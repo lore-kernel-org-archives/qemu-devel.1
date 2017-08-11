@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dgAwu-0005q6-5o
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:30:06 -0400
+	(envelope-from <diana.craciun@nxp.com>) id 1dgAyp-00082Q-Cr
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:32:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1dgAwq-00057S-0Y
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:30:04 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:37073)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1dgAwp-00056s-No
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:29:59 -0400
-Received: by mail-lf0-x244.google.com with SMTP id x16so2433087lfb.4
-	for <qemu-devel@nongnu.org>; Fri, 11 Aug 2017 07:29:58 -0700 (PDT)
-Date: Fri, 11 Aug 2017 16:29:54 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20170811142954.GN4859@toto>
-References: <1502438052-5117-1-git-send-email-frederic.konrad@adacore.com>
+	(envelope-from <diana.craciun@nxp.com>) id 1dgAyk-0006I2-UA
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:32:03 -0400
+From: Diana Madalina Craciun <diana.craciun@nxp.com>
+Date: Fri, 11 Aug 2017 14:31:52 +0000
+Message-ID: <AM3PR04MB06161BD9424CFE152E88E3BDFF890@AM3PR04MB0616.eurprd04.prod.outlook.com>
+References: <1495537965-4187-1-git-send-email-diana.craciun@nxp.com>
+	<20170525011034-mutt-send-email-mst@kernel.org>
+	<AM3PR04MB061619F6FDC53F7FD4C1DAE4FFF10@AM3PR04MB0616.eurprd04.prod.outlook.com>
+	<20170706023845-mutt-send-email-mst@kernel.org>
+	<AM3PR04MB0616507B6F0989360D582F37FFB20@AM3PR04MB0616.eurprd04.prod.outlook.com>
+	<20170731170217-mutt-send-email-mst@kernel.org>
+	<AM3PR04MB061656F255D688500AC8622BFFB20@AM3PR04MB0616.eurprd04.prod.outlook.com>
+	<20170801045857-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1502438052-5117-1-git-send-email-frederic.konrad@adacore.com>
-Subject: Re: [Qemu-devel] [PATCH V2 for-2.10] xlnx-qspi: add a property for
- mmio-execution
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] Add global device ID in virt machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,121 +29,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <frederic.konrad@adacore.com>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, dgilbert@redhat.com, quintela@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marcel@redhat.com" <marcel@redhat.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Mike Caraman <mike.caraman@nxp.com>, Laurentiu
+	Tudor <laurentiu.tudor@nxp.com>
 
-On Fri, Aug 11, 2017 at 09:54:12AM +0200, KONRAD Frederic wrote:
-> This adds mmio-exec property to workaround the migration bug.
-> When enabled the migration is blocked and will return an error.
-> 
-> Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
-
-Thanks Fred!
-
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-
-> 
-> V1 -> V2:
->   * changed mmio-exec to x-mmio-exec
-> ---
->  hw/ssi/xilinx_spips.c | 36 +++++++++++++++++++++++++++++++++---
->  1 file changed, 33 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-> index e833028..ef56d35 100644
-> --- a/hw/ssi/xilinx_spips.c
-> +++ b/hw/ssi/xilinx_spips.c
-> @@ -31,6 +31,8 @@
->  #include "hw/ssi/ssi.h"
->  #include "qemu/bitops.h"
->  #include "hw/ssi/xilinx_spips.h"
-> +#include "qapi/error.h"
-> +#include "migration/blocker.h"
->  
->  #ifndef XILINX_SPIPS_ERR_DEBUG
->  #define XILINX_SPIPS_ERR_DEBUG 0
-> @@ -139,6 +141,8 @@ typedef struct {
->  
->      uint8_t lqspi_buf[LQSPI_CACHE_SIZE];
->      hwaddr lqspi_cached_addr;
-> +    Error *migration_blocker;
-> +    bool mmio_execution_enabled;
->  } XilinxQSPIPS;
->  
->  typedef struct XilinxSPIPSClass {
-> @@ -500,12 +504,13 @@ static void xilinx_qspips_invalidate_mmio_ptr(XilinxQSPIPS *q)
->  {
->      XilinxSPIPS *s = &q->parent_obj;
->  
-> -    if (q->lqspi_cached_addr != ~0ULL) {
-> +    if ((q->mmio_execution_enabled) && (q->lqspi_cached_addr != ~0ULL)) {
->          /* Invalidate the current mapped mmio */
->          memory_region_invalidate_mmio_ptr(&s->mmlqspi, q->lqspi_cached_addr,
->                                            LQSPI_CACHE_SIZE);
-> -        q->lqspi_cached_addr = ~0ULL;
->      }
-> +
-> +    q->lqspi_cached_addr = ~0ULL;
->  }
->  
->  static void xilinx_qspips_write(void *opaque, hwaddr addr,
-> @@ -601,8 +606,13 @@ static void *lqspi_request_mmio_ptr(void *opaque, hwaddr addr, unsigned *size,
->                                      unsigned *offset)
->  {
->      XilinxQSPIPS *q = opaque;
-> -    hwaddr offset_within_the_region = addr & ~(LQSPI_CACHE_SIZE - 1);
-> +    hwaddr offset_within_the_region;
->  
-> +    if (!q->mmio_execution_enabled) {
-> +        return NULL;
-> +    }
-> +
-> +    offset_within_the_region = addr & ~(LQSPI_CACHE_SIZE - 1);
->      lqspi_load_cache(opaque, offset_within_the_region);
->      *size = LQSPI_CACHE_SIZE;
->      *offset = offset_within_the_region;
-> @@ -693,6 +703,15 @@ static void xilinx_qspips_realize(DeviceState *dev, Error **errp)
->      sysbus_init_mmio(sbd, &s->mmlqspi);
->  
->      q->lqspi_cached_addr = ~0ULL;
-> +
-> +    /* mmio_execution breaks migration better aborting than having strange
-> +     * bugs.
-> +     */
-> +    if (q->mmio_execution_enabled) {
-> +        error_setg(&q->migration_blocker,
-> +                   "enabling mmio_execution breaks migration");
-> +        migrate_add_blocker(q->migration_blocker, &error_fatal);
-> +    }
->  }
->  
->  static int xilinx_spips_post_load(void *opaque, int version_id)
-> @@ -716,6 +735,16 @@ static const VMStateDescription vmstate_xilinx_spips = {
->      }
->  };
->  
-> +static Property xilinx_qspips_properties[] = {
-> +    /* We had to turn this off for 2.10 as it is not compatible with migration.
-> +     * It can be enabled but will prevent the device to be migrated.
-> +     * This will go aways when a fix will be released.
-> +     */
-> +    DEFINE_PROP_BOOL("x-mmio-exec", XilinxQSPIPS, mmio_execution_enabled,
-> +                     false),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
->  static Property xilinx_spips_properties[] = {
->      DEFINE_PROP_UINT8("num-busses", XilinxSPIPS, num_busses, 1),
->      DEFINE_PROP_UINT8("num-ss-bits", XilinxSPIPS, num_cs, 4),
-> @@ -729,6 +758,7 @@ static void xilinx_qspips_class_init(ObjectClass *klass, void * data)
->      XilinxSPIPSClass *xsc = XILINX_SPIPS_CLASS(klass);
->  
->      dc->realize = xilinx_qspips_realize;
-> +    dc->props = xilinx_qspips_properties;
->      xsc->reg_ops = &qspips_ops;
->      xsc->rx_fifo_size = RXFF_A_Q;
->      xsc->tx_fifo_size = TXFF_A_Q;
-> -- 
-> 1.8.3.1
-> 
+On 08/01/2017 05:05 AM, Michael S. Tsirkin wrote:=0A=
+> On Mon, Jul 31, 2017 at 03:13:09PM +0000, Diana Madalina Craciun wrote:=
+=0A=
+>> On 07/31/2017 05:06 PM, Michael S. Tsirkin wrote:=0A=
+>>> On Mon, Jul 31, 2017 at 01:22:45PM +0000, Diana Madalina Craciun wrote:=
+=0A=
+>>>>>> If we are to use a value of 0 for the constant in case of PCI device=
+s,=0A=
+>>>>>> what happens if we have multiple PCI controllers?=0A=
+>>>>> I guess we'd use the PCI Segment number for that?=0A=
+>>>>>=0A=
+>>>>>=0A=
+>>>> Yes, we can use the PCI segment for this scenario. But this would mean=
+=0A=
+>>>> different solutions for the same problem. The main problem is that we=
+=0A=
+>>>> can have multiple entities in the system that are using MSIs (for now=
+=0A=
+>>>> PCI and NXP non-PCI bus infrastructure=0A=
+>>>> (https://emea01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2F=
+lwn.net%2FArticles%2F635905%2F&data=3D01%7C01%7Cdiana.craciun%40nxp.com%7C6=
+b0c6c879af64718a21908d4d81d534e%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0&sdat=
+a=3DbpYMMqajWzgzdbdQgy%2FUYR7y%2BswyvwE%2BqFzs7wdIkkA%3D&reserved=3D0). I g=
+uess that we may have other=0A=
+>>>> platform devices that are using MSIs in the future.=0A=
+>>>>=0A=
+>>>> Thanks,=0A=
+>>>> Diana=0A=
+>>>>=0A=
+>>>>=0A=
+>>> Don't have the time to explore NXP in depth, sorry - there's=0A=
+>>> a lot of complexity there.=0A=
+>>> Could you maybe stick some bits to specify bus type in there?=0A=
+>>> It just looks very wrong to push low level things like this=0A=
+>>> that users have no interest in up the stack.=0A=
+>>>=0A=
+>> Let's generalize the problem a little bit, the NXP details just does not=
+=0A=
+>> matter much. The problem we have is the following:=0A=
+>>=0A=
+>> The GIC-ITS, the ARM MSI controller is using deviceIDs in order to remap=
+=0A=
+>> the interrupts. Each device which is expected to send MSIs has a=0A=
+>> deviceID associated with it. These deviceIDs are configured into devices=
+=0A=
+>> by software/firmware. There is support in the device tree to specify the=
+=0A=
+>> correlation between requesterID and deviceID:=0A=
+>>=0A=
+>> "msi-map: Maps a Requester ID to an MSI controller and associated=0A=
+>>   msi-specifier data. The property is an arbitrary number of tuples of=
+=0A=
+>>   (rid-base,msi-controller,msi-base,length)"=0A=
+>> (https://emea01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fgi=
+t.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Ftorvalds%2Flinux.git%2Ftr=
+ee%2FDocumentation%2Fdevicetree%2Fbindings%2Fpci%2Fpci-msi.txt&data=3D01%7C=
+01%7Cdiana.craciun%40nxp.com%7C259982f3a83b4160083708d4d881d48a%7C686ea1d3b=
+c2b4c6fa92cd99c5c301635%7C0&sdata=3DQSRwrYcsTk9%2FgekD0YBYKvpWv05%2BXKiH2ab=
+Pp%2FtHpes%3D&reserved=3D0)=0A=
+>>=0A=
+>> Our problem is that we have to allocate these deviceIDs in QEMU as well=
+=0A=
+>> and we have to ensure that they are unique. Currently, for PCI, the=0A=
+>> assumption requesterID=3DdeviceID is made which will no longer be true i=
+n=0A=
+>> case other devices are added. So we need a way (preferable a general=0A=
+>> one) to allocate these IDs to different devices in the system in a=0A=
+>> consistent way which will ensure that two devices do not share the same =
+ID.=0A=
+> My question would be, do other types of devices that are there=0A=
+> right now have some kind of ID like the requester ID?=0A=
+> If so I would say just use that, and set high bits in the device ID=0A=
+> to specify the type (e.g. 00 for pci, etc).=0A=
+=0A=
+Would this mean extending the PCI requesterID usage as well? Or assume=0A=
+that it's 00 for PCI and no changes are needed? I understand that with=0A=
+this approach the allocation is  static: 00 for PCI, 01 for device type=0A=
+X, etc., so the situation when we have multiple controllers (PCI or=0A=
+whatever other devices) has to be solved differently. Wouldn't be this=0A=
+more complex?=0A=
+=0A=
+>=0A=
+>=0A=
+> IMHO if possible that is preferable to pushing this up to users.=0A=
+>=0A=
+>=0A=
+>> The reason I put this ID into the controller itself is because on real=
+=0A=
+>> hardware is actually programmed into the controller. It is needed (for=
+=0A=
+>> example) when the MSIs are sent.=0A=
+>>=0A=
+>> Thanks,=0A=
+>>=0A=
+>> Diana=0A=
+>>=0A=
+> IIUC what happens on real hardware is controller maps each requester ID=
+=0A=
+> (or presumably other source ID in the request) to the device ID,=0A=
+> and the mapping is internal to controller.=0A=
+> If you wanted a lot of flexibility then looks like you could pass this=0A=
+> mapping to controllers, but is it really necessary?=0A=
+> Why don't we build a mapping that's convenient for us?=0A=
+>=0A=
+>=0A=
+Thanks,=0A=
+=0A=
+Diana=0A=
+=0A=
