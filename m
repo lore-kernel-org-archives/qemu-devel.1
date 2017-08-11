@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dg62j-0006tj-OF
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:15:47 -0400
+	(envelope-from <berrange@redhat.com>) id 1dg69x-0001Zu-Dc
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:23:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dg62i-0005j8-Ah
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:15:45 -0400
-Date: Fri, 11 Aug 2017 10:15:04 +0100
+	(envelope-from <berrange@redhat.com>) id 1dg69v-0000Ig-Tv
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:23:13 -0400
+Date: Fri, 11 Aug 2017 10:22:52 +0100
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170811091504.GE2554@redhat.com>
+Message-ID: <20170811092252.GF2554@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <20170810160451.32723-1-berrange@redhat.com>
-	<20170810160451.32723-3-berrange@redhat.com>
-	<84729972-e3ab-676c-df66-4e28b754728d@redhat.com>
+	<20170810160451.32723-9-berrange@redhat.com>
+	<a9553758-f0b3-f8c8-2457-41c389203602@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <84729972-e3ab-676c-df66-4e28b754728d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/8] io: introduce a network socket
- listener API
+In-Reply-To: <a9553758-f0b3-f8c8-2457-41c389203602@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 8/8] sockets: fix parsing of ipv4/ipv6 opts
+ in parse_socket_addr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,102 +29,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eric Blake <eblake@redhat.com>
 Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org
 
-On Thu, Aug 10, 2017 at 01:12:25PM -0500, Eric Blake wrote:
+On Thu, Aug 10, 2017 at 01:35:15PM -0500, Eric Blake wrote:
 > On 08/10/2017 11:04 AM, Daniel P. Berrange wrote:
-> > The existing QIOChannelSocket class provides the ability to
-> > listen on a single socket at a time. This patch introduces
-> > a QIONetListener class that provides a higher level API
-> > concept around listening for network services, allowing
-> > for listening on multiple sockets.
+> > The inet_parse() function looks for 'ipv4' and 'ipv6'
+> > flags, but only treats them as bare bool flags. The normal
+> > QemuOpts parsing would allow on/off values to be set too.
+> > 
+> > This updated inet_parse() so that its handling of the
+> 
+> s/updated/updates/ ?
+> 
+> > 'ipv4' and 'ipv6' flags matches that done by QemuOpts.
+> 
+> Do we have a regression compared to any previous version, such that this
+> patch might be considered 2.10 material?  Offhand, though, I think it's
+> fine as the end of your series, waiting for 2.11.
+
+Well this code has been like this for years, so waiting to fix
+it in 2.11 isn't making our life any worse than it already
+us.
+
+The original code merely looks for a prefix so treats
+
+   ,ipv6
+   ,ipv6dumpsterfire
+   ,ipv6=off
+   ,ipv6=fishfood
+   ,ipv6<anything>
+
+as all meaning 'true'. The new code only treats ,ipv6 and ,ipv6=on
+as meaning true, or ipv6=off as false, rejecting all others.
+
+So yes, that is technically a regression, but IMHO it is a desirable
+regression :-)
+
+> 
 > > 
 > > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > > ---
+> >  tests/test-sockets-proto.c | 13 -------------
+> >  util/qemu-sockets.c        | 36 ++++++++++++++++++++++++++++++++----
+> >  2 files changed, 32 insertions(+), 17 deletions(-)
+> > 
 > 
-> > +++ b/include/io/net-listener.h
-> > @@ -0,0 +1,174 @@
-> > +/*
-> > + * QEMU I/O network listener
-> > + *
-> > + * Copyright (c) 2016 Red Hat, Inc.
-> 
-> Want to add 2017?
-> 
-> At least it's covered by MAINTAINERS :)
-> 
-> 
-> > +/**
-> > + * qio_net_listener_is_disconnected:
-> > + * @listener: the network listener object
-> > + *
-> > + * Determine if the listener is connected to any socket
-> > + * channels
-> > + *
-> > + * Returns: TRUE if connected, FALSE otherwise
-> > + */
-> > +gboolean qio_net_listener_is_disconnected(QIONetListener *listener);
-> > +
-> 
-> Must it return gboolean, or is bool sufficient?
-
-bool is fine.
-
-> 
-> TRUE if connected for a function named 'is_disconnected' sounds
-> backwards.  Avoid the double negative, name it:
-> 
-> qio_net_listener_is_connected(), returning true if connected
-
-The docs are wrong, as you noticed below
-
-> 
-> > +++ b/io/net-listener.c
-> > @@ -0,0 +1,315 @@
-> > +/*
-> > + * QEMU network listener
-> > + *
-> > + * Copyright (c) 2016 Red Hat, Inc.
-> 
-> More 2017.  Probably for the whole series :)
-> 
-> 
-> > +static gboolean qio_net_listener_channel_func(QIOChannel *ioc,
-> > +                                              GIOCondition condition,
-> > +                                              gpointer opaque)
+> > +++ b/util/qemu-sockets.c
+> > @@ -616,6 +616,25 @@ err:
+> >  }
+> >  
+> >  /* compatibility wrapper */
+> > +static int inet_parse_flag(const char *flagname, const char *optstr, bool *val,
+> > +                           Error **errp)
 > > +{
-> 
-> Again, can we use bool instead of gboolean?
-
-Yes
-
-> > +    for (i = 0; i < nresaddrs; i++) {
-> > +        QIOChannelSocket *sioc = qio_channel_socket_new();
+> > +    char *end;
+> > +    size_t len;
 > > +
-> > +        if (qio_channel_socket_listen_sync(sioc, resaddrs[i],
-> > +                                           err ? NULL : &err) == 0) {
-> > +            success = true;
-> > +        }
+> > +    end = strstr(optstr, ",");
 > 
-> This says that as long as at least one address connected, we are
-> successful...
+> Do we need to check that we are not landing on a ',,' escape that would
+> make QemuOpts behave differently?  [That is, ipv4=on,,garbage should be
+> parsed as setting ipv4 to 'on,garbage' (which is not valid), and NOT
+> setting 'ipv4=on' followed by the 'garbage' or ',garbage' key - while
+> the key named 'garbage' would fail, there might be other key names where
+> the distinction matters for catching command line typos]
 > 
-> > +
-> > +        qio_net_listener_add(listener, sioc);
-> 
-> ...but this adds sioc as a listener regardless of whether listen_sync()
-> succeeded.  Is that right?
+> But if this is unrelated to QemuOpts escape parsing, it seems okay.
 
-No, it should skip the add
+Ultimately this code should probably be converted to actually use
+QemuOpts. The existing code already allows ipv4=on,,garbage but as
+you point out I've not detected that case here. Should be easye
+enough to fix though.
 
 > 
-> 
-> > +gboolean qio_net_listener_is_disconnected(QIONetListener *listener)
-> > +{
-> > +    return listener->disconnected;
-> 
-> Documentation says it returns true on connected, but here you are
-> returning true on disconnected?
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Bad docs.
+
 
 Regards,
 Daniel
