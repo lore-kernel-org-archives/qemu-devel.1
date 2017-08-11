@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dg8YW-0002pu-Th
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 07:56:46 -0400
+	(envelope-from <famz@redhat.com>) id 1dg8gU-00068o-NW
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 08:05:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dg8YT-0006tI-Pc
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 07:56:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43060)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dg8YT-0006t0-Jp
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 07:56:41 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 573DD2CE97D
-	for <qemu-devel@nongnu.org>; Fri, 11 Aug 2017 11:56:40 +0000 (UTC)
-References: <20170811114723.12044-1-cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <9cd0cd32-5c2d-4c07-38fd-ca63ba204abf@redhat.com>
-Date: Fri, 11 Aug 2017 13:56:37 +0200
+	(envelope-from <famz@redhat.com>) id 1dg8gN-0003PM-R8
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 08:04:58 -0400
+Date: Fri, 11 Aug 2017 20:04:35 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170811120435.GB23309@lemon.lan>
+References: <CAATJJ0Jgyak9c=wYknret5y=yjfzcjiVw3221wX=SB2+am8H4A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170811114723.12044-1-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] boot-serial-test: fallback to kvm
- accelerator
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAATJJ0Jgyak9c=wYknret5y=yjfzcjiVw3221wX=SB2+am8H4A@mail.gmail.com>
+Subject: Re: [Qemu-devel] migration issue with qemu 2.10-rc2: QEMU command
+ 'nbd-server-add': Block node is read-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,45 +23,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+To: Christian Ehrhardt <christian.ehrhardt@canonical.com>, kwolf@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 11.08.2017 13:47, Cornelia Huck wrote:
-> Currently, at least x86_64 and s390x support building with --disable-tcg.
-> Instead of forcing tcg (which causes the test to fail on such builds),
-> allow to use kvm as well.
+On Fri, 08/11 13:07, Christian Ehrhardt wrote:
+> Hi,
+> testing on 2.10-rc2 I ran into an issue around:
+>   unable to execute QEMU command 'nbd-server-add': Block node is read-only
 > 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
+> ### TL;DR ###
+> - triggered by livbirt driven live migration with --copy-storage-all
+> - buils down to nbd_server_add failing
+> - can be reproduced on a single system without libvirt
+> - last known working (so far) was qemu 2.8
 > 
-> Not sure who should merge this. I can add it to the s390 tree if nobody
-> else takes it.
-
-Maybe CC: Paolo for "Character devices"? But sure, if nobody else takes
-it, it should be fine in the s390 tree, too.
-
-> ---
->  tests/boot-serial-test.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> Simple repro:
+> $ qemu-img create -f qcow2 /tmp/test.qcow2 100M
+> $ qemu-system-x86_64 -S -m 512 -smp 1 -nodefaults --nographic -monitor
+> stdio -drive
+> file=/tmp/test.qcow2,format=qcow2,if=none,id=drive-virtio-disk0 -incoming
+> defer
+> QEMU 2.9.92 monitor - type 'help' for more information
+> (qemu) warning: TCG doesn't support requested feature: CPUID.01H:ECX.vmx
+> [bit 5]
+> nbd_server_start 0.0.0.0:49153
+> (qemu) nbd_server_add -w drive-virtio-disk0
+> Block node is read-only
 > 
-> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-> index 11f48b049c..38664a0594 100644
-> --- a/tests/boot-serial-test.c
-> +++ b/tests/boot-serial-test.c
-> @@ -78,7 +78,8 @@ static void test_machine(const void *data)
->      fd = mkstemp(tmpname);
->      g_assert(fd != -1);
->  
-> -    args = g_strdup_printf("-M %s,accel=tcg -chardev file,id=serial0,path=%s"
-> +    args = g_strdup_printf("-M %s,accel=tcg:kvm "
-> +                           "-chardev file,id=serial0,path=%s"
->                             " -no-shutdown -serial chardev:serial0 %s",
->                             test->machine, tmpname, test->extra);
+> ### Details ###
+> 
+> Trigger:
+> virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh://
+> 10.22.69.61/system
+> 
+> Setup:
+> - Two systems without shared storage
+> - An equal image is synced before the test, so it would only migrate
+> minimal remaining changes
+> => Only the --copy-storage-all case triggers this, other migrations work as
+> far as I tested.
+> => No related apparmor denials
+> 
+> The last combination I knew to be successful was libvirt 3.5 and qemu 2.8.
+> So I Downgraded libvirt (but kept qemu) and retest.
+> => Still an issue
+> => So it is a qemu 2.10 issue and not libvirt 3.6
+> Continuing with libvirt 3.6 to have latest updates.
+> 
+> On the migration target I see the following in the log:
+> libvirtd[11829]: 2017-08-11 08:51:49.283+0000: 11842: warning :
+> qemuDomainObjTaint:4545 : Domain id=2 name='kvmguest-artful-normal'
+> uuid=b6f4cdab-77b0-43b1-933d-9683567f3a89 is tainted: high-privileges
+> libvirtd[11829]: 2017-08-11 08:51:49.386+0000: 11842: error :
+> qemuMonitorJSONCheckError:389 : internal error: unable to execute QEMU
+> command 'nbd-server-add': Block node is read-only
+> 
+> I checked the images on source (active since the guest is runngin) and
+> target (inactive and out of sync copies)
+> source $ virsh domblklist kvmguest-artful-normal
+> Target     Source
+> ------------------------------------------------
+> vda        /var/lib/uvtool/libvirt/images/kvmguest-artful-normal.qcow
+> vdb        /var/lib/uvtool/libvirt/images/kvmguest-artful-normal-ds.qcow
+> 
+> But when checking details on the source I didn't get any being blocked:
+> qemu-img info --backing-chain
+> /var/lib/uvtool/libvirt/images/kvmguest-artful-normal.qcow
+> qemu-img: Could not open
+> '/var/lib/uvtool/libvirt/images/kvmguest-artful-normal.qcow': Failed to get
+> shared "write" lock
+> Is another process using the image?
+> 
+> On the target these are inactive, so the inquiry works (content is the same
+> anyway).
+> All files are there and the backing chain looks correct.
+> 
+> I'm not sure if being unable to qemu-img while running is considered an
+> issue of its own, but this could be related to:
+> (qemu) commit 244a5668106297378391b768e7288eb157616f64
+> Author: Fam Zheng <famz@redhat.com>
+>     file-posix: Add image locking to perm operations
+> 
+> 
+> The add should be from libvirt
+>  - the chain here should be
+>    qemuMigrationPrepareAny -> qemuMigrationStartNBDServer ->
+> qemuMonitorNBDServerAdd -> qemuMonitorJSONNBDServerAdd
+>  - there is a debug statement in qemuMonitorNBDServerAdd
+> VIR_DEBUG("deviceID=%s", deviceID);
+>    This shows it is the nbd sevrer for the first disk
+>  - seems libvirt adding a nbd server for the copy-storage-all
+>  - that qmp fails in qemu
+>  - afterwards all else in the logs is libvirt cleaning up and killing the
+> qemu that was prepped (with -S) on
+>    the target
+> 
+> With virt debug and gdb I catched the device for the qmp command and stop
+> it while doing so.
+> debug : qemuMonitorNBDServerStart:3993 : host=:: port=49153
+> debug : qemuMonitorNBDServerStart:3995 : mon:0x7f6d4c016500
+> vm:0x7f6d4c011580 json:1 fd:27
+> debug : qemuMonitorNBDServerAdd:4006 : deviceID=drive-virtio-disk0
+> debug : qemuMonitorNBDServerAdd:4008 : mon:0x7f6d4c016500 vm:0x7f6d4c011580
+> json:1 fd:27
+> [...]
+> debug : qemuMonitorJSONCheckError:378 : unable to execute QEMU command
+> {"execute":"nbd-server-add","arguments":{"device":"drive-virtio-disk0","writable":true},"id":"libvirt-24"}:
+> {"id":"libvirt-24","error":{"class":"GenericError","desc":"Block node is
+> read-only"}}
+> 
+> 
+> Reducing the qemu call libvirt does to some basiscs that don't need libvirt
+> I tried to reproduce.
+> At the -S starting point that the migration uses just as well the devices
+> are already there, going on in monitor from there:
+> (qemu) info block
+> drive-virtio-disk0 (#block164):
+> /var/lib/uvtool/libvirt/images/kvmguest-artful-normal.qcow (qcow2)
+>     Attached to:      /machine/peripheral/virtio-disk0/virtio-backend
+>     Cache mode:       writeback
+>     Backing file:
+> /var/lib/uvtool/libvirt/images/x-uvt-b64-Y29tLnVidW50dS5jbG91ZC5kYWlseTpzZXJ2ZXI6MTcuMTA6YW1kNjQgMjAxNzA4MTA=
+> (chain depth: 1)
+> 
+> drive-virtio-disk1 (#block507):
+> /var/lib/uvtool/libvirt/images/kvmguest-artful-normal-ds.qcow (qcow2)
+>     Attached to:      /machine/peripheral/virtio-disk1/virtio-backend
+>     Cache mode:       writeback
+> 
+> # starting the server
+> (qemu) nbd_server_start 0.0.0.0:49153
+> # This gave me a valid server
+> tcp        0      0 0.0.0.0:49153           0.0.0.0:*               LISTEN
+>      0          2328989    13593/qemu-system-x
+> 
+> # adding the disk
+> (qemu) nbd_server_add -w drive-virtio-disk0
+> Block node is read-only
+> 
+> Ok, so reproducible without libvirt on the receiving side.
+> Simplifying that to a smaller test:
+> 
+> $ qemu-img create -f qcow2 /tmp/test.qcow2 100M
+> $ qemu-system-x86_64 -S -m 512 -smp 1 -nodefaults --nographic -monitor
+> stdio -drive
+> file=/tmp/test.qcow2,format=qcow2,if=none,id=drive-virtio-disk0 -incoming
+> defer
+> QEMU 2.9.92 monitor - type 'help' for more information
+> (qemu) warning: TCG doesn't support requested feature: CPUID.01H:ECX.vmx
+> [bit 5]
+> nbd_server_start 0.0.0.0:49153
+> (qemu) nbd_server_add -w drive-virtio-disk0
+> Block node is read-only
+> (qemu) quit
+> 
+> It might be reasonable to keep the -device section to specify how it is
+> included.
 
-I think I'd prefer "kvm:tcg" here to speed up the test if possible.
+This is actually caused by
 
-The reason for only using "tcg" in the past was that there was an
-annoying warning message "kvm accelerator not found" or so when also
-specifying kvm here, but that has been fixed just recently, so "kvm:tcg"
-should be fine now here, too.
+commit 9c5e6594f15b7364624a3ad40306c396c93a2145
+Author: Kevin Wolf <kwolf@redhat.com>
+Date:   Thu May 4 18:52:40 2017 +0200
 
- Thomas
+    block: Fix write/resize permissions for inactive images
+
+which forbids "nbd_server_add -w" in the "inactive" state set by -incoming.
+
+But I'm not sure what is a proper fix. Maybe revert the bdrv_is_writable() part
+of the commit? Kevin?
+
+Fam
