@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dg8Lr-0003Lj-Mz
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 07:43:41 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dg8MO-0003lC-HR
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 07:44:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dg8Lq-0000hw-6r
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 07:43:39 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170809070357.28723-1-david@gibson.dropbear.id.au>
-	<CAFEAcA_n88x0w1cVirQ61h+NOrvX1V7bXD1LCASVGyUZU=qDgg@mail.gmail.com>
-	<20170811085157.GY13670@umbus.fritz.box>
-	<CAFEAcA91j7zA2ptiLrcYL+cVF41_SJ2p0hL8Z=ejBiaqjfA--Q@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8f2f258e-6c14-a1df-8172-d20e51a70354@amsat.org>
-Date: Fri, 11 Aug 2017 08:43:27 -0300
+	(envelope-from <cohuck@redhat.com>) id 1dg8MK-0000xQ-Lk
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 07:44:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52644)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dg8MK-0000x4-Ed
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 07:44:08 -0400
+Date: Fri, 11 Aug 2017 13:43:55 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170811134355.0b0dfe58.cohuck@redhat.com>
+In-Reply-To: <8783416d-367e-3a7c-76b5-eb979b0c8625@redhat.com>
+References: <1502431076-22849-1-git-send-email-thuth@redhat.com>
+	<20170811114922.2edda3a7.cohuck@redhat.com>
+	<20170811121905.22bdc575.cohuck@redhat.com>
+	<8783416d-367e-3a7c-76b5-eb979b0c8625@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA91j7zA2ptiLrcYL+cVF41_SJ2p0hL8Z=ejBiaqjfA--Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 0/6] ppc patch queue 2017-08-09
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.11 0/2] Improvements for the pxe
+ tester
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Alexander Graf <agraf@suse.de>, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Victor Kaplansky <victork@redhat.com>
 
-Hi David, Peter,
+On Fri, 11 Aug 2017 12:52:54 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-On 08/11/2017 05:59 AM, Peter Maydell wrote:
-> On 11 August 2017 at 09:51, David Gibson <david@gibson.dropbear.id.au> wrote:
->> On Thu, Aug 10, 2017 at 01:47:03PM +0100, Peter Maydell wrote:
->>> On 9 August 2017 at 08:03, David Gibson <david@gibson.dropbear.id.au> wrote:
->>>> I haven't completed a Travis build for this, which is part of my usual
->>>> test regime, since the first dozen or so Travis builds are failing
->>>> more often than not on master as well.  I don't know why this is -
->>>> seems to be failing some of the x86 tests.
->>>
->>> Doesn't look much worse than usual to me -- of the last 24 travis
->>> builds for master 4 failed and 20 passed.
->>
->> Uh.. that's not been my experience.  I was a bit unclear in my
->> description, though.  Until maybe a week and a half ago I found the
->> Travis build was fairly reliable, though there were occasional
->> transien failures.  Now, essentially every Travis build is failing for
->> me.  Specifically most of the first dozen or so of the batch of build
->> configurations on Travis fail (that's "X" not "!").  These seem to be
->> transient failures in the sense that if I rebuild enough times they'll
->> eventually pass, but unlike earlier when the builds would suceed most
->> of the time, they now seem to succeed at best around 1/3 of the time
->> (that's ~1/3 of the time for each configuration sub-build, so with a
->> dozen or so apparently affected that means a complete passing build
->> essentially never).
->>
->> See for example https://travis-ci.org/dgibson/qemu/builds/263312174
->> where 5 subbuilds have failed (which is relatively few).  In each case
->> the failing error seems to be something like:
->>
->> ERROR:tests/vhost-user-test.c:807:test_connect_fail: child process (/i386/vhost-user/connect-fail/subprocess [55883]) failed unexpectedly
->>
->> Seems to be i386 in some cases and x86_64 in others.
+> On 11.08.2017 12:19, Cornelia Huck wrote:
 
-Yes, I'm experiencing the same (but a bit more frequent with i386 than 
-x86_64).
+> > A quick test on x86_64 with --disable-tcg showed no further problems
+> > than boot-serial-test, so at least it's only the one for now (and it
+> > might make sense to simply use accel=tcg:kvm for it).  
+> 
+> $ grep -rl accel=tcg tests/
+> tests/pnv-xscom-test.c
+> tests/boot-serial-test.c
+> tests/prom-env-test.c
+> 
+> ... so the other problematic tests are for ppc only - which does not
+> support --disable-tcg yet.
 
-> Weird. https://travis-ci.org/qemu/qemu/builds is the master
-> build history and as you can see it's mostly greens.
-> Not sure why your setup would be significantly worse:
-> maybe one of the travis submaintainers has an idea.
-> It could just be our vhost-user-test is flaky but I don't
-> know why that should hit you much more than master...
-
-No clue, I started to think repositories with less frequent builds are 
-deployed on faster hardware.
-
-Will keep the list informed if there are some improvements.
-
-Regards,
-
-Phil.
+I'll send a patch for boot serial, then. You probably know more about
+whether the ppc tests would make sense with kvm as well than I do :)
