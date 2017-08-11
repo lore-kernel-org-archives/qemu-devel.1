@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dg72E-0003XH-1n
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 06:19:19 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dg7Mv-0003jd-Sl
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 06:40:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dg72A-0005sx-N3
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 06:19:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44262)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dg72A-0005sj-BV
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 06:19:14 -0400
-Date: Fri, 11 Aug 2017 12:19:05 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170811121905.22bdc575.cohuck@redhat.com>
-In-Reply-To: <20170811114922.2edda3a7.cohuck@redhat.com>
-References: <1502431076-22849-1-git-send-email-thuth@redhat.com>
-	<20170811114922.2edda3a7.cohuck@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1dg7Mq-0000XD-P1
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 06:40:41 -0400
+Date: Fri, 11 Aug 2017 11:32:11 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170811103211.GD4568@stefanha-x1.localdomain>
+References: <20170811015749.20365-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.11 0/2] Improvements for the pxe
- tester
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="GyRA7555PLgSTuth"
+Content-Disposition: inline
+In-Reply-To: <20170811015749.20365-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] nbd: Fix trace message for
+ disconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +24,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Victor Kaplansky <victork@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-On Fri, 11 Aug 2017 11:49:22 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
 
-> On Fri, 11 Aug 2017 07:57:54 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
-> 
-> > The first patch improves the buffer handling in the pxe tester a
-> > little bit by allocating a separate buffer on the heap for each
-> > architecture. This also gets rid of the huge pre-initialized
-> > array in the tester, shrinking the size of the executable by
-> > half of a megabyte!
-> > The second patch adds s390x support to the pxe tester. Starting
-> > with QEMU 2.10, the guest firmware on s390x can now net-boot via
-> > TFTP, too, so we can automatically test this code in the pxe tester.
-> > 
-> > v2: Adressed Cornelia's review feedback from the first version, e.g.:
-> >  - Use g_malloc0() instead of g_malloc()
-> >  - Use sizeof with parentheses
-> > 
-> > Thomas Huth (2):
-> >   tests/boot-sector: Do not overwrite the x86 buffer on other
-> >     architectures
-> >   tests/pxe: Check virtio-net-ccw on s390x
-> > 
-> >  tests/Makefile.include |  1 +
-> >  tests/boot-sector.c    | 61 +++++++++++++++++++++++++++++++++++++-------------
-> >  tests/pxe-test.c       |  7 ++++++
-> >  3 files changed, 54 insertions(+), 15 deletions(-)
-> >   
-> 
-> Haven't reviewed the updates yet, but tried it out (on my laptop and on
-> a z/VM guest). Laptop went fine; on the z/VM guest, I forgot to turn on
-> vm.allocate_pgste at first:
-> 
-> TEST: tests/pxe-test... (pid=56084)
->   /s390x/pxe/virtio-ccw:                                               ioctl(KVM_CREATE_VM) failed: 22 Invalid argument
-> Host kernel setup problem detected. Please verify:
-> - for kernels supporting the switch_amode or user_mode parameters, whether
->   user space is running in primary address space
-> - for kernels supporting the vm.allocate_pgste sysctl, whether it is enabled
-> qemu-system-s390x: failed to initialize KVM: Invalid argument
-> qemu-system-s390x: Back to tcg accelerator
-> OK
-> PASS: tests/pxe-test
-> 
-> It does the correct fallback (the need for allocate_pgste will go away
-> with future kernels), so this is fine. However, it prompted me to test
-> with --disable-tcg:
-> 
-> TEST: tests/boot-serial-test... (pid=60499)
->   /s390x/boot-serial/s390-ccw-virtio:                                  qemu-system-s390x: -machine accel=tcg: No accelerator found
-> socket_accept failed: Resource temporarily unavailable
-> **
-> ERROR:/root/git/qemu/tests/libqtest.c:212:qtest_init_without_qmp_handshake: assertion failed: (s->fd >= 0 && s->qmp_fd >= 0)
-> FAIL
-> GTester: last random seed: R02S83c8a1860bbd8c2658647407c7070b7e
-> (pid=60503)
-> FAIL: tests/boot-serial-test
-> 
-> There are probably more tests that rely on tcg always being available,
-> which is no longer true. (Also, the boot-serial test should probably
-> check if qemu even started rather than run into in a timeout.)
-> 
-> [Your patches are fine, but I think we really need to consider tests
-> and accelerators.]
+--GyRA7555PLgSTuth
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-A quick test on x86_64 with --disable-tcg showed no further problems
-than boot-serial-test, so at least it's only the one for now (and it
-might make sense to simply use accel=tcg:kvm for it).
+On Thu, Aug 10, 2017 at 08:57:48PM -0500, Eric Blake wrote:
+> NBD_CMD_DISC is a disconnect request, not a data discard request.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>=20
+> Although this is not 2.10 material in isolation (it is only a
+> bad trace message), I don't mind including it in a larger pull
+> request; I'm still planning to fix the issue of a client hanging
+> on a malicious server in time for -rc3 (whether via Vladimir's
+> patch or a smaller one that I'm testing locally).
+>=20
+>  nbd/common.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--GyRA7555PLgSTuth
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZjYerAAoJEJykq7OBq3PIwSUH/A1hRUXUuXxUKMo2XrcEJEsE
+0AQ2HRhbasUlb9IrxFJeoAS58dbJzVm10Ao5b66Pu8VV94AB9J3lxQFsWEc3xNpl
+gmL6hSO1ozf28LSVJFdan0cLWCfuaTa5ONkAG+p5o1zEDk7aL39NsrfTFC9lhpgA
+hnCYiRktnWC+S4RrYHH3Md2p8HGfftUFkn/VguP7xj5EGW4XYbNoe5YaKxoJygdA
+QGK04NPQGAsWWS6VV+LeoruqrR334wEuQGH6rU/G2bwC+H7FVo1K0kq2RVv0NxPM
+8xtgktBhb4laSr/4xKWuQtnOjbchSMLG15/lH9Iw4yZin/KFuR0BEO9Kv39L5kc=
+=6dgY
+-----END PGP SIGNATURE-----
+
+--GyRA7555PLgSTuth--
