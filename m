@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dg4fK-0001te-Op
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 03:47:32 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dg4gj-0002vG-Oo
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 03:48:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dg4fG-0003I7-Q7
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 03:47:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49312)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dg4fG-0003Hq-GS
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 03:47:26 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Fri, 11 Aug 2017 09:46:52 +0200
-Message-Id: <20170811074652.31474-6-david@redhat.com>
-In-Reply-To: <20170811074652.31474-1-david@redhat.com>
-References: <20170811074652.31474-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 5/5] target/s390x: cleanup cpu.h
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dg4gg-0003lu-Jj
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 03:48:57 -0400
+References: <20170811023759.26390-1-eblake@redhat.com>
+	<20170811023759.26390-2-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <29dc6e29-7bbc-2c81-22cc-61db4e8ac609@virtuozzo.com>
+Date: Fri, 11 Aug 2017 10:48:48 +0300
+MIME-Version: 1.0
+In-Reply-To: <20170811023759.26390-2-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 1/2] nbd: Drop connection if broken server
+ is detected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,183 +25,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-Let's reshuffle the function prototypes so we get a cleaner outline
-of the files.
+11.08.2017 05:37, Eric Blake wrote:
+> As soon as the server is sending us garbage, we should quit
+> trying to send further messages to the server, and allow all
+> pending coroutines for any remaining replies to error out.
+> Failure to do so can let a malicious server cause the client
+> to hang, for example, if the server sends an invalid magic
+> number in its response.
+>
+> Reported by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>   block/nbd-client.c | 9 +++++++--
+>   1 file changed, 7 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/nbd-client.c b/block/nbd-client.c
+> index 25dd28406b..802d50b636 100644
+> --- a/block/nbd-client.c
+> +++ b/block/nbd-client.c
+> @@ -68,7 +68,8 @@ static void nbd_teardown_connection(BlockDriverState *bs)
+>
+>   static coroutine_fn void nbd_read_reply_entry(void *opaque)
+>   {
+> -    NBDClientSession *s = opaque;
+> +    BlockDriverState *bs = opaque;
+> +    NBDClientSession *s = nbd_get_client_session(bs);
+>       uint64_t i;
+>       int ret;
+>       Error *local_err = NULL;
+> @@ -107,8 +108,12 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+>           qemu_coroutine_yield();
+>       }
+>
+> +    s->reply.handle = 0;
+>       nbd_recv_coroutines_enter_all(s);
+>       s->read_reply_co = NULL;
+> +    if (ret < 0) {
+> +        nbd_teardown_connection(bs);
+> +    }
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/cpu.h | 140 ++++++++++++++++++++++++++---------------------------
- 1 file changed, 70 insertions(+), 70 deletions(-)
+what if it happens in parallel with nbd_co_send_request? 
+nbd_teardown_connectin destroys s->ioc, nbd_co_send_requests
+checks s->ioc only once and then calls nbd_send_request (which is 
+finally nbd_rwv and may yield). I think nbd_rwv is not
+prepared to sudden destruction of ioc..
 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index dc1eb77..f24688f 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -392,47 +392,6 @@ static inline void cpu_get_tb_cpu_state(CPUS390XState* env, target_ulong *pc,
- #define PER_CODE_EVENT_STORE_REAL      0x0800
- #define PER_CODE_EVENT_NULLIFICATION   0x0100
- 
--S390CPU *cpu_s390x_init(const char *cpu_model);
--S390CPU *s390x_new_cpu(const char *cpu_model, int64_t id, Error **errp);
--
--/* you can call this signal handler from your SIGBUS and SIGSEGV
--   signal handlers to inform the virtual CPU of exceptions. non zero
--   is returned if the signal was handled by the virtual CPU.  */
--int cpu_s390x_signal_handler(int host_signum, void *pinfo,
--                           void *puc);
--
--
--#ifndef CONFIG_USER_ONLY
--
--void s390_enable_css_support(S390CPU *cpu);
--int s390_virtio_hypercall(CPUS390XState *env);
--int s390_get_clock(uint8_t *tod_high, uint64_t *tod_low);
--int s390_set_clock(uint8_t *tod_high, uint64_t *tod_low);
--
--S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
--unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu);
--
--void gtod_save(QEMUFile *f, void *opaque);
--int gtod_load(QEMUFile *f, void *opaque, int version_id);
--
--/* service interrupts are floating therefore we must not pass an cpustate */
--void s390_sclp_extint(uint32_t parm);
--
--#else
--static inline unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu)
--{
--    return 0;
--}
--#endif
--
--extern void subsystem_reset(void);
--
--#define cpu_init(model) CPU(cpu_s390x_init(model))
--#define cpu_signal_handler cpu_s390x_signal_handler
--
--void s390_cpu_list(FILE *f, fprintf_function cpu_fprintf);
--#define cpu_list s390_cpu_list
--
- #define EXCP_EXT 1 /* external interrupt */
- #define EXCP_SVC 2 /* supervisor call (syscall) */
- #define EXCP_PGM 3 /* program interruption */
-@@ -652,39 +611,10 @@ struct sysib_322 {
- /* SIGP order code mask corresponding to bit positions 56-63 */
- #define SIGP_ORDER_MASK 0x000000ff
- 
--int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
--
--int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
--                         int len, bool is_write);
--
--#define s390_cpu_virt_mem_read(cpu, laddr, ar, dest, len)    \
--        s390_cpu_virt_mem_rw(cpu, laddr, ar, dest, len, false)
--#define s390_cpu_virt_mem_write(cpu, laddr, ar, dest, len)       \
--        s390_cpu_virt_mem_rw(cpu, laddr, ar, dest, len, true)
--#define s390_cpu_virt_mem_check_write(cpu, laddr, ar, len)   \
--        s390_cpu_virt_mem_rw(cpu, laddr, ar, NULL, len, true)
--
- /* from s390-virtio-ccw */
- #define MEM_SECTION_SIZE             0x10000000UL
- #define MAX_AVAIL_SLOTS              32
- 
--/* automatically detect the instruction length */
--#define ILEN_AUTO                   0xff
--void program_interrupt(CPUS390XState *env, uint32_t code, int ilen);
--
--int s390_set_memory_limit(uint64_t new_limit, uint64_t *hw_limit);
--void s390_cmma_reset(void);
--int s390_cpu_restart(S390CPU *cpu);
--int s390_get_memslot_count(KVMState *s);
--void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
--                       uint32_t io_int_parm, uint32_t io_int_word);
--void s390_crw_mchk(void);
--int s390_assign_subch_ioeventfd(EventNotifier *notifier,
--                                              uint32_t sch_id, int vq,
--                                              bool assign);
--void s390_crypto_reset(void);
--bool s390_get_squash_mcss(void);
--
- /* machine check interruption code */
- 
- /* subclasses */
-@@ -730,4 +660,74 @@ bool s390_get_squash_mcss(void);
- #define MCIC_VB_CT 0x0000000000020000ULL
- #define MCIC_VB_CC 0x0000000000010000ULL
- 
-+/* cpu.c */
-+int s390_get_clock(uint8_t *tod_high, uint64_t *tod_low);
-+int s390_set_clock(uint8_t *tod_high, uint64_t *tod_low);
-+void s390_crypto_reset(void);
-+bool s390_get_squash_mcss(void);
-+int s390_get_memslot_count(KVMState *s);
-+int s390_set_memory_limit(uint64_t new_limit, uint64_t *hw_limit);
-+void s390_cmma_reset(void);
-+int s390_cpu_restart(S390CPU *cpu);
-+void s390_enable_css_support(S390CPU *cpu);
-+int s390_assign_subch_ioeventfd(EventNotifier *notifier,
-+                                              uint32_t sch_id, int vq,
-+                                              bool assign);
-+#ifndef CONFIG_USER_ONLY
-+unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu);
-+#else
-+static inline unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu)
-+{
-+    return 0;
-+}
-+#endif /* CONFIG_USER_ONLY */
-+
-+
-+/* cpu_models.c */
-+void s390_cpu_list(FILE *f, fprintf_function cpu_fprintf);
-+#define cpu_list s390_cpu_list
-+
-+
-+/* helper.c */
-+S390CPU *cpu_s390x_init(const char *cpu_model);
-+#define cpu_init(model) CPU(cpu_s390x_init(model))
-+S390CPU *s390x_new_cpu(const char *cpu_model, int64_t id, Error **errp);
-+/* you can call this signal handler from your SIGBUS and SIGSEGV
-+   signal handlers to inform the virtual CPU of exceptions. non zero
-+   is returned if the signal was handled by the virtual CPU.  */
-+int cpu_s390x_signal_handler(int host_signum, void *pinfo,
-+                           void *puc);
-+#define cpu_signal_handler cpu_s390x_signal_handler
-+
-+
-+/* interrupt.c */
-+void s390_crw_mchk(void);
-+void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
-+                       uint32_t io_int_parm, uint32_t io_int_word);
-+/* automatically detect the instruction length */
-+#define ILEN_AUTO                   0xff
-+void program_interrupt(CPUS390XState *env, uint32_t code, int ilen);
-+/* service interrupts are floating therefore we must not pass an cpustate */
-+void s390_sclp_extint(uint32_t parm);
-+
-+
-+/* mmu_helper.c */
-+int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
-+                         int len, bool is_write);
-+#define s390_cpu_virt_mem_read(cpu, laddr, ar, dest, len)    \
-+        s390_cpu_virt_mem_rw(cpu, laddr, ar, dest, len, false)
-+#define s390_cpu_virt_mem_write(cpu, laddr, ar, dest, len)       \
-+        s390_cpu_virt_mem_rw(cpu, laddr, ar, dest, len, true)
-+#define s390_cpu_virt_mem_check_write(cpu, laddr, ar, len)   \
-+        s390_cpu_virt_mem_rw(cpu, laddr, ar, NULL, len, true)
-+
-+
-+/* outside of target/s390x/ */
-+S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
-+extern void subsystem_reset(void);
-+int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
-+int s390_virtio_hypercall(CPUS390XState *env);
-+void gtod_save(QEMUFile *f, void *opaque);
-+int gtod_load(QEMUFile *f, void *opaque, int version_id);
-+
- #endif
+>   }
+>
+>   static int nbd_co_send_request(BlockDriverState *bs,
+> @@ -416,7 +421,7 @@ int nbd_client_init(BlockDriverState *bs,
+>       /* Now that we're connected, set the socket to be non-blocking and
+>        * kick the reply mechanism.  */
+>       qio_channel_set_blocking(QIO_CHANNEL(sioc), false, NULL);
+> -    client->read_reply_co = qemu_coroutine_create(nbd_read_reply_entry, client);
+> +    client->read_reply_co = qemu_coroutine_create(nbd_read_reply_entry, bs);
+>       nbd_client_attach_aio_context(bs, bdrv_get_aio_context(bs));
+>
+>       logout("Established connection with NBD server\n");
+
+
 -- 
-2.9.4
+Best regards,
+Vladimir
