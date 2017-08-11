@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dg94e-0000E2-QL
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 08:29:58 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dg9By-0003vZ-70
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 08:37:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dg94d-0001zj-7r
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 08:29:56 -0400
-Date: Fri, 11 Aug 2017 13:29:36 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170811122936.GK2554@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170810160451.32723-1-berrange@redhat.com>
-	<20170810160451.32723-3-berrange@redhat.com>
-	<20170811122559.GB2076@work-vm>
+	(envelope-from <kwolf@redhat.com>) id 1dg9Bx-0006Zb-0j
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 08:37:30 -0400
+Date: Fri, 11 Aug 2017 14:37:16 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170811123716.GD4162@localhost.localdomain>
+References: <CAATJJ0Jgyak9c=wYknret5y=yjfzcjiVw3221wX=SB2+am8H4A@mail.gmail.com>
+	<20170811120435.GB23309@lemon.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170811122559.GB2076@work-vm>
-Subject: Re: [Qemu-devel] [PATCH 2/8] io: introduce a network socket
- listener API
+In-Reply-To: <20170811120435.GB23309@lemon.lan>
+Subject: Re: [Qemu-devel] migration issue with qemu 2.10-rc2: QEMU command
+ 'nbd-server-add': Block node is read-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,29 +24,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Fri, Aug 11, 2017 at 01:26:00PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > The existing QIOChannelSocket class provides the ability to
-> > listen on a single socket at a time. This patch introduces
-> > a QIONetListener class that provides a higher level API
-> > concept around listening for network services, allowing
-> > for listening on multiple sockets.
+Am 11.08.2017 um 14:04 hat Fam Zheng geschrieben:
+> On Fri, 08/11 13:07, Christian Ehrhardt wrote:
+> > Simplifying that to a smaller test:
+> > 
+> > $ qemu-img create -f qcow2 /tmp/test.qcow2 100M
+> > $ qemu-system-x86_64 -S -m 512 -smp 1 -nodefaults --nographic -monitor
+> > stdio -drive
+> > file=/tmp/test.qcow2,format=qcow2,if=none,id=drive-virtio-disk0 -incoming
+> > defer
+> > QEMU 2.9.92 monitor - type 'help' for more information
+> > (qemu) warning: TCG doesn't support requested feature: CPUID.01H:ECX.vmx
+> > [bit 5]
+> > nbd_server_start 0.0.0.0:49153
+> > (qemu) nbd_server_add -w drive-virtio-disk0
+> > Block node is read-only
+> > (qemu) quit
+> > 
+> > It might be reasonable to keep the -device section to specify how it is
+> > included.
 > 
-> What protects against a connection on more than one of the sockets?
+> This is actually caused by
+> 
+> commit 9c5e6594f15b7364624a3ad40306c396c93a2145
+> Author: Kevin Wolf <kwolf@redhat.com>
+> Date:   Thu May 4 18:52:40 2017 +0200
+> 
+>     block: Fix write/resize permissions for inactive images
+> 
+> which forbids "nbd_server_add -w" in the "inactive" state set by -incoming.
+> 
+> But I'm not sure what is a proper fix. Maybe revert the bdrv_is_writable() part
+> of the commit? Kevin?
 
-That's not the responsibility of this module. If a backend only
-wants to allow a single client at a time, it has to unregister
-the new client callback and re-register when it is ready to
-accept a new client. This aspect is no different to the existing
-case of multiple clients connecting to a single listener socket.
+No, the reason why this fail is simply that nbd_export_new() does things
+in the wrong order. It always had to activate the image, otherwise the
+first write would run into an assertion failure, but it only does so
+after requesting the permissions.
 
+blk_insert_bs() in line 1061 requests the permissions,
+blk_invalidate_cache() in line 1097 activates the image.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+We could either use bdrv_invalidate_cache() instead and call that before
+blk_insert_bs(), or start with perm=0, shared=BLK_PERM_ALL and then use
+blk_set_perm() only after activating the image. The third option would
+be to set blk->disable_perm = true, which would ensure that the
+permissions are only effective after the image gets activated; but this
+field isn't accessible outside block-backend.c at the moment.
+
+Kevin
