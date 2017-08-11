@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dg5mt-0004Uf-Ce
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 04:59:24 -0400
+	(envelope-from <berrange@redhat.com>) id 1dg5um-0001Yt-4u
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:07:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dg5ms-0005za-89
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 04:59:23 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:38778)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dg5ms-0005z4-10
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 04:59:22 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id f21so11061134wrf.5
-	for <qemu-devel@nongnu.org>; Fri, 11 Aug 2017 01:59:21 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1dg5uj-0001Ju-1E
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:07:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43042)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dg5ui-0001Jb-RZ
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:07:28 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 35D9652545
+	for <qemu-devel@nongnu.org>; Fri, 11 Aug 2017 09:07:27 +0000 (UTC)
+Date: Fri, 11 Aug 2017 10:07:15 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170811090715.GB2554@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170810155522.31099-1-berrange@redhat.com>
+	<20170810155522.31099-2-berrange@redhat.com>
+	<7c6d31b3-6d1f-f8de-c9bd-74b7e1b324f1@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170811085157.GY13670@umbus.fritz.box>
-References: <20170809070357.28723-1-david@gibson.dropbear.id.au>
-	<CAFEAcA_n88x0w1cVirQ61h+NOrvX1V7bXD1LCASVGyUZU=qDgg@mail.gmail.com>
-	<20170811085157.GY13670@umbus.fritz.box>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 11 Aug 2017 09:59:00 +0100
-Message-ID: <CAFEAcA91j7zA2ptiLrcYL+cVF41_SJ2p0hL8Z=ejBiaqjfA--Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/6] ppc patch queue 2017-08-09
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <7c6d31b3-6d1f-f8de-c9bd-74b7e1b324f1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 01/15] ui: add keycodemapdb repository as a
+ GIT submodule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +36,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Alexander Graf <agraf@suse.de>, Greg Kurz <groug@kaod.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 
-On 11 August 2017 at 09:51, David Gibson <david@gibson.dropbear.id.au> wrote:
-> On Thu, Aug 10, 2017 at 01:47:03PM +0100, Peter Maydell wrote:
->> On 9 August 2017 at 08:03, David Gibson <david@gibson.dropbear.id.au> wrote:
->> > I haven't completed a Travis build for this, which is part of my usual
->> > test regime, since the first dozen or so Travis builds are failing
->> > more often than not on master as well.  I don't know why this is -
->> > seems to be failing some of the x86 tests.
->>
->> Doesn't look much worse than usual to me -- of the last 24 travis
->> builds for master 4 failed and 20 passed.
->
-> Uh.. that's not been my experience.  I was a bit unclear in my
-> description, though.  Until maybe a week and a half ago I found the
-> Travis build was fairly reliable, though there were occasional
-> transien failures.  Now, essentially every Travis build is failing for
-> me.  Specifically most of the first dozen or so of the batch of build
-> configurations on Travis fail (that's "X" not "!").  These seem to be
-> transient failures in the sense that if I rebuild enough times they'll
-> eventually pass, but unlike earlier when the builds would suceed most
-> of the time, they now seem to succeed at best around 1/3 of the time
-> (that's ~1/3 of the time for each configuration sub-build, so with a
-> dozen or so apparently affected that means a complete passing build
-> essentially never).
->
-> See for example https://travis-ci.org/dgibson/qemu/builds/263312174
-> where 5 subbuilds have failed (which is relatively few).  In each case
-> the failing error seems to be something like:
->
-> ERROR:tests/vhost-user-test.c:807:test_connect_fail: child process (/i386/vhost-user/connect-fail/subprocess [55883]) failed unexpectedly
->
-> Seems to be i386 in some cases and x86_64 in others.
+On Thu, Aug 10, 2017 at 01:23:08PM -0500, Eric Blake wrote:
+> On 08/10/2017 10:55 AM, Daniel P. Berrange wrote:
+> > The https://gitlab.com/keycodemap/keycodemapdb/ repo contains a
+> > data file mapping between all the different scancode/keycode/keysym
+> > sets that are known, and a tool to auto-generate lookup tables for
+> > different combinations.
+> > 
+> > It is used by GTK-VNC, SPICE-GTK and libvirt for mapping keys.
+> > Using it in QEMU will let us replace many hand written lookup
+> > tables with auto-generated tables from a master data source,
+> > reducing bugs. Adding new QKeyCodes will now only require the
+> > master table to be updated, all ~20 other tables will be
+> > automatically updated to follow.
+> > 
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > ---
+> 
+> > +
+> > +ui/input-keymap-%.c: $(KEYCODEMAP_GEN) $(KEYCODEMAP_CSV) ui/Makefile.objs
+> > +	$(call quiet-command,\
+> > +	    $(PYTHON) $(KEYCODEMAP_GEN) \
+> > +	          --lang glib2 \
+> > +	          --varname qemu_input_map_$$(echo $@ | sed -e "s,^ui/input-keymap-,," -e "s,\.c$$,,") \
+> > +	          code-map $(KEYCODEMAP_CSV) \
+> > +	          $$(echo $@ | sed -E -e "s,^ui/input-keymap-([a-zA-Z0-9]+)2([a-zA-Z0-9]+)\.c$$,\1,") \
+> > +	          $$(echo $@ | sed -E -e "s,^ui/input-keymap-([a-zA-Z0-9]+)2([a-zA-Z0-9]+)\.c$$,\2,") \
+> 
+> Can this text transformation be done using intrinsic make functions,
+> instead of requiring the shell to spawn external processes?
 
-Weird. https://travis-ci.org/qemu/qemu/builds is the master
-build history and as you can see it's mostly greens.
-Not sure why your setup would be significantly worse:
-maybe one of the travis submaintainers has an idea.
-It could just be our vhost-user-test is flaky but I don't
-know why that should hit you much more than master...
+Suggestions welcome :-)
+
+> The regex looks fragile: if we ever have one keymap named '2abc' and
+> another named 'xyz2', then the input-keymap-xyz222abc may be difficult
+> to extract based on greedy matching favoring 'xyz22' 2 'abc'.  Would it
+> be better to have 'xyz2-to-2abc' as the preferred naming in the
+> keycodemapdb project, to make sure the conversion names are unambiguous?
+
+The names may end in a digit, but they won't start in a digit, so
+its unambiguous
 
 
-thanks
--- PMM
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
