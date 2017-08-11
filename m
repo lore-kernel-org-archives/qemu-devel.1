@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dg9EN-00052E-Qh
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 08:40:01 -0400
+	(envelope-from <famz@redhat.com>) id 1dg9Ih-0008Hk-8K
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 08:44:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dg9EM-0007dY-LA
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 08:39:59 -0400
-Date: Fri, 11 Aug 2017 13:39:43 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170811123942.GC2076@work-vm>
-References: <20170810160451.32723-1-berrange@redhat.com>
-	<20170810160451.32723-3-berrange@redhat.com>
-	<20170811122559.GB2076@work-vm> <20170811122936.GK2554@redhat.com>
+	(envelope-from <famz@redhat.com>) id 1dg9Ic-0002BG-CV
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 08:44:27 -0400
+Date: Fri, 11 Aug 2017 20:44:18 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170811124418.GC23309@lemon.lan>
+References: <20170728053610.15770-19-f4bug@amsat.org>
+	<87mv7aumav.fsf@linaro.org>
+	<8e2e3aa5-4459-76ba-3309-af6b30220346@amsat.org>
+	<87fud0vmak.fsf@linaro.org>
+	<3e66742f-04c5-51b7-de3a-f692c0637bc5@amsat.org>
+	<20170810104604.342af354.cohuck@redhat.com>
+	<CAFEAcA-GP53g+vfgDH1mNQnPHcrNULb+gkQk4JeJhb=8UCt+YA@mail.gmail.com>
+	<20170810122520.48403984.cohuck@redhat.com>
+	<20170811075455.GC27391@lemon.lan>
+	<1ac44263-dc9a-b16e-df10-09253b566b1b@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170811122936.GK2554@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/8] io: introduce a network socket
- listener API
+In-Reply-To: <1ac44263-dc9a-b16e-df10-09253b566b1b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 18/47] MAINTAINERS: add missing TCG entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-* Daniel P. Berrange (berrange@redhat.com) wrote:
-> On Fri, Aug 11, 2017 at 01:26:00PM +0100, Dr. David Alan Gilbert wrote:
-> > * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > > The existing QIOChannelSocket class provides the ability to
-> > > listen on a single socket at a time. This patch introduces
-> > > a QIONetListener class that provides a higher level API
-> > > concept around listening for network services, allowing
-> > > for listening on multiple sockets.
+On Fri, 08/11 14:06, Paolo Bonzini wrote:
+> On 11/08/2017 09:54, Fam Zheng wrote:
+> > On Thu, 08/10 12:25, Cornelia Huck wrote:
+> >>> I think the UI (giving no consideration to how we might implement
+> >>> this!) would ideally be something like:
+> >>>  * if anybody mails a patch which touches an "unmaintained" file,
+> >>>    a robot should send a reply along the lines of "thanks for the
+> >>>    patch; unfortunately file X is not maintained so it may be
+> >>>    tricky to get patch review for this. You'll need to be
+> >>>    persistent and do more of the legwork than if you were patching
+> >>>    a file that did have an active maintainer" so contributors
+> >>>    know when they've wandered into the swamp
+> >>
+> >> That's a good idea.
+> >>
+> >>>  * some mechanism for easily finding patches to unmaintained
+> >>>    files which haven't got review yet, so that anybody with some
+> >>>    spare time and interest can move some of them along (the idea
+> >>>    being to spread the load rather than trying to designate a
+> >>>    particular "owner" for this headache)
+> >>
+> >> Can maybe patchew set a special flag for patches that only touch
+> >> unmaintained files?
 > > 
-> > What protects against a connection on more than one of the sockets?
+> > Interesting idea. We have a number of patch status tracking feature requests for
+> > patchew already. We can tackle them one by one. (The next priority is implement
+> > "merged".)
 > 
-> That's not the responsibility of this module. If a backend only
-> wants to allow a single client at a time, it has to unregister
-> the new client callback and re-register when it is ready to
-> accept a new client. This aspect is no different to the existing
-> case of multiple clients connecting to a single listener socket.
+> Do you use github issues?
 
-OK, and we guarantee that we never call accept() twice because we
-make sure we do that unregister before we get back to the main loop?
+I have a private trello board that is slightly more up to date, but github
+issues does have a few entries too. We can certainly discuss things there.
 
-Dave
-
-> 
-> Regards,
-> Daniel
-> -- 
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Fam
