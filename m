@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dgEaN-0000Cz-MB
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 14:23:05 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dgEaN-0000Ch-Bz
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 14:23:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dgEaM-0007UI-D5
+	(envelope-from <alistai@xilinx.com>) id 1dgEaM-0007Tu-63
 	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 14:23:03 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 11 Aug 2017 11:19:24 -0700
-Message-ID: <2fbcf76e4ff63d8527edd3662342948276e2cd37.1502474835.git.alistair.francis@xilinx.com>
+Date: Fri, 11 Aug 2017 11:19:22 -0700
+Message-ID: <a970dcb0e2778db6af5ecb62bef234d50c20be66.1502474835.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1502474835.git.alistair.francis@xilinx.com>
 References: <cover.1502474835.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [RFC v1 3/3] target/arm: Correct exclusive store
- return value
+Subject: [Qemu-devel] [RFC v1 2/3] tcg/tcg-op: Expose the tcg_gen_ext_i*
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,99 +25,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
 Cc: alistair.francis@xilinx.com, alistair23@gmail.com, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com, qemu-arm@nongnu.org
 
-The exclusive store operation should return 0 if the operation updates
-memory and 1 if it doesn't. This means that storing tmp in the rd
-register is incorrect.
-
-This patch updates the succesful opertion to store 0 into the rd
-register instead of tmp. It also adds a branch to fail if the memory
-isn't updated.
-
-In order to add a branch for the pair case when size equals 2 we first
-need to apply the same memory operation on the exclusive value in order
-for the comparison to work.
-
-There is still no value checks added if we are doing a 64-bit store with
-pairs.
+Expose the tcg_gen_ext_i32() and tcg_gen_ext_i64() functions as we are
+going to use them later.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
-This was caught with an internal fuzzy tester. These patches fix the
-Xilinx 2.10-rc2 tree. I tested with the fuzzy tester (single CPU) and
-Linux boot (4 CPUs) on the Xilinx tree. I don't have a good test case to
-run on mainline at the moment, but I'm working on getting one. Also
-linux-user is fully untested.
 
-All tests were with MTTCG enabled.
+ tcg/tcg-op.c | 4 ++--
+ tcg/tcg-op.h | 2 ++
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
- target/arm/translate-a64.c | 22 ++++++++++++----------
- 1 file changed, 12 insertions(+), 10 deletions(-)
-
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 245175e2f1..ea7c61bc6f 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -1894,10 +1894,11 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
-      * }
-      * env->exclusive_addr = -1;
-      */
-+    TCGMemOp memop = size | MO_ALIGN | s->be_data;
-     TCGLabel *fail_label = gen_new_label();
-     TCGLabel *done_label = gen_new_label();
-     TCGv_i64 addr = tcg_temp_local_new_i64();
--    TCGv_i64 tmp;
-+    TCGv_i64 tmp, val;
- 
-     /* Copy input into a local temp so it is not trashed when the
-      * basic block ends at the branch insn.
-@@ -1907,15 +1908,15 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
- 
-     tmp = tcg_temp_new_i64();
-     if (is_pair) {
-+        val = tcg_temp_new_i64();
-         if (size == 2) {
--            TCGv_i64 val = tcg_temp_new_i64();
-             tcg_gen_concat32_i64(tmp, cpu_reg(s, rt), cpu_reg(s, rt2));
-             tcg_gen_concat32_i64(val, cpu_exclusive_val, cpu_exclusive_high);
-             tcg_gen_atomic_cmpxchg_i64(tmp, addr, val, tmp,
-                                        get_mem_index(s),
--                                       size | MO_ALIGN | s->be_data);
--            tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, val);
--            tcg_temp_free_i64(val);
-+                                       memop);
-+            tcg_gen_ext_i64(val, val, memop);
-+            tcg_gen_brcond_i64(TCG_COND_NE, tmp, val, fail_label);
-         } else if (s->be_data == MO_LE) {
-             gen_helper_paired_cmpxchg64_le(tmp, cpu_env, addr, cpu_reg(s, rt),
-                                            cpu_reg(s, rt2));
-@@ -1924,22 +1925,23 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
-                                            cpu_reg(s, rt2));
-         }
-     } else {
--        TCGv_i64 val = cpu_reg(s, rt);
-+        val = cpu_reg(s, rt);
-         tcg_gen_atomic_cmpxchg_i64(tmp, addr, cpu_exclusive_val, val,
-                                    get_mem_index(s),
--                                   size | MO_ALIGN | s->be_data);
--        tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, cpu_exclusive_val);
-+                                   memop);
-+        tcg_gen_brcond_i64(TCG_COND_NE, tmp, cpu_exclusive_val, fail_label);
-     }
- 
-     tcg_temp_free_i64(addr);
- 
--    tcg_gen_mov_i64(cpu_reg(s, rd), tmp);
--    tcg_temp_free_i64(tmp);
-+    tcg_gen_movi_i64(cpu_reg(s, rd), 0);
-     tcg_gen_br(done_label);
- 
-     gen_set_label(fail_label);
-     tcg_gen_movi_i64(cpu_reg(s, rd), 1);
-     gen_set_label(done_label);
-+    tcg_temp_free_i64(tmp);
-+    tcg_temp_free_i64(val);
-     tcg_gen_movi_i64(cpu_exclusive_addr, -1);
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index 87f673ef49..d25e3003ef 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -2709,7 +2709,7 @@ void tcg_gen_qemu_st_i64(TCGv_i64 val, TCGv addr, TCGArg idx, TCGMemOp memop)
+     gen_ldst_i64(INDEX_op_qemu_st_i64, val, addr, memop, idx);
  }
  
+-static void tcg_gen_ext_i32(TCGv_i32 ret, TCGv_i32 val, TCGMemOp opc)
++void tcg_gen_ext_i32(TCGv_i32 ret, TCGv_i32 val, TCGMemOp opc)
+ {
+     switch (opc & MO_SSIZE) {
+     case MO_SB:
+@@ -2730,7 +2730,7 @@ static void tcg_gen_ext_i32(TCGv_i32 ret, TCGv_i32 val, TCGMemOp opc)
+     }
+ }
+ 
+-static void tcg_gen_ext_i64(TCGv_i64 ret, TCGv_i64 val, TCGMemOp opc)
++void tcg_gen_ext_i64(TCGv_i64 ret, TCGv_i64 val, TCGMemOp opc)
+ {
+     switch (opc & MO_SSIZE) {
+     case MO_SB:
+diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
+index 5d3278f243..8c45b79a92 100644
+--- a/tcg/tcg-op.h
++++ b/tcg/tcg-op.h
+@@ -835,6 +835,8 @@ void tcg_gen_qemu_ld_i32(TCGv_i32, TCGv, TCGArg, TCGMemOp);
+ void tcg_gen_qemu_st_i32(TCGv_i32, TCGv, TCGArg, TCGMemOp);
+ void tcg_gen_qemu_ld_i64(TCGv_i64, TCGv, TCGArg, TCGMemOp);
+ void tcg_gen_qemu_st_i64(TCGv_i64, TCGv, TCGArg, TCGMemOp);
++void tcg_gen_ext_i32(TCGv_i32 ret, TCGv_i32 val, TCGMemOp opc);
++void tcg_gen_ext_i64(TCGv_i64 ret, TCGv_i64 val, TCGMemOp opc);
+ 
+ static inline void tcg_gen_qemu_ld8u(TCGv ret, TCGv addr, int mem_index)
+ {
 -- 
 2.11.0
