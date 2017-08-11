@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dg6jp-00034a-JN
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 06:00:23 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dg6kA-0003JN-3Z
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 06:00:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frederic.konrad@adacore.com>) id 1dg6jo-00063v-Kk
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 06:00:17 -0400
-Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:38373
-	helo=smtp.eu.adacore.com)
+	(envelope-from <stefanha@redhat.com>) id 1dg6k5-0006De-O5
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 06:00:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51682)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
-	id 1dg6jo-00063Q-Dq
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 06:00:16 -0400
-From: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-ID: <3710e9b8-4b16-1bcc-da17-80fb2cc2c644@adacore.com>
-Date: Fri, 11 Aug 2017 11:59:45 +0200
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dg6k5-0006Cu-I8
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 06:00:33 -0400
+Date: Fri, 11 Aug 2017 11:00:23 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170811100023.GC4568@stefanha-x1.localdomain>
+References: <1502387075-29078-1-git-send-email-chugh.ishani@research.iiit.ac.in>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] big endian arm.
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="mvpLiMfbWzRoNl4x"
+Content-Disposition: inline
+In-Reply-To: <1502387075-29078-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+Subject: Re: [Qemu-devel] [PATCH 0/2] QEMU Backup Tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, crosthwaite.peter@gmail.com
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com
 
-Hi Peters,
 
-I got some strange results since this commit:
+--mvpLiMfbWzRoNl4x
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-commit 9776f636455b6f0d9c14dce112242ed653f954b4
-Author: Peter Crosthwaite <crosthwaitepeter@gmail.com>
-Date:   Fri Mar 4 11:30:21 2016 +0000
+On Thu, Aug 10, 2017 at 11:14:33PM +0530, Ishani Chugh wrote:
+> This patch series is intended to introduce QEMU Backup tool.
+> qemu-backup will be a command-line tool for performing full and
+> incremental disk backups on running VMs. It is intended as a
+> reference implementation for management stack and backup developers
+> to see QEMU's backup features in action.
+> This patch series contains two patches,
+>      1) Adding Manpage for the tool
+>      2) QEMU Backup command line tool
+>=20
+> Ishani Chugh (2):
+>   Add manpage for QEMU Backup Tool
+>   backup: QEMU Backup Tool
+>=20
+>  Makefile                        |  15 +-
+>  contrib/backup/qemu-backup.py   | 309 ++++++++++++++++++++++++++++++++++=
+++++++
+>  contrib/backup/qemu-backup.texi | 135 ++++++++++++++++++
+>  3 files changed, 455 insertions(+), 4 deletions(-)
+>  create mode 100644 contrib/backup/qemu-backup.py
+>  create mode 100644 contrib/backup/qemu-backup.texi
 
-     arm: boot: Support big-endian elfs
-
-     Support ARM big-endian ELF files in system-mode emulation. 
-When loading
-     an elf, determine the endianness mode expected by the elf, 
-and set the
-     relevant CPU state accordingly.
-
-     With this, big-endian modes are now fully supported via 
-system-mode LE,
-     so there is no need to restrict the elf loading to the TARGET
-     endianness so the ifdeffery on TARGET_WORDS_BIGENDIAN goes away.
-
-     Signed-off-by: Peter Crosthwaite <crosthwaite.peter@gmail.com>
-     Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-     [PMM: fix typo in comments]
-     Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-It seems that when I try to load a big endian image on a
-Cortex-R5 it gets confused:
-  * the instructions are fine it executes some code.
-  * GDB address / insns are wrong endianness.
-  * in monitor x command is good endianness.
-  * the data order seems to be wrong endianness:
-    Here is my Hello World: lleHlroW
-
-We used to add a armeb-softmmu/qemu-system-armeb target for the
-big endian cpu but it doesn't work anymore as it's double
-reversed by the elf endianness (data_swab <= 2).
-
-And I'm surprised we don't set the CPSR_E and SCTLR_EE bits
-accordingly?
+Hi Ishani,
+Please send a v2 with the DOCS .pdf issue and my review comments from
+the previous email addressed:
+https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02021.html
 
 Thanks,
-Fred
+Stefan
+
+--mvpLiMfbWzRoNl4x
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZjYA3AAoJEJykq7OBq3PIB7EIAK7VOyA9Fe7SOiy97xDue0C/
+aMLsJuotMrJLNYtIIMIosIKk3wxQxyJXvJ5ZkzJxzJJe3EXJ9lGW+qnakFP8gs9C
+bQ3xqIQz4BmWaIsJl2V2Pq++gwD4VPhLHNBAPSKsnpz1ekycESUYkue/BguJ3C3k
+6JLjoUOUAbcjdVhINW47h4GSyC/aWyY9FRlJfeXmHA/P0GlURl6iqjxd/ewg/9Wf
+/AQKGgkFx4zKXawASy7vI8He9tc9ZeIOCMzfnvo7j0IqSDfbNb7hdzWUuiMACc4S
+OPgtSTiLhgma6OgOnW93L7eTcsSr7VB8/08kQp20zIZztz9V1htsj3fojgpVhHY=
+=1Kbn
+-----END PGP SIGNATURE-----
+
+--mvpLiMfbWzRoNl4x--
