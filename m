@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dgBy5-0004WZ-Aw
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 11:35:24 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dgC1g-0000w9-6z
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 11:39:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dgBy4-0003QD-1S
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 11:35:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43244)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dgBy3-0003OF-Ol
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 11:35:19 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 83D4B49771
-	for <qemu-devel@nongnu.org>; Fri, 11 Aug 2017 15:35:18 +0000 (UTC)
-Date: Fri, 11 Aug 2017 16:35:02 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170811153502.GX2554@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170808162629.32493-1-quintela@redhat.com>
-	<20170808162629.32493-17-quintela@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1dgC1b-0001xQ-Oh
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 11:39:04 -0400
+Resent-Message-Id: <E1dgC1b-0001xQ-Oh@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150246590902.69.17384455734437982173@dd743fd916bd>
+In-Reply-To: <1502461354-11327-1-git-send-email-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170808162629.32493-17-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 16/19] migration: Test new fd
- infrastructure
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 11 Aug 2017 08:38:30 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFC v6 0/9] ARM SMMUv3 Emulation Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,103 +23,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: eric.auger@redhat.com
+Cc: famz@redhat.com, eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, alex.williamson@redhat.com, prem.mallappa@gmail.com, mohun106@gmail.com, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mst@redhat.com, jean-philippe.brucker@arm.com, tn@semihalf.com, will.deacon@arm.com, robin.murphy@arm.com, peterx@redhat.com, edgar.iglesias@gmail.com, bharat.bhushan@nxp.com, christoffer.dall@linaro.org
 
-On Tue, Aug 08, 2017 at 06:26:26PM +0200, Juan Quintela wrote:
-> We just send the address through the alternate channels and test that it
-> is ok.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/ram.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 50 insertions(+)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index eb0015e..42ad126 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -479,8 +479,26 @@ static void *multifd_send_thread(void *opaque)
->              break;
->          }
->          if (p->pages.num) {
-> +            int i;
-> +            int num;
-> +
-> +            num = p->pages.num;
->              p->pages.num = 0;
->              qemu_mutex_unlock(&p->mutex);
-> +
-> +            for (i = 0; i < num; i++) {
-> +                if (qio_channel_write(p->c,
-> +                                      (const char *)&p->pages.iov[i].iov_base,
-> +                                      sizeof(uint8_t *), &error_abort)
-> +                    != sizeof(uint8_t *)) {
-> +                    MigrationState *s = migrate_get_current();
-> +
-> +                    migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
-> +                                      MIGRATION_STATUS_FAILED);
-> +                    terminate_multifd_send_threads();
-> +                    return NULL;
-> +                }
-> +            }
->              qemu_mutex_lock(&multifd_send_state->mutex);
->              p->done = true;
->              qemu_mutex_unlock(&multifd_send_state->mutex);
-> @@ -640,6 +658,7 @@ void multifd_load_cleanup(void)
->  static void *multifd_recv_thread(void *opaque)
->  {
->      MultiFDRecvParams *p = opaque;
-> +    uint8_t *recv_address;
->  
->      qemu_sem_post(&p->ready);
->      while (true) {
-> @@ -649,7 +668,38 @@ static void *multifd_recv_thread(void *opaque)
->              break;
->          }
->          if (p->pages.num) {
-> +            int i;
-> +            int num;
-> +
-> +            num = p->pages.num;
->              p->pages.num = 0;
-> +
-> +            for (i = 0; i < num; i++) {
-> +                if (qio_channel_read(p->c,
-> +                                     (char *)&recv_address,
-> +                                     sizeof(uint8_t *), &error_abort)
-> +                    != sizeof(uint8_t *)) {
-> +                    MigrationState *s = migrate_get_current();
-> +
-> +                    migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
-> +                                      MIGRATION_STATUS_FAILED);
-> +                    terminate_multifd_recv_threads();
-> +                    return NULL;
-> +                }
-> +                if (recv_address != p->pages.iov[i].iov_base) {
-> +                    MigrationState *s = migrate_get_current();
-> +
-> +                    printf("We received %p what we were expecting %p (%d)\n",
-> +                           recv_address,
-> +                           p->pages.iov[i].iov_base, i);
-> +
-> +                    migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
-> +                                      MIGRATION_STATUS_FAILED);
-> +                    terminate_multifd_recv_threads();
-> +                    return NULL;
-> +                }
-> +            }
-> +
->              p->done = true;
->              qemu_mutex_unlock(&p->mutex);
->              qemu_sem_post(&p->ready);
-
-Looks like all this code is deleting in patch 18. So IMHO just drop this
-patch entirely.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTUw
+MjQ2MTM1NC0xMTMyNy0xLWdpdC1zZW5kLWVtYWlsLWVyaWMuYXVnZXJAcmVkaGF0LmNvbQpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1JGQyB2NiAwLzldIEFSTSBTTU1VdjMgRW11bGF0aW9uIFN1cHBv
+cnQKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpC
+QVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpm
+YWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0l
+SCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hl
+Y2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4i
+CiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0
+Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAg
+ICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVO
+RCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQK
+U3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozZTYyY2VkZDczIGh3L2FybS92aXJ0LWFj
+cGktYnVpbGQ6IFVzZSB0aGUgQUNQSV9JT1JUX1NNTVVfVjNfQ0FDSElOR19NT0RFIG1vZGVsCjNh
+NTEwOTRlZTkgaHcvYXJtL3NtbXV2MzogVkZJTyBpbnRlZ3JhdGlvbgo4MTU1NzU1MTVmIHRhcmdl
+dC9hcm0va3ZtOiBUcmFuc2xhdGUgdGhlIE1TSSBkb29yYmVsbCBpbiBrdm1fYXJjaF9maXh1cF9t
+c2lfcm91dGUKZjcyYmM2YWU2NyBody9hcm0vdmlydDogQWRkIHRsYmktb24tbWFwIHByb3BlcnR5
+IHRvIHRoZSBzbW11djMgbm9kZQo1MmEyNTY5ZmU3IGh3L2FybS92aXJ0LWFjcGktYnVpbGQ6IEFk
+ZCBzbW11djMgbm9kZSBpbiBJT1JUIHRhYmxlCjYyYzNjMmZjYWUgaHcvYXJtL3ZpcnQ6IEFkZCAy
+LjExIG1hY2hpbmUgdHlwZQo4MDY3MWI0ZTkwIGh3L2FybS92aXJ0OiBBZGQgU01NVXYzIHRvIHRo
+ZSB2aXJ0IGJvYXJkCmFlMWMyMDNkNzMgaHcvYXJtL3NtbXV2Mzogc21tdXYzIGVtdWxhdGlvbiBt
+b2RlbApiY2I3ZDZlNDVkIGh3L2FybS9zbW11LWNvbW1vbjogc21tdSBiYXNlIGNsYXNzCgo9PT0g
+T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzk6IGh3L2FybS9zbW11LWNvbW1vbjog
+c21tdSBiYXNlIGNsYXNzLi4uCkNoZWNraW5nIFBBVENIIDIvOTogaHcvYXJtL3NtbXV2Mzogc21t
+dXYzIGVtdWxhdGlvbiBtb2RlbC4uLgpDaGVja2luZyBQQVRDSCAzLzk6IGh3L2FybS92aXJ0OiBB
+ZGQgU01NVXYzIHRvIHRoZSB2aXJ0IGJvYXJkLi4uCkNoZWNraW5nIFBBVENIIDQvOTogaHcvYXJt
+L3ZpcnQ6IEFkZCAyLjExIG1hY2hpbmUgdHlwZS4uLgpDaGVja2luZyBQQVRDSCA1Lzk6IGh3L2Fy
+bS92aXJ0LWFjcGktYnVpbGQ6IEFkZCBzbW11djMgbm9kZSBpbiBJT1JUIHRhYmxlLi4uCkNoZWNr
+aW5nIFBBVENIIDYvOTogaHcvYXJtL3ZpcnQ6IEFkZCB0bGJpLW9uLW1hcCBwcm9wZXJ0eSB0byB0
+aGUgc21tdXYzIG5vZGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNy85OiB0YXJnZXQvYXJtL2t2bTogVHJh
+bnNsYXRlIHRoZSBNU0kgZG9vcmJlbGwgaW4ga3ZtX2FyY2hfZml4dXBfbXNpX3JvdXRlLi4uCkNo
+ZWNraW5nIFBBVENIIDgvOTogaHcvYXJtL3NtbXV2MzogVkZJTyBpbnRlZ3JhdGlvbi4uLgpDaGVj
+a2luZyBQQVRDSCA5Lzk6IGh3L2FybS92aXJ0LWFjcGktYnVpbGQ6IFVzZSB0aGUgQUNQSV9JT1JU
+X1NNTVVfVjNfQ0FDSElOR19NT0RFIG1vZGVsLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQg
+bmV2ZXIgdXNlIHRhYnMKIzI2OiBGSUxFOiBody9hcm0vdmlydC1hY3BpLWJ1aWxkLmM6NDQwOgor
+XkleSXNtbXUtPm1vZGVsID0gMHgzOyAvKiBBQ1BJX0lPUlRfU01NVV9WM19DQUNISU5HX01PREUg
+Ki8kCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE0IGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
+dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
