@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dg84P-0005c1-1T
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 07:25:38 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dg87t-0006rW-1u
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 07:29:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dg84K-0006n4-7C
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 07:25:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47470)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1dg84J-0006la-Ut
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 07:25:32 -0400
-Date: Fri, 11 Aug 2017 13:25:22 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170811112522.GB4162@localhost.localdomain>
-References: <20170809203808.31725-1-eblake@redhat.com>
-	<20170810130240.GC3650@localhost.localdomain>
-	<daa65e6b-77d5-7779-faf4-8e76a811ba86@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dg87o-0000O7-6Z
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 07:29:13 -0400
+Received: from mail-qt0-x234.google.com ([2607:f8b0:400d:c0d::234]:33884)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dg87o-0000Nx-1O
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 07:29:08 -0400
+Received: by mail-qt0-x234.google.com with SMTP id s6so19360150qtc.1
+	for <qemu-devel@nongnu.org>; Fri, 11 Aug 2017 04:29:07 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <3710e9b8-4b16-1bcc-da17-80fb2cc2c644@adacore.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <4e23401d-0c39-feb1-13e8-0f3b4cc3b960@amsat.org>
+Date: Fri, 11 Aug 2017 08:29:04 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="5/uDoXvLw7AC5HRs"
-Content-Disposition: inline
-In-Reply-To: <daa65e6b-77d5-7779-faf4-8e76a811ba86@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 v2 0/5] More bdrv_getlength() fixes
+In-Reply-To: <3710e9b8-4b16-1bcc-da17-80fb2cc2c644@adacore.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] big endian arm.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +34,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, jcody@redhat.com
+To: KONRAD Frederic <frederic.konrad@adacore.com>, Peter Maydell <peter.maydell@linaro.org>, crosthwaite.peter@gmail.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+Hi Frederic,
 
---5/uDoXvLw7AC5HRs
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'm slowly working on Hercules MCU peripherals and use a R4F core.
 
-Am 10.08.2017 um 17:08 hat Eric Blake geschrieben:
-> On 08/10/2017 08:02 AM, Kevin Wolf wrote:
-> > Am 09.08.2017 um 22:38 hat Eric Blake geschrieben:
-> >> We already have a lot of bdrv_getlength() fixes in -rc2; so I think
-> >> this is still okay for -rc3.
-> >>
-> >> v1 was here (with a typo'd subject line):
-> >> https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg01226.html
-> >>
-> >> Since v1:
-> >> - patch 1: fix error message capitalization (Kevin, R-b kept)
-> >> - fix locking bug in original patch 2 (Kevin)
-> >> - split original patch 2 into two parts: signature update, and
-> >> added error checking (Kevin)
-> >> - check for unlikely integer overflow before bdrv_truncate (Jeff)
-> >>
-> >> 001/5:[0002] [FC] 'vpc: Check failure of bdrv_getlength()'
-> >> 002/5:[down] 'qcow: Change signature of get_cluster_offset()'
-> >> 003/5:[0048] [FC] 'qcow: Check failure of bdrv_getlength() and bdrv_tr=
-uncate()'
-> >> 004/5:[----] [--] 'qcow2: Drop debugging dump_refcounts()'
-> >> 005/5:[----] [--] 'qcow2: Check failure of bdrv_getlength()'
-> >=20
-> > Looks good to me, but as the bug is far from being critical, I'd rather
-> > apply the more complex qcow1 patches only to block-next. The vpc and
-> > qcow2 parts seems a lot less risky, so 2.10 should be okay for them.
-> >=20
-> > What do you think?
->=20
-> The argument for NOT doing the qcow changes (patches 2 and 3): the only
-> place where we are not checking for failures is part of
-> get_cluster_offset() - but in all likelihood, if we were unable to
-> determine or change the length of the backing file, we will have nearby
-> problems that will ultimately cause failure soon enough.  Furthermore,
-> it's not a regression (we've had several releases with the problem), and
-> qcow is not a good format (it's painfully slow, and we strongly
-> recommend qcow2 instead) - so no one will be hitting any actual bugs in
-> practice.
->=20
-> I'll trust your judgment as maintainer, so taking just 1, 4, and 5 in
-> 2.10 is fine.
+> It seems that when I try to load a big endian image on a
+> Cortex-R5 it gets confused:
+>   * the instructions are fine it executes some code.
 
-Thanks, applied the patches to block and block-next, respectively.
+So far no problem here
 
-Kevin
+>   * GDB address / insns are wrong endianness.
 
---5/uDoXvLw7AC5HRs
-Content-Type: application/pgp-signature; name="signature.asc"
+Maybe I didn't hit this problem since I use the same setup than with 
+openocd/real cpu with the following .gdbinit:
 
------BEGIN PGP SIGNATURE-----
+     set architecture armv5te
+     set arm fpu vfp
+     set endian big
+     set remote hardware-breakpoint-limit 6
+     set breakpoint auto-hw on
+     set displaced-stepping on
 
-iQIcBAEBAgAGBQJZjZQiAAoJEH8JsnLIjy/WXJ0QAJRtVuP6diARoy722CGb3jkI
-MVRPCk55UK0hFfDMrfd7U94ZP1KW4RQtoPcGOUIAa4KZXmboVoVXHEFs6jnHOnBL
-WPCuMoGsPAV+8KSEmlqtcv/K+3CGQJpzqFVbfUiz7ikJK4QhlywBPY/xdGn/Wvtn
-jfK8hT5C5F3VRzOx8O4l328MVgE2oegUSVt1o9ySfJV2Xkd3vYwbWVttX/tFENsS
-jKgMLd+UfT1K/YMGVqWobx26X0SYqT6F35Wa0/xiPVuwv/6KlexFRUh8ZdGrxvM6
-VizIA5hLvC7DHlj7FpKFCX+KN8rGB9vQLaB1/AvLOeBRzxeurT6uqz1meqOSbirP
-4N/juPLo9h2JFFBGMe3LLBWTOBD1J4/cL5V5+xcx5ypnjLZBCC6NRuKgV1OxmFtD
-86qRWwe6+AGw/DralfvO4rgH+8q2CoSqCKTzyfKuDmDqHpdRniqGyiDYCHi2SZ/h
-slWPc8b+6Q8aRN3VOiBT/iBWG1wuO+R8dbdG2rEF8GbSEr3kGOBDn8saNNHSuwOt
-snVtyd2AhXCboqWhvw3GZjZWKQBhfVoIkY9AAk/qcs8yjcKNQCgU969lfRpvj977
-OBvgw60+IjoEwzIXO4981vpna8CO8P/O2jU+4a7JwPHPfliMJMr1YLMNtGJcYo1G
-GyNRnLM5ea8alB7Zmk6F
-=DiCG
------END PGP SIGNATURE-----
+>   * in monitor x command is good endianness.
+>   * the data order seems to be wrong endianness:
+>     Here is my Hello World: lleHlroW
 
---5/uDoXvLw7AC5HRs--
+Indeed I hit a similar problem and found that 
+memory::access_with_adjusted_size() has some issues, I could never 
+finish the unit-tests but this is the first entry on my 2.11 TODO.
+
+I'll send as RFC.
+
+Regards,
+
+Phil.
