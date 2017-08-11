@@ -1,26 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dgAop-0006vh-7c
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:21:44 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dgAqY-0008Jh-VJ
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:23:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dgAol-0001Ei-3C
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:21:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27751)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dgAok-0001Ea-Qh
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:21:39 -0400
-References: <20170811074652.31474-1-david@redhat.com>
-	<20170811074652.31474-2-david@redhat.com>
-	<c9bb3167-3de8-42a3-2815-0851b56f49a5@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <79f9f850-f0dc-cea7-8a5c-85d23b07842b@redhat.com>
-Date: Fri, 11 Aug 2017 16:21:35 +0200
-MIME-Version: 1.0
-In-Reply-To: <c9bb3167-3de8-42a3-2815-0851b56f49a5@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 1/5] target/s390x: introduce internal.h
+	(envelope-from <eric.auger@redhat.com>) id 1dgAqX-0001vl-2g
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:23:30 -0400
+From: Eric Auger <eric.auger@redhat.com>
+Date: Fri, 11 Aug 2017 16:22:25 +0200
+Message-Id: <1502461354-11327-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [RFC v6 0/9] ARM SMMUv3 Emulation Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,183 +17,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, cohuck@redhat.com, borntraeger@de.ibm.com
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, alex.williamson@redhat.com, prem.mallappa@gmail.com
+Cc: drjones@redhat.com, christoffer.dall@linaro.org, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mohun106@gmail.com, tcain@qti.qualcomm.com, bharat.bhushan@nxp.com, tn@semihalf.com, mst@redhat.com, will.deacon@arm.com, jean-philippe.brucker@arm.com, robin.murphy@arm.com, peterx@redhat.com, edgar.iglesias@gmail.com
 
-On 11.08.2017 16:00, Thomas Huth wrote:
-> On 11.08.2017 09:46, David Hildenbrand wrote:
->> cpu.h should only contain what really has to be accessed outside of
->> target/s390x/. Add internal.h which can only be used inside target/s390x/.
->>
->> Move everything that isn't fast enough to run away and restructure it
->> right away.
->>
->> Minor style fixes to avoid checkpatch warning to:
->> - struct Lowcore: "{" goes into same line as typedef
->> - struct LowCore: add spaces around "-" in array length calculations
->> - time2tod() and tod2time(): move "{" to separate line
->> - get_per_atmid(): add space between ")" and "?". Move cases by one char.
->> - get_per_atmid(): drop extra paremthesis around (1 << 6)
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
-> [...]
->> diff --git a/target/s390x/internal.h b/target/s390x/internal.h
->> new file mode 100644
->> index 0000000..9a55271
->> --- /dev/null
->> +++ b/target/s390x/internal.h
->> @@ -0,0 +1,560 @@
->> +/*
->> + * s390x internal definitions and helpers
->> + *
->> + *  Copyright (c) 2009 Ulrich Hecht
->> + *
->> + * This library is free software; you can redistribute it and/or
->> + * modify it under the terms of the GNU Lesser General Public
->> + * License as published by the Free Software Foundation; either
->> + * version 2 of the License, or (at your option) any later version.
->> + *
->> + * This library is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
->> + * Lesser General Public License for more details.
->> + *
->> + * Contributions after 2012-10-29 are licensed under the terms of the
->> + * GNU GPL, version 2 or (at your option) any later version.
-> 
-> Slightly off-topic to your patch, but since you're at it anyway: AFAIK
-> the above sentence effectively means that we should update the copyright
-> boiler plate to GPL2+ nowadays. See
-> https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html section 3.
+This series implements the emulation code for ARM SMMUv3.
+This is the continuation of Prem's work [1].
 
-(not a license expert)
+This v6 fixes some VFIO integration issues:
+- Block replay was corrected.
+- Range unmap is done before the replay (vhost issue).
+- Introduction of a new CMDQ_OP_TLBI_NH_VA_AM command to
+  handle invalidation of hugepages. DPDK was tested with
+  a single assigned VF*.
+Also 64b MMIO accesses should be fixed now.
 
-Do you want me to replace it also in cpu.h?
+For VFIO integration, a quirk is needed on guest side in the arm-smmu-v3
+driver [2]. This quirk now can used both in dt and ACPI modes.
 
-Do we still need the remark about "contributions after 2012-10-29 are" ?
+The smmu is instantiated when passing the smmu option to machvirt:
+"-M virt-2.10,smmu". Most probably I will change this to instantiate it
+using -device option in next version and add an option to select caching
+mode.
+
+The series needs to be further split to allow decent reviews and I
+don't expect any at this stage. However testing really is welcome.
+
+I tested the following use cases:
+- booted a guest in dt and acpi mode with an iommu_platform
+  virtio-net-pci device (using dma ops). Tested with the following
+  guest combinations: 4K page - 39 bit VA, 4K - 48b, 64K - 39b,
+  64K - 48b.
+- booted a guest [2] with assigned PCIe device virtual functions:
+  - AMD Overdrive and igbvf passthrough (using gsi direct mapping)
+  - Cavium ThunderX and ixgbevf passthrough (using KVM MSI routing)
+  - ran DPDK testpmd on guest using a single passthroughed igbvf.
+
+* dpdk testpmd using Using 2 igbvf's does not work at the moment:
+  - the issue is on guest side the 2 devices are put in the same domain
+    by vfio_iommu_type1_attach_group() and mappings are replayed on
+    a single devicephysical smmu
+    only for the 1st device. This causes an smmu fault. I will address
+    this in next revision.
+
+Known limitations:
+- no VMSAv8-32 suport
+- no nested stage support (S1 + S2)
+- no support for HYP mappings
+- register fine emulation, commands, interrupts and errors were
+  not accurately tested. Handling is sufficient to run use cases
+  described above though.
+
+Best Regards
+
+Eric
+
+This series can be found at:
+v6: https://github.com/eauger/qemu/tree/v2.10.0-rc2-SMMU-v6
+v5: https://github.com/eauger/qemu/tree/v2.9-SMMU-v5
+
+References:
+[1] Prem's last iteration:
+[2] [RFC v2 0/4] arm-smmu-v3 tlbi-on-map option
+
+History:
+v5 -> v6:
+- Rebase on 2.10 and IOMMUMemoryRegion
+- add ACPI TLBI_ON_MAP support (VFIO integration also works in
+  ACPI mode)
+- fix block replay
+- handle implementation defined SMMU_CMD_TLBI_NH_VA_AM cmd
+  (goes along with TLBI_ON_MAP FW quirk)
+- replay systematically unmap the whole range first
+- smmuv3_map_hook does not unmap anymore and the unmap is done
+  before the replay
+- add and use smmuv3_context_device_invalidate instead of
+  blindly replaying everything
+
+v4 -> v5:
+- initial_level now part of SMMUTransCfg
+- smmu_page_walk_64 takes into account the max input size
+- implement sys->iommu_ops.replay and sys->iommu_ops.notify_flag_changed
+- smmuv3_translate: bug fix: don't walk on bypass
+- smmu_update_qreg: fix PROD index update
+- I did not yet address Peter's comments as the code is not mature enough
+  to be split into sub patches.
+
+v3 -> v4 [Eric]:
+- page table walk rewritten to allow scan of the page table within a
+  range of IOVA. This prepares for VFIO integration and replay.
+- configuration parsing partially reworked.
+- do not advertise unsupported/untested features: S2, S1 + S2, HYP,
+  PRI, ATS, ..
+- added ACPI table generation
+- migrated to dynamic traces
+- mingw compilation fix
+
+v2 -> v3 [Eric]:
+- rebased on 2.9
+- mostly code and patch reorganization to ease the review process
+- optional patches removed. They may be handled separately. I am currently
+  working on ACPI enablement.
+- optional instantiation of the smmu in mach-virt
+- removed [2/9] (fdt functions) since not mandated
+- start splitting main patch into base and derived object
+- no new function feature added
+
+v1 -> v2 [Prem]:
+- Adopted review comments from Eric Auger
+        - Make SMMU_DPRINTF to internally call qemu_log
+            (since translation requests are too many, we need control
+             on the type of log we want)
+        - SMMUTransCfg modified to suite simplicity
+        - Change RegInfo to uint64 register array
+        - Code cleanup
+        - Test cleanups
+- Reshuffled patches
+
+v0 -> v1 [Prem]:
+- As per SMMUv3 spec 16.0 (only is_ste_consistant() is noticeable)
+- Reworked register access/update logic
+- Factored out translation code for
+        - single point bug fix
+        - sharing/removal in future
+- (optional) Unit tests added, with PCI test device
+        - S1 with 4k/64k, S1+S2 with 4k/64k
+        - (S1 or S2) only can be verified by Linux 4.7 driver
+        - (optional) Priliminary ACPI support
+
+v0 [Prem]:
+- Implements SMMUv3 spec 11.0
+- Supported for PCIe devices,
+- Command Queue and Event Queue supported
+- LPAE only, S1 is supported and Tested, S2 not tested
+- BE mode Translation not supported
+- IRQ support (legacy, no MSI)
+- Tested with DPDK and e1000
 
 
-> 
->> + * You should have received a copy of the GNU (Lesser) General Public
->> + * License along with this library; if not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
+Eric Auger (6):
+  hw/arm/smmu-common: smmu base class
+  hw/arm/virt: Add 2.11 machine type
+  hw/arm/virt: Add tlbi-on-map property to the smmuv3 node
+  target/arm/kvm: Translate the MSI doorbell in kvm_arch_fixup_msi_route
+  hw/arm/smmuv3: VFIO integration
+  hw/arm/virt-acpi-build: Use the ACPI_IORT_SMMU_V3_CACHING_MODE model
 
-[...]
->> +    uint8_t         pad18[0x2000 - 0x1400];    /* 0x1400 */
->> +} QEMU_PACKED LowCore;
->> +#endif /* CONFIG_USER_ONLY */
-> 
-> Maybe you could move the cpu_map_lowcore() below into the same #ifdef
-> now? Or maybe move everything related to lowcore into a separate header
-> file called "lowcore.h" instead? ... just ideas, I've got not a strong
-> opinion about that yet.
+Prem Mallappa (3):
+  hw/arm/smmuv3: smmuv3 emulation model
+  hw/arm/virt: Add SMMUv3 to the virt board
+  hw/arm/virt-acpi-build: Add smmuv3 node in IORT table
 
-I'll leave it like that for now. I would agree if we also had a separate
-file called lowcore.c. We can do that later.
-
-> 
->> +static inline uint64_t cpu_mmu_idx_to_asc(int mmu_idx)
->> +{
->> +    switch (mmu_idx) {
->> +    case MMU_PRIMARY_IDX:
->> +        return PSW_ASC_PRIMARY;
->> +    case MMU_SECONDARY_IDX:
->> +        return PSW_ASC_SECONDARY;
->> +    case MMU_HOME_IDX:
->> +        return PSW_ASC_HOME;
->> +    default:
->> +        abort();
->> +    }
->> +}
-> 
-> Only used in excp_helper.c ===> move it there?
-
-Agreed, separate patch.
-
-> 
->> +static inline bool psw_key_valid(CPUS390XState *env, uint8_t psw_key)
->> +{
->> +    uint16_t pkm = env->cregs[3] >> 16;
->> +
->> +    if (env->psw.mask & PSW_MASK_PSTATE) {
->> +        /* PSW key has range 0..15, it is valid if the bit is 1 in the PKM */
->> +        return pkm & (0x80 >> psw_key);
->> +    }
->> +    return true;
->> +}
-> 
-> Only used in mem_helper.c ==> suggest to move it there.
-
-Agreed, separate patch.
-
-> 
-> [...]
->> +/* Check if an address is within the PER starting address and the PER
->> +   ending address.  The address range might loop.  */
->> +static inline bool get_per_in_range(CPUS390XState *env, uint64_t addr)
->> +{
->> +    if (env->cregs[10] <= env->cregs[11]) {
->> +        return env->cregs[10] <= addr && addr <= env->cregs[11];
->> +    } else {
->> +        return env->cregs[10] <= addr || addr <= env->cregs[11];
->> +    }
->> +}
-> 
-> Only used in misc_helper.c ==> move it there?
-
-Agreed, separate patch.
-
-> 
-> [...]
->> +/* helper functions for run_on_cpu() */
->> +static inline void s390_do_cpu_reset(CPUState *cs, run_on_cpu_data arg)
->> +{
->> +    S390CPUClass *scc = S390_CPU_GET_CLASS(cs);
->> +
->> +    scc->cpu_reset(cs);
->> +}
-> 
-> This function seems to be used in diag.c only, so you could also move it
-> there instead.
-
-Agreed, separate patch.
-
-[...]
-
->> +/* mem_helper.c */
->> +target_ulong mmu_real2abs(CPUS390XState *env, target_ulong raddr);
->> +
->> +
->> +/* mmu_helper.c */
->> +int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
->> +                  target_ulong *raddr, int *flags, bool exc);
->> +
->> +
->> +/* misc_helper.c */
->> +void QEMU_NORETURN runtime_exception(CPUS390XState *env, int excp,
->> +                                     uintptr_t retaddr);
->> +int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3);
->> +void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3);
->> +
->> +
->> +/* translate.c */
->> +void s390x_translate_init(void);
-> 
-> I wonder whether we maybe want to have separate headers for all these
-> prototypes, at least for the files that would have a lot of them, e.g.
-> ioinst.h ?
-
-I agree for kvm, that seems to be the longest list.
-
-> 
->  Thomas
-> 
-
+ default-configs/aarch64-softmmu.mak |    1 +
+ hw/arm/Makefile.objs                |    1 +
+ hw/arm/smmu-common.c                |  493 ++++++++++++
+ hw/arm/smmu-internal.h              |   89 +++
+ hw/arm/smmuv3-internal.h            |  652 ++++++++++++++++
+ hw/arm/smmuv3.c                     | 1412 +++++++++++++++++++++++++++++++++++
+ hw/arm/trace-events                 |   62 ++
+ hw/arm/virt-acpi-build.c            |   58 +-
+ hw/arm/virt.c                       |  110 ++-
+ include/hw/acpi/acpi-defs.h         |   15 +
+ include/hw/arm/smmu-common.h        |  126 ++++
+ include/hw/arm/smmuv3.h             |   89 +++
+ include/hw/arm/virt.h               |    5 +
+ include/hw/compat.h                 |    3 +
+ target/arm/kvm.c                    |   27 +
+ target/arm/trace-events             |    3 +
+ 16 files changed, 3137 insertions(+), 9 deletions(-)
+ create mode 100644 hw/arm/smmu-common.c
+ create mode 100644 hw/arm/smmu-internal.h
+ create mode 100644 hw/arm/smmuv3-internal.h
+ create mode 100644 hw/arm/smmuv3.c
+ create mode 100644 include/hw/arm/smmu-common.h
+ create mode 100644 include/hw/arm/smmuv3.h
 
 -- 
-
-Thanks,
-
-David
+2.5.5
