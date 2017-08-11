@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dgAiE-0000qR-Cr
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:14:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1dgAig-0001Ii-5Z
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:15:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dgAiB-0006yd-P8
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:14:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39500)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dgAiB-0006yB-GJ
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:14:51 -0400
-References: <20170811074652.31474-1-david@redhat.com>
-	<20170811074652.31474-2-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f5080f25-54d9-0a63-db7d-507d64b3d7a1@redhat.com>
-Date: Fri, 11 Aug 2017 16:14:45 +0200
+	(envelope-from <eblake@redhat.com>) id 1dgAie-0007Ci-Ji
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:15:22 -0400
+References: <20170811023759.26390-1-eblake@redhat.com>
+	<20170811023759.26390-2-eblake@redhat.com>
+	<29dc6e29-7bbc-2c81-22cc-61db4e8ac609@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7d6be617-6907-5213-941b-38fe5d3f0fee@redhat.com>
+Date: Fri, 11 Aug 2017 09:15:08 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170811074652.31474-2-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 1/5] target/s390x: introduce internal.h
+In-Reply-To: <29dc6e29-7bbc-2c81-22cc-61db4e8ac609@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="2TDBDl21GqrxKiXcaacBxCTFgFPAvHVDs"
+Subject: Re: [Qemu-devel] [PATCH 1/2] nbd: Drop connection if broken server
+ is detected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,92 +26,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, cohuck@redhat.com, borntraeger@de.ibm.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-On 11.08.2017 09:46, David Hildenbrand wrote:
-> cpu.h should only contain what really has to be accessed outside of
-> target/s390x/. Add internal.h which can only be used inside target/s390x/.
-> 
-> Move everything that isn't fast enough to run away and restructure it
-> right away.
-> 
-> Minor style fixes to avoid checkpatch warning to:
-> - struct Lowcore: "{" goes into same line as typedef
-> - struct LowCore: add spaces around "-" in array length calculations
-> - time2tod() and tod2time(): move "{" to separate line
-> - get_per_atmid(): add space between ")" and "?". Move cases by one char.
-> - get_per_atmid(): drop extra paremthesis around (1 << 6)
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
-[...]
-> +/* kvm.c */
-> +#ifdef CONFIG_KVM
-> +void kvm_s390_floating_interrupt(struct kvm_s390_irq *irq);
-> +void kvm_s390_service_interrupt(uint32_t parm);
-> +void kvm_s390_vcpu_interrupt(S390CPU *cpu, struct kvm_s390_irq *irq);
-> +void kvm_s390_access_exception(S390CPU *cpu, uint16_t code, uint64_t te_code);
-> +int kvm_s390_mem_op(S390CPU *cpu, vaddr addr, uint8_t ar, void *hostbuf,
-> +                    int len, bool is_write);
-> +void kvm_s390_program_interrupt(S390CPU *cpu, uint16_t code);
-> +void kvm_s390_io_interrupt(uint16_t subchannel_id,
-> +                           uint16_t subchannel_nr, uint32_t io_int_parm,
-> +                           uint32_t io_int_word);
-> +void kvm_s390_crw_mchk(void);
-> +int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state);
-> +void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu);
-> +int kvm_s390_vcpu_interrupt_post_load(S390CPU *cpu);
-> +int kvm_s390_get_ri(void);
-> +int kvm_s390_get_gs(void);
-> +#else
-> +static inline void kvm_s390_service_interrupt(uint32_t parm)
-> +{
-> +}
-> +static inline void kvm_s390_access_exception(S390CPU *cpu, uint16_t code,
-> +                                             uint64_t te_code)
-> +{
-> +}
-> +static inline int kvm_s390_mem_op(S390CPU *cpu, vaddr addr, uint8_t ar,
-> +                                  void *hostbuf, int len, bool is_write)
-> +{
-> +    return -ENOSYS;
-> +}
-> +static inline void kvm_s390_program_interrupt(S390CPU *cpu, uint16_t code)
-> +{
-> +}
-> +static inline void kvm_s390_io_interrupt(uint16_t subchannel_id,
-> +                                        uint16_t subchannel_nr,
-> +                                        uint32_t io_int_parm,
-> +                                        uint32_t io_int_word)
-> +{
-> +}
-> +static inline void kvm_s390_crw_mchk(void)
-> +{
-> +}
-> +static inline int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state)
-> +{
-> +    return -ENOSYS;
-> +}
-> +static inline void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu)
-> +{
-> +}
-> +static inline int kvm_s390_vcpu_interrupt_post_load(S390CPU *cpu)
-> +{
-> +    return 0;
-> +}
-> +static inline int kvm_s390_get_ri(void)
-> +{
-> +    return 0;
-> +}
-> +static inline int kvm_s390_get_gs(void)
-> +{
-> +    return 0;
-> +}
-> +#endif /* CONFIG_KVM */
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2TDBDl21GqrxKiXcaacBxCTFgFPAvHVDs
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Message-ID: <7d6be617-6907-5213-941b-38fe5d3f0fee@redhat.com>
+Subject: Re: [PATCH 1/2] nbd: Drop connection if broken server is detected
+References: <20170811023759.26390-1-eblake@redhat.com>
+ <20170811023759.26390-2-eblake@redhat.com>
+ <29dc6e29-7bbc-2c81-22cc-61db4e8ac609@virtuozzo.com>
+In-Reply-To: <29dc6e29-7bbc-2c81-22cc-61db4e8ac609@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-By the way, all the other targets that have KVM have a separate header
-for things like this: kvm_arm.h, kvm_ppc.h, kvm_mips.h, kvm_i386.h
-... maybe it's time for kvm_s390x.h now?
+On 08/11/2017 02:48 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 11.08.2017 05:37, Eric Blake wrote:
+>> As soon as the server is sending us garbage, we should quit
+>> trying to send further messages to the server, and allow all
+>> pending coroutines for any remaining replies to error out.
+>> Failure to do so can let a malicious server cause the client
+>> to hang, for example, if the server sends an invalid magic
+>> number in its response.
 
- Thomas
+>> @@ -107,8 +108,12 @@ static coroutine_fn void
+>> nbd_read_reply_entry(void *opaque)
+>>           qemu_coroutine_yield();
+>>       }
+>>
+>> +    s->reply.handle =3D 0;
+>>       nbd_recv_coroutines_enter_all(s);
+>>       s->read_reply_co =3D NULL;
+>> +    if (ret < 0) {
+>> +        nbd_teardown_connection(bs);
+>> +    }
+>=20
+> what if it happens in parallel with nbd_co_send_request?
+> nbd_teardown_connectin destroys s->ioc, nbd_co_send_requests
+> checks s->ioc only once and then calls nbd_send_request (which is
+> finally nbd_rwv and may yield). I think nbd_rwv is not
+> prepared to sudden destruction of ioc..
+
+The nbd_recv_coroutines_enter_all() call schedules all pending
+nbd_co_send_request coroutines to fire as soon as the current coroutine
+reaches a yield point. The next yield point is during the
+BDRV_POLL_WHILE of nbd_teardown_connection - but this is AFTER we've
+called qio_channel_shutdown() - so as long as nbd_rwv() is called with a
+valid ioc, the qio code should recognize that we are shutting down the
+connection and gracefully give an error on each write attempt.
+
+I see your point about the fact that coroutines can change hands in
+between our two writes for an NBD_CMD_WRITE in nbd_co_send_request()
+(the first write is nbd_send_request() for the header, the second is
+nbd_rwv() for the data) - if between those two writes we process a
+failing read, I see your point about us risking re-reading s->ioc as
+NULL for the second write call.  But maybe this is an appropriate fix -
+hanging on to the ioc that we learned when grabbing the send_mutex:
+
+
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 802d50b636..28b10f3fa2 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -122,6 +122,7 @@ static int nbd_co_send_request(BlockDriverState *bs,
+ {
+     NBDClientSession *s =3D nbd_get_client_session(bs);
+     int rc, ret, i;
++    QIOChannel *ioc;
+
+     qemu_co_mutex_lock(&s->send_mutex);
+     while (s->in_flight =3D=3D MAX_NBD_REQUESTS) {
+@@ -139,25 +140,26 @@ static int nbd_co_send_request(BlockDriverState *bs=
+,
+     g_assert(qemu_in_coroutine());
+     assert(i < MAX_NBD_REQUESTS);
+     request->handle =3D INDEX_TO_HANDLE(s, i);
++    ioc =3D s->ioc;
+
+-    if (!s->ioc) {
++    if (!ioc) {
+         qemu_co_mutex_unlock(&s->send_mutex);
+         return -EPIPE;
+     }
+
+     if (qiov) {
+-        qio_channel_set_cork(s->ioc, true);
+-        rc =3D nbd_send_request(s->ioc, request);
++        qio_channel_set_cork(ioc, true);
++        rc =3D nbd_send_request(ioc, request);
+         if (rc >=3D 0) {
+-            ret =3D nbd_rwv(s->ioc, qiov->iov, qiov->niov, request->len,=
+
+false,
++            ret =3D nbd_rwv(ioc, qiov->iov, qiov->niov, request->len, fa=
+lse,
+                           NULL);
+             if (ret !=3D request->len) {
+                 rc =3D -EIO;
+             }
+         }
+-        qio_channel_set_cork(s->ioc, false);
++        qio_channel_set_cork(ioc, false);
+     } else {
+-        rc =3D nbd_send_request(s->ioc, request);
++        rc =3D nbd_send_request(ioc, request);
+     }
+     qemu_co_mutex_unlock(&s->send_mutex);
+     return rc;
+
+
+
+But I'm really hoping Paolo will chime in on this thread.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--2TDBDl21GqrxKiXcaacBxCTFgFPAvHVDs
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmNu+wACgkQp6FrSiUn
+Q2oYtAf/UsBgQUYSYtNMUZP53/+zYECGQU1L53iwbMEdU4qSETWTeJbGgnCljDnH
+7xrjFDCtaWeKpj6mP/CAFUwVy3LTZThjSCFoPNEolEfC1Ui8xDFDNczsQnsV1h7H
+/fmKiu/+G2SridVpKcaA0N0HWmlz0urfy0j53+pZK8UCcHsFUrqFjI6ujCvx5EF5
+xj3nKEQFHBa3ibDqKMXuTBvxIXCgQ0OPcvCfrU31YQd1/ORaw4fKnD56Bl52p0w3
+K7GwV9bP99m0WcJnpXVUup0XiEq9rKFlVHgzBI066D4c/+Q0XCDtNW47uNZKUVIi
+Gy19BckBnohJwpO4xErYKZBGxYq9sQ==
+=LxRr
+-----END PGP SIGNATURE-----
+
+--2TDBDl21GqrxKiXcaacBxCTFgFPAvHVDs--
