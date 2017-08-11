@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dgD3e-0003Ra-6y
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:45:11 -0400
+	(envelope-from <bounces@canonical.com>) id 1dgD4m-0004AG-Pu
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:46:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dgD3a-0003la-9s
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:45:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34854)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dgD3a-0003kv-3r
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:45:06 -0400
-Date: Fri, 11 Aug 2017 17:44:55 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170811164455.GA2554@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170614203000.19984-1-ehabkost@redhat.com>
-	<20170811163300.GA29509@localhost.localdomain>
+	(envelope-from <bounces@canonical.com>) id 1dgD4h-0004uT-Us
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:46:20 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45784)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dgD4h-0004u4-PB
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:46:15 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dgD4g-0003Jd-Kk
+	for <qemu-devel@nongnu.org>; Fri, 11 Aug 2017 16:46:14 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7DE4B2E80CB
+	for <qemu-devel@nongnu.org>; Fri, 11 Aug 2017 16:46:14 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170811163300.GA29509@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 0/5] hostmem-file: Add "persistent" option
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 11 Aug 2017 16:33:19 -0000
+From: Daniel Berrange <1583420@bugs.launchpad.net>
+Reply-To: Bug 1583420 <1583420@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160519041228.8083.93782.malonedeb@soybean.canonical.com>
+Message-Id: <150246919995.17138.11156666501419196309.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1583420] Re: Please support "-soundhw none"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +36,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Zack Cornelius <zack.cornelius@kove.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Fri, Aug 11, 2017 at 01:33:00PM -0300, Eduardo Habkost wrote:
-> CCing Zack Cornelius.
-> 
-> On Wed, Jun 14, 2017 at 05:29:55PM -0300, Eduardo Habkost wrote:
-> > This series adds a new "persistent" option to
-> > memory-backend-file.  The new option it will be useful if
-> > somebody is sharing RAM contents on a file using share=on, but
-> > don't need it to be flushed to disk when QEMU exits.
-> > 
-> > Internally, it will trigger a madvise(MADV_REMOVE) or
-> > fallocate(FALLOC_FL_PUNCH_HOLE) call when the memory backend is
-> > destroyed.
-> > 
-> > To make we actually trigger the new code when QEMU exits, the
-> > first patch in the series ensures we destroy all user-created
-> > objects when exiting QEMU.
-> 
-> So, before sending a new version of this, we need to clarify one
-> thing: why exactly unlink()+close() wouldn't be enough to avoid
-> having data unnecessarily flushed to the backing store and make
-> the new option unnecessary?
+Pulseaudio is a sound *backend*. This is independent of the choice of
+guest hardware frontend.
 
-If the backend file is shared between processes, unlinking
-it feels bad - you're assuming no /future/ process wants to
-attach to the file. Also if QEMU aborts for any reason, the
-cleanup code is never going to run
+You can disable pulseaudio using an env variable QEMU_AUDIO_DRV=3Dnone
 
-> I would expect close() to not write any data unnecessarily if
-> there are no remaining references to the file.  Why/when this is
-> not the case?
+-- =
 
-Isn't the unlink() delayed until such time as *all* open handles
-on that file are closed. If so, it seems that if 2 processes
-have the file open, and one closes it, it is still valid for the
-kernel to want to flush data out to the backing store if it needs
-to free up working memory consumed by i/o cache.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1583420
 
-If this wasn't the case, then one process could write 20 GB of data,
-unlink + close the file, and that 20 GB would never be able to be
-purge from I/O cache for as long as another process had that FD
-open. That would be pretty bad denial of sevice for memory management
-system.
+Title:
+  Please support "-soundhw none"
 
+Status in QEMU:
+  Invalid
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Bug description:
+  qemu currently provides a default set of sound hardware.  The -soundhw
+  option can change that default set, such as by using "-soundhw pcspkr"
+  to disable most of it, but no "-soundhw none" option exists to disable
+  all of it.  As far as I can tell, disabling the default sound hardware
+  requires specifying -nodefaults and then manually specifying all the
+  desired hardware, leaving out sound hardware.
+
+  Please consider adding support for "-soundhw none", to disable all the
+  default sound hardware.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1583420/+subscriptions
