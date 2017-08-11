@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dg6dg-0007LT-Ne
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:53:57 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1dg6jp-00034a-JN
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 06:00:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dg6df-0002fl-O4
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:53:56 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Fri, 11 Aug 2017 17:53:28 +0800
-Message-Id: <20170811095328.13298-3-famz@redhat.com>
-In-Reply-To: <20170811095328.13298-1-famz@redhat.com>
-References: <20170811095328.13298-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10? v2 2/2] file-posix: Do runtime check
- for ofd lock API
+	(envelope-from <frederic.konrad@adacore.com>) id 1dg6jo-00063v-Kk
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 06:00:17 -0400
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:38373
+	helo=smtp.eu.adacore.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+	id 1dg6jo-00063Q-Dq
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 06:00:16 -0400
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <3710e9b8-4b16-1bcc-da17-80fb2cc2c644@adacore.com>
+Date: Fri, 11 Aug 2017 11:59:45 +0200
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] big endian arm.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,67 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, qemu-block@nongnu.org, eblake@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, christian.ehrhardt@canonical.com, Andrew Baumann <Andrew.Baumann@microsoft.com>, jsnow@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, crosthwaite.peter@gmail.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-It is reported that on Windows Subsystem for Linux, ofd operations fail
-with -EINVAL. In other words, QEMU binary built with system headers that
-exports F_OFD_SETLK doesn't necessarily run in an environment that
-actually supports it:
+Hi Peters,
 
-$ qemu-system-aarch64 ... -drive file=test.vhdx,if=none,id=hd0 \
-    -device virtio-blk-pci,drive=hd0
-qemu-system-aarch64: -drive file=test.vhdx,if=none,id=hd0: Failed to unlock byte 100
-qemu-system-aarch64: -drive file=test.vhdx,if=none,id=hd0: Failed to unlock byte 100
-qemu-system-aarch64: -drive file=test.vhdx,if=none,id=hd0: Failed to lock byte 100
+I got some strange results since this commit:
 
-As a matter of fact this is not WSL specific. It can happen when running
-a QEMU compiled against a newer glibc on an older kernel, such as in
-a containerized environment.
+commit 9776f636455b6f0d9c14dce112242ed653f954b4
+Author: Peter Crosthwaite <crosthwaitepeter@gmail.com>
+Date:   Fri Mar 4 11:30:21 2016 +0000
 
-Let's do a runtime check to cope with that.
+     arm: boot: Support big-endian elfs
 
-Reported-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block/file-posix.c | 19 ++++++++-----------
- 1 file changed, 8 insertions(+), 11 deletions(-)
+     Support ARM big-endian ELF files in system-mode emulation. 
+When loading
+     an elf, determine the endianness mode expected by the elf, 
+and set the
+     relevant CPU state accordingly.
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index f4de022ae0..cb3bfce147 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -457,22 +457,19 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-     switch (locking) {
-     case ON_OFF_AUTO_ON:
-         s->use_lock = true;
--#ifndef F_OFD_SETLK
--        fprintf(stderr,
--                "File lock requested but OFD locking syscall is unavailable, "
--                "falling back to POSIX file locks.\n"
--                "Due to the implementation, locks can be lost unexpectedly.\n");
--#endif
-+        if (!qemu_has_ofd_lock()) {
-+            fprintf(stderr,
-+                    "File lock requested but OFD locking syscall is "
-+                    "unavailable, falling back to POSIX file locks.\n"
-+                    "Due to the implementation, locks can be lost "
-+                    "unexpectedly.\n");
-+        }
-         break;
-     case ON_OFF_AUTO_OFF:
-         s->use_lock = false;
-         break;
-     case ON_OFF_AUTO_AUTO:
--#ifdef F_OFD_SETLK
--        s->use_lock = true;
--#else
--        s->use_lock = false;
--#endif
-+        s->use_lock = qemu_has_ofd_lock();
-         break;
-     default:
-         abort();
--- 
-2.13.4
+     With this, big-endian modes are now fully supported via 
+system-mode LE,
+     so there is no need to restrict the elf loading to the TARGET
+     endianness so the ifdeffery on TARGET_WORDS_BIGENDIAN goes away.
+
+     Signed-off-by: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+     Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+     [PMM: fix typo in comments]
+     Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+It seems that when I try to load a big endian image on a
+Cortex-R5 it gets confused:
+  * the instructions are fine it executes some code.
+  * GDB address / insns are wrong endianness.
+  * in monitor x command is good endianness.
+  * the data order seems to be wrong endianness:
+    Here is my Hello World: lleHlroW
+
+We used to add a armeb-softmmu/qemu-system-armeb target for the
+big endian cpu but it doesn't work anymore as it's double
+reversed by the elf endianness (data_swab <= 2).
+
+And I'm surprised we don't set the CPSR_E and SCTLR_EE bits
+accordingly?
+
+Thanks,
+Fred
