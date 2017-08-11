@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dg6C0-0003aW-CC
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:25:22 -0400
+	(envelope-from <otubo@redhat.com>) id 1dg6Z8-0003ta-Fv
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:49:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dg6Bx-0001N8-8Z
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:25:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47694)
+	(envelope-from <otubo@redhat.com>) id 1dg6Z4-00076S-I8
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:49:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33024)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dg6Bw-0001My-VY
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:25:17 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1dg6Z4-00074Z-8b
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:49:10 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 085ED4010D
-	for <qemu-devel@nongnu.org>; Fri, 11 Aug 2017 09:25:16 +0000 (UTC)
-Date: Fri, 11 Aug 2017 10:25:10 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170811092510.GG2554@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 05F40C09673F
+	for <qemu-devel@nongnu.org>; Fri, 11 Aug 2017 09:49:09 +0000 (UTC)
+Date: Fri, 11 Aug 2017 11:49:04 +0200
+From: Eduardo Otubo <otubo@redhat.com>
+Message-ID: <20170811094904.GA11001@vader>
 References: <20170728121040.631-1-otubo@redhat.com>
 	<20170728121040.631-3-otubo@redhat.com>
 	<20170802123356.GI4098@redhat.com> <20170811091248.GA3051@vader>
@@ -36,7 +35,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, thuth@redhat.com, pbonzini@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org, thuth@redhat.com, pbonzini@redhat.com
 
 On Fri, Aug 11, 2017 at 11:12:48AM +0200, Eduardo Otubo wrote:
 > On Wed, Aug 02, 2017 at 01:33:56PM +0100, Daniel P. Berrange wrote:
@@ -183,15 +182,73 @@ On Fri, Aug 11, 2017 at 11:12:48AM +0200, Eduardo Otubo wrote:
 > I agree with all the rest except with this one. This would require a
 > change on libseccomp itself. Not sure a change on the library would be
 > suited for now.
+> 
+> I'm working and reviewing all the comments today, so I'll try to post
+> a new version later today.
 
-Huh ?  QemuSeccompSyscall is a QEMU defined struct, and this is
-QEMU code. The change I describe here takes place before we even
-call libseccomp and doesn't affect any APIs we call in the future
+Let me reply this before you do: My mistake, this structure model does
+not belong to libseccomp. My bad. So yeah, I can change it to optimize
+things here. Thanks for the idea :)
 
+> 
+> > 	  }
+> > 
+> > 
+> > >          rc = seccomp_rule_add(ctx, SCMP_ACT_KILL, blacklist[i].num, 0);
+> > >          if (rc < 0) {
+> > >              goto seccomp_return;
+> > > diff --git a/vl.c b/vl.c
+> > > index 15b98800e9..cbe09c94af 100644
+> > > --- a/vl.c
+> > > +++ b/vl.c
+> > > @@ -271,6 +271,10 @@ static QemuOptsList qemu_sandbox_opts = {
+> > >              .name = "enable",
+> > >              .type = QEMU_OPT_BOOL,
+> > >          },
+> > > +        {
+> > > +            .name = "obsolete",
+> > > +            .type = QEMU_OPT_STRING,
+> > > +        },
+> > >          { /* end of list */ }
+> > >      },
+> > >  };
+> > > @@ -1032,7 +1036,17 @@ static int parse_sandbox(void *opaque, QemuOpts *opts, Error **errp)
+> > >  {
+> > >      if (qemu_opt_get_bool(opts, "enable", false)) {
+> > >  #ifdef CONFIG_SECCOMP
+> > > -        if (seccomp_start() < 0) {
+> > > +        uint8_t seccomp_opts = 0x0000;
+> > > +        const char *value = NULL;
+> > > +
+> > > +        value = qemu_opt_get(opts, "obsolete");
+> > > +        if (value) {
+> > > +            if (strcmp(value, "allow") == 0) {
+> > > +                seccomp_opts |= OBSOLETE;
+> > > +            }
+> > > +        }
+> > 
+> > IIUC, the values will all be booleans, so we should just use
+> > 
+> >    if (qemu_opt_get_bool(opts, "obsolete", false))
+> >        seccomp_opts |= OBSOLETE;
+> > 
+> > > +
+> > > +        if (seccomp_start(seccomp_opts) < 0) {
+> > >              error_report("failed to install seccomp syscall filter "
+> > >                           "in the kernel");
+> > >              return -1;
+> > 
+> > Regards,
+> > Daniel
+> > -- 
+> > |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> > |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> > |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> 
+> -- 
+> Eduardo Otubo
+> Senior Software Engineer @ RedHat
 
-Regards,
-Daniel
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Eduardo Otubo
+Senior Software Engineer @ RedHat
