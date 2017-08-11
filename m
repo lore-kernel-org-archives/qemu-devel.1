@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dgCRG-0006uG-Ke
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:05:31 -0400
+	(envelope-from <eblake@redhat.com>) id 1dgCTS-000092-Cq
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:07:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dgCRC-0007eG-IM
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:05:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50718)
+	(envelope-from <eblake@redhat.com>) id 1dgCTO-00009q-Cf
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:07:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32770)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dgCRC-0007di-C5
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:05:26 -0400
-From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 11 Aug 2017 18:05:20 +0200
-Message-Id: <1502467522-32237-1-git-send-email-armbru@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dgCTO-00008m-49
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 12:07:42 -0400
+References: <20170811023759.26390-1-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4015b150-ca85-06a8-d922-80048980559c@redhat.com>
+Date: Fri, 11 Aug 2017 11:07:37 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 0/2] vl: Partial support for non-scalar
- properties with -object
+In-Reply-To: <20170811023759.26390-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="5FuBF59jhDXHfC3L3RK60oiQuRqQxXK1A"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/2] Fix NBD client after server
+ error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,21 +29,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: el13635@mail.ntua.gr, kwolf@redhat.com, berrange@redhat.com, eblake@redhat.com, pbonzini@redhat.com, f4bug@amsat.org
+Cc: vsementsov@virtuozzo.com
 
-v2:
-* PATCH 1: Whitespace change dropped [Eric]
-* PATCH 2: Deallocation done differently [Paolo], R-by dropped
-           Commit message typo [Eric]
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5FuBF59jhDXHfC3L3RK60oiQuRqQxXK1A
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: vsementsov@virtuozzo.com
+Message-ID: <4015b150-ca85-06a8-d922-80048980559c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/2] Fix NBD client after server
+ error
+References: <20170811023759.26390-1-eblake@redhat.com>
+In-Reply-To: <20170811023759.26390-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Markus Armbruster (2):
-  vl: Factor object_create() out of main()
-  vl: Partial support for non-scalar properties with -object
+On 08/10/2017 09:37 PM, Eric Blake wrote:
+> Patch 1 is a much smaller patch than Vladimir's attempt [1] at fixing
+> the client in the face of a malicious server.
+>=20
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg01501.html=
 
- qapi-schema.json | 14 ++++++++---
- vl.c             | 71 ++++++++++++++++++++++++++++++++++++++++++++++++--=
-------
- 2 files changed, 72 insertions(+), 13 deletions(-)
+>=20
+> Patch 2 is not to be applied; it is a hack for easily creating a
+> malicious server; by setting NBD_SERVER_DEBUG to a positive integer,
+> the server will intentionally send bad magic when it reaches that
+> many replies.
+>=20
+> I tested using:
+>  NBD_SERVER_DEBUG=3D1 ./qemu-nbd -f raw -x foo file
+> coupled with
+>  qemu-io -c 'r 0 1' -c 'r 0 1' -f raw nbd://localhost:10809/foo
+>=20
+> Without the patch, the qemu-io client hangs; with the patch, the
+> client reports 'read failed: Input/output error' for the first read
+> (where the bad server was detected) and 'read failed: Broken pipe'
+> for the second (because the client has already dropped the
+> connection from the bad server).
+
+I've also confirmed that this is a regression from our 2.8 release
+(introduced when 2.9 switched NBD to use coroutines).
 
 --=20
-2.7.5
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--5FuBF59jhDXHfC3L3RK60oiQuRqQxXK1A
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmN1kkACgkQp6FrSiUn
+Q2rHFQf8DYQ0xNe8J8w6SxOQezXU3MUj77/Dir2Z7bauqO3tjCUqOS/05UYCZt5X
+CpM0Px+7PGZsJ74ogHVzodAogl9SnubaQPqMykZPYlygeDxWt9zfZ4oTE+VYvq7D
+PuX30tAcnm67xgMolKjYi6BMetpolhVYALmRmR5Aq2rm1c12VdcKJAF7TVodKgw5
+ubUjZ5D5V5zeAEjdLzOoAeR3uKNrqXboJ0sjbTpJHV9lEepis37/oQLIcD50caC8
+kV5gIKiYiNw8be50rvBFjreaX1jaxU2VFv79uM50iTN2+gPA8H8zUHEgSkdJ6QVn
+WyfcJsWiU+ePyZAQNbOLEbxOcLq/fQ==
+=ud7m
+-----END PGP SIGNATURE-----
+
+--5FuBF59jhDXHfC3L3RK60oiQuRqQxXK1A--
