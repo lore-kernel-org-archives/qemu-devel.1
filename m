@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1dg61u-00069S-HX
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:14:55 -0400
+	(envelope-from <berrange@redhat.com>) id 1dg62j-0006tj-OF
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:15:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1dg61r-0004ii-EP
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:14:54 -0400
-References: <1502121048-1816-1-git-send-email-frederic.konrad@adacore.com>
-	<20170809071315.GN13670@umbus.fritz.box>
-From: Alexander Graf <agraf@suse.de>
-Message-ID: <d64a5e9f-6d4f-42f0-d771-966fbf3d294e@suse.de>
-Date: Fri, 11 Aug 2017 10:14:47 +0100
+	(envelope-from <berrange@redhat.com>) id 1dg62i-0005j8-Ah
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 05:15:45 -0400
+Date: Fri, 11 Aug 2017 10:15:04 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170811091504.GE2554@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170810160451.32723-1-berrange@redhat.com>
+	<20170810160451.32723-3-berrange@redhat.com>
+	<84729972-e3ab-676c-df66-4e28b754728d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170809071315.GN13670@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.11 0/4] ppc64: add e6500
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <84729972-e3ab-676c-df66-4e28b754728d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/8] io: introduce a network socket
+ listener API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,31 +26,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, KONRAD Frederic <frederic.konrad@adacore.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org
 
-
-
-On 09.08.17 08:13, David Gibson wrote:
-> On Mon, Aug 07, 2017 at 05:50:44PM +0200, KONRAD Frederic wrote:
->> Hi,
->>
->> Those are some patches to add basic e6500 support for the moment e5500 with a
->> correct MMU configuration and supported instructions.
->> Some (maybe a lot of) things are missing (ie: the thread support) but it is
->> enough to boot a propietary OS on my side.
->>
->> The first two patches are fixes when using MAV 2.0 MMU.
->> The two last patches introduces the e6500.
->>
->> This can be cloned here:
->> https://github.com/FredKonrad/qemu.git branch e6500
+On Thu, Aug 10, 2017 at 01:12:25PM -0500, Eric Blake wrote:
+> On 08/10/2017 11:04 AM, Daniel P. Berrange wrote:
+> > The existing QIOChannelSocket class provides the ability to
+> > listen on a single socket at a time. This patch introduces
+> > a QIONetListener class that provides a higher level API
+> > concept around listening for network services, allowing
+> > for listening on multiple sockets.
+> > 
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > ---
 > 
-> Looks sane as best as my minimal knowledge of e500 goes.  Applied to
-> ppc-for-2.11.  Alex, if you (or anyone with knowledge of this
-> platform) has objections, I'll reconsider.
+> > +++ b/include/io/net-listener.h
+> > @@ -0,0 +1,174 @@
+> > +/*
+> > + * QEMU I/O network listener
+> > + *
+> > + * Copyright (c) 2016 Red Hat, Inc.
+> 
+> Want to add 2017?
+> 
+> At least it's covered by MAINTAINERS :)
+> 
+> 
+> > +/**
+> > + * qio_net_listener_is_disconnected:
+> > + * @listener: the network listener object
+> > + *
+> > + * Determine if the listener is connected to any socket
+> > + * channels
+> > + *
+> > + * Returns: TRUE if connected, FALSE otherwise
+> > + */
+> > +gboolean qio_net_listener_is_disconnected(QIONetListener *listener);
+> > +
+> 
+> Must it return gboolean, or is bool sufficient?
 
-I think it's good enough. We're missing a *lot* of e6500 features, but 
-if this is useful to Frederic, I don't see a good reason to hold it back.
+bool is fine.
 
-Alex
+> 
+> TRUE if connected for a function named 'is_disconnected' sounds
+> backwards.  Avoid the double negative, name it:
+> 
+> qio_net_listener_is_connected(), returning true if connected
+
+The docs are wrong, as you noticed below
+
+> 
+> > +++ b/io/net-listener.c
+> > @@ -0,0 +1,315 @@
+> > +/*
+> > + * QEMU network listener
+> > + *
+> > + * Copyright (c) 2016 Red Hat, Inc.
+> 
+> More 2017.  Probably for the whole series :)
+> 
+> 
+> > +static gboolean qio_net_listener_channel_func(QIOChannel *ioc,
+> > +                                              GIOCondition condition,
+> > +                                              gpointer opaque)
+> > +{
+> 
+> Again, can we use bool instead of gboolean?
+
+Yes
+
+> > +    for (i = 0; i < nresaddrs; i++) {
+> > +        QIOChannelSocket *sioc = qio_channel_socket_new();
+> > +
+> > +        if (qio_channel_socket_listen_sync(sioc, resaddrs[i],
+> > +                                           err ? NULL : &err) == 0) {
+> > +            success = true;
+> > +        }
+> 
+> This says that as long as at least one address connected, we are
+> successful...
+> 
+> > +
+> > +        qio_net_listener_add(listener, sioc);
+> 
+> ...but this adds sioc as a listener regardless of whether listen_sync()
+> succeeded.  Is that right?
+
+No, it should skip the add
+
+> 
+> 
+> > +gboolean qio_net_listener_is_disconnected(QIONetListener *listener)
+> > +{
+> > +    return listener->disconnected;
+> 
+> Documentation says it returns true on connected, but here you are
+> returning true on disconnected?
+
+Bad docs.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
