@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dgIIu-0008Pf-Ez
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 18:21:17 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dgIIv-0008RJ-SA
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 18:21:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dgIIt-0007Iv-5v
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 18:21:16 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dgIIu-0007JW-OX
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 18:21:17 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 11 Aug 2017 15:17:38 -0700
-Message-ID: <885b354ba1e79510bfd6a905d62971c275645ad5.1502488636.git.alistair.francis@xilinx.com>
+Date: Fri, 11 Aug 2017 15:17:36 -0700
+Message-ID: <e554047d3a8376721ab5b33dbe8e4162f2b14475.1502488636.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1502488636.git.alistair.francis@xilinx.com>
 References: <cover.1502488636.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v1 2/3] tcg/tcg-op: Expose the tcg_gen_ext_i*
- functions
+Subject: [Qemu-devel] [PATCH v1 1/3] target/arm: Update the memops for
+ exclusive load
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +25,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
 Cc: alistair.francis@xilinx.com, alistair23@gmail.com, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com, qemu-arm@nongnu.org
 
-Expose the tcg_gen_ext_i32() and tcg_gen_ext_i64() functions.
+Acording to the ARM ARM exclusive loads require the same allignment as
+exclusive stores. Let's update the memops used for the load to match
+that of the store. This adds the alignment requirement to the memops.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
 
-Although I no longer am using these functions I have left this patch in
-as Richard thought it was a good idea.
+ target/arm/translate-a64.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- tcg/tcg-op.c | 4 ++--
- tcg/tcg-op.h | 2 ++
- 2 files changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index 87f673ef49..d25e3003ef 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -2709,7 +2709,7 @@ void tcg_gen_qemu_st_i64(TCGv_i64 val, TCGv addr, TCGArg idx, TCGMemOp memop)
-     gen_ldst_i64(INDEX_op_qemu_st_i64, val, addr, memop, idx);
- }
- 
--static void tcg_gen_ext_i32(TCGv_i32 ret, TCGv_i32 val, TCGMemOp opc)
-+void tcg_gen_ext_i32(TCGv_i32 ret, TCGv_i32 val, TCGMemOp opc)
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 58ed4c6d05..245175e2f1 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1854,7 +1854,7 @@ static void gen_load_exclusive(DisasContext *s, int rt, int rt2,
+                                TCGv_i64 addr, int size, bool is_pair)
  {
-     switch (opc & MO_SSIZE) {
-     case MO_SB:
-@@ -2730,7 +2730,7 @@ static void tcg_gen_ext_i32(TCGv_i32 ret, TCGv_i32 val, TCGMemOp opc)
-     }
- }
+     TCGv_i64 tmp = tcg_temp_new_i64();
+-    TCGMemOp memop = s->be_data + size;
++    TCGMemOp memop = size | MO_ALIGN | s->be_data;
  
--static void tcg_gen_ext_i64(TCGv_i64 ret, TCGv_i64 val, TCGMemOp opc)
-+void tcg_gen_ext_i64(TCGv_i64 ret, TCGv_i64 val, TCGMemOp opc)
- {
-     switch (opc & MO_SSIZE) {
-     case MO_SB:
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index 5d3278f243..8c45b79a92 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -835,6 +835,8 @@ void tcg_gen_qemu_ld_i32(TCGv_i32, TCGv, TCGArg, TCGMemOp);
- void tcg_gen_qemu_st_i32(TCGv_i32, TCGv, TCGArg, TCGMemOp);
- void tcg_gen_qemu_ld_i64(TCGv_i64, TCGv, TCGArg, TCGMemOp);
- void tcg_gen_qemu_st_i64(TCGv_i64, TCGv, TCGArg, TCGMemOp);
-+void tcg_gen_ext_i32(TCGv_i32 ret, TCGv_i32 val, TCGMemOp opc);
-+void tcg_gen_ext_i64(TCGv_i64 ret, TCGv_i64 val, TCGMemOp opc);
- 
- static inline void tcg_gen_qemu_ld8u(TCGv ret, TCGv addr, int mem_index)
- {
+     g_assert(size <= 3);
+     tcg_gen_qemu_ld_i64(tmp, addr, get_mem_index(s), memop);
 -- 
 2.11.0
