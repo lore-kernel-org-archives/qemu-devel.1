@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dgB4f-0004Rq-Ov
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:38:11 -0400
+	(envelope-from <thuth@redhat.com>) id 1dgB6g-0006NI-Km
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:40:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dgB4d-0008TM-7Z
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:38:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46026)
+	(envelope-from <thuth@redhat.com>) id 1dgB6d-0000lM-C7
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:40:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33314)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dgB4c-0008Sr-UC
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:38:03 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BD68E51E8C
-	for <qemu-devel@nongnu.org>; Fri, 11 Aug 2017 14:38:01 +0000 (UTC)
-References: <1502461148-10154-1-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5dfccc7d-d9a5-7da8-c043-b7533192e378@redhat.com>
-Date: Fri, 11 Aug 2017 09:37:58 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dgB6d-0000jX-3X
+	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 10:40:07 -0400
+References: <20170811074652.31474-1-david@redhat.com>
+	<20170811074652.31474-2-david@redhat.com>
+	<c9bb3167-3de8-42a3-2815-0851b56f49a5@redhat.com>
+	<79f9f850-f0dc-cea7-8a5c-85d23b07842b@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c5c6bbd0-e975-76f1-4d18-0618aeaffe60@redhat.com>
+Date: Fri, 11 Aug 2017 16:39:59 +0200
 MIME-Version: 1.0
-In-Reply-To: <1502461148-10154-1-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="6FwAW2OvvtAvEGVR2LWO63grepShvVBf2"
-Subject: Re: [Qemu-devel] [PATCH v2] tests/qmp-test: Add generic,
- basic test of query commands
+In-Reply-To: <79f9f850-f0dc-cea7-8a5c-85d23b07842b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 1/5] target/s390x: introduce internal.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,67 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: crosa@redhat.com
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, cohuck@redhat.com, borntraeger@de.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6FwAW2OvvtAvEGVR2LWO63grepShvVBf2
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: crosa@redhat.com
-Message-ID: <5dfccc7d-d9a5-7da8-c043-b7533192e378@redhat.com>
-Subject: Re: [PATCH v2] tests/qmp-test: Add generic, basic test of query
- commands
-References: <1502461148-10154-1-git-send-email-armbru@redhat.com>
-In-Reply-To: <1502461148-10154-1-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 11.08.2017 16:21, David Hildenbrand wrote:
+> On 11.08.2017 16:00, Thomas Huth wrote:
+>> On 11.08.2017 09:46, David Hildenbrand wrote:
+>>> cpu.h should only contain what really has to be accessed outside of
+>>> target/s390x/. Add internal.h which can only be used inside target/s390x/.
+>>>
+>>> Move everything that isn't fast enough to run away and restructure it
+>>> right away.
+>>>
+>>> Minor style fixes to avoid checkpatch warning to:
+>>> - struct Lowcore: "{" goes into same line as typedef
+>>> - struct LowCore: add spaces around "-" in array length calculations
+>>> - time2tod() and tod2time(): move "{" to separate line
+>>> - get_per_atmid(): add space between ")" and "?". Move cases by one char.
+>>> - get_per_atmid(): drop extra paremthesis around (1 << 6)
+>>>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>> [...]
+>>> diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+>>> new file mode 100644
+>>> index 0000000..9a55271
+>>> --- /dev/null
+>>> +++ b/target/s390x/internal.h
+>>> @@ -0,0 +1,560 @@
+>>> +/*
+>>> + * s390x internal definitions and helpers
+>>> + *
+>>> + *  Copyright (c) 2009 Ulrich Hecht
+>>> + *
+>>> + * This library is free software; you can redistribute it and/or
+>>> + * modify it under the terms of the GNU Lesser General Public
+>>> + * License as published by the Free Software Foundation; either
+>>> + * version 2 of the License, or (at your option) any later version.
+>>> + *
+>>> + * This library is distributed in the hope that it will be useful,
+>>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+>>> + * Lesser General Public License for more details.
+>>> + *
+>>> + * Contributions after 2012-10-29 are licensed under the terms of the
+>>> + * GNU GPL, version 2 or (at your option) any later version.
+>>
+>> Slightly off-topic to your patch, but since you're at it anyway: AFAIK
+>> the above sentence effectively means that we should update the copyright
+>> boiler plate to GPL2+ nowadays. See
+>> https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html section 3.
+> 
+> (not a license expert)
+> 
+> Do you want me to replace it also in cpu.h?
 
-On 08/11/2017 09:19 AM, Markus Armbruster wrote:
-> A command is a query if it has no side effect and yields a result.
-> Such commands are typically named query-FOO, but there are exceptions.
->=20
-> The basic idea is to find candidates with query-qmp-schema, filter out
-> the ones that aren't queries with an explicit blacklist, and test the
-> remaining ones against a QEMU with no special arguments.
->=20
+No, at least not directly here in this patch series. I think that's
+something for a separate patch (we've got the same issue in cpu.c and
+kvm.c), so just use the correct boilerplate text in internal.h here.
 
-> ---
-> v2:
-> * Make the test pass for all targets (note to self: do not post
->   patches after dark)
-> * Tighten the test for query-spice, query-xen-replication-status:
->   expect failure only when they are stubs
-> * Don't blacklist query-acpi-ospm-status and query-hotpluggable-cpus;
->   they fail reliably
+> Do we still need the remark about "contributions after 2012-10-29 are" ?
 
-Indeed, looks like quite a few changes.
+Once the license text has been updated, the remark can certainly go away.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---6FwAW2OvvtAvEGVR2LWO63grepShvVBf2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmNwUYACgkQp6FrSiUn
-Q2rzXAgAh/eooiHlqVMCiTphuKC3vtmbEYVxAlgZlN8NiT4l/hIZxhAPHv6Wf8X6
-roUVJMSTEWVLpF7GL0szqG2qPZpaK5K1LNjmtsr04rQiV8wNjJUrl3ns3O8NBmx4
-9CSoCFrY2lm5ddj7Xjp/QK8bhpvdFd11JJFjBVlkpDKZR7cU23M8wuQgnIGbXSjO
-kys6VIfd1Fvm3NNKKMqzLoAE4uMM0MuovVVwsKtQ3adzz7lAOdjlnhLvje9/s9EX
-onbEkTPrf3/+Igiq0JYcMGsVhUzutv0Ko5rG5klMhYI9jckEzebX9ifTV0GTZpze
-rgOgqBz7KIX3q1aVqhlq63gmV3QQyw==
-=OPVC
------END PGP SIGNATURE-----
-
---6FwAW2OvvtAvEGVR2LWO63grepShvVBf2--
+ Thomas
