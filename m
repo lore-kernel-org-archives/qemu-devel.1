@@ -1,37 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dgYV0-00007s-2B
-	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 11:38:51 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dgYXl-0001nD-OJ
+	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 11:41:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dgYUt-0002CM-ND
-	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 11:38:50 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:36938)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dgYUt-0002BE-I0
-	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 11:38:43 -0400
-Received: by mail-qk0-x241.google.com with SMTP id x77so5985835qka.4
-	for <qemu-devel@nongnu.org>; Sat, 12 Aug 2017 08:38:42 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <35BC0F0B-7CB0-424C-86EA-2B5D8E219634@gmail.com>
-	<20170811215845.n667iobglz5cef3z@var.youpi.perso.aquilenet.fr>
-	<CAFEAcA_XrnDxZLhX5FGFBh+Mh-_80z3Z6b+0LkmQuoWzrWK0tA@mail.gmail.com>
-	<20170812110410.rosk6yhkj22w346s@var.youpi.perso.aquilenet.fr>
-	<CAFEAcA-N5pAM+3PXvjaJ-LMPFswAtmkAXA6yn151CCtfn+=JQA@mail.gmail.com>
-	<20170812112925.mpi2mmewt46wna7j@var.youpi.perso.aquilenet.fr>
-	<60ba7c95-8989-13bb-3aaf-ac9a8389320f@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <52a8c2c0-5d51-9c92-3dbe-3c25bd09e16e@amsat.org>
-Date: Sat, 12 Aug 2017 12:38:37 -0300
-MIME-Version: 1.0
-In-Reply-To: <60ba7c95-8989-13bb-3aaf-ac9a8389320f@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] SLIRP warning messages displayed while compiling
+	(envelope-from <rth7680@gmail.com>) id 1dgYXi-0004Hh-Lb
+	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 11:41:41 -0400
+From: Richard Henderson <rth7680@gmail.com>
+Date: Sat, 12 Aug 2017 08:41:31 -0700
+Message-Id: <20170812154131.29372-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH] target/arm: Correct load/store exclusive
+ pairing and alignment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,41 +18,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Samuel Thibault <samuel.thibault@gnu.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Programmingkid <programmingkidx@gmail.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Jan Kiszka <jan.kiszka@siemens.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, alistair.francis@xilinx.com, edgar.iglesias@xilinx.com, qemu-arm@nongnu.org
 
-Hi Eric,
+SetExclusiveMonitors in the pseudocode is on the address + width,
+and says nothing about the manner of the load.  Therefore
 
-On 08/12/2017 08:41 AM, Eric Blake wrote:
-> Here's an idea:  Instead of using struct ip6 { ... } QEMU_PACKED, use
-> 
-> struct ip6 {
-> ...
-> };
-> QEMU_BUG_ON(sizeof(struct ip6) != 32);
-> 
-> so that the compiler explicitly chokes if it introduced any padding, and
-> then we know all our accesses are naturally aligned which shuts up the
-> warning.
+	ldxp	w0, w1, [x2]
+vs
+	ldxr	x0, [x2]
 
-Following your suggestion I tried:
+must record the same metadata so that either may pair with
 
-#define QEMU_BUG_STRUCT_UNALIGNED(s) \
-         QEMU_BUILD_BUG_ON(sizeof(s) != sizeof(s QEMU_PACKED))
+	stxp	w3, w0, w1, [x2]
+vs
+	stxr	w3, x0, [x2]
 
-QEMU_BUG_STRUCT_UNALIGNED(struct ip6);
+Fix this by ignoring cpu_exclusive_high except for 64-bit LDXP/STXP.
 
-but this gives:
+Also note that we were not providing the required single-copy atomic
+semantics for 32-bit LDXP.  This is trivially fixed alongside the
+cpu_exclusive_val change.
 
-qemu/slirp/ip6.h:157:1: warning: 'packed' attribute ignored when parsing 
-type [-Wignored-attributes]
-QEMU_BUG_STRUCT_UNALIGNED(struct ip6);
-^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-qemu/slirp/ip6.h:155:49: note: expanded from macro 
-'QEMU_BUG_STRUCT_UNALIGNED'
-         QEMU_BUILD_BUG_ON(sizeof(s) != sizeof(s QEMU_PACKED))
-                                                 ^~~~~~~~~~~
-qemu/include/qemu/compiler.h:40:37: note: expanded from macro 'QEMU_PACKED'
-# define QEMU_PACKED __attribute__((packed))
-                                     ^~~~~~
-1 warning generated.
+At the same time, exclusive loads require the same alignment as
+exclusive stores.  For 64-bit LDXP, this means adding MO_ALIGN_16;
+for the others adding MO_ALIGN.
+
+Reported-by: Alistair Francis <alistair.francis@xilinx.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/translate-a64.c | 65 +++++++++++++++++++++++++++++-----------------
+ 1 file changed, 41 insertions(+), 24 deletions(-)
+---
+
+I have not yet constructed test cases for all of the combinations
+listed above.  I wanted to put this into your hands so that you could
+test against your existing code using LDXP/STXP.
+
+
+r~
+
+
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 58ed4c6d05..f3643ac8dc 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1853,29 +1853,45 @@ static void disas_b_exc_sys(DisasContext *s, uint32_t insn)
+ static void gen_load_exclusive(DisasContext *s, int rt, int rt2,
+                                TCGv_i64 addr, int size, bool is_pair)
+ {
+-    TCGv_i64 tmp = tcg_temp_new_i64();
+-    TCGMemOp memop = s->be_data + size;
++    int idx = get_mem_index(s);
++    TCGMemOp memop = s->be_data;
+ 
+     g_assert(size <= 3);
+-    tcg_gen_qemu_ld_i64(tmp, addr, get_mem_index(s), memop);
+-
+     if (is_pair) {
+-        TCGv_i64 addr2 = tcg_temp_new_i64();
+-        TCGv_i64 hitmp = tcg_temp_new_i64();
+-
+         g_assert(size >= 2);
+-        tcg_gen_addi_i64(addr2, addr, 1 << size);
+-        tcg_gen_qemu_ld_i64(hitmp, addr2, get_mem_index(s), memop);
+-        tcg_temp_free_i64(addr2);
+-        tcg_gen_mov_i64(cpu_exclusive_high, hitmp);
+-        tcg_gen_mov_i64(cpu_reg(s, rt2), hitmp);
+-        tcg_temp_free_i64(hitmp);
+-    }
++        if (size == 2) {
++            /* The pair must be single-copy atomic for the doubleword.  */
++            memop |= MO_64 | MO_ALIGN;
++            tcg_gen_qemu_ld_i64(cpu_exclusive_val, addr, idx, memop);
++            if (s->be_data == MO_LE) {
++                tcg_gen_extract_i64(cpu_reg(s, rt), cpu_exclusive_val, 0, 32);
++                tcg_gen_extract_i64(cpu_reg(s, rt2), cpu_exclusive_val, 32, 32);
++            } else {
++                tcg_gen_extract_i64(cpu_reg(s, rt), cpu_exclusive_val, 32, 32);
++                tcg_gen_extract_i64(cpu_reg(s, rt2), cpu_exclusive_val, 0, 32);
++            }
++        } else {
++            /* The pair must be single-copy atomic for *each* doubleword,
++               but not the entire quadword.  It must, however, be aligned.  */
++            TCGv_i64 addr2;
+ 
+-    tcg_gen_mov_i64(cpu_exclusive_val, tmp);
+-    tcg_gen_mov_i64(cpu_reg(s, rt), tmp);
++            memop |= MO_64;
++            tcg_gen_qemu_ld_i64(cpu_exclusive_val, addr, idx,
++                                memop | MO_ALIGN_16);
+ 
+-    tcg_temp_free_i64(tmp);
++            addr2 = tcg_temp_new_i64();
++            tcg_gen_addi_i64(addr2, addr, 8);
++            tcg_gen_qemu_ld_i64(cpu_exclusive_high, addr2, idx, memop);
++            tcg_temp_free_i64(addr2);
++
++            tcg_gen_mov_i64(cpu_reg(s, rt), cpu_exclusive_val);
++            tcg_gen_mov_i64(cpu_reg(s, rt2), cpu_exclusive_high);
++        }
++    } else {
++        memop |= size | MO_ALIGN;
++        tcg_gen_qemu_ld_i64(cpu_exclusive_val, addr, idx, memop);
++        tcg_gen_mov_i64(cpu_reg(s, rt), cpu_exclusive_val);
++    }
+     tcg_gen_mov_i64(cpu_exclusive_addr, addr);
+ }
+ 
+@@ -1908,14 +1924,15 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
+     tmp = tcg_temp_new_i64();
+     if (is_pair) {
+         if (size == 2) {
+-            TCGv_i64 val = tcg_temp_new_i64();
+-            tcg_gen_concat32_i64(tmp, cpu_reg(s, rt), cpu_reg(s, rt2));
+-            tcg_gen_concat32_i64(val, cpu_exclusive_val, cpu_exclusive_high);
+-            tcg_gen_atomic_cmpxchg_i64(tmp, addr, val, tmp,
++            if (s->be_data == MO_LE) {
++                tcg_gen_concat32_i64(tmp, cpu_reg(s, rt), cpu_reg(s, rt2));
++            } else {
++                tcg_gen_concat32_i64(tmp, cpu_reg(s, rt2), cpu_reg(s, rt));
++            }
++            tcg_gen_atomic_cmpxchg_i64(tmp, addr, cpu_exclusive_val, tmp,
+                                        get_mem_index(s),
+-                                       size | MO_ALIGN | s->be_data);
+-            tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, val);
+-            tcg_temp_free_i64(val);
++                                       MO_64 | MO_ALIGN | s->be_data);
++            tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, cpu_exclusive_val);
+         } else if (s->be_data == MO_LE) {
+             gen_helper_paired_cmpxchg64_le(tmp, cpu_env, addr, cpu_reg(s, rt),
+                                            cpu_reg(s, rt2));
+-- 
+2.13.4
