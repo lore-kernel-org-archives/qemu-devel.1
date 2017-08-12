@@ -1,29 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dgXvM-0003ca-Mj
-	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 11:02:02 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dgYV0-00007s-2B
+	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 11:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dgXvI-0005Zg-2n
-	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 11:02:00 -0400
-Received: from mail-pf0-x236.google.com ([2607:f8b0:400e:c00::236]:34307)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dgYUt-0002CM-ND
+	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 11:38:50 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:36938)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dgXvH-0005Z8-TH
-	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 11:01:56 -0400
-Received: by mail-pf0-x236.google.com with SMTP id o86so26450460pfj.1
-	for <qemu-devel@nongnu.org>; Sat, 12 Aug 2017 08:01:54 -0700 (PDT)
-References: <cover.1502488636.git.alistair.francis@xilinx.com>
-	<bc18dddca56e8c2ea4a3def48d33ceb5d21d1fff.1502488636.git.alistair.francis@xilinx.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b916859a-2ce6-24ae-5310-e07651c8acfe@linaro.org>
-Date: Sat, 12 Aug 2017 08:01:48 -0700
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dgYUt-0002BE-I0
+	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 11:38:43 -0400
+Received: by mail-qk0-x241.google.com with SMTP id x77so5985835qka.4
+	for <qemu-devel@nongnu.org>; Sat, 12 Aug 2017 08:38:42 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <35BC0F0B-7CB0-424C-86EA-2B5D8E219634@gmail.com>
+	<20170811215845.n667iobglz5cef3z@var.youpi.perso.aquilenet.fr>
+	<CAFEAcA_XrnDxZLhX5FGFBh+Mh-_80z3Z6b+0LkmQuoWzrWK0tA@mail.gmail.com>
+	<20170812110410.rosk6yhkj22w346s@var.youpi.perso.aquilenet.fr>
+	<CAFEAcA-N5pAM+3PXvjaJ-LMPFswAtmkAXA6yn151CCtfn+=JQA@mail.gmail.com>
+	<20170812112925.mpi2mmewt46wna7j@var.youpi.perso.aquilenet.fr>
+	<60ba7c95-8989-13bb-3aaf-ac9a8389320f@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <52a8c2c0-5d51-9c92-3dbe-3c25bd09e16e@amsat.org>
+Date: Sat, 12 Aug 2017 12:38:37 -0300
 MIME-Version: 1.0
-In-Reply-To: <bc18dddca56e8c2ea4a3def48d33ceb5d21d1fff.1502488636.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <60ba7c95-8989-13bb-3aaf-ac9a8389320f@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 3/3] target/arm: Correct exclusive store
- cmpxchg memop mask
+Subject: Re: [Qemu-devel] SLIRP warning messages displayed while compiling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +40,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: edgar.iglesias@xilinx.com, alistair23@gmail.com, qemu-arm@nongnu.org, edgar.iglesias@gmail.com
+To: Eric Blake <eblake@redhat.com>, Samuel Thibault <samuel.thibault@gnu.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Programmingkid <programmingkidx@gmail.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Jan Kiszka <jan.kiszka@siemens.com>
 
-On 08/11/2017 03:17 PM, Alistair Francis wrote:
-> When we perform the atomic_cmpxchg operation we want to perform the
-> operation on a pair of 32-bit registers. Previously we were just passing
-> the register size in which was set to MO_32. This would result in the
-> high register to be ignored. To fix this issue we hardcode the size to
-> be 64-bits long when operating on 32-bit pairs.
+Hi Eric,
+
+On 08/12/2017 08:41 AM, Eric Blake wrote:
+> Here's an idea:  Instead of using struct ip6 { ... } QEMU_PACKED, use
 > 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
+> struct ip6 {
+> ...
+> };
+> QEMU_BUG_ON(sizeof(struct ip6) != 32);
 > 
-> This was caught with an internal fuzzy tester. These patches fix the
-> Xilinx 2.10-rc2 tree. I tested with the fuzzy tester (single CPU) and
-> Linux boot (4 CPUs) on the Xilinx tree. I don't have a good test case to
-> run on mainline, but am working with some internal teams to get one.
-> Also linux-user is fully untested.
-> 
-> All tests were with MTTCG enabled.
-> 
->  target/arm/translate-a64.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 245175e2f1..49b4d6918d 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -1913,7 +1913,7 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
->              tcg_gen_concat32_i64(val, cpu_exclusive_val, cpu_exclusive_high);
->              tcg_gen_atomic_cmpxchg_i64(tmp, addr, val, tmp,
->                                         get_mem_index(s),
-> -                                       size | MO_ALIGN | s->be_data);
-> +                                       MO_64 | MO_ALIGN | s->be_data);
->              tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, val);
->              tcg_temp_free_i64(val);
->          } else if (s->be_data == MO_LE) {
-> 
+> so that the compiler explicitly chokes if it introduced any padding, and
+> then we know all our accesses are naturally aligned which shuts up the
+> warning.
 
-Reading the ARM pseudocode again, especially wrt SetExclusiveMonitors, I think
-there are other bugs here wrt 32-bit LDXP/STXP.
+Following your suggestion I tried:
 
-Since SetExclusiveMonitors is invoked only with address + dsize, one should be
-able to write
+#define QEMU_BUG_STRUCT_UNALIGNED(s) \
+         QEMU_BUILD_BUG_ON(sizeof(s) != sizeof(s QEMU_PACKED))
 
-	ldxp	w0, w1, [x5]
-	stxr	w3, x2, [x5]
-or
-	ldxr	x0, [x5]
-	stxp	w3, w1, w2, [x5]
+QEMU_BUG_STRUCT_UNALIGNED(struct ip6);
 
-However, the LDXR and LDXP above do not store the cpu_exclusive_* metadata in
-the same format.  Fixing this is simply a matter of ignoring cpu_exclusive_high
-for 32-bit pair operations and store it all in cpu_exclusive_val, as the 64-bit
-single-register operation does.
+but this gives:
 
-In addition, 32-bit LDXP must be single-copy atomic, and we're issuing 2 loads,
-this is trivially fixed with the rest of the required changes, but perhaps
-worth noting.
-
-I'll post a patch shortly.
-
-
-r~
+qemu/slirp/ip6.h:157:1: warning: 'packed' attribute ignored when parsing 
+type [-Wignored-attributes]
+QEMU_BUG_STRUCT_UNALIGNED(struct ip6);
+^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+qemu/slirp/ip6.h:155:49: note: expanded from macro 
+'QEMU_BUG_STRUCT_UNALIGNED'
+         QEMU_BUILD_BUG_ON(sizeof(s) != sizeof(s QEMU_PACKED))
+                                                 ^~~~~~~~~~~
+qemu/include/qemu/compiler.h:40:37: note: expanded from macro 'QEMU_PACKED'
+# define QEMU_PACKED __attribute__((packed))
+                                     ^~~~~~
+1 warning generated.
