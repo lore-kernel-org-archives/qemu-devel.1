@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <portias@xilinx.com>) id 1dgJOs-0001af-Id
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 19:31:31 -0400
+	(envelope-from <thuth@redhat.com>) id 1dgRw1-00022i-F3
+	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 04:38:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <portias@xilinx.com>) id 1dgJOp-00041U-EP
-	for qemu-devel@nongnu.org; Fri, 11 Aug 2017 19:31:30 -0400
-From: Portia Stephens <portia.stephens@xilinx.com>
-Date: Fri, 11 Aug 2017 23:31:19 +0000
-Message-ID: <C778EAF8E3D3BA4D9D24FA5453D7B7590105FAEA7A@XSJ-PSEXMBX02.xlnx.xilinx.com>
-References: <cover.1502488636.git.alistair.francis@xilinx.com>
-	<CAKmqyKPe8_205KZ5x++cdZ0BR950tQiaQvPstRzcKrwArgpMOw@mail.gmail.com>
-	<CAKmqyKOHX-==ZX5B0K_2dZ+D09XfGU6yfoo5mckkgms_6hevJw@mail.gmail.com>
-In-Reply-To: <CAKmqyKOHX-==ZX5B0K_2dZ+D09XfGU6yfoo5mckkgms_6hevJw@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v1 0/3] Fixup exclusive store logic
+	(envelope-from <thuth@redhat.com>) id 1dgRvy-0003Ue-89
+	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 04:38:17 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Sat, 12 Aug 2017 10:38:10 +0200
+Message-Id: <1502527090-11473-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/ppc/spapr_cpu_core: Add a proper check for
+ spapr machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,50 +18,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistai@xilinx.com>Alistair Francis <alistai@xilinx.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Edgar Iglesias <edgari@xilinx.com>, Edgar
-	Iglesias <edgar.iglesias@gmail.com>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBhbGlzdGFpcjIzQGdtYWlsLmNv
-bSBbbWFpbHRvOmFsaXN0YWlyMjNAZ21haWwuY29tXSBPbiBCZWhhbGYgT2YNCj4gQWxpc3RhaXIg
-RnJhbmNpcw0KPiBTZW50OiBGcmlkYXksIEF1Z3VzdCAxMSwgMjAxNyA0OjIzIFBNDQo+IFRvOiBB
-bGlzdGFpciBGcmFuY2lzIDxhbGlzdGFpQHhpbGlueC5jb20+OyBQb3J0aWEgU3RlcGhlbnMNCj4g
-PHBvcnRpYXNAeGlsaW54LmNvbT4NCj4gQ2M6IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZyBEZXZlbG9w
-ZXJzIDxxZW11LWRldmVsQG5vbmdudS5vcmc+Ow0KPiBQZXRlciBNYXlkZWxsIDxwZXRlci5tYXlk
-ZWxsQGxpbmFyby5vcmc+OyBFZGdhciBJZ2xlc2lhcw0KPiA8ZWRnYXJpQHhpbGlueC5jb20+OyBF
-ZGdhciBJZ2xlc2lhcyA8ZWRnYXIuaWdsZXNpYXNAZ21haWwuY29tPjsgcWVtdS1hcm0NCj4gPHFl
-bXUtYXJtQG5vbmdudS5vcmc+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjEgMC8zXSBGaXh1cCBl
-eGNsdXNpdmUgc3RvcmUgbG9naWMNCj4NCj4gT24gRnJpLCBBdWcgMTEsIDIwMTcgYXQgNDoyMSBQ
-TSwgQWxpc3RhaXIgRnJhbmNpcyA8YWxpc3RhaXIyM0BnbWFpbC5jb20+IHdyb3RlOg0KPiA+IE9u
-IEZyaSwgQXVnIDExLCAyMDE3IGF0IDM6MTcgUE0sIEFsaXN0YWlyIEZyYW5jaXMNCj4gPiA8YWxp
-c3RhaXIuZnJhbmNpc0B4aWxpbnguY29tPiB3cm90ZToNCj4gPj4gSSBmb3VuZCBzb21lIGlzc3Vl
-cyB3aXRoIHRoZSB3YXkgZXhjbHVzaXZlIHN0b3JlIHdhcyB3b3JraW5nLiBUaGlzIHBhdGNoDQo+
-ID4+IHNlcmllcyBzZWVtcyB0byBmaXggdGhlIHRlc3QgY2FzZXMgdGhhdCB3ZXJlIGZhaWxpbmcg
-Zm9yIG1lLg0KPiA+Pg0KPiA+PiBUaGUgZmlyc3QgcGF0Y2ggaXMganVzdCBhIHNpbXBsZSBhZGp1
-c3RtZW50Lg0KPiA+Pg0KPiA+PiBUaGUgdGhpcmQgcGF0Y2ggZml4ZXMgdGhlIG1haW4gYnVnIEkg
-d2FzIHNlZWluZy4NCj4gPj4NCj4gPj4gVGhlIHNlY29uZCBwYXRjaCBpcyBsZWZ0IG92ZXIgZnJv
-bSB0aGUgUkZDIHRoYXQgc2VlbXMgbGlrZSBpdCBpcyBzdGlsbCBhDQo+ID4+IGdvb2QgaWRlYS4N
-Cj4NCj4gKyBQb3J0aWEgZnJvbSBmdXp6eSB0ZXN0aW5nIHRlYW0uDQo+DQo+ID4NCj4gPiBBZnRl
-ciB3b3JraW5nIHdpdGggdGhlIGludGVybmFsIGZ1enp5IHRlc3RpbmcgdGVhbSBJIGhhdmUgYSB0
-ZXN0IGNhc2UNCj4gPiB3aGVyZSBleGNsdXNpdmUgb3BlcmF0aW9ucyBhcmUgZmFpbGluZyBvbiBt
-YXN0ZXIgYnV0IHdvcmtpbmcgb24gdG9wIG9mDQo+ID4gdGhpcyBwYXRjaCBzZXJpZXMuDQo+ID4N
-Cg0KVGhpcyBwYXRjaCBzZXJpZXMgZml4ZXMgdGhlIGZhaWx1cmVzIHByZXZpb3VzbHkgc2VlbiB3
-aXRoIGV4Y2x1c2l2ZSBzdG9yZXMNCmJ5IG91ciBpbnRlcm5hbCB0ZXN0cyBvbiBBQXJjaDY0Lg0K
-DQpUZXN0ZWQtYnk6IFBvcnRpYSBTdGVwaGVucyA8cG9ydGlhLnN0ZXBoZW5zQHhpbGlueC5jb20+
-DQoNCj4gPiBUaGFua3MsDQo+ID4gQWxpc3RhaXINCj4gPg0KPiA+Pg0KPiA+PiBDaGFuZ2VzIGZy
-b20gUkZDOg0KPiA+PiAgLSBSZXdyaXRlIHRoZSB0aGlyZCBwYXRjaCB0byBjb3JyZWN0bHkgZml4
-IHRoZSBpc3N1ZS4NCj4gPj4NCj4gPj4gQWxpc3RhaXIgRnJhbmNpcyAoMyk6DQo+ID4+ICAgdGFy
-Z2V0L2FybTogVXBkYXRlIHRoZSBtZW1vcHMgZm9yIGV4Y2x1c2l2ZSBsb2FkDQo+ID4+ICAgdGNn
-L3RjZy1vcDogRXhwb3NlIHRoZSB0Y2dfZ2VuX2V4dF9pKiBmdW5jdGlvbnMNCj4gPj4gICB0YXJn
-ZXQvYXJtOiBDb3JyZWN0IGV4Y2x1c2l2ZSBzdG9yZSBjbXB4Y2hnIG1lbW9wIG1hc2sNCj4gPj4N
-Cj4gPj4gIHRhcmdldC9hcm0vdHJhbnNsYXRlLWE2NC5jIHwgNCArKy0tDQo+ID4+ICB0Y2cvdGNn
-LW9wLmMgICAgICAgICAgICAgICB8IDQgKystLQ0KPiA+PiAgdGNnL3RjZy1vcC5oICAgICAgICAg
-ICAgICAgfCAyICsrDQo+ID4+ICAzIGZpbGVzIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwgNCBk
-ZWxldGlvbnMoLSkNCj4gPj4NCj4gPj4gLS0NCj4gPj4gMi4xMS4wDQo+ID4+DQoNCg0KVGhpcyBl
-bWFpbCBhbmQgYW55IGF0dGFjaG1lbnRzIGFyZSBpbnRlbmRlZCBmb3IgdGhlIHNvbGUgdXNlIG9m
-IHRoZSBuYW1lZCByZWNpcGllbnQocykgYW5kIGNvbnRhaW4ocykgY29uZmlkZW50aWFsIGluZm9y
-bWF0aW9uIHRoYXQgbWF5IGJlIHByb3ByaWV0YXJ5LCBwcml2aWxlZ2VkIG9yIGNvcHlyaWdodGVk
-IHVuZGVyIGFwcGxpY2FibGUgbGF3LiBJZiB5b3UgYXJlIG5vdCB0aGUgaW50ZW5kZWQgcmVjaXBp
-ZW50LCBkbyBub3QgcmVhZCwgY29weSwgb3IgZm9yd2FyZCB0aGlzIGVtYWlsIG1lc3NhZ2Ugb3Ig
-YW55IGF0dGFjaG1lbnRzLiBEZWxldGUgdGhpcyBlbWFpbCBtZXNzYWdlIGFuZCBhbnkgYXR0YWNo
-bWVudHMgaW1tZWRpYXRlbHkuDQoNCg==
+QEMU currently crashes when the user tries to add a spapr-cpu-core
+on a non-pseries machine:
+
+$ qemu-system-ppc64 -S -machine ppce500,accel=tcg \
+                    -device POWER5+_v2.1-spapr-cpu-core
+hw/ppc/spapr_cpu_core.c:178:spapr_cpu_core_realize_child:
+Object 0x55cee1f55160 is not an instance of type spapr-machine
+Aborted (core dumped)
+
+So let's add a proper check for the correct machine time with
+a more friendly error message here.
+
+Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/ppc/spapr_cpu_core.c   | 9 ++++++++-
+ scripts/device-crash-test | 1 +
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index ea278ce..0f3d653 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -175,11 +175,18 @@ static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
+ static void spapr_cpu_core_realize_child(Object *child, Error **errp)
+ {
+     Error *local_err = NULL;
+-    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
++    sPAPRMachineState *spapr;
+     CPUState *cs = CPU(child);
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+     Object *obj;
+ 
++    spapr = (sPAPRMachineState *)object_dynamic_cast(qdev_get_machine(),
++                                                     TYPE_SPAPR_MACHINE);
++    if (!spapr) {
++        error_setg(errp, "spapr-cpu-core needs a pseries machine");
++        return;
++    }
++
+     object_property_set_bool(child, true, "realized", &local_err);
+     if (local_err) {
+         goto error;
+diff --git a/scripts/device-crash-test b/scripts/device-crash-test
+index e77b693..8eb2d02 100755
+--- a/scripts/device-crash-test
++++ b/scripts/device-crash-test
+@@ -200,6 +200,7 @@ ERROR_WHITELIST = [
+     {'log':r"Multiple VT220 operator consoles are not supported"},
+     {'log':r"core 0 already populated"},
+     {'log':r"could not find stage1 bootloader"},
++    {'log':r"spapr-cpu-core needs a pseries machine"},
+ 
+     # other exitcode=1 failures not listed above will just generate INFO messages:
+     {'exitcode':1, 'loglevel':logging.INFO},
+-- 
+1.8.3.1
