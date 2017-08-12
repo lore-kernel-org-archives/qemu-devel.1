@@ -1,18 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dgZIr-0000pZ-1e
-	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 12:30:22 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dgZTt-00056p-C8
+	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 12:41:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dgZIp-0008Aw-P7
-	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 12:30:21 -0400
-MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <20170812154131.29372-1-richard.henderson@linaro.org>
+	(envelope-from <richard.henderson@linaro.org>) id 1dgZTq-0004Qt-Ai
+	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 12:41:45 -0400
+Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:34157)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dgZTq-0004Qf-3C
+	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 12:41:42 -0400
+Received: by mail-pg0-x231.google.com with SMTP id u185so26462757pgb.1
+	for <qemu-devel@nongnu.org>; Sat, 12 Aug 2017 09:41:41 -0700 (PDT)
 References: <20170812154131.29372-1-richard.henderson@linaro.org>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Sat, 12 Aug 2017 09:29:47 -0700
-Message-ID: <CAKmqyKO=+QDLgEAyqrdTCkDsu6nojmDsdqsu5+po3OP_KOwYQA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<CAKmqyKO=+QDLgEAyqrdTCkDsu6nojmDsdqsu5+po3OP_KOwYQA@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7343971c-2563-d18b-cdac-60c4d66f5240@linaro.org>
+Date: Sat, 12 Aug 2017 09:41:37 -0700
+MIME-Version: 1.0
+In-Reply-To: <CAKmqyKO=+QDLgEAyqrdTCkDsu6nojmDsdqsu5+po3OP_KOwYQA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] target/arm: Correct load/store exclusive
  pairing and alignment
 List-Id: <qemu-devel.nongnu.org>
@@ -23,152 +32,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth7680@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, Richard Henderson <rth7680@gmail.com>
+Cc: Edgar Iglesias <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On Sat, Aug 12, 2017 at 8:41 AM, Richard Henderson <rth7680@gmail.com> wrote:
-> SetExclusiveMonitors in the pseudocode is on the address + width,
-> and says nothing about the manner of the load.  Therefore
->
->         ldxp    w0, w1, [x2]
-> vs
->         ldxr    x0, [x2]
->
-> must record the same metadata so that either may pair with
->
->         stxp    w3, w0, w1, [x2]
-> vs
->         stxr    w3, x0, [x2]
->
-> Fix this by ignoring cpu_exclusive_high except for 64-bit LDXP/STXP.
->
-> Also note that we were not providing the required single-copy atomic
-> semantics for 32-bit LDXP.  This is trivially fixed alongside the
-> cpu_exclusive_val change.
->
-> At the same time, exclusive loads require the same alignment as
-> exclusive stores.  For 64-bit LDXP, this means adding MO_ALIGN_16;
-> for the others adding MO_ALIGN.
->
-> Reported-by: Alistair Francis <alistair.francis@xilinx.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate-a64.c | 65 +++++++++++++++++++++++++++++-----------------
->  1 file changed, 41 insertions(+), 24 deletions(-)
-> ---
->
-> I have not yet constructed test cases for all of the combinations
-> listed above.  I wanted to put this into your hands so that you could
-> test against your existing code using LDXP/STXP.
+On 08/12/2017 09:29 AM, Alistair Francis wrote:
+> Now we aren't ever checking cpu_exclusive_high. Is it even worth having?
 
-I can test it on Monday when I'm back in the office. I'll let you know
-what I find.
+We are checking cpu_exclusive_high for 64-bit STXP.
+See paired_cmpxchg64_{l,b}e in target/arm/helper-a64.c.
 
->
->
-> r~
->
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 58ed4c6d05..f3643ac8dc 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -1853,29 +1853,45 @@ static void disas_b_exc_sys(DisasContext *s, uint32_t insn)
->  static void gen_load_exclusive(DisasContext *s, int rt, int rt2,
->                                 TCGv_i64 addr, int size, bool is_pair)
->  {
-> -    TCGv_i64 tmp = tcg_temp_new_i64();
-> -    TCGMemOp memop = s->be_data + size;
-> +    int idx = get_mem_index(s);
-> +    TCGMemOp memop = s->be_data;
->
->      g_assert(size <= 3);
-> -    tcg_gen_qemu_ld_i64(tmp, addr, get_mem_index(s), memop);
-> -
->      if (is_pair) {
-> -        TCGv_i64 addr2 = tcg_temp_new_i64();
-> -        TCGv_i64 hitmp = tcg_temp_new_i64();
-> -
->          g_assert(size >= 2);
-> -        tcg_gen_addi_i64(addr2, addr, 1 << size);
-> -        tcg_gen_qemu_ld_i64(hitmp, addr2, get_mem_index(s), memop);
-> -        tcg_temp_free_i64(addr2);
-> -        tcg_gen_mov_i64(cpu_exclusive_high, hitmp);
-> -        tcg_gen_mov_i64(cpu_reg(s, rt2), hitmp);
-> -        tcg_temp_free_i64(hitmp);
-> -    }
-> +        if (size == 2) {
-> +            /* The pair must be single-copy atomic for the doubleword.  */
-> +            memop |= MO_64 | MO_ALIGN;
-> +            tcg_gen_qemu_ld_i64(cpu_exclusive_val, addr, idx, memop);
-> +            if (s->be_data == MO_LE) {
-> +                tcg_gen_extract_i64(cpu_reg(s, rt), cpu_exclusive_val, 0, 32);
-> +                tcg_gen_extract_i64(cpu_reg(s, rt2), cpu_exclusive_val, 32, 32);
-> +            } else {
-> +                tcg_gen_extract_i64(cpu_reg(s, rt), cpu_exclusive_val, 32, 32);
-> +                tcg_gen_extract_i64(cpu_reg(s, rt2), cpu_exclusive_val, 0, 32);
-> +            }
-> +        } else {
-> +            /* The pair must be single-copy atomic for *each* doubleword,
-> +               but not the entire quadword.  It must, however, be aligned.  */
-> +            TCGv_i64 addr2;
->
-> -    tcg_gen_mov_i64(cpu_exclusive_val, tmp);
-> -    tcg_gen_mov_i64(cpu_reg(s, rt), tmp);
-> +            memop |= MO_64;
-> +            tcg_gen_qemu_ld_i64(cpu_exclusive_val, addr, idx,
-> +                                memop | MO_ALIGN_16);
->
-> -    tcg_temp_free_i64(tmp);
-> +            addr2 = tcg_temp_new_i64();
-> +            tcg_gen_addi_i64(addr2, addr, 8);
-> +            tcg_gen_qemu_ld_i64(cpu_exclusive_high, addr2, idx, memop);
-> +            tcg_temp_free_i64(addr2);
-> +
-> +            tcg_gen_mov_i64(cpu_reg(s, rt), cpu_exclusive_val);
-> +            tcg_gen_mov_i64(cpu_reg(s, rt2), cpu_exclusive_high);
-> +        }
-> +    } else {
-> +        memop |= size | MO_ALIGN;
-> +        tcg_gen_qemu_ld_i64(cpu_exclusive_val, addr, idx, memop);
-> +        tcg_gen_mov_i64(cpu_reg(s, rt), cpu_exclusive_val);
-> +    }
->      tcg_gen_mov_i64(cpu_exclusive_addr, addr);
->  }
->
-> @@ -1908,14 +1924,15 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
->      tmp = tcg_temp_new_i64();
->      if (is_pair) {
->          if (size == 2) {
-> -            TCGv_i64 val = tcg_temp_new_i64();
-> -            tcg_gen_concat32_i64(tmp, cpu_reg(s, rt), cpu_reg(s, rt2));
-> -            tcg_gen_concat32_i64(val, cpu_exclusive_val, cpu_exclusive_high);
-> -            tcg_gen_atomic_cmpxchg_i64(tmp, addr, val, tmp,
-> +            if (s->be_data == MO_LE) {
-> +                tcg_gen_concat32_i64(tmp, cpu_reg(s, rt), cpu_reg(s, rt2));
-> +            } else {
-> +                tcg_gen_concat32_i64(tmp, cpu_reg(s, rt2), cpu_reg(s, rt));
-> +            }
-> +            tcg_gen_atomic_cmpxchg_i64(tmp, addr, cpu_exclusive_val, tmp,
->                                         get_mem_index(s),
-> -                                       size | MO_ALIGN | s->be_data);
-> -            tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, val);
-> -            tcg_temp_free_i64(val);
-> +                                       MO_64 | MO_ALIGN | s->be_data);
-> +            tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, cpu_exclusive_val);
 
-Now we aren't ever checking cpu_exclusive_high. Is it even worth having?
-
-Otherwise the patch looks good, let me test it next week and I'll get
-back to you.
-
-Thanks,
-Alistair
-
->          } else if (s->be_data == MO_LE) {
->              gen_helper_paired_cmpxchg64_le(tmp, cpu_env, addr, cpu_reg(s, rt),
->                                             cpu_reg(s, rt2));
-> --
-> 2.13.4
->
->
+r~
