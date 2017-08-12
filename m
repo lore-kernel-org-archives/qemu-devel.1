@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mtparkr@gmail.com>) id 1dge2U-0007WW-GF
-	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 17:33:47 -0400
+	(envelope-from <mtparkr@gmail.com>) id 1dge3c-00008t-IS
+	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 17:34:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mtparkr@gmail.com>) id 1dge2R-0002ku-E0
-	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 17:33:46 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:36990)
+	(envelope-from <mtparkr@gmail.com>) id 1dge3Z-00034P-Ej
+	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 17:34:56 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:38574)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mtparkr@gmail.com>) id 1dge2R-0002k6-77
-	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 17:33:43 -0400
-Received: by mail-wr0-x243.google.com with SMTP id f38so4715103wrf.4
-	for <qemu-devel@nongnu.org>; Sat, 12 Aug 2017 14:33:41 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mtparkr@gmail.com>) id 1dge3Z-000347-8T
+	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 17:34:53 -0400
+Received: by mail-wr0-x243.google.com with SMTP id g32so4705672wrd.5
+	for <qemu-devel@nongnu.org>; Sat, 12 Aug 2017 14:34:53 -0700 (PDT)
 From: Matt Parker <mtparkr@gmail.com>
-Date: Sat, 12 Aug 2017 22:33:30 +0100
-Message-Id: <20170812213330.20539-1-mtparkr@gmail.com>
+Date: Sat, 12 Aug 2017 22:34:48 +0100
+Message-Id: <20170812213448.20624-1-mtparkr@gmail.com>
 Subject: [Qemu-devel] [PATCH] net: rtl8139: do not use old_mmio accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,8 +23,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nognu.org
-Cc: Jason Wang <jasowang@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>
 
 This updates the current MemoryRegionOps for the bar 1 memory region
 from using the old_mmio accessors to the .read and .write accessors.
