@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dgVEq-00042O-NF
-	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 08:09:58 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dgWCu-0007IL-M7
+	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 09:12:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dgVEm-0006JT-1w
-	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 08:09:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33432)
+	(envelope-from <ehabkost@redhat.com>) id 1dgWCr-0000ze-Bo
+	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 09:12:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47440)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dgVEl-0006Ia-Pn
-	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 08:09:52 -0400
-References: <35BC0F0B-7CB0-424C-86EA-2B5D8E219634@gmail.com>
-	<20170811215845.n667iobglz5cef3z@var.youpi.perso.aquilenet.fr>
-	<CAFEAcA_XrnDxZLhX5FGFBh+Mh-_80z3Z6b+0LkmQuoWzrWK0tA@mail.gmail.com>
-	<20170812110410.rosk6yhkj22w346s@var.youpi.perso.aquilenet.fr>
-	<CAFEAcA-N5pAM+3PXvjaJ-LMPFswAtmkAXA6yn151CCtfn+=JQA@mail.gmail.com>
-	<20170812112925.mpi2mmewt46wna7j@var.youpi.perso.aquilenet.fr>
-	<60ba7c95-8989-13bb-3aaf-ac9a8389320f@redhat.com>
-	<20170812114728.cnikfuyke5dbrake@var.youpi.perso.aquilenet.fr>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2ec95b76-3904-2781-a5b1-702734dfabfe@redhat.com>
-Date: Sat, 12 Aug 2017 07:09:48 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dgWCr-0000yl-2g
+	for qemu-devel@nongnu.org; Sat, 12 Aug 2017 09:11:57 -0400
+Date: Sat, 12 Aug 2017 10:02:59 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170812130259.GK3108@localhost.localdomain>
+References: <1502527090-11473-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170812114728.cnikfuyke5dbrake@var.youpi.perso.aquilenet.fr>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WwocKBwLVOLWFs43QOHFg2Uaqd4mgT6lR"
-Subject: Re: [Qemu-devel] SLIRP warning messages displayed while compiling
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1502527090-11473-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/ppc/spapr_cpu_core: Add a proper check
+ for spapr machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,82 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Programmingkid <programmingkidx@gmail.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Jan Kiszka <jan.kiszka@siemens.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WwocKBwLVOLWFs43QOHFg2Uaqd4mgT6lR
-From: Eric Blake <eblake@redhat.com>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Programmingkid <programmingkidx@gmail.com>,
- "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>,
- Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <2ec95b76-3904-2781-a5b1-702734dfabfe@redhat.com>
-Subject: Re: [Qemu-devel] SLIRP warning messages displayed while compiling
-References: <35BC0F0B-7CB0-424C-86EA-2B5D8E219634@gmail.com>
- <20170811215845.n667iobglz5cef3z@var.youpi.perso.aquilenet.fr>
- <CAFEAcA_XrnDxZLhX5FGFBh+Mh-_80z3Z6b+0LkmQuoWzrWK0tA@mail.gmail.com>
- <20170812110410.rosk6yhkj22w346s@var.youpi.perso.aquilenet.fr>
- <CAFEAcA-N5pAM+3PXvjaJ-LMPFswAtmkAXA6yn151CCtfn+=JQA@mail.gmail.com>
- <20170812112925.mpi2mmewt46wna7j@var.youpi.perso.aquilenet.fr>
- <60ba7c95-8989-13bb-3aaf-ac9a8389320f@redhat.com>
- <20170812114728.cnikfuyke5dbrake@var.youpi.perso.aquilenet.fr>
-In-Reply-To: <20170812114728.cnikfuyke5dbrake@var.youpi.perso.aquilenet.fr>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Sat, Aug 12, 2017 at 10:38:10AM +0200, Thomas Huth wrote:
+> QEMU currently crashes when the user tries to add a spapr-cpu-core
+> on a non-pseries machine:
+> 
+> $ qemu-system-ppc64 -S -machine ppce500,accel=tcg \
+>                     -device POWER5+_v2.1-spapr-cpu-core
+> hw/ppc/spapr_cpu_core.c:178:spapr_cpu_core_realize_child:
+> Object 0x55cee1f55160 is not an instance of type spapr-machine
+> Aborted (core dumped)
+> 
+> So let's add a proper check for the correct machine time with
+> a more friendly error message here.
+> 
+> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/ppc/spapr_cpu_core.c   | 9 ++++++++-
+>  scripts/device-crash-test | 1 +
+>  2 files changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index ea278ce..0f3d653 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -175,11 +175,18 @@ static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
+>  static void spapr_cpu_core_realize_child(Object *child, Error **errp)
+>  {
+>      Error *local_err = NULL;
+> -    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+> +    sPAPRMachineState *spapr;
+>      CPUState *cs = CPU(child);
+>      PowerPCCPU *cpu = POWERPC_CPU(cs);
+>      Object *obj;
+>  
+> +    spapr = (sPAPRMachineState *)object_dynamic_cast(qdev_get_machine(),
+> +                                                     TYPE_SPAPR_MACHINE);
+> +    if (!spapr) {
+> +        error_setg(errp, "spapr-cpu-core needs a pseries machine");
+> +        return;
+> +    }
+> +
+>      object_property_set_bool(child, true, "realized", &local_err);
+>      if (local_err) {
+>          goto error;
+> diff --git a/scripts/device-crash-test b/scripts/device-crash-test
+> index e77b693..8eb2d02 100755
+> --- a/scripts/device-crash-test
+> +++ b/scripts/device-crash-test
+> @@ -200,6 +200,7 @@ ERROR_WHITELIST = [
+>      {'log':r"Multiple VT220 operator consoles are not supported"},
+>      {'log':r"core 0 already populated"},
+>      {'log':r"could not find stage1 bootloader"},
+> +    {'log':r"spapr-cpu-core needs a pseries machine"},
 
-On 08/12/2017 06:47 AM, Samuel Thibault wrote:
-> Eric Blake, on sam. 12 ao=C3=BBt 2017 06:41:30 -0500, wrote:
->> Here's an idea:  Instead of using struct ip6 { ... } QEMU_PACKED, use
->>
->> struct ip6 {
->> ...
->> };
->> QEMU_BUG_ON(sizeof(struct ip6) !=3D 32);
->=20
-> That's an interesting way indeed.  I however wonder whether there may b=
-e
-> not-so-uncommon systems where the compiler aligns some fields just for
-> performance or such.
+device/machine whitelist entries are preferred, if possible.
+This way, we can set expected=True and device-crash-test will
+avoid testing a device/machine combination known to be
+incompatible (when running in quick mode), or print a warning if
+it doesn't fail as expected (when running in full mode).
 
-If it does, the BUG_ON will flag it, and we'll deal with it as needed
-for that platform, perhaps by adding:
+I suggest the following (untested):
 
-=2E..
-}
-#ifdef WEIRD_PLATFORM
-  QEMU_PACKED
-#endif
- ;
-QEMU_BUG_ON(...);
+  # "spapr-cpu-core needs a pseries machine"
+  {'machine':'(?!pseries.*)', 'device':'.*-spapr-cpu-core', 'expected':True},
 
-But as long as the BUG_ON doesn't flag anything, we can use the struct
-as-is.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---WwocKBwLVOLWFs43QOHFg2Uaqd4mgT6lR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmO8AwACgkQp6FrSiUn
-Q2p+zggAoNc36urLylX3qkxwMTAl3ekX9KZeNHTsOkXZlTZH3JX3Wso7mzUEnIoN
-2kU0/e5BSP0w7IJn7aqfznBXqUSL5IxwIxXioUi3te4BsxnCVoceVm20bWiGqS8D
-xF8h8RxEO1e9QAAhbOsye8gS6/tOCJDIqPEjwkyVVmZMiPCxVWSNmeSIGzKGVT6z
-L1Wn3IGztzvUoJZMfckShTe5VTJDRBjAIuHtqUJkGPC15shlAU22+PwhQknIhgyC
-9BkD1C84KgbGNVN8p0a9zRgmJ0igT9ensjlyQl3OkHu/qIDAzKkWB5Ke97Us/0dw
-biHx5SEeNmfYTEdkGyIlbkHnyC4kGQ==
-=28rv
------END PGP SIGNATURE-----
-
---WwocKBwLVOLWFs43QOHFg2Uaqd4mgT6lR--
+-- 
+Eduardo
