@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1dh271-0007Ph-Nm
-	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 19:16:06 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1dh271-0007Pk-OM
+	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 19:16:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1dh26y-0005uK-PW
+	(envelope-from <balaton@eik.bme.hu>) id 1dh26y-0005uP-Q0
 	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 19:16:03 -0400
-Message-Id: <cover.1502643878.git.balaton@eik.bme.hu>
+Message-Id: <f07c7c77f83136f938f346e1f3b2aa5296ff4223.1502643878.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1502643878.git.balaton@eik.bme.hu>
+References: <cover.1502643878.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Date: Sun, 13 Aug 2017 19:04:38 +0200
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH 00/12] Sam460ex emulation
+Subject: [Qemu-devel] [RFC PATCH 05/12] ppc4xx: Split off 4xx I2C emulation
+ from ppc405_uc to its own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,143 +23,577 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Francois Revol <revol@free.fr>
 
-Hello,
-
-Here's a series to add emulation of the Sam460ex to QEMU. (This board
-is interesting because besides Linux, it is supported by several Amiga
-like OSes.) This code is based on previous work by Fran=C3=A7ois Revol,
-cleaning it up and adding some missing parts to get it to start
-working at least for the Linux kernel and the original U-Boot firmware
-of the board (which is needed to boot the Amiga like OSes easily).
-
-This is not complete and cannot run most of the interesting OSes yet
-as there are still missing parts and likely some bugs I could not fix
-but since I have limited time and knowledge to work on this, I'd like
-to submit it now to get it reviewed and maybe some advice or even some
-help to finish it from other interested parties (especially if you
-have better knowledge of this hardware). Hence this RFC series, but it
-is probably in a shape now like some of the similar boards already in
-QEMU so if after review it is deemed fit I'd like to submit it for
-inclusion when development opens again.
-
-Some resources and status for those who want to help:
-
-The board is described on the manufacturer's site:
-http://www.acube-systems.biz/index.php?page=3Dhardware&pid=3D5
-where links can also be found to the official firmware and Linux
-images. Only the original 2010.06.05 firmware is tested from the
-20110414 updater (there is a newer version but that's only relevant
-for real hardware and may not work with this emulation so that's not
-recommended). This firmware works and starts booting but that's when
-problems start and you'll most likely hit some problem with most
-images before they boot.
-
-AROS and Linux iso-s use the Parthenope (ub2lb) bootloader which
-currently fails when it calls the start_unit_scan with NULL first
-argument in cdrom.c:get_dev() which causes a null pointer dereference
-in U-Boot/board/ACube/common/sys_dep.c:start_unit_scan() which causes
-an exception in QEMU (vector 1300, I think it's Data TLB Error) and
-this leads to breakage. This may be a bug in the firmware but
-apparently on real hardware this works somehow so this suggests a
-difference in emulation that should be fixed. If I fix this in U-Boot
-then it hits another bug in board/ACube/common/cmd_boota.c where it
-references stack variable beyond its scope and gets garbled text (I
-wonder how this was working, maybe they used different compiler and
-were lucky). This causes Parthenope not find its menu.lst config. Also
-fixing this (here's a binary with both fixes:
-http://zero.eik.bme.hu/~balaton/qemu/ ) finally it gets further
-booting but then AROS fails while setting up the MMU so maybe this
-means there are some bugs or differences between the MMU/TLB/exception
-emulation and real hardware (assuming it works on real hardware at
-all). But I don't know how real hardware works so I could not find it
-out. Does anyone have an idea?
-
-Linux can also be booted via -kernel -dtb -initrd instead of booting
-the iso via the firmware and this gets to executing the initrd but
-then it seems to hang and I could not identify where and why. There
-are different Linux images so maybe some work better or worse but I
-could not fully boot a Linux system yet only to the initrd (although
-I've only tried a few not all of them). Also most of these images are
-network installers and the on board ppc4xx ethernet port is not yet
-emulated so this may cause the hang. Anyone wants to contribute?
-
-MorphOS starts booting but does not find PCI devices so it fails.
-Unfortunately I don't know how to set kernel parameters to enable
-debug logging (passing them via the bootloader like on Mac does not
-work and MorphOS people haven't reply my query about it) so I don't
-care for now until other OSes easier to debug can't boot. (Besides,
-MorphOS could also run on the Mac emulation and may get a new version
-soon which might change a few things so it's low priority now; maybe
-I look at it again when new version is available.) I could not test
-AmigaOS because I don't have that but I would not be surprised if it
-would also fail during boot for some reason but if someone has a copy
-and can try it let me know how it fails (try -serial stdio to hopefully
-get some logs).
-
-How can you help? (Besides fixing bugs and implementing missing parts
-if you can do that, but in that case you probably know what to do.)
-No monetary donations are solicited or accepted (I'm saying this
-because I got some anonymous donations in the past which I did not
-claim so they went to the QEMU project and did not help this work in
-any way, so this is not a good way to support this activity.) What
-would be more useful is to test on real hardware to get logs for
-comparison so if you have a Sam460ex (or its simpler Sam460cr version)
-and could gather debug logs over the serial port try getting some with
-an AROS iso then contact me with the log and for an AROS iso with more
-logging enabled to get more details.
-
-In any case, I do this in my free time and for personal interest so
-don't expect any support or roadmap for this. If the info here is not
-enough for you to get it working for testing then it's not ready for
-you yet. I don't have time to help people with this so if you can't
-find it out you should wait until it's more developed (which may take
-years or could be never). Sorry for this disclaimer here but I've
-learned that the situation with Amiga like OSes can sometimes be
-interesting and I would like to avoid misunderstandings. This is very
-much work in progress not useful for the general users at the moment,
-only for interested developers.
-
-
-BALATON Zoltan (12):
-  ppc4xx: Move MAL from ppc405_uc to ppc4xx_devs
-  ppc4xx: Make MAL emulation more generic
-  ohci: Allow sysbus version to be used as a companion
-  ehci: Add ppc4xx-ehci for the USB 2.0 controller in embedded PPC SoCs
-  ppc4xx: Split off 4xx I2C emulation from ppc405_uc to its own file
-  ppc4xx_i2c: QOMify
-  ppc4xx_i2c: Implement basic I2C functions
-  hw/ide: Emulate SiI3112 SATA controller
-  ppc440: Add emulation of plb-pcix controller found in some 440 SoCs
-  ppc: Add 460EX embedded CPU
-  ppc4xx: Export ECB and PLB emulation
-  ppc: Add aCube Sam460ex board
-
- default-configs/ppcemb-softmmu.mak |    3 +
- hw/ide/Makefile.objs               |    1 +
- hw/ide/sii3112.c                   |  365 +++++++
- hw/ppc/Makefile.objs               |    4 +-
- hw/ppc/ppc405.h                    |    3 +
- hw/ppc/ppc405_uc.c                 |  527 +---------
- hw/ppc/ppc440_pcix.c               |  506 ++++++++++
- hw/ppc/ppc4xx_devs.c               |  227 +++++
- hw/ppc/ppc4xx_i2c.c                |  391 ++++++++
- hw/ppc/sam460ex.c                  | 1895 ++++++++++++++++++++++++++++++=
-++++++
- hw/usb/hcd-ehci-sysbus.c           |   25 +
- hw/usb/hcd-ehci.h                  |    1 +
- hw/usb/hcd-ohci.c                  |   15 +-
- include/hw/i2c/ppc4xx_i2c.h        |   64 ++
- include/hw/pci/pcie_host.h         |    2 +-
- include/hw/ppc/ppc4xx.h            |    3 +
- target/ppc/cpu-models.c            |    3 +
- target/ppc/cpu-models.h            |    1 +
- target/ppc/translate_init.c        |   38 +
- 19 files changed, 3557 insertions(+), 517 deletions(-)
- create mode 100644 hw/ide/sii3112.c
- create mode 100644 hw/ppc/ppc440_pcix.c
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+ hw/ppc/Makefile.objs |   2 +-
+ hw/ppc/ppc405.h      |   2 +
+ hw/ppc/ppc405_uc.c   | 241 ---------------------------------------------
+ hw/ppc/ppc4xx_i2c.c  | 272 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 275 insertions(+), 242 deletions(-)
  create mode 100644 hw/ppc/ppc4xx_i2c.c
- create mode 100644 hw/ppc/sam460ex.c
- create mode 100644 include/hw/i2c/ppc4xx_i2c.h
 
---=20
+diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+index 7efc686..2077216 100644
+--- a/hw/ppc/Makefile.objs
++++ b/hw/ppc/Makefile.objs
+@@ -13,7 +13,7 @@ endif
+ obj-$(CONFIG_PSERIES) += spapr_rtas_ddw.o
+ # PowerPC 4xx boards
+ obj-y += ppc405_boards.o ppc4xx_devs.o ppc405_uc.o ppc440_bamboo.o
+-obj-y += ppc4xx_pci.o
++obj-y += ppc4xx_pci.o ppc4xx_i2c.o
+ # PReP
+ obj-$(CONFIG_PREP) += prep.o
+ obj-$(CONFIG_PREP) += prep_systemio.o
+diff --git a/hw/ppc/ppc405.h b/hw/ppc/ppc405.h
+index a9ffc87..61ec739 100644
+--- a/hw/ppc/ppc405.h
++++ b/hw/ppc/ppc405.h
+@@ -59,6 +59,8 @@ struct ppc4xx_bd_info_t {
+ ram_addr_t ppc405_set_bootinfo (CPUPPCState *env, ppc4xx_bd_info_t *bd,
+                                 uint32_t flags);
+ 
++void ppc405_i2c_init(hwaddr base, qemu_irq irq);
++
+ CPUPPCState *ppc405cr_init(MemoryRegion *address_space_mem,
+                         MemoryRegion ram_memories[4],
+                         hwaddr ram_bases[4],
+diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
+index 03856d5..3925e4c 100644
+--- a/hw/ppc/ppc405_uc.c
++++ b/hw/ppc/ppc405_uc.c
+@@ -40,7 +40,6 @@
+ //#define DEBUG_GPIO
+ //#define DEBUG_SERIAL
+ //#define DEBUG_OCM
+-//#define DEBUG_I2C
+ //#define DEBUG_GPT
+ //#define DEBUG_CLOCKS
+ //#define DEBUG_CLOCKS_LL
+@@ -993,246 +992,6 @@ static void ppc405_ocm_init(CPUPPCState *env)
+ }
+ 
+ /*****************************************************************************/
+-/* I2C controller */
+-typedef struct ppc4xx_i2c_t ppc4xx_i2c_t;
+-struct ppc4xx_i2c_t {
+-    qemu_irq irq;
+-    MemoryRegion iomem;
+-    uint8_t mdata;
+-    uint8_t lmadr;
+-    uint8_t hmadr;
+-    uint8_t cntl;
+-    uint8_t mdcntl;
+-    uint8_t sts;
+-    uint8_t extsts;
+-    uint8_t sdata;
+-    uint8_t lsadr;
+-    uint8_t hsadr;
+-    uint8_t clkdiv;
+-    uint8_t intrmsk;
+-    uint8_t xfrcnt;
+-    uint8_t xtcntlss;
+-    uint8_t directcntl;
+-};
+-
+-static uint32_t ppc4xx_i2c_readb (void *opaque, hwaddr addr)
+-{
+-    ppc4xx_i2c_t *i2c;
+-    uint32_t ret;
+-
+-#ifdef DEBUG_I2C
+-    printf("%s: addr " TARGET_FMT_plx "\n", __func__, addr);
+-#endif
+-    i2c = opaque;
+-    switch (addr) {
+-    case 0x00:
+-        //        i2c_readbyte(&i2c->mdata);
+-        ret = i2c->mdata;
+-        break;
+-    case 0x02:
+-        ret = i2c->sdata;
+-        break;
+-    case 0x04:
+-        ret = i2c->lmadr;
+-        break;
+-    case 0x05:
+-        ret = i2c->hmadr;
+-        break;
+-    case 0x06:
+-        ret = i2c->cntl;
+-        break;
+-    case 0x07:
+-        ret = i2c->mdcntl;
+-        break;
+-    case 0x08:
+-        ret = i2c->sts;
+-        break;
+-    case 0x09:
+-        ret = i2c->extsts;
+-        break;
+-    case 0x0A:
+-        ret = i2c->lsadr;
+-        break;
+-    case 0x0B:
+-        ret = i2c->hsadr;
+-        break;
+-    case 0x0C:
+-        ret = i2c->clkdiv;
+-        break;
+-    case 0x0D:
+-        ret = i2c->intrmsk;
+-        break;
+-    case 0x0E:
+-        ret = i2c->xfrcnt;
+-        break;
+-    case 0x0F:
+-        ret = i2c->xtcntlss;
+-        break;
+-    case 0x10:
+-        ret = i2c->directcntl;
+-        break;
+-    default:
+-        ret = 0x00;
+-        break;
+-    }
+-#ifdef DEBUG_I2C
+-    printf("%s: addr " TARGET_FMT_plx " %02" PRIx32 "\n", __func__, addr, ret);
+-#endif
+-
+-    return ret;
+-}
+-
+-static void ppc4xx_i2c_writeb (void *opaque,
+-                               hwaddr addr, uint32_t value)
+-{
+-    ppc4xx_i2c_t *i2c;
+-
+-#ifdef DEBUG_I2C
+-    printf("%s: addr " TARGET_FMT_plx " val %08" PRIx32 "\n", __func__, addr,
+-           value);
+-#endif
+-    i2c = opaque;
+-    switch (addr) {
+-    case 0x00:
+-        i2c->mdata = value;
+-        //        i2c_sendbyte(&i2c->mdata);
+-        break;
+-    case 0x02:
+-        i2c->sdata = value;
+-        break;
+-    case 0x04:
+-        i2c->lmadr = value;
+-        break;
+-    case 0x05:
+-        i2c->hmadr = value;
+-        break;
+-    case 0x06:
+-        i2c->cntl = value;
+-        break;
+-    case 0x07:
+-        i2c->mdcntl = value & 0xDF;
+-        break;
+-    case 0x08:
+-        i2c->sts &= ~(value & 0x0A);
+-        break;
+-    case 0x09:
+-        i2c->extsts &= ~(value & 0x8F);
+-        break;
+-    case 0x0A:
+-        i2c->lsadr = value;
+-        break;
+-    case 0x0B:
+-        i2c->hsadr = value;
+-        break;
+-    case 0x0C:
+-        i2c->clkdiv = value;
+-        break;
+-    case 0x0D:
+-        i2c->intrmsk = value;
+-        break;
+-    case 0x0E:
+-        i2c->xfrcnt = value & 0x77;
+-        break;
+-    case 0x0F:
+-        i2c->xtcntlss = value;
+-        break;
+-    case 0x10:
+-        i2c->directcntl = value & 0x7;
+-        break;
+-    }
+-}
+-
+-static uint32_t ppc4xx_i2c_readw (void *opaque, hwaddr addr)
+-{
+-    uint32_t ret;
+-
+-#ifdef DEBUG_I2C
+-    printf("%s: addr " TARGET_FMT_plx "\n", __func__, addr);
+-#endif
+-    ret = ppc4xx_i2c_readb(opaque, addr) << 8;
+-    ret |= ppc4xx_i2c_readb(opaque, addr + 1);
+-
+-    return ret;
+-}
+-
+-static void ppc4xx_i2c_writew (void *opaque,
+-                               hwaddr addr, uint32_t value)
+-{
+-#ifdef DEBUG_I2C
+-    printf("%s: addr " TARGET_FMT_plx " val %08" PRIx32 "\n", __func__, addr,
+-           value);
+-#endif
+-    ppc4xx_i2c_writeb(opaque, addr, value >> 8);
+-    ppc4xx_i2c_writeb(opaque, addr + 1, value);
+-}
+-
+-static uint32_t ppc4xx_i2c_readl (void *opaque, hwaddr addr)
+-{
+-    uint32_t ret;
+-
+-#ifdef DEBUG_I2C
+-    printf("%s: addr " TARGET_FMT_plx "\n", __func__, addr);
+-#endif
+-    ret = ppc4xx_i2c_readb(opaque, addr) << 24;
+-    ret |= ppc4xx_i2c_readb(opaque, addr + 1) << 16;
+-    ret |= ppc4xx_i2c_readb(opaque, addr + 2) << 8;
+-    ret |= ppc4xx_i2c_readb(opaque, addr + 3);
+-
+-    return ret;
+-}
+-
+-static void ppc4xx_i2c_writel (void *opaque,
+-                               hwaddr addr, uint32_t value)
+-{
+-#ifdef DEBUG_I2C
+-    printf("%s: addr " TARGET_FMT_plx " val %08" PRIx32 "\n", __func__, addr,
+-           value);
+-#endif
+-    ppc4xx_i2c_writeb(opaque, addr, value >> 24);
+-    ppc4xx_i2c_writeb(opaque, addr + 1, value >> 16);
+-    ppc4xx_i2c_writeb(opaque, addr + 2, value >> 8);
+-    ppc4xx_i2c_writeb(opaque, addr + 3, value);
+-}
+-
+-static const MemoryRegionOps i2c_ops = {
+-    .old_mmio = {
+-        .read = { ppc4xx_i2c_readb, ppc4xx_i2c_readw, ppc4xx_i2c_readl, },
+-        .write = { ppc4xx_i2c_writeb, ppc4xx_i2c_writew, ppc4xx_i2c_writel, },
+-    },
+-    .endianness = DEVICE_NATIVE_ENDIAN,
+-};
+-
+-static void ppc4xx_i2c_reset (void *opaque)
+-{
+-    ppc4xx_i2c_t *i2c;
+-
+-    i2c = opaque;
+-    i2c->mdata = 0x00;
+-    i2c->sdata = 0x00;
+-    i2c->cntl = 0x00;
+-    i2c->mdcntl = 0x00;
+-    i2c->sts = 0x00;
+-    i2c->extsts = 0x00;
+-    i2c->clkdiv = 0x00;
+-    i2c->xfrcnt = 0x00;
+-    i2c->directcntl = 0x0F;
+-}
+-
+-static void ppc405_i2c_init(hwaddr base, qemu_irq irq)
+-{
+-    ppc4xx_i2c_t *i2c;
+-
+-    i2c = g_malloc0(sizeof(ppc4xx_i2c_t));
+-    i2c->irq = irq;
+-#ifdef DEBUG_I2C
+-    printf("%s: offset " TARGET_FMT_plx "\n", __func__, base);
+-#endif
+-    memory_region_init_io(&i2c->iomem, NULL, &i2c_ops, i2c, "i2c", 0x011);
+-    memory_region_add_subregion(get_system_memory(), base, &i2c->iomem);
+-    qemu_register_reset(ppc4xx_i2c_reset, i2c);
+-}
+-
+-/*****************************************************************************/
+ /* General purpose timers */
+ typedef struct ppc4xx_gpt_t ppc4xx_gpt_t;
+ struct ppc4xx_gpt_t {
+diff --git a/hw/ppc/ppc4xx_i2c.c b/hw/ppc/ppc4xx_i2c.c
+new file mode 100644
+index 0000000..15f2dea
+--- /dev/null
++++ b/hw/ppc/ppc4xx_i2c.c
+@@ -0,0 +1,272 @@
++/*
++ * PPC4xx I2C controller emulation
++ *
++ * Copyright (c) 2007 Jocelyn Mayer
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "exec/address-spaces.h"
++#include "hw/ppc/ppc.h"
++#include "ppc405.h"
++
++/*#define DEBUG_I2C*/
++
++typedef struct ppc4xx_i2c_t ppc4xx_i2c_t;
++struct ppc4xx_i2c_t {
++    qemu_irq irq;
++    MemoryRegion iomem;
++    uint8_t mdata;
++    uint8_t lmadr;
++    uint8_t hmadr;
++    uint8_t cntl;
++    uint8_t mdcntl;
++    uint8_t sts;
++    uint8_t extsts;
++    uint8_t sdata;
++    uint8_t lsadr;
++    uint8_t hsadr;
++    uint8_t clkdiv;
++    uint8_t intrmsk;
++    uint8_t xfrcnt;
++    uint8_t xtcntlss;
++    uint8_t directcntl;
++};
++
++static uint32_t ppc4xx_i2c_readb(void *opaque, hwaddr addr)
++{
++    ppc4xx_i2c_t *i2c;
++    uint32_t ret;
++
++#ifdef DEBUG_I2C
++    printf("%s: addr " TARGET_FMT_plx "\n", __func__, addr);
++#endif
++    i2c = opaque;
++    switch (addr) {
++    case 0x00:
++        /*i2c_readbyte(&i2c->mdata);*/
++        ret = i2c->mdata;
++        break;
++    case 0x02:
++        ret = i2c->sdata;
++        break;
++    case 0x04:
++        ret = i2c->lmadr;
++        break;
++    case 0x05:
++        ret = i2c->hmadr;
++        break;
++    case 0x06:
++        ret = i2c->cntl;
++        break;
++    case 0x07:
++        ret = i2c->mdcntl;
++        break;
++    case 0x08:
++        ret = i2c->sts;
++        break;
++    case 0x09:
++        ret = i2c->extsts;
++        break;
++    case 0x0A:
++        ret = i2c->lsadr;
++        break;
++    case 0x0B:
++        ret = i2c->hsadr;
++        break;
++    case 0x0C:
++        ret = i2c->clkdiv;
++        break;
++    case 0x0D:
++        ret = i2c->intrmsk;
++        break;
++    case 0x0E:
++        ret = i2c->xfrcnt;
++        break;
++    case 0x0F:
++        ret = i2c->xtcntlss;
++        break;
++    case 0x10:
++        ret = i2c->directcntl;
++        break;
++    default:
++        ret = 0x00;
++        break;
++    }
++#ifdef DEBUG_I2C
++    printf("%s: addr " TARGET_FMT_plx " %02" PRIx32 "\n", __func__, addr, ret);
++#endif
++
++    return ret;
++}
++
++static void ppc4xx_i2c_writeb(void *opaque,
++                              hwaddr addr, uint32_t value)
++{
++    ppc4xx_i2c_t *i2c;
++
++#ifdef DEBUG_I2C
++    printf("%s: addr " TARGET_FMT_plx " val %08" PRIx32 "\n", __func__, addr,
++           value);
++#endif
++    i2c = opaque;
++    switch (addr) {
++    case 0x00:
++        i2c->mdata = value;
++        /*i2c_sendbyte(&i2c->mdata);*/
++        break;
++    case 0x02:
++        i2c->sdata = value;
++        break;
++    case 0x04:
++        i2c->lmadr = value;
++        break;
++    case 0x05:
++        i2c->hmadr = value;
++        break;
++    case 0x06:
++        i2c->cntl = value;
++        break;
++    case 0x07:
++        i2c->mdcntl = value & 0xDF;
++        break;
++    case 0x08:
++        i2c->sts &= ~(value & 0x0A);
++        break;
++    case 0x09:
++        i2c->extsts &= ~(value & 0x8F);
++        break;
++    case 0x0A:
++        i2c->lsadr = value;
++        break;
++    case 0x0B:
++        i2c->hsadr = value;
++        break;
++    case 0x0C:
++        i2c->clkdiv = value;
++        break;
++    case 0x0D:
++        i2c->intrmsk = value;
++        break;
++    case 0x0E:
++        i2c->xfrcnt = value & 0x77;
++        break;
++    case 0x0F:
++        i2c->xtcntlss = value;
++        break;
++    case 0x10:
++        i2c->directcntl = value & 0x7;
++        break;
++    }
++}
++
++static uint32_t ppc4xx_i2c_readw(void *opaque, hwaddr addr)
++{
++    uint32_t ret;
++
++#ifdef DEBUG_I2C
++    printf("%s: addr " TARGET_FMT_plx "\n", __func__, addr);
++#endif
++    ret = ppc4xx_i2c_readb(opaque, addr) << 8;
++    ret |= ppc4xx_i2c_readb(opaque, addr + 1);
++
++    return ret;
++}
++
++static void ppc4xx_i2c_writew(void *opaque,
++                              hwaddr addr, uint32_t value)
++{
++#ifdef DEBUG_I2C
++    printf("%s: addr " TARGET_FMT_plx " val %08" PRIx32 "\n", __func__, addr,
++           value);
++#endif
++    ppc4xx_i2c_writeb(opaque, addr, value >> 8);
++    ppc4xx_i2c_writeb(opaque, addr + 1, value);
++}
++
++static uint32_t ppc4xx_i2c_readl(void *opaque, hwaddr addr)
++{
++    uint32_t ret;
++
++#ifdef DEBUG_I2C
++    printf("%s: addr " TARGET_FMT_plx "\n", __func__, addr);
++#endif
++    ret = ppc4xx_i2c_readb(opaque, addr) << 24;
++    ret |= ppc4xx_i2c_readb(opaque, addr + 1) << 16;
++    ret |= ppc4xx_i2c_readb(opaque, addr + 2) << 8;
++    ret |= ppc4xx_i2c_readb(opaque, addr + 3);
++
++    return ret;
++}
++
++static void ppc4xx_i2c_writel(void *opaque,
++                              hwaddr addr, uint32_t value)
++{
++#ifdef DEBUG_I2C
++    printf("%s: addr " TARGET_FMT_plx " val %08" PRIx32 "\n", __func__, addr,
++           value);
++#endif
++    ppc4xx_i2c_writeb(opaque, addr, value >> 24);
++    ppc4xx_i2c_writeb(opaque, addr + 1, value >> 16);
++    ppc4xx_i2c_writeb(opaque, addr + 2, value >> 8);
++    ppc4xx_i2c_writeb(opaque, addr + 3, value);
++}
++
++static const MemoryRegionOps i2c_ops = {
++    .old_mmio = {
++        .read = { ppc4xx_i2c_readb, ppc4xx_i2c_readw, ppc4xx_i2c_readl, },
++        .write = { ppc4xx_i2c_writeb, ppc4xx_i2c_writew, ppc4xx_i2c_writel, },
++    },
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static void ppc4xx_i2c_reset(void *opaque)
++{
++    ppc4xx_i2c_t *i2c;
++
++    i2c = opaque;
++    i2c->mdata = 0x00;
++    i2c->sdata = 0x00;
++    i2c->cntl = 0x00;
++    i2c->mdcntl = 0x00;
++    i2c->sts = 0x00;
++    i2c->extsts = 0x00;
++    i2c->clkdiv = 0x00;
++    i2c->xfrcnt = 0x00;
++    i2c->directcntl = 0x0F;
++}
++
++void ppc405_i2c_init(hwaddr base, qemu_irq irq)
++{
++    ppc4xx_i2c_t *i2c;
++
++    i2c = g_malloc0(sizeof(ppc4xx_i2c_t));
++    i2c->irq = irq;
++#ifdef DEBUG_I2C
++    printf("%s: offset " TARGET_FMT_plx "\n", __func__, base);
++#endif
++    memory_region_init_io(&i2c->iomem, NULL, &i2c_ops, i2c, "i2c", 0x011);
++    memory_region_add_subregion(get_system_memory(), base, &i2c->iomem);
++    qemu_register_reset(ppc4xx_i2c_reset, i2c);
++}
+-- 
 2.7.4
