@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dgqwP-0006sa-B6
-	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 07:20:22 -0400
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dgr6a-0003Aw-Le
+	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 07:30:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dgqwL-0007WQ-BH
-	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 07:20:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44102)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dgqwL-0007Tw-1z
-	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 07:20:17 -0400
-References: <1502407288-22226-1-git-send-email-zuban32s@gmail.com>
-	<1502407288-22226-4-git-send-email-zuban32s@gmail.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <12889e1c-6db4-f3ab-27c5-a0ae33bde158@redhat.com>
-Date: Sun, 13 Aug 2017 14:20:05 +0300
-MIME-Version: 1.0
-In-Reply-To: <1502407288-22226-4-git-send-email-zuban32s@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 3/3] pci: enable RedHat PCI bridges to
- reserve additional resource on PCI init
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dgr6X-0006cn-E9
+	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 07:30:52 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:59916 helo=zte.com.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peng.hao2@zte.com.cn>) id 1dgr6W-0006al-R9
+	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 07:30:49 -0400
+From: Peng Hao <peng.hao2@zte.com.cn>
+Date: Mon, 14 Aug 2017 03:42:52 +0800
+Message-Id: <1502653372-115805-1-git-send-email-peng.hao2@zte.com.cn>
+Subject: [Qemu-devel] [RFC PATCH V2] target-i386 : reduce rtc 0x70 access
+ vm-exit time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,226 +22,277 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>, seabios@seabios.org
-Cc: mst@redhat.com, kevin@koconnor.net, kraxel@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org
+To: pbonzini@redhat.com, mst@redhat.com
+Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, Peng Hao <peng.hao2@zte.com.cn>
 
-On 11/08/2017 2:21, Aleksandr Bezzubikov wrote:
-> In case of Red Hat Generic PCIE Root Port reserve additional buses
-> and/or IO/MEM/PREF space, which values are provided in a vendor-specific capability.
-> 
-> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-> ---
->   src/fw/dev-pci.h |   2 +-
->   src/fw/pciinit.c | 125 +++++++++++++++++++++++++++++++++++++++++++++++++------
->   src/hw/pci_ids.h |   3 ++
->   3 files changed, 116 insertions(+), 14 deletions(-)
-> 
-> diff --git a/src/fw/dev-pci.h b/src/fw/dev-pci.h
-> index cf16b2e..99ccc12 100644
-> --- a/src/fw/dev-pci.h
-> +++ b/src/fw/dev-pci.h
-> @@ -38,7 +38,7 @@
->   #define PCI_CAP_REDHAT_TYPE_OFFSET  3
->   
->   /* List of valid Red Hat vendor-specific capability types */
-> -#define REDHAT_CAP_RESOURCE_RESERVE    1
-> +#define REDHAT_CAP_RESOURCE_RESERVE 1
->   
->   
->   /* Offsets of RESOURCE_RESERVE capability fields */
-> diff --git a/src/fw/pciinit.c b/src/fw/pciinit.c
-> index 864954f..d9aef56 100644
-> --- a/src/fw/pciinit.c
-> +++ b/src/fw/pciinit.c
-> @@ -15,6 +15,7 @@
->   #include "hw/pcidevice.h" // pci_probe_devices
->   #include "hw/pci_ids.h" // PCI_VENDOR_ID_INTEL
->   #include "hw/pci_regs.h" // PCI_COMMAND
-> +#include "fw/dev-pci.h" // REDHAT_CAP_RESOURCE_RESERVE
->   #include "list.h" // struct hlist_node
->   #include "malloc.h" // free
->   #include "output.h" // dprintf
-> @@ -522,6 +523,32 @@ static void pci_bios_init_platform(void)
->       }
->   }
->   
-> +static u8 pci_find_resource_reserve_capability(u16 bdf)
-> +{
-> +    if (pci_config_readw(bdf, PCI_VENDOR_ID) == PCI_VENDOR_ID_REDHAT &&
-> +        pci_config_readw(bdf, PCI_DEVICE_ID) ==
-> +                PCI_DEVICE_ID_REDHAT_ROOT_PORT) {
-> +        u8 cap = 0;
-> +        do {
-> +            cap = pci_find_capability(bdf, PCI_CAP_ID_VNDR, cap);
-> +        } while (cap &&
-> +                 pci_config_readb(bdf, cap + PCI_CAP_REDHAT_TYPE_OFFSET) !=
-> +                        REDHAT_CAP_RESOURCE_RESERVE);
-> +        if (cap) {
-> +            u8 cap_len = pci_config_readb(bdf, cap + PCI_CAP_FLAGS);
-> +            if (cap_len < RES_RESERVE_CAP_SIZE) {
-> +                dprintf(1, "PCI: QEMU resource reserve cap length %d is invalid\n",
-> +                        cap_len);
-> +            }
-> +        } else {
-> +            dprintf(1, "PCI: invalid QEMU resource reserve cap offset\n");
-> +        }
-> +        return cap;
-> +    } else {
-> +        dprintf(1, "PCI: QEMU resource reserve cap not found\n");
-> +        return 0;
-> +    }
-> +}
->   
->   /****************************************************************
->    * Bus initialization
-> @@ -578,9 +605,28 @@ pci_bios_init_bus_rec(int bus, u8 *pci_bus)
->           pci_bios_init_bus_rec(secbus, pci_bus);
->   
->           if (subbus != *pci_bus) {
-> +            u8 res_bus = 0;
-> +            u8 cap = pci_find_resource_reserve_capability(bdf);
-> +
-> +            if (cap) {
-> +                u32 tmp_res_bus = pci_config_readl(bdf,
-> +                        cap + RES_RESERVE_BUS_RES);
-> +                if (tmp_res_bus != (u32)-1) {
-> +                    res_bus = tmp_res_bus & 0xFF;
-> +                    if ((u8)(res_bus + secbus) < secbus ||
-> +                            (u8)(res_bus + secbus) < res_bus) {
-> +                        dprintf(1, "PCI: bus_reserve value %d is invalid\n",
-> +                                res_bus);
-> +                        res_bus = 0;
-> +                    }
-> +                }
-> +                res_bus = (*pci_bus > secbus + res_bus) ? *pci_bus
-> +                        : secbus + res_bus;
-> +            }
->               dprintf(1, "PCI: subordinate bus = 0x%x -> 0x%x\n",
-> -                    subbus, *pci_bus);
-> -            subbus = *pci_bus;
-> +                    subbus, res_bus);
-> +            subbus = res_bus;
-> +            *pci_bus = res_bus;
->           } else {
->               dprintf(1, "PCI: subordinate bus = 0x%x\n", subbus);
->           }
-> @@ -844,22 +890,74 @@ static int pci_bios_check_devices(struct pci_bus *busses)
->                */
->               parent = &busses[0];
->           int type;
-> -        u8 pcie_cap = pci_find_capability(s->bus_dev->bdf, PCI_CAP_ID_EXP, 0);
-> +        u16 bdf = s->bus_dev->bdf;
-> +        u8 pcie_cap = pci_find_capability(bdf, PCI_CAP_ID_EXP, 0);
-> +        u8 qemu_cap = pci_find_resource_reserve_capability(bdf);
-> +
->           int hotplug_support = pci_bus_hotplug_support(s, pcie_cap);
->           for (type = 0; type < PCI_REGION_TYPE_COUNT; type++) {
->               u64 align = (type == PCI_REGION_TYPE_IO) ?
-> -                PCI_BRIDGE_IO_MIN : PCI_BRIDGE_MEM_MIN;
-> +                    PCI_BRIDGE_IO_MIN : PCI_BRIDGE_MEM_MIN;
->               if (!pci_bridge_has_region(s->bus_dev, type))
->                   continue;
-> -            if (pci_region_align(&s->r[type]) > align)
-> -                 align = pci_region_align(&s->r[type]);
-> -            u64 sum = pci_region_sum(&s->r[type]);
-> -            int resource_optional = pcie_cap && (type == PCI_REGION_TYPE_IO);
-> -            if (!sum && hotplug_support && !resource_optional)
-> -                sum = align; /* reserve min size for hot-plug */
-> -            u64 size = ALIGN(sum, align);
-> -            int is64 = pci_bios_bridge_region_is64(&s->r[type],
-> -                                            s->bus_dev, type);
-> +            u64 size;
-> +            int is64;
-> +            int qemu_cap_used = 0;
-> +            if (qemu_cap) {
-> +                u32 tmp_size;
-> +                u64 tmp_size_64;
-> +                switch(type) {
-> +                case PCI_REGION_TYPE_IO:
-> +                    tmp_size_64 = (pci_config_readl(bdf, qemu_cap + RES_RESERVE_IO) |
-> +                            (u64)pci_config_readl(bdf, qemu_cap + RES_RESERVE_IO + 4) << 32);
-> +                    if (tmp_size_64 != (u64)-1) {
-> +                        size = tmp_size_64;
-> +                        is64 = 0;
-> +                        qemu_cap_used = 1;
-> +                    }
-> +                    break;
-> +                case PCI_REGION_TYPE_MEM:
-> +                    tmp_size = pci_config_readl(bdf, qemu_cap + RES_RESERVE_MEM);
-> +                    if (tmp_size != (u32)-1) {
-> +                        size = tmp_size;
-> +                        is64 = 0;
-> +                        qemu_cap_used = 1;
-> +                    }
-> +                    break;
-> +                case PCI_REGION_TYPE_PREFMEM:
-> +                    tmp_size = pci_config_readl(bdf, qemu_cap + RES_RESERVE_PREF_MEM_32);
-> +                    tmp_size_64 = (pci_config_readl(bdf, qemu_cap + RES_RESERVE_PREF_MEM_64) |
-> +                            (u64)pci_config_readl(bdf, qemu_cap + RES_RESERVE_PREF_MEM_64 + 4) << 32);
-> +                    if (tmp_size != (u32)-1 && tmp_size_64 == (u64)-1) {
-> +                        size = tmp_size;
-> +                        is64 = 0;
-> +                        qemu_cap_used = 1;
-> +                    } else if (tmp_size == (u32)-1 && tmp_size_64 != (u64)-1) {
-> +                        size = tmp_size_64;
-> +                        is64 = 1;
-> +                        qemu_cap_used = 1;
-> +                    } else if (tmp_size != (u32)-1 && tmp_size_64 != (u64)-1) {
-> +                        dprintf(1, "PCI: resource reserve cap PREF32 and PREF64"
-> +                                " conflict\n");
-> +                    }
-> +                    break;
-> +                default:
-> +                    break;
-> +                }
-> +            }
-> +            if (!qemu_cap_used) {
-> +                if (pci_region_align(&s->r[type]) > align)
-> +                     align = pci_region_align(&s->r[type]);
-> +                u64 sum = pci_region_sum(&s->r[type]);
-> +                int resource_optional = pcie_cap && (type == PCI_REGION_TYPE_IO);
-> +                if (!sum && hotplug_support && !resource_optional)
-> +                    sum = align; /* reserve min size for hot-plug */
-> +                size = ALIGN(sum, align);
-> +                is64 = pci_bios_bridge_region_is64(&s->r[type],
-> +                                                s->bus_dev, type);
-> +            } else {
-> +                dprintf(1, "PCI: resource reserve cap used\n");
+some versions of windows guest access rtc frequently because of
+rtc as system tick.guest access rtc like this: write register index
+to 0x70, then write or read data from 0x71. writing 0x70 port is
+just as index and do nothing else. So we can use coalesced mmio to
+handle this scene to reduce VM-EXIT time.
+without my patch, get the vm-exit time of accessing rtc 0x70 using
+perf tools: (guest OS : windows 7 64bit)
+IO Port Access  Samples Samples%  Time%  Min Time  Max Time  Avg time
+0x70:POUT        86     30.99%    74.59%   9us      29us    10.75us (+- 3.41%)
 
-Forgot about this one. Adding debug info that the cap was used is
-a great idea, but I think it misses extra info: What was used?
+with my patch
+IO Port Access  Samples Samples%  Time%   Min Time  Max Time   Avg time
+ 0x70:POUT       106    32.02%    29.47%    0us      10us     1.57us (+- 7.38%)
 
-I would expect to see:
-    - qemu resource reserve cap mem/io/pref...: 20000
-or something like this.
+the patch is a part of optimizing rtc 0x70 port access. Another is in
+kernel.
 
-Thanks,
-Marcel
+Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
+---
+ accel/kvm/kvm-all.c       | 57 ++++++++++++++++++++++++++++++++++++++++++-----
+ hw/timer/mc146818rtc.c    |  8 +++++++
+ include/exec/memattrs.h   |  1 +
+ include/exec/memory.h     |  6 +++++
+ include/sysemu/kvm.h      |  8 +++++++
+ linux-headers/linux/kvm.h |  5 +++--
+ memory.c                  |  5 +++++
+ 7 files changed, 83 insertions(+), 7 deletions(-)
 
-> +            }
->               // entry->bar is -1 if the entry represents a bridge region
->               struct pci_region_entry *entry = pci_region_create_entry(
->                   parent, s->bus_dev, -1, size, align, type, is64);
-> @@ -951,6 +1049,7 @@ pci_region_map_one_entry(struct pci_region_entry *entry, u64 addr)
->   
->       u16 bdf = entry->dev->bdf;
->       u64 limit = addr + entry->size - 1;
-> +
->       if (entry->type == PCI_REGION_TYPE_IO) {
->           pci_config_writeb(bdf, PCI_IO_BASE, addr >> PCI_IO_SHIFT);
->           pci_config_writew(bdf, PCI_IO_BASE_UPPER16, 0);
-> diff --git a/src/hw/pci_ids.h b/src/hw/pci_ids.h
-> index 4ac73b4..38fa2ca 100644
-> --- a/src/hw/pci_ids.h
-> +++ b/src/hw/pci_ids.h
-> @@ -2263,6 +2263,9 @@
->   #define PCI_DEVICE_ID_KORENIX_JETCARDF0	0x1600
->   #define PCI_DEVICE_ID_KORENIX_JETCARDF1	0x16ff
->   
-> +#define PCI_VENDOR_ID_REDHAT		0x1b36
-> +#define PCI_DEVICE_ID_REDHAT_ROOT_PORT	0x000C
-> +
->   #define PCI_VENDOR_ID_TEKRAM		0x1de1
->   #define PCI_DEVICE_ID_TEKRAM_DC290	0xdc29
->   
-> 
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 46ce479..d09fa83 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -122,6 +122,7 @@ bool kvm_vm_attributes_allowed;
+ bool kvm_direct_msi_allowed;
+ bool kvm_ioeventfd_any_length_allowed;
+ bool kvm_msi_use_devid;
++bool kvm_coalesced_pio_allowed;
+ static bool kvm_immediate_exit;
+ 
+ static const KVMCapabilityInfo kvm_required_capabilites[] = {
+@@ -516,7 +517,7 @@ static void kvm_coalesce_mmio_region(MemoryListener *listener,
+ 
+         zone.addr = start;
+         zone.size = size;
+-        zone.pad = 0;
++        zone.pio = 0;
+ 
+         (void)kvm_vm_ioctl(s, KVM_REGISTER_COALESCED_MMIO, &zone);
+     }
+@@ -533,7 +534,7 @@ static void kvm_uncoalesce_mmio_region(MemoryListener *listener,
+ 
+         zone.addr = start;
+         zone.size = size;
+-        zone.pad = 0;
++        zone.pio = 0;
+ 
+         (void)kvm_vm_ioctl(s, KVM_UNREGISTER_COALESCED_MMIO, &zone);
+     }
+@@ -953,6 +954,45 @@ static void kvm_io_ioeventfd_del(MemoryListener *listener,
+     }
+ }
+ 
++static void kvm_coalesce_io_add(MemoryListener *listener,
++                                MemoryRegionSection *section,
++                                hwaddr start, hwaddr size)
++{
++    KVMState *s = kvm_state;
++
++    if (kvm_coalesced_pio_allowed) {
++        struct kvm_coalesced_mmio_zone zone;
++
++        zone.addr = start;
++        zone.size = size;
++        zone.pio = 1;
++       (void)kvm_vm_ioctl(s, KVM_REGISTER_COALESCED_MMIO, &zone);
++    }
++}
++
++static void kvm_coalesce_io_del(MemoryListener *listener,
++                                MemoryRegionSection *section,
++                                hwaddr start, hwaddr size)
++{
++    KVMState *s = kvm_state;
++
++    if (kvm_coalesced_pio_allowed) {
++        struct kvm_coalesced_mmio_zone zone;
++
++        zone.addr = start;
++        zone.size = size;
++        zone.pio = 1;
++
++        (void)kvm_vm_ioctl(s, KVM_UNREGISTER_COALESCED_MMIO, &zone);
++    }
++
++}
++
++static MemoryListener kvm_coalesced_io_listener = {
++    .coalesced_mmio_add = kvm_coalesce_io_add,
++    .coalesced_mmio_del = kvm_coalesce_io_del,
++    .priority = 10,
++};
+ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
+                                   AddressSpace *as, int as_id)
+ {
+@@ -1691,7 +1731,8 @@ static int kvm_init(MachineState *ms)
+     }
+ 
+     s->coalesced_mmio = kvm_check_extension(s, KVM_CAP_COALESCED_MMIO);
+-
++    kvm_coalesced_pio_allowed = s->coalesced_mmio &&
++                          kvm_check_extension(s, KVM_CAP_COALESCED_PIO);
+     s->broken_set_mem_region = 1;
+     ret = kvm_check_extension(s, KVM_CAP_JOIN_MEMORY_REGIONS_WORKS);
+     if (ret > 0) {
+@@ -1762,6 +1803,8 @@ static int kvm_init(MachineState *ms)
+                                  &address_space_memory, 0);
+     memory_listener_register(&kvm_io_listener,
+                              &address_space_io);
++    memory_listener_register(&kvm_coalesced_io_listener,
++                             &address_space_io);
+ 
+     s->many_ioeventfds = kvm_check_many_ioeventfds();
+ 
+@@ -1841,8 +1884,12 @@ void kvm_flush_coalesced_mmio_buffer(void)
+             struct kvm_coalesced_mmio *ent;
+ 
+             ent = &ring->coalesced_mmio[ring->first];
+-
+-            cpu_physical_memory_write(ent->phys_addr, ent->data, ent->len);
++            if (ent->pio == 1) {
++                address_space_rw(&address_space_io, ent->phys_addr,
++                                 MEMTXATTRS_NONE, ent->data, ent->len, true);
++            } else {
++                cpu_physical_memory_write(ent->phys_addr, ent->data, ent->len);
++            }
+             smp_wmb();
+             ring->first = (ring->first + 1) % KVM_COALESCED_MMIO_MAX;
+         }
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index 82843ed..c7e4d7d 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -68,6 +68,7 @@ typedef struct RTCState {
+     ISADevice parent_obj;
+ 
+     MemoryRegion io;
++    MemoryRegion coalesced_io;
+     uint8_t cmos_data[128];
+     uint8_t cmos_index;
+     int32_t base_year;
+@@ -986,6 +987,13 @@ static void rtc_realizefn(DeviceState *dev, Error **errp)
+     memory_region_init_io(&s->io, OBJECT(s), &cmos_ops, s, "rtc", 2);
+     isa_register_ioport(isadev, &s->io, base);
+ 
++    if (memory_allow_coalesced_pio()) {
++        memory_region_set_flush_coalesced(&s->io);
++        memory_region_init_io(&s->coalesced_io, OBJECT(s), &cmos_ops,
++                              s, "rtc1", 1);
++        isa_register_ioport(isadev, &s->coalesced_io, base);
++        memory_region_add_coalescing(&s->coalesced_io, 0, 1);
++    }
+     qdev_set_legacy_instance_id(dev, base, 3);
+     qemu_register_reset(rtc_reset, s);
+ 
+diff --git a/include/exec/memattrs.h b/include/exec/memattrs.h
+index e601061..a628999 100644
+--- a/include/exec/memattrs.h
++++ b/include/exec/memattrs.h
+@@ -45,5 +45,6 @@ typedef struct MemTxAttrs {
+  * from "didn't specify" if necessary).
+  */
+ #define MEMTXATTRS_UNSPECIFIED ((MemTxAttrs) { .unspecified = 1 })
++#define MEMTXATTRS_NONE ((MemTxAttrs) { 0 })
+ 
+ #endif
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 400dd44..15274a4 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -1254,6 +1254,12 @@ void memory_region_set_flush_coalesced(MemoryRegion *mr);
+ void memory_region_clear_flush_coalesced(MemoryRegion *mr);
+ 
+ /**
++ * memory_allow_coalesced_pio: Check whether coalesced pio allowed.
++ *
++ */
++bool memory_allow_coalesced_pio(void);
++
++/**
+  * memory_region_set_global_locking: Declares the access processing requires
+  *                                   QEMU's global lock.
+  *
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 3a458f5..9d8874b 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -46,6 +46,7 @@ extern bool kvm_readonly_mem_allowed;
+ extern bool kvm_direct_msi_allowed;
+ extern bool kvm_ioeventfd_any_length_allowed;
+ extern bool kvm_msi_use_devid;
++extern bool kvm_coalesced_pio_allowed;
+ 
+ #define kvm_enabled()           (kvm_allowed)
+ /**
+@@ -168,6 +169,12 @@ extern bool kvm_msi_use_devid;
+  */
+ #define kvm_msi_devid_required() (kvm_msi_use_devid)
+ 
++/**
++ * kvm_coalesced_pio_enabled:
++ * Returns: true if KVM allow coalesced pio
++ */
++#define kvm_coalesced_pio_enabled() (kvm_coalesced_pio_allowed)
++
+ #else
+ 
+ #define kvm_enabled()           (0)
+@@ -185,6 +192,7 @@ extern bool kvm_msi_use_devid;
+ #define kvm_direct_msi_enabled() (false)
+ #define kvm_ioeventfd_any_length_enabled() (false)
+ #define kvm_msi_devid_required() (false)
++#define kvm_coalesced_pio_enabled() (false)
+ 
+ #endif  /* CONFIG_KVM_IS_POSSIBLE */
+ 
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 7971a4f..fbe20c3 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -415,13 +415,13 @@ struct kvm_run {
+ struct kvm_coalesced_mmio_zone {
+ 	__u64 addr;
+ 	__u32 size;
+-	__u32 pad;
++	__u32 pio;
+ };
+ 
+ struct kvm_coalesced_mmio {
+ 	__u64 phys_addr;
+ 	__u32 len;
+-	__u32 pad;
++	__u32 pio;
+ 	__u8  data[8];
+ };
+ 
+@@ -929,6 +929,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_PPC_SMT_POSSIBLE 147
+ #define KVM_CAP_HYPERV_SYNIC2 148
+ #define KVM_CAP_HYPERV_VP_INDEX 149
++#define KVM_CAP_COALESCED_PIO 150
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+diff --git a/memory.c b/memory.c
+index c0adc35..89ebbcf 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2023,6 +2023,11 @@ void memory_region_clear_flush_coalesced(MemoryRegion *mr)
+     }
+ }
+ 
++bool memory_allow_coalesced_pio(void)
++{
++    return kvm_enabled() && kvm_coalesced_pio_enabled();
++}
++
+ void memory_region_set_global_locking(MemoryRegion *mr)
+ {
+     mr->global_locking = true;
+-- 
+1.8.3.1
