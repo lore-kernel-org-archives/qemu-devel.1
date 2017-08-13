@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1dh271-0007Pl-Og
+	(envelope-from <balaton@eik.bme.hu>) id 1dh272-0007Pp-3q
 	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 19:16:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1dh26y-0005tt-HR
-	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 19:16:03 -0400
-Message-Id: <ef250ee340d5ab61446e2888c6205988d493aa6a.1502643878.git.balaton@eik.bme.hu>
+	(envelope-from <balaton@eik.bme.hu>) id 1dh270-0005w0-Io
+	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 19:16:04 -0400
+Message-Id: <a35170661f03bc19dbd2a5d6e9af626b83e2913d.1502643878.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1502643878.git.balaton@eik.bme.hu>
 References: <cover.1502643878.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Sun, 13 Aug 2017 19:04:38 +0200
-Subject: [Qemu-devel] [RFC PATCH 04/12] ehci: Add ppc4xx-ehci for the USB
- 2.0 controller in embedded PPC SoCs
+Subject: [Qemu-devel] [RFC PATCH 03/12] ohci: Allow sysbus version to be
+ used as a companion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +25,51 @@ Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, 
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- hw/usb/hcd-ehci-sysbus.c | 25 +++++++++++++++++++++++++
- hw/usb/hcd-ehci.h        |  1 +
- 2 files changed, 26 insertions(+)
+ hw/usb/hcd-ohci.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/hw/usb/hcd-ehci-sysbus.c b/hw/usb/hcd-ehci-sysbus.c
-index 6c20604..3b83beb 100644
---- a/hw/usb/hcd-ehci-sysbus.c
-+++ b/hw/usb/hcd-ehci-sysbus.c
-@@ -142,6 +142,30 @@ static const TypeInfo ehci_tegra2_type_info = {
-     .class_init    = ehci_tegra2_class_init,
+diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
+index 267982e..17beedd 100644
+--- a/hw/usb/hcd-ohci.c
++++ b/hw/usb/hcd-ohci.c
+@@ -1999,7 +1999,9 @@ typedef struct {
+     /*< public >*/
+ 
+     OHCIState ohci;
++    char *masterbus;
+     uint32_t num_ports;
++    uint32_t firstport;
+     dma_addr_t dma_offset;
+ } OHCISysBusState;
+ 
+@@ -2007,10 +2009,15 @@ static void ohci_realize_pxa(DeviceState *dev, Error **errp)
+ {
+     OHCISysBusState *s = SYSBUS_OHCI(dev);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
++    Error *err = NULL;
+ 
+-    /* Cannot fail as we pass NULL for masterbus */
+-    usb_ohci_init(&s->ohci, dev, s->num_ports, s->dma_offset, NULL, 0,
+-                  &address_space_memory, &error_abort);
++    usb_ohci_init(&s->ohci, dev, s->num_ports, s->dma_offset,
++                  s->masterbus, s->firstport,
++                  &address_space_memory, &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     sysbus_init_irq(sbd, &s->ohci.irq);
+     sysbus_init_mmio(sbd, &s->ohci.mem);
+ }
+@@ -2142,7 +2149,9 @@ static const TypeInfo ohci_pci_info = {
  };
  
-+static void ehci_ppc4xx_init(Object *o)
-+{
-+    EHCISysBusState *s = SYS_BUS_EHCI(o);
-+
-+    s->ehci.companion_enable = true;
-+}
-+
-+static void ehci_ppc4xx_class_init(ObjectClass *oc, void *data)
-+{
-+    SysBusEHCIClass *sec = SYS_BUS_EHCI_CLASS(oc);
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    sec->capsbase = 0x0;
-+    sec->opregbase = 0x10;
-+    set_bit(DEVICE_CATEGORY_USB, dc->categories);
-+}
-+
-+static const TypeInfo ehci_ppc4xx_type_info = {
-+    .name          = TYPE_PPC4xx_EHCI,
-+    .parent        = TYPE_SYS_BUS_EHCI,
-+    .class_init    = ehci_ppc4xx_class_init,
-+    .instance_init = ehci_ppc4xx_init,
-+};
-+
- /*
-  * Faraday FUSBH200 USB 2.0 EHCI
-  */
-@@ -224,6 +248,7 @@ static void ehci_sysbus_register_types(void)
-     type_register_static(&ehci_xlnx_type_info);
-     type_register_static(&ehci_exynos4210_type_info);
-     type_register_static(&ehci_tegra2_type_info);
-+    type_register_static(&ehci_ppc4xx_type_info);
-     type_register_static(&ehci_fusbh200_type_info);
- }
- 
-diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
-index 821f1de..0bc364b 100644
---- a/hw/usb/hcd-ehci.h
-+++ b/hw/usb/hcd-ehci.h
-@@ -344,6 +344,7 @@ typedef struct EHCIPCIState {
- #define TYPE_SYS_BUS_EHCI "sysbus-ehci-usb"
- #define TYPE_EXYNOS4210_EHCI "exynos4210-ehci-usb"
- #define TYPE_TEGRA2_EHCI "tegra2-ehci-usb"
-+#define TYPE_PPC4xx_EHCI "ppc4xx-ehci-usb"
- #define TYPE_FUSBH200_EHCI "fusbh200-ehci-usb"
- 
- #define SYS_BUS_EHCI(obj) \
+ static Property ohci_sysbus_properties[] = {
++    DEFINE_PROP_STRING("masterbus", OHCISysBusState, masterbus),
+     DEFINE_PROP_UINT32("num-ports", OHCISysBusState, num_ports, 3),
++    DEFINE_PROP_UINT32("firstport", OHCISysBusState, firstport, 0),
+     DEFINE_PROP_DMAADDR("dma-offset", OHCISysBusState, dma_offset, 0),
+     DEFINE_PROP_END_OF_LIST(),
+ };
 -- 
 2.7.4
