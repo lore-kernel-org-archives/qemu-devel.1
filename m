@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dgkY1-0002EQ-Vn
-	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 00:30:47 -0400
+	(envelope-from <marcel@redhat.com>) id 1dgqIV-0005uC-Vc
+	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 06:39:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dgkXx-0006Z8-J4
-	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 00:30:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47313)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dgkXx-0006X9-AW
-	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 00:30:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dgkXw-0003vl-C8
-	for <qemu-devel@nongnu.org>; Sun, 13 Aug 2017 04:30:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5AC2B2E80C7
-	for <qemu-devel@nongnu.org>; Sun, 13 Aug 2017 04:30:40 +0000 (UTC)
+	(envelope-from <marcel@redhat.com>) id 1dgqIS-0002aB-SO
+	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 06:39:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41526)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dgqIS-0002ZO-J7
+	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 06:39:04 -0400
+References: <1502407863-23182-1-git-send-email-zuban32s@gmail.com>
+	<1502407863-23182-2-git-send-email-zuban32s@gmail.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <610599bf-06aa-2d75-9adb-86651fdfc973@redhat.com>
+Date: Sun, 13 Aug 2017 13:31:32 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 13 Aug 2017 04:17:41 -0000
-From: Launchpad Bug Tracker <1067517@bugs.launchpad.net>
-Reply-To: Bug 1067517 <1067517@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20121016210525.14788.5580.malonedeb@gac.canonical.com>
-Message-Id: <150259786150.26933.164851479459855051.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1067517] Re: qemu dosn't save snapshots with the
- 'commit' command
+In-Reply-To: <1502407863-23182-2-git-send-email-zuban32s@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 1/4] hw/pci: introduce pcie-pci-bridge
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,171 +29,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Aleksandr Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, seabios@seabios.org
 
-[Expired for QEMU because there has been no activity for 60 days.]
+On 11/08/2017 2:31, Aleksandr Bezzubikov wrote:
+> Introduce a new PCIExpress-to-PCI Bridge device,
+> which is a hot-pluggable PCI Express device and
+> supports devices hot-plug with SHPC.
+> 
+> This device is intended to replace the DMI-to-PCI Bridge.
+> 
+> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+> ---
+>   hw/pci-bridge/Makefile.objs     |   2 +-
+>   hw/pci-bridge/pcie_pci_bridge.c | 192 ++++++++++++++++++++++++++++++++++++++++
+>   include/hw/pci/pci.h            |   1 +
+>   3 files changed, 194 insertions(+), 1 deletion(-)
+>   create mode 100644 hw/pci-bridge/pcie_pci_bridge.c
+> 
+> diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
+> index c4683cf..666db37 100644
+> --- a/hw/pci-bridge/Makefile.objs
+> +++ b/hw/pci-bridge/Makefile.objs
+> @@ -1,4 +1,4 @@
+> -common-obj-y += pci_bridge_dev.o
+> +common-obj-y += pci_bridge_dev.o pcie_pci_bridge.o
+>   common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o gen_pcie_root_port.o
+>   common-obj-$(CONFIG_PXB) += pci_expander_bridge.o
+>   common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
+> diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
+> new file mode 100644
+> index 0000000..9aa5cc3
+> --- /dev/null
+> +++ b/hw/pci-bridge/pcie_pci_bridge.c
+> @@ -0,0 +1,192 @@
+> +/*
+> + * QEMU Generic PCIE-PCI Bridge
+> + *
+> + * Copyright (c) 2017 Aleksandr Bezzubikov
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "hw/pci/pci.h"
+> +#include "hw/pci/pci_bus.h"
+> +#include "hw/pci/pci_bridge.h"
+> +#include "hw/pci/msi.h"
+> +#include "hw/pci/shpc.h"
+> +#include "hw/pci/slotid_cap.h"
+> +
+> +typedef struct PCIEPCIBridge {
+> +    /*< private >*/
+> +    PCIBridge parent_obj;
+> +
+> +    OnOffAuto msi;
+> +    MemoryRegion shpc_bar;
+> +    /*< public >*/
+> +} PCIEPCIBridge;
+> +
+> +#define TYPE_PCIE_PCI_BRIDGE_DEV "pcie-pci-bridge"
+> +#define PCIE_PCI_BRIDGE_DEV(obj) \
+> +        OBJECT_CHECK(PCIEPCIBridge, (obj), TYPE_PCIE_PCI_BRIDGE_DEV)
+> +
+> +static void pcie_pci_bridge_realize(PCIDevice *d, Error **errp)
+> +{
+> +    PCIBridge *br = PCI_BRIDGE(d);
+> +    PCIEPCIBridge *pcie_br = PCIE_PCI_BRIDGE_DEV(d);
+> +    int rc, pos;
+> +
+> +    pci_bridge_initfn(d, TYPE_PCI_BUS);
+> +
+> +    d->config[PCI_INTERRUPT_PIN] = 0x1;
+> +    memory_region_init(&pcie_br->shpc_bar, OBJECT(d), "shpc-bar",
+> +                       shpc_bar_size(d));
+> +    rc = shpc_init(d, &br->sec_bus, &pcie_br->shpc_bar, 0, errp);
+> +    if (rc) {
+> +        goto error;
+> +    }
+> +
+> +    rc = pcie_cap_init(d, 0, PCI_EXP_TYPE_PCI_BRIDGE, 0, errp);
+> +    if (rc < 0) {
+> +        goto cap_error;
+> +    }
+> +
+> +    pos = pci_add_capability(d, PCI_CAP_ID_PM, 0, PCI_PM_SIZEOF, errp);
+> +    if (pos < 0) {
+> +        goto pm_error;
+> +    }
+> +    d->exp.pm_cap = pos;
+> +    pci_set_word(d->config + pos + PCI_PM_PMC, 0x3);
+> +
+> +    pcie_cap_arifwd_init(d);
+> +    pcie_cap_deverr_init(d);
+> +
+> +    rc = pcie_aer_init(d, PCI_ERR_VER, 0x100, PCI_ERR_SIZEOF, errp);
+> +    if (rc < 0) {
+> +        goto aer_error;
+> +    }
+> +
+> +    if (pcie_br->msi != ON_OFF_AUTO_OFF) {
+> +        rc = msi_init(d, 0, 1, true, true, errp);
+> +        if (rc < 0) {
+> +            goto msi_error;
+> +        }
+> +    }
+> +    pci_register_bar(d, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
+> +                     PCI_BASE_ADDRESS_MEM_TYPE_64, &pcie_br->shpc_bar);
+> +    return;
+> +
+> +msi_error:
+> +    pcie_aer_exit(d);
+> +aer_error:
+> +pm_error:
+> +    pcie_cap_exit(d);
+> +cap_error:
+> +    shpc_free(d);
+> +error:
+> +    pci_bridge_exitfn(d);
+> +}
+> +
+> +static void pcie_pci_bridge_exit(PCIDevice *d)
+> +{
+> +    PCIEPCIBridge *bridge_dev = PCIE_PCI_BRIDGE_DEV(d);
+> +    pcie_cap_exit(d);
+> +    shpc_cleanup(d, &bridge_dev->shpc_bar);
+> +    pci_bridge_exitfn(d);
+> +}
+> +
+> +static void pcie_pci_bridge_reset(DeviceState *qdev)
+> +{
+> +    PCIDevice *d = PCI_DEVICE(qdev);
+> +    pci_bridge_reset(qdev);
+> +    msi_reset(d);
+> +    shpc_reset(d);
+> +}
+> +
+> +static void pcie_pci_bridge_write_config(PCIDevice *d,
+> +        uint32_t address, uint32_t val, int len)
+> +{
+> +    pci_bridge_write_config(d, address, val, len);
+> +    msi_write_config(d, address, val, len);
+> +    shpc_cap_write_config(d, address, val, len);
+> +}
+> +
+> +static Property pcie_pci_bridge_dev_properties[] = {
+> +        DEFINE_PROP_ON_OFF_AUTO("msi", PCIEPCIBridge, msi, ON_OFF_AUTO_ON),
+> +        DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static const VMStateDescription pcie_pci_bridge_dev_vmstate = {
+> +        .name = TYPE_PCIE_PCI_BRIDGE_DEV,
+> +        .fields = (VMStateField[]) {
+> +            VMSTATE_PCI_DEVICE(parent_obj, PCIBridge),
+> +            SHPC_VMSTATE(shpc, PCIDevice, NULL),
+> +            VMSTATE_END_OF_LIST()
+> +        }
+> +};
+> +
+> +static void pcie_pci_bridge_hotplug_cb(HotplugHandler *hotplug_dev,
+> +                                      DeviceState *dev, Error **errp)
+> +{
+> +    PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
+> +
+> +    if (!shpc_present(pci_hotplug_dev)) {
+> +        error_setg(errp, "standard hotplug controller has been disabled for "
+> +                   "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);
+> +        return;
+> +    }
+> +    shpc_device_hotplug_cb(hotplug_dev, dev, errp);
+> +}
+> +
+> +static void pcie_pci_bridge_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
+> +                                                 DeviceState *dev,
+> +                                                 Error **errp)
+> +{
+> +    PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
+> +
+> +    if (!shpc_present(pci_hotplug_dev)) {
+> +        error_setg(errp, "standard hotplug controller has been disabled for "
+> +                   "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);
+> +        return;
+> +    }
+> +    shpc_device_hot_unplug_request_cb(hotplug_dev, dev, errp);
+> +}
+> +
+> +static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
+> +{
+> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+> +
+> +    k->is_express = 1;
+> +    k->is_bridge = 1;
+> +    k->vendor_id = PCI_VENDOR_ID_REDHAT;
+> +    k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE;
+> +    k->realize = pcie_pci_bridge_realize;
+> +    k->exit = pcie_pci_bridge_exit;
+> +    k->config_write = pcie_pci_bridge_write_config;
+> +    dc->vmsd = &pcie_pci_bridge_dev_vmstate;
+> +    dc->props = pcie_pci_bridge_dev_properties;
+> +    dc->vmsd = &pcie_pci_bridge_dev_vmstate;
+> +    dc->reset = &pcie_pci_bridge_reset;
+> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+> +    hc->plug = pcie_pci_bridge_hotplug_cb;
+> +    hc->unplug_request = pcie_pci_bridge_hot_unplug_request_cb;
+> +}
+> +
+> +static const TypeInfo pcie_pci_bridge_info = {
+> +        .name = TYPE_PCIE_PCI_BRIDGE_DEV,
+> +        .parent = TYPE_PCI_BRIDGE,
+> +        .instance_size = sizeof(PCIEPCIBridge),
+> +        .class_init = pcie_pci_bridge_class_init,
+> +        .interfaces = (InterfaceInfo[]) {
+> +            { TYPE_HOTPLUG_HANDLER },
+> +            { },
+> +        }
+> +};
+> +
+> +static void pciepci_register(void)
+> +{
+> +    type_register_static(&pcie_pci_bridge_info);
+> +}
+> +
+> +type_init(pciepci_register);
+> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> index e598b09..b33a34f 100644
+> --- a/include/hw/pci/pci.h
+> +++ b/include/hw/pci/pci.h
+> @@ -98,6 +98,7 @@
+>   #define PCI_DEVICE_ID_REDHAT_PXB_PCIE    0x000b
+>   #define PCI_DEVICE_ID_REDHAT_PCIE_RP     0x000c
+>   #define PCI_DEVICE_ID_REDHAT_XHCI        0x000d
+> +#define PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE 0x000e
+>   #define PCI_DEVICE_ID_REDHAT_QXL         0x0100
+>   
+>   #define FMT_PCIBUS                      PRIx64
+> 
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1067517
-
-Title:
-  qemu dosn't save snapshots with the 'commit' command
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  Usually there is the 'commit' command in qemu which is described as follo=
-wed: "commit changes to the disk images (if -snapshot is used) or backing f=
-iles"
-  From the context i though if i start a guest with the "-snapshot" option,=
- the commit command would save all the changes back to the file. I've tried=
- it out but i didn't get it to work. I tried a few things like first use sa=
-vevm or stop and than commit all, but actually nothing works.
-  Interestingly, when using qcow2 files qemu doesn't show's any error at al=
-l. The changes in the guest just won't get saved. But if i'm using lvm2 par=
-titions i would get I/O errors after execute 'commit all'. That's probably =
-because lvm2 doesn't support this feature.?!? However i made a attachment w=
-hich shows the error's in the guest (dmesg).
-
-  Right now i started the guest with following command:
-  /usr/bin/qemu-system-x86_64 -name g64 -runas kvm -m 4096 -smp 2 \
-  -monitor unix:/var/run/kvm/g64.sock,server,nowait -pidfile /var/run/kvm/g=
-64.pid -daemonize -snapshot \
-  -device virtio-serial -chardev spicevmc,id=3Dvdagent,name=3Dvdagent \
-  -device virtserialport,chardev=3Dvdagent,name=3Dcom.redhat.spice.0 \
-  -drive file=3D/media/btrfs/g64.qcow2,if=3Dvirtio,cache=3Dnone,aio=3Dthrea=
-ds \
-  -netdev type=3Dtap,id=3Dg64_3,vhost=3Don,ifname=3Dqtap3,script=3Dno,downs=
-cript=3Dno \
-  -device virtio-net-pci,netdev=3Dg64_3,mac=3DDE:AD:BE:EF:CB:22 \
-  -spice port=3D5803,addr=3D192.168.2.60,password=3Dsecret -k de -cpu host \
-  -usb -usbdevice tablet -vga qxl
-
-  The system is stable gentoo:
-  Portage 2.1.11.9 (default/linux/amd64/10.0/no-multilib, gcc-4.5.4, glibc-=
-2.15-r2, 3.4.9-gentoo x86_64)
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-                          System Settings
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  System uname: Linux-3.4.9-gentoo-x86_64-Intel-R-_Xeon-R-_CPU_E5405_@_2.00=
-GHz-with-gentoo-2.1
-  Timestamp of tree: Tue, 16 Oct 2012 03:45:01 +0000
-  app-shells/bash:          4.2_p37
-  dev-lang/python:          2.7.3-r2, 3.2.3
-  dev-util/cmake:           2.8.8-r3
-  dev-util/pkgconfig:       0.27.1
-  sys-apps/baselayout:      2.1-r1
-  sys-apps/openrc:          0.9.8.4
-  sys-apps/sandbox:         2.5
-  sys-devel/autoconf:       2.68
-  sys-devel/automake:       1.11.6
-  sys-devel/binutils:       2.22-r1
-  sys-devel/gcc:            4.5.4
-  sys-devel/gcc-config:     1.7.3
-  sys-devel/libtool:        2.4-r1
-  sys-devel/make:           3.82-r3
-  sys-kernel/linux-headers: 3.4-r2 (virtual/os-headers)
-  sys-libs/glibc:           2.15-r2
-  Repositories: gentoo x-local x11 sunrise virtualization
-  ACCEPT_KEYWORDS=3D"amd64"
-  ACCEPT_LICENSE=3D"* -@EULA"
-  CBUILD=3D"x86_64-pc-linux-gnu"
-  CFLAGS=3D"-O2 -pipe -march=3Dnative -fopenmp"
-  CHOST=3D"x86_64-pc-linux-gnu"
-  CONFIG_PROTECT=3D"/etc /usr/share/openvpn/easy-rsa"
-  CONFIG_PROTECT_MASK=3D"/etc/ca-certificates.conf /etc/env.d /etc/fonts/fo=
-nts.conf /etc/gconf /etc/gentoo-release /etc/revdep-rebuild /etc/sandbox.d =
-/etc/terminfo"
-  CXXFLAGS=3D"-O2 -pipe -march=3Dnative -fopenmp"
-  DISTDIR=3D"/usr/portage/distfiles"
-  FCFLAGS=3D"-O2 -pipe"
-  FEATURES=3D"assume-digests binpkg-logs config-protect-if-modified distloc=
-ks ebuild-locks fixlafiles news parallel-fetch parse-eapi-ebuild-head prote=
-ct-owned sandbox sfperms strict unknown-features-warn unmerge-logs unmerge-=
-orphans userfetch"
-  FFLAGS=3D"-O2 -pipe"
-  GENTOO_MIRRORS=3D"        http://gentoo.supp.name/                       =
-         http://ftp.fi.muni.cz/pub/linux/gentoo/                         ht=
-tp://gentoo.mirror.web4u.cz/                          http://gentoo.mirror.=
-dkm.cz/pub/gentoo/                         http://gentoo.ynet.sk/pub"
-  LANG=3D"de_DE.utf8"
-  LDFLAGS=3D"-Wl,-O1 -Wl,--as-needed -fopenmp"
-  LINGUAS=3D"en"
-  MAKEOPTS=3D"-j12"
-  PKGDIR=3D"/usr/portage/packages"
-  PORTAGE_CONFIGROOT=3D"/"
-  PORTAGE_RSYNC_OPTS=3D"--recursive --links --safe-links --perms --times --=
-compress --force --whole-file --delete --stats --human-readable --timeout=
-=3D180 --exclude=3D/distfiles --exclude=3D/local --exclude=3D/packages"
-  PORTAGE_TMPDIR=3D"/var/tmp"
-  PORTDIR=3D"/usr/portage"
-  PORTDIR_OVERLAY=3D"/home/clown/public/overlays/local /home/clown/public/o=
-verlays/layman/x11 /home/clown/public/overlays/layman/sunrise /home/clown/p=
-ublic/overlays/layman/virtualization"
-  SYNC=3D"rsync://rsync.europe.gentoo.org/gentoo-portage/"
-  USE=3D"acl acpi amd64 berkdb bzip2 cli cracklib crypt cups cxx dbus dri f=
-ortran gdbm gif gpm iconv ipv6 mmx modules mudflap ncurses nls nptl openmp =
-pam pbm pcre png pppd readline session sqlite sse sse2 ssl ssse3 tcpd threa=
-ds unicode zlib" ALSA_CARDS=3D"ali5451 als4000 atiixp atiixp-modem bt87x ca=
-0106 cmipci emu10k1x ens1370 ens1371 es1938 es1968 fm801 hda-intel intel8x0=
- intel8x0m maestro3 trident usb-audio via82xx via82xx-modem ymfpci" ALSA_PC=
-M_PLUGINS=3D"adpcm alaw asym copy dmix dshare dsnoop empty extplug file hoo=
-ks iec958 ioplug ladspa lfloat linear meter mmap_emul mulaw multi null plug=
- rate route share shm softvol" APACHE2_MODULES=3D"authn_core authz_core soc=
-ache_shmcb unixd actions alias auth_basic authn_alias authn_anon authn_dbm =
-authn_default authn_file authz_dbm authz_default authz_groupfile authz_host=
- authz_owner authz_user autoindex cache cgi cgid dav dav_fs dav_lock deflat=
-e dir disk_cache env expires ext_filter file_cache filter headers include i=
-nfo log_config logio mem_cache mime mime_magic negotiation rewrite setenvif=
- speling status unique_id userdir usertrack vhost_alias" CALLIGRA_FEATURES=
-=3D"kexi words flow plan sheets stage tables krita karbon braindump" CAMERA=
-S=3D"ptp2" COLLECTD_PLUGINS=3D"df interface irq load memory rrdtool swap sy=
-slog" ELIBC=3D"glibc" GPSD_PROTOCOLS=3D"ashtech aivdm earthmate evermore fv=
-18 garmin garmintxt gpsclock itrax mtk3301 nmea ntrip navcom oceanserver ol=
-dstyle oncore rtcm104v2 rtcm104v3 sirf superstar2 timing tsip tripmate tnt =
-ubx" INPUT_DEVICES=3D"keyboard mouse evdev" KERNEL=3D"linux" LCD_DEVICES=3D=
-"bayrad cfontz cfontz633 glk hd44780 lb216 lcdm001 mtxorb ncurses text" LIB=
-REOFFICE_EXTENSIONS=3D"presenter-console presenter-minimizer" LINGUAS=3D"en=
-" PHP_TARGETS=3D"php5-3" PYTHON_TARGETS=3D"python3_2 python2_7" QEMU_SOFTMM=
-U_TARGETS=3D"i386 x86_64" QEMU_USER_TARGETS=3D"i386 x86_64" RUBY_TARGETS=3D=
-"ruby18 ruby19" SANE_BACKENDS=3D"niash" USERLAND=3D"GNU" VIDEO_CARDS=3D"fbd=
-ev glint intel mach64 mga nouveau nv r128 radeon savage sis tdfx trident ve=
-sa via vmware dummy v4l" XTABLES_ADDONS=3D"quota2 psd pknock lscan length2 =
-ipv4options ipset ipp2p iface geoip fuzzy condition tee tarpit sysrq steal =
-rawnat logmark ipmark dhcpmac delude chaos account"
-  Unset:  CPPFLAGS, CTARGET, EMERGE_DEFAULT_OPTS, INSTALL_MASK, LC_ALL, POR=
-TAGE_BUNZIP2_COMMAND, PORTAGE_COMPRESS, PORTAGE_COMPRESS_FLAGS, PORTAGE_RSY=
-NC_EXTRA_OPTS, USE_PYTHON
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-                          Package Settings
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  app-emulation/qemu-1.1.1-r1 was built with the following:
-  USE=3D"aio caps curl ncurses sasl spice vde vhost-net -alsa -bluetooth -b=
-rltty -debug -doc -fdt -opengl -pulseaudio -python -rbd -sdl -smartcard -st=
-atic -tci -tls -usbredir -virtfs -xattr -xen -xfs" QEMU_SOFTMMU_TARGETS=3D"=
-i386 x86_64 (-alpha) (-arm) -cris (-m68k) -microblaze -microblazeel (-mips)=
- -mips64 -mips64el -mipsel (-ppc) (-ppc64) -ppcemb -s390x -sh4 -sh4eb (-spa=
-rc) -sparc64 -xtensa -xtensaeb" QEMU_USER_TARGETS=3D"i386 x86_64 (-alpha) (=
--arm) -armeb -cris (-m68k) -microblaze -microblazeel (-mips) -mipsel (-ppc)=
- (-ppc64) -ppc64abi32 -s390x -sh4 -sh4eb (-sparc) -sparc32plus -sparc64 -un=
-icore32"
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1067517/+subscriptions
+Thanks,
+Marcel
