@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=392c10cbc=anthony.perard@citrix.com>)
-	id 1dhGmb-0005r8-CB
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:55:58 -0400
+	(envelope-from <armbru@redhat.com>) id 1dhHLY-0002rR-K8
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 11:32:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=392c10cbc=anthony.perard@citrix.com>)
-	id 1dhGmY-0007Yw-Oi
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:55:57 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:17879)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=392c10cbc=anthony.perard@citrix.com>)
-	id 1dhGmY-0007Xl-Ij
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:55:54 -0400
-Date: Mon, 14 Aug 2017 15:55:50 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20170814145550.GA1475@perard.uk.xensource.com>
-References: <20170811151138.29405-1-anthony.perard@citrix.com>
-	<20170811151138.29405-2-anthony.perard@citrix.com>
-	<20170811201006-mutt-send-email-mst@kernel.org>
+	(envelope-from <armbru@redhat.com>) id 1dhHLV-0006oZ-87
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 11:32:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51310)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dhHLU-0006o7-Va
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 11:32:01 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BD1B54023A
+	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 15:31:59 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170808205327.8768-1-crosa@redhat.com>
+	<20170808205327.8768-2-crosa@redhat.com>
+	<2e9697af-a48f-9fb6-696f-c2a8d3aebb06@redhat.com>
+	<aaf5d10e-e9a7-cf1f-fde8-7dd6f58652bf@redhat.com>
+Date: Mon, 14 Aug 2017 17:31:52 +0200
+In-Reply-To: <aaf5d10e-e9a7-cf1f-fde8-7dd6f58652bf@redhat.com> (Cleber Rosa's
+	message of "Tue, 8 Aug 2017 17:26:02 -0400")
+Message-ID: <87poby413r.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20170811201006-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 1/2] hw/acpi: Call
- acpi_set_pci_info when no ACPI tables needed
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/1] QAPI schema: turn example
+ commands/returns into proper JSON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +36,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Bruce Rogers <brogers@suse.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-On Fri, Aug 11, 2017 at 08:18:28PM +0300, Michael S. Tsirkin wrote:
-> On Fri, Aug 11, 2017 at 04:11:37PM +0100, Anthony PERARD wrote:
-> > To do PCI passthrough with Xen, the property acpi-pcihp-bsel needs to be
-> > set, but this was done only when ACPI tables are built which is not
-> > needed for a Xen guest. The need for the property starts with commit
-> > "pc: pcihp: avoid adding ACPI_PCIHP_PROP_BSEL twice"
-> > (f0c9d64a68b776374ec4732424a3e27753ce37b6).
-> > 
-> > Set pci info before checking for the needs to build ACPI tables.
-> > 
-> > Reported-by: Sander Eikelenboom <linux@eikelenboom.it>
-> > Tested-by: Sander Eikelenboom <linux@eikelenboom.it>
-> > Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
-> 
-> I am worried that Xen will come to depend on specific
-> assignment of bsel which isn't guaranteed. Thoughts on
-> how to avoid that?
+Cleber Rosa <crosa@redhat.com> writes:
 
-Is it possible to have a different BSEL than 0 with PIIX ?
-Also, I don't known if having more than on PCI bus is going to work on
-Xen, there is nothing in our ACPI tables beyond _SB.PCI0, and nothing to
-use a different BSEL.
+> On 08/08/2017 05:13 PM, Eric Blake wrote:
+>> On 08/08/2017 03:53 PM, Cleber Rosa wrote:
+>>> Most QMP commands and returns in the QAPI schema documentation
+>>> are valid "JSON-based wire format".  A few examples are either
+>>> malformed, or contain comments.
+>>>
+>>> This fixes all the examples command and return data, making them
+>>> proper JSON, as they would be received and generated by QEMU's
+>>> QMP monitor.
+>>>
+>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>>> ---
+>>>  qapi-schema.json     |  9 ++++-----
+>>>  qapi/block-core.json | 32 ++++++++++++++++----------------
+>>>  qapi/rocker.json     |  5 +----
+>>>  3 files changed, 21 insertions(+), 25 deletions(-)
+>> 
+>> 
+>>> +++ b/qapi-schema.json
+>>> @@ -2000,8 +2000,7 @@
+>>>  #                "host": "127.0.0.1",
+>>>  #                "channel-id": 0,
+>>>  #                "tls": false
+>>> -#             },
+>>> -#             [ ... more channels follow ... ]
+>>> +#             }
+>> 
+>> I still wonder if we want SOME sort of markup to make it obvious where
+>> we are compressing the example for the sake of brevity, where whatever
+>> we use to automate tests based on the docs would know how to recognize
+>> that the actual values given in reply to the test can be longer than the
+>> documented example.  But I guess we can cross that when we have an
+>> automated test where it matters.
+>> 
+>
+> I wonder the same.  Also, we seem to agree that it's a separate and more
+> complex problem, to be tackled later.
 
-> > 
-> > ---
-> > In this patch rather than always calling acpi_set_pci_info() when
-> > acpi_setup() is called, we could check first for acpi_enabled? (which is
-> > true for Xen.)
-> 
-> Yes, please change it like this. Also, please add
-> a comment explainging what it does.
+We can cross that bridge when we get to it.
 
-Will do.
+Any particular reason not to keep the [ ... more channels follow ... ]
+until then?
 
--- 
-Anthony PERARD
+>>> @@ -2039,7 +2038,7 @@
+>>>  #
+>>>  # -> { "execute": "query-balloon" }
+>>>  # <- { "return": {
+>>> -#          "actual": 1073741824,
+>>> +#          "actual": 1073741824
+>>>  #       }
+
+This is a straighforward doc fix.
+
+>> I also suspect that test automation will have to do a lot of filtering,
+>> even for commands that don't need to be abbreviated, since some of the
+>> examples have pretty arbitrary numbers that will be difficult to
+>> reliably reproduce any particular number.
+>> 
+>
+> Yes.  I'm already aware of a couple of use cases that will require
+> different types of comparison, including pretty relaxed ones.  Expect
+> more about that in a later thread.
+>
+>> This is a documentation fix, so it could still go in 2.10 - but since we
+>> are past -rc2, it's probably just as easy to save it for 2.11.  Either way,
+>> 
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> 
+>
+> Thanks for the prompt review!
