@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dhHai-0005NP-BV
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 11:47:57 -0400
+	(envelope-from <brijesh.singh@amd.com>) id 1dhHfQ-0001VH-8P
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 11:52:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dhHaK-0007lk-Dy
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 11:47:44 -0400
-References: <1502721197-32717-1-git-send-email-mst@redhat.com>
-	<20170814173335.58f0e84f.cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f08ad396-50bf-aff7-95e8-5cd1b862923e@redhat.com>
-Date: Mon, 14 Aug 2017 17:47:12 +0200
+	(envelope-from <brijesh.singh@amd.com>) id 1dhHfL-0004Ei-Dz
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 11:52:36 -0400
+Received: from mail-dm3nam03on0079.outbound.protection.outlook.com
+	([104.47.41.79]:29588
+	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1dhHfL-0004EL-4F
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 11:52:31 -0400
+From: Brijesh Singh <brijesh.singh@amd.com>
+Date: Mon, 14 Aug 2017 10:52:17 -0500
+Message-Id: <20170814155217.4898-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20170814173335.58f0e84f.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests: switch tests to accel=kvm:tcg
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] target-i386/cpu: Add new EYPC CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +26,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Brijesh Singh <brijesh.singh@amd.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>
 
-On 14.08.2017 17:33, Cornelia Huck wrote:
-> On Mon, 14 Aug 2017 17:34:15 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
->=20
->> Speed up tests on host systems with kvm support.
->> In particular, this fixes tests with --disable-tcg.
-[...]
->> diff --git a/tests/pnv-xscom-test.c b/tests/pnv-xscom-test.c
->> index 5adc3fd..7be396f 100644
->> --- a/tests/pnv-xscom-test.c
->> +++ b/tests/pnv-xscom-test.c
->> @@ -84,7 +84,7 @@ static void test_cfam_id(const void *data)
->>      char *args;
->>      const PnvChip *chip =3D data;
->> =20
->> -    args =3D g_strdup_printf("-M powernv,accel=3Dtcg -cpu %s", chip->=
-cpu_model);
->> +    args =3D g_strdup_printf("-M powernv,accel=3Dkvm:tcg -cpu %s", ch=
-ip->cpu_model);
->> =20
->>      qtest_start(args);
->>      test_xscom_cfam_id(chip);
->> @@ -112,7 +112,7 @@ static void test_core(const void *data)
->>      char *args;
->>      const PnvChip *chip =3D data;
->> =20
->> -    args =3D g_strdup_printf("-M powernv,accel=3Dtcg -cpu %s", chip->=
-cpu_model);
->> +    args =3D g_strdup_printf("-M powernv,accel=3Dkvm:tcg -cpu %s", ch=
-ip->cpu_model);
->> =20
->>      qtest_start(args);
->>      test_xscom_core(chip);
->=20
-> These seem to test a specified cpu model explicitly, so I'm not sure
-> how well this will work with kvm.
+Add a new base CPU model called 'EPYC' to model processors from AMD EPYC
+family (which includes EPYC 76xx,75xx,74xx,73xx and 72xx).
 
-AFAIK the powernv machine does not work with KVM yet (C=C3=A9dric, can yo=
-u
-confirm?), so you better drop the changes to this file.
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+---
+ target/i386/cpu.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
->> diff --git a/tests/prom-env-test.c b/tests/prom-env-test.c
->> index eac207b..0a10f06 100644
->> --- a/tests/prom-env-test.c
->> +++ b/tests/prom-env-test.c
->> @@ -50,7 +50,7 @@ static void test_machine(const void *machine)
->>      /* The pseries firmware boots much faster without the default dev=
-ices */
->>      extra_args =3D strcmp(machine, "pseries") =3D=3D 0 ? "-nodefaults=
-" : "";
->> =20
->> -    args =3D g_strdup_printf("-M %s,accel=3Dtcg %s -prom-env 'use-nvr=
-amrc?=3Dtrue' "
->> +    args =3D g_strdup_printf("-M %s,accel=3Dkvm:tcg %s -prom-env 'use=
--nvramrc?=3Dtrue' "
->>                             "-prom-env 'nvramrc=3D%x %x l!' ",
->>                             (const char *)machine, extra_args, MAGIC, =
-ADDRESS);
->=20
-> The header explicitly states that this is supposed to test tcg mode.
-
-This change should be OK here. But it is currently not necessary yet:
-The test only runs on SPARC and PPC machines, and both do not support
-the --disable-tcg switch yet.
-
- Thomas
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index ddc45ab..ed1708b 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1522,6 +1522,50 @@ static X86CPUDefinition builtin_x86_defs[] = {
+         .xlevel = 0x8000001A,
+         .model_id = "AMD Opteron 63xx class CPU",
+     },
++    {
++        .name = "EPYC",
++        .level = 0xd,
++        .vendor = CPUID_VENDOR_AMD,
++        .family = 23,
++        .model = 1,
++        .stepping = 2,
++        .features[FEAT_1_EDX] =
++            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
++            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
++            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
++            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
++            CPUID_DE | CPUID_FP87,
++        .features[FEAT_1_ECX] =
++            CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX |
++            CPUID_EXT_XSAVE | CPUID_EXT_MOVBE | CPUID_EXT_POPCNT |
++            CPUID_EXT_SSE42 | CPUID_EXT_SSE41 | CPUID_EXT_CX16 |
++            CPUID_EXT_FMA | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
++            CPUID_EXT_SSE3,
++        .features[FEAT_8000_0001_EDX] =
++            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_PDPE1GB |
++            CPUID_EXT2_FFXSR | CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
++            CPUID_EXT2_SYSCALL,
++        .features[FEAT_8000_0001_ECX] =
++            CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
++            CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
++            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
++        .features[FEAT_7_0_EBX] =
++            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
++            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
++            CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT |
++            CPUID_7_0_EBX_SHA_NI,
++        /* Missing: XSAVES (not supported by some Linux versions,
++         * including v4.1 to v4.12).
++         * KVM doesn't yet expose any XSAVES state save component.
++         */
++        .features[FEAT_XSAVE] =
++            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
++            CPUID_XSAVE_XGETBV1,
++        .features[FEAT_6_EAX] =
++            CPUID_6_EAX_ARAT,
++        .xlevel = 0x8000001F,
++        .model_id = "AMD EYPC Processor",
++    },
+ };
+ 
+ typedef struct PropValue {
+-- 
+2.9.4
