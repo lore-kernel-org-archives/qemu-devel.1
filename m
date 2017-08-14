@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhBLG-0005Mw-Dk
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 05:07:23 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dhBSl-00081Z-HE
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 05:15:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhBLF-0004bR-2y
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 05:07:22 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170705190404.22449-1-mreitz@redhat.com>
-	<20170705190404.22449-3-mreitz@redhat.com>
-	<87poddk583.fsf@dusky.pond.sub.org>
-	<6a1740fd-2a8c-f338-6ce1-e0f4bbade407@redhat.com>
-	<87a84c6476.fsf@dusky.pond.sub.org>
-	<704969af-283c-d22b-f0d2-e7bf0a7b609a@redhat.com>
-	<87y3rvjjip.fsf@dusky.pond.sub.org>
-	<27f963d3-46f3-d497-2bb6-eca05e808983@redhat.com>
-Date: Mon, 14 Aug 2017 11:07:11 +0200
-In-Reply-To: <27f963d3-46f3-d497-2bb6-eca05e808983@redhat.com> (Max Reitz's
-	message of "Tue, 11 Jul 2017 15:17:02 +0200")
-Message-ID: <87bmnih60w.fsf@dusky.pond.sub.org>
+	(envelope-from <imammedo@redhat.com>) id 1dhBSg-0001aC-GG
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 05:15:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57656)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dhBSg-0001ZV-72
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 05:15:02 -0400
+Date: Mon, 14 Aug 2017 11:14:54 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170814111454.6060171d@nial.brq.redhat.com>
+In-Reply-To: <faffe6ab-b094-5f9a-0834-12d5c380edd4@redhat.com>
+References: <34458438-9913-6bab-0ddb-e2908ddd006a@bluestop.org>
+	<faffe6ab-b094-5f9a-0834-12d5c380edd4@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 2/5] qapi: Add qobject_is_equal()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] OvmfPkg (PlatformPei?): supporting Qemu's nvdimm
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Rebecca Cran <rebecca@bluestop.org>, edk2-devel@lists.01.org, qemu devel list <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Max Reitz <mreitz@redhat.com> writes:
+On Thu, 10 Aug 2017 00:13:57 +0200
+Laszlo Ersek <lersek@redhat.com> wrote:
 
-> On 2017-07-11 13:33, Markus Armbruster wrote:
->> Max Reitz <mreitz@redhat.com> writes:
->> 
->>> First of all, OK, you don't want QNum(42.0) to equal QNum(42) at all (at
->>> least not right now and in the foreseeable future).
->>> You're the maintainer, so you decide, so I'll go along with it. :-)
->>>
->>> Now, let's follow up with my therefore rather useless commentary:
->>>
->>> (Feel free to disregard, because honestly, I can see how replying to
->>> most of the points I'm asking isn't really worth the time...)
->> 
->> When I use the authority entrusted to maintainers, I feel obliged to at
->> least explain my reasoning.  Besides, putting my reasoning in words
->> tends to lead me to new insights.
->
-> And I am indeed very grateful for that. :-)
->
->>> On 2017-07-10 11:17, Markus Armbruster wrote:
->>>> Max Reitz <mreitz@redhat.com> writes:
->>>>
->>>>> On 2017-07-06 16:30, Markus Armbruster wrote:
->
-> [...]
->
->>>> The only way to add unsigned integers without breaking QMP compatibility
->>>> is to make them interchangeable with signed integers.  That doesn't mean
->>>> you get to make floating-point numbers interchangeable with integers
->>>> now.
->>>
->>> Again, begs the question why QNum covers floating point numbers then and
->>> why this very fact is not documented in qnum.c.
->> 
->> What kind of documentation would you like to see?
->
-> It would be good to note that the QNum type is not meant to be a
-> completely uniform way to handle JSON numbers (e.g. if the user provides
-> something with a decimal point but you need an integer, QNum will not do
-> that conversion for you).
->
-> It is (English indirect speech is broken badly) just meant to
-> encapsulate the different variants a number can be represented in, but
-> you're still generally supposed to read it out the way it was put in
-> (exceptions apply, see signed/unsigned and qnum_get_double()).
+> On 08/09/17 22:47, Rebecca Cran wrote:
+> > I've been investigating adding support for Qemu's nvdimm devices to
+> > OVMF.  I was thinking such support would go into PlatformPei, but it
+> > looks like I can only read the ACPI NFIT in the DXE phase. So, should
+> > Qemu be changed to add non-volatile memory to the e820 table, or
+> > should such memory be added during the DXE phase instead?  
+> 
+> I don't have the slightest idea, sorry.
+> 
+> One thing that does look bad is that both edk2's
+> 
+>   MdeModulePkg/Universal/Disk/RamDiskDxe
+> 
+> and QEMU's
+> 
+>   hw/acpi/nvdimm.c
+> 
+> think they own the NVDIMM root device with, with _HID=ACPI0012.
+> 
+> I don't recall being consulted when QEMU's NVDIMM stuff was designed and
+> implemented, despite the fact that it uses the ACPI linker/loader
+> (apparently).
+> 
+> In general, using the ACPI linker/loader is a good recipe for making an
+> ACPI-defined feature "just work" under both SeaBIOS and OVMF, without
+> having to resort to specialized information channels such as new fw_cfg
+> files, or additional paravirt hardware. However, there are enough quirks
+> in edk2 / UEFI with regard to ACPI that, without special attention to
+> OVMF / edk2 at design time, things will likely break due to infighting
+> over ACPI ownership.
+> 
+> In RamDiskPublishNfit(), there is
+> 
+>     //
+>     // Assumption is made that if no NFIT is in the ACPI table, there is no
+>     // NVDIMM root device in the \SB scope.
+>     // Therefore, a NVDIMM root device will be reported via Secondary System
+>     // Description Table (SSDT).
+>     //
+>     Status = RamDiskPublishSsdt ();
+> 
+> That assumption might or might not be good enough, when QEMU pushes down
+> its NVDIMM / NFIT stuff. I suggest reading "docs/specs/acpi_nvdimm.txt"
+> in the QEMU tree, and figuring out if that can work with OVMF's ACPI
+> linker/loader client, and the rest of the edk2 modules. The assumption
+> could also be affected by whether OvmfPkg/AcpiTableDxe installs QEMU's
+> NVDIM stuff before or after RamDiskDxe does its thing. I have no clue.
+> 
+> I apologize but I don't think I can help (or even find the bandwidth to
+> research or discuss this -- it's 00:13 local time and I'm reviewing
+> patches...)
+> 
+> I'm CC'ing Michael and Igor, maybe they can provide you with pointers.
+> (Also adding qemu-devel.)
 
-Can we distill this into text that could become an actual patch?  Let me
-try.
+QEMU already provides NFIT table with all nvdimm devices present at startup,
+but looking at EDK's RamDiskPublishNfit() if we add to E820 the same nvdimm
+device with type set to EfiReservedMemoryType, EDK would append range from
+E820 again which would result in duplicate record, that would probably be wrong.
 
-    QNum encapsulates how our dialect of JSON fills in the blanks left
-    by the JSON specification (RFC 7159) regarding numbers.
-
-    Conceptually, we treat number as an abstract type with three
-    concrete subtypes: floating-point, signed integer, unsigned integer.
-    QNum implements this a discriminated union of double, int64_t,
-    uint64_t.
-
-    The JSON parser picks the subtype as follows.  If the number has a
-    decimal point or an exponent, it is floating-point.  Else if it fits
-    into int64_t, it's signed integer.  Else if it first into uint64_t,
-    it's unsigned integer.  Else it's floating-point.
-
-    Any number can serve as double: qnum_get_double() converts under the
-    hood.
-
-    An integer can serve as signed / unsigned integer as long as it is
-    in range: qnum_get_try_int() / qnum_get_try_uint() check range and
-    convert under the hood.
-
-What do you think?
+> 
+> Thanks
+> Laszlo
+> 
