@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dhNOf-0002eF-T2
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 17:59:43 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dhO01-0000dY-TC
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 18:38:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dhNOe-000316-3l
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 17:59:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35596)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dhNOd-00030l-RD
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 17:59:40 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BD6781F56C
-	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 21:59:38 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 14 Aug 2017 18:57:48 -0300
-Message-Id: <20170814215748.5158-14-ehabkost@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1dhNzx-0002M1-RF
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 18:38:17 -0400
+Resent-Message-Id: <E1dhNzx-0002M1-RF@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21463)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dhNzx-0002LJ-IL
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 18:38:13 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150275027466.78.7700688075458070134@dd743fd916bd>
 In-Reply-To: <20170814215748.5158-1-ehabkost@redhat.com>
-References: <20170814215748.5158-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [RFC v4 13/13] tests: Experimental query-device-slots
- test code
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 14 Aug 2017 15:37:55 -0700 (PDT)
+Subject: Re: [Qemu-devel] [libvirt] [RFC v4 00/13] qmp: query-device-slots
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,325 +29,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Laine Stump <laine@redhat.com>
+To: ehabkost@redhat.com
+Cc: famz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, mst@redhat.com, marcel@redhat.com, laine@redhat.com, libvir-list@redhat.com, imammedo@redhat.com
 
-The test script is crude and full of hacks.  Included in the RFC
-just in case somebody wants to try it.
-
-The script uses environment variables as arguments to make it
-easier to be invoked from the tests/ Makefile later.
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- tests/qmp-machine-info.py | 300 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 300 insertions(+)
- create mode 100755 tests/qmp-machine-info.py
-
-diff --git a/tests/qmp-machine-info.py b/tests/qmp-machine-info.py
-new file mode 100755
-index 0000000..ad4a0ac
---- /dev/null
-+++ b/tests/qmp-machine-info.py
-@@ -0,0 +1,300 @@
-+#!/usr/bin/env python
-+import sys, os
-+MY_DIR = os.path.dirname(__file__)
-+sys.path.append(os.path.join(MY_DIR, '..', 'scripts'))
-+import qtest
-+import unittest
-+import logging
-+import argparse
-+import itertools
-+import operator
-+import re
-+
-+logger = logging.getLogger('qemu.tests.machineinfo')
-+
-+# machines that we can't easily test because they can't run on all hosts:
-+BLACKLIST = set(['xenpv', 'xenfv'])
-+
-+# machines known to be broken when using -nodefaults:
-+NODEFAULTS_BLACKLIST = set([
-+    'cubieboard',      # segfaults
-+    'petalogix-ml605', # segfaults
-+    'or32-sim',        # segfaults
-+    'virtex-ml507',    # segfaults
-+    'Niagara',         # segfaults
-+    'akita',           # "qemu: missing SecureDigital device"
-+    'borzoi',          # "qemu: missing SecureDigital device"
-+    'cheetah',         # "qemu: missing SecureDigital device"
-+    'connex',          # "qemu: missing SecureDigital device"
-+    'mainstone',       # "qemu: missing SecureDigital device"
-+    'n800',            # "qemu: missing SecureDigital device"
-+    'n810',            # "qemu: missing SecureDigital device"
-+    'spitz',           # "qemu: missing SecureDigital device"
-+    'sx1',             # "qemu: missing SecureDigital device"
-+    'sx1-v1',          # "qemu: missing SecureDigital device"
-+    'terrier',         # "qemu: missing SecureDigital device"
-+    'tosa',            # "qemu: missing SecureDigital device"
-+    'verdex',          # "qemu: missing SecureDigital device"
-+    'z2',              # "qemu: missing SecureDigital device"
-+])
-+
-+# iterators for QAPI ValueSets:
-+# all of the iterators below should support iter() and len()
-+
-+class InvalidValueSet(Exception):
-+    pass
-+
-+class ElementIterator:
-+    def __init__(self, e):
-+        self._e = e
-+
-+    def _data(self):
-+        e = self._e
-+        if type(e) is not list:
-+            e = [e]
-+        if len(e) == 1:
-+            return e
-+        elif len(e) == 2:
-+            return xrange(e[0], e[1] + 1)
-+        else:
-+            raise InvalidValueSet
-+
-+    def __iter__(self):
-+        return iter(self._data())
-+
-+    def __len__(self):
-+        return len(self._data())
-+
-+class ValuesIterator:
-+    def __init__(self, values):
-+        if type(values) is not list:
-+            values = [values]
-+        self._values = values
-+
-+    def _iterators(self):
-+        return map(ElementIterator, self._values)
-+
-+    def __iter__(self):
-+        return itertools.chain(self._iterators())
-+
-+    def __len__(self):
-+        return sum(map(len, self._iterators()))
-+
-+
-+#TODO: move to common code
-+def infoQDM(vm):
-+    """Parse 'info qdm' output"""
-+    args = {'command-line': 'info qdm'}
-+    devhelp = vm.command('human-monitor-command', **args)
-+    for l in devhelp.split('\n'):
-+        l = l.strip()
-+        if l == '' or l.endswith(':'):
-+            continue
-+        d = {'name': re.search(r'name "([^"]+)"', l).group(1),
-+             'no-user': (re.search(', no-user', l) is not None)}
-+        yield d
-+
-+
-+
-+class QueryMachinesTest(unittest.TestCase):
-+    def setUp(self):
-+        self.vm = None
-+
-+    def tearDown(self):
-+        if self.vm is not None:
-+            self.vm.shutdown()
-+
-+    def walkQOMTree(self, vm, path):
-+        """Walk QOM tree recusrively, starting at path"""
-+        children = vm.qmp('qom-list', path=path)['return']
-+        for c in children:
-+            logging.debug('walking %s. child: %s', path, c)
-+            if not c['type'].startswith('child<'):
-+                continue
-+
-+            cp = '%s/%s' % (path, c['name'])
-+            yield cp
-+
-+            for gc in self.walkQOMTree(vm, cp):
-+                yield gc
-+
-+    def findAllBuses(self, vm):
-+        """Find all bus objects in the QOM tree"""
-+        r = vm.qmp('qom-list-types', implements='bus')
-+        bus_types = set([b['name'] for b in r['return']])
-+        for cp in self.walkQOMTree(vm, '/machine'):
-+            t = vm.qmp('qom-get', path=cp, property='type')['return']
-+            if t in bus_types:
-+                yield dict(path=cp, type=t)
-+
-+    def getSubtypes(self, implements, **kwargs):
-+        """Get full list of typenames of subtypes of @implements"""
-+        types = self.vm.command('qom-list-types', implements=implements, **kwargs)
-+        return [st['name'] for st in types]
-+
-+
-+    def getUserCreatableSubtypes(self, devtype):
-+        alldevs = set(self.getSubtypes(devtype, abstract=False))
-+        # there's no way to query DeviceClass::user_creatable using QMP,
-+        # so use 'info qdm':
-+        no_user_devs = set([d['name'] for d in infoQDM(self.vm, ) if d['no-user']])
-+        user_devs = alldevs.difference(no_user_devs)
-+        return user_devs
-+
-+    def typeImplements(self, t, i):
-+        """Returns True if type @t implements type @i"""
-+        stypes = self.getSubtypes(i)
-+        return t in stypes
-+
-+    def validateBus(self, bus, slots):
-+        """Check if the bus identified by the slot matches the information returned
-+        for the slot.
-+
-+        TODO: check if it is really a bus
-+        TODO: check if device-types matches device-types
-+              property in the bus
-+        """
-+
-+        ##we could do this:
-+        #bustype = self.vm.command('qom-get', path=bus, property='type')
-+        #self.assertTrue(self.typeImplements(bustype, 'bus'))
-+        ## but the bus _name_ (accepted by qbus_find()) does not necessarily matches the bus _path_
-+
-+        pass
-+
-+    def checkSlotProps(self, slots):
-+        """check if all properties on "props" are valid properties
-+        that appear on device-list-properties for all accepted device types
-+        """
-+        types_to_check = {}
-+        buses_to_check = {}
-+        for slot in slots:
-+            for prop in slot['opts']:
-+                if prop['option'] == 'bus':
-+                    values = ValuesIterator(bus['values'])
-+                    self.assertEquals(len(values), 1)
-+                    bus = values[0]
-+                    buses_to_check.setdefault(v, []).append(slot)
-+
-+            for t in slot['device-types']:
-+                types_to_check.setdefault(t, set()).update(slot['opts'].keys())
-+
-+        for bus,slots in buses_to_check.items():
-+            self.validateBus(bus, slots)
-+
-+        for t, props in types_to_check.items():
-+            props.discard('bus') # 'bus' is handled by device_add directly
-+            for st in self.vm.command('qom-list-types', implements=t, abstract=False):
-+                dprops = self.vm.command('device-list-properties', typename=st['name'])
-+                dpropnames = set([p['name'] for p in dprops])
-+                for p in props:
-+                    self.assertIn(p, dpropnames)
-+
-+    def checkAvailableField(self, slots):
-+        for slot in slots:
-+            if slot.has_key('max-devices') and len(slot['devices']) >= slot['max-devices']:
-+                self.assertFalse(slot['available'])
-+
-+    def checkSlotInfo(self, args):
-+        #TODO: check if:
-+        # * -device works with at least one device type
-+        # * query-hotpluggable-cpus matches what's in query-device-slots
-+        # * device-types match the property on the bus
-+        # * available=false if hotpluggable=false
-+        # * 'count' is always set if not incomplete
-+        # * slot count is <= set of possible values for @props
-+        self.vm = qtest.QEMUQtestMachine(self.binary, args=args)
-+        self.vm.launch()
-+
-+        slots = self.vm.command('query-device-slots')
-+        #self.checkSlotProps(slots)
-+        #self.checkSlotDevices(slots)
-+        #self.checkAvailableField(slots)
-+
-+        for slot in slots:
-+            logging.debug('slot: %r', slot)
-+            if 'device' in slot:
-+                dev = slot['device']
-+                self.assertFalse(slot['available'])
-+                dtype = self.vm.command('qom-get', path=dev, property='type')
-+                self.assertTrue(any(self.typeImplements(dtype, t) for t in slot['device-types']))
-+
-+            for dt in slot['device-types']:
-+                self.assertTrue(len(self.getUserCreatableSubtypes(dt)) > 0, "There's no user-creatable subtype of %s" % (dt))
-+
-+            if slot['opts-complete']:
-+                self.assertTrue('count' in slot)
-+
-+                all_counts = [len(ValuesIterator(p['values'])) for p in slot['opts']]
-+                total_count = reduce(operator.mul, all_counts, 1)
-+                logging.debug('%d possible values', total_count)
-+                self.assertEquals(total_count, slot['count'])
-+
-+        self.vm.shutdown()
-+
-+    def machineTestSlotInfo(self):
-+        if self.machine['name'] in BLACKLIST:
-+            self.skipTest("machine %s on BLACKLIST" % (self.machine['name']))
-+
-+        args = ['-S', '-machine', self.machine['name']]
-+        self.checkSlotInfo(args)
-+
-+        #TODO: also test using full config from docs/config/q35-*.cfg
-+
-+    @classmethod
-+    def addMachineTest(klass, method_name, binary, machine):
-+        """Dynamically add a testMachine_<arch>_<name>_<machine> method to the class"""
-+        method = getattr(klass, method_name)
-+        def testMachine(self):
-+            self.binary = binary
-+            self.machine = machine
-+            return method(self)
-+        machine_name = machine['name'].replace('-', '_').replace('.', '_')
-+        method_name = 'test_%s_%s_%s' % (method_name, machine['arch'], machine_name)
-+        setattr(klass, method_name, testMachine)
-+        return method_name
-+
-+
-+    @classmethod
-+    def discoverMachines(klass, binary):
-+        """Run query-machines
-+
-+        This method is run before test cases are started, so we
-+        can dynamically add test cases for each machine supported
-+        by the binary.
-+        """
-+        vm = qtest.QEMUQtestMachine(binary=binary, args=['-S', '-machine', 'none'])
-+        vm.launch()
-+        try:
-+            arch = vm.qmp('query-target')['return']['arch']
-+            machines = vm.qmp('query-machines')['return']
-+            for m in machines:
-+                m['arch'] = arch
-+        finally:
-+            vm.shutdown()
-+        return machines
-+
-+    @classmethod
-+    def addMachineTests(klass, binary):
-+        """Dynamically add test methods for each machine found on QEMU binary
-+
-+        Look for all methods with "machineTest" prefix, and add
-+        custom test methods that will test them, for each machine-type
-+        found on QEMU binary 'binary'.
-+        """
-+        method_names = unittest.loader.getTestCaseNames(klass, prefix='machineTest')
-+        machines = klass.discoverMachines(binary)
-+        for machine in machines:
-+            for mname in method_names:
-+                klass.addMachineTest(mname, binary, machine)
-+
-+
-+if os.getenv('QTEST_QEMU_BINARY'):
-+    QueryMachinesTest.addMachineTests(os.getenv('QTEST_QEMU_BINARY'))
-+
-+if __name__ == '__main__':
-+    if os.getenv('QTEST_LOG_LEVEL'):
-+        logging.basicConfig(level=int(os.getenv('QTEST_LOG_LEVEL')))
-+    else:
-+        logging.basicConfig(level=logging.WARN)
-+    unittest.main()
--- 
-2.9.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA4MTQyMTU3NDguNTE1OC0xLWVoYWJrb3N0QHJlZGhhdC5jb20KU3ViamVjdDogW2xpYnZpcnRd
+IFtSRkMgdjQgMDAvMTNdIHFtcDogcXVlcnktZGV2aWNlLXNsb3RzIGNvbW1hbmQKVHlwZTogc2Vy
+aWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
+CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2Ug
+JEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0gg
+JG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdp
+dCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWls
+YmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0k
+KChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0
+aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8g
+YSBuZXcgYnJhbmNoICd0ZXN0Jwo3NGJhMjVhNWE2IHRlc3RzOiBFeHBlcmltZW50YWwgcXVlcnkt
+ZGV2aWNlLXNsb3RzIHRlc3QgY29kZQo3ZjFiYTc1NzhhIHVzYjogZW51bWVyYXRlX3Nsb3RzIGlt
+cGxlbWVudGF0aW9uCmQ0ZDMwZmNjZTEgcGNpOiBlbnVtZXJhdGVfc2xvdHMgaW1wbGVtZW50YXRp
+b24KYzFlZmIwMmE0MiBwY2k6IGRldmljZS1udW1iZXIgJiBmdW5jdGlvbiBwcm9wZXJ0aWVzCmQ4
+NDYyMzdiMmIgcGNpOiBwY2lfYnVzX2hhc19wY2llX3Vwc3RyZWFtX3BvcnQoKSBmdW5jdGlvbgoz
+MDNkOWZjNzg0IGlkZTogZW51bWVyYXRlX3Nsb3RzIGltcGxlbWVudGF0aW9uCjQxNDFkODNkODcg
+cWRldjogRW51bWVyYXRlIENQVSBzbG90cyBvbiBxdWVyeS1kZXZpY2Utc2xvdHMKZDZiODk2Nzkz
+NiBxZGV2IGNvcmU6IGdlbmVyaWMgZW51bWVyYXRlX3Nsb3RzIGltcGxlbWVudGF0aW9uCjFlZjUx
+YzNhNWQgcXVlcnktZGV2aWNlLXNsb3RzOiBDb2xsYXBzZSBzaW1pbGFyIGVudHJpZXMKMGQ4NDQ0
+MjI4NyBxZGV2OiBTbG90IGluZm8gaGVscGVycwozY2ZkMzg1YmNiIHFkZXY6IEFkZCBCdXNDbGFz
+czo6ZGV2aWNlX3R5cGUgZmllbGQKNmM5OGE0ODcyZiBxYXBpOiBxb2JqZWN0X2NvbXBhcmUoKSBo
+ZWxwZXIKZjY5NWRiZDUzMyBxbXA6IERlZmluZSBxdWVyeS1kZXZpY2Utc2xvdHMgY29tbWFuZAoK
+PT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMzogcW1wOiBEZWZpbmUgcXVl
+cnktZGV2aWNlLXNsb3RzIGNvbW1hbmQuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMzogcWFwaTogcW9i
+amVjdF9jb21wYXJlKCkgaGVscGVyLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
+MTQwOiBGSUxFOiBxYXBpL3FhcGktdXRpbC5jOjE0MDoKKyAgICAgICAgcmV0dXJuIHN0cmNtcChx
+c3RyaW5nX2dldF9zdHIocW9iamVjdF90b19xc3RyaW5nKGEpKSwgcXN0cmluZ19nZXRfc3RyKHFv
+YmplY3RfdG9fcXN0cmluZyhiKSkpOwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMx
+NDI6IEZJTEU6IHFhcGkvcWFwaS11dGlsLmM6MTQyOgorICAgICAgICByZXR1cm4gKGludClxYm9v
+bF9nZXRfYm9vbChxb2JqZWN0X3RvX3Fib29sKGEpKSAtIChpbnQpcWJvb2xfZ2V0X2Jvb2wocW9i
+amVjdF90b19xYm9vbChiKSk7Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDE5MyBsaW5l
+cyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2lu
+ZyBQQVRDSCAzLzEzOiBxZGV2OiBBZGQgQnVzQ2xhc3M6OmRldmljZV90eXBlIGZpZWxkLi4uCkNo
+ZWNraW5nIFBBVENIIDQvMTM6IHFkZXY6IFNsb3QgaW5mbyBoZWxwZXJzLi4uCkVSUk9SOiBkbyBu
+b3QgdXNlIEM5OSAvLyBjb21tZW50cwojNTQ6IEZJTEU6IGh3L2NvcmUvc2xvdGluZm8uYzoxMzoK
+Ky8vI2RlZmluZSBERUJVR19RT0JKRUNUUwoKRVJST1I6IF9fZnVuY19fIHNob3VsZCBiZSB1c2Vk
+IGluc3RlYWQgb2YgZ2NjIHNwZWNpZmljIF9fRlVOQ1RJT05fXwojNTk6IEZJTEU6IGh3L2NvcmUv
+c2xvdGluZm8uYzoxODoKKyNkZWZpbmUgREJHKGFyZ3MuLi4pIGRvIHsgX0RCRygiJXM6ICIsIF9f
+RlVOQ1RJT05fXyk7IFwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNTU5OiBGSUxF
+OiBody9jb3JlL3Nsb3RpbmZvLmM6NTE4Ogorc3RhdGljIERldmljZVNsb3RJbmZvTGlzdCAqKnNs
+b3RfbGlzdF90cnlfY29tYmluZV9zbG90KERldmljZVNsb3RJbmZvTGlzdCAqKmwsIERldmljZVNs
+b3RJbmZvICpzbG90KQoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
+NzA5OiBGSUxFOiBpbmNsdWRlL2h3L3FkZXYtc2xvdGluZm8uaDo1MjoKK15JICAgICAgICAgICAg
+ICAgICAgICAgICBjb25zdCBjaGFyICoqb3B0X25hbWUpOyQKCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiM3MzQ6IEZJTEU6IGluY2x1ZGUvaHcvcWRldi1zbG90aW5mby5oOjc3Ogor
+c3RhdGljIGlubGluZSBTbG90T3B0aW9uICpzbG90X2ZpbmRfb3B0KERldmljZVNsb3RJbmZvICpz
+bG90LCBjb25zdCBjaGFyICpvcHRpb24pCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVy
+IHVzZSB0YWJzCiM3MzY6IEZJTEU6IGluY2x1ZGUvaHcvcWRldi1zbG90aW5mby5oOjc5OgorXkly
+ZXR1cm4gc2xvdF9vcHRpb25zX2ZpbmRfb3B0KHNsb3QtPm9wdHMsIG9wdGlvbik7JAoKRVJST1I6
+IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBhcmVudGhlc2lzICcoJwojODQ4OiBG
+SUxFOiB0ZXN0cy90ZXN0LXNsb3RpbmZvLmM6NTQ6CisgICAgZ19hc3NlcnRfdHJ1ZSgganNvbl92
+YWx1ZWxpc3RfY29udGFpbnMoVEVTVF9SQU5HRSwgIi0xMDAiKSk7CgpFUlJPUjogc3BhY2UgcHJv
+aGliaXRlZCBhZnRlciB0aGF0IG9wZW4gcGFyZW50aGVzaXMgJygnCiM4NDk6IEZJTEU6IHRlc3Rz
+L3Rlc3Qtc2xvdGluZm8uYzo1NToKKyAgICBnX2Fzc2VydF90cnVlKCBqc29uX3ZhbHVlbGlzdF9j
+b250YWlucyhURVNUX1JBTkdFLCAgIi05OSIpKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFm
+dGVyIHRoYXQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzg1MjogRklMRTogdGVzdHMvdGVzdC1zbG90
+aW5mby5jOjU4OgorICAgIGdfYXNzZXJ0X3RydWUoIGpzb25fdmFsdWVsaXN0X2NvbnRhaW5zKFRF
+U1RfUkFOR0UsICAiLTUxIikpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBv
+cGVuIHBhcmVudGhlc2lzICcoJwojODUzOiBGSUxFOiB0ZXN0cy90ZXN0LXNsb3RpbmZvLmM6NTk6
+CisgICAgZ19hc3NlcnRfdHJ1ZSgganNvbl92YWx1ZWxpc3RfY29udGFpbnMoVEVTVF9SQU5HRSwg
+ICItNTAiKSk7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0IG9wZW4gcGFyZW50
+aGVzaXMgJygnCiM4NTQ6IEZJTEU6IHRlc3RzL3Rlc3Qtc2xvdGluZm8uYzo2MDoKKyAgICBnX2Fz
+c2VydF90cnVlKCBqc29uX3ZhbHVlbGlzdF9jb250YWlucyhURVNUX1JBTkdFLCAgIi00OSIpKTsK
+CkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgb3BlbiBwYXJlbnRoZXNpcyAnKCcK
+Izg1NzogRklMRTogdGVzdHMvdGVzdC1zbG90aW5mby5jOjYzOgorICAgIGdfYXNzZXJ0X3RydWUo
+IGpzb25fdmFsdWVsaXN0X2NvbnRhaW5zKFRFU1RfUkFOR0UsICAgIi0xIikpOwoKRVJST1I6IHNw
+YWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBhcmVudGhlc2lzICcoJwojODU4OiBGSUxF
+OiB0ZXN0cy90ZXN0LXNsb3RpbmZvLmM6NjQ6CisgICAgZ19hc3NlcnRfdHJ1ZSgganNvbl92YWx1
+ZWxpc3RfY29udGFpbnMoVEVTVF9SQU5HRSwgICAgIjAiKSk7CgpFUlJPUjogc3BhY2UgcHJvaGli
+aXRlZCBhZnRlciB0aGF0IG9wZW4gcGFyZW50aGVzaXMgJygnCiM4NTk6IEZJTEU6IHRlc3RzL3Rl
+c3Qtc2xvdGluZm8uYzo2NToKKyAgICBnX2Fzc2VydF90cnVlKCBqc29uX3ZhbHVlbGlzdF9jb250
+YWlucyhURVNUX1JBTkdFLCAgICAiMSIpKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVy
+IHRoYXQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzg2MDogRklMRTogdGVzdHMvdGVzdC1zbG90aW5m
+by5jOjY2OgorICAgIGdfYXNzZXJ0X3RydWUoIGpzb25fdmFsdWVsaXN0X2NvbnRhaW5zKFRFU1Rf
+UkFOR0UsICAgICIyIikpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVu
+IHBhcmVudGhlc2lzICcoJwojODYzOiBGSUxFOiB0ZXN0cy90ZXN0LXNsb3RpbmZvLmM6Njk6Cisg
+ICAgZ19hc3NlcnRfdHJ1ZSgganNvbl92YWx1ZWxpc3RfY29udGFpbnMoVEVTVF9SQU5HRSwgICAg
+IjQiKSk7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0IG9wZW4gcGFyZW50aGVz
+aXMgJygnCiM4NjQ6IEZJTEU6IHRlc3RzL3Rlc3Qtc2xvdGluZm8uYzo3MDoKKyAgICBnX2Fzc2Vy
+dF90cnVlKCBqc29uX3ZhbHVlbGlzdF9jb250YWlucyhURVNUX1JBTkdFLCAgICAiNSIpKTsKCkVS
+Uk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzg2
+NTogRklMRTogdGVzdHMvdGVzdC1zbG90aW5mby5jOjcxOgorICAgIGdfYXNzZXJ0X3RydWUoIGpz
+b25fdmFsdWVsaXN0X2NvbnRhaW5zKFRFU1RfUkFOR0UsICAgICI2IikpOwoKRVJST1I6IHNwYWNl
+IHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBhcmVudGhlc2lzICcoJwojODY4OiBGSUxFOiB0
+ZXN0cy90ZXN0LXNsb3RpbmZvLmM6NzQ6CisgICAgZ19hc3NlcnRfdHJ1ZSgganNvbl92YWx1ZWxp
+c3RfY29udGFpbnMoVEVTVF9SQU5HRSwgICAgIjkiKSk7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRl
+ZCBhZnRlciB0aGF0IG9wZW4gcGFyZW50aGVzaXMgJygnCiM4Njk6IEZJTEU6IHRlc3RzL3Rlc3Qt
+c2xvdGluZm8uYzo3NToKKyAgICBnX2Fzc2VydF90cnVlKCBqc29uX3ZhbHVlbGlzdF9jb250YWlu
+cyhURVNUX1JBTkdFLCAgICIxMCIpKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRo
+YXQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzg3NDogRklMRTogdGVzdHMvdGVzdC1zbG90aW5mby5j
+OjgwOgorICAgIGdfYXNzZXJ0X3RydWUoIGpzb25fdmFsdWVsaXN0X2NvbnRhaW5zKFRFU1RfUkFO
+R0UsICAgIjE0IikpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBh
+cmVudGhlc2lzICcoJwojODc5OiBGSUxFOiB0ZXN0cy90ZXN0LXNsb3RpbmZvLmM6ODU6CisgICAg
+Z19hc3NlcnRfdHJ1ZSgganNvbl92YWx1ZWxpc3RfY29udGFpbnMoVEVTVF9SQU5HRSwgICAiMTgi
+KSk7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0IG9wZW4gcGFyZW50aGVzaXMg
+JygnCiM4ODA6IEZJTEU6IHRlc3RzL3Rlc3Qtc2xvdGluZm8uYzo4NjoKKyAgICBnX2Fzc2VydF90
+cnVlKCBqc29uX3ZhbHVlbGlzdF9jb250YWlucyhURVNUX1JBTkdFLCAgICIxOSIpKTsKCkVSUk9S
+OiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzg4MTog
+RklMRTogdGVzdHMvdGVzdC1zbG90aW5mby5jOjg3OgorICAgIGdfYXNzZXJ0X3RydWUoIGpzb25f
+dmFsdWVsaXN0X2NvbnRhaW5zKFRFU1RfUkFOR0UsICAgIjIwIikpOwoKRVJST1I6IHNwYWNlIHBy
+b2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBhcmVudGhlc2lzICcoJwojODg2OiBGSUxFOiB0ZXN0
+cy90ZXN0LXNsb3RpbmZvLmM6OTI6CisgICAgZ19hc3NlcnRfdHJ1ZSgganNvbl92YWx1ZWxpc3Rf
+Y29udGFpbnMoVEVTVF9SQU5HRSwgICAiNTEiKSk7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBh
+ZnRlciB0aGF0IG9wZW4gcGFyZW50aGVzaXMgJygnCiM4OTI6IEZJTEU6IHRlc3RzL3Rlc3Qtc2xv
+dGluZm8uYzo5ODoKKyAgICBnX2Fzc2VydF90cnVlKCBqc29uX3ZhbHVlbGlzdF9jb250YWlucyhU
+RVNUX1JBTkdFLCAgICJcImFhYWEyXCIiKSk7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRl
+ciB0aGF0IG9wZW4gcGFyZW50aGVzaXMgJygnCiM4OTk6IEZJTEU6IHRlc3RzL3Rlc3Qtc2xvdGlu
+Zm8uYzoxMDU6CisgICAgZ19hc3NlcnRfdHJ1ZSgganNvbl92YWx1ZWxpc3RfY29udGFpbnMoVEVT
+VF9SQU5HRSwgICAiXCJqeXpcIiIpKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRo
+YXQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzkwMDogRklMRTogdGVzdHMvdGVzdC1zbG90aW5mby5j
+OjEwNjoKKyAgICBnX2Fzc2VydF90cnVlKCBqc29uX3ZhbHVlbGlzdF9jb250YWlucyhURVNUX1JB
+TkdFLCAgICJcImp5ejJcIiIpKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQg
+b3BlbiBwYXJlbnRoZXNpcyAnKCcKIzkwMTogRklMRTogdGVzdHMvdGVzdC1zbG90aW5mby5jOjEw
+NzoKKyAgICBnX2Fzc2VydF90cnVlKCBqc29uX3ZhbHVlbGlzdF9jb250YWlucyhURVNUX1JBTkdF
+LCAgICJcImp5ejNcIiIpKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgb3Bl
+biBwYXJlbnRoZXNpcyAnKCcKIzkwNjogRklMRTogdGVzdHMvdGVzdC1zbG90aW5mby5jOjExMjoK
+KyAgICBnX2Fzc2VydF90cnVlKCBqc29uX3ZhbHVlbGlzdF9jb250YWlucyhURVNUX1JBTkdFLCAg
+ICJcImtra1wiIikpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBh
+cmVudGhlc2lzICcoJwojOTEyOiBGSUxFOiB0ZXN0cy90ZXN0LXNsb3RpbmZvLmM6MTE4OgorICAg
+IGdfYXNzZXJ0X3RydWUoIGpzb25fdmFsdWVsaXN0X2NvbnRhaW5zKFRFU1RfUkFOR0UsICAgIlsz
+MCwgMzFdIikpOwoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMxMDAzOiBGSUxF
+OiB0ZXN0cy90ZXN0LXNsb3RpbmZvLmM6MjA5OgorICAgIC8vVE9ETzogbWFrZSB0aGlzIHdvcms6
+Cgp0b3RhbDogMzEgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMTQyIGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvMTM6IHF1
+ZXJ5LWRldmljZS1zbG90czogQ29sbGFwc2Ugc2ltaWxhciBlbnRyaWVzLi4uCkNoZWNraW5nIFBB
+VENIIDYvMTM6IHFkZXYgY29yZTogZ2VuZXJpYyBlbnVtZXJhdGVfc2xvdHMgaW1wbGVtZW50YXRp
+b24uLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xMzogcWRldjogRW51bWVyYXRlIENQVSBzbG90cyBvbiBx
+dWVyeS1kZXZpY2Utc2xvdHMuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xMzogaWRlOiBlbnVtZXJhdGVf
+c2xvdHMgaW1wbGVtZW50YXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xMzogcGNpOiBwY2lfYnVz
+X2hhc19wY2llX3Vwc3RyZWFtX3BvcnQoKSBmdW5jdGlvbi4uLgpFUlJPUjogc3BhY2UgcmVxdWly
+ZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lzICcoJwojMzU6IEZJTEU6IGh3L3BjaS9wY2ku
+YzoyNjEyOgorICAgIGlmKHBjaV9idXNfaGFzX3BjaWVfdXBzdHJlYW1fcG9ydChwY2lfZGV2LT5i
+dXMpKSB7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE5IGxpbmVzIGNoZWNrZWQKCllv
+dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDEwLzEz
+OiBwY2k6IGRldmljZS1udW1iZXIgJiBmdW5jdGlvbiBwcm9wZXJ0aWVzLi4uCkNoZWNraW5nIFBB
+VENIIDExLzEzOiBwY2k6IGVudW1lcmF0ZV9zbG90cyBpbXBsZW1lbnRhdGlvbi4uLgpFUlJPUjog
+c3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lzICcoJwojMTY2OiBGSUxF
+OiBody9wY2kvcGNpLmM6MTY3OgorICAgIGZvcihkZXZuciA9IFBDSV9TTE9UKHBiLT5kZXZmbl9t
+aW4pOyBkZXZuciA8IGRldm5yczsgZGV2bnIrKykgewoKV0FSTklORzogbGluZSBvdmVyIDgwIGNo
+YXJhY3RlcnMKIzE3MTogRklMRTogaHcvcGNpL3BjaS5jOjE3MjoKKyAgICAgICAgICAgIC8qVE9E
+TzogYWRkIGluZm8gYWJvdXQgYWNjZXB0aW5nIG9ubHkgYnJpZGdlcyBvbiBleHRyYSBQQ0kgcm9v
+dCBidXNlcyAqLwoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCA2OCBsaW5lcyBjaGVja2Vk
+CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAx
+Mi8xMzogdXNiOiBlbnVtZXJhdGVfc2xvdHMgaW1wbGVtZW50YXRpb24uLi4KRVJST1I6IGxpbmUg
+b3ZlciA5MCBjaGFyYWN0ZXJzCiM1NDogRklMRTogaHcvdXNiL2J1cy5jOjI5Ogorc3RhdGljIHZv
+aWQgdXNiX2J1c19lbnVtZXJhdGVfc2xvdF9saXN0KERldmljZVNsb3RJbmZvTGlzdCAqKnIsIFVT
+QkJ1cyAqYnVzLCBVU0JQb3J0TGlzdCAqbCkKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywg
+NzIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
+ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
+IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
+Q2hlY2tpbmcgUEFUQ0ggMTMvMTM6IHRlc3RzOiBFeHBlcmltZW50YWwgcXVlcnktZGV2aWNlLXNs
+b3RzIHRlc3QgY29kZS4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTUyOiBG
+SUxFOiB0ZXN0cy9xbXAtbWFjaGluZS1pbmZvLnB5OjEzMjoKKyAgICAgICAgdHlwZXMgPSBzZWxm
+LnZtLmNvbW1hbmQoJ3FvbS1saXN0LXR5cGVzJywgaW1wbGVtZW50cz1pbXBsZW1lbnRzLCAqKmt3
+YXJncykKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNjA6IEZJTEU6IHRlc3Rz
+L3FtcC1tYWNoaW5lLWluZm8ucHk6MTQwOgorICAgICAgICBub191c2VyX2RldnMgPSBzZXQoW2Rb
+J25hbWUnXSBmb3IgZCBpbiBpbmZvUURNKHNlbGYudm0sICkgaWYgZFsnbm8tdXNlciddXSkKCldB
+Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNzA6IEZJTEU6IHRlc3RzL3FtcC1tYWNo
+aW5lLWluZm8ucHk6MTUwOgorICAgICAgICAiIiJDaGVjayBpZiB0aGUgYnVzIGlkZW50aWZpZWQg
+YnkgdGhlIHNsb3QgbWF0Y2hlcyB0aGUgaW5mb3JtYXRpb24gcmV0dXJuZWQKCkVSUk9SOiBsaW5l
+IG92ZXIgOTAgY2hhcmFjdGVycwojMTgxOiBGSUxFOiB0ZXN0cy9xbXAtbWFjaGluZS1pbmZvLnB5
+OjE2MToKKyAgICAgICAgIyMgYnV0IHRoZSBidXMgX25hbWVfIChhY2NlcHRlZCBieSBxYnVzX2Zp
+bmQoKSkgZG9lcyBub3QgbmVjZXNzYXJpbHkgbWF0Y2hlcyB0aGUgYnVzIF9wYXRoXwoKV0FSTklO
+RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIwNzogRklMRTogdGVzdHMvcW1wLW1hY2hpbmUt
+aW5mby5weToxODc6CisgICAgICAgICAgICBmb3Igc3QgaW4gc2VsZi52bS5jb21tYW5kKCdxb20t
+bGlzdC10eXBlcycsIGltcGxlbWVudHM9dCwgYWJzdHJhY3Q9RmFsc2UpOgoKV0FSTklORzogbGlu
+ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIwODogRklMRTogdGVzdHMvcW1wLW1hY2hpbmUtaW5mby5w
+eToxODg6CisgICAgICAgICAgICAgICAgZHByb3BzID0gc2VsZi52bS5jb21tYW5kKCdkZXZpY2Ut
+bGlzdC1wcm9wZXJ0aWVzJywgdHlwZW5hbWU9c3RbJ25hbWUnXSkKCkVSUk9SOiBsaW5lIG92ZXIg
+OTAgY2hhcmFjdGVycwojMjE1OiBGSUxFOiB0ZXN0cy9xbXAtbWFjaGluZS1pbmZvLnB5OjE5NToK
+KyAgICAgICAgICAgIGlmIHNsb3QuaGFzX2tleSgnbWF4LWRldmljZXMnKSBhbmQgbGVuKHNsb3Rb
+J2RldmljZXMnXSkgPj0gc2xvdFsnbWF4LWRldmljZXMnXToKCkVSUk9SOiBsaW5lIG92ZXIgOTAg
+Y2hhcmFjdGVycwojMjQwOiBGSUxFOiB0ZXN0cy9xbXAtbWFjaGluZS1pbmZvLnB5OjIyMDoKKyAg
+ICAgICAgICAgICAgICBzZWxmLmFzc2VydFRydWUoYW55KHNlbGYudHlwZUltcGxlbWVudHMoZHR5
+cGUsIHQpIGZvciB0IGluIHNsb3RbJ2RldmljZS10eXBlcyddKSkKCkVSUk9SOiBsaW5lIG92ZXIg
+OTAgY2hhcmFjdGVycwojMjQzOiBGSUxFOiB0ZXN0cy9xbXAtbWFjaGluZS1pbmZvLnB5OjIyMzoK
+KyAgICAgICAgICAgICAgICBzZWxmLmFzc2VydFRydWUobGVuKHNlbGYuZ2V0VXNlckNyZWF0YWJs
+ZVN1YnR5cGVzKGR0KSkgPiAwLCAiVGhlcmUncyBubyB1c2VyLWNyZWF0YWJsZSBzdWJ0eXBlIG9m
+ICVzIiAlIChkdCkpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjQ4OiBGSUxF
+OiB0ZXN0cy9xbXAtbWFjaGluZS1pbmZvLnB5OjIyODoKKyAgICAgICAgICAgICAgICBhbGxfY291
+bnRzID0gW2xlbihWYWx1ZXNJdGVyYXRvcihwWyd2YWx1ZXMnXSkpIGZvciBwIGluIHNsb3RbJ29w
+dHMnXV0KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNjY6IEZJTEU6IHRlc3Rz
+L3FtcC1tYWNoaW5lLWluZm8ucHk6MjQ2OgorICAgICAgICAiIiJEeW5hbWljYWxseSBhZGQgYSB0
+ZXN0TWFjaGluZV88YXJjaD5fPG5hbWU+XzxtYWNoaW5lPiBtZXRob2QgdG8gdGhlIGNsYXNzIiIi
+CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjczOiBGSUxFOiB0ZXN0cy9xbXAt
+bWFjaGluZS1pbmZvLnB5OjI1MzoKKyAgICAgICAgbWV0aG9kX25hbWUgPSAndGVzdF8lc18lc18l
+cycgJSAobWV0aG9kX25hbWUsIG1hY2hpbmVbJ2FyY2gnXSwgbWFjaGluZV9uYW1lKQoKV0FSTklO
+RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI4NjogRklMRTogdGVzdHMvcW1wLW1hY2hpbmUt
+aW5mby5weToyNjY6CisgICAgICAgIHZtID0gcXRlc3QuUUVNVVF0ZXN0TWFjaGluZShiaW5hcnk9
+YmluYXJ5LCBhcmdzPVsnLVMnLCAnLW1hY2hpbmUnLCAnbm9uZSddKQoKV0FSTklORzogbGluZSBv
+dmVyIDgwIGNoYXJhY3RlcnMKIzMwNTogRklMRTogdGVzdHMvcW1wLW1hY2hpbmUtaW5mby5weToy
+ODU6CisgICAgICAgIG1ldGhvZF9uYW1lcyA9IHVuaXR0ZXN0LmxvYWRlci5nZXRUZXN0Q2FzZU5h
+bWVzKGtsYXNzLCBwcmVmaXg9J21hY2hpbmVUZXN0JykKCnRvdGFsOiA0IGVycm9ycywgMTAgd2Fy
+bmluZ3MsIDMwMCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywg
+cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
+cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
+SU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
+OiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6
+Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
+ZWxAZnJlZWxpc3RzLm9yZw==
