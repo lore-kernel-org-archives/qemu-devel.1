@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dhHrs-0003pw-Db
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:05:30 -0400
+	(envelope-from <eblake@redhat.com>) id 1dhI8u-0008Hd-CZ
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:23:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dhHro-0002RY-Fp
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:05:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33646)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dhHro-0002RA-6y
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:05:24 -0400
-References: <35BC0F0B-7CB0-424C-86EA-2B5D8E219634@gmail.com>
-	<20170811215845.n667iobglz5cef3z@var.youpi.perso.aquilenet.fr>
-	<CAFEAcA_XrnDxZLhX5FGFBh+Mh-_80z3Z6b+0LkmQuoWzrWK0tA@mail.gmail.com>
-	<20170812110410.rosk6yhkj22w346s@var.youpi.perso.aquilenet.fr>
-	<CAFEAcA-N5pAM+3PXvjaJ-LMPFswAtmkAXA6yn151CCtfn+=JQA@mail.gmail.com>
-	<20170812112925.mpi2mmewt46wna7j@var.youpi.perso.aquilenet.fr>
-	<60ba7c95-8989-13bb-3aaf-ac9a8389320f@redhat.com>
-	<52a8c2c0-5d51-9c92-3dbe-3c25bd09e16e@amsat.org>
+	(envelope-from <eblake@redhat.com>) id 1dhI8t-0003vh-09
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:23:04 -0400
+References: <20170808152607.147691-1-vsementsov@virtuozzo.com>
+	<6079e4c4-ae54-826f-8cb4-dbcd773ecf50@redhat.com>
+	<561af6b4-ca21-7118-e44d-2f12da1b23b8@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <0ff38a6f-f310-887d-dddb-f45e00f367cd@redhat.com>
-Date: Mon, 14 Aug 2017 11:05:14 -0500
+Message-ID: <7ab0fcb2-b033-b67d-cec7-5a7470430a26@redhat.com>
+Date: Mon, 14 Aug 2017 11:22:49 -0500
 MIME-Version: 1.0
-In-Reply-To: <52a8c2c0-5d51-9c92-3dbe-3c25bd09e16e@amsat.org>
+In-Reply-To: <561af6b4-ca21-7118-e44d-2f12da1b23b8@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="AP3dOQspf7NrFLF4d0gcGnsBJsaUPN2Eq"
-Subject: Re: [Qemu-devel] SLIRP warning messages displayed while compiling
+	boundary="k8giNJxhNlO9WcB1q1uj8O1PTfbHiTkVl"
+Subject: Re: [Qemu-devel] [PATCH v2 for 2.10] block/nbd-client: always
+ return EIO on and after the first io channel error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,74 +26,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Samuel Thibault <samuel.thibault@gnu.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Programmingkid <programmingkidx@gmail.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Jan Kiszka <jan.kiszka@siemens.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AP3dOQspf7NrFLF4d0gcGnsBJsaUPN2Eq
+--k8giNJxhNlO9WcB1q1uj8O1PTfbHiTkVl
 From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Samuel Thibault <samuel.thibault@gnu.org>,
- Peter Maydell <peter.maydell@linaro.org>
-Cc: Programmingkid <programmingkidx@gmail.com>,
- "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>,
- Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <0ff38a6f-f310-887d-dddb-f45e00f367cd@redhat.com>
-Subject: Re: [Qemu-devel] SLIRP warning messages displayed while compiling
-References: <35BC0F0B-7CB0-424C-86EA-2B5D8E219634@gmail.com>
- <20170811215845.n667iobglz5cef3z@var.youpi.perso.aquilenet.fr>
- <CAFEAcA_XrnDxZLhX5FGFBh+Mh-_80z3Z6b+0LkmQuoWzrWK0tA@mail.gmail.com>
- <20170812110410.rosk6yhkj22w346s@var.youpi.perso.aquilenet.fr>
- <CAFEAcA-N5pAM+3PXvjaJ-LMPFswAtmkAXA6yn151CCtfn+=JQA@mail.gmail.com>
- <20170812112925.mpi2mmewt46wna7j@var.youpi.perso.aquilenet.fr>
- <60ba7c95-8989-13bb-3aaf-ac9a8389320f@redhat.com>
- <52a8c2c0-5d51-9c92-3dbe-3c25bd09e16e@amsat.org>
-In-Reply-To: <52a8c2c0-5d51-9c92-3dbe-3c25bd09e16e@amsat.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+Message-ID: <7ab0fcb2-b033-b67d-cec7-5a7470430a26@redhat.com>
+Subject: Re: [PATCH v2 for 2.10] block/nbd-client: always return EIO on and
+ after the first io channel error
+References: <20170808152607.147691-1-vsementsov@virtuozzo.com>
+ <6079e4c4-ae54-826f-8cb4-dbcd773ecf50@redhat.com>
+ <561af6b4-ca21-7118-e44d-2f12da1b23b8@virtuozzo.com>
+In-Reply-To: <561af6b4-ca21-7118-e44d-2f12da1b23b8@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08/12/2017 10:38 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Eric,
->=20
-> On 08/12/2017 08:41 AM, Eric Blake wrote:
->> Here's an idea:  Instead of using struct ip6 { ... } QEMU_PACKED, use
+On 08/14/2017 02:39 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 12.08.2017 01:28, Eric Blake wrote:
+>> On 08/08/2017 10:26 AM, Vladimir Sementsov-Ogievskiy wrote:
 >>
->> struct ip6 {
->> ...
->> };
->> QEMU_BUG_ON(sizeof(struct ip6) !=3D 32);
+>> Initial review, I'm still playing with this one, and will reply again =
+on
+>> Monday.
 >>
->> so that the compiler explicitly chokes if it introduced any padding, a=
-nd
->> then we know all our accesses are naturally aligned which shuts up the=
+>>> Do not communicate after the first error to avoid communicating throu=
+ght
+>> s/throught/through a/
+>>
+>>> broken channel. The only exclusion is try to send NBD_CMD_DISC anyway=
+ on
+>>> in nbd_client_close.
+>> I think the exclusion is wrong - if we detected the server sending us
+>> garbage, we're probably better off disconnecting entirely rather than
+>> trying to assume that the server will give us a clean disconnect via
+>> NBD_CMD_DISC.
+>=20
+> But we assume nothing, just send NBD_CMD_DISC and then disconnect. May
+> be it'll help server a bit.
 
->> warning.
->=20
-> Following your suggestion I tried:
->=20
-> #define QEMU_BUG_STRUCT_UNALIGNED(s) \
->         QEMU_BUILD_BUG_ON(sizeof(s) !=3D sizeof(s QEMU_PACKED))
+The server is already broken.  Assuming that anything we send will help
+the broken server behave correctly is a waste in effort.  The only
+reason to keep sending NBD_CMD_DISC if we detect a broken server is if
+it is easier to maintain the code that way, and not out of concern for
+the server.
 
-I don't think gcc likes that (you can't just add attribute packed in
-arbitrary places, but only where the type is declared).
+> The only doubt: is it possible to hang on nbd_rwv because some fail in
+> connection or server?
 
->=20
-> QEMU_BUG_STRUCT_UNALIGNED(struct ip6);
->=20
-> but this gives:
->=20
-> qemu/slirp/ip6.h:157:1: warning: 'packed' attribute ignored when parsin=
-g
-> type [-Wignored-attributes]
-> QEMU_BUG_STRUCT_UNALIGNED(struct ip6);
-> ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+We _already_ have the bug that we are hanging in trying to talk to a
+broken server, which is a regression introduced in 2.9 and not present
+in 2.8.  And that's what I'm most worried about getting fixed before
+2.10 is released.
 
-Indeed, there's the evidence that your attempt at a shortcut didn't
-work. My proposal was to put in a hard-coded number, rather than try to
-make the compiler compute two variants of the type and check that they
-occupy the same space (although I agree with your idea that if you CAN
-get the compiler to do that, it's nicer than hand-computing the number
-to compare against).
+I don't think that sending any more data to the server is necessarily
+going to cause a hang, so much as trying to read data that is going to
+be sent in reply or failing to manipulate the coroutine handlers
+correctly (that is, our current hang is because even after we detect
+failure, we are still sending NBD_CMD_FLUSH but no longer have a
+coroutine in place to read the reply, so we no longer make progress to
+the point of sending NBD_CMD_DISC and closing the connection).
+
+>>> +++ b/block/nbd-client.h
+>>> @@ -29,6 +29,7 @@ typedef struct NBDClientSession {
+>>>         Coroutine *recv_coroutine[MAX_NBD_REQUESTS];
+>>>       NBDReply reply;
+>>> +    bool eio_to_all;
+>> Bikeshedding - I'm wondering if there is a better name; maybe 'error' =
+or
+>> 'server_broken'?
+>=20
+> current name also used for normal path shutdown, when reply read return=
+s
+> 0 because of EOF.
+
+But my point is that we don't necessarily want to treat normal server
+shutdown the same as a buggy server.  Maybe we do as a minimal fix for
+2.10 purposes, but I really want to understand the fix we are putting in
+for the regression, and making the fix minimal goes a long way towards
+that goal.
+
+>>>   @@ -107,6 +113,7 @@ static coroutine_fn void
+>>> nbd_read_reply_entry(void *opaque)
+>>>           qemu_coroutine_yield();
+>>>       }
+>>>   +    s->eio_to_all =3D true;
+>> I think this one should be guarded by 'if (ret < 0)' - we also break o=
+ut
+>> of the for loop when ret =3D=3D 0 (aka EOF because the server ended
+>> cleanly), which is not the same as the server sending us garbage.
+>=20
+> but my idea was to use eio_to_all in this case too, so it is not called=
+
+> server_error.
+
+But that's what I'm questioning - it's not obvious that forcing all
+existing coroutines to fail with EIO is correct when we got a normal
+EOF, as that is different than a server that is actively sending us garba=
+ge.
+
+>>> +    if (s->eio_to_all) {
+>>>           qemu_co_mutex_unlock(&s->send_mutex);
+>>> -        return -EPIPE;
+>>> +        return -EIO;
+>>>       }
+>> I don't know if changing the errno is wise; maybe we want to keep both=
+
+>> conditions (the !s->ioc and the s->eio_to_all) - especially if we only=
+
+>> set eio_to_all on an actual detection of server garbage rather than on=
+
+>> all exit paths.
+>=20
+> I think it is ok for all exit paths, otherwise we should carefully
+> declare in which cases
+> we return EIO and in which EPIPE, and spread this difference to the
+> whole file.
+
+Losing the distinction between error codes generally has minimal impact
+to correctness (either way, you have an error, and know that your
+connection has dies), but can have drastic effects on ease of
+understanding error messages.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -109,7 +157,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---AP3dOQspf7NrFLF4d0gcGnsBJsaUPN2Eq
+--k8giNJxhNlO9WcB1q1uj8O1PTfbHiTkVl
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -118,14 +166,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmRyjoACgkQp6FrSiUn
-Q2p76gf/f9TmczYjtmAlfILZdxgBul4vEhxq5Qsxc2sFK4nIUH/bQyEN5u5JC+Y4
-0WHXWG8VHYBjW/b1bzzontUqTExrmQ2Kysc8LAH7Qy5Rpcb3E9VB/Y3OI4l1qGZh
-ruTtCG38vfJhnYua8UbXPkNnReinmwBD9BywOh4a53+TygL0aPmnSX/Pv8HlHLEi
-C9Z654PGc8oA6FjyN8aOkb6wrOF2CkWbOL4HphXuBMGZnuIva0HotU8/4uk3GF19
-EDvuSCuto1P0igRKWbjOnBS7DOcrmsyFY4qyC67wwM7BkVJXw6BF5vUW1E9YPqPF
-39TTCn5GpDqwjczyMRk+kJ6KLVAONA==
-=CuDw
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmRzlkACgkQp6FrSiUn
+Q2pp+gf9FicCxBoAqtHRTAkzcWXuQQLuKLelRdeVkbpYFhZygfHiJnnknfjlnJkA
+7ZgjkacvW7QQU6uU1tzqJUZg/ZrR0IwS7EIBWeHopEWukSrawiKp2LZjSrHvl6Gu
+5WhmsFRtTX4MrKATHK5S4Mi3UFCKgI3vN5ayVriaAnn7kVT6S3g3FJwkq2Fztd4O
+GfV8oqEdUWiWsuAAYDm3IaJ2uFq/kEtLz3dq5ax9V0O+w5o5JJiJHmZy43K43z2j
+4/9oDM8qZbLYV21eIK5R9qi5ijr7AaKOMkiVM+FIJ4Vf923/J/wd9zONH+6vR0jA
+te+TGTRjJdOz9CqU+7ZoFhw3IoX9PA==
+=DjyD
 -----END PGP SIGNATURE-----
 
---AP3dOQspf7NrFLF4d0gcGnsBJsaUPN2Eq--
+--k8giNJxhNlO9WcB1q1uj8O1PTfbHiTkVl--
