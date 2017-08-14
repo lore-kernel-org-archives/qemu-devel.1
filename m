@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhGJK-0004be-QE
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:25:44 -0400
+	(envelope-from <hahn@univention.de>) id 1dhGM6-0006kl-9p
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:28:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhGJG-0003Ss-KF
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:25:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48152)
+	(envelope-from <hahn@univention.de>) id 1dhGM1-0005VN-Hu
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:28:33 -0400
+Received: from mail.univention.de ([82.198.197.8]:32167)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dhGJG-0003Q9-4U
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:25:38 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170728121044.15488-1-vadim.galitsyn@profitbricks.com>
-	<20170728121044.15488-4-vadim.galitsyn@profitbricks.com>
-Date: Mon, 14 Aug 2017 16:25:31 +0200
-In-Reply-To: <20170728121044.15488-4-vadim.galitsyn@profitbricks.com> (Vadim
-	Galitsyn's message of "Fri, 28 Jul 2017 14:10:44 +0200")
-Message-ID: <87tw1ateec.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <hahn@univention.de>) id 1dhGM1-0005Sz-8C
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:28:29 -0400
+From: Philipp Hahn <hahn@univention.de>
+Message-ID: <8b120ab5-5319-30d6-6971-411c7e5c4330@univention.de>
+Date: Mon, 14 Aug 2017 16:28:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 3/3] hmp: introduce 'info
- memory-size-summary' command
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] RFH: difference in read-only mapped bios.bin - memory
+ corruption?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,155 +26,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Vasilis Liaskovitis <vasilis.liaskovitis@profitbricks.com>, Mohammed Gamal <mohammed.gamal@profitbricks.com>, Eduardo Otubo <eduardo.otubo@profitbricks.com>
+To: qemu-devel@nongnu.org
+Cc: Laszlo Ersek <lersek@redhat.com>, "Dr. David Alan Gilbert" <linux@treblig.org>
 
-Vadim Galitsyn <vadim.galitsyn@profitbricks.com> writes:
+Hello,
 
-> This command is an equivalent of QMP command query-memory-size-summary.
-> It provides the following memory information in bytes:
->
->   * base-memory - size of "base" memory specified with command line option -m.
->
->   * hotunpluggable-memory - amount of memory that was hot-plugged.
->     If target does not have CONFIG_MEM_HOTPLUG enabled, no
->     value is reported.
->
-> Signed-off-by: Vasilis Liaskovitis <vasilis.liaskovitis@profitbricks.com>
-> Signed-off-by: Mohammed Gamal <mohammed.gamal@profitbricks.com>
-> Signed-off-by: Eduardo Otubo <eduardo.otubo@profitbricks.com>
-> Signed-off-by: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
-> Reviewed-by: Eugene Crosser <evgenii.cherkashin@profitbricks.com>
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: qemu-devel@nongnu.org
-> ---
->  hmp-commands-info.hx     | 16 ++++++++++++++++
->  hmp.c                    | 16 ++++++++++++++++
->  hmp.h                    |  1 +
->  hw/mem/pc-dimm.c         |  2 +-
->  include/hw/mem/pc-dimm.h |  2 +-
->  qmp.c                    |  3 ++-
->  stubs/qmp_pc_dimm.c      |  2 +-
->  7 files changed, 38 insertions(+), 4 deletions(-)
->
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index d9df238a5f..c5a62699ed 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -849,6 +849,22 @@ ETEXI
->          .cmd = hmp_info_vm_generation_id,
->      },
->  
-> +STEXI
-> +@item info memory-size-summary
-> +@findex memory-size-summary
-> +Display the amount of initially allocated and hot-plugged (if
-> +enabled) memory in bytes.
-> +ETEXI
-> +
-> +    {
-> +        .name       = "memory-size-summary",
-> +        .args_type  = "",
-> +        .params     = "",
-> +        .help       = "show the amount of initially allocated and "
-> +                      "hot-plugged (if enabled) memory in bytes.",
-> +        .cmd        = hmp_info_memory_size_summary,
-> +    },
-> +
->  STEXI
->  @end table
->  ETEXI
-> diff --git a/hmp.c b/hmp.c
-> index fd80dce758..0c14ecc454 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -2868,3 +2868,19 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict)
->      hmp_handle_error(mon, &err);
->      qapi_free_GuidInfo(info);
->  }
-> +
-> +void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict)
-> +{
-> +    MemoryInfo *info = qmp_query_memory_size_summary(&error_abort);
-> +    if (info) {
-> +        monitor_printf(mon, "base memory: %" PRIu64 "\n",
-> +                       info->base_memory);
-> +
-> +        if (info->has_hotunpluggable_memory) {
-> +            monitor_printf(mon, "hotunpluggable memory: %" PRIu64 "\n",
-> +                           info->hotunpluggable_memory);
-> +        }
-> +
-> +        qapi_free_MemoryInfo(info);
-> +    }
-> +}
-> diff --git a/hmp.h b/hmp.h
-> index 1ff455295e..3605003e4c 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -145,5 +145,6 @@ void hmp_info_dump(Monitor *mon, const QDict *qdict);
->  void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
->  void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
->  void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
-> +void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
->  
->  #endif
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index 1df8b7ee57..f00c61bb82 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -159,7 +159,7 @@ uint64_t pc_existing_dimms_capacity(Error **errp)
->      return cap.size;
->  }
->  
-> -uint64_t get_existing_hotpluggable_memory_size(void)
-> +uint64_t get_existing_hotunpluggable_memory_size(void)
->  {
->      return pc_existing_dimms_capacity(&error_abort);
->  }
-> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-> index 52c6b5e641..7dd8c3b7c1 100644
-> --- a/include/hw/mem/pc-dimm.h
-> +++ b/include/hw/mem/pc-dimm.h
-> @@ -95,7 +95,7 @@ int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
->  
->  int qmp_pc_dimm_device_list(Object *obj, void *opaque);
->  uint64_t pc_existing_dimms_capacity(Error **errp);
-> -uint64_t get_existing_hotpluggable_memory_size(void);
-> +uint64_t get_existing_hotunpluggable_memory_size(void);
+I'm currently investigating a problem, were a Linux VM does not reboot
+and gets stuck in the SeaBIOS reboot code:
 
-Introduced in PATCH 2, renamed in PATCH 3.  Try again :)
+I'm using SeaBIOS-1.7 from Debian with a more modern qemu-2.8
 
->  void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
->                           MemoryRegion *mr, uint64_t align, Error **errp);
->  void pc_dimm_memory_unplug(DeviceState *dev, MemoryHotplugState *hpms,
-> diff --git a/qmp.c b/qmp.c
-> index 682d950440..18a7594b54 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -716,7 +716,8 @@ MemoryInfo *qmp_query_memory_size_summary(Error **errp)
->  
->      mem_info->base_memory = ram_size;
->  
-> -    mem_info->hotunpluggable_memory = get_existing_hotpluggable_memory_size();
-> +    mem_info->hotunpluggable_memory =
-> +        get_existing_hotunpluggable_memory_size();
->      mem_info->has_hotunpluggable_memory =
->          (mem_info->hotunpluggable_memory != (uint64_t)-1);
->  
-> diff --git a/stubs/qmp_pc_dimm.c b/stubs/qmp_pc_dimm.c
-> index 1d1e008b58..eba97dbbbb 100644
-> --- a/stubs/qmp_pc_dimm.c
-> +++ b/stubs/qmp_pc_dimm.c
-> @@ -7,7 +7,7 @@ int qmp_pc_dimm_device_list(Object *obj, void *opaque)
->     return 0;
->  }
->  
-> -uint64_t get_existing_hotpluggable_memory_size(void)
-> +uint64_t get_existing_hotunpluggable_memory_size(void)
->  {
->      return (uint64_t)-1;
->  }
+> virsh # qemu-monitor-command --hmp ucs41-414 info roms
+> fw=3Dgenroms/kvmvapic.bin size=3D0x002400 name=3D"kvmvapic.bin"
+> addr=3D00000000fffe0000 size=3D0x020000 mem=3Drom name=3D"bios.bin"
+
+which (to my understanding) is mapped at two physical locations:
+> virsh # qemu-monitor-command --hmp ucs41-414 info mtree
+...> memory-region: system
+...>       00000000000e0000-00000000000fffff (prio 1, R-): alias
+isa-bios @pc.bios 0000000000000000-000000000001ffff
+>       00000000fffe0000-00000000ffffffff (prio 0, R-): pc.bios
+
+If I dump both regions and compare them, I get a difference:
+> virsh # qemu-monitor-command --pretty --domain ucs41-414 '{"execute":"p=
+memsave","arguments":{"val":917504,"size":131072,"filename":"/tmp/bios-lo=
+w.dump"}}'
+> virsh # qemu-monitor-command --pretty --domain ucs41-414 '{"execute":"p=
+memsave","arguments":{"val":4294836224,"size":131072,"filename":"/tmp/bio=
+s-high.dump"}}'
+> # diff --suppress-common-lines -y <(od -Ax -tx1 -w1 -v /tmp/bios-low.du=
+mp) <(od -Ax -tx1 -w1 -v /tmp/bios-high.dump)
+> 00f798 fa                                                     | 00f798 =
+80
+> 00f799 7a                                                     | 00f799 =
+89
+> 00f79a f4                                                     | 00f79a =
+f2
+> 016d40 00                                                     | 016d40 =
+ff
+> 016d41 00                                                     | 016d41 =
+ff
+> 016d42 00                                                     | 016d42 =
+ff
+> 016d43 00                                                     | 016d43 =
+ff
+
+The high address dump is the same as the original:
+> # cmp -l /tmp/bios-high.dump /usr/share/seabios/bios.bin
+
+> virsh # qemu-monitor-command --hmp ucs41-414 x/6i 0x00000000000ef78f
+> 0x00000000000ef78f:  mov    $0xcf8,%esi
+> 0x00000000000ef794:  mov    $0xfa000000,%eax
+> 0x00000000000ef799:  jp     0xef78f
+                       ^^^^^^^^^^^^^^ BUG: endless loop
+> 0x00000000000ef79b:  out    %eax,(%dx)
+> 0x00000000000ef79c:  mov    $0xfe,%dl
+> 0x00000000000ef79e:  in     (%dx),%ax
+
+> virsh # qemu-monitor-command --hmp ucs41-414 xp/6i 0x00000000fffef78f
+> 0x00000000fffef78f:  mov    $0xcf8,%esi
+> 0x00000000fffef794:  mov    $0x80000000,%eax
+> 0x00000000fffef799:  mov    %esi,%edx
+                       ^^^^^^^^^^^^^^^^ CORRECT original code
+> 0x00000000fffef79b:  out    %eax,(%dx)
+> 0x00000000fffef79c:  mov    $0xfe,%dl
+> 0x00000000fffef79e:  in     (%dx),%ax
+
+(That's some code from seabios-1.7.0/src/pci.c)
+
+I had exactly the same run some weeks ago, but I also get different
+patterns:
+> # diff --suppress-common-lines -y <(od -Ax -tx1 -w1 -v /tmp/bios2.dump)=
+ <(od -Ax -tx1 -w1 -v bios.bin)
+> 00f798 f0                                                     | 00f798 =
+80
+> 00f799 8d                                                     | 00f799 =
+89
+> 00f79a f3                                                     | 00f79a =
+f2
+> 016d40 00                                                     | 016d40 =
+ff
+> 016d41 00                                                     | 016d41 =
+ff
+> 016d42 00                                                     | 016d42 =
+ff
+> 016d43 00                                                     | 016d43 =
+ff
+
+Not all runs lead to reboot problems, but I don't know if any other
+corruption happened there.
+
+I had a similar problem with OVMF back in June
+<https://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg03940.html>,
+which I "solved" by upgrading the OVMF version: I have not seen the
+problem there since than, but this problems looks very similar.
+
+
+1. How can it be, that the low-mem ROM mapping is modified?
+
+2. Can I tell QEMU or gdb to trap any modification of that 128 KiB area?
+
+I'll try to get http://rr-project.org/ running, but any help is appreciat=
+ed.
+
+Philipp
+--=20
+Philipp Hahn
+Open Source Software Engineer
+
+Univention GmbH
+be open.
+Mary-Somerville-Str. 1
+D-28359 Bremen
+Tel.: +49 421 22232-0
+Fax : +49 421 22232-99
+hahn@univention.de
+
+http://www.univention.de/
+Gesch=C3=A4ftsf=C3=BChrer: Peter H. Ganten
+HRB 20755 Amtsgericht Bremen
+Steuer-Nr.: 71-597-02876
