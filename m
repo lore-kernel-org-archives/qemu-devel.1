@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hahn@univention.de>) id 1dhGM6-0006kl-9p
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:28:35 -0400
+	(envelope-from <mst@redhat.com>) id 1dhGMG-0006sR-2p
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:28:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hahn@univention.de>) id 1dhGM1-0005VN-Hu
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:28:33 -0400
-Received: from mail.univention.de ([82.198.197.8]:32167)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hahn@univention.de>) id 1dhGM1-0005Sz-8C
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:28:29 -0400
-From: Philipp Hahn <hahn@univention.de>
-Message-ID: <8b120ab5-5319-30d6-6971-411c7e5c4330@univention.de>
-Date: Mon, 14 Aug 2017 16:28:21 +0200
+	(envelope-from <mst@redhat.com>) id 1dhGMB-0005cW-Vo
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:28:44 -0400
+Date: Mon, 14 Aug 2017 17:20:21 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170814172001-mutt-send-email-mst@kernel.org>
+References: <20170809070357.28723-1-david@gibson.dropbear.id.au>
+	<CAFEAcA_n88x0w1cVirQ61h+NOrvX1V7bXD1LCASVGyUZU=qDgg@mail.gmail.com>
+	<20170811085157.GY13670@umbus.fritz.box>
+	<CAFEAcA91j7zA2ptiLrcYL+cVF41_SJ2p0hL8Z=ejBiaqjfA--Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] RFH: difference in read-only mapped bios.bin - memory
- corruption?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA91j7zA2ptiLrcYL+cVF41_SJ2p0hL8Z=ejBiaqjfA--Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 0/6] ppc patch queue 2017-08-09
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,123 +25,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laszlo Ersek <lersek@redhat.com>, "Dr. David Alan Gilbert" <linux@treblig.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, QEMU Developers <qemu-devel@nongnu.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Alexander Graf <agraf@suse.de>, Greg Kurz <groug@kaod.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-Hello,
+On Fri, Aug 11, 2017 at 09:59:00AM +0100, Peter Maydell wrote:
+> On 11 August 2017 at 09:51, David Gibson <david@gibson.dropbear.id.au> wrote:
+> > On Thu, Aug 10, 2017 at 01:47:03PM +0100, Peter Maydell wrote:
+> >> On 9 August 2017 at 08:03, David Gibson <david@gibson.dropbear.id.au> wrote:
+> >> > I haven't completed a Travis build for this, which is part of my usual
+> >> > test regime, since the first dozen or so Travis builds are failing
+> >> > more often than not on master as well.  I don't know why this is -
+> >> > seems to be failing some of the x86 tests.
+> >>
+> >> Doesn't look much worse than usual to me -- of the last 24 travis
+> >> builds for master 4 failed and 20 passed.
+> >
+> > Uh.. that's not been my experience.  I was a bit unclear in my
+> > description, though.  Until maybe a week and a half ago I found the
+> > Travis build was fairly reliable, though there were occasional
+> > transien failures.  Now, essentially every Travis build is failing for
+> > me.  Specifically most of the first dozen or so of the batch of build
+> > configurations on Travis fail (that's "X" not "!").  These seem to be
+> > transient failures in the sense that if I rebuild enough times they'll
+> > eventually pass, but unlike earlier when the builds would suceed most
+> > of the time, they now seem to succeed at best around 1/3 of the time
+> > (that's ~1/3 of the time for each configuration sub-build, so with a
+> > dozen or so apparently affected that means a complete passing build
+> > essentially never).
+> >
+> > See for example https://travis-ci.org/dgibson/qemu/builds/263312174
+> > where 5 subbuilds have failed (which is relatively few).  In each case
+> > the failing error seems to be something like:
+> >
+> > ERROR:tests/vhost-user-test.c:807:test_connect_fail: child process (/i386/vhost-user/connect-fail/subprocess [55883]) failed unexpectedly
+> >
+> > Seems to be i386 in some cases and x86_64 in others.
 
-I'm currently investigating a problem, were a Linux VM does not reboot
-and gets stuck in the SeaBIOS reboot code:
+And is it always the connect-fail test?
 
-I'm using SeaBIOS-1.7 from Debian with a more modern qemu-2.8
-
-> virsh # qemu-monitor-command --hmp ucs41-414 info roms
-> fw=3Dgenroms/kvmvapic.bin size=3D0x002400 name=3D"kvmvapic.bin"
-> addr=3D00000000fffe0000 size=3D0x020000 mem=3Drom name=3D"bios.bin"
-
-which (to my understanding) is mapped at two physical locations:
-> virsh # qemu-monitor-command --hmp ucs41-414 info mtree
-...> memory-region: system
-...>       00000000000e0000-00000000000fffff (prio 1, R-): alias
-isa-bios @pc.bios 0000000000000000-000000000001ffff
->       00000000fffe0000-00000000ffffffff (prio 0, R-): pc.bios
-
-If I dump both regions and compare them, I get a difference:
-> virsh # qemu-monitor-command --pretty --domain ucs41-414 '{"execute":"p=
-memsave","arguments":{"val":917504,"size":131072,"filename":"/tmp/bios-lo=
-w.dump"}}'
-> virsh # qemu-monitor-command --pretty --domain ucs41-414 '{"execute":"p=
-memsave","arguments":{"val":4294836224,"size":131072,"filename":"/tmp/bio=
-s-high.dump"}}'
-> # diff --suppress-common-lines -y <(od -Ax -tx1 -w1 -v /tmp/bios-low.du=
-mp) <(od -Ax -tx1 -w1 -v /tmp/bios-high.dump)
-> 00f798 fa                                                     | 00f798 =
-80
-> 00f799 7a                                                     | 00f799 =
-89
-> 00f79a f4                                                     | 00f79a =
-f2
-> 016d40 00                                                     | 016d40 =
-ff
-> 016d41 00                                                     | 016d41 =
-ff
-> 016d42 00                                                     | 016d42 =
-ff
-> 016d43 00                                                     | 016d43 =
-ff
-
-The high address dump is the same as the original:
-> # cmp -l /tmp/bios-high.dump /usr/share/seabios/bios.bin
-
-> virsh # qemu-monitor-command --hmp ucs41-414 x/6i 0x00000000000ef78f
-> 0x00000000000ef78f:  mov    $0xcf8,%esi
-> 0x00000000000ef794:  mov    $0xfa000000,%eax
-> 0x00000000000ef799:  jp     0xef78f
-                       ^^^^^^^^^^^^^^ BUG: endless loop
-> 0x00000000000ef79b:  out    %eax,(%dx)
-> 0x00000000000ef79c:  mov    $0xfe,%dl
-> 0x00000000000ef79e:  in     (%dx),%ax
-
-> virsh # qemu-monitor-command --hmp ucs41-414 xp/6i 0x00000000fffef78f
-> 0x00000000fffef78f:  mov    $0xcf8,%esi
-> 0x00000000fffef794:  mov    $0x80000000,%eax
-> 0x00000000fffef799:  mov    %esi,%edx
-                       ^^^^^^^^^^^^^^^^ CORRECT original code
-> 0x00000000fffef79b:  out    %eax,(%dx)
-> 0x00000000fffef79c:  mov    $0xfe,%dl
-> 0x00000000fffef79e:  in     (%dx),%ax
-
-(That's some code from seabios-1.7.0/src/pci.c)
-
-I had exactly the same run some weeks ago, but I also get different
-patterns:
-> # diff --suppress-common-lines -y <(od -Ax -tx1 -w1 -v /tmp/bios2.dump)=
- <(od -Ax -tx1 -w1 -v bios.bin)
-> 00f798 f0                                                     | 00f798 =
-80
-> 00f799 8d                                                     | 00f799 =
-89
-> 00f79a f3                                                     | 00f79a =
-f2
-> 016d40 00                                                     | 016d40 =
-ff
-> 016d41 00                                                     | 016d41 =
-ff
-> 016d42 00                                                     | 016d42 =
-ff
-> 016d43 00                                                     | 016d43 =
-ff
-
-Not all runs lead to reboot problems, but I don't know if any other
-corruption happened there.
-
-I had a similar problem with OVMF back in June
-<https://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg03940.html>,
-which I "solved" by upgrading the OVMF version: I have not seen the
-problem there since than, but this problems looks very similar.
-
-
-1. How can it be, that the low-mem ROM mapping is modified?
-
-2. Can I tell QEMU or gdb to trap any modification of that 128 KiB area?
-
-I'll try to get http://rr-project.org/ running, but any help is appreciat=
-ed.
-
-Philipp
---=20
-Philipp Hahn
-Open Source Software Engineer
-
-Univention GmbH
-be open.
-Mary-Somerville-Str. 1
-D-28359 Bremen
-Tel.: +49 421 22232-0
-Fax : +49 421 22232-99
-hahn@univention.de
-
-http://www.univention.de/
-Gesch=C3=A4ftsf=C3=BChrer: Peter H. Ganten
-HRB 20755 Amtsgericht Bremen
-Steuer-Nr.: 71-597-02876
+> Weird. https://travis-ci.org/qemu/qemu/builds is the master
+> build history and as you can see it's mostly greens.
+> Not sure why your setup would be significantly worse:
+> maybe one of the travis submaintainers has an idea.
+> It could just be our vhost-user-test is flaky but I don't
+> know why that should hit you much more than master...
+> 
+> 
+> thanks
+> -- PMM
