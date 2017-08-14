@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dhIUg-00065r-5z
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:45:35 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dhJ2A-0005lG-7B
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 13:20:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dhIUb-0005lr-Ss
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:45:34 -0400
-Resent-Message-Id: <E1dhIUb-0005lr-Ss@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21308)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dhIUb-0005ka-LJ
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:45:29 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150272911898.78.981462169854023805@dd743fd916bd>
-In-Reply-To: <20170814162142.29666-1-stefanha@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 14 Aug 2017 09:45:19 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH for-2.10 0/2] trace: fix simpletrace.stp
- flight recorder mode
+	(envelope-from <programmingkidx@gmail.com>) id 1dhJ25-00014j-7l
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 13:20:10 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:38245)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dhJ25-00014L-2p
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 13:20:05 -0400
+Received: by mail-it0-x244.google.com with SMTP id f16so8311410itb.5
+	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 10:20:05 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20170814140003.GF8506@redhat.com>
+Date: Mon, 14 Aug 2017 13:20:02 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <EEABAA69-F4C9-4525-8A01-CDF143BAD31B@gmail.com>
+References: <mailman.1778.1502715001.21954.qemu-devel@nongnu.org>
+	<223B4DEC-A801-40E3-A118-33EBB9ED384D@gmail.com>
+	<20170814140003.GF8506@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 00/12] Convert over to use keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanha@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA4MTQxNjIxNDIuMjk2NjYtMS1zdGVmYW5oYUByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRl
-dmVsXSBbUEFUQ0ggZm9yLTIuMTAgMC8yXSB0cmFjZTogZml4IHNpbXBsZXRyYWNlLnN0cCBmbGln
-aHQgcmVjb3JkZXIgbW9kZQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
-IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
-RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQg
-bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
-CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
-bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
-cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
-ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
-dQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTcwODE0MTY0MDAyLjIzOTgy
-LTEtYnJpamVzaC5zaW5naEBhbWQuY29tIC0+IHBhdGNoZXcvMjAxNzA4MTQxNjQwMDIuMjM5ODIt
-MS1icmlqZXNoLnNpbmdoQGFtZC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo0
-NWU5YzU2YTRmIHNpbXBsZXRyYWNlOiBmaXggZmxpZ2h0IHJlY29yZGVyIC0tbm8taGVhZGVyIG9w
-dGlvbgoxOTJkNGZjMmJjIHRyYWNlOiB1c2Ugc3RhdGljIGV2ZW50IElEIG1hcHBpbmcgaW4gc2lt
-cGxldHJhY2Uuc3RwCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI6IHRy
-YWNlOiB1c2Ugc3RhdGljIGV2ZW50IElEIG1hcHBpbmcgaW4gc2ltcGxldHJhY2Uuc3RwLi4uCkNo
-ZWNraW5nIFBBVENIIDIvMjogc2ltcGxldHJhY2U6IGZpeCBmbGlnaHQgcmVjb3JkZXIgLS1uby1o
-ZWFkZXIgb3B0aW9uLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzk6IEZJTEU6
-IHNjcmlwdHMvc2ltcGxldHJhY2UucHk6MTAxOgorICAgICIiIkRlc2VyaWFsaXplIHRyYWNlIHJl
-Y29yZHMgZnJvbSBhIGZpbGUsIHlpZWxkaW5nIHJlY29yZCB0dXBsZXMgKGV2ZW50X251bSwgdGlt
-ZXN0YW1wLCBwaWQsIGFyZzEsIC4uLiwgYXJnNikuCgp0b3RhbDogMSBlcnJvcnMsIDAgd2Fybmlu
-Z3MsIDQ2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
-CgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBm
-cmVlbGlzdHMub3Jn
+
+> On Aug 14, 2017, at 10:00 AM, Daniel P. Berrange <berrange@redhat.com> =
+wrote:
+>=20
+> On Mon, Aug 14, 2017 at 09:39:56AM -0400, Programmingkid wrote:
+>>=20
+>>> On Aug 14, 2017, at 8:50 AM, qemu-devel-request@nongnu.org wrote:
+>>>=20
+>>> An update of:
+>>>=20
+>>> v1: =
+https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02047.html
+>>> v2: =
+https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02471.html
+>>>=20
+>>> The keycodemap project[1] provides a database mapping between
+>>> many different keysym/keycode/scancode sets, along with a
+>>> tool to generate mapping/lookup tables in various programming
+>>> languages. It is already used by GTK-VNC, SPICE-GTK and
+>>> libvirt.
+>>>=20
+>>> This series enables its use in QEMU, thus fixing a great
+>>> many bugs/ommissions in the 15+ key mapping tables people
+>>> have manually written for QEMU.
+>>=20
+>> Would you have a git repository that has all your patches already =
+applied? It would make testing your patches a lot easier.
+>=20
+> I only maintain stable public repos for pull requests.
+>=20
+> These are based against git master, just save the series and then 'git =
+am'
+> the lot in one go.
+
+Is there a tool that can be used to download a series of patches from a =
+mailing list? Copying and pasting patches sometimes introduces problems.=20=
