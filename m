@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dhEof-0006Wp-4U
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:50:00 -0400
+	(envelope-from <berrange@redhat.com>) id 1dhEog-0006Xu-Tg
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:50:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dhEob-0003uE-HV
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:49:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49252)
+	(envelope-from <berrange@redhat.com>) id 1dhEoc-0003vD-M8
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:49:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40634)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dhEob-0003ti-6d
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:49:53 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dhEoc-0003uI-8g
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:49:54 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D1CB970022
-	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 12:49:51 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1C5BD79736
+	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 12:49:53 +0000 (UTC)
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 14 Aug 2017 13:49:24 +0100
-Message-Id: <20170814124927.30134-10-berrange@redhat.com>
+Date: Mon, 14 Aug 2017 13:49:25 +0100
+Message-Id: <20170814124927.30134-11-berrange@redhat.com>
 In-Reply-To: <20170814124927.30134-1-berrange@redhat.com>
 References: <20170814124927.30134-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 09/12] ui: convert cocoa frontend to
+Subject: [Qemu-devel] [PATCH v3 10/12] ui: convert the SDL2 frontend to
  keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,200 +33,406 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Replace the mac_to_qkeycode_map table with automatically
-generated table.
+The SDL2 scancodes are conveniently identical to the USB
+scancodes. Replace the sdl2_scancode_to_qcode table with
+an automatically generated table.
+
+Missing entries in sdl2_scancode_to_qcode now fixed:
+
+  - 0x32 -> Q_KEY_CODE_BACKSLASH
+  - 0x66 -> Q_KEY_CODE_POWER
+  - 0x67 -> Q_KEY_CODE_KP_EQUALS
+  - 0x74 -> Q_KEY_CODE_OPEN
+  - 0x77 -> Q_KEY_CODE_FRONT
+  - 0x7f -> Q_KEY_CODE_AUDIOMUTE
+  - 0x80 -> Q_KEY_CODE_VOLUMEUP
+  - 0x81 -> Q_KEY_CODE_VOLUMEDOWN
+  - 0x85 -> Q_KEY_CODE_KP_COMMA
+  - 0x87 -> Q_KEY_CODE_RO
+  - 0x89 -> Q_KEY_CODE_YEN
+  - 0x8a -> Q_KEY_CODE_HENKAN
+  - 0x93 -> Q_KEY_CODE_HIRAGANA
+  - 0xe8 -> Q_KEY_CODE_AUDIOPLAY
+  - 0xe9 -> Q_KEY_CODE_AUDIOSTOP
+  - 0xea -> Q_KEY_CODE_AUDIOPREV
+  - 0xeb -> Q_KEY_CODE_AUDIONEXT
+  - 0xed -> Q_KEY_CODE_VOLUMEUP
+  - 0xee -> Q_KEY_CODE_VOLUMEDOWN
+  - 0xef -> Q_KEY_CODE_AUDIOMUTE
+  - 0xf1 -> Q_KEY_CODE_AC_BACK
+  - 0xf2 -> Q_KEY_CODE_AC_FORWARD
+  - 0xf3 -> Q_KEY_CODE_STOP
+  - 0xf4 -> Q_KEY_CODE_FIND
+  - 0xf8 -> Q_KEY_CODE_SLEEP
+  - 0xfa -> Q_KEY_CODE_AC_REFRESH
+  - 0xfb -> Q_KEY_CODE_CALCULATOR
+
+And some mistakes corrected:
+
+  - 0x65 -> Q_KEY_CODE_COMPOSE, not duplicating Q_KEY_CODE_MENU
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- include/ui/input.h |   3 ++
+ include/ui/input.h |   3 +
  ui/Makefile.objs   |   1 +
- ui/cocoa.m         | 129 +----------------------------------------------------
  ui/input-keymap.c  |   1 +
- 4 files changed, 7 insertions(+), 127 deletions(-)
+ ui/sdl2-input.c    |  16 +++-
+ ui/sdl2-keymap.h   | 267 -----------------------------------------------------
+ 5 files changed, 16 insertions(+), 272 deletions(-)
+ delete mode 100644 ui/sdl2-keymap.h
 
 diff --git a/include/ui/input.h b/include/ui/input.h
-index 4ba7340b7b..df3eb439bf 100644
+index df3eb439bf..dcf7e0e731 100644
 --- a/include/ui/input.h
 +++ b/include/ui/input.h
-@@ -71,6 +71,9 @@ void qemu_remove_mouse_mode_change_notifier(Notifier *notify);
- extern const guint qemu_input_map_linux_to_qcode_len;
- extern const guint16 qemu_input_map_linux_to_qcode[];
+@@ -98,4 +98,7 @@ extern const guint16 qemu_input_map_qcode_to_sun[];
+ extern const guint qemu_input_map_qnum_to_qcode_len;
+ extern const guint16 qemu_input_map_qnum_to_qcode[];
  
-+extern const guint qemu_input_map_osx_to_qcode_len;
-+extern const guint16 qemu_input_map_osx_to_qcode[];
++extern const guint qemu_input_map_usb_to_qcode_len;
++extern const guint16 qemu_input_map_usb_to_qcode[];
 +
- extern const guint qemu_input_map_qcode_to_adb_len;
- extern const guint16 qemu_input_map_qcode_to_adb[];
- 
+ #endif /* INPUT_H */
 diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index 478a039398..d35634cdc7 100644
+index d35634cdc7..0e5821f6eb 100644
 --- a/ui/Makefile.objs
 +++ b/ui/Makefile.objs
-@@ -55,6 +55,7 @@ KEYCODEMAP_CSV = $(SRC_PATH)/ui/keycodemapdb/data/keymaps.csv
+@@ -64,6 +64,7 @@ KEYCODEMAP_FILES = \
+ 		 ui/input-keymap-qcode-to-qnum.c \
+ 		 ui/input-keymap-qcode-to-sun.c \
+ 		 ui/input-keymap-qnum-to-qcode.c \
++		 ui/input-keymap-usb-to-qcode.c \
+ 		 $(NULL)
  
- KEYCODEMAP_FILES = \
- 		 ui/input-keymap-linux-to-qcode.c \
-+		 ui/input-keymap-osx-to-qcode.c \
- 		 ui/input-keymap-qcode-to-adb.c \
- 		 ui/input-keymap-qcode-to-atset1.c \
- 		 ui/input-keymap-qcode-to-atset2.c \
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 93e56d0518..e966605914 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -106,139 +106,14 @@ bool stretch_video;
- NSTextField *pauseLabel;
- NSArray * supportedImageFileTypes;
- 
--// Mac to QKeyCode conversion
--const int mac_to_qkeycode_map[] = {
--    [kVK_ANSI_A] = Q_KEY_CODE_A,
--    [kVK_ANSI_B] = Q_KEY_CODE_B,
--    [kVK_ANSI_C] = Q_KEY_CODE_C,
--    [kVK_ANSI_D] = Q_KEY_CODE_D,
--    [kVK_ANSI_E] = Q_KEY_CODE_E,
--    [kVK_ANSI_F] = Q_KEY_CODE_F,
--    [kVK_ANSI_G] = Q_KEY_CODE_G,
--    [kVK_ANSI_H] = Q_KEY_CODE_H,
--    [kVK_ANSI_I] = Q_KEY_CODE_I,
--    [kVK_ANSI_J] = Q_KEY_CODE_J,
--    [kVK_ANSI_K] = Q_KEY_CODE_K,
--    [kVK_ANSI_L] = Q_KEY_CODE_L,
--    [kVK_ANSI_M] = Q_KEY_CODE_M,
--    [kVK_ANSI_N] = Q_KEY_CODE_N,
--    [kVK_ANSI_O] = Q_KEY_CODE_O,
--    [kVK_ANSI_P] = Q_KEY_CODE_P,
--    [kVK_ANSI_Q] = Q_KEY_CODE_Q,
--    [kVK_ANSI_R] = Q_KEY_CODE_R,
--    [kVK_ANSI_S] = Q_KEY_CODE_S,
--    [kVK_ANSI_T] = Q_KEY_CODE_T,
--    [kVK_ANSI_U] = Q_KEY_CODE_U,
--    [kVK_ANSI_V] = Q_KEY_CODE_V,
--    [kVK_ANSI_W] = Q_KEY_CODE_W,
--    [kVK_ANSI_X] = Q_KEY_CODE_X,
--    [kVK_ANSI_Y] = Q_KEY_CODE_Y,
--    [kVK_ANSI_Z] = Q_KEY_CODE_Z,
--
--    [kVK_ANSI_0] = Q_KEY_CODE_0,
--    [kVK_ANSI_1] = Q_KEY_CODE_1,
--    [kVK_ANSI_2] = Q_KEY_CODE_2,
--    [kVK_ANSI_3] = Q_KEY_CODE_3,
--    [kVK_ANSI_4] = Q_KEY_CODE_4,
--    [kVK_ANSI_5] = Q_KEY_CODE_5,
--    [kVK_ANSI_6] = Q_KEY_CODE_6,
--    [kVK_ANSI_7] = Q_KEY_CODE_7,
--    [kVK_ANSI_8] = Q_KEY_CODE_8,
--    [kVK_ANSI_9] = Q_KEY_CODE_9,
--
--    [kVK_ANSI_Grave] = Q_KEY_CODE_GRAVE_ACCENT,
--    [kVK_ANSI_Minus] = Q_KEY_CODE_MINUS,
--    [kVK_ANSI_Equal] = Q_KEY_CODE_EQUAL,
--    [kVK_Delete] = Q_KEY_CODE_BACKSPACE,
--    [kVK_CapsLock] = Q_KEY_CODE_CAPS_LOCK,
--    [kVK_Tab] = Q_KEY_CODE_TAB,
--    [kVK_Return] = Q_KEY_CODE_RET,
--    [kVK_ANSI_LeftBracket] = Q_KEY_CODE_BRACKET_LEFT,
--    [kVK_ANSI_RightBracket] = Q_KEY_CODE_BRACKET_RIGHT,
--    [kVK_ANSI_Backslash] = Q_KEY_CODE_BACKSLASH,
--    [kVK_ANSI_Semicolon] = Q_KEY_CODE_SEMICOLON,
--    [kVK_ANSI_Quote] = Q_KEY_CODE_APOSTROPHE,
--    [kVK_ANSI_Comma] = Q_KEY_CODE_COMMA,
--    [kVK_ANSI_Period] = Q_KEY_CODE_DOT,
--    [kVK_ANSI_Slash] = Q_KEY_CODE_SLASH,
--    [kVK_Shift] = Q_KEY_CODE_SHIFT,
--    [kVK_RightShift] = Q_KEY_CODE_SHIFT_R,
--    [kVK_Control] = Q_KEY_CODE_CTRL,
--    [kVK_RightControl] = Q_KEY_CODE_CTRL_R,
--    [kVK_Option] = Q_KEY_CODE_ALT,
--    [kVK_RightOption] = Q_KEY_CODE_ALT_R,
--    [kVK_Command] = Q_KEY_CODE_META_L,
--    [0x36] = Q_KEY_CODE_META_R, /* There is no kVK_RightCommand */
--    [kVK_Space] = Q_KEY_CODE_SPC,
--
--    [kVK_ANSI_Keypad0] = Q_KEY_CODE_KP_0,
--    [kVK_ANSI_Keypad1] = Q_KEY_CODE_KP_1,
--    [kVK_ANSI_Keypad2] = Q_KEY_CODE_KP_2,
--    [kVK_ANSI_Keypad3] = Q_KEY_CODE_KP_3,
--    [kVK_ANSI_Keypad4] = Q_KEY_CODE_KP_4,
--    [kVK_ANSI_Keypad5] = Q_KEY_CODE_KP_5,
--    [kVK_ANSI_Keypad6] = Q_KEY_CODE_KP_6,
--    [kVK_ANSI_Keypad7] = Q_KEY_CODE_KP_7,
--    [kVK_ANSI_Keypad8] = Q_KEY_CODE_KP_8,
--    [kVK_ANSI_Keypad9] = Q_KEY_CODE_KP_9,
--    [kVK_ANSI_KeypadDecimal] = Q_KEY_CODE_KP_DECIMAL,
--    [kVK_ANSI_KeypadEnter] = Q_KEY_CODE_KP_ENTER,
--    [kVK_ANSI_KeypadPlus] = Q_KEY_CODE_KP_ADD,
--    [kVK_ANSI_KeypadMinus] = Q_KEY_CODE_KP_SUBTRACT,
--    [kVK_ANSI_KeypadMultiply] = Q_KEY_CODE_KP_MULTIPLY,
--    [kVK_ANSI_KeypadDivide] = Q_KEY_CODE_KP_DIVIDE,
--    [kVK_ANSI_KeypadEquals] = Q_KEY_CODE_KP_EQUALS,
--    [kVK_ANSI_KeypadClear] = Q_KEY_CODE_NUM_LOCK,
--
--    [kVK_UpArrow] = Q_KEY_CODE_UP,
--    [kVK_DownArrow] = Q_KEY_CODE_DOWN,
--    [kVK_LeftArrow] = Q_KEY_CODE_LEFT,
--    [kVK_RightArrow] = Q_KEY_CODE_RIGHT,
--
--    [kVK_Help] = Q_KEY_CODE_INSERT,
--    [kVK_Home] = Q_KEY_CODE_HOME,
--    [kVK_PageUp] = Q_KEY_CODE_PGUP,
--    [kVK_PageDown] = Q_KEY_CODE_PGDN,
--    [kVK_End] = Q_KEY_CODE_END,
--    [kVK_ForwardDelete] = Q_KEY_CODE_DELETE,
--
--    [kVK_Escape] = Q_KEY_CODE_ESC,
--
--    /* The Power key can't be used directly because the operating system uses
--     * it. This key can be emulated by using it in place of another key such as
--     * F1. Don't forget to disable the real key binding.
--     */
--    /* [kVK_F1] = Q_KEY_CODE_POWER, */
--
--    [kVK_F1] = Q_KEY_CODE_F1,
--    [kVK_F2] = Q_KEY_CODE_F2,
--    [kVK_F3] = Q_KEY_CODE_F3,
--    [kVK_F4] = Q_KEY_CODE_F4,
--    [kVK_F5] = Q_KEY_CODE_F5,
--    [kVK_F6] = Q_KEY_CODE_F6,
--    [kVK_F7] = Q_KEY_CODE_F7,
--    [kVK_F8] = Q_KEY_CODE_F8,
--    [kVK_F9] = Q_KEY_CODE_F9,
--    [kVK_F10] = Q_KEY_CODE_F10,
--    [kVK_F11] = Q_KEY_CODE_F11,
--    [kVK_F12] = Q_KEY_CODE_F12,
--    [kVK_F13] = Q_KEY_CODE_PRINT,
--    [kVK_F14] = Q_KEY_CODE_SCROLL_LOCK,
--    [kVK_F15] = Q_KEY_CODE_PAUSE,
--
--    /*
--     * The eject and volume keys can't be used here because they are handled at
--     * a lower level than what an Application can see.
--     */
--};
- 
- static int cocoa_keycode_to_qemu(int keycode)
- {
--    if (ARRAY_SIZE(mac_to_qkeycode_map) <= keycode) {
-+    if (keycode >= qemu_input_map_osx_to_qcode_len) {
-         fprintf(stderr, "(cocoa) warning unknown keycode 0x%x\n", keycode);
-         return 0;
-     }
--    return mac_to_qkeycode_map[keycode];
-+    return qemu_input_map_osx_to_qcode[keycode];
- }
- 
- /* Displays an alert dialog box with the specified message */
+ GENERATED_FILES += $(KEYCODEMAP_FILES)
 diff --git a/ui/input-keymap.c b/ui/input-keymap.c
-index 1b53cb4d0a..de11205dca 100644
+index de11205dca..ad98b153cf 100644
 --- a/ui/input-keymap.c
 +++ b/ui/input-keymap.c
-@@ -6,6 +6,7 @@
- #include "standard-headers/linux/input.h"
+@@ -15,6 +15,7 @@
+ #include "ui/input-keymap-qcode-to-qnum.c"
+ #include "ui/input-keymap-qcode-to-sun.c"
+ #include "ui/input-keymap-qnum-to-qcode.c"
++#include "ui/input-keymap-usb-to-qcode.c"
  
- #include "ui/input-keymap-linux-to-qcode.c"
-+#include "ui/input-keymap-osx-to-qcode.c"
- #include "ui/input-keymap-qcode-to-adb.c"
- #include "ui/input-keymap-qcode-to-atset1.c"
- #include "ui/input-keymap-qcode-to-atset2.c"
+ int qemu_input_linux_to_qcode(unsigned int lnx)
+ {
+diff --git a/ui/sdl2-input.c b/ui/sdl2-input.c
+index 6e315ae800..605d781971 100644
+--- a/ui/sdl2-input.c
++++ b/ui/sdl2-input.c
+@@ -30,8 +30,6 @@
+ #include "ui/sdl2.h"
+ #include "sysemu/sysemu.h"
+ 
+-#include "sdl2-keymap.h"
+-
+ static uint8_t modifiers_state[SDL_NUM_SCANCODES];
+ 
+ void sdl2_reset_keys(struct sdl2_console *scon)
+@@ -39,9 +37,11 @@ void sdl2_reset_keys(struct sdl2_console *scon)
+     QemuConsole *con = scon ? scon->dcl.con : NULL;
+     int i;
+ 
+-    for (i = 0; i < SDL_NUM_SCANCODES; i++) {
++    for (i = 0 ;
++         i < SDL_NUM_SCANCODES && i < qemu_input_map_usb_to_qcode_len ;
++         i++) {
+         if (modifiers_state[i]) {
+-            int qcode = sdl2_scancode_to_qcode[i];
++            int qcode = qemu_input_map_usb_to_qcode[i];
+             qemu_input_event_send_key_qcode(con, qcode, false);
+             modifiers_state[i] = 0;
+         }
+@@ -51,9 +51,15 @@ void sdl2_reset_keys(struct sdl2_console *scon)
+ void sdl2_process_key(struct sdl2_console *scon,
+                       SDL_KeyboardEvent *ev)
+ {
+-    int qcode = sdl2_scancode_to_qcode[ev->keysym.scancode];
++    int qcode;
+     QemuConsole *con = scon ? scon->dcl.con : NULL;
+ 
++    if (ev->keysym.scancode >= qemu_input_map_usb_to_qcode_len) {
++        return;
++    }
++
++    qcode = qemu_input_map_usb_to_qcode[ev->keysym.scancode];
++
+     if (!qemu_console_is_graphic(con)) {
+         if (ev->type == SDL_KEYDOWN) {
+             switch (ev->keysym.scancode) {
+diff --git a/ui/sdl2-keymap.h b/ui/sdl2-keymap.h
+deleted file mode 100644
+index cbedaa477d..0000000000
+--- a/ui/sdl2-keymap.h
++++ /dev/null
+@@ -1,267 +0,0 @@
+-
+-/* map SDL2 scancodes to QKeyCode */
+-
+-static const int sdl2_scancode_to_qcode[SDL_NUM_SCANCODES] = {
+-    [SDL_SCANCODE_A]                 = Q_KEY_CODE_A,
+-    [SDL_SCANCODE_B]                 = Q_KEY_CODE_B,
+-    [SDL_SCANCODE_C]                 = Q_KEY_CODE_C,
+-    [SDL_SCANCODE_D]                 = Q_KEY_CODE_D,
+-    [SDL_SCANCODE_E]                 = Q_KEY_CODE_E,
+-    [SDL_SCANCODE_F]                 = Q_KEY_CODE_F,
+-    [SDL_SCANCODE_G]                 = Q_KEY_CODE_G,
+-    [SDL_SCANCODE_H]                 = Q_KEY_CODE_H,
+-    [SDL_SCANCODE_I]                 = Q_KEY_CODE_I,
+-    [SDL_SCANCODE_J]                 = Q_KEY_CODE_J,
+-    [SDL_SCANCODE_K]                 = Q_KEY_CODE_K,
+-    [SDL_SCANCODE_L]                 = Q_KEY_CODE_L,
+-    [SDL_SCANCODE_M]                 = Q_KEY_CODE_M,
+-    [SDL_SCANCODE_N]                 = Q_KEY_CODE_N,
+-    [SDL_SCANCODE_O]                 = Q_KEY_CODE_O,
+-    [SDL_SCANCODE_P]                 = Q_KEY_CODE_P,
+-    [SDL_SCANCODE_Q]                 = Q_KEY_CODE_Q,
+-    [SDL_SCANCODE_R]                 = Q_KEY_CODE_R,
+-    [SDL_SCANCODE_S]                 = Q_KEY_CODE_S,
+-    [SDL_SCANCODE_T]                 = Q_KEY_CODE_T,
+-    [SDL_SCANCODE_U]                 = Q_KEY_CODE_U,
+-    [SDL_SCANCODE_V]                 = Q_KEY_CODE_V,
+-    [SDL_SCANCODE_W]                 = Q_KEY_CODE_W,
+-    [SDL_SCANCODE_X]                 = Q_KEY_CODE_X,
+-    [SDL_SCANCODE_Y]                 = Q_KEY_CODE_Y,
+-    [SDL_SCANCODE_Z]                 = Q_KEY_CODE_Z,
+-
+-    [SDL_SCANCODE_1]                 = Q_KEY_CODE_1,
+-    [SDL_SCANCODE_2]                 = Q_KEY_CODE_2,
+-    [SDL_SCANCODE_3]                 = Q_KEY_CODE_3,
+-    [SDL_SCANCODE_4]                 = Q_KEY_CODE_4,
+-    [SDL_SCANCODE_5]                 = Q_KEY_CODE_5,
+-    [SDL_SCANCODE_6]                 = Q_KEY_CODE_6,
+-    [SDL_SCANCODE_7]                 = Q_KEY_CODE_7,
+-    [SDL_SCANCODE_8]                 = Q_KEY_CODE_8,
+-    [SDL_SCANCODE_9]                 = Q_KEY_CODE_9,
+-    [SDL_SCANCODE_0]                 = Q_KEY_CODE_0,
+-
+-    [SDL_SCANCODE_RETURN]            = Q_KEY_CODE_RET,
+-    [SDL_SCANCODE_ESCAPE]            = Q_KEY_CODE_ESC,
+-    [SDL_SCANCODE_BACKSPACE]         = Q_KEY_CODE_BACKSPACE,
+-    [SDL_SCANCODE_TAB]               = Q_KEY_CODE_TAB,
+-    [SDL_SCANCODE_SPACE]             = Q_KEY_CODE_SPC,
+-    [SDL_SCANCODE_MINUS]             = Q_KEY_CODE_MINUS,
+-    [SDL_SCANCODE_EQUALS]            = Q_KEY_CODE_EQUAL,
+-    [SDL_SCANCODE_LEFTBRACKET]       = Q_KEY_CODE_BRACKET_LEFT,
+-    [SDL_SCANCODE_RIGHTBRACKET]      = Q_KEY_CODE_BRACKET_RIGHT,
+-    [SDL_SCANCODE_BACKSLASH]         = Q_KEY_CODE_BACKSLASH,
+-#if 0
+-    [SDL_SCANCODE_NONUSHASH]         = Q_KEY_CODE_NONUSHASH,
+-#endif
+-    [SDL_SCANCODE_SEMICOLON]         = Q_KEY_CODE_SEMICOLON,
+-    [SDL_SCANCODE_APOSTROPHE]        = Q_KEY_CODE_APOSTROPHE,
+-    [SDL_SCANCODE_GRAVE]             = Q_KEY_CODE_GRAVE_ACCENT,
+-    [SDL_SCANCODE_COMMA]             = Q_KEY_CODE_COMMA,
+-    [SDL_SCANCODE_PERIOD]            = Q_KEY_CODE_DOT,
+-    [SDL_SCANCODE_SLASH]             = Q_KEY_CODE_SLASH,
+-    [SDL_SCANCODE_CAPSLOCK]          = Q_KEY_CODE_CAPS_LOCK,
+-
+-    [SDL_SCANCODE_F1]                = Q_KEY_CODE_F1,
+-    [SDL_SCANCODE_F2]                = Q_KEY_CODE_F2,
+-    [SDL_SCANCODE_F3]                = Q_KEY_CODE_F3,
+-    [SDL_SCANCODE_F4]                = Q_KEY_CODE_F4,
+-    [SDL_SCANCODE_F5]                = Q_KEY_CODE_F5,
+-    [SDL_SCANCODE_F6]                = Q_KEY_CODE_F6,
+-    [SDL_SCANCODE_F7]                = Q_KEY_CODE_F7,
+-    [SDL_SCANCODE_F8]                = Q_KEY_CODE_F8,
+-    [SDL_SCANCODE_F9]                = Q_KEY_CODE_F9,
+-    [SDL_SCANCODE_F10]               = Q_KEY_CODE_F10,
+-    [SDL_SCANCODE_F11]               = Q_KEY_CODE_F11,
+-    [SDL_SCANCODE_F12]               = Q_KEY_CODE_F12,
+-
+-    [SDL_SCANCODE_PRINTSCREEN]       = Q_KEY_CODE_PRINT,
+-    [SDL_SCANCODE_SCROLLLOCK]        = Q_KEY_CODE_SCROLL_LOCK,
+-    [SDL_SCANCODE_PAUSE]             = Q_KEY_CODE_PAUSE,
+-    [SDL_SCANCODE_INSERT]            = Q_KEY_CODE_INSERT,
+-    [SDL_SCANCODE_HOME]              = Q_KEY_CODE_HOME,
+-    [SDL_SCANCODE_PAGEUP]            = Q_KEY_CODE_PGUP,
+-    [SDL_SCANCODE_DELETE]            = Q_KEY_CODE_DELETE,
+-    [SDL_SCANCODE_END]               = Q_KEY_CODE_END,
+-    [SDL_SCANCODE_PAGEDOWN]          = Q_KEY_CODE_PGDN,
+-    [SDL_SCANCODE_RIGHT]             = Q_KEY_CODE_RIGHT,
+-    [SDL_SCANCODE_LEFT]              = Q_KEY_CODE_LEFT,
+-    [SDL_SCANCODE_DOWN]              = Q_KEY_CODE_DOWN,
+-    [SDL_SCANCODE_UP]                = Q_KEY_CODE_UP,
+-    [SDL_SCANCODE_NUMLOCKCLEAR]      = Q_KEY_CODE_NUM_LOCK,
+-
+-    [SDL_SCANCODE_KP_DIVIDE]         = Q_KEY_CODE_KP_DIVIDE,
+-    [SDL_SCANCODE_KP_MULTIPLY]       = Q_KEY_CODE_KP_MULTIPLY,
+-    [SDL_SCANCODE_KP_MINUS]          = Q_KEY_CODE_KP_SUBTRACT,
+-    [SDL_SCANCODE_KP_PLUS]           = Q_KEY_CODE_KP_ADD,
+-    [SDL_SCANCODE_KP_ENTER]          = Q_KEY_CODE_KP_ENTER,
+-    [SDL_SCANCODE_KP_1]              = Q_KEY_CODE_KP_1,
+-    [SDL_SCANCODE_KP_2]              = Q_KEY_CODE_KP_2,
+-    [SDL_SCANCODE_KP_3]              = Q_KEY_CODE_KP_3,
+-    [SDL_SCANCODE_KP_4]              = Q_KEY_CODE_KP_4,
+-    [SDL_SCANCODE_KP_5]              = Q_KEY_CODE_KP_5,
+-    [SDL_SCANCODE_KP_6]              = Q_KEY_CODE_KP_6,
+-    [SDL_SCANCODE_KP_7]              = Q_KEY_CODE_KP_7,
+-    [SDL_SCANCODE_KP_8]              = Q_KEY_CODE_KP_8,
+-    [SDL_SCANCODE_KP_9]              = Q_KEY_CODE_KP_9,
+-    [SDL_SCANCODE_KP_0]              = Q_KEY_CODE_KP_0,
+-    [SDL_SCANCODE_KP_PERIOD]         = Q_KEY_CODE_KP_DECIMAL,
+-
+-    [SDL_SCANCODE_NONUSBACKSLASH]    = Q_KEY_CODE_LESS,
+-    [SDL_SCANCODE_APPLICATION]       = Q_KEY_CODE_MENU,
+-#if 0
+-    [SDL_SCANCODE_POWER]             = Q_KEY_CODE_POWER,
+-    [SDL_SCANCODE_KP_EQUALS]         = Q_KEY_CODE_KP_EQUALS,
+-
+-    [SDL_SCANCODE_F13]               = Q_KEY_CODE_F13,
+-    [SDL_SCANCODE_F14]               = Q_KEY_CODE_F14,
+-    [SDL_SCANCODE_F15]               = Q_KEY_CODE_F15,
+-    [SDL_SCANCODE_F16]               = Q_KEY_CODE_F16,
+-    [SDL_SCANCODE_F17]               = Q_KEY_CODE_F17,
+-    [SDL_SCANCODE_F18]               = Q_KEY_CODE_F18,
+-    [SDL_SCANCODE_F19]               = Q_KEY_CODE_F19,
+-    [SDL_SCANCODE_F20]               = Q_KEY_CODE_F20,
+-    [SDL_SCANCODE_F21]               = Q_KEY_CODE_F21,
+-    [SDL_SCANCODE_F22]               = Q_KEY_CODE_F22,
+-    [SDL_SCANCODE_F23]               = Q_KEY_CODE_F23,
+-    [SDL_SCANCODE_F24]               = Q_KEY_CODE_F24,
+-
+-    [SDL_SCANCODE_EXECUTE]           = Q_KEY_CODE_EXECUTE,
+-#endif
+-    [SDL_SCANCODE_HELP]              = Q_KEY_CODE_HELP,
+-    [SDL_SCANCODE_MENU]              = Q_KEY_CODE_MENU,
+-#if 0
+-    [SDL_SCANCODE_SELECT]            = Q_KEY_CODE_SELECT,
+-#endif
+-    [SDL_SCANCODE_STOP]              = Q_KEY_CODE_STOP,
+-    [SDL_SCANCODE_AGAIN]             = Q_KEY_CODE_AGAIN,
+-    [SDL_SCANCODE_UNDO]              = Q_KEY_CODE_UNDO,
+-    [SDL_SCANCODE_CUT]               = Q_KEY_CODE_CUT,
+-    [SDL_SCANCODE_COPY]              = Q_KEY_CODE_COPY,
+-    [SDL_SCANCODE_PASTE]             = Q_KEY_CODE_PASTE,
+-    [SDL_SCANCODE_FIND]              = Q_KEY_CODE_FIND,
+-#if 0
+-    [SDL_SCANCODE_MUTE]              = Q_KEY_CODE_MUTE,
+-    [SDL_SCANCODE_VOLUMEUP]          = Q_KEY_CODE_VOLUMEUP,
+-    [SDL_SCANCODE_VOLUMEDOWN]        = Q_KEY_CODE_VOLUMEDOWN,
+-
+-    [SDL_SCANCODE_KP_COMMA]          = Q_KEY_CODE_KP_COMMA,
+-    [SDL_SCANCODE_KP_EQUALSAS400]    = Q_KEY_CODE_KP_EQUALSAS400,
+-
+-    [SDL_SCANCODE_INTERNATIONAL1]    = Q_KEY_CODE_INTERNATIONAL1,
+-    [SDL_SCANCODE_INTERNATIONAL2]    = Q_KEY_CODE_INTERNATIONAL2,
+-    [SDL_SCANCODE_INTERNATIONAL3]    = Q_KEY_CODE_INTERNATIONAL3,
+-    [SDL_SCANCODE_INTERNATIONAL4]    = Q_KEY_CODE_INTERNATIONAL4,
+-    [SDL_SCANCODE_INTERNATIONAL5]    = Q_KEY_CODE_INTERNATIONAL5,
+-    [SDL_SCANCODE_INTERNATIONAL6]    = Q_KEY_CODE_INTERNATIONAL6,
+-    [SDL_SCANCODE_INTERNATIONAL7]    = Q_KEY_CODE_INTERNATIONAL7,
+-    [SDL_SCANCODE_INTERNATIONAL8]    = Q_KEY_CODE_INTERNATIONAL8,
+-    [SDL_SCANCODE_INTERNATIONAL9]    = Q_KEY_CODE_INTERNATIONAL9,
+-    [SDL_SCANCODE_LANG1]             = Q_KEY_CODE_LANG1,
+-    [SDL_SCANCODE_LANG2]             = Q_KEY_CODE_LANG2,
+-    [SDL_SCANCODE_LANG3]             = Q_KEY_CODE_LANG3,
+-    [SDL_SCANCODE_LANG4]             = Q_KEY_CODE_LANG4,
+-    [SDL_SCANCODE_LANG5]             = Q_KEY_CODE_LANG5,
+-    [SDL_SCANCODE_LANG6]             = Q_KEY_CODE_LANG6,
+-    [SDL_SCANCODE_LANG7]             = Q_KEY_CODE_LANG7,
+-    [SDL_SCANCODE_LANG8]             = Q_KEY_CODE_LANG8,
+-    [SDL_SCANCODE_LANG9]             = Q_KEY_CODE_LANG9,
+-    [SDL_SCANCODE_ALTERASE]          = Q_KEY_CODE_ALTERASE,
+-#endif
+-    [SDL_SCANCODE_SYSREQ]            = Q_KEY_CODE_SYSRQ,
+-#if 0
+-    [SDL_SCANCODE_CANCEL]            = Q_KEY_CODE_CANCEL,
+-    [SDL_SCANCODE_CLEAR]             = Q_KEY_CODE_CLEAR,
+-    [SDL_SCANCODE_PRIOR]             = Q_KEY_CODE_PRIOR,
+-    [SDL_SCANCODE_RETURN2]           = Q_KEY_CODE_RETURN2,
+-    [SDL_SCANCODE_SEPARATOR]         = Q_KEY_CODE_SEPARATOR,
+-    [SDL_SCANCODE_OUT]               = Q_KEY_CODE_OUT,
+-    [SDL_SCANCODE_OPER]              = Q_KEY_CODE_OPER,
+-    [SDL_SCANCODE_CLEARAGAIN]        = Q_KEY_CODE_CLEARAGAIN,
+-    [SDL_SCANCODE_CRSEL]             = Q_KEY_CODE_CRSEL,
+-    [SDL_SCANCODE_EXSEL]             = Q_KEY_CODE_EXSEL,
+-    [SDL_SCANCODE_KP_00]             = Q_KEY_CODE_KP_00,
+-    [SDL_SCANCODE_KP_000]            = Q_KEY_CODE_KP_000,
+-    [SDL_SCANCODE_THOUSANDSSEPARATOR] = Q_KEY_CODE_THOUSANDSSEPARATOR,
+-    [SDL_SCANCODE_DECIMALSEPARATOR]  = Q_KEY_CODE_DECIMALSEPARATOR,
+-    [SDL_SCANCODE_CURRENCYUNIT]      = Q_KEY_CODE_CURRENCYUNIT,
+-    [SDL_SCANCODE_CURRENCYSUBUNIT]   = Q_KEY_CODE_CURRENCYSUBUNIT,
+-    [SDL_SCANCODE_KP_LEFTPAREN]      = Q_KEY_CODE_KP_LEFTPAREN,
+-    [SDL_SCANCODE_KP_RIGHTPAREN]     = Q_KEY_CODE_KP_RIGHTPAREN,
+-    [SDL_SCANCODE_KP_LEFTBRACE]      = Q_KEY_CODE_KP_LEFTBRACE,
+-    [SDL_SCANCODE_KP_RIGHTBRACE]     = Q_KEY_CODE_KP_RIGHTBRACE,
+-    [SDL_SCANCODE_KP_TAB]            = Q_KEY_CODE_KP_TAB,
+-    [SDL_SCANCODE_KP_BACKSPACE]      = Q_KEY_CODE_KP_BACKSPACE,
+-    [SDL_SCANCODE_KP_A]              = Q_KEY_CODE_KP_A,
+-    [SDL_SCANCODE_KP_B]              = Q_KEY_CODE_KP_B,
+-    [SDL_SCANCODE_KP_C]              = Q_KEY_CODE_KP_C,
+-    [SDL_SCANCODE_KP_D]              = Q_KEY_CODE_KP_D,
+-    [SDL_SCANCODE_KP_E]              = Q_KEY_CODE_KP_E,
+-    [SDL_SCANCODE_KP_F]              = Q_KEY_CODE_KP_F,
+-    [SDL_SCANCODE_KP_XOR]            = Q_KEY_CODE_KP_XOR,
+-    [SDL_SCANCODE_KP_POWER]          = Q_KEY_CODE_KP_POWER,
+-    [SDL_SCANCODE_KP_PERCENT]        = Q_KEY_CODE_KP_PERCENT,
+-    [SDL_SCANCODE_KP_LESS]           = Q_KEY_CODE_KP_LESS,
+-    [SDL_SCANCODE_KP_GREATER]        = Q_KEY_CODE_KP_GREATER,
+-    [SDL_SCANCODE_KP_AMPERSAND]      = Q_KEY_CODE_KP_AMPERSAND,
+-    [SDL_SCANCODE_KP_DBLAMPERSAND]   = Q_KEY_CODE_KP_DBLAMPERSAND,
+-    [SDL_SCANCODE_KP_VERTICALBAR]    = Q_KEY_CODE_KP_VERTICALBAR,
+-    [SDL_SCANCODE_KP_DBLVERTICALBAR] = Q_KEY_CODE_KP_DBLVERTICALBAR,
+-    [SDL_SCANCODE_KP_COLON]          = Q_KEY_CODE_KP_COLON,
+-    [SDL_SCANCODE_KP_HASH]           = Q_KEY_CODE_KP_HASH,
+-    [SDL_SCANCODE_KP_SPACE]          = Q_KEY_CODE_KP_SPACE,
+-    [SDL_SCANCODE_KP_AT]             = Q_KEY_CODE_KP_AT,
+-    [SDL_SCANCODE_KP_EXCLAM]         = Q_KEY_CODE_KP_EXCLAM,
+-    [SDL_SCANCODE_KP_MEMSTORE]       = Q_KEY_CODE_KP_MEMSTORE,
+-    [SDL_SCANCODE_KP_MEMRECALL]      = Q_KEY_CODE_KP_MEMRECALL,
+-    [SDL_SCANCODE_KP_MEMCLEAR]       = Q_KEY_CODE_KP_MEMCLEAR,
+-    [SDL_SCANCODE_KP_MEMADD]         = Q_KEY_CODE_KP_MEMADD,
+-    [SDL_SCANCODE_KP_MEMSUBTRACT]    = Q_KEY_CODE_KP_MEMSUBTRACT,
+-    [SDL_SCANCODE_KP_MEMMULTIPLY]    = Q_KEY_CODE_KP_MEMMULTIPLY,
+-    [SDL_SCANCODE_KP_MEMDIVIDE]      = Q_KEY_CODE_KP_MEMDIVIDE,
+-    [SDL_SCANCODE_KP_PLUSMINUS]      = Q_KEY_CODE_KP_PLUSMINUS,
+-    [SDL_SCANCODE_KP_CLEAR]          = Q_KEY_CODE_KP_CLEAR,
+-    [SDL_SCANCODE_KP_CLEARENTRY]     = Q_KEY_CODE_KP_CLEARENTRY,
+-    [SDL_SCANCODE_KP_BINARY]         = Q_KEY_CODE_KP_BINARY,
+-    [SDL_SCANCODE_KP_OCTAL]          = Q_KEY_CODE_KP_OCTAL,
+-    [SDL_SCANCODE_KP_DECIMAL]        = Q_KEY_CODE_KP_DECIMAL,
+-    [SDL_SCANCODE_KP_HEXADECIMAL]    = Q_KEY_CODE_KP_HEXADECIMAL,
+-#endif
+-    [SDL_SCANCODE_LCTRL]             = Q_KEY_CODE_CTRL,
+-    [SDL_SCANCODE_LSHIFT]            = Q_KEY_CODE_SHIFT,
+-    [SDL_SCANCODE_LALT]              = Q_KEY_CODE_ALT,
+-    [SDL_SCANCODE_LGUI]              = Q_KEY_CODE_META_L,
+-    [SDL_SCANCODE_RCTRL]             = Q_KEY_CODE_CTRL_R,
+-    [SDL_SCANCODE_RSHIFT]            = Q_KEY_CODE_SHIFT_R,
+-    [SDL_SCANCODE_RALT]              = Q_KEY_CODE_ALT_R,
+-    [SDL_SCANCODE_RGUI]              = Q_KEY_CODE_META_R,
+-#if 0
+-    [SDL_SCANCODE_MODE]              = Q_KEY_CODE_MODE,
+-    [SDL_SCANCODE_AUDIONEXT]         = Q_KEY_CODE_AUDIONEXT,
+-    [SDL_SCANCODE_AUDIOPREV]         = Q_KEY_CODE_AUDIOPREV,
+-    [SDL_SCANCODE_AUDIOSTOP]         = Q_KEY_CODE_AUDIOSTOP,
+-    [SDL_SCANCODE_AUDIOPLAY]         = Q_KEY_CODE_AUDIOPLAY,
+-    [SDL_SCANCODE_AUDIOMUTE]         = Q_KEY_CODE_AUDIOMUTE,
+-    [SDL_SCANCODE_MEDIASELECT]       = Q_KEY_CODE_MEDIASELECT,
+-    [SDL_SCANCODE_WWW]               = Q_KEY_CODE_WWW,
+-    [SDL_SCANCODE_MAIL]              = Q_KEY_CODE_MAIL,
+-    [SDL_SCANCODE_CALCULATOR]        = Q_KEY_CODE_CALCULATOR,
+-    [SDL_SCANCODE_COMPUTER]          = Q_KEY_CODE_COMPUTER,
+-    [SDL_SCANCODE_AC_SEARCH]         = Q_KEY_CODE_AC_SEARCH,
+-    [SDL_SCANCODE_AC_HOME]           = Q_KEY_CODE_AC_HOME,
+-    [SDL_SCANCODE_AC_BACK]           = Q_KEY_CODE_AC_BACK,
+-    [SDL_SCANCODE_AC_FORWARD]        = Q_KEY_CODE_AC_FORWARD,
+-    [SDL_SCANCODE_AC_STOP]           = Q_KEY_CODE_AC_STOP,
+-    [SDL_SCANCODE_AC_REFRESH]        = Q_KEY_CODE_AC_REFRESH,
+-    [SDL_SCANCODE_AC_BOOKMARKS]      = Q_KEY_CODE_AC_BOOKMARKS,
+-    [SDL_SCANCODE_BRIGHTNESSDOWN]    = Q_KEY_CODE_BRIGHTNESSDOWN,
+-    [SDL_SCANCODE_BRIGHTNESSUP]      = Q_KEY_CODE_BRIGHTNESSUP,
+-    [SDL_SCANCODE_DISPLAYSWITCH]     = Q_KEY_CODE_DISPLAYSWITCH,
+-    [SDL_SCANCODE_KBDILLUMTOGGLE]    = Q_KEY_CODE_KBDILLUMTOGGLE,
+-    [SDL_SCANCODE_KBDILLUMDOWN]      = Q_KEY_CODE_KBDILLUMDOWN,
+-    [SDL_SCANCODE_KBDILLUMUP]        = Q_KEY_CODE_KBDILLUMUP,
+-    [SDL_SCANCODE_EJECT]             = Q_KEY_CODE_EJECT,
+-    [SDL_SCANCODE_SLEEP]             = Q_KEY_CODE_SLEEP,
+-    [SDL_SCANCODE_APP1]              = Q_KEY_CODE_APP1,
+-    [SDL_SCANCODE_APP2]              = Q_KEY_CODE_APP2,
+-#endif
+-};
 -- 
 2.13.3
