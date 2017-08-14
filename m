@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dhK1U-0006cq-EI
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:23:33 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dhK1X-0006eQ-Q3
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:23:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dhK1R-0007Ay-At
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:23:32 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:55772)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dhK1R-0007A5-0w
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:23:29 -0400
-References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
-	<1500040339-119465-15-git-send-email-imammedo@redhat.com>
-	<5bec6275-8e15-16c7-8d23-2975a563c78f@twiddle.net>
-	<20170717124146.5ae39d2b@nial.brq.redhat.com>
-	<f32dbe33-4a99-cf79-e41c-4a1accacda64@suse.de>
-	<20170717172322.54bd6888@nial.brq.redhat.com>
-	<20170814100036.28160651@nial.brq.redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <8acf5254-0d52-201c-800e-1911fee08931@vivier.eu>
-Date: Mon, 14 Aug 2017 20:23:10 +0200
+	(envelope-from <alistair23@gmail.com>) id 1dhK1W-0007D1-KO
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:23:35 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170814100036.28160651@nial.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 14/28] m68k: replace cpu_m68k_init() with
- cpu_generic_init()
+Sender: alistair23@gmail.com
+In-Reply-To: <20170812154131.29372-1-richard.henderson@linaro.org>
+References: <20170812154131.29372-1-richard.henderson@linaro.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Mon, 14 Aug 2017 11:23:01 -0700
+Message-ID: <CAKmqyKOnfiLhXh7G3jqjv0aF-HHCNHsfHPvy6h1X3g5NUNzXrA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Correct load/store exclusive
+ pairing and alignment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,74 +23,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Richard Henderson <rth7680@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-Le 14/08/2017 à 10:00, Igor Mammedov a écrit :
-> On Mon, 17 Jul 2017 17:23:22 +0200
-> Igor Mammedov <imammedo@redhat.com> wrote:
-> 
->> On Mon, 17 Jul 2017 17:05:15 +0200
->> Andreas Färber <afaerber@suse.de> wrote:
->>
->>> Am 17.07.2017 um 12:41 schrieb Igor Mammedov:  
->>>> On Sat, 15 Jul 2017 08:08:58 -1000
->>>> Richard Henderson <rth@twiddle.net> wrote:
->>>>     
->>>>> On 07/14/2017 03:52 AM, Igor Mammedov wrote:    
->>>>>> @@ -230,6 +230,8 @@ static void m68k_cpu_realizefn(DeviceState *dev, Error **errp)
->>>>>>       M68kCPUClass *mcc = M68K_CPU_GET_CLASS(dev);
->>>>>>       Error *local_err = NULL;
->>>>>>   
->>>>>> +    register_m68k_insns(&cpu->env);
->>>>>> +      
->>>>>
->>>>> I think it would make more sense to do this during m68k_tcg_init.
->>>>>    
->>>> it seems that m68k_cpu_initfn accesses 'env' via some global,
->>>> while cpu_mk68k_init() used to access concrete pointer of just created cpu,
->>>>
->>>> how about moving register_m68k_insns() to m68k_cpu_initfn(), instead?
->>>> it should be equivalent to what cpu_mk68k_init() used to do.    
->>>
->>> As a general note, realize should be re-entrant. Can't tell from the
->>> above diff whether that is the case here.  
->> Looking at
->>
->> void register_m68k_insns (CPUM68KState *env)                                     
->> {                                                                                
->>     /* Build the opcode table only once to avoid                                 
->>        multithreading issues. */                                                 
->>     if (opcode_table[0] != NULL) {                                               
->>         return;                                                                  
->>     }
->>
->> it is save to use multiple times,
->>
->> also looking further in it:
->>
->> #define BASE(name, opcode, mask) \                                               
->>     register_opcode(disas_##name, 0x##opcode, 0x##mask)                          
->> #define INSN(name, opcode, mask, feature) do { \                                 
->>     if (m68k_feature(env, M68K_FEATURE_##feature)) \                             
->>         BASE(name, opcode, mask); \                                              
->>     } while(0)                                                                   
->>     BASE(undef,     0000, 0000);                                                 
->>     INSN(arith_im,  0080, fff8, CF_ISA_A);
->>
->> INSN macro depends on enabled features, it might work with current code that
->> has no user settable features but it will break once that is available.
->>
->> So I retract my suggestion to move register_m68k_insns() into m68k_cpu_initfn()
->> and keep it as it's in this patch (in m68k_cpu_realizefn()),
->> that way features theoretically set between initfn(and m68k_tcg_init) and realize() will
->> have effect on created cpu and we won't have to fix it in future.
-> 
-> Richard, Laurent,
-> 
-> Do you agree with keeping register_m68k_insns() in realize()?
-> 
+On Sat, Aug 12, 2017 at 8:41 AM, Richard Henderson <rth7680@gmail.com> wrote:
+> SetExclusiveMonitors in the pseudocode is on the address + width,
+> and says nothing about the manner of the load.  Therefore
+>
+>         ldxp    w0, w1, [x2]
+> vs
+>         ldxr    x0, [x2]
+>
+> must record the same metadata so that either may pair with
+>
+>         stxp    w3, w0, w1, [x2]
+> vs
+>         stxr    w3, x0, [x2]
+>
+> Fix this by ignoring cpu_exclusive_high except for 64-bit LDXP/STXP.
+>
+> Also note that we were not providing the required single-copy atomic
+> semantics for 32-bit LDXP.  This is trivially fixed alongside the
+> cpu_exclusive_val change.
+>
+> At the same time, exclusive loads require the same alignment as
+> exclusive stores.  For 64-bit LDXP, this means adding MO_ALIGN_16;
+> for the others adding MO_ALIGN.
+>
+> Reported-by: Alistair Francis <alistair.francis@xilinx.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-I agree.
+This passes the same tests that my patch series passes.
 
-Acked-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Tested-by: Alistair Francis <alistair.francis@xilinx.com>
+
+Thanks,
+Alistair
+
+
+> ---
+>  target/arm/translate-a64.c | 65 +++++++++++++++++++++++++++++-----------------
+>  1 file changed, 41 insertions(+), 24 deletions(-)
+> ---
+>
+> I have not yet constructed test cases for all of the combinations
+> listed above.  I wanted to put this into your hands so that you could
+> test against your existing code using LDXP/STXP.
+>
+>
+> r~
+>
+>
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 58ed4c6d05..f3643ac8dc 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -1853,29 +1853,45 @@ static void disas_b_exc_sys(DisasContext *s, uint32_t insn)
+>  static void gen_load_exclusive(DisasContext *s, int rt, int rt2,
+>                                 TCGv_i64 addr, int size, bool is_pair)
+>  {
+> -    TCGv_i64 tmp = tcg_temp_new_i64();
+> -    TCGMemOp memop = s->be_data + size;
+> +    int idx = get_mem_index(s);
+> +    TCGMemOp memop = s->be_data;
+>
+>      g_assert(size <= 3);
+> -    tcg_gen_qemu_ld_i64(tmp, addr, get_mem_index(s), memop);
+> -
+>      if (is_pair) {
+> -        TCGv_i64 addr2 = tcg_temp_new_i64();
+> -        TCGv_i64 hitmp = tcg_temp_new_i64();
+> -
+>          g_assert(size >= 2);
+> -        tcg_gen_addi_i64(addr2, addr, 1 << size);
+> -        tcg_gen_qemu_ld_i64(hitmp, addr2, get_mem_index(s), memop);
+> -        tcg_temp_free_i64(addr2);
+> -        tcg_gen_mov_i64(cpu_exclusive_high, hitmp);
+> -        tcg_gen_mov_i64(cpu_reg(s, rt2), hitmp);
+> -        tcg_temp_free_i64(hitmp);
+> -    }
+> +        if (size == 2) {
+> +            /* The pair must be single-copy atomic for the doubleword.  */
+> +            memop |= MO_64 | MO_ALIGN;
+> +            tcg_gen_qemu_ld_i64(cpu_exclusive_val, addr, idx, memop);
+> +            if (s->be_data == MO_LE) {
+> +                tcg_gen_extract_i64(cpu_reg(s, rt), cpu_exclusive_val, 0, 32);
+> +                tcg_gen_extract_i64(cpu_reg(s, rt2), cpu_exclusive_val, 32, 32);
+> +            } else {
+> +                tcg_gen_extract_i64(cpu_reg(s, rt), cpu_exclusive_val, 32, 32);
+> +                tcg_gen_extract_i64(cpu_reg(s, rt2), cpu_exclusive_val, 0, 32);
+> +            }
+> +        } else {
+> +            /* The pair must be single-copy atomic for *each* doubleword,
+> +               but not the entire quadword.  It must, however, be aligned.  */
+> +            TCGv_i64 addr2;
+>
+> -    tcg_gen_mov_i64(cpu_exclusive_val, tmp);
+> -    tcg_gen_mov_i64(cpu_reg(s, rt), tmp);
+> +            memop |= MO_64;
+> +            tcg_gen_qemu_ld_i64(cpu_exclusive_val, addr, idx,
+> +                                memop | MO_ALIGN_16);
+>
+> -    tcg_temp_free_i64(tmp);
+> +            addr2 = tcg_temp_new_i64();
+> +            tcg_gen_addi_i64(addr2, addr, 8);
+> +            tcg_gen_qemu_ld_i64(cpu_exclusive_high, addr2, idx, memop);
+> +            tcg_temp_free_i64(addr2);
+> +
+> +            tcg_gen_mov_i64(cpu_reg(s, rt), cpu_exclusive_val);
+> +            tcg_gen_mov_i64(cpu_reg(s, rt2), cpu_exclusive_high);
+> +        }
+> +    } else {
+> +        memop |= size | MO_ALIGN;
+> +        tcg_gen_qemu_ld_i64(cpu_exclusive_val, addr, idx, memop);
+> +        tcg_gen_mov_i64(cpu_reg(s, rt), cpu_exclusive_val);
+> +    }
+>      tcg_gen_mov_i64(cpu_exclusive_addr, addr);
+>  }
+>
+> @@ -1908,14 +1924,15 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
+>      tmp = tcg_temp_new_i64();
+>      if (is_pair) {
+>          if (size == 2) {
+> -            TCGv_i64 val = tcg_temp_new_i64();
+> -            tcg_gen_concat32_i64(tmp, cpu_reg(s, rt), cpu_reg(s, rt2));
+> -            tcg_gen_concat32_i64(val, cpu_exclusive_val, cpu_exclusive_high);
+> -            tcg_gen_atomic_cmpxchg_i64(tmp, addr, val, tmp,
+> +            if (s->be_data == MO_LE) {
+> +                tcg_gen_concat32_i64(tmp, cpu_reg(s, rt), cpu_reg(s, rt2));
+> +            } else {
+> +                tcg_gen_concat32_i64(tmp, cpu_reg(s, rt2), cpu_reg(s, rt));
+> +            }
+> +            tcg_gen_atomic_cmpxchg_i64(tmp, addr, cpu_exclusive_val, tmp,
+>                                         get_mem_index(s),
+> -                                       size | MO_ALIGN | s->be_data);
+> -            tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, val);
+> -            tcg_temp_free_i64(val);
+> +                                       MO_64 | MO_ALIGN | s->be_data);
+> +            tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, cpu_exclusive_val);
+>          } else if (s->be_data == MO_LE) {
+>              gen_helper_paired_cmpxchg64_le(tmp, cpu_env, addr, cpu_reg(s, rt),
+>                                             cpu_reg(s, rt2));
+> --
+> 2.13.4
+>
+>
