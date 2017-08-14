@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dhEBP-00038Q-FN
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:09:24 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dhEBO-0000QW-Le
+	(envelope-from <jasowang@redhat.com>) id 1dhEBO-00038K-R3
 	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:09:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38312)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dhEBO-0000Q1-Fh
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <jasowang@redhat.com>) id 1dhEBM-0000PK-6g
 	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:09:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38954)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dhEBM-0000Oi-0F
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:09:20 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 14 Aug 2017 20:09:15 +0800
-Message-Id: <1502712555-4587-2-git-send-email-jasowang@redhat.com>
-In-Reply-To: <1502712555-4587-1-git-send-email-jasowang@redhat.com>
-References: <1502712555-4587-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL V2] qemu-doc: Mention host_net_add/-remove in
- the deprecation chapter
+Date: Mon, 14 Aug 2017 20:09:14 +0800
+Message-Id: <1502712555-4587-1-git-send-email-jasowang@redhat.com>
+Subject: [Qemu-devel] [PULL V2] Net patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +22,25 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+The following changes since commit 9db6ffc76676731a25a5538ab71e8ca6ac234f80:
 
-The two HMP commands host_net_add and -remove have recently been
-marked as deprecated, too, so we should now mention them in the
-chapter of deprecated features.
+  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2017-08-11 15:11:50 +0100)
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
+are available in the git repository at:
+
+  https://github.com/jasowang/qemu.git tags/net-pull-request
+
+for you to fetch changes up to d58686a0af5fda2b0b21836c675c9deb764e95f6:
+
+  qemu-doc: Mention host_net_add/-remove in the deprecation chapter (2017-08-14 20:04:06 +0800)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+Thomas Huth (1):
+      qemu-doc: Mention host_net_add/-remove in the deprecation chapter
+
  qemu-doc.texi | 8 ++++++++
  1 file changed, 8 insertions(+)
-
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index aeb7bc5..7b62fdf 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -3283,6 +3283,14 @@ by the ``convert -l snapshot_param'' argument instead.
- 
- @section System emulator human monitor commands
- 
-+@subsection host_net_add (since 2.10.0)
-+
-+The ``host_net_add'' command is replaced by the ``netdev_add'' command.
-+
-+@subsection host_net_remove (since 2.10.0)
-+
-+The ``host_net_remove'' command is replaced by the ``host_net_remove'' command.
-+
- @subsection usb_add (since 2.10.0)
- 
- The ``usb_add'' command is replaced by the ``device_add'' command.
--- 
-2.7.4
