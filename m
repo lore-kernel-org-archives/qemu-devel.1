@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dhEjj-0004Qb-Pu
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:44:52 -0400
+	(envelope-from <berrange@redhat.com>) id 1dhEoV-0006QX-8N
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:49:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dhEjf-0000eQ-95
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:44:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:4654)
+	(envelope-from <berrange@redhat.com>) id 1dhEoT-0003qX-Tf
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:49:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49008)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dhEjf-0000dz-2k
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:44:47 -0400
-Date: Mon, 14 Aug 2017 09:44:39 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170814124439.GM3108@localhost.localdomain>
-References: <1502705471-28407-1-git-send-email-douly.fnst@cn.fujitsu.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1502705471-28407-1-git-send-email-douly.fnst@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH] numa: Add a check whether the node0 has
- memory or not
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dhEoT-0003qF-Ky
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:49:45 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8BBDA70001
+	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 12:49:44 +0000 (UTC)
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Mon, 14 Aug 2017 13:49:18 +0100
+Message-Id: <20170814124927.30134-4-berrange@redhat.com>
+In-Reply-To: <20170814124927.30134-1-berrange@redhat.com>
+References: <20170814124927.30134-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 03/12] ui: convert key events to QKeyCodes
+ immediately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, dgilbert@redhat.com, armbru@redhat.com, david@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Mon, Aug 14, 2017 at 06:11:11PM +0800, Dou Liyang wrote:
-> Currently, Using the fisrt node without memory on the machine makes
-> QEMU unhappy. With this example command line:
->   ... \
->   -m 1024M,slots=4,maxmem=32G \
->   -numa node,nodeid=0 \
->   -numa node,mem=1024M,nodeid=1 \
->   -numa node,nodeid=2 \
->   -numa node,nodeid=3 \
-> Guest reports "No NUMA configuration found" and the NUMA topology is
-> wrong.
-> 
-> This is because when QEMU builds ACPI SRAT, it regards node0 as the
-> default node to deal with the memory hole(640K-1M). this means the
-> node0 must have some memory(>1M) firstly.
-> 
-> Add a check in parse_numa_opts to avoid this situation.
-> 
-> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
-> ---
->  numa.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/numa.c b/numa.c
-> index e32af04..1d6f73f 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -464,6 +464,10 @@ void parse_numa_opts(MachineState *ms)
->          if (i == nb_numa_nodes) {
->              assert(mc->numa_auto_assign_ram);
->              mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
-> +        } else if (i != 0) {
-> +            error_report("The first NUMA node must have some memory"
-> +                          " for building ACPI SART");
-> +            exit(1);
+Always use QKeyCode in the InputKeyEvent struct, by converting key
+numbers to QKeyCode at the time the event is created.
 
-This doesn't belong to numa.c.  numa.c is generic code, and the
-requirement you described is specific for PC.
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ ui/input.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-Anyway, adding this check would make existing VM configurations
-refuse to run after a QEMU upgrade.  I suggest fixing the bug in
-the ACPI code instead.
-
+diff --git a/ui/input.c b/ui/input.c
+index af05f06368..64e9103a61 100644
+--- a/ui/input.c
++++ b/ui/input.c
+@@ -400,10 +400,8 @@ void qemu_input_event_send_key(QemuConsole *src, KeyValue *key, bool down)
+ 
+ void qemu_input_event_send_key_number(QemuConsole *src, int num, bool down)
+ {
+-    KeyValue *key = g_new0(KeyValue, 1);
+-    key->type = KEY_VALUE_KIND_NUMBER;
+-    key->u.number.data = num;
+-    qemu_input_event_send_key(src, key, down);
++    QKeyCode code = qemu_input_key_number_to_qcode(num);
++    qemu_input_event_send_key_qcode(src, code, down);
+ }
+ 
+ void qemu_input_event_send_key_qcode(QemuConsole *src, QKeyCode q, bool down)
 -- 
-Eduardo
+2.13.3
