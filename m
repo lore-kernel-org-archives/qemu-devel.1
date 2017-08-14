@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dh5fl-0000dQ-Bl
-	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 23:04:10 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dh5i7-000264-Ix
+	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 23:06:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dh5fi-0002Tx-7v
-	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 23:04:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47516)
+	(envelope-from <jasowang@redhat.com>) id 1dh5i4-0003q3-E7
+	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 23:06:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59798)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dh5fh-0002Rs-Vw
-	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 23:04:06 -0400
-References: <20170812213448.20624-1-mtparkr@gmail.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dh5i4-0003pr-8O
+	for qemu-devel@nongnu.org; Sun, 13 Aug 2017 23:06:32 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 94FF3C04F2A6
+	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 02:57:25 +0000 (UTC)
+References: <1502351323-15186-1-git-send-email-thuth@redhat.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <98d64249-0d86-d412-d8b7-7c2c7a3ebac4@redhat.com>
-Date: Mon, 14 Aug 2017 10:58:07 +0800
+Message-ID: <17d55442-f976-70ad-a4a5-2a22ab73ff6c@redhat.com>
+Date: Mon, 14 Aug 2017 10:57:13 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170812213448.20624-1-mtparkr@gmail.com>
+In-Reply-To: <1502351323-15186-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] net: rtl8139: do not use old_mmio accesses
+Subject: Re: [Qemu-devel] [PATCH for-2.10] qemu-doc: Mention
+ host_net_add/-remove in the deprecation chapter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,107 +34,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Matt Parker <mtparkr@gmail.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
 
 
-On 2017=E5=B9=B408=E6=9C=8813=E6=97=A5 05:34, Matt Parker wrote:
-> This updates the current MemoryRegionOps for the bar 1 memory region
-> from using the old_mmio accessors to the .read and .write accessors.
+On 2017=E5=B9=B408=E6=9C=8810=E6=97=A5 15:48, Thomas Huth wrote:
+> The two HMP commands host_net_add and -remove have recently been
+> marked as deprecated, too, so we should now mention them in the
+> chapter of deprecated features.
 >
-> Signed-off-by: Matt Parker <mtparkr@gmail.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->   hw/net/rtl8139.c | 60 +++++++++++++++--------------------------------=
----------
->   1 file changed, 16 insertions(+), 44 deletions(-)
+>   qemu-doc.texi | 8 ++++++++
+>   1 file changed, 8 insertions(+)
 >
-> diff --git a/hw/net/rtl8139.c b/hw/net/rtl8139.c
-> index 671c7e48c6..b3aefda291 100644
-> --- a/hw/net/rtl8139.c
-> +++ b/hw/net/rtl8139.c
-> @@ -3131,39 +3131,6 @@ static uint32_t rtl8139_io_readl(void *opaque, u=
-int8_t addr)
->   }
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index aeb7bc5..7b62fdf 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -3283,6 +3283,14 @@ by the ``convert -l snapshot_param'' argument in=
+stead.
 >  =20
->   /* */
-> -
-> -static void rtl8139_mmio_writeb(void *opaque, hwaddr addr, uint32_t va=
-l)
-> -{
-> -    rtl8139_io_writeb(opaque, addr & 0xFF, val);
-> -}
-> -
-> -static void rtl8139_mmio_writew(void *opaque, hwaddr addr, uint32_t va=
-l)
-> -{
-> -    rtl8139_io_writew(opaque, addr & 0xFF, val);
-> -}
-> -
-> -static void rtl8139_mmio_writel(void *opaque, hwaddr addr, uint32_t va=
-l)
-> -{
-> -    rtl8139_io_writel(opaque, addr & 0xFF, val);
-> -}
-> -
-> -static uint32_t rtl8139_mmio_readb(void *opaque, hwaddr addr)
-> -{
-> -    return rtl8139_io_readb(opaque, addr & 0xFF);
-> -}
-> -
-> -static uint32_t rtl8139_mmio_readw(void *opaque, hwaddr addr)
-> -{
-> -    uint32_t val =3D rtl8139_io_readw(opaque, addr & 0xFF);
-> -    return val;
-> -}
-> -
-> -static uint32_t rtl8139_mmio_readl(void *opaque, hwaddr addr)
-> -{
-> -    uint32_t val =3D rtl8139_io_readl(opaque, addr & 0xFF);
-> -    return val;
-> -}
-> -
->   static int rtl8139_post_load(void *opaque, int version_id)
->   {
->       RTL8139State* s =3D opaque;
-> @@ -3344,18 +3311,23 @@ static const MemoryRegionOps rtl8139_io_ops =3D=
- {
->       .endianness =3D DEVICE_LITTLE_ENDIAN,
->   };
+>   @section System emulator human monitor commands
 >  =20
-> +static uint64_t rtl8139_mmio_read(void *opaque, hwaddr addr, unsigned =
-size)
-> +{
-> +   return rtl8139_ioport_read(opaque, addr & 0xFF, size);
-> +}
+> +@subsection host_net_add (since 2.10.0)
 > +
-> +static void rtl8139_mmio_write(void *opaque, hwaddr addr, uint64_t val=
-,
-> +                               unsigned size)
-> +{
-> +    return rtl8139_ioport_write(opaque, addr & 0xFF, val, size);
-> +}
+> +The ``host_net_add'' command is replaced by the ``netdev_add'' command=
+.
 > +
->   static const MemoryRegionOps rtl8139_mmio_ops =3D {
-> -    .old_mmio =3D {
-> -        .read =3D {
-> -            rtl8139_mmio_readb,
-> -            rtl8139_mmio_readw,
-> -            rtl8139_mmio_readl,
-> -        },
-> -        .write =3D {
-> -            rtl8139_mmio_writeb,
-> -            rtl8139_mmio_writew,
-> -            rtl8139_mmio_writel,
-> -        },
-> +    .read =3D rtl8139_mmio_read,
-> +    .write =3D rtl8139_mmio_write,
-> +    .impl =3D {
-> +        .min_access_size =3D 1,
-> +        .max_access_size =3D 4,
->       },
->       .endianness =3D DEVICE_LITTLE_ENDIAN,
->   };
+> +@subsection host_net_remove (since 2.10.0)
+> +
+> +The ``host_net_remove'' command is replaced by the ``host_net_remove''=
+ command.
+> +
+>   @subsection usb_add (since 2.10.0)
+>  =20
+>   The ``usb_add'' command is replaced by the ``device_add'' command.
 
-Queued for 2.11.
-
-Thanks
+Applied, thanks.
