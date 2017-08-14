@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dhBec-0004eu-Qm
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 05:27:23 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dhBoV-0001Hq-1N
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 05:37:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dhBeY-00040H-RO
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 05:27:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42366)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dhBeY-0003zp-LW
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 05:27:18 -0400
-Date: Mon, 14 Aug 2017 11:27:13 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170814112713.3ccfa968.cohuck@redhat.com>
-In-Reply-To: <20170814112407.262733fb@nial.brq.redhat.com>
-References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
-	<1500040339-119465-12-git-send-email-imammedo@redhat.com>
-	<20170718143009.432250d5@gondolin>
-	<20170718151721.25c3d603@nial.brq.redhat.com>
-	<20170814100348.50fb3a96@nial.brq.redhat.com>
-	<20170814105337.745899b3.cohuck@redhat.com>
-	<20170814112407.262733fb@nial.brq.redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dhBoU-00081R-6u
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 05:37:35 -0400
+References: <20170710163029.129912-1-vsementsov@virtuozzo.com>
+	<20170710163029.129912-8-vsementsov@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <7ee5b6bb-7406-4539-652f-a57c6088f8ff@virtuozzo.com>
+Date: Mon, 14 Aug 2017 12:37:15 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170710163029.129912-8-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 11/28] s390x: replace cpu_s390x_init() with
- cpu_generic_init()
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v7 07/16] block/dirty-bitmap: add
+ bdrv_dirty_bitmap_release_successor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,18 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, Richard Henderson <rth@twiddle.net>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-On Mon, 14 Aug 2017 11:24:07 +0200
-Igor Mammedov <imammedo@redhat.com> wrote:
+10.07.2017 19:30, Vladimir Sementsov-Ogievskiy wrote:
+> To just release successor and unfreeze bitmap without any additional
+> work.
+>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Denis V. Lunev <den@openvz.org>
+> ---
+>   block/dirty-bitmap.c         | 13 +++++++++++++
+>   include/block/dirty-bitmap.h |  2 ++
+>   2 files changed, 15 insertions(+)
+>
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index 7b598c36bf..b5678d2d25 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -303,6 +303,19 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
+>       return parent;
+>   }
+>   
+> +/* Called with BQL taken. */
+> +void bdrv_dirty_bitmap_release_successor(BlockDriverState *bs,
+> +                                         BdrvDirtyBitmap *parent)
+> +{
+> +    qemu_mutex_lock(parent->mutex);
+> +
+> +    if (parent->successor) {
+> +        bdrv_release_dirty_bitmap(bs, parent->successor);
 
-> I didn't look at possibility of refactoring next_cpu_id usage as
-> it's out of scope of this series. But from my understanding, it's been
-> introduced to support legacy cpu_add interface and enforce sequential
-> hotplug of CPUs when device_add CPU infrastructure hasn't been ready
-> yet. Perhaps S390 gurus could now refactor CPU hotplug to device_add
-> interface and get rid of next_cpu_id in process.
+this will try to lock same mutex and deadlock.
 
-Yup, much potential there. I won't mind if someone wants to look at
-this.
+> +        parent->successor = NULL;
+> +    }
+> +
+> +    qemu_mutex_unlock(parent->mutex);
+> +}
+>   /**
+>    * Truncates _all_ bitmaps attached to a BDS.
+>    * Called with BQL taken.
+> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+> index d00a7a4b7c..fa2f670050 100644
+> --- a/include/block/dirty-bitmap.h
+> +++ b/include/block/dirty-bitmap.h
+> @@ -20,6 +20,8 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
+>   BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
+>                                              BdrvDirtyBitmap *bitmap,
+>                                              Error **errp);
+> +void bdrv_dirty_bitmap_release_successor(BlockDriverState *bs,
+> +                                         BdrvDirtyBitmap *bitmap);
+>   void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap);
+>   BdrvDirtyBitmap *bdrv_find_dirty_bitmap(BlockDriverState *bs,
+>                                           const char *name);
+
+
+-- 
+Best regards,
+Vladimir
