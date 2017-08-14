@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dhJ9R-00023K-On
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 13:27:42 -0400
+	(envelope-from <groug@kaod.org>) id 1dhJUa-0003rz-Fu
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 13:49:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dhJ9M-0007bL-Sj
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 13:27:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43526)
+	(envelope-from <groug@kaod.org>) id 1dhJUX-0006mo-C5
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 13:49:32 -0400
+Received: from 6.mo5.mail-out.ovh.net ([178.32.119.138]:36255)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dhJ9M-0007aM-NK
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 13:27:36 -0400
-Date: Mon, 14 Aug 2017 18:27:22 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170814172722.GC2079@work-vm>
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<20170628190047.26159-4-dgilbert@redhat.com>
-	<20170703204425-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dhJUX-0006lk-6S
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 13:49:29 -0400
+Received: from player734.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 9A85511A889
+	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 19:49:27 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Mon, 14 Aug 2017 19:49:16 +0200
+Message-ID: <150273295665.11087.17582111045419718285.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170703204425-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [RFC 03/29] qemu_ram_block_host_offset
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] ppc: fix ppc_set_compat() with KVM PR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +27,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Wed, Jun 28, 2017 at 08:00:21PM +0100, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Utility to give the offset of a host pointer within a RAMBlock
-> > (assuming we already know it's in that RAMBlock)
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  exec.c                    | 6 ++++++
-> >  include/exec/cpu-common.h | 1 +
-> >  2 files changed, 7 insertions(+)
-> > 
-> > diff --git a/exec.c b/exec.c
-> > index 4e61226a16..a1499b9bee 100644
-> > --- a/exec.c
-> > +++ b/exec.c
-> > @@ -2218,6 +2218,12 @@ static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
-> >      return ramblock_ptr(block, addr);
-> >  }
-> >  
-> > +/* Return the offset of a hostpointer within a ramblock */
-> > +ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, void *host)
-> > +{
-> > +    return (uint8_t *)host - (uint8_t *)rb->host;
-> > +}
-> > +
-> 
-> I'd also assert that it's within that block.
+When running in KVM PR mode, kvmppc_set_compat() always fail because the
+current PR implementation doesn't handle KVM_REG_PPC_ARCH_COMPAT. Now that
+the machine code inconditionally calls ppc_set_compat_all() at reset time
+to restore the compat mode default value (commit 66d5c492dd3a9), it is
+impossible to start a guest with PR:
 
-Done
+qemu-system-ppc64: Unable to set CPU compatibility mode in KVM:
+ Invalid argument
 
-> >  /*
-> >   * Translates a host ptr back to a RAMBlock, a ram_addr and an offset
-> >   * in that RAMBlock.
-> > diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-> > index 4af179b543..fa1ec22d66 100644
-> > --- a/include/exec/cpu-common.h
-> > +++ b/include/exec/cpu-common.h
-> > @@ -66,6 +66,7 @@ ram_addr_t qemu_ram_addr_from_host(void *ptr);
-> >  RAMBlock *qemu_ram_block_by_name(const char *name);
-> >  RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
-> >                                     ram_addr_t *offset);
-> > +ram_addr_t qemu_ram_block_host_offset(RAMBlock *rb, void *host);
-> >  void qemu_ram_set_idstr(RAMBlock *block, const char *name, DeviceState *dev);
-> >  void qemu_ram_unset_idstr(RAMBlock *block);
-> >  const char *qemu_ram_get_idstr(RAMBlock *rb);
-> > -- 
-> > 2.13.0
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+A tentative patch [1] was recently sent by Suraj to address the issue, but
+it would prevent the compat mode to be turned off on reset. And we really
+don't want to explicitely check for KVM PR. During the patch's review,
+David suggested that we should only call the KVM ioctl() if the compat
+PVR changes. This allows at least to run with KVM PR, provided no compat
+mode is requested from the command line (which should be the case when
+running PR nested). This is what this patch does.
+
+While here, we also fix the side effect where KVM would fail but we would
+change the CPU state in QEMU anyway.
+
+[1] http://patchwork.ozlabs.org/patch/782039/
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ target/ppc/compat.c |    9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/target/ppc/compat.c b/target/ppc/compat.c
+index f1b67faa97e3..f8729fe46d61 100644
+--- a/target/ppc/compat.c
++++ b/target/ppc/compat.c
+@@ -140,16 +140,17 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp)
+ 
+     cpu_synchronize_state(CPU(cpu));
+ 
+-    cpu->compat_pvr = compat_pvr;
+-    env->spr[SPR_PCR] = pcr & pcc->pcr_mask;
+-
+-    if (kvm_enabled()) {
++    if (kvm_enabled() && cpu->compat_pvr != compat_pvr) {
+         int ret = kvmppc_set_compat(cpu, cpu->compat_pvr);
+         if (ret < 0) {
+             error_setg_errno(errp, -ret,
+                              "Unable to set CPU compatibility mode in KVM");
++            return;
+         }
+     }
++
++    cpu->compat_pvr = compat_pvr;
++    env->spr[SPR_PCR] = pcr & pcc->pcr_mask;
+ }
+ 
+ typedef struct {
