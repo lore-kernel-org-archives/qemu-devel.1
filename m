@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dhIEk-0003WX-DC
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:29:07 -0400
+	(envelope-from <berrange@redhat.com>) id 1dhIOe-0001sb-MC
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:39:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dhIEh-0006Sq-7M
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:29:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:30620)
+	(envelope-from <berrange@redhat.com>) id 1dhIOa-0000m4-NW
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:39:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55458)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dhIEg-0006SI-UP
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:29:03 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dhIOa-0000ll-H4
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:39:16 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B3127806D2
-	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 16:21:49 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 14 Aug 2017 17:21:41 +0100
-Message-Id: <20170814162142.29666-2-stefanha@redhat.com>
-In-Reply-To: <20170814162142.29666-1-stefanha@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 64A0BC000724
+	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 16:39:15 +0000 (UTC)
+Date: Mon, 14 Aug 2017 17:39:08 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170814163908.GG8506@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <20170814162142.29666-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 1/2] trace: use static event ID
- mapping in simpletrace.stp
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170814162142.29666-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/2] trace: fix simpletrace.stp
+ flight recorder mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,101 +34,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Daniel Berrange <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Commit 7f1b588f20d027730676e627713ae3bbf6baab04 ("trace: emit name <->
-ID mapping in simpletrace header") broke the SystemTap flight recorder
-because event mapping records may no longer be present in the ring
-buffer when the trace is analyzed.  This means simpletrace.py
---no-header does not know the event ID mapping needed to pretty-print
-the trace.
+On Mon, Aug 14, 2017 at 05:21:40PM +0100, Stefan Hajnoczi wrote:
+> The SystemTap flight recorder mode no longer works with simpletrace.stp because
+> the event ID mapping records are emitted the first time an event fires.
+> Chances are, the event ID mapping record will not be in ring buffer when the
+> users wants to print the trace.
+> 
+> This series solves the issue by using the trace-events-all global event
+> ordering for event IDs for simpletrace.stp.
 
-Instead of numbering events dynamically, use a static event ID mapping
-as dictated by the event order in the trace-events-all file.
+I see the way you've written it means it'll still honour the event
+id mappings in the header, if present, but I wonder what's the point
+of keeping that anymore ? If we need to support this ring-buffer mode,
+there's no way we can take advantage of having the ID mappings dynamically
+defined - we must always guarantee a stable mapping.
 
-The simpletrace.py script also uses trace-events-all so the next patch
-will fix the simpletrace.py --no-header option to take advantage of this
-knowledge.
+IOW, should we just revert
 
-Cc: Daniel P. Berrange <berrange@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- scripts/tracetool/format/simpletrace_stap.py | 36 ++++++++++++----------------
- 1 file changed, 15 insertions(+), 21 deletions(-)
+  commit 7f1b588f20d027730676e627713ae3bbf6baab04
+  Author: Daniel P. Berrange <berrange@redhat.com>
+  Date:   Tue Oct 4 14:35:50 2016 +0100
 
-diff --git a/scripts/tracetool/format/simpletrace_stap.py b/scripts/tracetool/format/simpletrace_stap.py
-index 144b704bcd..6cfdc32867 100644
---- a/scripts/tracetool/format/simpletrace_stap.py
-+++ b/scripts/tracetool/format/simpletrace_stap.py
-@@ -22,33 +22,18 @@ def global_var_name(name):
-     return probeprefix().replace(".", "_") + "_" + name
- 
- def generate(events, backend, group):
--    id_map = global_var_name("event_name_to_id_map")
--    next_id = global_var_name("event_next_id")
--    map_func = global_var_name("simple_trace_map_event")
-+    id_map = global_var_name("id_map")
-+
-     out('/* This file is autogenerated by tracetool, do not edit. */',
-         '',
-         'global %(id_map)s',
--        'global %(next_id)s',
--        'function %(map_func)s(name)',
-         '',
--        '{',
--        '    if (!([name] in %(id_map)s)) {',
--        '        %(id_map)s[name] = %(next_id)s',
--        '        name_len = strlen(name)',
--        '        printf("%%8b%%8b%%4b%%.*s", 0, ',
--        '               %(next_id)s, name_len, name_len, name)',
--        '        %(next_id)s = %(next_id)s + 1',
--        '    }',
--        '    return %(id_map)s[name]',
--        '}',
-         'probe begin',
-         '{',
-         '    printf("%%8b%%8b%%8b", 0xffffffffffffffff, 0xf2b177cb0aa429b4, 4)',
-         '}',
-         '',
--        id_map=id_map,
--        next_id=next_id,
--        map_func=map_func)
-+        id_map=id_map)
- 
-     for event_id, e in enumerate(events):
-         if 'disable' in e.properties:
-@@ -56,11 +41,20 @@ def generate(events, backend, group):
- 
-         out('probe %(probeprefix)s.simpletrace.%(name)s = %(probeprefix)s.%(name)s ?',
-             '{',
--            '    id = %(map_func)s("%(name)s")',
-             probeprefix=probeprefix(),
--            map_func=map_func,
-             name=e.name)
- 
-+        out('    if (!(["%(name)s"] in %(id_map)s)) {',
-+            '        %(id_map)s["%(name)s"] = 1',
-+            '        printf("%%8b%%8b%%4b%%.*s", 0, ',
-+            '               %(event_id)s, %(name_len)s, %(name_len)s,',
-+            '               "%(name)s")',
-+            '    }',
-+            id_map=id_map,
-+            name=e.name,
-+            name_len=len(e.name),
-+            event_id=event_id)
-+
-         # Calculate record size
-         sizes = ['24'] # sizeof(TraceRecord)
-         for type_, name in e.args:
-@@ -77,7 +71,7 @@ def generate(events, backend, group):
-         sizestr = ' + '.join(sizes)
- 
-         # Generate format string and value pairs for record header and arguments
--        fields = [('8b', 'id'),
-+        fields = [('8b', str(event_id)),
-                   ('8b', 'gettimeofday_ns()'),
-                   ('4b', sizestr),
-                   ('4b', 'pid()')]
+    trace: emit name <-> ID mapping in simpletrace header
+    
+entirely ?
+
+
+Regards,
+Daniel
 -- 
-2.13.4
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
