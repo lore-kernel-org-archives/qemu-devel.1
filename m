@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dhKCC-0003TQ-FU
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:34:37 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dhKDn-0004ZQ-P9
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:36:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dhKC9-0004ND-C0
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:34:36 -0400
-Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:48792)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dhKC9-0004LM-5Q
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:34:33 -0400
-Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 66D4DA31AF
-	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 20:34:24 +0200 (CEST)
-References: <1502721197-32717-1-git-send-email-mst@redhat.com>
-	<20170814173335.58f0e84f.cohuck@redhat.com>
-	<f08ad396-50bf-aff7-95e8-5cd1b862923e@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <0e0fabcc-5dfa-abee-a6ed-f39e57aa3aaa@kaod.org>
-Date: Mon, 14 Aug 2017 20:34:14 +0200
+	(envelope-from <alistair23@gmail.com>) id 1dhKDm-0006C8-Jj
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:36:15 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:37197)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dhKDm-0006Bs-BV
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:36:14 -0400
+Received: by mail-wm0-x241.google.com with SMTP id t138so15348946wmt.4
+	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 11:36:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <f08ad396-50bf-aff7-95e8-5cd1b862923e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests: switch tests to accel=kvm:tcg
+Sender: alistair23@gmail.com
+In-Reply-To: <87a832cqzz.fsf@dusky.pond.sub.org>
+References: <cover.1501084908.git.alistair.francis@xilinx.com>
+	<08f16288223244deeccbdc6e4d2fced5d379504d.1501084908.git.alistair.francis@xilinx.com>
+	<87a832cqzz.fsf@dusky.pond.sub.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Mon, 14 Aug 2017 11:35:42 -0700
+Message-ID: <CAKmqyKNwwxZ=TxPn0HApPt=YRtdX=kKGRKduK_+pM6XM=p0M5g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 2/5] Convert remaining error_report() to
+ warn_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,78 +32,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Greg Kurz <groug@kaod.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On 08/14/2017 05:47 PM, Thomas Huth wrote:
-> On 14.08.2017 17:33, Cornelia Huck wrote:
->> On Mon, 14 Aug 2017 17:34:15 +0300
->> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Mon, Aug 14, 2017 at 4:45 AM, Markus Armbruster <armbru@redhat.com> wrote:
+> Alistair Francis <alistair.francis@xilinx.com> writes:
+>
+>> In a previous patch (3dc6f8693694a649a9c83f1e2746565b47683923) we
+>> converted uses of error_report("warning:"... to use warn_report()
+>> instead. This was to help standardise on a single method of printing
+>> warnings to the user.
 >>
->>> Speed up tests on host systems with kvm support.
->>> In particular, this fixes tests with --disable-tcg.
-> [...]
->>> diff --git a/tests/pnv-xscom-test.c b/tests/pnv-xscom-test.c
->>> index 5adc3fd..7be396f 100644
->>> --- a/tests/pnv-xscom-test.c
->>> +++ b/tests/pnv-xscom-test.c
->>> @@ -84,7 +84,7 @@ static void test_cfam_id(const void *data)
->>>      char *args;
->>>      const PnvChip *chip =3D data;
->>> =20
->>> -    args =3D g_strdup_printf("-M powernv,accel=3Dtcg -cpu %s", chip-=
->cpu_model);
->>> +    args =3D g_strdup_printf("-M powernv,accel=3Dkvm:tcg -cpu %s", c=
-hip->cpu_model);
->>> =20
->>>      qtest_start(args);
->>>      test_xscom_cfam_id(chip);
->>> @@ -112,7 +112,7 @@ static void test_core(const void *data)
->>>      char *args;
->>>      const PnvChip *chip =3D data;
->>> =20
->>> -    args =3D g_strdup_printf("-M powernv,accel=3Dtcg -cpu %s", chip-=
->cpu_model);
->>> +    args =3D g_strdup_printf("-M powernv,accel=3Dkvm:tcg -cpu %s", c=
-hip->cpu_model);
->>> =20
->>>      qtest_start(args);
->>>      test_xscom_core(chip);
+>> There appears to have been some cases that slipped through in patch sets
+>> applied around the same time, this patch catches the few remaining
+>> cases.
 >>
->> These seem to test a specified cpu model explicitly, so I'm not sure
->> how well this will work with kvm.
->=20
-> AFAIK the powernv machine does not work with KVM yet (C=C3=A9dric, can =
-you
-> confirm?), so you better drop the changes to this file.
-
-No. the powernv machine does not work with KVM.
-
-C.
-
->>> diff --git a/tests/prom-env-test.c b/tests/prom-env-test.c
->>> index eac207b..0a10f06 100644
->>> --- a/tests/prom-env-test.c
->>> +++ b/tests/prom-env-test.c
->>> @@ -50,7 +50,7 @@ static void test_machine(const void *machine)
->>>      /* The pseries firmware boots much faster without the default de=
-vices */
->>>      extra_args =3D strcmp(machine, "pseries") =3D=3D 0 ? "-nodefault=
-s" : "";
->>> =20
->>> -    args =3D g_strdup_printf("-M %s,accel=3Dtcg %s -prom-env 'use-nv=
-ramrc?=3Dtrue' "
->>> +    args =3D g_strdup_printf("-M %s,accel=3Dkvm:tcg %s -prom-env 'us=
-e-nvramrc?=3Dtrue' "
->>>                             "-prom-env 'nvramrc=3D%x %x l!' ",
->>>                             (const char *)machine, extra_args, MAGIC,=
- ADDRESS);
+>> All of the warnings were changed using this command:
+>>   find ./* -type f -exec sed -i \
+>>     's|error_report(".*warning[,:] |warn_report("|Ig' {} +
 >>
->> The header explicitly states that this is supposed to test tcg mode.
->=20
-> This change should be OK here. But it is currently not necessary yet:
-> The test only runs on SPARC and PPC machines, and both do not support
-> the --disable-tcg switch yet.
->=20
->  Thomas
->=20
+>> Indentation fixed up manually afterwards.
+>>
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> Cc: Kevin Wolf <kwolf@redhat.com>
+>> Cc: Max Reitz <mreitz@redhat.com>
+>> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+>> Cc: Cornelia Huck <cohuck@redhat.com>
+>> Cc: Alexander Graf <agraf@suse.de>
+>> Cc: Richard Henderson <rth@twiddle.net>
+>> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+>> ---
+>>
+>>  block/qcow2.c      | 10 +++++-----
+>>  target/s390x/kvm.c |  4 ++--
+>>  trace/control.c    |  4 ++--
+>>  3 files changed, 9 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/block/qcow2.c b/block/qcow2.c
+>> index 90efa4477b..e6c6be0822 100644
+>> --- a/block/qcow2.c
+>> +++ b/block/qcow2.c
+>> @@ -302,11 +302,11 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
+>>              }
+>>
+>>              if (!(s->autoclear_features & QCOW2_AUTOCLEAR_BITMAPS)) {
+>> -                error_report("WARNING: a program lacking bitmap support "
+>> -                             "modified this file, so all bitmaps are now "
+>> -                             "considered inconsistent. Some clusters may be "
+>> -                             "leaked, run 'qemu-img check -r' on the image "
+>> -                             "file to fix.");
+>> +                warn_report("a program lacking bitmap support "
+>> +                            "modified this file, so all bitmaps are now "
+>> +                            "considered inconsistent. Some clusters may be "
+>> +                            "leaked, run 'qemu-img check -r' on the image "
+>> +                            "file to fix.");
+>
+> This message is awfully long.  What about splitting it while we're there:
+>
+>                    warn_report("a program lacking bitmap support "
+>                                "modified this file, so all bitmaps are now "
+>                                "considered inconsistent");
+>                    error_printf("Some clusters may be "leaked, "
+>                                 "run 'qemu-img check -r' on the image "
+>                                 "file to fix.");
+>
+>>                  if (need_update_header != NULL) {
+>>                      /* Updating is needed to drop invalid bitmap extension. */
+>>                      *need_update_header = true;
+>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+>> index c4c5791d27..1084923adb 100644
+>> --- a/target/s390x/kvm.c
+>> +++ b/target/s390x/kvm.c
+>> @@ -222,8 +222,8 @@ static void kvm_s390_enable_cmma(void)
+>>      };
+>>
+>>      if (mem_path) {
+>> -        error_report("Warning: CMM will not be enabled because it is not "
+>> -                     "compatible to hugetlbfs.");
+>> +        warn_report("CMM will not be enabled because it is not "
+>> +                    "compatible to hugetlbfs.");
+>
+> Not a native speaker, but here goes anyway: "compatible with".
+>
+>>          return;
+>>      }
+>>      rc = kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
+>> diff --git a/trace/control.c b/trace/control.c
+>> index 82d8989c4d..2769934bec 100644
+>> --- a/trace/control.c
+>> +++ b/trace/control.c
+>> @@ -72,8 +72,8 @@ void trace_event_register_group(TraceEvent **events)
+>>          if (likely(next_vcpu_id < CPU_TRACE_DSTATE_MAX_EVENTS)) {
+>>              events[i]->vcpu_id = next_vcpu_id++;
+>>          } else {
+>> -            error_report("WARNING: too many vcpu trace events; dropping '%s'",
+>> -                         events[i]->name);
+>> +            warn_report("too many vcpu trace events; dropping '%s'",
+>> +                        events[i]->name);
+>>          }
+>>      }
+>>      event_groups = g_renew(TraceEventGroup, event_groups, nevent_groups + 1);
+>
+> The nits I picked predate your patch, so:
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
+Thanks, I fixed up the changes you mentioned as well.
+
+Thanks,
+Alistair
