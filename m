@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dh71u-0005sm-GR
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 00:31:08 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dh78l-0001pu-3F
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 00:38:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dh71o-0001TZ-MB
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 00:31:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36228)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dh71o-0001T9-GD
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 00:31:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dh71l-0006m1-Vy
-	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 04:30:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9E0042E8197
-	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 04:30:56 +0000 (UTC)
+	(envelope-from <dgibson@ozlabs.org>) id 1dh78j-0006Mc-Uc
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 00:38:11 -0400
+Date: Mon, 14 Aug 2017 14:36:53 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170814043653.GB3452@umbus.fritz.box>
+References: <cover.1502643878.git.balaton@eik.bme.hu>
+	<ef250ee340d5ab61446e2888c6205988d493aa6a.1502643878.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Aug 2017 04:17:44 -0000
-From: Launchpad Bug Tracker <1093691@bugs.launchpad.net>
-Reply-To: Bug 1093691 <1093691@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20121225211212.2307.81304.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150268426513.12227.16800055006913892474.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1093691] Re: QEMU build fails on OpenBSD/mips64
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="gatW/ieO32f1wygP"
+Content-Disposition: inline
+In-Reply-To: <ef250ee340d5ab61446e2888c6205988d493aa6a.1502643878.git.balaton@eik.bme.hu>
+Subject: Re: [Qemu-devel] [RFC PATCH 04/12] ehci: Add ppc4xx-ehci for the
+ USB 2.0 controller in embedded PPC SoCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,90 +25,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
 
-[Expired for QEMU because there has been no activity for 60 days.]
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+--gatW/ieO32f1wygP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On Sun, Aug 13, 2017 at 07:04:38PM +0200, BALATON Zoltan wrote:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1093691
+This needs a commit message.  AFAICT the new device is basically a
+sysbus EHCI with some altered initial values.  Why do those values
+need to be different?  Where do the new values come from?
 
-Title:
-  QEMU build fails on OpenBSD/mips64
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> ---
+>  hw/usb/hcd-ehci-sysbus.c | 25 +++++++++++++++++++++++++
+>  hw/usb/hcd-ehci.h        |  1 +
+>  2 files changed, 26 insertions(+)
+>=20
+> diff --git a/hw/usb/hcd-ehci-sysbus.c b/hw/usb/hcd-ehci-sysbus.c
+> index 6c20604..3b83beb 100644
+> --- a/hw/usb/hcd-ehci-sysbus.c
+> +++ b/hw/usb/hcd-ehci-sysbus.c
+> @@ -142,6 +142,30 @@ static const TypeInfo ehci_tegra2_type_info =3D {
+>      .class_init    =3D ehci_tegra2_class_init,
+>  };
+> =20
+> +static void ehci_ppc4xx_init(Object *o)
+> +{
+> +    EHCISysBusState *s =3D SYS_BUS_EHCI(o);
+> +
+> +    s->ehci.companion_enable =3D true;
+> +}
+> +
+> +static void ehci_ppc4xx_class_init(ObjectClass *oc, void *data)
+> +{
+> +    SysBusEHCIClass *sec =3D SYS_BUS_EHCI_CLASS(oc);
+> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
+> +
+> +    sec->capsbase =3D 0x0;
+> +    sec->opregbase =3D 0x10;
+> +    set_bit(DEVICE_CATEGORY_USB, dc->categories);
+> +}
+> +
+> +static const TypeInfo ehci_ppc4xx_type_info =3D {
+> +    .name          =3D TYPE_PPC4xx_EHCI,
+> +    .parent        =3D TYPE_SYS_BUS_EHCI,
+> +    .class_init    =3D ehci_ppc4xx_class_init,
+> +    .instance_init =3D ehci_ppc4xx_init,
+> +};
+> +
+>  /*
+>   * Faraday FUSBH200 USB 2.0 EHCI
+>   */
+> @@ -224,6 +248,7 @@ static void ehci_sysbus_register_types(void)
+>      type_register_static(&ehci_xlnx_type_info);
+>      type_register_static(&ehci_exynos4210_type_info);
+>      type_register_static(&ehci_tegra2_type_info);
+> +    type_register_static(&ehci_ppc4xx_type_info);
+>      type_register_static(&ehci_fusbh200_type_info);
+>  }
+> =20
+> diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
+> index 821f1de..0bc364b 100644
+> --- a/hw/usb/hcd-ehci.h
+> +++ b/hw/usb/hcd-ehci.h
+> @@ -344,6 +344,7 @@ typedef struct EHCIPCIState {
+>  #define TYPE_SYS_BUS_EHCI "sysbus-ehci-usb"
+>  #define TYPE_EXYNOS4210_EHCI "exynos4210-ehci-usb"
+>  #define TYPE_TEGRA2_EHCI "tegra2-ehci-usb"
+> +#define TYPE_PPC4xx_EHCI "ppc4xx-ehci-usb"
+>  #define TYPE_FUSBH200_EHCI "fusbh200-ehci-usb"
+> =20
+>  #define SYS_BUS_EHCI(obj) \
 
-Status in QEMU:
-  Expired
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Bug description:
-  Building QEMU 1.2.1 on OpenBSD/mips64 fails as follows although I
-  believe QEMU was also broken with 1.1.x as well..
+--gatW/ieO32f1wygP
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  cc -I/usr/obj/ports/qemu-1.2.1/qemu-1.2.1/slirp -I. -I/usr/obj/ports/qemu=
--1.2.1/qemu-1.2.1 -I/usr/obj/ports/qemu-1.2.1/qemu-1.2.1/fpu -I/usr/obj/por=
-ts/qemu-1.2.1/qemu-1.2.1/tcg -
-  I/usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/mips  -D_GNU_SOURCE -D_FILE_OFF=
-SET_BITS=3D64 -D_LARGEFILE_SOURCE -Wstrict-prototypes -Wredundant-decls -Wa=
-ll -Wundef -Wwrite-strings -Wmis
-  sing-prototypes -fno-strict-aliasing -I/usr/local/include -I/usr/X11R6/in=
-clude -Wno-redundant-decls -DTIME_MAX=3DINT_MAX  -Wendif-labels -Wmissing-i=
-nclude-dirs -Wnested-externs -Wf
-  ormat-security -Wformat-y2k -Winit-self -Wold-style-definition -I/usr/loc=
-al/include/libpng -DHAS_AUDIO -DHAS_AUDIO_CHOICE  -DTARGET_PHYS_ADDR_BITS=
-=3D64 -I.. -I/usr/obj/ports/qemu-1
-  .2.1/qemu-1.2.1/target-i386 -DNEED_CPU_H -I/usr/obj/ports/qemu-1.2.1/qemu=
--1.2.1/include    -I/usr/local/include/libpng -pthread -I/usr/local/include=
-/glib-2.0 -I/usr/local/lib/gli
-  b-2.0/include -I/usr/local/include -MMD -MP -MT tcg/tcg.o -MF tcg/tcg.d -=
-O2 -pipe -c -o tcg/tcg.o /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg.c
-  In file included from /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg.c:50:
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h: In function 'tcg_gen_d=
-iv_i64':
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h:1229: error: 'TCG_TARGE=
-T_HAS_div_i64' undeclared (first use in this function)
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h:1229: error: (Each unde=
-clared identifier is reported only once
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h:1229: error: for each f=
-unction it appears in.)
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h:1231: error: 'TCG_TARGE=
-T_HAS_div2_i64' undeclared (first use in this function)
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h: In function 'tcg_gen_r=
-em_i64':
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h:1248: error: 'TCG_TARGE=
-T_HAS_div_i64' undeclared (first use in this function)
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h:1250: error: 'TCG_TARGE=
-T_HAS_div2_i64' undeclared (first use in this function)
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h: In function 'tcg_gen_d=
-ivu_i64':
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h:1267: error: 'TCG_TARGE=
-T_HAS_div_i64' undeclared (first use in this function)                     =
-                              =
+-----BEGIN PGP SIGNATURE-----
 
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h:1269: error: 'TCG_TARGE=
-T_HAS_div2_i64' undeclared (first use in this function)
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h: In function 'tcg_gen_r=
-emu_i64':
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h:1286: error: 'TCG_TARGE=
-T_HAS_div_i64' undeclared (first use in this function)                     =
-                              =
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmRKOMACgkQbDjKyiDZ
+s5JlSRAAv3Y0UdrzXmhPEWe4wWE27Loz0mjOfWulW6Xl5UsKZLyyqF1GHoGQkmuD
+lnNcZ8fO7jB86q7k0bta7wCxekbSjdxDTHNNcHbA6S040sx4nwBUrv1ONO7uAWWr
+5VUcDNI5evnlaqeCEt/fdw8mzcuuzcPeW21XRkDi/BlwtThQ94oOLY2tydeA8WyF
+pwm9/qHGe5A9aQYCQBRcAUkG7Ablwd8kogf2U2CFaobxunTYozYmR8/1jI6TlEOD
+Ox+PkSXnNBc5hcIJ4qhsNFkFgc3VDXnDmOQRfYnKS4idpFxhVGSqeSOLmQ3YQppe
+exB4YeyzMHzJ+qRg83Wo0aMHHgoOvX0QqEMheQtmhCTtWvfgOgle94vZTZqdmU5j
+p1/XyX8d+EUkwKGIYiM0BDgjmEp0TVVtLJGYbfXMjaLq6cI33OMEuYHwhmZeT4mH
+gPF6dRvdrCnYVrLeIAayc3fWOQmENGWOZv14GKBS0/y7nNo5uaFAuJfmzDdBP8uv
+jqXT3HOtPIWsTydl/lC4/RSsWq/M7Trl5Hp21wHucUAHXhSkE5Rv+4viNsaCxHvf
+i1apHlGU//xEMrNONCHaTxsEg4KHy5cDrea+ZAKCz4K/bZ2L5ZBO8+fpDWKNtdr2
+Ryli0chqswml7kRVfe9oswQS+JZuXXTFWoE++rY5/1w8OPxzEPc=
+=dSZs
+-----END PGP SIGNATURE-----
 
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h:1288: error: 'TCG_TARGE=
-T_HAS_div2_i64' undeclared (first use in this function)
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h: In function 'tcg_gen_e=
-xt8s_i64':
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h:1526: error: 'TCG_TARGE=
-T_HAS_ext8s_i64' undeclared (first use in this function)
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h: In function 'tcg_gen_e=
-xt16s_i64':
-  /usr/obj/ports/qemu-1.2.1/qemu-1.2.1/tcg/tcg-op.h:1536: error: 'TCG_TARGE=
-T_HAS_ext16s_i64' undeclared (first use in this function)
-  ...
-
-  Attached is the full build log.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1093691/+subscriptions
+--gatW/ieO32f1wygP--
