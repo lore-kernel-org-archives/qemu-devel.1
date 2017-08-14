@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dhF4w-00042u-Du
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 09:06:47 -0400
+	(envelope-from <wei.yang@ucloud.cn>) id 1dhBXW-0001cn-0x
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 05:20:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dhF4t-0006C6-61
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 09:06:46 -0400
-Resent-Message-Id: <E1dhF4t-0006C6-61@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21405)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dhF4s-0006Bn-TR
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 09:06:43 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150271598787.78.13170679825477738096@dd743fd916bd>
-In-Reply-To: <20170814124927.30134-1-berrange@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 14 Aug 2017 06:06:28 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 00/12] Convert over to use keycodemapdb
+	(envelope-from <wei.yang@ucloud.cn>) id 1dhBXR-0005JG-Vd
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 05:20:02 -0400
+Received: from m97136.mail.qiye.163.com ([220.181.97.136]:30230)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wei.yang@ucloud.cn>) id 1dhBXQ-0005HC-Oq
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 05:19:57 -0400
+From: wei.yang@ucloud.cn
+Date: Mon, 14 Aug 2017 16:48:38 +0800
+Message-Id: <20170814084838.12233-1-wei.yang@ucloud.cn>
+Subject: [Qemu-devel] [PATCH] bios-tables-test: delete a assert about block
+ name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +22,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: berrange@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com
+To: mst@redhat.com, imammedo@redhat.com
+Cc: qemu-devel@nongnu.org, wei.yang@ucloud.cn
 
-SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgYXV0b21hdGljIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5k
-IHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZl
-IGRvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHku
-CgpNZXNzYWdlLWlkOiAyMDE3MDgxNDEyNDkyNy4zMDEzNC0xLWJlcnJhbmdlQHJlZGhhdC5jb20K
-U3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwMC8xMl0gQ29udmVydCBvdmVyIHRvIHVz
-ZSBrZXljb2RlbWFwZGIKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
-L2Jpbi9iYXNoCnNldCAtZQpnaXQgc3VibW9kdWxlIHVwZGF0ZSAtLWluaXQgZHRjCiMgTGV0IGRv
-Y2tlciB0ZXN0cyBkdW1wIGVudmlyb25tZW50IGluZm8KZXhwb3J0IFNIT1dfRU5WPTEKZXhwb3J0
-IEo9OAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNgp0aW1lIG1ha2UgZG9ja2Vy
-LXRlc3QtYnVpbGRAbWluLWdsaWIKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZlZG9yYQo9
-PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
-ZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3Qv
-cWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTcwODE0MTI0OTI3LjMw
-MTM0LTEtYmVycmFuZ2VAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwODE0MTI0OTI3LjMwMTM0
-LTEtYmVycmFuZ2VAcmVkaGF0LmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3
-L2NvdmVyLjE1MDEyODAwMzUuZ2l0LmFsaXN0YWlyLmZyYW5jaXNAeGlsaW54LmNvbSAtPiBwYXRj
-aGV3L2NvdmVyLjE1MDEyODAwMzUuZ2l0LmFsaXN0YWlyLmZyYW5jaXNAeGlsaW54LmNvbQpTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjYzOTY5MzRhMGQgZGlzcGxheTogY29udmVydCBY
-ZW5JbnB1dCBrZXlib2FyZCB0byBrZXljb2RlbWFwZGIKYzc2ODZjMjBmMyB1aTogY29udmVydCBH
-VEsgYW5kIFNETDEgZnJvbnRlbmRzIHRvIGtleWNvZGVtYXBkYgpkNGRiZWUzMmMzIHVpOiBjb252
-ZXJ0IHRoZSBTREwyIGZyb250ZW5kIHRvIGtleWNvZGVtYXBkYgplY2Y0YzIyNmY2IHVpOiBjb252
-ZXJ0IGNvY29hIGZyb250ZW5kIHRvIGtleWNvZGVtYXBkYgowMjFlMDRiYmFmIGNoYXI6IGNvbnZl
-cnQgdGhlIGVzY2MgZGV2aWNlIHRvIGtleWNvZGVtYXBkYgo4Y2YwZDNkYTFiIGlucHV0OiBjb252
-ZXJ0IHRoZSBhZGIgZGV2aWNlIHRvIGtleWNvZGVtYXBkYgpkOGY4ZjM3NjJiIGlucHV0OiBjb252
-ZXJ0IHBzMiBkZXZpY2UgdG8ga2V5Y29kZW1hcGRiCjNhYWFlZmVlNDggaW5wdXQ6IGNvbnZlcnQg
-dmlydGlvLWlucHV0LWhpZCBkZXZpY2UgdG8ga2V5Y29kZW1hcGRiCmUwMzY4Y2ExOGEgdWk6IGRv
-bid0IGV4cG9ydCBxZW11X2lucHV0X2V2ZW50X25ld19rZXkKMzQ3ZDY0NzMxZCB1aTogY29udmVy
-dCBrZXkgZXZlbnRzIHRvIFFLZXlDb2RlcyBpbW1lZGlhdGVseQoxYjhmZGY0YmNhIHVpOiBjb252
-ZXJ0IGNvbW1vbiBpbnB1dCBjb2RlIHRvIGtleWNvZGVtYXBkYgo2OGFkZmEwZWJiIHVpOiBhZGQg
-a2V5Y29kZW1hcGRiIHJlcG9zaXRvcnkgYXMgYSBHSVQgc3VibW9kdWxlCgo9PT0gT1VUUFVUIEJF
-R0lOID09PQpTdWJtb2R1bGUgJ2R0YycgKGdpdDovL2dpdC5xZW11LXByb2plY3Qub3JnL2R0Yy5n
-aXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2R0YycKQ2xvbmluZyBpbnRvICcvdmFyL3RtcC9wYXRj
-aGV3LXRlc3Rlci10bXAtem9lZDY0YXMvc3JjL2R0YycuLi4KU3VibW9kdWxlIHBhdGggJ2R0Yyc6
-IGNoZWNrZWQgb3V0ICc1NThjZDgxYmRkNDMyNzY5YjU5YmZmMDEyNDBjNDRmODJjZmIxYTlkJwog
-IEJVSUxEICAgY2VudG9zNgptYWtlWzFdOiBFbnRlcmluZyBkaXJlY3RvcnkgJy92YXIvdG1wL3Bh
-dGNoZXctdGVzdGVyLXRtcC16b2VkNjRhcy9zcmMnCiAgQVJDSElWRSBxZW11LnRnegogIEFSQ0hJ
-VkUgZHRjLnRnegogIENPUFkgICAgUlVOTkVSCiAgICBSVU4gdGVzdC1xdWljayBpbiBxZW11OmNl
-bnRvczYgCnRhciAoY2hpbGQpOiAvdmFyL3RtcC9xZW11L2tleWNvZGVtYXBkYi50Z3o6IENhbm5v
-dCBvcGVuOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0b3J5CnRhciAoY2hpbGQpOiBFcnJvciBpcyBu
-b3QgcmVjb3ZlcmFibGU6IGV4aXRpbmcgbm93CnRhcjogQ2hpbGQgcmV0dXJuZWQgc3RhdHVzIDIK
-dGFyOiBFcnJvciBpcyBub3QgcmVjb3ZlcmFibGU6IGV4aXRpbmcgbm93ClRyYWNlYmFjayAobW9z
-dCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBs
-aW5lIDM4MiwgaW4gPG1vZHVsZT4KICAgIHN5cy5leGl0KG1haW4oKSkKICBGaWxlICIuL3Rlc3Rz
-L2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDM3OSwgaW4gbWFpbgogICAgcmV0dXJuIGFyZ3MuY21k
-b2JqLnJ1bihhcmdzLCBhcmd2KQogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxp
-bmUgMjM3LCBpbiBydW4KICAgIHJldHVybiBEb2NrZXIoKS5ydW4oYXJndiwgYXJncy5rZWVwLCBx
-dWlldD1hcmdzLnF1aWV0KQogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUg
-MjA1LCBpbiBydW4KICAgIHF1aWV0PXF1aWV0KQogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tl
-ci5weSIsIGxpbmUgMTIzLCBpbiBfZG9fY2hlY2sKICAgIHJldHVybiBzdWJwcm9jZXNzLmNoZWNr
-X2NhbGwoc2VsZi5fY29tbWFuZCArIGNtZCwgKiprd2FyZ3MpCiAgRmlsZSAiL3Vzci9saWI2NC9w
-eXRob24yLjcvc3VicHJvY2Vzcy5weSIsIGxpbmUgMTg2LCBpbiBjaGVja19jYWxsCiAgICByYWlz
-ZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nl
-c3NFcnJvcjogQ29tbWFuZCAnWydkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUu
-aW5zdGFuY2UudXVpZD01MDMwMzYwMjgwZjExMWU3ODM0OTUyNTQwMDY5YzgzMCcsICctdScsICcw
-JywgJy10JywgJy0tcm0nLCAnLS1uZXQ9bm9uZScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUn
-LCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9OCcsICctZScs
-ICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1w
-L2NjYWNoZScsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtem9lZDY0YXMvc3Jj
-L2RvY2tlci1zcmMuMjAxNy0wOC0xNC0wOS4wNS41My41NzA5Oi92YXIvdG1wL3FlbXU6eixybycs
-ICctdicsICcvcm9vdC8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6
-JywgJ3FlbXU6Y2VudG9zNicsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJl
-dHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIKbWFrZVsxXTogKioqIFt0ZXN0cy9kb2NrZXIv
-TWFrZWZpbGUuaW5jbHVkZToxNDA6IGRvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmlu
-ZyBkaXJlY3RvcnkgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC16b2VkNjRhcy9zcmMnCm1h
-a2U6ICoqKiBbdGVzdHMvZG9ja2VyL01ha2VmaWxlLmluY2x1ZGU6MTY5OiBkb2NrZXItcnVuLXRl
-c3QtcXVpY2tAY2VudG9zNl0gRXJyb3IgMgoKcmVhbAkwbTM1LjEzMHMKdXNlcgkwbTUuNDA3cwpz
-eXMJMG0xLjUwMHMKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMgoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQGZyZWVsaXN0cy5vcmc=
+From: Wei Yang <wei.yang@ucloud.cn>
+
+The assert would be touched when the version of acpica is greater than or
+equal to 20160318. its reason is that "Disasembler: Update a couple
+output items(commit id: 1ecbb3d)" is introduced by Robert, the patch
+emits the AML filename as a zero-length string, and allows the compiler
+to create the name later.
+
+Signed-off-by: Yang, Wei <wei.yang@ucloud.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
+CC: Igor Mammedov <imammedo@redhat.com>
+CC: qemu-devel@nongnu.org
+---
+ tests/bios-tables-test.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 88dbf97853..d2ab073848 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -350,7 +350,6 @@ static GString *normalize_asl(gchar *asl_code)
+     /* strip def block name (it has file path in it) */
+     if (g_str_has_prefix(asl->str, DEF_BLOCK)) {
+         block_name = g_strstr_len(asl->str, asl->len, BLOCK_NAME_END);
+-        g_assert(block_name);
+         asl = g_string_erase(asl, 0,
+                              block_name + sizeof(BLOCK_NAME_END) - asl->str);
+     }
+-- 
+2.11.0
