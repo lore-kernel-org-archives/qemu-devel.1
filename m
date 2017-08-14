@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dhNNS-0001ei-Fl
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 17:58:28 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dhNNb-0001nW-Dd
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 17:58:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dhNNP-0002M4-BC
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 17:58:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37624)
+	(envelope-from <ehabkost@redhat.com>) id 1dhNNX-0002Ql-Bs
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 17:58:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53718)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dhNNP-0002LT-1q
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 17:58:23 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dhNNW-0002Q3-VX
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 17:58:31 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E16C7F3FBD
-	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 21:58:21 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DF1E77003E
+	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 21:58:29 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 14 Aug 2017 18:57:38 -0300
-Message-Id: <20170814215748.5158-4-ehabkost@redhat.com>
+Date: Mon, 14 Aug 2017 18:57:39 -0300
+Message-Id: <20170814215748.5158-5-ehabkost@redhat.com>
 In-Reply-To: <20170814215748.5158-1-ehabkost@redhat.com>
 References: <20170814215748.5158-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [RFC v4 03/13] qdev: Add BusClass::device_type field
+Subject: [Qemu-devel] [RFC v4 04/13] qdev: Slot info helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,418 +31,1201 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Laine Stump <laine@redhat.com>
 
-The field will be useful when building device slot information
-for buses.
+Helper functions to deal with slot info data structures, and
+automatically merge similar device slots
 
-TODO: Confirm if all bus types were handled by the patch.
+There's room for improvement on the slot merging algorithm, but
+this version should be enough to demonstrate how bus
+implementations can benefit from it.
+
+TODO: write API documentation, make object ownership/reference
+rules clear, clean up code.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/qdev-core.h        |  3 +++
- hw/audio/intel-hda.c          |  7 +++++++
- hw/block/fdc.c                | 15 +++++++++++----
- hw/char/virtio-serial-bus.c   |  1 +
- hw/core/sysbus.c              |  1 +
- hw/i2c/core.c                 |  7 +++++++
- hw/ide/qdev.c                 |  1 +
- hw/input/adb.c                |  7 +++++++
- hw/ipack/ipack.c              |  7 +++++++
- hw/isa/isa-bus.c              |  1 +
- hw/misc/auxbus.c              |  1 +
- hw/pci/pci.c                  |  1 +
- hw/ppc/spapr_vio.c            |  1 +
- hw/s390x/css-bridge.c         |  2 ++
- hw/s390x/event-facility.c     |  1 +
- hw/s390x/s390-pci-bus.c       |  7 +++++++
- hw/scsi/scsi-bus.c            |  1 +
- hw/sd/core.c                  |  7 +++++++
- hw/ssi/ssi.c                  |  7 +++++++
- hw/usb/bus.c                  |  1 +
- hw/usb/dev-smartcard-reader.c |  7 +++++++
- hw/virtio/virtio-bus.c        |  1 +
- 22 files changed, 83 insertions(+), 4 deletions(-)
+ include/hw/qdev-slotinfo.h |  85 +++++++
+ hw/core/slotinfo.c         | 610 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/test-slotinfo.c      | 398 +++++++++++++++++++++++++++++
+ hw/core/Makefile.objs      |   2 +
+ tests/Makefile.include     |  14 +-
+ 5 files changed, 1103 insertions(+), 6 deletions(-)
+ create mode 100644 include/hw/qdev-slotinfo.h
+ create mode 100644 hw/core/slotinfo.c
+ create mode 100644 tests/test-slotinfo.c
 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 0111350..8aa1455 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -198,6 +198,9 @@ struct BusClass {
-     int max_dev;
-     /* number of automatically allocated bus ids (e.g. ide.0) */
-     int automatic_ids;
+diff --git a/include/hw/qdev-slotinfo.h b/include/hw/qdev-slotinfo.h
+new file mode 100644
+index 0000000..6d8fb54
+--- /dev/null
++++ b/include/hw/qdev-slotinfo.h
+@@ -0,0 +1,85 @@
++#ifndef QDEV_SLOTINFO_H
++#define QDEV_SLOTINFO_H
 +
-+    /* Device type accepted by bus */
-+    const char *device_type;
- };
- 
- typedef struct BusChild {
-diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
-index 06acc98..13b6904 100644
---- a/hw/audio/intel-hda.c
-+++ b/hw/audio/intel-hda.c
-@@ -36,9 +36,16 @@ static Property hda_props[] = {
-     DEFINE_PROP_END_OF_LIST()
- };
- 
-+static void hda_codec_bus_class_init(ObjectClass *oc, void *opaque)
++#include "qapi/qmp/qobject.h"
++#include "qapi/qmp/qstring.h"
++
++/**
++ * valuelist_contains:
++ *
++ * Returns true if the value list represented by @values
++ * contains @v.
++ *
++ * @values follows the format documented at SlotOption.values
++ * in the QAPI schema.
++ */
++bool valuelist_contains(QObject *values, QObject *v);
++
++/**
++ * valuelist_extend:
++ *
++ * Extend a value list with elements from another value list.
++ *
++ * Ownership of 'new' is transfered to the function.
++ */
++void valuelist_extend(QObject **valuelist, QObject *new);
++
++/*
++ * TODO: Use more efficient data structurs (instead of
++ * DeviceSlotInfoList and SlotOptionList) when building the list
++ * and combining items.
++ */
++
++/**
++ * slot_options_can_be_combined:
++ *
++ * Check if two SlotOptionLists can be combined in one.
++ *
++ * Two slot option lists can be combined if all options have exactly
++ * the same value except (at most) one.
++ *
++ * Returns true if the option lists can be combined.
++ *
++ * If return value is true, *@opt_name is set to the only
++ * mismatching option name.  If all options match, *@opt_name is
++ * set to NULL.
++ */
++bool slot_options_can_be_combined(SlotOptionList *a, SlotOptionList *b,
++                                  const char **opt_name);
++
++/*TODO: doc */
++bool slots_can_be_combined(DeviceSlotInfo *a, DeviceSlotInfo *b,
++	                       const char **opt_name);
++
++/*TODO: doc */
++void slots_combine(DeviceSlotInfo *a, DeviceSlotInfo *b, const char *opt_name);
++
++/*TODO: doc */
++bool slots_try_combine(DeviceSlotInfo *a, DeviceSlotInfo *b);
++
++/*TODO: doc */
++void slot_list_add_slot(DeviceSlotInfoList **l, DeviceSlotInfo *slot);
++
++/*TODO: doc */
++DeviceSlotInfoList *slot_list_collapse(DeviceSlotInfoList *l);
++
++/*TODO: doc */
++void slot_add_opt(DeviceSlotInfo *slot, const char *option, QObject *values);
++
++#define slot_add_opt_str(slot, option, s) \
++    slot_add_opt(slot, option, QOBJECT(qstring_from_str(s)));
++
++#define slot_add_opt_int(slot, option, i) \
++    slot_add_opt(slot, option, QOBJECT(qnum_from_int(i)));
++
++SlotOption *slot_options_find_opt(SlotOptionList *opts, const char *option);
++
++static inline SlotOption *slot_find_opt(DeviceSlotInfo *slot, const char *option)
 +{
-+    BusClass *bc = BUS_CLASS(oc);
-+    bc->device_type = TYPE_HDA_CODEC_DEVICE;
++	return slot_options_find_opt(slot->opts, option);
 +}
 +
- static const TypeInfo hda_codec_bus_info = {
-     .name = TYPE_HDA_BUS,
-     .parent = TYPE_BUS,
-+    .class_init = hda_codec_bus_class_init,
-     .instance_size = sizeof(HDACodecBus),
- };
- 
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index 4011290..976500f 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -60,6 +60,10 @@
- #define TYPE_FLOPPY_BUS "floppy-bus"
- #define FLOPPY_BUS(obj) OBJECT_CHECK(FloppyBus, (obj), TYPE_FLOPPY_BUS)
- 
-+#define TYPE_FLOPPY_DRIVE "floppy"
-+#define FLOPPY_DRIVE(obj) \
-+     OBJECT_CHECK(FloppyDrive, (obj), TYPE_FLOPPY_DRIVE)
++/*TODO: doc */
++DeviceSlotInfo *make_slot(BusState *bus);
 +
- typedef struct FDCtrl FDCtrl;
- typedef struct FDrive FDrive;
- static FDrive *get_drv(FDCtrl *fdctrl, int unit);
-@@ -69,9 +73,16 @@ typedef struct FloppyBus {
-     FDCtrl *fdc;
- } FloppyBus;
- 
-+static void floppy_bus_class_init(ObjectClass *oc, void *opaque)
++#endif /* QDEV_SLOTINFO_H */
+diff --git a/hw/core/slotinfo.c b/hw/core/slotinfo.c
+new file mode 100644
+index 0000000..c03bda2
+--- /dev/null
++++ b/hw/core/slotinfo.c
+@@ -0,0 +1,610 @@
++#include "qemu/osdep.h"
++#include "hw/qdev-core.h"
++#include "hw/qdev-slotinfo.h"
++#include "qapi/qmp/qlist.h"
++#include "qapi/qmp/qstring.h"
++#include "qapi/qmp/qnum.h"
++#include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qjson.h"
++#include "qapi/util.h"
++#include "qapi/qobject-output-visitor.h"
++#include "qapi-visit.h"
++
++//#define DEBUG_QOBJECTS
++
++#ifdef DEBUG_QOBJECTS
++#define _DBG(args...) fprintf(stderr, args);
++
++#define DBG(args...) do { _DBG("%s: ", __FUNCTION__); \
++                          _DBG(args); \
++                     } while (0)
++#define QDBG(fmt, obj, args...) do { \
++        QString *js = qobject_to_json(obj); \
++        DBG(fmt ## args); \
++        _DBG(": %s\n", qstring_get_str(js)); \
++        QDECREF(js); \
++    } while (0)
++#else
++#define DBG(...) do { } while (0)
++#define QDBG(...) do { } while (0)
++#endif
++
++/* Ensure a value list is normalized to a list of values
++ *
++ * This does NOT normalize individual elements of the list to be
++ * in the [A] or [A, B] format.
++ *
++ * Returns a new reference to the normalized value.
++ */
++static QList *valuelist_normalize(QObject *values)
 +{
-+    BusClass *bc = BUS_CLASS(oc);
-+    bc->device_type = TYPE_FLOPPY_DRIVE;
++    if (qobject_type(values) == QTYPE_QLIST) {
++        qobject_incref(values);
++        return qobject_to_qlist(values);
++    } else {
++        QList *l = qlist_new();
++
++        qobject_incref(values);
++        qlist_append_obj(l, values);
++        return l;
++    }
 +}
 +
- static const TypeInfo floppy_bus_info = {
-     .name = TYPE_FLOPPY_BUS,
-     .parent = TYPE_BUS,
-+    .class_init = floppy_bus_class_init,
-     .instance_size = sizeof(FloppyBus),
- };
- 
-@@ -497,10 +508,6 @@ static const BlockDevOps fd_block_ops = {
- };
- 
- 
--#define TYPE_FLOPPY_DRIVE "floppy"
--#define FLOPPY_DRIVE(obj) \
--     OBJECT_CHECK(FloppyDrive, (obj), TYPE_FLOPPY_DRIVE)
--
- typedef struct FloppyDrive {
-     DeviceState     qdev;
-     uint32_t        unit;
-diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
-index f5bc173..28342af 100644
---- a/hw/char/virtio-serial-bus.c
-+++ b/hw/char/virtio-serial-bus.c
-@@ -837,6 +837,7 @@ static void virtser_bus_class_init(ObjectClass *klass, void *data)
- {
-     BusClass *k = BUS_CLASS(klass);
-     k->print_dev = virtser_bus_dev_print;
-+    k->device_type = TYPE_VIRTIO_SERIAL_PORT;
- }
- 
- static const TypeInfo virtser_bus_info = {
-diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-index 5d0887f..9259931 100644
---- a/hw/core/sysbus.c
-+++ b/hw/core/sysbus.c
-@@ -76,6 +76,7 @@ static void system_bus_class_init(ObjectClass *klass, void *data)
- 
-     k->print_dev = sysbus_dev_print;
-     k->get_fw_dev_path = sysbus_get_fw_dev_path;
-+    k->device_type = TYPE_SYS_BUS_DEVICE;
- }
- 
- static const TypeInfo system_bus_info = {
-diff --git a/hw/i2c/core.c b/hw/i2c/core.c
-index 2c1234c..fb5aaad 100644
---- a/hw/i2c/core.c
-+++ b/hw/i2c/core.c
-@@ -35,9 +35,16 @@ static Property i2c_props[] = {
- #define TYPE_I2C_BUS "i2c-bus"
- #define I2C_BUS(obj) OBJECT_CHECK(I2CBus, (obj), TYPE_I2C_BUS)
- 
-+static void i2c_bus_class_init(ObjectClass *oc, void *opaque)
++/* Simplify value list, if possible
++ *
++ * Onwership of @values is transfered to the function, and a
++ * new object is returned.
++ */
++static QObject *valuelist_simplify(QList *values)
 +{
-+    BusClass *bc = BUS_CLASS(oc);
-+    bc->device_type = TYPE_I2C_SLAVE;
++    if (qlist_size(values) == 1) {
++        QObject *o = qlist_entry_obj(qlist_first(values));
++        QType t = qobject_type(o);
++        if (t == QTYPE_QNULL ||
++            t == QTYPE_QNUM ||
++            t == QTYPE_QSTRING ||
++            t == QTYPE_QBOOL) {
++            qobject_incref(o);
++            QDECREF(values);
++            return o;
++        }
++    }
++
++    return QOBJECT(values);
 +}
 +
- static const TypeInfo i2c_bus_info = {
-     .name = TYPE_I2C_BUS,
-     .parent = TYPE_BUS,
-+    .class_init = i2c_bus_class_init,
-     .instance_size = sizeof(I2CBus),
- };
- 
-diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-index cc2f5bd..f17da1f 100644
---- a/hw/ide/qdev.c
-+++ b/hw/ide/qdev.c
-@@ -44,6 +44,7 @@ static void ide_bus_class_init(ObjectClass *klass, void *data)
- 
-     k->get_fw_dev_path = idebus_get_fw_dev_path;
-     k->unrealize = idebus_unrealize;
-+    k->device_type = TYPE_IDE_DEVICE;
- }
- 
- static void idebus_unrealize(BusState *bus, Error **errp)
-diff --git a/hw/input/adb.c b/hw/input/adb.c
-index fcca3a8..2fc292c 100644
---- a/hw/input/adb.c
-+++ b/hw/input/adb.c
-@@ -121,9 +121,16 @@ int adb_poll(ADBBusState *s, uint8_t *obuf, uint16_t poll_mask)
-     return olen;
- }
- 
-+static void adb_bus_class_init(ObjectClass *oc, void *opaque)
++/* Check if a given single-element value can be represented as a [A, B] range */
++static bool value_can_be_range(QObject *v)
 +{
-+    BusClass *bc = BUS_CLASS(oc);
-+    bc->device_type = TYPE_ADB_DEVICE;
++    QType t = qobject_type(v);
++    return (t == QTYPE_QNUM || t == QTYPE_QSTRING);
 +}
 +
- static const TypeInfo adb_bus_type_info = {
-     .name = TYPE_ADB_BUS,
-     .parent = TYPE_BUS,
-+    .class_init = adb_bus_class_init,
-     .instance_size = sizeof(ADBBusState),
- };
- 
-diff --git a/hw/ipack/ipack.c b/hw/ipack/ipack.c
-index 6021e6d..f22c504 100644
---- a/hw/ipack/ipack.c
-+++ b/hw/ipack/ipack.c
-@@ -106,9 +106,16 @@ static const TypeInfo ipack_device_info = {
-     .abstract      = true,
- };
- 
-+static void ipack_bus_class_init(ObjectClass *oc, void *opaque)
++/*
++ * Represent a single value (if max is NULL), or a [min, max] range
++ * if @max is not NULL
++ */
++typedef struct ValueRange {
++    QObject *min, *max;
++} ValueRange;
++
++/*
++ * Validate a value list element and put result on ValueRange
++ *
++ * NOTE: this won't increase ref count of @vr->min and @vr->max
++ */
++static bool valuelist_element_get_range(QObject *elm, ValueRange *vr)
 +{
-+    BusClass *bc = BUS_CLASS(oc);
-+    bc->device_type = TYPE_IPACK_DEVICE;
++    QObject *min = NULL, *max = NULL;
++
++    if (qobject_type(elm) == QTYPE_QLIST) {
++        QList *l = qobject_to_qlist(elm);
++        if (qlist_size(l) < 1 || qlist_size(l) > 2) {
++            return false;
++        }
++        min = qlist_entry_obj(qlist_first(l));
++        if (qlist_size(l) == 2) {
++            max = qlist_entry_obj(qlist_next(qlist_first(l)));
++        }
++    } else {
++        min = elm;
++    }
++
++    assert(min);
++    /* Invalid range: */
++    if (max && (!value_can_be_range(min) || !value_can_be_range(max) ||
++                qobject_type(min) != qobject_type(max))) {
++        return false;
++    }
++
++    /* If the value can be a range, make it a range */
++    if (!max && value_can_be_range(min)) {
++        max = min;
++    }
++
++    vr->min = min;
++    vr->max = max;
++    return true;
 +}
 +
- static const TypeInfo ipack_bus_info = {
-     .name = TYPE_IPACK_BUS,
-     .parent = TYPE_BUS,
-+    .class_init = ipack_bus_class_init,
-     .instance_size = sizeof(IPackBus),
- };
- 
-diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
-index 348e0ea..45349c6 100644
---- a/hw/isa/isa-bus.c
-+++ b/hw/isa/isa-bus.c
-@@ -36,6 +36,7 @@ static void isa_bus_class_init(ObjectClass *klass, void *data)
- 
-     k->print_dev = isabus_dev_print;
-     k->get_fw_dev_path = isabus_get_fw_dev_path;
-+    k->device_type = TYPE_ISA_DEVICE;
- }
- 
- static const TypeInfo isa_dma_info = {
-diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
-index 8a90ddd..7f4c87f 100644
---- a/hw/misc/auxbus.c
-+++ b/hw/misc/auxbus.c
-@@ -57,6 +57,7 @@ static void aux_bus_class_init(ObjectClass *klass, void *data)
-      * in monitor.
-      */
-     k->print_dev = aux_slave_dev_print;
-+    k->device_type = TYPE_AUX_SLAVE;
- }
- 
- AUXBus *aux_init_bus(DeviceState *parent, const char *name)
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 258fbe5..31b4d69 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -154,6 +154,7 @@ static void pci_bus_class_init(ObjectClass *klass, void *data)
-     k->realize = pci_bus_realize;
-     k->unrealize = pci_bus_unrealize;
-     k->reset = pcibus_reset;
-+    k->device_type = TYPE_PCI_DEVICE;
- 
-     pbc->is_root = pcibus_is_root;
-     pbc->bus_num = pcibus_num;
-diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-index ea3bc8b..d07dcaa 100644
---- a/hw/ppc/spapr_vio.c
-+++ b/hw/ppc/spapr_vio.c
-@@ -61,6 +61,7 @@ static void spapr_vio_bus_class_init(ObjectClass *klass, void *data)
- 
-     k->get_dev_path = spapr_vio_get_dev_name;
-     k->get_fw_dev_path = spapr_vio_get_dev_name;
-+    k->device_type = TYPE_VIO_SPAPR_DEVICE;
- }
- 
- static const TypeInfo spapr_vio_bus_info = {
-diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
-index c4a9735..c442c23 100644
---- a/hw/s390x/css-bridge.c
-+++ b/hw/s390x/css-bridge.c
-@@ -17,6 +17,7 @@
- #include "hw/s390x/css.h"
- #include "ccw-device.h"
- #include "hw/s390x/css-bridge.h"
-+#include "hw/s390x/virtio-ccw.h"
- #include "cpu.h"
- 
- /*
-@@ -82,6 +83,7 @@ static void virtual_css_bus_class_init(ObjectClass *klass, void *data)
- 
-     k->reset = virtual_css_bus_reset;
-     k->get_dev_path = virtual_css_bus_get_dev_path;
-+    k->device_type = TYPE_VIRTIO_CCW_DEVICE;
- }
- 
- static const TypeInfo virtual_css_bus_info = {
-diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-index 34b2faf..f2562ce 100644
---- a/hw/s390x/event-facility.c
-+++ b/hw/s390x/event-facility.c
-@@ -307,6 +307,7 @@ static void sclp_events_bus_class_init(ObjectClass *klass, void *data)
-     BusClass *bc = BUS_CLASS(klass);
- 
-     bc->realize = sclp_events_bus_realize;
-+    bc->device_type = TYPE_SCLP_EVENT;
- }
- 
- static const TypeInfo sclp_events_bus_info = {
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 61cfd21..0d71d7e 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -888,10 +888,17 @@ static const TypeInfo s390_pcihost_info = {
-     }
- };
- 
-+static void s390_pcibus_class_init(ObjectClass *oc, void *opaque)
++/* Check if @v is inside the @vr range */
++static bool range_contains(ValueRange *vr, QObject *v)
 +{
-+    BusClass *bc = BUS_CLASS(oc);
-+    bc->device_type = TYPE_S390_PCI_DEVICE;
++    assert(vr->min);
++    if (vr->max) { /* range */
++        return qobject_type(vr->min) == qobject_type(v) &&
++               qobject_compare(vr->max, v) >= 0 &&
++               qobject_compare(v, vr->min) >= 0;
++    } else {  /* single element */
++        return qobject_compare(vr->min, v) == 0;
++    }
 +}
 +
- static const TypeInfo s390_pcibus_info = {
-     .name = TYPE_S390_PCI_BUS,
-     .parent = TYPE_BUS,
-     .instance_size = sizeof(S390PCIBus),
-+    .class_init = s390_pcibus_class_init,
- };
- 
- static uint16_t s390_pci_generate_uid(S390pciState *s)
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index e364410..181428f7 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -31,6 +31,7 @@ static void scsi_bus_class_init(ObjectClass *klass, void *data)
- 
-     k->get_dev_path = scsibus_get_dev_path;
-     k->get_fw_dev_path = scsibus_get_fw_dev_path;
-+    k->device_type = TYPE_SCSI_DEVICE;
-     hc->unplug = qdev_simple_device_unplug_cb;
- }
- 
-diff --git a/hw/sd/core.c b/hw/sd/core.c
-index 295dc44..5bfe404 100644
---- a/hw/sd/core.c
-+++ b/hw/sd/core.c
-@@ -158,11 +158,18 @@ void sdbus_reparent_card(SDBus *from, SDBus *to)
-     sdbus_set_readonly(to, readonly);
- }
- 
-+static void sd_bus_class_init(ObjectClass *oc, void *opaque)
++/* Check if @a contains @b */
++static bool range_contains_range(ValueRange *a, ValueRange *b)
 +{
-+    BusClass *bc = BUS_CLASS(oc);
-+    bc->device_type = TYPE_SD_CARD;
++    bool r = range_contains(a, b->min);
++    if (b->max) {
++        r &= range_contains(a, b->max);
++    }
++    return r;
 +}
 +
- static const TypeInfo sd_bus_info = {
-     .name = TYPE_SD_BUS,
-     .parent = TYPE_BUS,
-     .instance_size = sizeof(SDBus),
-     .class_size = sizeof(SDBusClass),
-+    .class_init = sd_bus_class_init,
- };
- 
- static void sd_bus_register_types(void)
-diff --git a/hw/ssi/ssi.c b/hw/ssi/ssi.c
-index 7eaaf56..c48920d 100644
---- a/hw/ssi/ssi.c
-+++ b/hw/ssi/ssi.c
-@@ -22,10 +22,17 @@ struct SSIBus {
- #define TYPE_SSI_BUS "SSI"
- #define SSI_BUS(obj) OBJECT_CHECK(SSIBus, (obj), TYPE_SSI_BUS)
- 
-+static void ssi_bus_class_init(ObjectClass *oc, void *opaque)
++/* Check if the intersection of @a and @b is not empty */
++static bool range_overlaps_range(ValueRange *a, ValueRange *b)
 +{
-+    BusClass *bc = BUS_CLASS(oc);
-+    bc->device_type = TYPE_SSI_SLAVE;
++    return range_contains(a, b->min) ||
++           (b->max && range_contains(a, b->max)) ||
++           range_contains_range(b, a);
 +}
 +
- static const TypeInfo ssi_bus_info = {
-     .name = TYPE_SSI_BUS,
-     .parent = TYPE_BUS,
-     .instance_size = sizeof(SSIBus),
-+    .class_init = ssi_bus_class_init,
- };
- 
- static void ssi_cs_default(void *opaque, int n, int level)
-diff --git a/hw/usb/bus.c b/hw/usb/bus.c
-index d910f84..42f85a7 100644
---- a/hw/usb/bus.c
-+++ b/hw/usb/bus.c
-@@ -33,6 +33,7 @@ static void usb_bus_class_init(ObjectClass *klass, void *data)
-     k->print_dev = usb_bus_dev_print;
-     k->get_dev_path = usb_get_dev_path;
-     k->get_fw_dev_path = usb_get_fw_dev_path;
-+    k->device_type = TYPE_USB_DEVICE;
-     hc->unplug = qdev_simple_device_unplug_cb;
- }
- 
-diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.c
-index bef1f03..01aa804 100644
---- a/hw/usb/dev-smartcard-reader.c
-+++ b/hw/usb/dev-smartcard-reader.c
-@@ -1195,10 +1195,17 @@ static Property ccid_props[] = {
- #define TYPE_CCID_BUS "ccid-bus"
- #define CCID_BUS(obj) OBJECT_CHECK(CCIDBus, (obj), TYPE_CCID_BUS)
- 
-+static void ccid_bus_class_init(ObjectClass *oc, void *opaque)
++/*
++ * Check if a given entry of a value list contains the range @minv-@maxv
++ * If @maxv is NULL, only check if the entry contains @minv
++ */
++static bool valuelist_entry_contains(QObject *ev, ValueRange *vr)
 +{
-+    BusClass *bc = BUS_CLASS(oc);
-+    bc->device_type = TYPE_CCID_CARD;
++    ValueRange er;
++
++    if (!valuelist_element_get_range(ev, &er)) {
++        return false;
++    }
++    return range_contains_range(&er, vr);
 +}
 +
- static const TypeInfo ccid_bus_info = {
-     .name = TYPE_CCID_BUS,
-     .parent = TYPE_BUS,
-     .instance_size = sizeof(CCIDBus),
-+    .class_init = ccid_bus_class_init,
- };
++/*
++ * Check if a given entry of a value list contains the range @minv-@maxv
++ * If @maxv is NULL, only check if the entry contains @minv
++ */
++static bool valuelist_entry_overlaps(QObject *ev, ValueRange *vr)
++{
++    ValueRange er;
++
++    if (!valuelist_element_get_range(ev, &er)) {
++        return false;
++    }
++
++    return range_overlaps_range(&er, vr);
++}
++
++/*
++ * Find the entry in the value list that contains the range @minv-@maxv
++ * If @maxv is NULL, check if the value list contains @minv
++ *
++ * Returns the list entry that contains the range, or NULL if
++ * not found.
++ */
++static QListEntry *nvaluelist_find_range_match(QList *l, ValueRange *vr)
++{
++    QListEntry *e;
++
++    QLIST_FOREACH_ENTRY(l, e) {
++        QObject *ev = qlist_entry_obj(e);
++        if (valuelist_entry_contains(ev, vr)) {
++            return e;
++        }
++    }
++
++    return NULL;
++}
++
++/*
++ * Find the entry in the value list that contains @v
++ *
++ * Returns the list entry that contains the range, or NULL if
++ * not found.
++ */
++static QListEntry *nvaluelist_find_value_match(QList *l, QObject *v)
++{
++    ValueRange vr = { .min = v };
++    return nvaluelist_find_range_match(l, &vr);
++}
++
++/*
++ * Try to sum i to number, if it's an integer.
++ * Otherwise, just return a new reference to @v
++ */
++static QObject *qnum_try_int_add(QObject *v, int i)
++{
++    QNum *qn;
++    uint64_t u64;
++    int64_t i64;
++
++    if (qobject_type(v) != QTYPE_QNUM) {
++        qobject_incref(v);
++        return v;
++    }
++
++    /*TODO: we should be able to convert uint to int and vice-versa. e.g.:
++     * - qnum_try_int_add(qnum_from_int(INT64_MAX), 1)
++     * - qnum_try_int_add(qnum_from_uint(UINT64_MIN), -1)
++     */
++    qn = qobject_to_qnum(v);
++    if (qnum_get_try_int(qn, &i64)) {
++        if ((i < 0) && INT64_MIN - i >= i64) {
++            i64 = INT64_MIN;
++        } else if ((i > 0) && INT64_MAX - i <= i64) {
++            i64 = INT64_MAX;
++        } else {
++            i64 = i64 + i;
++        }
++        return QOBJECT(qnum_from_int(i64));
++    } else if (qnum_get_try_uint(qn, &u64)) {
++        if ((i < 0) && -i >= u64) {
++            u64 = 0;
++        } else if ((i > 0) && UINT64_MAX - i <= u64) {
++            u64 = UINT64_MAX;
++        } else {
++            u64 = u64 + i;
++        }
++        return QOBJECT(qnum_from_uint(u64));
++    } else {
++        qobject_incref(v);
++        return v;
++    }
++}
++
++/*
++ * Look for any entry that overlaps or touches @vr
++ * If @skip is not NULL, @skip is not considered as a match.
++ */
++static QListEntry *nvaluelist_find_overlap(QList *l, ValueRange *vr,
++                                           QListEntry *skip)
++{
++    QListEntry *r = NULL;
++    QListEntry *e;
++    ValueRange key;
++
++    key.min = qnum_try_int_add(vr->min, -1);
++    key.max = qnum_try_int_add(vr->max, 1);
++
++    QLIST_FOREACH_ENTRY(l, e) {
++        QObject *ev = qlist_entry_obj(e);
++        if (e == skip) {
++            continue;
++        }
++        if (valuelist_entry_overlaps(ev, &key)) {
++            r = e;
++            break;
++        }
++    }
++
++    qobject_decref(key.min);
++    qobject_decref(key.max);
++    return r;
++}
++
++bool valuelist_contains(QObject *values, QObject *v)
++{
++    QList *l = valuelist_normalize(values);
++    bool r = !!nvaluelist_find_value_match(l, v);
++
++    QDECREF(l);
++    return r;
++}
++
++static QListEntry *valuelist_try_overlap(QList *l, ValueRange *vr,
++                                         QListEntry *skip)
++{
++    ValueRange ovr;
++    QList *newrange;
++    QListEntry *ov = nvaluelist_find_overlap(l, vr, skip);
++
++    if (!ov) {
++        return NULL;
++    }
++
++    valuelist_element_get_range(ov->value, &ovr);
++    if (qobject_compare(ovr.min, vr->min) > 0) {
++        ovr.min = vr->min;
++    }
++    if (qobject_compare(vr->max, ovr.max) > 0) {
++        ovr.max = vr->max;
++    }
++
++    newrange = qlist_new();
++    qobject_incref(ovr.min);
++    qlist_append_obj(newrange, ovr.min);
++    qobject_incref(ovr.max);
++    qlist_append_obj(newrange, ovr.max);
++
++    /*FIXME: this is a hack */
++    qobject_decref(ov->value);
++    ov->value = QOBJECT(newrange);
++    return ov;
++}
++
++/* Ownership of @e is passed to the function */
++static QListEntry *valuelist_try_merge(QList *l, QListEntry *e)
++{
++    ValueRange vr;
++    QListEntry *ov;
++
++    if (!valuelist_element_get_range(e->value, &vr)) {
++        return NULL;
++    }
++
++    ov = valuelist_try_overlap(l, &vr, e);
++    assert(ov != e);
++    if (ov) {
++        /*TODO: this is a hack */
++        QTAILQ_REMOVE(&l->head, e, next);
++        qobject_decref(e->value);
++        g_free(e);
++    }
++    return ov;
++}
++
++/* Ownership of @elm is NOT given to the function: only the reference
++ * count is increased if necessary.
++ */
++static void valuelist_append_element(QList *l, QObject *elm)
++{
++    ValueRange vr;
++
++    if (valuelist_element_get_range(elm, &vr)) {
++        QListEntry *ov;
++
++        if (nvaluelist_find_range_match(l, &vr)) {
++            return;
++        }
++
++        ov = valuelist_try_overlap(l, &vr, NULL);
++        /* If we find an overlapping entry, keep trying to merge it with
++         * other elements.
++         */
++        if (ov) {
++            while (ov) {
++                ov = valuelist_try_merge(l, ov);
++            }
++            return;
++        }
++    }
++
++    /* No overlap found, just append element to the list */
++    qobject_incref(elm);
++    qlist_append_obj(l, elm);
++}
++
++void valuelist_extend(QObject **valuelist, QObject *new)
++{
++    QObject *old = *valuelist;
++    QList *l = valuelist_normalize(old);
++    QList *newl = valuelist_normalize(new);
++    QListEntry *e;
++
++    QLIST_FOREACH_ENTRY(newl, e) {
++        QObject *elm = qlist_entry_obj(e);
++        valuelist_append_element(l, elm);
++    }
++    QDECREF(newl);
++
++    *valuelist = valuelist_simplify(l);
++    qobject_decref(old);
++}
++
++SlotOption *slot_options_find_opt(SlotOptionList *opts, const char *option)
++{
++    for (; opts; opts = opts->next) {
++        if (!strcmp(opts->value->option, option)) {
++            return opts->value;
++        }
++    }
++    return NULL;
++}
++
++bool slot_options_can_be_combined(SlotOptionList *a, SlotOptionList *b,
++                                  const char **opt_name)
++{
++    SlotOptionList *ol;
++    const char *mismatch = NULL;
++
++    /* Check if all options in @b will be handled when we loop through @a */
++    for (ol = b; ol; ol = ol->next) {
++        if (!slot_options_find_opt(a, ol->value->option)) {
++            return false;
++        }
++    }
++
++    for (ol = a; ol; ol = ol->next) {
++        SlotOption *ao = ol->value;
++        SlotOption *bo = slot_options_find_opt(b, ao->option);
++
++        if (!bo) {
++            return false;
++        }
++
++        if (qobject_compare(bo->values, ao->values)) {
++            if (mismatch && strcmp(mismatch, ao->option)) {
++                return false;
++            }
++
++            mismatch = ao->option;
++        }
++    }
++
++    if (opt_name) {
++        *opt_name = mismatch;
++    }
++    return true;
++}
++
++static int compare_strList(strList *a, strList *b)
++{
++    for (; a && b; a = a->next, b = b->next) {
++        int c = strcmp(a->value, b->value);
++        if (c) {
++            return c;
++        }
++    }
++
++    if (b) {
++        return -1;
++    } else if (a) {
++        return 1;
++    } else {
++        return 0;
++    }
++
++}
++
++bool slots_can_be_combined(DeviceSlotInfo *a, DeviceSlotInfo *b,
++                           const char **opt_name)
++{
++    if (a->available != b->available ||
++        a->hotpluggable != b->hotpluggable ||
++        a->has_count != b->has_count ||
++        a->opts_complete != b->opts_complete ||
++        a->has_device || b->has_device ||
++        compare_strList(a->device_types, b->device_types)) {
++        return false;
++    }
++
++    return slot_options_can_be_combined(a->opts, b->opts, opt_name);
++}
++
++void slots_combine(DeviceSlotInfo *a, DeviceSlotInfo *b, const char *opt_name)
++{
++    assert(slots_can_be_combined(a, b, NULL));
++    if (a->has_count) {
++        a->count += b->count;
++    }
++    if (opt_name) {
++        SlotOption *aopt = slot_options_find_opt(a->opts, opt_name);
++        SlotOption *bopt = slot_options_find_opt(b->opts, opt_name);
++
++        valuelist_extend(&aopt->values, bopt->values);
++    }
++}
++
++bool slots_try_combine(DeviceSlotInfo *a, DeviceSlotInfo *b)
++{
++    const char *opt = NULL;
++    assert(a != b);
++
++    if (slots_can_be_combined(a, b, &opt)) {
++        slots_combine(a, b, opt);
++        return true;
++    }
++
++    return false;
++}
++
++/* Try to combine @slot with an entry in @l
++ *
++ * Will return a pointer to the 'next' pointer in the previous entry,
++ * to allow callers to remove the entry from the list if necessary.
++ */
++static DeviceSlotInfoList **slot_list_try_combine_slot(DeviceSlotInfoList **l, DeviceSlotInfo *slot)
++{
++    DeviceSlotInfoList **pprev;
++
++    for (pprev = l; *pprev; pprev = &(*pprev)->next) {
++        DeviceSlotInfo *i = (*pprev)->value;
++        if (slots_try_combine(i, slot)) {
++            return pprev;
++        }
++    }
++
++    return NULL;
++}
++
++DeviceSlotInfoList *slot_list_collapse(DeviceSlotInfoList *l)
++{
++    DeviceSlotInfoList *newlist = NULL;
++    DeviceSlotInfoList *queue = l;
++
++    while (queue) {
++        DeviceSlotInfoList **pprev;
++        DeviceSlotInfoList *next = queue->next;
++
++        pprev = slot_list_try_combine_slot(&newlist, queue->value);
++        if (pprev) {
++            DeviceSlotInfoList *removed = *pprev;
++            /* Remove modified item from @newlist@ */
++            *pprev = (*pprev)->next;
++            /* Dequeue item from @queue */
++            queue->next = NULL;
++            qapi_free_DeviceSlotInfoList(queue);
++            /* Queue modified item on @queue */
++            removed->next = next;
++            queue = removed;
++        } else {
++            /* Not combined, just insert into newlist */
++            queue->next = newlist;
++            newlist = queue;
++            queue = next;
++        }
++    }
++
++    return newlist;
++}
++
++/* Ownership of @slot is given to the function */
++void slot_list_add_slot(DeviceSlotInfoList **l, DeviceSlotInfo *slot)
++{
++    DeviceSlotInfoList *li;
++
++    /* Avoid adding new entry if it can be combined */
++    if (slot_list_try_combine_slot(l, slot)) {
++        qapi_free_DeviceSlotInfo(slot);
++        return;
++    }
++
++    li = g_new0(DeviceSlotInfoList, 1);
++    li->value = slot;
++    li->next = *l;
++    *l = li;
++}
++
++void slot_add_opt(DeviceSlotInfo *slot, const char *option, QObject *values)
++{
++    SlotOptionList *l =  g_new0(SlotOptionList, 1);
++
++    l->value = g_new0(SlotOption, 1);
++    l->value->option = g_strdup(option);
++    l->value->values = values;
++    l->next = slot->opts;
++    slot->opts = l;
++}
++
++/*TODO: move it to common code */
++static inline bool qbus_is_full(BusState *bus)
++{
++    BusClass *bus_class = BUS_GET_CLASS(bus);
++    return bus_class->max_dev && bus->max_index >= bus_class->max_dev;
++}
++
++DeviceSlotInfo *make_slot(BusState *bus)
++{
++    DeviceSlotInfo *s = g_new0(DeviceSlotInfo, 1);
++
++    s->device_types = g_new0(strList, 1);
++    s->device_types->value = g_strdup(BUS_GET_CLASS(bus)->device_type);
++    s->hotpluggable = qbus_is_hotpluggable(bus);
++    s->available = !qbus_is_full(bus);
++
++    slot_add_opt_str(s, "bus", bus->name);
++
++    return s;
++}
+diff --git a/tests/test-slotinfo.c b/tests/test-slotinfo.c
+new file mode 100644
+index 0000000..b169712
+--- /dev/null
++++ b/tests/test-slotinfo.c
+@@ -0,0 +1,398 @@
++/*
++ * Unit tests for QAPI utility functions
++ *
++ * Copyright (C) 2017 Red Hat Inc.
++ *
++ * Authors:
++ *  Eduardo Habkost <ehabkost@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qapi/util.h"
++#include "qapi/qmp/qnum.h"
++#include "qapi/qmp/qstring.h"
++#include "qapi/qmp/qlist.h"
++#include "qapi/qmp/qjson.h"
++#include "hw/qdev-slotinfo.h"
++
++#define JS(json) qobject_from_json((json), &error_abort)
++
++static bool json_valuelist_contains(const char *jvalues, const char *jvalue)
++{
++    QObject *values = JS(jvalues);
++    QObject *value = JS(jvalue);
++    bool r = valuelist_contains(values, value);
++
++    qobject_decref(values);
++    qobject_decref(value);
++    return r;
++}
++
++static void test_valuelist_contains(void)
++{
++    g_assert_true(json_valuelist_contains("100", "100"));
++    g_assert_false(json_valuelist_contains("100", "200"));
++
++    g_assert_false(json_valuelist_contains("[]", "100"));
++    g_assert_true(json_valuelist_contains("[100, 200, 300]", "200"));
++    g_assert_false(json_valuelist_contains("[100, 200, 300]", "150"));
++
++    g_assert_true(json_valuelist_contains("\"abc\"", "\"abc\""));
++    g_assert_false(json_valuelist_contains("\"abc\"", "\"xyz\""));
++    g_assert_true(json_valuelist_contains("[\"abc\"]", "\"abc\""));
++    g_assert_false(json_valuelist_contains("[\"abc\", \"cde\"]", "\"xyz\""));
++
++#define TEST_RANGE "[[1,10], [18,20], [\"aaaa2\", \"jyz3\"], [-100, 5]," \
++                    "\"kkk\", 14, -50, [51], [[30, 31]] ]"
++
++    /* [-100, 5] */
++    g_assert_false(json_valuelist_contains(TEST_RANGE, "-101"));
++    g_assert_true( json_valuelist_contains(TEST_RANGE, "-100"));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,  "-99"));
++
++    /* -50 */
++    g_assert_true( json_valuelist_contains(TEST_RANGE,  "-51"));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,  "-50"));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,  "-49"));
++
++    /* [-100, 5], [1, 10] */
++    g_assert_true( json_valuelist_contains(TEST_RANGE,   "-1"));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,    "0"));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,    "1"));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,    "2"));
++
++    /* [-100, 5] */
++    g_assert_true( json_valuelist_contains(TEST_RANGE,    "4"));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,    "5"));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,    "6"));
++
++    /* [1, 10] */
++    g_assert_true( json_valuelist_contains(TEST_RANGE,    "9"));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,   "10"));
++    g_assert_false(json_valuelist_contains(TEST_RANGE,   "11"));
++
++    /* 14 */
++    g_assert_false(json_valuelist_contains(TEST_RANGE,   "13"));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,   "14"));
++    g_assert_false(json_valuelist_contains(TEST_RANGE,   "15"));
++
++    /* [18, 20] */
++    g_assert_false(json_valuelist_contains(TEST_RANGE,   "17"));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,   "18"));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,   "19"));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,   "20"));
++    g_assert_false(json_valuelist_contains(TEST_RANGE,   "21"));
++
++    /* [51] */
++    g_assert_false(json_valuelist_contains(TEST_RANGE,   "50"));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,   "51"));
++    g_assert_false(json_valuelist_contains(TEST_RANGE,   "52"));
++
++    /* [ "aaa2" , "jyz3" ] */
++    g_assert_false(json_valuelist_contains(TEST_RANGE,   "\"aaaa\""));
++    g_assert_false(json_valuelist_contains(TEST_RANGE,   "\"aaaa1\""));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,   "\"aaaa2\""));
++    g_assert_true(json_valuelist_contains(TEST_RANGE,   "\"aaaa3\""));
++
++    /* [ "aaa2" , "jyz3" ] */
++    g_assert_true(json_valuelist_contains(TEST_RANGE,   "\"bcde\""));
++
++    /* [ "aaa2" , "jyz3" ] */
++    g_assert_true( json_valuelist_contains(TEST_RANGE,   "\"jyz\""));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,   "\"jyz2\""));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,   "\"jyz3\""));
++    g_assert_false(json_valuelist_contains(TEST_RANGE,   "\"jyz4\""));
++
++    /* "kkk" */
++    g_assert_false(json_valuelist_contains(TEST_RANGE,   "\"kk\""));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,   "\"kkk\""));
++    g_assert_false(json_valuelist_contains(TEST_RANGE,   "\"kkkk\""));
++
++    /* [[30, 31]] */
++    g_assert_false(json_valuelist_contains(TEST_RANGE,   "30"));
++    g_assert_false(json_valuelist_contains(TEST_RANGE,   "[30]"));
++    g_assert_true( json_valuelist_contains(TEST_RANGE,   "[30, 31]"));
++
++    /* empty set doesn't contain an empty list: */
++    g_assert_false(json_valuelist_contains("[]", "[]"));
++
++    /* [] is an invalid element on a value list: */
++    g_assert_false(json_valuelist_contains("[[]]", "[]"));
++
++    /* [[]] indicates [] is a valid value */
++    g_assert_true(json_valuelist_contains("[[[]]]", "[]"));
++}
++
++#define assert_valuelist_extend(before, extend, after)           \
++    do {                                                         \
++        QObject *set = JS(before);                               \
++        QObject *expected = JS(after);                           \
++                                                                 \
++        valuelist_extend(&set, JS(extend));;                     \
++        g_assert_cmpint(qobject_compare(set, expected), ==, 0);  \
++                                                                 \
++        qobject_decref(set);                                     \
++        qobject_decref(expected);                                \
++    } while (0)
++
++static void test_valuelist_extend(void)
++{
++    assert_valuelist_extend("[]",
++                            "1",
++                            "1");
++
++    assert_valuelist_extend("1",
++                            "1",
++                            "1");
++
++    assert_valuelist_extend("1",
++                            "3",
++                            "[1, 3]");
++
++    assert_valuelist_extend("[1, 3]",
++                            "6",
++                            "[1, 3, 6]");
++
++    /*TODO: implement and test range merging */
++
++    /* single-element becomes range: */
++    assert_valuelist_extend("[1, 3, 6]",
++                            "4",
++                            "[1, [3, 4], 6]");
++    assert_valuelist_extend("[1, 4, 6]",
++                            "3",
++                            "[1, [3, 4], 6]");
++
++
++    /* single-element merges two elements: */
++    assert_valuelist_extend("[1, 3, 6]",
++                            "2",
++                            "[[1, 3], 6]");
++
++    /* [] -> empty set */
++    assert_valuelist_extend("[1, 3, 6]",
++                            "[]",
++                            "[1, 3, 6]");
++
++    /* [3, 100] -> two elements: 3 and 100 (not a range) */
++    assert_valuelist_extend("[[1, 4], 6]",
++                            "[3, 100]",
++                            "[[1, 4], 6, 100]");
++
++    /* tests for appending new ranges: */
++
++    /* add two ranges: 7-30, 40-50 */
++    assert_valuelist_extend("[[1, 4], 6, 100]",
++                            "[[7, 30], [40, 50]]",
++                            "[[1, 4], [6, 30], 100, [40, 50]]");
++
++    /* multiple ways of appending to a range: */
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "30",
++                            "[[1, 4], [6, 30], [40, 50], [53, 60]]");
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "31",
++                            "[[1, 4], [6, 31], [40, 50], [53, 60]]");
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "[[25, 35]]",
++                            "[[1, 4], [6, 35], [40, 50], [53, 60]]");
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "[[30, 35]]",
++                            "[[1, 4], [6, 35], [40, 50], [53, 60]]");
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "[[31, 35]]",
++                            "[[1, 4], [6, 35], [40, 50], [53, 60]]");
++    //TODO: make this work:
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "[[38, 51]]",
++                            "[[1, 4], [6, 30], [38, 51], [53, 60]]");
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "[[38, 52]]",
++                            "[[1, 4], [6, 30], [38, 60]]");
++    /* off-by-one check: */
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "51",
++                            "[[1, 4], [6, 30], [40, 51], [53, 60]]");
++    /* _not_ appending to a range: */
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "32",
++                            "[[1, 4], [6, 30], [40, 50], [53, 60], 32]");
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "[[32, 35]]",
++                            "[[1, 4], [6, 30], [40, 50], [53, 60], [32, 35]]");
++
++    /* multiple ways of prepending to a range: */
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "40",
++                            "[[1, 4], [6, 30], [40, 50], [53, 60]]");
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "39",
++                            "[[1, 4], [6, 30], [39, 50], [53, 60]]");
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "[[35, 45]]",
++                            "[[1, 4], [6, 30], [35, 50], [53, 60]]");
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "[[35, 40]]",
++                            "[[1, 4], [6, 30], [35, 50], [53, 60]]");
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "[[35, 39]]",
++                            "[[1, 4], [6, 30], [35, 50], [53, 60]]");
++    /* off-by-one check: */
++    assert_valuelist_extend("[[1, 4], [6, 30], [33, 50], [53, 60]]",
++                            "32",
++                            "[[1, 4], [6, 30], [32, 50], [53, 60]]");
++    /* _not_ prepending to a range: */
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "38",
++                            "[[1, 4], [6, 30], [40, 50], [53, 60], 38]");
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "[[35, 38]]",
++                            "[[1, 4], [6, 30], [40, 50], [53, 60], [35, 38]]");
++
++    /* multiple ways of combining two ranges: */
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "5",
++                            "[[1, 30], [40, 50], [53, 60]]");
++    assert_valuelist_extend("[[1, 4], [6, 30], [40, 50], [53, 60]]",
++                            "[[25, 45]]",
++                            "[[1, 4], [6, 50], [53, 60]]");
++}
++
++static void test_slots_can_combine(void)
++{
++    DeviceSlotInfo *a = g_new0(DeviceSlotInfo, 1);
++    DeviceSlotInfo *b = g_new0(DeviceSlotInfo, 1);
++    const char *opt_name = NULL;
++
++    g_assert_true(slots_can_be_combined(a, b, &opt_name));
++    g_assert_null(opt_name);
++
++    slot_add_opt(a, "bus", JS("\"mybus.0\""));
++    g_assert_false(slots_can_be_combined(a, b, &opt_name));
++    slot_add_opt(b, "bus", JS("\"mybus.0\""));
++
++    g_assert_true(slots_can_be_combined(a, b, &opt_name));
++    g_assert_null(opt_name);
++
++    slot_add_opt(a, "addr", JS("[ 1, 3 ]"));
++    g_assert_false(slots_can_be_combined(a, b, &opt_name));
++    slot_add_opt(b, "addr", JS("5"));
++
++    g_assert_true(slots_can_be_combined(a, b, &opt_name));
++    g_assert_cmpstr(opt_name, ==, "addr");
++
++    slot_add_opt(a, "unit", JS("1"));
++    g_assert_false(slots_can_be_combined(a, b, &opt_name));
++    slot_add_opt(b, "unit", JS("1"));
++
++    g_assert_true(slots_can_be_combined(a, b, &opt_name));
++    g_assert_cmpstr(opt_name, ==, "addr");
++
++    a->hotpluggable = true;
++    g_assert_false(slots_can_be_combined(a, b, &opt_name));
++    a->hotpluggable = false;
++
++    a->has_device = true;
++    a->device = g_strdup("/machine/somedevice");
++    g_assert_false(slots_can_be_combined(a, b, &opt_name));
++    g_free(a->device);
++    a->has_device = false;
++    a->device = NULL;
++
++    slot_add_opt(a, "port", JS("10"));
++    g_assert_false(slots_can_be_combined(a, b, &opt_name));
++    slot_add_opt(b, "port", JS("20"));
++
++    g_assert_false(slots_can_be_combined(a, b, &opt_name));
++}
++
++static void test_slots_combine(void)
++{
++    DeviceSlotInfo *a = g_new0(DeviceSlotInfo, 1);
++    DeviceSlotInfo *b = g_new0(DeviceSlotInfo, 1);
++    SlotOption *o;
++
++    slot_add_opt(a, "bus", JS("\"mybus.0\""));
++    slot_add_opt(b, "bus", JS("\"mybus.0\""));
++
++    slot_add_opt(a, "addr", JS("[ 1, 3 ]"));
++    slot_add_opt(b, "addr", JS("5"));
++
++    slot_add_opt(a, "unit", JS("1"));
++    slot_add_opt(b, "unit", JS("1"));
++
++    g_assert_true(slots_try_combine(a, b));
++
++    o = a->opts->value;
++    g_assert_cmpstr(o->option, ==, "unit");
++    g_assert_cmpint(qobject_compare(o->values, JS("1")), ==, 0);
++
++    o = a->opts->next->value;
++    g_assert_cmpstr(o->option, ==, "addr");
++    g_assert_cmpint(qobject_compare(o->values, JS("[1, 3, 5]")), ==, 0);
++
++    o = a->opts->next->next->value;
++    g_assert_cmpstr(o->option, ==, "bus");
++    g_assert_cmpint(qobject_compare(o->values, JS("\"mybus.0\"")), ==, 0);
++}
++
++static void test_slot_list_collapse(void)
++{
++    DeviceSlotInfoList *l = NULL;
++    SlotOption *o;
++    int node, socket, core, thread;
++
++    for (node = 0; node < 4; node++) {
++        for (socket = 0; socket < 8; socket++) {
++            for (core = 0; core < 4; core++) {
++                for (thread = 0; thread < 2; thread++) {
++                    DeviceSlotInfo *s = g_new0(DeviceSlotInfo, 1);
++                    slot_add_opt_int(s, "node", node);
++                    slot_add_opt_int(s, "socket", socket);
++                    slot_add_opt_int(s, "core", core);
++                    slot_add_opt_int(s, "thread", thread);
++                    slot_list_add_slot(&l, s);
++                }
++            }
++        }
++    }
++
++    /*
++     * All the entries above should be merged in a single entry:
++     * node = [0, 3]
++     * socket = [0, 7]
++     * core = [0, 3]
++     * thread = [0, 1]
++     */
++    l = slot_list_collapse(l);
++    g_assert_nonnull(l);
++    g_assert_null(l->next);
++
++    o = slot_find_opt(l->value, "node");
++    g_assert_cmpint(qobject_compare(o->values, JS("[ [0, 3] ]")), ==, 0);
++
++    o = slot_find_opt(l->value, "socket");
++    g_assert_cmpint(qobject_compare(o->values, JS("[ [0, 7] ]")), ==, 0);
++
++    o = slot_find_opt(l->value, "core");
++    g_assert_cmpint(qobject_compare(o->values, JS("[ [0, 3] ]")), ==, 0);
++
++    o = slot_find_opt(l->value, "thread");
++    g_assert_cmpint(qobject_compare(o->values, JS("[ [0, 1] ]")), ==, 0);
++}
++
++int main(int argc, char *argv[])
++{
++    g_test_init(&argc, &argv, NULL);
++    g_test_add_func("/qapi/util/valuelist_contains", test_valuelist_contains);
++    g_test_add_func("/qapi/util/valuelist_extend", test_valuelist_extend);
++    g_test_add_func("/qapi/util/slots_can_combine", test_slots_can_combine);
++    g_test_add_func("/qapi/util/slots_combine", test_slots_combine);
++    g_test_add_func("/qapi/util/slot_list_collapse", test_slot_list_collapse);
++    g_test_run();
++    return 0;
++}
+diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+index f8d7a4a..0f3a0a6 100644
+--- a/hw/core/Makefile.objs
++++ b/hw/core/Makefile.objs
+@@ -6,6 +6,7 @@ common-obj-y += fw-path-provider.o
+ common-obj-y += irq.o
+ common-obj-y += hotplug.o
+ common-obj-y += nmi.o
++common-obj-y += slotinfo.o
  
- void ccid_card_send_apdu_to_guest(CCIDCardState *card,
-diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
-index 3042232..76ce427 100644
---- a/hw/virtio/virtio-bus.c
-+++ b/hw/virtio/virtio-bus.c
-@@ -316,6 +316,7 @@ static void virtio_bus_class_init(ObjectClass *klass, void *data)
-     BusClass *bus_class = BUS_CLASS(klass);
-     bus_class->get_dev_path = virtio_bus_get_dev_path;
-     bus_class->get_fw_dev_path = virtio_bus_get_fw_dev_path;
-+    bus_class->device_type = TYPE_VIRTIO_DEVICE;
- }
+ common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
+ common-obj-$(CONFIG_XILINX_AXI) += stream.o
+@@ -21,3 +22,4 @@ common-obj-$(CONFIG_PLATFORM_BUS) += platform-bus.o
  
- static const TypeInfo virtio_bus_info = {
+ obj-$(CONFIG_SOFTMMU) += generic-loader.o
+ obj-$(CONFIG_SOFTMMU) += null-machine.o
++
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index eb4895f..493f9ce 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -131,6 +131,8 @@ check-unit-y += tests/ptimer-test$(EXESUF)
+ gcov-files-ptimer-test-y = hw/core/ptimer.c
+ check-unit-y += tests/test-qapi-util$(EXESUF)
+ gcov-files-test-qapi-util-y = qapi/qapi-util.c
++check-unit-y += tests/test-slotinfo$(EXESUF)
++gcov-files-test-slotinfo-y = hw/core/slotinfo.c
+ 
+ check-block-$(CONFIG_POSIX) += tests/qemu-iotests-quick.sh
+ 
+@@ -535,6 +537,10 @@ test-qom-obj-y = $(qom-obj-y) $(test-util-obj-y)
+ test-qapi-obj-y = tests/test-qapi-visit.o tests/test-qapi-types.o \
+ 	tests/test-qapi-event.o tests/test-qmp-introspect.o \
+ 	$(test-qom-obj-y)
++test-qdev-obj-y = hw/core/qdev.o hw/core/qdev-properties.o \
++	hw/core/hotplug.o hw/core/bus.o hw/core/irq.o \
++	hw/core/fw-path-provider.o hw/core/reset.o \
++	hw/core/slotinfo.o
+ benchmark-crypto-obj-y = $(crypto-obj-y) $(test-qom-obj-y)
+ test-crypto-obj-y = $(crypto-obj-y) $(test-qom-obj-y)
+ test-io-obj-y = $(io-obj-y) $(test-crypto-obj-y)
+@@ -573,12 +579,7 @@ tests/test-bufferiszero$(EXESUF): tests/test-bufferiszero.o $(test-util-obj-y)
+ tests/atomic_add-bench$(EXESUF): tests/atomic_add-bench.o $(test-util-obj-y)
+ 
+ tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
+-	hw/core/qdev.o hw/core/qdev-properties.o hw/core/hotplug.o\
+-	hw/core/bus.o \
+-	hw/core/irq.o \
+-	hw/core/fw-path-provider.o \
+-	hw/core/reset.o \
+-	$(test-qapi-obj-y)
++	$(test-qdev-obj-y) $(test-qapi-obj-y)
+ tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
+ 	migration/vmstate.o migration/vmstate-types.o migration/qemu-file.o \
+         migration/qemu-file-channel.o migration/qjson.o \
+@@ -767,6 +768,7 @@ tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o contrib/libvhost-use
+ tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
+ tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
+ tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
++tests/test-slotinfo$(EXESUF): tests/test-slotinfo.o hw/core/slotinfo.o $(test-qdev-obj-y) $(test-qom-obj-y)
+ tests/numa-test$(EXESUF): tests/numa-test.o
+ tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o tests/acpi-utils.o
+ 
 -- 
 2.9.4
