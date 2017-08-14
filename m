@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dhJUa-0003rz-Fu
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 13:49:33 -0400
+	(envelope-from <eblake@redhat.com>) id 1dhJyl-0004ym-CZ
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:20:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dhJUX-0006mo-C5
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 13:49:32 -0400
-Received: from 6.mo5.mail-out.ovh.net ([178.32.119.138]:36255)
+	(envelope-from <eblake@redhat.com>) id 1dhJyh-00061G-Rq
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:20:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34504)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dhJUX-0006lk-6S
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 13:49:29 -0400
-Received: from player734.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 9A85511A889
-	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 19:49:27 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Mon, 14 Aug 2017 19:49:16 +0200
-Message-ID: <150273295665.11087.17582111045419718285.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dhJyh-0005y8-Co
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:20:39 -0400
+References: <mailman.1778.1502715001.21954.qemu-devel@nongnu.org>
+	<223B4DEC-A801-40E3-A118-33EBB9ED384D@gmail.com>
+	<20170814140003.GF8506@redhat.com>
+	<EEABAA69-F4C9-4525-8A01-CDF143BAD31B@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b4268987-e25d-02fc-3931-7b9576969cc5@redhat.com>
+Date: Mon, 14 Aug 2017 13:20:33 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] ppc: fix ppc_set_compat() with KVM PR
+In-Reply-To: <EEABAA69-F4C9-4525-8A01-CDF143BAD31B@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="jmQ5VbtDiIMSh4o7KC0V2eM71WURDSPB1"
+Subject: Re: [Qemu-devel] [PATCH v3 00/12] Convert over to use keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Programmingkid <programmingkidx@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-When running in KVM PR mode, kvmppc_set_compat() always fail because the
-current PR implementation doesn't handle KVM_REG_PPC_ARCH_COMPAT. Now that
-the machine code inconditionally calls ppc_set_compat_all() at reset time
-to restore the compat mode default value (commit 66d5c492dd3a9), it is
-impossible to start a guest with PR:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jmQ5VbtDiIMSh4o7KC0V2eM71WURDSPB1
+From: Eric Blake <eblake@redhat.com>
+To: Programmingkid <programmingkidx@gmail.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <b4268987-e25d-02fc-3931-7b9576969cc5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 00/12] Convert over to use keycodemapdb
+References: <mailman.1778.1502715001.21954.qemu-devel@nongnu.org>
+ <223B4DEC-A801-40E3-A118-33EBB9ED384D@gmail.com>
+ <20170814140003.GF8506@redhat.com>
+ <EEABAA69-F4C9-4525-8A01-CDF143BAD31B@gmail.com>
+In-Reply-To: <EEABAA69-F4C9-4525-8A01-CDF143BAD31B@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-qemu-system-ppc64: Unable to set CPU compatibility mode in KVM:
- Invalid argument
+On 08/14/2017 12:20 PM, Programmingkid wrote:
+>> These are based against git master, just save the series and then 'git=
+ am'
+>> the lot in one go.
+>=20
+> Is there a tool that can be used to download a series of patches from a=
+ mailing list? Copying and pasting patches sometimes introduces problems.=
+=20
 
-A tentative patch [1] was recently sent by Suraj to address the issue, but
-it would prevent the compat mode to be turned off on reset. And we really
-don't want to explicitely check for KVM PR. During the patch's review,
-David suggested that we should only call the KVM ioctl() if the compat
-PVR changes. This allows at least to run with KVM PR, provided no compat
-mode is requested from the command line (which should be the case when
-running PR nested). This is what this patch does.
+'git am'.  I find it works well to save the patch series into a single
+mailbox, then save that mailbox for the file to feed to git am.
 
-While here, we also fix the side effect where KVM would fail but we would
-change the CPU state in QEMU anyway.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-[1] http://patchwork.ozlabs.org/patch/782039/
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- target/ppc/compat.c |    9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+--jmQ5VbtDiIMSh4o7KC0V2eM71WURDSPB1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-diff --git a/target/ppc/compat.c b/target/ppc/compat.c
-index f1b67faa97e3..f8729fe46d61 100644
---- a/target/ppc/compat.c
-+++ b/target/ppc/compat.c
-@@ -140,16 +140,17 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp)
- 
-     cpu_synchronize_state(CPU(cpu));
- 
--    cpu->compat_pvr = compat_pvr;
--    env->spr[SPR_PCR] = pcr & pcc->pcr_mask;
--
--    if (kvm_enabled()) {
-+    if (kvm_enabled() && cpu->compat_pvr != compat_pvr) {
-         int ret = kvmppc_set_compat(cpu, cpu->compat_pvr);
-         if (ret < 0) {
-             error_setg_errno(errp, -ret,
-                              "Unable to set CPU compatibility mode in KVM");
-+            return;
-         }
-     }
-+
-+    cpu->compat_pvr = compat_pvr;
-+    env->spr[SPR_PCR] = pcr & pcc->pcr_mask;
- }
- 
- typedef struct {
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmR6fEACgkQp6FrSiUn
+Q2oYkwgAijnank6cGQ0r7Q9r31WXO3DzhiwWBMNzHxmqC/qRbbgnozXmMroc2ZUD
+2kbq318wliV/gY9I842SROdC9sEkn1grudNUgOpdjBsRBfGhMQ549o/zVe8R0Rjz
+csg0MxzzroC5sl4aSLGdr9hRzGFVsOKRaeFf2p2nHTFhFHcG69ar4P4H81JB0UVr
+h8YzV1XQuNdUExxdzAGNzFa3gvxOYlxF+hBCI9+9kPXv4kIfIwNKkdo3BXM8LJzW
+ZZ75KBcZh0h35qV90E7XJtGOoSBJbLzGg/agTdvSTZHrroXyD7uUpC8EWJQ2U94z
+TPvOv3GDpNUBg39yM53pWdD2x1mAzQ==
+=sKag
+-----END PGP SIGNATURE-----
+
+--jmQ5VbtDiIMSh4o7KC0V2eM71WURDSPB1--
