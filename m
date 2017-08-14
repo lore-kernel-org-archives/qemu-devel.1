@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dhEon-0006gR-87
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:50:12 -0400
+	(envelope-from <armbru@redhat.com>) id 1dhExJ-0006qW-Ny
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:58:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dhEoe-0003vu-2y
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:50:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54570)
+	(envelope-from <armbru@redhat.com>) id 1dhExF-0001Kn-Pj
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:58:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53506)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dhEod-0003vL-H5
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:49:55 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 62FDF2D59F5
-	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 12:49:54 +0000 (UTC)
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Mon, 14 Aug 2017 13:49:26 +0100
-Message-Id: <20170814124927.30134-12-berrange@redhat.com>
-In-Reply-To: <20170814124927.30134-1-berrange@redhat.com>
-References: <20170814124927.30134-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 11/12] ui: convert GTK and SDL1 frontends to
- keycodemapdb
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dhExF-0001KV-FA
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 08:58:49 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1501280035.git.alistair.francis@xilinx.com>
+	<8ee229215bce0152a94928512507abedea078013.1501280035.git.alistair.francis@xilinx.com>
+Date: Mon, 14 Aug 2017 14:58:20 +0200
+In-Reply-To: <8ee229215bce0152a94928512507abedea078013.1501280035.git.alistair.francis@xilinx.com>
+	(Alistair Francis's message of "Fri, 28 Jul 2017 15:16:36 -0700")
+Message-ID: <878timxq4z.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] Convert single line fprintf() to
+ warn_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,924 +28,333 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, James Hogan <james.hogan@imgtec.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Yongbok Kim <yongbok.kim@imgtec.com>, alistair23@gmail.com, Michael Roth <mdroth@linux.vnet.ibm.com>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 
-The x_keycode_to_pc_keycode and evdev_keycode_to_pc_keycode
-tables are replaced with automatically generated tables.
-In addition the X11 heuristics are improved to detect running
-on XQuartz and XWin X11 servers, to activate the correct OS-X
-and Win32 keycode maps.
+Alistair Francis <alistair.francis@xilinx.com> writes:
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- include/ui/input.h |  21 +++++
- ui/Makefile.objs   |  12 ++-
- ui/gtk.c           | 205 +++++++++++++++++++++++++------------------
- ui/input-keymap.c  |   7 ++
- ui/sdl.c           | 105 +++++++---------------
- ui/trace-events    |   9 +-
- ui/x_keymap.c      | 250 ++++++++++++++++++++---------------------------------
- ui/x_keymap.h      |   8 +-
- 8 files changed, 300 insertions(+), 317 deletions(-)
+> Convert all the single line uses of fprintf(stderr, "warning:"..."\n"...
+> to use warn_report() instead. This helps standardise on a single
+> method of printing warnings to the user.
+>
+> All of the warnings were changed using this command:
+>   find ./* -type f -exec sed -i \
+>     's|fprintf(.*".*warning[,:] \(.*\)\\n"\(.*\));|warn_report("\1"\2);|Ig' \
+>     {} +
+>
+> Some of the lines were manually edited to reduce the line length to below
+> 80 charecters.
+>
+> The #include lines were manually updated to allow the code to compile.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Cc: James Hogan <james.hogan@imgtec.com>
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> Cc: Yongbok Kim <yongbok.kim@imgtec.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>
+>  block/vvfat.c              | 4 +++-
+>  hw/acpi/core.c             | 3 ++-
+>  hw/i386/pc.c               | 2 +-
+>  hw/misc/applesmc.c         | 2 +-
+>  hw/usb/hcd-ehci.c          | 5 +++--
+>  hw/virtio/virtio-balloon.c | 3 ++-
+>  net/hub.c                  | 3 ++-
+>  net/socket.c               | 7 +++++--
+>  qga/vss-win32.c            | 2 +-
+>  target/mips/kvm.c          | 4 ++--
+>  trace/simple.c             | 2 +-
+>  ui/keymaps.c               | 2 +-
+>  ui/spice-display.c         | 2 +-
+>  13 files changed, 25 insertions(+), 16 deletions(-)
+>
+> diff --git a/block/vvfat.c b/block/vvfat.c
+> index a9e207f7f0..d682f0a9dc 100644
+> --- a/block/vvfat.c
+> +++ b/block/vvfat.c
+> @@ -32,6 +32,7 @@
+>  #include "qapi/qmp/qbool.h"
+>  #include "qapi/qmp/qstring.h"
+>  #include "qemu/cutils.h"
+> +#include "qemu/error-report.h"
+>  
+>  #ifndef S_IWGRP
+>  #define S_IWGRP 0
+> @@ -3028,7 +3029,8 @@ DLOG(checkpoint());
+>                          if (memcmp(direntries + k,
+>                                      array_get(&(s->directory), dir_index + k),
+>                                      sizeof(direntry_t))) {
+> -                            fprintf(stderr, "Warning: tried to write to write-protected file\n");
+> +                            warn_report("tried to write to write-protected "
+> +                                        "file");
+>                              return -1;
+>                          }
+>                      }
+> diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+> index 95fcac95a2..2a1b79c838 100644
+> --- a/hw/acpi/core.c
+> +++ b/hw/acpi/core.c
+> @@ -28,6 +28,7 @@
+>  #include "qapi/opts-visitor.h"
+>  #include "qapi-visit.h"
+>  #include "qapi-event.h"
+> +#include "qemu/error-report.h"
+>  
+>  struct acpi_table_header {
+>      uint16_t _length;         /* our length, not actual part of the hdr */
+> @@ -221,7 +222,7 @@ static void acpi_table_install(const char unsigned *blob, size_t bloblen,
+>      }
+>  
+>      if (!has_header && changed_fields == 0) {
+> -        fprintf(stderr, "warning: ACPI table: no headers are specified\n");
+> +        warn_report("ACPI table: no headers are specified");
+>      }
+>  
+>      /* recalculate checksum */
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index a67440f2a1..2f4ba4cd4f 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1310,7 +1310,7 @@ void pc_acpi_init(const char *default_dsdt)
+>  
+>      filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, default_dsdt);
+>      if (filename == NULL) {
+> -        fprintf(stderr, "WARNING: failed to find %s\n", default_dsdt);
+> +        warn_report("failed to find %s", default_dsdt);
+>      } else {
+>          QemuOpts *opts = qemu_opts_create(qemu_find_opts("acpi"), NULL, 0,
+>                                            &error_abort);
+> diff --git a/hw/misc/applesmc.c b/hw/misc/applesmc.c
+> index 7896812304..7be8b5f13c 100644
+> --- a/hw/misc/applesmc.c
+> +++ b/hw/misc/applesmc.c
+> @@ -331,7 +331,7 @@ static void applesmc_isa_realize(DeviceState *dev, Error **errp)
+>                          s->iobase + APPLESMC_ERR_PORT);
+>  
+>      if (!s->osk || (strlen(s->osk) != 64)) {
+> -        fprintf(stderr, "WARNING: Using AppleSMC with invalid key\n");
+> +        warn_report("Using AppleSMC with invalid key");
+>          s->osk = default_osk;
+>      }
+>  
+> diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
+> index 604912cb3e..46fd30b075 100644
+> --- a/hw/usb/hcd-ehci.c
+> +++ b/hw/usb/hcd-ehci.c
+> @@ -32,6 +32,7 @@
+>  #include "hw/usb/ehci-regs.h"
+>  #include "hw/usb/hcd-ehci.h"
+>  #include "trace.h"
+> +#include "qemu/error-report.h"
+>  
+>  #define FRAME_TIMER_FREQ 1000
+>  #define FRAME_TIMER_NS   (NANOSECONDS_PER_SECOND / FRAME_TIMER_FREQ)
+> @@ -348,7 +349,7 @@ static void ehci_trace_sitd(EHCIState *s, hwaddr addr,
+>  static void ehci_trace_guest_bug(EHCIState *s, const char *message)
+>  {
+>      trace_usb_ehci_guest_bug(message);
+> -    fprintf(stderr, "ehci warning: %s\n", message);
+> +    warn_report("%s", message);
+>  }
+>  
+>  static inline bool ehci_enabled(EHCIState *s)
+> @@ -1728,7 +1729,7 @@ static int ehci_state_fetchsitd(EHCIState *ehci, int async)
+>          /* siTD is not active, nothing to do */;
+>      } else {
+>          /* TODO: split transfers are not implemented */
+> -        fprintf(stderr, "WARNING: Skipping active siTD\n");
+> +        warn_report("Skipping active siTD");
+>      }
+>  
+>      ehci_set_fetch_addr(ehci, async, sitd.next);
+> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> index a705e0ec55..37cde38982 100644
+> --- a/hw/virtio/virtio-balloon.c
+> +++ b/hw/virtio/virtio-balloon.c
+> @@ -26,6 +26,7 @@
+>  #include "qapi/visitor.h"
+>  #include "qapi-event.h"
+>  #include "trace.h"
+> +#include "qemu/error-report.h"
+>  
+>  #include "hw/virtio/virtio-bus.h"
+>  #include "hw/virtio/virtio-access.h"
+> @@ -292,7 +293,7 @@ static void virtio_balloon_receive_stats(VirtIODevice *vdev, VirtQueue *vq)
+>      s->stats_vq_offset = offset;
+>  
+>      if (qemu_gettimeofday(&tv) < 0) {
+> -        fprintf(stderr, "warning: %s: failed to get time of day\n", __func__);
+> +        warn_report("%s: failed to get time of day", __func__);
 
-diff --git a/include/ui/input.h b/include/ui/input.h
-index dcf7e0e731..1c1731ef18 100644
---- a/include/ui/input.h
-+++ b/include/ui/input.h
-@@ -68,6 +68,9 @@ void qemu_input_check_mode_change(void);
- void qemu_add_mouse_mode_change_notifier(Notifier *notify);
- void qemu_remove_mouse_mode_change_notifier(Notifier *notify);
- 
-+extern const guint qemu_input_map_atset1_to_qcode_len;
-+extern const guint16 qemu_input_map_atset1_to_qcode[];
-+
- extern const guint qemu_input_map_linux_to_qcode_len;
- extern const guint16 qemu_input_map_linux_to_qcode[];
- 
-@@ -101,4 +104,22 @@ extern const guint16 qemu_input_map_qnum_to_qcode[];
- extern const guint qemu_input_map_usb_to_qcode_len;
- extern const guint16 qemu_input_map_usb_to_qcode[];
- 
-+extern const guint qemu_input_map_win32_to_qcode_len;
-+extern const guint16 qemu_input_map_win32_to_qcode[];
-+
-+extern const guint qemu_input_map_x11_to_qcode_len;
-+extern const guint16 qemu_input_map_x11_to_qcode[];
-+
-+extern const guint qemu_input_map_xorgevdev_to_qcode_len;
-+extern const guint16 qemu_input_map_xorgevdev_to_qcode[];
-+
-+extern const guint qemu_input_map_xorgkbd_to_qcode_len;
-+extern const guint16 qemu_input_map_xorgkbd_to_qcode[];
-+
-+extern const guint qemu_input_map_xorgxquartz_to_qcode_len;
-+extern const guint16 qemu_input_map_xorgxquartz_to_qcode[];
-+
-+extern const guint qemu_input_map_xorgxwin_to_qcode_len;
-+extern const guint16 qemu_input_map_xorgxwin_to_qcode[];
-+
- #endif /* INPUT_H */
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index 0e5821f6eb..6cd39bf49d 100644
---- a/ui/Makefile.objs
-+++ b/ui/Makefile.objs
-@@ -11,11 +11,12 @@ common-obj-y += keymaps.o console.o cursor.o qemu-pixman.o
- common-obj-y += input.o input-keymap.o input-legacy.o
- common-obj-$(CONFIG_LINUX) += input-linux.o
- common-obj-$(CONFIG_SPICE) += spice-core.o spice-input.o spice-display.o
--common-obj-$(CONFIG_SDL) += sdl.mo x_keymap.o
-+common-obj-$(CONFIG_SDL) += sdl.mo
- common-obj-$(CONFIG_COCOA) += cocoa.o
- common-obj-$(CONFIG_CURSES) += curses.o
- common-obj-$(CONFIG_VNC) += $(vnc-obj-y)
--common-obj-$(CONFIG_GTK) += gtk.o x_keymap.o
-+common-obj-$(CONFIG_GTK) += gtk.o
-+common-obj-$(if $(CONFIG_WIN32),n,$(if $(CONFIG_SDL),y,$(CONFIG_GTK))) += x_keymap.o
- 
- ifeq ($(CONFIG_SDLABI),1.2)
- sdl.mo-objs := sdl.o sdl_zoom.o
-@@ -54,6 +55,7 @@ KEYCODEMAP_GEN = $(SRC_PATH)/ui/keycodemapdb/tools/keymap-gen
- KEYCODEMAP_CSV = $(SRC_PATH)/ui/keycodemapdb/data/keymaps.csv
- 
- KEYCODEMAP_FILES = \
-+		 ui/input-keymap-atset1-to-qcode.c \
- 		 ui/input-keymap-linux-to-qcode.c \
- 		 ui/input-keymap-osx-to-qcode.c \
- 		 ui/input-keymap-qcode-to-adb.c \
-@@ -65,6 +67,12 @@ KEYCODEMAP_FILES = \
- 		 ui/input-keymap-qcode-to-sun.c \
- 		 ui/input-keymap-qnum-to-qcode.c \
- 		 ui/input-keymap-usb-to-qcode.c \
-+		 ui/input-keymap-win32-to-qcode.c \
-+		 ui/input-keymap-x11-to-qcode.c \
-+		 ui/input-keymap-xorgevdev-to-qcode.c \
-+		 ui/input-keymap-xorgkbd-to-qcode.c \
-+		 ui/input-keymap-xorgxquartz-to-qcode.c \
-+		 ui/input-keymap-xorgxwin-to-qcode.c \
- 		 $(NULL)
- 
- GENERATED_FILES += $(KEYCODEMAP_FILES)
-diff --git a/ui/gtk.c b/ui/gtk.c
-index 5bd87c265a..398f3aad81 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -52,7 +52,6 @@
- #include "ui/input.h"
- #include "sysemu/sysemu.h"
- #include "qmp-commands.h"
--#include "x_keymap.h"
- #include "keymaps.h"
- #include "chardev/char.h"
- #include "qom/object.h"
-@@ -65,6 +64,48 @@
- #define VC_SCALE_MIN    0.25
- #define VC_SCALE_STEP   0.25
- 
-+#ifdef GDK_WINDOWING_X11
-+#include "ui/x_keymap.h"
-+
-+/* Gtk2 compat */
-+#ifndef GDK_IS_X11_DISPLAY
-+#define GDK_IS_X11_DISPLAY(dpy) (dpy != NULL)
-+#endif
-+#endif
-+
-+
-+#ifdef GDK_WINDOWING_WAYLAND
-+/* Gtk2 compat */
-+#ifndef GDK_IS_WAYLAND_DISPLAY
-+#define GDK_IS_WAYLAND_DISPLAY(dpy) (dpy != NULL)
-+#endif
-+#endif
-+
-+
-+#ifdef GDK_WINDOWING_WIN32
-+/* Gtk2 compat */
-+#ifndef GDK_IS_WIN32_DISPLAY
-+#define GDK_IS_WIN32_DISPLAY(dpy) (dpy != NULL)
-+#endif
-+#endif
-+
-+
-+#ifdef GDK_WINDOWING_BROADWAY
-+/* Gtk2 compat */
-+#ifndef GDK_IS_BROADWAY_DISPLAY
-+#define GDK_IS_BROADWAY_DISPLAY(dpy) (dpy != NULL)
-+#endif
-+#endif
-+
-+
-+#ifdef GDK_WINDOWING_QUARTZ
-+/* Gtk2 compat */
-+#ifndef GDK_IS_QUARTZ_DISPLAY
-+#define GDK_IS_QUARTZ_DISPLAY(dpy) (dpy != NULL)
-+#endif
-+#endif
-+
-+
- #if !defined(CONFIG_VTE)
- # define VTE_CHECK_VERSION(a, b, c) 0
- #endif
-@@ -123,10 +164,19 @@
- #define HOTKEY_MODIFIERS        (GDK_CONTROL_MASK | GDK_MOD1_MASK)
- 
- static const int modifier_keycode[] = {
--    /* shift, control, alt keys, meta keys, both left & right */
--    0x2a, 0x36, 0x1d, 0x9d, 0x38, 0xb8, 0xdb, 0xdd,
-+    Q_KEY_CODE_SHIFT,
-+    Q_KEY_CODE_SHIFT_R,
-+    Q_KEY_CODE_CTRL,
-+    Q_KEY_CODE_CTRL_R,
-+    Q_KEY_CODE_ALT,
-+    Q_KEY_CODE_ALT_R,
-+    Q_KEY_CODE_META_L,
-+    Q_KEY_CODE_META_R,
- };
- 
-+static const guint16 *keycode_map;
-+static size_t keycode_maplen;
-+
- struct GtkDisplayState {
-     GtkWidget *window;
- 
-@@ -178,7 +228,6 @@ struct GtkDisplayState {
-     bool external_pause_update;
- 
-     bool modifier_pressed[ARRAY_SIZE(modifier_keycode)];
--    bool has_evdev;
-     bool ignore_keys;
- };
- 
-@@ -412,18 +461,18 @@ static void gd_update_full_redraw(VirtualConsole *vc)
- static void gtk_release_modifiers(GtkDisplayState *s)
- {
-     VirtualConsole *vc = gd_vc_find_current(s);
--    int i, keycode;
-+    int i, qcode;
- 
-     if (vc->type != GD_VC_GFX ||
-         !qemu_console_is_graphic(vc->gfx.dcl.con)) {
-         return;
-     }
-     for (i = 0; i < ARRAY_SIZE(modifier_keycode); i++) {
--        keycode = modifier_keycode[i];
-+        qcode = modifier_keycode[i];
-         if (!s->modifier_pressed[i]) {
-             continue;
-         }
--        qemu_input_event_send_key_number(vc->gfx.dcl.con, keycode, false);
-+        qemu_input_event_send_key_qcode(vc->gfx.dcl.con, qcode, false);
-         s->modifier_pressed[i] = false;
-     }
- }
-@@ -1057,47 +1106,75 @@ static gboolean gd_scroll_event(GtkWidget *widget, GdkEventScroll *scroll,
-     return TRUE;
- }
- 
--static int gd_map_keycode(GtkDisplayState *s, GdkDisplay *dpy, int gdk_keycode)
-+
-+static const guint16 *gd_get_keymap(size_t *maplen)
- {
--    int qemu_keycode;
-+    GdkDisplay *dpy = gdk_display_get_default();
-+
-+#ifdef GDK_WINDOWING_X11
-+    if (GDK_IS_X11_DISPLAY(dpy)) {
-+        trace_gd_keymap_windowing("x11");
-+        return qemu_xkeymap_mapping_table(
-+            gdk_x11_display_get_xdisplay(dpy), maplen);
-+    }
-+#endif
-+
-+#ifdef GDK_WINDOWING_WAYLAND
-+    if (GDK_IS_WAYLAND_DISPLAY(dpy)) {
-+        trace_gd_keymap_windowing("wayland");
-+        *maplen = qemu_input_map_xorgevdev_to_qcode_len;
-+        return qemu_input_map_xorgevdev_to_qcode;
-+    }
-+#endif
- 
- #ifdef GDK_WINDOWING_WIN32
-     if (GDK_IS_WIN32_DISPLAY(dpy)) {
--        qemu_keycode = MapVirtualKey(gdk_keycode, MAPVK_VK_TO_VSC);
--        switch (qemu_keycode) {
--        case 103:   /* alt gr */
--            qemu_keycode = 56 | SCANCODE_GREY;
--            break;
--        }
--        return qemu_keycode;
-+        trace_gd_keymap_windowing("win32");
-+        *maplen = qemu_input_map_win32_to_qcode_len;
-+        return qemu_input_map_win32_to_qcode;
-     }
- #endif
- 
--    if (gdk_keycode < 9) {
--        qemu_keycode = 0;
--    } else if (gdk_keycode < 97) {
--        qemu_keycode = gdk_keycode - 8;
--#ifdef GDK_WINDOWING_X11
--    } else if (GDK_IS_X11_DISPLAY(dpy) && gdk_keycode < 158) {
--        if (s->has_evdev) {
--            qemu_keycode = translate_evdev_keycode(gdk_keycode - 97);
--        } else {
--            qemu_keycode = translate_xfree86_keycode(gdk_keycode - 97);
--        }
-+#ifdef GDK_WINDOWING_QUARTZ
-+    if (GDK_IS_QUARTZ_DISPLAY(dpy)) {
-+        trace_gd_keymap_windowing("quartz");
-+        *maplen = qemu_input_map_osx_to_qcode_len;
-+        return qemu_input_map_osx_to_qcode;
-+    }
- #endif
--#ifdef GDK_WINDOWING_WAYLAND
--    } else if (GDK_IS_WAYLAND_DISPLAY(dpy) && gdk_keycode < 158) {
--        qemu_keycode = translate_evdev_keycode(gdk_keycode - 97);
-+
-+#ifdef GDK_WINDOWING_BROADWAY
-+    if (GDK_IS_BROADWAY_DISPLAY(dpy)) {
-+        trace_gd_keymap_windowing("broadway");
-+        g_warning("experimental: using broadway, x11 virtual keysym\n"
-+                  "mapping - with very limited support. See also\n"
-+                  "https://bugzilla.gnome.org/show_bug.cgi?id=700105");
-+        *maplen = qemu_input_map_x11_to_qcode_len;
-+        return qemu_input_map_x11_to_qcode;
-+    }
- #endif
--    } else if (gdk_keycode == 208) { /* Hiragana_Katakana */
--        qemu_keycode = 0x70;
--    } else if (gdk_keycode == 211) { /* backslash */
--        qemu_keycode = 0x73;
--    } else {
--        qemu_keycode = 0;
-+
-+    g_warning("Unsupported GDK Windowing platform.\n"
-+              "Disabling extended keycode tables.\n"
-+              "Please report to qemu-devel@nongnu.org\n"
-+              "including the following information:\n"
-+              "\n"
-+              "  - Operating system\n"
-+              "  - GDK Windowing system build\n");
-+    return NULL;
-+}
-+
-+
-+static int gd_map_keycode(int scancode)
-+{
-+    if (!keycode_map) {
-+        return 0;
-+    }
-+    if (scancode > keycode_maplen) {
-+        return 0;
-     }
- 
--    return qemu_keycode;
-+    return keycode_map[scancode];
- }
- 
- static gboolean gd_text_key_down(GtkWidget *widget,
-@@ -1111,9 +1188,7 @@ static gboolean gd_text_key_down(GtkWidget *widget,
-     } else if (key->length) {
-         kbd_put_string_console(con, key->string, key->length);
-     } else {
--        int num = gd_map_keycode(vc->s, gtk_widget_get_display(widget),
--                                 key->hardware_keycode);
--        int qcode = qemu_input_key_number_to_qcode(num);
-+        int qcode = gd_map_keycode(key->hardware_keycode);
-         kbd_put_qcode_console(con, qcode);
-     }
-     return TRUE;
-@@ -1123,8 +1198,7 @@ static gboolean gd_key_event(GtkWidget *widget, GdkEventKey *key, void *opaque)
- {
-     VirtualConsole *vc = opaque;
-     GtkDisplayState *s = vc->s;
--    int gdk_keycode = key->hardware_keycode;
--    int qemu_keycode;
-+    int qcode;
-     int i;
- 
-     if (s->ignore_keys) {
-@@ -1138,20 +1212,19 @@ static gboolean gd_key_event(GtkWidget *widget, GdkEventKey *key, void *opaque)
-         return TRUE;
-     }
- 
--    qemu_keycode = gd_map_keycode(s, gtk_widget_get_display(widget),
--                                  gdk_keycode);
-+    qcode = gd_map_keycode(key->hardware_keycode);
- 
--    trace_gd_key_event(vc->label, gdk_keycode, qemu_keycode,
-+    trace_gd_key_event(vc->label, key->hardware_keycode, qcode,
-                        (key->type == GDK_KEY_PRESS) ? "down" : "up");
- 
-     for (i = 0; i < ARRAY_SIZE(modifier_keycode); i++) {
--        if (qemu_keycode == modifier_keycode[i]) {
-+        if (qcode == modifier_keycode[i]) {
-             s->modifier_pressed[i] = (key->type == GDK_KEY_PRESS);
-         }
-     }
- 
--    qemu_input_event_send_key_number(vc->gfx.dcl.con, qemu_keycode,
--                                     key->type == GDK_KEY_PRESS);
-+    qemu_input_event_send_key_qcode(vc->gfx.dcl.con, qcode,
-+                                    key->type == GDK_KEY_PRESS);
- 
-     return TRUE;
- }
-@@ -2195,38 +2268,6 @@ static void gd_create_menus(GtkDisplayState *s)
-     gtk_window_add_accel_group(GTK_WINDOW(s->window), s->accel_group);
- }
- 
--static void gd_set_keycode_type(GtkDisplayState *s)
--{
--#ifdef GDK_WINDOWING_X11
--    GdkDisplay *display = gtk_widget_get_display(s->window);
--    if (GDK_IS_X11_DISPLAY(display)) {
--        Display *x11_display = gdk_x11_display_get_xdisplay(display);
--        XkbDescPtr desc = XkbGetMap(x11_display, XkbGBN_AllComponentsMask,
--                                    XkbUseCoreKbd);
--        char *keycodes = NULL;
--
--        if (desc &&
--            (XkbGetNames(x11_display, XkbKeycodesNameMask, desc) == Success)) {
--            keycodes = XGetAtomName(x11_display, desc->names->keycodes);
--        }
--        if (keycodes == NULL) {
--            fprintf(stderr, "could not lookup keycode name\n");
--        } else if (strstart(keycodes, "evdev", NULL)) {
--            s->has_evdev = true;
--        } else if (!strstart(keycodes, "xfree86", NULL)) {
--            fprintf(stderr, "unknown keycodes `%s', please report to "
--                    "qemu-devel@nongnu.org\n", keycodes);
--        }
--
--        if (desc) {
--            XkbFreeKeyboard(desc, XkbGBN_AllComponentsMask, True);
--        }
--        if (keycodes) {
--            XFree(keycodes);
--        }
--    }
--#endif
--}
- 
- static gboolean gtkinit;
- 
-@@ -2329,8 +2370,6 @@ void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover)
-     if (grab_on_hover) {
-         gtk_menu_item_activate(GTK_MENU_ITEM(s->grab_on_hover_item));
-     }
--
--    gd_set_keycode_type(s);
- }
- 
- void early_gtk_display_init(int opengl)
-@@ -2377,6 +2416,8 @@ void early_gtk_display_init(int opengl)
-         break;
-     }
- 
-+    keycode_map = gd_get_keymap(&keycode_maplen);
-+
- #if defined(CONFIG_VTE)
-     type_register(&char_gd_vc_type_info);
- #endif
-diff --git a/ui/input-keymap.c b/ui/input-keymap.c
-index ad98b153cf..908d58ea63 100644
---- a/ui/input-keymap.c
-+++ b/ui/input-keymap.c
-@@ -5,6 +5,7 @@
- 
- #include "standard-headers/linux/input.h"
- 
-+#include "ui/input-keymap-atset1-to-qcode.c"
- #include "ui/input-keymap-linux-to-qcode.c"
- #include "ui/input-keymap-osx-to-qcode.c"
- #include "ui/input-keymap-qcode-to-adb.c"
-@@ -16,6 +17,12 @@
- #include "ui/input-keymap-qcode-to-sun.c"
- #include "ui/input-keymap-qnum-to-qcode.c"
- #include "ui/input-keymap-usb-to-qcode.c"
-+#include "ui/input-keymap-win32-to-qcode.c"
-+#include "ui/input-keymap-x11-to-qcode.c"
-+#include "ui/input-keymap-xorgevdev-to-qcode.c"
-+#include "ui/input-keymap-xorgkbd-to-qcode.c"
-+#include "ui/input-keymap-xorgxquartz-to-qcode.c"
-+#include "ui/input-keymap-xorgxwin-to-qcode.c"
- 
- int qemu_input_linux_to_qcode(unsigned int lnx)
- {
-diff --git a/ui/sdl.c b/ui/sdl.c
-index 7b71a9ac58..afb4992da2 100644
---- a/ui/sdl.c
-+++ b/ui/sdl.c
-@@ -34,7 +34,9 @@
- #include "ui/console.h"
- #include "ui/input.h"
- #include "sysemu/sysemu.h"
-+#ifndef WIN32
- #include "x_keymap.h"
-+#endif
- #include "sdl_zoom.h"
- 
- static DisplayChangeListener *dcl;
-@@ -63,6 +65,8 @@ static SDL_PixelFormat host_format;
- static int scaling_active = 0;
- static Notifier mouse_mode_notifier;
- static int idle_counter;
-+static const guint16 *keycode_map;
-+static size_t keycode_maplen;
- 
- #define SDL_REFRESH_INTERVAL_BUSY 10
- #define SDL_MAX_IDLE_COUNT (2 * GUI_REFRESH_INTERVAL_DEFAULT \
-@@ -208,94 +212,45 @@ static uint8_t sdl_keyevent_to_keycode_generic(const SDL_KeyboardEvent *ev)
-     return keysym2scancode(kbd_layout, keysym) & SCANCODE_KEYMASK;
- }
- 
--/* specific keyboard conversions from scan codes */
--
--#if defined(_WIN32)
- 
--static uint8_t sdl_keyevent_to_keycode(const SDL_KeyboardEvent *ev)
-+static const guint16 *sdl_get_keymap(size_t *maplen)
- {
--    return ev->keysym.scancode;
--}
--
-+#if defined(WIN32)
-+    *maplen = qemu_input_map_atset1_to_qcode_len;
-+    return qemu_input_map_atset1_to_qcode;
- #else
--
- #if defined(SDL_VIDEO_DRIVER_X11)
--#include <X11/XKBlib.h>
--
--static int check_for_evdev(void)
--{
-     SDL_SysWMinfo info;
--    XkbDescPtr desc = NULL;
--    int has_evdev = 0;
--    char *keycodes = NULL;
- 
-     SDL_VERSION(&info.version);
--    if (!SDL_GetWMInfo(&info)) {
--        return 0;
-+    if (SDL_GetWMInfo(&info) > 0) {
-+        return qemu_xkeymap_mapping_table(
-+            info.info.x11.display, maplen);
-     }
--    desc = XkbGetMap(info.info.x11.display,
--                     XkbGBN_AllComponentsMask,
--                     XkbUseCoreKbd);
--    if (desc &&
--        (XkbGetNames(info.info.x11.display,
--                     XkbKeycodesNameMask, desc) == Success)) {
--        keycodes = XGetAtomName(info.info.x11.display, desc->names->keycodes);
--        if (keycodes == NULL) {
--            fprintf(stderr, "could not lookup keycode name\n");
--        } else if (strstart(keycodes, "evdev", NULL)) {
--            has_evdev = 1;
--        } else if (!strstart(keycodes, "xfree86", NULL)) {
--            fprintf(stderr, "unknown keycodes `%s', please report to "
--                    "qemu-devel@nongnu.org\n", keycodes);
--        }
--    }
--
--    if (desc) {
--        XkbFreeKeyboard(desc, XkbGBN_AllComponentsMask, True);
--    }
--    if (keycodes) {
--        XFree(keycodes);
--    }
--    return has_evdev;
--}
--#else
--static int check_for_evdev(void)
--{
--	return 0;
--}
- #endif
-+    g_warning("Unsupported SDL video driver / platform.\n"
-+              "Assuming Linux KBD scancodes, but probably wrong.\n"
-+              "Please report to qemu-devel@nongnu.org\n"
-+              "including the following information:\n"
-+              "\n"
-+              "  - Operating system\n"
-+              "  - SDL video driver\n");
-+    *maplen = qemu_input_map_xorgkbd_to_qcode_len;
-+    return qemu_input_map_xorgkbd_to_qcode;
-+#endif
-+}
- 
- static uint8_t sdl_keyevent_to_keycode(const SDL_KeyboardEvent *ev)
- {
--    int keycode;
--    static int has_evdev = -1;
--
--    if (has_evdev == -1)
--        has_evdev = check_for_evdev();
--
--    keycode = ev->keysym.scancode;
--
--    if (keycode < 9) {
--        keycode = 0;
--    } else if (keycode < 97) {
--        keycode -= 8; /* just an offset */
--    } else if (keycode < 158) {
--        /* use conversion table */
--        if (has_evdev)
--            keycode = translate_evdev_keycode(keycode - 97);
--        else
--            keycode = translate_xfree86_keycode(keycode - 97);
--    } else if (keycode == 208) { /* Hiragana_Katakana */
--        keycode = 0x70;
--    } else if (keycode == 211) { /* backslash */
--        keycode = 0x73;
--    } else {
--        keycode = 0;
-+    if (!keycode_map) {
-+        return 0;
-+    }
-+    if (ev->keysym.scancode > keycode_maplen) {
-+        return 0;
-     }
--    return keycode;
--}
- 
--#endif
-+    return keycode_map[ev->keysym.scancode];
-+}
- 
- static void reset_keys(void)
- {
-@@ -995,6 +950,8 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
-     vi = SDL_GetVideoInfo();
-     host_format = *(vi->vfmt);
- 
-+    keycode_map = sdl_get_keymap(&keycode_maplen);
-+
-     /* Load a 32x32x4 image. White pixels are transparent. */
-     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, "qemu-icon.bmp");
-     if (filename) {
-diff --git a/ui/trace-events b/ui/trace-events
-index 34c2213700..9a943f645d 100644
---- a/ui/trace-events
-+++ b/ui/trace-events
-@@ -18,9 +18,10 @@ ppm_save(const char *filename, void *display_surface) "%s surface=%p"
- # ui/gtk.c
- gd_switch(const char *tab, int width, int height) "tab=%s, width=%d, height=%d"
- gd_update(const char *tab, int x, int y, int w, int h) "tab=%s, x=%d, y=%d, w=%d, h=%d"
--gd_key_event(const char *tab, int gdk_keycode, int qemu_keycode, const char *action) "tab=%s, translated GDK keycode %d to QEMU keycode %d (%s)"
-+gd_key_event(const char *tab, int gdk_keycode, int qkeycode, const char *action) "tab=%s, translated GDK keycode %d to QKeyCode %d (%s)"
- gd_grab(const char *tab, const char *device, const char *reason) "tab=%s, dev=%s, reason=%s"
- gd_ungrab(const char *tab, const char *device) "tab=%s, dev=%s"
-+gd_keymap_windowing(const char *name) "backend=%s"
- 
- # ui/vnc.c
- vnc_key_guest_leds(bool caps, bool num, bool scroll) "caps %d, num %d, scroll %d"
-@@ -51,3 +52,9 @@ qemu_spice_create_update(uint32_t left, uint32_t right, uint32_t top, uint32_t b
- keymap_parse(const char *file) "file %s"
- keymap_add(const char *type, int sym, int code, const char *line) "%-6s sym=0x%04x code=0x%04x (line: %s)"
- keymap_unmapped(int sym) "sym=0x%04x"
-+
-+# ui/x_keymap.c
-+xkeymap_extension(const char *name) "extension '%s'"
-+xkeymap_vendor(const char *name) "vendor '%s'"
-+xkeymap_keycodes(const char *name) "keycodes '%s'"
-+xkeymap_keymap(const char *name) "keymap '%s'"
-diff --git a/ui/x_keymap.c b/ui/x_keymap.c
-index 27884851de..22e0e77c4d 100644
---- a/ui/x_keymap.c
-+++ b/ui/x_keymap.c
-@@ -1,169 +1,111 @@
- /*
-- * QEMU SDL display driver
-+ * QEMU X11 keymaps
-  *
-- * Copyright (c) 2003 Fabrice Bellard
-+ * Copyright (C) 2009-2010 Daniel P. Berrange <dan@berrange.com>
-+ * Copyright (C) 2017 Red Hat, Inc
-  *
-- * Permission is hereby granted, free of charge, to any person obtaining a copy
-- * of this software and associated documentation files (the "Software"), to deal
-- * in the Software without restriction, including without limitation the rights
-- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-- * copies of the Software, and to permit persons to whom the Software is
-- * furnished to do so, subject to the following conditions:
-- *
-- * The above copyright notice and this permission notice shall be included in
-- * all copies or substantial portions of the Software.
-- *
-- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-- * THE SOFTWARE.
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU Lesser General Public License version 2 as
-+ * published by the Free Software Foundation.
-  */
-+
- #include "qemu/osdep.h"
--#include "qemu-common.h"
-+
- #include "x_keymap.h"
-+#include "trace.h"
-+#include "qemu/notify.h"
-+#include "ui/input.h"
- 
--static const uint8_t x_keycode_to_pc_keycode[115] = {
--   0xc7,      /*  97  Home   */
--   0xc8,      /*  98  Up     */
--   0xc9,      /*  99  PgUp   */
--   0xcb,      /* 100  Left   */
--   0x4c,        /* 101  KP-5   */
--   0xcd,      /* 102  Right  */
--   0xcf,      /* 103  End    */
--   0xd0,      /* 104  Down   */
--   0xd1,      /* 105  PgDn   */
--   0xd2,      /* 106  Ins    */
--   0xd3,      /* 107  Del    */
--   0x9c,      /* 108  Enter  */
--   0x9d,      /* 109  Ctrl-R */
--   0x0,       /* 110  Pause  */
--   0xb7,      /* 111  Print  */
--   0xb5,      /* 112  Divide */
--   0xb8,      /* 113  Alt-R  */
--   0xc6,      /* 114  Break  */
--   0x0,         /* 115 */
--   0x0,         /* 116 */
--   0x0,         /* 117 */
--   0x0,         /* 118 */
--   0x0,         /* 119 */
--   0x0,         /* 120 */
--   0x0,         /* 121 */
--   0x0,         /* 122 */
--   0x0,         /* 123 */
--   0x0,         /* 124 */
--   0x0,         /* 125 */
--   0x0,         /* 126 */
--   0x0,         /* 127 */
--   0x0,         /* 128 */
--   0x79,         /* 129 Henkan */
--   0x0,         /* 130 */
--   0x7b,         /* 131 Muhenkan */
--   0x0,         /* 132 */
--   0x7d,         /* 133 Yen */
--   0x0,         /* 134 */
--   0x0,         /* 135 */
--   0x47,         /* 136 KP_7 */
--   0x48,         /* 137 KP_8 */
--   0x49,         /* 138 KP_9 */
--   0x4b,         /* 139 KP_4 */
--   0x4c,         /* 140 KP_5 */
--   0x4d,         /* 141 KP_6 */
--   0x4f,         /* 142 KP_1 */
--   0x50,         /* 143 KP_2 */
--   0x51,         /* 144 KP_3 */
--   0x52,         /* 145 KP_0 */
--   0x53,         /* 146 KP_. */
--   0x47,         /* 147 KP_HOME */
--   0x48,         /* 148 KP_UP */
--   0x49,         /* 149 KP_PgUp */
--   0x4b,         /* 150 KP_Left */
--   0x4c,         /* 151 KP_ */
--   0x4d,         /* 152 KP_Right */
--   0x4f,         /* 153 KP_End */
--   0x50,         /* 154 KP_Down */
--   0x51,         /* 155 KP_PgDn */
--   0x52,         /* 156 KP_Ins */
--   0x53,         /* 157 KP_Del */
--};
-+#include <X11/XKBlib.h>
- 
--/* This table is generated based off the xfree86 -> scancode mapping above
-- * and the keycode mappings in /usr/share/X11/xkb/keycodes/evdev
-- * and  /usr/share/X11/xkb/keycodes/xfree86
-- */
-+static gboolean check_for_xwin(Display *dpy)
-+{
-+    const char *vendor = ServerVendor(dpy);
-+
-+    trace_xkeymap_vendor(vendor);
- 
--static const uint8_t evdev_keycode_to_pc_keycode[61] = {
--    0x73,      /*  97 EVDEV - RO   ("Internet" Keyboards) */
--    0,         /*  98 EVDEV - KATA (Katakana) */
--    0,         /*  99 EVDEV - HIRA (Hiragana) */
--    0x79,      /* 100 EVDEV - HENK (Henkan) */
--    0x70,      /* 101 EVDEV - HKTG (Hiragana/Katakana toggle) */
--    0x7b,      /* 102 EVDEV - MUHE (Muhenkan) */
--    0,         /* 103 EVDEV - JPCM (KPJPComma) */
--    0x9c,      /* 104 KPEN */
--    0x9d,      /* 105 RCTL */
--    0xb5,      /* 106 KPDV */
--    0xb7,      /* 107 PRSC */
--    0xb8,      /* 108 RALT */
--    0,         /* 109 EVDEV - LNFD ("Internet" Keyboards) */
--    0xc7,      /* 110 HOME */
--    0xc8,      /* 111 UP */
--    0xc9,      /* 112 PGUP */
--    0xcb,      /* 113 LEFT */
--    0xcd,      /* 114 RGHT */
--    0xcf,      /* 115 END */
--    0xd0,      /* 116 DOWN */
--    0xd1,      /* 117 PGDN */
--    0xd2,      /* 118 INS */
--    0xd3,      /* 119 DELE */
--    0,         /* 120 EVDEV - I120 ("Internet" Keyboards) */
--    0,         /* 121 EVDEV - MUTE */
--    0,         /* 122 EVDEV - VOL- */
--    0,         /* 123 EVDEV - VOL+ */
--    0,         /* 124 EVDEV - POWR */
--    0,         /* 125 EVDEV - KPEQ */
--    0,         /* 126 EVDEV - I126 ("Internet" Keyboards) */
--    0,         /* 127 EVDEV - PAUS */
--    0,         /* 128 EVDEV - ???? */
--    0x7e,      /* 129 EVDEV - KP_COMMA (brazilian) */
--    0xf1,      /* 130 EVDEV - HNGL (Korean Hangul Latin toggle) */
--    0xf2,      /* 131 EVDEV - HJCV (Korean Hangul Hanja toggle) */
--    0x7d,      /* 132 AE13 (Yen)*/
--    0xdb,      /* 133 EVDEV - LWIN */
--    0xdc,      /* 134 EVDEV - RWIN */
--    0xdd,      /* 135 EVDEV - MENU */
--    0,         /* 136 EVDEV - STOP */
--    0,         /* 137 EVDEV - AGAI */
--    0,         /* 138 EVDEV - PROP */
--    0,         /* 139 EVDEV - UNDO */
--    0,         /* 140 EVDEV - FRNT */
--    0,         /* 141 EVDEV - COPY */
--    0,         /* 142 EVDEV - OPEN */
--    0,         /* 143 EVDEV - PAST */
--    0,         /* 144 EVDEV - FIND */
--    0,         /* 145 EVDEV - CUT  */
--    0,         /* 146 EVDEV - HELP */
--    0,         /* 147 EVDEV - I147 */
--    0,         /* 148 EVDEV - I148 */
--    0,         /* 149 EVDEV - I149 */
--    0,         /* 150 EVDEV - I150 */
--    0,         /* 151 EVDEV - I151 */
--    0,         /* 152 EVDEV - I152 */
--    0,         /* 153 EVDEV - I153 */
--    0,         /* 154 EVDEV - I154 */
--    0,         /* 155 EVDEV - I156 */
--    0,         /* 156 EVDEV - I157 */
--    0,         /* 157 EVDEV - I158 */
--};
-+    if (strstr(vendor, "Cygwin/X")) {
-+        return TRUE;
-+    }
- 
--uint8_t translate_xfree86_keycode(const int key)
-+    return FALSE;
-+}
-+
-+static gboolean check_for_xquartz(Display *dpy)
- {
--    return x_keycode_to_pc_keycode[key];
-+    int nextensions;
-+    int i;
-+    gboolean match = FALSE;
-+    char **extensions = XListExtensions(dpy, &nextensions);
-+    for (i = 0 ; extensions != NULL && i < nextensions ; i++) {
-+        trace_xkeymap_extension(extensions[i]);
-+        if (strcmp(extensions[i], "Apple-WM") == 0 ||
-+            strcmp(extensions[i], "Apple-DRI") == 0) {
-+            match = TRUE;
-+        }
-+    }
-+    if (extensions) {
-+        XFreeExtensionList(extensions);
-+    }
-+
-+    return match;
- }
- 
--uint8_t translate_evdev_keycode(const int key)
-+const guint16 *qemu_xkeymap_mapping_table(Display *dpy, size_t *maplen)
- {
--    return evdev_keycode_to_pc_keycode[key];
-+    XkbDescPtr desc;
-+    const gchar *keycodes = NULL;
-+
-+    /* There is no easy way to determine what X11 server
-+     * and platform & keyboard driver is in use. Thus we
-+     * do best guess heuristics.
-+     *
-+     * This will need more work for people with other
-+     * X servers..... patches welcomed.
-+     */
-+
-+    desc = XkbGetMap(dpy,
-+                     XkbGBN_AllComponentsMask,
-+                     XkbUseCoreKbd);
-+    if (desc) {
-+        if (XkbGetNames(dpy, XkbKeycodesNameMask, desc) == Success) {
-+            keycodes = XGetAtomName (dpy, desc->names->keycodes);
-+            if (!keycodes) {
-+                g_warning("could not lookup keycode name");
-+            } else {
-+                trace_xkeymap_keycodes(keycodes);
-+            }
-+        }
-+        XkbFreeKeyboard(desc, XkbGBN_AllComponentsMask, True);
-+    }
-+
-+    if (check_for_xwin(dpy)) {
-+        trace_xkeymap_keymap("xwin");
-+        *maplen = qemu_input_map_xorgxwin_to_qcode_len;
-+        return qemu_input_map_xorgxwin_to_qcode;
-+    } else if (check_for_xquartz(dpy)) {
-+        trace_xkeymap_keymap("xquartz");
-+        *maplen = qemu_input_map_xorgxquartz_to_qcode_len;
-+        return qemu_input_map_xorgxquartz_to_qcode;
-+    } else if (keycodes && g_str_has_prefix(keycodes, "evdev")) {
-+        trace_xkeymap_keymap("evdev");
-+        *maplen = qemu_input_map_xorgevdev_to_qcode_len;
-+        return qemu_input_map_xorgevdev_to_qcode;
-+    } else if (keycodes && g_str_has_prefix(keycodes, "xfree86")) {
-+        trace_xkeymap_keymap("kbd");
-+        *maplen = qemu_input_map_xorgkbd_to_qcode_len;
-+        return qemu_input_map_xorgkbd_to_qcode;
-+    } else {
-+        trace_xkeymap_keymap("NULL");
-+        g_warning("Unknown X11 keycode mapping '%s'.\n"
-+                  "Please report to qemu-devel@nongnu.org\n"
-+                  "including the following information:\n"
-+                  "\n"
-+                  "  - Operating system\n"
-+                  "  - X11 Server\n"
-+                  "  - xprop -root\n"
-+                  "  - xdpyinfo\n",
-+                  keycodes ? keycodes : "<null>");
-+        return NULL;
-+    }
- }
-diff --git a/ui/x_keymap.h b/ui/x_keymap.h
-index afde2e94bf..0395e335ff 100644
---- a/ui/x_keymap.h
-+++ b/ui/x_keymap.h
-@@ -1,7 +1,7 @@
- /*
-- * QEMU SDL display driver
-+ * QEMU X11 keymaps
-  *
-- * Copyright (c) 2003 Fabrice Bellard
-+ * Copyright (c) 2017 Red Hat, Inc.
-  *
-  * Permission is hereby granted, free of charge, to any person obtaining a copy
-  * of this software and associated documentation files (the "Software"), to deal
-@@ -25,8 +25,8 @@
- #ifndef QEMU_X_KEYMAP_H
- #define QEMU_X_KEYMAP_H
- 
--uint8_t translate_xfree86_keycode(const int key);
-+#include <X11/Xlib.h>
- 
--uint8_t translate_evdev_keycode(const int key);
-+const guint16 *qemu_xkeymap_mapping_table(Display *dpy, size_t *maplen);
- 
- #endif
--- 
-2.13.3
+__func__ in error messages is an anti-pattern: if you need the function
+name (and thus a developer) to make sense of the message, then it's
+pretty bad.
+
+>          goto out;
+>      }
+>  
+> diff --git a/net/hub.c b/net/hub.c
+> index 32d8cf5cd4..afe941ae7a 100644
+> --- a/net/hub.c
+> +++ b/net/hub.c
+> @@ -18,6 +18,7 @@
+>  #include "clients.h"
+>  #include "hub.h"
+>  #include "qemu/iov.h"
+> +#include "qemu/error-report.h"
+>  
+>  /*
+>   * A hub broadcasts incoming packets to all its ports except the source port.
+> @@ -330,7 +331,7 @@ void net_hub_check_clients(void)
+>              }
+>          }
+>          if (has_host_dev && !has_nic) {
+> -            fprintf(stderr, "Warning: vlan %d with no nics\n", hub->id);
+> +            warn_report("vlan %d with no nics", hub->id);
+>          }
+>          if (has_nic && !has_host_dev) {
+>              fprintf(stderr,
+> diff --git a/net/socket.c b/net/socket.c
+> index f85ef7d61b..354f967769 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -449,8 +449,11 @@ static NetSocketState *net_socket_fd_init(NetClientState *peer,
+>      case SOCK_STREAM:
+>          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+>      default:
+> -        /* who knows ... this could be a eg. a pty, do warn and continue as stream */
+> -        fprintf(stderr, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM or SOCK_STREAM\n", so_type, fd);
+> +        /* who knows ... this could be a eg. a pty, do warn and continue as
+> +         * stream
+> +         */
+> +        warn_report("socket type=%d for fd=%d is not SOCK_DGRAM or "
+> +                    "SOCK_STREAM", so_type, fd);
+>          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+>      }
+>      return NULL;
+
+This is going to conflict with "[PATCH v8 1/4] net/socket: Don't treat
+odd socket type as SOCK_STREAM", just queued by Jason, but the conflict
+should be trivial to resolve.
+
+> diff --git a/qga/vss-win32.c b/qga/vss-win32.c
+> index a80933c98b..b748b9ff57 100644
+> --- a/qga/vss-win32.c
+> +++ b/qga/vss-win32.c
+> @@ -61,7 +61,7 @@ static bool vss_check_os_version(void)
+>              return false;
+>          }
+>          if (wow64) {
+> -            fprintf(stderr, "Warning: Running under WOW64\n");
+> +            warn_report("Running under WOW64");
+>          }
+>  #endif
+>          return !wow64;
+> diff --git a/target/mips/kvm.c b/target/mips/kvm.c
+> index 3317905e71..a23aa438d2 100644
+> --- a/target/mips/kvm.c
+> +++ b/target/mips/kvm.c
+> @@ -95,11 +95,11 @@ void kvm_mips_reset_vcpu(MIPSCPU *cpu)
+>      CPUMIPSState *env = &cpu->env;
+>  
+>      if (!kvm_mips_fpu_cap && env->CP0_Config1 & (1 << CP0C1_FP)) {
+> -        fprintf(stderr, "Warning: KVM does not support FPU, disabling\n");
+> +        warn_report("KVM does not support FPU, disabling");
+>          env->CP0_Config1 &= ~(1 << CP0C1_FP);
+>      }
+>      if (!kvm_mips_msa_cap && env->CP0_Config3 & (1 << CP0C3_MSAP)) {
+> -        fprintf(stderr, "Warning: KVM does not support MSA, disabling\n");
+> +        warn_report("KVM does not support MSA, disabling");
+>          env->CP0_Config3 &= ~(1 << CP0C3_MSAP);
+>      }
+>  
+> diff --git a/trace/simple.c b/trace/simple.c
+> index a221a3f703..003db00229 100644
+> --- a/trace/simple.c
+> +++ b/trace/simple.c
+> @@ -405,7 +405,7 @@ bool st_init(void)
+>  
+>      thread = trace_thread_create(writeout_thread);
+>      if (!thread) {
+> -        fprintf(stderr, "warning: unable to initialize simple trace backend\n");
+> +        warn_report("unable to initialize simple trace backend");
+>          return false;
+>      }
+>  
+
+Hmm, why is failure to initialize only a warning?  Aha: the only caller
+is trace_init_backends():
+
+    bool trace_init_backends(void)
+    {
+    #ifdef CONFIG_TRACE_SIMPLE
+        if (!st_init()) {
+            fprintf(stderr, "failed to initialize simple tracing backend.\n");
+            return false;
+        }
+    #endif
+    [...]
+    }
+
+which is universally called like this:
+
+    if (!trace_init_backends()) {
+        exit(1);
+    }
+
+In other words, it's always a fatal error, and reported like this:
+
+    warning: unable to initialize simple trace backend
+    failed to initialize simple tracing backend.
+
+Your patch changes it to something like
+
+    qemu-system-x86_64: warning: unable to initialize simple trace backend
+    failed to initialize simple tracing backend.
+
+An improvement of sorts.
+
+> diff --git a/ui/keymaps.c b/ui/keymaps.c
+> index fa00b82027..7fa21f81b2 100644
+> --- a/ui/keymaps.c
+> +++ b/ui/keymaps.c
+> @@ -141,7 +141,7 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
+>                  int keysym;
+>                  keysym = get_keysym(table, keyname);
+>                  if (keysym == 0) {
+> -                    /* fprintf(stderr, "Warning: unknown keysym %s\n", line);*/
+> +                    /* warn_report("unknown keysym %s", line);*/
+>                  } else {
+>                      const char *rest = line + offset + 1;
+>                      int keycode = strtol(rest, NULL, 0);
+
+Blech.  The maintainer of this file should make up his mind whether the
+condition is worth a warning, a tracepoint, or nothing.
+
+> diff --git a/ui/spice-display.c b/ui/spice-display.c
+> index 042292cc90..0963c7825f 100644
+> --- a/ui/spice-display.c
+> +++ b/ui/spice-display.c
+> @@ -850,7 +850,7 @@ static void qemu_spice_gl_unblock_bh(void *opaque)
+>  
+>  static void qemu_spice_gl_block_timer(void *opaque)
+>  {
+> -    fprintf(stderr, "WARNING: spice: no gl-draw-done within one second\n");
+> +    warn_report("spice: no gl-draw-done within one second");
+>  }
+>  
+>  static void spice_gl_refresh(DisplayChangeListener *dcl)
+
+As for PATCH v1 2/5, the things I hate all predate your patch, so
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
