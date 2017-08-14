@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dh78l-0001pu-3F
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 00:38:12 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dh78m-0001qc-Rs
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 00:38:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dh78j-0006Mc-Uc
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 00:38:11 -0400
-Date: Mon, 14 Aug 2017 14:36:53 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dh78j-0006MO-OT
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 00:38:12 -0400
+Date: Mon, 14 Aug 2017 13:24:56 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170814043653.GB3452@umbus.fritz.box>
-References: <cover.1502643878.git.balaton@eik.bme.hu>
-	<ef250ee340d5ab61446e2888c6205988d493aa6a.1502643878.git.balaton@eik.bme.hu>
+Message-ID: <20170814032456.GA3452@umbus.fritz.box>
+References: <1502527090-11473-1-git-send-email-thuth@redhat.com>
+	<20170812121651.497c6e39@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="gatW/ieO32f1wygP"
+	protocol="application/pgp-signature"; boundary="LZvS9be/3tNcYl/X"
 Content-Disposition: inline
-In-Reply-To: <ef250ee340d5ab61446e2888c6205988d493aa6a.1502643878.git.balaton@eik.bme.hu>
-Subject: Re: [Qemu-devel] [RFC PATCH 04/12] ehci: Add ppc4xx-ehci for the
- USB 2.0 controller in embedded PPC SoCs
+In-Reply-To: <20170812121651.497c6e39@bahia.lan>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] hw/ppc/spapr_cpu_core: Add a
+ proper check for spapr machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,82 +25,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
+To: Greg Kurz <groug@kaod.org>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
 
---gatW/ieO32f1wygP
+--LZvS9be/3tNcYl/X
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Aug 13, 2017 at 07:04:38PM +0200, BALATON Zoltan wrote:
-
-This needs a commit message.  AFAICT the new device is basically a
-sysbus EHCI with some altered initial values.  Why do those values
-need to be different?  Where do the new values come from?
-
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
->  hw/usb/hcd-ehci-sysbus.c | 25 +++++++++++++++++++++++++
->  hw/usb/hcd-ehci.h        |  1 +
->  2 files changed, 26 insertions(+)
+On Sat, Aug 12, 2017 at 12:16:51PM +0200, Greg Kurz wrote:
+> On Sat, 12 Aug 2017 10:38:10 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
 >=20
-> diff --git a/hw/usb/hcd-ehci-sysbus.c b/hw/usb/hcd-ehci-sysbus.c
-> index 6c20604..3b83beb 100644
-> --- a/hw/usb/hcd-ehci-sysbus.c
-> +++ b/hw/usb/hcd-ehci-sysbus.c
-> @@ -142,6 +142,30 @@ static const TypeInfo ehci_tegra2_type_info =3D {
->      .class_init    =3D ehci_tegra2_class_init,
->  };
-> =20
-> +static void ehci_ppc4xx_init(Object *o)
-> +{
-> +    EHCISysBusState *s =3D SYS_BUS_EHCI(o);
-> +
-> +    s->ehci.companion_enable =3D true;
-> +}
-> +
-> +static void ehci_ppc4xx_class_init(ObjectClass *oc, void *data)
-> +{
-> +    SysBusEHCIClass *sec =3D SYS_BUS_EHCI_CLASS(oc);
-> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
-> +
-> +    sec->capsbase =3D 0x0;
-> +    sec->opregbase =3D 0x10;
-> +    set_bit(DEVICE_CATEGORY_USB, dc->categories);
-> +}
-> +
-> +static const TypeInfo ehci_ppc4xx_type_info =3D {
-> +    .name          =3D TYPE_PPC4xx_EHCI,
-> +    .parent        =3D TYPE_SYS_BUS_EHCI,
-> +    .class_init    =3D ehci_ppc4xx_class_init,
-> +    .instance_init =3D ehci_ppc4xx_init,
-> +};
-> +
->  /*
->   * Faraday FUSBH200 USB 2.0 EHCI
->   */
-> @@ -224,6 +248,7 @@ static void ehci_sysbus_register_types(void)
->      type_register_static(&ehci_xlnx_type_info);
->      type_register_static(&ehci_exynos4210_type_info);
->      type_register_static(&ehci_tegra2_type_info);
-> +    type_register_static(&ehci_ppc4xx_type_info);
->      type_register_static(&ehci_fusbh200_type_info);
->  }
-> =20
-> diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
-> index 821f1de..0bc364b 100644
-> --- a/hw/usb/hcd-ehci.h
-> +++ b/hw/usb/hcd-ehci.h
-> @@ -344,6 +344,7 @@ typedef struct EHCIPCIState {
->  #define TYPE_SYS_BUS_EHCI "sysbus-ehci-usb"
->  #define TYPE_EXYNOS4210_EHCI "exynos4210-ehci-usb"
->  #define TYPE_TEGRA2_EHCI "tegra2-ehci-usb"
-> +#define TYPE_PPC4xx_EHCI "ppc4xx-ehci-usb"
->  #define TYPE_FUSBH200_EHCI "fusbh200-ehci-usb"
-> =20
->  #define SYS_BUS_EHCI(obj) \
+> > QEMU currently crashes when the user tries to add a spapr-cpu-core
+> > on a non-pseries machine:
+> >=20
+> > $ qemu-system-ppc64 -S -machine ppce500,accel=3Dtcg \
+> >                     -device POWER5+_v2.1-spapr-cpu-core
+> > hw/ppc/spapr_cpu_core.c:178:spapr_cpu_core_realize_child:
+> > Object 0x55cee1f55160 is not an instance of type spapr-machine
+> > Aborted (core dumped)
+> >=20
+> > So let's add a proper check for the correct machine time with
+> > a more friendly error message here.
+> >=20
+> > Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > ---
+> >  hw/ppc/spapr_cpu_core.c   | 9 ++++++++-
+> >  scripts/device-crash-test | 1 +
+> >  2 files changed, 9 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> > index ea278ce..0f3d653 100644
+> > --- a/hw/ppc/spapr_cpu_core.c
+> > +++ b/hw/ppc/spapr_cpu_core.c
+> > @@ -175,11 +175,18 @@ static void spapr_cpu_core_unrealizefn(DeviceStat=
+e *dev, Error **errp)
+> >  static void spapr_cpu_core_realize_child(Object *child, Error **errp)
+> >  {
+> >      Error *local_err =3D NULL;
+> > -    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+> > +    sPAPRMachineState *spapr;
+> >      CPUState *cs =3D CPU(child);
+> >      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> >      Object *obj;
+> > =20
+> > +    spapr =3D (sPAPRMachineState *)object_dynamic_cast(qdev_get_machin=
+e(),
+> > +                                                     TYPE_SPAPR_MACHIN=
+E);
+> > +    if (!spapr) {
+> > +        error_setg(errp, "spapr-cpu-core needs a pseries machine");
+> > +        return;
+> > +    }
+> > +
+>=20
+> This is the realize function for individual threads. Maybe this sanity ch=
+eck
+> should be performed earlier at the core level in spapr_cpu_core_realize()=
+ ?
+
+Ah, yes, that would be a better way of doing it.
+
+I'm also not clear if you're proposing this for 2.10 or 2.11.
+
+> Also, spapr_cpu_core_realize_child() seem to only have spapr to pass it d=
+own
+> to spapr_cpu_init()... ie, not even sure spapr_cpu_core_realize_child()
+> actually needs a spapr variable.
+
+
+
+>=20
+> >      object_property_set_bool(child, true, "realized", &local_err);
+> >      if (local_err) {
+> >          goto error;
+> > diff --git a/scripts/device-crash-test b/scripts/device-crash-test
+> > index e77b693..8eb2d02 100755
+> > --- a/scripts/device-crash-test
+> > +++ b/scripts/device-crash-test
+> > @@ -200,6 +200,7 @@ ERROR_WHITELIST =3D [
+> >      {'log':r"Multiple VT220 operator consoles are not supported"},
+> >      {'log':r"core 0 already populated"},
+> >      {'log':r"could not find stage1 bootloader"},
+> > +    {'log':r"spapr-cpu-core needs a pseries machine"},
+> > =20
+> >      # other exitcode=3D1 failures not listed above will just generate =
+INFO messages:
+> >      {'exitcode':1, 'loglevel':logging.INFO},
+>=20
+
+
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -108,24 +125,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---gatW/ieO32f1wygP
+--LZvS9be/3tNcYl/X
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmRKOMACgkQbDjKyiDZ
-s5JlSRAAv3Y0UdrzXmhPEWe4wWE27Loz0mjOfWulW6Xl5UsKZLyyqF1GHoGQkmuD
-lnNcZ8fO7jB86q7k0bta7wCxekbSjdxDTHNNcHbA6S040sx4nwBUrv1ONO7uAWWr
-5VUcDNI5evnlaqeCEt/fdw8mzcuuzcPeW21XRkDi/BlwtThQ94oOLY2tydeA8WyF
-pwm9/qHGe5A9aQYCQBRcAUkG7Ablwd8kogf2U2CFaobxunTYozYmR8/1jI6TlEOD
-Ox+PkSXnNBc5hcIJ4qhsNFkFgc3VDXnDmOQRfYnKS4idpFxhVGSqeSOLmQ3YQppe
-exB4YeyzMHzJ+qRg83Wo0aMHHgoOvX0QqEMheQtmhCTtWvfgOgle94vZTZqdmU5j
-p1/XyX8d+EUkwKGIYiM0BDgjmEp0TVVtLJGYbfXMjaLq6cI33OMEuYHwhmZeT4mH
-gPF6dRvdrCnYVrLeIAayc3fWOQmENGWOZv14GKBS0/y7nNo5uaFAuJfmzDdBP8uv
-jqXT3HOtPIWsTydl/lC4/RSsWq/M7Trl5Hp21wHucUAHXhSkE5Rv+4viNsaCxHvf
-i1apHlGU//xEMrNONCHaTxsEg4KHy5cDrea+ZAKCz4K/bZ2L5ZBO8+fpDWKNtdr2
-Ryli0chqswml7kRVfe9oswQS+JZuXXTFWoE++rY5/1w8OPxzEPc=
-=dSZs
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmRGAYACgkQbDjKyiDZ
+s5KeRQ/9HBrOrs1WLDN1ycASd9NJ7zZWk5uWebah7EBy8LfxsVdWNYvigdQ5fFzz
+MfRdDhJuL1NJxswPwvIw45aCK8yBnirpbCyH9xT4g9pCyP09Zzk20eVmIkWYAcbk
+w6CRcM2MZL5R5jJOShIEqREt/Uc5tALzCSbOpafn8mw0LjTm5b0HBZpNa4GP2s2M
+2GrXlVn0MG3b+suA/0vq8WAUFp4RhdkAiArsEjvXr3DME/BsqWiBkdDwINBpHtLh
+Ji3Z9dOO+iZI549fhQ1nbhpaPvdHzP4YWHX1kjWAzLXwfsoj91lXyUJkSGrJ0+qR
+s5BJyddIBj7RiwwbDwJvQJejdPrxxOgYDCuleXHjCI7/TFCaKz3qYfZXMK4+mJQg
+P4vf1Y1pwjgil6dGmuxzqYGi7kRd/BYDODhtArLkdGAbYGW7Id+opv5A39jxxjkH
+8LcrFmzN0gLL6RuQrpkLSVwJlGxkTEkHxecOTaphr/JNAlIkLhH4QsB+H4X4e8g+
+nmoUi1JLuh/cmINOqYK42hmPXEg2vpk2JwsyRxCQTmSXwGMLAOml7WF+KwBuXzAw
+MdSz47cAPQJBLskvNTyqJ5wYTmZKzTimTnoYiB6/2br9OjuJC8rwoC45gRCteSQJ
+SoqOx12jexyebcu8Hp0WJ27k2gk5K1HBKHnjlRRY6V1XVDhgJh0=
+=kKkI
 -----END PGP SIGNATURE-----
 
---gatW/ieO32f1wygP--
+--LZvS9be/3tNcYl/X--
