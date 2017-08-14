@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1dhIPk-0002db-B2
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:40:29 -0400
+	(envelope-from <prvs=392c10cbc=anthony.perard@citrix.com>)
+	id 1dhIUK-0005pU-N7
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:45:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1dhIPf-0001TR-GN
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:40:28 -0400
-Received: from mail-co1nam03on0062.outbound.protection.outlook.com
-	([104.47.40.62]:34951
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1dhIPf-0001S7-40
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:40:23 -0400
-From: Brijesh Singh <brijesh.singh@amd.com>
-Date: Mon, 14 Aug 2017 11:40:02 -0500
-Message-Id: <20170814164002.23982-1-brijesh.singh@amd.com>
+	(envelope-from <prvs=392c10cbc=anthony.perard@citrix.com>)
+	id 1dhIUG-00052h-J5
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:45:12 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:27589)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=392c10cbc=anthony.perard@citrix.com>)
+	id 1dhIUG-00050U-BV
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 12:45:08 -0400
+Date: Mon, 14 Aug 2017 17:45:02 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20170814164502.GB1475@perard.uk.xensource.com>
+References: <20170811151138.29405-1-anthony.perard@citrix.com>
+	<20170811151138.29405-2-anthony.perard@citrix.com>
+	<20170811201006-mutt-send-email-mst@kernel.org>
+	<20170814145550.GA1475@perard.uk.xensource.com>
+	<20170814185150-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] target-i386/cpu: Add new EPYC CPU model
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20170814185150-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 1/2] hw/acpi: Call
+ acpi_set_pci_info when no ACPI tables needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,79 +34,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Brijesh Singh <brijesh.singh@amd.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano
+	Stabellini <sstabellini@kernel.org>, Bruce Rogers <brogers@suse.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-Add a new base CPU model called 'EPYC' to model processors from AMD EPYC
-family (which includes EPYC 76xx,75xx,74xx, 73xx and 72xx).
+On Mon, Aug 14, 2017 at 06:53:14PM +0300, Michael S. Tsirkin wrote:
+> On Mon, Aug 14, 2017 at 03:55:50PM +0100, Anthony PERARD wrote:
+> > On Fri, Aug 11, 2017 at 08:18:28PM +0300, Michael S. Tsirkin wrote:
+> > > On Fri, Aug 11, 2017 at 04:11:37PM +0100, Anthony PERARD wrote:
+> > > > To do PCI passthrough with Xen, the property acpi-pcihp-bsel needs to be
+> > > > set, but this was done only when ACPI tables are built which is not
+> > > > needed for a Xen guest. The need for the property starts with commit
+> > > > "pc: pcihp: avoid adding ACPI_PCIHP_PROP_BSEL twice"
+> > > > (f0c9d64a68b776374ec4732424a3e27753ce37b6).
+> > > > 
+> > > > Set pci info before checking for the needs to build ACPI tables.
+> > > > 
+> > > > Reported-by: Sander Eikelenboom <linux@eikelenboom.it>
+> > > > Tested-by: Sander Eikelenboom <linux@eikelenboom.it>
+> > > > Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+> > > 
+> > > I am worried that Xen will come to depend on specific
+> > > assignment of bsel which isn't guaranteed. Thoughts on
+> > > how to avoid that?
+> > 
+> > Is it possible to have a different BSEL than 0 with PIIX ?
+> 
+> With PCI to PCI bridges, yes.
+> 
+> > Also, I don't known if having more than on PCI bus is going to work on
+> > Xen, there is nothing in our ACPI tables beyond _SB.PCI0, and nothing to
+> > use a different BSEL.
+> 
+> My worry is someone might decide to implement hotplug for pci to pci
+> bridges on Xen. If doing that, it's important to use the qemu supplied
+> acpi tables.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
----
-
-Changes since v1:
- * fix typo EYPC -> EPYC to reflect the correct branding name
-
- target/i386/cpu.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index ddc45ab..20de5fd 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1522,6 +1522,50 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .xlevel = 0x8000001A,
-         .model_id = "AMD Opteron 63xx class CPU",
-     },
-+    {
-+        .name = "EPYC",
-+        .level = 0xd,
-+        .vendor = CPUID_VENDOR_AMD,
-+        .family = 23,
-+        .model = 1,
-+        .stepping = 2,
-+        .features[FEAT_1_EDX] =
-+            CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-+            CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
-+            CPUID_PGE | CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
-+            CPUID_MCE | CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE |
-+            CPUID_DE | CPUID_FP87,
-+        .features[FEAT_1_ECX] =
-+            CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX |
-+            CPUID_EXT_XSAVE | CPUID_EXT_MOVBE | CPUID_EXT_POPCNT |
-+            CPUID_EXT_SSE42 | CPUID_EXT_SSE41 | CPUID_EXT_CX16 |
-+            CPUID_EXT_FMA | CPUID_EXT_SSSE3 | CPUID_EXT_PCLMULQDQ |
-+            CPUID_EXT_SSE3,
-+        .features[FEAT_8000_0001_EDX] =
-+            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_PDPE1GB |
-+            CPUID_EXT2_FFXSR | CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
-+            CPUID_EXT2_SYSCALL,
-+        .features[FEAT_8000_0001_ECX] =
-+            CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
-+            CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
-+            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-+        .features[FEAT_7_0_EBX] =
-+            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
-+            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
-+            CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT |
-+            CPUID_7_0_EBX_SHA_NI,
-+        /* Missing: XSAVES (not supported by some Linux versions,
-+         * including v4.1 to v4.12).
-+         * KVM doesn't yet expose any XSAVES state save component.
-+         */
-+        .features[FEAT_XSAVE] =
-+            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-+            CPUID_XSAVE_XGETBV1,
-+        .features[FEAT_6_EAX] =
-+            CPUID_6_EAX_ARAT,
-+        .xlevel = 0x8000001F,
-+        .model_id = "AMD EPYC Processor",
-+    },
- };
- 
- typedef struct PropValue {
--- 
-2.9.4
+I can always add assert((xen_enable() && !bsel) || !xen_enable()) in
+acpi_set_bsel(), so if someone was going to make any change, he would
+find out about bsel quicker. But I don't see Xen using QEMU supplied
+ACPI tables anytime soon.
