@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dhGRh-0002UN-Aa
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:34:27 -0400
+	(envelope-from <mst@redhat.com>) id 1dhGSl-0003Kw-5j
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:35:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dhGRe-0001LV-1Z
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:34:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49490)
+	(envelope-from <mst@redhat.com>) id 1dhGSh-00025r-SM
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:35:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51694)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dhGRd-0001L3-QZ
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:34:17 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BC6E15B30D
-	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 14:34:16 +0000 (UTC)
-Date: Mon, 14 Aug 2017 17:34:15 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dhGSh-00023T-MB
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 10:35:23 -0400
+Date: Mon, 14 Aug 2017 17:35:19 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1502721197-32717-1-git-send-email-mst@redhat.com>
+Message-ID: <20170814173419-mutt-send-email-mst@kernel.org>
+References: <1502431076-22849-1-git-send-email-thuth@redhat.com>
+	<20170811114922.2edda3a7.cohuck@redhat.com>
+	<20170811121905.22bdc575.cohuck@redhat.com>
+	<8783416d-367e-3a7c-76b5-eb979b0c8625@redhat.com>
+	<20170811134355.0b0dfe58.cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] tests: switch tests to accel=kvm:tcg
+In-Reply-To: <20170811134355.0b0dfe58.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.11 0/2] Improvements for the pxe
+ tester
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Victor Kaplansky <victork@redhat.com>
 
-Speed up tests on host systems with kvm support.
-In particular, this fixes tests with --disable-tcg.
+On Fri, Aug 11, 2017 at 01:43:55PM +0200, Cornelia Huck wrote:
+> On Fri, 11 Aug 2017 12:52:54 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+> 
+> > On 11.08.2017 12:19, Cornelia Huck wrote:
+> 
+> > > A quick test on x86_64 with --disable-tcg showed no further problems
+> > > than boot-serial-test, so at least it's only the one for now (and it
+> > > might make sense to simply use accel=tcg:kvm for it).  
+> > 
+> > $ grep -rl accel=tcg tests/
+> > tests/pnv-xscom-test.c
+> > tests/boot-serial-test.c
+> > tests/prom-env-test.c
+> > 
+> > ... so the other problematic tests are for ppc only - which does not
+> > support --disable-tcg yet.
+> 
+> I'll send a patch for boot serial, then. You probably know more about
+> whether the ppc tests would make sense with kvm as well than I do :)
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>
-Suggested-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
+Weird I thought I fixed that one.  Tweaking that is trivial though.
+Posted - could someone try on ppc pls? If it helps pls merge through the
+ppc tree.
 
-Tested on x86 only.
-
- tests/boot-serial-test.c | 2 +-
- tests/pnv-xscom-test.c   | 4 ++--
- tests/prom-env-test.c    | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index 11f48b0..c3b2e4e 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -78,7 +78,7 @@ static void test_machine(const void *data)
-     fd = mkstemp(tmpname);
-     g_assert(fd != -1);
- 
--    args = g_strdup_printf("-M %s,accel=tcg -chardev file,id=serial0,path=%s"
-+    args = g_strdup_printf("-M %s,accel=kvm:tcg -chardev file,id=serial0,path=%s"
-                            " -no-shutdown -serial chardev:serial0 %s",
-                            test->machine, tmpname, test->extra);
- 
-diff --git a/tests/pnv-xscom-test.c b/tests/pnv-xscom-test.c
-index 5adc3fd..7be396f 100644
---- a/tests/pnv-xscom-test.c
-+++ b/tests/pnv-xscom-test.c
-@@ -84,7 +84,7 @@ static void test_cfam_id(const void *data)
-     char *args;
-     const PnvChip *chip = data;
- 
--    args = g_strdup_printf("-M powernv,accel=tcg -cpu %s", chip->cpu_model);
-+    args = g_strdup_printf("-M powernv,accel=kvm:tcg -cpu %s", chip->cpu_model);
- 
-     qtest_start(args);
-     test_xscom_cfam_id(chip);
-@@ -112,7 +112,7 @@ static void test_core(const void *data)
-     char *args;
-     const PnvChip *chip = data;
- 
--    args = g_strdup_printf("-M powernv,accel=tcg -cpu %s", chip->cpu_model);
-+    args = g_strdup_printf("-M powernv,accel=kvm:tcg -cpu %s", chip->cpu_model);
- 
-     qtest_start(args);
-     test_xscom_core(chip);
-diff --git a/tests/prom-env-test.c b/tests/prom-env-test.c
-index eac207b..0a10f06 100644
---- a/tests/prom-env-test.c
-+++ b/tests/prom-env-test.c
-@@ -50,7 +50,7 @@ static void test_machine(const void *machine)
-     /* The pseries firmware boots much faster without the default devices */
-     extra_args = strcmp(machine, "pseries") == 0 ? "-nodefaults" : "";
- 
--    args = g_strdup_printf("-M %s,accel=tcg %s -prom-env 'use-nvramrc?=true' "
-+    args = g_strdup_printf("-M %s,accel=kvm:tcg %s -prom-env 'use-nvramrc?=true' "
-                            "-prom-env 'nvramrc=%x %x l!' ",
-                            (const char *)machine, extra_args, MAGIC, ADDRESS);
- 
 -- 
 MST
