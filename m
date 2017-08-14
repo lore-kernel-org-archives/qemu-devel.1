@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dhALw-0000aE-K2
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 04:04:01 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dhAOR-0001av-Di
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 04:06:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dhALt-0002H0-G1
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 04:04:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52306)
+	(envelope-from <imammedo@redhat.com>) id 1dhAOO-0004Bk-8a
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 04:06:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60584)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dhALt-0002GL-7D
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 04:03:57 -0400
-Date: Mon, 14 Aug 2017 10:03:48 +0200
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dhAON-0004AG-Vy
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 04:06:32 -0400
+Date: Mon, 14 Aug 2017 10:00:36 +0200
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170814100348.50fb3a96@nial.brq.redhat.com>
-In-Reply-To: <20170718151721.25c3d603@nial.brq.redhat.com>
+Message-ID: <20170814100036.28160651@nial.brq.redhat.com>
+In-Reply-To: <20170717172322.54bd6888@nial.brq.redhat.com>
 References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
-	<1500040339-119465-12-git-send-email-imammedo@redhat.com>
-	<20170718143009.432250d5@gondolin>
-	<20170718151721.25c3d603@nial.brq.redhat.com>
+	<1500040339-119465-15-git-send-email-imammedo@redhat.com>
+	<5bec6275-8e15-16c7-8d23-2975a563c78f@twiddle.net>
+	<20170717124146.5ae39d2b@nial.brq.redhat.com>
+	<f32dbe33-4a99-cf79-e41c-4a1accacda64@suse.de>
+	<20170717172322.54bd6888@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 11/28] s390x: replace cpu_s390x_init() with
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 14/28] m68k: replace cpu_m68k_init() with
  cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,131 +32,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, Richard Henderson <rth@twiddle.net>
+To: Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On Tue, 18 Jul 2017 15:17:21 +0200
+On Mon, 17 Jul 2017 17:23:22 +0200
 Igor Mammedov <imammedo@redhat.com> wrote:
 
-> On Tue, 18 Jul 2017 14:30:09 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> > On Fri, 14 Jul 2017 15:52:02 +0200
-> > Igor Mammedov <imammedo@redhat.com> wrote:
-> >   
-> > > cpu_s390x_init() is used only *-user targets indirectly
-> > > via cpu_init() macro and has a hack to assign ids to created
-> > > cpus (I'm not sure if 'id' really matters to *-user emulation).
-> > > 
-> > > So to on safe side, instead of having custom wrapper to do numbering
-> > > replace it with cpu_generic_init() and use S390CPUClass::next_cpu_id
-> > > which could serve the same purpose as static variable and move cpu->id
-> > > initialization to s390_cpu_initfn for CONFIG_USER_ONLY use-case.
-> > > 
-> > > PS:
-> > > ifdef is ugly but it allows us to hide s390x detail that isn't
-> > > set by *-user targets and reuse generic cpu creation utility
-> > > for btoh machine and user emulation.
-> > > 
-> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > ---
-> > > perhaps cpu->id isn't need by CONFIG_USER_ONLY but I'd leave to it
-> > > s390x maintainers to deal with it.
-> > > 
-> > > CC: Richard Henderson <rth@twiddle.net>
-> > > CC: Alexander Graf <agraf@suse.de>
-> > > CC: Cornelia Huck <cohuck@redhat.com>
-> > > CC: Thomas Huth <thuth@redhat.com>
-> > > ---
-> > >  target/s390x/cpu.h    |  3 +--
-> > >  target/s390x/cpu.c    |  7 +++++++
-> > >  target/s390x/helper.c | 14 --------------
-> > >  3 files changed, 8 insertions(+), 16 deletions(-)
-> > > 
-> > > diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> > > index bdb9bdb..b6d25c6 100644
-> > > --- a/target/s390x/cpu.h
-> > > +++ b/target/s390x/cpu.h
-> > > @@ -477,7 +477,6 @@ static inline bool get_per_in_range(CPUS390XState *env, uint64_t addr)
-> > >  void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_t ilen);
-> > >  #endif
-> > >  
-> > > -S390CPU *cpu_s390x_init(const char *cpu_model);
-> > >  S390CPU *s390x_new_cpu(const char *cpu_model, int64_t id, Error **errp);
-> > >  S390CPU *cpu_s390x_create(const char *cpu_model, Error **errp);
-> > >  void s390x_translate_init(void);
-> > > @@ -641,7 +640,7 @@ static inline unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu)
-> > >  
-> > >  extern void subsystem_reset(void);
-> > >  
-> > > -#define cpu_init(model) CPU(cpu_s390x_init(model))
-> > > +#define cpu_init(cpu_model) cpu_generic_init(TYPE_S390_CPU, cpu_model)
-> > >  #define cpu_signal_handler cpu_s390x_signal_handler
-> > >  
-> > >  void s390_cpu_list(FILE *f, fprintf_function cpu_fprintf);
-> > > diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> > > index accef03..e40a26f 100644
-> > > --- a/target/s390x/cpu.c
-> > > +++ b/target/s390x/cpu.c
-> > > @@ -303,6 +303,13 @@ static void s390_cpu_initfn(Object *obj)
-> > >          inited = true;
-> > >          s390x_translate_init();
-> > >      }
-> > > +
-> > > +#if defined(CONFIG_USER_ONLY)
-> > > +    {
-> > > +        S390CPUClass *scc = S390_CPU_GET_CLASS(obj);
-> > > +        cpu->id = scc->next_cpu_id;
-> > > +    }
-> > > +#endif    
-> > 
-> > What about the null machine, which calls cpu_init() as well? Am I
-> > missing something?  
-> it creates only 1 cpu so for it following will be true:
->  cpu->id == 0 and also scc->next_cpu_id == 0 at s390_cpu_initfn() time
-> then at realize() time scc->next_cpu_id++ happens and no more cpus could
-> be created in case of null machine.
-> 
-> Considering no -smp support for null-machine, we shouldn't care about
-> multiple instantiations with cpu_init() there. 
-> If we would ever start caring about -smp there, then we should
-> explicitly create cpus with properly set properties like other boards
-> do.
-ping,
+> On Mon, 17 Jul 2017 17:05:15 +0200
+> Andreas F=C3=A4rber <afaerber@suse.de> wrote:
+>=20
+> > Am 17.07.2017 um 12:41 schrieb Igor Mammedov: =20
+> > > On Sat, 15 Jul 2017 08:08:58 -1000
+> > > Richard Henderson <rth@twiddle.net> wrote:
+> > >    =20
+> > >> On 07/14/2017 03:52 AM, Igor Mammedov wrote:   =20
+> > >>> @@ -230,6 +230,8 @@ static void m68k_cpu_realizefn(DeviceState *dev=
+, Error **errp)
+> > >>>       M68kCPUClass *mcc =3D M68K_CPU_GET_CLASS(dev);
+> > >>>       Error *local_err =3D NULL;
+> > >>>  =20
+> > >>> +    register_m68k_insns(&cpu->env);
+> > >>> +     =20
+> > >>
+> > >> I think it would make more sense to do this during m68k_tcg_init.
+> > >>   =20
+> > > it seems that m68k_cpu_initfn accesses 'env' via some global,
+> > > while cpu_mk68k_init() used to access concrete pointer of just create=
+d cpu,
+> > >=20
+> > > how about moving register_m68k_insns() to m68k_cpu_initfn(), instead?
+> > > it should be equivalent to what cpu_mk68k_init() used to do.   =20
+> >=20
+> > As a general note, realize should be re-entrant. Can't tell from the
+> > above diff whether that is the case here. =20
+> Looking at
+>=20
+> void register_m68k_insns (CPUM68KState *env)                             =
+       =20
+> {                                                                        =
+       =20
+>     /* Build the opcode table only once to avoid                         =
+       =20
+>        multithreading issues. */                                         =
+       =20
+>     if (opcode_table[0] !=3D NULL) {                                     =
+         =20
+>         return;                                                          =
+       =20
+>     }
+>=20
+> it is save to use multiple times,
+>=20
+> also looking further in it:
+>=20
+> #define BASE(name, opcode, mask) \                                       =
+       =20
+>     register_opcode(disas_##name, 0x##opcode, 0x##mask)                  =
+       =20
+> #define INSN(name, opcode, mask, feature) do { \                         =
+       =20
+>     if (m68k_feature(env, M68K_FEATURE_##feature)) \                     =
+       =20
+>         BASE(name, opcode, mask); \                                      =
+       =20
+>     } while(0)                                                           =
+       =20
+>     BASE(undef,     0000, 0000);                                         =
+       =20
+>     INSN(arith_im,  0080, fff8, CF_ISA_A);
+>=20
+> INSN macro depends on enabled features, it might work with current code t=
+hat
+> has no user settable features but it will break once that is available.
+>=20
+> So I retract my suggestion to move register_m68k_insns() into m68k_cpu_in=
+itfn()
+> and keep it as it's in this patch (in m68k_cpu_realizefn()),
+> that way features theoretically set between initfn(and m68k_tcg_init) and=
+ realize() will
+> have effect on created cpu and we won't have to fix it in future.
 
-Cornelia,
-considering my previous reply does this patch look fine to you?
+Richard, Laurent,
 
-> 
-> >   
-> > >  }
-> > >  
-> > >  static void s390_cpu_finalize(Object *obj)
-> > > diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-> > > index aef09e1..632b030 100644
-> > > --- a/target/s390x/helper.c
-> > > +++ b/target/s390x/helper.c
-> > > @@ -129,20 +129,6 @@ out:
-> > >      return cpu;
-> > >  }
-> > >  
-> > > -S390CPU *cpu_s390x_init(const char *cpu_model)
-> > > -{
-> > > -    Error *err = NULL;
-> > > -    S390CPU *cpu;
-> > > -    /* Use to track CPU ID for linux-user only */
-> > > -    static int64_t next_cpu_id;
-> > > -
-> > > -    cpu = s390x_new_cpu(cpu_model, next_cpu_id++, &err);
-> > > -    if (err) {
-> > > -        error_report_err(err);
-> > > -    }
-> > > -    return cpu;
-> > > -}
-> > > -
-> > >  #if defined(CONFIG_USER_ONLY)
-> > >  
-> > >  void s390_cpu_do_interrupt(CPUState *cs)    
-> >   
-> 
-> 
+Do you agree with keeping register_m68k_insns() in realize()?
