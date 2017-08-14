@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mtparkr@gmail.com>) id 1dhKe5-0006uC-GE
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 15:03:26 -0400
+	(envelope-from <eblake@redhat.com>) id 1dhKia-0000OW-4J
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 15:08:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mtparkr@gmail.com>) id 1dhKe2-0007Rb-Ci
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 15:03:25 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:38553)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mtparkr@gmail.com>) id 1dhKe2-0007Ol-5g
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 15:03:22 -0400
-Received: by mail-wm0-x242.google.com with SMTP id y206so15419538wmd.5
-	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 12:03:20 -0700 (PDT)
-Date: Mon, 14 Aug 2017 20:03:17 +0100
-From: Matt Parker <mtparkr@gmail.com>
-Message-ID: <20170814190317.ylpbagx347qwbz7p@gmail.com>
-References: <20170812213330.20539-1-mtparkr@gmail.com>
-	<51a21727-6af3-cd8e-b542-d1e9e8e5ce8a@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dhKiW-0002T4-W3
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 15:08:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57686)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dhKiW-0002SV-MR
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 15:08:00 -0400
+References: <mailman.1778.1502715001.21954.qemu-devel@nongnu.org>
+	<223B4DEC-A801-40E3-A118-33EBB9ED384D@gmail.com>
+	<20170814140003.GF8506@redhat.com>
+	<EEABAA69-F4C9-4525-8A01-CDF143BAD31B@gmail.com>
+	<b4268987-e25d-02fc-3931-7b9576969cc5@redhat.com>
+	<05CBF3D0-1FBE-4139-B968-9ED138206FFC@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <36a10c9c-a074-7785-e09f-3372455fff34@redhat.com>
+Date: Mon, 14 Aug 2017 14:07:55 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <51a21727-6af3-cd8e-b542-d1e9e8e5ce8a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] net: rtl8139: do not use old_mmio accesses
+In-Reply-To: <05CBF3D0-1FBE-4139-B968-9ED138206FFC@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pH7jmiGcaod2teFA6K2FlE80GRj8WRmVl"
+Subject: Re: [Qemu-devel] [PATCH v3 00/12] Convert over to use keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,110 +32,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nognu.org, Jason Wang <jasowang@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Mon, Aug 14, 2017 at 10:40:27AM +0200, Paolo Bonzini wrote:
-> On 12/08/2017 23:33, Matt Parker wrote:
-> > This updates the current MemoryRegionOps for the bar 1 memory region
-> > from using the old_mmio accessors to the .read and .write accessors.
-> > 
-> > Signed-off-by: Matt Parker <mtparkr@gmail.com>
-> > ---
-> >  hw/net/rtl8139.c | 60 +++++++++++++++-----------------------------------------
-> >  1 file changed, 16 insertions(+), 44 deletions(-)
-> > 
-> > diff --git a/hw/net/rtl8139.c b/hw/net/rtl8139.c
-> > index 671c7e48c6..b3aefda291 100644
-> > --- a/hw/net/rtl8139.c
-> > +++ b/hw/net/rtl8139.c
-> > @@ -3131,39 +3131,6 @@ static uint32_t rtl8139_io_readl(void *opaque, uint8_t addr)
-> >  }
-> >  
-> >  /* */
-> > -
-> > -static void rtl8139_mmio_writeb(void *opaque, hwaddr addr, uint32_t val)
-> > -{
-> > -    rtl8139_io_writeb(opaque, addr & 0xFF, val);
-> > -}
-> > -
-> > -static void rtl8139_mmio_writew(void *opaque, hwaddr addr, uint32_t val)
-> > -{
-> > -    rtl8139_io_writew(opaque, addr & 0xFF, val);
-> > -}
-> > -
-> > -static void rtl8139_mmio_writel(void *opaque, hwaddr addr, uint32_t val)
-> > -{
-> > -    rtl8139_io_writel(opaque, addr & 0xFF, val);
-> > -}
-> > -
-> > -static uint32_t rtl8139_mmio_readb(void *opaque, hwaddr addr)
-> > -{
-> > -    return rtl8139_io_readb(opaque, addr & 0xFF);
-> > -}
-> > -
-> > -static uint32_t rtl8139_mmio_readw(void *opaque, hwaddr addr)
-> > -{
-> > -    uint32_t val = rtl8139_io_readw(opaque, addr & 0xFF);
-> > -    return val;
-> > -}
-> > -
-> > -static uint32_t rtl8139_mmio_readl(void *opaque, hwaddr addr)
-> > -{
-> > -    uint32_t val = rtl8139_io_readl(opaque, addr & 0xFF);
-> > -    return val;
-> > -}
-> > -
-> >  static int rtl8139_post_load(void *opaque, int version_id)
-> >  {
-> >      RTL8139State* s = opaque;
-> > @@ -3344,18 +3311,23 @@ static const MemoryRegionOps rtl8139_io_ops = {
-> >      .endianness = DEVICE_LITTLE_ENDIAN,
-> >  };
-> >  
-> > +static uint64_t rtl8139_mmio_read(void *opaque, hwaddr addr, unsigned size)
-> > +{
-> > +   return rtl8139_ioport_read(opaque, addr & 0xFF, size);
-> > +}
-> > +
-> > +static void rtl8139_mmio_write(void *opaque, hwaddr addr, uint64_t val,
-> > +                               unsigned size)
-> > +{
-> > +    return rtl8139_ioport_write(opaque, addr & 0xFF, val, size);
-> > +}
-> > +
-> >  static const MemoryRegionOps rtl8139_mmio_ops = {
-> 
-> I think you don't even need to declare a separate MemoryRegionOps, and
-> can just recycle rtl8139_io_ops?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pH7jmiGcaod2teFA6K2FlE80GRj8WRmVl
+From: Eric Blake <eblake@redhat.com>
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <36a10c9c-a074-7785-e09f-3372455fff34@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 00/12] Convert over to use keycodemapdb
+References: <mailman.1778.1502715001.21954.qemu-devel@nongnu.org>
+ <223B4DEC-A801-40E3-A118-33EBB9ED384D@gmail.com>
+ <20170814140003.GF8506@redhat.com>
+ <EEABAA69-F4C9-4525-8A01-CDF143BAD31B@gmail.com>
+ <b4268987-e25d-02fc-3931-7b9576969cc5@redhat.com>
+ <05CBF3D0-1FBE-4139-B968-9ED138206FFC@gmail.com>
+In-Reply-To: <05CBF3D0-1FBE-4139-B968-9ED138206FFC@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Looking at the memory region, it's only 0x100 bytes in size,
-so addr & 0xFF would not be needed.
+On 08/14/2017 01:49 PM, Programmingkid wrote:
+>=20
+>> On Aug 14, 2017, at 2:20 PM, Eric Blake <eblake@redhat.com> wrote:
+>>
+>> On 08/14/2017 12:20 PM, Programmingkid wrote:
+>>>> These are based against git master, just save the series and then 'g=
+it am'
+>>>> the lot in one go.
+>>>
 
-In that case your right, the bar1 memory can just reuse the MemoryRegion from IO.
-I'll update the patch for this.
+>=20
+> Thank you for the information. Can this be down when receiving emails a=
+s a digest,
 
-Thanks!
-Matt
-> 
-> > -    .old_mmio = {
-> > -        .read = {
-> > -            rtl8139_mmio_readb,
-> > -            rtl8139_mmio_readw,
-> > -            rtl8139_mmio_readl,
-> > -        },
-> > -        .write = {
-> > -            rtl8139_mmio_writeb,
-> > -            rtl8139_mmio_writew,
-> > -            rtl8139_mmio_writel,
-> > -        },
-> > +    .read = rtl8139_mmio_read,
-> > +    .write = rtl8139_mmio_write,
-> > +    .impl = {
-> > +        .min_access_size = 1,
-> > +        .max_access_size = 4,
-> >      },
-> >      .endianness = DEVICE_LITTLE_ENDIAN,
-> >  };
-> > 
-> 
+Presumably yes, and probably more likely if you selected MIME digests
+(rather than plain text) on the list subscription page:
+https://lists.gnu.org/mailman/options/qemu-devel
+
+However, I personally don't use digest mail, so I can't really say what
+git would do in that situation. You may get better answers by asking on
+freenode's #git IRC channel (as there are more git experts there that
+can quickly tell you what git can do).
+
+If nothing else, you can always use:
+https://lists.gnu.org/archive/html/qemu-devel/
+to get at mbox formatted files for all patches within the entire month,
+and use 'git am -i' to pick and choose which ones you want (may be
+tedious if you can't figure out how to prune it, first).
+
+(In situations like this, if you can't figure out how to make your
+mailer properly save mbox-formatted mails for easy feeding to git, you
+may want to reconsider whether you are using the best mailer on your end
+- I know many developers on this list use mutt or thunderbird, but when
+you start to get to other mail programs, you'll get better answers on a
+git forum than you will here.  It doesn't help that your current choice
+of mailer has a propensity to botch mail threading, by posting your
+replies as top-level threads rather than in-reply-to the message you are
+following up on)
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--pH7jmiGcaod2teFA6K2FlE80GRj8WRmVl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmR9QsACgkQp6FrSiUn
+Q2qYvgf/cf8irLahvEF1vNjVV4zmKgflwKvfcG0uiCBBW5zM5pA+3xSUGapgG/8w
+QfaWEhR1vxs3DZ/0ZMkcco5JT5PMGJMxfxtZ2i0gjttUz8rdQQNmvtA+S1uUSrv+
+6eYoaLMEP8r6KjVTMgrQLRWcYw1QtlfmdGewoMgi7AhjRmyMHuusXzqPgjkMtGPA
+4ZeXoN6P/93e82ldlLNeaxuhWKg87aJc5EGFLwLfnBphKe0spXk5dS3ozvv3GprQ
+3OK9C7sySpG2/KDzhj0el37xbzSszgwCnFukho86uWDI5EjypoEGEf+j0MMDwrBo
+anBAtdw/PyFz3rL0XJndaNDVJnN0Cg==
+=yCZ6
+-----END PGP SIGNATURE-----
+
+--pH7jmiGcaod2teFA6K2FlE80GRj8WRmVl--
