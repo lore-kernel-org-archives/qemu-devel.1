@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zack.cornelius@kove.net>) id 1dhKAv-0002bV-9a
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:33:18 -0400
+	(envelope-from <clg@kaod.org>) id 1dhKCC-0003TQ-FU
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:34:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zack.cornelius@kove.net>) id 1dhKAs-00043g-4X
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:33:17 -0400
-Received: from mail.kove.net ([67.109.75.252]:34076)
+	(envelope-from <clg@kaod.org>) id 1dhKC9-0004ND-C0
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:34:36 -0400
+Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:48792)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zack.cornelius@kove.net>)
-	id 1dhKAr-00043S-VA
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:33:14 -0400
-Date: Mon, 14 Aug 2017 13:33:02 -0500 (CDT)
-From: Zack Cornelius <zack.cornelius@kove.net>
-Reply-To: Zack Cornelius <zack.cornelius@kove.net>
-Message-ID: <945489181.3041.1502735582947.JavaMail.zimbra@kove.net>
-In-Reply-To: <20170814114035.GL3108@localhost.localdomain>
-References: <20170614203000.19984-1-ehabkost@redhat.com>
-	<20170811163300.GA29509@localhost.localdomain>
-	<20170811164455.GA2554@redhat.com>
-	<20170811181559.GB29509@localhost.localdomain>
-	<20170814093940.GC8506@redhat.com>
-	<20170814114035.GL3108@localhost.localdomain>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dhKC9-0004LM-5Q
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:34:33 -0400
+Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 66D4DA31AF
+	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 20:34:24 +0200 (CEST)
+References: <1502721197-32717-1-git-send-email-mst@redhat.com>
+	<20170814173335.58f0e84f.cohuck@redhat.com>
+	<f08ad396-50bf-aff7-95e8-5cd1b862923e@redhat.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <0e0fabcc-5dfa-abee-a6ed-f39e57aa3aaa@kaod.org>
+Date: Mon, 14 Aug 2017 20:34:14 +0200
 MIME-Version: 1.0
+In-Reply-To: <f08ad396-50bf-aff7-95e8-5cd1b862923e@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/5] hostmem-file: Add "persistent" option
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tests: switch tests to accel=kvm:tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,101 +32,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Greg Kurz <groug@kaod.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
 
-The share=on attribute can also be used in the case of a pre-allocated file, created outside qemu, to be used as a memory backing, using the MAP_SHARED flag to allow data to be written out to the file in the case of host memory pressure. In this case, as the file was created outside qemu, it would also be inappropriate to unlink the file.
+On 08/14/2017 05:47 PM, Thomas Huth wrote:
+> On 14.08.2017 17:33, Cornelia Huck wrote:
+>> On Mon, 14 Aug 2017 17:34:15 +0300
+>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>>
+>>> Speed up tests on host systems with kvm support.
+>>> In particular, this fixes tests with --disable-tcg.
+> [...]
+>>> diff --git a/tests/pnv-xscom-test.c b/tests/pnv-xscom-test.c
+>>> index 5adc3fd..7be396f 100644
+>>> --- a/tests/pnv-xscom-test.c
+>>> +++ b/tests/pnv-xscom-test.c
+>>> @@ -84,7 +84,7 @@ static void test_cfam_id(const void *data)
+>>>      char *args;
+>>>      const PnvChip *chip =3D data;
+>>> =20
+>>> -    args =3D g_strdup_printf("-M powernv,accel=3Dtcg -cpu %s", chip-=
+>cpu_model);
+>>> +    args =3D g_strdup_printf("-M powernv,accel=3Dkvm:tcg -cpu %s", c=
+hip->cpu_model);
+>>> =20
+>>>      qtest_start(args);
+>>>      test_xscom_cfam_id(chip);
+>>> @@ -112,7 +112,7 @@ static void test_core(const void *data)
+>>>      char *args;
+>>>      const PnvChip *chip =3D data;
+>>> =20
+>>> -    args =3D g_strdup_printf("-M powernv,accel=3Dtcg -cpu %s", chip-=
+>cpu_model);
+>>> +    args =3D g_strdup_printf("-M powernv,accel=3Dkvm:tcg -cpu %s", c=
+hip->cpu_model);
+>>> =20
+>>>      qtest_start(args);
+>>>      test_xscom_core(chip);
+>>
+>> These seem to test a specified cpu model explicitly, so I'm not sure
+>> how well this will work with kvm.
+>=20
+> AFAIK the powernv machine does not work with KVM yet (C=C3=A9dric, can =
+you
+> confirm?), so you better drop the changes to this file.
 
-In Kove's specific use case, we have a file on a virtual file system, which is allocated from and backed by a hardware device. In this case, unlink isn't available, but MADV_REMOVE or FALLOC_FL_PUNCH_HOLE will prevent qemu flushing unneeded data to the backing device.
+No. the powernv machine does not work with KVM.
 
---
-Zack
+C.
 
------ Original Message -----
-> From: "Eduardo Habkost" <ehabkost@redhat.com>
-> To: "Daniel P. Berrange" <berrange@redhat.com>
-> Cc: "Paolo Bonzini" <pbonzini@redhat.com>, "Zack Cornelius" <zack.cornelius@kove.net>, qemu-devel@nongnu.org, "Igor
-> Mammedov" <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Sent: Monday, August 14, 2017 6:40:35 AM
-> Subject: Re: [Qemu-devel] [PATCH 0/5] hostmem-file: Add "persistent" option
-
-> On Mon, Aug 14, 2017 at 10:39:40AM +0100, Daniel P. Berrange wrote:
->> On Fri, Aug 11, 2017 at 03:15:59PM -0300, Eduardo Habkost wrote:
->> > On Fri, Aug 11, 2017 at 05:44:55PM +0100, Daniel P. Berrange wrote:
->> > > On Fri, Aug 11, 2017 at 01:33:00PM -0300, Eduardo Habkost wrote:
->> > > > CCing Zack Cornelius.
->> > > > 
->> > > > On Wed, Jun 14, 2017 at 05:29:55PM -0300, Eduardo Habkost wrote:
->> > > > > This series adds a new "persistent" option to
->> > > > > memory-backend-file.  The new option it will be useful if
->> > > > > somebody is sharing RAM contents on a file using share=on, but
->> > > > > don't need it to be flushed to disk when QEMU exits.
->> > > > > 
->> > > > > Internally, it will trigger a madvise(MADV_REMOVE) or
->> > > > > fallocate(FALLOC_FL_PUNCH_HOLE) call when the memory backend is
->> > > > > destroyed.
->> > > > > 
->> > > > > To make we actually trigger the new code when QEMU exits, the
->> > > > > first patch in the series ensures we destroy all user-created
->> > > > > objects when exiting QEMU.
->> > > > 
->> > > > So, before sending a new version of this, we need to clarify one
->> > > > thing: why exactly unlink()+close() wouldn't be enough to avoid
->> > > > having data unnecessarily flushed to the backing store and make
->> > > > the new option unnecessary?
->> > > 
->> > > If the backend file is shared between processes, unlinking
->> > > it feels bad - you're assuming no /future/ process wants to
->> > > attach to the file. Also if QEMU aborts for any reason, the
->> > > cleanup code is never going to run
->> > 
->> > If mem-path is a directory, QEMU will create a file, open() it
->> > and unlink() it immediately.
->> > 
->> > This solves the problem of not running the cleanup code when QEMU
->> > aborts (which is not solved by the madvise() method).
->> > 
->> > > 
->> > > > I would expect close() to not write any data unnecessarily if
->> > > > there are no remaining references to the file.  Why/when this is
->> > > > not the case?
->> > > 
->> > > Isn't the unlink() delayed until such time as *all* open handles
->> > > on that file are closed. If so, it seems that if 2 processes
->> > > have the file open, and one closes it, it is still valid for the
->> > > kernel to want to flush data out to the backing store if it needs
->> > > to free up working memory consumed by i/o cache.
->> > > 
->> > > If this wasn't the case, then one process could write 20 GB of data,
->> > > unlink + close the file, and that 20 GB would never be able to be
->> > > purge from I/O cache for as long as another process had that FD
->> > > open. That would be pretty bad denial of sevice for memory management
->> > > system.
->> > 
->> > I'm assuming QEMU is the only process opening the file.  Are
->> > there use cases where 1) there's a need for another process to
->> > the keep the file open; but 2) there's no need for the data on
->> > the file to be kept?
->> 
->> Saying only QEMU opens the file contradicts what is implied
->> by the original commit message:
->> 
->>   > > > This series adds a new "persistent" option to
->>   > > > memory-backend-file.  The new option it will be useful if
->>   > > > somebody is sharing RAM contents on a file using share=on, but
->>   > > > don't need it to be flushed to disk when QEMU exits.
->> 
->> AFAIK, the whole point of share=on, is so that non-QEMU processes
->> can open the file to get access to the guest RAM region, eg the
->> vhostuser backend process.  Why would you ever use share=on, if
->> QEMU is the only process opening the file ?
-> 
-> That's exactly what I'm asking about: if the use case I tried to
-> describe in the cover letter really makes sense.
-> 
-> The cover letter tried to describe a theoretical scenario where
-> the new flag would make a difference.  Now I'm trying to
-> understand why/when exactly this would happen in practice.
-> 
-> --
-> Eduardo
+>>> diff --git a/tests/prom-env-test.c b/tests/prom-env-test.c
+>>> index eac207b..0a10f06 100644
+>>> --- a/tests/prom-env-test.c
+>>> +++ b/tests/prom-env-test.c
+>>> @@ -50,7 +50,7 @@ static void test_machine(const void *machine)
+>>>      /* The pseries firmware boots much faster without the default de=
+vices */
+>>>      extra_args =3D strcmp(machine, "pseries") =3D=3D 0 ? "-nodefault=
+s" : "";
+>>> =20
+>>> -    args =3D g_strdup_printf("-M %s,accel=3Dtcg %s -prom-env 'use-nv=
+ramrc?=3Dtrue' "
+>>> +    args =3D g_strdup_printf("-M %s,accel=3Dkvm:tcg %s -prom-env 'us=
+e-nvramrc?=3Dtrue' "
+>>>                             "-prom-env 'nvramrc=3D%x %x l!' ",
+>>>                             (const char *)machine, extra_args, MAGIC,=
+ ADDRESS);
+>>
+>> The header explicitly states that this is supposed to test tcg mode.
+>=20
+> This change should be OK here. But it is currently not necessary yet:
+> The test only runs on SPARC and PPC machines, and both do not support
+> the --disable-tcg switch yet.
+>=20
+>  Thomas
+>=20
