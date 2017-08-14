@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dh9It-0004Tb-10
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 02:56:48 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dh9Jz-0005Bz-Ah
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 02:57:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dh9Ip-0002oC-Us
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 02:56:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60000)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dh9Ip-0002o2-O6
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 02:56:43 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <150107094952.114.932926322923994155@5d477a5b5989>
-	<e982b2c6-dab4-24a0-7db4-2e76c370d227@redhat.com>
-	<87fud24drm.fsf@dusky.pond.sub.org>
-	<b289a6e6-9773-c490-6c12-d43a6920d1c3@redhat.com>
-Date: Mon, 14 Aug 2017 08:56:36 +0200
-In-Reply-To: <b289a6e6-9773-c490-6c12-d43a6920d1c3@redhat.com> (Eric Blake's
-	message of "Tue, 8 Aug 2017 10:04:48 -0500")
-Message-ID: <871soeljrv.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1dh9Jy-00036I-Nn
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 02:57:55 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:35034)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dh9Jy-000361-HY
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 02:57:54 -0400
+Received: by mail-wr0-x229.google.com with SMTP id k71so31377171wrc.2
+	for <qemu-devel@nongnu.org>; Sun, 13 Aug 2017 23:57:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/5] ui: keymap fixes for 2.10
+In-Reply-To: <CAOE=1Z2+PwXOCyK+=QR-engRF7P7JDjgCwbC+rbT=AGAgrXhtQ@mail.gmail.com>
+References: <CAOE=1Z2+PwXOCyK+=QR-engRF7P7JDjgCwbC+rbT=AGAgrXhtQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 14 Aug 2017 07:57:32 +0100
+Message-ID: <CAFEAcA-q5Q8LTgx-yXsCMNp9ODdcjMcZjffRCRmGkNuyE4unJA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-discuss] How to get qemu log?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: no-reply@patchew.org, famz@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <mlureau@redhat.com>
+To: Sam <batmanustc@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-discuss <qemu-discuss@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
-
-> On 08/08/2017 04:20 AM, Markus Armbruster wrote:
->> Just back from the signed-vs-unsigned swamp, still catching up, sorry
->> for the delay...
->>=20
+On 14 August 2017 at 07:26, Sam <batmanustc@gmail.com> wrote:
+> Hi all,
 >
->>>>   File "/var/tmp/patchew-tester-tmp-xs4657r8/src/scripts/qapi2texi.py"=
-, line 160, in texi_members
->>>>     items +=3D member_func(section.member) + desc + '\n'
->>>>   File "/var/tmp/patchew-tester-tmp-xs4657r8/src/scripts/qapi2texi.py"=
-, line 133, in texi_enum_value
->>>>     return '@item @code{%s}\n' % value.name
->>>> AttributeError: 'NoneType' object has no attribute 'name'
->>>
->>> Eww, we have a bug in our qapi generator (a stack dump instead of a nice
->>> error message).  I suspect this is caused by your use of '@ac_*' instead
->>> of spelling out all the ac_ members added in qapi-schema.json in 4/5 -
->>=20
->> Yes, we require doc comments to match the schema.  Wildcards aren't
->> supported.  They could be, if we want them badly enough.
->>=20
->>> but it IS something that needs to be fixed on your end to quit tripping
->>> up the doc generator.
->>=20
->> Has anyone worked on a fix for qapi2texi.py?
+> I add some log like this in QEMU_SRC/hw/i386/pc.c
 >
-> We worked around the generator bug in the meantime, so the qapi2texi.py
-> bug is still latent (sadly, it's not my highest priority)
+> +++ b/hw/i386/pc.c
+>>
+>> @@ -1364,6 +1364,13 @@ void pc_memory_init(PCMachineState *pcms,
+>>
+>>
+>>>      linux_boot = (machine->kernel_filename != NULL);
+>>
+>>
+>>> +    /* add for qemu start speed */
+>>
+>> +    time_t rawtime;
+>>
+>> +    struct tm * timeinfo;
+>>
+>> +    time ( &rawtime );
+>>
+>> +    timeinfo = localtime ( &rawtime );
+>>
+>> +    error_printf_unless_qmp("jpc_memory_init begin --
+>>> %s\n",asctime(timeinfo));
+>>
+>> +
+>>
+>>
+> Then I use `QEMU -D /qemu.log ...` command to start a vm, but I have seen
+> nothing in /qemu.log, I don't know why, and how to show my log while
+> starting qemu?
 
-Marc-Andr=C3=A9, can you have a look perhaps?
+You haven't called a function that adds a message to the -d/-D
+qemu.log logging -- those are the ones declared in include/qemu/log.h.
+
+The function you have called is for printing error messages,
+which will be displayed to the QEMU monitor prompt if they
+were provoked by a monitor command, otherwise to stderr.
+It's not intended for general debug/progress logging.
+
+thanks
+-- PMM
