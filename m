@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dh9Dt-0002LE-Nn
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 02:51:39 -0400
+	(envelope-from <armbru@redhat.com>) id 1dh9It-0004Tb-10
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 02:56:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dh9Dq-00013f-My
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 02:51:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59408)
+	(envelope-from <armbru@redhat.com>) id 1dh9Ip-0002oC-Us
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 02:56:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60000)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dh9Dq-00011l-G2
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 02:51:34 -0400
-References: <C2D23A89-6DB7-445C-BC25-71E9E49C288D@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ff49cfa1-5a00-c329-1647-3ad8367cc804@redhat.com>
-Date: Mon, 14 Aug 2017 08:51:27 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dh9Ip-0002o2-O6
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 02:56:43 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <150107094952.114.932926322923994155@5d477a5b5989>
+	<e982b2c6-dab4-24a0-7db4-2e76c370d227@redhat.com>
+	<87fud24drm.fsf@dusky.pond.sub.org>
+	<b289a6e6-9773-c490-6c12-d43a6920d1c3@redhat.com>
+Date: Mon, 14 Aug 2017 08:56:36 +0200
+In-Reply-To: <b289a6e6-9773-c490-6c12-d43a6920d1c3@redhat.com> (Eric Blake's
+	message of "Tue, 8 Aug 2017 10:04:48 -0500")
+Message-ID: <871soeljrv.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <C2D23A89-6DB7-445C-BC25-71E9E49C288D@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Help with Windows NT 4.0
+Subject: Re: [Qemu-devel] [PATCH 0/5] ui: keymap fixes for 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: no-reply@patchew.org, famz@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <mlureau@redhat.com>
 
-On 13/08/2017 21:13, Programmingkid wrote:
-> Lately I found out that Windows NT 4.0 seems to work well with the
-> 486 and pentium processors. Using "-cpu 486" made installing it
-> actually work. Now I am seeing another issue. When I boot Windows NT
-> 4.0 I see this error message:
->=20
-> *** STOP: 0x0000007B (0x807A8610,0x00000000,0x00000000,0x00000000)=20
-> INACESSIBLE_BOOT_DEVICE
->=20
-> Would anyone know a way to solve this issue?
+Eric Blake <eblake@redhat.com> writes:
 
-Herv=C3=A9 is probably the best person to answer this question.  Maybe tr=
-y
-installing it with SCSI disks ("-drive if=3Dscsi,id=3Dhd,file=3D... -driv=
-e
-if=3Dscsi,id=3Dcd,file=3D... -device lsi -device scsi-hd,drive=3Dhd -devi=
-ce
-scsi-cd,drive=3Dcd").
+> On 08/08/2017 04:20 AM, Markus Armbruster wrote:
+>> Just back from the signed-vs-unsigned swamp, still catching up, sorry
+>> for the delay...
+>>=20
+>
+>>>>   File "/var/tmp/patchew-tester-tmp-xs4657r8/src/scripts/qapi2texi.py"=
+, line 160, in texi_members
+>>>>     items +=3D member_func(section.member) + desc + '\n'
+>>>>   File "/var/tmp/patchew-tester-tmp-xs4657r8/src/scripts/qapi2texi.py"=
+, line 133, in texi_enum_value
+>>>>     return '@item @code{%s}\n' % value.name
+>>>> AttributeError: 'NoneType' object has no attribute 'name'
+>>>
+>>> Eww, we have a bug in our qapi generator (a stack dump instead of a nice
+>>> error message).  I suspect this is caused by your use of '@ac_*' instead
+>>> of spelling out all the ac_ members added in qapi-schema.json in 4/5 -
+>>=20
+>> Yes, we require doc comments to match the schema.  Wildcards aren't
+>> supported.  They could be, if we want them badly enough.
+>>=20
+>>> but it IS something that needs to be fixed on your end to quit tripping
+>>> up the doc generator.
+>>=20
+>> Has anyone worked on a fix for qapi2texi.py?
+>
+> We worked around the generator bug in the meantime, so the qapi2texi.py
+> bug is still latent (sadly, it's not my highest priority)
 
-Thanks,
-
-Paolo
+Marc-Andr=C3=A9, can you have a look perhaps?
