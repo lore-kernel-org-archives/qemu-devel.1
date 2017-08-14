@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dhNN6-0001Pr-TQ
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 17:58:07 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dhNNI-0001WN-Pu
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 17:58:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dhNN2-00029L-OO
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 17:58:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43636)
+	(envelope-from <ehabkost@redhat.com>) id 1dhNNE-0002GR-RC
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 17:58:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38168)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dhNN2-00028t-Eh
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 17:58:00 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dhNNE-0002G0-Ih
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 17:58:12 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4DED4C0546C9
-	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 21:57:59 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 74B4577916
+	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 21:58:11 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 14 Aug 2017 18:57:35 -0300
-Message-Id: <20170814215748.5158-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [RFC v4 00/13] qmp: query-device-slots command
+Date: Mon, 14 Aug 2017 18:57:36 -0300
+Message-Id: <20170814215748.5158-2-ehabkost@redhat.com>
+In-Reply-To: <20170814215748.5158-1-ehabkost@redhat.com>
+References: <20170814215748.5158-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [RFC v4 01/13] qmp: Define query-device-slots command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,15 +32,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Laine Stump <laine@redhat.com>
 Cc: libvir-list@redhat.com, Igor Mammedov <imammedo@redhat.com>
 
-Changelog
----------
+This adds a new command to QMP: query-device-slots. It will allow
+management software to query possible slots where devices can be
+plugged.
 
+Slot sets are represented by a list of option names and sets of
+possible values for each of those options.  We use a compact
+format for set of valid values, to keep JSON response size
+reasonable.  The format is documented at the SlotOption struct.
+
+In the future, we may use QAPI alternates to define and document
+the exact data format more strictly.
+
+Actual implementations of BusClass::enumerate_slots will be added
+by other patches.
+
+Cc: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Cc: libvir-list@redhat.com,
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Laine Stump <laine@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
 Changes v3 -> v4:
-* New compact representation of slot sets.
-* New generic code to automatically merge similar slots
-  into a single entry in the command output while keeping
-  implementations of the method simpler.
-* Example implementation of IDE and USB bus enumeration
+* Use a more compact format for the "slot sets"
+* Renamed DeviceSlotInfo.props to DeviceSlotInfo.opts
+* Replaced DeviceSlotInfo.incomplete with
+  DeviceSlotInfo.opts-complete
+* Now DeviceSlotInfo.available will be true even if hotplug is
+  unavailable, to indicate the slot would be available using
+  -device.
 
 Changes v2 -> v3:
 * Implemented a "slot set" structure, where multiple slots can be
@@ -66,397 +90,180 @@ Changes v1 -> v2:
 * PCI: Replaced "addr" property (string parsed by property
   setter) with "device-number" uint32 property
 * PCI: return only one slot for PCIe ports
+---
+ qapi-schema.json       | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/qdev-core.h |  2 ++
+ qdev-monitor.c         | 38 +++++++++++++++++++++
+ 3 files changed, 129 insertions(+)
 
-Summary
--------
-
-This adds a new command to QMP: query-device-slots. It will allow
-management software to query possible slots where devices can be
-plugged.
-
-This implementation of the command will return:
-
-* Multiple PCI slots per bus, in the case of PCI buses;
-* One slot for each entry from query-hotpluggable-cpus.
-* One slot per bus for the other buses (that don't
-  implement slot enumeration yet), with opts-complete=false
-
-Representation of slot sets in JSON
------------------------------------
-
-Slot sets are represented by a list of option names and sets of
-possible values for each of those options.  The command uses a
-compact representation for the set of valid values for an option.
-For example, the following set of 5 PCI functions:
-
-      bus: pcie.0
-      device-number: 31
-      functions: 1,4,5,6,7
-
-would be represented in the JSON data as:
-
-  {"available":false,"count":5,
-   "device-types":["pci-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"function","values":[1,[4,7]]},
-      {"option":"device-number","values":31},
-      {"option":"bus","values":"pcie.0"}],
-   "opts-complete":true}
-
-I planned to use QAPI alternates to model/document that in the
-schema, but it would require implementing a few missing features
-in QAPI alternate support.
-
-TODO
-----
-
-* Differentiation between legacy-pci-device and pcie-device
-* Implement enumeration for other buses
-* Document the slotinfo.c functions
-* Optimize the slot/option merging algorithm
-
-Example output
---------------
-
-Using the following QEMU command-line:
-
-  $ qemu-system-x86_64 -machine q35,accel=kvm \
-    -smp 16,maxcpus=32,threads=2,cores=2
-
-query-device-slots will return the following entries:
-
-  {"available":true,"count":224,
-   "device-types":["pci-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"function","values":[[0,7]]},
-      {"option":"device-number","values":[[3,30]]},
-      {"option":"bus","values":"pcie.0"}],
-   "opts-complete":true}
-  {"available":true,"count":1,
-   "device-types":["ide-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"unit","values":0},
-      {"option":"bus","values":"ide.2"}],
-   "opts-complete":true}
-  {"available":true,"count":10,
-   "device-types":["ide-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"unit","values":[[0,1]]},
-      {"option":"bus","values":["ide.4","ide.3","ide.5","ide.0","ide.1"]}],
-   "opts-complete":true}
-  {"available":true,
-   "device-types":["isa-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"bus","values":"isa.0"}],
-   "opts-complete":false}
-  {"available":true,"count":16,
-   "device-types":["qemu64-x86_64-cpu"],"hotpluggable":true,
-   "opts":[
-      {"option":"socket-id","values":[[4,7]]},
-      {"option":"thread-id","values":[[0,1]]},
-      {"option":"core-id","values":[[0,1]]}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[16]",
-   "device-types":["qemu64-x86_64-cpu"],"hotpluggable":true,
-   "opts":[
-      {"option":"socket-id","values":3},
-      {"option":"thread-id","values":1},
-      {"option":"core-id","values":1}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[15]",
-   "device-types":["qemu64-x86_64-cpu"],"hotpluggable":true,
-   "opts":[
-      {"option":"socket-id","values":3},
-      {"option":"thread-id","values":0},
-      {"option":"core-id","values":1}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[14]",
-   "device-types":["qemu64-x86_64-cpu"],"hotpluggable":true,
-   "opts":[
-      {"option":"socket-id","values":3},
-      {"option":"thread-id","values":1},
-      {"option":"core-id","values":0}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[13]",
-   "device-types":["qemu64-x86_64-cpu"],"hotpluggable":true,
-   "opts":[
-      {"option":"socket-id","values":3},
-      {"option":"thread-id","values":0},
-      {"option":"core-id","values":0}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[12]",
-   "device-types":["qemu64-x86_64-cpu"],"hotpluggable":true,
-   "opts":[
-      {"option":"socket-id","values":2},
-      {"option":"thread-id","values":1},
-      {"option":"core-id","values":1}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[11]",
-   "device-types":["qemu64-x86_64-cpu"],"hotpluggable":true,
-   "opts":[
-      {"option":"socket-id","values":2},
-      {"option":"thread-id","values":0},
-      {"option":"core-id","values":1}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[10]",
-   "device-types":["qemu64-x86_64-cpu"],"hotpluggable":true,
-   "opts":[
-      {"option":"socket-id","values":2},
-      {"option":"thread-id","values":1},
-      {"option":"core-id","values":0}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[9]",
-   "device-types":["qemu64-x86_64-cpu"],"hotpluggable":true,
-   "opts":[
-      {"option":"socket-id","values":2},
-      {"option":"thread-id","values":0},
-      {"option":"core-id","values":0}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[8]",
-   "device-types":["qemu64-x86_64-cpu"],"hotpluggable":true,
-   "opts":[
-      {"option":"socket-id","values":1},
-      {"option":"thread-id","values":1},
-      {"option":"core-id","values":1}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[7]",
-   "device-types":["qemu64-x86_64-cpu"],"hotpluggable":true,
-   "opts":[
-      {"option":"socket-id","values":1},
-      {"option":"thread-id","values":0},
-      {"option":"core-id","values":1}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[6]",
-   "device-types":["qemu64-x86_64-cpu"],"hotpluggable":true,
-   "opts":[
-      {"option":"socket-id","values":1},
-      {"option":"thread-id","values":1},
-      {"option":"core-id","values":0}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[5]",
-   "device-types":["qemu64-x86_64-cpu"],"hotpluggable":true,
-   "opts":[
-      {"option":"socket-id","values":1},
-      {"option":"thread-id","values":0},
-      {"option":"core-id","values":0}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[4]",
-   "device-types":["qemu64-x86_64-cpu"],"hotpluggable":true,
-   "opts":[
-      {"option":"socket-id","values":0},
-      {"option":"thread-id","values":1},
-      {"option":"core-id","values":1}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[3]",
-   "device-types":["qemu64-x86_64-cpu"],"hotpluggable":true,
-   "opts":[
-      {"option":"socket-id","values":0},
-      {"option":"thread-id","values":0},
-      {"option":"core-id","values":1}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[2]",
-   "device-types":["qemu64-x86_64-cpu"],"hotpluggable":true,
-   "opts":[
-      {"option":"socket-id","values":0},
-      {"option":"thread-id","values":1},
-      {"option":"core-id","values":0}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[0]",
-   "device-types":["qemu64-x86_64-cpu"],"hotpluggable":true,
-   "opts":[
-      {"option":"socket-id","values":0},
-      {"option":"thread-id","values":0},
-      {"option":"core-id","values":0}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/q35/mch",
-   "device-types":["pci-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"function","values":0},
-      {"option":"device-number","values":0},
-      {"option":"bus","values":"pcie.0"}],
-   "opts-complete":true}
-  {"available":false,"count":21,
-   "device-types":["pci-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"function","values":[[1,7]]},
-      {"option":"device-number","values":[[0,2]]},
-      {"option":"bus","values":"pcie.0"}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[44]",
-   "device-types":["pci-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"function","values":0},
-      {"option":"device-number","values":1},
-      {"option":"bus","values":"pcie.0"}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[45]",
-   "device-types":["pci-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"function","values":0},
-      {"option":"device-number","values":2},
-      {"option":"bus","values":"pcie.0"}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[18]",
-   "device-types":["pci-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"function","values":0},
-      {"option":"device-number","values":31},
-      {"option":"bus","values":"pcie.0"}],
-   "opts-complete":true}
-  {"available":false,"count":5,
-   "device-types":["pci-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"function","values":[1,[4,7]]},
-      {"option":"device-number","values":31},
-      {"option":"bus","values":"pcie.0"}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[33]",
-   "device-types":["pci-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"function","values":2},
-      {"option":"device-number","values":31},
-      {"option":"bus","values":"pcie.0"}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[35]",
-   "device-types":["pci-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"function","values":3},
-      {"option":"device-number","values":31},
-      {"option":"bus","values":"pcie.0"}],
-   "opts-complete":true}
-  {"available":false,"count":1,"device":"/machine/unattached/device[34]",
-   "device-types":["ide-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"unit","values":1},
-      {"option":"bus","values":"ide.2"}],
-   "opts-complete":true}
-  {"available":false,"device":"/machine/unattached/device[32]",
-   "device-types":["isa-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"bus","values":"isa.0"}],
-   "opts-complete":false}
-  {"available":false,"device":"/machine/unattached/device[31]",
-   "device-types":["isa-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"bus","values":"isa.0"}],
-   "opts-complete":false}
-  {"available":false,"device":"/machine/unattached/device[30]",
-   "device-types":["isa-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"bus","values":"isa.0"}],
-   "opts-complete":false}
-  {"available":false,"device":"/machine/unattached/device[29]",
-   "device-types":["isa-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"bus","values":"isa.0"}],
-   "opts-complete":false}
-  {"available":false,"device":"/machine/unattached/device[28]",
-   "device-types":["isa-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"bus","values":"isa.0"}],
-   "opts-complete":false}
-  {"available":false,"device":"/machine/unattached/device[27]",
-   "device-types":["isa-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"bus","values":"isa.0"}],
-   "opts-complete":false}
-  {"available":false,"device":"/machine/unattached/device[26]",
-   "device-types":["isa-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"bus","values":"isa.0"}],
-   "opts-complete":false}
-  {"available":false,"device":"/machine/unattached/device[25]",
-   "device-types":["isa-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"bus","values":"isa.0"}],
-   "opts-complete":false}
-  {"available":false,"device":"/machine/unattached/device[24]",
-   "device-types":["isa-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"bus","values":"isa.0"}],
-   "opts-complete":false}
-  {"available":false,"device":"/machine/unattached/device[23]",
-   "device-types":["isa-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"bus","values":"isa.0"}],
-   "opts-complete":false}
-  {"available":false,"device":"/machine/unattached/device[22]",
-   "device-types":["isa-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"bus","values":"isa.0"}],
-   "opts-complete":false}
-  {"available":false,"device":"/machine/unattached/device[20]",
-   "device-types":["isa-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"bus","values":"isa.0"}],
-   "opts-complete":false}
-  {"available":false,"device":"/machine/unattached/device[19]",
-   "device-types":["isa-device"],"hotpluggable":false,
-   "opts":[
-      {"option":"bus","values":"isa.0"}],
-   "opts-complete":false}
-
-Cc: Markus Armbruster <armbru@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>
-Cc: libvir-list@redhat.com
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Laine Stump <laine@redhat.com>
-
-Eduardo Habkost (13):
-  qmp: Define query-device-slots command
-  qapi: qobject_compare() helper
-  qdev: Add BusClass::device_type field
-  qdev: Slot info helpers
-  query-device-slots: Collapse similar entries
-  qdev core: generic enumerate_slots implementation
-  qdev: Enumerate CPU slots on query-device-slots
-  ide: enumerate_slots implementation
-  pci: pci_bus_has_pcie_upstream_port() function
-  pci: device-number & function properties
-  pci: enumerate_slots implementation
-  usb: enumerate_slots implementation
-  tests: Experimental query-device-slots test code
-
- qapi-schema.json              |  89 ++++++
- include/hw/qdev-core.h        |   5 +
- include/hw/qdev-slotinfo.h    |  85 ++++++
- include/hw/usb.h              |   6 +-
- include/qapi/util.h           |  39 +++
- hw/audio/intel-hda.c          |   7 +
- hw/block/fdc.c                |  15 +-
- hw/char/virtio-serial-bus.c   |   1 +
- hw/core/bus.c                 |  42 +++
- hw/core/slotinfo.c            | 610 ++++++++++++++++++++++++++++++++++++++++++
- hw/core/sysbus.c              |   8 +
- hw/i2c/core.c                 |   7 +
- hw/ide/qdev.c                 |  27 ++
- hw/input/adb.c                |   7 +
- hw/ipack/ipack.c              |   7 +
- hw/isa/isa-bus.c              |   1 +
- hw/misc/auxbus.c              |   1 +
- hw/pci/pci.c                  | 120 ++++++++-
- hw/ppc/spapr_vio.c            |   1 +
- hw/s390x/css-bridge.c         |   2 +
- hw/s390x/event-facility.c     |   1 +
- hw/s390x/s390-pci-bus.c       |   7 +
- hw/scsi/scsi-bus.c            |   1 +
- hw/sd/core.c                  |   7 +
- hw/ssi/ssi.c                  |   7 +
- hw/usb/bus.c                  |  37 +++
- hw/usb/dev-smartcard-reader.c |   7 +
- hw/virtio/virtio-bus.c        |   1 +
- qapi/qapi-util.c              |  66 +++++
- qdev-monitor.c                | 109 ++++++++
- tests/test-qapi-util.c        |  53 ++++
- tests/test-slotinfo.c         | 398 +++++++++++++++++++++++++++
- hw/core/Makefile.objs         |   2 +
- tests/Makefile.include        |  14 +-
- tests/qmp-machine-info.py     | 300 +++++++++++++++++++++
- 35 files changed, 2075 insertions(+), 15 deletions(-)
- create mode 100644 include/hw/qdev-slotinfo.h
- create mode 100644 hw/core/slotinfo.c
- create mode 100644 tests/test-slotinfo.c
- create mode 100755 tests/qmp-machine-info.py
-
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 802ea53..6a9329e 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -4325,6 +4325,95 @@
+ ##
+ { 'command': 'closefd', 'data': {'fdname': 'str'} }
+ 
++
++##
++# @SlotOption:
++#
++# A option to be used when plugging a device to a slot.
++#
++# @option: Option name.
++#
++# @values: Set of valid option values.
++#
++# @values follow a compact format to represent a set of values:
++# - If @values is a string, bool, or number, it representes a
++#   single-element set containing that value.  In other words,
++#   @values is the only valid value for the option.
++# - If @values is a list, each element E on the list represents
++#   one or more possible values for the option:
++#   - If E is a string, bool, or number, it indicates that E
++#     is a valid value for the option.
++#   - If E is a one-element list [V], it means V is a valid value
++#     for the option.
++#   - If E is a two-element list [A, B] where A and B are
++#     numbers, it means any number X, A <= X <= B is a valid
++#     value for the option.
++#
++# TODO: @values could be represented by nested 'alternate' types,
++#      for more consistent documentation and automatic
++#      validation/parsing, but the following limitations on
++#      alternates prevent that today:
++#      - alternate branches can't be lists
++#      - alternate string members conflict with scalar values
++#      - alternate types should have 2 or more branches
++##
++{ 'struct': 'SlotOption',
++  'data': { 'option': 'str', 'values': 'any' } }
++
++##
++# @DeviceSlotInfo:
++#
++# Information on a set of slots where devices can be plugged.
++#
++# @device-types: List of device types accepted by the slots.
++#                Any device plugged to the slot should implement
++#                one of the accepted device types.
++#
++# @device: QOM path of device plugged to the slot, if any.
++#
++# @available: If false, the slot is not available for plugging any device.
++#             This value can change at runtime if condition changes.
++#
++# @hotpluggable: If true, the slot accepts hotplugged devices.  If false,
++#                device_add won't work on the slot even if @available=true.
++#
++# @count: Number of slots represented by this slot set.
++#
++# @opts-complete: If true, all options required to plug devices
++#                 to slots in this set are present in @opts.  If
++#                 false, slot information is incomplete in this
++#                 QEMU version and additional options may be
++#                 required to plug devices on those slots.
++#
++# @opts: Information on the arguments that should be provided to
++#        @device_add if plugging a device to this slot.
++#
++# Incomplete Slot Sets
++# --------------------
++#
++# Slot sets with @opts-complete=false represent a bus that
++# doesn't support slot enumeration yet. Slots of this type should
++# be replaced by more detailed slot sets in future QEMU versions.
++#
++# If @count is omitted, the entry may or may not represent more
++# than one slots.  Future QEMU versions should include additional
++# code to set @count on those entries.
++##
++{ 'struct': 'DeviceSlotInfo',
++  'data': { 'device-types': [ 'str' ], '*device': 'str',
++            'available': 'bool', 'hotpluggable': 'bool',
++            '*count': 'int', 'opts-complete': 'bool',
++            'opts': [ 'SlotOption' ] } }
++
++##
++# @query-device-slots:
++#
++# Return the list of possible slots for plugging devices using
++# @device_add.
++##
++{ 'command': 'query-device-slots',
++  'returns': [ 'DeviceSlotInfo' ] }
++
+ ##
+ # @MachineInfo:
+ #
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index ae31728..0111350 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -191,6 +191,8 @@ struct BusClass {
+     void (*reset)(BusState *bus);
+     BusRealize realize;
+     BusUnrealize unrealize;
++    /*TODO: write doc */
++    DeviceSlotInfoList *(*enumerate_slots)(BusState *bus);
+ 
+     /* maximum devices allowed on the bus, 0: no limit. */
+     int max_dev;
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index 8fd6df9..785f4af 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -30,6 +30,8 @@
+ #include "qemu/help_option.h"
+ #include "sysemu/block-backend.h"
+ #include "migration/misc.h"
++#include "qapi/qobject-output-visitor.h"
++#include "hw/boards.h"
+ 
+ /*
+  * Aliases were a bad idea from the start.  Let's keep them
+@@ -638,6 +640,42 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+     return dev;
+ }
+ 
++typedef struct SlotListState {
++    DeviceSlotInfoList *result;
++    DeviceSlotInfoList **next;
++} SlotListState;
++
++static void append_slots(SlotListState *s, DeviceSlotInfoList *l)
++{
++    *s->next = l;
++    for (; l; l = l->next) {
++        s->next = &l->next;
++    }
++}
++
++static int enumerate_bus(Object *obj, void *opaque)
++{
++    SlotListState *s = opaque;
++
++    if (object_dynamic_cast(obj, TYPE_BUS)) {
++        BusState *bus = BUS(obj);
++        BusClass *bc = BUS_GET_CLASS(bus);
++
++        if (bc->enumerate_slots) {
++            append_slots(s, bc->enumerate_slots(bus));
++        }
++    }
++    return 0;
++}
++
++DeviceSlotInfoList *qmp_query_device_slots(Error **errp)
++{
++    SlotListState s = { .next = &s.result };
++
++    object_child_foreach_recursive(qdev_get_machine(), enumerate_bus, &s);
++    return s.result;
++}
++
+ 
+ #define qdev_printf(fmt, ...) monitor_printf(mon, "%*s" fmt, indent, "", ## __VA_ARGS__)
+ static void qbus_print(Monitor *mon, BusState *bus, int indent);
 -- 
 2.9.4
