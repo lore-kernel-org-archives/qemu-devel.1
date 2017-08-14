@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dhJyl-0004ym-CZ
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:20:44 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dhK1U-0006cq-EI
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:23:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dhJyh-00061G-Rq
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:20:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34504)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dhJyh-0005y8-Co
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:20:39 -0400
-References: <mailman.1778.1502715001.21954.qemu-devel@nongnu.org>
-	<223B4DEC-A801-40E3-A118-33EBB9ED384D@gmail.com>
-	<20170814140003.GF8506@redhat.com>
-	<EEABAA69-F4C9-4525-8A01-CDF143BAD31B@gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b4268987-e25d-02fc-3931-7b9576969cc5@redhat.com>
-Date: Mon, 14 Aug 2017 13:20:33 -0500
+	(envelope-from <laurent@vivier.eu>) id 1dhK1R-0007Ay-At
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:23:32 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:55772)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dhK1R-0007A5-0w
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 14:23:29 -0400
+References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
+	<1500040339-119465-15-git-send-email-imammedo@redhat.com>
+	<5bec6275-8e15-16c7-8d23-2975a563c78f@twiddle.net>
+	<20170717124146.5ae39d2b@nial.brq.redhat.com>
+	<f32dbe33-4a99-cf79-e41c-4a1accacda64@suse.de>
+	<20170717172322.54bd6888@nial.brq.redhat.com>
+	<20170814100036.28160651@nial.brq.redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <8acf5254-0d52-201c-800e-1911fee08931@vivier.eu>
+Date: Mon, 14 Aug 2017 20:23:10 +0200
 MIME-Version: 1.0
-In-Reply-To: <EEABAA69-F4C9-4525-8A01-CDF143BAD31B@gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="jmQ5VbtDiIMSh4o7KC0V2eM71WURDSPB1"
-Subject: Re: [Qemu-devel] [PATCH v3 00/12] Convert over to use keycodemapdb
+In-Reply-To: <20170814100036.28160651@nial.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 14/28] m68k: replace cpu_m68k_init() with
+ cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +34,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jmQ5VbtDiIMSh4o7KC0V2eM71WURDSPB1
-From: Eric Blake <eblake@redhat.com>
-To: Programmingkid <programmingkidx@gmail.com>,
- "Daniel P. Berrange" <berrange@redhat.com>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <b4268987-e25d-02fc-3931-7b9576969cc5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 00/12] Convert over to use keycodemapdb
-References: <mailman.1778.1502715001.21954.qemu-devel@nongnu.org>
- <223B4DEC-A801-40E3-A118-33EBB9ED384D@gmail.com>
- <20170814140003.GF8506@redhat.com>
- <EEABAA69-F4C9-4525-8A01-CDF143BAD31B@gmail.com>
-In-Reply-To: <EEABAA69-F4C9-4525-8A01-CDF143BAD31B@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Le 14/08/2017 à 10:00, Igor Mammedov a écrit :
+> On Mon, 17 Jul 2017 17:23:22 +0200
+> Igor Mammedov <imammedo@redhat.com> wrote:
+> 
+>> On Mon, 17 Jul 2017 17:05:15 +0200
+>> Andreas Färber <afaerber@suse.de> wrote:
+>>
+>>> Am 17.07.2017 um 12:41 schrieb Igor Mammedov:  
+>>>> On Sat, 15 Jul 2017 08:08:58 -1000
+>>>> Richard Henderson <rth@twiddle.net> wrote:
+>>>>     
+>>>>> On 07/14/2017 03:52 AM, Igor Mammedov wrote:    
+>>>>>> @@ -230,6 +230,8 @@ static void m68k_cpu_realizefn(DeviceState *dev, Error **errp)
+>>>>>>       M68kCPUClass *mcc = M68K_CPU_GET_CLASS(dev);
+>>>>>>       Error *local_err = NULL;
+>>>>>>   
+>>>>>> +    register_m68k_insns(&cpu->env);
+>>>>>> +      
+>>>>>
+>>>>> I think it would make more sense to do this during m68k_tcg_init.
+>>>>>    
+>>>> it seems that m68k_cpu_initfn accesses 'env' via some global,
+>>>> while cpu_mk68k_init() used to access concrete pointer of just created cpu,
+>>>>
+>>>> how about moving register_m68k_insns() to m68k_cpu_initfn(), instead?
+>>>> it should be equivalent to what cpu_mk68k_init() used to do.    
+>>>
+>>> As a general note, realize should be re-entrant. Can't tell from the
+>>> above diff whether that is the case here.  
+>> Looking at
+>>
+>> void register_m68k_insns (CPUM68KState *env)                                     
+>> {                                                                                
+>>     /* Build the opcode table only once to avoid                                 
+>>        multithreading issues. */                                                 
+>>     if (opcode_table[0] != NULL) {                                               
+>>         return;                                                                  
+>>     }
+>>
+>> it is save to use multiple times,
+>>
+>> also looking further in it:
+>>
+>> #define BASE(name, opcode, mask) \                                               
+>>     register_opcode(disas_##name, 0x##opcode, 0x##mask)                          
+>> #define INSN(name, opcode, mask, feature) do { \                                 
+>>     if (m68k_feature(env, M68K_FEATURE_##feature)) \                             
+>>         BASE(name, opcode, mask); \                                              
+>>     } while(0)                                                                   
+>>     BASE(undef,     0000, 0000);                                                 
+>>     INSN(arith_im,  0080, fff8, CF_ISA_A);
+>>
+>> INSN macro depends on enabled features, it might work with current code that
+>> has no user settable features but it will break once that is available.
+>>
+>> So I retract my suggestion to move register_m68k_insns() into m68k_cpu_initfn()
+>> and keep it as it's in this patch (in m68k_cpu_realizefn()),
+>> that way features theoretically set between initfn(and m68k_tcg_init) and realize() will
+>> have effect on created cpu and we won't have to fix it in future.
+> 
+> Richard, Laurent,
+> 
+> Do you agree with keeping register_m68k_insns() in realize()?
+> 
 
-On 08/14/2017 12:20 PM, Programmingkid wrote:
->> These are based against git master, just save the series and then 'git=
- am'
->> the lot in one go.
->=20
-> Is there a tool that can be used to download a series of patches from a=
- mailing list? Copying and pasting patches sometimes introduces problems.=
-=20
+I agree.
 
-'git am'.  I find it works well to save the patch series into a single
-mailbox, then save that mailbox for the file to feed to git am.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---jmQ5VbtDiIMSh4o7KC0V2eM71WURDSPB1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmR6fEACgkQp6FrSiUn
-Q2oYkwgAijnank6cGQ0r7Q9r31WXO3DzhiwWBMNzHxmqC/qRbbgnozXmMroc2ZUD
-2kbq318wliV/gY9I842SROdC9sEkn1grudNUgOpdjBsRBfGhMQ549o/zVe8R0Rjz
-csg0MxzzroC5sl4aSLGdr9hRzGFVsOKRaeFf2p2nHTFhFHcG69ar4P4H81JB0UVr
-h8YzV1XQuNdUExxdzAGNzFa3gvxOYlxF+hBCI9+9kPXv4kIfIwNKkdo3BXM8LJzW
-ZZ75KBcZh0h35qV90E7XJtGOoSBJbLzGg/agTdvSTZHrroXyD7uUpC8EWJQ2U94z
-TPvOv3GDpNUBg39yM53pWdD2x1mAzQ==
-=sKag
------END PGP SIGNATURE-----
-
---jmQ5VbtDiIMSh4o7KC0V2eM71WURDSPB1--
+Acked-by: Laurent Vivier <laurent@vivier.eu>
