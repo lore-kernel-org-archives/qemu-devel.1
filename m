@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dh81C-0007kj-0e
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 01:34:27 -0400
+	(envelope-from <armbru@redhat.com>) id 1dh8GJ-0003dH-Nj
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 01:50:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dh817-0007OH-30
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 01:34:26 -0400
-References: <1502527090-11473-1-git-send-email-thuth@redhat.com>
-	<20170812121651.497c6e39@bahia.lan>
-	<20170814032456.GA3452@umbus.fritz.box>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <53b4a8b5-dd86-4afd-d3c6-a0304fa4dc70@redhat.com>
-Date: Mon, 14 Aug 2017 07:34:08 +0200
+	(envelope-from <armbru@redhat.com>) id 1dh8GG-0008Rl-LQ
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 01:50:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56162)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dh8GG-0008RI-CO
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 01:50:00 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1502467522-32237-1-git-send-email-armbru@redhat.com>
+	<1502467522-32237-3-git-send-email-armbru@redhat.com>
+	<df0646df-6e46-4361-010d-aac529177b62@redhat.com>
+Date: Mon, 14 Aug 2017 07:49:54 +0200
+In-Reply-To: <df0646df-6e46-4361-010d-aac529177b62@redhat.com> (Eric Blake's
+	message of "Fri, 11 Aug 2017 12:47:44 -0500")
+Message-ID: <87shgusnp9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170814032456.GA3452@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="og73qpjImPMl9Bc57i5bG5e8X5N5GBEge"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] hw/ppc/spapr_cpu_core: Add a
- proper check for spapr machine
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] vl: Partial support for non-scalar
+ properties with -object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,102 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pbonzini@redhat.com, f4bug@amsat.org, el13635@mail.ntua.gr
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---og73qpjImPMl9Bc57i5bG5e8X5N5GBEge
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Eric Blake <eblake@redhat.com> writes:
 
-On 14.08.2017 05:24, David Gibson wrote:
-> On Sat, Aug 12, 2017 at 12:16:51PM +0200, Greg Kurz wrote:
->> On Sat, 12 Aug 2017 10:38:10 +0200
->> Thomas Huth <thuth@redhat.com> wrote:
->>
->>> QEMU currently crashes when the user tries to add a spapr-cpu-core
->>> on a non-pseries machine:
->>>
->>> $ qemu-system-ppc64 -S -machine ppce500,accel=3Dtcg \
->>>                     -device POWER5+_v2.1-spapr-cpu-core
->>> hw/ppc/spapr_cpu_core.c:178:spapr_cpu_core_realize_child:
->>> Object 0x55cee1f55160 is not an instance of type spapr-machine
->>> Aborted (core dumped)
->>>
->>> So let's add a proper check for the correct machine time with
->>> a more friendly error message here.
->>>
->>> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  hw/ppc/spapr_cpu_core.c   | 9 ++++++++-
->>>  scripts/device-crash-test | 1 +
->>>  2 files changed, 9 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
->>> index ea278ce..0f3d653 100644
->>> --- a/hw/ppc/spapr_cpu_core.c
->>> +++ b/hw/ppc/spapr_cpu_core.c
->>> @@ -175,11 +175,18 @@ static void spapr_cpu_core_unrealizefn(DeviceSt=
-ate *dev, Error **errp)
->>>  static void spapr_cpu_core_realize_child(Object *child, Error **errp=
-)
->>>  {
->>>      Error *local_err =3D NULL;
->>> -    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
->>> +    sPAPRMachineState *spapr;
->>>      CPUState *cs =3D CPU(child);
->>>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->>>      Object *obj;
->>> =20
->>> +    spapr =3D (sPAPRMachineState *)object_dynamic_cast(qdev_get_mach=
-ine(),
->>> +                                                     TYPE_SPAPR_MACH=
-INE);
->>> +    if (!spapr) {
->>> +        error_setg(errp, "spapr-cpu-core needs a pseries machine");
->>> +        return;
->>> +    }
->>> +
->>
->> This is the realize function for individual threads. Maybe this sanity=
- check
->> should be performed earlier at the core level in spapr_cpu_core_realiz=
-e() ?
->=20
-> Ah, yes, that would be a better way of doing it.
->=20
-> I'm also not clear if you're proposing this for 2.10 or 2.11.
+> On 08/11/2017 11:05 AM, Markus Armbruster wrote:
+>> We've wanted -object to support non-scalar properties for a while.
+>> Dan Berrange tried in "[PATCH v4 00/10]Provide a QOM-based
+>> authorization API".  Review led to the conclusion that we need to
+>> replace rather than add to QemuOpts.  Initial work towards that goal
+>> has been merged to provide -blockdev (commit 8746709), but there's
+>> substantial work left, mostly due to an bewildering array of
+>> compatibility problems.
+>> 
+>> Even if a full solution is still out of reach, we can have a partial
+>> solution now: accept -object argument in JSON syntax.  This should
+>> unblock development work that needs non-scalar properties with
+>> -object.
+>> 
+>> The implementation is similar to -blockdev, except we use the new
+>> infrastructure only for the new JSON case, and stick to QemuOpts for
+>> the existing KEY=VALUE,... case, to sidestep compatibility problems.
+>> 
+>> If we did this for more options, we'd have to factor out common code.
+>> But for one option, this will do.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  qapi-schema.json | 14 +++++++++++---
+>>  vl.c             | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 62 insertions(+), 3 deletions(-)
+>> 
+>>  static void object_create(bool (*type_predicate)(const char *))
+>>  {
+>> +    ObjectOptionsQueueEntry *e, *next;
+>> +
+>> +    QSIMPLEQ_FOREACH_SAFE(e, &oo_queue, entry, next) {
+>> +        if (!type_predicate(e->oo->qom_type)) {
+>> +            continue;
+>> +        }
+>> +
+>> +        loc_push_restore(&e->loc);
+>> +        qmp_object_add(e->oo->qom_type, e->oo->id,
+>> +                       e->oo->has_props, e->oo->props, &error_fatal);
+>> +        loc_pop(&e->loc);
+>> +
+>> +        QSIMPLEQ_REMOVE(&oo_queue, e, ObjectOptionsQueueEntry, entry);
+>> +        qapi_free_ObjectOptions(e->oo);
+>> +    }
+>> +
+>>      if (qemu_opts_foreach(qemu_find_opts("object"),
+>
+> This handles all JSON forms prior to any QemuOpt forms (within the two
+> priority levels), such that a command line using:
+>
+>  -object type,id=1,oldstyle... -object '{'id':2, 'type':..., newstyle...}'
+>
+> processes the arguments in a different order than
+>
+>  -object type,id=1,oldstyle... -object type,id=2,oldstyle
+>
+> But I don't see that as too bad (ideally, someone using the {} JSON
+> style will use it consistently).
 
-I was not sure, either ;-) Anyway, it's not a bug that blocks normal
-usage of QEMU, and apparently there's a better but more extensive way to
-fix this, so let's postpone this to 2.11.
+Yes, that's another restriction: if you need your -object evaluated in a
+certain order, you may have to stick to one of the two syntax variants.
 
- Thomas
+Aside: there are two sane evaluation orders: (1) strictly left to right,
+and (2) order doesn't matter.  QEMU of course does (3) unpredicable for
+humans without referring back to the source code.
 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
---og73qpjImPMl9Bc57i5bG5e8X5N5GBEge
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJZkTZVAAoJEC7Z13T+cC21+zAQAICS4bUFO7HbfhEavhshnoPn
-YPsMjwuE9HWOthAH4J5je3WWd2C39jxro65nP0ssLi29b0TZfYvHKk0uTZnuW+Iz
-rb5EqdE7ma68oOWd5giIpKrK7Izk65xcAAO2ldYifHoWpkS8QYATXfvA/XhB/tkP
-CqO1hmYb39BgUOVaQSvPGHHH93O96i6T9UZddpkLeh/f4wxvnSqhrcojQoiTUHsx
-zqludiQX/J7S0eRqC93l5QbRG9gTds8qoASciU1pKR4O8i85El+fnLHY+8vywKUf
-4zbDHalto36p7MMaZYTBBwV2aCZEKgVW8duHqrdBAyPYrPCnIvm62Up6QiC4rRXZ
-FlKCysDiEXRceHtmHyuG3O+eFN+AZUoSuA4YvJynYBGjM9OvkMbmWAL6e+TZV67j
-r5hMU8L46Rr9Trbi9H98OXCY25rLEsKVbMEvnYqXi264OnPzxUP6/zBRnfKjqAFQ
-iUZFLivk282lgG/rsbU9dJrn2kLmRC2zGv/7iWf8ICzrCgxUf5xdgT2ofVEs0h0A
-BDg7F20lIBcEKfn701GngvRxTgeyRhq5NyXGGAYTab4hEMuIXQMd4HmOYckdkri7
-EUSjzlKDOHfaBhuqEnZNXYOX3yvqR/iabjo75XrtqIk8JJHpDRjcIJVG7urRbXgF
-CoGDnyGWltQiXus5Far+
-=WpIF
------END PGP SIGNATURE-----
-
---og73qpjImPMl9Bc57i5bG5e8X5N5GBEge--
+Thanks!
