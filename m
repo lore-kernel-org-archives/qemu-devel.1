@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1dhXlq-0000sE-QV
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:04:19 -0400
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhXmA-0001Cq-Hn
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:04:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1dhXlm-0003Bp-68
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:04:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57974)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1dhXlm-0003BL-0U
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:04:14 -0400
-From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>
-Date: Tue, 15 Aug 2017 10:57:22 +0200
-Message-Id: <20170815085732.9794-1-ldoktor@redhat.com>
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhXm5-0003La-W4
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:04:38 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:35447
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhXm5-0003L0-La
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:04:33 -0400
+References: <1502705471-28407-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	<20170814124439.GM3108@localhost.localdomain>
+	<ad7ef887-7ff5-84f5-dfca-035dcd915c15@cn.fujitsu.com>
+	<20170815100418.134860d2@nial.brq.redhat.com>
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Message-ID: <fb0d639d-f848-5fe3-925c-ef27e1eb7980@cn.fujitsu.com>
+Date: Tue, 15 Aug 2017 17:04:27 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 00/10] qemu.py: Pylint/style fixes
+In-Reply-To: <20170815100418.134860d2@nial.brq.redhat.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] numa: Add a check whether the node0 has
+ memory or not
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +30,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, armbru@redhat.com, david@redhat.com, "Michael S.
+	Tsirkin" <mst@redhat.com>
 
-Hello guys,
+Hi Igor,
 
-I'm reading the available python modules to exercise qemu and while readi=
-ng them
-I fixed some issues that caught my attention. It usually starts with a si=
-mple
-pylint/docstring fixes and slowly graduates to more controversial ones so=
- I'm
-open to suggestion to remove some of them.
+At 08/15/2017 04:04 PM, Igor Mammedov wrote:
+> On Tue, 15 Aug 2017 09:26:46 +0800
+> Dou Liyang <douly.fnst@cn.fujitsu.com> wrote:
+>
+>> Hi Eduardo,
+>>
+>> At 08/14/2017 08:44 PM, Eduardo Habkost wrote:
+>>> On Mon, Aug 14, 2017 at 06:11:11PM +0800, Dou Liyang wrote:
+>>>> Currently, Using the fisrt node without memory on the machine makes
+>>>> QEMU unhappy. With this example command line:
+>>>>   ... \
+>>>>   -m 1024M,slots=4,maxmem=32G \
+>>>>   -numa node,nodeid=0 \
+>>>>   -numa node,mem=1024M,nodeid=1 \
+>>>>   -numa node,nodeid=2 \
+>>>>   -numa node,nodeid=3 \
+>>>> Guest reports "No NUMA configuration found" and the NUMA topology is
+>>>> wrong.
+>>>>
+>>>> This is because when QEMU builds ACPI SRAT, it regards node0 as the
+>>>> default node to deal with the memory hole(640K-1M). this means the
+>>>> node0 must have some memory(>1M) firstly.
+>>>>
+>>>> Add a check in parse_numa_opts to avoid this situation.
+>>>>
+>>>> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+>>>> ---
+>>>>  numa.c | 4 ++++
+>>>>  1 file changed, 4 insertions(+)
+>>>>
+>>>> diff --git a/numa.c b/numa.c
+>>>> index e32af04..1d6f73f 100644
+>>>> --- a/numa.c
+>>>> +++ b/numa.c
+>>>> @@ -464,6 +464,10 @@ void parse_numa_opts(MachineState *ms)
+>>>>          if (i == nb_numa_nodes) {
+>>>>              assert(mc->numa_auto_assign_ram);
+>>>>              mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
+>>>> +        } else if (i != 0) {
+>>>> +            error_report("The first NUMA node must have some memory"
+>>>> +                          " for building ACPI SART");
+>>>> +            exit(1);
+>>>
+>>> This doesn't belong to numa.c.  numa.c is generic code, and the
+>>> requirement you described is specific for PC.
+>>>
+>>> Anyway, adding this check would make existing VM configurations
+>>> refuse to run after a QEMU upgrade.  I suggest fixing the bug in
+>>> the ACPI code instead.
+>>>
+>>
+>> I see.
+>>
+>> If fixing the bug in the ACPI code, I have two solutions:
+>>
+>> 1). Add a check in build_srat(). If the first node has no memory, QEMU
+>> will exit.
+>>
+>> 2). Fix the initialization of memory affinity structure to cover this
+>> situation. Using the first node which has memory to deal with the memory
+>> hole.
+>>
+>> I prefer solution 2. what about you?
+> I'd go for 2nd solution
+>
 
-Kind regards,
-Luk=C3=A1=C5=A1
+Yeah, I see. And I just sent the 2nd solution, waiting for your reply.
 
-Changes in v2
-- Squashed 2nd and 10th patches into 2nd one
-- Use repr() in MonitorResponseError's description
-- Improved commit message of the 6th patch
-- Two tweaks to docstrings changed in the 6th patch
-- Also updated qmp-shell to use new-style super calls (7th patch)
-- Fixed the accidental rename of qmp `cmd_id` (kept the id->cmd_id patch)
-- Changed the style of the style-fix in the 10th commit
+Thanks,
+	dou.
 
-Changes in v3
-- Don't use repr in the 5th patch in MonitorResponseError
-
-Changes in v4
-- Use correct git base (remove unwanted commits)
-
-Changes in v5
-- Avoid bool comparison
-- Change report to return in one docstring
-- Removed the unnecessary spaces around single-line docstring
-
-Luk=C3=A1=C5=A1 Doktor (10):
-  qemu.py: Pylint/style fixes
-  qemu|qtest: Avoid dangerous arguments
-  qemu.py: Use iteritems rather than keys()
-  qemu.py: Simplify QMP key-conversion
-  qemu.py: Use custom exceptions rather than Exception
-  qmp.py: Couple of pylint/style fixes
-  qmp.py: Use object-based class for QEMUMonitorProtocol
-  qmp.py: Avoid "has_key" usage
-  qmp.py: Avoid overriding a builtin object
-  qtest.py: Few pylint/style fixes
-
- scripts/qemu.py       | 98 +++++++++++++++++++++++++++++++++++++--------=
-------
- scripts/qmp/qmp-shell |  4 +--
- scripts/qmp/qmp.py    | 49 ++++++++++++++++----------
- scripts/qtest.py      | 13 ++++---
- 4 files changed, 109 insertions(+), 55 deletions(-)
-
---=20
-2.9.4
+>>
+>> Thanks,
+>> 	dou.
+>>
+>>
+>
+>
+>
+>
