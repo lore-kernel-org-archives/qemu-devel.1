@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dhgw0-0001VD-Q1
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:51:27 -0400
+	(envelope-from <eblake@redhat.com>) id 1dhh2T-0005Ww-Hr
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:58:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dhgvw-0001sq-9i
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:51:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33910)
+	(envelope-from <eblake@redhat.com>) id 1dhh2P-00055i-Kj
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:58:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56876)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dhgvv-0001s9-Vk
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:51:20 -0400
-References: <20170815163959.6632-1-f4bug@amsat.org>
-	<20170815163959.6632-2-f4bug@amsat.org>
-	<a2773ebe-e841-4f3f-0234-d89e48811336@redhat.com>
-	<4837e428-461c-ef00-b584-42e4c22e8fc7@amsat.org>
-	<6b25c2fb-6f18-37e3-b7dd-56b9d59c22ca@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dhh2P-00055V-Ay
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:58:01 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 21EB0806D4
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 18:58:00 +0000 (UTC)
+References: <20170814215748.5158-1-ehabkost@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <17eb7281-8264-9510-a2a1-ad023ebfd2a7@redhat.com>
-Date: Tue, 15 Aug 2017 13:51:15 -0500
+Message-ID: <aaa8f7cd-5f55-0e3b-6eee-c45c9b45cbff@redhat.com>
+Date: Tue, 15 Aug 2017 13:57:50 -0500
 MIME-Version: 1.0
-In-Reply-To: <6b25c2fb-6f18-37e3-b7dd-56b9d59c22ca@redhat.com>
+In-Reply-To: <20170814215748.5158-1-ehabkost@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="7Vdoib47h5igxHPfkaGWE8eTrgAuQtlU1"
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] libqtest: add qtest_accel() to
- avoid warnings when kvm is not available
+	boundary="UWEbArr229HRNVBJTc2O9XX0lXtHgcDsc"
+Subject: Re: [Qemu-devel] [RFC v4 00/13] qmp: query-device-slots command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +33,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Michael S . Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Laine Stump <laine@redhat.com>
+Cc: libvir-list@redhat.com, Igor Mammedov <imammedo@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7Vdoib47h5igxHPfkaGWE8eTrgAuQtlU1
+--UWEbArr229HRNVBJTc2O9XX0lXtHgcDsc
 From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- "Michael S . Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <17eb7281-8264-9510-a2a1-ad023ebfd2a7@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] libqtest: add qtest_accel() to avoid
- warnings when kvm is not available
-References: <20170815163959.6632-1-f4bug@amsat.org>
- <20170815163959.6632-2-f4bug@amsat.org>
- <a2773ebe-e841-4f3f-0234-d89e48811336@redhat.com>
- <4837e428-461c-ef00-b584-42e4c22e8fc7@amsat.org>
- <6b25c2fb-6f18-37e3-b7dd-56b9d59c22ca@redhat.com>
-In-Reply-To: <6b25c2fb-6f18-37e3-b7dd-56b9d59c22ca@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>,
+ Laine Stump <laine@redhat.com>
+Cc: libvir-list@redhat.com, Igor Mammedov <imammedo@redhat.com>
+Message-ID: <aaa8f7cd-5f55-0e3b-6eee-c45c9b45cbff@redhat.com>
+Subject: Re: [RFC v4 00/13] qmp: query-device-slots command
+References: <20170814215748.5158-1-ehabkost@redhat.com>
+In-Reply-To: <20170814215748.5158-1-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08/15/2017 01:40 PM, Eric Blake wrote:
-> On 08/15/2017 01:27 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 08/15/2017 03:13 PM, Eric Blake wrote:
->>> On 08/15/2017 11:39 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->>>> only warn once about it.
->>>>
->>>> - kernel without kvm:
->>>>
->>>>      # make check-qtest-x86_64
->>>>        GTESTER check-qtest-x86_64
->>>>      Could not access KVM kernel module: No such device
->>>>      qemu-system-x86_64: failed to initialize KVM: No such device
->>>>      qemu-system-x86_64: Back to tcg accelerator
->>>
->>> How does this differ from what commit 2f6b38d1 was trying to do?
->>
->> I'd say 2f6b38d1 is for common end-user usage while this is for
->> QA/testers usage. If you run N qtests with the same machine arguments,=
-
->> having this warning displayed only once is enough and allow you to foc=
-us
->> on the tests output.
+On 08/14/2017 04:57 PM, Eduardo Habkost wrote:
+> Changelog
+> ---------
 >=20
-> I guess my question is: Are we still getting a warning output even with=
+> Changes v3 -> v4:
+> * New compact representation of slot sets.
+> * New generic code to automatically merge similar slots
+>   into a single entry in the command output while keeping
+>   implementations of the method simpler.
+> * Example implementation of IDE and USB bus enumeration
 
-> 2f6b38d1 applied?  If so, why, because the point of that commit was to
-> avoid the warning.
+>=20
+> Slot sets are represented by a list of option names and sets of
+> possible values for each of those options.  The command uses a
+> compact representation for the set of valid values for an option.
+> For example, the following set of 5 PCI functions:
+>=20
+>       bus: pcie.0
+>       device-number: 31
+>       functions: 1,4,5,6,7
+>=20
+> would be represented in the JSON data as:
+>=20
+>   {"available":false,"count":5,
+>    "device-types":["pci-device"],"hotpluggable":false,
+>    "opts":[
+>       {"option":"function","values":[1,[4,7]]},
 
-And answering my own question: yes, the builds are still verbose when
-done in a VM that lacks nested kvm.  :(
+A list (and not just a single-type list, but a list that mixes scalar
+and sublist),
+
+>       {"option":"device-number","values":31},
+
+vs. a scalar.  Why not a one-element array?
+
+>       {"option":"bus","values":"pcie.0"}],
+>    "opts-complete":true}
+>=20
+> I planned to use QAPI alternates to model/document that in the
+> schema, but it would require implementing a few missing features
+> in QAPI alternate support.
+
+Yeah, I can see how existing QAPI alternates do not yet support arrays,
+which becomes important to your representation.  Do you need help
+getting the QAPI generator improved to support a particular feature that
+you found to be lacking?
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -91,7 +104,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---7Vdoib47h5igxHPfkaGWE8eTrgAuQtlU1
+--UWEbArr229HRNVBJTc2O9XX0lXtHgcDsc
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -100,14 +113,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmTQqMACgkQp6FrSiUn
-Q2pIPQf/WBiew8nGdjRu+cb0XZSVOalc08zeGk+BC77k6dc5Srn7VKGOgY40qudS
-oTe5wvAq4ERD+/ug+foOP4ApGgYJtrJv1re/ubk9PVL6X1oPw457lHoFyxcjobVc
-K295vxXGNfMhH6r+M2Z5JBzdWXApgt/5tcY+G5YP3iTJJw49tUT1btL4+GaD6HIc
-RjzI+ItG92TZSh/niCweAQuzHv7pz5oh6pv+lI33IgvnaGkYOWSVCDfSVi6SxEMz
-DyKsVXPpe7Q7f3E9WXv/hYye9Itk7AFGDubnoygAQDfOPedu3Fdg3ZOlI2q6e5k1
-A8wpVesZD9StukDPWEADusAHwkAv7g==
-=f6r+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmTRC4ACgkQp6FrSiUn
+Q2rrkwgAgtsdKjBpz0ybkV2TuAAM95p6HlrHBujv5uaS26zchQLmOjtZswf4LhEC
+P8u4BujYVqs1YeQ3X0Nw4GTOujfQFR9RQd1OOQ25JQnkjMwqGtXaR75O9L7z2CSx
+g7OxoTVD8lX4x5S30N8xK8Z/PLYt6fyTRXzR9rWnlgSaxp+DCxPBpBP0GvMUc54b
+vPLFvJP9cFjV9IELIwUmCbI6EmdYSDKLpWaakv9+lPxPc+CK3spRB3trkn/3pl4+
+tm7OYGrgQAWpOvp4wiTWAFezEXS3/SqyO295svYVQN7FM4H4HIjLKsnqGXFgUrA/
+X2x93N5Us2BGV0KfLYzNCnAS5SFCDQ==
+=83ly
 -----END PGP SIGNATURE-----
 
---7Vdoib47h5igxHPfkaGWE8eTrgAuQtlU1--
+--UWEbArr229HRNVBJTc2O9XX0lXtHgcDsc--
