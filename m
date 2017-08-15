@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dhhqB-0007Xm-Q0
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:49:28 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dhhz8-0003zV-Rq
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:58:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dhhq7-00076r-PB
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:49:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51262)
+	(envelope-from <ehabkost@redhat.com>) id 1dhhz5-0007aB-Hz
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:58:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36728)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dhhq7-00075T-JC
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:49:23 -0400
-References: <1502721197-32717-1-git-send-email-mst@redhat.com>
-	<20170814173335.58f0e84f.cohuck@redhat.com>
-	<2f4dafd1-ba08-0f61-735a-31edefcff1e3@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f0c15434-53cf-9721-8eb4-efc77dff33f8@redhat.com>
-Date: Tue, 15 Aug 2017 21:49:16 +0200
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dhhz5-0007Ze-BN
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:58:39 -0400
+Date: Tue, 15 Aug 2017 16:58:27 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170815195827.GW3108@localhost.localdomain>
+References: <20170731085110.1050-1-apahim@redhat.com>
+	<20170731085110.1050-4-apahim@redhat.com>
+	<87zib1s13v.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <2f4dafd1-ba08-0f61-735a-31edefcff1e3@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tests: switch tests to accel=kvm:tcg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87zib1s13v.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v6 3/7] qemu.py: use python logging system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Cornelia Huck <cohuck@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, ldoktor@redhat.com, famz@redhat.com, stefanha@gmail.com, mreitz@redhat.com, crosa@redhat.com
 
-On 15.08.2017 17:47, Richard Henderson wrote:
-> On 08/14/2017 08:33 AM, Cornelia Huck wrote:
->> On Mon, 14 Aug 2017 17:34:15 +0300
->> "Michael S. Tsirkin" <mst@redhat.com> wrote:
->>
->>> Speed up tests on host systems with kvm support.
->>> In particular, this fixes tests with --disable-tcg.
->>>
->>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>> Cc: Thomas Huth <thuth@redhat.com>
->>> Cc: Laurent Vivier <lvivier@redhat.com>
->>> Suggested-by: Cornelia Huck <cohuck@redhat.com>
->>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>> ---
->>>
->>> Tested on x86 only.
->>>
->>>  tests/boot-serial-test.c | 2 +-
->>>  tests/pnv-xscom-test.c   | 4 ++--
->>>  tests/prom-env-test.c    | 2 +-
->>>  3 files changed, 4 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
->>> index 11f48b0..c3b2e4e 100644
->>> --- a/tests/boot-serial-test.c
->>> +++ b/tests/boot-serial-test.c
->>> @@ -78,7 +78,7 @@ static void test_machine(const void *data)
->>>      fd = mkstemp(tmpname);
->>>      g_assert(fd != -1);
->>>  
->>> -    args = g_strdup_printf("-M %s,accel=tcg -chardev file,id=serial0,path=%s"
->>> +    args = g_strdup_printf("-M %s,accel=kvm:tcg -chardev file,id=serial0,path=%s"
->>>                             " -no-shutdown -serial chardev:serial0 %s",
->>>                             test->machine, tmpname, test->extra);
->>
->> This has already been changed upstream.
+On Tue, Aug 15, 2017 at 10:10:12AM +0200, Markus Armbruster wrote:
+> Please spell "Python" with a capital "P" (it's a proper name).
 > 
-> Ouch.  This is the only real smoke test we have for the tcg backend for the
-> host.  While it is still going to test tcg for whatever machines do not run
-> natively on the host, I can't help think we've lost testing.
+> Amador Pahim <apahim@redhat.com> writes:
+> 
+> > Let's provide extra control and flexibility by using python logging
+> > system instead of print and/or sys.std*.write().
+> >
+> > Signed-off-by: Amador Pahim <apahim@redhat.com>
+> 
+> How exactly does this change error messages?
+> 
+> Is logging the right tool to report errors to the human user?  I'm
+> asking because logging and error reporting are generally separate
+> things.  Example: a program runs into a recoverable error.  It logs the
+> error, but does not report it.
+> 
+> Is reporting errors to stderr the right thing to do for library class
+> QEMUMachine?  I doubt it.  Libraries throw exceptions and let their
+> users decide how to handle them.
 
-Ah, well, I didn't think of that when I suggested to use "kvm:tcg"
-here... I rather thought that kvm would be preferable to speed up the
-test. But since the test is already quite fast anyway, it's likely also
-OK to use "tcg:kvm" here. (But we should keep "kvm:tcg" in the pxe-test
-since that is quite slow with TCG, at least on ppc64).
+I believe the "qemu received signal" event is supposed to be
+logged, not necessarily reported.  Callers can then choose where
+the log messages should go (scripts could choose to send them
+directly to stderr if verbose or debugging mode is enabled).  We
+don't even need an exception for it: we can let callers check
+exitcode() and decide what to do about the QEMU exit code.
 
- Thomas
+The send_fd_scm() messages, on the other hand, could become
+exceptions, and don't need the logging system at all.
+
+-- 
+Eduardo
