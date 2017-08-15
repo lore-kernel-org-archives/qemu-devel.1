@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dhdy5-0007F6-W6
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:41:23 -0400
+	(envelope-from <vadim.galitsyn@profitbricks.com>) id 1dhe05-0008BH-Oa
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:43:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dhdy2-0006e1-2L
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:41:22 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33366)
+	(envelope-from <vadim.galitsyn@profitbricks.com>) id 1dhe03-0007Rf-N8
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:43:25 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:32861)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dhdy1-0006cr-UM
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:41:17 -0400
-Received: by mail-qt0-x244.google.com with SMTP id u19so1071487qtc.0
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 08:41:17 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170815145714.17635-1-richard.henderson@linaro.org>
-	<20170815145714.17635-2-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <73e9be7e-c87a-9514-0fbe-55d082bf4e47@amsat.org>
-Date: Tue, 15 Aug 2017 12:41:09 -0300
+	(Exim 4.71) (envelope-from <vadim.galitsyn@profitbricks.com>)
+	id 1dhe03-0007Q9-Av
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:43:23 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id b65so4350591wrd.0
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 08:43:21 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170815145714.17635-2-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 1/3] target/arm: Correct
- exclusive store cmpxchg memop mask
+In-Reply-To: <20170815095114.014299c2@nial.brq.redhat.com>
+References: <20170728121044.15488-1-vadim.galitsyn@profitbricks.com>
+	<20170728121044.15488-3-vadim.galitsyn@profitbricks.com>
+	<20170815095114.014299c2@nial.brq.redhat.com>
+From: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
+Date: Tue, 15 Aug 2017 17:43:00 +0200
+Message-ID: <CAPHE7Nrr9Y-F37PWS=rTS5hak09-_3v_R-T7KG+zQuy2L8U0jg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] qmp: introduce
+ query-memory-size-summary command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,40 +31,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org, alistair.francis@xilinx.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Mohammed Gamal <mohammed.gamal@profitbricks.com>, Eduardo Otubo <eduardo.otubo@profitbricks.com>
 
-On 08/15/2017 11:57 AM, Richard Henderson wrote:
-> From: Alistair Francis <alistair.francis@xilinx.com>
-> 
-> When we perform the atomic_cmpxchg operation we want to perform the
-> operation on a pair of 32-bit registers. Previously we were just passing
-> the register size in which was set to MO_32. This would result in the
-> high register to be ignored. To fix this issue we hardcode the size to
-> be 64-bits long when operating on 32-bit pairs.
-> 
-> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Message-Id: <bc18dddca56e8c2ea4a3def48d33ceb5d21d1fff.1502488636.git.alistair.francis@xilinx.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Hi Guys,
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Thank you for the input!
 
-> ---
->   target/arm/translate-a64.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 58ed4c6d05..113e2e172b 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -1913,7 +1913,7 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
->               tcg_gen_concat32_i64(val, cpu_exclusive_val, cpu_exclusive_high);
->               tcg_gen_atomic_cmpxchg_i64(tmp, addr, val, tmp,
->                                          get_mem_index(s),
-> -                                       size | MO_ALIGN | s->be_data);
-> +                                       MO_64 | MO_ALIGN | s->be_data);
->               tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, val);
->               tcg_temp_free_i64(val);
->           } else if (s->be_data == MO_LE) {
-> 
+> "hotunpluggable" is ugly.  What about just "pluggable"?
+
+Markus, I think "pluggable" is a bit misleading here. Some people can take
+it like a maximum amount of memory that can be hot-added to a guest (i.e.,
+difference between static memory size and value specified with "-m
+...,maxmem=XXX"). I would say:
+
+  mem_info->plugged_memory = get_plugged_memory_size();
+
+..since it reflects actual amount which was already hot-added. Agree?
+
+> this could be done without wrapper
+
+Igor, your approach changes command behaviour a little. First of all it
+turns it in command which can fail. As far as I understand we wanted to
+avoid this.
+
+Wrapper is needed in order to "error_abort" command only in case if (a)
+CONFIG_MEM_HOTPLUG  is enabled, but (b) QOM data is somehow corrupted.
+If CONFIG_MEM_HOTPLUG
+is disabled for target, it does not mean to report an error -- in this case
+value simply not reported and no error path triggered.
+
+I agree with the rest of comments and will provide changes with the next
+version.
+Could you please leave a comment(s) if you agree or not (before I submit
+next version)?
+
+Thank you in advance,
+Vadim
+
+
+On Tue, Aug 15, 2017 at 9:51 AM, Igor Mammedov <imammedo@redhat.com> wrote:
+
+> On Fri, 28 Jul 2017 14:10:43 +0200
+> Vadim Galitsyn <vadim.galitsyn@profitbricks.com> wrote:
+>
+> > Command above provides the following memory information in bytes:
+> >
+> >   * base-memory - size of "base" memory specified with command line
+> option -m.
+> >
+> >   * hotunpluggable-memory - amount of memory that was hot-plugged.
+> >     If target does not have CONFIG_MEM_HOTPLUG enabled, no
+> >     value is reported.
+> >
+> > Signed-off-by: Vasilis Liaskovitis <vasilis.liaskovitis@profitbricks.com
+> >
+> > Signed-off-by: Mohammed Gamal <mohammed.gamal@profitbricks.com>
+> > Signed-off-by: Eduardo Otubo <eduardo.otubo@profitbricks.com>
+> > Signed-off-by: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
+> > Reviewed-by: Eugene Crosser <evgenii.cherkashin@profitbricks.com>
+> > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Cc: Markus Armbruster <armbru@redhat.com>
+> > Cc: Igor Mammedov <imammedo@redhat.com>
+> > Cc: Eric Blake <eblake@redhat.com>
+> > Cc: qemu-devel@nongnu.org
+> > ---
+> >  hw/mem/pc-dimm.c                                   |  5 +++++
+> >  include/hw/mem/pc-dimm.h                           |  1 +
+> >  qapi-schema.json                                   | 25
+> ++++++++++++++++++++++
+> >  qmp.c                                              | 13 +++++++++++
+> >  stubs/Makefile.objs                                |  2 +-
+> >  stubs/{qmp_pc_dimm_device_list.c => qmp_pc_dimm.c} |  5 +++++
+> >  6 files changed, 50 insertions(+), 1 deletion(-)
+> >  rename stubs/{qmp_pc_dimm_device_list.c => qmp_pc_dimm.c} (64%)
+> >
+> > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> > index ea67b461c2..1df8b7ee57 100644
+> > --- a/hw/mem/pc-dimm.c
+> > +++ b/hw/mem/pc-dimm.c
+> > @@ -159,6 +159,11 @@ uint64_t pc_existing_dimms_capacity(Error **errp)
+> >      return cap.size;
+> >  }
+> >
+> > +uint64_t get_existing_hotpluggable_memory_size(void)
+> > +{
+> > +    return pc_existing_dimms_capacity(&error_abort);
+> > +}
+> > +
+> >  int qmp_pc_dimm_device_list(Object *obj, void *opaque)
+> >  {
+> >      MemoryDeviceInfoList ***prev = opaque;
+> > diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+> > index 1e483f2670..52c6b5e641 100644
+> > --- a/include/hw/mem/pc-dimm.h
+> > +++ b/include/hw/mem/pc-dimm.h
+> > @@ -95,6 +95,7 @@ int pc_dimm_get_free_slot(const int *hint, int
+> max_slots, Error **errp);
+> >
+> >  int qmp_pc_dimm_device_list(Object *obj, void *opaque);
+> >  uint64_t pc_existing_dimms_capacity(Error **errp);
+> > +uint64_t get_existing_hotpluggable_memory_size(void);
+> >  void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+> >                           MemoryRegion *mr, uint64_t align, Error
+> **errp);
+> >  void pc_dimm_memory_unplug(DeviceState *dev, MemoryHotplugState *hpms,
+> > diff --git a/qapi-schema.json b/qapi-schema.json
+> > index 9c6c3e1a53..bbedf1a7bc 100644
+> > --- a/qapi-schema.json
+> > +++ b/qapi-schema.json
+> > @@ -4407,6 +4407,31 @@
+> >    'data': { 'name': 'str', '*migration-safe': 'bool', 'static': 'bool',
+> >              '*unavailable-features': [ 'str' ], 'typename': 'str' } }
+> >
+> > +##
+> > +# @MemoryInfo:
+> > +#
+> > +# Actual memory information in bytes.
+> > +#
+> > +# @base-memory: size of "base" memory specified with command line
+> > +#               option -m.
+> > +#
+> > +# @hotunpluggable-memory: size memory that can be hot-unplugged.
+> > +#
+> > +# Since: 2.10.0
+> > +##
+> > +{ 'struct': 'MemoryInfo',
+> > +  'data'  : { 'base-memory': 'size', '*hotunpluggable-memory': 'size' }
+> }
+> > +
+> > +##
+> > +# @query-memory-size-summary:
+> > +#
+> > +# Return the amount of initially allocated and hot-plugged (if
+> > +# enabled) memory in bytes.
+> > +#
+> > +# Since: 2.10.0
+> > +##
+> > +{ 'command': 'query-memory-size-summary', 'returns': 'MemoryInfo' }
+> > +
+> >  ##
+> >  # @query-cpu-definitions:
+> >  #
+> > diff --git a/qmp.c b/qmp.c
+> > index b86201e349..682d950440 100644
+> > --- a/qmp.c
+> > +++ b/qmp.c
+> > @@ -709,3 +709,16 @@ ACPIOSTInfoList *qmp_query_acpi_ospm_status(Error
+> **errp)
+> >
+> >      return head;
+> >  }
+> > +
+> > +MemoryInfo *qmp_query_memory_size_summary(Error **errp)
+> > +{
+> > +    MemoryInfo *mem_info = g_malloc0(sizeof(MemoryInfo));
+> > +
+> > +    mem_info->base_memory = ram_size;
+> > +
+> > +    mem_info->hotunpluggable_memory = get_existing_hotpluggable_
+> memory_size();
+> this could be done without wrapper:
+> mem_info->hotunpluggable_memory = pc_existing_dimms_capacity(&local_error)
+>
+> > +    mem_info->has_hotunpluggable_memory =
+> > +        (mem_info->hotunpluggable_memory != (uint64_t)-1);
+>
+> mem_info->has_hotunpluggable_memory = !local_error;
+> if (local_error)
+>   cleanup
+>
+> and defining stub:
+>
+> uint64_t pc_existing_dimms_capacity(Error **errp) {
+>      error_setg(errp, "not implemented");
+>      return 0;
+> }
+>
+> > +
+> > +    return mem_info;
+> > +}
+> > diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+> > index f5b47bfd74..f7cab5b11c 100644
+> > --- a/stubs/Makefile.objs
+> > +++ b/stubs/Makefile.objs
+> > @@ -32,7 +32,7 @@ stub-obj-y += uuid.o
+> >  stub-obj-y += vm-stop.o
+> >  stub-obj-y += vmstate.o
+> >  stub-obj-$(CONFIG_WIN32) += fd-register.o
+> > -stub-obj-y += qmp_pc_dimm_device_list.o
+> > +stub-obj-y += qmp_pc_dimm.o
+> >  stub-obj-y += target-monitor-defs.o
+> >  stub-obj-y += target-get-monitor-def.o
+> >  stub-obj-y += pc_madt_cpu_entry.o
+> > diff --git a/stubs/qmp_pc_dimm_device_list.c b/stubs/qmp_pc_dimm.c
+> > similarity index 64%
+> > rename from stubs/qmp_pc_dimm_device_list.c
+> > rename to stubs/qmp_pc_dimm.c
+> > index def211564d..1d1e008b58 100644
+> > --- a/stubs/qmp_pc_dimm_device_list.c
+> > +++ b/stubs/qmp_pc_dimm.c
+> > @@ -6,3 +6,8 @@ int qmp_pc_dimm_device_list(Object *obj, void *opaque)
+> >  {
+> >     return 0;
+> >  }
+> > +
+> > +uint64_t get_existing_hotpluggable_memory_size(void)
+> > +{
+> > +    return (uint64_t)-1;
+> > +}
+>
+>
