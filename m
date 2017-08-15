@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dhVAS-0005pG-Uv
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:17:34 -0400
+	(envelope-from <peterx@redhat.com>) id 1dhVAV-0005rF-Ki
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:17:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dhVAR-00018h-PV
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:17:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43804)
+	(envelope-from <peterx@redhat.com>) id 1dhVAU-00019o-Gr
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:17:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34876)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dhVAR-00018Y-Jt
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:17:31 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dhVAU-00019Y-7e
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:17:34 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A248D3E2BD
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 06:17:30 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3C4852C96DC
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 06:17:33 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Tue, 15 Aug 2017 14:17:05 +0800
-Message-Id: <1502777827-18874-5-git-send-email-peterx@redhat.com>
+Date: Tue, 15 Aug 2017 14:17:06 +0800
+Message-Id: <1502777827-18874-6-git-send-email-peterx@redhat.com>
 In-Reply-To: <1502777827-18874-1-git-send-email-peterx@redhat.com>
 References: <1502777827-18874-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC 4/6] migration: return incoming task tag for fd
+Subject: [Qemu-devel] [RFC 5/6] migration: store listen task tag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,63 +32,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Daniel P . Berrange" <berrange@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Allow to return the task tag in fd_start_incoming_migration().
+Store the task tag for migration types: tcp/unix/fd/exec in current
+MigrationIncomingState struct.
+
+For defered migration, no need to store task tag since there is no task
+running in the main loop at all. For RDMA, let's mark it as todo.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/fd.c | 18 +++++++++++-------
- migration/fd.h |  2 +-
- 2 files changed, 12 insertions(+), 8 deletions(-)
+ migration/migration.c | 22 ++++++++++++++++++----
+ migration/migration.h |  2 ++
+ 2 files changed, 20 insertions(+), 4 deletions(-)
 
-diff --git a/migration/fd.c b/migration/fd.c
-index 30f5258..e9a548c 100644
---- a/migration/fd.c
-+++ b/migration/fd.c
-@@ -52,7 +52,11 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
-     return FALSE; /* unregister */
- }
- 
--void fd_start_incoming_migration(const char *infd, Error **errp)
-+/*
-+ * Returns the tag ID of the watch that is attached to global main
-+ * loop (>0), or zero if failure detected.
-+ */
-+guint fd_start_incoming_migration(const char *infd, Error **errp)
- {
-     QIOChannel *ioc;
-     int fd;
-@@ -63,13 +67,13 @@ void fd_start_incoming_migration(const char *infd, Error **errp)
-     ioc = qio_channel_new_fd(fd, errp);
-     if (!ioc) {
-         close(fd);
--        return;
-+        return 0;
+diff --git a/migration/migration.c b/migration/migration.c
+index c9b7085..daf356b 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -171,6 +171,7 @@ void migration_incoming_state_destroy(void)
+         mis->from_src_file = NULL;
      }
  
-     qio_channel_set_name(QIO_CHANNEL(ioc), "migration-fd-incoming");
--    qio_channel_add_watch(ioc,
--                          G_IO_IN,
--                          fd_accept_incoming_migration,
--                          NULL,
--                          NULL);
-+    return qio_channel_add_watch(ioc,
-+                                 G_IO_IN,
-+                                 fd_accept_incoming_migration,
-+                                 NULL,
-+                                 NULL);
++    mis->listen_task_tag = 0;
+     qemu_event_destroy(&mis->main_thread_load_event);
  }
-diff --git a/migration/fd.h b/migration/fd.h
-index a14a63c..94cdea8 100644
---- a/migration/fd.h
-+++ b/migration/fd.h
-@@ -16,7 +16,7 @@
  
- #ifndef QEMU_MIGRATION_FD_H
- #define QEMU_MIGRATION_FD_H
--void fd_start_incoming_migration(const char *path, Error **errp);
-+guint fd_start_incoming_migration(const char *path, Error **errp);
+@@ -265,25 +266,31 @@ int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
+ void qemu_start_incoming_migration(const char *uri, Error **errp)
+ {
+     const char *p;
++    guint task_tag = 0;
++    MigrationIncomingState *mis = migration_incoming_get_current();
  
- void fd_start_outgoing_migration(MigrationState *s, const char *fdname,
-                                  Error **errp);
+     qapi_event_send_migration(MIGRATION_STATUS_SETUP, &error_abort);
+     if (!strcmp(uri, "defer")) {
+         deferred_incoming_migration(errp);
+     } else if (strstart(uri, "tcp:", &p)) {
+-        tcp_start_incoming_migration(p, errp);
++        task_tag = tcp_start_incoming_migration(p, errp);
+ #ifdef CONFIG_RDMA
+     } else if (strstart(uri, "rdma:", &p)) {
++        /* TODO: store task tag for RDMA migrations */
+         rdma_start_incoming_migration(p, errp);
+ #endif
+     } else if (strstart(uri, "exec:", &p)) {
+-        exec_start_incoming_migration(p, errp);
++        task_tag = exec_start_incoming_migration(p, errp);
+     } else if (strstart(uri, "unix:", &p)) {
+-        unix_start_incoming_migration(p, errp);
++        task_tag = unix_start_incoming_migration(p, errp);
+     } else if (strstart(uri, "fd:", &p)) {
+-        fd_start_incoming_migration(p, errp);
++        task_tag = fd_start_incoming_migration(p, errp);
+     } else {
+         error_setg(errp, "unknown migration protocol: %s", uri);
++        return;
+     }
++
++    mis->listen_task_tag = task_tag;
+ }
+ 
+ static void process_incoming_migration_bh(void *opaque)
+@@ -422,6 +429,13 @@ void migration_fd_process_incoming(QEMUFile *f)
+         co = qemu_coroutine_create(process_incoming_migration_co, f);
+         qemu_coroutine_enter(co);
+     }
++
++    /*
++     * When reach here, we should not need the listening port any
++     * more. We'll detach the listening task soon, let's reset the
++     * listen task tag.
++     */
++    mis->listen_task_tag = 0;
+ }
+ 
+ /*
+diff --git a/migration/migration.h b/migration/migration.h
+index d041369..1f4faef 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -26,6 +26,8 @@
+ /* State for the incoming migration */
+ struct MigrationIncomingState {
+     QEMUFile *from_src_file;
++    /* Task tag for incoming listen port. Valid when >0. */
++    guint listen_task_tag;
+ 
+     /*
+      * Free at the start of the main state load, set as the main thread finishes
 -- 
 2.7.4
