@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhQdc-0004QL-AP
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 21:27:21 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dhQqc-0001cM-KQ
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 21:40:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhQdX-0007ti-Oh
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 21:27:20 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:30330
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhQdX-0007sl-Db
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 21:27:15 -0400
-References: <1502705471-28407-1-git-send-email-douly.fnst@cn.fujitsu.com>
-	<20170814124439.GM3108@localhost.localdomain>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <ad7ef887-7ff5-84f5-dfca-035dcd915c15@cn.fujitsu.com>
-Date: Tue, 15 Aug 2017 09:26:46 +0800
-MIME-Version: 1.0
-In-Reply-To: <20170814124439.GM3108@localhost.localdomain>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] numa: Add a check whether the node0 has
- memory or not
+	(envelope-from <sjitindarsingh@gmail.com>) id 1dhQqY-0006OC-N6
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 21:40:46 -0400
+Message-ID: <1502761234.2143.4.camel@gmail.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Tue, 15 Aug 2017 11:40:34 +1000
+In-Reply-To: <150273295665.11087.17582111045419718285.stgit@bahia.lan>
+References: <150273295665.11087.17582111045419718285.stgit@bahia.lan>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] ppc: fix ppc_set_compat() with KVM PR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +22,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, dgilbert@redhat.com, armbru@redhat.com, david@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Hi Eduardo,
+On Mon, 2017-08-14 at 19:49 +0200, Greg Kurz wrote:
+> When running in KVM PR mode, kvmppc_set_compat() always fail because
+> the
+> current PR implementation doesn't handle KVM_REG_PPC_ARCH_COMPAT. Now
+> that
+> the machine code inconditionally calls ppc_set_compat_all() at reset
+> time
+> to restore the compat mode default value (commit 66d5c492dd3a9), it
+> is
+> impossible to start a guest with PR:
+> 
+> qemu-system-ppc64: Unable to set CPU compatibility mode in KVM:
+>  Invalid argument
+> 
+> A tentative patch [1] was recently sent by Suraj to address the
+> issue, but
+> it would prevent the compat mode to be turned off on reset. And we
+> really
+> don't want to explicitely check for KVM PR. During the patch's
+> review,
+> David suggested that we should only call the KVM ioctl() if the
+> compat
+> PVR changes. This allows at least to run with KVM PR, provided no
+> compat
+> mode is requested from the command line (which should be the case
+> when
+> running PR nested). This is what this patch does.
+> 
+> While here, we also fix the side effect where KVM would fail but we
+> would
+> change the CPU state in QEMU anyway.
+> 
+> [1] http://patchwork.ozlabs.org/patch/782039/
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-At 08/14/2017 08:44 PM, Eduardo Habkost wrote:
-> On Mon, Aug 14, 2017 at 06:11:11PM +0800, Dou Liyang wrote:
->> Currently, Using the fisrt node without memory on the machine makes
->> QEMU unhappy. With this example command line:
->>   ... \
->>   -m 1024M,slots=4,maxmem=32G \
->>   -numa node,nodeid=0 \
->>   -numa node,mem=1024M,nodeid=1 \
->>   -numa node,nodeid=2 \
->>   -numa node,nodeid=3 \
->> Guest reports "No NUMA configuration found" and the NUMA topology is
->> wrong.
->>
->> This is because when QEMU builds ACPI SRAT, it regards node0 as the
->> default node to deal with the memory hole(640K-1M). this means the
->> node0 must have some memory(>1M) firstly.
->>
->> Add a check in parse_numa_opts to avoid this situation.
->>
->> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
->> ---
->>  numa.c | 4 ++++
->>  1 file changed, 4 insertions(+)
->>
->> diff --git a/numa.c b/numa.c
->> index e32af04..1d6f73f 100644
->> --- a/numa.c
->> +++ b/numa.c
->> @@ -464,6 +464,10 @@ void parse_numa_opts(MachineState *ms)
->>          if (i == nb_numa_nodes) {
->>              assert(mc->numa_auto_assign_ram);
->>              mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
->> +        } else if (i != 0) {
->> +            error_report("The first NUMA node must have some memory"
->> +                          " for building ACPI SART");
->> +            exit(1);
->
-> This doesn't belong to numa.c.  numa.c is generic code, and the
-> requirement you described is specific for PC.
->
-> Anyway, adding this check would make existing VM configurations
-> refuse to run after a QEMU upgrade.  I suggest fixing the bug in
-> the ACPI code instead.
->
+I meant to send a follow up but it fell on my priority list so thanks
+for this
 
-I see.
+Looks good to me
 
-If fixing the bug in the ACPI code, I have two solutions:
+Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-1). Add a check in build_srat(). If the first node has no memory, QEMU
-will exit.
-
-2). Fix the initialization of memory affinity structure to cover this
-situation. Using the first node which has memory to deal with the memory
-hole.
-
-I prefer solution 2. what about you?
-
-Thanks,
-	dou.
+> ---
+>  target/ppc/compat.c |    9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/target/ppc/compat.c b/target/ppc/compat.c
+> index f1b67faa97e3..f8729fe46d61 100644
+> --- a/target/ppc/compat.c
+> +++ b/target/ppc/compat.c
+> @@ -140,16 +140,17 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t
+> compat_pvr, Error **errp)
+>  
+>      cpu_synchronize_state(CPU(cpu));
+>  
+> -    cpu->compat_pvr = compat_pvr;
+> -    env->spr[SPR_PCR] = pcr & pcc->pcr_mask;
+> -
+> -    if (kvm_enabled()) {
+> +    if (kvm_enabled() && cpu->compat_pvr != compat_pvr) {
+>          int ret = kvmppc_set_compat(cpu, cpu->compat_pvr);
+>          if (ret < 0) {
+>              error_setg_errno(errp, -ret,
+>                               "Unable to set CPU compatibility mode
+> in KVM");
+> +            return;
+>          }
+>      }
+> +
+> +    cpu->compat_pvr = compat_pvr;
+> +    env->spr[SPR_PCR] = pcr & pcc->pcr_mask;
+>  }
+>  
+>  typedef struct {
+> 
