@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dhhla-0004Dw-61
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:44:43 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dhhnW-0005Vn-RH
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:46:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dhhlW-0003G6-6R
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:44:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43840)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dhhlV-0003FO-UP
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:44:38 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B32B13A268
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 19:44:36 +0000 (UTC)
-Date: Tue, 15 Aug 2017 16:44:27 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170815194427.GV3108@localhost.localdomain>
-References: <20170814215748.5158-1-ehabkost@redhat.com>
-	<aaa8f7cd-5f55-0e3b-6eee-c45c9b45cbff@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1dhhnS-00055n-RH
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:46:42 -0400
+Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:34748)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dhhnS-00055E-KA
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:46:38 -0400
+Received: by mail-pg0-x22c.google.com with SMTP id u185so11611522pgb.1
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 12:46:38 -0700 (PDT)
+References: <1502721197-32717-1-git-send-email-mst@redhat.com>
+	<20170814173335.58f0e84f.cohuck@redhat.com>
+	<2f4dafd1-ba08-0f61-735a-31edefcff1e3@linaro.org>
+	<20170815222611-mutt-send-email-mst@kernel.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <00d26661-113b-fc4d-3485-1ef809c7dfe7@linaro.org>
+Date: Tue, 15 Aug 2017 12:46:34 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aaa8f7cd-5f55-0e3b-6eee-c45c9b45cbff@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v4 00/13] qmp: query-device-slots command
+In-Reply-To: <20170815222611-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tests: switch tests to accel=kvm:tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,71 +33,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Laine Stump <laine@redhat.com>, libvir-list@redhat.com, Igor Mammedov <imammedo@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, Aug 15, 2017 at 01:57:50PM -0500, Eric Blake wrote:
-> On 08/14/2017 04:57 PM, Eduardo Habkost wrote:
-> > Changelog
-> > ---------
-> > 
-> > Changes v3 -> v4:
-> > * New compact representation of slot sets.
-> > * New generic code to automatically merge similar slots
-> >   into a single entry in the command output while keeping
-> >   implementations of the method simpler.
-> > * Example implementation of IDE and USB bus enumeration
+On 08/15/2017 12:28 PM, Michael S. Tsirkin wrote:
+>> Ouch.  This is the only real smoke test we have for the tcg backend for the
+>> host.  While it is still going to test tcg for whatever machines do not run
+>> natively on the host, I can't help think we've lost testing.
+>>
+>> Can we use accel=tcg:kvm instead?
+>>
+>>
+>> r~
 > 
-> > 
-> > Slot sets are represented by a list of option names and sets of
-> > possible values for each of those options.  The command uses a
-> > compact representation for the set of valid values for an option.
-> > For example, the following set of 5 PCI functions:
-> > 
-> >       bus: pcie.0
-> >       device-number: 31
-> >       functions: 1,4,5,6,7
-> > 
-> > would be represented in the JSON data as:
-> > 
-> >   {"available":false,"count":5,
-> >    "device-types":["pci-device"],"hotpluggable":false,
-> >    "opts":[
-> >       {"option":"function","values":[1,[4,7]]},
-> 
-> A list (and not just a single-type list, but a list that mixes scalar
-> and sublist),
-> 
-> >       {"option":"device-number","values":31},
-> 
-> vs. a scalar.  Why not a one-element array?
+> We can add an environment to disable kvm on qemu side,
+> for e.g. CI systems who have spare time.
 
-It was just to keep the representation as compact as possible, in
-the common case of single-value sets.  Probably we can drop that
-feature as it saves only 2 bytes in the JSON representation.
+Hum.  I'm not especially keen on an environment variable that wouldn't be
+useful for anything else.  I'd much rather adjust the test case so that plain
+"make check" tests all that we need to test.
 
-> 
-> >       {"option":"bus","values":"pcie.0"}],
-> >    "opts-complete":true}
-> > 
-> > I planned to use QAPI alternates to model/document that in the
-> > schema, but it would require implementing a few missing features
-> > in QAPI alternate support.
-> 
-> Yeah, I can see how existing QAPI alternates do not yet support arrays,
-> which becomes important to your representation.  Do you need help
-> getting the QAPI generator improved to support a particular feature that
-> you found to be lacking?
 
-I think the lack of support for lists on alternates was the main
-obstacle.
-
-Probably we would also need to remove the restriction against
-alternates with ambiguous string representations, to allow a
-list/number/string/bool alternate to be defined.
-
-Being able to set constraints on the number of elements of a list
-would be nice to have, but not required.
-
--- 
-Eduardo
+r~
