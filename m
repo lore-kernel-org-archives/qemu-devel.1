@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dhY85-0007HS-FI
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:27:18 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dhYDS-0000fB-4u
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:32:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dhY82-0001I4-8j
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:27:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36082)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dhY82-0001Hd-0C
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:27:14 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E1A84C0587C6
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 09:27:12 +0000 (UTC)
-Date: Tue, 15 Aug 2017 10:27:07 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170815092707.GE9674@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1502777827-18874-1-git-send-email-peterx@redhat.com>
-	<1502777827-18874-6-git-send-email-peterx@redhat.com>
-	<20170815083714.GA9674@redhat.com>
-	<20170815085006.GA19446@pxdev.xzpeter.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1dhYDO-0006I2-Vy
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:32:50 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:37586)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dhYDO-0006H0-NL
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:32:46 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id o62so1439078wrc.4
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 02:32:45 -0700 (PDT)
+References: <20170810085025.14076-1-famz@redhat.com>
+	<0d899b2a-19a0-5b52-c63e-dba8b1d2d851@amsat.org>
+	<20170815070927.GB29320@lemon>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170815070927.GB29320@lemon>
+Date: Tue, 15 Aug 2017 10:32:42 +0100
+Message-ID: <87inhpdvlx.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170815085006.GA19446@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC 5/6] migration: store listen task tag
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] Makefile: Let "make check-help" work
+ without running ./configure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,114 +32,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-On Tue, Aug 15, 2017 at 04:50:06PM +0800, Peter Xu wrote:
-> On Tue, Aug 15, 2017 at 09:37:14AM +0100, Daniel P. Berrange wrote:
-> > On Tue, Aug 15, 2017 at 02:17:06PM +0800, Peter Xu wrote:
-> > > Store the task tag for migration types: tcp/unix/fd/exec in current
-> > > MigrationIncomingState struct.
-> > > 
-> > > For defered migration, no need to store task tag since there is no task
-> > > running in the main loop at all. For RDMA, let's mark it as todo.
-> > > 
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > ---
-> > >  migration/migration.c | 22 ++++++++++++++++++----
-> > >  migration/migration.h |  2 ++
-> > >  2 files changed, 20 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/migration/migration.c b/migration/migration.c
-> > > index c9b7085..daf356b 100644
-> > > --- a/migration/migration.c
-> > > +++ b/migration/migration.c
-> > > @@ -171,6 +171,7 @@ void migration_incoming_state_destroy(void)
-> > >          mis->from_src_file = NULL;
-> > >      }
-> > >  
-> > > +    mis->listen_task_tag = 0;
-> > >      qemu_event_destroy(&mis->main_thread_load_event);
-> > >  }
-> > >  
-> > > @@ -265,25 +266,31 @@ int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
-> > >  void qemu_start_incoming_migration(const char *uri, Error **errp)
-> > >  {
-> > >      const char *p;
-> > > +    guint task_tag = 0;
-> > > +    MigrationIncomingState *mis = migration_incoming_get_current();
-> > >  
-> > >      qapi_event_send_migration(MIGRATION_STATUS_SETUP, &error_abort);
-> > >      if (!strcmp(uri, "defer")) {
-> > >          deferred_incoming_migration(errp);
-> > >      } else if (strstart(uri, "tcp:", &p)) {
-> > > -        tcp_start_incoming_migration(p, errp);
-> > > +        task_tag = tcp_start_incoming_migration(p, errp);
-> > >  #ifdef CONFIG_RDMA
-> > >      } else if (strstart(uri, "rdma:", &p)) {
-> > > +        /* TODO: store task tag for RDMA migrations */
-> > >          rdma_start_incoming_migration(p, errp);
-> > >  #endif
-> > >      } else if (strstart(uri, "exec:", &p)) {
-> > > -        exec_start_incoming_migration(p, errp);
-> > > +        task_tag = exec_start_incoming_migration(p, errp);
-> > >      } else if (strstart(uri, "unix:", &p)) {
-> > > -        unix_start_incoming_migration(p, errp);
-> > > +        task_tag = unix_start_incoming_migration(p, errp);
-> > >      } else if (strstart(uri, "fd:", &p)) {
-> > > -        fd_start_incoming_migration(p, errp);
-> > > +        task_tag = fd_start_incoming_migration(p, errp);
-> > >      } else {
-> > >          error_setg(errp, "unknown migration protocol: %s", uri);
-> > > +        return;
-> > >      }
-> > > +
-> > > +    mis->listen_task_tag = task_tag;
-> > 
-> > This is unsafe as currently written. The main loop watches that are
-> > associated with these tags are all unregistered when incoming migration
-> > starts. So if you save them, and then unregister later when postcopy
-> > is "stuck", then you're likely unregistering a tag associated with
-> > some other random part of QEMU, because the saved value is no longer
-> > valid.
-> 
-> IIUC for incoming migration, the watch is not detached until
-> migration_fd_process_incoming() completes. So:
-> 
-> - for precopy, the watch should be detached when migration completes
-> 
-> - for postcopy, the watch should be detached when postcopy starts,
->   then main loop thread returns, while the ram_load_thread starts to
->   continue the migration.
-> 
-> So basically the watch is detaching itself after
-> migration_fd_process_incoming() completes. To handle that, this patch
-> has this change:
-> 
-> @@ -422,6 +429,13 @@ void migration_fd_process_incoming(QEMUFile *f)
->          co = qemu_coroutine_create(process_incoming_migration_co, f);
->          qemu_coroutine_enter(co);
->      }
-> +
-> +    /*
-> +     * When reach here, we should not need the listening port any
-> +     * more. We'll detach the listening task soon, let's reset the
-> +     * listen task tag.
-> +     */
-> +    mis->listen_task_tag = 0;
-> 
-> Would this make sure the listen_task_tag is always valid if nonzero?
 
-Mixing 'return FALSE' from callbacks, with g_source_remove is a recipe
-for hard to diagnose bugs, so should be avoided in general.
+Fam Zheng <famz@redhat.com> writes:
 
-So, IMHO, you should change all the callbacks to 'return TRUE' so that
-they keep the watch registered, and then explicitly call g_source_remove()
-passing the listen tag, when incoming migration starts.
+> On Thu, 08/10 08:59, Philippe Mathieu-Daudé wrote:
+>> Hi Fam,
+>>
+>> thank for fixing this :)
+>>
+>> I think as a bugfix it should enter 2.10
+>> (maybe through Alex's Travis series, CC'ing him)
+>
+> Since Alex hasn't replied, I'll send a pull request for -rc3.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Yes please. Sorry I got distracted by other stuff.
+
+>
+>>
+>> On 08/10/2017 05:50 AM, Fam Zheng wrote:
+>> > Currently if you do "make check-help" in a fresh checkout, only an error
+>> > is printed which is not nice:
+>> >
+>> >      $ make check-help V=1
+>> >      cc -nostdlib  -o check-help.mo
+>> >      cc: fatal error: no input files
+>> >      compilation terminated.
+>> >      rules.mak:115: recipe for target 'check-help.mo' failed
+>> >      make: *** [check-help.mo] Error 1
+>> >
+>> > Move the config-host.mak condition into the body of
+>> > tests/Makefile.include and always include the rule for check-help.
+>> >
+>> > Reported-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> > Signed-off-by: Fam Zheng <famz@redhat.com>
+>>
+>> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>
+>
+> Fam
+
+
+--
+Alex Bennée
