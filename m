@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dhWdK-00039p-PP
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 03:51:28 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dhWfM-0006kv-6I
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 03:53:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dhWdI-0001GQ-6r
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 03:51:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35458)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dhWdH-0001G6-T4
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 03:51:24 -0400
-Date: Tue, 15 Aug 2017 09:51:14 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170815095114.014299c2@nial.brq.redhat.com>
-In-Reply-To: <20170728121044.15488-3-vadim.galitsyn@profitbricks.com>
-References: <20170728121044.15488-1-vadim.galitsyn@profitbricks.com>
-	<20170728121044.15488-3-vadim.galitsyn@profitbricks.com>
+	(envelope-from <el13635@mail.ntua.gr>) id 1dhWfL-0001y7-G7
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 03:53:32 -0400
+Date: Tue, 15 Aug 2017 10:52:48 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170815075248.jannlmluiknk7onp@postretch>
+References: <20170815061921.31596-1-el13635@mail.ntua.gr>
+	<20170815061921.31596-2-el13635@mail.ntua.gr>
+	<3b7fc9da-ac71-8a37-ed3d-34428021e4d3@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 2/3] qmp: introduce
- query-memory-size-summary command
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="vogrbufdhnjwg5fy"
+Content-Disposition: inline
+In-Reply-To: <3b7fc9da-ac71-8a37-ed3d-34428021e4d3@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] block: use internal filter node in
+ backup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,166 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Vasilis Liaskovitis <vasilis.liaskovitis@profitbricks.com>, Mohammed Gamal <mohammed.gamal@profitbricks.com>, Eduardo Otubo <eduardo.otubo@profitbricks.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
 
-On Fri, 28 Jul 2017 14:10:43 +0200
-Vadim Galitsyn <vadim.galitsyn@profitbricks.com> wrote:
 
-> Command above provides the following memory information in bytes:
-> 
->   * base-memory - size of "base" memory specified with command line option -m.
-> 
->   * hotunpluggable-memory - amount of memory that was hot-plugged.
->     If target does not have CONFIG_MEM_HOTPLUG enabled, no
->     value is reported.
-> 
-> Signed-off-by: Vasilis Liaskovitis <vasilis.liaskovitis@profitbricks.com>
-> Signed-off-by: Mohammed Gamal <mohammed.gamal@profitbricks.com>
-> Signed-off-by: Eduardo Otubo <eduardo.otubo@profitbricks.com>
-> Signed-off-by: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
-> Reviewed-by: Eugene Crosser <evgenii.cherkashin@profitbricks.com>
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: qemu-devel@nongnu.org
-> ---
->  hw/mem/pc-dimm.c                                   |  5 +++++
->  include/hw/mem/pc-dimm.h                           |  1 +
->  qapi-schema.json                                   | 25 ++++++++++++++++++++++
->  qmp.c                                              | 13 +++++++++++
->  stubs/Makefile.objs                                |  2 +-
->  stubs/{qmp_pc_dimm_device_list.c => qmp_pc_dimm.c} |  5 +++++
->  6 files changed, 50 insertions(+), 1 deletion(-)
->  rename stubs/{qmp_pc_dimm_device_list.c => qmp_pc_dimm.c} (64%)
-> 
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index ea67b461c2..1df8b7ee57 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -159,6 +159,11 @@ uint64_t pc_existing_dimms_capacity(Error **errp)
->      return cap.size;
->  }
->  
-> +uint64_t get_existing_hotpluggable_memory_size(void)
-> +{
-> +    return pc_existing_dimms_capacity(&error_abort);
-> +}
-> +
->  int qmp_pc_dimm_device_list(Object *obj, void *opaque)
->  {
->      MemoryDeviceInfoList ***prev = opaque;
-> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-> index 1e483f2670..52c6b5e641 100644
-> --- a/include/hw/mem/pc-dimm.h
-> +++ b/include/hw/mem/pc-dimm.h
-> @@ -95,6 +95,7 @@ int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
->  
->  int qmp_pc_dimm_device_list(Object *obj, void *opaque);
->  uint64_t pc_existing_dimms_capacity(Error **errp);
-> +uint64_t get_existing_hotpluggable_memory_size(void);
->  void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
->                           MemoryRegion *mr, uint64_t align, Error **errp);
->  void pc_dimm_memory_unplug(DeviceState *dev, MemoryHotplugState *hpms,
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 9c6c3e1a53..bbedf1a7bc 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -4407,6 +4407,31 @@
->    'data': { 'name': 'str', '*migration-safe': 'bool', 'static': 'bool',
->              '*unavailable-features': [ 'str' ], 'typename': 'str' } }
->  
-> +##
-> +# @MemoryInfo:
-> +#
-> +# Actual memory information in bytes.
-> +#
-> +# @base-memory: size of "base" memory specified with command line
-> +#               option -m.
-> +#
-> +# @hotunpluggable-memory: size memory that can be hot-unplugged.
-> +#
-> +# Since: 2.10.0
-> +##
-> +{ 'struct': 'MemoryInfo',
-> +  'data'  : { 'base-memory': 'size', '*hotunpluggable-memory': 'size' } }
-> +
-> +##
-> +# @query-memory-size-summary:
-> +#
-> +# Return the amount of initially allocated and hot-plugged (if
-> +# enabled) memory in bytes.
-> +#
-> +# Since: 2.10.0
-> +##
-> +{ 'command': 'query-memory-size-summary', 'returns': 'MemoryInfo' }
-> +
->  ##
->  # @query-cpu-definitions:
->  #
-> diff --git a/qmp.c b/qmp.c
-> index b86201e349..682d950440 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -709,3 +709,16 @@ ACPIOSTInfoList *qmp_query_acpi_ospm_status(Error **errp)
->  
->      return head;
->  }
-> +
-> +MemoryInfo *qmp_query_memory_size_summary(Error **errp)
-> +{
-> +    MemoryInfo *mem_info = g_malloc0(sizeof(MemoryInfo));
-> +
-> +    mem_info->base_memory = ram_size;
-> +
-> +    mem_info->hotunpluggable_memory = get_existing_hotpluggable_memory_size();
-this could be done without wrapper:
-mem_info->hotunpluggable_memory = pc_existing_dimms_capacity(&local_error)
+--vogrbufdhnjwg5fy
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> +    mem_info->has_hotunpluggable_memory =
-> +        (mem_info->hotunpluggable_memory != (uint64_t)-1);
+On Tue, Aug 15, 2017 at 10:44:15AM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+>15.08.2017 09:19, Manos Pitsidianakis wrote:
+>>block/backup.c currently uses before write notifiers on the targeted
+>>node. We can create a filter node instead to intercept write requests
+>>for the backup job on the BDS level, instead of the BlockBackend level.
+>>
+>
+>Hi Manos!
+>
+>Looks interesting but what is the real benefit of it? It doesn't look=20
+>like it simplifies the code.. Also, is it affect performance?
+>I think it worth describing in commit message.
 
-mem_info->has_hotunpluggable_memory = !local_error;
-if (local_error)
-  cleanup
+The goal is to refactor the block layer into being more modular instead=20
+of having hard coded features. I don't suspect this will have any kind=20
+of performance gains, this is a minor change. Before write notifiers are=20
+not needed if you can intercept the write requests on the way.
 
-and defining stub:
+--vogrbufdhnjwg5fy
+Content-Type: application/pgp-signature; name="signature.asc"
 
-uint64_t pc_existing_dimms_capacity(Error **errp) {
-     error_setg(errp, "not implemented");
-     return 0;
-}
+-----BEGIN PGP SIGNATURE-----
 
-> +
-> +    return mem_info;
-> +}
-> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> index f5b47bfd74..f7cab5b11c 100644
-> --- a/stubs/Makefile.objs
-> +++ b/stubs/Makefile.objs
-> @@ -32,7 +32,7 @@ stub-obj-y += uuid.o
->  stub-obj-y += vm-stop.o
->  stub-obj-y += vmstate.o
->  stub-obj-$(CONFIG_WIN32) += fd-register.o
-> -stub-obj-y += qmp_pc_dimm_device_list.o
-> +stub-obj-y += qmp_pc_dimm.o
->  stub-obj-y += target-monitor-defs.o
->  stub-obj-y += target-get-monitor-def.o
->  stub-obj-y += pc_madt_cpu_entry.o
-> diff --git a/stubs/qmp_pc_dimm_device_list.c b/stubs/qmp_pc_dimm.c
-> similarity index 64%
-> rename from stubs/qmp_pc_dimm_device_list.c
-> rename to stubs/qmp_pc_dimm.c
-> index def211564d..1d1e008b58 100644
-> --- a/stubs/qmp_pc_dimm_device_list.c
-> +++ b/stubs/qmp_pc_dimm.c
-> @@ -6,3 +6,8 @@ int qmp_pc_dimm_device_list(Object *obj, void *opaque)
->  {
->     return 0;
->  }
-> +
-> +uint64_t get_existing_hotpluggable_memory_size(void)
-> +{
-> +    return (uint64_t)-1;
-> +}
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlmSqFAACgkQc2J8L2kN
+9xCYIRAAhn/i5Km65X/OFLL0+oaUCmeHDQRuO8+KctKQ5A6l6Ljgcjh6zvSHFAVj
+B2MTSi9U0J+LI5JXot6b5KGliu30zffQHrlibajyB8dhcLezYBMIc6iaLzX7Li2O
+m/wDzPeXEGscan5avUdiO7f5Y2M7xIHrIrFou35zQqRtgd4ayJht/8fcTgsfg0Ih
+clsNWAX5kmWyw60CpT3ZJwyKdxujWoEmFNsL/PU9yJxMWKZHpRj5liTk9QTvaDTV
+0ozFJeTysb4+Y2HMS/R/Dg1krYVZ8nUXt4Ah2zeeruZbQVt5oefqcGSJTdgwigym
+2unpsV40c+bEUDZnFuxYo8v44DVg1dGbnaa2avNJ9hylGj79ZP1N/x76gfteGEU2
+bON++bkve7c16BGtDQ/OJ8cdHCdZ2IG19vkjW8fofyCE9vovdEYIH7SwOUi6BDon
+CoEjFaRJ8LNidYstog7F2tBqKT5rUP1MH0Ji/uDhio7fPoiLNcbdZg2ab5EWBHHo
+KUV2B8kQJWiehNFkdIqrdX9qno2CLtK35Do3VMlrLKQZoTp/wJ+yvkcx2ir+zLYh
+vVXpxj+BcRy0sU80DLqZWIWG1TGny//PpUQoco2LAKQV4RckCyNKyeRuc6rswTuE
+KmJBKAHK+cjAxzt7chq8qvNcPL7mSIceHG7v1F9dK/1I0Y0wXQE=
+=TkYG
+-----END PGP SIGNATURE-----
+
+--vogrbufdhnjwg5fy--
