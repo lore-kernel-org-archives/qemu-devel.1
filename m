@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dhT6H-0007XW-LU
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 00:05:06 -0400
+	(envelope-from <famz@redhat.com>) id 1dhT6K-0007ba-PZ
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 00:05:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dhT6G-00054k-T0
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 00:05:05 -0400
+	(envelope-from <famz@redhat.com>) id 1dhT6K-00057U-0g
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 00:05:08 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue, 15 Aug 2017 12:04:50 +0800
-Message-Id: <20170815040454.4223-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 0/4] block: Fix non-shared storage
- migration
+Date: Tue, 15 Aug 2017 12:04:52 +0800
+Message-Id: <20170815040454.4223-3-famz@redhat.com>
+In-Reply-To: <20170815040454.4223-1-famz@redhat.com>
+References: <20170815040454.4223-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.10 2/4] nbd: Fix order of bdrv_set_perm
+ and bdrv_invalidate_cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,38 +23,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-"nbd-server-add -w" doesn't work when we are in "-incoming defer" state:
+From: Kevin Wolf <kwolf@redhat.com>
 
-    (qemu) nbd_server_add -w drive-virtio-disk0
-    Block node is read-only
+The "inactive" state of BDS affects whether the permissions can be
+granted, we must call bdrv_invalidate_cache before bdrv_set_perm to
+support "-incoming defer" case.
 
-Two problems are faced:
+Reported-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ nbd/server.c | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-  - nbd_export_new() calls bdrv_invalidate_cache() too late.
-  - bdrv_invalidate_cache() restores qdev permission (which are temporarily
-    masked by BlockBackend.disable_perm during INMIGRATE) too early.
-
-Fix both, and add a regression iotest.
-
-Fam Zheng (3):
-  stubs: Add vm state change handler stubs
-  block-backend: Defer shared_perm tightening migration completion
-  iotests: Add non-shared storage migration case 192
-
-Kevin Wolf (1):
-  nbd: Fix order of bdrv_set_perm and bdrv_invalidate_cache
-
- block/block-backend.c        | 37 ++++++++++++++++++++++++++
- nbd/server.c                 | 20 +++++++-------
- stubs/Makefile.objs          |  1 +
- stubs/change-state-handler.c | 14 ++++++++++
- tests/qemu-iotests/192       | 63 ++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/192.out   |  7 +++++
- tests/qemu-iotests/group     |  1 +
- 7 files changed, 134 insertions(+), 9 deletions(-)
- create mode 100644 stubs/change-state-handler.c
- create mode 100755 tests/qemu-iotests/192
- create mode 100644 tests/qemu-iotests/192.out
-
+diff --git a/nbd/server.c b/nbd/server.c
+index 82a78bf439..b68b6fb535 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1045,11 +1045,22 @@ NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t size,
+                           bool writethrough, BlockBackend *on_eject_blk,
+                           Error **errp)
+ {
++    AioContext  *ctx;
+     BlockBackend *blk;
+     NBDExport *exp = g_malloc0(sizeof(NBDExport));
+     uint64_t perm;
+     int ret;
+ 
++    /*
++     * NBD exports are used for non-shared storage migration.  Make sure
++     * that BDRV_O_INACTIVE is cleared and the image is ready for write
++     * access since the export could be available before migration handover.
++     */
++    ctx = bdrv_get_aio_context(bs);
++    aio_context_acquire(ctx);
++    bdrv_invalidate_cache(bs, NULL);
++    aio_context_release(ctx);
++
+     /* Don't allow resize while the NBD server is running, otherwise we don't
+      * care what happens with the node. */
+     perm = BLK_PERM_CONSISTENT_READ;
+@@ -1087,15 +1098,6 @@ NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t size,
+         exp->eject_notifier.notify = nbd_eject_notifier;
+         blk_add_remove_bs_notifier(on_eject_blk, &exp->eject_notifier);
+     }
+-
+-    /*
+-     * NBD exports are used for non-shared storage migration.  Make sure
+-     * that BDRV_O_INACTIVE is cleared and the image is ready for write
+-     * access since the export could be available before migration handover.
+-     */
+-    aio_context_acquire(exp->ctx);
+-    blk_invalidate_cache(blk, NULL);
+-    aio_context_release(exp->ctx);
+     return exp;
+ 
+ fail:
 -- 
 2.13.4
