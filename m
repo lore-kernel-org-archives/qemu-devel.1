@@ -1,28 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dhYmd-0005R3-GZ
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:09:13 -0400
+	(envelope-from <farman@linux.vnet.ibm.com>) id 1dhZ4o-0005eh-Gv
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:27:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dhYma-0005I9-6K
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:09:11 -0400
-Received: from 17.mo5.mail-out.ovh.net ([46.105.56.132]:41070)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dhYmZ-0005HN-Vo
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:09:08 -0400
-Received: from player734.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 5C6B211AA8F
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 12:09:06 +0200 (CEST)
-Date: Tue, 15 Aug 2017 12:09:00 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170815120900.2eff984f@bahia.lan>
-In-Reply-To: <20170815040409.GN3452@umbus.fritz.box>
-References: <150273295665.11087.17582111045419718285.stgit@bahia.lan>
-	<20170815040409.GN3452@umbus.fritz.box>
+	(envelope-from <farman@linux.vnet.ibm.com>) id 1dhZ4l-0007uO-Rb
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:27:58 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59391)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <farman@linux.vnet.ibm.com>)
+	id 1dhZ4l-0007u4-JK
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:27:55 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7FANvRg069438
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 06:27:54 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cbucv2p7v-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 06:27:53 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <farman@linux.vnet.ibm.com>;
+	Tue, 15 Aug 2017 04:27:53 -0600
+References: <20170814204450.24118-1-farman@linux.vnet.ibm.com>
+	<f637c206-266c-d76f-852e-4800422838bb@redhat.com>
+	<20170815090302.3f315027.cohuck@redhat.com>
+	<222ec8ee-0e1e-ca24-142e-505867bfee27@redhat.com>
+	<86e21c68-93ee-0311-643d-dde2c8589eea@redhat.com>
+From: Eric Farman <farman@linux.vnet.ibm.com>
+Date: Tue, 15 Aug 2017 06:27:48 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/lWCJYnLiWLVwZjiNh6txSNW";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] ppc: fix ppc_set_compat() with KVM PR
+In-Reply-To: <86e21c68-93ee-0311-643d-dde2c8589eea@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <4c48cf30-0f40-80c0-66c6-ae546b251c4e@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/1] Fix "make clean" for s390
+ target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,121 +46,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-
---Sig_/lWCJYnLiWLVwZjiNh6txSNW
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, 15 Aug 2017 14:04:09 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Mon, Aug 14, 2017 at 07:49:16PM +0200, Greg Kurz wrote:
-> > When running in KVM PR mode, kvmppc_set_compat() always fail because the
-> > current PR implementation doesn't handle KVM_REG_PPC_ARCH_COMPAT. Now t=
-hat
-> > the machine code inconditionally calls ppc_set_compat_all() at reset ti=
-me
-> > to restore the compat mode default value (commit 66d5c492dd3a9), it is
-> > impossible to start a guest with PR:
-> >=20
-> > qemu-system-ppc64: Unable to set CPU compatibility mode in KVM:
-> >  Invalid argument
-> >=20
-> > A tentative patch [1] was recently sent by Suraj to address the issue, =
-but
-> > it would prevent the compat mode to be turned off on reset. And we real=
-ly
-> > don't want to explicitely check for KVM PR. During the patch's review,
-> > David suggested that we should only call the KVM ioctl() if the compat
-> > PVR changes. This allows at least to run with KVM PR, provided no compat
-> > mode is requested from the command line (which should be the case when
-> > running PR nested). This is what this patch does. =20
->=20
-> I'm not sure that's true any more, since we now prefer compat modes
-> during CAS.  I guess we could exclude the compat modes from the
-
-Oops, I wanted to talk about CAS and I... forgot :(
-
-So, indeed, CAS fails to apply compat mode and immediately returns H_HARDWA=
-RE
-to the guest, ie the rest of CAS isn't done :-\. Linux guests print a warni=
-ng:
-
-WARNING: ibm,client-architecture-support call FAILED!
- done
-
-and (luckily?) continue to boot anyway (at least that's what happens with
-RHEL7 guests).
-
-> advertised list based on what KVM supports, but that seems pretty
-> awkward.
->=20
-
-I'll re-read the details in LoPAPR and try to come up with something.
-
-Cheers,
-
---
-Greg
-
-> > While here, we also fix the side effect where KVM would fail but we wou=
-ld
-> > change the CPU state in QEMU anyway.
-> >=20
-> > [1] http://patchwork.ozlabs.org/patch/782039/
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org> =20
->=20
-> In any case, this makes things better than they were, so I'm applying.
->=20
-> > ---
-> >  target/ppc/compat.c |    9 +++++----
-> >  1 file changed, 5 insertions(+), 4 deletions(-)
-> >=20
-> > diff --git a/target/ppc/compat.c b/target/ppc/compat.c
-> > index f1b67faa97e3..f8729fe46d61 100644
-> > --- a/target/ppc/compat.c
-> > +++ b/target/ppc/compat.c
-> > @@ -140,16 +140,17 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t com=
-pat_pvr, Error **errp)
-> > =20
-> >      cpu_synchronize_state(CPU(cpu));
-> > =20
-> > -    cpu->compat_pvr =3D compat_pvr;
-> > -    env->spr[SPR_PCR] =3D pcr & pcc->pcr_mask;
-> > -
-> > -    if (kvm_enabled()) {
-> > +    if (kvm_enabled() && cpu->compat_pvr !=3D compat_pvr) {
-> >          int ret =3D kvmppc_set_compat(cpu, cpu->compat_pvr);
-> >          if (ret < 0) {
-> >              error_setg_errno(errp, -ret,
-> >                               "Unable to set CPU compatibility mode in =
-KVM");
-> > +            return;
-> >          }
-> >      }
-> > +
-> > +    cpu->compat_pvr =3D compat_pvr;
-> > +    env->spr[SPR_PCR] =3D pcr & pcc->pcr_mask;
-> >  }
-> > =20
-> >  typedef struct {
-> >  =20
->=20
+To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org
 
 
---Sig_/lWCJYnLiWLVwZjiNh6txSNW
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+On 08/15/2017 04:26 AM, Thomas Huth wrote:
+> On 15.08.2017 10:01, Thomas Huth wrote:
+>> On 15.08.2017 09:03, Cornelia Huck wrote:
+>>> On Tue, 15 Aug 2017 07:02:10 +0200
+>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>
+>>>> On 14.08.2017 22:44, Eric Farman wrote:
+>>>>> How often does one really do a "make clean" ?  Rather infrequently,
+>>>>> as I only stumbled on this today.
+>>>>>
+>>>>> Perhaps I have missed the RM variable somewhere, as I see similar syntax
+>>>>> in some of the tests/tcg/ Makefiles, but I don't see it being set here.
+>>>>> My configure statement isn't terribly interesting, just enabling debug
+>>>>> for an s390x target, and as such there's no RM variable in its output.
+>>>>> I'll trust that Thomas will chime in with where it should have been.
+>>>>> In the meantime, this does the trick for me.
+>>>>
+>>>> RM is one of the variables that should be pre-initialized by Make, and
+>>>> AFAIK should be used to increase portability (well, it's likely not
+>>>> important for QEMU since we require a posix-shell like built environment
+>>>> anyway).
+>>>>
+>>>> According to the info page of Make, chapter "10.3 Variables Used by
+>>>> Implicit Rules":
+>>>>
+>>>> `RM'
+>>>>       Command to remove a file; default `rm -f'.
+>>>>
+>>>> I've also checked it again and "make clean" works fine here (using GNU
+>>>> Make 3.82). Which version of Make (and Linux distro) are you using?
 
-iEYEARECAAYFAlmSyDwACgkQAvw66wEB28JihQCgmplcSEnUL68D8mz/cH2B2L92
-YEsAn1M7ECrxcRwIoy+SXo3KznTK1ZHr
-=eYwY
------END PGP SIGNATURE-----
+Not that it matters now, but make 4.1 on F24
 
---Sig_/lWCJYnLiWLVwZjiNh6txSNW--
+>>>
+>>> Interesting. It fails for me with GNU Make 3.82 on my RHEL guest as
+>>> well.
+>>>
+>>>> Anyway, maybe I also simply missed something, so I'm certainly also fine
+>>>> with the patch to revert it to "rm -f".
+>>>
+>>> Given that other bios makefiles use rm -f as well, let's just change
+>>> back until we figure out what's wrong.
+>>
+>> I just discovered that it fails for me as well when I do "make clean"
+>> from the top directory. So far I was only doing "make clean" after doing
+>> a "cd pc-bios/s390-ccw" first, and that works fine. Weird. Something
+>> seems to unset the RM variable in our build system, but I fail to find
+>> the spot where this happens...
+> 
+> Ok, just found it: It's this line in rules.mak:
+> 
+> MAKEFLAGS += -rR
+> 
+> The parameter -R disables the built-in variables, so RM can indeed not
+> work here. Sorry, I wasn't aware of that setting yet, so your patch is
+> indeed the right fix here (or we should maybe define RM in rules.mak, too).
+
+Excellent find, Thomas!  I was not aware of that either.  Thanks to both 
+you and Cornelia for this.
+
+  - Eric
