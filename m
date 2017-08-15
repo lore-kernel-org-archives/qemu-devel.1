@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dhglD-0004Wj-DO
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:40:16 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dhgr3-0007dQ-GG
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:46:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dhgl8-00035Z-QD
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:40:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48300)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dhgl8-00034N-Gu
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:40:10 -0400
-References: <20170815163959.6632-1-f4bug@amsat.org>
-	<20170815163959.6632-2-f4bug@amsat.org>
-	<a2773ebe-e841-4f3f-0234-d89e48811336@redhat.com>
-	<4837e428-461c-ef00-b584-42e4c22e8fc7@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6b25c2fb-6f18-37e3-b7dd-56b9d59c22ca@redhat.com>
-Date: Tue, 15 Aug 2017 13:40:05 -0500
-MIME-Version: 1.0
-In-Reply-To: <4837e428-461c-ef00-b584-42e4c22e8fc7@amsat.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="FlRb2rCICerPxkORjLijvN7nrNVnRjTeX"
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] libqtest: add qtest_accel() to
- avoid warnings when kvm is not available
+	(envelope-from <programmingkidx@gmail.com>) id 1dhgqy-000792-L2
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:46:17 -0400
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:37930)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dhgqy-00078c-FH
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:46:12 -0400
+Received: by mail-it0-x241.google.com with SMTP id f16so1135953itb.5
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 11:46:12 -0700 (PDT)
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <ff49cfa1-5a00-c329-1647-3ad8367cc804@redhat.com>
+Date: Tue, 15 Aug 2017 14:46:09 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <5D42D1E3-A946-4E2C-BDC4-BB785D0B880D@gmail.com>
+References: <C2D23A89-6DB7-445C-BC25-71E9E49C288D@gmail.com>
+	<ff49cfa1-5a00-c329-1647-3ad8367cc804@redhat.com>
+Subject: Re: [Qemu-devel] Help with Windows NT 4.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Michael S . Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, =?utf-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FlRb2rCICerPxkORjLijvN7nrNVnRjTeX
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- "Michael S . Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6b25c2fb-6f18-37e3-b7dd-56b9d59c22ca@redhat.com>
-Subject: Re: [RFC PATCH 1/2] libqtest: add qtest_accel() to avoid warnings
- when kvm is not available
-References: <20170815163959.6632-1-f4bug@amsat.org>
- <20170815163959.6632-2-f4bug@amsat.org>
- <a2773ebe-e841-4f3f-0234-d89e48811336@redhat.com>
- <4837e428-461c-ef00-b584-42e4c22e8fc7@amsat.org>
-In-Reply-To: <4837e428-461c-ef00-b584-42e4c22e8fc7@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 08/15/2017 01:27 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 08/15/2017 03:13 PM, Eric Blake wrote:
->> On 08/15/2017 11:39 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->>> only warn once about it.
->>>
->>> - kernel without kvm:
->>>
->>>      # make check-qtest-x86_64
->>>        GTESTER check-qtest-x86_64
->>>      Could not access KVM kernel module: No such device
->>>      qemu-system-x86_64: failed to initialize KVM: No such device
->>>      qemu-system-x86_64: Back to tcg accelerator
->>
->> How does this differ from what commit 2f6b38d1 was trying to do?
+> On Aug 14, 2017, at 2:51 AM, Paolo Bonzini <pbonzini@redhat.com> =
+wrote:
 >=20
-> I'd say 2f6b38d1 is for common end-user usage while this is for
-> QA/testers usage. If you run N qtests with the same machine arguments,
-> having this warning displayed only once is enough and allow you to focu=
-s
-> on the tests output.
+> On 13/08/2017 21:13, Programmingkid wrote:
+>> Lately I found out that Windows NT 4.0 seems to work well with the
+>> 486 and pentium processors. Using "-cpu 486" made installing it
+>> actually work. Now I am seeing another issue. When I boot Windows NT
+>> 4.0 I see this error message:
+>>=20
+>> *** STOP: 0x0000007B (0x807A8610,0x00000000,0x00000000,0x00000000)=20
+>> INACESSIBLE_BOOT_DEVICE
+>>=20
+>> Would anyone know a way to solve this issue?
+>=20
+> Herv=C3=A9 is probably the best person to answer this question.  Maybe =
+try
+> installing it with SCSI disks ("-drive if=3Dscsi,id=3Dhd,file=3D... =
+-drive
+> if=3Dscsi,id=3Dcd,file=3D... -device lsi -device scsi-hd,drive=3Dhd =
+-device
+> scsi-cd,drive=3Dcd").
+>=20
+> Thanks,
+>=20
+> Paolo
 
-I guess my question is: Are we still getting a warning output even with
-2f6b38d1 applied?  If so, why, because the point of that commit was to
-avoid the warning.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---FlRb2rCICerPxkORjLijvN7nrNVnRjTeX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmTQAUACgkQp6FrSiUn
-Q2piNAf/QE5F01FBrDOzzH0F2o0DY00dKPlMd+XbnQzXHQmG5eern3pglGqb3pYl
-DNspR+YIfzZSeMHkCS+2wpC2D/J1UwC8o8tiguw3RlAdgHr9medoLAdWAQWLKH+D
-5FSYLI1THBWuHLfs42Bf5j3+uuXayklvxE38tModlGUeNQFmWh8pmhVHiyxZuBFs
-yIe27/Ae4ggnHmE/fMaGXWSbf1ltUDb/P3zZ73RZbPyNWN8/9iP9bWQoojCMQ+by
-hSI2Jx64TgKsMQ0l1wvi1+1cpOep9zVtqfs80ZYRLEFKhBoKaQd8y5QqkYZXBXSj
-RCE4SPDV97ZzxH/oRZC02D+Av1YRgA==
-=+6Xr
------END PGP SIGNATURE-----
-
---FlRb2rCICerPxkORjLijvN7nrNVnRjTeX--
+Thanks for the help. Unfortunately trying to boot from the install CD =
+leads to the INACCESSIBLE_BOOT_DEVICE error when using SCSI.=20=
