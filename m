@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dhPON-0001jy-RB
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 20:07:32 -0400
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhQdc-0004QL-AP
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 21:27:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dhPOK-0002UH-MG
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 20:07:31 -0400
-Received: from mail-wm0-f44.google.com ([74.125.82.44]:33482)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dhPOK-0002U3-F0
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 20:07:28 -0400
-Received: by mail-wm0-f44.google.com with SMTP id k20so20384625wmg.0
-	for <qemu-devel@nongnu.org>; Mon, 14 Aug 2017 17:07:28 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-References: <20170814231552.24593-1-pbonzini@redhat.com>
-Message-ID: <b1a81e45-a47c-7a9e-9ce4-60d363d08292@redhat.com>
-Date: Tue, 15 Aug 2017 02:07:24 +0200
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhQdX-0007ti-Oh
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 21:27:20 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:30330
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhQdX-0007sl-Db
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 21:27:15 -0400
+References: <1502705471-28407-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	<20170814124439.GM3108@localhost.localdomain>
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Message-ID: <ad7ef887-7ff5-84f5-dfca-035dcd915c15@cn.fujitsu.com>
+Date: Tue, 15 Aug 2017 09:26:46 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170814231552.24593-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10?] qxl: call
- qemu_spice_display_init_common for secondary devices
+In-Reply-To: <20170814124439.GM3108@localhost.localdomain>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] numa: Add a check whether the node0 has
+ memory or not
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, ademaria@redhat.com, kraxel@redhat.com, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, dgilbert@redhat.com, armbru@redhat.com, david@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 15/08/2017 01:15, Paolo Bonzini wrote:
-> Fixes this 2.10 regression:
-> 
->   $ qemu-system-x86_64  -cpu host -m 6144 -vga qxl -device qxl
->   qemu-system-x86_64: util/qemu-thread-posix.c:64: qemu_mutex_lock: Assertion `mutex->initialized' failed.
-> 
-> Reported-by: ademaria@redhat.com
-> Cc: kraxel@redhat.com
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Hi Eduardo,
 
-Hmm, Gerd is on vacation but perhaps Marc-André can ack it?  Or just
-revert the mutex->initialized patch for 2.10 (commit c096358e74,
-"qemu-thread: Assert locks are initialized before using", 2017-07-04).
+At 08/14/2017 08:44 PM, Eduardo Habkost wrote:
+> On Mon, Aug 14, 2017 at 06:11:11PM +0800, Dou Liyang wrote:
+>> Currently, Using the fisrt node without memory on the machine makes
+>> QEMU unhappy. With this example command line:
+>>   ... \
+>>   -m 1024M,slots=4,maxmem=32G \
+>>   -numa node,nodeid=0 \
+>>   -numa node,mem=1024M,nodeid=1 \
+>>   -numa node,nodeid=2 \
+>>   -numa node,nodeid=3 \
+>> Guest reports "No NUMA configuration found" and the NUMA topology is
+>> wrong.
+>>
+>> This is because when QEMU builds ACPI SRAT, it regards node0 as the
+>> default node to deal with the memory hole(640K-1M). this means the
+>> node0 must have some memory(>1M) firstly.
+>>
+>> Add a check in parse_numa_opts to avoid this situation.
+>>
+>> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+>> ---
+>>  numa.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/numa.c b/numa.c
+>> index e32af04..1d6f73f 100644
+>> --- a/numa.c
+>> +++ b/numa.c
+>> @@ -464,6 +464,10 @@ void parse_numa_opts(MachineState *ms)
+>>          if (i == nb_numa_nodes) {
+>>              assert(mc->numa_auto_assign_ram);
+>>              mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
+>> +        } else if (i != 0) {
+>> +            error_report("The first NUMA node must have some memory"
+>> +                          " for building ACPI SART");
+>> +            exit(1);
+>
+> This doesn't belong to numa.c.  numa.c is generic code, and the
+> requirement you described is specific for PC.
+>
+> Anyway, adding this check would make existing VM configurations
+> refuse to run after a QEMU upgrade.  I suggest fixing the bug in
+> the ACPI code instead.
+>
 
-Paolo
+I see.
 
-> ---
->  hw/display/qxl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-> index 7f8c73b56d..ae3677fd1e 100644
-> --- a/hw/display/qxl.c
-> +++ b/hw/display/qxl.c
-> @@ -2054,6 +2054,7 @@ static void qxl_realize_common(PCIQXLDevice *qxl, Error **errp)
->      uint32_t pci_device_rev;
->      uint32_t io_size;
->  
-> +    qemu_spice_display_init_common(&qxl->ssd);
->      qxl->mode = QXL_MODE_UNDEFINED;
->      qxl->generation = 1;
->      qxl->num_memslots = NUM_MEMSLOTS;
-> @@ -2176,7 +2177,6 @@ static void qxl_realize_primary(PCIDevice *dev, Error **errp)
->      portio_list_add(&qxl->vga_port_list, pci_address_space_io(dev), 0x3b0);
->  
->      vga->con = graphic_console_init(DEVICE(dev), 0, &qxl_ops, qxl);
-> -    qemu_spice_display_init_common(&qxl->ssd);
->  
->      qxl_realize_common(qxl, &local_err);
->      if (local_err) {
-> 
+If fixing the bug in the ACPI code, I have two solutions:
+
+1). Add a check in build_srat(). If the first node has no memory, QEMU
+will exit.
+
+2). Fix the initialization of memory affinity structure to cover this
+situation. Using the first node which has memory to deal with the memory
+hole.
+
+I prefer solution 2. what about you?
+
+Thanks,
+	dou.
