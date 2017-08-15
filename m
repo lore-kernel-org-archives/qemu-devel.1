@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dhWu1-00041W-Ut
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:08:43 -0400
+	(envelope-from <armbru@redhat.com>) id 1dhWvh-0004rv-1d
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:10:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dhWtx-0003Y0-Om
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:08:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46026)
+	(envelope-from <armbru@redhat.com>) id 1dhWvc-0004oe-S0
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:10:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39930)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dhWtx-0003Vh-IS
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:08:37 -0400
-References: <20170814204450.24118-1-farman@linux.vnet.ibm.com>
-	<f637c206-266c-d76f-852e-4800422838bb@redhat.com>
-	<20170815090302.3f315027.cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <222ec8ee-0e1e-ca24-142e-505867bfee27@redhat.com>
-Date: Tue, 15 Aug 2017 10:01:37 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dhWvc-0004mc-Lh
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:10:20 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170731085110.1050-1-apahim@redhat.com>
+	<20170731085110.1050-4-apahim@redhat.com>
+Date: Tue, 15 Aug 2017 10:10:12 +0200
+In-Reply-To: <20170731085110.1050-4-apahim@redhat.com> (Amador Pahim's message
+	of "Mon, 31 Jul 2017 10:51:06 +0200")
+Message-ID: <87zib1s13v.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170815090302.3f315027.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.10 0/1] Fix "make clean" for s390
- target
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 3/7] qemu.py: use python logging system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +27,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Eric Farman <farman@linux.vnet.ibm.com>, borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org
+To: Amador Pahim <apahim@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, stefanha@gmail.com, mreitz@redhat.com, crosa@redhat.com
 
-On 15.08.2017 09:03, Cornelia Huck wrote:
-> On Tue, 15 Aug 2017 07:02:10 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
-> 
->> On 14.08.2017 22:44, Eric Farman wrote:
->>> How often does one really do a "make clean" ?  Rather infrequently,
->>> as I only stumbled on this today.
->>>
->>> Perhaps I have missed the RM variable somewhere, as I see similar syntax
->>> in some of the tests/tcg/ Makefiles, but I don't see it being set here.
->>> My configure statement isn't terribly interesting, just enabling debug
->>> for an s390x target, and as such there's no RM variable in its output.
->>> I'll trust that Thomas will chime in with where it should have been.
->>> In the meantime, this does the trick for me.  
->>
->> RM is one of the variables that should be pre-initialized by Make, and
->> AFAIK should be used to increase portability (well, it's likely not
->> important for QEMU since we require a posix-shell like built environment
->> anyway).
->>
->> According to the info page of Make, chapter "10.3 Variables Used by
->> Implicit Rules":
->>
->> `RM'
->>      Command to remove a file; default `rm -f'.
->>
->> I've also checked it again and "make clean" works fine here (using GNU
->> Make 3.82). Which version of Make (and Linux distro) are you using?
-> 
-> Interesting. It fails for me with GNU Make 3.82 on my RHEL guest as
-> well.
-> 
->> Anyway, maybe I also simply missed something, so I'm certainly also fine
->> with the patch to revert it to "rm -f".
-> 
-> Given that other bios makefiles use rm -f as well, let's just change
-> back until we figure out what's wrong.
+Please spell "Python" with a capital "P" (it's a proper name).
 
-I just discovered that it fails for me as well when I do "make clean"
-from the top directory. So far I was only doing "make clean" after doing
-a "cd pc-bios/s390-ccw" first, and that works fine. Weird. Something
-seems to unset the RM variable in our build system, but I fail to find
-the spot where this happens...
+Amador Pahim <apahim@redhat.com> writes:
 
- Thomas
+> Let's provide extra control and flexibility by using python logging
+> system instead of print and/or sys.std*.write().
+>
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
+
+How exactly does this change error messages?
+
+Is logging the right tool to report errors to the human user?  I'm
+asking because logging and error reporting are generally separate
+things.  Example: a program runs into a recoverable error.  It logs the
+error, but does not report it.
+
+Is reporting errors to stderr the right thing to do for library class
+QEMUMachine?  I doubt it.  Libraries throw exceptions and let their
+users decide how to handle them.
