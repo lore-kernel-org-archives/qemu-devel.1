@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhXgZ-0003bW-DN
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:58:52 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dhXhp-00054E-C1
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:00:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhXgU-0007HA-Um
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:58:51 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:64783
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhXgU-0007GG-40
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:58:46 -0400
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Date: Tue, 15 Aug 2017 16:58:31 +0800
-Message-ID: <1502787511-20894-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	(envelope-from <no-reply@patchew.org>) id 1dhXhl-0008Av-49
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:00:09 -0400
+Resent-Message-Id: <E1dhXhl-0008Av-49@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21302)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dhXhk-0008AK-TX
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:00:05 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150278758924.78.16068223215275870985@dd743fd916bd>
+In-Reply-To: <20170815084430.7128-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] hw/acpi: Select an node with memory for
- mapping memory hole to
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 15 Aug 2017 01:59:50 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH for-2.10 v2 0/2] trace: fix simpletrace.stp
+ flight recorder mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,137 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, imammedo@redhat.com, mst@redhat.com, dgilbert@redhat.com, armbru@redhat.com, david@redhat.com, Dou Liyang <douly.fnst@cn.fujitsu.com>
+To: stefanha@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-Currently, Using the fisrt node without memory on the machine makes
-QEMU unhappy. With this example command line:
-  ... \
-  -m 1024M,slots=4,maxmem=32G \
-  -numa node,nodeid=0 \
-  -numa node,mem=1024M,nodeid=1 \
-  -numa node,nodeid=2 \
-  -numa node,nodeid=3 \
-Guest reports "No NUMA configuration found" and the NUMA topology is
-wrong.
-
-This is because when QEMU builds ACPI SRAT, it regards node0 as the
-default node to deal with the memory hole(640K-1M). this means the
-node0 must have some memory(>1M), but, actually it can have no
-memory.
-
-Fix this problem by replace the node0 with the first node which has
-memory on it. Add a new function for each node. Also do some cleanup.
-
-Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
----
- hw/i386/acpi-build.c | 76 +++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 48 insertions(+), 28 deletions(-)
-
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 98dd424..e5f57d2 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2318,15 +2318,43 @@ build_tpm2(GArray *table_data, BIOSLinker *linker)
-                  (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
- }
- 
-+static uint64_t
-+build_srat_node_entry(GArray *table_data, PCMachineState *pcms,
-+                                int i, uint64_t mem_base, uint64_t mem_len)
-+{
-+    AcpiSratMemoryAffinity *numamem;
-+    uint64_t next_base;
-+
-+    next_base = mem_base + mem_len;
-+
-+    /* Cut out the ACPI_PCI hole */
-+    if (mem_base <= pcms->below_4g_mem_size &&
-+        next_base > pcms->below_4g_mem_size) {
-+        mem_len -= next_base - pcms->below_4g_mem_size;
-+        if (mem_len > 0) {
-+            numamem = acpi_data_push(table_data, sizeof *numamem);
-+            build_srat_memory(numamem, mem_base, mem_len, i,
-+                              MEM_AFFINITY_ENABLED);
-+        }
-+        mem_base = 1ULL << 32;
-+        mem_len = next_base - pcms->below_4g_mem_size;
-+        next_base += (1ULL << 32) - pcms->below_4g_mem_size;
-+    }
-+    numamem = acpi_data_push(table_data, sizeof *numamem);
-+    build_srat_memory(numamem, mem_base, mem_len, i,
-+                      MEM_AFFINITY_ENABLED);
-+    return next_base;
-+}
-+
- static void
- build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
- {
-     AcpiSystemResourceAffinityTable *srat;
-     AcpiSratMemoryAffinity *numamem;
- 
--    int i;
-+    int i, node;
-     int srat_start, numa_start, slots;
--    uint64_t mem_len, mem_base, next_base;
-+    uint64_t mem_len, mem_base;
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(machine);
-     PCMachineState *pcms = PC_MACHINE(machine);
-@@ -2370,36 +2398,28 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-     /* the memory map is a bit tricky, it contains at least one hole
-      * from 640k-1M and possibly another one from 3.5G-4G.
-      */
--    next_base = 0;
-+
-     numa_start = table_data->len;
- 
-+    /* get the first node which has memory and  map the hole from 640K-1M */
-+    for (node = 0;
-+            node < pcms->numa_nodes && pcms->node_mem[node] == 0;
-+            node++);
-     numamem = acpi_data_push(table_data, sizeof *numamem);
--    build_srat_memory(numamem, 0, 640 * 1024, 0, MEM_AFFINITY_ENABLED);
--    next_base = 1024 * 1024;
--    for (i = 1; i < pcms->numa_nodes + 1; ++i) {
--        mem_base = next_base;
--        mem_len = pcms->node_mem[i - 1];
--        if (i == 1) {
--            mem_len -= 1024 * 1024;
--        }
--        next_base = mem_base + mem_len;
--
--        /* Cut out the ACPI_PCI hole */
--        if (mem_base <= pcms->below_4g_mem_size &&
--            next_base > pcms->below_4g_mem_size) {
--            mem_len -= next_base - pcms->below_4g_mem_size;
--            if (mem_len > 0) {
--                numamem = acpi_data_push(table_data, sizeof *numamem);
--                build_srat_memory(numamem, mem_base, mem_len, i - 1,
--                                  MEM_AFFINITY_ENABLED);
--            }
--            mem_base = 1ULL << 32;
--            mem_len = next_base - pcms->below_4g_mem_size;
--            next_base += (1ULL << 32) - pcms->below_4g_mem_size;
-+    build_srat_memory(numamem, 0, 640 * 1024, node, MEM_AFFINITY_ENABLED);
-+
-+    /* map the rest of memory from 1M */
-+    mem_base = 1024 * 1024;
-+    mem_len = pcms->node_mem[node] - mem_base;
-+    mem_base = build_srat_node_entry(table_data, pcms, node,
-+                                            mem_base, mem_len);
-+
-+    for (i = 0; i < pcms->numa_nodes; i++) {
-+        if (i == node) {
-+            continue;
-         }
--        numamem = acpi_data_push(table_data, sizeof *numamem);
--        build_srat_memory(numamem, mem_base, mem_len, i - 1,
--                          MEM_AFFINITY_ENABLED);
-+        mem_base = build_srat_node_entry(table_data, pcms, i,
-+                                            mem_base, pcms->node_mem[i]);
-     }
-     slots = (table_data->len - numa_start) / sizeof *numamem;
-     for (; slots < pcms->numa_nodes + 2; slots++) {
--- 
-2.5.5
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA4MTUwODQ0MzAuNzEyOC0xLXN0ZWZhbmhhQHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2
+ZWxdIFtQQVRDSCBmb3ItMi4xMCB2MiAwLzJdIHRyYWNlOiBmaXggc2ltcGxldHJhY2Uuc3RwIGZs
+aWdodCByZWNvcmRlciBtb2RlClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09
+PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRC
+QVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
+bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdp
+dCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsg
+ZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1m
+b3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4v
+c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0x
+CiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09
+PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
+N2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
+ZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxNzA4MTUwODQ0MzAuNzEy
+OC0xLXN0ZWZhbmhhQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MDgxNTA4NDQzMC43MTI4LTEt
+c3RlZmFuaGFAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjdkNmE0
+ZWFlOGQgc2ltcGxldHJhY2U6IGZpeCBmbGlnaHQgcmVjb3JkZXIgLS1uby1oZWFkZXIgb3B0aW9u
+CmIzNzFlZDI0N2QgdHJhY2U6IHVzZSBzdGF0aWMgZXZlbnQgSUQgbWFwcGluZyBpbiBzaW1wbGV0
+cmFjZS5zdHAKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjogdHJhY2U6
+IHVzZSBzdGF0aWMgZXZlbnQgSUQgbWFwcGluZyBpbiBzaW1wbGV0cmFjZS5zdHAuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMi8yOiBzaW1wbGV0cmFjZTogZml4IGZsaWdodCByZWNvcmRlciAtLW5vLWhlYWRl
+ciBvcHRpb24uLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0MDogRklMRTogc2Ny
+aXB0cy9zaW1wbGV0cmFjZS5weToxMDE6CisgICAgIiIiRGVzZXJpYWxpemUgdHJhY2UgcmVjb3Jk
+cyBmcm9tIGEgZmlsZSwgeWllbGRpbmcgcmVjb3JkIHR1cGxlcyAoZXZlbnRfbnVtLCB0aW1lc3Rh
+bXAsIHBpZCwgYXJnMSwgLi4uLCBhcmc2KS4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywg
+NDYgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
+ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
+IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
+PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0t
+LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
+dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVs
+aXN0cy5vcmc=
