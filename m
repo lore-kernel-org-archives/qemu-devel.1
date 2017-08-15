@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhYhg-00035g-RH
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:04:05 -0400
+	(envelope-from <berrange@redhat.com>) id 1dhYhy-0003I6-Pj
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:04:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhYhc-00021d-PQ
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:04:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33994)
+	(envelope-from <berrange@redhat.com>) id 1dhYhu-00028J-UF
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:04:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44754)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dhYhc-00021F-HP
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:04:00 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dhYhu-00027v-Oo
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:04:18 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6BD78C0546F8
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 10:03:59 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170808203935.30021-1-ehabkost@redhat.com>
-	<20170808203935.30021-5-ehabkost@redhat.com>
-Date: Tue, 15 Aug 2017 12:03:53 +0200
-In-Reply-To: <20170808203935.30021-5-ehabkost@redhat.com> (Eduardo Habkost's
-	message of "Tue, 8 Aug 2017 17:39:34 -0300")
-Message-ID: <87fuctp2pi.fsf@dusky.pond.sub.org>
+	by mx1.redhat.com (Postfix) with ESMTPS id BAE096B36A
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 10:04:17 +0000 (UTC)
+Date: Tue, 15 Aug 2017 11:04:10 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170815100410.GH9674@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170815093615.16453-1-berrange@redhat.com>
+	<20170815093615.16453-2-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-2.11 v2 4/5] qmp-shell: Accept QMP
- command as argument
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170815093615.16453-2-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 01/12] ui: add keycodemapdb repository
+ as a GIT submodule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,91 +35,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
-
-Suggest to insert here:
-
-  If additional arguments QMP-COMMAND ARG=VAL... are given, run just
-  that QMP command instead of the REPL.
-
-Question: is this limited to simple arguments?  If no, how would I write
-an object argument?  For instance, how would I do
-
-    { "execute": "blockdev-add", "arguments": { "node-name": "foo", "driver": "nbd", "server": { "type": "inet", "host": "localhost", "port": "12345" } } }
-
-?
-
-> This is useful for testing QMP commands in scripts.
->
-> Example usage, combined with 'jq' for filtering the results:
->
->   $ ./scripts/qmp/qmp-shell /tmp/qmp qom-list path=/ | jq -r .return[].name
->   machine
->   type
->   chardevs
->   backend
-
-What's jq?
-
->   $
-
-Let's drop this line.
-
->
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+On Tue, Aug 15, 2017 at 10:36:04AM +0100, Daniel P. Berrange wrote:
+> The https://gitlab.com/keycodemap/keycodemapdb/ repo contains a
+> data file mapping between all the different scancode/keycode/keysym
+> sets that are known, and a tool to auto-generate lookup tables for
+> different combinations.
+> 
+> It is used by GTK-VNC, SPICE-GTK and libvirt for mapping keys.
+> Using it in QEMU will let us replace many hand written lookup
+> tables with auto-generated tables from a master data source,
+> reducing bugs. Adding new QKeyCodes will now only require the
+> master table to be updated, all ~20 other tables will be
+> automatically updated to follow.
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
-> Changes v1 -> v2:
-> * Rewritten using optparse module
-> ---
->  scripts/qmp/qmp-shell | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
->
-> diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
-> index 4b9a420..4b7374e 100755
-> --- a/scripts/qmp/qmp-shell
-> +++ b/scripts/qmp/qmp-shell
-> @@ -400,7 +400,7 @@ def die(msg):
->  
->  def main():
->      parser = optparse.OptionParser(description='QMP shell utility')
-> -    parser.set_usage("%prog [options] <UNIX socket path> | <TCP address:port>")
-> +    parser.set_usage("%prog [options] <UNIX socket path> | <TCP address:port> [COMMAND [ARG=VALUE]...]")
->      parser.add_option('-v', action='store_true', dest='verbose',
->          help='Verbose (echo command sent and received)')
->      parser.add_option('-p', action='store_true', dest='pretty',
-> @@ -411,10 +411,11 @@ def main():
->          default=True, help='Skip negotiate (for qemu-ga)')
->      opts,args = parser.parse_args()
->  
-> -    if len(args) != 1:
-> +    if len(args) < 1:
->          parser.print_help(sys.stderr)
->          sys.exit(1)
->      addr = args[0]
-> +    cmdargs = args[1:]
->  
->      try:
->          if opts.hmp:
-> @@ -433,10 +434,13 @@ def main():
->      except qemu.error:
->          die('Could not connect to %s' % addr)
->  
-> -    qemu.show_banner()
->      qemu.set_verbosity(opts.verbose)
-> -    while qemu.read_exec_command(qemu.get_prompt()):
-> -        pass
-> +    if len(cmdargs):
+>  .gitignore                    |  2 ++
+>  .gitmodules                   |  3 +++
+>  configure                     |  2 ++
+>  tests/docker/Makefile.include | 11 +++++++----
+>  tests/docker/run              |  4 +++-
+>  ui/Makefile.objs              | 18 ++++++++++++++++++
+>  ui/keycodemapdb               |  1 +
+>  7 files changed, 36 insertions(+), 5 deletions(-)
+>  create mode 160000 ui/keycodemapdb
+> 
 
-Superfluous len().
-
-> +        qemu.execute_cmdargs(cmdargs)
-> +    else:
-> +        qemu.show_banner()
-> +        while qemu.read_exec_command(qemu.get_prompt()):
-> +            pass
->      qemu.close()
+> diff --git a/configure b/configure
+> index dd73cce62f..bd373ec2b4 100755
+> --- a/configure
+> +++ b/configure
+> @@ -5258,6 +5258,8 @@ echo_version() {
+>      fi
+>  }
 >  
->  if __name__ == '__main__':
+> +(cd $source_path && git submodule update --init ui/keycodemapdb)
+> +
+
+Urgh, no, this won't work because of course you don't have to
+have a git checkout when running configure.
+
+Any suggestions on the "best" way to ensure that the ui/keycodemapdb
+git submodule is always checked out, without requiring developers to
+do something manually ?
+
+I could try
+
+  (cd $source_path && test -d .git && git submodule update --init ui/keycodemapdb)
+
+but wonder if there's a better way ?
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
