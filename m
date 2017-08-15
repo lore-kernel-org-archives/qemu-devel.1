@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dhc4L-0001qG-If
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:39:42 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dhc4a-0001yE-0U
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:39:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dhc4D-0003pr-Ne
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:39:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44644)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dhc4D-0003pO-Gt
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:39:33 -0400
-Date: Tue, 15 Aug 2017 14:39:23 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170815133923.GL9674@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1dhc4W-00044O-Pt
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:39:56 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:38514)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dhc4W-00043k-IK
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:39:52 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id f15so10104617wmg.1
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 06:39:52 -0700 (PDT)
+Date: Tue, 15 Aug 2017 14:39:48 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170815133948.GA12671@stefanha-x1.localdomain>
 References: <20170814231552.24593-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="9amGYk9869ThD9tj"
 Content-Disposition: inline
 In-Reply-To: <20170814231552.24593-1-pbonzini@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH for 2.10?] qxl: call
@@ -31,52 +33,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, ademaria@redhat.com, kraxel@redhat.com
 
+
+--9amGYk9869ThD9tj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
 On Tue, Aug 15, 2017 at 01:15:52AM +0200, Paolo Bonzini wrote:
 > Fixes this 2.10 regression:
-> 
+>=20
 >   $ qemu-system-x86_64  -cpu host -m 6144 -vga qxl -device qxl
->   qemu-system-x86_64: util/qemu-thread-posix.c:64: qemu_mutex_lock: Assertion `mutex->initialized' failed.
-> 
+>   qemu-system-x86_64: util/qemu-thread-posix.c:64: qemu_mutex_lock: Asser=
+tion `mutex->initialized' failed.
+>=20
 > Reported-by: ademaria@redhat.com
 > Cc: kraxel@redhat.com
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
 >  hw/display/qxl.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-> index 7f8c73b56d..ae3677fd1e 100644
-> --- a/hw/display/qxl.c
-> +++ b/hw/display/qxl.c
-> @@ -2054,6 +2054,7 @@ static void qxl_realize_common(PCIQXLDevice *qxl, Error **errp)
->      uint32_t pci_device_rev;
->      uint32_t io_size;
->  
-> +    qemu_spice_display_init_common(&qxl->ssd);
->      qxl->mode = QXL_MODE_UNDEFINED;
->      qxl->generation = 1;
->      qxl->num_memslots = NUM_MEMSLOTS;
-> @@ -2176,7 +2177,6 @@ static void qxl_realize_primary(PCIDevice *dev, Error **errp)
->      portio_list_add(&qxl->vga_port_list, pci_address_space_io(dev), 0x3b0);
->  
->      vga->con = graphic_console_init(DEVICE(dev), 0, &qxl_ops, qxl);
-> -    qemu_spice_display_init_common(&qxl->ssd);
->  
->      qxl_realize_common(qxl, &local_err);
->      if (local_err) {
 
-IIUC, we hit the abort because we have 2 QXL devices, and only
-qxl_realize_primary() is calling  qemu_spice_display_init_common().
-By moving the qemu_spice_display_init_common() call upto into
-the qxl_realize_common() method, it also gets triggered by
-qxl_realize_secondary(). It makes that we need to initialize the
-'ssd' field for both primary and secondary displays
+I have audited the code and cannot see any bad side-effects.  Looks good
+to me!
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--9amGYk9869ThD9tj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZkvmkAAoJEJykq7OBq3PIHsEH/jli+P/rBH5t+QFTFjSz5KRX
+NazR2s5dd+0Q1CHi3x72vEo9kCmChZiEPU1TTFCW3vUiengPmsNHWG7FH0Ywzqgg
+YUnN6p7f8/cmI1dhxR2096y6nQz8h9C63/Haqd63ZNREGmLFkyXNhFPiSN3LtTlF
+1t2ICs2Hn9NQQ8OCYFm1s2t3XheDYOHJFkQe0kNaOc3BQNYKJsZ+ZDCYle26M0Ek
+in3Va0YLvxp2dMCyG9f5+dYP+/pODddXjXAQrQAxge+sz41UDYAH7Hg9suIFeOrH
+dtj06EAO7pTiz4nB+vJtEYu1kN28WljfIk8esbEuSXBUr4Js2AgGXCiIjFJ/D7c=
+=N0d4
+-----END PGP SIGNATURE-----
+
+--9amGYk9869ThD9tj--
