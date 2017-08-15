@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dhXYE-0007UA-LA
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:50:15 -0400
+	(envelope-from <armbru@redhat.com>) id 1dhXfP-0002X1-P8
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:57:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dhXYB-0001Fv-Cz
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:50:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59022)
+	(envelope-from <armbru@redhat.com>) id 1dhXfL-0006Ol-5H
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:57:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44110)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dhXYB-0001FD-3J
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:50:11 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 078198124A
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 08:50:10 +0000 (UTC)
-Date: Tue, 15 Aug 2017 16:50:06 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170815085006.GA19446@pxdev.xzpeter.org>
-References: <1502777827-18874-1-git-send-email-peterx@redhat.com>
-	<1502777827-18874-6-git-send-email-peterx@redhat.com>
-	<20170815083714.GA9674@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dhXfK-0006OP-SY
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:57:35 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170731085110.1050-1-apahim@redhat.com>
+	<20170731085110.1050-8-apahim@redhat.com>
+Date: Tue, 15 Aug 2017 10:57:27 +0200
+In-Reply-To: <20170731085110.1050-8-apahim@redhat.com> (Amador Pahim's message
+	of "Mon, 31 Jul 2017 10:51:10 +0200")
+Message-ID: <878tilryx4.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170815083714.GA9674@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 5/6] migration: store listen task tag
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 7/7] qemu.py: include debug information
+ on launch error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,104 +28,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Amador Pahim <apahim@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, stefanha@gmail.com, mreitz@redhat.com, crosa@redhat.com
 
-On Tue, Aug 15, 2017 at 09:37:14AM +0100, Daniel P. Berrange wrote:
-> On Tue, Aug 15, 2017 at 02:17:06PM +0800, Peter Xu wrote:
-> > Store the task tag for migration types: tcp/unix/fd/exec in current
-> > MigrationIncomingState struct.
-> > 
-> > For defered migration, no need to store task tag since there is no task
-> > running in the main loop at all. For RDMA, let's mark it as todo.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  migration/migration.c | 22 ++++++++++++++++++----
-> >  migration/migration.h |  2 ++
-> >  2 files changed, 20 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index c9b7085..daf356b 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -171,6 +171,7 @@ void migration_incoming_state_destroy(void)
-> >          mis->from_src_file = NULL;
-> >      }
-> >  
-> > +    mis->listen_task_tag = 0;
-> >      qemu_event_destroy(&mis->main_thread_load_event);
-> >  }
-> >  
-> > @@ -265,25 +266,31 @@ int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
-> >  void qemu_start_incoming_migration(const char *uri, Error **errp)
-> >  {
-> >      const char *p;
-> > +    guint task_tag = 0;
-> > +    MigrationIncomingState *mis = migration_incoming_get_current();
-> >  
-> >      qapi_event_send_migration(MIGRATION_STATUS_SETUP, &error_abort);
-> >      if (!strcmp(uri, "defer")) {
-> >          deferred_incoming_migration(errp);
-> >      } else if (strstart(uri, "tcp:", &p)) {
-> > -        tcp_start_incoming_migration(p, errp);
-> > +        task_tag = tcp_start_incoming_migration(p, errp);
-> >  #ifdef CONFIG_RDMA
-> >      } else if (strstart(uri, "rdma:", &p)) {
-> > +        /* TODO: store task tag for RDMA migrations */
-> >          rdma_start_incoming_migration(p, errp);
-> >  #endif
-> >      } else if (strstart(uri, "exec:", &p)) {
-> > -        exec_start_incoming_migration(p, errp);
-> > +        task_tag = exec_start_incoming_migration(p, errp);
-> >      } else if (strstart(uri, "unix:", &p)) {
-> > -        unix_start_incoming_migration(p, errp);
-> > +        task_tag = unix_start_incoming_migration(p, errp);
-> >      } else if (strstart(uri, "fd:", &p)) {
-> > -        fd_start_incoming_migration(p, errp);
-> > +        task_tag = fd_start_incoming_migration(p, errp);
-> >      } else {
-> >          error_setg(errp, "unknown migration protocol: %s", uri);
-> > +        return;
-> >      }
-> > +
-> > +    mis->listen_task_tag = task_tag;
-> 
-> This is unsafe as currently written. The main loop watches that are
-> associated with these tags are all unregistered when incoming migration
-> starts. So if you save them, and then unregister later when postcopy
-> is "stuck", then you're likely unregistering a tag associated with
-> some other random part of QEMU, because the saved value is no longer
-> valid.
+Amador Pahim <apahim@redhat.com> writes:
 
-IIUC for incoming migration, the watch is not detached until
-migration_fd_process_incoming() completes. So:
+> When launching a VM, if an exception happens and the VM is not
+> initiated, it is useful to see the qemu command line that was executed
+> and the output of that command.
+>
+> Before this patch:
+>
+>     >>> import qemu
+>     >>> vm = qemu.QEMUMachine('qemu-system-aarch64', debug=True)
+>     >>> vm.launch()
+>     Traceback (most recent call last):
+>       File "<stdin>", line 1, in <module>
+>       File "qemu.py", line 175, in launch
+>         self._launch()
+>       File "qemu.py", line 189, in _launch
+>         self._post_launch()
+>       File "qemu.py", line 154, in _post_launch
+>         self._qmp.accept()
+>       File "qmp/qmp.py", line 145, in accept
+>         self.__sock, _ = self.__sock.accept()
+>       File "/usr/lib64/python2.7/socket.py", line 206, in accept
+>         sock, addr = self._sock.accept()
+>     socket.timeout: timed out
+>     >>>
+>
+> After this patch:
+>
+>     >>> import qemu
+>     >>> vm = qemu.QEMUMachine('qemu-system-aarch64', debug=True)
+>     >>> vm.launch()
+>     DEBUG:qemu:Error launching VM. Command: 'qemu-system-aarch64
+>     -chardev socket,id=mon,path=/var/tmp/qemu-5298-monitor.sock
+>     -mon chardev=mon,mode=control -display none -vga none'.
+>     Output: 'qemu-system-aarch64: No machine specified, and there
+>     is no default\nUse -machine help to list supported machines\n'.
+>     Traceback (most recent call last):
+>       File "<stdin>", line 1, in <module>
+>       File "qemu.py", line 175, in launch
+>         self._launch()
+>       File "qemu.py", line 189, in _launch
+>         self._post_launch()
+>       File "qemu.py", line 154, in _post_launch
+>         self._qmp.accept()
+>       File "qmp/qmp.py", line 145, in accept
+>         self.__sock, _ = self.__sock.accept()
+>       File "/usr/lib64/python2.7/socket.py", line 206, in accept
+>         sock, addr = self._sock.accept()
+>     socket.timeout: timed out
+>     >>>
+>
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
+> ---
+>  scripts/qemu.py | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index e9a3a96d13..43fd0b072c 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -158,7 +158,10 @@ class QEMUMachine(object):
+>              self._remove_if_exists(self._created_files.pop())
+>  
+>      def launch(self):
+> -        '''Launch the VM and establish a QMP connection'''
+> +        '''
+> +        Try to launch the VM and make sure we cleanup and expose the
+> +        command line/output in case of exception.
+> +        '''
+>  
+>          if self.is_running():
+>              raise QEMULaunchError('VM already running.')
+> @@ -169,6 +172,7 @@ class QEMUMachine(object):
+>                                    'before launching again.')
+>  
+>          try:
+> +            self._iolog = None
+>              self._qemu_full_args = None
+>              self._qemu_full_args = (self._wrapper + [self._binary] +
+>                                      self._base_args() + self._args)
+> @@ -176,9 +180,15 @@ class QEMUMachine(object):
+>              self._pending_shutdown = True
+>          except:
+>              self.shutdown()
+> +            LOG.debug('Error launching VM.%s%s',
+> +                      ' Command: %r.' % ' '.join(self._qemu_full_args)
+> +                      if self._qemu_full_args else '',
+> +                      ' Output: %r.' % self._iolog
+> +                      if self._iolog else '')
 
-- for precopy, the watch should be detached when migration completes
+This nested interpolation is too ugly to live :)
 
-- for postcopy, the watch should be detached when postcopy starts,
-  then main loop thread returns, while the ram_load_thread starts to
-  continue the migration.
+Nesting is easy to avoid:
 
-So basically the watch is detaching itself after
-migration_fd_process_incoming() completes. To handle that, this patch
-has this change:
+               LOG.debug('Error launching VM\n. ' Command: %r. Output: %r.'
+                         % (' '.join(self._qemu_full_args)
+                            if self._qemu_full_args else '',
+                            self._iolog
+                            if self._iolog else ''))
 
-@@ -422,6 +429,13 @@ void migration_fd_process_incoming(QEMUFile *f)
-         co = qemu_coroutine_create(process_incoming_migration_co, f);
-         qemu_coroutine_enter(co);
-     }
-+
-+    /*
-+     * When reach here, we should not need the listening port any
-+     * more. We'll detach the listening task soon, let's reset the
-+     * listen task tag.
-+     */
-+    mis->listen_task_tag = 0;
+Why %r and not %s?
 
-Would this make sure the listen_task_tag is always valid if nonzero?
+Are you sure '\n' is appropriate in the argument of LOG.debug()?
 
-Thanks,
+Why cram everything into a single LOG.debug()?
 
--- 
-Peter Xu
+               LOG.debug('Error launching VM')
+               LOG.debug('Command: %s' % (' '.join(self._qemu_full_args)
+                                          if self._qemu_full_args else ''))
+               LOG.debug('Output: %s' % self._iolog if self._iolog else ''))
+
+>              raise
+>  
+>      def _launch(self):
+> +        '''Launch the VM and establish a QMP connection.'''
+>          self._pre_launch()
+>          devnull = open(os.path.devnull, 'rb')
+>          self._popen = subprocess.Popen(self._qemu_full_args,
