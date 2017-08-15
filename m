@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dhbqS-00011j-LB
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:25:21 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dhbsz-0002wk-4w
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:27:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dhbqP-0000cQ-Uy
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:25:20 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170809140256.25584-2-el13635@mail.ntua.gr>
-References: <20170809140256.25584-1-el13635@mail.ntua.gr>
-	<20170809140256.25584-2-el13635@mail.ntua.gr>
-Date: Tue, 15 Aug 2017 15:24:38 +0200
-Message-ID: <w51fuctyne1.fsf@maestria.local.igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] block: skip implicit nodes in
- snapshots, blockjobs
+	(envelope-from <stefanha@redhat.com>) id 1dhbsw-0002q9-GX
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:27:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50568)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dhbsw-0002pe-Aq
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:27:54 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue, 15 Aug 2017 14:27:44 +0100
+Message-Id: <20170815132746.12540-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL 0/2] Tracing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,38 +21,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>
-Cc: qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Wed 09 Aug 2017 04:02:51 PM CEST, Manos Pitsidianakis wrote:
-> @@ -2988,6 +3004,9 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
->          return;
->      }
->  
-> +    /* Skip implicit filter nodes */
-> +    bs = bdrv_get_first_explicit(bs);
-> +
->      aio_context = bdrv_get_aio_context(bs);
->      aio_context_acquire(aio_context);
+The following changes since commit 5681da292242550f37ba4c03f46a8a6f8ee9278a:
 
-This change works here because right now the only implicit node that we
-could have in practice is the throttle node, but I wonder if this is
-good enough for any kind of implicit node in general.
+  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20170815' into staging (2017-08-15 09:39:14 +0100)
 
-> +static inline BlockDriverState *child_bs(BlockDriverState *bs)
-> +{
-> +    BdrvChild *child = QLIST_FIRST(&bs->children);
-> +    assert(child && !QLIST_NEXT(child, next));
-> +    return child->bs;
-> +}
+are available in the git repository at:
 
-This aborts if the bs has a number of children != 1. That's not
-something that I would expect from a function named like that.
+  git://github.com/stefanha/qemu.git tags/tracing-pull-request
 
-Considering that you're only using it in bdrv_get_first_explicit(), why
-don't you simply move the code there?
+for you to fetch changes up to 840d8351774664d01c328d31ed33b0e2d85c866e:
 
-The other question is of course whether we can rely for the future on
-the assumption that implicit nodes only have one children.
+  simpletrace: fix flight recorder --no-header option (2017-08-15 12:50:29 +0100)
 
-Berto
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Stefan Hajnoczi (2):
+  trace: use static event ID mapping in simpletrace.stp
+  simpletrace: fix flight recorder --no-header option
+
+ scripts/simpletrace.py                       | 24 +++++++++++++++------
+ scripts/tracetool/format/simpletrace_stap.py | 31 ++--------------------------
+ 2 files changed, 20 insertions(+), 35 deletions(-)
+
+-- 
+2.13.4
