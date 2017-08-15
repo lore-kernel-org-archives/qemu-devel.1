@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dhdTD-00049v-CH
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:09:33 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dhdkC-0007EB-H2
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:27:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dhdTC-0002cq-79
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:09:27 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Tue, 15 Aug 2017 10:09:06 -0500
-Message-Id: <20170815150907.21495-7-eblake@redhat.com>
-In-Reply-To: <20170815150907.21495-1-eblake@redhat.com>
-References: <20170815150907.21495-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 6/7] iotests: Add non-shared storage migration
- case 192
+	(envelope-from <cohuck@redhat.com>) id 1dhdk7-0004iz-K2
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:27:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43886)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dhdk7-0004ib-DO
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:26:55 -0400
+Date: Tue, 15 Aug 2017 17:26:43 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170815172643.423342d6.cohuck@redhat.com>
+In-Reply-To: <1502431076-22849-3-git-send-email-thuth@redhat.com>
+References: <1502431076-22849-1-git-send-email-thuth@redhat.com>
+	<1502431076-22849-3-git-send-email-thuth@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.11 2/2] tests/pxe: Check
+ virtio-net-ccw on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,113 +28,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Victor Kaplansky <victork@redhat.com>
 
-From: Fam Zheng <famz@redhat.com>
+On Fri, 11 Aug 2017 07:57:56 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170815130740.31229-5-famz@redhat.com>
-Tested-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- tests/qemu-iotests/192     | 63 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/192.out |  7 ++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 71 insertions(+)
- create mode 100755 tests/qemu-iotests/192
- create mode 100644 tests/qemu-iotests/192.out
+> Now that we've got a firmware that can do TFTP booting on s390x (i.e.
+> the pc-bios/s390-netboot.img), we can enable the PXE tester for this
+> architecture, too.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tests/Makefile.include |  1 +
+>  tests/boot-sector.c    | 20 ++++++++++++++++++++
+>  tests/pxe-test.c       |  7 +++++++
+>  3 files changed, 28 insertions(+)
 
-diff --git a/tests/qemu-iotests/192 b/tests/qemu-iotests/192
-new file mode 100755
-index 0000000000..b50a2c0c8e
---- /dev/null
-+++ b/tests/qemu-iotests/192
-@@ -0,0 +1,63 @@
-+#!/bin/bash
-+#
-+# Test NBD export with -incoming (non-shared storage migration use case from
-+# libvirt)
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=famz@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+	_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt generic
-+_supported_proto file
-+_supported_os Linux
-+
-+if [ "$QEMU_DEFAULT_MACHINE" != "pc" ]; then
-+    _notrun "Requires a PC machine"
-+fi
-+
-+size=64M
-+_make_test_img $size
-+
-+{
-+echo "nbd_server_start unix:$TEST_DIR/nbd"
-+echo "nbd_server_add -w drive0"
-+echo "q"
-+} | $QEMU -nodefaults -display none -monitor stdio \
-+    -drive format=$IMGFMT,file=$TEST_IMG,if=ide,id=drive0 \
-+    -incoming defer 2>&1 | _filter_testdir | _filter_qemu | _filter_hmp
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/192.out b/tests/qemu-iotests/192.out
-new file mode 100644
-index 0000000000..1e0be4c4d7
---- /dev/null
-+++ b/tests/qemu-iotests/192.out
-@@ -0,0 +1,7 @@
-+QA output created by 192
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) nbd_server_start unix:TEST_DIR/nbd
-+(qemu) nbd_server_add -w drive0
-+(qemu) q
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 1848077932..afbdc427ea 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -186,3 +186,4 @@
- 188 rw auto quick
- 189 rw auto
- 190 rw auto quick
-+192 rw auto quick
--- 
-2.13.5
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
