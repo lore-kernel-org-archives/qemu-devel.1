@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dhZU2-0006dK-QN
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:54:04 -0400
+	(envelope-from <famz@redhat.com>) id 1dhZXM-0007qk-Fe
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:57:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dhZTz-00009r-8u
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:54:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41316)
+	(envelope-from <famz@redhat.com>) id 1dhZXJ-0002Jl-Dx
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:57:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36760)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dhZTy-00009U-W2
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:53:59 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CA9DD9D416
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 10:53:57 +0000 (UTC)
-Date: Tue, 15 Aug 2017 11:53:50 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170815105350.GI9674@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170815093615.16453-1-berrange@redhat.com>
-	<20170815093615.16453-2-berrange@redhat.com>
-	<20170815100410.GH9674@redhat.com> <20170815104722.GB14412@lemon>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dhZXJ-0002JH-7T
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 06:57:25 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Tue, 15 Aug 2017 18:57:16 +0800
+Message-Id: <20170815105721.31893-1-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170815104722.GB14412@lemon>
-Subject: Re: [Qemu-devel] [PATCH v4 01/12] ui: add keycodemapdb repository
- as a GIT submodule
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/5] Build and test patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,96 +24,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-On Tue, Aug 15, 2017 at 06:47:22PM +0800, Fam Zheng wrote:
-> On Tue, 08/15 11:04, Daniel P. Berrange wrote:
-> > On Tue, Aug 15, 2017 at 10:36:04AM +0100, Daniel P. Berrange wrote:
-> > > The https://gitlab.com/keycodemap/keycodemapdb/ repo contains a
-> > > data file mapping between all the different scancode/keycode/keysym
-> > > sets that are known, and a tool to auto-generate lookup tables for
-> > > different combinations.
-> > > 
-> > > It is used by GTK-VNC, SPICE-GTK and libvirt for mapping keys.
-> > > Using it in QEMU will let us replace many hand written lookup
-> > > tables with auto-generated tables from a master data source,
-> > > reducing bugs. Adding new QKeyCodes will now only require the
-> > > master table to be updated, all ~20 other tables will be
-> > > automatically updated to follow.
-> > > 
-> > > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > > ---
-> > >  .gitignore                    |  2 ++
-> > >  .gitmodules                   |  3 +++
-> > >  configure                     |  2 ++
-> > >  tests/docker/Makefile.include | 11 +++++++----
-> > >  tests/docker/run              |  4 +++-
-> > >  ui/Makefile.objs              | 18 ++++++++++++++++++
-> > >  ui/keycodemapdb               |  1 +
-> > >  7 files changed, 36 insertions(+), 5 deletions(-)
-> > >  create mode 160000 ui/keycodemapdb
-> > > 
-> > 
-> > > diff --git a/configure b/configure
-> > > index dd73cce62f..bd373ec2b4 100755
-> > > --- a/configure
-> > > +++ b/configure
-> > > @@ -5258,6 +5258,8 @@ echo_version() {
-> > >      fi
-> > >  }
-> > >  
-> > > +(cd $source_path && git submodule update --init ui/keycodemapdb)
-> > > +
-> > 
-> > Urgh, no, this won't work because of course you don't have to
-> > have a git checkout when running configure.
-> > 
-> > Any suggestions on the "best" way to ensure that the ui/keycodemapdb
-> > git submodule is always checked out, without requiring developers to
-> > do something manually ?
-> > 
-> > I could try
-> > 
-> >   (cd $source_path && test -d .git && git submodule update --init ui/keycodemapdb)
-> > 
-> > but wonder if there's a better way ?
-> 
-> I think the way dtc handles this is okay: probe headers/libs, if failed, hint
-> the "git submodule update" command in the error message.  This is also a
-> familiar/friendly user interface to developers.
+The following changes since commit 83c3a1f61673ef554facf4d6d29ed56c5a219f=
+9d:
 
-I don't think that's acceptable in this case. Few people will ever need
-to setup the dtc submodule as distros commonly have that available.
+  xlnx-qspi: add a property for mmio-execution (2017-08-14 14:17:18 +0100=
+)
 
-For the keycodemapdb *EVERY* single person who builds QEMU from git will
-need it, and they'll also need to update it periodically when the submodule
-hash changes. So we need to have it automated IMHO.
+are available in the git repository at:
 
-> (If you looks at the test snippet that patchew runs, there is an explicit
-> submodule command:
-> 
->     #!/bin/bash
->     set -e
->     git submodule update --init dtc
->     # Let docker tests dump environment info
->     export SHOW_ENV=1
->     export J=8
->     time make docker-test-quick@centos6
->     time make docker-test-build@min-glib
->     time make docker-test-mingw@fedora
-> 
-> as the libfdt devel package is not available in every docker images.)
+  git://github.com/famz/qemu.git tags/build-and-test-pull-request
 
-IMHO that is a bad approach because someone typing
-'make docker-test-mingw@fedora' is  going to be missing the dtc
-module. You'll see in this case I extended the docker/Makefile
-to always pull in keycodemapdb, not rely on someone remembering
-todo it manually.
+for you to fetch changes up to a8132a2f288c260fb43243eb3c092b5186d84968:
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+  docker: add centos7 image (2017-08-15 15:16:45 +0800)
+
+----------------------------------------------------------------
+
+One fix and a few docker test enhancements. Not 2.10 blocker, but it's
+good to have them.
+
+----------------------------------------------------------------
+
+Fam Zheng (1):
+  Makefile: Let "make check-help" work without running ./configure
+
+Philippe Mathieu-Daud=C3=A9 (4):
+  docker: use one package per line in CentOS config
+  docker: add Xen libs to centos6 image
+  docker: install more packages on CentOS to extend code coverage
+  docker: add centos7 image
+
+ Makefile                                |  2 --
+ tests/Makefile.include                  | 46 ++++++++++++++++++---------=
+------
+ tests/docker/dockerfiles/centos6.docker | 31 ++++++++++++++++++----
+ tests/docker/dockerfiles/centos7.docker | 31 ++++++++++++++++++++++
+ 4 files changed, 82 insertions(+), 28 deletions(-)
+ create mode 100644 tests/docker/dockerfiles/centos7.docker
+
+--=20
+2.13.4
