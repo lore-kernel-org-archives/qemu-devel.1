@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dhaRs-0000mW-8k
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 07:55:53 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dhadh-00057r-Ti
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 08:08:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dhaRn-0002O6-6l
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 07:55:52 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:36817)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dhaRm-0002M7-VV
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 07:55:47 -0400
-Received: by mail-wm0-x235.google.com with SMTP id t201so7188252wmt.1
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 04:55:46 -0700 (PDT)
-Date: Tue, 15 Aug 2017 12:55:43 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170815115543.GC22606@stefanha-x1.localdomain>
-References: <20170815085732.9794-1-ldoktor@redhat.com>
-	<20170815085732.9794-2-ldoktor@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1dhadb-0003Ot-T2
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 08:08:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57156)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dhadb-0003OU-JO
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 08:07:59 -0400
+Date: Tue, 15 Aug 2017 14:07:51 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170815140751.2d432a46@nial.brq.redhat.com>
+In-Reply-To: <20170815111549.6232-2-anthony.perard@citrix.com>
+References: <20170815111549.6232-1-anthony.perard@citrix.com>
+	<20170815111549.6232-2-anthony.perard@citrix.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="7qSK/uQB79J36Y4o"
-Content-Disposition: inline
-In-Reply-To: <20170815085732.9794-2-ldoktor@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 01/10] qemu.py: Pylint/style fixes
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.10 v2 1/2] hw/acpi: Call
+ acpi_set_pci_info when no ACPI tables needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +28,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
+To: Anthony PERARD <anthony.perard@citrix.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Bruce Rogers <brogers@suse.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+
+On Tue, 15 Aug 2017 12:15:48 +0100
+Anthony PERARD <anthony.perard@citrix.com> wrote:
+
+> To do PCI passthrough with Xen, the property acpi-pcihp-bsel needs to be
+> set, but this was done only when ACPI tables are built which is not
+> needed for a Xen guest. The need for the property starts with commit
+> "pc: pcihp: avoid adding ACPI_PCIHP_PROP_BSEL twice"
+> (f0c9d64a68b776374ec4732424a3e27753ce37b6).
+> 
+> Set pci info before checking for the needs to build ACPI tables.
+> 
+> Assign bsel=0 property only to the root bus on Xen as there is no
+> support in the Xen ACPI tables for a different value.
+
+looking at hw/acpi/pcihp.c and bsel usage there it looks like
+bsel property is owned by it and not by ACPI tables, so instead of
+shuffling it in acpi_setup(), how about moving bsel initialization
+to hw/acpi/pcihp.c and initialize it there unconditionally?
+
+It could be as simple as moving acpi_set_pci_info()/acpi_set_bsel()
+there and calling it from acpi_pcihp_reset().
+
+Then there won't be need for Xen specific branches, as root bus
+will have bsel set automatically which is sufficient for Xen and
+the rest of bsel-s (bridges) will be just unused by Xen,
+which could later extend its ACPI table implementation to utilize them. 
 
 
---7qSK/uQB79J36Y4o
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Aug 15, 2017 at 10:57:23AM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
-> No actual code changes, just several pylint/style fixes and docstring
-> clarifications.
->=20
-> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> Reported-by: Sander Eikelenboom <linux@eikelenboom.it>
+> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+> 
 > ---
->  scripts/qemu.py | 76 ++++++++++++++++++++++++++++++++++++++++-----------=
-------
->  1 file changed, 53 insertions(+), 23 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---7qSK/uQB79J36Y4o
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZkuE/AAoJEJykq7OBq3PI5B0IAMDItfCKFwjhBfMPviKu5qPP
-W5klEP7h1PX86l+1EEGUmkf36F1Mq6+noa/UMHvMqjqAygimk1Ty6qNsELI313UH
-87BF0yBLyOdqs9TFU9UX9wUxuYlHLsf8/VelDSWozTfSlCgHrNcRnwV/KUoDyfo4
-RA4Te06KISFlFhOyhW2EQyxtkyycZzGZu/1Bqxz6Uhc5mJrr6WY8ruFAxWkcZH0+
-VbA4QOgKvuq9w/HkTFWpIEPsVQk7fd94EuL7TczGFg03nPrenYsDEnszPpna1e/c
-/yeYg+Dh5SkL1ULjXro8uszzHq/YfVpKgk2jZ7hDp3fg4/M7+ptSMaPsFZ7wyXE=
-=yUgK
------END PGP SIGNATURE-----
-
---7qSK/uQB79J36Y4o--
+> Changes in V2:
+>   - check for acpi_enabled before calling acpi_set_pci_info.
+>   - set the property on the root bus only.
+> 
+> This patch would be a canditade to backport to 2.9.
+> 
+> CC: Stefano Stabellini <sstabellini@kernel.org>
+> CC: Bruce Rogers <brogers@suse.com>
+> ---
+>  hw/i386/acpi-build.c | 25 ++++++++++++++++---------
+>  1 file changed, 16 insertions(+), 9 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 98dd424678..c0483b96cf 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -46,6 +46,7 @@
+>  #include "sysemu/tpm_backend.h"
+>  #include "hw/timer/mc146818rtc_regs.h"
+>  #include "sysemu/numa.h"
+> +#include "hw/xen/xen.h"
+>  
+>  /* Supported chipsets: */
+>  #include "hw/acpi/piix4.h"
+> @@ -518,8 +519,13 @@ static void acpi_set_pci_info(void)
+>      unsigned bsel_alloc = ACPI_PCIHP_BSEL_DEFAULT;
+>  
+>      if (bus) {
+> -        /* Scan all PCI buses. Set property to enable acpi based hotplug. */
+> -        pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_alloc);
+> +        if (xen_enabled()) {
+> +            /* Assign BSEL property to root bus only. */
+> +            acpi_set_bsel(bus, &bsel_alloc);
+> +        } else {
+> +            /* Scan all PCI buses. Set property to enable acpi based hotplug. */
+> +            pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_alloc);
+> +        }
+>      }
+>  }
+>  
+> @@ -2871,6 +2877,14 @@ void acpi_setup(void)
+>      AcpiBuildState *build_state;
+>      Object *vmgenid_dev;
+>  
+> +    if (!acpi_enabled) {
+> +        ACPI_BUILD_DPRINTF("ACPI disabled. Bailing out.\n");
+> +        return;
+> +    }
+> +
+> +    /* Assign BSEL property on hotpluggable PCI buses. */
+> +    acpi_set_pci_info();
+> +
+>      if (!pcms->fw_cfg) {
+>          ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
+>          return;
+> @@ -2881,15 +2895,8 @@ void acpi_setup(void)
+>          return;
+>      }
+>  
+> -    if (!acpi_enabled) {
+> -        ACPI_BUILD_DPRINTF("ACPI disabled. Bailing out.\n");
+> -        return;
+> -    }
+> -
+>      build_state = g_malloc0(sizeof *build_state);
+>  
+> -    acpi_set_pci_info();
+> -
+>      acpi_build_tables_init(&tables);
+>      acpi_build(&tables, MACHINE(pcms));
+>  
