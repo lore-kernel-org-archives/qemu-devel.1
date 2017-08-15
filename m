@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhXmA-0001Cq-Hn
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:04:40 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1dhXoP-0003dV-Lh
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:06:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhXm5-0003La-W4
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:04:38 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:35447
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhXm5-0003L0-La
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:04:33 -0400
-References: <1502705471-28407-1-git-send-email-douly.fnst@cn.fujitsu.com>
-	<20170814124439.GM3108@localhost.localdomain>
-	<ad7ef887-7ff5-84f5-dfca-035dcd915c15@cn.fujitsu.com>
-	<20170815100418.134860d2@nial.brq.redhat.com>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <fb0d639d-f848-5fe3-925c-ef27e1eb7980@cn.fujitsu.com>
-Date: Tue, 15 Aug 2017 17:04:27 +0800
+	(envelope-from <ldoktor@redhat.com>) id 1dhXoO-0005Ki-U0
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:06:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47746)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1dhXoO-0005J3-Oo
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:06:56 -0400
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>
+Date: Tue, 15 Aug 2017 10:57:25 +0200
+Message-Id: <20170815085732.9794-4-ldoktor@redhat.com>
+In-Reply-To: <20170815085732.9794-1-ldoktor@redhat.com>
+References: <20170815085732.9794-1-ldoktor@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170815100418.134860d2@nial.brq.redhat.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] numa: Add a check whether the node0 has
- memory or not
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 03/10] qemu.py: Use iteritems rather than
+ keys()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, armbru@redhat.com, david@redhat.com, "Michael S.
-	Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
 
-Hi Igor,
+Let's avoid creating an in-memory list of keys and query for each value
+and use `iteritems` which is an iterator of key-value pairs.
 
-At 08/15/2017 04:04 PM, Igor Mammedov wrote:
-> On Tue, 15 Aug 2017 09:26:46 +0800
-> Dou Liyang <douly.fnst@cn.fujitsu.com> wrote:
->
->> Hi Eduardo,
->>
->> At 08/14/2017 08:44 PM, Eduardo Habkost wrote:
->>> On Mon, Aug 14, 2017 at 06:11:11PM +0800, Dou Liyang wrote:
->>>> Currently, Using the fisrt node without memory on the machine makes
->>>> QEMU unhappy. With this example command line:
->>>>   ... \
->>>>   -m 1024M,slots=4,maxmem=32G \
->>>>   -numa node,nodeid=0 \
->>>>   -numa node,mem=1024M,nodeid=1 \
->>>>   -numa node,nodeid=2 \
->>>>   -numa node,nodeid=3 \
->>>> Guest reports "No NUMA configuration found" and the NUMA topology is
->>>> wrong.
->>>>
->>>> This is because when QEMU builds ACPI SRAT, it regards node0 as the
->>>> default node to deal with the memory hole(640K-1M). this means the
->>>> node0 must have some memory(>1M) firstly.
->>>>
->>>> Add a check in parse_numa_opts to avoid this situation.
->>>>
->>>> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
->>>> ---
->>>>  numa.c | 4 ++++
->>>>  1 file changed, 4 insertions(+)
->>>>
->>>> diff --git a/numa.c b/numa.c
->>>> index e32af04..1d6f73f 100644
->>>> --- a/numa.c
->>>> +++ b/numa.c
->>>> @@ -464,6 +464,10 @@ void parse_numa_opts(MachineState *ms)
->>>>          if (i == nb_numa_nodes) {
->>>>              assert(mc->numa_auto_assign_ram);
->>>>              mc->numa_auto_assign_ram(mc, numa_info, nb_numa_nodes, ram_size);
->>>> +        } else if (i != 0) {
->>>> +            error_report("The first NUMA node must have some memory"
->>>> +                          " for building ACPI SART");
->>>> +            exit(1);
->>>
->>> This doesn't belong to numa.c.  numa.c is generic code, and the
->>> requirement you described is specific for PC.
->>>
->>> Anyway, adding this check would make existing VM configurations
->>> refuse to run after a QEMU upgrade.  I suggest fixing the bug in
->>> the ACPI code instead.
->>>
->>
->> I see.
->>
->> If fixing the bug in the ACPI code, I have two solutions:
->>
->> 1). Add a check in build_srat(). If the first node has no memory, QEMU
->> will exit.
->>
->> 2). Fix the initialization of memory affinity structure to cover this
->> situation. Using the first node which has memory to deal with the memory
->> hole.
->>
->> I prefer solution 2. what about you?
-> I'd go for 2nd solution
->
+Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
+ scripts/qemu.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Yeah, I see. And I just sent the 2nd solution, waiting for your reply.
-
-Thanks,
-	dou.
-
->>
->> Thanks,
->> 	dou.
->>
->>
->
->
->
->
+diff --git a/scripts/qemu.py b/scripts/qemu.py
+index 888f5b3..571f852 100644
+--- a/scripts/qemu.py
++++ b/scripts/qemu.py
+@@ -185,11 +185,11 @@ class QEMUMachine(object):
+     def qmp(self, cmd, conv_keys=3DTrue, **args):
+         '''Invoke a QMP command and return the result dict'''
+         qmp_args =3D dict()
+-        for key in args.keys():
++        for key, value in args.iteritems():
+             if conv_keys:
+-                qmp_args[key.translate(self.underscore_to_dash)] =3D arg=
+s[key]
++                qmp_args[key.translate(self.underscore_to_dash)] =3D val=
+ue
+             else:
+-                qmp_args[key] =3D args[key]
++                qmp_args[key] =3D value
+=20
+         return self._qmp.cmd(cmd, args=3Dqmp_args)
+=20
+--=20
+2.9.4
