@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dhXSy-0002sZ-Om
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:44:49 -0400
+	(envelope-from <famz@redhat.com>) id 1dhXTx-0003r5-RQ
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:45:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dhXSv-0005yn-Lz
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:44:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48846)
+	(envelope-from <famz@redhat.com>) id 1dhXTx-0006qx-1c
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:45:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55802)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dhXSv-0005yQ-D2
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:44:45 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 582216C0AA
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 08:44:44 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 15 Aug 2017 09:44:30 +0100
-Message-Id: <20170815084430.7128-3-stefanha@redhat.com>
-In-Reply-To: <20170815084430.7128-1-stefanha@redhat.com>
-References: <20170815084430.7128-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 v2 2/2] simpletrace: fix flight
- recorder --no-header option
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dhXTw-0006qL-Rp
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:45:48 -0400
+Date: Tue, 15 Aug 2017 16:45:45 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170815084545.GA14412@lemon>
+References: <20170728233316.13352-1-f4bug@amsat.org>
+	<20170728233316.13352-5-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170728233316.13352-5-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/4] docker: add centos7 image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Daniel Berrange <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 
-The simpletrace.py script can pretty-print flight recorder ring buffers.
-These are not full simpletrace binary trace files but just the end of a
-trace file.  There is no header and the event ID mapping information is
-often unavailable since the ring buffer may have filled up and discarded
-event ID mapping records.
+On Fri, 07/28 20:33, Philippe Mathieu-Daud=E9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+>  tests/docker/dockerfiles/centos7.docker | 31 +++++++++++++++++++++++++=
+++++++
+>  1 file changed, 31 insertions(+)
+>  create mode 100644 tests/docker/dockerfiles/centos7.docker
+>=20
+> diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/doc=
+kerfiles/centos7.docker
+> new file mode 100644
+> index 0000000000..0b59aa2f26
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/centos7.docker
+> @@ -0,0 +1,31 @@
+> +FROM centos:7
+> +RUN yum install -y epel-release centos-release-xen
+> +RUN yum -y update
+> +ENV PACKAGES \
+> +    bison \
+> +    bzip2-devel \
+> +    ccache \
+> +    csnappy-devel \
+> +    flex \
+> +    g++ \
+> +    gcc \
+> +    git \
+> +    glib2-devel \
+> +    libepoxy-devel \
+> +    libfdt-devel \
+> +    librdmacm-devel \
+> +    lzo-devel \
+> +    make \
+> +    mesa-libEGL-devel \
+> +    mesa-libgbm-devel \
+> +    pixman-devel \
+> +    SDL-devel \
+> +    spice-glib-devel \
+> +    spice-server-devel \
+> +    tar \
+> +    vte-devel \
+> +    xen-devel \
+> +    zlib-devel
+> +RUN yum install -y $PACKAGES
+> +RUN rpm -q $PACKAGES | sort > /packages.txt
+> +
+> --=20
+> 2.13.3
+>=20
 
-The simpletrace.stp script that generates ring buffer traces uses the
-same trace-events-all input file as simpletrace.py.  Therefore both
-scripts have the same global ordering of trace events.  A dynamic event
-ID mapping isn't necessary: just use the trace-events-all file as the
-reference for how event IDs are numbered.
+Not a fault of this patch but I found that "test-quick" fails at vhost-us=
+er-test
+due to -EACCESS in qemu_memfd_alloc():ftruncate(). Adding --privileged to=
+ the
+docker run command line fixes it.
 
-It is now possible to analyze simpletrace.stp ring buffers again using:
-
-  $ ./simpletrace.py trace-events-all path/to/ring-buffer
-
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- scripts/simpletrace.py | 24 ++++++++++++++++++------
- 1 file changed, 18 insertions(+), 6 deletions(-)
-
-diff --git a/scripts/simpletrace.py b/scripts/simpletrace.py
-index 2a977e2ab9..a3a6315055 100755
---- a/scripts/simpletrace.py
-+++ b/scripts/simpletrace.py
-@@ -97,11 +97,17 @@ def read_trace_header(fobj):
-         raise ValueError('Log format %d not supported with this QEMU release!'
-                          % log_version)
- 
--def read_trace_records(edict, fobj):
--    """Deserialize trace records from a file, yielding record tuples (event_num, timestamp, pid, arg1, ..., arg6)."""
--    idtoname = {
--        dropped_event_id: "dropped"
--    }
-+def read_trace_records(edict, idtoname, fobj):
-+    """Deserialize trace records from a file, yielding record tuples (event_num, timestamp, pid, arg1, ..., arg6).
-+
-+    Note that `idtoname` is modified if the file contains mapping records.
-+
-+    Args:
-+        edict (str -> Event): events dict, indexed by name
-+        idtoname (int -> str): event names dict, indexed by event ID
-+        fobj (file): input file
-+
-+    """
-     while True:
-         t = fobj.read(8)
-         if len(t) == 0:
-@@ -171,10 +177,16 @@ def process(events, log, analyzer, read_header=True):
- 
-     dropped_event = Event.build("Dropped_Event(uint64_t num_events_dropped)")
-     edict = {"dropped": dropped_event}
-+    idtoname = {dropped_event_id: "dropped"}
- 
-     for event in events:
-         edict[event.name] = event
- 
-+    # If there is no header assume event ID mapping matches events list
-+    if not read_header:
-+        for event_id, event in enumerate(events):
-+            idtoname[event_id] = event.name
-+
-     def build_fn(analyzer, event):
-         if isinstance(event, str):
-             return analyzer.catchall
-@@ -197,7 +209,7 @@ def process(events, log, analyzer, read_header=True):
- 
-     analyzer.begin()
-     fn_cache = {}
--    for rec in read_trace_records(edict, log):
-+    for rec in read_trace_records(edict, idtoname, log):
-         event_num = rec[0]
-         event = edict[event_num]
-         if event_num not in fn_cache:
--- 
-2.13.4
+Fam
