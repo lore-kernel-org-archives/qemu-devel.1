@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dhdTD-0004A9-Iv
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:09:28 -0400
+	(envelope-from <eblake@redhat.com>) id 1dhdTD-00049v-CH
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:09:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dhdTC-0002d1-9z
+	(envelope-from <eblake@redhat.com>) id 1dhdTC-0002cq-79
 	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:09:27 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 15 Aug 2017 10:09:07 -0500
-Message-Id: <20170815150907.21495-8-eblake@redhat.com>
+Date: Tue, 15 Aug 2017 10:09:06 -0500
+Message-Id: <20170815150907.21495-7-eblake@redhat.com>
 In-Reply-To: <20170815150907.21495-1-eblake@redhat.com>
 References: <20170815150907.21495-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 7/7] nbd-client: Fix regression when server
- sends garbage
+Subject: [Qemu-devel] [PULL 6/7] iotests: Add non-shared storage migration
+ case 192
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,137 +21,112 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-When we switched NBD to use coroutines for qemu 2.9 (in particular,
-commit a12a712a), we introduced a regression: if a server sends us
-garbage (such as a corrupted magic number), we quit the read loop
-but do not stop sending further queued commands, resulting in the
-client hanging when it never reads the response to those additional
-commands.  In qemu 2.8, we properly detected that the server is no
-longer reliable, and cancelled all existing pending commands with
-EIO, then tore down the socket so that all further command attempts
-get EPIPE.
+From: Fam Zheng <famz@redhat.com>
 
-Restore the proper behavior of quitting (almost) all communication
-with a broken server: Once we know we are out of sync or otherwise
-can't trust the server, we must assume that any further incoming
-data is unreliable and therefore end all pending commands with EIO,
-and quit trying to send any further commands.  As an exception, we
-still (try to) send NBD_CMD_DISC to let the server know we are going
-away (in part, because it is easier to do that than to further
-refactor nbd_teardown_connection, and in part because it is the
-only command where we do not have to wait for a reply).
-
-Based on a patch by Vladimir Sementsov-Ogievskiy.
-
-A malicious server can be created with the following hack,
-followed by setting NBD_SERVER_DEBUG to a non-zero value in the
-environment when running qemu-nbd:
-
-| --- a/nbd/server.c
-| +++ b/nbd/server.c
-| @@ -919,6 +919,17 @@ static int nbd_send_reply(QIOChannel *ioc, NBDReply *reply, Error **errp)
-|      stl_be_p(buf + 4, reply->error);
-|      stq_be_p(buf + 8, reply->handle);
-|
-| +    static int debug;
-| +    static int count;
-| +    if (!count++) {
-| +        const char *str = getenv("NBD_SERVER_DEBUG");
-| +        if (str) {
-| +            debug = atoi(str);
-| +        }
-| +    }
-| +    if (debug && !(count % debug)) {
-| +        buf[0] = 0;
-| +    }
-|      return nbd_write(ioc, buf, sizeof(buf), errp);
-|  }
-
-Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Message-Id: <20170815130740.31229-5-famz@redhat.com>
+Tested-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20170814213426.24681-1-eblake@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/nbd-client.h |  1 +
- block/nbd-client.c | 17 +++++++++++++----
- 2 files changed, 14 insertions(+), 4 deletions(-)
+ tests/qemu-iotests/192     | 63 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/192.out |  7 ++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 71 insertions(+)
+ create mode 100755 tests/qemu-iotests/192
+ create mode 100644 tests/qemu-iotests/192.out
 
-diff --git a/block/nbd-client.h b/block/nbd-client.h
-index df80771357..1935ffbcaa 100644
---- a/block/nbd-client.h
-+++ b/block/nbd-client.h
-@@ -29,6 +29,7 @@ typedef struct NBDClientSession {
-
-     Coroutine *recv_coroutine[MAX_NBD_REQUESTS];
-     NBDReply reply;
-+    bool quit;
- } NBDClientSession;
-
- NBDClientSession *nbd_get_client_session(BlockDriverState *bs);
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 25dd28406b..422ecb4307 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -73,7 +73,7 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
-     int ret;
-     Error *local_err = NULL;
-
--    for (;;) {
-+    while (!s->quit) {
-         assert(s->reply.handle == 0);
-         ret = nbd_receive_reply(s->ioc, &s->reply, &local_err);
-         if (ret < 0) {
-@@ -107,6 +107,9 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
-         qemu_coroutine_yield();
-     }
-
-+    if (ret < 0) {
-+        s->quit = true;
-+    }
-     nbd_recv_coroutines_enter_all(s);
-     s->read_reply_co = NULL;
- }
-@@ -135,6 +138,10 @@ static int nbd_co_send_request(BlockDriverState *bs,
-     assert(i < MAX_NBD_REQUESTS);
-     request->handle = INDEX_TO_HANDLE(s, i);
-
-+    if (s->quit) {
-+        qemu_co_mutex_unlock(&s->send_mutex);
-+        return -EIO;
-+    }
-     if (!s->ioc) {
-         qemu_co_mutex_unlock(&s->send_mutex);
-         return -EPIPE;
-@@ -143,7 +150,7 @@ static int nbd_co_send_request(BlockDriverState *bs,
-     if (qiov) {
-         qio_channel_set_cork(s->ioc, true);
-         rc = nbd_send_request(s->ioc, request);
--        if (rc >= 0) {
-+        if (rc >= 0 && !s->quit) {
-             ret = nbd_rwv(s->ioc, qiov->iov, qiov->niov, request->len, false,
-                           NULL);
-             if (ret != request->len) {
-@@ -154,6 +161,9 @@ static int nbd_co_send_request(BlockDriverState *bs,
-     } else {
-         rc = nbd_send_request(s->ioc, request);
-     }
-+    if (rc < 0) {
-+        s->quit = true;
-+    }
-     qemu_co_mutex_unlock(&s->send_mutex);
-     return rc;
- }
-@@ -168,8 +178,7 @@ static void nbd_co_receive_reply(NBDClientSession *s,
-     /* Wait until we're woken up by nbd_read_reply_entry.  */
-     qemu_coroutine_yield();
-     *reply = s->reply;
--    if (reply->handle != request->handle ||
--        !s->ioc) {
-+    if (reply->handle != request->handle || !s->ioc || s->quit) {
-         reply->error = EIO;
-     } else {
-         if (qiov && reply->error == 0) {
+diff --git a/tests/qemu-iotests/192 b/tests/qemu-iotests/192
+new file mode 100755
+index 0000000000..b50a2c0c8e
+--- /dev/null
++++ b/tests/qemu-iotests/192
+@@ -0,0 +1,63 @@
++#!/bin/bash
++#
++# Test NBD export with -incoming (non-shared storage migration use case from
++# libvirt)
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=famz@redhat.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1	# failure is the default!
++
++_cleanup()
++{
++	_cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt generic
++_supported_proto file
++_supported_os Linux
++
++if [ "$QEMU_DEFAULT_MACHINE" != "pc" ]; then
++    _notrun "Requires a PC machine"
++fi
++
++size=64M
++_make_test_img $size
++
++{
++echo "nbd_server_start unix:$TEST_DIR/nbd"
++echo "nbd_server_add -w drive0"
++echo "q"
++} | $QEMU -nodefaults -display none -monitor stdio \
++    -drive format=$IMGFMT,file=$TEST_IMG,if=ide,id=drive0 \
++    -incoming defer 2>&1 | _filter_testdir | _filter_qemu | _filter_hmp
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/192.out b/tests/qemu-iotests/192.out
+new file mode 100644
+index 0000000000..1e0be4c4d7
+--- /dev/null
++++ b/tests/qemu-iotests/192.out
+@@ -0,0 +1,7 @@
++QA output created by 192
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) nbd_server_start unix:TEST_DIR/nbd
++(qemu) nbd_server_add -w drive0
++(qemu) q
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 1848077932..afbdc427ea 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -186,3 +186,4 @@
+ 188 rw auto quick
+ 189 rw auto
+ 190 rw auto quick
++192 rw auto quick
 -- 
 2.13.5
