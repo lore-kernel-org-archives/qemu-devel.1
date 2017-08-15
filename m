@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1dhXlg-0000hL-3G
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:04:09 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1dhXlq-0000sE-QV
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:04:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1dhXlb-00036a-6l
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:04:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58430)
+	(envelope-from <ldoktor@redhat.com>) id 1dhXlm-0003Bp-68
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:04:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57974)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1dhXlb-00036G-01
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:04:03 -0400
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1dhXlm-0003BL-0U
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 05:04:14 -0400
 From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>
-Date: Tue, 15 Aug 2017 10:57:24 +0200
-Message-Id: <20170815085732.9794-3-ldoktor@redhat.com>
-In-Reply-To: <20170815085732.9794-1-ldoktor@redhat.com>
-References: <20170815085732.9794-1-ldoktor@redhat.com>
+Date: Tue, 15 Aug 2017 10:57:22 +0200
+Message-Id: <20170815085732.9794-1-ldoktor@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 02/10] qemu|qtest: Avoid dangerous arguments
+Subject: [Qemu-devel] [PATCH v5 00/10] qemu.py: Pylint/style fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +27,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
 
-The list object is mutable in python and potentially might modify other
-object's arguments when used as default argument. Reproducer:
+Hello guys,
 
-    >>> vm1 =3D QEMUMachine("qemu")
-    >>> vm2 =3D QEMUMachine("qemu")
-    >>> vm1._wrapper.append("foo")
-    >>> print vm2._wrapper
-    ['foo']
+I'm reading the available python modules to exercise qemu and while readi=
+ng them
+I fixed some issues that caught my attention. It usually starts with a si=
+mple
+pylint/docstring fixes and slowly graduates to more controversial ones so=
+ I'm
+open to suggestion to remove some of them.
 
-In this case the `args` is actually copied so it would be safe to keep
-it, but it's not a good practice to keep it. The same issue applies in
-inherited qtest module.
+Kind regards,
+Luk=C3=A1=C5=A1
 
-Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
----
- scripts/qemu.py  | 6 +++++-
- scripts/qtest.py | 2 +-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+Changes in v2
+- Squashed 2nd and 10th patches into 2nd one
+- Use repr() in MonitorResponseError's description
+- Improved commit message of the 6th patch
+- Two tweaks to docstrings changed in the 6th patch
+- Also updated qmp-shell to use new-style super calls (7th patch)
+- Fixed the accidental rename of qmp `cmd_id` (kept the id->cmd_id patch)
+- Changed the style of the style-fix in the 10th commit
 
-diff --git a/scripts/qemu.py b/scripts/qemu.py
-index 466aaab..888f5b3 100644
---- a/scripts/qemu.py
-+++ b/scripts/qemu.py
-@@ -23,7 +23,7 @@ import qmp.qmp
- class QEMUMachine(object):
-     '''A QEMU VM'''
-=20
--    def __init__(self, binary, args=3D[], wrapper=3D[], name=3DNone,
-+    def __init__(self, binary, args=3DNone, wrapper=3DNone, name=3DNone,
-                  test_dir=3D"/var/tmp", monitor_address=3DNone,
-                  socket_scm_helper=3DNone, debug=3DFalse):
-         '''
-@@ -39,6 +39,10 @@ class QEMUMachine(object):
-         @param debug: enable debug mode (forwarded to QMP helper and suc=
-h)
-         @note: Qemu process is not started until launch() is used.
-         '''
-+        if args is None:
-+            args =3D []
-+        if wrapper is None:
-+            wrapper =3D []
-         if name is None:
-             name =3D "qemu-%d" % os.getpid()
-         if monitor_address is None:
-diff --git a/scripts/qtest.py b/scripts/qtest.py
-index d5aecb5..ab183c0 100644
---- a/scripts/qtest.py
-+++ b/scripts/qtest.py
-@@ -79,7 +79,7 @@ class QEMUQtestProtocol(object):
- class QEMUQtestMachine(qemu.QEMUMachine):
-     '''A QEMU VM'''
-=20
--    def __init__(self, binary, args=3D[], name=3DNone, test_dir=3D"/var/=
-tmp",
-+    def __init__(self, binary, args=3DNone, name=3DNone, test_dir=3D"/va=
-r/tmp",
-                  socket_scm_helper=3DNone):
-         if name is None:
-             name =3D "qemu-%d" % os.getpid()
+Changes in v3
+- Don't use repr in the 5th patch in MonitorResponseError
+
+Changes in v4
+- Use correct git base (remove unwanted commits)
+
+Changes in v5
+- Avoid bool comparison
+- Change report to return in one docstring
+- Removed the unnecessary spaces around single-line docstring
+
+Luk=C3=A1=C5=A1 Doktor (10):
+  qemu.py: Pylint/style fixes
+  qemu|qtest: Avoid dangerous arguments
+  qemu.py: Use iteritems rather than keys()
+  qemu.py: Simplify QMP key-conversion
+  qemu.py: Use custom exceptions rather than Exception
+  qmp.py: Couple of pylint/style fixes
+  qmp.py: Use object-based class for QEMUMonitorProtocol
+  qmp.py: Avoid "has_key" usage
+  qmp.py: Avoid overriding a builtin object
+  qtest.py: Few pylint/style fixes
+
+ scripts/qemu.py       | 98 +++++++++++++++++++++++++++++++++++++--------=
+------
+ scripts/qmp/qmp-shell |  4 +--
+ scripts/qmp/qmp.py    | 49 ++++++++++++++++----------
+ scripts/qtest.py      | 13 ++++---
+ 4 files changed, 109 insertions(+), 55 deletions(-)
+
 --=20
 2.9.4
