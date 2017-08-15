@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dhXB6-00037n-JM
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:26:21 -0400
+	(envelope-from <armbru@redhat.com>) id 1dhXB8-00038A-CU
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:26:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dhXB3-00052m-8P
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:26:20 -0400
-Received: from 7.mo5.mail-out.ovh.net ([178.32.124.100]:33511)
+	(envelope-from <armbru@redhat.com>) id 1dhXB5-00053H-3e
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:26:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49550)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dhXB3-0004ws-1t
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:26:17 -0400
-Received: from player734.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id C782111AA30
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 10:26:07 +0200 (CEST)
-Date: Tue, 15 Aug 2017 10:26:01 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170815102601.78639e8b@bahia.lan>
-In-Reply-To: <1502761234.2143.4.camel@gmail.com>
-References: <150273295665.11087.17582111045419718285.stgit@bahia.lan>
-	<1502761234.2143.4.camel@gmail.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dhXB4-00052z-Ri
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:26:19 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170731085110.1050-1-apahim@redhat.com>
+	<20170731085110.1050-5-apahim@redhat.com>
+Date: Tue, 15 Aug 2017 10:26:12 +0200
+In-Reply-To: <20170731085110.1050-5-apahim@redhat.com> (Amador Pahim's message
+	of "Mon, 31 Jul 2017 10:51:07 +0200")
+Message-ID: <87tw19s0d7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/UO+zmTMtpAUx2r8TcmYw0np";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] ppc: fix ppc_set_compat() with KVM PR
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 4/7] qemu.py: improve message on
+ negative exit code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,121 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Amador Pahim <apahim@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, stefanha@gmail.com, mreitz@redhat.com, crosa@redhat.com
 
---Sig_/UO+zmTMtpAUx2r8TcmYw0np
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Amador Pahim <apahim@redhat.com> writes:
 
-On Tue, 15 Aug 2017 11:40:34 +1000
-Suraj Jitindar Singh <sjitindarsingh@gmail.com> wrote:
+> The current message shows 'self._args', which contains only part of the
+> options used in the qemu command line.
+>
+> This patch makes the qemu full args list an instance variable and then
+> uses it in the negative exit code message.
+>
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
+> ---
+>  scripts/qemu.py | 17 ++++++++++++-----
+>  1 file changed, 12 insertions(+), 5 deletions(-)
+>
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index e3ea534ec4..9434ccc30b 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -48,6 +48,7 @@ class QEMUMachine(object):
+>          self._iolog = None
+>          self._socket_scm_helper = socket_scm_helper
+>          self._debug = debug
+> +        self._qemu_full_args = None
+>  
+>      # This can be used to add an unused monitor instance.
+>      def add_monitor_telnet(self, ip, port):
+> @@ -140,9 +141,14 @@ class QEMUMachine(object):
+>          qemulog = open(self._qemu_log_path, 'wb')
+>          try:
+>              self._pre_launch()
+> -            args = self._wrapper + [self._binary] + self._base_args() + self._args
+> -            self._popen = subprocess.Popen(args, stdin=devnull, stdout=qemulog,
+> -                                           stderr=subprocess.STDOUT, shell=False)
+> +            self._qemu_full_args = None
+> +            self._qemu_full_args = (self._wrapper + [self._binary] +
+> +                                    self._base_args() + self._args)
 
-> On Mon, 2017-08-14 at 19:49 +0200, Greg Kurz wrote:
-> > When running in KVM PR mode, kvmppc_set_compat() always fail because
-> > the
-> > current PR implementation doesn't handle KVM_REG_PPC_ARCH_COMPAT. Now
-> > that
-> > the machine code inconditionally calls ppc_set_compat_all() at reset
-> > time
-> > to restore the compat mode default value (commit 66d5c492dd3a9), it
-> > is
-> > impossible to start a guest with PR:
-> >=20
-> > qemu-system-ppc64: Unable to set CPU compatibility mode in KVM:
-> > =C2=A0Invalid argument
-> >=20
-> > A tentative patch [1] was recently sent by Suraj to address the
-> > issue, but
-> > it would prevent the compat mode to be turned off on reset. And we
-> > really
-> > don't want to explicitely check for KVM PR. During the patch's
-> > review,
-> > David suggested that we should only call the KVM ioctl() if the
-> > compat
-> > PVR changes. This allows at least to run with KVM PR, provided no
-> > compat
-> > mode is requested from the command line (which should be the case
-> > when
-> > running PR nested). This is what this patch does.
-> >=20
-> > While here, we also fix the side effect where KVM would fail but we
-> > would
-> > change the CPU state in QEMU anyway.
-> >=20
-> > [1] http://patchwork.ozlabs.org/patch/782039/
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org> =20
->=20
-> I meant to send a follow up but it fell on my priority list so thanks
-> for this
->=20
+Why set self._qemu_full_args twice?
 
-No problem :)
+> +            self._popen = subprocess.Popen(self._qemu_full_args,
+> +                                           stdin=devnull,
+> +                                           stdout=qemulog,
+> +                                           stderr=subprocess.STDOUT,
+> +                                           shell=False)
+>              self._post_launch()
+>          except:
+>              if self.is_running():
+> @@ -163,8 +169,9 @@ class QEMUMachine(object):
+>  
+>              exitcode = self._popen.wait()
+>              if exitcode < 0:
+> -                LOG.error('qemu received signal %i: %s', -exitcode,
+> -                          ' '.join(self._args))
+> +                LOG.error('qemu received signal %i:%s', -exitcode,
+> +                          ' Command: %r.' % ' '.join(self._qemu_full_args)
+> +                          if self._qemu_full_args else '')
 
-This is more a workaround than an actual fix since CAS will still want to
-change the compat mode and fail, but at least QEMU doesn't exit right away.
-I needed that to chase down another bug that breaks loadvm of a KVM PR gues=
-t.
+The last argument is hard to read.
 
-> Looks good to me
->=20
-> Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
->=20
+>              self._load_io_log()
+>              self._post_shutdown()
 
-Thanks!
-
-> > ---
-> > =C2=A0target/ppc/compat.c |=C2=A0=C2=A0=C2=A0=C2=A09 +++++----
-> > =C2=A01 file changed, 5 insertions(+), 4 deletions(-)
-> >=20
-> > diff --git a/target/ppc/compat.c b/target/ppc/compat.c
-> > index f1b67faa97e3..f8729fe46d61 100644
-> > --- a/target/ppc/compat.c
-> > +++ b/target/ppc/compat.c
-> > @@ -140,16 +140,17 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t
-> > compat_pvr, Error **errp)
-> > =C2=A0
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0cpu_synchronize_state(CPU(cpu));
-> > =C2=A0
-> > -=C2=A0=C2=A0=C2=A0=C2=A0cpu->compat_pvr =3D compat_pvr;
-> > -=C2=A0=C2=A0=C2=A0=C2=A0env->spr[SPR_PCR] =3D pcr & pcc->pcr_mask;
-> > -
-> > -=C2=A0=C2=A0=C2=A0=C2=A0if (kvm_enabled()) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0if (kvm_enabled() && cpu->compat_pvr !=3D comp=
-at_pvr) {
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int ret =3D kvmpp=
-c_set_compat(cpu, cpu->compat_pvr);
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (ret < 0) {
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0error_setg_errno(errp, -ret,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0"Unable to set CPU compatibility mode
-> > in KVM");
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0return;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0cpu->compat_pvr =3D compat_pvr;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0env->spr[SPR_PCR] =3D pcr & pcc->pcr_mask;
-> > =C2=A0}
-> > =C2=A0
-> > =C2=A0typedef struct {
-> >  =20
-
-
---Sig_/UO+zmTMtpAUx2r8TcmYw0np
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlmSsBkACgkQAvw66wEB28LIZgCeN+JBgZRftFt7cQzvlia5tXl9
-EjEAoJ2fDq6gp7JMc2GG2w/Vue0F2Zn2
-=7xYH
------END PGP SIGNATURE-----
-
---Sig_/UO+zmTMtpAUx2r8TcmYw0np--
+The subprocess module appears to keep track of the full command with
+methods check_call() and check_output(): its in exception
+CalledProcessError right when you need it.  Sadly, it doesn't appear to
+be tracked with method Popen().
