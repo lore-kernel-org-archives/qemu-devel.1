@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dhelh-0005Dw-3F
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 12:32:37 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dherS-0007fW-R1
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 12:38:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dheld-0007dW-2n
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 12:32:37 -0400
-Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:36735)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dhelc-0007dF-S9
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 12:32:33 -0400
-Received: by mail-pg0-x231.google.com with SMTP id i12so8587579pgr.3
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 09:32:32 -0700 (PDT)
-References: <20170815145714.17635-1-richard.henderson@linaro.org>
-	<20170815145714.17635-4-richard.henderson@linaro.org>
-	<c30ad9c1-bd1c-0fdf-085e-2449d9034dd6@amsat.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8846d546-5dc3-4d71-ff57-f1978ae91528@linaro.org>
-Date: Tue, 15 Aug 2017 09:32:29 -0700
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dherP-0002CU-Ld
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 12:38:34 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:50127
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1dherP-0002CA-FN
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 12:38:31 -0400
+Received: from host86-189-213-185.range86-189.btcentralplus.com
+	([86.189.213.185] helo=[192.168.1.65])
+	by s16892447.onlinehome-server.info with esmtpsa
+	(TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16) (Exim 4.76)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dherO-0001ZH-BW
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 17:38:31 +0100
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <ea7e7a76-09ac-b8b2-a480-6c7d341c6881@ilande.co.uk>
+Date: Tue, 15 Aug 2017 17:38:20 +0100
 MIME-Version: 1.0
-In-Reply-To: <c30ad9c1-bd1c-0fdf-085e-2449d9034dd6@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 3/3] target/arm: Require
- alignment for load exclusive
+Subject: [Qemu-devel] How to implement different endian accesses per MMU
+ page?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,27 +34,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
-Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org, alistair.francis@xilinx.com
+To: qemu-devel <qemu-devel@nongnu.org>
 
-On 08/15/2017 08:56 AM, Philippe Mathieu-Daudé wrote:
->> @@ -1885,7 +1886,7 @@ static void gen_load_exclusive(DisasContext *s, int rt,
->> int rt2,
->>               tcg_gen_mov_i64(cpu_reg(s, rt2), cpu_exclusive_high);
->>           }
->>       } else {
->> -        memop |= size;
->> +        memop |= size | MO_ALIGN;
-> 
-> MO_ALIGN_8 here too?
-> 
->>           tcg_gen_qemu_ld_i64(cpu_exclusive_val, addr, idx, memop);
->>           tcg_gen_mov_i64(cpu_reg(s, rt), cpu_exclusive_val);
+Hi all,
 
-Peter already pointed out that MO_ALIGN_N should be reserved for those cases
-where an explicit size really needed.  You should note that using MO_ALIGN_8
-would be actively wrong here -- it would incorrectly require 8 byte alignment
-for the single byte access of LDXRB.
+Working through an incorrect endian issue on qemu-system-sparc64, it has
+become apparent that at least one OS makes use of the IE (Invert Endian)
+bit in the SPARCv9 MMU TTE to map PCI memory space without the
+programmer having to manually endian-swap accesses.
+
+In other words, to quote the UltraSPARC specification: "if this bit is
+set, accesses to the associated page are processed with inverse
+endianness from what is specified by the instruction (big-for-little and
+little-for-big)".
+
+Looking through various bits of code, I'm trying to get a feel for the
+best way to implement this in an efficient manner. From what I can see
+this could be solved using an additional MMU index, however I'm not
+overly familiar with the memory and softmmu subsystems.
+
+Can anyone point me in the right direction as to what would be the best
+way to implement this feature within QEMU?
 
 
-r~
+Many thanks,
+
+Mark.
