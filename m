@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhd17-0003mf-T3
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 10:40:27 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dhd4n-0006B4-GE
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 10:44:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhd13-00026O-0U
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 10:40:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35210)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dhd12-00023k-OG
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 10:40:20 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
-	<20170727154126.11339-2-marcandre.lureau@redhat.com>
-Date: Tue, 15 Aug 2017 16:40:12 +0200
-In-Reply-To: <20170727154126.11339-2-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Thu, 27 Jul 2017 17:41:01 +0200")
-Message-ID: <87zib0j3n7.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <programmingkidx@gmail.com>) id 1dhd4j-0004ci-FD
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 10:44:13 -0400
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:36109)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dhd4j-0004cN-AL
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 10:44:09 -0400
+Received: by mail-io0-x242.google.com with SMTP id j32so711391iod.3
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 07:44:09 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20170815134945.GM9674@redhat.com>
+Date: Tue, 15 Aug 2017 10:44:07 -0400
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 01/26] qapi: fix type_seen key error
+Message-Id: <3C886DE0-FFF9-4C88-BC59-2FA9ED26BB14@gmail.com>
+References: <695CE828-CE3F-48D0-B20E-7B88C76453B8@gmail.com>
+	<20170815083822.GB9674@redhat.com>
+	<85B66A0C-33EF-4DF8-8137-ECCA251A0F2D@gmail.com>
+	<20170815134945.GM9674@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 00/12] Convert over to use keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +32,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-> The type_seen member can be of a different type than the 'qtype' being
-> checked, since a string create several conflicts. Lookup the real
-> conflicting type in the conflict set, that one must be present in
-> type_seen.
->
-> This fixes the following error, reproducible with the modified test:
->
-> Traceback (most recent call last):
->   File "/home/elmarco/src/qq/tests/qapi-schema/test-qapi.py", line 56, in=
- <module>
->     schema =3D QAPISchema(sys.argv[1])
->   File "/home/elmarco/src/qq/scripts/qapi.py", line 1470, in __init__
->     self.exprs =3D check_exprs(parser.exprs)
->   File "/home/elmarco/src/qq/scripts/qapi.py", line 959, in check_exprs
->     check_alternate(expr, info)
->   File "/home/elmarco/src/qq/scripts/qapi.py", line 831, in check_alterna=
-te
->     % (name, key, types_seen[qtype]))
-> KeyError: 'QTYPE_QSTRING'
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi.py                                  | 4 +++-
->  tests/qapi-schema/alternate-conflict-string.json | 4 ++--
->  2 files changed, 5 insertions(+), 3 deletions(-)
->
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index 8aa2775f12..4ecc19e944 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -825,7 +825,9 @@ def check_alternate(expr, info):
->              else:
->                  conflicting.add('QTYPE_QNUM')
->                  conflicting.add('QTYPE_QBOOL')
-> -        if conflicting & set(types_seen):
-> +        conflict =3D conflicting & set(types_seen)
-> +        if conflict:
-> +            qtype =3D list(conflict)[0]
->              raise QAPISemError(info, "Alternate '%s' member '%s' can't "
->                                 "be distinguished from member '%s'"
->                                 % (name, key, types_seen[qtype]))
+> On Aug 15, 2017, at 9:49 AM, Daniel P. Berrange <berrange@redhat.com> =
+wrote:
+>=20
+> On Tue, Aug 15, 2017 at 09:49:00AM -0400, Programmingkid wrote:
+>>=20
+>>> On Aug 15, 2017, at 4:38 AM, Daniel P. Berrange =
+<berrange@redhat.com> wrote:
+>>>=20
+>>> On Mon, Aug 14, 2017 at 02:46:22PM -0400, Programmingkid wrote:
+>>>> Sorry but there appears to be an issue with your patchset. I ran =
+this command:
+>>>>=20
+>>>> ./configure --target-list=3Dppc-softmmu,i386-softmmu
+>>>>=20
+>>>> Then saw this error message:=20
+>>>>=20
+>>>> error: pathspec 'ui/keycodemapdb' did not match any file(s) known =
+to git.
+>>>>=20
+>>>> Running 'make' I saw this error message:
+>>>>=20
+>>>> make: *** No rule to make target =
+`ui/input-keymap-atset1-to-qcode.c', needed by `Makefile'.  Stop.
+>>>> make: *** Waiting for unfinished jobs....
+>>>>=20
+>>>> Running the 'make clean' command produces this error message:
+>>>>=20
+>>>> make[1]: *** No rule to make target =
+`ui/input-keymap-atset1-to-qcode.c', needed by `Makefile'.  Stop.
+>>>> make: *** [clean] Error 1
+>>>>=20
+>>>> Perhaps a missing patch?
+>>>=20
+>>> No, its a missing "git submodule update --init ui/keycodemapdb" call
+>>=20
+>> Thank you for replying. I tried this command and saw this error =
+message:
+>>=20
+>> error: pathspec 'ui/keycodemapdb' did not match any file(s) known to =
+git.
+>>=20
+>> Note: I'm using version 3. Will test version 4 soon.=20
+>>=20
+>> I suggest adding the git submodule update info to your cover letter
+>> saying it is required.
+>=20
+> It isn't supposed to be required - its a bug, hence why the tests are
+> failing.
+>=20
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    =
+https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            =
+https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    =
+https://www.instagram.com/dberrange :|
 
-I see.
+Version four appears to have the same problem as version three. I still =
+see this error message:
 
-The fix is uninvasive, but I'm not thrilled by repurposing @qtype, and
-the meaning of list(dict) is less obvious than dict.keys().  What about
-
-           conflict =3D conflicting & set(types_seen)
-           if conflict:
-               conflicting_member_name =3D conflict.keys()[0]
-               raise QAPISemError(info, "Alternate '%s' member '%s' can't "
-                                  "be distinguished from member '%s'"
-                                  % (name, key, conflicting_member_name))
-
-Alternatively, list all conflicting names (I wouldn't bother).
-
-> diff --git a/tests/qapi-schema/alternate-conflict-string.json b/tests/qap=
-i-schema/alternate-conflict-string.json
-> index 85adbd4adc..bb2702978e 100644
-> --- a/tests/qapi-schema/alternate-conflict-string.json
-> +++ b/tests/qapi-schema/alternate-conflict-string.json
-> @@ -1,4 +1,4 @@
->  # alternate branches of 'str' type conflict with all scalar types
->  { 'alternate': 'Alt',
-> -  'data': { 'one': 'str',
-> -            'two': 'int' } }
-> +  'data': { 'one': 'int',
-> +            'two': 'str' } }
-
-I had to think for several minutes to convince myself that this is a
-better test, not just a test that happens to demonstrate a particular
-bug.  It's hot, I'm slow :)
+make: *** No rule to make target `ui/input-keymap-atset1-to-qcode.c', =
+needed by `Makefile'.  Stop.
+make: *** Waiting for unfinished jobs....=
