@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dhdlK-00087r-TL
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:28:11 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dhdy5-0007F6-W6
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:41:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dhdlF-00057q-Vy
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:28:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34794)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dhdlF-00057Z-Os
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:28:05 -0400
-Date: Tue, 15 Aug 2017 17:27:55 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170815172755.39d3559b.cohuck@redhat.com>
-In-Reply-To: <1502431076-22849-1-git-send-email-thuth@redhat.com>
-References: <1502431076-22849-1-git-send-email-thuth@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dhdy2-0006e1-2L
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:41:22 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33366)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dhdy1-0006cr-UM
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:41:17 -0400
+Received: by mail-qt0-x244.google.com with SMTP id u19so1071487qtc.0
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 08:41:17 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170815145714.17635-1-richard.henderson@linaro.org>
+	<20170815145714.17635-2-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <73e9be7e-c87a-9514-0fbe-55d082bf4e47@amsat.org>
+Date: Tue, 15 Aug 2017 12:41:09 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.11 0/2] Improvements for the pxe
- tester
+In-Reply-To: <20170815145714.17635-2-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.10 1/3] target/arm: Correct
+ exclusive store cmpxchg memop mask
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,36 +36,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Victor Kaplansky <victork@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org, alistair.francis@xilinx.com
 
-On Fri, 11 Aug 2017 07:57:54 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+On 08/15/2017 11:57 AM, Richard Henderson wrote:
+> From: Alistair Francis <alistair.francis@xilinx.com>
+> 
+> When we perform the atomic_cmpxchg operation we want to perform the
+> operation on a pair of 32-bit registers. Previously we were just passing
+> the register size in which was set to MO_32. This would result in the
+> high register to be ignored. To fix this issue we hardcode the size to
+> be 64-bits long when operating on 32-bit pairs.
+> 
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> Message-Id: <bc18dddca56e8c2ea4a3def48d33ceb5d21d1fff.1502488636.git.alistair.francis@xilinx.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-> The first patch improves the buffer handling in the pxe tester a
-> little bit by allocating a separate buffer on the heap for each
-> architecture. This also gets rid of the huge pre-initialized
-> array in the tester, shrinking the size of the executable by
-> half of a megabyte!
-> The second patch adds s390x support to the pxe tester. Starting
-> with QEMU 2.10, the guest firmware on s390x can now net-boot via
-> TFTP, too, so we can automatically test this code in the pxe tester.
-> 
-> v2: Adressed Cornelia's review feedback from the first version, e.g.:
->  - Use g_malloc0() instead of g_malloc()
->  - Use sizeof with parentheses
-> 
-> Thomas Huth (2):
->   tests/boot-sector: Do not overwrite the x86 buffer on other
->     architectures
->   tests/pxe: Check virtio-net-ccw on s390x
-> 
->  tests/Makefile.include |  1 +
->  tests/boot-sector.c    | 61 +++++++++++++++++++++++++++++++++++++-------------
->  tests/pxe-test.c       |  7 ++++++
->  3 files changed, 54 insertions(+), 15 deletions(-)
-> 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-It's that question again: Who picks this up? :)
-
-I can take it through the s390 tree if nobody else wants it.
+> ---
+>   target/arm/translate-a64.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 58ed4c6d05..113e2e172b 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -1913,7 +1913,7 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
+>               tcg_gen_concat32_i64(val, cpu_exclusive_val, cpu_exclusive_high);
+>               tcg_gen_atomic_cmpxchg_i64(tmp, addr, val, tmp,
+>                                          get_mem_index(s),
+> -                                       size | MO_ALIGN | s->be_data);
+> +                                       MO_64 | MO_ALIGN | s->be_data);
+>               tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, val);
+>               tcg_temp_free_i64(val);
+>           } else if (s->be_data == MO_LE) {
+> 
