@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tianyu.lan@intel.com>) id 1dhSIo-0002Kq-HS
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 23:13:59 -0400
+	(envelope-from <wei.yang@ucloud.cn>) id 1dhSw6-0002Ca-Ap
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 23:54:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tianyu.lan@intel.com>) id 1dhSIl-0007xR-5q
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 23:13:58 -0400
-Received: from mga04.intel.com ([192.55.52.120]:33681)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
-	id 1dhSIk-0007wG-UD
-	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 23:13:55 -0400
-References: <1502311882-11038-1-git-send-email-tianyu.lan@intel.com>
-	<1502311882-11038-3-git-send-email-tianyu.lan@intel.com>
-	<20170811180438.GI1519@perard.uk.xensource.com>
-From: Lan Tianyu <tianyu.lan@intel.com>
-Message-ID: <d11787d1-dc57-1f22-86cc-9da639fd28af@intel.com>
-Date: Tue, 15 Aug 2017 11:10:56 +0800
+	(envelope-from <wei.yang@ucloud.cn>) id 1dhSw1-0000si-G5
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 23:54:34 -0400
+Received: from m97136.mail.qiye.163.com ([220.181.97.136]:20878)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wei.yang@ucloud.cn>) id 1dhSvT-0000kn-Cm
+	for qemu-devel@nongnu.org; Mon, 14 Aug 2017 23:54:29 -0400
+References: <20170814084838.12233-1-wei.yang@ucloud.cn>
+	<20170814185545-mutt-send-email-mst@kernel.org>
+	<59925A94.4070502@ucloud.cn>
+	<20170815053445-mutt-send-email-mst@kernel.org>
+	<59926083.4030708@ucloud.cn>
+	<20170815054903-mutt-send-email-mst@kernel.org>
+From: wyang <wei.yang@ucloud.cn>
+Message-ID: <59927039.9000700@ucloud.cn>
+Date: Tue, 15 Aug 2017 11:53:29 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170811180438.GI1519@perard.uk.xensource.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2 2/3] xen-pt: bind/unbind interrupt
- remapping format MSI
+In-Reply-To: <20170815054903-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] bios-tables-test: delete a assert about
+ block name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Chao Gao <chao.gao@intel.com>, sstabellini@kernel.org, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, marcel@redhat.com, kevin.tian@intel.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: imammedo@redhat.com, qemu-devel@nongnu.org
 
-Hi Anthony:
 
-On 2017年08月12日 02:04, Anthony PERARD wrote:
-> On Wed, Aug 09, 2017 at 04:51:21PM -0400, Lan Tianyu wrote:
->> From: Chao Gao <chao.gao@intel.com>
->>
->> If a vIOMMU is exposed to guest, guest will configure the msi to remapping
->> format. The original code isn't suitable to the new format. A new pair
->> bind/unbind interfaces are added for this usage. This patch recognizes
->> this case and uses new interfaces to bind/unbind msi.
->>
->> Signed-off-by: Chao Gao <chao.gao@intel.com>
->> Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
-> 
-> Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
-> 
-> That patch series can be applied once the Xen side patches are merged.
-> 
+On 2017年08月15日 10:49, Michael S. Tsirkin wrote:
+> BTW sizeof(BLOCK_NAME_END) is actually 2. I think it works
+> because there's a space after ,. It is better to replace it with
+> strlen so it will work without a space too.
 
-Great. Thanks for your review.
+MST,
+
+I double check the failure of assert, it has already been fixed by the 
+following commit,
+
+commit a3973f551dbee91f1f6f2c78e9942fb113b5d30b
+Author: Marcel Apfelbaum <marcel@redhat.com>
+Date:   Mon Apr 4 20:00:57 2016 +0300
+
+     tests/bios-tables-test: fix assert
+
+     Newer iasl does not add the aml file name to the Definition Block.
+     See acpica tools commit  1ecbb3d5:
+       "Emit the AMLFilename as a zero-length string. Allows the 
+compiler to create
+        the name later -- making it easier to rename the parent ASL 
+(DSL) file."
+
+     That causes an assert in acpi tests:
+        tests/bios-tables-test.c:455:normalize_asl: assertion failed: 
+(block_name)
+
+     Fix it by striping the start of the definition block line until the 
+first comma.
+     The block name is always the first parameter and
+     the grammar does not allow comma in between, so it is safe.
+
+     Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+     Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+     Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+     Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+
+I am sorry for my fault,  my qemu version does not contain the patch.:-(
+
+Seems the only place, which needs to be fixed, is to replace sizeof with 
+strlen.  Just like what you said, it is not fault but just refinement.
+If you need it, I am glad to send patch to fix it.
+
+Wei
 
 -- 
-Best regards
-Tianyu Lan
+Wei Yang(杨伟)
+Mobile: +86-13436682065
+Email: wei.yang@ucloud.cn
