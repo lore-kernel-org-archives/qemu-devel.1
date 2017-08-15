@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhVZ0-00086Y-Qm
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:42:56 -0400
+	(envelope-from <peterx@redhat.com>) id 1dhVZ2-00087g-Be
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:42:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhVYx-0005kI-A6
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:42:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46392)
+	(envelope-from <peterx@redhat.com>) id 1dhVZ1-0005la-9n
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:42:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42758)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dhVYx-0005jK-1c
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:42:51 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <cover.1501084908.git.alistair.francis@xilinx.com>
-	<44655faac8ff8a48e1ed7a50ad0ac66bfd70975b.1501084908.git.alistair.francis@xilinx.com>
-Date: Tue, 15 Aug 2017 08:42:45 +0200
-In-Reply-To: <44655faac8ff8a48e1ed7a50ad0ac66bfd70975b.1501084908.git.alistair.francis@xilinx.com>
-	(Alistair Francis's message of "Wed, 26 Jul 2017 09:07:57 -0700")
-Message-ID: <878tilwcuy.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dhVZ1-0005lE-0q
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:42:55 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EA0EE80491
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 06:42:53 +0000 (UTC)
+Date: Tue, 15 Aug 2017 14:42:48 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170815064248.GT26015@pxdev.xzpeter.org>
+References: <20170808162629.32493-1-quintela@redhat.com>
+	<20170808162629.32493-10-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 4/5] Convert multi-line fprintf() to
- warn_report()
+Content-Disposition: inline
+In-Reply-To: <20170808162629.32493-10-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 09/19] migration: Create multifd
+ migration threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,98 +34,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, alistair23@gmail.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
 
-Alistair Francis <alistair.francis@xilinx.com> writes:
-
-> Convert all the multi-line uses of fprintf(stderr, "warning:"..."\n"...
-> to use warn_report() instead. This helps standardise on a single
-> method of printing warnings to the user.
->
-> All of the warnings were changed using these commands:
->   find ./* -type f -exec sed -i \
->     'N; {s|fprintf(.*".*warning[,:] \(.*\)\\n"\(.*\));|warn_report("\1"\2=
-);|Ig}' \
->     {} +
->   find ./* -type f -exec sed -i \
->     'N;N; {s|fprintf(.*".*warning[,:] \(.*\)\\n"\(.*\));|warn_report("\1"=
-\2);|Ig}' \
->     {} +
->   find ./* -type f -exec sed -i \
->     'N;N;N; {s|fprintf(.*".*warning[,:] \(.*\)\\n"\(.*\));|warn_report("\=
-1"\2);|Ig}' \
->     {} +
->   find ./* -type f -exec sed -i \
->     'N;N;N;N {s|fprintf(.*".*warning[,:] \(.*\)\\n"\(.*\));|warn_report("=
-\1"\2);|Ig}' \
->     {} +
->   find ./* -type f -exec sed -i \
->     'N;N;N;N;N {s|fprintf(.*".*warning[,:] \(.*\)\\n"\(.*\));|warn_report=
-("\1"\2);|Ig}' \
->     {} +
->   find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N {s|fprintf(.*".*warning[,:] \(.*\)\\n"\(.*\));|warn_repo=
-rt("\1"\2);|Ig}' \
->     {} +
->   find ./* -type f -exec sed -i \
->     'N;N;N;N;N;N;N; {s|fprintf(.*".*warning[,:] \(.*\)\\n"\(.*\));|warn_r=
-eport("\1"\2);|Ig}' \
->     {} +
->
-> Indentation fixed up manually afterwards.
->
-> Some of the lines were manually edited to reduce the line length to below
-> 80 charecters. Some of the lines with newlines in the middle of the
-> string were also manually edit to avoid checkpatch errrors.
->
-> The #include lines were manually updated to allow the code to compile.
->
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Aurelien Jarno <aurelien@aurel32.net>
-> Cc: Yongbok Kim <yongbok.kim@imgtec.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> ---
-> I couldn't figure out any nice way (it is possible with some more logic
-> inside the sed apparently) to do this is one command, so I had to use
-> all of the commands above.
-[...]
-> diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
-> index 369c3df8a0..3985a92f02 100644
-> --- a/hw/i386/xen/xen-mapcache.c
-> +++ b/hw/i386/xen/xen-mapcache.c
-> @@ -125,8 +125,8 @@ void xen_map_cache_init(phys_offset_to_gaddr_t f, voi=
-d *opaque)
->          rlimit_as.rlim_cur =3D rlimit_as.rlim_max;
->=20=20
->          if (rlimit_as.rlim_max !=3D RLIM_INFINITY) {
-> -            fprintf(stderr, "Warning: QEMU's maximum size of virtual"
-> -                    " memory is not infinity.\n");
-> +            warn_report("QEMU's maximum size of virtual"
-> +                        " memory is not infinity.");
->          }
->          if (rlimit_as.rlim_max < MCACHE_MAX_SIZE + NON_MCACHE_MEMORY_SIZ=
-E) {
->              mapcache->max_mcache_size =3D rlimit_as.rlim_max -
-
-warning: implicit declaration of function =E2=80=98warn_report=E2=80=99 [-W=
-implicit-function-declaration]
-
-Please double-check for warnings.
+On Tue, Aug 08, 2017 at 06:26:19PM +0200, Juan Quintela wrote:
 
 [...]
+
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 6c4eb4b..d031c93 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -296,6 +296,7 @@ static void process_incoming_migration_bh(void *opaque)
+>      } else {
+>          runstate_set(global_state_get_runstate());
+>      }
+> +    multifd_load_cleanup();
+
+Maybe we can put multifd_load_cleanup() into
+migration_incoming_state_destroy(), then this line can be removed,
+and...
+
+>      /*
+>       * This must happen after any state changes since as soon as an external
+>       * observer sees this event they might start to prod at the VM assuming
+> @@ -358,6 +359,7 @@ static void process_incoming_migration_co(void *opaque)
+>                            MIGRATION_STATUS_FAILED);
+>          error_report("load of migration failed: %s", strerror(-ret));
+>          qemu_fclose(mis->from_src_file);
+> +        multifd_load_cleanup();
+
+... here we can call migration_incoming_state_destroy() as well, and
+we also don't need "qemu_fclose(mis->from_src_file)" any more.
+
+>          exit(EXIT_FAILURE);
+>      }
+>      mis->bh = qemu_bh_new(process_incoming_migration_bh, mis);
+> @@ -368,7 +370,12 @@ void migration_fd_process_incoming(QEMUFile *f)
+>  {
+>      Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, NULL);
+>      MigrationIncomingState *mis = migration_incoming_get_current();
+> -    
+> +
+> +    if (multifd_load_setup() != 0) {
+> +        /* We haven't been able to create multifd threads
+> +           nothing better to do */
+
+Nit: maybe an error_report() before quit (though I see that
+multifd_load_setup() actually never fails)?
+
+> +        exit(EXIT_FAILURE);
+> +    }
+>      if (!mis->from_src_file) {
+>          mis->from_src_file = f;
+>      }
+
+[...]
+
+> +int multifd_load_setup(void)
+> +{
+> +    int thread_count;
+> +    uint8_t i;
+> +
+> +    if (!migrate_use_multifd()) {
+> +        return 0;
+> +    }
+> +    thread_count = migrate_multifd_threads();
+> +    multifd_recv_state = g_malloc0(sizeof(*multifd_recv_state));
+> +    multifd_recv_state->params = g_new0(MultiFDRecvParams *, thread_count);
+> +    multifd_recv_state->count = 0;
+> +    for (i = 0; i < thread_count; i++) {
+> +        char thread_name[16];
+> +        MultiFDRecvParams *p = multifd_recv_state->params[i];
+> +
+> +        qemu_mutex_init(&p->mutex);
+
+multifd_recv_state->params is still an array of pointers, and we are
+trying to use "p", which is still uninitialized?
+
+> +        qemu_sem_init(&p->sem, 0);
+> +        p->quit = false;
+> +        p->id = i;
+> +        snprintf(thread_name, sizeof(thread_name), "multifdrecv_%d", i);
+> +        qemu_thread_create(&p->thread, thread_name, multifd_recv_thread, p,
+> +                           QEMU_THREAD_JOINABLE);
+> +        multifd_recv_state->count++;
+> +    }
+> +    return 0;
+> +}
+
+Thanks,
+
+-- 
+Peter Xu
