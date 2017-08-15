@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dhc4a-0001yE-0U
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:39:59 -0400
+	(envelope-from <eblake@redhat.com>) id 1dhc8Q-0004ph-DN
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:43:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dhc4W-00044O-Pt
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:39:56 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:38514)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dhc4W-00043k-IK
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:39:52 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id f15so10104617wmg.1
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 06:39:52 -0700 (PDT)
-Date: Tue, 15 Aug 2017 14:39:48 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170815133948.GA12671@stefanha-x1.localdomain>
-References: <20170814231552.24593-1-pbonzini@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dhc8P-0008NL-Gf
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:43:54 -0400
+References: <20170815130502.8736-1-stefanha@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a2e272ed-4c69-b692-1775-ffd95bdc4a0f@redhat.com>
+Date: Tue, 15 Aug 2017 08:43:39 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="9amGYk9869ThD9tj"
-Content-Disposition: inline
-In-Reply-To: <20170814231552.24593-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.10?] qxl: call
- qemu_spice_display_init_common for secondary devices
+In-Reply-To: <20170815130502.8736-1-stefanha@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="V0xTC3lelvnTT9RVG5wn65b5vJ4FgcrmS"
+Subject: Re: [Qemu-devel] [PATCH for-2.10] qemu-iotests: step clock after
+ each test iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +24,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, ademaria@redhat.com, kraxel@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, John Snow <jsnow@redhat.com>
 
-
---9amGYk9869ThD9tj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--V0xTC3lelvnTT9RVG5wn65b5vJ4FgcrmS
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ qemu-block@nongnu.org, John Snow <jsnow@redhat.com>
+Message-ID: <a2e272ed-4c69-b692-1775-ffd95bdc4a0f@redhat.com>
+Subject: Re: [PATCH for-2.10] qemu-iotests: step clock after each test
+ iteration
+References: <20170815130502.8736-1-stefanha@redhat.com>
+In-Reply-To: <20170815130502.8736-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 15, 2017 at 01:15:52AM +0200, Paolo Bonzini wrote:
-> Fixes this 2.10 regression:
+On 08/15/2017 08:05 AM, Stefan Hajnoczi wrote:
+> The 093 throttling test submits twice as many requests as the throttle
+> limit in order to ensure that we reach the limit.  The remaining
+> requests are left in-flight at the end of each test iteration.
 >=20
->   $ qemu-system-x86_64  -cpu host -m 6144 -vga qxl -device qxl
->   qemu-system-x86_64: util/qemu-thread-posix.c:64: qemu_mutex_lock: Asser=
-tion `mutex->initialized' failed.
+> Commit 452589b6b47e8dc6353df257fc803dfc1383bed8 ("vl.c/exit: pause cpus=
+
+> before closing block devices") exposed a hang in 093.  This happens
+> because requests are still in flight when QEMU terminates but
+> QEMU_CLOCK_VIRTUAL time is frozen.  bdrv_drain_all() hangs forever sinc=
+e
+> throttled requests cannot complete.
 >=20
-> Reported-by: ademaria@redhat.com
-> Cc: kraxel@redhat.com
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Step the clock at the end of each test iteration so in-flight requests
+> actually finish.  This solves the hang and is cleaner than leaving test=
+s
+> in-flight.
+>=20
+> Note that this could also be "fixed" by disabling throttling when drive=
+s
+> are closed in QEMU.  That approach has two issues:
+>=20
+> 1. We must drain requests before disabling throttling, so the hang
+>    cannot be easily avoided!
+>=20
+> 2. Any time QEMU disables throttling internally there is a chance that
+>    malicious users can abuse the code path to bypass throttling limits.=
+
+>=20
+> Therefore it makes more sense to fix the test case than to modify QEMU.=
+
+>=20
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  hw/display/qxl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  tests/qemu-iotests/093 | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
 
-I have audited the code and cannot see any bad side-effects.  Looks good
-to me!
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+I can take this through the NBD tree (since that's one environment that
+trips up on the test), if Peter doesn't apply it directly.
 
---9amGYk9869ThD9tj
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--V0xTC3lelvnTT9RVG5wn65b5vJ4FgcrmS
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJZkvmkAAoJEJykq7OBq3PIHsEH/jli+P/rBH5t+QFTFjSz5KRX
-NazR2s5dd+0Q1CHi3x72vEo9kCmChZiEPU1TTFCW3vUiengPmsNHWG7FH0Ywzqgg
-YUnN6p7f8/cmI1dhxR2096y6nQz8h9C63/Haqd63ZNREGmLFkyXNhFPiSN3LtTlF
-1t2ICs2Hn9NQQ8OCYFm1s2t3XheDYOHJFkQe0kNaOc3BQNYKJsZ+ZDCYle26M0Ek
-in3Va0YLvxp2dMCyG9f5+dYP+/pODddXjXAQrQAxge+sz41UDYAH7Hg9suIFeOrH
-dtj06EAO7pTiz4nB+vJtEYu1kN28WljfIk8esbEuSXBUr4Js2AgGXCiIjFJ/D7c=
-=N0d4
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmS+osACgkQp6FrSiUn
+Q2rrOAf+MaKb12yTaRpXfrqI5QBv+LRlL66hlfFjokA75IM2nQHsGa82+tdXcqMt
+8y13wmNwYuERuVKFiZvYTAnqVL8BVYhQu0UCNgk2jtStPGnqAzPsS64rx4l9cXE+
+wrwQGFoIiNO8nswkwx0LwyacR/x0/dtshir0RZmI9QLGnAKN0VH9cLTql+R9GJHq
++4v5Lh9esLSRRowhe2K4kI9u1IhW7gg4wnTd1C7y0j0TUETWDv4QZXnpcORwdw3I
+BR3DTuFa+AHabSy32qexFxGKuKlPlSBuOUAdy8lswQ8ruo+y95fTBlSR8Sdki8QY
+h8TZC0bIOoffSoK6wNS7sqizWpZYJg==
+=IIPN
 -----END PGP SIGNATURE-----
 
---9amGYk9869ThD9tj--
+--V0xTC3lelvnTT9RVG5wn65b5vJ4FgcrmS--
