@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dhc8Q-0004ph-DN
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:43:55 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dhcCY-00065r-14
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:48:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dhc8P-0008NL-Gf
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:43:54 -0400
-References: <20170815130502.8736-1-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a2e272ed-4c69-b692-1775-ffd95bdc4a0f@redhat.com>
-Date: Tue, 15 Aug 2017 08:43:39 -0500
+	(envelope-from <no-reply@patchew.org>) id 1dhcCU-0002A2-UI
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:48:10 -0400
+Resent-Message-Id: <E1dhcCU-0002A2-UI@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21339)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dhcCU-00029e-MM
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:48:06 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150280487559.78.4014191157004778780@dd743fd916bd>
+In-Reply-To: <20170815132746.12540-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170815130502.8736-1-stefanha@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="V0xTC3lelvnTT9RVG5wn65b5vJ4FgcrmS"
-Subject: Re: [Qemu-devel] [PATCH for-2.10] qemu-iotests: step clock after
- each test iteration
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 15 Aug 2017 06:47:56 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 0/2] Tracing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, John Snow <jsnow@redhat.com>
+To: stefanha@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---V0xTC3lelvnTT9RVG5wn65b5vJ4FgcrmS
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-block@nongnu.org, John Snow <jsnow@redhat.com>
-Message-ID: <a2e272ed-4c69-b692-1775-ffd95bdc4a0f@redhat.com>
-Subject: Re: [PATCH for-2.10] qemu-iotests: step clock after each test
- iteration
-References: <20170815130502.8736-1-stefanha@redhat.com>
-In-Reply-To: <20170815130502.8736-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 08/15/2017 08:05 AM, Stefan Hajnoczi wrote:
-> The 093 throttling test submits twice as many requests as the throttle
-> limit in order to ensure that we reach the limit.  The remaining
-> requests are left in-flight at the end of each test iteration.
->=20
-> Commit 452589b6b47e8dc6353df257fc803dfc1383bed8 ("vl.c/exit: pause cpus=
-
-> before closing block devices") exposed a hang in 093.  This happens
-> because requests are still in flight when QEMU terminates but
-> QEMU_CLOCK_VIRTUAL time is frozen.  bdrv_drain_all() hangs forever sinc=
-e
-> throttled requests cannot complete.
->=20
-> Step the clock at the end of each test iteration so in-flight requests
-> actually finish.  This solves the hang and is cleaner than leaving test=
-s
-> in-flight.
->=20
-> Note that this could also be "fixed" by disabling throttling when drive=
-s
-> are closed in QEMU.  That approach has two issues:
->=20
-> 1. We must drain requests before disabling throttling, so the hang
->    cannot be easily avoided!
->=20
-> 2. Any time QEMU disables throttling internally there is a chance that
->    malicious users can abuse the code path to bypass throttling limits.=
-
->=20
-> Therefore it makes more sense to fix the test case than to modify QEMU.=
-
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  tests/qemu-iotests/093 | 4 ++++
->  1 file changed, 4 insertions(+)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-I can take this through the NBD tree (since that's one environment that
-trips up on the test), if Peter doesn't apply it directly.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---V0xTC3lelvnTT9RVG5wn65b5vJ4FgcrmS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmS+osACgkQp6FrSiUn
-Q2rrOAf+MaKb12yTaRpXfrqI5QBv+LRlL66hlfFjokA75IM2nQHsGa82+tdXcqMt
-8y13wmNwYuERuVKFiZvYTAnqVL8BVYhQu0UCNgk2jtStPGnqAzPsS64rx4l9cXE+
-wrwQGFoIiNO8nswkwx0LwyacR/x0/dtshir0RZmI9QLGnAKN0VH9cLTql+R9GJHq
-+4v5Lh9esLSRRowhe2K4kI9u1IhW7gg4wnTd1C7y0j0TUETWDv4QZXnpcORwdw3I
-BR3DTuFa+AHabSy32qexFxGKuKlPlSBuOUAdy8lswQ8ruo+y95fTBlSR8Sdki8QY
-h8TZC0bIOoffSoK6wNS7sqizWpZYJg==
-=IIPN
------END PGP SIGNATURE-----
-
---V0xTC3lelvnTT9RVG5wn65b5vJ4FgcrmS--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA4MTUxMzI3NDYuMTI1NDAtMS1zdGVmYW5oYUByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRl
+dmVsXSBbUFVMTCAwLzJdIFRyYWNpbmcgcGF0Y2hlcwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9n
+IC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoK
+Y29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMg
+aW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0
+IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3Jt
+YXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAg
+ICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4
+aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
+Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRj
+aGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTcw
+ODE0MjMxNTUyLjI0NTkzLTEtcGJvbnppbmlAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwODE0
+MjMxNTUyLjI0NTkzLTEtcGJvbnppbmlAcmVkaGF0LmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAg
+ICAgICBwYXRjaGV3LzIwMTcwODE1MTMwNTAyLjg3MzYtMS1zdGVmYW5oYUByZWRoYXQuY29tIC0+
+IHBhdGNoZXcvMjAxNzA4MTUxMzA1MDIuODczNi0xLXN0ZWZhbmhhQHJlZGhhdC5jb20KU3dpdGNo
+ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpjOGE5NjM4ODhjIHNpbXBsZXRyYWNlOiBmaXggZmxp
+Z2h0IHJlY29yZGVyIC0tbm8taGVhZGVyIG9wdGlvbgoyNzJmNjA5NjA3IHRyYWNlOiB1c2Ugc3Rh
+dGljIGV2ZW50IElEIG1hcHBpbmcgaW4gc2ltcGxldHJhY2Uuc3RwCgo9PT0gT1VUUFVUIEJFR0lO
+ID09PQpDaGVja2luZyBQQVRDSCAxLzI6IHRyYWNlOiB1c2Ugc3RhdGljIGV2ZW50IElEIG1hcHBp
+bmcgaW4gc2ltcGxldHJhY2Uuc3RwLi4uCkNoZWNraW5nIFBBVENIIDIvMjogc2ltcGxldHJhY2U6
+IGZpeCBmbGlnaHQgcmVjb3JkZXIgLS1uby1oZWFkZXIgb3B0aW9uLi4uCkVSUk9SOiBsaW5lIG92
+ZXIgOTAgY2hhcmFjdGVycwojNDI6IEZJTEU6IHNjcmlwdHMvc2ltcGxldHJhY2UucHk6MTAxOgor
+ICAgICIiIkRlc2VyaWFsaXplIHRyYWNlIHJlY29yZHMgZnJvbSBhIGZpbGUsIHlpZWxkaW5nIHJl
+Y29yZCB0dXBsZXMgKGV2ZW50X251bSwgdGltZXN0YW1wLCBwaWQsIGFyZzEsIC4uLiwgYXJnNiku
+Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDQ2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
+Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
+b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
+Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
+ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
