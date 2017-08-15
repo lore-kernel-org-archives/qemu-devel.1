@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dhcEG-0007Di-Bk
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:49:57 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dhcFW-0008CJ-Kx
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:51:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dhcED-0002pZ-9a
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:49:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42762)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dhcED-0002pI-3g
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:49:53 -0400
-Date: Tue, 15 Aug 2017 14:49:45 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170815134945.GM9674@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <695CE828-CE3F-48D0-B20E-7B88C76453B8@gmail.com>
-	<20170815083822.GB9674@redhat.com>
-	<85B66A0C-33EF-4DF8-8137-ECCA251A0F2D@gmail.com>
+	(envelope-from <el13635@mail.ntua.gr>) id 1dhcFN-0003jp-6k
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:51:14 -0400
+Date: Tue, 15 Aug 2017 16:50:12 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170815135012.2kjflh6z2b6pdw44@postretch>
+References: <20170809140256.25584-1-el13635@mail.ntua.gr>
+	<20170809140256.25584-2-el13635@mail.ntua.gr>
+	<w51fuctyne1.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="4gyk3d6svkacoyq6"
 Content-Disposition: inline
-In-Reply-To: <85B66A0C-33EF-4DF8-8137-ECCA251A0F2D@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 00/12] Convert over to use keycodemapdb
+In-Reply-To: <w51fuctyne1.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] block: skip implicit nodes in
+ snapshots, blockjobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +26,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On Tue, Aug 15, 2017 at 09:49:00AM -0400, Programmingkid wrote:
-> 
-> > On Aug 15, 2017, at 4:38 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
-> > 
-> > On Mon, Aug 14, 2017 at 02:46:22PM -0400, Programmingkid wrote:
-> >> Sorry but there appears to be an issue with your patchset. I ran this command:
-> >> 
-> >> ./configure --target-list=ppc-softmmu,i386-softmmu
-> >> 
-> >> Then saw this error message: 
-> >> 
-> >> error: pathspec 'ui/keycodemapdb' did not match any file(s) known to git.
-> >> 
-> >> Running 'make' I saw this error message:
-> >> 
-> >> make: *** No rule to make target `ui/input-keymap-atset1-to-qcode.c', needed by `Makefile'.  Stop.
-> >> make: *** Waiting for unfinished jobs....
-> >> 
-> >> Running the 'make clean' command produces this error message:
-> >> 
-> >> make[1]: *** No rule to make target `ui/input-keymap-atset1-to-qcode.c', needed by `Makefile'.  Stop.
-> >> make: *** [clean] Error 1
-> >> 
-> >> Perhaps a missing patch?
-> > 
-> > No, its a missing "git submodule update --init ui/keycodemapdb" call
-> 
-> Thank you for replying. I tried this command and saw this error message:
-> 
-> error: pathspec 'ui/keycodemapdb' did not match any file(s) known to git.
-> 
-> Note: I'm using version 3. Will test version 4 soon. 
-> 
-> I suggest adding the git submodule update info to your cover letter
-> saying it is required.
 
-It isn't supposed to be required - its a bug, hence why the tests are
-failing.
+--4gyk3d6svkacoyq6
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+On Tue, Aug 15, 2017 at 03:24:38PM +0200, Alberto Garcia wrote:
+>On Wed 09 Aug 2017 04:02:51 PM CEST, Manos Pitsidianakis wrote:
+>> @@ -2988,6 +3004,9 @@ void qmp_block_stream(bool has_job_id, const char =
+*job_id, const char *device,
+>>          return;
+>>      }
+>>
+>> +    /* Skip implicit filter nodes */
+>> +    bs =3D bdrv_get_first_explicit(bs);
+>> +
+>>      aio_context =3D bdrv_get_aio_context(bs);
+>>      aio_context_acquire(aio_context);
+>
+>This change works here because right now the only implicit node that we
+>could have in practice is the throttle node, but I wonder if this is
+>good enough for any kind of implicit node in general.
+
+It does feel a bit sloppy but block jobs should work the same with
+implicit nodes and without, so all we can do is ignore them.
+
+>
+>> +static inline BlockDriverState *child_bs(BlockDriverState *bs)
+>> +{
+>> +    BdrvChild *child =3D QLIST_FIRST(&bs->children);
+>> +    assert(child && !QLIST_NEXT(child, next));
+>> +    return child->bs;
+>> +}
+>
+>This aborts if the bs has a number of children !=3D 1. That's not
+>something that I would expect from a function named like that.
+>
+>Considering that you're only using it in bdrv_get_first_explicit(), why
+>don't you simply move the code there?
+
+It felt useful to have a function that also returns file->bs (we have=20
+backing_bs() already) instead of doing backing_bs(bs) ? : file_bs(bs)
+>
+>The other question is of course whether we can rely for the future on
+>the assumption that implicit nodes only have one children.
+
+This is only to get either bs->backing or bs->file (we can't have both
+anyway). I wanted to document it with something like "Used for filter=20
+drivers with only one child" which fits with what implicit nodes we have=20
+so far (mirror, commit, throttle and in the future backup)
+
+--4gyk3d6svkacoyq6
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlmS/BMACgkQc2J8L2kN
+9xDnnA/+NRZecdvI32Qx6jWzA4heRh2IO91Ow7jpcPTMYEGpxHGi3k/CEXyTmvQ6
+gJ1QOJVsNSsft5Ndukxvsp4PXuF1xxIhVUPQNXGWFSx0g7gJTfEgPf1tUXsprmJs
+clfcucjjcqC/oYReGPiLrQhNZeB7l6hRuqZ3akJ7ruUvQ28PX0louNMT1VMqG0n4
+ck/CQj+wn9Sib78CQ5PhVZnqfYWSJswsvVWTPARi4leSdBCZ0uuQxJFl83kdBGCb
+0nwEvlgeaWWuQdHIFQeK9rPtgFdTzXcHls+M5tCdvUijF2wcoo9Tyy68FjuXpVTW
+/Cg5Vm6rrcPCwEQLky++ADUIvbmdOhKrUZyU2KANaVNUTvvzX3ftwEJAeHnyM1+t
+nYrrLvC5STWkP5Ce5OA5GOo5oujSNoNM3LCK2B9OB51kOLQVXQWM4DkQl3g1WFVd
+GGJqGF4bKWtLC4Rz9Nl/qMVjBpPYyQYuSW3BdeEb9CH52Wpkl9ioknXb/yyFypaN
+dII3jV7zxg4q58FxHWwTl++pk/bDPXOPkojjlkZvewN8JSGwo8Ppwb9v83/ktqfU
+HMUImgNA0eIWjccf6xBKcPeT0w6vlpsvRsSW0rK96/wXMO3eCb4v/qiiGpJsTzY8
+hOJH2Udl/1hq2mCxDKpgiwAisSVlCdkcmry1nNh2QgMjTXM126Q=
+=nKR/
+-----END PGP SIGNATURE-----
+
+--4gyk3d6svkacoyq6--
