@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dhdT5-00042l-7x
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:09:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1dhdTC-00048D-1G
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:09:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dhdT4-0002Yd-DM
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:09:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:29195)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dhdT4-0002Y7-7D
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:09:18 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 48D86C058EB7
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 15:09:17 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1dhdTB-0002cN-08
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:09:25 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 15 Aug 2017 10:09:03 -0500
-Message-Id: <20170815150907.21495-4-eblake@redhat.com>
+Date: Tue, 15 Aug 2017 10:09:05 -0500
+Message-Id: <20170815150907.21495-6-eblake@redhat.com>
 In-Reply-To: <20170815150907.21495-1-eblake@redhat.com>
 References: <20170815150907.21495-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 3/7] stubs: Add vm state change handler stubs
+Subject: [Qemu-devel] [PULL 5/7] block-backend: Defer shared_perm tightening
+ migration completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +21,102 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
 From: Fam Zheng <famz@redhat.com>
 
-They will be used by BlockBackend code in block-obj-y, which doesn't
-always get linked with common-obj-y. Add stubs to keep ld happy.
+As in the case of nbd_export_new(), bdrv_invalidate_cache() can be
+called when migration is still in progress. In this case we are not
+ready to tighten the shared permissions fenced by blk->disable_perm.
+
+Defer to a VM state change handler.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170815130740.31229-2-famz@redhat.com>
+Message-Id: <20170815130740.31229-4-famz@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- stubs/change-state-handler.c | 14 ++++++++++++++
- stubs/Makefile.objs          |  1 +
- 2 files changed, 15 insertions(+)
- create mode 100644 stubs/change-state-handler.c
+ block/block-backend.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
-diff --git a/stubs/change-state-handler.c b/stubs/change-state-handler.c
-new file mode 100644
-index 0000000000..01b1c6986d
---- /dev/null
-+++ b/stubs/change-state-handler.c
-@@ -0,0 +1,14 @@
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "sysemu/sysemu.h"
-+
-+VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandler *cb,
-+                                                     void *opaque)
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 968438c149..e9798e897d 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -20,6 +20,7 @@
+ #include "qapi-event.h"
+ #include "qemu/id.h"
+ #include "trace.h"
++#include "migration/misc.h"
+
+ /* Number of coroutines to reserve per attached device model */
+ #define COROUTINE_POOL_RESERVATION 64
+@@ -68,6 +69,7 @@ struct BlockBackend {
+     NotifierList remove_bs_notifiers, insert_bs_notifiers;
+
+     int quiesce_counter;
++    VMChangeStateEntry *vmsh;
+ };
+
+ typedef struct BlockBackendAIOCB {
+@@ -129,6 +131,23 @@ static const char *blk_root_get_name(BdrvChild *child)
+     return blk_name(child->opaque);
+ }
+
++static void blk_vm_state_changed(void *opaque, int running, RunState state)
 +{
-+    return NULL;
++    Error *local_err = NULL;
++    BlockBackend *blk = opaque;
++
++    if (state == RUN_STATE_INMIGRATE) {
++        return;
++    }
++
++    qemu_del_vm_change_state_handler(blk->vmsh);
++    blk->vmsh = NULL;
++    blk_set_perm(blk, blk->perm, blk->shared_perm, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++    }
 +}
 +
-+void qemu_del_vm_change_state_handler(VMChangeStateEntry *e)
-+{
-+    /* Nothing to do. */
-+}
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index f5b47bfd74..e69c217aff 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -19,6 +19,7 @@ stub-obj-y += is-daemonized.o
- stub-obj-$(CONFIG_LINUX_AIO) += linux-aio.o
- stub-obj-y += machine-init-done.o
- stub-obj-y += migr-blocker.o
-+stub-obj-y += change-state-handler.o
- stub-obj-y += monitor.o
- stub-obj-y += notify-event.o
- stub-obj-y += qtest.o
+ /*
+  * Notifies the user of the BlockBackend that migration has completed. qdev
+  * devices can tighten their permissions in response (specifically revoke
+@@ -147,6 +166,24 @@ static void blk_root_activate(BdrvChild *child, Error **errp)
+
+     blk->disable_perm = false;
+
++    blk_set_perm(blk, blk->perm, BLK_PERM_ALL, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        blk->disable_perm = true;
++        return;
++    }
++
++    if (runstate_check(RUN_STATE_INMIGRATE)) {
++        /* Activation can happen when migration process is still active, for
++         * example when nbd_server_add is called during non-shared storage
++         * migration. Defer the shared_perm update to migration completion. */
++        if (!blk->vmsh) {
++            blk->vmsh = qemu_add_vm_change_state_handler(blk_vm_state_changed,
++                                                         blk);
++        }
++        return;
++    }
++
+     blk_set_perm(blk, blk->perm, blk->shared_perm, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+@@ -291,6 +328,10 @@ static void blk_delete(BlockBackend *blk)
+     if (blk->root) {
+         blk_remove_bs(blk);
+     }
++    if (blk->vmsh) {
++        qemu_del_vm_change_state_handler(blk->vmsh);
++        blk->vmsh = NULL;
++    }
+     assert(QLIST_EMPTY(&blk->remove_bs_notifiers.notifiers));
+     assert(QLIST_EMPTY(&blk->insert_bs_notifiers.notifiers));
+     QTAILQ_REMOVE(&block_backends, blk, link);
 -- 
 2.13.5
