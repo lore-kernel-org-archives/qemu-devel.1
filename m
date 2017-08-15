@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dhVAV-0005rF-Ki
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:17:36 -0400
+	(envelope-from <peterx@redhat.com>) id 1dhVAc-0005w5-7w
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:17:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dhVAU-00019o-Gr
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:17:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34876)
+	(envelope-from <peterx@redhat.com>) id 1dhVAY-0001B9-VK
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:17:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49118)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dhVAU-00019Y-7e
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:17:34 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dhVAY-0001At-MA
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 02:17:38 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3C4852C96DC
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 06:17:33 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B1E84A036F
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 06:17:37 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Tue, 15 Aug 2017 14:17:06 +0800
-Message-Id: <1502777827-18874-6-git-send-email-peterx@redhat.com>
+Date: Tue, 15 Aug 2017 14:17:07 +0800
+Message-Id: <1502777827-18874-7-git-send-email-peterx@redhat.com>
 In-Reply-To: <1502777827-18874-1-git-send-email-peterx@redhat.com>
 References: <1502777827-18874-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC 5/6] migration: store listen task tag
+Subject: [Qemu-devel] [RFC 6/6] migration: allow migrate_incoming for paused
+ VM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,92 +33,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Daniel P . Berrange" <berrange@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Store the task tag for migration types: tcp/unix/fd/exec in current
-MigrationIncomingState struct.
+migrate_incoming command is previously only used when we were providing
+"-incoming defer" in the command line, to defer the incoming migration
+channel creation.
 
-For defered migration, no need to store task tag since there is no task
-running in the main loop at all. For RDMA, let's mark it as todo.
+However there is similar requirement when we are paused during postcopy
+migration. The old incoming channel might have been destroyed already.
+We may need another new channel for the recovery to happen.
+
+This patch leveraged the same interface, but allows the user to specify
+incoming migration channel even for paused postcopy.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c | 22 ++++++++++++++++++----
- migration/migration.h |  2 ++
- 2 files changed, 20 insertions(+), 4 deletions(-)
+ migration/migration.c | 34 +++++++++++++++++++++++++++-------
+ 1 file changed, 27 insertions(+), 7 deletions(-)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index c9b7085..daf356b 100644
+index daf356b..696cc7c 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -171,6 +171,7 @@ void migration_incoming_state_destroy(void)
-         mis->from_src_file = NULL;
-     }
- 
-+    mis->listen_task_tag = 0;
-     qemu_event_destroy(&mis->main_thread_load_event);
+@@ -1288,17 +1288,39 @@ void migrate_del_blocker(Error *reason)
+     migration_blockers = g_slist_remove(migration_blockers, reason);
  }
  
-@@ -265,25 +266,31 @@ int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
- void qemu_start_incoming_migration(const char *uri, Error **errp)
++static bool migrate_incoming_detach_listen(MigrationIncomingState *mis)
++{
++    if (mis->listen_task_tag) {
++        /* Never fail */
++        g_source_remove(mis->listen_task_tag);
++        mis->listen_task_tag = 0;
++        return true;
++    }
++    return false;
++}
++
+ void qmp_migrate_incoming(const char *uri, Error **errp)
  {
-     const char *p;
-+    guint task_tag = 0;
+     Error *local_err = NULL;
+-    static bool once = true;
 +    MigrationIncomingState *mis = migration_incoming_get_current();
  
-     qapi_event_send_migration(MIGRATION_STATUS_SETUP, &error_abort);
-     if (!strcmp(uri, "defer")) {
-         deferred_incoming_migration(errp);
-     } else if (strstart(uri, "tcp:", &p)) {
--        tcp_start_incoming_migration(p, errp);
-+        task_tag = tcp_start_incoming_migration(p, errp);
- #ifdef CONFIG_RDMA
-     } else if (strstart(uri, "rdma:", &p)) {
-+        /* TODO: store task tag for RDMA migrations */
-         rdma_start_incoming_migration(p, errp);
- #endif
-     } else if (strstart(uri, "exec:", &p)) {
--        exec_start_incoming_migration(p, errp);
-+        task_tag = exec_start_incoming_migration(p, errp);
-     } else if (strstart(uri, "unix:", &p)) {
--        unix_start_incoming_migration(p, errp);
-+        task_tag = unix_start_incoming_migration(p, errp);
-     } else if (strstart(uri, "fd:", &p)) {
--        fd_start_incoming_migration(p, errp);
-+        task_tag = fd_start_incoming_migration(p, errp);
-     } else {
-         error_setg(errp, "unknown migration protocol: %s", uri);
-+        return;
+-    if (!deferred_incoming) {
+-        error_setg(errp, "For use with '-incoming defer'");
++    if (!deferred_incoming &&
++        mis->state != MIGRATION_STATUS_POSTCOPY_PAUSED) {
++        error_setg(errp, "For use with '-incoming defer'"
++                   " or PAUSED postcopy migration only.");
+         return;
      }
-+
-+    mis->listen_task_tag = task_tag;
- }
- 
- static void process_incoming_migration_bh(void *opaque)
-@@ -422,6 +429,13 @@ void migration_fd_process_incoming(QEMUFile *f)
-         co = qemu_coroutine_create(process_incoming_migration_co, f);
-         qemu_coroutine_enter(co);
-     }
+-    if (!once) {
+-        error_setg(errp, "The incoming migration has already been started");
 +
 +    /*
-+     * When reach here, we should not need the listening port any
-+     * more. We'll detach the listening task soon, let's reset the
-+     * listen task tag.
++     * Destroy existing listening task if exist. Logically this should
++     * not really happen at all (for either deferred migration or
++     * postcopy migration, we should both detached the listening
++     * task). So raise an error but still we safely detach it.
 +     */
-+    mis->listen_task_tag = 0;
++    if (migrate_incoming_detach_listen(mis)) {
++        error_report("%s: detected existing listen channel, "
++                     "while it should not exist", __func__);
++        /* Continue */
+     }
+ 
+     qemu_start_incoming_migration(uri, &local_err);
+@@ -1307,8 +1329,6 @@ void qmp_migrate_incoming(const char *uri, Error **errp)
+         error_propagate(errp, local_err);
+         return;
+     }
+-
+-    once = false;
  }
  
- /*
-diff --git a/migration/migration.h b/migration/migration.h
-index d041369..1f4faef 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -26,6 +26,8 @@
- /* State for the incoming migration */
- struct MigrationIncomingState {
-     QEMUFile *from_src_file;
-+    /* Task tag for incoming listen port. Valid when >0. */
-+    guint listen_task_tag;
- 
-     /*
-      * Free at the start of the main state load, set as the main thread finishes
+ bool migration_is_blocked(Error **errp)
 -- 
 2.7.4
