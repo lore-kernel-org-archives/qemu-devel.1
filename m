@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dhhUU-000587-5M
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:27:03 -0400
+	(envelope-from <mst@redhat.com>) id 1dhhVj-0005x7-91
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:28:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dhhUP-0006Yd-5g
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:27:02 -0400
-Received: from mail-io0-x22d.google.com ([2607:f8b0:4001:c06::22d]:34455)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1dhhUP-0006Y7-0g
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:26:57 -0400
-Received: by mail-io0-x22d.google.com with SMTP id o9so6551396iod.1
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 12:26:56 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <600cf481-8708-a622-cc6f-a7ecf14acdab@ilande.co.uk>
-Date: Tue, 15 Aug 2017 15:26:54 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <4F3AA93F-6273-45D8-863C-B735397E2E05@gmail.com>
-References: <C2D23A89-6DB7-445C-BC25-71E9E49C288D@gmail.com>
-	<ff49cfa1-5a00-c329-1647-3ad8367cc804@redhat.com>
-	<600cf481-8708-a622-cc6f-a7ecf14acdab@ilande.co.uk>
-Subject: Re: [Qemu-devel] Help with Windows NT 4.0
+	(envelope-from <mst@redhat.com>) id 1dhhVe-0007YX-6z
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:28:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50676)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dhhVe-0007Xw-0K
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:28:14 -0400
+Date: Tue, 15 Aug 2017 22:28:11 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170815222611-mutt-send-email-mst@kernel.org>
+References: <1502721197-32717-1-git-send-email-mst@redhat.com>
+	<20170814173335.58f0e84f.cohuck@redhat.com>
+	<2f4dafd1-ba08-0f61-735a-31edefcff1e3@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2f4dafd1-ba08-0f61-735a-31edefcff1e3@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH] tests: switch tests to accel=kvm:tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, =?utf-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
+On Tue, Aug 15, 2017 at 08:47:35AM -0700, Richard Henderson wrote:
+> On 08/14/2017 08:33 AM, Cornelia Huck wrote:
+> > On Mon, 14 Aug 2017 17:34:15 +0300
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > 
+> >> Speed up tests on host systems with kvm support.
+> >> In particular, this fixes tests with --disable-tcg.
+> >>
+> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> >> Cc: Thomas Huth <thuth@redhat.com>
+> >> Cc: Laurent Vivier <lvivier@redhat.com>
+> >> Suggested-by: Cornelia Huck <cohuck@redhat.com>
+> >> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> >> ---
+> >>
+> >> Tested on x86 only.
+> >>
+> >>  tests/boot-serial-test.c | 2 +-
+> >>  tests/pnv-xscom-test.c   | 4 ++--
+> >>  tests/prom-env-test.c    | 2 +-
+> >>  3 files changed, 4 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+> >> index 11f48b0..c3b2e4e 100644
+> >> --- a/tests/boot-serial-test.c
+> >> +++ b/tests/boot-serial-test.c
+> >> @@ -78,7 +78,7 @@ static void test_machine(const void *data)
+> >>      fd = mkstemp(tmpname);
+> >>      g_assert(fd != -1);
+> >>  
+> >> -    args = g_strdup_printf("-M %s,accel=tcg -chardev file,id=serial0,path=%s"
+> >> +    args = g_strdup_printf("-M %s,accel=kvm:tcg -chardev file,id=serial0,path=%s"
+> >>                             " -no-shutdown -serial chardev:serial0 %s",
+> >>                             test->machine, tmpname, test->extra);
+> > 
+> > This has already been changed upstream.
+> 
+> Ouch.  This is the only real smoke test we have for the tcg backend for the
+> host.  While it is still going to test tcg for whatever machines do not run
+> natively on the host, I can't help think we've lost testing.
+> 
+> Can we use accel=tcg:kvm instead?
+> 
+> 
+> r~
 
-> On Aug 14, 2017, at 3:18 AM, Mark Cave-Ayland =
-<mark.cave-ayland@ilande.co.uk> wrote:
->=20
-> On 14/08/17 07:51, Paolo Bonzini wrote:
->=20
->> On 13/08/2017 21:13, Programmingkid wrote:
->>> Lately I found out that Windows NT 4.0 seems to work well with the
->>> 486 and pentium processors. Using "-cpu 486" made installing it
->>> actually work. Now I am seeing another issue. When I boot Windows NT
->>> 4.0 I see this error message:
->>>=20
->>> *** STOP: 0x0000007B (0x807A8610,0x00000000,0x00000000,0x00000000)=20=
+We can add an environment to disable kvm on qemu side,
+for e.g. CI systems who have spare time.
 
->>> INACESSIBLE_BOOT_DEVICE
->>>=20
->>> Would anyone know a way to solve this issue?
->>=20
->> Herv=C3=A9 is probably the best person to answer this question.  =
-Maybe try
->> installing it with SCSI disks ("-drive if=3Dscsi,id=3Dhd,file=3D... =
--drive
->> if=3Dscsi,id=3Dcd,file=3D... -device lsi -device scsi-hd,drive=3Dhd =
--device
->> scsi-cd,drive=3Dcd").
->=20
-> FWIW I used to run NT 4.0 in QEMU 0.9.1 without too many problems,
-> (although every so often the mouse would go crazy and it would require =
-a
-> reboot). The only thing I needed to do was install updated VGA drivers
-> from http://www.bearwindows.boot-land.net/vbemp.htm in order to =
-prevent
-> issues with the mouse pointer not displaying correctly.
->=20
-> I'm also fairly sure that was with a single -hda on the command line, =
-so
-> it might be useful to go back quite far back in time to figure out =
-what
-> changed.
->=20
->=20
-> ATB,
->=20
-> Mark.
-
-Thanks for the info. Trying to build 0.9.1 is going to be challenging. =
-It requires GCC 3.x.=20=
+-- 
+MST
