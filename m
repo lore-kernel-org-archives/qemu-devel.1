@@ -1,36 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dhhEO-0004o4-0I
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:10:24 -0400
+	(envelope-from <mst@redhat.com>) id 1dhhRr-0003Hg-Fp
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:24:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dhhEK-0003gM-OG
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:10:23 -0400
-Received: from mail-qt0-x22c.google.com ([2607:f8b0:400d:c0d::22c]:33855)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dhhEK-0003gF-JO
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:10:20 -0400
-Received: by mail-qt0-x22c.google.com with SMTP id s6so9489247qtc.1
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 12:10:20 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170815163959.6632-1-f4bug@amsat.org>
-	<20170815163959.6632-2-f4bug@amsat.org>
-	<a2773ebe-e841-4f3f-0234-d89e48811336@redhat.com>
-	<4837e428-461c-ef00-b584-42e4c22e8fc7@amsat.org>
-	<CAFEAcA88ygrba_8oGp1vLadJJ9+J66RnDm4HZ4LcdhDq9_GDSA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1717b7b5-3396-4e92-4c30-8b9a0156bddd@amsat.org>
-Date: Tue, 15 Aug 2017 16:10:15 -0300
+	(envelope-from <mst@redhat.com>) id 1dhhRn-0003ju-FH
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:24:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55442)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dhhRn-0003iF-5Y
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 15:24:15 -0400
+Date: Tue, 15 Aug 2017 22:24:08 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170815222133-mutt-send-email-mst@kernel.org>
+References: <20170815111549.6232-1-anthony.perard@citrix.com>
+	<20170815111549.6232-2-anthony.perard@citrix.com>
+	<20170815140751.2d432a46@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA88ygrba_8oGp1vLadJJ9+J66RnDm4HZ4LcdhDq9_GDSA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] libqtest: add qtest_accel() to
- avoid warnings when kvm is not available
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170815140751.2d432a46@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 v2 1/2] hw/acpi: Call
+ acpi_set_pci_info when no ACPI tables needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,47 +29,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eric Blake <eblake@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Anthony PERARD <anthony.perard@citrix.com>, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Bruce Rogers <brogers@suse.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 08/15/2017 03:39 PM, Peter Maydell wrote:
-> On 15 August 2017 at 19:27, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> On 08/15/2017 03:13 PM, Eric Blake wrote:
->>>
->>> On 08/15/2017 11:39 AM, Philippe Mathieu-Daudé wrote:
->>>>
->>>> only warn once about it.
->>>>
->>>> - kernel without kvm:
->>>>
->>>>       # make check-qtest-x86_64
->>>>         GTESTER check-qtest-x86_64
->>>>       Could not access KVM kernel module: No such device
->>>>       qemu-system-x86_64: failed to initialize KVM: No such device
->>>>       qemu-system-x86_64: Back to tcg accelerator
->>>
->>>
->>> How does this differ from what commit 2f6b38d1 was trying to do?
->>
->>
->> I'd say 2f6b38d1 is for common end-user usage while this is for QA/testers
->> usage. If you run N qtests with the same machine arguments, having this
->> warning displayed only once is enough and allow you to focus on the tests
->> output.
+On Tue, Aug 15, 2017 at 02:07:51PM +0200, Igor Mammedov wrote:
+> On Tue, 15 Aug 2017 12:15:48 +0100
+> Anthony PERARD <anthony.perard@citrix.com> wrote:
 > 
-> I think I'd rather we just straightforwardly didn't complain at
-> all in the 'make check' output. There's no benefit to this
-> for all these tests, especially given that they pretty much
-> don't care whether they run under KVM or TCG because they're
+> > To do PCI passthrough with Xen, the property acpi-pcihp-bsel needs to be
+> > set, but this was done only when ACPI tables are built which is not
+> > needed for a Xen guest. The need for the property starts with commit
+> > "pc: pcihp: avoid adding ACPI_PCIHP_PROP_BSEL twice"
+> > (f0c9d64a68b776374ec4732424a3e27753ce37b6).
+> > 
+> > Set pci info before checking for the needs to build ACPI tables.
+> > 
+> > Assign bsel=0 property only to the root bus on Xen as there is no
+> > support in the Xen ACPI tables for a different value.
+> 
+> looking at hw/acpi/pcihp.c and bsel usage there it looks like
+> bsel property is owned by it and not by ACPI tables, so instead of
+> shuffling it in acpi_setup(), how about moving bsel initialization
+> to hw/acpi/pcihp.c and initialize it there unconditionally?
+> 
+> It could be as simple as moving acpi_set_pci_info()/acpi_set_bsel()
+> there and calling it from acpi_pcihp_reset().
+> 
+> Then there won't be need for Xen specific branches, as root bus
+> will have bsel set automatically which is sufficient for Xen and
+> the rest of bsel-s (bridges) will be just unused by Xen,
+> which could later extend its ACPI table implementation to utilize them. 
 
-Oh you mean checking qtest_enabled() within configure_accelerator()? Ok, 
-clever :)
+Later is exactly what I'd like to try to avoid.
+Whoever wants acpi hotplug for bridges needs to get
+the bsel info from qemu supplied acpi tables.
 
-> not trying to test that. (If they *are* trying to test KVM
-> specific functionality then they should either skip the
-> test quietly if KVM isn't present or they should fail it;
-> printing useless waffle to the logs isn't helpful IMHO.)
 > 
-> thanks
-> -- PMM
-> 
+> > Reported-by: Sander Eikelenboom <linux@eikelenboom.it>
+> > Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+> > 
+> > ---
+> > Changes in V2:
+> >   - check for acpi_enabled before calling acpi_set_pci_info.
+> >   - set the property on the root bus only.
+> > 
+> > This patch would be a canditade to backport to 2.9.
+> > 
+> > CC: Stefano Stabellini <sstabellini@kernel.org>
+> > CC: Bruce Rogers <brogers@suse.com>
+> > ---
+> >  hw/i386/acpi-build.c | 25 ++++++++++++++++---------
+> >  1 file changed, 16 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > index 98dd424678..c0483b96cf 100644
+> > --- a/hw/i386/acpi-build.c
+> > +++ b/hw/i386/acpi-build.c
+> > @@ -46,6 +46,7 @@
+> >  #include "sysemu/tpm_backend.h"
+> >  #include "hw/timer/mc146818rtc_regs.h"
+> >  #include "sysemu/numa.h"
+> > +#include "hw/xen/xen.h"
+> >  
+> >  /* Supported chipsets: */
+> >  #include "hw/acpi/piix4.h"
+> > @@ -518,8 +519,13 @@ static void acpi_set_pci_info(void)
+> >      unsigned bsel_alloc = ACPI_PCIHP_BSEL_DEFAULT;
+> >  
+> >      if (bus) {
+> > -        /* Scan all PCI buses. Set property to enable acpi based hotplug. */
+> > -        pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_alloc);
+> > +        if (xen_enabled()) {
+> > +            /* Assign BSEL property to root bus only. */
+> > +            acpi_set_bsel(bus, &bsel_alloc);
+> > +        } else {
+> > +            /* Scan all PCI buses. Set property to enable acpi based hotplug. */
+> > +            pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_alloc);
+> > +        }
+> >      }
+> >  }
+> >  
+> > @@ -2871,6 +2877,14 @@ void acpi_setup(void)
+> >      AcpiBuildState *build_state;
+> >      Object *vmgenid_dev;
+> >  
+> > +    if (!acpi_enabled) {
+> > +        ACPI_BUILD_DPRINTF("ACPI disabled. Bailing out.\n");
+> > +        return;
+> > +    }
+> > +
+> > +    /* Assign BSEL property on hotpluggable PCI buses. */
+> > +    acpi_set_pci_info();
+> > +
+> >      if (!pcms->fw_cfg) {
+> >          ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
+> >          return;
+> > @@ -2881,15 +2895,8 @@ void acpi_setup(void)
+> >          return;
+> >      }
+> >  
+> > -    if (!acpi_enabled) {
+> > -        ACPI_BUILD_DPRINTF("ACPI disabled. Bailing out.\n");
+> > -        return;
+> > -    }
+> > -
+> >      build_state = g_malloc0(sizeof *build_state);
+> >  
+> > -    acpi_set_pci_info();
+> > -
+> >      acpi_build_tables_init(&tables);
+> >      acpi_build(&tables, MACHINE(pcms));
+> >  
