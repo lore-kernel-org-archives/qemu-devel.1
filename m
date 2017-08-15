@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dha0r-0008B9-02
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 07:27:57 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dha8J-0007nl-Qp
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 07:35:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dha0n-00038S-2f
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 07:27:57 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:49610
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dha0m-00035y-S5
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 07:27:53 -0400
-References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
-	<1500040339-119465-5-git-send-email-imammedo@redhat.com>
-	<20170814095657.549d0bc8@nial.brq.redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <b983e544-77fc-f3c3-056f-aa445cfe5053@ilande.co.uk>
-Date: Tue, 15 Aug 2017 12:27:33 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1dha8F-0008SV-9x
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 07:35:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37228)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dha8F-0008Ru-3o
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 07:35:35 -0400
+Date: Tue, 15 Aug 2017 08:35:31 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170815113531.GR3108@localhost.localdomain>
+References: <20170814155217.4898-1-brijesh.singh@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20170814095657.549d0bc8@nial.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/28] sparc: convert cpu models to SPARC
- cpu subclasses
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170814155217.4898-1-brijesh.singh@amd.com>
+Subject: Re: [Qemu-devel] [PATCH] target-i386/cpu: Add new EYPC CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,37 +26,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Brijesh Singh <brijesh.singh@amd.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Tom Lendacky <Thomas.Lendacky@amd.com>
 
-On 14/08/17 08:56, Igor Mammedov wrote:
+Hi,
 
-> On Fri, 14 Jul 2017 15:51:55 +0200
-> Igor Mammedov <imammedo@redhat.com> wrote:
+Thanks for the patch.
+
+On Mon, Aug 14, 2017 at 10:52:17AM -0500, Brijesh Singh wrote:
+> Add a new base CPU model called 'EPYC' to model processors from AMD EPYC
+> family (which includes EPYC 76xx,75xx,74xx,73xx and 72xx).
+
+I suggest enumerating in the commit message which features were
+added to the CPU model in comparison to Opteron_G5.
+
 > 
->> QOMfy cpu models handling introducing propper cpu types
->> for each cpu model.
->>
->> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->> ---
->> with this and conversion of features to properties,
->> it would be possible to replace cpu_sparc_init() with
->> cpu_generic_init() and reuse common -cpu handling
->> infrastructure.
->>
->> CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> CC: Artyom Tarasenko <atar4qemu@gmail.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  target/i386/cpu.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 44 insertions(+)
 > 
-> ping,
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index ddc45ab..ed1708b 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -1522,6 +1522,50 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>          .xlevel = 0x8000001A,
+>          .model_id = "AMD Opteron 63xx class CPU",
+>      },
+> +    {
+> +        .name = "EPYC",
+> +        .level = 0xd,
+> +        .vendor = CPUID_VENDOR_AMD,
+> +        .family = 23,
+> +        .model = 1,
+> +        .stepping = 2,
+[...]
+> +        /* Missing: XSAVES (not supported by some Linux versions,
+> +         * including v4.1 to v4.12).
+> +         * KVM doesn't yet expose any XSAVES state save component.
+> +         */
+
+Do you know which supervisor state components are available in
+EPYC CPUs?  Do you have a pointer to public AMD documentation
+about XSAVES?
+
+
+> +        .features[FEAT_XSAVE] =
+> +            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
+> +            CPUID_XSAVE_XGETBV1,
+> +        .features[FEAT_6_EAX] =
+> +            CPUID_6_EAX_ARAT,
+> +        .xlevel = 0x8000001F,
+
+All CPUID leaves from 0x8000000B to 0x8000001F return all-zeroes
+today.  If we set xlevel to 0x8000001F before we actually
+implement those CPUID leaves, we will be forced to add extra
+machine-type compat code when we finally implement them.
+
+I suggest setting it to 0x8000000A, and increasing it only after
+we actually implement the new CPUID leaves.
+
+
+> +        .model_id = "AMD EYPC Processor",
+> +    },
+>  };
+>  
+>  typedef struct PropValue {
+> -- 
+> 2.9.4
 > 
-> Mark, Artoym,
-> 
-> As SPARC maintainers, cloud you please review/test patches 4-10/28.
 
-Yes, sorry - it has been a fairly busy few weeks. I should have some
-time to look at these towards the end of the week.
-
-
-ATB,
-
-Mark.
+-- 
+Eduardo
