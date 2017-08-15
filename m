@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dhXMs-0008Rr-Fy
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:38:31 -0400
+	(envelope-from <thuth@redhat.com>) id 1dhXNq-0000jk-PQ
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:39:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dhXMp-000390-CJ
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:38:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44852)
+	(envelope-from <thuth@redhat.com>) id 1dhXNn-0003be-LG
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:39:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46118)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dhXMp-00038J-5c
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:38:27 -0400
-Date: Tue, 15 Aug 2017 09:38:22 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170815083822.GB9674@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <695CE828-CE3F-48D0-B20E-7B88C76453B8@gmail.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dhXNn-0003bM-EZ
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:39:27 -0400
+References: <20170814204450.24118-1-farman@linux.vnet.ibm.com>
+	<f637c206-266c-d76f-852e-4800422838bb@redhat.com>
+	<20170815090302.3f315027.cohuck@redhat.com>
+	<222ec8ee-0e1e-ca24-142e-505867bfee27@redhat.com>
+	<86e21c68-93ee-0311-643d-dde2c8589eea@redhat.com>
+	<20170815103221.2446bc3d.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <435fa5db-64a3-57f8-d71c-e88c1a11ab3a@redhat.com>
+Date: Tue, 15 Aug 2017 10:39:23 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170815103221.2446bc3d.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <695CE828-CE3F-48D0-B20E-7B88C76453B8@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 00/12] Convert over to use keycodemapdb
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/1] Fix "make clean" for s390
+ target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +33,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Eric Farman <farman@linux.vnet.ibm.com>, borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org
 
-On Mon, Aug 14, 2017 at 02:46:22PM -0400, Programmingkid wrote:
-> Sorry but there appears to be an issue with your patchset. I ran this command:
+On 15.08.2017 10:32, Cornelia Huck wrote:
+> On Tue, 15 Aug 2017 10:26:18 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+[...]
+>> The parameter -R disables the built-in variables, so RM can indeed not
+>> work here. Sorry, I wasn't aware of that setting yet, so your patch is
+>> indeed the right fix here (or we should maybe define RM in rules.mak, too).
 > 
-> ./configure --target-list=ppc-softmmu,i386-softmmu
+> The other users are all in tests/tcg/.
 > 
-> Then saw this error message: 
-> 
-> error: pathspec 'ui/keycodemapdb' did not match any file(s) known to git.
-> 
-> Running 'make' I saw this error message:
-> 
-> make: *** No rule to make target `ui/input-keymap-atset1-to-qcode.c', needed by `Makefile'.  Stop.
-> make: *** Waiting for unfinished jobs....
-> 
-> Running the 'make clean' command produces this error message:
-> 
-> make[1]: *** No rule to make target `ui/input-keymap-atset1-to-qcode.c', needed by `Makefile'.  Stop.
-> make: *** [clean] Error 1
-> 
-> Perhaps a missing patch?
+> Would there be value in using the built-in variables generally? (Well,
+> value that outweighs having to go through the qemu build system...)
 
-No, its a missing "git submodule update --init ui/keycodemapdb" call
+There are some non-posix shells where "rm -f" does not work (e.g.
+COMMAND.COM on Windows), and this is where $(RM) is really useful. But
+since we require a posix-style built environment anyway, it's not that
+important for the QEMU build system. OTOH, $(RM) is a standard Make
+variable, so other people might step into this trap as well - so it's
+maybe better to define it in rules.mak to avoid future confusion?
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+ Thomas
