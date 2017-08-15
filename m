@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dhX8l-0001jL-5T
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:23:56 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dhX95-0001uh-Ce
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:24:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dhX8i-0003SK-19
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:23:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53920)
+	(envelope-from <stefanha@redhat.com>) id 1dhX92-0003YR-8p
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:24:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46171)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dhX8h-0003Rz-Qa
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:23:51 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dhX92-0003YC-3U
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:24:12 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 252682CE920
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 08:23:50 +0000 (UTC)
-Date: Tue, 15 Aug 2017 09:23:44 +0100
+	by mx1.redhat.com (Postfix) with ESMTPS id 24857788AD
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 08:24:11 +0000 (UTC)
+Date: Tue, 15 Aug 2017 09:24:07 +0100
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170815082344.GA32702@stefanha-x1.localdomain>
+Message-ID: <20170815082407.GB32702@stefanha-x1.localdomain>
 References: <20170814162142.29666-1-stefanha@redhat.com>
-	<20170814163908.GG8506@redhat.com>
+	<150272911898.78.981462169854023805@dd743fd916bd>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="+HP7ph2BbKc20aGI"
+	protocol="application/pgp-signature"; boundary="0ntfKIWw70PvrIHh"
 Content-Disposition: inline
-In-Reply-To: <20170814163908.GG8506@redhat.com>
+In-Reply-To: <150272911898.78.981462169854023805@dd743fd916bd>
 Subject: Re: [Qemu-devel] [PATCH for-2.10 0/2] trace: fix simpletrace.stp
  flight recorder mode
 List-Id: <qemu-devel.nongnu.org>
@@ -35,65 +35,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com
 
 
---+HP7ph2BbKc20aGI
+--0ntfKIWw70PvrIHh
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 14, 2017 at 05:39:08PM +0100, Daniel P. Berrange wrote:
-> On Mon, Aug 14, 2017 at 05:21:40PM +0100, Stefan Hajnoczi wrote:
-> > The SystemTap flight recorder mode no longer works with simpletrace.stp=
- because
-> > the event ID mapping records are emitted the first time an event fires.
-> > Chances are, the event ID mapping record will not be in ring buffer whe=
-n the
-> > users wants to print the trace.
-> >=20
-> > This series solves the issue by using the trace-events-all global event
-> > ordering for event IDs for simpletrace.stp.
->=20
-> I see the way you've written it means it'll still honour the event
-> id mappings in the header, if present, but I wonder what's the point
-> of keeping that anymore ? If we need to support this ring-buffer mode,
-> there's no way we can take advantage of having the ID mappings dynamically
-> defined - we must always guarantee a stable mapping.
->=20
-> IOW, should we just revert
->=20
->   commit 7f1b588f20d027730676e627713ae3bbf6baab04
->   Author: Daniel P. Berrange <berrange@redhat.com>
->   Date:   Tue Oct 4 14:35:50 2016 +0100
->=20
->     trace: emit name <-> ID mapping in simpletrace header
->    =20
-> entirely ?
+On Mon, Aug 14, 2017 at 09:45:19AM -0700, no-reply@patchew.org wrote:
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/2: trace: use static event ID mapping in simpletrace.stp...
+> Checking PATCH 2/2: simpletrace: fix flight recorder --no-header option...
+> ERROR: line over 90 characters
+> #39: FILE: scripts/simpletrace.py:101:
+> +    """Deserialize trace records from a file, yielding record tuples (event_num, timestamp, pid, arg1, ..., arg6).
 
-We cannot revert the commit because QEMU dynamically assigns event IDs
-on startup.  Event IDs are not known ahead of time when the 'simple'
-tracer is used.
-
-Event IDs are only static when simpletrace.stp is used with the 'dtrace'
-tracer since simpletrace.stp has global knowledge of all trace events
-ahead of time.
+This line was not changed by this patch.
 
 Stefan
 
---+HP7ph2BbKc20aGI
+--0ntfKIWw70PvrIHh
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZkq+QAAoJEJykq7OBq3PIWmYH/3jLGChyafR4WF1FYx2AnhL3
-iW/JHViGeYKhbZCVoxzFv7xMZMR8+TzWfSX3nKuj/rT7DMyRpDvnIStG9MCCC8FG
-qqCebRt4UDEdcI3pPcWG2l10JbpRfoc2JrcNDs3RYUpJDeHcqPQC5Tvvm91FCSLO
-R3qvkLKvXovRhaLsvd2rd/p3+9/v0gZHG+7ns8HPgLA5N4Xls14LAOidSB/9redF
-IrrTs0lxr9QZ5jGkLof20coW1Xvc6oOJCIpNpbwD1Zt2Q3mu2+rGvibgttOV5bcK
-Arzpu8KbVb5DGP1LfwNj9Gqwu3UOk487U+Bh5Eb6yDiGUju0RzlNfzxdg+zx7kE=
-=qL6R
+iQEcBAEBAgAGBQJZkq+nAAoJEJykq7OBq3PIZ6cH/33celZbwA5pcP4Cp7hGfMGG
+7wD5c9ExIrWwy/ZuB8o0t39h7cxxV0tDQJVG/i2vG6dkgqpgF7DL88Aci6Nbale2
+ngnvyOrxfpTJFtWMof0VpapwExCBWyBzG4iJJ0NJSDA7YMQm4OrMDMlSXaa3i+sV
+O/DCc5vdXSpfUbt6m67GPliVv6aOrQrBajfsU8IyU4KHHV9iWAd3IFroo8sf1Ewi
+LuLNZDDBe/ARN/EX4UB5YAmVZit5k7cm7gkJB2EDrzHYnsF6vzt9m68viEqyQPPB
+0q5BZcceZAg88CiDsH/8YWC1fl/Upd3ZGbXiXcd9wGdtrVMHwBWncQOOVYfqeBs=
+=QqLc
 -----END PGP SIGNATURE-----
 
---+HP7ph2BbKc20aGI--
+--0ntfKIWw70PvrIHh--
