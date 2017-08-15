@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhb0e-00005k-31
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 08:31:51 -0400
+	(envelope-from <famz@redhat.com>) id 1dhb7q-0004L5-85
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 08:39:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhb0V-000527-5K
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 08:31:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34808)
+	(envelope-from <famz@redhat.com>) id 1dhb7n-0002GF-Fv
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 08:39:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48212)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dhb0U-00051d-Sa
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 08:31:39 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170815085732.9794-1-ldoktor@redhat.com>
-	<20170815085732.9794-2-ldoktor@redhat.com>
-Date: Tue, 15 Aug 2017 14:31:30 +0200
-In-Reply-To: <20170815085732.9794-2-ldoktor@redhat.com> (=?utf-8?B?Ikx1?=
-	=?utf-8?B?a8OhxaE=?= Doktor"'s
-	message of "Tue, 15 Aug 2017 10:57:23 +0200")
-Message-ID: <87fuctm2ql.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dhb7n-0002Fd-6m
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 08:39:11 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CD0D5883C3
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 12:39:09 +0000 (UTC)
+Date: Tue, 15 Aug 2017 20:39:03 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170815123903.GC14412@lemon>
+References: <20170815093615.16453-1-berrange@redhat.com>
+	<20170815093615.16453-2-berrange@redhat.com>
+	<20170815100410.GH9674@redhat.com> <20170815104722.GB14412@lemon>
+	<20170815105350.GI9674@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 01/10] qemu.py: Pylint/style fixes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170815105350.GI9674@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 01/12] ui: add keycodemapdb repository
+ as a GIT submodule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,322 +36,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 
-Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com> writes:
+On Tue, 08/15 11:53, Daniel P. Berrange wrote:
+> On Tue, Aug 15, 2017 at 06:47:22PM +0800, Fam Zheng wrote:
+> > On Tue, 08/15 11:04, Daniel P. Berrange wrote:
+> > > On Tue, Aug 15, 2017 at 10:36:04AM +0100, Daniel P. Berrange wrote:
+> > > > The https://gitlab.com/keycodemap/keycodemapdb/ repo contains a
+> > > > data file mapping between all the different scancode/keycode/keysym
+> > > > sets that are known, and a tool to auto-generate lookup tables for
+> > > > different combinations.
+> > > > 
+> > > > It is used by GTK-VNC, SPICE-GTK and libvirt for mapping keys.
+> > > > Using it in QEMU will let us replace many hand written lookup
+> > > > tables with auto-generated tables from a master data source,
+> > > > reducing bugs. Adding new QKeyCodes will now only require the
+> > > > master table to be updated, all ~20 other tables will be
+> > > > automatically updated to follow.
+> > > > 
+> > > > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > > > ---
+> > > >  .gitignore                    |  2 ++
+> > > >  .gitmodules                   |  3 +++
+> > > >  configure                     |  2 ++
+> > > >  tests/docker/Makefile.include | 11 +++++++----
+> > > >  tests/docker/run              |  4 +++-
+> > > >  ui/Makefile.objs              | 18 ++++++++++++++++++
+> > > >  ui/keycodemapdb               |  1 +
+> > > >  7 files changed, 36 insertions(+), 5 deletions(-)
+> > > >  create mode 160000 ui/keycodemapdb
+> > > > 
+> > > 
+> > > > diff --git a/configure b/configure
+> > > > index dd73cce62f..bd373ec2b4 100755
+> > > > --- a/configure
+> > > > +++ b/configure
+> > > > @@ -5258,6 +5258,8 @@ echo_version() {
+> > > >      fi
+> > > >  }
+> > > >  
+> > > > +(cd $source_path && git submodule update --init ui/keycodemapdb)
+> > > > +
+> > > 
+> > > Urgh, no, this won't work because of course you don't have to
+> > > have a git checkout when running configure.
+> > > 
+> > > Any suggestions on the "best" way to ensure that the ui/keycodemapdb
+> > > git submodule is always checked out, without requiring developers to
+> > > do something manually ?
+> > > 
+> > > I could try
+> > > 
+> > >   (cd $source_path && test -d .git && git submodule update --init ui/keycodemapdb)
+> > > 
+> > > but wonder if there's a better way ?
+> > 
+> > I think the way dtc handles this is okay: probe headers/libs, if failed, hint
+> > the "git submodule update" command in the error message.  This is also a
+> > familiar/friendly user interface to developers.
+> 
+> I don't think that's acceptable in this case. Few people will ever need
+> to setup the dtc submodule as distros commonly have that available.
 
-> No actual code changes, just several pylint/style fixes and docstring
-> clarifications.
->
-> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> ---
->  scripts/qemu.py | 76 ++++++++++++++++++++++++++++++++++++++++-----------=
-------
->  1 file changed, 53 insertions(+), 23 deletions(-)
->
-> diff --git a/scripts/qemu.py b/scripts/qemu.py
-> index 880e3e8..466aaab 100644
-> --- a/scripts/qemu.py
-> +++ b/scripts/qemu.py
-> @@ -23,8 +23,22 @@ import qmp.qmp
->  class QEMUMachine(object):
->      '''A QEMU VM'''
->=20=20
-> -    def __init__(self, binary, args=3D[], wrapper=3D[], name=3DNone, tes=
-t_dir=3D"/var/tmp",
-> -                 monitor_address=3DNone, socket_scm_helper=3DNone, debug=
-=3DFalse):
-> +    def __init__(self, binary, args=3D[], wrapper=3D[], name=3DNone,
-> +                 test_dir=3D"/var/tmp", monitor_address=3DNone,
-> +                 socket_scm_helper=3DNone, debug=3DFalse):
-> +        '''
-> +        Create a QEMUMachine object
+It's not available in the case of RHEL/CentOS 7, so it is similar in a degree
+which is why I mentioned it.
 
-Initialize a QEMUMachine
+But certainly I'll be happy to see a way to have this automated.  FWIW I've no
+objection to the "test -d .git" idea.
 
-Rationale: it's __init__, not __create__, and "object" is redundant.
+For docker tests to work, I'm inclined to change the Makefile rules so that
+every initialized submodule under $SRC_PATH is git-archived and copied in.
 
-> +
-> +        @param binary: path to the qemu binary (str)
-
-Drop (str), because what else could it be?
-
-> +        @param args: initial list of extra arguments
-
-If this is the initial list, then what's the final list?
-
-> +        @param wrapper: list of arguments used as prefix to qemu binary
-> +        @param name: name of this object (used for log/monitor/... file =
-names)
-prefix for socket and log file names (default: qemu-PID)
-
-> +        @param test_dir: base location to put log/monitor/... files in
-
-where to create socket and log file
-
-Aside: test_dir is a lousy name.
-
-> +        @param monitor_address: custom address for QMP monitor
-
-Yes, but what *is* a custom address?  Its user _base_args() appears to
-expect either a pair of strings (host, port) or a string filename.
-
-> +        @param socket_scm_helper: path to scm_helper binary (to forward =
-fds)
-
-What is an scm_helper, and why would I want to use it?
-
-> +        @param debug: enable debug mode (forwarded to QMP helper and suc=
-h)
-
-What is a QMP helper?  To what else is debug forwarded?
-
-> +        @note: Qemu process is not started until launch() is used.
-
-until launch().
-
-> +        '''
-
-It's an improvement.
-
->          if name is None:
->              name =3D "qemu-%d" % os.getpid()
->          if monitor_address is None:
-> @@ -33,12 +47,13 @@ class QEMUMachine(object):
->          self._qemu_log_path =3D os.path.join(test_dir, name + ".log")
->          self._popen =3D None
->          self._binary =3D binary
-> -        self._args =3D list(args) # Force copy args in case we modify th=
-em
-> +        self._args =3D list(args)     # Force copy args in case we modif=
-y them
->          self._wrapper =3D wrapper
->          self._events =3D []
->          self._iolog =3D None
->          self._socket_scm_helper =3D socket_scm_helper
->          self._debug =3D debug
-> +        self._qmp =3D None
->=20=20
->      # This can be used to add an unused monitor instance.
->      def add_monitor_telnet(self, ip, port):
-> @@ -64,16 +79,16 @@ class QEMUMachine(object):
->          if self._socket_scm_helper is None:
->              print >>sys.stderr, "No path to socket_scm_helper set"
->              return -1
-> -        if os.path.exists(self._socket_scm_helper) =3D=3D False:
-> +        if not os.path.exists(self._socket_scm_helper):
->              print >>sys.stderr, "%s does not exist" % self._socket_scm_h=
-elper
->              return -1
->          fd_param =3D ["%s" % self._socket_scm_helper,
->                      "%d" % self._qmp.get_sock_fd(),
->                      "%s" % fd_file_path]
->          devnull =3D open('/dev/null', 'rb')
-> -        p =3D subprocess.Popen(fd_param, stdin=3Ddevnull, stdout=3Dsys.s=
-tdout,
-> -                             stderr=3Dsys.stderr)
-> -        return p.wait()
-> +        proc =3D subprocess.Popen(fd_param, stdin=3Ddevnull, stdout=3Dsy=
-s.stdout,
-> +                                stderr=3Dsys.stderr)
-> +        return proc.wait()
->=20=20
->      @staticmethod
->      def _remove_if_exists(path):
-> @@ -99,8 +114,8 @@ class QEMUMachine(object):
->          return self._popen.pid
->=20=20
->      def _load_io_log(self):
-> -        with open(self._qemu_log_path, "r") as fh:
-> -            self._iolog =3D fh.read()
-> +        with open(self._qemu_log_path, "r") as iolog:
-> +            self._iolog =3D iolog.read()
->=20=20
->      def _base_args(self):
->          if isinstance(self._monitor_address, tuple):
-> @@ -114,8 +129,8 @@ class QEMUMachine(object):
->                  '-display', 'none', '-vga', 'none']
->=20=20
->      def _pre_launch(self):
-> -        self._qmp =3D qmp.qmp.QEMUMonitorProtocol(self._monitor_address,=
- server=3DTrue,
-> -                                                debug=3Dself._debug)
-> +        self._qmp =3D qmp.qmp.QEMUMonitorProtocol(self._monitor_address,
-> +                                                server=3DTrue, debug=3Ds=
-elf._debug)
-
-Recommend to break the line between the last two arguments.
-
->=20=20
->      def _post_launch(self):
->          self._qmp.accept()
-> @@ -131,9 +146,11 @@ class QEMUMachine(object):
->          qemulog =3D open(self._qemu_log_path, 'wb')
->          try:
->              self._pre_launch()
-> -            args =3D self._wrapper + [self._binary] + self._base_args() =
-+ self._args
-> +            args =3D (self._wrapper + [self._binary] + self._base_args()=
- +
-> +                    self._args)
->              self._popen =3D subprocess.Popen(args, stdin=3Ddevnull, stdo=
-ut=3Dqemulog,
-> -                                           stderr=3Dsubprocess.STDOUT, s=
-hell=3DFalse)
-> +                                           stderr=3Dsubprocess.STDOUT,
-> +                                           shell=3DFalse)
->              self._post_launch()
->          except:
->              if self.is_running():
-> @@ -149,28 +166,34 @@ class QEMUMachine(object):
->              try:
->                  self._qmp.cmd('quit')
->                  self._qmp.close()
-> -            except:
-> +            except:     # kill VM on any failure pylint: disable=3DW0702
-
-The bare except is almost certainly inappropriate.  Are you sure we
-should silence pylint?
-
-Note that there's another bare except in launch(), visible in the
-previous patch hunk.  I guess pylint is okay with that one because it
-re-throws the exception.
-
-In case we should silence pylint: what's the scope of this magic pylint
-comment?  Can we use the symbolic disable=3Dbare-except?
-
->                  self._popen.kill()
->=20=20
->              exitcode =3D self._popen.wait()
->              if exitcode < 0:
-> -                sys.stderr.write('qemu received signal %i: %s\n' % (-exi=
-tcode, ' '.join(self._args)))
-> +                sys.stderr.write('qemu received signal %i: %s\n'
-> +                                 % (-exitcode, ' '.join(self._args)))
->              self._load_io_log()
->              self._post_shutdown()
->=20=20
->      underscore_to_dash =3D string.maketrans('_', '-')
-> +
->      def qmp(self, cmd, conv_keys=3DTrue, **args):
->          '''Invoke a QMP command and return the result dict'''
-
-Make that "and return the response", because that's how
-docs/interop/qmp-spec.txt calls the thing.
-
->          qmp_args =3D dict()
-> -        for k in args.keys():
-> +        for key in args.keys():
->              if conv_keys:
-> -                qmp_args[k.translate(self.underscore_to_dash)] =3D args[=
-k]
-> +                qmp_args[key.translate(self.underscore_to_dash)] =3D arg=
-s[key]
->              else:
-> -                qmp_args[k] =3D args[k]
-> +                qmp_args[key] =3D args[key]
->=20=20
->          return self._qmp.cmd(cmd, args=3Dqmp_args)
->=20=20
->      def command(self, cmd, conv_keys=3DTrue, **args):
-> +        '''
-> +        Invoke a QMP command and on success return result dict or on fai=
-lure
-> +        raise exception with details.
-> +        '''
-
-I'm afraid "result dict" is wrong: it need not be a dict.  "on failure
-raise exception" adds precious little information, and "with details"
-adds none.
-
-Perhaps:
-
-           Invoke a QMP command.
-           On success return the return value.
-           On failure raise an exception.
-
-The last sentence is too vague, but it's hard to do better because...
-
->          reply =3D self.qmp(cmd, conv_keys, **args)
->          if reply is None:
->              raise Exception("Monitor is closed")
-
-... we raise Exception!  This code is a *turd* (pardon my french), and
-PEP8 / pylint violations are the least of its problems.
-
-> @@ -193,15 +216,18 @@ class QEMUMachine(object):
->          return events
->=20=20
->      def event_wait(self, name, timeout=3D60.0, match=3DNone):
-> -        # Test if 'match' is a recursive subset of 'event'
-> -        def event_match(event, match=3DNone):
-> +        '''Wait for event in QMP, optionally filter results by match.'''
-
-What is match?
-
-name and timeout not worth mentioning?
-
-> +        # Test if 'match' is a recursive subset of 'event'; skips branch
-> +        # processing on match's value `None`
-
-What's a "recursive subset"?  What's "branch processing"?
-
-There's an unusual set of quotes around `None`.
-
-> +        #    {"foo": {"bar": 1} matches {"foo": None}
-
-Aha: None servers as wildcard.
-
-> +        def _event_match(event, match=3DNone):
-
-Any particular reason for renaming this function?
-
->              if match is None:
->                  return True
->=20=20
->              for key in match:
->                  if key in event:
->                      if isinstance(event[key], dict):
-> -                        if not event_match(event[key], match[key]):
-> +                        if not _event_match(event[key], match[key]):
->                              return False
->                      elif event[key] !=3D match[key]:
->                          return False
-> @@ -212,18 +238,22 @@ class QEMUMachine(object):
->=20=20
->          # Search cached events
->          for event in self._events:
-> -            if (event['event'] =3D=3D name) and event_match(event, match=
-):
-> +            if (event['event'] =3D=3D name) and _event_match(event, matc=
-h):
->                  self._events.remove(event)
->                  return event
->=20=20
->          # Poll for new events
->          while True:
->              event =3D self._qmp.pull_event(wait=3Dtimeout)
-> -            if (event['event'] =3D=3D name) and event_match(event, match=
-):
-> +            if (event['event'] =3D=3D name) and _event_match(event, matc=
-h):
->                  return event
->              self._events.append(event)
->=20=20
->          return None
->=20=20
->      def get_log(self):
-> +        '''
-> +        After self.shutdown or failed qemu execution this returns the ou=
-tput
-
-Comma after execution, please.
-
-> +        of the qemu process.
-> +        '''
->          return self._iolog
-
-I understand this code was factored out of qemu-iotests for use by
-qtest.py.  That's okay, but I'd rather not serve as its maintainer.
--E2MUCH...
+Fam
