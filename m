@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dhT6K-0007ba-PZ
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 00:05:09 -0400
+	(envelope-from <famz@redhat.com>) id 1dhT6W-0007px-8d
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 00:05:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dhT6K-00057U-0g
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 00:05:08 -0400
+	(envelope-from <famz@redhat.com>) id 1dhT6V-0005O5-53
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 00:05:20 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue, 15 Aug 2017 12:04:52 +0800
-Message-Id: <20170815040454.4223-3-famz@redhat.com>
+Date: Tue, 15 Aug 2017 12:04:54 +0800
+Message-Id: <20170815040454.4223-5-famz@redhat.com>
 In-Reply-To: <20170815040454.4223-1-famz@redhat.com>
 References: <20170815040454.4223-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 2/4] nbd: Fix order of bdrv_set_perm
- and bdrv_invalidate_cache
+Subject: [Qemu-devel] [PATCH for-2.10 4/4] iotests: Add non-shared storage
+ migration case 192
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,60 +23,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-From: Kevin Wolf <kwolf@redhat.com>
-
-The "inactive" state of BDS affects whether the permissions can be
-granted, we must call bdrv_invalidate_cache before bdrv_set_perm to
-support "-incoming defer" case.
-
-Reported-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- nbd/server.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+ tests/qemu-iotests/192     | 63 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/192.out |  7 ++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 71 insertions(+)
+ create mode 100755 tests/qemu-iotests/192
+ create mode 100644 tests/qemu-iotests/192.out
 
-diff --git a/nbd/server.c b/nbd/server.c
-index 82a78bf439..b68b6fb535 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1045,11 +1045,22 @@ NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t size,
-                           bool writethrough, BlockBackend *on_eject_blk,
-                           Error **errp)
- {
-+    AioContext  *ctx;
-     BlockBackend *blk;
-     NBDExport *exp = g_malloc0(sizeof(NBDExport));
-     uint64_t perm;
-     int ret;
- 
-+    /*
-+     * NBD exports are used for non-shared storage migration.  Make sure
-+     * that BDRV_O_INACTIVE is cleared and the image is ready for write
-+     * access since the export could be available before migration handover.
-+     */
-+    ctx = bdrv_get_aio_context(bs);
-+    aio_context_acquire(ctx);
-+    bdrv_invalidate_cache(bs, NULL);
-+    aio_context_release(ctx);
+diff --git a/tests/qemu-iotests/192 b/tests/qemu-iotests/192
+new file mode 100755
+index 0000000000..b50a2c0c8e
+--- /dev/null
++++ b/tests/qemu-iotests/192
+@@ -0,0 +1,63 @@
++#!/bin/bash
++#
++# Test NBD export with -incoming (non-shared storage migration use case from
++# libvirt)
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-     /* Don't allow resize while the NBD server is running, otherwise we don't
-      * care what happens with the node. */
-     perm = BLK_PERM_CONSISTENT_READ;
-@@ -1087,15 +1098,6 @@ NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t size,
-         exp->eject_notifier.notify = nbd_eject_notifier;
-         blk_add_remove_bs_notifier(on_eject_blk, &exp->eject_notifier);
-     }
--
--    /*
--     * NBD exports are used for non-shared storage migration.  Make sure
--     * that BDRV_O_INACTIVE is cleared and the image is ready for write
--     * access since the export could be available before migration handover.
--     */
--    aio_context_acquire(exp->ctx);
--    blk_invalidate_cache(blk, NULL);
--    aio_context_release(exp->ctx);
-     return exp;
- 
- fail:
++# creator
++owner=famz@redhat.com
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1	# failure is the default!
++
++_cleanup()
++{
++	_cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++_supported_fmt generic
++_supported_proto file
++_supported_os Linux
++
++if [ "$QEMU_DEFAULT_MACHINE" != "pc" ]; then
++    _notrun "Requires a PC machine"
++fi
++
++size=64M
++_make_test_img $size
++
++{
++echo "nbd_server_start unix:$TEST_DIR/nbd"
++echo "nbd_server_add -w drive0"
++echo "q"
++} | $QEMU -nodefaults -display none -monitor stdio \
++    -drive format=$IMGFMT,file=$TEST_IMG,if=ide,id=drive0 \
++    -incoming defer 2>&1 | _filter_testdir | _filter_qemu | _filter_hmp
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/192.out b/tests/qemu-iotests/192.out
+new file mode 100644
+index 0000000000..1e0be4c4d7
+--- /dev/null
++++ b/tests/qemu-iotests/192.out
+@@ -0,0 +1,7 @@
++QA output created by 192
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) nbd_server_start unix:TEST_DIR/nbd
++(qemu) nbd_server_add -w drive0
++(qemu) q
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 1848077932..afbdc427ea 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -186,3 +186,4 @@
+ 188 rw auto quick
+ 189 rw auto
+ 190 rw auto quick
++192 rw auto quick
 -- 
 2.13.4
