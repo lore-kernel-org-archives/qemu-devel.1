@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dhg8R-0001F7-1H
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:00:12 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dhgIL-0005sl-G8
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:10:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dhg8K-0001ek-Um
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:00:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38688)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dhg8K-0001cF-M3
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:00:04 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 05AD46B364
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 18:00:01 +0000 (UTC)
-Date: Tue, 15 Aug 2017 14:59:52 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170815175952.GU3108@localhost.localdomain>
-References: <20170814215748.5158-1-ehabkost@redhat.com>
-	<20170814215748.5158-3-ehabkost@redhat.com>
-	<c78602cc-80e3-932b-5a0f-e3aa0003a183@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1dhgII-0008Pz-BF
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:10:25 -0400
+Received: from mail-pg0-x232.google.com ([2607:f8b0:400e:c05::232]:38354)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dhgII-0008Pd-3m
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 14:10:22 -0400
+Received: by mail-pg0-x232.google.com with SMTP id l64so10071108pge.5
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 11:10:22 -0700 (PDT)
+References: <ea7e7a76-09ac-b8b2-a480-6c7d341c6881@ilande.co.uk>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a2183a93-e00a-3900-4be6-0c34644cfaf2@linaro.org>
+Date: Tue, 15 Aug 2017 11:10:18 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c78602cc-80e3-932b-5a0f-e3aa0003a183@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v4 02/13] qapi: qobject_compare() helper
+In-Reply-To: <ea7e7a76-09ac-b8b2-a480-6c7d341c6881@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] How to implement different endian accesses per MMU
+ page?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,94 +31,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Laine Stump <laine@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On Tue, Aug 15, 2017 at 11:16:57AM -0500, Eric Blake wrote:
-> On 08/14/2017 04:57 PM, Eduardo Habkost wrote:
-> > The helper function will be useful when writing support code to
-> > deal with device slot information.
-> > 
-> > TODO: documentation is incomplete and unclear, needs to be
-> > improved.
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  include/qapi/util.h    | 39 +++++++++++++++++++++++++++++
-> >  qapi/qapi-util.c       | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  tests/test-qapi-util.c | 53 ++++++++++++++++++++++++++++++++++++++++
-> >  3 files changed, 158 insertions(+)
-> > 
+[CC Peter re MemTxAttrs below]
+
+On 08/15/2017 09:38 AM, Mark Cave-Ayland wrote:
+> Working through an incorrect endian issue on qemu-system-sparc64, it has
+> become apparent that at least one OS makes use of the IE (Invert Endian)
+> bit in the SPARCv9 MMU TTE to map PCI memory space without the
+> programmer having to manually endian-swap accesses.
 > 
-> > +/**
-> > + * qobject_compare:
-> > + *
-> > + * Compare the value of @a and @b.
-> > + *
-> > + * If @a and @b have the same type and the same value (see list
-> > + * of supported types below), return 0.
-> > + *
-> > + * If @a and @b are both strings, return strcmp(a, b).
-> > + *
-> > + * If @a and @b are numbers, return a negative value if a < b,
-> > + * and a positive value if a > b.
-> > + *
-> > + * Otherwise (if @a and @b are not the same, have different types,
-> > + * are of an unsupported type, or are different), return a non-zero value.
+> In other words, to quote the UltraSPARC specification: "if this bit is
+> set, accesses to the associated page are processed with inverse
+> endianness from what is specified by the instruction (big-for-little and
+> little-for-big)".
 > 
-> Is this number going to be commutative and distributive, in order to
-> provide stable qsort()ing?  That is, if comparing a and b gives a
-> positive number, then comparing b and a should give a negative number;
-> and if comparing a and b then b and c results in two positive numbers,
-> then comparing a and c should also give a positive number.  It is
-> unclear from the documentation whether you are able to make this
-> guarantee; and without it, it is unsafe to use this comparator in places
-> that require stability.
+> Looking through various bits of code, I'm trying to get a feel for the
+> best way to implement this in an efficient manner. From what I can see
+> this could be solved using an additional MMU index, however I'm not
+> overly familiar with the memory and softmmu subsystems.
 
-No, I don't make that guarantee when the types don't match or in
-the case of unsupported types.  That's a limitation of this
-implementation.
+No, it can't be solved with an MMU index.
 
-Guaranteeing it when types don't match should be easy.
-Guaranteeing it in the case of QTYPE_QDICT looks a bit harder.
-Probably it's easier to simply implement full dictionary
-comparison.
+> Can anyone point me in the right direction as to what would be the best
+> way to implement this feature within QEMU?
 
-> 
-> > + *
-> > + * Note that this function doesn't support some types, and may
-> > + * return false if the types are unsupported, or if the types don't
-> > + * match exactly.
-> 
-> How is a return of false (== 0, which also means equivalent) correct?
+It's definitely tricky.
 
-This is a documentation bug.  Leftover from a version that
-returned a boolean value (true for equal, false for not equal) in
-the past.
+We definitely need some TLB_FLAGS_MASK bit set so that we're forced through the
+memory slow path.  There is no other way to bypass the endianness that we've
+already encoded from the target instruction.
 
-> 
-> > + *
-> > + * Supported types:
-> > + * - QTYPE_QNULL
-> > + * - QTYPE_QSTRING
-> > + * - QTYPE_QBOOL
-> > + * - QTYPE_QNUM (integers only)
-> > + * - QTYPE_QLIST
-> > + *
-> > + * Unsupported (always return false):
-> > + * - QTYPE_QNUM (non-integer values)
-> > + * - QTYPE_QDICT
-> > + *
-> > + * TODO: rewrite documentation to be clearer.
-> > + * TODO: support non-integer QTYPE_NUM values and QTYPE_QDICT.
-> 
-> There's another patch series pending for qobject_is_equal(); should
-> these two patches share approaches or even code?
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg01134.html
-> https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02459.html
+Given the tlb_set_page_with_attrs interface, I would think that we need a new
+bit in MemTxAttrs, so that the target/sparc tlb_fill (and subroutines) can pass
+along the TTE bit for the given page.
 
-I will take a look.  Thanks!
+We have an existing problem in softmmu_template.h,
 
--- 
-Eduardo
+    /* ??? Note that the io helpers always read data in the target
+       byte ordering.  We should push the LE/BE request down into io.  */
+    res = glue(io_read, SUFFIX)(env, mmu_idx, index, addr, retaddr);
+    res = TGT_BE(res);
+
+We do not want to add a third(!) byte swap along the i/o path.  We need to
+collapse the two that we have already before considering this one.
+
+This probably takes the form of:
+
+(1) Replacing the "int size" argument with "TCGMemOp memop" for
+      a) io_{read,write}x in accel/tcg/cputlb.c,
+      b) memory_region_dispatch_{read,write} in memory.c,
+      c) adjust_endianness in memory.c.
+    This carries size+sign+endianness down to the next level.
+
+(2) In memory.c, adjust_endianness,
+
+     if (memory_region_wrong_endianness(mr)) {
+-        switch (size) {
++        memop ^= MO_BSWAP;
++    }
++    if (memop & MO_BSWAP) {
+
+    For extra credit, re-arrange memory_region_wrong_endianness
+    to something more explicit -- "wrong" isn't helpful.
+
+(3) In tlb_set_page_with_attrs, notice attrs.byte_swap and set
+    a new TLB_FORCE_SLOW bit within TLB_FLAGS_MASK.
+
+(4) In io_{read,write}x, if iotlbentry->attrs.byte_swap is set,
+    then memop ^= MO_BSWAP.
+
+
+
+r~
