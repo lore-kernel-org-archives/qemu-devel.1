@@ -1,17 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dhT6V-0007pM-UQ
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 00:05:20 -0400
+	(envelope-from <mst@redhat.com>) id 1dhT7w-0000ep-N0
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 00:06:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dhT6V-0005Nk-2v
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 00:05:19 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Tue, 15 Aug 2017 12:04:53 +0800
-Message-Id: <20170815040454.4223-4-famz@redhat.com>
-In-Reply-To: <20170815040454.4223-1-famz@redhat.com>
-References: <20170815040454.4223-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 3/4] block-backend: Defer shared_perm
- tightening migration completion
+	(envelope-from <mst@redhat.com>) id 1dhT7s-0006P2-PP
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 00:06:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40940)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dhT7s-0006Mx-IH
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 00:06:44 -0400
+Date: Tue, 15 Aug 2017 07:06:42 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170815070625-mutt-send-email-mst@kernel.org>
+References: <20170814084838.12233-1-wei.yang@ucloud.cn>
+	<20170814185545-mutt-send-email-mst@kernel.org>
+	<59925A94.4070502@ucloud.cn>
+	<20170815053445-mutt-send-email-mst@kernel.org>
+	<59926083.4030708@ucloud.cn>
+	<20170815054903-mutt-send-email-mst@kernel.org>
+	<59927039.9000700@ucloud.cn>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <59927039.9000700@ucloud.cn>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] bios-tables-test: delete a assert about
+ block name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,88 +34,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: wyang <wei.yang@ucloud.cn>
+Cc: imammedo@redhat.com, qemu-devel@nongnu.org
 
-As in the case of nbd_export_new(), bdrv_invalidate_cache() can be
-called when migration is still in progress. In this case we are not
-ready to tighten the shared permissions fenced by blk->disable_perm.
+On Tue, Aug 15, 2017 at 11:53:29AM +0800, wyang wrote:
+> Seems the only place, which needs to be fixed, is to replace sizeof wit=
+h
+> strlen.  Just like what you said, it is not fault but just refinement.
+> If you need it, I am glad to send patch to fix it.
+>=20
+> Wei
 
-Defer to a VM state change handler.
+Sure.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block/block-backend.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
-
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 968438c149..237dd5135d 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -20,6 +20,7 @@
- #include "qapi-event.h"
- #include "qemu/id.h"
- #include "trace.h"
-+#include "migration/misc.h"
- 
- /* Number of coroutines to reserve per attached device model */
- #define COROUTINE_POOL_RESERVATION 64
-@@ -68,6 +69,7 @@ struct BlockBackend {
-     NotifierList remove_bs_notifiers, insert_bs_notifiers;
- 
-     int quiesce_counter;
-+    VMChangeStateEntry *vmsh;
- };
- 
- typedef struct BlockBackendAIOCB {
-@@ -129,6 +131,23 @@ static const char *blk_root_get_name(BdrvChild *child)
-     return blk_name(child->opaque);
- }
- 
-+static void blk_vm_state_changed(void *opaque, int running, RunState state)
-+{
-+    Error *local_err = NULL;
-+    BlockBackend *blk = opaque;
-+
-+    if (state == RUN_STATE_INMIGRATE) {
-+        return;
-+    }
-+
-+    qemu_del_vm_change_state_handler(blk->vmsh);
-+    blk->vmsh = NULL;
-+    blk_set_perm(blk, blk->perm, blk->shared_perm, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+    }
-+}
-+
- /*
-  * Notifies the user of the BlockBackend that migration has completed. qdev
-  * devices can tighten their permissions in response (specifically revoke
-@@ -147,6 +166,24 @@ static void blk_root_activate(BdrvChild *child, Error **errp)
- 
-     blk->disable_perm = false;
- 
-+    blk_set_perm(blk, blk->perm, BLK_PERM_ALL, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        blk->disable_perm = true;
-+        return;
-+    }
-+
-+    if (runstate_check(RUN_STATE_INMIGRATE)) {
-+        /* Activation can happen when migration process is still active, for
-+         * example when nbd_server_add is called during non-shared storage
-+         * migration. Defer the shared_perm update to migration completion. */
-+        if (!blk->vmsh) {
-+            blk->vmsh = qemu_add_vm_change_state_handler(blk_vm_state_changed,
-+                                                         blk);
-+        }
-+        return;
-+    }
-+
-     blk_set_perm(blk, blk->perm, blk->shared_perm, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
--- 
-2.13.4
+> --=20
+> Wei Yang(=E6=9D=A8=E4=BC=9F)
+> Mobile: +86-13436682065
+> Email: wei.yang@ucloud.cn
+>=20
