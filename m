@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhWvh-0004rv-1d
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:10:25 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dhX4q-0007IU-EJ
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:19:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhWvc-0004oe-S0
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:10:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39930)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dhWvc-0004mc-Lh
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:10:20 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170731085110.1050-1-apahim@redhat.com>
-	<20170731085110.1050-4-apahim@redhat.com>
-Date: Tue, 15 Aug 2017 10:10:12 +0200
-In-Reply-To: <20170731085110.1050-4-apahim@redhat.com> (Amador Pahim's message
-	of "Mon, 31 Jul 2017 10:51:06 +0200")
-Message-ID: <87zib1s13v.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 3/7] qemu.py: use python logging system
+	(envelope-from <el13635@mail.ntua.gr>) id 1dhX4p-0001mo-JV
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:19:52 -0400
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Date: Tue, 15 Aug 2017 11:18:52 +0300
+Message-Id: <20170815081854.14568-1-el13635@mail.ntua.gr>
+Subject: [Qemu-devel] [PATCH v2 0/2] add internal backup job and
+ write-threshold filter drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,25 +18,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amador Pahim <apahim@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, stefanha@gmail.com, mreitz@redhat.com, crosa@redhat.com
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Please spell "Python" with a capital "P" (it's a proper name).
+This is part of my GSOC project, which is refactoring hardcoded block layer
+features into filter drivers. Block filter drivers are inserted into the graph
+only when a feature is needed. This makes the block layer more modular and
+reuses the block driver abstraction that is already present.
 
-Amador Pahim <apahim@redhat.com> writes:
+Before write notifiers currently have two users:
 
-> Let's provide extra control and flexibility by using python logging
-> system instead of print and/or sys.std*.write().
->
-> Signed-off-by: Amador Pahim <apahim@redhat.com>
+block/backup.c uses before write notifiers to intercept write requests. This
+can be refactored to use the filter driver interface by injecting an implicit
+filter node to intercept the write requests and call backup_do_cow().
 
-How exactly does this change error messages?
+block/write-threshold.c checks that write requests do not pass a user set
+offset and issue an event when they do. A new write-threshold driver can
+perform the same function and be added by the user when
+block-{insert,remove}-node are introduced. It is not trivial to convert the
+existing interface (block-set-write-threshold) to using the filter driver.
 
-Is logging the right tool to report errors to the human user?  I'm
-asking because logging and error reporting are generally separate
-things.  Example: a program runs into a recoverable error.  It logs the
-error, but does not report it.
+v2:
+  add motivation in commit messages
+  dropped hunk that removed before-write notifiers
 
-Is reporting errors to stderr the right thing to do for library class
-QEMUMachine?  I doubt it.  Libraries throw exceptions and let their
-users decide how to handle them.
+Manos Pitsidianakis (2):
+  block: use internal filter node in backup
+  block: add filter driver to block/write-threshold.c
+
+ block.c                         |  89 ++++++++++++--
+ block/backup.c                  | 207 +++++++++++++++++++++++++++----
+ block/mirror.c                  |   7 +-
+ block/qapi.c                    |   2 +-
+ block/write-threshold.c         | 264 +++++++++++++++++++++++++++++++++++-----
+ blockdev.c                      |   2 +-
+ include/block/block.h           |   8 +-
+ include/block/write-threshold.h |  22 ++--
+ qapi/block-core.json            |  19 ++-
+ tests/qemu-iotests/141.out      |   2 +-
+ tests/test-write-threshold.c    |  40 +++---
+ 11 files changed, 557 insertions(+), 105 deletions(-)
+
+-- 
+2.11.0
