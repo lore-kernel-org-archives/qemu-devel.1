@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mtparkr@gmail.com>) id 1dhi6w-0007tN-3C
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 16:06:47 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dhi7I-0008E2-IE
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 16:07:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mtparkr@gmail.com>) id 1dhi6s-0006SR-Vq
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 16:06:46 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34341)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mtparkr@gmail.com>) id 1dhi6s-0006QS-OX
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 16:06:42 -0400
-Received: by mail-wm0-x242.google.com with SMTP id x64so2558546wmg.1
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 13:06:41 -0700 (PDT)
-From: Matt Parker <mtparkr@gmail.com>
-Date: Tue, 15 Aug 2017 21:06:07 +0100
-Message-Id: <20170815200607.16232-1-mtparkr@gmail.com>
-Subject: [Qemu-devel] [PATCH v2] net: rtl8139: do not use old_mmio accesses
+	(envelope-from <ehabkost@redhat.com>) id 1dhi7F-0006ey-DO
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 16:07:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52758)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dhi7F-0006eW-6I
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 16:07:05 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2045690903
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 20:07:04 +0000 (UTC)
+Date: Tue, 15 Aug 2017 17:06:46 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170815200646.GX3108@localhost.localdomain>
+References: <20170808203935.30021-1-ehabkost@redhat.com>
+	<20170808203935.30021-2-ehabkost@redhat.com>
+	<87o9rhp3gv.fsf@dusky.pond.sub.org>
+	<20170815095607.GF9674@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170815095607.GF9674@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11 v2 1/5] qmp-shell: Use optparse
+ module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,95 +36,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jasowang@redhat.com, pbonzini@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-Both io and memory use the same mmio functions in the rtl8139 device.
-This patch removes the separate MemoryRegionOps and old_mmio accessors
-for memory, and replaces it with an alias to the io memory region.
+On Tue, Aug 15, 2017 at 10:56:07AM +0100, Daniel P. Berrange wrote:
+> On Tue, Aug 15, 2017 at 11:47:28AM +0200, Markus Armbruster wrote:
+> > Eduardo Habkost <ehabkost@redhat.com> writes:
+> > 
+> > > It makes command-line parsing and generation of help text much
+> > > simpler.
+> > 
+> > There's really no excuse for parsing command line arguments by hand in
+> > Python.
+> > 
+> > > The optparse module is deprecated since Python 2.7, but argparse
+> > > is not available in Python 2.6 (the minimum Python version
+> > > required for building QEMU).
+> > 
+> > We have a few uses of argparse in the tree.  Are they okay?
+> > 
+> > We also use getopt in places.  Perhaps we should pick one way to parse
+> > command lines and stick to it.
+> 
+> I just came up against this problem with keycodemapdb which I'm adding as
+> a submodule to qemu.  I used argparse there because it is the modern
+> recommended API for python >= 2.7.   I examined possibilty of using
+> optparse instead, but it lacks key features - in particular the idea
+> of 'subcommands' is entirely missing from optparse.
+> 
+> The 'argparse' module is part of python core, but is *also* available
+> as a standalone module that is implemented in terms of optparse.
+> 
+> So, I would suggest that we just copy the 'argparse' module into the
+> QEMU 'scripts/thirdparty' directory.
+> 
+> Then in any files which need argparse, you can do this
+> 
+>   try:
+>       import argparse
+>   except:
+>       import os, sys
+>       sys.path.append(os.path.join(os.path.dirname(__file__), "thirdparty"))
+>       import argparse
 
-Signed-off-by: Matt Parker <mtparkr@gmail.com>
----
- hw/net/rtl8139.c | 53 +++--------------------------------------------------
- 1 file changed, 3 insertions(+), 50 deletions(-)
+What about:
 
-diff --git a/hw/net/rtl8139.c b/hw/net/rtl8139.c
-index 671c7e48c6..3be24bbee7 100644
---- a/hw/net/rtl8139.c
-+++ b/hw/net/rtl8139.c
-@@ -3132,38 +3132,6 @@ static uint32_t rtl8139_io_readl(void *opaque, uint8_t addr)
- 
- /* */
- 
--static void rtl8139_mmio_writeb(void *opaque, hwaddr addr, uint32_t val)
--{
--    rtl8139_io_writeb(opaque, addr & 0xFF, val);
--}
--
--static void rtl8139_mmio_writew(void *opaque, hwaddr addr, uint32_t val)
--{
--    rtl8139_io_writew(opaque, addr & 0xFF, val);
--}
--
--static void rtl8139_mmio_writel(void *opaque, hwaddr addr, uint32_t val)
--{
--    rtl8139_io_writel(opaque, addr & 0xFF, val);
--}
--
--static uint32_t rtl8139_mmio_readb(void *opaque, hwaddr addr)
--{
--    return rtl8139_io_readb(opaque, addr & 0xFF);
--}
--
--static uint32_t rtl8139_mmio_readw(void *opaque, hwaddr addr)
--{
--    uint32_t val = rtl8139_io_readw(opaque, addr & 0xFF);
--    return val;
--}
--
--static uint32_t rtl8139_mmio_readl(void *opaque, hwaddr addr)
--{
--    uint32_t val = rtl8139_io_readl(opaque, addr & 0xFF);
--    return val;
--}
--
- static int rtl8139_post_load(void *opaque, int version_id)
- {
-     RTL8139State* s = opaque;
-@@ -3344,22 +3312,6 @@ static const MemoryRegionOps rtl8139_io_ops = {
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
- 
--static const MemoryRegionOps rtl8139_mmio_ops = {
--    .old_mmio = {
--        .read = {
--            rtl8139_mmio_readb,
--            rtl8139_mmio_readw,
--            rtl8139_mmio_readl,
--        },
--        .write = {
--            rtl8139_mmio_writeb,
--            rtl8139_mmio_writew,
--            rtl8139_mmio_writel,
--        },
--    },
--    .endianness = DEVICE_LITTLE_ENDIAN,
--};
--
- static void rtl8139_timer(void *opaque)
- {
-     RTL8139State *s = opaque;
-@@ -3422,8 +3374,9 @@ static void pci_rtl8139_realize(PCIDevice *dev, Error **errp)
- 
-     memory_region_init_io(&s->bar_io, OBJECT(s), &rtl8139_io_ops, s,
-                           "rtl8139", 0x100);
--    memory_region_init_io(&s->bar_mem, OBJECT(s), &rtl8139_mmio_ops, s,
--                          "rtl8139", 0x100);
-+    memory_region_init_alias(&s->bar_mem, OBJECT(s), "rtl8139-mem", &s->bar_io,
-+                             0, 0x100);
-+
-     pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_IO, &s->bar_io);
-     pci_register_bar(dev, 1, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->bar_mem);
- 
+  try:
+      import argparse
+  except:
+      from thirdparty import argparse
+
+(I think we could move all our Python modules [qemu.py, qmp.py]
+to ./scripts/qemu/, so this would become "qemu.thirdparty").
+
+> 
+> so that it tries to use the argparse provided by python, and falls back
+> to pulling in the one in our scripts/thirdparty directory.
+> 
+> When we finally bump our min python to 2.7, we can simply drop this
+> compat code for the import statement.  This avoids need for us to
+> re-write code to use a deprecated API, with a worse feature set.
+
+Sounds good to me.
+
 -- 
-2.13.2
+Eduardo
