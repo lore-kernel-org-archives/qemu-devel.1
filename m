@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dhXH3-0006Dv-Rv
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:32:30 -0400
+	(envelope-from <berrange@redhat.com>) id 1dhXLo-0007kc-AU
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:37:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dhXH0-0008D5-Nu
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:32:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36594)
+	(envelope-from <berrange@redhat.com>) id 1dhXLl-0002Uj-5w
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:37:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50406)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dhXH0-0008Cf-Fh
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:32:26 -0400
-Date: Tue, 15 Aug 2017 10:32:21 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170815103221.2446bc3d.cohuck@redhat.com>
-In-Reply-To: <86e21c68-93ee-0311-643d-dde2c8589eea@redhat.com>
-References: <20170814204450.24118-1-farman@linux.vnet.ibm.com>
-	<f637c206-266c-d76f-852e-4800422838bb@redhat.com>
-	<20170815090302.3f315027.cohuck@redhat.com>
-	<222ec8ee-0e1e-ca24-142e-505867bfee27@redhat.com>
-	<86e21c68-93ee-0311-643d-dde2c8589eea@redhat.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dhXLk-0002UE-TZ
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 04:37:21 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B6EF93E2B6
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 08:37:19 +0000 (UTC)
+Date: Tue, 15 Aug 2017 09:37:14 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170815083714.GA9674@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1502777827-18874-1-git-send-email-peterx@redhat.com>
+	<1502777827-18874-6-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.10 0/1] Fix "make clean" for s390
- target
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1502777827-18874-6-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 5/6] migration: store listen task tag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,66 +34,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Eric Farman <farman@linux.vnet.ibm.com>, borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Tue, 15 Aug 2017 10:26:18 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 15.08.2017 10:01, Thomas Huth wrote:
-> > On 15.08.2017 09:03, Cornelia Huck wrote:  
-> >> On Tue, 15 Aug 2017 07:02:10 +0200
-> >> Thomas Huth <thuth@redhat.com> wrote:
-> >>  
-> >>> On 14.08.2017 22:44, Eric Farman wrote:  
-> >>>> How often does one really do a "make clean" ?  Rather infrequently,
-> >>>> as I only stumbled on this today.
-> >>>>
-> >>>> Perhaps I have missed the RM variable somewhere, as I see similar syntax
-> >>>> in some of the tests/tcg/ Makefiles, but I don't see it being set here.
-> >>>> My configure statement isn't terribly interesting, just enabling debug
-> >>>> for an s390x target, and as such there's no RM variable in its output.
-> >>>> I'll trust that Thomas will chime in with where it should have been.
-> >>>> In the meantime, this does the trick for me.    
-> >>>
-> >>> RM is one of the variables that should be pre-initialized by Make, and
-> >>> AFAIK should be used to increase portability (well, it's likely not
-> >>> important for QEMU since we require a posix-shell like built environment
-> >>> anyway).
-> >>>
-> >>> According to the info page of Make, chapter "10.3 Variables Used by
-> >>> Implicit Rules":
-> >>>
-> >>> `RM'
-> >>>      Command to remove a file; default `rm -f'.
-> >>>
-> >>> I've also checked it again and "make clean" works fine here (using GNU
-> >>> Make 3.82). Which version of Make (and Linux distro) are you using?  
-> >>
-> >> Interesting. It fails for me with GNU Make 3.82 on my RHEL guest as
-> >> well.
-> >>  
-> >>> Anyway, maybe I also simply missed something, so I'm certainly also fine
-> >>> with the patch to revert it to "rm -f".  
-> >>
-> >> Given that other bios makefiles use rm -f as well, let's just change
-> >> back until we figure out what's wrong.  
-> > 
-> > I just discovered that it fails for me as well when I do "make clean"
-> > from the top directory. So far I was only doing "make clean" after doing
-> > a "cd pc-bios/s390-ccw" first, and that works fine. Weird. Something
-> > seems to unset the RM variable in our build system, but I fail to find
-> > the spot where this happens...  
+On Tue, Aug 15, 2017 at 02:17:06PM +0800, Peter Xu wrote:
+> Store the task tag for migration types: tcp/unix/fd/exec in current
+> MigrationIncomingState struct.
 > 
-> Ok, just found it: It's this line in rules.mak:
+> For defered migration, no need to store task tag since there is no task
+> running in the main loop at all. For RDMA, let's mark it as todo.
 > 
-> MAKEFLAGS += -rR
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  migration/migration.c | 22 ++++++++++++++++++----
+>  migration/migration.h |  2 ++
+>  2 files changed, 20 insertions(+), 4 deletions(-)
 > 
-> The parameter -R disables the built-in variables, so RM can indeed not
-> work here. Sorry, I wasn't aware of that setting yet, so your patch is
-> indeed the right fix here (or we should maybe define RM in rules.mak, too).
+> diff --git a/migration/migration.c b/migration/migration.c
+> index c9b7085..daf356b 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -171,6 +171,7 @@ void migration_incoming_state_destroy(void)
+>          mis->from_src_file = NULL;
+>      }
+>  
+> +    mis->listen_task_tag = 0;
+>      qemu_event_destroy(&mis->main_thread_load_event);
+>  }
+>  
+> @@ -265,25 +266,31 @@ int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
+>  void qemu_start_incoming_migration(const char *uri, Error **errp)
+>  {
+>      const char *p;
+> +    guint task_tag = 0;
+> +    MigrationIncomingState *mis = migration_incoming_get_current();
+>  
+>      qapi_event_send_migration(MIGRATION_STATUS_SETUP, &error_abort);
+>      if (!strcmp(uri, "defer")) {
+>          deferred_incoming_migration(errp);
+>      } else if (strstart(uri, "tcp:", &p)) {
+> -        tcp_start_incoming_migration(p, errp);
+> +        task_tag = tcp_start_incoming_migration(p, errp);
+>  #ifdef CONFIG_RDMA
+>      } else if (strstart(uri, "rdma:", &p)) {
+> +        /* TODO: store task tag for RDMA migrations */
+>          rdma_start_incoming_migration(p, errp);
+>  #endif
+>      } else if (strstart(uri, "exec:", &p)) {
+> -        exec_start_incoming_migration(p, errp);
+> +        task_tag = exec_start_incoming_migration(p, errp);
+>      } else if (strstart(uri, "unix:", &p)) {
+> -        unix_start_incoming_migration(p, errp);
+> +        task_tag = unix_start_incoming_migration(p, errp);
+>      } else if (strstart(uri, "fd:", &p)) {
+> -        fd_start_incoming_migration(p, errp);
+> +        task_tag = fd_start_incoming_migration(p, errp);
+>      } else {
+>          error_setg(errp, "unknown migration protocol: %s", uri);
+> +        return;
+>      }
+> +
+> +    mis->listen_task_tag = task_tag;
 
-The other users are all in tests/tcg/.
+This is unsafe as currently written. The main loop watches that are
+associated with these tags are all unregistered when incoming migration
+starts. So if you save them, and then unregister later when postcopy
+is "stuck", then you're likely unregistering a tag associated with
+some other random part of QEMU, because the saved value is no longer
+valid.
 
-Would there be value in using the built-in variables generally? (Well,
-value that outweighs having to go through the qemu build system...)
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
