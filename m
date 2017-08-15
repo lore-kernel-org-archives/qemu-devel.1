@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dhdHX-0005Is-Ty
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 10:57:24 -0400
+	(envelope-from <eblake@redhat.com>) id 1dhdT2-000413-2m
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:09:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dhdHW-0004L0-L8
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 10:57:24 -0400
-Received: from mail-pg0-x236.google.com ([2607:f8b0:400e:c05::236]:38147)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dhdHW-0004KW-FT
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 10:57:22 -0400
-Received: by mail-pg0-x236.google.com with SMTP id l64so7001247pge.5
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 07:57:22 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 15 Aug 2017 07:57:14 -0700
-Message-Id: <20170815145714.17635-4-richard.henderson@linaro.org>
-In-Reply-To: <20170815145714.17635-1-richard.henderson@linaro.org>
-References: <20170815145714.17635-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 for-2.10 3/3] target/arm: Require alignment
- for load exclusive
+	(envelope-from <eblake@redhat.com>) id 1dhdSy-0002Vy-TS
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:09:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:2750)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dhdSy-0002Vi-NN
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 11:09:12 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B83087CDEA
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 15:09:11 +0000 (UTC)
+Received: from red.redhat.com (ovpn-121-22.rdu2.redhat.com [10.10.121.22])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5A7EC61B79
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 15:09:11 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Tue, 15 Aug 2017 10:09:00 -0500
+Message-Id: <20170815150907.21495-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL for 2.10-rc3 0/7] NBD changes for 2.10-rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +31,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, alistair.francis@xilinx.com, edgar.iglesias@xilinx.com
 
-From: Alistair Francis <alistair.francis@xilinx.com>
+The following changes since commit 47025a0193f1f910300adfa443305ccf8482ef87:
 
-Acording to the ARM ARM exclusive loads require the same allignment as
-exclusive stores. Let's update the memops used for the load to match
-that of the store. This adds the alignment requirement to the memops.
+  qxl: call qemu_spice_display_init_common for secondary devices (2017-08-15 15:04:51 +0100)
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-[rth: Require 16-byte alignment for 64-bit LDXP.]
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/translate-a64.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+are available in the git repository at:
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index eac545e4f2..2200e25be0 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -1861,7 +1861,7 @@ static void gen_load_exclusive(DisasContext *s, int rt, int rt2,
-         g_assert(size >= 2);
-         if (size == 2) {
-             /* The pair must be single-copy atomic for the doubleword.  */
--            memop |= MO_64;
-+            memop |= MO_64 | MO_ALIGN;
-             tcg_gen_qemu_ld_i64(cpu_exclusive_val, addr, idx, memop);
-             if (s->be_data == MO_LE) {
-                 tcg_gen_extract_i64(cpu_reg(s, rt), cpu_exclusive_val, 0, 32);
-@@ -1871,10 +1871,11 @@ static void gen_load_exclusive(DisasContext *s, int rt, int rt2,
-                 tcg_gen_extract_i64(cpu_reg(s, rt2), cpu_exclusive_val, 0, 32);
-             }
-         } else {
--            /* The pair must be single-copy atomic for *each* doubleword,
--               but not the entire quadword.  */
-+            /* The pair must be single-copy atomic for *each* doubleword, not
-+               the entire quadword, however it must be quadword aligned.  */
-             memop |= MO_64;
--            tcg_gen_qemu_ld_i64(cpu_exclusive_val, addr, idx, memop);
-+            tcg_gen_qemu_ld_i64(cpu_exclusive_val, addr, idx,
-+                                memop | MO_ALIGN_16);
- 
-             TCGv_i64 addr2 = tcg_temp_new_i64();
-             tcg_gen_addi_i64(addr2, addr, 8);
-@@ -1885,7 +1886,7 @@ static void gen_load_exclusive(DisasContext *s, int rt, int rt2,
-             tcg_gen_mov_i64(cpu_reg(s, rt2), cpu_exclusive_high);
-         }
-     } else {
--        memop |= size;
-+        memop |= size | MO_ALIGN;
-         tcg_gen_qemu_ld_i64(cpu_exclusive_val, addr, idx, memop);
-         tcg_gen_mov_i64(cpu_reg(s, rt), cpu_exclusive_val);
-     }
+  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-08-15
+
+for you to fetch changes up to 72b6ffc76653214b69a94a7b1643ff80df134486:
+
+  nbd-client: Fix regression when server sends garbage (2017-08-15 10:03:28 -0500)
+
+----------------------------------------------------------------
+nbd patches for 2017-08-15
+
+- Eric Blake: nbd: Fix trace message for disconnect
+- Stefan Hajnoczi: qemu-iotests: step clock after each test iteration
+- Fam Zheng: 0/4 block: Fix non-shared storage migration
+- Eric Blake: nbd-client: Fix regression when server sends garbage
+
+----------------------------------------------------------------
+Eric Blake (2):
+      nbd: Fix trace message for disconnect
+      nbd-client: Fix regression when server sends garbage
+
+Fam Zheng (3):
+      stubs: Add vm state change handler stubs
+      block-backend: Defer shared_perm tightening migration completion
+      iotests: Add non-shared storage migration case 192
+
+Kevin Wolf (1):
+      nbd: Fix order of bdrv_set_perm and bdrv_invalidate_cache
+
+Stefan Hajnoczi (1):
+      qemu-iotests: step clock after each test iteration
+
+ block/nbd-client.h           |  1 +
+ block/block-backend.c        | 41 ++++++++++++++++++++++++++++
+ block/nbd-client.c           | 17 +++++++++---
+ nbd/common.c                 |  2 +-
+ nbd/server.c                 | 20 +++++++-------
+ stubs/change-state-handler.c | 14 ++++++++++
+ stubs/Makefile.objs          |  1 +
+ tests/qemu-iotests/093       |  4 +++
+ tests/qemu-iotests/192       | 63 ++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/192.out   |  7 +++++
+ tests/qemu-iotests/group     |  1 +
+ 11 files changed, 157 insertions(+), 14 deletions(-)
+ create mode 100644 stubs/change-state-handler.c
+ create mode 100755 tests/qemu-iotests/192
+ create mode 100644 tests/qemu-iotests/192.out
+
 -- 
-2.13.4
+2.13.5
