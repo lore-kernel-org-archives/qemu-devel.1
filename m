@@ -1,15 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dhbXO-0006V3-KX
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:05:39 -0400
+	(envelope-from <famz@redhat.com>) id 1dhbZs-0007wh-R0
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:08:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dhbXK-0005MW-7S
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:05:38 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 15 Aug 2017 14:05:02 +0100
-Message-Id: <20170815130502.8736-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10] qemu-iotests: step clock after each
- test iteration
+	(envelope-from <famz@redhat.com>) id 1dhbZp-0007Wa-EC
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 09:08:12 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Tue, 15 Aug 2017 21:07:36 +0800
+Message-Id: <20170815130740.31229-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.10 v2 0/4] block: Fix non-shared storage
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,52 +19,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, stefanha@redhat.com
 
-The 093 throttling test submits twice as many requests as the throttle
-limit in order to ensure that we reach the limit.  The remaining
-requests are left in-flight at the end of each test iteration.
+v2: Don't leak blk->vmsh when BB is deleted before the callback is called.
+    [Stefan]
+    From stub functions, don't return g_malloc0(1) which is risky, return NULL.
+    [Eric]
 
-Commit 452589b6b47e8dc6353df257fc803dfc1383bed8 ("vl.c/exit: pause cpus
-before closing block devices") exposed a hang in 093.  This happens
-because requests are still in flight when QEMU terminates but
-QEMU_CLOCK_VIRTUAL time is frozen.  bdrv_drain_all() hangs forever since
-throttled requests cannot complete.
+"nbd-server-add -w" doesn't work when we are in "-incoming defer" state:
 
-Step the clock at the end of each test iteration so in-flight requests
-actually finish.  This solves the hang and is cleaner than leaving tests
-in-flight.
+    (qemu) nbd_server_add -w drive-virtio-disk0
+    Block node is read-only
 
-Note that this could also be "fixed" by disabling throttling when drives
-are closed in QEMU.  That approach has two issues:
+Two problems are faced:
 
-1. We must drain requests before disabling throttling, so the hang
-   cannot be easily avoided!
+  - nbd_export_new() calls bdrv_invalidate_cache() too late.
+  - bdrv_invalidate_cache() restores qdev permission (which are temporarily
+    masked by BlockBackend.disable_perm during INMIGRATE) too early.
 
-2. Any time QEMU disables throttling internally there is a chance that
-   malicious users can abuse the code path to bypass throttling limits.
+Fix both, and add a regression iotest.
 
-Therefore it makes more sense to fix the test case than to modify QEMU.
+Fam Zheng (3):
+  stubs: Add vm state change handler stubs
+  block-backend: Defer shared_perm tightening migration completion
+  iotests: Add non-shared storage migration case 192
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tests/qemu-iotests/093 | 4 ++++
- 1 file changed, 4 insertions(+)
+Kevin Wolf (1):
+  nbd: Fix order of bdrv_set_perm and bdrv_invalidate_cache
 
-diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
-index 2ed393a548..ef3997206b 100755
---- a/tests/qemu-iotests/093
-+++ b/tests/qemu-iotests/093
-@@ -133,6 +133,10 @@ class ThrottleTestCase(iotests.QMPTestCase):
-             self.assertTrue(check_limit(params['iops_rd'], rd_iops))
-             self.assertTrue(check_limit(params['iops_wr'], wr_iops))
- 
-+        # Allow remaining requests to finish.  We submitted twice as many to
-+        # ensure the throttle limit is reached.
-+        self.vm.qtest("clock_step %d" % ns)
-+
-     # Connect N drives to a VM and test I/O in all of them
-     def test_all(self):
-         params = {"bps": 4096,
+ block/block-backend.c        | 41 ++++++++++++++++++++++++++++
+ nbd/server.c                 | 20 +++++++-------
+ stubs/Makefile.objs          |  1 +
+ stubs/change-state-handler.c | 14 ++++++++++
+ tests/qemu-iotests/192       | 63 ++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/192.out   |  7 +++++
+ tests/qemu-iotests/group     |  1 +
+ 7 files changed, 138 insertions(+), 9 deletions(-)
+ create mode 100644 stubs/change-state-handler.c
+ create mode 100755 tests/qemu-iotests/192
+ create mode 100644 tests/qemu-iotests/192.out
+
 -- 
 2.13.4
