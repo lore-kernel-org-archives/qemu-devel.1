@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dhWFV-0006fX-I7
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 03:26:50 -0400
+	(envelope-from <armbru@redhat.com>) id 1dhWJU-0000h8-2K
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 03:30:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dhWFU-0001tb-A0
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 03:26:49 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:33594 helo=relay.sw.ru)
+	(envelope-from <armbru@redhat.com>) id 1dhWJQ-0003kK-0c
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 03:30:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59444)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dhWFT-0001rj-TY
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 03:26:48 -0400
-References: <20170808152607.147691-1-vsementsov@virtuozzo.com>
-	<6079e4c4-ae54-826f-8cb4-dbcd773ecf50@redhat.com>
-	<561af6b4-ca21-7118-e44d-2f12da1b23b8@virtuozzo.com>
-	<7ab0fcb2-b033-b67d-cec7-5a7470430a26@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <ddc6199c-a20d-8c94-e285-ff08369c461f@virtuozzo.com>
-Date: Tue, 15 Aug 2017 10:26:34 +0300
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dhWJP-0003jT-Nd
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 03:30:51 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1501280035.git.alistair.francis@xilinx.com>
+	<2897c32f34b415aadcf43a5ae296cf5f6e15e757.1501280035.git.alistair.francis@xilinx.com>
+	<87valqw9x0.fsf@dusky.pond.sub.org>
+	<CAKmqyKPA6v3RpZAFOibfNeOZVzai5phfXo2njDkD6PxsBgqVrw@mail.gmail.com>
+Date: Tue, 15 Aug 2017 09:30:47 +0200
+In-Reply-To: <CAKmqyKPA6v3RpZAFOibfNeOZVzai5phfXo2njDkD6PxsBgqVrw@mail.gmail.com>
+	(Alistair Francis's message of "Mon, 14 Aug 2017 12:00:33 -0700")
+Message-ID: <87lgmluw2g.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <7ab0fcb2-b033-b67d-cec7-5a7470430a26@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 for 2.10] block/nbd-client: always
- return EIO on and after the first io channel error
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] Convert single line fprintf() to
+ warn_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,111 +30,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-14.08.2017 19:22, Eric Blake wrote:
-> On 08/14/2017 02:39 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 12.08.2017 01:28, Eric Blake wrote:
->>> On 08/08/2017 10:26 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>
->>> Initial review, I'm still playing with this one, and will reply again on
->>> Monday.
->>>
->>>> Do not communicate after the first error to avoid communicating throught
->>> s/throught/through a/
->>>
->>>> broken channel. The only exclusion is try to send NBD_CMD_DISC anyway on
->>>> in nbd_client_close.
->>> I think the exclusion is wrong - if we detected the server sending us
->>> garbage, we're probably better off disconnecting entirely rather than
->>> trying to assume that the server will give us a clean disconnect via
->>> NBD_CMD_DISC.
->> But we assume nothing, just send NBD_CMD_DISC and then disconnect. May
->> be it'll help server a bit.
-> The server is already broken.  Assuming that anything we send will help
-> the broken server behave correctly is a waste in effort.  The only
-> reason to keep sending NBD_CMD_DISC if we detect a broken server is if
-> it is easier to maintain the code that way, and not out of concern for
-> the server.
->
->> The only doubt: is it possible to hang on nbd_rwv because some fail in
->> connection or server?
-> We _already_ have the bug that we are hanging in trying to talk to a
-> broken server, which is a regression introduced in 2.9 and not present
-> in 2.8.  And that's what I'm most worried about getting fixed before
-> 2.10 is released.
->
-> I don't think that sending any more data to the server is necessarily
-> going to cause a hang, so much as trying to read data that is going to
-> be sent in reply or failing to manipulate the coroutine handlers
-> correctly (that is, our current hang is because even after we detect
-> failure, we are still sending NBD_CMD_FLUSH but no longer have a
-> coroutine in place to read the reply, so we no longer make progress to
-> the point of sending NBD_CMD_DISC and closing the connection).
+Paolo, there's a Make puzzle for you below.
 
-but we will not try to read.
-However, I'm convinced, ok, let's send nothing to the broken server.
+Alistair Francis <alistair.francis@xilinx.com> writes:
 
+> On Mon, Aug 14, 2017 at 6:34 AM, Markus Armbruster <armbru@redhat.com> wrote:
+>> PATCH 3/5 has the exact same subject.  Why are the two separate?
 >
->>>> +++ b/block/nbd-client.h
->>>> @@ -29,6 +29,7 @@ typedef struct NBDClientSession {
->>>>          Coroutine *recv_coroutine[MAX_NBD_REQUESTS];
->>>>        NBDReply reply;
->>>> +    bool eio_to_all;
->>> Bikeshedding - I'm wondering if there is a better name; maybe 'error' or
->>> 'server_broken'?
->> current name also used for normal path shutdown, when reply read returns
->> 0 because of EOF.
-> But my point is that we don't necessarily want to treat normal server
-> shutdown the same as a buggy server.  Maybe we do as a minimal fix for
-> 2.10 purposes, but I really want to understand the fix we are putting in
-> for the regression, and making the fix minimal goes a long way towards
-> that goal.
+> You are right, that is a mess.
 >
->>>>    @@ -107,6 +113,7 @@ static coroutine_fn void
->>>> nbd_read_reply_entry(void *opaque)
->>>>            qemu_coroutine_yield();
->>>>        }
->>>>    +    s->eio_to_all = true;
->>> I think this one should be guarded by 'if (ret < 0)' - we also break out
->>> of the for loop when ret == 0 (aka EOF because the server ended
->>> cleanly), which is not the same as the server sending us garbage.
->> but my idea was to use eio_to_all in this case too, so it is not called
->> server_error.
-> But that's what I'm questioning - it's not obvious that forcing all
-> existing coroutines to fail with EIO is correct when we got a normal
-> EOF, as that is different than a server that is actively sending us garbage.
+> This one doesn't check for newlines at the end while the earlier one
+> checked for and removed new lines.
+>
+>>
+>> Alistair Francis <alistair.francis@xilinx.com> writes:
+[...]
+>>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>>> index 7af278db55..4886caf565 100644
+>>> --- a/tests/Makefile.include
+>>> +++ b/tests/Makefile.include
+>>> @@ -560,8 +560,8 @@ tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
+>>>  tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
+>>>  tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
+>>>  tests/test-x86-cpuid$(EXESUF): tests/test-x86-cpuid.o
+>>> -tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/xbzrle.o migration/page_cache.o $(test-util-obj-y)
+>>> -tests/test-cutils$(EXESUF): tests/test-cutils.o util/cutils.o
+>>> +tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/xbzrle.o migration/page_cache.o $(test-qom-obj-y)
+>>> +tests/test-cutils$(EXESUF): tests/test-cutils.o util/cutils.o $(test-qom-obj-y)
+>>
+>> No.  What symbols exactly is the linker missing?
+>
+> Without the change, this is the error I see when running make check:
+>
+>   CC      tests/test-x86-cpuid.o
+>   LINK    tests/test-x86-cpuid
+>   GTESTER tests/test-x86-cpuid
+>   CC      tests/test-xbzrle.o
+>   LINK    tests/test-xbzrle
+> libqemustub.a(monitor.o): In function `monitor_get_fd':
+> /scratch/alistai/master-qemu/stubs/monitor.c:10: undefined reference
+> to `error_setg_internal'
+> collect2: error: ld returned 1 exit status
+> /scratch/alistai/master-qemu/rules.mak:121: recipe for target
+> 'tests/test-xbzrle' failed
+> make: *** [tests/test-xbzrle] Error 1
 
-actually, we are not sure, is it a normal path or error: read from 
-socket retuns EOF, that means that
-server closed connection after sending last reply. If we really received 
-all needed replies and sent
-CMD_DISC that is ok, but if not - it's an error path.
-Also, read of last reply can fail because of qio_channel_shutdown 
-running in parallel, which is a normal
-path actually.
+The root cause is "obvious" ;-P
 
->
->>>> +    if (s->eio_to_all) {
->>>>            qemu_co_mutex_unlock(&s->send_mutex);
->>>> -        return -EPIPE;
->>>> +        return -EIO;
->>>>        }
->>> I don't know if changing the errno is wise; maybe we want to keep both
->>> conditions (the !s->ioc and the s->eio_to_all) - especially if we only
->>> set eio_to_all on an actual detection of server garbage rather than on
->>> all exit paths.
->> I think it is ok for all exit paths, otherwise we should carefully
->> declare in which cases
->> we return EIO and in which EPIPE, and spread this difference to the
->> whole file.
-> Losing the distinction between error codes generally has minimal impact
-> to correctness (either way, you have an error, and know that your
-> connection has dies), but can have drastic effects on ease of
-> understanding error messages.
->
+The linker searches each .a just once.  We link with
 
--- 
-Best regards,
-Vladimir
+    test-util-obj-y = libqemuutil.a libqemustub.a
+
+i.e. the linker first pulls whatever it needs out of libqemuutil.a, then
+moves on to pull whatever it now needs out of libqemustub.a.  If
+libqemustub.a needs something from libqemuutil.a that hasn't been pulled
+already, linking fails.
+
+The linker explains its doings (--print-map):
+
+    Archive member included to satisfy reference by file (symbol)
+
+    libqemuutil.a(cutils.o)       tests/test-xbzrle.o (uleb128_encode_small)
+    libqemuutil.a(qemu-error.o)   libqemuutil.a(cutils.o) (warn_report)
+    libqemustub.a(error-printf.o)
+                                  libqemuutil.a(qemu-error.o) (error_vprintf)
+    libqemustub.a(monitor.o)      libqemuutil.a(qemu-error.o) (cur_mon)
+
+Let me explain the linker's explanation:
+
+    test-xbzrle.o pulls in libqemuutil.a(cutils.o) for
+    uleb128_encode_small
+    
+    libqemuutil.a(cutils.o) pulls in libqemuutil.a(qemu-error.o) for
+    warn_report
+
+    libqemuutil.a(qemu-error.o) pulls in libqemustub.a(error_printf.o)
+    and libqemustub.a(monitor.o) for error_vprintf and cur_mon
+
+    libqemuutil(monitor.o) references error_setg_internal, which can't
+    be resolved.
+
+The stupid fix is to repeat libraries until the link succeeds:
+
+    test-util-obj-y = libqemuutil.a libqemustub.a libqemuutil.a
+
+You may have seen this with -lX11 if you're old enough.
+
+ld(1) suggests the linker can do it for us:
+
+    -( archives -)
+    --start-group archives --end-group
+        The archives should be a list of archive files.  They may be either
+        explicit file names, or -l options.
+
+        The specified archives are searched repeatedly until no new
+        undefined references are created.  Normally, an archive is searched
+        only once in the order that it is specified on the command line.
+        If a symbol in that archive is needed to resolve an undefined
+        symbol referred to by an object in an archive that appears later on
+        the command line, the linker would not be able to resolve that
+        reference.  By grouping the archives, they all be searched
+        repeatedly until all possible references are resolved.
+
+        Using this option has a significant performance cost.  It is best
+        to use it only when there are unavoidable circular references
+        between two or more archives.
+
+Sticking '-Wp,-(' and '-Wp,-)' into the command line I get from make V=1
+doesn't work for me, though.
+
+The smart solution is not to have .a reference each other.
+
+Paolo, what do you think?
+
+> If only the xbzrle change is made then I see this:
+>
+>   LINK    tests/test-xbzrle
+>   GTESTER tests/test-xbzrle
+>   CC      tests/test-vmstate.o
+>   LINK    tests/test-vmstate
+>   GTESTER tests/test-vmstate
+>   CC      tests/test-cutils.o
+>   LINK    tests/test-cutils
+> util/cutils.o: In function `parse_debug_env':
+> /scratch/alistai/master-qemu/util/cutils.c:605: undefined reference to
+> `warn_report'
+> collect2: error: ld returned 1 exit status
+> /scratch/alistai/master-qemu/rules.mak:121: recipe for target
+> 'tests/test-cutils' failed
+> make: *** [tests/test-cutils] Error 1
