@@ -1,36 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dhj10-0003Jt-1q
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 17:04:43 -0400
+	(envelope-from <groug@kaod.org>) id 1dhj5E-0006PX-Qx
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 17:09:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dhj0w-00024p-S3
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 17:04:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54780
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dhj0w-00023w-My
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 17:04:38 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7FL3kXu135265
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 17:04:36 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2cc6f6nes7-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 17:04:36 -0400
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 15 Aug 2017 15:04:36 -0600
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <groug@kaod.org>) id 1dhj59-0005lZ-OQ
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 17:09:04 -0400
+Received: from 14.mo5.mail-out.ovh.net ([188.165.51.82]:53575)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dhj59-0005kp-Di
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 17:08:59 -0400
+Received: from player734.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id ED34411AD60
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 23:08:57 +0200 (CEST)
+Date: Tue, 15 Aug 2017 23:08:49 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170815230849.5ade57c8@bahia.lan>
+In-Reply-To: <beaad4313aaf2569939bab4831acb8f6b39ef993.1502771785.git.sam.bobroff@au1.ibm.com>
+References: <cover.1502771785.git.sam.bobroff@au1.ibm.com>
+	<beaad4313aaf2569939bab4831acb8f6b39ef993.1502771785.git.sam.bobroff@au1.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 15 Aug 2017 16:04:21 -0500
-Message-Id: <150283106173.12142.14640827565327335906@loki>
-Subject: [Qemu-devel] [ANNOUNCE] QEMU 2.10.0-rc3 is now available
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/HMnUeYrL7=/ljJ.A=g/Mq.x";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v3 1/1] PPC: KVM: Support machine option to
+ set VSMT mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,108 +32,340 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Sam Bobroff <sam.bobroff@au1.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-Hello,
+--Sig_/HMnUeYrL7=/ljJ.A=g/Mq.x
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On behalf of the QEMU Team, I'd like to announce the availability of the
-fourth release candidate for the QEMU 2.10 release.  This release is meant
-for testing purposes and should not be used in a production environment.
+On Tue, 15 Aug 2017 14:42:21 +1000
+Sam Bobroff <sam.bobroff@au1.ibm.com> wrote:
 
-  http://download.qemu-project.org/qemu-2.10.0-rc3.tar.xz
-  http://download.qemu-project.org/qemu-2.10.0-rc3.tar.xz.sig
+> KVM now allows writing to KVM_CAP_PPC_SMT which has previously been
+> read only. Doing so causes KVM to act, for that VM, as if the host's
+> SMT mode was the given value. This is particularly important on Power
+> 9 systems because their default value is 1, but they are able to
+> support values up to 8.
+>=20
+> This patch introduces a way to control this capability via a new
+> machine property called VSMT ("Virtual SMT"). If the value is not set
+> on the command line a default is chosen that is, when possible,
+> compatible with legacy systems.
+>=20
+> Note that the intialization of KVM_CAP_PPC_SMT has changed slightly
+> because it has changed (in KVM) from a global capability to a
+> VM-specific one. This won't cause a problem on older KVMs because VM
+> capabilities fall back to global ones.
+>=20
+> Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+> ---
 
-A note from the maintainer:
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-  We don't currently know of any outstanding release critical bugs,
-  so unless any last minute showstoppers appear next week, we hope
-  to be able to release 2.10.0 on schedule on the 22nd. If any
-  further release critical bugs are fixed we'll release an rc4 on
-  the 22nd and the final release a week after that.
+> Changes in v3:
+>=20
+> * Suggested by Greg Kurz:
+>     * Comment on show_vsmt_possible() converted in to an assert().
+>     * Better use of g_string_new().
+>     * Removed trailing periods from several error_report() strings.
+>     * Shortened overly long line.
+>     * Converted some helpful error_report() calls into error_printf().
+>     * Simplified error handling in spapr_set_vsmt().
+>     * Use error_abort when adding properties (instead of ignoring errors)=
+, as it's a bug if it fails.
+>     * Moved the explanation about KVM_CAP_PPC_SMT into the commit so that=
+ it's not lost with the cover letter.
+>=20
+>  hw/ppc/spapr.c              | 96 +++++++++++++++++++++++++++++++++++++++=
+++++++
+>  include/hw/ppc/spapr.h      |  1 +
+>  target/ppc/kvm.c            | 20 +++++++++-
+>  target/ppc/kvm_ppc.h        | 12 ++++++
+>  target/ppc/translate_init.c | 14 -------
+>  5 files changed, 128 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index cd6eb2d4a9..e266cdd36a 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -26,6 +26,7 @@
+>   */
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+> +#include "qapi/visitor.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/numa.h"
+>  #include "hw/hw.h"
+> @@ -2140,6 +2141,82 @@ static void spapr_init_cpus(sPAPRMachineState *spa=
+pr)
+>      g_free(type);
+>  }
+> =20
+> +static void show_vsmt_possible(void)
+> +{
+> +    int i;
+> +    GString *g;
+> +    char *s;
+> +
+> +    assert(kvm_enabled());
+> +    if (kvmppc_smt_possible()) {
+> +        g =3D g_string_new("Available VSMT modes:");
+> +        for (i =3D 63; i >=3D 0; i--) {
+> +            if ((1UL << i) & kvmppc_smt_possible()) {
+> +                g_string_append_printf(g, " %lu", (1UL << i));
+> +            }
+> +        }
+> +        s =3D g_string_free(g, false);
+> +        error_printf("%s.\n", s);
+> +        g_free(s);
+> +    } else {
+> +        error_printf("This KVM seems to be too old to support VSMT.\n");
+> +    }
+> +}
+> +
+> +static void spapr_set_vsmt_mode(sPAPRMachineState *spapr)
+> +{
+> +    bool vsmt_user =3D !!spapr->vsmt;
+> +    int kvm_smt =3D kvmppc_smt_threads();
+> +    int ret;
+> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> +    const char *machine_name =3D object_class_get_name(OBJECT_CLASS(smc)=
+);
+> +
+> +    if (!kvm_enabled() && (smp_threads > 1)) {
+> +        error_report("TCG cannot support more than 1 thread/core "
+> +                     "on a %s", machine_name);
+> +        exit(1);
+> +    }
+> +    if (!is_power_of_2(smp_threads)) {
+> +        error_report("Cannot support %d threads/core on a %s because "
+> +                     "it must be a power of 2", smp_threads, machine_nam=
+e);
+> +        exit(1);
+> +    }
+> +
+> +    /* Detemine the VSMT mode to use: */
+> +    if (vsmt_user) {
+> +        if (spapr->vsmt < smp_threads) {
+> +            error_report("Cannot support VSMT mode %d"
+> +                         " because it must be >=3D threads/core (%d)",
+> +                         spapr->vsmt, smp_threads);
+> +            exit(1);
+> +        }
+> +        /* In this case, spapr->vsmt has been set by the command line */
+> +    } else {
+> +        /* Choose a VSMT mode that may be higher than necessary but is
+> +         * likely to be compatible with hosts that don't have VSMT. */
+> +        spapr->vsmt =3D MAX(kvm_smt, smp_threads);
+> +    }
+> +
+> +    /* KVM: If necessary, set the SMT mode: */
+> +    if (kvm_enabled() && (spapr->vsmt !=3D kvm_smt)) {
+> +        ret =3D kvmppc_set_smt_threads(spapr->vsmt);
+> +        if (ret) {
+> +            error_report("Failed to set KVM's VSMT mode to %d (errno %d)=
+",
+> +                         spapr->vsmt, ret);
+> +            if (!vsmt_user) {
+> +                error_printf("On PPC, a VM with %d threads/core on a hos=
+t"
+> +                             " with %d threads/core requires the use of"
+> +                             " VSMT mode %d.\n",
+> +                             smp_threads, kvm_smt, spapr->vsmt);
+> +            }
+> +            show_vsmt_possible();
+> +            exit(1);
+> +        }
+> +    }
+> +    /* else TCG: nothing to do currently */
+> +    return;
+> +}
+> +
+>  /* pSeries LPAR / sPAPR hardware init */
+>  static void ppc_spapr_init(MachineState *machine)
+>  {
+> @@ -2272,6 +2349,8 @@ static void ppc_spapr_init(MachineState *machine)
+> =20
+>      spapr_cpu_parse_features(spapr);
+> =20
+> +    spapr_set_vsmt_mode(spapr);
+> +
+>      spapr_init_cpus(spapr);
+> =20
+>      if (kvm_enabled()) {
+> @@ -2656,6 +2735,18 @@ static void spapr_set_resize_hpt(Object *obj, cons=
+t char *value, Error **errp)
+>      }
+>  }
+> =20
+> +static void spapr_get_vsmt(Object *obj, Visitor *v, const char *name,
+> +                                   void *opaque, Error **errp)
+> +{
+> +    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+> +}
+> +
+> +static void spapr_set_vsmt(Object *obj, Visitor *v, const char *name,
+> +                                   void *opaque, Error **errp)
+> +{
+> +    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+> +}
+> +
+>  static void spapr_machine_initfn(Object *obj)
+>  {
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> @@ -2686,6 +2777,11 @@ static void spapr_machine_initfn(Object *obj)
+>      object_property_set_description(obj, "resize-hpt",
+>                                      "Resizing of the Hash Page Table (en=
+abled, disabled, required)",
+>                                      NULL);
+> +    object_property_add(obj, "vsmt", "uint32", spapr_get_vsmt,
+> +                        spapr_set_vsmt, NULL, &spapr->vsmt, &error_abort=
+);
+> +    object_property_set_description(obj, "vsmt",
+> +                                    "Virtual SMT: KVM behaves as if this=
+ were"
+> +                                    " the host's SMT mode", &error_abort=
+);
+>  }
+> =20
+>  static void spapr_machine_finalizefn(Object *obj)
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 86c982cf2c..68c510339f 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -99,6 +99,7 @@ struct sPAPRMachineState {
+>      uint64_t rtc_offset; /* Now used only during incoming migration */
+>      struct PPCTimebase tb;
+>      bool has_graphics;
+> +    uint32_t vsmt;       /* Virtual SMT mode (KVM's "core stride") */
+> =20
+>      Notifier epow_notifier;
+>      QTAILQ_HEAD(, sPAPREventLogEntry) pending_events;
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 5fc7f238eb..0b9d5b83fa 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -74,6 +74,7 @@ static int cap_interrupt_level =3D false;
+>  static int cap_segstate;
+>  static int cap_booke_sregs;
+>  static int cap_ppc_smt;
+> +static int cap_ppc_smt_possible;
+>  static int cap_ppc_rma;
+>  static int cap_spapr_tce;
+>  static int cap_spapr_tce_64;
+> @@ -130,7 +131,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>      cap_interrupt_level =3D kvm_check_extension(s, KVM_CAP_PPC_IRQ_LEVEL=
+);
+>      cap_segstate =3D kvm_check_extension(s, KVM_CAP_PPC_SEGSTATE);
+>      cap_booke_sregs =3D kvm_check_extension(s, KVM_CAP_PPC_BOOKE_SREGS);
+> -    cap_ppc_smt =3D kvm_check_extension(s, KVM_CAP_PPC_SMT);
+> +    cap_ppc_smt_possible =3D kvm_check_extension(s, KVM_CAP_PPC_SMT_POSS=
+IBLE);
+>      cap_ppc_rma =3D kvm_check_extension(s, KVM_CAP_PPC_RMA);
+>      cap_spapr_tce =3D kvm_check_extension(s, KVM_CAP_SPAPR_TCE);
+>      cap_spapr_tce_64 =3D kvm_check_extension(s, KVM_CAP_SPAPR_TCE_64);
+> @@ -144,6 +145,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>       * only activated after this by kvmppc_set_papr() */
+>      cap_htab_fd =3D kvm_check_extension(s, KVM_CAP_PPC_HTAB_FD);
+>      cap_fixup_hcalls =3D kvm_check_extension(s, KVM_CAP_PPC_FIXUP_HCALL);
+> +    cap_ppc_smt =3D kvm_vm_check_extension(s, KVM_CAP_PPC_SMT);
+>      cap_htm =3D kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
+>      cap_mmu_radix =3D kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
+>      cap_mmu_hash_v3 =3D kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V=
+3);
+> @@ -2134,6 +2136,22 @@ int kvmppc_smt_threads(void)
+>      return cap_ppc_smt ? cap_ppc_smt : 1;
+>  }
+> =20
+> +int kvmppc_set_smt_threads(int smt)
+> +{
+> +    int ret;
+> +
+> +    ret =3D kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_SMT, 0, smt, 0);
+> +    if (!ret) {
+> +        cap_ppc_smt =3D smt;
+> +    }
+> +    return ret;
+> +}
+> +
+> +int kvmppc_smt_possible(void)
+> +{
+> +    return cap_ppc_smt_possible;
+> +}
+> +
+>  #ifdef TARGET_PPC64
+>  off_t kvmppc_alloc_rma(void **rma)
+>  {
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index 381afe6240..7b2962eb86 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -29,6 +29,8 @@ void kvmppc_set_papr(PowerPCCPU *cpu);
+>  int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
+>  void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
+>  int kvmppc_smt_threads(void);
+> +int kvmppc_smt_possible(void);
+> +int kvmppc_set_smt_threads(int smt);
+>  int kvmppc_clear_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
+>  int kvmppc_or_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
+>  int kvmppc_set_tcr(PowerPCCPU *cpu);
+> @@ -148,6 +150,16 @@ static inline int kvmppc_smt_threads(void)
+>      return 1;
+>  }
+> =20
+> +static inline int kvmppc_smt_possible(void)
+> +{
+> +    return 1;
+> +}
+> +
+> +static inline int kvmppc_set_smt_threads(int smt)
+> +{
+> +    return 0;
+> +}
+> +
+>  static inline int kvmppc_or_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits)
+>  {
+>      return 0;
+> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> index 0ce923be46..7f6a349e43 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -9907,20 +9907,6 @@ static void ppc_cpu_realizefn(DeviceState *dev, Er=
+ror **errp)
+>      int max_smt =3D kvmppc_smt_threads();
+>  #endif
+> =20
+> -#if !defined(CONFIG_USER_ONLY)
+> -    if (smp_threads > max_smt) {
+> -        error_setg(errp, "Cannot support more than %d threads on PPC wit=
+h %s",
+> -                   max_smt, kvm_enabled() ? "KVM" : "TCG");
+> -        return;
+> -    }
+> -    if (!is_power_of_2(smp_threads)) {
+> -        error_setg(errp, "Cannot support %d threads on PPC with %s, "
+> -                   "threads count must be a power of 2.",
+> -                   smp_threads, kvm_enabled() ? "KVM" : "TCG");
+> -        return;
+> -    }
+> -#endif
+> -
+>      cpu_exec_realizefn(cs, &local_err);
+>      if (local_err !=3D NULL) {
+>          error_propagate(errp, local_err);
 
-You can help improve the quality of the QEMU 2.10 release by testing this
-release and reporting bugs on Launchpad:
 
-  https://bugs.launchpad.net/qemu/
+--Sig_/HMnUeYrL7=/ljJ.A=g/Mq.x
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-The release plan, as well a documented known issues for release
-candidates, are available at:
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-  http://wiki.qemu.org/Planning/2.10
+iEYEARECAAYFAlmTYuEACgkQAvw66wEB28IeUQCfdzCNfnuHefQvx6nfxqOhj2w3
+JjcAn0uV81f1rff94kKLKxj5FJzse29d
+=CYtT
+-----END PGP SIGNATURE-----
 
-Please add entries to the ChangeLog for the 2.10 release below:
-
-  http://wiki.qemu.org/ChangeLog/2.10
-
-Changes since rc2:
-
-1f29673: Update version for v2.10.0-rc3 release (Peter Maydell)
-72b384f: mmio-interface: Mark as not user creatable (Peter Maydell)
-4a2fdb7: target/arm: Require alignment for load exclusive (Alistair Francis)
-19514cd: target/arm: Correct load exclusive pair atomicity (Richard Henders=
-on)
-955fd0a: target/arm: Correct exclusive store cmpxchg memop mask (Alistair F=
-rancis)
-72b6ffc: nbd-client: Fix regression when server sends garbage (Eric Blake)
-dd7fdaa: iotests: Add non-shared storage migration case 192 (Fam Zheng)
-5f7772c: block-backend: Defer shared_perm tightening migration completion (=
-Fam Zheng)
-3dff24f: nbd: Fix order of bdrv_set_perm and bdrv_invalidate_cache (Kevin W=
-olf)
-80adf54: stubs: Add vm state change handler stubs (Fam Zheng)
-cbaddb2: qemu-iotests: step clock after each test iteration (Stefan Hajnocz=
-i)
-dad3946: nbd: Fix trace message for disconnect (Eric Blake)
-47025a0: qxl: call qemu_spice_display_init_common for secondary devices (Pa=
-olo Bonzini)
-840d835: simpletrace: fix flight recorder --no-header option (Stefan Hajnoc=
-zi)
-d6b76d6: trace: use static event ID mapping in simpletrace.stp (Stefan Hajn=
-oczi)
-a8132a2: docker: add centos7 image (Philippe Mathieu-Daud=C3=A9)
-06f3c7b: docker: install more packages on CentOS to extend code coverage (P=
-hilippe Mathieu-Daud=C3=A9)
-18a2b7a: docker: add Xen libs to centos6 image (Philippe Mathieu-Daud=C3=A9)
-6aef2ad: docker: use one package per line in CentOS config (Philippe Mathie=
-u-Daud=C3=A9)
-e45eaef: Makefile: Let "make check-help" work without running ./configure (=
-Fam Zheng)
-88b3739: pc-bios/s390-ccw: Use rm command during make clean (Eric Farman)
-83c3a1f: xlnx-qspi: add a property for mmio-execution (KONRAD Frederic)
-bd7adc8: qemu-doc: Mention host_net_add/-remove in the deprecation chapter =
-(Thomas Huth)
-a808c08: hw/misc/mmio_interface: Return after error_setg() to avoid crash (=
-Thomas Huth)
-a3e08c2: qemu-iotests: remove comment about root privileges requirement (Cl=
-eber Rosa)
-80758ec: qemu-iotests: remove commented out variables (Cleber Rosa)
-657c572: qemu-iotests: get rid of _full_imgproto_details() (Cleber Rosa)
-88552b5: qemu-doc: Fix "-net van" typo (Thomas Huth)
-e8ec011: libqtest: Fix typo in comments (Eric Blake)
-0ac241b: unicore32: abort when entering "x 0" on the monitor (Eduardo Otubo)
-6900191: qemu-doc: Fix "-net van" typo (Thomas Huth)
-480bc11: boot-serial-test: fallback to kvm accelerator (Cornelia Huck)
-8565c3a: qemu-iotests: fix 185 (Vladimir Sementsov-Ogievskiy)
-2b218f5: file-posix: Do runtime check for ofd lock API (Fam Zheng)
-ca74995: osdep: Add runtime OFD lock detection (Fam Zheng)
-d0d5d0e: qcow2: Check failure of bdrv_getlength() (Eric Blake)
-c40fe9c: qcow2: Drop debugging dump_refcounts() (Eric Blake)
-81caa3c: vpc: Check failure of bdrv_getlength() (Eric Blake)
-01a02ec: tests/multiboot: Fix whitespace failure (Eric Blake)
-17d0bc0: virtio-blk: handle blk_getlength() errors (Stefan Hajnoczi)
-ce317e8: IDE: test flush on empty CDROM (Kevin Wolf)
-4da9712: IDE: Do not flush empty CDROM drives (Stefan Hajnoczi)
-4751fd5: 9pfs: local: fix fchmodat_nofollow() limitations (Greg Kurz)
-f57467e: spapr: Fix bug in h_signal_sys_reset() (Sam Bobroff)
-325837c: spapr_drc: abort if object_property_add_child() fails (Greg Kurz)
-b8af5b2: target/ppc: Add stub implementation of the PSSCR (David Gibson)
-650f328: target/ppc: Implement TIDR (David Gibson)
-e7bab9a: ppc: fix double-free in cpu_post_load() (Greg Kurz)
-89fca22: booke206: fix MAS update on tlb miss (KONRAD Frederic)
-24dd1e1: libqtest: always set up signal handler for SIGABRT (Jens Freimann)
-2566378: libvhost-user: quit when no more data received (Jens Freimann)
-0f8c289: net: fix -netdev socket,fd=3D for UDP sockets (Jens Freimann)
-cde0a63: Revert "cpu: add APIs to allocate/free CPU environment" (Michael S=
-. Tsirkin)
-114e0af: acpi-test: update expected DSDT files (Michael S. Tsirkin)
+--Sig_/HMnUeYrL7=/ljJ.A=g/Mq.x--
