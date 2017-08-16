@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhrdq-0008Td-Ux
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 02:17:23 -0400
+	(envelope-from <pizhi0616@gmail.com>) id 1dhrlb-00035M-RQ
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 02:25:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhrdm-0002gf-0C
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 02:17:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48738)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dhrdl-0002gP-Pn
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 02:17:17 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170731085110.1050-1-apahim@redhat.com>
-	<20170731085110.1050-4-apahim@redhat.com>
-	<87zib1s13v.fsf@dusky.pond.sub.org>
-	<20170815195827.GW3108@localhost.localdomain>
-Date: Wed, 16 Aug 2017 08:17:11 +0200
-In-Reply-To: <20170815195827.GW3108@localhost.localdomain> (Eduardo Habkost's
-	message of "Tue, 15 Aug 2017 16:58:27 -0300")
-Message-ID: <878tikf34o.fsf@dusky.pond.sub.org>
+	(envelope-from <pizhi0616@gmail.com>) id 1dhrla-0006Yj-FL
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 02:25:23 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:37749)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pizhi0616@gmail.com>) id 1dhrla-0006Sh-4T
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 02:25:22 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id i66so25417303wmg.0
+	for <qemu-devel@nongnu.org>; Tue, 15 Aug 2017 23:25:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 3/7] qemu.py: use python logging system
+From: =?UTF-8?B?55qu5pm6?= <pizhi0616@gmail.com>
+Date: Wed, 16 Aug 2017 14:25:19 +0800
+Message-ID: <CAC0nwAR8tCfVU518a3p8Qmd8Y84mLeb6j2yTrErnnK8_AUnpWg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] ask a question
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +26,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: kwolf@redhat.com, ldoktor@redhat.com, famz@redhat.com, stefanha@gmail.com, Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com, crosa@redhat.com
+To: qemu-devel@nongnu.org
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+Hi=EF=BC=8CI meet a problem with vm, my environment is qemu-kvm-2.3,
+virtio-win-0.1.126, host(centos7.2), guest(windows10).
 
-> On Tue, Aug 15, 2017 at 10:10:12AM +0200, Markus Armbruster wrote:
->> Please spell "Python" with a capital "P" (it's a proper name).
->> 
->> Amador Pahim <apahim@redhat.com> writes:
->> 
->> > Let's provide extra control and flexibility by using python logging
->> > system instead of print and/or sys.std*.write().
->> >
->> > Signed-off-by: Amador Pahim <apahim@redhat.com>
->> 
->> How exactly does this change error messages?
->> 
->> Is logging the right tool to report errors to the human user?  I'm
->> asking because logging and error reporting are generally separate
->> things.  Example: a program runs into a recoverable error.  It logs the
->> error, but does not report it.
->> 
->> Is reporting errors to stderr the right thing to do for library class
->> QEMUMachine?  I doubt it.  Libraries throw exceptions and let their
->> users decide how to handle them.
+libvirt xml has four virtio-serial channel as follows:
+    <channel type=3D'spicevmc'>
+      <target type=3D'virtio' name=3D'com.redhat.spice.0' state=3D'connecte=
+d'/>
+      <alias name=3D'channel0'/>
+      <address type=3D'virtio-serial' controller=3D'0' bus=3D'0' port=3D'1'=
+/>
+    </channel>
+    <channel type=3D'unix'>
+      <source mode=3D'bind'
+path=3D'/var/lib/libvirt/qemu/e597eab9-95db-46e9-96f0-12a84c692569'/>
+      <target type=3D'virtio' name=3D'pv-mon' state=3D'connected'/>
+      <alias name=3D'channel1'/>
+      <address type=3D'virtio-serial' controller=3D'0' bus=3D'0' port=3D'2'=
+/>
+    </channel>
+    <channel type=3D'unix'>
+      <source mode=3D'bind'
+path=3D'/var/lib/libvirt/qemu/e597eab9-95db-46e9-96f0-12a84c692569-qga'/>
+      <target type=3D'virtio' name=3D'org.qemu.guest_agent.0'
+state=3D'connected'/>
+      <alias name=3D'channel2'/>
+      <address type=3D'virtio-serial' controller=3D'0' bus=3D'0' port=3D'3'=
+/>
+    </channel>
+    <channel type=3D'unix'>
+      <source mode=3D'bind'
+path=3D'/var/lib/libvirt/qemu/e597eab9-95db-46e9-96f0-12a84c692569-report'/=
 >
-> I believe the "qemu received signal" event is supposed to be
-> logged, not necessarily reported.  Callers can then choose where
-> the log messages should go (scripts could choose to send them
-> directly to stderr if verbose or debugging mode is enabled).  We
-> don't even need an exception for it: we can let callers check
-> exitcode() and decide what to do about the QEMU exit code.
+      <target type=3D'virtio' name=3D'qga-active-report' state=3D'connected=
+'/>
+      <alias name=3D'channel3'/>
+      <address type=3D'virtio-serial' controller=3D'0' bus=3D'0' port=3D'4'=
+/>
+    </channel>
 
-Makes sense.
+If I hard reboot the vm, it may happen as follows:
 
-> The send_fd_scm() messages, on the other hand, could become
-> exceptions, and don't need the logging system at all.
+2017-08-14T07:51:18.401008Z qemu-kvm: virtio-serial-bus: Unexpected port id
+1122983520 for device virtio-serial0.0
+2017-08-14T07:51:18.956482Z qemu-kvm: virtio-serial-bus: Guest failure in
+adding device virtio-serial0.0
+2017-08-14T07:51:29.176795Z qemu-kvm: virtio-serial-bus: Guest failure in
+adding device virtio-serial0.0
+2017-08-14T07:51:34.454819Z qemu-kvm: virtio-serial-bus: Unexpected port id
+2042451128 for device virtio-serial0.0
+2017-08-14T07:51:44.655068Z qemu-kvm: virtio-serial-bus: Guest failure in
+adding device virtio-serial0.0
+2017-08-14T07:51:49.764201Z qemu-kvm: virtio-serial-bus: Unexpected port id
+1122983520 for device virtio-serial0.0
+2017-08-14T07:51:59.969836Z qemu-kvm: virtio-serial-bus: Guest failure in
+adding device virtio-serial0.0
+2017-08-14T07:52:21.564461Z qemu-kvm: virtio-serial-bus: Unexpected port id
+1122983520 for device virtio-serial0.0
+2017-08-14T07:52:47.059452Z qemu-kvm: virtio-serial-bus: Guest failure in
+adding device virtio-serial0.0
+2017-08-14T07:53:22.710677Z qemu-kvm: virtio-serial-bus: Unexpected port id
+1122983520 for device virtio-serial0.0
+2017-08-14T07:53:32.781204Z qemu-kvm: virtio-serial-bus: Guest failure in
+adding device virtio-serial0.0
+2017-08-14T07:53:48.040513Z qemu-kvm: virtio-serial-bus: Unexpected port id
+3179968584 for device virtio-serial0.0
+2017-08-14T07:54:23.547393Z qemu-kvm: virtio-serial-bus: Unexpected port id
+1122983520 for device virtio-serial0.0
+2017-08-14T07:55:54.350754Z qemu-kvm: virtio-serial-bus: Unexpected port id
+1122983520 for device virtio-serial0.0
+2017-08-14T07:56:09.393056Z qemu-kvm: virtio-serial-bus: Unexpected port id
+1122983520 for device virtio-serial0.0
+2017-08-14T07:57:39.670850Z qemu-kvm: virtio-serial-bus: Unexpected port id
+1122983520 for device virtio-serial0.0
+2017-08-14T07:58:09.867650Z qemu-kvm: virtio-serial-bus: Unexpected port id
+1185792 for device virtio-serial0.0
+2017-08-14T07:59:10.053208Z qemu-kvm: virtio-serial-bus: Unexpected port id
+1122983520 for device virtio-serial0.0
+2017-08-14T08:00:20.235162Z qemu-kvm: virtio-serial-bus: Guest failure in
+adding device virtio-serial0.0
+2017-08-14T08:01:20.394196Z qemu-kvm: virtio-serial-bus: Guest failure in
+adding device virtio-serial0.0
 
-I think we all agree that printing to stderr is not a good idea for this
-library class.  Instead of a blanket conversion to logging without
-further explanation, I'd like to see cleanup with rationale such as
-yours.
+So, the virtio-serial port will not be available, it cause my program
+doesn't start in guest(windows10).
+Can you give me some advices ?
+
+Looking forward to your reply.
