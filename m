@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53300)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1dhuov-00076X-8h
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:41:02 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53335)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhup1-000792-Fq
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:41:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1dhuos-000293-5X
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:41:01 -0400
-Received: from mout.gmx.net ([212.227.15.18]:56811)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1dhuor-00028O-PU
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:40:58 -0400
-References: <20170816072104.24420-1-famz@redhat.com>
-	<20170816072104.24420-8-famz@redhat.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <1278039f-cf0c-ae69-7bc0-2fc45fdf98c4@gmx.com>
-Date: Wed, 16 Aug 2017 11:31:01 +0200
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhuox-0002C9-E0
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:41:07 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:43852
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhuow-0002Aa-IB
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:41:03 -0400
+References: <1502846811-32360-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	<20170816111807.0275dd5d@nial.brq.redhat.com>
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Message-ID: <d05d94e3-0216-8d18-7b51-56fa8161fd31@cn.fujitsu.com>
+Date: Wed, 16 Aug 2017 17:40:47 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170816072104.24420-8-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0AGqni8DN8ANKxAf01U5EFcjD7Reu85JN"
-Subject: Re: [Qemu-devel] [PATCH RFC 7/9] tests: Add NetBSD image
+In-Reply-To: <20170816111807.0275dd5d@nial.brq.redhat.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] hw/acpi: Select an node with memory for
+ mapping memory hole to
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,116 +28,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Kamil Rytarowski <kamil@netbsd.org>, stefanha@redhat.com, pbonzini@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0AGqni8DN8ANKxAf01U5EFcjD7Reu85JN
-From: Kamil Rytarowski <n54@gmx.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Kamil Rytarowski <kamil@netbsd.org>, stefanha@redhat.com,
- pbonzini@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Message-ID: <1278039f-cf0c-ae69-7bc0-2fc45fdf98c4@gmx.com>
-Subject: Re: [PATCH RFC 7/9] tests: Add NetBSD image
-References: <20170816072104.24420-1-famz@redhat.com>
- <20170816072104.24420-8-famz@redhat.com>
-In-Reply-To: <20170816072104.24420-8-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Igor,
 
-On 16.08.2017 09:21, Fam Zheng wrote:
-> The image is prepared following instructions as in:
->=20
-> https://wiki.qemu.org/Hosts/BSD
->=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  tests/vm/netbsd | 44 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 44 insertions(+)
->  create mode 100755 tests/vm/netbsd
->=20
-> diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-> new file mode 100755
-> index 0000000000..4cd07d3b1b
-> --- /dev/null
-> +++ b/tests/vm/netbsd
-> @@ -0,0 +1,44 @@
-> +#!/usr/bin/env python
-> +#
-> +# NetBSD VM image
-> +#
-> +# Copyright (C) 2017 Red Hat Inc.
-> +#
-> +# Authors:
-> +#  Fam Zheng <famz@redhat.com>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2.  Se=
-e
-> +# the COPYING file in the top-level directory.
-> +#
-> +
-> +import os
-> +import sys
-> +import logging
-> +import subprocess
-> +import tempfile
-> +import time
-> +import basevm
-> +
-> +class NetBSDVM(basevm.BaseVM):
-> +    name =3D "netbsd"
-> +    BUILD_SCRIPT =3D """
-> +        set -e;
-> +        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-> +        tar -xf /dev/ld1a;
-> +        ./configure --python=3Dpython2.7 {configure_opts};
-> +        gmake -j{jobs};
-> +        gmake check;
-> +    """
-> +
-> +    def build_image(self, img, rebuild=3DFalse):
-> +        if os.path.exists(img) and not rebuild:
-> +            return
-> +        cimg =3D self._download_with_cache("http://localhost:8000/netb=
-sd.img.xz")
+At 08/16/2017 05:18 PM, Igor Mammedov wrote:
+> On Wed, 16 Aug 2017 09:26:51 +0800
+> Dou Liyang <douly.fnst@cn.fujitsu.com> wrote:
+>
+>> Currently, Using the fisrt node without memory on the machine makes
+>> QEMU unhappy. With this example command line:
+>>   ... \
+>>   -m 1024M,slots=4,maxmem=32G \
+>>   -numa node,nodeid=0 \
+>>   -numa node,mem=1024M,nodeid=1 \
+>>   -numa node,nodeid=2 \
+>>   -numa node,nodeid=3 \
+>> Guest reports "No NUMA configuration found" and the NUMA topology is
+>> wrong.
+>>
+>> This is because when QEMU builds ACPI SRAT, it regards node0 as the
+>> default node to deal with the memory hole(640K-1M). this means the
+>> node0 must have some memory(>1M), but, actually it can have no
+>> memory.
+>>
+>> Fix this problem by replace the node0 with the first node which has
+>> memory on it. Add a new function for each node. Also do some cleanup.
+> It seems harmless but one never knows for sure,
+> could you test it with different guests including old windows (up to XP)/
+> linux (2.6 stable kernel) versions?
+>
 
-http://download.patchew.org/netbsd.img.xz
+I have test it with the following guests:
 
-> +        img_tmp_xz =3D img + ".tmp.xz"
-> +        img_tmp =3D img + ".tmp"
-> +        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
-> +        subprocess.check_call(["xz", "-df", img_tmp_xz])
-> +        subprocess.check_call(["mv", img_tmp, img])
-> +
-> +if __name__ =3D=3D "__main__":
-> +    sys.exit(basevm.main(NetBSDVM))
->=20
+windows 7.
+linux 4.13-rc5.
 
+will test it in linux (2.6 and 3.10 stable kernel).
 
+Thanks,
+	dou.
 
---0AGqni8DN8ANKxAf01U5EFcjD7Reu85JN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZlBDcAAoJEEuzCOmwLnZsAooP/2Us+9cNlWdtGMDny/tb/rTk
-i1RMzEFFO0AaA3g+qB0sMuaDL2jOP5FfRfuAUxfUBfJu2wLkfi4NOW7B77pidzPd
-1IkRNcbdbY9hmHpDRqZ1Gq9v7X2RFhA1XZOJPzvHz36c9LxNRttbUPVMzQ9MxhNy
-D97wZ5Fi6EatCY7V0osytvKFajM+9WU3u8BEk0pM79m2DZz5fgRZdxYr/oWcT9b/
-V54ulx81WzGte3aSDDMDZCjHEEo8ctTqBqwH9lCGGU1sY0jozZ38A10IA8YiK7HS
-+TDMf0W1MNEpN3LKCnslEnabzcfqoPmbu7WUtcdMOfJQvHc5WspzosoWeX/QQRTX
-m63Q2+rjfcXoQs713bH+/4VMeyrosqaaJoByrnf/zLPSLZh7Onr3bRsgT+B6vTZ/
-//S0fg72WezM+locq636/rS7pK7X2OYjrifIbLeQHWtE73pFj63Nr9w7o/seSo2n
-j0crZcgDNQthGvxsOt5oltaBEO13FiO6aUra3awCAPAIfB04Yvsad1wvC1Hj5EZW
-E2XCzJIA3BfUNaqotbmZ+jzEl2NMkGQRKsJ0WB9BHttexn6rXNiWt4letwHF3WrR
-1g/OgvwqSIWC3Eex0sstDZk5x7F71sHm6E8u1QU3AGjpIGma6oJaG3Bz987xN+B/
-5ScENljyJJqYPab+gyTt
-=T49f
------END PGP SIGNATURE-----
-
---0AGqni8DN8ANKxAf01U5EFcjD7Reu85JN--
+>>
+>> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+>> ---
+>> V2 --> V1:
+>>   -Fix a coding style problem
+>> Replace
+>>     for (node = 0;
+>>             node < pcms->numa_nodes && pcms->node_mem[node] == 0;
+>>             node++);
+>>
+>> with
+>>     for (node = 0; node < pcms->numa_nodes; node++) {
+>>        if (pcms->node_mem[node] != 0) {
+>>             break;
+>>          }
+>>
+>>  hw/i386/acpi-build.c | 78 +++++++++++++++++++++++++++++++++-------------------
+>>  1 file changed, 50 insertions(+), 28 deletions(-)
+>>
+>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> index 98dd424..f93d712 100644
+>> --- a/hw/i386/acpi-build.c
+>> +++ b/hw/i386/acpi-build.c
+>> @@ -2318,15 +2318,43 @@ build_tpm2(GArray *table_data, BIOSLinker *linker)
+>>                   (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
+>>  }
+>>
+>> +static uint64_t
+>> +build_srat_node_entry(GArray *table_data, PCMachineState *pcms,
+>> +                                int i, uint64_t mem_base, uint64_t mem_len)
+>> +{
+>> +    AcpiSratMemoryAffinity *numamem;
+>> +    uint64_t next_base;
+>> +
+>> +    next_base = mem_base + mem_len;
+>> +
+>> +    /* Cut out the ACPI_PCI hole */
+>> +    if (mem_base <= pcms->below_4g_mem_size &&
+>> +        next_base > pcms->below_4g_mem_size) {
+>> +        mem_len -= next_base - pcms->below_4g_mem_size;
+>> +        if (mem_len > 0) {
+>> +            numamem = acpi_data_push(table_data, sizeof *numamem);
+>> +            build_srat_memory(numamem, mem_base, mem_len, i,
+>> +                              MEM_AFFINITY_ENABLED);
+>> +        }
+>> +        mem_base = 1ULL << 32;
+>> +        mem_len = next_base - pcms->below_4g_mem_size;
+>> +        next_base += (1ULL << 32) - pcms->below_4g_mem_size;
+>> +    }
+>> +    numamem = acpi_data_push(table_data, sizeof *numamem);
+>> +    build_srat_memory(numamem, mem_base, mem_len, i,
+>> +                      MEM_AFFINITY_ENABLED);
+>> +    return next_base;
+>> +}
+>> +
+>>  static void
+>>  build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>>  {
+>>      AcpiSystemResourceAffinityTable *srat;
+>>      AcpiSratMemoryAffinity *numamem;
+>>
+>> -    int i;
+>> +    int i, node;
+>>      int srat_start, numa_start, slots;
+>> -    uint64_t mem_len, mem_base, next_base;
+>> +    uint64_t mem_len, mem_base;
+>>      MachineClass *mc = MACHINE_GET_CLASS(machine);
+>>      const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(machine);
+>>      PCMachineState *pcms = PC_MACHINE(machine);
+>> @@ -2370,36 +2398,30 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>>      /* the memory map is a bit tricky, it contains at least one hole
+>>       * from 640k-1M and possibly another one from 3.5G-4G.
+>>       */
+>> -    next_base = 0;
+>> +
+>>      numa_start = table_data->len;
+>>
+>> -    numamem = acpi_data_push(table_data, sizeof *numamem);
+>> -    build_srat_memory(numamem, 0, 640 * 1024, 0, MEM_AFFINITY_ENABLED);
+>> -    next_base = 1024 * 1024;
+>> -    for (i = 1; i < pcms->numa_nodes + 1; ++i) {
+>> -        mem_base = next_base;
+>> -        mem_len = pcms->node_mem[i - 1];
+>> -        if (i == 1) {
+>> -            mem_len -= 1024 * 1024;
+>> +    /* get the first node which has memory and map the hole from 640K-1M */
+>> +    for (node = 0; node < pcms->numa_nodes; node++) {
+>> +        if (pcms->node_mem[node] != 0) {
+>> +            break;
+>>          }
+>> -        next_base = mem_base + mem_len;
+>> -
+>> -        /* Cut out the ACPI_PCI hole */
+>> -        if (mem_base <= pcms->below_4g_mem_size &&
+>> -            next_base > pcms->below_4g_mem_size) {
+>> -            mem_len -= next_base - pcms->below_4g_mem_size;
+>> -            if (mem_len > 0) {
+>> -                numamem = acpi_data_push(table_data, sizeof *numamem);
+>> -                build_srat_memory(numamem, mem_base, mem_len, i - 1,
+>> -                                  MEM_AFFINITY_ENABLED);
+>> -            }
+>> -            mem_base = 1ULL << 32;
+>> -            mem_len = next_base - pcms->below_4g_mem_size;
+>> -            next_base += (1ULL << 32) - pcms->below_4g_mem_size;
+>> +    }
+>> +    numamem = acpi_data_push(table_data, sizeof *numamem);
+>> +    build_srat_memory(numamem, 0, 640 * 1024, node, MEM_AFFINITY_ENABLED);
+>> +
+>> +    /* map the rest of memory from 1M */
+>> +    mem_base = 1024 * 1024;
+>> +    mem_len = pcms->node_mem[node] - mem_base;
+>> +    mem_base = build_srat_node_entry(table_data, pcms, node,
+>> +                                            mem_base, mem_len);
+>> +
+>> +    for (i = 0; i < pcms->numa_nodes; i++) {
+>> +        if (i == node) {
+>> +            continue;
+>>          }
+>> -        numamem = acpi_data_push(table_data, sizeof *numamem);
+>> -        build_srat_memory(numamem, mem_base, mem_len, i - 1,
+>> -                          MEM_AFFINITY_ENABLED);
+>> +        mem_base = build_srat_node_entry(table_data, pcms, i,
+>> +                                            mem_base, pcms->node_mem[i]);
+>>      }
+>>      slots = (table_data->len - numa_start) / sizeof *numamem;
+>>      for (; slots < pcms->numa_nodes + 2; slots++) {
+>
+>
+>
+>
