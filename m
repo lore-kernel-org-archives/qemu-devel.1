@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1di7bF-0002Nk-RJ
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 19:19:46 -0400
+	(envelope-from <bounces@canonical.com>) id 1di532-0002iH-QO
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 16:36:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1di7bC-0001qu-MG
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 19:19:45 -0400
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:37616)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1di7bC-0001qI-H6
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 19:19:42 -0400
-Received: by mail-it0-x244.google.com with SMTP id 77so3294098itj.4
-	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 16:19:42 -0700 (PDT)
-In-Reply-To: <db1ad643-9dc6-6464-1487-44007b3609ee@redhat.com>
-References: <C2D23A89-6DB7-445C-BC25-71E9E49C288D@gmail.com>
-	<ff49cfa1-5a00-c329-1647-3ad8367cc804@redhat.com>
-	<5D42D1E3-A946-4E2C-BDC4-BB785D0B880D@gmail.com>
-	<db1ad643-9dc6-6464-1487-44007b3609ee@redhat.com>
-Mime-Version: 1.0 (Apple Message framework v753.1)
-Content-Type: text/plain; charset=ISO-8859-1; delsp=yes; format=flowed
-Message-Id: <C17DC1B9-FE9A-43CD-B84F-51D321209300@gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1di52x-0002oH-U3
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 16:36:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60539)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1di52x-0002nv-LQ
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 16:36:11 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1di52u-0001QP-Ev
+	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 20:36:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D6E1D2E80CF
+	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 20:36:06 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-From: G 3 <programmingkidx@gmail.com>
-Date: Wed, 16 Aug 2017 19:19:37 -0400
-Subject: Re: [Qemu-devel] Help with Windows NT 4.0
+Date: Wed, 16 Aug 2017 20:28:22 -0000
+From: George Kraft <george.kraft@canonical.com>
+Reply-To: Bug 1701798 <1701798@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <149890819992.24827.8096984642709091835.malonedeb@soybean.canonical.com>
+Message-Id: <150291530206.17031.9658204012485945131.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1701798] Re: dynamically linked binaries crash
+ for big-endian targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,64 +37,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, =?ISO-8859-1?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
+I think I hit this problem trying to use qemu-s390x-static in the
+s390x/ubuntu:16.04 docker image. Running qemu-s390x-static 2.9.0 on
+binaries in that image (e.g. /bin/echo) results in a hang.
 
-On Aug 15, 2017, at 6:27 PM, Paolo Bonzini wrote:
+I've noticed that doing the same in a s390x/debian:jessie image does NOT
+have the same problem. No hang. Looks like the binaries are built for
+different kernel versions, could that be why?
 
-> On 15/08/2017 20:46, Programmingkid wrote:
->>
->>> On Aug 14, 2017, at 2:51 AM, Paolo Bonzini <pbonzini@redhat.com> =20
->>> wrote:
->>>
->>> On 13/08/2017 21:13, Programmingkid wrote:
->>>> Lately I found out that Windows NT 4.0 seems to work well with the
->>>> 486 and pentium processors. Using "-cpu 486" made installing it
->>>> actually work. Now I am seeing another issue. When I boot =20
->>>> Windows NT
->>>> 4.0 I see this error message:
->>>>
->>>> *** STOP: 0x0000007B (0x807A8610,0x00000000,0x00000000,0x00000000)
->>>> INACESSIBLE_BOOT_DEVICE
->>>>
->>>> Would anyone know a way to solve this issue?
->>>
->>> Herv=E9 is probably the best person to answer this question.  Maybe =20=
+$ file ubuntu16.04/bin/echo
+ubuntu16.04/bin/echo: ELF 64-bit MSB shared object, IBM S/390, version 1 (S=
+YSV), dynamically linked, interpreter /lib/ld64.so.1, for GNU/Linux 3.2.0, =
+BuildID[sha1]=3D4befa0df07957e117e8cc44d0dd14a3df6d44619, stripped
 
->>> try
->>> installing it with SCSI disks ("-drive if=3Dscsi,id=3Dhd,file=3D... =
--drive
->>> if=3Dscsi,id=3Dcd,file=3D... -device lsi -device scsi-hd,drive=3Dhd =
--device
->>> scsi-cd,drive=3Dcd").
->>>
->>> Thanks,
->>>
->>> Paolo
->>
->> Thanks for the help. Unfortunately trying to boot from the install =20=
+$ file debian/bin/echo
+debian/bin/echo: ELF 64-bit MSB executable, IBM S/390, version 1 (SYSV), dy=
+namically linked, interpreter /lib/ld64.so.1, for GNU/Linux 2.6.32, BuildID=
+[sha1]=3D4bd45eb0ae5287ba9271a9daa9809166dd2eeab5, stripped
 
->> CD leads to the INACCESSIBLE_BOOT_DEVICE error when using SCSI.
->
-> Try with 0.12.
+-- =
 
-After doing a lot of bisecting I found a patch that did break Windows =20=
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1701798
 
-NT 4.0 compatibility long ago. Not sure if it is the problem we face =20
-today. This is it:
+Title:
+  dynamically linked binaries crash for big-endian targets
 
-commit 2bec46dc97571a3c34b18fe4ca198e7bfbdca41f
-Author: aliguori <aliguori@c046a42c-6fe2-441c-8c8c-71466251a162>
-Date:   Mon Nov 24 20:21:41 2008 +0000
+Status in QEMU:
+  New
 
-     vga optimization (Glauber Costa)
+Bug description:
+  On the targets
+    hppa
+    m68k
+    mips
+    mips64
+    powerpc
+    powerpc64
+    s390x
+    sparc64
+  dynamically linked binaries crash, but statically linked binaries work.
+  On the targets
+    aarch64
+    alpha
+    armhf
+    powerpc64le
+    sh4
+  both dynamically linked and statically linked binaries work.
 
-     Hypervisors like KVM perform badly while doing mmio on
-     a loop, because it'll generate an exit on each access.
-     This is the case with VGA, which results in very bad
-     performance.
+  How to reproduce:
 
-     In this patch, we map the linear frame buffer as RAM,
-     make sure it has dirty region tracking enabled, and then
-     just let the region to be written.
+  1) On Ubuntu 16.04, install the packages
+  g++-5-aarch64-linux-gnu
+  g++-5-alpha-linux-gnu
+  g++-5-arm-linux-gnueabihf
+  g++-5-hppa-linux-gnu
+  g++-5-m68k-linux-gnu
+  g++-5-mips-linux-gnu
+  g++-5-mips64-linux-gnuabi64
+  g++-5-powerpc-linux-gnu
+  g++-5-powerpc64-linux-gnu
+  g++-5-powerpc64le-linux-gnu
+  g++-5-s390x-linux-gnu
+  g++-5-sh4-linux-gnu
+  g++-5-sparc64-linux-gnu
+
+  2) Install qemu 2.9.0 from source (for m68k, use the 2.7.0-m68k
+  code from https://github.com/vivier/qemu-m68k.git):
+  $ ../configure --prefix=3D/home/bruno/inst-qemu/2.9.0 --target-list=3Daar=
+ch64-softmmu,alpha-softmmu,arm-softmmu,i386-softmmu,m68k-softmmu,mips-softm=
+mu,mipsel-softmmu,mips64-softmmu,mips64el-softmmu,ppc-softmmu,ppc64-softmmu=
+,s390x-softmmu,sh4-softmmu,sparc-softmmu,sparc64-softmmu,x86_64-softmmu,aar=
+ch64-linux-user,alpha-linux-user,arm-linux-user,hppa-linux-user,m68k-linux-=
+user,mips-linux-user,mipsel-linux-user,mips64-linux-user,mips64el-linux-use=
+r,ppc-linux-user,ppc64-linux-user,ppc64le-linux-user,s390x-linux-user,sh4-l=
+inux-user,sparc-linux-user,sparc64-linux-user --disable-strip --disable-wer=
+ror --enable-gtk --enable-vnc
+  $ make
+  $ make install
+
+  3) Cross-compile the programs:
+
+  $ aarch64-linux-gnu-gcc-5 -O hello.c -o hello.aarch64
+  $ alpha-linux-gnu-gcc-5 -O hello.c -o hello.alpha
+  $ arm-linux-gnueabihf-gcc-5 -O hello.c -o hello.armhf
+  $ hppa-linux-gnu-gcc-5 -O hello.c -o hello.hppa
+  $ m68k-linux-gnu-gcc-5 -O hello.c -o hello.m68k
+  $ mips-linux-gnu-gcc-5 -O hello.c -o hello.mips
+  $ mips64-linux-gnuabi64-gcc-5 -O hello.c -o hello.mips64
+  $ powerpc-linux-gnu-gcc-5 -O hello.c -o hello.powerpc
+  $ powerpc64-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64
+  $ powerpc64le-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64le
+  $ s390x-linux-gnu-gcc-5 -O hello.c -o hello.s390x
+  $ sh4-linux-gnu-gcc-5 -O hello.c -o hello.sh4
+  $ sparc64-linux-gnu-gcc-5 -O hello.c -o hello.sparc64
+
+  4) Run the programs:
+
+  * aarch64 works:
+  $ QEMU_LD_PREFIX=3D/usr/aarch64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-aarc=
+h64 hello.aarch64
+  Hello world
+
+  * alpha works:
+  $ QEMU_LD_PREFIX=3D/usr/alpha-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-alpha =
+hello.alpha =
+
+  Hello world
+
+  * armhf works:
+  $ QEMU_LD_PREFIX=3D/usr/arm-linux-gnueabihf ~/inst-qemu/2.9.0/bin/qemu-ar=
+m hello.armhf
+  Hello world
+
+  * powerpc64le works:
+  $ QEMU_LD_PREFIX=3D/usr/powerpc64le-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-=
+ppc64le hello.powerpc64le
+  Hello world
+
+  * sh4 works:
+  $ QEMU_LD_PREFIX=3D/usr/sh4-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-sh4 hell=
+o.sh4
+  Hello world
+
+  * =3D=3D=3D=3D=3D sparc64 does not work:
+  $ QEMU_LD_PREFIX=3D/usr/sparc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-spar=
+c64 hello.sparc64
+  Segmentation fault (core dumped)
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 4.5.0-2-sp=
+arc64 sparc64",
+  it works:
+  $ ./hello.sparc64
+  Hello world
+
+  When I copy the file and its execution environment /usr/sparc64-linux-gnu=
+ to the
+  same machine and run the binary in a chroot environment:
+  # /bin/hello.sparc64 =
+
+  Hello world
+
+  * =3D=3D=3D=3D=3D mips does not work:
+  $ QEMU_LD_PREFIX=3D/usr/mips-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-mips he=
+llo.mips
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-4=
+kc-malta mips",
+  it works:
+  $ ./hello.mips
+  Hello world
+
+  When I copy the file and its execution environment /usr/mips-linux-gnu to=
+ the
+  same machine and run the binary in a chroot environment:
+  # /bin/hello.mips =
+
+  Hello world
+
+  * =3D=3D=3D=3D=3D mips64 does not work:
+  $ QEMU_LD_PREFIX=3D/usr/mips64-linux-gnuabi64 ~/inst-qemu/2.9.0/bin/qemu-=
+mips64 hello.mips64
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-5=
+kc-malta mips64",
+  it works:
+  $ ./hello.mips64
+  Hello world
+
+  * =3D=3D=3D=3D=3D powerpc does not work:
+  $ QEMU_LD_PREFIX=3D/usr/powerpc-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-ppc =
+hello.powerpc
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
+.fc20.ppc64p7 ppc64",
+  it works:
+  $ ./hello.powerpc
+  Hello world
+
+  * =3D=3D=3D=3D=3D powerpc64 does not work:
+  $ QEMU_LD_PREFIX=3D/usr/powerpc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-pp=
+c64 hello.powerpc64
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
+.fc20.ppc64p7 ppc64",
+  it works:
+  $ ./hello.powerpc64
+  Hello world
+
+  * =3D=3D=3D=3D=3D s390x does not work:
+  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-s390x =
+hello.s390x
+  <hangs>
+  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.8.1/bin/qemu-s390x =
+hello.s390x
+  qemu-s390x: /media/develdata/devel/build/qemu-2.8.1/translate-all.c:175: =
+tb_lock: Assertion `!have_tb_lock' failed.
+  Segmentation fault (core dumped)
+
+  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-s=
+390x s390x",
+  it works:
+  $ ./hello.s390x
+  Hello world
+
+  * =3D=3D=3D=3D=3D hppa does not work:
+  $ QEMU_LD_PREFIX=3D/usr/hppa-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-hppa he=
+llo.hppa
+  Segmentation fault (core dumped)
+
+  * =3D=3D=3D=3D=3D m68k does not work:
+  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.9.=
+0/bin/qemu-m68k hello.m68k
+  qemu: uncaught target signal 4 (Illegal instruction) - core dumped
+  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.7.=
+0-m68k/bin/qemu-m68k hello.m68k
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  =
+
+  The set of targets where it does not work is exactly the big-endian targe=
+ts.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1701798/+subscriptions
