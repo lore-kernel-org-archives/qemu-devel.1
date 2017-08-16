@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dverma@redhat.com>) id 1di0sb-0002v3-NT
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 12:09:15 -0400
+	(envelope-from <armbru@redhat.com>) id 1di0wt-0006VD-IA
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 12:13:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dverma@redhat.com>) id 1di0sX-0007Gh-3c
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 12:09:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39768)
+	(envelope-from <armbru@redhat.com>) id 1di0ws-0001gp-KN
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 12:13:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32883)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dverma@redhat.com>) id 1di0sW-0007GJ-QS
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 12:09:09 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EFC58C058EC2
-	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 15:59:34 +0000 (UTC)
-From: dverma <dverma@redhat.com>
-Date: Wed, 16 Aug 2017 11:59:26 -0400
-Message-Id: <1502899168-19852-2-git-send-email-dverma@redhat.com>
-In-Reply-To: <1502899168-19852-1-git-send-email-dverma@redhat.com>
-References: <1502899168-19852-1-git-send-email-dverma@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] Fix format and styles;
- make code more pythonic
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1di0ws-0001gL-At
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 12:13:38 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1499182263-19139-3-git-send-email-pradeep.jagadeesh@huawei.com>
+	<87bmoxcuvn.fsf@dusky.pond.sub.org>
+	<61626c42-9c47-14e5-24b7-e6086d042a6b@huawei.com>
+	<87shh3fn7d.fsf@dusky.pond.sub.org>
+	<w511soml2kh.fsf@maestria.local.igalia.com>
+	<34e45421-0b22-15b4-deb7-980f26e5ca23@huawei.com>
+	<w51shh2jfi9.fsf@maestria.local.igalia.com>
+	<87wp6e6qb7.fsf@dusky.pond.sub.org>
+	<dc14df7c-2f7c-300b-5f60-44411f3d6604@huawei.com>
+	<66aac45f-6319-2eca-3703-aaab43557e00@redhat.com>
+	<87shgz8k5q.fsf@dusky.pond.sub.org>
+Date: Wed, 16 Aug 2017 18:13:35 +0200
+In-Reply-To: <87shgz8k5q.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Thu, 10 Aug 2017 18:25:21 +0200")
+Message-ID: <87pobv1oeo.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v7 2/6] qmp: Create IOThrottle structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,283 +37,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jen@redhat.com, dgilbert@redhat.com, quintela@redhat.com, dverma <dverma@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, greg kurz <groug@kaod.org>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, qemu-devel@nongnu.org
 
-- Format fixes, cleaned up the print statement
-- Style fixes, e.g. changed "if not x in y" to "if x not in y"
-- Improved variable names
+Markus Armbruster <armbru@redhat.com> writes:
 
-Changes v1->v2:
-1. Fix patchew warnings about exceeding 80 characters
+> Eric Blake <eblake@redhat.com> writes:
+>
+>> On 08/10/2017 09:06 AM, Pradeep Jagadeesh wrote:
+>>
+>>>>> It's not "moving it back", it's keeping it where it is. But I see no big
+>>>>> problem with moving it to a common file either.
+>>>>
+>>>> I'd rather not put every struct shared across subsystem boundaries in
+>>>> its own file.
+>>>>
+>>>> We can keep it right where it is for now.  Bonus: more readable diff.
+>>>> If we start sharing more throttle-related material than just a struct,
+>>>> we can reconsider.
+>>>>
+>>>> We could also move it to the existing file for common stuff:
+>>>> qapi/common.json.  Not a great fit, though.
+>>>
+>>> So, the final conclusion is to move to common.json?
+>>
+>> No.
+>>
+>> If more than one .json file would benefit by including the definition,
+>> then put it in a separate file that both .json include from.
+>
+> This is the case.
+>
+> Your opinion is incompatible with mine, stated above.
+>
+>> But if only one .json file would be including a new file, then just
+>> inline the struct directly into that one original file (in this case,
+>> block-core.json) instead of creating a separate file (so no to needing
+>> iothrottle.json), or putting the code in yet a different file than the
+>> one that is using the struct (so no to putting it in common.json).
+>
+> This is no longer the case.
+>
+> Conclusion: no consensus, yet.
 
-Signed-off-by: Deepak Verma <dverma@redhat.com>
----
- scripts/vmstate-static-checker.py | 111 +++++++++++++++++++++-----------------
- 1 file changed, 62 insertions(+), 49 deletions(-)
+All right, let's start over and try to resolve the impasse and/or
+misunderstanding.
 
-diff --git a/scripts/vmstate-static-checker.py b/scripts/vmstate-static-checker.py
-index bcef7ee..b416b66 100755
---- a/scripts/vmstate-static-checker.py
-+++ b/scripts/vmstate-static-checker.py
-@@ -19,6 +19,11 @@
- # You should have received a copy of the GNU General Public License along
- # with this program; if not, see <http://www.gnu.org/licenses/>.
- 
-+#
-+# 2017 Deepak Verma <dverma@redhat.com>
-+# Added few functions and fields for whitelisting
-+#
-+
- import argparse
- import json
- import sys
-@@ -26,6 +31,7 @@ import sys
- # Count the number of errors found
- taint = 0
- 
-+
- def bump_taint():
-     global taint
- 
-@@ -92,7 +98,7 @@ def check_fields_match(name, s_field, d_field):
-                       'io_win_size', 'mig_io_win_size'],
-     }
- 
--    if not name in changed_names:
-+    if name not in changed_names:
-         return False
- 
-     if s_field in changed_names[name] and d_field in changed_names[name]:
-@@ -100,6 +106,7 @@ def check_fields_match(name, s_field, d_field):
- 
-     return False
- 
-+
- def get_changed_sec_name(sec):
-     # Section names can change -- see commit 292b1634 for an example.
-     changes = {
-@@ -114,16 +121,17 @@ def get_changed_sec_name(sec):
-             return item
-     return ""
- 
-+
- def exists_in_substruct(fields, item):
-     # Some QEMU versions moved a few fields inside a substruct.  This
-     # kept the on-wire format the same.  This function checks if
-     # something got shifted inside a substruct.  For example, the
-     # change in commit 1f42d22233b4f3d1a2933ff30e8d6a6d9ee2d08f
- 
--    if not "Description" in fields:
-+    if "Description" not in fields:
-         return False
- 
--    if not "Fields" in fields["Description"]:
-+    if "Fields" not in fields["Description"]:
-         return False
- 
-     substruct_fields = fields["Description"]["Fields"]
-@@ -176,10 +184,10 @@ def check_fields(src_fields, dest_fields, desc, sec):
-             except StopIteration:
-                 if d_iter_list == []:
-                     # We were not in a substruct
--                    print "Section \"" + sec + "\",",
--                    print "Description " + "\"" + desc + "\":",
--                    print "expected field \"" + s_item["field"] + "\",",
--                    print "while dest has no further fields"
-+                    print('Section "' + sec + '", '
-+                          'Description "' + desc + '": '
-+                          'expected field "' + s_item["field"] + '", '
-+                          'while dest has no further fields')
-                     bump_taint()
-                     break
- 
-@@ -191,30 +199,28 @@ def check_fields(src_fields, dest_fields, desc, sec):
-                 advance_dest = True
- 
-         if unused_count != 0:
--            if advance_dest == False:
-+            if not advance_dest:
-                 unused_count = unused_count - s_item["size"]
-                 if unused_count == 0:
-                     advance_dest = True
-                     continue
-                 if unused_count < 0:
--                    print "Section \"" + sec + "\",",
--                    print "Description \"" + desc + "\":",
--                    print "unused size mismatch near \"",
--                    print s_item["field"] + "\""
-+                    print('Section "' + sec + '", '
-+                          'Description "' + desc + '": '
-+                          'unused size mismatch near "' + s_item["field"] + '"')
-                     bump_taint()
-                     break
-                 continue
- 
--            if advance_src == False:
-+            if not advance_src:
-                 unused_count = unused_count - d_item["size"]
-                 if unused_count == 0:
-                     advance_src = True
-                     continue
-                 if unused_count < 0:
--                    print "Section \"" + sec + "\",",
--                    print "Description \"" + desc + "\":",
--                    print "unused size mismatch near \"",
--                    print d_item["field"] + "\""
-+                    print('Section "' + sec + '", '
-+                          'Description "' + desc + '": '
-+                          'unused size mismatch near "' + d_item["field"] + '"')
-                     bump_taint()
-                     break
-                 continue
-@@ -262,16 +268,16 @@ def check_fields(src_fields, dest_fields, desc, sec):
-                     unused_count = s_item["size"] - d_item["size"]
-                     continue
- 
--            print "Section \"" + sec + "\",",
--            print "Description \"" + desc + "\":",
--            print "expected field \"" + s_item["field"] + "\",",
--            print "got \"" + d_item["field"] + "\"; skipping rest"
-+            print('Section "' + sec + '", '
-+                  'Description "' + desc + '": '
-+                  'expected field "' + s_item["field"] + '", '
-+                  'got "' + d_item["field"] + '"; skipping rest')
-             bump_taint()
-             break
- 
-         check_version(s_item, d_item, sec, desc)
- 
--        if not "Description" in s_item:
-+        if "Description" not in s_item:
-             # Check size of this field only if it's not a VMSTRUCT entry
-             check_size(s_item, d_item, sec, desc, s_item["field"])
- 
-@@ -289,18 +295,20 @@ def check_subsections(src_sub, dest_sub, desc, sec):
-             check_descriptions(s_item, d_item, sec)
- 
-         if not found:
--            print "Section \"" + sec + "\", Description \"" + desc + "\":",
--            print "Subsection \"" + s_item["name"] + "\" not found"
-+            print('Section "' + sec + '", '
-+                  'Description "' + desc + '": '
-+                  'Subsection "' + s_item["name"] + '" not found')
-             bump_taint()
- 
- 
- def check_description_in_list(s_item, d_item, sec, desc):
--    if not "Description" in s_item:
-+    if "Description" not in s_item:
-         return
- 
--    if not "Description" in d_item:
--        print "Section \"" + sec + "\", Description \"" + desc + "\",",
--        print "Field \"" + s_item["field"] + "\": missing description"
-+    if "Description" not in d_item:
-+        print('Section "' + sec + '", '
-+              'Description "' + desc + '", '
-+              'Field "' + s_item["field"] + '": missing description')
-         bump_taint()
-         return
- 
-@@ -311,17 +319,17 @@ def check_descriptions(src_desc, dest_desc, sec):
-     check_version(src_desc, dest_desc, sec, src_desc["name"])
- 
-     if not check_fields_match(sec, src_desc["name"], dest_desc["name"]):
--        print "Section \"" + sec + "\":",
--        print "Description \"" + src_desc["name"] + "\"",
--        print "missing, got \"" + dest_desc["name"] + "\" instead; skipping"
-+        print('Section "' + sec + '": '
-+              'Description "' + src_desc["name"] + '" '
-+              'missing, got "' + dest_desc["name"] + '" instead; skipping')
-         bump_taint()
-         return
- 
-     for f in src_desc:
-         if not f in dest_desc:
--            print "Section \"" + sec + "\"",
--            print "Description \"" + src_desc["name"] + "\":",
--            print "Entry \"" + f + "\" missing"
-+            print('Section "' + sec + '" '
-+                  'Description "' + src_desc["name"] + '": '
-+                  'Entry "' + field + '" missing')
-             bump_taint()
-             continue
- 
-@@ -340,15 +348,15 @@ def check_version(s, d, sec, desc=None):
-         print "version error:", s["version_id"], ">", d["version_id"]
-         bump_taint()
- 
--    if not "minimum_version_id" in d:
-+    if "minimum_version_id" not in dest_ver:
-         return
- 
-     if s["version_id"] < d["minimum_version_id"]:
-         print "Section \"" + sec + "\"",
-         if desc:
--            print "Description \"" + desc + "\":",
--            print "minimum version error:", s["version_id"], "<",
--            print d["minimum_version_id"]
-+            print('Description "' + desc + '": ' +
-+                  'minimum version error: ' + str(src_ver["version_id"]) + ' < ' +
-+                  str(dest_ver["minimum_version_id"]))
-             bump_taint()
- 
- 
-@@ -363,15 +371,21 @@ def check_size(s, d, sec, desc=None, field=None):
-         bump_taint()
- 
- 
--def check_machine_type(s, d):
--    if s["Name"] != d["Name"]:
--        print "Warning: checking incompatible machine types:",
--        print "\"" + s["Name"] + "\", \"" + d["Name"] + "\""
-+
-+def check_machine_type(src, dest):
-+    if src["Name"] != dest["Name"]:
-+        print('Warning: checking incompatible machine types: '
-+              '"' + src["Name"] + '", "' + dest["Name"] + '"')
-     return
- 
- 
- def main():
--    help_text = "Parse JSON-formatted vmstate dumps from QEMU in files SRC and DEST.  Checks whether migration from SRC to DEST QEMU versions would break based on the VMSTATE information contained within the JSON outputs.  The JSON output is created from a QEMU invocation with the -dump-vmstate parameter and a filename argument to it.  Other parameters to QEMU do not matter, except the -M (machine type) parameter."
-+    help_text = ("Parse JSON-formatted vmstate dumps from QEMU in files "
-+    "SRC and DEST.  Checks whether migration from SRC to DEST QEMU versions "
-+    "would break based on the VMSTATE information contained within the JSON "
-+    "outputs. The JSON output is created from a QEMU invocation with the "
-+    "-dump-vmstate parameter and a filename argument to it. Other parameters to "
-+    "QEMU do not matter, except the -M (machine type) parameter.")
- 
-     parser = argparse.ArgumentParser(description=help_text)
-     parser.add_argument('-s', '--src', type=file, required=True,
-@@ -395,12 +409,12 @@ def main():
- 
-     for sec in src_data:
-         dest_sec = sec
--        if not dest_sec in dest_data:
-+        if dest_sec not in dest_data:
-             # Either the section name got changed, or the section
-             # doesn't exist in dest.
-             dest_sec = get_changed_sec_name(sec)
--            if not dest_sec in dest_data:
--                print "Section \"" + sec + "\" does not exist in dest"
-+            if dest_sec not in dest_data:
-+                print('Section "' + sec + '" does not exist in dest')
-                 bump_taint()
-                 continue
- 
-@@ -414,9 +428,8 @@ def main():
-         check_version(s, d, sec)
- 
-         for entry in s:
--            if not entry in d:
--                print "Section \"" + sec + "\": Entry \"" + entry + "\"",
--                print "missing"
-+            if entry not in d:
-+                print('Section "' + sec + '": Entry "' + entry + '" missing')
-                 bump_taint()
-                 continue
- 
--- 
-1.8.3.1
+Type BlockIOThrottle lives in qapi/block-core.json, and is used by QMP
+command block_set_io_throttle.  Since 1.1.
+
+Pradeep has a use case for throttling in fsdev.  Instead of duplicating
+the relevant parts of BlockIOThrottle, qmp_block_set_io_throttle() and
+hmp_block_set_io_throttle(), he factors them out smartly, into
+
+* [PATCH 2] IOThrottle, base type of BlockIOThrottle
+
+* [PATCH 3] throttle_set_io_limits(), called by
+  qmp_block_set_io_throttle()
+
+* [PATCH 4] hmp_initialize_io_throttle(), called by
+  hmp_block_set_io_throttle()
+
+throttle_set_io_limits() goes into existing util/throttle.c, and
+hmp_initialize_io_throttle() goes into existing hmp.c.  The question is
+where IOThrottle should go.
+
+Pradeep proposes to put it in new qapi/throttle.json.  Certainly
+defensible, but I really don't like putting every little thing shared
+across subsystem boundaries into its own schema file.
+
+Let me step back and discuss why we split the QAPI schema into multiple
+files in the first place.  For me, the one and only reason is
+MAINTAINERS.
+
+If the block folks should continue to maintain IOThrottle, then it
+should stay put in block-core.json.
+
+If somebody else should start maintaining it, it should move.  We'd need
+a suitable entry in MAINTAINERS then.
+
+I don't see why maintenance should change, and therefore believe it
+should stay put.
+
+Eric?
