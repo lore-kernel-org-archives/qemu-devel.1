@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1di65h-0004wv-Ap
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 17:43:06 -0400
+	(envelope-from <jsnow@redhat.com>) id 1di69P-0006W3-81
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 17:46:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1di65g-0001Gh-Jn
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 17:43:05 -0400
-References: <1500537221-20556-1-git-send-email-armbru@redhat.com>
-	<a7a4e4dd-8c2f-8014-6486-13f9a90a0341@redhat.com>
-	<46c38cbd-136a-4546-6204-e3044c50ef7b@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1di69O-00040L-8i
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 17:46:55 -0400
+References: <20170814215748.5158-1-ehabkost@redhat.com>
+	<20170814215748.5158-9-ehabkost@redhat.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <09b534bc-dcb5-d209-64a8-84d6f182b06d@redhat.com>
-Date: Wed, 16 Aug 2017 17:42:54 -0400
+Message-ID: <7327f3f6-16fb-e9c6-4f2a-eed6144f2282@redhat.com>
+Date: Wed, 16 Aug 2017 17:46:18 -0400
 MIME-Version: 1.0
-In-Reply-To: <46c38cbd-136a-4546-6204-e3044c50ef7b@redhat.com>
+In-Reply-To: <20170814215748.5158-9-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 00/10] Correct two minor
- QMP interface design flaws
+Subject: Re: [Qemu-devel] [RFC v4 08/13] ide: enumerate_slots implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,23 +24,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, mreitz@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Laine Stump <laine@redhat.com>
+Cc: qemu-block@nongnu.org
 
 
 
-On 08/16/2017 05:41 PM, Eric Blake wrote:
-> On 08/16/2017 04:34 PM, John Snow wrote:
->> Looks like this series got no replies (maybe a failure of my mail
->> filtering?) but it has since been merged, so purely for my own selfish
->> purposes;
+On 08/14/2017 05:57 PM, Eduardo Habkost wrote:
+> Example output when using "-machine q35":
 > 
-> No replies to v2 due to the fact that the differences from v1 were
-> trivial enough to keep R-b from that spin (it was mostly conflict
-> resolution that required the respin).
-> 
+>   {
+>     "available": true,
+>     "count": 1,
+>     "device-types": [
+>       "ide-device"
+>     ],
+>     "hotpluggable": false,
+>     "opts": [
+>       { "option": "unit", "values": 0 },
+>       { "option": "bus", "values": "ide.2" }
+>     ],
+>     "opts-complete": true
+>   }
+>   {
+>     "available": false,
+>     "count": 1,
+>     "device": "/machine/unattached/device[19]",
+>     "device-types": [
+>       "ide-device"
+>     ],
+>     "hotpluggable": false,
+>     "opts": [
+>       { "option": "unit", "values": 1 },
+>       { "option": "bus", "values": "ide.2" } ],
+>     "opts-complete": true
+>   }
+>   {
+>     "available": true,
+>     "count": 10,
+>     "device-types": [
+>       "ide-device"
+>     ],
+>     "hotpluggable": false,
+>     "opts": [
+>       { "option": "unit", "values": [ [ 0, 1 ] ] },
 
-That's fine; just very visibly marking it as "done" for the purposes of
-the list, archives, tooling, etc.
+Hm, these unit values aren't really correct -- we do not support
+primary/secondary semantics for IDE buses on the AHCI device. I guess
+they technically exist, but you cannot use them for anything.
+
+Should I do something to "disable" or otherwise hide the unusable
+secondary unit slots for AHCI devices?
 
 --js
+
+>       { "option": "bus", "values": [ "ide.4", "ide.3", "ide.5", "ide.0", "ide.1" ] }
+>     ],
+>     "opts-complete": true
+>   }
+> 
+> Cc: John Snow <jsnow@redhat.com>
+> Cc: qemu-block@nongnu.org
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  hw/ide/qdev.c | 26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+> 
+> diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+> index f17da1f..cc96f6f 100644
+> --- a/hw/ide/qdev.c
+> +++ b/hw/ide/qdev.c
+> @@ -25,6 +25,7 @@
+>  #include "sysemu/block-backend.h"
+>  #include "sysemu/blockdev.h"
+>  #include "hw/block/block.h"
+> +#include "hw/qdev-slotinfo.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qapi/visitor.h"
+>  
+> @@ -38,6 +39,30 @@ static Property ide_props[] = {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> +static DeviceSlotInfoList *ide_bus_enumerate_slots(BusState *bus)
+> +{
+> +    int unit;
+> +    DeviceSlotInfoList *r = NULL;
+> +    IDEBus *ib = IDE_BUS(bus);
+> +
+> +    for (unit = 0; unit < 2; unit++) {
+> +        DeviceSlotInfo *s = make_slot(bus);
+> +        IDEDevice *dev = (unit ? ib->master : ib->slave);
+> +        slot_add_opt_int(s, "unit", unit);
+> +        s->opts_complete = true;
+> +        s->has_count = true;
+> +        s->count = 1;
+> +        if (dev) {
+> +            s->available = false;
+> +            s->has_device = true;
+> +            s->device = object_get_canonical_path(OBJECT(dev));
+> +        }
+> +        slot_list_add_slot(&r, s);
+> +    }
+> +
+> +    return r;
+> +}
+> +
+>  static void ide_bus_class_init(ObjectClass *klass, void *data)
+>  {
+>      BusClass *k = BUS_CLASS(klass);
+> @@ -45,6 +70,7 @@ static void ide_bus_class_init(ObjectClass *klass, void *data)
+>      k->get_fw_dev_path = idebus_get_fw_dev_path;
+>      k->unrealize = idebus_unrealize;
+>      k->device_type = TYPE_IDE_DEVICE;
+> +    k->enumerate_slots = ide_bus_enumerate_slots;
+>  }
+>  
+>  static void idebus_unrealize(BusState *bus, Error **errp)
+> 
