@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1di5xa-0007Tb-0x
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 17:34:43 -0400
+	(envelope-from <bounces@canonical.com>) id 1di5ym-0008WH-Ef
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 17:35:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1di5xY-0001R1-Pc
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 17:34:42 -0400
-References: <1500537221-20556-1-git-send-email-armbru@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <a7a4e4dd-8c2f-8014-6486-13f9a90a0341@redhat.com>
-Date: Wed, 16 Aug 2017 17:34:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1di5yj-0002LN-B2
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 17:35:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39570)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1di5yj-0002Km-4H
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 17:35:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1di5yh-0006Tq-T7
+	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 21:35:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DB1262E805B
+	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 21:35:51 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1500537221-20556-1-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 00/10] Correct two minor
- QMP interface design flaws
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 16 Aug 2017 21:18:56 -0000
+From: Sergey Blagodurov <1576347@bugs.launchpad.net>
+Reply-To: Bug 1576347 <1576347@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160428174421.24544.77308.malonedeb@gac.canonical.com>
+Message-Id: <150291833686.16815.16398127979286321280.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1576347] Re: Only one NVMe device is usable in
+ Windows (10) guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,108 +37,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, berrange@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, mreitz@redhat.com
+To: qemu-devel@nongnu.org
 
-Looks like this series got no replies (maybe a failure of my mail
-filtering?) but it has since been merged, so purely for my own selfish
-purposes;
+Trying it on Windows 10 guest and QEMU 2.8.0 has the same issue. However, I=
+ noticed that:
+  Supplying 1 NVMe drive -> Win10 sees it.
+  Supplying 2 NVMe drives -> Win10 sees only one of them.
+  Supplying 3 NVMe drives -> Win10 sees only two of them.
+So I still have been able to create a ReFS mirrored storage space with two =
+NVMe disks under QEMU, I just had to pass three drives instead of two:
 
-Merged upstream as:
+qemu-system-x86_64 -enable-kvm <...> -drive
+file=3D/media/ssd/NVMe_drvA.qcow2,id=3DdiskNVMeA,format=3Dqcow2,if=3Dnone -=
+drive
+file=3D/media/ssd/NVMe_drvB.qcow2,id=3DdiskNVMeB,format=3Dqcow2,if=3Dnone -=
+drive
+file=3D/media/ssd/NVMe_drvC.qcow2,id=3DdiskNVMeC,format=3Dqcow2,if=3Dnone
+-device nvme,drive=3DdiskNVMeA,serial=3Dfoo -device
+nvme,drive=3DdiskNVMeB,serial=3Dfoo -device nvme,drive=3DdiskNVMeC,serial=
+=3Dfoo
 
-01fa55982692fb51a16049b63b571651a1053989 migration: Use JSON null
-instead of "" to reset parameter to default
-1bda8b3c6950f74482ba19e8529db72b511ba977 migration: Unshare
-MigrationParameters struct for now
-e87fae4c488ff8a10b921311a63f16b94031c611 migration: Add TODO comments on
-duplication of QAPI_CLONE()
-8cc99dcdc264bc896926e43e7576c7b7ab633d70 migration: Clean up around
-tls_creds, tls_hostname
-7e91e82044f8d23acfb9949a2cdd667a6b239acd hmp: Clean up and simplify
-hmp_migrate_set_parameter()
-c42e8742f527476839bcc5f91c3d2ea456ca6a45 block: Use JSON null instead of
-"" to disable backing file
-06f80154b2ada1d58ac504e98ff6e943b069b96c
-tests/test-qobject-input-visitor: Drop redundant test
-4d2d5c41a9e8ee201cda8be8701f7f9fc92e71aa qapi: Introduce a first class
-'null' type
-d2f95f4d482374485234790a6fc3cca29ebb7355 qapi: Use QNull for a more
-regular visit_type_null()
-006ca09f3027d86346fce707e9295975c6558f42 qapi: Separate type QNull from
-QObject
+Hope this helps,
+--Sergey
 
---js
+-- =
 
-On 07/20/2017 03:53 AM, Markus Armbruster wrote:
-> blockdev-add and migrate-set-parameters overload empty strings to mean
-> something entirely different.  See my memo "qapi: Stop abusing
-> "special" values for something entirely different" for details.
-> 
->     Message-ID: <87379zhrhn.fsf@dusky.pond.sub.org>
->     https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg04526.html
-> 
-> This series deprecates these usages of "" in favour of JSON null.
-> Because we're so close to the 2.10 freeze, the implementation is
-> intentionally stupid: rewrite null to "" at first opportunity.  The
-> proper way to do it would be rewriting "" to null, but that requires
-> fixing up code to work with null.  There are TODO comments for that.
-> I'm willing to take care of them in the next development cycle.
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1576347
 
-Did this get dropped in favor of a more comprehensive 2.11 fix?
+Title:
+  Only one NVMe device is usable in Windows (10) guest
 
-> v2, because my pull request clashed with Juan's:
-> * Rebased, non-trivial conflicts in migration/migration.c
-> * PATCH 02: Commit message typo [Eric]
->   	    Fix ppc [patchew]
-> * PATCH 03: qapi-code-gen.txt update [Eric]
-> * PATCH 09: Conflict resolution, somewhat ugly
-> * PATCH 10: Doc improvement [Eric]
->   	    Conflict resolution
-> 
-> Markus Armbruster (10):
->   qapi: Separate type QNull from QObject
->   qapi: Use QNull for a more regular visit_type_null()
->   qapi: Introduce a first class 'null' type
->   tests/test-qobject-input-visitor: Drop redundant test
->   block: Use JSON null instead of "" to disable backing file
->   hmp: Clean up and simplify hmp_migrate_set_parameter()
->   migration: Clean up around tls_creds, tls_hostname
->   migration: Add TODO comments on duplication of QAPI_CLONE()
->   migration: Unshare MigrationParameters struct for now
->   migration: Use JSON null instead of "" to reset parameter to default
-> 
->  blockdev.c                              |  14 +++++
->  docs/devel/qapi-code-gen.txt            |  10 +--
->  hmp.c                                   |  88 ++++++++++++--------------
->  hw/ppc/spapr_drc.c                      |   4 +-
->  include/qapi/qmp/qobject.h              |  10 ++-
->  include/qapi/visitor-impl.h             |   3 +-
->  include/qapi/visitor.h                  |   8 +--
->  include/qemu/typedefs.h                 |   1 +
->  migration/migration.c                   |  96 +++++++++++++++++++++++++---
->  qapi-schema.json                        | 108 ++++++++++++++++++++++++++++----
->  qapi/block-core.json                    |  29 ++++++---
->  qapi/qapi-clone-visitor.c               |   5 +-
->  qapi/qapi-dealloc-visitor.c             |   6 +-
->  qapi/qapi-visit-core.c                  |   7 ++-
->  qapi/qobject-input-visitor.c            |   6 +-
->  qapi/qobject-output-visitor.c           |   5 +-
->  qapi/string-input-visitor.c             |   8 ++-
->  qapi/string-output-visitor.c            |   3 +-
->  qapi/trace-events                       |   2 +-
->  qobject/json-parser.c                   |   2 +-
->  qobject/qnull.c                         |   8 ++-
->  scripts/qapi.py                         |   5 +-
->  target/i386/cpu.c                       |   4 +-
->  target/ppc/translate_init.c             |   5 +-
->  tests/check-qjson.c                     |   6 +-
->  tests/check-qnull.c                     |  27 ++++----
->  tests/qapi-schema/qapi-schema-test.json |   3 +-
->  tests/qapi-schema/qapi-schema-test.out  |   1 +
->  tests/qemu-iotests/085                  |   2 +-
->  tests/qemu-iotests/139                  |   2 +-
->  tests/test-qobject-input-visitor.c      |  24 ++++---
->  tests/test-qobject-output-visitor.c     |  13 +++-
->  32 files changed, 378 insertions(+), 137 deletions(-)
-> 
+Status in QEMU:
+  New
+
+Bug description:
+  Full command: qemu-system-x86_64 -enable-kvm -cpu host -smp cores=3D4 -m
+  4G -net bridge -net nic -full-screen -drive
+  file=3Dovmf_x64.bin,format=3Draw,if=3Dpflash -drive
+  file=3Ddisks/win16_ide.img,format=3Draw,cache=3Dnone,aio=3Dnative -drive
+  file=3Ddisks/one.img,if=3Dnone,format=3Dqcow2,id=3Done -drive
+  file=3Ddisks/two.img,if=3Dnone,format=3Dqcow2,id=3Dtwo -device
+  nvme,drive=3Done,serial=3DE86C3CFC43518D6F -device
+  nvme,drive=3Dtwo,serial=3D2BDAC262CF831698
+
+  QEMU version: 2.5.0
+
+  Kernel: 4.5.1 (Arch Linux)
+
+  When there are two NVMe devices specified, only the second one will be
+  usable in Windows. The following error is shown under "Device status"
+  of the failed NVMe controller in Device Manager:
+
+  "This device cannot start. (Code 10)
+
+  The I/O device is configured incorrectly or the configuration
+  parameters to the driver are incorrect."
+
+  The only thing seems suspicious to me is that the nvme emulation in
+  qemu does not have WWN/EUI-64 set for the devices, though I have no
+  idea at all whether that is mandatory:
+
+  "C:\Windows\system32>sg_vpd -i PD1
+  Device Identification VPD page:
+    Addressed logical unit:
+      designator type: SCSI name string,  code set: UTF-8
+        SCSI name string:
+        8086QEMU NVMe Ctrl                          00012BDAC262CF831698
+
+  C:\Windows\system32>sg_vpd -p sn PD1
+  Unit serial number VPD page:
+    Unit serial number: 0000_0000_0000_0000."
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1576347/+subscriptions
