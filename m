@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dhx0B-0002lc-AV
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 08:00:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1dhx2p-0004dd-MK
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 08:03:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dhx06-0004MX-UX
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 08:00:47 -0400
-References: <20170815150907.21495-1-eblake@redhat.com>
-	<20170815150907.21495-8-eblake@redhat.com>
-	<e0254924-0e90-4e56-f734-d74c8c2ea8ee@virtuozzo.com>
-	<2d3ed7c8-f561-cdae-e7e5-411dff341dd8@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <f4ca52b8-9ec7-bf99-dc19-dc732b994cd3@virtuozzo.com>
-Date: Wed, 16 Aug 2017 15:00:35 +0300
+	(envelope-from <eblake@redhat.com>) id 1dhx2m-000773-HZ
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 08:03:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38192)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dhx2m-00076S-86
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 08:03:28 -0400
+References: <1502881586-25044-1-git-send-email-vadim.galitsyn@profitbricks.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <11c4defb-1915-0544-6ea8-9816500b749a@redhat.com>
+Date: Wed, 16 Aug 2017 07:03:22 -0500
 MIME-Version: 1.0
-In-Reply-To: <2d3ed7c8-f561-cdae-e7e5-411dff341dd8@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PULL 7/7] nbd-client: Fix regression when server
- sends garbage
+In-Reply-To: <1502881586-25044-1-git-send-email-vadim.galitsyn@profitbricks.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="r9X0UaeeQd7H04eIQDBnUAxN1tsfa8mbM"
+Subject: Re: [Qemu-devel] [PATCH v6 1/3] Extend "info numa" with hotplugged
+ memory information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,114 +28,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 
-15.08.2017 19:51, Eric Blake wrote:
-> On 08/15/2017 10:50 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 15.08.2017 18:09, Eric Blake wrote:
->>> When we switched NBD to use coroutines for qemu 2.9 (in particular,
->>> commit a12a712a), we introduced a regression: if a server sends us
->>> garbage (such as a corrupted magic number), we quit the read loop
->>> but do not stop sending further queued commands, resulting in the
->>> client hanging when it never reads the response to those additional
->>> commands.  In qemu 2.8, we properly detected that the server is no
->>> longer reliable, and cancelled all existing pending commands with
->>> EIO, then tore down the socket so that all further command attempts
->>> get EPIPE.
->>>
->>> +++ b/block/nbd-client.c
->>> @@ -73,7 +73,7 @@ static coroutine_fn void nbd_read_reply_entry(void
->>> *opaque)
->>>        int ret;
->>>        Error *local_err = NULL;
->>>
->>> -    for (;;) {
->>> +    while (!s->quit) {
->>>            assert(s->reply.handle == 0);
->>>            ret = nbd_receive_reply(s->ioc, &s->reply, &local_err);
->>>            if (ret < 0) {
->> I think we should check quit here, if it is true, we should not continue
->> normal path of handling reply
-> I don't think it matters.  If nbd_receive_reply() correctly got data off
-> the wire for this particular coroutine's request, we might as well act
-> on that data, regardless of what other coroutines have learned in the
-> meantime.
->
-> This is already in the pull request for -rc3, but if you can come up
-> with a scenario that still behaves incorrectly, we can do a followup
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--r9X0UaeeQd7H04eIQDBnUAxN1tsfa8mbM
+From: Eric Blake <eblake@redhat.com>
+To: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ qemu-devel@nongnu.org
+Message-ID: <11c4defb-1915-0544-6ea8-9816500b749a@redhat.com>
+Subject: Re: [PATCH v6 1/3] Extend "info numa" with hotplugged memory
+ information
+References: <1502881586-25044-1-git-send-email-vadim.galitsyn@profitbricks.com>
+In-Reply-To: <1502881586-25044-1-git-send-email-vadim.galitsyn@profitbricks.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-it just don't correspond to your commit message:
-"... therefore end all pending commands with EIO, and quit trying to 
-send any further commands"
+On 08/16/2017 06:06 AM, Vadim Galitsyn wrote:
+> Report amount of hotplugged memory in addition to total
+> amount per NUMA node.
+>=20
 
-so, we should end this command (we read reply for it) with EIO, instead 
-of continuing success path.
+meta-comment: when sending a multi-patch series, it's best to include a
+0/3 cover letter.  This, and more tips, are found at
+http://wiki.qemu.org/Contribute/SubmitAPatch
 
-However, I think this don't leads to a scenario, leading to a hang or a 
-crash of the client, it's OK for me to
-handle it in my refactoring for 2.11.
+> Signed-off-by: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: qemu-devel@nongnu.org
+> ---
+>  include/qemu/typedefs.h |  1 +
+>  include/sysemu/numa.h   |  7 ++++++-
+>  monitor.c               |  9 ++++++---
+>  numa.c                  | 18 +++++++++++++-----
+>  4 files changed, 26 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+> index 39bc835..e5f5347 100644
+> --- a/include/qemu/typedefs.h
+> +++ b/include/qemu/typedefs.h
+> @@ -100,6 +100,7 @@ typedef struct uWireSlave uWireSlave;
+>  typedef struct VirtIODevice VirtIODevice;
+>  typedef struct Visitor Visitor;
+>  typedef struct node_info NodeInfo;
+> +typedef struct numa_node_mem NumaNodeMem;
 
-> patch for -rc4 (although I'm hoping we don't have to change it any
-> further for 2.10).  Otherwise, I'm fine if your refactoring work for
-> 2.11 addresses the issue as part of making the code easier to read.
->
->>> @@ -154,6 +161,9 @@ static int nbd_co_send_request(BlockDriverState *bs,
->>>        } else {
->>>            rc = nbd_send_request(s->ioc, request);
->>>        }
->>> +    if (rc < 0) {
->>> +        s->quit = true;
->>> +    }
->>>        qemu_co_mutex_unlock(&s->send_mutex);
->> and here, if rc == 0 and quite is true, we should not return 0
->>
->>>        return rc;
-> We don't - we return rc, which is negative.
+Please follow HACKING naming conventions - name the struct NumaNodeMem
+in all places (just because node_info didn't follow the rules doesn't
+mean your addition should break them).  Also, this file should stay sorte=
+d.
 
-I think it can be zero, while quit is set to true in other coroutine.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
->
->>>    }
->>> @@ -168,8 +178,7 @@ static void nbd_co_receive_reply(NBDClientSession *s,
->>>        /* Wait until we're woken up by nbd_read_reply_entry.  */
->>>        qemu_coroutine_yield();
->>>        *reply = s->reply;
->>> -    if (reply->handle != request->handle ||
->>> -        !s->ioc) {
->>> +    if (reply->handle != request->handle || !s->ioc || s->quit) {
->>>            reply->error = EIO;
->> here, if s->quit is false, we should set it to inform other coroutines
-> We can't get into nbd_co_receive_reply() unless the two handles were
-> once equal, and the only code that changes them to be not equal is when
-> we are shutting down.  Checking s->quit is a safety valve if some other
-> coroutine detects corruption first, but this coroutine does not need to
-> set s->quit because it is either already set, or we are already shutting
-> down.
 
-ok, and, as s->quit is set when we are shutting down, we can drop 
-comparing handles here.
+--r9X0UaeeQd7H04eIQDBnUAxN1tsfa8mbM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
->
->>>        } else {
->>>            if (qiov && reply->error == 0) {
->> and here follows a call to nbd_rwv(), where s->quit should be
->> appropriately handled..
-> Reading from a corrupt server is not as bad as writing to the corrupt
-> server; the patch for 2.10 is solely focused on preventing writes where
-> we need a followup read (because once we know the server is corrupt, we
-> can't guarantee the followup reads will come).
->
-> Again, if you can prove we have a scenario that is still buggy (client
-> can crash or hang), then it is -rc4 material; if not, then this is all
-> the more that 2.10 needs, and your refactoring work for 2.11 should
-> clean up a lot of this mess in the first place as you make the
-> coroutines easier to follow.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-ok.
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmUNIoACgkQp6FrSiUn
+Q2o5Ggf/ces7JIOv9yXn/unCyxUyNbujrmSRZezqaqPDnCH41l0edeBuJK/pGO8T
+UOho8p2vbVvYa52pOQUC2Mr3+fHt4SbyWzbEsGhcYCsGcO8EbNrZ+93l+ytiZTym
+59crU6nae2X5nbbtIJoasCeICvYWBRH05T2Gksf8//CykEIV26QqWe5akcqN69xO
+SJcC2/WXJB6BignjtZpZltvEuEwiRSyonjP/fIw0xXzrG6goXcHA+UNhCCFMZnLh
+LnE7gUfS7KyfCrSfAyowkQCGb8qWgs/xNR8Qml02viN8irVF7TvFUg+MmjQo7+2U
+gdI/wy+7Sg8BycagSqrOlEikqDC2Xg==
+=f3to
+-----END PGP SIGNATURE-----
 
->
-
--- 
-Best regards,
-Vladimir
+--r9X0UaeeQd7H04eIQDBnUAxN1tsfa8mbM--
