@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dhuPV-00039o-94
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:14:46 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dhuSv-000738-Cg
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:18:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dhuPR-0004ge-Tx
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:14:45 -0400
-Received: from mx7.zte.com.cn ([202.103.147.169]:47736)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dhuPR-0004fT-Ao
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:14:41 -0400
-From: Wang yong <wang.yong155@zte.com.cn>
-Date: Wed, 16 Aug 2017 17:14:02 +0800
-Message-Id: <1502874842-4191-3-git-send-email-wang.yong155@zte.com.cn>
-In-Reply-To: <1502874842-4191-1-git-send-email-wang.yong155@zte.com.cn>
-References: <1502874842-4191-1-git-send-email-wang.yong155@zte.com.cn>
-Subject: [Qemu-devel] [PATCHv3 02/02] colo-compare: Update the COLO document
- to add the IOThread configuration
+	(envelope-from <imammedo@redhat.com>) id 1dhuSs-0005ua-2N
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:18:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40116)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dhuSr-0005u7-P4
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:18:13 -0400
+Date: Wed, 16 Aug 2017 11:18:07 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170816111807.0275dd5d@nial.brq.redhat.com>
+In-Reply-To: <1502846811-32360-1-git-send-email-douly.fnst@cn.fujitsu.com>
+References: <1502846811-32360-1-git-send-email-douly.fnst@cn.fujitsu.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] hw/acpi: Select an node with memory for
+ mapping memory hole to
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +27,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhang.zhanghailiang@huawei.com, zhangchen.fnst@cn.fujitsu.com, jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, famz@redhat.com
-Cc: wang.yong155@zte.com.cn, wang.guang55@zte.com.cn, lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org
+To: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com
 
-From: Wang Yong <wang.yong155@zte.com.cn>
+On Wed, 16 Aug 2017 09:26:51 +0800
+Dou Liyang <douly.fnst@cn.fujitsu.com> wrote:
 
-Update colo-proxy.txt,add IOThread configuration.
-Later we have to configure IOThread,if not COLO can not work.
+> Currently, Using the fisrt node without memory on the machine makes
+> QEMU unhappy. With this example command line:
+>   ... \
+>   -m 1024M,slots=4,maxmem=32G \
+>   -numa node,nodeid=0 \
+>   -numa node,mem=1024M,nodeid=1 \
+>   -numa node,nodeid=2 \
+>   -numa node,nodeid=3 \
+> Guest reports "No NUMA configuration found" and the NUMA topology is
+> wrong.
+> 
+> This is because when QEMU builds ACPI SRAT, it regards node0 as the
+> default node to deal with the memory hole(640K-1M). this means the
+> node0 must have some memory(>1M), but, actually it can have no
+> memory.
+> 
+> Fix this problem by replace the node0 with the first node which has
+> memory on it. Add a new function for each node. Also do some cleanup.
+It seems harmless but one never knows for sure,
+could you test it with different guests including old windows (up to XP)/
+linux (2.6 stable kernel) versions?
 
-Signed-off-by: Wang Yong<wang.yong155@zte.com.cn>
-Signed-off-by: Wang Guang<wang.guang55@zte.com.cn>
----
- docs/colo-proxy.txt | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/docs/colo-proxy.txt b/docs/colo-proxy.txt
-index c4941de..ce3f783 100644
---- a/docs/colo-proxy.txt
-+++ b/docs/colo-proxy.txt
-@@ -170,10 +170,11 @@ Primary(ip:3.3.3.3):
- -chardev socket,id=compare0-0,host=3.3.3.3,port=9001
- -chardev socket,id=compare_out,host=3.3.3.3,port=9005,server,nowait
- -chardev socket,id=compare_out0,host=3.3.3.3,port=9005
-+-object iothread,id=iothread1
- -object filter-mirror,id=m0,netdev=hn0,queue=tx,outdev=mirror0
- -object filter-redirector,netdev=hn0,id=redire0,queue=rx,indev=compare_out
- -object filter-redirector,netdev=hn0,id=redire1,queue=rx,outdev=compare0
---object colo-compare,id=comp0,primary_in=compare0-0,secondary_in=compare1,outdev=compare_out0
-+-object colo-compare,id=comp0,primary_in=compare0-0,secondary_in=compare1,outdev=compare_out0,iothread=iothread1
- 
- Secondary(ip:3.3.3.8):
- -netdev tap,id=hn0,vhost=off,script=/etc/qemu-ifup,down script=/etc/qemu-ifdown
--- 
-1.8.3.1
+> 
+> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+> ---
+> V2 --> V1:
+>   -Fix a coding style problem
+> Replace
+>     for (node = 0;
+>             node < pcms->numa_nodes && pcms->node_mem[node] == 0;
+>             node++);
+> 
+> with
+>     for (node = 0; node < pcms->numa_nodes; node++) {
+>        if (pcms->node_mem[node] != 0) {
+>             break;
+>          }
+> 
+>  hw/i386/acpi-build.c | 78 +++++++++++++++++++++++++++++++++-------------------
+>  1 file changed, 50 insertions(+), 28 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 98dd424..f93d712 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2318,15 +2318,43 @@ build_tpm2(GArray *table_data, BIOSLinker *linker)
+>                   (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
+>  }
+>  
+> +static uint64_t
+> +build_srat_node_entry(GArray *table_data, PCMachineState *pcms,
+> +                                int i, uint64_t mem_base, uint64_t mem_len)
+> +{
+> +    AcpiSratMemoryAffinity *numamem;
+> +    uint64_t next_base;
+> +
+> +    next_base = mem_base + mem_len;
+> +
+> +    /* Cut out the ACPI_PCI hole */
+> +    if (mem_base <= pcms->below_4g_mem_size &&
+> +        next_base > pcms->below_4g_mem_size) {
+> +        mem_len -= next_base - pcms->below_4g_mem_size;
+> +        if (mem_len > 0) {
+> +            numamem = acpi_data_push(table_data, sizeof *numamem);
+> +            build_srat_memory(numamem, mem_base, mem_len, i,
+> +                              MEM_AFFINITY_ENABLED);
+> +        }
+> +        mem_base = 1ULL << 32;
+> +        mem_len = next_base - pcms->below_4g_mem_size;
+> +        next_base += (1ULL << 32) - pcms->below_4g_mem_size;
+> +    }
+> +    numamem = acpi_data_push(table_data, sizeof *numamem);
+> +    build_srat_memory(numamem, mem_base, mem_len, i,
+> +                      MEM_AFFINITY_ENABLED);
+> +    return next_base;
+> +}
+> +
+>  static void
+>  build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>  {
+>      AcpiSystemResourceAffinityTable *srat;
+>      AcpiSratMemoryAffinity *numamem;
+>  
+> -    int i;
+> +    int i, node;
+>      int srat_start, numa_start, slots;
+> -    uint64_t mem_len, mem_base, next_base;
+> +    uint64_t mem_len, mem_base;
+>      MachineClass *mc = MACHINE_GET_CLASS(machine);
+>      const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(machine);
+>      PCMachineState *pcms = PC_MACHINE(machine);
+> @@ -2370,36 +2398,30 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>      /* the memory map is a bit tricky, it contains at least one hole
+>       * from 640k-1M and possibly another one from 3.5G-4G.
+>       */
+> -    next_base = 0;
+> +
+>      numa_start = table_data->len;
+>  
+> -    numamem = acpi_data_push(table_data, sizeof *numamem);
+> -    build_srat_memory(numamem, 0, 640 * 1024, 0, MEM_AFFINITY_ENABLED);
+> -    next_base = 1024 * 1024;
+> -    for (i = 1; i < pcms->numa_nodes + 1; ++i) {
+> -        mem_base = next_base;
+> -        mem_len = pcms->node_mem[i - 1];
+> -        if (i == 1) {
+> -            mem_len -= 1024 * 1024;
+> +    /* get the first node which has memory and map the hole from 640K-1M */
+> +    for (node = 0; node < pcms->numa_nodes; node++) {
+> +        if (pcms->node_mem[node] != 0) {
+> +            break;
+>          }
+> -        next_base = mem_base + mem_len;
+> -
+> -        /* Cut out the ACPI_PCI hole */
+> -        if (mem_base <= pcms->below_4g_mem_size &&
+> -            next_base > pcms->below_4g_mem_size) {
+> -            mem_len -= next_base - pcms->below_4g_mem_size;
+> -            if (mem_len > 0) {
+> -                numamem = acpi_data_push(table_data, sizeof *numamem);
+> -                build_srat_memory(numamem, mem_base, mem_len, i - 1,
+> -                                  MEM_AFFINITY_ENABLED);
+> -            }
+> -            mem_base = 1ULL << 32;
+> -            mem_len = next_base - pcms->below_4g_mem_size;
+> -            next_base += (1ULL << 32) - pcms->below_4g_mem_size;
+> +    }
+> +    numamem = acpi_data_push(table_data, sizeof *numamem);
+> +    build_srat_memory(numamem, 0, 640 * 1024, node, MEM_AFFINITY_ENABLED);
+> +
+> +    /* map the rest of memory from 1M */
+> +    mem_base = 1024 * 1024;
+> +    mem_len = pcms->node_mem[node] - mem_base;
+> +    mem_base = build_srat_node_entry(table_data, pcms, node,
+> +                                            mem_base, mem_len);
+> +
+> +    for (i = 0; i < pcms->numa_nodes; i++) {
+> +        if (i == node) {
+> +            continue;
+>          }
+> -        numamem = acpi_data_push(table_data, sizeof *numamem);
+> -        build_srat_memory(numamem, mem_base, mem_len, i - 1,
+> -                          MEM_AFFINITY_ENABLED);
+> +        mem_base = build_srat_node_entry(table_data, pcms, i,
+> +                                            mem_base, pcms->node_mem[i]);
+>      }
+>      slots = (table_data->len - numa_start) / sizeof *numamem;
+>      for (; slots < pcms->numa_nodes + 2; slots++) {
