@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dhslV-0006NM-SK
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 03:29:25 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dht2y-00063i-MB
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 03:47:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dhslU-00058N-R9
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 03:29:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45856)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dhslU-000582-Kk
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 03:29:20 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Wed, 16 Aug 2017 15:20:55 +0800
-Message-Id: <20170816072104.24420-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 0/9] tests: Add VM based build tests (for
- non-x86_64 and/or non-Linux)
+	(envelope-from <no-reply@patchew.org>) id 1dht2e-0001PF-Mz
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 03:47:24 -0400
+Resent-Message-Id: <E1dht2e-0001PF-Mz@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21436)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dht2e-0001Od-D7
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 03:47:04 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150286960827.78.6788806411910154670@dd743fd916bd>
+In-Reply-To: <20170816072104.24420-1-famz@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 16 Aug 2017 00:46:49 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH RFC 0/9] tests: Add VM based build tests
+ (for non-x86_64 and/or non-Linux)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,58 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, stefanha@redhat.com, pbonzini@redhat.com, Peter Maydell <peter.maydell@linaro.org>, Kamil Rytarowski <kamil@netbsd.org>
+To: famz@redhat.com
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, f4bug@amsat.org, kamil@netbsd.org, stefanha@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
 
-Build tests in one 32 bit Linux guest and three BSD images are defined in this
-series. This is a more managable way than the manually maintained virtual
-machines in patchew. Also, one big advantage of ephemeral VMs over long running
-guests is the reduced RAM usage of host, which makes it possible to have one
-host test all these BSD variants and probably more.
-
-The BSD guest templates are manually prepared following
-
-https://wiki.qemu.org/Hosts/BSD
-
-as it is not easy to automate. (The ideal approach is like the ubuntu.i386
-script, which configures the guest on top of an official released image, fully
-automatically.)
-
-Need for help: "gmake check" in the added OpenBSD image fails with -ENOMEM
-errors, even if I change "-m 2G" to "-m 8G" when starting VM. Ideas? And there
-is a warning from ./configure about OpenBSD going to be unsupported in coming
-releases, is it still the case?
-
-Fam
-
-Fam Zheng (9):
-  gitignore: Ignore vm test images
-  qemu.py: Add variable vga type
-  qemu.py: Add "wait()" method
-  tests: Add vm test lib
-  tests: Add ubuntu.i386 image
-  tests: Add FreeBSD image
-  tests: Add NetBSD image
-  tests: Add OpenBSD image
-  Makefile: Add rules to run vm tests
-
- .gitignore                |   2 +
- Makefile                  |   2 +
- configure                 |   2 +-
- scripts/qemu.py           |   8 +-
- tests/vm/Makefile.include |  41 ++++++++
- tests/vm/basevm.py        | 246 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/vm/freebsd          |  44 +++++++++
- tests/vm/netbsd           |  44 +++++++++
- tests/vm/openbsd          |  45 +++++++++
- tests/vm/ubuntu.i386      |  88 +++++++++++++++++
- 10 files changed, 520 insertions(+), 2 deletions(-)
- create mode 100644 tests/vm/Makefile.include
- create mode 100755 tests/vm/basevm.py
- create mode 100755 tests/vm/freebsd
- create mode 100755 tests/vm/netbsd
- create mode 100755 tests/vm/openbsd
- create mode 100755 tests/vm/ubuntu.i386
-
--- 
-2.13.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA4MTYwNzIxMDQuMjQ0MjAtMS1mYW16QHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxd
+IFtQQVRDSCBSRkMgMC85XSB0ZXN0czogQWRkIFZNIGJhc2VkIGJ1aWxkIHRlc3RzIChmb3Igbm9u
+LXg4Nl82NCBhbmQvb3Igbm9uLUxpbnV4KQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBC
+RUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25l
+bGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0
+cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNv
+bW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAt
+biAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1h
+aWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBm
+YWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZh
+aWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIx
+NjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjA1
+NTQ2NGYyMDAgTWFrZWZpbGU6IEFkZCBydWxlcyB0byBydW4gdm0gdGVzdHMKYTUxYmJiOTcwZCB0
+ZXN0czogQWRkIE9wZW5CU0QgaW1hZ2UKYWQ3YjViNjE5YiB0ZXN0czogQWRkIE5ldEJTRCBpbWFn
+ZQplODBmNjAyMmVjIHRlc3RzOiBBZGQgRnJlZUJTRCBpbWFnZQpjYzg3YzQzYzZkIHRlc3RzOiBB
+ZGQgdWJ1bnR1LmkzODYgaW1hZ2UKOWJiNTRkNmMyMyB0ZXN0czogQWRkIHZtIHRlc3QgbGliCjVj
+ODNhY2ZjZWQgcWVtdS5weTogQWRkICJ3YWl0KCkiIG1ldGhvZAo2NGNhM2E4Y2RlIHFlbXUucHk6
+IEFkZCB2YXJpYWJsZSB2Z2EgdHlwZQo4Yzg3M2U0MzA3IGdpdGlnbm9yZTogSWdub3JlIHZtIHRl
+c3QgaW1hZ2VzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzk6IGdpdGln
+bm9yZTogSWdub3JlIHZtIHRlc3QgaW1hZ2VzLi4uCkNoZWNraW5nIFBBVENIIDIvOTogcWVtdS5w
+eTogQWRkIHZhcmlhYmxlIHZnYSB0eXBlLi4uCkNoZWNraW5nIFBBVENIIDMvOTogcWVtdS5weTog
+QWRkICJ3YWl0KCkiIG1ldGhvZC4uLgpDaGVja2luZyBQQVRDSCA0Lzk6IHRlc3RzOiBBZGQgdm0g
+dGVzdCBsaWIuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM4MzogRklMRTogdGVz
+dHMvdm0vYmFzZXZtLnB5OjU4Ogorc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFC
+QVFDaWtDNDZXWXRYb3RVZDBVR1B6OTU0N0FqMEtxQzRnaytudDRCQkptODZJSGdDRDlGeWdTR1g5
+RUZ1dFhsaHo5S1pJUGc5T2trNytJelhSSENXSTJNTnZocmNqeXJlektSRW03MXowOGo5aXdmeFkz
+MzQwZlkyTW8rMGtod3BPN2J6c2d6a2xqSElIcWNPZzdNZ3R0UEluVk1OSC9FZnFwZ1I4RURLSnVX
+Q0IyTnkrRUJGTi8zZEFpZmYwWC9FdktsZTlQVXJZNzBFa1N5Y255VVJTOEhaUmVFcWo4bE45SjVr
+WHpBOEY2akJvLzBRNDJUdHY2ZTRrNVljYURyd21MckJXTHJhMlBDWFpMTnlIcVhFaUZrR21kWHRB
+MUVveDlnYy9wNGpJWGltNnhyUE5tcE42V3lyckVqYUNGNXhZdk52OHdYa0Q2dVNXd2JIWVUyNGxJ
+QW4gcWVtdS12bS1rZXkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxODc6IEZJ
+TEU6IHRlc3RzL3ZtL2Jhc2V2bS5weToxNjI6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ImZpbGU9JXMsaWY9bm9uZSxpZD0lcyxjYWNoZT13cml0ZWJhY2ssZm9ybWF0PXJhdyIgJSBcCgpX
+QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTkwOiBGSUxFOiB0ZXN0cy92bS9iYXNl
+dm0ucHk6MTY1OgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICJ2aXJ0aW8tYmxrLGRyaXZl
+PSVzLHNlcmlhbD0lcyxib290aW5kZXg9MSIgJSAobmFtZSwgbmFtZSldCgp0b3RhbDogMSBlcnJv
+cnMsIDIgd2FybmluZ3MsIDI0NiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1Lzk6IHRlc3RzOiBBZGQgdWJ1bnR1Lmkz
+ODYgaW1hZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNi85OiB0ZXN0czogQWRkIEZyZWVCU0QgaW1hZ2Uu
+Li4KQ2hlY2tpbmcgUEFUQ0ggNy85OiB0ZXN0czogQWRkIE5ldEJTRCBpbWFnZS4uLgpDaGVja2lu
+ZyBQQVRDSCA4Lzk6IHRlc3RzOiBBZGQgT3BlbkJTRCBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCA5
+Lzk6IE1ha2VmaWxlOiBBZGQgcnVsZXMgdG8gcnVuIHZtIHRlc3RzLi4uCj09PSBPVVRQVVQgRU5E
+ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
+dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
+ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
