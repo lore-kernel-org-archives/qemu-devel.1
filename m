@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dhxBT-0000bo-NP
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 08:12:28 -0400
+	(envelope-from <eblake@redhat.com>) id 1dhxHg-0003e0-JS
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 08:18:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dhxBS-0005wX-QN
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 08:12:27 -0400
-Date: Wed, 16 Aug 2017 15:11:38 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170816121138.jecvtc7ei3sgqomp@postretch>
+	(envelope-from <eblake@redhat.com>) id 1dhxHf-0001ji-I7
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 08:18:52 -0400
 References: <20170815074513.9055-1-el13635@mail.ntua.gr>
 	<6ebebb61-1f5e-391b-03d7-cae2bee99a2f@redhat.com>
 	<20170816094135.beufpqce3v4amhl3@postretch>
 	<1d2871d5-e224-6bc7-ebc1-f791357371ce@redhat.com>
+	<20170816121138.jecvtc7ei3sgqomp@postretch>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a4664b0a-cfce-c495-02f0-ffd2668b1e44@redhat.com>
+Date: Wed, 16 Aug 2017 07:18:39 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="lzkfbtzcjelpsn4g"
-Content-Disposition: inline
-In-Reply-To: <1d2871d5-e224-6bc7-ebc1-f791357371ce@redhat.com>
+In-Reply-To: <20170816121138.jecvtc7ei3sgqomp@postretch>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="nCKXNtvlb6BqP2kSgm0bSqRmTcr18QODp"
 Subject: Re: [Qemu-devel] [PATCH RFC] block: add block-insert-node QMP
  command
 List-Id: <qemu-devel.nongnu.org>
@@ -27,75 +28,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
 
-
---lzkfbtzcjelpsn4g
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--nCKXNtvlb6BqP2kSgm0bSqRmTcr18QODp
+From: Eric Blake <eblake@redhat.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>,
+ qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
+ Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-block <qemu-block@nongnu.org>
+Message-ID: <a4664b0a-cfce-c495-02f0-ffd2668b1e44@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC] block: add block-insert-node QMP command
+References: <20170815074513.9055-1-el13635@mail.ntua.gr>
+ <6ebebb61-1f5e-391b-03d7-cae2bee99a2f@redhat.com>
+ <20170816094135.beufpqce3v4amhl3@postretch>
+ <1d2871d5-e224-6bc7-ebc1-f791357371ce@redhat.com>
+ <20170816121138.jecvtc7ei3sgqomp@postretch>
+In-Reply-To: <20170816121138.jecvtc7ei3sgqomp@postretch>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 16, 2017 at 06:59:25AM -0500, Eric Blake wrote:
->On 08/16/2017 04:41 AM, Manos Pitsidianakis wrote:
->
->>>> +##
->>>> +# @block-insert-node:
->>>> +#
->>>> +# Insert a filter node between a specific edge in the block driver
->>>> state graph.
->>>> +# @parent:  the name of the parent node or device
->>>> +# @node:    the name of the node to insert under parent
->>>> +# @child:   the name of the child of both node and parent
->>>
->>> Is this always going to be between two existing nodes, or can this
->>> command also be used to insert at the end of the chain (for example, if
->>> parent or child is omitted)?
+On 08/16/2017 07:11 AM, Manos Pitsidianakis wrote:
+
 >>
->> If this is used for filter nodes, I suppose only between would make
->> sense (for now). Is there a use case for the latter?
->
->Perhaps.
->
->Given a qcow2 image backing chain:
->
->base <- active
->
->there are four BDS (2 format, 2 protocol).  Ideally, I could add
->filtering to any one of those four nodes (a filter on the base protocol
->level restricts how much guest data can be used from the backing image,
->but with no limits on the qcow2 metadata; a filter on the base format
->level restricts metadata reads as well; similarly for filters on the
->active protocol and format layers).
->
->But adding a filter on 'active' at the format level has no pre-existing
->parent (I'm adding the filter as the new top-level).  Or am I missing
->something?
+>> Given a qcow2 image backing chain:
+>>
+>> base <- active
+>>
+>> there are four BDS (2 format, 2 protocol).  Ideally, I could add
+>> filtering to any one of those four nodes (a filter on the base protoco=
+l
+>> level restricts how much guest data can be used from the backing image=
+,
+>> but with no limits on the qcow2 metadata; a filter on the base format
+>> level restricts metadata reads as well; similarly for filters on the
+>> active protocol and format layers).
+>>
+>> But adding a filter on 'active' at the format level has no pre-existin=
+g
+>> parent (I'm adding the filter as the new top-level).  Or am I missing
+>> something?
+>=20
+> The parent in this case is the storage device (disk / cdrom), whose nam=
+e
+> is specified as the parent. The first example in the
+> qapi/block-core.json is such a case. In code I check blk_by_name(parent=
+)
+> and if that doesn't exist, I try with bdrv_find_node(parent).  Perhaps =
+I
+> should reword the documentation or did I misunderstand what you wrote?
 
-The parent in this case is the storage device (disk / cdrom), whose name=20
-is specified as the parent. The first example in the=20
-qapi/block-core.json is such a case. In code I check blk_by_name(parent)=20
-and if that doesn't exist, I try with bdrv_find_node(parent).  Perhaps I=20
-should reword the documentation or did I misunderstand what you wrote?
+Ah, so you are including both BB and BDS in your set of names for parent
+objects.  Yes, clarifying the documentation that the parent can be
+either a device name (for the top of the chain) or a node name (for the
+middle of the chain) would help; the child name is always a node name
+(since we are filtering how the child will be used when accessed from
+the parent).
 
---lzkfbtzcjelpsn4g
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--nCKXNtvlb6BqP2kSgm0bSqRmTcr18QODp
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlmUNnkACgkQc2J8L2kN
-9xDbEg//buVBaJaXf3jEyOUY4FlrN5/wPoXhWcHTkHgAwScJU4GA28T7tFssb7MT
-M4pkDZrZzeX4Xg7yIyu7oBfemaXDCxVAhoVZbEpnSRfTIFDNOuKU65NxbcMXaXss
-goR/S4QaxaPLx1ArR9wHu2elhusQfTKmUYkJxQem587FtLvmBlmbGtBzCb5qXBZ0
-ArPJt6ZQ8O+UkFpCrn8qUHElC8mTDCon/YaXHcvh1m5jE9xJ3cEx5I810YxQu1wj
-05LVs73tBOmG1p/Nq0E4vGZaFws2Tbg8N0dqAW+JKDFocAceREdva42judaYxarP
-lqa+pQe3cpcKyXPegc+IajQBGKKDLcnoRBC6smqILG5grtqcAp3bBxvUtNlaDTTw
-dCl8BVQSIq/G3jCQe6MKpZQht/A2k9Ut/qkeQw/Q0i+mluaV6oY3FYuuEwAMC46A
-ZYLRj2/+iYdV1mm6d6WqfeWwsI/3VkBZ3QHL4J6FzrwPmNndY//8MPrvLByOBCWa
-PiPjLJ3AUwdMIJrVn/Q5kk5y1thUefGNpCdBTDg2muWN8BNXZyR7nig4lmiWe/AQ
-8puTWNZIwwuNNIoNG5Tuu6zn9xO/6Juqu+fY5PK0RQ5LYTkGP+/ddRuX6htVBuTC
-Lzyry1n93Qn7G13poG6vaL3qTelxjXx9Rn4qFkBtT9BgJgTT6Tc=
-=3Tag
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmUOB8ACgkQp6FrSiUn
+Q2p9XAf/ZQ71XsCZvsNbzKg1Sf+SIj/NVHMvhnYpxqFJOBGruhXCxK6Xl9k15c6O
+oYSVefZXJB63s1V8WzatPar5NWuK4EkcJuOE+jRqce0Mu3DXEixjK96tVSJxlC9t
+4zjoR3YOhTwDk52tsiiUsGReQojDhgsauv7TPU4wBthEm/TV/jW8W/tB/NQhwPiC
+5R+nZHDuFBpp2FLqjgH659d/wFl8RmJZdfGOmFPCKYST3yMjeALGOHu342B5TOFG
+DFk2YjF6saGEL+OA2E7YsYX5xwyjv7Cosehs++EheJQ2eT5jJQaT8RFxsxN8BPEd
+m5iFAvKGOXZ71SS+lkHFFunGwbghbQ==
+=sGIS
 -----END PGP SIGNATURE-----
 
---lzkfbtzcjelpsn4g--
+--nCKXNtvlb6BqP2kSgm0bSqRmTcr18QODp--
