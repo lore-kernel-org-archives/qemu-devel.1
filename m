@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1di5gO-0005ov-Ln
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 17:16:59 -0400
+	(envelope-from <eblake@redhat.com>) id 1di5ka-0008GC-4r
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 17:21:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1di5gN-0006up-HU
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 17:16:56 -0400
-References: <20170714153749.25132-1-pbutsykin@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <00598d39-0ee6-5f8d-a1a1-8e0c8d3c1dde@redhat.com>
-Date: Wed, 16 Aug 2017 17:07:40 -0400
+	(envelope-from <eblake@redhat.com>) id 1di5kW-0001Un-5R
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 17:21:13 -0400
+References: <20170804151440.320927-1-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3f9ef2bf-bd52-b2ef-4051-bea6c06d24ce@redhat.com>
+Date: Wed, 16 Aug 2017 16:21:01 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170714153749.25132-1-pbutsykin@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v6 0/4] Add shrink image for
- qcow2
+In-Reply-To: <20170804151440.320927-1-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="u5WT7TpxFsruQaXe6Hl8Jho0hOpQpH1wT"
+Subject: Re: [Qemu-devel] [PATCH 00/17] nbd client refactoring and fixing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,101 +23,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-Over a month with no replies and we're nearing the next QEMU release. If
-this patchset is still applicable, can you rebase and resend for 2.11?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--u5WT7TpxFsruQaXe6Hl8Jho0hOpQpH1wT
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+Message-ID: <3f9ef2bf-bd52-b2ef-4051-bea6c06d24ce@redhat.com>
+Subject: Re: [PATCH 00/17] nbd client refactoring and fixing
+References: <20170804151440.320927-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20170804151440.320927-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
---js
+On 08/04/2017 10:14 AM, Vladimir Sementsov-Ogievskiy wrote:
+> A bit more refactoring and fixing before BLOCK_STATUS series.
+> I've tried to make individual patches simple enough, so there are
+> a lot of them.
 
-On 07/14/2017 11:37 AM, Pavel Butsykin wrote:
-> This patch add shrinking of the image file for qcow2. As a result, this allows
-> us to reduce the virtual image size and free up space on the disk without
-> copying the image. Image can be fragmented and shrink is done by punching holes
-> in the image file.
-> 
-> # ./qemu-img create -f qcow2 image.qcow2 4G
-> Formatting 'image.qcow2', fmt=qcow2 size=4294967296 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-> 
-> # ./qemu-io -c "write -P 0x22 0 1G" image.qcow2
-> wrote 1073741824/1073741824 bytes at offset 0
-> 1 GiB, 1 ops; 0:00:04.59 (222.886 MiB/sec and 0.2177 ops/sec)
-> 
-> # ./qemu-img resize image.qcow2 512M
-> warning: qemu-img: Shrinking an image will delete all data beyond the shrunken image's end. Before performing such an operation, make sure there is no important data there.
-> error: qemu-img: Use the --shrink option to perform a shrink operation.
-> 
-> # ./qemu-img resize --shrink image.qcow2 128M
-> Image resized.
-> 
-> # ./qemu-img info image.qcow2
-> image: image.qcow2
-> file format: qcow2
-> virtual size: 128M (134217728 bytes)
-> disk size: 128M
-> cluster_size: 65536
-> Format specific information:
->     compat: 1.1
->     lazy refcounts: false
->     refcount bits: 16
->     corrupt: false
-> 
-> # du -h image.qcow2
-> 129M    image.qcow2
-> 
-> Changes from v1:
-> - add --shrink flag for qemu-img resize
-> - add qcow2_cache_discard
-> - simplify qcow2_shrink_l1_table() to reduce the likelihood of image corruption
-> - add new qemu-iotests for shrinking images
-> 
-> Changes from v2:
-> - replace qprintf() on error_report() (1)
-> - rewrite warning messages (1)
-> - enforce --shrink flag for all formats except raw (1)
-> - split qcow2_cache_discard() (2)
-> - minor fixes according to comments (3)
-> - rewrite the last part of qcow2_shrink_reftable() to avoid
->   qcow2_free_clusters() calls inside (3)
-> - improve test for shrinking image (4)
-> 
-> Changes from v3:
-> - rebase on "Implement a warning_report function" Alistair's patch-set (1)
-> - spelling fixes (1)
-> - the man page fix according to the discussion (1)
-> - add call qcow2_signal_corruption() in case of image corruption (3)
-> 
-> Changes from v4:
-> - rebase on https://github.com/XanClic/qemu/commits/block Max's block branch
-> 
-> Changes from v5:
-> - the condition refcount == 0 should be enough to evict the l2/refcount cluster
->   from the cache (2)
-> - overwrite the l1/refcount table in memory with zeros, even if overwriting the
->   l1/refcount table on disk has failed (3)
-> - replace g_try_malloc() on g_malloc() for allocation reftable_tmp (3)
-> 
-> Pavel Butsykin (4):
->   qemu-img: add --shrink flag for resize
->   qcow2: add qcow2_cache_discard
->   qcow2: add shrink image support
->   qemu-iotests: add shrinking image test
-> 
->  block/qcow2-cache.c        |  26 +++++++
->  block/qcow2-cluster.c      |  50 +++++++++++++
->  block/qcow2-refcount.c     | 140 ++++++++++++++++++++++++++++++++++++-
->  block/qcow2.c              |  43 +++++++++---
->  block/qcow2.h              |  17 +++++
->  qapi/block-core.json       |   3 +-
->  qemu-img-cmds.hx           |   4 +-
->  qemu-img.c                 |  23 ++++++
->  qemu-img.texi              |   6 +-
->  tests/qemu-iotests/102     |   4 +-
->  tests/qemu-iotests/163     | 170 +++++++++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/163.out |   5 ++
->  tests/qemu-iotests/group   |   1 +
->  13 files changed, 475 insertions(+), 17 deletions(-)
->  create mode 100644 tests/qemu-iotests/163
->  create mode 100644 tests/qemu-iotests/163.out
-> 
+Is your BLOCK_STATUS series something that is in good enough shape to
+post a preliminary version of it (the version you posted back in
+February is now horribly out-of-date, with all the good cleanups you
+have been doing in the meantime).  I want to get a running start at
+reviewing what I can to make sure we get improved NBD functionality into
+2.11.
+
+Also, please feel free to offer your Reviewed-by on other patches
+(whether NBD-related or not).  Speaking as the NBD maintainer, I welcome
+any help I can get.  And from personal experience, reviews tend to be
+one of the largest bottlenecks in open source software - if you are
+writing patches but not offering reviews, then you are adding to the
+bottleneck so reviewers tend to set your patches aside for when they
+have more time; while if you are actively offering reviews, then it is
+obvious that you care about the project and your patch contributions
+tend to have an easier time getting in.  My personal rule of thumb is to
+try and review at least 2 other patches for every one that I send,
+although that is a rather ambitious goal and there's nothing wrong if
+you can't commit to theh same level of effort.
+
+>=20
+> Vladimir Sementsov-Ogievskiy (17):
+>   nbd/client: fix nbd_opt_go
+>   nbd/client: refactor nbd_read_eof
+>   nbd/client: refactor nbd_receive_reply
+>   nbd/client: fix nbd_send_request to return int
+>   block/nbd-client: get rid of ssize_t
+>   block/nbd-client: fix nbd_read_reply_entry
+>   block/nbd-client: refactor request send/receive
+>   block/nbd-client: rename nbd_recv_coroutines_enter_all
+>   block/nbd-client: move nbd_co_receive_reply content into
+>     nbd_co_request
+>   block/nbd-client: move nbd_coroutine_end content into nbd_co_request
+>   block/nbd-client: fix nbd_co_request: set s->reply.handle to 0 on
+>     error
+>   block/nbd-client: refactor nbd_co_request
+>   block/nbd-client: refactor NBDClientSession.recv_coroutine
+>   block/nbd-client: exit reply-reading coroutine on incorrect handle
+>   block/nbd-client: refactor reading reply
+>   block/nbd-client: drop reply field from NBDClientSession
+>   block/nbd-client: always return EIO on and after the first io channel=
+
+>     error
+
+Of course, parts of this will need rebasing based on what finally landed
+in 2.10, but I can start reviewing what I can for this round.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--u5WT7TpxFsruQaXe6Hl8Jho0hOpQpH1wT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmUtz0ACgkQp6FrSiUn
+Q2oVbwf+LwLZxm/LFBtzYGOqzoY/L3gdZ1frvSgd45Z7KkpCFcqvQ5hBC1idrJgQ
+rUVv+xeCF3aE57EY33Yh16TM/AYw3iRPdSdEWbX4cnWZTNb5LeWuWSxrH4P5I9zi
+XiEJK7WVdFG+v0E1oU3O+mPGGa8FmtyvshLRSddtke3NcpqYqeNkJoaHb6x/LJQt
+yxIm0gMcfp6hMGMSVO587o/1X5mwniYh5hWzKeP/kwO1Lk6TcaD53/0nx3TxXMJU
+cnFhx4BV+TiuwLJuD+XFyPsyNbcgBAIdSqnZWIYVOXzuFrOEQ2gcEVQqZtB9Hey7
+zbP5pNxJp+XL3Zt43NBzxMJUcoGobw==
+=Haoo
+-----END PGP SIGNATURE-----
+
+--u5WT7TpxFsruQaXe6Hl8Jho0hOpQpH1wT--
