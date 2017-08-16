@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vadim.galitsyn@profitbricks.com>) id 1dhw9v-0000lI-Q5
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 07:06:49 -0400
+	(envelope-from <vadim.galitsyn@profitbricks.com>) id 1dhw9v-0000lB-2P
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 07:06:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vadim.galitsyn@profitbricks.com>) id 1dhw9r-0008EQ-Vx
+	(envelope-from <vadim.galitsyn@profitbricks.com>) id 1dhw9q-0008CV-SN
 	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 07:06:47 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:35197)
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:33944)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <vadim.galitsyn@profitbricks.com>)
-	id 1dhw9r-0008Cf-Mk
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 07:06:43 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id 49so3778212wrw.2
-	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 04:06:43 -0700 (PDT)
+	id 1dhw9q-0008Aq-HR
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 07:06:42 -0400
+Received: by mail-wr0-x232.google.com with SMTP id y96so9027039wrc.1
+	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 04:06:42 -0700 (PDT)
 From: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
-Date: Wed, 16 Aug 2017 13:06:25 +0200
-Message-Id: <1502881586-25044-2-git-send-email-vadim.galitsyn@profitbricks.com>
-In-Reply-To: <1502881586-25044-1-git-send-email-vadim.galitsyn@profitbricks.com>
-References: <1502881586-25044-1-git-send-email-vadim.galitsyn@profitbricks.com>
-Subject: [Qemu-devel] [PATCH v6 2/3] qmp: introduce
- query-memory-size-summary command
+Date: Wed, 16 Aug 2017 13:06:24 +0200
+Message-Id: <1502881586-25044-1-git-send-email-vadim.galitsyn@profitbricks.com>
+Subject: [Qemu-devel] [PATCH v6 1/3] Extend "info numa" with hotplugged
+ memory information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,168 +26,138 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>, Vasilis Liaskovitis <vasilis.liaskovitis@profitbricks.com>, Mohammed Gamal <mohammed.gamal@profitbricks.com>, Eduardo Otubo <eduardo.otubo@profitbricks.com>
+Cc: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
 
-Command above provides the following memory information in bytes:
+Report amount of hotplugged memory in addition to total
+amount per NUMA node.
 
-  * base-memory - size of "base" memory specified with command line option -m.
-
-  * plugged-memory - amount of memory that was hot-plugged.
-    If target does not have CONFIG_MEM_HOTPLUG enabled, no
-    value is reported.
-
-Signed-off-by: Vasilis Liaskovitis <vasilis.liaskovitis@profitbricks.com>
-Signed-off-by: Mohammed Gamal <mohammed.gamal@profitbricks.com>
-Signed-off-by: Eduardo Otubo <eduardo.otubo@profitbricks.com>
 Signed-off-by: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
-Reviewed-by: Eugene Crosser <evgenii.cherkashin@profitbricks.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>
 Cc: qemu-devel@nongnu.org
 ---
- hw/mem/pc-dimm.c                |  5 +++++
- include/hw/mem/pc-dimm.h        |  1 +
- qapi-schema.json                | 25 +++++++++++++++++++++++++
- qmp.c                           | 13 +++++++++++++
- stubs/Makefile.objs             |  2 +-
- stubs/qmp_pc_dimm.c             | 13 +++++++++++++
- stubs/qmp_pc_dimm_device_list.c |  8 --------
- 7 files changed, 58 insertions(+), 9 deletions(-)
- create mode 100644 stubs/qmp_pc_dimm.c
- delete mode 100644 stubs/qmp_pc_dimm_device_list.c
+ include/qemu/typedefs.h |  1 +
+ include/sysemu/numa.h   |  7 ++++++-
+ monitor.c               |  9 ++++++---
+ numa.c                  | 18 +++++++++++++-----
+ 4 files changed, 26 insertions(+), 9 deletions(-)
 
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index ea67b46..6ef2ccd 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -159,6 +159,11 @@ uint64_t pc_existing_dimms_capacity(Error **errp)
-     return cap.size;
- }
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index 39bc835..e5f5347 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -100,6 +100,7 @@ typedef struct uWireSlave uWireSlave;
+ typedef struct VirtIODevice VirtIODevice;
+ typedef struct Visitor Visitor;
+ typedef struct node_info NodeInfo;
++typedef struct numa_node_mem NumaNodeMem;
+ typedef void SaveStateHandler(QEMUFile *f, void *opaque);
+ typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
  
-+uint64_t get_plugged_memory_size(void)
-+{
-+    return pc_existing_dimms_capacity(&error_abort);
-+}
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index 610eece..af2e2d3 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -24,9 +24,14 @@ struct node_info {
+     uint8_t distance[MAX_NODES];
+ };
+ 
++struct numa_node_mem {
++    uint64_t node_mem;
++    uint64_t node_hotpluggable_mem;
++};
 +
- int qmp_pc_dimm_device_list(Object *obj, void *opaque)
+ extern NodeInfo numa_info[MAX_NODES];
+ void parse_numa_opts(MachineState *ms);
+-void query_numa_node_mem(uint64_t node_mem[]);
++void query_numa_node_mem(NumaNodeMem node_mem[]);
+ extern QemuOptsList qemu_numa_opts;
+ void numa_set_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
+ void numa_unset_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
+diff --git a/monitor.c b/monitor.c
+index e0f8801..46506ba 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1710,11 +1710,12 @@ static void hmp_info_mtree(Monitor *mon, const QDict *qdict)
+ static void hmp_info_numa(Monitor *mon, const QDict *qdict)
  {
-     MemoryDeviceInfoList ***prev = opaque;
-diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-index 1e483f2..a56f901 100644
---- a/include/hw/mem/pc-dimm.h
-+++ b/include/hw/mem/pc-dimm.h
-@@ -95,6 +95,7 @@ int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
+     int i;
+-    uint64_t *node_mem;
++    NumaNodeMem *node_mem;
+     CpuInfoList *cpu_list, *cpu;
  
- int qmp_pc_dimm_device_list(Object *obj, void *opaque);
- uint64_t pc_existing_dimms_capacity(Error **errp);
-+uint64_t get_plugged_memory_size(void);
- void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-                          MemoryRegion *mr, uint64_t align, Error **errp);
- void pc_dimm_memory_unplug(DeviceState *dev, MemoryHotplugState *hpms,
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 802ea53..23916b7 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -4408,6 +4408,31 @@
-             '*unavailable-features': [ 'str' ], 'typename': 'str' } }
- 
- ##
-+# @MemoryInfo:
-+#
-+# Actual memory information in bytes.
-+#
-+# @base-memory: size of "base" memory specified with command line
-+#               option -m.
-+#
-+# @plugged-memory: size memory that can be hot-unplugged.
-+#
-+# Since: 2.10.0
-+##
-+{ 'struct': 'MemoryInfo',
-+  'data'  : { 'base-memory': 'size', '*plugged-memory': 'size' } }
+     cpu_list = qmp_query_cpus(&error_abort);
+-    node_mem = g_new0(uint64_t, nb_numa_nodes);
++    node_mem = g_new0(NumaNodeMem, nb_numa_nodes);
 +
-+##
-+# @query-memory-size-summary:
-+#
-+# Return the amount of initially allocated and hot-plugged (if
-+# enabled) memory in bytes.
-+#
-+# Since: 2.10.0
-+##
-+{ 'command': 'query-memory-size-summary', 'returns': 'MemoryInfo' }
-+
-+##
- # @query-cpu-definitions:
- #
- # Return a list of supported virtual CPU definitions
-diff --git a/qmp.c b/qmp.c
-index b86201e..e8c3031 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -709,3 +709,16 @@ ACPIOSTInfoList *qmp_query_acpi_ospm_status(Error **errp)
- 
-     return head;
+     query_numa_node_mem(node_mem);
+     monitor_printf(mon, "%d nodes\n", nb_numa_nodes);
+     for (i = 0; i < nb_numa_nodes; i++) {
+@@ -1727,7 +1728,9 @@ static void hmp_info_numa(Monitor *mon, const QDict *qdict)
+         }
+         monitor_printf(mon, "\n");
+         monitor_printf(mon, "node %d size: %" PRId64 " MB\n", i,
+-                       node_mem[i] >> 20);
++                       node_mem[i].node_mem >> 20);
++        monitor_printf(mon, "node %d hotplugged: %" PRId64 " MB\n", i,
++                       node_mem[i].node_hotpluggable_mem >> 20);
+     }
+     qapi_free_CpuInfoList(cpu_list);
+     g_free(node_mem);
+diff --git a/numa.c b/numa.c
+index e32af04..e3b4013 100644
+--- a/numa.c
++++ b/numa.c
+@@ -591,11 +591,12 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
+     }
  }
+ 
+-static void numa_stat_memory_devices(uint64_t node_mem[])
++static void numa_stat_memory_devices(NumaNodeMem node_mem[])
+ {
+     MemoryDeviceInfoList *info_list = NULL;
+     MemoryDeviceInfoList **prev = &info_list;
+     MemoryDeviceInfoList *info;
++    PCDIMMDeviceInfo     *pcdimm_info;
+ 
+     qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
+     for (info = info_list; info; info = info->next) {
+@@ -603,9 +604,16 @@ static void numa_stat_memory_devices(uint64_t node_mem[])
+ 
+         if (value) {
+             switch (value->type) {
+-            case MEMORY_DEVICE_INFO_KIND_DIMM:
+-                node_mem[value->u.dimm.data->node] += value->u.dimm.data->size;
++            case MEMORY_DEVICE_INFO_KIND_DIMM: {
++                pcdimm_info = value->u.dimm.data;
++                node_mem[pcdimm_info->node].node_mem += pcdimm_info->size;
++                if (pcdimm_info->hotpluggable && pcdimm_info->hotplugged) {
++                    node_mem[pcdimm_info->node].node_hotpluggable_mem +=
++                        pcdimm_info->size;
++                }
+                 break;
++            }
 +
-+MemoryInfo *qmp_query_memory_size_summary(Error **errp)
-+{
-+    MemoryInfo *mem_info = g_malloc0(sizeof(MemoryInfo));
-+
-+    mem_info->base_memory = ram_size;
-+
-+    mem_info->plugged_memory = get_plugged_memory_size();
-+    mem_info->has_plugged_memory =
-+        mem_info->plugged_memory != (uint64_t)-1;
-+
-+    return mem_info;
-+}
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index f5b47bf..f7cab5b 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -32,7 +32,7 @@ stub-obj-y += uuid.o
- stub-obj-y += vm-stop.o
- stub-obj-y += vmstate.o
- stub-obj-$(CONFIG_WIN32) += fd-register.o
--stub-obj-y += qmp_pc_dimm_device_list.o
-+stub-obj-y += qmp_pc_dimm.o
- stub-obj-y += target-monitor-defs.o
- stub-obj-y += target-get-monitor-def.o
- stub-obj-y += pc_madt_cpu_entry.o
-diff --git a/stubs/qmp_pc_dimm.c b/stubs/qmp_pc_dimm.c
-new file mode 100644
-index 0000000..9ddc4f6
---- /dev/null
-+++ b/stubs/qmp_pc_dimm.c
-@@ -0,0 +1,13 @@
-+#include "qemu/osdep.h"
-+#include "qom/object.h"
-+#include "hw/mem/pc-dimm.h"
-+
-+int qmp_pc_dimm_device_list(Object *obj, void *opaque)
-+{
-+   return 0;
-+}
-+
-+uint64_t get_plugged_memory_size(void)
-+{
-+    return (uint64_t)-1;
-+}
-diff --git a/stubs/qmp_pc_dimm_device_list.c b/stubs/qmp_pc_dimm_device_list.c
-deleted file mode 100644
-index def2115..0000000
---- a/stubs/qmp_pc_dimm_device_list.c
-+++ /dev/null
-@@ -1,8 +0,0 @@
--#include "qemu/osdep.h"
--#include "qom/object.h"
--#include "hw/mem/pc-dimm.h"
--
--int qmp_pc_dimm_device_list(Object *obj, void *opaque)
--{
--   return 0;
--}
+             default:
+                 break;
+             }
+@@ -614,7 +622,7 @@ static void numa_stat_memory_devices(uint64_t node_mem[])
+     qapi_free_MemoryDeviceInfoList(info_list);
+ }
+ 
+-void query_numa_node_mem(uint64_t node_mem[])
++void query_numa_node_mem(NumaNodeMem node_mem[])
+ {
+     int i;
+ 
+@@ -624,7 +632,7 @@ void query_numa_node_mem(uint64_t node_mem[])
+ 
+     numa_stat_memory_devices(node_mem);
+     for (i = 0; i < nb_numa_nodes; i++) {
+-        node_mem[i] += numa_info[i].node_mem;
++        node_mem[i].node_mem += numa_info[i].node_mem;
+     }
+ }
+ 
 -- 
 2.1.4
