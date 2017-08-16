@@ -1,33 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhrm3-0003KS-Tl
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 02:25:52 -0400
+	(envelope-from <tianyu.lan@intel.com>) id 1dhrp6-0005FC-Ut
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 02:29:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhrm0-00077S-Ov
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 02:25:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39084)
+	(envelope-from <tianyu.lan@intel.com>) id 1dhrp3-0008Kf-SY
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 02:29:00 -0400
+Received: from mga07.intel.com ([134.134.136.100]:6079)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dhrm0-00076p-8R
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 02:25:48 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2B65C61482
-	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 06:25:47 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170808203935.30021-1-ehabkost@redhat.com>
-	<20170808203935.30021-5-ehabkost@redhat.com>
-	<87fuctp2pi.fsf@dusky.pond.sub.org>
-	<20170815203909.GY3108@localhost.localdomain>
-Date: Wed, 16 Aug 2017 08:25:41 +0200
-In-Reply-To: <20170815203909.GY3108@localhost.localdomain> (Eduardo Habkost's
-	message of "Tue, 15 Aug 2017 17:39:09 -0300")
-Message-ID: <87378sf2qi.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-2.11 v2 4/5] qmp-shell: Accept QMP
- command as argument
+	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
+	id 1dhrp3-0008Jv-Jn
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 02:28:57 -0400
+From: Lan Tianyu <tianyu.lan@intel.com>
+Date: Tue, 15 Aug 2017 20:22:13 -0400
+Message-Id: <1502842933-8323-1-git-send-email-tianyu.lan@intel.com>
+Subject: [Qemu-devel] [PATCH] x86: Skip check apic_id_limit for Xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,64 +22,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Lan Tianyu <tianyu.lan@intel.com>, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+Xen vIOMMU device model will be in Xen hypervisor. Skip vIOMMU
+check for Xen here when vcpu number is more than 255.
 
-> On Tue, Aug 15, 2017 at 12:03:53PM +0200, Markus Armbruster wrote:
->> Eduardo Habkost <ehabkost@redhat.com> writes:
->> 
->> Suggest to insert here:
->> 
->>   If additional arguments QMP-COMMAND ARG=VAL... are given, run just
->>   that QMP command instead of the REPL.
->> 
->> Question: is this limited to simple arguments?  If no, how would I write
->> an object argument?  For instance, how would I do
->> 
->>     { "execute": "blockdev-add", "arguments": { "node-name": "foo", "driver": "nbd", "server": { "type": "inet", "host": "localhost", "port": "12345" } } }
->> 
->> ?
->
-> Exactly the same way you would write it when running qmp-shell in
-> interactive mode.  e.g.:
->
->   $ ./scripts/qmp/qmp-shell /tmp/qmp blockdev-add driver=qcow2 node-name=node-E 'file={"driver":"file","filename":"/path/to/file.qcow2"}'
+Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
+---
+ hw/i386/pc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I see.
-
-The QEMU command line uses dotted key syntax instead.
-
-To be honest, the less qmp-shell is used, the happier I am.  Would you
-like to serve as its sub-maintainer?
-
->> > This is useful for testing QMP commands in scripts.
->> >
->> > Example usage, combined with 'jq' for filtering the results:
->> >
->> >   $ ./scripts/qmp/qmp-shell /tmp/qmp qom-list path=/ | jq -r .return[].name
->> >   machine
->> >   type
->> >   chardevs
->> >   backend
->> 
->> What's jq?
->
-> https://stedolan.github.io/jq/
->
-> "like sed for JSON data"
-
-A fine addition to your commit message.
-
->> 
->> >   $
->> 
->> Let's drop this line.
->
-> Will do it.
->
->> 
->> >
->> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-[...]
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 5943539..fc17885 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1260,7 +1260,7 @@ void pc_machine_done(Notifier *notifier, void *data)
+         fw_cfg_modify_i16(pcms->fw_cfg, FW_CFG_NB_CPUS, pcms->boot_cpus);
+     }
+ 
+-    if (pcms->apic_id_limit > 255) {
++    if (pcms->apic_id_limit > 255 && !xen_enabled()) {
+         IntelIOMMUState *iommu = INTEL_IOMMU_DEVICE(x86_iommu_get_default());
+ 
+         if (!iommu || !iommu->x86_iommu.intr_supported ||
+-- 
+1.8.3.1
