@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhxrP-000688-BD
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 08:55:48 -0400
+	(envelope-from <sw@weilnetz.de>) id 1dhxtK-0007mq-23
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 08:57:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dhxrK-0004a5-9j
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 08:55:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55558)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dhxrK-0004Zt-3A
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 08:55:42 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
-	<20170727154126.11339-7-marcandre.lureau@redhat.com>
-Date: Wed, 16 Aug 2017 14:55:37 +0200
-In-Reply-To: <20170727154126.11339-7-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Thu, 27 Jul 2017 17:41:06 +0200")
-Message-ID: <871sob8yeu.fsf@dusky.pond.sub.org>
+	(envelope-from <sw@weilnetz.de>) id 1dhxtE-0005Ml-60
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 08:57:46 -0400
+References: <20170328184959.5550-1-sw@weilnetz.de>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <6a5b9248-312c-cb66-c189-9a3e1651013a@weilnetz.de>
+Date: Wed, 16 Aug 2017 14:57:33 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170328184959.5550-1-sw@weilnetz.de>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 06/26] qapi2texi: minor python code
- simplification
+Content-Language: de-DE
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9?] configure: Remove unused code
+ (found by shellcheck)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Trivial <qemu-trivial@nongnu.org>
+Cc: qemu-devel@nongnu.org
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+It looks like this patch got lost somehow.
 
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Stefan
+
+See also https://patchwork.codeaurora.org/patch/210129/
+
+
+Am 28.03.2017 um 20:49 schrieb Stefan Weil:
+> smartcard_cflags is no longer needed since commit
+> 0b22ef0f57a8910d849602bef0940edcd0553d2c.
+> 
+> Signed-off-by: Stefan Weil <sw@weilnetz.de>
 > ---
->  scripts/qapi2texi.py | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-> index 9e015002ef..639eb1d042 100755
-> --- a/scripts/qapi2texi.py
-> +++ b/scripts/qapi2texi.py
-> @@ -136,10 +136,9 @@ def texi_enum_value(value):
->  def texi_member(member, suffix=3D''):
->      """Format a table of members item for an object type member"""
->      typ =3D member.type.doc_type()
-> -    return '@item @code{%s%s%s}%s%s\n' % (
-> +    return '@item @code{%s%s}%s%s\n' % (
->          member.name,
-> -        ': ' if typ else '',
-> -        typ if typ else '',
-> +        ': %s' % typ if typ else '',
->          ' (optional)' if member.optional else '',
->          suffix)
-
-Is nested interpolation really simpler?
+> 
+> This is a very old patch which I just found in my patch queue.
+> It's not mandatory for 2.9, but I also think that there is
+> no risk to apply it.
+> 
+> Sorry for sending it so late.
+> 
+> Regards
+> Stefan
+> 
+>  configure | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/configure b/configure
+> index d1ce33bc79..b65ea2931c 100755
+> --- a/configure
+> +++ b/configure
+> @@ -4096,7 +4096,6 @@ EOF
+>  fi
+>  
+>  # check for smartcard support
+> -smartcard_cflags=""
+>  if test "$smartcard" != "no"; then
+>      if $pkg_config libcacard; then
+>          libcacard_cflags=$($pkg_config --cflags libcacard)
+> 
