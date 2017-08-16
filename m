@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1di1LI-0000J9-U9
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 12:38:54 -0400
+	(envelope-from <armbru@redhat.com>) id 1di1ey-0002LT-B9
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 12:59:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1di1LF-0007CS-ON
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 12:38:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57744)
+	(envelope-from <armbru@redhat.com>) id 1di1et-00025p-9O
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 12:59:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41702)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1di1LF-0007Bq-El
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 12:38:49 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1DC793C58
-	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 16:38:46 +0000 (UTC)
-Date: Wed, 16 Aug 2017 17:38:39 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170816163839.GC2494@work-vm>
-References: <20170808162629.32493-1-quintela@redhat.com>
-	<20170808162629.32493-19-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1di1et-00025b-05
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 12:59:07 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170815085732.9794-1-ldoktor@redhat.com>
+	<20170815085732.9794-2-ldoktor@redhat.com>
+	<87fuctm2ql.fsf@dusky.pond.sub.org>
+	<343636b3-85d2-cb2b-8975-dcc1bb0ddee1@redhat.com>
+Date: Wed, 16 Aug 2017 18:58:56 +0200
+In-Reply-To: <343636b3-85d2-cb2b-8975-dcc1bb0ddee1@redhat.com>
+	(=?utf-8?B?Ikx1a8OhxaE=?=
+	Doktor"'s message of "Wed, 16 Aug 2017 18:01:10 +0200")
+Message-ID: <87pobvxxdb.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170808162629.32493-19-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 18/19] migration: Transfer pages over
- new channels
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 01/10] qemu.py: Pylint/style fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,188 +31,455 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
+Cc: famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We switch for sending the page number to send real pages.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> 
-> --
-> 
-> Remove the HACK bit, now we have the function that calculates the size
-> of a page exported.
-> ---
->  migration/migration.c |  7 +++++-
->  migration/ram.c       | 59 +++++++++++++++++----------------------------------
->  2 files changed, 25 insertions(+), 41 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 974ff92..aac3cdc 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -2051,6 +2051,7 @@ static void *migration_thread(void *opaque)
->       */
->      int64_t threshold_size = 0;
->      int64_t qemu_file_bytes = 0;
-> +    int64_t multifd_pages = 0;
->      int64_t start_time = initial_time;
->      int64_t end_time;
->      bool old_vm_running = false;
-> @@ -2139,8 +2140,11 @@ static void *migration_thread(void *opaque)
->          current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->          if (current_time >= initial_time + BUFFER_DELAY) {
->              uint64_t qemu_file_bytes_now = qemu_ftell(s->to_dst_file);
-> +            uint64_t multifd_pages_now = ram_counters.multifd;
->              uint64_t transferred_bytes =
-> -                qemu_file_bytes_now - qemu_file_bytes;
-> +                (qemu_file_bytes_now - qemu_file_bytes) +
-> +                (multifd_pages_now - multifd_pages) *
-> +                qemu_target_page_size();
->              uint64_t time_spent = current_time - initial_time;
->              double bandwidth = (double)transferred_bytes / time_spent;
->              threshold_size = bandwidth * s->parameters.downtime_limit;
-> @@ -2160,6 +2164,7 @@ static void *migration_thread(void *opaque)
->              qemu_file_reset_rate_limit(s->to_dst_file);
->              initial_time = current_time;
->              qemu_file_bytes = qemu_file_bytes_now;
-> +            multifd_pages = multifd_pages_now;
->          }
->          if (qemu_file_rate_limit(s->to_dst_file)) {
->              /* usleep expects microseconds */
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 42ad126..f337360 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -479,25 +479,21 @@ static void *multifd_send_thread(void *opaque)
->              break;
->          }
->          if (p->pages.num) {
-> -            int i;
->              int num;
->  
->              num = p->pages.num;
->              p->pages.num = 0;
->              qemu_mutex_unlock(&p->mutex);
->  
-> -            for (i = 0; i < num; i++) {
-> -                if (qio_channel_write(p->c,
-> -                                      (const char *)&p->pages.iov[i].iov_base,
-> -                                      sizeof(uint8_t *), &error_abort)
-> -                    != sizeof(uint8_t *)) {
-> -                    MigrationState *s = migrate_get_current();
-> +            if (qio_channel_writev_all(p->c, p->pages.iov,
-> +                                       num, &error_abort)
+Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com> writes:
 
-One way out of the problem of errors might be to add an
-  Error *errp;
+> Dne 15.8.2017 v 14:31 Markus Armbruster napsal(a):
+>> Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com> writes:
+>>=20
+>>> No actual code changes, just several pylint/style fixes and docstring
+>>> clarifications.
+>>>
+>>> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+>>> ---
+>>>  scripts/qemu.py | 76 ++++++++++++++++++++++++++++++++++++++++---------=
+--------
+>>>  1 file changed, 53 insertions(+), 23 deletions(-)
+>>>
+>>> diff --git a/scripts/qemu.py b/scripts/qemu.py
+>>> index 880e3e8..466aaab 100644
+>>> --- a/scripts/qemu.py
+>>> +++ b/scripts/qemu.py
+>>> @@ -23,8 +23,22 @@ import qmp.qmp
+>>>  class QEMUMachine(object):
+>>>      '''A QEMU VM'''
+>>>=20=20
+>>> -    def __init__(self, binary, args=3D[], wrapper=3D[], name=3DNone, t=
+est_dir=3D"/var/tmp",
+>>> -                 monitor_address=3DNone, socket_scm_helper=3DNone, deb=
+ug=3DFalse):
+>>> +    def __init__(self, binary, args=3D[], wrapper=3D[], name=3DNone,
+>>> +                 test_dir=3D"/var/tmp", monitor_address=3DNone,
+>>> +                 socket_scm_helper=3DNone, debug=3DFalse):
+>>> +        '''
+>>> +        Create a QEMUMachine object
+>>=20
+>> Initialize a QEMUMachine
+>>=20
+>> Rationale: it's __init__, not __create__, and "object" is redundant.
+>>=20
+>
+> sure
+>
+>>> +
+>>> +        @param binary: path to the qemu binary (str)
+>>=20
+>> Drop (str), because what else could it be?
+>
+> it could be shlex.split of arguments to be passed to process. Anyway no s=
+trong opinion here so I dropping it...
+>
+>>=20
+>>> +        @param args: initial list of extra arguments
+>>=20
+>> If this is the initial list, then what's the final list?
+>>=20
+>
+> It's the basic set of arguments which can be modified before the executio=
+n. Do you think it requires additional explanation, or would you like to im=
+prove it somehow?
 
-to MultiFD*Params, and make sure it's NULL initially;
-then instead of &error_abort you can have &p->errp,
-I think we're already guaranteed the lifetime of the
-params is at least the length of the thread and then
-you can check p->errp before you free the params.
+Can this list of extra arguments really be *modified*?  Adding more
+arguments doesn't count for me --- I'd consider them added to the
+"non-extra" arguments.
 
-You could also return this value as the return value of
-the thread as an easy way to flag the thread failed when the
-join happens.
+Drop "initial"?
 
-Dave
+>>> +        @param wrapper: list of arguments used as prefix to qemu binary
+>>> +        @param name: name of this object (used for log/monitor/... fil=
+e names)
+>> prefix for socket and log file names (default: qemu-PID)
+>>=20
+>
+> Sure, both make sense to me.
+>
+>>> +        @param test_dir: base location to put log/monitor/... files in
+>>=20
+>> where to create socket and log file
+>>=20
+>> Aside: test_dir is a lousy name.
+>
+> Agree but changing names is tricky as people might be using kwargs to set=
+ it. Anyway using your description here, keeping the possible rename for a =
+separate patchset (if needed).
 
+I'm merely observing the lousiness of this name.  I'm not asking you to
+do anything about it :)
 
-> +                != num * TARGET_PAGE_SIZE) {
-> +                MigrationState *s = migrate_get_current();
->  
-> -                    migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
-> -                                      MIGRATION_STATUS_FAILED);
-> -                    terminate_multifd_send_threads();
-> -                    return NULL;
-> -                }
-> +                migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
-> +                                  MIGRATION_STATUS_FAILED);
-> +                terminate_multifd_send_threads();
-> +                return NULL;
->              }
->              qemu_mutex_lock(&multifd_send_state->mutex);
->              p->done = true;
-> @@ -658,7 +654,6 @@ void multifd_load_cleanup(void)
->  static void *multifd_recv_thread(void *opaque)
->  {
->      MultiFDRecvParams *p = opaque;
-> -    uint8_t *recv_address;
->  
->      qemu_sem_post(&p->ready);
->      while (true) {
-> @@ -668,38 +663,21 @@ static void *multifd_recv_thread(void *opaque)
->              break;
->          }
->          if (p->pages.num) {
-> -            int i;
->              int num;
->  
->              num = p->pages.num;
->              p->pages.num = 0;
->  
-> -            for (i = 0; i < num; i++) {
-> -                if (qio_channel_read(p->c,
-> -                                     (char *)&recv_address,
-> -                                     sizeof(uint8_t *), &error_abort)
-> -                    != sizeof(uint8_t *)) {
-> -                    MigrationState *s = migrate_get_current();
-> +            if (qio_channel_readv_all(p->c, p->pages.iov,
-> +                                      num, &error_abort)
-> +                != num * TARGET_PAGE_SIZE) {
-> +                MigrationState *s = migrate_get_current();
->  
-> -                    migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
-> -                                      MIGRATION_STATUS_FAILED);
-> -                    terminate_multifd_recv_threads();
-> -                    return NULL;
-> -                }
-> -                if (recv_address != p->pages.iov[i].iov_base) {
-> -                    MigrationState *s = migrate_get_current();
-> -
-> -                    printf("We received %p what we were expecting %p (%d)\n",
-> -                           recv_address,
-> -                           p->pages.iov[i].iov_base, i);
-> -
-> -                    migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
-> -                                      MIGRATION_STATUS_FAILED);
-> -                    terminate_multifd_recv_threads();
-> -                    return NULL;
-> -                }
-> +                migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
-> +                                  MIGRATION_STATUS_FAILED);
-> +                terminate_multifd_recv_threads();
-> +                return NULL;
->              }
-> -
->              p->done = true;
->              qemu_mutex_unlock(&p->mutex);
->              qemu_sem_post(&p->ready);
-> @@ -1259,8 +1237,10 @@ static int ram_multifd_page(RAMState *rs, PageSearchStatus *pss,
->                               offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
->          fd_num = multifd_send_page(p, rs->migration_dirty_pages == 1);
->          qemu_put_be16(rs->f, fd_num);
-> +        if (fd_num != MULTIFD_CONTINUE) {
-> +            qemu_fflush(rs->f);
-> +        }
->          ram_counters.transferred += 2; /* size of fd_num */
-> -        qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
->          ram_counters.transferred += TARGET_PAGE_SIZE;
->          pages = 1;
->          ram_counters.normal++;
-> @@ -3123,7 +3103,6 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->          case RAM_SAVE_FLAG_MULTIFD_PAGE:
->              fd_num = qemu_get_be16(f);
->              multifd_recv_page(host, fd_num);
-> -            qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
->              break;
->  
->          case RAM_SAVE_FLAG_EOS:
-> -- 
-> 2.9.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>> +        @param monitor_address: custom address for QMP monitor
+>>=20
+>> Yes, but what *is* a custom address?  Its user _base_args() appears to
+>> expect either a pair of strings (host, port) or a string filename.
+>>=20
+>
+> If you insist I can add something like "a tuple(host, port) or string to =
+specify path", but I find it unnecessary detailed...
+
+I'm not the maintainer, I'm definitely not insisting on anything.
+
+If you're aiming for brevity, then drop "custom".
+
+>>> +        @param socket_scm_helper: path to scm_helper binary (to forwar=
+d fds)
+>>=20
+>> What is an scm_helper, and why would I want to use it?
+>>=20
+>
+> To forward a file descriptor. It's for example used in tests/qemu-iotests=
+/045 or tests/qemu-iotests/147
+
+What about "socket_scm_helper: helper program, required for send_fd_scm()"?
+
+>>> +        @param debug: enable debug mode (forwarded to QMP helper and s=
+uch)
+>>=20
+>> What is a QMP helper?  To what else is debug forwarded?
+>>=20
+>
+> Debug is set in `self._debug` and can be consumed by anyone who has acces=
+s to this variable. Currently that is the QMP, but people can inherit and u=
+se that variable to adjust their behavior.
+
+Drop the parenthesis?
+
+>>> +        @note: Qemu process is not started until launch() is used.
+>>=20
+>> until launch().
+>>=20
+>
+> OK
+
+One more thing: what the use of "@param"?
+
+>>> +        '''
+>>=20
+>> It's an improvement.
+>>=20
+>>>          if name is None:
+>>>              name =3D "qemu-%d" % os.getpid()
+>>>          if monitor_address is None:
+>>> @@ -33,12 +47,13 @@ class QEMUMachine(object):
+>>>          self._qemu_log_path =3D os.path.join(test_dir, name + ".log")
+>>>          self._popen =3D None
+>>>          self._binary =3D binary
+>>> -        self._args =3D list(args) # Force copy args in case we modify =
+them
+>>> +        self._args =3D list(args)     # Force copy args in case we mod=
+ify them
+>>>          self._wrapper =3D wrapper
+>>>          self._events =3D []
+>>>          self._iolog =3D None
+>>>          self._socket_scm_helper =3D socket_scm_helper
+>>>          self._debug =3D debug
+>>> +        self._qmp =3D None
+>>>=20=20
+>>>      # This can be used to add an unused monitor instance.
+>>>      def add_monitor_telnet(self, ip, port):
+>>> @@ -64,16 +79,16 @@ class QEMUMachine(object):
+>>>          if self._socket_scm_helper is None:
+>>>              print >>sys.stderr, "No path to socket_scm_helper set"
+>>>              return -1
+>>> -        if os.path.exists(self._socket_scm_helper) =3D=3D False:
+>>> +        if not os.path.exists(self._socket_scm_helper):
+>>>              print >>sys.stderr, "%s does not exist" % self._socket_scm=
+_helper
+>>>              return -1
+>>>          fd_param =3D ["%s" % self._socket_scm_helper,
+>>>                      "%d" % self._qmp.get_sock_fd(),
+>>>                      "%s" % fd_file_path]
+>>>          devnull =3D open('/dev/null', 'rb')
+>>> -        p =3D subprocess.Popen(fd_param, stdin=3Ddevnull, stdout=3Dsys=
+.stdout,
+>>> -                             stderr=3Dsys.stderr)
+>>> -        return p.wait()
+>>> +        proc =3D subprocess.Popen(fd_param, stdin=3Ddevnull, stdout=3D=
+sys.stdout,
+>>> +                                stderr=3Dsys.stderr)
+>>> +        return proc.wait()
+>>>=20=20
+>>>      @staticmethod
+>>>      def _remove_if_exists(path):
+>>> @@ -99,8 +114,8 @@ class QEMUMachine(object):
+>>>          return self._popen.pid
+>>>=20=20
+>>>      def _load_io_log(self):
+>>> -        with open(self._qemu_log_path, "r") as fh:
+>>> -            self._iolog =3D fh.read()
+>>> +        with open(self._qemu_log_path, "r") as iolog:
+>>> +            self._iolog =3D iolog.read()
+>>>=20=20
+>>>      def _base_args(self):
+>>>          if isinstance(self._monitor_address, tuple):
+>>> @@ -114,8 +129,8 @@ class QEMUMachine(object):
+>>>                  '-display', 'none', '-vga', 'none']
+>>>=20=20
+>>>      def _pre_launch(self):
+>>> -        self._qmp =3D qmp.qmp.QEMUMonitorProtocol(self._monitor_addres=
+s, server=3DTrue,
+>>> -                                                debug=3Dself._debug)
+>>> +        self._qmp =3D qmp.qmp.QEMUMonitorProtocol(self._monitor_addres=
+s,
+>>> +                                                server=3DTrue, debug=
+=3Dself._debug)
+>>=20
+>> Recommend to break the line between the last two arguments.
+>>=20
+>
+> I'm not used to do that, but I can most certainly do that. Do you want me=
+ to change all places (eg. in the next chunk)
+
+PEP8 asks you to limit all lines to a maximum of 79 characters.  This
+one is right at the maximum.  Tolerable, but I prefer my lines a bit
+shorter.  Use your judgement.
+
+>>>=20=20
+>>>      def _post_launch(self):
+>>>          self._qmp.accept()
+>>> @@ -131,9 +146,11 @@ class QEMUMachine(object):
+>>>          qemulog =3D open(self._qemu_log_path, 'wb')
+>>>          try:
+>>>              self._pre_launch()
+>>> -            args =3D self._wrapper + [self._binary] + self._base_args(=
+) + self._args
+>>> +            args =3D (self._wrapper + [self._binary] + self._base_args=
+() +
+>>> +                    self._args)
+>>>              self._popen =3D subprocess.Popen(args, stdin=3Ddevnull, st=
+dout=3Dqemulog,
+>>> -                                           stderr=3Dsubprocess.STDOUT,=
+ shell=3DFalse)
+>>> +                                           stderr=3Dsubprocess.STDOUT,
+>>> +                                           shell=3DFalse)
+>>>              self._post_launch()
+>>>          except:
+>>>              if self.is_running():
+>>> @@ -149,28 +166,34 @@ class QEMUMachine(object):
+>>>              try:
+>>>                  self._qmp.cmd('quit')
+>>>                  self._qmp.close()
+>>> -            except:
+>>> +            except:     # kill VM on any failure pylint: disable=3DW07=
+02
+>>=20
+>> The bare except is almost certainly inappropriate.  Are you sure we
+>> should silence pylint?
+>>=20
+>> Note that there's another bare except in launch(), visible in the
+>> previous patch hunk.  I guess pylint is okay with that one because it
+>> re-throws the exception.
+>>=20
+>> In case we should silence pylint: what's the scope of this magic pylint
+>> comment?  Can we use the symbolic disable=3Dbare-except?
+>>=20
+>
+> Yep, we can use symbolic name as well. Well more appropriate would be to =
+catch `SystemExit` and `KeyboardInterrupt`, treat them and raise them and t=
+hen ignore the rest of exceptions. I'll do that in the next version...
+>
+>>>                  self._popen.kill()
+>>>=20=20
+>>>              exitcode =3D self._popen.wait()
+>>>              if exitcode < 0:
+>>> -                sys.stderr.write('qemu received signal %i: %s\n' % (-e=
+xitcode, ' '.join(self._args)))
+>>> +                sys.stderr.write('qemu received signal %i: %s\n'
+>>> +                                 % (-exitcode, ' '.join(self._args)))
+>>>              self._load_io_log()
+>>>              self._post_shutdown()
+>>>=20=20
+>>>      underscore_to_dash =3D string.maketrans('_', '-')
+>>> +
+>>>      def qmp(self, cmd, conv_keys=3DTrue, **args):
+>>>          '''Invoke a QMP command and return the result dict'''
+>>=20
+>> Make that "and return the response", because that's how
+>> docs/interop/qmp-spec.txt calls the thing.
+>>=20
+>
+> Sure, no problem. I wanted to stress-out it's a dict and not encoded stri=
+ng, but it's probably given by the context.
+
+"return the response dict" would be fine with me.
+
+>>>          qmp_args =3D dict()
+>>> -        for k in args.keys():
+>>> +        for key in args.keys():
+>>>              if conv_keys:
+>>> -                qmp_args[k.translate(self.underscore_to_dash)] =3D arg=
+s[k]
+>>> +                qmp_args[key.translate(self.underscore_to_dash)] =3D a=
+rgs[key]
+>>>              else:
+>>> -                qmp_args[k] =3D args[k]
+>>> +                qmp_args[key] =3D args[key]
+>>>=20=20
+>>>          return self._qmp.cmd(cmd, args=3Dqmp_args)
+>>>=20=20
+>>>      def command(self, cmd, conv_keys=3DTrue, **args):
+>>> +        '''
+>>> +        Invoke a QMP command and on success return result dict or on f=
+ailure
+>>> +        raise exception with details.
+>>> +        '''
+>>=20
+>> I'm afraid "result dict" is wrong: it need not be a dict.  "on failure
+>> raise exception" adds precious little information, and "with details"
+>> adds none.
+>>=20
+>> Perhaps:
+>>=20
+>>            Invoke a QMP command.
+>>            On success return the return value.
+>>            On failure raise an exception.
+>>=20
+>
+> That is quite more verbose than I'd like and result in the same (for non-=
+native speaker), but I have no strong opinion here so changing it to your v=
+ersion in v2.
+>
+>> The last sentence is too vague, but it's hard to do better because...
+>>=20
+>>>          reply =3D self.qmp(cmd, conv_keys, **args)
+>>>          if reply is None:
+>>>              raise Exception("Monitor is closed")
+>>=20
+>> ... we raise Exception!  This code is a *turd* (pardon my french), and
+>> PEP8 / pylint violations are the least of its problems.
+>>=20
+>
+> Yep, adding rework-exceptions to my TODO list (for a future patchset)
+>
+>>> @@ -193,15 +216,18 @@ class QEMUMachine(object):
+>>>          return events
+>>>=20=20
+>>>      def event_wait(self, name, timeout=3D60.0, match=3DNone):
+>>> -        # Test if 'match' is a recursive subset of 'event'
+>>> -        def event_match(event, match=3DNone):
+>>> +        '''Wait for event in QMP, optionally filter results by match.'=
+''
+>>=20
+>> What is match?
+>>=20
+>> name and timeout not worth mentioning?
+>>=20
+>
+> IMO this does not require full-blown documentation, it's not really a use=
+r-facing API and sometimes shorter is better. Anyway if you insist I can ad=
+d full documentation of each parameter. I can even add `:type:` and `:retur=
+ns:` and perhaps some `:warns:` and `:notes:` and I should descend and note=
+ all the possible `:raises:`.
+>
+> ... the point I'm trying to make is I don't think it's necessary to go th=
+at much into details. Anyway if you think the params are necessary to list,=
+ then I can do that.
+
+Use your judgement.  The more detailed comments you add, the more
+questions you'll get ;)
+
+>>> +        # Test if 'match' is a recursive subset of 'event'; skips bran=
+ch
+>>> +        # processing on match's value `None`
+>>=20
+>> What's a "recursive subset"?  What's "branch processing"?
+>>=20
+>> There's an unusual set of quotes around `None`.
+>>=20
+>
+> Basically I was surprised why this function exists as one can directly co=
+mpare dicts. It's because it works as the stock dict compare only on value =
+"None" it breaks and assumes that "branch" matches. That's why I listed the=
+ example as I'm unsure how to explain it in a human language.
+>
+> As for the `None`, in sphinx/doxygen it becomes "block" so I'm used to th=
+ese, anyway people use `'`s and `"`s here so I'll change it in next version=
+ to be consistent.
+
+According to git-grep, we're using neither sphinx nor doxygen right now.
+
+>>> +        #    {"foo": {"bar": 1} matches {"foo": None}
+>>=20
+>> Aha: None servers as wildcard.
+>
+> Exactly.
+>
+>>=20
+>>> +        def _event_match(event, match=3DNone):
+>>=20
+>> Any particular reason for renaming this function?
+>>=20
+>
+> To emphasize it's internal, not a strong opinion but IMO looks better thi=
+s way.
+
+It's a nested function, how could it *not* be internal?
+
+>>>              if match is None:
+>>>                  return True
+>>>=20=20
+>>>              for key in match:
+>>>                  if key in event:
+>>>                      if isinstance(event[key], dict):
+>>> -                        if not event_match(event[key], match[key]):
+>>> +                        if not _event_match(event[key], match[key]):
+>>>                              return False
+>>>                      elif event[key] !=3D match[key]:
+>>>                          return False
+>>> @@ -212,18 +238,22 @@ class QEMUMachine(object):
+>>>=20=20
+>>>          # Search cached events
+>>>          for event in self._events:
+>>> -            if (event['event'] =3D=3D name) and event_match(event, mat=
+ch):
+>>> +            if (event['event'] =3D=3D name) and _event_match(event, ma=
+tch):
+>>>                  self._events.remove(event)
+>>>                  return event
+>>>=20=20
+>>>          # Poll for new events
+>>>          while True:
+>>>              event =3D self._qmp.pull_event(wait=3Dtimeout)
+>>> -            if (event['event'] =3D=3D name) and event_match(event, mat=
+ch):
+>>> +            if (event['event'] =3D=3D name) and _event_match(event, ma=
+tch):
+>>>                  return event
+>>>              self._events.append(event)
+>>>=20=20
+>>>          return None
+>>>=20=20
+>>>      def get_log(self):
+>>> +        '''
+>>> +        After self.shutdown or failed qemu execution this returns the =
+output
+>>=20
+>> Comma after execution, please.
+>>=20
+>
+> OK
+>
+>>> +        of the qemu process.
+>>> +        '''
+>>>          return self._iolog
+>>=20
+>> I understand this code was factored out of qemu-iotests for use by
+>> qtest.py.  That's okay, but I'd rather not serve as its maintainer.
+>> -E2MUCH...
+>>=20
+>
+> Yep, anyway it contains several useful methods/helpers and fixing basic i=
+ssues is the simplest way to get to know the code (and the submitting proce=
+ss). Thank you for your time.
+
+You're welcome!
