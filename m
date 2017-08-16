@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dhvnk-0007Lk-Jc
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 06:43:54 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dhvvR-00029Y-6H
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 06:51:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dhvnh-0002Wb-GQ
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 06:43:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47262)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dhvnh-0002WD-6E
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 06:43:49 -0400
-References: <1502639388-12580-1-git-send-email-zuban32s@gmail.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <00651e6a-1d0b-3f37-afa4-b95c3b68e4bd@redhat.com>
-Date: Wed, 16 Aug 2017 13:43:42 +0300
+	(envelope-from <pbonzini@redhat.com>) id 1dhvvO-0008L5-4b
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 06:51:49 -0400
+Received: from mail-wr0-f169.google.com ([209.85.128.169]:35807)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dhvvN-0008Ji-U7
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 06:51:46 -0400
+Received: by mail-wr0-f169.google.com with SMTP id 49so3433273wrw.2
+	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 03:51:43 -0700 (PDT)
+References: <20170816082650.21880-1-cohuck@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
+Date: Wed, 16 Aug 2017 12:51:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <1502639388-12580-1-git-send-email-zuban32s@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170816082650.21880-1-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 0/4] Generic PCIE-PCI Bridge
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.10] boot-serial-test: prefer tcg
+ accelerator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,139 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, lersek@redhat.com, seabios@seabios.org
+To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, thuth@redhat.com, mst@redhat.com, richard.henderson@linaro.org
 
-On 13/08/2017 18:49, Aleksandr Bezzubikov wrote:
-> This series introduces a new device - Generic PCI Express to PCI bridge=
-,
-> and also makes all necessary changes to enable hotplug of the bridge it=
-self
-> and any device into the bridge.
->=20
+On 16/08/2017 10:26, Cornelia Huck wrote:
+> Prefer to use the tcg accelarator if it is available: This is our only
+> real smoke test for tcg, and fast enough to use it for that.
 
-Hi Aleksandr,
-Thanks for all the effort you put in this series.
+I'm not sure this is required for 2.10.  Yes, it means the coverage from
+"make check" is worse, but that's it.
 
-I tested it and succeeded to hotplug a pcie-pci-bridge into
-a pcie-root-port by reserving an extra bus number, then succeeded
-to hotplug a NIC into the pcie-pci-bridge. (Windows an Linux guests)
+Paolo
 
-I also succeeded to reserve more mem/io using the pcie-root-port
-  parameters.
-
-One minor but importing comment:
-While testing it I observed the "reserve" parameters are not "size", but=20
-integers and that is not user friendly.
-It is better to be able to use:
-    -device pcie-root-port,io-reserve=3D1k,mem-reserve=3D4M
-For bus numbers, even a byte parameter is enough, but for others "size"
-is much better.
-
-Sorry for not observing earlier.
-Marcel
-
-
-> Changes v5->v6:
-> 1. Fix indentation in the cap creation function (addresses Marcel's com=
-ment)
-> 2. Simplify capability pref_mem_* fields assignment (addresses Marcel's=
- comment)
-> 3. Documentation fixes:
-> 	- fix mutually exclusive fields definition (addresses Laszlo's comment=
-)
-> 	- fix pcie-pci-bridge usage example (addresses Marcel's comment)
->=20
-> Changes v4->v5:
-> 1. Change PCIE-PCI Bridge license (addresses Marcel's comment)
-> 2. The capability layout changes (adress Laszlo' comments):
->      - separate pref_mem into pref_mem_32 and pref_mem_64 fields (SeaBI=
-OS side has the same changes)
->      - accordingly change the Generic Root Port's properties
-> 3. Do not add the capability to the root port if no valid values are pr=
-ovided (adresses Michael's comment)
-> 4. Rename the capability type to 'RESOURCE_RESERVE' (addresses Marcel's=
- comment)
-> 5. Remove shpc_present check function (addresses Marcel's comment)
-> 6. Fix the 4th patch message (adresses Michael's comment)
-> 7. Patch for SHPC enabling in _OSC method has been already merged
->=20
-> Changes v3->v4:
-> 1. PCIE-PCI Bridge device: "msi_enable"->"msi", "shpc"->"shpc_bar", rem=
-ove local_err,
->     make "msi" property OnOffAuto, shpc_present() is still here
->     to avoid SHPC_VMSTATE refactoring (address Marcel's comments).
-> 2. Change QEMU PCI capability layout (SeaBIOS side has the same changes=
-):
->    - change reservation fields types: bus_res - uint32_t, others - uint=
-64_t
->    - rename 'non_pref' and 'pref' fields
->    - interpret -1 value as 'ignore'
-> 3. Use parent_realize in Generic PCI Express Root Port properly.
-> 4. Fix documentation: fully replace the DMI-PCI bridge references with =
-the new PCIE-PCI bridge,
-> "PCIE"->"PCI Express", small mistakes and typos - address Laszlo's and =
-Marcel's comments.
-> 5. Rename QEMU PCI cap creation fucntion - addresses Marcel's comment.
->=20
-> Changes v2->v3:
-> (0). 'do_not_use' capability field flag is still _not_ in here since we=
- haven't come to consesus on it yet.
-> 1. Merge commits 5 (bus_reserve property creation) and 6 (property usag=
-e) together - addresses Michael's comment.
-> 2. Add 'bus_reserve' property and QEMU PCI capability only to Generic P=
-CIE Root Port - addresses Michael's and Marcel's comments.
-> 3. Change 'bus_reserve' property's default value to 0 - addresses Micha=
-el's comment.
-> 4. Rename QEMU bridge-specific PCI capability creation function - addre=
-sses Michael's comment.
-> 5. Init the whole QEMU PCI capability with zeroes - addresses Michael's=
- and Laszlo's comments.
-> 6. Change QEMU PCI capability layout (SeaBIOS side has the same changes=
-)
->    - add 'type' field to distinguish multiple
->      RedHat-specific capabilities - addresses Michael's comment
->    - do not mimi=D1=81 PCI Config space register layout, but use mutual=
-ly exclusive differently
->      sized fields for IO and prefetchable memory limits - addresses Las=
-zlo's comment
-> 7. Correct error handling in PCIE-PCI bridge realize function.
-> 8. Replace a '2' constant with PCI_CAP_FLAGS in the capability creation=
- function - addresses Michael's comment.
-> 9. Remove a comment on _OSC which isn't correct anymore - address Marce=
-l's comment.
-> 10. Add documentation for the Generic PCIE-PCI Bridge and QEMU PCI capa=
-bility - addresses Michael's comment.
->=20
-> Changes v1->v2:
-> 1. Enable SHPC for the bridge.
-> 2. Enable SHPC support for the Q35 machine (ACPI stuff).
-> 3. Introduce PCI capability to help firmware on the system init.
->     This allows the bridge to be hotpluggable. Now it's supported
->     only for pcie-root-port. Now it's supposed to used with
->     SeaBIOS only, look at the SeaBIOS corresponding series
->     "Allow RedHat PCI bridges reserve more buses than necessary during =
-init".
->=20
-> Aleksandr Bezzubikov (4):
->    hw/pci: introduce pcie-pci-bridge device
->    hw/pci: introduce bridge-only vendor-specific capability to provide
->      some hints to firmware
->    hw/pci: add QEMU-specific PCI capability to the Generic PCI Express
->      Root Port
->    docs: update documentation considering PCIE-PCI bridge
->=20
->   docs/pcie.txt                      |  49 +++++-----
->   docs/pcie_pci_bridge.txt           | 114 ++++++++++++++++++++++
->   hw/pci-bridge/Makefile.objs        |   2 +-
->   hw/pci-bridge/gen_pcie_root_port.c |  36 +++++++
->   hw/pci-bridge/pcie_pci_bridge.c    | 192 ++++++++++++++++++++++++++++=
-+++++++++
->   hw/pci/pci_bridge.c                |  46 +++++++++
->   include/hw/pci/pci.h               |   1 +
->   include/hw/pci/pci_bridge.h        |  25 +++++
->   include/hw/pci/pcie_port.h         |   1 +
->   9 files changed, 442 insertions(+), 24 deletions(-)
->   create mode 100644 docs/pcie_pci_bridge.txt
->   create mode 100644 hw/pci-bridge/pcie_pci_bridge.c
->=20
+> Fixes: 480bc11e6 ("boot-serial-test: fallback to kvm accelerator")
+> Reported-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  tests/boot-serial-test.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+> index a8ca877168..b95c5e74ea 100644
+> --- a/tests/boot-serial-test.c
+> +++ b/tests/boot-serial-test.c
+> @@ -78,7 +78,11 @@ static void test_machine(const void *data)
+>      fd = mkstemp(tmpname);
+>      g_assert(fd != -1);
+>  
+> -    args = g_strdup_printf("-M %s,accel=kvm:tcg "
+> +    /*
+> +     * Make sure that this test uses tcg if available: It is used as a
+> +     * fast-enough smoketest for that.
+> +     */
+> +    args = g_strdup_printf("-M %s,accel=tcg:kvm "
+>                             "-chardev file,id=serial0,path=%s "
+>                             "-no-shutdown -serial chardev:serial0 %s",
+>                             test->machine, tmpname, test->extra);
+> 
