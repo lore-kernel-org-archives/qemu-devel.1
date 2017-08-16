@@ -1,28 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1di1ey-0002LT-B9
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 12:59:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1di1t7-0001UR-8g
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 13:13:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1di1et-00025p-9O
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 12:59:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41702)
+	(envelope-from <eblake@redhat.com>) id 1di1t4-00017c-2o
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 13:13:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54880)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1di1et-00025b-05
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 12:59:07 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170815085732.9794-1-ldoktor@redhat.com>
-	<20170815085732.9794-2-ldoktor@redhat.com>
-	<87fuctm2ql.fsf@dusky.pond.sub.org>
-	<343636b3-85d2-cb2b-8975-dcc1bb0ddee1@redhat.com>
-Date: Wed, 16 Aug 2017 18:58:56 +0200
-In-Reply-To: <343636b3-85d2-cb2b-8975-dcc1bb0ddee1@redhat.com>
-	(=?utf-8?B?Ikx1a8OhxaE=?=
-	Doktor"'s message of "Wed, 16 Aug 2017 18:01:10 +0200")
-Message-ID: <87pobvxxdb.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1di1t3-00016p-PM
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 13:13:46 -0400
+References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1499182263-19139-3-git-send-email-pradeep.jagadeesh@huawei.com>
+	<87bmoxcuvn.fsf@dusky.pond.sub.org>
+	<61626c42-9c47-14e5-24b7-e6086d042a6b@huawei.com>
+	<87shh3fn7d.fsf@dusky.pond.sub.org>
+	<w511soml2kh.fsf@maestria.local.igalia.com>
+	<34e45421-0b22-15b4-deb7-980f26e5ca23@huawei.com>
+	<w51shh2jfi9.fsf@maestria.local.igalia.com>
+	<87wp6e6qb7.fsf@dusky.pond.sub.org>
+	<dc14df7c-2f7c-300b-5f60-44411f3d6604@huawei.com>
+	<66aac45f-6319-2eca-3703-aaab43557e00@redhat.com>
+	<87shgz8k5q.fsf@dusky.pond.sub.org> <87pobv1oeo.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <77e7be70-4d71-56ba-18e3-92cb2b24b38e@redhat.com>
+Date: Wed, 16 Aug 2017 12:13:39 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 01/10] qemu.py: Pylint/style fixes
+In-Reply-To: <87pobv1oeo.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="WHnKNH0OobdfJDQCMqIj1ETVWcm0LMMOe"
+Subject: Re: [Qemu-devel] [PATCH v7 2/6] qmp: Create IOThrottle structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,455 +38,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
-Cc: famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, greg kurz <groug@kaod.org>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, qemu-devel@nongnu.org
 
-Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WHnKNH0OobdfJDQCMqIj1ETVWcm0LMMOe
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>,
+ Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>,
+ jani kokkonen <jani.kokkonen@huawei.com>, greg kurz <groug@kaod.org>,
+ Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, qemu-devel@nongnu.org
+Message-ID: <77e7be70-4d71-56ba-18e3-92cb2b24b38e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 2/6] qmp: Create IOThrottle structure
+References: <1499182263-19139-1-git-send-email-pradeep.jagadeesh@huawei.com>
+ <1499182263-19139-3-git-send-email-pradeep.jagadeesh@huawei.com>
+ <87bmoxcuvn.fsf@dusky.pond.sub.org>
+ <61626c42-9c47-14e5-24b7-e6086d042a6b@huawei.com>
+ <87shh3fn7d.fsf@dusky.pond.sub.org>
+ <w511soml2kh.fsf@maestria.local.igalia.com>
+ <34e45421-0b22-15b4-deb7-980f26e5ca23@huawei.com>
+ <w51shh2jfi9.fsf@maestria.local.igalia.com>
+ <87wp6e6qb7.fsf@dusky.pond.sub.org>
+ <dc14df7c-2f7c-300b-5f60-44411f3d6604@huawei.com>
+ <66aac45f-6319-2eca-3703-aaab43557e00@redhat.com>
+ <87shgz8k5q.fsf@dusky.pond.sub.org> <87pobv1oeo.fsf@dusky.pond.sub.org>
+In-Reply-To: <87pobv1oeo.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Dne 15.8.2017 v 14:31 Markus Armbruster napsal(a):
->> Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com> writes:
->>=20
->>> No actual code changes, just several pylint/style fixes and docstring
->>> clarifications.
->>>
->>> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
->>> ---
->>>  scripts/qemu.py | 76 ++++++++++++++++++++++++++++++++++++++++---------=
---------
->>>  1 file changed, 53 insertions(+), 23 deletions(-)
->>>
->>> diff --git a/scripts/qemu.py b/scripts/qemu.py
->>> index 880e3e8..466aaab 100644
->>> --- a/scripts/qemu.py
->>> +++ b/scripts/qemu.py
->>> @@ -23,8 +23,22 @@ import qmp.qmp
->>>  class QEMUMachine(object):
->>>      '''A QEMU VM'''
->>>=20=20
->>> -    def __init__(self, binary, args=3D[], wrapper=3D[], name=3DNone, t=
-est_dir=3D"/var/tmp",
->>> -                 monitor_address=3DNone, socket_scm_helper=3DNone, deb=
-ug=3DFalse):
->>> +    def __init__(self, binary, args=3D[], wrapper=3D[], name=3DNone,
->>> +                 test_dir=3D"/var/tmp", monitor_address=3DNone,
->>> +                 socket_scm_helper=3DNone, debug=3DFalse):
->>> +        '''
->>> +        Create a QEMUMachine object
->>=20
->> Initialize a QEMUMachine
->>=20
->> Rationale: it's __init__, not __create__, and "object" is redundant.
->>=20
->
-> sure
->
->>> +
->>> +        @param binary: path to the qemu binary (str)
->>=20
->> Drop (str), because what else could it be?
->
-> it could be shlex.split of arguments to be passed to process. Anyway no s=
-trong opinion here so I dropping it...
->
->>=20
->>> +        @param args: initial list of extra arguments
->>=20
->> If this is the initial list, then what's the final list?
->>=20
->
-> It's the basic set of arguments which can be modified before the executio=
-n. Do you think it requires additional explanation, or would you like to im=
-prove it somehow?
+On 08/16/2017 11:13 AM, Markus Armbruster wrote:
+> Markus Armbruster <armbru@redhat.com> writes:
+>=20
 
-Can this list of extra arguments really be *modified*?  Adding more
-arguments doesn't count for me --- I'd consider them added to the
-"non-extra" arguments.
+>>
+>> Conclusion: no consensus, yet.
+>=20
+> All right, let's start over and try to resolve the impasse and/or
+> misunderstanding.
+>=20
+> Type BlockIOThrottle lives in qapi/block-core.json, and is used by QMP
+> command block_set_io_throttle.  Since 1.1.
+>=20
+> Pradeep has a use case for throttling in fsdev.  Instead of duplicating=
 
-Drop "initial"?
+> the relevant parts of BlockIOThrottle, qmp_block_set_io_throttle() and
+> hmp_block_set_io_throttle(), he factors them out smartly, into
+>=20
+> * [PATCH 2] IOThrottle, base type of BlockIOThrottle
+>=20
+> * [PATCH 3] throttle_set_io_limits(), called by
+>   qmp_block_set_io_throttle()
+>=20
+> * [PATCH 4] hmp_initialize_io_throttle(), called by
+>   hmp_block_set_io_throttle()
+>=20
+> throttle_set_io_limits() goes into existing util/throttle.c, and
+> hmp_initialize_io_throttle() goes into existing hmp.c.  The question is=
 
->>> +        @param wrapper: list of arguments used as prefix to qemu binary
->>> +        @param name: name of this object (used for log/monitor/... fil=
-e names)
->> prefix for socket and log file names (default: qemu-PID)
->>=20
->
-> Sure, both make sense to me.
->
->>> +        @param test_dir: base location to put log/monitor/... files in
->>=20
->> where to create socket and log file
->>=20
->> Aside: test_dir is a lousy name.
->
-> Agree but changing names is tricky as people might be using kwargs to set=
- it. Anyway using your description here, keeping the possible rename for a =
-separate patchset (if needed).
+> where IOThrottle should go.
 
-I'm merely observing the lousiness of this name.  I'm not asking you to
-do anything about it :)
+Good summary.
 
->>> +        @param monitor_address: custom address for QMP monitor
->>=20
->> Yes, but what *is* a custom address?  Its user _base_args() appears to
->> expect either a pair of strings (host, port) or a string filename.
->>=20
->
-> If you insist I can add something like "a tuple(host, port) or string to =
-specify path", but I find it unnecessary detailed...
+>=20
+> Pradeep proposes to put it in new qapi/throttle.json.  Certainly
+> defensible, but I really don't like putting every little thing shared
+> across subsystem boundaries into its own schema file.
 
-I'm not the maintainer, I'm definitely not insisting on anything.
+I agree with the dislike of creating new files, if an existing file is
+adequate.
 
-If you're aiming for brevity, then drop "custom".
+>=20
+> Let me step back and discuss why we split the QAPI schema into multiple=
 
->>> +        @param socket_scm_helper: path to scm_helper binary (to forwar=
-d fds)
->>=20
->> What is an scm_helper, and why would I want to use it?
->>=20
->
-> To forward a file descriptor. It's for example used in tests/qemu-iotests=
-/045 or tests/qemu-iotests/147
+> files in the first place.  For me, the one and only reason is
+> MAINTAINERS.
 
-What about "socket_scm_helper: helper program, required for send_fd_scm()"?
+Indeed, that's a good description of why splits would be appropriate.
+So the obvious next question is if this is a case that needs a new
+maintainer.
 
->>> +        @param debug: enable debug mode (forwarded to QMP helper and s=
-uch)
->>=20
->> What is a QMP helper?  To what else is debug forwarded?
->>=20
->
-> Debug is set in `self._debug` and can be consumed by anyone who has acces=
-s to this variable. Currently that is the QMP, but people can inherit and u=
-se that variable to adjust their behavior.
+>=20
+> If the block folks should continue to maintain IOThrottle, then it
+> should stay put in block-core.json.
 
-Drop the parenthesis?
+I think Manos' work on making throttling a filter driver at the block
+layer is proof enough that it it is still fine to keep throttling
+maintained in block-core.json.
 
->>> +        @note: Qemu process is not started until launch() is used.
->>=20
->> until launch().
->>=20
->
-> OK
+>=20
+> If somebody else should start maintaining it, it should move.  We'd nee=
+d
+> a suitable entry in MAINTAINERS then.
+>=20
+> I don't see why maintenance should change, and therefore believe it
+> should stay put.
+>=20
+> Eric?
 
-One more thing: what the use of "@param"?
+I think we're in violent agreement: don't create a new file, and having
+the new factored type live in block-core.json is the best fit because we
+haven't come up with any reasons why it needs to be split.
 
->>> +        '''
->>=20
->> It's an improvement.
->>=20
->>>          if name is None:
->>>              name =3D "qemu-%d" % os.getpid()
->>>          if monitor_address is None:
->>> @@ -33,12 +47,13 @@ class QEMUMachine(object):
->>>          self._qemu_log_path =3D os.path.join(test_dir, name + ".log")
->>>          self._popen =3D None
->>>          self._binary =3D binary
->>> -        self._args =3D list(args) # Force copy args in case we modify =
-them
->>> +        self._args =3D list(args)     # Force copy args in case we mod=
-ify them
->>>          self._wrapper =3D wrapper
->>>          self._events =3D []
->>>          self._iolog =3D None
->>>          self._socket_scm_helper =3D socket_scm_helper
->>>          self._debug =3D debug
->>> +        self._qmp =3D None
->>>=20=20
->>>      # This can be used to add an unused monitor instance.
->>>      def add_monitor_telnet(self, ip, port):
->>> @@ -64,16 +79,16 @@ class QEMUMachine(object):
->>>          if self._socket_scm_helper is None:
->>>              print >>sys.stderr, "No path to socket_scm_helper set"
->>>              return -1
->>> -        if os.path.exists(self._socket_scm_helper) =3D=3D False:
->>> +        if not os.path.exists(self._socket_scm_helper):
->>>              print >>sys.stderr, "%s does not exist" % self._socket_scm=
-_helper
->>>              return -1
->>>          fd_param =3D ["%s" % self._socket_scm_helper,
->>>                      "%d" % self._qmp.get_sock_fd(),
->>>                      "%s" % fd_file_path]
->>>          devnull =3D open('/dev/null', 'rb')
->>> -        p =3D subprocess.Popen(fd_param, stdin=3Ddevnull, stdout=3Dsys=
-.stdout,
->>> -                             stderr=3Dsys.stderr)
->>> -        return p.wait()
->>> +        proc =3D subprocess.Popen(fd_param, stdin=3Ddevnull, stdout=3D=
-sys.stdout,
->>> +                                stderr=3Dsys.stderr)
->>> +        return proc.wait()
->>>=20=20
->>>      @staticmethod
->>>      def _remove_if_exists(path):
->>> @@ -99,8 +114,8 @@ class QEMUMachine(object):
->>>          return self._popen.pid
->>>=20=20
->>>      def _load_io_log(self):
->>> -        with open(self._qemu_log_path, "r") as fh:
->>> -            self._iolog =3D fh.read()
->>> +        with open(self._qemu_log_path, "r") as iolog:
->>> +            self._iolog =3D iolog.read()
->>>=20=20
->>>      def _base_args(self):
->>>          if isinstance(self._monitor_address, tuple):
->>> @@ -114,8 +129,8 @@ class QEMUMachine(object):
->>>                  '-display', 'none', '-vga', 'none']
->>>=20=20
->>>      def _pre_launch(self):
->>> -        self._qmp =3D qmp.qmp.QEMUMonitorProtocol(self._monitor_addres=
-s, server=3DTrue,
->>> -                                                debug=3Dself._debug)
->>> +        self._qmp =3D qmp.qmp.QEMUMonitorProtocol(self._monitor_addres=
-s,
->>> +                                                server=3DTrue, debug=
-=3Dself._debug)
->>=20
->> Recommend to break the line between the last two arguments.
->>=20
->
-> I'm not used to do that, but I can most certainly do that. Do you want me=
- to change all places (eg. in the next chunk)
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-PEP8 asks you to limit all lines to a maximum of 79 characters.  This
-one is right at the maximum.  Tolerable, but I prefer my lines a bit
-shorter.  Use your judgement.
 
->>>=20=20
->>>      def _post_launch(self):
->>>          self._qmp.accept()
->>> @@ -131,9 +146,11 @@ class QEMUMachine(object):
->>>          qemulog =3D open(self._qemu_log_path, 'wb')
->>>          try:
->>>              self._pre_launch()
->>> -            args =3D self._wrapper + [self._binary] + self._base_args(=
-) + self._args
->>> +            args =3D (self._wrapper + [self._binary] + self._base_args=
-() +
->>> +                    self._args)
->>>              self._popen =3D subprocess.Popen(args, stdin=3Ddevnull, st=
-dout=3Dqemulog,
->>> -                                           stderr=3Dsubprocess.STDOUT,=
- shell=3DFalse)
->>> +                                           stderr=3Dsubprocess.STDOUT,
->>> +                                           shell=3DFalse)
->>>              self._post_launch()
->>>          except:
->>>              if self.is_running():
->>> @@ -149,28 +166,34 @@ class QEMUMachine(object):
->>>              try:
->>>                  self._qmp.cmd('quit')
->>>                  self._qmp.close()
->>> -            except:
->>> +            except:     # kill VM on any failure pylint: disable=3DW07=
-02
->>=20
->> The bare except is almost certainly inappropriate.  Are you sure we
->> should silence pylint?
->>=20
->> Note that there's another bare except in launch(), visible in the
->> previous patch hunk.  I guess pylint is okay with that one because it
->> re-throws the exception.
->>=20
->> In case we should silence pylint: what's the scope of this magic pylint
->> comment?  Can we use the symbolic disable=3Dbare-except?
->>=20
->
-> Yep, we can use symbolic name as well. Well more appropriate would be to =
-catch `SystemExit` and `KeyboardInterrupt`, treat them and raise them and t=
-hen ignore the rest of exceptions. I'll do that in the next version...
->
->>>                  self._popen.kill()
->>>=20=20
->>>              exitcode =3D self._popen.wait()
->>>              if exitcode < 0:
->>> -                sys.stderr.write('qemu received signal %i: %s\n' % (-e=
-xitcode, ' '.join(self._args)))
->>> +                sys.stderr.write('qemu received signal %i: %s\n'
->>> +                                 % (-exitcode, ' '.join(self._args)))
->>>              self._load_io_log()
->>>              self._post_shutdown()
->>>=20=20
->>>      underscore_to_dash =3D string.maketrans('_', '-')
->>> +
->>>      def qmp(self, cmd, conv_keys=3DTrue, **args):
->>>          '''Invoke a QMP command and return the result dict'''
->>=20
->> Make that "and return the response", because that's how
->> docs/interop/qmp-spec.txt calls the thing.
->>=20
->
-> Sure, no problem. I wanted to stress-out it's a dict and not encoded stri=
-ng, but it's probably given by the context.
+--WHnKNH0OobdfJDQCMqIj1ETVWcm0LMMOe
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-"return the response dict" would be fine with me.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
->>>          qmp_args =3D dict()
->>> -        for k in args.keys():
->>> +        for key in args.keys():
->>>              if conv_keys:
->>> -                qmp_args[k.translate(self.underscore_to_dash)] =3D arg=
-s[k]
->>> +                qmp_args[key.translate(self.underscore_to_dash)] =3D a=
-rgs[key]
->>>              else:
->>> -                qmp_args[k] =3D args[k]
->>> +                qmp_args[key] =3D args[key]
->>>=20=20
->>>          return self._qmp.cmd(cmd, args=3Dqmp_args)
->>>=20=20
->>>      def command(self, cmd, conv_keys=3DTrue, **args):
->>> +        '''
->>> +        Invoke a QMP command and on success return result dict or on f=
-ailure
->>> +        raise exception with details.
->>> +        '''
->>=20
->> I'm afraid "result dict" is wrong: it need not be a dict.  "on failure
->> raise exception" adds precious little information, and "with details"
->> adds none.
->>=20
->> Perhaps:
->>=20
->>            Invoke a QMP command.
->>            On success return the return value.
->>            On failure raise an exception.
->>=20
->
-> That is quite more verbose than I'd like and result in the same (for non-=
-native speaker), but I have no strong opinion here so changing it to your v=
-ersion in v2.
->
->> The last sentence is too vague, but it's hard to do better because...
->>=20
->>>          reply =3D self.qmp(cmd, conv_keys, **args)
->>>          if reply is None:
->>>              raise Exception("Monitor is closed")
->>=20
->> ... we raise Exception!  This code is a *turd* (pardon my french), and
->> PEP8 / pylint violations are the least of its problems.
->>=20
->
-> Yep, adding rework-exceptions to my TODO list (for a future patchset)
->
->>> @@ -193,15 +216,18 @@ class QEMUMachine(object):
->>>          return events
->>>=20=20
->>>      def event_wait(self, name, timeout=3D60.0, match=3DNone):
->>> -        # Test if 'match' is a recursive subset of 'event'
->>> -        def event_match(event, match=3DNone):
->>> +        '''Wait for event in QMP, optionally filter results by match.'=
-''
->>=20
->> What is match?
->>=20
->> name and timeout not worth mentioning?
->>=20
->
-> IMO this does not require full-blown documentation, it's not really a use=
-r-facing API and sometimes shorter is better. Anyway if you insist I can ad=
-d full documentation of each parameter. I can even add `:type:` and `:retur=
-ns:` and perhaps some `:warns:` and `:notes:` and I should descend and note=
- all the possible `:raises:`.
->
-> ... the point I'm trying to make is I don't think it's necessary to go th=
-at much into details. Anyway if you think the params are necessary to list,=
- then I can do that.
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmUfUQACgkQp6FrSiUn
+Q2qtXgf+IQSoKMQtovviknmd5Nt9Wwh9DoyEQiwrC4cBspZbGnpYosXAk6V0AIn2
+xaOD6rCa65eDoYtfmIrkq4A1+vGhKFmFklxoH/1Ge+hOtsuPAf21R3GfTMts3jaO
+zTGRy+3eg1Ycgv78fUPM5gDpCLylCag6iKaGCS6nXQGfYTSBPs8DP7zO3IMlJrN4
+ez+uFKbdZgTRw7Q+0/IoP3qg8bIThjhi89OKPJnVwCQlwOijbryfI/t+koIzO7Mf
+HmsK3IywoowJZFiXe1nthfiqYeVcOD3aWHg6o0sD24bI0PTGanWHEtUict7iKTLt
+mVb59PtVGOTA/V4f8P7t83g/PJNDMw==
+=v+SW
+-----END PGP SIGNATURE-----
 
-Use your judgement.  The more detailed comments you add, the more
-questions you'll get ;)
-
->>> +        # Test if 'match' is a recursive subset of 'event'; skips bran=
-ch
->>> +        # processing on match's value `None`
->>=20
->> What's a "recursive subset"?  What's "branch processing"?
->>=20
->> There's an unusual set of quotes around `None`.
->>=20
->
-> Basically I was surprised why this function exists as one can directly co=
-mpare dicts. It's because it works as the stock dict compare only on value =
-"None" it breaks and assumes that "branch" matches. That's why I listed the=
- example as I'm unsure how to explain it in a human language.
->
-> As for the `None`, in sphinx/doxygen it becomes "block" so I'm used to th=
-ese, anyway people use `'`s and `"`s here so I'll change it in next version=
- to be consistent.
-
-According to git-grep, we're using neither sphinx nor doxygen right now.
-
->>> +        #    {"foo": {"bar": 1} matches {"foo": None}
->>=20
->> Aha: None servers as wildcard.
->
-> Exactly.
->
->>=20
->>> +        def _event_match(event, match=3DNone):
->>=20
->> Any particular reason for renaming this function?
->>=20
->
-> To emphasize it's internal, not a strong opinion but IMO looks better thi=
-s way.
-
-It's a nested function, how could it *not* be internal?
-
->>>              if match is None:
->>>                  return True
->>>=20=20
->>>              for key in match:
->>>                  if key in event:
->>>                      if isinstance(event[key], dict):
->>> -                        if not event_match(event[key], match[key]):
->>> +                        if not _event_match(event[key], match[key]):
->>>                              return False
->>>                      elif event[key] !=3D match[key]:
->>>                          return False
->>> @@ -212,18 +238,22 @@ class QEMUMachine(object):
->>>=20=20
->>>          # Search cached events
->>>          for event in self._events:
->>> -            if (event['event'] =3D=3D name) and event_match(event, mat=
-ch):
->>> +            if (event['event'] =3D=3D name) and _event_match(event, ma=
-tch):
->>>                  self._events.remove(event)
->>>                  return event
->>>=20=20
->>>          # Poll for new events
->>>          while True:
->>>              event =3D self._qmp.pull_event(wait=3Dtimeout)
->>> -            if (event['event'] =3D=3D name) and event_match(event, mat=
-ch):
->>> +            if (event['event'] =3D=3D name) and _event_match(event, ma=
-tch):
->>>                  return event
->>>              self._events.append(event)
->>>=20=20
->>>          return None
->>>=20=20
->>>      def get_log(self):
->>> +        '''
->>> +        After self.shutdown or failed qemu execution this returns the =
-output
->>=20
->> Comma after execution, please.
->>=20
->
-> OK
->
->>> +        of the qemu process.
->>> +        '''
->>>          return self._iolog
->>=20
->> I understand this code was factored out of qemu-iotests for use by
->> qtest.py.  That's okay, but I'd rather not serve as its maintainer.
->> -E2MUCH...
->>=20
->
-> Yep, anyway it contains several useful methods/helpers and fixing basic i=
-ssues is the simplest way to get to know the code (and the submitting proce=
-ss). Thank you for your time.
-
-You're welcome!
+--WHnKNH0OobdfJDQCMqIj1ETVWcm0LMMOe--
