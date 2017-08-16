@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dht2y-00063i-MB
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 03:47:54 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dhtJM-0002O0-NK
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 04:04:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dht2e-0001PF-Mz
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 03:47:24 -0400
-Resent-Message-Id: <E1dht2e-0001PF-Mz@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21436)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dht2e-0001Od-D7
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 03:47:04 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150286960827.78.6788806411910154670@dd743fd916bd>
-In-Reply-To: <20170816072104.24420-1-famz@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1dhtJH-0002Jd-PI
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 04:04:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46566)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dhtJH-0002JS-FW
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 04:04:15 -0400
+Date: Wed, 16 Aug 2017 10:04:07 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170816100407.75c8cf4b.cohuck@redhat.com>
+In-Reply-To: <f6da168f-2d33-55e9-1b52-3ede15a7f5c1@amsat.org>
+References: <1502721197-32717-1-git-send-email-mst@redhat.com>
+	<20170814173335.58f0e84f.cohuck@redhat.com>
+	<2f4dafd1-ba08-0f61-735a-31edefcff1e3@linaro.org>
+	<f6da168f-2d33-55e9-1b52-3ede15a7f5c1@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 16 Aug 2017 00:46:49 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH RFC 0/9] tests: Add VM based build tests
- (for non-x86_64 and/or non-Linux)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tests: switch tests to accel=kvm:tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, f4bug@amsat.org, kamil@netbsd.org, stefanha@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA4MTYwNzIxMDQuMjQ0MjAtMS1mYW16QHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxd
-IFtQQVRDSCBSRkMgMC85XSB0ZXN0czogQWRkIFZNIGJhc2VkIGJ1aWxkIHRlc3RzIChmb3Igbm9u
-LXg4Nl82NCBhbmQvb3Igbm9uLUxpbnV4KQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25l
-bGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0
-cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNv
-bW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAt
-biAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1h
-aWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBm
-YWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZh
-aWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIx
-NjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjA1
-NTQ2NGYyMDAgTWFrZWZpbGU6IEFkZCBydWxlcyB0byBydW4gdm0gdGVzdHMKYTUxYmJiOTcwZCB0
-ZXN0czogQWRkIE9wZW5CU0QgaW1hZ2UKYWQ3YjViNjE5YiB0ZXN0czogQWRkIE5ldEJTRCBpbWFn
-ZQplODBmNjAyMmVjIHRlc3RzOiBBZGQgRnJlZUJTRCBpbWFnZQpjYzg3YzQzYzZkIHRlc3RzOiBB
-ZGQgdWJ1bnR1LmkzODYgaW1hZ2UKOWJiNTRkNmMyMyB0ZXN0czogQWRkIHZtIHRlc3QgbGliCjVj
-ODNhY2ZjZWQgcWVtdS5weTogQWRkICJ3YWl0KCkiIG1ldGhvZAo2NGNhM2E4Y2RlIHFlbXUucHk6
-IEFkZCB2YXJpYWJsZSB2Z2EgdHlwZQo4Yzg3M2U0MzA3IGdpdGlnbm9yZTogSWdub3JlIHZtIHRl
-c3QgaW1hZ2VzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzk6IGdpdGln
-bm9yZTogSWdub3JlIHZtIHRlc3QgaW1hZ2VzLi4uCkNoZWNraW5nIFBBVENIIDIvOTogcWVtdS5w
-eTogQWRkIHZhcmlhYmxlIHZnYSB0eXBlLi4uCkNoZWNraW5nIFBBVENIIDMvOTogcWVtdS5weTog
-QWRkICJ3YWl0KCkiIG1ldGhvZC4uLgpDaGVja2luZyBQQVRDSCA0Lzk6IHRlc3RzOiBBZGQgdm0g
-dGVzdCBsaWIuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM4MzogRklMRTogdGVz
-dHMvdm0vYmFzZXZtLnB5OjU4Ogorc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFC
-QVFDaWtDNDZXWXRYb3RVZDBVR1B6OTU0N0FqMEtxQzRnaytudDRCQkptODZJSGdDRDlGeWdTR1g5
-RUZ1dFhsaHo5S1pJUGc5T2trNytJelhSSENXSTJNTnZocmNqeXJlektSRW03MXowOGo5aXdmeFkz
-MzQwZlkyTW8rMGtod3BPN2J6c2d6a2xqSElIcWNPZzdNZ3R0UEluVk1OSC9FZnFwZ1I4RURLSnVX
-Q0IyTnkrRUJGTi8zZEFpZmYwWC9FdktsZTlQVXJZNzBFa1N5Y255VVJTOEhaUmVFcWo4bE45SjVr
-WHpBOEY2akJvLzBRNDJUdHY2ZTRrNVljYURyd21MckJXTHJhMlBDWFpMTnlIcVhFaUZrR21kWHRB
-MUVveDlnYy9wNGpJWGltNnhyUE5tcE42V3lyckVqYUNGNXhZdk52OHdYa0Q2dVNXd2JIWVUyNGxJ
-QW4gcWVtdS12bS1rZXkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxODc6IEZJ
-TEU6IHRlc3RzL3ZtL2Jhc2V2bS5weToxNjI6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ImZpbGU9JXMsaWY9bm9uZSxpZD0lcyxjYWNoZT13cml0ZWJhY2ssZm9ybWF0PXJhdyIgJSBcCgpX
-QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTkwOiBGSUxFOiB0ZXN0cy92bS9iYXNl
-dm0ucHk6MTY1OgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICJ2aXJ0aW8tYmxrLGRyaXZl
-PSVzLHNlcmlhbD0lcyxib290aW5kZXg9MSIgJSAobmFtZSwgbmFtZSldCgp0b3RhbDogMSBlcnJv
-cnMsIDIgd2FybmluZ3MsIDI0NiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1Lzk6IHRlc3RzOiBBZGQgdWJ1bnR1Lmkz
-ODYgaW1hZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNi85OiB0ZXN0czogQWRkIEZyZWVCU0QgaW1hZ2Uu
-Li4KQ2hlY2tpbmcgUEFUQ0ggNy85OiB0ZXN0czogQWRkIE5ldEJTRCBpbWFnZS4uLgpDaGVja2lu
-ZyBQQVRDSCA4Lzk6IHRlc3RzOiBBZGQgT3BlbkJTRCBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCA5
-Lzk6IE1ha2VmaWxlOiBBZGQgcnVsZXMgdG8gcnVuIHZtIHRlc3RzLi4uCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
-ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Tue, 15 Aug 2017 17:04:35 -0300
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+
+> On 08/15/2017 12:47 PM, Richard Henderson wrote:
+> > On 08/14/2017 08:33 AM, Cornelia Huck wrote: =20
+> >> On Mon, 14 Aug 2017 17:34:15 +0300
+> >> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >> =20
+> >>> Speed up tests on host systems with kvm support.
+> >>> In particular, this fixes tests with --disable-tcg.
+> >>>
+> >>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> >>> Cc: Thomas Huth <thuth@redhat.com>
+> >>> Cc: Laurent Vivier <lvivier@redhat.com>
+> >>> Suggested-by: Cornelia Huck <cohuck@redhat.com>
+> >>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> >>> ---
+> >>>
+> >>> Tested on x86 only.
+> >>>
+> >>>   tests/boot-serial-test.c | 2 +-
+> >>>   tests/pnv-xscom-test.c   | 4 ++--
+> >>>   tests/prom-env-test.c    | 2 +-
+> >>>   3 files changed, 4 insertions(+), 4 deletions(-)
+> >>>
+> >>> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+> >>> index 11f48b0..c3b2e4e 100644
+> >>> --- a/tests/boot-serial-test.c
+> >>> +++ b/tests/boot-serial-test.c
+> >>> @@ -78,7 +78,7 @@ static void test_machine(const void *data)
+> >>>       fd =3D mkstemp(tmpname);
+> >>>       g_assert(fd !=3D -1);
+> >>>  =20
+> >>> -    args =3D g_strdup_printf("-M %s,accel=3Dtcg -chardev file,id=3Ds=
+erial0,path=3D%s"
+> >>> +    args =3D g_strdup_printf("-M %s,accel=3Dkvm:tcg -chardev file,id=
+=3Dserial0,path=3D%s"
+> >>>                              " -no-shutdown -serial chardev:serial0 %=
+s",
+> >>>                              test->machine, tmpname, test->extra); =20
+> >>
+> >> This has already been changed upstream. =20
+> >=20
+> > Ouch.  This is the only real smoke test we have for the tcg backend for=
+ the
+> > host.  While it is still going to test tcg for whatever machines do not=
+ run
+> > natively on the host, I can't help think we've lost testing.
+> >=20
+> > Can we use accel=3Dtcg:kvm instead? =20
+>=20
+> can we use the following in this test main()?
+>=20
+> /* This test is fast fast enough to use to test the host TCG backend,
+>   * so use "tcg" as default accel if available. */
+> #ifdef CONFIG_TCG
+> static const char *accel =3D "tcg";
+> #else
+> static const char *accel =3D "kvm";
+> #endif
+
+accel=3Dtcg:kvm should already have the same effect, no?
+
+(But adding a comment may be a good idea.)
