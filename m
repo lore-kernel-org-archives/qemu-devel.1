@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dhyPc-000752-3N
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 09:31:09 -0400
+	(envelope-from <thuth@redhat.com>) id 1dhyVC-0001SM-0M
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 09:36:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dhyPY-00087Y-SO
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 09:31:08 -0400
-Received: from 19.mo5.mail-out.ovh.net ([46.105.35.78]:51437)
+	(envelope-from <thuth@redhat.com>) id 1dhyV8-0002LB-RL
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 09:36:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39600)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dhyPY-00083n-Mh
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 09:31:04 -0400
-Received: from player734.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 1F47011B63D
-	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 15:30:56 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 16 Aug 2017 15:30:44 +0200
-Message-ID: <150289024450.6512.7645802616766236425.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dhyV8-0002KE-LW
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 09:36:50 -0400
+References: <451ff313-11c5-9f67-d7f1-a606c02efc79@redhat.com>
+	<20170816112349.5cf3c106.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <df6b9347-0300-9080-141e-bdb99476b64b@redhat.com>
+Date: Wed, 16 Aug 2017 15:36:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20170816112349.5cf3c106.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] spapr: fallback to raw mode if best compat
- mode cannot be set during CAS
+Subject: Re: [Qemu-devel] Crash when deleting the diag288 watchdog
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Sascha Silbe <silbe@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, David Hildenbrand <david@redhat.com>
 
-KVM PR doesn't allow to set a compat mode. This causes ppc_set_compat_all()
-to fail and we return H_HARDWARE to the guest right away.
+On 16.08.2017 11:23, Cornelia Huck wrote:
+> On Wed, 16 Aug 2017 07:05:37 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+> 
+>>  Hi,
+>>
+>> I recently noticed that QEMU abort()s if you try to remove the diag288
+>> watchdog. For example:
+>>
+>> $ qemu-system-s390x -nographic -nodefaults -S -monitor stdio
+>> QEMU 2.9.92 monitor - type 'help' for more information
+>> (qemu) device_add diag288,id=x
+>> (qemu) device_del x
+>> **
+>> ERROR:/home/thuth/devel/qemu/qdev-monitor.c:872:qdev_unplug: assertion
+>> failed: (hotplug_ctrl)
+>> Aborted (core dumped)
+>>
+>> This is ugly, can we fix this somehow? For example, should the diag288
+>> device be hot-pluggable at all, or can it only be used via the
+>> "-watchdog" parameter instead? In the latter case, we could simply mark
+>> the device with "user_creatable = false", I guess?
+> 
+> I don't think the diag288 watchdog should be hotpluggable. IIUC, it is
+> simply present on z/VM (and I don't think it's different on LPAR, but I
+> could not find docs for that). So yes, user_creatable = false sounds
+> like the right thing to do.
 
-This is excessive: even if we favor compat mode since commit 152ef803ceb19,
-we should at least fallback to raw mode if the guest supports it.
+I tried that now, but it does not work - when I specify the -watchdog
+parameter, I get a "Parameter 'driver' expects pluggable device type"
+with that modification.
+I think the best option is to use "hotpluggable = false" instead...
 
-This patch modifies cas_check_pvr() so that it also reports that the real
-PVR was found in the table supplied by the guest. Note that this is only
-makes sense if raw mode isn't explicitely disabled (ie, the user didn't
-set the machine "max-cpu-compat" property). If this is the case, we can
-simply ignore ppc_set_compat_all() failures, and let the guest run in raw
-mode.
+> Related: We currently only handle diag288 via kvm if I did not miss
+> something. It probably makes sense to wire it up for tcg as well.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr_hcall.c |   18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+Sounds like a good idea, yes... are you going to send a patch, or shall
+I put it on my todo list?
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 07b3da8dc4cd..7e9f7752afd5 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1441,7 +1441,8 @@ static target_ulong h_signal_sys_reset(PowerPCCPU *cpu,
- }
- 
- static uint32_t cas_check_pvr(sPAPRMachineState *spapr, PowerPCCPU *cpu,
--                              target_ulong *addr, Error **errp)
-+                              target_ulong *addr, bool *raw_mode_supported,
-+                              Error **errp)
- {
-     bool explicit_match = false; /* Matched the CPU's real PVR */
-     uint32_t max_compat = spapr->max_compat_pvr;
-@@ -1481,6 +1482,8 @@ static uint32_t cas_check_pvr(sPAPRMachineState *spapr, PowerPCCPU *cpu,
-         return 0;
-     }
- 
-+    *raw_mode_supported = explicit_match;
-+
-     /* Parsing finished */
-     trace_spapr_cas_pvr(cpu->compat_pvr, explicit_match, best_compat);
- 
-@@ -1499,8 +1502,9 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
-     bool guest_radix;
-     Error *local_err = NULL;
-+    bool raw_mode_supported;
- 
--    cas_pvr = cas_check_pvr(spapr, cpu, &addr, &local_err);
-+    cas_pvr = cas_check_pvr(spapr, cpu, &addr, &raw_mode_supported, &local_err);
-     if (local_err) {
-         error_report_err(local_err);
-         return H_HARDWARE;
-@@ -1510,8 +1514,14 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     if (cpu->compat_pvr != cas_pvr) {
-         ppc_set_compat_all(cas_pvr, &local_err);
-         if (local_err) {
--            error_report_err(local_err);
--            return H_HARDWARE;
-+            /* We fail to set compat mode (likely because running with KVM PR),
-+             * but maybe we can fallback to raw mode if the guest supports it.
-+             */
-+            if (!raw_mode_supported) {
-+                error_report_err(local_err);
-+                return H_HARDWARE;
-+            }
-+            local_err = NULL;
-         }
-     }
- 
+ Thomas
