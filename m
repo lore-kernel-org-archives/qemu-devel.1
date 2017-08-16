@@ -1,39 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1dhuNJ-0000ZA-OP
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:12:33 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1dhuNO-0000g5-I1
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:12:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1dhuND-00046S-VK
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:12:29 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50058
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1dhuNM-00049H-9S
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:12:34 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45274)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
-	id 1dhuND-00046M-P2
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:12:23 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7G99r4C075667
-	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 05:12:23 -0400
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ccefkvctm-1
+	id 1dhuNM-000490-0n
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:12:32 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7G9Awov029042
+	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 05:12:31 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ccepgkvpg-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 05:12:23 -0400
+	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 05:12:30 -0400
 Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
-	Wed, 16 Aug 2017 05:12:22 -0400
+	Wed, 16 Aug 2017 03:12:29 -0600
 From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Date: Wed, 16 Aug 2017 14:42:13 +0530
+Date: Wed, 16 Aug 2017 14:42:21 +0530
 In-Reply-To: <150287457293.9760.17827532208744487789.stgit@aravinda>
 References: <150287457293.9760.17827532208744487789.stgit@aravinda>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <150287473305.9760.9007559736340136424.stgit@aravinda>
-Subject: [Qemu-devel] [PATCH v3 1/5] ppc: spapr: Register and handle HCALL
- to receive updated RTAS region
+Message-Id: <150287474187.9760.12052550430995757993.stgit@aravinda>
+Subject: [Qemu-devel] [PATCH v3 2/5] ppc: spapr: Handle "ibm,
+ nmi-register" and "ibm, nmi-interlock" RTAS calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,69 +44,136 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Cc: aik@ozlabs.ru, mahesh@linux.vnet.ibm.com, benh@au1.ibm.com, paulus@samba.org, sam.bobroff@au1.ibm.com
 
-Receive updates from SLOF about the updated rtas-base.
-A separate patch for SLOF [1] adds functionality to invoke
-a private HCALL whenever OS issues instantiate-rtas with
-a new rtas-base.
+This patch adds support in QEMU to handle "ibm,nmi-register"
+and "ibm,nmi-interlock" RTAS calls.
 
-This is required as QEMU needs to know the updated rtas-base
-as it allocates error reporting structure in RTAS space upon
-a machine check exception.
+The machine check notification address is saved when the
+OS issues "ibm,nmi-register" RTAS call.
 
-[1] https://lists.ozlabs.org/pipermail/linuxppc-dev/2014-August/120386.html
+This patch also handles the case when multiple processors
+experience machine check at or about the same time by
+handling "ibm,nmi-interlock" call. In such cases, as per
+PAPR, subsequent processors serialize waiting for the first
+processor to issue the "ibm,nmi-interlock" call. The second
+processor waits till the first processor, which also
+received a machine check error, is done reading the error
+log. The first processor issues "ibm,nmi-interlock" call
+when the error log is consumed. This patch implements the
+releasing part of the error-log while subsequent patch
+(which builds error log) handles the locking part.
 
 Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_hcall.c   |    8 ++++++++
- include/hw/ppc/spapr.h |    4 +++-
- 2 files changed, 11 insertions(+), 1 deletion(-)
+ hw/ppc/spapr.c         |    8 ++++++++
+ hw/ppc/spapr_rtas.c    |   35 +++++++++++++++++++++++++++++++++++
+ include/hw/ppc/spapr.h |   10 +++++++++-
+ 3 files changed, 52 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 72ea5a8..e66c72e 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1062,6 +1062,13 @@ static target_ulong h_rtas(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                            nret, rtas_r3 + 12 + 4*nargs);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 2a3e53d..0bb2c4a 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1441,6 +1441,11 @@ static void ppc_spapr_reset(void)
+     first_ppc_cpu->env.nip = SPAPR_ENTRY_POINT;
+ 
+     spapr->cas_reboot = false;
++
++    spapr->mc_in_progress = false;
++    spapr->guest_machine_check_addr = 0;
++    qemu_cond_destroy(&spapr->mc_delivery_cond);
++    qemu_cond_init(&spapr->mc_delivery_cond);
  }
  
-+static target_ulong h_rtas_update(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-+                                  target_ulong opcode, target_ulong *args)
+ static void spapr_create_nvram(sPAPRMachineState *spapr)
+@@ -2491,6 +2496,9 @@ static void ppc_spapr_init(MachineState *machine)
+ 
+         kvmppc_spapr_enable_inkernel_multitce();
+     }
++
++    spapr->mc_in_progress = false;
++    qemu_cond_init(&spapr->mc_delivery_cond);
+ }
+ 
+ static int spapr_kvm_type(const char *vm_type)
+diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+index 94a2799..2f3c47b 100644
+--- a/hw/ppc/spapr_rtas.c
++++ b/hw/ppc/spapr_rtas.c
+@@ -348,6 +348,37 @@ static void rtas_get_power_level(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+     rtas_st(rets, 1, 100);
+ }
+ 
++static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
++                                  sPAPRMachineState *spapr,
++                                  uint32_t token, uint32_t nargs,
++                                  target_ulong args,
++                                  uint32_t nret, target_ulong rets)
 +{
-+    spapr->rtas_addr = args[0];
-+    return 0;
++    spapr->guest_machine_check_addr = rtas_ld(args, 1);
++    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
 +}
 +
- static target_ulong h_logical_load(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                                    target_ulong opcode, target_ulong *args)
- {
-@@ -1717,6 +1724,7 @@ static void hypercall_register_types(void)
++static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
++                                   sPAPRMachineState *spapr,
++                                   uint32_t token, uint32_t nargs,
++                                   target_ulong args,
++                                   uint32_t nret, target_ulong rets)
++{
++    if (!spapr->guest_machine_check_addr) {
++        /* NMI register not called */
++        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
++    } else {
++        /*
++         * VCPU issuing "ibm,nmi-interlock" is done with NMI handling,
++         * hence unset mc_in_progress.
++         */
++        spapr->mc_in_progress = false;
++        qemu_cond_signal(&spapr->mc_delivery_cond);
++        rtas_st(rets, 0, RTAS_OUT_SUCCESS);
++    }
++}
++
++
+ static struct rtas_call {
+     const char *name;
+     spapr_rtas_fn fn;
+@@ -489,6 +520,10 @@ static void core_rtas_register_types(void)
+                         rtas_set_power_level);
+     spapr_rtas_register(RTAS_GET_POWER_LEVEL, "get-power-level",
+                         rtas_get_power_level);
++    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
++                        rtas_ibm_nmi_register);
++    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
++                        rtas_ibm_nmi_interlock);
+ }
  
-     /* qemu/KVM-PPC specific hcalls */
-     spapr_register_hypercall(KVMPPC_H_RTAS, h_rtas);
-+    spapr_register_hypercall(KVMPPC_H_RTAS_UPDATE, h_rtas_update);
- 
-     /* ibm,client-architecture-support support */
-     spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support);
+ type_init(core_rtas_register_types)
 diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 2a303a7..46012b3 100644
+index 46012b3..eee8d33 100644
 --- a/include/hw/ppc/spapr.h
 +++ b/include/hw/ppc/spapr.h
-@@ -90,6 +90,7 @@ struct sPAPRMachineState {
+@@ -123,6 +123,12 @@ struct sPAPRMachineState {
+      * occurs during the unplug process. */
+     QTAILQ_HEAD(, sPAPRDIMMState) pending_dimm_unplugs;
  
-     hwaddr rma_size;
-     int vrma_adjust;
-+    hwaddr rtas_addr;
-     ssize_t rtas_size;
-     void *rtas_blob;
-     long kernel_size;
-@@ -399,7 +400,8 @@ struct sPAPRMachineState {
- #define KVMPPC_H_LOGICAL_MEMOP  (KVMPPC_HCALL_BASE + 0x1)
- /* Client Architecture support */
- #define KVMPPC_H_CAS            (KVMPPC_HCALL_BASE + 0x2)
--#define KVMPPC_HCALL_MAX        KVMPPC_H_CAS
-+#define KVMPPC_H_RTAS_UPDATE    (KVMPPC_HCALL_BASE + 0x3)
-+#define KVMPPC_HCALL_MAX        KVMPPC_H_RTAS_UPDATE
++    /* State related to "ibm,nmi-register" and "ibm,nmi-interlock" calls */
++    target_ulong guest_machine_check_addr;
++    bool mc_in_progress;
++    int mc_cpu;
++    QemuCond mc_delivery_cond;
++
+     /*< public >*/
+     char *kvm_type;
+     MemoryHotplugState hotplug_memory;
+@@ -519,8 +525,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
+ #define RTAS_IBM_CREATE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x27)
+ #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
+ #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
++#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x2A)
++#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x2B)
  
- typedef struct sPAPRDeviceTreeUpdateHeader {
-     uint32_t version_id;
+-#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2A)
++#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2C)
+ 
+ /* RTAS ibm,get-system-parameter token values */
+ #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
