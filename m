@@ -1,37 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1dhuN9-0000N3-M7
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:12:20 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1dhuNJ-0000ZA-OP
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:12:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1dhuN6-00044Y-BH
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:12:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36405
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1dhuND-00046S-VK
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:12:29 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50058
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
-	id 1dhuN6-00044E-5b
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:12:16 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	id 1dhuND-00046M-P2
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 05:12:23 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7G99S2q022754
-	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 05:12:14 -0400
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ccerg3ry5-1
+	v7G99r4C075667
+	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 05:12:23 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ccefkvctm-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 05:12:14 -0400
+	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 05:12:23 -0400
 Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
-	Wed, 16 Aug 2017 05:12:13 -0400
+	Wed, 16 Aug 2017 05:12:22 -0400
 From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Date: Wed, 16 Aug 2017 14:41:59 +0530
+Date: Wed, 16 Aug 2017 14:42:13 +0530
+In-Reply-To: <150287457293.9760.17827532208744487789.stgit@aravinda>
+References: <150287457293.9760.17827532208744487789.stgit@aravinda>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <150287457293.9760.17827532208744487789.stgit@aravinda>
-Subject: [Qemu-devel] [PATCH v3 0/5] target-ppc/spapr: Add FWNMI support in
- QEMU for PowerKVM guests
+Message-Id: <150287473305.9760.9007559736340136424.stgit@aravinda>
+Subject: [Qemu-devel] [PATCH v3 1/5] ppc: spapr: Register and handle HCALL
+ to receive updated RTAS region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,48 +45,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Cc: aik@ozlabs.ru, mahesh@linux.vnet.ibm.com, benh@au1.ibm.com, paulus@samba.org, sam.bobroff@au1.ibm.com
 
-This series of patches adds support for FWNMI in PowerKVM guests.
+Receive updates from SLOF about the updated rtas-base.
+A separate patch for SLOF [1] adds functionality to invoke
+a private HCALL whenever OS issues instantiate-rtas with
+a new rtas-base.
 
-Memory error such as bit flips that cannot be corrected
-by hardware is passed on to the kernel for handling
-by raising machine check exception (an NMI). Upon such
-machine check exception, if the address in error belongs
-to guest then KVM causes a guest exit with KVM_EXIT_NMI
-exit reason.
+This is required as QEMU needs to know the updated rtas-base
+as it allocates error reporting structure in RTAS space upon
+a machine check exception.
 
-This patch series adds functionality to pass on such
-machine check exception to the guest kernel by suitably
-handling KVM_EXIT_NMI exit and building the error log.
+[1] https://lists.ozlabs.org/pipermail/linuxppc-dev/2014-August/120386.html
 
-The KVM changes are now part of the upstream kernel
-(commit e20bbd3d). This series contain QEMU changes.
-
-Change Log v3:
-    - Rebased to v2.10.0-rc0 (git://github.com/dgibson/qemu)
-
-Change Log v2:
-    - Added KVM capability
-    - Serialized multiple NMIs with a conditional wait
-
+Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
+ hw/ppc/spapr_hcall.c   |    8 ++++++++
+ include/hw/ppc/spapr.h |    4 +++-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
-Aravinda Prasad (5):
-      ppc: spapr: Register and handle HCALL to receive updated RTAS region
-      ppc: spapr: Handle "ibm,nmi-register" and "ibm,nmi-interlock" RTAS calls
-      Wrapper function to wait on condition for the main loop mutex
-      target/ppc: Handle NMI guest exit
-      ppc: spapr: Enable FWNMI capability
-
-
- cpus.c                   |    5 +++
- hw/ppc/spapr.c           |   12 ++++++
- hw/ppc/spapr_hcall.c     |    8 ++++
- hw/ppc/spapr_rtas.c      |   52 +++++++++++++++++++++++++++
- include/hw/ppc/spapr.h   |   14 ++++++-
- include/qemu/main-loop.h |    8 ++++
- target/ppc/kvm.c         |   88 ++++++++++++++++++++++++++++++++++++++++++++++
- target/ppc/kvm_ppc.h     |   81 ++++++++++++++++++++++++++++++++++++++++++
- 8 files changed, 266 insertions(+), 2 deletions(-)
-
---
-Aravinda Prasad
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 72ea5a8..e66c72e 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1062,6 +1062,13 @@ static target_ulong h_rtas(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                            nret, rtas_r3 + 12 + 4*nargs);
+ }
+ 
++static target_ulong h_rtas_update(PowerPCCPU *cpu, sPAPRMachineState *spapr,
++                                  target_ulong opcode, target_ulong *args)
++{
++    spapr->rtas_addr = args[0];
++    return 0;
++}
++
+ static target_ulong h_logical_load(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                                    target_ulong opcode, target_ulong *args)
+ {
+@@ -1717,6 +1724,7 @@ static void hypercall_register_types(void)
+ 
+     /* qemu/KVM-PPC specific hcalls */
+     spapr_register_hypercall(KVMPPC_H_RTAS, h_rtas);
++    spapr_register_hypercall(KVMPPC_H_RTAS_UPDATE, h_rtas_update);
+ 
+     /* ibm,client-architecture-support support */
+     spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support);
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 2a303a7..46012b3 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -90,6 +90,7 @@ struct sPAPRMachineState {
+ 
+     hwaddr rma_size;
+     int vrma_adjust;
++    hwaddr rtas_addr;
+     ssize_t rtas_size;
+     void *rtas_blob;
+     long kernel_size;
+@@ -399,7 +400,8 @@ struct sPAPRMachineState {
+ #define KVMPPC_H_LOGICAL_MEMOP  (KVMPPC_HCALL_BASE + 0x1)
+ /* Client Architecture support */
+ #define KVMPPC_H_CAS            (KVMPPC_HCALL_BASE + 0x2)
+-#define KVMPPC_HCALL_MAX        KVMPPC_H_CAS
++#define KVMPPC_H_RTAS_UPDATE    (KVMPPC_HCALL_BASE + 0x3)
++#define KVMPPC_HCALL_MAX        KVMPPC_H_RTAS_UPDATE
+ 
+ typedef struct sPAPRDeviceTreeUpdateHeader {
+     uint32_t version_id;
