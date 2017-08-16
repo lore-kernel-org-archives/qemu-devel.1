@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhnP4-0005rl-V6
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 21:45:52 -0400
+	(envelope-from <konrad.wilk@oracle.com>) id 1dhnT1-0007Pv-3J
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 21:49:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhnP0-0001Ez-1Y
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 21:45:50 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:40233
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dhnOy-0001Dm-NZ
-	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 21:45:45 -0400
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Date: Wed, 16 Aug 2017 09:45:35 +0800
-Message-ID: <1502847935-20483-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	(envelope-from <konrad.wilk@oracle.com>) id 1dhnSw-0003hL-54
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 21:49:55 -0400
+Received: from userp1040.oracle.com ([156.151.31.81]:21323)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <konrad.wilk@oracle.com>)
+	id 1dhnSv-0003fu-QD
+	for qemu-devel@nongnu.org; Tue, 15 Aug 2017 21:49:50 -0400
+Date: Tue, 15 Aug 2017 21:49:38 -0400
+From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Message-ID: <20170816014938.GC12928@localhost.localdomain>
+References: <20170807085703.32267-1-lprosek@redhat.com>
+	<20170809005053.GA26386@amt.cnet>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3] hw/acpi-build: Fix SRAT memory building
- when there is no memory in node0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170809005053.GA26386@amt.cnet>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] i386/kvm: advertise Hyper-V
+ frequency MSRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,154 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, imammedo@redhat.com, mst@redhat.com, Dou Liyang <douly.fnst@cn.fujitsu.com>
+To: Marcelo Tosatti <mtosatti@redhat.com>
+Cc: Ladi Prosek <lprosek@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com, david@redhat.com, rkrcmar@redhat.com
 
-Currently, Using the fisrt node without memory on the machine makes
-QEMU unhappy. With this example command line:
-  ... \
-  -m 1024M,slots=4,maxmem=32G \
-  -numa node,nodeid=0 \
-  -numa node,mem=1024M,nodeid=1 \
-  -numa node,nodeid=2 \
-  -numa node,nodeid=3 \
-Guest reports "No NUMA configuration found" and the NUMA topology is
-wrong.
+On Tue, Aug 08, 2017 at 09:50:53PM -0300, Marcelo Tosatti wrote:
+> On Mon, Aug 07, 2017 at 10:56:59AM +0200, Ladi Prosek wrote:
+> > This is the QEMU part of the changes required for nested Hyper-V to read
+> > timestamps with RDTSC + TSC page. Without exposing the frequency MSRs,
+> > Windows with the Hyper-V role enabled use the much slower
+> > HV_X64_MSR_TIME_REF_COUNT (0x40000020) RDMSR to read timestamps.
+> > 
+> > The new registers are exposed only if the TSC frequency is stable across
+> > migration and known, as suggested by Paolo.
+> > 
+> > v1->v2:
+> > * deleted an extra empty line in patch 1
+> > * added patch 3 introducing a helper function for the "TSC is stable and
+> >   known" check (David)
+> > 
+> > Ladi Prosek (4):
+> >   i386/kvm: use a switch statement for MSR detection
+> >   i386/kvm: set tsc_khz before configuring Hyper-V CPUID
+> >   i386/kvm: introduce tsc_is_stable_and_known()
+> >   i386/kvm: advertise Hyper-V frequency MSRs
+> > 
+> >  target/i386/kvm.c | 138 ++++++++++++++++++++++++++++--------------------------
+> >  1 file changed, 71 insertions(+), 67 deletions(-)
+> > 
+> > -- 
+> > 2.9.3
+> 
+> 
+> Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
 
-This is because when QEMU builds ACPI SRAT, it regards node0 as the
-default node to deal with the memory hole(640K-1M). this means the
-node0 must have some memory(>1M), but, actually it can have no
-memory.
+Come again please?
 
-Fix this problem by replace the node0 with the first node which has
-memory on it. Add a new function for each node. Also do some cleanup.
-
-Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
----
-V3 --> V2
-  -Modify the title
-V2 --> V1:
-  -Fix a coding style problem
-Replace
-    for (node = 0;
-            node < pcms->numa_nodes && pcms->node_mem[node] == 0;
-            node++);
-
-with
-    for (node = 0; node < pcms->numa_nodes; node++) {
-       if (pcms->node_mem[node] != 0) {
-            break;
-         }
-
- hw/i386/acpi-build.c | 78 +++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 50 insertions(+), 28 deletions(-)
-
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 98dd424..f93d712 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2318,15 +2318,43 @@ build_tpm2(GArray *table_data, BIOSLinker *linker)
-                  (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
- }
- 
-+static uint64_t
-+build_srat_node_entry(GArray *table_data, PCMachineState *pcms,
-+                                int i, uint64_t mem_base, uint64_t mem_len)
-+{
-+    AcpiSratMemoryAffinity *numamem;
-+    uint64_t next_base;
-+
-+    next_base = mem_base + mem_len;
-+
-+    /* Cut out the ACPI_PCI hole */
-+    if (mem_base <= pcms->below_4g_mem_size &&
-+        next_base > pcms->below_4g_mem_size) {
-+        mem_len -= next_base - pcms->below_4g_mem_size;
-+        if (mem_len > 0) {
-+            numamem = acpi_data_push(table_data, sizeof *numamem);
-+            build_srat_memory(numamem, mem_base, mem_len, i,
-+                              MEM_AFFINITY_ENABLED);
-+        }
-+        mem_base = 1ULL << 32;
-+        mem_len = next_base - pcms->below_4g_mem_size;
-+        next_base += (1ULL << 32) - pcms->below_4g_mem_size;
-+    }
-+    numamem = acpi_data_push(table_data, sizeof *numamem);
-+    build_srat_memory(numamem, mem_base, mem_len, i,
-+                      MEM_AFFINITY_ENABLED);
-+    return next_base;
-+}
-+
- static void
- build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
- {
-     AcpiSystemResourceAffinityTable *srat;
-     AcpiSratMemoryAffinity *numamem;
- 
--    int i;
-+    int i, node;
-     int srat_start, numa_start, slots;
--    uint64_t mem_len, mem_base, next_base;
-+    uint64_t mem_len, mem_base;
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(machine);
-     PCMachineState *pcms = PC_MACHINE(machine);
-@@ -2370,36 +2398,30 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-     /* the memory map is a bit tricky, it contains at least one hole
-      * from 640k-1M and possibly another one from 3.5G-4G.
-      */
--    next_base = 0;
-+
-     numa_start = table_data->len;
- 
--    numamem = acpi_data_push(table_data, sizeof *numamem);
--    build_srat_memory(numamem, 0, 640 * 1024, 0, MEM_AFFINITY_ENABLED);
--    next_base = 1024 * 1024;
--    for (i = 1; i < pcms->numa_nodes + 1; ++i) {
--        mem_base = next_base;
--        mem_len = pcms->node_mem[i - 1];
--        if (i == 1) {
--            mem_len -= 1024 * 1024;
-+    /* get the first node which has memory and map the hole from 640K-1M */
-+    for (node = 0; node < pcms->numa_nodes; node++) {
-+        if (pcms->node_mem[node] != 0) {
-+            break;
-         }
--        next_base = mem_base + mem_len;
--
--        /* Cut out the ACPI_PCI hole */
--        if (mem_base <= pcms->below_4g_mem_size &&
--            next_base > pcms->below_4g_mem_size) {
--            mem_len -= next_base - pcms->below_4g_mem_size;
--            if (mem_len > 0) {
--                numamem = acpi_data_push(table_data, sizeof *numamem);
--                build_srat_memory(numamem, mem_base, mem_len, i - 1,
--                                  MEM_AFFINITY_ENABLED);
--            }
--            mem_base = 1ULL << 32;
--            mem_len = next_base - pcms->below_4g_mem_size;
--            next_base += (1ULL << 32) - pcms->below_4g_mem_size;
-+    }
-+    numamem = acpi_data_push(table_data, sizeof *numamem);
-+    build_srat_memory(numamem, 0, 640 * 1024, node, MEM_AFFINITY_ENABLED);
-+
-+    /* map the rest of memory from 1M */
-+    mem_base = 1024 * 1024;
-+    mem_len = pcms->node_mem[node] - mem_base;
-+    mem_base = build_srat_node_entry(table_data, pcms, node,
-+                                            mem_base, mem_len);
-+
-+    for (i = 0; i < pcms->numa_nodes; i++) {
-+        if (i == node) {
-+            continue;
-         }
--        numamem = acpi_data_push(table_data, sizeof *numamem);
--        build_srat_memory(numamem, mem_base, mem_len, i - 1,
--                          MEM_AFFINITY_ENABLED);
-+        mem_base = build_srat_node_entry(table_data, pcms, i,
-+                                            mem_base, pcms->node_mem[i]);
-     }
-     slots = (table_data->len - numa_start) / sizeof *numamem;
-     for (; slots < pcms->numa_nodes + 2; slots++) {
--- 
-2.5.5
+> 
