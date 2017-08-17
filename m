@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1diGNA-0002vR-4N
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 04:41:49 -0400
+	(envelope-from <armbru@redhat.com>) id 1diGPS-0003rF-W9
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 04:44:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1diGN7-0007u0-1D
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 04:41:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53370)
+	(envelope-from <armbru@redhat.com>) id 1diGPO-0000Eh-3g
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 04:44:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41034)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1diGN6-0007th-Nw
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 04:41:44 -0400
-Date: Thu, 17 Aug 2017 10:41:22 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170817104122.4d72674b.cohuck@redhat.com>
-In-Reply-To: <1502951113-4246-3-git-send-email-thuth@redhat.com>
-References: <1502951113-4246-1-git-send-email-thuth@redhat.com>
-	<1502951113-4246-3-git-send-email-thuth@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1diGPN-0000DE-T7
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 04:44:06 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D5BC8C08735A
+	for <qemu-devel@nongnu.org>; Thu, 17 Aug 2017 08:44:04 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
+	<20170727154126.11339-18-marcandre.lureau@redhat.com>
+	<87h8x6obqr.fsf@dusky.pond.sub.org>
+Date: Thu, 17 Aug 2017 10:43:58 +0200
+In-Reply-To: <87h8x6obqr.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Thu, 17 Aug 2017 10:10:52 +0200")
+Message-ID: <871soamvn5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/6] tests: Add network filter tests to the
- check-qtest-s390x list
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 17/26] qapi: add conditions to SPICE
+ type/commands/events on the schema
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,117 +35,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Eric Farman <farman@linux.vnet.ibm.com>, Fan Zhang <zhangfan@linux.vnet.ibm.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Fei Li <sherrylf@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Jason J Herne <jjherne@linux.vnet.ibm.com>, Jing Liu <liujbjl@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, QingFeng Hao <haoqf@linux.vnet.ibm.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Yang Chen <bjcyang@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Marc Mari <markmb@redhat.com>, Cleber Rosa <crosa@redhat.com>, Michael S Tsirkin <mst@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Thu, 17 Aug 2017 08:25:09 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+Markus Armbruster <armbru@redhat.com> writes:
 
-> With some small modifications, we can also use the the netfilter,
-> the fiter-mirror and the filter-redirector tests on s390x.
+[...]
+> Check for completeness by reviewing the case insensitive occurrences of
+> SPICE in the schema not covered by your patch:
+>
+> * add_client
+>
+>   Same rationale as for VNC (see my review of PATCH 16).  Good.
 
-s/fiter/filter/
+Hmm, there's a difference to VNC, in qmp_add_client():
 
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/Makefile.include         |  3 +++
->  tests/test-filter-mirror.c     |  9 +++++++--
->  tests/test-filter-redirector.c | 22 ++++++++++++++++------
->  tests/test-netfilter.c         | 11 ++++++++++-
->  4 files changed, 36 insertions(+), 9 deletions(-)
-> 
+    if (strcmp(protocol, "spice") == 0) {
+        if (!qemu_using_spice(errp)) {
+            close(fd);
+            return;
+        }
+        skipauth = has_skipauth ? skipauth : false;
+        tls = has_tls ? tls : false;
+        if (qemu_spice_display_add_client(fd, skipauth, tls) < 0) {
+            error_setg(errp, "spice failed to add client");
+            close(fd);
+        }
+        return;
+#ifdef CONFIG_VNC
+    } else if (strcmp(protocol, "vnc") == 0) {
+        skipauth = has_skipauth ? skipauth : false;
+        vnc_display_add_client(NULL, fd, skipauth);
+        return;
+#endif
+    } else if ((s = qemu_chr_find(protocol)) != NULL) {
+        if (qemu_chr_add_client(s, fd) < 0) {
+            error_setg(errp, "failed to add client");
+            close(fd);
+            return;
+        }
+        return;
+    }
 
-> diff --git a/tests/test-filter-mirror.c b/tests/test-filter-mirror.c
-> index a1d5865..d569d27 100644
-> --- a/tests/test-filter-mirror.c
-> +++ b/tests/test-filter-mirror.c
-> @@ -25,6 +25,11 @@ static void test_mirror(void)
->      char *recv_buf;
->      uint32_t size = sizeof(send_buf);
->      size = htonl(size);
-> +    const char *devstr = "e1000";
-> +
-> +    if (g_str_equal(qtest_get_arch(), "s390x")) {
-> +        devstr = "virtio-net-ccw";
-> +    }
+    error_setg(errp, "protocol '%s' is invalid", protocol);
+    close(fd);
 
-I'm wondering if we could unify selection of the network device
-somehow. There's probably two cases:
-- Test a specific device. This obviously needs to be decided
-  individually.
-- Just use a functional network device. For s390x, this will be
-  virtio-net-ccw; for other architectures, this test uses e1000, while
-  one of the tests below uses rtl8139 (why?). A helper for that may be
-  useful.
+Observe:
 
->  
->      ret = socketpair(PF_UNIX, SOCK_STREAM, 0, send_sock);
->      g_assert_cmpint(ret, !=, -1);
+* Protocol "spice" is always recognized.  Without CONFIG_SPICE,
+  using_spice is always false, and the command fails with
+  qemu_using_spice()'s error "SPICE is not in use".
 
-> diff --git a/tests/test-filter-redirector.c b/tests/test-filter-redirector.c
-> index 69c663b..3afd411 100644
-> --- a/tests/test-filter-redirector.c
-> +++ b/tests/test-filter-redirector.c
-> @@ -57,6 +57,16 @@
->  #include "qemu/error-report.h"
->  #include "qemu/main-loop.h"
->  
-> +static const char *get_devstr(void)
-> +{
-> +    if (g_str_equal(qtest_get_arch(), "s390x")) {
-> +        return "virtio-net-ccw";
-> +    }
-> +
-> +    return "rtl8139";
+* Protocol "vnc" is only recognized with CONFIG_VNC.  Without, it's
+  rejected with "protocol 'vnc' is invalid".
 
-No problem with your patch, but I'm wondering why this does not use
-e1000. Special capabilities of rtl8139?
+* If you name your character device "spice" or "vnc", you can't use it
+  with add_client.  This is a design flaw.
 
-> +}
-> +
-> +
->  static void test_redirector_tx(void)
->  {
->      int backend_sock[2], recv_sock;
+  Except you can use one named "vnc" when !CONFIG_VNC.
 
-> diff --git a/tests/test-netfilter.c b/tests/test-netfilter.c
-> index 8b5a9b2..2506473 100644
-> --- a/tests/test-netfilter.c
-> +++ b/tests/test-netfilter.c
-> @@ -182,6 +182,12 @@ static void remove_netdev_with_multi_netfilter(void)
->  int main(int argc, char **argv)
->  {
->      int ret;
-> +    char *args;
-> +    const char *devstr = "e1000";
+  I'm afraid the command needs to be replaced.  Not in this series, of
+  course.
 
-It's our old friend again :)
-
-> +
-> +    if (g_str_equal(qtest_get_arch(), "s390x")) {
-> +        devstr = "virtio-net-ccw";
-> +    }
->  
->      g_test_init(&argc, &argv, NULL);
->      qtest_add_func("/netfilter/addremove_one", add_one_netfilter);
-> @@ -191,10 +197,13 @@ int main(int argc, char **argv)
->      qtest_add_func("/netfilter/remove_netdev_multi",
->                     remove_netdev_with_multi_netfilter);
->  
-> -    qtest_start("-netdev user,id=qtest-bn0 -device e1000,netdev=qtest-bn0");
-> +    args = g_strdup_printf("-netdev user,id=qtest-bn0 "
-> +                           "-device %s,netdev=qtest-bn0", devstr);
-> +    qtest_start(args);
->      ret = g_test_run();
->  
->      qtest_end();
-> +    g_free(args);
->  
->      return ret;
->  }
-
-Even though I think we should deal with the questions above, having
-more tests for s390x is certainly a good idea. Thus,
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+[...]
