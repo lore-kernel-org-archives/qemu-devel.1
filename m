@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1diP9R-00042z-VJ
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 14:04:14 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1diP9U-00044k-ED
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 14:04:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1diP9P-0005IR-Ki
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 14:04:13 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:33116)
+	(envelope-from <alex.bennee@linaro.org>) id 1diP9T-0005MX-81
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 14:04:16 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:35804)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1diP9P-0005Hz-EV
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 14:04:11 -0400
-Received: by mail-wr0-x233.google.com with SMTP id b65so50612553wrd.0
-	for <qemu-devel@nongnu.org>; Thu, 17 Aug 2017 11:04:11 -0700 (PDT)
+	id 1diP9T-0005Lh-11
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 14:04:15 -0400
+Received: by mail-wr0-x236.google.com with SMTP id 49so41959017wrw.2
+	for <qemu-devel@nongnu.org>; Thu, 17 Aug 2017 11:04:14 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 17 Aug 2017 19:03:59 +0100
-Message-Id: <20170817180404.29334-5-alex.bennee@linaro.org>
+Date: Thu, 17 Aug 2017 19:04:03 +0100
+Message-Id: <20170817180404.29334-9-alex.bennee@linaro.org>
 In-Reply-To: <20170817180404.29334-1-alex.bennee@linaro.org>
 References: <20170817180404.29334-1-alex.bennee@linaro.org>
-Subject: [Qemu-devel] [RFC PATCH 4/9] helper-head: add support for vec type
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC PATCH 8/9] target/arm/helpers: introduce ADVSIMD
+ flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +31,99 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: rth@twiddle.net, cota@braap.org, batuzovk@ispras.ru
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 
+This is used to pass constant information to the helper. This includes
+immediate data and element counts/offsets.
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- include/exec/helper-head.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ target/arm/advsimd_helper_flags.h | 50 +++++++++++++++++++++++++++++++++++++++
+ target/arm/helper-a64.c           |  1 +
+ target/arm/translate-a64.c        |  2 ++
+ 3 files changed, 53 insertions(+)
+ create mode 100644 target/arm/advsimd_helper_flags.h
 
-diff --git a/include/exec/helper-head.h b/include/exec/helper-head.h
-index 1cfc43b9ff..3fb4c3fc39 100644
---- a/include/exec/helper-head.h
-+++ b/include/exec/helper-head.h
-@@ -23,6 +23,7 @@
- #define GET_TCGV_i32 GET_TCGV_I32
- #define GET_TCGV_i64 GET_TCGV_I64
- #define GET_TCGV_ptr GET_TCGV_PTR
-+#define GET_TCGV_vec GET_TCGV_VEC
+diff --git a/target/arm/advsimd_helper_flags.h b/target/arm/advsimd_helper_flags.h
+new file mode 100644
+index 0000000000..47429e6fd1
+--- /dev/null
++++ b/target/arm/advsimd_helper_flags.h
+@@ -0,0 +1,50 @@
++/*
++ *  AArch64 Vector Flags
++ *
++ *  Copyright (c) 2017 Linaro
++ *  Author: Alex Bennée <alex.bennee@linaro.org>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++/* AdvSIMD element data
++ *
++ * We pack all the additional information for elements into a single
++ * 32 bit constant passed by register. Hopefully for groups of
++ * identical operations on different registers this should propergate
++ * nicely in the TCG.
++ *
++ * The following control element iteration:
++ *   ADVSIMD_OPR_ELT  - the count of elements affected
++ *   ADVSIMD_ALL_ELT  - the total count of elements (e.g. clear all-opr elements)
++ *   ADVSIMD_DOFF_ELT - the offset for the destination register (e.g. foo2 ops)
++ *
++ * We encode immediate data in:
++ *   ADVSIMD_DATA
++ *
++ * Typically this is things like shift counts and the like.
++ */
++
++#define ADVSIMD_OPR_ELT_BITS      5
++#define ADVSIMD_OPR_ELT_SHIFT     0
++#define ADVSIMD_ALL_ELT_BITS      5
++#define ADVSIMD_ALL_ELT_SHIFT     5
++#define ADVSIMD_DOFF_ELT_BITS     5
++#define ADVSIMD_DOFF_ELT_SHIFT   10
++#define ADVSIMD_DATA_BITS        16
++#define ADVSIMD_DATA_SHIFT       16
++
++#define GET_SIMD_DATA(t, d) extract32(d,    \
++        ADVSIMD_ ## t ## _SHIFT,            \
++        ADVSIMD_ ## t ## _BITS)
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index d9df82cff5..17b1edfb5f 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -30,6 +30,7 @@
+ #include "exec/exec-all.h"
+ #include "exec/cpu_ldst.h"
+ #include "qemu/int128.h"
++#include "advsimd_helper_flags.h"
+ #include "tcg.h"
+ #include <zlib.h> /* For crc32 */
  
- /* Some types that make sense in C, but not for TCG.  */
- #define dh_alias_i32 i32
-@@ -33,6 +34,7 @@
- #define dh_alias_f32 i32
- #define dh_alias_f64 i64
- #define dh_alias_ptr ptr
-+#define dh_alias_vec vec
- #define dh_alias_void void
- #define dh_alias_noreturn noreturn
- #define dh_alias(t) glue(dh_alias_, t)
-@@ -45,6 +47,7 @@
- #define dh_ctype_f32 float32
- #define dh_ctype_f64 float64
- #define dh_ctype_ptr void *
-+#define dh_ctype_vec void *
- #define dh_ctype_void void
- #define dh_ctype_noreturn void QEMU_NORETURN
- #define dh_ctype(t) dh_ctype_##t
-@@ -90,6 +93,7 @@
- #define dh_is_64bit_i32 0
- #define dh_is_64bit_i64 1
- #define dh_is_64bit_ptr (sizeof(void *) == 8)
-+#define dh_is_64bit_vec (sizeof(void *) == 8)
- #define dh_is_64bit(t) glue(dh_is_64bit_, dh_alias(t))
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index b5f48605a7..f474c5008b 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -34,6 +34,8 @@
+ #include "exec/helper-gen.h"
+ #include "exec/log.h"
  
- #define dh_is_signed_void 0
-@@ -106,6 +110,7 @@
-    extension instructions that may be required, e.g. ia64's addp4.  But
-    for now we don't support any 64-bit targets with 32-bit pointers.  */
- #define dh_is_signed_ptr 0
-+#define dh_is_signed_vec dh_is_signed_ptr
- #define dh_is_signed_env dh_is_signed_ptr
- #define dh_is_signed(t) dh_is_signed_##t
++#include "advsimd_helper_flags.h"
++
+ #include "trace-tcg.h"
  
+ /* Global registers */
 -- 
 2.13.0
