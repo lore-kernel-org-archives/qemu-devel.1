@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lists@wiesinger.com>) id 1diSC5-0007g4-9J
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 17:19:11 -0400
+	(envelope-from <lists@wiesinger.com>) id 1diSC5-0007g5-9L
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 17:19:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lists@wiesinger.com>) id 1diSC1-0003s6-TY
+	(envelope-from <lists@wiesinger.com>) id 1diSC2-0003sE-18
 	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 17:19:09 -0400
-Received: from [2a02:25b0:aaaa:57a::affe:bade] (port=38720
+Received: from [2a02:25b0:aaaa:57a::affe:bade] (port=38718
 	helo=vps01.wiesinger.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lists@wiesinger.com>) id 1diSC1-0003rL-Iw
+	(Exim 4.71) (envelope-from <lists@wiesinger.com>) id 1diSC1-0003rM-J6
 	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 17:19:05 -0400
 From: Gerhard Wiesinger <lists@wiesinger.com>
-References: <35eda6a9-086e-f899-e131-288f2346effe@wiesinger.com>
-Message-ID: <ce477c53-25bc-e6dd-3e05-c74af1f33c2d@wiesinger.com>
-Date: Thu, 17 Aug 2017 23:14:01 +0200
+Message-ID: <35eda6a9-086e-f899-e131-288f2346effe@wiesinger.com>
+Date: Thu, 17 Aug 2017 22:58:48 +0200
 MIME-Version: 1.0
-In-Reply-To: <35eda6a9-086e-f899-e131-288f2346effe@wiesinger.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] kvm_intel fails to load on Conroe CPUs running
  Linux 4.12
@@ -31,26 +29,20 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On 17.08.2017 22:58, Gerhard Wiesinger wrote:
+On 07.08.2017 19:50, Paolo Bonzini wrote:
+
+
+ >Not much to say, unfortunately. It's pretty much the same capabilities
+ >as a Prescott/Cedar Mill processor, except that it has MSR bitmaps. It
+ >also lacks FlexPriority compared to the Conroe I had checked.
  >
- > On 07.08.2017 19:50, Paolo Bonzini wrote:
+ >It's not great that even the revert patch doesn't apply cleanly---this
+ >is *not* necessarily a boring area of the hypervisor...
  >
- > >Not much to say, unfortunately. It's pretty much the same capabilitie=
-s
- > >as a Prescott/Cedar Mill processor, except that it has MSR bitmaps. I=
-t
- > >also lacks FlexPriority compared to the Conroe I had checked.
- > >
- > >It's not great that even the revert patch doesn't apply cleanly---thi=
-s
- > >is *not* necessarily a boring area of the hypervisor...
- > >
- > >Given the rarity of your machine I'm currently leaning towards _not_
- > >reverting the change. I'll check another non-Xeon Core 2 tomorrow tha=
-t
- > >is from December 2008 (IIRC). If that one also lacks vNMI, or if I ge=
-t
- > >other reports, I suppose I will have to reconsider that.
+ >Given the rarity of your machine I'm currently leaning towards _not_
+ >reverting the change. I'll check another non-Xeon Core 2 tomorrow that
+ >is from December 2008 (IIRC). If that one also lacks vNMI, or if I get
+ >other reports, I suppose I will have to reconsider that.
 
 Hello Paolo,
 
