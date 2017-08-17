@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1diGq2-0005Pr-OU
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:11:39 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1diGuY-0000Dc-Ua
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:16:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1diGq1-0001JX-SI
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:11:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43440)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1diGq1-0001Fu-Jc
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:11:37 -0400
-References: <1502861458-30270-1-git-send-email-thuth@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <96918c60-9133-064a-d289-d13562a5f551@redhat.com>
-Date: Thu, 17 Aug 2017 11:05:35 +0200
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1diGuX-0004VR-Nj
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:16:18 -0400
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Date: Thu, 17 Aug 2017 12:15:39 +0300
+Message-Id: <20170817091542.9403-2-pbutsykin@virtuozzo.com>
+In-Reply-To: <20170817091542.9403-1-pbutsykin@virtuozzo.com>
+References: <20170817091542.9403-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <1502861458-30270-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/s390x/ipl: The s390-ipl device is not
- hot-pluggable
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v7 1/4] qemu-img: add --shrink flag for resize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +21,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org, pbutsykin@virtuozzo.com
 
-On 16.08.2017 07:30, Thomas Huth wrote:
-> The s390-ipl device can not be created by the user, since it is meant only
-> to  be instantiated once internally to load the ROMs and kernel. If the user
-> tries to do a "device_add s390-ipl" via the monitor later, QEMU aborts with
-> a "ROM images must be loaded at startup" error message.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/s390x/ipl.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index cc36003..0d06fc1 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -442,6 +442,8 @@ static void s390_ipl_class_init(ObjectClass *klass, void *data)
->      dc->reset = s390_ipl_reset;
->      dc->vmsd = &vmstate_ipl;
->      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-> +    /* Reason: Loads the ROMs and thus can only be used one time - internally */
-> +    dc->user_creatable = false;
->  }
->  
->  static const TypeInfo s390_ipl_info = {
-> 
+The flag is additional precaution against data loss. Perhaps in the future the
+operation shrink without this flag will be blocked for all formats, but for now
+we need to maintain compatibility with raw.
 
-Late but still
+Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ qemu-img-cmds.hx       |  4 ++--
+ qemu-img.c             | 23 +++++++++++++++++++++++
+ qemu-img.texi          |  6 +++++-
+ tests/qemu-iotests/102 |  4 ++--
+ 4 files changed, 32 insertions(+), 5 deletions(-)
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index b47d409665..2fe31893cf 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -89,9 +89,9 @@ STEXI
+ ETEXI
+ 
+ DEF("resize", img_resize,
+-    "resize [--object objectdef] [--image-opts] [-q] filename [+ | -]size")
++    "resize [--object objectdef] [--image-opts] [-q] [--shrink] filename [+ | -]size")
+ STEXI
+-@item resize [--object @var{objectdef}] [--image-opts] [-q] @var{filename} [+ | -]@var{size}
++@item resize [--object @var{objectdef}] [--image-opts] [-q] [--shrink] @var{filename} [+ | -]@var{size}
+ ETEXI
+ 
+ STEXI
+diff --git a/qemu-img.c b/qemu-img.c
+index 56ef49e214..b7b2386cbd 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -65,6 +65,7 @@ enum {
+     OPTION_TARGET_IMAGE_OPTS = 263,
+     OPTION_SIZE = 264,
+     OPTION_PREALLOCATION = 265,
++    OPTION_SHRINK = 266,
+ };
+ 
+ typedef enum OutputFormat {
+@@ -3437,6 +3438,7 @@ static int img_resize(int argc, char **argv)
+         },
+     };
+     bool image_opts = false;
++    bool shrink = false;
+ 
+     /* Remove size from argv manually so that negative numbers are not treated
+      * as options by getopt. */
+@@ -3455,6 +3457,7 @@ static int img_resize(int argc, char **argv)
+             {"object", required_argument, 0, OPTION_OBJECT},
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+             {"preallocation", required_argument, 0, OPTION_PREALLOCATION},
++            {"shrink", no_argument, 0, OPTION_SHRINK},
+             {0, 0, 0, 0}
+         };
+         c = getopt_long(argc, argv, ":f:hq",
+@@ -3498,6 +3501,9 @@ static int img_resize(int argc, char **argv)
+                 return 1;
+             }
+             break;
++        case OPTION_SHRINK:
++            shrink = true;
++            break;
+         }
+     }
+     if (optind != argc - 1) {
+@@ -3571,6 +3577,23 @@ static int img_resize(int argc, char **argv)
+         goto out;
+     }
+ 
++    if (total_size < current_size && !shrink) {
++        warn_report("Shrinking an image will delete all data beyond the "
++                    "shrunken image's end. Before performing such an "
++                    "operation, make sure there is no important data there.");
++
++        if (g_strcmp0(bdrv_get_format_name(blk_bs(blk)), "raw") != 0) {
++            error_report(
++              "Use the --shrink option to perform a shrink operation.");
++            ret = -1;
++            goto out;
++        } else {
++            warn_report("Using the --shrink option will suppress this message."
++                        "Note that future versions of qemu-img may refuse to "
++                        "shrink images without this option.");
++        }
++    }
++
+     ret = blk_truncate(blk, total_size, prealloc, &err);
+     if (!ret) {
+         qprintf(quiet, "Image resized.\n");
+diff --git a/qemu-img.texi b/qemu-img.texi
+index 72dabd6b3e..ea5d04b873 100644
+--- a/qemu-img.texi
++++ b/qemu-img.texi
+@@ -536,7 +536,7 @@ qemu-img rebase -b base.img diff.qcow2
+ At this point, @code{modified.img} can be discarded, since
+ @code{base.img + diff.qcow2} contains the same information.
+ 
+-@item resize [--preallocation=@var{prealloc}] @var{filename} [+ | -]@var{size}
++@item resize [--shrink] [--preallocation=@var{prealloc}] @var{filename} [+ | -]@var{size}
+ 
+ Change the disk image as if it had been created with @var{size}.
+ 
+@@ -544,6 +544,10 @@ Before using this command to shrink a disk image, you MUST use file system and
+ partitioning tools inside the VM to reduce allocated file systems and partition
+ sizes accordingly.  Failure to do so will result in data loss!
+ 
++When shrinking images, the @code{--shrink} option must be given. This informs
++qemu-img that the user acknowledges all loss of data beyond the truncated
++image's end.
++
+ After using this command to grow a disk image, you must use file system and
+ partitioning tools inside the VM to actually begin using the new space on the
+ device.
+diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
+index 87db1bb1bf..d7ad8d9840 100755
+--- a/tests/qemu-iotests/102
++++ b/tests/qemu-iotests/102
+@@ -54,7 +54,7 @@ _make_test_img $IMG_SIZE
+ $QEMU_IO -c 'write 0 64k' "$TEST_IMG" | _filter_qemu_io
+ # Remove data cluster from image (first cluster: image header, second: reftable,
+ # third: refblock, fourth: L1 table, fifth: L2 table)
+-$QEMU_IMG resize -f raw "$TEST_IMG" $((5 * 64 * 1024))
++$QEMU_IMG resize -f raw --shrink "$TEST_IMG" $((5 * 64 * 1024))
+ 
+ $QEMU_IO -c map "$TEST_IMG"
+ $QEMU_IMG map "$TEST_IMG"
+@@ -69,7 +69,7 @@ $QEMU_IO -c 'write 0 64k' "$TEST_IMG" | _filter_qemu_io
+ 
+ qemu_comm_method=monitor _launch_qemu -drive if=none,file="$TEST_IMG",id=drv0
+ 
+-$QEMU_IMG resize -f raw "$TEST_IMG" $((5 * 64 * 1024))
++$QEMU_IMG resize -f raw --shrink "$TEST_IMG" $((5 * 64 * 1024))
+ 
+ _send_qemu_cmd $QEMU_HANDLE 'qemu-io drv0 map' 'allocated' \
+     | sed -e 's/^(qemu).*qemu-io drv0 map...$/(qemu) qemu-io drv0 map/'
 -- 
-
-Thanks,
-
-David
+2.14.1
