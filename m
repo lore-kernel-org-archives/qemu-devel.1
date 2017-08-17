@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1diH0d-0006Pk-JG
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:22:36 -0400
+	(envelope-from <david@redhat.com>) id 1diH0g-0006T0-5O
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:22:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1diH0c-0000Cm-LU
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:22:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44356)
+	(envelope-from <david@redhat.com>) id 1diH0f-0000Et-7H
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:22:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44602)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1diH0c-0000CE-FA
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:22:34 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1diH0f-0000EH-1a
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:22:37 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Thu, 17 Aug 2017 11:22:17 +0200
-Message-Id: <20170817092225.4264-3-david@redhat.com>
+Date: Thu, 17 Aug 2017 11:22:18 +0200
+Message-Id: <20170817092225.4264-4-david@redhat.com>
 In-Reply-To: <20170817092225.4264-1-david@redhat.com>
 References: <20170817092225.4264-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 for-2.11 02/10] target/s390x: move
- cpu_mmu_idx_to_asc() to excp_helper.c
+Subject: [Qemu-devel] [PATCH v1 for-2.11 03/10] target/s390x: move
+ psw_key_valid() to mem_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +31,53 @@ Only used in that file.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/cpu.h         | 14 --------------
- target/s390x/excp_helper.c | 14 ++++++++++++++
- 2 files changed, 14 insertions(+), 14 deletions(-)
+ target/s390x/cpu.h        | 11 -----------
+ target/s390x/mem_helper.c | 11 +++++++++++
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 3e798ef..6567cfa 100644
+index 6567cfa..42d4ac0 100644
 --- a/target/s390x/cpu.h
 +++ b/target/s390x/cpu.h
-@@ -393,20 +393,6 @@ static inline int cpu_mmu_index(CPUS390XState *env, bool ifetch)
-     }
- }
+@@ -366,17 +366,6 @@ void s390x_cpu_debug_excp_handler(CPUState *cs);
+ #define MMU_SECONDARY_IDX       1
+ #define MMU_HOME_IDX            2
  
--static inline uint64_t cpu_mmu_idx_to_asc(int mmu_idx)
+-static inline bool psw_key_valid(CPUS390XState *env, uint8_t psw_key)
 -{
--    switch (mmu_idx) {
--    case MMU_PRIMARY_IDX:
--        return PSW_ASC_PRIMARY;
--    case MMU_SECONDARY_IDX:
--        return PSW_ASC_SECONDARY;
--    case MMU_HOME_IDX:
--        return PSW_ASC_HOME;
--    default:
--        abort();
+-    uint16_t pkm = env->cregs[3] >> 16;
+-
+-    if (env->psw.mask & PSW_MASK_PSTATE) {
+-        /* PSW key has range 0..15, it is valid if the bit is 1 in the PKM */
+-        return pkm & (0x80 >> psw_key);
 -    }
+-    return true;
 -}
 -
- static inline void cpu_get_tb_cpu_state(CPUS390XState* env, target_ulong *pc,
-                                         target_ulong *cs_base, uint32_t *flags)
+ static inline int cpu_mmu_index(CPUS390XState *env, bool ifetch)
  {
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index d183377..db86259 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -68,6 +68,20 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr address,
+     switch (env->psw.mask & PSW_MASK_ASC) {
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index c71dce4..b91c740 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -56,6 +56,17 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
+ #define HELPER_LOG(x...)
+ #endif
  
- #else /* !CONFIG_USER_ONLY */
- 
-+static inline uint64_t cpu_mmu_idx_to_asc(int mmu_idx)
++static inline bool psw_key_valid(CPUS390XState *env, uint8_t psw_key)
 +{
-+    switch (mmu_idx) {
-+    case MMU_PRIMARY_IDX:
-+        return PSW_ASC_PRIMARY;
-+    case MMU_SECONDARY_IDX:
-+        return PSW_ASC_SECONDARY;
-+    case MMU_HOME_IDX:
-+        return PSW_ASC_HOME;
-+    default:
-+        abort();
++    uint16_t pkm = env->cregs[3] >> 16;
++
++    if (env->psw.mask & PSW_MASK_PSTATE) {
++        /* PSW key has range 0..15, it is valid if the bit is 1 in the PKM */
++        return pkm & (0x80 >> psw_key);
 +    }
++    return true;
 +}
 +
- int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr,
-                               int rw, int mmu_idx)
+ /* Reduce the length so that addr + len doesn't cross a page boundary.  */
+ static inline uint32_t adj_len_to_page(uint32_t len, uint64_t addr)
  {
 -- 
 2.9.4
