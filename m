@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=3958fb005=anthony.perard@citrix.com>)
-	id 1diLhu-0001kF-V9
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 10:23:36 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1diLi7-0001tG-9b
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 10:23:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=3958fb005=anthony.perard@citrix.com>)
-	id 1diLhr-0003Mh-Ny
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 10:23:34 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:47564)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=3958fb005=anthony.perard@citrix.com>)
-	id 1diLhr-0003Lq-Eu
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 10:23:31 -0400
-Date: Thu, 17 Aug 2017 15:23:27 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20170817142327.GE1475@perard.uk.xensource.com>
-References: <20170815111549.6232-1-anthony.perard@citrix.com>
-	<20170815111549.6232-2-anthony.perard@citrix.com>
-	<20170815140751.2d432a46@nial.brq.redhat.com>
-	<20170815222133-mutt-send-email-mst@kernel.org>
-	<20170816111046.7e0a935d@nial.brq.redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1diLi4-0003Rk-3G
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 10:23:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29723)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1diLi3-0003RP-QQ
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 10:23:44 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C72D313AAB
+	for <qemu-devel@nongnu.org>; Thu, 17 Aug 2017 14:23:42 +0000 (UTC)
+References: <20170817141148.13111-1-famz@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <dad88591-da0d-d9dd-ef0d-4153bbc68b85@redhat.com>
+Date: Thu, 17 Aug 2017 16:23:35 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20170816111046.7e0a935d@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 v2 1/2] hw/acpi: Call
- acpi_set_pci_info when no ACPI tables needed
+In-Reply-To: <20170817141148.13111-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] scsi-block: Add qdev error properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,121 +33,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Bruce Rogers <brogers@suse.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, Aug 16, 2017 at 11:10:46AM +0200, Igor Mammedov wrote:
-> On Tue, 15 Aug 2017 22:24:08 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Tue, Aug 15, 2017 at 02:07:51PM +0200, Igor Mammedov wrote:
-> > > On Tue, 15 Aug 2017 12:15:48 +0100
-> > > Anthony PERARD <anthony.perard@citrix.com> wrote:
-> > >   
-> > > > To do PCI passthrough with Xen, the property acpi-pcihp-bsel needs to be
-> > > > set, but this was done only when ACPI tables are built which is not
-> > > > needed for a Xen guest. The need for the property starts with commit
-> > > > "pc: pcihp: avoid adding ACPI_PCIHP_PROP_BSEL twice"
-> > > > (f0c9d64a68b776374ec4732424a3e27753ce37b6).
-> > > > 
-> > > > Set pci info before checking for the needs to build ACPI tables.
-> > > > 
-> > > > Assign bsel=0 property only to the root bus on Xen as there is no
-> > > > support in the Xen ACPI tables for a different value.  
-> > > 
-> > > looking at hw/acpi/pcihp.c and bsel usage there it looks like
-> > > bsel property is owned by it and not by ACPI tables, so instead of
-> > > shuffling it in acpi_setup(), how about moving bsel initialization
-> > > to hw/acpi/pcihp.c and initialize it there unconditionally?
-> > > 
-> > > It could be as simple as moving acpi_set_pci_info()/acpi_set_bsel()
-> > > there and calling it from acpi_pcihp_reset().
-> > > 
-> > > Then there won't be need for Xen specific branches, as root bus
-> > > will have bsel set automatically which is sufficient for Xen and
-> > > the rest of bsel-s (bridges) will be just unused by Xen,
-> > > which could later extend its ACPI table implementation to utilize them.   
-> > 
-> > Later is exactly what I'd like to try to avoid.
-> > Whoever wants acpi hotplug for bridges needs to get
-> > the bsel info from qemu supplied acpi tables.
-> 
-> I'd prefer to have only one behavior in QEMU (on hw interface)
-> side and let Xen to maintain their own ACPI tables  dealing
-> with issues that arise from it since they insist on doing job twice.
-> 
-> The point is bsel is so embedded in HW part of impl.
-> that it should be allocated/manged there, otherwise it leads
-> to hacks where acpi_setup() is called but does partial init
-> and then bails out to fix code pcihp.c that depend on it being run,
-> pcihp.c (hw part) shouldn't depend on on ACPI tables generation
-> (bios part).
-> 
-> Anyway if you insist on capping Xen, it probably could be done
-> with comat machinery, something like this:
-> 
-> (where the 1st hunk should been there since, we've introduced
-> "acpi-pci-hotplug-with-bridge-support")
-> 
-> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-> index c420a38..a55f022 100644
-> --- a/hw/acpi/pcihp.c
-> +++ b/hw/acpi/pcihp.c
-> @@ -273,7 +273,7 @@ static void pci_write(void *opaque, hwaddr addr, uint64_t data,
->                        addr, data);
->          break;
->      case PCI_SEL_BASE:
-> -        s->hotplug_select = data;
-> +        s->hotplug_select = s->legacy_piix ? 0 : data;
->          ACPI_PCIHP_DPRINTF("pcisel write %" HWADDR_PRIx " <== %" PRIu64 "\n",
->                        addr, data);
->      default:
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index 22dbef6..81b8c3e 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -1117,6 +1117,13 @@ static void xenfv_machine_options(MachineClass *m)
->      m->max_cpus = HVM_MAX_VCPUS;
->      m->default_machine_opts = "accel=xen";
->      m->hot_add_cpu = pc_hot_add_cpu;
-> +    SET_MACHINE_COMPAT(m,
-> +        {\
-> +            .driver   = "PIIX4_PM",\
-> +            .property = "acpi-pci-hotplug-with-bridge-support",\
-> +            .value    = "off",\
+On 17/08/2017 16:11, Fam Zheng wrote:
+> This makes the werror/rerror options available on the scsi-block device=
+,
+> to allow user specify error handling policy in the same way as scsi-hd
+> etc.
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+>=20
+> ---
+>=20
+> Take care of status, error, sense and QMP as well. [Paolo]
+> ---
+>  hw/scsi/scsi-disk.c | 81 ++++++++++++++++++++++++++++++++++++++-------=
+--------
+>  1 file changed, 59 insertions(+), 22 deletions(-)
+>=20
+> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+> index 5f1e5e8070..124d77c159 100644
+> --- a/hw/scsi/scsi-disk.c
+> +++ b/hw/scsi/scsi-disk.c
+> @@ -106,7 +106,8 @@ typedef struct SCSIDiskState
+>      bool tray_locked;
+>  } SCSIDiskState;
+> =20
+> -static int scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_f=
+ailed);
+> +static int scsi_handle_rw_error(SCSIDiskReq *r, int error, int status,
+> +                                bool update_sense, bool acct_failed);
+> =20
+>  static void scsi_free_request(SCSIRequest *req)
+>  {
+> @@ -179,21 +180,23 @@ static void scsi_disk_load_request(QEMUFile *f, S=
+CSIRequest *req)
+> =20
+>  static bool scsi_disk_req_check_error(SCSIDiskReq *r, int ret, bool ac=
+ct_failed)
+>  {
+> +    int status =3D r->status ? *r->status : 0;
+> +
+>      if (r->req.io_canceled) {
+>          scsi_req_cancel_complete(&r->req);
+>          return true;
+>      }
+> =20
+> -    if (ret < 0) {
+> -        return scsi_handle_rw_error(r, -ret, acct_failed);
+> +    if (ret < 0 || status) {
+> +        return scsi_handle_rw_error(r, -ret, status, !r->status, acct_=
+failed);
 
-That property is actually already turned off for Xen, but this is done
-in piix4_pm_init(). Also, having the property only for xenfv would not
-be enought because we can use -machine pc,accel=xen.
+Do we need to pass both ret and !r->status?  We should update the sense
+whenever error !=3D 0, meaning the command hasn't run, so you can just ad=
+d a
 
-Maybe we could use s->legacy_piix in acpi_pcihp_device_{,un}plug_cb() to
-find out if the missing bsel property is an issue or not?
+	case 0:
+	    /* The command has run, no need to fake sense.  */
+	    assert(r->status && *r->status);
+	    scsi_req_complete(&r->req, *r->status);
 
+in scsi_handle_rw_error's switch statement.
 
-diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-index c420a388ea..79b7ed9900 100644
---- a/hw/acpi/pcihp.c
-+++ b/hw/acpi/pcihp.c
-@@ -186,6 +186,9 @@ void acpi_pcihp_device_plug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
-     PCIDevice *pdev = PCI_DEVICE(dev);
-     int slot = PCI_SLOT(pdev->devfn);
-     int bsel = acpi_pcihp_get_bsel(pdev->bus);
-+
-+    if (bsel < 0 && s->legacy_piix)
-+        bsel = 0;
-     if (bsel < 0) {
-         error_setg(errp, "Unsupported bus. Bus doesn't have property '"
-                    ACPI_PCIHP_PROP_BSEL "' set");
-@@ -209,6 +212,9 @@ void acpi_pcihp_device_unplug_cb(HotplugHandler *hotplug_dev, AcpiPciHpState *s,
-     PCIDevice *pdev = PCI_DEVICE(dev);
-     int slot = PCI_SLOT(pdev->devfn);
-     int bsel = acpi_pcihp_get_bsel(pdev->bus);
-+
-+    if (bsel < 0 && s->legacy_piix)
-+        bsel = 0;
-     if (bsel < 0) {
-         error_setg(errp, "Unsupported bus. Bus doesn't have property '"
-                    ACPI_PCIHP_PROP_BSEL "' set");
+>      }
+> =20
+> -    if (r->status && *r->status) {
+> +    if (status) {
+>          if (acct_failed) {
+>              SCSIDiskState *s =3D DO_UPCAST(SCSIDiskState, qdev, r->req=
+.dev);
+>              block_acct_failed(blk_get_stats(s->qdev.conf.blk), &r->acc=
+t);
+>          }
+> -        scsi_req_complete(&r->req, *r->status);
+> +        scsi_req_complete(&r->req, status);
+>          return true;
 
--- 
-Anthony PERARD
+This "if" is now dead code (yay!).
+
+>      }
+> =20
+> @@ -428,7 +447,8 @@ static void scsi_read_data(SCSIRequest *req)
+>   * scsi_handle_rw_error always manages its reference counts, independe=
+nt
+>   * of the return value.
+>   */
+> -static int scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_f=
+ailed)
+> +static int scsi_handle_rw_error(SCSIDiskReq *r, int error, int status,
+> +                                bool update_sense, bool acct_failed)
+>  {
+>      bool is_read =3D (r->req.cmd.mode =3D=3D SCSI_XFER_FROM_DEV);
+>      SCSIDiskState *s =3D DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
+> @@ -439,22 +459,38 @@ static int scsi_handle_rw_error(SCSIDiskReq *r, i=
+nt error, bool acct_failed)
+>          if (acct_failed) {
+>              block_acct_failed(blk_get_stats(s->qdev.conf.blk), &r->acc=
+t);
+>          }
+> -        switch (error) {
+> -        case ENOMEDIUM:
+> -            scsi_check_condition(r, SENSE_CODE(NO_MEDIUM));
+> -            break;
+> -        case ENOMEM:
+> -            scsi_check_condition(r, SENSE_CODE(TARGET_FAILURE));
+> -            break;
+> -        case EINVAL:
+> -            scsi_check_condition(r, SENSE_CODE(INVALID_FIELD));
+> -            break;
+> -        case ENOSPC:
+> -            scsi_check_condition(r, SENSE_CODE(SPACE_ALLOC_FAILED));
+> -            break;
+> -        default:
+> -            scsi_check_condition(r, SENSE_CODE(IO_ERROR));
+> -            break;
+> +        if (update_sense) {
+> +            switch (error) {
+> +            case ENOMEDIUM:
+> +                scsi_check_condition(r, SENSE_CODE(NO_MEDIUM));
+> +                break;
+> +            case ENOMEM:
+> +                scsi_check_condition(r, SENSE_CODE(TARGET_FAILURE));
+> +                break;
+> +            case EINVAL:
+> +                scsi_check_condition(r, SENSE_CODE(INVALID_FIELD));
+> +                break;
+> +            case ENOSPC:
+> +                scsi_check_condition(r, SENSE_CODE(SPACE_ALLOC_FAILED)=
+);
+> +                break;
+> +            default:
+> +                scsi_check_condition(r, SENSE_CODE(IO_ERROR));
+> +                break;
+> +            }
+> +        }
+
+Because of the dead code above, you're now not running scsi_req_complete.
+
+> +    }
+> +    if (!error) {
+> +        assert(status);
+
+Since you are using the request object, you might as well
+"assert(r->status && *r->status)" and skip passing the argument.
+
+> +        if (scsi_sense_matches(r, SENSE_CODE(NO_MEDIUM))) {
+> +            error =3D ENOMEDIUM;
+> +        } else if (scsi_sense_matches(r, SENSE_CODE(TARGET_FAILURE))) =
+{
+> +            error =3D ENOMEM;
+> +        } else if (scsi_sense_matches(r, SENSE_CODE(INVALID_FIELD))) {
+> +            error =3D EINVAL;
+> +        } else if (scsi_sense_matches(r, SENSE_CODE(SPACE_ALLOC_FAILED=
+))) {
+> +            error =3D ENOSPC;
+> +        } else {
+> +            error =3D EIO;
+
+Nice touch :) and in fact the ENOSPC case is needed for correctness.
+
+Later we could also add a blk_error_action version that takes a char*,
+and pass a string that describes the sense data (see Linux
+drivers/scsi/sense_codes.h).
+
+Paolo
+
+>          }
+>      }
+>      blk_error_action(s->qdev.conf.blk, action, is_read, error);
+> @@ -2972,6 +3008,7 @@ static const TypeInfo scsi_cd_info =3D {
+> =20
+>  #ifdef __linux__
+>  static Property scsi_block_properties[] =3D {
+> +    DEFINE_BLOCK_ERROR_PROPERTIES(SCSIDiskState, qdev.conf),         \
+>      DEFINE_PROP_DRIVE("drive", SCSIDiskState, qdev.conf.blk),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>=20
