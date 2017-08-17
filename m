@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1diIMV-0008WI-Lb
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 06:49:16 -0400
+	(envelope-from <imammedo@redhat.com>) id 1diIQO-00026n-5d
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 06:53:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1diIMS-0007et-JB
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 06:49:15 -0400
-Date: Thu, 17 Aug 2017 17:52:36 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170817075236.GI5509@umbus.fritz.box>
-References: <20170815202846.24749-1-danielhb@linux.vnet.ibm.com>
+	(envelope-from <imammedo@redhat.com>) id 1diIQL-0002Dj-1x
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 06:53:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57750)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1diIQK-000251-Oi
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 06:53:12 -0400
+Date: Thu, 17 Aug 2017 12:53:06 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170817125306.45dc8d04@nial.brq.redhat.com>
+In-Reply-To: <8d859891-c442-c1a6-021c-acbd30841263@amsat.org>
+References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
+	<1500040339-119465-3-git-send-email-imammedo@redhat.com>
+	<d675fe0d-a775-b594-cbf1-057c8c5ba94f@amsat.org>
+	<8d859891-c442-c1a6-021c-acbd30841263@amsat.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="tT3UgwmDxwvOMqfu"
-Content-Disposition: inline
-In-Reply-To: <20170815202846.24749-1-danielhb@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/ppc: disable hotplug before CAS is
- completed
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 02/28] mips: MIPSCPU model subclasses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,97 +29,316 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, lvivier@redhat.com
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Yongbok Kim <yongbok.kim@imgtec.com>, Peter Maydell <peter.maydell@linaro.org>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>
 
+On Thu, 17 Aug 2017 00:38:59 -0300
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
---tT3UgwmDxwvOMqfu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Aug 15, 2017 at 05:28:46PM -0300, Daniel Henrique Barboza wrote:
-> This patch is a follow up on the discussions that started with
-> Laurent's patch series "spapr: disable hotplugging without OS" [1]
-> and discussions made at patch "spapr: reset DRCs on migration
-> pre_load" [2].
+> Hi Igor,
 >=20
-> At this moment, we do not support CPU/memory hotplug in early
-> boot stages, before CAS. The reason is that the hotplug event
-> can't be handled at SLOF level (or even in PRELAUNCH runstate) and
-> at the same time can't be canceled. This leads to devices being
-> unable to be hot unplugged and, in some cases, guest kernel Ooops.
-> After CAS, with the FDT in place, the guest can handle the hotplug
-> events and everything works as usual.
+> On 07/15/2017 06:48 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> > On 07/14/2017 10:51 AM, Igor Mammedov wrote: =20
+> >> Register separate QOM types for each mips cpu model,
+> >> so it would be possible to reuse generic CPU creation
+> >> routines.
+> >>
+> >> Signed-off-by: Igor Mammedov <imammedo@redhat.com> =20
+> >=20
+> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >  =20
+> >> ---
+> >> CC: Aurelien Jarno <aurelien@aurel32.net>
+> >> CC: Yongbok Kim <yongbok.kim@imgtec.com>
+> >> ---
+> >>   target/mips/cpu-qom.h        |  2 ++
+> >>   target/mips/cpu.h            | 57=20
+> >> +++++++++++++++++++++++++++++++++++++++++++-
+> >>   target/mips/cpu.c            | 51=20
+> >> +++++++++++++++++++++++++++++++++++++++
+> >>   target/mips/translate.c      | 13 +++++-----
+> >>   target/mips/translate_init.c | 57=20
+> >> ++------------------------------------------
+> >>   5 files changed, 117 insertions(+), 63 deletions(-)
+> >>
+> >> diff --git a/target/mips/cpu-qom.h b/target/mips/cpu-qom.h
+> >> index 3f5bf23..4b32401 100644
+> >> --- a/target/mips/cpu-qom.h
+> >> +++ b/target/mips/cpu-qom.h
+> >> @@ -35,6 +35,7 @@
+> >>   #define MIPS_CPU_GET_CLASS(obj) \
+> >>       OBJECT_GET_CLASS(MIPSCPUClass, (obj), TYPE_MIPS_CPU)
+> >> +typedef struct mips_def_t mips_def_t;
+> >>   /**
+> >>    * MIPSCPUClass:
+> >>    * @parent_realize: The parent class' realize handler.
+> >> @@ -49,6 +50,7 @@ typedef struct MIPSCPUClass {
+> >>       DeviceRealize parent_realize;
+> >>       void (*parent_reset)(CPUState *cpu);
+> >> +    const mips_def_t *cpu_def;
+> >>   } MIPSCPUClass;
+> >>   typedef struct MIPSCPU MIPSCPU;
+> >> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+> >> index 9c32228..7c2e0bf 100644
+> >> --- a/target/mips/cpu.h
+> >> +++ b/target/mips/cpu.h
+> >> @@ -161,7 +161,62 @@ struct CPUMIPSMVPContext {
+> >>   #define CP0MVPC1_PCP1    0
+> >>   };
+> >> -typedef struct mips_def_t mips_def_t;
+> >> +/* MMU types, the first four entries have the same layout as the
+> >> +   CP0C0_MT field.  */
+> >> +enum mips_mmu_types {
+> >> +    MMU_TYPE_NONE,
+> >> +    MMU_TYPE_R4000,
+> >> +    MMU_TYPE_RESERVED,
+> >> +    MMU_TYPE_FMT,
+> >> +    MMU_TYPE_R3000,
+> >> +    MMU_TYPE_R6000,
+> >> +    MMU_TYPE_R8000
+> >> +};
+> >> +
+> >> +struct mips_def_t {
+> >> +    const char *name;
+> >> +    int32_t CP0_PRid;
+> >> +    int32_t CP0_Config0;
+> >> +    int32_t CP0_Config1;
+> >> +    int32_t CP0_Config2;
+> >> +    int32_t CP0_Config3;
+> >> +    int32_t CP0_Config4;
+> >> +    int32_t CP0_Config4_rw_bitmask;
+> >> +    int32_t CP0_Config5;
+> >> +    int32_t CP0_Config5_rw_bitmask;
+> >> +    int32_t CP0_Config6;
+> >> +    int32_t CP0_Config7;
+> >> +    target_ulong CP0_LLAddr_rw_bitmask;
+> >> +    int CP0_LLAddr_shift;
+> >> +    int32_t SYNCI_Step;
+> >> +    int32_t CCRes;
+> >> +    int32_t CP0_Status_rw_bitmask;
+> >> +    int32_t CP0_TCStatus_rw_bitmask;
+> >> +    int32_t CP0_SRSCtl;
+> >> +    int32_t CP1_fcr0;
+> >> +    int32_t CP1_fcr31_rw_bitmask;
+> >> +    int32_t CP1_fcr31;
+> >> +    int32_t MSAIR;
+> >> +    int32_t SEGBITS;
+> >> +    int32_t PABITS;
+> >> +    int32_t CP0_SRSConf0_rw_bitmask;
+> >> +    int32_t CP0_SRSConf0;
+> >> +    int32_t CP0_SRSConf1_rw_bitmask;
+> >> +    int32_t CP0_SRSConf1;
+> >> +    int32_t CP0_SRSConf2_rw_bitmask;
+> >> +    int32_t CP0_SRSConf2;
+> >> +    int32_t CP0_SRSConf3_rw_bitmask;
+> >> +    int32_t CP0_SRSConf3;
+> >> +    int32_t CP0_SRSConf4_rw_bitmask;
+> >> +    int32_t CP0_SRSConf4;
+> >> +    int32_t CP0_PageGrain_rw_bitmask;
+> >> +    int32_t CP0_PageGrain;
+> >> +    int insn_flags;
+> >> +    enum mips_mmu_types mmu_type;
+> >> +};
+> >> +
+> >> +extern const struct mips_def_t mips_defs[];
+> >> +extern const int mips_defs_number;
+> >>   #define MIPS_SHADOW_SET_MAX 16
+> >>   #define MIPS_TC_MAX 5
+> >> diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+> >> index 82afdaa..111b5ae 100644
+> >> --- a/target/mips/cpu.c
+> >> +++ b/target/mips/cpu.c
+> >> @@ -151,12 +151,37 @@ static void mips_cpu_initfn(Object *obj)
+> >>       CPUState *cs =3D CPU(obj);
+> >>       MIPSCPU *cpu =3D MIPS_CPU(obj);
+> >>       CPUMIPSState *env =3D &cpu->env;
+> >> +    MIPSCPUClass *mcc =3D MIPS_CPU_GET_CLASS(obj);
+> >>       cs->env_ptr =3D env;
+> >>       if (tcg_enabled()) {
+> >>           mips_tcg_init();
+> >>       }
+> >> +
+> >> +    if (mcc->cpu_def) {
+> >> +        env->cpu_model =3D mcc->cpu_def;
+> >> +    }
+> >> +}
+> >> +
+> >> +static char *mips_cpu_type_name(const char *cpu_model)
+> >> +{
+> >> +    return g_strdup_printf("%s-" TYPE_MIPS_CPU, cpu_model);
+> >> +}
+> >> +
+> >> +static ObjectClass *mips_cpu_class_by_name(const char *cpu_model)
+> >> +{
+> >> +    ObjectClass *oc;
+> >> +    char *typename;
+> >> +
+> >> +    if (cpu_model =3D=3D NULL) {
+> >> +        return NULL;
+> >> +    }
+> >> +
+> >> +    typename =3D mips_cpu_type_name(cpu_model);
+> >> +    oc =3D object_class_by_name(typename);
+> >> +    g_free(typename);
+> >> +    return oc;
+> >>   }
+> >>   static void mips_cpu_class_init(ObjectClass *c, void *data)
+> >> @@ -171,6 +196,7 @@ static void mips_cpu_class_init(ObjectClass *c,=20
+> >> void *data)
+> >>       mcc->parent_reset =3D cc->reset;
+> >>       cc->reset =3D mips_cpu_reset;
+> >> +    cc->class_by_name =3D mips_cpu_class_by_name; =20
 >=20
-> An attempt to try to support hotplug before CAS was made, but not
-> successful. The key difference in the current code flow between a
-> coldplugged and a hotplugged device, in the PRELAUNCH state, is that
-> the coldplugged device is registered at the base FDT, allowing its
-> DRC to go straight to CONFIGURED state. In theory, this can also be
-> done with a hotplugged device if we can add it to the base of the
-> existing FDT. However, tampering with the FDT after writing in the
-> guest memory, besides being a dubitable idea, is also not
-> possible. The FDT is written in ppc_spapr_reset and there is no
-> way to retrieve it - we can calculate the fdt_address but the
-> fdt_size isn't stored. Storing the fdt_size to allow for
-> later retrieval is yet another state that would need to be
-> migrated. In short, it is not worth the trouble.
+> Now than I'm reading again...
 >=20
-> All this said, this patch opted to disable CPU/mem hotplug at early
-> boot stages. CAS detection is made by checking if there are
-> any bits set in ov5_cas to avoid adding an extra state that
-> would need tracking/migration. The patch also makes sure that
-> it doesn't interfere with hotplug in the INMIGRATE state.
+> >>       cc->has_work =3D mips_cpu_has_work;
+> >>       cc->do_interrupt =3D mips_cpu_do_interrupt;
+> >>       cc->cpu_exec_interrupt =3D mips_cpu_exec_interrupt;
+> >> @@ -203,9 +229,34 @@ static const TypeInfo mips_cpu_type_info =3D { =20
 >=20
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg05226.html
-> [2] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg01989.html
+> Shouldn't this class now be abstract?
+it should,
+
+I see your are fixing it in your version of series,
+so I'll just drop mips from my series so that you could merge
+your version of mips part separately via your tree,
+assuming you can do it fast once merge window is open
+as I have another series on top that does more extensive
+generalization/clean up and depends on this series
+(including mips being properly QOMified)
+
 >=20
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-
-I don't think this is a good idea.
-
-1) After my DRC cleanups, early hotplug works just fine for me.  I'm
-not sure why it isn't for you: we need to understand that before
-proceeding.
-
-2) libvirt actually uses early hotplug fairly often (before even
-starting the firmware).  At the moment this works - at least in some
-cases (see above), though there are some wrinkles to work out.  This
-will break it completely and require an entirely different approach to
-fix again.
-
-3) There's no fundamental reason early hotplug shouldn't work - the
-event will just be queued until the OS boots and processes it.
-
-I know I suggested disabling early hotplug earlier, but that was
-before I'd dug into the DRC layer and properly understood what was
-going on here.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---tT3UgwmDxwvOMqfu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmVS0IACgkQbDjKyiDZ
-s5I1mhAAi5sRqFK0Ae4R1aGKbBwNGq2JZi2ZcTx8pt1vKJ0+zKqXzMSl4tujeVAp
-DE/QoLUVP8lBCMNcw/hugCSU00k6qcL7kYvRVrc43SMgKH1+x019op8r32Xr7+8Y
-UhLKfjw89UZyT3DF+SDevRWh2ciRYt1YD2KTyTVd6S/dqmyg/Xj7ANrczHhQmTI4
-37EW/872+KoqJ5mv2UsuPmGAXY3eb8lkpMO/xXpOVkVcALFGvBcdrbflBehz6nAc
-ZI2RsKGa01rdpcEvMkWWOaZfVCYiHZgJTgDGAThGOFoitACUQDsQXSnUfeUDoufX
-TTXXHLDcEjTqXEn2o7D/mcd1Ui2t1ScjuzoAcGXXrcgqUE1wj1X1S+Ag6NxSPS8L
-Z/dMcyGeCvj1ASrNorvfuKs5OanifakOFSsXPRFRUkHLELNmg7zHGsflhboJJMvS
-JiKgh9jBtGD8VyYf2C/lg5qnrkYAlOnEnHvUz1e2lP+tgvNFjUbwgeJexlOfBBfY
-C0OyWdNf0UtSXKfsLIe+Cy1RY6i259z6BK+MTbHUcctSR/Uysw8Mz64JZGeg3inz
-18rqXSJjI+HICjywJKFH4khrNdUJbwkbwchdYbCQADRu/VdTCY2t16zGndiOAAAd
-ZJU1bGfMBpG59svFB9Qo9xAZiz5mo02vfSR8gM02aGHBNwLaPUE=
-=N+JJ
------END PGP SIGNATURE-----
-
---tT3UgwmDxwvOMqfu--
+> >>       .class_init =3D mips_cpu_class_init,
+> >>   };
+> >> +static void mips_cpu_cpudef_class_init(ObjectClass *oc, void *data)
+> >> +{
+> >> +    MIPSCPUClass *mcc =3D MIPS_CPU_CLASS(oc);
+> >> +    mcc->cpu_def =3D data;
+> >> +}
+> >> +
+> >> +static void mips_register_cpudef_type(const struct mips_def_t *def)
+> >> +{
+> >> +    char *typename =3D mips_cpu_type_name(def->name);
+> >> +    TypeInfo ti =3D {
+> >> +        .name =3D typename,
+> >> +        .parent =3D TYPE_MIPS_CPU,
+> >> +        .class_init =3D mips_cpu_cpudef_class_init,
+> >> +        .class_data =3D (void *)def,
+> >> +    };
+> >> +
+> >> +    type_register(&ti);
+> >> +    g_free(typename);
+> >> +}
+> >> +
+> >>   static void mips_cpu_register_types(void)
+> >>   {
+> >> +    int i;
+> >> +
+> >>       type_register_static(&mips_cpu_type_info);
+> >> +    for (i =3D 0; i < mips_defs_number; i++) {
+> >> +        mips_register_cpudef_type(&mips_defs[i]);
+> >> +    }
+> >>   }
+> >>   type_init(mips_cpu_register_types)
+> >> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> >> index 7b3ae81..ae7ca80 100644
+> >> --- a/target/mips/translate.c
+> >> +++ b/target/mips/translate.c
+> >> @@ -20193,16 +20193,15 @@ void mips_tcg_init(void)
+> >>   MIPSCPU *cpu_mips_init(const char *cpu_model)
+> >>   {
+> >> +    ObjectClass *oc;
+> >>       MIPSCPU *cpu;
+> >> -    CPUMIPSState *env;
+> >> -    const mips_def_t *def;
+> >> -    def =3D cpu_mips_find_by_name(cpu_model);
+> >> -    if (!def)
+> >> +    oc =3D cpu_class_by_name(TYPE_MIPS_CPU, cpu_model);
+> >> +    if (oc =3D=3D NULL) {
+> >>           return NULL;
+> >> -    cpu =3D MIPS_CPU(object_new(TYPE_MIPS_CPU));
+> >> -    env =3D &cpu->env;
+> >> -    env->cpu_model =3D def;
+> >> +    }
+> >> +
+> >> +    cpu =3D MIPS_CPU(object_new(object_class_get_name(oc)));
+> >>       object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
+> >> diff --git a/target/mips/translate_init.c b/target/mips/translate_init=
+.c
+> >> index c771ff1..16c214b 100644
+> >> --- a/target/mips/translate_init.c
+> >> +++ b/target/mips/translate_init.c
+> >> @@ -51,63 +51,9 @@
+> >>   #define MIPS_CONFIG5                                              \
+> >>   ((0 << CP0C5_M))
+> >> -/* MMU types, the first four entries have the same layout as the
+> >> -   CP0C0_MT field.  */
+> >> -enum mips_mmu_types {
+> >> -    MMU_TYPE_NONE,
+> >> -    MMU_TYPE_R4000,
+> >> -    MMU_TYPE_RESERVED,
+> >> -    MMU_TYPE_FMT,
+> >> -    MMU_TYPE_R3000,
+> >> -    MMU_TYPE_R6000,
+> >> -    MMU_TYPE_R8000
+> >> -};
+> >> -
+> >> -struct mips_def_t {
+> >> -    const char *name;
+> >> -    int32_t CP0_PRid;
+> >> -    int32_t CP0_Config0;
+> >> -    int32_t CP0_Config1;
+> >> -    int32_t CP0_Config2;
+> >> -    int32_t CP0_Config3;
+> >> -    int32_t CP0_Config4;
+> >> -    int32_t CP0_Config4_rw_bitmask;
+> >> -    int32_t CP0_Config5;
+> >> -    int32_t CP0_Config5_rw_bitmask;
+> >> -    int32_t CP0_Config6;
+> >> -    int32_t CP0_Config7;
+> >> -    target_ulong CP0_LLAddr_rw_bitmask;
+> >> -    int CP0_LLAddr_shift;
+> >> -    int32_t SYNCI_Step;
+> >> -    int32_t CCRes;
+> >> -    int32_t CP0_Status_rw_bitmask;
+> >> -    int32_t CP0_TCStatus_rw_bitmask;
+> >> -    int32_t CP0_SRSCtl;
+> >> -    int32_t CP1_fcr0;
+> >> -    int32_t CP1_fcr31_rw_bitmask;
+> >> -    int32_t CP1_fcr31;
+> >> -    int32_t MSAIR;
+> >> -    int32_t SEGBITS;
+> >> -    int32_t PABITS;
+> >> -    int32_t CP0_SRSConf0_rw_bitmask;
+> >> -    int32_t CP0_SRSConf0;
+> >> -    int32_t CP0_SRSConf1_rw_bitmask;
+> >> -    int32_t CP0_SRSConf1;
+> >> -    int32_t CP0_SRSConf2_rw_bitmask;
+> >> -    int32_t CP0_SRSConf2;
+> >> -    int32_t CP0_SRSConf3_rw_bitmask;
+> >> -    int32_t CP0_SRSConf3;
+> >> -    int32_t CP0_SRSConf4_rw_bitmask;
+> >> -    int32_t CP0_SRSConf4;
+> >> -    int32_t CP0_PageGrain_rw_bitmask;
+> >> -    int32_t CP0_PageGrain;
+> >> -    int insn_flags;
+> >> -    enum mips_mmu_types mmu_type;
+> >> -};
+> >> -
+> >>  =20
+> >> /*********************************************************************=
+********/=20
+> >>
+> >>   /* MIPS CPU definitions */
+> >> -static const mips_def_t mips_defs[] =3D
+> >> +const mips_def_t mips_defs[] =3D
+> >>   {
+> >>       {
+> >>           .name =3D "4Kc",
+> >> @@ -803,6 +749,7 @@ static const mips_def_t mips_defs[] =3D
+> >>   #endif
+> >>   };
+> >> +const int mips_defs_number =3D ARRAY_SIZE(mips_defs);
+> >>   static const mips_def_t *cpu_mips_find_by_name (const char *name)
+> >>   {
+> >> =20
