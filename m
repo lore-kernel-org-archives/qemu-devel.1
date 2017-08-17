@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1diKcl-0008Ps-Gf
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 09:14:12 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1diKsd-0007al-2U
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 09:30:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1diKcg-0001F2-G7
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 09:14:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57894)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1diKcg-0001EY-9f
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 09:14:06 -0400
-From: David Hildenbrand <david@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1diKsX-0005n7-4j
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 09:30:35 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:36166)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1diKsW-0005mU-Vs
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 09:30:29 -0400
+Received: by mail-qk0-x243.google.com with SMTP id d21so4597831qke.3
+	for <qemu-devel@nongnu.org>; Thu, 17 Aug 2017 06:30:28 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
 References: <20170817092225.4264-1-david@redhat.com>
 	<20170817092225.4264-10-david@redhat.com>
 	<f2b025c6-bfd9-2b01-497c-d08f262bd0d5@amsat.org>
 	<1cb3a142-be2d-920e-7b9e-f3ea3df0ad52@redhat.com>
 	<c38eee58-0e16-1a3f-47f5-550f7cbc943f@redhat.com>
 	<42546fae-b442-2061-1b70-9b5603cab21d@redhat.com>
-	<20170817150746.54ca6150.cohuck@redhat.com>
-	<2f729af0-168b-25b8-621b-8a67c08bc6ce@redhat.com>
-Message-ID: <527ac6e5-9b2a-5eb5-048f-bfd13f12309e@redhat.com>
-Date: Thu, 17 Aug 2017 15:14:01 +0200
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <5e000894-664d-da8e-ac49-da8c76e5c36f@amsat.org>
+Date: Thu, 17 Aug 2017 10:30:24 -0300
 MIME-Version: 1.0
-In-Reply-To: <2f729af0-168b-25b8-621b-8a67c08bc6ce@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <42546fae-b442-2061-1b70-9b5603cab21d@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Subject: Re: [Qemu-devel] [PATCH v1 for-2.11 09/10] s390x/kvm: move KVM
  declarations and stubs to separate files
 List-Id: <qemu-devel.nongnu.org>
@@ -35,58 +40,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, Aurelien Jarno <aurelien@aurel32.net>, rth@twiddle.net
+To: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: cohuck@redhat.com, borntraeger@de.ibm.com, Aurelien Jarno <aurelien@aurel32.net>, rth@twiddle.net
 
-On 17.08.2017 15:10, David Hildenbrand wrote:
-> On 17.08.2017 15:07, Cornelia Huck wrote:
->> On Thu, 17 Aug 2017 15:06:10 +0200
->> Thomas Huth <thuth@redhat.com> wrote:
->>
->>> On 17.08.2017 14:55, David Hildenbrand wrote:
->>>> On 17.08.2017 14:35, Thomas Huth wrote: =20
->>>>> On 17.08.2017 13:40, Philippe Mathieu-Daud=C3=A9 wrote: =20
->>>>>> On 08/17/2017 06:22 AM, David Hildenbrand wrote: =20
->>> [...]
->>>>>>>   feat-src =3D $(SRC_PATH)/target/$(TARGET_BASE_ARCH)/
->>>>>>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
->>>>>>> index 74d5b35..aeb730c 100644
->>>>>>> --- a/target/s390x/cpu.h
->>>>>>> +++ b/target/s390x/cpu.h
->>>>>>> @@ -41,6 +41,7 @@
->>>>>>>   #include "exec/cpu-all.h"
->>>>>>>     #include "fpu/softfloat.h"
->>>>>>> +#include "kvm_s390x.h" =20
->>>>>
->>>>> Do we still need that? cpu.h should theoretically be independent fr=
-om
->>>>> kvm now, shouldn't it? And for the .c files, it's likely better to
->>>>> include kvm_s390x.h directly there if they require it. =20
->>>>
->>>> It should work if:
->>>>
->>>> a) we include "sysemu/kvm.h" in hw/s390x/s390-virtio-ccw.c
->>>> b) we include "target/s390x/kvm_s390x.h" in hw/intc/s390_flic_kvm.c
->>>> c) we include "kvm_s390x.h" in "internal.h"
->>>> d) we drop the "KVMState" parameter from kvm_s390_get_memslot_count(=
-)
->>>> (separate patch) =20
+On 08/17/2017 10:06 AM, Thomas Huth wrote:
+> On 17.08.2017 14:55, David Hildenbrand wrote:
+>> On 17.08.2017 14:35, Thomas Huth wrote:
+>>> On 17.08.2017 13:40, Philippe Mathieu-Daudé wrote:
+>>>> On 08/17/2017 06:22 AM, David Hildenbrand wrote:
+> [...]
+>>>>>    feat-src = $(SRC_PATH)/target/$(TARGET_BASE_ARCH)/
+>>>>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+>>>>> index 74d5b35..aeb730c 100644
+>>>>> --- a/target/s390x/cpu.h
+>>>>> +++ b/target/s390x/cpu.h
+>>>>> @@ -41,6 +41,7 @@
+>>>>>    #include "exec/cpu-all.h"
+>>>>>      #include "fpu/softfloat.h"
+>>>>> +#include "kvm_s390x.h"
 >>>
->>> Ok, that's rather a lot of changes already. Maybe that's rather
->>> something for a later patch instead, so I'm also fine if you keep in
->>> #include "kvm_s390x.h" in cpu.h here.
+>>> Do we still need that? cpu.h should theoretically be independent from
+>>> kvm now, shouldn't it? And for the .c files, it's likely better to
+>>> include kvm_s390x.h directly there if they require it.
 >>
->> Yup, let's defer it. It's not like that is the last series that will
->> ever go in.
+>> It should work if:
 >>
->=20
-> Sorry guys, already creating patches :)
->=20
+>> a) we include "sysemu/kvm.h" in hw/s390x/s390-virtio-ccw.c
+>> b) we include "target/s390x/kvm_s390x.h" in hw/intc/s390_flic_kvm.c
 
-s/guys/folks/ ;)
+that sounds odd... but git grep gives:
 
---=20
+hw/i386/kvm/apic.c:19:#include "target/i386/kvm_i386.h"
+hw/ppc/spapr_cpu_core.c:17:#include "target/ppc/kvm_ppc.h"
 
-Thanks,
+>> c) we include "kvm_s390x.h" in "internal.h"
+>> d) we drop the "KVMState" parameter from kvm_s390_get_memslot_count()
+>> (separate patch)
+> 
+> Ok, that's rather a lot of changes already. Maybe that's rather
+> something for a later patch instead, so I'm also fine if you keep in
+> #include "kvm_s390x.h" in cpu.h here.
 
-David
+there is still time until 2.11 :)
