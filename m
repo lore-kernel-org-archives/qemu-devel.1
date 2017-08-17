@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1diIuE-0003cp-BP
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:24:07 -0400
+	(envelope-from <bounces@canonical.com>) id 1diIw1-0005ou-S0
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:25:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1diIuA-0000d5-Cv
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:24:06 -0400
-Received: from 4.mo173.mail-out.ovh.net ([46.105.34.219]:37536)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1diIuA-0000cf-5r
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:24:02 -0400
-Received: from player791.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 56EE8698F5
-	for <qemu-devel@nongnu.org>; Thu, 17 Aug 2017 13:24:00 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Thu, 17 Aug 2017 13:23:50 +0200
-Message-ID: <150296903004.12575.16996499098384404656.stgit@bahia.lan>
+	(envelope-from <bounces@canonical.com>) id 1diIvx-0001qZ-SO
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:25:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53883)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1diIvx-0001qR-MR
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:25:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1diIvv-0006S1-V3
+	for <qemu-devel@nongnu.org>; Thu, 17 Aug 2017 11:25:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E7BDC2E80CC
+	for <qemu-devel@nongnu.org>; Thu, 17 Aug 2017 11:25:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v2] spapr: fallback to raw mode if best compat
- mode cannot be set during CAS
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 17 Aug 2017 11:08:24 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 821078 <821078@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20110804185353.20230.46645.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150296810470.8620.1264507752021135276.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 821078] Re: virtio-serial-bus: Unexpected port id
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +37,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-KVM PR doesn't allow to set a compat mode. This causes ppc_set_compat_all()
-to fail and we return H_HARDWARE to the guest right away.
+This looks like https://bugzilla.redhat.com/show_bug.cgi?id=3D819412
+which is about the same age.
 
-This is excessive: even if we favor compat mode since commit 152ef803ceb19,
-we should at least fallback to raw mode if the guest supports it.
+** Bug watch added: Red Hat Bugzilla #819412
+   https://bugzilla.redhat.com/show_bug.cgi?id=3D819412
 
-This patch modifies cas_check_pvr() so that it also reports that the real
-PVR was found in the table supplied by the guest. Note that this is only
-makes sense if raw mode isn't explicitely disabled (ie, the user didn't
-set the machine "max-cpu-compat" property). If this is the case, we can
-simply ignore ppc_set_compat_all() failures, and let the guest run in raw
-mode.
+-- =
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
-v2: - initialize raw_mode_supported to silent patchew
----
- hw/ppc/spapr_hcall.c |   18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/821078
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 07b3da8dc4cd..2f4c4f59e110 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1441,7 +1441,8 @@ static target_ulong h_signal_sys_reset(PowerPCCPU *cpu,
- }
- 
- static uint32_t cas_check_pvr(sPAPRMachineState *spapr, PowerPCCPU *cpu,
--                              target_ulong *addr, Error **errp)
-+                              target_ulong *addr, bool *raw_mode_supported,
-+                              Error **errp)
- {
-     bool explicit_match = false; /* Matched the CPU's real PVR */
-     uint32_t max_compat = spapr->max_compat_pvr;
-@@ -1481,6 +1482,8 @@ static uint32_t cas_check_pvr(sPAPRMachineState *spapr, PowerPCCPU *cpu,
-         return 0;
-     }
- 
-+    *raw_mode_supported = explicit_match;
-+
-     /* Parsing finished */
-     trace_spapr_cas_pvr(cpu->compat_pvr, explicit_match, best_compat);
- 
-@@ -1499,8 +1502,9 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
-     bool guest_radix;
-     Error *local_err = NULL;
-+    bool raw_mode_supported = false;
- 
--    cas_pvr = cas_check_pvr(spapr, cpu, &addr, &local_err);
-+    cas_pvr = cas_check_pvr(spapr, cpu, &addr, &raw_mode_supported, &local_err);
-     if (local_err) {
-         error_report_err(local_err);
-         return H_HARDWARE;
-@@ -1510,8 +1514,14 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     if (cpu->compat_pvr != cas_pvr) {
-         ppc_set_compat_all(cas_pvr, &local_err);
-         if (local_err) {
--            error_report_err(local_err);
--            return H_HARDWARE;
-+            /* We fail to set compat mode (likely because running with KVM PR),
-+             * but maybe we can fallback to raw mode if the guest supports it.
-+             */
-+            if (!raw_mode_supported) {
-+                error_report_err(local_err);
-+                return H_HARDWARE;
-+            }
-+            local_err = NULL;
-         }
-     }
- 
+Title:
+  virtio-serial-bus: Unexpected port id
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  With qemu-kvm-0.15.0-rc1 virtio-serial-bus reports an error, and windows =
+vdagent can not start.  qemu-0.15.0-rc1 behaves as expected, ie vdagent run=
+s in the guest, mouse passes seamlessly between spicec and host and copy/pa=
+ste works between guest and host.
+  qemu-kvm has been configured with
+  ./configure --target-list=3Dx86_64-softmmu --disable-curses  --disable-cu=
+rl --audio-drv-list=3Dalsa --audio-card-list=3Dsb16,ac97,hda --enable-vnc-t=
+hread --disable-bluez --enable-vhost-net --enable-spice
+  and is started with
+  qemu-system-x86_64 -cpu host -enable-kvm -pidfile /home/rick/qemu/hds/wxp=
+.pid -drive file=3D/home/rick/qemu/hds/wxp.raw,if=3Dvirtio,aio=3Dnative -m =
+1536 -name WinXP -net nic,model -net user -localtime -usb -vga qxl -device =
+virtio-serial-pci,id=3Dvirtio-serial0,max_ports=3D16,bus=3Dpci.0,addr=3D0x5=
+ -chardev spicevmc,name=3Dvdagent,id=3Dvdagent -device virtserialport,nr=3D=
+1,bus=3Dvirtio-serial0.0,chardev=3Dvdagent,name=3Dcom.redhat.spice.0 -spice=
+ port=3D1234,disable-ticketing -monitor stdio
+
+  I've also tried start qemu like
+  qemu-system-x86_64 -cpu host -enable-kvm -pidfile /home/rick/qemu/hds/wxp=
+.pid -drive file=3D/home/rick/qemu/hds/wxp.raw,if=3Dvirtio -m 768 -name Win=
+XP -net nic,model=3Dvirtio -net user -localtime -usb -vga qxl -device virti=
+o-serial -chardev spicevmc,name=3Dvdagent,id=3Dvdagent -device virtserialpo=
+rt,chardev=3Dvdagent,name=3Dcom.redhat.spice.0 -spice port=3D1234,disable-t=
+icketing -monitor stdio
+  and observed the same results.
+
+  the host runs 2.6.39.4 vanilla kernel.  the guest uses the most recent
+  virtio-serial, vga-qxl and vdagent from spice-space.org
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/821078/+subscriptions
