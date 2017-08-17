@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1diPbJ-0004Qv-41
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 14:33:02 -0400
+	(envelope-from <thuth@redhat.com>) id 1diPbZ-0004aj-Cl
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 14:33:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1diPbF-0006Xt-UL
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 14:33:01 -0400
-Resent-Message-Id: <E1diPbF-0006Xt-UL@eggs.gnu.org>
-Message-ID: <150299475927.27.5716239824585872477@205a2245145f>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170817180404.29334-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 17 Aug 2017 11:32:40 -0700 (PDT)
-Subject: Re: [Qemu-devel] [RFC PATCH 0/9] TCG Vector types and example
- conversion
+	(envelope-from <thuth@redhat.com>) id 1diPbW-0006eX-7a
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 14:33:17 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu, 17 Aug 2017 20:33:10 +0200
+Message-Id: <1502994790-21856-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/ppc/spapr: Fix segfault when instantiating
+ a 'pc-dimm' without 'memdev'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +18,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: famz@redhat.com, rth@twiddle.net, cota@braap.org, batuzovk@ispras.ru, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwODE3MTgwNDA0LjI5MzM0LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZwpT
-dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1JGQyBQQVRDSCAwLzldIFRDRyBWZWN0b3IgdHlwZXMgYW5k
-IGV4YW1wbGUgY29udmVyc2lvbgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
-bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3Jt
-YXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8g
-IkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMp
-Li4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVj
-a3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNo
-bwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQ
-VCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEz
-Mzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYmFiNjExOTJhNCB0YXJnZXQvYXJt
-L3RyYW5zbGF0ZS1hNjQ6IHZlY3RvcmlzZSBzbXVsbCB2RC40cywgdk4uWzQ4XXMsIHZNLmhbXQpj
-NWM3MzNhMWY5IHRhcmdldC9hcm0vaGVscGVyczogaW50cm9kdWNlIEFEVlNJTUQgZmxhZ3MKZTI3
-NjkxZjA3YSB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1hNjQ6IHJlZ2lzdGVyIGdsb2JhbCB2ZWN0b3Jz
-CjZhNTVlNjA0NTQgdGFyZ2V0L2FybS90cmFuc2xhdGUtYTY0OiByZWduYW1lcyAtPiB4X3JlZ25h
-bWVzCmU3YTBlMjQ2NmIgYXJtL2NwdS5oOiBhbGlnbiBWRlAgcmVnaXN0ZXJzCmVmYTk0YzA0Y2Ug
-aGVscGVyLWhlYWQ6IGFkZCBzdXBwb3J0IGZvciB2ZWMgdHlwZQpkOGM5NmViZGQyIHRjZzogZ2Vu
-ZXJhdGUgcHRycyB0byB2ZWN0b3IgcmVnaXN0ZXJzCjI2ZWMwN2MzZDcgdGNnOiBpbnRyb2R1Y2Ug
-dGhlIGNvbmNlcHRzIG9mIGEgVENHdl92ZWMgcmVnaXN0ZXIgdHlwZQo5ZWMzYjQ3NTRkIHRjZy9S
-RUFETUU6IGxpc3RpZnkgdGhlIFRDRyB0eXBlcy4KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
-aW5nIFBBVENIIDEvOTogdGNnL1JFQURNRTogbGlzdGlmeSB0aGUgVENHIHR5cGVzLi4uLgpDaGVj
-a2luZyBQQVRDSCAyLzk6IHRjZzogaW50cm9kdWNlIHRoZSBjb25jZXB0cyBvZiBhIFRDR3ZfdmVj
-IHJlZ2lzdGVyIHR5cGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMy85OiB0Y2c6IGdlbmVyYXRlIHB0cnMg
-dG8gdmVjdG9yIHJlZ2lzdGVycy4uLgpDaGVja2luZyBQQVRDSCA0Lzk6IGhlbHBlci1oZWFkOiBh
-ZGQgc3VwcG9ydCBmb3IgdmVjIHR5cGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNS85OiBhcm0vY3B1Lmg6
-IGFsaWduIFZGUCByZWdpc3RlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNi85OiB0YXJnZXQvYXJtL3Ry
-YW5zbGF0ZS1hNjQ6IHJlZ25hbWVzIC0+IHhfcmVnbmFtZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggNy85
-OiB0YXJnZXQvYXJtL3RyYW5zbGF0ZS1hNjQ6IHJlZ2lzdGVyIGdsb2JhbCB2ZWN0b3JzLi4uCkNo
-ZWNraW5nIFBBVENIIDgvOTogdGFyZ2V0L2FybS9oZWxwZXJzOiBpbnRyb2R1Y2UgQURWU0lNRCBm
-bGFncy4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNTA6IEZJTEU6IHRhcmdl
-dC9hcm0vYWR2c2ltZF9oZWxwZXJfZmxhZ3MuaDozMDoKKyAqICAgQURWU0lNRF9BTExfRUxUICAt
-IHRoZSB0b3RhbCBjb3VudCBvZiBlbGVtZW50cyAoZS5nLiBjbGVhciBhbGwtb3ByIGVsZW1lbnRz
-KQoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA2NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
-dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDkvOTogdGFyZ2V0
-L2FybS90cmFuc2xhdGUtYTY0OiB2ZWN0b3Jpc2Ugc211bGwgdkQuNHMsIHZOLls0OF1zLCB2TS5o
-W10uLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzY1OiBGSUxFOiB0YXJnZXQv
-YXJtL3RyYW5zbGF0ZS1hNjQuYzoxMDQ2OToKK3R5cGVkZWYgdm9pZCBBZHZTSU1ER2VuVHdvUGx1
-c09uZVZlY3RvckZuKFRDR3ZfdmVjLCBUQ0d2X3ZlYywgVENHdl9pMzIsIFRDR3ZfaTMyKTsKCkVS
-Uk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNzE6IEZJTEU6IHRhcmdldC9hcm0vdHJhbnNs
-YXRlLWE2NC5jOjEwNDc1Ogorc3RhdGljIGJvb2wgaGFuZGxlX3ZlY19zaW1kX211bF9hZGRzdWIo
-RGlzYXNDb250ZXh0ICpzLCB1aW50MzJfdCBpbnNuLCBpbnQgb3Bjb2RlLCBpbnQgc2l6ZSwgYm9v
-bCBpc19xLCBib29sIHUsIGludCBybiwgaW50IHJtLCBpbnQgcmQpCgpFUlJPUjogdGhhdCBvcGVu
-IGJyYWNlIHsgc2hvdWxkIGJlIG9uIHRoZSBwcmV2aW91cyBsaW5lCiM4NjogRklMRTogdGFyZ2V0
-L2FybS90cmFuc2xhdGUtYTY0LmM6MTA0OTA6CisgICAgICAgICAgICBpZiAoIXUpCisgICAgICAg
-ICAgICB7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojOTU6IEZJTEU6IHRhcmdl
-dC9hcm0vdHJhbnNsYXRlLWE2NC5jOjEwNDk5OgorICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBBRFZTSU1EX09QUl9FTFRfU0hJRlQsIEFEVlNJTURfT1BSX0VMVF9CSVRTLCA0
-KTsKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojOTk6IEZJTEU6IHRhcmdldC9hcm0v
-dHJhbnNsYXRlLWE2NC5jOjEwNTAzOgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgQURWU0lNRF9ET0ZGX0VMVF9TSElGVCwgQURWU0lNRF9ET0ZGX0VMVF9CSVRTLCA0
-KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNDE6IEZJTEU6IHRhcmdldC9h
-cm0vdHJhbnNsYXRlLWE2NC5jOjEwNTkwOgorICAgICAgICBpZiAoaGFuZGxlX3ZlY19zaW1kX211
-bF9hZGRzdWIocywgaW5zbiwgb3Bjb2RlLCBzaXplLCBpc19xLCB1LCBybiwgcm0sIHJkKSkgewoK
-dG90YWw6IDMgZXJyb3JzLCAzIHdhcm5pbmdzLCAxMDkgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
-aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
-bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
-YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+QEMU currently crashes when trying to use a 'pc-dimm' on the pseries
+machine without specifying its 'memdev' property. Let's add a sanity
+check to the pre_plug handler to fix this issue.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/ppc/spapr.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index f7a1972..22d400a 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2808,10 +2808,17 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+ {
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+-    MemoryRegion *mr = ddc->get_memory_region(dimm);
+-    uint64_t size = memory_region_size(mr);
++    MemoryRegion *mr;
++    uint64_t size;
+     char *mem_dev;
+ 
++    if (!dimm->hostmem) {
++        error_setg(errp, "'" PC_DIMM_MEMDEV_PROP "' property must be set");
++        return;
++    }
++
++    mr = ddc->get_memory_region(dimm);
++    size = memory_region_size(mr);
+     if (size % SPAPR_MEMORY_BLOCK_SIZE) {
+         error_setg(errp, "Hotplugged memory size must be a multiple of "
+                       "%lld MB", SPAPR_MEMORY_BLOCK_SIZE / M_BYTE);
+-- 
+1.8.3.1
