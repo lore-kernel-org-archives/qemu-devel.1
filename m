@@ -1,16 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1diGuY-0000Dd-Uv
+	(envelope-from <cohuck@redhat.com>) id 1diGuZ-0000Dk-Pi
 	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:16:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1diGuX-0004VX-O2
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:16:18 -0400
-From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Date: Thu, 17 Aug 2017 12:15:38 +0300
-Message-Id: <20170817091542.9403-1-pbutsykin@virtuozzo.com>
+	(envelope-from <cohuck@redhat.com>) id 1diGuW-0004Sz-KR
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:16:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:27335)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1diGuW-0004QC-Dp
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:16:16 -0400
+Date: Thu, 17 Aug 2017 11:16:09 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170817111609.4beac270.cohuck@redhat.com>
+In-Reply-To: <96918c60-9133-064a-d289-d13562a5f551@redhat.com>
+References: <1502861458-30270-1-git-send-email-thuth@redhat.com>
+	<96918c60-9133-064a-d289-d13562a5f551@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v7 0/4] Add shrink image for qcow2
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/s390x/ipl: The s390-ipl device is not
+ hot-pluggable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,100 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org, pbutsykin@virtuozzo.com
+To: David Hildenbrand <david@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 
-This patch add shrinking of the image file for qcow2. As a result, this allows
-us to reduce the virtual image size and free up space on the disk without
-copying the image. Image can be fragmented and shrink is done by punching holes
-in the image file.
+On Thu, 17 Aug 2017 11:05:35 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-# ./qemu-img create -f qcow2 image.qcow2 4G
-Formatting 'image.qcow2', fmt=qcow2 size=4294967296 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
+> On 16.08.2017 07:30, Thomas Huth wrote:
+> > The s390-ipl device can not be created by the user, since it is meant only
+> > to  be instantiated once internally to load the ROMs and kernel. If the user
+> > tries to do a "device_add s390-ipl" via the monitor later, QEMU aborts with
+> > a "ROM images must be loaded at startup" error message.
+> > 
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > ---
+> >  hw/s390x/ipl.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> > index cc36003..0d06fc1 100644
+> > --- a/hw/s390x/ipl.c
+> > +++ b/hw/s390x/ipl.c
+> > @@ -442,6 +442,8 @@ static void s390_ipl_class_init(ObjectClass *klass, void *data)
+> >      dc->reset = s390_ipl_reset;
+> >      dc->vmsd = &vmstate_ipl;
+> >      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> > +    /* Reason: Loads the ROMs and thus can only be used one time - internally */
+> > +    dc->user_creatable = false;
+> >  }
+> >  
+> >  static const TypeInfo s390_ipl_info = {
+> >   
+> 
+> Late but still
+> 
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> 
 
-# ./qemu-io -c "write -P 0x22 0 1G" image.qcow2
-wrote 1073741824/1073741824 bytes at offset 0
-1 GiB, 1 ops; 0:00:04.59 (222.886 MiB/sec and 0.2177 ops/sec)
+Not too late for me to add the tag :)
 
-# ./qemu-img resize image.qcow2 512M
-warning: qemu-img: Shrinking an image will delete all data beyond the shrunken image's end. Before performing such an operation, make sure there is no important data there.
-error: qemu-img: Use the --shrink option to perform a shrink operation.
-
-# ./qemu-img resize --shrink image.qcow2 128M
-Image resized.
-
-# ./qemu-img info image.qcow2
-image: image.qcow2
-file format: qcow2
-virtual size: 128M (134217728 bytes)
-disk size: 128M
-cluster_size: 65536
-Format specific information:
-    compat: 1.1
-    lazy refcounts: false
-    refcount bits: 16
-    corrupt: false
-
-# du -h image.qcow2
-129M    image.qcow2
-
-Changes from v1:
-- add --shrink flag for qemu-img resize
-- add qcow2_cache_discard
-- simplify qcow2_shrink_l1_table() to reduce the likelihood of image corruption
-- add new qemu-iotests for shrinking images
-
-Changes from v2:
-- replace qprintf() on error_report() (1)
-- rewrite warning messages (1)
-- enforce --shrink flag for all formats except raw (1)
-- split qcow2_cache_discard() (2)
-- minor fixes according to comments (3)
-- rewrite the last part of qcow2_shrink_reftable() to avoid
-  qcow2_free_clusters() calls inside (3)
-- improve test for shrinking image (4)
-
-Changes from v3:
-- rebase on "Implement a warning_report function" Alistair's patch-set (1)
-- spelling fixes (1)
-- the man page fix according to the discussion (1)
-- add call qcow2_signal_corruption() in case of image corruption (3)
-
-Changes from v4:
-- rebase on https://github.com/XanClic/qemu/commits/block Max's block branch
-
-Changes from v5:
-- the condition refcount == 0 should be enough to evict the l2/refcount cluster
-  from the cache (2)
-- overwrite the l1/refcount table in memory with zeros, even if overwriting the
-  l1/refcount table on disk has failed (3)
-- replace g_try_malloc() on g_malloc() for allocation reftable_tmp (3)
-
-Changes from v6:
-- rebase on master 1f29673387
-
-Pavel Butsykin (4):
-  qemu-img: add --shrink flag for resize
-  qcow2: add qcow2_cache_discard
-  qcow2: add shrink image support
-  qemu-iotests: add shrinking image test
-
- block/qcow2-cache.c        |  26 +++++++
- block/qcow2-cluster.c      |  50 +++++++++++++
- block/qcow2-refcount.c     | 140 ++++++++++++++++++++++++++++++++++++-
- block/qcow2.c              |  43 +++++++++---
- block/qcow2.h              |  17 +++++
- qapi/block-core.json       |   3 +-
- qemu-img-cmds.hx           |   4 +-
- qemu-img.c                 |  23 ++++++
- qemu-img.texi              |   6 +-
- tests/qemu-iotests/102     |   4 +-
- tests/qemu-iotests/163     | 170 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/163.out |   5 ++
- tests/qemu-iotests/group   |   1 +
- 13 files changed, 475 insertions(+), 17 deletions(-)
- create mode 100644 tests/qemu-iotests/163
- create mode 100644 tests/qemu-iotests/163.out
-
--- 
-2.14.1
+Thanks!
