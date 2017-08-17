@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1diMdQ-0000LL-PB
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 11:23:02 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1diMnf-0004xX-1y
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 11:33:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1diMdM-0003sV-7M
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 11:23:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56146)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1diMdL-0003sL-Ul
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 11:22:56 -0400
-Date: Thu, 17 Aug 2017 17:22:49 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170817172249.31cf5e3d@nial.brq.redhat.com>
-In-Reply-To: <20170817043102.6322-1-f4bug@amsat.org>
-References: <20170817043102.6322-1-f4bug@amsat.org>
+	(envelope-from <eric.auger@redhat.com>) id 1diMna-0001UR-W7
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 11:33:35 -0400
+References: <1500017104-3574-1-git-send-email-Bharat.Bhushan@nxp.com>
+	<1500017104-3574-2-git-send-email-Bharat.Bhushan@nxp.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <c5f6a0f8-0f7c-aff8-1411-ae83b8ff83e6@redhat.com>
+Date: Thu, 17 Aug 2017 17:33:10 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/8] QOMify MIPS cpu
+In-Reply-To: <1500017104-3574-2-git-send-email-Bharat.Bhushan@nxp.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 PATCH 1/2] target/arm/kvm: Translate the
+ MSI doorbell in kvm_arch_fixup_msi_route
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,81 +24,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Cc: =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, James Hogan <james.hogan@imgtec.com>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Bharat Bhushan <Bharat.Bhushan@nxp.com>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: wei@redhat.com, kevin.tian@intel.com, marc.zyngier@arm.com, tn@semihalf.com, will.deacon@arm.com, drjones@redhat.com, robin.murphy@arm.com, christoffer.dall@linaro.org
 
-On Thu, 17 Aug 2017 01:30:54 -0300
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+Hi Bharat,
+On 14/07/2017 09:25, Bharat Bhushan wrote:
+> Translate msi address if device is behind virtio-iommu.
+> This logic is similar to vSMMUv3/Intel iommu emulation.
+Why Intel?
+> 
+> This RFC patch does not handle the case where both vsmmuv3 and
+> virtio-iommu are available.
+I think this should be hidden by the creation of a base vIOMMU object as
+initiated by Peter in: "[Qemu-devel] [RFC PATCH 0/8] IOMMU: introduce
+common IOMMUObject". I will try to rebase the virtio-iommu and vsmmuv3
+series on this idea.
 
-> Hi,
->=20
-> While working with the mips codebase I had to QOMify it.
->=20
-> I then read Igor's series "complete cpu QOMification" [1] and after some =
-IRC
-> chat I suggested Igor to rebase his series on mine to avoid code moving
-> forward then back.
->=20
-> Since most of Igor's series is reviewed I'm posting this a week before 2.=
-11.
->=20
-> I'm not sure about the TypeInfo.abstract change so it is RFC.
->=20
-> Also I couldn't test it with KVM.
-Tested in TCG mode (boots debian mips/mips64 kernel with different cpu type=
-s),
-and new CPU leaf types show up on QOM tree as expected (QOMifycation is don=
-e as expected)
-and '-cpu help' also works as expected,
-so with checkpatch issues fixed you may add to patches my
+Thanks
 
-Tested-by: Igor Mammedov <imammedo@redhat.com>
-
-
-
->=20
-> Regards,
->=20
-> Phil.
->=20
-> [1]: http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg04414.html
->=20
-> Igor Mammedov (2):
->   mips: MIPSCPU model subclasses
->   mips: replace cpu_mips_init() with cpu_generic_init()
->=20
-> Philippe Mathieu-Daud=C3=A9 (6):
->   mips: move hw/mips/cputimer.c to target/mips/
->   mips: introduce internal.h and cleanup cpu.h
->   mips: split cpu_mips_realize_env() out of cpu_mips_init()
->   mips: call cpu_mips_realize_env() from mips_cpu_realizefn()
->   mips: now than MIPSCPU is QOMified, mark it abstract
->   mips: update mips_cpu_list() to use object_class_get_list()
->=20
->  target/mips/cpu-qom.h                         |   1 +
->  target/mips/cpu.h                             | 357 +-------------------=
---
->  target/mips/internal.h                        | 422 ++++++++++++++++++++=
-++++++
->  hw/mips/cps.c                                 |   2 +-
->  hw/mips/mips_fulong2e.c                       |   2 +-
->  hw/mips/mips_jazz.c                           |   2 +-
->  hw/mips/mips_malta.c                          |   2 +-
->  hw/mips/mips_mipssim.c                        |   2 +-
->  hw/mips/mips_r4k.c                            |   2 +-
->  hw/mips/cputimer.c =3D> target/mips/cp0_timer.c |   2 +-
->  target/mips/cpu.c                             |  57 +++-
->  target/mips/gdbstub.c                         |   1 +
->  target/mips/helper.c                          |  47 +++
->  target/mips/kvm.c                             |   1 +
->  target/mips/machine.c                         |   1 +
->  target/mips/msa_helper.c                      |   1 +
->  target/mips/op_helper.c                       |   1 +
->  target/mips/translate.c                       |  23 +-
->  target/mips/translate_init.c                  |  68 +----
->  hw/mips/Makefile.objs                         |   2 +-
->  target/mips/Makefile.objs                     |   2 +-
->  21 files changed, 549 insertions(+), 449 deletions(-)
->  create mode 100644 target/mips/internal.h
->  rename hw/mips/cputimer.c =3D> target/mips/cp0_timer.c (99%)
->=20
+Eric
+> 
+> Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
+> ---
+> v1-v2:
+>   - Added trace events
+>   - removed vSMMU3 link in patch description
+> 
+>  target/arm/kvm.c        | 25 +++++++++++++++++++++++++
+>  target/arm/trace-events |  3 +++
+>  2 files changed, 28 insertions(+)
+> 
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 4555468..5a28956 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -21,7 +21,11 @@
+>  #include "kvm_arm.h"
+>  #include "cpu.h"
+>  #include "internals.h"
+> +#include "trace.h"
+>  #include "hw/arm/arm.h"
+> +#include "hw/pci/pci.h"
+> +#include "hw/pci/msi.h"
+> +#include "hw/virtio/virtio-iommu.h"
+>  #include "exec/memattrs.h"
+>  #include "exec/address-spaces.h"
+>  #include "hw/boards.h"
+> @@ -611,6 +615,27 @@ int kvm_arm_vgic_probe(void)
+>  int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+>                               uint64_t address, uint32_t data, PCIDevice *dev)
+>  {
+> +    AddressSpace *as = pci_device_iommu_address_space(dev);
+> +    IOMMUTLBEntry entry;
+> +    IOMMUDevice *sdev;
+> +    VirtIOIOMMU *s;
+> +
+> +    if (as == &address_space_memory) {
+> +        return 0;
+> +    }
+> +
+> +    /* MSI doorbell address is translated by an IOMMU */
+> +    sdev = container_of(as, IOMMUDevice, as);
+> +    s = sdev->viommu;
+> +
+> +    entry = s->iommu_ops.translate(&sdev->iommu_mr, address, IOMMU_WO);
+> +
+> +    route->u.msi.address_lo = entry.translated_addr;
+> +    route->u.msi.address_hi = entry.translated_addr >> 32;
+> +
+> +    trace_kvm_arm_fixup_msi_route(address, sdev->devfn, sdev->iommu_mr.name,
+> +                                  entry.translated_addr);
+> +
+>      return 0;
+>  }
+>  
+> diff --git a/target/arm/trace-events b/target/arm/trace-events
+> index e21c84f..eff2822 100644
+> --- a/target/arm/trace-events
+> +++ b/target/arm/trace-events
+> @@ -8,3 +8,6 @@ arm_gt_tval_write(int timer, uint64_t value) "gt_tval_write: timer %d value %" P
+>  arm_gt_ctl_write(int timer, uint64_t value) "gt_ctl_write: timer %d value %" PRIx64
+>  arm_gt_imask_toggle(int timer, int irqstate) "gt_ctl_write: timer %d IMASK toggle, new irqstate %d"
+>  arm_gt_cntvoff_write(uint64_t value) "gt_cntvoff_write: value %" PRIx64
+> +
+> +# target/arm/kvm.c
+> +kvm_arm_fixup_msi_route(uint64_t iova, uint32_t devid, const char *name, uint64_t gpa) "MSI addr = 0x%"PRIx64" is translated for devfn=%d through %s into 0x%"PRIx64
+> 
