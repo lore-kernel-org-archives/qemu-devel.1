@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1diCp9-0004XM-Qg
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 00:54:29 -0400
+	(envelope-from <no-reply@patchew.org>) id 1diCr7-0005zb-91
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 00:56:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1diCp8-0000wO-VM
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 00:54:27 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170814215748.5158-1-ehabkost@redhat.com>
-	<20170814215748.5158-9-ehabkost@redhat.com>
-	<7327f3f6-16fb-e9c6-4f2a-eed6144f2282@redhat.com>
-Date: Thu, 17 Aug 2017 06:54:10 +0200
-In-Reply-To: <7327f3f6-16fb-e9c6-4f2a-eed6144f2282@redhat.com> (John Snow's
-	message of "Wed, 16 Aug 2017 17:46:18 -0400")
-Message-ID: <87mv6yssjx.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1diCr2-0003Dt-Op
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 00:56:29 -0400
+Resent-Message-Id: <E1diCr2-0003Dt-Op@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21313)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1diCr2-0003Cf-Hh
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 00:56:24 -0400
+Message-ID: <150294568458.27.15059400979281725389@205a2245145f>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20170817043102.6322-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC v4 08/13] ide: enumerate_slots implementation
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 16 Aug 2017 21:54:45 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/8] QOMify MIPS cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +28,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Laine Stump <laine@redhat.com>, qemu-block@nongnu.org
+To: f4bug@amsat.org
+Cc: famz@redhat.com, imammedo@redhat.com, hpoussin@reactos.org, aurelien@aurel32.net, yongbok.kim@imgtec.com, peter.maydell@linaro.org, thuth@redhat.com, james.hogan@imgtec.com, ehabkost@redhat.com, qemu-devel@nongnu.org
 
-John Snow <jsnow@redhat.com> writes:
-
-> On 08/14/2017 05:57 PM, Eduardo Habkost wrote:
->> Example output when using "-machine q35":
->> 
->>   {
->>     "available": true,
->>     "count": 1,
->>     "device-types": [
->>       "ide-device"
->>     ],
->>     "hotpluggable": false,
->>     "opts": [
->>       { "option": "unit", "values": 0 },
->>       { "option": "bus", "values": "ide.2" }
->>     ],
->>     "opts-complete": true
->>   }
->>   {
->>     "available": false,
->>     "count": 1,
->>     "device": "/machine/unattached/device[19]",
->>     "device-types": [
->>       "ide-device"
->>     ],
->>     "hotpluggable": false,
->>     "opts": [
->>       { "option": "unit", "values": 1 },
->>       { "option": "bus", "values": "ide.2" } ],
->>     "opts-complete": true
->>   }
->>   {
->>     "available": true,
->>     "count": 10,
->>     "device-types": [
->>       "ide-device"
->>     ],
->>     "hotpluggable": false,
->>     "opts": [
->>       { "option": "unit", "values": [ [ 0, 1 ] ] },
->
-> Hm, these unit values aren't really correct -- we do not support
-> primary/secondary semantics for IDE buses on the AHCI device. I guess
-> they technically exist, but you cannot use them for anything.
->
-> Should I do something to "disable" or otherwise hide the unusable
-> secondary unit slots for AHCI devices?
-
-I think that would make this introspection more useful.
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcwODE3MDQzMTAyLjYzMjItMS1mNGJ1Z0BhbXNhdC5vcmcKU3ViamVjdDog
+W1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzhdIFFPTWlmeSBNSVBTIGNwdQoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1v
+bmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
+LnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21t
+aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
+Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
+IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
+bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
+IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
+ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
+MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
+MTU1N2ExOTQxYiBtaXBzOiB1cGRhdGUgbWlwc19jcHVfbGlzdCgpIHRvIHVzZSBvYmplY3RfY2xh
+c3NfZ2V0X2xpc3QoKQpmZmYwNWU0Nzg2IG1pcHM6IHJlcGxhY2UgY3B1X21pcHNfaW5pdCgpIHdp
+dGggY3B1X2dlbmVyaWNfaW5pdCgpCjc4YWZhNTU5ZjQgIWZpeHVwIG1pcHM6IG5vdyB0aGFuIE1J
+UFNDUFUgaXMgUU9NaWZpZWQsIG1hcmsgaXQgYWJzdHJhY3QKZmYyOTI2NTcwYyBtaXBzOiBNSVBT
+Q1BVIG1vZGVsIHN1YmNsYXNzZXMKMzZmNjJhOGEwYiBtaXBzOiBjYWxsIGNwdV9taXBzX3JlYWxp
+emVfZW52KCkgZnJvbSBtaXBzX2NwdV9yZWFsaXplZm4oKQo4MjUwOTQ3ODBjIG1pcHM6IHNwbGl0
+IGNwdV9taXBzX3JlYWxpemVfZW52KCkgb3V0IG9mIGNwdV9taXBzX2luaXQoKQo3MzM5ZGU2OTVl
+IG1pcHM6IGludHJvZHVjZSBpbnRlcm5hbC5oIGFuZCBjbGVhbnVwIGNwdS5oCjAxMTE1MDYzNGUg
+bWlwczogbW92ZSBody9taXBzL2NwdXRpbWVyLmMgdG8gdGFyZ2V0L21pcHMvCgo9PT0gT1VUUFVU
+IEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzg6IG1pcHM6IG1vdmUgaHcvbWlwcy9jcHV0aW1l
+ci5jIHRvIHRhcmdldC9taXBzLy4uLgpDaGVja2luZyBQQVRDSCAyLzg6IG1pcHM6IGludHJvZHVj
+ZSBpbnRlcm5hbC5oIGFuZCBjbGVhbnVwIGNwdS5oLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVk
+IGFmdGVyIHRoYXQgJyYnIChjdHg6V3hXKQojNzI1OiBGSUxFOiB0YXJnZXQvbWlwcy9pbnRlcm5h
+bC5oOjIzMDoKKyAgICBpZiAoKGVudi0+Q1AwX1ZQQ29udHJvbCA+PiBDUDBWUEN0bF9ESVMpICYg
+MSkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJS
+T1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCAnJicgKGN0eDpXeFcpCiM3MzM6IEZJTEU6
+IHRhcmdldC9taXBzL2ludGVybmFsLmg6MjM4OgorICAgICAgICAgICAgKChvdGhlcl9jcHUtPmVu
+di5DUDBfVlBDb250cm9sID4+IENQMFZQQ3RsX0RJUykgJiAxKSkgewogICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNw
+YWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCAnJicgKGN0eDpXeFcpCiM3NTM6IEZJTEU6IHRhcmdl
+dC9taXBzL2ludGVybmFsLmg6MjU4OgorICAgICAgICBlbnYtPmhmbGFncyB8PSAoZW52LT5DUDBf
+U3RhdHVzID4+IENQMFN0X0tTVSkgJiBNSVBTX0hGTEFHX0tTVTsKICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAzIGVycm9ycywg
+MCB3YXJuaW5ncywgODQyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMvODogbWlwczogc3BsaXQgY3B1X21pcHNfcmVh
+bGl6ZV9lbnYoKSBvdXQgb2YgY3B1X21pcHNfaW5pdCgpLi4uCkNoZWNraW5nIFBBVENIIDQvODog
+bWlwczogY2FsbCBjcHVfbWlwc19yZWFsaXplX2VudigpIGZyb20gbWlwc19jcHVfcmVhbGl6ZWZu
+KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNS84OiBtaXBzOiBNSVBTQ1BVIG1vZGVsIHN1YmNsYXNzZXMu
+Li4KQ2hlY2tpbmcgUEFUQ0ggNi84OiAhZml4dXAgbWlwczogbm93IHRoYW4gTUlQU0NQVSBpcyBR
+T01pZmllZCwgbWFyayBpdCBhYnN0cmFjdC4uLgpDaGVja2luZyBQQVRDSCA3Lzg6IG1pcHM6IHJl
+cGxhY2UgY3B1X21pcHNfaW5pdCgpIHdpdGggY3B1X2dlbmVyaWNfaW5pdCgpLi4uCkNoZWNraW5n
+IFBBVENIIDgvODogbWlwczogdXBkYXRlIG1pcHNfY3B1X2xpc3QoKSB0byB1c2Ugb2JqZWN0X2Ns
+YXNzX2dldF9saXN0KCkuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
+IHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
+aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
+YXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
