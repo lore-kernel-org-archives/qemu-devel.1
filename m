@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Linu.Cherian@cavium.com>) id 1diNZx-0005K9-76
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 12:23:30 -0400
+	(envelope-from <lersek@redhat.com>) id 1diS0e-0001X6-4z
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 17:07:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Linu.Cherian@cavium.com>) id 1diNZw-00036O-6k
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 12:23:29 -0400
-Date: Thu, 17 Aug 2017 21:52:53 +0530
-From: Linu Cherian <linu.cherian@cavium.com>
-Message-ID: <20170817162253.GA6192@virtx40>
-References: <1501579994-3320-1-git-send-email-eric.auger@redhat.com>
-	<20170817112627.GA5417@virtx40>
-	<da30de94-118d-b81e-f163-b60f71894415@arm.com>
-	<20c68b9d-380d-1fbc-0fae-a5af44c2cdb2@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1diS0a-0005pI-4S
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 17:07:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59204)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1diS0Z-0005fW-Qz
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 17:07:16 -0400
+References: <1501835795-92331-1-git-send-email-hare@suse.de>
+	<1501835795-92331-4-git-send-email-hare@suse.de>
+	<cecc5581-7013-f870-dbd7-da28ac80d2a4@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <347fe244-d544-0bfa-f7a6-0f87ea7a475b@redhat.com>
+Date: Thu, 17 Aug 2017 22:57:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20c68b9d-380d-1fbc-0fae-a5af44c2cdb2@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-arm] [RFC v3 0/8] VIRTIO-IOMMU device
+In-Reply-To: <cecc5581-7013-f870-dbd7-da28ac80d2a4@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv2 3/4] scsi: clarify sense codes for LUN0
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +30,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>, Linu Cherian <linuc.decode@gmail.com>, peter.maydell@linaro.org, kevin.tian@intel.com, drjones@redhat.com, mst@redhat.com, marc.zyngier@arm.com, tn@semihalf.com, will.deacon@arm.com, qemu-devel@nongnu.org, peterx@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org, bharat.bhushan@nxp.com, christoffer.dall@linaro.org, eric.auger.pro@gmail.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Hannes Reinecke <hare@suse.de>
+Cc: Hannes Reinecke <hare@suse.com>, qemu-devel@nongnu.org
 
-On Thu Aug 17, 2017 at 05:26:53PM +0200, Auger Eric wrote:
-> Hi Linu, Jean,
+On 08/04/17 12:49, Paolo Bonzini wrote:
+> On 04/08/2017 10:36, Hannes Reinecke wrote:
+>> The LUN0 emulation is just that, an emulation for a non-existing
+>> LUN0. So we should be returning LUN_NOT_SUPPORTED for any request
+>> coming from any other LUN.
+>> And we should be aborting unhandled commands with INVALID OPCODE,
+>> not LUN NOT SUPPORTED.
+>>
+>> Signed-off-by: Hannes Reinecke <hare@suse.com>
+>> ---
+>>  hw/scsi/scsi-bus.c | 7 ++++++-
+>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+>> index 8419c75..79a222f 100644
+>> --- a/hw/scsi/scsi-bus.c
+>> +++ b/hw/scsi/scsi-bus.c
+>> @@ -583,6 +583,11 @@ static int32_t scsi_target_send_command(SCSIRequest *req, uint8_t *buf)
+>>  {
+>>      SCSITargetReq *r = DO_UPCAST(SCSITargetReq, req, req);
+>>  
+>> +    if (req->lun != 0) {
+>> +        scsi_req_build_sense(req, SENSE_CODE(LUN_NOT_SUPPORTED));
+>> +        scsi_req_complete(req, CHECK_CONDITION);
+>> +        return 0;
+>> +    }
+>>      switch (buf[0]) {
+>>      case REPORT_LUNS:
+>>          if (!scsi_target_emulate_report_luns(r)) {
+>> @@ -613,7 +618,7 @@ static int32_t scsi_target_send_command(SCSIRequest *req, uint8_t *buf)
+>>      case TEST_UNIT_READY:
+>>          break;
+>>      default:
+>> -        scsi_req_build_sense(req, SENSE_CODE(LUN_NOT_SUPPORTED));
+>> +        scsi_req_build_sense(req, SENSE_CODE(INVALID_OPCODE));
+>>          scsi_req_complete(req, CHECK_CONDITION);
+>>          return 0;
+>>      illegal_request:
+>>
 > 
-> On 17/08/2017 15:39, Jean-Philippe Brucker wrote:
-> > Hi Linu,
-> > 
-> > On 17/08/17 12:26, Linu Cherian wrote:
-> >> Hi Eric,
-> >>
-> >> On Tue Aug 01, 2017 at 11:33:06AM +0200, Eric Auger wrote:
-> >>> This series implements the virtio-iommu device.
-> >>>
-> >>> This v3 mostly is a rebase on top of v2.10-rc0 that uses
-> >>> IOMMUMmeoryRegion plus some small fixes.
-> >>>
-> >>> This is a proof of concept based on the virtio-iommu specification
-> >>> written by Jean-Philippe Brucker [1].
-> >>>
-> >>> The device gets instantiated using the "-device virtio-iommu-device"
-> >>> option. It currently works with ARM virt machine only, as the machine
-> >>> must handle the dt binding between the virtio-mmio "iommu" node and
-> >>> the PCI host bridge node.
-> >>>
-> >>> ACPI booting is not yet supported.
-> >>>
-> >>> Best Regards
-> >>>
-> >>> Eric
-> >>>
-> >>> This series can be found at:
-> >>> https://github.com/eauger/qemu/tree/v2.10.0-rc0-virtio-iommu-rfcv3
-> >>>
-> >>> References:
-> >>> [1] [RFC 0/3] virtio-iommu: a paravirtualized IOMMU,
-> >>> [2] [RFC PATCH linux] iommu: Add virtio-iommu driver
-> >>> [3] [RFC PATCH kvmtool 00/15] Add virtio-iommu
-> >>>
-> >>> Testing:
-> >>> - >= 4.12 guest kernel + virtio-iommu driver [2]
-> >>> - guest using a virtio-net-pci device:
-> >>>   ,vhost=off,iommu_platform,disable-modern=off,disable-legacy=on
-> >>
-> >> Was trying to test this out and facing issues.
-> >> Guest and Host Kernel - git://linux-arm.org/linux-jpb.git, Branch virtio-iommu/v0.4
-> >> Qemu - As mentioned above.
-> > 
-> > Could you try branch virtio-iommu/v0.1? It contains the UAPI headers
-> > compatible with this RFC.
-> Thank you Jean. Yes the QEMU virtio-iommu device is based on the first
-> user API written in [2]. I plan to rebase on v0.4 in short delay. Jean
-> can I rebase on virtio-iommu/v0.4 or shall I wait a bit more?
-> 
-> Thanks
+> I am queuing this one since it's an independent bugfix.
 
-Yes, virtio-iommu/v0.1 works for me. Thanks.
+This patch (ded6ddc5a7b9, "scsi: clarify sense codes for LUN0
+emulation", 2017-08-04) seems to confuse the media detection in edk2's
+"MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.c".
 
-> 
-> Eric
-> > 
-> > Thanks,
-> > Jean
-> > 
+Namely, when it enumerates the {targets}x{LUNs} matrix on the
+virtio-scsi HBA, it now reports the following message, for each
+(target,LUN) pair to which no actual SCSI device (like disk or CD-ROM)
+is assigned on the command line:
 
--- 
-Linu cherian
+ScsiDisk: Sense Key = 0x5 ASC = 0x25!
+
+Unfortunately, this is not all that happens -- the ScsiDiskDxe driver
+even installs a BlockIo protocol instance on the handle (again, there is
+no media, and no actual SCSI device), on which further protocols are
+stacked, such as BlockIo2:
+
+ScsiDisk: Sense Key = 0x5 ASC = 0x25!
+InstallProtocolInterface: [EfiBlockIoProtocol] 13A59A3A8
+InstallProtocolInterface: [EfiBlockIo2Protocol] 13A59A3D8
+InstallProtocolInterface: [EfiDiskInfoProtocol] 13A59A4D0
+
+In turn, in BDS, UEFI boot options are auto-generated for these devices,
+which is not nice, given that this procedure in BDS is very
+pflash-intensive, and pflash access is remarkably slow on aarch64 KVM.
+
+For example, if I use one virtio-scsi HBA, and put a CD-ROM on target 0,
+LUN 0, and a disk on target 1, LUN 0, then edk2 will create protocol
+interfaces, and matching boot options, for
+
+  2 targets * 7 LUNs/target = 14 LUNs
+
+of which only 2 make sense.
+
+
+If I revert the patch (on top of v2.10.0-rc3), then everything works as
+before -- BlockIo protocol instances are produced only for actual
+devices (with media).
+
+I guess the path forward is to fix the ScsiDiskDxe driver in edk2; the
+new ASC should be recognized.
+
+My question is, how *exactly* did this patch change the reported sense
+key and ASC? That is, what did they use to be *before*? INVALID_OPCODE?
+
+Thanks!
+Laszlo
