@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1diIVh-0004E6-6G
+	(envelope-from <wang.yong155@zte.com.cn>) id 1diIVh-0004E4-5i
 	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 06:58:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1diIVe-0004Kz-4V
+	(envelope-from <wang.yong155@zte.com.cn>) id 1diIVe-0004Ku-3q
 	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 06:58:45 -0400
-Received: from mx7.zte.com.cn ([202.103.147.169]:34570)
+Received: from mxhk.zte.com.cn ([63.217.80.70]:45040 helo=zte.com.cn)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1diIVd-0004Kc-HB
+	(envelope-from <wang.yong155@zte.com.cn>) id 1diIVd-0004Kd-Gm
 	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 06:58:42 -0400
 From: Wang yong <wang.yong155@zte.com.cn>
-Date: Thu, 17 Aug 2017 18:58:00 +0800
-Message-Id: <1502967483-4090-1-git-send-email-wang.yong155@zte.com.cn>
-Subject: [Qemu-devel] [PATCHv3 00/03] Replace the COLO comparing thread with
- IOThread
+Date: Thu, 17 Aug 2017 18:58:01 +0800
+Message-Id: <1502967483-4090-2-git-send-email-wang.yong155@zte.com.cn>
+In-Reply-To: <1502967483-4090-1-git-send-email-wang.yong155@zte.com.cn>
+References: <1502967483-4090-1-git-send-email-wang.yong155@zte.com.cn>
+Subject: [Qemu-devel] [PATCHv3 01/03] qemu-iothread: IOThread supports the
+ GMainContext event loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,27 +29,110 @@ Cc: wang.yong155@zte.com.cn, wang.guang55@zte.com.cn, lizhijian@cn.fujitsu.com, 
 
 From: Wang Yong <wang.yong155@zte.com.cn>
 
-It's a good idea to use IOThread instead of COLO comparing thread.
-comparing thread can be completely replaced by IOThread, so this idea came.
+IOThread uses AioContext event loop and does not run a GMainContext.
+Therefore,chardev cannot work in IOThread,such as the chardev is
+used for colo-compare packets reception.
 
-This series of updates mainly include IOThread supports the GMainContext
-event loop, then the old packet regularly check and primary/secondary network
-packets compare all into the IOThread processing.
+This patch makes the IOThread run the GMainContext event loop,
+chardev and IOThread can work together.
 
-Please review,thanks.
+Signed-off-by: Wang Yong <wang.yong155@zte.com.cn>
+Signed-off-by: Wang Guang <wang.guang55@zte.com.cn>
+---
+ include/sysemu/iothread.h |  4 ++++
+ iothread.c                | 41 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 45 insertions(+)
 
-wangyong(3):
-qemu-iothread: IOThread supports the GMainContext event loop
-colo-compare: Use IOThread to Check old packet regularly and
- Process pactkets of the primary
-colo-compare: Update the COLO document to add the IOThread
- configuration
-
- include/sysemu/iothread.h | 10 +++++++++
- iothread.c                | 54 +++++++++++++++++++++++++++++++++++++++++++++++
- net/colo-compare.c | 75 ++++++++++++++++++++++++++++--------------------------
- docs/colo-proxy.txt | 3 ++- 
- 4 file changed, 86 insertions(+), 37 deletions(-)
-
---
+diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
+index e6da1a4..d2985b3 100644
+--- a/include/sysemu/iothread.h
++++ b/include/sysemu/iothread.h
+@@ -24,6 +24,9 @@ typedef struct {
+ 
+     QemuThread thread;
+     AioContext *ctx;
++    GMainContext *worker_context;
++    GMainLoop *main_loop;
++    GOnce once;
+     QemuMutex init_done_lock;
+     QemuCond init_done_cond;    /* is thread initialization done? */
+     bool stopping;
+@@ -41,5 +44,6 @@ typedef struct {
+ char *iothread_get_id(IOThread *iothread);
+ AioContext *iothread_get_aio_context(IOThread *iothread);
+ void iothread_stop_all(void);
++GMainContext *iothread_get_g_main_context(IOThread *iothread);
+ 
+ #endif /* IOTHREAD_H */
+diff --git a/iothread.c b/iothread.c
+index beeb870..80ef830 100644
+--- a/iothread.c
++++ b/iothread.c
+@@ -57,6 +57,20 @@ static void *iothread_run(void *opaque)
+ 
+     while (!atomic_read(&iothread->stopping)) {
+         aio_poll(iothread->ctx, true);
++
++        if (atomic_read(&iothread->worker_context)) {
++            g_main_context_push_thread_default(iothread->worker_context);
++            iothread->main_loop =
++                g_main_loop_new(iothread->worker_context, TRUE);
++            g_main_loop_run(iothread->main_loop);
++
++            g_main_loop_unref(iothread->main_loop);
++            iothread->main_loop = NULL;
++
++            g_main_context_pop_thread_default(iothread->worker_context);
++            g_main_context_unref(iothread->worker_context);
++            iothread->worker_context = NULL;
++        }
+     }
+ 
+     rcu_unregister_thread();
+@@ -73,6 +87,9 @@ static int iothread_stop(Object *object, void *opaque)
+     }
+     iothread->stopping = true;
+     aio_notify(iothread->ctx);
++    if (atomic_read(&iothread->main_loop)) {
++        g_main_loop_quit(iothread->main_loop);
++    }
+     qemu_thread_join(&iothread->thread);
+     return 0;
+ }
+@@ -125,6 +142,7 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
+ 
+     qemu_mutex_init(&iothread->init_done_lock);
+     qemu_cond_init(&iothread->init_done_cond);
++    iothread->once = (GOnce) G_ONCE_INIT;
+ 
+     /* This assumes we are called from a thread with useful CPU affinity for us
+      * to inherit.
+@@ -309,3 +327,26 @@ void iothread_stop_all(void)
+ 
+     object_child_foreach(container, iothread_stop, NULL);
+ }
++
++static gpointer iothread_g_main_context_init(gpointer opaque)
++{
++    AioContext *ctx;
++    IOThread *iothread = opaque;
++    GSource *source;
++
++    iothread->worker_context = g_main_context_new();
++
++    ctx = iothread_get_aio_context(iothread);
++    source = aio_get_g_source(ctx);
++    g_source_attach(source, iothread->worker_context);
++    g_source_unref(source);
++
++    return NULL;
++}
++
++GMainContext *iothread_get_g_main_context(IOThread *iothread)
++{
++    g_once(&iothread->once, iothread_g_main_context_init, iothread);
++
++    return iothread->worker_context;
++}
+-- 
 1.8.3.1
