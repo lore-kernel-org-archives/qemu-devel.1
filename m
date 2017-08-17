@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1diLi7-0001tG-9b
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 10:23:48 -0400
+	(envelope-from <berto@igalia.com>) id 1diLnT-0005hI-Be
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 10:29:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1diLi4-0003Rk-3G
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 10:23:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:29723)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1diLi3-0003RP-QQ
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 10:23:44 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C72D313AAB
-	for <qemu-devel@nongnu.org>; Thu, 17 Aug 2017 14:23:42 +0000 (UTC)
-References: <20170817141148.13111-1-famz@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dad88591-da0d-d9dd-ef0d-4153bbc68b85@redhat.com>
-Date: Thu, 17 Aug 2017 16:23:35 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170817141148.13111-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] scsi-block: Add qdev error properties
+	(envelope-from <berto@igalia.com>) id 1diLnQ-0006ue-5e
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 10:29:19 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Thu, 17 Aug 2017 17:28:14 +0300
+Message-Id: <112e28c8da085ffd59381d86f3acb0b8f75d5f9a.1502979710.git.berto@igalia.com>
+In-Reply-To: <cover.1502979710.git.berto@igalia.com>
+References: <cover.1502979710.git.berto@igalia.com>
+In-Reply-To: <cover.1502979710.git.berto@igalia.com>
+References: <cover.1502979710.git.berto@igalia.com>
+Subject: [Qemu-devel] [PATCH 3/4] throttle: Remove throttle_fix_bucket() /
+ throttle_unfix_bucket()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,181 +22,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>
 
-On 17/08/2017 16:11, Fam Zheng wrote:
-> This makes the werror/rerror options available on the scsi-block device=
-,
-> to allow user specify error handling policy in the same way as scsi-hd
-> etc.
->=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
->=20
-> ---
->=20
-> Take care of status, error, sense and QMP as well. [Paolo]
-> ---
->  hw/scsi/scsi-disk.c | 81 ++++++++++++++++++++++++++++++++++++++-------=
---------
->  1 file changed, 59 insertions(+), 22 deletions(-)
->=20
-> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-> index 5f1e5e8070..124d77c159 100644
-> --- a/hw/scsi/scsi-disk.c
-> +++ b/hw/scsi/scsi-disk.c
-> @@ -106,7 +106,8 @@ typedef struct SCSIDiskState
->      bool tray_locked;
->  } SCSIDiskState;
-> =20
-> -static int scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_f=
-ailed);
-> +static int scsi_handle_rw_error(SCSIDiskReq *r, int error, int status,
-> +                                bool update_sense, bool acct_failed);
-> =20
->  static void scsi_free_request(SCSIRequest *req)
->  {
-> @@ -179,21 +180,23 @@ static void scsi_disk_load_request(QEMUFile *f, S=
-CSIRequest *req)
-> =20
->  static bool scsi_disk_req_check_error(SCSIDiskReq *r, int ret, bool ac=
-ct_failed)
->  {
-> +    int status =3D r->status ? *r->status : 0;
-> +
->      if (r->req.io_canceled) {
->          scsi_req_cancel_complete(&r->req);
->          return true;
->      }
-> =20
-> -    if (ret < 0) {
-> -        return scsi_handle_rw_error(r, -ret, acct_failed);
-> +    if (ret < 0 || status) {
-> +        return scsi_handle_rw_error(r, -ret, status, !r->status, acct_=
-failed);
+The throttling code can change internally the value of bkt->max if it
+hasn't been set by the user. The problem with this is that if we want
+to retrieve the original value we have to undo this change first. This
+is ugly and unnecessary: this patch removes the throttle_fix_bucket()
+and throttle_unfix_bucket() functions completely and moves the logic
+to throttle_compute_wait().
 
-Do we need to pass both ret and !r->status?  We should update the sense
-whenever error !=3D 0, meaning the command hasn't run, so you can just ad=
-d a
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ util/throttle.c | 62 +++++++++++++++++++++------------------------------------
+ 1 file changed, 23 insertions(+), 39 deletions(-)
 
-	case 0:
-	    /* The command has run, no need to fake sense.  */
-	    assert(r->status && *r->status);
-	    scsi_req_complete(&r->req, *r->status);
-
-in scsi_handle_rw_error's switch statement.
-
->      }
-> =20
-> -    if (r->status && *r->status) {
-> +    if (status) {
->          if (acct_failed) {
->              SCSIDiskState *s =3D DO_UPCAST(SCSIDiskState, qdev, r->req=
-.dev);
->              block_acct_failed(blk_get_stats(s->qdev.conf.blk), &r->acc=
-t);
->          }
-> -        scsi_req_complete(&r->req, *r->status);
-> +        scsi_req_complete(&r->req, status);
->          return true;
-
-This "if" is now dead code (yay!).
-
->      }
-> =20
-> @@ -428,7 +447,8 @@ static void scsi_read_data(SCSIRequest *req)
->   * scsi_handle_rw_error always manages its reference counts, independe=
-nt
->   * of the return value.
->   */
-> -static int scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_f=
-ailed)
-> +static int scsi_handle_rw_error(SCSIDiskReq *r, int error, int status,
-> +                                bool update_sense, bool acct_failed)
->  {
->      bool is_read =3D (r->req.cmd.mode =3D=3D SCSI_XFER_FROM_DEV);
->      SCSIDiskState *s =3D DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
-> @@ -439,22 +459,38 @@ static int scsi_handle_rw_error(SCSIDiskReq *r, i=
-nt error, bool acct_failed)
->          if (acct_failed) {
->              block_acct_failed(blk_get_stats(s->qdev.conf.blk), &r->acc=
-t);
->          }
-> -        switch (error) {
-> -        case ENOMEDIUM:
-> -            scsi_check_condition(r, SENSE_CODE(NO_MEDIUM));
-> -            break;
-> -        case ENOMEM:
-> -            scsi_check_condition(r, SENSE_CODE(TARGET_FAILURE));
-> -            break;
-> -        case EINVAL:
-> -            scsi_check_condition(r, SENSE_CODE(INVALID_FIELD));
-> -            break;
-> -        case ENOSPC:
-> -            scsi_check_condition(r, SENSE_CODE(SPACE_ALLOC_FAILED));
-> -            break;
-> -        default:
-> -            scsi_check_condition(r, SENSE_CODE(IO_ERROR));
-> -            break;
-> +        if (update_sense) {
-> +            switch (error) {
-> +            case ENOMEDIUM:
-> +                scsi_check_condition(r, SENSE_CODE(NO_MEDIUM));
-> +                break;
-> +            case ENOMEM:
-> +                scsi_check_condition(r, SENSE_CODE(TARGET_FAILURE));
-> +                break;
-> +            case EINVAL:
-> +                scsi_check_condition(r, SENSE_CODE(INVALID_FIELD));
-> +                break;
-> +            case ENOSPC:
-> +                scsi_check_condition(r, SENSE_CODE(SPACE_ALLOC_FAILED)=
-);
-> +                break;
-> +            default:
-> +                scsi_check_condition(r, SENSE_CODE(IO_ERROR));
-> +                break;
-> +            }
-> +        }
-
-Because of the dead code above, you're now not running scsi_req_complete.
-
-> +    }
-> +    if (!error) {
-> +        assert(status);
-
-Since you are using the request object, you might as well
-"assert(r->status && *r->status)" and skip passing the argument.
-
-> +        if (scsi_sense_matches(r, SENSE_CODE(NO_MEDIUM))) {
-> +            error =3D ENOMEDIUM;
-> +        } else if (scsi_sense_matches(r, SENSE_CODE(TARGET_FAILURE))) =
-{
-> +            error =3D ENOMEM;
-> +        } else if (scsi_sense_matches(r, SENSE_CODE(INVALID_FIELD))) {
-> +            error =3D EINVAL;
-> +        } else if (scsi_sense_matches(r, SENSE_CODE(SPACE_ALLOC_FAILED=
-))) {
-> +            error =3D ENOSPC;
-> +        } else {
-> +            error =3D EIO;
-
-Nice touch :) and in fact the ENOSPC case is needed for correctness.
-
-Later we could also add a blk_error_action version that takes a char*,
-and pass a string that describes the sense data (see Linux
-drivers/scsi/sense_codes.h).
-
-Paolo
-
->          }
->      }
->      blk_error_action(s->qdev.conf.blk, action, is_read, error);
-> @@ -2972,6 +3008,7 @@ static const TypeInfo scsi_cd_info =3D {
-> =20
->  #ifdef __linux__
->  static Property scsi_block_properties[] =3D {
-> +    DEFINE_BLOCK_ERROR_PROPERTIES(SCSIDiskState, qdev.conf),         \
->      DEFINE_PROP_DRIVE("drive", SCSIDiskState, qdev.conf.blk),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->=20
+diff --git a/util/throttle.c b/util/throttle.c
+index 9a6bda813c..1f29cf9918 100644
+--- a/util/throttle.c
++++ b/util/throttle.c
+@@ -95,23 +95,36 @@ static int64_t throttle_do_compute_wait(double limit, double extra)
+ int64_t throttle_compute_wait(LeakyBucket *bkt)
+ {
+     double extra; /* the number of extra units blocking the io */
++    double bucket_size;   /* I/O before throttling to bkt->avg */
++    double burst_bucket_size; /* Before throttling to bkt->max */
+ 
+     if (!bkt->avg) {
+         return 0;
+     }
+ 
+-    /* If the bucket is full then we have to wait */
+-    extra = bkt->level - bkt->max * bkt->burst_length;
++    if (!bkt->max) {
++        /* If bkt->max is 0 we still want to allow short bursts of I/O
++         * from the guest, otherwise every other request will be throttled
++         * and performance will suffer considerably. */
++        bucket_size = bkt->avg / 10;
++        burst_bucket_size = 0;
++    } else {
++        /* If we have a burst limit then we have to wait until all I/O
++         * at burst rate has finished before throttling to bkt->avg */
++        bucket_size = bkt->max * bkt->burst_length;
++        burst_bucket_size = bkt->max / 10;
++    }
++
++    /* If the main bucket is full then we have to wait */
++    extra = bkt->level - bucket_size;
+     if (extra > 0) {
+         return throttle_do_compute_wait(bkt->avg, extra);
+     }
+ 
+-    /* If the bucket is not full yet we have to make sure that we
+-     * fulfill the goal of bkt->max units per second. */
++    /* If the main bucket is not full yet we still have to check the
++     * burst bucket in order to enforce the burst limit */
+     if (bkt->burst_length > 1) {
+-        /* We use 1/10 of the max value to smooth the throttling.
+-         * See throttle_fix_bucket() for more details. */
+-        extra = bkt->burst_level - bkt->max / 10;
++        extra = bkt->burst_level - burst_bucket_size;
+         if (extra > 0) {
+             return throttle_do_compute_wait(bkt->max, extra);
+         }
+@@ -358,31 +371,6 @@ bool throttle_is_valid(ThrottleConfig *cfg, Error **errp)
+     return true;
+ }
+ 
+-/* fix bucket parameters */
+-static void throttle_fix_bucket(LeakyBucket *bkt)
+-{
+-    double min;
+-
+-    /* zero bucket level */
+-    bkt->level = bkt->burst_level = 0;
+-
+-    /* If bkt->max is 0 we still want to allow short bursts of I/O
+-     * from the guest, otherwise every other request will be throttled
+-     * and performance will suffer considerably. */
+-    min = bkt->avg / 10;
+-    if (bkt->avg && !bkt->max) {
+-        bkt->max = min;
+-    }
+-}
+-
+-/* undo internal bucket parameter changes (see throttle_fix_bucket()) */
+-static void throttle_unfix_bucket(LeakyBucket *bkt)
+-{
+-    if (bkt->max < bkt->avg) {
+-        bkt->max = 0;
+-    }
+-}
+-
+ /* Used to configure the throttle
+  *
+  * @ts: the throttle state we are working on
+@@ -397,8 +385,10 @@ void throttle_config(ThrottleState *ts,
+ 
+     ts->cfg = *cfg;
+ 
++    /* Zero bucket level */
+     for (i = 0; i < BUCKETS_COUNT; i++) {
+-        throttle_fix_bucket(&ts->cfg.buckets[i]);
++        ts->cfg.buckets[i].level = 0;
++        ts->cfg.buckets[i].burst_level = 0;
+     }
+ 
+     ts->previous_leak = qemu_clock_get_ns(clock_type);
+@@ -411,13 +401,7 @@ void throttle_config(ThrottleState *ts,
+  */
+ void throttle_get_config(ThrottleState *ts, ThrottleConfig *cfg)
+ {
+-    int i;
+-
+     *cfg = ts->cfg;
+-
+-    for (i = 0; i < BUCKETS_COUNT; i++) {
+-        throttle_unfix_bucket(&cfg->buckets[i]);
+-    }
+ }
+ 
+ 
+-- 
+2.11.0
