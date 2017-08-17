@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1diGuZ-0000Dk-Pi
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1diGuY-0000D1-Km
 	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:16:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1diGuW-0004Sz-KR
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:16:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27335)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1diGuW-0004QC-Dp
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:16:16 -0400
-Date: Thu, 17 Aug 2017 11:16:09 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170817111609.4beac270.cohuck@redhat.com>
-In-Reply-To: <96918c60-9133-064a-d289-d13562a5f551@redhat.com>
-References: <1502861458-30270-1-git-send-email-thuth@redhat.com>
-	<96918c60-9133-064a-d289-d13562a5f551@redhat.com>
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1diGuX-0004V4-CL
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:16:18 -0400
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Date: Thu, 17 Aug 2017 12:15:40 +0300
+Message-Id: <20170817091542.9403-3-pbutsykin@virtuozzo.com>
+In-Reply-To: <20170817091542.9403-1-pbutsykin@virtuozzo.com>
+References: <20170817091542.9403-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/s390x/ipl: The s390-ipl device is not
- hot-pluggable
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v7 2/4] qcow2: add qcow2_cache_discard
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +21,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org, pbutsykin@virtuozzo.com
 
-On Thu, 17 Aug 2017 11:05:35 +0200
-David Hildenbrand <david@redhat.com> wrote:
+Whenever l2/refcount table clusters are discarded from the file we can
+automatically drop unnecessary content of the cache tables. This reduces
+the chance of eviction useful cache data and eliminates inconsistent data
+in the cache with the data in the file.
 
-> On 16.08.2017 07:30, Thomas Huth wrote:
-> > The s390-ipl device can not be created by the user, since it is meant only
-> > to  be instantiated once internally to load the ROMs and kernel. If the user
-> > tries to do a "device_add s390-ipl" via the monitor later, QEMU aborts with
-> > a "ROM images must be loaded at startup" error message.
-> > 
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > ---
-> >  hw/s390x/ipl.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> > index cc36003..0d06fc1 100644
-> > --- a/hw/s390x/ipl.c
-> > +++ b/hw/s390x/ipl.c
-> > @@ -442,6 +442,8 @@ static void s390_ipl_class_init(ObjectClass *klass, void *data)
-> >      dc->reset = s390_ipl_reset;
-> >      dc->vmsd = &vmstate_ipl;
-> >      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-> > +    /* Reason: Loads the ROMs and thus can only be used one time - internally */
-> > +    dc->user_creatable = false;
-> >  }
-> >  
-> >  static const TypeInfo s390_ipl_info = {
-> >   
-> 
-> Late but still
-> 
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> 
+Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ block/qcow2-cache.c    | 26 ++++++++++++++++++++++++++
+ block/qcow2-refcount.c | 20 ++++++++++++++++++--
+ block/qcow2.h          |  3 +++
+ 3 files changed, 47 insertions(+), 2 deletions(-)
 
-Not too late for me to add the tag :)
-
-Thanks!
+diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
+index 1d25147392..75746a7f43 100644
+--- a/block/qcow2-cache.c
++++ b/block/qcow2-cache.c
+@@ -411,3 +411,29 @@ void qcow2_cache_entry_mark_dirty(BlockDriverState *bs, Qcow2Cache *c,
+     assert(c->entries[i].offset != 0);
+     c->entries[i].dirty = true;
+ }
++
++void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
++                                  uint64_t offset)
++{
++    int i;
++
++    for (i = 0; i < c->size; i++) {
++        if (c->entries[i].offset == offset) {
++            return qcow2_cache_get_table_addr(bs, c, i);
++        }
++    }
++    return NULL;
++}
++
++void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table)
++{
++    int i = qcow2_cache_get_table_idx(bs, c, table);
++
++    assert(c->entries[i].ref == 0);
++
++    c->entries[i].offset = 0;
++    c->entries[i].lru_counter = 0;
++    c->entries[i].dirty = false;
++
++    qcow2_cache_table_release(bs, c, i, 1);
++}
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 168fc32e7b..8c17c0e3aa 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -861,8 +861,24 @@ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
+         }
+         s->set_refcount(refcount_block, block_index, refcount);
+ 
+-        if (refcount == 0 && s->discard_passthrough[type]) {
+-            update_refcount_discard(bs, cluster_offset, s->cluster_size);
++        if (refcount == 0) {
++            void *table;
++
++            table = qcow2_cache_is_table_offset(bs, s->refcount_block_cache,
++                                                offset);
++            if (table != NULL) {
++                qcow2_cache_put(bs, s->refcount_block_cache, &refcount_block);
++                qcow2_cache_discard(bs, s->refcount_block_cache, table);
++            }
++
++            table = qcow2_cache_is_table_offset(bs, s->l2_table_cache, offset);
++            if (table != NULL) {
++                qcow2_cache_discard(bs, s->l2_table_cache, table);
++            }
++
++            if (s->discard_passthrough[type]) {
++                update_refcount_discard(bs, cluster_offset, s->cluster_size);
++            }
+         }
+     }
+ 
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 96a8d43c17..52c374e9ed 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -649,6 +649,9 @@ int qcow2_cache_get(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
+ int qcow2_cache_get_empty(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
+     void **table);
+ void qcow2_cache_put(BlockDriverState *bs, Qcow2Cache *c, void **table);
++void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
++                                  uint64_t offset);
++void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table);
+ 
+ /* qcow2-bitmap.c functions */
+ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
+-- 
+2.14.1
