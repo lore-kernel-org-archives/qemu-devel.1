@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1diArd-00010B-O3
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 22:48:54 -0400
+	(envelope-from <famz@redhat.com>) id 1diArj-00016p-F2
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 22:49:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1diAra-0001kO-Li
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 22:48:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56006)
+	(envelope-from <famz@redhat.com>) id 1diAri-0001lT-Au
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 22:48:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44564)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1diAra-0001kA-FE
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 22:48:50 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1diAri-0001lB-4k
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 22:48:58 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Thu, 17 Aug 2017 10:47:42 +0800
-Message-Id: <20170817024746.5961-7-famz@redhat.com>
+Date: Thu, 17 Aug 2017 10:47:43 +0800
+Message-Id: <20170817024746.5961-8-famz@redhat.com>
 In-Reply-To: <20170817024746.5961-1-famz@redhat.com>
 References: <20170817024746.5961-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC v2 06/10] tests: Add FreeBSD image
+Subject: [Qemu-devel] [PATCH RFC v2 07/10] tests: Add NetBSD image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,19 +32,19 @@ https://wiki.qemu.org/Hosts/BSD
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/vm/freebsd | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/vm/netbsd | 45 +++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 45 insertions(+)
- create mode 100755 tests/vm/freebsd
+ create mode 100755 tests/vm/netbsd
 
-diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+diff --git a/tests/vm/netbsd b/tests/vm/netbsd
 new file mode 100755
-index 0000000000..0e4eb037d7
+index 0000000000..7d7dfe6586
 --- /dev/null
-+++ b/tests/vm/freebsd
++++ b/tests/vm/netbsd
 @@ -0,0 +1,45 @@
 +#!/usr/bin/env python
 +#
-+# FreeBSD VM image
++# NetBSD VM image
 +#
 +# Copyright (C) 2017 Red Hat Inc.
 +#
@@ -63,13 +63,13 @@ index 0000000000..0e4eb037d7
 +import time
 +import basevm
 +
-+class FreeBSDVM(basevm.BaseVM):
-+    name = "freebsd"
++class NetBSDVM(basevm.BaseVM):
++    name = "netbsd"
 +    BUILD_SCRIPT = """
 +        set -e;
 +        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-+        tar -xf /dev/vtbd1;
-+        ./configure {configure_opts};
++        tar -xf /dev/ld1a;
++        ./configure --python=python2.7 {configure_opts};
 +        gmake -j{jobs};
 +        gmake check;
 +    """
@@ -77,8 +77,8 @@ index 0000000000..0e4eb037d7
 +    def build_image(self, img, rebuild=False):
 +        if os.path.exists(img) and not rebuild:
 +            return
-+        cimg = self._download_with_cache("http://download.patchew.org/freebsd.img.xz",
-+                sha256sum='adcb771549b37bc63826c501f05121a206ed3d9f55f49145908f7e1432d65891')
++        cimg = self._download_with_cache("http://download.patchew.org/netbsd.img.xz",
++                                         sha256sum='b633d565b0eac3d02015cd0c81440bd8a7a8df8512615ac1ee05d318be015732')
 +        img_tmp_xz = img + ".tmp.xz"
 +        img_tmp = img + ".tmp"
 +        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
@@ -86,6 +86,6 @@ index 0000000000..0e4eb037d7
 +        os.rename(img_tmp, img)
 +
 +if __name__ == "__main__":
-+    sys.exit(basevm.main(FreeBSDVM))
++    sys.exit(basevm.main(NetBSDVM))
 -- 
 2.13.4
