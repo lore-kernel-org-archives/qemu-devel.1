@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1diIm7-0007Wp-Uc
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:15:45 -0400
+	(envelope-from <david@redhat.com>) id 1diInU-0008RV-5P
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:17:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1diIm3-0004e3-Tz
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:15:43 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:32995)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1diIm3-0004cy-Nk
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:15:39 -0400
-Received: by mail-qt0-x241.google.com with SMTP id c13so1657639qtk.0
-	for <qemu-devel@nongnu.org>; Thu, 17 Aug 2017 04:15:39 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
-	<1500040339-119465-3-git-send-email-imammedo@redhat.com>
-	<d675fe0d-a775-b594-cbf1-057c8c5ba94f@amsat.org>
-	<8d859891-c442-c1a6-021c-acbd30841263@amsat.org>
-	<20170817125306.45dc8d04@nial.brq.redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3dd33437-2373-b1a7-5b60-346feb5e5c0a@amsat.org>
-Date: Thu, 17 Aug 2017 08:15:34 -0300
+	(envelope-from <david@redhat.com>) id 1diInO-0005aI-6y
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:17:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51306)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1diInN-0005a4-UL
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:17:02 -0400
+References: <1502951113-4246-1-git-send-email-thuth@redhat.com>
+	<1502951113-4246-5-git-send-email-thuth@redhat.com>
+	<6454a1a2-e9eb-272f-1380-f514a07c5a20@redhat.com>
+	<9d10d055-0256-cf39-f68e-175b56da5bb2@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <b492b1af-3dc6-e445-6d75-5321bdff4532@redhat.com>
+Date: Thu, 17 Aug 2017 13:16:53 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170817125306.45dc8d04@nial.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <9d10d055-0256-cf39-f68e-175b56da5bb2@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 02/28] mips: MIPSCPU model subclasses
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/6] tests: Introduce generic device
+ hot-plug/hot-unplug functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,64 +31,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Yongbok Kim <yongbok.kim@imgtec.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Aurelien Jarno <aurelien@aurel32.net>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Eric Farman <farman@linux.vnet.ibm.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Fei Li <sherrylf@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Jason J Herne <jjherne@linux.vnet.ibm.com>, Jing Liu <liujbjl@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, QingFeng Hao <haoqf@linux.vnet.ibm.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Yang Chen <bjcyang@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>, Michael S Tsirkin <mst@redhat.com>
 
-On 08/17/2017 07:53 AM, Igor Mammedov wrote:
-> On Thu, 17 Aug 2017 00:38:59 -0300
-> Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
-> 
->> Hi Igor,
->>
->> On 07/15/2017 06:48 PM, Philippe Mathieu-Daudé wrote:
->>> On 07/14/2017 10:51 AM, Igor Mammedov wrote:
->>>> Register separate QOM types for each mips cpu model,
->>>> so it would be possible to reuse generic CPU creation
->>>> routines.
->>>>
->>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+On 17.08.2017 12:57, Thomas Huth wrote:
+> On 17.08.2017 11:53, David Hildenbrand wrote:
+>> On 17.08.2017 08:25, Thomas Huth wrote:
+>>> A lot of tests provide code for adding and removing a device via the
+>>> device_add and device_del QMP commands. Maintaining this code in so
+>>> many places is cumbersome and error-prone (some of the code parts
+>>> check the responses in an incorrect way, for example), so let's
+>>> provide some proper generic qtest functions for adding and removing a
+>>> device instead.
 >>>
->>> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>    
->>>> ---
-[...]
->>>> +static ObjectClass *mips_cpu_class_by_name(const char *cpu_model)
->>>> +{
->>>> +    ObjectClass *oc;
->>>> +    char *typename;
->>>> +
->>>> +    if (cpu_model == NULL) {
->>>> +        return NULL;
->>>> +    }
->>>> +
->>>> +    typename = mips_cpu_type_name(cpu_model);
->>>> +    oc = object_class_by_name(typename);
->>>> +    g_free(typename);
->>>> +    return oc;
->>>>    }
->>>>    static void mips_cpu_class_init(ObjectClass *c, void *data)
->>>> @@ -171,6 +196,7 @@ static void mips_cpu_class_init(ObjectClass *c,
->>>> void *data)
->>>>        mcc->parent_reset = cc->reset;
->>>>        cc->reset = mips_cpu_reset;
->>>> +    cc->class_by_name = mips_cpu_class_by_name;
->>
->> Now than I'm reading again...
->>
->>>>        cc->has_work = mips_cpu_has_work;
->>>>        cc->do_interrupt = mips_cpu_do_interrupt;
->>>>        cc->cpu_exec_interrupt = mips_cpu_exec_interrupt;
->>>> @@ -203,9 +229,34 @@ static const TypeInfo mips_cpu_type_info = {
->>
->> Shouldn't this class now be abstract?
-> it should,
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+> [...]
+>>> diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
+>>> index 2dcdead..aada753 100644
+>>> --- a/tests/libqos/pci.c
+>>> +++ b/tests/libqos/pci.c
+>>> @@ -394,21 +394,6 @@ QPCIBar qpci_legacy_iomap(QPCIDevice *dev, uint16_t addr)
+>>>  void qpci_plug_device_test(const char *driver, const char *id,
+>>>                             uint8_t slot, const char *opts)
+>>>  {
+>>> -    QDict *response;
+>>> -    char *cmd;
+>>> -
+>>> -    cmd = g_strdup_printf("{'execute': 'device_add',"
+>>> -                          " 'arguments': {"
+>>> -                          "   'driver': '%s',"
+>>> -                          "   'addr': '%d',"
+>>> -                          "   %s%s"
+>>> -                          "   'id': '%s'"
+>>> -                          "}}", driver, slot,
+>>> -                          opts ? opts : "", opts ? "," : "",
+>>> -                          id);
+>>> -    response = qmp(cmd);
+>>> -    g_free(cmd);
+>>> -    g_assert(response);
+>>> -    g_assert(!qdict_haskey(response, "error"));
+>>> -    QDECREF(response);
+>>> +    qtest_hot_plug_device(driver, id, "'addr': '%d'%s%s", slot,
+>>> +                          opts ? ", " : "", opts ? opts : "");
 > 
-> I see your are fixing it in your version of series,
-> so I'll just drop mips from my series so that you could merge
-> your version of mips part separately via your tree,
-> assuming you can do it fast once merge window is open
-> as I have another series on top that does more extensive
-> generalization/clean up and depends on this series
-> (including mips being properly QOMified)
+> While PCI uses 'addr' as additional parameter here...
 
-Ok I'll squash it there.
+so addr would be needed in addition.
+
+> 
+> [...]
+>>> +    qtest_hot_plug_device("usb-tablet", id, "'port': '%d', 'bus': '%s.0'",
+>>> +                          port, hcd_id);
+> 
+> ... USB uses 'port' and 'bus' ...
+> 
+> [...]
+>>
+>> Not sure if it would be better to avoid the fmt and provide more
+>> parameters instead. Specifying a parameter as NULL will ifgnore it.
+>>
+>> void qtest_hot_plug_device(const char *driver, const char *id,
+>>                            const char *drive, const char *port,
+>>                            const char *bus)
+>>
+>> that should cover all cases and callers don't have to build strings in a
+>> special format.
+> 
+> ... so I'm afraid, but no, this does not work. The additional parameters
+> are specific to the device type, so there is no way to get around the
+> format string if we want to stay flexible here.
+
+It will work, but yes it is not flexible. Just an idea because I don't
+like having to specify json strings on a function.
+
+> 
+>  Thomas
+> 
+
+
+-- 
+
+Thanks,
+
+David
