@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1diGq2-0005Pm-Ab
+	(envelope-from <david@redhat.com>) id 1diGq2-0005Pr-OU
 	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:11:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1diGpy-0001Gg-9l
+	(envelope-from <david@redhat.com>) id 1diGq1-0001JX-SI
 	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:11:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52108)
+Received: from mx1.redhat.com ([209.132.183.28]:43440)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1diGpx-0001Fv-W6
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:11:34 -0400
-Date: Thu, 17 Aug 2017 11:11:16 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170817111116.79e918e9.cohuck@redhat.com>
-In-Reply-To: <1502951113-4246-1-git-send-email-thuth@redhat.com>
-References: <1502951113-4246-1-git-send-email-thuth@redhat.com>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1diGq1-0001Fu-Jc
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:11:37 -0400
+References: <1502861458-30270-1-git-send-email-thuth@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <96918c60-9133-064a-d289-d13562a5f551@redhat.com>
+Date: Thu, 17 Aug 2017 11:05:35 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1502861458-30270-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.11 0/6] Enable more qtests for s390x
+Subject: Re: [Qemu-devel] [PATCH] hw/s390x/ipl: The s390-ipl device is not
+ hot-pluggable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,69 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Eric Farman <farman@linux.vnet.ibm.com>, Fan Zhang <zhangfan@linux.vnet.ibm.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Fei Li <sherrylf@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Jason J Herne <jjherne@linux.vnet.ibm.com>, Jing Liu <liujbjl@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, QingFeng Hao <haoqf@linux.vnet.ibm.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Yang Chen <bjcyang@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Marc Mari <markmb@redhat.com>, Cleber Rosa <crosa@redhat.com>, Michael S Tsirkin <mst@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
 
-On Thu, 17 Aug 2017 08:25:07 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> We currently do not have many tests enabled for QEMU on s390x yet,
-> so this series reworks some of the tests to be also usable on s390x
-> to get some extended test coverage there.
-
-More coverage on s390x is certainly desirable. I'm wondering how many
-other tests are needlessly restricted to certain architectures as
-well...
-
+On 16.08.2017 07:30, Thomas Huth wrote:
+> The s390-ipl device can not be created by the user, since it is meant only
+> to  be instantiated once internally to load the ROMs and kernel. If the user
+> tries to do a "device_add s390-ipl" via the monitor later, QEMU aborts with
+> a "ROM images must be loaded at startup" error message.
 > 
-> Along the way, this also cleans up some of the generic test code,
-> e.g. by introducing generic functions to do hot-plugging with
-> the device_add QMP command.
-
-Cleanup also sounds good :)
-
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/s390x/ipl.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> Please review!
-> 
->  Thanks,
->   Thomas
-> 
-> 
-> Thomas Huth (6):
->   tests: Run filter-redirector and -mirror test only on POSIX systems
->   tests: Add network filter tests to the check-qtest-s390x list
-
-I think these two are fine as-is.
-
->   tests: Enable the drive_del test also on s390x
->   tests: Introduce generic device hot-plug/hot-unplug functions
->   tests: Add qvirtio_(un)plug_device_test wrapper functions
->   tests: Enable the simple virtio tests on s390x, too
-
-But these probably need some work (or at least, some thought.)
-
-> 
->  tests/Makefile.include         | 20 +++++++++-----
->  tests/drive_del-test.c         | 13 ++++-----
->  tests/libqos/pci.c             | 19 ++-----------
->  tests/libqos/usb.c             | 30 +++++----------------
->  tests/libqos/virtio.c          | 29 ++++++++++++++++++++
->  tests/libqos/virtio.h          |  5 ++++
->  tests/libqtest.c               | 60 ++++++++++++++++++++++++++++++++++++++++++
->  tests/libqtest.h               | 19 +++++++++++++
->  tests/test-filter-mirror.c     | 14 +++++-----
->  tests/test-filter-redirector.c | 32 +++++++++++-----------
->  tests/test-netfilter.c         | 11 +++++++-
->  tests/usb-hcd-uhci-test.c      | 26 ++----------------
->  tests/usb-hcd-xhci-test.c      | 51 +++--------------------------------
->  tests/virtio-balloon-test.c    |  6 ++---
->  tests/virtio-console-test.c    | 12 ++++-----
->  tests/virtio-net-test.c        |  8 ++----
->  tests/virtio-rng-test.c        | 17 +++++-------
->  tests/virtio-scsi-test.c       | 24 ++---------------
->  tests/virtio-serial-test.c     | 33 +++++------------------
->  19 files changed, 208 insertions(+), 221 deletions(-)
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index cc36003..0d06fc1 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -442,6 +442,8 @@ static void s390_ipl_class_init(ObjectClass *klass, void *data)
+>      dc->reset = s390_ipl_reset;
+>      dc->vmsd = &vmstate_ipl;
+>      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> +    /* Reason: Loads the ROMs and thus can only be used one time - internally */
+> +    dc->user_creatable = false;
+>  }
+>  
+>  static const TypeInfo s390_ipl_info = {
 > 
 
-The big question remains again: Who merges this? I can merge this
-through the s390x tree if there are no other takers.
+Late but still
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+-- 
+
+Thanks,
+
+David
