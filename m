@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55926)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1diCTA-0000lA-1k
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 00:31:47 -0400
+	id 1diCTJ-0000ws-So
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 00:31:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1diCT8-0005BW-Os
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 00:31:44 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:37038)
+	id 1diCTI-0005Jb-SY
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 00:31:53 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:33944)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1diCT8-0005BF-JD
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 00:31:42 -0400
-Received: by mail-qt0-x243.google.com with SMTP id d10so5317145qtb.4
-	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 21:31:42 -0700 (PDT)
+	id 1diCTI-0005JK-NP
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 00:31:52 -0400
+Received: by mail-qt0-x242.google.com with SMTP id i19so5325285qte.1
+	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 21:31:52 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 17 Aug 2017 01:31:01 -0300
-Message-Id: <20170817043102.6322-8-f4bug@amsat.org>
+Date: Thu, 17 Aug 2017 01:31:02 -0300
+Message-Id: <20170817043102.6322-9-f4bug@amsat.org>
 In-Reply-To: <20170817043102.6322-1-f4bug@amsat.org>
 References: <20170817043102.6322-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 7/8] mips: replace cpu_mips_init() with
- cpu_generic_init()
+Subject: [Qemu-devel] [PATCH 8/8] mips: update mips_cpu_list() to use
+ object_class_get_list()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,149 +35,90 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, James Hogan <james.hogan@imgtec.com>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, James Hogan <james.hogan@imgtec.com>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+while here, move it from translate_init.c to helper.c
 
-now cpu_mips_init() reimplements subset of cpu_generic_init()
-tasks, so just drop it and use cpu_generic_init() directly.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-[PMD: use internal.h instead of cpu.h]
 ---
- target/mips/cpu.h       |  3 +--
- hw/mips/cps.c           |  2 +-
- hw/mips/mips_fulong2e.c |  2 +-
- hw/mips/mips_jazz.c     |  2 +-
- hw/mips/mips_malta.c    |  2 +-
- hw/mips/mips_mipssim.c  |  2 +-
- hw/mips/mips_r4k.c      |  2 +-
- target/mips/translate.c | 17 -----------------
- 8 files changed, 7 insertions(+), 25 deletions(-)
+ target/mips/helper.c         | 46 ++++++++++++++++++++++++++++++++++++++++++++
+ target/mips/translate_init.c | 10 ----------
+ 2 files changed, 46 insertions(+), 10 deletions(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 2f81e0f950..66265e4eb6 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -737,10 +737,9 @@ enum {
-  */
- #define CPU_INTERRUPT_WAKE CPU_INTERRUPT_TGT_INT_0
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index ea076261af..8d12b0088a 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -1093,3 +1093,49 @@ void QEMU_NORETURN do_raise_exception_err(CPUMIPSState *env,
  
--MIPSCPU *cpu_mips_init(const char *cpu_model);
- int cpu_mips_signal_handler(int host_signum, void *pinfo, void *puc);
- 
--#define cpu_init(cpu_model) CPU(cpu_mips_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_MIPS_CPU, cpu_model)
- bool cpu_supports_cps_smp(const char *cpu_model);
- bool cpu_supports_isa(const char *cpu_model, unsigned int isa);
- void cpu_set_exception_base(int vp_index, target_ulong address);
-diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-index 4ef337d5c4..708899cf92 100644
---- a/hw/mips/cps.c
-+++ b/hw/mips/cps.c
-@@ -71,7 +71,7 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
-     bool itu_present = false;
- 
-     for (i = 0; i < s->num_vp; i++) {
--        cpu = cpu_mips_init(s->cpu_model);
-+        cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, s->cpu_model));
-         if (cpu == NULL) {
-             error_setg(errp, "%s: CPU initialization failed",  __func__);
-             return;
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 3532399a13..5d9462ec35 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -280,7 +280,7 @@ static void mips_fulong2e_init(MachineState *machine)
-     if (cpu_model == NULL) {
-         cpu_model = "Loongson-2E";
-     }
--    cpu = cpu_mips_init(cpu_model);
-+    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-     if (cpu == NULL) {
-         fprintf(stderr, "Unable to find CPU definition\n");
-         exit(1);
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index df2262a2a8..c1402de1ce 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -151,7 +151,7 @@ static void mips_jazz_init(MachineState *machine,
-     if (cpu_model == NULL) {
-         cpu_model = "R4000";
-     }
--    cpu = cpu_mips_init(cpu_model);
-+    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-     if (cpu == NULL) {
-         fprintf(stderr, "Unable to find CPU definition\n");
-         exit(1);
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index af678f5784..9ecdc818b1 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -931,7 +931,7 @@ static void create_cpu_without_cps(const char *cpu_model,
-     int i;
- 
-     for (i = 0; i < smp_cpus; i++) {
--        cpu = cpu_mips_init(cpu_model);
-+        cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-         if (cpu == NULL) {
-             fprintf(stderr, "Unable to find CPU definition\n");
-             exit(1);
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-index 07fc4c2300..1166834f54 100644
---- a/hw/mips/mips_mipssim.c
-+++ b/hw/mips/mips_mipssim.c
-@@ -163,7 +163,7 @@ mips_mipssim_init(MachineState *machine)
-         cpu_model = "24Kf";
- #endif
-     }
--    cpu = cpu_mips_init(cpu_model);
-+    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-     if (cpu == NULL) {
-         fprintf(stderr, "Unable to find CPU definition\n");
-         exit(1);
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index 2f5ced7409..de212f5c13 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -193,7 +193,7 @@ void mips_r4k_init(MachineState *machine)
-         cpu_model = "24Kf";
- #endif
-     }
--    cpu = cpu_mips_init(cpu_model);
-+    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-     if (cpu == NULL) {
-         fprintf(stderr, "Unable to find CPU definition\n");
-         exit(1);
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index f7128bc91d..d16d879df7 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -20523,23 +20523,6 @@ void cpu_mips_realize_env(CPUMIPSState *env)
-     mvp_init(env, env->cpu_model);
+     cpu_loop_exit_restore(cs, pc);
+ }
++
++/* Sort alphabetically by type name, except for "any". */
++static gint mips_cpu_list_compare(gconstpointer a, gconstpointer b)
++{
++    ObjectClass *class_a = (ObjectClass *)a;
++    ObjectClass *class_b = (ObjectClass *)b;
++    const char *name_a, *name_b;
++
++    name_a = object_class_get_name(class_a);
++    name_b = object_class_get_name(class_b);
++    if (strcmp(name_a, "any-" TYPE_MIPS_CPU) == 0) {
++        return 1;
++    } else if (strcmp(name_b, "any-" TYPE_MIPS_CPU) == 0) {
++        return -1;
++    } else {
++        return strcmp(name_a, name_b);
++    }
++}
++
++static void mips_cpu_list_entry(gpointer data, gpointer user_data)
++{
++    ObjectClass *oc = data;
++    CPUListState *s = user_data;
++    const char *typename;
++    char *name;
++
++    typename = object_class_get_name(oc);
++    name = g_strndup(typename, strlen(typename) - strlen("-" TYPE_MIPS_CPU));
++    (*s->cpu_fprintf)(s->file, "  %s\n", name);
++    g_free(name);
++}
++
++void mips_cpu_list(FILE *f, fprintf_function cpu_fprintf)
++{
++    CPUListState s = {
++        .file = f,
++        .cpu_fprintf = cpu_fprintf,
++    };
++    GSList *list;
++
++    list = object_class_get_list(TYPE_MIPS_CPU, false);
++    list = g_slist_sort(list, mips_cpu_list_compare);
++    (*cpu_fprintf)(f, "Available CPUs:\n");
++    g_slist_foreach(list, mips_cpu_list_entry, &s);
++    g_slist_free(list);
++}
+diff --git a/target/mips/translate_init.c b/target/mips/translate_init.c
+index 8bbded46c4..b75f4c9065 100644
+--- a/target/mips/translate_init.c
++++ b/target/mips/translate_init.c
+@@ -767,16 +767,6 @@ static const mips_def_t *cpu_mips_find_by_name (const char *name)
+     return NULL;
  }
  
--MIPSCPU *cpu_mips_init(const char *cpu_model)
+-void mips_cpu_list (FILE *f, fprintf_function cpu_fprintf)
 -{
--    ObjectClass *oc;
--    MIPSCPU *cpu;
+-    int i;
 -
--    oc = cpu_class_by_name(TYPE_MIPS_CPU, cpu_model);
--    if (oc == NULL) {
--        return NULL;
+-    for (i = 0; i < ARRAY_SIZE(mips_defs); i++) {
+-        (*cpu_fprintf)(f, "MIPS '%s'\n",
+-                       mips_defs[i].name);
 -    }
--
--    cpu = MIPS_CPU(object_new(object_class_get_name(oc)));
--
--    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
--
--    return cpu;
 -}
 -
- bool cpu_supports_cps_smp(const char *cpu_model)
+ #ifndef CONFIG_USER_ONLY
+ static void no_mmu_init (CPUMIPSState *env, const mips_def_t *def)
  {
-     const mips_def_t *def = cpu_mips_find_by_name(cpu_model);
 -- 
 2.14.1
