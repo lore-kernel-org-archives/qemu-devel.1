@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1diIUg-0003bs-Rx
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 06:57:43 -0400
+	(envelope-from <wang.yong155@zte.com.cn>) id 1diIVh-0004E5-64
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 06:58:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1diIUd-0004AI-Oo
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 06:57:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34832)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1diIUd-0004A4-GN
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 06:57:39 -0400
-References: <1502951113-4246-1-git-send-email-thuth@redhat.com>
-	<1502951113-4246-5-git-send-email-thuth@redhat.com>
-	<6454a1a2-e9eb-272f-1380-f514a07c5a20@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <9d10d055-0256-cf39-f68e-175b56da5bb2@redhat.com>
-Date: Thu, 17 Aug 2017 12:57:27 +0200
-MIME-Version: 1.0
-In-Reply-To: <6454a1a2-e9eb-272f-1380-f514a07c5a20@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/6] tests: Introduce generic device
- hot-plug/hot-unplug functions
+	(envelope-from <wang.yong155@zte.com.cn>) id 1diIVe-0004L9-HL
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 06:58:45 -0400
+Received: from mx7.zte.com.cn ([202.103.147.169]:34578)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wang.yong155@zte.com.cn>) id 1diIVd-0004Kl-UM
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 06:58:42 -0400
+From: Wang yong <wang.yong155@zte.com.cn>
+Date: Thu, 17 Aug 2017 18:58:03 +0800
+Message-Id: <1502967483-4090-4-git-send-email-wang.yong155@zte.com.cn>
+In-Reply-To: <1502967483-4090-1-git-send-email-wang.yong155@zte.com.cn>
+References: <1502967483-4090-1-git-send-email-wang.yong155@zte.com.cn>
+Subject: [Qemu-devel] [PATCHv3 03/03] colo-compare: Update the COLO document
+ to add the IOThread configuration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Eric Farman <farman@linux.vnet.ibm.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Fei Li <sherrylf@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Jason J Herne <jjherne@linux.vnet.ibm.com>, Jing Liu <liujbjl@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, QingFeng Hao <haoqf@linux.vnet.ibm.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Yang Chen <bjcyang@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>, Michael S Tsirkin <mst@redhat.com>
+To: pbonzini@redhat.com, stefanha@redhat.com, famz@redhat.com, jasowang@redhat.com, zhangchen.fnst@cn.fujitsu.com, zhang.zhanghailiang@huawei.com
+Cc: wang.yong155@zte.com.cn, wang.guang55@zte.com.cn, lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org
 
-On 17.08.2017 11:53, David Hildenbrand wrote:
-> On 17.08.2017 08:25, Thomas Huth wrote:
->> A lot of tests provide code for adding and removing a device via the
->> device_add and device_del QMP commands. Maintaining this code in so
->> many places is cumbersome and error-prone (some of the code parts
->> check the responses in an incorrect way, for example), so let's
->> provide some proper generic qtest functions for adding and removing a
->> device instead.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
-[...]
->> diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
->> index 2dcdead..aada753 100644
->> --- a/tests/libqos/pci.c
->> +++ b/tests/libqos/pci.c
->> @@ -394,21 +394,6 @@ QPCIBar qpci_legacy_iomap(QPCIDevice *dev, uint16_t addr)
->>  void qpci_plug_device_test(const char *driver, const char *id,
->>                             uint8_t slot, const char *opts)
->>  {
->> -    QDict *response;
->> -    char *cmd;
->> -
->> -    cmd = g_strdup_printf("{'execute': 'device_add',"
->> -                          " 'arguments': {"
->> -                          "   'driver': '%s',"
->> -                          "   'addr': '%d',"
->> -                          "   %s%s"
->> -                          "   'id': '%s'"
->> -                          "}}", driver, slot,
->> -                          opts ? opts : "", opts ? "," : "",
->> -                          id);
->> -    response = qmp(cmd);
->> -    g_free(cmd);
->> -    g_assert(response);
->> -    g_assert(!qdict_haskey(response, "error"));
->> -    QDECREF(response);
->> +    qtest_hot_plug_device(driver, id, "'addr': '%d'%s%s", slot,
->> +                          opts ? ", " : "", opts ? opts : "");
+From: Wang Yong <wang.yong155@zte.com.cn>
 
-While PCI uses 'addr' as additional parameter here...
+Update colo-proxy.txt,add IOThread configuration.
+Later we have to configure IOThread,if not COLO can not work.
 
-[...]
->> +    qtest_hot_plug_device("usb-tablet", id, "'port': '%d', 'bus': '%s.0'",
->> +                          port, hcd_id);
+Signed-off-by: Wang Yong <wang.yong155@zte.com.cn>
+Signed-off-by: Wang Guang <wang.guang55@zte.com.cn>
+---
+ docs/colo-proxy.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-... USB uses 'port' and 'bus' ...
-
-[...]
->
-> Not sure if it would be better to avoid the fmt and provide more
-> parameters instead. Specifying a parameter as NULL will ifgnore it.
-> 
-> void qtest_hot_plug_device(const char *driver, const char *id,
->                            const char *drive, const char *port,
->                            const char *bus)
-> 
-> that should cover all cases and callers don't have to build strings in a
-> special format.
-
-... so I'm afraid, but no, this does not work. The additional parameters
-are specific to the device type, so there is no way to get around the
-format string if we want to stay flexible here.
-
- Thomas
+diff --git a/docs/colo-proxy.txt b/docs/colo-proxy.txt
+index c4941de..ce3f783 100644
+--- a/docs/colo-proxy.txt
++++ b/docs/colo-proxy.txt
+@@ -170,10 +170,11 @@ Primary(ip:3.3.3.3):
+ -chardev socket,id=compare0-0,host=3.3.3.3,port=9001
+ -chardev socket,id=compare_out,host=3.3.3.3,port=9005,server,nowait
+ -chardev socket,id=compare_out0,host=3.3.3.3,port=9005
++-object iothread,id=iothread1
+ -object filter-mirror,id=m0,netdev=hn0,queue=tx,outdev=mirror0
+ -object filter-redirector,netdev=hn0,id=redire0,queue=rx,indev=compare_out
+ -object filter-redirector,netdev=hn0,id=redire1,queue=rx,outdev=compare0
+--object colo-compare,id=comp0,primary_in=compare0-0,secondary_in=compare1,outdev=compare_out0
++-object colo-compare,id=comp0,primary_in=compare0-0,secondary_in=compare1,outdev=compare_out0,iothread=iothread1
+ 
+ Secondary(ip:3.3.3.8):
+ -netdev tap,id=hn0,vhost=off,script=/etc/qemu-ifup,down script=/etc/qemu-ifdown
+-- 
+1.8.3.1
