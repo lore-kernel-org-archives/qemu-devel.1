@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wanpeng.li@hotmail.com>) id 1diBuV-0001wQ-Ra
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 23:55:57 -0400
+	(envelope-from <famz@redhat.com>) id 1diBw8-0002s5-Fn
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 23:57:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wanpeng.li@hotmail.com>) id 1diBuS-0004BT-Nc
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 23:55:55 -0400
-Received: from mail-oln040092254037.outbound.protection.outlook.com
-	([40.92.254.37]:49450
-	helo=APC01-PU1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wanpeng.li@hotmail.com>)
-	id 1diBuR-00044n-Vw
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 23:55:52 -0400
-From: Wanpeng Li <wanpeng.li@hotmail.com>
-Date: Thu, 17 Aug 2017 03:55:45 +0000
-Message-ID: <SG2PR02MB1312BD95F982C3062A01C77580830@SG2PR02MB1312.apcprd02.prod.outlook.com>
-References: <20170815170051.127257-1-brijesh.singh@amd.com>
-In-Reply-To: <20170815170051.127257-1-brijesh.singh@amd.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <38166534D789154FBE9D934693D61A89@apcprd02.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3] target-i386/cpu: Add new EPYC CPU model
+	(envelope-from <famz@redhat.com>) id 1diBw2-0004xK-Ed
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 23:57:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48680)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1diBw2-0004x1-8d
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 23:57:30 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Thu, 17 Aug 2017 11:57:21 +0800
+Message-Id: <20170817035721.11064-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH] tests/docker: Clean up paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,74 +21,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard
-	Henderson <rth@twiddle.net>, "chandu@amd.com" <chandu@amd.com>
+To: qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Q2MgQ2hhbmR1LA0KDQpPbiA4LzE2LzE3IDE6MDAgQU0sIEJyaWplc2ggU2luZ2ggd3JvdGU6DQo+
-IEFkZCBhIG5ldyBiYXNlIENQVSBtb2RlbCBjYWxsZWQgJ0VQWUMnIHRvIG1vZGVsIHByb2Nlc3Nv
-cnMgZnJvbSBBTUQgRVBZQw0KPiBmYW1pbHkgKHdoaWNoIGluY2x1ZGVzIEVQWUMgNzZ4eCw3NXh4
-LDc0eHgsIDczeHggYW5kIDcyeHgpLg0KPg0KPiBUaGUgZm9sbG93aW5nIGZlYXR1cmVzIGJpdHMg
-aGF2ZSBiZWVuIGFkZGVkL3JlbW92ZWQgY29tcGFyZSB0byBPcHRlcm9uX0c1DQo+DQo+IEFkZGVk
-OiBtb25pdG9yLCBtb3ZiZSwgcmRyYW5kLCBtbXhleHQsIGZmeHNyLCByZHRzY3AsIGNyOGxlZ2Fj
-eSwgb3N2dywNCj4gICAgICAgICBmc2dzYmFzZSwgYm1pMSwgYXZ4Miwgc21lcCwgYm1pMiwgcmRz
-ZWVkLCBhZHgsIHNtYXAsIGNsZnNob3B0LCBzaGENCj4gICAgICAgICB4c2F2ZW9wdCwgeHNhdmVj
-LCB4Z2V0YnYxLCBhcmF0DQoNCkhpIEJyaWplc2gsDQoNCkFjdHVhbGx5IEkgd29uZGVyIHdoZXRo
-ZXIgb3Igbm90IHRoZSBzdXBwb3J0IGZvciB0aGVzZSBuZXcgaW5zdHJ1Y3Rpb25zIA0KaGF2ZSBh
-bHJlYWR5IGJlZW4gbWVyZ2VkIGluIGt2bS9xZW11Pw0KDQpSZWdhcmRzLA0KV2FucGVuZyBMaQ0K
-DQo+DQo+IFJlbW92ZWQ6IHhvcCwgZm1hNCwgdGJtDQo+DQo+IENjOiBQYW9sbyBCb256aW5pIDxw
-Ym9uemluaUByZWRoYXQuY29tPg0KPiBDYzogUmljaGFyZCBIZW5kZXJzb24gPHJ0aEB0d2lkZGxl
-Lm5ldD4NCj4gQ2M6IEVkdWFyZG8gSGFia29zdCA8ZWhhYmtvc3RAcmVkaGF0LmNvbT4NCj4gQ2M6
-IFRvbSBMZW5kYWNreSA8VGhvbWFzLkxlbmRhY2t5QGFtZC5jb20+DQo+IFNpZ25lZC1vZmYtYnk6
-IEJyaWplc2ggU2luZ2ggPGJyaWplc2guc2luZ2hAYW1kLmNvbT4NCj4gLS0tDQo+DQo+IENoYW5n
-ZXMgc2luY2UgdjI6DQo+ICAgKiBsaW1pdCB0aGUgeGxldmVsIHRvIDB4ODAwMDAwMGENCj4NCj4g
-Q2hhbmdlcyBzaW5jZSB2MToNCj4gICAqIGZpeCB0eXBvIEVZUEMgLT4gRVBZQyB0byByZWZsZWN0
-IHRoZSBjb3JyZWN0IGJyYW5kaW5nIG5hbWUNCj4NCj4gICB0YXJnZXQvaTM4Ni9jcHUuYyB8IDQ0
-ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICAgMSBmaWxl
-IGNoYW5nZWQsIDQ0IGluc2VydGlvbnMoKykNCj4NCj4gZGlmZiAtLWdpdCBhL3RhcmdldC9pMzg2
-L2NwdS5jIGIvdGFyZ2V0L2kzODYvY3B1LmMNCj4gaW5kZXggZGRjNDVhYi4uNjYxN2UwMSAxMDA2
-NDQNCj4gLS0tIGEvdGFyZ2V0L2kzODYvY3B1LmMNCj4gKysrIGIvdGFyZ2V0L2kzODYvY3B1LmMN
-Cj4gQEAgLTE1MjIsNiArMTUyMiw1MCBAQCBzdGF0aWMgWDg2Q1BVRGVmaW5pdGlvbiBidWlsdGlu
-X3g4Nl9kZWZzW10gPSB7DQo+ICAgICAgICAgICAueGxldmVsID0gMHg4MDAwMDAxQSwNCj4gICAg
-ICAgICAgIC5tb2RlbF9pZCA9ICJBTUQgT3B0ZXJvbiA2M3h4IGNsYXNzIENQVSIsDQo+ICAgICAg
-IH0sDQo+ICsgICAgew0KPiArICAgICAgICAubmFtZSA9ICJFUFlDIiwNCj4gKyAgICAgICAgLmxl
-dmVsID0gMHhkLA0KPiArICAgICAgICAudmVuZG9yID0gQ1BVSURfVkVORE9SX0FNRCwNCj4gKyAg
-ICAgICAgLmZhbWlseSA9IDIzLA0KPiArICAgICAgICAubW9kZWwgPSAxLA0KPiArICAgICAgICAu
-c3RlcHBpbmcgPSAyLA0KPiArICAgICAgICAuZmVhdHVyZXNbRkVBVF8xX0VEWF0gPQ0KPiArICAg
-ICAgICAgICAgQ1BVSURfU1NFMiB8IENQVUlEX1NTRSB8IENQVUlEX0ZYU1IgfCBDUFVJRF9NTVgg
-fCBDUFVJRF9DTEZMVVNIIHwNCj4gKyAgICAgICAgICAgIENQVUlEX1BTRTM2IHwgQ1BVSURfUEFU
-IHwgQ1BVSURfQ01PViB8IENQVUlEX01DQSB8IENQVUlEX1BHRSB8DQo+ICsgICAgICAgICAgICBD
-UFVJRF9NVFJSIHwgQ1BVSURfU0VQIHwgQ1BVSURfQVBJQyB8IENQVUlEX0NYOCB8IENQVUlEX01D
-RSB8DQo+ICsgICAgICAgICAgICBDUFVJRF9QQUUgfCBDUFVJRF9NU1IgfCBDUFVJRF9UU0MgfCBD
-UFVJRF9QU0UgfCBDUFVJRF9ERSB8DQo+ICsgICAgICAgICAgICBDUFVJRF9WTUUgfCBDUFVJRF9G
-UDg3LA0KPiArICAgICAgICAuZmVhdHVyZXNbRkVBVF8xX0VDWF0gPQ0KPiArICAgICAgICAgICAg
-Q1BVSURfRVhUX1JEUkFORCB8IENQVUlEX0VYVF9GMTZDIHwgQ1BVSURfRVhUX0FWWCB8DQo+ICsg
-ICAgICAgICAgICBDUFVJRF9FWFRfWFNBVkUgfCBDUFVJRF9FWFRfQUVTIHwgIENQVUlEX0VYVF9Q
-T1BDTlQgfA0KPiArICAgICAgICAgICAgQ1BVSURfRVhUX01PVkJFIHwgQ1BVSURfRVhUX1NTRTQy
-IHwgQ1BVSURfRVhUX1NTRTQxIHwNCj4gKyAgICAgICAgICAgIENQVUlEX0VYVF9DWDE2IHwgQ1BV
-SURfRVhUX0ZNQSB8IENQVUlEX0VYVF9TU1NFMyB8DQo+ICsgICAgICAgICAgICBDUFVJRF9FWFRf
-TU9OSVRPUiB8IENQVUlEX0VYVF9QQ0xNVUxRRFEgfCBDUFVJRF9FWFRfU1NFMywNCj4gKyAgICAg
-ICAgLmZlYXR1cmVzW0ZFQVRfODAwMF8wMDAxX0VEWF0gPQ0KPiArICAgICAgICAgICAgQ1BVSURf
-RVhUMl9MTSB8IENQVUlEX0VYVDJfUkRUU0NQIHwgQ1BVSURfRVhUMl9QRFBFMUdCIHwNCj4gKyAg
-ICAgICAgICAgIENQVUlEX0VYVDJfRkZYU1IgfCBDUFVJRF9FWFQyX01NWEVYVCB8IENQVUlEX0VY
-VDJfTlggfA0KPiArICAgICAgICAgICAgQ1BVSURfRVhUMl9TWVNDQUxMLA0KPiArICAgICAgICAu
-ZmVhdHVyZXNbRkVBVF84MDAwXzAwMDFfRUNYXSA9DQo+ICsgICAgICAgICAgICBDUFVJRF9FWFQz
-X09TVlcgfCBDUFVJRF9FWFQzXzNETk9XUFJFRkVUQ0ggfA0KPiArICAgICAgICAgICAgQ1BVSURf
-RVhUM19NSVNBTElHTlNTRSB8IENQVUlEX0VYVDNfU1NFNEEgfCBDUFVJRF9FWFQzX0FCTSB8DQo+
-ICsgICAgICAgICAgICBDUFVJRF9FWFQzX0NSOExFRyB8IENQVUlEX0VYVDNfU1ZNIHwgQ1BVSURf
-RVhUM19MQUhGX0xNLA0KPiArICAgICAgICAuZmVhdHVyZXNbRkVBVF83XzBfRUJYXSA9DQo+ICsg
-ICAgICAgICAgICBDUFVJRF83XzBfRUJYX0ZTR1NCQVNFIHwgQ1BVSURfN18wX0VCWF9CTUkxIHwg
-Q1BVSURfN18wX0VCWF9BVlgyIHwNCj4gKyAgICAgICAgICAgIENQVUlEXzdfMF9FQlhfU01FUCB8
-IENQVUlEXzdfMF9FQlhfQk1JMiB8IENQVUlEXzdfMF9FQlhfUkRTRUVEIHwNCj4gKyAgICAgICAg
-ICAgIENQVUlEXzdfMF9FQlhfQURYIHwgQ1BVSURfN18wX0VCWF9TTUFQIHwgQ1BVSURfN18wX0VC
-WF9DTEZMVVNIT1BUIHwNCj4gKyAgICAgICAgICAgIENQVUlEXzdfMF9FQlhfU0hBX05JLA0KPiAr
-ICAgICAgICAvKiBNaXNzaW5nOiBYU0FWRVMgKG5vdCBzdXBwb3J0ZWQgYnkgc29tZSBMaW51eCB2
-ZXJzaW9ucywNCj4gKyAgICAgICAgICogaW5jbHVkaW5nIHY0LjEgdG8gdjQuMTIpLg0KPiArICAg
-ICAgICAgKiBLVk0gZG9lc24ndCB5ZXQgZXhwb3NlIGFueSBYU0FWRVMgc3RhdGUgc2F2ZSBjb21w
-b25lbnQuDQo+ICsgICAgICAgICAqLw0KPiArICAgICAgICAuZmVhdHVyZXNbRkVBVF9YU0FWRV0g
-PQ0KPiArICAgICAgICAgICAgQ1BVSURfWFNBVkVfWFNBVkVPUFQgfCBDUFVJRF9YU0FWRV9YU0FW
-RUMgfA0KPiArICAgICAgICAgICAgQ1BVSURfWFNBVkVfWEdFVEJWMSwNCj4gKyAgICAgICAgLmZl
-YXR1cmVzW0ZFQVRfNl9FQVhdID0NCj4gKyAgICAgICAgICAgIENQVUlEXzZfRUFYX0FSQVQsDQo+
-ICsgICAgICAgIC54bGV2ZWwgPSAweDgwMDAwMDBBLA0KPiArICAgICAgICAubW9kZWxfaWQgPSAi
-QU1EIEVQWUMgUHJvY2Vzc29yIiwNCj4gKyAgICB9LA0KPiAgIH07DQo+ICAgDQo+ICAgdHlwZWRl
-ZiBzdHJ1Y3QgUHJvcFZhbHVlIHsNCg0K
+The 'run' script already creats src, build and install directories under
+$TEST_DIR, use it in common.rc.
+
+Also the tests always run from $QEMU_SRC/tests/docker, so use a relative
+$CMD string.
+
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ tests/docker/common.rc | 5 +----
+ tests/docker/run       | 4 +++-
+ 2 files changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/tests/docker/common.rc b/tests/docker/common.rc
+index 6865689bb5..64b36ba2d0 100755
+--- a/tests/docker/common.rc
++++ b/tests/docker/common.rc
+@@ -11,9 +11,6 @@
+ # or (at your option) any later version. See the COPYING file in
+ # the top-level directory.
+ 
+-BUILD_DIR=/var/tmp/qemu-build
+-mkdir $BUILD_DIR
+-
+ requires()
+ {
+     for c in $@; do
+@@ -28,7 +25,7 @@ build_qemu()
+ {
+     config_opts="--enable-werror \
+                  ${TARGET_LIST:+--target-list=${TARGET_LIST}} \
+-                 --prefix=$PWD/install \
++                 --prefix=$INSTALL_DIR \
+                  $QEMU_CONFIGURE_OPTS $EXTRA_CONFIGURE_OPTS \
+                  $@"
+     echo "Configure options:"
+diff --git a/tests/docker/run b/tests/docker/run
+index c1e4513bce..ec2541cbd9 100755
+--- a/tests/docker/run
++++ b/tests/docker/run
+@@ -52,10 +52,12 @@ if test -n "$SHOW_ENV"; then
+ fi
+ 
+ export QEMU_SRC="$TEST_DIR/src"
++export BUILD_DIR="$TEST_DIR/build"
++export INSTALL_DIR="$TEST_DIR/install"
+ 
+ cd "$QEMU_SRC/tests/docker"
+ 
+-CMD="$QEMU_SRC/tests/docker/$@"
++CMD="./$@"
+ 
+ if test -z "$DEBUG"; then
+     exec $CMD
+-- 
+2.13.4
