@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1diMni-00050B-9u
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 11:33:40 -0400
+	(envelope-from <jean-philippe.brucker@arm.com>) id 1diMnw-0005AB-Uv
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 11:33:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1diMng-0001YK-PR
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 11:33:38 -0400
-References: <1500017104-3574-1-git-send-email-Bharat.Bhushan@nxp.com>
-	<1500017104-3574-3-git-send-email-Bharat.Bhushan@nxp.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <997bdcca-b84c-300c-bca0-5950c17db8d7@redhat.com>
-Date: Thu, 17 Aug 2017 17:33:26 +0200
+	(envelope-from <jean-philippe.brucker@arm.com>) id 1diMnv-0001gH-Vd
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 11:33:52 -0400
+References: <1501579994-3320-1-git-send-email-eric.auger@redhat.com>
+	<20170817112627.GA5417@virtx40>
+	<da30de94-118d-b81e-f163-b60f71894415@arm.com>
+	<20c68b9d-380d-1fbc-0fae-a5af44c2cdb2@redhat.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Message-ID: <b56c09fc-9704-6adc-151b-1b796813f679@arm.com>
+Date: Thu, 17 Aug 2017 16:36:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <1500017104-3574-3-git-send-email-Bharat.Bhushan@nxp.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20c68b9d-380d-1fbc-0fae-a5af44c2cdb2@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 PATCH 2/2] virtio-iommu: vfio integration
- with virtio-iommu
+Subject: Re: [Qemu-devel] [Qemu-arm] [RFC v3 0/8] VIRTIO-IOMMU device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,295 +26,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharat Bhushan <Bharat.Bhushan@nxp.com>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: wei@redhat.com, kevin.tian@intel.com, marc.zyngier@arm.com, tn@semihalf.com, will.deacon@arm.com, drjones@redhat.com, robin.murphy@arm.com, christoffer.dall@linaro.org
+To: Auger Eric <eric.auger@redhat.com>, Linu Cherian <linuc.decode@gmail.com>
+Cc: peter.maydell@linaro.org, kevin.tian@intel.com, drjones@redhat.com, mst@redhat.com, marc.zyngier@arm.com, tn@semihalf.com, will.deacon@arm.com, qemu-devel@nongnu.org, peterx@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org, linu.cherian@cavium.com, bharat.bhushan@nxp.com, christoffer.dall@linaro.org, eric.auger.pro@gmail.com
 
-Hi Bharat,
-
-On 14/07/2017 09:25, Bharat Bhushan wrote:
-> This patch allows virtio-iommu protection for PCI
-> device-passthrough.
+On 17/08/17 16:26, Auger Eric wrote:
+> Hi Linu, Jean,
 > 
-> MSI region is mapped by current version of virtio-iommu driver.
-> This MSI region mapping in not getting pushed on hw iommu
-> vfio_get_vaddr() allows only ram-region.
-Why is it an issue. As far as I understand this is not needed actually
-as the guest MSI doorbell is not used by the host.
- This RFC patch needed
-> to be improved.
-> 
-> Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
-> ---
-> v1-v2:
->   - Added trace events
-> 
->  hw/virtio/trace-events           |   5 ++
->  hw/virtio/virtio-iommu.c         | 133 +++++++++++++++++++++++++++++++++++++++
->  include/hw/virtio/virtio-iommu.h |   6 ++
->  3 files changed, 144 insertions(+)
-> 
-> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> index 9196b63..3a3968b 100644
-> --- a/hw/virtio/trace-events
-> +++ b/hw/virtio/trace-events
-> @@ -39,3 +39,8 @@ virtio_iommu_unmap_left_interval(uint64_t low, uint64_t high, uint64_t next_low,
->  virtio_iommu_unmap_right_interval(uint64_t low, uint64_t high, uint64_t next_low, uint64_t next_high) "Unmap right [0x%"PRIx64",0x%"PRIx64"], new interval=[0x%"PRIx64",0x%"PRIx64"]"
->  virtio_iommu_unmap_inc_interval(uint64_t low, uint64_t high) "Unmap inc [0x%"PRIx64",0x%"PRIx64"]"
->  virtio_iommu_translate_result(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
-> +virtio_iommu_notify_flag_add(const char *iommu) "Add virtio-iommu notifier node for memory region %s"
-> +virtio_iommu_notify_flag_del(const char *iommu) "Del virtio-iommu notifier node for memory region %s"
-> +virtio_iommu_remap(hwaddr iova, hwaddr pa, hwaddr size) "iova=0x%"PRIx64" pa=0x%" PRIx64" size=0x%"PRIx64""
-> +virtio_iommu_map_region(hwaddr iova, hwaddr paddr, hwaddr map_size) "iova=0x%"PRIx64" pa=0x%" PRIx64" size=0x%"PRIx64""
-> +virtio_iommu_unmap_region(hwaddr iova, hwaddr paddr, hwaddr map_size) "iova=0x%"PRIx64" pa=0x%" PRIx64" size=0x%"PRIx64""
-> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-> index cd188fc..61f33cb 100644
-> --- a/hw/virtio/virtio-iommu.c
-> +++ b/hw/virtio/virtio-iommu.c
-> @@ -129,6 +129,48 @@ static gint interval_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
->      }
->  }
->  
-> +static void virtio_iommu_map_region(VirtIOIOMMU *s, hwaddr iova, hwaddr paddr,
-> +                                    hwaddr size, int map)
-bool map?
+> On 17/08/2017 15:39, Jean-Philippe Brucker wrote:
+>> Hi Linu,
+>>
+>> On 17/08/17 12:26, Linu Cherian wrote:
+>>> Hi Eric,
+>>>
+>>> On Tue Aug 01, 2017 at 11:33:06AM +0200, Eric Auger wrote:
+>>>> This series implements the virtio-iommu device.
+>>>>
+>>>> This v3 mostly is a rebase on top of v2.10-rc0 that uses
+>>>> IOMMUMmeoryRegion plus some small fixes.
+>>>>
+>>>> This is a proof of concept based on the virtio-iommu specification
+>>>> written by Jean-Philippe Brucker [1].
+>>>>
+>>>> The device gets instantiated using the "-device virtio-iommu-device"
+>>>> option. It currently works with ARM virt machine only, as the machine
+>>>> must handle the dt binding between the virtio-mmio "iommu" node and
+>>>> the PCI host bridge node.
+>>>>
+>>>> ACPI booting is not yet supported.
+>>>>
+>>>> Best Regards
+>>>>
+>>>> Eric
+>>>>
+>>>> This series can be found at:
+>>>> https://github.com/eauger/qemu/tree/v2.10.0-rc0-virtio-iommu-rfcv3
+>>>>
+>>>> References:
+>>>> [1] [RFC 0/3] virtio-iommu: a paravirtualized IOMMU,
+>>>> [2] [RFC PATCH linux] iommu: Add virtio-iommu driver
+>>>> [3] [RFC PATCH kvmtool 00/15] Add virtio-iommu
+>>>>
+>>>> Testing:
+>>>> - >= 4.12 guest kernel + virtio-iommu driver [2]
+>>>> - guest using a virtio-net-pci device:
+>>>>   ,vhost=off,iommu_platform,disable-modern=off,disable-legacy=on
+>>>
+>>> Was trying to test this out and facing issues.
+>>> Guest and Host Kernel - git://linux-arm.org/linux-jpb.git, Branch virtio-iommu/v0.4
+>>> Qemu - As mentioned above.
+>>
+>> Could you try branch virtio-iommu/v0.1? It contains the UAPI headers
+>> compatible with this RFC.
+> Thank you Jean. Yes the QEMU virtio-iommu device is based on the first
+> user API written in [2]. I plan to rebase on v0.4 in short delay. Jean
+> can I rebase on virtio-iommu/v0.4 or shall I wait a bit more?
 
-the function name is a bit misleading to me and does not really explain
-what the function does. It "notifies" so why not using something like
-virtio_iommu_map_notify and virtio_iommu_unmap_notify. I tend to think
-having separate proto is cleaner and more standard.
+Please go ahead, I don't have any pending changes at the moment :)
 
-Binding should happen on a specific IOMMUmemoryRegion (see next comment).
-
-> +{
-> +    VirtioIOMMUNotifierNode *node;
-> +    IOMMUTLBEntry entry;
-> +    uint64_t map_size = (1 << 12);
-TODO: handle something else than 4K page.
-> +    int npages;
-> +    int i;
-> +
-> +    npages = size / map_size;
-> +    entry.target_as = &address_space_memory;
-> +    entry.addr_mask = map_size - 1;
-> +
-> +    for (i = 0; i < npages; i++) {
-Although I understand we currently fail checking the consistency between
-pIOMMU and vIOMMU page sizes, this will be very slow for guest DPDK use
-case where hugepages are used.
-
-Why not directly using the full size?  vfio_iommu_map_notify will report
-errors if vfio_dma_map/unmap() fail.
-> +        entry.iova = iova + (i * map_size);
-> +        if (map) {
-> +                trace_virtio_iommu_map_region(iova, paddr, map_size);
-> +                entry.perm = IOMMU_RW;
-> +                entry.translated_addr = paddr + (i * map_size);
-> +        } else {
-> +                trace_virtio_iommu_unmap_region(iova, paddr, map_size);
-> +                entry.perm = IOMMU_NONE;
-> +                entry.translated_addr = 0;
-> +        }
-> +
-> +        QLIST_FOREACH(node, &s->notifiers_list, next) {
-> +            memory_region_notify_iommu(&node->iommu_dev->iommu_mr, entry);
-So as discussed this will notify *all* IOMMU memory regions and all
-their notifiers which is not what we want. You may have a look at
-vsmmuv3 v6 (or intel_iommu) where smmuv3_context_device_invalidate
-retrieves the mr from the sid.
-
-> +        }
-> +    }
-> +}
-> +
-> +static gboolean virtio_iommu_unmap_single(gpointer key, gpointer value,
-> +                                          gpointer data)
-> +{
-> +    viommu_mapping *mapping = (viommu_mapping *) value;
-> +    VirtIOIOMMU *s = (VirtIOIOMMU *) data;
-> +
-> +    virtio_iommu_map_region(s, mapping->virt_addr, 0, mapping->size, 0);
-paddr=0? mapping->phys_addr as the trace() will be misleading. But as
-mentioned earlier better use unmap() separate function.
-> +
-> +    return true;
-> +}
-> +
->  static int virtio_iommu_attach(VirtIOIOMMU *s,
->                                 struct virtio_iommu_req_attach *req)
->  {
-> @@ -170,10 +212,26 @@ static int virtio_iommu_detach(VirtIOIOMMU *s,
->  {
->      uint32_t devid = le32_to_cpu(req->device);
->      uint32_t reserved = le32_to_cpu(req->reserved);
-> +    viommu_dev *dev;
->      int ret;
->  
->      trace_virtio_iommu_detach(devid, reserved);
->  
-> +    dev = g_tree_lookup(s->devices, GUINT_TO_POINTER(devid));
-> +    if (!dev || !dev->as) {
-> +        return -EINVAL;
-> +    }
-> +
-> +    dev->as->nr_devices--;
-> +
-> +    /* Unmap all if this is last device detached */
-> +    if (dev->as->nr_devices == 0) {
-> +        g_tree_foreach(dev->as->mappings, virtio_iommu_unmap_single, s);
-> +
-> +        g_tree_remove(s->address_spaces, GUINT_TO_POINTER(dev->as->id));
-> +        g_tree_destroy(dev->as->mappings);
-> +    }
-so this should be rebased on new ref count code.
-> +
->      ret = g_tree_remove(s->devices, GUINT_TO_POINTER(devid));
->  
->      return ret ? VIRTIO_IOMMU_S_OK : VIRTIO_IOMMU_S_INVAL;
-> @@ -217,6 +275,7 @@ static int virtio_iommu_map(VirtIOIOMMU *s,
->  
->      g_tree_insert(as->mappings, interval, mapping);
->  
-> +    virtio_iommu_map_region(s, virt_addr, phys_addr, size, 1);
->      return VIRTIO_IOMMU_S_OK;
->  }
->  
-> @@ -267,7 +326,9 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
->          } else {
->              break;
->          }
-> +
->          if (interval.low >= interval.high) {
-> +            virtio_iommu_map_region(s, virt_addr, 0, size, 0);
->              return VIRTIO_IOMMU_S_OK;
->          } else {
->              mapping = g_tree_lookup(as->mappings, (gpointer)&interval);
-> @@ -410,6 +471,37 @@ static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
->      }
->  }
->  
-> +static void virtio_iommu_notify_flag_changed(MemoryRegion *iommu,
-> +                                          IOMMUNotifierFlag old,
-> +                                          IOMMUNotifierFlag new)
-> +{
-> +    IOMMUDevice *sdev = container_of(iommu, IOMMUDevice, iommu_mr);
-> +    VirtIOIOMMU *s = sdev->viommu;
-> +    VirtioIOMMUNotifierNode *node = NULL;
-> +    VirtioIOMMUNotifierNode *next_node = NULL;
-> +
-> +    if (old == IOMMU_NOTIFIER_NONE) {
-> +        trace_virtio_iommu_notify_flag_add(iommu->name);
-> +        node = g_malloc0(sizeof(*node));
-> +        node->iommu_dev = sdev;
-> +        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
-> +        return;
-> +    }
-> +
-> +    /* update notifier node with new flags */
-> +    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
-> +        if (node->iommu_dev == sdev) {
-> +            if (new == IOMMU_NOTIFIER_NONE) {
-> +                trace_virtio_iommu_notify_flag_del(iommu->name);
-> +                QLIST_REMOVE(node, next);
-> +                g_free(node);
-> +            }
-> +            return;
-> +        }
-> +    }
-> +}
-I think all that mechanics should be factorized somewhere else as all
-vIOMMUs use that but this goes beyond the scope of this series.
-> +
-> +
->  static IOMMUTLBEntry virtio_iommu_translate(MemoryRegion *mr, hwaddr addr,
->                                              IOMMUAccessFlags flag)
->  {
-> @@ -523,11 +615,50 @@ static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
->      return (ua > ub) - (ua < ub);
->  }
->  
-> +static gboolean virtio_iommu_remap(gpointer key, gpointer value, gpointer data)
-> +{
-> +    viommu_mapping *mapping = (viommu_mapping *) value;
-> +    VirtIOIOMMU *s = (VirtIOIOMMU *) data;
-> +
-> +    trace_virtio_iommu_remap(mapping->virt_addr, mapping->phys_addr,
-> +                             mapping->size);
-> +    /* unmap previous entry and map again */
-> +    virtio_iommu_map_region(s, mapping->virt_addr, 0, mapping->size, 0);
-> +
-> +    virtio_iommu_map_region(s, mapping->virt_addr, mapping->phys_addr,
-> +                            mapping->size, 1);
-> +    return true;
-> +}
-> +
-> +static void virtio_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n)
-> +{
-> +    IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
-> +    VirtIOIOMMU *s = sdev->viommu;
-> +    uint32_t sid;
-> +    viommu_dev *dev;
-> +
-> +    sid = smmu_get_sid(sdev);
-> +
-> +    qemu_mutex_lock(&s->mutex);
-> +
-> +    dev = g_tree_lookup(s->devices, GUINT_TO_POINTER(sid));
-> +    if (!dev) {
-> +        goto unlock;
-> +    }
-> +
-> +    g_tree_foreach(dev->as->mappings, virtio_iommu_remap, s);
-> +
-> +unlock:
-> +    qemu_mutex_unlock(&s->mutex);
-> +    return;
-not needed
-
-Thanks
-
-Eric
-> +}
-> +
->  static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
->  {
->      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
->      VirtIOIOMMU *s = VIRTIO_IOMMU(dev);
->  
-> +    QLIST_INIT(&s->notifiers_list);
->      virtio_init(vdev, "virtio-iommu", VIRTIO_ID_IOMMU,
->                  sizeof(struct virtio_iommu_config));
->  
-> @@ -538,6 +669,8 @@ static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
->      s->config.input_range.end = -1UL;
->  
->      s->iommu_ops.translate = virtio_iommu_translate;
-> +    s->iommu_ops.notify_flag_changed = virtio_iommu_notify_flag_changed;
-> +    s->iommu_ops.replay = virtio_iommu_replay;
->      memset(s->as_by_bus_num, 0, sizeof(s->as_by_bus_num));
->      s->as_by_busptr = g_hash_table_new_full(as_uint64_hash,
->                                              as_uint64_equal,
-> diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virtio-iommu.h
-> index 2259413..76c758d 100644
-> --- a/include/hw/virtio/virtio-iommu.h
-> +++ b/include/hw/virtio/virtio-iommu.h
-> @@ -44,6 +44,11 @@ typedef struct IOMMUPciBus {
->      IOMMUDevice  *pbdev[0]; /* Parent array is sparse, so dynamically alloc */
->  } IOMMUPciBus;
->  
-> +typedef struct VirtioIOMMUNotifierNode {
-> +    IOMMUDevice *iommu_dev;
-> +    QLIST_ENTRY(VirtioIOMMUNotifierNode) next;
-> +} VirtioIOMMUNotifierNode;
-> +
->  typedef struct VirtIOIOMMU {
->      VirtIODevice parent_obj;
->      VirtQueue *vq;
-> @@ -55,6 +60,7 @@ typedef struct VirtIOIOMMU {
->      GTree *address_spaces;
->      QemuMutex mutex;
->      GTree *devices;
-> +    QLIST_HEAD(, VirtioIOMMUNotifierNode) notifiers_list;
->  } VirtIOIOMMU;
->  
->  #endif
-> 
+Thanks,
+Jean
