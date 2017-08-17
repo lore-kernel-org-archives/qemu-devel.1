@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1diBdl-0008Gl-NY
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 23:38:41 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1diBeK-0000Np-El
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 23:39:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1diBdk-0003vk-B4
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 23:38:37 -0400
-Received: from mga01.intel.com ([192.55.52.88]:1602)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1diBdj-0003iP-VY
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 23:38:36 -0400
-From: Wei Wang <wei.w.wang@intel.com>
-Date: Thu, 17 Aug 2017 11:26:56 +0800
-Message-Id: <1502940416-42944-6-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1502940416-42944-1-git-send-email-wei.w.wang@intel.com>
-References: <1502940416-42944-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v14 5/5] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_VQ
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1diBeG-00045T-GQ
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 23:39:12 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33432)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1diBeG-00044b-A1
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 23:39:08 -0400
+Received: by mail-qt0-x244.google.com with SMTP id c13so1017586qtk.0
+	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 20:39:05 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <1500040339-119465-1-git-send-email-imammedo@redhat.com>
+	<1500040339-119465-3-git-send-email-imammedo@redhat.com>
+	<d675fe0d-a775-b594-cbf1-057c8c5ba94f@amsat.org>
+Message-ID: <8d859891-c442-c1a6-021c-acbd30841263@amsat.org>
+Date: Thu, 17 Aug 2017 00:38:59 -0300
+MIME-Version: 1.0
+In-Reply-To: <d675fe0d-a775-b594-cbf1-057c8c5ba94f@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 02/28] mips: MIPSCPU model subclasses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,269 +36,301 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com
-Cc: david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, wei.w.wang@intel.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-Add a new vq to report hints of guest free pages to the host.
+Hi Igor,
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-Signed-off-by: Liang Li <liang.z.li@intel.com>
----
- drivers/virtio/virtio_balloon.c     | 167 +++++++++++++++++++++++++++++++-----
- include/uapi/linux/virtio_balloon.h |   1 +
- 2 files changed, 147 insertions(+), 21 deletions(-)
+On 07/15/2017 06:48 PM, Philippe Mathieu-Daudé wrote:
+> On 07/14/2017 10:51 AM, Igor Mammedov wrote:
+>> Register separate QOM types for each mips cpu model,
+>> so it would be possible to reuse generic CPU creation
+>> routines.
+>>
+>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> 
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+>> ---
+>> CC: Aurelien Jarno <aurelien@aurel32.net>
+>> CC: Yongbok Kim <yongbok.kim@imgtec.com>
+>> ---
+>>   target/mips/cpu-qom.h        |  2 ++
+>>   target/mips/cpu.h            | 57 
+>> +++++++++++++++++++++++++++++++++++++++++++-
+>>   target/mips/cpu.c            | 51 
+>> +++++++++++++++++++++++++++++++++++++++
+>>   target/mips/translate.c      | 13 +++++-----
+>>   target/mips/translate_init.c | 57 
+>> ++------------------------------------------
+>>   5 files changed, 117 insertions(+), 63 deletions(-)
+>>
+>> diff --git a/target/mips/cpu-qom.h b/target/mips/cpu-qom.h
+>> index 3f5bf23..4b32401 100644
+>> --- a/target/mips/cpu-qom.h
+>> +++ b/target/mips/cpu-qom.h
+>> @@ -35,6 +35,7 @@
+>>   #define MIPS_CPU_GET_CLASS(obj) \
+>>       OBJECT_GET_CLASS(MIPSCPUClass, (obj), TYPE_MIPS_CPU)
+>> +typedef struct mips_def_t mips_def_t;
+>>   /**
+>>    * MIPSCPUClass:
+>>    * @parent_realize: The parent class' realize handler.
+>> @@ -49,6 +50,7 @@ typedef struct MIPSCPUClass {
+>>       DeviceRealize parent_realize;
+>>       void (*parent_reset)(CPUState *cpu);
+>> +    const mips_def_t *cpu_def;
+>>   } MIPSCPUClass;
+>>   typedef struct MIPSCPU MIPSCPU;
+>> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+>> index 9c32228..7c2e0bf 100644
+>> --- a/target/mips/cpu.h
+>> +++ b/target/mips/cpu.h
+>> @@ -161,7 +161,62 @@ struct CPUMIPSMVPContext {
+>>   #define CP0MVPC1_PCP1    0
+>>   };
+>> -typedef struct mips_def_t mips_def_t;
+>> +/* MMU types, the first four entries have the same layout as the
+>> +   CP0C0_MT field.  */
+>> +enum mips_mmu_types {
+>> +    MMU_TYPE_NONE,
+>> +    MMU_TYPE_R4000,
+>> +    MMU_TYPE_RESERVED,
+>> +    MMU_TYPE_FMT,
+>> +    MMU_TYPE_R3000,
+>> +    MMU_TYPE_R6000,
+>> +    MMU_TYPE_R8000
+>> +};
+>> +
+>> +struct mips_def_t {
+>> +    const char *name;
+>> +    int32_t CP0_PRid;
+>> +    int32_t CP0_Config0;
+>> +    int32_t CP0_Config1;
+>> +    int32_t CP0_Config2;
+>> +    int32_t CP0_Config3;
+>> +    int32_t CP0_Config4;
+>> +    int32_t CP0_Config4_rw_bitmask;
+>> +    int32_t CP0_Config5;
+>> +    int32_t CP0_Config5_rw_bitmask;
+>> +    int32_t CP0_Config6;
+>> +    int32_t CP0_Config7;
+>> +    target_ulong CP0_LLAddr_rw_bitmask;
+>> +    int CP0_LLAddr_shift;
+>> +    int32_t SYNCI_Step;
+>> +    int32_t CCRes;
+>> +    int32_t CP0_Status_rw_bitmask;
+>> +    int32_t CP0_TCStatus_rw_bitmask;
+>> +    int32_t CP0_SRSCtl;
+>> +    int32_t CP1_fcr0;
+>> +    int32_t CP1_fcr31_rw_bitmask;
+>> +    int32_t CP1_fcr31;
+>> +    int32_t MSAIR;
+>> +    int32_t SEGBITS;
+>> +    int32_t PABITS;
+>> +    int32_t CP0_SRSConf0_rw_bitmask;
+>> +    int32_t CP0_SRSConf0;
+>> +    int32_t CP0_SRSConf1_rw_bitmask;
+>> +    int32_t CP0_SRSConf1;
+>> +    int32_t CP0_SRSConf2_rw_bitmask;
+>> +    int32_t CP0_SRSConf2;
+>> +    int32_t CP0_SRSConf3_rw_bitmask;
+>> +    int32_t CP0_SRSConf3;
+>> +    int32_t CP0_SRSConf4_rw_bitmask;
+>> +    int32_t CP0_SRSConf4;
+>> +    int32_t CP0_PageGrain_rw_bitmask;
+>> +    int32_t CP0_PageGrain;
+>> +    int insn_flags;
+>> +    enum mips_mmu_types mmu_type;
+>> +};
+>> +
+>> +extern const struct mips_def_t mips_defs[];
+>> +extern const int mips_defs_number;
+>>   #define MIPS_SHADOW_SET_MAX 16
+>>   #define MIPS_TC_MAX 5
+>> diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+>> index 82afdaa..111b5ae 100644
+>> --- a/target/mips/cpu.c
+>> +++ b/target/mips/cpu.c
+>> @@ -151,12 +151,37 @@ static void mips_cpu_initfn(Object *obj)
+>>       CPUState *cs = CPU(obj);
+>>       MIPSCPU *cpu = MIPS_CPU(obj);
+>>       CPUMIPSState *env = &cpu->env;
+>> +    MIPSCPUClass *mcc = MIPS_CPU_GET_CLASS(obj);
+>>       cs->env_ptr = env;
+>>       if (tcg_enabled()) {
+>>           mips_tcg_init();
+>>       }
+>> +
+>> +    if (mcc->cpu_def) {
+>> +        env->cpu_model = mcc->cpu_def;
+>> +    }
+>> +}
+>> +
+>> +static char *mips_cpu_type_name(const char *cpu_model)
+>> +{
+>> +    return g_strdup_printf("%s-" TYPE_MIPS_CPU, cpu_model);
+>> +}
+>> +
+>> +static ObjectClass *mips_cpu_class_by_name(const char *cpu_model)
+>> +{
+>> +    ObjectClass *oc;
+>> +    char *typename;
+>> +
+>> +    if (cpu_model == NULL) {
+>> +        return NULL;
+>> +    }
+>> +
+>> +    typename = mips_cpu_type_name(cpu_model);
+>> +    oc = object_class_by_name(typename);
+>> +    g_free(typename);
+>> +    return oc;
+>>   }
+>>   static void mips_cpu_class_init(ObjectClass *c, void *data)
+>> @@ -171,6 +196,7 @@ static void mips_cpu_class_init(ObjectClass *c, 
+>> void *data)
+>>       mcc->parent_reset = cc->reset;
+>>       cc->reset = mips_cpu_reset;
+>> +    cc->class_by_name = mips_cpu_class_by_name;
 
-diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-index 72041b4..e6755bc 100644
---- a/drivers/virtio/virtio_balloon.c
-+++ b/drivers/virtio/virtio_balloon.c
-@@ -54,11 +54,12 @@ static struct vfsmount *balloon_mnt;
- 
- struct virtio_balloon {
- 	struct virtio_device *vdev;
--	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq;
-+	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq, *free_page_vq;
- 
- 	/* The balloon servicing is delegated to a freezable workqueue. */
- 	struct work_struct update_balloon_stats_work;
- 	struct work_struct update_balloon_size_work;
-+	struct work_struct report_free_page_work;
- 
- 	/* Prevent updating balloon when it is being canceled. */
- 	spinlock_t stop_update_lock;
-@@ -90,6 +91,13 @@ struct virtio_balloon {
- 	/* Memory statistics */
- 	struct virtio_balloon_stat stats[VIRTIO_BALLOON_S_NR];
- 
-+	/*
-+	 * Used by the device and driver to signal each other.
-+	 * device->driver: start the free page report.
-+	 * driver->device: end the free page report.
-+	 */
-+	__virtio32 report_free_page_signal;
-+
- 	/* To register callback in oom notifier call chain */
- 	struct notifier_block nb;
- };
-@@ -174,6 +182,17 @@ static void send_balloon_page_sg(struct virtio_balloon *vb,
- 	} while (unlikely(ret == -ENOSPC));
- }
- 
-+static void send_free_page_sg(struct virtqueue *vq, void *addr, uint32_t size)
-+{
-+	unsigned int len;
-+
-+	add_one_sg(vq, addr, size);
-+	virtqueue_kick(vq);
-+	/* Release entries if there are */
-+	while (virtqueue_get_buf(vq, &len))
-+		;
-+}
-+
- /*
-  * Send balloon pages in sgs to host. The balloon pages are recorded in the
-  * page xbitmap. Each bit in the bitmap corresponds to a page of PAGE_SIZE.
-@@ -511,42 +530,143 @@ static void update_balloon_size_func(struct work_struct *work)
- 		queue_work(system_freezable_wq, work);
- }
- 
-+static void virtio_balloon_send_free_pages(void *opaque, unsigned long pfn,
-+					   unsigned long nr_pages)
-+{
-+	struct virtio_balloon *vb = (struct virtio_balloon *)opaque;
-+	void *addr = (void *)pfn_to_kaddr(pfn);
-+	uint32_t len = nr_pages << PAGE_SHIFT;
-+
-+	send_free_page_sg(vb->free_page_vq, addr, len);
-+}
-+
-+static void report_free_page_completion(struct virtio_balloon *vb)
-+{
-+	struct virtqueue *vq = vb->free_page_vq;
-+	struct scatterlist sg;
-+	unsigned int len;
-+	int ret;
-+
-+	sg_init_one(&sg, &vb->report_free_page_signal, sizeof(__virtio32));
-+retry:
-+	ret = virtqueue_add_outbuf(vq, &sg, 1, vb, GFP_KERNEL);
-+	virtqueue_kick(vq);
-+	if (unlikely(ret == -ENOSPC)) {
-+		wait_event(vb->acked, virtqueue_get_buf(vq, &len));
-+		goto retry;
-+	}
-+}
-+
-+static void report_free_page(struct work_struct *work)
-+{
-+	struct virtio_balloon *vb;
-+
-+	vb = container_of(work, struct virtio_balloon, report_free_page_work);
-+	walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
-+	report_free_page_completion(vb);
-+}
-+
-+static void free_page_request(struct virtqueue *vq)
-+{
-+	struct virtio_balloon *vb = vq->vdev->priv;
-+
-+	queue_work(system_freezable_wq, &vb->report_free_page_work);
-+}
-+
- static int init_vqs(struct virtio_balloon *vb)
- {
--	struct virtqueue *vqs[3];
--	vq_callback_t *callbacks[] = { balloon_ack, balloon_ack, stats_request };
--	static const char * const names[] = { "inflate", "deflate", "stats" };
--	int err, nvqs;
-+	struct virtqueue **vqs;
-+	vq_callback_t **callbacks;
-+	const char **names;
-+	struct scatterlist sg;
-+	int i, nvqs, err = -ENOMEM;
-+
-+	/* Inflateq and deflateq are used unconditionally */
-+	nvqs = 2;
-+	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ))
-+		nvqs++;
-+	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_FREE_PAGE_VQ))
-+		nvqs++;
-+
-+	/* Allocate space for find_vqs parameters */
-+	vqs = kcalloc(nvqs, sizeof(*vqs), GFP_KERNEL);
-+	if (!vqs)
-+		goto err_vq;
-+	callbacks = kmalloc_array(nvqs, sizeof(*callbacks), GFP_KERNEL);
-+	if (!callbacks)
-+		goto err_callback;
-+	names = kmalloc_array(nvqs, sizeof(*names), GFP_KERNEL);
-+	if (!names)
-+		goto err_names;
-+
-+	callbacks[0] = balloon_ack;
-+	names[0] = "inflate";
-+	callbacks[1] = balloon_ack;
-+	names[1] = "deflate";
-+
-+	i = 2;
-+	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
-+		callbacks[i] = stats_request;
-+		names[i] = "stats";
-+		i++;
-+	}
- 
--	/*
--	 * We expect two virtqueues: inflate and deflate, and
--	 * optionally stat.
--	 */
--	nvqs = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ) ? 3 : 2;
--	err = virtio_find_vqs(vb->vdev, nvqs, vqs, callbacks, names, NULL);
-+	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_FREE_PAGE_VQ)) {
-+		callbacks[i] = free_page_request;
-+		names[i] = "free_page_vq";
-+	}
-+
-+	err = vb->vdev->config->find_vqs(vb->vdev, nvqs, vqs, callbacks, names,
-+					 NULL, NULL);
- 	if (err)
--		return err;
-+		goto err_find;
- 
- 	vb->inflate_vq = vqs[0];
- 	vb->deflate_vq = vqs[1];
-+	i = 2;
- 	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
--		struct scatterlist sg;
--		unsigned int num_stats;
--		vb->stats_vq = vqs[2];
--
-+		vb->stats_vq = vqs[i++];
- 		/*
- 		 * Prime this virtqueue with one buffer so the hypervisor can
- 		 * use it to signal us later (it can't be broken yet!).
- 		 */
--		num_stats = update_balloon_stats(vb);
--
--		sg_init_one(&sg, vb->stats, sizeof(vb->stats[0]) * num_stats);
-+		sg_init_one(&sg, vb->stats, sizeof(vb->stats));
- 		if (virtqueue_add_outbuf(vb->stats_vq, &sg, 1, vb, GFP_KERNEL)
--		    < 0)
--			BUG();
-+		    < 0) {
-+			dev_warn(&vb->vdev->dev, "%s: add stat_vq failed\n",
-+				 __func__);
-+			goto err_find;
-+		}
- 		virtqueue_kick(vb->stats_vq);
- 	}
-+
-+	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_FREE_PAGE_VQ)) {
-+		vb->free_page_vq = vqs[i];
-+		vb->report_free_page_signal = 0;
-+		sg_init_one(&sg, &vb->report_free_page_signal,
-+			    sizeof(__virtio32));
-+		if (virtqueue_add_outbuf(vb->free_page_vq, &sg, 1, vb,
-+					 GFP_KERNEL) < 0) {
-+			dev_warn(&vb->vdev->dev, "%s: add signal buf failed\n",
-+				 __func__);
-+			goto err_find;
-+		}
-+		virtqueue_kick(vb->free_page_vq);
-+	}
-+
-+	kfree(names);
-+	kfree(callbacks);
-+	kfree(vqs);
- 	return 0;
-+
-+err_find:
-+	kfree(names);
-+err_names:
-+	kfree(callbacks);
-+err_callback:
-+	kfree(vqs);
-+err_vq:
-+	return err;
- }
- 
- #ifdef CONFIG_BALLOON_COMPACTION
-@@ -675,6 +795,9 @@ static int virtballoon_probe(struct virtio_device *vdev)
- 	if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_SG))
- 		xb_init(&vb->page_xb);
- 
-+	if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_VQ))
-+		INIT_WORK(&vb->report_free_page_work, report_free_page);
-+
- 	vb->nb.notifier_call = virtballoon_oom_notify;
- 	vb->nb.priority = VIRTBALLOON_OOM_NOTIFY_PRIORITY;
- 	err = register_oom_notifier(&vb->nb);
-@@ -739,6 +862,7 @@ static void virtballoon_remove(struct virtio_device *vdev)
- 	spin_unlock_irq(&vb->stop_update_lock);
- 	cancel_work_sync(&vb->update_balloon_size_work);
- 	cancel_work_sync(&vb->update_balloon_stats_work);
-+	cancel_work_sync(&vb->report_free_page_work);
- 
- 	remove_common(vb);
- #ifdef CONFIG_BALLOON_COMPACTION
-@@ -792,6 +916,7 @@ static unsigned int features[] = {
- 	VIRTIO_BALLOON_F_STATS_VQ,
- 	VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
- 	VIRTIO_BALLOON_F_SG,
-+	VIRTIO_BALLOON_F_FREE_PAGE_VQ,
- };
- 
- static struct virtio_driver virtio_balloon_driver = {
-diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
-index 37780a7..8214f84 100644
---- a/include/uapi/linux/virtio_balloon.h
-+++ b/include/uapi/linux/virtio_balloon.h
-@@ -35,6 +35,7 @@
- #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue */
- #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
- #define VIRTIO_BALLOON_F_SG		3 /* Use sg instead of PFN lists */
-+#define VIRTIO_BALLOON_F_FREE_PAGE_VQ	4 /* Virtqueue to report free pages */
- 
- /* Size of a PFN in the balloon interface. */
- #define VIRTIO_BALLOON_PFN_SHIFT 12
--- 
-2.7.4
+Now than I'm reading again...
+
+>>       cc->has_work = mips_cpu_has_work;
+>>       cc->do_interrupt = mips_cpu_do_interrupt;
+>>       cc->cpu_exec_interrupt = mips_cpu_exec_interrupt;
+>> @@ -203,9 +229,34 @@ static const TypeInfo mips_cpu_type_info = {
+
+Shouldn't this class now be abstract?
+
+>>       .class_init = mips_cpu_class_init,
+>>   };
+>> +static void mips_cpu_cpudef_class_init(ObjectClass *oc, void *data)
+>> +{
+>> +    MIPSCPUClass *mcc = MIPS_CPU_CLASS(oc);
+>> +    mcc->cpu_def = data;
+>> +}
+>> +
+>> +static void mips_register_cpudef_type(const struct mips_def_t *def)
+>> +{
+>> +    char *typename = mips_cpu_type_name(def->name);
+>> +    TypeInfo ti = {
+>> +        .name = typename,
+>> +        .parent = TYPE_MIPS_CPU,
+>> +        .class_init = mips_cpu_cpudef_class_init,
+>> +        .class_data = (void *)def,
+>> +    };
+>> +
+>> +    type_register(&ti);
+>> +    g_free(typename);
+>> +}
+>> +
+>>   static void mips_cpu_register_types(void)
+>>   {
+>> +    int i;
+>> +
+>>       type_register_static(&mips_cpu_type_info);
+>> +    for (i = 0; i < mips_defs_number; i++) {
+>> +        mips_register_cpudef_type(&mips_defs[i]);
+>> +    }
+>>   }
+>>   type_init(mips_cpu_register_types)
+>> diff --git a/target/mips/translate.c b/target/mips/translate.c
+>> index 7b3ae81..ae7ca80 100644
+>> --- a/target/mips/translate.c
+>> +++ b/target/mips/translate.c
+>> @@ -20193,16 +20193,15 @@ void mips_tcg_init(void)
+>>   MIPSCPU *cpu_mips_init(const char *cpu_model)
+>>   {
+>> +    ObjectClass *oc;
+>>       MIPSCPU *cpu;
+>> -    CPUMIPSState *env;
+>> -    const mips_def_t *def;
+>> -    def = cpu_mips_find_by_name(cpu_model);
+>> -    if (!def)
+>> +    oc = cpu_class_by_name(TYPE_MIPS_CPU, cpu_model);
+>> +    if (oc == NULL) {
+>>           return NULL;
+>> -    cpu = MIPS_CPU(object_new(TYPE_MIPS_CPU));
+>> -    env = &cpu->env;
+>> -    env->cpu_model = def;
+>> +    }
+>> +
+>> +    cpu = MIPS_CPU(object_new(object_class_get_name(oc)));
+>>       object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
+>> diff --git a/target/mips/translate_init.c b/target/mips/translate_init.c
+>> index c771ff1..16c214b 100644
+>> --- a/target/mips/translate_init.c
+>> +++ b/target/mips/translate_init.c
+>> @@ -51,63 +51,9 @@
+>>   #define MIPS_CONFIG5                                              \
+>>   ((0 << CP0C5_M))
+>> -/* MMU types, the first four entries have the same layout as the
+>> -   CP0C0_MT field.  */
+>> -enum mips_mmu_types {
+>> -    MMU_TYPE_NONE,
+>> -    MMU_TYPE_R4000,
+>> -    MMU_TYPE_RESERVED,
+>> -    MMU_TYPE_FMT,
+>> -    MMU_TYPE_R3000,
+>> -    MMU_TYPE_R6000,
+>> -    MMU_TYPE_R8000
+>> -};
+>> -
+>> -struct mips_def_t {
+>> -    const char *name;
+>> -    int32_t CP0_PRid;
+>> -    int32_t CP0_Config0;
+>> -    int32_t CP0_Config1;
+>> -    int32_t CP0_Config2;
+>> -    int32_t CP0_Config3;
+>> -    int32_t CP0_Config4;
+>> -    int32_t CP0_Config4_rw_bitmask;
+>> -    int32_t CP0_Config5;
+>> -    int32_t CP0_Config5_rw_bitmask;
+>> -    int32_t CP0_Config6;
+>> -    int32_t CP0_Config7;
+>> -    target_ulong CP0_LLAddr_rw_bitmask;
+>> -    int CP0_LLAddr_shift;
+>> -    int32_t SYNCI_Step;
+>> -    int32_t CCRes;
+>> -    int32_t CP0_Status_rw_bitmask;
+>> -    int32_t CP0_TCStatus_rw_bitmask;
+>> -    int32_t CP0_SRSCtl;
+>> -    int32_t CP1_fcr0;
+>> -    int32_t CP1_fcr31_rw_bitmask;
+>> -    int32_t CP1_fcr31;
+>> -    int32_t MSAIR;
+>> -    int32_t SEGBITS;
+>> -    int32_t PABITS;
+>> -    int32_t CP0_SRSConf0_rw_bitmask;
+>> -    int32_t CP0_SRSConf0;
+>> -    int32_t CP0_SRSConf1_rw_bitmask;
+>> -    int32_t CP0_SRSConf1;
+>> -    int32_t CP0_SRSConf2_rw_bitmask;
+>> -    int32_t CP0_SRSConf2;
+>> -    int32_t CP0_SRSConf3_rw_bitmask;
+>> -    int32_t CP0_SRSConf3;
+>> -    int32_t CP0_SRSConf4_rw_bitmask;
+>> -    int32_t CP0_SRSConf4;
+>> -    int32_t CP0_PageGrain_rw_bitmask;
+>> -    int32_t CP0_PageGrain;
+>> -    int insn_flags;
+>> -    enum mips_mmu_types mmu_type;
+>> -};
+>> -
+>>   
+>> /*****************************************************************************/ 
+>>
+>>   /* MIPS CPU definitions */
+>> -static const mips_def_t mips_defs[] =
+>> +const mips_def_t mips_defs[] =
+>>   {
+>>       {
+>>           .name = "4Kc",
+>> @@ -803,6 +749,7 @@ static const mips_def_t mips_defs[] =
+>>   #endif
+>>   };
+>> +const int mips_defs_number = ARRAY_SIZE(mips_defs);
+>>   static const mips_def_t *cpu_mips_find_by_name (const char *name)
+>>   {
+>>
