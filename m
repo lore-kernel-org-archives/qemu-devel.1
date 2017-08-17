@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1diJmu-0004uu-93
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 08:20:37 -0400
+	(envelope-from <stefanha@redhat.com>) id 1diJoC-0005rH-T9
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 08:21:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1diJmr-0004qr-0F
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 08:20:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55202)
+	(envelope-from <stefanha@redhat.com>) id 1diJo9-0005Zl-IT
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 08:21:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:62012)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1diJmq-0004qc-QY
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 08:20:32 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9CB68745DD
-	for <qemu-devel@nongnu.org>; Thu, 17 Aug 2017 12:20:31 +0000 (UTC)
-References: <20170817102848.19294-1-famz@redhat.com>
-	<1d0ebe1e-293d-b119-0621-d0f666b9ca36@redhat.com>
-	<20170817120348.GE616@lemon>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a4902208-fca3-519a-76d9-3074aa802ef6@redhat.com>
-Date: Thu, 17 Aug 2017 14:20:25 +0200
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1diJo9-0005Yt-9E
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 08:21:53 -0400
+Date: Thu, 17 Aug 2017 13:21:48 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170817122148.GE5539@stefanha-x1.localdomain>
+References: <20170817024746.5961-1-famz@redhat.com>
+	<20170817024746.5961-5-famz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170817120348.GE616@lemon>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] scsi-block: Add qdev error properties
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="EXKGNeO8l0xGFBjy"
+Content-Disposition: inline
+In-Reply-To: <20170817024746.5961-5-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v2 04/10] tests: Add vm test lib
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,34 +29,122 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, pbonzini@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
 
-On 17/08/2017 14:03, Fam Zheng wrote:
-> On Thu, 08/17 13:44, Paolo Bonzini wrote:
->> On 17/08/2017 12:28, Fam Zheng wrote:
->>> This makes the werror/rerror options available on the scsi-block devi=
-ce,
->>> to allow user specify error handling policy in the same way as scsi-h=
-d
->>> etc.
->>>
->>> Signed-off-by: Fam Zheng <famz@redhat.com>
->>
->> I'm not sure this is enough, because you would only obey the
->> rerror/werror action if ioctl fails, not if the ioctl succeeds but the
->> command fails (the "r->status && *r->status" conditional in
->> scsi_disk_req_check_error).
->=20
-> Yes, I missed that.  Why isn't scsi_handle_rw_error called in that if b=
-lock
-> currently?
 
-A recursive answer is because scsi-block doesn't have rerror and werror
-(and it's the only one that sets r->status, see scsi_block_dma_command).
+--EXKGNeO8l0xGFBjy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-More precisely, scsi_handle_rw_error more or less assumes error !=3D 0
-(see the switch statement and blk_error_action), so some other changes
-are needed to cover that case---at least not overwrite the sense and
-ensure something sensible comes out of the QMP event.
+On Thu, Aug 17, 2017 at 10:47:40AM +0800, Fam Zheng wrote:
+> +        self._args = [ \
+> +            "-nodefaults", "-enable-kvm", "-m", "2G",
+> +            "-smp", os.environ.get("J", "4"), "-cpu", "host",
 
-Paolo
+I suggested making -j a command-line argument and constructor argument
+instead of using a environment variable.  Your email reply seemed to
+agree but this patch is still using an environment variable.  Did you
+forget?
+
+> +    def boot(self, img, extra_args=[]):
+> +        args = self._args + [
+> +            "-drive", "file=%s,if=none,id=drive0,cache=writeback" % img,
+> +            "-device", "virtio-blk,drive=drive0,bootindex=0"]
+> +        args += self._data_args + extra_args
+> +        logging.debug("QEMU args: %s", " ".join(args))
+> +        guest = QEMUMachine(binary=os.environ.get("QEMU", "qemu-system-x86_64"),
+> +                            args=args)
+> +        guest._vga = "std"
+
+_vga is a protected field.  We don't inherit from QEMUMachine so it
+shouldn't be accessed directly.  One option is to add a vga argument to
+the QEMUMachine() constructor.
+
+> +        guest.launch()
+> +        atexit.register(self.shutdown)
+> +        self._guest = guest
+> +        usernet_info = guest.qmp("human-monitor-command",
+> +                                 command_line="info usernet")
+> +        self.ssh_port = None
+> +        for l in usernet_info["return"].splitlines():
+> +            fields = l.split()
+> +            if "TCP[HOST_FORWARD]" in fields and "22" in fields:
+> +                self.ssh_port = l.split()[3]
+> +        if not self.ssh_port:
+> +            raise Exception("Cannot find ssh port from 'info usernet':\n%s" % \
+> +                            usernet_info)
+> +
+> +    def wait_ssh(self, seconds=120):
+> +        guest_remote = self.GUEST_USER + "@127.0.0.1"
+
+Please remove this unused variable.
+
+> +def parse_args(vm_name):
+> +    parser = argparse.ArgumentParser()
+
+Python 2.6 only has optparse, not argparse.  Perhaps we can raise the
+minimum Python version requirement to 2.7 starting from QEMU 2.11.  For
+the time being it would be necessary to use optparse instead.
+
+> +    parser.add_argument("--debug", "-D", action="store_true",
+> +                        help="enable debug output")
+> +    parser.add_argument("--image", "-i", default="%s.img" % vm_name,
+> +                        help="image file name")
+> +    parser.add_argument("--force", "-f", action="store_true",
+> +                        help="force build image even if image exists")
+> +    parser.add_argument("--build-image", "-b", action="store_true",
+> +                        help="build image")
+> +    parser.add_argument("--build-qemu",
+> +                        help="build QEMU from source in guest")
+> +    parser.add_argument("--interactive", "-I", action="store_true",
+> +                        help="Interactively run command")
+> +    return parser.parse_known_args()
+
+Documentation would be really helpful.  I'm not sure what workflow you
+have in mind for this command-line tool.  There are two scenarios that
+would be good to document:
+1. How to invoke and use existing images for tests.
+2. How to create new images (e.g. add a guest operating system).
+
+> +
+> +def main(vmcls):
+> +    args, argv = parse_args(vmcls.name)
+> +    if not argv and not args.build_qemu:
+> +        print "Nothing to do?"
+> +        return 1
+> +    if args.debug:
+> +        logging.getLogger().setLevel(logging.DEBUG)
+> +    vm = vmcls(debug=args.debug)
+> +    if args.build_image:
+> +        if os.path.exists(args.image) and not args.force:
+> +            sys.stderr.writelines(["Image file exists: %s\n" % img,
+> +                                  "Use --force option to overwrite\n"])
+> +            return 1
+> +        return vm.build_image(args.image)
+> +    if args.build_qemu:
+> +        vm.add_source_dir(args.build_qemu)
+> +        cmd = [vm.BUILD_SCRIPT.format(
+> +               configure_opts = " ".join(argv),
+> +               jobs=os.environ.get("J", "4"))]
+> +    else:
+> +        cmd = argv
+> +    vm.boot(args.image + ",snapshot=on")
+> +    vm.wait_ssh()
+
+This method returns 2 on timeout.  Exit here?
+
+--EXKGNeO8l0xGFBjy
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJZlYpcAAoJEJykq7OBq3PIcf0H/j5xyaNvkeJmfYIZp9P6hPEk
+ujnWjqxePZNuq4rNo1k0WrnlUSFje2TSCXhy8hDuKp3xGjgrVjlGVwbISGHemt9s
+mGdkO3iQ964EKAC9x8ArJ7mlDmwn4ruZqf8paVPFOeeS3gAuLCqG7sTwG3SJRFcv
+eao5+YHRqRODTjrTwfG+IlBjoVyAnDV/U1dVYQ+7XoyYDjaZdcHlBFEqnYFJkpGS
+H3mfsCHHT+prMIIiBw1FQlBbRt0r1prsgWQV9nLONFRkODXjMpGJIWgtzobcJo4W
+9rSMm4zYxi0WJ2FToZL/GKAk3SeVcuhMajbCthg0gQc0HcJ9Gy1JWyXmfgHkAeY=
+=3tO+
+-----END PGP SIGNATURE-----
+
+--EXKGNeO8l0xGFBjy--
