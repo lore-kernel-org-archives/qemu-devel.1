@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1diJPq-00022z-OF
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:56:47 -0400
+	(envelope-from <armbru@redhat.com>) id 1diJQx-0002nx-6j
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:57:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1diJPm-00080h-0L
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:56:46 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:37662)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1diJPl-00080U-SG
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:56:41 -0400
-Received: by mail-qt0-x241.google.com with SMTP id d10so5968697qtb.4
-	for <qemu-devel@nongnu.org>; Thu, 17 Aug 2017 04:56:41 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170328184959.5550-1-sw@weilnetz.de>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5dac6dc9-dc22-997a-06b6-10de4b804d64@amsat.org>
-Date: Thu, 17 Aug 2017 08:56:38 -0300
+	(envelope-from <armbru@redhat.com>) id 1diJQs-0008RP-9K
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:57:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55454)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1diJQs-0008RC-2k
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 07:57:50 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D13617DD0A
+	for <qemu-devel@nongnu.org>; Thu, 17 Aug 2017 11:57:48 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
+	<20170727154126.11339-23-marcandre.lureau@redhat.com>
+Date: Thu, 17 Aug 2017 13:57:39 +0200
+In-Reply-To: <20170727154126.11339-23-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 27 Jul 2017
+	17:41:22 +0200")
+Message-ID: <87inhmflu4.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170328184959.5550-1-sw@weilnetz.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9?] configure: Remove unused code
- (found by shellcheck)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 22/26] qapi: make rtc-reset-reinjection
+ depend on TARGET_I386
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +36,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 03/28/2017 03:49 PM, Stefan Weil wrote:
-> smartcard_cflags is no longer needed since commit
-> 0b22ef0f57a8910d849602bef0940edcd0553d2c.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-leftover from afd347ab387
-
-> 
-> Signed-off-by: Stefan Weil <sw@weilnetz.de>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
-> 
-> This is a very old patch which I just found in my patch queue.
-> It's not mandatory for 2.9, but I also think that there is
-> no risk to apply it.
-> 
-> Sorry for sending it so late.
-> 
-> Regards
-> Stefan
-> 
->   configure | 1 -
->   1 file changed, 1 deletion(-)
-> 
-> diff --git a/configure b/configure
-> index d1ce33bc79..b65ea2931c 100755
-> --- a/configure
-> +++ b/configure
-> @@ -4096,7 +4096,6 @@ EOF
->   fi
->   
->   # check for smartcard support
-> -smartcard_cflags=""
->   if test "$smartcard" != "no"; then
->       if $pkg_config libcacard; then
->           libcacard_cflags=$($pkg_config --cflags libcacard)
-> 
+>  qapi-schema.json |  3 ++-
+>  monitor.c        | 10 ----------
+>  2 files changed, 2 insertions(+), 11 deletions(-)
+>
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 2f4528c769..2361c13fc8 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -6270,7 +6270,8 @@
+>  # <- { "return": {} }
+>  #
+>  ##
+> -{ 'command': 'rtc-reset-reinjection' }
+> +{ 'command': 'rtc-reset-reinjection',
+> +  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_I386)'] }
+
+Aha, here' you use the list syntax.
+
+And your strategy to keep things compiling also becomes clear: you wrap
+uses of poisoned symbols like TARGET_I386 in #if defined(NEED_CPU_H).
+
+Not exactly elegant, but looks workable.  But you need to explain this
+solution in commit messages [PATCH 21, I guess] and document it in
+qapi-code-gen.txt.  *Unless* we can find a better one.
+
+>=20=20
+>  # Rocker ethernet network switch
+>  { 'include': 'qapi/rocker.json' }
+> diff --git a/monitor.c b/monitor.c
+> index 383c84d162..f3dafafa22 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -970,9 +970,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QObjec=
+t **ret_data,
+>   */
+>  static void qmp_unregister_commands_hack(void)
+>  {
+> -#ifndef TARGET_I386
+> -    qmp_unregister_command(&qmp_commands, "rtc-reset-reinjection");
+> -#endif
+>  #ifndef TARGET_S390X
+>      qmp_unregister_command(&qmp_commands, "dump-skeys");
+>  #endif
+> @@ -4151,13 +4148,6 @@ QemuOptsList qemu_mon_opts =3D {
+>      },
+>  };
+>=20=20
+> -#ifndef TARGET_I386
+> -void qmp_rtc_reset_reinjection(Error **errp)
+> -{
+> -    error_setg(errp, QERR_FEATURE_DISABLED, "rtc-reset-reinjection");
+> -}
+> -#endif
+> -
+>  #ifndef TARGET_S390X
+>  void qmp_dump_skeys(const char *filename, Error **errp)
+>  {
