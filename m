@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1di532-0002iH-QO
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 16:36:18 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1di9ht-0004Qk-NG
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 21:34:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1di52x-0002oH-U3
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 16:36:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60539)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1di52x-0002nv-LQ
-	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 16:36:11 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1di52u-0001QP-Ev
-	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 20:36:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D6E1D2E80CF
-	for <qemu-devel@nongnu.org>; Wed, 16 Aug 2017 20:36:06 +0000 (UTC)
+	(envelope-from <dgibson@ozlabs.org>) id 1di9hs-0001QQ-H5
+	for qemu-devel@nongnu.org; Wed, 16 Aug 2017 21:34:45 -0400
+Date: Thu, 17 Aug 2017 11:29:19 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170817012919.GA5509@umbus.fritz.box>
+References: <1502883336-14608-1-git-send-email-bharata@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 16 Aug 2017 20:28:22 -0000
-From: George Kraft <george.kraft@canonical.com>
-Reply-To: Bug 1701798 <1701798@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149890819992.24827.8096984642709091835.malonedeb@soybean.canonical.com>
-Message-Id: <150291530206.17031.9658204012485945131.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1701798] Re: dynamically linked binaries crash
- for big-endian targets
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="MGYHOYXEY6WxJCY8"
+Content-Disposition: inline
+In-Reply-To: <1502883336-14608-1-git-send-email-bharata@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [FIX PATCH v0] spapr: Allow configure-connector to
+ be called multiple times for LMBs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,234 +24,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, nfont@linux.vnet.ibm.com
 
-I think I hit this problem trying to use qemu-s390x-static in the
-s390x/ubuntu:16.04 docker image. Running qemu-s390x-static 2.9.0 on
-binaries in that image (e.g. /bin/echo) results in a hang.
 
-I've noticed that doing the same in a s390x/debian:jessie image does NOT
-have the same problem. No hang. Looks like the binaries are built for
-different kernel versions, could that be why?
+--MGYHOYXEY6WxJCY8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-$ file ubuntu16.04/bin/echo
-ubuntu16.04/bin/echo: ELF 64-bit MSB shared object, IBM S/390, version 1 (S=
-YSV), dynamically linked, interpreter /lib/ld64.so.1, for GNU/Linux 3.2.0, =
-BuildID[sha1]=3D4befa0df07957e117e8cc44d0dd14a3df6d44619, stripped
+On Wed, Aug 16, 2017 at 05:05:36PM +0530, Bharata B Rao wrote:
+> In case of in-kernel memory hot unplug, when the guest is not able
+> to remove all the LMBs that are requested for removal, it will add back
+> any LMBs that have been successfully removed. The DR Connectors of
+> these LMBs wouldn't have been unconfigured and hence the addition of
+> these LMBs will result in configure-connector call being issued on
+> LMB DR connectors that are already in configured state. Such
+> configure-connector calls will fail resulting in a DIMM which is
+> partially unplugged.
+>=20
+> This however worked till recently before we overhauled the DRC
+> implementation in QEMU. Commit 9d4c0f4f0a71e: "spapr: Consolidate
+> DRC state variables" is the first commit where this problem shows up
+> as per git bisect.
+>=20
+> Ideally guest shouldn't be issuing configure-connector call on an
+> already configured DR connector. However for now, work around this in
+> QEMU by allowing configure-connector to be called multiple times for
+> LMBs.
+>=20
+> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+> ---
+>  hw/ppc/spapr_drc.c | 37 +++++++++++++++++++++++++++++++------
+>  1 file changed, 31 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index 5260b5d..2dd9635 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -446,8 +446,17 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
+>          drc->state =3D drck->empty_state;
+>      }
+> =20
+> -    drc->ccs_offset =3D -1;
+> -    drc->ccs_depth =3D -1;
+> +    if (spapr_drc_type(drc) =3D=3D SPAPR_DR_CONNECTOR_TYPE_LMB) {
 
-$ file debian/bin/echo
-debian/bin/echo: ELF 64-bit MSB executable, IBM S/390, version 1 (SYSV), dy=
-namically linked, interpreter /lib/ld64.so.1, for GNU/Linux 2.6.32, BuildID=
-[sha1]=3D4bd45eb0ae5287ba9271a9daa9809166dd2eeab5, stripped
+We shouldn't have a type dependency here.  If we want the configure
+connector process to be repeatable, it should be repeatable for
+everything, even if we only actually need it for LMBs.
 
--- =
+> +        /*
+> +         * Ensure that we are able to send the FDT fragment of the
+> +         * LMB again via configure-connector call if guest requests.
+> +         */
+> +        drc->ccs_offset =3D drc->fdt_start_offset;
+> +        drc->ccs_depth =3D 0;
+> +    } else {
+> +        drc->ccs_offset =3D -1;
+> +        drc->ccs_depth =3D -1;
+> +    }
+>  }
+> =20
+>  static void drc_reset(void *opaque)
+> @@ -1071,8 +1080,14 @@ static void rtas_ibm_configure_connector(PowerPCCP=
+U *cpu,
+>      }
+> =20
+>      if ((drc->state !=3D SPAPR_DRC_STATE_LOGICAL_UNISOLATE)
+> -        && (drc->state !=3D SPAPR_DRC_STATE_PHYSICAL_UNISOLATE)) {
+> -        /* Need to unisolate the device before configuring */
+> +        && (drc->state !=3D SPAPR_DRC_STATE_PHYSICAL_UNISOLATE) &&
+> +        (spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_LMB)) {
+> +        /*
+> +         * Need to unisolate the device before configuring, however
+> +         * LMB DRCs are exempted from this check as guest can issue
+> +         * configure-connector calls for an already configured
+> +         * LMB DRC.
+> +         */
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1701798
+Same here - but we do need to explicitly check that the state is
+either UNISOLATE *or* CONFIGURED, and not allow it from some other
+random state.
 
-Title:
-  dynamically linked binaries crash for big-endian targets
+>          rc =3D SPAPR_DR_CC_RESPONSE_NOT_CONFIGURABLE;
+>          goto out;
+>      }
+> @@ -1108,8 +1123,18 @@ static void rtas_ibm_configure_connector(PowerPCCP=
+U *cpu,
+>                  /* done sending the device tree, move to configured stat=
+e */
+>                  trace_spapr_drc_set_configured(drc_index);
+>                  drc->state =3D drck->ready_state;
+> -                drc->ccs_offset =3D -1;
+> -                drc->ccs_depth =3D -1;
+> +                if (spapr_drc_type(drc) =3D=3D SPAPR_DR_CONNECTOR_TYPE_L=
+MB) {
 
-Status in QEMU:
-  New
+And again.
 
-Bug description:
-  On the targets
-    hppa
-    m68k
-    mips
-    mips64
-    powerpc
-    powerpc64
-    s390x
-    sparc64
-  dynamically linked binaries crash, but statically linked binaries work.
-  On the targets
-    aarch64
-    alpha
-    armhf
-    powerpc64le
-    sh4
-  both dynamically linked and statically linked binaries work.
+> +                    /*
+> +                     * Ensure that we are able to send the FDT fragment =
+of the
+> +                     * LMB again via configure-connector call if guest r=
+equests.
+> +                     */
+> +                    drc->ccs_offset =3D drc->fdt_start_offset;
+> +                    drc->ccs_depth =3D 0;
+> +                    fdt_offset_next =3D drc->fdt_start_offset;
+> +                } else {
+> +                    drc->ccs_offset =3D -1;
+> +                    drc->ccs_depth =3D -1;
+> +                }
+>                  resp =3D SPAPR_DR_CC_RESPONSE_SUCCESS;
+>              } else {
+>                  resp =3D SPAPR_DR_CC_RESPONSE_PREV_PARENT;
 
-  How to reproduce:
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-  1) On Ubuntu 16.04, install the packages
-  g++-5-aarch64-linux-gnu
-  g++-5-alpha-linux-gnu
-  g++-5-arm-linux-gnueabihf
-  g++-5-hppa-linux-gnu
-  g++-5-m68k-linux-gnu
-  g++-5-mips-linux-gnu
-  g++-5-mips64-linux-gnuabi64
-  g++-5-powerpc-linux-gnu
-  g++-5-powerpc64-linux-gnu
-  g++-5-powerpc64le-linux-gnu
-  g++-5-s390x-linux-gnu
-  g++-5-sh4-linux-gnu
-  g++-5-sparc64-linux-gnu
+--MGYHOYXEY6WxJCY8
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  2) Install qemu 2.9.0 from source (for m68k, use the 2.7.0-m68k
-  code from https://github.com/vivier/qemu-m68k.git):
-  $ ../configure --prefix=3D/home/bruno/inst-qemu/2.9.0 --target-list=3Daar=
-ch64-softmmu,alpha-softmmu,arm-softmmu,i386-softmmu,m68k-softmmu,mips-softm=
-mu,mipsel-softmmu,mips64-softmmu,mips64el-softmmu,ppc-softmmu,ppc64-softmmu=
-,s390x-softmmu,sh4-softmmu,sparc-softmmu,sparc64-softmmu,x86_64-softmmu,aar=
-ch64-linux-user,alpha-linux-user,arm-linux-user,hppa-linux-user,m68k-linux-=
-user,mips-linux-user,mipsel-linux-user,mips64-linux-user,mips64el-linux-use=
-r,ppc-linux-user,ppc64-linux-user,ppc64le-linux-user,s390x-linux-user,sh4-l=
-inux-user,sparc-linux-user,sparc64-linux-user --disable-strip --disable-wer=
-ror --enable-gtk --enable-vnc
-  $ make
-  $ make install
+-----BEGIN PGP SIGNATURE-----
 
-  3) Cross-compile the programs:
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmU8W0ACgkQbDjKyiDZ
+s5LlFBAAgnE6FmskfMp9dtxsu9yKQITgP84HtUziIQcmIVhioN1UAGysmpdjKCHx
+W//EmMh818fkIr4+KEr8TdFmRoMas0MARGLVG3qj2gnuwMaLLabY5owkqCHMZlIB
+65QG3QfaM2CRdS9WwODK87DZDVQH4wq5oMrHD01w92/4EwIMFwkPytDodaigvLhA
+Z4Aw3vcdoBLEuwmkfC1J22SwfCNYIhJgDcvnYMqIAOpjM0n0580a3l9+izM9kr0c
+NVllKQZKYouh8Ru9OUNAiowTnqyB+9tupTjRABJTQePKT2OvjY7Wc6XgKhUiDBP8
+UXAw01TzB649J6zbutV/iBXu84zelRcs0p/Bl3LArQuz0rN+lwM5XE2DC8pDQbck
+L1bqjExzTV6giAzDAWJa+HHA9vvkG1jwRm7552izcqgMjL1xvz89pT3F+eSt4fvv
+a6bglbDJ1KN9T+w6NNAf/12NnQGdUCxzXFzeh7Z1Lbzwi7cHnX4rfnA9rkKACVqd
+maldIXxovv3q7mom6Wbzn7nD6CYDVVZ/LETktV6IpgblpuLs/0DjUlVIZpcW063U
+LIorIDRe9x4FyxrOjnU0dddc/FUSAR23rqTyDTB30R2Ke+M5p9QjnYsVFQOWvcOr
+wZmpaLemESXV3pdXmSTBISf8LZzPb+76LGbQ39W658cxacgLqj0=
+=nTCW
+-----END PGP SIGNATURE-----
 
-  $ aarch64-linux-gnu-gcc-5 -O hello.c -o hello.aarch64
-  $ alpha-linux-gnu-gcc-5 -O hello.c -o hello.alpha
-  $ arm-linux-gnueabihf-gcc-5 -O hello.c -o hello.armhf
-  $ hppa-linux-gnu-gcc-5 -O hello.c -o hello.hppa
-  $ m68k-linux-gnu-gcc-5 -O hello.c -o hello.m68k
-  $ mips-linux-gnu-gcc-5 -O hello.c -o hello.mips
-  $ mips64-linux-gnuabi64-gcc-5 -O hello.c -o hello.mips64
-  $ powerpc-linux-gnu-gcc-5 -O hello.c -o hello.powerpc
-  $ powerpc64-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64
-  $ powerpc64le-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64le
-  $ s390x-linux-gnu-gcc-5 -O hello.c -o hello.s390x
-  $ sh4-linux-gnu-gcc-5 -O hello.c -o hello.sh4
-  $ sparc64-linux-gnu-gcc-5 -O hello.c -o hello.sparc64
-
-  4) Run the programs:
-
-  * aarch64 works:
-  $ QEMU_LD_PREFIX=3D/usr/aarch64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-aarc=
-h64 hello.aarch64
-  Hello world
-
-  * alpha works:
-  $ QEMU_LD_PREFIX=3D/usr/alpha-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-alpha =
-hello.alpha =
-
-  Hello world
-
-  * armhf works:
-  $ QEMU_LD_PREFIX=3D/usr/arm-linux-gnueabihf ~/inst-qemu/2.9.0/bin/qemu-ar=
-m hello.armhf
-  Hello world
-
-  * powerpc64le works:
-  $ QEMU_LD_PREFIX=3D/usr/powerpc64le-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-=
-ppc64le hello.powerpc64le
-  Hello world
-
-  * sh4 works:
-  $ QEMU_LD_PREFIX=3D/usr/sh4-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-sh4 hell=
-o.sh4
-  Hello world
-
-  * =3D=3D=3D=3D=3D sparc64 does not work:
-  $ QEMU_LD_PREFIX=3D/usr/sparc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-spar=
-c64 hello.sparc64
-  Segmentation fault (core dumped)
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 4.5.0-2-sp=
-arc64 sparc64",
-  it works:
-  $ ./hello.sparc64
-  Hello world
-
-  When I copy the file and its execution environment /usr/sparc64-linux-gnu=
- to the
-  same machine and run the binary in a chroot environment:
-  # /bin/hello.sparc64 =
-
-  Hello world
-
-  * =3D=3D=3D=3D=3D mips does not work:
-  $ QEMU_LD_PREFIX=3D/usr/mips-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-mips he=
-llo.mips
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-4=
-kc-malta mips",
-  it works:
-  $ ./hello.mips
-  Hello world
-
-  When I copy the file and its execution environment /usr/mips-linux-gnu to=
- the
-  same machine and run the binary in a chroot environment:
-  # /bin/hello.mips =
-
-  Hello world
-
-  * =3D=3D=3D=3D=3D mips64 does not work:
-  $ QEMU_LD_PREFIX=3D/usr/mips64-linux-gnuabi64 ~/inst-qemu/2.9.0/bin/qemu-=
-mips64 hello.mips64
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-5=
-kc-malta mips64",
-  it works:
-  $ ./hello.mips64
-  Hello world
-
-  * =3D=3D=3D=3D=3D powerpc does not work:
-  $ QEMU_LD_PREFIX=3D/usr/powerpc-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-ppc =
-hello.powerpc
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
-.fc20.ppc64p7 ppc64",
-  it works:
-  $ ./hello.powerpc
-  Hello world
-
-  * =3D=3D=3D=3D=3D powerpc64 does not work:
-  $ QEMU_LD_PREFIX=3D/usr/powerpc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-pp=
-c64 hello.powerpc64
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
-.fc20.ppc64p7 ppc64",
-  it works:
-  $ ./hello.powerpc64
-  Hello world
-
-  * =3D=3D=3D=3D=3D s390x does not work:
-  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-s390x =
-hello.s390x
-  <hangs>
-  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.8.1/bin/qemu-s390x =
-hello.s390x
-  qemu-s390x: /media/develdata/devel/build/qemu-2.8.1/translate-all.c:175: =
-tb_lock: Assertion `!have_tb_lock' failed.
-  Segmentation fault (core dumped)
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-s=
-390x s390x",
-  it works:
-  $ ./hello.s390x
-  Hello world
-
-  * =3D=3D=3D=3D=3D hppa does not work:
-  $ QEMU_LD_PREFIX=3D/usr/hppa-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-hppa he=
-llo.hppa
-  Segmentation fault (core dumped)
-
-  * =3D=3D=3D=3D=3D m68k does not work:
-  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.9.=
-0/bin/qemu-m68k hello.m68k
-  qemu: uncaught target signal 4 (Illegal instruction) - core dumped
-  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.7.=
-0-m68k/bin/qemu-m68k hello.m68k
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  =
-
-  The set of targets where it does not work is exactly the big-endian targe=
-ts.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1701798/+subscriptions
+--MGYHOYXEY6WxJCY8--
