@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1diIVh-0004E4-5i
+	(envelope-from <wang.yong155@zte.com.cn>) id 1diIVh-0004E9-6y
 	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 06:58:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1diIVe-0004Ku-3q
+	(envelope-from <wang.yong155@zte.com.cn>) id 1diIVe-0004LG-M5
 	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 06:58:45 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:45040 helo=zte.com.cn)
+Received: from mx7.zte.com.cn ([202.103.147.169]:34586)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1diIVd-0004Kd-Gm
+	(envelope-from <wang.yong155@zte.com.cn>) id 1diIVd-0004Kk-SH
 	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 06:58:42 -0400
 From: Wang yong <wang.yong155@zte.com.cn>
-Date: Thu, 17 Aug 2017 18:58:01 +0800
-Message-Id: <1502967483-4090-2-git-send-email-wang.yong155@zte.com.cn>
+Date: Thu, 17 Aug 2017 18:58:02 +0800
+Message-Id: <1502967483-4090-3-git-send-email-wang.yong155@zte.com.cn>
 In-Reply-To: <1502967483-4090-1-git-send-email-wang.yong155@zte.com.cn>
 References: <1502967483-4090-1-git-send-email-wang.yong155@zte.com.cn>
-Subject: [Qemu-devel] [PATCHv3 01/03] qemu-iothread: IOThread supports the
- GMainContext event loop
+Subject: [Qemu-devel] [PATCHv3 02/03] colo-compare: Use IOThread to Check
+ old packet regularly and Process pactkets of the primary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,110 +29,177 @@ Cc: wang.yong155@zte.com.cn, wang.guang55@zte.com.cn, lizhijian@cn.fujitsu.com, 
 
 From: Wang Yong <wang.yong155@zte.com.cn>
 
-IOThread uses AioContext event loop and does not run a GMainContext.
-Therefore,chardev cannot work in IOThread,such as the chardev is
-used for colo-compare packets reception.
+Remove the task which check old packet in the comparing thread,
+then use IOthread context timer to handle it.
 
-This patch makes the IOThread run the GMainContext event loop,
-chardev and IOThread can work together.
+Process pactkets in the IOThread which arrived over the socket.
+we use iothread_get_g_main_context to create a new g_main_loop in
+the IOThread.then the packets from the primary and the secondary
+are processed in the IOThread.
+
+Finally remove the colo-compare thread using the IOThread instead.
 
 Signed-off-by: Wang Yong <wang.yong155@zte.com.cn>
 Signed-off-by: Wang Guang <wang.guang55@zte.com.cn>
 ---
- include/sysemu/iothread.h |  4 ++++
- iothread.c                | 41 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 45 insertions(+)
+ net/colo-compare.c | 75 ++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 39 insertions(+), 36 deletions(-)
 
-diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
-index e6da1a4..d2985b3 100644
---- a/include/sysemu/iothread.h
-+++ b/include/sysemu/iothread.h
-@@ -24,6 +24,9 @@ typedef struct {
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 5fe8e3f..69cb16e 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -29,6 +29,7 @@
+ #include "qemu/sockets.h"
+ #include "qapi-visit.h"
+ #include "net/colo.h"
++#include "sysemu/iothread.h"
  
-     QemuThread thread;
-     AioContext *ctx;
-+    GMainContext *worker_context;
-+    GMainLoop *main_loop;
-+    GOnce once;
-     QemuMutex init_done_lock;
-     QemuCond init_done_cond;    /* is thread initialization done? */
-     bool stopping;
-@@ -41,5 +44,6 @@ typedef struct {
- char *iothread_get_id(IOThread *iothread);
- AioContext *iothread_get_aio_context(IOThread *iothread);
- void iothread_stop_all(void);
-+GMainContext *iothread_get_g_main_context(IOThread *iothread);
+ #define TYPE_COLO_COMPARE "colo-compare"
+ #define COLO_COMPARE(obj) \
+@@ -82,11 +83,10 @@ typedef struct CompareState {
+     GQueue conn_list;
+     /* hashtable to save connection */
+     GHashTable *connection_track_table;
+-    /* compare thread, a thread for each NIC */
+-    QemuThread thread;
  
- #endif /* IOTHREAD_H */
-diff --git a/iothread.c b/iothread.c
-index beeb870..80ef830 100644
---- a/iothread.c
-+++ b/iothread.c
-@@ -57,6 +57,20 @@ static void *iothread_run(void *opaque)
++    IOThread *iothread;
+     GMainContext *worker_context;
+-    GMainLoop *compare_loop;
++    QEMUTimer *packet_check_timer;
+ } CompareState;
  
-     while (!atomic_read(&iothread->stopping)) {
-         aio_poll(iothread->ctx, true);
+ typedef struct CompareClass {
+@@ -597,22 +597,40 @@ static void compare_sec_chr_in(void *opaque, const uint8_t *buf, int size)
+  * Check old packet regularly so it can watch for any packets
+  * that the secondary hasn't produced equivalents of.
+  */
+-static gboolean check_old_packet_regular(void *opaque)
++static void check_old_packet_regular(void *opaque)
+ {
+     CompareState *s = opaque;
+ 
+     /* if have old packet we will notify checkpoint */
+     colo_old_packet_check(s);
++    timer_mod(s->packet_check_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
++                REGULAR_PACKET_CHECK_MS);
++}
 +
-+        if (atomic_read(&iothread->worker_context)) {
-+            g_main_context_push_thread_default(iothread->worker_context);
-+            iothread->main_loop =
-+                g_main_loop_new(iothread->worker_context, TRUE);
-+            g_main_loop_run(iothread->main_loop);
-+
-+            g_main_loop_unref(iothread->main_loop);
-+            iothread->main_loop = NULL;
-+
-+            g_main_context_pop_thread_default(iothread->worker_context);
-+            g_main_context_unref(iothread->worker_context);
-+            iothread->worker_context = NULL;
-+        }
-     }
++static void colo_compare_timer_init(CompareState *s)
++{
++    AioContext *ctx = iothread_get_aio_context(s->iothread);
  
-     rcu_unregister_thread();
-@@ -73,6 +87,9 @@ static int iothread_stop(Object *object, void *opaque)
-     }
-     iothread->stopping = true;
-     aio_notify(iothread->ctx);
-+    if (atomic_read(&iothread->main_loop)) {
-+        g_main_loop_quit(iothread->main_loop);
+-    return TRUE;
++    s->packet_check_timer = aio_timer_new(ctx, QEMU_CLOCK_VIRTUAL,
++                                SCALE_MS, check_old_packet_regular,
++                                s);
++    timer_mod(s->packet_check_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
++                    REGULAR_PACKET_CHECK_MS);
+ }
+ 
+-static void *colo_compare_thread(void *opaque)
++static void colo_compare_timer_del(CompareState *s)
+ {
+-    CompareState *s = opaque;
+-    GSource *timeout_source;
++    if (s->packet_check_timer) {
++        timer_del(s->packet_check_timer);
++        timer_free(s->packet_check_timer);
++        s->packet_check_timer = NULL;
 +    }
-     qemu_thread_join(&iothread->thread);
-     return 0;
- }
-@@ -125,6 +142,7 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
++ }
  
-     qemu_mutex_init(&iothread->init_done_lock);
-     qemu_cond_init(&iothread->init_done_cond);
-+    iothread->once = (GOnce) G_ONCE_INIT;
- 
-     /* This assumes we are called from a thread with useful CPU affinity for us
-      * to inherit.
-@@ -309,3 +327,26 @@ void iothread_stop_all(void)
- 
-     object_child_foreach(container, iothread_stop, NULL);
- }
-+
-+static gpointer iothread_g_main_context_init(gpointer opaque)
+-    s->worker_context = g_main_context_new();
++static void colo_compare_iothread(CompareState *s)
 +{
-+    AioContext *ctx;
-+    IOThread *iothread = opaque;
-+    GSource *source;
-+
-+    iothread->worker_context = g_main_context_new();
-+
-+    ctx = iothread_get_aio_context(iothread);
-+    source = aio_get_g_source(ctx);
-+    g_source_attach(source, iothread->worker_context);
-+    g_source_unref(source);
-+
-+    return NULL;
-+}
-+
-+GMainContext *iothread_get_g_main_context(IOThread *iothread)
-+{
-+    g_once(&iothread->once, iothread_g_main_context_init, iothread);
-+
-+    return iothread->worker_context;
-+}
++    object_ref(OBJECT(s->iothread));
++    s->worker_context = iothread_get_g_main_context(s->iothread);
+ 
+     qemu_chr_fe_set_handlers(&s->chr_pri_in, compare_chr_can_read,
+                              compare_pri_chr_in, NULL, NULL,
+@@ -621,20 +639,7 @@ static void *colo_compare_thread(void *opaque)
+                              compare_sec_chr_in, NULL, NULL,
+                              s, s->worker_context, true);
+ 
+-    s->compare_loop = g_main_loop_new(s->worker_context, FALSE);
+-
+-    /* To kick any packets that the secondary doesn't match */
+-    timeout_source = g_timeout_source_new(REGULAR_PACKET_CHECK_MS);
+-    g_source_set_callback(timeout_source,
+-                          (GSourceFunc)check_old_packet_regular, s, NULL);
+-    g_source_attach(timeout_source, s->worker_context);
+-
+-    g_main_loop_run(s->compare_loop);
+-
+-    g_source_unref(timeout_source);
+-    g_main_loop_unref(s->compare_loop);
+-    g_main_context_unref(s->worker_context);
+-    return NULL;
++    colo_compare_timer_init(s);
+ }
+ 
+ static char *compare_get_pri_indev(Object *obj, Error **errp)
+@@ -759,12 +764,10 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+ {
+     CompareState *s = COLO_COMPARE(uc);
+     Chardev *chr;
+-    char thread_name[64];
+-    static int compare_id;
+ 
+-    if (!s->pri_indev || !s->sec_indev || !s->outdev) {
++    if (!s->pri_indev || !s->sec_indev || !s->outdev || !s->iothread) {
+         error_setg(errp, "colo compare needs 'primary_in' ,"
+-                   "'secondary_in','outdev' property set");
++                   "'secondary_in','outdev','iothread' property set");
+         return;
+     } else if (!strcmp(s->pri_indev, s->outdev) ||
+                !strcmp(s->sec_indev, s->outdev) ||
+@@ -799,12 +802,7 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+                                                       g_free,
+                                                       connection_destroy);
+ 
+-    sprintf(thread_name, "colo-compare %d", compare_id);
+-    qemu_thread_create(&s->thread, thread_name,
+-                       colo_compare_thread, s,
+-                       QEMU_THREAD_JOINABLE);
+-    compare_id++;
+-
++    colo_compare_iothread(s);
+     return;
+ }
+ 
+@@ -848,6 +846,10 @@ static void colo_compare_init(Object *obj)
+     object_property_add_str(obj, "outdev",
+                             compare_get_outdev, compare_set_outdev,
+                             NULL);
++    object_property_add_link(obj, "iothread", TYPE_IOTHREAD,
++                            (Object **)&s->iothread,
++                            object_property_allow_set_link,
++                            OBJ_PROP_LINK_UNREF_ON_RELEASE, NULL);
+ 
+     s->vnet_hdr = false;
+     object_property_add_bool(obj, "vnet_hdr_support", compare_get_vnet_hdr,
+@@ -861,9 +863,7 @@ static void colo_compare_finalize(Object *obj)
+     qemu_chr_fe_deinit(&s->chr_pri_in, false);
+     qemu_chr_fe_deinit(&s->chr_sec_in, false);
+     qemu_chr_fe_deinit(&s->chr_out, false);
+-
+-    g_main_loop_quit(s->compare_loop);
+-    qemu_thread_join(&s->thread);
++    colo_compare_timer_del(s);
+ 
+     /* Release all unhandled packets after compare thead exited */
+     g_queue_foreach(&s->conn_list, colo_flush_packets, s);
+@@ -871,6 +871,9 @@ static void colo_compare_finalize(Object *obj)
+     g_queue_clear(&s->conn_list);
+ 
+     g_hash_table_destroy(s->connection_track_table);
++    if (s->iothread) {
++        object_unref(OBJECT(s->iothread));
++    }
+     g_free(s->pri_indev);
+     g_free(s->sec_indev);
+     g_free(s->outdev);
 -- 
 1.8.3.1
