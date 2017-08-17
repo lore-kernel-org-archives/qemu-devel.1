@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1diJoC-0005rH-T9
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 08:21:58 -0400
+	(envelope-from <david@redhat.com>) id 1diJoE-0005sJ-6h
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 08:21:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1diJo9-0005Zl-IT
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 08:21:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:62012)
+	(envelope-from <david@redhat.com>) id 1diJoD-0005dp-46
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 08:21:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34346)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1diJo9-0005Yt-9E
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 08:21:53 -0400
-Date: Thu, 17 Aug 2017 13:21:48 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170817122148.GE5539@stefanha-x1.localdomain>
-References: <20170817024746.5961-1-famz@redhat.com>
-	<20170817024746.5961-5-famz@redhat.com>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1diJoC-0005cV-QU
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 08:21:57 -0400
+References: <20170817092225.4264-1-david@redhat.com>
+	<20170817092225.4264-10-david@redhat.com>
+	<f2b025c6-bfd9-2b01-497c-d08f262bd0d5@amsat.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <1a09b39a-3dfb-67fc-5b5c-851ddeee83cb@redhat.com>
+Date: Thu, 17 Aug 2017 14:21:53 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="EXKGNeO8l0xGFBjy"
-Content-Disposition: inline
-In-Reply-To: <20170817024746.5961-5-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v2 04/10] tests: Add vm test lib
+In-Reply-To: <f2b025c6-bfd9-2b01-497c-d08f262bd0d5@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 for-2.11 09/10] s390x/kvm: move KVM
+ declarations and stubs to separate files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,123 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, pbonzini@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, cohuck@redhat.com, borntraeger@de.ibm.com, Aurelien Jarno <aurelien@aurel32.net>, rth@twiddle.net
 
 
---EXKGNeO8l0xGFBjy
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+>> +#include "qemu/osdep.h"
+>> +#include "qemu-common.h"
+>> +#include "cpu.h"
+>> +#include "kvm_s390x.h"
+> 
+> here goes the:
+> 
+> struct kvm_s390_irq {};
 
-On Thu, Aug 17, 2017 at 10:47:40AM +0800, Fam Zheng wrote:
-> +        self._args = [ \
-> +            "-nodefaults", "-enable-kvm", "-m", "2G",
-> +            "-smp", os.environ.get("J", "4"), "-cpu", "host",
+As we don't have a stub using kvm_s390_irq, I guess I can just drop this
+for now.
+[...]
 
-I suggested making -j a command-line argument and constructor argument
-instead of using a environment variable.  Your email reply seemed to
-agree but this patch is still using an environment variable.  Did you
-forget?
+> 
+> change by
+> 
+> typedef struct kvm_s390_irq kvm_s390_irq_t;
+> 
+>> +
+>> +void kvm_s390_floating_interrupt(struct kvm_s390_irq *irq);
+>> +void kvm_s390_service_interrupt(uint32_t parm);
+>> +void kvm_s390_vcpu_interrupt(S390CPU *cpu, struct kvm_s390_irq *irq);
+> 
+> change these to use 'kvm_s390_irq_t *irq' arg
+> 
+>> +void kvm_s390_access_exception(S390CPU *cpu, uint16_t code, uint64_t te_code);
+>> +int kvm_s390_mem_op(S390CPU *cpu, vaddr addr, uint8_t ar, void *hostbuf,
+>> +                    int len, bool is_write);
+>> +void kvm_s390_program_interrupt(S390CPU *cpu, uint16_t code);
+>> +void kvm_s390_io_interrupt(uint16_t subchannel_id,
+>> +                           uint16_t subchannel_nr, uint32_t io_int_parm,
+>> +                           uint32_t io_int_word);
+>> +void kvm_s390_crw_mchk(void);
+>> +int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state);
+>> +void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu);
+>> +int kvm_s390_vcpu_interrupt_post_load(S390CPU *cpu);
+>> +int kvm_s390_get_ri(void);
+>> +int kvm_s390_get_gs(void);
+>> +int kvm_s390_get_clock(uint8_t *tod_high, uint64_t *tod_clock);
+>> +int kvm_s390_set_clock(uint8_t *tod_high, uint64_t *tod_clock);
+>> +void kvm_s390_enable_css_support(S390CPU *cpu);
+>> +int kvm_s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch,
+>> +                                    int vq, bool assign);
+>> +int kvm_s390_cpu_restart(S390CPU *cpu);
+>> +int kvm_s390_get_memslot_count(KVMState *s);
+>> +int kvm_s390_cmma_active(void);
+>> +void kvm_s390_cmma_reset(void);
+>> +void kvm_s390_reset_vcpu(S390CPU *cpu);
+>> +int kvm_s390_set_mem_limit(KVMState *s, uint64_t new_limit, uint64_t *hw_limit);
+>> +void kvm_s390_crypto_reset(void);
+>> +
+>> +/* implemented outside of target/s390x/ */
+>> +int kvm_s390_inject_flic(struct kvm_s390_irq *irq);
+> 
+> also change this to use 'kvm_s390_irq_t *irq' arg here and in hw/intc/
+> 
 
-> +    def boot(self, img, extra_args=[]):
-> +        args = self._args + [
-> +            "-drive", "file=%s,if=none,id=drive0,cache=writeback" % img,
-> +            "-device", "virtio-blk,drive=drive0,bootindex=0"]
-> +        args += self._data_args + extra_args
-> +        logging.debug("QEMU args: %s", " ".join(args))
-> +        guest = QEMUMachine(binary=os.environ.get("QEMU", "qemu-system-x86_64"),
-> +                            args=args)
-> +        guest._vga = "std"
+Yes, this seems to compile!
 
-_vga is a protected field.  We don't inherit from QEMUMachine so it
-shouldn't be accessed directly.  One option is to add a vga argument to
-the QEMUMachine() constructor.
 
-> +        guest.launch()
-> +        atexit.register(self.shutdown)
-> +        self._guest = guest
-> +        usernet_info = guest.qmp("human-monitor-command",
-> +                                 command_line="info usernet")
-> +        self.ssh_port = None
-> +        for l in usernet_info["return"].splitlines():
-> +            fields = l.split()
-> +            if "TCP[HOST_FORWARD]" in fields and "22" in fields:
-> +                self.ssh_port = l.split()[3]
-> +        if not self.ssh_port:
-> +            raise Exception("Cannot find ssh port from 'info usernet':\n%s" % \
-> +                            usernet_info)
-> +
-> +    def wait_ssh(self, seconds=120):
-> +        guest_remote = self.GUEST_USER + "@127.0.0.1"
+-- 
 
-Please remove this unused variable.
+Thanks,
 
-> +def parse_args(vm_name):
-> +    parser = argparse.ArgumentParser()
-
-Python 2.6 only has optparse, not argparse.  Perhaps we can raise the
-minimum Python version requirement to 2.7 starting from QEMU 2.11.  For
-the time being it would be necessary to use optparse instead.
-
-> +    parser.add_argument("--debug", "-D", action="store_true",
-> +                        help="enable debug output")
-> +    parser.add_argument("--image", "-i", default="%s.img" % vm_name,
-> +                        help="image file name")
-> +    parser.add_argument("--force", "-f", action="store_true",
-> +                        help="force build image even if image exists")
-> +    parser.add_argument("--build-image", "-b", action="store_true",
-> +                        help="build image")
-> +    parser.add_argument("--build-qemu",
-> +                        help="build QEMU from source in guest")
-> +    parser.add_argument("--interactive", "-I", action="store_true",
-> +                        help="Interactively run command")
-> +    return parser.parse_known_args()
-
-Documentation would be really helpful.  I'm not sure what workflow you
-have in mind for this command-line tool.  There are two scenarios that
-would be good to document:
-1. How to invoke and use existing images for tests.
-2. How to create new images (e.g. add a guest operating system).
-
-> +
-> +def main(vmcls):
-> +    args, argv = parse_args(vmcls.name)
-> +    if not argv and not args.build_qemu:
-> +        print "Nothing to do?"
-> +        return 1
-> +    if args.debug:
-> +        logging.getLogger().setLevel(logging.DEBUG)
-> +    vm = vmcls(debug=args.debug)
-> +    if args.build_image:
-> +        if os.path.exists(args.image) and not args.force:
-> +            sys.stderr.writelines(["Image file exists: %s\n" % img,
-> +                                  "Use --force option to overwrite\n"])
-> +            return 1
-> +        return vm.build_image(args.image)
-> +    if args.build_qemu:
-> +        vm.add_source_dir(args.build_qemu)
-> +        cmd = [vm.BUILD_SCRIPT.format(
-> +               configure_opts = " ".join(argv),
-> +               jobs=os.environ.get("J", "4"))]
-> +    else:
-> +        cmd = argv
-> +    vm.boot(args.image + ",snapshot=on")
-> +    vm.wait_ssh()
-
-This method returns 2 on timeout.  Exit here?
-
---EXKGNeO8l0xGFBjy
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZlYpcAAoJEJykq7OBq3PIcf0H/j5xyaNvkeJmfYIZp9P6hPEk
-ujnWjqxePZNuq4rNo1k0WrnlUSFje2TSCXhy8hDuKp3xGjgrVjlGVwbISGHemt9s
-mGdkO3iQ964EKAC9x8ArJ7mlDmwn4ruZqf8paVPFOeeS3gAuLCqG7sTwG3SJRFcv
-eao5+YHRqRODTjrTwfG+IlBjoVyAnDV/U1dVYQ+7XoyYDjaZdcHlBFEqnYFJkpGS
-H3mfsCHHT+prMIIiBw1FQlBbRt0r1prsgWQV9nLONFRkODXjMpGJIWgtzobcJo4W
-9rSMm4zYxi0WJ2FToZL/GKAk3SeVcuhMajbCthg0gQc0HcJ9Gy1JWyXmfgHkAeY=
-=3tO+
------END PGP SIGNATURE-----
-
---EXKGNeO8l0xGFBjy--
+David
