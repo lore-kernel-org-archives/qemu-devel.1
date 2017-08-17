@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1diCoI-00041E-Ai
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 00:53:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1diCp9-0004XM-Qg
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 00:54:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1diCoH-0000In-Eh
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 00:53:34 -0400
+	(envelope-from <armbru@redhat.com>) id 1diCp8-0000wO-VM
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 00:54:27 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <1500537221-20556-1-git-send-email-armbru@redhat.com>
-	<a7a4e4dd-8c2f-8014-6486-13f9a90a0341@redhat.com>
-Date: Thu, 17 Aug 2017 06:53:24 +0200
-In-Reply-To: <a7a4e4dd-8c2f-8014-6486-13f9a90a0341@redhat.com> (John Snow's
-	message of "Wed, 16 Aug 2017 17:34:29 -0400")
-Message-ID: <87r2wassl7.fsf@dusky.pond.sub.org>
+References: <20170814215748.5158-1-ehabkost@redhat.com>
+	<20170814215748.5158-9-ehabkost@redhat.com>
+	<7327f3f6-16fb-e9c6-4f2a-eed6144f2282@redhat.com>
+Date: Thu, 17 Aug 2017 06:54:10 +0200
+In-Reply-To: <7327f3f6-16fb-e9c6-4f2a-eed6144f2282@redhat.com> (John Snow's
+	message of "Wed, 16 Aug 2017 17:46:18 -0400")
+Message-ID: <87mv6yssjx.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 00/10] Correct two minor
- QMP interface design flaws
+Subject: Re: [Qemu-devel] [RFC v4 08/13] ide: enumerate_slots implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,30 +25,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, mreitz@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Laine Stump <laine@redhat.com>, qemu-block@nongnu.org
 
 John Snow <jsnow@redhat.com> writes:
 
-[...]
-> On 07/20/2017 03:53 AM, Markus Armbruster wrote:
->> blockdev-add and migrate-set-parameters overload empty strings to mean
->> something entirely different.  See my memo "qapi: Stop abusing
->> "special" values for something entirely different" for details.
+> On 08/14/2017 05:57 PM, Eduardo Habkost wrote:
+>> Example output when using "-machine q35":
 >> 
->>     Message-ID: <87379zhrhn.fsf@dusky.pond.sub.org>
->>     https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg04526.html
->> 
->> This series deprecates these usages of "" in favour of JSON null.
->> Because we're so close to the 2.10 freeze, the implementation is
->> intentionally stupid: rewrite null to "" at first opportunity.  The
->> proper way to do it would be rewriting "" to null, but that requires
->> fixing up code to work with null.  There are TODO comments for that.
->> I'm willing to take care of them in the next development cycle.
->> 
+>>   {
+>>     "available": true,
+>>     "count": 1,
+>>     "device-types": [
+>>       "ide-device"
+>>     ],
+>>     "hotpluggable": false,
+>>     "opts": [
+>>       { "option": "unit", "values": 0 },
+>>       { "option": "bus", "values": "ide.2" }
+>>     ],
+>>     "opts-complete": true
+>>   }
+>>   {
+>>     "available": false,
+>>     "count": 1,
+>>     "device": "/machine/unattached/device[19]",
+>>     "device-types": [
+>>       "ide-device"
+>>     ],
+>>     "hotpluggable": false,
+>>     "opts": [
+>>       { "option": "unit", "values": 1 },
+>>       { "option": "bus", "values": "ide.2" } ],
+>>     "opts-complete": true
+>>   }
+>>   {
+>>     "available": true,
+>>     "count": 10,
+>>     "device-types": [
+>>       "ide-device"
+>>     ],
+>>     "hotpluggable": false,
+>>     "opts": [
+>>       { "option": "unit", "values": [ [ 0, 1 ] ] },
 >
-> Did this get dropped in favor of a more comprehensive 2.11 fix?
+> Hm, these unit values aren't really correct -- we do not support
+> primary/secondary semantics for IDE buses on the AHCI device. I guess
+> they technically exist, but you cannot use them for anything.
+>
+> Should I do something to "disable" or otherwise hide the unusable
+> secondary unit slots for AHCI devices?
 
-This is the stupid solution for 2.10.  TODO comments in PATCH 05+08-10
-mark the spots that could use cleanup.  I hope to get to them in 2.11.
-
-[...]
+I think that would make this introspection more useful.
