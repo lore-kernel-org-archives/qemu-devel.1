@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1diH0b-0006Nd-Fl
+	(envelope-from <david@redhat.com>) id 1diH0b-0006Nc-40
 	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:22:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1diH0a-0000Ax-8C
+	(envelope-from <david@redhat.com>) id 1diH0X-00009H-W4
 	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:22:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39462)
+Received: from mx1.redhat.com ([209.132.183.28]:23768)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1diH0Z-0000AD-Up
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:22:32 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1diH0X-00008j-PE
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 05:22:29 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Thu, 17 Aug 2017 11:22:16 +0200
-Message-Id: <20170817092225.4264-2-david@redhat.com>
-In-Reply-To: <20170817092225.4264-1-david@redhat.com>
-References: <20170817092225.4264-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 for-2.11 01/10] target/s390x: move cc_name()
- to cc_helper.c
+Date: Thu, 17 Aug 2017 11:22:15 +0200
+Message-Id: <20170817092225.4264-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 for-2.11 00/10] target/s390x: cleanup cpu.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,131 +24,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com
 
-While at it, move the translations into the function.
+cpu.h is accessed outside of target/s390x. It should only contain
+what is expected to be accessed outside of this folder. Therefore, create
+internal.h and move a lot to that file. In addition, introduce
+kvm-stub.c and kvm_390x.h for kvm specific functions.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/cc_helper.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- target/s390x/cpu.h       | 48 +-----------------------------------------------
- 2 files changed, 49 insertions(+), 47 deletions(-)
+Let's see what compilers think about this version.
 
-diff --git a/target/s390x/cc_helper.c b/target/s390x/cc_helper.c
-index 1cf8551..a4562e5 100644
---- a/target/s390x/cc_helper.c
-+++ b/target/s390x/cc_helper.c
-@@ -31,6 +31,54 @@
- #define HELPER_LOG(x...)
- #endif
- 
-+const char *cc_name(int cc_op)
-+{
-+    static const char *cc_names[] = {
-+        [CC_OP_CONST0]    = "CC_OP_CONST0",
-+        [CC_OP_CONST1]    = "CC_OP_CONST1",
-+        [CC_OP_CONST2]    = "CC_OP_CONST2",
-+        [CC_OP_CONST3]    = "CC_OP_CONST3",
-+        [CC_OP_DYNAMIC]   = "CC_OP_DYNAMIC",
-+        [CC_OP_STATIC]    = "CC_OP_STATIC",
-+        [CC_OP_NZ]        = "CC_OP_NZ",
-+        [CC_OP_LTGT_32]   = "CC_OP_LTGT_32",
-+        [CC_OP_LTGT_64]   = "CC_OP_LTGT_64",
-+        [CC_OP_LTUGTU_32] = "CC_OP_LTUGTU_32",
-+        [CC_OP_LTUGTU_64] = "CC_OP_LTUGTU_64",
-+        [CC_OP_LTGT0_32]  = "CC_OP_LTGT0_32",
-+        [CC_OP_LTGT0_64]  = "CC_OP_LTGT0_64",
-+        [CC_OP_ADD_64]    = "CC_OP_ADD_64",
-+        [CC_OP_ADDU_64]   = "CC_OP_ADDU_64",
-+        [CC_OP_ADDC_64]   = "CC_OP_ADDC_64",
-+        [CC_OP_SUB_64]    = "CC_OP_SUB_64",
-+        [CC_OP_SUBU_64]   = "CC_OP_SUBU_64",
-+        [CC_OP_SUBB_64]   = "CC_OP_SUBB_64",
-+        [CC_OP_ABS_64]    = "CC_OP_ABS_64",
-+        [CC_OP_NABS_64]   = "CC_OP_NABS_64",
-+        [CC_OP_ADD_32]    = "CC_OP_ADD_32",
-+        [CC_OP_ADDU_32]   = "CC_OP_ADDU_32",
-+        [CC_OP_ADDC_32]   = "CC_OP_ADDC_32",
-+        [CC_OP_SUB_32]    = "CC_OP_SUB_32",
-+        [CC_OP_SUBU_32]   = "CC_OP_SUBU_32",
-+        [CC_OP_SUBB_32]   = "CC_OP_SUBB_32",
-+        [CC_OP_ABS_32]    = "CC_OP_ABS_32",
-+        [CC_OP_NABS_32]   = "CC_OP_NABS_32",
-+        [CC_OP_COMP_32]   = "CC_OP_COMP_32",
-+        [CC_OP_COMP_64]   = "CC_OP_COMP_64",
-+        [CC_OP_TM_32]     = "CC_OP_TM_32",
-+        [CC_OP_TM_64]     = "CC_OP_TM_64",
-+        [CC_OP_NZ_F32]    = "CC_OP_NZ_F32",
-+        [CC_OP_NZ_F64]    = "CC_OP_NZ_F64",
-+        [CC_OP_NZ_F128]   = "CC_OP_NZ_F128",
-+        [CC_OP_ICM]       = "CC_OP_ICM",
-+        [CC_OP_SLA_32]    = "CC_OP_SLA_32",
-+        [CC_OP_SLA_64]    = "CC_OP_SLA_64",
-+        [CC_OP_FLOGR]     = "CC_OP_FLOGR",
-+    };
-+
-+    return cc_names[cc_op];
-+}
-+
- static uint32_t cc_calc_ltgt_32(int32_t src, int32_t dst)
- {
-     if (src == dst) {
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 29fdd5d..3e798ef 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -744,53 +744,7 @@ enum cc_op {
-     CC_OP_MAX
- };
- 
--static const char *cc_names[] = {
--    [CC_OP_CONST0]    = "CC_OP_CONST0",
--    [CC_OP_CONST1]    = "CC_OP_CONST1",
--    [CC_OP_CONST2]    = "CC_OP_CONST2",
--    [CC_OP_CONST3]    = "CC_OP_CONST3",
--    [CC_OP_DYNAMIC]   = "CC_OP_DYNAMIC",
--    [CC_OP_STATIC]    = "CC_OP_STATIC",
--    [CC_OP_NZ]        = "CC_OP_NZ",
--    [CC_OP_LTGT_32]   = "CC_OP_LTGT_32",
--    [CC_OP_LTGT_64]   = "CC_OP_LTGT_64",
--    [CC_OP_LTUGTU_32] = "CC_OP_LTUGTU_32",
--    [CC_OP_LTUGTU_64] = "CC_OP_LTUGTU_64",
--    [CC_OP_LTGT0_32]  = "CC_OP_LTGT0_32",
--    [CC_OP_LTGT0_64]  = "CC_OP_LTGT0_64",
--    [CC_OP_ADD_64]    = "CC_OP_ADD_64",
--    [CC_OP_ADDU_64]   = "CC_OP_ADDU_64",
--    [CC_OP_ADDC_64]   = "CC_OP_ADDC_64",
--    [CC_OP_SUB_64]    = "CC_OP_SUB_64",
--    [CC_OP_SUBU_64]   = "CC_OP_SUBU_64",
--    [CC_OP_SUBB_64]   = "CC_OP_SUBB_64",
--    [CC_OP_ABS_64]    = "CC_OP_ABS_64",
--    [CC_OP_NABS_64]   = "CC_OP_NABS_64",
--    [CC_OP_ADD_32]    = "CC_OP_ADD_32",
--    [CC_OP_ADDU_32]   = "CC_OP_ADDU_32",
--    [CC_OP_ADDC_32]   = "CC_OP_ADDC_32",
--    [CC_OP_SUB_32]    = "CC_OP_SUB_32",
--    [CC_OP_SUBU_32]   = "CC_OP_SUBU_32",
--    [CC_OP_SUBB_32]   = "CC_OP_SUBB_32",
--    [CC_OP_ABS_32]    = "CC_OP_ABS_32",
--    [CC_OP_NABS_32]   = "CC_OP_NABS_32",
--    [CC_OP_COMP_32]   = "CC_OP_COMP_32",
--    [CC_OP_COMP_64]   = "CC_OP_COMP_64",
--    [CC_OP_TM_32]     = "CC_OP_TM_32",
--    [CC_OP_TM_64]     = "CC_OP_TM_64",
--    [CC_OP_NZ_F32]    = "CC_OP_NZ_F32",
--    [CC_OP_NZ_F64]    = "CC_OP_NZ_F64",
--    [CC_OP_NZ_F128]   = "CC_OP_NZ_F128",
--    [CC_OP_ICM]       = "CC_OP_ICM",
--    [CC_OP_SLA_32]    = "CC_OP_SLA_32",
--    [CC_OP_SLA_64]    = "CC_OP_SLA_64",
--    [CC_OP_FLOGR]     = "CC_OP_FLOGR",
--};
--
--static inline const char *cc_name(int cc_op)
--{
--    return cc_names[cc_op];
--}
-+const char *cc_name(int cc_op);
- 
- static inline void setcc(S390CPU *cpu, uint64_t cc)
- {
+RFC -> v1:
+- (hopefully) fixed a compile error
+- move some functions from cpu.h to the only c file they are used in
+- move kvm function and stubs to kvm_s390x.h and kvm-stub.c
+- smaller requested style fixes
+
+
+David Hildenbrand (10):
+  target/s390x: move cc_name() to cc_helper.c
+  target/s390x: move cpu_mmu_idx_to_asc() to excp_helper.c
+  target/s390x: move psw_key_valid() to mem_helper.c
+  target/s390x: move s390_do_cpu_reset() to diag.c
+  target/s390x: move get_per_in_range() to misc_helper.c
+  target/s390x: introduce internal.h
+  target/s390x: move a couple of functions to cpu.c
+  s390x: avoid calling kvm_ functions outside of target/s390x/
+  s390x/kvm: move KVM declarations and stubs to separate files
+  target/s390x: cleanup cpu.h
+
+ hw/s390x/s390-virtio-ccw.c |   4 +-
+ target/s390x/Makefile.objs |   1 +
+ target/s390x/arch_dump.c   |   1 +
+ target/s390x/cc_helper.c   |  49 +++
+ target/s390x/cpu.c         |  87 ++++++
+ target/s390x/cpu.h         | 761 +++++----------------------------------------
+ target/s390x/cpu_models.c  |   1 +
+ target/s390x/diag.c        |   8 +
+ target/s390x/excp_helper.c |  15 +
+ target/s390x/fpu_helper.c  |   1 +
+ target/s390x/gdbstub.c     |   1 +
+ target/s390x/helper.c      |   1 +
+ target/s390x/int_helper.c  |   1 +
+ target/s390x/internal.h    | 391 +++++++++++++++++++++++
+ target/s390x/interrupt.c   |   1 +
+ target/s390x/ioinst.c      |   1 +
+ target/s390x/kvm-stub.c    | 111 +++++++
+ target/s390x/kvm.c         |   1 +
+ target/s390x/kvm_s390x.h   |  51 +++
+ target/s390x/machine.c     |   1 +
+ target/s390x/mem_helper.c  |  12 +
+ target/s390x/misc_helper.c |  12 +
+ target/s390x/mmu_helper.c  |   1 +
+ target/s390x/translate.c   |   1 +
+ 24 files changed, 820 insertions(+), 694 deletions(-)
+ create mode 100644 target/s390x/internal.h
+ create mode 100644 target/s390x/kvm-stub.c
+ create mode 100644 target/s390x/kvm_s390x.h
+
 -- 
 2.9.4
