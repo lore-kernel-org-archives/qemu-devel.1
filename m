@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1diTy5-0005JX-PM
+	(envelope-from <zuban32s@gmail.com>) id 1diTy5-0005JW-P5
 	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 19:12:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1diTy1-0006zd-Eg
+	(envelope-from <zuban32s@gmail.com>) id 1diTy0-0006zU-QA
 	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 19:12:49 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:38727)
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35695)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1diTy1-0006zK-2l
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 19:12:45 -0400
-Received: by mail-lf0-x243.google.com with SMTP id y15so5220472lfd.5
-	for <qemu-devel@nongnu.org>; Thu, 17 Aug 2017 16:12:45 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1diTy0-0006yp-F4
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 19:12:44 -0400
+Received: by mail-lf0-x244.google.com with SMTP id w199so5235941lff.2
+	for <qemu-devel@nongnu.org>; Thu, 17 Aug 2017 16:12:43 -0700 (PDT)
 From: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Date: Fri, 18 Aug 2017 02:12:29 +0300
-Message-Id: <1503011551-7246-2-git-send-email-zuban32s@gmail.com>
-In-Reply-To: <1503011551-7246-1-git-send-email-zuban32s@gmail.com>
-References: <1503011551-7246-1-git-send-email-zuban32s@gmail.com>
-Subject: [Qemu-devel] [PATCH v7 1/3] pci: refactor pci_find_capapibilty to
- get bdf as the first argument instead of the whole pci_device
+Date: Fri, 18 Aug 2017 02:12:28 +0300
+Message-Id: <1503011551-7246-1-git-send-email-zuban32s@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v7 0/3] Red Hat PCI bridge resource reserve
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,172 +30,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: seabios@seabios.org
 Cc: marcel@redhat.com, mst@redhat.com, kraxel@redhat.com, kevin@koconnor.net, lersek@redhat.com, qemu-devel@nongnu.org, Aleksandr Bezzubikov <zuban32s@gmail.com>
 
-Refactor pci_find_capability function to get bdf instead of
-a whole pci_device* as the only necessary field for this function
-is still bdf.
+Now PCI bridges get a bus range number on a system init,
+basing on currently plugged devices. That's why when one wants to hotplug another bridge,
+it needs his child bus, which the parent is unable to provide (speaking about virtual device).
+The suggested workaround is to have vendor-specific capability in Red Hat PCI bridges
+that contains number of additional bus to reserve (as well as IO/MEM/PREF space limit hints) 
+on BIOS PCI init.
+So this capability is intended only for pure QEMU->SeaBIOS usage.
 
-Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
----
- src/fw/pciinit.c    |  4 ++--
- src/hw/pci.c        | 25 +++++++++++++++++++++++++
- src/hw/pci.h        |  1 +
- src/hw/pcidevice.c  | 24 ------------------------
- src/hw/pcidevice.h  |  1 -
- src/hw/virtio-pci.c |  6 +++---
- 6 files changed, 31 insertions(+), 30 deletions(-)
+Considering all aforesaid, this series is directly connected with
+QEMU series "Generic PCIE-PCI Bridge".
 
-diff --git a/src/fw/pciinit.c b/src/fw/pciinit.c
-index 08221e6..864954f 100644
---- a/src/fw/pciinit.c
-+++ b/src/fw/pciinit.c
-@@ -762,7 +762,7 @@ static int pci_bus_hotplug_support(struct pci_bus *bus, u8 pcie_cap)
-         return downstream_port && slot_implemented;
-     }
- 
--    shpc_cap = pci_find_capability(bus->bus_dev, PCI_CAP_ID_SHPC, 0);
-+    shpc_cap = pci_find_capability(bus->bus_dev->bdf, PCI_CAP_ID_SHPC, 0);
-     return !!shpc_cap;
- }
- 
-@@ -844,7 +844,7 @@ static int pci_bios_check_devices(struct pci_bus *busses)
-              */
-             parent = &busses[0];
-         int type;
--        u8 pcie_cap = pci_find_capability(s->bus_dev, PCI_CAP_ID_EXP, 0);
-+        u8 pcie_cap = pci_find_capability(s->bus_dev->bdf, PCI_CAP_ID_EXP, 0);
-         int hotplug_support = pci_bus_hotplug_support(s, pcie_cap);
-         for (type = 0; type < PCI_REGION_TYPE_COUNT; type++) {
-             u64 align = (type == PCI_REGION_TYPE_IO) ?
-diff --git a/src/hw/pci.c b/src/hw/pci.c
-index 8e3d617..50d9d2d 100644
---- a/src/hw/pci.c
-+++ b/src/hw/pci.c
-@@ -58,6 +58,30 @@ pci_config_maskw(u16 bdf, u32 addr, u16 off, u16 on)
-     pci_config_writew(bdf, addr, val);
- }
- 
-+u8 pci_find_capability(u16 bdf, u8 cap_id, u8 cap)
-+{
-+    int i;
-+    u16 status = pci_config_readw(bdf, PCI_STATUS);
-+
-+    if (!(status & PCI_STATUS_CAP_LIST))
-+        return 0;
-+
-+    if (cap == 0) {
-+        /* find first */
-+        cap = pci_config_readb(bdf, PCI_CAPABILITY_LIST);
-+    } else {
-+        /* find next */
-+        cap = pci_config_readb(bdf, cap + PCI_CAP_LIST_NEXT);
-+    }
-+    for (i = 0; cap && i <= 0xff; i++) {
-+        if (pci_config_readb(bdf, cap + PCI_CAP_LIST_ID) == cap_id)
-+            return cap;
-+        cap = pci_config_readb(bdf, cap + PCI_CAP_LIST_NEXT);
-+    }
-+
-+    return 0;
-+}
-+
- // Helper function for foreachbdf() macro - return next device
- int
- pci_next(int bdf, int bus)
-@@ -107,3 +131,4 @@ pci_reboot(void)
-     outb(v|6, PORT_PCI_REBOOT); /* Actually do the reset */
-     udelay(50);
- }
-+
-diff --git a/src/hw/pci.h b/src/hw/pci.h
-index ee6e196..2e30e28 100644
---- a/src/hw/pci.h
-+++ b/src/hw/pci.h
-@@ -39,6 +39,7 @@ u32 pci_config_readl(u16 bdf, u32 addr);
- u16 pci_config_readw(u16 bdf, u32 addr);
- u8 pci_config_readb(u16 bdf, u32 addr);
- void pci_config_maskw(u16 bdf, u32 addr, u16 off, u16 on);
-+u8 pci_find_capability(u16 bdf, u8 cap_id, u8 cap);
- int pci_next(int bdf, int bus);
- int pci_probe_host(void);
- void pci_reboot(void);
-diff --git a/src/hw/pcidevice.c b/src/hw/pcidevice.c
-index cfebf66..8853cf7 100644
---- a/src/hw/pcidevice.c
-+++ b/src/hw/pcidevice.c
-@@ -134,30 +134,6 @@ pci_find_init_device(const struct pci_device_id *ids, void *arg)
-     return NULL;
- }
- 
--u8 pci_find_capability(struct pci_device *pci, u8 cap_id, u8 cap)
--{
--    int i;
--    u16 status = pci_config_readw(pci->bdf, PCI_STATUS);
--
--    if (!(status & PCI_STATUS_CAP_LIST))
--        return 0;
--
--    if (cap == 0) {
--        /* find first */
--        cap = pci_config_readb(pci->bdf, PCI_CAPABILITY_LIST);
--    } else {
--        /* find next */
--        cap = pci_config_readb(pci->bdf, cap + PCI_CAP_LIST_NEXT);
--    }
--    for (i = 0; cap && i <= 0xff; i++) {
--        if (pci_config_readb(pci->bdf, cap + PCI_CAP_LIST_ID) == cap_id)
--            return cap;
--        cap = pci_config_readb(pci->bdf, cap + PCI_CAP_LIST_NEXT);
--    }
--
--    return 0;
--}
--
- // Enable PCI bus-mastering (ie, DMA) support on a pci device
- void
- pci_enable_busmaster(struct pci_device *pci)
-diff --git a/src/hw/pcidevice.h b/src/hw/pcidevice.h
-index 354b549..225d545 100644
---- a/src/hw/pcidevice.h
-+++ b/src/hw/pcidevice.h
-@@ -69,7 +69,6 @@ int pci_init_device(const struct pci_device_id *ids
-                     , struct pci_device *pci, void *arg);
- struct pci_device *pci_find_init_device(const struct pci_device_id *ids
-                                         , void *arg);
--u8 pci_find_capability(struct pci_device *pci, u8 cap_id, u8 cap);
- void pci_enable_busmaster(struct pci_device *pci);
- u16 pci_enable_iobar(struct pci_device *pci, u32 addr);
- void *pci_enable_membar(struct pci_device *pci, u32 addr);
-diff --git a/src/hw/virtio-pci.c b/src/hw/virtio-pci.c
-index e5c2c33..96f9c6b 100644
---- a/src/hw/virtio-pci.c
-+++ b/src/hw/virtio-pci.c
-@@ -19,7 +19,7 @@
- #include "malloc.h" // free
- #include "output.h" // dprintf
- #include "pci.h" // pci_config_readl
--#include "pcidevice.h" // pci_find_capability
-+#include "pcidevice.h" // struct pci_device
- #include "pci_regs.h" // PCI_BASE_ADDRESS_0
- #include "string.h" // memset
- #include "virtio-pci.h"
-@@ -381,7 +381,7 @@ fail:
- 
- void vp_init_simple(struct vp_device *vp, struct pci_device *pci)
- {
--    u8 cap = pci_find_capability(pci, PCI_CAP_ID_VNDR, 0);
-+    u8 cap = pci_find_capability(pci->bdf, PCI_CAP_ID_VNDR, 0);
-     struct vp_cap *vp_cap;
-     const char *mode;
-     u32 offset, base, mul;
-@@ -479,7 +479,7 @@ void vp_init_simple(struct vp_device *vp, struct pci_device *pci)
-                     vp_cap->cap, type, vp_cap->bar, addr, offset, mode);
-         }
- 
--        cap = pci_find_capability(pci, PCI_CAP_ID_VNDR, cap);
-+        cap = pci_find_capability(pci->bdf, PCI_CAP_ID_VNDR, cap);
-     }
- 
-     if (vp->common.cap && vp->notify.cap && vp->isr.cap && vp->device.cap) {
+Although the new PCI capability is supposed to contain various limits along with
+bus number to reserve, now only its full layout is proposed. And
+only bus_reserve field is used in QEMU and BIOS. Limits usage
+is still a subject for implementation as now
+the main goal of this series to provide necessary support from the 
+firmware side to PCIE-PCI bridge hotplug. 
+
+Changes v6->v7:
+1. Do not use alignment in case of IO reservation cap usage.
+2. Log additional buses reservation events.
+
+Changes v5->v6:
+1. Remove unnecessary indents and line breaks (addresses Marcel's comments)
+2. Count IO/MEM/PREF region size as a maximum of necessary size and one provide in
+	RESOURCE_RESERVE capability (addresses Marcel's comment).
+3. Make the cap debug message more detailed (addresses Marcel's comment).
+4. Change pref_32 and pref_64 cap fields comment.
+
+Changes v4->v5:
+1. Rename capability-related #defines
+2. Move capability IO/MEM/PREF fields values usage to the regions creation stage (addresses Marcel's comment)
+3. The capability layout change: separate pref_mem into pref_mem_32 and pref_mem_64 fields (QEMU side has the same changes) (addresses Laszlo's comment)
+4. Extract the capability lookup and check to the separate function (addresses Marcel's comment)
+	- despite of Marcel's comment do not extract field check for -1 since it increases code length
+	  and doesn't look nice because of different field types 
+5. Fix the capability's comment (addresses Marcel's comment)
+6. Fix the 3rd patch message
+
+Changes v3->v4:
+1. Use all QEMU PCI capability fields - addresses Michael's comment
+2. Changes of the capability layout (QEMU side has the same changes):
+	- change reservation fields types: bus_res - uint32_t, others - uint64_t
+	- interpret -1 value as 'ignore'
+
+Changes v2->v3:
+1. Merge commit 2 (Red Hat vendor ID) into commit 4 - addresses Marcel's comment,
+	and add Generic PCIE Root Port device ID - addresses Michael's comment.
+2. Changes of the capability layout  (QEMU side has the same changes):
+	- add 'type' field to distinguish multiple 
+		RedHat-specific capabilities - addresses Michael's comment
+	- do not mimiс PCI Config space register layout, but use mutually exclusive differently
+		sized fields for IO and prefetchable memory limits - addresses Laszlo's comment
+	- use defines instead of structure and offsetof - addresses Michael's comment
+3. Interpret 'bus_reserve' field as a minimum necessary
+	 range to reserve - addresses Gerd's comment
+4. pci_find_capability moved to pci.c - addresses Kevin's comment
+5. Move capability layout header to src/fw/dev-pci.h - addresses Kevin's comment
+6. Add the capability documentation - addresses Michael's comment
+7. Add capability length and bus_reserve field sanity checks - addresses Michael's comment
+
+Changes v1->v2:
+1. New #define for Red Hat vendor added (addresses Konrad's comment).
+2. Refactored pci_find_capability function (addresses Marcel's comment).
+3. Capability reworked:
+	- data type added;
+	- reserve space in a structure for IO, memory and 
+	  prefetchable memory limits.
+
+Aleksandr Bezzubikov (3):
+  pci: refactor pci_find_capapibilty to get bdf as the first argument
+    instead of the whole pci_device
+  pci: add QEMU-specific PCI capability structure
+  pci: enable RedHat PCI bridges to reserve additional resources on PCI
+    init
+
+ src/fw/dev-pci.h    |  53 ++++++++++++++++++++++++++
+ src/fw/pciinit.c    | 108 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ src/hw/pci.c        |  25 ++++++++++++
+ src/hw/pci.h        |   1 +
+ src/hw/pci_ids.h    |   3 ++
+ src/hw/pcidevice.c  |  24 ------------
+ src/hw/pcidevice.h  |   1 -
+ src/hw/virtio-pci.c |   6 +--
+ 8 files changed, 188 insertions(+), 33 deletions(-)
+ create mode 100644 src/fw/dev-pci.h
+
 -- 
 2.7.4
