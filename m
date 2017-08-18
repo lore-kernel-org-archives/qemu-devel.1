@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dieDW-0004Gp-Um
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:28 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dieDQ-00048M-L1
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dieDV-0000pF-Kl
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49006)
+	(envelope-from <imammedo@redhat.com>) id 1dieDK-0000a3-DN
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60254)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dieDV-0000og-C3
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:25 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7810A37E88
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:24 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
-	(dell-r430-03.lab.eng.brq.redhat.com [10.34.112.60])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id F212966D62
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:23 +0000 (UTC)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dieDK-0000ZX-4E
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:14 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 18 Aug 2017 12:08:54 +0200
-Message-Id: <1503050939-227939-23-git-send-email-imammedo@redhat.com>
+Date: Fri, 18 Aug 2017 12:08:40 +0200
+Message-Id: <1503050939-227939-9-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
 References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11 22/27] lm32: replace cpu_lm32_init()
+Subject: [Qemu-devel] [PATCH for-2.11 08/27] sparc: replace cpu_sparc_init()
  with cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -35,90 +25,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Fabien Chouteau <chouteau@adacore.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
 it's just a wrapper, drop it and use cpu_generic_init() directly
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: Michael Walle <michael@walle.cc>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/lm32/cpu.h     | 3 +--
- hw/lm32/lm32_boards.c | 4 ++--
- hw/lm32/milkymist.c   | 2 +-
- target/lm32/helper.c  | 5 -----
- 4 files changed, 4 insertions(+), 10 deletions(-)
+CC: Fabien Chouteau <chouteau@adacore.com>
+CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+CC: Artyom Tarasenko <atar4qemu@gmail.com>
+---
+ target/sparc/cpu.h   | 3 +--
+ hw/sparc/leon3.c     | 2 +-
+ hw/sparc/sun4m.c     | 2 +-
+ hw/sparc64/sparc64.c | 2 +-
+ target/sparc/cpu.c   | 5 -----
+ 5 files changed, 4 insertions(+), 10 deletions(-)
 
-diff --git a/target/lm32/cpu.h b/target/lm32/cpu.h
-index 1d972cb..de265b5 100644
---- a/target/lm32/cpu.h
-+++ b/target/lm32/cpu.h
-@@ -238,7 +238,6 @@ static inline lm32_wp_t lm32_wp_type(uint32_t dc, int idx)
-     return (dc >> (idx+1)*2) & 0x3;
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index 0e41916..b45cfb4 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -579,7 +579,6 @@ void cpu_raise_exception_ra(CPUSPARCState *, int, uintptr_t) QEMU_NORETURN;
+ 
+ #ifndef NO_CPU_IO_DEFS
+ /* cpu_init.c */
+-SPARCCPU *cpu_sparc_init(const char *cpu_model);
+ void cpu_sparc_set_id(CPUSPARCState *env, unsigned int cpu);
+ void sparc_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+ /* mmu_helper.c */
+@@ -656,7 +655,7 @@ hwaddr cpu_get_phys_page_nofault(CPUSPARCState *env, target_ulong addr,
+ int cpu_sparc_signal_handler(int host_signum, void *pinfo, void *puc);
+ 
+ #ifndef NO_CPU_IO_DEFS
+-#define cpu_init(cpu_model) CPU(cpu_sparc_init(cpu_model))
++#define cpu_init(cpu_model) cpu_generic_init(TYPE_SPARC_CPU, cpu_model)
+ #endif
+ 
+ #define cpu_signal_handler cpu_sparc_signal_handler
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index d5ff188..56512ec 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -126,7 +126,7 @@ static void leon3_generic_hw_init(MachineState *machine)
+         cpu_model = "LEON3";
+     }
+ 
+-    cpu = cpu_sparc_init(cpu_model);
++    cpu = SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+     if (cpu == NULL) {
+         fprintf(stderr, "qemu: Unable to find Sparc CPU definition\n");
+         exit(1);
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 89dd8a9..cf47dca 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -797,7 +797,7 @@ static void cpu_devinit(const char *cpu_model, unsigned int id,
+     SPARCCPU *cpu;
+     CPUSPARCState *env;
+ 
+-    cpu = cpu_sparc_init(cpu_model);
++    cpu = SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+     if (cpu == NULL) {
+         fprintf(stderr, "qemu: Unable to find Sparc CPU definition\n");
+         exit(1);
+diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
+index 4e4fdab..ecf38a4 100644
+--- a/hw/sparc64/sparc64.c
++++ b/hw/sparc64/sparc64.c
+@@ -353,7 +353,7 @@ SPARCCPU *sparc64_cpu_devinit(const char *cpu_model,
+     if (cpu_model == NULL) {
+         cpu_model = default_cpu_model;
+     }
+-    cpu = cpu_sparc_init(cpu_model);
++    cpu = SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+     if (cpu == NULL) {
+         fprintf(stderr, "Unable to find Sparc CPU definition\n");
+         exit(1);
+diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+index fd01cbf..2917021 100644
+--- a/target/sparc/cpu.c
++++ b/target/sparc/cpu.c
+@@ -110,11 +110,6 @@ static void sparc_cpu_parse_features(const char *typename, char *features,
+     cpu_legacy_parse_featurestr(typename, features, errp);
  }
  
--LM32CPU *cpu_lm32_init(const char *cpu_model);
- /* you can call this signal handler from your SIGBUS and SIGSEGV
-    signal handlers to inform the virtual CPU of exceptions. non zero
-    is returned if the signal was handled by the virtual CPU.  */
-@@ -256,7 +255,7 @@ void lm32_watchpoint_insert(CPULM32State *env, int index, target_ulong address,
- void lm32_watchpoint_remove(CPULM32State *env, int index);
- bool lm32_cpu_do_semihosting(CPUState *cs);
- 
--#define cpu_init(cpu_model) CPU(cpu_lm32_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_LM32_CPU, cpu_model)
- 
- #define cpu_list lm32_cpu_list
- #define cpu_signal_handler cpu_lm32_signal_handler
-diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
-index 8f0c307..eccf0ac 100644
---- a/hw/lm32/lm32_boards.c
-+++ b/hw/lm32/lm32_boards.c
-@@ -104,7 +104,7 @@ static void lm32_evr_init(MachineState *machine)
-     if (cpu_model == NULL) {
-         cpu_model = "lm32-full";
-     }
--    cpu = cpu_lm32_init(cpu_model);
-+    cpu = LM32_CPU(cpu_generic_init(TYPE_LM32_CPU, cpu_model));
-     if (cpu == NULL) {
-         fprintf(stderr, "qemu: unable to find CPU '%s'\n", cpu_model);
-         exit(1);
-@@ -205,7 +205,7 @@ static void lm32_uclinux_init(MachineState *machine)
-     if (cpu_model == NULL) {
-         cpu_model = "lm32-full";
-     }
--    cpu = cpu_lm32_init(cpu_model);
-+    cpu = LM32_CPU(cpu_generic_init(TYPE_LM32_CPU, cpu_model));
-     if (cpu == NULL) {
-         fprintf(stderr, "qemu: unable to find CPU '%s'\n", cpu_model);
-         exit(1);
-diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
-index 5cae0f1..dffd879 100644
---- a/hw/lm32/milkymist.c
-+++ b/hw/lm32/milkymist.c
-@@ -111,7 +111,7 @@ milkymist_init(MachineState *machine)
-     if (cpu_model == NULL) {
-         cpu_model = "lm32-full";
-     }
--    cpu = cpu_lm32_init(cpu_model);
-+    cpu = LM32_CPU(cpu_generic_init(TYPE_LM32_CPU, cpu_model));
-     if (cpu == NULL) {
-         fprintf(stderr, "qemu: unable to find CPU '%s'\n", cpu_model);
-         exit(1);
-diff --git a/target/lm32/helper.c b/target/lm32/helper.c
-index 891da18..929cc36 100644
---- a/target/lm32/helper.c
-+++ b/target/lm32/helper.c
-@@ -219,11 +219,6 @@ bool lm32_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     return false;
- }
- 
--LM32CPU *cpu_lm32_init(const char *cpu_model)
+-SPARCCPU *cpu_sparc_init(const char *cpu_model)
 -{
--    return LM32_CPU(cpu_generic_init(TYPE_LM32_CPU, cpu_model));
+-    return SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
 -}
 -
- /* Some soc ignores the MSB on the address bus. Thus creating a shadow memory
-  * area. As a general rule, 0x00000000-0x7fffffff is cached, whereas
-  * 0x80000000-0xffffffff is not cached and used to access IO devices. */
+ void cpu_sparc_set_id(CPUSPARCState *env, unsigned int cpu)
+ {
+ #if !defined(TARGET_SPARC64)
 -- 
 2.7.4
