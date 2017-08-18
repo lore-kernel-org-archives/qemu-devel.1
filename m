@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1digkj-0000a4-JQ
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 08:51:54 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1digvz-0005uH-MZ
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:03:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1digki-0002Rp-9k
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 08:51:53 -0400
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:36226)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1digki-0002RZ-1n
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 08:51:52 -0400
-Received: by mail-wr0-x235.google.com with SMTP id f8so26205083wrf.3
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 05:51:51 -0700 (PDT)
+	(envelope-from <balaton@eik.bme.hu>) id 1digvu-0004Ir-OR
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:03:31 -0400
+Date: Fri, 18 Aug 2017 15:03:24 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <ae5953f1-267c-af76-e92e-3ad423ed2478@free.fr>
+Message-ID: <alpine.BSF.2.21.1708181500260.19483@zero.eik.bme.hu>
+References: <cover.1502643878.git.balaton@eik.bme.hu>
+	<0362ffdbfb08b46edef0e2180387078299a9b721.1502643878.git.balaton@eik.bme.hu>
+	<AM5P194MB0132F81D398EB4EB8EB13E22C8800@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
+	<ae5953f1-267c-af76-e92e-3ad423ed2478@free.fr>
 MIME-Version: 1.0
-In-Reply-To: <87r2w9i38i.fsf@linaro.org>
-References: <150097502966.6397.351311629210845503.malonedeb@gac.canonical.com>
-	<150240857521.18943.1371547756430353016.malone@chaenomeles.canonical.com>
-	<87shgpi800.fsf@linaro.org>
-	<CAFEAcA8S6S_T9d=QhncSb4or09HqRoZQNtxWDo3vj8OA9+pb-w@mail.gmail.com>
-	<87r2w9i38i.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 Aug 2017 13:51:30 +0100
-Message-ID: <CAFEAcA-MciXfwrccwpQmpF5pNuEr7k0qphKmtk4hZ07M5uURHw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Bug 1706296] Re: Booting NT 4 disk causes
- /home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion failed:
- (!qemu_mutex_iothread_locked())
+Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH 09/12] ppc440: Add emulation
+ of plb-pcix controller found in some 440 SoCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,16 +26,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Bug 1706296 <1706296@bugs.launchpad.net>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?ISO-8859-15?Q?Fran=E7ois_Revol?= <revol@free.fr>
+Cc: luigi burdo <intermediadc@hotmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
 
-On 18 August 2017 at 11:23, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote=
-:
-> If we invert the lock before writing the stack
-> page is it just going to crash in a more esoteric way?
+On Fri, 18 Aug 2017, Fran=C3=A7ois Revol wrote:
+> I once managed to build a binary from their published source code with
+> an old compiler,
 
-Paolo suggested a straightforward fix for 2.10 (which we unfortunately
-never did :-() which we could use to check this theory.
+It builds here with the patch I've posted next to the bin image.
 
-thanks
--- PMM
+> although it's not exactly the same of the binary used,
+> which I think is actually run with the on-chip RAM or something weird a=
+like.
+
+Maybe it's the same but we may have a problem with MMU emulation so it=20
+behaves differently (or they've compiled with different compiler/version=20
+which generates different code, I haven't checked that deep).
+
+But AROS has a problem with MMU so it may be a bug. I'll send a separate=20
+message about that.
+
+Regards,
+BALATON Zoltan
