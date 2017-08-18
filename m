@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <revol@free.fr>) id 1difKS-0000sO-8D
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:20:41 -0400
+	(envelope-from <revol@free.fr>) id 1difOB-0002mp-8W
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:24:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <revol@free.fr>) id 1difKR-0004Vu-Ce
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:20:40 -0400
+	(envelope-from <revol@free.fr>) id 1difO6-0005VP-CS
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:24:31 -0400
 References: <cover.1502643878.git.balaton@eik.bme.hu>
-	<0362ffdbfb08b46edef0e2180387078299a9b721.1502643878.git.balaton@eik.bme.hu>
-	<AM5P194MB0132F81D398EB4EB8EB13E22C8800@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
+	<5e493fd14e60d92d4fd80492ceff5ba13eb7b558.1502643878.git.balaton@eik.bme.hu>
+	<20170818061028.GU5509@umbus.fritz.box>
 From: =?UTF-8?Q?Fran=c3=a7ois_Revol?= <revol@free.fr>
-Message-ID: <ae5953f1-267c-af76-e92e-3ad423ed2478@free.fr>
-Date: Fri, 18 Aug 2017 13:20:27 +0200
+Message-ID: <dc9842ab-a7b1-5499-7e7c-ddbeff1c70dd@free.fr>
+Date: Fri, 18 Aug 2017 13:24:13 +0200
 MIME-Version: 1.0
-In-Reply-To: <AM5P194MB0132F81D398EB4EB8EB13E22C8800@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH 09/12] ppc440: Add emulation
- of plb-pcix controller found in some 440 SoCs
+In-Reply-To: <20170818061028.GU5509@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="PNRmdKuwrqcWuUvqoTdh3qnXklJ2x1nAU"
+Subject: Re: [Qemu-devel] [RFC PATCH 12/12] ppc: Add aCube Sam460ex board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,29 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: luigi burdo <intermediadc@hotmail.com>, BALATON Zoltan <balaton@eik.bme.hu>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: David Gibson <david@gibson.dropbear.id.au>, BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
 
-Hi,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--PNRmdKuwrqcWuUvqoTdh3qnXklJ2x1nAU
+From: =?UTF-8?Q?Fran=c3=a7ois_Revol?= <revol@free.fr>
+To: David Gibson <david@gibson.dropbear.id.au>,
+ BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+Message-ID: <dc9842ab-a7b1-5499-7e7c-ddbeff1c70dd@free.fr>
+Subject: Re: [RFC PATCH 12/12] ppc: Add aCube Sam460ex board
+References: <cover.1502643878.git.balaton@eik.bme.hu>
+ <5e493fd14e60d92d4fd80492ceff5ba13eb7b558.1502643878.git.balaton@eik.bme.hu>
+ <20170818061028.GU5509@umbus.fritz.box>
+In-Reply-To: <20170818061028.GU5509@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-Le 18/08/2017 =C3=A0 11:30, luigi burdo a =C3=A9crit :
-> hi Balaton, i can help with amigaos4 for sam . i can test it on P5040
-> book3e and on G5 quad book3s machine. note sam for boot amigaos need
-> a special modified version of uboot that is available on acube
-> website it is a firmware update. without modified uboot will be not
-> posdible auto boot amigaos. idont know if is possible use standard
-> uboot incuded in qemu for boot amigaos from uboot command line. i can
-> ask help to Enrico Vidale as my FB friend but i dont know if he will
-> be available for this kind of helping.
+Le 18/08/2017 =E0 08:10, David Gibson a =E9crit :
+> On Sun, Aug 13, 2017 at 07:04:38PM +0200, BALATON Zoltan wrote:
+>> Add emulation of aCube Sam460ex board based on AMCC 460EX embedded SoC=
+=2E
+>> This is not a full implementation yet with a lot of components still
+>> missing but enough to start a Linux kernel and the U-Boot firmware.
+>>
+>> Signed-off-by: Fran=E7ois Revol <revol@free.fr>
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>=20
+> There are a *lot* of devices defined here.  Most of them look like
+> they belong to the SoC, not the board (since they use DCRs), so it
+> doesn't really make sense to define them in a board file.  It would
+> also make it easier to review if they were split up into separate
+> patches.
 >=20
 
-Yes they use their own custom U-Boot, with a lot of changes and code
-duplication, and added x86 emulation to run a VGA BIOS, and never
-upstreamed the changes... much like any other vendor, sadly.
 
-I once managed to build a binary from their published source code with
-an old compiler, although it's not exactly the same of the binary used,
-which I think is actually run with the on-chip RAM or something weird ali=
-ke.
+Indeed, I never thought it would need that many devices to run, and I
+intended to move that out but never did.
 
-Fran=C3=A7ois.
+While it'd make it easier to review, I also recall waiting 3 years to
+get a simple patch in just because someone wanted the code to first be
+refactored (hint: wacom) :p
+
+Fran=E7ois.
+
+
+--PNRmdKuwrqcWuUvqoTdh3qnXklJ2x1nAU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRNJo6DsZLupSa6nwuKOKbtgqZASQUCWZbOXQAKCRCKOKbtgqZA
+SQzXAJ98fpktMnd58vJ9p0Ve+KoB1xsibwCfWQ4WAmt8qesunWzraYj9/udFCuo=
+=6CHM
+-----END PGP SIGNATURE-----
+
+--PNRmdKuwrqcWuUvqoTdh3qnXklJ2x1nAU--
