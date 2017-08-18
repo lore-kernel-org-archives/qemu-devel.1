@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1diWTf-0003kY-C7
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 21:53:36 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1diWkj-0002Mh-JG
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 22:11:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1diWTc-0000c0-8G
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 21:53:35 -0400
-Date: Fri, 18 Aug 2017 11:53:21 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170818015321.GN5509@umbus.fritz.box>
-References: <cover.1502643878.git.balaton@eik.bme.hu>
-	<0362ffdbfb08b46edef0e2180387078299a9b721.1502643878.git.balaton@eik.bme.hu>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1diWkg-0007Lb-FN
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 22:11:13 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33932)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1diWkg-0007LP-Ah
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 22:11:10 -0400
+Received: by mail-qt0-x241.google.com with SMTP id i19so7855442qte.1
+	for <qemu-devel@nongnu.org>; Thu, 17 Aug 2017 19:11:10 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <CAMM1KhhxQg8H8uYeGEHpXYgE=iTRyhik7pU+MdRr7HL6utpREg@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <11bbf041-b0b8-00a6-6201-b4deb3ccf673@amsat.org>
+Date: Thu, 17 Aug 2017 23:11:05 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="9Jdw4pA1x1k2W7MG"
-Content-Disposition: inline
-In-Reply-To: <0362ffdbfb08b46edef0e2180387078299a9b721.1502643878.git.balaton@eik.bme.hu>
-Subject: Re: [Qemu-devel] [RFC PATCH 09/12] ppc440: Add emulation of
- plb-pcix controller found in some 440 SoCs
+In-Reply-To: <CAMM1KhhxQg8H8uYeGEHpXYgE=iTRyhik7pU+MdRr7HL6utpREg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] nVidia emulation in QEMU?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,175 +34,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
+To: Darius Goad <alegend45@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+Hi,
 
---9Jdw4pA1x1k2W7MG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 08/17/2017 10:01 PM, Darius Goad wrote:
+> Hello. I'm Melissa, a trans woman who is the main developer of the nVidia
+> emulation code for 86Box. I'm interested in porting this code over to QEMU
+> as QEMU has higher compatibility with newer operating systems, as well as
+> expanding the developer base for nVidia graphics card emulation.
+> 
+> The 86Box code currently only handles the RIVA 128, the RIVA TNT, and a few
+> versions of the RIVA TNT2, and in a very incomplete state at that. I have
+> not been able to progress further due to the fact that 86Box's support of
+> modern Linux operating systems is poor, and due to the lack of a debugger
+> in 86Box.
+> 
+> I do need some help, however, as QEMU's code structure is not my strong
+> suit.
+> 
+> Anyway, my code is here:
+> https://github.com/MoochMcGee/86Box-experimental/blob/experimental/src/VIDEO/vid_nv_riva128.c
 
-On Sun, Aug 13, 2017 at 07:04:38PM +0200, BALATON Zoltan wrote:
+This code seems to match how devices are implemented in QEMU.
 
-You know I'm going to say it, right: needs a commit message.
+You can start looking at this concise QEMU device (no PCI):
 
-What's a "plb-pcix", and what's an example of a 440 SoCs which has it.
+https://github.com/qemu/qemu/blob/master/hw/display/cg3.c
 
-This is basically a new device, so I'm pretty willing to merge for
-2.11 with minimal review once rebased with the rest of the series.
+and a device with PCI:
 
-Couple of comments below
+https://github.com/qemu/qemu/blob/master/hw/display/sm501.c
 
-[snip]
-> +static void ppc440_pcix_reset(DeviceState *dev)
-> +{
-> +    struct PPC440PCIXState *s =3D PPC440_PCIX_HOST_BRIDGE(dev);
-> +    int i;
-> +
-> +    memset(s->pom, 0, sizeof(s->pom));
-> +    memset(s->pim, 0, sizeof(s->pim));
+Regards,
 
-Is it safe to just memset() the memory region objects within the
-pim/pom arrays without cleaning them up?  I'm guessing not..
-
-> +    for (i =3D 0; i < PPC440_PCIX_NR_PIMS; i++) {
-> +        s->pim[i].sa =3D 0xffffffff00000000ULL;
-> +    }
-> +    s->sts =3D 0;
-> +}
-> +
-> +/* All pins from each slot are tied to a single board IRQ.
-> + * This may need further refactoring for other boards. */
-> +static int ppc440_pcix_map_irq(PCIDevice *pci_dev, int irq_num)
-> +{
-> +    int slot =3D pci_dev->devfn >> 3;
-> +
-> +    DPRINTF("%s: devfn %x irq %d -> %d\n", __func__,
-> +            pci_dev->devfn, irq_num, slot);
-> +
-> +    return slot - 1;
-> +}
-> +
-> +static void ppc440_pcix_set_irq(void *opaque, int irq_num, int level)
-> +{
-> +    qemu_irq *pci_irqs =3D opaque;
-> +
-> +    DPRINTF("%s: PCI irq %d\n", __func__, irq_num);
-> +    if (irq_num < 0) {
-> +        fprintf(stderr, "%s: PCI irq %d\n", __func__, irq_num);
-
-Use report_error() please.
-
-> +        return;
-> +    }
-> +    qemu_set_irq(pci_irqs[irq_num], level);
-> +}
-> +
-> +static AddressSpace *ppc440_pcix_set_iommu(PCIBus *b, void *opaque, int =
-devfn)
-> +{
-> +    PPC440PCIXState *s =3D opaque;
-> +
-> +    return &s->bm_as;
-> +}
-> +
-> +static int ppc440_pcix_initfn(SysBusDevice *dev)
-> +{
-> +    PPC440PCIXState *s;
-> +    PCIHostState *h;
-> +    int i;
-> +
-> +    h =3D PCI_HOST_BRIDGE(dev);
-> +    s =3D PPC440_PCIX_HOST_BRIDGE(dev);
-> +
-> +    for (i =3D 0; i < ARRAY_SIZE(s->irq); i++) {
-> +        sysbus_init_irq(dev, &s->irq[i]);
-> +    }
-> +
-> +    memory_region_init(&s->busmem, OBJECT(dev), "pci bus memory", UINT64=
-_MAX);
-> +    h->bus =3D pci_register_bus(DEVICE(dev), NULL, ppc440_pcix_set_irq,
-> +                         ppc440_pcix_map_irq, s->irq, &s->busmem,
-> +                         get_system_io(), PCI_DEVFN(0, 0), 4, TYPE_PCI_B=
-US);
-> +
-> +    s->dev =3D pci_create_simple(h->bus, PCI_DEVFN(0, 0), "ppc4xx-host-b=
-ridge");
-> +
-> +    memory_region_init(&s->bm, OBJECT(s), "bm-ppc440-pcix", UINT64_MAX);
-> +    memory_region_add_subregion(&s->bm, 0x0, &s->busmem);
-> +    address_space_init(&s->bm_as, &s->bm, "pci-bm");
-> +    pci_setup_iommu(h->bus, ppc440_pcix_set_iommu, s);
-> +
-> +    memory_region_init(&s->container, OBJECT(s), "pci-container", PCI_AL=
-L_SIZE);
-> +    memory_region_init_io(&h->conf_mem, OBJECT(s), &pci_host_conf_le_ops=
-, h,
-> +                          "pci-conf-idx", 4);
-> +    memory_region_init_io(&h->data_mem, OBJECT(s), &pci_host_data_le_ops=
-, h,
-> +                          "pci-conf-data", 4);
-> +    memory_region_init_io(&s->iomem, OBJECT(s), &pci_reg_ops, s,
-> +                          "pci.reg", PPC440_REG_SIZE);
-> +    memory_region_add_subregion(&s->container, PCIC0_CFGADDR, &h->conf_m=
-em);
-> +    memory_region_add_subregion(&s->container, PCIC0_CFGDATA, &h->data_m=
-em);
-> +    memory_region_add_subregion(&s->container, PPC440_REG_BASE, &s->iome=
-m);
-> +    sysbus_init_mmio(dev, &s->container);
-> +
-> +    return 0;
-> +}
-> +
-> +static void ppc440_pcix_class_init(ObjectClass *klass, void *data)
-> +{
-> +    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +
-> +    k->init =3D ppc440_pcix_initfn;
-> +    dc->reset =3D ppc440_pcix_reset;
-> +}
-> +
-> +static const TypeInfo ppc440_pcix_info =3D {
-> +    .name          =3D TYPE_PPC440_PCIX_HOST_BRIDGE,
-> +    .parent        =3D TYPE_PCI_HOST_BRIDGE,
-> +    .instance_size =3D sizeof(PPC440PCIXState),
-> +    .class_init    =3D ppc440_pcix_class_init,
-> +};
-> +
-> +static void ppc440_pcix_register_types(void)
-> +{
-> +    type_register_static(&ppc440_pcix_info);
-> +}
-> +
-> +type_init(ppc440_pcix_register_types)
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---9Jdw4pA1x1k2W7MG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmWSJEACgkQbDjKyiDZ
-s5JIdhAAnNft3pfwrS8hGJ4MbZRvnvExjc4cInr4o9D0N/ooYobhDmcMiqOgkcts
-kaj+EO/SutwlTMRgWl5VX3NXwKxatlE5sbM7xVK3T4r0tF5SFRSdZxeC8YkDuSPa
-PXqw18tO4VnLV8q5zN67NkqT3wd19CjUF3+qW2rH+FZBPE3G4KzxUeORJEk8VVIs
-gd1gI107C9z81DtyGryUBQloxjG1YfGFHkxjSoSwdxm/1d74kOgmpEJS2JnBzwuN
-yselhF1aZ49IeV26shKgIcuv7luCM/E+hpTd3sKIDMO4wia3GMoCj82UBF1K1tDR
-Qq3PmhSMQjAtqfpGXHXbh/CbVlnpbBpkUoa2u4ERTexAUqiYsyonLQUAcMbDwOpb
-3mX74CVFBGtSuGb2IRd37VfRGM9o4lCcDtBohwqKEUBqRbhu1H6SolFBcaxxan7f
-avsNh9JNAECvx+P6LCtDA128UGKJSmqhDyi4qydZHfFMsRx+2knsHAb4quqnNEkg
-Fqfve8M2S5jT157bkCyKM819plorp1fsrk2MqDtSJidIoH9NvsNg4OM+BGrwA1nd
-1JoFpScOAmExP4pijK6T1J27ttkrRQPiuvBYaa82+V8JzEM4a86g7gdgaY6zut9w
-2pvwXBcRGad/xD3tJnuIuaIzG+Y4vX0C552r73AB6rhl9Ncrqak=
-=RVx1
------END PGP SIGNATURE-----
-
---9Jdw4pA1x1k2W7MG--
+Phil.
