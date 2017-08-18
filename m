@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dii8E-0002e7-G8
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:20:15 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1diiEN-0008Ey-Mp
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:26:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dii8D-00010K-1P
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:20:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54316)
+	(envelope-from <ldoktor@redhat.com>) id 1diiEK-0006EF-GF
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:26:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42218)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dii8C-0000yK-OB
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:20:12 -0400
-Date: Fri, 18 Aug 2017 16:19:57 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170818161957.3a63f611@nial.brq.redhat.com>
-In-Reply-To: <20170818133107.GG1475@perard.uk.xensource.com>
-References: <20170817162347.1590-1-anthony.perard@citrix.com>
-	<20170817162347.1590-3-anthony.perard@citrix.com>
-	<20170818043655-mutt-send-email-mst@kernel.org>
-	<20170818113734.181332ad@nial.brq.redhat.com>
-	<20170818133107.GG1475@perard.uk.xensource.com>
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1diiEK-0006Ao-9k
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:26:32 -0400
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>
+Date: Fri, 18 Aug 2017 16:26:03 +0200
+Message-Id: <20170818142613.32394-1-ldoktor@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.10 v3 2/3] hw/acpi: Move
- acpi_set_pci_info to pcihp
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v6 00/10] qemu.py: Pylint/style fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,148 +24,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony PERARD <anthony.perard@citrix.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Bruce Rogers <brogers@suse.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
 
-On Fri, 18 Aug 2017 14:31:07 +0100
-Anthony PERARD <anthony.perard@citrix.com> wrote:
+Hello guys,
 
-> On Fri, Aug 18, 2017 at 11:37:34AM +0200, Igor Mammedov wrote:
-> > On Fri, 18 Aug 2017 04:40:02 +0300
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > On Thu, Aug 17, 2017 at 05:23:46PM +0100, Anthony PERARD wrote:  
-> > > > This means that the function will be call and the property
-> > > > acpi-pcihp-bsel will be set even if ACPI build is disable.
-> > > > 
-> > > > To do PCI passthrough with Xen, the property acpi-pcihp-bsel needs to be
-> > > > set, but this was done only when ACPI tables are built which is not
-> > > > needed for a Xen guest. The need for the property starts with commit
-> > > > "pc: pcihp: avoid adding ACPI_PCIHP_PROP_BSEL twice"
-> > > > (f0c9d64a68b776374ec4732424a3e27753ce37b6).
-> > > > 
-> > > > Reported-by: Sander Eikelenboom <linux@eikelenboom.it>
-> > > > Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
-> > > > 
-> > > > ---
-> > > > Changes in V3:
-> > > >   - move acpi_set_pci_info to pcihp instead
-> > > > 
-> > > > Changes in V2:
-> > > >   - check for acpi_enabled before calling acpi_set_pci_info.
-> > > >   - set the property on the root bus only.
-> > > > 
-> > > > This patch would be a canditade to backport to 2.9, along with
-> > > > "hw/acpi: Limit hotplug to root bus on legacy mode"
-> > > > 
-> > > > CC: Stefano Stabellini <sstabellini@kernel.org>
-> > > > CC: Bruce Rogers <brogers@suse.com>
-> > > > ---
-> > > >  hw/acpi/pcihp.c      | 31 +++++++++++++++++++++++++++++++
-> > > >  hw/i386/acpi-build.c | 32 --------------------------------
-> > > >  2 files changed, 31 insertions(+), 32 deletions(-)
-> > > > 
-> > > > diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-> > > > index 9db3c2eaf2..44e8842db8 100644
-> > > > --- a/hw/acpi/pcihp.c
-> > > > +++ b/hw/acpi/pcihp.c
-> > > > @@ -75,6 +75,36 @@ static int acpi_pcihp_get_bsel(PCIBus *bus)
-> > > >      }
-> > > >  }
-> > > >  
-> > > > +/* Assign BSEL property to all buses.  In the future, this can be changed
-> > > > + * to only assign to buses that support hotplug.
-> > > > + */
-> > > > +static void *acpi_set_bsel(PCIBus *bus, void *opaque)
-> > > > +{
-> > > > +    unsigned *bsel_alloc = opaque;
-> > > > +    unsigned *bus_bsel;
-> > > > +
-> > > > +    if (qbus_is_hotpluggable(BUS(bus))) {
-> > > > +        bus_bsel = g_malloc(sizeof *bus_bsel);
-> > > > +
-> > > > +        *bus_bsel = (*bsel_alloc)++;
-> > > > +        object_property_add_uint32_ptr(OBJECT(bus), ACPI_PCIHP_PROP_BSEL,
-> > > > +                                       bus_bsel, &error_abort);
-> > > > +    }
-> > > > +
-> > > > +    return bsel_alloc;
-> > > > +}
-> > > > +
-> > > > +static void acpi_set_pci_info(void)
-> > > > +{
-> > > > +    PCIBus *bus = find_i440fx(); /* TODO: Q35 support */
-> > > > +    unsigned bsel_alloc = ACPI_PCIHP_BSEL_DEFAULT;
-> > > > +
-> > > > +    if (bus) {
-> > > > +        /* Scan all PCI buses. Set property to enable acpi based hotplug. */
-> > > > +        pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_alloc);
-> > > > +    }
-> > > > +}
-> > > > +
-> > > >  static void acpi_pcihp_test_hotplug_bus(PCIBus *bus, void *opaque)
-> > > >  {
-> > > >      AcpiPciHpFind *find = opaque;
-> > > > @@ -177,6 +207,7 @@ static void acpi_pcihp_update(AcpiPciHpState *s)
-> > > >  
-> > > >  void acpi_pcihp_reset(AcpiPciHpState *s)
-> > > >  {
-> > > > +    acpi_set_pci_info();
-> > > >      acpi_pcihp_update(s);
-> > > >  }    
-> > > 
-> > > IIUC doing this on reset will add property over and over again leaking
-> > > memory.  
-> > in v2 I've explicitly suggested to call it once, like:  
-> 
-> Sorry I misunderstood. I'll fix it.
-> 
-> > acpi_set_pci_info() {
-> > 
-> >    static bool bsel_is set;
-> > 
-> >    if (bsel_is set)
-> >        return;
-> >    bsel_is set = true;
-> > 
-> >    ...
-> > }
-> > 
-> > not patch related:
-> > BTW bsel assignment is not stable in hotplug + migration use case,
-> > and we probably should fix it up in 2.11 (CCing Marcel)
-> >   
-> > > I think that we need to do it on machine done.
-> > > 
-> > > Igor,  I think reordering acpi-build like earlier version did
-> > > is less intrusive and more appropriate for 2.10.
-> > > 
-> > > For 2.10 I would like to see ideally some changes that
-> > > are all if (xen) making it obvious non xen is not
-> > > affected. I can then ack it and it will be merged in xen tree.  
-> > it didn't work before so I'd just push fix to 2.11 without
-> > intermediate fix.
-> > But if you guys think it's worth to fix in 2.10, I'm fine with v2
-> > for it if Anthony will take care of it (rebase this series)
-> > in 2.11 merge window.  
-> 
-> Yes, I can take care of this series for 2.11, and find out how to build
-> the mips-softmmu target which does not build because it's missing
-> find_i440fx.
-it doesn't look like mips supports ACPI, so we probably shouldn't
-build acpi/pcihp for it at all but I'm not sure how hard it
-would be to factor out if possible at all
+I'm reading the available python modules to exercise qemu and while readi=
+ng them
+I fixed some issues that caught my attention. It usually starts with a si=
+mple
+pylint/docstring fixes and slowly graduates to more controversial ones so=
+ I'm
+open to suggestion to remove some of them.
 
- 
-> > > 
-> > > Clean it up after 2.10.
-> > >   
-> 
-> So is the v2 good enough or do I need to resend it?
-Do you really need it in 2.10?
-it's only 2 days left till release so unless it's blocker
-I'd wait till after release and do clean fix.
+Kind regards,
+Luk=C3=A1=C5=A1
 
+Changes in v2
+- Squashed 2nd and 10th patches into 2nd one
+- Use repr() in MonitorResponseError's description
+- Improved commit message of the 6th patch
+- Two tweaks to docstrings changed in the 6th patch
+- Also updated qmp-shell to use new-style super calls (7th patch)
+- Fixed the accidental rename of qmp `cmd_id` (kept the id->cmd_id patch)
+- Changed the style of the style-fix in the 10th commit
 
-> Thanks,
-> 
+Changes in v3
+- Don't use repr in the 5th patch in MonitorResponseError
+
+Changes in v4
+- Use correct git base (remove unwanted commits)
+
+Changes in v5
+- Avoid bool comparison
+- Change report to return in one docstring
+- Removed the unnecessary spaces around single-line docstring
+
+Changes in v6
+- Bunch of docstring tweaks by Markus Armbruster
+- Line break in <80 chars
+- result dict =3D> response dict
+- Removed the "event_match" rename
+
+Luk=C3=A1=C5=A1 Doktor (10):
+  qemu.py: Pylint/style fixes
+  qemu|qtest: Avoid dangerous arguments
+  qemu.py: Use iteritems rather than keys()
+  qemu.py: Simplify QMP key-conversion
+  qemu.py: Use custom exceptions rather than Exception
+  qmp.py: Couple of pylint/style fixes
+  qmp.py: Use object-based class for QEMUMonitorProtocol
+  qmp.py: Avoid "has_key" usage
+  qmp.py: Avoid overriding a builtin object
+  qtest.py: Few pylint/style fixes
+
+ scripts/qemu.py       | 95 +++++++++++++++++++++++++++++++++++++++------=
+------
+ scripts/qmp/qmp-shell |  4 +--
+ scripts/qmp/qmp.py    | 49 +++++++++++++++-----------
+ scripts/qtest.py      | 13 ++++---
+ 4 files changed, 111 insertions(+), 50 deletions(-)
+
+--=20
+2.9.4
