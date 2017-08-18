@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dikia-00032q-Bg
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:05:57 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dikjU-0003go-N2
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:06:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dikiX-0001tP-6c
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:05:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39512)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dikiX-0001t5-0m
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:05:53 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C60634A6EB
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 17:05:51 +0000 (UTC)
-Date: Fri, 18 Aug 2017 14:05:45 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170818170545.GC3108@localhost.localdomain>
-References: <20170808203935.30021-1-ehabkost@redhat.com>
-	<20170808203935.30021-5-ehabkost@redhat.com>
-	<87fuctp2pi.fsf@dusky.pond.sub.org>
-	<20170815203909.GY3108@localhost.localdomain>
-	<87378sf2qi.fsf@dusky.pond.sub.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dikjR-0002ij-Il
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:06:52 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:37693)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dikjR-0002ia-D8
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:06:49 -0400
+Received: by mail-qk0-x241.google.com with SMTP id x77so9255040qka.4
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:06:49 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <1503065708-28277-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1503065708-28277-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<66172cef-cd84-4d0f-dee3-fdfa7b4144eb@amsat.org>
+Message-ID: <035ce9db-73d0-9bb6-8aa8-4e0b1a2dd383@amsat.org>
+Date: Fri, 18 Aug 2017 14:06:46 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87378sf2qi.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH for-2.11 v2 4/5] qmp-shell: Accept QMP
- command as argument
+In-Reply-To: <66172cef-cd84-4d0f-dee3-fdfa7b4144eb@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/4] net: move CRC32 calculation from
+ compute_mcast_idx() into its own net_crc32() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,48 +37,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, jasowang@redhat.com
 
-On Wed, Aug 16, 2017 at 08:25:41AM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
+On 08/18/2017 01:51 PM, Philippe Mathieu-Daudé wrote:
+> On 08/18/2017 11:15 AM, Mark Cave-Ayland wrote:
+>> Separate out the standard ethernet CRC32 calculation into a new 
+>> net_crc32()
+>> function, renaming the constant POLYNOMIAL to POLYNOMIAL_BE to make it 
+>> clear
+>> that this is a big-endian CRC32 calculation.
+>>
+>> Then remove the existing implementation from compute_mcast_idx() and 
+>> call the
+>> new function in its place.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+>>   include/net/net.h |    3 ++-
+>>   net/net.c         |   16 +++++++++++-----
+>>   2 files changed, 13 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/include/net/net.h b/include/net/net.h
+>> index 1c55a93..586098c 100644
+>> --- a/include/net/net.h
+>> +++ b/include/net/net.h
+>> @@ -227,7 +227,8 @@ NetClientState *net_hub_port_find(int hub_id);
+>>   void qdev_set_nic_properties(DeviceState *dev, NICInfo *nd);
+>> -#define POLYNOMIAL 0x04c11db6
+>> +#define POLYNOMIAL_BE 0x04c11db6
+>> +uint32_t net_crc32(const uint8_t *p, int len);
+>>   unsigned compute_mcast_idx(const uint8_t *ep);
+>>   #define vmstate_offset_macaddr(_state, _field)                       \
+>> diff --git a/net/net.c b/net/net.c
+>> index 0e28099..a856907 100644
+>> --- a/net/net.c
+>> +++ b/net/net.c
+>> @@ -1568,25 +1568,31 @@ int net_client_parse(QemuOptsList *opts_list, 
+>> const char *optarg)
+>>   /* From FreeBSD */
+>>   /* XXX: optimize */
+>> -unsigned compute_mcast_idx(const uint8_t *ep)
+>> +uint32_t net_crc32(const uint8_t *p, int len)
 > 
-> > On Tue, Aug 15, 2017 at 12:03:53PM +0200, Markus Armbruster wrote:
-> >> Eduardo Habkost <ehabkost@redhat.com> writes:
-> >> 
-> >> Suggest to insert here:
-> >> 
-> >>   If additional arguments QMP-COMMAND ARG=VAL... are given, run just
-> >>   that QMP command instead of the REPL.
-> >> 
-> >> Question: is this limited to simple arguments?  If no, how would I write
-> >> an object argument?  For instance, how would I do
-> >> 
-> >>     { "execute": "blockdev-add", "arguments": { "node-name": "foo", "driver": "nbd", "server": { "type": "inet", "host": "localhost", "port": "12345" } } }
-> >> 
-> >> ?
-> >
-> > Exactly the same way you would write it when running qmp-shell in
-> > interactive mode.  e.g.:
-> >
-> >   $ ./scripts/qmp/qmp-shell /tmp/qmp blockdev-add driver=qcow2 node-name=node-E 'file={"driver":"file","filename":"/path/to/file.qcow2"}'
+> imho there is no point in using signed length.
 > 
-> I see.
+>>   {
+>>       uint32_t crc;
+>>       int carry, i, j;
+>>       uint8_t b;
+>>       crc = 0xffffffff;
+>> -    for (i = 0; i < 6; i++) {
+>> -        b = *ep++;
+>> +    for (i = 0; i < len; i++) {
+>> +        b = *p++;
+>>           for (j = 0; j < 8; j++) {
+>>               carry = ((crc & 0x80000000L) ? 1 : 0) ^ (b & 0x01);
+>>               crc <<= 1;
+>>               b >>= 1;
+>>               if (carry) {
+>> -                crc = ((crc ^ POLYNOMIAL) | carry);
+>> +                crc = ((crc ^ POLYNOMIAL_BE) | carry);
+>>               }
+>>           }
+>>       }
+>> -    return crc >> 26;
+>> +
+>> +    return crc;
+>> +}
+>> +
+>> +unsigned compute_mcast_idx(const uint8_t *ep)
+>> +{
+>> +    return net_crc32(ep, 6) >> 26;
 > 
-> The QEMU command line uses dotted key syntax instead.
+> while here let's use ETH_ALEN
+>
 
-You mean -blockdev, or is there another way to send QMP commands
-to QEMU that I'm not aware of?
+reading the next patches, what do you think about:
 
-> 
-> To be honest, the less qmp-shell is used, the happier I am.
+static inline uint32_t mac_crc32_be(const uint8_t *p)
+{
+     return net_crc32_be(ep, ETH_ALEN);
+}
 
-What people would use instead of it?
+unsigned compute_mcast_idx(const uint8_t *ep)
+{
+     return mac_crc32_be(p) >> 26;
+}
 
->                                                              Would you
-> like to serve as its sub-maintainer?
-
-I'd be glad to.
-
--- 
-Eduardo
+>>   }
+>>   QemuOptsList qemu_netdev_opts = {
+>>
+> with "uint32_t net_crc32(const uint8_t *p, size_t len);":
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
