@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dieDO-00045F-Mh
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:19 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dieDN-0000ew-EM
+	(envelope-from <imammedo@redhat.com>) id 1dieDM-00043L-Va
 	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60400)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <imammedo@redhat.com>) id 1dieDL-0000cQ-Tm
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45332)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dieDN-0000cw-69
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:17 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dieDL-0000aq-KA
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:15 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4A3E581DFD
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:16 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id AB50B4ACA7
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:14 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
 	(dell-r430-03.lab.eng.brq.redhat.com [10.34.112.60])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C40D45D743
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:15 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2F18F61297
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:14 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 18 Aug 2017 12:08:44 +0200
-Message-Id: <1503050939-227939-13-git-send-email-imammedo@redhat.com>
+Date: Fri, 18 Aug 2017 12:08:42 +0200
+Message-Id: <1503050939-227939-11-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
 References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11 12/27] m68k: replace cpu_m68k_init()
+Subject: [Qemu-devel] [PATCH for-2.11 10/27] alpha: replace cpu_alpha_init()
  with cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -36,112 +36,100 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-call register_m68k_insns() at realize time which makes
-cpu_m68k_init() typical object creation function.
-As result we can replace it with cpu_generic_init()
-which does the same job, reducing code duplication a bit.
+cpu_alpha_init() used to provide default fallback if invalid
+(i.e. non existent) cpu_model were provided.
+
+dp264 machine provides its own default so sole user of fallback
+is [bsd|linux]-user targets which specifies 'any' cpu model that
+fallbacks to "ev67" in cpu_alpha_init(). Push fallback handling
+into alpha_cpu_class_by_name() and replace cpu_alpha_init() with
+cpu_generic_init().
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Tested-by: Thomas Huth <huth@tuxfamily.org>
-Acked-by: Laurent Vivier <laurent@vivier.eu>
+Acked-by: Richard Henderson <rth@twiddle.net>
 ---
- target/m68k/cpu.h    |  3 +--
- hw/m68k/an5206.c     |  2 +-
- hw/m68k/mcf5208.c    |  2 +-
- target/m68k/cpu.c    |  2 ++
- target/m68k/helper.c | 20 --------------------
- 5 files changed, 5 insertions(+), 24 deletions(-)
+PS:
+  tested only linux-user as I don't have bsd box to test on
+---
+ target/alpha/cpu.h |  4 +---
+ hw/alpha/dp264.c   |  8 ++++++--
+ target/alpha/cpu.c | 20 +++++---------------
+ 3 files changed, 12 insertions(+), 20 deletions(-)
 
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 38a7e11..d936547 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -163,7 +163,6 @@ int m68k_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
+index e95be2b..0738e97 100644
+--- a/target/alpha/cpu.h
++++ b/target/alpha/cpu.h
+@@ -468,9 +468,7 @@ enum {
  
- void m68k_tcg_init(void);
- void m68k_cpu_init_gdb(M68kCPU *cpu);
--M68kCPU *cpu_m68k_init(const char *cpu_model);
+ void alpha_translate_init(void);
+ 
+-AlphaCPU *cpu_alpha_init(const char *cpu_model);
+-
+-#define cpu_init(cpu_model) CPU(cpu_alpha_init(cpu_model))
++#define cpu_init(cpu_model) cpu_generic_init(TYPE_ALPHA_CPU, cpu_model)
+ 
+ void alpha_cpu_list(FILE *f, fprintf_function cpu_fprintf);
  /* you can call this signal handler from your SIGBUS and SIGSEGV
-    signal handlers to inform the virtual CPU of exceptions. non zero
-    is returned if the signal was handled by the virtual CPU.  */
-@@ -322,7 +321,7 @@ void register_m68k_insns (CPUM68KState *env);
- #define TARGET_PHYS_ADDR_SPACE_BITS 32
- #define TARGET_VIRT_ADDR_SPACE_BITS 32
- 
--#define cpu_init(cpu_model) CPU(cpu_m68k_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_M68K_CPU, cpu_model)
- 
- #define cpu_signal_handler cpu_m68k_signal_handler
- #define cpu_list m68k_cpu_list
-diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
-index c762441..7b9b15d 100644
---- a/hw/m68k/an5206.c
-+++ b/hw/m68k/an5206.c
-@@ -42,7 +42,7 @@ static void an5206_init(MachineState *machine)
-     if (!cpu_model) {
-         cpu_model = "m5206";
+diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+index 3b307ad..1c5a177 100644
+--- a/hw/alpha/dp264.c
++++ b/hw/alpha/dp264.c
+@@ -51,7 +51,7 @@ static int clipper_pci_map_irq(PCIDevice *d, int irq_num)
+ static void clipper_init(MachineState *machine)
+ {
+     ram_addr_t ram_size = machine->ram_size;
+-    const char *cpu_model = machine->cpu_model;
++    const char *cpu_model = machine->cpu_model ? machine->cpu_model : "ev67";
+     const char *kernel_filename = machine->kernel_filename;
+     const char *kernel_cmdline = machine->kernel_cmdline;
+     const char *initrd_filename = machine->initrd_filename;
+@@ -67,7 +67,11 @@ static void clipper_init(MachineState *machine)
+     /* Create up to 4 cpus.  */
+     memset(cpus, 0, sizeof(cpus));
+     for (i = 0; i < smp_cpus; ++i) {
+-        cpus[i] = cpu_alpha_init(cpu_model ? cpu_model : "ev67");
++        cpus[i] = ALPHA_CPU(cpu_generic_init(TYPE_ALPHA_CPU, cpu_model));
++        if (!cpus[i]) {
++            error_report("Unable to find CPU definition");
++            exit(1);
++        }
      }
--    cpu = cpu_m68k_init(cpu_model);
-+    cpu = M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
-     if (!cpu) {
-         error_report("Unable to find m68k CPU definition");
-         exit(1);
-diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
-index f4b1387..1a0f180 100644
---- a/hw/m68k/mcf5208.c
-+++ b/hw/m68k/mcf5208.c
-@@ -232,7 +232,7 @@ static void mcf5208evb_init(MachineState *machine)
-     if (!cpu_model) {
-         cpu_model = "m5208";
+ 
+     cpus[0]->env.trap_arg0 = ram_size;
+diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
+index 76150f4..1ea597b 100644
+--- a/target/alpha/cpu.c
++++ b/target/alpha/cpu.c
+@@ -155,24 +155,14 @@ static ObjectClass *alpha_cpu_class_by_name(const char *cpu_model)
+     if (oc != NULL && object_class_is_abstract(oc)) {
+         oc = NULL;
      }
--    cpu = cpu_m68k_init(cpu_model);
-+    cpu = M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
-     if (!cpu) {
-         fprintf(stderr, "Unable to find m68k CPU definition\n");
-         exit(1);
-diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-index a14b6dd..55bf24b 100644
---- a/target/m68k/cpu.c
-+++ b/target/m68k/cpu.c
-@@ -230,6 +230,8 @@ static void m68k_cpu_realizefn(DeviceState *dev, Error **errp)
-     M68kCPUClass *mcc = M68K_CPU_GET_CLASS(dev);
-     Error *local_err = NULL;
- 
-+    register_m68k_insns(&cpu->env);
-+
-     cpu_exec_realizefn(cs, &local_err);
-     if (local_err != NULL) {
-         error_propagate(errp, local_err);
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index caae291..7e50ff5 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -156,26 +156,6 @@ static int m68k_fpu_gdb_set_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
-     return 0;
- }
- 
--M68kCPU *cpu_m68k_init(const char *cpu_model)
--{
--    M68kCPU *cpu;
--    CPUM68KState *env;
--    ObjectClass *oc;
--
--    oc = cpu_class_by_name(TYPE_M68K_CPU, cpu_model);
--    if (oc == NULL) {
--        return NULL;
--    }
--    cpu = M68K_CPU(object_new(object_class_get_name(oc)));
--    env = &cpu->env;
--
--    register_m68k_insns(env);
--
--    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
--
--    return cpu;
+-    return oc;
 -}
 -
- void m68k_cpu_init_gdb(M68kCPU *cpu)
- {
-     CPUState *cs = CPU(cpu);
+-AlphaCPU *cpu_alpha_init(const char *cpu_model)
+-{
+-    AlphaCPU *cpu;
+-    ObjectClass *cpu_class;
+ 
+-    cpu_class = alpha_cpu_class_by_name(cpu_model);
+-    if (cpu_class == NULL) {
+-        /* Default to ev67; no reason not to emulate insns by default.  */
+-        cpu_class = object_class_by_name(TYPE("ev67"));
++    /* TODO: remove match everything nonsense */
++    /* Default to ev67; no reason not to emulate insns by default. */
++    if (!oc) {
++        oc = object_class_by_name(TYPE("ev67"));
+     }
+-    cpu = ALPHA_CPU(object_new(object_class_get_name(cpu_class)));
+-
+-    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
+ 
+-    return cpu;
++    return oc;
+ }
+ 
+ static void ev4_cpu_initfn(Object *obj)
 -- 
 2.7.4
