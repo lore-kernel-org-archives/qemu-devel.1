@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1diiFH-0000f2-NF
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:27:32 -0400
+	(envelope-from <bounces@canonical.com>) id 1diiJ7-0004W9-Lj
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:31:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1diiFE-0008LK-Fj
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:27:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34232)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1diiFE-0008Ks-9c
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:27:28 -0400
-From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>
-Date: Fri, 18 Aug 2017 16:26:13 +0200
-Message-Id: <20170818142613.32394-11-ldoktor@redhat.com>
-In-Reply-To: <20170818142613.32394-1-ldoktor@redhat.com>
-References: <20170818142613.32394-1-ldoktor@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1diiJ4-0003Gi-FE
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:31:29 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48852)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1diiJ4-0003G4-9O
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:31:26 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1diiJ2-0003gc-D3
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 14:31:24 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 03B192E81BD
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 14:31:21 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 10/10] qtest.py: Few pylint/style fixes
+Date: Fri, 18 Aug 2017 14:15:55 -0000
+From: ChristianEhrhardt <1711602@bugs.launchpad.net>
+Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
+Message-Id: <150306575536.10892.13493058691755324320.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
+ 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +38,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
 
-No actual code changes, just few pylint/style fixes.
+I reached out to the people involved in the initial fixes which were relate=
+d to image locking and qemu-nbd. But this might after all be something comp=
+letely different.
+Yet until we know better it might be wiser to reach out to more people.
 
-Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
----
- scripts/qtest.py | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+=3D> http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg03465.html
 
-diff --git a/scripts/qtest.py b/scripts/qtest.py
-index ab183c0..df0daf2 100644
---- a/scripts/qtest.py
-+++ b/scripts/qtest.py
-@@ -11,14 +11,11 @@
- # Based on qmp.py.
- #
-=20
--import errno
- import socket
--import string
- import os
--import subprocess
--import qmp.qmp
- import qemu
-=20
-+
- class QEMUQtestProtocol(object):
-     def __init__(self, address, server=3DFalse):
-         """
-@@ -83,8 +80,10 @@ class QEMUQtestMachine(qemu.QEMUMachine):
-                  socket_scm_helper=3DNone):
-         if name is None:
-             name =3D "qemu-%d" % os.getpid()
--        super(QEMUQtestMachine, self).__init__(binary, args, name=3Dname=
-, test_dir=3Dtest_dir,
--                                               socket_scm_helper=3Dsocke=
-t_scm_helper)
-+        super(QEMUQtestMachine,
-+              self).__init__(binary, args, name=3Dname, test_dir=3Dtest_=
-dir,
-+                             socket_scm_helper=3Dsocket_scm_helper)
-+        self._qtest =3D None
-         self._qtest_path =3D os.path.join(test_dir, name + "-qtest.sock"=
-)
-=20
-     def _base_args(self):
---=20
-2.9.4
+** Also affects: qemu (Ubuntu)
+   Importance: Undecided
+       Status: New
+
+** Also affects: qemu
+   Importance: Undecided
+       Status: New
+
+** Changed in: qemu (Ubuntu)
+     Assignee: (unassigned) =3D> ChristianEhrhardt (paelzer)
+
+** Changed in: qemu (Ubuntu)
+       Status: New =3D> Confirmed
+
+** Changed in: qemu (Ubuntu)
+   Importance: Undecided =3D> High
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1711602
+
+Title:
+  --copy-storage-all failing with qemu 2.10
+
+Status in QEMU:
+  New
+Status in libvirt package in Ubuntu:
+  Confirmed
+Status in qemu package in Ubuntu:
+  Confirmed
+
+Bug description:
+  We fixed an issue around disk locking already in regard to qemu-nbd
+  [1], but there still seem to be issues.
+
+  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
+://10.22.69.196/system
+  error: internal error: qemu unexpectedly closed the monitor: 2017-08-18T1=
+2:10:29.800397Z qemu-system-x86_64: -chardev pty,id=3Dcharserial0: char dev=
+ice redirected to /dev/pts/0 (label charserial0)
+  2017-08-18T12:10:48.545776Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+
+  Source libvirt log for the guest:
+  2017-08-18 12:09:08.251+0000: initiating migration
+  2017-08-18T12:09:08.809023Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+  2017-08-18T12:09:08.809481Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+
+  Target libvirt log for the guest:
+  2017-08-18T12:09:08.730911Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+  2017-08-18 12:09:09.010+0000: shutting down, reason=3Dcrashed
+
+  Given the timing it seems that the actual copy now works (it is busy ~10 =
+seconds on my environment which would be the copy).
+  Also we don't see the old errors we saw before, but afterwards on the act=
+ual take-over it fails.
+
+  Dmesg has no related denials as often apparmor is in the mix.
+
+  Need to check libvirt logs of source [2] and target [3] in Detail.
+
+  [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02200.html
+  [2]: http://paste.ubuntu.com/25339356/
+  [3]: http://paste.ubuntu.com/25339358/
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1711602/+subscriptions
