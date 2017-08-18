@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1diocS-0006sa-Rq
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 17:15:54 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1diocR-0000ed-CM
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 17:15:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35334)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1diocR-0000c9-3g
+	(envelope-from <eblake@redhat.com>) id 1diocQ-0006rm-Rl
 	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 17:15:51 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <eblake@redhat.com>) id 1diocP-0000bm-P2
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 17:15:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38714)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1diocP-0000Zn-FB
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 17:15:49 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3676A77355
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 21:15:50 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8E9C23B98
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 21:15:48 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Fri, 18 Aug 2017 16:15:35 -0500
-Message-Id: <20170818211542.5380-7-eblake@redhat.com>
+Date: Fri, 18 Aug 2017 16:15:33 -0500
+Message-Id: <20170818211542.5380-5-eblake@redhat.com>
 In-Reply-To: <20170818211542.5380-1-eblake@redhat.com>
 References: <20170818211542.5380-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 06/13] libqtest: Topologically sort functions
+Subject: [Qemu-devel] [PATCH v5 04/13] libqtest: Let socket_send() compute
+ length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,303 +33,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com
 
-Put static functions prior to public headers, in part so that
-improvements to qtest_start() can benefit from the static
-helpers without needing forward references.  Code motion, with
-no semantic change.
+Rather than make multiple callers call strlen(), it's easier if
+socket_send() itself can compute a length via strlen() if none
+was provided (caller passes -1).  Callers that can get at the
+length more efficiently are left that way.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/libqtest.c | 263 +++++++++++++++++++++++++++----------------------------
- 1 file changed, 131 insertions(+), 132 deletions(-)
+ tests/libqtest.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 438a22678d..5d16351e24 100644
+index 3f956f09fc..a6ce21d7f9 100644
 --- a/tests/libqtest.c
 +++ b/tests/libqtest.c
-@@ -49,7 +49,6 @@ static struct sigaction sigact_old;
-     g_assert_cmpint(ret, !=, -1); \
- } while (0)
-
--static int qtest_query_target_endianness(QTestState *s);
-
- static int init_socket(const char *socket_path)
- {
-@@ -128,6 +127,137 @@ static void setup_sigabrt_handler(void)
-     sigaction(SIGABRT, &sigact, &sigact_old);
- }
-
-+static void socket_send(int fd, const char *buf, ssize_t size)
-+{
-+    size_t offset;
-+
-+    if (size < 0) {
-+        size = strlen(buf);
-+    }
-+    offset = 0;
-+    while (offset < size) {
-+        ssize_t len;
-+
-+        len = write(fd, buf + offset, size - offset);
-+        if (len == -1 && errno == EINTR) {
-+            continue;
-+        }
-+
-+        g_assert_no_errno(len);
-+        g_assert_cmpint(len, >, 0);
-+
-+        offset += len;
-+    }
-+}
-+
-+static void socket_sendf(int fd, const char *fmt, va_list ap)
-+{
-+    gchar *str = g_strdup_vprintf(fmt, ap);
-+
-+    socket_send(fd, str, -1);
-+    g_free(str);
-+}
-+
-+static void GCC_FMT_ATTR(2, 3) qtest_sendf(QTestState *s, const char *fmt, ...)
-+{
-+    va_list ap;
-+
-+    va_start(ap, fmt);
-+    socket_sendf(s->fd, fmt, ap);
-+    va_end(ap);
-+}
-+
-+static GString *qtest_recv_line(QTestState *s)
-+{
-+    GString *line;
-+    size_t offset;
-+    char *eol;
-+
-+    while ((eol = strchr(s->rx->str, '\n')) == NULL) {
-+        ssize_t len;
-+        char buffer[1024];
-+
-+        len = read(s->fd, buffer, sizeof(buffer));
-+        if (len == -1 && errno == EINTR) {
-+            continue;
-+        }
-+
-+        if (len == -1 || len == 0) {
-+            fprintf(stderr, "Broken pipe\n");
-+            exit(1);
-+        }
-+
-+        g_string_append_len(s->rx, buffer, len);
-+    }
-+
-+    offset = eol - s->rx->str;
-+    line = g_string_new_len(s->rx->str, offset);
-+    g_string_erase(s->rx, 0, offset + 1);
-+
-+    return line;
-+}
-+
-+static gchar **qtest_rsp(QTestState *s, int expected_args)
-+{
-+    GString *line;
-+    gchar **words;
-+    int i;
-+
-+redo:
-+    line = qtest_recv_line(s);
-+    words = g_strsplit(line->str, " ", 0);
-+    g_string_free(line, TRUE);
-+
-+    if (strcmp(words[0], "IRQ") == 0) {
-+        long irq;
-+        int ret;
-+
-+        g_assert(words[1] != NULL);
-+        g_assert(words[2] != NULL);
-+
-+        ret = qemu_strtol(words[2], NULL, 0, &irq);
-+        g_assert(!ret);
-+        g_assert_cmpint(irq, >=, 0);
-+        g_assert_cmpint(irq, <, MAX_IRQ);
-+
-+        if (strcmp(words[1], "raise") == 0) {
-+            s->irq_level[irq] = true;
-+        } else {
-+            s->irq_level[irq] = false;
-+        }
-+
-+        g_strfreev(words);
-+        goto redo;
-+    }
-+
-+    g_assert(words[0] != NULL);
-+    g_assert_cmpstr(words[0], ==, "OK");
-+
-+    if (expected_args) {
-+        for (i = 0; i < expected_args; i++) {
-+            g_assert(words[i] != NULL);
-+        }
-+    } else {
-+        g_strfreev(words);
-+    }
-+
-+    return words;
-+}
-+
-+static int qtest_query_target_endianness(QTestState *s)
-+{
-+    gchar **args;
-+    int big_endian;
-+
-+    qtest_sendf(s, "endianness\n");
-+    args = qtest_rsp(s, 1);
-+    g_assert(strcmp(args[1], "big") == 0 || strcmp(args[1], "little") == 0);
-+    big_endian = strcmp(args[1], "big") == 0;
-+    g_strfreev(args);
-+
-+    return big_endian;
-+}
-+
- static void cleanup_sigabrt_handler(void)
- {
-     sigaction(SIGABRT, &sigact_old, NULL);
-@@ -252,137 +382,6 @@ void qtest_quit(QTestState *s)
+@@ -251,10 +251,13 @@ void qtest_quit(QTestState *s)
      g_free(s);
  }
 
--static void socket_send(int fd, const char *buf, ssize_t size)
--{
--    size_t offset;
--
--    if (size < 0) {
--        size = strlen(buf);
--    }
--    offset = 0;
--    while (offset < size) {
--        ssize_t len;
--
--        len = write(fd, buf + offset, size - offset);
--        if (len == -1 && errno == EINTR) {
--            continue;
--        }
--
--        g_assert_no_errno(len);
--        g_assert_cmpint(len, >, 0);
--
--        offset += len;
--    }
--}
--
--static void socket_sendf(int fd, const char *fmt, va_list ap)
--{
--    gchar *str = g_strdup_vprintf(fmt, ap);
--
--    socket_send(fd, str, -1);
--    g_free(str);
--}
--
--static void GCC_FMT_ATTR(2, 3) qtest_sendf(QTestState *s, const char *fmt, ...)
--{
--    va_list ap;
--
--    va_start(ap, fmt);
--    socket_sendf(s->fd, fmt, ap);
--    va_end(ap);
--}
--
--static GString *qtest_recv_line(QTestState *s)
--{
--    GString *line;
--    size_t offset;
--    char *eol;
--
--    while ((eol = strchr(s->rx->str, '\n')) == NULL) {
--        ssize_t len;
--        char buffer[1024];
--
--        len = read(s->fd, buffer, sizeof(buffer));
--        if (len == -1 && errno == EINTR) {
--            continue;
--        }
--
--        if (len == -1 || len == 0) {
--            fprintf(stderr, "Broken pipe\n");
--            exit(1);
--        }
--
--        g_string_append_len(s->rx, buffer, len);
--    }
--
--    offset = eol - s->rx->str;
--    line = g_string_new_len(s->rx->str, offset);
--    g_string_erase(s->rx, 0, offset + 1);
--
--    return line;
--}
--
--static gchar **qtest_rsp(QTestState *s, int expected_args)
--{
--    GString *line;
--    gchar **words;
--    int i;
--
--redo:
--    line = qtest_recv_line(s);
--    words = g_strsplit(line->str, " ", 0);
--    g_string_free(line, TRUE);
--
--    if (strcmp(words[0], "IRQ") == 0) {
--        long irq;
--        int ret;
--
--        g_assert(words[1] != NULL);
--        g_assert(words[2] != NULL);
--
--        ret = qemu_strtol(words[2], NULL, 0, &irq);
--        g_assert(!ret);
--        g_assert_cmpint(irq, >=, 0);
--        g_assert_cmpint(irq, <, MAX_IRQ);
--
--        if (strcmp(words[1], "raise") == 0) {
--            s->irq_level[irq] = true;
--        } else {
--            s->irq_level[irq] = false;
--        }
--
--        g_strfreev(words);
--        goto redo;
--    }
--
--    g_assert(words[0] != NULL);
--    g_assert_cmpstr(words[0], ==, "OK");
--
--    if (expected_args) {
--        for (i = 0; i < expected_args; i++) {
--            g_assert(words[i] != NULL);
--        }
--    } else {
--        g_strfreev(words);
--    }
--
--    return words;
--}
--
--static int qtest_query_target_endianness(QTestState *s)
--{
--    gchar **args;
--    int big_endian;
--
--    qtest_sendf(s, "endianness\n");
--    args = qtest_rsp(s, 1);
--    g_assert(strcmp(args[1], "big") == 0 || strcmp(args[1], "little") == 0);
--    big_endian = strcmp(args[1], "big") == 0;
--    g_strfreev(args);
--
--    return big_endian;
--}
--
- typedef struct {
-     JSONMessageParser parser;
-     QDict *response;
+-static void socket_send(int fd, const char *buf, size_t size)
++static void socket_send(int fd, const char *buf, ssize_t size)
+ {
+     size_t offset;
+
++    if (size < 0) {
++        size = strlen(buf);
++    }
+     offset = 0;
+     while (offset < size) {
+         ssize_t len;
+@@ -274,9 +277,8 @@ static void socket_send(int fd, const char *buf, size_t size)
+ static void socket_sendf(int fd, const char *fmt, va_list ap)
+ {
+     gchar *str = g_strdup_vprintf(fmt, ap);
+-    size_t size = strlen(str);
+
+-    socket_send(fd, str, size);
++    socket_send(fd, str, -1);
+     g_free(str);
+ }
+
+@@ -858,7 +860,7 @@ void qtest_bufwrite(QTestState *s, uint64_t addr, const void *data, size_t size)
+
+     bdata = g_base64_encode(data, size);
+     qtest_sendf(s, "b64write 0x%" PRIx64 " 0x%zx ", addr, size);
+-    socket_send(s->fd, bdata, strlen(bdata));
++    socket_send(s->fd, bdata, -1);
+     socket_send(s->fd, "\n", 1);
+     qtest_rsp(s, 0);
+     g_free(bdata);
 -- 
 2.13.5
