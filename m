@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1difha-0002Gb-LX
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:44:35 -0400
+	(envelope-from <david@redhat.com>) id 1difhe-0002L8-Al
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:44:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1difhW-0007II-PX
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:44:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51578)
+	(envelope-from <david@redhat.com>) id 1difhd-0007M7-DL
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:44:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48794)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1difhW-0007HY-Ha
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:44:30 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1difhd-0007Ll-6n
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:44:37 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Fri, 18 Aug 2017 13:43:46 +0200
-Message-Id: <20170818114353.13455-12-david@redhat.com>
+Date: Fri, 18 Aug 2017 13:43:48 +0200
+Message-Id: <20170818114353.13455-14-david@redhat.com>
 In-Reply-To: <20170818114353.13455-1-david@redhat.com>
 References: <20170818114353.13455-1-david@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 for-2.11 11/18] target/s390x: move
- psw_key_valid() to mem_helper.c
+Subject: [Qemu-devel] [PATCH v3 for-2.11 13/18] target/s390x: move
+ get_per_in_range() to misc_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,57 +37,54 @@ Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/cpu.h        | 11 -----------
- target/s390x/mem_helper.c | 11 +++++++++++
+ target/s390x/cpu.h         | 11 -----------
+ target/s390x/misc_helper.c | 11 +++++++++++
  2 files changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index c71a4bf..8300cb2 100644
+index 9cdce6c..55aab52 100644
 --- a/target/s390x/cpu.h
 +++ b/target/s390x/cpu.h
-@@ -366,17 +366,6 @@ void s390x_cpu_debug_excp_handler(CPUState *cs);
- #define MMU_SECONDARY_IDX       1
- #define MMU_HOME_IDX            2
+@@ -438,17 +438,6 @@ static inline uint8_t get_per_atmid(CPUS390XState *e=
+nv)
+            ((env->psw.mask & PSW_ASC_ACCREG)?    (1 << 2) : 0);
+ }
 =20
--static inline bool psw_key_valid(CPUS390XState *env, uint8_t psw_key)
+-/* Check if an address is within the PER starting address and the PER
+-   ending address.  The address range might loop.  */
+-static inline bool get_per_in_range(CPUS390XState *env, uint64_t addr)
 -{
--    uint16_t pkm =3D env->cregs[3] >> 16;
--
--    if (env->psw.mask & PSW_MASK_PSTATE) {
--        /* PSW key has range 0..15, it is valid if the bit is 1 in the P=
-KM */
--        return pkm & (0x80 >> psw_key);
+-    if (env->cregs[10] <=3D env->cregs[11]) {
+-        return env->cregs[10] <=3D addr && addr <=3D env->cregs[11];
+-    } else {
+-        return env->cregs[10] <=3D addr || addr <=3D env->cregs[11];
 -    }
--    return true;
 -}
 -
- static inline int cpu_mmu_index(CPUS390XState *env, bool ifetch)
- {
-     switch (env->psw.mask & PSW_MASK_ASC) {
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index c71dce4..b91c740 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -56,6 +56,17 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAcce=
-ssType access_type,
- #define HELPER_LOG(x...)
- #endif
+ S390CPU *cpu_s390x_init(const char *cpu_model);
+ S390CPU *s390x_new_cpu(const char *cpu_model, int64_t id, Error **errp);
+ S390CPU *cpu_s390x_create(const char *cpu_model, Error **errp);
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index d23ffcd..ab0c53d 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -451,6 +451,17 @@ void HELPER(per_check_exception)(CPUS390XState *env)
+     }
+ }
 =20
-+static inline bool psw_key_valid(CPUS390XState *env, uint8_t psw_key)
++/* Check if an address is within the PER starting address and the PER
++   ending address.  The address range might loop.  */
++static inline bool get_per_in_range(CPUS390XState *env, uint64_t addr)
 +{
-+    uint16_t pkm =3D env->cregs[3] >> 16;
-+
-+    if (env->psw.mask & PSW_MASK_PSTATE) {
-+        /* PSW key has range 0..15, it is valid if the bit is 1 in the P=
-KM */
-+        return pkm & (0x80 >> psw_key);
++    if (env->cregs[10] <=3D env->cregs[11]) {
++        return env->cregs[10] <=3D addr && addr <=3D env->cregs[11];
++    } else {
++        return env->cregs[10] <=3D addr || addr <=3D env->cregs[11];
 +    }
-+    return true;
 +}
 +
- /* Reduce the length so that addr + len doesn't cross a page boundary.  =
-*/
- static inline uint32_t adj_len_to_page(uint32_t len, uint64_t addr)
+ void HELPER(per_branch)(CPUS390XState *env, uint64_t from, uint64_t to)
  {
+     if ((env->cregs[9] & PER_CR9_EVENT_BRANCH)) {
 --=20
 2.9.4
