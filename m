@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dieDV-0004FO-PX
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:29 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dieDY-0004It-UP
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dieDU-0000oj-PL
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:28835)
+	(envelope-from <imammedo@redhat.com>) id 1dieDY-0000qk-03
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49122)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dieDU-0000oC-JA
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:24 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dieDX-0000q7-Pb
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:27 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A831B5D5F4
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:23 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DF35A37E85
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:26 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
 	(dell-r430-03.lab.eng.brq.redhat.com [10.34.112.60])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2CD6F5D743
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:23 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6446261297
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:26 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 18 Aug 2017 12:08:53 +0200
-Message-Id: <1503050939-227939-22-git-send-email-imammedo@redhat.com>
+Date: Fri, 18 Aug 2017 12:08:57 +0200
+Message-Id: <1503050939-227939-26-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
 References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11 21/27] x86: replace cpu_x86_init()
- with cpu_generic_init()
+Subject: [Qemu-devel] [PATCH for-2.11 25/27] unicore32: replace
+ uc32_cpu_init() with cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,46 +41,54 @@ it's just a wrapper, drop it and use cpu_generic_init() directly
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu.h | 3 +--
- target/i386/cpu.c | 5 -----
- 2 files changed, 1 insertion(+), 7 deletions(-)
+ target/unicore32/cpu.h    | 4 +---
+ hw/unicore32/puv3.c       | 2 +-
+ target/unicore32/helper.c | 5 -----
+ 3 files changed, 2 insertions(+), 9 deletions(-)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 0518673..525d35d 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1327,7 +1327,6 @@ int x86_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
- void x86_cpu_exec_enter(CPUState *cpu);
- void x86_cpu_exec_exit(CPUState *cpu);
+diff --git a/target/unicore32/cpu.h b/target/unicore32/cpu.h
+index 7b5b405..7724108 100644
+--- a/target/unicore32/cpu.h
++++ b/target/unicore32/cpu.h
+@@ -165,9 +165,7 @@ static inline int cpu_mmu_index(CPUUniCore32State *env, bool ifetch)
  
--X86CPU *cpu_x86_init(const char *cpu_model);
- void x86_cpu_list(FILE *f, fprintf_function cpu_fprintf);
- int cpu_x86_support_mca_broadcast(CPUX86State *env);
+ #include "exec/cpu-all.h"
  
-@@ -1507,7 +1506,7 @@ uint64_t cpu_get_tsc(CPUX86State *env);
+-UniCore32CPU *uc32_cpu_init(const char *cpu_model);
+-
+-#define cpu_init(cpu_model) CPU(uc32_cpu_init(cpu_model))
++#define cpu_init(cpu_model) cpu_generic_init(TYPE_UNICORE32_CPU, cpu_model)
  
- #define PHYS_ADDR_MASK MAKE_64BIT_MASK(0, TCG_PHYS_ADDR_BITS)
+ static inline void cpu_get_tb_cpu_state(CPUUniCore32State *env, target_ulong *pc,
+                                         target_ulong *cs_base, uint32_t *flags)
+diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
+index ff62efb..eb9862f 100644
+--- a/hw/unicore32/puv3.c
++++ b/hw/unicore32/puv3.c
+@@ -127,7 +127,7 @@ static void puv3_init(MachineState *machine)
+         cpu_model = "UniCore-II";
+     }
  
--#define cpu_init(cpu_model) CPU(cpu_x86_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_X86_CPU, cpu_model)
- 
- #define cpu_signal_handler cpu_x86_signal_handler
- #define cpu_list x86_cpu_list
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index ac60c1a..217aade 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2522,11 +2522,6 @@ static gchar *x86_gdb_arch_name(CPUState *cs)
+-    cpu = uc32_cpu_init(cpu_model);
++    cpu = UNICORE32_CPU(cpu_generic_init(TYPE_UNICORE32_CPU, cpu_model));
+     if (!cpu) {
+         error_report("Unable to find CPU definition");
+         exit(1);
+diff --git a/target/unicore32/helper.c b/target/unicore32/helper.c
+index f9239dc..309dcd1 100644
+--- a/target/unicore32/helper.c
++++ b/target/unicore32/helper.c
+@@ -27,11 +27,6 @@
+ #define DPRINTF(fmt, ...) do {} while (0)
  #endif
- }
  
--X86CPU *cpu_x86_init(const char *cpu_model)
+-UniCore32CPU *uc32_cpu_init(const char *cpu_model)
 -{
--    return X86_CPU(cpu_generic_init(TYPE_X86_CPU, cpu_model));
+-    return UNICORE32_CPU(cpu_generic_init(TYPE_UNICORE32_CPU, cpu_model));
 -}
 -
- static void x86_cpu_cpudef_class_init(ObjectClass *oc, void *data)
- {
-     X86CPUDefinition *cpudef = data;
+ #ifndef CONFIG_USER_ONLY
+ void helper_cp0_set(CPUUniCore32State *env, uint32_t val, uint32_t creg,
+         uint32_t cop)
 -- 
 2.7.4
