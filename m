@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1diiRB-0003dK-MD
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:39:50 -0400
+	(envelope-from <s.priebe@profihost.ag>) id 1diiS7-0004Tp-KP
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:40:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1diiR8-0001C3-Ir
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:39:49 -0400
-Resent-Message-Id: <E1diiR8-0001C3-Ir@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21305)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1diiR8-0001Bh-BF
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:39:46 -0400
-Message-ID: <150306717604.27.17218116548918586379@205a2245145f>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170818141512.15205-1-famz@redhat.com>
+	(envelope-from <s.priebe@profihost.ag>) id 1diiS4-0001dN-HQ
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:40:47 -0400
+Received: from cloud1-vm154.de-nserver.de ([178.250.10.56]:38076)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <s.priebe@profihost.ag>)
+	id 1diiS4-0001cQ-6Q
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:40:44 -0400
+From: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
+Message-ID: <7c9b2e44-ad64-99e0-cff6-87c669618b00@profihost.ag>
+Date: Fri, 18 Aug 2017 16:40:36 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 18 Aug 2017 07:39:37 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] scsi-block: Support werror/rerror
+Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] virtio: network: lost tcp/ip packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +26,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
+To: qemu-devel <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwODE4MTQxNTEyLjE1MjA1LTEtZmFtekByZWRoYXQuY29tClN1YmplY3Q6
-IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC8zXSBzY3NpLWJsb2NrOiBTdXBwb3J0IHdlcnJvci9y
-ZXJyb3IKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
-PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
-ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
-SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
-Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
-PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
-Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAg
-ICAgICBwYXRjaGV3LzE1MDMwNjU3MDgtMjgyNzctMS1naXQtc2VuZC1lbWFpbC1tYXJrLmNhdmUt
-YXlsYW5kQGlsYW5kZS5jby51ayAtPiBwYXRjaGV3LzE1MDMwNjU3MDgtMjgyNzctMS1naXQtc2Vu
-ZC1lbWFpbC1tYXJrLmNhdmUtYXlsYW5kQGlsYW5kZS5jby51awpTd2l0Y2hlZCB0byBhIG5ldyBi
-cmFuY2ggJ3Rlc3QnCjUwOTdkOTI3ZGUgc2NzaS1ibG9jazogU3VwcG9ydCByZXJyb3Ivd2Vycm9y
-CmQyYzUzNmE0N2Mgc2NzaTogRW5oYW5jZSBzY3NpX3NlbnNlX3RvX2Vycm5vCjE3NjQyZTlhOGUg
-c2NzaTogUmVmYWN0b3Igc2NzaSBzZW5zZSBpbnRlcnByZXRpbmcgY29kZQoKPT09IE9VVFBVVCBC
-RUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8zOiBzY3NpOiBSZWZhY3RvciBzY3NpIHNlbnNlIGlu
-dGVycHJldGluZyBjb2RlLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgJy0n
-IChjdHg6V3hXKQojODQ6IEZJTEU6IGJsb2NrL2lzY3NpLmM6MjEzOgorICAgIHJldHVybiAtIHNj
-c2lfc2Vuc2VfdG9fZXJybm8oc2Vuc2UtPmtleSwKICAgICAgICAgICAgXgoKRVJST1I6IHJldHVy
-biBvZiBhbiBlcnJubyBzaG91bGQgdHlwaWNhbGx5IGJlIC12ZSAocmV0dXJuIC1FQlVTWSkKIzE1
-MTogRklMRTogdXRpbC9zY3NpLmM6MjI6CisgICAgICAgIHJldHVybiBFQlVTWTsKCkVSUk9SOiBy
-ZXR1cm4gb2YgYW4gZXJybm8gc2hvdWxkIHR5cGljYWxseSBiZSAtdmUgKHJldHVybiAtRUFDQ0VT
-KQojMTUzOiBGSUxFOiB1dGlsL3Njc2kuYzoyNDoKKyAgICAgICAgcmV0dXJuIEVBQ0NFUzsKCkVS
-Uk9SOiByZXR1cm4gb2YgYW4gZXJybm8gc2hvdWxkIHR5cGljYWxseSBiZSAtdmUgKHJldHVybiAt
-RUNBTkNFTEVEKQojMTU1OiBGSUxFOiB1dGlsL3Njc2kuYzoyNjoKKyAgICAgICAgcmV0dXJuIEVD
-QU5DRUxFRDsKCkVSUk9SOiByZXR1cm4gb2YgYW4gZXJybm8gc2hvdWxkIHR5cGljYWxseSBiZSAt
-dmUgKHJldHVybiAtRUlPKQojMTYwOiBGSUxFOiB1dGlsL3Njc2kuYzozMToKKyAgICAgICAgcmV0
-dXJuIEVJTzsKCkVSUk9SOiByZXR1cm4gb2YgYW4gZXJybm8gc2hvdWxkIHR5cGljYWxseSBiZSAt
-dmUgKHJldHVybiAtRUlOVkFMKQojMTY3OiBGSUxFOiB1dGlsL3Njc2kuYzozODoKKyAgICAgICAg
-cmV0dXJuIEVJTlZBTDsKCkVSUk9SOiByZXR1cm4gb2YgYW4gZXJybm8gc2hvdWxkIHR5cGljYWxs
-eSBiZSAtdmUgKHJldHVybiAtRU5PU1BDKQojMTY5OiBGSUxFOiB1dGlsL3Njc2kuYzo0MDoKKyAg
-ICAgICAgcmV0dXJuIEVOT1NQQzsKCkVSUk9SOiByZXR1cm4gb2YgYW4gZXJybm8gc2hvdWxkIHR5
-cGljYWxseSBiZSAtdmUgKHJldHVybiAtRU5PVFNVUCkKIzE3MTogRklMRTogdXRpbC9zY3NpLmM6
-NDI6CisgICAgICAgIHJldHVybiBFTk9UU1VQOwoKRVJST1I6IHJldHVybiBvZiBhbiBlcnJubyBz
-aG91bGQgdHlwaWNhbGx5IGJlIC12ZSAocmV0dXJuIC1FTk9NRURJVU0pCiMxNzU6IEZJTEU6IHV0
-aWwvc2NzaS5jOjQ2OgorICAgICAgICByZXR1cm4gRU5PTUVESVVNOwoKRVJST1I6IHJldHVybiBv
-ZiBhbiBlcnJubyBzaG91bGQgdHlwaWNhbGx5IGJlIC12ZSAocmV0dXJuIC1FQUNDRVMpCiMxNzc6
-IEZJTEU6IHV0aWwvc2NzaS5jOjQ4OgorICAgICAgICByZXR1cm4gRUFDQ0VTOwoKRVJST1I6IHJl
-dHVybiBvZiBhbiBlcnJubyBzaG91bGQgdHlwaWNhbGx5IGJlIC12ZSAocmV0dXJuIC1FSU8pCiMx
-Nzk6IEZJTEU6IHV0aWwvc2NzaS5jOjUwOgorICAgICAgICByZXR1cm4gRUlPOwoKdG90YWw6IDEx
-IGVycm9ycywgMCB3YXJuaW5ncywgMTQxIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvMzogc2NzaTogRW5oYW5jZSBz
-Y3NpX3NlbnNlX3RvX2Vycm5vLi4uCkNoZWNraW5nIFBBVENIIDMvMzogc2NzaS1ibG9jazogU3Vw
-cG9ydCByZXJyb3Ivd2Vycm9yLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4
-aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
-UGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sg
-dG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+Hello,
+
+i've a problem with two VMs running on the SAME host machine using qemu
+2.7.1 or 2.9.0 and vhost_net + virtio.
+
+Sometimes TCP packets going from machine a to machine b are simply lost.
+I see them in VM A using tcpdump going out but they never come in on
+machine B. Both machines have iptables and stuff turned off.
+
+On the host both VMs network interfaces are connected to the same bridge.
+
+Any ideas? May be a known bug?
+
+Host and Guest Kernel is an OpenSuSE 42.3 kernel based on vanilla 4.4.82.
+
+Thanks!
+
+Greets,
+Stefan
