@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dipRk-0007Q4-IX
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 18:08:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1dipfo-0004yM-Cy
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 18:23:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dipRg-0002Tv-UT
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 18:08:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50830)
+	(envelope-from <eblake@redhat.com>) id 1dipfl-0005QO-6t
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 18:23:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36596)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dipRg-0002TJ-K2
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 18:08:48 -0400
-References: <20170818211542.5380-1-eblake@redhat.com>
-	<20170818211542.5380-8-eblake@redhat.com>
-	<a12d0bfc-4112-414c-6d19-8f9071b5f936@amsat.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dipfk-0005NM-UD
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 18:23:21 -0400
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <c8880b01-c9dd-50f9-66c4-db79e69b836e@redhat.com>
-Date: Fri, 18 Aug 2017 17:08:45 -0500
-MIME-Version: 1.0
-In-Reply-To: <a12d0bfc-4112-414c-6d19-8f9071b5f936@amsat.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="AGHU91NNTBVoMNMbs5Aln0x2LrJHJ98ks"
-Subject: Re: [Qemu-devel] [PATCH v5 07/13] libqtest: Inline
- qtest_query_target_endianness()
+Date: Fri, 18 Aug 2017 17:23:13 -0500
+Message-Id: <20170818222313.13391-1-eblake@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH] osdep.h: Prohibit disabling assert() in
+ supported builds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +22,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, f4bug@amsat.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AGHU91NNTBVoMNMbs5Aln0x2LrJHJ98ks
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-Cc: armbru@redhat.com
-Message-ID: <c8880b01-c9dd-50f9-66c4-db79e69b836e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 07/13] libqtest: Inline
- qtest_query_target_endianness()
-References: <20170818211542.5380-1-eblake@redhat.com>
- <20170818211542.5380-8-eblake@redhat.com>
- <a12d0bfc-4112-414c-6d19-8f9071b5f936@amsat.org>
-In-Reply-To: <a12d0bfc-4112-414c-6d19-8f9071b5f936@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+We already have several files that knowingly require assert()
+to work.  While we do NOT want to encourage the use of
+'assert(side-effects)' (that is a bad practice that prevents
+copy-and-paste of code to other projects that CAN disable
+assertions; plus it costs unnecessary reviewer mental cycles
+to remember our project policy on crippling asserts), we DO
+want to send a message that anyone that disables assertions
+has to tweak code in order to compile, making it obvious that
+we are not going to support their efforts.
 
-On 08/18/2017 04:46 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 08/18/2017 06:15 PM, Eric Blake wrote:
->> There was only one caller; it's easier to inline things.
->=20
-> What's the benefit of this change? Having a separate function ease code=
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
 
-> reading. You might add the 'inline' qualifier but the compiler is smart=
+First mentioned as an idea here:
+http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg06084.html
+but I'm titling this RFC as I'm not 100% convinced we want to make
+it a project-wide, rather than a per-file decision.
 
-> enough to inline it.
->=20
-> Instead of this change I'd inline it and remove the return value, havin=
-g
-> a void function initializing s->big_endian. Matter of taste I think :)
->=20
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
->>   tests/libqtest.c | 22 ++++++----------------
->>   1 file changed, 6 insertions(+), 16 deletions(-)
+ include/qemu/osdep.h | 12 ++++++++++++
+ hw/scsi/mptsas.c     |  4 ----
+ hw/virtio/virtio.c   |  4 ----
+ 3 files changed, 12 insertions(+), 8 deletions(-)
 
-I think the diffstat shows that inlining is a win.  My other reason that
-it is a win:
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 6855b94bbf..9e745a8af9 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -107,6 +107,18 @@ extern int daemon(int, int);
+ #include "glib-compat.h"
+ #include "qemu/typedefs.h"
 
->> @@ -351,8 +338,11 @@ QTestState
->> *qtest_init_without_qmp_handshake(const char *extra_args)
->>       }
->>
->>       /* ask endianness of the target */
->> -
->> -    s->big_endian =3D qtest_query_target_endianness(s);
->> +    qtest_sendf(s, "endianness\n");
->> +    args =3D qtest_rsp(s, 1);
++/*
++ * We have a lot of unaudited code that will fail in strange ways if
++ * you disable assertions at compile-time.  You are on your own if
++ * you cripple these safety-checks.
++ */
++#ifdef NDEBUG
++#error building with NDEBUG is not supported
++#endif
++#ifdef G_DISABLE_ASSERT
++#error building with G_DISABLE_ASSERT is not supported
++#endif
++
+ #ifndef O_LARGEFILE
+ #define O_LARGEFILE 0
+ #endif
+diff --git a/hw/scsi/mptsas.c b/hw/scsi/mptsas.c
+index 765ab53c34..3b93f12cdb 100644
+--- a/hw/scsi/mptsas.c
++++ b/hw/scsi/mptsas.c
+@@ -1236,11 +1236,7 @@ static void *mptsas_load_request(QEMUFile *f, SCSIRequest *sreq)
+     n = qemu_get_be32(f);
+     /* TODO: add a way for SCSIBusInfo's load_request to fail,
+      * and fail migration instead of asserting here.
+-     * When we do, we might be able to re-enable NDEBUG below.
+      */
+-#ifdef NDEBUG
+-#error building with NDEBUG is not supported
+-#endif
+     assert(n >= 0);
 
-The old code has to pass an arbitrary QTestState *s down to a helper
-function.  But I'm trying to get rid of as many functions as possible
-that depend on arbitrary QTestState *s, particularly when callers end up
-passing 'global_qtest' for 's'.  Inlining it makes it more obvious that
-the changes in 10/13 are safely operating on global_qtest, which in turn
-makes it possible for 12/13 to drop QTestState *s parameters from
-qtest_sendf() and qtest_rsp().  If the function were not inlined, those
-later cleanups would not be as trivial.  (Or put another way - I rebased
-this patch to be earlier in the series precisely because of what I ran
-into while writing those patches)
+     pci_dma_sglist_init(&req->qsg, pci, n);
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 464947f76d..2778adabcc 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -1025,11 +1025,7 @@ void *qemu_get_virtqueue_element(VirtIODevice *vdev, QEMUFile *f, size_t sz)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+     /* TODO: teach all callers that this can fail, and return failure instead
+      * of asserting here.
+-     * When we do, we might be able to re-enable NDEBUG below.
+      */
+-#ifdef NDEBUG
+-#error building with NDEBUG is not supported
+-#endif
+     assert(ARRAY_SIZE(data.in_addr) >= data.in_num);
+     assert(ARRAY_SIZE(data.out_addr) >= data.out_num);
 
-
---AGHU91NNTBVoMNMbs5Aln0x2LrJHJ98ks
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmXZW0ACgkQp6FrSiUn
-Q2oUXwgAn7bzc42JEQ//5JdjTVkM0v58dGfctA/dfenSHu7H6wCFti8FGyJDRJUn
-QfzM6w/m0l7cgorY2GL234pmGW6UBoL7JitGXx3prWherNTc7eelkrQnmwMF8Xjy
-fCGUg9JTla1QnmnZfO/Vgwh0xOpI5xSix+/HL7PdqK+KmECyQ0lGE2bKzs2tqw4U
-5hTm6QZMP6VFBrERb49z1Vf+WCQyxVmqt37CSdkkQ7aagZE8sjdAVD95wxcptj6X
-4yNSxlyKVdm1pm9RJmEkbG7UMz9joYDG93M3APFY6A6FHuDVLiu2v8geqi+BGRVB
-Ll9YAEX0lTW7/NSXvblU7ry0URLuNw==
-=i6eM
------END PGP SIGNATURE-----
-
---AGHU91NNTBVoMNMbs5Aln0x2LrJHJ98ks--
+-- 
+2.13.5
