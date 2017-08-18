@@ -1,23 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharat.bhushan@nxp.com>) id 1diZET-000425-NJ
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 00:50:09 -0400
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1diZtZ-00026U-QI
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 01:32:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharat.bhushan@nxp.com>) id 1diZER-00014l-Mc
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 00:50:05 -0400
-From: Bharat Bhushan <bharat.bhushan@nxp.com>
-Date: Fri, 18 Aug 2017 04:49:53 +0000
-Message-ID: <AM5PR0401MB2545633BC35214EF8A405D419A800@AM5PR0401MB2545.eurprd04.prod.outlook.com>
-References: <1500017104-3574-1-git-send-email-Bharat.Bhushan@nxp.com>
-	<1500017104-3574-3-git-send-email-Bharat.Bhushan@nxp.com>
-	<997bdcca-b84c-300c-bca0-5950c17db8d7@redhat.com>
-In-Reply-To: <997bdcca-b84c-300c-bca0-5950c17db8d7@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1diZtW-00012Q-HZ
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 01:32:33 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48979)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
+	id 1diZtW-00011B-7L
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 01:32:30 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7I5SuxK044978
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 01:32:28 -0400
+Received: from e23smtp05.au.ibm.com (e23smtp05.au.ibm.com [202.81.31.147])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cdmkdgcpa-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 01:32:27 -0400
+Received: from localhost
+	by e23smtp05.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
+	Fri, 18 Aug 2017 15:32:25 +1000
+Date: Fri, 18 Aug 2017 15:32:21 +1000
+From: Sam Bobroff <sam.bobroff@au1.ibm.com>
+References: <cover.1502771785.git.sam.bobroff@au1.ibm.com>
+	<beaad4313aaf2569939bab4831acb8f6b39ef993.1502771785.git.sam.bobroff@au1.ibm.com>
+	<20170818023536.GO5509@umbus.fritz.box>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v2 PATCH 2/2] virtio-iommu: vfio integration
- with virtio-iommu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170818023536.GO5509@umbus.fritz.box>
+Message-Id: <20170818053221.bhdxb4wi3itucwjl@tungsten.ozlabs.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/1] PPC: KVM: Support machine option to
+ set VSMT mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,229 +43,360 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "wei@redhat.com" <wei@redhat.com>, "kevin.tian@intel.com" <kevin.tian@intel.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "tn@semihalf.com" <tn@semihalf.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "drjones@redhat.com" <drjones@redhat.com>, "robin.murphy@arm.com" <robin.murphy@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQXVnZXIgRXJpYyBbbWFp
-bHRvOmVyaWMuYXVnZXJAcmVkaGF0LmNvbV0NCj4gU2VudDogVGh1cnNkYXksIEF1Z3VzdCAxNywg
-MjAxNyA5OjAzIFBNDQo+IFRvOiBCaGFyYXQgQmh1c2hhbiA8YmhhcmF0LmJodXNoYW5AbnhwLmNv
-bT47DQo+IGVyaWMuYXVnZXIucHJvQGdtYWlsLmNvbTsgcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
-Ow0KPiBhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbTsgbXN0QHJlZGhhdC5jb207IHFlbXUtYXJt
-QG5vbmdudS5vcmc7DQo+IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBDYzogd2VpQHJlZGhhdC5j
-b207IGtldmluLnRpYW5AaW50ZWwuY29tOyBtYXJjLnp5bmdpZXJAYXJtLmNvbTsNCj4gdG5Ac2Vt
-aWhhbGYuY29tOyB3aWxsLmRlYWNvbkBhcm0uY29tOyBkcmpvbmVzQHJlZGhhdC5jb207DQo+IHJv
-YmluLm11cnBoeUBhcm0uY29tOyBjaHJpc3RvZmZlci5kYWxsQGxpbmFyby5vcmcNCj4gU3ViamVj
-dDogUmU6IFtRZW11LWRldmVsXSBbUkZDIHYyIFBBVENIIDIvMl0gdmlydGlvLWlvbW11OiB2Zmlv
-IGludGVncmF0aW9uDQo+IHdpdGggdmlydGlvLWlvbW11DQo+IA0KPiBIaSBCaGFyYXQsDQo+IA0K
-PiBPbiAxNC8wNy8yMDE3IDA5OjI1LCBCaGFyYXQgQmh1c2hhbiB3cm90ZToNCj4gPiBUaGlzIHBh
-dGNoIGFsbG93cyB2aXJ0aW8taW9tbXUgcHJvdGVjdGlvbiBmb3IgUENJIGRldmljZS1wYXNzdGhy
-b3VnaC4NCj4gPg0KPiA+IE1TSSByZWdpb24gaXMgbWFwcGVkIGJ5IGN1cnJlbnQgdmVyc2lvbiBv
-ZiB2aXJ0aW8taW9tbXUgZHJpdmVyLg0KPiA+IFRoaXMgTVNJIHJlZ2lvbiBtYXBwaW5nIGluIG5v
-dCBnZXR0aW5nIHB1c2hlZCBvbiBodyBpb21tdQ0KPiA+IHZmaW9fZ2V0X3ZhZGRyKCkgYWxsb3dz
-IG9ubHkgcmFtLXJlZ2lvbi4NCj4gV2h5IGlzIGl0IGFuIGlzc3VlLiBBcyBmYXIgYXMgSSB1bmRl
-cnN0YW5kIHRoaXMgaXMgbm90IG5lZWRlZCBhY3R1YWxseSBhcyB0aGUNCj4gZ3Vlc3QgTVNJIGRv
-b3JiZWxsIGlzIG5vdCB1c2VkIGJ5IHRoZSBob3N0Lg0KPiAgVGhpcyBSRkMgcGF0Y2ggbmVlZGVk
-DQo+ID4gdG8gYmUgaW1wcm92ZWQuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBCaGFyYXQgQmh1
-c2hhbiA8QmhhcmF0LkJodXNoYW5AbnhwLmNvbT4NCj4gPiAtLS0NCj4gPiB2MS12MjoNCj4gPiAg
-IC0gQWRkZWQgdHJhY2UgZXZlbnRzDQo+ID4NCj4gPiAgaHcvdmlydGlvL3RyYWNlLWV2ZW50cyAg
-ICAgICAgICAgfCAgIDUgKysNCj4gPiAgaHcvdmlydGlvL3ZpcnRpby1pb21tdS5jICAgICAgICAg
-fCAxMzMNCj4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ID4gIGlu
-Y2x1ZGUvaHcvdmlydGlvL3ZpcnRpby1pb21tdS5oIHwgICA2ICsrDQo+ID4gIDMgZmlsZXMgY2hh
-bmdlZCwgMTQ0IGluc2VydGlvbnMoKykNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9ody92aXJ0aW8v
-dHJhY2UtZXZlbnRzIGIvaHcvdmlydGlvL3RyYWNlLWV2ZW50cyBpbmRleA0KPiA+IDkxOTZiNjMu
-LjNhMzk2OGIgMTAwNjQ0DQo+ID4gLS0tIGEvaHcvdmlydGlvL3RyYWNlLWV2ZW50cw0KPiA+ICsr
-KyBiL2h3L3ZpcnRpby90cmFjZS1ldmVudHMNCj4gPiBAQCAtMzksMyArMzksOCBAQCB2aXJ0aW9f
-aW9tbXVfdW5tYXBfbGVmdF9pbnRlcnZhbCh1aW50NjRfdCBsb3csDQo+ID4gdWludDY0X3QgaGln
-aCwgdWludDY0X3QgbmV4dF9sb3csDQo+IHZpcnRpb19pb21tdV91bm1hcF9yaWdodF9pbnRlcnZh
-bCh1aW50NjRfdCBsb3csIHVpbnQ2NF90IGhpZ2gsIHVpbnQ2NF90DQo+IG5leHRfbG93LCB1aW50
-NjRfdCBuZXh0X2hpZ2gpICJVbm1hcCByaWdodCBbMHglIlBSSXg2NCIsMHglIlBSSXg2NCJdLA0K
-PiBuZXcgaW50ZXJ2YWw9WzB4JSJQUkl4NjQiLDB4JSJQUkl4NjQiXSINCj4gPiAgdmlydGlvX2lv
-bW11X3VubWFwX2luY19pbnRlcnZhbCh1aW50NjRfdCBsb3csIHVpbnQ2NF90IGhpZ2gpICJVbm1h
-cA0KPiBpbmMgWzB4JSJQUkl4NjQiLDB4JSJQUkl4NjQiXSINCj4gPiAgdmlydGlvX2lvbW11X3Ry
-YW5zbGF0ZV9yZXN1bHQodWludDY0X3QgdmlydF9hZGRyLCB1aW50NjRfdCBwaHlzX2FkZHIsDQo+
-IHVpbnQzMl90IHNpZCkgIjB4JSJQUkl4NjQiIC0+IDB4JSJQUkl4NjQgIiBmb3Igc2lkPSVkIg0K
-PiA+ICt2aXJ0aW9faW9tbXVfbm90aWZ5X2ZsYWdfYWRkKGNvbnN0IGNoYXIgKmlvbW11KSAiQWRk
-IHZpcnRpby1pb21tdQ0KPiBub3RpZmllciBub2RlIGZvciBtZW1vcnkgcmVnaW9uICVzIg0KPiA+
-ICt2aXJ0aW9faW9tbXVfbm90aWZ5X2ZsYWdfZGVsKGNvbnN0IGNoYXIgKmlvbW11KSAiRGVsIHZp
-cnRpby1pb21tdQ0KPiBub3RpZmllciBub2RlIGZvciBtZW1vcnkgcmVnaW9uICVzIg0KPiA+ICt2
-aXJ0aW9faW9tbXVfcmVtYXAoaHdhZGRyIGlvdmEsIGh3YWRkciBwYSwgaHdhZGRyIHNpemUpDQo+
-ICJpb3ZhPTB4JSJQUkl4NjQiIHBhPTB4JSIgUFJJeDY0IiBzaXplPTB4JSJQUkl4NjQiIg0KPiA+
-ICt2aXJ0aW9faW9tbXVfbWFwX3JlZ2lvbihod2FkZHIgaW92YSwgaHdhZGRyIHBhZGRyLCBod2Fk
-ZHINCj4gbWFwX3NpemUpICJpb3ZhPTB4JSJQUkl4NjQiIHBhPTB4JSIgUFJJeDY0IiBzaXplPTB4
-JSJQUkl4NjQiIg0KPiA+ICt2aXJ0aW9faW9tbXVfdW5tYXBfcmVnaW9uKGh3YWRkciBpb3ZhLCBo
-d2FkZHIgcGFkZHIsIGh3YWRkcg0KPiBtYXBfc2l6ZSkgImlvdmE9MHglIlBSSXg2NCIgcGE9MHgl
-IiBQUkl4NjQiIHNpemU9MHglIlBSSXg2NCIiDQo+ID4gZGlmZiAtLWdpdCBhL2h3L3ZpcnRpby92
-aXJ0aW8taW9tbXUuYyBiL2h3L3ZpcnRpby92aXJ0aW8taW9tbXUuYyBpbmRleA0KPiA+IGNkMTg4
-ZmMuLjYxZjMzY2IgMTAwNjQ0DQo+ID4gLS0tIGEvaHcvdmlydGlvL3ZpcnRpby1pb21tdS5jDQo+
-ID4gKysrIGIvaHcvdmlydGlvL3ZpcnRpby1pb21tdS5jDQo+ID4gQEAgLTEyOSw2ICsxMjksNDgg
-QEAgc3RhdGljIGdpbnQgaW50ZXJ2YWxfY21wKGdjb25zdHBvaW50ZXIgYSwNCj4gZ2NvbnN0cG9p
-bnRlciBiLCBncG9pbnRlciB1c2VyX2RhdGEpDQo+ID4gICAgICB9DQo+ID4gIH0NCj4gPg0KPiA+
-ICtzdGF0aWMgdm9pZCB2aXJ0aW9faW9tbXVfbWFwX3JlZ2lvbihWaXJ0SU9JT01NVSAqcywgaHdh
-ZGRyIGlvdmEsDQo+IGh3YWRkciBwYWRkciwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgaHdhZGRyIHNpemUsIGludCBtYXApDQo+IGJvb2wgbWFwPw0KPiANCj4gdGhl
-IGZ1bmN0aW9uIG5hbWUgaXMgYSBiaXQgbWlzbGVhZGluZyB0byBtZSBhbmQgZG9lcyBub3QgcmVh
-bGx5IGV4cGxhaW4gd2hhdA0KPiB0aGUgZnVuY3Rpb24gZG9lcy4gSXQgIm5vdGlmaWVzIiBzbyB3
-aHkgbm90IHVzaW5nIHNvbWV0aGluZyBsaWtlDQo+IHZpcnRpb19pb21tdV9tYXBfbm90aWZ5IGFu
-ZCB2aXJ0aW9faW9tbXVfdW5tYXBfbm90aWZ5LiBJIHRlbmQgdG8gdGhpbmsNCj4gaGF2aW5nIHNl
-cGFyYXRlIHByb3RvIGlzIGNsZWFuZXIgYW5kIG1vcmUgc3RhbmRhcmQuDQo+IA0KPiBCaW5kaW5n
-IHNob3VsZCBoYXBwZW4gb24gYSBzcGVjaWZpYyBJT01NVW1lbW9yeVJlZ2lvbiAoc2VlIG5leHQN
-Cj4gY29tbWVudCkuDQo+IA0KPiA+ICt7DQo+ID4gKyAgICBWaXJ0aW9JT01NVU5vdGlmaWVyTm9k
-ZSAqbm9kZTsNCj4gPiArICAgIElPTU1VVExCRW50cnkgZW50cnk7DQo+ID4gKyAgICB1aW50NjRf
-dCBtYXBfc2l6ZSA9ICgxIDw8IDEyKTsNCj4gVE9ETzogaGFuZGxlIHNvbWV0aGluZyBlbHNlIHRo
-YW4gNEsgcGFnZS4NCj4gPiArICAgIGludCBucGFnZXM7DQo+ID4gKyAgICBpbnQgaTsNCj4gPiAr
-DQo+ID4gKyAgICBucGFnZXMgPSBzaXplIC8gbWFwX3NpemU7DQo+ID4gKyAgICBlbnRyeS50YXJn
-ZXRfYXMgPSAmYWRkcmVzc19zcGFjZV9tZW1vcnk7DQo+ID4gKyAgICBlbnRyeS5hZGRyX21hc2sg
-PSBtYXBfc2l6ZSAtIDE7DQo+ID4gKw0KPiA+ICsgICAgZm9yIChpID0gMDsgaSA8IG5wYWdlczsg
-aSsrKSB7DQo+IEFsdGhvdWdoIEkgdW5kZXJzdGFuZCB3ZSBjdXJyZW50bHkgZmFpbCBjaGVja2lu
-ZyB0aGUgY29uc2lzdGVuY3kgYmV0d2Vlbg0KPiBwSU9NTVUgYW5kIHZJT01NVSBwYWdlIHNpemVz
-LCB0aGlzIHdpbGwgYmUgdmVyeSBzbG93IGZvciBndWVzdCBEUERLIHVzZQ0KPiBjYXNlIHdoZXJl
-IGh1Z2VwYWdlcyBhcmUgdXNlZC4NCj4gDQo+IFdoeSBub3QgZGlyZWN0bHkgdXNpbmcgdGhlIGZ1
-bGwgc2l6ZT8gIHZmaW9faW9tbXVfbWFwX25vdGlmeSB3aWxsIHJlcG9ydA0KPiBlcnJvcnMgaWYg
-dmZpb19kbWFfbWFwL3VubWFwKCkgZmFpbC4NCg0KWWVzLCBqdXN0IGZvciB1bmRlcnN0YW5kaW5n
-LCBWRklPL0lPTU1VIHdpbGwgbWFwIGF0IHBhZ2UgZ3JhbnVsYXJpdHkgYW5kIFFFTVUgcmVseSBv
-biB0aGF0Pw0KDQo+ID4gKyAgICAgICAgZW50cnkuaW92YSA9IGlvdmEgKyAoaSAqIG1hcF9zaXpl
-KTsNCj4gPiArICAgICAgICBpZiAobWFwKSB7DQo+ID4gKyAgICAgICAgICAgICAgICB0cmFjZV92
-aXJ0aW9faW9tbXVfbWFwX3JlZ2lvbihpb3ZhLCBwYWRkciwgbWFwX3NpemUpOw0KPiA+ICsgICAg
-ICAgICAgICAgICAgZW50cnkucGVybSA9IElPTU1VX1JXOw0KPiA+ICsgICAgICAgICAgICAgICAg
-ZW50cnkudHJhbnNsYXRlZF9hZGRyID0gcGFkZHIgKyAoaSAqIG1hcF9zaXplKTsNCj4gPiArICAg
-ICAgICB9IGVsc2Ugew0KPiA+ICsgICAgICAgICAgICAgICAgdHJhY2VfdmlydGlvX2lvbW11X3Vu
-bWFwX3JlZ2lvbihpb3ZhLCBwYWRkciwgbWFwX3NpemUpOw0KPiA+ICsgICAgICAgICAgICAgICAg
-ZW50cnkucGVybSA9IElPTU1VX05PTkU7DQo+ID4gKyAgICAgICAgICAgICAgICBlbnRyeS50cmFu
-c2xhdGVkX2FkZHIgPSAwOw0KPiA+ICsgICAgICAgIH0NCj4gPiArDQo+ID4gKyAgICAgICAgUUxJ
-U1RfRk9SRUFDSChub2RlLCAmcy0+bm90aWZpZXJzX2xpc3QsIG5leHQpIHsNCj4gPiArICAgICAg
-ICAgICAgbWVtb3J5X3JlZ2lvbl9ub3RpZnlfaW9tbXUoJm5vZGUtPmlvbW11X2Rldi0+aW9tbXVf
-bXIsDQo+ID4gKyBlbnRyeSk7DQo+IFNvIGFzIGRpc2N1c3NlZCB0aGlzIHdpbGwgbm90aWZ5ICph
-bGwqIElPTU1VIG1lbW9yeSByZWdpb25zIGFuZCBhbGwgdGhlaXINCj4gbm90aWZpZXJzIHdoaWNo
-IGlzIG5vdCB3aGF0IHdlIHdhbnQuIFlvdSBtYXkgaGF2ZSBhIGxvb2sgYXQNCj4gdnNtbXV2MyB2
-NiAob3IgaW50ZWxfaW9tbXUpIHdoZXJlIHNtbXV2M19jb250ZXh0X2RldmljZV9pbnZhbGlkYXRl
-DQo+IHJldHJpZXZlcyB0aGUgbXIgZnJvbSB0aGUgc2lkLg0KDQpZZXMsIHRoaXMgaXMgb25lIG9m
-IHRoZSByZWFzb24gd2h5IG11bHRpcGxlIGludGVyZmFjZXMgZmFpbHMgdG8gd29yayDimLkNCldp
-bGwgZml4IHRoaXMuDQoNCj4gDQo+ID4gKyAgICAgICAgfQ0KPiA+ICsgICAgfQ0KPiA+ICt9DQo+
-ID4gKw0KPiA+ICtzdGF0aWMgZ2Jvb2xlYW4gdmlydGlvX2lvbW11X3VubWFwX3NpbmdsZShncG9p
-bnRlciBrZXksIGdwb2ludGVyDQo+IHZhbHVlLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBncG9pbnRlciBkYXRhKSB7DQo+ID4gKyAgICB2aW9tbXVfbWFw
-cGluZyAqbWFwcGluZyA9ICh2aW9tbXVfbWFwcGluZyAqKSB2YWx1ZTsNCj4gPiArICAgIFZpcnRJ
-T0lPTU1VICpzID0gKFZpcnRJT0lPTU1VICopIGRhdGE7DQo+ID4gKw0KPiA+ICsgICAgdmlydGlv
-X2lvbW11X21hcF9yZWdpb24ocywgbWFwcGluZy0+dmlydF9hZGRyLCAwLCBtYXBwaW5nLT5zaXpl
-LA0KPiA+ICsgMCk7DQo+IHBhZGRyPTA/IG1hcHBpbmctPnBoeXNfYWRkciBhcyB0aGUgdHJhY2Uo
-KSB3aWxsIGJlIG1pc2xlYWRpbmcuIEJ1dCBhcw0KPiBtZW50aW9uZWQgZWFybGllciBiZXR0ZXIg
-dXNlIHVubWFwKCkgc2VwYXJhdGUgZnVuY3Rpb24uDQo+ID4gKw0KPiA+ICsgICAgcmV0dXJuIHRy
-dWU7DQo+ID4gK30NCj4gPiArDQo+ID4gIHN0YXRpYyBpbnQgdmlydGlvX2lvbW11X2F0dGFjaChW
-aXJ0SU9JT01NVSAqcywNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cnVj
-dCB2aXJ0aW9faW9tbXVfcmVxX2F0dGFjaCAqcmVxKQ0KPiA+IHsgQEAgLTE3MCwxMCArMjEyLDI2
-IEBAIHN0YXRpYyBpbnQgdmlydGlvX2lvbW11X2RldGFjaChWaXJ0SU9JT01NVQ0KPiAqcywNCj4g
-PiB7DQo+ID4gICAgICB1aW50MzJfdCBkZXZpZCA9IGxlMzJfdG9fY3B1KHJlcS0+ZGV2aWNlKTsN
-Cj4gPiAgICAgIHVpbnQzMl90IHJlc2VydmVkID0gbGUzMl90b19jcHUocmVxLT5yZXNlcnZlZCk7
-DQo+ID4gKyAgICB2aW9tbXVfZGV2ICpkZXY7DQo+ID4gICAgICBpbnQgcmV0Ow0KPiA+DQo+ID4g
-ICAgICB0cmFjZV92aXJ0aW9faW9tbXVfZGV0YWNoKGRldmlkLCByZXNlcnZlZCk7DQo+ID4NCj4g
-PiArICAgIGRldiA9IGdfdHJlZV9sb29rdXAocy0+ZGV2aWNlcywgR1VJTlRfVE9fUE9JTlRFUihk
-ZXZpZCkpOw0KPiA+ICsgICAgaWYgKCFkZXYgfHwgIWRldi0+YXMpIHsNCj4gPiArICAgICAgICBy
-ZXR1cm4gLUVJTlZBTDsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4gKyAgICBkZXYtPmFzLT5ucl9k
-ZXZpY2VzLS07DQo+ID4gKw0KPiA+ICsgICAgLyogVW5tYXAgYWxsIGlmIHRoaXMgaXMgbGFzdCBk
-ZXZpY2UgZGV0YWNoZWQgKi8NCj4gPiArICAgIGlmIChkZXYtPmFzLT5ucl9kZXZpY2VzID09IDAp
-IHsNCj4gPiArICAgICAgICBnX3RyZWVfZm9yZWFjaChkZXYtPmFzLT5tYXBwaW5ncywgdmlydGlv
-X2lvbW11X3VubWFwX3NpbmdsZSwNCj4gPiArIHMpOw0KPiA+ICsNCj4gPiArICAgICAgICBnX3Ry
-ZWVfcmVtb3ZlKHMtPmFkZHJlc3Nfc3BhY2VzLCBHVUlOVF9UT19QT0lOVEVSKGRldi0+YXMtDQo+
-ID5pZCkpOw0KPiA+ICsgICAgICAgIGdfdHJlZV9kZXN0cm95KGRldi0+YXMtPm1hcHBpbmdzKTsN
-Cj4gPiArICAgIH0NCj4gc28gdGhpcyBzaG91bGQgYmUgcmViYXNlZCBvbiBuZXcgcmVmIGNvdW50
-IGNvZGUuDQo+ID4gKw0KPiA+ICAgICAgcmV0ID0gZ190cmVlX3JlbW92ZShzLT5kZXZpY2VzLCBH
-VUlOVF9UT19QT0lOVEVSKGRldmlkKSk7DQo+ID4NCj4gPiAgICAgIHJldHVybiByZXQgPyBWSVJU
-SU9fSU9NTVVfU19PSyA6IFZJUlRJT19JT01NVV9TX0lOVkFMOyBAQCAtDQo+IDIxNyw2DQo+ID4g
-KzI3NSw3IEBAIHN0YXRpYyBpbnQgdmlydGlvX2lvbW11X21hcChWaXJ0SU9JT01NVSAqcywNCj4g
-Pg0KPiA+ICAgICAgZ190cmVlX2luc2VydChhcy0+bWFwcGluZ3MsIGludGVydmFsLCBtYXBwaW5n
-KTsNCj4gPg0KPiA+ICsgICAgdmlydGlvX2lvbW11X21hcF9yZWdpb24ocywgdmlydF9hZGRyLCBw
-aHlzX2FkZHIsIHNpemUsIDEpOw0KPiA+ICAgICAgcmV0dXJuIFZJUlRJT19JT01NVV9TX09LOw0K
-PiA+ICB9DQo+ID4NCj4gPiBAQCAtMjY3LDcgKzMyNiw5IEBAIHN0YXRpYyBpbnQgdmlydGlvX2lv
-bW11X3VubWFwKFZpcnRJT0lPTU1VICpzLA0KPiA+ICAgICAgICAgIH0gZWxzZSB7DQo+ID4gICAg
-ICAgICAgICAgIGJyZWFrOw0KPiA+ICAgICAgICAgIH0NCj4gPiArDQo+ID4gICAgICAgICAgaWYg
-KGludGVydmFsLmxvdyA+PSBpbnRlcnZhbC5oaWdoKSB7DQo+ID4gKyAgICAgICAgICAgIHZpcnRp
-b19pb21tdV9tYXBfcmVnaW9uKHMsIHZpcnRfYWRkciwgMCwgc2l6ZSwgMCk7DQo+ID4gICAgICAg
-ICAgICAgIHJldHVybiBWSVJUSU9fSU9NTVVfU19PSzsNCj4gPiAgICAgICAgICB9IGVsc2Ugew0K
-PiA+ICAgICAgICAgICAgICBtYXBwaW5nID0gZ190cmVlX2xvb2t1cChhcy0+bWFwcGluZ3MsDQo+
-ID4gKGdwb2ludGVyKSZpbnRlcnZhbCk7IEBAIC00MTAsNiArNDcxLDM3IEBAIHN0YXRpYyB2b2lk
-DQo+IHZpcnRpb19pb21tdV9oYW5kbGVfY29tbWFuZChWaXJ0SU9EZXZpY2UgKnZkZXYsIFZpcnRR
-dWV1ZSAqdnEpDQo+ID4gICAgICB9DQo+ID4gIH0NCj4gPg0KPiA+ICtzdGF0aWMgdm9pZCB2aXJ0
-aW9faW9tbXVfbm90aWZ5X2ZsYWdfY2hhbmdlZChNZW1vcnlSZWdpb24gKmlvbW11LA0KPiA+ICsg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBJT01NVU5vdGlmaWVyRmxh
-ZyBvbGQsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIElP
-TU1VTm90aWZpZXJGbGFnIG5ldykgew0KPiA+ICsgICAgSU9NTVVEZXZpY2UgKnNkZXYgPSBjb250
-YWluZXJfb2YoaW9tbXUsIElPTU1VRGV2aWNlLA0KPiBpb21tdV9tcik7DQo+ID4gKyAgICBWaXJ0
-SU9JT01NVSAqcyA9IHNkZXYtPnZpb21tdTsNCj4gPiArICAgIFZpcnRpb0lPTU1VTm90aWZpZXJO
-b2RlICpub2RlID0gTlVMTDsNCj4gPiArICAgIFZpcnRpb0lPTU1VTm90aWZpZXJOb2RlICpuZXh0
-X25vZGUgPSBOVUxMOw0KPiA+ICsNCj4gPiArICAgIGlmIChvbGQgPT0gSU9NTVVfTk9USUZJRVJf
-Tk9ORSkgew0KPiA+ICsgICAgICAgIHRyYWNlX3ZpcnRpb19pb21tdV9ub3RpZnlfZmxhZ19hZGQo
-aW9tbXUtPm5hbWUpOw0KPiA+ICsgICAgICAgIG5vZGUgPSBnX21hbGxvYzAoc2l6ZW9mKCpub2Rl
-KSk7DQo+ID4gKyAgICAgICAgbm9kZS0+aW9tbXVfZGV2ID0gc2RldjsNCj4gPiArICAgICAgICBR
-TElTVF9JTlNFUlRfSEVBRCgmcy0+bm90aWZpZXJzX2xpc3QsIG5vZGUsIG5leHQpOw0KPiA+ICsg
-ICAgICAgIHJldHVybjsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4gKyAgICAvKiB1cGRhdGUgbm90
-aWZpZXIgbm9kZSB3aXRoIG5ldyBmbGFncyAqLw0KPiA+ICsgICAgUUxJU1RfRk9SRUFDSF9TQUZF
-KG5vZGUsICZzLT5ub3RpZmllcnNfbGlzdCwgbmV4dCwgbmV4dF9ub2RlKSB7DQo+ID4gKyAgICAg
-ICAgaWYgKG5vZGUtPmlvbW11X2RldiA9PSBzZGV2KSB7DQo+ID4gKyAgICAgICAgICAgIGlmIChu
-ZXcgPT0gSU9NTVVfTk9USUZJRVJfTk9ORSkgew0KPiA+ICsgICAgICAgICAgICAgICAgdHJhY2Vf
-dmlydGlvX2lvbW11X25vdGlmeV9mbGFnX2RlbChpb21tdS0+bmFtZSk7DQo+ID4gKyAgICAgICAg
-ICAgICAgICBRTElTVF9SRU1PVkUobm9kZSwgbmV4dCk7DQo+ID4gKyAgICAgICAgICAgICAgICBn
-X2ZyZWUobm9kZSk7DQo+ID4gKyAgICAgICAgICAgIH0NCj4gPiArICAgICAgICAgICAgcmV0dXJu
-Ow0KPiA+ICsgICAgICAgIH0NCj4gPiArICAgIH0NCj4gPiArfQ0KPiBJIHRoaW5rIGFsbCB0aGF0
-IG1lY2hhbmljcyBzaG91bGQgYmUgZmFjdG9yaXplZCBzb21ld2hlcmUgZWxzZSBhcyBhbGwNCj4g
-dklPTU1VcyB1c2UgdGhhdCBidXQgdGhpcyBnb2VzIGJleW9uZCB0aGUgc2NvcGUgb2YgdGhpcyBz
-ZXJpZXMuDQo+ID4gKw0KPiA+ICsNCj4gPiAgc3RhdGljIElPTU1VVExCRW50cnkgdmlydGlvX2lv
-bW11X3RyYW5zbGF0ZShNZW1vcnlSZWdpb24gKm1yLA0KPiBod2FkZHIgYWRkciwNCj4gPiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBJT01NVUFjY2Vzc0ZsYWdz
-IGZsYWcpICB7DQo+ID4gQEAgLTUyMywxMSArNjE1LDUwIEBAIHN0YXRpYyBnaW50IGludF9jbXAo
-Z2NvbnN0cG9pbnRlciBhLCBnY29uc3Rwb2ludGVyDQo+IGIsIGdwb2ludGVyIHVzZXJfZGF0YSkN
-Cj4gPiAgICAgIHJldHVybiAodWEgPiB1YikgLSAodWEgPCB1Yik7DQo+ID4gIH0NCj4gPg0KPiA+
-ICtzdGF0aWMgZ2Jvb2xlYW4gdmlydGlvX2lvbW11X3JlbWFwKGdwb2ludGVyIGtleSwgZ3BvaW50
-ZXIgdmFsdWUsDQo+ID4gK2dwb2ludGVyIGRhdGEpIHsNCj4gPiArICAgIHZpb21tdV9tYXBwaW5n
-ICptYXBwaW5nID0gKHZpb21tdV9tYXBwaW5nICopIHZhbHVlOw0KPiA+ICsgICAgVmlydElPSU9N
-TVUgKnMgPSAoVmlydElPSU9NTVUgKikgZGF0YTsNCj4gPiArDQo+ID4gKyAgICB0cmFjZV92aXJ0
-aW9faW9tbXVfcmVtYXAobWFwcGluZy0+dmlydF9hZGRyLCBtYXBwaW5nLT5waHlzX2FkZHIsDQo+
-ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbWFwcGluZy0+c2l6ZSk7DQo+ID4gKyAg
-ICAvKiB1bm1hcCBwcmV2aW91cyBlbnRyeSBhbmQgbWFwIGFnYWluICovDQo+ID4gKyAgICB2aXJ0
-aW9faW9tbXVfbWFwX3JlZ2lvbihzLCBtYXBwaW5nLT52aXJ0X2FkZHIsIDAsIG1hcHBpbmctPnNp
-emUsDQo+ID4gKyAwKTsNCj4gPiArDQo+ID4gKyAgICB2aXJ0aW9faW9tbXVfbWFwX3JlZ2lvbihz
-LCBtYXBwaW5nLT52aXJ0X2FkZHIsIG1hcHBpbmctDQo+ID5waHlzX2FkZHIsDQo+ID4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBtYXBwaW5nLT5zaXplLCAxKTsNCj4gPiArICAgIHJldHVy
-biB0cnVlOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICtzdGF0aWMgdm9pZCB2aXJ0aW9faW9tbXVfcmVw
-bGF5KE1lbW9yeVJlZ2lvbiAqbXIsIElPTU1VTm90aWZpZXIgKm4pDQo+IHsNCj4gPiArICAgIElP
-TU1VRGV2aWNlICpzZGV2ID0gY29udGFpbmVyX29mKG1yLCBJT01NVURldmljZSwgaW9tbXVfbXIp
-Ow0KPiA+ICsgICAgVmlydElPSU9NTVUgKnMgPSBzZGV2LT52aW9tbXU7DQo+ID4gKyAgICB1aW50
-MzJfdCBzaWQ7DQo+ID4gKyAgICB2aW9tbXVfZGV2ICpkZXY7DQo+ID4gKw0KPiA+ICsgICAgc2lk
-ID0gc21tdV9nZXRfc2lkKHNkZXYpOw0KPiA+ICsNCj4gPiArICAgIHFlbXVfbXV0ZXhfbG9jaygm
-cy0+bXV0ZXgpOw0KPiA+ICsNCj4gPiArICAgIGRldiA9IGdfdHJlZV9sb29rdXAocy0+ZGV2aWNl
-cywgR1VJTlRfVE9fUE9JTlRFUihzaWQpKTsNCj4gPiArICAgIGlmICghZGV2KSB7DQo+ID4gKyAg
-ICAgICAgZ290byB1bmxvY2s7DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICsgICAgZ190cmVlX2Zv
-cmVhY2goZGV2LT5hcy0+bWFwcGluZ3MsIHZpcnRpb19pb21tdV9yZW1hcCwgcyk7DQo+ID4gKw0K
-PiA+ICt1bmxvY2s6DQo+ID4gKyAgICBxZW11X211dGV4X3VubG9jaygmcy0+bXV0ZXgpOw0KPiA+
-ICsgICAgcmV0dXJuOw0KPiBub3QgbmVlZGVkDQoNClRoYW5rcw0KLUJoYXJhdA0KDQo+IA0KPiBU
-aGFua3MNCj4gDQo+IEVyaWMNCj4gPiArfQ0KPiA+ICsNCj4gPiAgc3RhdGljIHZvaWQgdmlydGlv
-X2lvbW11X2RldmljZV9yZWFsaXplKERldmljZVN0YXRlICpkZXYsIEVycm9yDQo+ID4gKiplcnJw
-KSAgew0KPiA+ICAgICAgVmlydElPRGV2aWNlICp2ZGV2ID0gVklSVElPX0RFVklDRShkZXYpOw0K
-PiA+ICAgICAgVmlydElPSU9NTVUgKnMgPSBWSVJUSU9fSU9NTVUoZGV2KTsNCj4gPg0KPiA+ICsg
-ICAgUUxJU1RfSU5JVCgmcy0+bm90aWZpZXJzX2xpc3QpOw0KPiA+ICAgICAgdmlydGlvX2luaXQo
-dmRldiwgInZpcnRpby1pb21tdSIsIFZJUlRJT19JRF9JT01NVSwNCj4gPiAgICAgICAgICAgICAg
-ICAgIHNpemVvZihzdHJ1Y3QgdmlydGlvX2lvbW11X2NvbmZpZykpOw0KPiA+DQo+ID4gQEAgLTUz
-OCw2ICs2NjksOCBAQCBzdGF0aWMgdm9pZA0KPiB2aXJ0aW9faW9tbXVfZGV2aWNlX3JlYWxpemUo
-RGV2aWNlU3RhdGUgKmRldiwgRXJyb3IgKiplcnJwKQ0KPiA+ICAgICAgcy0+Y29uZmlnLmlucHV0
-X3JhbmdlLmVuZCA9IC0xVUw7DQo+ID4NCj4gPiAgICAgIHMtPmlvbW11X29wcy50cmFuc2xhdGUg
-PSB2aXJ0aW9faW9tbXVfdHJhbnNsYXRlOw0KPiA+ICsgICAgcy0+aW9tbXVfb3BzLm5vdGlmeV9m
-bGFnX2NoYW5nZWQgPQ0KPiB2aXJ0aW9faW9tbXVfbm90aWZ5X2ZsYWdfY2hhbmdlZDsNCj4gPiAr
-ICAgIHMtPmlvbW11X29wcy5yZXBsYXkgPSB2aXJ0aW9faW9tbXVfcmVwbGF5Ow0KPiA+ICAgICAg
-bWVtc2V0KHMtPmFzX2J5X2J1c19udW0sIDAsIHNpemVvZihzLT5hc19ieV9idXNfbnVtKSk7DQo+
-ID4gICAgICBzLT5hc19ieV9idXNwdHIgPSBnX2hhc2hfdGFibGVfbmV3X2Z1bGwoYXNfdWludDY0
-X2hhc2gsDQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-YXNfdWludDY0X2VxdWFsLCBkaWZmDQo+ID4gLS1naXQgYS9pbmNsdWRlL2h3L3ZpcnRpby92aXJ0
-aW8taW9tbXUuaA0KPiA+IGIvaW5jbHVkZS9ody92aXJ0aW8vdmlydGlvLWlvbW11LmgNCj4gPiBp
-bmRleCAyMjU5NDEzLi43NmM3NThkIDEwMDY0NA0KPiA+IC0tLSBhL2luY2x1ZGUvaHcvdmlydGlv
-L3ZpcnRpby1pb21tdS5oDQo+ID4gKysrIGIvaW5jbHVkZS9ody92aXJ0aW8vdmlydGlvLWlvbW11
-LmgNCj4gPiBAQCAtNDQsNiArNDQsMTEgQEAgdHlwZWRlZiBzdHJ1Y3QgSU9NTVVQY2lCdXMgew0K
-PiA+ICAgICAgSU9NTVVEZXZpY2UgICpwYmRldlswXTsgLyogUGFyZW50IGFycmF5IGlzIHNwYXJz
-ZSwgc28gZHluYW1pY2FsbHkNCj4gPiBhbGxvYyAqLyAgfSBJT01NVVBjaUJ1czsNCj4gPg0KPiA+
-ICt0eXBlZGVmIHN0cnVjdCBWaXJ0aW9JT01NVU5vdGlmaWVyTm9kZSB7DQo+ID4gKyAgICBJT01N
-VURldmljZSAqaW9tbXVfZGV2Ow0KPiA+ICsgICAgUUxJU1RfRU5UUlkoVmlydGlvSU9NTVVOb3Rp
-Zmllck5vZGUpIG5leHQ7IH0NCj4gPiArVmlydGlvSU9NTVVOb3RpZmllck5vZGU7DQo+ID4gKw0K
-PiA+ICB0eXBlZGVmIHN0cnVjdCBWaXJ0SU9JT01NVSB7DQo+ID4gICAgICBWaXJ0SU9EZXZpY2Ug
-cGFyZW50X29iajsNCj4gPiAgICAgIFZpcnRRdWV1ZSAqdnE7DQo+ID4gQEAgLTU1LDYgKzYwLDcg
-QEAgdHlwZWRlZiBzdHJ1Y3QgVmlydElPSU9NTVUgew0KPiA+ICAgICAgR1RyZWUgKmFkZHJlc3Nf
-c3BhY2VzOw0KPiA+ICAgICAgUWVtdU11dGV4IG11dGV4Ow0KPiA+ICAgICAgR1RyZWUgKmRldmlj
-ZXM7DQo+ID4gKyAgICBRTElTVF9IRUFEKCwgVmlydGlvSU9NTVVOb3RpZmllck5vZGUpIG5vdGlm
-aWVyc19saXN0Ow0KPiA+ICB9IFZpcnRJT0lPTU1VOw0KPiA+DQo+ID4gICNlbmRpZg0KPiA+DQo=
+On Fri, Aug 18, 2017 at 12:35:36PM +1000, David Gibson wrote:
+> On Tue, Aug 15, 2017 at 02:42:21PM +1000, Sam Bobroff wrote:
+> > KVM now allows writing to KVM_CAP_PPC_SMT which has previously been
+> > read only. Doing so causes KVM to act, for that VM, as if the host's
+> > SMT mode was the given value. This is particularly important on Power
+> > 9 systems because their default value is 1, but they are able to
+> > support values up to 8.
+> > 
+> > This patch introduces a way to control this capability via a new
+> > machine property called VSMT ("Virtual SMT"). If the value is not set
+> > on the command line a default is chosen that is, when possible,
+> > compatible with legacy systems.
+> > 
+> > Note that the intialization of KVM_CAP_PPC_SMT has changed slightly
+> > because it has changed (in KVM) from a global capability to a
+> > VM-specific one. This won't cause a problem on older KVMs because VM
+> > capabilities fall back to global ones.
+> > 
+> > Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+> 
+> Looks basically good, though a couple of minor comments.  I'm still
+> not sure if I like this approach over the alternative of having the
+> machine take over allocation of the kvm vcpu ids itself.  But I think
+> this is probably simpler and doesn't make taking the other approach
+> any harder later on.  So, I'm fine with going this way for now.
+
+I agree and I'll look at doing it in a follow-up patch.
+
+(I've replied below.)
+
+Cheers for the review!
+Sam.
+
+> > ---
+> > Changes in v3:
+> > 
+> > * Suggested by Greg Kurz:
+> >     * Comment on show_vsmt_possible() converted in to an assert().
+> >     * Better use of g_string_new().
+> >     * Removed trailing periods from several error_report() strings.
+> >     * Shortened overly long line.
+> >     * Converted some helpful error_report() calls into error_printf().
+> >     * Simplified error handling in spapr_set_vsmt().
+> >     * Use error_abort when adding properties (instead of ignoring errors), as it's a bug if it fails.
+> >     * Moved the explanation about KVM_CAP_PPC_SMT into the commit so that it's not lost with the cover letter.
+> > 
+> >  hw/ppc/spapr.c              | 96 +++++++++++++++++++++++++++++++++++++++++++++
+> >  include/hw/ppc/spapr.h      |  1 +
+> >  target/ppc/kvm.c            | 20 +++++++++-
+> >  target/ppc/kvm_ppc.h        | 12 ++++++
+> >  target/ppc/translate_init.c | 14 -------
+> >  5 files changed, 128 insertions(+), 15 deletions(-)
+> > 
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index cd6eb2d4a9..e266cdd36a 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -26,6 +26,7 @@
+> >   */
+> >  #include "qemu/osdep.h"
+> >  #include "qapi/error.h"
+> > +#include "qapi/visitor.h"
+> >  #include "sysemu/sysemu.h"
+> >  #include "sysemu/numa.h"
+> >  #include "hw/hw.h"
+> > @@ -2140,6 +2141,82 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
+> >      g_free(type);
+> >  }
+> >  
+> > +static void show_vsmt_possible(void)
+> 
+> This is only used conditional on KVM, so it probably belongs in kvm.c
+> (instead of exposing kvm_smt_possible()).
+
+OK, done.
+
+> > +{
+> > +    int i;
+> > +    GString *g;
+> > +    char *s;
+> > +
+> > +    assert(kvm_enabled());
+> > +    if (kvmppc_smt_possible()) {
+> > +        g = g_string_new("Available VSMT modes:");
+> > +        for (i = 63; i >= 0; i--) {
+> > +            if ((1UL << i) & kvmppc_smt_possible()) {
+> > +                g_string_append_printf(g, " %lu", (1UL << i));
+> > +            }
+> > +        }
+> > +        s = g_string_free(g, false);
+> > +        error_printf("%s.\n", s);
+> > +        g_free(s);
+> > +    } else {
+> > +        error_printf("This KVM seems to be too old to support VSMT.\n");
+> > +    }
+> > +}
+> > +
+> > +static void spapr_set_vsmt_mode(sPAPRMachineState *spapr)
+> > +{
+> > +    bool vsmt_user = !!spapr->vsmt;
+> > +    int kvm_smt = kvmppc_smt_threads();
+> > +    int ret;
+> > +    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+> > +    const char *machine_name = object_class_get_name(OBJECT_CLASS(smc));
+> > +
+> > +    if (!kvm_enabled() && (smp_threads > 1)) {
+> > +        error_report("TCG cannot support more than 1 thread/core "
+> > +                     "on a %s", machine_name);
+> > +        exit(1);
+> 
+> If you respin, it might be worth having this function take an Error **
+> parameter, rather than dealing with the errors locally - the callers
+> probably have a better idea if the error should be fatal or not.
+
+OK, will do. I hope I've done it correctly :-)
+
+> > +    }
+> > +    if (!is_power_of_2(smp_threads)) {
+> > +        error_report("Cannot support %d threads/core on a %s because "
+> > +                     "it must be a power of 2", smp_threads, machine_name);
+> > +        exit(1);
+> 
+> I guess it's already in the kernel (and, sort of, in the hardware),
+> but the power of 2 limitation bothers me a bit.  There's no inherent
+> reason that the number of threads per core has to be a power of 2.
+> After all, the ideal number of threads depends on relative compute and
+> memory intensity of your workload, combined with relative latency of
+> arithmetic versus memory operations.  There's no particular reason to
+> expect that to come out to a power of 2.
+
+Yep, that's all correct AFAIK. On Power 9 this is only enfoced by KVM,
+so it could be changed in the future.
+
+> > +    }
+> > +
+> > +    /* Detemine the VSMT mode to use: */
+> > +    if (vsmt_user) {
+> > +        if (spapr->vsmt < smp_threads) {
+> > +            error_report("Cannot support VSMT mode %d"
+> > +                         " because it must be >= threads/core (%d)",
+> > +                         spapr->vsmt, smp_threads);
+> > +            exit(1);
+> > +        }
+> > +        /* In this case, spapr->vsmt has been set by the command line */
+> > +    } else {
+> > +        /* Choose a VSMT mode that may be higher than necessary but is
+> > +         * likely to be compatible with hosts that don't have VSMT. */
+> > +        spapr->vsmt = MAX(kvm_smt, smp_threads);
+> 
+> I don't love having this dependent on the kvm property, but I guess
+> that's already the case.  We can potentially change this default for
+> newer machine types in a later patch.
+
+Right. The only reason to consider the KVM value here is to remain
+compatible with machines created before VSMT. And also yes, I think we
+should change the default in a newer machine version.
+
+> > +    }
+> > +
+> > +    /* KVM: If necessary, set the SMT mode: */
+> > +    if (kvm_enabled() && (spapr->vsmt != kvm_smt)) {
+> > +        ret = kvmppc_set_smt_threads(spapr->vsmt);
+> > +        if (ret) {
+> > +            error_report("Failed to set KVM's VSMT mode to %d (errno %d)",
+> > +                         spapr->vsmt, ret);
+> > +            if (!vsmt_user) {
+> > +                error_printf("On PPC, a VM with %d threads/core on a host"
+> > +                             " with %d threads/core requires the use of"
+> > +                             " VSMT mode %d.\n",
+> > +                             smp_threads, kvm_smt, spapr->vsmt);
+> > +            }
+> > +            show_vsmt_possible();
+> > +            exit(1);
+> > +        }
+> > +    }
+> > +    /* else TCG: nothing to do currently */
+> > +    return;
+> > +}
+> > +
+> >  /* pSeries LPAR / sPAPR hardware init */
+> >  static void ppc_spapr_init(MachineState *machine)
+> >  {
+> > @@ -2272,6 +2349,8 @@ static void ppc_spapr_init(MachineState *machine)
+> >  
+> >      spapr_cpu_parse_features(spapr);
+> >  
+> > +    spapr_set_vsmt_mode(spapr);
+> > +
+> >      spapr_init_cpus(spapr);
+> >  
+> >      if (kvm_enabled()) {
+> > @@ -2656,6 +2735,18 @@ static void spapr_set_resize_hpt(Object *obj, const char *value, Error **errp)
+> >      }
+> >  }
+> >  
+> > +static void spapr_get_vsmt(Object *obj, Visitor *v, const char *name,
+> > +                                   void *opaque, Error **errp)
+> > +{
+> > +    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+> > +}
+> > +
+> > +static void spapr_set_vsmt(Object *obj, Visitor *v, const char *name,
+> > +                                   void *opaque, Error **errp)
+> > +{
+> > +    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+> > +}
+> > +
+> >  static void spapr_machine_initfn(Object *obj)
+> >  {
+> >      sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+> > @@ -2686,6 +2777,11 @@ static void spapr_machine_initfn(Object *obj)
+> >      object_property_set_description(obj, "resize-hpt",
+> >                                      "Resizing of the Hash Page Table (enabled, disabled, required)",
+> >                                      NULL);
+> > +    object_property_add(obj, "vsmt", "uint32", spapr_get_vsmt,
+> > +                        spapr_set_vsmt, NULL, &spapr->vsmt, &error_abort);
+> > +    object_property_set_description(obj, "vsmt",
+> > +                                    "Virtual SMT: KVM behaves as if this were"
+> > +                                    " the host's SMT mode", &error_abort);
+> >  }
+> >  
+> >  static void spapr_machine_finalizefn(Object *obj)
+> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> > index 86c982cf2c..68c510339f 100644
+> > --- a/include/hw/ppc/spapr.h
+> > +++ b/include/hw/ppc/spapr.h
+> > @@ -99,6 +99,7 @@ struct sPAPRMachineState {
+> >      uint64_t rtc_offset; /* Now used only during incoming migration */
+> >      struct PPCTimebase tb;
+> >      bool has_graphics;
+> > +    uint32_t vsmt;       /* Virtual SMT mode (KVM's "core stride") */
+> 
+> I thought you were going to add a VMSTATE_EQUAL migration for this.  I
+> guess that can be a follow up since it will change the migration
+> stream.
+
+Yes, that's my intent. (I think I'd like to get the design for having the
+machine handle the VCPU ID allocation worked out first.)
+
+> >      Notifier epow_notifier;
+> >      QTAILQ_HEAD(, sPAPREventLogEntry) pending_events;
+> > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> > index 5fc7f238eb..0b9d5b83fa 100644
+> > --- a/target/ppc/kvm.c
+> > +++ b/target/ppc/kvm.c
+> > @@ -74,6 +74,7 @@ static int cap_interrupt_level = false;
+> >  static int cap_segstate;
+> >  static int cap_booke_sregs;
+> >  static int cap_ppc_smt;
+> > +static int cap_ppc_smt_possible;
+> >  static int cap_ppc_rma;
+> >  static int cap_spapr_tce;
+> >  static int cap_spapr_tce_64;
+> > @@ -130,7 +131,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+> >      cap_interrupt_level = kvm_check_extension(s, KVM_CAP_PPC_IRQ_LEVEL);
+> >      cap_segstate = kvm_check_extension(s, KVM_CAP_PPC_SEGSTATE);
+> >      cap_booke_sregs = kvm_check_extension(s, KVM_CAP_PPC_BOOKE_SREGS);
+> > -    cap_ppc_smt = kvm_check_extension(s, KVM_CAP_PPC_SMT);
+> > +    cap_ppc_smt_possible = kvm_check_extension(s, KVM_CAP_PPC_SMT_POSSIBLE);
+> >      cap_ppc_rma = kvm_check_extension(s, KVM_CAP_PPC_RMA);
+> >      cap_spapr_tce = kvm_check_extension(s, KVM_CAP_SPAPR_TCE);
+> >      cap_spapr_tce_64 = kvm_check_extension(s, KVM_CAP_SPAPR_TCE_64);
+> > @@ -144,6 +145,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+> >       * only activated after this by kvmppc_set_papr() */
+> >      cap_htab_fd = kvm_check_extension(s, KVM_CAP_PPC_HTAB_FD);
+> >      cap_fixup_hcalls = kvm_check_extension(s, KVM_CAP_PPC_FIXUP_HCALL);
+> > +    cap_ppc_smt = kvm_vm_check_extension(s, KVM_CAP_PPC_SMT);
+> >      cap_htm = kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
+> >      cap_mmu_radix = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
+> >      cap_mmu_hash_v3 = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
+> > @@ -2134,6 +2136,22 @@ int kvmppc_smt_threads(void)
+> >      return cap_ppc_smt ? cap_ppc_smt : 1;
+> >  }
+> >  
+> > +int kvmppc_set_smt_threads(int smt)
+> > +{
+> > +    int ret;
+> > +
+> > +    ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_SMT, 0, smt, 0);
+> > +    if (!ret) {
+> > +        cap_ppc_smt = smt;
+> > +    }
+> > +    return ret;
+> > +}
+> > +
+> > +int kvmppc_smt_possible(void)
+> > +{
+> > +    return cap_ppc_smt_possible;
+> > +}
+> > +
+> >  #ifdef TARGET_PPC64
+> >  off_t kvmppc_alloc_rma(void **rma)
+> >  {
+> > diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> > index 381afe6240..7b2962eb86 100644
+> > --- a/target/ppc/kvm_ppc.h
+> > +++ b/target/ppc/kvm_ppc.h
+> > @@ -29,6 +29,8 @@ void kvmppc_set_papr(PowerPCCPU *cpu);
+> >  int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
+> >  void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
+> >  int kvmppc_smt_threads(void);
+> > +int kvmppc_smt_possible(void);
+> > +int kvmppc_set_smt_threads(int smt);
+> >  int kvmppc_clear_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
+> >  int kvmppc_or_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
+> >  int kvmppc_set_tcr(PowerPCCPU *cpu);
+> > @@ -148,6 +150,16 @@ static inline int kvmppc_smt_threads(void)
+> >      return 1;
+> >  }
+> >  
+> > +static inline int kvmppc_smt_possible(void)
+> > +{
+> > +    return 1;
+> > +}
+> > +
+> > +static inline int kvmppc_set_smt_threads(int smt)
+> > +{
+> > +    return 0;
+> > +}
+> > +
+> >  static inline int kvmppc_or_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits)
+> >  {
+> >      return 0;
+> > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> > index 0ce923be46..7f6a349e43 100644
+> > --- a/target/ppc/translate_init.c
+> > +++ b/target/ppc/translate_init.c
+> > @@ -9907,20 +9907,6 @@ static void ppc_cpu_realizefn(DeviceState *dev, Error **errp)
+> >      int max_smt = kvmppc_smt_threads();
+> >  #endif
+> >  
+> > -#if !defined(CONFIG_USER_ONLY)
+> > -    if (smp_threads > max_smt) {
+> > -        error_setg(errp, "Cannot support more than %d threads on PPC with %s",
+> > -                   max_smt, kvm_enabled() ? "KVM" : "TCG");
+> > -        return;
+> > -    }
+> > -    if (!is_power_of_2(smp_threads)) {
+> > -        error_setg(errp, "Cannot support %d threads on PPC with %s, "
+> > -                   "threads count must be a power of 2.",
+> > -                   smp_threads, kvm_enabled() ? "KVM" : "TCG");
+> > -        return;
+> > -    }
+> > -#endif
+> > -
+> >      cpu_exec_realizefn(cs, &local_err);
+> >      if (local_err != NULL) {
+> >          error_propagate(errp, local_err);
+> 
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
