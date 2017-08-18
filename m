@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dilhX-00012T-Us
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:08:57 -0400
+	(envelope-from <mst@redhat.com>) id 1dilje-0002Kc-BZ
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:11:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dilhT-00037S-Sd
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:08:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34366)
+	(envelope-from <mst@redhat.com>) id 1dilja-0003yT-A7
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:11:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52656)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dilhT-00037A-JY
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:08:51 -0400
-Date: Fri, 18 Aug 2017 15:08:48 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170818180848.GB27715@localhost.localdomain>
-References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
-	<1503050939-227939-7-git-send-email-imammedo@redhat.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dilja-0003yJ-0S
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:11:02 -0400
+Date: Fri, 18 Aug 2017 21:10:55 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170818202337-mutt-send-email-mst@kernel.org>
+References: <1502940416-42944-1-git-send-email-wei.w.wang@intel.com>
+	<1502940416-42944-6-git-send-email-wei.w.wang@intel.com>
+	<20170818052301-mutt-send-email-mst@kernel.org>
+	<5996A6F6.2050405@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1503050939-227939-7-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11 06/27] x86: extract legacy cpu
- features format parser
+In-Reply-To: <5996A6F6.2050405@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v14 5/5] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_VQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +30,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-On Fri, Aug 18, 2017 at 12:08:38PM +0200, Igor Mammedov wrote:
-> Move cpu_model +-feat parsing into a separate file so that it
-> could be reused later for parsing similar format of sparc target
+On Fri, Aug 18, 2017 at 04:36:06PM +0800, Wei Wang wrote:
+> On 08/18/2017 10:28 AM, Michael S. Tsirkin wrote:
+> > On Thu, Aug 17, 2017 at 11:26:56AM +0800, Wei Wang wrote:
+> > > Add a new vq to report hints of guest free pages to the host.
+> > > 
+> > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > > Signed-off-by: Liang Li <liang.z.li@intel.com>
+> > > ---
+> > >   drivers/virtio/virtio_balloon.c     | 167 +++++++++++++++++++++++++++++++-----
+> > >   include/uapi/linux/virtio_balloon.h |   1 +
+> > >   2 files changed, 147 insertions(+), 21 deletions(-)
+> > > 
+> > > diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
+> > > index 72041b4..e6755bc 100644
+> > > --- a/drivers/virtio/virtio_balloon.c
+> > > +++ b/drivers/virtio/virtio_balloon.c
+> > > @@ -54,11 +54,12 @@ static struct vfsmount *balloon_mnt;
+> > >   struct virtio_balloon {
+> > >   	struct virtio_device *vdev;
+> > > -	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq;
+> > > +	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq, *free_page_vq;
+> > >   	/* The balloon servicing is delegated to a freezable workqueue. */
+> > >   	struct work_struct update_balloon_stats_work;
+> > >   	struct work_struct update_balloon_size_work;
+> > > +	struct work_struct report_free_page_work;
+> > >   	/* Prevent updating balloon when it is being canceled. */
+> > >   	spinlock_t stop_update_lock;
+> > > @@ -90,6 +91,13 @@ struct virtio_balloon {
+> > >   	/* Memory statistics */
+> > >   	struct virtio_balloon_stat stats[VIRTIO_BALLOON_S_NR];
+> > > +	/*
+> > > +	 * Used by the device and driver to signal each other.
+> > > +	 * device->driver: start the free page report.
+> > > +	 * driver->device: end the free page report.
+> > > +	 */
+> > > +	__virtio32 report_free_page_signal;
+> > > +
+> > >   	/* To register callback in oom notifier call chain */
+> > >   	struct notifier_block nb;
+> > >   };
+> > > @@ -174,6 +182,17 @@ static void send_balloon_page_sg(struct virtio_balloon *vb,
+> > >   	} while (unlikely(ret == -ENOSPC));
+> > >   }
+> > > +static void send_free_page_sg(struct virtqueue *vq, void *addr, uint32_t size)
+> > > +{
+> > > +	unsigned int len;
+> > > +
+> > > +	add_one_sg(vq, addr, size);
+> > > +	virtqueue_kick(vq);
+> > > +	/* Release entries if there are */
+> > > +	while (virtqueue_get_buf(vq, &len))
+> > > +		;
+> > > +}
+> > > +
+> > >   /*
+> > >    * Send balloon pages in sgs to host. The balloon pages are recorded in the
+> > >    * page xbitmap. Each bit in the bitmap corresponds to a page of PAGE_SIZE.
+> > > @@ -511,42 +530,143 @@ static void update_balloon_size_func(struct work_struct *work)
+> > >   		queue_work(system_freezable_wq, work);
+> > >   }
+> > > +static void virtio_balloon_send_free_pages(void *opaque, unsigned long pfn,
+> > > +					   unsigned long nr_pages)
+> > > +{
+> > > +	struct virtio_balloon *vb = (struct virtio_balloon *)opaque;
+> > > +	void *addr = (void *)pfn_to_kaddr(pfn);
+> > > +	uint32_t len = nr_pages << PAGE_SHIFT;
+> > > +
+> > > +	send_free_page_sg(vb->free_page_vq, addr, len);
+> > > +}
+> > > +
+> > > +static void report_free_page_completion(struct virtio_balloon *vb)
+> > > +{
+> > > +	struct virtqueue *vq = vb->free_page_vq;
+> > > +	struct scatterlist sg;
+> > > +	unsigned int len;
+> > > +	int ret;
+> > > +
+> > > +	sg_init_one(&sg, &vb->report_free_page_signal, sizeof(__virtio32));
+> > > +retry:
+> > > +	ret = virtqueue_add_outbuf(vq, &sg, 1, vb, GFP_KERNEL);
+> > > +	virtqueue_kick(vq);
+> > > +	if (unlikely(ret == -ENOSPC)) {
+> > > +		wait_event(vb->acked, virtqueue_get_buf(vq, &len));
+> > > +		goto retry;
+> > > +	}
+> > > +}
+> > So the annoying thing here is that once this starts going,
+> > it will keep sending free pages from the list even if
+> > host is no longer interested. There should be a way
+> > for host to tell guest "stop" or "start from the beginning".
 > 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-[...]
-> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> index 25eefea..30247dc 100644
-> --- a/include/qom/cpu.h
-> +++ b/include/qom/cpu.h
-> @@ -1038,4 +1038,6 @@ extern const struct VMStateDescription vmstate_cpu_common;
->  
->  #define UNASSIGNED_CPU_INDEX -1
->  
-> +void cpu_legacy_parse_featurestr(const char *typename, char *features,
-> +                                 Error **errp);
->  #endif
-> diff --git a/default-configs/i386-bsd-user.mak b/default-configs/i386-bsd-user.mak
-> index af1b31a..b28a05f 100644
-> --- a/default-configs/i386-bsd-user.mak
-> +++ b/default-configs/i386-bsd-user.mak
-> @@ -1 +1,2 @@
->  # Default configuration for i386-bsd-user
-> +CONFIG_LEGACY_CPU_FEATURES=y
-> diff --git a/default-configs/i386-linux-user.mak b/default-configs/i386-linux-user.mak
-> index 8657e68..c136967 100644
-> --- a/default-configs/i386-linux-user.mak
-> +++ b/default-configs/i386-linux-user.mak
-> @@ -1 +1,2 @@
->  # Default configuration for i386-linux-user
-> +CONFIG_LEGACY_CPU_FEATURES=y
-> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-> index d2ab2f6..e3e7c0e 100644
-> --- a/default-configs/i386-softmmu.mak
-> +++ b/default-configs/i386-softmmu.mak
-> @@ -59,3 +59,4 @@ CONFIG_SMBIOS=y
->  CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
->  CONFIG_PXB=y
->  CONFIG_ACPI_VMGENID=y
-> +CONFIG_LEGACY_CPU_FEATURES=y
-> diff --git a/default-configs/x86_64-bsd-user.mak b/default-configs/x86_64-bsd-user.mak
-> index 73e5d34..952323c 100644
-> --- a/default-configs/x86_64-bsd-user.mak
-> +++ b/default-configs/x86_64-bsd-user.mak
-> @@ -1 +1,2 @@
->  # Default configuration for x86_64-bsd-user
-> +CONFIG_LEGACY_CPU_FEATURES=y
-> diff --git a/default-configs/x86_64-linux-user.mak b/default-configs/x86_64-linux-user.mak
-> index bec1d9e..b513ef2 100644
-> --- a/default-configs/x86_64-linux-user.mak
-> +++ b/default-configs/x86_64-linux-user.mak
-> @@ -1 +1,2 @@
->  # Default configuration for x86_64-linux-user
-> +CONFIG_LEGACY_CPU_FEATURES=y
-> diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
-> index 9bde2f1..6594ddf 100644
-> --- a/default-configs/x86_64-softmmu.mak
-> +++ b/default-configs/x86_64-softmmu.mak
-> @@ -59,3 +59,4 @@ CONFIG_SMBIOS=y
->  CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
->  CONFIG_PXB=y
->  CONFIG_ACPI_VMGENID=y
-> +CONFIG_LEGACY_CPU_FEATURES=y
-[...]
-> diff --git a/util/Makefile.objs b/util/Makefile.objs
-> index 50a55ec..14e28f7 100644
-> --- a/util/Makefile.objs
-> +++ b/util/Makefile.objs
-> @@ -45,3 +45,4 @@ util-obj-y += qht.o
->  util-obj-y += range.o
->  util-obj-y += stats64.o
->  util-obj-y += systemd.o
-> +util-obj-$(CONFIG_LEGACY_CPU_FEATURES) += legacy_cpu_features_parser.o
+> This can be achieved via two output signal buf here:
+> signal_buf_start: filled with VIRTIO_BALLOON_F_FREE_PAGE_REPORT_START
+> signal_buf_end: filled with VIRTIO_BALLOON_F_FREE_PAGE_REPORT_END
+> 
+> The device holds both, and can put one of them to the vq and notify.
 
-Do we really need this?  Isn't it easier to just tell the linker
-to drop the object file if it's unused?
+Do you mean device writes start and end in the buf? then it's an inbuf
+not an outbuf.
+
+> 
+> 
+> > 
+> > It's the result of using same vq for guest to host and
+> > host to guest communication, and I think it's not a great idea.
+> > I'd reuse stats vq for host to guest requests maybe.
+> > 
+> 
+> 
+> As we discussed before, we can't have a vq interleave the report of stats
+> and free pages.
+> The vq will be locked when one command is in use. So, when live migration
+> starts, the
+> periodically reported stats will be delayed.
+
+
+
+
+
+
+> Would this be OK? Or would you
+> like to have
+> one host to guest vq, and multiple host to guest vqs? That is,
+> 
+> - host to guest:
+> CMD_VQ
+> 
+> - guest to host:
+> STATS_REPORT_VQ
+> FREE_PAGE_VQ
+> 
+> 
+> Best,
+> Wei
+> 
+
+Point is stats report vq is also host to guest.
+So I think it can be combined with CMD VQ.
+If it's too hard a separate vq isn't too bad though.
 
 -- 
-Eduardo
+MST
