@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1didLw-0004fs-30
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 05:14:05 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1didLu-000722-UP
+	(envelope-from <dgibson@ozlabs.org>) id 1didLw-0004fm-0S
 	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 05:14:04 -0400
-Date: Fri, 18 Aug 2017 16:11:49 +1000
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1didLu-000723-UL
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 05:14:03 -0400
+Date: Fri, 18 Aug 2017 16:10:28 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170818061149.GV5509@umbus.fritz.box>
+Message-ID: <20170818061028.GU5509@umbus.fritz.box>
 References: <cover.1502643878.git.balaton@eik.bme.hu>
-	<675e091387248b49c97ff99ef07eb23ed316aefb.1502643878.git.balaton@eik.bme.hu>
-	<20170814044454.GG3452@umbus.fritz.box>
-	<alpine.BSF.2.21.1708141258050.10227@zero.eik.bme.hu>
+	<5e493fd14e60d92d4fd80492ceff5ba13eb7b558.1502643878.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="l/3WCmqZNZ+BnHMk"
+	protocol="application/pgp-signature"; boundary="WQ40utMgiyDduspJ"
 Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.1708141258050.10227@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [RFC PATCH 11/12] ppc4xx: Export ECB and PLB
- emulation
+In-Reply-To: <5e493fd14e60d92d4fd80492ceff5ba13eb7b558.1502643878.git.balaton@eik.bme.hu>
+Subject: Re: [Qemu-devel] [RFC PATCH 12/12] ppc: Add aCube Sam460ex board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +28,24 @@ To: BALATON Zoltan <balaton@eik.bme.hu>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
 
 
---l/3WCmqZNZ+BnHMk
-Content-Type: text/plain; charset=us-ascii
+--WQ40utMgiyDduspJ
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 14, 2017 at 01:06:42PM +0200, BALATON Zoltan wrote:
-> On Mon, 14 Aug 2017, David Gibson wrote:
-> > On Sun, Aug 13, 2017 at 07:04:38PM +0200, BALATON Zoltan wrote:
-> > > These devices are found in some other ppc4xx cores too.
+On Sun, Aug 13, 2017 at 07:04:38PM +0200, BALATON Zoltan wrote:
+> Add emulation of aCube Sam460ex board based on AMCC 460EX embedded SoC.
+> This is not a full implementation yet with a lot of components still
+> missing but enough to start a Linux kernel and the U-Boot firmware.
 >=20
-> Thanks for the quick review, hope more will follow for other patches too
-> maybe also from others.
->=20
-> > Elsewhere in the series you moved things that were used elsewhere out
-> > of 405_uc, why not do that here as well?
->=20
-> I've moved those because those devices needed to be modified extensively
-> while these two in this patch are used basically unchanged (they may not
-> even be completely correct for 460EX but seem to work well enough) so I've
-> left them here. I could add this explanation to the commit message or may=
-be
-> move them to ppc4xx_devs to make it clearer that they are not only used by
-> 405 emulation.
+> Signed-off-by: Fran=E7ois Revol <revol@free.fr>
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 
-I think move them.  Probably to their own file - I think smaller files
-are usually going to be more readable than one big file with heaps of
-4xx devices.
-
-> > > Also add some more PLB registers for 460EX.
-> >=20
-> > Separate patch for that please, it's logically unrelated.  Plus the
-> > commit message should say what these registers are, where they appear,
-> > why do we need them?
->=20
-> OK. I don't really know what these registers are. I guess we need them
-> because U-Boot or other guests poke them but they are only added to avoid
-> the crash, not really emulated (just read zero, ignore write) for
-> now.
-
-Ok, so say that in the commit message.
+There are a *lot* of devices defined here.  Most of them look like
+they belong to the SoC, not the board (since they use DCRs), so it
+doesn't really make sense to define them in a board file.  It would
+also make it easier to review if they were split up into separate
+patches.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -78,24 +53,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---l/3WCmqZNZ+BnHMk
+--WQ40utMgiyDduspJ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmWhSUACgkQbDjKyiDZ
-s5JPjw//SOki7rxilAfkfLLVjJ9sVDC8PY8DQUMFhpVyMIW9VR/9bKLeeCvHuwVG
-MURMkrefKNtZmNKvmIQ4XILWoLr4rwv0ge3pz0OYWcO8ymZ+tzxAvQTe8zwzjX/b
-/ArT52BZIvZYJQQrH7PPnAe3YDWWq+a9SCa2lU5FUs0tQbVy9b3eDs/LOfz12awn
-9NSEgFw2wsSgTofDjLPfdP5kulFJeAtttZPvlcT21990AogwqH1W4jxsPfXmD41S
-2sGmjXhxE0QVX7X3EIwedjFsL1UcawK6/hALjwVU/4on/KzTBKfD7k6gI1ZZnpco
-RT1evNsWmhHCh8gF1PxYyHojHsiE+GJXV9W1MXVHci0ZRuC0pG1nRYings5iNjYb
-RcbuzNPmKkBe1xgnMheAPDtlgoePbRmcj44kcsjSZYs8J/PWfONYBLUAvP8AQnZ1
-hPgBVtQGN33ypf7rZaTdaEvor47aZq2KQMT0fwHo0LwDHos9ZHXW9aruULSZyZgZ
-V8XHcBRxJGlIplh7Q+JM8RWkEIDj8WdRj+lk7diLjZ8eBnanqJkKMg2lg1z55lhH
-5qNPhGN4pG6Vk6EgSl50ehieFc1qX1jGZxq4DAlJuu03J+fsnFiRrEl+owGHRqMN
-UimlyfHe1TIUMSgJkZH50jeV/Lc5F5HcpPlePPd9dnNmBGch2RU=
-=qRAl
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmWhNIACgkQbDjKyiDZ
+s5LWIhAArL9huhKrovWIHVD6RoUX5ec/wp8ma9Z5ZbsmXO9UA1G4vu8U6rZqJB9/
+7bWlfcqrfWllgs8ebPivupnEURu/eh64X8Lien/5L6+K+C/xEUTKXMM7AMDXVwn2
+GyqMjLzqbvwlOFHfrr9Moj588OObZsRhqD+ebAvV4+BpaLJrb2+gKOu5ypX+pwco
+7xq5hp98koMcxmGCT3BemhRLpX7d5glq/Kyi0py0ShjlV0QSQ3pMmd19J4xc5HDK
+GyqxxtpXH7goxsxTKSDkX4tyrrz9sxEZfk/KXcKq9A3oFojfVyn2fi2QdOkvTGsa
+I1FsUIZnxgB32J8+xBhq2wKjPD2NaFckPkL9agy7vc600gvKiCUo6Q/O9Os0vEdm
+2/if2HtKsdm4yzgTBWsUXH+jZYQXqNi+l99m+iwDLXZt3jyz2qXNewKqieSuwhBl
+fNt8Wsj66rAPP7iTTPnP9tJQx9s2k5uSd/BylUivR64Ik3FWz2pA5jiGMDm574vq
+5lK3UCmMDxqhV6k5lFd7ftGgm1fQniLJ7wTIJZSDmC+n8nTTG34zFfB1B/YOE0dW
+qQOfcqb8wEkLjf9YUSLwkivTqAjgMj36DE2Ozj/HyNQQYCtjMIV9sl0ul0YOzigy
+uYgU43dgt6xmfov4q/kqH4yEqDP1nvhAXn/jM4Kj8n7utgNObns=
+=8Xaa
 -----END PGP SIGNATURE-----
 
---l/3WCmqZNZ+BnHMk--
+--WQ40utMgiyDduspJ--
