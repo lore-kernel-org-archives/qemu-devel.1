@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dikaT-0007BL-IV
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:57:34 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dikcC-0008Ek-VM
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:59:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dikaS-0005Wn-UB
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:57:33 -0400
-Date: Fri, 18 Aug 2017 13:57:16 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170818165716.GB3108@localhost.localdomain>
-References: <20170814215748.5158-1-ehabkost@redhat.com>
-	<20170814215748.5158-9-ehabkost@redhat.com>
-	<7327f3f6-16fb-e9c6-4f2a-eed6144f2282@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dikc9-0005wq-UD
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:59:21 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:37073)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dikc9-0005wk-Oq
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:59:17 -0400
+Received: by mail-qk0-x244.google.com with SMTP id x77so9235393qka.4
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 09:59:17 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1503065708-28277-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1503065708-28277-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b199b6a5-9679-741b-9fcb-d69f7e8da7bc@amsat.org>
+Date: Fri, 18 Aug 2017 13:59:14 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7327f3f6-16fb-e9c6-4f2a-eed6144f2282@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v4 08/13] ide: enumerate_slots implementation
+In-Reply-To: <1503065708-28277-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/4] pcnet: switch lnc_mchash() over to use
+ net_crc32_le()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,61 +36,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Laine Stump <laine@redhat.com>, qemu-block@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, jasowang@redhat.com
 
-On Wed, Aug 16, 2017 at 05:46:18PM -0400, John Snow wrote:
+On 08/18/2017 11:15 AM, Mark Cave-Ayland wrote:
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>   hw/net/pcnet.c |   16 +---------------
+>   1 file changed, 1 insertion(+), 15 deletions(-)
 > 
-> 
-> On 08/14/2017 05:57 PM, Eduardo Habkost wrote:
-> > Example output when using "-machine q35":
-> > 
-> >   {
-> >     "available": true,
-> >     "count": 1,
-> >     "device-types": [
-> >       "ide-device"
-> >     ],
-> >     "hotpluggable": false,
-> >     "opts": [
-> >       { "option": "unit", "values": 0 },
-> >       { "option": "bus", "values": "ide.2" }
-> >     ],
-> >     "opts-complete": true
-> >   }
-> >   {
-> >     "available": false,
-> >     "count": 1,
-> >     "device": "/machine/unattached/device[19]",
-> >     "device-types": [
-> >       "ide-device"
-> >     ],
-> >     "hotpluggable": false,
-> >     "opts": [
-> >       { "option": "unit", "values": 1 },
-> >       { "option": "bus", "values": "ide.2" } ],
-> >     "opts-complete": true
-> >   }
-> >   {
-> >     "available": true,
-> >     "count": 10,
-> >     "device-types": [
-> >       "ide-device"
-> >     ],
-> >     "hotpluggable": false,
-> >     "opts": [
-> >       { "option": "unit", "values": [ [ 0, 1 ] ] },
-> 
-> Hm, these unit values aren't really correct -- we do not support
-> primary/secondary semantics for IDE buses on the AHCI device. I guess
-> they technically exist, but you cannot use them for anything.
-> 
-> Should I do something to "disable" or otherwise hide the unusable
-> secondary unit slots for AHCI devices?
+> diff --git a/hw/net/pcnet.c b/hw/net/pcnet.c
+> index 6544553..c050993 100644
+> --- a/hw/net/pcnet.c
+> +++ b/hw/net/pcnet.c
+> @@ -522,23 +522,9 @@ static inline void pcnet_rmd_store(PCNetState *s, struct pcnet_RMD *rmd,
+>              be16_to_cpu(hdr->ether_type));       \
+>   } while (0)
+>   
+> -#define MULTICAST_FILTER_LEN 8
+> -
+>   static inline uint32_t lnc_mchash(const uint8_t *ether_addr)
+>   {
+> -#define LNC_POLYNOMIAL          0xEDB88320UL
+> -    uint32_t crc = 0xFFFFFFFF;
+> -    int idx, bit;
+> -    uint8_t data;
+> -
+> -    for (idx = 0; idx < 6; idx++) {
+> -        for (data = *ether_addr++, bit = 0; bit < MULTICAST_FILTER_LEN; bit++) {
+> -            crc = (crc >> 1) ^ (((crc ^ data) & 1) ? LNC_POLYNOMIAL : 0);
+> -            data >>= 1;
+> -        }
+> -    }
+> -    return crc;
+> -#undef LNC_POLYNOMIAL
+> +    return net_crc32_le(ether_addr, 6);
 
-If the device is already rejecting -device ...,unit=1, then the
-bug is in my implementation of enumerate_devices.  Maybe it
-should just look at IDEBus::max_units to find that out?
+using ETH_ALEN:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
--- 
-Eduardo
+>   }
+>   
+>   #define CRC(crc, ch)	 (crc = (crc >> 8) ^ crctab[(crc ^ (ch)) & 0xff])
