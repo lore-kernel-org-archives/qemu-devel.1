@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1diigi-0007XK-Sy
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:55:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1dij2y-00009H-Ve
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 11:18:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1diigf-0001so-QS
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:55:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49980)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1diigf-0001rM-CI
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:55:49 -0400
-References: <85cdeb9f-a6ea-5530-edcd-10ed3853026f@exactcode.com>
-	<20170818143707.GE2222@work-vm>
+	(envelope-from <eblake@redhat.com>) id 1dij2x-0007sy-Sf
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 11:18:52 -0400
+References: <20170818133118.8650-1-stefanha@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <7006f856-bd13-0716-259a-a4c665e3b89a@redhat.com>
-Date: Fri, 18 Aug 2017 09:55:41 -0500
+Message-ID: <72ab2a83-3da3-a87e-0196-6b4c533e9461@redhat.com>
+Date: Fri, 18 Aug 2017 10:18:37 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170818143707.GE2222@work-vm>
+In-Reply-To: <20170818133118.8650-1-stefanha@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="W3BKRV6FUJB8tdFdTDrUDf6u9QvDXVANt"
-Subject: Re: [Qemu-devel] [PATCH] QXL: always show default cursor,
- even for unsupported chunks
+	boundary="UBsHjQP3eFeJ4r91OQ2qJtotHtgNT7mmN"
+Subject: Re: [Qemu-devel] [PATCH] qcow2: allocate cluster_cache/cluster_data
+ on demand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?Q?Ren=c3=a9_Rebe?= <rene@exactcode.com>, kraxel@redhat.com
-Cc: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---W3BKRV6FUJB8tdFdTDrUDf6u9QvDXVANt
+--UBsHjQP3eFeJ4r91OQ2qJtotHtgNT7mmN
 From: Eric Blake <eblake@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- =?UTF-8?Q?Ren=c3=a9_Rebe?= <rene@exactcode.com>, kraxel@redhat.com
-Cc: qemu-devel@nongnu.org
-Message-ID: <7006f856-bd13-0716-259a-a4c665e3b89a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] QXL: always show default cursor, even for
- unsupported chunks
-References: <85cdeb9f-a6ea-5530-edcd-10ed3853026f@exactcode.com>
- <20170818143707.GE2222@work-vm>
-In-Reply-To: <20170818143707.GE2222@work-vm>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org
+Message-ID: <72ab2a83-3da3-a87e-0196-6b4c533e9461@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qcow2: allocate cluster_cache/cluster_data
+ on demand
+References: <20170818133118.8650-1-stefanha@redhat.com>
+In-Reply-To: <20170818133118.8650-1-stefanha@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08/18/2017 09:37 AM, Dr. David Alan Gilbert wrote:
-> cc'ing in Gerd
+On 08/18/2017 08:31 AM, Stefan Hajnoczi wrote:
+> Most qcow2 files are uncompressed so it is wasteful to allocate (32 + 1=
+)
+> * cluster_size + 512 bytes upfront.  Allocate s->cluster_cache and
+> s->cluster_data when the first read operation is performance on a
+> compressed cluster.
 >=20
-> * Ren=C3=A9 Rebe (rene@exactcode.com) wrote:
->> Hi,
->>
->> I was testing a Windows 10 guest with HiDPI scaling which
->>
->> actually made the cursor disappear and only multiple chunks
->>
->> warnings being printed.
->>
->> When the cursor is using currently unsupported multiple chunks, the
->> builtin-left cursor is better than none.
+> The buffers are freed in .bdrv_close().  .bdrv_open() no longer has any=
 
-This part is okay, but might be better written in an imperative sense
-(the best commit messages are ones where you add an implicit "Apply this
-patch to ..." prior to the first word after the blank line separating
-the subject).
+> code paths that can allocate these buffers, so remove the free function=
+s
+> in the error code path.
+>=20
+> Reported-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+> Alexey: Does this improve your memory profiling results?
 
->>
->> PS: if TB damages the white-space just let me know, only recently star=
-ted
->> using it, ...
+Is this a regression from earlier versions?  Likely, it is NOT -rc4
+material, and thus can wait for 2.11; but it should be fine for -stable
+as part of 2.10.1 down the road.
 
-This part belongs after a --- separator, as it is useful to reviewers
-but adds nothing to git.
+> +++ b/block/qcow2-cluster.c
+> @@ -1516,6 +1516,23 @@ int qcow2_decompress_cluster(BlockDriverState *b=
+s, uint64_t cluster_offset)
+>          nb_csectors =3D ((cluster_offset >> s->csize_shift) & s->csize=
+_mask) + 1;
+>          sector_offset =3D coffset & 511;
+>          csize =3D nb_csectors * 512 - sector_offset;
+> +
+> +        /* Allocate buffers on first decompress operation, most images=
+ are
+> +         * uncompressed and the memory overhead can be avoided.  The b=
+uffers
+> +         * are freed in .bdrv_close().
+> +         */
+> +        if (!s->cluster_data) {
+> +            /* one more sector for decompressed data alignment */
+> +            s->cluster_data =3D qemu_try_blockalign(bs->file->bs,
+> +                    QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size + 512);
+> +            if (!s->cluster_data) {
+> +                return -EIO;
 
-By the way, while your patch did not appear to be whitespace damaged on
-a cursory glance, the fact that you used thunderbird to send it is
-risky; thunderbird HAS been known to mess up patches that are pasted
-inline, and sending patches as attachments is harder to read than direct
-patches.  Using 'git send-email' excels at making sure the patch will be
-in a format easy to apply.
-
->>
->>   - Ren=C3=A9 Rebe <rene@exactcode.de>
-
-And this is not a proper Signed-off-by: tag; we'll need one of those
-before your patch can be considered.  More hints at:
-http://wiki.qemu.org/Contribute/SubmitAPatch
+Is -ENOMEM any better than -EIO here?
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -95,7 +93,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---W3BKRV6FUJB8tdFdTDrUDf6u9QvDXVANt
+--UBsHjQP3eFeJ4r91OQ2qJtotHtgNT7mmN
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -104,14 +102,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmW/+0ACgkQp6FrSiUn
-Q2oj5ggAqZ87xs1gPKucB/SagRQnnqY7TKALl2yU/2+krb7dcy6Ggrny9ufyuy8V
-2dsVpCPdrj99xJP0kZd8GgGZo/OHvq1tc5A+djCqWGbDmCaVu7oqJ10zEl2K4D5T
-anD6KAOBH+xkw2Oxh+Nus0y9c69vYMV4BhH3Ve7NLVpe0YSL4ZYcrpYi6AODpV4z
-ou5wjVyP8eHxBnVw1ncaE3G8mbXsrpr98wCS+R5yfno7rWjUCu63g/gIX4EvY7iL
-aeMDd2pASlMH1sUpRdxUGA776QEqV6lEiZgEUGT341Hu0DLniRAZG9wz3YQVNwk3
-q/mcusl7lB3T0ib5ETWPbZrr7Q/ZKQ==
-=DYvD
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmXBU0ACgkQp6FrSiUn
+Q2qokwf8CJtc0eEm7VBR8nvO+PNsuUKDTszuJNP6vGk8RPhBwwsWz8Y0gR0CqOQb
+KZhOuQ3Ne0I9NGAeFbDGZX8Un9G7t5iDEEDIcukNWkcKpjdqe1MQOG0vyvwq/KNH
+heHK4jyUbkjYFXns63rcynsnCQmJFFvytjsaxOjbmgjYgpbYlNtQXFGV5WMN3pV4
+RaCQ6Zk0jMhTDpWlw0ZotEEPyF5no0UrI9YzQWgQ04cs2xBj2X6aFKc5DXbI5egH
+hd8GFfYxh05E9RiM15D0h3mvPDBmS/0eZMqbye5tlkbyjz7ke5goFe7/gXAx4qdz
+X+HW40jKWhLT2nAFwjexIAbfnhWc+g==
+=Ispc
 -----END PGP SIGNATURE-----
 
---W3BKRV6FUJB8tdFdTDrUDf6u9QvDXVANt--
+--UBsHjQP3eFeJ4r91OQ2qJtotHtgNT7mmN--
