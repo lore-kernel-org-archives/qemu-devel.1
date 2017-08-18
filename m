@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1diknV-0006Yv-Q6
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:11:02 -0400
+	(envelope-from <apahim@redhat.com>) id 1diko7-00077E-4J
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:11:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1diknS-0004jX-KG
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:11:01 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33742)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1diknS-0004jK-GO
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:10:58 -0400
-Received: by mail-qk0-x242.google.com with SMTP id o124so5639804qke.0
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:10:58 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1503065708-28277-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1503065708-28277-5-git-send-email-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <abf0dfdf-d8eb-2be2-0509-0710427ef602@amsat.org>
-Date: Fri, 18 Aug 2017 14:10:54 -0300
-MIME-Version: 1.0
-In-Reply-To: <1503065708-28277-5-git-send-email-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] eepro100: switch
- e100_compute_mcast_idx() over to use net_crc32()
+	(envelope-from <apahim@redhat.com>) id 1diko3-0005R0-Tp
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:11:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49688)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <apahim@redhat.com>) id 1diko3-0005OB-Nr
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:11:35 -0400
+From: Amador Pahim <apahim@redhat.com>
+Date: Fri, 18 Aug 2017 19:05:22 +0200
+Message-Id: <20170818170526.13496-8-apahim@redhat.com>
+In-Reply-To: <20170818170526.13496-1-apahim@redhat.com>
+References: <20170818170526.13496-1-apahim@redhat.com>
+Subject: [Qemu-devel] [PATCH v7 07/11] qemu.py: include debug information on
+ launch error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,52 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, jasowang@redhat.com
+To: qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com, Amador Pahim <apahim@redhat.com>
 
-On 08/18/2017 11:15 AM, Mark Cave-Ayland wrote:
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->   hw/net/eepro100.c |   19 +------------------
->   1 file changed, 1 insertion(+), 18 deletions(-)
-> 
-> diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-> index 5a4774a..4226572 100644
-> --- a/hw/net/eepro100.c
-> +++ b/hw/net/eepro100.c
-> @@ -327,26 +327,9 @@ static const uint16_t eepro100_mdi_mask[] = {
->   
->   static E100PCIDeviceInfo *eepro100_get_class(EEPRO100State *s);
->   
-> -/* From FreeBSD (locally modified). */
->   static unsigned e100_compute_mcast_idx(const uint8_t *ep)
->   {
-> -    uint32_t crc;
-> -    int carry, i, j;
-> -    uint8_t b;
-> -
-> -    crc = 0xffffffff;
-> -    for (i = 0; i < 6; i++) {
-> -        b = *ep++;
-> -        for (j = 0; j < 8; j++) {
-> -            carry = ((crc & 0x80000000L) ? 1 : 0) ^ (b & 0x01);
-> -            crc <<= 1;
-> -            b >>= 1;
-> -            if (carry) {
-> -                crc = ((crc ^ POLYNOMIAL) | carry);
-> -            }
-> -        }
-> -    }
-> -    return (crc & BITS(7, 2)) >> 2;
-> +    return (net_crc32(ep, 6) & BITS(7, 2)) >> 2;
+When launching a VM, if an exception happens and the VM is not
+initiated, it might be useful to see the qemu command line and
+the qemu command output.
 
-with previous suggestion from patch 1/4:
+This patch creates that message. Notice that self._iolog needs to be
+cleaned up in the beginning of the launch() to make sure we will not
+expose the qemu log from a previous launch if the current one fails.
 
-        return (mac_crc32_be(ep) & BITS(7, 2)) >> 2;
+Signed-off-by: Amador Pahim <apahim@redhat.com>
+---
+ scripts/qemu.py | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-then
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
->   }
->   
->   /* Read a 16 bit control/status (CSR) register. */
-> 
+diff --git a/scripts/qemu.py b/scripts/qemu.py
+index 0bcec4b3b1..29fd2469f9 100644
+--- a/scripts/qemu.py
++++ b/scripts/qemu.py
+@@ -147,6 +147,7 @@ class QEMUMachine(object):
+ 
+     def launch(self):
+         '''Launch the VM and establish a QMP connection'''
++        self._iolog = None
+         self._qemu_full_args = None
+         devnull = open(os.path.devnull, 'rb')
+         qemulog = open(self._qemu_log_path, 'wb')
+@@ -162,6 +163,13 @@ class QEMUMachine(object):
+             self._post_launch()
+         except:
+             self.shutdown()
++
++            LOG.debug('Error launching VM')
++            if self._qemu_full_args:
++                LOG.debug('Command: %r', ' '.join(self._qemu_full_args))
++            if self._iolog:
++                LOG.debug('Output: %r', self._iolog)
++
+             raise
+ 
+     def shutdown(self):
+-- 
+2.13.5
