@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dikcC-0008Ek-VM
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:59:21 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dikia-00032q-Bg
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:05:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dikc9-0005wq-UD
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:59:21 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:37073)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dikc9-0005wk-Oq
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:59:17 -0400
-Received: by mail-qk0-x244.google.com with SMTP id x77so9235393qka.4
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 09:59:17 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1503065708-28277-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1503065708-28277-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b199b6a5-9679-741b-9fcb-d69f7e8da7bc@amsat.org>
-Date: Fri, 18 Aug 2017 13:59:14 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1dikiX-0001tP-6c
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:05:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39512)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dikiX-0001t5-0m
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:05:53 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C60634A6EB
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 17:05:51 +0000 (UTC)
+Date: Fri, 18 Aug 2017 14:05:45 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170818170545.GC3108@localhost.localdomain>
+References: <20170808203935.30021-1-ehabkost@redhat.com>
+	<20170808203935.30021-5-ehabkost@redhat.com>
+	<87fuctp2pi.fsf@dusky.pond.sub.org>
+	<20170815203909.GY3108@localhost.localdomain>
+	<87378sf2qi.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1503065708-28277-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 3/4] pcnet: switch lnc_mchash() over to use
- net_crc32_le()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87378sf2qi.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH for-2.11 v2 4/5] qmp-shell: Accept QMP
+ command as argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,44 +37,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, jasowang@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 08/18/2017 11:15 AM, Mark Cave-Ayland wrote:
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->   hw/net/pcnet.c |   16 +---------------
->   1 file changed, 1 insertion(+), 15 deletions(-)
+On Wed, Aug 16, 2017 at 08:25:41AM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
 > 
-> diff --git a/hw/net/pcnet.c b/hw/net/pcnet.c
-> index 6544553..c050993 100644
-> --- a/hw/net/pcnet.c
-> +++ b/hw/net/pcnet.c
-> @@ -522,23 +522,9 @@ static inline void pcnet_rmd_store(PCNetState *s, struct pcnet_RMD *rmd,
->              be16_to_cpu(hdr->ether_type));       \
->   } while (0)
->   
-> -#define MULTICAST_FILTER_LEN 8
-> -
->   static inline uint32_t lnc_mchash(const uint8_t *ether_addr)
->   {
-> -#define LNC_POLYNOMIAL          0xEDB88320UL
-> -    uint32_t crc = 0xFFFFFFFF;
-> -    int idx, bit;
-> -    uint8_t data;
-> -
-> -    for (idx = 0; idx < 6; idx++) {
-> -        for (data = *ether_addr++, bit = 0; bit < MULTICAST_FILTER_LEN; bit++) {
-> -            crc = (crc >> 1) ^ (((crc ^ data) & 1) ? LNC_POLYNOMIAL : 0);
-> -            data >>= 1;
-> -        }
-> -    }
-> -    return crc;
-> -#undef LNC_POLYNOMIAL
-> +    return net_crc32_le(ether_addr, 6);
+> > On Tue, Aug 15, 2017 at 12:03:53PM +0200, Markus Armbruster wrote:
+> >> Eduardo Habkost <ehabkost@redhat.com> writes:
+> >> 
+> >> Suggest to insert here:
+> >> 
+> >>   If additional arguments QMP-COMMAND ARG=VAL... are given, run just
+> >>   that QMP command instead of the REPL.
+> >> 
+> >> Question: is this limited to simple arguments?  If no, how would I write
+> >> an object argument?  For instance, how would I do
+> >> 
+> >>     { "execute": "blockdev-add", "arguments": { "node-name": "foo", "driver": "nbd", "server": { "type": "inet", "host": "localhost", "port": "12345" } } }
+> >> 
+> >> ?
+> >
+> > Exactly the same way you would write it when running qmp-shell in
+> > interactive mode.  e.g.:
+> >
+> >   $ ./scripts/qmp/qmp-shell /tmp/qmp blockdev-add driver=qcow2 node-name=node-E 'file={"driver":"file","filename":"/path/to/file.qcow2"}'
+> 
+> I see.
+> 
+> The QEMU command line uses dotted key syntax instead.
 
-using ETH_ALEN:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+You mean -blockdev, or is there another way to send QMP commands
+to QEMU that I'm not aware of?
 
->   }
->   
->   #define CRC(crc, ch)	 (crc = (crc >> 8) ^ crctab[(crc ^ (ch)) & 0xff])
+> 
+> To be honest, the less qmp-shell is used, the happier I am.
+
+What people would use instead of it?
+
+>                                                              Would you
+> like to serve as its sub-maintainer?
+
+I'd be glad to.
+
+-- 
+Eduardo
