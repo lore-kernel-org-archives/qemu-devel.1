@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dimrS-0007vd-Dv
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:23:15 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dimy4-00033m-0J
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:30:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dimrP-0006ac-9Q
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:23:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43324)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1dimrO-0006Zm-W6
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:23:11 -0400
-References: <C2D23A89-6DB7-445C-BC25-71E9E49C288D@gmail.com>
-	<ff49cfa1-5a00-c329-1647-3ad8367cc804@redhat.com>
-	<5D42D1E3-A946-4E2C-BDC4-BB785D0B880D@gmail.com>
-	<db1ad643-9dc6-6464-1487-44007b3609ee@redhat.com>
-	<D7EDAC6E-E598-491A-BB4F-789DC57196A0@gmail.com>
-	<CACXAS8BKpKbkAMXPDKw2exX-MKO7sC_R5NbMSysCvjcx0qZJ6Q@mail.gmail.com>
-	<5ABAF863-78A7-4D17-A519-D823CF2E9135@gmail.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <8d1c9c3b-2180-8c6e-a8e5-79e9c4afd8d4@redhat.com>
-Date: Fri, 18 Aug 2017 15:23:06 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dimy0-0002eL-R2
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:30:04 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34779)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dimy0-0002e6-LR
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:30:00 -0400
+Received: by mail-qt0-x242.google.com with SMTP id i19so9779609qte.1
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 12:30:00 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1503077821.git.alistair.francis@xilinx.com>
+	<54e6458745493d10901964624479a7d9a872f481.1503077821.git.alistair.francis@xilinx.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b162f9c5-8f49-45ba-751e-de7f832ebfa4@amsat.org>
+Date: Fri, 18 Aug 2017 16:29:56 -0300
 MIME-Version: 1.0
-In-Reply-To: <5ABAF863-78A7-4D17-A519-D823CF2E9135@gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <54e6458745493d10901964624479a7d9a872f481.1503077821.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Help with Windows NT 4.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] Makefile: Remove libqemustub.a
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,87 +35,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>, Artyom Tarasenko <atar4qemu@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, armbru@redhat.com
+Cc: alistair23@gmail.com, pbonzini@redhat.com
 
+Hi Alistair,
 
+On 08/18/2017 03:47 PM, Alistair Francis wrote:
+> Using two libraries (libqemuutil.a and libqemustub.a) would sometimes
+> result in circular dependencies. To avoid these issues let's just
+> combine both into a single library that functions as both.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> ---
+> 
+>   Makefile                    |  7 +++----
+>   Makefile.target             |  2 +-
+>   docs/devel/build-system.txt | 14 +++++---------
+>   tests/Makefile.include      |  6 +++---
+>   4 files changed, 12 insertions(+), 17 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 81447b1f08..f111e93c63 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -344,7 +344,7 @@ subdir-dtc:dtc/libfdt dtc/tests
+>   dtc/%:
+>   	mkdir -p $@
+>   
+> -$(SUBDIR_RULES): libqemuutil.a libqemustub.a $(common-obj-y) $(chardev-obj-y) \
+> +$(SUBDIR_RULES): libqemuutil.a $(common-obj-y) $(chardev-obj-y) \
+>   	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
+>   
+>   ROMSUBDIR_RULES=$(patsubst %,romsubdir-%, $(ROMS))
+> @@ -364,12 +364,11 @@ Makefile: $(version-obj-y)
+>   ######################################################################
+>   # Build libraries
+>   
+> -libqemustub.a: $(stub-obj-y)
+> -libqemuutil.a: $(util-obj-y) $(trace-obj-y)
+> +libqemuutil.a: $(util-obj-y) $(trace-obj-y) $(stub-obj-y)
+>   
+>   ######################################################################
+>   
+> -COMMON_LDADDS = libqemuutil.a libqemustub.a
+> +COMMON_LDADDS = libqemuutil.a
+>   
+>   qemu-img.o: qemu-img-cmds.h
+>   
+> diff --git a/Makefile.target b/Makefile.target
+> index 7f42c45db8..0a80caf79c 100644
+> --- a/Makefile.target
+> +++ b/Makefile.target
+> @@ -193,7 +193,7 @@ all-obj-$(CONFIG_SOFTMMU) += $(io-obj-y)
+>   
+>   $(QEMU_PROG_BUILD): config-devices.mak
+>   
+> -COMMON_LDADDS = ../libqemuutil.a ../libqemustub.a
+> +COMMON_LDADDS = ../libqemuutil.a
+>   
+>   # build either PROG or PROGW
+>   $(QEMU_PROG_BUILD): $(all-obj-y) $(COMMON_LDADDS)
+> diff --git a/docs/devel/build-system.txt b/docs/devel/build-system.txt
+> index 2af1e668c5..5f32e53248 100644
+> --- a/docs/devel/build-system.txt
+> +++ b/docs/devel/build-system.txt
+> @@ -232,15 +232,11 @@ The utility code that is used by all binaries is built into a
+>   static archive called libqemuutil.a, which is then linked to all the
+>   binaries. In order to provide hooks that are only needed by some of the
+>   binaries, code in libqemuutil.a may depend on other functions that are
+> -not fully implemented by all QEMU binaries. To deal with this there is a
+> -second library called libqemustub.a which provides dummy stubs for all
+> -these functions. These will get lazy linked into the binary if the real
+> -implementation is not present. In this way, the libqemustub.a static
+> -library can be thought of as a portable implementation of the weak
+> -symbols concept. All binaries should link to both libqemuutil.a and
+> -libqemustub.a. e.g.
+> -
+> - qemu-img$(EXESUF): qemu-img.o ..snip.. libqemuutil.a libqemustub.a
+> +not fully implemented by all QEMU binaries. To deal with this there are
+> +dummy stubs for all these functions in libqemuutil.a.
+> +All binaries should link to both libqemuutil.a and libqemustub.a. e.g.
 
-On 08/18/2017 09:36 AM, Programmingkid wrote:
->=20
->> On Aug 18, 2017, at 4:46 AM, Artyom Tarasenko <atar4qemu@gmail.com> wr=
-ote:
->>
->> On Fri, Aug 18, 2017 at 6:31 AM, Programmingkid
->> <programmingkidx@gmail.com> wrote:
->>>
->>>> On Aug 15, 2017, at 6:27 PM, Paolo Bonzini <pbonzini@redhat.com> wro=
-te:
->>>>
->>>> On 15/08/2017 20:46, Programmingkid wrote:
->>>>>
->>>>>> On Aug 14, 2017, at 2:51 AM, Paolo Bonzini <pbonzini@redhat.com> w=
-rote:
->>>>>>
->>>>>> On 13/08/2017 21:13, Programmingkid wrote:
->>>>>>> Lately I found out that Windows NT 4.0 seems to work well with th=
-e
->>>>>>> 486 and pentium processors. Using "-cpu 486" made installing it
->>>>>>> actually work. Now I am seeing another issue. When I boot Windows=
- NT
->>>>>>> 4.0 I see this error message:
->>>>>>>
->>>>>>> *** STOP: 0x0000007B (0x807A8610,0x00000000,0x00000000,0x00000000=
-)
->>>>>>> INACESSIBLE_BOOT_DEVICE
->>>>>>>
->>>>>>> Would anyone know a way to solve this issue?
->>>>>>
->>>>>> Herv=C3=A9 is probably the best person to answer this question.  M=
-aybe try
->>>>>> installing it with SCSI disks ("-drive if=3Dscsi,id=3Dhd,file=3D..=
-. -drive
->>>>>> if=3Dscsi,id=3Dcd,file=3D... -device lsi -device scsi-hd,drive=3Dh=
-d -device
->>>>>> scsi-cd,drive=3Dcd").
->>>>>>
->>>>>> Thanks,
->>>>>>
->>>>>> Paolo
->>>>>
->>>>> Thanks for the help. Unfortunately trying to boot from the install =
-CD leads to the INACCESSIBLE_BOOT_DEVICE error when using SCSI.
->>>>
->>>> Try with 0.12.
->>>>
->>>> Paolo
->>>
->>> I finally figured out why I was seeing the INACESSIBLE_BOOT_DEVICE er=
-ror. It was because of the qcow2 image format. As soon as I switched to t=
-he qcow format, the error disappeared.
->>
->> That's weird. The image format is not guest visible. Probably you are
->> hitting some sort of timing issue.
->>
->>
->> --=20
->> Regards,
->> Artyom Tarasenko
->>
->> SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/la=
-bel/qemu
->=20
-> I'm not sure how timing is involved but I'm pretty sure I've heard abou=
-t guests having problems with the qcow2 format in the past.=20
->=20
+still libqemustub.a
 
-If the qcow2 driver in QEMU is written correctly, it should be 100%
-invisible to guests. There should be no actual way to determine in any
-way that qcow2 is being used.
+> +
+> + qemu-img$(EXESUF): qemu-img.o ..snip.. libqemuutil.a
 
-Either the qcow2 driver is broken (unlikely), or the way in which the
-qcow2 driver is written is exposing race conditions or other timing
-problems in either the qcow2 driver, the guest, or both.
+changed a bit:
 
-The odds of this being a "qcow2 problem" are pretty slim.
+The utility code that is used by all binaries is built into a
+static archive called libqemuutil.a, which is then linked to all the
+binaries. In order to provide hooks that are only needed by some of the
+binaries, code in libqemuutil.a may depend on other functions that are
+not fully implemented by all QEMU binaries. Dummy stubs for all  these
+functions are also provided by this library, and will get lazy linked
+into the binary if the real implementation is not present. In this way,
+this static library can be thought of as a portable implementation of
+the weak symbols concept. All binaries should link to libqemuutil.a. e.g.
 
---js
+  qemu-img$(EXESUF): qemu-img.o ..snip.. libqemuutil.a
+
+This or removing "libqemustub.a":
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+>   Windows platform portability
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 37c1bed683..80527a8763 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -553,7 +553,7 @@ QEMU_CFLAGS += -I$(SRC_PATH)/tests
+>   
+>   
+>   # Deps that are common to various different sets of tests below
+> -test-util-obj-y = libqemuutil.a libqemustub.a
+> +test-util-obj-y = libqemuutil.a
+>   test-qom-obj-y = $(qom-obj-y) $(test-util-obj-y)
+>   test-qapi-obj-y = tests/test-qapi-visit.o tests/test-qapi-types.o \
+>   	tests/test-qapi-event.o tests/test-qmp-introspect.o \
+> @@ -608,8 +608,8 @@ tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
+>   	$(test-io-obj-y)
+>   tests/test-timed-average$(EXESUF): tests/test-timed-average.o $(test-util-obj-y)
+>   tests/test-base64$(EXESUF): tests/test-base64.o \
+> -	libqemuutil.a libqemustub.a
+> -tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.o hw/core/ptimer.o libqemustub.a
+> +	libqemuutil.a
+> +tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.o hw/core/ptimer.o $(test-util-obj-y)
+>   
+>   tests/test-logging$(EXESUF): tests/test-logging.o $(test-util-obj-y)
+>   
+> 
