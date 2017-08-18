@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dilkJ-0002pC-AU
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:11:48 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dilwJ-0008Od-8Y
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:24:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dilkF-0004Cx-BM
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:11:47 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:58003
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dilkF-0004B7-3R
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:11:43 -0400
-References: <1503065708-28277-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1503065708-28277-2-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<66172cef-cd84-4d0f-dee3-fdfa7b4144eb@amsat.org>
-	<035ce9db-73d0-9bb6-8aa8-4e0b1a2dd383@amsat.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <7b2e8fef-a161-e800-fd52-405486003632@ilande.co.uk>
-Date: Fri, 18 Aug 2017 19:11:33 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1dilwG-0004DF-3g
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:24:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39288)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dilwF-0004Cy-QY
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:24:08 -0400
+Date: Fri, 18 Aug 2017 15:24:04 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170818182404.GC27715@localhost.localdomain>
+References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
+	<1503050939-227939-4-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <035ce9db-73d0-9bb6-8aa8-4e0b1a2dd383@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] net: move CRC32 calculation from
- compute_mcast_idx() into its own net_crc32() function
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1503050939-227939-4-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11 03/27] sparc: convert cpu features
+ to qdev properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,104 +28,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, jasowang@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-On 18/08/17 18:06, Philippe Mathieu-Daudé wrote:
-
-> On 08/18/2017 01:51 PM, Philippe Mathieu-Daudé wrote:
->> On 08/18/2017 11:15 AM, Mark Cave-Ayland wrote:
->>> Separate out the standard ethernet CRC32 calculation into a new
->>> net_crc32()
->>> function, renaming the constant POLYNOMIAL to POLYNOMIAL_BE to make
->>> it clear
->>> that this is a big-endian CRC32 calculation.
->>>
->>> Then remove the existing implementation from compute_mcast_idx() and
->>> call the
->>> new function in its place.
->>>
->>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>> ---
->>>   include/net/net.h |    3 ++-
->>>   net/net.c         |   16 +++++++++++-----
->>>   2 files changed, 13 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/include/net/net.h b/include/net/net.h
->>> index 1c55a93..586098c 100644
->>> --- a/include/net/net.h
->>> +++ b/include/net/net.h
->>> @@ -227,7 +227,8 @@ NetClientState *net_hub_port_find(int hub_id);
->>>   void qdev_set_nic_properties(DeviceState *dev, NICInfo *nd);
->>> -#define POLYNOMIAL 0x04c11db6
->>> +#define POLYNOMIAL_BE 0x04c11db6
->>> +uint32_t net_crc32(const uint8_t *p, int len);
->>>   unsigned compute_mcast_idx(const uint8_t *ep);
->>>   #define vmstate_offset_macaddr(_state, _field)                       \
->>> diff --git a/net/net.c b/net/net.c
->>> index 0e28099..a856907 100644
->>> --- a/net/net.c
->>> +++ b/net/net.c
->>> @@ -1568,25 +1568,31 @@ int net_client_parse(QemuOptsList *opts_list,
->>> const char *optarg)
->>>   /* From FreeBSD */
->>>   /* XXX: optimize */
->>> -unsigned compute_mcast_idx(const uint8_t *ep)
->>> +uint32_t net_crc32(const uint8_t *p, int len)
->>
->> imho there is no point in using signed length.
->>
->>>   {
->>>       uint32_t crc;
->>>       int carry, i, j;
->>>       uint8_t b;
->>>       crc = 0xffffffff;
->>> -    for (i = 0; i < 6; i++) {
->>> -        b = *ep++;
->>> +    for (i = 0; i < len; i++) {
->>> +        b = *p++;
->>>           for (j = 0; j < 8; j++) {
->>>               carry = ((crc & 0x80000000L) ? 1 : 0) ^ (b & 0x01);
->>>               crc <<= 1;
->>>               b >>= 1;
->>>               if (carry) {
->>> -                crc = ((crc ^ POLYNOMIAL) | carry);
->>> +                crc = ((crc ^ POLYNOMIAL_BE) | carry);
->>>               }
->>>           }
->>>       }
->>> -    return crc >> 26;
->>> +
->>> +    return crc;
->>> +}
->>> +
->>> +unsigned compute_mcast_idx(const uint8_t *ep)
->>> +{
->>> +    return net_crc32(ep, 6) >> 26;
->>
->> while here let's use ETH_ALEN
->>
+On Fri, Aug 18, 2017 at 12:08:35PM +0200, Igor Mammedov wrote:
+> SPARC is the last target that uses legacy way of parsing
+> and initializing cpu features, drop legacy approach and
+> convert features to properties so that SPARC could as minimum
+> benefit from generic cpu_generic_init(), common with
+> x86 +-feat parser
 > 
-> reading the next patches, what do you think about:
+> PS:
+> the main purpose is to remove legacy way of cpu creation as
+> a blocker for unifying cpu creation code across targets.
 > 
-> static inline uint32_t mac_crc32_be(const uint8_t *p)
-> {
->     return net_crc32_be(ep, ETH_ALEN);
-> }
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+[...]
+> ---
+> CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> CC: Artyom Tarasenko <atar4qemu@gmail.com>
+> CC: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  target/sparc/cpu.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 66 insertions(+)
 > 
-> unsigned compute_mcast_idx(const uint8_t *ep)
-> {
->     return mac_crc32_be(p) >> 26;
-> }
+> diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+> index f4e7343..e735d73 100644
+> --- a/target/sparc/cpu.c
+> +++ b/target/sparc/cpu.c
+> @@ -22,6 +22,8 @@
+>  #include "cpu.h"
+>  #include "qemu/error-report.h"
+>  #include "exec/exec-all.h"
+> +#include "hw/qdev-properties.h"
+> +#include "qapi/visitor.h"
+>  
+>  //#define DEBUG_FEATURES
+>  
+> @@ -853,6 +855,69 @@ static void sparc_cpu_initfn(Object *obj)
+>      }
+>  }
+>  
+> +static void sparc_get_nwindows(Object *obj, Visitor *v, const char *name,
+> +                               void *opaque, Error **errp)
+> +{
+> +    SPARCCPU *cpu = SPARC_CPU(obj);
+> +    int64_t value = cpu->env.def.nwindows;
+> +
+> +    visit_type_int(v, name, &value, errp);
+> +}
+> +
+> +static void sparc_set_nwindows(Object *obj, Visitor *v, const char *name,
+> +                               void *opaque, Error **errp)
+> +{
+> +    const int64_t min = MIN_NWINDOWS;
+> +    const int64_t max = MAX_NWINDOWS;
+> +    SPARCCPU *cpu = SPARC_CPU(obj);
+> +    Error *err = NULL;
+> +    int64_t value;
+> +
+> +    visit_type_int(v, name, &value, &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +
+> +    if (value < min || value > max) {
+> +        error_setg(errp, "Property %s.%s doesn't take value %" PRId64
+> +                   " (minimum: %" PRId64 ", maximum: %" PRId64 ")",
+> +                   object_get_typename(obj), name ? name : "null",
+> +                   value, min, max);
+> +        return;
+> +    }
+> +    cpu->env.def.nwindows = value;
 
-Yes, using ETH_ALEN looks like a good idea - I can do that for the next
-revision.
+I think it would be much simpler to just validate nwindows at
+realize time and use DEFINE_PROP_UINT32 below, but I won't mind
+if you really prefer the custom setter.
 
-As for the naming of the functions, I've followed the kernel convention
-that by default the CRC32 functions are big-endian unless they have a
-_le suffix. I don't really feel strongly either way, so I'm happy to go
-with whatever naming scheme Jason prefers.
+But I have another question:
 
+> +}
+> +
+> +static PropertyInfo qdev_prop_nwindows = {
+> +    .name  = "int",
+> +    .get   = sparc_get_nwindows,
+> +    .set   = sparc_set_nwindows,
+> +};
+> +
+> +static Property sparc_cpu_properties[] = {
+> +    DEFINE_PROP_BIT("float",    SPARCCPU, env.def.features, 0, false),
+> +    DEFINE_PROP_BIT("float128", SPARCCPU, env.def.features, 1, false),
+> +    DEFINE_PROP_BIT("swap",     SPARCCPU, env.def.features, 2, false),
+> +    DEFINE_PROP_BIT("mul",      SPARCCPU, env.def.features, 3, false),
+> +    DEFINE_PROP_BIT("div",      SPARCCPU, env.def.features, 4, false),
+> +    DEFINE_PROP_BIT("flush",    SPARCCPU, env.def.features, 5, false),
+> +    DEFINE_PROP_BIT("fsqrt",    SPARCCPU, env.def.features, 6, false),
+> +    DEFINE_PROP_BIT("fmul",     SPARCCPU, env.def.features, 7, false),
+> +    DEFINE_PROP_BIT("vis1",     SPARCCPU, env.def.features, 8, false),
+> +    DEFINE_PROP_BIT("vis2",     SPARCCPU, env.def.features, 9, false),
+> +    DEFINE_PROP_BIT("fsmuld",   SPARCCPU, env.def.features, 10, false),
+> +    DEFINE_PROP_BIT("hypv",     SPARCCPU, env.def.features, 11, false),
+> +    DEFINE_PROP_BIT("cmt",      SPARCCPU, env.def.features, 12, false),
+> +    DEFINE_PROP_BIT("gl",       SPARCCPU, env.def.features, 13, false),
+> +    DEFINE_PROP_UNSIGNED("iu-version", SPARCCPU, env.def.iu_version, 0,
+> +                         qdev_prop_uint64, target_ulong),
+> +    DEFINE_PROP_UINT32("fpu-version", SPARCCPU, env.def.fpu_version, 0),
+> +    DEFINE_PROP_UINT32("mmu-version", SPARCCPU, env.def.mmu_version, 0),
+> +    { .name  = "nwindows", .info  = &qdev_prop_nwindows },
 
-ATB,
+What's the advantage of using a custom PropertyInfo struct if you
+can just call object_class_property_add() at
+sparc_cpu_class_init()?
 
-Mark.
+> +    DEFINE_PROP_END_OF_LIST()
+> +};
+> +
+>  static void sparc_cpu_class_init(ObjectClass *oc, void *data)
+>  {
+>      SPARCCPUClass *scc = SPARC_CPU_CLASS(oc);
+> @@ -861,6 +926,7 @@ static void sparc_cpu_class_init(ObjectClass *oc, void *data)
+>  
+>      scc->parent_realize = dc->realize;
+>      dc->realize = sparc_cpu_realizefn;
+> +    dc->props = sparc_cpu_properties;
+>  
+>      scc->parent_reset = cc->reset;
+>      cc->reset = sparc_cpu_reset;
+> -- 
+> 2.7.4
+> 
+> 
+
+-- 
+Eduardo
