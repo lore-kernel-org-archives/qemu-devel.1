@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dij5I-0001rF-DS
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 11:21:18 -0400
+	(envelope-from <bounces@canonical.com>) id 1dij5K-0001sT-J6
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 11:21:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dij5H-0001M6-9G
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 11:21:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60515)
+	(envelope-from <bounces@canonical.com>) id 1dij5J-0001Ql-9I
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 11:21:18 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60576)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dij5H-0001I7-2w
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 11:21:15 -0400
+	id 1dij5J-0001Py-2i
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 11:21:17 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dij5E-0000WU-Mw
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 15:21:13 +0000
+	id 1dij5H-0000Vr-3e
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 15:21:15 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 187182E824E
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 15:21:03 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id D1DAE2E8264
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 15:21:05 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 Aug 2017 15:04:04 -0000
+Date: Fri, 18 Aug 2017 15:04:46 -0000
 From: ChristianEhrhardt <1711602@bugs.launchpad.net>
 Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
-Message-Id: <150306864502.18943.11067797086488434661.malone@chaenomeles.canonical.com>
+Message-Id: <150306868673.11238.15527334550168276787.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
  2.10
@@ -39,9 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "libvirtd-target.log"
-   https://bugs.launchpad.net/qemu/+bug/1711602/+attachment/4934824/+files/=
-libvirtd-target.log
+** Attachment added: "libvirtd-source.log"
+   https://bugs.launchpad.net/qemu/+bug/1711602/+attachment/4934825/+files/=
+libvirtd-source.log
 
 -- =
 
