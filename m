@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dig1G-0003qc-Tx
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 08:04:57 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1digC3-0001p1-HB
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 08:16:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dig1G-0001tt-49
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 08:04:54 -0400
-Date: Fri, 18 Aug 2017 20:04:20 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170818120420.GC15392@lemon>
-References: <1493916761-32319-1-git-send-email-kwolf@redhat.com>
-	<1493916761-32319-6-git-send-email-kwolf@redhat.com>
-	<849a6489-11f5-73c0-a7a8-400c58f995a4@gmail.com>
+	(envelope-from <balaton@eik.bme.hu>) id 1digBy-0008Gq-JC
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 08:16:03 -0400
+Date: Fri, 18 Aug 2017 14:15:49 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <194c2b39-e36a-24ea-1ba4-527593b7226f@free.fr>
+Message-ID: <alpine.BSF.2.21.1708181410200.19483@zero.eik.bme.hu>
+References: <cover.1502643878.git.balaton@eik.bme.hu>
+	<0362ffdbfb08b46edef0e2180387078299a9b721.1502643878.git.balaton@eik.bme.hu>
+	<20170818015321.GN5509@umbus.fritz.box>
+	<194c2b39-e36a-24ea-1ba4-527593b7226f@free.fr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <849a6489-11f5-73c0-a7a8-400c58f995a4@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 5/6] block: Fix write/resize permissions
- for inactive images
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH 09/12] ppc440: Add emulation
+ of plb-pcix controller found in some 440 SoCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,22 +26,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Xie Changlong <xiechanglong.d@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Zhang Hailiang <zhang.zhanghailiang@huawei.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Wen Congyang <wencongyang2@huawei.com>, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: =?ISO-8859-15?Q?Fran=E7ois_Revol?= <revol@free.fr>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Fri, 08/18 18:06, Xie Changlong wrote:
-> The root casue is when we run replication in secondary, vmstate changes to
-> RUN_STATE_INMIGRATE, then blockdev_init() sets bdrv_flags |=
-> BDRV_O_INACTIVE. So the whole chain become readonly. I've tried on my side,
-> but it seems not easy to fix it. I wonder if there is any way to bypass
-> this? Any suggestion would be appreciated.
+On Fri, 18 Aug 2017, Fran=E7ois Revol wrote:
+> Le 18/08/2017 =E0 03:53, David Gibson a =E9crit :
+>> On Sun, Aug 13, 2017 at 07:04:38PM +0200, BALATON Zoltan wrote:
+>>
+>> You know I'm going to say it, right: needs a commit message.
+>>
+>> What's a "plb-pcix", and what's an example of a 440 SoCs which has it.
+>
+> IIRC that's the PCI(express) controller, which is not memory-mapped but
+> inside the DCR address space, so accessed from the PLB.
 
-The non-shared storage migration uses "nbd_server_add -w" at destinition side
-where BDRV_O_INACTIVE is set for images like your case, the way it handles it is
-by calling bdrv_invalidate_cache(). See nbd_export_new().
+This is the PCI(X) controller only, the PCIe(xpress) controller is=20
+(partially) implemented in sam460ex.c=20
+TYPE_PPC460EX_PCIE_HOST/"ppc460ex-pcie-host". The plb-pcix is the=20
+compatible name the fdt refers to. I only know of the 460EX that has it=20
+but probably other similar SoCs (like some 440 variants) also have this=20
+kind of PCI controller (according to #defines in U-Boot source but don't=20
+remember the details).
 
-See also commit 3dff24f2dffc5f3aa46dc014122012848bd7959d.
-
-I'm not sure if this is enough for block replication?
-
-Fam
+Regards,
+BALATON Zoltan
