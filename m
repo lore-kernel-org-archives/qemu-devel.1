@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1didGB-0000zL-Ht
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 05:08:08 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1didLw-0004fs-30
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 05:14:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1didGA-0002ay-KY
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 05:08:07 -0400
-Date: Fri, 18 Aug 2017 12:07:22 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170818090722.t4njxb6ubxvl2nsb@postretch>
-References: <20170818031019.3723-1-el13635@mail.ntua.gr>
-	<20170818031019.3723-6-el13635@mail.ntua.gr>
-	<w51wp615loy.fsf@maestria.local.igalia.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1didLu-000722-UP
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 05:14:04 -0400
+Date: Fri, 18 Aug 2017 16:11:49 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170818061149.GV5509@umbus.fritz.box>
+References: <cover.1502643878.git.balaton@eik.bme.hu>
+	<675e091387248b49c97ff99ef07eb23ed316aefb.1502643878.git.balaton@eik.bme.hu>
+	<20170814044454.GG3452@umbus.fritz.box>
+	<alpine.BSF.2.21.1708141258050.10227@zero.eik.bme.hu>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="s2mfrzevwncjfz6j"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="l/3WCmqZNZ+BnHMk"
 Content-Disposition: inline
-In-Reply-To: <w51wp615loy.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH v5 5/6] block: add throttle block filter
- driver
+In-Reply-To: <alpine.BSF.2.21.1708141258050.10227@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [RFC PATCH 11/12] ppc4xx: Export ECB and PLB
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,60 +27,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
 
 
---s2mfrzevwncjfz6j
-Content-Type: text/plain; charset=utf-8; format=flowed
+--l/3WCmqZNZ+BnHMk
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 18, 2017 at 10:23:09AM +0200, Alberto Garcia wrote:
->On Fri 18 Aug 2017 05:10:18 AM CEST, Manos Pitsidianakis wrote:
->> block/throttle.c uses existing I/O throttle infrastructure inside a
->> block filter driver. I/O operations are intercepted in the filter's
->> read/write coroutines, and referred to block/throttle-groups.c
->>
->> The driver can be used with the syntax
->> -drive driver=3Dthrottle,file.filename=3Dfoo.qcow2, \
->>         limits.iops-total=3D...,throttle-group=3Dbar
->
->I had understood that we would get rid of the limits.* options in this
->driver, or did I get it wrong?
->
->Other than that, the rest of the code looks perfect to me.
->
->Berto
->
+On Mon, Aug 14, 2017 at 01:06:42PM +0200, BALATON Zoltan wrote:
+> On Mon, 14 Aug 2017, David Gibson wrote:
+> > On Sun, Aug 13, 2017 at 07:04:38PM +0200, BALATON Zoltan wrote:
+> > > These devices are found in some other ppc4xx cores too.
+>=20
+> Thanks for the quick review, hope more will follow for other patches too
+> maybe also from others.
+>=20
+> > Elsewhere in the series you moved things that were used elsewhere out
+> > of 405_uc, why not do that here as well?
+>=20
+> I've moved those because those devices needed to be modified extensively
+> while these two in this patch are used basically unchanged (they may not
+> even be completely correct for 460EX but seem to work well enough) so I've
+> left them here. I could add this explanation to the commit message or may=
+be
+> move them to ppc4xx_devs to make it clearer that they are not only used by
+> 405 emulation.
 
-I was going to send a patch after this was merged along with adding=20
-ThrottleGroups to the root container, to speed things up. Do you prefer=20
-to do this in this patch?
+I think move them.  Probably to their own file - I think smaller files
+are usually going to be more readable than one big file with heaps of
+4xx devices.
 
-The root container patch probably has to go to the 'remove legacy'=20
-series since adding it here means the name collision errors introduce=20
-error paths in block/block-backend.c that go away in that series, and=20
-that'd be a waste of effort.
+> > > Also add some more PLB registers for 460EX.
+> >=20
+> > Separate patch for that please, it's logically unrelated.  Plus the
+> > commit message should say what these registers are, where they appear,
+> > why do we need them?
+>=20
+> OK. I don't really know what these registers are. I guess we need them
+> because U-Boot or other guests poke them but they are only added to avoid
+> the crash, not really emulated (just read zero, ignore write) for
+> now.
 
---s2mfrzevwncjfz6j
+Ok, so say that in the commit message.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--l/3WCmqZNZ+BnHMk
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlmWrkoACgkQc2J8L2kN
-9xDS0BAAtvKqOHjyZLMs40Ud/tlkizicb6wxRqcr0qIXfmcabPw4QCh/sL8RVa/g
-zvmSOv/ZLRnqoiY3Zzb0fZ4THzjwyvg/Ewp4aD+1hYnx0pNah9o8QSb7GSdbegYt
-wJ05L4uqsiJJ42r6Dj4UBLnoyJpAN1TAxA8kc31HQ5WntTVHfq5bDNAZ/Ggc2cCm
-vwCOgKrKm11ZkOjO5W6Sh7aWBcqzx4ygl5xMQLxlxOMLfNOcStrVqxEc39s3hoTN
-KcmKxpPcsg6wmHvaW8M8LXuyuiptDN/C8fVvA1FnV01gI7LVwY2Fz+M7QwAuQ5v+
-Dh88TIkfTl6zqJA2iwoV+w4LinVJUoVlb1+pV/uiBet2q3WEu8aFXkEKWPKnZZX6
-yjnAqljbGX8mK7PZ/U0j1D58W7dP2NA4HQBBolIlwot9MBCo6FeInKtMbWJwyq+a
-XSIgBhQl8zpkaUDsJPwx2xlyDXRG5JRLM4fMVoOxfh8DJl0jOBvKBpJJiVynH6g6
-K0I4+WdtalP24drS+8ez38Zu3VIgTfGONw3cQ+GZvtihJAv9LycD7/goFE0hR8rE
-nJcZ8eyvdpCk0GBQFSrRu3o44Tv5Xw+TwjbISIOh0IJwfFuXNSa8xpo+8+164F+5
-us+5CzzdEg2pmTcwJjioF6UWEMfvbgr0EM5z37wc5S0eTzmgbKA=
-=8aN6
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmWhSUACgkQbDjKyiDZ
+s5JPjw//SOki7rxilAfkfLLVjJ9sVDC8PY8DQUMFhpVyMIW9VR/9bKLeeCvHuwVG
+MURMkrefKNtZmNKvmIQ4XILWoLr4rwv0ge3pz0OYWcO8ymZ+tzxAvQTe8zwzjX/b
+/ArT52BZIvZYJQQrH7PPnAe3YDWWq+a9SCa2lU5FUs0tQbVy9b3eDs/LOfz12awn
+9NSEgFw2wsSgTofDjLPfdP5kulFJeAtttZPvlcT21990AogwqH1W4jxsPfXmD41S
+2sGmjXhxE0QVX7X3EIwedjFsL1UcawK6/hALjwVU/4on/KzTBKfD7k6gI1ZZnpco
+RT1evNsWmhHCh8gF1PxYyHojHsiE+GJXV9W1MXVHci0ZRuC0pG1nRYings5iNjYb
+RcbuzNPmKkBe1xgnMheAPDtlgoePbRmcj44kcsjSZYs8J/PWfONYBLUAvP8AQnZ1
+hPgBVtQGN33ypf7rZaTdaEvor47aZq2KQMT0fwHo0LwDHos9ZHXW9aruULSZyZgZ
+V8XHcBRxJGlIplh7Q+JM8RWkEIDj8WdRj+lk7diLjZ8eBnanqJkKMg2lg1z55lhH
+5qNPhGN4pG6Vk6EgSl50ehieFc1qX1jGZxq4DAlJuu03J+fsnFiRrEl+owGHRqMN
+UimlyfHe1TIUMSgJkZH50jeV/Lc5F5HcpPlePPd9dnNmBGch2RU=
+=qRAl
 -----END PGP SIGNATURE-----
 
---s2mfrzevwncjfz6j--
+--l/3WCmqZNZ+BnHMk--
