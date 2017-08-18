@@ -1,15 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dikl1-0004qb-JG
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:08:28 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dikmv-00063p-SG
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:10:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dikl0-0003Rw-N5
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:08:27 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 18 Aug 2017 19:08:16 +0200
-Message-Id: <1503076096-14220-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/arm/allwinner: Fix crash with -nodefaults
- -M cubieboard
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dikms-0004Cq-MM
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:10:25 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33705)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dikms-0004Cd-Hp
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:10:22 -0400
+Received: by mail-qk0-x242.google.com with SMTP id o124so5638176qke.0
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:10:22 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <1503065708-28277-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1503065708-28277-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<b199b6a5-9679-741b-9fcb-d69f7e8da7bc@amsat.org>
+Message-ID: <c605a917-54bd-63ae-d743-4db847263dbf@amsat.org>
+Date: Fri, 18 Aug 2017 14:10:19 -0300
+MIME-Version: 1.0
+In-Reply-To: <b199b6a5-9679-741b-9fcb-d69f7e8da7bc@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/4] pcnet: switch lnc_mchash() over to use
+ net_crc32_le()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,47 +37,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Beniamino Galvani <b.galvani@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Li Guang <lig.fnst@cn.fujitsu.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, jasowang@redhat.com
 
-The allwinner-a10 device uses serial_hds[0] without checking whether
-it is available or not. So using the cubieboard with -nodefaults
-currently results in a segmentation fault. Fix it by adding a
-proper check here.
-And while we're at it, mark the device as "user_creatable = false"
-since this apparently can not directly be used by the users but has
-to be wired up in code instead.
+On 08/18/2017 01:59 PM, Philippe Mathieu-Daudé wrote:
+> On 08/18/2017 11:15 AM, Mark Cave-Ayland wrote:
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+>>   hw/net/pcnet.c |   16 +---------------
+>>   1 file changed, 1 insertion(+), 15 deletions(-)
+>>
+>> diff --git a/hw/net/pcnet.c b/hw/net/pcnet.c
+>> index 6544553..c050993 100644
+>> --- a/hw/net/pcnet.c
+>> +++ b/hw/net/pcnet.c
+>> @@ -522,23 +522,9 @@ static inline void pcnet_rmd_store(PCNetState *s, 
+>> struct pcnet_RMD *rmd,
+>>              be16_to_cpu(hdr->ether_type));       \
+>>   } while (0)
+>> -#define MULTICAST_FILTER_LEN 8
+>> -
+>>   static inline uint32_t lnc_mchash(const uint8_t *ether_addr)
+>>   {
+>> -#define LNC_POLYNOMIAL          0xEDB88320UL
+>> -    uint32_t crc = 0xFFFFFFFF;
+>> -    int idx, bit;
+>> -    uint8_t data;
+>> -
+>> -    for (idx = 0; idx < 6; idx++) {
+>> -        for (data = *ether_addr++, bit = 0; bit < 
+>> MULTICAST_FILTER_LEN; bit++) {
+>> -            crc = (crc >> 1) ^ (((crc ^ data) & 1) ? LNC_POLYNOMIAL : 
+>> 0);
+>> -            data >>= 1;
+>> -        }
+>> -    }
+>> -    return crc;
+>> -#undef LNC_POLYNOMIAL
+>> +    return net_crc32_le(ether_addr, 6);
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/arm/allwinner-a10.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+with previous suggestion from patch 1/4:
 
-diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
-index f62a9a3..e152566 100644
---- a/hw/arm/allwinner-a10.c
-+++ b/hw/arm/allwinner-a10.c
-@@ -109,8 +109,10 @@ static void aw_a10_realize(DeviceState *dev, Error **errp)
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->sata), 0, s->irq[56]);
- 
-     /* FIXME use a qdev chardev prop instead of serial_hds[] */
--    serial_mm_init(get_system_memory(), AW_A10_UART0_REG_BASE, 2, s->irq[1],
--                   115200, serial_hds[0], DEVICE_NATIVE_ENDIAN);
-+    if (serial_hds[0]) {
-+        serial_mm_init(get_system_memory(), AW_A10_UART0_REG_BASE, 2, s->irq[1],
-+                       115200, serial_hds[0], DEVICE_NATIVE_ENDIAN);
-+    }
- }
- 
- static void aw_a10_class_init(ObjectClass *oc, void *data)
-@@ -118,6 +120,8 @@ static void aw_a10_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
- 
-     dc->realize = aw_a10_realize;
-+    /* Reason: Needs to be wired up in code, see cubieboard_init() */
-+    dc->user_creatable = false;
- }
- 
- static const TypeInfo aw_a10_type_info = {
--- 
-1.8.3.1
+        return mac_crc32_le(ether_addr);
+
+> 
+> using ETH_ALEN:
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+>>   }
+>>   #define CRC(crc, ch)     (crc = (crc >> 8) ^ crctab[(crc ^ (ch)) & 
+>> 0xff])
+> 
