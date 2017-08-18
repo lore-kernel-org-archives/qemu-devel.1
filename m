@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dieDM-00043L-Va
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:18 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dieDP-00046e-L3
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dieDL-0000cQ-Tm
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45332)
+	(envelope-from <imammedo@redhat.com>) id 1dieDO-0000hS-C9
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48720)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dieDL-0000aq-KA
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:15 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dieDO-0000ei-3M
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:18 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AB50B4ACA7
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:14 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1C6DD20274
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:17 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
 	(dell-r430-03.lab.eng.brq.redhat.com [10.34.112.60])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2F18F61297
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:14 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 933AF66D62
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:16 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 18 Aug 2017 12:08:42 +0200
-Message-Id: <1503050939-227939-11-git-send-email-imammedo@redhat.com>
+Date: Fri, 18 Aug 2017 12:08:45 +0200
+Message-Id: <1503050939-227939-14-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
 References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11 10/27] alpha: replace cpu_alpha_init()
- with cpu_generic_init()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH for-2.11 13/27] microblaze: replace
+ cpu_mb_init() with cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,100 +39,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-cpu_alpha_init() used to provide default fallback if invalid
-(i.e. non existent) cpu_model were provided.
-
-dp264 machine provides its own default so sole user of fallback
-is [bsd|linux]-user targets which specifies 'any' cpu model that
-fallbacks to "ev67" in cpu_alpha_init(). Push fallback handling
-into alpha_cpu_class_by_name() and replace cpu_alpha_init() with
-cpu_generic_init().
+cpu_mb_init() always falls back to TYPE_MICROBLAZE_CPU object
+regardless of cpu_model. Put fallback logic into
+mb_cpu_class_by_name() which would translate any cpu_model
+into TYPE_MICROBLAZE_CPU class and replace cpu_mb_init()
+with cpu_generic_init().
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: Richard Henderson <rth@twiddle.net>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
-PS:
-  tested only linux-user as I don't have bsd box to test on
----
- target/alpha/cpu.h |  4 +---
- hw/alpha/dp264.c   |  8 ++++++--
- target/alpha/cpu.c | 20 +++++---------------
- 3 files changed, 12 insertions(+), 20 deletions(-)
+ target/microblaze/cpu.h       |  3 +--
+ target/microblaze/cpu.c       |  6 ++++++
+ target/microblaze/translate.c | 11 -----------
+ 3 files changed, 7 insertions(+), 13 deletions(-)
 
-diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
-index e95be2b..0738e97 100644
---- a/target/alpha/cpu.h
-+++ b/target/alpha/cpu.h
-@@ -468,9 +468,7 @@ enum {
- 
- void alpha_translate_init(void);
- 
--AlphaCPU *cpu_alpha_init(const char *cpu_model);
--
--#define cpu_init(cpu_model) CPU(cpu_alpha_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_ALPHA_CPU, cpu_model)
- 
- void alpha_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+index 5ce4c82..52b6b6a 100644
+--- a/target/microblaze/cpu.h
++++ b/target/microblaze/cpu.h
+@@ -331,7 +331,6 @@ int mb_cpu_gdb_read_register(CPUState *cpu, uint8_t *=
+buf, int reg);
+ int mb_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+=20
+ void mb_tcg_init(void);
+-MicroBlazeCPU *cpu_mb_init(const char *cpu_model);
  /* you can call this signal handler from your SIGBUS and SIGSEGV
-diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-index 3b307ad..1c5a177 100644
---- a/hw/alpha/dp264.c
-+++ b/hw/alpha/dp264.c
-@@ -51,7 +51,7 @@ static int clipper_pci_map_irq(PCIDevice *d, int irq_num)
- static void clipper_init(MachineState *machine)
+    signal handlers to inform the virtual CPU of exceptions. non zero
+    is returned if the signal was handled by the virtual CPU.  */
+@@ -344,7 +343,7 @@ int cpu_mb_signal_handler(int host_signum, void *pinf=
+o,
+ #define TARGET_PHYS_ADDR_SPACE_BITS 32
+ #define TARGET_VIRT_ADDR_SPACE_BITS 32
+=20
+-#define cpu_init(cpu_model) CPU(cpu_mb_init(cpu_model))
++#define cpu_init(cpu_model) cpu_generic_init(TYPE_MICROBLAZE_CPU, cpu_mo=
+del)
+=20
+ #define cpu_signal_handler cpu_mb_signal_handler
+=20
+diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+index f85ff01..ddffe86 100644
+--- a/target/microblaze/cpu.c
++++ b/target/microblaze/cpu.c
+@@ -253,6 +253,11 @@ static Property mb_properties[] =3D {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
++static ObjectClass *mb_cpu_class_by_name(const char *cpu_model)
++{
++    return object_class_by_name(TYPE_MICROBLAZE_CPU);
++}
++
+ static void mb_cpu_class_init(ObjectClass *oc, void *data)
  {
-     ram_addr_t ram_size = machine->ram_size;
--    const char *cpu_model = machine->cpu_model;
-+    const char *cpu_model = machine->cpu_model ? machine->cpu_model : "ev67";
-     const char *kernel_filename = machine->kernel_filename;
-     const char *kernel_cmdline = machine->kernel_cmdline;
-     const char *initrd_filename = machine->initrd_filename;
-@@ -67,7 +67,11 @@ static void clipper_init(MachineState *machine)
-     /* Create up to 4 cpus.  */
-     memset(cpus, 0, sizeof(cpus));
-     for (i = 0; i < smp_cpus; ++i) {
--        cpus[i] = cpu_alpha_init(cpu_model ? cpu_model : "ev67");
-+        cpus[i] = ALPHA_CPU(cpu_generic_init(TYPE_ALPHA_CPU, cpu_model));
-+        if (!cpus[i]) {
-+            error_report("Unable to find CPU definition");
-+            exit(1);
-+        }
-     }
- 
-     cpus[0]->env.trap_arg0 = ram_size;
-diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
-index 76150f4..1ea597b 100644
---- a/target/alpha/cpu.c
-+++ b/target/alpha/cpu.c
-@@ -155,24 +155,14 @@ static ObjectClass *alpha_cpu_class_by_name(const char *cpu_model)
-     if (oc != NULL && object_class_is_abstract(oc)) {
-         oc = NULL;
-     }
--    return oc;
--}
--
--AlphaCPU *cpu_alpha_init(const char *cpu_model)
+     DeviceClass *dc =3D DEVICE_CLASS(oc);
+@@ -265,6 +270,7 @@ static void mb_cpu_class_init(ObjectClass *oc, void *=
+data)
+     mcc->parent_reset =3D cc->reset;
+     cc->reset =3D mb_cpu_reset;
+=20
++    cc->class_by_name =3D mb_cpu_class_by_name;
+     cc->has_work =3D mb_cpu_has_work;
+     cc->do_interrupt =3D mb_cpu_do_interrupt;
+     cc->cpu_exec_interrupt =3D mb_cpu_exec_interrupt;
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.=
+c
+index a24373c..83e2ef4 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -1845,17 +1845,6 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, fpri=
+ntf_function cpu_fprintf,
+     cpu_fprintf(f, "\n\n");
+ }
+=20
+-MicroBlazeCPU *cpu_mb_init(const char *cpu_model)
 -{
--    AlphaCPU *cpu;
--    ObjectClass *cpu_class;
- 
--    cpu_class = alpha_cpu_class_by_name(cpu_model);
--    if (cpu_class == NULL) {
--        /* Default to ev67; no reason not to emulate insns by default.  */
--        cpu_class = object_class_by_name(TYPE("ev67"));
-+    /* TODO: remove match everything nonsense */
-+    /* Default to ev67; no reason not to emulate insns by default. */
-+    if (!oc) {
-+        oc = object_class_by_name(TYPE("ev67"));
-     }
--    cpu = ALPHA_CPU(object_new(object_class_get_name(cpu_class)));
+-    MicroBlazeCPU *cpu;
+-
+-    cpu =3D MICROBLAZE_CPU(object_new(TYPE_MICROBLAZE_CPU));
 -
 -    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
- 
+-
 -    return cpu;
-+    return oc;
- }
- 
- static void ev4_cpu_initfn(Object *obj)
--- 
+-}
+-
+ void mb_tcg_init(void)
+ {
+     int i;
+--=20
 2.7.4
