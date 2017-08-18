@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1diUUx-0008DC-J5
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 19:46:48 -0400
+	(envelope-from <lersek@redhat.com>) id 1diUxg-0001PX-W7
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 20:16:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1diUUw-0006Pi-N3
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 19:46:47 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170817230114.3655-1-richard.henderson@linaro.org>
-	<20170817230114.3655-4-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9ceed03c-896b-a947-0736-3ee108bec7a3@amsat.org>
-Date: Thu, 17 Aug 2017 20:46:36 -0300
+	(envelope-from <lersek@redhat.com>) id 1diUxd-0002W0-QT
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 20:16:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50788)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1diUxd-0002To-GV
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 20:16:25 -0400
+From: Laszlo Ersek <lersek@redhat.com>
+References: <1501835795-92331-1-git-send-email-hare@suse.de>
+	<1501835795-92331-4-git-send-email-hare@suse.de>
+	<cecc5581-7013-f870-dbd7-da28ac80d2a4@redhat.com>
+	<347fe244-d544-0bfa-f7a6-0f87ea7a475b@redhat.com>
+Message-ID: <c2451b20-c457-dbca-340f-fed0a35e673a@redhat.com>
+Date: Fri, 18 Aug 2017 02:16:22 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170817230114.3655-4-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <347fe244-d544-0bfa-f7a6-0f87ea7a475b@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 3/8] tcg: Add types for host vectors
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv2 3/4] scsi: clarify sense codes for LUN0
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +31,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, alex.bennee@linaro.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Hannes Reinecke <hare@suse.de>
+Cc: Hannes Reinecke <hare@suse.com>, qemu-devel@nongnu.org
 
-On 08/17/2017 08:01 PM, Richard Henderson wrote:
-> Nothing uses or enables them yet.
+On 08/17/17 22:57, Laszlo Ersek wrote:
+> On 08/04/17 12:49, Paolo Bonzini wrote:
+>> On 04/08/2017 10:36, Hannes Reinecke wrote:
+>>> The LUN0 emulation is just that, an emulation for a non-existing
+>>> LUN0. So we should be returning LUN_NOT_SUPPORTED for any request
+>>> coming from any other LUN.
+>>> And we should be aborting unhandled commands with INVALID OPCODE,
+>>> not LUN NOT SUPPORTED.
+>>>
+>>> Signed-off-by: Hannes Reinecke <hare@suse.com>
+>>> ---
+>>>  hw/scsi/scsi-bus.c | 7 ++++++-
+>>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+>>> index 8419c75..79a222f 100644
+>>> --- a/hw/scsi/scsi-bus.c
+>>> +++ b/hw/scsi/scsi-bus.c
+>>> @@ -583,6 +583,11 @@ static int32_t scsi_target_send_command(SCSIRequest *req, uint8_t *buf)
+>>>  {
+>>>      SCSITargetReq *r = DO_UPCAST(SCSITargetReq, req, req);
+>>>  
+>>> +    if (req->lun != 0) {
+>>> +        scsi_req_build_sense(req, SENSE_CODE(LUN_NOT_SUPPORTED));
+>>> +        scsi_req_complete(req, CHECK_CONDITION);
+>>> +        return 0;
+>>> +    }
+>>>      switch (buf[0]) {
+>>>      case REPORT_LUNS:
+>>>          if (!scsi_target_emulate_report_luns(r)) {
+>>> @@ -613,7 +618,7 @@ static int32_t scsi_target_send_command(SCSIRequest *req, uint8_t *buf)
+>>>      case TEST_UNIT_READY:
+>>>          break;
+>>>      default:
+>>> -        scsi_req_build_sense(req, SENSE_CODE(LUN_NOT_SUPPORTED));
+>>> +        scsi_req_build_sense(req, SENSE_CODE(INVALID_OPCODE));
+>>>          scsi_req_complete(req, CHECK_CONDITION);
+>>>          return 0;
+>>>      illegal_request:
+>>>
+>>
+>> I am queuing this one since it's an independent bugfix.
 > 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> This patch (ded6ddc5a7b9, "scsi: clarify sense codes for LUN0
+> emulation", 2017-08-04) seems to confuse the media detection in edk2's
+> "MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDisk.c".
+> 
+> Namely, when it enumerates the {targets}x{LUNs} matrix on the
+> virtio-scsi HBA, it now reports the following message, for each
+> (target,LUN) pair to which no actual SCSI device (like disk or CD-ROM)
+> is assigned on the command line:
+> 
+> ScsiDisk: Sense Key = 0x5 ASC = 0x25!
+> 
+> Unfortunately, this is not all that happens -- the ScsiDiskDxe driver
+> even installs a BlockIo protocol instance on the handle (again, there is
+> no media, and no actual SCSI device), on which further protocols are
+> stacked, such as BlockIo2:
+> 
+> ScsiDisk: Sense Key = 0x5 ASC = 0x25!
+> InstallProtocolInterface: [EfiBlockIoProtocol] 13A59A3A8
+> InstallProtocolInterface: [EfiBlockIo2Protocol] 13A59A3D8
+> InstallProtocolInterface: [EfiDiskInfoProtocol] 13A59A4D0
+> 
+> In turn, in BDS, UEFI boot options are auto-generated for these devices,
+> which is not nice, given that this procedure in BDS is very
+> pflash-intensive, and pflash access is remarkably slow on aarch64 KVM.
+> 
+> For example, if I use one virtio-scsi HBA, and put a CD-ROM on target 0,
+> LUN 0, and a disk on target 1, LUN 0, then edk2 will create protocol
+> interfaces, and matching boot options, for
+> 
+>   2 targets * 7 LUNs/target = 14 LUNs
+> 
+> of which only 2 make sense.
+> 
+> 
+> If I revert the patch (on top of v2.10.0-rc3), then everything works as
+> before -- BlockIo protocol instances are produced only for actual
+> devices (with media).
+> 
+> I guess the path forward is to fix the ScsiDiskDxe driver in edk2; the
+> new ASC should be recognized.
+> 
+> My question is, how *exactly* did this patch change the reported sense
+> key and ASC? That is, what did they use to be *before*? INVALID_OPCODE?
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+I found the bug in edk2. It's a missing error check. I'll send a patch
+and CC you guys.
 
-> ---
->   tcg/tcg.h | 5 +++++
->   tcg/tcg.c | 2 +-
->   2 files changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tcg/tcg.h b/tcg/tcg.h
-> index dd97095af5..1277caed3d 100644
-> --- a/tcg/tcg.h
-> +++ b/tcg/tcg.h
-> @@ -256,6 +256,11 @@ typedef struct TCGPool {
->   typedef enum TCGType {
->       TCG_TYPE_I32,
->       TCG_TYPE_I64,
-> +
-> +    TCG_TYPE_V64,
-> +    TCG_TYPE_V128,
-> +    TCG_TYPE_V256,
-> +
->       TCG_TYPE_COUNT, /* number of different types */
->   
->       /* An alias for the size of the host register.  */
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index 787c8ba0f7..ea78d47fad 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -118,7 +118,7 @@ static TCGReg tcg_reg_alloc_new(TCGContext *s, TCGType t)
->   static bool tcg_out_ldst_finalize(TCGContext *s);
->   #endif
->   
-> -static TCGRegSet tcg_target_available_regs[2];
-> +static TCGRegSet tcg_target_available_regs[TCG_TYPE_COUNT];
->   static TCGRegSet tcg_target_call_clobber_regs;
->   
->   #if TCG_TARGET_INSN_UNIT_SIZE == 1
-> 
+Thanks
+Laszlo
