@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <asegundo@redhat.com>) id 1diiay-0003ek-9c
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:49:57 -0400
+	(envelope-from <david@redhat.com>) id 1diici-0004v4-PR
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:51:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <asegundo@redhat.com>) id 1diiav-0006X1-5v
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:49:56 -0400
-Received: from mail-it0-f44.google.com ([209.85.214.44]:36728)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <asegundo@redhat.com>) id 1diiau-0006Wp-VJ
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:49:53 -0400
-Received: by mail-it0-f44.google.com with SMTP id 77so8027533itj.1
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 07:49:52 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1diicf-0008I0-Nr
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:51:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41462)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1diicf-0008HT-Ha
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:51:41 -0400
+References: <20170818114844.30061-1-cohuck@redhat.com>
+	<20170818114844.30061-3-cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <5d2c55c3-6d24-5098-7c06-130901069559@redhat.com>
+Date: Fri, 18 Aug 2017 16:51:37 +0200
 MIME-Version: 1.0
-In-Reply-To: <87k2210ybh.fsf@dusky.pond.sub.org>
-References: <20170731085110.1050-1-apahim@redhat.com>
-	<20170731085110.1050-8-apahim@redhat.com>
-	<878tilryx4.fsf@dusky.pond.sub.org>
-	<CALAZnb1naw=TtrsDaBw3ehESCp7ET42DUuc=cSTQTXpsKsvoyw@mail.gmail.com>
-	<87k2210ybh.fsf@dusky.pond.sub.org>
-From: Amador Pahim <apahim@redhat.com>
-Date: Fri, 18 Aug 2017 16:49:51 +0200
-Message-ID: <CALAZnb26B0v9murz-fSuhoXxy2DwHjvUcRT+EJpEP9ER+_O6gg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v6 7/7] qemu.py: include debug information
- on launch error
+In-Reply-To: <20170818114844.30061-3-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] watchdog/wdt_diag288: Mark diag288
+ watchdog as non-hotpluggable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,165 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, thuth@redhat.com, agraf@suse.de, rth@twiddle.net
 
-On Fri, Aug 18, 2017 at 4:01 PM, Markus Armbruster <armbru@redhat.com> wrote:
-> Amador Pahim <apahim@redhat.com> writes:
->
->> On Tue, Aug 15, 2017 at 10:57 AM, Markus Armbruster <armbru@redhat.com> wrote:
->>> Amador Pahim <apahim@redhat.com> writes:
->>>
->>>> When launching a VM, if an exception happens and the VM is not
->>>> initiated, it is useful to see the qemu command line that was executed
->>>> and the output of that command.
->>>>
->>>> Before this patch:
->>>>
->>>>     >>> import qemu
->>>>     >>> vm = qemu.QEMUMachine('qemu-system-aarch64', debug=True)
->>>>     >>> vm.launch()
->>>>     Traceback (most recent call last):
->>>>       File "<stdin>", line 1, in <module>
->>>>       File "qemu.py", line 175, in launch
->>>>         self._launch()
->>>>       File "qemu.py", line 189, in _launch
->>>>         self._post_launch()
->>>>       File "qemu.py", line 154, in _post_launch
->>>>         self._qmp.accept()
->>>>       File "qmp/qmp.py", line 145, in accept
->>>>         self.__sock, _ = self.__sock.accept()
->>>>       File "/usr/lib64/python2.7/socket.py", line 206, in accept
->>>>         sock, addr = self._sock.accept()
->>>>     socket.timeout: timed out
->>>>     >>>
->>>>
->>>> After this patch:
->>>>
->>>>     >>> import qemu
->>>>     >>> vm = qemu.QEMUMachine('qemu-system-aarch64', debug=True)
->>>>     >>> vm.launch()
->>>>     DEBUG:qemu:Error launching VM. Command: 'qemu-system-aarch64
->>>>     -chardev socket,id=mon,path=/var/tmp/qemu-5298-monitor.sock
->>>>     -mon chardev=mon,mode=control -display none -vga none'.
->>>>     Output: 'qemu-system-aarch64: No machine specified, and there
->>>>     is no default\nUse -machine help to list supported machines\n'.
->>>>     Traceback (most recent call last):
->>>>       File "<stdin>", line 1, in <module>
->>>>       File "qemu.py", line 175, in launch
->>>>         self._launch()
->>>>       File "qemu.py", line 189, in _launch
->>>>         self._post_launch()
->>>>       File "qemu.py", line 154, in _post_launch
->>>>         self._qmp.accept()
->>>>       File "qmp/qmp.py", line 145, in accept
->>>>         self.__sock, _ = self.__sock.accept()
->>>>       File "/usr/lib64/python2.7/socket.py", line 206, in accept
->>>>         sock, addr = self._sock.accept()
->>>>     socket.timeout: timed out
->>>>     >>>
->>>>
->>>> Signed-off-by: Amador Pahim <apahim@redhat.com>
->>>> ---
->>>>  scripts/qemu.py | 12 +++++++++++-
->>>>  1 file changed, 11 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/scripts/qemu.py b/scripts/qemu.py
->>>> index e9a3a96d13..43fd0b072c 100644
->>>> --- a/scripts/qemu.py
->>>> +++ b/scripts/qemu.py
->>>> @@ -158,7 +158,10 @@ class QEMUMachine(object):
->>>>              self._remove_if_exists(self._created_files.pop())
->>>>
->>>>      def launch(self):
->>>> -        '''Launch the VM and establish a QMP connection'''
->>>> +        '''
->>>> +        Try to launch the VM and make sure we cleanup and expose the
->>>> +        command line/output in case of exception.
->>>> +        '''
->>>>
->>>>          if self.is_running():
->>>>              raise QEMULaunchError('VM already running.')
->>>> @@ -169,6 +172,7 @@ class QEMUMachine(object):
->>>>                                    'before launching again.')
->>>>
->>>>          try:
->>>> +            self._iolog = None
->>>>              self._qemu_full_args = None
->>>>              self._qemu_full_args = (self._wrapper + [self._binary] +
->>>>                                      self._base_args() + self._args)
->>>> @@ -176,9 +180,15 @@ class QEMUMachine(object):
->>>>              self._pending_shutdown = True
->>>>          except:
->>>>              self.shutdown()
->>>> +            LOG.debug('Error launching VM.%s%s',
->>>> +                      ' Command: %r.' % ' '.join(self._qemu_full_args)
->>>> +                      if self._qemu_full_args else '',
->>>> +                      ' Output: %r.' % self._iolog
->>>> +                      if self._iolog else '')
->>>
->>> This nested interpolation is too ugly to live :)
->>
->> I find it beautiful :)
->> Killing it anyway.
->>
->>>
->>> Nesting is easy to avoid:
->>>
->>>                LOG.debug('Error launching VM\n. ' Command: %r. Output: %r.'
->>>                          % (' '.join(self._qemu_full_args)
->>>                             if self._qemu_full_args else '',
->>>                             self._iolog
->>>                             if self._iolog else ''))
->>
->> In this case we will have the strings "Command: " and "Output:" even
->> with no content to expose.
->
-> No command should not happen.
+On 18.08.2017 13:48, Cornelia Huck wrote:
+> From: Thomas Huth <thuth@redhat.com>
+> 
+> QEMU currently aborts when the user tries to hot-unplug a diag288
+> device:
+> 
+> $ qemu-system-s390x -nographic -nodefaults -S -monitor stdio
+> QEMU 2.9.92 monitor - type 'help' for more information
+> (qemu) device_add diag288,id=x
+> (qemu) device_del x
+> **
+> ERROR:qemu/qdev-monitor.c:872:qdev_unplug: assertion failed: (hotplug_ctrl)
+> Aborted (core dumped)
+> 
+> The device is not designed as hot-pluggable (it should only be used
+> via the "-watchdog" parameter), so let's simply remove the possibility
+> to hotplug it to prevent that users can run into this ugly situation.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Message-Id: <1502892528-22618-1-git-send-email-thuth@redhat.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  hw/watchdog/wdt_diag288.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/watchdog/wdt_diag288.c b/hw/watchdog/wdt_diag288.c
+> index a7b64e2c40..47f289216a 100644
+> --- a/hw/watchdog/wdt_diag288.c
+> +++ b/hw/watchdog/wdt_diag288.c
+> @@ -121,6 +121,7 @@ static void wdt_diag288_class_init(ObjectClass *klass, void *data)
+>      dc->realize = wdt_diag288_realize;
+>      dc->unrealize = wdt_diag288_unrealize;
+>      dc->reset = wdt_diag288_reset;
+> +    dc->hotpluggable = false;
+>      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+>      dc->vmsd = &vmstate_diag288;
+>      diag288->handle_timer = wdt_diag288_handle_timer;
+> 
 
-It can happen, if we fail before the self._qemu_full_args become ready
-(i.e. if self._base_args() fails).
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
->
-> No output would be bad news.  Making that explicit in the logs feels
-> right to me.
+-- 
 
-Same here. But even more likely to happen, as one exception either
-pre_launch() or launch() can trigger this message without an output.
-But if that's your preference, I don't really mind having:
-INFO:qemu:Error launching VM. Command: ''. Output: ''.
+Thanks,
 
-
->
->>> Why %r and not %s?
->>
->> It's a matter of preference. I tend to avoid allowing messages to
->> break the log line. Anyway, I'm improving this.
->
-> That's a really good point.  I'd go as far and call %s wrong now :)
->
-> Output could be arbitrarily long, though.
-
-Hard to say what's a sane limit. I'd prefer to log it all and let the
-scripts tweak that using the logging.Formatter, if they want to.
-
->
->>> Are you sure '\n' is appropriate in the argument of LOG.debug()?
->>>
->>> Why cram everything into a single LOG.debug()?
->>>
->>>                LOG.debug('Error launching VM')
->>>                LOG.debug('Command: %s' % (' '.join(self._qemu_full_args)
->>>                                           if self._qemu_full_args else ''))
->>>                LOG.debug('Output: %s' % self._iolog if self._iolog else ''))
->>
->> Sure, I'm ok with both ways.
->>
->>>
->>>>              raise
->>>>
->>>>      def _launch(self):
->>>> +        '''Launch the VM and establish a QMP connection.'''
->>>>          self._pre_launch()
->>>>          devnull = open(os.path.devnull, 'rb')
->>>>          self._popen = subprocess.Popen(self._qemu_full_args,
+David
