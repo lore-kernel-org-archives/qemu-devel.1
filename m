@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dikXN-0004aw-SO
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:54:22 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dikaT-0007BL-IV
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:57:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dikXK-0004Ks-R3
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:54:21 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:36152)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dikXK-0004Kk-Lz
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:54:18 -0400
-Received: by mail-qt0-x242.google.com with SMTP id c15so9421966qta.3
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 09:54:18 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1503065708-28277-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1503065708-28277-3-git-send-email-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9a59c21e-bc3f-10a1-fa3c-7d25231791af@amsat.org>
-Date: Fri, 18 Aug 2017 13:54:15 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1dikaS-0005Wn-UB
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:57:33 -0400
+Date: Fri, 18 Aug 2017 13:57:16 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170818165716.GB3108@localhost.localdomain>
+References: <20170814215748.5158-1-ehabkost@redhat.com>
+	<20170814215748.5158-9-ehabkost@redhat.com>
+	<7327f3f6-16fb-e9c6-4f2a-eed6144f2282@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1503065708-28277-3-git-send-email-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/4] net: introduce net_crc32_le() function
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7327f3f6-16fb-e9c6-4f2a-eed6144f2282@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v4 08/13] ide: enumerate_slots implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,66 +24,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, jasowang@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Laine Stump <laine@redhat.com>, qemu-block@nongnu.org
 
-On 08/18/2017 11:15 AM, Mark Cave-Ayland wrote:
-> This provides a standard ethernet CRC32 little-endian implementation.
+On Wed, Aug 16, 2017 at 05:46:18PM -0400, John Snow wrote:
 > 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->   include/net/net.h |    2 ++
->   net/net.c         |   22 ++++++++++++++++++++++
->   2 files changed, 24 insertions(+)
 > 
-> diff --git a/include/net/net.h b/include/net/net.h
-> index 586098c..4afac1a 100644
-> --- a/include/net/net.h
-> +++ b/include/net/net.h
-> @@ -228,7 +228,9 @@ NetClientState *net_hub_port_find(int hub_id);
->   void qdev_set_nic_properties(DeviceState *dev, NICInfo *nd);
->   
->   #define POLYNOMIAL_BE 0x04c11db6
-> +#define POLYNOMIAL_LE 0xedb88320
->   uint32_t net_crc32(const uint8_t *p, int len);
-> +uint32_t net_crc32_le(const uint8_t *p, int len);
+> On 08/14/2017 05:57 PM, Eduardo Habkost wrote:
+> > Example output when using "-machine q35":
+> > 
+> >   {
+> >     "available": true,
+> >     "count": 1,
+> >     "device-types": [
+> >       "ide-device"
+> >     ],
+> >     "hotpluggable": false,
+> >     "opts": [
+> >       { "option": "unit", "values": 0 },
+> >       { "option": "bus", "values": "ide.2" }
+> >     ],
+> >     "opts-complete": true
+> >   }
+> >   {
+> >     "available": false,
+> >     "count": 1,
+> >     "device": "/machine/unattached/device[19]",
+> >     "device-types": [
+> >       "ide-device"
+> >     ],
+> >     "hotpluggable": false,
+> >     "opts": [
+> >       { "option": "unit", "values": 1 },
+> >       { "option": "bus", "values": "ide.2" } ],
+> >     "opts-complete": true
+> >   }
+> >   {
+> >     "available": true,
+> >     "count": 10,
+> >     "device-types": [
+> >       "ide-device"
+> >     ],
+> >     "hotpluggable": false,
+> >     "opts": [
+> >       { "option": "unit", "values": [ [ 0, 1 ] ] },
+> 
+> Hm, these unit values aren't really correct -- we do not support
+> primary/secondary semantics for IDE buses on the AHCI device. I guess
+> they technically exist, but you cannot use them for anything.
+> 
+> Should I do something to "disable" or otherwise hide the unusable
+> secondary unit slots for AHCI devices?
 
-same here, with size_t len:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+If the device is already rejecting -device ...,unit=1, then the
+bug is in my implementation of enumerate_devices.  Maybe it
+should just look at IDEBus::max_units to find that out?
 
->   unsigned compute_mcast_idx(const uint8_t *ep);
->   
->   #define vmstate_offset_macaddr(_state, _field)                       \
-> diff --git a/net/net.c b/net/net.c
-> index a856907..c99e705 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -1590,6 +1590,28 @@ uint32_t net_crc32(const uint8_t *p, int len)
->       return crc;
->   }
->   
-> +uint32_t net_crc32_le(const uint8_t *p, int len)
-> +{
-> +    uint32_t crc;
-> +    int carry, i, j;
-> +    uint8_t b;
-> +
-> +    crc = 0xffffffff;
-> +    for (i = 0; i < len; i++) {
-> +        b = *p++;
-> +        for (j = 0; j < 8; j++) {
-> +            carry = (crc & 0x1) ^ (b & 0x01);
-> +            crc >>= 1;
-> +            b >>= 1;
-> +            if (carry) {
-> +                crc = crc ^ POLYNOMIAL_LE;
-> +            }
-> +        }
-> +    }
-> +
-> +    return crc;
-> +}
-> +
->   unsigned compute_mcast_idx(const uint8_t *ep)
->   {
->       return net_crc32(ep, 6) >> 26;
-> 
+-- 
+Eduardo
