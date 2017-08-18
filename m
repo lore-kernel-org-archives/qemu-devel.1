@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dikUZ-0002Zo-4G
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:51:28 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dikWf-00043e-GI
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:53:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dikUW-00032E-1m
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:51:27 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33261)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dikUV-00031o-TL
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:51:23 -0400
-Received: by mail-qk0-x244.google.com with SMTP id o124so5590622qke.0
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 09:51:22 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1503065708-28277-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1503065708-28277-2-git-send-email-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <66172cef-cd84-4d0f-dee3-fdfa7b4144eb@amsat.org>
-Date: Fri, 18 Aug 2017 13:51:18 -0300
+	(envelope-from <pbonzini@redhat.com>) id 1dikWc-00048t-FI
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:53:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59674)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dikWc-00048f-8S
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:53:34 -0400
+References: <1502842933-8323-1-git-send-email-tianyu.lan@intel.com>
+	<34042934-782b-6bcc-b9b2-de7a1816cfb7@redhat.com>
+	<3ababa62-f055-5bbb-b9b9-c55ada8368dd@intel.com>
+	<20170818163854.GY3108@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d02e9f04-2487-1a02-4453-5e604b0f3f2b@redhat.com>
+Date: Fri, 18 Aug 2017 18:53:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <1503065708-28277-2-git-send-email-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170818163854.GY3108@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] net: move CRC32 calculation from
- compute_mcast_idx() into its own net_crc32() function
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] x86: Skip check apic_id_limit for Xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,83 +30,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, jasowang@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>, Lan Tianyu <tianyu.lan@intel.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, rth@twiddle.net, anthony.perard@citrix.com, xen-devel@lists.xenproject.org
 
-On 08/18/2017 11:15 AM, Mark Cave-Ayland wrote:
-> Separate out the standard ethernet CRC32 calculation into a new net_crc32()
-> function, renaming the constant POLYNOMIAL to POLYNOMIAL_BE to make it clear
-> that this is a big-endian CRC32 calculation.
-> 
-> Then remove the existing implementation from compute_mcast_idx() and call the
-> new function in its place.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->   include/net/net.h |    3 ++-
->   net/net.c         |   16 +++++++++++-----
->   2 files changed, 13 insertions(+), 6 deletions(-)
-> 
-> diff --git a/include/net/net.h b/include/net/net.h
-> index 1c55a93..586098c 100644
-> --- a/include/net/net.h
-> +++ b/include/net/net.h
-> @@ -227,7 +227,8 @@ NetClientState *net_hub_port_find(int hub_id);
->   
->   void qdev_set_nic_properties(DeviceState *dev, NICInfo *nd);
->   
-> -#define POLYNOMIAL 0x04c11db6
-> +#define POLYNOMIAL_BE 0x04c11db6
-> +uint32_t net_crc32(const uint8_t *p, int len);
->   unsigned compute_mcast_idx(const uint8_t *ep);
->   
->   #define vmstate_offset_macaddr(_state, _field)                       \
-> diff --git a/net/net.c b/net/net.c
-> index 0e28099..a856907 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -1568,25 +1568,31 @@ int net_client_parse(QemuOptsList *opts_list, const char *optarg)
->   
->   /* From FreeBSD */
->   /* XXX: optimize */
-> -unsigned compute_mcast_idx(const uint8_t *ep)
-> +uint32_t net_crc32(const uint8_t *p, int len)
+On 18/08/2017 18:38, Eduardo Habkost wrote:
+>>> I think you still need to do a check for vIOMMU being enabled.
+>>
+>> Yes, this will be done in the Xen tool stack and Qemu doesn't have such
+>> knowledge. Operations of create, destroy Xen vIOMMU will be done in the
+>> Xen tool stack.
+>
+> Shouldn't we make QEMU have knowledge of the vIOMMU device, then?
+> Won't QEMU need to know about it eventually?
 
-imho there is no point in using signed length.
+No, it actually makes sense since Xen hosts all system-wide interrupt
+sources outside QEMU, unlike KVM which only hosts the (per-CPU) local APIC.
 
->   {
->       uint32_t crc;
->       int carry, i, j;
->       uint8_t b;
->   
->       crc = 0xffffffff;
-> -    for (i = 0; i < 6; i++) {
-> -        b = *ep++;
-> +    for (i = 0; i < len; i++) {
-> +        b = *p++;
->           for (j = 0; j < 8; j++) {
->               carry = ((crc & 0x80000000L) ? 1 : 0) ^ (b & 0x01);
->               crc <<= 1;
->               b >>= 1;
->               if (carry) {
-> -                crc = ((crc ^ POLYNOMIAL) | carry);
-> +                crc = ((crc ^ POLYNOMIAL_BE) | carry);
->               }
->           }
->       }
-> -    return crc >> 26;
-> +
-> +    return crc;
-> +}
-> +
-> +unsigned compute_mcast_idx(const uint8_t *ep)
-> +{
-> +    return net_crc32(ep, 6) >> 26;
-
-while here let's use ETH_ALEN
-
->   }
->   
->   QemuOptsList qemu_netdev_opts = {
-> 
-with "uint32_t net_crc32(const uint8_t *p, size_t len);":
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Paolo
