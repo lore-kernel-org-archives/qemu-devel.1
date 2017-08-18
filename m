@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1diXgz-0000vW-GM
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 23:11:27 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1diXh0-0000va-4B
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 23:11:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1diXgx-0000Eg-Mm
-	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 23:11:25 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1diXgy-0000Eq-4j
+	for qemu-devel@nongnu.org; Thu, 17 Aug 2017 23:11:26 -0400
 From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Fri, 18 Aug 2017 06:10:15 +0300
-Message-Id: <20170818031019.3723-3-el13635@mail.ntua.gr>
+Date: Fri, 18 Aug 2017 06:10:18 +0300
+Message-Id: <20170818031019.3723-6-el13635@mail.ntua.gr>
 In-Reply-To: <20170818031019.3723-1-el13635@mail.ntua.gr>
 References: <20170818031019.3723-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH v5 2/6] block: add aio_context field in
- ThrottleGroupMember
+Subject: [Qemu-devel] [PATCH v5 5/6] block: add throttle block filter driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,358 +22,426 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel <qemu-devel@nongnu.org>
 Cc: qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-timer_cb() needs to know about the current Aio context of the throttle
-request that is woken up. In order to make ThrottleGroupMember backend
-agnostic, this information is stored in an aio_context field instead of
-accessing it from BlockBackend.
+block/throttle.c uses existing I/O throttle infrastructure inside a
+block filter driver. I/O operations are intercepted in the filter's
+read/write coroutines, and referred to block/throttle-groups.c
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+The driver can be used with the syntax
+-drive driver=throttle,file.filename=foo.qcow2, \
+        limits.iops-total=...,throttle-group=bar
+
+The configuration flags and their semantics are identical to the
+hardcoded throttling ones.
+
+A node can be created referring to an existing group, and will overwrite
+its limits if any are specified, otherwise they are retained.
+
 Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 ---
- include/block/throttle-groups.h |  7 ++++-
- block/block-backend.c           | 15 ++++------
- block/throttle-groups.c         | 38 ++++++++++++++++---------
- tests/test-throttle.c           | 63 +++++++++++++++++++++--------------------
- 4 files changed, 69 insertions(+), 54 deletions(-)
+ qapi/block-core.json            |  22 ++-
+ include/qemu/throttle-options.h |   1 +
+ block/throttle.c                | 314 ++++++++++++++++++++++++++++++++++++++++
+ block/Makefile.objs             |   1 +
+ 4 files changed, 337 insertions(+), 1 deletion(-)
+ create mode 100644 block/throttle.c
 
-diff --git a/include/block/throttle-groups.h b/include/block/throttle-groups.h
-index 1a6bcdae74..a0f27cac63 100644
---- a/include/block/throttle-groups.h
-+++ b/include/block/throttle-groups.h
-@@ -33,6 +33,7 @@
-  */
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 0bdc69aa5f..12fd749a94 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2222,6 +2222,7 @@
+ # Drivers that are supported in block device operations.
+ #
+ # @vxhs: Since 2.10
++# @throttle: Since 2.11
+ #
+ # Since: 2.9
+ ##
+@@ -2231,7 +2232,7 @@
+             'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
+             'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed',
+             'quorum', 'raw', 'rbd', 'replication', 'sheepdog', 'ssh',
+-            'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
++            'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
  
- typedef struct ThrottleGroupMember {
-+    AioContext   *aio_context;
-     /* throttled_reqs_lock protects the CoQueues for throttled requests.  */
-     CoMutex      throttled_reqs_lock;
-     CoQueue      throttled_reqs[2];
-@@ -61,12 +62,16 @@ void throttle_group_config(ThrottleGroupMember *tgm, ThrottleConfig *cfg);
- void throttle_group_get_config(ThrottleGroupMember *tgm, ThrottleConfig *cfg);
+ ##
+ # @BlockdevOptionsFile:
+@@ -3095,6 +3096,24 @@
+             '*tls-creds': 'str' } }
  
- void throttle_group_register_tgm(ThrottleGroupMember *tgm,
--                                const char *groupname);
-+                                const char *groupname,
-+                                AioContext *ctx);
- void throttle_group_unregister_tgm(ThrottleGroupMember *tgm);
- void throttle_group_restart_tgm(ThrottleGroupMember *tgm);
+ ##
++# @BlockdevOptionsThrottle:
++#
++# Driver specific block device options for the throttle driver
++#
++# @throttle-group:   the name of the throttle-group object to use. It will be
++#                    created if it doesn't already exist. If not specified, an
++#                    anonymous group will be created, which cannot be
++#                    referenced by other throttle nodes.
++# @file:             reference to or definition of the data source block device
++# @limits:           ThrottleLimits options
++# Since: 2.11
++##
++{ 'struct': 'BlockdevOptionsThrottle',
++  'data': { '*throttle-group': 'str',
++            'file' : 'BlockdevRef',
++            '*limits' : 'ThrottleLimits'
++             } }
++##
+ # @BlockdevOptions:
+ #
+ # Options for creating a block device.  Many options are available for all
+@@ -3155,6 +3174,7 @@
+       'replication':'BlockdevOptionsReplication',
+       'sheepdog':   'BlockdevOptionsSheepdog',
+       'ssh':        'BlockdevOptionsSsh',
++      'throttle':   'BlockdevOptionsThrottle',
+       'vdi':        'BlockdevOptionsGenericFormat',
+       'vhdx':       'BlockdevOptionsGenericFormat',
+       'vmdk':       'BlockdevOptionsGenericCOWFormat',
+diff --git a/include/qemu/throttle-options.h b/include/qemu/throttle-options.h
+index 182b7896e1..3528a8f4a2 100644
+--- a/include/qemu/throttle-options.h
++++ b/include/qemu/throttle-options.h
+@@ -29,6 +29,7 @@
+ #define QEMU_OPT_BPS_WRITE_MAX "bps-write-max"
+ #define QEMU_OPT_BPS_WRITE_MAX_LENGTH "bps-write-max-length"
+ #define QEMU_OPT_IOPS_SIZE "iops-size"
++#define QEMU_OPT_THROTTLE_GROUP_NAME "throttle-group"
  
- void coroutine_fn throttle_group_co_io_limits_intercept(ThrottleGroupMember *tgm,
-                                                         unsigned int bytes,
-                                                         bool is_write);
-+void throttle_group_attach_aio_context(ThrottleGroupMember *tgm,
-+                                       AioContext *new_context);
-+void throttle_group_detach_aio_context(ThrottleGroupMember *tgm);
- 
- #endif
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 7b981e00bb..9ba800e733 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -1726,18 +1726,14 @@ static AioContext *blk_aiocb_get_aio_context(BlockAIOCB *acb)
- void blk_set_aio_context(BlockBackend *blk, AioContext *new_context)
- {
-     BlockDriverState *bs = blk_bs(blk);
--    ThrottleTimers *tt;
-+    ThrottleGroupMember *tgm = &blk->public.throttle_group_member;
- 
-     if (bs) {
--        if (blk->public.throttle_group_member.throttle_state) {
--            tt = &blk->public.throttle_group_member.throttle_timers;
--            throttle_timers_detach_aio_context(tt);
-+        if (tgm->throttle_state) {
-+            throttle_group_detach_aio_context(tgm);
-+            throttle_group_attach_aio_context(tgm, new_context);
-         }
-         bdrv_set_aio_context(bs, new_context);
--        if (blk->public.throttle_group_member.throttle_state) {
--            tt = &blk->public.throttle_group_member.throttle_timers;
--            throttle_timers_attach_aio_context(tt, new_context);
--        }
-     }
- }
- 
-@@ -1970,7 +1966,8 @@ void blk_io_limits_disable(BlockBackend *blk)
- void blk_io_limits_enable(BlockBackend *blk, const char *group)
- {
-     assert(!blk->public.throttle_group_member.throttle_state);
--    throttle_group_register_tgm(&blk->public.throttle_group_member, group);
-+    throttle_group_register_tgm(&blk->public.throttle_group_member,
-+                                group, blk_get_aio_context(blk));
- }
- 
- void blk_io_limits_update_group(BlockBackend *blk, const char *group)
-diff --git a/block/throttle-groups.c b/block/throttle-groups.c
-index c8ed16ddf8..3b07b25f39 100644
---- a/block/throttle-groups.c
-+++ b/block/throttle-groups.c
-@@ -391,9 +391,6 @@ static void coroutine_fn throttle_group_restart_queue_entry(void *opaque)
- 
- static void throttle_group_restart_queue(ThrottleGroupMember *tgm, bool is_write)
- {
--    BlockBackendPublic *blkp = container_of(tgm, BlockBackendPublic,
--            throttle_group_member);
--    BlockBackend *blk = blk_by_public(blkp);
-     Coroutine *co;
-     RestartData rd = {
-         .tgm = tgm,
-@@ -401,7 +398,7 @@ static void throttle_group_restart_queue(ThrottleGroupMember *tgm, bool is_write
-     };
- 
-     co = qemu_coroutine_create(throttle_group_restart_queue_entry, &rd);
--    aio_co_enter(blk_get_aio_context(blk), co);
-+    aio_co_enter(tgm->aio_context, co);
- }
- 
- void throttle_group_restart_tgm(ThrottleGroupMember *tgm)
-@@ -449,13 +446,11 @@ void throttle_group_get_config(ThrottleGroupMember *tgm, ThrottleConfig *cfg)
- /* ThrottleTimers callback. This wakes up a request that was waiting
-  * because it had been throttled.
-  *
-- * @blk:       the BlockBackend whose request had been throttled
-+ * @tgm:       the ThrottleGroupMember whose request had been throttled
-  * @is_write:  the type of operation (read/write)
-  */
--static void timer_cb(BlockBackend *blk, bool is_write)
-+static void timer_cb(ThrottleGroupMember *tgm, bool is_write)
- {
--    BlockBackendPublic *blkp = blk_get_public(blk);
--    ThrottleGroupMember *tgm = &blkp->throttle_group_member;
-     ThrottleState *ts = tgm->throttle_state;
-     ThrottleGroup *tg = container_of(ts, ThrottleGroup, ts);
- 
-@@ -484,18 +479,18 @@ static void write_timer_cb(void *opaque)
-  *
-  * @tgm:       the ThrottleGroupMember to insert
-  * @groupname: the name of the group
-+ * @ctx:       the AioContext to use
-  */
- void throttle_group_register_tgm(ThrottleGroupMember *tgm,
--                                 const char *groupname)
-+                                 const char *groupname,
-+                                 AioContext *ctx)
- {
-     int i;
--    BlockBackendPublic *blkp = container_of(tgm, BlockBackendPublic,
--            throttle_group_member);
--    BlockBackend *blk = blk_by_public(blkp);
-     ThrottleState *ts = throttle_group_incref(groupname);
-     ThrottleGroup *tg = container_of(ts, ThrottleGroup, ts);
- 
-     tgm->throttle_state = ts;
-+    tgm->aio_context = ctx;
- 
-     qemu_mutex_lock(&tg->lock);
-     /* If the ThrottleGroup is new set this ThrottleGroupMember as the token */
-@@ -508,11 +503,11 @@ void throttle_group_register_tgm(ThrottleGroupMember *tgm,
-     QLIST_INSERT_HEAD(&tg->head, tgm, round_robin);
- 
-     throttle_timers_init(&tgm->throttle_timers,
--                         blk_get_aio_context(blk),
-+                         tgm->aio_context,
-                          tg->clock_type,
-                          read_timer_cb,
-                          write_timer_cb,
--                         blk);
-+                         tgm);
- 
-     qemu_mutex_unlock(&tg->lock);
- }
-@@ -559,6 +554,21 @@ void throttle_group_unregister_tgm(ThrottleGroupMember *tgm)
-     tgm->throttle_state = NULL;
- }
- 
-+void throttle_group_attach_aio_context(ThrottleGroupMember *tgm,
-+                                       AioContext *new_context)
+ #define THROTTLE_OPT_PREFIX "throttling."
+ #define THROTTLE_OPTS \
+diff --git a/block/throttle.c b/block/throttle.c
+new file mode 100644
+index 0000000000..6484c2ae2a
+--- /dev/null
++++ b/block/throttle.c
+@@ -0,0 +1,314 @@
++/*
++ * QEMU block throttling filter driver infrastructure
++ *
++ * Copyright (c) 2017 Manos Pitsidianakis
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 or
++ * (at your option) version 3 of the License.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "block/throttle-groups.h"
++#include "qemu/throttle-options.h"
++#include "qapi/error.h"
++
++#undef THROTTLE_OPT_PREFIX
++#define THROTTLE_OPT_PREFIX "limits."
++static QemuOptsList throttle_opts = {
++    .name = "throttle",
++    .head = QTAILQ_HEAD_INITIALIZER(throttle_opts.head),
++    .desc = {
++        THROTTLE_OPTS,
++        {
++            .name = QEMU_OPT_THROTTLE_GROUP_NAME,
++            .type = QEMU_OPT_STRING,
++            .help = "throttle group name",
++        },
++        { /* end of list */ }
++    },
++};
++
++/* Extract ThrottleConfig options. Assumes cfg is initialized and will be
++ * checked for validity.
++ *
++ * Returns -1 and sets errp if a burst_length value is over UINT_MAX.
++ */
++static int throttle_extract_options(QemuOpts *opts, ThrottleConfig *cfg,
++                                    Error **errp)
 +{
-+    ThrottleTimers *tt = &tgm->throttle_timers;
-+    throttle_timers_attach_aio_context(tt, new_context);
-+    tgm->aio_context = new_context;
++#define IF_OPT_SET(rvalue, opt_name) \
++    if (qemu_opt_get(opts, THROTTLE_OPT_PREFIX opt_name)) { \
++        rvalue = qemu_opt_get_number(opts, THROTTLE_OPT_PREFIX opt_name, 0); }
++
++    IF_OPT_SET(cfg->buckets[THROTTLE_BPS_TOTAL].avg, QEMU_OPT_BPS_TOTAL);
++    IF_OPT_SET(cfg->buckets[THROTTLE_BPS_READ].avg, QEMU_OPT_BPS_READ);
++    IF_OPT_SET(cfg->buckets[THROTTLE_BPS_WRITE].avg, QEMU_OPT_BPS_WRITE);
++    IF_OPT_SET(cfg->buckets[THROTTLE_OPS_TOTAL].avg, QEMU_OPT_IOPS_TOTAL);
++    IF_OPT_SET(cfg->buckets[THROTTLE_OPS_READ].avg, QEMU_OPT_IOPS_READ);
++    IF_OPT_SET(cfg->buckets[THROTTLE_OPS_WRITE].avg, QEMU_OPT_IOPS_WRITE);
++    IF_OPT_SET(cfg->buckets[THROTTLE_BPS_TOTAL].max, QEMU_OPT_BPS_TOTAL_MAX);
++    IF_OPT_SET(cfg->buckets[THROTTLE_BPS_READ].max, QEMU_OPT_BPS_READ_MAX);
++    IF_OPT_SET(cfg->buckets[THROTTLE_BPS_WRITE].max, QEMU_OPT_BPS_WRITE_MAX);
++    IF_OPT_SET(cfg->buckets[THROTTLE_OPS_TOTAL].max, QEMU_OPT_IOPS_TOTAL_MAX);
++    IF_OPT_SET(cfg->buckets[THROTTLE_OPS_READ].max, QEMU_OPT_IOPS_READ_MAX);
++    IF_OPT_SET(cfg->buckets[THROTTLE_OPS_WRITE].max, QEMU_OPT_IOPS_WRITE_MAX);
++    IF_OPT_SET(cfg->op_size, QEMU_OPT_IOPS_SIZE);
++
++#define IF_OPT_UINT_SET(rvalue, opt_name) \
++    if (qemu_opt_get(opts, THROTTLE_OPT_PREFIX opt_name)) { \
++        if (qemu_opt_get_number(opts,  \
++                    THROTTLE_OPT_PREFIX opt_name, 1) > UINT_MAX) { \
++            error_setg(errp, "%s value must be in the range [0, %u]", \
++                       THROTTLE_OPT_PREFIX opt_name, UINT_MAX); \
++            return -1; \
++        } \
++        rvalue = qemu_opt_get_number(opts, THROTTLE_OPT_PREFIX opt_name, 1); \
++    }
++
++    IF_OPT_UINT_SET(cfg->buckets[THROTTLE_BPS_TOTAL].burst_length,
++                    QEMU_OPT_BPS_TOTAL_MAX_LENGTH);
++    IF_OPT_UINT_SET(cfg->buckets[THROTTLE_BPS_READ].burst_length,
++                    QEMU_OPT_BPS_READ_MAX_LENGTH);
++    IF_OPT_UINT_SET(cfg->buckets[THROTTLE_BPS_WRITE].burst_length,
++                    QEMU_OPT_BPS_WRITE_MAX_LENGTH);
++    IF_OPT_UINT_SET(cfg->buckets[THROTTLE_OPS_TOTAL].burst_length,
++                    QEMU_OPT_IOPS_TOTAL_MAX_LENGTH);
++    IF_OPT_UINT_SET(cfg->buckets[THROTTLE_OPS_READ].burst_length,
++                    QEMU_OPT_IOPS_READ_MAX_LENGTH);
++    IF_OPT_UINT_SET(cfg->buckets[THROTTLE_OPS_WRITE].burst_length,
++                    QEMU_OPT_IOPS_WRITE_MAX_LENGTH);
++
++    return 0;
 +}
 +
-+void throttle_group_detach_aio_context(ThrottleGroupMember *tgm)
++static int throttle_configure_tgm(BlockDriverState *bs,
++                                  ThrottleGroupMember *tgm,
++                                  QDict *options, Error **errp)
 +{
-+    ThrottleTimers *tt = &tgm->throttle_timers;
-+    throttle_timers_detach_aio_context(tt);
-+    tgm->aio_context = NULL;
++    int ret;
++    ThrottleConfig cfg;
++    const char *group_name;
++    Error *local_err = NULL;
++    QemuOpts *opts = qemu_opts_create(&throttle_opts, NULL, 0, &error_abort);
++
++    qemu_opts_absorb_qdict(opts, options, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        ret = -EINVAL;
++        goto fin;
++    }
++
++    /* If group_name is NULL, an anonymous group will be created */
++    group_name = qemu_opt_get(opts, QEMU_OPT_THROTTLE_GROUP_NAME);
++
++    /* Register membership to group with name group_name */
++    throttle_group_register_tgm(tgm, group_name, bdrv_get_aio_context(bs));
++
++    /* Copy previous configuration */
++    throttle_group_get_config(tgm, &cfg);
++
++    /* Change limits if user has specified them */
++    if (throttle_extract_options(opts, &cfg, errp) ||
++        !throttle_is_valid(&cfg, errp)) {
++        throttle_group_unregister_tgm(tgm);
++        ret = -EINVAL;
++        goto fin;
++    }
++    /* Update group configuration */
++    throttle_group_config(tgm, &cfg);
++
++    ret = 0;
++fin:
++    qemu_opts_del(opts);
++    return ret;
 +}
 +
- static void throttle_groups_init(void)
- {
-     qemu_mutex_init(&throttle_groups_lock);
-diff --git a/tests/test-throttle.c b/tests/test-throttle.c
-index 6e6d926883..57cf5ba711 100644
---- a/tests/test-throttle.c
-+++ b/tests/test-throttle.c
-@@ -24,8 +24,9 @@
- static AioContext     *ctx;
- static LeakyBucket    bkt;
- static ThrottleConfig cfg;
-+static ThrottleGroupMember tgm;
- static ThrottleState  ts;
--static ThrottleTimers tt;
-+static ThrottleTimers *tt;
- 
- /* useful function */
- static bool double_cmp(double x, double y)
-@@ -153,19 +154,21 @@ static void test_init(void)
- {
-     int i;
- 
-+    tt = &tgm.throttle_timers;
++static int throttle_open(BlockDriverState *bs, QDict *options,
++                         int flags, Error **errp)
++{
++    ThrottleGroupMember *tgm = bs->opaque;
 +
-     /* fill the structures with crap */
-     memset(&ts, 1, sizeof(ts));
--    memset(&tt, 1, sizeof(tt));
-+    memset(tt, 1, sizeof(*tt));
++    bs->file = bdrv_open_child(NULL, options, "file",
++                               bs, &child_file, false, errp);
++    if (!bs->file) {
++        return -EINVAL;
++    }
++    bs->supported_write_flags = bs->file->bs->supported_write_flags;
++    bs->supported_zero_flags = bs->file->bs->supported_zero_flags;
++
++    return throttle_configure_tgm(bs, tgm, options, errp);
++}
++
++static void throttle_close(BlockDriverState *bs)
++{
++    ThrottleGroupMember *tgm = bs->opaque;
++    throttle_group_unregister_tgm(tgm);
++}
++
++
++static int64_t throttle_getlength(BlockDriverState *bs)
++{
++    return bdrv_getlength(bs->file->bs);
++}
++
++
++static int coroutine_fn throttle_co_preadv(BlockDriverState *bs,
++                                           uint64_t offset, uint64_t bytes,
++                                           QEMUIOVector *qiov, int flags)
++{
++
++    ThrottleGroupMember *tgm = bs->opaque;
++    throttle_group_co_io_limits_intercept(tgm, bytes, false);
++
++    return bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
++}
++
++static int coroutine_fn throttle_co_pwritev(BlockDriverState *bs,
++                                            uint64_t offset, uint64_t bytes,
++                                            QEMUIOVector *qiov, int flags)
++{
++    ThrottleGroupMember *tgm = bs->opaque;
++    throttle_group_co_io_limits_intercept(tgm, bytes, true);
++
++    return bdrv_co_pwritev(bs->file, offset, bytes, qiov, flags);
++}
++
++static int coroutine_fn throttle_co_pwrite_zeroes(BlockDriverState *bs,
++                                                  int64_t offset, int bytes,
++                                                  BdrvRequestFlags flags)
++{
++    ThrottleGroupMember *tgm = bs->opaque;
++    throttle_group_co_io_limits_intercept(tgm, bytes, true);
++
++    return bdrv_co_pwrite_zeroes(bs->file, offset, bytes, flags);
++}
++
++static int coroutine_fn throttle_co_pdiscard(BlockDriverState *bs,
++                                             int64_t offset, int bytes)
++{
++    ThrottleGroupMember *tgm = bs->opaque;
++    throttle_group_co_io_limits_intercept(tgm, bytes, true);
++
++    return bdrv_co_pdiscard(bs->file->bs, offset, bytes);
++}
++
++static int throttle_co_flush(BlockDriverState *bs)
++{
++    return bdrv_co_flush(bs->file->bs);
++}
++
++static void throttle_detach_aio_context(BlockDriverState *bs)
++{
++    ThrottleGroupMember *tgm = bs->opaque;
++    throttle_group_detach_aio_context(tgm);
++}
++
++static void throttle_attach_aio_context(BlockDriverState *bs,
++                                        AioContext *new_context)
++{
++    ThrottleGroupMember *tgm = bs->opaque;
++    throttle_group_attach_aio_context(tgm, new_context);
++}
++
++static int throttle_reopen_prepare(BDRVReopenState *reopen_state,
++                                   BlockReopenQueue *queue, Error **errp)
++{
++    ThrottleGroupMember *tgm;
++
++    assert(reopen_state != NULL);
++    assert(reopen_state->bs != NULL);
++
++    reopen_state->opaque = g_new0(ThrottleGroupMember, 1);
++    tgm = reopen_state->opaque;
++
++    return throttle_configure_tgm(reopen_state->bs, tgm, reopen_state->options,
++            errp);
++}
++
++static void throttle_reopen_commit(BDRVReopenState *reopen_state)
++{
++    ThrottleGroupMember *old_tgm = reopen_state->bs->opaque;
++    ThrottleGroupMember *new_tgm = reopen_state->opaque;
++
++    throttle_group_unregister_tgm(old_tgm);
++    g_free(old_tgm);
++    reopen_state->bs->opaque = new_tgm;
++    reopen_state->opaque = NULL;
++}
++
++static void throttle_reopen_abort(BDRVReopenState *reopen_state)
++{
++    ThrottleGroupMember *tgm = reopen_state->opaque;
++
++    throttle_group_unregister_tgm(tgm);
++    g_free(tgm);
++    reopen_state->opaque = NULL;
++}
++
++static bool throttle_recurse_is_first_non_filter(BlockDriverState *bs,
++                                                 BlockDriverState *candidate)
++{
++    return bdrv_recurse_is_first_non_filter(bs->file->bs, candidate);
++}
++
++static int64_t coroutine_fn throttle_co_get_block_status(BlockDriverState *bs,
++                                                         int64_t sector_num,
++                                                         int nb_sectors,
++                                                         int *pnum,
++                                                         BlockDriverState **file)
++{
++    assert(bs->file && bs->file->bs);
++    *pnum = nb_sectors;
++    *file = bs->file->bs;
++    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
++           (sector_num << BDRV_SECTOR_BITS);
++}
++
++static BlockDriver bdrv_throttle = {
++    .format_name                        =   "throttle",
++    .protocol_name                      =   "throttle",
++    .instance_size                      =   sizeof(ThrottleGroupMember),
++
++    .bdrv_file_open                     =   throttle_open,
++    .bdrv_close                         =   throttle_close,
++    .bdrv_co_flush                      =   throttle_co_flush,
++
++    .bdrv_child_perm                    =   bdrv_filter_default_perms,
++
++    .bdrv_getlength                     =   throttle_getlength,
++
++    .bdrv_co_preadv                     =   throttle_co_preadv,
++    .bdrv_co_pwritev                    =   throttle_co_pwritev,
++
++    .bdrv_co_pwrite_zeroes              =   throttle_co_pwrite_zeroes,
++    .bdrv_co_pdiscard                   =   throttle_co_pdiscard,
++
++    .bdrv_recurse_is_first_non_filter   =   throttle_recurse_is_first_non_filter,
++
++    .bdrv_attach_aio_context            =   throttle_attach_aio_context,
++    .bdrv_detach_aio_context            =   throttle_detach_aio_context,
++
++    .bdrv_reopen_prepare                =   throttle_reopen_prepare,
++    .bdrv_reopen_commit                 =   throttle_reopen_commit,
++    .bdrv_reopen_abort                  =   throttle_reopen_abort,
++    .bdrv_co_get_block_status           =   throttle_co_get_block_status,
++
++    .is_filter                          =   true,
++};
++
++static void bdrv_throttle_init(void)
++{
++    bdrv_register(&bdrv_throttle);
++}
++
++block_init(bdrv_throttle_init);
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index 2aaede4ae1..6eaf78a046 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -25,6 +25,7 @@ block-obj-y += accounting.o dirty-bitmap.o
+ block-obj-y += write-threshold.o
+ block-obj-y += backup.o
+ block-obj-$(CONFIG_REPLICATION) += replication.o
++block-obj-y += throttle.o
  
-     /* init structures */
-     throttle_init(&ts);
--    throttle_timers_init(&tt, ctx, QEMU_CLOCK_VIRTUAL,
-+    throttle_timers_init(tt, ctx, QEMU_CLOCK_VIRTUAL,
-                          read_timer_cb, write_timer_cb, &ts);
+ block-obj-y += crypto.o
  
-     /* check initialized fields */
--    g_assert(tt.clock_type == QEMU_CLOCK_VIRTUAL);
--    g_assert(tt.timers[0]);
--    g_assert(tt.timers[1]);
-+    g_assert(tt->clock_type == QEMU_CLOCK_VIRTUAL);
-+    g_assert(tt->timers[0]);
-+    g_assert(tt->timers[1]);
- 
-     /* check other fields where cleared */
-     g_assert(!ts.previous_leak);
-@@ -176,18 +179,18 @@ static void test_init(void)
-         g_assert(!ts.cfg.buckets[i].level);
-     }
- 
--    throttle_timers_destroy(&tt);
-+    throttle_timers_destroy(tt);
- }
- 
- static void test_destroy(void)
- {
-     int i;
-     throttle_init(&ts);
--    throttle_timers_init(&tt, ctx, QEMU_CLOCK_VIRTUAL,
-+    throttle_timers_init(tt, ctx, QEMU_CLOCK_VIRTUAL,
-                          read_timer_cb, write_timer_cb, &ts);
--    throttle_timers_destroy(&tt);
-+    throttle_timers_destroy(tt);
-     for (i = 0; i < 2; i++) {
--        g_assert(!tt.timers[i]);
-+        g_assert(!tt->timers[i]);
-     }
- }
- 
-@@ -224,7 +227,7 @@ static void test_config_functions(void)
-     orig_cfg.op_size = 1;
- 
-     throttle_init(&ts);
--    throttle_timers_init(&tt, ctx, QEMU_CLOCK_VIRTUAL,
-+    throttle_timers_init(tt, ctx, QEMU_CLOCK_VIRTUAL,
-                          read_timer_cb, write_timer_cb, &ts);
-     /* structure reset by throttle_init previous_leak should be null */
-     g_assert(!ts.previous_leak);
-@@ -236,7 +239,7 @@ static void test_config_functions(void)
-     /* get back the fixed configuration */
-     throttle_get_config(&ts, &final_cfg);
- 
--    throttle_timers_destroy(&tt);
-+    throttle_timers_destroy(tt);
- 
-     g_assert(final_cfg.buckets[THROTTLE_BPS_TOTAL].avg == 153);
-     g_assert(final_cfg.buckets[THROTTLE_BPS_READ].avg  == 56);
-@@ -417,45 +420,45 @@ static void test_have_timer(void)
- {
-     /* zero structures */
-     memset(&ts, 0, sizeof(ts));
--    memset(&tt, 0, sizeof(tt));
-+    memset(tt, 0, sizeof(*tt));
- 
-     /* no timer set should return false */
--    g_assert(!throttle_timers_are_initialized(&tt));
-+    g_assert(!throttle_timers_are_initialized(tt));
- 
-     /* init structures */
-     throttle_init(&ts);
--    throttle_timers_init(&tt, ctx, QEMU_CLOCK_VIRTUAL,
-+    throttle_timers_init(tt, ctx, QEMU_CLOCK_VIRTUAL,
-                          read_timer_cb, write_timer_cb, &ts);
- 
-     /* timer set by init should return true */
--    g_assert(throttle_timers_are_initialized(&tt));
-+    g_assert(throttle_timers_are_initialized(tt));
- 
--    throttle_timers_destroy(&tt);
-+    throttle_timers_destroy(tt);
- }
- 
- static void test_detach_attach(void)
- {
-     /* zero structures */
-     memset(&ts, 0, sizeof(ts));
--    memset(&tt, 0, sizeof(tt));
-+    memset(tt, 0, sizeof(*tt));
- 
-     /* init the structure */
-     throttle_init(&ts);
--    throttle_timers_init(&tt, ctx, QEMU_CLOCK_VIRTUAL,
-+    throttle_timers_init(tt, ctx, QEMU_CLOCK_VIRTUAL,
-                          read_timer_cb, write_timer_cb, &ts);
- 
-     /* timer set by init should return true */
--    g_assert(throttle_timers_are_initialized(&tt));
-+    g_assert(throttle_timers_are_initialized(tt));
- 
-     /* timer should no longer exist after detaching */
--    throttle_timers_detach_aio_context(&tt);
--    g_assert(!throttle_timers_are_initialized(&tt));
-+    throttle_timers_detach_aio_context(tt);
-+    g_assert(!throttle_timers_are_initialized(tt));
- 
-     /* timer should exist again after attaching */
--    throttle_timers_attach_aio_context(&tt, ctx);
--    g_assert(throttle_timers_are_initialized(&tt));
-+    throttle_timers_attach_aio_context(tt, ctx);
-+    g_assert(throttle_timers_are_initialized(tt));
- 
--    throttle_timers_destroy(&tt);
-+    throttle_timers_destroy(tt);
- }
- 
- static bool do_test_accounting(bool is_ops, /* are we testing bps or ops */
-@@ -484,7 +487,7 @@ static bool do_test_accounting(bool is_ops, /* are we testing bps or ops */
-     cfg.op_size = op_size;
- 
-     throttle_init(&ts);
--    throttle_timers_init(&tt, ctx, QEMU_CLOCK_VIRTUAL,
-+    throttle_timers_init(tt, ctx, QEMU_CLOCK_VIRTUAL,
-                          read_timer_cb, write_timer_cb, &ts);
-     throttle_config(&ts, QEMU_CLOCK_VIRTUAL, &cfg);
- 
-@@ -511,7 +514,7 @@ static bool do_test_accounting(bool is_ops, /* are we testing bps or ops */
-         return false;
-     }
- 
--    throttle_timers_destroy(&tt);
-+    throttle_timers_destroy(tt);
- 
-     return true;
- }
-@@ -611,9 +614,9 @@ static void test_groups(void)
-     g_assert(tgm2->throttle_state == NULL);
-     g_assert(tgm3->throttle_state == NULL);
- 
--    throttle_group_register_tgm(tgm1, "bar");
--    throttle_group_register_tgm(tgm2, "foo");
--    throttle_group_register_tgm(tgm3, "bar");
-+    throttle_group_register_tgm(tgm1, "bar", blk_get_aio_context(blk1));
-+    throttle_group_register_tgm(tgm2, "foo", blk_get_aio_context(blk2));
-+    throttle_group_register_tgm(tgm3, "bar", blk_get_aio_context(blk3));
- 
-     g_assert(tgm1->throttle_state != NULL);
-     g_assert(tgm2->throttle_state != NULL);
 -- 
 2.11.0
