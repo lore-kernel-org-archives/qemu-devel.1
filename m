@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dilz4-0001hV-Gr
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:27:06 -0400
+	(envelope-from <mst@redhat.com>) id 1dim0y-0002yX-T9
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:29:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dilz1-0005pS-Cg
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:27:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27521)
+	(envelope-from <mst@redhat.com>) id 1dim0v-0006Fz-Ni
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:29:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38398)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dilz1-0005oj-2l
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:26:59 -0400
-Date: Fri, 18 Aug 2017 21:26:51 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dim0v-0006Fj-E8
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:28:57 -0400
+Date: Fri, 18 Aug 2017 21:28:55 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170818211119-mutt-send-email-mst@kernel.org>
-References: <1502940416-42944-1-git-send-email-wei.w.wang@intel.com>
-	<1502940416-42944-6-git-send-email-wei.w.wang@intel.com>
-	<20170818045519-mutt-send-email-mst@kernel.org>
-	<5996A845.4010405@intel.com>
+Message-ID: <20170818212833-mutt-send-email-mst@kernel.org>
+References: <1502846811-32360-1-git-send-email-douly.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5996A845.4010405@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v14 5/5] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_VQ
+In-Reply-To: <1502846811-32360-1-git-send-email-douly.fnst@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH v2] hw/acpi: Select an node with memory for
+ mapping memory hole to
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,144 +27,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, imammedo@redhat.com
 
-On Fri, Aug 18, 2017 at 04:41:41PM +0800, Wei Wang wrote:
-> On 08/18/2017 10:13 AM, Michael S. Tsirkin wrote:
-> > On Thu, Aug 17, 2017 at 11:26:56AM +0800, Wei Wang wrote:
-> > > Add a new vq to report hints of guest free pages to the host.
-> > Please add some text here explaining the report_free_page_signal
-> > thing.
-> > 
-> > 
-> > I also really think we need some kind of ID in the
-> > buffer to do a handshake. whenever id changes you
-> > add another outbuf.
+On Wed, Aug 16, 2017 at 09:26:51AM +0800, Dou Liyang wrote:
+> Currently, Using the fisrt node without memory on the machine makes
+> QEMU unhappy. With this example command line:
+>   ... \
+>   -m 1024M,slots=4,maxmem=32G \
+>   -numa node,nodeid=0 \
+>   -numa node,mem=1024M,nodeid=1 \
+>   -numa node,nodeid=2 \
+>   -numa node,nodeid=3 \
+> Guest reports "No NUMA configuration found" and the NUMA topology is
+> wrong.
 > 
-> Please let me introduce the current design first:
-> 1) device put the signal buf to the vq and notify the driver (we need
-> a buffer because currently the device can't notify when the vq is empty);
+> This is because when QEMU builds ACPI SRAT, it regards node0 as the
+> default node to deal with the memory hole(640K-1M). this means the
+> node0 must have some memory(>1M), but, actually it can have no
+> memory.
 > 
-> 2) the driver starts the report of free page blocks via inbuf;
+> Fix this problem by replace the node0 with the first node which has
+> memory on it. Add a new function for each node. Also do some cleanup.
 > 
-> 3) the driver adds an the signal buf via outbuf to tell the device all are
-> reported.
+> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+
+This isn't a regression, is it?
+If so I think it's safe to postpone this to 2.11.
+
+> ---
+> V2 --> V1:
+>   -Fix a coding style problem
+> Replace
+>     for (node = 0;
+>             node < pcms->numa_nodes && pcms->node_mem[node] == 0;
+>             node++);
+> 
+> with
+>     for (node = 0; node < pcms->numa_nodes; node++) {
+>        if (pcms->node_mem[node] != 0) {
+>             break;
+>          }
+> 
+>  hw/i386/acpi-build.c | 78 +++++++++++++++++++++++++++++++++-------------------
+>  1 file changed, 50 insertions(+), 28 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 98dd424..f93d712 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2318,15 +2318,43 @@ build_tpm2(GArray *table_data, BIOSLinker *linker)
+>                   (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
+>  }
+>  
+> +static uint64_t
+> +build_srat_node_entry(GArray *table_data, PCMachineState *pcms,
+> +                                int i, uint64_t mem_base, uint64_t mem_len)
+> +{
+> +    AcpiSratMemoryAffinity *numamem;
+> +    uint64_t next_base;
+> +
+> +    next_base = mem_base + mem_len;
+> +
+> +    /* Cut out the ACPI_PCI hole */
+> +    if (mem_base <= pcms->below_4g_mem_size &&
+> +        next_base > pcms->below_4g_mem_size) {
+> +        mem_len -= next_base - pcms->below_4g_mem_size;
+> +        if (mem_len > 0) {
+> +            numamem = acpi_data_push(table_data, sizeof *numamem);
+> +            build_srat_memory(numamem, mem_base, mem_len, i,
+> +                              MEM_AFFINITY_ENABLED);
+> +        }
+> +        mem_base = 1ULL << 32;
+> +        mem_len = next_base - pcms->below_4g_mem_size;
+> +        next_base += (1ULL << 32) - pcms->below_4g_mem_size;
+> +    }
+> +    numamem = acpi_data_push(table_data, sizeof *numamem);
+> +    build_srat_memory(numamem, mem_base, mem_len, i,
+> +                      MEM_AFFINITY_ENABLED);
+> +    return next_base;
+> +}
+> +
+>  static void
+>  build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>  {
+>      AcpiSystemResourceAffinityTable *srat;
+>      AcpiSratMemoryAffinity *numamem;
+>  
+> -    int i;
+> +    int i, node;
+>      int srat_start, numa_start, slots;
+> -    uint64_t mem_len, mem_base, next_base;
+> +    uint64_t mem_len, mem_base;
+>      MachineClass *mc = MACHINE_GET_CLASS(machine);
+>      const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(machine);
+>      PCMachineState *pcms = PC_MACHINE(machine);
+> @@ -2370,36 +2398,30 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>      /* the memory map is a bit tricky, it contains at least one hole
+>       * from 640k-1M and possibly another one from 3.5G-4G.
+>       */
+> -    next_base = 0;
+> +
+>      numa_start = table_data->len;
+>  
+> -    numamem = acpi_data_push(table_data, sizeof *numamem);
+> -    build_srat_memory(numamem, 0, 640 * 1024, 0, MEM_AFFINITY_ENABLED);
+> -    next_base = 1024 * 1024;
+> -    for (i = 1; i < pcms->numa_nodes + 1; ++i) {
+> -        mem_base = next_base;
+> -        mem_len = pcms->node_mem[i - 1];
+> -        if (i == 1) {
+> -            mem_len -= 1024 * 1024;
+> +    /* get the first node which has memory and map the hole from 640K-1M */
+> +    for (node = 0; node < pcms->numa_nodes; node++) {
+> +        if (pcms->node_mem[node] != 0) {
+> +            break;
+>          }
+> -        next_base = mem_base + mem_len;
+> -
+> -        /* Cut out the ACPI_PCI hole */
+> -        if (mem_base <= pcms->below_4g_mem_size &&
+> -            next_base > pcms->below_4g_mem_size) {
+> -            mem_len -= next_base - pcms->below_4g_mem_size;
+> -            if (mem_len > 0) {
+> -                numamem = acpi_data_push(table_data, sizeof *numamem);
+> -                build_srat_memory(numamem, mem_base, mem_len, i - 1,
+> -                                  MEM_AFFINITY_ENABLED);
+> -            }
+> -            mem_base = 1ULL << 32;
+> -            mem_len = next_base - pcms->below_4g_mem_size;
+> -            next_base += (1ULL << 32) - pcms->below_4g_mem_size;
+> +    }
+> +    numamem = acpi_data_push(table_data, sizeof *numamem);
+> +    build_srat_memory(numamem, 0, 640 * 1024, node, MEM_AFFINITY_ENABLED);
+> +
+> +    /* map the rest of memory from 1M */
+> +    mem_base = 1024 * 1024;
+> +    mem_len = pcms->node_mem[node] - mem_base;
+> +    mem_base = build_srat_node_entry(table_data, pcms, node,
+> +                                            mem_base, mem_len);
+> +
+> +    for (i = 0; i < pcms->numa_nodes; i++) {
+> +        if (i == node) {
+> +            continue;
+>          }
+> -        numamem = acpi_data_push(table_data, sizeof *numamem);
+> -        build_srat_memory(numamem, mem_base, mem_len, i - 1,
+> -                          MEM_AFFINITY_ENABLED);
+> +        mem_base = build_srat_node_entry(table_data, pcms, i,
+> +                                            mem_base, pcms->node_mem[i]);
+>      }
+>      slots = (table_data->len - numa_start) / sizeof *numamem;
+>      for (; slots < pcms->numa_nodes + 2; slots++) {
+> -- 
+> 2.5.5
 > 
 > 
-> Could you please elaborate more on the usage of ID?
-
-While driver is free to maintain at most one buffer in flight
-the design must work with pipelined requests as that
-is important for performance.
-
-So host might be able to request the reporting twice.
-How does it know what is the report in response to?
-
-If we put an id in request and in response, then that fixes it.
-
-
-So there's a vq used for requesting free page reports.
-driver does add_inbuf( &device->id).
-
-Then when it starts reporting it does
-
-
-add_outbuf(&device->id)
-
-followed by pages.
-
-
-Also if device->id changes it knows it should restart
-reporting from beginning.
-
-
-
-
-
-
-> > > +retry:
-> > > +	ret = virtqueue_add_outbuf(vq, &sg, 1, vb, GFP_KERNEL);
-> > > +	virtqueue_kick(vq);
-> > > +	if (unlikely(ret == -ENOSPC)) {
-> > what if there's another error?
-> 
-> Another error is -EIO, how about disabling the free page report feature?
-> (I also saw it isn't handled in many other virtio devices e.g. virtio-net)
-> 
-> > > +		wait_event(vb->acked, virtqueue_get_buf(vq, &len));
-> > > +		goto retry;
-> > > +	}
-> > what is this trickery doing? needs more comments or
-> > a simplification.
-> 
-> Just this:
-> if the vq is full, blocking wait till an entry gets released, then retry.
-> This is the
-> final one, which puts the signal buf to the vq to signify the end of the
-> report and
-> the mm lock is not held here, so it is fine to block.
-> 
-
-But why do you kick here on failure? I would understand it if you
-did not kick when adding pages, as it is I don't understand.
-
-
-Also pls rewrite this with a for or while loop for clarity.
-
-
-> > 
-> > 
-> > > +}
-> > > +
-> > > +static void report_free_page(struct work_struct *work)
-> > > +{
-> > > +	struct virtio_balloon *vb;
-> > > +
-> > > +	vb = container_of(work, struct virtio_balloon, report_free_page_work);
-> > > +	walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
-> > That's a lot of work here. And system_wq documentation says:
-> >   *
-> >   * system_wq is the one used by schedule[_delayed]_work[_on]().
-> >   * Multi-CPU multi-threaded.  There are users which expect relatively
-> >   * short queue flush time.  Don't queue works which can run for too
-> >   * long.
-> > 
-> > You might want to create your own wq, maybe even with WQ_CPU_INTENSIVE.
-> 
-> Thanks for the reminder. If not creating a new wq, how about
-> system_unbound_wq?
-
-I don't think that one's freezeable. 
-
-> The first round of live migration needs the free pages, in that way we can
-> have the
-> pages reported to the hypervisor quicker.
-
-The reason people call it *live* migration is because tasks keep
-running. If you pin VCPUs with maintainance tasks it becomes pointless.
-
-Maybe we need to set a special wq which will create idle
-class threads. Does not seem to be supported but not hard to do.
-
-> > 
-> > > +	report_free_page_completion(vb);
-> > So first you get list of pages, then an outbuf telling you
-> > what they are in end of.  I think it's backwards.
-> > Add an outbuf first followed by inbufs that tell you
-> > what they are.
-> 
-> 
-> If we have the signal filled with those flags like
-> VIRTIO_BALLOON_F_FREE_PAGE_REPORT_START,
-> Probably not necessary to have an inbuf followed by an outbuf, right?
-> 
-> 
-> Best,
-> Wei
-
-You really should document the messages in the commit log
-and in the header.
-
--- 
-MST
