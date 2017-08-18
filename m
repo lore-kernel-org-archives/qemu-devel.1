@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dieDM-00041y-2s
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:17 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dieDL-0000b2-1Q
+	(envelope-from <imammedo@redhat.com>) id 1dieDK-00040K-KO
 	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:64106)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dieDK-0000Zn-Oc
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <imammedo@redhat.com>) id 1dieDJ-0000Z1-08
 	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:14 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DA720C0587E9
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:13 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
-	(dell-r430-03.lab.eng.brq.redhat.com [10.34.112.60])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5F4FA5D743
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:13 +0000 (UTC)
+Received: from mx1.redhat.com ([209.132.183.28]:60122)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dieDI-0000Ya-NZ
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:12 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 18 Aug 2017 12:08:41 +0200
-Message-Id: <1503050939-227939-10-git-send-email-imammedo@redhat.com>
+Date: Fri, 18 Aug 2017 12:08:39 +0200
+Message-Id: <1503050939-227939-8-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
 References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11 09/27] s390x: replace cpu_s390x_init()
- with cpu_generic_init()
+Subject: [Qemu-devel] [PATCH for-2.11 07/27] sparc: replace custom cpu
+ feature parsing with cpu_legacy_parse_featurestr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,95 +25,269 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-cpu_s390x_init() is used only *-user targets indirectly
-via cpu_init() macro and has a hack to assign ids to created
-cpus (I'm not sure if 'id' really matters to *-user emulation).
+with features converted to properties we can reuse shared
+with x86 cpu_legacy_parse_featurestr() for features parsing
+and drop legacy parser that manipulated CPU directly.
 
-So to on safe side, instead of having custom wrapper to do numbering
-replace it with cpu_generic_init() and use S390CPUClass::next_cpu_id
-which could serve the same purpose as static variable and move cpu->id
-initialization to s390_cpu_initfn for CONFIG_USER_ONLY use-case.
-
-PS:
-ifdef is ugly but it allows us to hide s390x detail that isn't
-set by *-user targets and reuse generic cpu creation utility
-for btoh machine and user emulation.
+With that in place and sparc_cpu_parse_features() providing
+generic CPUClass::parse_features callback, the cpu_sparc_init()
+will do the same job as cpu_generic_init() so replace content
+of cpu_sparc_init() with it.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
 ---
-perhaps cpu->id isn't need by CONFIG_USER_ONLY but I'd leave to it
-s390x maintainers to deal with it.
----
- target/s390x/cpu.h    |  3 +--
- target/s390x/cpu.c    |  7 +++++++
- target/s390x/helper.c | 14 --------------
- 3 files changed, 8 insertions(+), 16 deletions(-)
+CC: Riku Voipio <riku.voipio@iki.fi>
+CC: Laurent Vivier <laurent@vivier.eu>
+CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+CC: Artyom Tarasenko <atar4qemu@gmail.com>
 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 29fdd5d..7891d68 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -474,7 +474,6 @@ static inline bool get_per_in_range(CPUS390XState *env, uint64_t addr)
-     }
+v2:
+  * use new cpu_legacy_parse_featurestr() without
+    plus_features/minus_features
+  * drop cpu_legacy_apply_features() as it's been removed in
+    previuos patch and new cpu_legacy_parse_featurestr()
+    does its job
+---
+ default-configs/sparc-bsd-user.mak         |   1 +
+ default-configs/sparc-linux-user.mak       |   1 +
+ default-configs/sparc-softmmu.mak          |   1 +
+ default-configs/sparc32plus-linux-user.mak |   1 +
+ default-configs/sparc64-bsd-user.mak       |   1 +
+ default-configs/sparc64-linux-user.mak     |   1 +
+ default-configs/sparc64-softmmu.mak        |   1 +
+ target/sparc/cpu.c                         | 146 +----------------------------
+ 8 files changed, 12 insertions(+), 141 deletions(-)
+
+diff --git a/default-configs/sparc-bsd-user.mak b/default-configs/sparc-bsd-user.mak
+index 21e0950..caea9ea 100644
+--- a/default-configs/sparc-bsd-user.mak
++++ b/default-configs/sparc-bsd-user.mak
+@@ -1 +1,2 @@
+ # Default configuration for sparc-bsd-user
++CONFIG_LEGACY_CPU_FEATURES=y
+diff --git a/default-configs/sparc-linux-user.mak b/default-configs/sparc-linux-user.mak
+index 9c716d1..0f23504 100644
+--- a/default-configs/sparc-linux-user.mak
++++ b/default-configs/sparc-linux-user.mak
+@@ -1 +1,2 @@
+ # Default configuration for sparc-linux-user
++CONFIG_LEGACY_CPU_FEATURES=y
+diff --git a/default-configs/sparc-softmmu.mak b/default-configs/sparc-softmmu.mak
+index 004b0f4..d8fa9fd 100644
+--- a/default-configs/sparc-softmmu.mak
++++ b/default-configs/sparc-softmmu.mak
+@@ -18,3 +18,4 @@ CONFIG_GRLIB=y
+ CONFIG_STP2000=y
+ CONFIG_ECCMEMCTL=y
+ CONFIG_SUN4M=y
++CONFIG_LEGACY_CPU_FEATURES=y
+diff --git a/default-configs/sparc32plus-linux-user.mak b/default-configs/sparc32plus-linux-user.mak
+index 432e880..e3cc16b 100644
+--- a/default-configs/sparc32plus-linux-user.mak
++++ b/default-configs/sparc32plus-linux-user.mak
+@@ -1 +1,2 @@
+ # Default configuration for sparc32plus-linux-user
++CONFIG_LEGACY_CPU_FEATURES=y
+diff --git a/default-configs/sparc64-bsd-user.mak b/default-configs/sparc64-bsd-user.mak
+index b8b9eea..25bfa1f 100644
+--- a/default-configs/sparc64-bsd-user.mak
++++ b/default-configs/sparc64-bsd-user.mak
+@@ -1 +1,2 @@
+ # Default configuration for sparc64-bsd-user
++CONFIG_LEGACY_CPU_FEATURES=y
+diff --git a/default-configs/sparc64-linux-user.mak b/default-configs/sparc64-linux-user.mak
+index bf1bdd6..7c8a9f0 100644
+--- a/default-configs/sparc64-linux-user.mak
++++ b/default-configs/sparc64-linux-user.mak
+@@ -1 +1,2 @@
+ # Default configuration for sparc64-linux-user
++CONFIG_LEGACY_CPU_FEATURES=y
+diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc64-softmmu.mak
+index d07876a..658546a 100644
+--- a/default-configs/sparc64-softmmu.mak
++++ b/default-configs/sparc64-softmmu.mak
+@@ -16,3 +16,4 @@ CONFIG_MC146818RTC=y
+ CONFIG_ISA_TESTDEV=y
+ CONFIG_EMPTY_SLOT=y
+ CONFIG_SUN4V_RTC=y
++CONFIG_LEGACY_CPU_FEATURES=y
+diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+index 7f74b1c..fd01cbf 100644
+--- a/target/sparc/cpu.c
++++ b/target/sparc/cpu.c
+@@ -104,51 +104,15 @@ static void cpu_sparc_disas_set_info(CPUState *cpu, disassemble_info *info)
+ #endif
  }
  
--S390CPU *cpu_s390x_init(const char *cpu_model);
- S390CPU *s390x_new_cpu(const char *cpu_model, int64_t id, Error **errp);
- S390CPU *cpu_s390x_create(const char *cpu_model, Error **errp);
- void s390x_translate_init(void);
-@@ -638,7 +637,7 @@ static inline unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu)
- 
- extern void subsystem_reset(void);
- 
--#define cpu_init(model) CPU(cpu_s390x_init(model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_S390_CPU, cpu_model)
- #define cpu_signal_handler cpu_s390x_signal_handler
- 
- void s390_cpu_list(FILE *f, fprintf_function cpu_fprintf);
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 489bc25..72b0b9e 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -303,6 +303,13 @@ static void s390_cpu_initfn(Object *obj)
-         inited = true;
-         s390x_translate_init();
-     }
-+
-+#if defined(CONFIG_USER_ONLY)
-+    {
-+        S390CPUClass *scc = S390_CPU_GET_CLASS(obj);
-+        cpu->id = scc->next_cpu_id;
-+    }
-+#endif
- }
- 
- static void s390_cpu_finalize(Object *obj)
-diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-index 0c989b1..5c23552 100644
---- a/target/s390x/helper.c
-+++ b/target/s390x/helper.c
-@@ -128,20 +128,6 @@ out:
-     return cpu;
- }
- 
--S390CPU *cpu_s390x_init(const char *cpu_model)
--{
--    Error *err = NULL;
--    S390CPU *cpu;
--    /* Use to track CPU ID for linux-user only */
--    static int64_t next_cpu_id;
+-static void sparc_cpu_parse_features(CPUState *cs, char *features,
+-                                     Error **errp);
 -
--    cpu = s390x_new_cpu(cpu_model, next_cpu_id++, &err);
+-static int cpu_sparc_register(SPARCCPU *cpu, const char *cpu_model)
++static void sparc_cpu_parse_features(const char *typename, char *features,
++                                     Error **errp)
+ {
+-    char *s = g_strdup(cpu_model);
+-    char *featurestr = strtok(s, ",");
+-    Error *err = NULL;
+-
+-    featurestr = strtok(NULL, ",");
+-    sparc_cpu_parse_features(CPU(cpu), featurestr, &err);
+-    g_free(s);
 -    if (err) {
 -        error_report_err(err);
+-        return -1;
 -    }
+-
+-    return 0;
++    cpu_legacy_parse_featurestr(typename, features, errp);
+ }
+ 
+ SPARCCPU *cpu_sparc_init(const char *cpu_model)
+ {
+-    SPARCCPU *cpu;
+-    ObjectClass *oc;
+-    char *str, *name;
+-
+-    str = g_strdup(cpu_model);
+-    name = strtok(str, ",");
+-    oc = cpu_class_by_name(TYPE_SPARC_CPU, name);
+-    if (oc == NULL) {
+-        g_free(str);
+-        return NULL;
+-    }
+-    g_free(str);
+-
+-    cpu = SPARC_CPU(object_new(object_class_get_name(oc)));
+-
+-    if (cpu_sparc_register(cpu, cpu_model) < 0) {
+-        object_unref(OBJECT(cpu));
+-        return NULL;
+-    }
+-
+-    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
+-
 -    return cpu;
++    return SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+ }
+ 
+ void cpu_sparc_set_id(CPUSPARCState *env, unsigned int cpu)
+@@ -529,107 +493,6 @@ static void print_features(FILE *f, fprintf_function cpu_fprintf,
+     }
+ }
+ 
+-static void add_flagname_to_bitmaps(const char *flagname, uint32_t *features)
+-{
+-    unsigned int i;
+-
+-    for (i = 0; i < ARRAY_SIZE(feature_name); i++) {
+-        if (feature_name[i] && !strcmp(flagname, feature_name[i])) {
+-            *features |= 1 << i;
+-            return;
+-        }
+-    }
+-    error_report("CPU feature %s not found", flagname);
 -}
 -
- #ifndef CONFIG_USER_ONLY
+-static void sparc_cpu_parse_features(CPUState *cs, char *features,
+-                                     Error **errp)
+-{
+-    SPARCCPU *cpu = SPARC_CPU(cs);
+-    sparc_def_t *cpu_def = &cpu->env.def;
+-    char *featurestr;
+-    uint32_t plus_features = 0;
+-    uint32_t minus_features = 0;
+-    uint64_t iu_version;
+-    uint32_t fpu_version, mmu_version, nwindows;
+-
+-    featurestr = features ? strtok(features, ",") : NULL;
+-    while (featurestr) {
+-        char *val;
+-
+-        if (featurestr[0] == '+') {
+-            add_flagname_to_bitmaps(featurestr + 1, &plus_features);
+-        } else if (featurestr[0] == '-') {
+-            add_flagname_to_bitmaps(featurestr + 1, &minus_features);
+-        } else if ((val = strchr(featurestr, '='))) {
+-            *val = 0; val++;
+-            if (!strcmp(featurestr, "iu_version")) {
+-                char *err;
+-
+-                iu_version = strtoll(val, &err, 0);
+-                if (!*val || *err) {
+-                    error_setg(errp, "bad numerical value %s", val);
+-                    return;
+-                }
+-                cpu_def->iu_version = iu_version;
+-#ifdef DEBUG_FEATURES
+-                fprintf(stderr, "iu_version %" PRIx64 "\n", iu_version);
+-#endif
+-            } else if (!strcmp(featurestr, "fpu_version")) {
+-                char *err;
+-
+-                fpu_version = strtol(val, &err, 0);
+-                if (!*val || *err) {
+-                    error_setg(errp, "bad numerical value %s", val);
+-                    return;
+-                }
+-                cpu_def->fpu_version = fpu_version;
+-#ifdef DEBUG_FEATURES
+-                fprintf(stderr, "fpu_version %x\n", fpu_version);
+-#endif
+-            } else if (!strcmp(featurestr, "mmu_version")) {
+-                char *err;
+-
+-                mmu_version = strtol(val, &err, 0);
+-                if (!*val || *err) {
+-                    error_setg(errp, "bad numerical value %s", val);
+-                    return;
+-                }
+-                cpu_def->mmu_version = mmu_version;
+-#ifdef DEBUG_FEATURES
+-                fprintf(stderr, "mmu_version %x\n", mmu_version);
+-#endif
+-            } else if (!strcmp(featurestr, "nwindows")) {
+-                char *err;
+-
+-                nwindows = strtol(val, &err, 0);
+-                if (!*val || *err || nwindows > MAX_NWINDOWS ||
+-                    nwindows < MIN_NWINDOWS) {
+-                    error_setg(errp, "bad numerical value %s", val);
+-                    return;
+-                }
+-                cpu_def->nwindows = nwindows;
+-#ifdef DEBUG_FEATURES
+-                fprintf(stderr, "nwindows %d\n", nwindows);
+-#endif
+-            } else {
+-                error_setg(errp, "unrecognized feature %s", featurestr);
+-                return;
+-            }
+-        } else {
+-            error_setg(errp, "feature string `%s' not in format "
+-                             "(+feature|-feature|feature=xyz)", featurestr);
+-            return;
+-        }
+-        featurestr = strtok(NULL, ",");
+-    }
+-    cpu_def->features |= plus_features;
+-    cpu_def->features &= ~minus_features;
+-#ifdef DEBUG_FEATURES
+-    print_features(stderr, fprintf, cpu_def->features, NULL);
+-#endif
+-}
+-
+ void sparc_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+ {
+     unsigned int i;
+@@ -932,6 +795,7 @@ static void sparc_cpu_class_init(ObjectClass *oc, void *data)
+     cc->reset = sparc_cpu_reset;
  
- hwaddr s390_cpu_get_phys_page_debug(CPUState *cs, vaddr vaddr)
+     cc->class_by_name = sparc_cpu_class_by_name;
++    cc->parse_features = sparc_cpu_parse_features;
+     cc->has_work = sparc_cpu_has_work;
+     cc->do_interrupt = sparc_cpu_do_interrupt;
+     cc->cpu_exec_interrupt = sparc_cpu_exec_interrupt;
 -- 
 2.7.4
