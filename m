@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dij5P-0001wu-J4
+	(envelope-from <bounces@canonical.com>) id 1dij5P-0001wt-J2
 	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 11:21:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dij5O-0001XU-5i
+	(envelope-from <bounces@canonical.com>) id 1dij5L-0001UK-KD
 	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 11:21:23 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60736)
+Received: from indium.canonical.com ([91.189.90.7]:60650)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dij5N-0001X8-V2
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 11:21:22 -0400
+	id 1dij5L-0001SV-DS
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 11:21:19 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dij5L-0000Vj-OV
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 15:21:20 +0000
+	id 1dij5J-0000Vr-C4
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 15:21:17 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BA4CC2E822D
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 15:21:10 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 4E11B2E827D
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 15:21:08 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 Aug 2017 15:09:08 -0000
+Date: Fri, 18 Aug 2017 15:06:36 -0000
 From: ChristianEhrhardt <1711602@bugs.launchpad.net>
 Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
-Message-Id: <150306894881.19046.999203821860729922.malone@chaenomeles.canonical.com>
+Message-Id: <150306879651.16815.183125010987371994.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
  2.10
@@ -39,8 +39,20 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Currently I plan to test with the svm/vmx changes disabled as well as a
-cross test on ppc64 and s390x which might complete the picture.
+I've seen something in the logs which I want to eliminate from the list of =
+possibilities:
+  "warning: host doesn't support requested feature: CPUID.80000001H:ECX.svm=
+ [bit 2]"
+
+We had always a patch I questioned to enable svm capabilitiy for guests in =
+general, it worked all the time but I'd have preferred to be an explicit us=
+er opt-in.
+I remember seeing the warning in the past which made me neglect it at first=
+, but maybe the target capability check is now more strict.
+
+I'll drop this change for a test build and run all that again to be sure.
+I doubt that is the reason, but let verifying this particular lead be my ta=
+sk - please be open with other suggestions.
 
 -- =
 
