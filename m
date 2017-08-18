@@ -1,33 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45772)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dinOa-0006xF-TW
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:57:29 -0400
+	id 1dinU9-0000xl-By
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 16:03:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dinOW-0002E9-Hw
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:57:28 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:37874)
+	id 1dinU4-0007NA-GG
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 16:03:13 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:37255)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dinOW-0002Dt-Co
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:57:24 -0400
-Received: by mail-qt0-x242.google.com with SMTP id v49so3013015qtc.4
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 12:57:24 -0700 (PDT)
+	id 1dinU4-0007Mm-A6
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 16:03:08 -0400
+Received: by mail-qt0-x244.google.com with SMTP id v49so3026325qtc.4
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 13:03:08 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
-	<1503050939-227939-9-git-send-email-imammedo@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7a176771-d903-9b64-a503-c81c409bcda1@amsat.org>
-Date: Fri, 18 Aug 2017 16:57:20 -0300
+References: <20170817043102.6322-1-f4bug@amsat.org>
+	<20170817043102.6322-3-f4bug@amsat.org>
+	<20170817163830.1a6f32ed@nial.brq.redhat.com>
+	<df43cc8b-70d1-5ae5-371c-8ca6318231df@amsat.org>
+Message-ID: <d311ba1a-b494-d1bd-da4f-89ed52ede072@amsat.org>
+Date: Fri, 18 Aug 2017 17:03:03 -0300
 MIME-Version: 1.0
-In-Reply-To: <1503050939-227939-9-git-send-email-imammedo@redhat.com>
+In-Reply-To: <df43cc8b-70d1-5ae5-371c-8ca6318231df@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.11 08/27] sparc: replace
- cpu_sparc_init() with cpu_generic_init()
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/8] mips: introduce internal.h and cleanup
+ cpu.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,103 +38,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Fabien Chouteau <chouteau@adacore.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, James Hogan <james.hogan@imgtec.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Yongbok Kim <yongbok.kim@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-I succeed booting a SPARC image once applying 1 to 8 (this commit),
-so not being able to boot the image previously is probably due to patch 
-order, which mean current order is not bisect-able.
+Hi Igor,
 
-On 08/18/2017 07:08 AM, Igor Mammedov wrote:
-> it's just a wrapper, drop it and use cpu_generic_init() directly
+On 08/17/2017 12:06 PM, Philippe Mathieu-Daudé wrote:
+>>> no logical change, only code movement (and fix a comment typo).
 > 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> CC: Fabien Chouteau <chouteau@adacore.com>
-> CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> CC: Artyom Tarasenko <atar4qemu@gmail.com>
-> ---
->   target/sparc/cpu.h   | 3 +--
->   hw/sparc/leon3.c     | 2 +-
->   hw/sparc/sun4m.c     | 2 +-
->   hw/sparc64/sparc64.c | 2 +-
->   target/sparc/cpu.c   | 5 -----
->   5 files changed, 4 insertions(+), 10 deletions(-)
-> 
-> diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-> index 0e41916..b45cfb4 100644
-> --- a/target/sparc/cpu.h
-> +++ b/target/sparc/cpu.h
-> @@ -579,7 +579,6 @@ void cpu_raise_exception_ra(CPUSPARCState *, int, uintptr_t) QEMU_NORETURN;
->   
->   #ifndef NO_CPU_IO_DEFS
->   /* cpu_init.c */
-> -SPARCCPU *cpu_sparc_init(const char *cpu_model);
->   void cpu_sparc_set_id(CPUSPARCState *env, unsigned int cpu);
->   void sparc_cpu_list(FILE *f, fprintf_function cpu_fprintf);
->   /* mmu_helper.c */
-> @@ -656,7 +655,7 @@ hwaddr cpu_get_phys_page_nofault(CPUSPARCState *env, target_ulong addr,
->   int cpu_sparc_signal_handler(int host_signum, void *pinfo, void *puc);
->   
->   #ifndef NO_CPU_IO_DEFS
-> -#define cpu_init(cpu_model) CPU(cpu_sparc_init(cpu_model))
-> +#define cpu_init(cpu_model) cpu_generic_init(TYPE_SPARC_CPU, cpu_model)
->   #endif
->   
->   #define cpu_signal_handler cpu_sparc_signal_handler
-> diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-> index d5ff188..56512ec 100644
-> --- a/hw/sparc/leon3.c
-> +++ b/hw/sparc/leon3.c
-> @@ -126,7 +126,7 @@ static void leon3_generic_hw_init(MachineState *machine)
->           cpu_model = "LEON3";
->       }
->   
-> -    cpu = cpu_sparc_init(cpu_model);
-> +    cpu = SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
->       if (cpu == NULL) {
->           fprintf(stderr, "qemu: Unable to find Sparc CPU definition\n");
->           exit(1);
-> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-> index 89dd8a9..cf47dca 100644
-> --- a/hw/sparc/sun4m.c
-> +++ b/hw/sparc/sun4m.c
-> @@ -797,7 +797,7 @@ static void cpu_devinit(const char *cpu_model, unsigned int id,
->       SPARCCPU *cpu;
->       CPUSPARCState *env;
->   
-> -    cpu = cpu_sparc_init(cpu_model);
-> +    cpu = SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
->       if (cpu == NULL) {
->           fprintf(stderr, "qemu: Unable to find Sparc CPU definition\n");
->           exit(1);
-> diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
-> index 4e4fdab..ecf38a4 100644
-> --- a/hw/sparc64/sparc64.c
-> +++ b/hw/sparc64/sparc64.c
-> @@ -353,7 +353,7 @@ SPARCCPU *sparc64_cpu_devinit(const char *cpu_model,
->       if (cpu_model == NULL) {
->           cpu_model = default_cpu_model;
->       }
-> -    cpu = cpu_sparc_init(cpu_model);
-> +    cpu = SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
->       if (cpu == NULL) {
->           fprintf(stderr, "Unable to find Sparc CPU definition\n");
->           exit(1);
-> diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-> index fd01cbf..2917021 100644
-> --- a/target/sparc/cpu.c
-> +++ b/target/sparc/cpu.c
-> @@ -110,11 +110,6 @@ static void sparc_cpu_parse_features(const char *typename, char *features,
->       cpu_legacy_parse_featurestr(typename, features, errp);
->   }
->   
-> -SPARCCPU *cpu_sparc_init(const char *cpu_model)
-> -{
-> -    return SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
-> -}
-> -
->   void cpu_sparc_set_id(CPUSPARCState *env, unsigned int cpu)
->   {
->   #if !defined(TARGET_SPARC64)
-> 
+>> while at that fix checkpatch errors or
+>> first fix checkpatch noted issues in cpu.h and then move it in next 
+>> patch to internal.h
+
+After asking confirmation on IRC these 3 checkpatch issues are false 
+positives, and I'm not fluent in Perl to fix it, so I'll add a comment 
+about it in the next series cover.
+
+Regards,
+
+Phil.
