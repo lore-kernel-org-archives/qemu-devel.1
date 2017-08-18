@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dinGP-0003lS-Ht
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:49:02 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dinOa-0006xF-TW
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:57:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dinGM-0005vx-Ex
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:49:01 -0400
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:36149)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dinOW-0002E9-Hw
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:57:28 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:37874)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1dinGM-0005vh-7V
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:48:58 -0400
-Received: by mail-io0-x242.google.com with SMTP id j32so6224733iod.3
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 12:48:58 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <8d1c9c3b-2180-8c6e-a8e5-79e9c4afd8d4@redhat.com>
-Date: Fri, 18 Aug 2017 15:48:55 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <1411A1A9-3DA9-4223-BA60-D78618BAFBAE@gmail.com>
-References: <C2D23A89-6DB7-445C-BC25-71E9E49C288D@gmail.com>
-	<ff49cfa1-5a00-c329-1647-3ad8367cc804@redhat.com>
-	<5D42D1E3-A946-4E2C-BDC4-BB785D0B880D@gmail.com>
-	<db1ad643-9dc6-6464-1487-44007b3609ee@redhat.com>
-	<D7EDAC6E-E598-491A-BB4F-789DC57196A0@gmail.com>
-	<CACXAS8BKpKbkAMXPDKw2exX-MKO7sC_R5NbMSysCvjcx0qZJ6Q@mail.gmail.com>
-	<5ABAF863-78A7-4D17-A519-D823CF2E9135@gmail.com>
-	<8d1c9c3b-2180-8c6e-a8e5-79e9c4afd8d4@redhat.com>
-Subject: Re: [Qemu-devel] Help with Windows NT 4.0
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dinOW-0002Dt-Co
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:57:24 -0400
+Received: by mail-qt0-x242.google.com with SMTP id v49so3013015qtc.4
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 12:57:24 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
+	<1503050939-227939-9-git-send-email-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7a176771-d903-9b64-a503-c81c409bcda1@amsat.org>
+Date: Fri, 18 Aug 2017 16:57:20 -0300
+MIME-Version: 1.0
+In-Reply-To: <1503050939-227939-9-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11 08/27] sparc: replace
+ cpu_sparc_init() with cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,125 +36,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Fabien Chouteau <chouteau@adacore.com>
 
+I succeed booting a SPARC image once applying 1 to 8 (this commit),
+so not being able to boot the image previously is probably due to patch 
+order, which mean current order is not bisect-able.
 
-> On Aug 18, 2017, at 3:23 PM, John Snow <jsnow@redhat.com> wrote:
->=20
->=20
->=20
-> On 08/18/2017 09:36 AM, Programmingkid wrote:
->>=20
->>> On Aug 18, 2017, at 4:46 AM, Artyom Tarasenko <atar4qemu@gmail.com> =
-wrote:
->>>=20
->>> On Fri, Aug 18, 2017 at 6:31 AM, Programmingkid
->>> <programmingkidx@gmail.com> wrote:
->>>>=20
->>>>> On Aug 15, 2017, at 6:27 PM, Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->>>>>=20
->>>>> On 15/08/2017 20:46, Programmingkid wrote:
->>>>>>=20
->>>>>>> On Aug 14, 2017, at 2:51 AM, Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->>>>>>>=20
->>>>>>> On 13/08/2017 21:13, Programmingkid wrote:
->>>>>>>> Lately I found out that Windows NT 4.0 seems to work well with =
-the
->>>>>>>> 486 and pentium processors. Using "-cpu 486" made installing it
->>>>>>>> actually work. Now I am seeing another issue. When I boot =
-Windows NT
->>>>>>>> 4.0 I see this error message:
->>>>>>>>=20
->>>>>>>> *** STOP: 0x0000007B =
-(0x807A8610,0x00000000,0x00000000,0x00000000)
->>>>>>>> INACESSIBLE_BOOT_DEVICE
->>>>>>>>=20
->>>>>>>> Would anyone know a way to solve this issue?
->>>>>>>=20
->>>>>>> Herv=C3=A9 is probably the best person to answer this question.  =
-Maybe try
->>>>>>> installing it with SCSI disks ("-drive if=3Dscsi,id=3Dhd,file=3D..=
-. -drive
->>>>>>> if=3Dscsi,id=3Dcd,file=3D... -device lsi -device =
-scsi-hd,drive=3Dhd -device
->>>>>>> scsi-cd,drive=3Dcd").
->>>>>>>=20
->>>>>>> Thanks,
->>>>>>>=20
->>>>>>> Paolo
->>>>>>=20
->>>>>> Thanks for the help. Unfortunately trying to boot from the =
-install CD leads to the INACCESSIBLE_BOOT_DEVICE error when using SCSI.
->>>>>=20
->>>>> Try with 0.12.
->>>>>=20
->>>>> Paolo
->>>>=20
->>>> I finally figured out why I was seeing the INACESSIBLE_BOOT_DEVICE =
-error. It was because of the qcow2 image format. As soon as I switched =
-to the qcow format, the error disappeared.
->>>=20
->>> That's weird. The image format is not guest visible. Probably you =
-are
->>> hitting some sort of timing issue.
->>>=20
->>>=20
->>> --=20
->>> Regards,
->>> Artyom Tarasenko
->>>=20
->>> SPARC and PPC PReP under qemu blog: =
-http://tyom.blogspot.com/search/label/qemu
->>=20
->> I'm not sure how timing is involved but I'm pretty sure I've heard =
-about guests having problems with the qcow2 format in the past.=20
->>=20
->=20
-> If the qcow2 driver in QEMU is written correctly, it should be 100%
-> invisible to guests. There should be no actual way to determine in any
-> way that qcow2 is being used.
-
-That is what I thought.
-
-> Either the qcow2 driver is broken (unlikely), or the way in which the
-> qcow2 driver is written is exposing race conditions or other timing
-> problems in either the qcow2 driver, the guest, or both.
-
-Interesting idea.
-
->=20
-> The odds of this being a "qcow2 problem" are pretty slim.
->=20
-> --js
-
-To anyone who wishes to recreate this test here is what you need to do.
-
-Download this iso:
-=
-https://archive.org/download/Microsoft_Windows_NT_Workstation_4.0_Microsof=
-t_1996/Microsoft%20Windows%20NT%20Workstation%20(4.0)%20(Microsoft)%20(199=
-6).iso
-
-Create the qcow hard drive image file:
-qemu-img create -f qcow qcowtest.qcow 4G
-
-Create the qcow2 hard drive image file:
-qemu-img create -f qcow2 qcow2test.qcow2 4G
-
-Install Windows NT 4.0 for each hard drive image file type:
-qemu-system-i386 -cpu pentium -vga cirrus -hda qcowtest.qcow -boot c
--cdrom <Windows NT 4.0 iso file>
-
-qemu-system-i386 -cpu pentium -vga cirrus -hda qcow2test.qcow2 -boot c
--cdrom <Windows NT 4.0 iso file>
-
-The actual installation for Windows NT 4.0 only takes about 5 minutes to =
-do, so it should be an easy test to do. Once done installing and setting =
-up Windows, try quitting and relaunching QEMU for each image format.=20
-
-Windows NT Workstation 4.0 CD-KEY: 30495-0006276-08164=20
-
-Please let us know your results.=20=
+On 08/18/2017 07:08 AM, Igor Mammedov wrote:
+> it's just a wrapper, drop it and use cpu_generic_init() directly
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> CC: Fabien Chouteau <chouteau@adacore.com>
+> CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> CC: Artyom Tarasenko <atar4qemu@gmail.com>
+> ---
+>   target/sparc/cpu.h   | 3 +--
+>   hw/sparc/leon3.c     | 2 +-
+>   hw/sparc/sun4m.c     | 2 +-
+>   hw/sparc64/sparc64.c | 2 +-
+>   target/sparc/cpu.c   | 5 -----
+>   5 files changed, 4 insertions(+), 10 deletions(-)
+> 
+> diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+> index 0e41916..b45cfb4 100644
+> --- a/target/sparc/cpu.h
+> +++ b/target/sparc/cpu.h
+> @@ -579,7 +579,6 @@ void cpu_raise_exception_ra(CPUSPARCState *, int, uintptr_t) QEMU_NORETURN;
+>   
+>   #ifndef NO_CPU_IO_DEFS
+>   /* cpu_init.c */
+> -SPARCCPU *cpu_sparc_init(const char *cpu_model);
+>   void cpu_sparc_set_id(CPUSPARCState *env, unsigned int cpu);
+>   void sparc_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+>   /* mmu_helper.c */
+> @@ -656,7 +655,7 @@ hwaddr cpu_get_phys_page_nofault(CPUSPARCState *env, target_ulong addr,
+>   int cpu_sparc_signal_handler(int host_signum, void *pinfo, void *puc);
+>   
+>   #ifndef NO_CPU_IO_DEFS
+> -#define cpu_init(cpu_model) CPU(cpu_sparc_init(cpu_model))
+> +#define cpu_init(cpu_model) cpu_generic_init(TYPE_SPARC_CPU, cpu_model)
+>   #endif
+>   
+>   #define cpu_signal_handler cpu_sparc_signal_handler
+> diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+> index d5ff188..56512ec 100644
+> --- a/hw/sparc/leon3.c
+> +++ b/hw/sparc/leon3.c
+> @@ -126,7 +126,7 @@ static void leon3_generic_hw_init(MachineState *machine)
+>           cpu_model = "LEON3";
+>       }
+>   
+> -    cpu = cpu_sparc_init(cpu_model);
+> +    cpu = SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+>       if (cpu == NULL) {
+>           fprintf(stderr, "qemu: Unable to find Sparc CPU definition\n");
+>           exit(1);
+> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+> index 89dd8a9..cf47dca 100644
+> --- a/hw/sparc/sun4m.c
+> +++ b/hw/sparc/sun4m.c
+> @@ -797,7 +797,7 @@ static void cpu_devinit(const char *cpu_model, unsigned int id,
+>       SPARCCPU *cpu;
+>       CPUSPARCState *env;
+>   
+> -    cpu = cpu_sparc_init(cpu_model);
+> +    cpu = SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+>       if (cpu == NULL) {
+>           fprintf(stderr, "qemu: Unable to find Sparc CPU definition\n");
+>           exit(1);
+> diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
+> index 4e4fdab..ecf38a4 100644
+> --- a/hw/sparc64/sparc64.c
+> +++ b/hw/sparc64/sparc64.c
+> @@ -353,7 +353,7 @@ SPARCCPU *sparc64_cpu_devinit(const char *cpu_model,
+>       if (cpu_model == NULL) {
+>           cpu_model = default_cpu_model;
+>       }
+> -    cpu = cpu_sparc_init(cpu_model);
+> +    cpu = SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+>       if (cpu == NULL) {
+>           fprintf(stderr, "Unable to find Sparc CPU definition\n");
+>           exit(1);
+> diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+> index fd01cbf..2917021 100644
+> --- a/target/sparc/cpu.c
+> +++ b/target/sparc/cpu.c
+> @@ -110,11 +110,6 @@ static void sparc_cpu_parse_features(const char *typename, char *features,
+>       cpu_legacy_parse_featurestr(typename, features, errp);
+>   }
+>   
+> -SPARCCPU *cpu_sparc_init(const char *cpu_model)
+> -{
+> -    return SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+> -}
+> -
+>   void cpu_sparc_set_id(CPUSPARCState *env, unsigned int cpu)
+>   {
+>   #if !defined(TARGET_SPARC64)
+> 
