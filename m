@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1diiPz-0002XU-Rn
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:38:37 -0400
+	(envelope-from <no-reply@patchew.org>) id 1diiRB-0003dK-MD
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:39:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1diiPw-0000U8-Kr
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:38:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48728)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1diiPw-0000SB-C0
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:38:32 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 59093C047B6E
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 14:38:31 +0000 (UTC)
-References: <20170818141512.15205-1-famz@redhat.com>
-	<20170818141512.15205-4-famz@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d8a88a4d-907a-c6f1-47a7-2e85849ee2f0@redhat.com>
-Date: Fri, 18 Aug 2017 16:38:24 +0200
+	(envelope-from <no-reply@patchew.org>) id 1diiR8-0001C3-Ir
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:39:49 -0400
+Resent-Message-Id: <E1diiR8-0001C3-Ir@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21305)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1diiR8-0001Bh-BF
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:39:46 -0400
+Message-ID: <150306717604.27.17218116548918586379@205a2245145f>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20170818141512.15205-1-famz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170818141512.15205-4-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] scsi-block: Support rerror/werror
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 18 Aug 2017 07:39:37 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] scsi-block: Support werror/rerror
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,137 +28,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: famz@redhat.com
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
 
-On 18/08/2017 16:15, Fam Zheng wrote:
-> This makes the werror/rerror options available on the scsi-block device,
-> to allow user specify error handling policy similar to scsi-hd.
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  hw/scsi/scsi-disk.c | 54 +++++++++++++++++++++++++++++++++++++++--------------
->  1 file changed, 40 insertions(+), 14 deletions(-)
-> 
-> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-> index 5f1e5e8070..ec7dbe4a2d 100644
-> --- a/hw/scsi/scsi-disk.c
-> +++ b/hw/scsi/scsi-disk.c
-> @@ -39,6 +39,7 @@ do { printf("scsi-disk: " fmt , ## __VA_ARGS__); } while (0)
->  #include "hw/block/block.h"
->  #include "sysemu/dma.h"
->  #include "qemu/cutils.h"
-> +#include "scsi/scsi.h"
->  
->  #ifdef __linux
->  #include <scsi/sg.h>
-> @@ -106,7 +107,7 @@ typedef struct SCSIDiskState
->      bool tray_locked;
->  } SCSIDiskState;
->  
-> -static int scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed);
-> +static bool scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed);
->  
->  static void scsi_free_request(SCSIRequest *req)
->  {
-> @@ -184,19 +185,10 @@ static bool scsi_disk_req_check_error(SCSIDiskReq *r, int ret, bool acct_failed)
->          return true;
->      }
->  
-> -    if (ret < 0) {
-> +    if (ret < 0 || (r->status && *r->status)) {
->          return scsi_handle_rw_error(r, -ret, acct_failed);
->      }
->  
-> -    if (r->status && *r->status) {
-> -        if (acct_failed) {
-> -            SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
-> -            block_acct_failed(blk_get_stats(s->qdev.conf.blk), &r->acct);
-> -        }
-> -        scsi_req_complete(&r->req, *r->status);
-> -        return true;
-> -    }
-> -
->      return false;
->  }
->  
-> @@ -422,13 +414,13 @@ static void scsi_read_data(SCSIRequest *req)
->  }
->  
->  /*
-> - * scsi_handle_rw_error has two return values.  0 means that the error
-> - * must be ignored, 1 means that the error has been processed and the
-> + * scsi_handle_rw_error has two return values.  False means that the error
-> + * must be ignored, true means that the error has been processed and the
->   * caller should not do anything else for this request.  Note that
->   * scsi_handle_rw_error always manages its reference counts, independent
->   * of the return value.
->   */
-> -static int scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
-> +static bool scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
->  {
->      bool is_read = (r->req.cmd.mode == SCSI_XFER_FROM_DEV);
->      SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
-> @@ -440,6 +432,11 @@ static int scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
->              block_acct_failed(blk_get_stats(s->qdev.conf.blk), &r->acct);
->          }
->          switch (error) {
-> +        case 0:
-> +            /* The command has run, no need to fake sense.  */
-> +            assert(r->status && *r->status);
-> +            scsi_req_complete(&r->req, *r->status);
-> +            break;
->          case ENOMEDIUM:
->              scsi_check_condition(r, SENSE_CODE(NO_MEDIUM));
->              break;
-> @@ -457,6 +454,34 @@ static int scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
->              break;
->          }
->      }
-> +    if (!error) {
-> +        int key, asc, ascq;
-> +        assert(r->status && *r->status);
-> +        switch (r->req.sense[0]) {
-> +        case 0x70: /* Fixed format sense data. */
-> +            key = r->req.sense[2] & 0xF;
-> +            asc = r->req.sense[12];
-> +            ascq = r->req.sense[13];
-> +            error = scsi_sense_to_errno(key, asc, ascq);
-> +            break;
-> +        case 0x72: /* Descriptor format sense data. */
-> +            key = r->req.sense[1] & 0xF;
-> +            asc = r->req.sense[2];
-> +            ascq = r->req.sense[3];
-> +            error = scsi_sense_to_errno(key, asc, ascq);
-> +            break;
-> +        default:
-> +            error = EIO;
-> +            break;
-> +        }
-
-Maybe this switch statement should also be a function in util/iscsi.c
-(scsi_sense_buf_to_errno)?
-> +
-> +        if (error == ECANCELED) {
-
-... || error == EAGAIN || error == ENOTCONN || error == 0
-
-?
-
-> +            /* Command aborted shouldn't stop the VM. */
-> +            scsi_req_complete(&r->req, *r->status);
-> +            return true;
-> +        }
-> +    }
-> +
->      blk_error_action(s->qdev.conf.blk, action, is_read, error);
->      if (action == BLOCK_ERROR_ACTION_STOP) {
->          scsi_req_retry(&r->req);
-> @@ -2972,6 +2997,7 @@ static const TypeInfo scsi_cd_info = {
->  
->  #ifdef __linux__
->  static Property scsi_block_properties[] = {
-> +    DEFINE_BLOCK_ERROR_PROPERTIES(SCSIDiskState, qdev.conf),         \
->      DEFINE_PROP_DRIVE("drive", SCSIDiskState, qdev.conf.blk),
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcwODE4MTQxNTEyLjE1MjA1LTEtZmFtekByZWRoYXQuY29tClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC8zXSBzY3NpLWJsb2NrOiBTdXBwb3J0IHdlcnJvci9y
+ZXJyb3IKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
+PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
+ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
+SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
+Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
+aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
+PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
+YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
+Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAg
+ICAgICBwYXRjaGV3LzE1MDMwNjU3MDgtMjgyNzctMS1naXQtc2VuZC1lbWFpbC1tYXJrLmNhdmUt
+YXlsYW5kQGlsYW5kZS5jby51ayAtPiBwYXRjaGV3LzE1MDMwNjU3MDgtMjgyNzctMS1naXQtc2Vu
+ZC1lbWFpbC1tYXJrLmNhdmUtYXlsYW5kQGlsYW5kZS5jby51awpTd2l0Y2hlZCB0byBhIG5ldyBi
+cmFuY2ggJ3Rlc3QnCjUwOTdkOTI3ZGUgc2NzaS1ibG9jazogU3VwcG9ydCByZXJyb3Ivd2Vycm9y
+CmQyYzUzNmE0N2Mgc2NzaTogRW5oYW5jZSBzY3NpX3NlbnNlX3RvX2Vycm5vCjE3NjQyZTlhOGUg
+c2NzaTogUmVmYWN0b3Igc2NzaSBzZW5zZSBpbnRlcnByZXRpbmcgY29kZQoKPT09IE9VVFBVVCBC
+RUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8zOiBzY3NpOiBSZWZhY3RvciBzY3NpIHNlbnNlIGlu
+dGVycHJldGluZyBjb2RlLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgJy0n
+IChjdHg6V3hXKQojODQ6IEZJTEU6IGJsb2NrL2lzY3NpLmM6MjEzOgorICAgIHJldHVybiAtIHNj
+c2lfc2Vuc2VfdG9fZXJybm8oc2Vuc2UtPmtleSwKICAgICAgICAgICAgXgoKRVJST1I6IHJldHVy
+biBvZiBhbiBlcnJubyBzaG91bGQgdHlwaWNhbGx5IGJlIC12ZSAocmV0dXJuIC1FQlVTWSkKIzE1
+MTogRklMRTogdXRpbC9zY3NpLmM6MjI6CisgICAgICAgIHJldHVybiBFQlVTWTsKCkVSUk9SOiBy
+ZXR1cm4gb2YgYW4gZXJybm8gc2hvdWxkIHR5cGljYWxseSBiZSAtdmUgKHJldHVybiAtRUFDQ0VT
+KQojMTUzOiBGSUxFOiB1dGlsL3Njc2kuYzoyNDoKKyAgICAgICAgcmV0dXJuIEVBQ0NFUzsKCkVS
+Uk9SOiByZXR1cm4gb2YgYW4gZXJybm8gc2hvdWxkIHR5cGljYWxseSBiZSAtdmUgKHJldHVybiAt
+RUNBTkNFTEVEKQojMTU1OiBGSUxFOiB1dGlsL3Njc2kuYzoyNjoKKyAgICAgICAgcmV0dXJuIEVD
+QU5DRUxFRDsKCkVSUk9SOiByZXR1cm4gb2YgYW4gZXJybm8gc2hvdWxkIHR5cGljYWxseSBiZSAt
+dmUgKHJldHVybiAtRUlPKQojMTYwOiBGSUxFOiB1dGlsL3Njc2kuYzozMToKKyAgICAgICAgcmV0
+dXJuIEVJTzsKCkVSUk9SOiByZXR1cm4gb2YgYW4gZXJybm8gc2hvdWxkIHR5cGljYWxseSBiZSAt
+dmUgKHJldHVybiAtRUlOVkFMKQojMTY3OiBGSUxFOiB1dGlsL3Njc2kuYzozODoKKyAgICAgICAg
+cmV0dXJuIEVJTlZBTDsKCkVSUk9SOiByZXR1cm4gb2YgYW4gZXJybm8gc2hvdWxkIHR5cGljYWxs
+eSBiZSAtdmUgKHJldHVybiAtRU5PU1BDKQojMTY5OiBGSUxFOiB1dGlsL3Njc2kuYzo0MDoKKyAg
+ICAgICAgcmV0dXJuIEVOT1NQQzsKCkVSUk9SOiByZXR1cm4gb2YgYW4gZXJybm8gc2hvdWxkIHR5
+cGljYWxseSBiZSAtdmUgKHJldHVybiAtRU5PVFNVUCkKIzE3MTogRklMRTogdXRpbC9zY3NpLmM6
+NDI6CisgICAgICAgIHJldHVybiBFTk9UU1VQOwoKRVJST1I6IHJldHVybiBvZiBhbiBlcnJubyBz
+aG91bGQgdHlwaWNhbGx5IGJlIC12ZSAocmV0dXJuIC1FTk9NRURJVU0pCiMxNzU6IEZJTEU6IHV0
+aWwvc2NzaS5jOjQ2OgorICAgICAgICByZXR1cm4gRU5PTUVESVVNOwoKRVJST1I6IHJldHVybiBv
+ZiBhbiBlcnJubyBzaG91bGQgdHlwaWNhbGx5IGJlIC12ZSAocmV0dXJuIC1FQUNDRVMpCiMxNzc6
+IEZJTEU6IHV0aWwvc2NzaS5jOjQ4OgorICAgICAgICByZXR1cm4gRUFDQ0VTOwoKRVJST1I6IHJl
+dHVybiBvZiBhbiBlcnJubyBzaG91bGQgdHlwaWNhbGx5IGJlIC12ZSAocmV0dXJuIC1FSU8pCiMx
+Nzk6IEZJTEU6IHV0aWwvc2NzaS5jOjUwOgorICAgICAgICByZXR1cm4gRUlPOwoKdG90YWw6IDEx
+IGVycm9ycywgMCB3YXJuaW5ncywgMTQxIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvMzogc2NzaTogRW5oYW5jZSBz
+Y3NpX3NlbnNlX3RvX2Vycm5vLi4uCkNoZWNraW5nIFBBVENIIDMvMzogc2NzaS1ibG9jazogU3Vw
+cG9ydCByZXJyb3Ivd2Vycm9yLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4
+aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
+UGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sg
+dG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
