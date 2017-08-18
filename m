@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dii3b-0006CC-6p
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:15:32 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dii3p-0006Pi-9R
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:15:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dii3Z-0005xE-VR
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:15:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60184)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dii3Z-0005uv-LH
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:15:25 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8D874461D2
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 14:15:24 +0000 (UTC)
-From: Fam Zheng <famz@redhat.com>
-Date: Fri, 18 Aug 2017 22:15:12 +0800
-Message-Id: <20170818141512.15205-4-famz@redhat.com>
-In-Reply-To: <20170818141512.15205-1-famz@redhat.com>
-References: <20170818141512.15205-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 3/3] scsi-block: Support rerror/werror
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dii3l-0006N5-95
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:15:41 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:57467
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1dii3l-00068E-1h
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:15:37 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Fri, 18 Aug 2017 15:15:06 +0100
+Message-Id: <1503065708-28277-3-git-send-email-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <1503065708-28277-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+References: <1503065708-28277-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 2/4] net: introduce net_crc32_le() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,130 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org, jasowang@redhat.com
 
-This makes the werror/rerror options available on the scsi-block device,
-to allow user specify error handling policy similar to scsi-hd.
+This provides a standard ethernet CRC32 little-endian implementation.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/scsi/scsi-disk.c | 54 +++++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 40 insertions(+), 14 deletions(-)
+ include/net/net.h |    2 ++
+ net/net.c         |   22 ++++++++++++++++++++++
+ 2 files changed, 24 insertions(+)
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 5f1e5e8070..ec7dbe4a2d 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -39,6 +39,7 @@ do { printf("scsi-disk: " fmt , ## __VA_ARGS__); } while (0)
- #include "hw/block/block.h"
- #include "sysemu/dma.h"
- #include "qemu/cutils.h"
-+#include "scsi/scsi.h"
+diff --git a/include/net/net.h b/include/net/net.h
+index 586098c..4afac1a 100644
+--- a/include/net/net.h
++++ b/include/net/net.h
+@@ -228,7 +228,9 @@ NetClientState *net_hub_port_find(int hub_id);
+ void qdev_set_nic_properties(DeviceState *dev, NICInfo *nd);
  
- #ifdef __linux
- #include <scsi/sg.h>
-@@ -106,7 +107,7 @@ typedef struct SCSIDiskState
-     bool tray_locked;
- } SCSIDiskState;
+ #define POLYNOMIAL_BE 0x04c11db6
++#define POLYNOMIAL_LE 0xedb88320
+ uint32_t net_crc32(const uint8_t *p, int len);
++uint32_t net_crc32_le(const uint8_t *p, int len);
+ unsigned compute_mcast_idx(const uint8_t *ep);
  
--static int scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed);
-+static bool scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed);
- 
- static void scsi_free_request(SCSIRequest *req)
- {
-@@ -184,19 +185,10 @@ static bool scsi_disk_req_check_error(SCSIDiskReq *r, int ret, bool acct_failed)
-         return true;
-     }
- 
--    if (ret < 0) {
-+    if (ret < 0 || (r->status && *r->status)) {
-         return scsi_handle_rw_error(r, -ret, acct_failed);
-     }
- 
--    if (r->status && *r->status) {
--        if (acct_failed) {
--            SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
--            block_acct_failed(blk_get_stats(s->qdev.conf.blk), &r->acct);
--        }
--        scsi_req_complete(&r->req, *r->status);
--        return true;
--    }
--
-     return false;
+ #define vmstate_offset_macaddr(_state, _field)                       \
+diff --git a/net/net.c b/net/net.c
+index a856907..c99e705 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1590,6 +1590,28 @@ uint32_t net_crc32(const uint8_t *p, int len)
+     return crc;
  }
  
-@@ -422,13 +414,13 @@ static void scsi_read_data(SCSIRequest *req)
- }
- 
- /*
-- * scsi_handle_rw_error has two return values.  0 means that the error
-- * must be ignored, 1 means that the error has been processed and the
-+ * scsi_handle_rw_error has two return values.  False means that the error
-+ * must be ignored, true means that the error has been processed and the
-  * caller should not do anything else for this request.  Note that
-  * scsi_handle_rw_error always manages its reference counts, independent
-  * of the return value.
-  */
--static int scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
-+static bool scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
- {
-     bool is_read = (r->req.cmd.mode == SCSI_XFER_FROM_DEV);
-     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
-@@ -440,6 +432,11 @@ static int scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
-             block_acct_failed(blk_get_stats(s->qdev.conf.blk), &r->acct);
-         }
-         switch (error) {
-+        case 0:
-+            /* The command has run, no need to fake sense.  */
-+            assert(r->status && *r->status);
-+            scsi_req_complete(&r->req, *r->status);
-+            break;
-         case ENOMEDIUM:
-             scsi_check_condition(r, SENSE_CODE(NO_MEDIUM));
-             break;
-@@ -457,6 +454,34 @@ static int scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
-             break;
-         }
-     }
-+    if (!error) {
-+        int key, asc, ascq;
-+        assert(r->status && *r->status);
-+        switch (r->req.sense[0]) {
-+        case 0x70: /* Fixed format sense data. */
-+            key = r->req.sense[2] & 0xF;
-+            asc = r->req.sense[12];
-+            ascq = r->req.sense[13];
-+            error = scsi_sense_to_errno(key, asc, ascq);
-+            break;
-+        case 0x72: /* Descriptor format sense data. */
-+            key = r->req.sense[1] & 0xF;
-+            asc = r->req.sense[2];
-+            ascq = r->req.sense[3];
-+            error = scsi_sense_to_errno(key, asc, ascq);
-+            break;
-+        default:
-+            error = EIO;
-+            break;
-+        }
++uint32_t net_crc32_le(const uint8_t *p, int len)
++{
++    uint32_t crc;
++    int carry, i, j;
++    uint8_t b;
 +
-+        if (error == ECANCELED) {
-+            /* Command aborted shouldn't stop the VM. */
-+            scsi_req_complete(&r->req, *r->status);
-+            return true;
++    crc = 0xffffffff;
++    for (i = 0; i < len; i++) {
++        b = *p++;
++        for (j = 0; j < 8; j++) {
++            carry = (crc & 0x1) ^ (b & 0x01);
++            crc >>= 1;
++            b >>= 1;
++            if (carry) {
++                crc = crc ^ POLYNOMIAL_LE;
++            }
 +        }
 +    }
 +
-     blk_error_action(s->qdev.conf.blk, action, is_read, error);
-     if (action == BLOCK_ERROR_ACTION_STOP) {
-         scsi_req_retry(&r->req);
-@@ -2972,6 +2997,7 @@ static const TypeInfo scsi_cd_info = {
- 
- #ifdef __linux__
- static Property scsi_block_properties[] = {
-+    DEFINE_BLOCK_ERROR_PROPERTIES(SCSIDiskState, qdev.conf),         \
-     DEFINE_PROP_DRIVE("drive", SCSIDiskState, qdev.conf.blk),
-     DEFINE_PROP_END_OF_LIST(),
- };
++    return crc;
++}
++
+ unsigned compute_mcast_idx(const uint8_t *ep)
+ {
+     return net_crc32(ep, 6) >> 26;
 -- 
-2.13.4
+1.7.10.4
