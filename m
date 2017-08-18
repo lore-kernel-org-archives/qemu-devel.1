@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1difhA-0001qO-5T
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:44:09 -0400
+	(envelope-from <david@redhat.com>) id 1difhC-0001sw-JG
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:44:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1difh9-00078K-Ah
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:44:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44542)
+	(envelope-from <david@redhat.com>) id 1difhB-00079C-UU
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:44:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36278)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1difh9-00078A-1V
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:44:07 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1difhB-00078s-OE
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:44:09 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Fri, 18 Aug 2017 13:43:37 +0200
-Message-Id: <20170818114353.13455-3-david@redhat.com>
+Date: Fri, 18 Aug 2017 13:43:38 +0200
+Message-Id: <20170818114353.13455-4-david@redhat.com>
 In-Reply-To: <20170818114353.13455-1-david@redhat.com>
 References: <20170818114353.13455-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 for-2.11 02/18] s390x/kvm: drop KVMState
- parameter from kvm_s390_set_mem_limit()
+Subject: [Qemu-devel] [PATCH v3 for-2.11 03/18] target/s390x: simplify
+ ri_allowed()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,94 +27,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Not needed at that point. Also drop it from kvm_s390_query_mem_limit()
-we call in kvm_s390_set_mem_limit().
+Only used in KVM and there is no reason why it shouldn't be allowed for
+tcg - it is simply not available.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/cpu.h |  7 +++----
- target/s390x/kvm.c | 12 ++++++------
- 2 files changed, 9 insertions(+), 10 deletions(-)
+ hw/s390x/s390-virtio-ccw.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 44b1a7a..798e299 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -1169,7 +1169,7 @@ int kvm_s390_cmma_active(void);
- void kvm_s390_cmma_reset(void);
- int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state);
- void kvm_s390_reset_vcpu(S390CPU *cpu);
--int kvm_s390_set_mem_limit(KVMState *s, uint64_t new_limit, uint64_t *hw_limit);
-+int kvm_s390_set_mem_limit(uint64_t new_limit, uint64_t *hw_limit);
- void kvm_s390_vcpu_interrupt_pre_save(S390CPU *cpu);
- int kvm_s390_vcpu_interrupt_post_load(S390CPU *cpu);
- int kvm_s390_get_ri(void);
-@@ -1215,8 +1215,7 @@ static inline int kvm_s390_set_cpu_state(S390CPU *cpu, uint8_t cpu_state)
- static inline void kvm_s390_reset_vcpu(S390CPU *cpu)
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 1c7af39..3a674f5 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -276,9 +276,6 @@ static S390CcwMachineClass *get_machine_class(void)
+ 
+ bool ri_allowed(void)
  {
+-    if (!kvm_enabled()) {
+-        return false;
+-    }
+     /* for "none" machine this results in true */
+     return get_machine_class()->ri_allowed;
  }
--static inline int kvm_s390_set_mem_limit(KVMState *s, uint64_t new_limit,
--                                         uint64_t *hw_limit)
-+static inline int kvm_s390_set_mem_limit(uint64_t new_limit, uint64_t *hw_limit)
- {
-     return 0;
- }
-@@ -1243,7 +1242,7 @@ static inline void kvm_s390_crypto_reset(void)
- static inline int s390_set_memory_limit(uint64_t new_limit, uint64_t *hw_limit)
- {
-     if (kvm_enabled()) {
--        return kvm_s390_set_mem_limit(kvm_state, new_limit, hw_limit);
-+        return kvm_s390_set_mem_limit(new_limit, hw_limit);
-     }
-     return 0;
- }
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index d0bb9e9..0e324ae 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -145,7 +145,7 @@ static int active_cmma;
- 
- static void *legacy_s390_alloc(size_t size, uint64_t *align);
- 
--static int kvm_s390_query_mem_limit(KVMState *s, uint64_t *memory_limit)
-+static int kvm_s390_query_mem_limit(uint64_t *memory_limit)
- {
-     struct kvm_device_attr attr = {
-         .group = KVM_S390_VM_MEM_CTRL,
-@@ -153,10 +153,10 @@ static int kvm_s390_query_mem_limit(KVMState *s, uint64_t *memory_limit)
-         .addr = (uint64_t) memory_limit,
-     };
- 
--    return kvm_vm_ioctl(s, KVM_GET_DEVICE_ATTR, &attr);
-+    return kvm_vm_ioctl(kvm_state, KVM_GET_DEVICE_ATTR, &attr);
- }
- 
--int kvm_s390_set_mem_limit(KVMState *s, uint64_t new_limit, uint64_t *hw_limit)
-+int kvm_s390_set_mem_limit(uint64_t new_limit, uint64_t *hw_limit)
- {
-     int rc;
- 
-@@ -166,18 +166,18 @@ int kvm_s390_set_mem_limit(KVMState *s, uint64_t new_limit, uint64_t *hw_limit)
-         .addr = (uint64_t) &new_limit,
-     };
- 
--    if (!kvm_vm_check_mem_attr(s, KVM_S390_VM_MEM_LIMIT_SIZE)) {
-+    if (!kvm_vm_check_mem_attr(kvm_state, KVM_S390_VM_MEM_LIMIT_SIZE)) {
-         return 0;
-     }
- 
--    rc = kvm_s390_query_mem_limit(s, hw_limit);
-+    rc = kvm_s390_query_mem_limit(hw_limit);
-     if (rc) {
-         return rc;
-     } else if (*hw_limit < new_limit) {
-         return -E2BIG;
-     }
- 
--    return kvm_vm_ioctl(s, KVM_SET_DEVICE_ATTR, &attr);
-+    return kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
- }
- 
- int kvm_s390_cmma_active(void)
 -- 
 2.9.4
