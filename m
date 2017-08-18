@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dieDN-00044G-LJ
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:18 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dieDO-00045F-Mh
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dieDM-0000cz-JO
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46290)
+	(envelope-from <imammedo@redhat.com>) id 1dieDN-0000ew-EM
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60400)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dieDM-0000cH-Cw
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:16 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dieDN-0000cw-69
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:17 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7A67EC04B928
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:15 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4A3E581DFD
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:16 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
 	(dell-r430-03.lab.eng.brq.redhat.com [10.34.112.60])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id F312B5D743
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:14 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C40D45D743
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:15 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 18 Aug 2017 12:08:43 +0200
-Message-Id: <1503050939-227939-12-git-send-email-imammedo@redhat.com>
+Date: Fri, 18 Aug 2017 12:08:44 +0200
+Message-Id: <1503050939-227939-13-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
 References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11 11/27] hppa: replace cpu_hppa_init()
+Subject: [Qemu-devel] [PATCH for-2.11 12/27] m68k: replace cpu_m68k_init()
  with cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -36,65 +36,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-drop custom cpu_hppa_init() in favor of cpu_generic_init(),
-to make cpu_generic_init() work all we need is to provide
-cc->class_by_name callback that would resolve any cpu_model
-to the sole TYPE_HPPA_CPU to match current behaviour.
+call register_m68k_insns() at realize time which makes
+cpu_m68k_init() typical object creation function.
+As result we can replace it with cpu_generic_init()
+which does the same job, reducing code duplication a bit.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: Richard Henderson <rth@twiddle.net>
+Tested-by: Thomas Huth <huth@tuxfamily.org>
+Acked-by: Laurent Vivier <laurent@vivier.eu>
 ---
+ target/m68k/cpu.h    |  3 +--
+ hw/m68k/an5206.c     |  2 +-
+ hw/m68k/mcf5208.c    |  2 +-
+ target/m68k/cpu.c    |  2 ++
+ target/m68k/helper.c | 20 --------------------
+ 5 files changed, 5 insertions(+), 24 deletions(-)
 
-tested with linux-user
----
- target/hppa/cpu.h |  4 +---
- target/hppa/cpu.c | 11 +++--------
- 2 files changed, 4 insertions(+), 11 deletions(-)
-
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index 4cf4ac6..8d14077 100644
---- a/target/hppa/cpu.h
-+++ b/target/hppa/cpu.h
-@@ -112,9 +112,7 @@ static inline int cpu_mmu_index(CPUHPPAState *env, bool ifetch)
+diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+index 38a7e11..d936547 100644
+--- a/target/m68k/cpu.h
++++ b/target/m68k/cpu.h
+@@ -163,7 +163,6 @@ int m68k_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
  
- void hppa_translate_init(void);
+ void m68k_tcg_init(void);
+ void m68k_cpu_init_gdb(M68kCPU *cpu);
+-M68kCPU *cpu_m68k_init(const char *cpu_model);
+ /* you can call this signal handler from your SIGBUS and SIGSEGV
+    signal handlers to inform the virtual CPU of exceptions. non zero
+    is returned if the signal was handled by the virtual CPU.  */
+@@ -322,7 +321,7 @@ void register_m68k_insns (CPUM68KState *env);
+ #define TARGET_PHYS_ADDR_SPACE_BITS 32
+ #define TARGET_VIRT_ADDR_SPACE_BITS 32
  
--HPPACPU *cpu_hppa_init(const char *cpu_model);
--
--#define cpu_init(cpu_model) CPU(cpu_hppa_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_HPPA_CPU, cpu_model)
+-#define cpu_init(cpu_model) CPU(cpu_m68k_init(cpu_model))
++#define cpu_init(cpu_model) cpu_generic_init(TYPE_M68K_CPU, cpu_model)
  
- void hppa_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+ #define cpu_signal_handler cpu_m68k_signal_handler
+ #define cpu_list m68k_cpu_list
+diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
+index c762441..7b9b15d 100644
+--- a/hw/m68k/an5206.c
++++ b/hw/m68k/an5206.c
+@@ -42,7 +42,7 @@ static void an5206_init(MachineState *machine)
+     if (!cpu_model) {
+         cpu_model = "m5206";
+     }
+-    cpu = cpu_m68k_init(cpu_model);
++    cpu = M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
+     if (!cpu) {
+         error_report("Unable to find m68k CPU definition");
+         exit(1);
+diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
+index f4b1387..1a0f180 100644
+--- a/hw/m68k/mcf5208.c
++++ b/hw/m68k/mcf5208.c
+@@ -232,7 +232,7 @@ static void mcf5208evb_init(MachineState *machine)
+     if (!cpu_model) {
+         cpu_model = "m5208";
+     }
+-    cpu = cpu_m68k_init(cpu_model);
++    cpu = M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
+     if (!cpu) {
+         fprintf(stderr, "Unable to find m68k CPU definition\n");
+         exit(1);
+diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+index a14b6dd..55bf24b 100644
+--- a/target/m68k/cpu.c
++++ b/target/m68k/cpu.c
+@@ -230,6 +230,8 @@ static void m68k_cpu_realizefn(DeviceState *dev, Error **errp)
+     M68kCPUClass *mcc = M68K_CPU_GET_CLASS(dev);
+     Error *local_err = NULL;
  
-diff --git a/target/hppa/cpu.c b/target/hppa/cpu.c
-index 30299e9..a477b45 100644
---- a/target/hppa/cpu.c
-+++ b/target/hppa/cpu.c
-@@ -112,15 +112,9 @@ static void hppa_cpu_initfn(Object *obj)
-     hppa_translate_init();
++    register_m68k_insns(&cpu->env);
++
+     cpu_exec_realizefn(cs, &local_err);
+     if (local_err != NULL) {
+         error_propagate(errp, local_err);
+diff --git a/target/m68k/helper.c b/target/m68k/helper.c
+index caae291..7e50ff5 100644
+--- a/target/m68k/helper.c
++++ b/target/m68k/helper.c
+@@ -156,26 +156,6 @@ static int m68k_fpu_gdb_set_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
+     return 0;
  }
  
--HPPACPU *cpu_hppa_init(const char *cpu_model)
-+static ObjectClass *hppa_cpu_class_by_name(const char *cpu_model)
- {
--    HPPACPU *cpu;
+-M68kCPU *cpu_m68k_init(const char *cpu_model)
+-{
+-    M68kCPU *cpu;
+-    CPUM68KState *env;
+-    ObjectClass *oc;
 -
--    cpu = HPPA_CPU(object_new(TYPE_HPPA_CPU));
+-    oc = cpu_class_by_name(TYPE_M68K_CPU, cpu_model);
+-    if (oc == NULL) {
+-        return NULL;
+-    }
+-    cpu = M68K_CPU(object_new(object_class_get_name(oc)));
+-    env = &cpu->env;
+-
+-    register_m68k_insns(env);
 -
 -    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
 -
 -    return cpu;
-+    return object_class_by_name(TYPE_HPPA_CPU);
- }
- 
- static void hppa_cpu_class_init(ObjectClass *oc, void *data)
-@@ -132,6 +126,7 @@ static void hppa_cpu_class_init(ObjectClass *oc, void *data)
-     acc->parent_realize = dc->realize;
-     dc->realize = hppa_cpu_realizefn;
- 
-+    cc->class_by_name = hppa_cpu_class_by_name;
-     cc->do_interrupt = hppa_cpu_do_interrupt;
-     cc->cpu_exec_interrupt = hppa_cpu_exec_interrupt;
-     cc->dump_state = hppa_cpu_dump_state;
+-}
+-
+ void m68k_cpu_init_gdb(M68kCPU *cpu)
+ {
+     CPUState *cs = CPU(cpu);
 -- 
 2.7.4
