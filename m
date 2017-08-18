@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1difSm-0004t3-UY
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:29:17 -0400
+	(envelope-from <cohuck@redhat.com>) id 1difVo-0006B7-Gs
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:32:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1difSi-0006oA-0N
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:29:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45412)
+	(envelope-from <cohuck@redhat.com>) id 1difVj-0008RE-D6
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:32:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36108)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1difSh-0006nr-Pq
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:29:11 -0400
-Date: Fri, 18 Aug 2017 13:29:00 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1difVj-0008QV-6J
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:32:19 -0400
+Date: Fri, 18 Aug 2017 13:32:14 +0200
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170818132900.724ae811.cohuck@redhat.com>
-In-Reply-To: <20170815172755.39d3559b.cohuck@redhat.com>
-References: <1502431076-22849-1-git-send-email-thuth@redhat.com>
-	<20170815172755.39d3559b.cohuck@redhat.com>
+Message-ID: <20170818133214.13414eb4.cohuck@redhat.com>
+In-Reply-To: <4b80d965-d162-84eb-c6c6-0adb86d83ce8@redhat.com>
+References: <20170818110015.25310-1-cohuck@redhat.com>
+	<4b80d965-d162-84eb-c6c6-0adb86d83ce8@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.11 0/2] Improvements for the pxe
- tester
+Subject: Re: [Qemu-devel] [PATCH] s390x/tcg: specification exception for
+ unknown diag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +29,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Victor Kaplansky <victork@redhat.com>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, borntraeger@de.ibm.com
 
-On Tue, 15 Aug 2017 17:27:55 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+On Fri, 18 Aug 2017 13:26:15 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-> On Fri, 11 Aug 2017 07:57:54 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
+> On 18.08.2017 13:00, Cornelia Huck wrote:
+> > While the PoP is silent on the issue, z/VM documentation states
+> > that unknown diagnose codes trigger a specification exception.
+> > We already do that when running with kvm, so change tcg to do so
+> > as well.  
 > 
-> > The first patch improves the buffer handling in the pxe tester a
-> > little bit by allocating a separate buffer on the heap for each
-> > architecture. This also gets rid of the huge pre-initialized
-> > array in the tester, shrinking the size of the executable by
-> > half of a megabyte!
-> > The second patch adds s390x support to the pxe tester. Starting
-> > with QEMU 2.10, the guest firmware on s390x can now net-boot via
-> > TFTP, too, so we can automatically test this code in the pxe tester.
-> > 
-> > v2: Adressed Cornelia's review feedback from the first version, e.g.:
-> >  - Use g_malloc0() instead of g_malloc()
-> >  - Use sizeof with parentheses
-> > 
-> > Thomas Huth (2):
-> >   tests/boot-sector: Do not overwrite the x86 buffer on other
-> >     architectures
-> >   tests/pxe: Check virtio-net-ccw on s390x
-> > 
-> >  tests/Makefile.include |  1 +
-> >  tests/boot-sector.c    | 61 +++++++++++++++++++++++++++++++++++++-------------
-> >  tests/pxe-test.c       |  7 ++++++
-> >  3 files changed, 54 insertions(+), 15 deletions(-)
-> >   
-> 
-> It's that question again: Who picks this up? :)
-> 
-> I can take it through the s390 tree if nobody else wants it.
+> I just tried on a z/VM guest what happens if I call diag with an
+> unsupported code, and the Linux kernel then crashes with a specification
+> exception, indeed. So this sounds like the right thing to do!
 
-OK, I just went ahead and queued it to my s390-next branch.
+For reference, here's the relevant hunk in z/VM documentation:
+https://www.ibm.com/support/knowledgecenter/SSB27U_6.4.0/com.ibm.zvm.v640.hcpb4/hcpb432.htm
+
+> 
+> > This is on top of "s390x: wire up diag288 in tcg".  
+> 
+> May I suggest to order the patches the other way round? ... that's less
+> code churn that way.
+
+Let me detangle my branches...
