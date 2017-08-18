@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dieDT-0004BS-7E
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:24 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dieDU-0004DQ-F7
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dieDQ-0000la-Ra
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48876)
+	(envelope-from <imammedo@redhat.com>) id 1dieDT-0000nn-9U
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54622)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dieDQ-0000kI-IH
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:20 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dieDS-0000n4-Vf
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 06:09:23 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 16922883BC
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:22 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+	(dell-r430-03.lab.eng.brq.redhat.com [10.34.112.60])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8EFDF5D743
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 10:09:21 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Fri, 18 Aug 2017 12:08:48 +0200
-Message-Id: <1503050939-227939-17-git-send-email-imammedo@redhat.com>
+Date: Fri, 18 Aug 2017 12:08:51 +0200
+Message-Id: <1503050939-227939-20-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
 References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11 16/27] xtensa: replace
- cpu_xtensa_init() with cpu_generic_init()
+Subject: [Qemu-devel] [PATCH for-2.11 19/27] arm: replace cpu_arm_init()
+ with cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,114 +35,131 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-call xtensa_irq_init() at realize time which makes
-cpu_xtensa_init() like generic cpu creation function.
-As result we can replace it with cpu_generic_init()
-which does the same job, reducing code duplication a bit.
+it's just a wrapper, drop it and use cpu_generic_init() directly
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
-CC: Max Filippov <jcmvbkbc@gmail.com>
----
- target/xtensa/cpu.h    |  4 +---
- hw/xtensa/sim.c        |  2 +-
- hw/xtensa/xtfpga.c     |  2 +-
- target/xtensa/cpu.c    |  3 +++
- target/xtensa/helper.c | 22 ----------------------
- 5 files changed, 6 insertions(+), 27 deletions(-)
+ target/arm/cpu.h    | 3 +--
+ hw/arm/musicpal.c   | 2 +-
+ hw/arm/omap1.c      | 2 +-
+ hw/arm/omap2.c      | 2 +-
+ hw/arm/pxa2xx.c     | 4 ++--
+ hw/arm/strongarm.c  | 2 +-
+ target/arm/helper.c | 5 -----
+ 7 files changed, 7 insertions(+), 13 deletions(-)
 
-diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-index ee29fb1..4803331 100644
---- a/target/xtensa/cpu.h
-+++ b/target/xtensa/cpu.h
-@@ -475,9 +475,7 @@ void xtensa_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
- #define XTENSA_DEFAULT_CPU_MODEL "dc232b"
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index b39d64a..5932ef1 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -748,7 +748,6 @@ int aarch64_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
+ int aarch64_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
  #endif
  
--XtensaCPU *cpu_xtensa_init(const char *cpu_model);
--
--#define cpu_init(cpu_model) CPU(cpu_xtensa_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_XTENSA_CPU, cpu_model)
+-ARMCPU *cpu_arm_init(const char *cpu_model);
+ target_ulong do_arm_semihosting(CPUARMState *env);
+ void aarch64_sync_32_to_64(CPUARMState *env);
+ void aarch64_sync_64_to_32(CPUARMState *env);
+@@ -2001,7 +2000,7 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
+     return unmasked || pstate_unmasked;
+ }
  
- void xtensa_translate_init(void);
- void xtensa_breakpoint_handler(CPUState *cs);
-diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
-index 249cd1e..1b4767f 100644
---- a/hw/xtensa/sim.c
-+++ b/hw/xtensa/sim.c
-@@ -84,7 +84,7 @@ static void xtensa_sim_init(MachineState *machine)
+-#define cpu_init(cpu_model) CPU(cpu_arm_init(cpu_model))
++#define cpu_init(cpu_model) cpu_generic_init(TYPE_ARM_CPU, cpu_model)
+ 
+ #define cpu_signal_handler cpu_arm_signal_handler
+ #define cpu_list arm_cpu_list
+diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
+index 7e8ab31..a8b3d46 100644
+--- a/hw/arm/musicpal.c
++++ b/hw/arm/musicpal.c
+@@ -1593,7 +1593,7 @@ static void musicpal_init(MachineState *machine)
+     if (!cpu_model) {
+         cpu_model = "arm926";
+     }
+-    cpu = cpu_arm_init(cpu_model);
++    cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, cpu_model));
+     if (!cpu) {
+         fprintf(stderr, "Unable to find CPU definition\n");
+         exit(1);
+diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
+index 3d15ff6..400ba30 100644
+--- a/hw/arm/omap1.c
++++ b/hw/arm/omap1.c
+@@ -3863,7 +3863,7 @@ struct omap_mpu_state_s *omap310_mpu_init(MemoryRegion *system_memory,
+ 
+     /* Core */
+     s->mpu_model = omap310;
+-    s->cpu = cpu_arm_init(core);
++    s->cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, core));
+     if (s->cpu == NULL) {
+         fprintf(stderr, "Unable to find CPU definition\n");
+         exit(1);
+diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
+index bbf0b7e..ece25ae 100644
+--- a/hw/arm/omap2.c
++++ b/hw/arm/omap2.c
+@@ -2261,7 +2261,7 @@ struct omap_mpu_state_s *omap2420_mpu_init(MemoryRegion *sysmem,
+ 
+     /* Core */
+     s->mpu_model = omap2420;
+-    s->cpu = cpu_arm_init(core ?: "arm1136-r2");
++    s->cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, core ?: "arm1136-r2"));
+     if (s->cpu == NULL) {
+         fprintf(stderr, "Unable to find CPU definition\n");
+         exit(1);
+diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
+index 194b0bc..b0ac3cf 100644
+--- a/hw/arm/pxa2xx.c
++++ b/hw/arm/pxa2xx.c
+@@ -2066,7 +2066,7 @@ PXA2xxState *pxa270_init(MemoryRegion *address_space,
+     if (!revision)
+         revision = "pxa270";
+ 
+-    s->cpu = cpu_arm_init(revision);
++    s->cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, revision));
+     if (s->cpu == NULL) {
+         fprintf(stderr, "Unable to find CPU definition\n");
+         exit(1);
+@@ -2196,7 +2196,7 @@ PXA2xxState *pxa255_init(MemoryRegion *address_space, unsigned int sdram_size)
+ 
+     s = g_new0(PXA2xxState, 1);
+ 
+-    s->cpu = cpu_arm_init("pxa255");
++    s->cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, "pxa255"));
+     if (s->cpu == NULL) {
+         fprintf(stderr, "Unable to find CPU definition\n");
+         exit(1);
+diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
+index 6a45dcc..884242b 100644
+--- a/hw/arm/strongarm.c
++++ b/hw/arm/strongarm.c
+@@ -1597,7 +1597,7 @@ StrongARMState *sa1110_init(MemoryRegion *sysmem,
+         exit(1);
      }
  
-     for (n = 0; n < smp_cpus; n++) {
--        cpu = cpu_xtensa_init(cpu_model);
-+        cpu = XTENSA_CPU(cpu_generic_init(TYPE_XTENSA_CPU, cpu_model));
-         if (cpu == NULL) {
-             error_report("unable to find CPU definition '%s'",
-                          cpu_model);
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index 635a4d4..182ec1e 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -232,7 +232,7 @@ static void lx_init(const LxBoardDesc *board, MachineState *machine)
-     }
+-    s->cpu = cpu_arm_init(rev);
++    s->cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, rev));
  
-     for (n = 0; n < smp_cpus; n++) {
--        cpu = cpu_xtensa_init(cpu_model);
-+        cpu = XTENSA_CPU(cpu_generic_init(TYPE_XTENSA_CPU, cpu_model));
-         if (cpu == NULL) {
-             error_report("unable to find CPU definition '%s'",
-                          cpu_model);
-diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
-index cd7f958..85897df 100644
---- a/target/xtensa/cpu.c
-+++ b/target/xtensa/cpu.c
-@@ -100,9 +100,12 @@ static ObjectClass *xtensa_cpu_class_by_name(const char *cpu_model)
- static void xtensa_cpu_realizefn(DeviceState *dev, Error **errp)
- {
-     CPUState *cs = CPU(dev);
-+    XtensaCPU *cpu = XTENSA_CPU(dev);
-     XtensaCPUClass *xcc = XTENSA_CPU_GET_CLASS(dev);
-     Error *local_err = NULL;
- 
-+    xtensa_irq_init(&cpu->env);
-+
-     cpu_exec_realizefn(cs, &local_err);
-     if (local_err != NULL) {
-         error_propagate(errp, local_err);
-diff --git a/target/xtensa/helper.c b/target/xtensa/helper.c
-index bcd0b77..e8fba20 100644
---- a/target/xtensa/helper.c
-+++ b/target/xtensa/helper.c
-@@ -113,28 +113,6 @@ void xtensa_breakpoint_handler(CPUState *cs)
+     if (!s->cpu) {
+         error_report("Unable to find CPU definition");
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index fa60040..0ec92d3 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -5233,11 +5233,6 @@ void register_cp_regs_for_features(ARMCPU *cpu)
      }
  }
  
--XtensaCPU *cpu_xtensa_init(const char *cpu_model)
+-ARMCPU *cpu_arm_init(const char *cpu_model)
 -{
--    ObjectClass *oc;
--    XtensaCPU *cpu;
--    CPUXtensaState *env;
--
--    oc = cpu_class_by_name(TYPE_XTENSA_CPU, cpu_model);
--    if (oc == NULL) {
--        return NULL;
--    }
--
--    cpu = XTENSA_CPU(object_new(object_class_get_name(oc)));
--    env = &cpu->env;
--
--    xtensa_irq_init(env);
--
--    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
--
--    return cpu;
+-    return ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, cpu_model));
 -}
 -
--
- void xtensa_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+ void arm_cpu_register_gdb_regs_for_features(ARMCPU *cpu)
  {
-     XtensaConfigList *core = xtensa_cores;
+     CPUState *cs = CPU(cpu);
 -- 
 2.7.4
