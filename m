@@ -1,35 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1diaBo-0007an-CN
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 01:51:25 -0400
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1diaCD-0007qF-DZ
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 01:51:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1diaBl-0003Wq-8T
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 01:51:24 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37747)
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1diaCA-0004Bu-64
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 01:51:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49207
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
-	id 1diaBk-0003WP-VR
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 01:51:21 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	id 1diaC9-0004BT-VE
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 01:51:46 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7I5nkx3078964
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 01:51:18 -0400
-Received: from e23smtp05.au.ibm.com (e23smtp05.au.ibm.com [202.81.31.147])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cdsrdac7s-1
+	v7I5mjbJ098317
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 01:51:45 -0400
+Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cdqt188yh-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 01:51:18 -0400
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 01:51:45 -0400
 Received: from localhost
-	by e23smtp05.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
-	Fri, 18 Aug 2017 15:51:16 +1000
-Date: Fri, 18 Aug 2017 15:50:16 +1000
+	Fri, 18 Aug 2017 15:51:42 +1000
+Date: Fri, 18 Aug 2017 15:50:22 +1000
 From: Sam Bobroff <sam.bobroff@au1.ibm.com>
+References: <cover.1503034743.git.sam.bobroff@au1.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Message-Id: <cover.1503034743.git.sam.bobroff@au1.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 0/1] Exploit settable KVM_CAP_PPC_SMT
+In-Reply-To: <cover.1503034743.git.sam.bobroff@au1.ibm.com>
+Message-Id: <b1865d81456e774567ab624a5b4ffde47772dd08.1503034743.git.sam.bobroff@au1.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 1/1] PPC: KVM: Support machine option to set
+ VSMT mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,46 +45,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Cc: david@gibson.dropbear.id.au, groug@kaod.org
 
+KVM now allows writing to KVM_CAP_PPC_SMT which has previously been
+read only. Doing so causes KVM to act, for that VM, as if the host's
+SMT mode was the given value. This is particularly important on Power
+9 systems because their default value is 1, but they are able to
+support values up to 8.
 
-Hello QEMU PPC people,
+This patch introduces a way to control this capability via a new
+machine property called VSMT ("Virtual SMT"). If the value is not set
+on the command line a default is chosen that is, when possible,
+compatible with legacy systems.
 
-This is v3, it is only a single patch now.
+Note that the intialization of KVM_CAP_PPC_SMT has changed slightly
+because it has changed (in KVM) from a global capability to a
+VM-specific one. This won't cause a problem on older KVMs because VM
+capabilities fall back to global ones.
 
-My core objective with this patch is to provide a way for QEMU to configure the
-newly writeable KVM capability 'KVM_CAP_PPC_SMT', because without it Power 9
-hosts can only run VMs with a single thread per core. (With this capability they
-are able to run VMs with 1, 2, 4 or 8 threads per core.) KVM also now contains a
-new read-only property ('KVM_CAP_PPC_SMT_POSSIBLE') to expose the possible
-valid values of KVM_CAP_PPC_SMT, although this is only used in a hint to the
-user at this stage. This new capability is already upstream and the QEMU
-headers have already been updated to include it.
-
-The new way KVM_CAP_PPC_SMT works is that, when set, it causes KVM to act as if
-the host's native number of threads per core were the value of the capability.
-
-I've implemented this by adding a new property to pseries machines, which is
-stored in sPAPRMachineState as 'vsmt'. This provides a way to set it from the
-command line (and a way to add it to the VMState if we later decide to do so)
-and makes the property available only when using SPAPR (pseries) machines. I
-use this value to call in to KVM and set the capability when necessary.
-
-For pseries machines, the vsmt value will be a duplicate of the KVM capability
-value, and in version 1 I tried to remove this duplication by replacing
-cap_ppc_smt completely with references to spapr->vsmt. Unfortunately, that
-forced generic code (e.g. translate_init.c) to have knowledge of the
-sPAPRMachine state which didn't seem conceptually clean. In version 2, I've
-left the capability on the KVM side which keeps the KVM and generic code clear
-of SPAPR concepts. I think on the whole this is a better solution.
-
-Notes/Questions:
-* I've moved the code that validates smp_threads out of ppc_cpu_realizefn()
-  because it only needs to be done once, not once per CPU.
-
-Patch set changelog follows:
-
+Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+---
 ====== Version 3 -> version 4: ======
 
-Patch 1/1: PPC: KVM: Support machine option to set VSMT mode
 * Use "pseries" as the machine name in some hint messages rather than the
   specific instance name, as that's sufficient.
 * Merged show_vsmt_possible() and kvmppc_smt_possible() into a single function
@@ -91,10 +75,6 @@ Patch 1/1: PPC: KVM: Support machine option to set VSMT mode
       error.
     * show_vsmt_possible() now appends an error hint.
 
-
-Sam Bobroff (1):
-  PPC: KVM: Support machine option to set VSMT mode
-
  hw/ppc/spapr.c              | 75 +++++++++++++++++++++++++++++++++++++++++++++
  include/hw/ppc/spapr.h      |  1 +
  target/ppc/kvm.c            | 39 ++++++++++++++++++++++-
@@ -102,5 +82,257 @@ Sam Bobroff (1):
  target/ppc/translate_init.c | 14 ---------
  5 files changed, 126 insertions(+), 15 deletions(-)
 
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index cd6eb2d4a9..7859367154 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -26,6 +26,7 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qapi/visitor.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/numa.h"
+ #include "hw/hw.h"
+@@ -2140,6 +2141,61 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
+     g_free(type);
+ }
+ 
++static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
++{
++    Error *local_err = NULL;
++    bool vsmt_user = !!spapr->vsmt;
++    int kvm_smt = kvmppc_smt_threads();
++    int ret;
++
++    if (!kvm_enabled() && (smp_threads > 1)) {
++        error_setg(&local_err, "TCG cannot support more than 1 thread/core "
++                     "on a pseries machine");
++        goto out;
++    }
++    if (!is_power_of_2(smp_threads)) {
++        error_setg(&local_err, "Cannot support %d threads/core on a pseries "
++                     "machine because it must be a power of 2", smp_threads);
++        goto out;
++    }
++
++    /* Detemine the VSMT mode to use: */
++    if (vsmt_user) {
++        if (spapr->vsmt < smp_threads) {
++            error_setg(&local_err, "Cannot support VSMT mode %d"
++                         " because it must be >= threads/core (%d)",
++                         spapr->vsmt, smp_threads);
++            goto out;
++        }
++        /* In this case, spapr->vsmt has been set by the command line */
++    } else {
++        /* Choose a VSMT mode that may be higher than necessary but is
++         * likely to be compatible with hosts that don't have VSMT. */
++        spapr->vsmt = MAX(kvm_smt, smp_threads);
++    }
++
++    /* KVM: If necessary, set the SMT mode: */
++    if (kvm_enabled() && (spapr->vsmt != kvm_smt)) {
++        ret = kvmppc_set_smt_threads(spapr->vsmt);
++        if (ret) {
++            error_setg(&local_err,
++                       "Failed to set KVM's VSMT mode to %d (errno %d)",
++                       spapr->vsmt, ret);
++            if (!vsmt_user) {
++                error_append_hint(&local_err, "On PPC, a VM with %d threads/"
++                             "core on a host with %d threads/core requires "
++                             " the use of VSMT mode %d.\n",
++                             smp_threads, kvm_smt, spapr->vsmt);
++            }
++            kvmppc_hint_smt_possible(&local_err);
++            goto out;
++        }
++    }
++    /* else TCG: nothing to do currently */
++out:
++    error_propagate(errp, local_err);
++}
++
+ /* pSeries LPAR / sPAPR hardware init */
+ static void ppc_spapr_init(MachineState *machine)
+ {
+@@ -2272,6 +2328,8 @@ static void ppc_spapr_init(MachineState *machine)
+ 
+     spapr_cpu_parse_features(spapr);
+ 
++    spapr_set_vsmt_mode(spapr, &error_fatal);
++
+     spapr_init_cpus(spapr);
+ 
+     if (kvm_enabled()) {
+@@ -2656,6 +2714,18 @@ static void spapr_set_resize_hpt(Object *obj, const char *value, Error **errp)
+     }
+ }
+ 
++static void spapr_get_vsmt(Object *obj, Visitor *v, const char *name,
++                                   void *opaque, Error **errp)
++{
++    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
++}
++
++static void spapr_set_vsmt(Object *obj, Visitor *v, const char *name,
++                                   void *opaque, Error **errp)
++{
++    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
++}
++
+ static void spapr_machine_initfn(Object *obj)
+ {
+     sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+@@ -2686,6 +2756,11 @@ static void spapr_machine_initfn(Object *obj)
+     object_property_set_description(obj, "resize-hpt",
+                                     "Resizing of the Hash Page Table (enabled, disabled, required)",
+                                     NULL);
++    object_property_add(obj, "vsmt", "uint32", spapr_get_vsmt,
++                        spapr_set_vsmt, NULL, &spapr->vsmt, &error_abort);
++    object_property_set_description(obj, "vsmt",
++                                    "Virtual SMT: KVM behaves as if this were"
++                                    " the host's SMT mode", &error_abort);
+ }
+ 
+ static void spapr_machine_finalizefn(Object *obj)
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 86c982cf2c..68c510339f 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -99,6 +99,7 @@ struct sPAPRMachineState {
+     uint64_t rtc_offset; /* Now used only during incoming migration */
+     struct PPCTimebase tb;
+     bool has_graphics;
++    uint32_t vsmt;       /* Virtual SMT mode (KVM's "core stride") */
+ 
+     Notifier epow_notifier;
+     QTAILQ_HEAD(, sPAPREventLogEntry) pending_events;
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 5fc7f238eb..92a318e37b 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -74,6 +74,7 @@ static int cap_interrupt_level = false;
+ static int cap_segstate;
+ static int cap_booke_sregs;
+ static int cap_ppc_smt;
++static int cap_ppc_smt_possible;
+ static int cap_ppc_rma;
+ static int cap_spapr_tce;
+ static int cap_spapr_tce_64;
+@@ -130,7 +131,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_interrupt_level = kvm_check_extension(s, KVM_CAP_PPC_IRQ_LEVEL);
+     cap_segstate = kvm_check_extension(s, KVM_CAP_PPC_SEGSTATE);
+     cap_booke_sregs = kvm_check_extension(s, KVM_CAP_PPC_BOOKE_SREGS);
+-    cap_ppc_smt = kvm_check_extension(s, KVM_CAP_PPC_SMT);
++    cap_ppc_smt_possible = kvm_check_extension(s, KVM_CAP_PPC_SMT_POSSIBLE);
+     cap_ppc_rma = kvm_check_extension(s, KVM_CAP_PPC_RMA);
+     cap_spapr_tce = kvm_check_extension(s, KVM_CAP_SPAPR_TCE);
+     cap_spapr_tce_64 = kvm_check_extension(s, KVM_CAP_SPAPR_TCE_64);
+@@ -144,6 +145,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+      * only activated after this by kvmppc_set_papr() */
+     cap_htab_fd = kvm_check_extension(s, KVM_CAP_PPC_HTAB_FD);
+     cap_fixup_hcalls = kvm_check_extension(s, KVM_CAP_PPC_FIXUP_HCALL);
++    cap_ppc_smt = kvm_vm_check_extension(s, KVM_CAP_PPC_SMT);
+     cap_htm = kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
+     cap_mmu_radix = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
+     cap_mmu_hash_v3 = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
+@@ -2134,6 +2136,41 @@ int kvmppc_smt_threads(void)
+     return cap_ppc_smt ? cap_ppc_smt : 1;
+ }
+ 
++int kvmppc_set_smt_threads(int smt)
++{
++    int ret;
++
++    ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_SMT, 0, smt, 0);
++    if (!ret) {
++        cap_ppc_smt = smt;
++    }
++    return ret;
++}
++
++void kvmppc_hint_smt_possible(Error **errp)
++{
++    int i;
++    GString *g;
++    char *s;
++
++    assert(kvm_enabled());
++    if (cap_ppc_smt_possible) {
++        g = g_string_new("Available VSMT modes:");
++        for (i = 63; i >= 0; i--) {
++            if ((1UL << i) & cap_ppc_smt_possible) {
++                g_string_append_printf(g, " %lu", (1UL << i));
++            }
++        }
++        s = g_string_free(g, false);
++        error_append_hint(errp, "%s.\n", s);
++        g_free(s);
++    } else {
++        error_append_hint(errp,
++                          "This KVM seems to be too old to support VSMT.\n");
++    }
++}
++
++
+ #ifdef TARGET_PPC64
+ off_t kvmppc_alloc_rma(void **rma)
+ {
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 381afe6240..e6711fc2b7 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -29,6 +29,8 @@ void kvmppc_set_papr(PowerPCCPU *cpu);
+ int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
+ void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
+ int kvmppc_smt_threads(void);
++void kvmppc_hint_smt_possible(Error **errp);
++int kvmppc_set_smt_threads(int smt);
+ int kvmppc_clear_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
+ int kvmppc_or_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
+ int kvmppc_set_tcr(PowerPCCPU *cpu);
+@@ -148,6 +150,16 @@ static inline int kvmppc_smt_threads(void)
+     return 1;
+ }
+ 
++static inline void kvmppc_hint_smt_possible(Error **errp)
++{
++    return;
++}
++
++static inline int kvmppc_set_smt_threads(int smt)
++{
++    return 0;
++}
++
+ static inline int kvmppc_or_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits)
+ {
+     return 0;
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 0ce923be46..7f6a349e43 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -9907,20 +9907,6 @@ static void ppc_cpu_realizefn(DeviceState *dev, Error **errp)
+     int max_smt = kvmppc_smt_threads();
+ #endif
+ 
+-#if !defined(CONFIG_USER_ONLY)
+-    if (smp_threads > max_smt) {
+-        error_setg(errp, "Cannot support more than %d threads on PPC with %s",
+-                   max_smt, kvm_enabled() ? "KVM" : "TCG");
+-        return;
+-    }
+-    if (!is_power_of_2(smp_threads)) {
+-        error_setg(errp, "Cannot support %d threads on PPC with %s, "
+-                   "threads count must be a power of 2.",
+-                   smp_threads, kvm_enabled() ? "KVM" : "TCG");
+-        return;
+-    }
+-#endif
+-
+     cpu_exec_realizefn(cs, &local_err);
+     if (local_err != NULL) {
+         error_propagate(errp, local_err);
 -- 
 2.14.1.2.g4274c698f
