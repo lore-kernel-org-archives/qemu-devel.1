@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1diqAz-00019x-Ja
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 18:55:38 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1diqCs-0002Qj-Qf
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 18:57:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1diqAw-0008JN-Gt
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 18:55:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46940)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1diqAw-0008DA-11
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 18:55:34 -0400
-References: <1503049022-14749-1-git-send-email-hare@suse.de>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <09f093ef-a073-7374-0f40-330febc7c196@redhat.com>
-Date: Sat, 19 Aug 2017 00:55:28 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1diqCp-0000vV-MR
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 18:57:34 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34688)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1diqCp-0000vO-FJ
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 18:57:31 -0400
+Received: by mail-qt0-x243.google.com with SMTP id i19so10169950qte.1
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 15:57:31 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170818222313.13391-1-eblake@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a31ed9ca-120f-e5fd-b4c7-0c9d38da72e7@amsat.org>
+Date: Fri, 18 Aug 2017 19:57:27 -0300
 MIME-Version: 1.0
-In-Reply-To: <1503049022-14749-1-git-send-email-hare@suse.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170818222313.13391-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] scsi-bus: correct responses for INQUIRY
- and REQUEST SENSE
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH] osdep.h: Prohibit disabling assert()
+ in supported builds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,96 +35,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hannes Reinecke <hare@suse.de>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Hannes Reinecke <hare@suse.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com
 
-Hello Hannes,
-
-On 08/18/17 11:37, Hannes Reinecke wrote:
-> According to SPC-3 INQUIRY and REQUEST SENSE should return GOOD
-> even on unsupported LUNS.
+On 08/18/2017 07:23 PM, Eric Blake wrote:
+> We already have several files that knowingly require assert()
+> to work.  While we do NOT want to encourage the use of
+> 'assert(side-effects)' (that is a bad practice that prevents
+> copy-and-paste of code to other projects that CAN disable
+> assertions; plus it costs unnecessary reviewer mental cycles
+> to remember our project policy on crippling asserts), we DO
+> want to send a message that anyone that disables assertions
+> has to tweak code in order to compile, making it obvious that
+> we are not going to support their efforts.
 > 
-> Signed-off-by: Hannes Reinecke <hare@suse.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
->  hw/scsi/scsi-bus.c | 29 +++++++++++++++++++++++++----
->  1 file changed, 25 insertions(+), 4 deletions(-)
 > 
-> diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-> index e364410a23..ade31c11f5 100644
-> --- a/hw/scsi/scsi-bus.c
-> +++ b/hw/scsi/scsi-bus.c
-> @@ -516,8 +516,10 @@ static size_t scsi_sense_len(SCSIRequest *req)
->  static int32_t scsi_target_send_command(SCSIRequest *req, uint8_t *buf)
->  {
->      SCSITargetReq *r = DO_UPCAST(SCSITargetReq, req, req);
-> +    int fixed_sense = (req->cmd.buf[1] & 1) == 0;
->  
-> -    if (req->lun != 0) {
-> +    if (req->lun != 0 &&
-> +        buf[0] != INQUIRY && buf[0] != REQUEST_SENSE) {
->          scsi_req_build_sense(req, SENSE_CODE(LUN_NOT_SUPPORTED));
->          scsi_req_complete(req, CHECK_CONDITION);
->          return 0;
-> @@ -535,9 +537,28 @@ static int32_t scsi_target_send_command(SCSIRequest *req, uint8_t *buf)
->          break;
->      case REQUEST_SENSE:
->          scsi_target_alloc_buf(&r->req, scsi_sense_len(req));
-> -        r->len = scsi_device_get_sense(r->req.dev, r->buf,
-> -                                       MIN(req->cmd.xfer, r->buf_len),
-> -                                       (req->cmd.buf[1] & 1) == 0);
-> +        if (req->lun != 0) {
-> +            const struct SCSISense sense = SENSE_CODE(LUN_NOT_SUPPORTED);
+> First mentioned as an idea here:
+> http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg06084.html
+> but I'm titling this RFC as I'm not 100% convinced we want to make
+> it a project-wide, rather than a per-file decision.
+
+I think project-wide is the correct way.
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> 
+>   include/qemu/osdep.h | 12 ++++++++++++
+>   hw/scsi/mptsas.c     |  4 ----
+>   hw/virtio/virtio.c   |  4 ----
+>   3 files changed, 12 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index 6855b94bbf..9e745a8af9 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -107,6 +107,18 @@ extern int daemon(int, int);
+>   #include "glib-compat.h"
+>   #include "qemu/typedefs.h"
+> 
+> +/*
+> + * We have a lot of unaudited code that will fail in strange ways if
+> + * you disable assertions at compile-time.  You are on your own if
+> + * you cripple these safety-checks.
+> + */
+> +#ifdef NDEBUG
+> +#error building with NDEBUG is not supported
+> +#endif
+> +#ifdef G_DISABLE_ASSERT
+> +#error building with G_DISABLE_ASSERT is not supported
+> +#endif
 > +
-> +            if (fixed_sense) {
-> +                r->buf[0] = 0x70;
-> +                r->buf[2] = sense.key;
-> +                r->buf[10] = 10;
-> +                r->buf[12] = sense.asc;
-> +                r->buf[13] = sense.ascq;
-> +                r->len = MIN(req->cmd.xfer, SCSI_SENSE_LEN);
-> +            } else {
-> +                r->buf[0] = 0x72;
-> +                r->buf[1] = sense.key;
-> +                r->buf[2] = sense.asc;
-> +                r->buf[3] = sense.ascq;
-> +                r->len = 8;
-> +            }
-> +        } else {
-> +            r->len = scsi_device_get_sense(r->req.dev, r->buf,
-> +                                           MIN(req->cmd.xfer, r->buf_len),
-> +                                           fixed_sense);
-> +        }
->          if (r->req.dev->sense_is_ua) {
->              scsi_device_unit_attention_reported(req->dev);
->              r->req.dev->sense_len = 0;
+>   #ifndef O_LARGEFILE
+>   #define O_LARGEFILE 0
+>   #endif
+> diff --git a/hw/scsi/mptsas.c b/hw/scsi/mptsas.c
+> index 765ab53c34..3b93f12cdb 100644
+> --- a/hw/scsi/mptsas.c
+> +++ b/hw/scsi/mptsas.c
+> @@ -1236,11 +1236,7 @@ static void *mptsas_load_request(QEMUFile *f, SCSIRequest *sreq)
+>       n = qemu_get_be32(f);
+>       /* TODO: add a way for SCSIBusInfo's load_request to fail,
+>        * and fail migration instead of asserting here.
+> -     * When we do, we might be able to re-enable NDEBUG below.
+>        */
+> -#ifdef NDEBUG
+> -#error building with NDEBUG is not supported
+> -#endif
+>       assert(n >= 0);
 > 
-
-thank you for the quick patch.
-
-I've repeated my original testing steps now, in the following scenarios:
-
-                             edk2:ba40cb31b69d  ovmf:ce13d2d8c81f
-qemu:v2.10.0-rc3             [1]                [2]
-qemu:v2.10.0-rc3+this patch  [3]                [4]
-
-(Edk2 commit ba40cb31b69d was edk2 master just before I pushed my
-respective edk2 patches, and edk2 commit ce13d2d8c81f is current edk2
-master, with my respective patches.)
-
-[1] FAIL: as reported originally
-[2] PASS: my edk2 patches fix ScsiBusDxe (which is justified in itself),
-          and then it deals with QEMU post-ded6ddc5a7b9
-[3] PASS: this patch of yours makes the reported symptoms vanish even
-          without applying my patches to edk2
-[4] PASS: your patch works fine with the current (fixed) ScsiBusDxe as
-          well, no regressions found.
-
-Tested-by: Laszlo Ersek <lersek@redhat.com>
-
-If you agree, I'd suggest two additional tags for the commit message:
-
-Reported-by: Laszlo Ersek <lersek@redhat.com>
-Fixes: ded6ddc5a7b95217557fa360913d1213e12d4a6d
-
-Thanks!
-Laszlo
+>       pci_dma_sglist_init(&req->qsg, pci, n);
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 464947f76d..2778adabcc 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -1025,11 +1025,7 @@ void *qemu_get_virtqueue_element(VirtIODevice *vdev, QEMUFile *f, size_t sz)
+> 
+>       /* TODO: teach all callers that this can fail, and return failure instead
+>        * of asserting here.
+> -     * When we do, we might be able to re-enable NDEBUG below.
+>        */
+> -#ifdef NDEBUG
+> -#error building with NDEBUG is not supported
+> -#endif
+>       assert(ARRAY_SIZE(data.in_addr) >= data.in_num);
+>       assert(ARRAY_SIZE(data.out_addr) >= data.out_num);
+> 
