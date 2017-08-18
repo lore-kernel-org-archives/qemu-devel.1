@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dinZN-000409-7v
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 16:08:38 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dio3g-0000oj-N2
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 16:39:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dinZK-0002f0-2u
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 16:08:37 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33078)
+	(envelope-from <alistair23@gmail.com>) id 1dio3f-0002OJ-BE
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 16:39:56 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:38467)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dinZJ-0002eo-TQ
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 16:08:34 -0400
-Received: by mail-qt0-x243.google.com with SMTP id 57so352075qtu.0
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 13:08:33 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170817043102.6322-1-f4bug@amsat.org>
-	<20170817172249.31cf5e3d@nial.brq.redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e3552801-588d-a192-1da4-0cefee5aa483@amsat.org>
-Date: Fri, 18 Aug 2017 17:08:29 -0300
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dio3f-0002NR-23
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 16:39:55 -0400
+Received: by mail-wr0-x244.google.com with SMTP id 49so8119802wrw.5
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 13:39:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170817172249.31cf5e3d@nial.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/8] QOMify MIPS cpu
+Sender: alistair23@gmail.com
+In-Reply-To: <b162f9c5-8f49-45ba-751e-de7f832ebfa4@amsat.org>
+References: <cover.1503077821.git.alistair.francis@xilinx.com>
+	<54e6458745493d10901964624479a7d9a872f481.1503077821.git.alistair.francis@xilinx.com>
+	<b162f9c5-8f49-45ba-751e-de7f832ebfa4@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Fri, 18 Aug 2017 13:39:21 -0700
+Message-ID: <CAKmqyKPMx3R7v9jMf=fmtJkhc2KB_R82WYJJxmtg-FZkbNTLkA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] Makefile: Remove libqemustub.a
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,62 +32,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, James Hogan <james.hogan@imgtec.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Yongbok Kim <yongbok.kim@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>James Hogan <james.hogan@imgtec.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 08/17/2017 12:22 PM, Igor Mammedov wrote:
-> On Thu, 17 Aug 2017 01:30:54 -0300
-> Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
-[...]
->> Also I couldn't test it with KVM.
-> Tested in TCG mode (boots debian mips/mips64 kernel with different cpu types),
-> and new CPU leaf types show up on QOM tree as expected (QOMifycation is done as expected)
-
-you mean the "info qom-tree" output?
-
-> and '-cpu help' also works as expected,
-> so with checkpatch issues fixed you may add to patches my
-> 
-> Tested-by: Igor Mammedov <imammedo@redhat.com>
-
-ok thanks for the testing!
-
-I'll wait to see if there is some KVM feedback from imgtec folks before 
-spaming a v2.
-
->> Igor Mammedov (2):
->>    mips: MIPSCPU model subclasses
->>    mips: replace cpu_mips_init() with cpu_generic_init()
+On Fri, Aug 18, 2017 at 12:29 PM, Philippe Mathieu-Daud=C3=A9
+<f4bug@amsat.org> wrote:
+> Hi Alistair,
+>
+>
+> On 08/18/2017 03:47 PM, Alistair Francis wrote:
 >>
->> Philippe Mathieu-Daudé (6):
->>    mips: move hw/mips/cputimer.c to target/mips/
->>    mips: introduce internal.h and cleanup cpu.h
->>    mips: split cpu_mips_realize_env() out of cpu_mips_init()
->>    mips: call cpu_mips_realize_env() from mips_cpu_realizefn()
->>    mips: now than MIPSCPU is QOMified, mark it abstract
->>    mips: update mips_cpu_list() to use object_class_get_list()
+>> Using two libraries (libqemuutil.a and libqemustub.a) would sometimes
+>> result in circular dependencies. To avoid these issues let's just
+>> combine both into a single library that functions as both.
 >>
->>   target/mips/cpu-qom.h                         |   1 +
->>   target/mips/cpu.h                             | 357 +---------------------
->>   target/mips/internal.h                        | 422 ++++++++++++++++++++++++++
->>   hw/mips/cps.c                                 |   2 +-
->>   hw/mips/mips_fulong2e.c                       |   2 +-
->>   hw/mips/mips_jazz.c                           |   2 +-
->>   hw/mips/mips_malta.c                          |   2 +-
->>   hw/mips/mips_mipssim.c                        |   2 +-
->>   hw/mips/mips_r4k.c                            |   2 +-
->>   hw/mips/cputimer.c => target/mips/cp0_timer.c |   2 +-
->>   target/mips/cpu.c                             |  57 +++-
->>   target/mips/gdbstub.c                         |   1 +
->>   target/mips/helper.c                          |  47 +++
->>   target/mips/kvm.c                             |   1 +
->>   target/mips/machine.c                         |   1 +
->>   target/mips/msa_helper.c                      |   1 +
->>   target/mips/op_helper.c                       |   1 +
->>   target/mips/translate.c                       |  23 +-
->>   target/mips/translate_init.c                  |  68 +----
->>   hw/mips/Makefile.objs                         |   2 +-
->>   target/mips/Makefile.objs                     |   2 +-
->>   21 files changed, 549 insertions(+), 449 deletions(-)
->>   create mode 100644 target/mips/internal.h
->>   rename hw/mips/cputimer.c => target/mips/cp0_timer.c (99%)
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> ---
+>>
+>>   Makefile                    |  7 +++----
+>>   Makefile.target             |  2 +-
+>>   docs/devel/build-system.txt | 14 +++++---------
+>>   tests/Makefile.include      |  6 +++---
+>>   4 files changed, 12 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/Makefile b/Makefile
+>> index 81447b1f08..f111e93c63 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -344,7 +344,7 @@ subdir-dtc:dtc/libfdt dtc/tests
+>>   dtc/%:
+>>         mkdir -p $@
+>>   -$(SUBDIR_RULES): libqemuutil.a libqemustub.a $(common-obj-y)
+>> $(chardev-obj-y) \
+>> +$(SUBDIR_RULES): libqemuutil.a $(common-obj-y) $(chardev-obj-y) \
+>>         $(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
+>>     ROMSUBDIR_RULES=3D$(patsubst %,romsubdir-%, $(ROMS))
+>> @@ -364,12 +364,11 @@ Makefile: $(version-obj-y)
+>>   ######################################################################
+>>   # Build libraries
+>>   -libqemustub.a: $(stub-obj-y)
+>> -libqemuutil.a: $(util-obj-y) $(trace-obj-y)
+>> +libqemuutil.a: $(util-obj-y) $(trace-obj-y) $(stub-obj-y)
+>>     ####################################################################=
+##
+>>   -COMMON_LDADDS =3D libqemuutil.a libqemustub.a
+>> +COMMON_LDADDS =3D libqemuutil.a
+>>     qemu-img.o: qemu-img-cmds.h
+>>   diff --git a/Makefile.target b/Makefile.target
+>> index 7f42c45db8..0a80caf79c 100644
+>> --- a/Makefile.target
+>> +++ b/Makefile.target
+>> @@ -193,7 +193,7 @@ all-obj-$(CONFIG_SOFTMMU) +=3D $(io-obj-y)
+>>     $(QEMU_PROG_BUILD): config-devices.mak
+>>   -COMMON_LDADDS =3D ../libqemuutil.a ../libqemustub.a
+>> +COMMON_LDADDS =3D ../libqemuutil.a
+>>     # build either PROG or PROGW
+>>   $(QEMU_PROG_BUILD): $(all-obj-y) $(COMMON_LDADDS)
+>> diff --git a/docs/devel/build-system.txt b/docs/devel/build-system.txt
+>> index 2af1e668c5..5f32e53248 100644
+>> --- a/docs/devel/build-system.txt
+>> +++ b/docs/devel/build-system.txt
+>> @@ -232,15 +232,11 @@ The utility code that is used by all binaries is
+>> built into a
+>>   static archive called libqemuutil.a, which is then linked to all the
+>>   binaries. In order to provide hooks that are only needed by some of th=
+e
+>>   binaries, code in libqemuutil.a may depend on other functions that are
+>> -not fully implemented by all QEMU binaries. To deal with this there is =
+a
+>> -second library called libqemustub.a which provides dummy stubs for all
+>> -these functions. These will get lazy linked into the binary if the real
+>> -implementation is not present. In this way, the libqemustub.a static
+>> -library can be thought of as a portable implementation of the weak
+>> -symbols concept. All binaries should link to both libqemuutil.a and
+>> -libqemustub.a. e.g.
+>> -
+>> - qemu-img$(EXESUF): qemu-img.o ..snip.. libqemuutil.a libqemustub.a
+>> +not fully implemented by all QEMU binaries. To deal with this there are
+>> +dummy stubs for all these functions in libqemuutil.a.
+>> +All binaries should link to both libqemuutil.a and libqemustub.a. e.g.
+>
+>
+> still libqemustub.a
+
+Ah, I missed this. I'll fix this up.
+
+>
+>> +
+>> + qemu-img$(EXESUF): qemu-img.o ..snip.. libqemuutil.a
+>
+>
+> changed a bit:
+>
+> The utility code that is used by all binaries is built into a
+> static archive called libqemuutil.a, which is then linked to all the
+> binaries. In order to provide hooks that are only needed by some of the
+> binaries, code in libqemuutil.a may depend on other functions that are
+> not fully implemented by all QEMU binaries. Dummy stubs for all  these
+> functions are also provided by this library, and will get lazy linked
+> into the binary if the real implementation is not present. In this way,
+> this static library can be thought of as a portable implementation of
+> the weak symbols concept. All binaries should link to libqemuutil.a. e.g.
+>
+>  qemu-img$(EXESUF): qemu-img.o ..snip.. libqemuutil.a
+>
+> This or removing "libqemustub.a":
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+Thanks!
+Alistair
+
+>
+>
+>>   Windows platform portability
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index 37c1bed683..80527a8763 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -553,7 +553,7 @@ QEMU_CFLAGS +=3D -I$(SRC_PATH)/tests
+>>       # Deps that are common to various different sets of tests below
+>> -test-util-obj-y =3D libqemuutil.a libqemustub.a
+>> +test-util-obj-y =3D libqemuutil.a
+>>   test-qom-obj-y =3D $(qom-obj-y) $(test-util-obj-y)
+>>   test-qapi-obj-y =3D tests/test-qapi-visit.o tests/test-qapi-types.o \
+>>         tests/test-qapi-event.o tests/test-qmp-introspect.o \
+>> @@ -608,8 +608,8 @@ tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
+>>         $(test-io-obj-y)
+>>   tests/test-timed-average$(EXESUF): tests/test-timed-average.o
+>> $(test-util-obj-y)
+>>   tests/test-base64$(EXESUF): tests/test-base64.o \
+>> -       libqemuutil.a libqemustub.a
+>> -tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs=
+.o
+>> hw/core/ptimer.o libqemustub.a
+>> +       libqemuutil.a
+>> +tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs=
+.o
+>> hw/core/ptimer.o $(test-util-obj-y)
+>>     tests/test-logging$(EXESUF): tests/test-logging.o $(test-util-obj-y)
+>>
