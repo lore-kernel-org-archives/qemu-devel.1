@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dicnx-000585-4n
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 04:38:58 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dicpa-0005yF-6i
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 04:40:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dicnu-0002qC-0t
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 04:38:57 -0400
-Received: from mga11.intel.com ([192.55.52.93]:3369)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dicnt-0002ps-OT
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 04:38:53 -0400
-Message-ID: <5996A845.4010405@intel.com>
-Date: Fri, 18 Aug 2017 16:41:41 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dicpW-0003YH-Pp
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 04:40:38 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:35799)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dicpW-0003Xw-IY
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 04:40:34 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id 49so55392943wrw.2
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 01:40:34 -0700 (PDT)
+References: <150097502966.6397.351311629210845503.malonedeb@gac.canonical.com>
+	<150240857521.18943.1371547756430353016.malone@chaenomeles.canonical.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <150240857521.18943.1371547756430353016.malone@chaenomeles.canonical.com>
+Date: Fri, 18 Aug 2017 09:40:31 +0100
+Message-ID: <87shgpi800.fsf@linaro.org>
 MIME-Version: 1.0
-References: <1502940416-42944-1-git-send-email-wei.w.wang@intel.com>
-	<1502940416-42944-6-git-send-email-wei.w.wang@intel.com>
-	<20170818045519-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170818045519-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v14 5/5] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_VQ
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Bug 1706296] Re: Booting NT 4 disk causes
+ /home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion failed:
+ (!qemu_mutex_iothread_locked())
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +32,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
-
-On 08/18/2017 10:13 AM, Michael S. Tsirkin wrote:
-> On Thu, Aug 17, 2017 at 11:26:56AM +0800, Wei Wang wrote:
->> Add a new vq to report hints of guest free pages to the host.
-> Please add some text here explaining the report_free_page_signal
-> thing.
->
->
-> I also really think we need some kind of ID in the
-> buffer to do a handshake. whenever id changes you
-> add another outbuf.
-
-Please let me introduce the current design first:
-1) device put the signal buf to the vq and notify the driver (we need
-a buffer because currently the device can't notify when the vq is empty);
-
-2) the driver starts the report of free page blocks via inbuf;
-
-3) the driver adds an the signal buf via outbuf to tell the device all 
-are reported.
+To: Bug 1706296 <1706296@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 
 
-Could you please elaborate more on the usage of ID?
+John Arbuckle <programmingkidx@gmail.com> writes:
 
->> +retry:
->> +	ret = virtqueue_add_outbuf(vq, &sg, 1, vb, GFP_KERNEL);
->> +	virtqueue_kick(vq);
->> +	if (unlikely(ret == -ENOSPC)) {
-> what if there's another error?
+> Using '-cpu 486' gets past the assertion error. I guess Windows NT 4.0
+> is not compatible with newer Intel processors.
 
-Another error is -EIO, how about disabling the free page report feature?
-(I also saw it isn't handled in many other virtio devices e.g. virtio-net)
+It might be related. The assertion error is caused by the fact an
+exception has occurred and processor is trying to dump a stack frame that
+overlaps from RAM into device memory. As the IRQ/exception handling is
+already under the BQL (as it changes machine state) we get the assertion
+when it tries to take the BQL a second time when accessing device
+memory.
 
->> +		wait_event(vb->acked, virtqueue_get_buf(vq, &len));
->> +		goto retry;
->> +	}
-> what is this trickery doing? needs more comments or
-> a simplification.
-
-Just this:
-if the vq is full, blocking wait till an entry gets released, then 
-retry. This is the
-final one, which puts the signal buf to the vq to signify the end of the 
-report and
-the mm lock is not held here, so it is fine to block.
-
+We can drop the lock in the stack frame writing code but I don't know
+what effect that would have as the guest still might crash having tried
+to write a stack frame to device memory....
 
 >
->
->> +}
->> +
->> +static void report_free_page(struct work_struct *work)
->> +{
->> +	struct virtio_balloon *vb;
->> +
->> +	vb = container_of(work, struct virtio_balloon, report_free_page_work);
->> +	walk_free_mem_block(vb, 0, &virtio_balloon_send_free_pages);
-> That's a lot of work here. And system_wq documentation says:
->   *
->   * system_wq is the one used by schedule[_delayed]_work[_on]().
->   * Multi-CPU multi-threaded.  There are users which expect relatively
->   * short queue flush time.  Don't queue works which can run for too
->   * long.
->
-> You might want to create your own wq, maybe even with WQ_CPU_INTENSIVE.
-
-Thanks for the reminder. If not creating a new wq, how about 
-system_unbound_wq?
-The first round of live migration needs the free pages, in that way we 
-can have the
-pages reported to the hypervisor quicker.
-
->
->> +	report_free_page_completion(vb);
-> So first you get list of pages, then an outbuf telling you
-> what they are in end of.  I think it's backwards.
-> Add an outbuf first followed by inbufs that tell you
-> what they are.
+> Currently I can install Windows NT 4.0, but booting from the
+> installation has its problems. It won't boot unless you use the NTFS
+> file system. Even with this file system I still see a BSOD that states
+> INACCESSIBLE_BOOT_DEVICE. Not sure what is wrong. Switching to a SCSI
+> controller didn't help.
 
 
-If we have the signal filled with those flags like
-VIRTIO_BALLOON_F_FREE_PAGE_REPORT_START,
-Probably not necessary to have an inbuf followed by an outbuf, right?
-
-
-Best,
-Wei
+--
+Alex Bennée
