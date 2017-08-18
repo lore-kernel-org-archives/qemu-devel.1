@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1difpK-0001fz-1A
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:52:37 -0400
+	(envelope-from <famz@redhat.com>) id 1dig1G-0003qc-Tx
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 08:04:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1difpI-0003f8-Ni
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:52:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45946)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1difpI-0003dZ-H6
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 07:52:32 -0400
-References: <20170818114844.30061-1-cohuck@redhat.com>
-	<20170818114844.30061-4-cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2d380a07-4298-e1a7-7151-dec1380c8f39@redhat.com>
-Date: Fri, 18 Aug 2017 13:52:28 +0200
+	(envelope-from <famz@redhat.com>) id 1dig1G-0001tt-49
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 08:04:54 -0400
+Date: Fri, 18 Aug 2017 20:04:20 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170818120420.GC15392@lemon>
+References: <1493916761-32319-1-git-send-email-kwolf@redhat.com>
+	<1493916761-32319-6-git-send-email-kwolf@redhat.com>
+	<849a6489-11f5-73c0-a7a8-400c58f995a4@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170818114844.30061-4-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] s390x: wire up diag288 in tcg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <849a6489-11f5-73c0-a7a8-400c58f995a4@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 5/6] block: Fix write/resize permissions
+ for inactive images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +25,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, agraf@suse.de, borntraeger@de.ibm.com
+To: Xie Changlong <xiechanglong.d@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Zhang Hailiang <zhang.zhanghailiang@huawei.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Wen Congyang <wencongyang2@huawei.com>, qemu-devel@nongnu.org
 
-On 18.08.2017 13:48, Cornelia Huck wrote:
-> Make the diag288 watchdog useable via tcg as well.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  target/s390x/misc_helper.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-> index 5a1eba02ab..34d730ba73 100644
-> --- a/target/s390x/misc_helper.c
-> +++ b/target/s390x/misc_helper.c
-> @@ -103,6 +103,10 @@ void HELPER(diag)(CPUS390XState *env, uint32_t r1, uint32_t r3, uint32_t num)
->          handle_diag_308(env, r1, r3);
->          r = 0;
->          break;
-> +    case 0x288:
-> +        /* time bomb (watchdog) */
-> +        r = handle_diag_288(env, r1, r3);
-> +        break;
->      default:
->          r = -1;
->          break;
+On Fri, 08/18 18:06, Xie Changlong wrote:
+> The root casue is when we run replication in secondary, vmstate changes to
+> RUN_STATE_INMIGRATE, then blockdev_init() sets bdrv_flags |=
+> BDRV_O_INACTIVE. So the whole chain become readonly. I've tried on my side,
+> but it seems not easy to fix it. I wonder if there is any way to bypass
+> this? Any suggestion would be appreciated.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+The non-shared storage migration uses "nbd_server_add -w" at destinition side
+where BDRV_O_INACTIVE is set for images like your case, the way it handles it is
+by calling bdrv_invalidate_cache(). See nbd_export_new().
+
+See also commit 3dff24f2dffc5f3aa46dc014122012848bd7959d.
+
+I'm not sure if this is enough for block replication?
+
+Fam
