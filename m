@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dihWK-0001Of-4s
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:41:05 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dihZz-0003m8-2Z
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:44:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dihWH-0000aC-0j
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:41:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42854)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dihWG-0000ZH-Mu
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:41:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dihWE-00089Q-P7
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 13:40:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BA9B42E80CC
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 13:40:58 +0000 (UTC)
+	(envelope-from <richard.henderson@linaro.org>) id 1dihZw-0002rY-0B
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:44:51 -0400
+Received: from mail-pg0-x229.google.com ([2607:f8b0:400e:c05::229]:33881)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dihZv-0002r0-RR
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:44:47 -0400
+Received: by mail-pg0-x229.google.com with SMTP id n4so1153846pgn.1
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 06:44:47 -0700 (PDT)
+References: <20170817180404.29334-1-alex.bennee@linaro.org>
+	<alpine.DEB.2.20.1708181355080.2770@bulbul.intra.ispras.ru>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <64af762a-5d2b-5e33-fc8e-18244b0c6586@linaro.org>
+Date: Fri, 18 Aug 2017 06:44:44 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 Aug 2017 13:32:18 -0000
-From: John Arbuckle <programmingkidx@gmail.com>
-Reply-To: Bug 1706296 <1706296@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150097502966.6397.351311629210845503.malonedeb@gac.canonical.com>
-Message-Id: <150306313809.10786.2554033877611084904.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1706296] Re: Booting NT 4 disk causes
- /home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion failed:
- (!qemu_mutex_iothread_locked())
+In-Reply-To: <alpine.DEB.2.20.1708181355080.2770@bulbul.intra.ispras.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 0/9] TCG Vector types and example
+ conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,104 +32,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kirill Batuzov <batuzovk@ispras.ru>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: cota@braap.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, rth@twiddle.net
 
-Actually Windows NT 4.0 requires a 486 or higher.
-https://en.wikipedia.org/wiki/Windows_NT
+On 08/18/2017 04:33 AM, Kirill Batuzov wrote:
+> From my own experimentations some times ago,
+> 
+> (1) translating vector instructions to vector instructions in TCG is faster than
+> 
+> (2) translating vector instructions to series of scalar instructions in TCG,
+> which is faster than*
+> 
+> (3) translating vector instructions to single helper calls, which is faster
+> than*
+> 
+> (4) translating vector instructions to helper calls for each vector element.
+> 
+> (*) (2) and (3) may change their respective places in case of some
+> complicated instructions.
 
-Found out that the qcow2 image format causes INACCESSIBLE_BOOT_DEVICE
-errors with Windows NT 4.0, so I am going to update my workaround to use
-the qcow format instead.
+This was my gut feeling as well.  With the caveat that for the ARM SVE case of
+2048-bit registers we cannot afford to expand inline due to generated code size.
 
-qemu-img create -f qcow <HD image file name>.qcow 4G
+> ARM (at least ARM32, I have not checked aarch64 in this regard) uses the
+> last, the slowest scheme. As far as I understand, you are want to change
+> it to the third approach. This approach is used in SSE emulation, may be
+> you can use similar structure of helpers?
+> 
+> I still hope to finish my own series about implementation of the first
+> approach. I apologize for the long delay since last update and hope to
+> send next version somewhere next week. I do not think our series
+> contradict each other: you are trying to optimize existing general
+> purpose case while I'm trying to optimize case where both host and guest
+> support vector instructions. Since I'm experimenting on ARM32, we'll not
+> have much merge conflicts either.
 
-qemu-system-i386 -cpu pentium -vga cirrus -hda <HD image file name>.qcow
--cdrom <path to iso> -boot c
+I posted my own, different, take on vectorization yesterday as well.
 
--- =
+  http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg03272.html
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1706296
+The primary difference between my version and your version is that I do not
+allow target/cpu/translate*.c to create vector types.  All of the host vector
+expansion is done within tcg/*.c.
 
-Title:
-  Booting NT 4 disk causes
-  /home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion
-  failed: (!qemu_mutex_iothread_locked())
+We also would like to settle on a common style for out-of-line helpers, if that
+is possible.  One thing *not* to take from our current SSE emulation is that we
+do not yet support AVX, AVX2, or AVX512 extensions.  So the current
+construction of helpers within target/i386/ doesn't really take into account
+all that should be required.
 
-Status in QEMU:
-  New
+The thing that's common between AVX512 and SVE is that we have multiple vector
+lengths, and that elements beyond the operation length are zeroed.  Both Alex
+and I have packed operation length + full vector length into a descriptor given
+to the helper.  (Alex allows for some other bits too; I'm not sure about that.)
 
-Bug description:
-  Grab the NT 4 disk from
-  https://archive.org/details/Microsoft_Windows_NT_Server_Version_4.0_227-0=
-75
-  -385_CD-KEY_419-1343253_1996
 
-  Try to boot it as follows:
-
-  qemu-system-x86_64 -hda disk.img -cdrom Microsoft_Windows_NT_Server_Versi=
-on_4.0_227-075-385_CD-KEY_419-1343253_1996.iso -m 2048 -boot d -machine pc,=
-accel=3Dtcg
-  WARNING: Image format was not specified for 'disk.img' and probing guesse=
-d raw.
-           Automatically detecting the format is dangerous for raw images, =
-write operations on block 0 will be restricted.
-           Specify the 'raw' format explicitly to remove the restrictions.
-  **
-  ERROR:/home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion=
- failed: (!qemu_mutex_iothread_locked())
-  Aborted (core dumped)
-
-  The stack trace in the failing thread is:
-
-  Thread 4 (Thread 0x7fffb0418700 (LWP 21979)):
-  #0  0x00007fffdd89b64b in raise () at /lib64/libc.so.6
-  #1  0x00007fffdd89d450 in abort () at /lib64/libc.so.6
-  #2  0x00007fffdff8c75d in g_assertion_message () at /lib64/libglib-2.0.so=
-.0
-  #3  0x00007fffdff8c7ea in g_assertion_message_expr ()
-      at /lib64/libglib-2.0.so.0
-  #4  0x00005555557a7d00 in qemu_mutex_lock_iothread ()
-      at /home/rjones/d/qemu/cpus.c:1580
-  #5  0x00005555557cb429 in io_writex (env=3Denv@entry=3D0x555556751400, io=
-tlbentry=3D0x55555675b678, =
-
-      iotlbentry@entry=3D0x5aaaaae40c918, val=3Dval@entry=3D8, addr=3Daddr@=
-entry=3D2148532220, retaddr=3D0, retaddr@entry=3D93825011136120, size=3Dsiz=
-e@entry=3D4)
-      at /home/rjones/d/qemu/accel/tcg/cputlb.c:795
-  #6  0x00005555557ce0f7 in io_writel (retaddr=3D93825011136120, addr=3D214=
-8532220, val=3D8, index=3D255, mmu_idx=3D21845, env=3D0x555556751400)
-      at /home/rjones/d/qemu/softmmu_template.h:265
-  #7  0x00005555557ce0f7 in helper_le_stl_mmu (env=3Denv@entry=3D0x55555675=
-1400, addr=3Daddr@entry=3D2148532220, val=3Dval@entry=3D8, oi=3D<optimized =
-out>, retaddr=3D93825011136120, retaddr@entry=3D0) at /home/rjones/d/qemu/s=
-oftmmu_template.h:300
-  #8  0x000055555587c0a4 in cpu_stl_kernel_ra (env=3D0x555556751400, ptr=3D=
-2148532220, v=3D8, retaddr=3D0) at /home/rjones/d/qemu/include/exec/cpu_lds=
-t_template.h:182
-  #9  0x0000555555882610 in do_interrupt_protected (is_hw=3D<optimized out>=
-, next_eip=3D<optimized out>, error_code=3D2, is_int=3D<optimized out>, int=
-no=3D<optimized out>, env=3D0x555556751400) at /home/rjones/d/qemu/target/i=
-386/seg_helper.c:758
-  #10 0x0000555555882610 in do_interrupt_all (cpu=3Dcpu@entry=3D0x555556749=
-170, intno=3D<optimized out>, is_int=3D<optimized out>, error_code=3D2, nex=
-t_eip=3D<optimized out>, is_hw=3Dis_hw@entry=3D0) at /home/rjones/d/qemu/ta=
-rget/i386/seg_helper.c:1252
-  #11 0x00005555558839d3 in x86_cpu_do_interrupt (cs=3D0x555556749170)
-      at /home/rjones/d/qemu/target/i386/seg_helper.c:1298
-  #12 0x00005555557d2ccb in cpu_handle_exception (ret=3D<synthetic pointer>=
-, cpu=3D0x5555566a4590) at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:465
-  #13 0x00005555557d2ccb in cpu_exec (cpu=3Dcpu@entry=3D0x555556749170)
-      at /home/rjones/d/qemu/accel/tcg/cpu-exec.c:670
-  #14 0x00005555557a855a in tcg_cpu_exec (cpu=3D0x555556749170)
-      at /home/rjones/d/qemu/cpus.c:1270
-  #15 0x00005555557a855a in qemu_tcg_rr_cpu_thread_fn (arg=3D<optimized out=
->)
-      at /home/rjones/d/qemu/cpus.c:1365
-  #16 0x00007fffddc3d36d in start_thread () at /lib64/libpthread.so.0
-  #17 0x00007fffdd975b9f in clone () at /lib64/libc.so.6
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1706296/+subscriptions
+r~
