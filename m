@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1didLw-0004fm-0S
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 05:14:04 -0400
+	(envelope-from <berto@igalia.com>) id 1didbX-0002PC-O2
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 05:30:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1didLu-000723-UL
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 05:14:03 -0400
-Date: Fri, 18 Aug 2017 16:10:28 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170818061028.GU5509@umbus.fritz.box>
-References: <cover.1502643878.git.balaton@eik.bme.hu>
-	<5e493fd14e60d92d4fd80492ceff5ba13eb7b558.1502643878.git.balaton@eik.bme.hu>
+	(envelope-from <berto@igalia.com>) id 1didbR-0003o2-QD
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 05:30:11 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170818090722.t4njxb6ubxvl2nsb@postretch>
+References: <20170818031019.3723-1-el13635@mail.ntua.gr>
+	<20170818031019.3723-6-el13635@mail.ntua.gr>
+	<w51wp615loy.fsf@maestria.local.igalia.com>
+	<20170818090722.t4njxb6ubxvl2nsb@postretch>
+Date: Fri, 18 Aug 2017 11:30:02 +0200
+Message-ID: <w51tw155ilh.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="WQ40utMgiyDduspJ"
-Content-Disposition: inline
-In-Reply-To: <5e493fd14e60d92d4fd80492ceff5ba13eb7b558.1502643878.git.balaton@eik.bme.hu>
-Subject: Re: [Qemu-devel] [RFC PATCH 12/12] ppc: Add aCube Sam460ex board
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 5/6] block: add throttle block filter
+ driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +25,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
+On Fri 18 Aug 2017 11:07:22 AM CEST, Manos Pitsidianakis wrote:
 
---WQ40utMgiyDduspJ
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>>> The driver can be used with the syntax
+>>> -drive driver=throttle,file.filename=foo.qcow2, \
+>>>         limits.iops-total=...,throttle-group=bar
+>>
+>>I had understood that we would get rid of the limits.* options in this
+>>driver, or did I get it wrong?
+>>
+> I was going to send a patch after this was merged along with adding
+> ThrottleGroups to the root container, to speed things up. Do you
+> prefer to do this in this patch?
 
-On Sun, Aug 13, 2017 at 07:04:38PM +0200, BALATON Zoltan wrote:
-> Add emulation of aCube Sam460ex board based on AMCC 460EX embedded SoC.
-> This is not a full implementation yet with a lot of components still
-> missing but enough to start a Linux kernel and the U-Boot firmware.
->=20
-> Signed-off-by: Fran=E7ois Revol <revol@free.fr>
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+I'm not sure what's the benefit of adding a complete infrastructure that
+you are going to remove immediately afterwards :-?
 
-There are a *lot* of devices defined here.  Most of them look like
-they belong to the SoC, not the board (since they use DCRs), so it
-doesn't really make sense to define them in a board file.  It would
-also make it easier to review if they were split up into separate
-patches.
+> The root container patch probably has to go to the 'remove legacy'
+> series since adding it here means the name collision errors introduce
+> error paths in block/block-backend.c that go away in that series, and
+> that'd be a waste of effort.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Ok.
 
---WQ40utMgiyDduspJ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmWhNIACgkQbDjKyiDZ
-s5LWIhAArL9huhKrovWIHVD6RoUX5ec/wp8ma9Z5ZbsmXO9UA1G4vu8U6rZqJB9/
-7bWlfcqrfWllgs8ebPivupnEURu/eh64X8Lien/5L6+K+C/xEUTKXMM7AMDXVwn2
-GyqMjLzqbvwlOFHfrr9Moj588OObZsRhqD+ebAvV4+BpaLJrb2+gKOu5ypX+pwco
-7xq5hp98koMcxmGCT3BemhRLpX7d5glq/Kyi0py0ShjlV0QSQ3pMmd19J4xc5HDK
-GyqxxtpXH7goxsxTKSDkX4tyrrz9sxEZfk/KXcKq9A3oFojfVyn2fi2QdOkvTGsa
-I1FsUIZnxgB32J8+xBhq2wKjPD2NaFckPkL9agy7vc600gvKiCUo6Q/O9Os0vEdm
-2/if2HtKsdm4yzgTBWsUXH+jZYQXqNi+l99m+iwDLXZt3jyz2qXNewKqieSuwhBl
-fNt8Wsj66rAPP7iTTPnP9tJQx9s2k5uSd/BylUivR64Ik3FWz2pA5jiGMDm574vq
-5lK3UCmMDxqhV6k5lFd7ftGgm1fQniLJ7wTIJZSDmC+n8nTTG34zFfB1B/YOE0dW
-qQOfcqb8wEkLjf9YUSLwkivTqAjgMj36DE2Ozj/HyNQQYCtjMIV9sl0ul0YOzigy
-uYgU43dgt6xmfov4q/kqH4yEqDP1nvhAXn/jM4Kj8n7utgNObns=
-=8Xaa
------END PGP SIGNATURE-----
-
---WQ40utMgiyDduspJ--
+Berto
