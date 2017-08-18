@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dicpa-0005yF-6i
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 04:40:39 -0400
+	(envelope-from <hahn@univention.de>) id 1dicqx-0006hw-O8
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 04:42:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dicpW-0003YH-Pp
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 04:40:38 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:35799)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dicpW-0003Xw-IY
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 04:40:34 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id 49so55392943wrw.2
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 01:40:34 -0700 (PDT)
-References: <150097502966.6397.351311629210845503.malonedeb@gac.canonical.com>
-	<150240857521.18943.1371547756430353016.malone@chaenomeles.canonical.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <150240857521.18943.1371547756430353016.malone@chaenomeles.canonical.com>
-Date: Fri, 18 Aug 2017 09:40:31 +0100
-Message-ID: <87shgpi800.fsf@linaro.org>
+	(envelope-from <hahn@univention.de>) id 1dicqu-0004jV-Kz
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 04:42:03 -0400
+Received: from mail.univention.de ([82.198.197.8]:12881)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <hahn@univention.de>) id 1dicqu-0004ib-C1
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 04:42:00 -0400
+References: <8b120ab5-5319-30d6-6971-411c7e5c4330@univention.de>
+	<20170814183910.GA2469@work-vm>
+	<35734e50-0fe7-1809-1826-f6f28856ff88@redhat.com>
+From: Philipp Hahn <hahn@univention.de>
+Message-ID: <410b3398-470f-4434-7488-890054b4921b@univention.de>
+Date: Fri, 18 Aug 2017 10:41:47 +0200
 MIME-Version: 1.0
+In-Reply-To: <35734e50-0fe7-1809-1826-f6f28856ff88@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Bug 1706296] Re: Booting NT 4 disk causes
- /home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion failed:
- (!qemu_mutex_iothread_locked())
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] RFH: difference in read-only mapped bios.bin -
+ memory corruption?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,33 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1706296 <1706296@bugs.launchpad.net>
+To: Laszlo Ersek <lersek@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: qemu-devel@nongnu.org
 
+Hello,
 
-John Arbuckle <programmingkidx@gmail.com> writes:
+Am 15.08.2017 um 13:25 schrieb Laszlo Ersek:
+> On 08/14/17 20:39, Dr. David Alan Gilbert wrote:
+>> * Philipp Hahn (hahn@univention.de) wrote:
+>>> I'm currently investigating a problem, were a Linux VM does not reboo=
+t
+>>> and gets stuck in the SeaBIOS reboot code:
+>>>
+>>> I'm using SeaBIOS-1.7 from Debian with a more modern qemu-2.8
+...>>> If I dump both regions and compare them, I get a difference:
+...>> You might want seabios commit c68aff5 and b837e6 that got fixed aft=
+er
+>> I tracked down some reboot hangs - although they were rare, not every
+>> time.  c68aff5 did certainly cause a corruption, and the address of th=
+at
+>> corruption was determined at link time and could overlay random useful
+>> bits of code if you were unlucky.
 
-> Using '-cpu 486' gets past the assertion error. I guess Windows NT 4.0
-> is not compatible with newer Intel processors.
+Thanks you for the commit IDs - to me this looks like they fixed the
+problem. Testing with seabios-1.10 does not show any reboot problem so fa=
+r.
 
-It might be related. The assertion error is caused by the fact an
-exception has occurred and processor is trying to dump a stack frame that
-overlaps from RAM into device memory. As the IRQ/exception handling is
-already under the BQL (as it changes machine state) we get the assertion
-when it tries to take the BQL a second time when accessing device
-memory.
+>>> 1. How can it be, that the low-mem ROM mapping is modified?
+>>
+>> I can't remember all the details, but PC ROM is shadowed and mapped ov=
+er
+>> with RAM at various times,
+>=20
+> Right. I don't remember for sure, but I believe the state of the PAM
+> registers doesn't only affect what the VCPUs see in that address range,
+> but also what your monitor commands will dump. (This would be the
+> logical choice -- make the monitor output what the VCPUs see anyway, at
+> the moment, dependent on the PAM settings.)
 
-We can drop the lock in the stack frame writing code but I don't know
-what effect that would have as the guest still might crash having tried
-to write a stack frame to device memory....
+That makes sense.
+Do you know by change what change in Qemu triggered that bug, as I've
+never seen any reboot problem with qemu-1.1.2, but only since switching
+to qemu-2.8?
 
->
-> Currently I can install Windows NT 4.0, but booting from the
-> installation has its problems. It won't boot unless you use the NTFS
-> file system. Even with this file system I still see a BSOD that states
-> INACCESSIBLE_BOOT_DEVICE. Not sure what is wrong. Switching to a SCSI
-> controller didn't help.
+Thanks again for your excellent help.
 
-
---
-Alex Bennée
+Philipp
