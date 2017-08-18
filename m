@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dimVh-0002UK-Bm
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:00:47 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dimWV-00030H-Md
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:01:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dimVe-00082A-9O
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:00:45 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:35638)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dimVe-00081z-2i
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:00:42 -0400
-Received: by mail-qk0-x241.google.com with SMTP id a77so9533820qkb.2
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 12:00:41 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
-	<1503050939-227939-2-git-send-email-imammedo@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c65c99e5-5d60-5aef-7e69-ce236f6b7d4e@amsat.org>
-Date: Fri, 18 Aug 2017 16:00:37 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1dimWS-0000Ap-LI
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:01:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52402)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dimWS-00009O-GC
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:01:32 -0400
+Date: Fri, 18 Aug 2017 16:01:26 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170818190126.GD27715@localhost.localdomain>
+References: <1502841979-6233-1-git-send-email-tianyu.lan@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1503050939-227939-2-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-2.11 01/27] sparc: convert cpu models
- to SPARC cpu subclasses
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1502841979-6233-1-git-send-email-tianyu.lan@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] pc: add 2.11 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,277 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
+To: Lan Tianyu <tianyu.lan@intel.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, rkrcmar@redhat.com, pbonzini@redhat.com, rth@twiddle.net, Laurent Vivier <lvivier@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Hi Igor,
-
-On 08/18/2017 07:08 AM, Igor Mammedov wrote:
-> QOMfy cpu models handling introducing propper cpu types
-> for each cpu model.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+On Tue, Aug 15, 2017 at 08:06:18PM -0400, Lan Tianyu wrote:
+> Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
 > ---
-> with this and conversion of features to properties,
-> it would be possible to replace cpu_sparc_init() with
-> cpu_generic_init() and reuse common -cpu handling
-> infrastructure.
+>  hw/i386/pc_piix.c    | 14 +++++++++++---
+>  hw/i386/pc_q35.c     | 14 +++++++++++---
+>  include/hw/compat.h  |  3 +++
+>  include/hw/i386/pc.h |  3 +++
+>  4 files changed, 28 insertions(+), 6 deletions(-)
 > 
-> CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> CC: Artyom Tarasenko <atar4qemu@gmail.com>
-> CC: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> 
-> v2:
->    * make base class abstract (Philippe Mathieu-Daudé <f4bug@amsat.org>)
-> ---
->   target/sparc/cpu-qom.h |   2 +
->   target/sparc/cpu.c     | 121 +++++++++++++++++++++++++++++++++----------------
->   2 files changed, 84 insertions(+), 39 deletions(-)
-> 
-> diff --git a/target/sparc/cpu-qom.h b/target/sparc/cpu-qom.h
-> index f63af72..af6d57a 100644
-> --- a/target/sparc/cpu-qom.h
-> +++ b/target/sparc/cpu-qom.h
-> @@ -35,6 +35,7 @@
->   #define SPARC_CPU_GET_CLASS(obj) \
->       OBJECT_GET_CLASS(SPARCCPUClass, (obj), TYPE_SPARC_CPU)
->   
-> +typedef struct sparc_def_t sparc_def_t;
->   /**
->    * SPARCCPUClass:
->    * @parent_realize: The parent class' realize handler.
-> @@ -49,6 +50,7 @@ typedef struct SPARCCPUClass {
->   
->       DeviceRealize parent_realize;
->       void (*parent_reset)(CPUState *cpu);
-> +    sparc_def_t *cpu_def;
->   } SPARCCPUClass;
->   
->   typedef struct SPARCCPU SPARCCPU;
-> diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-> index d606eb5..2994c09 100644
-> --- a/target/sparc/cpu.c
-> +++ b/target/sparc/cpu.c
-> @@ -25,8 +25,6 @@
->   
->   //#define DEBUG_FEATURES
->   
-> -static int cpu_sparc_find_by_name(sparc_def_t *cpu_def, const char *cpu_model);
-> -
->   /* CPUClass::reset() */
->   static void sparc_cpu_reset(CPUState *s)
->   {
-> @@ -111,17 +109,9 @@ static int cpu_sparc_register(SPARCCPU *cpu, const char *cpu_model)
->   {
->       CPUSPARCState *env = &cpu->env;
->       char *s = g_strdup(cpu_model);
-> -    char *featurestr, *name = strtok(s, ",");
-> -    sparc_def_t def1, *def = &def1;
-> +    char *featurestr = strtok(s, ",");
->       Error *err = NULL;
->   
-> -    if (cpu_sparc_find_by_name(def, name) < 0) {
-> -        g_free(s);
-> -        return -1;
-> -    }
-> -
-> -    env->def = g_memdup(def, sizeof(*def));
-> -
->       featurestr = strtok(NULL, ",");
->       sparc_cpu_parse_features(CPU(cpu), featurestr, &err);
->       g_free(s);
-> @@ -130,18 +120,18 @@ static int cpu_sparc_register(SPARCCPU *cpu, const char *cpu_model)
->           return -1;
->       }
->   
-> -    env->version = def->iu_version;
-> -    env->fsr = def->fpu_version;
-> -    env->nwindows = def->nwindows;
-> +    env->version = env->def->iu_version;
-> +    env->fsr = env->def->fpu_version;
-> +    env->nwindows = env->def->nwindows;
->   #if !defined(TARGET_SPARC64)
-> -    env->mmuregs[0] |= def->mmu_version;
-> +    env->mmuregs[0] |= env->def->mmu_version;
->       cpu_sparc_set_id(env, 0);
-> -    env->mxccregs[7] |= def->mxcc_version;
-> +    env->mxccregs[7] |= env->def->mxcc_version;
->   #else
-> -    env->mmu_version = def->mmu_version;
-> -    env->maxtl = def->maxtl;
-> -    env->version |= def->maxtl << 8;
-> -    env->version |= def->nwindows - 1;
-> +    env->mmu_version = env->def->mmu_version;
-> +    env->maxtl = env->def->maxtl;
-> +    env->version |= env->def->maxtl << 8;
-> +    env->version |= env->def->nwindows - 1;
->   #endif
->       return 0;
->   }
-> @@ -149,8 +139,19 @@ static int cpu_sparc_register(SPARCCPU *cpu, const char *cpu_model)
->   SPARCCPU *cpu_sparc_init(const char *cpu_model)
->   {
->       SPARCCPU *cpu;
-> +    ObjectClass *oc;
-> +    char *str, *name;
-> +
-> +    str = g_strdup(cpu_model);
-> +    name = strtok(str, ",");
-
-you can free 'str' once here:
-
-        g_free(str);
-
-> +    oc = cpu_class_by_name(TYPE_SPARC_CPU, name);
-> +    if (oc == NULL) {
-> +        g_free(str);
-
-drop
-
-> +        return NULL;
-> +    }
-> +    g_free(str);
-
-drop
-
->   
-> -    cpu = SPARC_CPU(object_new(TYPE_SPARC_CPU));
-> +    cpu = SPARC_CPU(object_new(object_class_get_name(oc)));
->   
->       if (cpu_sparc_register(cpu, cpu_model) < 0) {
->           object_unref(OBJECT(cpu));
-> @@ -553,23 +554,6 @@ static void add_flagname_to_bitmaps(const char *flagname, uint32_t *features)
->       error_report("CPU feature %s not found", flagname);
->   }
->   
-> -static int cpu_sparc_find_by_name(sparc_def_t *cpu_def, const char *name)
-> -{
-> -    unsigned int i;
-> -    const sparc_def_t *def = NULL;
-> -
-> -    for (i = 0; i < ARRAY_SIZE(sparc_defs); i++) {
-> -        if (strcasecmp(name, sparc_defs[i].name) == 0) {
-> -            def = &sparc_defs[i];
-> -        }
-> -    }
-> -    if (!def) {
-> -        return -1;
-> -    }
-> -    memcpy(cpu_def, def, sizeof(*def));
-> -    return 0;
-> -}
-> -
->   static void sparc_cpu_parse_features(CPUState *cs, char *features,
->                                        Error **errp)
->   {
-> @@ -796,6 +780,36 @@ static bool sparc_cpu_has_work(CPUState *cs)
->              cpu_interrupts_enabled(env);
->   }
->   
-> +static char *sparc_cpu_type_name(const char *cpu_model)
-> +{
-> +    char *name = g_strdup_printf("%s-" TYPE_SPARC_CPU, cpu_model);
-> +    char *s = name;
-> +
-> +    /* SPARC cpu model names happen to have whitespaces,
-> +     * as type names shouldn't have spaces replace them with '-'
-> +     */
-> +    while ((s = strchr(s, ' '))) {
-> +        *s = '-';
-> +    }
-> +
-> +    return name;
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 11b4336..e99ec8c 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -436,11 +436,21 @@ static void pc_i440fx_machine_options(MachineClass *m)
+>      m->default_display = "std";
+>  }
+>  
+> -static void pc_i440fx_2_10_machine_options(MachineClass *m)
+> +static void pc_i440fx_2_11_machine_options(MachineClass *m)
+>  {
+>      pc_i440fx_machine_options(m);
+>      m->alias = "pc";
+>      m->is_default = 1;
 > +}
 > +
-> +static ObjectClass *sparc_cpu_class_by_name(const char *cpu_model)
+> +DEFINE_I440FX_MACHINE(v2_11, "pc-i440fx-2.11", NULL,
+> +                      pc_i440fx_2_11_machine_options);
+> +
+> +static void pc_i440fx_2_10_machine_options(MachineClass *m)
 > +{
-> +    ObjectClass *oc;
-> +    char *typename;
-> +
-> +    if (cpu_model == NULL) {
-> +        return NULL;
-> +    }
-> +
-> +    typename = sparc_cpu_type_name(cpu_model);
-> +    oc = object_class_by_name(typename);
-> +    g_free(typename);
-> +    return oc;
-> +}
-> +
->   static void sparc_cpu_realizefn(DeviceState *dev, Error **errp)
->   {
->       CPUState *cs = CPU(dev);
-> @@ -825,6 +839,7 @@ static void sparc_cpu_initfn(Object *obj)
->   {
->       CPUState *cs = CPU(obj);
->       SPARCCPU *cpu = SPARC_CPU(obj);
-> +    SPARCCPUClass *scc = SPARC_CPU_GET_CLASS(obj);
->       CPUSPARCState *env = &cpu->env;
->   
->       cs->env_ptr = env;
-> @@ -832,6 +847,8 @@ static void sparc_cpu_initfn(Object *obj)
->       if (tcg_enabled()) {
->           gen_intermediate_code_init(env);
->       }
-> +
-> +    env->def = g_memdup(scc->cpu_def, sizeof(*scc->cpu_def));
->   }
->   
->   static void sparc_cpu_uninitfn(Object *obj)
-> @@ -854,6 +871,7 @@ static void sparc_cpu_class_init(ObjectClass *oc, void *data)
->       scc->parent_reset = cc->reset;
->       cc->reset = sparc_cpu_reset;
->   
-> +    cc->class_by_name = sparc_cpu_class_by_name;
->       cc->has_work = sparc_cpu_has_work;
->       cc->do_interrupt = sparc_cpu_do_interrupt;
->       cc->cpu_exec_interrupt = sparc_cpu_exec_interrupt;
-> @@ -888,14 +906,39 @@ static const TypeInfo sparc_cpu_type_info = {
->       .instance_size = sizeof(SPARCCPU),
->       .instance_init = sparc_cpu_initfn,
->       .instance_finalize = sparc_cpu_uninitfn,
-> -    .abstract = false,
-> +    .abstract = true,
->       .class_size = sizeof(SPARCCPUClass),
->       .class_init = sparc_cpu_class_init,
->   };
->   
-> +static void sparc_cpu_cpudef_class_init(ObjectClass *oc, void *data)
-> +{
-> +    SPARCCPUClass *scc = SPARC_CPU_CLASS(oc);
-> +    scc->cpu_def = data;
-> +}
-> +
-> +static void sparc_register_cpudef_type(const struct sparc_def_t *def)
-> +{
-> +    char *typename = sparc_cpu_type_name(def->name);
-> +    TypeInfo ti = {
-> +        .name = typename,
-> +        .parent = TYPE_SPARC_CPU,
-> +        .class_init = sparc_cpu_cpudef_class_init,
-> +        .class_data = (void *)def,
-> +    };
-> +
-> +    type_register(&ti);
-> +    g_free(typename);
-> +}
-> +
->   static void sparc_cpu_register_types(void)
->   {
-> +    int i;
-> +
->       type_register_static(&sparc_cpu_type_info);
-> +    for (i = 0; i < ARRAY_SIZE(sparc_defs); i++) {
-> +        sparc_register_cpudef_type(&sparc_defs[i]);
-> +    }
->   }
->   
->   type_init(sparc_cpu_register_types)
-> 
+> +    pc_i440fx_machine_options(m);
+> +    m->is_default = 0;
+> +    m->alias = NULL;
+>      m->numa_auto_assign_ram = numa_legacy_auto_assign_ram;
 
-Anyway I can't start Aurelien's image [1] with this commit:
+Interesting, this was supposed to be in
+pc_i440fx_2_9_machine_options() (see commit 3bfe5716 "numa:
+equally distribute memory on nodes"), but the merge commit
+adb354dd ("Merge remote-tracking branch 'mst/tags/for_upstream'
+into staging") moved it to the pc_i440fx_2_10_machine_options().
 
-$ sparc-softmmu/qemu-system-sparc -hda debian_etch_sparc_small.qcow2
-qemu: Unable to find Sparc CPU definition
+I will submit a fix for -rc4 ASAP.
 
-[1] https://people.debian.org/~aurel32/qemu/sparc/
+-- 
+Eduardo
