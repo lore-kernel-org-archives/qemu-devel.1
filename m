@@ -1,19 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dihHr-0007oM-Px
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:26:09 -0400
+	(envelope-from <rene@exactcode.com>) id 1dihJS-0000cU-CJ
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:27:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dihHl-0007RH-VR
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:26:07 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170815130502.8736-1-stefanha@redhat.com>
-References: <20170815130502.8736-1-stefanha@redhat.com>
-Date: Fri, 18 Aug 2017 15:25:59 +0200
-Message-ID: <w51o9rd57o8.fsf@maestria.local.igalia.com>
+	(envelope-from <rene@exactcode.com>) id 1dihJP-0008BA-86
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:27:46 -0400
+Received: from [144.76.154.42] (port=35088 helo=exactco.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rene@exactcode.com>) id 1dihJO-0008A6-V6
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:27:43 -0400
+Received: from exactco.de ([90.187.5.221]) by exactco.de with esmtp (Exim 4.82)
+	(envelope-from <rene@exactcode.com>) id 1digvB-0008TR-Sq
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:02:41 +0000
+Received: from 14.red-81-36-154.dynamicip.rima-tde.net ([81.36.154.14]
+	helo=[192.168.10.100])
+	by exactco.de with esmtpsa (TLSv1:AES128-SHA:128) (Exim 4.54)
+	id 1digvN-0007pr-NX
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 13:02:54 +0000
+From: =?UTF-8?Q?Ren=c3=a9_Rebe?= <rene@exactcode.com>
+Message-ID: <85cdeb9f-a6ea-5530-edcd-10ed3853026f@exactcode.com>
+Date: Fri, 18 Aug 2017 15:02:04 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-2.10] qemu-iotests: step clock after
- each test iteration
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: [Qemu-devel] [PATCH] QXL: always show default cursor,
+ even for unsupported chunks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,37 +34,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Tue 15 Aug 2017 03:05:02 PM CEST, Stefan Hajnoczi wrote:
-> The 093 throttling test submits twice as many requests as the throttle
-> limit in order to ensure that we reach the limit.  The remaining
-> requests are left in-flight at the end of each test iteration.
->
-> Commit 452589b6b47e8dc6353df257fc803dfc1383bed8 ("vl.c/exit: pause cpus
-> before closing block devices") exposed a hang in 093.  This happens
-> because requests are still in flight when QEMU terminates but
-> QEMU_CLOCK_VIRTUAL time is frozen.  bdrv_drain_all() hangs forever since
-> throttled requests cannot complete.
->
-> Step the clock at the end of each test iteration so in-flight requests
-> actually finish.  This solves the hang and is cleaner than leaving tests
-> in-flight.
->
-> Note that this could also be "fixed" by disabling throttling when drives
-> are closed in QEMU.  That approach has two issues:
->
-> 1. We must drain requests before disabling throttling, so the hang
->    cannot be easily avoided!
->
-> 2. Any time QEMU disables throttling internally there is a chance that
->    malicious users can abuse the code path to bypass throttling limits.
->
-> Therefore it makes more sense to fix the test case than to modify QEMU.
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Hi,
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+I was testing a Windows 10 guest with HiDPI scaling which
 
-Berto
+actually made the cursor disappear and only multiple chunks
+
+warnings being printed.
+
+When the cursor is using currently unsupported multiple chunks, the
+builtin-left cursor is better than none.
+
+PS: if TB damages the white-space just let me know, only recently 
+started using it, ...
+
+   - René Rebe <rene@exactcode.de>
+
+diff -u -ur qemu-2.10.0-rc3/hw/display/qxl-render.c 
+qemu-2.10.0-rc3-fixed/hw/display/qxl-render.c
+--- qemu-2.10.0-rc3/hw/display/qxl-render.c    2017-08-15 
+20:39:41.000000000 +0200
++++ qemu-2.10.0-rc3-fixed/hw/display/qxl-render.c    2017-08-17 
+13:42:37.108953910 +0200
+@@ -270,9 +270,10 @@
+          }
+          if (cursor->chunk.data_size != cursor->data_size) {
+              fprintf(stderr, "%s: multiple chunks\n", __FUNCTION__);
+-            return 1;
++            c = NULL; /* fall back to built-in left cursor */
++        } else {
++            c = qxl_cursor(qxl, cursor);
+          }
+-        c = qxl_cursor(qxl, cursor);
+          if (c == NULL) {
+              c = cursor_builtin_left_ptr();
+          }
