@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dikWf-00043e-GI
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:53:38 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dikXN-0004aw-SO
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:54:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dikWc-00048t-FI
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:53:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59674)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dikWc-00048f-8S
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:53:34 -0400
-References: <1502842933-8323-1-git-send-email-tianyu.lan@intel.com>
-	<34042934-782b-6bcc-b9b2-de7a1816cfb7@redhat.com>
-	<3ababa62-f055-5bbb-b9b9-c55ada8368dd@intel.com>
-	<20170818163854.GY3108@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d02e9f04-2487-1a02-4453-5e604b0f3f2b@redhat.com>
-Date: Fri, 18 Aug 2017 18:53:27 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dikXK-0004Ks-R3
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:54:21 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:36152)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dikXK-0004Kk-Lz
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 12:54:18 -0400
+Received: by mail-qt0-x242.google.com with SMTP id c15so9421966qta.3
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 09:54:18 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1503065708-28277-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1503065708-28277-3-git-send-email-mark.cave-ayland@ilande.co.uk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <9a59c21e-bc3f-10a1-fa3c-7d25231791af@amsat.org>
+Date: Fri, 18 Aug 2017 13:54:15 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170818163854.GY3108@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1503065708-28277-3-git-send-email-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] x86: Skip check apic_id_limit for Xen
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/4] net: introduce net_crc32_le() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,20 +35,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Lan Tianyu <tianyu.lan@intel.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, rth@twiddle.net, anthony.perard@citrix.com, xen-devel@lists.xenproject.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, jasowang@redhat.com
 
-On 18/08/2017 18:38, Eduardo Habkost wrote:
->>> I think you still need to do a check for vIOMMU being enabled.
->>
->> Yes, this will be done in the Xen tool stack and Qemu doesn't have such
->> knowledge. Operations of create, destroy Xen vIOMMU will be done in the
->> Xen tool stack.
->
-> Shouldn't we make QEMU have knowledge of the vIOMMU device, then?
-> Won't QEMU need to know about it eventually?
+On 08/18/2017 11:15 AM, Mark Cave-Ayland wrote:
+> This provides a standard ethernet CRC32 little-endian implementation.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>   include/net/net.h |    2 ++
+>   net/net.c         |   22 ++++++++++++++++++++++
+>   2 files changed, 24 insertions(+)
+> 
+> diff --git a/include/net/net.h b/include/net/net.h
+> index 586098c..4afac1a 100644
+> --- a/include/net/net.h
+> +++ b/include/net/net.h
+> @@ -228,7 +228,9 @@ NetClientState *net_hub_port_find(int hub_id);
+>   void qdev_set_nic_properties(DeviceState *dev, NICInfo *nd);
+>   
+>   #define POLYNOMIAL_BE 0x04c11db6
+> +#define POLYNOMIAL_LE 0xedb88320
+>   uint32_t net_crc32(const uint8_t *p, int len);
+> +uint32_t net_crc32_le(const uint8_t *p, int len);
 
-No, it actually makes sense since Xen hosts all system-wide interrupt
-sources outside QEMU, unlike KVM which only hosts the (per-CPU) local APIC.
+same here, with size_t len:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Paolo
+>   unsigned compute_mcast_idx(const uint8_t *ep);
+>   
+>   #define vmstate_offset_macaddr(_state, _field)                       \
+> diff --git a/net/net.c b/net/net.c
+> index a856907..c99e705 100644
+> --- a/net/net.c
+> +++ b/net/net.c
+> @@ -1590,6 +1590,28 @@ uint32_t net_crc32(const uint8_t *p, int len)
+>       return crc;
+>   }
+>   
+> +uint32_t net_crc32_le(const uint8_t *p, int len)
+> +{
+> +    uint32_t crc;
+> +    int carry, i, j;
+> +    uint8_t b;
+> +
+> +    crc = 0xffffffff;
+> +    for (i = 0; i < len; i++) {
+> +        b = *p++;
+> +        for (j = 0; j < 8; j++) {
+> +            carry = (crc & 0x1) ^ (b & 0x01);
+> +            crc >>= 1;
+> +            b >>= 1;
+> +            if (carry) {
+> +                crc = crc ^ POLYNOMIAL_LE;
+> +            }
+> +        }
+> +    }
+> +
+> +    return crc;
+> +}
+> +
+>   unsigned compute_mcast_idx(const uint8_t *ep)
+>   {
+>       return net_crc32(ep, 6) >> 26;
+> 
