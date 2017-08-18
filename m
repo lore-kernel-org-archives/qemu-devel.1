@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dim6u-0007Lj-Ml
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:35:10 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dimMW-0004dM-0C
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:51:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dim6o-0000lv-Ss
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:35:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57686)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dim6o-0000lG-Ji
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:35:02 -0400
-Date: Fri, 18 Aug 2017 21:35:00 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170818213432-mutt-send-email-mst@kernel.org>
-References: <1502847935-20483-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	(envelope-from <alistai@xilinx.com>) id 1dimMS-0002hN-UJ
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:51:16 -0400
+Received: from mail-by2nam01on0051.outbound.protection.outlook.com
+	([104.47.34.51]:9952
+	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dimMS-0002gl-Gf
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 14:51:12 -0400
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Fri, 18 Aug 2017 11:47:35 -0700
+Message-ID: <2c94ac3bb116cc6b8ebbcd66a254920a69665515.1503077821.git.alistair.francis@xilinx.com>
+In-Reply-To: <cover.1503077821.git.alistair.francis@xilinx.com>
+References: <cover.1503077821.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1502847935-20483-1-git-send-email-douly.fnst@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH v3] hw/acpi-build: Fix SRAT memory building
- when there is no memory in node0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v1 2/2] Convert remaining single line fprintf()
+ to warn_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,161 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, imammedo@redhat.com
+To: qemu-devel@nongnu.org, armbru@redhat.com
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, pbonzini@redhat.com
 
-On Wed, Aug 16, 2017 at 09:45:35AM +0800, Dou Liyang wrote:
-> Currently, Using the fisrt node without memory on the machine makes
-> QEMU unhappy. With this example command line:
->   ... \
->   -m 1024M,slots=4,maxmem=32G \
->   -numa node,nodeid=0 \
->   -numa node,mem=1024M,nodeid=1 \
->   -numa node,nodeid=2 \
->   -numa node,nodeid=3 \
-> Guest reports "No NUMA configuration found" and the NUMA topology is
-> wrong.
-> 
-> This is because when QEMU builds ACPI SRAT, it regards node0 as the
-> default node to deal with the memory hole(640K-1M). this means the
-> node0 must have some memory(>1M), but, actually it can have no
-> memory.
-> 
-> Fix this problem by replace the node0 with the first node which has
-> memory on it. Add a new function for each node. Also do some cleanup.
-> 
-> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Convert any remaining uses of fprintf(stderr, "warning:"...
+to use warn_report() instead. This helps standardise on a single
+method of printing warnings to the user.
 
-This isn't a regression, is it? If it isn't, it's not a 2.10 candidate
-IMHO.
+All of the warnings were changed using this command:
+  find ./* -type f -exec sed -i 's|fprintf(.*".*warning[,:] |warn_report("|Ig' {} +
 
-> ---
-> V3 --> V2
->   -Modify the title
-> V2 --> V1:
->   -Fix a coding style problem
-> Replace
->     for (node = 0;
->             node < pcms->numa_nodes && pcms->node_mem[node] == 0;
->             node++);
-> 
-> with
->     for (node = 0; node < pcms->numa_nodes; node++) {
->        if (pcms->node_mem[node] != 0) {
->             break;
->          }
-> 
->  hw/i386/acpi-build.c | 78 +++++++++++++++++++++++++++++++++-------------------
->  1 file changed, 50 insertions(+), 28 deletions(-)
-> 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 98dd424..f93d712 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2318,15 +2318,43 @@ build_tpm2(GArray *table_data, BIOSLinker *linker)
->                   (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
->  }
->  
-> +static uint64_t
-> +build_srat_node_entry(GArray *table_data, PCMachineState *pcms,
-> +                                int i, uint64_t mem_base, uint64_t mem_len)
-> +{
-> +    AcpiSratMemoryAffinity *numamem;
-> +    uint64_t next_base;
-> +
-> +    next_base = mem_base + mem_len;
-> +
-> +    /* Cut out the ACPI_PCI hole */
-> +    if (mem_base <= pcms->below_4g_mem_size &&
-> +        next_base > pcms->below_4g_mem_size) {
-> +        mem_len -= next_base - pcms->below_4g_mem_size;
-> +        if (mem_len > 0) {
-> +            numamem = acpi_data_push(table_data, sizeof *numamem);
-> +            build_srat_memory(numamem, mem_base, mem_len, i,
-> +                              MEM_AFFINITY_ENABLED);
-> +        }
-> +        mem_base = 1ULL << 32;
-> +        mem_len = next_base - pcms->below_4g_mem_size;
-> +        next_base += (1ULL << 32) - pcms->below_4g_mem_size;
-> +    }
-> +    numamem = acpi_data_push(table_data, sizeof *numamem);
-> +    build_srat_memory(numamem, mem_base, mem_len, i,
-> +                      MEM_AFFINITY_ENABLED);
-> +    return next_base;
-> +}
-> +
->  static void
->  build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->  {
->      AcpiSystemResourceAffinityTable *srat;
->      AcpiSratMemoryAffinity *numamem;
->  
-> -    int i;
-> +    int i, node;
->      int srat_start, numa_start, slots;
-> -    uint64_t mem_len, mem_base, next_base;
-> +    uint64_t mem_len, mem_base;
->      MachineClass *mc = MACHINE_GET_CLASS(machine);
->      const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(machine);
->      PCMachineState *pcms = PC_MACHINE(machine);
-> @@ -2370,36 +2398,30 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->      /* the memory map is a bit tricky, it contains at least one hole
->       * from 640k-1M and possibly another one from 3.5G-4G.
->       */
-> -    next_base = 0;
-> +
->      numa_start = table_data->len;
->  
-> -    numamem = acpi_data_push(table_data, sizeof *numamem);
-> -    build_srat_memory(numamem, 0, 640 * 1024, 0, MEM_AFFINITY_ENABLED);
-> -    next_base = 1024 * 1024;
-> -    for (i = 1; i < pcms->numa_nodes + 1; ++i) {
-> -        mem_base = next_base;
-> -        mem_len = pcms->node_mem[i - 1];
-> -        if (i == 1) {
-> -            mem_len -= 1024 * 1024;
-> +    /* get the first node which has memory and map the hole from 640K-1M */
-> +    for (node = 0; node < pcms->numa_nodes; node++) {
-> +        if (pcms->node_mem[node] != 0) {
-> +            break;
->          }
-> -        next_base = mem_base + mem_len;
-> -
-> -        /* Cut out the ACPI_PCI hole */
-> -        if (mem_base <= pcms->below_4g_mem_size &&
-> -            next_base > pcms->below_4g_mem_size) {
-> -            mem_len -= next_base - pcms->below_4g_mem_size;
-> -            if (mem_len > 0) {
-> -                numamem = acpi_data_push(table_data, sizeof *numamem);
-> -                build_srat_memory(numamem, mem_base, mem_len, i - 1,
-> -                                  MEM_AFFINITY_ENABLED);
-> -            }
-> -            mem_base = 1ULL << 32;
-> -            mem_len = next_base - pcms->below_4g_mem_size;
-> -            next_base += (1ULL << 32) - pcms->below_4g_mem_size;
-> +    }
-> +    numamem = acpi_data_push(table_data, sizeof *numamem);
-> +    build_srat_memory(numamem, 0, 640 * 1024, node, MEM_AFFINITY_ENABLED);
-> +
-> +    /* map the rest of memory from 1M */
-> +    mem_base = 1024 * 1024;
-> +    mem_len = pcms->node_mem[node] - mem_base;
-> +    mem_base = build_srat_node_entry(table_data, pcms, node,
-> +                                            mem_base, mem_len);
-> +
-> +    for (i = 0; i < pcms->numa_nodes; i++) {
-> +        if (i == node) {
-> +            continue;
->          }
-> -        numamem = acpi_data_push(table_data, sizeof *numamem);
-> -        build_srat_memory(numamem, mem_base, mem_len, i - 1,
-> -                          MEM_AFFINITY_ENABLED);
-> +        mem_base = build_srat_node_entry(table_data, pcms, i,
-> +                                            mem_base, pcms->node_mem[i]);
->      }
->      slots = (table_data->len - numa_start) / sizeof *numamem;
->      for (; slots < pcms->numa_nodes + 2; slots++) {
-> -- 
-> 2.5.5
-> 
-> 
+The #include lines and chagnes to the test Makefile were manually
+updated to allow the code to compile.
+
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+---
+This was split out of my original series fixing QEMU warnings.
+
+ tests/Makefile.include | 2 +-
+ util/cutils.c          | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 80527a8763..91d5a4544f 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -584,7 +584,7 @@ tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
+ tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
+ tests/test-x86-cpuid$(EXESUF): tests/test-x86-cpuid.o
+ tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/xbzrle.o migration/page_cache.o $(test-util-obj-y)
+-tests/test-cutils$(EXESUF): tests/test-cutils.o util/cutils.o
++tests/test-cutils$(EXESUF): tests/test-cutils.o util/cutils.o $(test-util-obj-y)
+ tests/test-int128$(EXESUF): tests/test-int128.o
+ tests/rcutorture$(EXESUF): tests/rcutorture.o $(test-util-obj-y)
+ tests/test-rcu-list$(EXESUF): tests/test-rcu-list.o $(test-util-obj-y)
+diff --git a/util/cutils.c b/util/cutils.c
+index 1534682083..b33ede83d1 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -30,6 +30,7 @@
+ #include "qemu/iov.h"
+ #include "net/net.h"
+ #include "qemu/cutils.h"
++#include "qemu/error-report.h"
+ 
+ void strpadcpy(char *buf, int buf_size, const char *str, char pad)
+ {
+@@ -601,7 +602,7 @@ int parse_debug_env(const char *name, int max, int initial)
+         return initial;
+     }
+     if (debug < 0 || debug > max || errno != 0) {
+-        fprintf(stderr, "warning: %s not in [0, %d]", name, max);
++        warn_report("%s not in [0, %d]", name, max);
+         return initial;
+     }
+     return debug;
+-- 
+2.11.0
