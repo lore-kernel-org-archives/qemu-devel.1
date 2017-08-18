@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dihqT-000418-H4
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:01:54 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1dihqe-00048B-6B
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:02:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dihqO-0008N4-SY
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:01:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:63449)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dihqO-0008MQ-JH
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:01:48 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170731085110.1050-1-apahim@redhat.com>
-	<20170731085110.1050-8-apahim@redhat.com>
-	<878tilryx4.fsf@dusky.pond.sub.org>
-	<CALAZnb1naw=TtrsDaBw3ehESCp7ET42DUuc=cSTQTXpsKsvoyw@mail.gmail.com>
-Date: Fri, 18 Aug 2017 16:01:38 +0200
-In-Reply-To: <CALAZnb1naw=TtrsDaBw3ehESCp7ET42DUuc=cSTQTXpsKsvoyw@mail.gmail.com>
-	(Amador Pahim's message of "Fri, 18 Aug 2017 14:42:39 +0200")
-Message-ID: <87k2210ybh.fsf@dusky.pond.sub.org>
+	(envelope-from <gengdongjiu@huawei.com>) id 1dihqd-00005B-94
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:02:04 -0400
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Date: Fri, 18 Aug 2017 22:23:44 +0800
+Message-ID: <1503066227-18251-4-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <1503066227-18251-1-git-send-email-gengdongjiu@huawei.com>
+References: <1503066227-18251-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 7/7] qemu.py: include debug information
- on launch error
+Subject: [Qemu-devel] [PATCH v11 3/6] ACPI: build and enable APEI GHES in
+ the Makefile and configuration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,149 +22,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amador Pahim <apahim@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: mst@redhat.com, imammedo@redhat.com, zhaoshenglong@huawei.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org, edk2-devel@lists.01.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, will.deacon@arm.com, james.morse@arm.com, tbaicar@codeaurora.org, ard.biesheuvel@linaro.org, mingo@kernel.org, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, devel@acpica.org, john.garry@huawei.com, jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com, huangdaode@hisilicon.com, wangzhou1@hisilicon.com
+Cc: huangshaoyu@huawei.com, wuquanming@huawei.com, linuxarm@huawei.com, gengdongjiu@huawei.com, zhengqiang10@huawei.com
 
-Amador Pahim <apahim@redhat.com> writes:
+Add CONFIG_ACPI_APEI configuration in the Makefile and
+enable it in the arm-softmmu.mak
 
-> On Tue, Aug 15, 2017 at 10:57 AM, Markus Armbruster <armbru@redhat.com> wrote:
->> Amador Pahim <apahim@redhat.com> writes:
->>
->>> When launching a VM, if an exception happens and the VM is not
->>> initiated, it is useful to see the qemu command line that was executed
->>> and the output of that command.
->>>
->>> Before this patch:
->>>
->>>     >>> import qemu
->>>     >>> vm = qemu.QEMUMachine('qemu-system-aarch64', debug=True)
->>>     >>> vm.launch()
->>>     Traceback (most recent call last):
->>>       File "<stdin>", line 1, in <module>
->>>       File "qemu.py", line 175, in launch
->>>         self._launch()
->>>       File "qemu.py", line 189, in _launch
->>>         self._post_launch()
->>>       File "qemu.py", line 154, in _post_launch
->>>         self._qmp.accept()
->>>       File "qmp/qmp.py", line 145, in accept
->>>         self.__sock, _ = self.__sock.accept()
->>>       File "/usr/lib64/python2.7/socket.py", line 206, in accept
->>>         sock, addr = self._sock.accept()
->>>     socket.timeout: timed out
->>>     >>>
->>>
->>> After this patch:
->>>
->>>     >>> import qemu
->>>     >>> vm = qemu.QEMUMachine('qemu-system-aarch64', debug=True)
->>>     >>> vm.launch()
->>>     DEBUG:qemu:Error launching VM. Command: 'qemu-system-aarch64
->>>     -chardev socket,id=mon,path=/var/tmp/qemu-5298-monitor.sock
->>>     -mon chardev=mon,mode=control -display none -vga none'.
->>>     Output: 'qemu-system-aarch64: No machine specified, and there
->>>     is no default\nUse -machine help to list supported machines\n'.
->>>     Traceback (most recent call last):
->>>       File "<stdin>", line 1, in <module>
->>>       File "qemu.py", line 175, in launch
->>>         self._launch()
->>>       File "qemu.py", line 189, in _launch
->>>         self._post_launch()
->>>       File "qemu.py", line 154, in _post_launch
->>>         self._qmp.accept()
->>>       File "qmp/qmp.py", line 145, in accept
->>>         self.__sock, _ = self.__sock.accept()
->>>       File "/usr/lib64/python2.7/socket.py", line 206, in accept
->>>         sock, addr = self._sock.accept()
->>>     socket.timeout: timed out
->>>     >>>
->>>
->>> Signed-off-by: Amador Pahim <apahim@redhat.com>
->>> ---
->>>  scripts/qemu.py | 12 +++++++++++-
->>>  1 file changed, 11 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/scripts/qemu.py b/scripts/qemu.py
->>> index e9a3a96d13..43fd0b072c 100644
->>> --- a/scripts/qemu.py
->>> +++ b/scripts/qemu.py
->>> @@ -158,7 +158,10 @@ class QEMUMachine(object):
->>>              self._remove_if_exists(self._created_files.pop())
->>>
->>>      def launch(self):
->>> -        '''Launch the VM and establish a QMP connection'''
->>> +        '''
->>> +        Try to launch the VM and make sure we cleanup and expose the
->>> +        command line/output in case of exception.
->>> +        '''
->>>
->>>          if self.is_running():
->>>              raise QEMULaunchError('VM already running.')
->>> @@ -169,6 +172,7 @@ class QEMUMachine(object):
->>>                                    'before launching again.')
->>>
->>>          try:
->>> +            self._iolog = None
->>>              self._qemu_full_args = None
->>>              self._qemu_full_args = (self._wrapper + [self._binary] +
->>>                                      self._base_args() + self._args)
->>> @@ -176,9 +180,15 @@ class QEMUMachine(object):
->>>              self._pending_shutdown = True
->>>          except:
->>>              self.shutdown()
->>> +            LOG.debug('Error launching VM.%s%s',
->>> +                      ' Command: %r.' % ' '.join(self._qemu_full_args)
->>> +                      if self._qemu_full_args else '',
->>> +                      ' Output: %r.' % self._iolog
->>> +                      if self._iolog else '')
->>
->> This nested interpolation is too ugly to live :)
->
-> I find it beautiful :)
-> Killing it anyway.
->
->>
->> Nesting is easy to avoid:
->>
->>                LOG.debug('Error launching VM\n. ' Command: %r. Output: %r.'
->>                          % (' '.join(self._qemu_full_args)
->>                             if self._qemu_full_args else '',
->>                             self._iolog
->>                             if self._iolog else ''))
->
-> In this case we will have the strings "Command: " and "Output:" even
-> with no content to expose.
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+---
+ default-configs/arm-softmmu.mak | 1 +
+ hw/acpi/Makefile.objs           | 1 +
+ 2 files changed, 2 insertions(+)
 
-No command should not happen.
-
-No output would be bad news.  Making that explicit in the logs feels
-right to me.
-
->> Why %r and not %s?
->
-> It's a matter of preference. I tend to avoid allowing messages to
-> break the log line. Anyway, I'm improving this.
-
-That's a really good point.  I'd go as far and call %s wrong now :)
-
-Output could be arbitrarily long, though.
-
->> Are you sure '\n' is appropriate in the argument of LOG.debug()?
->>
->> Why cram everything into a single LOG.debug()?
->>
->>                LOG.debug('Error launching VM')
->>                LOG.debug('Command: %s' % (' '.join(self._qemu_full_args)
->>                                           if self._qemu_full_args else ''))
->>                LOG.debug('Output: %s' % self._iolog if self._iolog else ''))
->
-> Sure, I'm ok with both ways.
->
->>
->>>              raise
->>>
->>>      def _launch(self):
->>> +        '''Launch the VM and establish a QMP connection.'''
->>>          self._pre_launch()
->>>          devnull = open(os.path.devnull, 'rb')
->>>          self._popen = subprocess.Popen(self._qemu_full_args,
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index bbdd3c1..c362113 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -129,3 +129,4 @@ CONFIG_ACPI=y
+ CONFIG_SMBIOS=y
+ CONFIG_ASPEED_SOC=y
+ CONFIG_GPIO_KEY=y
++CONFIG_ACPI_APEI=y
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+index 11c35bc..bafb148 100644
+--- a/hw/acpi/Makefile.objs
++++ b/hw/acpi/Makefile.objs
+@@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
+ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
+ common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
+ common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
++common-obj-$(CONFIG_ACPI_APEI) += hest_ghes.o
+ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
+ 
+ common-obj-y += acpi_interface.o
+-- 
+1.8.3.1
