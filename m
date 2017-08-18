@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dimnp-0004WN-AT
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:19:30 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dimot-0005Rd-98
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:20:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dimnk-0003Ve-DD
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:19:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34526)
+	(envelope-from <ehabkost@redhat.com>) id 1dimoo-0004J0-Ik
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:20:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42762)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dimnk-0003U1-76
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:19:24 -0400
-Date: Fri, 18 Aug 2017 20:19:08 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170818191907.GI2222@work-vm>
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<20170628190047.26159-26-dgilbert@redhat.com>
-	<20170705005657-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dimoo-0004If-C3
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 15:20:30 -0400
+Date: Fri, 18 Aug 2017 16:20:23 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170818192023.GH3108@localhost.localdomain>
+References: <1502847935-20483-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	<20170818213432-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170705005657-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [RFC 25/29] vhu: enable = false on get_vring_base
+In-Reply-To: <20170818213432-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v3] hw/acpi-build: Fix SRAT memory building
+ when there is no memory in node0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +29,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+Cc: Dou Liyang <douly.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, imammedo@redhat.com
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Wed, Jun 28, 2017 at 08:00:43PM +0100, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Fri, Aug 18, 2017 at 09:35:00PM +0300, Michael S. Tsirkin wrote:
+> On Wed, Aug 16, 2017 at 09:45:35AM +0800, Dou Liyang wrote:
+> > Currently, Using the fisrt node without memory on the machine makes
+> > QEMU unhappy. With this example command line:
+> >   ... \
+> >   -m 1024M,slots=4,maxmem=32G \
+> >   -numa node,nodeid=0 \
+> >   -numa node,mem=1024M,nodeid=1 \
+> >   -numa node,nodeid=2 \
+> >   -numa node,nodeid=3 \
+> > Guest reports "No NUMA configuration found" and the NUMA topology is
+> > wrong.
 > > 
-> > When we receive a GET_VRING_BASE message set enable = false
-> > to stop any new received packets modifying the ring.
+> > This is because when QEMU builds ACPI SRAT, it regards node0 as the
+> > default node to deal with the memory hole(640K-1M). this means the
+> > node0 must have some memory(>1M), but, actually it can have no
+> > memory.
 > > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Fix this problem by replace the node0 with the first node which has
+> > memory on it. Add a new function for each node. Also do some cleanup.
+> > 
+> > Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
 > 
-> I think I already reviewed a similar patch.
-> Spec says:
-> Client must only process each ring when it is started.
-> 
-> IMHO the real fix is to fix client to check the started
-> flag before processing the ring.
+> This isn't a regression, is it? If it isn't, it's not a 2.10 candidate
+> IMHO.
 
-Done, I added a vu_queue_started to match vu_queue_enabled
-and then used it.
+As noted in another reply to v2, I agree and I'm treating it as a
+2.11 candidate.
 
-Dave
-
-> > ---
-> >  contrib/libvhost-user/libvhost-user.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-> > index ceddeac74f..d37052b7b0 100644
-> > --- a/contrib/libvhost-user/libvhost-user.c
-> > +++ b/contrib/libvhost-user/libvhost-user.c
-> > @@ -652,6 +652,7 @@ vu_get_vring_base_exec(VuDev *dev, VhostUserMsg *vmsg)
-> >      vmsg->size = sizeof(vmsg->payload.state);
-> >  
-> >      dev->vq[index].started = false;
-> > +    dev->vq[index].enable = false;
-> >      if (dev->iface->queue_set_started) {
-> >          dev->iface->queue_set_started(dev, index, false);
-> >      }
-> > -- 
-> > 2.13.0
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+Eduardo
