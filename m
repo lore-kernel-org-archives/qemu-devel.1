@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1diiJ8-0004X0-Mh
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:31:33 -0400
+	(envelope-from <asegundo@redhat.com>) id 1diiL8-0006MX-N9
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:33:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1diiJ7-0003Is-EP
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:31:30 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48955)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1diiJ7-0003IF-8a
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:31:29 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1diiJ4-0003go-Qs
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 14:31:27 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0D99F2E81F3
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 14:31:23 +0000 (UTC)
+	(envelope-from <asegundo@redhat.com>) id 1diiL5-0004jd-Dj
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:33:34 -0400
+Received: from mail-it0-f46.google.com ([209.85.214.46]:37886)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <asegundo@redhat.com>) id 1diiL5-0004jB-8o
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 10:33:31 -0400
+Received: by mail-it0-f46.google.com with SMTP id 76so7801988ith.0
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 07:33:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 Aug 2017 14:22:07 -0000
-From: ChristianEhrhardt <1711602@bugs.launchpad.net>
-Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
-Message-Id: <150306612773.16885.2757417694990547337.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
- 2.10
+In-Reply-To: <87shgp0yj1.fsf@dusky.pond.sub.org>
+References: <20170731085110.1050-1-apahim@redhat.com>
+	<20170731085110.1050-5-apahim@redhat.com>
+	<87tw19s0d7.fsf@dusky.pond.sub.org>
+	<CALAZnb3=A4JMfuLLV5wjF5zhEhw7z717bA6CJYP70GwLJvdtpg@mail.gmail.com>
+	<87shgp0yj1.fsf@dusky.pond.sub.org>
+From: Amador Pahim <apahim@redhat.com>
+Date: Fri, 18 Aug 2017 16:33:29 +0200
+Message-ID: <CALAZnb38k_uu-WhRmN13zpBa21nCsGu09dPe4W4DMHVpHL5fjA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v6 4/7] qemu.py: improve message on
+ negative exit code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,63 +32,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-The source log is virsh, I need to ensure we also have a source libvirtd
-log ...
+On Fri, Aug 18, 2017 at 3:57 PM, Markus Armbruster <armbru@redhat.com> wrote:
+> Amador Pahim <apahim@redhat.com> writes:
+>
+>> On Tue, Aug 15, 2017 at 10:26 AM, Markus Armbruster <armbru@redhat.com> wrote:
+>>> Amador Pahim <apahim@redhat.com> writes:
+>>>
+>>>> The current message shows 'self._args', which contains only part of the
+>>>> options used in the qemu command line.
+>>>>
+>>>> This patch makes the qemu full args list an instance variable and then
+>>>> uses it in the negative exit code message.
+>>>>
+>>>> Signed-off-by: Amador Pahim <apahim@redhat.com>
+>>>> ---
+>>>>  scripts/qemu.py | 17 ++++++++++++-----
+>>>>  1 file changed, 12 insertions(+), 5 deletions(-)
+>>>>
+>>>> diff --git a/scripts/qemu.py b/scripts/qemu.py
+>>>> index e3ea534ec4..9434ccc30b 100644
+>>>> --- a/scripts/qemu.py
+>>>> +++ b/scripts/qemu.py
+>>>> @@ -48,6 +48,7 @@ class QEMUMachine(object):
+>>>>          self._iolog = None
+>>>>          self._socket_scm_helper = socket_scm_helper
+>>>>          self._debug = debug
+>>>> +        self._qemu_full_args = None
+>>>>
+>>>>      # This can be used to add an unused monitor instance.
+>>>>      def add_monitor_telnet(self, ip, port):
+>>>> @@ -140,9 +141,14 @@ class QEMUMachine(object):
+>>>>          qemulog = open(self._qemu_log_path, 'wb')
+>>>>          try:
+>>>>              self._pre_launch()
+>>>> -            args = self._wrapper + [self._binary] + self._base_args() + self._args
+>>>> -            self._popen = subprocess.Popen(args, stdin=devnull, stdout=qemulog,
+>>>> -                                           stderr=subprocess.STDOUT, shell=False)
+>>>> +            self._qemu_full_args = None
+>>>> +            self._qemu_full_args = (self._wrapper + [self._binary] +
+>>>> +                                    self._base_args() + self._args)
+>>>
+>>> Why set self._qemu_full_args twice?
+>>
+>> If it's not cleaned up and an exception happens in
+>> "self._qemu_full_args = (self._wrapper ...", the message logged in the
+>> "except" will expose an outdated version of it.
+>
+> Ignorant question: why aren't we cleaning it up?
 
--- =
+The "self._qemu_full_args = None" is the cleanup. Case the next
+instruction fails, exception will have "None" instead of arguments
+from a previous launch().
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1711602
-
-Title:
-  --copy-storage-all failing with qemu 2.10
-
-Status in QEMU:
-  New
-Status in libvirt package in Ubuntu:
-  Confirmed
-Status in qemu package in Ubuntu:
-  Confirmed
-
-Bug description:
-  We fixed an issue around disk locking already in regard to qemu-nbd
-  [1], but there still seem to be issues.
-
-  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
-://10.22.69.196/system
-  error: internal error: qemu unexpectedly closed the monitor: 2017-08-18T1=
-2:10:29.800397Z qemu-system-x86_64: -chardev pty,id=3Dcharserial0: char dev=
-ice redirected to /dev/pts/0 (label charserial0)
-  2017-08-18T12:10:48.545776Z qemu-system-x86_64: load of migration failed:=
- Input/output error
-
-  Source libvirt log for the guest:
-  2017-08-18 12:09:08.251+0000: initiating migration
-  2017-08-18T12:09:08.809023Z qemu-system-x86_64: Unable to read from socke=
-t: Connection reset by peer
-  2017-08-18T12:09:08.809481Z qemu-system-x86_64: Unable to read from socke=
-t: Connection reset by peer
-
-  Target libvirt log for the guest:
-  2017-08-18T12:09:08.730911Z qemu-system-x86_64: load of migration failed:=
- Input/output error
-  2017-08-18 12:09:09.010+0000: shutting down, reason=3Dcrashed
-
-  Given the timing it seems that the actual copy now works (it is busy ~10 =
-seconds on my environment which would be the copy).
-  Also we don't see the old errors we saw before, but afterwards on the act=
-ual take-over it fails.
-
-  Dmesg has no related denials as often apparmor is in the mix.
-
-  Need to check libvirt logs of source [2] and target [3] in Detail.
-
-  [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02200.html
-  [2]: http://paste.ubuntu.com/25339356/
-  [3]: http://paste.ubuntu.com/25339358/
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1711602/+subscriptions
+>
+>>>> +            self._popen = subprocess.Popen(self._qemu_full_args,
+>>>> +                                           stdin=devnull,
+>>>> +                                           stdout=qemulog,
+>>>> +                                           stderr=subprocess.STDOUT,
+>>>> +                                           shell=False)
+>>>>              self._post_launch()
+>>>>          except:
+>>>>              if self.is_running():
+>>>> @@ -163,8 +169,9 @@ class QEMUMachine(object):
+>>>>
+>>>>              exitcode = self._popen.wait()
+>>>>              if exitcode < 0:
+>>>> -                LOG.error('qemu received signal %i: %s', -exitcode,
+>>>> -                          ' '.join(self._args))
+>>>> +                LOG.error('qemu received signal %i:%s', -exitcode,
+>>>> +                          ' Command: %r.' % ' '.join(self._qemu_full_args)
+>>>> +                          if self._qemu_full_args else '')
+>>>
+>>> The last argument is hard to read.
+>>
+>> Ok, I'm making it easier.
+>>
+>>>
+>>>>              self._load_io_log()
+>>>>              self._post_shutdown()
+>>>
+>>> The subprocess module appears to keep track of the full command with
+>>> methods check_call() and check_output(): its in exception
+>>> CalledProcessError right when you need it.  Sadly, it doesn't appear to
+>>> be tracked with method Popen().
+>>
+>> Indeed.
