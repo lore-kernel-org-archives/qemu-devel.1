@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dij5F-0001oo-6o
+	(envelope-from <bounces@canonical.com>) id 1dij5F-0001p3-JH
 	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 11:21:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dij5B-00011v-60
+	(envelope-from <bounces@canonical.com>) id 1dij5E-0001A4-AZ
 	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 11:21:13 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60344)
+Received: from indium.canonical.com ([91.189.90.7]:60424)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dij5A-00010A-Vg
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 11:21:09 -0400
+	id 1dij5E-00019g-5Q
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 11:21:12 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dij58-0000Vi-57
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 15:21:06 +0000
+	id 1dij5C-0000WJ-5f
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 15:21:10 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 281782E820C
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 15:20:59 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id C13932E8232
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 15:21:00 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 Aug 2017 15:03:10 -0000
+Date: Fri, 18 Aug 2017 15:03:49 -0000
 From: ChristianEhrhardt <1711602@bugs.launchpad.net>
 Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
-Message-Id: <150306859037.17173.16078522005136551706.malone@gac.canonical.com>
+Message-Id: <150306862924.11306.9333344245361680052.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
  2.10
@@ -39,18 +39,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Since this is pretty reproducible here on the setup:
+To simplify downloading the logs I'm attaching here a full set of:
+- virsh
+- source libvirtd
+- target libvirtd
 
-- Two systems (actually two lxd containers on one system)
-- Both running Artful with qemu 2.10-rc3 and libvirt 3.6
-- Storage path is not shared but set up equivalent with a manual pre-copy
-- Migration with post copy is failing, no other options set, example:
-  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
-://10.22.69.100/system
-- Same setup works on the qemu versions in Xenial (2.5), Yakkety (2.6), and=
- Zesty (2.8)
-- In fact it seems even a migration from a Zesty qemu (2.8) to the new (2.1=
-0) works
+** Attachment added: "virsh-source.log"
+   https://bugs.launchpad.net/qemu/+bug/1711602/+attachment/4934823/+files/=
+virsh-source.log
 
 -- =
 
