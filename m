@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dihB8-0004Lz-Kp
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:19:14 -0400
+	(envelope-from <famz@redhat.com>) id 1dihDw-0005rM-C1
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:22:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dihB4-0004QR-Jm
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:19:10 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:34973)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dihB4-0004QI-BP
-	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:19:06 -0400
-Received: by mail-lf0-x244.google.com with SMTP id w199so6278406lff.2
-	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 06:19:04 -0700 (PDT)
-Date: Fri, 18 Aug 2017 14:18:53 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170818131853.GB17654@stefanha-x1.localdomain>
-References: <283a2a27-7fb5-5fa7-4921-60ba91f13666@ozlabs.ru>
+	(envelope-from <famz@redhat.com>) id 1dihDs-000637-PN
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:22:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57762)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dihDs-00061R-Id
+	for qemu-devel@nongnu.org; Fri, 18 Aug 2017 09:22:00 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 84BC3C0587E8
+	for <qemu-devel@nongnu.org>; Fri, 18 Aug 2017 13:21:59 +0000 (UTC)
+Date: Fri, 18 Aug 2017 21:21:57 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170818132157.GD15392@lemon>
+References: <20170817141148.13111-1-famz@redhat.com>
+	<dad88591-da0d-d9dd-ef0d-4153bbc68b85@redhat.com>
+	<20170818033829.GA15392@lemon>
+	<39e28f27-c45c-b2a2-bb46-16b65f9d04f8@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="aM3YZ0Iwxop3KEKx"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <283a2a27-7fb5-5fa7-4921-60ba91f13666@ozlabs.ru>
-Subject: Re: [Qemu-devel] Memory use with >100 virtio devices
+In-Reply-To: <39e28f27-c45c-b2a2-bb46-16b65f9d04f8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] scsi-block: Add qdev error properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +35,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+On Fri, 08/18 08:41, Paolo Bonzini wrote:
+> On 18/08/2017 05:38, Fam Zheng wrote:
+> > On Thu, 08/17 16:23, Paolo Bonzini wrote:
+> >>> +        if (scsi_sense_matches(r, SENSE_CODE(NO_MEDIUM))) {
+> >>> +            error = ENOMEDIUM;
+> >>> +        } else if (scsi_sense_matches(r, SENSE_CODE(TARGET_FAILURE))) {
+> >>> +            error = ENOMEM;
+> >>> +        } else if (scsi_sense_matches(r, SENSE_CODE(INVALID_FIELD))) {
+> >>> +            error = EINVAL;
+> >>> +        } else if (scsi_sense_matches(r, SENSE_CODE(SPACE_ALLOC_FAILED))) {
+> >>> +            error = ENOSPC;
+> >>> +        } else {
+> >>> +            error = EIO;
+> >>
+> >> Nice touch :) and in fact the ENOSPC case is needed for correctness.
+> >>
+> > 
+> > Offline you mentioned iscsi_translate_sense(). Makes sense to unify both. We can
+> > create a util/scsi.c to move it there.
+> > 
+> > About the error/non-error condition, is it enough to add a check "status ==
+> > CHECK_CONDITION"?
+> 
+> No, CHECK_CONDITION is for almost every error.
+> 
+> Of those in iscsi_translate_sense:
+> 
+> - DATA_PROTECTION should be an error
+> 
+> - COMMAND_ABORTED should be passed down
+> 
+> - of the various ILLEGAL_REQUEST cases, only ENOMEDIUM and ENOACCES
+> should stop.  LBA out of range should never happen (see
+> scsi_disk_dma_command).
+> 
+> - NOT_READY should also look at asc/ascq individually, like
+> ILLEGAL_REQUEST, see below
 
---aM3YZ0Iwxop3KEKx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+And the same to DATA PROTECT.
 
-On Fri, Aug 18, 2017 at 03:39:20PM +1000, Alexey Kardashevskiy wrote:
-> ==94451== -------------------- 4 of 10 --------------------
-> ==94451== max-live:    314,649,600 in 150 blocks
-> ==94451== tot-alloc:   314,649,600 in 150 blocks (avg size 2097664.00)
-> ==94451== deaths:      none (none of these blocks were freed)
-> ==94451== acc-ratios:  0.00 rd, 0.00 wr  (0 b-read, 0 b-written)
-> ==94451==    at 0x4895600: memalign (in
-> /usr/lib/valgrind/vgpreload_exp-dhat-ppc64le-linux.so)
-> ==94451==    by 0x48957E7: posix_memalign (in
-> /usr/lib/valgrind/vgpreload_exp-dhat-ppc64le-linux.so)
-> ==94451==    by 0xB744AB: qemu_try_memalign (oslib-posix.c:106)
-> ==94451==    by 0xA92053: qemu_try_blockalign (io.c:2493)
-> ==94451==    by 0xA34DDF: qcow2_do_open (qcow2.c:1365)
-> ==94451==    by 0xA35627: qcow2_open (qcow2.c:1526)
-> ==94451==    by 0x9FB94F: bdrv_open_driver (block.c:1109)
-> ==94451==    by 0x9FC413: bdrv_open_common (block.c:1365)
-> ==94451==    by 0x9FF823: bdrv_open_inherit (block.c:2542)
-> ==94451==    by 0x9FFC17: bdrv_open (block.c:2626)
-> ==94451==    by 0xA71027: blk_new_open (block-backend.c:267)
-> ==94451==    by 0x6D3E6B: blockdev_init (blockdev.c:588)
+> 
+> Of those in your list above, these are missing in iscsi_translate_sense:
+> 
+> - SPACE_ALLOC_FAILED (which should stop the VM)
+> 
+> - NOT_READY should also look at asc/ascq individually, like
+> ILLEGAL_REQUEST.  NO_MEDIUM is returning -EBUSY instead of -ENOMEDIUM.
+> 
+> Among other sense keys, MEDIUM_ERROR and HARDWARE_ERROR probably should
+> stop the VM.
 
-This allocation is unnecessary.  Most qcow2 files are not encrypted so
-s->cluster_data does not need to be allocated upfront.
+Thanks, I'll work on a new version.
 
-I'll send a patch.
-
-Stefan
-
---aM3YZ0Iwxop3KEKx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJZluk9AAoJEJykq7OBq3PIa1IH/3phP/qGW4n5XoU0m/MwVWyk
-qZK3huJD7OMMxG6mePecjC78ropQClseWcBoXTWCFu0GDMYAEZkTr9tQnjtlGXiJ
-AA2VyioATqGby6DYX9mGIrVsXfo8dNg5EQAvhBqbk7ynTJ+osxr4kzBxiMq2e4nI
-en5JodM6X+zXs46a3/P55bXgTnSIEgumJEPj0nGeAcui4eTkhqjdeSnmz1rjTHi8
-OPl3R7KkqYuhy0oFZ1jQC3oUJUlM7oYXoN03+mAuqA4HW5I+MHqUorjkCiNyotr3
-QU01NUX4kvY9zosoxPXr+FfSEWtpmRZYjh5MGCupHicGdUzRTdTug1d46jR9nV4=
-=j2Xk
------END PGP SIGNATURE-----
-
---aM3YZ0Iwxop3KEKx--
+Fam
