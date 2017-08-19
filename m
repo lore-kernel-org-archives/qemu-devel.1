@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1diy44-0006ba-Ks
-	for qemu-devel@nongnu.org; Sat, 19 Aug 2017 03:21:05 -0400
+	(envelope-from <thuth@redhat.com>) id 1diyJr-0002bS-FC
+	for qemu-devel@nongnu.org; Sat, 19 Aug 2017 03:37:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1diy3z-0000jy-Vg
-	for qemu-devel@nongnu.org; Sat, 19 Aug 2017 03:21:00 -0400
-Date: Fri, 18 Aug 2017 22:18:50 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170818121850.GC3658@umbus.fritz.box>
-References: <cover.1502643878.git.balaton@eik.bme.hu>
-	<0362ffdbfb08b46edef0e2180387078299a9b721.1502643878.git.balaton@eik.bme.hu>
-	<20170818015321.GN5509@umbus.fritz.box>
-	<194c2b39-e36a-24ea-1ba4-527593b7226f@free.fr>
+	(envelope-from <thuth@redhat.com>) id 1diyJn-0005lr-65
+	for qemu-devel@nongnu.org; Sat, 19 Aug 2017 03:37:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59416)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1diyJm-0005j5-QZ
+	for qemu-devel@nongnu.org; Sat, 19 Aug 2017 03:37:15 -0400
+References: <20170818222313.13391-1-eblake@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <2e4024b0-ec9d-151a-28b0-01c50471570b@redhat.com>
+Date: Sat, 19 Aug 2017 09:37:06 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="xesSdrSSBC0PokLI"
-Content-Disposition: inline
-In-Reply-To: <194c2b39-e36a-24ea-1ba4-527593b7226f@free.fr>
-Subject: Re: [Qemu-devel] [RFC PATCH 09/12] ppc440: Add emulation of
- plb-pcix controller found in some 440 SoCs
+In-Reply-To: <20170818222313.13391-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] osdep.h: Prohibit disabling assert()
+ in supported builds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Fran=E7ois?= Revol <revol@free.fr>
-Cc: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com, f4bug@amsat.org
 
+On 19.08.2017 00:23, Eric Blake wrote:
+> We already have several files that knowingly require assert()
+> to work.  While we do NOT want to encourage the use of
+> 'assert(side-effects)' (that is a bad practice that prevents
+> copy-and-paste of code to other projects that CAN disable
+> assertions; plus it costs unnecessary reviewer mental cycles
+> to remember our project policy on crippling asserts), we DO
+> want to send a message that anyone that disables assertions
+> has to tweak code in order to compile, making it obvious that
+> we are not going to support their efforts.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+> 
+> First mentioned as an idea here:
+> http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg06084.html
+> but I'm titling this RFC as I'm not 100% convinced we want to make
+> it a project-wide, rather than a per-file decision.
 
---xesSdrSSBC0PokLI
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I think we should make this project-wide. Otherwise we will have the
+discussion again and again whether it is ok to compile with NDEBUG or not.
 
-On Fri, Aug 18, 2017 at 01:07:28PM +0200, Fran=E7ois Revol wrote:
-> Hi,
->=20
-> Le 18/08/2017 =E0 03:53, David Gibson a =E9crit :
-> > On Sun, Aug 13, 2017 at 07:04:38PM +0200, BALATON Zoltan wrote:
-> >=20
-> > You know I'm going to say it, right: needs a commit message.
-> >=20
-> > What's a "plb-pcix", and what's an example of a 440 SoCs which has it.
->=20
-> IIRC that's the PCI(express) controller, which is not memory-mapped but
-> inside the DCR address space, so accessed from the PLB.
->=20
-> See:
->=20
-> http://www.embeddeddeveloper.com/assets/processors/amcc/datasheets/PP460E=
-X_DS2063.pdf
->=20
-> page 9, 13.
-
-Sure, I can guess that.  But my point is that this is the sort of
-information (including the link) that ought to be in the commit
-message.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---xesSdrSSBC0PokLI
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmW2ycACgkQbDjKyiDZ
-s5JD3BAApmj/yakalPHbJxC5JNtLbk2UmkUjrjcnCW9fxpHbhCvMwyjVzi34C088
-jYwCVqcPgd9woPKdfXGTLFvgqEJ6YhGEtI7pJNQYMIQ+hjE80FkqhXWch/u4FvCF
-GbsGJ4ZQdeqCH/xLGHJPp/xGqBnrncFkBr8XDI7dFW60dhcLIKY4CGLwW5rSO4EK
-li0iWhylS2estoTlPxlj8EsTwyS0VptqA5hS7U9V0tTjpSmjRhP+k2mRI+fakhvd
-BTwgpgEQlk4jypBw1Kp7qxYh6sQMFN1R9l30UrFLOQDXUW2+6o2eOaUlr84ksmfb
-zLWIDn1nrYoWccIWkpC7KLrfK9LaA5i4EUFfClOsNzLB2CqUyn5UXwhMpwTP0JgF
-1Y2ue+sCs20srEkT2N191L8e5b+CmrIXmIJUMnKX25fiLRi1asYlj530Jf2gV5pW
-EeBVcs0qDhGC5cqH8np/I7sB6MMspagOxzYwa4n4McXruQIfvecTScAL6NgYdvwl
-6v0FhPIetDbUS1kVaaDaBFd5PjTspWlmrXtQ/ALmcoCjsdCEUM1vux7FF3ktvmgT
-vW5ALKsDaKQq1FrNYe3N+GOzmxGFzu9vMJwrnsZkPKVeEAard/RkE07U1wbBOFdA
-+zp5dQNA0UAU9IuYdXj2nUOzq6Xbh+YtOLQaFcvGAsrEMHl02qU=
-=CYJK
------END PGP SIGNATURE-----
-
---xesSdrSSBC0PokLI--
+Reviewed-by: Thomas Huth <thuth@redhat.com>
