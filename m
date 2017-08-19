@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1djBUD-0000DX-BH
-	for qemu-devel@nongnu.org; Sat, 19 Aug 2017 17:40:54 -0400
+	(envelope-from <no-reply@patchew.org>) id 1djBqi-0002HY-UY
+	for qemu-devel@nongnu.org; Sat, 19 Aug 2017 18:04:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1djBUA-0007Ds-9t
-	for qemu-devel@nongnu.org; Sat, 19 Aug 2017 17:40:53 -0400
-Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:36258)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1djBUA-00076Q-4S
-	for qemu-devel@nongnu.org; Sat, 19 Aug 2017 17:40:50 -0400
-Received: by mail-pf0-x22f.google.com with SMTP id c28so14681365pfe.3
-	for <qemu-devel@nongnu.org>; Sat, 19 Aug 2017 14:40:48 -0700 (PDT)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Sat, 19 Aug 2017 16:40:37 -0500
-Message-Id: <1503178840-21512-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 0/3] ipmi: Fix some minor issues
+	(envelope-from <no-reply@patchew.org>) id 1djBqf-0004Pc-Oa
+	for qemu-devel@nongnu.org; Sat, 19 Aug 2017 18:04:08 -0400
+Resent-Message-Id: <E1djBqf-0004Pc-Oa@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21325)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1djBqf-0004O1-Gu
+	for qemu-devel@nongnu.org; Sat, 19 Aug 2017 18:04:05 -0400
+Message-ID: <150318021851.27.11627919606401027894@205a2245145f>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <1503178840-21512-1-git-send-email-minyard@acm.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 19 Aug 2017 15:03:39 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/3] ipmi: Fix some minor issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,10 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+To: minyard@acm.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, clg@kaod.org, david@gibson.dropbear.id.au
 
-I ran into these testing some stuff in the IPMI driver.  Nothing big,
-but they need to be fixed.
-
--corey
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MDMxNzg4NDAtMjE1MTItMS1naXQtc2VuZC1lbWFpbC1taW55YXJkQGFjbS5v
+cmcKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzNdIGlwbWk6IEZpeCBzb21lIG1pbm9y
+IGlzc3VlcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNl
+Cm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAK
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZl
+cnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBB
+VENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYg
+ISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
+bWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAg
+IG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpV
+cGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVk
+IHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKM2QzNjgxNmUzZCBpcG1pOiBBZGQgdGhlIHBsYXRmb3Jt
+IGV2ZW50IG1lc3NhZ2UgY29tbWFuZApmMzVmMDE5NzIxIGlwbWk6IERvbid0IHNldCB0aGUgdGlt
+ZXN0YW1wIG9uIGFkZCBldmVudHMgdGhhdCBkb24ndCBoYXZlIGl0CjFlNmMzZDViNTQgaXBtaTog
+Rml4IFNFTCBnZXQvc2V0IHRpbWUgY29tbWFuZHMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
+aW5nIFBBVENIIDEvMzogaXBtaTogRml4IFNFTCBnZXQvc2V0IHRpbWUgY29tbWFuZHMuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMi8zOiBpcG1pOiBEb24ndCBzZXQgdGhlIHRpbWVzdGFtcCBvbiBhZGQgZXZl
+bnRzIHRoYXQgZG9uJ3QgaGF2ZSBpdC4uLgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3Nhcnkg
+Zm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMyOTogRklMRTogaHcvaXBtaS9pcG1pX2Jt
+Y19zaW0uYzo0NTE6CisgICAgaWYgKGV2ZW50WzJdIDwgMHhlMCkgLyogRG9uJ3Qgc2V0IHRpbWVz
+dGFtcHMgZm9yIHRoZXNlLCBwZXIgdGhlIHNwZWMuICovClsuLi5dCgp0b3RhbDogMSBlcnJvcnMs
+IDAgd2FybmluZ3MsIDIyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMvMzogaXBtaTogQWRkIHRoZSBwbGF0Zm9ybSBl
+dmVudCBtZXNzYWdlIGNvbW1hbmQuLi4KRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZv
+ciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNDU6IEZJTEU6IGh3L2lwbWkvaXBtaV9ibWNf
+c2ltLmM6MTYwMToKKyAgICBpZiAoc2VsX2FkZF9ldmVudChpYnMsIGV2ZW50KSkKWy4uLl0KCnRv
+dGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNDEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
+bmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
+eSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
+YmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
