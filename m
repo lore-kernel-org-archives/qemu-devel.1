@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1djY3e-0007Fb-8L
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 17:46:59 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1djYFN-0006Sm-CJ
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 17:59:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1djY3a-0003q7-CE
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 17:46:58 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:33783)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1djY3a-0003pT-58
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 17:46:54 -0400
-Received: by mail-pg0-x244.google.com with SMTP id n4so5970012pgn.0
-	for <qemu-devel@nongnu.org>; Sun, 20 Aug 2017 14:46:52 -0700 (PDT)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Sun, 20 Aug 2017 16:46:42 -0500
-Message-Id: <1503265602-9349-4-git-send-email-minyard@acm.org>
-In-Reply-To: <1503265602-9349-1-git-send-email-minyard@acm.org>
-References: <1503265602-9349-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH v2 3/3] ipmi: Add the platform event message
- command
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1djYFM-0001iD-Jc
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 17:59:05 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1503249785.git.balaton@eik.bme.hu>
+	<ac6a19d43a6d36ae6f7cab99a1ac25d2515339ad.1503249785.git.balaton@eik.bme.hu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1f2ce36c-928b-0631-fdb0-0f413a7a5cb5@amsat.org>
+Date: Sun, 20 Aug 2017 18:58:52 -0300
+MIME-Version: 1.0
+In-Reply-To: <ac6a19d43a6d36ae6f7cab99a1ac25d2515339ad.1503249785.git.balaton@eik.bme.hu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 13/15] ppc4xx: Add more PLB registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>, Corey Minyard <cminyard@mvista.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: Francois Revol <revol@free.fr>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Corey Minyard <cminyard@mvista.com>
+Hi Zoltan,
 
-This lets an event be added to the SEL as if a sensor had generated
-it.  The OpenIPMI driver uses it for storing panic event information.
+On 08/20/2017 02:23 PM, BALATON Zoltan wrote:
+> These registers are present in 440 SoCs (and maybe in others too) and
+> U-Boot accesses them when printing register info. We don't emulate
+> these but add them to avoid crashing when they are read or written.
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
----
- hw/ipmi/ipmi_bmc_sim.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+Your code isn't incorrect but it doesn't sound the right way to fix your 
+problem. Your firmware shouldn't *crash* on unimplemented dcr.
 
-diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
-index a0bbfd5..e84d710 100644
---- a/hw/ipmi/ipmi_bmc_sim.c
-+++ b/hw/ipmi/ipmi_bmc_sim.c
-@@ -38,6 +38,7 @@
- 
- #define IPMI_NETFN_SENSOR_EVENT       0x04
- 
-+#define IPMI_CMD_PLATFORM_EVENT_MSG       0x02
- #define IPMI_CMD_SET_SENSOR_EVT_ENABLE    0x28
- #define IPMI_CMD_GET_SENSOR_EVT_ENABLE    0x29
- #define IPMI_CMD_REARM_SENSOR_EVTS        0x2a
-@@ -1581,6 +1582,28 @@ static void set_sel_time(IPMIBmcSim *ibs,
-     ibs->sel.time_offset = now.tv_sec - ((long) val);
- }
- 
-+static void platform_event_msg(IPMIBmcSim *ibs,
-+                               uint8_t *cmd, unsigned int cmd_len,
-+                               RspBuffer *rsp)
-+{
-+    uint8_t event[16];
-+
-+    event[2] = 2; /* System event record */
-+    event[7] = cmd[2]; /* Generator ID */
-+    event[8] = 0;
-+    event[9] = cmd[3]; /* EvMRev */
-+    event[10] = cmd[4]; /* Sensor type */
-+    event[11] = cmd[5]; /* Sensor number */
-+    event[12] = cmd[6]; /* Event dir / Event type */
-+    event[13] = cmd[7]; /* Event data 1 */
-+    event[14] = cmd[8]; /* Event data 2 */
-+    event[15] = cmd[9]; /* Event data 3 */
-+
-+    if (sel_add_event(ibs, event)) {
-+        rsp_buffer_set_error(rsp, IPMI_CC_OUT_OF_SPACE);
-+    }
-+}
-+
- static void set_sensor_evt_enable(IPMIBmcSim *ibs,
-                                   uint8_t *cmd, unsigned int cmd_len,
-                                   RspBuffer *rsp)
-@@ -1757,6 +1780,7 @@ static const IPMINetfn chassis_netfn = {
- };
- 
- static const IPMICmdHandler sensor_event_cmds[] = {
-+    [IPMI_CMD_PLATFORM_EVENT_MSG] = { platform_event_msg, 10 },
-     [IPMI_CMD_SET_SENSOR_EVT_ENABLE] = { set_sensor_evt_enable, 4 },
-     [IPMI_CMD_GET_SENSOR_EVT_ENABLE] = { get_sensor_evt_enable, 3 },
-     [IPMI_CMD_REARM_SENSOR_EVTS] = { rearm_sensor_evts, 4 },
--- 
-2.7.4
+Looking at ppc_dcr_read() I see that *valp isn't updated on unimp dcrn, 
+while the dcr_read_plb() callback you are using return 0 on unimp (with 
+an "avoid gcc warning" misleading comment).
+
+What is the hardware behavior on implemented dcr? return 0? In that case 
+this should be used in ppc_dcr_read(), also adding some 
+qemu_log_mask(LOG_UNIMP,...) log entry there.
+
+Regards,
+
+Phil.
+
+> 
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> ---
+>   hw/ppc/ppc405_uc.c | 12 +++++++++---
+>   1 file changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
+> index e621d0a..8e58065 100644
+> --- a/hw/ppc/ppc405_uc.c
+> +++ b/hw/ppc/ppc405_uc.c
+> @@ -105,9 +105,12 @@ ram_addr_t ppc405_set_bootinfo (CPUPPCState *env, ppc4xx_bd_info_t *bd,
+>   /*****************************************************************************/
+>   /* Peripheral local bus arbitrer */
+>   enum {
+> -    PLB0_BESR = 0x084,
+> -    PLB0_BEAR = 0x086,
+> -    PLB0_ACR  = 0x087,
+> +    PLB3A0_ACR = 0x077,
+> +    PLB4A0_ACR = 0x081,
+> +    PLB0_BESR  = 0x084,
+> +    PLB0_BEAR  = 0x086,
+> +    PLB0_ACR   = 0x087,
+> +    PLB4A1_ACR = 0x089,
+>   };
+>   
+>   typedef struct ppc4xx_plb_t ppc4xx_plb_t;
+> @@ -179,9 +182,12 @@ void ppc4xx_plb_init(CPUPPCState *env)
+>       ppc4xx_plb_t *plb;
+>   
+>       plb = g_malloc0(sizeof(ppc4xx_plb_t));
+> +    ppc_dcr_register(env, PLB3A0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
+> +    ppc_dcr_register(env, PLB4A0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
+>       ppc_dcr_register(env, PLB0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
+>       ppc_dcr_register(env, PLB0_BEAR, plb, &dcr_read_plb, &dcr_write_plb);
+>       ppc_dcr_register(env, PLB0_BESR, plb, &dcr_read_plb, &dcr_write_plb);
+> +    ppc_dcr_register(env, PLB4A1_ACR, plb, &dcr_read_plb, &dcr_write_plb);
+>       qemu_register_reset(ppc4xx_plb_reset, plb);
+>   }
+>   
+> 
