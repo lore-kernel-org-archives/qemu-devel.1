@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1djUKy-00045B-Nl
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 13:48:40 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1djUL0-00046j-DO
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 13:48:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1djUKv-00053r-J1
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 13:48:36 -0400
-Message-Id: <6f3ed438554182ece631f4bdcf43134aa95315f1.1503249785.git.balaton@eik.bme.hu>
+	(envelope-from <balaton@eik.bme.hu>) id 1djUKw-00055M-Sk
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 13:48:38 -0400
+Message-Id: <962e7e3b1355309c75f27bd6abdd64155743ad48.1503249785.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1503249785.git.balaton@eik.bme.hu>
 References: <cover.1503249785.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Sun, 20 Aug 2017 19:23:05 +0200
-Subject: [Qemu-devel] [PATCH 05/15] ppc4xx: Split off 4xx I2C emulation from
- ppc405_uc to its own file
+Subject: [Qemu-devel] [PATCH 01/15] ppc4xx: Move MAL from ppc405_uc to
+ ppc4xx_devs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,581 +23,581 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Francois Revol <revol@free.fr>
 
-This device appears in other SoCs as well not just in 405 ones and
-subsequent patches will modify it, so move it out of ppc405_uc.c in
-preparation
+This device appears in other SoCs as well not just in 405 ones
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/Makefile.objs |   2 +-
- hw/ppc/ppc405.h      |   2 +
- hw/ppc/ppc405_uc.c   | 241 ---------------------------------------------
- hw/ppc/ppc4xx_i2c.c  | 272 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 275 insertions(+), 242 deletions(-)
- create mode 100644 hw/ppc/ppc4xx_i2c.c
+ hw/ppc/ppc405_uc.c      | 263 -----------------------------------------------
+ hw/ppc/ppc4xx_devs.c    | 264 ++++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/ppc/ppc4xx.h |   2 +
+ 3 files changed, 266 insertions(+), 263 deletions(-)
 
-diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-index 7efc686..2077216 100644
---- a/hw/ppc/Makefile.objs
-+++ b/hw/ppc/Makefile.objs
-@@ -13,7 +13,7 @@ endif
- obj-$(CONFIG_PSERIES) += spapr_rtas_ddw.o
- # PowerPC 4xx boards
- obj-y += ppc405_boards.o ppc4xx_devs.o ppc405_uc.o ppc440_bamboo.o
--obj-y += ppc4xx_pci.o
-+obj-y += ppc4xx_pci.o ppc4xx_i2c.o
- # PReP
- obj-$(CONFIG_PREP) += prep.o
- obj-$(CONFIG_PREP) += prep_systemio.o
-diff --git a/hw/ppc/ppc405.h b/hw/ppc/ppc405.h
-index a9ffc87..61ec739 100644
---- a/hw/ppc/ppc405.h
-+++ b/hw/ppc/ppc405.h
-@@ -59,6 +59,8 @@ struct ppc4xx_bd_info_t {
- ram_addr_t ppc405_set_bootinfo (CPUPPCState *env, ppc4xx_bd_info_t *bd,
-                                 uint32_t flags);
- 
-+void ppc405_i2c_init(hwaddr base, qemu_irq irq);
-+
- CPUPPCState *ppc405cr_init(MemoryRegion *address_space_mem,
-                         MemoryRegion ram_memories[4],
-                         hwaddr ram_bases[4],
 diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
-index 03856d5..3925e4c 100644
+index f6fe3e6..3c74402 100644
 --- a/hw/ppc/ppc405_uc.c
 +++ b/hw/ppc/ppc405_uc.c
-@@ -40,7 +40,6 @@
- //#define DEBUG_GPIO
- //#define DEBUG_SERIAL
+@@ -42,7 +42,6 @@
  //#define DEBUG_OCM
--//#define DEBUG_I2C
+ //#define DEBUG_I2C
  //#define DEBUG_GPT
+-//#define DEBUG_MAL
  //#define DEBUG_CLOCKS
  //#define DEBUG_CLOCKS_LL
-@@ -993,246 +992,6 @@ static void ppc405_ocm_init(CPUPPCState *env)
+ 
+@@ -1513,268 +1512,6 @@ static void ppc4xx_gpt_init(hwaddr base, qemu_irq irqs[5])
  }
  
  /*****************************************************************************/
--/* I2C controller */
--typedef struct ppc4xx_i2c_t ppc4xx_i2c_t;
--struct ppc4xx_i2c_t {
--    qemu_irq irq;
--    MemoryRegion iomem;
--    uint8_t mdata;
--    uint8_t lmadr;
--    uint8_t hmadr;
--    uint8_t cntl;
--    uint8_t mdcntl;
--    uint8_t sts;
--    uint8_t extsts;
--    uint8_t sdata;
--    uint8_t lsadr;
--    uint8_t hsadr;
--    uint8_t clkdiv;
--    uint8_t intrmsk;
--    uint8_t xfrcnt;
--    uint8_t xtcntlss;
--    uint8_t directcntl;
+-/* MAL */
+-enum {
+-    MAL0_CFG      = 0x180,
+-    MAL0_ESR      = 0x181,
+-    MAL0_IER      = 0x182,
+-    MAL0_TXCASR   = 0x184,
+-    MAL0_TXCARR   = 0x185,
+-    MAL0_TXEOBISR = 0x186,
+-    MAL0_TXDEIR   = 0x187,
+-    MAL0_RXCASR   = 0x190,
+-    MAL0_RXCARR   = 0x191,
+-    MAL0_RXEOBISR = 0x192,
+-    MAL0_RXDEIR   = 0x193,
+-    MAL0_TXCTP0R  = 0x1A0,
+-    MAL0_TXCTP1R  = 0x1A1,
+-    MAL0_TXCTP2R  = 0x1A2,
+-    MAL0_TXCTP3R  = 0x1A3,
+-    MAL0_RXCTP0R  = 0x1C0,
+-    MAL0_RXCTP1R  = 0x1C1,
+-    MAL0_RCBS0    = 0x1E0,
+-    MAL0_RCBS1    = 0x1E1,
 -};
 -
--static uint32_t ppc4xx_i2c_readb (void *opaque, hwaddr addr)
+-typedef struct ppc40x_mal_t ppc40x_mal_t;
+-struct ppc40x_mal_t {
+-    qemu_irq irqs[4];
+-    uint32_t cfg;
+-    uint32_t esr;
+-    uint32_t ier;
+-    uint32_t txcasr;
+-    uint32_t txcarr;
+-    uint32_t txeobisr;
+-    uint32_t txdeir;
+-    uint32_t rxcasr;
+-    uint32_t rxcarr;
+-    uint32_t rxeobisr;
+-    uint32_t rxdeir;
+-    uint32_t txctpr[4];
+-    uint32_t rxctpr[2];
+-    uint32_t rcbs[2];
+-};
+-
+-static void ppc40x_mal_reset (void *opaque);
+-
+-static uint32_t dcr_read_mal (void *opaque, int dcrn)
 -{
--    ppc4xx_i2c_t *i2c;
+-    ppc40x_mal_t *mal;
 -    uint32_t ret;
 -
--#ifdef DEBUG_I2C
--    printf("%s: addr " TARGET_FMT_plx "\n", __func__, addr);
--#endif
--    i2c = opaque;
--    switch (addr) {
--    case 0x00:
--        //        i2c_readbyte(&i2c->mdata);
--        ret = i2c->mdata;
+-    mal = opaque;
+-    switch (dcrn) {
+-    case MAL0_CFG:
+-        ret = mal->cfg;
 -        break;
--    case 0x02:
--        ret = i2c->sdata;
+-    case MAL0_ESR:
+-        ret = mal->esr;
 -        break;
--    case 0x04:
--        ret = i2c->lmadr;
+-    case MAL0_IER:
+-        ret = mal->ier;
 -        break;
--    case 0x05:
--        ret = i2c->hmadr;
+-    case MAL0_TXCASR:
+-        ret = mal->txcasr;
 -        break;
--    case 0x06:
--        ret = i2c->cntl;
+-    case MAL0_TXCARR:
+-        ret = mal->txcarr;
 -        break;
--    case 0x07:
--        ret = i2c->mdcntl;
+-    case MAL0_TXEOBISR:
+-        ret = mal->txeobisr;
 -        break;
--    case 0x08:
--        ret = i2c->sts;
+-    case MAL0_TXDEIR:
+-        ret = mal->txdeir;
 -        break;
--    case 0x09:
--        ret = i2c->extsts;
+-    case MAL0_RXCASR:
+-        ret = mal->rxcasr;
 -        break;
--    case 0x0A:
--        ret = i2c->lsadr;
+-    case MAL0_RXCARR:
+-        ret = mal->rxcarr;
 -        break;
--    case 0x0B:
--        ret = i2c->hsadr;
+-    case MAL0_RXEOBISR:
+-        ret = mal->rxeobisr;
 -        break;
--    case 0x0C:
--        ret = i2c->clkdiv;
+-    case MAL0_RXDEIR:
+-        ret = mal->rxdeir;
 -        break;
--    case 0x0D:
--        ret = i2c->intrmsk;
+-    case MAL0_TXCTP0R:
+-        ret = mal->txctpr[0];
 -        break;
--    case 0x0E:
--        ret = i2c->xfrcnt;
+-    case MAL0_TXCTP1R:
+-        ret = mal->txctpr[1];
 -        break;
--    case 0x0F:
--        ret = i2c->xtcntlss;
+-    case MAL0_TXCTP2R:
+-        ret = mal->txctpr[2];
 -        break;
--    case 0x10:
--        ret = i2c->directcntl;
+-    case MAL0_TXCTP3R:
+-        ret = mal->txctpr[3];
+-        break;
+-    case MAL0_RXCTP0R:
+-        ret = mal->rxctpr[0];
+-        break;
+-    case MAL0_RXCTP1R:
+-        ret = mal->rxctpr[1];
+-        break;
+-    case MAL0_RCBS0:
+-        ret = mal->rcbs[0];
+-        break;
+-    case MAL0_RCBS1:
+-        ret = mal->rcbs[1];
 -        break;
 -    default:
--        ret = 0x00;
+-        ret = 0;
 -        break;
 -    }
--#ifdef DEBUG_I2C
--    printf("%s: addr " TARGET_FMT_plx " %02" PRIx32 "\n", __func__, addr, ret);
--#endif
 -
 -    return ret;
 -}
 -
--static void ppc4xx_i2c_writeb (void *opaque,
--                               hwaddr addr, uint32_t value)
+-static void dcr_write_mal (void *opaque, int dcrn, uint32_t val)
 -{
--    ppc4xx_i2c_t *i2c;
+-    ppc40x_mal_t *mal;
+-    int idx;
 -
--#ifdef DEBUG_I2C
--    printf("%s: addr " TARGET_FMT_plx " val %08" PRIx32 "\n", __func__, addr,
--           value);
--#endif
--    i2c = opaque;
--    switch (addr) {
--    case 0x00:
--        i2c->mdata = value;
--        //        i2c_sendbyte(&i2c->mdata);
+-    mal = opaque;
+-    switch (dcrn) {
+-    case MAL0_CFG:
+-        if (val & 0x80000000)
+-            ppc40x_mal_reset(mal);
+-        mal->cfg = val & 0x00FFC087;
 -        break;
--    case 0x02:
--        i2c->sdata = value;
+-    case MAL0_ESR:
+-        /* Read/clear */
+-        mal->esr &= ~val;
 -        break;
--    case 0x04:
--        i2c->lmadr = value;
+-    case MAL0_IER:
+-        mal->ier = val & 0x0000001F;
 -        break;
--    case 0x05:
--        i2c->hmadr = value;
+-    case MAL0_TXCASR:
+-        mal->txcasr = val & 0xF0000000;
 -        break;
--    case 0x06:
--        i2c->cntl = value;
+-    case MAL0_TXCARR:
+-        mal->txcarr = val & 0xF0000000;
 -        break;
--    case 0x07:
--        i2c->mdcntl = value & 0xDF;
+-    case MAL0_TXEOBISR:
+-        /* Read/clear */
+-        mal->txeobisr &= ~val;
 -        break;
--    case 0x08:
--        i2c->sts &= ~(value & 0x0A);
+-    case MAL0_TXDEIR:
+-        /* Read/clear */
+-        mal->txdeir &= ~val;
 -        break;
--    case 0x09:
--        i2c->extsts &= ~(value & 0x8F);
+-    case MAL0_RXCASR:
+-        mal->rxcasr = val & 0xC0000000;
 -        break;
--    case 0x0A:
--        i2c->lsadr = value;
+-    case MAL0_RXCARR:
+-        mal->rxcarr = val & 0xC0000000;
 -        break;
--    case 0x0B:
--        i2c->hsadr = value;
+-    case MAL0_RXEOBISR:
+-        /* Read/clear */
+-        mal->rxeobisr &= ~val;
 -        break;
--    case 0x0C:
--        i2c->clkdiv = value;
+-    case MAL0_RXDEIR:
+-        /* Read/clear */
+-        mal->rxdeir &= ~val;
 -        break;
--    case 0x0D:
--        i2c->intrmsk = value;
+-    case MAL0_TXCTP0R:
+-        idx = 0;
+-        goto update_tx_ptr;
+-    case MAL0_TXCTP1R:
+-        idx = 1;
+-        goto update_tx_ptr;
+-    case MAL0_TXCTP2R:
+-        idx = 2;
+-        goto update_tx_ptr;
+-    case MAL0_TXCTP3R:
+-        idx = 3;
+-    update_tx_ptr:
+-        mal->txctpr[idx] = val;
 -        break;
--    case 0x0E:
--        i2c->xfrcnt = value & 0x77;
+-    case MAL0_RXCTP0R:
+-        idx = 0;
+-        goto update_rx_ptr;
+-    case MAL0_RXCTP1R:
+-        idx = 1;
+-    update_rx_ptr:
+-        mal->rxctpr[idx] = val;
 -        break;
--    case 0x0F:
--        i2c->xtcntlss = value;
--        break;
--    case 0x10:
--        i2c->directcntl = value & 0x7;
+-    case MAL0_RCBS0:
+-        idx = 0;
+-        goto update_rx_size;
+-    case MAL0_RCBS1:
+-        idx = 1;
+-    update_rx_size:
+-        mal->rcbs[idx] = val & 0x000000FF;
 -        break;
 -    }
 -}
 -
--static uint32_t ppc4xx_i2c_readw (void *opaque, hwaddr addr)
+-static void ppc40x_mal_reset (void *opaque)
 -{
--    uint32_t ret;
+-    ppc40x_mal_t *mal;
 -
--#ifdef DEBUG_I2C
--    printf("%s: addr " TARGET_FMT_plx "\n", __func__, addr);
--#endif
--    ret = ppc4xx_i2c_readb(opaque, addr) << 8;
--    ret |= ppc4xx_i2c_readb(opaque, addr + 1);
--
--    return ret;
+-    mal = opaque;
+-    mal->cfg = 0x0007C000;
+-    mal->esr = 0x00000000;
+-    mal->ier = 0x00000000;
+-    mal->rxcasr = 0x00000000;
+-    mal->rxdeir = 0x00000000;
+-    mal->rxeobisr = 0x00000000;
+-    mal->txcasr = 0x00000000;
+-    mal->txdeir = 0x00000000;
+-    mal->txeobisr = 0x00000000;
 -}
 -
--static void ppc4xx_i2c_writew (void *opaque,
--                               hwaddr addr, uint32_t value)
+-static void ppc405_mal_init(CPUPPCState *env, qemu_irq irqs[4])
 -{
--#ifdef DEBUG_I2C
--    printf("%s: addr " TARGET_FMT_plx " val %08" PRIx32 "\n", __func__, addr,
--           value);
--#endif
--    ppc4xx_i2c_writeb(opaque, addr, value >> 8);
--    ppc4xx_i2c_writeb(opaque, addr + 1, value);
--}
+-    ppc40x_mal_t *mal;
+-    int i;
 -
--static uint32_t ppc4xx_i2c_readl (void *opaque, hwaddr addr)
--{
--    uint32_t ret;
--
--#ifdef DEBUG_I2C
--    printf("%s: addr " TARGET_FMT_plx "\n", __func__, addr);
--#endif
--    ret = ppc4xx_i2c_readb(opaque, addr) << 24;
--    ret |= ppc4xx_i2c_readb(opaque, addr + 1) << 16;
--    ret |= ppc4xx_i2c_readb(opaque, addr + 2) << 8;
--    ret |= ppc4xx_i2c_readb(opaque, addr + 3);
--
--    return ret;
--}
--
--static void ppc4xx_i2c_writel (void *opaque,
--                               hwaddr addr, uint32_t value)
--{
--#ifdef DEBUG_I2C
--    printf("%s: addr " TARGET_FMT_plx " val %08" PRIx32 "\n", __func__, addr,
--           value);
--#endif
--    ppc4xx_i2c_writeb(opaque, addr, value >> 24);
--    ppc4xx_i2c_writeb(opaque, addr + 1, value >> 16);
--    ppc4xx_i2c_writeb(opaque, addr + 2, value >> 8);
--    ppc4xx_i2c_writeb(opaque, addr + 3, value);
--}
--
--static const MemoryRegionOps i2c_ops = {
--    .old_mmio = {
--        .read = { ppc4xx_i2c_readb, ppc4xx_i2c_readw, ppc4xx_i2c_readl, },
--        .write = { ppc4xx_i2c_writeb, ppc4xx_i2c_writew, ppc4xx_i2c_writel, },
--    },
--    .endianness = DEVICE_NATIVE_ENDIAN,
--};
--
--static void ppc4xx_i2c_reset (void *opaque)
--{
--    ppc4xx_i2c_t *i2c;
--
--    i2c = opaque;
--    i2c->mdata = 0x00;
--    i2c->sdata = 0x00;
--    i2c->cntl = 0x00;
--    i2c->mdcntl = 0x00;
--    i2c->sts = 0x00;
--    i2c->extsts = 0x00;
--    i2c->clkdiv = 0x00;
--    i2c->xfrcnt = 0x00;
--    i2c->directcntl = 0x0F;
--}
--
--static void ppc405_i2c_init(hwaddr base, qemu_irq irq)
--{
--    ppc4xx_i2c_t *i2c;
--
--    i2c = g_malloc0(sizeof(ppc4xx_i2c_t));
--    i2c->irq = irq;
--#ifdef DEBUG_I2C
--    printf("%s: offset " TARGET_FMT_plx "\n", __func__, base);
--#endif
--    memory_region_init_io(&i2c->iomem, NULL, &i2c_ops, i2c, "i2c", 0x011);
--    memory_region_add_subregion(get_system_memory(), base, &i2c->iomem);
--    qemu_register_reset(ppc4xx_i2c_reset, i2c);
+-    mal = g_malloc0(sizeof(ppc40x_mal_t));
+-    for (i = 0; i < 4; i++)
+-        mal->irqs[i] = irqs[i];
+-    qemu_register_reset(&ppc40x_mal_reset, mal);
+-    ppc_dcr_register(env, MAL0_CFG,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_ESR,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_IER,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_TXCASR,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_TXCARR,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_TXEOBISR,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_TXDEIR,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_RXCASR,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_RXCARR,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_RXEOBISR,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_RXDEIR,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_TXCTP0R,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_TXCTP1R,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_TXCTP2R,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_TXCTP3R,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_RXCTP0R,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_RXCTP1R,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_RCBS0,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_RCBS1,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
 -}
 -
 -/*****************************************************************************/
- /* General purpose timers */
- typedef struct ppc4xx_gpt_t ppc4xx_gpt_t;
- struct ppc4xx_gpt_t {
-diff --git a/hw/ppc/ppc4xx_i2c.c b/hw/ppc/ppc4xx_i2c.c
-new file mode 100644
-index 0000000..15f2dea
---- /dev/null
-+++ b/hw/ppc/ppc4xx_i2c.c
-@@ -0,0 +1,272 @@
-+/*
-+ * PPC4xx I2C controller emulation
-+ *
-+ * Copyright (c) 2007 Jocelyn Mayer
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
+ /* SPR */
+ void ppc40x_core_reset(PowerPCCPU *cpu)
+ {
+diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
+index e7f413e..8e4f78e 100644
+--- a/hw/ppc/ppc4xx_devs.c
++++ b/hw/ppc/ppc4xx_devs.c
+@@ -734,3 +734,267 @@ ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
+ 
+     return ram_size;
+ }
 +
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu-common.h"
-+#include "cpu.h"
-+#include "hw/hw.h"
-+#include "exec/address-spaces.h"
-+#include "hw/ppc/ppc.h"
-+#include "ppc405.h"
-+
-+/*#define DEBUG_I2C*/
-+
-+typedef struct ppc4xx_i2c_t ppc4xx_i2c_t;
-+struct ppc4xx_i2c_t {
-+    qemu_irq irq;
-+    MemoryRegion iomem;
-+    uint8_t mdata;
-+    uint8_t lmadr;
-+    uint8_t hmadr;
-+    uint8_t cntl;
-+    uint8_t mdcntl;
-+    uint8_t sts;
-+    uint8_t extsts;
-+    uint8_t sdata;
-+    uint8_t lsadr;
-+    uint8_t hsadr;
-+    uint8_t clkdiv;
-+    uint8_t intrmsk;
-+    uint8_t xfrcnt;
-+    uint8_t xtcntlss;
-+    uint8_t directcntl;
++/*****************************************************************************/
++/* MAL */
++enum {
++    MAL0_CFG      = 0x180,
++    MAL0_ESR      = 0x181,
++    MAL0_IER      = 0x182,
++    MAL0_TXCASR   = 0x184,
++    MAL0_TXCARR   = 0x185,
++    MAL0_TXEOBISR = 0x186,
++    MAL0_TXDEIR   = 0x187,
++    MAL0_RXCASR   = 0x190,
++    MAL0_RXCARR   = 0x191,
++    MAL0_RXEOBISR = 0x192,
++    MAL0_RXDEIR   = 0x193,
++    MAL0_TXCTP0R  = 0x1A0,
++    MAL0_TXCTP1R  = 0x1A1,
++    MAL0_TXCTP2R  = 0x1A2,
++    MAL0_TXCTP3R  = 0x1A3,
++    MAL0_RXCTP0R  = 0x1C0,
++    MAL0_RXCTP1R  = 0x1C1,
++    MAL0_RCBS0    = 0x1E0,
++    MAL0_RCBS1    = 0x1E1,
 +};
 +
-+static uint32_t ppc4xx_i2c_readb(void *opaque, hwaddr addr)
++typedef struct ppc40x_mal_t ppc40x_mal_t;
++struct ppc40x_mal_t {
++    qemu_irq irqs[4];
++    uint32_t cfg;
++    uint32_t esr;
++    uint32_t ier;
++    uint32_t txcasr;
++    uint32_t txcarr;
++    uint32_t txeobisr;
++    uint32_t txdeir;
++    uint32_t rxcasr;
++    uint32_t rxcarr;
++    uint32_t rxeobisr;
++    uint32_t rxdeir;
++    uint32_t txctpr[4];
++    uint32_t rxctpr[2];
++    uint32_t rcbs[2];
++};
++
++static void ppc40x_mal_reset(void *opaque);
++
++static uint32_t dcr_read_mal(void *opaque, int dcrn)
 +{
-+    ppc4xx_i2c_t *i2c;
++    ppc40x_mal_t *mal;
 +    uint32_t ret;
 +
-+#ifdef DEBUG_I2C
-+    printf("%s: addr " TARGET_FMT_plx "\n", __func__, addr);
-+#endif
-+    i2c = opaque;
-+    switch (addr) {
-+    case 0x00:
-+        /*i2c_readbyte(&i2c->mdata);*/
-+        ret = i2c->mdata;
++    mal = opaque;
++    switch (dcrn) {
++    case MAL0_CFG:
++        ret = mal->cfg;
 +        break;
-+    case 0x02:
-+        ret = i2c->sdata;
++    case MAL0_ESR:
++        ret = mal->esr;
 +        break;
-+    case 0x04:
-+        ret = i2c->lmadr;
++    case MAL0_IER:
++        ret = mal->ier;
 +        break;
-+    case 0x05:
-+        ret = i2c->hmadr;
++    case MAL0_TXCASR:
++        ret = mal->txcasr;
 +        break;
-+    case 0x06:
-+        ret = i2c->cntl;
++    case MAL0_TXCARR:
++        ret = mal->txcarr;
 +        break;
-+    case 0x07:
-+        ret = i2c->mdcntl;
++    case MAL0_TXEOBISR:
++        ret = mal->txeobisr;
 +        break;
-+    case 0x08:
-+        ret = i2c->sts;
++    case MAL0_TXDEIR:
++        ret = mal->txdeir;
 +        break;
-+    case 0x09:
-+        ret = i2c->extsts;
++    case MAL0_RXCASR:
++        ret = mal->rxcasr;
 +        break;
-+    case 0x0A:
-+        ret = i2c->lsadr;
++    case MAL0_RXCARR:
++        ret = mal->rxcarr;
 +        break;
-+    case 0x0B:
-+        ret = i2c->hsadr;
++    case MAL0_RXEOBISR:
++        ret = mal->rxeobisr;
 +        break;
-+    case 0x0C:
-+        ret = i2c->clkdiv;
++    case MAL0_RXDEIR:
++        ret = mal->rxdeir;
 +        break;
-+    case 0x0D:
-+        ret = i2c->intrmsk;
++    case MAL0_TXCTP0R:
++        ret = mal->txctpr[0];
 +        break;
-+    case 0x0E:
-+        ret = i2c->xfrcnt;
++    case MAL0_TXCTP1R:
++        ret = mal->txctpr[1];
 +        break;
-+    case 0x0F:
-+        ret = i2c->xtcntlss;
++    case MAL0_TXCTP2R:
++        ret = mal->txctpr[2];
 +        break;
-+    case 0x10:
-+        ret = i2c->directcntl;
++    case MAL0_TXCTP3R:
++        ret = mal->txctpr[3];
++        break;
++    case MAL0_RXCTP0R:
++        ret = mal->rxctpr[0];
++        break;
++    case MAL0_RXCTP1R:
++        ret = mal->rxctpr[1];
++        break;
++    case MAL0_RCBS0:
++        ret = mal->rcbs[0];
++        break;
++    case MAL0_RCBS1:
++        ret = mal->rcbs[1];
 +        break;
 +    default:
-+        ret = 0x00;
++        ret = 0;
 +        break;
 +    }
-+#ifdef DEBUG_I2C
-+    printf("%s: addr " TARGET_FMT_plx " %02" PRIx32 "\n", __func__, addr, ret);
-+#endif
 +
 +    return ret;
 +}
 +
-+static void ppc4xx_i2c_writeb(void *opaque,
-+                              hwaddr addr, uint32_t value)
++static void dcr_write_mal(void *opaque, int dcrn, uint32_t val)
 +{
-+    ppc4xx_i2c_t *i2c;
++    ppc40x_mal_t *mal;
++    int idx;
 +
-+#ifdef DEBUG_I2C
-+    printf("%s: addr " TARGET_FMT_plx " val %08" PRIx32 "\n", __func__, addr,
-+           value);
-+#endif
-+    i2c = opaque;
-+    switch (addr) {
-+    case 0x00:
-+        i2c->mdata = value;
-+        /*i2c_sendbyte(&i2c->mdata);*/
++    mal = opaque;
++    switch (dcrn) {
++    case MAL0_CFG:
++        if (val & 0x80000000) {
++            ppc40x_mal_reset(mal);
++        }
++        mal->cfg = val & 0x00FFC087;
 +        break;
-+    case 0x02:
-+        i2c->sdata = value;
++    case MAL0_ESR:
++        /* Read/clear */
++        mal->esr &= ~val;
 +        break;
-+    case 0x04:
-+        i2c->lmadr = value;
++    case MAL0_IER:
++        mal->ier = val & 0x0000001F;
 +        break;
-+    case 0x05:
-+        i2c->hmadr = value;
++    case MAL0_TXCASR:
++        mal->txcasr = val & 0xF0000000;
 +        break;
-+    case 0x06:
-+        i2c->cntl = value;
++    case MAL0_TXCARR:
++        mal->txcarr = val & 0xF0000000;
 +        break;
-+    case 0x07:
-+        i2c->mdcntl = value & 0xDF;
++    case MAL0_TXEOBISR:
++        /* Read/clear */
++        mal->txeobisr &= ~val;
 +        break;
-+    case 0x08:
-+        i2c->sts &= ~(value & 0x0A);
++    case MAL0_TXDEIR:
++        /* Read/clear */
++        mal->txdeir &= ~val;
 +        break;
-+    case 0x09:
-+        i2c->extsts &= ~(value & 0x8F);
++    case MAL0_RXCASR:
++        mal->rxcasr = val & 0xC0000000;
 +        break;
-+    case 0x0A:
-+        i2c->lsadr = value;
++    case MAL0_RXCARR:
++        mal->rxcarr = val & 0xC0000000;
 +        break;
-+    case 0x0B:
-+        i2c->hsadr = value;
++    case MAL0_RXEOBISR:
++        /* Read/clear */
++        mal->rxeobisr &= ~val;
 +        break;
-+    case 0x0C:
-+        i2c->clkdiv = value;
++    case MAL0_RXDEIR:
++        /* Read/clear */
++        mal->rxdeir &= ~val;
 +        break;
-+    case 0x0D:
-+        i2c->intrmsk = value;
++    case MAL0_TXCTP0R:
++        idx = 0;
++        goto update_tx_ptr;
++    case MAL0_TXCTP1R:
++        idx = 1;
++        goto update_tx_ptr;
++    case MAL0_TXCTP2R:
++        idx = 2;
++        goto update_tx_ptr;
++    case MAL0_TXCTP3R:
++        idx = 3;
++    update_tx_ptr:
++        mal->txctpr[idx] = val;
 +        break;
-+    case 0x0E:
-+        i2c->xfrcnt = value & 0x77;
++    case MAL0_RXCTP0R:
++        idx = 0;
++        goto update_rx_ptr;
++    case MAL0_RXCTP1R:
++        idx = 1;
++    update_rx_ptr:
++        mal->rxctpr[idx] = val;
 +        break;
-+    case 0x0F:
-+        i2c->xtcntlss = value;
-+        break;
-+    case 0x10:
-+        i2c->directcntl = value & 0x7;
++    case MAL0_RCBS0:
++        idx = 0;
++        goto update_rx_size;
++    case MAL0_RCBS1:
++        idx = 1;
++    update_rx_size:
++        mal->rcbs[idx] = val & 0x000000FF;
 +        break;
 +    }
 +}
 +
-+static uint32_t ppc4xx_i2c_readw(void *opaque, hwaddr addr)
++static void ppc40x_mal_reset(void *opaque)
 +{
-+    uint32_t ret;
++    ppc40x_mal_t *mal;
 +
-+#ifdef DEBUG_I2C
-+    printf("%s: addr " TARGET_FMT_plx "\n", __func__, addr);
-+#endif
-+    ret = ppc4xx_i2c_readb(opaque, addr) << 8;
-+    ret |= ppc4xx_i2c_readb(opaque, addr + 1);
-+
-+    return ret;
++    mal = opaque;
++    mal->cfg = 0x0007C000;
++    mal->esr = 0x00000000;
++    mal->ier = 0x00000000;
++    mal->rxcasr = 0x00000000;
++    mal->rxdeir = 0x00000000;
++    mal->rxeobisr = 0x00000000;
++    mal->txcasr = 0x00000000;
++    mal->txdeir = 0x00000000;
++    mal->txeobisr = 0x00000000;
 +}
 +
-+static void ppc4xx_i2c_writew(void *opaque,
-+                              hwaddr addr, uint32_t value)
++void ppc405_mal_init(CPUPPCState *env, qemu_irq irqs[4])
 +{
-+#ifdef DEBUG_I2C
-+    printf("%s: addr " TARGET_FMT_plx " val %08" PRIx32 "\n", __func__, addr,
-+           value);
-+#endif
-+    ppc4xx_i2c_writeb(opaque, addr, value >> 8);
-+    ppc4xx_i2c_writeb(opaque, addr + 1, value);
++    ppc40x_mal_t *mal;
++    int i;
++
++    mal = g_malloc0(sizeof(ppc40x_mal_t));
++    for (i = 0; i < 4; i++) {
++        mal->irqs[i] = irqs[i];
++    }
++    qemu_register_reset(&ppc40x_mal_reset, mal);
++    ppc_dcr_register(env, MAL0_CFG,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_ESR,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_IER,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_TXCASR,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_TXCARR,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_TXEOBISR,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_TXDEIR,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_RXCASR,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_RXCARR,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_RXEOBISR,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_RXDEIR,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_TXCTP0R,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_TXCTP1R,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_TXCTP2R,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_TXCTP3R,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_RXCTP0R,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_RXCTP1R,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_RCBS0,
++                     mal, &dcr_read_mal, &dcr_write_mal);
++    ppc_dcr_register(env, MAL0_RCBS1,
++                     mal, &dcr_read_mal, &dcr_write_mal);
 +}
+diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
+index 66e57a5..db50cfa 100644
+--- a/include/hw/ppc/ppc4xx.h
++++ b/include/hw/ppc/ppc4xx.h
+@@ -53,6 +53,8 @@ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq irq, int nbanks,
+                         hwaddr *ram_sizes,
+                         int do_init);
+ 
++void ppc405_mal_init(CPUPPCState *env, qemu_irq irqs[4]);
 +
-+static uint32_t ppc4xx_i2c_readl(void *opaque, hwaddr addr)
-+{
-+    uint32_t ret;
-+
-+#ifdef DEBUG_I2C
-+    printf("%s: addr " TARGET_FMT_plx "\n", __func__, addr);
-+#endif
-+    ret = ppc4xx_i2c_readb(opaque, addr) << 24;
-+    ret |= ppc4xx_i2c_readb(opaque, addr + 1) << 16;
-+    ret |= ppc4xx_i2c_readb(opaque, addr + 2) << 8;
-+    ret |= ppc4xx_i2c_readb(opaque, addr + 3);
-+
-+    return ret;
-+}
-+
-+static void ppc4xx_i2c_writel(void *opaque,
-+                              hwaddr addr, uint32_t value)
-+{
-+#ifdef DEBUG_I2C
-+    printf("%s: addr " TARGET_FMT_plx " val %08" PRIx32 "\n", __func__, addr,
-+           value);
-+#endif
-+    ppc4xx_i2c_writeb(opaque, addr, value >> 24);
-+    ppc4xx_i2c_writeb(opaque, addr + 1, value >> 16);
-+    ppc4xx_i2c_writeb(opaque, addr + 2, value >> 8);
-+    ppc4xx_i2c_writeb(opaque, addr + 3, value);
-+}
-+
-+static const MemoryRegionOps i2c_ops = {
-+    .old_mmio = {
-+        .read = { ppc4xx_i2c_readb, ppc4xx_i2c_readw, ppc4xx_i2c_readl, },
-+        .write = { ppc4xx_i2c_writeb, ppc4xx_i2c_writew, ppc4xx_i2c_writel, },
-+    },
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+};
-+
-+static void ppc4xx_i2c_reset(void *opaque)
-+{
-+    ppc4xx_i2c_t *i2c;
-+
-+    i2c = opaque;
-+    i2c->mdata = 0x00;
-+    i2c->sdata = 0x00;
-+    i2c->cntl = 0x00;
-+    i2c->mdcntl = 0x00;
-+    i2c->sts = 0x00;
-+    i2c->extsts = 0x00;
-+    i2c->clkdiv = 0x00;
-+    i2c->xfrcnt = 0x00;
-+    i2c->directcntl = 0x0F;
-+}
-+
-+void ppc405_i2c_init(hwaddr base, qemu_irq irq)
-+{
-+    ppc4xx_i2c_t *i2c;
-+
-+    i2c = g_malloc0(sizeof(ppc4xx_i2c_t));
-+    i2c->irq = irq;
-+#ifdef DEBUG_I2C
-+    printf("%s: offset " TARGET_FMT_plx "\n", __func__, base);
-+#endif
-+    memory_region_init_io(&i2c->iomem, NULL, &i2c_ops, i2c, "i2c", 0x011);
-+    memory_region_add_subregion(get_system_memory(), base, &i2c->iomem);
-+    qemu_register_reset(ppc4xx_i2c_reset, i2c);
-+}
+ #define TYPE_PPC4xx_PCI_HOST_BRIDGE "ppc4xx-pcihost"
+ 
+ #endif /* PPC4XX_H */
 -- 
 2.7.6
