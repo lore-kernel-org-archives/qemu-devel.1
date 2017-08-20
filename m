@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1djUKy-00045C-O8
+	(envelope-from <balaton@eik.bme.hu>) id 1djUKy-000457-HE
 	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 13:48:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1djUKw-00055c-Uh
+	(envelope-from <balaton@eik.bme.hu>) id 1djUKw-000555-OC
 	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 13:48:36 -0400
-Message-Id: <f34dbaefd1224bca33a9052107cd32b628400106.1503249785.git.balaton@eik.bme.hu>
+Message-Id: <ac6a19d43a6d36ae6f7cab99a1ac25d2515339ad.1503249785.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1503249785.git.balaton@eik.bme.hu>
 References: <cover.1503249785.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Sun, 20 Aug 2017 19:23:05 +0200
-Subject: [Qemu-devel] [PATCH 11/15] ppc: Add 460EX embedded CPU
+Subject: [Qemu-devel] [PATCH 13/15] ppc4xx: Add more PLB registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,97 +22,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Francois Revol <revol@free.fr>
 
-Despite its name it is a 440 core CPU
+These registers are present in 440 SoCs (and maybe in others too) and
+U-Boot accesses them when printing register info. We don't emulate
+these but add them to avoid crashing when they are read or written.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/cpu-models.c     |  3 +++
- target/ppc/cpu-models.h     |  1 +
- target/ppc/translate_init.c | 38 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 42 insertions(+)
+ hw/ppc/ppc405_uc.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
-index 4d3e635..7c368fc 100644
---- a/target/ppc/cpu-models.c
-+++ b/target/ppc/cpu-models.c
-@@ -348,6 +348,8 @@
-                 "PowerPC 440 EPb")
-     POWERPC_DEF("440EPX",        CPU_POWERPC_440EPX,                 440EP,
-                 "PowerPC 440 EPX")
-+    POWERPC_DEF("460EXb",        CPU_POWERPC_460EXb,                 460EX,
-+                "PowerPC 460 EXb")
- #if defined(TODO_USER_ONLY)
-     POWERPC_DEF("440GPb",        CPU_POWERPC_440GPb,                 440GP,
-                 "PowerPC 440 GPb")
-@@ -1238,6 +1240,7 @@ PowerPCCPUAlias ppc_cpu_aliases[] = {
-     { "440GP", "440GPc" },
-     { "440GR", "440GRa" },
-     { "440GX", "440GXf" },
-+    { "460EX", "460EXb" },
+diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
+index e621d0a..8e58065 100644
+--- a/hw/ppc/ppc405_uc.c
++++ b/hw/ppc/ppc405_uc.c
+@@ -105,9 +105,12 @@ ram_addr_t ppc405_set_bootinfo (CPUPPCState *env, ppc4xx_bd_info_t *bd,
+ /*****************************************************************************/
+ /* Peripheral local bus arbitrer */
+ enum {
+-    PLB0_BESR = 0x084,
+-    PLB0_BEAR = 0x086,
+-    PLB0_ACR  = 0x087,
++    PLB3A0_ACR = 0x077,
++    PLB4A0_ACR = 0x081,
++    PLB0_BESR  = 0x084,
++    PLB0_BEAR  = 0x086,
++    PLB0_ACR   = 0x087,
++    PLB4A1_ACR = 0x089,
+ };
  
-     { "RCPU", "MPC5xx" },
-     /* MPC5xx microcontrollers */
-diff --git a/target/ppc/cpu-models.h b/target/ppc/cpu-models.h
-index b563c45..92f99c0 100644
---- a/target/ppc/cpu-models.h
-+++ b/target/ppc/cpu-models.h
-@@ -241,6 +241,7 @@ enum {
-     CPU_POWERPC_440SP              = 0x53221850,
-     CPU_POWERPC_440SP2             = 0x53221891,
-     CPU_POWERPC_440SPE             = 0x53421890,
-+    CPU_POWERPC_460EXb             = 0x130218A4, /* called 460 but 440 core */
-     /* PowerPC 460 family */
- #if 0
-     /* Generic PowerPC 464 */
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 8fb407e..1e0d566 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -3832,6 +3832,44 @@ POWERPC_FAMILY(440EP)(ObjectClass *oc, void *data)
-                  POWERPC_FLAG_DE | POWERPC_FLAG_BUS_CLK;
+ typedef struct ppc4xx_plb_t ppc4xx_plb_t;
+@@ -179,9 +182,12 @@ void ppc4xx_plb_init(CPUPPCState *env)
+     ppc4xx_plb_t *plb;
+ 
+     plb = g_malloc0(sizeof(ppc4xx_plb_t));
++    ppc_dcr_register(env, PLB3A0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
++    ppc_dcr_register(env, PLB4A0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
+     ppc_dcr_register(env, PLB0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
+     ppc_dcr_register(env, PLB0_BEAR, plb, &dcr_read_plb, &dcr_write_plb);
+     ppc_dcr_register(env, PLB0_BESR, plb, &dcr_read_plb, &dcr_write_plb);
++    ppc_dcr_register(env, PLB4A1_ACR, plb, &dcr_read_plb, &dcr_write_plb);
+     qemu_register_reset(ppc4xx_plb_reset, plb);
  }
  
-+POWERPC_FAMILY(460EX)(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
-+
-+    dc->desc = "PowerPC 460 EX";
-+    pcc->init_proc = init_proc_440EP;
-+    pcc->check_pow = check_pow_nocheck;
-+    pcc->insns_flags = PPC_INSNS_BASE | PPC_STRING |
-+                       PPC_FLOAT | PPC_FLOAT_FRES | PPC_FLOAT_FSEL |
-+                       PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
-+                       PPC_FLOAT_STFIWX |
-+                       PPC_DCR | PPC_DCRX | PPC_WRTEE | PPC_RFMCI |
-+                       PPC_CACHE | PPC_CACHE_ICBI |
-+                       PPC_CACHE_DCBZ | PPC_CACHE_DCBA |
-+                       PPC_MEM_TLBSYNC | PPC_MFTB |
-+                       PPC_BOOKE | PPC_4xx_COMMON | PPC_405_MAC |
-+                       PPC_440_SPEC;
-+    pcc->msr_mask = (1ull << MSR_POW) |
-+                    (1ull << MSR_CE) |
-+                    (1ull << MSR_EE) |
-+                    (1ull << MSR_PR) |
-+                    (1ull << MSR_FP) |
-+                    (1ull << MSR_ME) |
-+                    (1ull << MSR_FE0) |
-+                    (1ull << MSR_DWE) |
-+                    (1ull << MSR_DE) |
-+                    (1ull << MSR_FE1) |
-+                    (1ull << MSR_IR) |
-+                    (1ull << MSR_DR);
-+    pcc->mmu_model = POWERPC_MMU_BOOKE;
-+    pcc->excp_model = POWERPC_EXCP_BOOKE;
-+    pcc->bus_model = PPC_FLAGS_INPUT_BookE;
-+    pcc->bfd_mach = bfd_mach_ppc_403;
-+    pcc->flags = POWERPC_FLAG_CE | POWERPC_FLAG_DWE |
-+                 POWERPC_FLAG_DE | POWERPC_FLAG_BUS_CLK;
-+}
-+
- static void init_proc_440GP(CPUPPCState *env)
- {
-     /* Time base */
 -- 
 2.7.6
