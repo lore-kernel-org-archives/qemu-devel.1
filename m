@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1djYuQ-0000to-10
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 18:41:31 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1djZ1w-0003mi-Op
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 18:49:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1djYuM-00005i-Tm
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 18:41:30 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:37516)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1djYuM-00005D-NA
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 18:41:26 -0400
-Received: by mail-pg0-x243.google.com with SMTP id 83so20979177pgb.4
-	for <qemu-devel@nongnu.org>; Sun, 20 Aug 2017 15:41:26 -0700 (PDT)
-Reply-To: minyard@acm.org
-References: <1503265602-9349-1-git-send-email-minyard@acm.org>
-	<1503265602-9349-4-git-send-email-minyard@acm.org>
-	<9a03693b-a8a3-ada6-de38-15d28f26b2ec@amsat.org>
-From: Corey Minyard <tcminyard@gmail.com>
-Message-ID: <73893c0a-8a18-ae60-34e3-5c75e71185c9@gmail.com>
-Date: Sun, 20 Aug 2017 17:41:22 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1djZ1t-0004sI-Mg
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 18:49:16 -0400
+References: <alpine.BSF.2.21.1708181526340.19483@zero.eik.bme.hu>
+	<0e3383a1-33b5-8238-75e2-48e36b7daea4@adacore.com>
+	<alpine.BSF.2.21.1708200101080.95468@zero.eik.bme.hu>
+	<03c6e36f-c79d-3174-772d-5cd361703f7d@ilande.co.uk>
+	<alpine.BSF.2.21.1708201455480.49986@zero.eik.bme.hu>
+	<7f4e58b7-7e8e-4e94-8435-861af3103d1c@ilande.co.uk>
+	<alpine.LMD.2.02.1708202333240.3635@jedlik.phy.bme.hu>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <24fb125a-de7e-ca18-8ca8-9ab7f2d113d1@ilande.co.uk>
+Date: Sun, 20 Aug 2017 23:48:39 +0100
 MIME-Version: 1.0
-In-Reply-To: <9a03693b-a8a3-ada6-de38-15d28f26b2ec@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <alpine.LMD.2.02.1708202333240.3635@jedlik.phy.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] ipmi: Add the platform event
- message command
+Subject: Re: [Qemu-devel] [Qemu-ppc] BookE MMU question
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,86 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, minyard@acm.org, qemu-devel@nongnu.org
-Cc: Corey Minyard <cminyard@mvista.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: Francois Revol <revol@free.fr>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On 08/20/2017 05:24 PM, Philippe Mathieu-Daudé wrote:
-> Hi Corey,
->
-> On 08/20/2017 06:46 PM, minyard@acm.org wrote:
->> From: Corey Minyard <cminyard@mvista.com>
->>
->> This lets an event be added to the SEL as if a sensor had generated
->> it.  The OpenIPMI driver uses it for storing panic event information.
->>
->> Signed-off-by: Corey Minyard <cminyard@mvista.com>
->> ---
->>   hw/ipmi/ipmi_bmc_sim.c | 24 ++++++++++++++++++++++++
->>   1 file changed, 24 insertions(+)
->>
->> diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
->> index a0bbfd5..e84d710 100644
->> --- a/hw/ipmi/ipmi_bmc_sim.c
->> +++ b/hw/ipmi/ipmi_bmc_sim.c
->> @@ -38,6 +38,7 @@
->>     #define IPMI_NETFN_SENSOR_EVENT       0x04
->>   +#define IPMI_CMD_PLATFORM_EVENT_MSG       0x02
->>   #define IPMI_CMD_SET_SENSOR_EVT_ENABLE    0x28
->>   #define IPMI_CMD_GET_SENSOR_EVT_ENABLE    0x29
->>   #define IPMI_CMD_REARM_SENSOR_EVTS        0x2a
->> @@ -1581,6 +1582,28 @@ static void set_sel_time(IPMIBmcSim *ibs,
->>       ibs->sel.time_offset = now.tv_sec - ((long) val);
->>   }
->>   +static void platform_event_msg(IPMIBmcSim *ibs,
->> +                               uint8_t *cmd, unsigned int cmd_len,
->> +                               RspBuffer *rsp)
->> +{
->> +    uint8_t event[16];
->
-> Watch out, here you are using uninitialized stack,
->
->> +
->> +    event[2] = 2; /* System event record */
->> +    event[7] = cmd[2]; /* Generator ID */
->> +    event[8] = 0;
->> +    event[9] = cmd[3]; /* EvMRev */
->> +    event[10] = cmd[4]; /* Sensor type */
->> +    event[11] = cmd[5]; /* Sensor number */
->> +    event[12] = cmd[6]; /* Event dir / Event type */
->> +    event[13] = cmd[7]; /* Event data 1 */
->> +    event[14] = cmd[8]; /* Event data 2 */
->> +    event[15] = cmd[9]; /* Event data 3 */
->> +
->> +    if (sel_add_event(ibs, event)) {
->
-> So here you have event[0,1,3-6] as crap/random.
->
+On 20/08/17 22:59, BALATON Zoltan wrote:
 
-Actually, if you look at sel_add_event(), it fills in these values.
+>> So I'd suggest adding debugging to alloc_tlb() to find out why TLB slot
+>> 0 is being chosen again for the 0x80000000 mapping even though
+>> free_tlb() hasn't been called for that entry.
+> 
+> I've tried that but it only confirmed what I thought. This is the first
+> map_region call so nothing is allocated yet and it just picks the first
+> slot:
+> 
+> [KRN] i = 2, allowable_pages[i].mask = 000fffff; tlb_info
+> ffffffff:ffffffff => 7fffffff:ffffffff
+> 
+> (The numbers after tlb_info are bitmap[0]:bitmap[1] before and after the
+> alloc_tlb() call.) So this looks OK just does not work on QEMU and I
+> don't know why it works on real hardware (or if it works there at all
+> but I assume it does).
 
-> Also it'd be more efficient to use
->
->     memcpy(&event[9], &cmd[3], sizeof(event) - 9);
->
+I'm slightly confused here as I thought you'd said you changed the order
+of the mappings? But if its the first entry then I presume you mean
+we're back to this one, which is definitely the first mapping according
+to the source.
 
-Maybe, I'm not sure if the compiler would catch this and do something
-more efficient.  I like being able to document the individual values.
+ppcemb_tlb_check: TLB 0 address ff7fd648 PID 0 <=> ff7f7000 fffff000 03b
+mmubooke_check_tlb: TLB entry not found
 
--corey
+[KRN] map_region(007f7000, ff7f7000, 00009000, 081b):
+[KRN] TLB00: 007f7000 - 007f7fff : ff7f7000 - ff7f7fff:
 
->> +        rsp_buffer_set_error(rsp, IPMI_CC_OUT_OF_SPACE);
->> +    }
->> +}
->> +
->>   static void set_sensor_evt_enable(IPMIBmcSim *ibs,
->>                                     uint8_t *cmd, unsigned int cmd_len,
->>                                     RspBuffer *rsp)
->> @@ -1757,6 +1780,7 @@ static const IPMINetfn chassis_netfn = {
->>   };
->>     static const IPMICmdHandler sensor_event_cmds[] = {
->> +    [IPMI_CMD_PLATFORM_EVENT_MSG] = { platform_event_msg, 10 },
->>       [IPMI_CMD_SET_SENSOR_EVT_ENABLE] = { set_sensor_evt_enable, 4 },
->>       [IPMI_CMD_GET_SENSOR_EVT_ENABLE] = { get_sensor_evt_enable, 3 },
->>       [IPMI_CMD_REARM_SENSOR_EVTS] = { rearm_sensor_evts, 4 },
->>
->
+In that case the working is as follows:
+
+- You request a region of size 0x9000
+- map_region() rounds this up to the next biggest size from
+  allowable_pages() which is 64KB (0xffff) with
+  allowable_pages.code == 0x30
+- The 0x30 code (which indicates the page size) is encoded into the
+  first tlbwe instruction
+
+The first thing I'd check is to follow through QEMU's tlbwe and make
+sure that the 0x30 gets decoded correctly back to a TLB size of 0x10000
+as indicated by allowable_pages - at the moment it looks as if QEMU is
+interpreting the 0x30 as a page size of 0x1000 instead.
+
+
+ATB,
+
+Mark.
