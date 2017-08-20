@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1djUL0-00046j-DO
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 13:48:42 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1djUL0-00045f-5A
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 13:48:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1djUKw-00055M-Sk
+	(envelope-from <balaton@eik.bme.hu>) id 1djUKx-000565-2d
 	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 13:48:38 -0400
-Message-Id: <962e7e3b1355309c75f27bd6abdd64155743ad48.1503249785.git.balaton@eik.bme.hu>
+Message-Id: <1815e11378b48532e902e0138a58557c297c3eb2.1503249785.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1503249785.git.balaton@eik.bme.hu>
 References: <cover.1503249785.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Sun, 20 Aug 2017 19:23:05 +0200
-Subject: [Qemu-devel] [PATCH 01/15] ppc4xx: Move MAL from ppc405_uc to
- ppc4xx_devs
+Subject: [Qemu-devel] [PATCH 09/15] hw/ide: Emulate SiI3112 SATA controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,583 +20,403 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Francois Revol <revol@free.fr>
+Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Francois Revol <revol@free.fr>, John Snow <jsnow@redhat.com>
 
-This device appears in other SoCs as well not just in 405 ones
+This is a common generic PCI SATA conroller that is also used in PCs
+but more importantly guests running on the Sam460ex board prefer this
+card and have a driver for it (unlike for other SATA controllers
+already emulated).
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/ppc405_uc.c      | 263 -----------------------------------------------
- hw/ppc/ppc4xx_devs.c    | 264 ++++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/ppc4xx.h |   2 +
- 3 files changed, 266 insertions(+), 263 deletions(-)
+ hw/ide/Makefile.objs |   1 +
+ hw/ide/sii3112.c     | 369 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 370 insertions(+)
+ create mode 100644 hw/ide/sii3112.c
 
-diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
-index f6fe3e6..3c74402 100644
---- a/hw/ppc/ppc405_uc.c
-+++ b/hw/ppc/ppc405_uc.c
-@@ -42,7 +42,6 @@
- //#define DEBUG_OCM
- //#define DEBUG_I2C
- //#define DEBUG_GPT
--//#define DEBUG_MAL
- //#define DEBUG_CLOCKS
- //#define DEBUG_CLOCKS_LL
- 
-@@ -1513,268 +1512,6 @@ static void ppc4xx_gpt_init(hwaddr base, qemu_irq irqs[5])
- }
- 
- /*****************************************************************************/
--/* MAL */
--enum {
--    MAL0_CFG      = 0x180,
--    MAL0_ESR      = 0x181,
--    MAL0_IER      = 0x182,
--    MAL0_TXCASR   = 0x184,
--    MAL0_TXCARR   = 0x185,
--    MAL0_TXEOBISR = 0x186,
--    MAL0_TXDEIR   = 0x187,
--    MAL0_RXCASR   = 0x190,
--    MAL0_RXCARR   = 0x191,
--    MAL0_RXEOBISR = 0x192,
--    MAL0_RXDEIR   = 0x193,
--    MAL0_TXCTP0R  = 0x1A0,
--    MAL0_TXCTP1R  = 0x1A1,
--    MAL0_TXCTP2R  = 0x1A2,
--    MAL0_TXCTP3R  = 0x1A3,
--    MAL0_RXCTP0R  = 0x1C0,
--    MAL0_RXCTP1R  = 0x1C1,
--    MAL0_RCBS0    = 0x1E0,
--    MAL0_RCBS1    = 0x1E1,
--};
--
--typedef struct ppc40x_mal_t ppc40x_mal_t;
--struct ppc40x_mal_t {
--    qemu_irq irqs[4];
--    uint32_t cfg;
--    uint32_t esr;
--    uint32_t ier;
--    uint32_t txcasr;
--    uint32_t txcarr;
--    uint32_t txeobisr;
--    uint32_t txdeir;
--    uint32_t rxcasr;
--    uint32_t rxcarr;
--    uint32_t rxeobisr;
--    uint32_t rxdeir;
--    uint32_t txctpr[4];
--    uint32_t rxctpr[2];
--    uint32_t rcbs[2];
--};
--
--static void ppc40x_mal_reset (void *opaque);
--
--static uint32_t dcr_read_mal (void *opaque, int dcrn)
--{
--    ppc40x_mal_t *mal;
--    uint32_t ret;
--
--    mal = opaque;
--    switch (dcrn) {
--    case MAL0_CFG:
--        ret = mal->cfg;
--        break;
--    case MAL0_ESR:
--        ret = mal->esr;
--        break;
--    case MAL0_IER:
--        ret = mal->ier;
--        break;
--    case MAL0_TXCASR:
--        ret = mal->txcasr;
--        break;
--    case MAL0_TXCARR:
--        ret = mal->txcarr;
--        break;
--    case MAL0_TXEOBISR:
--        ret = mal->txeobisr;
--        break;
--    case MAL0_TXDEIR:
--        ret = mal->txdeir;
--        break;
--    case MAL0_RXCASR:
--        ret = mal->rxcasr;
--        break;
--    case MAL0_RXCARR:
--        ret = mal->rxcarr;
--        break;
--    case MAL0_RXEOBISR:
--        ret = mal->rxeobisr;
--        break;
--    case MAL0_RXDEIR:
--        ret = mal->rxdeir;
--        break;
--    case MAL0_TXCTP0R:
--        ret = mal->txctpr[0];
--        break;
--    case MAL0_TXCTP1R:
--        ret = mal->txctpr[1];
--        break;
--    case MAL0_TXCTP2R:
--        ret = mal->txctpr[2];
--        break;
--    case MAL0_TXCTP3R:
--        ret = mal->txctpr[3];
--        break;
--    case MAL0_RXCTP0R:
--        ret = mal->rxctpr[0];
--        break;
--    case MAL0_RXCTP1R:
--        ret = mal->rxctpr[1];
--        break;
--    case MAL0_RCBS0:
--        ret = mal->rcbs[0];
--        break;
--    case MAL0_RCBS1:
--        ret = mal->rcbs[1];
--        break;
--    default:
--        ret = 0;
--        break;
--    }
--
--    return ret;
--}
--
--static void dcr_write_mal (void *opaque, int dcrn, uint32_t val)
--{
--    ppc40x_mal_t *mal;
--    int idx;
--
--    mal = opaque;
--    switch (dcrn) {
--    case MAL0_CFG:
--        if (val & 0x80000000)
--            ppc40x_mal_reset(mal);
--        mal->cfg = val & 0x00FFC087;
--        break;
--    case MAL0_ESR:
--        /* Read/clear */
--        mal->esr &= ~val;
--        break;
--    case MAL0_IER:
--        mal->ier = val & 0x0000001F;
--        break;
--    case MAL0_TXCASR:
--        mal->txcasr = val & 0xF0000000;
--        break;
--    case MAL0_TXCARR:
--        mal->txcarr = val & 0xF0000000;
--        break;
--    case MAL0_TXEOBISR:
--        /* Read/clear */
--        mal->txeobisr &= ~val;
--        break;
--    case MAL0_TXDEIR:
--        /* Read/clear */
--        mal->txdeir &= ~val;
--        break;
--    case MAL0_RXCASR:
--        mal->rxcasr = val & 0xC0000000;
--        break;
--    case MAL0_RXCARR:
--        mal->rxcarr = val & 0xC0000000;
--        break;
--    case MAL0_RXEOBISR:
--        /* Read/clear */
--        mal->rxeobisr &= ~val;
--        break;
--    case MAL0_RXDEIR:
--        /* Read/clear */
--        mal->rxdeir &= ~val;
--        break;
--    case MAL0_TXCTP0R:
--        idx = 0;
--        goto update_tx_ptr;
--    case MAL0_TXCTP1R:
--        idx = 1;
--        goto update_tx_ptr;
--    case MAL0_TXCTP2R:
--        idx = 2;
--        goto update_tx_ptr;
--    case MAL0_TXCTP3R:
--        idx = 3;
--    update_tx_ptr:
--        mal->txctpr[idx] = val;
--        break;
--    case MAL0_RXCTP0R:
--        idx = 0;
--        goto update_rx_ptr;
--    case MAL0_RXCTP1R:
--        idx = 1;
--    update_rx_ptr:
--        mal->rxctpr[idx] = val;
--        break;
--    case MAL0_RCBS0:
--        idx = 0;
--        goto update_rx_size;
--    case MAL0_RCBS1:
--        idx = 1;
--    update_rx_size:
--        mal->rcbs[idx] = val & 0x000000FF;
--        break;
--    }
--}
--
--static void ppc40x_mal_reset (void *opaque)
--{
--    ppc40x_mal_t *mal;
--
--    mal = opaque;
--    mal->cfg = 0x0007C000;
--    mal->esr = 0x00000000;
--    mal->ier = 0x00000000;
--    mal->rxcasr = 0x00000000;
--    mal->rxdeir = 0x00000000;
--    mal->rxeobisr = 0x00000000;
--    mal->txcasr = 0x00000000;
--    mal->txdeir = 0x00000000;
--    mal->txeobisr = 0x00000000;
--}
--
--static void ppc405_mal_init(CPUPPCState *env, qemu_irq irqs[4])
--{
--    ppc40x_mal_t *mal;
--    int i;
--
--    mal = g_malloc0(sizeof(ppc40x_mal_t));
--    for (i = 0; i < 4; i++)
--        mal->irqs[i] = irqs[i];
--    qemu_register_reset(&ppc40x_mal_reset, mal);
--    ppc_dcr_register(env, MAL0_CFG,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_ESR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_IER,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_TXCASR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_TXCARR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_TXEOBISR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_TXDEIR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_RXCASR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_RXCARR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_RXEOBISR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_RXDEIR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_TXCTP0R,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_TXCTP1R,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_TXCTP2R,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_TXCTP3R,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_RXCTP0R,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_RXCTP1R,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_RCBS0,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_RCBS1,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--}
--
--/*****************************************************************************/
- /* SPR */
- void ppc40x_core_reset(PowerPCCPU *cpu)
- {
-diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
-index e7f413e..8e4f78e 100644
---- a/hw/ppc/ppc4xx_devs.c
-+++ b/hw/ppc/ppc4xx_devs.c
-@@ -734,3 +734,267 @@ ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
- 
-     return ram_size;
- }
+diff --git a/hw/ide/Makefile.objs b/hw/ide/Makefile.objs
+index 729e9bd..76f3d6d 100644
+--- a/hw/ide/Makefile.objs
++++ b/hw/ide/Makefile.objs
+@@ -10,3 +10,4 @@ common-obj-$(CONFIG_IDE_VIA) += via.o
+ common-obj-$(CONFIG_MICRODRIVE) += microdrive.o
+ common-obj-$(CONFIG_AHCI) += ahci.o
+ common-obj-$(CONFIG_AHCI) += ich.o
++common-obj-$(CONFIG_IDE_SII3112) += sii3112.o
+diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
+new file mode 100644
+index 0000000..9ec8cd1
+--- /dev/null
++++ b/hw/ide/sii3112.c
+@@ -0,0 +1,369 @@
++/*
++ * QEMU SiI3112A PCI to Serial ATA Controller Emulation
++ *
++ * Copyright (C) 2017 BALATON Zoltan <balaton@eik.bme.hu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
 +
-+/*****************************************************************************/
-+/* MAL */
-+enum {
-+    MAL0_CFG      = 0x180,
-+    MAL0_ESR      = 0x181,
-+    MAL0_IER      = 0x182,
-+    MAL0_TXCASR   = 0x184,
-+    MAL0_TXCARR   = 0x185,
-+    MAL0_TXEOBISR = 0x186,
-+    MAL0_TXDEIR   = 0x187,
-+    MAL0_RXCASR   = 0x190,
-+    MAL0_RXCARR   = 0x191,
-+    MAL0_RXEOBISR = 0x192,
-+    MAL0_RXDEIR   = 0x193,
-+    MAL0_TXCTP0R  = 0x1A0,
-+    MAL0_TXCTP1R  = 0x1A1,
-+    MAL0_TXCTP2R  = 0x1A2,
-+    MAL0_TXCTP3R  = 0x1A3,
-+    MAL0_RXCTP0R  = 0x1C0,
-+    MAL0_RXCTP1R  = 0x1C1,
-+    MAL0_RCBS0    = 0x1E0,
-+    MAL0_RCBS1    = 0x1E1,
-+};
++/* For documentation on this and similar cards see:
++ * http://wiki.osdev.org/User:Quok/Silicon_Image_Datasheets
++ */
 +
-+typedef struct ppc40x_mal_t ppc40x_mal_t;
-+struct ppc40x_mal_t {
-+    qemu_irq irqs[4];
-+    uint32_t cfg;
-+    uint32_t esr;
-+    uint32_t ier;
-+    uint32_t txcasr;
-+    uint32_t txcarr;
-+    uint32_t txeobisr;
-+    uint32_t txdeir;
-+    uint32_t rxcasr;
-+    uint32_t rxcarr;
-+    uint32_t rxeobisr;
-+    uint32_t rxdeir;
-+    uint32_t txctpr[4];
-+    uint32_t rxctpr[2];
-+    uint32_t rcbs[2];
-+};
++#include <qemu/osdep.h>
++#include <hw/ide/pci.h>
 +
-+static void ppc40x_mal_reset(void *opaque);
++#ifdef DEBUG_IDE
++#define DPRINTF(fmt, ...) fprintf(stderr, fmt, ## __VA_ARGS__);
++#else
++#define DPRINTF(fmt, ...)
++#endif /* DEBUG */
 +
-+static uint32_t dcr_read_mal(void *opaque, int dcrn)
++#define TYPE_SII3112_PCI "sii3112"
++#define SII3112_PCI(obj) OBJECT_CHECK(SiI3112PCIState, (obj), \
++                         TYPE_SII3112_PCI)
++
++typedef struct SiI3112Regs {
++    uint32_t confstat;
++    uint32_t scontrol;
++    uint16_t sien;
++    uint8_t swdata;
++} SiI3112Regs;
++
++typedef struct SiI3112PCIState {
++    PCIIDEState i;
++    MemoryRegion mmio;
++    SiI3112Regs regs[2];
++} SiI3112PCIState;
++
++static uint64_t sii3112_reg_read(void *opaque, hwaddr addr,
++                                unsigned int size)
 +{
-+    ppc40x_mal_t *mal;
-+    uint32_t ret;
++    SiI3112PCIState *d = opaque;
++    uint64_t val = 0;
 +
-+    mal = opaque;
-+    switch (dcrn) {
-+    case MAL0_CFG:
-+        ret = mal->cfg;
++    switch (addr) {
++    case 0x00:
++        val = d->i.bmdma[0].cmd;
 +        break;
-+    case MAL0_ESR:
-+        ret = mal->esr;
++    case 0x01:
++        val = d->regs[0].swdata;
 +        break;
-+    case MAL0_IER:
-+        ret = mal->ier;
++    case 0x02:
++        val = d->i.bmdma[0].status;
 +        break;
-+    case MAL0_TXCASR:
-+        ret = mal->txcasr;
++    case 0x03:
++        val = 0;
 +        break;
-+    case MAL0_TXCARR:
-+        ret = mal->txcarr;
++    case 0x04 ... 0x07:
++        val = bmdma_addr_ioport_ops.read(&d->i.bmdma[0], addr - 4, size);
 +        break;
-+    case MAL0_TXEOBISR:
-+        ret = mal->txeobisr;
++    case 0x08:
++        val = d->i.bmdma[1].cmd;
 +        break;
-+    case MAL0_TXDEIR:
-+        ret = mal->txdeir;
++    case 0x09:
++        val = d->regs[1].swdata;
 +        break;
-+    case MAL0_RXCASR:
-+        ret = mal->rxcasr;
++    case 0x0a:
++        val = d->i.bmdma[1].status;
 +        break;
-+    case MAL0_RXCARR:
-+        ret = mal->rxcarr;
++    case 0x0b:
++        val = 0;
 +        break;
-+    case MAL0_RXEOBISR:
-+        ret = mal->rxeobisr;
++    case 0x0c ... 0x0f:
++        val = bmdma_addr_ioport_ops.read(&d->i.bmdma[1], addr - 12, size);
 +        break;
-+    case MAL0_RXDEIR:
-+        ret = mal->rxdeir;
++    case 0x10:
++        val = d->i.bmdma[0].cmd;
++        val |= (d->regs[0].confstat & (1UL << 11) ? (1 << 4) : 0); /*SATAINT0*/
++        val |= (d->regs[1].confstat & (1UL << 11) ? (1 << 6) : 0); /*SATAINT1*/
++        val |= (d->i.bmdma[1].status & BM_STATUS_INT ? (1 << 14) : 0);
++        val |= d->i.bmdma[0].status << 16;
++        val |= d->i.bmdma[1].status << 24;
 +        break;
-+    case MAL0_TXCTP0R:
-+        ret = mal->txctpr[0];
++    case 0x18:
++        val = d->i.bmdma[1].cmd;
++        val |= (d->regs[1].confstat & (1UL << 11) ? (1 << 4) : 0);
++        val |= d->i.bmdma[1].status << 16;
 +        break;
-+    case MAL0_TXCTP1R:
-+        ret = mal->txctpr[1];
++    case 0x80 ... 0x87:
++        if (size == 1) {
++            val = ide_ioport_read(&d->i.bus[0], addr - 0x80);
++        } else if (addr == 0x80) {
++            val = (size == 2) ? ide_data_readw(&d->i.bus[0], 0) :
++                                ide_data_readl(&d->i.bus[0], 0);
++        } else {
++            val = (1ULL << (size * 8)) - 1;
++        }
 +        break;
-+    case MAL0_TXCTP2R:
-+        ret = mal->txctpr[2];
++    case 0x8a:
++        val = (size == 1) ? ide_status_read(&d->i.bus[0], 4) :
++                            (1ULL << (size * 8)) - 1;
 +        break;
-+    case MAL0_TXCTP3R:
-+        ret = mal->txctpr[3];
++    case 0xa0:
++        val = d->regs[0].confstat;
 +        break;
-+    case MAL0_RXCTP0R:
-+        ret = mal->rxctpr[0];
++    case 0xc0 ... 0xc7:
++        if (size == 1) {
++            val = ide_ioport_read(&d->i.bus[1], addr - 0xc0);
++        } else if (addr == 0xc0) {
++            val = (size == 2) ? ide_data_readw(&d->i.bus[1], 0) :
++                                ide_data_readl(&d->i.bus[1], 0);
++        } else {
++            val = (1ULL << (size * 8)) - 1;
++        }
 +        break;
-+    case MAL0_RXCTP1R:
-+        ret = mal->rxctpr[1];
++    case 0xca:
++        val = (size == 1) ? ide_status_read(&d->i.bus[0], 4) :
++                            (1ULL << (size * 8)) - 1;
 +        break;
-+    case MAL0_RCBS0:
-+        ret = mal->rcbs[0];
++    case 0xe0:
++        val = d->regs[1].confstat;
 +        break;
-+    case MAL0_RCBS1:
-+        ret = mal->rcbs[1];
++    case 0x100:
++        val = d->regs[0].scontrol;
++        break;
++    case 0x104:
++        val = (d->i.bus[0].ifs[0].blk) ? 0x113 : 0;
++        break;
++    case 0x148:
++        val = d->regs[0].sien << 16;
++        break;
++    case 0x180:
++        val = d->regs[1].scontrol;
++        break;
++    case 0x184:
++        val = (d->i.bus[1].ifs[0].blk) ? 0x113 : 0;
++        break;
++    case 0x1c8:
++        val = d->regs[1].sien << 16;
 +        break;
 +    default:
-+        ret = 0;
-+        break;
++        val = 0;
 +    }
-+
-+    return ret;
++    DPRINTF("%s: addr 0x%"PRIx64 " size %d = %"PRIx64 "\n",
++            __func__, addr, size, val);
++    return val;
 +}
 +
-+static void dcr_write_mal(void *opaque, int dcrn, uint32_t val)
++static void sii3112_reg_write(void *opaque, hwaddr addr,
++                              uint64_t val, unsigned int size)
 +{
-+    ppc40x_mal_t *mal;
-+    int idx;
++    SiI3112PCIState *d = opaque;
 +
-+    mal = opaque;
-+    switch (dcrn) {
-+    case MAL0_CFG:
-+        if (val & 0x80000000) {
-+            ppc40x_mal_reset(mal);
++    DPRINTF("%s: addr 0x%"PRIx64 " size %d = %"PRIx64 "\n",
++            __func__, addr, size, val);
++    switch (addr) {
++    case 0x00:
++    case 0x10:
++        bmdma_cmd_writeb(&d->i.bmdma[0], val);
++        break;
++    case 0x01:
++    case 0x11:
++        d->regs[0].swdata = val & 0x3f;
++        break;
++    case 0x02:
++    case 0x12:
++        d->i.bmdma[0].status = (val & 0x60) | (d->i.bmdma[0].status & 1) |
++                               (d->i.bmdma[0].status & ~val & 6);
++        break;
++    case 0x04 ... 0x07:
++        bmdma_addr_ioport_ops.write(&d->i.bmdma[0], addr - 4, val, size);
++        break;
++    case 0x08:
++    case 0x18:
++        bmdma_cmd_writeb(&d->i.bmdma[1], val);
++        break;
++    case 0x09:
++    case 0x19:
++        d->regs[1].swdata = val & 0x3f;
++        break;
++    case 0x0a:
++    case 0x1a:
++        d->i.bmdma[1].status = (val & 0x60) | (d->i.bmdma[1].status & 1) |
++                               (d->i.bmdma[1].status & ~val & 6);
++        break;
++    case 0x0c ... 0x0f:
++        bmdma_addr_ioport_ops.write(&d->i.bmdma[1], addr - 12, val, size);
++        break;
++    case 0x80 ... 0x87:
++        if (size == 1) {
++            ide_ioport_write(&d->i.bus[0], addr - 0x80, val);
++        } else if (addr == 0x80) {
++            if (size == 2) {
++                ide_data_writew(&d->i.bus[0], 0, val);
++            } else {
++                ide_data_writel(&d->i.bus[0], 0, val);
++            }
 +        }
-+        mal->cfg = val & 0x00FFC087;
 +        break;
-+    case MAL0_ESR:
-+        /* Read/clear */
-+        mal->esr &= ~val;
++    case 0x8a:
++        if (size == 1) {
++            ide_cmd_write(&d->i.bus[0], 4, val);
++        }
 +        break;
-+    case MAL0_IER:
-+        mal->ier = val & 0x0000001F;
++    case 0xc0 ... 0xc7:
++        if (size == 1) {
++            ide_ioport_write(&d->i.bus[1], addr - 0xc0, val);
++        } else if (addr == 0xc0) {
++            if (size == 2) {
++                ide_data_writew(&d->i.bus[1], 0, val);
++            } else {
++                ide_data_writel(&d->i.bus[1], 0, val);
++            }
++        }
 +        break;
-+    case MAL0_TXCASR:
-+        mal->txcasr = val & 0xF0000000;
++    case 0xca:
++        if (size == 1) {
++            ide_cmd_write(&d->i.bus[1], 4, val);
++        }
 +        break;
-+    case MAL0_TXCARR:
-+        mal->txcarr = val & 0xF0000000;
++    case 0x100:
++        d->regs[0].scontrol = val & 0xfff;
++        if (val & 1) {
++            ide_bus_reset(&d->i.bus[0]);
++        }
 +        break;
-+    case MAL0_TXEOBISR:
-+        /* Read/clear */
-+        mal->txeobisr &= ~val;
++    case 0x148:
++        d->regs[0].sien = (val >> 16) & 0x3eed;
 +        break;
-+    case MAL0_TXDEIR:
-+        /* Read/clear */
-+        mal->txdeir &= ~val;
++    case 0x180:
++        d->regs[1].scontrol = val & 0xfff;
++        if (val & 1) {
++            ide_bus_reset(&d->i.bus[1]);
++        }
 +        break;
-+    case MAL0_RXCASR:
-+        mal->rxcasr = val & 0xC0000000;
++    case 0x1c8:
++        d->regs[1].sien = (val >> 16) & 0x3eed;
 +        break;
-+    case MAL0_RXCARR:
-+        mal->rxcarr = val & 0xC0000000;
-+        break;
-+    case MAL0_RXEOBISR:
-+        /* Read/clear */
-+        mal->rxeobisr &= ~val;
-+        break;
-+    case MAL0_RXDEIR:
-+        /* Read/clear */
-+        mal->rxdeir &= ~val;
-+        break;
-+    case MAL0_TXCTP0R:
-+        idx = 0;
-+        goto update_tx_ptr;
-+    case MAL0_TXCTP1R:
-+        idx = 1;
-+        goto update_tx_ptr;
-+    case MAL0_TXCTP2R:
-+        idx = 2;
-+        goto update_tx_ptr;
-+    case MAL0_TXCTP3R:
-+        idx = 3;
-+    update_tx_ptr:
-+        mal->txctpr[idx] = val;
-+        break;
-+    case MAL0_RXCTP0R:
-+        idx = 0;
-+        goto update_rx_ptr;
-+    case MAL0_RXCTP1R:
-+        idx = 1;
-+    update_rx_ptr:
-+        mal->rxctpr[idx] = val;
-+        break;
-+    case MAL0_RCBS0:
-+        idx = 0;
-+        goto update_rx_size;
-+    case MAL0_RCBS1:
-+        idx = 1;
-+    update_rx_size:
-+        mal->rcbs[idx] = val & 0x000000FF;
-+        break;
++    default:
++        val = 0;
 +    }
 +}
 +
-+static void ppc40x_mal_reset(void *opaque)
-+{
-+    ppc40x_mal_t *mal;
++static const MemoryRegionOps sii3112_reg_ops = {
++    .read = sii3112_reg_read,
++    .write = sii3112_reg_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++};
 +
-+    mal = opaque;
-+    mal->cfg = 0x0007C000;
-+    mal->esr = 0x00000000;
-+    mal->ier = 0x00000000;
-+    mal->rxcasr = 0x00000000;
-+    mal->rxdeir = 0x00000000;
-+    mal->rxeobisr = 0x00000000;
-+    mal->txcasr = 0x00000000;
-+    mal->txdeir = 0x00000000;
-+    mal->txeobisr = 0x00000000;
++/* the PCI irq level is the logical OR of the two channels */
++static void sii3112_update_irq(SiI3112PCIState *s)
++{
++    int i, set = 0;
++
++    for (i = 0; i < 2; i++) {
++        set |= s->regs[i].confstat & (1UL << 11);
++    }
++    pci_set_irq(PCI_DEVICE(s), (set ? 1 : 0));
 +}
 +
-+void ppc405_mal_init(CPUPPCState *env, qemu_irq irqs[4])
++static void sii3112_set_irq(void *opaque, int channel, int level)
 +{
-+    ppc40x_mal_t *mal;
++    SiI3112PCIState *s = opaque;
++
++    DPRINTF("%s: channel %d level %d\n", __func__, channel, level);
++    if (level) {
++        s->regs[channel].confstat |= (1UL << 11);
++    } else {
++        s->regs[channel].confstat &= ~(1UL << 11);
++    }
++
++    sii3112_update_irq(s);
++}
++
++static void sii3112_reset(void *opaque)
++{
++    SiI3112PCIState *s = opaque;
 +    int i;
 +
-+    mal = g_malloc0(sizeof(ppc40x_mal_t));
-+    for (i = 0; i < 4; i++) {
-+        mal->irqs[i] = irqs[i];
++    for (i = 0; i < 2; i++) {
++        s->regs[i].confstat = 0x6515 << 16;
++        ide_bus_reset(&s->i.bus[i]);
 +    }
-+    qemu_register_reset(&ppc40x_mal_reset, mal);
-+    ppc_dcr_register(env, MAL0_CFG,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_ESR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_IER,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_TXCASR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_TXCARR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_TXEOBISR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_TXDEIR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_RXCASR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_RXCARR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_RXEOBISR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_RXDEIR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_TXCTP0R,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_TXCTP1R,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_TXCTP2R,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_TXCTP3R,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_RXCTP0R,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_RXCTP1R,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_RCBS0,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_RCBS1,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
 +}
-diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
-index 66e57a5..db50cfa 100644
---- a/include/hw/ppc/ppc4xx.h
-+++ b/include/hw/ppc/ppc4xx.h
-@@ -53,6 +53,8 @@ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq irq, int nbanks,
-                         hwaddr *ram_sizes,
-                         int do_init);
- 
-+void ppc405_mal_init(CPUPPCState *env, qemu_irq irqs[4]);
 +
- #define TYPE_PPC4xx_PCI_HOST_BRIDGE "ppc4xx-pcihost"
- 
- #endif /* PPC4XX_H */
++static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
++{
++    SiI3112PCIState *d = SII3112_PCI(dev);
++    PCIIDEState *s = PCI_IDE(dev);
++    MemoryRegion *mr;
++    qemu_irq *irq;
++    int i;
++
++    pci_config_set_interrupt_pin(dev->config, 1);
++    pci_set_byte(dev->config + PCI_CACHE_LINE_SIZE, 8);
++
++    memory_region_init_io(&d->mmio, OBJECT(d), &sii3112_reg_ops, d,
++                         "sii3112.bar5", 0x200);
++    pci_register_bar(dev, 5, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
++
++    mr = g_new(MemoryRegion, 1);
++    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar0", &d->mmio, 0x80, 8);
++    pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_IO, mr);
++    mr = g_new(MemoryRegion, 1);
++    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar1", &d->mmio, 0x88, 4);
++    pci_register_bar(dev, 1, PCI_BASE_ADDRESS_SPACE_IO, mr);
++    mr = g_new(MemoryRegion, 1);
++    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar2", &d->mmio, 0xc0, 8);
++    pci_register_bar(dev, 2, PCI_BASE_ADDRESS_SPACE_IO, mr);
++    mr = g_new(MemoryRegion, 1);
++    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar3", &d->mmio, 0xc8, 4);
++    pci_register_bar(dev, 3, PCI_BASE_ADDRESS_SPACE_IO, mr);
++    mr = g_new(MemoryRegion, 1);
++    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar4", &d->mmio, 0, 16);
++    pci_register_bar(dev, 4, PCI_BASE_ADDRESS_SPACE_IO, mr);
++
++    irq = qemu_allocate_irqs(sii3112_set_irq, d, 2);
++    for (i = 0; i < 2; i++) {
++        ide_bus_new(&s->bus[i], sizeof(s->bus[i]), DEVICE(dev), i, 1);
++        ide_init2(&s->bus[i], irq[i]);
++
++        bmdma_init(&s->bus[i], &s->bmdma[i], s);
++        s->bmdma[i].bus = &s->bus[i];
++        ide_register_restart_cb(&s->bus[i]);
++    }
++    qemu_register_reset(sii3112_reset, s);
++}
++
++static void sii3112_pci_exitfn(PCIDevice *dev)
++{
++    PCIIDEState *d = PCI_IDE(dev);
++    int i;
++
++    for (i = 0; i < 2; ++i) {
++        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].extra_io);
++        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].addr_ioport);
++    }
++}
++
++static void sii3112_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    PCIDeviceClass *pd = PCI_DEVICE_CLASS(klass);
++
++    pd->vendor_id = 0x1095;
++    pd->device_id = 0x3112;
++    pd->class_id = PCI_CLASS_STORAGE_RAID;
++    pd->revision = 1;
++    pd->realize = sii3112_pci_realize;
++    pd->exit = sii3112_pci_exitfn;
++    dc->desc = "SiI3112A SATA controller";
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++}
++
++static const TypeInfo sii3112_pci_info = {
++    .name = TYPE_SII3112_PCI,
++    .parent = TYPE_PCI_IDE,
++    .instance_size = sizeof(SiI3112PCIState),
++    .class_init = sii3112_pci_class_init,
++};
++
++static void sii3112_register_types(void)
++{
++    type_register_static(&sii3112_pci_info);
++}
++
++type_init(sii3112_register_types)
 -- 
 2.7.6
