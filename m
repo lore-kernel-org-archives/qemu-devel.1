@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1djKY3-0004VW-HW
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 03:21:30 -0400
+	(envelope-from <clg@kaod.org>) id 1djKw3-0005rr-MI
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 03:46:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1djKY0-00056d-Bh
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 03:21:27 -0400
-References: <alpine.BSF.2.21.1708181526340.19483@zero.eik.bme.hu>
-	<0e3383a1-33b5-8238-75e2-48e36b7daea4@adacore.com>
-	<alpine.BSF.2.21.1708200101080.95468@zero.eik.bme.hu>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <03c6e36f-c79d-3174-772d-5cd361703f7d@ilande.co.uk>
-Date: Sun, 20 Aug 2017 08:20:45 +0100
+	(envelope-from <clg@kaod.org>) id 1djKw0-0006p3-HG
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 03:46:15 -0400
+Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:40337)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1djKw0-0006Yl-9d
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 03:46:12 -0400
+Received: from player763.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id A272B7648D
+	for <qemu-devel@nongnu.org>; Sun, 20 Aug 2017 09:46:02 +0200 (CEST)
+References: <1503178840-21512-1-git-send-email-minyard@acm.org>
+	<1503178840-21512-2-git-send-email-minyard@acm.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <ffb62325-a4f0-c438-a38b-4d63f76ee163@kaod.org>
+Date: Sun, 20 Aug 2017 09:45:57 +0200
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.1708200101080.95468@zero.eik.bme.hu>
+In-Reply-To: <1503178840-21512-2-git-send-email-minyard@acm.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] BookE MMU question
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] ipmi: Fix SEL get/set time commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,83 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, KONRAD Frederic <frederic.konrad@adacore.com>
-Cc: Francois Revol <revol@free.fr>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: minyard@acm.org, qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Corey Minyard <cminyard@mvista.com>
 
-On 20/08/17 00:19, BALATON Zoltan wrote:
-
-> This function is defined in AROS/arch/ppc-sam440/kernel/mmu.c:95 at the
-> link below. I think it basically generates tlbwe instructions to set up
-> a TLB entry to map the region to a virtual address.
+On 08/19/2017 11:40 PM, minyard@acm.org wrote:
+> From: Corey Minyard <cminyard@mvista.com>
 > 
->> eg: what is in the MAS registers before the tlbwe
->> happen (checking field by field) and what is the tlb which is
->> created / expected.
+> The minimum message size was wrong for both commands, for getting
+> the time it's zero and for setting the time it's 4.  And the data
+> was being pulled from the wrong place in the set time message, it
+> should be the first four bytes.
 > 
-> I don't know what MAS registers are. Is that specific to BOOKE206? The
-> PPC440 core in this board has POWERPC_MMU_BOOKE, not 206 but I don't
-> know what's the difference between these. The TLB entries before and
-> after the tlbwe instructions are logged below and I think TLB 0 should
-> match the address that is tried to be accessed (ff7fd648) but it fails
-> and returns refused. Does it ignore the new TLB entry just set for some
-> reason?
+> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+> ---
+>  hw/ipmi/ipmi_bmc_sim.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
->> I got a pretty similar problem with a MAV V2 MMU and fixed size
->> tlb.. But I don't think it affects your device.. I'm not totally
->> sure though.
+> diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
+> index 277c28c..1c732aa 100644
+> --- a/hw/ipmi/ipmi_bmc_sim.c
+> +++ b/hw/ipmi/ipmi_bmc_sim.c
+> @@ -1571,7 +1571,7 @@ static void set_sel_time(IPMIBmcSim *ibs,
+>      uint32_t val;
+>      struct ipmi_time now;
+>  
+> -    val = cmd[2] | (cmd[3] << 8) | (cmd[4] << 16) | (cmd[5] << 24);
+> +    val = cmd[0] | (cmd[1] << 8) | (cmd[2] << 16) | (cmd[3] << 24);
+
+I am confused. I thought cmd[0] and cmd[1] were the 'netfun' and 
+'cmd' bytes, data beginning at byte 2. Isn't it the case for this
+command also ? 
+
+C.
+
+
+>      ipmi_gettime(&now);
+>      ibs->sel.time_offset = now.tv_sec - ((long) val);
+>  }
+> @@ -1802,8 +1802,8 @@ static const IPMICmdHandler storage_cmds[] = {
+>      [IPMI_CMD_GET_SEL_ENTRY] = { get_sel_entry, 8 },
+>      [IPMI_CMD_ADD_SEL_ENTRY] = { add_sel_entry, 18 },
+>      [IPMI_CMD_CLEAR_SEL] = { clear_sel, 8 },
+> -    [IPMI_CMD_GET_SEL_TIME] = { get_sel_time, 6 },
+> -    [IPMI_CMD_SET_SEL_TIME] = { set_sel_time },
+> +    [IPMI_CMD_GET_SEL_TIME] = { get_sel_time },
+> +    [IPMI_CMD_SET_SEL_TIME] = { set_sel_time, 4 },
+>  };
+>  
+>  static const IPMINetfn storage_netfn = {
 > 
-> Do you have more info on this? Is it this patch: "booke206: fix tlbnps
-> for fixed size TLB"? Unfortunately I don't understand that code well
-> enough to tell if it's the same problem but your changes are specific to
-> mmu_booke206 so they won't fix this problem with mmu_booke for sure.
-> 
-> Thanks for the suggestions but I think I need more help with this.
-
-I've only spent a small amount of time in PPC MMU land via OpenBIOS but
-the obvious thing that stands out here is this:
-
-helper_440_tlbwe word 0 entry 0 value ff7f7210
-tlb_flush_nocheck: (count: 36)
-helper_440_tlbwe word 1 entry 0 value 007f7000
-tlb_flush_nocheck: (count: 37)
-helper_440_tlbwe word 2 entry 0 value 0000081b
-ppcemb_tlb_check: TLB 0 address ff7fd648 PID 0 <=> ff7f7000 fffff000 0 3b
-mmubooke_check_tlb: TLB entry not found
-
-[KRN] map_region(007f7000, ff7f7000, 00009000, 081b):
-[KRN] TLB00: 007f7000 - 007f7fff : ff7f7000 - ff7f7fff:
-
-Here you can see that map_region() in
-https://github.com/ezrec/AROS-mirror/blob/ABI_V1/AROS/arch/ppc-sam440/kernel/mmu.c
-is requesting to map a region of size 0x9000 but the size of the
-resulting TLB entry is only 0x1000 (4KB) which I believe is default PPC
-page size.
-
-So I would suggest 2 things here:
-
-1) Confirm AROS's map_region() iterates once for the 0xff7f7000 mapping
-
-On the plus side, it seems that you are fortunate to be able to builg
-the AROS sources yourself. Make sure that the while (length) {} loop in
-map_region() iterates only once for the 0xff7f7000 mapping, i.e. only
-one TLB entry is expected to be created for map_region(007f7000,
-ff7f7000, 00009000, 081b).
-
-My reading of the comments in the source hints that it should be (i.e.
-references to minimising the number of TLB entries) however it's always
-worth checking to be sure.
-
-2) Check the mask in QEMU's ppcemb_tlb_check()
-
-If the above loop iterates only once then you'll need to figure out why
-the region size in the TLB is set to 0x1000 rather than 0x9000. I see
-that ppcemb_tlb_check() applies a mask to the address based upon
-tlb->size, so I'd work backwards and see where that is being set.
-
-And of course read the BookE specification to understand exactly what
-types of TLB mapping are available, particularly with respect to page size.
-
-
-ATB,
-
-Mark.
