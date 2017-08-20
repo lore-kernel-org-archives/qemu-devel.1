@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1djUL0-00045f-5A
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 13:48:41 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1djUL0-00047D-Lz
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 13:48:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1djUKx-000565-2d
+	(envelope-from <balaton@eik.bme.hu>) id 1djUKx-00056B-2D
 	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 13:48:38 -0400
-Message-Id: <1815e11378b48532e902e0138a58557c297c3eb2.1503249785.git.balaton@eik.bme.hu>
+Message-Id: <d9d735634eb1c6af360bf0aca2131a2822606c40.1503249785.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1503249785.git.balaton@eik.bme.hu>
 References: <cover.1503249785.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Sun, 20 Aug 2017 19:23:05 +0200
-Subject: [Qemu-devel] [PATCH 09/15] hw/ide: Emulate SiI3112 SATA controller
+Subject: [Qemu-devel] [PATCH 10/15] ppc440: Add emulation of plb-pcix
+ controller found in some 440 SoCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,403 +21,553 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Francois Revol <revol@free.fr>, John Snow <jsnow@redhat.com>
+Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Francois Revol <revol@free.fr>
 
-This is a common generic PCI SATA conroller that is also used in PCs
-but more importantly guests running on the Sam460ex board prefer this
-card and have a driver for it (unlike for other SATA controllers
-already emulated).
+This is the PCIX controller found in newer 440 core SoCs e.g. the AMMC
+460EX. The device tree refers to this as plb-pcix compared to the
+plb-pci controller in older 440 SoCs.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- hw/ide/Makefile.objs |   1 +
- hw/ide/sii3112.c     | 369 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 370 insertions(+)
- create mode 100644 hw/ide/sii3112.c
+ hw/ppc/Makefile.objs |   2 +-
+ hw/ppc/ppc440_pcix.c | 516 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 517 insertions(+), 1 deletion(-)
+ create mode 100644 hw/ppc/ppc440_pcix.c
 
-diff --git a/hw/ide/Makefile.objs b/hw/ide/Makefile.objs
-index 729e9bd..76f3d6d 100644
---- a/hw/ide/Makefile.objs
-+++ b/hw/ide/Makefile.objs
-@@ -10,3 +10,4 @@ common-obj-$(CONFIG_IDE_VIA) += via.o
- common-obj-$(CONFIG_MICRODRIVE) += microdrive.o
- common-obj-$(CONFIG_AHCI) += ahci.o
- common-obj-$(CONFIG_AHCI) += ich.o
-+common-obj-$(CONFIG_IDE_SII3112) += sii3112.o
-diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
+diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+index 7efc686..fc39fe4 100644
+--- a/hw/ppc/Makefile.objs
++++ b/hw/ppc/Makefile.objs
+@@ -13,7 +13,7 @@ endif
+ obj-$(CONFIG_PSERIES) += spapr_rtas_ddw.o
+ # PowerPC 4xx boards
+ obj-y += ppc405_boards.o ppc4xx_devs.o ppc405_uc.o ppc440_bamboo.o
+-obj-y += ppc4xx_pci.o
++obj-y += ppc4xx_pci.o ppc440_pcix.o
+ # PReP
+ obj-$(CONFIG_PREP) += prep.o
+ obj-$(CONFIG_PREP) += prep_systemio.o
+diff --git a/hw/ppc/ppc440_pcix.c b/hw/ppc/ppc440_pcix.c
 new file mode 100644
-index 0000000..9ec8cd1
+index 0000000..5c2ceec
 --- /dev/null
-+++ b/hw/ide/sii3112.c
-@@ -0,0 +1,369 @@
++++ b/hw/ppc/ppc440_pcix.c
+@@ -0,0 +1,516 @@
 +/*
-+ * QEMU SiI3112A PCI to Serial ATA Controller Emulation
++ * Emulation of the ibm,plb-pcix PCI controller
++ * This is found in some 440 SoCs e.g. the 460EX.
 + *
-+ * Copyright (C) 2017 BALATON Zoltan <balaton@eik.bme.hu>
++ * Copyright (c) 2016 BALATON Zoltan
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
++ * Derived from ppc4xx_pci.c and pci-host/ppce500.c
 + *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License, version 2, as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+/* For documentation on this and similar cards see:
-+ * http://wiki.osdev.org/User:Quok/Silicon_Image_Datasheets
-+ */
++#include "qemu/osdep.h"
++#include "qemu/error-report.h"
++#include "hw/hw.h"
++#include "hw/ppc/ppc.h"
++#include "hw/ppc/ppc4xx.h"
++#include "hw/pci/pci.h"
++#include "hw/pci/pci_host.h"
++#include "exec/address-spaces.h"
 +
-+#include <qemu/osdep.h>
-+#include <hw/ide/pci.h>
++/*#define DEBUG_PCI*/
 +
-+#ifdef DEBUG_IDE
++#ifdef DEBUG_PCI
 +#define DPRINTF(fmt, ...) fprintf(stderr, fmt, ## __VA_ARGS__);
 +#else
 +#define DPRINTF(fmt, ...)
 +#endif /* DEBUG */
 +
-+#define TYPE_SII3112_PCI "sii3112"
-+#define SII3112_PCI(obj) OBJECT_CHECK(SiI3112PCIState, (obj), \
-+                         TYPE_SII3112_PCI)
++struct PLBOutMap {
++    uint64_t la;
++    uint64_t pcia;
++    uint32_t sa;
++    MemoryRegion mr;
++};
 +
-+typedef struct SiI3112Regs {
-+    uint32_t confstat;
-+    uint32_t scontrol;
-+    uint16_t sien;
-+    uint8_t swdata;
-+} SiI3112Regs;
++struct PLBInMap {
++    uint64_t sa;
++    uint64_t la;
++    MemoryRegion mr;
++};
 +
-+typedef struct SiI3112PCIState {
-+    PCIIDEState i;
-+    MemoryRegion mmio;
-+    SiI3112Regs regs[2];
-+} SiI3112PCIState;
++#define TYPE_PPC440_PCIX_HOST_BRIDGE "ppc440-pcix-host"
++#define PPC440_PCIX_HOST_BRIDGE(obj) \
++    OBJECT_CHECK(PPC440PCIXState, (obj), TYPE_PPC440_PCIX_HOST_BRIDGE)
 +
-+static uint64_t sii3112_reg_read(void *opaque, hwaddr addr,
-+                                unsigned int size)
++#define PPC440_PCIX_NR_POMS 3
++#define PPC440_PCIX_NR_PIMS 3
++
++typedef struct PPC440PCIXState {
++    PCIHostState parent_obj;
++
++    PCIDevice *dev;
++    struct PLBOutMap pom[PPC440_PCIX_NR_POMS];
++    struct PLBInMap pim[PPC440_PCIX_NR_PIMS];
++    uint32_t sts;
++    qemu_irq irq[PCI_NUM_PINS];
++    AddressSpace bm_as;
++    MemoryRegion bm;
++
++    MemoryRegion container;
++    MemoryRegion iomem;
++    MemoryRegion busmem;
++} PPC440PCIXState;
++
++#define PPC440_REG_BASE     0x80000
++#define PPC440_REG_SIZE     0xff
++
++#define PCIC0_CFGADDR       0x0
++#define PCIC0_CFGDATA       0x4
++
++#define PCIX0_POM0LAL       0x68
++#define PCIX0_POM0LAH       0x6c
++#define PCIX0_POM0SA        0x70
++#define PCIX0_POM0PCIAL     0x74
++#define PCIX0_POM0PCIAH     0x78
++#define PCIX0_POM1LAL       0x7c
++#define PCIX0_POM1LAH       0x80
++#define PCIX0_POM1SA        0x84
++#define PCIX0_POM1PCIAL     0x88
++#define PCIX0_POM1PCIAH     0x8c
++#define PCIX0_POM2SA        0x90
++
++#define PCIX0_PIM0SAL       0x98
++#define PCIX0_PIM0LAL       0x9c
++#define PCIX0_PIM0LAH       0xa0
++#define PCIX0_PIM1SA        0xa4
++#define PCIX0_PIM1LAL       0xa8
++#define PCIX0_PIM1LAH       0xac
++#define PCIX0_PIM2SAL       0xb0
++#define PCIX0_PIM2LAL       0xb4
++#define PCIX0_PIM2LAH       0xb8
++#define PCIX0_PIM0SAH       0xf8
++#define PCIX0_PIM2SAH       0xfc
++
++#define PCIX0_STS           0xe0
++
++#define PCI_ALL_SIZE        (PPC440_REG_BASE + PPC440_REG_SIZE)
++
++static void ppc440_pcix_clear_region(MemoryRegion *parent,
++                                     MemoryRegion *mem)
 +{
-+    SiI3112PCIState *d = opaque;
-+    uint64_t val = 0;
++    if (memory_region_is_mapped(mem)) {
++        memory_region_del_subregion(parent, mem);
++        object_unparent(OBJECT(mem));
++    }
++}
++
++/* DMA mapping */
++static void ppc440_pcix_update_pim(PPC440PCIXState *s, int idx)
++{
++    MemoryRegion *mem = &s->pim[idx].mr;
++    char *name;
++    uint64_t size;
++
++    /* Before we modify anything, unmap and destroy the region */
++    ppc440_pcix_clear_region(&s->bm, mem);
++
++    if (!(s->pim[idx].sa & 1)) {
++        /* Not enabled, nothing to do */
++        return;
++    }
++
++    name = g_strdup_printf("PCI Inbound Window %d", idx);
++    size = ~(s->pim[idx].sa & ~7ULL) + 1;
++    memory_region_init_alias(mem, OBJECT(s), name, get_system_memory(),
++                             s->pim[idx].la, size);
++    memory_region_add_subregion_overlap(&s->bm, 0, mem, -1);
++    g_free(name);
++
++    DPRINTF("%s: Added window %d of size=%#"PRIx64" to CPU=%#"PRIx64"\n",
++            __func__, idx, size, s->pim[idx].la);
++}
++
++/* BAR mapping */
++static void ppc440_pcix_update_pom(PPC440PCIXState *s, int idx)
++{
++    MemoryRegion *mem = &s->pom[idx].mr;
++    MemoryRegion *address_space_mem = get_system_memory();
++    char *name;
++    uint32_t size;
++
++    /* Before we modify anything, unmap and destroy the region */
++    ppc440_pcix_clear_region(address_space_mem, mem);
++
++    if (!(s->pom[idx].sa & 1)) {
++        /* Not enabled, nothing to do */
++        return;
++    }
++
++    name = g_strdup_printf("PCI Outbound Window %d", idx);
++    size = ~(s->pom[idx].sa & 0xfffffffe) + 1;
++    if (!size) {
++        size = 0xffffffff;
++    }
++    memory_region_init_alias(mem, OBJECT(s), name, &s->busmem,
++                             s->pom[idx].pcia, size);
++    memory_region_add_subregion(address_space_mem, s->pom[idx].la, mem);
++    g_free(name);
++
++    DPRINTF("%s: Added window %d of size=%#x from CPU=%#"PRIx64
++            " to PCI=%#"PRIx64"\n", __func__, idx, size, s->pom[idx].la,
++            s->pom[idx].pcia);
++}
++
++static void ppc440_pcix_reg_write4(void *opaque, hwaddr addr,
++                                   uint64_t val, unsigned size)
++{
++    struct PPC440PCIXState *s = opaque;
++
++    DPRINTF("%s: addr 0x%"PRIx64 " = %"PRIx64 "\n", __func__, addr, val);
++    switch (addr) {
++    case PCI_VENDOR_ID ... PCI_MAX_LAT:
++        stl_le_p(s->dev->config + addr, val);
++        break;
++
++    case PCIX0_POM0LAL:
++        s->pom[0].la &= 0xffffffff00000000ULL;
++        s->pom[0].la |= val;
++        ppc440_pcix_update_pom(s, 0);
++        break;
++    case PCIX0_POM0LAH:
++        s->pom[0].la &= 0xffffffffULL;
++        s->pom[0].la |= val << 32;
++        ppc440_pcix_update_pom(s, 0);
++        break;
++    case PCIX0_POM0SA:
++        s->pom[0].sa = val;
++        ppc440_pcix_update_pom(s, 0);
++        break;
++    case PCIX0_POM0PCIAL:
++        s->pom[0].pcia &= 0xffffffff00000000ULL;
++        s->pom[0].pcia |= val;
++        ppc440_pcix_update_pom(s, 0);
++        break;
++    case PCIX0_POM0PCIAH:
++        s->pom[0].pcia &= 0xffffffffULL;
++        s->pom[0].pcia |= val << 32;
++        ppc440_pcix_update_pom(s, 0);
++        break;
++    case PCIX0_POM1LAL:
++        s->pom[1].la &= 0xffffffff00000000ULL;
++        s->pom[1].la |= val;
++        ppc440_pcix_update_pom(s, 1);
++        break;
++    case PCIX0_POM1LAH:
++        s->pom[1].la &= 0xffffffffULL;
++        s->pom[1].la |= val << 32;
++        ppc440_pcix_update_pom(s, 1);
++        break;
++    case PCIX0_POM1SA:
++        s->pom[1].sa = val;
++        ppc440_pcix_update_pom(s, 1);
++        break;
++    case PCIX0_POM1PCIAL:
++        s->pom[1].pcia &= 0xffffffff00000000ULL;
++        s->pom[1].pcia |= val;
++        ppc440_pcix_update_pom(s, 1);
++        break;
++    case PCIX0_POM1PCIAH:
++        s->pom[1].pcia &= 0xffffffffULL;
++        s->pom[1].pcia |= val << 32;
++        ppc440_pcix_update_pom(s, 1);
++        break;
++    case PCIX0_POM2SA:
++        s->pom[2].sa = val;
++        break;
++
++    case PCIX0_PIM0SAL:
++        s->pim[0].sa &= 0xffffffff00000000ULL;
++        s->pim[0].sa |= val;
++        ppc440_pcix_update_pim(s, 0);
++        break;
++    case PCIX0_PIM0LAL:
++        s->pim[0].la &= 0xffffffff00000000ULL;
++        s->pim[0].la |= val;
++        ppc440_pcix_update_pim(s, 0);
++        break;
++    case PCIX0_PIM0LAH:
++        s->pim[0].la &= 0xffffffffULL;
++        s->pim[0].la |= val << 32;
++        ppc440_pcix_update_pim(s, 0);
++        break;
++    case PCIX0_PIM1SA:
++        s->pim[1].sa = val;
++        ppc440_pcix_update_pim(s, 1);
++        break;
++    case PCIX0_PIM1LAL:
++        s->pim[1].la &= 0xffffffff00000000ULL;
++        s->pim[1].la |= val;
++        ppc440_pcix_update_pim(s, 1);
++        break;
++    case PCIX0_PIM1LAH:
++        s->pim[1].la &= 0xffffffffULL;
++        s->pim[1].la |= val << 32;
++        ppc440_pcix_update_pim(s, 1);
++        break;
++    case PCIX0_PIM2SAL:
++        s->pim[2].sa &= 0xffffffff00000000ULL;
++        s->pim[2].sa = val;
++        ppc440_pcix_update_pim(s, 2);
++        break;
++    case PCIX0_PIM2LAL:
++        s->pim[2].la &= 0xffffffff00000000ULL;
++        s->pim[2].la |= val;
++        ppc440_pcix_update_pim(s, 2);
++        break;
++    case PCIX0_PIM2LAH:
++        s->pim[2].la &= 0xffffffffULL;
++        s->pim[2].la |= val << 32;
++        ppc440_pcix_update_pim(s, 2);
++        break;
++
++    case PCIX0_STS:
++        s->sts = val;
++        break;
++
++    case PCIX0_PIM0SAH:
++        s->pim[0].sa &= 0xffffffffULL;
++        s->pim[0].sa |= val << 32;
++        ppc440_pcix_update_pim(s, 0);
++        break;
++    case PCIX0_PIM2SAH:
++        s->pim[2].sa &= 0xffffffffULL;
++        s->pim[2].sa |= val << 32;
++        ppc440_pcix_update_pim(s, 2);
++        break;
++
++    default:
++        printf("%s: unhandled PCI internal register 0x%lx\n", __func__,
++               (unsigned long)addr);
++        break;
++    }
++}
++
++static uint64_t ppc440_pcix_reg_read4(void *opaque, hwaddr addr,
++                                     unsigned size)
++{
++    struct PPC440PCIXState *s = opaque;
++    uint32_t val;
 +
 +    switch (addr) {
-+    case 0x00:
-+        val = d->i.bmdma[0].cmd;
++    case PCI_VENDOR_ID ... PCI_MAX_LAT:
++        val = ldl_le_p(s->dev->config + addr);
 +        break;
-+    case 0x01:
-+        val = d->regs[0].swdata;
++
++    case PCIX0_POM0LAL:
++        val = s->pom[0].la;
 +        break;
-+    case 0x02:
-+        val = d->i.bmdma[0].status;
++    case PCIX0_POM0LAH:
++        val = s->pom[0].la >> 32;
 +        break;
-+    case 0x03:
-+        val = 0;
++    case PCIX0_POM0SA:
++        val = s->pom[0].sa;
 +        break;
-+    case 0x04 ... 0x07:
-+        val = bmdma_addr_ioport_ops.read(&d->i.bmdma[0], addr - 4, size);
++    case PCIX0_POM0PCIAL:
++        val = s->pom[0].pcia;
 +        break;
-+    case 0x08:
-+        val = d->i.bmdma[1].cmd;
++    case PCIX0_POM0PCIAH:
++        val = s->pom[0].pcia >> 32;
 +        break;
-+    case 0x09:
-+        val = d->regs[1].swdata;
++    case PCIX0_POM1LAL:
++        val = s->pom[1].la;
 +        break;
-+    case 0x0a:
-+        val = d->i.bmdma[1].status;
++    case PCIX0_POM1LAH:
++        val = s->pom[1].la >> 32;
 +        break;
-+    case 0x0b:
-+        val = 0;
++    case PCIX0_POM1SA:
++        val = s->pom[1].sa;
 +        break;
-+    case 0x0c ... 0x0f:
-+        val = bmdma_addr_ioport_ops.read(&d->i.bmdma[1], addr - 12, size);
++    case PCIX0_POM1PCIAL:
++        val = s->pom[1].pcia;
 +        break;
-+    case 0x10:
-+        val = d->i.bmdma[0].cmd;
-+        val |= (d->regs[0].confstat & (1UL << 11) ? (1 << 4) : 0); /*SATAINT0*/
-+        val |= (d->regs[1].confstat & (1UL << 11) ? (1 << 6) : 0); /*SATAINT1*/
-+        val |= (d->i.bmdma[1].status & BM_STATUS_INT ? (1 << 14) : 0);
-+        val |= d->i.bmdma[0].status << 16;
-+        val |= d->i.bmdma[1].status << 24;
++    case PCIX0_POM1PCIAH:
++        val = s->pom[1].pcia >> 32;
 +        break;
-+    case 0x18:
-+        val = d->i.bmdma[1].cmd;
-+        val |= (d->regs[1].confstat & (1UL << 11) ? (1 << 4) : 0);
-+        val |= d->i.bmdma[1].status << 16;
++    case PCIX0_POM2SA:
++        val = s->pom[2].sa;
 +        break;
-+    case 0x80 ... 0x87:
-+        if (size == 1) {
-+            val = ide_ioport_read(&d->i.bus[0], addr - 0x80);
-+        } else if (addr == 0x80) {
-+            val = (size == 2) ? ide_data_readw(&d->i.bus[0], 0) :
-+                                ide_data_readl(&d->i.bus[0], 0);
-+        } else {
-+            val = (1ULL << (size * 8)) - 1;
-+        }
++
++    case PCIX0_PIM0SAL:
++        val = s->pim[0].sa;
 +        break;
-+    case 0x8a:
-+        val = (size == 1) ? ide_status_read(&d->i.bus[0], 4) :
-+                            (1ULL << (size * 8)) - 1;
++    case PCIX0_PIM0LAL:
++        val = s->pim[0].la;
 +        break;
-+    case 0xa0:
-+        val = d->regs[0].confstat;
++    case PCIX0_PIM0LAH:
++        val = s->pim[0].la >> 32;
 +        break;
-+    case 0xc0 ... 0xc7:
-+        if (size == 1) {
-+            val = ide_ioport_read(&d->i.bus[1], addr - 0xc0);
-+        } else if (addr == 0xc0) {
-+            val = (size == 2) ? ide_data_readw(&d->i.bus[1], 0) :
-+                                ide_data_readl(&d->i.bus[1], 0);
-+        } else {
-+            val = (1ULL << (size * 8)) - 1;
-+        }
++    case PCIX0_PIM1SA:
++        val = s->pim[1].sa;
 +        break;
-+    case 0xca:
-+        val = (size == 1) ? ide_status_read(&d->i.bus[0], 4) :
-+                            (1ULL << (size * 8)) - 1;
++    case PCIX0_PIM1LAL:
++        val = s->pim[1].la;
 +        break;
-+    case 0xe0:
-+        val = d->regs[1].confstat;
++    case PCIX0_PIM1LAH:
++        val = s->pim[1].la >> 32;
 +        break;
-+    case 0x100:
-+        val = d->regs[0].scontrol;
++    case PCIX0_PIM2SAL:
++        val = s->pim[2].sa;
 +        break;
-+    case 0x104:
-+        val = (d->i.bus[0].ifs[0].blk) ? 0x113 : 0;
++    case PCIX0_PIM2LAL:
++        val = s->pim[2].la;
 +        break;
-+    case 0x148:
-+        val = d->regs[0].sien << 16;
++    case PCIX0_PIM2LAH:
++        val = s->pim[2].la >> 32;
 +        break;
-+    case 0x180:
-+        val = d->regs[1].scontrol;
++
++    case PCIX0_STS:
++        val = s->sts;
 +        break;
-+    case 0x184:
-+        val = (d->i.bus[1].ifs[0].blk) ? 0x113 : 0;
++
++    case PCIX0_PIM0SAH:
++        val = s->pim[0].sa  >> 32;
 +        break;
-+    case 0x1c8:
-+        val = d->regs[1].sien << 16;
++    case PCIX0_PIM2SAH:
++        val = s->pim[2].sa  >> 32;
 +        break;
++
 +    default:
++        printf("%s: invalid PCI internal register 0x%lx\n", __func__,
++               (unsigned long)addr);
 +        val = 0;
 +    }
-+    DPRINTF("%s: addr 0x%"PRIx64 " size %d = %"PRIx64 "\n",
-+            __func__, addr, size, val);
++
++    DPRINTF("%s: addr 0x%"PRIx64 " = %"PRIx32 "\n", __func__, addr, val);
 +    return val;
 +}
 +
-+static void sii3112_reg_write(void *opaque, hwaddr addr,
-+                              uint64_t val, unsigned int size)
-+{
-+    SiI3112PCIState *d = opaque;
-+
-+    DPRINTF("%s: addr 0x%"PRIx64 " size %d = %"PRIx64 "\n",
-+            __func__, addr, size, val);
-+    switch (addr) {
-+    case 0x00:
-+    case 0x10:
-+        bmdma_cmd_writeb(&d->i.bmdma[0], val);
-+        break;
-+    case 0x01:
-+    case 0x11:
-+        d->regs[0].swdata = val & 0x3f;
-+        break;
-+    case 0x02:
-+    case 0x12:
-+        d->i.bmdma[0].status = (val & 0x60) | (d->i.bmdma[0].status & 1) |
-+                               (d->i.bmdma[0].status & ~val & 6);
-+        break;
-+    case 0x04 ... 0x07:
-+        bmdma_addr_ioport_ops.write(&d->i.bmdma[0], addr - 4, val, size);
-+        break;
-+    case 0x08:
-+    case 0x18:
-+        bmdma_cmd_writeb(&d->i.bmdma[1], val);
-+        break;
-+    case 0x09:
-+    case 0x19:
-+        d->regs[1].swdata = val & 0x3f;
-+        break;
-+    case 0x0a:
-+    case 0x1a:
-+        d->i.bmdma[1].status = (val & 0x60) | (d->i.bmdma[1].status & 1) |
-+                               (d->i.bmdma[1].status & ~val & 6);
-+        break;
-+    case 0x0c ... 0x0f:
-+        bmdma_addr_ioport_ops.write(&d->i.bmdma[1], addr - 12, val, size);
-+        break;
-+    case 0x80 ... 0x87:
-+        if (size == 1) {
-+            ide_ioport_write(&d->i.bus[0], addr - 0x80, val);
-+        } else if (addr == 0x80) {
-+            if (size == 2) {
-+                ide_data_writew(&d->i.bus[0], 0, val);
-+            } else {
-+                ide_data_writel(&d->i.bus[0], 0, val);
-+            }
-+        }
-+        break;
-+    case 0x8a:
-+        if (size == 1) {
-+            ide_cmd_write(&d->i.bus[0], 4, val);
-+        }
-+        break;
-+    case 0xc0 ... 0xc7:
-+        if (size == 1) {
-+            ide_ioport_write(&d->i.bus[1], addr - 0xc0, val);
-+        } else if (addr == 0xc0) {
-+            if (size == 2) {
-+                ide_data_writew(&d->i.bus[1], 0, val);
-+            } else {
-+                ide_data_writel(&d->i.bus[1], 0, val);
-+            }
-+        }
-+        break;
-+    case 0xca:
-+        if (size == 1) {
-+            ide_cmd_write(&d->i.bus[1], 4, val);
-+        }
-+        break;
-+    case 0x100:
-+        d->regs[0].scontrol = val & 0xfff;
-+        if (val & 1) {
-+            ide_bus_reset(&d->i.bus[0]);
-+        }
-+        break;
-+    case 0x148:
-+        d->regs[0].sien = (val >> 16) & 0x3eed;
-+        break;
-+    case 0x180:
-+        d->regs[1].scontrol = val & 0xfff;
-+        if (val & 1) {
-+            ide_bus_reset(&d->i.bus[1]);
-+        }
-+        break;
-+    case 0x1c8:
-+        d->regs[1].sien = (val >> 16) & 0x3eed;
-+        break;
-+    default:
-+        val = 0;
-+    }
-+}
-+
-+static const MemoryRegionOps sii3112_reg_ops = {
-+    .read = sii3112_reg_read,
-+    .write = sii3112_reg_write,
++static const MemoryRegionOps pci_reg_ops = {
++    .read = ppc440_pcix_reg_read4,
++    .write = ppc440_pcix_reg_write4,
 +    .endianness = DEVICE_LITTLE_ENDIAN,
 +};
 +
-+/* the PCI irq level is the logical OR of the two channels */
-+static void sii3112_update_irq(SiI3112PCIState *s)
++static void ppc440_pcix_reset(DeviceState *dev)
 +{
-+    int i, set = 0;
-+
-+    for (i = 0; i < 2; i++) {
-+        set |= s->regs[i].confstat & (1UL << 11);
-+    }
-+    pci_set_irq(PCI_DEVICE(s), (set ? 1 : 0));
-+}
-+
-+static void sii3112_set_irq(void *opaque, int channel, int level)
-+{
-+    SiI3112PCIState *s = opaque;
-+
-+    DPRINTF("%s: channel %d level %d\n", __func__, channel, level);
-+    if (level) {
-+        s->regs[channel].confstat |= (1UL << 11);
-+    } else {
-+        s->regs[channel].confstat &= ~(1UL << 11);
-+    }
-+
-+    sii3112_update_irq(s);
-+}
-+
-+static void sii3112_reset(void *opaque)
-+{
-+    SiI3112PCIState *s = opaque;
++    struct PPC440PCIXState *s = PPC440_PCIX_HOST_BRIDGE(dev);
 +    int i;
 +
-+    for (i = 0; i < 2; i++) {
-+        s->regs[i].confstat = 0x6515 << 16;
-+        ide_bus_reset(&s->i.bus[i]);
++    for (i = 0; i < PPC440_PCIX_NR_POMS; i++) {
++        ppc440_pcix_clear_region(get_system_memory(), &s->pom[i].mr);
 +    }
++    for (i = 0; i < PPC440_PCIX_NR_PIMS; i++) {
++        ppc440_pcix_clear_region(&s->bm, &s->pim[i].mr);
++    }
++    memset(s->pom, 0, sizeof(s->pom));
++    memset(s->pim, 0, sizeof(s->pim));
++    for (i = 0; i < PPC440_PCIX_NR_PIMS; i++) {
++        s->pim[i].sa = 0xffffffff00000000ULL;
++    }
++    s->sts = 0;
 +}
 +
-+static void sii3112_pci_realize(PCIDevice *dev, Error **errp)
++/* All pins from each slot are tied to a single board IRQ.
++ * This may need further refactoring for other boards. */
++static int ppc440_pcix_map_irq(PCIDevice *pci_dev, int irq_num)
 +{
-+    SiI3112PCIState *d = SII3112_PCI(dev);
-+    PCIIDEState *s = PCI_IDE(dev);
-+    MemoryRegion *mr;
-+    qemu_irq *irq;
++    int slot = pci_dev->devfn >> 3;
++
++    DPRINTF("%s: devfn %x irq %d -> %d\n", __func__,
++            pci_dev->devfn, irq_num, slot);
++
++    return slot - 1;
++}
++
++static void ppc440_pcix_set_irq(void *opaque, int irq_num, int level)
++{
++    qemu_irq *pci_irqs = opaque;
++
++    DPRINTF("%s: PCI irq %d\n", __func__, irq_num);
++    if (irq_num < 0) {
++        error_report("%s: PCI irq %d", __func__, irq_num);
++        return;
++    }
++    qemu_set_irq(pci_irqs[irq_num], level);
++}
++
++static AddressSpace *ppc440_pcix_set_iommu(PCIBus *b, void *opaque, int devfn)
++{
++    PPC440PCIXState *s = opaque;
++
++    return &s->bm_as;
++}
++
++static int ppc440_pcix_initfn(SysBusDevice *dev)
++{
++    PPC440PCIXState *s;
++    PCIHostState *h;
 +    int i;
 +
-+    pci_config_set_interrupt_pin(dev->config, 1);
-+    pci_set_byte(dev->config + PCI_CACHE_LINE_SIZE, 8);
++    h = PCI_HOST_BRIDGE(dev);
++    s = PPC440_PCIX_HOST_BRIDGE(dev);
 +
-+    memory_region_init_io(&d->mmio, OBJECT(d), &sii3112_reg_ops, d,
-+                         "sii3112.bar5", 0x200);
-+    pci_register_bar(dev, 5, PCI_BASE_ADDRESS_SPACE_MEMORY, &d->mmio);
-+
-+    mr = g_new(MemoryRegion, 1);
-+    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar0", &d->mmio, 0x80, 8);
-+    pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_IO, mr);
-+    mr = g_new(MemoryRegion, 1);
-+    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar1", &d->mmio, 0x88, 4);
-+    pci_register_bar(dev, 1, PCI_BASE_ADDRESS_SPACE_IO, mr);
-+    mr = g_new(MemoryRegion, 1);
-+    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar2", &d->mmio, 0xc0, 8);
-+    pci_register_bar(dev, 2, PCI_BASE_ADDRESS_SPACE_IO, mr);
-+    mr = g_new(MemoryRegion, 1);
-+    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar3", &d->mmio, 0xc8, 4);
-+    pci_register_bar(dev, 3, PCI_BASE_ADDRESS_SPACE_IO, mr);
-+    mr = g_new(MemoryRegion, 1);
-+    memory_region_init_alias(mr, OBJECT(d), "sii3112.bar4", &d->mmio, 0, 16);
-+    pci_register_bar(dev, 4, PCI_BASE_ADDRESS_SPACE_IO, mr);
-+
-+    irq = qemu_allocate_irqs(sii3112_set_irq, d, 2);
-+    for (i = 0; i < 2; i++) {
-+        ide_bus_new(&s->bus[i], sizeof(s->bus[i]), DEVICE(dev), i, 1);
-+        ide_init2(&s->bus[i], irq[i]);
-+
-+        bmdma_init(&s->bus[i], &s->bmdma[i], s);
-+        s->bmdma[i].bus = &s->bus[i];
-+        ide_register_restart_cb(&s->bus[i]);
++    for (i = 0; i < ARRAY_SIZE(s->irq); i++) {
++        sysbus_init_irq(dev, &s->irq[i]);
 +    }
-+    qemu_register_reset(sii3112_reset, s);
++
++    memory_region_init(&s->busmem, OBJECT(dev), "pci bus memory", UINT64_MAX);
++    h->bus = pci_register_bus(DEVICE(dev), NULL, ppc440_pcix_set_irq,
++                         ppc440_pcix_map_irq, s->irq, &s->busmem,
++                         get_system_io(), PCI_DEVFN(0, 0), 4, TYPE_PCI_BUS);
++
++    s->dev = pci_create_simple(h->bus, PCI_DEVFN(0, 0), "ppc4xx-host-bridge");
++
++    memory_region_init(&s->bm, OBJECT(s), "bm-ppc440-pcix", UINT64_MAX);
++    memory_region_add_subregion(&s->bm, 0x0, &s->busmem);
++    address_space_init(&s->bm_as, &s->bm, "pci-bm");
++    pci_setup_iommu(h->bus, ppc440_pcix_set_iommu, s);
++
++    memory_region_init(&s->container, OBJECT(s), "pci-container", PCI_ALL_SIZE);
++    memory_region_init_io(&h->conf_mem, OBJECT(s), &pci_host_conf_le_ops, h,
++                          "pci-conf-idx", 4);
++    memory_region_init_io(&h->data_mem, OBJECT(s), &pci_host_data_le_ops, h,
++                          "pci-conf-data", 4);
++    memory_region_init_io(&s->iomem, OBJECT(s), &pci_reg_ops, s,
++                          "pci.reg", PPC440_REG_SIZE);
++    memory_region_add_subregion(&s->container, PCIC0_CFGADDR, &h->conf_mem);
++    memory_region_add_subregion(&s->container, PCIC0_CFGDATA, &h->data_mem);
++    memory_region_add_subregion(&s->container, PPC440_REG_BASE, &s->iomem);
++    sysbus_init_mmio(dev, &s->container);
++
++    return 0;
 +}
 +
-+static void sii3112_pci_exitfn(PCIDevice *dev)
++static void ppc440_pcix_class_init(ObjectClass *klass, void *data)
 +{
-+    PCIIDEState *d = PCI_IDE(dev);
-+    int i;
-+
-+    for (i = 0; i < 2; ++i) {
-+        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].extra_io);
-+        memory_region_del_subregion(&d->bmdma_bar, &d->bmdma[i].addr_ioport);
-+    }
-+}
-+
-+static void sii3112_pci_class_init(ObjectClass *klass, void *data)
-+{
++    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
 +    DeviceClass *dc = DEVICE_CLASS(klass);
-+    PCIDeviceClass *pd = PCI_DEVICE_CLASS(klass);
 +
-+    pd->vendor_id = 0x1095;
-+    pd->device_id = 0x3112;
-+    pd->class_id = PCI_CLASS_STORAGE_RAID;
-+    pd->revision = 1;
-+    pd->realize = sii3112_pci_realize;
-+    pd->exit = sii3112_pci_exitfn;
-+    dc->desc = "SiI3112A SATA controller";
-+    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    k->init = ppc440_pcix_initfn;
++    dc->reset = ppc440_pcix_reset;
 +}
 +
-+static const TypeInfo sii3112_pci_info = {
-+    .name = TYPE_SII3112_PCI,
-+    .parent = TYPE_PCI_IDE,
-+    .instance_size = sizeof(SiI3112PCIState),
-+    .class_init = sii3112_pci_class_init,
++static const TypeInfo ppc440_pcix_info = {
++    .name          = TYPE_PPC440_PCIX_HOST_BRIDGE,
++    .parent        = TYPE_PCI_HOST_BRIDGE,
++    .instance_size = sizeof(PPC440PCIXState),
++    .class_init    = ppc440_pcix_class_init,
 +};
 +
-+static void sii3112_register_types(void)
++static void ppc440_pcix_register_types(void)
 +{
-+    type_register_static(&sii3112_pci_info);
++    type_register_static(&ppc440_pcix_info);
 +}
 +
-+type_init(sii3112_register_types)
++type_init(ppc440_pcix_register_types)
 -- 
 2.7.6
