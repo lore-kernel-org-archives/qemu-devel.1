@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1djQOR-0008I2-JH
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 09:35:59 -0400
+	(envelope-from <fedora.dm0@gmail.com>) id 1djJGW-0007Sn-11
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 01:59:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1djQOO-0003wW-EW
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 09:35:55 -0400
-Date: Sun, 20 Aug 2017 15:35:48 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <03c6e36f-c79d-3174-772d-5cd361703f7d@ilande.co.uk>
-Message-ID: <alpine.BSF.2.21.1708201455480.49986@zero.eik.bme.hu>
-References: <alpine.BSF.2.21.1708181526340.19483@zero.eik.bme.hu>
-	<0e3383a1-33b5-8238-75e2-48e36b7daea4@adacore.com>
-	<alpine.BSF.2.21.1708200101080.95468@zero.eik.bme.hu>
-	<03c6e36f-c79d-3174-772d-5cd361703f7d@ilande.co.uk>
+	(envelope-from <fedora.dm0@gmail.com>) id 1djJGU-0002NM-Fg
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 01:59:16 -0400
+Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:35464)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <fedora.dm0@gmail.com>)
+	id 1djJGU-0002Ms-7O
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 01:59:14 -0400
+Received: by mail-pg0-x22c.google.com with SMTP id u191so8590329pgc.2
+	for <qemu-devel@nongnu.org>; Sat, 19 Aug 2017 22:59:12 -0700 (PDT)
+Received: from callisto ([2604:5500:15:30d4:4616:792b:4666:f4bb])
+	by smtp.gmail.com with ESMTPSA id
+	q88sm19974368pfk.8.2017.08.19.22.59.09 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Sat, 19 Aug 2017 22:59:10 -0700 (PDT)
+From: David Michael <fedora.dm0@gmail.com>
+Date: Sat, 19 Aug 2017 22:58:44 -0700
+Message-ID: <87r2w6eq5n.fsf@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [Qemu-ppc]   BookE MMU question
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] scripts: Support building with Python 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,161 +31,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Francois Revol <revol@free.fr>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-On Sun, 20 Aug 2017, Mark Cave-Ayland wrote:
-> I've only spent a small amount of time in PPC MMU land via OpenBIOS but
-> the obvious thing that stands out here is this:
->
-> helper_440_tlbwe word 0 entry 0 value ff7f7210
-> tlb_flush_nocheck: (count: 36)
-> helper_440_tlbwe word 1 entry 0 value 007f7000
-> tlb_flush_nocheck: (count: 37)
-> helper_440_tlbwe word 2 entry 0 value 0000081b
-> ppcemb_tlb_check: TLB 0 address ff7fd648 PID 0 <=> ff7f7000 fffff000 0 3b
-> mmubooke_check_tlb: TLB entry not found
->
-> [KRN] map_region(007f7000, ff7f7000, 00009000, 081b):
-> [KRN] TLB00: 007f7000 - 007f7fff : ff7f7000 - ff7f7fff:
->
-> Here you can see that map_region() in
-> https://github.com/ezrec/AROS-mirror/blob/ABI_V1/AROS/arch/ppc-sam440/kernel/mmu.c
-> is requesting to map a region of size 0x9000 but the size of the
-> resulting TLB entry is only 0x1000 (4KB) which I believe is default PPC
-> page size.
->
-> So I would suggest 2 things here:
->
-> 1) Confirm AROS's map_region() iterates once for the 0xff7f7000 mapping
+This allows building with "./configure --python=python3", where
+the python3 program is at least version 3.6.  It preserves
+compatibility with Python 2.  The changes include:
 
-Unfortunately I can't test what it does on real hardware, that's why I was 
-asking if there's anyone with this board who can do some testing. Without 
-that I'm not sure how it should work, I can only test what it does on 
-QEMU.
+  - Avoiding "print" usage
+  - Using bytes with files opened in binary mode
+  - Switching .iteritems() to .items()
+  - Adding fallback imports for functions moved to other modules
 
-> On the plus side, it seems that you are fortunate to be able to builg
-> the AROS sources yourself. Make sure that the while (length) {} loop in
+Signed-off-by: David Michael <fedora.dm0@gmail.com>
+---
 
-This did not need a lot of fortune. It builds with a few simple fixes and 
-a lot of disk space and patience. I've tried adding more debug log to show 
-what the loop has selected.
+Hi,
 
-> map_region() iterates only once for the 0xff7f7000 mapping, i.e. only
-> one TLB entry is expected to be created for map_region(007f7000,
-> ff7f7000, 00009000, 081b).
->
-> My reading of the comments in the source hints that it should be (i.e.
-> references to minimising the number of TLB entries) however it's always
-> worth checking to be sure.
+I've been applying these changes when building on Fedora 26, which does
+not include any Python 2 packages by default.  It was tested with Python
+2.7 and 3.6.
 
-I've tried with the additional debug and the results are a bit unexpected 
-because now I get:
+I just saw the list of scripts that need updating on the mailing list,
+and this doesn't cover all of them, but it is enough to build a binary
+for running virtual machines with KVM.  Maybe it is still useful as a
+starting point.
 
-[KRN] lowest = 007f74e8, base = 00800000, highest = 00c08260
-[...]
-[KRN] TLB00: -I---rwxrwx ff000000 - ffffffff : 00000000: 0:ff000270 1:00000000 2:0000043f
-[...]
-[KRN] Executing at ff841690, stack at ff7fd260, bss at ff7fd848, data at ff7fffb8
+Thanks.
 
-ppcemb_tlb_check: TLB 0 address ff841690 PID 0 <=> ff000000 ff000000 0 7f
-mmubooke_check_tlb: good TLB!
-mmubooke_get_physical_address: access granted ff841690 => 0000000000841690 7 0
-tlb_set_page_with_attrs: vaddr=ff841400 paddr=0x0000000000841400 prot=7 idx=1
-ppcemb_tlb_check: TLB 0 address ff840c9c PID 0 <=> ff000000 ff000000 0 7f
-mmubooke_check_tlb: good TLB!
-mmubooke_get_physical_address: access granted ff840c9c => 0000000000840c9c 7 0
-tlb_set_page_with_attrs: vaddr=ff840c00 paddr=0x0000000000840c00 prot=7 idx=1
+David
 
-[KRN] map_region(00800000, ff800000, 00410000, 082f):
+ configure            |  6 ++++--
+ scripts/qapi.py      | 31 ++++++++++++++++++++-----------
+ scripts/qapi2texi.py | 10 +++++-----
+ scripts/signrom.py   |  4 ++--
+ 4 files changed, 31 insertions(+), 20 deletions(-)
 
-ppcemb_tlb_check: TLB 0 address ff871b7c PID 0 <=> ff000000 ff000000 0 7f
-mmubooke_check_tlb: good TLB!
-mmubooke_get_physical_address: access granted ff871b7c => 0000000000871b7c 7 0
-tlb_set_page_with_attrs: vaddr=ff871800 paddr=0x0000000000871800 prot=7 idx=1
-
-[KRN] i = 2, allowable_pages[i].mask = 000fffff:
-
-ppcemb_tlb_check: TLB 0 address ff840e0c PID 0 <=> ff000000 ff000000 0 7f
-mmubooke_check_tlb: good TLB!
-mmubooke_get_physical_address: access granted ff840e0c => 0000000000840e0c 7 0
-tlb_set_page_with_attrs: vaddr=ff840c00 paddr=0x0000000000840c00 prot=7 idx=1
-ppcemb_tlb_check: TLB 0 address ff840a18 PID 0 <=> ff000000 ff000000 0 7f
-mmubooke_check_tlb: good TLB!
-mmubooke_get_physical_address: access granted ff840a18 => 0000000000840a18 7 0
-tlb_set_page_with_attrs: vaddr=ff840800 paddr=0x0000000000840800 prot=7 idx=1
-
-[KRN] TLB00: 00800000 - 008fffff : ff800000 - ff8fffff:
-
-helper_440_tlbwe word 0 entry 0 value ff800250
-tlb_flush_nocheck: (count: 37)
-helper_440_tlbwe word 1 entry 0 value 00800000
-tlb_flush_nocheck: (count: 38)
-helper_440_tlbwe word 2 entry 0 value 0000082f
-ppcemb_tlb_check: TLB 0 address ff7fd648 PID 0 <=> ff800000 fff00000 0 7d
-mmubooke_check_tlb: TLB entry not found
-ppcemb_tlb_check: TLB 1 address ff7fd648 PID 0 <=> d0000000 f0000000 0 3b
-mmubooke_check_tlb: TLB entry not found
-ppcemb_tlb_check: TLB 2 address ff7fd648 PID 0 <=> 80000000 f0000000 0 3b
-mmubooke_check_tlb: TLB entry not found
-ppcemb_tlb_check: TLB 3 address ff7fd648 PID 0 <=> 90000000 f0000000 0 3b
-mmubooke_check_tlb: TLB entry not found
-ppcemb_tlb_check: TLB 4 address ff7fd648 PID 0 <=> a0000000 f0000000 0 3b
-mmubooke_check_tlb: TLB entry not found
-ppcemb_tlb_check: TLB 5 address ff7fd648 PID 0 <=> b0000000 f0000000 0 3b
-mmubooke_check_tlb: TLB entry not found
-ppcemb_tlb_check: TLB 6 address ff7fd648 PID 0 <=> c0000000 f0000000 0 3b
-mmubooke_check_tlb: TLB entry not found
-ppcemb_tlb_check: TLB 7 address ff7fd648 PID 0 <=> e0000000 ff000000 0 3b
-mmubooke_check_tlb: TLB entry not found
-ppcemb_tlb_check: TLB 8 address ff7fd648 PID 0 <=> e1000000 ff000000 0 3b
-mmubooke_check_tlb: TLB entry not found
-ppcemb_tlb_check: TLB 9 address ff7fd648 PID 0 <=> e3000000 fffffc00 0 3b
-mmubooke_check_tlb: TLB entry not found
-ppcemb_tlb_check: TLB 10 address ff7fd648 PID 0 <=> e3001000 fffffc00 0 3b
-mmubooke_check_tlb: TLB entry not found
-ppcemb_tlb_check: TLB 11 address ff7fd648 PID 0 <=> e4000000 ffffc000 0 3b
-mmubooke_check_tlb: TLB entry not found
-ppcemb_tlb_check: TLB 12 address ff7fd648 PID 0 <=> e5000000 fff00000 0 7f
-mmubooke_check_tlb: TLB entry not found
-ppcemb_tlb_check: TLB 13 address ff7fd648 PID 0 <=> ef000000 ff000000 0 7f
-mmubooke_check_tlb: TLB entry not found
-ppcemb_tlb_check: TLB 14 address ff7fd648 PID 0 <=> e2000000 fff00000 0 7f
-mmubooke_check_tlb: TLB entry not found
-ppcemb_tlb_check: TLB 15 address ff7fd648 PID 0 <=> 00000000 f0000000 0 7f
-mmubooke_check_tlb: TLB entry not found
-mmubooke_check_tlb: TLB entry not found
-[...]
-mmubooke_get_physical_address: access refused ff7fd648 => ffffffffffffffff 0 -1
-
-The unexpected part is that now the kernel base at 00800000 is tried to be 
-mapped not the data area. Actually this matches the order in mmu.c:273, so 
-I'm not sure why I got the error with the data area first. Maybe because 
-previously I've tried to change the order of these map_region calls to see 
-if that changes anything and this may have been left in the binary somehow 
-after reverting this change (although I've rebuild multiple times after 
-the revert).
-
-Anyway, this makes more sense because if the TLB 0 entry is replaced like 
-the above log shows then there will be no mapping for the ff7fd648 address 
-until the next map_region call maps it. On real hardware this seems to 
-work but on QEMU this causes an exception. Any idea why? My guesses are 
-that on real hardware either the initial TLB entries are different so this 
-call does not replace the entry used to look up addresses needed for 
-running this code or the TLB changes are not effective until the last 
-isync is executed to flush shadow TLB regs which still contain mappings 
-that allow this code to run. To confirm this I'd need logs from real 
-hardware though.
-
-Any idea how to fix this problem?
-
-> And of course read the BookE specification to understand exactly what
-> types of TLB mapping are available, particularly with respect to page size.
-
-That's what I wanted to avoid and hoped someone already with this 
-knowledge can spot the problem easily. I don't have much time to spend on 
-learning everything about PPC features and their QEMU implementation so I 
-rather asked.
-
-Thank you,
-BALATON Zoltan
+diff --git a/configure b/configure
+index dd73cce..09f4d68 100755
+--- a/configure
++++ b/configure
+@@ -1548,9 +1548,11 @@ fi
+ 
+ # Note that if the Python conditional here evaluates True we will exit
+ # with status 1 which is a shell 'false' value.
+-if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6) or sys.version_info >= (3,))'; then
++if ! $python -c 'import sys; sys.exit(sys.version_info >= (3,) and sys.version_info < (3,6))'; then
++  error_exit "Cannot use '$python', Python 3.6 or later is required." \
++      "Use --python=/path/to/python3 to specify a supported Python 3."
++elif ! $python -c 'import sys; sys.exit(sys.version_info < (2,6))'; then
+   error_exit "Cannot use '$python', Python 2.6 or later is required." \
+-      "Note that Python 3 or later is not yet supported." \
+       "Use --python=/path/to/python to specify a supported Python."
+ fi
+ 
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index 8aa2775..6450998 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -15,9 +15,11 @@ import errno
+ import getopt
+ import os
+ import re
+-import string
+ import sys
+-from ordereddict import OrderedDict
++try:
++    from collections import OrderedDict
++except ImportError:
++    from ordereddict import OrderedDict
+ 
+ builtin_types = {
+     'null':     'QTYPE_QNULL',
+@@ -252,7 +254,7 @@ class QAPIDoc(object):
+                                "'Returns:' is only valid for commands")
+ 
+     def check(self):
+-        bogus = [name for name, section in self.args.iteritems()
++        bogus = [name for name, section in self.args.items()
+                  if not section.member]
+         if bogus:
+             raise QAPISemError(
+@@ -308,7 +310,7 @@ class QAPISchemaParser(object):
+                 if not isinstance(pragma, dict):
+                     raise QAPISemError(
+                         info, "Value of 'pragma' must be a dictionary")
+-                for name, value in pragma.iteritems():
++                for name, value in pragma.items():
+                     self._pragma(name, value, info)
+             else:
+                 expr_elem = {'expr': expr,
+@@ -1574,7 +1576,7 @@ class QAPISchema(object):
+ 
+     def _make_members(self, data, info):
+         return [self._make_member(key, value, info)
+-                for (key, value) in data.iteritems()]
++                for (key, value) in data.items()]
+ 
+     def _def_struct_type(self, expr, info, doc):
+         name = expr['struct']
+@@ -1606,11 +1608,11 @@ class QAPISchema(object):
+                 name, info, doc, 'base', self._make_members(base, info)))
+         if tag_name:
+             variants = [self._make_variant(key, value)
+-                        for (key, value) in data.iteritems()]
++                        for (key, value) in data.items()]
+             members = []
+         else:
+             variants = [self._make_simple_variant(key, value, info)
+-                        for (key, value) in data.iteritems()]
++                        for (key, value) in data.items()]
+             typ = self._make_implicit_enum_type(name, info,
+                                                 [v.name for v in variants])
+             tag_member = QAPISchemaObjectTypeMember('type', typ, False)
+@@ -1625,7 +1627,7 @@ class QAPISchema(object):
+         name = expr['alternate']
+         data = expr['data']
+         variants = [self._make_variant(key, value)
+-                    for (key, value) in data.iteritems()]
++                    for (key, value) in data.items()]
+         tag_member = QAPISchemaObjectTypeMember('type', 'QType', False)
+         self._def_entity(
+             QAPISchemaAlternateType(name, info, doc,
+@@ -1735,7 +1737,11 @@ def c_enum_const(type_name, const_name, prefix=None):
+         type_name = prefix
+     return camel_to_upper(type_name) + '_' + c_name(const_name, False).upper()
+ 
+-c_name_trans = string.maketrans('.-', '__')
++try:
++    c_name_trans = str.maketrans('.-', '__')
++except AttributeError:
++    import string
++    c_name_trans = string.maketrans('.-', '__')
+ 
+ 
+ # Map @name to a valid C identifier.
+@@ -1997,8 +2003,11 @@ def open_output(output_dir, do_c, do_h, prefix, c_file, h_file,
+         if really:
+             return open(name, opt)
+         else:
+-            import StringIO
+-            return StringIO.StringIO()
++            try:
++                from StringIO import StringIO
++            except ImportError:
++                from io import StringIO
++            return StringIO()
+ 
+     fdef = maybe_open(do_c, c_file, 'w')
+     fdecl = maybe_open(do_h, h_file, 'w')
+diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+index a317526..9a6fed9 100755
+--- a/scripts/qapi2texi.py
++++ b/scripts/qapi2texi.py
+@@ -147,7 +147,7 @@ def texi_member(member, suffix=''):
+ def texi_members(doc, what, base, variants, member_func):
+     """Format the table of members"""
+     items = ''
+-    for section in doc.args.itervalues():
++    for section in doc.args.values():
+         # TODO Drop fallbacks when undocumented members are outlawed
+         if section.content:
+             desc = texi_format(str(section))
+@@ -285,15 +285,15 @@ def texi_schema(schema):
+ def main(argv):
+     """Takes schema argument, prints result to stdout"""
+     if len(argv) != 2:
+-        print >>sys.stderr, "%s: need exactly 1 argument: SCHEMA" % argv[0]
++        sys.stderr.write("%s: need exactly 1 argument: SCHEMA\n" % argv[0])
+         sys.exit(1)
+ 
+     schema = qapi.QAPISchema(argv[1])
+     if not qapi.doc_required:
+-        print >>sys.stderr, ("%s: need pragma 'doc-required' "
+-                             "to generate documentation" % argv[0])
++        sys.stderr.write("%s: need pragma 'doc-required' "
++                         "to generate documentation\n" % argv[0])
+         sys.exit(1)
+-    print texi_schema(schema)
++    sys.stdout.write(texi_schema(schema) + "\n")
+ 
+ 
+ if __name__ == '__main__':
+diff --git a/scripts/signrom.py b/scripts/signrom.py
+index d1dabe0..0497a1c 100644
+--- a/scripts/signrom.py
++++ b/scripts/signrom.py
+@@ -18,7 +18,7 @@ fin = open(sys.argv[1], 'rb')
+ fout = open(sys.argv[2], 'wb')
+ 
+ magic = fin.read(2)
+-if magic != '\x55\xaa':
++if magic != b'\x55\xaa':
+     sys.exit("%s: option ROM does not begin with magic 55 aa" % sys.argv[1])
+ 
+ size_byte = ord(fin.read(1))
+@@ -33,7 +33,7 @@ elif len(data) < size:
+     # Add padding if necessary, rounding the whole input to a multiple of
+     # 512 bytes according to the third byte of the input.
+     # size-1 because a final byte is added below to store the checksum.
+-    data = data.ljust(size-1, '\0')
++    data = data.ljust(size-1, b'\0')
+ else:
+     if ord(data[-1:]) != 0:
+         sys.stderr.write('WARNING: ROM includes nonzero checksum\n')
+-- 
+2.13.5
