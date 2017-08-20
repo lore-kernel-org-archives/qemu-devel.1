@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1djYFN-0006Sm-CJ
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 17:59:06 -0400
+	(envelope-from <balaton@jedlik.phy.bme.hu>) id 1djYOC-0002mr-TM
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 18:08:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1djYFM-0001iD-Jc
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 17:59:05 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1503249785.git.balaton@eik.bme.hu>
-	<ac6a19d43a6d36ae6f7cab99a1ac25d2515339ad.1503249785.git.balaton@eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1f2ce36c-928b-0631-fdb0-0f413a7a5cb5@amsat.org>
-Date: Sun, 20 Aug 2017 18:58:52 -0300
+	(envelope-from <balaton@jedlik.phy.bme.hu>) id 1djYO9-0007yO-L7
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 18:08:12 -0400
+Received: from jedlik.phy.bme.hu ([152.66.102.83]:38750)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@jedlik.phy.bme.hu>)
+	id 1djYO9-0007yE-EE
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 18:08:09 -0400
+Date: Sun, 20 Aug 2017 23:59:55 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <7f4e58b7-7e8e-4e94-8435-861af3103d1c@ilande.co.uk>
+Message-ID: <alpine.LMD.2.02.1708202333240.3635@jedlik.phy.bme.hu>
+References: <alpine.BSF.2.21.1708181526340.19483@zero.eik.bme.hu>
+	<0e3383a1-33b5-8238-75e2-48e36b7daea4@adacore.com>
+	<alpine.BSF.2.21.1708200101080.95468@zero.eik.bme.hu>
+	<03c6e36f-c79d-3174-772d-5cd361703f7d@ilande.co.uk>
+	<alpine.BSF.2.21.1708201455480.49986@zero.eik.bme.hu>
+	<7f4e58b7-7e8e-4e94-8435-861af3103d1c@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <ac6a19d43a6d36ae6f7cab99a1ac25d2515339ad.1503249785.git.balaton@eik.bme.hu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 13/15] ppc4xx: Add more PLB registers
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [Qemu-ppc] BookE MMU question
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: Francois Revol <revol@free.fr>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Francois Revol <revol@free.fr>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Hi Zoltan,
+On Sun, 20 Aug 2017, Mark Cave-Ayland wrote:
+> Just glancing at the code again it looks like the choice of slot is
+> determined by alloc_tlb(). It seems there are 64 TLB slots stored in
+> tlb_info as 2 x 32-bit bitmaps where a 1 bit indicates the slot is free
+> and a 0 bit indicates the slot is in use.
+>
+> From alloc_tlb() you can see that it uses clz (count leading zeros) in
+> order to locate the next free TLB slot in the bitmap, returning the slot
+> number as an integer (tlb) which is then passed into tlbwe.
+>
+> So I'd suggest adding debugging to alloc_tlb() to find out why TLB slot
+> 0 is being chosen again for the 0x80000000 mapping even though
+> free_tlb() hasn't been called for that entry.
 
-On 08/20/2017 02:23 PM, BALATON Zoltan wrote:
-> These registers are present in 440 SoCs (and maybe in others too) and
-> U-Boot accesses them when printing register info. We don't emulate
-> these but add them to avoid crashing when they are read or written.
+I've tried that but it only confirmed what I thought. This is the first 
+map_region call so nothing is allocated yet and it just picks the first 
+slot:
 
-Your code isn't incorrect but it doesn't sound the right way to fix your 
-problem. Your firmware shouldn't *crash* on unimplemented dcr.
+[KRN] i = 2, allowable_pages[i].mask = 000fffff; tlb_info ffffffff:ffffffff => 7fffffff:ffffffff
 
-Looking at ppc_dcr_read() I see that *valp isn't updated on unimp dcrn, 
-while the dcr_read_plb() callback you are using return 0 on unimp (with 
-an "avoid gcc warning" misleading comment).
+(The numbers after tlb_info are bitmap[0]:bitmap[1] before and after the 
+alloc_tlb() call.) So this looks OK just does not work on QEMU and I don't 
+know why it works on real hardware (or if it works there at all but I 
+assume it does).
 
-What is the hardware behavior on implemented dcr? return 0? In that case 
-this should be used in ppc_dcr_read(), also adding some 
-qemu_log_mask(LOG_UNIMP,...) log entry there.
-
-Regards,
-
-Phil.
-
-> 
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
->   hw/ppc/ppc405_uc.c | 12 +++++++++---
->   1 file changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
-> index e621d0a..8e58065 100644
-> --- a/hw/ppc/ppc405_uc.c
-> +++ b/hw/ppc/ppc405_uc.c
-> @@ -105,9 +105,12 @@ ram_addr_t ppc405_set_bootinfo (CPUPPCState *env, ppc4xx_bd_info_t *bd,
->   /*****************************************************************************/
->   /* Peripheral local bus arbitrer */
->   enum {
-> -    PLB0_BESR = 0x084,
-> -    PLB0_BEAR = 0x086,
-> -    PLB0_ACR  = 0x087,
-> +    PLB3A0_ACR = 0x077,
-> +    PLB4A0_ACR = 0x081,
-> +    PLB0_BESR  = 0x084,
-> +    PLB0_BEAR  = 0x086,
-> +    PLB0_ACR   = 0x087,
-> +    PLB4A1_ACR = 0x089,
->   };
->   
->   typedef struct ppc4xx_plb_t ppc4xx_plb_t;
-> @@ -179,9 +182,12 @@ void ppc4xx_plb_init(CPUPPCState *env)
->       ppc4xx_plb_t *plb;
->   
->       plb = g_malloc0(sizeof(ppc4xx_plb_t));
-> +    ppc_dcr_register(env, PLB3A0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
-> +    ppc_dcr_register(env, PLB4A0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
->       ppc_dcr_register(env, PLB0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
->       ppc_dcr_register(env, PLB0_BEAR, plb, &dcr_read_plb, &dcr_write_plb);
->       ppc_dcr_register(env, PLB0_BESR, plb, &dcr_read_plb, &dcr_write_plb);
-> +    ppc_dcr_register(env, PLB4A1_ACR, plb, &dcr_read_plb, &dcr_write_plb);
->       qemu_register_reset(ppc4xx_plb_reset, plb);
->   }
->   
-> 
+I've also tried to change mmubooke_create_initial_mapping_uboot() in 
+sam460ex.c to use another TLB slot than 0 for the initial mapping hoping 
+it may avoid the problem but that does not work because U-Boot clears TLB 
+slots 1-63 so it has to be slot 0. Because of this I think it cannot be 
+another slot on real hardware either and it probably works due to caching 
+TLB entries in shadow TLB until the isync call at the end of mmu_init(). 
+How could that be matched in QEMU?
