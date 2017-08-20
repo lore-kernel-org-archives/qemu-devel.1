@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49340)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1djYaS-00014z-5H
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 18:20:55 -0400
+	id 1djYeX-000300-Hv
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 18:25:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1djYaP-0006uK-Px
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 18:20:52 -0400
+	id 1djYeU-0007t0-D9
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 18:25:05 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36100)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1djYeU-0007sw-8I
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 18:25:02 -0400
+Received: by mail-qt0-x243.google.com with SMTP id c15so13246065qta.3
+	for <qemu-devel@nongnu.org>; Sun, 20 Aug 2017 15:25:02 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <cover.1503249785.git.balaton@eik.bme.hu>
-	<d9d735634eb1c6af360bf0aca2131a2822606c40.1503249785.git.balaton@eik.bme.hu>
+References: <1503265602-9349-1-git-send-email-minyard@acm.org>
+	<1503265602-9349-4-git-send-email-minyard@acm.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7e49b073-a7fe-96d0-17c0-93042fb9d805@amsat.org>
-Date: Sun, 20 Aug 2017 19:20:36 -0300
+Message-ID: <9a03693b-a8a3-ada6-de38-15d28f26b2ec@amsat.org>
+Date: Sun, 20 Aug 2017 19:24:56 -0300
 MIME-Version: 1.0
-In-Reply-To: <d9d735634eb1c6af360bf0aca2131a2822606c40.1503249785.git.balaton@eik.bme.hu>
+In-Reply-To: <1503265602-9349-4-git-send-email-minyard@acm.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/15] ppc440: Add emulation of plb-pcix
- controller found in some 440 SoCs
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] ipmi: Add the platform event
+ message command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,598 +36,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: Francois Revol <revol@free.fr>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+To: minyard@acm.org, qemu-devel@nongnu.org
+Cc: Corey Minyard <cminyard@mvista.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-Hi Zoltan,
+Hi Corey,
 
-On 08/20/2017 02:23 PM, BALATON Zoltan wrote:
-> This is the PCIX controller found in newer 440 core SoCs e.g. the AMMC
-> 460EX. The device tree refers to this as plb-pcix compared to the
-> plb-pci controller in older 440 SoCs.
+On 08/20/2017 06:46 PM, minyard@acm.org wrote:
+> From: Corey Minyard <cminyard@mvista.com>
 > 
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> This lets an event be added to the SEL as if a sensor had generated
+> it.  The OpenIPMI driver uses it for storing panic event information.
+> 
+> Signed-off-by: Corey Minyard <cminyard@mvista.com>
 > ---
->   hw/ppc/Makefile.objs |   2 +-
->   hw/ppc/ppc440_pcix.c | 516 +++++++++++++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 517 insertions(+), 1 deletion(-)
->   create mode 100644 hw/ppc/ppc440_pcix.c
+>   hw/ipmi/ipmi_bmc_sim.c | 24 ++++++++++++++++++++++++
+>   1 file changed, 24 insertions(+)
 > 
-> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-> index 7efc686..fc39fe4 100644
-> --- a/hw/ppc/Makefile.objs
-> +++ b/hw/ppc/Makefile.objs
-> @@ -13,7 +13,7 @@ endif
->   obj-$(CONFIG_PSERIES) += spapr_rtas_ddw.o
->   # PowerPC 4xx boards
->   obj-y += ppc405_boards.o ppc4xx_devs.o ppc405_uc.o ppc440_bamboo.o
-> -obj-y += ppc4xx_pci.o
-> +obj-y += ppc4xx_pci.o ppc440_pcix.o
->   # PReP
->   obj-$(CONFIG_PREP) += prep.o
->   obj-$(CONFIG_PREP) += prep_systemio.o
-> diff --git a/hw/ppc/ppc440_pcix.c b/hw/ppc/ppc440_pcix.c
-> new file mode 100644
-> index 0000000..5c2ceec
-> --- /dev/null
-> +++ b/hw/ppc/ppc440_pcix.c
-> @@ -0,0 +1,516 @@
-> +/*
-> + * Emulation of the ibm,plb-pcix PCI controller
-> + * This is found in some 440 SoCs e.g. the 460EX.
-> + *
-> + * Copyright (c) 2016 BALATON Zoltan
-> + *
-> + * Derived from ppc4xx_pci.c and pci-host/ppce500.c
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License, version 2, as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
-> +#include "hw/hw.h"
-> +#include "hw/ppc/ppc.h"
-> +#include "hw/ppc/ppc4xx.h"
-> +#include "hw/pci/pci.h"
-> +#include "hw/pci/pci_host.h"
-> +#include "exec/address-spaces.h"
-> +
-> +/*#define DEBUG_PCI*/
-> +
-> +#ifdef DEBUG_PCI
-> +#define DPRINTF(fmt, ...) fprintf(stderr, fmt, ## __VA_ARGS__);
-> +#else
-> +#define DPRINTF(fmt, ...)
-> +#endif /* DEBUG */
-> +
-> +struct PLBOutMap {
-> +    uint64_t la;
-> +    uint64_t pcia;
-> +    uint32_t sa;
-> +    MemoryRegion mr;
-> +};
-> +
-> +struct PLBInMap {
-> +    uint64_t sa;
-> +    uint64_t la;
-> +    MemoryRegion mr;
-> +};
-> +
-> +#define TYPE_PPC440_PCIX_HOST_BRIDGE "ppc440-pcix-host"
-> +#define PPC440_PCIX_HOST_BRIDGE(obj) \
-> +    OBJECT_CHECK(PPC440PCIXState, (obj), TYPE_PPC440_PCIX_HOST_BRIDGE)
-> +
-> +#define PPC440_PCIX_NR_POMS 3
-> +#define PPC440_PCIX_NR_PIMS 3
-> +
-> +typedef struct PPC440PCIXState {
-> +    PCIHostState parent_obj;
-> +
-> +    PCIDevice *dev;
-> +    struct PLBOutMap pom[PPC440_PCIX_NR_POMS];
-> +    struct PLBInMap pim[PPC440_PCIX_NR_PIMS];
-> +    uint32_t sts;
-> +    qemu_irq irq[PCI_NUM_PINS];
-> +    AddressSpace bm_as;
-> +    MemoryRegion bm;
-> +
-> +    MemoryRegion container;
-> +    MemoryRegion iomem;
-> +    MemoryRegion busmem;
-> +} PPC440PCIXState;
-> +
-> +#define PPC440_REG_BASE     0x80000
-> +#define PPC440_REG_SIZE     0xff
-> +
-> +#define PCIC0_CFGADDR       0x0
-> +#define PCIC0_CFGDATA       0x4
-> +
-> +#define PCIX0_POM0LAL       0x68
-> +#define PCIX0_POM0LAH       0x6c
-> +#define PCIX0_POM0SA        0x70
-> +#define PCIX0_POM0PCIAL     0x74
-> +#define PCIX0_POM0PCIAH     0x78
-> +#define PCIX0_POM1LAL       0x7c
-> +#define PCIX0_POM1LAH       0x80
-> +#define PCIX0_POM1SA        0x84
-> +#define PCIX0_POM1PCIAL     0x88
-> +#define PCIX0_POM1PCIAH     0x8c
-> +#define PCIX0_POM2SA        0x90
-> +
-> +#define PCIX0_PIM0SAL       0x98
-> +#define PCIX0_PIM0LAL       0x9c
-> +#define PCIX0_PIM0LAH       0xa0
-> +#define PCIX0_PIM1SA        0xa4
-> +#define PCIX0_PIM1LAL       0xa8
-> +#define PCIX0_PIM1LAH       0xac
-> +#define PCIX0_PIM2SAL       0xb0
-> +#define PCIX0_PIM2LAL       0xb4
-> +#define PCIX0_PIM2LAH       0xb8
-> +#define PCIX0_PIM0SAH       0xf8
-> +#define PCIX0_PIM2SAH       0xfc
-> +
-> +#define PCIX0_STS           0xe0
-> +
-> +#define PCI_ALL_SIZE        (PPC440_REG_BASE + PPC440_REG_SIZE)
-> +
-> +static void ppc440_pcix_clear_region(MemoryRegion *parent,
-> +                                     MemoryRegion *mem)
+> diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
+> index a0bbfd5..e84d710 100644
+> --- a/hw/ipmi/ipmi_bmc_sim.c
+> +++ b/hw/ipmi/ipmi_bmc_sim.c
+> @@ -38,6 +38,7 @@
+>   
+>   #define IPMI_NETFN_SENSOR_EVENT       0x04
+>   
+> +#define IPMI_CMD_PLATFORM_EVENT_MSG       0x02
+>   #define IPMI_CMD_SET_SENSOR_EVT_ENABLE    0x28
+>   #define IPMI_CMD_GET_SENSOR_EVT_ENABLE    0x29
+>   #define IPMI_CMD_REARM_SENSOR_EVTS        0x2a
+> @@ -1581,6 +1582,28 @@ static void set_sel_time(IPMIBmcSim *ibs,
+>       ibs->sel.time_offset = now.tv_sec - ((long) val);
+>   }
+>   
+> +static void platform_event_msg(IPMIBmcSim *ibs,
+> +                               uint8_t *cmd, unsigned int cmd_len,
+> +                               RspBuffer *rsp)
 > +{
-> +    if (memory_region_is_mapped(mem)) {
-> +        memory_region_del_subregion(parent, mem);
-> +        object_unparent(OBJECT(mem));
+> +    uint8_t event[16];
+
+Watch out, here you are using uninitialized stack,
+
+> +
+> +    event[2] = 2; /* System event record */
+> +    event[7] = cmd[2]; /* Generator ID */
+> +    event[8] = 0;
+> +    event[9] = cmd[3]; /* EvMRev */
+> +    event[10] = cmd[4]; /* Sensor type */
+> +    event[11] = cmd[5]; /* Sensor number */
+> +    event[12] = cmd[6]; /* Event dir / Event type */
+> +    event[13] = cmd[7]; /* Event data 1 */
+> +    event[14] = cmd[8]; /* Event data 2 */
+> +    event[15] = cmd[9]; /* Event data 3 */
+> +
+> +    if (sel_add_event(ibs, event)) {
+
+So here you have event[0,1,3-6] as crap/random.
+
+Also it'd be more efficient to use
+
+	memcpy(&event[9], &cmd[3], sizeof(event) - 9);
+
+> +        rsp_buffer_set_error(rsp, IPMI_CC_OUT_OF_SPACE);
 > +    }
 > +}
 > +
-> +/* DMA mapping */
-> +static void ppc440_pcix_update_pim(PPC440PCIXState *s, int idx)
-> +{
-> +    MemoryRegion *mem = &s->pim[idx].mr;
-> +    char *name;
-> +    uint64_t size;
-> +
-> +    /* Before we modify anything, unmap and destroy the region */
-> +    ppc440_pcix_clear_region(&s->bm, mem);
-> +
-> +    if (!(s->pim[idx].sa & 1)) {
-> +        /* Not enabled, nothing to do */
-> +        return;
-> +    }
-> +
-> +    name = g_strdup_printf("PCI Inbound Window %d", idx);
-> +    size = ~(s->pim[idx].sa & ~7ULL) + 1;
-> +    memory_region_init_alias(mem, OBJECT(s), name, get_system_memory(),
-> +                             s->pim[idx].la, size);
-> +    memory_region_add_subregion_overlap(&s->bm, 0, mem, -1);
-> +    g_free(name);
-> +
-> +    DPRINTF("%s: Added window %d of size=%#"PRIx64" to CPU=%#"PRIx64"\n",
-> +            __func__, idx, size, s->pim[idx].la);
-> +}
-> +
-> +/* BAR mapping */
-> +static void ppc440_pcix_update_pom(PPC440PCIXState *s, int idx)
-> +{
-> +    MemoryRegion *mem = &s->pom[idx].mr;
-> +    MemoryRegion *address_space_mem = get_system_memory();
-> +    char *name;
-> +    uint32_t size;
-> +
-> +    /* Before we modify anything, unmap and destroy the region */
-> +    ppc440_pcix_clear_region(address_space_mem, mem);
-> +
-> +    if (!(s->pom[idx].sa & 1)) {
-> +        /* Not enabled, nothing to do */
-> +        return;
-> +    }
-> +
-> +    name = g_strdup_printf("PCI Outbound Window %d", idx);
-> +    size = ~(s->pom[idx].sa & 0xfffffffe) + 1;
-> +    if (!size) {
-> +        size = 0xffffffff;
-> +    }
-> +    memory_region_init_alias(mem, OBJECT(s), name, &s->busmem,
-> +                             s->pom[idx].pcia, size);
-> +    memory_region_add_subregion(address_space_mem, s->pom[idx].la, mem);
-> +    g_free(name);
-> +
-> +    DPRINTF("%s: Added window %d of size=%#x from CPU=%#"PRIx64
-> +            " to PCI=%#"PRIx64"\n", __func__, idx, size, s->pom[idx].la,
-> +            s->pom[idx].pcia);
-> +}
-> +
-> +static void ppc440_pcix_reg_write4(void *opaque, hwaddr addr,
-> +                                   uint64_t val, unsigned size)
-> +{
-> +    struct PPC440PCIXState *s = opaque;
-> +
-> +    DPRINTF("%s: addr 0x%"PRIx64 " = %"PRIx64 "\n", __func__, addr, val);
-> +    switch (addr) {
-> +    case PCI_VENDOR_ID ... PCI_MAX_LAT:
-> +        stl_le_p(s->dev->config + addr, val);
-> +        break;
-> +
-> +    case PCIX0_POM0LAL:
-
-Those lines ...
-
-> +        s->pom[0].la &= 0xffffffff00000000ULL;
-> +        s->pom[0].la |= val;
-
-equivs to:
-
-	   s->pom[0].la = deposit64(s->pom[0].la, 0, 32, val);
-
-> +        ppc440_pcix_update_pom(s, 0);
-> +        break;
-> +    case PCIX0_POM0LAH:
-
-Those
-
-> +        s->pom[0].la &= 0xffffffffULL;
-> +        s->pom[0].la |= val << 32;
-
-to:
-
-	   s->pom[0].la = deposit64(s->pom[0].la, 32, 32, val);
-
-> +        ppc440_pcix_update_pom(s, 0);
-> +        break;
-> +    case PCIX0_POM0SA:
-> +        s->pom[0].sa = val;
-> +        ppc440_pcix_update_pom(s, 0);
-> +        break;
-> +    case PCIX0_POM0PCIAL:
-> +        s->pom[0].pcia &= 0xffffffff00000000ULL;
-> +        s->pom[0].pcia |= val;
-
-and so on
-
-> +        ppc440_pcix_update_pom(s, 0);
-> +        break;
-> +    case PCIX0_POM0PCIAH:
-> +        s->pom[0].pcia &= 0xffffffffULL;
-> +        s->pom[0].pcia |= val << 32;
-> +        ppc440_pcix_update_pom(s, 0);
-> +        break;
-> +    case PCIX0_POM1LAL:
-> +        s->pom[1].la &= 0xffffffff00000000ULL;
-> +        s->pom[1].la |= val;
-> +        ppc440_pcix_update_pom(s, 1);
-> +        break;
-> +    case PCIX0_POM1LAH:
-> +        s->pom[1].la &= 0xffffffffULL;
-> +        s->pom[1].la |= val << 32;
-> +        ppc440_pcix_update_pom(s, 1);
-> +        break;
-> +    case PCIX0_POM1SA:
-> +        s->pom[1].sa = val;
-> +        ppc440_pcix_update_pom(s, 1);
-> +        break;
-> +    case PCIX0_POM1PCIAL:
-> +        s->pom[1].pcia &= 0xffffffff00000000ULL;
-> +        s->pom[1].pcia |= val;
-> +        ppc440_pcix_update_pom(s, 1);
-> +        break;
-> +    case PCIX0_POM1PCIAH:
-> +        s->pom[1].pcia &= 0xffffffffULL;
-> +        s->pom[1].pcia |= val << 32;
-> +        ppc440_pcix_update_pom(s, 1);
-> +        break;
-> +    case PCIX0_POM2SA:
-> +        s->pom[2].sa = val;
-> +        break;
-> +
-> +    case PCIX0_PIM0SAL:
-> +        s->pim[0].sa &= 0xffffffff00000000ULL;
-> +        s->pim[0].sa |= val;
-> +        ppc440_pcix_update_pim(s, 0);
-> +        break;
-> +    case PCIX0_PIM0LAL:
-> +        s->pim[0].la &= 0xffffffff00000000ULL;
-> +        s->pim[0].la |= val;
-> +        ppc440_pcix_update_pim(s, 0);
-> +        break;
-> +    case PCIX0_PIM0LAH:
-> +        s->pim[0].la &= 0xffffffffULL;
-> +        s->pim[0].la |= val << 32;
-> +        ppc440_pcix_update_pim(s, 0);
-> +        break;
-> +    case PCIX0_PIM1SA:
-> +        s->pim[1].sa = val;
-> +        ppc440_pcix_update_pim(s, 1);
-> +        break;
-> +    case PCIX0_PIM1LAL:
-> +        s->pim[1].la &= 0xffffffff00000000ULL;
-> +        s->pim[1].la |= val;
-> +        ppc440_pcix_update_pim(s, 1);
-> +        break;
-> +    case PCIX0_PIM1LAH:
-> +        s->pim[1].la &= 0xffffffffULL;
-> +        s->pim[1].la |= val << 32;
-> +        ppc440_pcix_update_pim(s, 1);
-> +        break;
-> +    case PCIX0_PIM2SAL:
-> +        s->pim[2].sa &= 0xffffffff00000000ULL;
-> +        s->pim[2].sa = val;
-> +        ppc440_pcix_update_pim(s, 2);
-> +        break;
-> +    case PCIX0_PIM2LAL:
-> +        s->pim[2].la &= 0xffffffff00000000ULL;
-> +        s->pim[2].la |= val;
-> +        ppc440_pcix_update_pim(s, 2);
-> +        break;
-> +    case PCIX0_PIM2LAH:
-> +        s->pim[2].la &= 0xffffffffULL;
-> +        s->pim[2].la |= val << 32;
-> +        ppc440_pcix_update_pim(s, 2);
-> +        break;
-> +
-> +    case PCIX0_STS:
-> +        s->sts = val;
-> +        break;
-> +
-> +    case PCIX0_PIM0SAH:
-> +        s->pim[0].sa &= 0xffffffffULL;
-> +        s->pim[0].sa |= val << 32;
-> +        ppc440_pcix_update_pim(s, 0);
-> +        break;
-> +    case PCIX0_PIM2SAH:
-> +        s->pim[2].sa &= 0xffffffffULL;
-> +        s->pim[2].sa |= val << 32;
-> +        ppc440_pcix_update_pim(s, 2);
-> +        break;
-> +
-> +    default:
-> +        printf("%s: unhandled PCI internal register 0x%lx\n", __func__,
-> +               (unsigned long)addr);
-> +        break;
-> +    }
-> +}
-> +
-> +static uint64_t ppc440_pcix_reg_read4(void *opaque, hwaddr addr,
-> +                                     unsigned size)
-> +{
-> +    struct PPC440PCIXState *s = opaque;
-> +    uint32_t val;
-> +
-> +    switch (addr) {
-> +    case PCI_VENDOR_ID ... PCI_MAX_LAT:
-> +        val = ldl_le_p(s->dev->config + addr);
-> +        break;
-> +
-> +    case PCIX0_POM0LAL:
-> +        val = s->pom[0].la;
-
-This should be
-
-            val = s->pom[0].la & 0xffffffffULL;
-
-or:
-
-            val = extract64(s->pom[0].la, 0, 32);
-
-> +        break;
-> +    case PCIX0_POM0LAH:
-> +        val = s->pom[0].la >> 32;
-
-or to be consistent:
-
-            val = extract64(s->pom[0].la, 32, 32);
-
-> +        break;
-> +    case PCIX0_POM0SA:
-> +        val = s->pom[0].sa;
-> +        break;
-> +    case PCIX0_POM0PCIAL:
-> +        val = s->pom[0].pcia;
-
-also 32-bit masked
-
-> +        break;
-> +    case PCIX0_POM0PCIAH:
-> +        val = s->pom[0].pcia >> 32;
-> +        break;
-> +    case PCIX0_POM1LAL:
-> +        val = s->pom[1].la;
-
-also 32-bit masked
-
-> +        break;
-> +    case PCIX0_POM1LAH:
-> +        val = s->pom[1].la >> 32;
-> +        break;
-> +    case PCIX0_POM1SA:
-> +        val = s->pom[1].sa;
-
-also 32-bit masked, etc...
-
-> +        break;
-> +    case PCIX0_POM1PCIAL:
-> +        val = s->pom[1].pcia;
-> +        break;
-> +    case PCIX0_POM1PCIAH:
-> +        val = s->pom[1].pcia >> 32;
-> +        break;
-> +    case PCIX0_POM2SA:
-> +        val = s->pom[2].sa;
-> +        break;
-> +
-> +    case PCIX0_PIM0SAL:
-> +        val = s->pim[0].sa;
-> +        break;
-> +    case PCIX0_PIM0LAL:
-> +        val = s->pim[0].la;
-> +        break;
-> +    case PCIX0_PIM0LAH:
-> +        val = s->pim[0].la >> 32;
-> +        break;
-> +    case PCIX0_PIM1SA:
-> +        val = s->pim[1].sa;
-> +        break;
-> +    case PCIX0_PIM1LAL:
-> +        val = s->pim[1].la;
-> +        break;
-> +    case PCIX0_PIM1LAH:
-> +        val = s->pim[1].la >> 32;
-> +        break;
-> +    case PCIX0_PIM2SAL:
-> +        val = s->pim[2].sa;
-> +        break;
-> +    case PCIX0_PIM2LAL:
-> +        val = s->pim[2].la;
-> +        break;
-> +    case PCIX0_PIM2LAH:
-> +        val = s->pim[2].la >> 32;
-> +        break;
-> +
-> +    case PCIX0_STS:
-> +        val = s->sts;
-> +        break;
-> +
-> +    case PCIX0_PIM0SAH:
-> +        val = s->pim[0].sa  >> 32;
-> +        break;
-> +    case PCIX0_PIM2SAH:
-> +        val = s->pim[2].sa  >> 32;
-> +        break;
-> +
-> +    default:
-> +        printf("%s: invalid PCI internal register 0x%lx\n", __func__,
-> +               (unsigned long)addr);
-> +        val = 0;
-> +    }
-> +
-> +    DPRINTF("%s: addr 0x%"PRIx64 " = %"PRIx32 "\n", __func__, addr, val);
-> +    return val;
-> +}
-> +
-> +static const MemoryRegionOps pci_reg_ops = {
-> +    .read = ppc440_pcix_reg_read4,
-> +    .write = ppc440_pcix_reg_write4,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +};
-> +
-> +static void ppc440_pcix_reset(DeviceState *dev)
-> +{
-> +    struct PPC440PCIXState *s = PPC440_PCIX_HOST_BRIDGE(dev);
-> +    int i;
-> +
-> +    for (i = 0; i < PPC440_PCIX_NR_POMS; i++) {
-> +        ppc440_pcix_clear_region(get_system_memory(), &s->pom[i].mr);
-> +    }
-> +    for (i = 0; i < PPC440_PCIX_NR_PIMS; i++) {
-> +        ppc440_pcix_clear_region(&s->bm, &s->pim[i].mr);
-> +    }
-> +    memset(s->pom, 0, sizeof(s->pom));
-> +    memset(s->pim, 0, sizeof(s->pim));
-> +    for (i = 0; i < PPC440_PCIX_NR_PIMS; i++) {
-> +        s->pim[i].sa = 0xffffffff00000000ULL;
-> +    }
-> +    s->sts = 0;
-> +}
-> +
-> +/* All pins from each slot are tied to a single board IRQ.
-> + * This may need further refactoring for other boards. */
-> +static int ppc440_pcix_map_irq(PCIDevice *pci_dev, int irq_num)
-> +{
-> +    int slot = pci_dev->devfn >> 3;
-> +
-> +    DPRINTF("%s: devfn %x irq %d -> %d\n", __func__,
-> +            pci_dev->devfn, irq_num, slot);
-> +
-> +    return slot - 1;
-> +}
-> +
-> +static void ppc440_pcix_set_irq(void *opaque, int irq_num, int level)
-> +{
-> +    qemu_irq *pci_irqs = opaque;
-> +
-> +    DPRINTF("%s: PCI irq %d\n", __func__, irq_num);
-> +    if (irq_num < 0) {
-> +        error_report("%s: PCI irq %d", __func__, irq_num);
-> +        return;
-> +    }
-> +    qemu_set_irq(pci_irqs[irq_num], level);
-> +}
-> +
-> +static AddressSpace *ppc440_pcix_set_iommu(PCIBus *b, void *opaque, int devfn)
-> +{
-> +    PPC440PCIXState *s = opaque;
-> +
-> +    return &s->bm_as;
-> +}
-> +
-> +static int ppc440_pcix_initfn(SysBusDevice *dev)
-> +{
-> +    PPC440PCIXState *s;
-> +    PCIHostState *h;
-> +    int i;
-> +
-> +    h = PCI_HOST_BRIDGE(dev);
-> +    s = PPC440_PCIX_HOST_BRIDGE(dev);
-> +
-> +    for (i = 0; i < ARRAY_SIZE(s->irq); i++) {
-> +        sysbus_init_irq(dev, &s->irq[i]);
-> +    }
-> +
-> +    memory_region_init(&s->busmem, OBJECT(dev), "pci bus memory", UINT64_MAX);
-> +    h->bus = pci_register_bus(DEVICE(dev), NULL, ppc440_pcix_set_irq,
-> +                         ppc440_pcix_map_irq, s->irq, &s->busmem,
-> +                         get_system_io(), PCI_DEVFN(0, 0), 4, TYPE_PCI_BUS);
-> +
-> +    s->dev = pci_create_simple(h->bus, PCI_DEVFN(0, 0), "ppc4xx-host-bridge");
-> +
-> +    memory_region_init(&s->bm, OBJECT(s), "bm-ppc440-pcix", UINT64_MAX);
-> +    memory_region_add_subregion(&s->bm, 0x0, &s->busmem);
-> +    address_space_init(&s->bm_as, &s->bm, "pci-bm");
-> +    pci_setup_iommu(h->bus, ppc440_pcix_set_iommu, s);
-> +
-> +    memory_region_init(&s->container, OBJECT(s), "pci-container", PCI_ALL_SIZE);
-> +    memory_region_init_io(&h->conf_mem, OBJECT(s), &pci_host_conf_le_ops, h,
-> +                          "pci-conf-idx", 4);
-> +    memory_region_init_io(&h->data_mem, OBJECT(s), &pci_host_data_le_ops, h,
-> +                          "pci-conf-data", 4);
-> +    memory_region_init_io(&s->iomem, OBJECT(s), &pci_reg_ops, s,
-> +                          "pci.reg", PPC440_REG_SIZE);
-> +    memory_region_add_subregion(&s->container, PCIC0_CFGADDR, &h->conf_mem);
-> +    memory_region_add_subregion(&s->container, PCIC0_CFGDATA, &h->data_mem);
-> +    memory_region_add_subregion(&s->container, PPC440_REG_BASE, &s->iomem);
-> +    sysbus_init_mmio(dev, &s->container);
-> +
-> +    return 0;
-> +}
-> +
-> +static void ppc440_pcix_class_init(ObjectClass *klass, void *data)
-> +{
-> +    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    k->init = ppc440_pcix_initfn;
-> +    dc->reset = ppc440_pcix_reset;
-> +}
-> +
-> +static const TypeInfo ppc440_pcix_info = {
-> +    .name          = TYPE_PPC440_PCIX_HOST_BRIDGE,
-> +    .parent        = TYPE_PCI_HOST_BRIDGE,
-> +    .instance_size = sizeof(PPC440PCIXState),
-> +    .class_init    = ppc440_pcix_class_init,
-> +};
-> +
-> +static void ppc440_pcix_register_types(void)
-> +{
-> +    type_register_static(&ppc440_pcix_info);
-> +}
-> +
-> +type_init(ppc440_pcix_register_types)
+>   static void set_sensor_evt_enable(IPMIBmcSim *ibs,
+>                                     uint8_t *cmd, unsigned int cmd_len,
+>                                     RspBuffer *rsp)
+> @@ -1757,6 +1780,7 @@ static const IPMINetfn chassis_netfn = {
+>   };
+>   
+>   static const IPMICmdHandler sensor_event_cmds[] = {
+> +    [IPMI_CMD_PLATFORM_EVENT_MSG] = { platform_event_msg, 10 },
+>       [IPMI_CMD_SET_SENSOR_EVT_ENABLE] = { set_sensor_evt_enable, 4 },
+>       [IPMI_CMD_GET_SENSOR_EVT_ENABLE] = { get_sensor_evt_enable, 3 },
+>       [IPMI_CMD_REARM_SENSOR_EVTS] = { rearm_sensor_evts, 4 },
 > 
