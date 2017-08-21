@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1djipL-0001WN-Ln
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:16:56 -0400
+	(envelope-from <cohuck@redhat.com>) id 1djiuJ-00069e-Rg
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:22:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1djipK-0006X1-NS
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:16:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33774)
+	(envelope-from <cohuck@redhat.com>) id 1djiuG-00013X-5N
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:22:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40618)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1djipK-0006Wb-Ht
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:16:54 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1djiuF-000133-ST
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:22:00 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon, 21 Aug 2017 11:16:14 +0200
-Message-Id: <20170821091614.28251-11-cohuck@redhat.com>
+Date: Mon, 21 Aug 2017 11:16:06 +0200
+Message-Id: <20170821091614.28251-3-cohuck@redhat.com>
 In-Reply-To: <20170821091614.28251-1-cohuck@redhat.com>
 References: <20170821091614.28251-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 10/10] s390x: refine pci dependencies
+Subject: [Qemu-devel] [PATCH v4 02/10] kvm: remove hard dependency on pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,27 +26,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
 
-VIRTIO_PCI should properly depend on CONFIG_PCI.
-With this change, we can switch off pci for s390x by removing
-'CONFIG_PCI=y' from the default config.
+The msi routing code in kvm calls some pci functions: provide
+some stubs to enable builds without pci.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Also, to make this more obvious, guard them via a pci_available boolean
+(which also can be reused in other places).
+
+Fixes: e1d4fb2de ("kvm-irqchip: x86: add msi route notify fn")
+Fixes: 767a554a0 ("kvm-all: Pass requester ID to MSI routing functions")
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- default-configs/s390x-softmmu.mak | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ accel/kvm/kvm-all.c  |  6 +++---
+ hw/pci/pci-stub.c    | 15 +++++++++++++++
+ hw/pci/pci.c         |  2 ++
+ include/hw/pci/pci.h |  2 ++
+ 4 files changed, 22 insertions(+), 3 deletions(-)
 
-diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
-index 51191b77df..6ab2bc65ac 100644
---- a/default-configs/s390x-softmmu.mak
-+++ b/default-configs/s390x-softmmu.mak
-@@ -1,5 +1,5 @@
- CONFIG_PCI=y
--CONFIG_VIRTIO_PCI=y
-+CONFIG_VIRTIO_PCI=$(CONFIG_PCI)
- CONFIG_VHOST_USER_SCSI=$(and $(CONFIG_VHOST_USER),$(CONFIG_LINUX))
- CONFIG_VIRTIO=y
- CONFIG_SCLPCONSOLE=y
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 46ce479dc3..f85553a851 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -1248,7 +1248,7 @@ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
+     int virq;
+     MSIMessage msg = {0, 0};
+ 
+-    if (dev) {
++    if (pci_available && dev) {
+         msg = pci_get_msi_message(dev, vector);
+     }
+ 
+@@ -1271,7 +1271,7 @@ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
+     kroute.u.msi.address_lo = (uint32_t)msg.address;
+     kroute.u.msi.address_hi = msg.address >> 32;
+     kroute.u.msi.data = le32_to_cpu(msg.data);
+-    if (kvm_msi_devid_required()) {
++    if (pci_available && kvm_msi_devid_required()) {
+         kroute.flags = KVM_MSI_VALID_DEVID;
+         kroute.u.msi.devid = pci_requester_id(dev);
+     }
+@@ -1309,7 +1309,7 @@ int kvm_irqchip_update_msi_route(KVMState *s, int virq, MSIMessage msg,
+     kroute.u.msi.address_lo = (uint32_t)msg.address;
+     kroute.u.msi.address_hi = msg.address >> 32;
+     kroute.u.msi.data = le32_to_cpu(msg.data);
+-    if (kvm_msi_devid_required()) {
++    if (pci_available && kvm_msi_devid_required()) {
+         kroute.flags = KVM_MSI_VALID_DEVID;
+         kroute.u.msi.devid = pci_requester_id(dev);
+     }
+diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
+index ecad664946..ace43821ca 100644
+--- a/hw/pci/pci-stub.c
++++ b/hw/pci/pci-stub.c
+@@ -23,10 +23,12 @@
+ #include "monitor/monitor.h"
+ #include "qapi/qmp/qerror.h"
+ #include "hw/pci/pci.h"
++#include "hw/pci/msi.h"
+ #include "qmp-commands.h"
+ #include "hw/pci/msi.h"
+ 
+ bool msi_nonbroken;
++bool pci_available;
+ 
+ PciInfoList *qmp_query_pci(Error **errp)
+ {
+@@ -38,3 +40,16 @@ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict)
+ {
+     monitor_printf(mon, "PCI devices not supported\n");
+ }
++
++/* kvm-all wants this */
++MSIMessage pci_get_msi_message(PCIDevice *dev, int vector)
++{
++    g_assert(false);
++    return (MSIMessage){};
++}
++
++uint16_t pci_requester_id(PCIDevice *dev)
++{
++    g_assert(false);
++    return 0;
++}
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 258fbe51e2..26f346db2c 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -49,6 +49,8 @@
+ # define PCI_DPRINTF(format, ...)       do { } while (0)
+ #endif
+ 
++bool pci_available = true;
++
+ static void pcibus_dev_print(Monitor *mon, DeviceState *dev, int indent);
+ static char *pcibus_get_dev_path(DeviceState *dev);
+ static char *pcibus_get_fw_dev_path(DeviceState *dev);
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index e598b095eb..8bb6449dd7 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -10,6 +10,8 @@
+ 
+ #include "hw/pci/pcie.h"
+ 
++extern bool pci_available;
++
+ /* PCI bus */
+ 
+ #define PCI_DEVFN(slot, func)   ((((slot) & 0x1f) << 3) | ((func) & 0x07))
 -- 
 2.13.5
