@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1djjht-0007VM-6w
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:13:20 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1djjvI-0005RO-3R
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:27:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1djjhq-0008LT-PQ
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:13:17 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20170815150907.21495-1-eblake@redhat.com>
-	<20170815150907.21495-8-eblake@redhat.com>
-	<aca0bbb8-0893-c02a-c3cb-b85fa431437b@virtuozzo.com>
-Message-ID: <7e7d839d-7ae7-9b92-7830-d568eb8f1be2@virtuozzo.com>
-Date: Mon, 21 Aug 2017 13:13:12 +0300
+	(envelope-from <dgilbert@redhat.com>) id 1djjvE-0003gl-49
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:27:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48344)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1djjvD-0003dr-QN
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:27:04 -0400
+Date: Mon, 21 Aug 2017 11:17:28 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170821101727.GB2231@work-vm>
+References: <1503301464-27886-1-git-send-email-peterx@redhat.com>
+	<20170821085851.GA4371@lemon>
+	<20170821100555.GC30356@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <aca0bbb8-0893-c02a-c3cb-b85fa431437b@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PULL 7/7] nbd-client: Fix regression when server
- sends garbage
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20170821100555.GC30356@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC 0/6] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,125 +29,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-MjEuMDguMjAxNyAxMzoxMSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToN
-Cj4gMTUuMDguMjAxNyAxODowOSwgRXJpYyBCbGFrZSB3cm90ZToNCj4+IFdoZW4gd2Ugc3dp
-dGNoZWQgTkJEIHRvIHVzZSBjb3JvdXRpbmVzIGZvciBxZW11IDIuOSAoaW4gcGFydGljdWxh
-ciwNCj4+IGNvbW1pdCBhMTJhNzEyYSksIHdlIGludHJvZHVjZWQgYSByZWdyZXNzaW9uOiBp
-ZiBhIHNlcnZlciBzZW5kcyB1cw0KPj4gZ2FyYmFnZSAoc3VjaCBhcyBhIGNvcnJ1cHRlZCBt
-YWdpYyBudW1iZXIpLCB3ZSBxdWl0IHRoZSByZWFkIGxvb3ANCj4+IGJ1dCBkbyBub3Qgc3Rv
-cCBzZW5kaW5nIGZ1cnRoZXIgcXVldWVkIGNvbW1hbmRzLCByZXN1bHRpbmcgaW4gdGhlDQo+
-PiBjbGllbnQgaGFuZ2luZyB3aGVuIGl0IG5ldmVyIHJlYWRzIHRoZSByZXNwb25zZSB0byB0
-aG9zZSBhZGRpdGlvbmFsDQo+PiBjb21tYW5kcy7CoCBJbiBxZW11IDIuOCwgd2UgcHJvcGVy
-bHkgZGV0ZWN0ZWQgdGhhdCB0aGUgc2VydmVyIGlzIG5vDQo+PiBsb25nZXIgcmVsaWFibGUs
-IGFuZCBjYW5jZWxsZWQgYWxsIGV4aXN0aW5nIHBlbmRpbmcgY29tbWFuZHMgd2l0aA0KPj4g
-RUlPLCB0aGVuIHRvcmUgZG93biB0aGUgc29ja2V0IHNvIHRoYXQgYWxsIGZ1cnRoZXIgY29t
-bWFuZCBhdHRlbXB0cw0KPj4gZ2V0IEVQSVBFLg0KPj4NCj4+IFJlc3RvcmUgdGhlIHByb3Bl
-ciBiZWhhdmlvciBvZiBxdWl0dGluZyAoYWxtb3N0KSBhbGwgY29tbXVuaWNhdGlvbg0KPj4g
-d2l0aCBhIGJyb2tlbiBzZXJ2ZXI6IE9uY2Ugd2Uga25vdyB3ZSBhcmUgb3V0IG9mIHN5bmMg
-b3Igb3RoZXJ3aXNlDQo+PiBjYW4ndCB0cnVzdCB0aGUgc2VydmVyLCB3ZSBtdXN0IGFzc3Vt
-ZSB0aGF0IGFueSBmdXJ0aGVyIGluY29taW5nDQo+PiBkYXRhIGlzIHVucmVsaWFibGUgYW5k
-IHRoZXJlZm9yZSBlbmQgYWxsIHBlbmRpbmcgY29tbWFuZHMgd2l0aCBFSU8sDQo+PiBhbmQg
-cXVpdCB0cnlpbmcgdG8gc2VuZCBhbnkgZnVydGhlciBjb21tYW5kcy7CoCBBcyBhbiBleGNl
-cHRpb24sIHdlDQo+PiBzdGlsbCAodHJ5IHRvKSBzZW5kIE5CRF9DTURfRElTQyB0byBsZXQg
-dGhlIHNlcnZlciBrbm93IHdlIGFyZSBnb2luZw0KPj4gYXdheSAoaW4gcGFydCwgYmVjYXVz
-ZSBpdCBpcyBlYXNpZXIgdG8gZG8gdGhhdCB0aGFuIHRvIGZ1cnRoZXINCj4+IHJlZmFjdG9y
-IG5iZF90ZWFyZG93bl9jb25uZWN0aW9uLCBhbmQgaW4gcGFydCBiZWNhdXNlIGl0IGlzIHRo
-ZQ0KPj4gb25seSBjb21tYW5kIHdoZXJlIHdlIGRvIG5vdCBoYXZlIHRvIHdhaXQgZm9yIGEg
-cmVwbHkpLg0KPj4NCj4+IEJhc2VkIG9uIGEgcGF0Y2ggYnkgVmxhZGltaXIgU2VtZW50c292
-LU9naWV2c2tpeS4NCj4+DQo+PiBBIG1hbGljaW91cyBzZXJ2ZXIgY2FuIGJlIGNyZWF0ZWQg
-d2l0aCB0aGUgZm9sbG93aW5nIGhhY2ssDQo+PiBmb2xsb3dlZCBieSBzZXR0aW5nIE5CRF9T
-RVJWRVJfREVCVUcgdG8gYSBub24temVybyB2YWx1ZSBpbiB0aGUNCj4+IGVudmlyb25tZW50
-IHdoZW4gcnVubmluZyBxZW11LW5iZDoNCj4+DQo+PiB8IC0tLSBhL25iZC9zZXJ2ZXIuYw0K
-Pj4gfCArKysgYi9uYmQvc2VydmVyLmMNCj4+IHwgQEAgLTkxOSw2ICs5MTksMTcgQEAgc3Rh
-dGljIGludCBuYmRfc2VuZF9yZXBseShRSU9DaGFubmVsICppb2MsIA0KPj4gTkJEUmVwbHkg
-KnJlcGx5LCBFcnJvciAqKmVycnApDQo+PiB8wqDCoMKgwqDCoCBzdGxfYmVfcChidWYgKyA0
-LCByZXBseS0+ZXJyb3IpOw0KPj4gfMKgwqDCoMKgwqAgc3RxX2JlX3AoYnVmICsgOCwgcmVw
-bHktPmhhbmRsZSk7DQo+PiB8DQo+PiB8ICvCoMKgwqAgc3RhdGljIGludCBkZWJ1ZzsNCj4+
-IHwgK8KgwqDCoCBzdGF0aWMgaW50IGNvdW50Ow0KPj4gfCArwqDCoMKgIGlmICghY291bnQr
-Kykgew0KPj4gfCArwqDCoMKgwqDCoMKgwqAgY29uc3QgY2hhciAqc3RyID0gZ2V0ZW52KCJO
-QkRfU0VSVkVSX0RFQlVHIik7DQo+PiB8ICvCoMKgwqDCoMKgwqDCoCBpZiAoc3RyKSB7DQo+
-PiB8ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGRlYnVnID0gYXRvaShzdHIpOw0KPj4gfCAr
-wqDCoMKgwqDCoMKgwqAgfQ0KPj4gfCArwqDCoMKgIH0NCj4+IHwgK8KgwqDCoCBpZiAoZGVi
-dWcgJiYgIShjb3VudCAlIGRlYnVnKSkgew0KPj4gfCArwqDCoMKgwqDCoMKgwqAgYnVmWzBd
-ID0gMDsNCj4+IHwgK8KgwqDCoCB9DQo+PiB8wqDCoMKgwqDCoCByZXR1cm4gbmJkX3dyaXRl
-KGlvYywgYnVmLCBzaXplb2YoYnVmKSwgZXJycCk7DQo+PiB8wqAgfQ0KPj4NCj4+IFJlcG9y
-dGVkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1
-b3p6by5jb20+DQo+PiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0
-LmNvbT4NCj4+IE1lc3NhZ2UtSWQ6IDwyMDE3MDgxNDIxMzQyNi4yNDY4MS0xLWVibGFrZUBy
-ZWRoYXQuY29tPg0KPj4gUmV2aWV3ZWQtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFA
-cmVkaGF0LmNvbT4NCj4+IC0tLQ0KPj4gwqAgYmxvY2svbmJkLWNsaWVudC5oIHzCoCAxICsN
-Cj4+IMKgIGJsb2NrL25iZC1jbGllbnQuYyB8IDE3ICsrKysrKysrKysrKystLS0tDQo+PiDC
-oCAyIGZpbGVzIGNoYW5nZWQsIDE0IGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pDQo+
-Pg0KPj4gZGlmZiAtLWdpdCBhL2Jsb2NrL25iZC1jbGllbnQuaCBiL2Jsb2NrL25iZC1jbGll
-bnQuaA0KPj4gaW5kZXggZGY4MDc3MTM1Ny4uMTkzNWZmYmNhYSAxMDA2NDQNCj4+IC0tLSBh
-L2Jsb2NrL25iZC1jbGllbnQuaA0KPj4gKysrIGIvYmxvY2svbmJkLWNsaWVudC5oDQo+PiBA
-QCAtMjksNiArMjksNyBAQCB0eXBlZGVmIHN0cnVjdCBOQkRDbGllbnRTZXNzaW9uIHsNCj4+
-DQo+PiDCoMKgwqDCoMKgIENvcm91dGluZSAqcmVjdl9jb3JvdXRpbmVbTUFYX05CRF9SRVFV
-RVNUU107DQo+PiDCoMKgwqDCoMKgIE5CRFJlcGx5IHJlcGx5Ow0KPj4gK8KgwqDCoCBib29s
-IHF1aXQ7DQo+PiDCoCB9IE5CRENsaWVudFNlc3Npb247DQo+Pg0KPj4gwqAgTkJEQ2xpZW50
-U2Vzc2lvbiAqbmJkX2dldF9jbGllbnRfc2Vzc2lvbihCbG9ja0RyaXZlclN0YXRlICpicyk7
-DQo+PiBkaWZmIC0tZ2l0IGEvYmxvY2svbmJkLWNsaWVudC5jIGIvYmxvY2svbmJkLWNsaWVu
-dC5jDQo+PiBpbmRleCAyNWRkMjg0MDZiLi40MjJlY2I0MzA3IDEwMDY0NA0KPj4gLS0tIGEv
-YmxvY2svbmJkLWNsaWVudC5jDQo+PiArKysgYi9ibG9jay9uYmQtY2xpZW50LmMNCj4+IEBA
-IC03Myw3ICs3Myw3IEBAIHN0YXRpYyBjb3JvdXRpbmVfZm4gdm9pZCBuYmRfcmVhZF9yZXBs
-eV9lbnRyeSh2b2lkIA0KPj4gKm9wYXF1ZSkNCj4+IMKgwqDCoMKgwqAgaW50IHJldDsNCj4+
-IMKgwqDCoMKgwqAgRXJyb3IgKmxvY2FsX2VyciA9IE5VTEw7DQo+Pg0KPj4gLcKgwqDCoCBm
-b3IgKDs7KSB7DQo+PiArwqDCoMKgIHdoaWxlICghcy0+cXVpdCkgew0KPj4gwqDCoMKgwqDC
-oMKgwqDCoMKgIGFzc2VydChzLT5yZXBseS5oYW5kbGUgPT0gMCk7DQo+PiDCoMKgwqDCoMKg
-wqDCoMKgwqAgcmV0ID0gbmJkX3JlY2VpdmVfcmVwbHkocy0+aW9jLCAmcy0+cmVwbHksICZs
-b2NhbF9lcnIpOw0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIGlmIChyZXQgPCAwKSB7DQo+PiBA
-QCAtMTA3LDYgKzEwNyw5IEBAIHN0YXRpYyBjb3JvdXRpbmVfZm4gdm9pZCANCj4+IG5iZF9y
-ZWFkX3JlcGx5X2VudHJ5KHZvaWQgKm9wYXF1ZSkNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCBx
-ZW11X2Nvcm91dGluZV95aWVsZCgpOw0KPj4gwqDCoMKgwqDCoCB9DQo+Pg0KPj4gK8KgwqDC
-oCBpZiAocmV0IDwgMCkgew0KPj4gK8KgwqDCoMKgwqDCoMKgIHMtPnF1aXQgPSB0cnVlOw0K
-Pg0KPiBidXQgb24gd3JvbmcgaGFuZGxlIHJldCBpcyAwOg0KDQpzLzAvcG9zaXRpdmUvDQoN
-Cj4NCj4gwqDCoMKgwqDCoMKgwqAgaWYgKHJldCA8PSAwKSB7DQo+IGJyZWFrOw0KPiB9DQo+
-DQo+IMKgwqDCoMKgwqDCoMKgIC8qIFRoZXJlJ3Mgbm8gbmVlZCBmb3IgYSBtdXRleCBvbiB0
-aGUgcmVjZWl2ZSBzaWRlLCBiZWNhdXNlIHRoZQ0KPiDCoMKgwqDCoMKgwqDCoMKgICogaGFu
-ZGxlciBhY3RzIGFzIGEgc3luY2hyb25pemF0aW9uIHBvaW50IGFuZCBlbnN1cmVzIHRoYXQg
-b25seQ0KPiDCoMKgwqDCoMKgwqDCoMKgICogb25lIGNvcm91dGluZSBpcyBjYWxsZWQgdW50
-aWwgdGhlIHJlcGx5IGZpbmlzaGVzLg0KPiAqLw0KPiDCoMKgwqDCoMKgwqDCoCBpID0gSEFO
-RExFX1RPX0lOREVYKHMsIHMtPnJlcGx5LmhhbmRsZSk7DQo+IMKgwqDCoMKgwqDCoMKgIGlm
-IChpID49IE1BWF9OQkRfUkVRVUVTVFMgfHwgIXMtPnJlY3ZfY29yb3V0aW5lW2ldKSB7DQo+
-IGJyZWFrOw0KPiDCoMKgwqDCoMKgwqDCoCB9DQo+DQo+DQo+IGxvb2tzIGxpa2Ugd2Ugc2hv
-dWxkIHNldCByZXQgaW4gdGhpcyBpZi1ibG9jaw0KPg0KPj4gK8KgwqDCoCB9DQo+PiDCoMKg
-wqDCoMKgIG5iZF9yZWN2X2Nvcm91dGluZXNfZW50ZXJfYWxsKHMpOw0KPj4gwqDCoMKgwqDC
-oCBzLT5yZWFkX3JlcGx5X2NvID0gTlVMTDsNCj4+IMKgIH0NCj4+IEBAIC0xMzUsNiArMTM4
-LDEwIEBAIHN0YXRpYyBpbnQgbmJkX2NvX3NlbmRfcmVxdWVzdChCbG9ja0RyaXZlclN0YXRl
-IA0KPj4gKmJzLA0KPj4gwqDCoMKgwqDCoCBhc3NlcnQoaSA8IE1BWF9OQkRfUkVRVUVTVFMp
-Ow0KPj4gwqDCoMKgwqDCoCByZXF1ZXN0LT5oYW5kbGUgPSBJTkRFWF9UT19IQU5ETEUocywg
-aSk7DQo+Pg0KPj4gK8KgwqDCoCBpZiAocy0+cXVpdCkgew0KPj4gK8KgwqDCoMKgwqDCoMKg
-IHFlbXVfY29fbXV0ZXhfdW5sb2NrKCZzLT5zZW5kX211dGV4KTsNCj4+ICvCoMKgwqDCoMKg
-wqDCoCByZXR1cm4gLUVJTzsNCj4+ICvCoMKgwqAgfQ0KPj4gwqDCoMKgwqDCoCBpZiAoIXMt
-PmlvYykgew0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIHFlbXVfY29fbXV0ZXhfdW5sb2NrKCZz
-LT5zZW5kX211dGV4KTsNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gLUVQSVBFOw0K
-Pj4gQEAgLTE0Myw3ICsxNTAsNyBAQCBzdGF0aWMgaW50IG5iZF9jb19zZW5kX3JlcXVlc3Qo
-QmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+PiDCoMKgwqDCoMKgIGlmIChxaW92KSB7DQo+PiDC
-oMKgwqDCoMKgwqDCoMKgwqAgcWlvX2NoYW5uZWxfc2V0X2Nvcmsocy0+aW9jLCB0cnVlKTsN
-Cj4+IMKgwqDCoMKgwqDCoMKgwqDCoCByYyA9IG5iZF9zZW5kX3JlcXVlc3Qocy0+aW9jLCBy
-ZXF1ZXN0KTsNCj4+IC3CoMKgwqDCoMKgwqDCoCBpZiAocmMgPj0gMCkgew0KPj4gK8KgwqDC
-oMKgwqDCoMKgIGlmIChyYyA+PSAwICYmICFzLT5xdWl0KSB7DQo+PiDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCByZXQgPSBuYmRfcnd2KHMtPmlvYywgcWlvdi0+aW92LCBxaW92LT5u
-aW92LCANCj4+IHJlcXVlc3QtPmxlbiwgZmFsc2UsDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgTlVMTCk7DQo+PiDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAocmV0ICE9IHJlcXVlc3QtPmxlbikgew0KPj4gQEAg
-LTE1NCw2ICsxNjEsOSBAQCBzdGF0aWMgaW50IG5iZF9jb19zZW5kX3JlcXVlc3QoQmxvY2tE
-cml2ZXJTdGF0ZSAqYnMsDQo+PiDCoMKgwqDCoMKgIH0gZWxzZSB7DQo+PiDCoMKgwqDCoMKg
-wqDCoMKgwqAgcmMgPSBuYmRfc2VuZF9yZXF1ZXN0KHMtPmlvYywgcmVxdWVzdCk7DQo+PiDC
-oMKgwqDCoMKgIH0NCj4+ICvCoMKgwqAgaWYgKHJjIDwgMCkgew0KPj4gK8KgwqDCoMKgwqDC
-oMKgIHMtPnF1aXQgPSB0cnVlOw0KPj4gK8KgwqDCoCB9DQo+PiDCoMKgwqDCoMKgIHFlbXVf
-Y29fbXV0ZXhfdW5sb2NrKCZzLT5zZW5kX211dGV4KTsNCj4+IMKgwqDCoMKgwqAgcmV0dXJu
-IHJjOw0KPj4gwqAgfQ0KPj4gQEAgLTE2OCw4ICsxNzgsNyBAQCBzdGF0aWMgdm9pZCBuYmRf
-Y29fcmVjZWl2ZV9yZXBseShOQkRDbGllbnRTZXNzaW9uIA0KPj4gKnMsDQo+PiDCoMKgwqDC
-oMKgIC8qIFdhaXQgdW50aWwgd2UncmUgd29rZW4gdXAgYnkgbmJkX3JlYWRfcmVwbHlfZW50
-cnkuwqAgKi8NCj4+IMKgwqDCoMKgwqAgcWVtdV9jb3JvdXRpbmVfeWllbGQoKTsNCj4+IMKg
-wqDCoMKgwqAgKnJlcGx5ID0gcy0+cmVwbHk7DQo+PiAtwqDCoMKgIGlmIChyZXBseS0+aGFu
-ZGxlICE9IHJlcXVlc3QtPmhhbmRsZSB8fA0KPj4gLcKgwqDCoMKgwqDCoMKgICFzLT5pb2Mp
-IHsNCj4+ICvCoMKgwqAgaWYgKHJlcGx5LT5oYW5kbGUgIT0gcmVxdWVzdC0+aGFuZGxlIHx8
-ICFzLT5pb2MgfHwgcy0+cXVpdCkgew0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIHJlcGx5LT5l
-cnJvciA9IEVJTzsNCj4+IMKgwqDCoMKgwqAgfSBlbHNlIHsNCj4+IMKgwqDCoMKgwqDCoMKg
-wqDCoCBpZiAocWlvdiAmJiByZXBseS0+ZXJyb3IgPT0gMCkgew0KPg0KPg0KDQotLSANCkJl
-c3QgcmVnYXJkcywNClZsYWRpbWlyDQoNCg==
+* Peter Xu (peterx@redhat.com) wrote:
+> On Mon, Aug 21, 2017 at 04:58:51PM +0800, Fam Zheng wrote:
+> > On Mon, 08/21 15:44, Peter Xu wrote:
+> > > This is an extended work for migration postcopy recovery. This series
+> > > is tested with the following series to make sure it solves the monitor
+> > > hang problem that we have encountered for postcopy recovery:
+> > >=20
+> > >   [RFC 00/29] Migration: postcopy failure recovery
+> > >   [RFC 0/6] migration: re-use migrate_incoming for postcopy recovery
+> > >=20
+> > > The root problem is that, monitor commands are all handled in main
+> > > loop thread now, no matter how many monitors we specify. And, if main
+> > > loop thread hangs due to some reason, all monitors will be stuck.
+> > > This can be done in reversed order as well: if any of the monitor
+> > > hangs, it will hang the main loop, and the rest of the monitors (if
+> > > there is any).
+> > >=20
+> > > That affects postcopy recovery, since the recovery requires user input
+> > > on destination side.  If monitors hang, the destination VM dies and
+> > > lose hope for even a final recovery.
+> > >=20
+> > > So, sometimes we need to make sure the monitor be alive, at least one
+> > > of them.
+> > >=20
+> > > The whole idea of this series is that instead if handling monitor
+> > > commands all in main loop thread, we do it separately in per-monitor
+> > > threads.  Then, even if main loop thread hangs at any point by any
+> > > reason, per-monitor thread can still survive.  Further, we add hint in
+> > > QMP/HMP to show whether a command can be executed without QMP, if so,
+> > > we avoid taking BQL when running that command.  It greatly reduced
+> > > contention of BQL.  Now the only user of that new parameter (currently
+> > > I call it "without-bql") is "migrate-incoming" command, which is the
+> > > only command to rescue a paused postcopy migration.
+> > >=20
+> > > However, even with the series, it does not mean that per-monitor
+> > > threads will never hang.  One example is that we can still run "info
+> > > vcpus" in per-monitor threads during a paused postcopy (in that state,
+> > > page faults are never handled, and "info cpus" will never return since
+> > > it tries to sync every vcpus).  So to make sure it does not hang, we
+> > > not only need the per-monitor thread, the user should be careful as
+> > > well on how to use it.
+> >=20
+> > I think this is like saying we expect the user to understand the intern=
+als of
+> > QEMU, unless the "rules" are clearly documented.  Taking this into acco=
+unt,
+> > does it make sense to make the per-monitor thread only allow BQL-free c=
+ommands?
+>=20
+> I don't think users need to know the internals - they just need to be
+> careful on using them.  Just take the example of "info cpus": during
+> paused postcopy it will hang, but IMHO it does not mean that it's
+> illegal for user to send that command.  It's "by-design" that it'll be
+> stuck if one of the vcpus is stuck somewhere; it's just not the
+> correct way to use it when the monitor is prepared for postcopy
+> recovery.
+>=20
+> And IMHO we should not treat threaded monitors special - it should be
+> exactly the same monitor service when used with main loop thread.  It
+> just has its own thread to handle the requests, so it is less
+> dependent on main loop thread, and that's all.
+
+=46rom previous discussions we've had, one suggestion was to have some
+type of 'safe' command; once issued in a thread, the monitor thread
+would only allow other lock-free commands to be issued; it stops any
+accidents of them issuing unsafe commands.
+
+Dave
+
+> Thanks,
+>=20
+> --=20
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
