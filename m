@@ -1,31 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1djmjw-00047b-LZ
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:27:37 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1djmom-0006JM-7B
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:32:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1djmjs-0000W8-NY
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:27:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56222)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1djmjs-0000VL-I3
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:27:32 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 95F9EC0587F2
-	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 13:27:31 +0000 (UTC)
-Message-ID: <1503322045.26016.21.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 21 Aug 2017 15:27:25 +0200
-In-Reply-To: <20170809050846-mutt-send-email-mst@kernel.org>
-References: <20170808224750.23904-1-marcandre.lureau@redhat.com>
-	<20170809050846-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio-input: send rel-wheel events for
- wheel buttons
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1djmog-0004n1-Me
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:32:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43581
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1djmog-0004mO-GV
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:32:30 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7LDT9Ux029467
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 09:32:29 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2cg0610ys0-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 09:32:29 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Mon, 21 Aug 2017 14:32:27 +0100
+References: <20170821091614.28251-1-cohuck@redhat.com>
+	<20170821091614.28251-8-cohuck@redhat.com>
+	<700d1722-baf1-163e-6764-179f1340cc22@linux.vnet.ibm.com>
+	<20170821151650.35050b3e.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Mon, 21 Aug 2017 15:32:23 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170821151650.35050b3e.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <e21f5781-38c9-5909-b0e1-f47de1cb524d@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 07/10] s390x/sclp: properly guard
+ pci-specific functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,45 +46,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: thuth@redhat.com, zyimin@linux.vnet.ibm.com, david@redhat.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, qemu-devel@nongnu.org, borntraeger@de.ibm.com
 
-  Hi,
 
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.select=C2=A0=C2=
-=A0=C2=A0=C2=A0=3D VIRTIO_INPUT_CFG_EV_BITS,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.subsel=C2=A0=C2=
-=A0=C2=A0=C2=A0=3D EV_REL,
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.size=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=3D 1,
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.size=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=3D 2,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.u.bitmap=C2=A0=
-=C2=A0=3D {
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0(1 << REL_X) | (1 << REL_Y),
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0(1 << REL_X) | (1 << REL_Y),=C2=A0=C2=A0(1 << (REL_WHEEL - 8))
->=20
-> Works only when REL_WHEEL is between 8 and 15.
-> Add BUILD_BUG_ON?
 
-Not needed IMO, REL_WHEEL value is kernel/userspace abi and will never
-change.
+On 08/21/2017 03:16 PM, Cornelia Huck wrote:
+> On Mon, 21 Aug 2017 13:41:53 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+>> On 08/21/2017 11:16 AM, Cornelia Huck wrote:
+>>> If we do not provide zpci, pci reconfiguration via sclp is not available
+>>> either. Don't indicate it in the sclp facilities and return an invalid
+>>> command if the guest tries to issue pci configure/deconfigure.
+>>>
+>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>> ---
+>>>  hw/s390x/sclp.c | 19 +++++++++++++++----
+>>>  1 file changed, 15 insertions(+), 4 deletions(-)
+> 
+> (...)
+> 
+>> LGTM
+> 
+> Is that an Acked-by:? Or a Reviewed-by:? :)
+> 
 
->=20
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0},
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0},
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0{ /* end of list */ },
->=20
-> Is it problematic e.g. if you migrate from a host with REL_WHEEL
-> to one without? Should we maintain a version without REL_WHEEL
-> for old machine types?
+r-b
 
-Yes, we need a compat property.
-
-Possibly it is easier to fix on the guest side, assuming it is actually
-needed (see other reply).
-
-cheers,
-  Gerd
+(Not sure what Acked-by from a role other that affected
+maintainer means.)
