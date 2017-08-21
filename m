@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1djctv-00005n-Pv
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 22:57:17 -0400
+	(envelope-from <jasowang@redhat.com>) id 1djdDG-0007su-79
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 23:17:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1djcts-0001lj-Kj
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 22:57:15 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:40858)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1djctq-0001jK-W2
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 22:57:12 -0400
-Date: Mon, 21 Aug 2017 10:56:52 +0800 (CST)
-Message-ID: <201708211056520797017@zte.com.cn>
-References: 1502967483-4090-1-git-send-email-wang.yong155@zte.com.cn,
-	13be36f3-0bdf-ea6c-69df-105f4bdedb29@redhat.com
-Mime-Version: 1.0
-From: <wang.yong155@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogW1BBVENIdjMgMDEvMDNdIHFl?=
- =?utf-8?q?mu-iothread=3A_IOThread_supports_the_GMainContextevent_loop?=
+	(envelope-from <jasowang@redhat.com>) id 1djdDD-0007ur-2n
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 23:17:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48046)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1djdDC-0007ud-ST
+	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 23:17:10 -0400
+References: <1501236190-15177-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<10b93f73-c7a0-f07a-2f94-f2bd860e073c@cn.fujitsu.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <c716edf1-479e-95ec-e279-e106da3685a2@redhat.com>
+Date: Mon, 21 Aug 2017 11:17:03 +0800
+MIME-Version: 1.0
+In-Reply-To: <10b93f73-c7a0-f07a-2f94-f2bd860e073c@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] net/filter-rewriter.c: Fix rewirter
+ checksum bug when use virtio-net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,92 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: stefanha@redhat.com, famz@redhat.com, jasowang@redhat.com, zhangchen.fnst@cn.fujitsu.com, zhang.zhanghailiang@huawei.com, wang.guang55@zte.com.cn, lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Pj4gK3N0YXRpYyBncG9pbnRlciBpb3RocmVhZF9nX21haW5fY29udGV4dF9pbml0KGdwb2ludGVy
-IG9wYXF1ZSk+PiArez4+ICsgICAgQWlvQ29udGV4dCAqY3R4Pj4gKyAgICBJT1RocmVhZCAqaW90
-aHJlYWQgPSBvcGFxdWU+PiArICAgIEdTb3VyY2UgKnNvdXJjZT4+ICs+PiArICAgIGlvdGhyZWFk
-LT53b3JrZXJfY29udGV4dCA9IGdfbWFpbl9jb250ZXh0X25ldygpPj4gKz4+ICsgICAgY3R4ID0g
-aW90aHJlYWRfZ2V0X2Fpb19jb250ZXh0KGlvdGhyZWFkKT4+ICsgICAgc291cmNlID0gYWlvX2dl
-dF9nX3NvdXJjZShjdHgpPj4gKyAgICBnX3NvdXJjZV9hdHRhY2goc291cmNlLCBpb3RocmVhZC0+
-d29ya2VyX2NvbnRleHQpPj4gKyAgICBnX3NvdXJjZV91bnJlZihzb3VyY2UpPg0KDQo+WW91IHN0
-aWxsIG5lZWQgYWlvX25vdGlmeSwgc28gdGhhdCB0aGUgYWlvX3BvbGwgY2FsbCBpbiBpb3RocmVh
-ZF9ydW4gZXhpdHMuDQpUaGFua3MuIFRoZSBwcm9wb3NhbCBpcyByZWFzb25hYmxlLCBhbmQgaGVy
-ZSB3ZSBzaG91bGQgbm90aWZ5IGFpb19wb2xsIHRvIGV4aXQuDQoNCg0KDQoNCldhbmdZb25nDQoN
-Cg0KDQrljp/lp4vpgq7ku7YNCg0KDQoNCuWPkeS7tuS6uu+8miA8cGJvbnppbmlAcmVkaGF0LmNv
-bT4NCuaUtuS7tuS6uu+8mueOi+WLhzEwMTcwNTMwIDxzdGVmYW5oYUByZWRoYXQuY29tPiA8ZmFt
-ekByZWRoYXQuY29tPiA8amFzb3dhbmdAcmVkaGF0LmNvbT4gPHpoYW5nY2hlbi5mbnN0QGNuLmZ1
-aml0c3UuY29tPiA8emhhbmcuemhhbmdoYWlsaWFuZ0BodWF3ZWkuY29tPg0K5oqE6YCB5Lq677ya
-546L5bm/MTAxNjU5OTIgPGxpemhpamlhbkBjbi5mdWppdHN1LmNvbT4gPHFlbXUtZGV2ZWxAbm9u
-Z251Lm9yZz4NCuaXpSDmnJ8g77yaMjAxN+W5tDA45pyIMTfml6UgMTk6NDcNCuS4uyDpopgg77ya
-UmU6IFtQQVRDSHYzIDAxLzAzXSBxZW11LWlvdGhyZWFkOiBJT1RocmVhZCBzdXBwb3J0cyB0aGUg
-R01haW5Db250ZXh0ZXZlbnQgbG9vcA0KDQoNCg0KDQoNCk9uIDE3LzA4LzIwMTcgMTI6NTgsIFdh
-bmcgeW9uZyB3cm90ZToNCj4gRnJvbTogV2FuZyBZb25nIDx3YW5nLnlvbmcxNTVAenRlLmNvbS5j
-bj4NCj4gDQo+IElPVGhyZWFkIHVzZXMgQWlvQ29udGV4dCBldmVudCBsb29wIGFuZCBkb2VzIG5v
-dCBydW4gYSBHTWFpbkNvbnRleHQuDQo+IFRoZXJlZm9yZSxjaGFyZGV2IGNhbm5vdCB3b3JrIGlu
-IElPVGhyZWFkLHN1Y2ggYXMgdGhlIGNoYXJkZXYgaXMNCj4gdXNlZCBmb3IgY29sby1jb21wYXJl
-IHBhY2tldHMgcmVjZXB0aW9uLg0KPiANCj4gVGhpcyBwYXRjaCBtYWtlcyB0aGUgSU9UaHJlYWQg
-cnVuIHRoZSBHTWFpbkNvbnRleHQgZXZlbnQgbG9vcCwNCj4gY2hhcmRldiBhbmQgSU9UaHJlYWQg
-Y2FuIHdvcmsgdG9nZXRoZXIuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBXYW5nIFlvbmcgPHdhbmcu
-eW9uZzE1NUB6dGUuY29tLmNuPg0KPiBTaWduZWQtb2ZmLWJ5OiBXYW5nIEd1YW5nIDx3YW5nLmd1
-YW5nNTVAenRlLmNvbS5jbj4NCj4gLS0tDQo+ICBpbmNsdWRlL3N5c2VtdS9pb3RocmVhZC5oIHwg
-IDQgKysrKw0KPiAgaW90aHJlYWQuYyAgICAgICAgICAgICAgICB8IDQxICsrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICAyIGZpbGVzIGNoYW5nZWQsIDQ1IGluc2Vy
-dGlvbnMoKykNCj4gDQo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL3N5c2VtdS9pb3RocmVhZC5oIGIv
-aW5jbHVkZS9zeXNlbXUvaW90aHJlYWQuaA0KPiBpbmRleCBlNmRhMWE0Li5kMjk4NWIzIDEwMDY0
-NA0KPiAtLS0gYS9pbmNsdWRlL3N5c2VtdS9pb3RocmVhZC5oDQo+ICsrKyBiL2luY2x1ZGUvc3lz
-ZW11L2lvdGhyZWFkLmgNCj4gQEAgLTI0LDYgKzI0LDkgQEAgdHlwZWRlZiBzdHJ1Y3Qgew0KPiAg
-DQo+ICAgICAgUWVtdVRocmVhZCB0aHJlYWQNCj4gICAgICBBaW9Db250ZXh0ICpjdHgNCj4gKyAg
-ICBHTWFpbkNvbnRleHQgKndvcmtlcl9jb250ZXh0DQo+ICsgICAgR01haW5Mb29wICptYWluX2xv
-b3ANCj4gKyAgICBHT25jZSBvbmNlDQo+ICAgICAgUWVtdU11dGV4IGluaXRfZG9uZV9sb2NrDQo+
-ICAgICAgUWVtdUNvbmQgaW5pdF9kb25lX2NvbmQgICAgLyogaXMgdGhyZWFkIGluaXRpYWxpemF0
-aW9uIGRvbmU/ICovDQo+ICAgICAgYm9vbCBzdG9wcGluZw0KPiBAQCAtNDEsNSArNDQsNiBAQCB0
-eXBlZGVmIHN0cnVjdCB7DQo+ICBjaGFyICppb3RocmVhZF9nZXRfaWQoSU9UaHJlYWQgKmlvdGhy
-ZWFkKQ0KPiAgQWlvQ29udGV4dCAqaW90aHJlYWRfZ2V0X2Fpb19jb250ZXh0KElPVGhyZWFkICpp
-b3RocmVhZCkNCj4gIHZvaWQgaW90aHJlYWRfc3RvcF9hbGwodm9pZCkNCj4gK0dNYWluQ29udGV4
-dCAqaW90aHJlYWRfZ2V0X2dfbWFpbl9jb250ZXh0KElPVGhyZWFkICppb3RocmVhZCkNCj4gIA0K
-PiAgI2VuZGlmIC8qIElPVEhSRUFEX0ggKi8NCj4gZGlmZiAtLWdpdCBhL2lvdGhyZWFkLmMgYi9p
-b3RocmVhZC5jDQo+IGluZGV4IGJlZWI4NzAuLjgwZWY4MzAgMTAwNjQ0DQo+IC0tLSBhL2lvdGhy
-ZWFkLmMNCj4gKysrIGIvaW90aHJlYWQuYw0KPiBAQCAtNTcsNiArNTcsMjAgQEAgc3RhdGljIHZv
-aWQgKmlvdGhyZWFkX3J1bih2b2lkICpvcGFxdWUpDQo+ICANCj4gICAgICB3aGlsZSAoIWF0b21p
-Y19yZWFkKCZpb3RocmVhZC0+c3RvcHBpbmcpKSB7DQo+ICAgICAgICAgIGFpb19wb2xsKGlvdGhy
-ZWFkLT5jdHgsIHRydWUpDQo+ICsNCj4gKyAgICAgICAgaWYgKGF0b21pY19yZWFkKCZpb3RocmVh
-ZC0+d29ya2VyX2NvbnRleHQpKSB7DQo+ICsgICAgICAgICAgICBnX21haW5fY29udGV4dF9wdXNo
-X3RocmVhZF9kZWZhdWx0KGlvdGhyZWFkLT53b3JrZXJfY29udGV4dCkNCj4gKyAgICAgICAgICAg
-IGlvdGhyZWFkLT5tYWluX2xvb3AgPQ0KPiArICAgICAgICAgICAgICAgIGdfbWFpbl9sb29wX25l
-dyhpb3RocmVhZC0+d29ya2VyX2NvbnRleHQsIFRSVUUpDQo+ICsgICAgICAgICAgICBnX21haW5f
-bG9vcF9ydW4oaW90aHJlYWQtPm1haW5fbG9vcCkNCj4gKw0KPiArICAgICAgICAgICAgZ19tYWlu
-X2xvb3BfdW5yZWYoaW90aHJlYWQtPm1haW5fbG9vcCkNCj4gKyAgICAgICAgICAgIGlvdGhyZWFk
-LT5tYWluX2xvb3AgPSBOVUxMDQo+ICsNCj4gKyAgICAgICAgICAgIGdfbWFpbl9jb250ZXh0X3Bv
-cF90aHJlYWRfZGVmYXVsdChpb3RocmVhZC0+d29ya2VyX2NvbnRleHQpDQo+ICsgICAgICAgICAg
-ICBnX21haW5fY29udGV4dF91bnJlZihpb3RocmVhZC0+d29ya2VyX2NvbnRleHQpDQo+ICsgICAg
-ICAgICAgICBpb3RocmVhZC0+d29ya2VyX2NvbnRleHQgPSBOVUxMDQo+ICsgICAgICAgIH0NCj4g
-ICAgICB9DQo+ICANCj4gICAgICByY3VfdW5yZWdpc3Rlcl90aHJlYWQoKQ0KPiBAQCAtNzMsNiAr
-ODcsOSBAQCBzdGF0aWMgaW50IGlvdGhyZWFkX3N0b3AoT2JqZWN0ICpvYmplY3QsIHZvaWQgKm9w
-YXF1ZSkNCj4gICAgICB9DQo+ICAgICAgaW90aHJlYWQtPnN0b3BwaW5nID0gdHJ1ZQ0KPiAgICAg
-IGFpb19ub3RpZnkoaW90aHJlYWQtPmN0eCkNCj4gKyAgICBpZiAoYXRvbWljX3JlYWQoJmlvdGhy
-ZWFkLT5tYWluX2xvb3ApKSB7DQo+ICsgICAgICAgIGdfbWFpbl9sb29wX3F1aXQoaW90aHJlYWQt
-Pm1haW5fbG9vcCkNCj4gKyAgICB9DQo+ICAgICAgcWVtdV90aHJlYWRfam9pbigmaW90aHJlYWQt
-PnRocmVhZCkNCj4gICAgICByZXR1cm4gMA0KPiAgfQ0KPiBAQCAtMTI1LDYgKzE0Miw3IEBAIHN0
-YXRpYyB2b2lkIGlvdGhyZWFkX2NvbXBsZXRlKFVzZXJDcmVhdGFibGUgKm9iaiwgRXJyb3IgKipl
-cnJwKQ0KPiAgDQo+ICAgICAgcWVtdV9tdXRleF9pbml0KCZpb3RocmVhZC0+aW5pdF9kb25lX2xv
-Y2spDQo+ICAgICAgcWVtdV9jb25kX2luaXQoJmlvdGhyZWFkLT5pbml0X2RvbmVfY29uZCkNCj4g
-KyAgICBpb3RocmVhZC0+b25jZSA9IChHT25jZSkgR19PTkNFX0lOSVQNCj4gIA0KPiAgICAgIC8q
-IFRoaXMgYXNzdW1lcyB3ZSBhcmUgY2FsbGVkIGZyb20gYSB0aHJlYWQgd2l0aCB1c2VmdWwgQ1BV
-IGFmZmluaXR5IGZvciB1cw0KPiAgICAgICAqIHRvIGluaGVyaXQuDQo+IEBAIC0zMDksMyArMzI3
-LDI2IEBAIHZvaWQgaW90aHJlYWRfc3RvcF9hbGwodm9pZCkNCj4gIA0KPiAgICAgIG9iamVjdF9j
-aGlsZF9mb3JlYWNoKGNvbnRhaW5lciwgaW90aHJlYWRfc3RvcCwgTlVMTCkNCj4gIH0NCj4gKw0K
-PiArc3RhdGljIGdwb2ludGVyIGlvdGhyZWFkX2dfbWFpbl9jb250ZXh0X2luaXQoZ3BvaW50ZXIg
-b3BhcXVlKQ0KPiArew0KPiArICAgIEFpb0NvbnRleHQgKmN0eA0KPiArICAgIElPVGhyZWFkICpp
-b3RocmVhZCA9IG9wYXF1ZQ0KPiArICAgIEdTb3VyY2UgKnNvdXJjZQ0KPiArDQo+ICsgICAgaW90
-aHJlYWQtPndvcmtlcl9jb250ZXh0ID0gZ19tYWluX2NvbnRleHRfbmV3KCkNCj4gKw0KPiArICAg
-IGN0eCA9IGlvdGhyZWFkX2dldF9haW9fY29udGV4dChpb3RocmVhZCkNCj4gKyAgICBzb3VyY2Ug
-PSBhaW9fZ2V0X2dfc291cmNlKGN0eCkNCj4gKyAgICBnX3NvdXJjZV9hdHRhY2goc291cmNlLCBp
-b3RocmVhZC0+d29ya2VyX2NvbnRleHQpDQo+ICsgICAgZ19zb3VyY2VfdW5yZWYoc291cmNlKQ0K
-DQpZb3Ugc3RpbGwgbmVlZCBhaW9fbm90aWZ5LCBzbyB0aGF0IHRoZSBhaW9fcG9sbCBjYWxsIGlu
-IGlvdGhyZWFkX3J1biBleGl0cy4NCg0KUGFvbG8NCg0KPiArICAgIHJldHVybiBOVUxMDQo+ICt9
-DQo+ICsNCj4gK0dNYWluQ29udGV4dCAqaW90aHJlYWRfZ2V0X2dfbWFpbl9jb250ZXh0KElPVGhy
-ZWFkICppb3RocmVhZCkNCj4gK3sNCj4gKyAgICBnX29uY2UoJmlvdGhyZWFkLT5vbmNlLCBpb3Ro
-cmVhZF9nX21haW5fY29udGV4dF9pbml0LCBpb3RocmVhZCkNCj4gKw0KPiArICAgIHJldHVybiBp
-b3RocmVhZC0+d29ya2VyX2NvbnRleHQNCj4gK30NCj4=
+
+
+On 2017=E5=B9=B408=E6=9C=8821=E6=97=A5 09:42, Zhang Chen wrote:
+> Hi~ All~
+>
+> Someone can review it? Just a ping for this patch.
+>
+>
+> Thanks
+>
+> Zhang Chen
+>
+
+Queued this for 2.11.
+
+Thanks
