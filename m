@@ -1,40 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1djlvs-0004ab-QK
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 08:35:54 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1djm9x-0001f4-WC
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 08:50:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1djlvo-00038e-IX
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 08:35:52 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52453)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
-	id 1djlvo-00035y-8g
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 08:35:48 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7LCYe6B014883
-	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 08:35:47 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cfttvxujk-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 08:35:46 -0400
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
-	Mon, 21 Aug 2017 08:35:45 -0400
-References: <150287457293.9760.17827532208744487789.stgit@aravinda>
-	<150287474187.9760.12052550430995757993.stgit@aravinda>
-	<20170817013934.GC5509@umbus.fritz.box>
-From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Date: Mon, 21 Aug 2017 18:05:34 +0530
+	(envelope-from <dgibson@ozlabs.org>) id 1djm9u-0003M2-Qj
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 08:50:26 -0400
+Date: Mon, 21 Aug 2017 20:50:01 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170821105001.GM12356@umbus.fritz.box>
+References: <cover.1503249785.git.balaton@eik.bme.hu>
+	<4817dda8eabbba2c7a3c886a1f70b7872ce8ae31.1503249785.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
-In-Reply-To: <20170817013934.GC5509@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Message-Id: <555e187e-38af-d897-85b7-f08364b264fd@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] ppc: spapr: Handle "ibm,
- nmi-register" and "ibm, nmi-interlock" RTAS calls
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="6CiRFyVmOOJ3DkBX"
+Content-Disposition: inline
+In-Reply-To: <4817dda8eabbba2c7a3c886a1f70b7872ce8ae31.1503249785.git.balaton@eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH 06/15] ppc4xx_i2c: QOMify
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,174 +24,396 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru, mahesh@linux.vnet.ibm.com, benh@au1.ibm.com, paulus@samba.org, sam.bobroff@au1.ibm.com
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
 
 
+--6CiRFyVmOOJ3DkBX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Thursday 17 August 2017 07:09 AM, David Gibson wrote:
-> What's with the extra spaces in the subject line?
+On Sun, Aug 20, 2017 at 07:23:05PM +0200, BALATON Zoltan wrote:
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 
-I don't see any. Can you pls point out?
+Applied patches 5 & 6 to ppc-for-2.11.
 
-> 
-> On Wed, Aug 16, 2017 at 02:42:21PM +0530, Aravinda Prasad wrote:
->> This patch adds support in QEMU to handle "ibm,nmi-register"
->> and "ibm,nmi-interlock" RTAS calls.
->>
->> The machine check notification address is saved when the
->> OS issues "ibm,nmi-register" RTAS call.
->>
->> This patch also handles the case when multiple processors
->> experience machine check at or about the same time by
->> handling "ibm,nmi-interlock" call. In such cases, as per
->> PAPR, subsequent processors serialize waiting for the first
->> processor to issue the "ibm,nmi-interlock" call. The second
->> processor waits till the first processor, which also
->> received a machine check error, is done reading the error
->> log. The first processor issues "ibm,nmi-interlock" call
->> when the error log is consumed. This patch implements the
->> releasing part of the error-log while subsequent patch
->> (which builds error log) handles the locking part.
->>
->> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
->> ---
->>  hw/ppc/spapr.c         |    8 ++++++++
->>  hw/ppc/spapr_rtas.c    |   35 +++++++++++++++++++++++++++++++++++
->>  include/hw/ppc/spapr.h |   10 +++++++++-
->>  3 files changed, 52 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 2a3e53d..0bb2c4a 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -1441,6 +1441,11 @@ static void ppc_spapr_reset(void)
->>      first_ppc_cpu->env.nip = SPAPR_ENTRY_POINT;
->>  
->>      spapr->cas_reboot = false;
->> +
->> +    spapr->mc_in_progress = false;
->> +    spapr->guest_machine_check_addr = 0;
->> +    qemu_cond_destroy(&spapr->mc_delivery_cond);
->> +    qemu_cond_init(&spapr->mc_delivery_cond);
->>  }
->>  
->>  static void spapr_create_nvram(sPAPRMachineState *spapr)
->> @@ -2491,6 +2496,9 @@ static void ppc_spapr_init(MachineState *machine)
->>  
->>          kvmppc_spapr_enable_inkernel_multitce();
->>      }
->> +
->> +    spapr->mc_in_progress = false;
->> +    qemu_cond_init(&spapr->mc_delivery_cond);
->>  }
->>  
->>  static int spapr_kvm_type(const char *vm_type)
->> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
->> index 94a2799..2f3c47b 100644
->> --- a/hw/ppc/spapr_rtas.c
->> +++ b/hw/ppc/spapr_rtas.c
->> @@ -348,6 +348,37 @@ static void rtas_get_power_level(PowerPCCPU *cpu, sPAPRMachineState *spapr,
->>      rtas_st(rets, 1, 100);
->>  }
->>  
->> +static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
->> +                                  sPAPRMachineState *spapr,
->> +                                  uint32_t token, uint32_t nargs,
->> +                                  target_ulong args,
->> +                                  uint32_t nret, target_ulong rets)
->> +{
->> +    spapr->guest_machine_check_addr = rtas_ld(args, 1);
->> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->> +}
->> +
->> +static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
->> +                                   sPAPRMachineState *spapr,
->> +                                   uint32_t token, uint32_t nargs,
->> +                                   target_ulong args,
->> +                                   uint32_t nret, target_ulong rets)
->> +{
->> +    if (!spapr->guest_machine_check_addr) {
->> +        /* NMI register not called */
->> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
->> +    } else {
->> +        /*
->> +         * VCPU issuing "ibm,nmi-interlock" is done with NMI handling,
->> +         * hence unset mc_in_progress.
->> +         */
->> +        spapr->mc_in_progress = false;
->> +        qemu_cond_signal(&spapr->mc_delivery_cond);
->> +        rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->> +    }
->> +}
->> +
->> +
->>  static struct rtas_call {
->>      const char *name;
->>      spapr_rtas_fn fn;
->> @@ -489,6 +520,10 @@ static void core_rtas_register_types(void)
->>                          rtas_set_power_level);
->>      spapr_rtas_register(RTAS_GET_POWER_LEVEL, "get-power-level",
->>                          rtas_get_power_level);
->> +    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
->> +                        rtas_ibm_nmi_register);
->> +    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
->> +                        rtas_ibm_nmi_interlock);
->>  }
->>  
->>  type_init(core_rtas_register_types)
->> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->> index 46012b3..eee8d33 100644
->> --- a/include/hw/ppc/spapr.h
->> +++ b/include/hw/ppc/spapr.h
->> @@ -123,6 +123,12 @@ struct sPAPRMachineState {
->>       * occurs during the unplug process. */
->>      QTAILQ_HEAD(, sPAPRDIMMState) pending_dimm_unplugs;
->>  
->> +    /* State related to "ibm,nmi-register" and "ibm,nmi-interlock" calls */
->> +    target_ulong guest_machine_check_addr;
->> +    bool mc_in_progress;
->> +    int mc_cpu;
-> 
-> mc_cpu isn't actually used yet in this patch.  In any case it and
-> mc_in_progress could probably be folded together, no?
+> ---
+>  hw/ppc/ppc405.h             |   2 -
+>  hw/ppc/ppc405_uc.c          |   5 +-
+>  hw/ppc/ppc4xx_i2c.c         | 154 ++++++++++++++------------------------=
+------
+>  include/hw/i2c/ppc4xx_i2c.h |  61 ++++++++++++++++++
+>  4 files changed, 113 insertions(+), 109 deletions(-)
+>  create mode 100644 include/hw/i2c/ppc4xx_i2c.h
+>=20
+> diff --git a/hw/ppc/ppc405.h b/hw/ppc/ppc405.h
+> index 61ec739..a9ffc87 100644
+> --- a/hw/ppc/ppc405.h
+> +++ b/hw/ppc/ppc405.h
+> @@ -59,8 +59,6 @@ struct ppc4xx_bd_info_t {
+>  ram_addr_t ppc405_set_bootinfo (CPUPPCState *env, ppc4xx_bd_info_t *bd,
+>                                  uint32_t flags);
+> =20
+> -void ppc405_i2c_init(hwaddr base, qemu_irq irq);
+> -
+>  CPUPPCState *ppc405cr_init(MemoryRegion *address_space_mem,
+>                          MemoryRegion ram_memories[4],
+>                          hwaddr ram_bases[4],
+> diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
+> index 3925e4c..8f44cb4 100644
+> --- a/hw/ppc/ppc405_uc.c
+> +++ b/hw/ppc/ppc405_uc.c
+> @@ -28,6 +28,7 @@
+>  #include "hw/hw.h"
+>  #include "hw/ppc/ppc.h"
+>  #include "hw/boards.h"
+> +#include "hw/i2c/ppc4xx_i2c.h"
+>  #include "ppc405.h"
+>  #include "hw/char/serial.h"
+>  #include "qemu/timer.h"
+> @@ -1663,7 +1664,7 @@ CPUPPCState *ppc405cr_init(MemoryRegion *address_sp=
+ace_mem,
+>                         DEVICE_BIG_ENDIAN);
+>      }
+>      /* IIC controller */
+> -    ppc405_i2c_init(0xef600500, pic[2]);
+> +    sysbus_create_simple(TYPE_PPC4xx_I2C, 0xef600500, pic[2]);
+>      /* GPIO */
+>      ppc405_gpio_init(0xef600700);
+>      /* CPU control */
+> @@ -2010,7 +2011,7 @@ CPUPPCState *ppc405ep_init(MemoryRegion *address_sp=
+ace_mem,
+>      dma_irqs[3] =3D pic[8];
+>      ppc405_dma_init(env, dma_irqs);
+>      /* IIC controller */
+> -    ppc405_i2c_init(0xef600500, pic[2]);
+> +    sysbus_create_simple(TYPE_PPC4xx_I2C, 0xef600500, pic[2]);
+>      /* GPIO */
+>      ppc405_gpio_init(0xef600700);
+>      /* Serial ports */
+> diff --git a/hw/ppc/ppc4xx_i2c.c b/hw/ppc/ppc4xx_i2c.c
+> index 15f2dea..5a6bde9 100644
+> --- a/hw/ppc/ppc4xx_i2c.c
+> +++ b/hw/ppc/ppc4xx_i2c.c
+> @@ -27,42 +27,20 @@
+>  #include "qemu-common.h"
+>  #include "cpu.h"
+>  #include "hw/hw.h"
+> -#include "exec/address-spaces.h"
+> -#include "hw/ppc/ppc.h"
+> -#include "ppc405.h"
+> +#include "hw/i2c/ppc4xx_i2c.h"
+> =20
+>  /*#define DEBUG_I2C*/
+> =20
+> -typedef struct ppc4xx_i2c_t ppc4xx_i2c_t;
+> -struct ppc4xx_i2c_t {
+> -    qemu_irq irq;
+> -    MemoryRegion iomem;
+> -    uint8_t mdata;
+> -    uint8_t lmadr;
+> -    uint8_t hmadr;
+> -    uint8_t cntl;
+> -    uint8_t mdcntl;
+> -    uint8_t sts;
+> -    uint8_t extsts;
+> -    uint8_t sdata;
+> -    uint8_t lsadr;
+> -    uint8_t hsadr;
+> -    uint8_t clkdiv;
+> -    uint8_t intrmsk;
+> -    uint8_t xfrcnt;
+> -    uint8_t xtcntlss;
+> -    uint8_t directcntl;
+> -};
+> +#define PPC4xx_I2C_MEM_SIZE 0x11
+> =20
+> -static uint32_t ppc4xx_i2c_readb(void *opaque, hwaddr addr)
+> +static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr addr, unsigned int=
+ size)
+>  {
+> -    ppc4xx_i2c_t *i2c;
+> -    uint32_t ret;
+> +    PPC4xxI2CState *i2c =3D PPC4xx_I2C(opaque);
+> +    uint64_t ret;
+> =20
+>  #ifdef DEBUG_I2C
+>      printf("%s: addr " TARGET_FMT_plx "\n", __func__, addr);
+>  #endif
+> -    i2c =3D opaque;
+>      switch (addr) {
+>      case 0x00:
+>          /*i2c_readbyte(&i2c->mdata);*/
+> @@ -115,22 +93,20 @@ static uint32_t ppc4xx_i2c_readb(void *opaque, hwadd=
+r addr)
+>          break;
+>      }
+>  #ifdef DEBUG_I2C
+> -    printf("%s: addr " TARGET_FMT_plx " %02" PRIx32 "\n", __func__, addr=
+, ret);
+> +    printf("%s: addr " TARGET_FMT_plx " %02" PRIx64 "\n", __func__, addr=
+, ret);
+>  #endif
+> =20
+>      return ret;
+>  }
+> =20
+> -static void ppc4xx_i2c_writeb(void *opaque,
+> -                              hwaddr addr, uint32_t value)
+> +static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
+> +                              unsigned int size)
+>  {
+> -    ppc4xx_i2c_t *i2c;
+> -
+> +    PPC4xxI2CState *i2c =3D opaque;
+>  #ifdef DEBUG_I2C
+> -    printf("%s: addr " TARGET_FMT_plx " val %08" PRIx32 "\n", __func__, =
+addr,
+> -           value);
+> +    printf("%s: addr " TARGET_FMT_plx " val %08" PRIx64 "\n",
+> +           __func__, addr, value);
+>  #endif
+> -    i2c =3D opaque;
+>      switch (addr) {
+>      case 0x00:
+>          i2c->mdata =3D value;
+> @@ -181,71 +157,20 @@ static void ppc4xx_i2c_writeb(void *opaque,
+>      }
+>  }
+> =20
+> -static uint32_t ppc4xx_i2c_readw(void *opaque, hwaddr addr)
+> -{
+> -    uint32_t ret;
+> -
+> -#ifdef DEBUG_I2C
+> -    printf("%s: addr " TARGET_FMT_plx "\n", __func__, addr);
+> -#endif
+> -    ret =3D ppc4xx_i2c_readb(opaque, addr) << 8;
+> -    ret |=3D ppc4xx_i2c_readb(opaque, addr + 1);
+> -
+> -    return ret;
+> -}
+> -
+> -static void ppc4xx_i2c_writew(void *opaque,
+> -                              hwaddr addr, uint32_t value)
+> -{
+> -#ifdef DEBUG_I2C
+> -    printf("%s: addr " TARGET_FMT_plx " val %08" PRIx32 "\n", __func__, =
+addr,
+> -           value);
+> -#endif
+> -    ppc4xx_i2c_writeb(opaque, addr, value >> 8);
+> -    ppc4xx_i2c_writeb(opaque, addr + 1, value);
+> -}
+> -
+> -static uint32_t ppc4xx_i2c_readl(void *opaque, hwaddr addr)
+> -{
+> -    uint32_t ret;
+> -
+> -#ifdef DEBUG_I2C
+> -    printf("%s: addr " TARGET_FMT_plx "\n", __func__, addr);
+> -#endif
+> -    ret =3D ppc4xx_i2c_readb(opaque, addr) << 24;
+> -    ret |=3D ppc4xx_i2c_readb(opaque, addr + 1) << 16;
+> -    ret |=3D ppc4xx_i2c_readb(opaque, addr + 2) << 8;
+> -    ret |=3D ppc4xx_i2c_readb(opaque, addr + 3);
+> -
+> -    return ret;
+> -}
+> -
+> -static void ppc4xx_i2c_writel(void *opaque,
+> -                              hwaddr addr, uint32_t value)
+> -{
+> -#ifdef DEBUG_I2C
+> -    printf("%s: addr " TARGET_FMT_plx " val %08" PRIx32 "\n", __func__, =
+addr,
+> -           value);
+> -#endif
+> -    ppc4xx_i2c_writeb(opaque, addr, value >> 24);
+> -    ppc4xx_i2c_writeb(opaque, addr + 1, value >> 16);
+> -    ppc4xx_i2c_writeb(opaque, addr + 2, value >> 8);
+> -    ppc4xx_i2c_writeb(opaque, addr + 3, value);
+> -}
+> -
+> -static const MemoryRegionOps i2c_ops =3D {
+> -    .old_mmio =3D {
+> -        .read =3D { ppc4xx_i2c_readb, ppc4xx_i2c_readw, ppc4xx_i2c_readl=
+, },
+> -        .write =3D { ppc4xx_i2c_writeb, ppc4xx_i2c_writew, ppc4xx_i2c_wr=
+itel, },
+> -    },
+> +static const MemoryRegionOps ppc4xx_i2c_ops =3D {
+> +    .read =3D ppc4xx_i2c_readb,
+> +    .write =3D ppc4xx_i2c_writeb,
+> +    .valid.min_access_size =3D 1,
+> +    .valid.max_access_size =3D 4,
+> +    .impl.min_access_size =3D 1,
+> +    .impl.max_access_size =3D 1,
+>      .endianness =3D DEVICE_NATIVE_ENDIAN,
+>  };
+> =20
+> -static void ppc4xx_i2c_reset(void *opaque)
+> +static void ppc4xx_i2c_reset(DeviceState *s)
+>  {
+> -    ppc4xx_i2c_t *i2c;
+> +    PPC4xxI2CState *i2c =3D PPC4xx_I2C(s);
+> =20
+> -    i2c =3D opaque;
+>      i2c->mdata =3D 0x00;
+>      i2c->sdata =3D 0x00;
+>      i2c->cntl =3D 0x00;
+> @@ -257,16 +182,35 @@ static void ppc4xx_i2c_reset(void *opaque)
+>      i2c->directcntl =3D 0x0F;
+>  }
+> =20
+> -void ppc405_i2c_init(hwaddr base, qemu_irq irq)
+> +static void ppc4xx_i2c_init(Object *o)
+>  {
+> -    ppc4xx_i2c_t *i2c;
+> +    PPC4xxI2CState *s =3D PPC4xx_I2C(o);
+> =20
+> -    i2c =3D g_malloc0(sizeof(ppc4xx_i2c_t));
+> -    i2c->irq =3D irq;
+> -#ifdef DEBUG_I2C
+> -    printf("%s: offset " TARGET_FMT_plx "\n", __func__, base);
+> -#endif
+> -    memory_region_init_io(&i2c->iomem, NULL, &i2c_ops, i2c, "i2c", 0x011=
+);
+> -    memory_region_add_subregion(get_system_memory(), base, &i2c->iomem);
+> -    qemu_register_reset(ppc4xx_i2c_reset, i2c);
+> +    memory_region_init_io(&s->iomem, OBJECT(s), &ppc4xx_i2c_ops, s,
+> +                          TYPE_PPC4xx_I2C, PPC4xx_I2C_MEM_SIZE);
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
+> +    sysbus_init_irq(SYS_BUS_DEVICE(s), &s->irq);
+> +    s->bus =3D i2c_init_bus(DEVICE(s), "i2c");
+>  }
+> +
+> +static void ppc4xx_i2c_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +
+> +    dc->reset =3D ppc4xx_i2c_reset;
+> +}
+> +
+> +static const TypeInfo ppc4xx_i2c_type_info =3D {
+> +    .name =3D TYPE_PPC4xx_I2C,
+> +    .parent =3D TYPE_SYS_BUS_DEVICE,
+> +    .instance_size =3D sizeof(PPC4xxI2CState),
+> +    .instance_init =3D ppc4xx_i2c_init,
+> +    .class_init =3D ppc4xx_i2c_class_init,
+> +};
+> +
+> +static void ppc4xx_i2c_register_types(void)
+> +{
+> +    type_register_static(&ppc4xx_i2c_type_info);
+> +}
+> +
+> +type_init(ppc4xx_i2c_register_types)
+> diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
+> new file mode 100644
+> index 0000000..e53042f
+> --- /dev/null
+> +++ b/include/hw/i2c/ppc4xx_i2c.h
+> @@ -0,0 +1,61 @@
+> +/*
+> + * PPC4xx I2C controller emulation
+> + *
+> + * Copyright (c) 2007 Jocelyn Mayer
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+> + * of this software and associated documentation files (the "Software"),=
+ to deal
+> + * in the Software without restriction, including without limitation the=
+ rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be includ=
+ed in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef PPC4XX_I2C_H
+> +#define PPC4XX_I2C_H
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/i2c/i2c.h"
+> +
+> +#define TYPE_PPC4xx_I2C "ppc4xx-i2c"
+> +#define PPC4xx_I2C(obj) OBJECT_CHECK(PPC4xxI2CState, (obj), TYPE_PPC4xx_=
+I2C)
+> +
+> +typedef struct PPC4xxI2CState {
+> +    /*< private >*/
+> +    SysBusDevice parent_obj;
+> +
+> +    /*< public >*/
+> +    I2CBus *bus;
+> +    qemu_irq irq;
+> +    MemoryRegion iomem;
+> +    uint8_t mdata;
+> +    uint8_t lmadr;
+> +    uint8_t hmadr;
+> +    uint8_t cntl;
+> +    uint8_t mdcntl;
+> +    uint8_t sts;
+> +    uint8_t extsts;
+> +    uint8_t sdata;
+> +    uint8_t lsadr;
+> +    uint8_t hsadr;
+> +    uint8_t clkdiv;
+> +    uint8_t intrmsk;
+> +    uint8_t xfrcnt;
+> +    uint8_t xtcntlss;
+> +    uint8_t directcntl;
+> +} PPC4xxI2CState;
+> +
+> +#endif /* PPC4XX_I2C_H */
 
-It is possible to fold mc_cpu and mc_in_progress together with the
-convention that if it is set to -1 mc is not in progress otherwise it is
-set to the CPU handling the mc.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-> 
-> These values will also need to be migrated, AFAICT.
+--6CiRFyVmOOJ3DkBX
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I am thinking of how to handle the migration when machine check handling
-is in progress. Probably wait for machine check handling to complete
-before migrating as the error could be irrelevant once migrated to a new
-hardware. If that is the case we don't need to migrate these values.
+-----BEGIN PGP SIGNATURE-----
 
-Regards,
-Aravinda
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmautkACgkQbDjKyiDZ
+s5K4nRAA0fED2FTKnBL2e4Qu2z0JyAeTNSJOI2Sqpxhuf+Ic97Tr5q2ox6Nl50kx
+DGNaB45K6qHIGlSleNzaLygaeA357JR9yDdCw4QNNytGDJAcmsBbXKVVDWoW7fE/
++b4Cg/8ulz1mgGCXmQdT++nKLfjY1afiBW5bRV8GNqLhxhYfmmJZW5PteAruslO8
+rVJcPLsBr5YvOd2ENUeIKJIjWTufrZs24rYw/rmWNwvlJjAd0WGTNGagI21qqZ7i
+85a6mgI0RNaqn0LjDHxsJ0m2cDQB21ubiGNOxuaE7NFyDyz4N9EWGUFAUHlX15j8
+ZjttUSqBvXFKulT/Dd5GcwzitIngQkKqcQ4Tp//UXpxhVbnhhlXq1d19Z/dq1STe
+d3k33v9cjmVx9mUoIF76oj3GPWyzev+6uwarSBG5rhL7nuDnbz7GXsQKuzZlLEBn
+U4oLpX6VraN7cLemORJ7/67LR8F2j1Z8xN9EbQ74kk8hEdjjaIfqcbgNHcT6d5de
+rxnGVIBELFBpLP3Fs3i7xZ6srhUWLgu54BkqdqHmbMS8W/KJzHspkbqW8hVqVEcx
+AU0zISbzEcyfgHAN3K/LmMpp+iCKG4nG71KWjJnXqgCJEflWsY407JVgy2C7RGzf
+3dIwdNCOhAmx6+Jg/PN03dG3zMcIjcFnZs3OeHaCmEIA+4LUU9M=
+=cr1Q
+-----END PGP SIGNATURE-----
 
-> 
->> +    QemuCond mc_delivery_cond;
->> +
->>      /*< public >*/
->>      char *kvm_type;
->>      MemoryHotplugState hotplug_memory;
->> @@ -519,8 +525,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
->>  #define RTAS_IBM_CREATE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x27)
->>  #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
->>  #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
->> +#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x2A)
->> +#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x2B)
->>  
->> -#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2A)
->> +#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2C)
->>  
->>  /* RTAS ibm,get-system-parameter token values */
->>  #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
->>
-> 
-
--- 
-Regards,
-Aravinda
+--6CiRFyVmOOJ3DkBX--
