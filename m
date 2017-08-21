@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1djkiH-0007re-FP
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:17:46 -0400
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1djkoL-0002GV-Pf
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:24:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1djkiE-000164-6u
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:17:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50316)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1djkiE-00015A-0G
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:17:42 -0400
-Date: Mon, 21 Aug 2017 13:17:32 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170821131732.074c8e17@nial.brq.redhat.com>
-In-Reply-To: <20170818191534.GE3108@localhost.localdomain>
-References: <20170818190943.23858-1-ehabkost@redhat.com>
-	<20170818191534.GE3108@localhost.localdomain>
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1djkoI-0004bg-GV
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:24:01 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:44614
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1djkoI-0004ao-4c
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:23:58 -0400
+References: <1502847935-20483-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	<9e5b10ce-6259-a21b-01dc-13f57d28a0ef@cn.fujitsu.com>
+	<20170818164852.GZ3108@localhost.localdomain>
+	<e67b5c35-5077-2603-f0ca-6abcade205db@cn.fujitsu.com>
+	<20170821105708.4391e201@nial.brq.redhat.com>
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Message-ID: <6d8a9fae-fce8-c739-3e23-293cd201b91f@cn.fujitsu.com>
+Date: Mon, 21 Aug 2017 19:23:35 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170821105708.4391e201@nial.brq.redhat.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.10] numa: Move
- numa_legacy_auto_assign_ram to pc-i440fx-2.9
+Subject: Re: [Qemu-devel] [PATCH v3] hw/acpi-build: Fix SRAT memory building
+ when there is no memory in node0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, mst@redhat.com
 
-On Fri, 18 Aug 2017 16:15:34 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+Hi, Igor
 
-> On Fri, Aug 18, 2017 at 04:09:43PM -0300, Eduardo Habkost wrote:
-> > The 'm->numa_auto_assign_ram = numa_legacy_auto_assign_ram;' line
-> > was supposed to be in pc_i440fx_2_9_machine_options() (see commit
-> > 3bfe5716 "numa: equally distribute memory on nodes"), but the
-> > merge commit adb354dd ("Merge remote-tracking branch
-> > 'mst/tags/for_upstream' into staging") moved it to the
-> > pc_i440fx_2_10_machine_options().
-> > 
-> > Move the line back to pc_i440fx_2_9_machine_options().
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>  
-> 
-> I just re-read the schedule wiki page and noticed 2017-08-22 is
-> "release _or_ tag -rc4".  Does this mean including this patch
-> would slip the schedule for 1 week?
-> 
-> In that case, I don't think this patch should block the release
-> and cause a schedule slip.  We can simply change the NUMA RAM
-> assignment algorithm in pc-2.11 and keep the old one in pc-2.10.
-> 
+[...]
+>>
+>> Ok, I will do it right now.
+>
+> see commit 6b9c1dd2c for example of adding test case,
+> currently test has base SRAT tables that is reused by all tests.
+> When you create testcase that produces different SRAT table,
+> 'make check' will print warnings that ables do not match
+> you can add "V=1" env. var. 'make V=1 check' to get detailed
+> diff of what's changed.
+>
+> also see how 'test_data.variant' is handled to get idea how to use
+> it to differentiate specific test case vs shared ACPI tables baseline blobs.
+>
 
-It doesn't look like blocker tom either,
-at this point, I'd keep old algorithm for 2.10.
+Thanks for teaching me that, it's very helpful to me.
+
+Except for adding a new case, can we except memhp testcase with
+node RAM check? just like following shows:
+
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 564da45..c79ece4 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -788,7 +788,7 @@ static void test_acpi_q35_tcg_memhp(void)
+      data.machine = MACHINE_Q35;
+      data.variant = ".memhp";
+      test_acpi_one(" -m 128,slots=3,maxmem=1G"
+-                  " -numa node -numa node"
++                  " -numa node -numa node,mem=128"
+                    " -numa dist,src=0,dst=1,val=21",
+                    &data);
+      free_test_data(&data);
+@@ -802,7 +802,7 @@ static void test_acpi_piix4_tcg_memhp(void)
+      data.machine = MACHINE_PC;
+      data.variant = ".memhp";
+      test_acpi_one(" -m 128,slots=3,maxmem=1G"
+-                  " -numa node -numa node"
++                  " -numa node -numa node,mem=128"
+                    " -numa dist,src=0,dst=1,val=21",
+                    &data);
+      free_test_data(&data);
+
+
+Thanks,
+	dou.
