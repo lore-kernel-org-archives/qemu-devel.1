@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1djj6F-00068F-OU
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:34:24 -0400
+	(envelope-from <pagupta@redhat.com>) id 1djj6X-0006Lj-Iu
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:34:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1djj6E-0001Jj-SI
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:34:23 -0400
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Mon, 21 Aug 2017 12:31:47 +0300
-Message-Id: <20170821093150.6783-4-el13635@mail.ntua.gr>
-In-Reply-To: <20170821093150.6783-1-el13635@mail.ntua.gr>
-References: <20170821093150.6783-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH v6 3/6] block: tidy ThrottleGroupMember
- initializations
+	(envelope-from <pagupta@redhat.com>) id 1djj6T-0001PO-I7
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:34:41 -0400
+Date: Mon, 21 Aug 2017 05:34:33 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <327375832.388365.1503308073646.JavaMail.zimbra@redhat.com>
+In-Reply-To: <73d69240-d9c3-cb71-1623-501e873fc70a@redhat.com>
+References: <1503297029-28436-1-git-send-email-thuth@redhat.com>
+	<242295486.322283.1503300985716.JavaMail.zimbra@redhat.com>
+	<73d69240-d9c3-cb71-1623-501e873fc70a@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] hw/ppc/spapr: Fix segfault when
+ instantiating a 'pc-dimm' without 'memdev'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,48 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, qemu-ppc@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-Move the CoMutex and CoQueue inits inside throttle_group_register_tgm()
-which is called whenever a ThrottleGroupMember is initialized. There's
-no need for them to be separate.
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
----
- block/block-backend.c   | 3 ---
- block/throttle-groups.c | 3 +++
- 2 files changed, 3 insertions(+), 3 deletions(-)
+> > 
+> > Hello Thomas,
+> >>
+> >> QEMU currently crashes when trying to use a 'pc-dimm' on the pseries
+> >> machine without specifying its 'memdev' property. This happens because
+> >> pc_dimm_get_memory_region() does not check whether the 'memdev' property
+> >> has properly been set by the user. Looking closer at this function, it's
+> >> also obvious that it is using &error_abort to call another function - and
+> >> this is bad in a function that is used in the hot-plugging calling chain
+> >> since this can also cause QEMU to exit unexpectedly.
+> > 
+> > In place of checking if 'memdev' is already allocated/present while
+> > fetching
+> > 'get_functions' every place. If 'memdev' is required for memory hotplug
+> > operation
+> > can we just put a check at some common place and don't start or instantiate
+> > if
+> > 'memdev' is not present.
+> > 
+> > I can see:
+> > 
+> > 'pc_dimm_realize' function checks for : in my case prints warning
+> > and avoid Qemu to start.
+> > ...
+> > ...
+> > if (!dimm->hostmem) {
+> >         error_setg(errp, "'" PC_DIMM_MEMDEV_PROP "' property is not set");
+> >         return;
+> >     }
+> > ...
+> 
+> That check unfortunately does not apply here: The crash happens in the
+> pre_plug() handler of the spapr machine, and this is called *before* the
+> realize function of the pc-dimm is called!
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 9ba800e733..c51fb8c8aa 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -252,9 +252,6 @@ BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm)
-     blk->shared_perm = shared_perm;
-     blk_set_enable_write_cache(blk, true);
- 
--    qemu_co_mutex_init(&blk->public.throttle_group_member.throttled_reqs_lock);
--    qemu_co_queue_init(&blk->public.throttle_group_member.throttled_reqs[0]);
--    qemu_co_queue_init(&blk->public.throttle_group_member.throttled_reqs[1]);
-     block_acct_init(&blk->stats);
- 
-     notifier_list_init(&blk->remove_bs_notifiers);
-diff --git a/block/throttle-groups.c b/block/throttle-groups.c
-index 3b07b25f39..7749cf043f 100644
---- a/block/throttle-groups.c
-+++ b/block/throttle-groups.c
-@@ -508,6 +508,9 @@ void throttle_group_register_tgm(ThrottleGroupMember *tgm,
-                          read_timer_cb,
-                          write_timer_cb,
-                          tgm);
-+    qemu_co_mutex_init(&tgm->throttled_reqs_lock);
-+    qemu_co_queue_init(&tgm->throttled_reqs[0]);
-+    qemu_co_queue_init(&tgm->throttled_reqs[1]);
- 
-     qemu_mutex_unlock(&tg->lock);
- }
--- 
-2.11.0
+o.k I guessed so.
+> 
+> But even if we could find another common place where we could check
+> dimm->hostmem first, you still have the problem that
+> host_memory_backend_get_memory() could return an error and thus
+> pc_dimm_get_memory_region() still needs a way to fail gracefully during
+> the hotplug (or also hot-unplug) operation. So I think my patch is the
+> right way to go here.
+
+Right. Thanks for the explanation.
+
+Pankaj
+> 
+>  Thomas
+> 
