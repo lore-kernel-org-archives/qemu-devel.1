@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1djmsQ-00007w-6U
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:36:23 -0400
+	(envelope-from <kraxel@redhat.com>) id 1djn4r-0006aD-EF
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:49:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1djmsN-0007pK-1y
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:36:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45910)
+	(envelope-from <kraxel@redhat.com>) id 1djn4m-00064y-FI
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:49:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34828)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1djmsM-0007oi-RP
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:36:18 -0400
-Date: Mon, 21 Aug 2017 15:36:12 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170821153612.63264857.cohuck@redhat.com>
-In-Reply-To: <e21f5781-38c9-5909-b0e1-f47de1cb524d@linux.vnet.ibm.com>
-References: <20170821091614.28251-1-cohuck@redhat.com>
-	<20170821091614.28251-8-cohuck@redhat.com>
-	<700d1722-baf1-163e-6764-179f1340cc22@linux.vnet.ibm.com>
-	<20170821151650.35050b3e.cohuck@redhat.com>
-	<e21f5781-38c9-5909-b0e1-f47de1cb524d@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 07/10] s390x/sclp: properly guard
- pci-specific functions
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1djn4m-00064j-9m
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:49:08 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id ECF6AC047B87
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 13:49:06 +0000 (UTC)
+Message-ID: <1503323345.26016.23.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 21 Aug 2017 15:49:05 +0200
+In-Reply-To: <20170810155522.31099-7-berrange@redhat.com>
+References: <20170810155522.31099-1-berrange@redhat.com>
+	<20170810155522.31099-7-berrange@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 06/15] input: convert virtio-input-hid
+ device to keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +34,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: thuth@redhat.com, zyimin@linux.vnet.ibm.com, david@redhat.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, qemu-devel@nongnu.org, borntraeger@de.ibm.com
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, 21 Aug 2017 15:32:23 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+On Thu, 2017-08-10 at 16:55 +0100, Daniel P. Berrange wrote:
+> -=C2=A0=C2=A0=C2=A0 virtio_input_key_config(vinput, keymap_qcode,
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 ARRAY_SIZE(keymap_qcode));
+> +=C2=A0=C2=A0=C2=A0 virtio_input_key_config(vinput, qemu_input_map_qcod=
+e2linux,
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 qemu_input_map_qcode2linux_len);
 
-> On 08/21/2017 03:16 PM, Cornelia Huck wrote:
-> > On Mon, 21 Aug 2017 13:41:53 +0200
-> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> >   
-> >> On 08/21/2017 11:16 AM, Cornelia Huck wrote:  
-> >>> If we do not provide zpci, pci reconfiguration via sclp is not available
-> >>> either. Don't indicate it in the sclp facilities and return an invalid
-> >>> command if the guest tries to issue pci configure/deconfigure.
-> >>>
-> >>> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> >>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> >>> ---
-> >>>  hw/s390x/sclp.c | 19 +++++++++++++++----
-> >>>  1 file changed, 15 insertions(+), 4 deletions(-)  
-> > 
-> > (...)
-> >   
-> >> LGTM  
-> > 
-> > Is that an Acked-by:? Or a Reviewed-by:? :)
-> >   
-> 
-> r-b
+That is a guest-visible change.
 
-If you write that out in future, I can simply copy'n'paste it :)
-
-> 
-> (Not sure what Acked-by from a role other that affected
-> maintainer means.)
-
-I've always used it in the sense of "I don't know the gory details, and
-I haven't tried to find them out, but it generally looks sane to me".
+cheers,
+  Gerd
