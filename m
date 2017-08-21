@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1djvsx-0006zX-9x
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 19:13:35 -0400
+	(envelope-from <jsnow@redhat.com>) id 1djwAV-0005uE-FA
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 19:31:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1djvsu-0001kS-3k
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 19:13:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52808)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1djvst-0001kL-RA
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 19:13:28 -0400
-Date: Mon, 21 Aug 2017 16:13:25 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <1501081831-9587-3-git-send-email-owen.smith@citrix.com>
-Message-ID: <alpine.DEB.2.10.1708211612360.12143@sstabellini-ThinkPad-X260>
-References: <1501081831-9587-1-git-send-email-owen.smith@citrix.com>
-	<1501081831-9587-3-git-send-email-owen.smith@citrix.com>
+	(envelope-from <jsnow@redhat.com>) id 1djwAU-0003t1-Ba
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 19:31:39 -0400
+References: <20170817091542.9403-1-pbutsykin@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <9e6b08b2-6f01-3d35-2644-a86955770844@redhat.com>
+Date: Mon, 21 Aug 2017 19:31:29 -0400
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH 2/2 v3] xenfb: Add
- [feature|request]-raw-pointer
+In-Reply-To: <20170817091542.9403-1-pbutsykin@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 0/4] Add shrink image for qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +23,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Owen Smith <owen.smith@citrix.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, sstabellini@kernel.org, anthony.perard@citrix.com
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 
-On Wed, 26 Jul 2017, Owen Smith wrote:
-> Writes "feature-raw-pointer" during init to indicate the backend
-> can pass raw unscaled values for absolute axes to the frontend.
-> Frontends set "request-raw-pointer" to indicate the backend should
-> not attempt to scale absolute values to console size.
-> "request-raw-pointer" is only valid if "request-abs-pointer" is
-> also set. Raw unscaled pointer values are in the range [0, 0x7fff]
+
+
+On 08/17/2017 05:15 AM, Pavel Butsykin wrote:
+> This patch add shrinking of the image file for qcow2. As a result, this allows
+> us to reduce the virtual image size and free up space on the disk without
+> copying the image. Image can be fragmented and shrink is done by punching holes
+> in the image file.
 > 
-> "feature-raw-pointer" and "request-raw-pointer" added to Xen
-> header in commit 7868654ff7fe5e4a2eeae2b277644fa884a5031e
+> # ./qemu-img create -f qcow2 image.qcow2 4G
+> Formatting 'image.qcow2', fmt=qcow2 size=4294967296 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
 > 
-> Signed-off-by: Owen Smith <owen.smith@citrix.com>
-
-Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
-
-
-> ---
->  hw/display/xenfb.c | 37 ++++++++++++++++++++++++-------------
->  1 file changed, 24 insertions(+), 13 deletions(-)
+> # ./qemu-io -c "write -P 0x22 0 1G" image.qcow2
+> wrote 1073741824/1073741824 bytes at offset 0
+> 1 GiB, 1 ops; 0:00:04.59 (222.886 MiB/sec and 0.2177 ops/sec)
 > 
-> diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
-> index e412753..f397f9a 100644
-> --- a/hw/display/xenfb.c
-> +++ b/hw/display/xenfb.c
-> @@ -50,6 +50,7 @@ struct common {
->  struct XenInput {
->      struct common c;
->      int abs_pointer_wanted; /* Whether guest supports absolute pointer */
-> +    int raw_pointer_wanted; /* Whether guest supports raw (unscaled) pointer */
->      QemuInputHandlerState *qkbd;
->      QemuInputHandlerState *qmou;
->      int mouse_axes[INPUT_AXIS__MAX];
-> @@ -380,21 +381,23 @@ static void xenfb_mouse_sync(DeviceState *dev)
->                              in->abs_pointer_wanted);
->  
->      if (in->abs_pointer_wanted) {
-> -        QemuConsole *con = qemu_console_lookup_by_index(0);
-> -        DisplaySurface *surface;
-> -        int dw, dh;
-> -
-> -        if (!con) {
-> -            xen_pv_printf(&in->c.xendev, 0, "No QEMU console available");
-> -            return;
-> -        }
-> +        if (!in->raw_pointer_wanted) {
-> +            QemuConsole *con = qemu_console_lookup_by_index(0);
-> +            DisplaySurface *surface;
-> +            int dw, dh;
-> +
-> +            if (!con) {
-> +                xen_pv_printf(&in->c.xendev, 0, "No QEMU console available");
-> +                return;
-> +            }
->  
-> -        surface = qemu_console_surface(con);
-> -        dw = surface_width(surface);
-> -        dh = surface_height(surface);
-> +            surface = qemu_console_surface(con);
-> +            dw = surface_width(surface);
-> +            dh = surface_height(surface);
->  
-> -        dx = dx * (dw - 1) / 0x7fff;
-> -        dy = dy * (dh - 1) / 0x7fff;
-> +            dx = dx * (dw - 1) / 0x7fff;
-> +            dy = dy * (dh - 1) / 0x7fff;
-> +        }
->  
->          xenfb_send_position(in, dx, dy, dz);
->      } else {
-> @@ -428,6 +431,7 @@ static QemuInputHandler xenfb_rel_mouse = {
->  static int input_init(struct XenDevice *xendev)
->  {
->      xenstore_write_be_int(xendev, "feature-abs-pointer", 1);
-> +    xenstore_write_be_int(xendev, "feature-raw-pointer", 1);
->      return 0;
->  }
->  
-> @@ -451,6 +455,13 @@ static void input_connected(struct XenDevice *xendev)
->                               &in->abs_pointer_wanted) == -1) {
->          in->abs_pointer_wanted = 0;
->      }
-> +    if (xenstore_read_fe_int(xendev, "request-raw-pointer",
-> +                             &in->raw_pointer_wanted) == -1) {
-> +        in->raw_pointer_wanted = 0;
-> +    }
-> +    if (in->raw_pointer_wanted && !in->abs_pointer_wanted) {
-> +        xen_pv_printf(xendev, 0, "raw pointer set without absolute pointer.");
-> +    }
->  
->      if (in->qkbd) {
->          qemu_input_handler_unregister(in->qkbd);
-> -- 
-> 2.1.4
+> # ./qemu-img resize image.qcow2 512M
+> warning: qemu-img: Shrinking an image will delete all data beyond the shrunken image's end. Before performing such an operation, make sure there is no important data there.
+> error: qemu-img: Use the --shrink option to perform a shrink operation.
+> 
+> # ./qemu-img resize --shrink image.qcow2 128M
+> Image resized.
+> 
+> # ./qemu-img info image.qcow2
+> image: image.qcow2
+> file format: qcow2
+> virtual size: 128M (134217728 bytes)
+> disk size: 128M
+> cluster_size: 65536
+> Format specific information:
+>     compat: 1.1
+>     lazy refcounts: false
+>     refcount bits: 16
+>     corrupt: false
+> 
+> # du -h image.qcow2
+> 129M    image.qcow2
+> 
+
+It looks sane to me, and already has a full set of R-Bs from Max. Are we
+waiting for Kevin?
+
+It looks like in Vladimir's series we sidestepped the problem of what
+happens if we resize with persistent bitmaps: we deny the operation,
+regardless of if we are shrinking, growing, or have bitmaps that are
+read-only, frozen, or what-have-you.
+
+It shouldn't be too hard to add soon, but this is fine for now.
+(I think for adding it we just need to make sure the bitmaps aren't
+frozen and are not read-only, and the implementation bitmap structure
+can already handle truncation in either direction just fine.)
+
+Anyway;
+
+Reviewed-by: John Snow <jsnow@redhat.com>
+
+
+> Changes from v1:
+> - add --shrink flag for qemu-img resize
+> - add qcow2_cache_discard
+> - simplify qcow2_shrink_l1_table() to reduce the likelihood of image corruption
+> - add new qemu-iotests for shrinking images
+> 
+> Changes from v2:
+> - replace qprintf() on error_report() (1)
+> - rewrite warning messages (1)
+> - enforce --shrink flag for all formats except raw (1)
+> - split qcow2_cache_discard() (2)
+> - minor fixes according to comments (3)
+> - rewrite the last part of qcow2_shrink_reftable() to avoid
+>   qcow2_free_clusters() calls inside (3)
+> - improve test for shrinking image (4)
+> 
+> Changes from v3:
+> - rebase on "Implement a warning_report function" Alistair's patch-set (1)
+> - spelling fixes (1)
+> - the man page fix according to the discussion (1)
+> - add call qcow2_signal_corruption() in case of image corruption (3)
+> 
+> Changes from v4:
+> - rebase on https://github.com/XanClic/qemu/commits/block Max's block branch
+> 
+> Changes from v5:
+> - the condition refcount == 0 should be enough to evict the l2/refcount cluster
+>   from the cache (2)
+> - overwrite the l1/refcount table in memory with zeros, even if overwriting the
+>   l1/refcount table on disk has failed (3)
+> - replace g_try_malloc() on g_malloc() for allocation reftable_tmp (3)
+> 
+> Changes from v6:
+> - rebase on master 1f29673387
+> 
+> Pavel Butsykin (4):
+>   qemu-img: add --shrink flag for resize
+>   qcow2: add qcow2_cache_discard
+>   qcow2: add shrink image support
+>   qemu-iotests: add shrinking image test
+> 
+>  block/qcow2-cache.c        |  26 +++++++
+>  block/qcow2-cluster.c      |  50 +++++++++++++
+>  block/qcow2-refcount.c     | 140 ++++++++++++++++++++++++++++++++++++-
+>  block/qcow2.c              |  43 +++++++++---
+>  block/qcow2.h              |  17 +++++
+>  qapi/block-core.json       |   3 +-
+>  qemu-img-cmds.hx           |   4 +-
+>  qemu-img.c                 |  23 ++++++
+>  qemu-img.texi              |   6 +-
+>  tests/qemu-iotests/102     |   4 +-
+>  tests/qemu-iotests/163     | 170 +++++++++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/163.out |   5 ++
+>  tests/qemu-iotests/group   |   1 +
+>  13 files changed, 475 insertions(+), 17 deletions(-)
+>  create mode 100644 tests/qemu-iotests/163
+>  create mode 100644 tests/qemu-iotests/163.out
 > 
