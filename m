@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1djn9Q-0000eV-9m
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:53:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1djnA5-00014c-Mg
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:54:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1djn9L-00009b-CM
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:53:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51922)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1djn9L-00009M-5h
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:53:51 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2435B25C28
-	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 13:53:50 +0000 (UTC)
-Message-ID: <1503323628.26016.25.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 21 Aug 2017 15:53:48 +0200
-In-Reply-To: <20170810155522.31099-1-berrange@redhat.com>
-References: <20170810155522.31099-1-berrange@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1djnA4-0000QJ-Rx
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:54:37 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:35986)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1djnA4-0000PX-LW
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:54:36 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id f8so63710354wrf.3
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 06:54:36 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1503316706.26016.11.camel@redhat.com>
+References: <20170807163121.797e7ad6@nial.brq.redhat.com>
+	<CAFEAcA8=+8cPjKayq3Bre7y9=6jzFgjCCjRkNUeHxArJu9Ue6A@mail.gmail.com>
+	<be880655-0c04-8369-01fc-76dd6241ca78@redhat.com>
+	<1503316706.26016.11.camel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 21 Aug 2017 14:54:14 +0100
+Message-ID: <CAFEAcA9Lz=pBZxYqHk7kdaU_LsvE34+DJmTm_jHSFeKzoCM3xw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/15] Convert over to use keycodemapdb
+Subject: Re: [Qemu-devel] AVMF & OVMF blobs in QEMU tree???
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +31,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-On Thu, 2017-08-10 at 16:55 +0100, Daniel P. Berrange wrote:
-> The keycodemap project[1] provides a database mapping between
-> many different keysym/keycode/scancode sets, along with a
-> tool to generate mapping/lookup tables in various programming
-> languages. It is already used by GTK-VNC, SPICE-GTK and
-> libvirt.
-> 
-> This series enables its use in QEMU, thus fixing a great
-> many bugs/ommissions in the 15+ key mapping tables people
-> have manually written for QEMU.
+On 21 August 2017 at 12:58, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> Related question (as the edk2 blobs are pretty big):  Do we want commit
+> this to the qemu repo directly?   Or should we create a qemu-firmware
+> repo for the precompiled blobs and hook it up as submodule?
 
-Looks good on a quick look.  I'll have a closer look and test once I'm
-done processing my vacation email backlog.
+Having all our precompiled blobs be in a submodule would
+maybe be handy for properly keeping them separate from the
+QEMU code -- would that be useful for downstream distro
+packagers?
 
-One thing for now:  I think we should not require the keycodemapdb at
-build time.   Instead commit the generated files to git so the build
-works without the submodule, then update the generated files each time
-the submodule is updated (simliar to firmware blobs/submodules).
+In any case this seems like a good opportunity to write down
+exactly what our policy about ROM blobs is (eg where they
+are, how we update them, requirement for source, whether
+we allow source to be in a submodule not on qemu.org...)
 
-cheers,
-  Gerd
+thanks
+-- PMM
