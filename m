@@ -1,24 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1djkIy-00062O-OL
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:51:37 -0400
+	(envelope-from <Bharat.Bhushan@nxp.com>) id 1djkJA-0006Cq-6y
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:51:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1djkIx-0001wD-JX
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:51:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34954)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1djkIx-0001v5-DE
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:51:35 -0400
-Message-ID: <1503312229.26016.1.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 21 Aug 2017 12:43:49 +0200
-In-Reply-To: <11bbf041-b0b8-00a6-6201-b4deb3ccf673@amsat.org>
-References: <CAMM1KhhxQg8H8uYeGEHpXYgE=iTRyhik7pU+MdRr7HL6utpREg@mail.gmail.com>
-	<11bbf041-b0b8-00a6-6201-b4deb3ccf673@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] nVidia emulation in QEMU?
+	(envelope-from <Bharat.Bhushan@nxp.com>) id 1djkJ5-00022L-84
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:51:48 -0400
+From: Bharat Bhushan <Bharat.Bhushan@nxp.com>
+Date: Mon, 21 Aug 2017 16:18:52 +0530
+Message-ID: <1503312534-6642-1-git-send-email-Bharat.Bhushan@nxp.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 0/2] virtio-iommu: VFIO integration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +19,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Darius Goad <alegend45@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: eric.auger@redhat.com, eric.auger.pro@gmail.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: wei@redhat.com, kevin.tian@intel.com, marc.zyngier@arm.com, tn@semihalf.com, will.deacon@arm.com, drjones@redhat.com, robin.murphy@arm.com, christoffer.dall@linaro.org, bharat.bhushan@nxp.com, Bharat Bhushan <Bharat.Bhushan@nxp.com>
 
-On Thu, 2017-08-17 at 23:11 -0300, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi,
->=20
-> On 08/17/2017 10:01 PM, Darius Goad wrote:
-> > Hello. I'm Melissa, a trans woman who is the main developer of the
-> > nVidia
-> > emulation code for 86Box. I'm interested in porting this code over
-> > to QEMU
-> > as QEMU has higher compatibility with newer operating systems, as
-> > well as
-> > expanding the developer base for nVidia graphics card emulation.
-> >=20
-> > The 86Box code currently only handles the RIVA 128, the RIVA TNT,
-> > and a few
-> > versions of the RIVA TNT2, and in a very incomplete state at that.
-> > I have
-> > not been able to progress further due to the fact that 86Box's
-> > support of
-> > modern Linux operating systems is poor, and due to the lack of a
-> > debugger
-> > in 86Box.
-> >=20
-> > I do need some help, however, as QEMU's code structure is not my
-> > strong
-> > suit.
-> >=20
-> > Anyway, my code is here:
-> > https://github.com/MoochMcGee/86Box-experimental/blob/experimental/
-> > src/VIDEO/vid_nv_riva128.c
->=20
-> This code seems to match how devices are implemented in QEMU.
+This V3 version is mainly about rebasing on v3 version on Virtio-iommu device
+framework from Eric Augur and addresing review comments.
 
-Partly.  From a very quick view it seems the register emulation works
-very simliar but the graphics output side seems to be different.
+This patch series allows PCI pass-through using virtio-iommu.
+  
+This series is based on:
+ - virtio-iommu specification written by Jean-Philippe Brucker
+   [RFC 0/3] virtio-iommu: a paravirtualized IOMMU,
+ 
+ - virtio-iommu driver by Jean-Philippe Brucker
+   [RFC PATCH linux] iommu: Add virtio-iommu driver
+ 
+ - virtio-iommu device emulation by Eric Augur.
+   [RFC v3 0/8] VIRTIO-IOMMU device
 
-Riva is pretty old, right?  Something like 15-20 years?  What
-capabilities do these cards have?  3d accel?  Or 2d only?
-Which features are emulated?
-Which features are actually used by modern linux?
+PCI device pass-through and virtio-net-pci is tested with these changes using dma-ops
 
-cheers,
-  Gerd
+This patch series does not implement RESV_MEM changes proposal by Jean-Philippe "https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg01796.html"
+
+v2->v3:
+ - This series is based on "[RFC v3 0/8] VIRTIO-IOMMU device"
+   Which is based on top of v2.10-rc0 that 
+ - Fixed issue with two PCI devices
+ - Addressed review comments
+
+v1->v2:
+  - Added trace events
+  - removed vSMMU3 link in patch description
+
+Bharat Bhushan (2):
+  target/arm/kvm: Translate the MSI doorbell in kvm_arch_fixup_msi_route
+  virtio-iommu: vfio integration with virtio-iommu
+
+ hw/virtio/trace-events           |   5 ++
+ hw/virtio/virtio-iommu.c         | 163 +++++++++++++++++++++++++++++++++++++++
+ include/hw/virtio/virtio-iommu.h |   6 ++
+ target/arm/kvm.c                 |  27 +++++++
+ target/arm/trace-events          |   3 +
+ 5 files changed, 204 insertions(+)
+
+-- 
+1.9.3
