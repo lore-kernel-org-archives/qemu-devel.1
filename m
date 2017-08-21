@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1djn7M-0007y5-7S
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:51:49 -0400
+	(envelope-from <kraxel@redhat.com>) id 1djn9Q-0000eV-9m
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:53:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1djn7H-0007PK-Dg
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:51:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55518)
+	(envelope-from <kraxel@redhat.com>) id 1djn9L-00009b-CM
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:53:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51922)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1djn7H-0007JI-83
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:51:43 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1djn9L-00009M-5h
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:53:51 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C86CC806B8
-	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 13:51:40 +0000 (UTC)
-Date: Mon, 21 Aug 2017 09:51:30 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <1576327362.1079876.1503323490461.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1503321812.26016.19.camel@redhat.com>
-References: <20170808224750.23904-1-marcandre.lureau@redhat.com>
-	<1503321812.26016.19.camel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio-input: send rel-wheel events for
- wheel buttons
+	by mx1.redhat.com (Postfix) with ESMTPS id 2435B25C28
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 13:53:50 +0000 (UTC)
+Message-ID: <1503323628.26016.25.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 21 Aug 2017 15:53:48 +0200
+In-Reply-To: <20170810155522.31099-1-berrange@redhat.com>
+References: <20170810155522.31099-1-berrange@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 00/15] Convert over to use keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,30 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 
-Hi
+On Thu, 2017-08-10 at 16:55 +0100, Daniel P. Berrange wrote:
+> The keycodemap project[1] provides a database mapping between
+> many different keysym/keycode/scancode sets, along with a
+> tool to generate mapping/lookup tables in various programming
+> languages. It is already used by GTK-VNC, SPICE-GTK and
+> libvirt.
+> 
+> This series enables its use in QEMU, thus fixing a great
+> many bugs/ommissions in the 15+ key mapping tables people
+> have manually written for QEMU.
 
------ Original Message -----
-> On Wed, 2017-08-09 at 00:47 +0200, Marc-Andr=C3=A9 Lureau wrote:
-> > qemu uses wheel-up/down button events for mouse wheel input, however
-> > linux applications typically want REL_WHEEL events.
->=20
-> --verbose please.
->=20
-> Both should work just fine.
+Looks good on a quick look.  I'll have a closer look and test once I'm
+done processing my vacation email backlog.
 
-I haven't done extensive review of all input code on linux, but from what I=
- remember the event got dropped here:
+One thing for now:  I think we should not require the keycodemapdb at
+build time.   Instead commit the generated files to git so the build
+works without the submodule, then update the generated files each time
+the submodule is updated (simliar to firmware blobs/submodules).
 
-https://cgit.freedesktop.org/xorg/driver/xf86-input-evdev/tree/src/evdev.c#=
-n2720
-
-It seems BTN_GEAR isn't clearly defined either.
-
-Perhaps libinput does a better job at mapping the event, but we should cons=
-ider older guests. Spice agent is using rel-wheel events, and we never had =
-issues with it.
-
-thanks
+cheers,
+  Gerd
