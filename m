@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1djoq0-0007AL-SA
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 11:42:07 -0400
+	(envelope-from <bounces@canonical.com>) id 1djp3h-0004IA-Mt
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 11:56:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1djopv-0004kD-VX
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 11:42:00 -0400
-Date: Mon, 21 Aug 2017 18:39:48 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170821153948.agdtsvy3m5u4jfip@postretch>
-References: <20170809140256.25584-1-el13635@mail.ntua.gr>
-	<20170809140256.25584-4-el13635@mail.ntua.gr>
-	<w51ziatm05h.fsf@maestria.local.igalia.com>
+	(envelope-from <bounces@canonical.com>) id 1djp3d-0004Vf-Qs
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 11:56:09 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58669)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1djp3d-0004VV-KW
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 11:56:05 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1djp3a-00016K-Vz
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 15:56:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A4FBB2E81C2
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 15:55:59 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="4ud4cy4eqvmphs2g"
-Content-Disposition: inline
-In-Reply-To: <w51ziatm05h.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] block: require job-id when device
- is a node name
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 21 Aug 2017 15:46:47 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
+Message-Id: <150333040775.7999.5561970298106685609.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
+ 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,103 +37,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
 
+oh yeh you want to tell gdb to ignore SIGUSR1, something like: =
 
---4ud4cy4eqvmphs2g
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  handle SIGUSR1 nostop noprint pass
 
-On Mon, Aug 21, 2017 at 05:05:30PM +0200, Alberto Garcia wrote:
->On Wed 09 Aug 2017 04:02:53 PM CEST, Manos Pitsidianakis wrote:
->> @@ -622,20 +622,14 @@ void *block_job_create(const char *job_id, const B=
-lockJobDriver *driver,
->>          return NULL;
->>      }
->>
->> -    if (job_id =3D=3D NULL && !(flags & BLOCK_JOB_INTERNAL)) {
->> -        job_id =3D bdrv_get_device_name(bs);
->> -        if (!*job_id) {
->> -            error_setg(errp, "An explicit job ID is required for this n=
-ode");
->> -            return NULL;
->> -        }
->> -    }
->> -
->> -    if (job_id) {
->> -        if (flags & BLOCK_JOB_INTERNAL) {
->> +    if (flags & BLOCK_JOB_INTERNAL) {
->> +        if (job_id) {
->>              error_setg(errp, "Cannot specify job ID for internal block =
-job");
->>              return NULL;
->>          }
->
->When BLOCK_JOB_INTERNAL is set, then job_id must be NULL...
->
->> -
->> +    } else {
->> +        /* Require job-id. */
->> +        assert(job_id);
->>          if (!id_wellformed(job_id)) {
->>              error_setg(errp, "Invalid job ID '%s'", job_id);
->>              return NULL;
->> diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
->> index f13ad05c0d..ff906808a6 100644
->> --- a/include/block/blockjob_int.h
->> +++ b/include/block/blockjob_int.h
->> @@ -112,8 +112,7 @@ struct BlockJobDriver {
->>
->>  /**
->>   * block_job_create:
->> - * @job_id: The id of the newly-created job, or %NULL to have one
->> - * generated automatically.
->> + * @job_id: The id of the newly-created job, must be non %NULL.
->
->...but here you say that it must not be NULL.
->
->And since job_id can be NULL in some cases I think I'd replace the
->assert(job_id) that you added to block_job_create() with a normal
->pointer check + error_setg().
->
->> @@ -93,9 +93,6 @@ static void test_job_ids(void)
->>      blk[1] =3D create_blk("drive1");
->>      blk[2] =3D create_blk("drive2");
->>
->> -    /* No job ID provided and the block backend has no name */
->> -    job[0] =3D do_test_id(blk[0], NULL, false);
->> -
->
->If you decide to handle NULL ids by returning and error instead of
->asserting, we should keep a couple of tests for that scenario.
->
->Berto
->
+-- =
 
-Thanks, I will change that. What cases are you thinking of besides=20
-internal jobs though? And should documentation of block_job_create=20
-reflect that internal jobs have job_id =3D=3D NULL?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1711602
 
---4ud4cy4eqvmphs2g
-Content-Type: application/pgp-signature; name="signature.asc"
+Title:
+  --copy-storage-all failing with qemu 2.10
 
------BEGIN PGP SIGNATURE-----
+Status in QEMU:
+  New
+Status in libvirt package in Ubuntu:
+  Confirmed
+Status in qemu package in Ubuntu:
+  Confirmed
 
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlma/sQACgkQc2J8L2kN
-9xCGUw/8C8/A0aNQQTjf3h/eSX2aKxZGjmX9oHPGXeVvIPHGRnKnpA0Q8cFw4cvy
-p4x4+Uzb/YMrjnUjiGBb7SguXLom8ZdDBlQUWw3U6mLpiOGM++VC4KHAW6/5gucV
-x4vfMFrL/05LgAZY+mznVZP1bQKCnD46nvFEsTPqaSCLG1GT/G15cuPSiwsmELC4
-o9LDmZx1EIcwGvTdrnhoic5E+8PaJV9FvOnmq/Z8V5viKc3mw2DEycge1UzMwH80
-Qbh8bbihbbt9rk2nPLkP4ocB+lBNgzDm0jeSE/qMem612c9UG0nI17dh3bqI+Siv
-Qx1JpDexBg+V329I0Jb1gvowZWpcw/vTyMVmBLDeqLtXMsrsoedQtuHmv+mxMSZz
-Q8BFD6pjas2dNKtka24orVMjMWZNbiZX9/TsZekSrBcAB3fdJIZAq5ZdrSRi2T0u
-uDhc6Av3BYc0imQhtIh2qNfUYmDH2aC6Mb19HXp2sVnI7FNA4d+vyTFyIpSK/UAx
-mb4EotCnvqpzxKj1Pfup8foxcSwFTVcqnCXVJqy271PayJZaH53GhB4As+p4HSoD
-FqWGTg+od5tL8O5mYEHUKPzc984nIi8ZJDSHcrA8E6EWQ/UJtHrQBlLYWDq5eIXa
-dgwN/jjC19l//INIpyRV8NTASvdZJ/wubm6kar3Ixa+LL5o364E=
-=7V81
------END PGP SIGNATURE-----
+Bug description:
+  We fixed an issue around disk locking already in regard to qemu-nbd
+  [1], but there still seem to be issues.
 
---4ud4cy4eqvmphs2g--
+  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
+://10.22.69.196/system
+  error: internal error: qemu unexpectedly closed the monitor: 2017-08-18T1=
+2:10:29.800397Z qemu-system-x86_64: -chardev pty,id=3Dcharserial0: char dev=
+ice redirected to /dev/pts/0 (label charserial0)
+  2017-08-18T12:10:48.545776Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+
+  Source libvirt log for the guest:
+  2017-08-18 12:09:08.251+0000: initiating migration
+  2017-08-18T12:09:08.809023Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+  2017-08-18T12:09:08.809481Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+
+  Target libvirt log for the guest:
+  2017-08-18T12:09:08.730911Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+  2017-08-18 12:09:09.010+0000: shutting down, reason=3Dcrashed
+
+  Given the timing it seems that the actual copy now works (it is busy ~10 =
+seconds on my environment which would be the copy).
+  Also we don't see the old errors we saw before, but afterwards on the act=
+ual take-over it fails.
+
+  Dmesg has no related denials as often apparmor is in the mix.
+
+  Need to check libvirt logs of source [2] and target [3] in Detail.
+
+  [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02200.html
+  [2]: http://paste.ubuntu.com/25339356/
+  [3]: http://paste.ubuntu.com/25339358/
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1711602/+subscriptions
