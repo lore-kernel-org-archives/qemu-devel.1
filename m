@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1djtMz-0001Ij-42
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 16:32:22 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1djtgk-0002fL-B6
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 16:52:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1djtMu-0006Iz-7b
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 16:32:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45664)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1djtMu-0006GV-1L
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 16:32:16 -0400
-Date: Mon, 21 Aug 2017 23:22:17 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170821232052-mutt-send-email-mst@kernel.org>
-References: <1502940416-42944-1-git-send-email-wei.w.wang@intel.com>
-	<1502940416-42944-4-git-send-email-wei.w.wang@intel.com>
-	<20170818051451-mutt-send-email-mst@kernel.org>
-	<599699AF.1090705@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <599699AF.1090705@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v14 3/5] virtio-balloon: VIRTIO_BALLOON_F_SG
+	(envelope-from <programmingkidx@gmail.com>) id 1djtgi-00019x-0q
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 16:52:46 -0400
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:32827)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1djtgh-000198-Rf
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 16:52:43 -0400
+Received: by mail-it0-x243.google.com with SMTP id m81so5460629itb.0
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 13:52:42 -0700 (PDT)
+From: John Arbuckle <programmingkidx@gmail.com>
+Date: Mon, 21 Aug 2017 16:52:25 -0400
+Message-Id: <20170821205225.3401-3-programmingkidx@gmail.com>
+In-Reply-To: <20170821205225.3401-1-programmingkidx@gmail.com>
+References: <20170821205225.3401-1-programmingkidx@gmail.com>
+Subject: [Qemu-devel] [PATCH 1/2] ui/cocoa.m: move ungrab to ctrl-alt-g
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: "qemu-devel@nongnu.org qemu-devel peter . maydell @ linaro . org" <qemu-devel@nongnu.org>
+Cc: John Arbuckle <programmingkidx@gmail.com>
 
-On Fri, Aug 18, 2017 at 03:39:27PM +0800, Wei Wang wrote:
-> On 08/18/2017 10:22 AM, Michael S. Tsirkin wrote:
-> > +static void send_balloon_page_sg(struct virtio_balloon *vb,
-> > +				 struct virtqueue *vq,
-> > +				 void *addr,
-> > +				 uint32_t size)
-> > +{
-> > +	unsigned int len;
-> > +	int ret;
-> > +
-> > +	do {
-> > +		ret = add_one_sg(vq, addr, size);
-> > +		virtqueue_kick(vq);
-> > +		wait_event(vb->acked, virtqueue_get_buf(vq, &len));
-> > +		/*
-> > +		 * It is uncommon to see the vq is full, because the sg is sent
-> > +		 * one by one and the device is able to handle it in time. But
-> > +		 * if that happens, we go back to retry after an entry gets
-> > +		 * released.
-> > +		 */
-> > Why send one by one though? Why not batch some s/gs and wait for all
-> > of them to be completed? If memory if fragmented, waiting every time is
-> > worse than what we have now (VIRTIO_BALLOON_ARRAY_PFNS_MAX at a time).
-> > 
-> 
-> OK, I'll do batching in some fashion.
-> 
-> 
-> Best,
-> Wei
-> 
-> 
+Currently the cocoa user interface relys on the user pushing control-alt to ungrab the mouse. This is patch changes the key combination to control-alt-g to be in line with the GTK user interface. 
 
-btw you need to address the build errors that kbot has found.
+Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+---
+ ui/cocoa.m | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
+diff --git a/ui/cocoa.m b/ui/cocoa.m
+index 93e56d0518..d3e7907103 100644
+--- a/ui/cocoa.m
++++ b/ui/cocoa.m
+@@ -609,10 +609,6 @@ - (void) handleEvent:(NSEvent *)event
+                 }
+             }
+ 
+-            // release Mouse grab when pressing ctrl+alt
+-            if (([event modifierFlags] & NSEventModifierFlagControl) && ([event modifierFlags] & NSEventModifierFlagOption)) {
+-                [self ungrabMouse];
+-            }
+             break;
+         case NSEventTypeKeyDown:
+             keycode = cocoa_keycode_to_qemu([event keyCode]);
+@@ -625,7 +621,7 @@ - (void) handleEvent:(NSEvent *)event
+ 
+             // default
+ 
+-            // handle control + alt Key Combos (ctrl+alt is reserved for QEMU)
++            // handle control + alt Key Combos (ctrl+alt+[1..9,g] is reserved for QEMU)
+             if (([event modifierFlags] & NSEventModifierFlagControl) && ([event modifierFlags] & NSEventModifierFlagOption)) {
+                 switch (keycode) {
+ 
+@@ -633,6 +629,11 @@ - (void) handleEvent:(NSEvent *)event
+                     case Q_KEY_CODE_1 ... Q_KEY_CODE_9: // '1' to '9' keys
+                         console_select(keycode - 11);
+                         break;
++
++                    // release the mouse grab
++                    case Q_KEY_CODE_G:
++                        [self ungrabMouse];
++                        break;
+                 }
+ 
+             // handle keys for graphic console
+@@ -806,9 +807,9 @@ - (void) grabMouse
+ 
+     if (!isFullscreen) {
+         if (qemu_name)
+-            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU %s - (Press ctrl + alt to release Mouse)", qemu_name]];
++            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU %s - (Press ctrl + alt + g to release Mouse)", qemu_name]];
+         else
+-            [normalWindow setTitle:@"QEMU - (Press ctrl + alt to release Mouse)"];
++            [normalWindow setTitle:@"QEMU - (Press ctrl + alt + g to release Mouse)"];
+     }
+     [self hideCursor];
+     if (!isAbsoluteEnabled) {
 -- 
-MST
+2.11.0 (Apple Git-81)
