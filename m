@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1djfbS-0008UP-9e
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 01:50:23 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1djfuU-0003za-A0
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 02:10:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1djfbP-00086g-5T
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 01:50:22 -0400
-Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:34025)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1djfbO-0007u9-T7
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 01:50:19 -0400
-Received: by mail-io0-x241.google.com with SMTP id p141so2729189iop.1
-	for <qemu-devel@nongnu.org>; Sun, 20 Aug 2017 22:50:17 -0700 (PDT)
-References: <283a2a27-7fb5-5fa7-4921-60ba91f13666@ozlabs.ru>
-	<20170818131853.GB17654@stefanha-x1.localdomain>
-	<20170821043125.GH12356@umbus.fritz.box>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <6e2ae379-9cff-9615-c19f-747867328cb5@ozlabs.ru>
-Date: Mon, 21 Aug 2017 15:50:09 +1000
+	(envelope-from <wei.w.wang@intel.com>) id 1djfuR-0007Q1-4H
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 02:10:02 -0400
+Received: from mga01.intel.com ([192.55.52.88]:55498)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1djfuQ-0007PH-OY
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 02:09:59 -0400
+Message-ID: <599A79DF.2000707@intel.com>
+Date: Mon, 21 Aug 2017 14:12:47 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170821043125.GH12356@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="3QAtLRFcO5NlWl2iCuq1KMgmFGlw9NDFe"
-Subject: Re: [Qemu-devel] Memory use with >100 virtio devices
+References: <1502940416-42944-1-git-send-email-wei.w.wang@intel.com>
+	<1502940416-42944-5-git-send-email-wei.w.wang@intel.com>
+	<20170818134650.GC18499@dhcp22.suse.cz>
+In-Reply-To: <20170818134650.GC18499@dhcp22.suse.cz>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v14 4/5] mm: support reporting free page
+ blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,95 +30,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Michal Hocko <mhocko@kernel.org>
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3QAtLRFcO5NlWl2iCuq1KMgmFGlw9NDFe
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: David Gibson <david@gibson.dropbear.id.au>,
- Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Message-ID: <6e2ae379-9cff-9615-c19f-747867328cb5@ozlabs.ru>
-Subject: Re: [Qemu-devel] Memory use with >100 virtio devices
-References: <283a2a27-7fb5-5fa7-4921-60ba91f13666@ozlabs.ru>
- <20170818131853.GB17654@stefanha-x1.localdomain>
- <20170821043125.GH12356@umbus.fritz.box>
-In-Reply-To: <20170821043125.GH12356@umbus.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 08/18/2017 09:46 PM, Michal Hocko wrote:
+> On Thu 17-08-17 11:26:55, Wei Wang wrote:
+>> This patch adds support to walk through the free page blocks in the
+>> system and report them via a callback function. Some page blocks may
+>> leave the free list after zone->lock is released, so it is the caller's
+>> responsibility to either detect or prevent the use of such pages.
+> This could see more details to be honest. Especially the usecase you are
+> going to use this for. This will help us to understand the motivation
+> in future when the current user might be gone a new ones largely diverge
+> into a different usage. This wouldn't be the first time I have seen
+> something like that.
 
-On 21/08/17 14:31, David Gibson wrote:
-> On Fri, Aug 18, 2017 at 02:18:53PM +0100, Stefan Hajnoczi wrote:
->> On Fri, Aug 18, 2017 at 03:39:20PM +1000, Alexey Kardashevskiy wrote:
->>> =3D=3D94451=3D=3D -------------------- 4 of 10 --------------------
->>> =3D=3D94451=3D=3D max-live:    314,649,600 in 150 blocks
->>> =3D=3D94451=3D=3D tot-alloc:   314,649,600 in 150 blocks (avg size 20=
-97664.00)
->>> =3D=3D94451=3D=3D deaths:      none (none of these blocks were freed)=
+OK, I will more details here about how it's used to accelerate live 
+migration.
 
->>> =3D=3D94451=3D=3D acc-ratios:  0.00 rd, 0.00 wr  (0 b-read, 0 b-writt=
-en)
->>> =3D=3D94451=3D=3D    at 0x4895600: memalign (in
->>> /usr/lib/valgrind/vgpreload_exp-dhat-ppc64le-linux.so)
->>> =3D=3D94451=3D=3D    by 0x48957E7: posix_memalign (in
->>> /usr/lib/valgrind/vgpreload_exp-dhat-ppc64le-linux.so)
->>> =3D=3D94451=3D=3D    by 0xB744AB: qemu_try_memalign (oslib-posix.c:10=
-6)
->>> =3D=3D94451=3D=3D    by 0xA92053: qemu_try_blockalign (io.c:2493)
->>> =3D=3D94451=3D=3D    by 0xA34DDF: qcow2_do_open (qcow2.c:1365)
->>> =3D=3D94451=3D=3D    by 0xA35627: qcow2_open (qcow2.c:1526)
->>> =3D=3D94451=3D=3D    by 0x9FB94F: bdrv_open_driver (block.c:1109)
->>> =3D=3D94451=3D=3D    by 0x9FC413: bdrv_open_common (block.c:1365)
->>> =3D=3D94451=3D=3D    by 0x9FF823: bdrv_open_inherit (block.c:2542)
->>> =3D=3D94451=3D=3D    by 0x9FFC17: bdrv_open (block.c:2626)
->>> =3D=3D94451=3D=3D    by 0xA71027: blk_new_open (block-backend.c:267)
->>> =3D=3D94451=3D=3D    by 0x6D3E6B: blockdev_init (blockdev.c:588)
+>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>> Signed-off-by: Liang Li <liang.z.li@intel.com>
+>> Cc: Michal Hocko <mhocko@kernel.org>
+>> Cc: Michael S. Tsirkin <mst@redhat.com>
+>> ---
+>>   include/linux/mm.h |  6 ++++++
+>>   mm/page_alloc.c    | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 50 insertions(+)
 >>
->> This allocation is unnecessary.  Most qcow2 files are not encrypted so=
+>> diff --git a/include/linux/mm.h b/include/linux/mm.h
+>> index 46b9ac5..cd29b9f 100644
+>> --- a/include/linux/mm.h
+>> +++ b/include/linux/mm.h
+>> @@ -1835,6 +1835,12 @@ extern void free_area_init_node(int nid, unsigned long * zones_size,
+>>   		unsigned long zone_start_pfn, unsigned long *zholes_size);
+>>   extern void free_initmem(void);
+>>   
+>> +extern void walk_free_mem_block(void *opaque1,
+>> +				unsigned int min_order,
+>> +				void (*visit)(void *opaque2,
+>> +					      unsigned long pfn,
+>> +					      unsigned long nr_pages));
+>> +
+>>   /*
+>>    * Free reserved pages within range [PAGE_ALIGN(start), end & PAGE_MASK)
+>>    * into the buddy system. The freed pages will be poisoned with pattern
+>> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+>> index 6d00f74..a721a35 100644
+>> --- a/mm/page_alloc.c
+>> +++ b/mm/page_alloc.c
+>> @@ -4762,6 +4762,50 @@ void show_free_areas(unsigned int filter, nodemask_t *nodemask)
+>>   	show_swap_cache_info();
+>>   }
+>>   
+>> +/**
+>> + * walk_free_mem_block - Walk through the free page blocks in the system
+>> + * @opaque1: the context passed from the caller
+>> + * @min_order: the minimum order of free lists to check
+>> + * @visit: the callback function given by the caller
+> The original suggestion for using visit was motivated by a visit design
+> pattern but I can see how this can be confusing. Maybe a more explicit
+> name wold be better. What about report_free_range.
 
->> s->cluster_data does not need to be allocated upfront.
->>
->> I'll send a patch.
->=20
-> Is that sufficient to explain the problem, I can't quickly see how big
-> that unnecessary allocation is - but would it account for the 10s of
-> gigabytes usage we're seeing here?
->=20
-> I'm suspecting we accidentally have a O(n^2) or worse space complexity
-> going on here.
->=20
 
-No, it is a small fraction only. See "[PATCH] qcow2: allocate
-cluster_cache/cluster_data on demand" thread for more details.
+I'm afraid that name would be too long to fit in nicely.
+How about simply naming it "report"?
 
 
+>
+>> + *
+>> + * The function is used to walk through the free page blocks in the system,
+>> + * and each free page block is reported to the caller via the @visit callback.
+>> + * Please note:
+>> + * 1) The function is used to report hints of free pages, so the caller should
+>> + * not use those reported pages after the callback returns.
+>> + * 2) The callback is invoked with the zone->lock being held, so it should not
+>> + * block and should finish as soon as possible.
+> I think that the explicit note about zone->lock is not really need. This
+> can change in future and I would even bet that somebody might rely on
+> the lock being held for some purpose and silently get broken with the
+> change. Instead I would much rather see something like the following:
+> "
+> Please note that there are no locking guarantees for the callback
 
---=20
-Alexey
+Just a little confused with this one:
+
+The callback is invoked within zone->lock, why would we claim it "no
+locking guarantees for the callback"?
+
+> and
+> that the reported pfn range might be freed or disappear after the
+> callback returns so the caller has to be very careful how it is used.
+>
+> The callback itself must not sleep or perform any operations which would
+> require any memory allocations directly (not even GFP_NOWAIT/GFP_ATOMIC)
+> or via any lock dependency. It is generally advisable to implement
+> the callback as simple as possible and defer any heavy lifting to a
+> different context.
+>
+> There is no guarantee that each free range will be reported only once
+> during one walk_free_mem_block invocation.
+>
+> pfn_to_page on the given range is strongly discouraged and if there is
+> an absolute need for that make sure to contact MM people to discuss
+> potential problems.
+>
+> The function itself might sleep so it cannot be called from atomic
+> contexts.
+>
+> In general low orders tend to be very volatile and so it makes more
+> sense to query larger ones for various optimizations which like
+> ballooning etc... This will reduce the overhead as well.
+> "
+
+I think it looks quite comprehensive. Thanks.
 
 
---3QAtLRFcO5NlWl2iCuq1KMgmFGlw9NDFe
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIrBAEBCAAVBQJZmnSSDhxhaWtAb3psYWJzLnJ1AAoJEIYTPdgrwSC5tgUQAJXR
-Iq3zEoux3iS8bwChRb4njh/G/eHkctpb2fyjbT9XNgzPETAy87nDUp48KDL4qvQt
-c0ye4IcXyF35LuYGnG682m5F78zB/zre9p8d5VEV37USuL/yhCjuEIs5nWgMOQ/L
-v9KV2j0uY9jqVFr1eyltoHmxzso91T59Cx5jYpJngRitF//TI3EpADdlKBt6FLi3
-AY8YJUQv6EJME7LyczS/H3QigZyd8qPBajilhFSL+xUHtwBH+VRW50bt7kVhbNct
-eFIi3SO5zCEG2DfRBZbaOUhbD8RHhMWGksqjTPWrp96mdnFM2krTuWQT+Ty1YXLz
-c1sElPfCna0S4A8ycGIU/ZnzLzDQr94Y/XQ7yLtrK1x2/UCqhIAZsfVVBrHcJawm
-Qk+LfY/TX+kT6FAmwiMWjIpzuNxcc4oqfJzutq+FhFZ2ksX6QIrqHgXCx/9ODAu9
-aZoPVtvEVDtPYJcrAYQpmBaR2PEpNRdEhcgaOtAArX0RuMDlKRIMtDMA6fbZLj84
-93KOME4djuLE4m/hrz4LsD8BmT3uESYpvxRiF7GTIJ1CDu9ZFLlS+ccY5C02fmsa
-+ZbA+CEyg1C7CXfPIiV6OeoAiziFTBORf62Za5Hr/rnTujiWv1mWzYRW1HXUaPCE
-t7Xd+yjfDXxG8K0S1WTcNdnwTZVbBrS4mGTK2cB1
-=mMyb
------END PGP SIGNATURE-----
-
---3QAtLRFcO5NlWl2iCuq1KMgmFGlw9NDFe--
+Best,
+Wei
