@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1djjga-0006aA-Iw
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:11:57 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1djjht-0007VM-6w
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:13:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1djjgV-0007go-J3
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:11:56 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1djjhq-0008LT-PQ
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:13:17 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 References: <20170815150907.21495-1-eblake@redhat.com>
 	<20170815150907.21495-8-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <aca0bbb8-0893-c02a-c3cb-b85fa431437b@virtuozzo.com>
-Date: Mon, 21 Aug 2017 13:11:45 +0300
+	<aca0bbb8-0893-c02a-c3cb-b85fa431437b@virtuozzo.com>
+Message-ID: <7e7d839d-7ae7-9b92-7830-d568eb8f1be2@virtuozzo.com>
+Date: Mon, 21 Aug 2017 13:13:12 +0300
 MIME-Version: 1.0
-In-Reply-To: <20170815150907.21495-8-eblake@redhat.com>
+In-Reply-To: <aca0bbb8-0893-c02a-c3cb-b85fa431437b@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: base64
 Subject: Re: [Qemu-devel] [PULL 7/7] nbd-client: Fix regression when server
  sends garbage
 List-Id: <qemu-devel.nongnu.org>
@@ -28,171 +29,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-15.08.2017 18:09, Eric Blake wrote:
-> When we switched NBD to use coroutines for qemu 2.9 (in particular,
-> commit a12a712a), we introduced a regression: if a server sends us
-> garbage (such as a corrupted magic number), we quit the read loop
-> but do not stop sending further queued commands, resulting in the
-> client hanging when it never reads the response to those additional
-> commands.  In qemu 2.8, we properly detected that the server is no
-> longer reliable, and cancelled all existing pending commands with
-> EIO, then tore down the socket so that all further command attempts
-> get EPIPE.
->
-> Restore the proper behavior of quitting (almost) all communication
-> with a broken server: Once we know we are out of sync or otherwise
-> can't trust the server, we must assume that any further incoming
-> data is unreliable and therefore end all pending commands with EIO,
-> and quit trying to send any further commands.  As an exception, we
-> still (try to) send NBD_CMD_DISC to let the server know we are going
-> away (in part, because it is easier to do that than to further
-> refactor nbd_teardown_connection, and in part because it is the
-> only command where we do not have to wait for a reply).
->
-> Based on a patch by Vladimir Sementsov-Ogievskiy.
->
-> A malicious server can be created with the following hack,
-> followed by setting NBD_SERVER_DEBUG to a non-zero value in the
-> environment when running qemu-nbd:
->
-> | --- a/nbd/server.c
-> | +++ b/nbd/server.c
-> | @@ -919,6 +919,17 @@ static int nbd_send_reply(QIOChannel *ioc, NBDRe=
-ply *reply, Error **errp)
-> |      stl_be_p(buf + 4, reply->error);
-> |      stq_be_p(buf + 8, reply->handle);
-> |
-> | +    static int debug;
-> | +    static int count;
-> | +    if (!count++) {
-> | +        const char *str =3D getenv("NBD_SERVER_DEBUG");
-> | +        if (str) {
-> | +            debug =3D atoi(str);
-> | +        }
-> | +    }
-> | +    if (debug && !(count % debug)) {
-> | +        buf[0] =3D 0;
-> | +    }
-> |      return nbd_write(ioc, buf, sizeof(buf), errp);
-> |  }
->
-> Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Message-Id: <20170814213426.24681-1-eblake@redhat.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->   block/nbd-client.h |  1 +
->   block/nbd-client.c | 17 +++++++++++++----
->   2 files changed, 14 insertions(+), 4 deletions(-)
->
-> diff --git a/block/nbd-client.h b/block/nbd-client.h
-> index df80771357..1935ffbcaa 100644
-> --- a/block/nbd-client.h
-> +++ b/block/nbd-client.h
-> @@ -29,6 +29,7 @@ typedef struct NBDClientSession {
->
->       Coroutine *recv_coroutine[MAX_NBD_REQUESTS];
->       NBDReply reply;
-> +    bool quit;
->   } NBDClientSession;
->
->   NBDClientSession *nbd_get_client_session(BlockDriverState *bs);
-> diff --git a/block/nbd-client.c b/block/nbd-client.c
-> index 25dd28406b..422ecb4307 100644
-> --- a/block/nbd-client.c
-> +++ b/block/nbd-client.c
-> @@ -73,7 +73,7 @@ static coroutine_fn void nbd_read_reply_entry(void *o=
-paque)
->       int ret;
->       Error *local_err =3D NULL;
->
-> -    for (;;) {
-> +    while (!s->quit) {
->           assert(s->reply.handle =3D=3D 0);
->           ret =3D nbd_receive_reply(s->ioc, &s->reply, &local_err);
->           if (ret < 0) {
-> @@ -107,6 +107,9 @@ static coroutine_fn void nbd_read_reply_entry(void =
-*opaque)
->           qemu_coroutine_yield();
->       }
->
-> +    if (ret < 0) {
-> +        s->quit =3D true;
-
-but on wrong handle ret is 0:
-
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret <=3D 0) {
-break;
-}
-
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* There's no need for a mute=
-x on the receive side, because the
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * handler acts as a syn=
-chronization point and ensures that only
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * one coroutine is call=
-ed until the reply finishes.
-*/
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i =3D HANDLE_TO_INDEX(s, s->r=
-eply.handle);
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (i >=3D MAX_NBD_REQUESTS |=
-| !s->recv_coroutine[i]) {
-break;
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-
-
-looks like we should set ret in this if-block
-
-> +    }
->       nbd_recv_coroutines_enter_all(s);
->       s->read_reply_co =3D NULL;
->   }
-> @@ -135,6 +138,10 @@ static int nbd_co_send_request(BlockDriverState *b=
-s,
->       assert(i < MAX_NBD_REQUESTS);
->       request->handle =3D INDEX_TO_HANDLE(s, i);
->
-> +    if (s->quit) {
-> +        qemu_co_mutex_unlock(&s->send_mutex);
-> +        return -EIO;
-> +    }
->       if (!s->ioc) {
->           qemu_co_mutex_unlock(&s->send_mutex);
->           return -EPIPE;
-> @@ -143,7 +150,7 @@ static int nbd_co_send_request(BlockDriverState *bs=
-,
->       if (qiov) {
->           qio_channel_set_cork(s->ioc, true);
->           rc =3D nbd_send_request(s->ioc, request);
-> -        if (rc >=3D 0) {
-> +        if (rc >=3D 0 && !s->quit) {
->               ret =3D nbd_rwv(s->ioc, qiov->iov, qiov->niov, request->l=
-en, false,
->                             NULL);
->               if (ret !=3D request->len) {
-> @@ -154,6 +161,9 @@ static int nbd_co_send_request(BlockDriverState *bs=
-,
->       } else {
->           rc =3D nbd_send_request(s->ioc, request);
->       }
-> +    if (rc < 0) {
-> +        s->quit =3D true;
-> +    }
->       qemu_co_mutex_unlock(&s->send_mutex);
->       return rc;
->   }
-> @@ -168,8 +178,7 @@ static void nbd_co_receive_reply(NBDClientSession *=
-s,
->       /* Wait until we're woken up by nbd_read_reply_entry.  */
->       qemu_coroutine_yield();
->       *reply =3D s->reply;
-> -    if (reply->handle !=3D request->handle ||
-> -        !s->ioc) {
-> +    if (reply->handle !=3D request->handle || !s->ioc || s->quit) {
->           reply->error =3D EIO;
->       } else {
->           if (qiov && reply->error =3D=3D 0) {
-
-
---=20
-Best regards,
-Vladimir
+MjEuMDguMjAxNyAxMzoxMSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToN
+Cj4gMTUuMDguMjAxNyAxODowOSwgRXJpYyBCbGFrZSB3cm90ZToNCj4+IFdoZW4gd2Ugc3dp
+dGNoZWQgTkJEIHRvIHVzZSBjb3JvdXRpbmVzIGZvciBxZW11IDIuOSAoaW4gcGFydGljdWxh
+ciwNCj4+IGNvbW1pdCBhMTJhNzEyYSksIHdlIGludHJvZHVjZWQgYSByZWdyZXNzaW9uOiBp
+ZiBhIHNlcnZlciBzZW5kcyB1cw0KPj4gZ2FyYmFnZSAoc3VjaCBhcyBhIGNvcnJ1cHRlZCBt
+YWdpYyBudW1iZXIpLCB3ZSBxdWl0IHRoZSByZWFkIGxvb3ANCj4+IGJ1dCBkbyBub3Qgc3Rv
+cCBzZW5kaW5nIGZ1cnRoZXIgcXVldWVkIGNvbW1hbmRzLCByZXN1bHRpbmcgaW4gdGhlDQo+
+PiBjbGllbnQgaGFuZ2luZyB3aGVuIGl0IG5ldmVyIHJlYWRzIHRoZSByZXNwb25zZSB0byB0
+aG9zZSBhZGRpdGlvbmFsDQo+PiBjb21tYW5kcy7CoCBJbiBxZW11IDIuOCwgd2UgcHJvcGVy
+bHkgZGV0ZWN0ZWQgdGhhdCB0aGUgc2VydmVyIGlzIG5vDQo+PiBsb25nZXIgcmVsaWFibGUs
+IGFuZCBjYW5jZWxsZWQgYWxsIGV4aXN0aW5nIHBlbmRpbmcgY29tbWFuZHMgd2l0aA0KPj4g
+RUlPLCB0aGVuIHRvcmUgZG93biB0aGUgc29ja2V0IHNvIHRoYXQgYWxsIGZ1cnRoZXIgY29t
+bWFuZCBhdHRlbXB0cw0KPj4gZ2V0IEVQSVBFLg0KPj4NCj4+IFJlc3RvcmUgdGhlIHByb3Bl
+ciBiZWhhdmlvciBvZiBxdWl0dGluZyAoYWxtb3N0KSBhbGwgY29tbXVuaWNhdGlvbg0KPj4g
+d2l0aCBhIGJyb2tlbiBzZXJ2ZXI6IE9uY2Ugd2Uga25vdyB3ZSBhcmUgb3V0IG9mIHN5bmMg
+b3Igb3RoZXJ3aXNlDQo+PiBjYW4ndCB0cnVzdCB0aGUgc2VydmVyLCB3ZSBtdXN0IGFzc3Vt
+ZSB0aGF0IGFueSBmdXJ0aGVyIGluY29taW5nDQo+PiBkYXRhIGlzIHVucmVsaWFibGUgYW5k
+IHRoZXJlZm9yZSBlbmQgYWxsIHBlbmRpbmcgY29tbWFuZHMgd2l0aCBFSU8sDQo+PiBhbmQg
+cXVpdCB0cnlpbmcgdG8gc2VuZCBhbnkgZnVydGhlciBjb21tYW5kcy7CoCBBcyBhbiBleGNl
+cHRpb24sIHdlDQo+PiBzdGlsbCAodHJ5IHRvKSBzZW5kIE5CRF9DTURfRElTQyB0byBsZXQg
+dGhlIHNlcnZlciBrbm93IHdlIGFyZSBnb2luZw0KPj4gYXdheSAoaW4gcGFydCwgYmVjYXVz
+ZSBpdCBpcyBlYXNpZXIgdG8gZG8gdGhhdCB0aGFuIHRvIGZ1cnRoZXINCj4+IHJlZmFjdG9y
+IG5iZF90ZWFyZG93bl9jb25uZWN0aW9uLCBhbmQgaW4gcGFydCBiZWNhdXNlIGl0IGlzIHRo
+ZQ0KPj4gb25seSBjb21tYW5kIHdoZXJlIHdlIGRvIG5vdCBoYXZlIHRvIHdhaXQgZm9yIGEg
+cmVwbHkpLg0KPj4NCj4+IEJhc2VkIG9uIGEgcGF0Y2ggYnkgVmxhZGltaXIgU2VtZW50c292
+LU9naWV2c2tpeS4NCj4+DQo+PiBBIG1hbGljaW91cyBzZXJ2ZXIgY2FuIGJlIGNyZWF0ZWQg
+d2l0aCB0aGUgZm9sbG93aW5nIGhhY2ssDQo+PiBmb2xsb3dlZCBieSBzZXR0aW5nIE5CRF9T
+RVJWRVJfREVCVUcgdG8gYSBub24temVybyB2YWx1ZSBpbiB0aGUNCj4+IGVudmlyb25tZW50
+IHdoZW4gcnVubmluZyBxZW11LW5iZDoNCj4+DQo+PiB8IC0tLSBhL25iZC9zZXJ2ZXIuYw0K
+Pj4gfCArKysgYi9uYmQvc2VydmVyLmMNCj4+IHwgQEAgLTkxOSw2ICs5MTksMTcgQEAgc3Rh
+dGljIGludCBuYmRfc2VuZF9yZXBseShRSU9DaGFubmVsICppb2MsIA0KPj4gTkJEUmVwbHkg
+KnJlcGx5LCBFcnJvciAqKmVycnApDQo+PiB8wqDCoMKgwqDCoCBzdGxfYmVfcChidWYgKyA0
+LCByZXBseS0+ZXJyb3IpOw0KPj4gfMKgwqDCoMKgwqAgc3RxX2JlX3AoYnVmICsgOCwgcmVw
+bHktPmhhbmRsZSk7DQo+PiB8DQo+PiB8ICvCoMKgwqAgc3RhdGljIGludCBkZWJ1ZzsNCj4+
+IHwgK8KgwqDCoCBzdGF0aWMgaW50IGNvdW50Ow0KPj4gfCArwqDCoMKgIGlmICghY291bnQr
+Kykgew0KPj4gfCArwqDCoMKgwqDCoMKgwqAgY29uc3QgY2hhciAqc3RyID0gZ2V0ZW52KCJO
+QkRfU0VSVkVSX0RFQlVHIik7DQo+PiB8ICvCoMKgwqDCoMKgwqDCoCBpZiAoc3RyKSB7DQo+
+PiB8ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGRlYnVnID0gYXRvaShzdHIpOw0KPj4gfCAr
+wqDCoMKgwqDCoMKgwqAgfQ0KPj4gfCArwqDCoMKgIH0NCj4+IHwgK8KgwqDCoCBpZiAoZGVi
+dWcgJiYgIShjb3VudCAlIGRlYnVnKSkgew0KPj4gfCArwqDCoMKgwqDCoMKgwqAgYnVmWzBd
+ID0gMDsNCj4+IHwgK8KgwqDCoCB9DQo+PiB8wqDCoMKgwqDCoCByZXR1cm4gbmJkX3dyaXRl
+KGlvYywgYnVmLCBzaXplb2YoYnVmKSwgZXJycCk7DQo+PiB8wqAgfQ0KPj4NCj4+IFJlcG9y
+dGVkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1
+b3p6by5jb20+DQo+PiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0
+LmNvbT4NCj4+IE1lc3NhZ2UtSWQ6IDwyMDE3MDgxNDIxMzQyNi4yNDY4MS0xLWVibGFrZUBy
+ZWRoYXQuY29tPg0KPj4gUmV2aWV3ZWQtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFA
+cmVkaGF0LmNvbT4NCj4+IC0tLQ0KPj4gwqAgYmxvY2svbmJkLWNsaWVudC5oIHzCoCAxICsN
+Cj4+IMKgIGJsb2NrL25iZC1jbGllbnQuYyB8IDE3ICsrKysrKysrKysrKystLS0tDQo+PiDC
+oCAyIGZpbGVzIGNoYW5nZWQsIDE0IGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pDQo+
+Pg0KPj4gZGlmZiAtLWdpdCBhL2Jsb2NrL25iZC1jbGllbnQuaCBiL2Jsb2NrL25iZC1jbGll
+bnQuaA0KPj4gaW5kZXggZGY4MDc3MTM1Ny4uMTkzNWZmYmNhYSAxMDA2NDQNCj4+IC0tLSBh
+L2Jsb2NrL25iZC1jbGllbnQuaA0KPj4gKysrIGIvYmxvY2svbmJkLWNsaWVudC5oDQo+PiBA
+QCAtMjksNiArMjksNyBAQCB0eXBlZGVmIHN0cnVjdCBOQkRDbGllbnRTZXNzaW9uIHsNCj4+
+DQo+PiDCoMKgwqDCoMKgIENvcm91dGluZSAqcmVjdl9jb3JvdXRpbmVbTUFYX05CRF9SRVFV
+RVNUU107DQo+PiDCoMKgwqDCoMKgIE5CRFJlcGx5IHJlcGx5Ow0KPj4gK8KgwqDCoCBib29s
+IHF1aXQ7DQo+PiDCoCB9IE5CRENsaWVudFNlc3Npb247DQo+Pg0KPj4gwqAgTkJEQ2xpZW50
+U2Vzc2lvbiAqbmJkX2dldF9jbGllbnRfc2Vzc2lvbihCbG9ja0RyaXZlclN0YXRlICpicyk7
+DQo+PiBkaWZmIC0tZ2l0IGEvYmxvY2svbmJkLWNsaWVudC5jIGIvYmxvY2svbmJkLWNsaWVu
+dC5jDQo+PiBpbmRleCAyNWRkMjg0MDZiLi40MjJlY2I0MzA3IDEwMDY0NA0KPj4gLS0tIGEv
+YmxvY2svbmJkLWNsaWVudC5jDQo+PiArKysgYi9ibG9jay9uYmQtY2xpZW50LmMNCj4+IEBA
+IC03Myw3ICs3Myw3IEBAIHN0YXRpYyBjb3JvdXRpbmVfZm4gdm9pZCBuYmRfcmVhZF9yZXBs
+eV9lbnRyeSh2b2lkIA0KPj4gKm9wYXF1ZSkNCj4+IMKgwqDCoMKgwqAgaW50IHJldDsNCj4+
+IMKgwqDCoMKgwqAgRXJyb3IgKmxvY2FsX2VyciA9IE5VTEw7DQo+Pg0KPj4gLcKgwqDCoCBm
+b3IgKDs7KSB7DQo+PiArwqDCoMKgIHdoaWxlICghcy0+cXVpdCkgew0KPj4gwqDCoMKgwqDC
+oMKgwqDCoMKgIGFzc2VydChzLT5yZXBseS5oYW5kbGUgPT0gMCk7DQo+PiDCoMKgwqDCoMKg
+wqDCoMKgwqAgcmV0ID0gbmJkX3JlY2VpdmVfcmVwbHkocy0+aW9jLCAmcy0+cmVwbHksICZs
+b2NhbF9lcnIpOw0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIGlmIChyZXQgPCAwKSB7DQo+PiBA
+QCAtMTA3LDYgKzEwNyw5IEBAIHN0YXRpYyBjb3JvdXRpbmVfZm4gdm9pZCANCj4+IG5iZF9y
+ZWFkX3JlcGx5X2VudHJ5KHZvaWQgKm9wYXF1ZSkNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCBx
+ZW11X2Nvcm91dGluZV95aWVsZCgpOw0KPj4gwqDCoMKgwqDCoCB9DQo+Pg0KPj4gK8KgwqDC
+oCBpZiAocmV0IDwgMCkgew0KPj4gK8KgwqDCoMKgwqDCoMKgIHMtPnF1aXQgPSB0cnVlOw0K
+Pg0KPiBidXQgb24gd3JvbmcgaGFuZGxlIHJldCBpcyAwOg0KDQpzLzAvcG9zaXRpdmUvDQoN
+Cj4NCj4gwqDCoMKgwqDCoMKgwqAgaWYgKHJldCA8PSAwKSB7DQo+IGJyZWFrOw0KPiB9DQo+
+DQo+IMKgwqDCoMKgwqDCoMKgIC8qIFRoZXJlJ3Mgbm8gbmVlZCBmb3IgYSBtdXRleCBvbiB0
+aGUgcmVjZWl2ZSBzaWRlLCBiZWNhdXNlIHRoZQ0KPiDCoMKgwqDCoMKgwqDCoMKgICogaGFu
+ZGxlciBhY3RzIGFzIGEgc3luY2hyb25pemF0aW9uIHBvaW50IGFuZCBlbnN1cmVzIHRoYXQg
+b25seQ0KPiDCoMKgwqDCoMKgwqDCoMKgICogb25lIGNvcm91dGluZSBpcyBjYWxsZWQgdW50
+aWwgdGhlIHJlcGx5IGZpbmlzaGVzLg0KPiAqLw0KPiDCoMKgwqDCoMKgwqDCoCBpID0gSEFO
+RExFX1RPX0lOREVYKHMsIHMtPnJlcGx5LmhhbmRsZSk7DQo+IMKgwqDCoMKgwqDCoMKgIGlm
+IChpID49IE1BWF9OQkRfUkVRVUVTVFMgfHwgIXMtPnJlY3ZfY29yb3V0aW5lW2ldKSB7DQo+
+IGJyZWFrOw0KPiDCoMKgwqDCoMKgwqDCoCB9DQo+DQo+DQo+IGxvb2tzIGxpa2Ugd2Ugc2hv
+dWxkIHNldCByZXQgaW4gdGhpcyBpZi1ibG9jaw0KPg0KPj4gK8KgwqDCoCB9DQo+PiDCoMKg
+wqDCoMKgIG5iZF9yZWN2X2Nvcm91dGluZXNfZW50ZXJfYWxsKHMpOw0KPj4gwqDCoMKgwqDC
+oCBzLT5yZWFkX3JlcGx5X2NvID0gTlVMTDsNCj4+IMKgIH0NCj4+IEBAIC0xMzUsNiArMTM4
+LDEwIEBAIHN0YXRpYyBpbnQgbmJkX2NvX3NlbmRfcmVxdWVzdChCbG9ja0RyaXZlclN0YXRl
+IA0KPj4gKmJzLA0KPj4gwqDCoMKgwqDCoCBhc3NlcnQoaSA8IE1BWF9OQkRfUkVRVUVTVFMp
+Ow0KPj4gwqDCoMKgwqDCoCByZXF1ZXN0LT5oYW5kbGUgPSBJTkRFWF9UT19IQU5ETEUocywg
+aSk7DQo+Pg0KPj4gK8KgwqDCoCBpZiAocy0+cXVpdCkgew0KPj4gK8KgwqDCoMKgwqDCoMKg
+IHFlbXVfY29fbXV0ZXhfdW5sb2NrKCZzLT5zZW5kX211dGV4KTsNCj4+ICvCoMKgwqDCoMKg
+wqDCoCByZXR1cm4gLUVJTzsNCj4+ICvCoMKgwqAgfQ0KPj4gwqDCoMKgwqDCoCBpZiAoIXMt
+PmlvYykgew0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIHFlbXVfY29fbXV0ZXhfdW5sb2NrKCZz
+LT5zZW5kX211dGV4KTsNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gLUVQSVBFOw0K
+Pj4gQEAgLTE0Myw3ICsxNTAsNyBAQCBzdGF0aWMgaW50IG5iZF9jb19zZW5kX3JlcXVlc3Qo
+QmxvY2tEcml2ZXJTdGF0ZSAqYnMsDQo+PiDCoMKgwqDCoMKgIGlmIChxaW92KSB7DQo+PiDC
+oMKgwqDCoMKgwqDCoMKgwqAgcWlvX2NoYW5uZWxfc2V0X2Nvcmsocy0+aW9jLCB0cnVlKTsN
+Cj4+IMKgwqDCoMKgwqDCoMKgwqDCoCByYyA9IG5iZF9zZW5kX3JlcXVlc3Qocy0+aW9jLCBy
+ZXF1ZXN0KTsNCj4+IC3CoMKgwqDCoMKgwqDCoCBpZiAocmMgPj0gMCkgew0KPj4gK8KgwqDC
+oMKgwqDCoMKgIGlmIChyYyA+PSAwICYmICFzLT5xdWl0KSB7DQo+PiDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoCByZXQgPSBuYmRfcnd2KHMtPmlvYywgcWlvdi0+aW92LCBxaW92LT5u
+aW92LCANCj4+IHJlcXVlc3QtPmxlbiwgZmFsc2UsDQo+PiDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgTlVMTCk7DQo+PiDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAocmV0ICE9IHJlcXVlc3QtPmxlbikgew0KPj4gQEAg
+LTE1NCw2ICsxNjEsOSBAQCBzdGF0aWMgaW50IG5iZF9jb19zZW5kX3JlcXVlc3QoQmxvY2tE
+cml2ZXJTdGF0ZSAqYnMsDQo+PiDCoMKgwqDCoMKgIH0gZWxzZSB7DQo+PiDCoMKgwqDCoMKg
+wqDCoMKgwqAgcmMgPSBuYmRfc2VuZF9yZXF1ZXN0KHMtPmlvYywgcmVxdWVzdCk7DQo+PiDC
+oMKgwqDCoMKgIH0NCj4+ICvCoMKgwqAgaWYgKHJjIDwgMCkgew0KPj4gK8KgwqDCoMKgwqDC
+oMKgIHMtPnF1aXQgPSB0cnVlOw0KPj4gK8KgwqDCoCB9DQo+PiDCoMKgwqDCoMKgIHFlbXVf
+Y29fbXV0ZXhfdW5sb2NrKCZzLT5zZW5kX211dGV4KTsNCj4+IMKgwqDCoMKgwqAgcmV0dXJu
+IHJjOw0KPj4gwqAgfQ0KPj4gQEAgLTE2OCw4ICsxNzgsNyBAQCBzdGF0aWMgdm9pZCBuYmRf
+Y29fcmVjZWl2ZV9yZXBseShOQkRDbGllbnRTZXNzaW9uIA0KPj4gKnMsDQo+PiDCoMKgwqDC
+oMKgIC8qIFdhaXQgdW50aWwgd2UncmUgd29rZW4gdXAgYnkgbmJkX3JlYWRfcmVwbHlfZW50
+cnkuwqAgKi8NCj4+IMKgwqDCoMKgwqAgcWVtdV9jb3JvdXRpbmVfeWllbGQoKTsNCj4+IMKg
+wqDCoMKgwqAgKnJlcGx5ID0gcy0+cmVwbHk7DQo+PiAtwqDCoMKgIGlmIChyZXBseS0+aGFu
+ZGxlICE9IHJlcXVlc3QtPmhhbmRsZSB8fA0KPj4gLcKgwqDCoMKgwqDCoMKgICFzLT5pb2Mp
+IHsNCj4+ICvCoMKgwqAgaWYgKHJlcGx5LT5oYW5kbGUgIT0gcmVxdWVzdC0+aGFuZGxlIHx8
+ICFzLT5pb2MgfHwgcy0+cXVpdCkgew0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgIHJlcGx5LT5l
+cnJvciA9IEVJTzsNCj4+IMKgwqDCoMKgwqAgfSBlbHNlIHsNCj4+IMKgwqDCoMKgwqDCoMKg
+wqDCoCBpZiAocWlvdiAmJiByZXBseS0+ZXJyb3IgPT0gMCkgew0KPg0KPg0KDQotLSANCkJl
+c3QgcmVnYXJkcywNClZsYWRpbWlyDQoNCg==
