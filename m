@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1djlGF-0005M0-Fc
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:52:52 -0400
+	(envelope-from <kraxel@redhat.com>) id 1djlLl-0007vh-3W
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:58:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1djlGA-00049q-K0
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:52:50 -0400
-Received: from mail-by2nam01on0068.outbound.protection.outlook.com
-	([104.47.34.68]:28128
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1djlGA-00049L-4t
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:52:46 -0400
-References: <20170815170051.127257-1-brijesh.singh@amd.com>
-	<276d5c64-7ef3-127b-b2f4-e5f7b3a5aab4@redhat.com>
-	<2f426b2d-cea3-bed4-1966-6868d6e3bbfe@amd.com>
-From: Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <bc615022-ef99-026a-742d-c53c2a4297ed@amd.com>
-Date: Mon, 21 Aug 2017 06:52:37 -0500
-MIME-Version: 1.0
-In-Reply-To: <2f426b2d-cea3-bed4-1966-6868d6e3bbfe@amd.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <kraxel@redhat.com>) id 1djlLh-0007Vk-1W
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:58:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42536)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1djlLg-0007VN-RQ
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:58:28 -0400
+Message-ID: <1503316706.26016.11.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 21 Aug 2017 13:58:26 +0200
+In-Reply-To: <be880655-0c04-8369-01fc-76dd6241ca78@redhat.com>
+References: <20170807163121.797e7ad6@nial.brq.redhat.com>
+	<CAFEAcA8=+8cPjKayq3Bre7y9=6jzFgjCCjRkNUeHxArJu9Ue6A@mail.gmail.com>
+	<be880655-0c04-8369-01fc-76dd6241ca78@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3] target-i386/cpu: Add new EPYC CPU model
+Subject: Re: [Qemu-devel] AVMF & OVMF blobs in QEMU tree???
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: brijesh.singh@amd.com, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>
+To: Laszlo Ersek <lersek@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-Hi Paolo,
+On Mon, 2017-08-07 at 18:51 +0200, Laszlo Ersek wrote:
+> On 08/07/17 16:40, Peter Maydell wrote:
+> > On 7 August 2017 at 15:31, Igor Mammedov <imammedo@redhat.com>
+> > wrote:
+> > > As I recall there were issues with FAT driver licensing in edk2,
+> > > but I've heard there were some changes in that regard.
+> > > 
+> > > Is there any other reasons why we are not putting subj.
+> > > in QEMU tree like we do with SeaBIOS and other roms?
+> > 
+> > I suspect the primary answer is "nobody who's willing to
+> > maintain, test and update the resulting binary blobs has
+> > stepped forward to say they want to do so" :-)
+> > 
+> > (I think that shipping them in the QEMU tree would be
+> > nice but is principally a convenience for our direct
+> > users, since distros are going to want to build their
+> > own ROM blobs from source anyway.)
+> 
+> I agree that OVMF and ArmVirtQemu firmware binaries (and matching
+> varstore templates, likely compressed) should be bundled with QEMU.
+> There are no license-related reasons left that would prevent this.
+> 
+> Please let us discuss this when Gerd returns from vacation. (CC'ing
+> Gerd.)
 
+slighly oldish wip branch:
+https://www.kraxel.org/cgit/qemu/log/?h=work/edk2
 
-On 8/17/17 1:37 PM, Brijesh Singh wrote:
-> On 08/17/2017 11:45 AM, Paolo Bonzini wrote:
->> On 15/08/2017 19:00, Brijesh Singh wrote:
->>>
->>> The following features bits have been added/removed compare to
->>> Opteron_G5
->>>
->>> Added: monitor, movbe, rdrand, mmxext, ffxsr, rdtscp, cr8legacy, osvw,
->>>         fsgsbase, bmi1, avx2, smep, bmi2, rdseed, adx, smap,
->>> clfshopt, sha
->>>         xsaveopt, xsavec, xgetbv1, arat
->>>
->>> Removed: xop, fma4, tbm
->>
->> Interesting, why were these removed?
->>
->
-> I don't know exact reason why these were removed - I am going with
-> whatever is
-> listed as supported feature bit in PPR [1], but I will ask around and
-> let you
-> know. I believe some of these instruction are superseded with newer
-> instructions
-> (e.g fma4->fma)
->
-> [1]
-> http://support.amd.com/TechDocs/54945_PPR_Family_17h_Models_00h-0Fh.pdf
->
->
+Related question (as the edk2 blobs are pretty big):  Do we want commit
+this to the qemu repo directly?   Or should we create a qemu-firmware
+repo for the precompiled blobs and hook it up as submodule?
 
-I checked with CPU team, it seems those instruction sets were never
-really used, I believe AMD came up with them but they were superseded by
-SSE4/AVX extensions.
-
--Brijesh
+cheers,
+  Gerd
