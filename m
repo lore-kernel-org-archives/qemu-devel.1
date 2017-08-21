@@ -1,33 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1djkul-00059P-4a
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:30:41 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1djl5v-0000MW-2l
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:42:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1djkuk-0007rg-70
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:30:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41726)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1djkuj-0007qk-Pq
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:30:37 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B7F0737EE9
-	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 11:30:34 +0000 (UTC)
-References: <20170818141512.15205-1-famz@redhat.com>
-	<20170818141512.15205-3-famz@redhat.com>
-	<060c28df-bc84-01da-9c7b-2b47221f5311@redhat.com>
-	<20170821111108.GB4371@lemon>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1e943c21-9382-2df7-053e-7de9310d4197@redhat.com>
-Date: Mon, 21 Aug 2017 13:30:29 +0200
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1djl5s-0006iY-G9
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:42:11 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42720)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1djl5s-0006hg-76
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:42:08 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7LBcdxd135329
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 07:42:06 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cfttvvdr0-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 07:42:06 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Mon, 21 Aug 2017 12:42:03 +0100
+References: <20170821091614.28251-1-cohuck@redhat.com>
+	<20170821091614.28251-8-cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Mon, 21 Aug 2017 13:41:53 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170821111108.GB4371@lemon>
+In-Reply-To: <20170821091614.28251-8-cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] scsi: Enhance scsi_sense_to_errno
+Message-Id: <700d1722-baf1-163e-6764-179f1340cc22@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 07/10] s390x/sclp: properly guard
+ pci-specific functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,69 +43,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, zyimin@linux.vnet.ibm.com, david@redhat.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, borntraeger@de.ibm.com
 
-On 21/08/2017 13:11, Fam Zheng wrote:
-> On Fri, 08/18 16:36, Paolo Bonzini wrote:
->> On 18/08/2017 16:15, Fam Zheng wrote:
->>> Two changes:
->>>
->>> 1) Look at asc/ascq for NOT_READY and DATA_PROTECT;
->>> 2) Translate SPACE_ALLOC_FAILED as ENOSPC;
->>>
->>> Signed-off-by: Fam Zheng <famz@redhat.com>
->>> ---
->>>  util/scsi.c | 7 +++----
->>>  1 file changed, 3 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/util/scsi.c b/util/scsi.c
->>> index 92ca436cd0..d42ce33449 100644
->>> --- a/util/scsi.c
->>> +++ b/util/scsi.c
->>> @@ -18,13 +18,11 @@
->>>  int scsi_sense_to_errno(int key, int asc, int ascq)
->>>  {
->>>      switch (key) {
->>> -    case 0x02: /* SCSI_SENSE_NOT_READY */
->>> -        return EBUSY;
->>> -    case 0x07: /* SCSI_SENSE_DATA_PROTECTION */
->>> -        return EACCES;
->>>      case 0x0b: /* SCSI_SENSE_COMMAND_ABORTED */
->>>          return ECANCELED;
->>> +    case 0x02: /* SCSI_SENSE_NOT_READY */
->>>      case 0x05: /* SCSI_SENSE_ILLEGAL_REQUEST */
->>> +    case 0x07: /* SCSI_SENSE_DATA_PROTECTION */
->>>          /* Parse ASCQ */
->>>          break;
->>>      default:
->>
->> UNIT_ATTENTION should also be passed down to the guest without stopping
->> the VM.  Maybe map it to EAGAIN?
-> 
-> Or just 0?
 
-That works too, it depends on how you define 0.  1h is defined as
-informational only and can be dropped, 0x0401 or UNIT_ATTENTION
-definitely cannot.
 
-Paolo
+On 08/21/2017 11:16 AM, Cornelia Huck wrote:
+> If we do not provide zpci, pci reconfiguration via sclp is not available
+> either. Don't indicate it in the sclp facilities and return an invalid
+> command if the guest tries to issue pci configure/deconfigure.
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  hw/s390x/sclp.c | 19 +++++++++++++++----
+>  1 file changed, 15 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> index 9253dbbc64..d0104cd784 100644
+> --- a/hw/s390x/sclp.c
+> +++ b/hw/s390x/sclp.c
+> @@ -59,6 +59,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+>      int rnsize, rnmax;
+>      int slots = MIN(machine->ram_slots, s390_get_memslot_count(kvm_state));
+>      IplParameterBlock *ipib = s390_ipl_get_iplb();
+> +    uint64_t sclp_facilities = SCLP_HAS_CPU_INFO;
+> 
+>      CPU_FOREACH(cpu) {
+>          cpu_count++;
+> @@ -79,8 +80,10 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+> 
+>      prepare_cpu_entries(sclp, read_info->entries, cpu_count);
+> 
+> -    read_info->facilities = cpu_to_be64(SCLP_HAS_CPU_INFO |
+> -                                        SCLP_HAS_PCI_RECONFIG);
+> +    if (s390_has_feat(S390_FEAT_ZPCI)) {
+> +        sclp_facilities |= SCLP_HAS_PCI_RECONFIG;
+> +    }
+> +    read_info->facilities = cpu_to_be64(sclp_facilities);
+> 
+>      /* Memory Hotplug is only supported for the ccw machine type */
+>      if (mhd) {
+> @@ -385,10 +388,18 @@ static void sclp_execute(SCLPDevice *sclp, SCCB *sccb, uint32_t code)
+>          sclp_c->unassign_storage(sclp, sccb);
+>          break;
+>      case SCLP_CMDW_CONFIGURE_PCI:
+> -        s390_pci_sclp_configure(sccb);
+> +        if (s390_has_feat(S390_FEAT_ZPCI)) {
+> +            s390_pci_sclp_configure(sccb);
+> +        } else {
+> +            sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
+> +        }
+>          break;
+>      case SCLP_CMDW_DECONFIGURE_PCI:
+> -        s390_pci_sclp_deconfigure(sccb);
+> +        if (s390_has_feat(S390_FEAT_ZPCI)) {
+> +            s390_pci_sclp_deconfigure(sccb);
+> +        } else {
+> +            sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
+> +        }
+>          break;
+>      default:
+>          efc->command_handler(ef, sccb, code);
+> 
 
->>
->> Looking at what Linux does:
->>
->> - RECOVERED_ERROR should just return 0
->>
->> - 0x0401 is "unit in the process of becoming ready", and it should also
->> be EAGAIN
->>
->> - 0x0402 is "initializing command required", and probably can be fixed
->> by the guest by scsi-block but not by iscsi so it should be its own
->> errno, maybe ENOTCONN?  (iscsi might try sending START STOP UNIT
->> followed by a bunch of TEST UNIT READYs, see scsi_eh_try_stu in Linux's
->> drivers/scsi/scsi_error.c).
-> 
-> These makes sense to me.
-> 
-> Fam
-> 
+LGTM
