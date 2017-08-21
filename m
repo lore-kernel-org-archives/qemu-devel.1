@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1djlWK-0005ou-1l
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 08:09:32 -0400
+	(envelope-from <berto@igalia.com>) id 1djlXu-00076n-V1
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 08:11:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1djlWG-0005AP-Mb
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 08:09:28 -0400
-Date: Mon, 21 Aug 2017 14:09:19 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170821140919.585cdcc0.cohuck@redhat.com>
-In-Reply-To: <20170821103524.22619-1-david@gibson.dropbear.id.au>
-References: <20170821103524.22619-1-david@gibson.dropbear.id.au>
+	(envelope-from <berto@igalia.com>) id 1djlXp-00068b-5u
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 08:11:06 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170819152312.752zb42qc5ko6rat@postretch>
+References: <cover.1502979710.git.berto@igalia.com>
+	<112e28c8da085ffd59381d86f3acb0b8f75d5f9a.1502979710.git.berto@igalia.com>
+	<20170819152312.752zb42qc5ko6rat@postretch>
+Date: Mon, 21 Aug 2017 14:10:59 +0200
+Message-ID: <w51efs5nmss.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/ppc/spapr: Fix segfault when
- instantiating a 'pc-dimm' without 'memdev'
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 3/4] throttle: Remove throttle_fix_bucket()
+ / throttle_unfix_bucket()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,56 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: lvivier@redhat.com, berrange@redhat.com, thuth@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Mon, 21 Aug 2017 20:35:24 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On Sat 19 Aug 2017 05:23:12 PM CEST, Manos Pitsidianakis wrote:
+>>-    /* If the bucket is full then we have to wait */
+>>-    extra = bkt->level - bkt->max * bkt->burst_length;
+>>+    if (!bkt->max) {
+>>+        /* If bkt->max is 0 we still want to allow short bursts of I/O
+>>+         * from the guest, otherwise every other request will be throttled
+>>+         * and performance will suffer considerably. */
+>>+        bucket_size = bkt->avg / 10;
+>>+        burst_bucket_size = 0;
+>
+> Might be wrong, but shouldn't that be
+>     bucket_size = (bkt->avg / 10) * bkt->burst_length?
+>     burst_bucket_size = (bkt->avg / 10) / 10;
 
-> From: Thomas Huth <thuth@redhat.com>
-> 
-> QEMU currently crashes when trying to use a 'pc-dimm' on the pseries
-> machine without specifying its 'memdev' property. This happens because
-> pc_dimm_get_memory_region() does not check whether the 'memdev' property
-> has properly been set by the user. Looking closer at this function, it's
-> also obvious that it is using &error_abort to call another function - and
-> this is bad in a function that is used in the hot-plugging calling chain
-> since this can also cause QEMU to exit unexpectedly.
-> 
-> So let's fix these issues in a proper way now: Add a "Error **errp"
-> parameter to pc_dimm_get_memory_region() which we use in case the 'memdev'
-> property has not been set by the user, and which we can use instead of
-> the &error_abort, and change the callers of get_memory_region() to make
-> use of this "errp" parameter for proper error checking.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/i386/pc.c             | 14 ++++++++++++--
->  hw/mem/nvdimm.c          |  2 +-
->  hw/mem/pc-dimm.c         | 14 +++++++++++---
->  hw/ppc/spapr.c           | 42 ++++++++++++++++++++++++++++++------------
->  include/hw/mem/pc-dimm.h |  2 +-
->  5 files changed, 55 insertions(+), 19 deletions(-)
+if !bkt->max then the user didn't define any bursts, and the I/O is only
+throttled to the rate set in bkt->avg.
 
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index ea67b461c2..bdf6649083 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -363,7 +363,10 @@ static void pc_dimm_get_size(Object *obj, Visitor *v, const char *name,
->      PCDIMMDevice *dimm = PC_DIMM(obj);
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(obj);
->  
-> -    mr = ddc->get_memory_region(dimm);
-> +    mr = ddc->get_memory_region(dimm, errp);
-> +    if (!mr) {
-> +        return;
+>>+    } else {
+>>+        /* If we have a burst limit then we have to wait until all I/O
+>>+         * at burst rate has finished before throttling to bkt->avg */
+>>+        bucket_size = bkt->max * bkt->burst_length;
+>>+        burst_bucket_size = bkt->max / 10;
+>>+    }
+>>+
+>>+    /* If the main bucket is full then we have to wait */
+>>+    extra = bkt->level - bucket_size;
+> because it used to be that if bkt->max is 0 then
+>  extra = bkt->level - (bkt->avg /10) * bkt->burst_length; //fixed value
+>  and now it's
+>  extra = bkt->level - (bkt->avg / 10);
+>
+>  and
+>
+>>     if (extra > 0) {
+>>         return throttle_do_compute_wait(bkt->avg, extra);
+>>     }
+>>
+>>-    /* If the bucket is not full yet we have to make sure that we
+>>-     * fulfill the goal of bkt->max units per second. */
+>>+    /* If the main bucket is not full yet we still have to check the
+>>+     * burst bucket in order to enforce the burst limit */
+>>     if (bkt->burst_length > 1) {
+>>-        /* We use 1/10 of the max value to smooth the throttling.
+>>-         * See throttle_fix_bucket() for more details. */
+>>-        extra = bkt->burst_level - bkt->max / 10;
+>>+        extra = bkt->burst_level - burst_bucket_size;
+> This used to be 
+>
+>     extra = bkt->burst_level - (bkt->avg / 10) / 10;
+> and now it's
+>     extra = bkt->burst_level  - 0;
 
-What happens if mr == NULL, but no error was set (backend memory not
-inited case)?
+No, if bkt->burst_length > 1 then bkt->max != 0, and therefore
+burst_bucket_size is never 0 either.
 
-> +    }
->      value = memory_region_size(mr);
->  
->      visit_type_uint64(v, name, &value, errp);
+Perhaps you missed the ! in the first "if (!bkt->max)" ?
+
+Berto
