@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37789)
 	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <hch@lst.de>)
-	id 1djmQi-0002QX-Pg
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:07:50 -0400
+	id 1djmSO-0003pp-45
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:09:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hch@lst.de>) id 1djmQd-0003qI-8R
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:07:44 -0400
-Date: Mon, 21 Aug 2017 15:07:32 +0200
+	(envelope-from <hch@lst.de>) id 1djmSJ-0004GF-Be
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:09:28 -0400
+Received: from verein.lst.de ([213.95.11.211]:58548 helo=newverein.lst.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <hch@lst.de>) id 1djmSJ-0004G8-5X
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:09:23 -0400
+Date: Mon, 21 Aug 2017 15:09:21 +0200
 From: Christoph Hellwig <hch@lst.de>
-Message-ID: <20170821130732.GB16745@lst.de>
-References: <20170606073806.8180-1-quwenruo@cn.fujitsu.com>
-	<20170606073806.8180-2-quwenruo@cn.fujitsu.com>
+Message-ID: <20170821130921.GA16988@lst.de>
+References: <20170528130649.28168-1-dan@kernelim.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170606073806.8180-2-quwenruo@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] nvme: Check PSDT flag for admin and	rw
-	command
+In-Reply-To: <20170528130649.28168-1-dan@kernelim.com>
+Subject: Re: [Qemu-devel] [PATCH] nvme: Fix get/set number of queues	feature,
+	again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,8 +27,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qu Wenruo <quwenruo@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, keith.busch@intel.com
+To: Dan Aloni <dan@kernelim.com>
+Cc: qemu-devel@nongnu.org, Keith Busch <keith.busch@intel.com>, Alex Friedman <alex@e8storage.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Can you send a patch with just the PSDT flag check?  The rest should
-only be in an eventually patch to add SGL support.
+This didn't seem to make it into mainline, does it need a ping?
