@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <taimoor.mrza@gmail.com>) id 1djmLU-00086e-VB
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:02:27 -0400
+	(envelope-from <cohuck@redhat.com>) id 1djmsQ-00007w-6U
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:36:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <taimoor.mrza@gmail.com>) id 1djmLN-0001kU-UI
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:02:18 -0400
-Received: from mail-lf0-x231.google.com ([2a00:1450:4010:c07::231]:33653)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <taimoor.mrza@gmail.com>)
-	id 1djmLN-0001kB-ME
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:02:13 -0400
-Received: by mail-lf0-x231.google.com with SMTP id d17so66457388lfe.0
-	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 06:02:09 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1djmsN-0007pK-1y
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:36:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45910)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1djmsM-0007oi-RP
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 09:36:18 -0400
+Date: Mon, 21 Aug 2017 15:36:12 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170821153612.63264857.cohuck@redhat.com>
+In-Reply-To: <e21f5781-38c9-5909-b0e1-f47de1cb524d@linux.vnet.ibm.com>
+References: <20170821091614.28251-1-cohuck@redhat.com>
+	<20170821091614.28251-8-cohuck@redhat.com>
+	<700d1722-baf1-163e-6764-179f1340cc22@linux.vnet.ibm.com>
+	<20170821151650.35050b3e.cohuck@redhat.com>
+	<e21f5781-38c9-5909-b0e1-f47de1cb524d@linux.vnet.ibm.com>
 MIME-Version: 1.0
-From: Taimoor Mirza <taimoor.mrza@gmail.com>
-Date: Mon, 21 Aug 2017 18:02:07 +0500
-Message-ID: <CAO6-N=a7WwhsDqZsm=wppXWMunGub=RH17FBk5w_tK0vu-8=cQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] stack smash while using SDL 1.2.5 with QEMU 2.9
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 07/10] s390x/sclp: properly guard
+ pci-specific functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: thuth@redhat.com, zyimin@linux.vnet.ibm.com, david@redhat.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, qemu-devel@nongnu.org, borntraeger@de.ibm.com
 
-Hi Guys,
+On Mon, 21 Aug 2017 15:32:23 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-I have been using QEMU 1.5 earlier with SDL version 1.2.5. Now we have
-decided to move to new version of QEMU. I have built QEMU binaries with SDL
-support using SDL 1.2.5 that we were using earlier. Windows binaries work
-fine but I get stack smash in sdl.c on Linux. Below are stack traces that I
-have got from GDB:
+> On 08/21/2017 03:16 PM, Cornelia Huck wrote:
+> > On Mon, 21 Aug 2017 13:41:53 +0200
+> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> >   
+> >> On 08/21/2017 11:16 AM, Cornelia Huck wrote:  
+> >>> If we do not provide zpci, pci reconfiguration via sclp is not available
+> >>> either. Don't indicate it in the sclp facilities and return an invalid
+> >>> command if the guest tries to issue pci configure/deconfigure.
+> >>>
+> >>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> >>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> >>> ---
+> >>>  hw/s390x/sclp.c | 19 +++++++++++++++----
+> >>>  1 file changed, 15 insertions(+), 4 deletions(-)  
+> > 
+> > (...)
+> >   
+> >> LGTM  
+> > 
+> > Is that an Acked-by:? Or a Reviewed-by:? :)
+> >   
+> 
+> r-b
 
-Program received signal SIGABRT, Aborted.
-0x00007ffff6e74c37 in __GI_raise (sig=sig@entry=6) at
-../nptl/sysdeps/unix/sysv/linux/raise.c:56
-56    ../nptl/sysdeps/unix/sysv/linux/raise.c: No such file or directory.
-(gdb) bt
-#0  0x00007ffff6e74c37 in __GI_raise (sig=sig@entry=6) at
-../nptl/sysdeps/unix/sysv/linux/raise.c:56
-#1  0x00007ffff6e78028 in __GI_abort () at abort.c:89
-#2  0x00007ffff6eb12a4 in __libc_message (do_abort=do_abort@entry=1,
-fmt=fmt@entry=0x7ffff6fc0d70 "*** %s ***: %s terminated\n") at
-../sysdeps/posix/libc_fatal.c:175
-#3  0x00007ffff6f4c83c in __GI___fortify_fail (msg=<optimized out>,
-msg@entry=0x7ffff6fc0d58 "stack smashing detected") at fortify_fail.c:38
-#4  0x00007ffff6f4c7e0 in __stack_chk_fail () at stack_chk_fail.c:28
-#5  0x0000555555a66909 in sdl_display_init (ds=<optimized out>,
-full_screen=0, no_frame=<optimized out>) at
-/scratch/tmirza/builds/qemu_build/obj/qemu-src-master-999999-arm-linux-gnueabi-x86_64-linux-gnu/ui/sdl.c:1054
-#6  0x0000000006e00002 in ?? ()
-#7  0x0000000006e00003 in ?? ()
-#8  0x0000555556feca30 in ?? ()
-#9  0x0000555555c784e1 in ?? ()
-#10 0x0000000000000000 in ?? ()
+If you write that out in future, I can simply copy'n'paste it :)
 
-I want to know whether it is a known issue and Is QEMU 2.9 compatible with
-SDL 1.2.5?
+> 
+> (Not sure what Acked-by from a role other that affected
+> maintainer means.)
 
-Thanks,
-Taimoor Mirza
+I've always used it in the sense of "I don't know the gory details, and
+I haven't tried to find them out, but it generally looks sane to me".
