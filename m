@@ -1,20 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1djiuJ-00069e-Rg
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:22:04 -0400
+	(envelope-from <armbru@redhat.com>) id 1djiun-0006af-0c
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:22:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1djiuG-00013X-5N
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:22:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40618)
+	(envelope-from <armbru@redhat.com>) id 1djiui-0001LU-37
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:22:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50896)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1djiuF-000133-ST
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:22:00 -0400
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon, 21 Aug 2017 11:16:06 +0200
-Message-Id: <20170821091614.28251-3-cohuck@redhat.com>
-In-Reply-To: <20170821091614.28251-1-cohuck@redhat.com>
-References: <20170821091614.28251-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 02/10] kvm: remove hard dependency on pci
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1djiuh-0001Kv-Pd
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:22:27 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CBCFE267D5
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 09:22:26 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170808203935.30021-1-ehabkost@redhat.com>
+	<20170808203935.30021-5-ehabkost@redhat.com>
+	<87fuctp2pi.fsf@dusky.pond.sub.org>
+	<20170815203909.GY3108@localhost.localdomain>
+	<87378sf2qi.fsf@dusky.pond.sub.org>
+	<20170818170545.GC3108@localhost.localdomain>
+Date: Mon, 21 Aug 2017 11:22:20 +0200
+In-Reply-To: <20170818170545.GC3108@localhost.localdomain> (Eduardo Habkost's
+	message of "Fri, 18 Aug 2017 14:05:45 -0300")
+Message-ID: <878tid6zsj.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-2.11 v2 4/5] qmp-shell: Accept QMP
+ command as argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,115 +38,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-The msi routing code in kvm calls some pci functions: provide
-some stubs to enable builds without pci.
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-Also, to make this more obvious, guard them via a pci_available boolean
-(which also can be reused in other places).
+> On Wed, Aug 16, 2017 at 08:25:41AM +0200, Markus Armbruster wrote:
+>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>> 
+>> > On Tue, Aug 15, 2017 at 12:03:53PM +0200, Markus Armbruster wrote:
+>> >> Eduardo Habkost <ehabkost@redhat.com> writes:
+>> >> 
+>> >> Suggest to insert here:
+>> >> 
+>> >>   If additional arguments QMP-COMMAND ARG=VAL... are given, run just
+>> >>   that QMP command instead of the REPL.
+>> >> 
+>> >> Question: is this limited to simple arguments?  If no, how would I write
+>> >> an object argument?  For instance, how would I do
+>> >> 
+>> >>     { "execute": "blockdev-add", "arguments": { "node-name": "foo", "driver": "nbd", "server": { "type": "inet", "host": "localhost", "port": "12345" } } }
+>> >> 
+>> >> ?
+>> >
+>> > Exactly the same way you would write it when running qmp-shell in
+>> > interactive mode.  e.g.:
+>> >
+>> >   $ ./scripts/qmp/qmp-shell /tmp/qmp blockdev-add driver=qcow2 node-name=node-E 'file={"driver":"file","filename":"/path/to/file.qcow2"}'
+>> 
+>> I see.
+>> 
+>> The QEMU command line uses dotted key syntax instead.
+>
+> You mean -blockdev, or is there another way to send QMP commands
+> to QEMU that I'm not aware of?
 
-Fixes: e1d4fb2de ("kvm-irqchip: x86: add msi route notify fn")
-Fixes: 767a554a0 ("kvm-all: Pass requester ID to MSI routing functions")
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- accel/kvm/kvm-all.c  |  6 +++---
- hw/pci/pci-stub.c    | 15 +++++++++++++++
- hw/pci/pci.c         |  2 ++
- include/hw/pci/pci.h |  2 ++
- 4 files changed, 22 insertions(+), 3 deletions(-)
+Dotted keys were invented for the block layer's -drive.  I adopted them
+for -blockdev after considerable discussion.  The -blockdev code is all
+new, and it even has documentation and tests.
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 46ce479dc3..f85553a851 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -1248,7 +1248,7 @@ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
-     int virq;
-     MSIMessage msg = {0, 0};
- 
--    if (dev) {
-+    if (pci_available && dev) {
-         msg = pci_get_msi_message(dev, vector);
-     }
- 
-@@ -1271,7 +1271,7 @@ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
-     kroute.u.msi.address_lo = (uint32_t)msg.address;
-     kroute.u.msi.address_hi = msg.address >> 32;
-     kroute.u.msi.data = le32_to_cpu(msg.data);
--    if (kvm_msi_devid_required()) {
-+    if (pci_available && kvm_msi_devid_required()) {
-         kroute.flags = KVM_MSI_VALID_DEVID;
-         kroute.u.msi.devid = pci_requester_id(dev);
-     }
-@@ -1309,7 +1309,7 @@ int kvm_irqchip_update_msi_route(KVMState *s, int virq, MSIMessage msg,
-     kroute.u.msi.address_lo = (uint32_t)msg.address;
-     kroute.u.msi.address_hi = msg.address >> 32;
-     kroute.u.msi.data = le32_to_cpu(msg.data);
--    if (kvm_msi_devid_required()) {
-+    if (pci_available && kvm_msi_devid_required()) {
-         kroute.flags = KVM_MSI_VALID_DEVID;
-         kroute.u.msi.devid = pci_requester_id(dev);
-     }
-diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
-index ecad664946..ace43821ca 100644
---- a/hw/pci/pci-stub.c
-+++ b/hw/pci/pci-stub.c
-@@ -23,10 +23,12 @@
- #include "monitor/monitor.h"
- #include "qapi/qmp/qerror.h"
- #include "hw/pci/pci.h"
-+#include "hw/pci/msi.h"
- #include "qmp-commands.h"
- #include "hw/pci/msi.h"
- 
- bool msi_nonbroken;
-+bool pci_available;
- 
- PciInfoList *qmp_query_pci(Error **errp)
- {
-@@ -38,3 +40,16 @@ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict)
- {
-     monitor_printf(mon, "PCI devices not supported\n");
- }
-+
-+/* kvm-all wants this */
-+MSIMessage pci_get_msi_message(PCIDevice *dev, int vector)
-+{
-+    g_assert(false);
-+    return (MSIMessage){};
-+}
-+
-+uint16_t pci_requester_id(PCIDevice *dev)
-+{
-+    g_assert(false);
-+    return 0;
-+}
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 258fbe51e2..26f346db2c 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -49,6 +49,8 @@
- # define PCI_DPRINTF(format, ...)       do { } while (0)
- #endif
- 
-+bool pci_available = true;
-+
- static void pcibus_dev_print(Monitor *mon, DeviceState *dev, int indent);
- static char *pcibus_get_dev_path(DeviceState *dev);
- static char *pcibus_get_fw_dev_path(DeviceState *dev);
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index e598b095eb..8bb6449dd7 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -10,6 +10,8 @@
- 
- #include "hw/pci/pcie.h"
- 
-+extern bool pci_available;
-+
- /* PCI bus */
- 
- #define PCI_DEVFN(slot, func)   ((((slot) & 0x1f) << 3) | ((func) & 0x07))
--- 
-2.13.5
+>> To be honest, the less qmp-shell is used, the happier I am.
+>
+> What people would use instead of it?
+
+The syntactic sugar qmp-shell provides over plain QMP doesn't simplify
+its use all that much, and it can get in the way.
+
+For my interactive QMP needs, I use
+
+    $ socat UNIX:/wherever/qmp-socket READLINE,history=$HOME/.qmp_history,prompt='QMP> '
+
+In programs, I send or receive either plain text or JSON objects,
+depending on the program's needs.  Libqtest supports the latter.
+
+>>                                                              Would you
+>> like to serve as its sub-maintainer?
+>
+> I'd be glad to.
+
+Great!  Please post a suitable MAINTAINERS stanza.
