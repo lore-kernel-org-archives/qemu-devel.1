@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1djiKg-0002VA-FA
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:45:15 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1djiQZ-0004Ii-2Q
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:51:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1djiKc-0004H2-BS
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:45:14 -0400
-Date: Mon, 21 Aug 2017 10:45:02 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170821104502.18b31564@nial.brq.redhat.com>
-In-Reply-To: <20170821075520.GJ12356@umbus.fritz.box>
+	(envelope-from <dgibson@ozlabs.org>) id 1djiQY-0007G8-2x
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:51:19 -0400
+Date: Mon, 21 Aug 2017 18:47:48 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170821084748.GK12356@umbus.fritz.box>
 References: <1503297029-28436-1-git-send-email-thuth@redhat.com>
 	<20170821075520.GJ12356@umbus.fritz.box>
+	<20170821104502.18b31564@nial.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="fUvfsPTz/SzOZDdw"
+Content-Disposition: inline
+In-Reply-To: <20170821104502.18b31564@nial.brq.redhat.com>
 Subject: Re: [Qemu-devel] [PATCH v2] hw/ppc/spapr: Fix segfault when
  instantiating a 'pc-dimm' without 'memdev'
 List-Id: <qemu-devel.nongnu.org>
@@ -24,231 +26,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
+To: Igor Mammedov <imammedo@redhat.com>
 Cc: Thomas Huth <thuth@redhat.com>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, 21 Aug 2017 17:55:20 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> On Mon, Aug 21, 2017 at 08:30:29AM +0200, Thomas Huth wrote:
-> > QEMU currently crashes when trying to use a 'pc-dimm' on the pseries
-> > machine without specifying its 'memdev' property. This happens because
-> > pc_dimm_get_memory_region() does not check whether the 'memdev' property
-> > has properly been set by the user. Looking closer at this function, it's
-> > also obvious that it is using &error_abort to call another function - and
-> > this is bad in a function that is used in the hot-plugging calling chain
-> > since this can also cause QEMU to exit unexpectedly.
-> > 
-> > So let's fix these issues in a proper way now: Add a "Error **errp"
-> > parameter to pc_dimm_get_memory_region() which we use in case the 'memdev'
-> > property has not been set by the user, and which we can use instead of
-> > the &error_abort, and change the callers of get_memory_region() to make
-> > use of this "errp" parameter for proper error checking.
-> > 
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>  
-> 
-> ppc portions
-> 
-> Acked-by: David Gibson <david@gibson.dropbear.id.au>
-> 
-> and the rest
-> 
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+--fUvfsPTz/SzOZDdw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- 
-> I'm happy to queue this or have someone else queue it.
-Pls, go ahead and queue it via your tree
+On Mon, Aug 21, 2017 at 10:45:02AM +0200, Igor Mammedov wrote:
+> On Mon, 21 Aug 2017 17:55:20 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > On Mon, Aug 21, 2017 at 08:30:29AM +0200, Thomas Huth wrote:
+> > > QEMU currently crashes when trying to use a 'pc-dimm' on the pseries
+> > > machine without specifying its 'memdev' property. This happens because
+> > > pc_dimm_get_memory_region() does not check whether the 'memdev' prope=
+rty
+> > > has properly been set by the user. Looking closer at this function, i=
+t's
+> > > also obvious that it is using &error_abort to call another function -=
+ and
+> > > this is bad in a function that is used in the hot-plugging calling ch=
+ain
+> > > since this can also cause QEMU to exit unexpectedly.
+> > >=20
+> > > So let's fix these issues in a proper way now: Add a "Error **errp"
+> > > parameter to pc_dimm_get_memory_region() which we use in case the 'me=
+mdev'
+> > > property has not been set by the user, and which we can use instead of
+> > > the &error_abort, and change the callers of get_memory_region() to ma=
+ke
+> > > use of this "errp" parameter for proper error checking.
+> > >=20
+> > > Signed-off-by: Thomas Huth <thuth@redhat.com> =20
+> >=20
+> > ppc portions
+> >=20
+> > Acked-by: David Gibson <david@gibson.dropbear.id.au>
+> >=20
+> > and the rest
+> >=20
+> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>=20
+> =20
+> > I'm happy to queue this or have someone else queue it.
+> Pls, go ahead and queue it via your tree
 
-> 
-> > ---
-> >  hw/i386/pc.c             | 14 ++++++++++++--
-> >  hw/mem/nvdimm.c          |  2 +-
-> >  hw/mem/pc-dimm.c         | 14 +++++++++++---
-> >  hw/ppc/spapr.c           | 42 ++++++++++++++++++++++++++++++------------
-> >  include/hw/mem/pc-dimm.h |  2 +-
-> >  5 files changed, 55 insertions(+), 19 deletions(-)
-> > 
-> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> > index 5943539..2108104 100644
-> > --- a/hw/i386/pc.c
-> > +++ b/hw/i386/pc.c
-> > @@ -1691,10 +1691,15 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
-> >      PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-> >      PCDIMMDevice *dimm = PC_DIMM(dev);
-> >      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> > -    MemoryRegion *mr = ddc->get_memory_region(dimm);
-> > +    MemoryRegion *mr;
-> >      uint64_t align = TARGET_PAGE_SIZE;
-> >      bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
-> >  
-> > +    mr = ddc->get_memory_region(dimm, &local_err);
-> > +    if (local_err) {
-> > +        goto out;
-> > +    }
-> > +
-> >      if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
-> >          align = memory_region_get_alignment(mr);
-> >      }
-> > @@ -1758,10 +1763,15 @@ static void pc_dimm_unplug(HotplugHandler *hotplug_dev,
-> >      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
-> >      PCDIMMDevice *dimm = PC_DIMM(dev);
-> >      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> > -    MemoryRegion *mr = ddc->get_memory_region(dimm);
-> > +    MemoryRegion *mr;
-> >      HotplugHandlerClass *hhc;
-> >      Error *local_err = NULL;
-> >  
-> > +    mr = ddc->get_memory_region(dimm, &local_err);
-> > +    if (local_err) {
-> > +        goto out;
-> > +    }
-> > +
-> >      hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
-> >      hhc->unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
-> >  
-> > diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-> > index db896b0..952fce5 100644
-> > --- a/hw/mem/nvdimm.c
-> > +++ b/hw/mem/nvdimm.c
-> > @@ -71,7 +71,7 @@ static void nvdimm_init(Object *obj)
-> >                          NULL, NULL);
-> >  }
-> >  
-> > -static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm)
-> > +static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
-> >  {
-> >      NVDIMMDevice *nvdimm = NVDIMM(dimm);
-> >  
-> > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> > index ea67b46..bdf6649 100644
-> > --- a/hw/mem/pc-dimm.c
-> > +++ b/hw/mem/pc-dimm.c
-> > @@ -363,7 +363,10 @@ static void pc_dimm_get_size(Object *obj, Visitor *v, const char *name,
-> >      PCDIMMDevice *dimm = PC_DIMM(obj);
-> >      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(obj);
-> >  
-> > -    mr = ddc->get_memory_region(dimm);
-> > +    mr = ddc->get_memory_region(dimm, errp);
-> > +    if (!mr) {
-> > +        return;
-> > +    }
-> >      value = memory_region_size(mr);
-> >  
-> >      visit_type_uint64(v, name, &value, errp);
-> > @@ -411,9 +414,14 @@ static void pc_dimm_unrealize(DeviceState *dev, Error **errp)
-> >      host_memory_backend_set_mapped(dimm->hostmem, false);
-> >  }
-> >  
-> > -static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm)
-> > +static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
-> >  {
-> > -    return host_memory_backend_get_memory(dimm->hostmem, &error_abort);
-> > +    if (!dimm->hostmem) {
-> > +        error_setg(errp, "'" PC_DIMM_MEMDEV_PROP "' property must be set");
-> > +        return NULL;
-> > +    }
-> > +
-> > +    return host_memory_backend_get_memory(dimm->hostmem, errp);
-> >  }
-> >  
-> >  static MemoryRegion *pc_dimm_get_vmstate_memory_region(PCDIMMDevice *dimm)
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index f7a1972..cec441c 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -2772,10 +2772,15 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> >      sPAPRMachineState *ms = SPAPR_MACHINE(hotplug_dev);
-> >      PCDIMMDevice *dimm = PC_DIMM(dev);
-> >      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> > -    MemoryRegion *mr = ddc->get_memory_region(dimm);
-> > -    uint64_t align = memory_region_get_alignment(mr);
-> > -    uint64_t size = memory_region_size(mr);
-> > -    uint64_t addr;
-> > +    MemoryRegion *mr;
-> > +    uint64_t align, size, addr;
-> > +
-> > +    mr = ddc->get_memory_region(dimm, &local_err);
-> > +    if (local_err) {
-> > +        goto out;
-> > +    }
-> > +    align = memory_region_get_alignment(mr);
-> > +    size = memory_region_size(mr);
-> >  
-> >      pc_dimm_memory_plug(dev, &ms->hotplug_memory, mr, align, &local_err);
-> >      if (local_err) {
-> > @@ -2808,10 +2813,16 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-> >  {
-> >      PCDIMMDevice *dimm = PC_DIMM(dev);
-> >      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> > -    MemoryRegion *mr = ddc->get_memory_region(dimm);
-> > -    uint64_t size = memory_region_size(mr);
-> > +    MemoryRegion *mr;
-> > +    uint64_t size;
-> >      char *mem_dev;
-> >  
-> > +    mr = ddc->get_memory_region(dimm, errp);
-> > +    if (!mr) {
-> > +        return;
-> > +    }
-> > +    size = memory_region_size(mr);
-> > +
-> >      if (size % SPAPR_MEMORY_BLOCK_SIZE) {
-> >          error_setg(errp, "Hotplugged memory size must be a multiple of "
-> >                        "%lld MB", SPAPR_MEMORY_BLOCK_SIZE / M_BYTE);
-> > @@ -2882,7 +2893,7 @@ static sPAPRDIMMState *spapr_recover_pending_dimm_state(sPAPRMachineState *ms,
-> >  {
-> >      sPAPRDRConnector *drc;
-> >      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> > -    MemoryRegion *mr = ddc->get_memory_region(dimm);
-> > +    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
-> >      uint64_t size = memory_region_size(mr);
-> >      uint32_t nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
-> >      uint32_t avail_lmbs = 0;
-> > @@ -2912,7 +2923,7 @@ void spapr_lmb_release(DeviceState *dev)
-> >      sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_hotplug_handler(dev));
-> >      PCDIMMDevice *dimm = PC_DIMM(dev);
-> >      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> > -    MemoryRegion *mr = ddc->get_memory_region(dimm);
-> > +    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
-> >      sPAPRDIMMState *ds = spapr_pending_dimm_unplugs_find(spapr, PC_DIMM(dev));
-> >  
-> >      /* This information will get lost if a migration occurs
-> > @@ -2945,12 +2956,19 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
-> >      Error *local_err = NULL;
-> >      PCDIMMDevice *dimm = PC_DIMM(dev);
-> >      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> > -    MemoryRegion *mr = ddc->get_memory_region(dimm);
-> > -    uint64_t size = memory_region_size(mr);
-> > -    uint32_t nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
-> > -    uint64_t addr_start, addr;
-> > +    MemoryRegion *mr;
-> > +    uint32_t nr_lmbs;
-> > +    uint64_t size, addr_start, addr;
-> >      int i;
-> >      sPAPRDRConnector *drc;
-> > +
-> > +    mr = ddc->get_memory_region(dimm, &local_err);
-> > +    if (local_err) {
-> > +        goto out;
-> > +    }
-> > +    size = memory_region_size(mr);
-> > +    nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
-> > +
-> >      addr_start = object_property_get_uint(OBJECT(dimm), PC_DIMM_ADDR_PROP,
-> >                                           &local_err);
-> >      if (local_err) {
-> > diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-> > index 1e483f2..6f8c3eb 100644
-> > --- a/include/hw/mem/pc-dimm.h
-> > +++ b/include/hw/mem/pc-dimm.h
-> > @@ -71,7 +71,7 @@ typedef struct PCDIMMDeviceClass {
-> >  
-> >      /* public */
-> >      void (*realize)(PCDIMMDevice *dimm, Error **errp);
-> > -    MemoryRegion *(*get_memory_region)(PCDIMMDevice *dimm);
-> > +    MemoryRegion *(*get_memory_region)(PCDIMMDevice *dimm, Error **errp);
-> >      MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm);
-> >  } PCDIMMDeviceClass;
-> >    
-> 
+Done.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--fUvfsPTz/SzOZDdw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmanjIACgkQbDjKyiDZ
+s5JS1xAAwVW7P9tEB2Zg0Fu/sxpyR/qmieXolVKqZ1IYlAEN0yI1izWE5FhiXlIu
+K7z/SXh3oo1az8Yplf8NeoT1NcJZ5kkVg+VMDbiZlSpWOjxpu+kqznky430lVqpr
+eng9swQ1tegGi65QKQQgDnsKtr3wFuOmQAXzJPww/0cYFJe0s5Xx1XlKtarbMGxw
+2+YL81TFNHBc0MPRrzBzA4QzehY9lRSVVO2HN2itxuchDUUCBf5uBkl7EwPx7xWe
+1xvW1NhInUKGUcXXqvddRaWRMeksBmVD/wIbrGXeyI2VUXnE39m02uVIFxEWY3u3
+5X/nWF+JjqQYWj408eoBrv87UDacbu5hZdMnHtwUmzmEDhFekI62+kwDH8wrHQTk
+Iz6r7RJWvP7V/R0oN/QDWg4SfIQjHtgHoMBG/j8PP2f1KqrsKo6z/lukov1D/K/E
+xCBDwNDV6WWgjv66oiWQk+S2l2V0vLFxlah3LuEyYoqkNaj45j4zTnCKLNlMcuaT
+GfobMsjxRm9eMyTGNGtW9VE6ar7XWjxU4S+cQujL4+ugbqr96SuqomLh6qWj3Tyu
+93fwr0AtmxfTcEwzyxhqQOWnHjnwGE7cU3lDjQLGOSRGExYOsEQ/HN9/rqO5gF21
+PTZTqE/G9vR54dpVq6T9YPymcSVkpeh9+90hsFNDLaGvJn9gZVk=
+=Z5Wp
+-----END PGP SIGNATURE-----
+
+--fUvfsPTz/SzOZDdw--
