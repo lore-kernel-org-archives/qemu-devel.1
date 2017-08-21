@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dji0p-0002pr-Sa
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:24:45 -0400
+	(envelope-from <imammedo@redhat.com>) id 1djiHg-0001VY-9x
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:42:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dji0m-0001JL-4y
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:24:43 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:60984)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dji0k-0001HF-80
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:24:40 -0400
-Date: Mon, 21 Aug 2017 16:23:57 +0800 (CST)
-Message-ID: <201708211623572540647@zte.com.cn>
-References: 1502967483-4090-1-git-send-email-wang.yong155@zte.com.cn,
-	2474c9bc-641a-ba44-fd4b-2649cf65fcfe@cn.fujitsu.com
-Mime-Version: 1.0
-From: <wang.yong155@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogW1BBVENIdjMgMDAvMDNdIFJl?=
- =?utf-8?q?place_the_COLO_comparing_thread_with_IOThread?=
+	(envelope-from <imammedo@redhat.com>) id 1djiHc-0003Hx-9M
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:42:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53480)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1djiHc-0003GZ-00
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:42:04 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6ED9381E18
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 08:32:43 +0000 (UTC)
+Date: Mon, 21 Aug 2017 10:32:41 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170821103241.2651a5bc@nial.brq.redhat.com>
+In-Reply-To: <20170818174029.GA27715@localhost.localdomain>
+References: <20170816193218.GF3108@localhost.localdomain>
+	<1502978877-127751-1-git-send-email-imammedo@redhat.com>
+	<20170818174029.GA27715@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] target-i386: cpu: convert plus/minus
+ properties to global properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +35,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhangchen.fnst@cn.fujitsu.com
-Cc: pbonzini@redhat.com, stefanha@redhat.com, famz@redhat.com, jasowang@redhat.com, zhang.zhanghailiang@huawei.com, wang.guang55@zte.com.cn, lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-PkhpfiBXYW5nIFlvbmcuDQoNCj4+SSBoYXZlIHJlYmFzZWQgdGhpcyBzZXJpZXMgdG8gY29sby1m
-b3ItcWVtdS0yLjEwLTIwMTctNC0yMiA+PGh0dHBzOi8vZ2l0aHViLmNvbS9jb2xvZnQvcWVtdS90
-cmVlL2NvbG8tZm9yLXFlbXUtMi4xMC0yMDE3LTQtMjI+LD4+QnV0IHdpdGggdGhpcyBwYXRjaCBz
-ZXQgQ09MTyBjYW4ndCBzdGFydCBub3JtYWxseSwgc29tZXRoaW5nIEkgbWlzc2VkPz4+Q2FuIHlv
-dSBnaXZlIG1lIGEgZ2l0aHViIGJyYW5jaCBiYXNlZCBvbiBjb2xvLWZvci1xZW11LTIuMTAtMjAx
-Ny00LTIyID48aHR0cHM6Ly9naXRodWIuY29tL2NvbG9mdC9xZW11L3RyZWUvY29sby1mb3ItcWVt
-dS0yLjEwLTIwMTctNC0yMj50aGF0ID53ZSBjYW4gdGVzdD8NCg0KVGhpcyBzZXJpZXMgaXMgYmFz
-ZWQgb24gdGhlIGdpdGh1YiBtYXN0ZXIsbm90IHRoZSBnaXRodWIgYnJhbmNoLg0KDQpJJ2xsIHNl
-bmQgeW91IGEgcGF0Y2ggYmFzZWQgb24gY29sby1mb3ItcWVtdS0yLjEwLTIwMTctNC0yMi4NCg0K
-DQoNCg0KVGhhbmtzDQoNCg0KDQrljp/lp4vpgq7ku7YNCg0KDQoNCuWPkeS7tuS6uu+8miA8emhh
-bmdjaGVuLmZuc3RAY24uZnVqaXRzdS5jb20+DQrmlLbku7bkurrvvJrnjovli4cxMDE3MDUzMCA8
-cGJvbnppbmlAcmVkaGF0LmNvbT4gPHN0ZWZhbmhhQHJlZGhhdC5jb20+IDxmYW16QHJlZGhhdC5j
-b20+IDxqYXNvd2FuZ0ByZWRoYXQuY29tPiA8emhhbmcuemhhbmdoYWlsaWFuZ0BodWF3ZWkuY29t
-Pg0K5oqE6YCB5Lq677yaIDx6aGFuZ2NoZW4uZm5zdEBjbi5mdWppdHN1LmNvbT7njovlub8xMDE2
-NTk5MiA8bGl6aGlqaWFuQGNuLmZ1aml0c3UuY29tPiA8cWVtdS1kZXZlbEBub25nbnUub3JnPg0K
-5pelIOacnyDvvJoyMDE35bm0MDjmnIgyMeaXpSAxNTozOQ0K5Li7IOmimCDvvJpSZTogW1BBVENI
-djMgMDAvMDNdIFJlcGxhY2UgdGhlIENPTE8gY29tcGFyaW5nIHRocmVhZCB3aXRoIElPVGhyZWFk
-DQoNCg0KDQoNCg0KSGl+IFdhbmcgWW9uZy4NCg0KSSBoYXZlIHJlYmFzZWQgdGhpcyBzZXJpZXMg
-dG8gY29sby1mb3ItcWVtdS0yLjEwLTIwMTctNC0yMiANCjxodHRwczovL2dpdGh1Yi5jb20vY29s
-b2Z0L3FlbXUvdHJlZS9jb2xvLWZvci1xZW11LTIuMTAtMjAxNy00LTIyPiwNCg0KQnV0IHdpdGgg
-dGhpcyBwYXRjaCBzZXQgQ09MTyBjYW4ndCBzdGFydCBub3JtYWxseSwgc29tZXRoaW5nIEkgbWlz
-c2VkPw0KDQpDYW4geW91IGdpdmUgbWUgYSBnaXRodWIgYnJhbmNoIGJhc2VkIG9uIGNvbG8tZm9y
-LXFlbXUtMi4xMC0yMDE3LTQtMjIgDQo8aHR0cHM6Ly9naXRodWIuY29tL2NvbG9mdC9xZW11L3Ry
-ZWUvY29sby1mb3ItcWVtdS0yLjEwLTIwMTctNC0yMj50aGF0IA0Kd2UgY2FuIHRlc3Q/DQoNCg0K
-VGhhbmtzDQoNClpoYW5nIENoZW4NCg0KDQpPbiAwOC8xNy8yMDE3IDA2OjU4IFBNLCBXYW5nIHlv
-bmcgd3JvdGU6DQo+IEZyb206IFdhbmcgWW9uZyA8d2FuZy55b25nMTU1QHp0ZS5jb20uY24+DQo+
-DQo+IEl0J3MgYSBnb29kIGlkZWEgdG8gdXNlIElPVGhyZWFkIGluc3RlYWQgb2YgQ09MTyBjb21w
-YXJpbmcgdGhyZWFkLg0KPiBjb21wYXJpbmcgdGhyZWFkIGNhbiBiZSBjb21wbGV0ZWx5IHJlcGxh
-Y2VkIGJ5IElPVGhyZWFkLCBzbyB0aGlzIGlkZWEgY2FtZS4NCj4NCj4gVGhpcyBzZXJpZXMgb2Yg
-dXBkYXRlcyBtYWlubHkgaW5jbHVkZSBJT1RocmVhZCBzdXBwb3J0cyB0aGUgR01haW5Db250ZXh0
-DQo+IGV2ZW50IGxvb3AsIHRoZW4gdGhlIG9sZCBwYWNrZXQgcmVndWxhcmx5IGNoZWNrIGFuZCBw
-cmltYXJ5L3NlY29uZGFyeSBuZXR3b3JrDQo+IHBhY2tldHMgY29tcGFyZSBhbGwgaW50byB0aGUg
-SU9UaHJlYWQgcHJvY2Vzc2luZy4NCj4NCj4gUGxlYXNlIHJldmlldyx0aGFua3MuDQo+DQo+IHdh
-bmd5b25nKDMpOg0KPiBxZW11LWlvdGhyZWFkOiBJT1RocmVhZCBzdXBwb3J0cyB0aGUgR01haW5D
-b250ZXh0IGV2ZW50IGxvb3ANCj4gY29sby1jb21wYXJlOiBVc2UgSU9UaHJlYWQgdG8gQ2hlY2sg
-b2xkIHBhY2tldCByZWd1bGFybHkgYW5kDQo+ICAgUHJvY2VzcyBwYWN0a2V0cyBvZiB0aGUgcHJp
-bWFyeQ0KPiBjb2xvLWNvbXBhcmU6IFVwZGF0ZSB0aGUgQ09MTyBkb2N1bWVudCB0byBhZGQgdGhl
-IElPVGhyZWFkDQo+ICAgY29uZmlndXJhdGlvbg0KPg0KPiAgIGluY2x1ZGUvc3lzZW11L2lvdGhy
-ZWFkLmggfCAxMCArKysrKysrKysNCj4gICBpb3RocmVhZC5jICAgICAgICAgICAgICAgIHwgNTQg
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gICBuZXQv
-Y29sby1jb21wYXJlLmMgfCA3NSArKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0NCj4gICBkb2NzL2NvbG8tcHJveHkudHh0IHwgMyArKy0NCj4gICA0
-IGZpbGUgY2hhbmdlZCwgODYgaW5zZXJ0aW9ucygrKSwgMzcgZGVsZXRpb25zKC0pDQo+DQo+IC0t
-DQo+IDEuOC4zLjENCj4NCj4NCj4NCj4gLg0KPg0KDQotLSANClRoYW5rcw0KWmhhbmcgQ2hlbg==
+On Fri, 18 Aug 2017 14:40:29 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
+
+> On Thu, Aug 17, 2017 at 04:07:56PM +0200, Igor Mammedov wrote:
+> > Since
+> >  (commit d4a606b3 i386: Don't override -cpu options on -cpu host/max)
+> > it became possible to delete hack where it was necessary to
+> > postpone applying plus/minus features to realize time
+> > after max_features were applied to keep legacy +-feat
+> > override semantics.
+> > 
+> > With above commit it's possible to convert +-feat to a set
+> > of GlobalProperty items and keep +-feat override semantics,
+> > these properties should be added to global list at the end
+> > to override properties that were set with feat=on|off syntax.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
+> [...]
+> > +/* Parse "+feature,-feature,feature=foo" CPU feature string */
+> >  static void x86_cpu_parse_featurestr(const char *typename, char *features,
+> >                                       Error **errp)
+> >  {
+> > +    /* Compatibily hack to maintain legacy +-feat semantic,
+> > +     * where +-feat overwrites any feature set by
+> > +     * feat=on|feat even if the later is parsed after +-feat
+> > +     * (i.e. "-x2apic,x2apic=on" will result in x2apic disabled)
+> > +     */
+> > +    GList *l, *plus_features = NULL, *minus_features = NULL;  
+> 
+> The warning about ambiguous CPU options exists since 2.8, I think
+> this is a good opportunity to get rid of the "[+-]feat overrides
+> feat=on|off" rule and simplify the parsing code.  Do you want to
+> do this in the same patch?
+I'd prefer not to do it in this patch/series, as it's not related.
+
+WE can do cleanups later on top.
+
+> 
+> 
+> >      char *featurestr; /* Single 'key=value" string being parsed */
+> >      static bool cpu_globals_initialized;
+> >      bool ambiguous = false;
+> > @@ -2095,7 +2104,6 @@ static void x86_cpu_parse_featurestr(const char *typename, char *features,
+> >          const char *val = NULL;
+> >          char *eq = NULL;
+> >          char num[32];
+> > -        GlobalProperty *prop;
+> >  
+> >          /* Compatibility syntax: */
+> >          if (featurestr[0] == '+') {
+> > @@ -2147,21 +2155,32 @@ static void x86_cpu_parse_featurestr(const char *typename, char *features,
+> >              name = "tsc-frequency";
+> >          }
+> >  
+> > -        prop = g_new0(typeof(*prop), 1);
+> > -        prop->driver = typename;
+> > -        prop->property = g_strdup(name);
+> > -        prop->value = g_strdup(val);
+> > -        prop->errp = &error_fatal;
+> > -        qdev_prop_register_global(prop);
+> > +        cpu_add_feat_as_prop(typename, name, val);
+> >      }
+> >  
+> >      if (ambiguous) {
+> >          warn_report("Compatibility of ambiguous CPU model "
+> >                      "strings won't be kept on future QEMU versions");
+> >      }
+> > +
+> > +    for (l = plus_features; l; l = l->next) {
+> > +        const char *name = l->data;
+> > +        cpu_add_feat_as_prop(typename, name, "on");
+> > +    }
+> > +    if (plus_features) {
+> > +        g_list_free_full(plus_features, g_free);
+> > +    }
+> > +
+> > +    for (l = minus_features; l; l = l->next) {
+> > +        const char *name = l->data;
+> > +        cpu_add_feat_as_prop(typename, name, "off");
+> > +    }
+> > +    if (minus_features) {
+> > +        g_list_free_full(minus_features, g_free);
+> > +    }
+> >  }
+> >  
+> > -static void x86_cpu_expand_features(X86CPU *cpu, Error **errp);
+> > +static void x86_cpu_expand_features(X86CPU *cpu);
+> >  static int x86_cpu_filter_features(X86CPU *cpu);
+> >  
+> >  /* Check for missing features that may prevent the CPU class from
+> > @@ -2172,7 +2191,6 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
+> >  {
+> >      X86CPU *xc;
+> >      FeatureWord w;
+> > -    Error *err = NULL;
+> >      strList **next = missing_feats;
+> >  
+> >      if (xcc->kvm_required && !kvm_enabled()) {
+> > @@ -2184,18 +2202,7 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
+> >  
+> >      xc = X86_CPU(object_new(object_class_get_name(OBJECT_CLASS(xcc))));
+> >  
+> > -    x86_cpu_expand_features(xc, &err);
+> > -    if (err) {
+> > -        /* Errors at x86_cpu_expand_features should never happen,
+> > -         * but in case it does, just report the model as not
+> > -         * runnable at all using the "type" property.
+> > -         */
+> > -        strList *new = g_new0(strList, 1);
+> > -        new->value = g_strdup("type");
+> > -        *next = new;
+> > -        next = &new->next;
+> > -    }
+> > -
+> > +    x86_cpu_expand_features(xc);
+> >      x86_cpu_filter_features(xc);
+> >  
+> >      for (w = 0; w < FEATURE_WORDS; w++) {
+> > @@ -2559,11 +2566,7 @@ static X86CPU *x86_cpu_from_model(const char *model, QDict *props, Error **errp)
+> >          }
+> >      }
+> >  
+> > -    x86_cpu_expand_features(xc, &err);
+> > -    if (err) {
+> > -        goto out;
+> > -    }
+> > -
+> > +    x86_cpu_expand_features(xc);
+> >  out:
+> >      if (err) {
+> >          error_propagate(errp, err);
+> > @@ -3453,18 +3456,11 @@ static void x86_cpu_enable_xsave_components(X86CPU *cpu)
+> >  /* Expand CPU configuration data, based on configured features
+> >   * and host/accelerator capabilities when appropriate.
+> >   */
+> > -static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+> > +static void x86_cpu_expand_features(X86CPU *cpu)
+> >  {
+> >      CPUX86State *env = &cpu->env;
+> >      FeatureWord w;
+> > -    GList *l;
+> > -    Error *local_err = NULL;
+> >  
+> > -    /*TODO: Now cpu->max_features doesn't overwrite features
+> > -     * set using QOM properties, and we can convert
+> > -     * plus_features & minus_features to global properties
+> > -     * inside x86_cpu_parse_featurestr() too.
+> > -     */
+> >      if (cpu->max_features) {
+> >          for (w = 0; w < FEATURE_WORDS; w++) {
+> >              /* Override only features that weren't set explicitly
+> > @@ -3476,22 +3472,6 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+> >          }
+> >      }
+> >  
+> > -    for (l = plus_features; l; l = l->next) {
+> > -        const char *prop = l->data;
+> > -        object_property_set_bool(OBJECT(cpu), true, prop, &local_err);
+> > -        if (local_err) {
+> > -            goto out;
+> > -        }
+> > -    }
+> > -
+> > -    for (l = minus_features; l; l = l->next) {
+> > -        const char *prop = l->data;
+> > -        object_property_set_bool(OBJECT(cpu), false, prop, &local_err);
+> > -        if (local_err) {
+> > -            goto out;
+> > -        }
+> > -    }
+> > -
+> >      if (!kvm_enabled() || !cpu->expose_kvm) {
+> >          env->features[FEAT_KVM] = 0;
+> >      }
+> > @@ -3527,11 +3507,6 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+> >      if (env->cpuid_xlevel2 == UINT32_MAX) {
+> >          env->cpuid_xlevel2 = env->cpuid_min_xlevel2;
+> >      }
+> > -
+> > -out:
+> > -    if (local_err != NULL) {
+> > -        error_propagate(errp, local_err);
+> > -    }
+> >  }
+> >  
+> >  /*
+> > @@ -3587,10 +3562,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+> >          return;
+> >      }
+> >  
+> > -    x86_cpu_expand_features(cpu, &local_err);
+> > -    if (local_err) {
+> > -        goto out;
+> > -    }
+> > +    x86_cpu_expand_features(cpu);
+> >  
+> >      if (x86_cpu_filter_features(cpu) &&
+> >          (cpu->check_cpuid || cpu->enforce_cpuid)) {
+> > -- 
+> > 2.7.4
+> > 
+> >   
+> 
