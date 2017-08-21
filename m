@@ -1,35 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1djiun-0006af-0c
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:22:34 -0400
+	(envelope-from <cohuck@redhat.com>) id 1djivb-0007E2-C4
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:23:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1djiui-0001LU-37
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:22:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50896)
+	(envelope-from <cohuck@redhat.com>) id 1djivW-0001oD-5F
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:23:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44668)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1djiuh-0001Kv-Pd
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:22:27 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CBCFE267D5
-	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 09:22:26 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170808203935.30021-1-ehabkost@redhat.com>
-	<20170808203935.30021-5-ehabkost@redhat.com>
-	<87fuctp2pi.fsf@dusky.pond.sub.org>
-	<20170815203909.GY3108@localhost.localdomain>
-	<87378sf2qi.fsf@dusky.pond.sub.org>
-	<20170818170545.GC3108@localhost.localdomain>
-Date: Mon, 21 Aug 2017 11:22:20 +0200
-In-Reply-To: <20170818170545.GC3108@localhost.localdomain> (Eduardo Habkost's
-	message of "Fri, 18 Aug 2017 14:05:45 -0300")
-Message-ID: <878tid6zsj.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-2.11 v2 4/5] qmp-shell: Accept QMP
- command as argument
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1djivV-0001nV-UB
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:23:18 -0400
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Mon, 21 Aug 2017 11:16:04 +0200
+Message-Id: <20170821091614.28251-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 00/10] zpci detangling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,62 +21,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+Just some minor changes from the last one. If nobody complains, I'll
+queue to s390-next.
 
-> On Wed, Aug 16, 2017 at 08:25:41AM +0200, Markus Armbruster wrote:
->> Eduardo Habkost <ehabkost@redhat.com> writes:
->> 
->> > On Tue, Aug 15, 2017 at 12:03:53PM +0200, Markus Armbruster wrote:
->> >> Eduardo Habkost <ehabkost@redhat.com> writes:
->> >> 
->> >> Suggest to insert here:
->> >> 
->> >>   If additional arguments QMP-COMMAND ARG=VAL... are given, run just
->> >>   that QMP command instead of the REPL.
->> >> 
->> >> Question: is this limited to simple arguments?  If no, how would I write
->> >> an object argument?  For instance, how would I do
->> >> 
->> >>     { "execute": "blockdev-add", "arguments": { "node-name": "foo", "driver": "nbd", "server": { "type": "inet", "host": "localhost", "port": "12345" } } }
->> >> 
->> >> ?
->> >
->> > Exactly the same way you would write it when running qmp-shell in
->> > interactive mode.  e.g.:
->> >
->> >   $ ./scripts/qmp/qmp-shell /tmp/qmp blockdev-add driver=qcow2 node-name=node-E 'file={"driver":"file","filename":"/path/to/file.qcow2"}'
->> 
->> I see.
->> 
->> The QEMU command line uses dotted key syntax instead.
->
-> You mean -blockdev, or is there another way to send QMP commands
-> to QEMU that I'm not aware of?
+I'd be happy about some acks/r-bs for patches that don't have any yet,
+though.
 
-Dotted keys were invented for the block layer's -drive.  I adopted them
-for -blockdev after considerable discussion.  The -blockdev code is all
-new, and it even has documentation and tests.
+v3->v4:
+- add "9pfs: fix dependencies"
+- in "kvm: remove hard dependency on pci", do s/assert/g_assert/ and add
+  return statements for builds with asserts off
 
->> To be honest, the less qmp-shell is used, the happier I am.
->
-> What people would use instead of it?
+Cornelia Huck (10):
+  9pfs: fix dependencies
+  kvm: remove hard dependency on pci
+  s390x/pci: add stubs
+  s390x: chsc nt2 events are pci-only
+  s390x/pci: do not advertise pci on non-pci builds
+  s390x/ccw: create s390 phb conditionally
+  s390x/sclp: properly guard pci-specific functions
+  s390x/pci: fence off instructions for non-pci
+  s390x/kvm: msi route fixup for non-pci
+  s390x: refine pci dependencies
 
-The syntactic sugar qmp-shell provides over plain QMP doesn't simplify
-its use all that much, and it can get in the way.
+ accel/kvm/kvm-all.c               |  6 ++--
+ default-configs/s390x-softmmu.mak |  2 +-
+ fsdev/Makefile.objs               |  9 ++---
+ hw/9pfs/Makefile.objs             |  2 +-
+ hw/Makefile.objs                  |  2 +-
+ hw/pci/pci-stub.c                 | 15 ++++++++
+ hw/pci/pci.c                      |  2 ++
+ hw/s390x/Makefile.objs            |  3 +-
+ hw/s390x/s390-pci-bus.c           |  4 +--
+ hw/s390x/s390-pci-bus.h           |  4 +--
+ hw/s390x/s390-pci-stub.c          | 74 +++++++++++++++++++++++++++++++++++++++
+ hw/s390x/s390-virtio-ccw.c        | 14 ++++----
+ hw/s390x/sclp.c                   | 19 +++++++---
+ include/hw/pci/pci.h              |  2 ++
+ target/s390x/ioinst.c             | 16 +++++++++
+ target/s390x/kvm.c                | 64 +++++++++++++++++++++++++--------
+ 16 files changed, 197 insertions(+), 41 deletions(-)
+ create mode 100644 hw/s390x/s390-pci-stub.c
 
-For my interactive QMP needs, I use
-
-    $ socat UNIX:/wherever/qmp-socket READLINE,history=$HOME/.qmp_history,prompt='QMP> '
-
-In programs, I send or receive either plain text or JSON objects,
-depending on the program's needs.  Libqtest supports the latter.
-
->>                                                              Would you
->> like to serve as its sub-maintainer?
->
-> I'd be glad to.
-
-Great!  Please post a suitable MAINTAINERS stanza.
+-- 
+2.13.5
