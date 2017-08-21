@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1djePD-0004td-8R
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 00:33:40 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1djePd-0005CO-AU
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 00:34:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1djePC-0005IF-1i
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 00:33:39 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:51759)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1djePB-0005FL-Jn
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 00:33:37 -0400
-Date: Mon, 21 Aug 2017 14:31:25 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1djePa-0005Y8-6M
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 00:34:05 -0400
+Date: Mon, 21 Aug 2017 14:18:47 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170821043125.GH12356@umbus.fritz.box>
-References: <283a2a27-7fb5-5fa7-4921-60ba91f13666@ozlabs.ru>
-	<20170818131853.GB17654@stefanha-x1.localdomain>
+Message-ID: <20170821041847.GG12356@umbus.fritz.box>
+References: <cover.1503249785.git.balaton@eik.bme.hu>
+	<e6021f12f4e245dc2162a6ab479d416374efc799.1503249785.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qM81t570OJUP5TU/"
+	protocol="application/pgp-signature"; boundary="oOB74oR0WcNeq9Zb"
 Content-Disposition: inline
-In-Reply-To: <20170818131853.GB17654@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] Memory use with >100 virtio devices
+In-Reply-To: <e6021f12f4e245dc2162a6ab479d416374efc799.1503249785.git.balaton@eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH 04/15] ehci: Add ppc4xx-ehci for the USB
+ 2.0 controller in embedded PPC SoCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +25,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>, Gerd Hoffmann <kraxel@redhat.com>
 
 
---qM81t570OJUP5TU/
+--oOB74oR0WcNeq9Zb
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 18, 2017 at 02:18:53PM +0100, Stefan Hajnoczi wrote:
-> On Fri, Aug 18, 2017 at 03:39:20PM +1000, Alexey Kardashevskiy wrote:
-> > =3D=3D94451=3D=3D -------------------- 4 of 10 --------------------
-> > =3D=3D94451=3D=3D max-live:    314,649,600 in 150 blocks
-> > =3D=3D94451=3D=3D tot-alloc:   314,649,600 in 150 blocks (avg size 2097=
-664.00)
-> > =3D=3D94451=3D=3D deaths:      none (none of these blocks were freed)
-> > =3D=3D94451=3D=3D acc-ratios:  0.00 rd, 0.00 wr  (0 b-read, 0 b-written)
-> > =3D=3D94451=3D=3D    at 0x4895600: memalign (in
-> > /usr/lib/valgrind/vgpreload_exp-dhat-ppc64le-linux.so)
-> > =3D=3D94451=3D=3D    by 0x48957E7: posix_memalign (in
-> > /usr/lib/valgrind/vgpreload_exp-dhat-ppc64le-linux.so)
-> > =3D=3D94451=3D=3D    by 0xB744AB: qemu_try_memalign (oslib-posix.c:106)
-> > =3D=3D94451=3D=3D    by 0xA92053: qemu_try_blockalign (io.c:2493)
-> > =3D=3D94451=3D=3D    by 0xA34DDF: qcow2_do_open (qcow2.c:1365)
-> > =3D=3D94451=3D=3D    by 0xA35627: qcow2_open (qcow2.c:1526)
-> > =3D=3D94451=3D=3D    by 0x9FB94F: bdrv_open_driver (block.c:1109)
-> > =3D=3D94451=3D=3D    by 0x9FC413: bdrv_open_common (block.c:1365)
-> > =3D=3D94451=3D=3D    by 0x9FF823: bdrv_open_inherit (block.c:2542)
-> > =3D=3D94451=3D=3D    by 0x9FFC17: bdrv_open (block.c:2626)
-> > =3D=3D94451=3D=3D    by 0xA71027: blk_new_open (block-backend.c:267)
-> > =3D=3D94451=3D=3D    by 0x6D3E6B: blockdev_init (blockdev.c:588)
+On Sun, Aug 20, 2017 at 07:23:05PM +0200, BALATON Zoltan wrote:
+> Some PPC SoCs have an EHCI with OHCI companion USB controller. Add a
+> new type for this similar to types used for other embedded SoCs.
 >=20
-> This allocation is unnecessary.  Most qcow2 files are not encrypted so
-> s->cluster_data does not need to be allocated upfront.
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+Gerd, again, if it's convenient to you, I can queue this for 2.11.
+
+> ---
+>  hw/usb/hcd-ehci-sysbus.c | 25 +++++++++++++++++++++++++
+>  hw/usb/hcd-ehci.h        |  1 +
+>  2 files changed, 26 insertions(+)
 >=20
-> I'll send a patch.
-
-Is that sufficient to explain the problem, I can't quickly see how big
-that unnecessary allocation is - but would it account for the 10s of
-gigabytes usage we're seeing here?
-
-I'm suspecting we accidentally have a O(n^2) or worse space complexity
-going on here.
+> diff --git a/hw/usb/hcd-ehci-sysbus.c b/hw/usb/hcd-ehci-sysbus.c
+> index 6c20604..3b83beb 100644
+> --- a/hw/usb/hcd-ehci-sysbus.c
+> +++ b/hw/usb/hcd-ehci-sysbus.c
+> @@ -142,6 +142,30 @@ static const TypeInfo ehci_tegra2_type_info =3D {
+>      .class_init    =3D ehci_tegra2_class_init,
+>  };
+> =20
+> +static void ehci_ppc4xx_init(Object *o)
+> +{
+> +    EHCISysBusState *s =3D SYS_BUS_EHCI(o);
+> +
+> +    s->ehci.companion_enable =3D true;
+> +}
+> +
+> +static void ehci_ppc4xx_class_init(ObjectClass *oc, void *data)
+> +{
+> +    SysBusEHCIClass *sec =3D SYS_BUS_EHCI_CLASS(oc);
+> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
+> +
+> +    sec->capsbase =3D 0x0;
+> +    sec->opregbase =3D 0x10;
+> +    set_bit(DEVICE_CATEGORY_USB, dc->categories);
+> +}
+> +
+> +static const TypeInfo ehci_ppc4xx_type_info =3D {
+> +    .name          =3D TYPE_PPC4xx_EHCI,
+> +    .parent        =3D TYPE_SYS_BUS_EHCI,
+> +    .class_init    =3D ehci_ppc4xx_class_init,
+> +    .instance_init =3D ehci_ppc4xx_init,
+> +};
+> +
+>  /*
+>   * Faraday FUSBH200 USB 2.0 EHCI
+>   */
+> @@ -224,6 +248,7 @@ static void ehci_sysbus_register_types(void)
+>      type_register_static(&ehci_xlnx_type_info);
+>      type_register_static(&ehci_exynos4210_type_info);
+>      type_register_static(&ehci_tegra2_type_info);
+> +    type_register_static(&ehci_ppc4xx_type_info);
+>      type_register_static(&ehci_fusbh200_type_info);
+>  }
+> =20
+> diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
+> index 821f1de..0bc364b 100644
+> --- a/hw/usb/hcd-ehci.h
+> +++ b/hw/usb/hcd-ehci.h
+> @@ -344,6 +344,7 @@ typedef struct EHCIPCIState {
+>  #define TYPE_SYS_BUS_EHCI "sysbus-ehci-usb"
+>  #define TYPE_EXYNOS4210_EHCI "exynos4210-ehci-usb"
+>  #define TYPE_TEGRA2_EHCI "tegra2-ehci-usb"
+> +#define TYPE_PPC4xx_EHCI "ppc4xx-ehci-usb"
+>  #define TYPE_FUSBH200_EHCI "fusbh200-ehci-usb"
+> =20
+>  #define SYS_BUS_EHCI(obj) \
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -78,24 +111,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---qM81t570OJUP5TU/
+--oOB74oR0WcNeq9Zb
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmaYhsACgkQbDjKyiDZ
-s5KGHBAAsyTxjArAOyDVlo3dPihwABDv0pyFEHM+vcmwtzR+0FDOkCUu/C9bdwAP
-ZvGPXDMABiI3J1Et++I1xrwI4NlQO8AKMmuF+6BCHQ4jrGjERly/dxx2OdUQiZwr
-yZdXJg+uTEoS7JW4YUpVdu7kcmvzV6WauKHCU4wKSAxJskk05ekcBdTrdM2tjmBI
-MwGE8hJeicArV6LWXtc4PTHozCV9U4ci2+oVSxDIFtsc8OT9LLG4c04irFhToLMd
-cLr+w9XRkDbJZ+DorCXdkUm9Anjr7GiVmwJbDeWe48YNBMlvyLrAO41MJHDMqEjp
-U/XTrDeGGXytfzX+sJyO3Isbf/u/YCRfDaUPJl+u+ymiwB5Atw/w0vPrjMGHxHlg
-85KvuS5HRbzQGMuVIIVEu7BZHxMSkRfQUUhb65Gznjqr1LIl4YZ5mZdMfyQLUb6N
-hbYOMBe06idqSlp0sgSObDRLUKks/Du1k+egyM2rhP9/CQaREiXDRHuuz8nCW3bB
-5lUyk32GeVFdanedcsV3AvZAf9Qf/D4kCcigC9RN1g1rcBADZxsstwcK29YYjqz9
-90SWjjfBFBPDTeAnmzdPRnHnsyfzFVyX0psh+dG+DJKcjbSPY2ErcOkcRz1ieCfY
-Q46lCDlq7AaPIWLdFVpjIxhEqrSti0LOf7+I0iJ8LVerDv5jYtY=
-=V1Kf
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmaXycACgkQbDjKyiDZ
+s5IgqRAAt+mt8UTMIsvkqS2Vnz3WlZSY5iUY4gK88/yDECcN4rQ+jY+fbAv0esC0
+a9TVF8TXNpAOav96XLRbq3Ibv/FS5WPeI+sxmb99MrtMcqrAG+jtzbJFmtlErlPt
+z5fLomTzDWjYSQmaGRILXVHLBJnGp9iBOR7CJ22hk4WxHgsl/g2r2JSOCawIGq4F
+iqB/9IB9HjQGV0YrN5UvIykuy68gxKMAr8Rey1WooMwV5expjfLJfGf5LvWH6yS1
+inQo1br+uPcsvwXyyuBrNYPxKgoDHt+ErgC75iJ9+fGcuTPmtEx1noh2h3AOS/fM
+nVltQgXDog+EwHPpdhDSLRZ1qvJ16EHpdkxGHTiw60xvCsvqBLJBNHQCCrSHhLiz
+gXx5tmOMcF5IzGkK8NPzM+Z3tEPKUxCFWxAmcHAsiniKJhjXALyLfvxS9twq5MGa
+Cb5BW+FeS1PRwLNCt/b3Y9sRQgqwY/Y+pITzfL8rJLWojoXwi11AkJwNinz4kF5Z
+pAiebrWn0aqsvzcfmshkzfJe3xO68lJ4CwtMSPtC8KwBRNLqnjdDbwu9ahK4Tie3
+7N4BEDKHirZXrf0npqD1htU69Ro37PIU0HPNdDMHgdG9zasFOBj0gNMTOxFOURKz
+cwSzclt83hq8fwV2dTmhl8GUoZfF6Nt5kSjeLrSrgGkzaerswYs=
+=4xMF
 -----END PGP SIGNATURE-----
 
---qM81t570OJUP5TU/--
+--oOB74oR0WcNeq9Zb--
