@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Bharat.Bhushan@nxp.com>) id 1djkJL-0006Mf-Ai
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:52:01 -0400
+	(envelope-from <imammedo@redhat.com>) id 1djkMU-0000oF-UW
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:55:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Bharat.Bhushan@nxp.com>) id 1djkJG-00028q-9O
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:51:59 -0400
-From: Bharat Bhushan <Bharat.Bhushan@nxp.com>
-Date: Mon, 21 Aug 2017 16:18:54 +0530
-Message-ID: <1503312534-6642-3-git-send-email-Bharat.Bhushan@nxp.com>
-In-Reply-To: <1503312534-6642-1-git-send-email-Bharat.Bhushan@nxp.com>
-References: <1503312534-6642-1-git-send-email-Bharat.Bhushan@nxp.com>
+	(envelope-from <imammedo@redhat.com>) id 1djkMQ-0003d8-Co
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:55:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45430)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1djkMQ-0003cF-32
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:55:10 -0400
+Date: Mon, 21 Aug 2017 12:55:05 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170821125505.37ce8935@nial.brq.redhat.com>
+In-Reply-To: <c65c99e5-5d60-5aef-7e69-ce236f6b7d4e@amsat.org>
+References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
+	<1503050939-227939-2-git-send-email-imammedo@redhat.com>
+	<c65c99e5-5d60-5aef-7e69-ce236f6b7d4e@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 2/2] virtio-iommu: vfio integration with
- virtio-iommu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.11 01/27] sparc: convert cpu models
+ to SPARC cpu subclasses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,364 +29,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger@redhat.com, eric.auger.pro@gmail.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: wei@redhat.com, kevin.tian@intel.com, marc.zyngier@arm.com, tn@semihalf.com, will.deacon@arm.com, drjones@redhat.com, robin.murphy@arm.com, christoffer.dall@linaro.org, bharat.bhushan@nxp.com, Bharat Bhushan <Bharat.Bhushan@nxp.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-This RFC patch allows virtio-iommu protection for PCI
-device-passthrough.
+On Fri, 18 Aug 2017 16:00:37 -0300
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
-MSI region is mapped by current version of virtio-iommu driver.
-This uses VFIO extension of map/unmap notification when an area
-of memory is mappedi/unmapped in emulated iommu device.
+> Hi Igor,
+>=20
+> On 08/18/2017 07:08 AM, Igor Mammedov wrote:
+> > QOMfy cpu models handling introducing propper cpu types
+> > for each cpu model.
+> >=20
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> > with this and conversion of features to properties,
+> > it would be possible to replace cpu_sparc_init() with
+> > cpu_generic_init() and reuse common -cpu handling
+> > infrastructure.
+> >=20
+> > CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> > CC: Artyom Tarasenko <atar4qemu@gmail.com>
+> > CC: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >=20
+> > v2:
+> >    * make base class abstract (Philippe Mathieu-Daud=C3=A9 <f4bug@amsat=
+.org>)
+> > ---
+> >   target/sparc/cpu-qom.h |   2 +
+> >   target/sparc/cpu.c     | 121 +++++++++++++++++++++++++++++++++-------=
+---------
+> >   2 files changed, 84 insertions(+), 39 deletions(-)
+> >=20
+> > diff --git a/target/sparc/cpu-qom.h b/target/sparc/cpu-qom.h
+> > index f63af72..af6d57a 100644
+> > --- a/target/sparc/cpu-qom.h
+> > +++ b/target/sparc/cpu-qom.h
+> > @@ -35,6 +35,7 @@
+> >   #define SPARC_CPU_GET_CLASS(obj) \
+> >       OBJECT_GET_CLASS(SPARCCPUClass, (obj), TYPE_SPARC_CPU)
+> >  =20
+> > +typedef struct sparc_def_t sparc_def_t;
+> >   /**
+> >    * SPARCCPUClass:
+> >    * @parent_realize: The parent class' realize handler.
+> > @@ -49,6 +50,7 @@ typedef struct SPARCCPUClass {
+> >  =20
+> >       DeviceRealize parent_realize;
+> >       void (*parent_reset)(CPUState *cpu);
+> > +    sparc_def_t *cpu_def;
+> >   } SPARCCPUClass;
+> >  =20
+> >   typedef struct SPARCCPU SPARCCPU;
+> > diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+> > index d606eb5..2994c09 100644
+> > --- a/target/sparc/cpu.c
+> > +++ b/target/sparc/cpu.c
+> > @@ -25,8 +25,6 @@
+> >  =20
+> >   //#define DEBUG_FEATURES
+> >  =20
+> > -static int cpu_sparc_find_by_name(sparc_def_t *cpu_def, const char *cp=
+u_model);
+> > -
+> >   /* CPUClass::reset() */
+> >   static void sparc_cpu_reset(CPUState *s)
+> >   {
+> > @@ -111,17 +109,9 @@ static int cpu_sparc_register(SPARCCPU *cpu, const=
+ char *cpu_model)
+> >   {
+> >       CPUSPARCState *env =3D &cpu->env;
+> >       char *s =3D g_strdup(cpu_model);
+> > -    char *featurestr, *name =3D strtok(s, ",");
+> > -    sparc_def_t def1, *def =3D &def1;
+> > +    char *featurestr =3D strtok(s, ",");
+> >       Error *err =3D NULL;
+> >  =20
+> > -    if (cpu_sparc_find_by_name(def, name) < 0) {
+> > -        g_free(s);
+> > -        return -1;
+> > -    }
+> > -
+> > -    env->def =3D g_memdup(def, sizeof(*def));
+> > -
+> >       featurestr =3D strtok(NULL, ",");
+> >       sparc_cpu_parse_features(CPU(cpu), featurestr, &err);
+> >       g_free(s);
+> > @@ -130,18 +120,18 @@ static int cpu_sparc_register(SPARCCPU *cpu, cons=
+t char *cpu_model)
+> >           return -1;
+> >       }
+> >  =20
+> > -    env->version =3D def->iu_version;
+> > -    env->fsr =3D def->fpu_version;
+> > -    env->nwindows =3D def->nwindows;
+> > +    env->version =3D env->def->iu_version;
+> > +    env->fsr =3D env->def->fpu_version;
+> > +    env->nwindows =3D env->def->nwindows;
+> >   #if !defined(TARGET_SPARC64)
+> > -    env->mmuregs[0] |=3D def->mmu_version;
+> > +    env->mmuregs[0] |=3D env->def->mmu_version;
+> >       cpu_sparc_set_id(env, 0);
+> > -    env->mxccregs[7] |=3D def->mxcc_version;
+> > +    env->mxccregs[7] |=3D env->def->mxcc_version;
+> >   #else
+> > -    env->mmu_version =3D def->mmu_version;
+> > -    env->maxtl =3D def->maxtl;
+> > -    env->version |=3D def->maxtl << 8;
+> > -    env->version |=3D def->nwindows - 1;
+> > +    env->mmu_version =3D env->def->mmu_version;
+> > +    env->maxtl =3D env->def->maxtl;
+> > +    env->version |=3D env->def->maxtl << 8;
+> > +    env->version |=3D env->def->nwindows - 1;
+> >   #endif
+> >       return 0;
+> >   }
+> > @@ -149,8 +139,19 @@ static int cpu_sparc_register(SPARCCPU *cpu, const=
+ char *cpu_model)
+> >   SPARCCPU *cpu_sparc_init(const char *cpu_model)
+> >   {
+> >       SPARCCPU *cpu;
+> > +    ObjectClass *oc;
+> > +    char *str, *name;
+> > +
+> > +    str =3D g_strdup(cpu_model);
+> > +    name =3D strtok(str, ","); =20
+>=20
+> you can free 'str' once here:
+>=20
+>         g_free(str);
+>=20
+> > +    oc =3D cpu_class_by_name(TYPE_SPARC_CPU, name);
+> > +    if (oc =3D=3D NULL) {
+> > +        g_free(str); =20
+>=20
+> drop
+>=20
+> > +        return NULL;
+> > +    }
+> > +    g_free(str); =20
+>=20
+> drop
 
-This series is tested with 2 PCI devices to virtual machine using
-dma-ops and DPDK in VM is not yet tested.
+I'll fix it up if I have to respin series (note this function is removed wi=
+thin series)
 
-Also with this series we observe below prints for MSI region mapping
+[...]
+=20
 
-   "qemu-system-aarch64: iommu map to non memory area 0"
+> Anyway I can't start Aurelien's image [1] with this commit:
+Can't reproduce it locally (either dirty/clean tree rebuild)
+with ./configure --enable-debug
 
-   This print comes when vfio/map-notifier is called for MSI region.
+=20
+> $ sparc-softmmu/qemu-system-sparc -hda debian_etch_sparc_small.qcow2
+> qemu: Unable to find Sparc CPU definition
+for this kind of error guest image doesn't matter as error happens during m=
+achine_init()
 
-vfio map/unmap notification is called for given device
-   This assumes that devid passed in virtio_iommu_attach is same as devfn
-   This assumption is based on 1:1 mapping of requested-id with device-id
-   in QEMU.
+> [1] https://people.debian.org/~aurel32/qemu/sparc/
+It boots just fine with default CPU model:
 
-Signed-off-by: Bharat Bhushan <Bharat.Bhushan@nxp.com>
----
-v2->v3:
- - Addressed review comments:
-    - virtio-iommu_map_region function is split in two functions
-      virtio_iommu_notify_map/virtio_iommu_notify_unmap
-    - use size received from driver and do not split in 4K pages
- 
- - map/unmap notification is called for given device/as
-   This relies on devid passed in virtio_iommu_attach is same as devfn
-   This is assumed as iommu-map maps 1:1 requested-id to device-id in QEMU
-   Looking for comment about this assumtion.
+./sparc-softmmu/qemu-system-sparc -hda debian_etch_sparc_small.qcow2
 
- - Keeping track devices in address-space
+and with explicitly specified one:
 
- - Verified with 2 PCI endpoints
- - some code cleanup
+sparc-softmmu/qemu-system-sparc -cpu "Fujitsu MB86904"
 
- hw/virtio/trace-events           |   5 ++
- hw/virtio/virtio-iommu.c         | 163 +++++++++++++++++++++++++++++++++++++++
- include/hw/virtio/virtio-iommu.h |   6 ++
- 3 files changed, 174 insertions(+)
-
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 8db3d91..7e9663f 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -39,3 +39,8 @@ virtio_iommu_unmap_left_interval(uint64_t low, uint64_t high, uint64_t next_low,
- virtio_iommu_unmap_right_interval(uint64_t low, uint64_t high, uint64_t next_low, uint64_t next_high) "Unmap right [0x%"PRIx64",0x%"PRIx64"], new interval=[0x%"PRIx64",0x%"PRIx64"]"
- virtio_iommu_unmap_inc_interval(uint64_t low, uint64_t high) "Unmap inc [0x%"PRIx64",0x%"PRIx64"]"
- virtio_iommu_translate_result(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
-+virtio_iommu_notify_flag_add(const char *iommu) "Add virtio-iommu notifier node for memory region %s"
-+virtio_iommu_notify_flag_del(const char *iommu) "Del virtio-iommu notifier node for memory region %s"
-+virtio_iommu_remap(hwaddr iova, hwaddr pa, hwaddr size) "iova=0x%"PRIx64" pa=0x%" PRIx64" size=0x%"PRIx64""
-+virtio_iommu_notify_map(hwaddr iova, hwaddr paddr, hwaddr map_size) "iova=0x%"PRIx64" pa=0x%" PRIx64" size=0x%"PRIx64""
-+virtio_iommu_notify_unmap(hwaddr iova, hwaddr paddr, hwaddr map_size) "iova=0x%"PRIx64" pa=0x%" PRIx64" size=0x%"PRIx64""
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 9217587..9eae050 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -55,11 +55,13 @@ typedef struct viommu_interval {
- typedef struct viommu_dev {
-     uint32_t id;
-     viommu_as *as;
-+    QLIST_ENTRY(viommu_dev) next;
- } viommu_dev;
- 
- struct viommu_as {
-     uint32_t id;
-     GTree *mappings;
-+    QLIST_HEAD(, viommu_dev) device_list;
- };
- 
- static inline uint16_t virtio_iommu_get_sid(IOMMUDevice *dev)
-@@ -133,12 +135,70 @@ static gint interval_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
-     }
- }
- 
-+static void virtio_iommu_notify_map(IOMMUMemoryRegion *mr, hwaddr iova,
-+                                    hwaddr paddr, hwaddr size)
-+{
-+    IOMMUTLBEntry entry;
-+
-+    entry.target_as = &address_space_memory;
-+    entry.addr_mask = size - 1;
-+
-+    entry.iova = iova;
-+    trace_virtio_iommu_notify_map(iova, paddr, size);
-+    entry.perm = IOMMU_RW;
-+    entry.translated_addr = paddr;
-+
-+    memory_region_notify_iommu(mr, entry);
-+}
-+
-+static void virtio_iommu_notify_unmap(IOMMUMemoryRegion *mr, hwaddr iova,
-+                                      hwaddr paddr, hwaddr size)
-+{
-+    IOMMUTLBEntry entry;
-+
-+    entry.target_as = &address_space_memory;
-+    entry.addr_mask = size - 1;
-+
-+    entry.iova = iova;
-+    trace_virtio_iommu_notify_unmap(iova, paddr, size);
-+    entry.perm = IOMMU_NONE;
-+    entry.translated_addr = 0;
-+
-+    memory_region_notify_iommu(mr, entry);
-+}
-+
-+static gboolean virtio_iommu_maping_unmap(gpointer key, gpointer value,
-+                                          gpointer data)
-+{
-+    viommu_mapping *mapping = (viommu_mapping *) value;
-+    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
-+
-+    virtio_iommu_notify_unmap(mr, mapping->virt_addr, 0, mapping->size);
-+
-+    return true;
-+}
-+
- static void virtio_iommu_detach_dev(VirtIOIOMMU *s, viommu_dev *dev)
- {
-+    VirtioIOMMUNotifierNode *node;
-     viommu_as *as = dev->as;
-+    int devid = dev->id;
- 
-     trace_virtio_iommu_detach(dev->id);
- 
-+    /* Remove device from address-space list */
-+    QLIST_REMOVE(dev, next);
-+    /* unmap all if no devices attached to address-spaceRemove */
-+    if (QLIST_EMPTY(&as->device_list)) {
-+        QLIST_FOREACH(node, &s->notifiers_list, next) {
-+            if (devid == node->iommu_dev->devfn) {
-+                g_tree_foreach(as->mappings, virtio_iommu_maping_unmap,
-+                               &node->iommu_dev->iommu_mr);
-+            }
-+        }
-+    }
-+
-+    /* Remove device from global list */
-     g_tree_remove(s->devices, GUINT_TO_POINTER(dev->id));
-     g_tree_unref(as->mappings);
- }
-@@ -171,6 +231,7 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
-     if (!as) {
-         as = g_malloc0(sizeof(*as));
-         as->id = asid;
-+        QLIST_INIT(&as->device_list);
-         as->mappings = g_tree_new_full((GCompareDataFunc)interval_cmp,
-                                          NULL, NULL, (GDestroyNotify)g_free);
-         g_tree_insert(s->address_spaces, GUINT_TO_POINTER(asid), as);
-@@ -182,6 +243,7 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
-     dev->id = devid;
-     trace_virtio_iommu_new_devid(devid);
-     g_tree_insert(s->devices, GUINT_TO_POINTER(devid), dev);
-+    QLIST_INSERT_HEAD(&as->device_list, dev, next);
-     g_tree_ref(as->mappings);
- 
-     return VIRTIO_IOMMU_S_OK;
-@@ -219,6 +281,8 @@ static int virtio_iommu_map(VirtIOIOMMU *s,
-     viommu_as *as;
-     viommu_interval *interval;
-     viommu_mapping *mapping;
-+    VirtioIOMMUNotifierNode *node;
-+    viommu_dev *dev;
- 
-     interval = g_malloc0(sizeof(*interval));
- 
-@@ -230,6 +294,11 @@ static int virtio_iommu_map(VirtIOIOMMU *s,
-         return VIRTIO_IOMMU_S_NOENT;
-     }
- 
-+    dev = QLIST_FIRST(&as->device_list);
-+    if (!dev) {
-+        return VIRTIO_IOMMU_S_NOENT;
-+    }
-+
-     mapping = g_tree_lookup(as->mappings, (gpointer)interval);
-     if (mapping) {
-         g_free(interval);
-@@ -246,6 +315,14 @@ static int virtio_iommu_map(VirtIOIOMMU *s,
- 
-     g_tree_insert(as->mappings, interval, mapping);
- 
-+    /* All devices in an address-space share mapping */
-+    QLIST_FOREACH(node, &s->notifiers_list, next) {
-+        if (dev->id == node->iommu_dev->devfn) {
-+            virtio_iommu_notify_map(&node->iommu_dev->iommu_mr, virt_addr,
-+                                    phys_addr, size);
-+        }
-+    }
-+
-     return VIRTIO_IOMMU_S_OK;
- }
- 
-@@ -259,6 +336,8 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
-     viommu_mapping *mapping;
-     viommu_interval interval;
-     viommu_as *as;
-+    VirtioIOMMUNotifierNode *node;
-+    viommu_dev *dev;
- 
-     trace_virtio_iommu_unmap(asid, virt_addr, size, flags);
- 
-@@ -267,6 +346,12 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
-         error_report("%s: no as", __func__);
-         return VIRTIO_IOMMU_S_NOENT;
-     }
-+
-+    dev = QLIST_FIRST(&as->device_list);
-+    if (!dev) {
-+        return VIRTIO_IOMMU_S_NOENT;
-+    }
-+
-     interval.low = virt_addr;
-     interval.high = virt_addr + size - 1;
- 
-@@ -296,7 +381,15 @@ static int virtio_iommu_unmap(VirtIOIOMMU *s,
-         } else {
-             break;
-         }
-+
-         if (interval.low >= interval.high) {
-+            /* All devices in an address-space share mapping */
-+            QLIST_FOREACH(node, &s->notifiers_list, next) {
-+                if (dev->id == node->iommu_dev->devfn) {
-+                    virtio_iommu_notify_unmap(&node->iommu_dev->iommu_mr, virt_addr,
-+                                              0, size);
-+                }
-+            }
-             return VIRTIO_IOMMU_S_OK;
-         } else {
-             mapping = g_tree_lookup(as->mappings, (gpointer)&interval);
-@@ -439,6 +532,36 @@ static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
-     }
- }
- 
-+static void virtio_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu_mr,
-+                                          IOMMUNotifierFlag old,
-+                                          IOMMUNotifierFlag new)
-+{
-+    IOMMUDevice *sdev = container_of(iommu_mr, IOMMUDevice, iommu_mr);
-+    VirtIOIOMMU *s = sdev->viommu;
-+    VirtioIOMMUNotifierNode *node = NULL;
-+    VirtioIOMMUNotifierNode *next_node = NULL;
-+
-+    if (old == IOMMU_NOTIFIER_NONE) {
-+        trace_virtio_iommu_notify_flag_add(iommu_mr->parent_obj.name);
-+        node = g_malloc0(sizeof(*node));
-+        node->iommu_dev = sdev;
-+        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
-+        return;
-+    }
-+
-+    /* update notifier node with new flags */
-+    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
-+        if (node->iommu_dev == sdev) {
-+            if (new == IOMMU_NOTIFIER_NONE) {
-+                trace_virtio_iommu_notify_flag_del(iommu_mr->parent_obj.name);
-+                QLIST_REMOVE(node, next);
-+                g_free(node);
-+            }
-+            return;
-+        }
-+    }
-+}
-+
- static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-                                             IOMMUAccessFlags flag)
- {
-@@ -553,11 +676,49 @@ static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
-     return (ua > ub) - (ua < ub);
- }
- 
-+static gboolean virtio_iommu_remap(gpointer key, gpointer value, gpointer data)
-+{
-+    viommu_mapping *mapping = (viommu_mapping *) value;
-+    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
-+
-+    trace_virtio_iommu_remap(mapping->virt_addr, mapping->phys_addr,
-+                             mapping->size);
-+    /* unmap previous entry and map again */
-+    virtio_iommu_notify_unmap(mr, mapping->virt_addr, 0, mapping->size);
-+
-+    virtio_iommu_notify_map(mr, mapping->virt_addr, mapping->phys_addr,
-+                            mapping->size);
-+    return true;
-+}
-+
-+static void virtio_iommu_replay(IOMMUMemoryRegion *mr, IOMMUNotifier *n)
-+{
-+    IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
-+    VirtIOIOMMU *s = sdev->viommu;
-+    uint32_t sid;
-+    viommu_dev *dev;
-+
-+    sid = virtio_iommu_get_sid(sdev);
-+
-+    qemu_mutex_lock(&s->mutex);
-+
-+    dev = g_tree_lookup(s->devices, GUINT_TO_POINTER(sid));
-+    if (!dev) {
-+        goto unlock;
-+    }
-+
-+    g_tree_foreach(dev->as->mappings, virtio_iommu_remap, mr);
-+
-+unlock:
-+    qemu_mutex_unlock(&s->mutex);
-+}
-+
- static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VirtIOIOMMU *s = VIRTIO_IOMMU(dev);
- 
-+    QLIST_INIT(&s->notifiers_list);
-     virtio_init(vdev, "virtio-iommu", VIRTIO_ID_IOMMU,
-                 sizeof(struct virtio_iommu_config));
- 
-@@ -644,6 +805,8 @@ static void virtio_iommu_memory_region_class_init(ObjectClass *klass,
-     IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
- 
-     imrc->translate = virtio_iommu_translate;
-+    imrc->notify_flag_changed = virtio_iommu_notify_flag_changed;
-+    imrc->replay = virtio_iommu_replay;
- }
- 
- static const TypeInfo virtio_iommu_info = {
-diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virtio-iommu.h
-index f9c988f..7e04184 100644
---- a/include/hw/virtio/virtio-iommu.h
-+++ b/include/hw/virtio/virtio-iommu.h
-@@ -46,6 +46,11 @@ typedef struct IOMMUPciBus {
-     IOMMUDevice  *pbdev[0]; /* Parent array is sparse, so dynamically alloc */
- } IOMMUPciBus;
- 
-+typedef struct VirtioIOMMUNotifierNode {
-+    IOMMUDevice *iommu_dev;
-+    QLIST_ENTRY(VirtioIOMMUNotifierNode) next;
-+} VirtioIOMMUNotifierNode;
-+
- typedef struct VirtIOIOMMU {
-     VirtIODevice parent_obj;
-     VirtQueue *vq;
-@@ -56,6 +61,7 @@ typedef struct VirtIOIOMMU {
-     GTree *address_spaces;
-     QemuMutex mutex;
-     GTree *devices;
-+    QLIST_HEAD(, VirtioIOMMUNotifierNode) notifiers_list;
- } VirtIOIOMMU;
- 
- #endif
--- 
-1.9.3
+I get from "info qom-tree"
+...
+ /device[0] (Fujitsu-MB86904-sparc-cpu)
+...
