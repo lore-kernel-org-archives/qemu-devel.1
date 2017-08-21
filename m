@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1djiyS-0001OJ-87
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:26:21 -0400
+	(envelope-from <armbru@redhat.com>) id 1djj3T-0004Zx-6W
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:31:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1djiyN-0004oW-9x
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:26:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38372)
+	(envelope-from <armbru@redhat.com>) id 1djj3O-0000AC-Ak
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:31:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60288)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1djiyN-0004mG-3v
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:26:15 -0400
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon, 21 Aug 2017 11:16:05 +0200
-Message-Id: <20170821091614.28251-2-cohuck@redhat.com>
-In-Reply-To: <20170821091614.28251-1-cohuck@redhat.com>
-References: <20170821091614.28251-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 01/10] 9pfs: fix dependencies
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1djj3O-00009B-4c
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:31:26 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170818222313.13391-1-eblake@redhat.com>
+Date: Mon, 21 Aug 2017 11:31:18 +0200
+In-Reply-To: <20170818222313.13391-1-eblake@redhat.com> (Eric Blake's message
+	of "Fri, 18 Aug 2017 17:23:13 -0500")
+Message-ID: <874lt16zdl.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC PATCH] osdep.h: Prohibit disabling assert()
+ in supported builds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, f4bug@amsat.org
 
-Nothing in fsdev/ or hw/9pfs/ depends on pci; it should rather depend
-on CONFIG_VIRTFS and CONFIG_VIRTIO/CONFIG_XEN only.
+Eric Blake <eblake@redhat.com> writes:
 
-Acked-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- fsdev/Makefile.objs   | 9 +++------
- hw/9pfs/Makefile.objs | 2 +-
- hw/Makefile.objs      | 2 +-
- 3 files changed, 5 insertions(+), 8 deletions(-)
+> We already have several files that knowingly require assert()
+> to work.  While we do NOT want to encourage the use of
+> 'assert(side-effects)' (that is a bad practice that prevents
+> copy-and-paste of code to other projects that CAN disable
+> assertions; plus it costs unnecessary reviewer mental cycles
+> to remember our project policy on crippling asserts), we DO
+> want to send a message that anyone that disables assertions
+> has to tweak code in order to compile, making it obvious that
+> we are not going to support their efforts.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>
+> First mentioned as an idea here:
+> http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg06084.html
+> but I'm titling this RFC as I'm not 100% convinced we want to make
+> it a project-wide, rather than a per-file decision.
 
-diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
-index 659df6e187..fb38017c0b 100644
---- a/fsdev/Makefile.objs
-+++ b/fsdev/Makefile.objs
-@@ -1,10 +1,7 @@
--ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
- # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
--# only pull in the actual virtio-9p device if we also enabled virtio.
--common-obj-y = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
--else
--common-obj-y = qemu-fsdev-dummy.o
--endif
-+# only pull in the actual 9p backend if we also enabled virtio or xen.
-+common-obj-$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO),$(CONFIG_XEN))) = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
-+common-obj-$(call lnot,$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO),$(CONFIG_XEN)))) = qemu-fsdev-dummy.o
- common-obj-y += qemu-fsdev-opts.o qemu-fsdev-throttle.o
- 
- # Toplevel always builds this; targets without virtio will put it in
-diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
-index cab5e942ed..fd90b62900 100644
---- a/hw/9pfs/Makefile.objs
-+++ b/hw/9pfs/Makefile.objs
-@@ -7,4 +7,4 @@ common-obj-$(CONFIG_OPEN_BY_HANDLE) +=  9p-handle.o
- common-obj-y += 9p-proxy.o
- common-obj-$(CONFIG_XEN) += xen-9p-backend.o
- 
--obj-y += virtio-9p-device.o
-+obj-$(CONFIG_VIRTIO) += virtio-9p-device.o
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index a2c61f6b09..cf4cb2010b 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -1,4 +1,4 @@
--devices-dirs-$(call land, $(CONFIG_VIRTIO),$(call land,$(CONFIG_VIRTFS),$(CONFIG_PCI))) += 9pfs/
-+devices-dirs-$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO),$(CONFIG_XEN))) += 9pfs/
- devices-dirs-$(CONFIG_SOFTMMU) += acpi/
- devices-dirs-$(CONFIG_SOFTMMU) += adc/
- devices-dirs-$(CONFIG_SOFTMMU) += audio/
--- 
-2.13.5
+I'm fine with project-wide, but does it have to be a hard error?  Can we
+make it a warning?  Same effect by default, but it lets people
+experiment more easily with --disable-werror.
