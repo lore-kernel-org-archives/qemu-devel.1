@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1djlal-0000mI-PT
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 08:14:07 -0400
+	(envelope-from <berto@igalia.com>) id 1djlbO-0001B3-TN
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 08:14:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1djlai-0007im-EK
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 08:14:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57472)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1djlai-0007ia-9A
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 08:14:00 -0400
-Date: Mon, 21 Aug 2017 14:13:53 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170821141353.32a1242c.cohuck@redhat.com>
-In-Reply-To: <feebff17-e4b8-2e00-9775-126055172564@linux.vnet.ibm.com>
-References: <20170821091614.28251-1-cohuck@redhat.com>
-	<20170821091614.28251-10-cohuck@redhat.com>
-	<feebff17-e4b8-2e00-9775-126055172564@linux.vnet.ibm.com>
+	(envelope-from <berto@igalia.com>) id 1djlbJ-0007qq-Rz
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 08:14:41 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170819142947.e5xqkmfe6kssot3f@postretch>
+References: <cover.1502979710.git.berto@igalia.com>
+	<427228619067b0a029d2ae7706a3743a6da38128.1502979710.git.berto@igalia.com>
+	<20170819142947.e5xqkmfe6kssot3f@postretch>
+Date: Mon, 21 Aug 2017 14:14:36 +0200
+Message-ID: <w51bmn9nmmr.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 09/10] s390x/kvm: msi route fixup for
- non-pci
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/4] throttle: Fix wrong variable name in
+ the header documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +24,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com, zyimin@linux.vnet.ibm.com, david@redhat.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, borntraeger@de.ibm.com
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Mon, 21 Aug 2017 14:00:15 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+On Sat 19 Aug 2017 04:29:47 PM CEST, Manos Pitsidianakis wrote:
+> On Thu, Aug 17, 2017 at 05:28:12PM +0300, Alberto Garcia wrote:
+>>The level of the burst bucket is stored in bkt.burst_level, not
+>>bkt.burst_lenght.
+>
+> s/lenght/length, otherwise:
 
-> On 08/21/2017 11:16 AM, Cornelia Huck wrote:
-> > If we don't provide pci, we cannot have a pci device for which we
-> > have to translate to adapter routes: just return -ENODEV.
-> > 
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> >  target/s390x/kvm.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> > index 9de165d8b1..d8db1cbf6e 100644
-> > --- a/target/s390x/kvm.c
-> > +++ b/target/s390x/kvm.c
-> > @@ -2424,6 +2424,12 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
-> >      uint32_t idx = data >> ZPCI_MSI_VEC_BITS;
-> >      uint32_t vec = data & ZPCI_MSI_VEC_MASK;
-> > 
-> > +    if (!s390_has_feat(S390_FEAT_ZPCI)) {
-> > +        /* How can we get here without pci enabled? */
-> > +        g_assert(false);  
-> 
-> You don't tell us about the g_assert in the commit message.
-> Do you expect G_DISABLE_ASSERT being defined for production 
-> builds. I've grepped for G_DISABLE_ASSERT and found nothing.
+Oh my, fixing a typo by introducing another typo :-)
 
-AFAIK this is set by distribution builds. I've also noticed that mingw
-builds treat (g_)assert() as if code flow continues, but I don't know
-whether asserts do anything there at all.
+> Reviewed-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 
-> 
-> And why g_assert over assert (again no guidance in HACKING
-> mostly asking for my own learning)?
-
-I do recall a recent(ish) discussion, but not the details. Anyway,
-using glib interfaces seems more consistent.
-
-> 
-> Other that that LGTM.
-
-Thanks!
-
-> 
-> 
-> > +        return -ENODEV;
-> > +    }
-> > +
-> >      pbdev = s390_pci_find_dev_by_idx(s390_get_phb(), idx);
-> >      if (!pbdev) {
-> >          DPRINTF("add_msi_route no dev\n");
-> >   
-> 
+Berto
