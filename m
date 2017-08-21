@@ -1,18 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1djivb-0007E2-C4
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:23:24 -0400
+	(envelope-from <bounces@canonical.com>) id 1djixy-0000zH-1E
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:25:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1djivW-0001oD-5F
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:23:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44668)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1djivV-0001nV-UB
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:23:18 -0400
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon, 21 Aug 2017 11:16:04 +0200
-Message-Id: <20170821091614.28251-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 00/10] zpci detangling
+	(envelope-from <bounces@canonical.com>) id 1djixt-0004Pi-3T
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:25:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38579)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1djixs-0004NP-Sr
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:25:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1djixq-00068V-UZ
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 09:25:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8EE8C2E80D3
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 09:25:42 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 21 Aug 2017 09:12:02 -0000
+From: Huang Yong <1712027@bugs.launchpad.net>
+Reply-To: Bug 1712027 <1712027@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <150330672268.8725.17665790368733773133.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1712027] [NEW] qemu: Cryptography adding
+ encrypted disk with luks format failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,49 +37,139 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
 
-Just some minor changes from the last one. If nobody complains, I'll
-queue to s390-next.
+Public bug reported:
 
-I'd be happy about some acks/r-bs for patches that don't have any yet,
-though.
+I'm using libvirt to attach luks encrypted disk to a running VM. The
+qemu-monitor-command like the
 
-v3->v4:
-- add "9pfs: fix dependencies"
-- in "kvm: remove hard dependency on pci", do s/assert/g_assert/ and add
-  return statements for builds with asserts off
+following:
 
-Cornelia Huck (10):
-  9pfs: fix dependencies
-  kvm: remove hard dependency on pci
-  s390x/pci: add stubs
-  s390x: chsc nt2 events are pci-only
-  s390x/pci: do not advertise pci on non-pci builds
-  s390x/ccw: create s390 phb conditionally
-  s390x/sclp: properly guard pci-specific functions
-  s390x/pci: fence off instructions for non-pci
-  s390x/kvm: msi route fixup for non-pci
-  s390x: refine pci dependencies
+{"execute":"object-add","arguments":{"qom-type":"secret","id":"virtio-
+disk11-luks-
+secret0","props":{"data":"El7jOYLCZwrij2Mue0q2tA=3D=3D","keyid":"masterKey0=
+","iv":"J2je0WJjCa89L3iKc1lceg=3D=3D","format":"base64"}}
 
- accel/kvm/kvm-all.c               |  6 ++--
- default-configs/s390x-softmmu.mak |  2 +-
- fsdev/Makefile.objs               |  9 ++---
- hw/9pfs/Makefile.objs             |  2 +-
- hw/Makefile.objs                  |  2 +-
- hw/pci/pci-stub.c                 | 15 ++++++++
- hw/pci/pci.c                      |  2 ++
- hw/s390x/Makefile.objs            |  3 +-
- hw/s390x/s390-pci-bus.c           |  4 +--
- hw/s390x/s390-pci-bus.h           |  4 +--
- hw/s390x/s390-pci-stub.c          | 74 +++++++++++++++++++++++++++++++++++++++
- hw/s390x/s390-virtio-ccw.c        | 14 ++++----
- hw/s390x/sclp.c                   | 19 +++++++---
- include/hw/pci/pci.h              |  2 ++
- target/s390x/ioinst.c             | 16 +++++++++
- target/s390x/kvm.c                | 64 +++++++++++++++++++++++++--------
- 16 files changed, 197 insertions(+), 41 deletions(-)
- create mode 100644 hw/s390x/s390-pci-stub.c
+the masterKey0 specify the secret which has been created before.
 
--- 
-2.13.5
+command above return with error message "Incorrect number of padding
+bytes XXX found on decrypted
+
+data". This is triggered by the following code snippets in qemu/crypto/secr=
+et.c:
+         =
+
+if (plaintext[ciphertextlen - 1] > 16 ||
+             plaintext[ciphertextlen - 1] > ciphertextlen) {
+             error_setg(errp, "Incorrect number of padding bytes (%d) "
+                     "found on decrypted data",
+                     (int)plaintext[ciphertextlen - 1]); =
+
+                   =E2=80=A6
+         }
+
+The bug is: There is on padding in plaintext if the actual length of the
+plaintext  decrypted is
+
+equal to ciphertext.
+
+In this case, the last element in plaintext array may be one of the
+character in base64 code table
+
+or other.
+
+I would like to know why length of padding bytes cannot exceed 16 and
+whether i can remove
+
+judement: =E2=80=9Cplaintext[ciphertextlen - 1] > 16=E2=80=9D so that I can=
+ eliminate
+the error above.
+
+Much appreciate it if doubts above is cleared up.
+
+libvirt/qemu version:
+
+# virsh version
+Compiled against library: libvirt 3.0.0
+Using library: libvirt 3.0.0
+Using API: QEMU 3.0.0
+Running hypervisor: QEMU 2.7.1
+
+OS: Ubuntu 12.04 LTS
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1712027
+
+Title:
+  qemu: Cryptography adding encrypted disk with luks format failed
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm using libvirt to attach luks encrypted disk to a running VM. The
+  qemu-monitor-command like the
+
+  following:
+
+  {"execute":"object-add","arguments":{"qom-type":"secret","id":"virtio-
+  disk11-luks-
+  secret0","props":{"data":"El7jOYLCZwrij2Mue0q2tA=3D=3D","keyid":"masterKe=
+y0","iv":"J2je0WJjCa89L3iKc1lceg=3D=3D","format":"base64"}}
+
+  the masterKey0 specify the secret which has been created before.
+
+  command above return with error message "Incorrect number of padding
+  bytes XXX found on decrypted
+
+  data". This is triggered by the following code snippets in qemu/crypto/se=
+cret.c:
+           =
+
+  if (plaintext[ciphertextlen - 1] > 16 ||
+               plaintext[ciphertextlen - 1] > ciphertextlen) {
+               error_setg(errp, "Incorrect number of padding bytes (%d) "
+                       "found on decrypted data",
+                       (int)plaintext[ciphertextlen - 1]); =
+
+                     =E2=80=A6
+           }
+
+  The bug is: There is on padding in plaintext if the actual length of
+  the plaintext  decrypted is
+
+  equal to ciphertext.
+
+  In this case, the last element in plaintext array may be one of the
+  character in base64 code table
+
+  or other.
+
+  I would like to know why length of padding bytes cannot exceed 16 and
+  whether i can remove
+
+  judement: =E2=80=9Cplaintext[ciphertextlen - 1] > 16=E2=80=9D so that I c=
+an eliminate
+  the error above.
+
+  Much appreciate it if doubts above is cleared up.
+
+  libvirt/qemu version:
+
+  # virsh version
+  Compiled against library: libvirt 3.0.0
+  Using library: libvirt 3.0.0
+  Using API: QEMU 3.0.0
+  Running hypervisor: QEMU 2.7.1
+
+  OS: Ubuntu 12.04 LTS
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1712027/+subscriptions
