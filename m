@@ -1,23 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1djifP-0004Aw-2S
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:06:42 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1djijU-0006Az-6J
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:10:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1djifL-000128-Tz
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:06:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34758)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1djifL-0000wq-Mk
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:06:35 -0400
-Date: Mon, 21 Aug 2017 16:58:51 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170821085851.GA4371@lemon>
-References: <1503301464-27886-1-git-send-email-peterx@redhat.com>
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1djijO-0002ak-QY
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:10:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54704
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+	id 1djijO-0002a3-Kd
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:10:46 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7L998Lu006757
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 05:10:43 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2cfrfgubk0-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 05:10:42 -0400
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
+	Mon, 21 Aug 2017 03:10:42 -0600
+References: <150287457293.9760.17827532208744487789.stgit@aravinda>
+	<20170817033554.ip36jmv6kwf7bpbp@tungsten.ozlabs.ibm.com>
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Date: Mon, 21 Aug 2017 14:40:17 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1503301464-27886-1-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 0/6] monitor: allow per-monitor thread
+In-Reply-To: <20170817033554.ip36jmv6kwf7bpbp@tungsten.ozlabs.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Message-Id: <7f67f71b-1661-09cb-1b6f-c8edeaa54144@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/5] target-ppc/spapr: Add FWNMI support
+ in QEMU for PowerKVM guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,51 +43,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Sam Bobroff <sam.bobroff@au1.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au, aik@ozlabs.ru, mahesh@linux.vnet.ibm.com, benh@au1.ibm.com, paulus@samba.org
 
-On Mon, 08/21 15:44, Peter Xu wrote:
-> This is an extended work for migration postcopy recovery. This series
-> is tested with the following series to make sure it solves the monitor
-> hang problem that we have encountered for postcopy recovery:
-> 
->   [RFC 00/29] Migration: postcopy failure recovery
->   [RFC 0/6] migration: re-use migrate_incoming for postcopy recovery
-> 
-> The root problem is that, monitor commands are all handled in main
-> loop thread now, no matter how many monitors we specify. And, if main
-> loop thread hangs due to some reason, all monitors will be stuck.
-> This can be done in reversed order as well: if any of the monitor
-> hangs, it will hang the main loop, and the rest of the monitors (if
-> there is any).
-> 
-> That affects postcopy recovery, since the recovery requires user input
-> on destination side.  If monitors hang, the destination VM dies and
-> lose hope for even a final recovery.
-> 
-> So, sometimes we need to make sure the monitor be alive, at least one
-> of them.
-> 
-> The whole idea of this series is that instead if handling monitor
-> commands all in main loop thread, we do it separately in per-monitor
-> threads.  Then, even if main loop thread hangs at any point by any
-> reason, per-monitor thread can still survive.  Further, we add hint in
-> QMP/HMP to show whether a command can be executed without QMP, if so,
-> we avoid taking BQL when running that command.  It greatly reduced
-> contention of BQL.  Now the only user of that new parameter (currently
-> I call it "without-bql") is "migrate-incoming" command, which is the
-> only command to rescue a paused postcopy migration.
-> 
-> However, even with the series, it does not mean that per-monitor
-> threads will never hang.  One example is that we can still run "info
-> vcpus" in per-monitor threads during a paused postcopy (in that state,
-> page faults are never handled, and "info cpus" will never return since
-> it tries to sync every vcpus).  So to make sure it does not hang, we
-> not only need the per-monitor thread, the user should be careful as
-> well on how to use it.
 
-I think this is like saying we expect the user to understand the internals of
-QEMU, unless the "rules" are clearly documented.  Taking this into account,
-does it make sense to make the per-monitor thread only allow BQL-free commands?
 
-Fam
+On Thursday 17 August 2017 09:05 AM, Sam Bobroff wrote:
+> On Wed, Aug 16, 2017 at 02:41:59PM +0530, Aravinda Prasad wrote:
+>> This series of patches adds support for FWNMI in PowerKVM guests.
+>>
+>> Memory error such as bit flips that cannot be corrected
+>> by hardware is passed on to the kernel for handling
+>> by raising machine check exception (an NMI). Upon such
+>> machine check exception, if the address in error belongs
+>> to guest then KVM causes a guest exit with KVM_EXIT_NMI
+>> exit reason.
+>>
+>> This patch series adds functionality to pass on such
+>> machine check exception to the guest kernel by suitably
+>> handling KVM_EXIT_NMI exit and building the error log.
+>>
+>> The KVM changes are now part of the upstream kernel
+>> (commit e20bbd3d). This series contain QEMU changes.
+> 
+> [snip]
+> 
+> Hi,
+> 
+> I'm concerned that this implementation may introduce a problem with
+> kexec. If a VM registers an NMI handler, then kexecs to a new kernel
+> and an NMI is received before the new kernel has registered it's
+> handler, won't QEMU cause the guest to jump to the old, now invalid,
+> handler address? Is this worth worrying about?
+
+I think there is a small time window till the kexec kernel registers a
+new handler during which NMI can branch to the old invalid address.
+
+Two points of interest. First, I did not find any "ibm,nmi-unregister"
+call. Hence, once the VM registers for NMI it cannot unregister it.
+Second, if kexec is triggered due to VM crash, then the guest will not
+get the opportunity to unregister NMI even in case something similar to
+"ibm,nmi-unregister" is available.
+
+Not sure if this is worth handling as machine check NMIs are rare, and
+getting a machine check NMI during that small time window is very rare.
+
+Regards,
+Aravinda
+
+> 
+> Cheers,
+> Sam.
+> 
+
+-- 
+Regards,
+Aravinda
