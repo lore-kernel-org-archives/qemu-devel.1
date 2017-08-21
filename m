@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1djtgk-0002fN-B6
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 16:52:47 -0400
+	(envelope-from <mtparkr@gmail.com>) id 1dju0o-0003E5-D4
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 17:13:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1djtgh-00019Q-5Z
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 16:52:46 -0400
-Received: from mail-it0-x22e.google.com ([2607:f8b0:4001:c0b::22e]:36189)
+	(envelope-from <mtparkr@gmail.com>) id 1dju0l-0006M9-7u
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 17:13:30 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:35771)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1djtgh-00018s-0w
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 16:52:43 -0400
-Received: by mail-it0-x22e.google.com with SMTP id 77so36658387itj.1
-	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 13:52:41 -0700 (PDT)
-From: John Arbuckle <programmingkidx@gmail.com>
-Date: Mon, 21 Aug 2017 16:52:24 -0400
-Message-Id: <20170821205225.3401-2-programmingkidx@gmail.com>
-In-Reply-To: <20170821205225.3401-1-programmingkidx@gmail.com>
-References: <20170821205225.3401-1-programmingkidx@gmail.com>
-Subject: [Qemu-devel] [PATCH 0/2] ui/cocoa.m: enable guest to see
- control-alt key combinations
+	(Exim 4.71) (envelope-from <mtparkr@gmail.com>) id 1dju0l-0006L8-0x
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 17:13:27 -0400
+Received: by mail-wr0-x243.google.com with SMTP id p8so16923240wrf.2
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 14:13:25 -0700 (PDT)
+From: Matt Parker <mtparkr@gmail.com>
+Date: Mon, 21 Aug 2017 22:13:20 +0100
+Message-Id: <20170821211320.7026-1-mtparkr@gmail.com>
+Subject: [Qemu-devel] [PATCH] audio: intel-hda: do not use old_mmio accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,17 +23,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org qemu-devel peter . maydell @ linaro . org" <qemu-devel@nongnu.org>
-Cc: John Arbuckle <programmingkidx@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 
-Currently if the user needs to send a control-alt key combination, he or she was either out of luck or had to rely on the monitor's sendkey command to do so. With this patch the user can now directly send control-alt key combinations. This is great for Windows guest that may need the control-alt-delete key combination. 
+intel-hda is still using the old_mmio accessors for io.
+This updates the device to use .read and .write accessors instead.
+---
+ hw/audio/intel-hda.c | 56 +++++++++-------------------------------------------
+ 1 file changed, 9 insertions(+), 47 deletions(-)
 
-John Arbuckle (2):
-  move ungrab to ctrl-alt-g
-  send ctrl-alt key combinations to guest if not used by QEMU
-
- ui/cocoa.m | 23 ++++++++++++++++-------
- 1 file changed, 16 insertions(+), 7 deletions(-)
-
+diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
+index 06acc98f7b..c0f002f744 100644
+--- a/hw/audio/intel-hda.c
++++ b/hw/audio/intel-hda.c
+@@ -1043,66 +1043,28 @@ static void intel_hda_regs_reset(IntelHDAState *d)
+ 
+ /* --------------------------------------------------------------------- */
+ 
+-static void intel_hda_mmio_writeb(void *opaque, hwaddr addr, uint32_t val)
++static void intel_hda_mmio_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+ {
+     IntelHDAState *d = opaque;
+     const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+ 
+-    intel_hda_reg_write(d, reg, val, 0xff);
++    intel_hda_reg_write(d, reg, val, (1UL << (size * 8)) - 1);
+ }
+ 
+-static void intel_hda_mmio_writew(void *opaque, hwaddr addr, uint32_t val)
++static uint64_t intel_hda_mmio_read(void *opaque, hwaddr addr, unsigned size)
+ {
+     IntelHDAState *d = opaque;
+     const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+ 
+-    intel_hda_reg_write(d, reg, val, 0xffff);
+-}
+-
+-static void intel_hda_mmio_writel(void *opaque, hwaddr addr, uint32_t val)
+-{
+-    IntelHDAState *d = opaque;
+-    const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+-
+-    intel_hda_reg_write(d, reg, val, 0xffffffff);
+-}
+-
+-static uint32_t intel_hda_mmio_readb(void *opaque, hwaddr addr)
+-{
+-    IntelHDAState *d = opaque;
+-    const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+-
+-    return intel_hda_reg_read(d, reg, 0xff);
+-}
+-
+-static uint32_t intel_hda_mmio_readw(void *opaque, hwaddr addr)
+-{
+-    IntelHDAState *d = opaque;
+-    const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+-
+-    return intel_hda_reg_read(d, reg, 0xffff);
+-}
+-
+-static uint32_t intel_hda_mmio_readl(void *opaque, hwaddr addr)
+-{
+-    IntelHDAState *d = opaque;
+-    const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+-
+-    return intel_hda_reg_read(d, reg, 0xffffffff);
++    return intel_hda_reg_read(d, reg, (1UL << (size * 8)) - 1);
+ }
+ 
+ static const MemoryRegionOps intel_hda_mmio_ops = {
+-    .old_mmio = {
+-        .read = {
+-            intel_hda_mmio_readb,
+-            intel_hda_mmio_readw,
+-            intel_hda_mmio_readl,
+-        },
+-        .write = {
+-            intel_hda_mmio_writeb,
+-            intel_hda_mmio_writew,
+-            intel_hda_mmio_writel,
+-        },
++    .read = intel_hda_mmio_read,
++    .write = intel_hda_mmio_write,
++    .impl = {
++        .min_access_size = 1,
++        .max_access_size = 4,
+     },
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
 -- 
-2.11.0 (Apple Git-81)
+2.13.2
