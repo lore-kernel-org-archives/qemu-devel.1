@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1djhdX-0001zS-9L
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:00:45 -0400
+	(envelope-from <thuth@redhat.com>) id 1djhe2-0002Xz-FK
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:01:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1djhdR-00045x-92
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:00:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52289)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1djhdR-00045l-3E
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:00:33 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1djhdQ-0000w8-4q
-	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 08:00:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 20E202E80C9
-	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 08:00:32 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1djhdw-0004VT-Ns
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:01:10 -0400
+References: <1503297029-28436-1-git-send-email-thuth@redhat.com>
+	<242295486.322283.1503300985716.JavaMail.zimbra@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <73d69240-d9c3-cb71-1623-501e873fc70a@redhat.com>
+Date: Mon, 21 Aug 2017 10:00:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 21 Aug 2017 07:48:39 -0000
-From: Thomas Huth <1054180@bugs.launchpad.net>
-Reply-To: Bug 1054180 <1054180@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120921161324.22633.34633.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150330171918.11273.2779287120959028186.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1054180] Re: DNS activity in slirp (user
- networking) mode quickly depletes file descriptors and crashes qemu
+In-Reply-To: <242295486.322283.1503300985716.JavaMail.zimbra@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] hw/ppc/spapr: Fix segfault when
+ instantiating a 'pc-dimm' without 'memdev'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +25,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, qemu-ppc@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-Also could you please provide the exact command line that you use to
-start QEMU?
+ Hi,
 
--- =
+On 21.08.2017 09:36, Pankaj Gupta wrote:
+> 
+> Hello Thomas,
+>>
+>> QEMU currently crashes when trying to use a 'pc-dimm' on the pseries
+>> machine without specifying its 'memdev' property. This happens because
+>> pc_dimm_get_memory_region() does not check whether the 'memdev' property
+>> has properly been set by the user. Looking closer at this function, it's
+>> also obvious that it is using &error_abort to call another function - and
+>> this is bad in a function that is used in the hot-plugging calling chain
+>> since this can also cause QEMU to exit unexpectedly.
+> 
+> In place of checking if 'memdev' is already allocated/present while fetching 
+> 'get_functions' every place. If 'memdev' is required for memory hotplug operation 
+> can we just put a check at some common place and don't start or instantiate if 
+> 'memdev' is not present.
+> 
+> I can see:
+> 
+> 'pc_dimm_realize' function checks for : in my case prints warning
+> and avoid Qemu to start.
+> ...
+> ...
+> if (!dimm->hostmem) {
+>         error_setg(errp, "'" PC_DIMM_MEMDEV_PROP "' property is not set");
+>         return;
+>     } 
+> ...
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1054180
+That check unfortunately does not apply here: The crash happens in the
+pre_plug() handler of the spapr machine, and this is called *before* the
+realize function of the pc-dimm is called!
 
-Title:
-  DNS activity in slirp (user networking) mode quickly depletes file
-  descriptors and crashes qemu
+But even if we could find another common place where we could check
+dimm->hostmem first, you still have the problem that
+host_memory_backend_get_memory() could return an error and thus
+pc_dimm_get_memory_region() still needs a way to fail gracefully during
+the hotplug (or also hot-unplug) operation. So I think my patch is the
+right way to go here.
 
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Hi, we have encountered quite some trouble with filedescriptor
-  depletion of the qemu process. We have figured out that it can be
-  demonstrated easily by doing a lot of DNS queries inside the VM -- in
-  our real world scenario this is caused by running centos network
-  install with a fast mirror.
-
-  This situation is further problematic because qemu can't handle fd deplet=
-ion very well:
-  1) if ulimit is 1024 then qemu hangs in infinite loop whenever it tries t=
-o open the 1025th fd
-  2) setting ulimit >1024 does not help that much because qemu uses select =
-and max. fd set size is 1024 per default =3D> qemu crashes because of buffe=
-r overflow in select()
-  3) setting ulimit > 1024 AND recompiling with large enough fd set size AN=
-D disabling gcc's fortify source seems to work, but that's really just a ho=
-t-fix
-
-  The problem can be replicated quite easily by running something like
-
-  while :; do echo >/dev/udp/10.0.2.3/53; done
-
-  inside a Linux VM -- crash comes very soon.
-
-  This problem is present in current qemu (1.2.0) and in earlier as
-  well.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1054180/+subscriptions
+ Thomas
