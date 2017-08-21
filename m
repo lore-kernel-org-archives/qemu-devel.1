@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1djkbt-0002IS-Iq
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:11:11 -0400
+	(envelope-from <famz@redhat.com>) id 1djkc1-0002O5-05
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:11:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1djkbr-0004Xf-Ij
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:11:09 -0400
-Received: from research.iiit.ac.in ([196.12.53.8]:56756)
+	(envelope-from <famz@redhat.com>) id 1djkbw-0004f9-SJ
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:11:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40018)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1djkbq-0004Sy-IJ
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:11:07 -0400
-From: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-Date: Mon, 21 Aug 2017 16:40:39 +0530
-Message-Id: <1503313839-10258-4-git-send-email-chugh.ishani@research.iiit.ac.in>
-In-Reply-To: <1503313839-10258-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-References: <1503313839-10258-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-Subject: [Qemu-devel] [PATCH 3/3] Add manpage for QEMU Backup Tool
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1djkbw-0004cr-Jp
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:11:12 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AB317C047B87
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 11:11:11 +0000 (UTC)
+Date: Mon, 21 Aug 2017 19:11:08 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170821111108.GB4371@lemon>
+References: <20170818141512.15205-1-famz@redhat.com>
+	<20170818141512.15205-3-famz@redhat.com>
+	<060c28df-bc84-01da-9c7b-2b47221f5311@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <060c28df-bc84-01da-9c7b-2b47221f5311@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] scsi: Enhance scsi_sense_to_errno
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,209 +34,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, jsnow@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-qemu-backup will be a command-line tool for performing full and
-incremental disk backups on running VMs. It is intended as a
-reference implementation for management stack and backup developers
-to see QEMU's backup features in action. The following commit is an
-initial implementation of manpage listing the commands which the
-backup tool will support. The manpage wil be build along with other
-docs when configure is provided with --enable-docs flag in the
-location contrib/backup in build directory.
+On Fri, 08/18 16:36, Paolo Bonzini wrote:
+> On 18/08/2017 16:15, Fam Zheng wrote:
+> > Two changes:
+> > 
+> > 1) Look at asc/ascq for NOT_READY and DATA_PROTECT;
+> > 2) Translate SPACE_ALLOC_FAILED as ENOSPC;
+> > 
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > ---
+> >  util/scsi.c | 7 +++----
+> >  1 file changed, 3 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/util/scsi.c b/util/scsi.c
+> > index 92ca436cd0..d42ce33449 100644
+> > --- a/util/scsi.c
+> > +++ b/util/scsi.c
+> > @@ -18,13 +18,11 @@
+> >  int scsi_sense_to_errno(int key, int asc, int ascq)
+> >  {
+> >      switch (key) {
+> > -    case 0x02: /* SCSI_SENSE_NOT_READY */
+> > -        return EBUSY;
+> > -    case 0x07: /* SCSI_SENSE_DATA_PROTECTION */
+> > -        return EACCES;
+> >      case 0x0b: /* SCSI_SENSE_COMMAND_ABORTED */
+> >          return ECANCELED;
+> > +    case 0x02: /* SCSI_SENSE_NOT_READY */
+> >      case 0x05: /* SCSI_SENSE_ILLEGAL_REQUEST */
+> > +    case 0x07: /* SCSI_SENSE_DATA_PROTECTION */
+> >          /* Parse ASCQ */
+> >          break;
+> >      default:
+> 
+> UNIT_ATTENTION should also be passed down to the guest without stopping
+> the VM.  Maybe map it to EAGAIN?
 
-Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
----
- Makefile                        |  14 +++--
- contrib/backup/qemu-backup.texi | 134 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 144 insertions(+), 4 deletions(-)
- create mode 100644 contrib/backup/qemu-backup.texi
+Or just 0?
 
-diff --git a/Makefile b/Makefile
-index 81447b1..ba1574d 100644
---- a/Makefile
-+++ b/Makefile
-@@ -209,6 +209,7 @@ ifdef BUILD_DOCS
- DOCS=qemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 qemu-nbd.8 qemu-ga.8
- DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7
- DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7
-+DOCS+=contrib/backup/qemu-backup.html contrib/backup/qemu-backup.txt
- ifdef CONFIG_VIRTFS
- DOCS+=fsdev/virtfs-proxy-helper.1
- endif
-@@ -508,6 +509,8 @@ VERSION ?= $(shell cat VERSION)
- 
- dist: qemu-$(VERSION).tar.bz2
- 
-+qemu-backup.8: contrib/backup/qemu-backup.texi
-+
- qemu-%.tar.bz2:
- 	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar.bz2,%,$@)"
- 
-@@ -719,16 +722,19 @@ fsdev/virtfs-proxy-helper.1: fsdev/virtfs-proxy-helper.texi
- qemu-nbd.8: qemu-nbd.texi qemu-option-trace.texi
- qemu-ga.8: qemu-ga.texi
- 
--html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
--info: qemu-doc.info docs/interop/qemu-qmp-ref.info docs/interop/qemu-ga-ref.info
--pdf: qemu-doc.pdf docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
--txt: qemu-doc.txt docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt
-+html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html contrib/backup/qemu-backup.html
-+info: qemu-doc.info docs/interop/qemu-qmp-ref.info docs/interop/qemu-ga-ref.info contrib/backup/qemu-backup.info
-+pdf: qemu-doc.pdf docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf contrib/backup/qemu-backup.pdf
-+txt: qemu-doc.txt docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt contrib/backup/qemu-backup.txt
- 
- qemu-doc.html qemu-doc.info qemu-doc.pdf qemu-doc.txt: \
- 	qemu-img.texi qemu-nbd.texi qemu-options.texi qemu-option-trace.texi \
- 	qemu-monitor.texi qemu-img-cmds.texi qemu-ga.texi \
- 	qemu-monitor-info.texi
- 
-+contrib/backup/qemu-backup.html contrib/backup/qemu-backup.pdf contrib/backup/qemu-backup.txt contrib/backup/qemu-backup.info: \
-+	contrib/backup/qemu-backup.texi
-+
- docs/interop/qemu-ga-ref.dvi docs/interop/qemu-ga-ref.html \
-     docs/interop/qemu-ga-ref.info docs/interop/qemu-ga-ref.pdf \
-     docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7: \
-diff --git a/contrib/backup/qemu-backup.texi b/contrib/backup/qemu-backup.texi
-new file mode 100644
-index 0000000..b3daf0d
---- /dev/null
-+++ b/contrib/backup/qemu-backup.texi
-@@ -0,0 +1,134 @@
-+\input texinfo
-+@setfilename qemu-backup
-+
-+@documentlanguage en
-+@documentencoding UTF-8
-+
-+@settitle QEMU Backup Tool
-+@copying
-+
-+Copyright @copyright{} 2017 The QEMU Project developers
-+@end copying
-+@ifinfo
-+@direntry
-+* QEMU: (QEMU-backup).    Man page for QEMU Backup Tool.
-+@end direntry
-+@end ifinfo
-+@iftex
-+@titlepage
-+@sp 7
-+@center @titlefont{QEMU Backup Tool}
-+@sp 1
-+@sp 3
-+@end titlepage
-+@end iftex
-+@ifnottex
-+@node Top
-+@top Short Sample
-+
-+@menu
-+* Name::
-+* Synopsis::
-+* List of Commands::
-+* Command Parameters::
-+* Command Descriptions::
-+* License::
-+@end menu
-+
-+@end ifnottex
-+
-+@node Name
-+@chapter Name
-+
-+QEMU disk backup tool.
-+
-+@node Synopsis
-+@chapter Synopsis
-+
-+qemu-backup command [command options].
-+
-+@node  List of Commands
-+@chapter  List of Commands
-+@itemize
-+@item qemu-backup guest add --guest guestname --qmp socketpath
-+@item qemu-backup guest list
-+@item qemu-backup drive add --id driveid --guest guestname --target target
-+@item qemu-backup drive add --all --guest guestname --target target
-+@item qemu-backup drive list --guest guestname
-+@item qemu-backup backup [--inc] --guest guestname
-+@item qemu-backup restore --guest guestname
-+@item qemu-backup guest remove --guest guestname
-+@item qemu-backup drive remove --guest guestname --id driveid
-+@end itemize
-+@node  Command Parameters
-+@chapter  Command Parameters
-+@itemize
-+@item --all: Add all the drives present in a guest which are suitable for backup.
-+@item --guest: Name of the guest.
-+@item --id: id of guest or drive.
-+@item --inc: (Optional) For incremental backup.
-+@item --qmp: Path of qmp socket.
-+@item --target: Destination path on which you want your backup to be made.
-+@end itemize
-+
-+@node  Command Descriptions
-+@chapter  Command Descriptions
-+@itemize
-+@item qemu-backup guest add --guest guestname --qmp socketpath
-+This command adds a guest to the configuration file given its path to qmp socket.
-+
-+example:
-+qemu-backup guest add --id=fedora --qmp=unix:/var/run/qemu/fedora.sock
-+
-+qemu-backup guest add --id=fedora --qmp=tcp:localhost:4444
-+
-+@item qemu-backup guest list
-+This commands lists the names of guests which are added to configuration file.
-+
-+@item qemu-backup drive add --guest guestname --id driveid --target target
-+This command adds different drives for backup in a particular guest by giving the name of drive to be backed up and target imagefile in which we want to store the drive backup.
-+
-+example: qemu-backup drive add --guest=fedora --id=root --target=/backup/root.img
-+
-+@item qemu-backup drive add --all --guest guestname --destination destination
-+This command adds all the drives of the guest for backup other than CDROM drive and read-only drives. Here all the backup drives will have the same names as original drives and target will be the destination folder.
-+
-+example: qemu-backup drive add --all --guest fedora --destination =/backup/fedora/
-+
-+@item qemu-backup drive list --guest guestname
-+This commands gives the names of the drive present in a guest which are added for backup.
-+
-+example: qemu-backup drive list --guest=fedora
-+
-+@item qemu-backup backup --guest guestname
-+
-+This command makes the backup of the drives, in their respective given destinations. The ids of drive and their destinations are taken from the configuration file.
-+
-+example: qemu-backup backup --guest=fedora
-+
-+@item qemu-backup restore --guest guestname
-+This command is needed if we want to restore the backup. It will list the commands to be run for performing the same but will not perform any action.
-+
-+example: qemu-backup restore --guest=fedora
-+
-+@item qemu-backup guest remove --guest guestname
-+This command removes the guest from the configuration file.
-+
-+example: qemu-backup guest remove --guest=fedora
-+
-+@item qemu-backup drive remove --guest guestname --id driveid
-+This command helps remove a drive which is set for backup in configuration of given host.
-+
-+example: drive remove --guest=fedora --id=root
-+
-+
-+@end itemize
-+
-+@node License
-+@appendix License
-+QEMU is a trademark of Fabrice Bellard.
-+QEMU is released under the
-+@url{https://www.gnu.org/licenses/gpl-2.0.txt,GNU General Public License},
-+version 2. Parts of QEMU have specific licenses, see file
-+@url{http://git.qemu.org/?p=qemu.git;a=blob_plain;f=LICENSE,LICENSE}.
-+@bye
--- 
-2.7.4
+> 
+> Looking at what Linux does:
+> 
+> - RECOVERED_ERROR should just return 0
+> 
+> - 0x0401 is "unit in the process of becoming ready", and it should also
+> be EAGAIN
+> 
+> - 0x0402 is "initializing command required", and probably can be fixed
+> by the guest by scsi-block but not by iscsi so it should be its own
+> errno, maybe ENOTCONN?  (iscsi might try sending START STOP UNIT
+> followed by a bunch of TEST UNIT READYs, see scsi_eh_try_stu in Linux's
+> drivers/scsi/scsi_error.c).
+
+These makes sense to me.
+
+Fam
