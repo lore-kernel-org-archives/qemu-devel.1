@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1djhLc-0000KZ-J9
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 03:42:10 -0400
+	(envelope-from <peterx@redhat.com>) id 1djhO7-0001NG-Fw
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 03:44:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1djhLW-0004Tr-5r
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 03:42:08 -0400
-Date: Mon, 21 Aug 2017 03:36:25 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <242295486.322283.1503300985716.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1503297029-28436-1-git-send-email-thuth@redhat.com>
-References: <1503297029-28436-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] hw/ppc/spapr: Fix segfault when
- instantiating a 'pc-dimm' without 'memdev'
+	(envelope-from <peterx@redhat.com>) id 1djhO5-0005AR-9I
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 03:44:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34950)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1djhO4-0005A8-Vx
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 03:44:41 -0400
+From: Peter Xu <peterx@redhat.com>
+Date: Mon, 21 Aug 2017 15:44:21 +0800
+Message-Id: <1503301464-27886-4-git-send-email-peterx@redhat.com>
+In-Reply-To: <1503301464-27886-1-git-send-email-peterx@redhat.com>
+References: <1503301464-27886-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [RFC 3/6] QAPI: new QMP command option "without-bql"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,251 +23,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, qemu-ppc@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
+Introducing this new parameter for QMP commands in general to mark out
+when the command does not need BQL.  Normally QMP command executions are
+done with the protection of BQL in QEMU.  However the truth is that not
+all the QMP commands require the BQL.
 
-Hello Thomas,
+This new parameter provides a way to allow QMP commands to run in
+parallel when possible, without the contention on the BQL.
 
-> 
-> QEMU currently crashes when trying to use a 'pc-dimm' on the pseries
-> machine without specifying its 'memdev' property. This happens because
-> pc_dimm_get_memory_region() does not check whether the 'memdev' property
-> has properly been set by the user. Looking closer at this function, it's
-> also obvious that it is using &error_abort to call another function - and
-> this is bad in a function that is used in the hot-plugging calling chain
-> since this can also cause QEMU to exit unexpectedly.
+Since the default value of "without-bql" is still false, so now all QMP
+commands are still protected by BQL still.
 
-In place of checking if 'memdev' is already allocated/present while fetching 
-'get_functions' every place. If 'memdev' is required for memory hotplug operation 
-can we just put a check at some common place and don't start or instantiate if 
-'memdev' is not present.
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ docs/devel/qapi-code-gen.txt | 10 +++++++++-
+ include/qapi/qmp/dispatch.h  |  1 +
+ qapi/qmp-dispatch.c          | 11 +++++++++++
+ scripts/qapi-commands.py     | 18 +++++++++++++-----
+ scripts/qapi-introspect.py   |  2 +-
+ scripts/qapi.py              | 15 ++++++++++-----
+ scripts/qapi2texi.py         |  2 +-
+ 7 files changed, 46 insertions(+), 13 deletions(-)
 
-I can see:
-
-'pc_dimm_realize' function checks for : in my case prints warning
-and avoid Qemu to start.
-...
-...
-if (!dimm->hostmem) {
-        error_setg(errp, "'" PC_DIMM_MEMDEV_PROP "' property is not set");
-        return;
-    } 
-...
-
-Thanks,
-Pankaj
-
-> 
-> So let's fix these issues in a proper way now: Add a "Error **errp"
-> parameter to pc_dimm_get_memory_region() which we use in case the 'memdev'
-> property has not been set by the user, and which we can use instead of
-> the &error_abort, and change the callers of get_memory_region() to make
-> use of this "errp" parameter for proper error checking.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/i386/pc.c             | 14 ++++++++++++--
->  hw/mem/nvdimm.c          |  2 +-
->  hw/mem/pc-dimm.c         | 14 +++++++++++---
->  hw/ppc/spapr.c           | 42 ++++++++++++++++++++++++++++++------------
->  include/hw/mem/pc-dimm.h |  2 +-
->  5 files changed, 55 insertions(+), 19 deletions(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 5943539..2108104 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1691,10 +1691,15 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
->      PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
->      PCDIMMDevice *dimm = PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr = ddc->get_memory_region(dimm);
-> +    MemoryRegion *mr;
->      uint64_t align = TARGET_PAGE_SIZE;
->      bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->  
-> +    mr = ddc->get_memory_region(dimm, &local_err);
-> +    if (local_err) {
-> +        goto out;
-> +    }
-> +
->      if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
->          align = memory_region_get_alignment(mr);
->      }
-> @@ -1758,10 +1763,15 @@ static void pc_dimm_unplug(HotplugHandler
-> *hotplug_dev,
->      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
->      PCDIMMDevice *dimm = PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr = ddc->get_memory_region(dimm);
-> +    MemoryRegion *mr;
->      HotplugHandlerClass *hhc;
->      Error *local_err = NULL;
->  
-> +    mr = ddc->get_memory_region(dimm, &local_err);
-> +    if (local_err) {
-> +        goto out;
-> +    }
-> +
->      hhc = HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
->      hhc->unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
->  
-> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-> index db896b0..952fce5 100644
-> --- a/hw/mem/nvdimm.c
-> +++ b/hw/mem/nvdimm.c
-> @@ -71,7 +71,7 @@ static void nvdimm_init(Object *obj)
->                          NULL, NULL);
->  }
->  
-> -static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm)
-> +static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error
-> **errp)
->  {
->      NVDIMMDevice *nvdimm = NVDIMM(dimm);
->  
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index ea67b46..bdf6649 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -363,7 +363,10 @@ static void pc_dimm_get_size(Object *obj, Visitor *v,
-> const char *name,
->      PCDIMMDevice *dimm = PC_DIMM(obj);
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(obj);
->  
-> -    mr = ddc->get_memory_region(dimm);
-> +    mr = ddc->get_memory_region(dimm, errp);
-> +    if (!mr) {
-> +        return;
-> +    }
->      value = memory_region_size(mr);
->  
->      visit_type_uint64(v, name, &value, errp);
-> @@ -411,9 +414,14 @@ static void pc_dimm_unrealize(DeviceState *dev, Error
-> **errp)
->      host_memory_backend_set_mapped(dimm->hostmem, false);
->  }
->  
-> -static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm)
-> +static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm, Error
-> **errp)
->  {
-> -    return host_memory_backend_get_memory(dimm->hostmem, &error_abort);
-> +    if (!dimm->hostmem) {
-> +        error_setg(errp, "'" PC_DIMM_MEMDEV_PROP "' property must be set");
-> +        return NULL;
-> +    }
-> +
-> +    return host_memory_backend_get_memory(dimm->hostmem, errp);
->  }
->  
->  static MemoryRegion *pc_dimm_get_vmstate_memory_region(PCDIMMDevice *dimm)
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index f7a1972..cec441c 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2772,10 +2772,15 @@ static void spapr_memory_plug(HotplugHandler
-> *hotplug_dev, DeviceState *dev,
->      sPAPRMachineState *ms = SPAPR_MACHINE(hotplug_dev);
->      PCDIMMDevice *dimm = PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr = ddc->get_memory_region(dimm);
-> -    uint64_t align = memory_region_get_alignment(mr);
-> -    uint64_t size = memory_region_size(mr);
-> -    uint64_t addr;
-> +    MemoryRegion *mr;
-> +    uint64_t align, size, addr;
-> +
-> +    mr = ddc->get_memory_region(dimm, &local_err);
-> +    if (local_err) {
-> +        goto out;
-> +    }
-> +    align = memory_region_get_alignment(mr);
-> +    size = memory_region_size(mr);
->  
->      pc_dimm_memory_plug(dev, &ms->hotplug_memory, mr, align, &local_err);
->      if (local_err) {
-> @@ -2808,10 +2813,16 @@ static void spapr_memory_pre_plug(HotplugHandler
-> *hotplug_dev, DeviceState *dev,
->  {
->      PCDIMMDevice *dimm = PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr = ddc->get_memory_region(dimm);
-> -    uint64_t size = memory_region_size(mr);
-> +    MemoryRegion *mr;
-> +    uint64_t size;
->      char *mem_dev;
->  
-> +    mr = ddc->get_memory_region(dimm, errp);
-> +    if (!mr) {
-> +        return;
-> +    }
-> +    size = memory_region_size(mr);
-> +
->      if (size % SPAPR_MEMORY_BLOCK_SIZE) {
->          error_setg(errp, "Hotplugged memory size must be a multiple of "
->                        "%lld MB", SPAPR_MEMORY_BLOCK_SIZE / M_BYTE);
-> @@ -2882,7 +2893,7 @@ static sPAPRDIMMState
-> *spapr_recover_pending_dimm_state(sPAPRMachineState *ms,
->  {
->      sPAPRDRConnector *drc;
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr = ddc->get_memory_region(dimm);
-> +    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
->      uint64_t size = memory_region_size(mr);
->      uint32_t nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
->      uint32_t avail_lmbs = 0;
-> @@ -2912,7 +2923,7 @@ void spapr_lmb_release(DeviceState *dev)
->      sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_hotplug_handler(dev));
->      PCDIMMDevice *dimm = PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr = ddc->get_memory_region(dimm);
-> +    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
->      sPAPRDIMMState *ds = spapr_pending_dimm_unplugs_find(spapr,
->      PC_DIMM(dev));
->  
->      /* This information will get lost if a migration occurs
-> @@ -2945,12 +2956,19 @@ static void
-> spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
->      Error *local_err = NULL;
->      PCDIMMDevice *dimm = PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr = ddc->get_memory_region(dimm);
-> -    uint64_t size = memory_region_size(mr);
-> -    uint32_t nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
-> -    uint64_t addr_start, addr;
-> +    MemoryRegion *mr;
-> +    uint32_t nr_lmbs;
-> +    uint64_t size, addr_start, addr;
->      int i;
->      sPAPRDRConnector *drc;
-> +
-> +    mr = ddc->get_memory_region(dimm, &local_err);
-> +    if (local_err) {
-> +        goto out;
-> +    }
-> +    size = memory_region_size(mr);
-> +    nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
-> +
->      addr_start = object_property_get_uint(OBJECT(dimm), PC_DIMM_ADDR_PROP,
->                                           &local_err);
->      if (local_err) {
-> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-> index 1e483f2..6f8c3eb 100644
-> --- a/include/hw/mem/pc-dimm.h
-> +++ b/include/hw/mem/pc-dimm.h
-> @@ -71,7 +71,7 @@ typedef struct PCDIMMDeviceClass {
->  
->      /* public */
->      void (*realize)(PCDIMMDevice *dimm, Error **errp);
-> -    MemoryRegion *(*get_memory_region)(PCDIMMDevice *dimm);
-> +    MemoryRegion *(*get_memory_region)(PCDIMMDevice *dimm, Error **errp);
->      MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm);
->  } PCDIMMDeviceClass;
->  
-> --
-> 1.8.3.1
-> 
-> 
-> 
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 9903ac4..4960d00 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -556,7 +556,8 @@ following example objects:
+ 
+ Usage: { 'command': STRING, '*data': COMPLEX-TYPE-NAME-OR-DICT,
+          '*returns': TYPE-NAME, '*boxed': true,
+-         '*gen': false, '*success-response': false }
++         '*gen': false, '*success-response': false,
++         '*without-bql': false }
+ 
+ Commands are defined by using a dictionary containing several members,
+ where three members are most common.  The 'command' member is a
+@@ -636,6 +637,13 @@ possible, the command expression should include the optional key
+ 'success-response' with boolean value false.  So far, only QGA makes
+ use of this member.
+ 
++Most of the commands require the Big QEMU Lock (BQL) be held during
++execution.  However, there is a small subset of the commands that may
++not really need BQL at all.  To mark out this kind of commands, we can
++specify "without-bql" to "true".  This parameter is only a hint for
++internal QMP implementation to provide possiblility to allow commands
++be run in parallel, or reduce the contention of the lock.  Users of QMP
++should not really be aware of such information.
+ 
+ === Events ===
+ 
+diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+index 20578dc..ec5c620 100644
+--- a/include/qapi/qmp/dispatch.h
++++ b/include/qapi/qmp/dispatch.h
+@@ -23,6 +23,7 @@ typedef enum QmpCommandOptions
+ {
+     QCO_NO_OPTIONS = 0x0,
+     QCO_NO_SUCCESS_RESP = 0x1,
++    QCO_WITHOUT_BQL = 0x2,
+ } QmpCommandOptions;
+ 
+ typedef struct QmpCommand
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index 3b6b224..b7fba5e 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -107,6 +107,17 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
+         QINCREF(args);
+     }
+ 
++    if (cmd->options & QCO_WITHOUT_BQL) {
++        /*
++         * If this command can live without BQL, then we don't take
++         * it.  One thing to mention: we may have already taken the
++         * BQL before reaching here.  If so, we just keep it.  So
++         * generally speaking we are trying our best on reducing the
++         * contention of BQL.
++         */
++        take_bql = false;
++    }
++
+     if (take_bql) {
+         qemu_mutex_lock_iothread();
+     }
+diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
+index 974d0a4..155a0a4 100644
+--- a/scripts/qapi-commands.py
++++ b/scripts/qapi-commands.py
+@@ -192,10 +192,17 @@ out:
+     return ret
+ 
+ 
+-def gen_register_command(name, success_response):
+-    options = 'QCO_NO_OPTIONS'
++def gen_register_command(name, success_response, without_bql):
++    options = []
++
+     if not success_response:
+-        options = 'QCO_NO_SUCCESS_RESP'
++        options += ['QCO_NO_SUCCESS_RESP']
++    if without_bql:
++        options += ['QCO_WITHOUT_BQL']
++
++    if not options:
++        options = ['QCO_NO_OPTIONS']
++    options = " | ".join(options)
+ 
+     ret = mcgen('''
+     qmp_register_command(cmds, "%(name)s",
+@@ -241,7 +248,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
+         self._visited_ret_types = None
+ 
+     def visit_command(self, name, info, arg_type, ret_type,
+-                      gen, success_response, boxed):
++                      gen, success_response, boxed, without_bql):
+         if not gen:
+             return
+         self.decl += gen_command_decl(name, arg_type, boxed, ret_type)
+@@ -250,7 +257,8 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
+             self.defn += gen_marshal_output(ret_type)
+         self.decl += gen_marshal_decl(name)
+         self.defn += gen_marshal(name, arg_type, boxed, ret_type)
+-        self._regy += gen_register_command(name, success_response)
++        self._regy += gen_register_command(name, success_response,
++                                           without_bql)
+ 
+ 
+ (input_file, output_dir, do_c, do_h, prefix, opts) = parse_command_line()
+diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
+index 032bcea..a523544 100644
+--- a/scripts/qapi-introspect.py
++++ b/scripts/qapi-introspect.py
+@@ -154,7 +154,7 @@ const char %(c_name)s[] = %(c_string)s;
+                                     for m in variants.variants]})
+ 
+     def visit_command(self, name, info, arg_type, ret_type,
+-                      gen, success_response, boxed):
++                      gen, success_response, boxed, without_bql):
+         arg_type = arg_type or self._schema.the_empty_object_type
+         ret_type = ret_type or self._schema.the_empty_object_type
+         self._gen_json(name, 'command',
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index 8aa2775..3951143 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -920,7 +920,8 @@ def check_exprs(exprs):
+         elif 'command' in expr:
+             meta = 'command'
+             check_keys(expr_elem, 'command', [],
+-                       ['data', 'returns', 'gen', 'success-response', 'boxed'])
++                       ['data', 'returns', 'gen', 'success-response',
++                        'boxed', 'without-bql'])
+         elif 'event' in expr:
+             meta = 'event'
+             check_keys(expr_elem, 'event', [], ['data', 'boxed'])
+@@ -1031,7 +1032,7 @@ class QAPISchemaVisitor(object):
+         pass
+ 
+     def visit_command(self, name, info, arg_type, ret_type,
+-                      gen, success_response, boxed):
++                      gen, success_response, boxed, without_bql):
+         pass
+ 
+     def visit_event(self, name, info, arg_type, boxed):
+@@ -1398,7 +1399,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
+ 
+ class QAPISchemaCommand(QAPISchemaEntity):
+     def __init__(self, name, info, doc, arg_type, ret_type,
+-                 gen, success_response, boxed):
++                 gen, success_response, boxed, without_bql):
+         QAPISchemaEntity.__init__(self, name, info, doc)
+         assert not arg_type or isinstance(arg_type, str)
+         assert not ret_type or isinstance(ret_type, str)
+@@ -1408,6 +1409,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
+         self.ret_type = None
+         self.gen = gen
+         self.success_response = success_response
++        self.without_bql = without_bql
+         self.boxed = boxed
+ 
+     def check(self, schema):
+@@ -1432,7 +1434,8 @@ class QAPISchemaCommand(QAPISchemaEntity):
+     def visit(self, visitor):
+         visitor.visit_command(self.name, self.info,
+                               self.arg_type, self.ret_type,
+-                              self.gen, self.success_response, self.boxed)
++                              self.gen, self.success_response,
++                              self.boxed, self.without_bql)
+ 
+ 
+ class QAPISchemaEvent(QAPISchemaEntity):
+@@ -1639,6 +1642,7 @@ class QAPISchema(object):
+         rets = expr.get('returns')
+         gen = expr.get('gen', True)
+         success_response = expr.get('success-response', True)
++        without_bql = expr.get('without-bql', False)
+         boxed = expr.get('boxed', False)
+         if isinstance(data, OrderedDict):
+             data = self._make_implicit_object_type(
+@@ -1647,7 +1651,8 @@ class QAPISchema(object):
+             assert len(rets) == 1
+             rets = self._make_array_type(rets[0], info)
+         self._def_entity(QAPISchemaCommand(name, info, doc, data, rets,
+-                                           gen, success_response, boxed))
++                                           gen, success_response,
++                                           boxed, without_bql))
+ 
+     def _def_event(self, expr, info, doc):
+         name = expr['event']
+diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+index a317526..659bd83 100755
+--- a/scripts/qapi2texi.py
++++ b/scripts/qapi2texi.py
+@@ -236,7 +236,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
+                              body=texi_entity(doc, 'Members'))
+ 
+     def visit_command(self, name, info, arg_type, ret_type,
+-                      gen, success_response, boxed):
++                      gen, success_response, boxed, without_bql):
+         doc = self.cur_doc
+         if self.out:
+             self.out += '\n'
+-- 
+2.7.4
