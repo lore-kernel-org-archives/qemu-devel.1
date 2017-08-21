@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1djwAV-0005uE-FA
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 19:31:40 -0400
+	(envelope-from <jsnow@redhat.com>) id 1djwCy-0007J5-GM
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 19:34:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1djwAU-0003t1-Ba
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 19:31:39 -0400
-References: <20170817091542.9403-1-pbutsykin@virtuozzo.com>
+	(envelope-from <jsnow@redhat.com>) id 1djwCx-000771-PX
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 19:34:12 -0400
+References: <20170710163029.129912-1-vsementsov@virtuozzo.com>
+	<20170710163029.129912-4-vsementsov@virtuozzo.com>
+	<20170711130650.GD2223@work-vm>
+	<2394bb38-de82-8621-eeae-14ffea68869b@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <9e6b08b2-6f01-3d35-2644-a86955770844@redhat.com>
-Date: Mon, 21 Aug 2017 19:31:29 -0400
+Message-ID: <b802048c-f5c0-efff-5550-6faed26023cd@redhat.com>
+Date: Mon, 21 Aug 2017 19:34:00 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170817091542.9403-1-pbutsykin@virtuozzo.com>
+In-Reply-To: <2394bb38-de82-8621-eeae-14ffea68869b@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 0/4] Add shrink image for qcow2
+Subject: Re: [Qemu-devel] [PATCH v7 03/16] migration: split common postcopy
+ out of ram postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,120 +27,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, famz@redhat.com, lirans@il.ibm.com, qemu-block@nongnu.org, quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, mreitz@redhat.com
 
 
 
-On 08/17/2017 05:15 AM, Pavel Butsykin wrote:
-> This patch add shrinking of the image file for qcow2. As a result, this allows
-> us to reduce the virtual image size and free up space on the disk without
-> copying the image. Image can be fragmented and shrink is done by punching holes
-> in the image file.
+On 07/11/2017 09:38 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 11.07.2017 16:06, Dr. David Alan Gilbert wrote:
+>> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+>>> Split common postcopy staff from ram postcopy staff.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> I'm OK with this; I'm not sure I'd have bothered making the ping's
+>> dependent on it being RAM.
+>>
+>> (These first few are pretty much a separable series).
 > 
-> # ./qemu-img create -f qcow2 image.qcow2 4G
-> Formatting 'image.qcow2', fmt=qcow2 size=4294967296 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-> 
-> # ./qemu-io -c "write -P 0x22 0 1G" image.qcow2
-> wrote 1073741824/1073741824 bytes at offset 0
-> 1 GiB, 1 ops; 0:00:04.59 (222.886 MiB/sec and 0.2177 ops/sec)
-> 
-> # ./qemu-img resize image.qcow2 512M
-> warning: qemu-img: Shrinking an image will delete all data beyond the shrunken image's end. Before performing such an operation, make sure there is no important data there.
-> error: qemu-img: Use the --shrink option to perform a shrink operation.
-> 
-> # ./qemu-img resize --shrink image.qcow2 128M
-> Image resized.
-> 
-> # ./qemu-img info image.qcow2
-> image: image.qcow2
-> file format: qcow2
-> virtual size: 128M (134217728 bytes)
-> disk size: 128M
-> cluster_size: 65536
-> Format specific information:
->     compat: 1.1
->     lazy refcounts: false
->     refcount bits: 16
->     corrupt: false
-> 
-> # du -h image.qcow2
-> 129M    image.qcow2
+> It would be grate if you (or Juan?) can take them separately.
 > 
 
-It looks sane to me, and already has a full set of R-Bs from Max. Are we
-waiting for Kevin?
-
-It looks like in Vladimir's series we sidestepped the problem of what
-happens if we resize with persistent bitmaps: we deny the operation,
-regardless of if we are shrinking, growing, or have bitmaps that are
-read-only, frozen, or what-have-you.
-
-It shouldn't be too hard to add soon, but this is fine for now.
-(I think for adding it we just need to make sure the bitmaps aren't
-frozen and are not read-only, and the implementation bitmap structure
-can already handle truncation in either direction just fine.)
-
-Anyway;
-
-Reviewed-by: John Snow <jsnow@redhat.com>
-
-
-> Changes from v1:
-> - add --shrink flag for qemu-img resize
-> - add qcow2_cache_discard
-> - simplify qcow2_shrink_l1_table() to reduce the likelihood of image corruption
-> - add new qemu-iotests for shrinking images
-> 
-> Changes from v2:
-> - replace qprintf() on error_report() (1)
-> - rewrite warning messages (1)
-> - enforce --shrink flag for all formats except raw (1)
-> - split qcow2_cache_discard() (2)
-> - minor fixes according to comments (3)
-> - rewrite the last part of qcow2_shrink_reftable() to avoid
->   qcow2_free_clusters() calls inside (3)
-> - improve test for shrinking image (4)
-> 
-> Changes from v3:
-> - rebase on "Implement a warning_report function" Alistair's patch-set (1)
-> - spelling fixes (1)
-> - the man page fix according to the discussion (1)
-> - add call qcow2_signal_corruption() in case of image corruption (3)
-> 
-> Changes from v4:
-> - rebase on https://github.com/XanClic/qemu/commits/block Max's block branch
-> 
-> Changes from v5:
-> - the condition refcount == 0 should be enough to evict the l2/refcount cluster
->   from the cache (2)
-> - overwrite the l1/refcount table in memory with zeros, even if overwriting the
->   l1/refcount table on disk has failed (3)
-> - replace g_try_malloc() on g_malloc() for allocation reftable_tmp (3)
-> 
-> Changes from v6:
-> - rebase on master 1f29673387
-> 
-> Pavel Butsykin (4):
->   qemu-img: add --shrink flag for resize
->   qcow2: add qcow2_cache_discard
->   qcow2: add shrink image support
->   qemu-iotests: add shrinking image test
-> 
->  block/qcow2-cache.c        |  26 +++++++
->  block/qcow2-cluster.c      |  50 +++++++++++++
->  block/qcow2-refcount.c     | 140 ++++++++++++++++++++++++++++++++++++-
->  block/qcow2.c              |  43 +++++++++---
->  block/qcow2.h              |  17 +++++
->  qapi/block-core.json       |   3 +-
->  qemu-img-cmds.hx           |   4 +-
->  qemu-img.c                 |  23 ++++++
->  qemu-img.texi              |   6 +-
->  tests/qemu-iotests/102     |   4 +-
->  tests/qemu-iotests/163     | 170 +++++++++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/163.out |   5 ++
->  tests/qemu-iotests/group   |   1 +
->  13 files changed, 475 insertions(+), 17 deletions(-)
->  create mode 100644 tests/qemu-iotests/163
->  create mode 100644 tests/qemu-iotests/163.out
-> 
+Yes please. I don't think this ever happened, did it? Can we split off
+1-3 and re-roll?
