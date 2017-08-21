@@ -1,22 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1djk8N-0002Rf-PT
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:40:42 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1djkI7-0005T4-HD
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:50:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1djk8K-00009c-AX
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:40:39 -0400
-Date: Mon, 21 Aug 2017 20:40:07 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170821104006.GL12356@umbus.fritz.box>
-References: <cover.1503249785.git.balaton@eik.bme.hu>
-	<158c09e2f3e7930786edcc49bcd9b19b9f92bfa5.1503249785.git.balaton@eik.bme.hu>
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1djkI3-0000xb-0d
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:50:43 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57344)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+	id 1djkI2-0000tV-Nr
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:50:38 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7LAiIxT072844
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 06:50:36 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cft983r9e-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 06:50:36 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
+	Mon, 21 Aug 2017 04:50:35 -0600
+References: <150287457293.9760.17827532208744487789.stgit@aravinda>
+	<150287476880.9760.9354459130009292681.stgit@aravinda>
+	<20170817015951.GE5509@umbus.fritz.box>
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Date: Mon, 21 Aug 2017 16:20:25 +0530
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="rVkomL2febZOZtGQ"
-Content-Disposition: inline
-In-Reply-To: <158c09e2f3e7930786edcc49bcd9b19b9f92bfa5.1503249785.git.balaton@eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH 02/15] ppc4xx: Make MAL emulation more
- generic
+In-Reply-To: <20170817015951.GE5509@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Message-Id: <0f641a28-cb9e-7458-8fcb-c9b373f861c2@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] ppc: spapr: Enable FWNMI capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,337 +42,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru, mahesh@linux.vnet.ibm.com, benh@au1.ibm.com, paulus@samba.org, sam.bobroff@au1.ibm.com
 
 
---rVkomL2febZOZtGQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Sun, Aug 20, 2017 at 07:23:05PM +0200, BALATON Zoltan wrote:
-> Allow MAL with more RX and TX channels as found in newer versions.
->=20
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+On Thursday 17 August 2017 07:29 AM, David Gibson wrote:
+> On Wed, Aug 16, 2017 at 02:42:48PM +0530, Aravinda Prasad wrote:
+>> Enable the KVM capability KVM_CAP_PPC_FWNMI so that
+>> the KVM causes guest exit with NMI as exit reason
+>> when it encounters a machine check exception on the
+>> address belonging to a guest. Without this capability
+>> enabled, KVM redirects machine check exceptions to
+>> guest's 0x200 vector.
+>>
+>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+>> ---
+>>  hw/ppc/spapr_rtas.c |   17 +++++++++++++++++
+>>  target/ppc/kvm.c    |    2 ++
+>>  2 files changed, 19 insertions(+)
+>>
+>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+>> index 2f3c47b..c2a361a 100644
+>> --- a/hw/ppc/spapr_rtas.c
+>> +++ b/hw/ppc/spapr_rtas.c
+>> @@ -47,6 +47,8 @@
+>>  #include "trace.h"
+>>  #include "hw/ppc/fdt.h"
+>>  
+>> +extern int cap_fwnmi;
+> 
+> Ew.  as the style checker will tell you, bare externs in .c files are
+> frowned upon.  And the cap_* variables xertainly shouldn't be exported
+> from kvm.c.
 
-I've applied patches 1 & 2 to my ppc-for-2.11 tree.
+Noted.
 
-> ---
->  hw/ppc/ppc405_uc.c      |   2 +-
->  hw/ppc/ppc4xx_devs.c    | 171 +++++++++++++++++++-----------------------=
-------
->  include/hw/ppc/ppc4xx.h |   3 +-
->  3 files changed, 70 insertions(+), 106 deletions(-)
->=20
-> diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
-> index 3c74402..03856d5 100644
-> --- a/hw/ppc/ppc405_uc.c
-> +++ b/hw/ppc/ppc405_uc.c
-> @@ -2281,7 +2281,7 @@ CPUPPCState *ppc405ep_init(MemoryRegion *address_sp=
-ace_mem,
->      mal_irqs[1] =3D pic[12];
->      mal_irqs[2] =3D pic[13];
->      mal_irqs[3] =3D pic[14];
-> -    ppc405_mal_init(env, mal_irqs);
-> +    ppc4xx_mal_init(env, 4, 2, mal_irqs);
->      /* Ethernet */
->      /* Uses pic[9], pic[15], pic[17] */
->      /* CPU control */
-> diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
-> index 8e4f78e..6e1cc09 100644
-> --- a/hw/ppc/ppc4xx_devs.c
-> +++ b/hw/ppc/ppc4xx_devs.c
-> @@ -737,6 +737,7 @@ ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, i=
-nt nr_banks,
-> =20
->  /***********************************************************************=
-******/
->  /* MAL */
-> +
->  enum {
->      MAL0_CFG      =3D 0x180,
->      MAL0_ESR      =3D 0x181,
-> @@ -750,17 +751,13 @@ enum {
->      MAL0_RXEOBISR =3D 0x192,
->      MAL0_RXDEIR   =3D 0x193,
->      MAL0_TXCTP0R  =3D 0x1A0,
-> -    MAL0_TXCTP1R  =3D 0x1A1,
-> -    MAL0_TXCTP2R  =3D 0x1A2,
-> -    MAL0_TXCTP3R  =3D 0x1A3,
->      MAL0_RXCTP0R  =3D 0x1C0,
-> -    MAL0_RXCTP1R  =3D 0x1C1,
->      MAL0_RCBS0    =3D 0x1E0,
->      MAL0_RCBS1    =3D 0x1E1,
->  };
-> =20
-> -typedef struct ppc40x_mal_t ppc40x_mal_t;
-> -struct ppc40x_mal_t {
-> +typedef struct ppc4xx_mal_t ppc4xx_mal_t;
-> +struct ppc4xx_mal_t {
->      qemu_irq irqs[4];
->      uint32_t cfg;
->      uint32_t esr;
-> @@ -773,16 +770,32 @@ struct ppc40x_mal_t {
->      uint32_t rxcarr;
->      uint32_t rxeobisr;
->      uint32_t rxdeir;
-> -    uint32_t txctpr[4];
-> -    uint32_t rxctpr[2];
-> -    uint32_t rcbs[2];
-> +    uint32_t *txctpr;
-> +    uint32_t *rxctpr;
-> +    uint32_t *rcbs;
-> +    uint8_t  txcnum;
-> +    uint8_t  rxcnum;
->  };
-> =20
-> -static void ppc40x_mal_reset(void *opaque);
-> +static void ppc4xx_mal_reset(void *opaque)
-> +{
-> +    ppc4xx_mal_t *mal;
-> +
-> +    mal =3D opaque;
-> +    mal->cfg =3D 0x0007C000;
-> +    mal->esr =3D 0x00000000;
-> +    mal->ier =3D 0x00000000;
-> +    mal->rxcasr =3D 0x00000000;
-> +    mal->rxdeir =3D 0x00000000;
-> +    mal->rxeobisr =3D 0x00000000;
-> +    mal->txcasr =3D 0x00000000;
-> +    mal->txdeir =3D 0x00000000;
-> +    mal->txeobisr =3D 0x00000000;
-> +}
-> =20
->  static uint32_t dcr_read_mal(void *opaque, int dcrn)
->  {
-> -    ppc40x_mal_t *mal;
-> +    ppc4xx_mal_t *mal;
->      uint32_t ret;
-> =20
->      mal =3D opaque;
-> @@ -820,48 +833,32 @@ static uint32_t dcr_read_mal(void *opaque, int dcrn)
->      case MAL0_RXDEIR:
->          ret =3D mal->rxdeir;
->          break;
-> -    case MAL0_TXCTP0R:
-> -        ret =3D mal->txctpr[0];
-> -        break;
-> -    case MAL0_TXCTP1R:
-> -        ret =3D mal->txctpr[1];
-> -        break;
-> -    case MAL0_TXCTP2R:
-> -        ret =3D mal->txctpr[2];
-> -        break;
-> -    case MAL0_TXCTP3R:
-> -        ret =3D mal->txctpr[3];
-> -        break;
-> -    case MAL0_RXCTP0R:
-> -        ret =3D mal->rxctpr[0];
-> -        break;
-> -    case MAL0_RXCTP1R:
-> -        ret =3D mal->rxctpr[1];
-> -        break;
-> -    case MAL0_RCBS0:
-> -        ret =3D mal->rcbs[0];
-> -        break;
-> -    case MAL0_RCBS1:
-> -        ret =3D mal->rcbs[1];
-> -        break;
->      default:
->          ret =3D 0;
->          break;
->      }
-> +    if (dcrn >=3D MAL0_TXCTP0R && dcrn < MAL0_TXCTP0R + mal->txcnum) {
-> +        ret =3D mal->txctpr[dcrn - MAL0_TXCTP0R];
-> +    }
-> +    if (dcrn >=3D MAL0_RXCTP0R && dcrn < MAL0_RXCTP0R + mal->rxcnum) {
-> +        ret =3D mal->rxctpr[dcrn - MAL0_RXCTP0R];
-> +    }
-> +    if (dcrn >=3D MAL0_RCBS0 && dcrn < MAL0_RCBS0 + mal->rxcnum) {
-> +        ret =3D mal->rcbs[dcrn - MAL0_RCBS0];
-> +    }
-> =20
->      return ret;
->  }
-> =20
->  static void dcr_write_mal(void *opaque, int dcrn, uint32_t val)
->  {
-> -    ppc40x_mal_t *mal;
-> -    int idx;
-> +    ppc4xx_mal_t *mal;
-> =20
->      mal =3D opaque;
->      switch (dcrn) {
->      case MAL0_CFG:
->          if (val & 0x80000000) {
-> -            ppc40x_mal_reset(mal);
-> +            ppc4xx_mal_reset(mal);
->          }
->          mal->cfg =3D val & 0x00FFC087;
->          break;
-> @@ -900,65 +897,35 @@ static void dcr_write_mal(void *opaque, int dcrn, u=
-int32_t val)
->          /* Read/clear */
->          mal->rxdeir &=3D ~val;
->          break;
-> -    case MAL0_TXCTP0R:
-> -        idx =3D 0;
-> -        goto update_tx_ptr;
-> -    case MAL0_TXCTP1R:
-> -        idx =3D 1;
-> -        goto update_tx_ptr;
-> -    case MAL0_TXCTP2R:
-> -        idx =3D 2;
-> -        goto update_tx_ptr;
-> -    case MAL0_TXCTP3R:
-> -        idx =3D 3;
-> -    update_tx_ptr:
-> -        mal->txctpr[idx] =3D val;
-> -        break;
-> -    case MAL0_RXCTP0R:
-> -        idx =3D 0;
-> -        goto update_rx_ptr;
-> -    case MAL0_RXCTP1R:
-> -        idx =3D 1;
-> -    update_rx_ptr:
-> -        mal->rxctpr[idx] =3D val;
-> -        break;
-> -    case MAL0_RCBS0:
-> -        idx =3D 0;
-> -        goto update_rx_size;
-> -    case MAL0_RCBS1:
-> -        idx =3D 1;
-> -    update_rx_size:
-> -        mal->rcbs[idx] =3D val & 0x000000FF;
-> -        break;
-> +    }
-> +    if (dcrn >=3D MAL0_TXCTP0R && dcrn < MAL0_TXCTP0R + mal->txcnum) {
-> +        mal->txctpr[dcrn - MAL0_TXCTP0R] =3D val;
-> +    }
-> +    if (dcrn >=3D MAL0_RXCTP0R && dcrn < MAL0_RXCTP0R + mal->rxcnum) {
-> +        mal->rxctpr[dcrn - MAL0_RXCTP0R] =3D val;
-> +    }
-> +    if (dcrn >=3D MAL0_RCBS0 && dcrn < MAL0_RCBS0 + mal->rxcnum) {
-> +        mal->rcbs[dcrn - MAL0_RCBS0] =3D val & 0x000000FF;
->      }
->  }
-> =20
-> -static void ppc40x_mal_reset(void *opaque)
-> -{
-> -    ppc40x_mal_t *mal;
-> -
-> -    mal =3D opaque;
-> -    mal->cfg =3D 0x0007C000;
-> -    mal->esr =3D 0x00000000;
-> -    mal->ier =3D 0x00000000;
-> -    mal->rxcasr =3D 0x00000000;
-> -    mal->rxdeir =3D 0x00000000;
-> -    mal->rxeobisr =3D 0x00000000;
-> -    mal->txcasr =3D 0x00000000;
-> -    mal->txdeir =3D 0x00000000;
-> -    mal->txeobisr =3D 0x00000000;
-> -}
-> -
-> -void ppc405_mal_init(CPUPPCState *env, qemu_irq irqs[4])
-> +void ppc4xx_mal_init(CPUPPCState *env, uint8_t txcnum, uint8_t rxcnum,
-> +                     qemu_irq irqs[4])
->  {
-> -    ppc40x_mal_t *mal;
-> +    ppc4xx_mal_t *mal;
->      int i;
-> =20
-> -    mal =3D g_malloc0(sizeof(ppc40x_mal_t));
-> +    assert(txcnum <=3D 32 && rxcnum <=3D 32);
-> +    mal =3D g_malloc0(sizeof(*mal));
-> +    mal->txcnum =3D txcnum;
-> +    mal->rxcnum =3D rxcnum;
-> +    mal->txctpr =3D g_new0(uint32_t, txcnum);
-> +    mal->rxctpr =3D g_new0(uint32_t, rxcnum);
-> +    mal->rcbs =3D g_new0(uint32_t, rxcnum);
->      for (i =3D 0; i < 4; i++) {
->          mal->irqs[i] =3D irqs[i];
->      }
-> -    qemu_register_reset(&ppc40x_mal_reset, mal);
-> +    qemu_register_reset(&ppc4xx_mal_reset, mal);
->      ppc_dcr_register(env, MAL0_CFG,
->                       mal, &dcr_read_mal, &dcr_write_mal);
->      ppc_dcr_register(env, MAL0_ESR,
-> @@ -981,20 +948,16 @@ void ppc405_mal_init(CPUPPCState *env, qemu_irq irq=
-s[4])
->                       mal, &dcr_read_mal, &dcr_write_mal);
->      ppc_dcr_register(env, MAL0_RXDEIR,
->                       mal, &dcr_read_mal, &dcr_write_mal);
-> -    ppc_dcr_register(env, MAL0_TXCTP0R,
-> -                     mal, &dcr_read_mal, &dcr_write_mal);
-> -    ppc_dcr_register(env, MAL0_TXCTP1R,
-> -                     mal, &dcr_read_mal, &dcr_write_mal);
-> -    ppc_dcr_register(env, MAL0_TXCTP2R,
-> -                     mal, &dcr_read_mal, &dcr_write_mal);
-> -    ppc_dcr_register(env, MAL0_TXCTP3R,
-> -                     mal, &dcr_read_mal, &dcr_write_mal);
-> -    ppc_dcr_register(env, MAL0_RXCTP0R,
-> -                     mal, &dcr_read_mal, &dcr_write_mal);
-> -    ppc_dcr_register(env, MAL0_RXCTP1R,
-> -                     mal, &dcr_read_mal, &dcr_write_mal);
-> -    ppc_dcr_register(env, MAL0_RCBS0,
-> -                     mal, &dcr_read_mal, &dcr_write_mal);
-> -    ppc_dcr_register(env, MAL0_RCBS1,
-> -                     mal, &dcr_read_mal, &dcr_write_mal);
-> +    for (i =3D 0; i < txcnum; i++) {
-> +        ppc_dcr_register(env, MAL0_TXCTP0R + i,
-> +                         mal, &dcr_read_mal, &dcr_write_mal);
-> +    }
-> +    for (i =3D 0; i < rxcnum; i++) {
-> +        ppc_dcr_register(env, MAL0_RXCTP0R + i,
-> +                         mal, &dcr_read_mal, &dcr_write_mal);
-> +    }
-> +    for (i =3D 0; i < rxcnum; i++) {
-> +        ppc_dcr_register(env, MAL0_RCBS0 + i,
-> +                         mal, &dcr_read_mal, &dcr_write_mal);
-> +    }
->  }
-> diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
-> index db50cfa..cb0bb55 100644
-> --- a/include/hw/ppc/ppc4xx.h
-> +++ b/include/hw/ppc/ppc4xx.h
-> @@ -53,7 +53,8 @@ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq irq,=
- int nbanks,
->                          hwaddr *ram_sizes,
->                          int do_init);
-> =20
-> -void ppc405_mal_init(CPUPPCState *env, qemu_irq irqs[4]);
-> +void ppc4xx_mal_init(CPUPPCState *env, uint8_t txcnum, uint8_t rxcnum,
-> +                     qemu_irq irqs[4]);
-> =20
->  #define TYPE_PPC4xx_PCI_HOST_BRIDGE "ppc4xx-pcihost"
-> =20
+> 
+>>  static void rtas_display_character(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+>>                                     uint32_t token, uint32_t nargs,
+>>                                     target_ulong args,
+>> @@ -354,7 +356,22 @@ static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
+>>                                    target_ulong args,
+>>                                    uint32_t nret, target_ulong rets)
+>>  {
+>> +    int ret;
+>> +    CPUState *cs = CPU(cpu);
+>> +
+>> +    if (!cap_fwnmi) {
+>> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
+>> +        return;
+>> +    }
+>> +
+>>      spapr->guest_machine_check_addr = rtas_ld(args, 1);
+>> +
+>> +    ret = kvm_vcpu_enable_cap(cs, KVM_CAP_PPC_FWNMI, 0);
+>> +    if (ret < 0) {
+>> +        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+>> +        return;
+>> +    }
+>> +
+> 
+> Congratulations, you broke build on an x86 host.  Things that directly
+> call KVM need to go in kvm.c with suitable stubs for non-kvm builds.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Sure.
 
---rVkomL2febZOZtGQ
-Content-Type: application/pgp-signature; name="signature.asc"
+Regards,
+Aravinda
 
------BEGIN PGP SIGNATURE-----
+> 
+>>      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>>  }
+>>  
+>> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+>> index 73f64ed..ca1ffa6 100644
+>> --- a/target/ppc/kvm.c
+>> +++ b/target/ppc/kvm.c
+>> @@ -90,6 +90,7 @@ static int cap_htm;             /* Hardware transactional memory support */
+>>  static int cap_mmu_radix;
+>>  static int cap_mmu_hash_v3;
+>>  static int cap_resize_hpt;
+>> +int cap_fwnmi;
+>>  
+>>  static uint32_t debug_inst_opcode;
+>>  
+>> @@ -147,6 +148,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>>      cap_mmu_radix = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
+>>      cap_mmu_hash_v3 = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
+>>      cap_resize_hpt = kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HPT);
+>> +    cap_fwnmi = kvm_check_extension(s, KVM_CAP_PPC_FWNMI);
+>>  
+>>      if (!cap_interrupt_level) {
+>>          fprintf(stderr, "KVM: Couldn't find level irq capability. Expect the "
+>>
+> 
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmauIQACgkQbDjKyiDZ
-s5JN6A//RpOYNzzHqreSkgkPd2nEPiJaqtWUH6tFobXpe+Shu2VKt0BQ3pSpp/x1
-+Fqf8SGAwdGwZy/bwuhmRqi/fQIlRwRI7IznX8fz3C9X31OKqm6LmRF7Xj5CAqgT
-1D8XZDNLGpgK95ggOqqGIlbHej2Erci3Xn5F5YPhDtCyw9Xh2LKF5bCzHOY54WQZ
-BYAnU4vGpLd5Jy+AwSQd4yLRv2oYVRTJEqDu/po/qkFSda65hcx2DTqi87NSj005
-a+jSYBnxdaBzJ384BDOh5GVMi3UFkIKUgaX1RK/k0B2reDgxIgK/nKZbl1GzX+3q
-vMsiQOb3cQTzpXLt+irJsEogHS3NsxKpeBNQJU+96wwVj83nt8eC5p3Tvp69L393
-+uKUOsg8RELJ0EJrixfkrDGMObLah2KHMu984KBmBqETD5qRF5WDb/fENA7H/heo
-oBLzQunGFm8ZtBJpMw//l6C+/kyjVb9kP6TXZDodLYurcZOUvUeOE+mX0SfnpTil
-ssMMsW0mSX8RXb3i9HSRusXtUcHD0D6wfVggvYApT6YEsMrpXpH33cGBAmj5Slo3
-az10gF34yvHv8m0e0NdLSPe6ohKP42LotfpqlaL1cl+2UvyefPx5DY39UR2FqKHg
-sbdGDogRC6zVlVvRO96MqRGAFnrFrHDJ/BwqQaVM2smxUVhLSw4=
-=nNoI
------END PGP SIGNATURE-----
-
---rVkomL2febZOZtGQ--
+-- 
+Regards,
+Aravinda
