@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1djtKT-0007z8-6x
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 16:29:46 -0400
+	(envelope-from <mst@redhat.com>) id 1djtMz-0001Ij-42
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 16:32:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1djtKO-0004Ax-9b
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 16:29:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42948)
+	(envelope-from <mst@redhat.com>) id 1djtMu-0006Iz-7b
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 16:32:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45664)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1djtKO-00048E-3v
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 16:29:40 -0400
-Date: Mon, 21 Aug 2017 13:29:36 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <d11787d1-dc57-1f22-86cc-9da639fd28af@intel.com>
-Message-ID: <alpine.DEB.2.10.1708211327330.12143@sstabellini-ThinkPad-X260>
-References: <1502311882-11038-1-git-send-email-tianyu.lan@intel.com>
-	<1502311882-11038-3-git-send-email-tianyu.lan@intel.com>
-	<20170811180438.GI1519@perard.uk.xensource.com>
-	<d11787d1-dc57-1f22-86cc-9da639fd28af@intel.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1djtMu-0006GV-1L
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 16:32:16 -0400
+Date: Mon, 21 Aug 2017 23:22:17 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170821232052-mutt-send-email-mst@kernel.org>
+References: <1502940416-42944-1-git-send-email-wei.w.wang@intel.com>
+	<1502940416-42944-4-git-send-email-wei.w.wang@intel.com>
+	<20170818051451-mutt-send-email-mst@kernel.org>
+	<599699AF.1090705@intel.com>
 MIME-Version: 1.0
-Content-ID: <alpine.DEB.2.10.1708211327480.12143@sstabellini-ThinkPad-X260>
-Content-Type: TEXT/PLAIN; CHARSET=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V2 2/3] xen-pt: bind/unbind interrupt
- remapping format MSI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <599699AF.1090705@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v14 3/5] virtio-balloon: VIRTIO_BALLOON_F_SG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lan Tianyu <tianyu.lan@intel.com>
-Cc: Anthony PERARD <anthony.perard@citrix.com>, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Chao Gao <chao.gao@intel.com>, sstabellini@kernel.org, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, marcel@redhat.com, kevin.tian@intel.com
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-On Tue, 15 Aug 2017, Lan Tianyu wrote:
-> Hi Anthony:
->=20
-> On 2017=E5=B9=B408=E6=9C=8812=E6=97=A5 02:04, Anthony PERARD wrote:
-> > On Wed, Aug 09, 2017 at 04:51:21PM -0400, Lan Tianyu wrote:
-> >> From: Chao Gao <chao.gao@intel.com>
-> >>
-> >> If a vIOMMU is exposed to guest, guest will configure the msi to rem=
-apping
-> >> format. The original code isn't suitable to the new format. A new pa=
-ir
-> >> bind/unbind interfaces are added for this usage. This patch recogniz=
-es
-> >> this case and uses new interfaces to bind/unbind msi.
-> >>
-> >> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> >> Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
-> >=20
-> > Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
-> >=20
-> > That patch series can be applied once the Xen side patches are merged=
-.
-> >=20
->=20
-> Great. Thanks for your review.
+On Fri, Aug 18, 2017 at 03:39:27PM +0800, Wei Wang wrote:
+> On 08/18/2017 10:22 AM, Michael S. Tsirkin wrote:
+> > +static void send_balloon_page_sg(struct virtio_balloon *vb,
+> > +				 struct virtqueue *vq,
+> > +				 void *addr,
+> > +				 uint32_t size)
+> > +{
+> > +	unsigned int len;
+> > +	int ret;
+> > +
+> > +	do {
+> > +		ret = add_one_sg(vq, addr, size);
+> > +		virtqueue_kick(vq);
+> > +		wait_event(vb->acked, virtqueue_get_buf(vq, &len));
+> > +		/*
+> > +		 * It is uncommon to see the vq is full, because the sg is sent
+> > +		 * one by one and the device is able to handle it in time. But
+> > +		 * if that happens, we go back to retry after an entry gets
+> > +		 * released.
+> > +		 */
+> > Why send one by one though? Why not batch some s/gs and wait for all
+> > of them to be completed? If memory if fragmented, waiting every time is
+> > worse than what we have now (VIRTIO_BALLOON_ARRAY_PFNS_MAX at a time).
+> > 
+> 
+> OK, I'll do batching in some fashion.
+> 
+> 
+> Best,
+> Wei
+> 
+> 
 
-Lan,
+btw you need to address the build errors that kbot has found.
 
-Could you please add a reference to the Xen side patch series in the
-description of this patch? That way, it is easier to check what is the
-dependecy. In fact, it would be even better to add a reference to the
-commit id, once the patches are committed to xen.git.
-
-Thanks,
-
-Stefano
+-- 
+MST
