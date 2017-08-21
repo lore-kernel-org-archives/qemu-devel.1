@@ -1,24 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1djj3T-0004Zx-6W
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:31:32 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1djj5s-0005mT-6u
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:34:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1djj3O-0000AC-Ak
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:31:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60288)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1djj3O-00009B-4c
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:31:26 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170818222313.13391-1-eblake@redhat.com>
-Date: Mon, 21 Aug 2017 11:31:18 +0200
-In-Reply-To: <20170818222313.13391-1-eblake@redhat.com> (Eric Blake's message
-	of "Fri, 18 Aug 2017 17:23:13 -0500")
-Message-ID: <874lt16zdl.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC PATCH] osdep.h: Prohibit disabling assert()
- in supported builds
+	(envelope-from <el13635@mail.ntua.gr>) id 1djj5r-0001Dt-D6
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:34:00 -0400
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Date: Mon, 21 Aug 2017 12:31:44 +0300
+Message-Id: <20170821093150.6783-1-el13635@mail.ntua.gr>
+Subject: [Qemu-devel] [PATCH v6 0/6] add throttle block driver filter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +17,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, f4bug@amsat.org
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Eric Blake <eblake@redhat.com> writes:
+This series adds a throttle block driver filter. Currently throttling is done
+at the BlockBackend level. Using block driver interfaces we can move the
+throttling to any point in the BDS graph using a throttle node which uses the
+existing throttling code. This allows for potentially more complex
+configurations (throttling at any point in the graph, chained filters)
 
-> We already have several files that knowingly require assert()
-> to work.  While we do NOT want to encourage the use of
-> 'assert(side-effects)' (that is a bad practice that prevents
-> copy-and-paste of code to other projects that CAN disable
-> assertions; plus it costs unnecessary reviewer mental cycles
-> to remember our project policy on crippling asserts), we DO
-> want to send a message that anyone that disables assertions
-> has to tweak code in order to compile, making it obvious that
-> we are not going to support their efforts.
->
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->
-> First mentioned as an idea here:
-> http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg06084.html
-> but I'm titling this RFC as I'm not 100% convinced we want to make
-> it a project-wide, rather than a per-file decision.
+v6:
+  don't allow named group limit configuration in block/throttle.c; allow either
+        -drive driver=throttle,file.filename=foo.qcow2, \
+            limits.iops-total=...
+      or
+        -drive driver=throttle,file.filename=foo.qcow2,throttle-group=bar
+  fixes suggested by berto
 
-I'm fine with project-wide, but does it have to be a hard error?  Can we
-make it a warning?  Same effect by default, but it lets people
-experiment more easily with --disable-werror.
+v5:
+  fix crash in 'add aio_context field in ThrottleGroupMember'
+  fix suggestions in block/throttle.c
+
+v4:
+  fix suggestions in block/throttle.c
+  fix suggestions in block/throttle_groups.c
+  add doc note in BlockDevOptionsThrottle
+
+v3:
+  fix style error in 'add aio_context field in ThrottleGroupMember'
+
+v2:
+  change QOM throttle group object name
+  print valid ranges for uint on error
+  move frees in throttle_group_obj_finalize()
+  split throttle_group_{set,get}()
+  add throttle_recurse_is_first_non_filter()
+
+Manos Pitsidianakis (6):
+  block: move ThrottleGroup membership to ThrottleGroupMember
+  block: add aio_context field in ThrottleGroupMember
+  block: tidy ThrottleGroupMember initializations
+  block: convert ThrottleGroup to object with QOM
+  block: add throttle block filter driver
+  qemu-iotests: add 184 for throttle filter driver
+
+ qapi/block-core.json            |  70 +++-
+ include/block/throttle-groups.h |  47 ++-
+ include/qapi/qmp/qdict.h        |   1 +
+ include/qemu/throttle-options.h |  60 ++--
+ include/qemu/throttle.h         |   3 +
+ include/sysemu/block-backend.h  |  20 +-
+ block/block-backend.c           |  62 ++--
+ block/qapi.c                    |   8 +-
+ block/throttle-groups.c         | 734 +++++++++++++++++++++++++++++-----------
+ block/throttle.c                | 332 ++++++++++++++++++
+ blockdev.c                      |   4 +-
+ qobject/qdict.c                 |   2 +-
+ tests/test-throttle.c           | 111 +++---
+ util/throttle.c                 | 151 +++++++++
+ block/Makefile.objs             |   1 +
+ tests/qemu-iotests/184          | 244 +++++++++++++
+ tests/qemu-iotests/184.out      | 339 +++++++++++++++++++
+ tests/qemu-iotests/group        |   1 +
+ 18 files changed, 1868 insertions(+), 322 deletions(-)
+ create mode 100644 block/throttle.c
+ create mode 100755 tests/qemu-iotests/184
+ create mode 100644 tests/qemu-iotests/184.out
+
+-- 
+2.11.0
