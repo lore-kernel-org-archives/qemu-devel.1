@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1djkoL-0002GV-Pf
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:24:07 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1djkul-00059P-4a
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:30:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1djkoI-0004bg-GV
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:24:01 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:44614
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1djkoI-0004ao-4c
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:23:58 -0400
-References: <1502847935-20483-1-git-send-email-douly.fnst@cn.fujitsu.com>
-	<9e5b10ce-6259-a21b-01dc-13f57d28a0ef@cn.fujitsu.com>
-	<20170818164852.GZ3108@localhost.localdomain>
-	<e67b5c35-5077-2603-f0ca-6abcade205db@cn.fujitsu.com>
-	<20170821105708.4391e201@nial.brq.redhat.com>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <6d8a9fae-fce8-c739-3e23-293cd201b91f@cn.fujitsu.com>
-Date: Mon, 21 Aug 2017 19:23:35 +0800
+	(envelope-from <pbonzini@redhat.com>) id 1djkuk-0007rg-70
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:30:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41726)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1djkuj-0007qk-Pq
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 07:30:37 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B7F0737EE9
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 11:30:34 +0000 (UTC)
+References: <20170818141512.15205-1-famz@redhat.com>
+	<20170818141512.15205-3-famz@redhat.com>
+	<060c28df-bc84-01da-9c7b-2b47221f5311@redhat.com>
+	<20170821111108.GB4371@lemon>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1e943c21-9382-2df7-053e-7de9310d4197@redhat.com>
+Date: Mon, 21 Aug 2017 13:30:29 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170821105708.4391e201@nial.brq.redhat.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+In-Reply-To: <20170821111108.GB4371@lemon>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] hw/acpi-build: Fix SRAT memory building
- when there is no memory in node0
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] scsi: Enhance scsi_sense_to_errno
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +36,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, mst@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Hi, Igor
-
-[...]
+On 21/08/2017 13:11, Fam Zheng wrote:
+> On Fri, 08/18 16:36, Paolo Bonzini wrote:
+>> On 18/08/2017 16:15, Fam Zheng wrote:
+>>> Two changes:
+>>>
+>>> 1) Look at asc/ascq for NOT_READY and DATA_PROTECT;
+>>> 2) Translate SPACE_ALLOC_FAILED as ENOSPC;
+>>>
+>>> Signed-off-by: Fam Zheng <famz@redhat.com>
+>>> ---
+>>>  util/scsi.c | 7 +++----
+>>>  1 file changed, 3 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/util/scsi.c b/util/scsi.c
+>>> index 92ca436cd0..d42ce33449 100644
+>>> --- a/util/scsi.c
+>>> +++ b/util/scsi.c
+>>> @@ -18,13 +18,11 @@
+>>>  int scsi_sense_to_errno(int key, int asc, int ascq)
+>>>  {
+>>>      switch (key) {
+>>> -    case 0x02: /* SCSI_SENSE_NOT_READY */
+>>> -        return EBUSY;
+>>> -    case 0x07: /* SCSI_SENSE_DATA_PROTECTION */
+>>> -        return EACCES;
+>>>      case 0x0b: /* SCSI_SENSE_COMMAND_ABORTED */
+>>>          return ECANCELED;
+>>> +    case 0x02: /* SCSI_SENSE_NOT_READY */
+>>>      case 0x05: /* SCSI_SENSE_ILLEGAL_REQUEST */
+>>> +    case 0x07: /* SCSI_SENSE_DATA_PROTECTION */
+>>>          /* Parse ASCQ */
+>>>          break;
+>>>      default:
 >>
->> Ok, I will do it right now.
->
-> see commit 6b9c1dd2c for example of adding test case,
-> currently test has base SRAT tables that is reused by all tests.
-> When you create testcase that produces different SRAT table,
-> 'make check' will print warnings that ables do not match
-> you can add "V=1" env. var. 'make V=1 check' to get detailed
-> diff of what's changed.
->
-> also see how 'test_data.variant' is handled to get idea how to use
-> it to differentiate specific test case vs shared ACPI tables baseline blobs.
->
+>> UNIT_ATTENTION should also be passed down to the guest without stopping
+>> the VM.  Maybe map it to EAGAIN?
+> 
+> Or just 0?
 
-Thanks for teaching me that, it's very helpful to me.
+That works too, it depends on how you define 0.  1h is defined as
+informational only and can be dropped, 0x0401 or UNIT_ATTENTION
+definitely cannot.
 
-Except for adding a new case, can we except memhp testcase with
-node RAM check? just like following shows:
+Paolo
 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 564da45..c79ece4 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -788,7 +788,7 @@ static void test_acpi_q35_tcg_memhp(void)
-      data.machine = MACHINE_Q35;
-      data.variant = ".memhp";
-      test_acpi_one(" -m 128,slots=3,maxmem=1G"
--                  " -numa node -numa node"
-+                  " -numa node -numa node,mem=128"
-                    " -numa dist,src=0,dst=1,val=21",
-                    &data);
-      free_test_data(&data);
-@@ -802,7 +802,7 @@ static void test_acpi_piix4_tcg_memhp(void)
-      data.machine = MACHINE_PC;
-      data.variant = ".memhp";
-      test_acpi_one(" -m 128,slots=3,maxmem=1G"
--                  " -numa node -numa node"
-+                  " -numa node -numa node,mem=128"
-                    " -numa dist,src=0,dst=1,val=21",
-                    &data);
-      free_test_data(&data);
-
-
-Thanks,
-	dou.
+>>
+>> Looking at what Linux does:
+>>
+>> - RECOVERED_ERROR should just return 0
+>>
+>> - 0x0401 is "unit in the process of becoming ready", and it should also
+>> be EAGAIN
+>>
+>> - 0x0402 is "initializing command required", and probably can be fixed
+>> by the guest by scsi-block but not by iscsi so it should be its own
+>> errno, maybe ENOTCONN?  (iscsi might try sending START STOP UNIT
+>> followed by a bunch of TEST UNIT READYs, see scsi_eh_try_stu in Linux's
+>> drivers/scsi/scsi_error.c).
+> 
+> These makes sense to me.
+> 
+> Fam
+> 
