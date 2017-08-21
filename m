@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mhocko@kernel.org>) id 1djfyq-0005O2-NF
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 02:14:33 -0400
+	(envelope-from <mhocko@kernel.org>) id 1djg2X-0006OX-P1
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 02:18:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mhocko@kernel.org>) id 1djfyn-0000sw-Hg
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 02:14:32 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47053 helo=mx1.suse.de)
+	(envelope-from <mhocko@kernel.org>) id 1djg2S-0004QS-Ru
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 02:18:21 -0400
+Received: from mx2.suse.de ([195.135.220.15]:47158 helo=mx1.suse.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mhocko@kernel.org>) id 1djfyn-0000sn-An
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 02:14:29 -0400
-Date: Mon, 21 Aug 2017 08:14:23 +0200
+	(Exim 4.71) (envelope-from <mhocko@kernel.org>) id 1djg2S-0004PQ-JM
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 02:18:16 -0400
+Date: Mon, 21 Aug 2017 08:18:12 +0200
 From: Michal Hocko <mhocko@kernel.org>
-Message-ID: <20170821061421.GA13724@dhcp22.suse.cz>
+Message-ID: <20170821061812.GB13724@dhcp22.suse.cz>
 References: <1502940416-42944-1-git-send-email-wei.w.wang@intel.com>
 	<1502940416-42944-5-git-send-email-wei.w.wang@intel.com>
-	<20170818134650.GC18499@dhcp22.suse.cz>
-	<599A79DF.2000707@intel.com>
+	<20170818201946-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <599A79DF.2000707@intel.com>
+In-Reply-To: <20170818201946-mutt-send-email-mst@kernel.org>
 Subject: Re: [Qemu-devel] [PATCH v14 4/5] mm: support reporting free page
  blocks
 List-Id: <qemu-devel.nongnu.org>
@@ -30,51 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Wei Wang <wei.w.wang@intel.com>, virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-On Mon 21-08-17 14:12:47, Wei Wang wrote:
-> On 08/18/2017 09:46 PM, Michal Hocko wrote:
+On Fri 18-08-17 20:23:05, Michael S. Tsirkin wrote:
+> On Thu, Aug 17, 2017 at 11:26:55AM +0800, Wei Wang wrote:
 [...]
-> >>+/**
-> >>+ * walk_free_mem_block - Walk through the free page blocks in the system
-> >>+ * @opaque1: the context passed from the caller
-> >>+ * @min_order: the minimum order of free lists to check
-> >>+ * @visit: the callback function given by the caller
-> >The original suggestion for using visit was motivated by a visit design
-> >pattern but I can see how this can be confusing. Maybe a more explicit
-> >name wold be better. What about report_free_range.
+> > +void walk_free_mem_block(void *opaque1,
+> > +			 unsigned int min_order,
+> > +			 void (*visit)(void *opaque2,
 > 
+> You can just avoid opaque2 completely I think, then opaque1 can
+> be renamed opaque.
 > 
-> I'm afraid that name would be too long to fit in nicely.
-> How about simply naming it "report"?
+> > +				       unsigned long pfn,
+> > +				       unsigned long nr_pages))
+> > +{
+> > +	struct zone *zone;
+> > +	struct page *page;
+> > +	struct list_head *list;
+> > +	unsigned int order;
+> > +	enum migratetype mt;
+> > +	unsigned long pfn, flags;
+> > +
+> > +	for_each_populated_zone(zone) {
+> > +		for (order = MAX_ORDER - 1;
+> > +		     order < MAX_ORDER && order >= min_order; order--) {
+> > +			for (mt = 0; mt < MIGRATE_TYPES; mt++) {
+> > +				spin_lock_irqsave(&zone->lock, flags);
+> > +				list = &zone->free_area[order].free_list[mt];
+> > +				list_for_each_entry(page, list, lru) {
+> > +					pfn = page_to_pfn(page);
+> > +					visit(opaque1, pfn, 1 << order);
+> 
+> My only concern here is inability of callback to
+> 1. break out of list
+> 2. remove page from the list
 
-I do not have a strong opinion on this. I wouldn't be afraid of using
-slightly longer name here for the clarity sake, though.
- 
-> >>+ *
-> >>+ * The function is used to walk through the free page blocks in the system,
-> >>+ * and each free page block is reported to the caller via the @visit callback.
-> >>+ * Please note:
-> >>+ * 1) The function is used to report hints of free pages, so the caller should
-> >>+ * not use those reported pages after the callback returns.
-> >>+ * 2) The callback is invoked with the zone->lock being held, so it should not
-> >>+ * block and should finish as soon as possible.
-> >I think that the explicit note about zone->lock is not really need. This
-> >can change in future and I would even bet that somebody might rely on
-> >the lock being held for some purpose and silently get broken with the
-> >change. Instead I would much rather see something like the following:
-> >"
-> >Please note that there are no locking guarantees for the callback
-> 
-> Just a little confused with this one:
-> 
-> The callback is invoked within zone->lock, why would we claim it "no
-> locking guarantees for the callback"?
+As I've said before this has to be a read only API. You cannot simply
+fiddle with the page allocator internals under its feet.
 
-Because we definitely do not want anybody to rely on that fact and
-(ab)use it. This might change in future and it would be better to be
-clear about that.
+> So I would make the callback bool, and I would use
+> list_for_each_entry_safe.
+
+If a bool would tell to break out of the loop then I agree. This sounds
+useful.
 -- 
 Michal Hocko
 SUSE Labs
