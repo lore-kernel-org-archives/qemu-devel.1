@@ -1,39 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1djkI7-0005T4-HD
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:50:44 -0400
+	(envelope-from <david@redhat.com>) id 1djkIE-0005Wi-H6
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:50:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1djkI3-0000xb-0d
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:50:43 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57344)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
-	id 1djkI2-0000tV-Nr
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:50:38 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7LAiIxT072844
-	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 06:50:36 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cft983r9e-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 06:50:36 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
-	Mon, 21 Aug 2017 04:50:35 -0600
-References: <150287457293.9760.17827532208744487789.stgit@aravinda>
-	<150287476880.9760.9354459130009292681.stgit@aravinda>
-	<20170817015951.GE5509@umbus.fritz.box>
-From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Date: Mon, 21 Aug 2017 16:20:25 +0530
+	(envelope-from <david@redhat.com>) id 1djkI9-0001EU-JA
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:50:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41708)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1djkI9-00017s-C7
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 06:50:45 -0400
+References: <20170818114353.13455-1-david@redhat.com>
+	<20170818114353.13455-8-david@redhat.com>
+	<65be761f-752a-d63c-8654-d333bfb4bd08@redhat.com>
+	<2b685ad1-fc58-e68d-51ee-32128b5b1555@redhat.com>
+	<20170821115258.4f94ff12.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <05bd1704-d270-c7d2-3cce-11360472d9ff@redhat.com>
+Date: Mon, 21 Aug 2017 12:50:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170817015951.GE5509@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20170821115258.4f94ff12.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <0f641a28-cb9e-7458-8fcb-c9b373f861c2@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] ppc: spapr: Enable FWNMI capability
+Subject: Re: [Qemu-devel] [PATCH v3 for-2.11 07/18] s390x: drop inclusion of
+ sysemu/kvm.h from some files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,102 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru, mahesh@linux.vnet.ibm.com, benh@au1.ibm.com, paulus@samba.org, sam.bobroff@au1.ibm.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, rth@twiddle.net, Aurelien Jarno <aurelien@aurel32.net>, borntraeger@de.ibm.com, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-
-
-On Thursday 17 August 2017 07:29 AM, David Gibson wrote:
-> On Wed, Aug 16, 2017 at 02:42:48PM +0530, Aravinda Prasad wrote:
->> Enable the KVM capability KVM_CAP_PPC_FWNMI so that
->> the KVM causes guest exit with NMI as exit reason
->> when it encounters a machine check exception on the
->> address belonging to a guest. Without this capability
->> enabled, KVM redirects machine check exceptions to
->> guest's 0x200 vector.
+On 21.08.2017 11:52, Cornelia Huck wrote:
+> On Fri, 18 Aug 2017 19:28:34 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> On 18.08.2017 18:08, Thomas Huth wrote:
+>>> On 18.08.2017 13:43, David Hildenbrand wrote:  
+>>>> s390-stattrib.c needs definition of TARGET_PAGE_SIZE, solve it via cpu.h.  
+>>>
+>>> Why not simply #include "exec/cpu-all.h" ? If cpu.h is not really needed
+>>> here...
+>>>
+>>>  Thomas
+>>>
+>>>   
 >>
->> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
->> ---
->>  hw/ppc/spapr_rtas.c |   17 +++++++++++++++++
->>  target/ppc/kvm.c    |    2 ++
->>  2 files changed, 19 insertions(+)
->>
->> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
->> index 2f3c47b..c2a361a 100644
->> --- a/hw/ppc/spapr_rtas.c
->> +++ b/hw/ppc/spapr_rtas.c
->> @@ -47,6 +47,8 @@
->>  #include "trace.h"
->>  #include "hw/ppc/fdt.h"
->>  
->> +extern int cap_fwnmi;
+>> Git grep showed me that this is a very rare thing to do, so I went for
+>> cpu.h. If you prefer cpu-all.h, I can use that.
 > 
-> Ew.  as the style checker will tell you, bare externs in .c files are
-> frowned upon.  And the cap_* variables xertainly shouldn't be exported
-> from kvm.c.
-
-Noted.
-
+> Is there any target that does not include cpu-all.h in its cpu.h? We
+> probably can remove all includes of cpu-all.h in .c files, as all of
+> them include cpu.h as well...
 > 
->>  static void rtas_display_character(PowerPCCPU *cpu, sPAPRMachineState *spapr,
->>                                     uint32_t token, uint32_t nargs,
->>                                     target_ulong args,
->> @@ -354,7 +356,22 @@ static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
->>                                    target_ulong args,
->>                                    uint32_t nret, target_ulong rets)
->>  {
->> +    int ret;
->> +    CPUState *cs = CPU(cpu);
->> +
->> +    if (!cap_fwnmi) {
->> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
->> +        return;
->> +    }
->> +
->>      spapr->guest_machine_check_addr = rtas_ld(args, 1);
->> +
->> +    ret = kvm_vcpu_enable_cap(cs, KVM_CAP_PPC_FWNMI, 0);
->> +    if (ret < 0) {
->> +        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
->> +        return;
->> +    }
->> +
-> 
-> Congratulations, you broke build on an x86 host.  Things that directly
-> call KVM need to go in kvm.c with suitable stubs for non-kvm builds.
 
-Sure.
+I guess they have to, otherwise this stuff will not compile.
 
-Regards,
-Aravinda
-
-> 
->>      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->>  }
->>  
->> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
->> index 73f64ed..ca1ffa6 100644
->> --- a/target/ppc/kvm.c
->> +++ b/target/ppc/kvm.c
->> @@ -90,6 +90,7 @@ static int cap_htm;             /* Hardware transactional memory support */
->>  static int cap_mmu_radix;
->>  static int cap_mmu_hash_v3;
->>  static int cap_resize_hpt;
->> +int cap_fwnmi;
->>  
->>  static uint32_t debug_inst_opcode;
->>  
->> @@ -147,6 +148,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->>      cap_mmu_radix = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
->>      cap_mmu_hash_v3 = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
->>      cap_resize_hpt = kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HPT);
->> +    cap_fwnmi = kvm_check_extension(s, KVM_CAP_PPC_FWNMI);
->>  
->>      if (!cap_interrupt_level) {
->>          fprintf(stderr, "KVM: Couldn't find level irq capability. Expect the "
->>
-> 
+Yes, we should be able to remove exec/cpu-all.h from both remaining
+users, dump.c and exec.c, as they already include cpu.h as you also noticed.
 
 -- 
-Regards,
-Aravinda
+
+Thanks,
+
+David
