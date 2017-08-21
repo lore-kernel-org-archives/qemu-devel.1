@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1djhdU-0001xB-Ev
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:00:42 -0400
+	(envelope-from <bounces@canonical.com>) id 1djhdX-0001zS-9L
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:00:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1djhdQ-00045T-81
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:00:36 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52275)
+	(envelope-from <bounces@canonical.com>) id 1djhdR-00045x-92
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:00:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52289)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1djhdQ-00045H-2H
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:00:32 -0400
+	id 1djhdR-00045l-3E
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:00:33 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1djhdP-0000vm-3w
-	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 08:00:31 +0000
+	id 1djhdQ-0000w8-4q
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 08:00:32 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 18B7E2E80C7
-	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 08:00:31 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 20E202E80C9
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 08:00:32 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 21 Aug 2017 07:47:51 -0000
+Date: Mon, 21 Aug 2017 07:48:39 -0000
 From: Thomas Huth <1054180@bugs.launchpad.net>
 Reply-To: Bug 1054180 <1054180@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20120921161324.22633.34633.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150330167165.17444.7297182278064985891.malone@gac.canonical.com>
+Message-Id: <150330171918.11273.2779287120959028186.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1054180] Re: DNS activity in slirp (user
  networking) mode quickly depletes file descriptors and crashes qemu
@@ -39,12 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Triaging old bug tickets ... can you still reproduce this problem with
-the latest version of QEMU (currently v2.9 or a release candidate of
-2.10)?
-
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Also could you please provide the exact command line that you use to
+start QEMU?
 
 -- =
 
