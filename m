@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1djhR6-0003vA-Gf
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 03:47:49 -0400
+	(envelope-from <peterx@redhat.com>) id 1djhVS-0006SQ-5s
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 03:52:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1djhR2-0007IG-KG
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 03:47:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40962)
+	(envelope-from <peterx@redhat.com>) id 1djhVO-0001BU-9k
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 03:52:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47856)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1djhR2-0007Hw-Dk
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 03:47:44 -0400
-Date: Mon, 21 Aug 2017 15:47:44 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1djhVO-0001BE-1O
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 03:52:14 -0400
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170821074744.GA30356@pxdev.xzpeter.org>
-References: <1501229198-30588-1-git-send-email-peterx@redhat.com>
-	<20170803155753.GD3673@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170803155753.GD3673@work-vm>
-Subject: Re: [Qemu-devel] [RFC 00/29] Migration: postcopy failure recovery
+Date: Mon, 21 Aug 2017 15:44:18 +0800
+Message-Id: <1503301464-27886-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [RFC 0/6] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +21,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, berrange@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, Aug 03, 2017 at 04:57:54PM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > As we all know that postcopy migration has a potential risk to lost
-> > the VM if the network is broken during the migration. This series
-> > tries to solve the problem by allowing the migration to pause at the
-> > failure point, and do recovery after the link is reconnected.
-> > 
-> > There was existing work on this issue from Md Haris Iqbal:
-> > 
-> > https://lists.nongnu.org/archive/html/qemu-devel/2016-08/msg03468.html
-> > 
-> > This series is a totally re-work of the issue, based on Alexey
-> > Perevalov's recved bitmap v8 series:
-> > 
-> > https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg06401.html
-> 
-> 
-> Hi Peter,
->   See my comments on the individual patches; but at a top level I think
-> it looks pretty good.
-> 
->   I still worry about two related things, one I see is similar to what
-> you discussed with Dan.
-> 
->   1) Is what happens if we end up hanging on a missing page with the bql
->   taken and can't use the monitor.
->   Checking my notes from when I was chatting to Harris last year,
->     'info cpu' was pretty good at doing this because it needed the vcpus
->   to come out of their loops, so if any vcpu was blocked on memory we'd
->   block waiting.  The other case is where an emulated IO device accesses
->   it, and that's easiest by doing a migrate with inbound network
->   traffic.
->   In this case, will your 'accept' still work?
+This is an extended work for migration postcopy recovery. This series
+is tested with the following series to make sure it solves the monitor
+hang problem that we have encountered for postcopy recovery:
 
-It will not work.
+  [RFC 00/29] Migration: postcopy failure recovery
+  [RFC 0/6] migration: re-use migrate_incoming for postcopy recovery
 
-To solve this problem, I posted the series:
+The root problem is that, monitor commands are all handled in main
+loop thread now, no matter how many monitors we specify. And, if main
+loop thread hangs due to some reason, all monitors will be stuck.
+This can be done in reversed order as well: if any of the monitor
+hangs, it will hang the main loop, and the rest of the monitors (if
+there is any).
 
-  [RFC 0/6] monitor: allow per-monitor thread
+That affects postcopy recovery, since the recovery requires user input
+on destination side.  If monitors hang, the destination VM dies and
+lose hope for even a final recovery.
 
-Let's see whether that is acceptable.
+So, sometimes we need to make sure the monitor be alive, at least one
+of them.
 
-> 
->   2) Similar to Dan's question of what happens if the network just hangs
->   as opposed to gives an error;  it should eventually sort itself out
->   with TCP timeouts - eventually.  Perhaps the easiest way to test this
->   is just to add a iptables -j DROP  for the migration port - it's
->   probably easier to trigger (1).
+The whole idea of this series is that instead if handling monitor
+commands all in main loop thread, we do it separately in per-monitor
+threads.  Then, even if main loop thread hangs at any point by any
+reason, per-monitor thread can still survive.  Further, we add hint in
+QMP/HMP to show whether a command can be executed without QMP, if so,
+we avoid taking BQL when running that command.  It greatly reduced
+contention of BQL.  Now the only user of that new parameter (currently
+I call it "without-bql") is "migrate-incoming" command, which is the
+only command to rescue a paused postcopy migration.
 
-Yeah, so I think I'll just avoid considering this for now.  Thanks,
+However, even with the series, it does not mean that per-monitor
+threads will never hang.  One example is that we can still run "info
+vcpus" in per-monitor threads during a paused postcopy (in that state,
+page faults are never handled, and "info cpus" will never return since
+it tries to sync every vcpus).  So to make sure it does not hang, we
+not only need the per-monitor thread, the user should be careful as
+well on how to use it.
+
+For postcopy recovery, we may need dedicated monitor channel for
+recovery.  In other words, a destination VM that supports postcopy
+recovery would possibly need:
+
+  -qmp MAIN_CHANNEL -qmp RECOVERY_CHANNEL
+
+Here, the MAIN_CHANNEL can be MUXed and shared by other chardev
+frontends, while the RECOVERY_CHANNEL should *ONLY* be used to input
+the "migrate-incoming" command (similar thing applies to HMP
+channels).  As long as we are following this rule, the
+RECOVERY_CHANNEL can never hang.
+
+Some details on each patch:
+
+Patch 1: a simple cleanup only
+
+Patch 2: allow monitors to create per-monitor thread to handle monitor
+         command requests. Since monitor is only one type of chardev
+         frontend, we only do this if the backend is dedicated, say,
+         if MUX is not turned on (if MUX is on, it's still using main
+         loop thread).
+
+Patch 3: based on patch 2, this patch introduced a new parameter for
+         QMP commands called "without-bql", it is a hint that the
+         command does not need BQL.
+
+Patch 4: Let QMP command "migrate-incoming" avoid taking BQL.
+
+Patch 5: Introduced sister parameter for HMP "without_bql", which
+         works just like QMP "without-bql".
+
+Patch 6: Let HMP command "migrate-incoming" avoid taking BQL.
+
+Please review. Thanks,
+
+Peter Xu (6):
+  monitor: move skip_flush into monitor_data_init
+  monitor: allow monitor to create thread to poll
+  QAPI: new QMP command option "without-bql"
+  migration: qmp: migrate_incoming don't need BQL
+  hmp: support "without_bql"
+  migration: hmp: migrate_incoming don't need BQL
+
+ docs/devel/qapi-code-gen.txt | 10 +++++-
+ hmp-commands.hx              |  1 +
+ include/qapi/qmp/dispatch.h  |  1 +
+ monitor.c                    | 79 ++++++++++++++++++++++++++++++++++++++++----
+ qapi-schema.json             |  3 +-
+ qapi/qmp-dispatch.c          | 26 +++++++++++++++
+ scripts/qapi-commands.py     | 18 +++++++---
+ scripts/qapi-introspect.py   |  2 +-
+ scripts/qapi.py              | 15 ++++++---
+ scripts/qapi2texi.py         |  2 +-
+ 10 files changed, 137 insertions(+), 20 deletions(-)
 
 -- 
-Peter Xu
+2.7.4
