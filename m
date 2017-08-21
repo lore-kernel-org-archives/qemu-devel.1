@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1djdo6-0006Tg-Bd
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 23:55:19 -0400
+	(envelope-from <bounces@canonical.com>) id 1djeM8-0003KA-4I
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 00:30:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1djdo3-0000Xp-A4
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 23:55:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40902)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1djdo3-0000XP-3t
-	for qemu-devel@nongnu.org; Sun, 20 Aug 2017 23:55:15 -0400
-References: <1500449399-19107-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<e41d36bc-ed32-8d0d-7fff-bf68fb78707c@cn.fujitsu.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <f00fdc9a-6f9a-bae2-78a0-9d1124ca9640@redhat.com>
-Date: Mon, 21 Aug 2017 11:55:07 +0800
+	(envelope-from <bounces@canonical.com>) id 1djeM3-0001tI-Jx
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 00:30:26 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59809)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1djeM3-0001qk-Dz
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 00:30:23 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1djeM2-00045P-Ck
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 04:30:22 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3D5E42E80C3
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 04:30:22 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <e41d36bc-ed32-8d0d-7fff-bf68fb78707c@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V3 0/4] Optimize COLO-compare performance
+Date: Mon, 21 Aug 2017 04:17:39 -0000
+From: Launchpad Bug Tracker <1042654@bugs.launchpad.net>
+Reply-To: Bug 1042654 <1042654@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120828092908.6948.63420.malonedeb@gac.canonical.com>
+Message-Id: <150328906008.1320.7017183091437925030.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1042654] Re: Floppy disks and network not working
+ on NT 3.1 on Qemu 1.2 rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +37,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
 
+[Expired for QEMU because there has been no activity for 60 days.]
 
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-On 2017=E5=B9=B408=E6=9C=8821=E6=97=A5 09:45, Zhang Chen wrote:
-> Hi~~ All~
->
-> No one review this series for a long time.
->
-> Ping...
->
->
+-- =
 
-Looks ok to me. But I don't like patch 1 since it adds more TODO=20
-especially for a non-exist function colo_notify_checkpoint().
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1042654
 
-I tend to have it after colo_notify_checkpoint() is implemented or merged=
-.
+Title:
+  Floppy disks and network not working on NT 3.1 on Qemu 1.2 rc1
 
-Thanks
+Status in QEMU:
+  Expired
+
+Bug description:
+  When I try to put Floppy IMG/IMA/VFD images on NT 3.1 when it is running =
+on Qemu 1.2 rc, they are not recognized and the network is not working even=
+ though I set it correctly (especially the AMD PCnet adapter)
+  Here's some screenshot of the floppy error:
+  http://i49.tinypic.com/j77wcw.png
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1042654/+subscriptions
