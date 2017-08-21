@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1djipG-0001Pv-HD
+	(envelope-from <cohuck@redhat.com>) id 1djipG-0001Px-HY
 	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:16:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1djipF-0006Uf-B5
+	(envelope-from <cohuck@redhat.com>) id 1djipD-0006Tu-Bu
 	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:16:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:15954)
+Received: from mx1.redhat.com ([209.132.183.28]:51038)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1djipF-0006UP-1z
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:16:49 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1djipD-0006Ti-5w
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:16:47 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Mon, 21 Aug 2017 11:16:12 +0200
-Message-Id: <20170821091614.28251-9-cohuck@redhat.com>
+Date: Mon, 21 Aug 2017 11:16:11 +0200
+Message-Id: <20170821091614.28251-8-cohuck@redhat.com>
 In-Reply-To: <20170821091614.28251-1-cohuck@redhat.com>
 References: <20170821091614.28251-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 08/10] s390x/pci: fence off instructions for
- non-pci
+Subject: [Qemu-devel] [PATCH v4 07/10] s390x/sclp: properly guard
+ pci-specific functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,124 +27,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
 
-If a guest running on a machine without zpci issues a pci instruction,
-throw them an exception.
+If we do not provide zpci, pci reconfiguration via sclp is not available
+either. Don't indicate it in the sclp facilities and return an invalid
+command if the guest tries to issue pci configure/deconfigure.
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/kvm.c | 54 +++++++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 41 insertions(+), 13 deletions(-)
+ hw/s390x/sclp.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index bc62bba5b7..9de165d8b1 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -1191,7 +1191,11 @@ static int kvm_clp_service_call(S390CPU *cpu, struct kvm_run *run)
- {
-     uint8_t r2 = (run->s390_sieic.ipb & 0x000f0000) >> 16;
+diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+index 9253dbbc64..d0104cd784 100644
+--- a/hw/s390x/sclp.c
++++ b/hw/s390x/sclp.c
+@@ -59,6 +59,7 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+     int rnsize, rnmax;
+     int slots = MIN(machine->ram_slots, s390_get_memslot_count(kvm_state));
+     IplParameterBlock *ipib = s390_ipl_get_iplb();
++    uint64_t sclp_facilities = SCLP_HAS_CPU_INFO;
  
--    return clp_service_call(cpu, r2);
+     CPU_FOREACH(cpu) {
+         cpu_count++;
+@@ -79,8 +80,10 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+ 
+     prepare_cpu_entries(sclp, read_info->entries, cpu_count);
+ 
+-    read_info->facilities = cpu_to_be64(SCLP_HAS_CPU_INFO |
+-                                        SCLP_HAS_PCI_RECONFIG);
 +    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        return clp_service_call(cpu, r2);
-+    } else {
-+        return -1;
++        sclp_facilities |= SCLP_HAS_PCI_RECONFIG;
 +    }
- }
++    read_info->facilities = cpu_to_be64(sclp_facilities);
  
- static int kvm_pcilg_service_call(S390CPU *cpu, struct kvm_run *run)
-@@ -1199,7 +1203,11 @@ static int kvm_pcilg_service_call(S390CPU *cpu, struct kvm_run *run)
-     uint8_t r1 = (run->s390_sieic.ipb & 0x00f00000) >> 20;
-     uint8_t r2 = (run->s390_sieic.ipb & 0x000f0000) >> 16;
- 
--    return pcilg_service_call(cpu, r1, r2);
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        return pcilg_service_call(cpu, r1, r2);
-+    } else {
-+        return -1;
-+    }
- }
- 
- static int kvm_pcistg_service_call(S390CPU *cpu, struct kvm_run *run)
-@@ -1207,7 +1215,11 @@ static int kvm_pcistg_service_call(S390CPU *cpu, struct kvm_run *run)
-     uint8_t r1 = (run->s390_sieic.ipb & 0x00f00000) >> 20;
-     uint8_t r2 = (run->s390_sieic.ipb & 0x000f0000) >> 16;
- 
--    return pcistg_service_call(cpu, r1, r2);
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        return pcistg_service_call(cpu, r1, r2);
-+    } else {
-+        return -1;
-+    }
- }
- 
- static int kvm_stpcifc_service_call(S390CPU *cpu, struct kvm_run *run)
-@@ -1216,10 +1228,14 @@ static int kvm_stpcifc_service_call(S390CPU *cpu, struct kvm_run *run)
-     uint64_t fiba;
-     uint8_t ar;
- 
--    cpu_synchronize_state(CPU(cpu));
--    fiba = get_base_disp_rxy(cpu, run, &ar);
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        cpu_synchronize_state(CPU(cpu));
-+        fiba = get_base_disp_rxy(cpu, run, &ar);
- 
--    return stpcifc_service_call(cpu, r1, fiba, ar);
-+        return stpcifc_service_call(cpu, r1, fiba, ar);
-+    } else {
-+        return -1;
-+    }
- }
- 
- static int kvm_sic_service_call(S390CPU *cpu, struct kvm_run *run)
-@@ -1247,7 +1263,11 @@ static int kvm_rpcit_service_call(S390CPU *cpu, struct kvm_run *run)
-     uint8_t r1 = (run->s390_sieic.ipb & 0x00f00000) >> 20;
-     uint8_t r2 = (run->s390_sieic.ipb & 0x000f0000) >> 16;
- 
--    return rpcit_service_call(cpu, r1, r2);
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        return rpcit_service_call(cpu, r1, r2);
-+    } else {
-+        return -1;
-+    }
- }
- 
- static int kvm_pcistb_service_call(S390CPU *cpu, struct kvm_run *run)
-@@ -1257,10 +1277,14 @@ static int kvm_pcistb_service_call(S390CPU *cpu, struct kvm_run *run)
-     uint64_t gaddr;
-     uint8_t ar;
- 
--    cpu_synchronize_state(CPU(cpu));
--    gaddr = get_base_disp_rsy(cpu, run, &ar);
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        cpu_synchronize_state(CPU(cpu));
-+        gaddr = get_base_disp_rsy(cpu, run, &ar);
- 
--    return pcistb_service_call(cpu, r1, r3, gaddr, ar);
-+        return pcistb_service_call(cpu, r1, r3, gaddr, ar);
-+    } else {
-+        return -1;
-+    }
- }
- 
- static int kvm_mpcifc_service_call(S390CPU *cpu, struct kvm_run *run)
-@@ -1269,10 +1293,14 @@ static int kvm_mpcifc_service_call(S390CPU *cpu, struct kvm_run *run)
-     uint64_t fiba;
-     uint8_t ar;
- 
--    cpu_synchronize_state(CPU(cpu));
--    fiba = get_base_disp_rxy(cpu, run, &ar);
-+    if (s390_has_feat(S390_FEAT_ZPCI)) {
-+        cpu_synchronize_state(CPU(cpu));
-+        fiba = get_base_disp_rxy(cpu, run, &ar);
- 
--    return mpcifc_service_call(cpu, r1, fiba, ar);
-+        return mpcifc_service_call(cpu, r1, fiba, ar);
-+    } else {
-+        return -1;
-+    }
- }
- 
- static int handle_b9(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
+     /* Memory Hotplug is only supported for the ccw machine type */
+     if (mhd) {
+@@ -385,10 +388,18 @@ static void sclp_execute(SCLPDevice *sclp, SCCB *sccb, uint32_t code)
+         sclp_c->unassign_storage(sclp, sccb);
+         break;
+     case SCLP_CMDW_CONFIGURE_PCI:
+-        s390_pci_sclp_configure(sccb);
++        if (s390_has_feat(S390_FEAT_ZPCI)) {
++            s390_pci_sclp_configure(sccb);
++        } else {
++            sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
++        }
+         break;
+     case SCLP_CMDW_DECONFIGURE_PCI:
+-        s390_pci_sclp_deconfigure(sccb);
++        if (s390_has_feat(S390_FEAT_ZPCI)) {
++            s390_pci_sclp_deconfigure(sccb);
++        } else {
++            sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
++        }
+         break;
+     default:
+         efc->command_handler(ef, sccb, code);
 -- 
 2.13.5
