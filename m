@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1djimm-00086w-Bv
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:14:17 -0400
+	(envelope-from <cohuck@redhat.com>) id 1djip1-00019s-SH
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:16:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1djimj-0004No-5e
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:14:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45530)
+	(envelope-from <cohuck@redhat.com>) id 1djioz-0006O3-93
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:16:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50048)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1djimi-0004Lr-Tt
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:14:13 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170731085110.1050-1-apahim@redhat.com>
-	<20170731085110.1050-8-apahim@redhat.com>
-	<878tilryx4.fsf@dusky.pond.sub.org>
-	<CALAZnb1naw=TtrsDaBw3ehESCp7ET42DUuc=cSTQTXpsKsvoyw@mail.gmail.com>
-	<87k2210ybh.fsf@dusky.pond.sub.org>
-	<CALAZnb26B0v9murz-fSuhoXxy2DwHjvUcRT+EJpEP9ER+_O6gg@mail.gmail.com>
-Date: Mon, 21 Aug 2017 11:14:03 +0200
-In-Reply-To: <CALAZnb26B0v9murz-fSuhoXxy2DwHjvUcRT+EJpEP9ER+_O6gg@mail.gmail.com>
-	(Amador Pahim's message of "Fri, 18 Aug 2017 16:49:51 +0200")
-Message-ID: <87inhh706c.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 7/7] qemu.py: include debug information
- on launch error
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1djioz-0006Na-0R
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 05:16:33 -0400
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Mon, 21 Aug 2017 11:16:08 +0200
+Message-Id: <20170821091614.28251-5-cohuck@redhat.com>
+In-Reply-To: <20170821091614.28251-1-cohuck@redhat.com>
+References: <20170821091614.28251-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 04/10] s390x: chsc nt2 events are pci-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,135 +23,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amador Pahim <apahim@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
 
-Amador Pahim <apahim@redhat.com> writes:
+The nt2 event class is pci-only - don't look for events if pci is
+not in the active cpu model.
 
-> On Fri, Aug 18, 2017 at 4:01 PM, Markus Armbruster <armbru@redhat.com> wrote:
->> Amador Pahim <apahim@redhat.com> writes:
->>
->>> On Tue, Aug 15, 2017 at 10:57 AM, Markus Armbruster <armbru@redhat.com> wrote:
->>>> Amador Pahim <apahim@redhat.com> writes:
->>>>
->>>>> When launching a VM, if an exception happens and the VM is not
->>>>> initiated, it is useful to see the qemu command line that was executed
->>>>> and the output of that command.
->>>>>
->>>>> Before this patch:
->>>>>
->>>>>     >>> import qemu
->>>>>     >>> vm = qemu.QEMUMachine('qemu-system-aarch64', debug=True)
->>>>>     >>> vm.launch()
->>>>>     Traceback (most recent call last):
->>>>>       File "<stdin>", line 1, in <module>
->>>>>       File "qemu.py", line 175, in launch
->>>>>         self._launch()
->>>>>       File "qemu.py", line 189, in _launch
->>>>>         self._post_launch()
->>>>>       File "qemu.py", line 154, in _post_launch
->>>>>         self._qmp.accept()
->>>>>       File "qmp/qmp.py", line 145, in accept
->>>>>         self.__sock, _ = self.__sock.accept()
->>>>>       File "/usr/lib64/python2.7/socket.py", line 206, in accept
->>>>>         sock, addr = self._sock.accept()
->>>>>     socket.timeout: timed out
->>>>>     >>>
->>>>>
->>>>> After this patch:
->>>>>
->>>>>     >>> import qemu
->>>>>     >>> vm = qemu.QEMUMachine('qemu-system-aarch64', debug=True)
->>>>>     >>> vm.launch()
->>>>>     DEBUG:qemu:Error launching VM. Command: 'qemu-system-aarch64
->>>>>     -chardev socket,id=mon,path=/var/tmp/qemu-5298-monitor.sock
->>>>>     -mon chardev=mon,mode=control -display none -vga none'.
->>>>>     Output: 'qemu-system-aarch64: No machine specified, and there
->>>>>     is no default\nUse -machine help to list supported machines\n'.
->>>>>     Traceback (most recent call last):
->>>>>       File "<stdin>", line 1, in <module>
->>>>>       File "qemu.py", line 175, in launch
->>>>>         self._launch()
->>>>>       File "qemu.py", line 189, in _launch
->>>>>         self._post_launch()
->>>>>       File "qemu.py", line 154, in _post_launch
->>>>>         self._qmp.accept()
->>>>>       File "qmp/qmp.py", line 145, in accept
->>>>>         self.__sock, _ = self.__sock.accept()
->>>>>       File "/usr/lib64/python2.7/socket.py", line 206, in accept
->>>>>         sock, addr = self._sock.accept()
->>>>>     socket.timeout: timed out
->>>>>     >>>
->>>>>
->>>>> Signed-off-by: Amador Pahim <apahim@redhat.com>
->>>>> ---
->>>>>  scripts/qemu.py | 12 +++++++++++-
->>>>>  1 file changed, 11 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/scripts/qemu.py b/scripts/qemu.py
->>>>> index e9a3a96d13..43fd0b072c 100644
->>>>> --- a/scripts/qemu.py
->>>>> +++ b/scripts/qemu.py
->>>>> @@ -158,7 +158,10 @@ class QEMUMachine(object):
->>>>>              self._remove_if_exists(self._created_files.pop())
->>>>>
->>>>>      def launch(self):
->>>>> -        '''Launch the VM and establish a QMP connection'''
->>>>> +        '''
->>>>> +        Try to launch the VM and make sure we cleanup and expose the
->>>>> +        command line/output in case of exception.
->>>>> +        '''
->>>>>
->>>>>          if self.is_running():
->>>>>              raise QEMULaunchError('VM already running.')
->>>>> @@ -169,6 +172,7 @@ class QEMUMachine(object):
->>>>>                                    'before launching again.')
->>>>>
->>>>>          try:
->>>>> +            self._iolog = None
->>>>>              self._qemu_full_args = None
->>>>>              self._qemu_full_args = (self._wrapper + [self._binary] +
->>>>>                                      self._base_args() + self._args)
->>>>> @@ -176,9 +180,15 @@ class QEMUMachine(object):
->>>>>              self._pending_shutdown = True
->>>>>          except:
->>>>>              self.shutdown()
->>>>> +            LOG.debug('Error launching VM.%s%s',
->>>>> +                      ' Command: %r.' % ' '.join(self._qemu_full_args)
->>>>> +                      if self._qemu_full_args else '',
->>>>> +                      ' Output: %r.' % self._iolog
->>>>> +                      if self._iolog else '')
->>>>
->>>> This nested interpolation is too ugly to live :)
->>>
->>> I find it beautiful :)
->>> Killing it anyway.
->>>
->>>>
->>>> Nesting is easy to avoid:
->>>>
->>>>                LOG.debug('Error launching VM\n. ' Command: %r. Output: %r.'
->>>>                          % (' '.join(self._qemu_full_args)
->>>>                             if self._qemu_full_args else '',
->>>>                             self._iolog
->>>>                             if self._iolog else ''))
->>>
->>> In this case we will have the strings "Command: " and "Output:" even
->>> with no content to expose.
->>
->> No command should not happen.
->
-> It can happen, if we fail before the self._qemu_full_args become ready
-> (i.e. if self._base_args() fails).
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/s390x/s390-pci-bus.c  |  4 ++--
+ hw/s390x/s390-pci-bus.h  |  4 ++--
+ hw/s390x/s390-pci-stub.c |  4 ++--
+ target/s390x/ioinst.c    | 16 ++++++++++++++++
+ 4 files changed, 22 insertions(+), 6 deletions(-)
 
-If we fail before we even have a command line, it's not really an "Error
-launching VM", it's more like "can't figure out how to launch the VM".
-
-I suspect the root of the problem is an overly large try block.  Which
-also has a catch-all except to further enhance that delicious code
-smell.
-
-I fear we have bigger fish to fry than careless error reporting.
-Debating it to the n-th degree is no use; do what you think is best.
-
-[...]
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index 61cfd2138f..c57f6ebae0 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -47,7 +47,7 @@ S390pciState *s390_get_phb(void)
+     return phb;
+ }
+ 
+-int chsc_sei_nt2_get_event(void *res)
++int pci_chsc_sei_nt2_get_event(void *res)
+ {
+     ChscSeiNt2Res *nt2_res = (ChscSeiNt2Res *)res;
+     PciCcdfAvail *accdf;
+@@ -87,7 +87,7 @@ int chsc_sei_nt2_get_event(void *res)
+     return rc;
+ }
+ 
+-int chsc_sei_nt2_have_event(void)
++int pci_chsc_sei_nt2_have_event(void)
+ {
+     S390pciState *s = s390_get_phb();
+ 
+diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
+index 67af2c12ff..5df6292509 100644
+--- a/hw/s390x/s390-pci-bus.h
++++ b/hw/s390x/s390-pci-bus.h
+@@ -319,8 +319,8 @@ typedef struct S390pciState {
+ } S390pciState;
+ 
+ S390pciState *s390_get_phb(void);
+-int chsc_sei_nt2_get_event(void *res);
+-int chsc_sei_nt2_have_event(void);
++int pci_chsc_sei_nt2_get_event(void *res);
++int pci_chsc_sei_nt2_have_event(void);
+ void s390_pci_sclp_configure(SCCB *sccb);
+ void s390_pci_sclp_deconfigure(SCCB *sccb);
+ void s390_pci_iommu_enable(S390PCIIOMMU *iommu);
+diff --git a/hw/s390x/s390-pci-stub.c b/hw/s390x/s390-pci-stub.c
+index 2e7e42a2af..cc7278a865 100644
+--- a/hw/s390x/s390-pci-stub.c
++++ b/hw/s390x/s390-pci-stub.c
+@@ -7,12 +7,12 @@
+ #include "s390-pci-bus.h"
+ 
+ /* target/s390x/ioinst.c */
+-int chsc_sei_nt2_get_event(void *res)
++int pci_chsc_sei_nt2_get_event(void *res)
+ {
+     return 1;
+ }
+ 
+-int chsc_sei_nt2_have_event(void)
++int pci_chsc_sei_nt2_have_event(void)
+ {
+     return 0;
+ }
+diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
+index 51fbea620d..3fa3301f50 100644
+--- a/target/s390x/ioinst.c
++++ b/target/s390x/ioinst.c
+@@ -599,6 +599,22 @@ static int chsc_sei_nt0_have_event(void)
+     return 0;
+ }
+ 
++static int chsc_sei_nt2_get_event(void *res)
++{
++    if (s390_has_feat(S390_FEAT_ZPCI)) {
++        return pci_chsc_sei_nt2_get_event(res);
++    }
++    return 1;
++}
++
++static int chsc_sei_nt2_have_event(void)
++{
++    if (s390_has_feat(S390_FEAT_ZPCI)) {
++        return pci_chsc_sei_nt2_have_event();
++    }
++    return 0;
++}
++
+ #define CHSC_SEI_NT0    (1ULL << 63)
+ #define CHSC_SEI_NT2    (1ULL << 61)
+ static void ioinst_handle_chsc_sei(ChscReq *req, ChscResp *res)
+-- 
+2.13.5
