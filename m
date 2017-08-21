@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1djhtP-0008UR-5o
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:17:04 -0400
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dji0p-0002pr-Sa
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:24:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1djhtL-0006Mm-TX
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:17:03 -0400
-Date: Mon, 21 Aug 2017 17:55:20 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170821075520.GJ12356@umbus.fritz.box>
-References: <1503297029-28436-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="va4/JQ6j8/8uipEp"
-Content-Disposition: inline
-In-Reply-To: <1503297029-28436-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] hw/ppc/spapr: Fix segfault when
- instantiating a 'pc-dimm' without 'memdev'
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dji0m-0001JL-4y
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:24:43 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:60984)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dji0k-0001HF-80
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 04:24:40 -0400
+Date: Mon, 21 Aug 2017 16:23:57 +0800 (CST)
+Message-ID: <201708211623572540647@zte.com.cn>
+References: 1502967483-4090-1-git-send-email-wang.yong155@zte.com.cn,
+	2474c9bc-641a-ba44-fd4b-2649cf65fcfe@cn.fujitsu.com
+Mime-Version: 1.0
+From: <wang.yong155@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogW1BBVENIdjMgMDAvMDNdIFJl?=
+ =?utf-8?q?place_the_COLO_comparing_thread_with_IOThread?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,272 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-ppc@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <guangrong.xiao@linux.intel.com>
+To: zhangchen.fnst@cn.fujitsu.com
+Cc: pbonzini@redhat.com, stefanha@redhat.com, famz@redhat.com, jasowang@redhat.com, zhang.zhanghailiang@huawei.com, wang.guang55@zte.com.cn, lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org
 
-
---va4/JQ6j8/8uipEp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Aug 21, 2017 at 08:30:29AM +0200, Thomas Huth wrote:
-> QEMU currently crashes when trying to use a 'pc-dimm' on the pseries
-> machine without specifying its 'memdev' property. This happens because
-> pc_dimm_get_memory_region() does not check whether the 'memdev' property
-> has properly been set by the user. Looking closer at this function, it's
-> also obvious that it is using &error_abort to call another function - and
-> this is bad in a function that is used in the hot-plugging calling chain
-> since this can also cause QEMU to exit unexpectedly.
->=20
-> So let's fix these issues in a proper way now: Add a "Error **errp"
-> parameter to pc_dimm_get_memory_region() which we use in case the 'memdev'
-> property has not been set by the user, and which we can use instead of
-> the &error_abort, and change the callers of get_memory_region() to make
-> use of this "errp" parameter for proper error checking.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-ppc portions
-
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-
-and the rest
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-I'm happy to queue this or have someone else queue it.
-
-> ---
->  hw/i386/pc.c             | 14 ++++++++++++--
->  hw/mem/nvdimm.c          |  2 +-
->  hw/mem/pc-dimm.c         | 14 +++++++++++---
->  hw/ppc/spapr.c           | 42 ++++++++++++++++++++++++++++++------------
->  include/hw/mem/pc-dimm.h |  2 +-
->  5 files changed, 55 insertions(+), 19 deletions(-)
->=20
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 5943539..2108104 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1691,10 +1691,15 @@ static void pc_dimm_plug(HotplugHandler *hotplug_=
-dev,
->      PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(pcms);
->      PCDIMMDevice *dimm =3D PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr =3D ddc->get_memory_region(dimm);
-> +    MemoryRegion *mr;
->      uint64_t align =3D TARGET_PAGE_SIZE;
->      bool is_nvdimm =3D object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
-> =20
-> +    mr =3D ddc->get_memory_region(dimm, &local_err);
-> +    if (local_err) {
-> +        goto out;
-> +    }
-> +
->      if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
->          align =3D memory_region_get_alignment(mr);
->      }
-> @@ -1758,10 +1763,15 @@ static void pc_dimm_unplug(HotplugHandler *hotplu=
-g_dev,
->      PCMachineState *pcms =3D PC_MACHINE(hotplug_dev);
->      PCDIMMDevice *dimm =3D PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr =3D ddc->get_memory_region(dimm);
-> +    MemoryRegion *mr;
->      HotplugHandlerClass *hhc;
->      Error *local_err =3D NULL;
-> =20
-> +    mr =3D ddc->get_memory_region(dimm, &local_err);
-> +    if (local_err) {
-> +        goto out;
-> +    }
-> +
->      hhc =3D HOTPLUG_HANDLER_GET_CLASS(pcms->acpi_dev);
->      hhc->unplug(HOTPLUG_HANDLER(pcms->acpi_dev), dev, &local_err);
-> =20
-> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-> index db896b0..952fce5 100644
-> --- a/hw/mem/nvdimm.c
-> +++ b/hw/mem/nvdimm.c
-> @@ -71,7 +71,7 @@ static void nvdimm_init(Object *obj)
->                          NULL, NULL);
->  }
-> =20
-> -static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm)
-> +static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error =
-**errp)
->  {
->      NVDIMMDevice *nvdimm =3D NVDIMM(dimm);
-> =20
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index ea67b46..bdf6649 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -363,7 +363,10 @@ static void pc_dimm_get_size(Object *obj, Visitor *v=
-, const char *name,
->      PCDIMMDevice *dimm =3D PC_DIMM(obj);
->      PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(obj);
-> =20
-> -    mr =3D ddc->get_memory_region(dimm);
-> +    mr =3D ddc->get_memory_region(dimm, errp);
-> +    if (!mr) {
-> +        return;
-> +    }
->      value =3D memory_region_size(mr);
-> =20
->      visit_type_uint64(v, name, &value, errp);
-> @@ -411,9 +414,14 @@ static void pc_dimm_unrealize(DeviceState *dev, Erro=
-r **errp)
->      host_memory_backend_set_mapped(dimm->hostmem, false);
->  }
-> =20
-> -static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm)
-> +static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm, Error=
- **errp)
->  {
-> -    return host_memory_backend_get_memory(dimm->hostmem, &error_abort);
-> +    if (!dimm->hostmem) {
-> +        error_setg(errp, "'" PC_DIMM_MEMDEV_PROP "' property must be set=
-");
-> +        return NULL;
-> +    }
-> +
-> +    return host_memory_backend_get_memory(dimm->hostmem, errp);
->  }
-> =20
->  static MemoryRegion *pc_dimm_get_vmstate_memory_region(PCDIMMDevice *dim=
-m)
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index f7a1972..cec441c 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2772,10 +2772,15 @@ static void spapr_memory_plug(HotplugHandler *hot=
-plug_dev, DeviceState *dev,
->      sPAPRMachineState *ms =3D SPAPR_MACHINE(hotplug_dev);
->      PCDIMMDevice *dimm =3D PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr =3D ddc->get_memory_region(dimm);
-> -    uint64_t align =3D memory_region_get_alignment(mr);
-> -    uint64_t size =3D memory_region_size(mr);
-> -    uint64_t addr;
-> +    MemoryRegion *mr;
-> +    uint64_t align, size, addr;
-> +
-> +    mr =3D ddc->get_memory_region(dimm, &local_err);
-> +    if (local_err) {
-> +        goto out;
-> +    }
-> +    align =3D memory_region_get_alignment(mr);
-> +    size =3D memory_region_size(mr);
-> =20
->      pc_dimm_memory_plug(dev, &ms->hotplug_memory, mr, align, &local_err);
->      if (local_err) {
-> @@ -2808,10 +2813,16 @@ static void spapr_memory_pre_plug(HotplugHandler =
-*hotplug_dev, DeviceState *dev,
->  {
->      PCDIMMDevice *dimm =3D PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr =3D ddc->get_memory_region(dimm);
-> -    uint64_t size =3D memory_region_size(mr);
-> +    MemoryRegion *mr;
-> +    uint64_t size;
->      char *mem_dev;
-> =20
-> +    mr =3D ddc->get_memory_region(dimm, errp);
-> +    if (!mr) {
-> +        return;
-> +    }
-> +    size =3D memory_region_size(mr);
-> +
->      if (size % SPAPR_MEMORY_BLOCK_SIZE) {
->          error_setg(errp, "Hotplugged memory size must be a multiple of "
->                        "%lld MB", SPAPR_MEMORY_BLOCK_SIZE / M_BYTE);
-> @@ -2882,7 +2893,7 @@ static sPAPRDIMMState *spapr_recover_pending_dimm_s=
-tate(sPAPRMachineState *ms,
->  {
->      sPAPRDRConnector *drc;
->      PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr =3D ddc->get_memory_region(dimm);
-> +    MemoryRegion *mr =3D ddc->get_memory_region(dimm, &error_abort);
->      uint64_t size =3D memory_region_size(mr);
->      uint32_t nr_lmbs =3D size / SPAPR_MEMORY_BLOCK_SIZE;
->      uint32_t avail_lmbs =3D 0;
-> @@ -2912,7 +2923,7 @@ void spapr_lmb_release(DeviceState *dev)
->      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_hotplug_handler(=
-dev));
->      PCDIMMDevice *dimm =3D PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr =3D ddc->get_memory_region(dimm);
-> +    MemoryRegion *mr =3D ddc->get_memory_region(dimm, &error_abort);
->      sPAPRDIMMState *ds =3D spapr_pending_dimm_unplugs_find(spapr, PC_DIM=
-M(dev));
-> =20
->      /* This information will get lost if a migration occurs
-> @@ -2945,12 +2956,19 @@ static void spapr_memory_unplug_request(HotplugHa=
-ndler *hotplug_dev,
->      Error *local_err =3D NULL;
->      PCDIMMDevice *dimm =3D PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr =3D ddc->get_memory_region(dimm);
-> -    uint64_t size =3D memory_region_size(mr);
-> -    uint32_t nr_lmbs =3D size / SPAPR_MEMORY_BLOCK_SIZE;
-> -    uint64_t addr_start, addr;
-> +    MemoryRegion *mr;
-> +    uint32_t nr_lmbs;
-> +    uint64_t size, addr_start, addr;
->      int i;
->      sPAPRDRConnector *drc;
-> +
-> +    mr =3D ddc->get_memory_region(dimm, &local_err);
-> +    if (local_err) {
-> +        goto out;
-> +    }
-> +    size =3D memory_region_size(mr);
-> +    nr_lmbs =3D size / SPAPR_MEMORY_BLOCK_SIZE;
-> +
->      addr_start =3D object_property_get_uint(OBJECT(dimm), PC_DIMM_ADDR_P=
-ROP,
->                                           &local_err);
->      if (local_err) {
-> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-> index 1e483f2..6f8c3eb 100644
-> --- a/include/hw/mem/pc-dimm.h
-> +++ b/include/hw/mem/pc-dimm.h
-> @@ -71,7 +71,7 @@ typedef struct PCDIMMDeviceClass {
-> =20
->      /* public */
->      void (*realize)(PCDIMMDevice *dimm, Error **errp);
-> -    MemoryRegion *(*get_memory_region)(PCDIMMDevice *dimm);
-> +    MemoryRegion *(*get_memory_region)(PCDIMMDevice *dimm, Error **errp);
->      MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm);
->  } PCDIMMDeviceClass;
-> =20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---va4/JQ6j8/8uipEp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmakeUACgkQbDjKyiDZ
-s5LeLg/9EBADz4sm1w+6zEstghZpdHFwCsK0muJ5rZmJGpAslWJL1lGK/1Ng0qF4
-fFmuu+HtE4Zut0avPSMzevAQ/KPvZgF9DyYsUdZWAN+PqBSJYpMXGlqP5meGG8Xe
-jQX4EoEf1TffIjxOoonUuUmWQQpGajUtHuC2sepAcclWfGkGRqZQBbCu/oyEETdF
-cxZ+8xN8fO2lMp7n10U424Ens5ddXkt0CJ2kvmW+TelWK4D1t+453yneqbntqj/Z
-HXtoejy3QiRONbjniALMp4afBOzdPMB6gfbpE/ZXZMKtHqCvuX8wG81RjIWmtots
-OxA1ShCZDVXwadn/6VvqAWDx2KuubDa12EH/HCoHjEYuONrAAeGBmWV/IQbuVRyt
-FzZOPYct4A2zIXLG0llgTGoYVO2YB7eb8ouf4d6UN5TPcpZO664HMEeNXVhjve+u
-dxbs8PIKI+ngQ3N7Gu7DSTQ49bgMr9NKALvCAxhoNTHA879hndk7YwCh8NNmod7b
-BbFoqOA5rjtkyzUNFyKyhum57nTLgg/PqQWPjyo3hSV9SDgf9qQ6Z2ZMWclEwDWD
-btqNKoiCWm6IGNn6Tj6JrL/iGjSVdfPuB/exRT0IDRgUmSz5fryBCdeZo60jhilQ
-dD/cZh8kyNdU78Qo0M7kJjgqnpROPAVChdIlHROloKnTmFZsoGM=
-=gRRa
------END PGP SIGNATURE-----
-
---va4/JQ6j8/8uipEp--
+PkhpfiBXYW5nIFlvbmcuDQoNCj4+SSBoYXZlIHJlYmFzZWQgdGhpcyBzZXJpZXMgdG8gY29sby1m
+b3ItcWVtdS0yLjEwLTIwMTctNC0yMiA+PGh0dHBzOi8vZ2l0aHViLmNvbS9jb2xvZnQvcWVtdS90
+cmVlL2NvbG8tZm9yLXFlbXUtMi4xMC0yMDE3LTQtMjI+LD4+QnV0IHdpdGggdGhpcyBwYXRjaCBz
+ZXQgQ09MTyBjYW4ndCBzdGFydCBub3JtYWxseSwgc29tZXRoaW5nIEkgbWlzc2VkPz4+Q2FuIHlv
+dSBnaXZlIG1lIGEgZ2l0aHViIGJyYW5jaCBiYXNlZCBvbiBjb2xvLWZvci1xZW11LTIuMTAtMjAx
+Ny00LTIyID48aHR0cHM6Ly9naXRodWIuY29tL2NvbG9mdC9xZW11L3RyZWUvY29sby1mb3ItcWVt
+dS0yLjEwLTIwMTctNC0yMj50aGF0ID53ZSBjYW4gdGVzdD8NCg0KVGhpcyBzZXJpZXMgaXMgYmFz
+ZWQgb24gdGhlIGdpdGh1YiBtYXN0ZXIsbm90IHRoZSBnaXRodWIgYnJhbmNoLg0KDQpJJ2xsIHNl
+bmQgeW91IGEgcGF0Y2ggYmFzZWQgb24gY29sby1mb3ItcWVtdS0yLjEwLTIwMTctNC0yMi4NCg0K
+DQoNCg0KVGhhbmtzDQoNCg0KDQrljp/lp4vpgq7ku7YNCg0KDQoNCuWPkeS7tuS6uu+8miA8emhh
+bmdjaGVuLmZuc3RAY24uZnVqaXRzdS5jb20+DQrmlLbku7bkurrvvJrnjovli4cxMDE3MDUzMCA8
+cGJvbnppbmlAcmVkaGF0LmNvbT4gPHN0ZWZhbmhhQHJlZGhhdC5jb20+IDxmYW16QHJlZGhhdC5j
+b20+IDxqYXNvd2FuZ0ByZWRoYXQuY29tPiA8emhhbmcuemhhbmdoYWlsaWFuZ0BodWF3ZWkuY29t
+Pg0K5oqE6YCB5Lq677yaIDx6aGFuZ2NoZW4uZm5zdEBjbi5mdWppdHN1LmNvbT7njovlub8xMDE2
+NTk5MiA8bGl6aGlqaWFuQGNuLmZ1aml0c3UuY29tPiA8cWVtdS1kZXZlbEBub25nbnUub3JnPg0K
+5pelIOacnyDvvJoyMDE35bm0MDjmnIgyMeaXpSAxNTozOQ0K5Li7IOmimCDvvJpSZTogW1BBVENI
+djMgMDAvMDNdIFJlcGxhY2UgdGhlIENPTE8gY29tcGFyaW5nIHRocmVhZCB3aXRoIElPVGhyZWFk
+DQoNCg0KDQoNCg0KSGl+IFdhbmcgWW9uZy4NCg0KSSBoYXZlIHJlYmFzZWQgdGhpcyBzZXJpZXMg
+dG8gY29sby1mb3ItcWVtdS0yLjEwLTIwMTctNC0yMiANCjxodHRwczovL2dpdGh1Yi5jb20vY29s
+b2Z0L3FlbXUvdHJlZS9jb2xvLWZvci1xZW11LTIuMTAtMjAxNy00LTIyPiwNCg0KQnV0IHdpdGgg
+dGhpcyBwYXRjaCBzZXQgQ09MTyBjYW4ndCBzdGFydCBub3JtYWxseSwgc29tZXRoaW5nIEkgbWlz
+c2VkPw0KDQpDYW4geW91IGdpdmUgbWUgYSBnaXRodWIgYnJhbmNoIGJhc2VkIG9uIGNvbG8tZm9y
+LXFlbXUtMi4xMC0yMDE3LTQtMjIgDQo8aHR0cHM6Ly9naXRodWIuY29tL2NvbG9mdC9xZW11L3Ry
+ZWUvY29sby1mb3ItcWVtdS0yLjEwLTIwMTctNC0yMj50aGF0IA0Kd2UgY2FuIHRlc3Q/DQoNCg0K
+VGhhbmtzDQoNClpoYW5nIENoZW4NCg0KDQpPbiAwOC8xNy8yMDE3IDA2OjU4IFBNLCBXYW5nIHlv
+bmcgd3JvdGU6DQo+IEZyb206IFdhbmcgWW9uZyA8d2FuZy55b25nMTU1QHp0ZS5jb20uY24+DQo+
+DQo+IEl0J3MgYSBnb29kIGlkZWEgdG8gdXNlIElPVGhyZWFkIGluc3RlYWQgb2YgQ09MTyBjb21w
+YXJpbmcgdGhyZWFkLg0KPiBjb21wYXJpbmcgdGhyZWFkIGNhbiBiZSBjb21wbGV0ZWx5IHJlcGxh
+Y2VkIGJ5IElPVGhyZWFkLCBzbyB0aGlzIGlkZWEgY2FtZS4NCj4NCj4gVGhpcyBzZXJpZXMgb2Yg
+dXBkYXRlcyBtYWlubHkgaW5jbHVkZSBJT1RocmVhZCBzdXBwb3J0cyB0aGUgR01haW5Db250ZXh0
+DQo+IGV2ZW50IGxvb3AsIHRoZW4gdGhlIG9sZCBwYWNrZXQgcmVndWxhcmx5IGNoZWNrIGFuZCBw
+cmltYXJ5L3NlY29uZGFyeSBuZXR3b3JrDQo+IHBhY2tldHMgY29tcGFyZSBhbGwgaW50byB0aGUg
+SU9UaHJlYWQgcHJvY2Vzc2luZy4NCj4NCj4gUGxlYXNlIHJldmlldyx0aGFua3MuDQo+DQo+IHdh
+bmd5b25nKDMpOg0KPiBxZW11LWlvdGhyZWFkOiBJT1RocmVhZCBzdXBwb3J0cyB0aGUgR01haW5D
+b250ZXh0IGV2ZW50IGxvb3ANCj4gY29sby1jb21wYXJlOiBVc2UgSU9UaHJlYWQgdG8gQ2hlY2sg
+b2xkIHBhY2tldCByZWd1bGFybHkgYW5kDQo+ICAgUHJvY2VzcyBwYWN0a2V0cyBvZiB0aGUgcHJp
+bWFyeQ0KPiBjb2xvLWNvbXBhcmU6IFVwZGF0ZSB0aGUgQ09MTyBkb2N1bWVudCB0byBhZGQgdGhl
+IElPVGhyZWFkDQo+ICAgY29uZmlndXJhdGlvbg0KPg0KPiAgIGluY2x1ZGUvc3lzZW11L2lvdGhy
+ZWFkLmggfCAxMCArKysrKysrKysNCj4gICBpb3RocmVhZC5jICAgICAgICAgICAgICAgIHwgNTQg
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gICBuZXQv
+Y29sby1jb21wYXJlLmMgfCA3NSArKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0NCj4gICBkb2NzL2NvbG8tcHJveHkudHh0IHwgMyArKy0NCj4gICA0
+IGZpbGUgY2hhbmdlZCwgODYgaW5zZXJ0aW9ucygrKSwgMzcgZGVsZXRpb25zKC0pDQo+DQo+IC0t
+DQo+IDEuOC4zLjENCj4NCj4NCj4NCj4gLg0KPg0KDQotLSANClRoYW5rcw0KWmhhbmcgQ2hlbg==
