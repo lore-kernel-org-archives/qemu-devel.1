@@ -1,47 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dk8nW-0000yf-OH
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:00:50 -0400
+	(envelope-from <armbru@redhat.com>) id 1dk8ne-00012Y-0s
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:00:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dk8nR-0001xJ-Ip
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:00:46 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53375
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dk8nR-0001vm-Ca
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:00:41 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7MCx25v061068
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:00:40 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cghkyy9v1-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:00:40 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 22 Aug 2017 14:00:38 +0100
-References: <20170821091614.28251-1-cohuck@redhat.com>
-	<20170821091614.28251-8-cohuck@redhat.com>
-	<0d8dcac1-f536-5d69-0187-23656d003348@linux.vnet.ibm.com>
-	<17cb7925-e4eb-d174-2886-49ab9af0852c@linux.vnet.ibm.com>
-	<20170822103955.1cbc0714.cohuck@redhat.com>
-	<b7e7810c-7822-2fb8-2a2e-d67c08126639@linux.vnet.ibm.com>
-	<20170822113914.3ff24d75.cohuck@redhat.com>
-	<20170822145713.7f2da9cf.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 22 Aug 2017 15:00:32 +0200
+	(envelope-from <armbru@redhat.com>) id 1dk8nZ-0002Cw-1w
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:00:54 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
+	<1502117160-24655-5-git-send-email-armbru@redhat.com>
+	<CAJ+F1CLhMBQuKFT1w9Q-U1xAts4zpERNd_CZB7V2Yg4w0Q+m3g@mail.gmail.com>
+Date: Tue, 22 Aug 2017 15:00:19 +0200
+In-Reply-To: <CAJ+F1CLhMBQuKFT1w9Q-U1xAts4zpERNd_CZB7V2Yg4w0Q+m3g@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 22 Aug 2017
+	13:32:42 +0200")
+Message-ID: <87ziarep0c.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170822145713.7f2da9cf.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <b8a05285-8212-e16f-1fce-02e0f3e445dc@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v4 07/10] s390x/sclp: properly guard
- pci-specific functions
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 04/56] char: Make ringbuf-read size
+ unsigned in QAPI/QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -50,60 +27,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, jcody <jcody@redhat.com>, QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
+> Hi
+>
+> On Mon, Aug 7, 2017 at 4:45 PM, Markus Armbruster <armbru@redhat.com> wro=
+te:
+>> Sizes should use QAPI type 'size' (uint64_t).  ringbuf-read parameter
+>> @size is 'int' (int64_t).  qmp_ringbuf_read() rejects negative values,
+>> then implicitly converts to size_t.
+>>
+>> Change the parameter to 'size' and drop the check for negative values.
+>>
+>> ringbuf-read now accepts size values between 2^63 and 2^64-1.  It
+>> accepts negative values as before, because that's how the QObject
+>> input visitor works for backward compatibility.
+>>
+>
+> Negative values over json will be implicitly converted to positive
+> values with this change, right? Or are they rejected earlier?
 
-On 08/22/2017 02:57 PM, Cornelia Huck wrote:
-> On Tue, 22 Aug 2017 11:39:14 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
->> On Tue, 22 Aug 2017 11:20:51 +0200
->> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->>
->>> On 08/22/2017 10:39 AM, Cornelia Huck wrote:  
->>>>> I'm fine either way. If I imagine having a lots of adapter types, then I
->>>>> would expect a switch or a jumptable on the type before handling control
->>>>> to the pci specific function. In this case statically not supported types
->>>>> would probably get caught by the default branch of the switch and for a
->>>>> jumptable it could even handle the dynamic case (based on the facilities)
->>>>> trivially. In short both approaches can make sense.    
->>>> I'm also wondering at the naming (the command sounds very
->>>> pci-specific). I'd just stick with this approach (modulo a possible
->>>> change of the response code, for which I need to rely on you guys).
->>>>     
->>>
->>>
->>> Well, the QEMU name of the command is misleading misleading. In the AR
->>> it's called 'Configure I/O Adapter'. The PCI comes into the picture via
->>> byte 8 of the SCCB, the so called adapter type. Valid values for the
->>> adapter type are: 00-01 reserved; 02 PCI function; 03-FF reserved. So
->>> at this point we only have PCI.  
->>
->> OK, misleading naming combined with missing documentation leads to
->> confusion...
->>
->> So:
->>
->> - s/PCI/IOA/ for SCLP_CMDW_{CONFIGURE,DECONFIGURE}_PCI
->> - have a switch/case over byte 8 with only one case (pci)
-> 
-> - switch to response code 0x06f0 instead of invalid command
-> 
->> - move the pci feature check into the pci code(? - not sure)
->>
->> There's still the question of when this sclp command first became
->> available...
-> 
-> ...because we probably want to indicate invalid command for older
-> machine types (or is there another facility bit?)
-> 
-> Another question: There's the sclp facilities bit SCLP_HAS_PCI_RECONFIG
-> - is that really pci, or I/O adapter as for the actual commands?
-> 
-> [The Linux kernel uses the _PCI naming scheme, so I can't derive
-> anything from that.]
-> 
+Yes.  For details, see my reply to Juan's review of PATCH 15.
 
-Ah, we to each other almost simultaneously... See my other mail.
+> If so that is a change of behaviour that I am not sure is worth doing
+> now (without explicit protocol break), but I don't mind.
