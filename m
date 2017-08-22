@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7BW-0007cM-6u
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:17:28 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7Bu-0007wz-Bb
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:17:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7BS-0002bU-Um
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:17:26 -0400
-Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:35988)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7Br-0002zE-TN
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:17:50 -0400
+Received: from mail-ua0-x230.google.com ([2607:f8b0:400c:c08::230]:36967)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dk7BS-0002bL-OG
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:17:22 -0400
-Received: by mail-ua0-x241.google.com with SMTP id l47so346392uai.3
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 04:17:22 -0700 (PDT)
+	id 1dk7Br-0002y2-NF
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:17:47 -0400
+Received: by mail-ua0-x230.google.com with SMTP id e28so10414714uah.4
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 04:17:47 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87shgrbyou.fsf@dusky.pond.sub.org>
+In-Reply-To: <8760dn8ygv.fsf@dusky.pond.sub.org>
 References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
-	<20170727154126.11339-5-marcandre.lureau@redhat.com>
-	<87shgrbyou.fsf@dusky.pond.sub.org>
+	<20170727154126.11339-6-marcandre.lureau@redhat.com>
+	<8760dn8ygv.fsf@dusky.pond.sub.org>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 22 Aug 2017 13:17:21 +0200
-Message-ID: <CAJ+F1CKr-jh9XjcAF-vmU3nsjuRKG-b-3MUUKrs9HzSqg70N6Q@mail.gmail.com>
+Date: Tue, 22 Aug 2017 13:17:46 +0200
+Message-ID: <CAJ+F1C+gkZ7MTftTiFSwyLNa23CSyg_q05x8h35F_MyYzTAH7g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 04/26] qapi: generate a literal qobject for
- introspection
+Subject: Re: [Qemu-devel] [PATCH 05/26] visitor: pass size of strings array
+ to enum visitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,431 +33,509 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Jason Wang <jasowang@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>
 
-Hi
+hi
 
-On Wed, Aug 16, 2017 at 12:21 PM, Markus Armbruster <armbru@redhat.com> wro=
-te:
+On Wed, Aug 16, 2017 at 2:54 PM, Markus Armbruster <armbru@redhat.com> wrot=
+e:
 > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 >
->> Replace the generated json string with a literal qobject. The later is
->> easier to deal with, at run time, as well as compile time:
->
-> at run time as well as compile time
->
->>                                                            #if blocks
->> can be more easily added than in a json string.
->
-> Future tense, e.g. "adding #if conditionals will be easier".
-
-ok
-
->
+>> The size is known at compile time, this avoids having to compute to
+>> check array boundaries.
+>>
+>> Additionally, the following conditional enum entry change will create
+>> "hole" in the generated _lookup tables, that should be skipped.
 >>
 >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 >> ---
->>  scripts/qapi-introspect.py         | 83 +++++++++++++++++++++----------=
--------
->>  monitor.c                          |  2 +-
->>  tests/test-qobject-input-visitor.c | 10 +++--
->>  docs/devel/qapi-code-gen.txt       | 29 ++++++++-----
->>  4 files changed, 72 insertions(+), 52 deletions(-)
->>
->> diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
->> index 032bcea491..fc72cdb66d 100644
->> --- a/scripts/qapi-introspect.py
->> +++ b/scripts/qapi-introspect.py
->> @@ -12,72 +12,74 @@
->>  from qapi import *
->>
->>
->> -# Caveman's json.dumps() replacement (we're stuck at Python 2.4)
->> -# TODO try to use json.dumps() once we get unstuck
->> -def to_json(obj, level=3D0):
->> +def to_qlit(obj, level=3D0, first_indent=3DTrue):
+>>  include/qapi/visitor.h             |  3 ++-
+>>  scripts/qapi-visit.py              | 10 +++++-----
+>>  include/hw/qdev-core.h             |  1 +
+>>  include/qom/object.h               |  4 ++++
+>>  qapi/qapi-visit-core.c             | 23 ++++++++++++-----------
+>>  backends/hostmem.c                 |  1 +
+>>  crypto/secret.c                    |  1 +
+>>  crypto/tlscreds.c                  |  1 +
+>>  hw/core/qdev-properties.c          | 11 +++++++++--
+>>  net/filter.c                       |  1 +
+>>  qom/object.c                       | 11 ++++++++---
+>>  tests/check-qom-proplist.c         |  1 +
+>>  tests/test-qobject-input-visitor.c |  2 +-
+>>  13 files changed, 47 insertions(+), 23 deletions(-)
 >
-> Suggest suppress_indent=3DFalse.  I prefer defaulting to False.
-
-It's not about suppressing whole indent, just the first.
-
-I suggest you rewrite the code in a follow-up patch if you have an
-idea how to do it.
-
-I'd like this apporach in general for the whole series, since it is
-long and tedious to deal with that many patches, and not always easy
-to understand what you want.  If something works, it will be easier to
-get it done and improve the code as follow-up. This approach worked
-better when we ended qapi-doc for ex, and you followed up soon after
-with 50 more patches ;).
-
+> No change to scripts/qapi-types.c.  The generated lookup tables continue
+> to contain the NULL sentinel.  Possibly intentional, because it saves
+> you the trouble of searching for uses of FOO_lookup[FOO__MAX].
 >
->> +    def indent(level):
->> +        return level * 4 * ' '
->
-> Blank line before and after nested function definition, please.
-
-ok
-
->
->> +    ret =3D ''
->> +    if first_indent:
->> +        ret +=3D indent(level)
->>      if obj is None:
->> -        ret =3D 'null'
->> +        ret +=3D 'QLIT_QNULL'
->>      elif isinstance(obj, str):
->> -        ret =3D '"' + obj.replace('"', r'\"') + '"'
->> +        ret +=3D 'QLIT_QSTR(' + '"' + obj.replace('"', r'\"') + '"' + '=
-)'
->
-> Why not
->
->            ret +=3D 'QLIT_QSTR("' + obj.replace('"', r'\"') + '")'
->
-> Hmm, make that
->
->            ret +=3D 'QLIT_QSTR(' + to_c_string(obj) + ')'
->
-> because it makes the meaning more obvious, and it's also more robust: it
-> doubles backslashes.
-
-I can't find to_c_string(), I added one
-
->
->>      elif isinstance(obj, list):
->> -        elts =3D [to_json(elt, level + 1)
->> +        elts =3D [to_qlit(elt, level + 1)
->>                  for elt in obj]
->> -        ret =3D '[' + ', '.join(elts) + ']'
->> +        elts.append(indent(level + 1) + "{ }")
->
-> I'd prefer "{}".  More of the same below.
-
-ok
-
->
->> +        ret +=3D 'QLIT_QLIST(((QLitObject[]) {\n'
->> +        ret +=3D ',\n'.join(elts) + '\n'
->> +        ret +=3D indent(level) + '}))'
->
-> The extra pair of parenthesis in QLIT_QLIST(( ... )) is slightly ugly.
-> Not this patch's fault.  Same for QLIT_QDICT(( ... )) below.
->
->>      elif isinstance(obj, dict):
->> -        elts =3D ['"%s": %s' % (key.replace('"', r'\"'),
->> -                              to_json(obj[key], level + 1))
->> -                for key in sorted(obj.keys())]
->> -        ret =3D '{' + ', '.join(elts) + '}'
->> +        elts =3D [ indent(level + 1) + '{ "%s", %s }' %
->> +                 (key.replace('"', r'\"'), to_qlit(obj[key], level + 1,=
- False))
->
-> $ pep8 scripts/qapi-introspect.py
-> scripts/qapi-introspect.py:33:17: E201 whitespace after '['
->
-> Also, break lines at operators with the least precedence, not in the
-> middle of sub-expressions.
->
-> However
->
->            elts =3D [indent(level + 1)
->                    + ('{ "%s", %s }'
->                       % (to_c_string(key),
->                          to_qlit(obj[key], level + 1, suppress_indent=3DT=
-rue)))
->                    for key in sorted(obj.keys())]
->
-> is still illegible.  I'm afraid this is simply too complex for a list
-> comprehension.  Try rewriting as a loop.
->
-
-ok
-
-> Another option would be separating off indentation: generate the C
-> initializer unindented, then feed it to a stupid indenter that counts
-> parentheses (round, square and curly).
-
-hmm
-
->
->> +                 for key in sorted(obj.keys())]
->> +        elts.append(indent(level + 1) + '{ }')
->> +        ret +=3D 'QLIT_QDICT(((QLitDictEntry[]) {\n'
->> +        ret +=3D ',\n'.join(elts) + '\n'
->> +        ret +=3D indent(level) + '}))'
->>      else:
->>          assert False                # not implemented
->> -    if level =3D=3D 1:
->> -        ret =3D '\n' + ret
->>      return ret
->>
->>
->> -def to_c_string(string):
->> -    return '"' + string.replace('\\', r'\\').replace('"', r'\"') + '"'
->> -
->> -
->>  class QAPISchemaGenIntrospectVisitor(QAPISchemaVisitor):
->>      def __init__(self, unmask):
->>          self._unmask =3D unmask
->>          self.defn =3D None
->>          self.decl =3D None
->>          self._schema =3D None
->> -        self._jsons =3D None
->> +        self._qlits =3D None
->>          self._used_types =3D None
->>          self._name_map =3D None
->>
->>      def visit_begin(self, schema):
->>          self._schema =3D schema
->> -        self._jsons =3D []
->> +        self._qlits =3D []
->>          self._used_types =3D []
->>          self._name_map =3D {}
->>
->>      def visit_end(self):
->>          # visit the types that are actually used
->> -        jsons =3D self._jsons
->> -        self._jsons =3D []
->> +        qlits =3D self._qlits
->> +        self._qlits =3D []
->>          for typ in self._used_types:
->>              typ.visit(self)
->>          # generate C
->>          # TODO can generate awfully long lines
->> -        jsons.extend(self._jsons)
->> -        name =3D c_name(prefix, protect=3DFalse) + 'qmp_schema_json'
->> +        qlits.extend(self._qlits)
->> +        name =3D c_name(prefix, protect=3DFalse) + 'qmp_schema_qlit'
->>          self.decl =3D mcgen('''
->> -extern const char %(c_name)s[];
->> +extern const QLitObject %(c_name)s;
->>  ''',
->>                            c_name=3Dc_name(name))
->> -        lines =3D to_json(jsons).split('\n')
->> -        c_string =3D '\n    '.join([to_c_string(line) for line in lines=
-])
->> +        c_string =3D to_qlit(qlits)
->
-> The value is simple, and it's used just once.  Let's eliminate the
-> variable.
->
->>          self.defn =3D mcgen('''
->> -const char %(c_name)s[] =3D %(c_string)s;
->> +const QLitObject %(c_name)s =3D %(c_string)s;
->>  ''',
->>                            c_name=3Dc_name(name),
->>                            c_string=3Dc_string)
->>          self._schema =3D None
->> -        self._jsons =3D None
->> +        self._qlits =3D None
->>          self._used_types =3D None
->>          self._name_map =3D None
->>
->> @@ -111,12 +113,12 @@ const char %(c_name)s[] =3D %(c_string)s;
->>              return '[' + self._use_type(typ.element_type) + ']'
->>          return self._name(typ.name)
->>
->> -    def _gen_json(self, name, mtype, obj):
->> +    def _gen_qlit(self, name, mtype, obj):
->>          if mtype not in ('command', 'event', 'builtin', 'array'):
->>              name =3D self._name(name)
->>          obj['name'] =3D name
->>          obj['meta-type'] =3D mtype
->> -        self._jsons.append(obj)
->> +        self._qlits.append(obj)
->>
->>      def _gen_member(self, member):
->>          ret =3D {'name': member.name, 'type': self._use_type(member.typ=
-e)}
->> @@ -132,24 +134,24 @@ const char %(c_name)s[] =3D %(c_string)s;
->>          return {'case': variant.name, 'type': self._use_type(variant.ty=
-pe)}
->>
->>      def visit_builtin_type(self, name, info, json_type):
->> -        self._gen_json(name, 'builtin', {'json-type': json_type})
->> +        self._gen_qlit(name, 'builtin', {'json-type': json_type})
->>
->>      def visit_enum_type(self, name, info, values, prefix):
->> -        self._gen_json(name, 'enum', {'values': values})
->> +        self._gen_qlit(name, 'enum', {'values': values})
->>
->>      def visit_array_type(self, name, info, element_type):
->>          element =3D self._use_type(element_type)
->> -        self._gen_json('[' + element + ']', 'array', {'element-type': e=
-lement})
->> +        self._gen_qlit('[' + element + ']', 'array', {'element-type': e=
-lement})
->>
->>      def visit_object_type_flat(self, name, info, members, variants):
->>          obj =3D {'members': [self._gen_member(m) for m in members]}
->>          if variants:
->>              obj.update(self._gen_variants(variants.tag_member.name,
->>                                            variants.variants))
->> -        self._gen_json(name, 'object', obj)
->> +        self._gen_qlit(name, 'object', obj)
->>
->>      def visit_alternate_type(self, name, info, variants):
->> -        self._gen_json(name, 'alternate',
->> +        self._gen_qlit(name, 'alternate',
->>                         {'members': [{'type': self._use_type(m.type)}
->>                                      for m in variants.variants]})
->>
->> @@ -157,13 +159,13 @@ const char %(c_name)s[] =3D %(c_string)s;
->>                        gen, success_response, boxed):
->>          arg_type =3D arg_type or self._schema.the_empty_object_type
->>          ret_type =3D ret_type or self._schema.the_empty_object_type
->> -        self._gen_json(name, 'command',
->> +        self._gen_qlit(name, 'command',
->>                         {'arg-type': self._use_type(arg_type),
->>                          'ret-type': self._use_type(ret_type)})
->>
->>      def visit_event(self, name, info, arg_type, boxed):
->>          arg_type =3D arg_type or self._schema.the_empty_object_type
->> -        self._gen_json(name, 'event', {'arg-type': self._use_type(arg_t=
-ype)})
->> +        self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_t=
-ype)})
->>
->>  # Debugging aid: unmask QAPI schema's type names
->>  # We normally mask them, because they're not QMP wire ABI
->> @@ -205,11 +207,18 @@ h_comment =3D '''
->>
->>  fdef.write(mcgen('''
->>  #include "qemu/osdep.h"
->> +#include "qapi/qmp/qlit.h"
->>  #include "%(prefix)sqmp-introspect.h"
->>
->>  ''',
->>                   prefix=3Dprefix))
->>
->> +fdecl.write(mcgen('''
->> +#include "qemu/osdep.h"
->> +#include "qapi/qmp/qlit.h"
->> +
->> +'''))
->> +
->>  schema =3D QAPISchema(input_file)
->>  gen =3D QAPISchemaGenIntrospectVisitor(opt_unmask)
->>  schema.visit(gen)
->> diff --git a/monitor.c b/monitor.c
->> index 6d040e620f..a1773d5bc7 100644
->> --- a/monitor.c
->> +++ b/monitor.c
->> @@ -953,7 +953,7 @@ EventInfoList *qmp_query_events(Error **errp)
->>  static void qmp_query_qmp_schema(QDict *qdict, QObject **ret_data,
->>                                   Error **errp)
->>  {
->> -    *ret_data =3D qobject_from_json(qmp_schema_json, &error_abort);
->> +    *ret_data =3D qobject_from_qlit(&qmp_schema_qlit);
->>  }
+>> diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
+>> index fe9faf469f..a2d9786c52 100644
+>> --- a/include/qapi/visitor.h
+>> +++ b/include/qapi/visitor.h
+>> @@ -469,7 +469,8 @@ bool visit_optional(Visitor *v, const char *name, bo=
+ol *present);
+>>   * that visit_type_str() must have no unwelcome side effects.
+>>   */
+>>  void visit_type_enum(Visitor *v, const char *name, int *obj,
+>> -                     const char *const strings[], Error **errp);
+>> +                     const char *const strings[], int nstrings,
+>> +                     Error **errp);
 >>
 >>  /*
+>>   * Check if visitor is an input visitor.
+>> diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
+>> index bd0b742236..60850a6cdd 100644
+>> --- a/scripts/qapi-visit.py
+>> +++ b/scripts/qapi-visit.py
+>> @@ -147,17 +147,17 @@ out:
+>>                   c_name=3Dc_name(name), c_elt_type=3Delement_type.c_nam=
+e())
+>>
+>>
+>> -def gen_visit_enum(name):
+>> +def gen_visit_enum(name, prefix):
+>>      return mcgen('''
+>>
+>>  void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s *ob=
+j, Error **errp)
+>>  {
+>>      int value =3D *obj;
+>> -    visit_type_enum(v, name, &value, %(c_name)s_lookup, errp);
+>> +    visit_type_enum(v, name, &value, %(c_name)s_lookup, %(c_max)s, errp=
+);
+>>      *obj =3D value;
+>>  }
+>>  ''',
+>> -                 c_name=3Dc_name(name))
+>> +                 c_name=3Dc_name(name), c_max=3Dc_enum_const(name, '_MA=
+X', prefix))
+>>
+>>
+>>  def gen_visit_alternate(name, variants):
+>> @@ -288,10 +288,10 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor)=
+:
+>>          if not info:
+>>              self._btin +=3D gen_visit_decl(name, scalar=3DTrue)
+>>              if do_builtins:
+>> -                self.defn +=3D gen_visit_enum(name)
+>> +                self.defn +=3D gen_visit_enum(name, prefix)
+>>          else:
+>>              self.decl +=3D gen_visit_decl(name, scalar=3DTrue)
+>> -            self.defn +=3D gen_visit_enum(name)
+>> +            self.defn +=3D gen_visit_enum(name, prefix)
+>>
+>>      def visit_array_type(self, name, info, element_type):
+>>          decl =3D gen_visit_decl(name)
+>> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+>> index ae317286a4..f86a0e1a75 100644
+>> --- a/include/hw/qdev-core.h
+>> +++ b/include/hw/qdev-core.h
+>> @@ -250,6 +250,7 @@ struct PropertyInfo {
+>>      const char *name;
+>>      const char *description;
+>>      const char * const *enum_table;
+>> +    int enum_table_size;
+>>      int (*print)(DeviceState *dev, Property *prop, char *dest, size_t l=
+en);
+>>      void (*set_default_value)(Object *obj, const Property *prop);
+>>      void (*create)(Object *obj, Property *prop, Error **errp);
+>> diff --git a/include/qom/object.h b/include/qom/object.h
+>> index 1b828994fa..53d807e1e6 100644
+>> --- a/include/qom/object.h
+>> +++ b/include/qom/object.h
+>> @@ -1406,6 +1406,8 @@ void object_class_property_add_bool(ObjectClass *k=
+lass, const char *name,
+>>   * @obj: the object to add a property to
+>>   * @name: the name of the property
+>>   * @typename: the name of the enum data type
+>> + * @strings: an array of strings for the enum
+>
+> Fixes a preexisting doc buglet.
+>
+>> + * @nstrings: the size of @strings
+>>   * @get: the getter or %NULL if the property is write-only.
+>>   * @set: the setter or %NULL if the property is read-only
+>>   * @errp: if an error occurs, a pointer to an area to store the error
+>> @@ -1416,6 +1418,7 @@ void object_class_property_add_bool(ObjectClass *k=
+lass, const char *name,
+>>  void object_property_add_enum(Object *obj, const char *name,
+>>                                const char *typename,
+>>                                const char * const *strings,
+>> +                              int nstrings,
+>>                                int (*get)(Object *, Error **),
+>>                                void (*set)(Object *, int, Error **),
+>>                                Error **errp);
+>> @@ -1423,6 +1426,7 @@ void object_property_add_enum(Object *obj, const c=
+har *name,
+>>  void object_class_property_add_enum(ObjectClass *klass, const char *nam=
+e,
+>>                                      const char *typename,
+>>                                      const char * const *strings,
+>> +                                    int nstrings,
+>>                                      int (*get)(Object *, Error **),
+>>                                      void (*set)(Object *, int, Error **=
+),
+>>                                      Error **errp);
+>> diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
+>> index ed6d2af462..dc0b9f2cee 100644
+>> --- a/qapi/qapi-visit-core.c
+>> +++ b/qapi/qapi-visit-core.c
+>> @@ -333,14 +333,13 @@ void visit_type_null(Visitor *v, const char *name,=
+ QNull **obj,
+>>  }
+>>
+>>  static void output_type_enum(Visitor *v, const char *name, int *obj,
+>> -                             const char *const strings[], Error **errp)
+>> +                             const char *const strings[],
+>> +                             int nstrings, Error **errp)
+>>  {
+>> -    int i =3D 0;
+>>      int value =3D *obj;
+>>      char *enum_str;
+>>
+>> -    while (strings[i++] !=3D NULL);
+>
+> This is the computation we save.
+>
+>> -    if (value < 0 || value >=3D i - 1) {
+>> +    if (value < 0 || value >=3D nstrings) {
+>>          error_setg(errp, QERR_INVALID_PARAMETER, name ? name : "null");
+>>          return;
+>>      }
+>> @@ -350,7 +349,8 @@ static void output_type_enum(Visitor *v, const char =
+*name, int *obj,
+>>  }
+>>
+>>  static void input_type_enum(Visitor *v, const char *name, int *obj,
+>> -                            const char *const strings[], Error **errp)
+>> +                            const char *const strings[],
+>> +                            int nstrings, Error **errp)
+>>  {
+>>      Error *local_err =3D NULL;
+>>      int64_t value =3D 0;
+>> @@ -362,14 +362,14 @@ static void input_type_enum(Visitor *v, const char=
+ *name, int *obj,
+>>          return;
+>>      }
+>>
+>> -    while (strings[value] !=3D NULL) {
+>
+> This is the predicate that becomes invalid when we put holes into
+> strings[].
+>
+>> -        if (strcmp(strings[value], enum_str) =3D=3D 0) {
+>> +    while (value < nstrings) {
+>> +        if (strings[value] && strcmp(strings[value], enum_str) =3D=3D 0=
+) {
+>
+> I'd prefer !strcmp().
+>
+>>              break;
+>>          }
+>>          value++;
+>>      }
+>>
+>> -    if (strings[value] =3D=3D NULL) {
+>> +    if (value >=3D nstrings || strings[value] =3D=3D NULL) {
+>
+> Make that
+>
+>        if (value =3D=3D nstrings) {
+>
+> to match the loop above.
+>
+>>          error_setg(errp, QERR_INVALID_PARAMETER, enum_str);
+>>          g_free(enum_str);
+>>          return;
+>> @@ -380,16 +380,17 @@ static void input_type_enum(Visitor *v, const char=
+ *name, int *obj,
+>>  }
+>>
+>>  void visit_type_enum(Visitor *v, const char *name, int *obj,
+>> -                     const char *const strings[], Error **errp)
+>> +                     const char *const strings[], int nstrings,
+>> +                     Error **errp)
+>>  {
+>>      assert(obj && strings);
+>>      trace_visit_type_enum(v, name, obj);
+>>      switch (v->type) {
+>>      case VISITOR_INPUT:
+>> -        input_type_enum(v, name, obj, strings, errp);
+>> +        input_type_enum(v, name, obj, strings, nstrings, errp);
+>>          break;
+>>      case VISITOR_OUTPUT:
+>> -        output_type_enum(v, name, obj, strings, errp);
+>> +        output_type_enum(v, name, obj, strings, nstrings, errp);
+>>          break;
+>>      case VISITOR_CLONE:
+>>          /* nothing further to do, scalar value was already copied by
+>> diff --git a/backends/hostmem.c b/backends/hostmem.c
+>> index 4606b73849..fc475a5387 100644
+>> --- a/backends/hostmem.c
+>> +++ b/backends/hostmem.c
+>> @@ -396,6 +396,7 @@ host_memory_backend_class_init(ObjectClass *oc, void=
+ *data)
+>>          NULL, NULL, &error_abort);
+>>      object_class_property_add_enum(oc, "policy", "HostMemPolicy",
+>>          HostMemPolicy_lookup,
+>> +        HOST_MEM_POLICY__MAX,
+>>          host_memory_backend_get_policy,
+>>          host_memory_backend_set_policy, &error_abort);
+>>      object_class_property_add_str(oc, "id", get_id, set_id, &error_abor=
+t);
+>> diff --git a/crypto/secret.c b/crypto/secret.c
+>> index 285ab7a63c..b5382cb7e3 100644
+>> --- a/crypto/secret.c
+>> +++ b/crypto/secret.c
+>> @@ -379,6 +379,7 @@ qcrypto_secret_class_init(ObjectClass *oc, void *dat=
+a)
+>>      object_class_property_add_enum(oc, "format",
+>>                                     "QCryptoSecretFormat",
+>>                                     QCryptoSecretFormat_lookup,
+>> +                                   QCRYPTO_SECRET_FORMAT__MAX,
+>>                                     qcrypto_secret_prop_get_format,
+>>                                     qcrypto_secret_prop_set_format,
+>>                                     NULL);
+>> diff --git a/crypto/tlscreds.c b/crypto/tlscreds.c
+>> index a8965531b6..8c060127ea 100644
+>> --- a/crypto/tlscreds.c
+>> +++ b/crypto/tlscreds.c
+>> @@ -234,6 +234,7 @@ qcrypto_tls_creds_class_init(ObjectClass *oc, void *=
+data)
+>>      object_class_property_add_enum(oc, "endpoint",
+>>                                     "QCryptoTLSCredsEndpoint",
+>>                                     QCryptoTLSCredsEndpoint_lookup,
+>> +                                   QCRYPTO_TLS_CREDS_ENDPOINT__MAX,
+>>                                     qcrypto_tls_creds_prop_get_endpoint,
+>>                                     qcrypto_tls_creds_prop_set_endpoint,
+>>                                     NULL);
+>> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+>> index 078fc5d239..696fed5b5b 100644
+>> --- a/hw/core/qdev-properties.c
+>> +++ b/hw/core/qdev-properties.c
+>> @@ -52,7 +52,8 @@ static void get_enum(Object *obj, Visitor *v, const ch=
+ar *name, void *opaque,
+>>      Property *prop =3D opaque;
+>>      int *ptr =3D qdev_get_prop_ptr(dev, prop);
+>>
+>> -    visit_type_enum(v, prop->name, ptr, prop->info->enum_table, errp);
+>> +    visit_type_enum(v, prop->name, ptr, prop->info->enum_table,
+>> +                    prop->info->enum_table_size, errp);
+>>  }
+>>
+>>  static void set_enum(Object *obj, Visitor *v, const char *name, void *o=
+paque,
+>> @@ -67,7 +68,8 @@ static void set_enum(Object *obj, Visitor *v, const ch=
+ar *name, void *opaque,
+>>          return;
+>>      }
+>>
+>> -    visit_type_enum(v, prop->name, ptr, prop->info->enum_table, errp);
+>> +    visit_type_enum(v, prop->name, ptr, prop->info->enum_table,
+>> +                    prop->info->enum_table_size, errp);
+>>  }
+>>
+>>  static void set_default_value_enum(Object *obj, const Property *prop)
+>> @@ -586,6 +588,7 @@ const PropertyInfo qdev_prop_on_off_auto =3D {
+>>      .name =3D "OnOffAuto",
+>>      .description =3D "on/off/auto",
+>>      .enum_table =3D OnOffAuto_lookup,
+>> +    .enum_table_size =3D ON_OFF_AUTO__MAX,
+>>      .get =3D get_enum,
+>>      .set =3D set_enum,
+>>      .set_default_value =3D set_default_value_enum,
+>> @@ -598,6 +601,7 @@ QEMU_BUILD_BUG_ON(sizeof(LostTickPolicy) !=3D sizeof=
+(int));
+>>  const PropertyInfo qdev_prop_losttickpolicy =3D {
+>>      .name  =3D "LostTickPolicy",
+>>      .enum_table  =3D LostTickPolicy_lookup,
+>> +    .enum_table_size =3D LOST_TICK_POLICY__MAX,
+>>      .get   =3D get_enum,
+>>      .set   =3D set_enum,
+>>      .set_default_value =3D set_default_value_enum,
+>> @@ -612,6 +616,7 @@ const PropertyInfo qdev_prop_blockdev_on_error =3D {
+>>      .description =3D "Error handling policy, "
+>>                     "report/ignore/enospc/stop/auto",
+>>      .enum_table =3D BlockdevOnError_lookup,
+>> +    .enum_table_size =3D BLOCKDEV_ON_ERROR__MAX,
+>>      .get =3D get_enum,
+>>      .set =3D set_enum,
+>>      .set_default_value =3D set_default_value_enum,
+>> @@ -626,6 +631,7 @@ const PropertyInfo qdev_prop_bios_chs_trans =3D {
+>>      .description =3D "Logical CHS translation algorithm, "
+>>                     "auto/none/lba/large/rechs",
+>>      .enum_table =3D BiosAtaTranslation_lookup,
+>> +    .enum_table_size =3D BIOS_ATA_TRANSLATION__MAX,
+>>      .get =3D get_enum,
+>>      .set =3D set_enum,
+>>      .set_default_value =3D set_default_value_enum,
+>> @@ -638,6 +644,7 @@ const PropertyInfo qdev_prop_fdc_drive_type =3D {
+>>      .description =3D "FDC drive type, "
+>>                     "144/288/120/none/auto",
+>>      .enum_table =3D FloppyDriveType_lookup,
+>> +    .enum_table_size =3D FLOPPY_DRIVE_TYPE__MAX,
+>>      .get =3D get_enum,
+>>      .set =3D set_enum,
+>>      .set_default_value =3D set_default_value_enum,
+>> diff --git a/net/filter.c b/net/filter.c
+>> index 1dfd2caa23..cf62851344 100644
+>> --- a/net/filter.c
+>> +++ b/net/filter.c
+>> @@ -180,6 +180,7 @@ static void netfilter_init(Object *obj)
+>>                              NULL);
+>>      object_property_add_enum(obj, "queue", "NetFilterDirection",
+>>                               NetFilterDirection_lookup,
+>> +                             NET_FILTER_DIRECTION__MAX,
+>>                               netfilter_get_direction, netfilter_set_dir=
+ection,
+>>                               NULL);
+>>      object_property_add_str(obj, "status",
+>> diff --git a/qom/object.c b/qom/object.c
+>> index fe6e744b4d..425bae3a2a 100644
+>> --- a/qom/object.c
+>> +++ b/qom/object.c
+>> @@ -1247,6 +1247,7 @@ uint64_t object_property_get_uint(Object *obj, con=
+st char *name,
+>>
+>>  typedef struct EnumProperty {
+>>      const char * const *strings;
+>> +    int nstrings;
+>>      int (*get)(Object *, Error **);
+>>      void (*set)(Object *, int, Error **);
+>>  } EnumProperty;
+>> @@ -1284,7 +1285,7 @@ int object_property_get_enum(Object *obj, const ch=
+ar *name,
+>>      visit_complete(v, &str);
+>>      visit_free(v);
+>>      v =3D string_input_visitor_new(str);
+>> -    visit_type_enum(v, name, &ret, enumprop->strings, errp);
+>> +    visit_type_enum(v, name, &ret, enumprop->strings, enumprop->nstring=
+s, errp);
+>
+> Long line.
+>
+>>
+>>      g_free(str);
+>>      visit_free(v);
+>> @@ -1950,7 +1951,7 @@ static void property_get_enum(Object *obj, Visitor=
+ *v, const char *name,
+>>          return;
+>>      }
+>>
+>> -    visit_type_enum(v, name, &value, prop->strings, errp);
+>> +    visit_type_enum(v, name, &value, prop->strings, prop->nstrings, err=
+p);
+>>  }
+>>
+>>  static void property_set_enum(Object *obj, Visitor *v, const char *name=
+,
+>> @@ -1960,7 +1961,7 @@ static void property_set_enum(Object *obj, Visitor=
+ *v, const char *name,
+>>      int value;
+>>      Error *err =3D NULL;
+>>
+>> -    visit_type_enum(v, name, &value, prop->strings, &err);
+>> +    visit_type_enum(v, name, &value, prop->strings, prop->nstrings, &er=
+r);
+>>      if (err) {
+>>          error_propagate(errp, err);
+>>          return;
+>> @@ -1978,6 +1979,7 @@ static void property_release_enum(Object *obj, con=
+st char *name,
+>>  void object_property_add_enum(Object *obj, const char *name,
+>>                                const char *typename,
+>>                                const char * const *strings,
+>> +                              int nstrings,
+>>                                int (*get)(Object *, Error **),
+>>                                void (*set)(Object *, int, Error **),
+>>                                Error **errp)
+>> @@ -1986,6 +1988,7 @@ void object_property_add_enum(Object *obj, const c=
+har *name,
+>>      EnumProperty *prop =3D g_malloc(sizeof(*prop));
+>>
+>>      prop->strings =3D strings;
+>> +    prop->nstrings =3D nstrings;
+>>      prop->get =3D get;
+>>      prop->set =3D set;
+>>
+>> @@ -2003,6 +2006,7 @@ void object_property_add_enum(Object *obj, const c=
+har *name,
+>>  void object_class_property_add_enum(ObjectClass *klass, const char *nam=
+e,
+>>                                      const char *typename,
+>>                                      const char * const *strings,
+>> +                                    int nstrings,
+>>                                      int (*get)(Object *, Error **),
+>>                                      void (*set)(Object *, int, Error **=
+),
+>>                                      Error **errp)
+>> @@ -2011,6 +2015,7 @@ void object_class_property_add_enum(ObjectClass *k=
+lass, const char *name,
+>>      EnumProperty *prop =3D g_malloc(sizeof(*prop));
+>>
+>>      prop->strings =3D strings;
+>> +    prop->nstrings =3D nstrings;
+>>      prop->get =3D get;
+>>      prop->set =3D set;
+>>
+>> diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
+>> index 432b66585f..1179030248 100644
+>> --- a/tests/check-qom-proplist.c
+>> +++ b/tests/check-qom-proplist.c
+>> @@ -143,6 +143,7 @@ static void dummy_class_init(ObjectClass *cls, void =
+*data)
+>>      object_class_property_add_enum(cls, "av",
+>>                                     "DummyAnimal",
+>>                                     dummy_animal_map,
+>> +                                   DUMMY_LAST,
+>>                                     dummy_get_av,
+>>                                     dummy_set_av,
+>>                                     NULL);
 >> diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-inp=
 ut-visitor.c
->> index bcf02617dc..1969733971 100644
+>> index 1969733971..4da5d02c35 100644
 >> --- a/tests/test-qobject-input-visitor.c
 >> +++ b/tests/test-qobject-input-visitor.c
->> @@ -1247,24 +1247,26 @@ static void test_visitor_in_fail_alternate(TestI=
-nputVisitorData *data,
->>  }
->>
->>  static void do_test_visitor_in_qmp_introspect(TestInputVisitorData *dat=
-a,
->> -                                              const char *schema_json)
->> +                                              const QLitObject *qlit)
->>  {
->>      SchemaInfoList *schema =3D NULL;
->> +    QObject *obj =3D qobject_from_qlit(qlit);
->>      Visitor *v;
->>
->> -    v =3D visitor_input_test_init_raw(data, schema_json);
->> +    v =3D qobject_input_visitor_new(obj);
->>
->>      visit_type_SchemaInfoList(v, NULL, &schema, &error_abort);
->>      g_assert(schema);
->>
->>      qapi_free_SchemaInfoList(schema);
->> +    qobject_decref(obj);
->>  }
->>
->>  static void test_visitor_in_qmp_introspect(TestInputVisitorData *data,
->>                                             const void *unused)
->>  {
->> -    do_test_visitor_in_qmp_introspect(data, test_qmp_schema_json);
->> -    do_test_visitor_in_qmp_introspect(data, qmp_schema_json);
->> +    do_test_visitor_in_qmp_introspect(data, &test_qmp_schema_qlit);
->> +    do_test_visitor_in_qmp_introspect(data, &qmp_schema_qlit);
->>  }
->>
+>> @@ -1110,7 +1110,7 @@ static void test_visitor_in_fail_struct_missing(Te=
+stInputVisitorData *data,
+>>      error_free_or_abort(&err);
+>>      visit_optional(v, "optional", &present);
+>>      g_assert(!present);
+>> -    visit_type_enum(v, "enum", &en, EnumOne_lookup, &err);
+>> +    visit_type_enum(v, "enum", &en, EnumOne_lookup, ENUM_ONE__MAX, &err=
+);
+>>      error_free_or_abort(&err);
+>>      visit_type_int(v, "i64", &i64, &err);
+>>      error_free_or_abort(&err);
 >
-> These tests are only marginally useful now.  Before, they ensured that a
-> qapi-introspect.py generating invalid JSON fails at "make check" compile
-> time.  Such bugs should now fail when we compile the generated
-> qapi-introspect.c.
+> Missing: a review of FOO_lookup[] uses outside these two, to make sure
+> none of them fall into holes like input_type_enum() would.  From the top
+> of my head: qapi_enum_parse().  A quick grep for loops counting up to
+> FOO__MAX additionally finds get_event_by_name() in blkdebug.c,
+> parse_read_pattern() in quorum.c, hmp_migrate_set_capability() in hmp.c,
+> and then I stopped looking.  Most (or all?) of them should use
+> qapi_enum_parse().
 >
->>  int main(int argc, char **argv)
->> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
->> index 9903ac4c19..885c61b52f 100644
->> --- a/docs/devel/qapi-code-gen.txt
->> +++ b/docs/devel/qapi-code-gen.txt
->> @@ -1295,18 +1295,27 @@ Example:
->>      #ifndef EXAMPLE_QMP_INTROSPECT_H
->>      #define EXAMPLE_QMP_INTROSPECT_H
->>
->> -    extern const char example_qmp_schema_json[];
->> +    extern const QLitObject qmp_schema_qlit;
->>
->>      #endif
->>      $ cat qapi-generated/example-qmp-introspect.c
->>  [Uninteresting stuff omitted...]
->>
->> -    const char example_qmp_schema_json[] =3D "["
->> -        "{\"arg-type\": \"0\", \"meta-type\": \"event\", \"name\": \"MY=
-_EVENT\"}, "
->> -        "{\"arg-type\": \"1\", \"meta-type\": \"command\", \"name\": \"=
-my-command\", \"ret-type\": \"2\"}, "
->> -        "{\"members\": [], \"meta-type\": \"object\", \"name\": \"0\"},=
- "
->> -        "{\"members\": [{\"name\": \"arg1\", \"type\": \"[2]\"}], \"met=
-a-type\": \"object\", \"name\": \"1\"}, "
->> -        "{\"members\": [{\"name\": \"integer\", \"type\": \"int\"}, {\"=
-default\": null, \"name\": \"string\", \"type\": \"str\"}], \"meta-type\": =
-\"object\", \"name\": \"2\"}, "
->> -        "{\"element-type\": \"2\", \"meta-type\": \"array\", \"name\": =
-\"[2]\"}, "
->> -        "{\"json-type\": \"int\", \"meta-type\": \"builtin\", \"name\":=
- \"int\"}, "
->> -        "{\"json-type\": \"string\", \"meta-type\": \"builtin\", \"name=
-\": \"str\"}]";
->> +    const QLitObject example_qmp_schema_qlit =3D QLIT_QLIST(((QLitObjec=
-t[]) {
->> +        QLIT_QDICT(((QLitDictEntry[]) {
->> +            { "arg-type", QLIT_QSTR("0") },
->> +            { "meta-type", QLIT_QSTR("event") },
->> +            { "name", QLIT_QSTR("Event") },
->> +            { }
->> +        })),
->> +        QLIT_QDICT(((QLitDictEntry[]) {
->> +            { "members", QLIT_QLIST(((QLitObject[]) {
->> +                { }
->> +            })) },
->> +            { "meta-type", QLIT_QSTR("object") },
->> +            { "name", QLIT_QSTR("0") },
->> +            { }
->> +        })),
->> +        ....
+> There's one patch hunk to make input_type_enum() cope with holes, one
+> patch hunk to opportunistically simplify output_type_enum(), and all the
+> others are for plumbing the table size to these two.  That's a lot of
+> plumbing.  Can't say I like it.
 >
-> Ellipsis is three dots, not four :)
+> Alternatives:
 >
-> Output is no longer complete (less file boilerplate).  Not an issue now,
-> but it might become one when we make the examples testable.  We can
-> restore the deleted output then.
+> (1) Use a value other than NULL for holes, say ""
+>
+> (2) Use a value other than NULL for the sentinel, say ""
+>
+> (3) Store the length in the lookup table, i.e. change it from
+>     const char *const[] to struct { int n, const char *const s[] }.
+>
+> The least work is probably (1).  Slightly ugly.
+>
+> If you do (3), please consider getting rid of the sentinel.
 >
 
-ok
-
-
+I have done (3)
 
 --=20
 Marc-Andr=C3=A9 Lureau
