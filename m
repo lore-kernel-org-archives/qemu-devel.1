@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dk4rH-0001kq-2H
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:24 -0400
+	(envelope-from <famz@redhat.com>) id 1dk4rU-0001sB-6E
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dk4rD-00043E-TL
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:23 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:22313 helo=zte.com.cn)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dk4rD-0003ys-B5
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:19 -0400
-From: Wang yong <wang.yong155@zte.com.cn>
-Date: Tue, 22 Aug 2017 16:46:17 +0800
-Message-Id: <1503391578-6121-3-git-send-email-wang.yong155@zte.com.cn>
-In-Reply-To: <1503391578-6121-1-git-send-email-wang.yong155@zte.com.cn>
-References: <1503391578-6121-1-git-send-email-wang.yong155@zte.com.cn>
-Subject: [Qemu-devel] [PATCHv4 02/03] colo-compare: Use IOThread to Check
- old packet regularly and Process pactkets of the primary
+	(envelope-from <famz@redhat.com>) id 1dk4rR-0004T9-3o
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38426)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dk4rQ-0004Qv-PX
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:33 -0400
+Date: Tue, 22 Aug 2017 16:48:25 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170822084825.GA3210@lemon>
+References: <20170821135743.GC4371@lemon> <20170821153622.GG2231@work-vm>
+	<20170821165450.GE4371@lemon> <20170821172852.GA3236@work-vm>
+	<20170822021556.GA2146@lemon>
+	<20170822025654.GE30356@pxdev.xzpeter.org>
+	<20170822041519.GC2146@lemon>
+	<20170822055903.GF30356@pxdev.xzpeter.org>
+	<20170822063348.GE2146@lemon> <20170822082940.GB2109@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170822082940.GB2109@work-vm>
+Subject: Re: [Qemu-devel] [RFC 0/6] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,182 +32,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, stefanha@redhat.com, famz@redhat.com, jasowang@redhat.com, zhangchen.fnst@cn.fujitsu.com, zhang.zhanghailiang@huawei.com
-Cc: wang.yong155@zte.com.cn, wang.guang55@zte.com.cn, lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Wang Yong <wang.yong155@zte.com.cn>
+On Tue, 08/22 09:29, Dr. David Alan Gilbert wrote:
+> * Fam Zheng (famz@redhat.com) wrote:
+> > On Tue, 08/22 13:59, Peter Xu wrote:
+> > > On Tue, Aug 22, 2017 at 12:15:19PM +0800, Fam Zheng wrote:
+> > > > On Tue, 08/22 10:56, Peter Xu wrote:
+> > > > > I haven't really encountered (c), but I think it's the migrate_cancel
+> > > > > command that matters, which should not need BQL as well.
+> > > > 
+> > > > There is bdrv_invalidate_cache_all() in migrate_cancel which clearly isn't safe.
+> > > > Is that if block unreachable in this case? If so we should assert, otherwise
+> > > > this command is not okay to run without BQL.
+> > > 
+> > > Ah. I see.  Even if so, if that is the only usage of BQL, IMHO we can
+> > > still mark migrate_cancel as "without-bql=true", instead we take the
+> > > BQL before calling bdrv_invalidate_cache_all().  Then migrate_cancel
+> > > can be BQL-free at least when block migration is not active.
+> > > 
+> > > > 
+> > > > Generically, what guarantee the thread-safety of a qmp command when you decide
+> > > > BQL is not needed? In other words, how do you prove commands are safe without
+> > > > BQL? I think almost every command accesses global state, but lock-free data
+> > > > structures are rare AFAICT.
+> > > 
+> > > I would suggest we split the problem into at least three parts.  IMHO
+> > > we need to answer below questions one by one to know what we should do
+> > > next:
+> > > 
+> > > 1. whether we can handle monitor commands outside iothread, or say, in
+> > >    an isolated thread?
+> > > 
+> > >    This is basically what patch 2 does, the "per-monitor threads".
+> > > 
+> > >    IMHO this is the very first question to ask.  So now I know that at
+> > >    least current code cannot do it.  We need to at least do something
+> > >    to remove/replace the assertion to make this happen.  Can we?  I
+> > >    don't really know the answer yet.  If this is undoable, we can skip
+> > >    question 2/3 below and may need to rethink on how to solve the
+> > >    problem that postcopy recovery encounters.
+> > > 
+> > > 2. whether there is any monitor commands can run without BQL?
+> > > 
+> > >    This is basically what patch 3/5 does, one for QMP, one for HMP.
+> > > 
+> > >    If we can settle question 1, then we can possibly start consider
+> > >    this question.  This step does not really allow any command to run
+> > >    without BQL, but we need to know whether it's possible in general,
+> > >    and if possible, we provide a framework to allow QMP/HMP developers
+> > >    to specify that.  If you see patch 3/5, the default behavior is
+> > >    still taking the BQL for all commands.
+> > > 
+> > >    IMHO doing this whole thing is generally good in the sense that
+> > >    this is actually forcing ourselves to break the BQL into smaller
+> > >    locks.  Take the migration commands for example: migrate_incoming
+> > >    do not need BQL, and when we write codes around it we know that we
+> > >    don't need to think about thread-safety.  That's not good IMHO.  I
+> > >    think it's time we should start consider thread-safety always.
+> > >    Again, for migrate_incoming to do this, actually we'll possibly at
+> > >    least need a migration management lock (the smaller lock) to make
+> > >    sure e.g. the user is not running two migrate_incoming commands in
+> > >    parallel (after per-monitor threads, it can happen).  But it's
+> > >    better than BQL, because BQL is for sure too big, so even a guest
+> > >    page access (as long as it held the BQL) can block migration
+> > >    commands.
+> > 
+> > Yes, this is my point. You cannot just declare a command "BQL-free" without
+> > adding small locks first, and I think this is actually missing in this series.
+> > As you said, two per-monitor threads can race if they do migrate_incoming in
+> > parallel.  This is also the answer to 3.
+> 
+> Some commands really could be lock-free.  For example an 'info status'
+> should just be a read without any locking.
 
-Remove the task which check old packet in the comparing thread,
-then use IOthread context timer to handle it.
+Indeed, it makes sense to enable as many info (query-*) commands as possible on
+non-mainloop monitors.
 
-Process pactkets in the IOThread which arrived over the socket.
-we use iothread_get_g_main_context to create a new g_main_loop in
-the IOThread.then the packets from the primary and the secondary
-are processed in the IOThread.
+> It might also be possible to make a version of migrate_cancel lock-free;
+> in particular the critical part is being able to do a shutdown() on the
+> socket - that's enough to cause any of the migration threads to 
+> unblock and take their failure path.
+> 
+> Also in the case of COLO; there should be an equivalent place to
+> do the shutdown() on the migration thread and then set a flag to cause
+> failover.
+> (It's currently qmp_x_colo_lost_heartbeat but I think the eventual
+> version would be more complex).
 
-Finally remove the colo-compare thread using the IOThread instead.
-
-Signed-off-by: Wang Yong <wang.yong155@zte.com.cn>
-Signed-off-by: Wang Guang <wang.guang55@zte.com.cn>
----
- net/colo-compare.c | 75 ++++++++++++++++++++++++++++--------------------------
- 1 file changed, 39 insertions(+), 36 deletions(-)
-
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 5fe8e3f..69cb16e 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -29,6 +29,7 @@
- #include "qemu/sockets.h"
- #include "qapi-visit.h"
- #include "net/colo.h"
-+#include "sysemu/iothread.h"
- 
- #define TYPE_COLO_COMPARE "colo-compare"
- #define COLO_COMPARE(obj) \
-@@ -82,11 +83,10 @@ typedef struct CompareState {
-     GQueue conn_list;
-     /* hashtable to save connection */
-     GHashTable *connection_track_table;
--    /* compare thread, a thread for each NIC */
--    QemuThread thread;
- 
-+    IOThread *iothread;
-     GMainContext *worker_context;
--    GMainLoop *compare_loop;
-+    QEMUTimer *packet_check_timer;
- } CompareState;
- 
- typedef struct CompareClass {
-@@ -597,22 +597,40 @@ static void compare_sec_chr_in(void *opaque, const uint8_t *buf, int size)
-  * Check old packet regularly so it can watch for any packets
-  * that the secondary hasn't produced equivalents of.
-  */
--static gboolean check_old_packet_regular(void *opaque)
-+static void check_old_packet_regular(void *opaque)
- {
-     CompareState *s = opaque;
- 
-     /* if have old packet we will notify checkpoint */
-     colo_old_packet_check(s);
-+    timer_mod(s->packet_check_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
-+                REGULAR_PACKET_CHECK_MS);
-+}
-+
-+static void colo_compare_timer_init(CompareState *s)
-+{
-+    AioContext *ctx = iothread_get_aio_context(s->iothread);
- 
--    return TRUE;
-+    s->packet_check_timer = aio_timer_new(ctx, QEMU_CLOCK_VIRTUAL,
-+                                SCALE_MS, check_old_packet_regular,
-+                                s);
-+    timer_mod(s->packet_check_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
-+                    REGULAR_PACKET_CHECK_MS);
- }
- 
--static void *colo_compare_thread(void *opaque)
-+static void colo_compare_timer_del(CompareState *s)
- {
--    CompareState *s = opaque;
--    GSource *timeout_source;
-+    if (s->packet_check_timer) {
-+        timer_del(s->packet_check_timer);
-+        timer_free(s->packet_check_timer);
-+        s->packet_check_timer = NULL;
-+    }
-+ }
- 
--    s->worker_context = g_main_context_new();
-+static void colo_compare_iothread(CompareState *s)
-+{
-+    object_ref(OBJECT(s->iothread));
-+    s->worker_context = iothread_get_g_main_context(s->iothread);
- 
-     qemu_chr_fe_set_handlers(&s->chr_pri_in, compare_chr_can_read,
-                              compare_pri_chr_in, NULL, NULL,
-@@ -621,20 +639,7 @@ static void *colo_compare_thread(void *opaque)
-                              compare_sec_chr_in, NULL, NULL,
-                              s, s->worker_context, true);
- 
--    s->compare_loop = g_main_loop_new(s->worker_context, FALSE);
--
--    /* To kick any packets that the secondary doesn't match */
--    timeout_source = g_timeout_source_new(REGULAR_PACKET_CHECK_MS);
--    g_source_set_callback(timeout_source,
--                          (GSourceFunc)check_old_packet_regular, s, NULL);
--    g_source_attach(timeout_source, s->worker_context);
--
--    g_main_loop_run(s->compare_loop);
--
--    g_source_unref(timeout_source);
--    g_main_loop_unref(s->compare_loop);
--    g_main_context_unref(s->worker_context);
--    return NULL;
-+    colo_compare_timer_init(s);
- }
- 
- static char *compare_get_pri_indev(Object *obj, Error **errp)
-@@ -759,12 +764,10 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
- {
-     CompareState *s = COLO_COMPARE(uc);
-     Chardev *chr;
--    char thread_name[64];
--    static int compare_id;
- 
--    if (!s->pri_indev || !s->sec_indev || !s->outdev) {
-+    if (!s->pri_indev || !s->sec_indev || !s->outdev || !s->iothread) {
-         error_setg(errp, "colo compare needs 'primary_in' ,"
--                   "'secondary_in','outdev' property set");
-+                   "'secondary_in','outdev','iothread' property set");
-         return;
-     } else if (!strcmp(s->pri_indev, s->outdev) ||
-                !strcmp(s->sec_indev, s->outdev) ||
-@@ -799,12 +802,7 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
-                                                       g_free,
-                                                       connection_destroy);
- 
--    sprintf(thread_name, "colo-compare %d", compare_id);
--    qemu_thread_create(&s->thread, thread_name,
--                       colo_compare_thread, s,
--                       QEMU_THREAD_JOINABLE);
--    compare_id++;
--
-+    colo_compare_iothread(s);
-     return;
- }
- 
-@@ -848,6 +846,10 @@ static void colo_compare_init(Object *obj)
-     object_property_add_str(obj, "outdev",
-                             compare_get_outdev, compare_set_outdev,
-                             NULL);
-+    object_property_add_link(obj, "iothread", TYPE_IOTHREAD,
-+                            (Object **)&s->iothread,
-+                            object_property_allow_set_link,
-+                            OBJ_PROP_LINK_UNREF_ON_RELEASE, NULL);
- 
-     s->vnet_hdr = false;
-     object_property_add_bool(obj, "vnet_hdr_support", compare_get_vnet_hdr,
-@@ -861,9 +863,7 @@ static void colo_compare_finalize(Object *obj)
-     qemu_chr_fe_deinit(&s->chr_pri_in, false);
-     qemu_chr_fe_deinit(&s->chr_sec_in, false);
-     qemu_chr_fe_deinit(&s->chr_out, false);
--
--    g_main_loop_quit(s->compare_loop);
--    qemu_thread_join(&s->thread);
-+    colo_compare_timer_del(s);
- 
-     /* Release all unhandled packets after compare thead exited */
-     g_queue_foreach(&s->conn_list, colo_flush_packets, s);
-@@ -871,6 +871,9 @@ static void colo_compare_finalize(Object *obj)
-     g_queue_clear(&s->conn_list);
- 
-     g_hash_table_destroy(s->connection_track_table);
-+    if (s->iothread) {
-+        object_unref(OBJECT(s->iothread));
-+    }
-     g_free(s->pri_indev);
-     g_free(s->sec_indev);
-     g_free(s->outdev);
--- 
-1.8.3.1
+Fam
