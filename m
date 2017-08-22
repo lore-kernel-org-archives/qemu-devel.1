@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dk2MZ-0000nw-R7
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 02:08:33 -0400
+	(envelope-from <peterx@redhat.com>) id 1dk2ZD-0003nV-85
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 02:21:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dk2MX-000253-Se
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 02:08:31 -0400
+	(envelope-from <peterx@redhat.com>) id 1dk2Z9-0008VF-34
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 02:21:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46176)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dk2Z8-0008V0-Po
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 02:21:31 -0400
+Date: Tue, 22 Aug 2017 14:21:23 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170822062123.GG30356@pxdev.xzpeter.org>
+References: <1503301464-27886-1-git-send-email-peterx@redhat.com>
+	<150337750658.30.7791724179303558490@205a2245145f>
 MIME-Version: 1.0
-In-Reply-To: <CALHRZuovDOou9nR5U0BmEdp_qu9N_ym+UnsxmnBwF3=jWwmQEQ@mail.gmail.com>
-References: <1499057115-6773-1-git-send-email-sundeep.lkml@gmail.com>
-	<1499057115-6773-3-git-send-email-sundeep.lkml@gmail.com>
-	<CAKmqyKORKWWOUSAQ8_GtF6rOspE0mtJOEhJTvfuJ6h7JAru74A@mail.gmail.com>
-	<CALHRZuo7Y2RpS3EWnd55_Te_p2YSo03JcdTYB31MDz7p07bSGA@mail.gmail.com>
-	<CAKmqyKM7WGg30=TNtPotC-Vr7uYFxZmAuYXWRDjXHDxMM1vhbA@mail.gmail.com>
-	<CALHRZurJgf3r8_pA=vx0=N8L6oo_ZnaQO==yRxtCHhoFZ-pG7w@mail.gmail.com>
-	<CALHRZuo2WuZRWgDnfoE+cyi9ypPxdKQdH7XTrDuWK_SU1b=z2w@mail.gmail.com>
-	<CALHRZupSqy8Tu-Pb5nWPY8dz-qduwNt7exVGXBO45EEoU-mqww@mail.gmail.com>
-	<CALHRZuovDOou9nR5U0BmEdp_qu9N_ym+UnsxmnBwF3=jWwmQEQ@mail.gmail.com>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Tue, 22 Aug 2017 11:38:27 +0530
-Message-ID: <CALHRZup_pn8UUPrcA7_gd-Ztt_9JZedoQJC=Rdi9DMxF7-0koQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu devel v6 PATCH 2/5] msf2: Microsemi
- Smartfusion2 System Register block.
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <150337750658.30.7791724179303558490@205a2245145f>
+Subject: Re: [Qemu-devel] [RFC 0/6] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,270 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, lvivier@redhat.com, quintela@redhat.com, mdroth@linux.vnet.ibm.com, armbru@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com
 
-Hi Alistair,
+On Mon, Aug 21, 2017 at 09:51:47PM -0700, no-reply@patchew.org wrote:
 
-I will remove the abort and send next iteration.
+[...]
 
-Thanks,
-Sundeep
+>   TEST    tests/qapi-schema/doc-duplicated-return.out
+>   TEST    tests/qapi-schema/doc-duplicated-since.out
+>   TEST    tests/qapi-schema/doc-empty-arg.out
+>   TEST    tests/qapi-schema/doc-empty-section.out
+>   TEST    tests/qapi-schema/doc-empty-symbol.out
+>   TEST    tests/qapi-schema/doc-good.out
+>   TEST    tests/qapi-schema/doc-interleaved-section.out
+>   TEST    tests/qapi-schema/doc-invalid-end.out
+>   TEST    tests/qapi-schema/doc-invalid-end2.out
+>   TEST    tests/qapi-schema/doc-invalid-return.out
+>   TEST    tests/qapi-schema/doc-invalid-section.out
+> Files /tmp/qemu-test/src/tests/qapi-schema/doc-good.out and tests/qapi-schema/doc-good.test.out differ
+> make: *** [check-tests/qapi-schema/doc-good.json] Error 1
+> make: *** Waiting for unfinished jobs....
+> Traceback (most recent call last):
+>   File "./tests/docker/docker.py", line 382, in <module>
+>     sys.exit(main())
+>   File "./tests/docker/docker.py", line 379, in main
+>     return args.cmdobj.run(args, argv)
+>   File "./tests/docker/docker.py", line 237, in run
+>     return Docker().run(argv, args.keep, quiet=args.quiet)
+>   File "./tests/docker/docker.py", line 205, in run
+>     quiet=quiet)
+>   File "./tests/docker/docker.py", line 123, in _do_check
+>     return subprocess.check_call(self._command + cmd, **kwargs)
+>   File "/usr/lib64/python2.7/subprocess.py", line 186, in check_call
+>     raise CalledProcessError(retcode, cmd)
+> subprocess.CalledProcessError: Command '['docker', 'run', '--label', 'com.qemu.instance.uuid=579f531486f511e7961952540069c830', '-u', '0', '-t', '--rm', '--net=none', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=8', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/var/tmp/patchew-tester-tmp-vbkqrhlc/src/docker-src.2017-08-22-00.49.51.7825:/var/tmp/qemu:z,ro', '-v', '/root/.cache/qemu-docker-ccache:/var/tmp/ccache:z', 'qemu:centos6', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exit status 2
+> make[1]: *** [tests/docker/Makefile.include:139: docker-run] Error 1
+> make[1]: Leaving directory '/var/tmp/patchew-tester-tmp-vbkqrhlc/src'
+> make: *** [tests/docker/Makefile.include:168: docker-run-test-quick@centos6] Error 2
 
-On Tue, Aug 1, 2017 at 11:38 AM, sundeep subbaraya <sundeep.lkml@gmail.com>
-wrote:
+This is because I forgot to touch-up tests/qapi-schema/test-qapi.py
+for its visit_command() test.  Fixed up.
 
-> Hi Philippe,
->
-> Ping again :)
->
-> Thanks,
-> Sundeep
->
-> On Fri, Jul 21, 2017 at 2:50 PM, sundeep subbaraya <sundeep.lkml@gmail.com
-> > wrote:
->
->> Hi,
->>
->> Ping
->>
->> On Thu, Jul 13, 2017 at 7:51 AM, sundeep subbaraya <
->> sundeep.lkml@gmail.com> wrote:
->>
->>> Hi Phiiippe,
->>>
->>> Gentle reminder.
->>>
->>> Thanks,
->>> Sundeep
->>>
->>>
->>> On Mon, Jul 10, 2017 at 1:55 PM, sundeep subbaraya <
->>> sundeep.lkml@gmail.com> wrote:
->>>
->>>> Hi Alistair,
->>>>
->>>> On Fri, Jul 7, 2017 at 10:03 PM, Alistair Francis <alistair23@gmail.com
->>>> > wrote:
->>>>
->>>>> On Fri, Jul 7, 2017 at 12:08 AM, sundeep subbaraya
->>>>> <sundeep.lkml@gmail.com> wrote:
->>>>> > Hi Alistair,
->>>>> >
->>>>> > On Wed, Jul 5, 2017 at 11:36 PM, Alistair Francis <
->>>>> alistair23@gmail.com>
->>>>> > wrote:
->>>>> >>
->>>>> >> On Sun, Jul 2, 2017 at 9:45 PM, Subbaraya Sundeep
->>>>> >> <sundeep.lkml@gmail.com> wrote:
->>>>> >> > Added Sytem register block of Smartfusion2.
->>>>> >> > This block has PLL registers which are accessed by guest.
->>>>> >> >
->>>>> >> > Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
->>>>> >> > ---
->>>>> >> >  hw/misc/Makefile.objs         |   1 +
->>>>> >> >  hw/misc/msf2-sysreg.c         | 200
->>>>> >> > ++++++++++++++++++++++++++++++++++++++++++
->>>>> >> >  include/hw/misc/msf2-sysreg.h |  82 +++++++++++++++++
->>>>> >> >  3 files changed, 283 insertions(+)
->>>>> >> >  create mode 100644 hw/misc/msf2-sysreg.c
->>>>> >> >  create mode 100644 include/hw/misc/msf2-sysreg.h
->>>>> >> >
->>>>> >> > diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
->>>>> >> > index c8b4893..0f52354 100644
->>>>> >> > --- a/hw/misc/Makefile.objs
->>>>> >> > +++ b/hw/misc/Makefile.objs
->>>>> >> > @@ -56,3 +56,4 @@ obj-$(CONFIG_EDU) += edu.o
->>>>> >> >  obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
->>>>> >> >  obj-$(CONFIG_AUX) += auxbus.o
->>>>> >> >  obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
->>>>> >> > +obj-$(CONFIG_MSF2) += msf2-sysreg.o
->>>>> >> > diff --git a/hw/misc/msf2-sysreg.c b/hw/misc/msf2-sysreg.c
->>>>> >> > new file mode 100644
->>>>> >> > index 0000000..64ee141
->>>>> >> > --- /dev/null
->>>>> >> > +++ b/hw/misc/msf2-sysreg.c
->>>>> >> > @@ -0,0 +1,200 @@
->>>>> >> > +/*
->>>>> >> > + * System Register block model of Microsemi SmartFusion2.
->>>>> >> > + *
->>>>> >> > + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
->>>>> >> > + *
->>>>> >> > + * This program is free software; you can redistribute it and/or
->>>>> >> > + * modify it under the terms of the GNU General Public License
->>>>> >> > + * as published by the Free Software Foundation; either version
->>>>> >> > + * 2 of the License, or (at your option) any later version.
->>>>> >> > + *
->>>>> >> > + * You should have received a copy of the GNU General Public
->>>>> License
->>>>> >> > along
->>>>> >> > + * with this program; if not, see <http://www.gnu.org/licenses/>
->>>>> .
->>>>> >> > + */
->>>>> >> > +
->>>>> >> > +#include "hw/misc/msf2-sysreg.h"
->>>>> >>
->>>>> >> Same #include comment from patch 1.
->>>>> >
->>>>> >
->>>>> > Ok will change.
->>>>> >>
->>>>> >>
->>>>> >> > +
->>>>> >> > +#ifndef MSF2_SYSREG_ERR_DEBUG
->>>>> >> > +#define MSF2_SYSREG_ERR_DEBUG  0
->>>>> >> > +#endif
->>>>> >> > +
->>>>> >> > +#define DB_PRINT_L(lvl, fmt, args...) do { \
->>>>> >> > +    if (MSF2_SYSREG_ERR_DEBUG >= lvl) { \
->>>>> >> > +        qemu_log("%s: " fmt "\n", __func__, ## args); \
->>>>> >> > +    } \
->>>>> >> > +} while (0);
->>>>> >> > +
->>>>> >> > +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
->>>>> >> > +
->>>>> >> > +static inline int msf2_divbits(uint32_t div)
->>>>> >> > +{
->>>>> >> > +    int ret = 0;
->>>>> >> > +
->>>>> >> > +    switch (div) {
->>>>> >> > +    case 1:
->>>>> >> > +        ret = 0;
->>>>> >> > +        break;
->>>>> >> > +    case 2:
->>>>> >> > +        ret = 1;
->>>>> >> > +        break;
->>>>> >> > +    case 4:
->>>>> >> > +        ret = 2;
->>>>> >> > +        break;
->>>>> >> > +    case 8:
->>>>> >> > +        ret = 4;
->>>>> >> > +        break;
->>>>> >> > +    case 16:
->>>>> >> > +        ret = 5;
->>>>> >> > +        break;
->>>>> >> > +    case 32:
->>>>> >> > +        ret = 6;
->>>>> >> > +        break;
->>>>> >> > +    default:
->>>>> >> > +        break;
->>>>> >> > +    }
->>>>> >> > +
->>>>> >> > +    return ret;
->>>>> >> > +}
->>>>> >> > +
->>>>> >> > +static void msf2_sysreg_reset(DeviceState *d)
->>>>> >> > +{
->>>>> >> > +    MSF2SysregState *s = MSF2_SYSREG(d);
->>>>> >> > +
->>>>> >> > +    DB_PRINT("RESET");
->>>>> >> > +
->>>>> >> > +    s->regs[MSSDDR_PLL_STATUS_LOW_CR] = 0x021A2358;
->>>>> >> > +    s->regs[MSSDDR_PLL_STATUS] = 0x3;
->>>>> >> > +    s->regs[MSSDDR_FACC1_CR] = msf2_divbits(s->apb0div) << 5 |
->>>>> >> > +                               msf2_divbits(s->apb1div) << 2;
->>>>> >> > +}
->>>>> >> > +
->>>>> >> > +static uint64_t msf2_sysreg_read(void *opaque, hwaddr offset,
->>>>> >> > +    unsigned size)
->>>>> >> > +{
->>>>> >> > +    MSF2SysregState *s = opaque;
->>>>> >> > +    offset /= 4;
->>>>> >>
->>>>> >> Probably best to use a bitshift.
->>>>> >
->>>>> >
->>>>> > Ok will change.
->>>>> >>
->>>>> >>
->>>>> >> > +    uint32_t ret = 0;
->>>>> >> > +
->>>>> >> > +    if (offset < ARRAY_SIZE(s->regs)) {
->>>>> >> > +        ret = s->regs[offset];
->>>>> >> > +        DB_PRINT("addr: 0x%08" HWADDR_PRIx " data: 0x%08" PRIx32,
->>>>> >> > +                    offset * 4, ret);
->>>>> >>
->>>>> >> Bitshift here as well.
->>>>> >
->>>>> >
->>>>> > Ok will change.
->>>>> >>
->>>>> >>
->>>>> >> > +    } else {
->>>>> >> > +        qemu_log_mask(LOG_GUEST_ERROR,
->>>>> >> > +                    "%s: Bad offset 0x%08" HWADDR_PRIx "\n",
->>>>> __func__,
->>>>> >> > +                    offset * 4);
->>>>> >> > +    }
->>>>> >> > +
->>>>> >> > +    return ret;
->>>>> >> > +}
->>>>> >> > +
->>>>> >> > +static void msf2_sysreg_write(void *opaque, hwaddr offset,
->>>>> >> > +                          uint64_t val, unsigned size)
->>>>> >> > +{
->>>>> >> > +    MSF2SysregState *s = (MSF2SysregState *)opaque;
->>>>> >> > +    uint32_t newval = val;
->>>>> >> > +    uint32_t oldval;
->>>>> >> > +
->>>>> >> > +    DB_PRINT("addr: 0x%08" HWADDR_PRIx " data: 0x%08" PRIx64,
->>>>> >> > +            offset, val);
->>>>> >> > +
->>>>> >> > +    offset /= 4;
->>>>> >>
->>>>> >> Same here
->>>>> >
->>>>> >
->>>>> > Ok will change
->>>>> >>
->>>>> >>
->>>>> >> > +
->>>>> >> > +    switch (offset) {
->>>>> >> > +    case MSSDDR_PLL_STATUS:
->>>>> >> > +        break;
->>>>> >> > +
->>>>> >> > +    case ESRAM_CR:
->>>>> >> > +        oldval = s->regs[ESRAM_CR];
->>>>> >> > +        if (oldval ^ newval) {
->>>>> >> > +            qemu_log_mask(LOG_GUEST_ERROR,
->>>>> >> > +                       TYPE_MSF2_SYSREG": eSRAM remapping not
->>>>> >> > supported\n");
->>>>> >> > +            abort();
->>>>> >>
->>>>> >> The guest should not be able to kill QEMU, a guest error should
->>>>> never
->>>>> >> result in an abort.
->>>>> >
->>>>> >
->>>>> > Philippe suggested to abort because:
->>>>> > If guest tries to remap since firmware do a remap, the code flow
->>>>> will be
->>>>> > completely wrong.
->>>>> > Reporting a GUEST_ERROR here is not enough since code flow
->>>>> continuing would
->>>>> > be
->>>>> > pretty hard to understand/debug.
->>>>>
->>>>> I don't see how it will be that hard to debug as QEMU will tell you
->>>>> that the guest is doing something wrong.
->>>>>
->>>>> You can't allow the guest to abort or exit QEMU. It's a security
->>>>> liability issue and specifically mentioned as not allowed:
->>>>> https://github.com/qemu/qemu/blob/master/HACKING#L230
->>>>>
->>>>> Ok. Lets hear from Philippe. Philippe?
->>>>
->>>> Thanks,
->>>> Sundeep
->>>>
->>>>
->>>>> Thanks,
->>>>> Alistair
->>>>>
->>>>> > We decided to abort for now.
->>>>>
->>>>
->>>>
->>>
->>
->
+-- 
+Peter Xu
