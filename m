@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bishara@daynix.com>) id 1dk8Ar-0004lX-Hw
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:20:50 -0400
+	(envelope-from <sameeh@daynix.com>) id 1dk8De-0006iR-Qy
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:23:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bishara@daynix.com>) id 1dk8Al-0004hZ-NS
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:20:49 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:34737)
+	(envelope-from <sameeh@daynix.com>) id 1dk8Da-0006Y4-PG
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:23:42 -0400
+Received: from mail-io0-x235.google.com ([2607:f8b0:4001:c06::235]:34417)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bishara@daynix.com>) id 1dk8Al-0004h7-8z
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:20:43 -0400
-Received: by mail-wr0-x243.google.com with SMTP id p14so17086151wrg.1
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 05:20:41 -0700 (PDT)
-From: Bishara AbuHattoum <bishara@daynix.com>
-Date: Tue, 22 Aug 2017 15:20:35 +0300
-Message-Id: <20170822122035.8914-1-bishara@daynix.com>
-Subject: [Qemu-devel] [PATCH] qga-win: Updating guest_set_time action
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1dk8Da-0006Xy-IV
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:23:38 -0400
+Received: by mail-io0-x235.google.com with SMTP id g135so22672453iog.1
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 05:23:38 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170822122035.8914-1-bishara@daynix.com>
+References: <20170822122035.8914-1-bishara@daynix.com>
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Tue, 22 Aug 2017 15:23:37 +0300
+Message-ID: <CAKPgXcFFNQCFWXX5r4uq8-_sEenhyT6XWidYAtgEqTE1Vm+QPQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] qga-win: Updating guest_set_time action
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +27,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: Sameeh Jubran <sameeh@daynix.com>, Yan Vugenfirer <yan@daynix.com>
+To: Bishara AbuHattoum <bishara@daynix.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Yan Vugenfirer <yan@daynix.com>
 
-  At the moment, Windows libraries don't provide a way to access
-  RTC, so, a workaround is to use the Windows w32tm command to
-  resync the time.
-  Related bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1183874
+Reviewed-by: Sameeh Jubran <sameeh@daynix.com>
 
-Signed-off-by: Bishara AbuHattoum <bishara@daynix.com>
----
- configure            |  2 +-
- qga/commands-win32.c | 36 +++++++++++++++++++++++++++++++++++-
- 2 files changed, 36 insertions(+), 2 deletions(-)
+On Tue, Aug 22, 2017 at 3:20 PM, Bishara AbuHattoum <bishara@daynix.com>
+wrote:
 
-diff --git a/configure b/configure
-index dd73cce62f..c7d42d8b00 100755
---- a/configure
-+++ b/configure
-@@ -824,7 +824,7 @@ if test "$mingw32" = "yes" ; then
-   sysconfdir="\${prefix}"
-   local_statedir=
-   confsuffix=""
--  libs_qga="-lws2_32 -lwinmm -lpowrprof -lwtsapi32 -liphlpapi -lnetapi32 $libs_qga"
-+  libs_qga="-lws2_32 -lwinmm -lpowrprof -lwtsapi32 -lsensapi -liphlpapi -lnetapi32 $libs_qga"
- fi
- 
- werror=""
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 619dbd2bc2..f93f69baeb 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -29,6 +29,7 @@
- #endif
- #include <lm.h>
- #include <wtsapi32.h>
-+#include <sensapi.h>
- 
- #include "qga/guest-agent-core.h"
- #include "qga/vss-win32.h"
-@@ -1277,8 +1278,41 @@ void qmp_guest_set_time(bool has_time, int64_t time_ns, Error **errp)
-          * RTC yet:
-          *
-          * https://msdn.microsoft.com/en-us/library/aa908981.aspx
-+         *
-+         * Instead, a workaround is to use the Windows win32tm command to
-+         * resync the time using the Windows Time service.
-          */
--        error_setg(errp, "Time argument is required on this platform");
-+        LPVOID msg_buffer;
-+        DWORD ret_flags;
-+
-+        HRESULT hr = system("w32tm /resync /nowait");
-+
-+        if (GetLastError() != 0) {
-+            strerror_s((LPTSTR) & msg_buffer, 0, errno);
-+            error_setg(errp, "system(...) failed: %s", (LPCTSTR)msg_buffer);
-+        } else if (hr != 0) {
-+            if (hr == HRESULT_FROM_WIN32(ERROR_SERVICE_NOT_ACTIVE)) {
-+                error_setg(errp, "Windows Time service not running on the "
-+                                 "guest");
-+            } else {
-+                if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-+                                   FORMAT_MESSAGE_FROM_SYSTEM |
-+                                   FORMAT_MESSAGE_IGNORE_INSERTS, NULL,
-+                                   (DWORD)hr, MAKELANGID(LANG_NEUTRAL,
-+                                   SUBLANG_DEFAULT), (LPTSTR) & msg_buffer, 0,
-+                                   NULL)) {
-+                    error_setg(errp, "w32tm failed with error (0x%lx), couldn'"
-+                                     "t retrieve error message", hr);
-+                } else {
-+                    error_setg(errp, "w32tm failed with error (0x%lx): %s", hr,
-+                               (LPCTSTR)msg_buffer);
-+                    LocalFree(msg_buffer);
-+                }
-+            }
-+        } else if (!IsNetworkAlive(&ret_flags)) {
-+            error_setg(errp, "No network connection on guest, sync not"
-+                             " accurate");
-+        }
-         return;
-     }
- 
+>   At the moment, Windows libraries don't provide a way to access
+>   RTC, so, a workaround is to use the Windows w32tm command to
+>   resync the time.
+>   Related bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1183874
+>
+> Signed-off-by: Bishara AbuHattoum <bishara@daynix.com>
+> ---
+>  configure            |  2 +-
+>  qga/commands-win32.c | 36 +++++++++++++++++++++++++++++++++++-
+>  2 files changed, 36 insertions(+), 2 deletions(-)
+>
+> diff --git a/configure b/configure
+> index dd73cce62f..c7d42d8b00 100755
+> --- a/configure
+> +++ b/configure
+> @@ -824,7 +824,7 @@ if test "$mingw32" = "yes" ; then
+>    sysconfdir="\${prefix}"
+>    local_statedir=
+>    confsuffix=""
+> -  libs_qga="-lws2_32 -lwinmm -lpowrprof -lwtsapi32 -liphlpapi -lnetapi32
+> $libs_qga"
+> +  libs_qga="-lws2_32 -lwinmm -lpowrprof -lwtsapi32 -lsensapi -liphlpapi
+> -lnetapi32 $libs_qga"
+>  fi
+>
+>  werror=""
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 619dbd2bc2..f93f69baeb 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -29,6 +29,7 @@
+>  #endif
+>  #include <lm.h>
+>  #include <wtsapi32.h>
+> +#include <sensapi.h>
+>
+>  #include "qga/guest-agent-core.h"
+>  #include "qga/vss-win32.h"
+> @@ -1277,8 +1278,41 @@ void qmp_guest_set_time(bool has_time, int64_t
+> time_ns, Error **errp)
+>           * RTC yet:
+>           *
+>           * https://msdn.microsoft.com/en-us/library/aa908981.aspx
+> +         *
+> +         * Instead, a workaround is to use the Windows win32tm command to
+> +         * resync the time using the Windows Time service.
+>           */
+> -        error_setg(errp, "Time argument is required on this platform");
+> +        LPVOID msg_buffer;
+> +        DWORD ret_flags;
+> +
+> +        HRESULT hr = system("w32tm /resync /nowait");
+> +
+> +        if (GetLastError() != 0) {
+> +            strerror_s((LPTSTR) & msg_buffer, 0, errno);
+> +            error_setg(errp, "system(...) failed: %s",
+> (LPCTSTR)msg_buffer);
+> +        } else if (hr != 0) {
+> +            if (hr == HRESULT_FROM_WIN32(ERROR_SERVICE_NOT_ACTIVE)) {
+> +                error_setg(errp, "Windows Time service not running on the
+> "
+> +                                 "guest");
+> +            } else {
+> +                if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+> +                                   FORMAT_MESSAGE_FROM_SYSTEM |
+> +                                   FORMAT_MESSAGE_IGNORE_INSERTS, NULL,
+> +                                   (DWORD)hr, MAKELANGID(LANG_NEUTRAL,
+> +                                   SUBLANG_DEFAULT), (LPTSTR) &
+> msg_buffer, 0,
+> +                                   NULL)) {
+> +                    error_setg(errp, "w32tm failed with error (0x%lx),
+> couldn'"
+> +                                     "t retrieve error message", hr);
+> +                } else {
+> +                    error_setg(errp, "w32tm failed with error (0x%lx):
+> %s", hr,
+> +                               (LPCTSTR)msg_buffer);
+> +                    LocalFree(msg_buffer);
+> +                }
+> +            }
+> +        } else if (!IsNetworkAlive(&ret_flags)) {
+> +            error_setg(errp, "No network connection on guest, sync not"
+> +                             " accurate");
+> +        }
+>          return;
+>      }
+>
+> --
+> 2.13.5
+>
+>
+
+
 -- 
-2.13.5
+Respectfully,
+*Sameeh Jubran*
+*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+*Software Engineer @ Daynix <http://www.daynix.com>.*
