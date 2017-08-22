@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dk40M-0001MM-Gf
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 03:53:43 -0400
+	(envelope-from <prvs=400b57bf0=ross.lagerwall@citrix.com>)
+	id 1dk4RM-0001jg-Fv
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:21:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dk40J-0000kf-Dh
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 03:53:42 -0400
-Resent-Message-Id: <E1dk40J-0000kf-Dh@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21310)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dk40J-0000kP-5l
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 03:53:39 -0400
-Message-ID: <150338839910.30.2558485024069310501@205a2245145f>
-Reply-To: <qemu-devel@nongnu.org>
-In-Reply-To: <20170822044155.2451-1-famz@redhat.com>
+	(envelope-from <prvs=400b57bf0=ross.lagerwall@citrix.com>)
+	id 1dk4RG-0006pI-Nd
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:21:36 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:21457)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=400b57bf0=ross.lagerwall@citrix.com>)
+	id 1dk4RG-0006on-Hv
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:21:30 -0400
+References: <20170821140138.27421-1-ross.lagerwall@citrix.com>
+	<alpine.DEB.2.10.1708211528350.12143@sstabellini-ThinkPad-X260>
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
+Message-ID: <e56c3b75-332d-4876-2d45-fd2f4edc4d69@citrix.com>
+Date: Tue, 22 Aug 2017 09:21:26 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 22 Aug 2017 00:53:20 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 00/10] tests: Add VM based build tests
- (for non-x86_64 and/or non-Linux)
+In-Reply-To: <alpine.DEB.2.10.1708211528350.12143@sstabellini-ThinkPad-X260>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] xen: Emit RTC_CHANGE upon TIMEOFFSET ioreq
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, crosa@redhat.com, f4bug@amsat.org, kamil@netbsd.org, stefanha@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Anthony Perard <anthony.perard@citrix.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwODIyMDQ0MTU1LjI0NTEtMS1mYW16QHJlZGhhdC5jb20KU3ViamVjdDog
-W1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwMC8xMF0gdGVzdHM6IEFkZCBWTSBiYXNlZCBidWlsZCB0
-ZXN0cyAoZm9yIG5vbi14ODZfNjQgYW5kL29yIG5vbi1MaW51eCkKCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25l
-bGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0
-cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNv
-bW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAt
-biAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1h
-aWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBm
-YWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZh
-aWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIx
-NjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjdh
-YTRkMDUyMWQgdGVzdHM6IEFkZCBSRUFETUUgZm9yIHZtIHRlc3RzCjcwZWZlZTYyNDYgTUFJTlRB
-SU5FUlM6IEFkZCB0ZXN0cy92bSBlbnRyeQpjNDQ2YmM1ODMxIE1ha2VmaWxlOiBBZGQgcnVsZXMg
-dG8gcnVuIHZtIHRlc3RzCmUxZmQ1OTBiZjYgdGVzdHM6IEFkZCBPcGVuQlNEIGltYWdlCmUzMDVl
-ZDNkMWQgdGVzdHM6IEFkZCBOZXRCU0QgaW1hZ2UKMmVkYjA2MDVmYSB0ZXN0czogQWRkIEZyZWVC
-U0QgaW1hZ2UKZTQ5NzIzZTM5MSB0ZXN0czogQWRkIHVidW50dS5pMzg2IGltYWdlCmEzMmFkZGI4
-ZDkgdGVzdHM6IEFkZCB2bSB0ZXN0IGxpYgo0MTA1NWE2ZTUyIHFlbXUucHk6IEFkZCAid2FpdCgp
-IiBtZXRob2QKY2NhZDEyMzNiMiBnaXRpZ25vcmU6IElnbm9yZSB2bSB0ZXN0IGltYWdlcwoKPT09
-IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMDogZ2l0aWdub3JlOiBJZ25vcmUg
-dm0gdGVzdCBpbWFnZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMDogcWVtdS5weTogQWRkICJ3YWl0
-KCkiIG1ldGhvZC4uLgpDaGVja2luZyBQQVRDSCAzLzEwOiB0ZXN0czogQWRkIHZtIHRlc3QgbGli
-Li4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojODU6IEZJTEU6IHRlc3RzL3ZtL2Jh
-c2V2bS5weTo2MDoKK3NzaC1yc2EgQUFBQUIzTnphQzF5YzJFQUFBQURBUUFCQUFBQkFRQ2lrQzQ2
-V1l0WG90VWQwVUdQejk1NDdBajBLcUM0Z2srbnQ0QkJKbTg2SUhnQ0Q5RnlnU0dYOUVGdXRYbGh6
-OUtaSVBnOU9razcrSXpYUkhDV0kyTU52aHJjanlyZXpLUkVtNzF6MDhqOWl3ZnhZMzM0MGZZMk1v
-KzBraHdwTzdienNnemtsakhJSHFjT2c3TWd0dFBJblZNTkgvRWZxcGdSOEVES0p1V0NCMk55K0VC
-Rk4vM2RBaWZmMFgvRXZLbGU5UFVyWTcwRWtTeWNueVVSUzhIWlJlRXFqOGxOOUo1a1h6QThGNmpC
-by8wUTQyVHR2NmU0azVZY2FEcndtTHJCV0xyYTJQQ1haTE55SHFYRWlGa0dtZFh0QTFFb3g5Z2Mv
-cDRqSVhpbTZ4clBObXBONld5cnJFamFDRjV4WXZOdjh3WGtENnVTV3diSFlVMjRsSUFuIHFlbXUt
-dm0ta2V5CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTk3OiBGSUxFOiB0ZXN0
-cy92bS9iYXNldm0ucHk6MTcyOgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICJmaWxlPSVz
-LGlmPW5vbmUsaWQ9JXMsY2FjaGU9d3JpdGViYWNrLGZvcm1hdD1yYXciICUgXAoKV0FSTklORzog
-bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIwMDogRklMRTogdGVzdHMvdm0vYmFzZXZtLnB5OjE3
-NToKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAidmlydGlvLWJsayxkcml2ZT0lcyxzZXJp
-YWw9JXMsYm9vdGluZGV4PTEiICUgKG5hbWUsIG5hbWUpXQoKRVJST1I6IGxpbmUgb3ZlciA5MCBj
-aGFyYWN0ZXJzCiMyNDc6IEZJTEU6IHRlc3RzL3ZtL2Jhc2V2bS5weToyMjI6CisgICAgVk0gdGVz
-dCB1dGlsaXR5LiAgRXhpdCBjb2RlczogMCA9IHN1Y2Nlc3MsIDEgPSBjb21tYW5kIGxpbmUgZXJy
-b3IsIDIgPSBlbnZpcm9ubWVudCBpbml0aWFsaXphdGlvbiBmYWlsZWQsIDMgPSB0ZXN0IGNvbW1h
-bmQgZmFpbGVkIiIiKQoKdG90YWw6IDIgZXJyb3JzLCAyIHdhcm5pbmdzLCAyNzggbGluZXMgY2hl
-Y2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFU
-Q0ggNC8xMDogdGVzdHM6IEFkZCB1YnVudHUuaTM4NiBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCA1
-LzEwOiB0ZXN0czogQWRkIEZyZWVCU0QgaW1hZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xMDogdGVz
-dHM6IEFkZCBOZXRCU0QgaW1hZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xMDogdGVzdHM6IEFkZCBP
-cGVuQlNEIGltYWdlLi4uCkNoZWNraW5nIFBBVENIIDgvMTA6IE1ha2VmaWxlOiBBZGQgcnVsZXMg
-dG8gcnVuIHZtIHRlc3RzLi4uCkNoZWNraW5nIFBBVENIIDkvMTA6IE1BSU5UQUlORVJTOiBBZGQg
-dGVzdHMvdm0gZW50cnkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTA6IHRlc3RzOiBBZGQgUkVBRE1F
-IGZvciB2bSB0ZXN0cy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
-d2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
-dGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On 08/21/2017 11:30 PM, Stefano Stabellini wrote:
+> On Mon, 21 Aug 2017, Ross Lagerwall wrote:
+>> When the guest writes to the RTC, Xen emulates it and broadcasts a
+>> TIMEOFFSET ioreq. Emit an RTC_CHANGE QMP message when this happens
+>> rather than ignoring it so that something useful can be done with the
+>> information.
+> 
+> Are there any handlers of the RTC_CHANGE QMP message today? What happens
+> if there are no handlers?
+
+The libxl toolstack doesn't handle it nor does the XAPI project 
+currently, although we plan on modifying XAPI to handle it.
+
+It is simply an event that is broadcast to any QMP monitors. If nothing 
+handles the event, then it is the same behavior as before. If something 
+is interested in the event, then it can make use of the time offset 
+however it wants.
+
+-- 
+Ross Lagerwall
