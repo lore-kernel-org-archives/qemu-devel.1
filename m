@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dkAnv-0006cy-Pi
+	(envelope-from <pm215@archaic.org.uk>) id 1dkAnw-0006dP-6K
 	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dkAns-0003J4-CI
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:19 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dkAns-0003JR-La
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:20 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Aug 2017 16:08:50 +0100
-Message-Id: <1503414539-28762-12-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 22 Aug 2017 16:08:56 +0100
+Message-Id: <1503414539-28762-18-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
 References: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 11/20] target/arm: Make VTOR register banked
- for v8M
+Subject: [Qemu-devel] [PATCH 17/20] target/arm: Make MMFAR banked for v8M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,119 +22,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Make the VTOR register banked if v8M security extensions are enabled.
+Make the MMFAR register banked if v8M security extensions are
+enabled.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h      |  2 +-
- hw/intc/armv7m_nvic.c | 13 +++++++------
- target/arm/helper.c   |  2 +-
- target/arm/machine.c  |  3 ++-
- 4 files changed, 11 insertions(+), 9 deletions(-)
+ target/arm/cpu.h      | 2 +-
+ hw/intc/armv7m_nvic.c | 4 ++--
+ target/arm/helper.c   | 4 ++--
+ target/arm/machine.c  | 3 ++-
+ 4 files changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index e922d1f..d0b0936 100644
+index 25ebf9e..21c68d7 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -420,7 +420,7 @@ typedef struct CPUARMState {
- 
-     struct {
-         uint32_t other_sp;
--        uint32_t vecbase;
-+        uint32_t vecbase[2];
-         uint32_t basepri[2];
-         uint32_t control[2];
-         uint32_t ccr; /* Configuration and Control */
+@@ -427,7 +427,7 @@ typedef struct CPUARMState {
+         uint32_t cfsr; /* Configurable Fault Status */
+         uint32_t hfsr; /* HardFault Status */
+         uint32_t dfsr; /* Debug Fault Status Register */
+-        uint32_t mmfar; /* MemManage Fault Address */
++        uint32_t mmfar[2]; /* MemManage Fault Address */
+         uint32_t bfar; /* BusFault Address */
+         unsigned mpu_ctrl[2]; /* MPU_CTRL */
+         int exception;
 diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 2b0b328..3a1f02d 100644
+index f071649..99b62ac 100644
 --- a/hw/intc/armv7m_nvic.c
 +++ b/hw/intc/armv7m_nvic.c
-@@ -403,7 +403,7 @@ static void set_irq_level(void *opaque, int n, int level)
-     }
- }
- 
--static uint32_t nvic_readl(NVICState *s, uint32_t offset)
-+static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
- {
-     ARMCPU *cpu = s->cpu;
-     uint32_t val;
-@@ -441,7 +441,7 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset)
-         /* ISRPREEMPT not implemented */
-         return val;
-     case 0xd08: /* Vector Table Offset.  */
--        return cpu->env.v7m.vecbase;
-+        return cpu->env.v7m.vecbase[attrs.secure];
-     case 0xd0c: /* Application Interrupt/Reset Control.  */
-         return 0xfa050000 | (s->prigroup << 8);
-     case 0xd10: /* System Control.  */
-@@ -617,7 +617,8 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset)
-     }
- }
- 
--static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
-+static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-+                        MemTxAttrs attrs)
- {
-     ARMCPU *cpu = s->cpu;
- 
-@@ -638,7 +639,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
-         }
+@@ -506,7 +506,7 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
+     case 0xd30: /* Debug Fault Status.  */
+         return cpu->env.v7m.dfsr;
+     case 0xd34: /* MMFAR MemManage Fault Address */
+-        return cpu->env.v7m.mmfar;
++        return cpu->env.v7m.mmfar[attrs.secure];
+     case 0xd38: /* Bus Fault Address.  */
+         return cpu->env.v7m.bfar;
+     case 0xd3c: /* Aux Fault Status.  */
+@@ -723,7 +723,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
+         cpu->env.v7m.dfsr &= ~value; /* W1C */
          break;
-     case 0xd08: /* Vector Table Offset.  */
--        cpu->env.v7m.vecbase = value & 0xffffff80;
-+        cpu->env.v7m.vecbase[attrs.secure] = value & 0xffffff80;
-         break;
-     case 0xd0c: /* Application Interrupt/Reset Control.  */
-         if ((value >> 16) == 0x05fa) {
-@@ -944,7 +945,7 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-         break;
-     default:
-         if (size == 4) {
--            val = nvic_readl(s, offset);
-+            val = nvic_readl(s, offset, attrs);
-         } else {
-             qemu_log_mask(LOG_GUEST_ERROR,
-                           "NVIC: Bad read of size %d at offset 0x%x\n",
-@@ -1025,7 +1026,7 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
-         return MEMTX_OK;
-     }
-     if (size == 4) {
--        nvic_writel(s, offset, value);
-+        nvic_writel(s, offset, value, attrs);
-         return MEMTX_OK;
-     }
-     qemu_log_mask(LOG_GUEST_ERROR,
+     case 0xd34: /* Mem Manage Address.  */
+-        cpu->env.v7m.mmfar = value;
++        cpu->env.v7m.mmfar[attrs.secure] = value;
+         return;
+     case 0xd38: /* Bus Fault Address.  */
+         cpu->env.v7m.bfar = value;
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 8e74b10..b1bb507 100644
+index 28b3d6c..e587e85 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -6072,7 +6072,7 @@ static uint32_t arm_v7m_load_vector(ARMCPU *cpu)
-     CPUState *cs = CPU(cpu);
-     CPUARMState *env = &cpu->env;
-     MemTxResult result;
--    hwaddr vec = env->v7m.vecbase + env->v7m.exception * 4;
-+    hwaddr vec = env->v7m.vecbase[env->v7m.secure] + env->v7m.exception * 4;
-     uint32_t addr;
- 
-     addr = address_space_ldl(cs->as, vec,
+@@ -6380,10 +6380,10 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+             case EXCP_DATA_ABORT:
+                 env->v7m.cfsr |=
+                     (R_V7M_CFSR_DACCVIOL_MASK | R_V7M_CFSR_MMARVALID_MASK);
+-                env->v7m.mmfar = env->exception.vaddress;
++                env->v7m.mmfar[env->v7m.secure] = env->exception.vaddress;
+                 qemu_log_mask(CPU_LOG_INT,
+                               "...with CFSR.DACCVIOL and MMFAR 0x%x\n",
+-                              env->v7m.mmfar);
++                              env->v7m.mmfar[env->v7m.secure]);
+                 break;
+             }
+             armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_MEM);
 diff --git a/target/arm/machine.c b/target/arm/machine.c
-index 2cd64c5..cd6b6af 100644
+index 4457ec6..5122e58 100644
 --- a/target/arm/machine.c
 +++ b/target/arm/machine.c
-@@ -114,7 +114,7 @@ static const VMStateDescription vmstate_m = {
-     .minimum_version_id = 4,
-     .needed = m_needed,
-     .fields = (VMStateField[]) {
--        VMSTATE_UINT32(env.v7m.vecbase, ARMCPU),
-+        VMSTATE_UINT32(env.v7m.vecbase[M_REG_NS], ARMCPU),
-         VMSTATE_UINT32(env.v7m.basepri[M_REG_NS], ARMCPU),
-         VMSTATE_UINT32(env.v7m.control[M_REG_NS], ARMCPU),
-         VMSTATE_UINT32(env.v7m.ccr, ARMCPU),
-@@ -254,6 +254,7 @@ static const VMStateDescription vmstate_m_security = {
-         VMSTATE_UINT32(env.v7m.primask[M_REG_S], ARMCPU),
-         VMSTATE_UINT32(env.v7m.faultmask[M_REG_S], ARMCPU),
-         VMSTATE_UINT32(env.v7m.control[M_REG_S], ARMCPU),
-+        VMSTATE_UINT32(env.v7m.vecbase[M_REG_S], ARMCPU),
+@@ -121,7 +121,7 @@ static const VMStateDescription vmstate_m = {
+         VMSTATE_UINT32(env.v7m.cfsr, ARMCPU),
+         VMSTATE_UINT32(env.v7m.hfsr, ARMCPU),
+         VMSTATE_UINT32(env.v7m.dfsr, ARMCPU),
+-        VMSTATE_UINT32(env.v7m.mmfar, ARMCPU),
++        VMSTATE_UINT32(env.v7m.mmfar[M_REG_NS], ARMCPU),
+         VMSTATE_UINT32(env.v7m.bfar, ARMCPU),
+         VMSTATE_UINT32(env.v7m.mpu_ctrl[M_REG_NS], ARMCPU),
+         VMSTATE_INT32(env.v7m.exception, ARMCPU),
+@@ -272,6 +272,7 @@ static const VMStateDescription vmstate_m_security = {
+         VMSTATE_VALIDATE("secure MPU_RNR is valid", s_rnr_vmstate_validate),
+         VMSTATE_UINT32(env.v7m.mpu_ctrl[M_REG_S], ARMCPU),
+         VMSTATE_UINT32(env.v7m.ccr[M_REG_S], ARMCPU),
++        VMSTATE_UINT32(env.v7m.mmfar[M_REG_S], ARMCPU),
          VMSTATE_END_OF_LIST()
      }
  };
