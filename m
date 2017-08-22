@@ -1,30 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dk36k-0003KZ-S4
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 02:56:16 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1dk3MV-0008O5-LA
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 03:12:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dk36h-0000qq-Qj
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 02:56:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60008)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dk36h-0000qa-HH
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 02:56:11 -0400
-Date: Tue, 22 Aug 2017 14:56:04 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170822065604.GH30356@pxdev.xzpeter.org>
-References: <20170821100555.GC30356@pxdev.xzpeter.org>
-	<20170821135743.GC4371@lemon> <20170821153622.GG2231@work-vm>
-	<20170821165450.GE4371@lemon> <20170821172852.GA3236@work-vm>
-	<20170822021556.GA2146@lemon>
-	<20170822025654.GE30356@pxdev.xzpeter.org>
-	<20170822041519.GC2146@lemon>
-	<20170822055903.GF30356@pxdev.xzpeter.org>
-	<20170822063348.GE2146@lemon>
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1dk3MP-000203-IS
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 03:12:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43199)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+	id 1dk3MP-0001ze-9x
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 03:12:25 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7M7BtR9001393
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 03:12:23 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cgchynurc-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 03:12:23 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
+	Tue, 22 Aug 2017 01:12:22 -0600
+References: <150287457293.9760.17827532208744487789.stgit@aravinda>
+	<150287474187.9760.12052550430995757993.stgit@aravinda>
+	<20170817013934.GC5509@umbus.fritz.box>
+	<555e187e-38af-d897-85b7-f08364b264fd@linux.vnet.ibm.com>
+	<20170822020854.GY12356@umbus.fritz.box>
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Date: Tue, 22 Aug 2017 12:42:09 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170822063348.GE2146@lemon>
-Subject: Re: [Qemu-devel] [RFC 0/6] monitor: allow per-monitor thread
+In-Reply-To: <20170822020854.GY12356@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Message-Id: <163ba5d0-268f-cbbe-f0df-fe1e499da462@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/5] ppc: spapr: Handle "ibm,
+ nmi-register" and "ibm, nmi-interlock" RTAS calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,78 +45,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru, mahesh@linux.vnet.ibm.com, benh@au1.ibm.com, paulus@samba.org, sam.bobroff@au1.ibm.com
 
-On Tue, Aug 22, 2017 at 02:33:48PM +0800, Fam Zheng wrote:
-> On Tue, 08/22 13:59, Peter Xu wrote:
-> > On Tue, Aug 22, 2017 at 12:15:19PM +0800, Fam Zheng wrote:
-> > > On Tue, 08/22 10:56, Peter Xu wrote:
-> > > > I haven't really encountered (c), but I think it's the migrate_cancel
-> > > > command that matters, which should not need BQL as well.
-> > > 
-> > > There is bdrv_invalidate_cache_all() in migrate_cancel which clearly isn't safe.
-> > > Is that if block unreachable in this case? If so we should assert, otherwise
-> > > this command is not okay to run without BQL.
-> > 
-> > Ah. I see.  Even if so, if that is the only usage of BQL, IMHO we can
-> > still mark migrate_cancel as "without-bql=true", instead we take the
-> > BQL before calling bdrv_invalidate_cache_all().  Then migrate_cancel
-> > can be BQL-free at least when block migration is not active.
-> > 
-> > > 
-> > > Generically, what guarantee the thread-safety of a qmp command when you decide
-> > > BQL is not needed? In other words, how do you prove commands are safe without
-> > > BQL? I think almost every command accesses global state, but lock-free data
-> > > structures are rare AFAICT.
-> > 
-> > I would suggest we split the problem into at least three parts.  IMHO
-> > we need to answer below questions one by one to know what we should do
-> > next:
-> > 
-> > 1. whether we can handle monitor commands outside iothread, or say, in
-> >    an isolated thread?
-> > 
-> >    This is basically what patch 2 does, the "per-monitor threads".
-> > 
-> >    IMHO this is the very first question to ask.  So now I know that at
-> >    least current code cannot do it.  We need to at least do something
-> >    to remove/replace the assertion to make this happen.  Can we?  I
-> >    don't really know the answer yet.  If this is undoable, we can skip
-> >    question 2/3 below and may need to rethink on how to solve the
-> >    problem that postcopy recovery encounters.
-> > 
-> > 2. whether there is any monitor commands can run without BQL?
-> > 
-> >    This is basically what patch 3/5 does, one for QMP, one for HMP.
-> > 
-> >    If we can settle question 1, then we can possibly start consider
-> >    this question.  This step does not really allow any command to run
-> >    without BQL, but we need to know whether it's possible in general,
-> >    and if possible, we provide a framework to allow QMP/HMP developers
-> >    to specify that.  If you see patch 3/5, the default behavior is
-> >    still taking the BQL for all commands.
-> > 
-> >    IMHO doing this whole thing is generally good in the sense that
-> >    this is actually forcing ourselves to break the BQL into smaller
-> >    locks.  Take the migration commands for example: migrate_incoming
-> >    do not need BQL, and when we write codes around it we know that we
-> >    don't need to think about thread-safety.  That's not good IMHO.  I
-> >    think it's time we should start consider thread-safety always.
-> >    Again, for migrate_incoming to do this, actually we'll possibly at
-> >    least need a migration management lock (the smaller lock) to make
-> >    sure e.g. the user is not running two migrate_incoming commands in
-> >    parallel (after per-monitor threads, it can happen).  But it's
-> >    better than BQL, because BQL is for sure too big, so even a guest
-> >    page access (as long as it held the BQL) can block migration
-> >    commands.
+
+
+On Tuesday 22 August 2017 07:38 AM, David Gibson wrote:
+> On Mon, Aug 21, 2017 at 06:05:34PM +0530, Aravinda Prasad wrote:
+>>
+>>
+>> On Thursday 17 August 2017 07:09 AM, David Gibson wrote:
+>>> What's with the extra spaces in the subject line?
+>>
+>> I don't see any. Can you pls point out?
 > 
-> Yes, this is my point. You cannot just declare a command "BQL-free" without
-> adding small locks first, and I think this is actually missing in this series.
-> As you said, two per-monitor threads can race if they do migrate_incoming in
-> parallel.  This is also the answer to 3.
+> I see "ibm, nmi-register" and "ibm, nmi-interlock"
 
-Ah, I see.  The small lock will be there if there is another post. :)
+Ah.. space after comma. Will correct it.
+
+Regards,
+Aravinda
+
+> 
+>>
+>>>
+>>> On Wed, Aug 16, 2017 at 02:42:21PM +0530, Aravinda Prasad wrote:
+>>>> This patch adds support in QEMU to handle "ibm,nmi-register"
+>>>> and "ibm,nmi-interlock" RTAS calls.
+>>>>
+>>>> The machine check notification address is saved when the
+>>>> OS issues "ibm,nmi-register" RTAS call.
+>>>>
+>>>> This patch also handles the case when multiple processors
+>>>> experience machine check at or about the same time by
+>>>> handling "ibm,nmi-interlock" call. In such cases, as per
+>>>> PAPR, subsequent processors serialize waiting for the first
+>>>> processor to issue the "ibm,nmi-interlock" call. The second
+>>>> processor waits till the first processor, which also
+>>>> received a machine check error, is done reading the error
+>>>> log. The first processor issues "ibm,nmi-interlock" call
+>>>> when the error log is consumed. This patch implements the
+>>>> releasing part of the error-log while subsequent patch
+>>>> (which builds error log) handles the locking part.
+>>>>
+>>>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+>>>> ---
+>>>>  hw/ppc/spapr.c         |    8 ++++++++
+>>>>  hw/ppc/spapr_rtas.c    |   35 +++++++++++++++++++++++++++++++++++
+>>>>  include/hw/ppc/spapr.h |   10 +++++++++-
+>>>>  3 files changed, 52 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>>> index 2a3e53d..0bb2c4a 100644
+>>>> --- a/hw/ppc/spapr.c
+>>>> +++ b/hw/ppc/spapr.c
+>>>> @@ -1441,6 +1441,11 @@ static void ppc_spapr_reset(void)
+>>>>      first_ppc_cpu->env.nip = SPAPR_ENTRY_POINT;
+>>>>  
+>>>>      spapr->cas_reboot = false;
+>>>> +
+>>>> +    spapr->mc_in_progress = false;
+>>>> +    spapr->guest_machine_check_addr = 0;
+>>>> +    qemu_cond_destroy(&spapr->mc_delivery_cond);
+>>>> +    qemu_cond_init(&spapr->mc_delivery_cond);
+>>>>  }
+>>>>  
+>>>>  static void spapr_create_nvram(sPAPRMachineState *spapr)
+>>>> @@ -2491,6 +2496,9 @@ static void ppc_spapr_init(MachineState *machine)
+>>>>  
+>>>>          kvmppc_spapr_enable_inkernel_multitce();
+>>>>      }
+>>>> +
+>>>> +    spapr->mc_in_progress = false;
+>>>> +    qemu_cond_init(&spapr->mc_delivery_cond);
+>>>>  }
+>>>>  
+>>>>  static int spapr_kvm_type(const char *vm_type)
+>>>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+>>>> index 94a2799..2f3c47b 100644
+>>>> --- a/hw/ppc/spapr_rtas.c
+>>>> +++ b/hw/ppc/spapr_rtas.c
+>>>> @@ -348,6 +348,37 @@ static void rtas_get_power_level(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+>>>>      rtas_st(rets, 1, 100);
+>>>>  }
+>>>>  
+>>>> +static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
+>>>> +                                  sPAPRMachineState *spapr,
+>>>> +                                  uint32_t token, uint32_t nargs,
+>>>> +                                  target_ulong args,
+>>>> +                                  uint32_t nret, target_ulong rets)
+>>>> +{
+>>>> +    spapr->guest_machine_check_addr = rtas_ld(args, 1);
+>>>> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>>>> +}
+>>>> +
+>>>> +static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+>>>> +                                   sPAPRMachineState *spapr,
+>>>> +                                   uint32_t token, uint32_t nargs,
+>>>> +                                   target_ulong args,
+>>>> +                                   uint32_t nret, target_ulong rets)
+>>>> +{
+>>>> +    if (!spapr->guest_machine_check_addr) {
+>>>> +        /* NMI register not called */
+>>>> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+>>>> +    } else {
+>>>> +        /*
+>>>> +         * VCPU issuing "ibm,nmi-interlock" is done with NMI handling,
+>>>> +         * hence unset mc_in_progress.
+>>>> +         */
+>>>> +        spapr->mc_in_progress = false;
+>>>> +        qemu_cond_signal(&spapr->mc_delivery_cond);
+>>>> +        rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>>>> +    }
+>>>> +}
+>>>> +
+>>>> +
+>>>>  static struct rtas_call {
+>>>>      const char *name;
+>>>>      spapr_rtas_fn fn;
+>>>> @@ -489,6 +520,10 @@ static void core_rtas_register_types(void)
+>>>>                          rtas_set_power_level);
+>>>>      spapr_rtas_register(RTAS_GET_POWER_LEVEL, "get-power-level",
+>>>>                          rtas_get_power_level);
+>>>> +    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
+>>>> +                        rtas_ibm_nmi_register);
+>>>> +    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
+>>>> +                        rtas_ibm_nmi_interlock);
+>>>>  }
+>>>>  
+>>>>  type_init(core_rtas_register_types)
+>>>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>>>> index 46012b3..eee8d33 100644
+>>>> --- a/include/hw/ppc/spapr.h
+>>>> +++ b/include/hw/ppc/spapr.h
+>>>> @@ -123,6 +123,12 @@ struct sPAPRMachineState {
+>>>>       * occurs during the unplug process. */
+>>>>      QTAILQ_HEAD(, sPAPRDIMMState) pending_dimm_unplugs;
+>>>>  
+>>>> +    /* State related to "ibm,nmi-register" and "ibm,nmi-interlock" calls */
+>>>> +    target_ulong guest_machine_check_addr;
+>>>> +    bool mc_in_progress;
+>>>> +    int mc_cpu;
+>>>
+>>> mc_cpu isn't actually used yet in this patch.  In any case it and
+>>> mc_in_progress could probably be folded together, no?
+>>
+>> It is possible to fold mc_cpu and mc_in_progress together with the
+>> convention that if it is set to -1 mc is not in progress otherwise it is
+>> set to the CPU handling the mc.
+>>
+>>>
+>>> These values will also need to be migrated, AFAICT.
+>>
+>> I am thinking of how to handle the migration when machine check handling
+>> is in progress. Probably wait for machine check handling to complete
+>> before migrating as the error could be irrelevant once migrated to a new
+>> hardware. If that is the case we don't need to migrate these values.
+> 
+> Ok.
+> 
+>>
+>> Regards,
+>> Aravinda
+>>
+>>>
+>>>> +    QemuCond mc_delivery_cond;
+>>>> +
+>>>>      /*< public >*/
+>>>>      char *kvm_type;
+>>>>      MemoryHotplugState hotplug_memory;
+>>>> @@ -519,8 +525,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
+>>>>  #define RTAS_IBM_CREATE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x27)
+>>>>  #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
+>>>>  #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
+>>>> +#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x2A)
+>>>> +#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x2B)
+>>>>  
+>>>> -#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2A)
+>>>> +#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2C)
+>>>>  
+>>>>  /* RTAS ibm,get-system-parameter token values */
+>>>>  #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
+>>>>
+>>>
+>>
+> 
 
 -- 
-Peter Xu
+Regards,
+Aravinda
