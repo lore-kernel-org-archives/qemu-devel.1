@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dk4qp-0001V1-Sn
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:47:56 -0400
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dk4rH-0001kq-2H
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dk4qp-0003YC-4N
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:47:55 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:36482)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dk4qo-0003Xk-UW
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:47:55 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id f8so82861985wrf.3
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 01:47:54 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170822010917.GO12356@umbus.fritz.box>
-References: <20170816082650.21880-1-cohuck@redhat.com>
-	<223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
-	<CAFEAcA_UfM_XNKdc5zfHsehoRE6Q+EszRZX3FByskir7c+0Lww@mail.gmail.com>
-	<20170822010917.GO12356@umbus.fritz.box>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Aug 2017 09:47:33 +0100
-Message-ID: <CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.10] boot-serial-test: prefer tcg
- accelerator
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dk4rD-00043E-TL
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:23 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:22313 helo=zte.com.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dk4rD-0003ys-B5
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:19 -0400
+From: Wang yong <wang.yong155@zte.com.cn>
+Date: Tue, 22 Aug 2017 16:46:17 +0800
+Message-Id: <1503391578-6121-3-git-send-email-wang.yong155@zte.com.cn>
+In-Reply-To: <1503391578-6121-1-git-send-email-wang.yong155@zte.com.cn>
+References: <1503391578-6121-1-git-send-email-wang.yong155@zte.com.cn>
+Subject: [Qemu-devel] [PATCHv4 02/03] colo-compare: Use IOThread to Check
+ old packet regularly and Process pactkets of the primary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,29 +24,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: pbonzini@redhat.com, stefanha@redhat.com, famz@redhat.com, jasowang@redhat.com, zhangchen.fnst@cn.fujitsu.com, zhang.zhanghailiang@huawei.com
+Cc: wang.yong155@zte.com.cn, wang.guang55@zte.com.cn, lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org
 
-On 22 August 2017 at 02:09, David Gibson <david@gibson.dropbear.id.au> wrote:
-> On Wed, Aug 16, 2017 at 12:18:07PM +0100, Peter Maydell wrote:
->> On 16 August 2017 at 11:51, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> > On 16/08/2017 10:26, Cornelia Huck wrote:
->> >> Prefer to use the tcg accelarator if it is available: This is our only
->> >> real smoke test for tcg, and fast enough to use it for that.
->> >
->> > I'm not sure this is required for 2.10.  Yes, it means the coverage from
->> > "make check" is worse, but that's it.
->>
->> Yes, I'd put it under "if we need to roll an rc4 anyway for
->> some more significant bug we might as well put this in too,
->> but it doesn't merit cutting rc4 by itself."
->
-> It does entirely break "make check" on a ppc host.  And that in turn
-> has held up my testing cycle for a couple of ppc regressions from 2.9
-> that I was hoping to squeeze in.  Does that change your calculations?
+From: Wang Yong <wang.yong155@zte.com.cn>
 
-I have a PPC64 box in my standard set of build tests, and it
-runs 'make check' without problems...
+Remove the task which check old packet in the comparing thread,
+then use IOthread context timer to handle it.
 
-thanks
--- PMM
+Process pactkets in the IOThread which arrived over the socket.
+we use iothread_get_g_main_context to create a new g_main_loop in
+the IOThread.then the packets from the primary and the secondary
+are processed in the IOThread.
+
+Finally remove the colo-compare thread using the IOThread instead.
+
+Signed-off-by: Wang Yong <wang.yong155@zte.com.cn>
+Signed-off-by: Wang Guang <wang.guang55@zte.com.cn>
+---
+ net/colo-compare.c | 75 ++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 39 insertions(+), 36 deletions(-)
+
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 5fe8e3f..69cb16e 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -29,6 +29,7 @@
+ #include "qemu/sockets.h"
+ #include "qapi-visit.h"
+ #include "net/colo.h"
++#include "sysemu/iothread.h"
+ 
+ #define TYPE_COLO_COMPARE "colo-compare"
+ #define COLO_COMPARE(obj) \
+@@ -82,11 +83,10 @@ typedef struct CompareState {
+     GQueue conn_list;
+     /* hashtable to save connection */
+     GHashTable *connection_track_table;
+-    /* compare thread, a thread for each NIC */
+-    QemuThread thread;
+ 
++    IOThread *iothread;
+     GMainContext *worker_context;
+-    GMainLoop *compare_loop;
++    QEMUTimer *packet_check_timer;
+ } CompareState;
+ 
+ typedef struct CompareClass {
+@@ -597,22 +597,40 @@ static void compare_sec_chr_in(void *opaque, const uint8_t *buf, int size)
+  * Check old packet regularly so it can watch for any packets
+  * that the secondary hasn't produced equivalents of.
+  */
+-static gboolean check_old_packet_regular(void *opaque)
++static void check_old_packet_regular(void *opaque)
+ {
+     CompareState *s = opaque;
+ 
+     /* if have old packet we will notify checkpoint */
+     colo_old_packet_check(s);
++    timer_mod(s->packet_check_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
++                REGULAR_PACKET_CHECK_MS);
++}
++
++static void colo_compare_timer_init(CompareState *s)
++{
++    AioContext *ctx = iothread_get_aio_context(s->iothread);
+ 
+-    return TRUE;
++    s->packet_check_timer = aio_timer_new(ctx, QEMU_CLOCK_VIRTUAL,
++                                SCALE_MS, check_old_packet_regular,
++                                s);
++    timer_mod(s->packet_check_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
++                    REGULAR_PACKET_CHECK_MS);
+ }
+ 
+-static void *colo_compare_thread(void *opaque)
++static void colo_compare_timer_del(CompareState *s)
+ {
+-    CompareState *s = opaque;
+-    GSource *timeout_source;
++    if (s->packet_check_timer) {
++        timer_del(s->packet_check_timer);
++        timer_free(s->packet_check_timer);
++        s->packet_check_timer = NULL;
++    }
++ }
+ 
+-    s->worker_context = g_main_context_new();
++static void colo_compare_iothread(CompareState *s)
++{
++    object_ref(OBJECT(s->iothread));
++    s->worker_context = iothread_get_g_main_context(s->iothread);
+ 
+     qemu_chr_fe_set_handlers(&s->chr_pri_in, compare_chr_can_read,
+                              compare_pri_chr_in, NULL, NULL,
+@@ -621,20 +639,7 @@ static void *colo_compare_thread(void *opaque)
+                              compare_sec_chr_in, NULL, NULL,
+                              s, s->worker_context, true);
+ 
+-    s->compare_loop = g_main_loop_new(s->worker_context, FALSE);
+-
+-    /* To kick any packets that the secondary doesn't match */
+-    timeout_source = g_timeout_source_new(REGULAR_PACKET_CHECK_MS);
+-    g_source_set_callback(timeout_source,
+-                          (GSourceFunc)check_old_packet_regular, s, NULL);
+-    g_source_attach(timeout_source, s->worker_context);
+-
+-    g_main_loop_run(s->compare_loop);
+-
+-    g_source_unref(timeout_source);
+-    g_main_loop_unref(s->compare_loop);
+-    g_main_context_unref(s->worker_context);
+-    return NULL;
++    colo_compare_timer_init(s);
+ }
+ 
+ static char *compare_get_pri_indev(Object *obj, Error **errp)
+@@ -759,12 +764,10 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+ {
+     CompareState *s = COLO_COMPARE(uc);
+     Chardev *chr;
+-    char thread_name[64];
+-    static int compare_id;
+ 
+-    if (!s->pri_indev || !s->sec_indev || !s->outdev) {
++    if (!s->pri_indev || !s->sec_indev || !s->outdev || !s->iothread) {
+         error_setg(errp, "colo compare needs 'primary_in' ,"
+-                   "'secondary_in','outdev' property set");
++                   "'secondary_in','outdev','iothread' property set");
+         return;
+     } else if (!strcmp(s->pri_indev, s->outdev) ||
+                !strcmp(s->sec_indev, s->outdev) ||
+@@ -799,12 +802,7 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+                                                       g_free,
+                                                       connection_destroy);
+ 
+-    sprintf(thread_name, "colo-compare %d", compare_id);
+-    qemu_thread_create(&s->thread, thread_name,
+-                       colo_compare_thread, s,
+-                       QEMU_THREAD_JOINABLE);
+-    compare_id++;
+-
++    colo_compare_iothread(s);
+     return;
+ }
+ 
+@@ -848,6 +846,10 @@ static void colo_compare_init(Object *obj)
+     object_property_add_str(obj, "outdev",
+                             compare_get_outdev, compare_set_outdev,
+                             NULL);
++    object_property_add_link(obj, "iothread", TYPE_IOTHREAD,
++                            (Object **)&s->iothread,
++                            object_property_allow_set_link,
++                            OBJ_PROP_LINK_UNREF_ON_RELEASE, NULL);
+ 
+     s->vnet_hdr = false;
+     object_property_add_bool(obj, "vnet_hdr_support", compare_get_vnet_hdr,
+@@ -861,9 +863,7 @@ static void colo_compare_finalize(Object *obj)
+     qemu_chr_fe_deinit(&s->chr_pri_in, false);
+     qemu_chr_fe_deinit(&s->chr_sec_in, false);
+     qemu_chr_fe_deinit(&s->chr_out, false);
+-
+-    g_main_loop_quit(s->compare_loop);
+-    qemu_thread_join(&s->thread);
++    colo_compare_timer_del(s);
+ 
+     /* Release all unhandled packets after compare thead exited */
+     g_queue_foreach(&s->conn_list, colo_flush_packets, s);
+@@ -871,6 +871,9 @@ static void colo_compare_finalize(Object *obj)
+     g_queue_clear(&s->conn_list);
+ 
+     g_hash_table_destroy(s->connection_track_table);
++    if (s->iothread) {
++        object_unref(OBJECT(s->iothread));
++    }
+     g_free(s->pri_indev);
+     g_free(s->sec_indev);
+     g_free(s->outdev);
+-- 
+1.8.3.1
