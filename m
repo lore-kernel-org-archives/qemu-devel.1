@@ -1,34 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk5De-00075e-4c
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:31 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dk5Mw-0004fA-Ra
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:21:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk5DY-0006oh-2s
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:30 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37128)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dk5Ms-0003zh-Sa
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:21:06 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35529)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dk5DX-0006oT-So
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:24 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dk5DW-0002CS-Ny
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:11:22 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9D71A2E80D7
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:11:22 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dk5Ms-0003v0-Jt
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:21:02 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7M9KUOI061818
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 05:21:01 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cghutra3s-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 05:21:00 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 22 Aug 2017 10:20:58 +0100
+References: <20170821091614.28251-1-cohuck@redhat.com>
+	<20170821091614.28251-8-cohuck@redhat.com>
+	<0d8dcac1-f536-5d69-0187-23656d003348@linux.vnet.ibm.com>
+	<17cb7925-e4eb-d174-2886-49ab9af0852c@linux.vnet.ibm.com>
+	<20170822103955.1cbc0714.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 22 Aug 2017 11:20:51 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Aug 2017 09:01:20 -0000
-From: ChristianEhrhardt <1711602@bugs.launchpad.net>
-Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
-Message-Id: <150339248011.8283.13263938229046983817.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
- 2.10
+In-Reply-To: <20170822103955.1cbc0714.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <b7e7810c-7822-2fb8-2a2e-d67c08126639@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 07/10] s390x/sclp: properly guard
+ pci-specific functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,99 +46,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-(gdb) handle SIGUSR1 nostop noprint pass
-(gdb) b migration/qemu-file.c:295
-(gdb) command
-p f->pos
-c
-end
-
-That showed the pos is ever increasing and fails at an offset it never read=
- before. Yet the absolute number was different.
-$1 =3D 0
-$2 =3D 8948
-$3 =3D 41423
-[...]
-$11359 =3D 326387440
-$11360 =3D 326420208 =3D> This was the one failing this time
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
 
-This was a different f->pos than last time, so I wondered if this would cha=
-nge every time.
-With a less interactive gdb config I got in three tries:
-1. 313153311
-2. 313313376
-3. 313571856
-So a different f->pos to fail each time.
 
-Different but rather close.
-I wondered if the reasons I got a higher one when tracing in more detail pr=
-inting all offsets could be that there still is something copied/synced and=
- only slowly gets available.
+On 08/22/2017 10:39 AM, Cornelia Huck wrote:
+>> I'm fine either way. If I imagine having a lots of adapter types, then I
+>> would expect a switch or a jumptable on the type before handling control
+>> to the pci specific function. In this case statically not supported types
+>> would probably get caught by the default branch of the switch and for a
+>> jumptable it could even handle the dynamic case (based on the facilities)
+>> trivially. In short both approaches can make sense.
+> I'm also wondering at the naming (the command sounds very
+> pci-specific). I'd just stick with this approach (modulo a possible
+> change of the response code, for which I need to rely on you guys).
+> 
 
-I stepped through rather slowly and got to 322429260 this time.
-So slower continuing on the iteration over qemu_fill_buffer makes it fail "=
-later"?
 
-Finally it is surely interesting which channel that actually is- likely the=
- migration socket?
-And yes, ioc->name in qio_channel_read is:
- $8 =3D 0x56ab78e5c0 "migration-socket-incoming
+Well, the QEMU name of the command is misleading misleading. In the AR
+it's called 'Configure I/O Adapter'. The PCI comes into the picture via
+byte 8 of the SCCB, the so called adapter type. Valid values for the
+adapter type are: 00-01 reserved; 02 PCI function; 03-FF reserved. So
+at this point we only have PCI.
 
--- =
+Regarding the code. I think we should wait for Pierre.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1711602
-
-Title:
-  --copy-storage-all failing with qemu 2.10
-
-Status in QEMU:
-  New
-Status in libvirt package in Ubuntu:
-  Confirmed
-Status in qemu package in Ubuntu:
-  Confirmed
-
-Bug description:
-  We fixed an issue around disk locking already in regard to qemu-nbd
-  [1], but there still seem to be issues.
-
-  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
-://10.22.69.196/system
-  error: internal error: qemu unexpectedly closed the monitor: 2017-08-18T1=
-2:10:29.800397Z qemu-system-x86_64: -chardev pty,id=3Dcharserial0: char dev=
-ice redirected to /dev/pts/0 (label charserial0)
-  2017-08-18T12:10:48.545776Z qemu-system-x86_64: load of migration failed:=
- Input/output error
-
-  Source libvirt log for the guest:
-  2017-08-18 12:09:08.251+0000: initiating migration
-  2017-08-18T12:09:08.809023Z qemu-system-x86_64: Unable to read from socke=
-t: Connection reset by peer
-  2017-08-18T12:09:08.809481Z qemu-system-x86_64: Unable to read from socke=
-t: Connection reset by peer
-
-  Target libvirt log for the guest:
-  2017-08-18T12:09:08.730911Z qemu-system-x86_64: load of migration failed:=
- Input/output error
-  2017-08-18 12:09:09.010+0000: shutting down, reason=3Dcrashed
-
-  Given the timing it seems that the actual copy now works (it is busy ~10 =
-seconds on my environment which would be the copy).
-  Also we don't see the old errors we saw before, but afterwards on the act=
-ual take-over it fails.
-
-  Dmesg has no related denials as often apparmor is in the mix.
-
-  Need to check libvirt logs of source [2] and target [3] in Detail.
-
-  [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02200.html
-  [2]: http://paste.ubuntu.com/25339356/
-  [3]: http://paste.ubuntu.com/25339358/
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1711602/+subscriptions
+Regards,
+Halil
