@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dkAnx-0006f9-5q
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:26 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dkAo1-0006lS-Sk
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dkAnt-0003K6-Ic
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:21 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dkAo0-0003PM-OL
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:25 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Aug 2017 16:08:42 +0100
-Message-Id: <1503414539-28762-4-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 22 Aug 2017 16:08:44 +0100
+Message-Id: <1503414539-28762-6-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
 References: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 03/20] target/arm: Add state field,
- feature bit and migration for v8M secure state
+Subject: [Qemu-devel] [PATCH 05/20] target/arm: Add MMU indexes for secure
+ v8M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,136 +23,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-As the first step in implementing ARM v8M's security extension:
- * add a new feature bit ARM_FEATURE_M_SECURITY
- * add the CPU state field that indicates whether the CPU is
-   currently in the secure state
- * add a migration subsection for this new state
-   (we will add the Secure copies of banked register state
-   to this subsection in later patches)
- * add a #define for the one new-in-v8M exception type
- * make the CPU debug log print S/NS status
+Now that MPU lookups can return different results for v8M
+when the CPU is in secure vs non-secure state, we need to
+have separate MMU indexes; add the secure counterparts
+to the existing three M profile MMU indexes.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h       |  3 +++
- target/arm/cpu.c       |  4 ++++
- target/arm/machine.c   | 20 ++++++++++++++++++++
- target/arm/translate.c |  8 +++++++-
- 4 files changed, 34 insertions(+), 1 deletion(-)
+ target/arm/cpu.h    | 19 +++++++++++++++++--
+ target/arm/helper.c |  9 ++++++++-
+ 2 files changed, 25 insertions(+), 3 deletions(-)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index b6bb78a..24666baa 100644
+index 24666baa..436ca0d 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -66,6 +66,7 @@
- #define ARMV7M_EXCP_MEM     4
- #define ARMV7M_EXCP_BUS     5
- #define ARMV7M_EXCP_USAGE   6
-+#define ARMV7M_EXCP_SECURE  7
- #define ARMV7M_EXCP_SVC     11
- #define ARMV7M_EXCP_DEBUG   12
- #define ARMV7M_EXCP_PENDSV  14
-@@ -420,6 +421,7 @@ typedef struct CPUARMState {
-         int exception;
-         uint32_t primask;
-         uint32_t faultmask;
-+        uint32_t secure; /* Is CPU in Secure state? (not guest visible) */
-     } v7m;
+@@ -2104,6 +2104,10 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
+  *  Execution priority negative (this is like privileged, but the
+  *  MPU HFNMIENA bit means that it may have different access permission
+  *  check results to normal privileged code, so can't share a TLB).
++ * If the CPU supports the v8M Security Extension then there are also:
++ *  Secure User
++ *  Secure Privileged
++ *  Secure, execution priority negative
+  *
+  * The ARMMMUIdx and the mmu index value used by the core QEMU TLB code
+  * are not quite the same -- different CPU types (most notably M profile
+@@ -2141,6 +2145,9 @@ typedef enum ARMMMUIdx {
+     ARMMMUIdx_MUser = 0 | ARM_MMU_IDX_M,
+     ARMMMUIdx_MPriv = 1 | ARM_MMU_IDX_M,
+     ARMMMUIdx_MNegPri = 2 | ARM_MMU_IDX_M,
++    ARMMMUIdx_MSUser = 3 | ARM_MMU_IDX_M,
++    ARMMMUIdx_MSPriv = 4 | ARM_MMU_IDX_M,
++    ARMMMUIdx_MSNegPri = 5 | ARM_MMU_IDX_M,
+     /* Indexes below here don't have TLBs and are used only for AT system
+      * instructions or for the first stage of an S12 page table walk.
+      */
+@@ -2162,6 +2169,9 @@ typedef enum ARMMMUIdxBit {
+     ARMMMUIdxBit_MUser = 1 << 0,
+     ARMMMUIdxBit_MPriv = 1 << 1,
+     ARMMMUIdxBit_MNegPri = 1 << 2,
++    ARMMMUIdxBit_MSUser = 1 << 3,
++    ARMMMUIdxBit_MSPriv = 1 << 4,
++    ARMMMUIdxBit_MSNegPri = 1 << 5,
+ } ARMMMUIdxBit;
  
-     /* Information associated with an exception about to be taken:
-@@ -1264,6 +1266,7 @@ enum arm_features {
-     ARM_FEATURE_THUMB_DSP, /* DSP insns supported in the Thumb encodings */
-     ARM_FEATURE_PMU, /* has PMU support */
-     ARM_FEATURE_VBAR, /* has cp15 VBAR */
-+    ARM_FEATURE_M_SECURITY, /* M profile Security Extension */
- };
- 
- static inline int arm_feature(CPUARMState *env, int feature)
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 8b610de..f32317e 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -185,6 +185,10 @@ static void arm_cpu_reset(CPUState *s)
-         uint32_t initial_pc; /* Loaded from 0x4 */
-         uint8_t *rom;
- 
-+        if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-+            env->v7m.secure = true;
-+        }
-+
-         /* The reset value of this bit is IMPDEF, but ARM recommends
-          * that it resets to 1, so QEMU always does that rather than making
-          * it dependent on CPU model.
-diff --git a/target/arm/machine.c b/target/arm/machine.c
-index 05e2909..745adae 100644
---- a/target/arm/machine.c
-+++ b/target/arm/machine.c
-@@ -235,6 +235,25 @@ static const VMStateDescription vmstate_pmsav8 = {
+ #define MMU_USER_IDX 0
+@@ -2187,7 +2197,8 @@ static inline int arm_mmu_idx_to_el(ARMMMUIdx mmu_idx)
+     case ARM_MMU_IDX_A:
+         return mmu_idx & 3;
+     case ARM_MMU_IDX_M:
+-        return mmu_idx == ARMMMUIdx_MUser ? 0 : 1;
++        return (mmu_idx == ARMMMUIdx_MUser || mmu_idx == ARMMMUIdx_MSUser)
++            ? 0 : 1;
+     default:
+         g_assert_not_reached();
      }
- };
- 
-+static bool m_security_needed(void *opaque)
-+{
-+    ARMCPU *cpu = opaque;
-+    CPUARMState *env = &cpu->env;
-+
-+    return arm_feature(env, ARM_FEATURE_M_SECURITY);
-+}
-+
-+static const VMStateDescription vmstate_m_security = {
-+    .name = "cpu/m-security",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = m_security_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(env.v7m.secure, ARMCPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static int get_cpsr(QEMUFile *f, void *opaque, size_t size,
-                     VMStateField *field)
- {
-@@ -484,6 +503,7 @@ const VMStateDescription vmstate_arm_cpu = {
+@@ -2206,7 +2217,11 @@ static inline int cpu_mmu_index(CPUARMState *env, bool ifetch)
           */
-         &vmstate_pmsav7_rnr,
-         &vmstate_pmsav7,
-+        &vmstate_m_security,
-         NULL
-     }
- };
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index e52a6d7..dea0a6f 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -12232,6 +12232,11 @@ void arm_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-     if (arm_feature(env, ARM_FEATURE_M)) {
-         uint32_t xpsr = xpsr_read(env);
-         const char *mode;
-+        const char *ns_status = "";
-+
-+        if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-+            ns_status = env->v7m.secure ? "S " : "NS ";
+         if ((env->v7m.exception > 0 && env->v7m.exception <= 3)
+             || env->v7m.faultmask) {
+-            return arm_to_core_mmu_idx(ARMMMUIdx_MNegPri);
++            mmu_idx = ARMMMUIdx_MNegPri;
 +        }
- 
-         if (xpsr & XPSR_EXCP) {
-             mode = "handler";
-@@ -12243,13 +12248,14 @@ void arm_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-             }
++
++        if (env->v7m.secure) {
++            mmu_idx += ARMMMUIdx_MSUser;
          }
  
--        cpu_fprintf(f, "XPSR=%08x %c%c%c%c %c %s\n",
-+        cpu_fprintf(f, "XPSR=%08x %c%c%c%c %c %s%s\n",
-                     xpsr,
-                     xpsr & XPSR_N ? 'N' : '-',
-                     xpsr & XPSR_Z ? 'Z' : '-',
-                     xpsr & XPSR_C ? 'C' : '-',
-                     xpsr & XPSR_V ? 'V' : '-',
-                     xpsr & XPSR_T ? 'T' : 'A',
-+                    ns_status,
-                     mode);
-     } else {
-         uint32_t psr = cpsr_read(env);
+         return arm_to_core_mmu_idx(mmu_idx);
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 887490a..1debebc 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -7037,6 +7037,9 @@ static inline uint32_t regime_el(CPUARMState *env, ARMMMUIdx mmu_idx)
+     case ARMMMUIdx_MPriv:
+     case ARMMMUIdx_MNegPri:
+     case ARMMMUIdx_MUser:
++    case ARMMMUIdx_MSPriv:
++    case ARMMMUIdx_MSNegPri:
++    case ARMMMUIdx_MSUser:
+         return 1;
+     default:
+         g_assert_not_reached();
+@@ -7060,6 +7063,9 @@ static inline bool regime_is_secure(CPUARMState *env, ARMMMUIdx mmu_idx)
+     case ARMMMUIdx_S1E3:
+     case ARMMMUIdx_S1SE0:
+     case ARMMMUIdx_S1SE1:
++    case ARMMMUIdx_MSPriv:
++    case ARMMMUIdx_MSNegPri:
++    case ARMMMUIdx_MSUser:
+         return true;
+     default:
+         g_assert_not_reached();
+@@ -7081,7 +7087,8 @@ static inline bool regime_translation_disabled(CPUARMState *env,
+                 (R_V7M_MPU_CTRL_ENABLE_MASK | R_V7M_MPU_CTRL_HFNMIENA_MASK)) {
+         case R_V7M_MPU_CTRL_ENABLE_MASK:
+             /* Enabled, but not for HardFault and NMI */
+-            return mmu_idx == ARMMMUIdx_MNegPri;
++            return mmu_idx == ARMMMUIdx_MNegPri ||
++                mmu_idx == ARMMMUIdx_MSNegPri;
+         case R_V7M_MPU_CTRL_ENABLE_MASK | R_V7M_MPU_CTRL_HFNMIENA_MASK:
+             /* Enabled for all cases */
+             return false;
 -- 
 2.7.4
