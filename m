@@ -1,23 +1,47 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dk9cL-00006y-EJ
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:53:20 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dk9dp-0001Ko-Ho
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:54:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dk9cH-0001o6-H3
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:53:17 -0400
-References: <20170822131832.20191-1-pbonzini@redhat.com>
-	<20170822131832.20191-5-pbonzini@redhat.com>
-	<74cd69b3-0425-53fe-5c5d-9604740d8f34@amsat.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <65d6f4f3-c30b-5cb2-9b2a-7d1e25038a19@redhat.com>
-Date: Tue, 22 Aug 2017 15:53:01 +0200
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dk9dm-0002io-El
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:54:49 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53160)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dk9dm-0002iS-5i
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:54:46 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7MDse57074776
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:54:44 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cgjnf78w9-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:54:43 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 22 Aug 2017 14:54:38 +0100
+References: <20170821091614.28251-1-cohuck@redhat.com>
+	<20170821091614.28251-8-cohuck@redhat.com>
+	<0d8dcac1-f536-5d69-0187-23656d003348@linux.vnet.ibm.com>
+	<17cb7925-e4eb-d174-2886-49ab9af0852c@linux.vnet.ibm.com>
+	<20170822103955.1cbc0714.cohuck@redhat.com>
+	<b7e7810c-7822-2fb8-2a2e-d67c08126639@linux.vnet.ibm.com>
+	<20170822113914.3ff24d75.cohuck@redhat.com>
+	<ff247730-9d10-352c-b6dc-8d98198181cf@linux.vnet.ibm.com>
+	<20170822152434.068b5038.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 22 Aug 2017 15:54:32 +0200
 MIME-Version: 1.0
-In-Reply-To: <74cd69b3-0425-53fe-5c5d-9604740d8f34@amsat.org>
+In-Reply-To: <20170822152434.068b5038.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 04/10] scsi: introduce
- sg_io_sense_from_errno
+Content-Transfer-Encoding: 8bit
+Message-Id: <4a85cfd0-7b36-175c-4671-f8dbc10f4d9e@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 07/10] s390x/sclp: properly guard
+ pci-specific functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,141 +50,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, qemu-block@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On 22/08/2017 15:45, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Paolo,
->=20
-> On 08/22/2017 10:18 AM, Paolo Bonzini wrote:
->> Move more knowledge of SG_IO out of hw/scsi/scsi-generic.c, for
->> reusability.
+
+
+On 08/22/2017 03:24 PM, Cornelia Huck wrote:
+> On Tue, 22 Aug 2017 14:58:37 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+>> On 08/22/2017 11:39 AM, Cornelia Huck wrote:
+>>> On Tue, 22 Aug 2017 11:20:51 +0200
+>>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+>>>   
+>>>> On 08/22/2017 10:39 AM, Cornelia Huck wrote:  
+>>>>>> I'm fine either way. If I imagine having a lots of adapter types, then I
+>>>>>> would expect a switch or a jumptable on the type before handling control
+>>>>>> to the pci specific function. In this case statically not supported types
+>>>>>> would probably get caught by the default branch of the switch and for a
+>>>>>> jumptable it could even handle the dynamic case (based on the facilities)
+>>>>>> trivially. In short both approaches can make sense.    
+>>>>> I'm also wondering at the naming (the command sounds very
+>>>>> pci-specific). I'd just stick with this approach (modulo a possible
+>>>>> change of the response code, for which I need to rely on you guys).
+>>>>>     
+>>>>
+>>>>
+>>>> Well, the QEMU name of the command is misleading misleading. In the AR
+>>>> it's called 'Configure I/O Adapter'. The PCI comes into the picture via
+>>>> byte 8 of the SCCB, the so called adapter type. Valid values for the
+>>>> adapter type are: 00-01 reserved; 02 PCI function; 03-FF reserved. So
+>>>> at this point we only have PCI.  
+>>>
+>>> OK, misleading naming combined with missing documentation leads to
+>>> confusion...
+>>>
+>>> So:
+>>>
+>>> - s/PCI/IOA/ for SCLP_CMDW_{CONFIGURE,DECONFIGURE}_PCI  
+>> nod
 >>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>   hw/scsi/scsi-generic.c | 40 +++++++---------------------------------
->>   include/scsi/utils.h   |  3 +++
->>   scsi/utils.c           | 35 +++++++++++++++++++++++++++++++++++
->>   3 files changed, 45 insertions(+), 33 deletions(-)
+>>> - have a switch/case over byte 8 with only one case (pci)  
 >>
->> diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
->> index 7a8f500934..04c687ee76 100644
->> --- a/hw/scsi/scsi-generic.c
->> +++ b/hw/scsi/scsi-generic.c
->> @@ -81,6 +81,7 @@ static void scsi_free_request(SCSIRequest *req)
->>   static void scsi_command_complete_noio(SCSIGenericReq *r, int ret)
->>   {
->>       int status;
->> +    SCSISense sense;
->>         assert(r->req.aiocb =3D=3D NULL);
->>   @@ -88,42 +89,15 @@ static void
->> scsi_command_complete_noio(SCSIGenericReq *r, int ret)
->>           scsi_req_cancel_complete(&r->req);
->>           goto done;
->>       }
->> -    if (r->io_header.driver_status & SG_ERR_DRIVER_SENSE) {
->> -        r->req.sense_len =3D r->io_header.sb_len_wr;
->> -    }
->> -
->> -    if (ret !=3D 0) {
->> -        switch (ret) {
->> -        case -EDOM:
->> -            status =3D TASK_SET_FULL;
->> -            break;
->> -        case -ENOMEM:
->> -            status =3D CHECK_CONDITION;
->> -            scsi_req_build_sense(&r->req, SENSE_CODE(TARGET_FAILURE))=
-;
->> -            break;
->> -        default:
->> -            status =3D CHECK_CONDITION;
->> -            scsi_req_build_sense(&r->req, SENSE_CODE(IO_ERROR));
->> -            break;
->> -        }
->> -    } else {
->> -        if (r->io_header.host_status =3D=3D SG_ERR_DID_NO_CONNECT ||
->> -            r->io_header.host_status =3D=3D SG_ERR_DID_BUS_BUSY ||
->> -            r->io_header.host_status =3D=3D SG_ERR_DID_TIME_OUT ||
->> -            (r->io_header.driver_status & SG_ERR_DRIVER_TIMEOUT)) {
->> -            status =3D BUSY;
->> -            BADF("Driver Timeout\n");
->> -        } else if (r->io_header.host_status) {
->> -            status =3D CHECK_CONDITION;
->> -            scsi_req_build_sense(&r->req, SENSE_CODE(I_T_NEXUS_LOSS))=
-;
->> -        } else if (r->io_header.status) {
->> -            status =3D r->io_header.status;
->> -        } else if (r->io_header.driver_status & SG_ERR_DRIVER_SENSE) =
-{
->> -            status =3D CHECK_CONDITION;
->> +    status =3D sg_io_sense_from_errno(-ret, &r->io_header, &sense);
->> +    if (status =3D=3D CHECK_CONDITION) {
->> +        if (r->io_header.driver_status & SG_ERR_DRIVER_SENSE) {
->> +            r->req.sense_len =3D r->io_header.sb_len_wr;
->>           } else {
->> -            status =3D GOOD;
->> +            scsi_req_build_sense(&r->req, sense);
->>           }
->>       }
->> +
->>       DPRINTF("Command complete 0x%p tag=3D0x%x status=3D%d\n",
->>               r, r->req.tag, status);
->>   diff --git a/include/scsi/utils.h b/include/scsi/utils.h
->> index 76c3db98c0..c12b34f2e5 100644
->> --- a/include/scsi/utils.h
->> +++ b/include/scsi/utils.h
->> @@ -113,6 +113,9 @@ int scsi_cdb_length(uint8_t *buf);
->>   #define SG_ERR_DID_TIME_OUT    0x03
->>     #define SG_ERR_DRIVER_SENSE    0x08
->> +
->> +int sg_io_sense_from_errno(int errno_value, struct sg_io_hdr *io_hdr,
->> +                           SCSISense *sense);
->>   #endif
->>     #endif
->> diff --git a/scsi/utils.c b/scsi/utils.c
->> index 54d6d4486a..ca5b058a73 100644
->> --- a/scsi/utils.c
->> +++ b/scsi/utils.c
->> @@ -412,3 +412,38 @@ const char *scsi_command_name(uint8_t cmd)
->>       }
->>       return names[cmd];
->>   }
->> +
->> +#ifdef CONFIG_LINUX
->> +int sg_io_sense_from_errno(int errno_value, struct sg_io_hdr *io_hdr,
->> +                           SCSISense *sense)
->> +{
->> +    if (errno_value !=3D 0) {
->> +        switch (errno_value) {
->> +        case EDOM:
->> +            return TASK_SET_FULL;
->> +        case ENOMEM:
->> +            *sense =3D SENSE_CODE(TARGET_FAILURE);
->> +            return CHECK_CONDITION;
->> +        default:
->> +            *sense =3D SENSE_CODE(IO_ERROR);
->> +            return CHECK_CONDITION;
->> +        }
->> +    } else {
->> +        if (io_hdr->host_status =3D=3D SG_ERR_DID_NO_CONNECT ||
->> +            io_hdr->host_status =3D=3D SG_ERR_DID_BUS_BUSY ||
->> +            io_hdr->host_status =3D=3D SG_ERR_DID_TIME_OUT ||
->> +            (io_hdr->driver_status & SG_ERR_DRIVER_TIMEOUT)) {
->> +            return BUSY;
->> +        } else if (io_hdr->host_status) {
->> +            *sense =3D SENSE_CODE(I_T_NEXUS_LOSS);
->> +            return CHECK_CONDITION;
->> +        } else if (io_hdr->status) {
->> +            return io_hdr->status;
->> +        } else if (io_hdr->driver_status & SG_ERR_DRIVER_SENSE) {
->> +            return CHECK_CONDITION;
->> +        }
->=20
->> +    }
-> I find it easier to read with the return GOOD out of the if/else:
->=20
->        return GOOD;
+>> Let's say some kind of a check for bit 8 is a good idea.
+> 
+> Yes.
+> 
+>>
+>>> - move the pci feature check into the pci code(? - not sure)  
+>>
+>> Don't know. Architecturally I don't see any direct connection
+>> between the pci feature and this command.
+> 
+> I'd either have the check in the pci case for the adapter type, or in
+> the called function. It's probably cleaner to do the check before
+> calling the pci function.
+> 
 
-Yes, you're right.
+nod
 
-Paolo
+>>
+>> The availability of SCLP_CMDW_{,DE}CONFIGURE_IOA is indicated
+>> by the result of the read scp info command read info in
+>> ReadInfo.facilities. I think we should assume that the read scp
+>> info command is always there.
+> 
+> Sure. But see the question in my other mail regarding the sclp
+> facilities bit (does it cover pci or adapter reconfiguration?)
+
+It (SCLP_HAS_PCI_RECONFIG) exactly  covers adapter reconfiguration.
+That's what I tried to say with the paragraph above.
+
+> 
+>>
+>> I would appreciate someone with AR access double checking.
+> 
+> I'd have hoped you had AR access :p
+
+Yes, my statements are based solely on my reading of the AR (me
+still lacks druid-knowledge). What I've asked for is a second
+opinion (because AR-s are a twisty maze).
+
+> 
+>>
+>>>
+>>> There's still the question of when this sclp command first became
+>>> available...
+>>>   
+>>
+>> I would argue that it should not be important for AR
+>> compliance. Currently it operates only on PCI so I doubt it
+>> pre-dates PCI. But I don't think the current implementation
+>> is buggy because it offers the sclp command regardless
+>> of the zPCI facility.
+> 
+> I'm just wondering if there's another facility we're missing. The zpci
+> facility might imply presence of adapter reconfiguration, but are there
+> other facilities implying that as well, or even a dedicated facility?
+
+Yes. The SCLP facility with the facility code 33 (aka SCLP_HAS_PCI_RECONFIG).
+It is the dedicated facility.
+
+I don't think zPCI architecturally implies the presence of this SCLP
+command. And logically I would say it's either the other way around
+adapter reconfiguration implies zPCI (because otherwise adapter
+reconfiguration would be completely useless) or bidirectional. 
+
+> 
+>>
+>> I don't know where should I look for the historical details
+>> which go beyond the AR.
+> 
+> If there is no independent facility, it is probably best to just always
+> provide the command, but fail for pci adapter type if the zpci facility
+> is off.
+
+IMHO we should SCLP_RC_INVALID_SCLP_COMMAND iff we don't provide
+SCLP_HAS_PCI_RECONFIG (which has bad name again s/PCI/IOA).
+
+I don't know of any facility except basic SCLP on which 
+SCLP_HAS_PCI_RECONFIG depends on. 
+
+For me both presenting and not presenting SCLP_HAS_PCI_RECONFIG
+to the guest (via read SCP info SCLP command) in the absence of
+the zPCI feature makes sense. The late because of the likely historical
+reasons, the former because I think the AR allows it and it gives us more
+flexibility.
+
+> 
