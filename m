@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dkHbo-0006HY-Cx
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 18:25:17 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dkHoJ-0004ZP-SW
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 18:38:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dkHbn-00060c-GQ
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 18:25:16 -0400
-References: <59a56959-ca12-ea75-33fa-ff07eba1b090@redhat.com>
-	<5b835c12-04c2-b1f9-4768-0f443742eb07@redhat.com>
-	<5a85f2a6-feb7-dd11-53f2-91df6262a827@amsat.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <355a2c68-e46b-97f7-12d0-1e72c8f09c13@redhat.com>
-Date: Tue, 22 Aug 2017 18:25:04 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dkHoI-0008WT-U6
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 18:38:11 -0400
+Received: from mail-pg0-x232.google.com ([2607:f8b0:400e:c05::232]:35939)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dkHoI-0008VL-NM
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 18:38:10 -0400
+Received: by mail-pg0-x232.google.com with SMTP id 83so350808pgb.3
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 15:38:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <5a85f2a6-feb7-dd11-53f2-91df6262a827@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Use after free problem somewhere in ahci.c or
- ich.c code
+From: Aleksandr Bezzubikov <zuban32s@gmail.com>
+Date: Wed, 23 Aug 2017 01:38:07 +0300
+Message-ID: <CAKSfGUCds0X0zjf+rb8D7ZgAesT6vELJa4=CXTi54i4NEwvN7A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] Generic PCIE-PCI Bridge GSoC Project Report
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,50 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>
 
+Hi,
+I'm a GSoC student and I have completed my project "Generic PCIE-PCI Bridge".
+Its aim was to create a new device to replace existing DMI-PCI bridge
+as it isn't
+cross-platform and doesn't support hotplugging.
+By completing this project next goals were achieved:
+1. Introduce a brand new pcie-pci-bridge device.
+2. Add SHPC support to the Q35 machine in order to enable device
+hotplugging into the PCIE-PCI bridge.
+3. Fix disabled BUSMASTER bug in Linux kernel.
+4. Add QEMU-specific bridge-only PCI capability for additional
+resources reservation, such as additional bus number, IO/MEM/PREF
+space. The capability usage was implemented in QEMU and SeaBIOS both.
+5. Update documentation according to the changes stated above.
 
+All QEMU and SeaBIOS patches have got reviewed-by and tested-by tags.
+Linux kernel patches has been accepted for merge in 4.14 version.
+Some QEMU (and therefore all SeaBIOS) patches hasn't been merged yet
+because of current freeze. But I'm ready to push the patches when it
+becomes possible (even though GSoC ends in a week). At the moment in
+QEMU only ACPI refactoring and SHPC-enabling patches are merged
+upstream.
 
-On 08/22/2017 05:02 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 08/22/2017 03:39 PM, John Snow wrote:
->> On 08/22/2017 02:15 PM, Thomas Huth wrote:
->>>
->>> Looks like there is a use-after-free problem somewhere in
->>> the ahci.c or ich.c code when trying to add the ich9-ahci
->>> on a old PC machine. Using valgrind, I get:
->>>
->=20
-> those old PC don't support AHCI hotplug, so realize() fails then
-> unparent() is called.
->=20
->> I'll look; it looks like it works okay for pc-i440fx-2.9 as well as 2.=
-0
->> and 1.7.
->>
->> 1.6 appears to be the most modern board that has issues, as well as 1.=
-4
->> and the pc-1.2 board you specify.
->=20
-> commit 9e047b982452 "piix4: add acpi pci hotplug support"
->=20
-> "Add support for acpi pci hotplug using the new infrastructure.
-> PIIX4 legacy interface is maintained as is for machine types 1.7 and
-> older."
->=20
-> I see piix4_pm_init() disabling use_acpi_pci_hotplug if xen_enabled(),
-> later when piix4_device_plug_cb() is called for TYPE_PCI_DEVICE it
-> checks xen_enabled() instead of checking use_acpi_pci_hotplug.
-> Same happens in piix4_device_unplug_request_cb(), not sure it can be
-> reached although.
->=20
-> My guess is changing !xen_enabled() -> s->use_acpi_pci_hotplug fixes
-> this issue, but I'm not sure this is the safest way to fix it.
->=20
-> I'll send a patch.
->=20
-> Regards,
->=20
-> Phil.
+QEMU series link:
+http://lists.gnu.org/archive/html/qemu-devel/2017-08/msg03288.html
+SeaBIOS series link:
+https://mail.coreboot.org/pipermail/seabios/2017-August/011728.html
+Linux patch link: http://www.spinics.net/lists/linux-pci/msg63052.html
 
-Beat me to it! I'll review, thanks.
+QEMU part github: https://github.com/zuban32/qemu/commits/v7?author=zuban32
+SeaBIOS part github:
+https://github.com/zuban32/seabios/commits/qemu_res_cap?author=zuban32
+
+ --
+Aleksandr Bezzubikov
