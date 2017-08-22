@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dkBQv-0001OG-Py
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:49:38 -0400
+	(envelope-from <mlureau@redhat.com>) id 1dkBRa-00022k-5S
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:50:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dkBQs-0007Lg-Kv
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:49:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:30428)
+	(envelope-from <mlureau@redhat.com>) id 1dkBRW-0007eB-Tt
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:50:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53576)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dkBQs-0007LU-Bh
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:49:34 -0400
-References: <20170815170051.127257-1-brijesh.singh@amd.com>
-	<9ab5d26f-a35d-eae6-6d68-60dabc2c5238@amd.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f2a991e0-6006-e839-f6c8-090be9877037@redhat.com>
-Date: Tue, 22 Aug 2017 17:49:30 +0200
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dkBRW-0007dw-LC
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:50:14 -0400
+Date: Tue, 22 Aug 2017 11:50:13 -0400 (EDT)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <494634424.1900896.1503417013134.JavaMail.zimbra@redhat.com>
+In-Reply-To: <87h8wz8x5u.fsf@dusky.pond.sub.org>
+References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
+	<20170822132255.23945-2-marcandre.lureau@redhat.com>
+	<87h8wz8x5u.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <9ab5d26f-a35d-eae6-6d68-60dabc2c5238@amd.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] target-i386/cpu: Add new EPYC CPU model
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 01/54] qapi: fix type_seen key error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,114 +28,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 22/08/2017 16:44, Brijesh Singh wrote:
-> Hi Eduardo and Paolo,
-> 
-> Please let me know if want me to address something else in this patch.
-> 
-> After this patch is accepted, I am planning to submit similar patch to
-> to libvirt to create EPYC CPU.
+Hi
 
-It looks good to me, but Eduardo is the maintainer and may spot
-something missing. :)
+----- Original Message -----
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>=20
+> > The type_seen member can be of a different type than the 'qtype' being
+> > checked, since a string create several conflicts. Lookup the real
+> > conflicting type in the conflict set, that one must be present in
+> > type_seen.
+> >
+> > This fixes the following error, reproducible with the modified test:
+> >
+> > Traceback (most recent call last):
+> >   File "/home/elmarco/src/qq/tests/qapi-schema/test-qapi.py", line 56, =
+in
+> >   <module>
+> >     schema =3D QAPISchema(sys.argv[1])
+> >   File "/home/elmarco/src/qq/scripts/qapi.py", line 1470, in __init__
+> >     self.exprs =3D check_exprs(parser.exprs)
+> >   File "/home/elmarco/src/qq/scripts/qapi.py", line 959, in check_exprs
+> >     check_alternate(expr, info)
+> >   File "/home/elmarco/src/qq/scripts/qapi.py", line 831, in check_alter=
+nate
+> >     % (name, key, types_seen[qtype]))
+> > KeyError: 'QTYPE_QSTRING'
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  scripts/qapi.py                                  | 6 ++++--
+> >  tests/qapi-schema/alternate-conflict-string.json | 4 ++--
+> >  2 files changed, 6 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/scripts/qapi.py b/scripts/qapi.py
+> > index 8aa2775f12..a3ac799535 100644
+> > --- a/scripts/qapi.py
+> > +++ b/scripts/qapi.py
+> > @@ -825,10 +825,12 @@ def check_alternate(expr, info):
+> >              else:
+> >                  conflicting.add('QTYPE_QNUM')
+> >                  conflicting.add('QTYPE_QBOOL')
+> > -        if conflicting & set(types_seen):
+> > +        conflict =3D conflicting & set(types_seen)
+> > +        if conflict:
+> > +            conflict_qtype =3D list(conflict)[0]
+>=20
+> Converting from set to list just to extract an element is clumsly.
+> Let's use conflict.pop(), and eliminate the variable.  Can do on commit.
 
-QEMU is now in freeze, but the patch can easily go in at the beginning
-of 2.11.
+I didn't realize that. thanks
 
-Paolo
-
-> - Brijesh
-> 
-> On 08/15/2017 12:00 PM, Brijesh Singh wrote:
->> Add a new base CPU model called 'EPYC' to model processors from AMD EPYC
->> family (which includes EPYC 76xx,75xx,74xx, 73xx and 72xx).
->>
->> The following features bits have been added/removed compare to Opteron_G5
->>
->> Added: monitor, movbe, rdrand, mmxext, ffxsr, rdtscp, cr8legacy, osvw,
->>         fsgsbase, bmi1, avx2, smep, bmi2, rdseed, adx, smap, clfshopt,
->> sha
->>         xsaveopt, xsavec, xgetbv1, arat
->>
->> Removed: xop, fma4, tbm
->>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Richard Henderson <rth@twiddle.net>
->> Cc: Eduardo Habkost <ehabkost@redhat.com>
->> Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
->> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->> ---
->>
->> Changes since v2:
->>   * limit the xlevel to 0x8000000a
->>
->> Changes since v1:
->>   * fix typo EYPC -> EPYC to reflect the correct branding name
->>
->>   target/i386/cpu.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 44 insertions(+)
->>
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index ddc45ab..6617e01 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -1522,6 +1522,50 @@ static X86CPUDefinition builtin_x86_defs[] = {
->>           .xlevel = 0x8000001A,
->>           .model_id = "AMD Opteron 63xx class CPU",
->>       },
->> +    {
->> +        .name = "EPYC",
->> +        .level = 0xd,
->> +        .vendor = CPUID_VENDOR_AMD,
->> +        .family = 23,
->> +        .model = 1,
->> +        .stepping = 2,
->> +        .features[FEAT_1_EDX] =
->> +            CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
->> CPUID_CLFLUSH |
->> +            CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
->> CPUID_PGE |
->> +            CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 |
->> CPUID_MCE |
->> +            CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE | CPUID_DE |
->> +            CPUID_VME | CPUID_FP87,
->> +        .features[FEAT_1_ECX] =
->> +            CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX |
->> +            CPUID_EXT_XSAVE | CPUID_EXT_AES |  CPUID_EXT_POPCNT |
->> +            CPUID_EXT_MOVBE | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
->> +            CPUID_EXT_CX16 | CPUID_EXT_FMA | CPUID_EXT_SSSE3 |
->> +            CPUID_EXT_MONITOR | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
->> +        .features[FEAT_8000_0001_EDX] =
->> +            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_PDPE1GB |
->> +            CPUID_EXT2_FFXSR | CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
->> +            CPUID_EXT2_SYSCALL,
->> +        .features[FEAT_8000_0001_ECX] =
->> +            CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
->> +            CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
->> +            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
->> +        .features[FEAT_7_0_EBX] =
->> +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
->> CPUID_7_0_EBX_AVX2 |
->> +            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 |
->> CPUID_7_0_EBX_RDSEED |
->> +            CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP |
->> CPUID_7_0_EBX_CLFLUSHOPT |
->> +            CPUID_7_0_EBX_SHA_NI,
->> +        /* Missing: XSAVES (not supported by some Linux versions,
->> +         * including v4.1 to v4.12).
->> +         * KVM doesn't yet expose any XSAVES state save component.
->> +         */
->> +        .features[FEAT_XSAVE] =
->> +            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
->> +            CPUID_XSAVE_XGETBV1,
->> +        .features[FEAT_6_EAX] =
->> +            CPUID_6_EAX_ARAT,
->> +        .xlevel = 0x8000000A,
->> +        .model_id = "AMD EPYC Processor",
->> +    },
->>   };
->>     typedef struct PropValue {
->>
+>=20
+> >              raise QAPISemError(info, "Alternate '%s' member '%s' can't=
+ "
+> >                                 "be distinguished from member '%s'"
+> > -                               % (name, key, types_seen[qtype]))
+> > +                               % (name, key, types_seen[conflict_qtype=
+]))
+> >          for qt in conflicting:
+> >              types_seen[qt] =3D key
+> > =20
+> > diff --git a/tests/qapi-schema/alternate-conflict-string.json
+> > b/tests/qapi-schema/alternate-conflict-string.json
+> > index 85adbd4adc..bb2702978e 100644
+> > --- a/tests/qapi-schema/alternate-conflict-string.json
+> > +++ b/tests/qapi-schema/alternate-conflict-string.json
+> > @@ -1,4 +1,4 @@
+> >  # alternate branches of 'str' type conflict with all scalar types
+> >  { 'alternate': 'Alt',
+> > -  'data': { 'one': 'str',
+> > -            'two': 'int' } }
+> > +  'data': { 'one': 'int',
+> > +            'two': 'str' } }
+>=20
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>=20
