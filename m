@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dk4rx-0002ET-Tq
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:49:06 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dk4sS-0002b8-Tr
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:49:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dk4ru-0005fH-Ry
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:49:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53628)
+	(envelope-from <lvivier@redhat.com>) id 1dk4sP-0006JC-Sf
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:49:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55712)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dk4ru-0005bw-LE
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:49:02 -0400
-Date: Tue, 22 Aug 2017 09:48:55 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170822084855.GC2109@work-vm>
-References: <1503301464-27886-1-git-send-email-peterx@redhat.com>
-	<20170821085851.GA4371@lemon>
-	<20170821100555.GC30356@pxdev.xzpeter.org>
-	<20170821135743.GC4371@lemon> <20170821153622.GG2231@work-vm>
-	<20170821165450.GE4371@lemon> <20170821172852.GA3236@work-vm>
-	<20170822021556.GA2146@lemon>
-	<20170822025654.GE30356@pxdev.xzpeter.org>
-	<20170822041519.GC2146@lemon>
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1dk4sP-0006Ia-Ld
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:49:33 -0400
+References: <20170816082650.21880-1-cohuck@redhat.com>
+	<223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
+	<CAFEAcA_UfM_XNKdc5zfHsehoRE6Q+EszRZX3FByskir7c+0Lww@mail.gmail.com>
+	<20170822010917.GO12356@umbus.fritz.box>
+	<CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <3f0dc918-0f55-e2f4-bf47-fe4abf5453bb@redhat.com>
+Date: Tue, 22 Aug 2017 10:49:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170822041519.GC2146@lemon>
-Subject: Re: [Qemu-devel] [RFC 0/6] monitor: allow per-monitor thread
+In-Reply-To: <CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.10] boot-serial-test: prefer tcg
+ accelerator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,41 +32,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-* Fam Zheng (famz@redhat.com) wrote:
-> On Tue, 08/22 10:56, Peter Xu wrote:
-> > I haven't really encountered (c), but I think it's the migrate_cancel
-> > command that matters, which should not need BQL as well.
+On 22/08/2017 10:47, Peter Maydell wrote:
+> On 22 August 2017 at 02:09, David Gibson <david@gibson.dropbear.id.au> wrote:
+>> On Wed, Aug 16, 2017 at 12:18:07PM +0100, Peter Maydell wrote:
+>>> On 16 August 2017 at 11:51, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>>> On 16/08/2017 10:26, Cornelia Huck wrote:
+>>>>> Prefer to use the tcg accelarator if it is available: This is our only
+>>>>> real smoke test for tcg, and fast enough to use it for that.
+>>>>
+>>>> I'm not sure this is required for 2.10.  Yes, it means the coverage from
+>>>> "make check" is worse, but that's it.
+>>>
+>>> Yes, I'd put it under "if we need to roll an rc4 anyway for
+>>> some more significant bug we might as well put this in too,
+>>> but it doesn't merit cutting rc4 by itself."
+>>
+>> It does entirely break "make check" on a ppc host.  And that in turn
+>> has held up my testing cycle for a couple of ppc regressions from 2.9
+>> that I was hoping to squeeze in.  Does that change your calculations?
 > 
-> There is bdrv_invalidate_cache_all() in migrate_cancel which clearly isn't safe.
-> Is that if block unreachable in this case? If so we should assert, otherwise
-> this command is not okay to run without BQL.
+> I have a PPC64 box in my standard set of build tests, and it
+> runs 'make check' without problems...
 
-Hmm yes that's a fairly recent addition to migrate_cancel - it used to
-be a simplish shutdown();  still I think it must be possible to get
-back to a simple shutdown() which is run directly with the cache stuff
-perhaps coming along later;  actually the tricky bit is that the fd for
-the shutdown() isn't just a simple int, but is in an object which
-we have to make sure doesn't get freed while we do it.
+You need to use KVM HV to have the problem, not KVM PR.
+Is that the case?
 
-> Generically, what guarantee the thread-safety of a qmp command when you decide
-> BQL is not needed? In other words, how do you prove commands are safe without
-> BQL? I think almost every command accesses global state, but lock-free data
-> structures are rare AFAICT.
-
-I'm assuming there would initially be very few commands marked as
-lock-free, that were mostly trivially small.
-
-I was thinking that it might be possible to do a debug build with
-some checking as well; something like making the code that takes
-the bql check a per-thread flag, and assert if the flag is set.
-The monitor-threads could set the flag, so that if we fell
-down a path that tried to take the BQL we'd fail.
-
-Dave
-
-> Fam
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Laurent
