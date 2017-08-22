@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dk95E-0002uB-Te
+	(envelope-from <pbonzini@redhat.com>) id 1dk95D-0002sh-LN
 	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:19:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dk95C-00064E-1j
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:19:04 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dk95B-00063T-7N
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:19:03 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 22 Aug 2017 15:18:30 +0200
-Message-Id: <20170822131832.20191-9-pbonzini@redhat.com>
+Date: Tue, 22 Aug 2017 15:18:31 +0200
+Message-Id: <20170822131832.20191-10-pbonzini@redhat.com>
 In-Reply-To: <20170822131832.20191-1-pbonzini@redhat.com>
 References: <20170822131832.20191-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 08/10] scsi: build qemu-pr-helper
+Subject: [Qemu-devel] [PATCH 09/10] scsi: add multipath support to
+ qemu-pr-helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,899 +23,651 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, famz@redhat.com
 
-Introduce a privileged helper to run persistent reservation commands.
-This lets virtual machines send persistent reservations without using
-CAP_SYS_RAWIO or out-of-tree patches.  The helper uses Unix permissions
-and SCM_RIGHTS to restrict access to processes that can access its socket
-and prove that they have an open file descriptor for a raw SCSI device.
-
-The next patch will also correct the usage of persistent reservations
-with multipath devices.
-
-It would also be possible to support for Linux's IOC_PR_* ioctls in
-the future, to support NVMe devices.  For now, however, only SCSI is
-supported.
+Proper support of persistent reservation for multipath devices requires
+communication with the multipath daemon, so that the reservation is
+registered and applied when a path comes up.  The device mapper
+utilities provide a library to do so; this patch makes qemu-pr-helper.c
+detect multipath devices and, when one is found, delegate the operation
+to libmpathpersist.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                   |   9 +-
- configure                  |   2 +-
- docs/interop/pr-helper.rst |  78 ++++++
- docs/pr-manager.rst        |  33 +++
- scsi/pr-helper.h           |  13 +
- scsi/qemu-pr-helper.c      | 657 +++++++++++++++++++++++++++++++++++++++++++++
- 6 files changed, 790 insertions(+), 2 deletions(-)
- create mode 100644 docs/interop/pr-helper.rst
- create mode 100644 scsi/pr-helper.h
- create mode 100644 scsi/qemu-pr-helper.c
+ Makefile              |   3 +
+ configure             |  57 ++++++++-
+ docs/pr-manager.rst   |  27 +++++
+ include/scsi/utils.h  |   6 +
+ scsi/qemu-pr-helper.c | 311 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ scsi/utils.c          |  15 +++
+ 6 files changed, 414 insertions(+), 5 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 97a58a0f4e..bfd4f69ecd 100644
+index bfd4f69ecd..f1acaad05b 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -209,6 +209,9 @@ ifdef BUILD_DOCS
- DOCS=qemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 qemu-nbd.8 qemu-ga.8
- DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7
- DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7
-+ifdef CONFIG_LINUX
-+DOCS+=scsi/qemu-pr-helper.8
-+endif
- ifdef CONFIG_VIRTFS
- DOCS+=fsdev/virtfs-proxy-helper.1
- endif
-@@ -384,6 +387,8 @@ qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
- fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
+@@ -388,6 +388,9 @@ fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal
  fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
  
-+scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
-+
+ scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
++ifdef CONFIG_MPATH
++scsi/qemu-pr-helper$(EXESUF): LIBS += -ludev -lmultipath -lmpathpersist
++endif
+ 
  qemu-img-cmds.h: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
- 
-@@ -491,7 +496,7 @@ clean:
- 	rm -f *.msi
- 	find . \( -name '*.so' -o -name '*.dll' -o -name '*.mo' -o -name '*.[oda]' \) -type f -exec rm {} +
- 	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga TAGS cscope.* *.pod *~ */*~
--	rm -f fsdev/*.pod
-+	rm -f fsdev/*.pod scsi/*.pod
- 	rm -f qemu-img-cmds.h
- 	rm -f ui/shader/*-vert.h ui/shader/*-frag.h
- 	@# May not be present in GENERATED_FILES
-@@ -590,6 +595,7 @@ endif
- ifdef CONFIG_VIRTFS
- 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
- 	$(INSTALL_DATA) fsdev/virtfs-proxy-helper.1 "$(DESTDIR)$(mandir)/man1"
-+	$(INSTALL_DATA) scsi/qemu-pr-helper.8 "$(DESTDIR)$(mandir)/man8"
- endif
- 
- install-datadir:
-@@ -718,6 +724,7 @@ qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi qemu-monitor-info.texi
- qemu.1: qemu-option-trace.texi
- qemu-img.1: qemu-img.texi qemu-option-trace.texi qemu-img-cmds.texi
- fsdev/virtfs-proxy-helper.1: fsdev/virtfs-proxy-helper.texi
-+scsi/qemu-pr-helper.8: scsi/qemu-pr-helper.texi
- qemu-nbd.8: qemu-nbd.texi qemu-option-trace.texi
- qemu-ga.8: qemu-ga.texi
- 
 diff --git a/configure b/configure
-index dd73cce62f..772aff18d6 100755
+index 772aff18d6..d3c9371f7c 100755
 --- a/configure
 +++ b/configure
-@@ -6545,7 +6545,7 @@ fi
+@@ -286,6 +286,7 @@ pixman=""
+ sdl=""
+ sdlabi=""
+ virtfs=""
++mpath=""
+ vnc="yes"
+ sparse="no"
+ vde=""
+@@ -948,6 +949,10 @@ for opt do
+   ;;
+   --enable-virtfs) virtfs="yes"
+   ;;
++  --disable-mpath) mpath="no"
++  ;;
++  --enable-mpath) mpath="yes"
++  ;;
+   --disable-vnc) vnc="no"
+   ;;
+   --enable-vnc) vnc="yes"
+@@ -1491,6 +1496,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   vnc-png         PNG compression for VNC server
+   cocoa           Cocoa UI (Mac OS X only)
+   virtfs          VirtFS
++  mpath           Multipath persistent reservation passthrough
+   xen             xen backend driver support
+   xen-pci-passthrough
+   brlapi          BrlAPI (Braile)
+@@ -3336,6 +3342,29 @@ else
+ fi
  
- # build tree in object directory in case the source is not in the current directory
- DIRS="tests tests/tcg tests/tcg/cris tests/tcg/lm32 tests/libqos tests/qapi-schema tests/tcg/xtensa tests/qemu-iotests"
--DIRS="$DIRS docs docs/interop fsdev"
-+DIRS="$DIRS docs docs/interop fsdev scsi"
- DIRS="$DIRS pc-bios/optionrom pc-bios/spapr-rtas pc-bios/s390-ccw"
- DIRS="$DIRS roms/seabios roms/vgabios"
- DIRS="$DIRS qapi-generated"
-diff --git a/docs/interop/pr-helper.rst b/docs/interop/pr-helper.rst
-new file mode 100644
-index 0000000000..765174c31f
---- /dev/null
-+++ b/docs/interop/pr-helper.rst
-@@ -0,0 +1,78 @@
-+..
+ ##########################################
++# libmpathpersist probe
 +
-+======================================
-+Persistent reservation helper protocol
-+======================================
++if test "$mpath" != "no" ; then
++  cat > $TMPC <<EOF
++#include <libudev.h>
++#include <mpath_persist.h>
++unsigned mpath_mx_alloc_len = 1024;
++int logsink;
++int main(void) {
++    struct udev *udev = udev_new();
++    mpath_lib_init(udev);
++}
++EOF
++  if compile_prog "" "-ludev -lmultipath -lmpathpersist" ; then
++    mpathpersist=yes
++  else
++    mpathpersist=no
++  fi
++else
++  mpathpersist=no
++fi
 +
-+QEMU's SCSI passthrough devices, ``scsi-block`` and ``scsi-generic``,
-+can delegate implementation of persistent reservations to an external
-+(and typically privilege) program.  Persistent Reservations allow
-+restricting access to block devices to specific initiators in a shared
-+storage setup.
-+
-+For a more detailed reference please refer the the SCSI Primary
-+Commands standard, specifically the section on Reservations and the
-+"PERSISTENT RESERVE IN" and "PERSISTENT RESERVE OUT" commands.
-+
-+This document describes the socket protocol used between QEMU's
-+``pr-manager-helper`` object and the external program.
-+
-+.. contents::
-+
-+Connection and initialization
-+-----------------------------
-+
-+After connecting to the helper program's socket, the helper starts a simple
-+feature negotiation process by writing four bytes corresponding to
-+the features it exposes (``supported_features``).  QEMU also writes
-+four bytes corresponding to the desired features of the helper program
-+(``requested_features``).
-+
-+If a bit is 1 in ``requested_features`` and 0 in ``supported_features``,
-+the corresponding feature is not supported by the helper and the connection
-+is closed.  On the other hand, it is acceptable for a bit to be 0 in
-+``requested_features`` and 1 in ``supported_features``; in this case,
-+he helper will not enable the feature.
-+
-+Right now no feature is defined, so the two parts always write four
-+zero bytes.
-+
-+All data transmitted on the socket is big-endian.
-+
-+Command format
-+--------------
-+
-+A command consists of a request and a response.  A request consists
-+of a 16-byte SCSI CDB.  A file descriptor must be passed to the helper
-+together with the SCSI CDB using ancillary data.
-+
-+The CDB has the following limitations:
-+
-+- the command (stored in the first byte) must be one of 0x5E
-+  (PERSISTENT RESERVE IN) or 0x5F (PERSISTENT RESERVE OUT).
-+
-+- the allocation length (stored in bytes 7-8 of the CDB for PERSISTENT
-+  RESERVE IN) or parameter list length (stored in bytes 5-8 of the CDB
-+  for PERSISTENT RESERVE OUT) is limited to 8 KiB.
-+
-+For PERSISTENT RESERVE OUT, the parameter list is sent right after the
-+CDB.
-+
-+The helper's reply has the following fixed structure:
-+
-+- 4 bytes for the SCSI status
-+
-+- 96 bytes for the SCSI sense data
-+
-+The sense data is always sent to keep the protocol simple, even though
-+it is only valid if the SCSI status is CHECK CONDITION (0x02).
-+
-+For PERSISTENT RESERVE IN, the data is sent right after the sense
-+data if the SCSI status is GOOD (0x00).
-+
-+It is invalid to send multiple commands concurrently on the same
-+socket.  It is however possible to connect multiple sockets to the
-+helper and send multiple commands to the helper for one or more
-+file descriptors.
-+
-+If the protocol is violated, the helper closes the socket.
++##########################################
+ # libcap probe
+ 
+ if test "$cap" != "no" ; then
+@@ -5070,16 +5099,34 @@ if test "$want_tools" = "yes" ; then
+   fi
+ fi
+ if test "$softmmu" = yes ; then
+-  if test "$virtfs" != no ; then
+-    if test "$cap" = yes && test "$linux" = yes && test "$attr" = yes ; then
++  if test "$linux" = yes; then
++    if test "$virtfs" != no && test "$cap" = yes && test "$attr" = yes ; then
+       virtfs=yes
+       tools="$tools fsdev/virtfs-proxy-helper\$(EXESUF)"
+     else
+       if test "$virtfs" = yes; then
+-        error_exit "VirtFS is supported only on Linux and requires libcap devel and libattr devel"
++        error_exit "VirtFS requires libcap devel and libattr devel"
+       fi
+       virtfs=no
+     fi
++    if test "$mpath" != no && test "$mpathpersist" = yes ; then
++      mpath=yes
++      tools="$tools mpath/qemu-mpath-helper\$(EXESUF)"
++    else
++      if test "$mpath" = yes; then
++        error_exit "Multipath requires libmpathpersist devel"
++      fi
++      mpath=no
++    fi
++  else
++    if test "$virtfs" = yes; then
++      error_exit "VirtFS is supported only on Linux"
++    fi
++    virtfs=no
++    if test "$mpath" = yes; then
++      error_exit "Multipath is supported only on Linux"
++    fi
++    mpath=no
+   fi
+ fi
+ 
+@@ -5326,6 +5373,7 @@ echo "Audio drivers     $audio_drv_list"
+ echo "Block whitelist (rw) $block_drv_rw_whitelist"
+ echo "Block whitelist (ro) $block_drv_ro_whitelist"
+ echo "VirtFS support    $virtfs"
++echo "Multipath support $mpath"
+ echo "VNC support       $vnc"
+ if test "$vnc" = "yes" ; then
+     echo "VNC SASL support  $vnc_sasl"
+@@ -5773,6 +5821,9 @@ fi
+ if test "$virtfs" = "yes" ; then
+   echo "CONFIG_VIRTFS=y" >> $config_host_mak
+ fi
++if test "$mpath" = "yes" ; then
++  echo "CONFIG_MPATH=y" >> $config_host_mak
++fi
+ if test "$vhost_scsi" = "yes" ; then
+   echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
+ fi
 diff --git a/docs/pr-manager.rst b/docs/pr-manager.rst
-index b6089fb57c..7107e59fb8 100644
+index 7107e59fb8..9b1de198b1 100644
 --- a/docs/pr-manager.rst
 +++ b/docs/pr-manager.rst
-@@ -49,3 +49,36 @@ Alternatively, using ``-blockdev``::
-           -object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock
-           -blockdev node-name=hd,driver=raw,file.driver=host_device,file.filename=/dev/sdb,file.pr-manager=helper0
-           -device scsi-block,drive=hd
+@@ -60,6 +60,7 @@ system service and supports the following option:
+ 
+ -d, --daemon              run in the background
+ -q, --quiet               decrease verbosity
++-v, --verbose             increase verbosity
+ -f, --pidfile=path        PID file when running as a daemon
+ -k, --socket=path         path to the socket
+ -T, --trace=trace-opts    tracing options
+@@ -82,3 +83,29 @@ its operation.  To do this, add the following options:
+ 
+ -u, --user=user           user to drop privileges to
+ -g, --group=group         group to drop privileges to
 +
-+----------------------------------
-+Invoking :program:`qemu-pr-helper`
-+----------------------------------
++---------------------------------------------
++Multipath devices and persistent reservations
++---------------------------------------------
 +
-+QEMU provides an implementation of the persistent reservation helper,
-+called :program:`qemu-pr-helper`.  The helper should be started as a
-+system service and supports the following option:
++Proper support of persistent reservation for multipath devices requires
++communication with the multipath daemon, so that the reservation is
++registered and applied when a path is newly discovered or becomes online
++again.  :command:`qemu-pr-helper` can do this if the ``libmpathpersist``
++library was available on the system at build time.
 +
-+-d, --daemon              run in the background
-+-q, --quiet               decrease verbosity
-+-f, --pidfile=path        PID file when running as a daemon
-+-k, --socket=path         path to the socket
-+-T, --trace=trace-opts    tracing options
++As of August 2017, a reservation key must be specified in ``multipath.conf``
++for ``multipathd`` to check for persistent reservation for newly
++discovered paths or reinstated paths.  The attribute can be added
++to the ``defaults`` section or the ``multipaths`` section; for example::
 +
-+By default, the socket and PID file are placed in the runtime state
-+directory, for example :file:`/var/run/qemu-pr-helper.sock` and
-+:file:`/var/run/qemu-pr-helper.pid`.  The PID file is not created
-+unless :option:`-d` is passed too.
++    multipaths {
++        multipath {
++            wwid   XXXXXXXXXXXXXXXX
++            alias      yellow
++            reservation_key  0x123abc
++        }
++    }
 +
-+:program:`qemu-pr-helper` can also use the systemd socket activation
-+protocol.  In this case, the systemd socket unit should specify a
-+Unix stream socket, like this::
-+
-+    [Socket]
-+    ListenStream=/var/run/qemu-pr-helper.sock
-+
-+After connecting to the socket, :program:`qemu-pr-helper`` can optionally drop
-+root privileges, except for those capabilities that are needed for
-+its operation.  To do this, add the following options:
-+
-+-u, --user=user           user to drop privileges to
-+-g, --group=group         group to drop privileges to
-diff --git a/scsi/pr-helper.h b/scsi/pr-helper.h
-new file mode 100644
-index 0000000000..2c7ccc9928
---- /dev/null
-+++ b/scsi/pr-helper.h
-@@ -0,0 +1,13 @@
-+#ifndef QEMU_PR_HELPER_H
-+#define QEMU_PR_HELPER_H 1
-+
-+#define PR_HELPER_CDB_SIZE     16
-+#define PR_HELPER_SENSE_SIZE   96
-+#define PR_HELPER_DATA_SIZE    8192
-+
-+typedef struct PRHelperResponse {
-+    int32_t result;
-+    uint8_t sense[PR_HELPER_SENSE_SIZE];
-+} PRHelperResponse;
-+
-+#endif
++Linking :program:`qemu-pr-helper` to ``libmpathpersist`` does not impede
++its usage on regular SCSI devices.
+diff --git a/include/scsi/utils.h b/include/scsi/utils.h
+index c12b34f2e5..c626be2c78 100644
+--- a/include/scsi/utils.h
++++ b/include/scsi/utils.h
+@@ -44,6 +44,8 @@ extern const struct SCSISense sense_code_LUN_NOT_READY;
+ extern const struct SCSISense sense_code_NO_MEDIUM;
+ /* LUN not ready, medium removal prevented */
+ extern const struct SCSISense sense_code_NOT_READY_REMOVAL_PREVENTED;
++/* Medium Error, Unrecoverable Read Error */
++extern const struct SCSISense sense_code_READ_ERROR;
+ /* Hardware error, internal target failure */
+ extern const struct SCSISense sense_code_TARGET_FAILURE;
+ /* Illegal request, invalid command operation code */
+@@ -80,6 +82,8 @@ extern const struct SCSISense sense_code_CAPACITY_CHANGED;
+ extern const struct SCSISense sense_code_UNIT_ATTENTION_NO_MEDIUM;
+ /* Unit attention, Power on, reset or bus device reset occurred */
+ extern const struct SCSISense sense_code_RESET;
++/* Unit attention, SCSI Bus Reset */
++extern const struct SCSISense sense_code_SCSI_BUS_RESET;
+ /* Unit attention, Medium may have changed*/
+ extern const struct SCSISense sense_code_MEDIUM_CHANGED;
+ /* Unit attention, Reported LUNs data has changed */
+@@ -90,6 +94,8 @@ extern const struct SCSISense sense_code_DEVICE_INTERNAL_RESET;
+ extern const struct SCSISense sense_code_WRITE_PROTECTED;
+ /* Data Protection, Space Allocation Failed Write Protect */
+ extern const struct SCSISense sense_code_SPACE_ALLOC_FAILED;
++/* Aborted Command, LUN Communication Failure */
++extern const struct SCSISense sense_code_LUN_COMM_FAILURE;
+ 
+ #define SENSE_CODE(x) sense_code_ ## x
+ 
 diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
-new file mode 100644
-index 0000000000..d52234af0f
---- /dev/null
+index d52234af0f..707bb6127b 100644
+--- a/scsi/qemu-pr-helper.c
 +++ b/scsi/qemu-pr-helper.c
-@@ -0,0 +1,657 @@
-+/*
-+ * Helper to forward persistent reservation commands to libmpathpersist
-+ *
-+ * Copyright (C) 2017 Red Hat, Inc. <pbonzini@redhat.com>
-+ *
-+ * Author: Paolo Bonzini <pbonzini@redhat.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; under version 2 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include <getopt.h>
-+#include "qapi/error.h"
-+#include "qemu-common.h"
-+#include "qemu/cutils.h"
-+#include "qemu/main-loop.h"
-+#include "qemu/error-report.h"
-+#include "qemu/config-file.h"
-+#include "qemu/bswap.h"
-+#include "qemu/log.h"
-+#include "qemu/systemd.h"
-+#include "qapi/util.h"
-+#include "qapi/qmp/qstring.h"
-+#include "io/channel-socket.h"
-+#include "trace/control.h"
-+#include "qemu-version.h"
-+
-+#include "block/aio.h"
-+#include "block/thread-pool.h"
-+
-+#include "scsi/constants.h"
-+#include "scsi/utils.h"
-+#include "pr-helper.h"
-+#include <sys/ioctl.h>
-+#include <linux/dm-ioctl.h>
-+#include <scsi/sg.h>
-+
-+#ifdef CONFIG_LIBCAP
-+#include <cap-ng.h>
-+#endif
-+#include <pwd.h>
-+#include <grp.h>
-+
-+
-+#define PR_OUT_FIXED_PARAM_SIZE 24
-+
-+static char *socket_path;
-+static char *pidfile;
-+static enum { RUNNING, TERMINATE, TERMINATING } state;
-+static QIOChannelSocket *server_ioc;
-+static int server_watch;
-+static int num_active_sockets = 1;
-+static int verbose;
-+
-+#ifdef CONFIG_LIBCAP
-+static int uid = -1;
-+static int gid = -1;
+@@ -51,6 +51,14 @@
+ #include <pwd.h>
+ #include <grp.h>
+ 
++#ifdef CONFIG_MPATH
++#define CONTROL_PATH "/dev/mapper/control"
++#include <libudev.h>
++#include "mpath_cmd.h"
++#include "mpath_persist.h"
 +#endif
 +
-+static void usage(const char *name)
-+{
-+    (printf) (
-+"Usage: %s [OPTIONS] FILE\n"
-+"Persistent Reservation helper program for QEMU\n"
-+"\n"
-+"  -h, --help                display this help and exit\n"
-+"  -V, --version             output version information and exit\n"
-+"\n"
-+"  -d, --daemon              run in the background\n"
-+"  -f, --pidfile=PATH        PID file when running as a daemon\n"
-+"                            (default '%s')\n"
-+"  -k, --socket=PATH         path to the unix socket\n"
-+"                            (default '%s')\n"
-+"  -T, --trace [[enable=]<pattern>][,events=<file>][,file=<file>]\n"
-+"                            specify tracing options\n"
-+#ifdef CONFIG_LIBCAP
-+"  -u, --user=USER           user to drop privileges to\n"
-+"  -g, --group=GROUP         group to drop privileges to\n"
-+#endif
-+"\n"
-+QEMU_HELP_BOTTOM "\n"
-+    , name, pidfile, socket_path);
-+}
-+
-+static void version(const char *name)
-+{
-+    printf(
-+"%s " QEMU_VERSION QEMU_PKGVERSION "\n"
-+"Written by Paolo Bonzini.\n"
-+"\n"
-+QEMU_COPYRIGHT "\n"
-+"This is free software; see the source for copying conditions.  There is NO\n"
-+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
-+    , name);
-+}
-+
-+/* SG_IO support */
-+
-+typedef struct PRHelperSGIOData {
-+    int fd;
-+    const uint8_t *cdb;
-+    uint8_t *sense;
-+    uint8_t *buf;
-+    int sz;
-+    int dir;
-+} PRHelperSGIOData;
-+
-+static int do_sgio_worker(void *opaque)
-+{
-+    PRHelperSGIOData *data = opaque;
-+    struct sg_io_hdr io_hdr;
-+    int ret;
-+    int status;
-+    SCSISense sense_code;
-+
-+    memset(data->sense, 0, PR_HELPER_SENSE_SIZE);
-+    memset(&io_hdr, 0, sizeof(io_hdr));
-+    io_hdr.interface_id = 'S';
-+    io_hdr.cmd_len = PR_HELPER_CDB_SIZE;
-+    io_hdr.cmdp = (uint8_t *)data->cdb;
-+    io_hdr.sbp = data->sense;
-+    io_hdr.mx_sb_len = PR_HELPER_SENSE_SIZE;
-+    io_hdr.timeout = 1;
-+    io_hdr.dxfer_direction = data->dir;
-+    io_hdr.dxferp = (char *)data->buf;
-+    io_hdr.dxfer_len = data->sz;
-+    ret = ioctl(data->fd, SG_IO, &io_hdr);
-+    status = sg_io_sense_from_errno(ret < 0 ? errno : 0, &io_hdr,
-+                                    &sense_code);
-+    if (status == CHECK_CONDITION &&
-+        !(io_hdr.driver_status & SG_ERR_DRIVER_SENSE)) {
-+        scsi_build_sense(data->sense, sense_code);
-+    }
-+
-+    return status;
-+}
-+
-+static int do_sgio(int fd, const uint8_t *cdb, uint8_t *sense,
-+                    uint8_t *buf, int sz, int dir)
-+{
-+    ThreadPool *pool = aio_get_thread_pool(qemu_get_aio_context());
-+
-+    PRHelperSGIOData data = {
-+        .fd = fd,
-+        .cdb = cdb,
-+        .sense = sense,
-+        .buf = buf,
-+        .sz = sz,
-+        .dir = dir,
-+    };
-+
-+    return thread_pool_submit_co(pool, do_sgio_worker, &data);
-+}
-+
-+static int do_pr_in(int fd, const uint8_t *cdb, uint8_t *sense,
-+                    uint8_t *data, int sz)
-+{
-+    return do_sgio(fd, cdb, sense, data, sz,
-+                   SG_DXFER_FROM_DEV);
-+}
-+
-+static int do_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
-+                     const uint8_t *param, int sz)
-+{
-+    return do_sgio(fd, cdb, sense, (uint8_t *)param, sz,
-+                   SG_DXFER_TO_DEV);
-+}
-+
-+/* Client */
-+
-+typedef struct PRHelperClient {
-+    QIOChannelSocket *ioc;
-+    Coroutine *co;
-+    int fd;
-+    uint8_t data[PR_HELPER_DATA_SIZE];
-+} PRHelperClient;
-+
-+typedef struct PRHelperRequest {
-+    int fd;
-+    size_t sz;
-+    uint8_t cdb[PR_HELPER_CDB_SIZE];
-+} PRHelperRequest;
-+
-+static int prh_read(PRHelperClient *client, void *buf, int sz, Error **errp)
-+{
-+    while (sz > 0) {
-+        int *fds = NULL;
-+        size_t nfds = 0;
-+        int i;
-+        struct iovec iov;
-+        ssize_t n_read;
-+
-+        iov.iov_base = buf;
-+        iov.iov_len = sz;
-+        n_read = qio_channel_readv_full(QIO_CHANNEL(client->ioc), &iov, 1,
-+                                        &fds, &nfds, errp);
-+
-+        if (n_read == QIO_CHANNEL_ERR_BLOCK) {
-+            qio_channel_yield(QIO_CHANNEL(client->ioc), G_IO_IN);
-+            continue;
-+        }
-+        if (n_read <= 0) {
-+            return n_read ? n_read : -1;
-+        }
-+
-+        /* Stash one file descriptor per request.  */
-+        if (nfds) {
-+            for (i = 0; i < nfds; i++) {
-+                if (client->fd == -1) {
-+                    client->fd = fds[i++];
-+                } else {
-+                    close(fds[i]);
-+                }
-+            }
-+            g_free(fds);
-+        }
-+
-+        buf += n_read;
-+        sz -= n_read;
-+    }
-+
-+    return 0;
-+}
-+
-+static int prh_read_request(PRHelperClient *client, PRHelperRequest *req,
-+                            PRHelperResponse *resp, Error **errp)
-+{
-+    uint32_t sz;
-+
-+    if (prh_read(client, req->cdb, sizeof(req->cdb), NULL) < 0) {
-+        return -1;
-+    }
-+
-+    if (client->fd == -1) {
-+        error_setg(errp, "No file descriptor in request.");
-+        return -1;
-+    }
-+
-+    if (req->cdb[0] != PERSISTENT_RESERVE_OUT &&
-+        req->cdb[0] != PERSISTENT_RESERVE_IN) {
-+        error_setg(errp, "Invalid CDB, closing socket.");
-+        goto out_close;
-+    }
-+
-+    sz = scsi_cdb_xfer(req->cdb);
-+    if (sz > sizeof(client->data)) {
-+        goto out_close;
-+    }
-+
-+    if (req->cdb[0] == PERSISTENT_RESERVE_OUT) {
-+        if (qio_channel_read_all(QIO_CHANNEL(client->ioc),
-+                                 (char *)client->data, sz,
-+                                 errp) < 0) {
-+            goto out_close;
-+        }
-+        if (sz < PR_OUT_FIXED_PARAM_SIZE) {
-+            /* Illegal request, Parameter list length error.  Not a fatal
-+             * error, so read the data and do not close the socket.
-+            */
-+            scsi_build_sense(resp->sense, SENSE_CODE(INVALID_PARAM_LEN));
-+            resp->result = CHECK_CONDITION;
-+            sz = 0;
-+            close(client->fd);
-+            client->fd = -1;
-+        }
-+    }
-+
-+    req->fd = client->fd;
-+    req->sz = sz;
-+    client->fd = -1;
-+    return sz;
-+
-+out_close:
-+    close(client->fd);
-+    client->fd = -1;
-+    return -1;
-+}
-+
-+static int prh_write_response(PRHelperClient *client, PRHelperRequest *req,
-+                              PRHelperResponse *resp, Error **errp)
-+{
-+    ssize_t r;
-+
-+    resp->result = cpu_to_be32(resp->result);
-+    r = qio_channel_write_all(QIO_CHANNEL(client->ioc),
-+                              (char *) resp, sizeof(*resp), errp);
-+    if (r < 0) {
-+        return r;
-+    }
-+
-+    if (req->cdb[0] == PERSISTENT_RESERVE_IN && resp->result == GOOD) {
-+        assert(req->sz <= sizeof(client->data));
-+        r = qio_channel_write_all(QIO_CHANNEL(client->ioc),
-+                                  (char *) client->data,
-+                                  req->sz, errp);
-+    }
-+    return r < 0 ? r : 0;
-+}
-+
-+static void prh_co_entry(void *opaque)
-+{
-+    PRHelperClient *client = opaque;
-+    Error *local_err = NULL;
-+    uint32_t flags;
-+    int r;
-+
-+    qio_channel_set_blocking(QIO_CHANNEL(client->ioc),
-+                             false, NULL);
-+    qio_channel_attach_aio_context(QIO_CHANNEL(client->ioc),
-+                                   qemu_get_aio_context());
-+
-+    /* A very simple negotiation for future extensibility.  No features
-+     * are defined so write 0.
-+     */
-+    flags = cpu_to_be32(0);
-+    r = qio_channel_write_all(QIO_CHANNEL(client->ioc),
-+                             (char *) &flags, sizeof(flags), NULL);
-+    if (r < 0) {
-+        goto out;
-+    }
-+
-+    r = qio_channel_read_all(QIO_CHANNEL(client->ioc),
-+                             (char *) &flags, sizeof(flags), NULL);
-+    if (be32_to_cpu(flags) != 0 || r < 0) {
-+        goto out;
-+    }
-+
-+    while (atomic_read(&state) == RUNNING) {
-+        PRHelperRequest req;
-+        PRHelperResponse resp;
-+        int sz;
-+
-+        sz = prh_read_request(client, &req, &resp, &local_err);
-+        if (sz < 0) {
-+            break;
-+        }
-+
-+        if (sz > 0) {
-+            num_active_sockets++;
-+            if (req.cdb[0] == PERSISTENT_RESERVE_OUT) {
-+                r = do_pr_out(req.fd, req.cdb, resp.sense, client->data, sz);
-+            } else {
-+                r = do_pr_in(req.fd, req.cdb, resp.sense, client->data, sz);
-+            }
-+            num_active_sockets--;
-+            close(req.fd);
-+            if (r == -1) {
-+                break;
-+            }
-+            resp.result = r;
-+        }
-+
-+        if (prh_write_response(client, &req, &resp, &local_err) < 0) {
-+            break;
-+        }
-+    }
-+
-+    if (local_err) {
-+        if (verbose == 0) {
-+            error_free(local_err);
-+        } else {
-+            error_report_err(local_err);
-+        }
-+    }
-+
-+out:
-+    qio_channel_detach_aio_context(QIO_CHANNEL(client->ioc));
-+    object_unref(OBJECT(client->ioc));
-+    g_free(client);
-+}
-+
-+static gboolean accept_client(QIOChannel *ioc, GIOCondition cond, gpointer opaque)
-+{
-+    QIOChannelSocket *cioc;
-+    PRHelperClient *prh;
-+
-+    cioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
-+                                     NULL);
-+    if (!cioc) {
-+        return TRUE;
-+    }
-+
-+    prh = g_new(PRHelperClient, 1);
-+    prh->ioc = cioc;
-+    prh->fd = -1;
-+    prh->co = qemu_coroutine_create(prh_co_entry, prh);
-+    qemu_coroutine_enter(prh->co);
-+
-+    return TRUE;
-+}
-+
-+
-+/*
-+ * Check socket parameters compatibility when socket activation is used.
-+ */
-+static const char *socket_activation_validate_opts(void)
-+{
-+    if (socket_path != NULL) {
-+        return "Unix socket can't be set when using socket activation";
-+    }
-+
-+    return NULL;
-+}
-+
-+static void compute_default_paths(void)
-+{
-+    socket_path = qemu_get_local_state_pathname("run/qemu-pr-helper.sock");
-+    pidfile = qemu_get_local_state_pathname("run/qemu-pr-helper.pid");
-+}
-+
-+static void termsig_handler(int signum)
-+{
-+    atomic_cmpxchg(&state, RUNNING, TERMINATE);
-+    qemu_notify_event();
-+}
-+
-+static void close_server_socket(void)
-+{
-+    g_assert(server_ioc);
-+
-+    g_source_remove(server_watch);
-+    server_watch = -1;
-+    object_unref(OBJECT(server_ioc));
-+    num_active_sockets--;
-+}
-+
-+#ifdef CONFIG_LIBCAP
-+static int drop_privileges(void)
-+{
-+    /* clear all capabilities */
-+    capng_clear(CAPNG_SELECT_BOTH);
-+
-+    if (capng_update(CAPNG_ADD, CAPNG_EFFECTIVE | CAPNG_PERMITTED,
-+                     CAP_SYS_RAWIO) < 0) {
-+        return -1;
-+    }
-+
-+    /* Change user/group id, retaining the capabilities.  Because file descriptors
-+     * are passed via SCM_RIGHTS, we don't need supplementary groups (and in
-+     * fact the helper can run as "nobody").
-+     */
-+    if (capng_change_id(uid != -1 ? uid : getuid(),
-+                        gid != -1 ? gid : getgid(),
-+                        CAPNG_DROP_SUPP_GRP | CAPNG_CLEAR_BOUNDING)) {
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+#endif
-+
-+int main(int argc, char **argv)
-+{
-+    const char *sopt = "hVk:fdT:u:g:q";
-+    struct option lopt[] = {
-+        { "help", no_argument, NULL, 'h' },
-+        { "version", no_argument, NULL, 'V' },
-+        { "socket", required_argument, NULL, 'k' },
-+        { "pidfile", no_argument, NULL, 'f' },
-+        { "daemon", no_argument, NULL, 'd' },
-+        { "trace", required_argument, NULL, 'T' },
-+        { "user", required_argument, NULL, 'u' },
-+        { "group", required_argument, NULL, 'g' },
-+        { "quiet", no_argument, NULL, 'q' },
-+        { NULL, 0, NULL, 0 }
-+    };
-+    int opt_ind = 0;
-+    int quiet = 0;
-+    char ch;
-+    Error *local_err = NULL;
-+    char *trace_file = NULL;
-+    bool daemonize = false;
-+    unsigned socket_activation;
-+
-+    struct sigaction sa_sigterm;
-+    memset(&sa_sigterm, 0, sizeof(sa_sigterm));
-+    sa_sigterm.sa_handler = termsig_handler;
-+    sigaction(SIGTERM, &sa_sigterm, NULL);
-+    sigaction(SIGINT, &sa_sigterm, NULL);
-+    sigaction(SIGHUP, &sa_sigterm, NULL);
-+
-+    signal(SIGPIPE, SIG_IGN);
-+
-+    compute_default_paths();
-+
-+    module_call_init(MODULE_INIT_TRACE);
-+    module_call_init(MODULE_INIT_QOM);
-+    qemu_add_opts(&qemu_trace_opts);
-+    qemu_init_exec_dir(argv[0]);
-+
-+    while ((ch = getopt_long(argc, argv, sopt, lopt, &opt_ind)) != -1) {
-+        switch (ch) {
-+        case 'k':
-+            socket_path = optarg;
-+            if (socket_path[0] != '/') {
-+                error_report("socket path must be absolute");
-+                exit(EXIT_FAILURE);
-+            }
-+            break;
-+        case 'f':
-+            pidfile = optarg;
-+            break;
-+#ifdef CONFIG_LIBCAP
-+        case 'u': {
-+            unsigned long res;
-+            struct passwd *userinfo = getpwnam(optarg);
-+            if (userinfo) {
-+                uid = userinfo->pw_uid;
-+            } else if (qemu_strtoul(optarg, NULL, 10, &res) == 0 &&
-+                       (uid_t)res == res) {
-+                uid = res;
-+            } else {
-+                error_report("invalid user '%s'", optarg);
-+                exit(EXIT_FAILURE);
-+            }
-+            break;
-+        }
-+        case 'g': {
-+            unsigned long res;
-+            struct group *groupinfo = getgrnam(optarg);
-+            if (groupinfo) {
-+                gid = groupinfo->gr_gid;
-+            } else if (qemu_strtoul(optarg, NULL, 10, &res) == 0 &&
-+                       (gid_t)res == res) {
-+                gid = res;
-+            } else {
-+                error_report("invalid group '%s'", optarg);
-+                exit(EXIT_FAILURE);
-+            }
-+            break;
-+        }
-+#else
-+        case 'u':
-+        case 'g':
-+            error_report("-%c not supported by this %s", ch, argv[0]);
-+            exit(1);
-+#endif
-+        case 'd':
-+            daemonize = true;
-+            break;
-+        case 'q':
-+            quiet = 1;
-+            break;
-+        case 'T':
-+            g_free(trace_file);
-+            trace_file = trace_opt_parse(optarg);
-+            break;
-+        case 'V':
-+            version(argv[0]);
-+            exit(0);
-+            break;
-+        case 'h':
-+            usage(argv[0]);
-+            exit(0);
-+            break;
-+        case '?':
-+            error_report("Try `%s --help' for more information.", argv[0]);
-+            exit(EXIT_FAILURE);
-+        }
-+    }
-+
-+    /* set verbosity */
-+    verbose = !quiet;
-+
-+    if (!trace_init_backends()) {
-+        exit(1);
-+    }
-+    trace_init_file(trace_file);
-+    qemu_set_log(LOG_TRACE);
++QEMU_BUILD_BUG_ON(PR_HELPER_DATA_SIZE > MPATH_MAX_PARAM_LEN);
+ 
+ #define PR_OUT_FIXED_PARAM_SIZE 24
+ 
+@@ -60,6 +68,7 @@ static enum { RUNNING, TERMINATE, TERMINATING } state;
+ static QIOChannelSocket *server_ioc;
+ static int server_watch;
+ static int num_active_sockets = 1;
++static int noisy;
+ static int verbose;
+ 
+ #ifdef CONFIG_LIBCAP
+@@ -162,9 +171,290 @@ static int do_sgio(int fd, const uint8_t *cdb, uint8_t *sense,
+     return thread_pool_submit_co(pool, do_sgio_worker, &data);
+ }
+ 
++/* Device mapper interface */
 +
 +#ifdef CONFIG_MPATH
-+    dm_init();
-+    multipath_pr_init();
-+#endif
++typedef struct DMData {
++    struct dm_ioctl dm;
++    uint8_t data[1024];
++} DMData;
 +
-+    socket_activation = check_socket_activation();
-+    if (socket_activation == 0) {
-+        SocketAddress saddr = {
-+            .type = SOCKET_ADDRESS_TYPE_UNIX,
-+            .u.q_unix.path = g_strdup(socket_path)
-+        };
-+        server_ioc = qio_channel_socket_new();
-+        if (qio_channel_socket_listen_sync(server_ioc, &saddr, &local_err) < 0) {
-+            object_unref(OBJECT(server_ioc));
-+            error_report_err(local_err);
-+            return 1;
-+        }
-+        g_free(saddr.u.q_unix.path);
-+    } else {
-+        /* Using socket activation - check user didn't use -p etc. */
-+        const char *err_msg = socket_activation_validate_opts();
-+        if (err_msg != NULL) {
-+            error_report("%s", err_msg);
-+            exit(EXIT_FAILURE);
-+        }
++static int control_fd;
 +
-+        /* Can only listen on a single socket.  */
-+        if (socket_activation > 1) {
-+            error_report("%s does not support socket activation with LISTEN_FDS > 1",
-+                         argv[0]);
-+            exit(EXIT_FAILURE);
-+        }
-+        server_ioc = qio_channel_socket_new_fd(FIRST_SOCKET_ACTIVATION_FD,
-+                                               &local_err);
-+        if (server_ioc == NULL) {
-+            error_report("Failed to use socket activation: %s",
-+                         error_get_pretty(local_err));
-+            exit(EXIT_FAILURE);
-+        }
-+        socket_path = NULL;
++static void *dm_ioctl(int ioc, struct dm_ioctl *dm)
++{
++    static DMData d;
++    memcpy(&d.dm, dm, sizeof(d.dm));
++    QEMU_BUILD_BUG_ON(sizeof(d.data) < sizeof(struct dm_target_spec));
++
++    d.dm.version[0] = DM_VERSION_MAJOR;
++    d.dm.version[1] = 0;
++    d.dm.version[2] = 0;
++    d.dm.data_size = 1024;
++    d.dm.data_start = offsetof(DMData, data);
++    if (ioctl(control_fd, ioc, &d) < 0) {
++        return NULL;
 +    }
-+
-+    if (qemu_init_main_loop(&local_err)) {
-+        error_report_err(local_err);
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    server_watch = qio_channel_add_watch(QIO_CHANNEL(server_ioc),
-+                                         G_IO_IN,
-+                                         accept_client,
-+                                         NULL, NULL);
-+
-+#ifdef CONFIG_LIBCAP
-+    if (drop_privileges() < 0) {
-+        error_report("Failed to drop privileges: %s", strerror(errno));
-+        exit(EXIT_FAILURE);
-+    }
-+#endif
-+
-+    if (daemonize) {
-+        if (daemon(0, 0) < 0) {
-+            error_report("Failed to daemonize: %s", strerror(errno));
-+            exit(EXIT_FAILURE);
-+        }
-+    }
-+
-+    state = RUNNING;
-+    do {
-+        main_loop_wait(false);
-+        if (state == TERMINATE) {
-+            state = TERMINATING;
-+            close_server_socket();
-+        }
-+    } while (num_active_sockets > 0);
-+
-+    exit(EXIT_SUCCESS);
++    memcpy(dm, &d.dm, sizeof(d.dm));
++    return &d.data;
 +}
++
++static void *dm_dev_ioctl(int fd, int ioc, struct dm_ioctl *dm)
++{
++    struct stat st;
++    int r;
++
++    r = fstat(fd, &st);
++    if (r < 0) {
++        perror("fstat");
++        exit(1);
++    }
++
++    dm->dev = st.st_rdev;
++    return dm_ioctl(ioc, dm);
++}
++
++static void dm_init(void)
++{
++    control_fd = open(CONTROL_PATH, O_RDWR);
++    if (control_fd < 0) {
++        perror("Cannot open " CONTROL_PATH);
++        exit(1);
++    }
++    struct dm_ioctl dm = { 0 };
++    if (!dm_ioctl(DM_VERSION, &dm)) {
++        perror("ioctl");
++        exit(1);
++    }
++    if (dm.version[0] != DM_VERSION_MAJOR) {
++        fprintf(stderr, "Unsupported device mapper interface");
++        exit(1);
++    }
++}
++
++/* Variables required by libmultipath and libmpathpersist.  */
++unsigned mpath_mx_alloc_len = PR_HELPER_DATA_SIZE;
++int logsink;
++
++static void multipath_pr_init(void)
++{
++    static struct udev *udev;
++
++    udev = udev_new();
++    mpath_lib_init(udev);
++}
++
++static int is_mpath(int fd)
++{
++    struct dm_ioctl dm = { .flags = DM_NOFLUSH_FLAG };
++    struct dm_target_spec *tgt;
++
++    tgt = dm_dev_ioctl(fd, DM_TABLE_STATUS, &dm);
++    if (!tgt) {
++        if (errno == ENXIO) {
++            return 0;
++        }
++        perror("ioctl");
++        exit(EXIT_FAILURE);
++    }
++    return !strncmp(tgt->target_type, "multipath", DM_MAX_TYPE_NAME);
++}
++
++static int mpath_reconstruct_sense(int fd, int r, uint8_t *sense)
++{
++    switch (r) {
++    case MPATH_PR_SUCCESS:
++        return GOOD;
++    case MPATH_PR_SENSE_NOT_READY:
++    case MPATH_PR_SENSE_MEDIUM_ERROR:
++    case MPATH_PR_SENSE_HARDWARE_ERROR:
++    case MPATH_PR_SENSE_ABORTED_COMMAND:
++        {
++            /* libmpathpersist ate the exact sense.  Try to find it by
++             * issuing TEST UNIT READY.
++             */
++            uint8_t cdb[6] = { TEST_UNIT_READY };
++            return do_sgio(fd, cdb, sense, NULL, 0, SG_DXFER_NONE);
++        }
++
++    case MPATH_PR_SENSE_UNIT_ATTENTION:
++        /* Congratulations libmpathpersist, you ruined the Unit Attention...
++         * Return a heavyweight one.
++         */
++        scsi_build_sense(sense, SENSE_CODE(SCSI_BUS_RESET));
++        return CHECK_CONDITION;
++    case MPATH_PR_SENSE_INVALID_OP:
++        /* Only one valid sense.  */
++        scsi_build_sense(sense, SENSE_CODE(INVALID_OPCODE));
++        return CHECK_CONDITION;
++    case MPATH_PR_ILLEGAL_REQ:
++        /* Guess.  */
++        scsi_build_sense(sense, SENSE_CODE(INVALID_PARAM));
++        return CHECK_CONDITION;
++    case MPATH_PR_NO_SENSE:
++        scsi_build_sense(sense, SENSE_CODE(NO_SENSE));
++        return CHECK_CONDITION;
++
++    case MPATH_PR_RESERV_CONFLICT:
++        return RESERVATION_CONFLICT;
++
++    case MPATH_PR_OTHER:
++    default:
++        scsi_build_sense(sense, SENSE_CODE(LUN_COMM_FAILURE));
++        return CHECK_CONDITION;
++    }
++}
++
++static int multipath_pr_in(int fd, const uint8_t *cdb, uint8_t *sense,
++                           uint8_t *data, int sz)
++{
++    int rq_servact = cdb[1];
++    struct prin_resp resp;
++    size_t written;
++    int r;
++
++    switch (rq_servact) {
++    case MPATH_PRIN_RKEY_SA:
++    case MPATH_PRIN_RRES_SA:
++    case MPATH_PRIN_RCAP_SA:
++        break;
++    case MPATH_PRIN_RFSTAT_SA:
++        /* Nobody implements it anyway, so bail out. */
++    default:
++        /* Cannot parse any other output.  */
++        scsi_build_sense(sense, SENSE_CODE(INVALID_FIELD));
++        return CHECK_CONDITION;
++    }
++
++    r = mpath_persistent_reserve_in(fd, rq_servact, &resp, noisy, verbose);
++    if (r == MPATH_PR_SUCCESS) {
++        switch (rq_servact) {
++        case MPATH_PRIN_RKEY_SA:
++        case MPATH_PRIN_RRES_SA: {
++            struct prin_readdescr *out = &resp.prin_descriptor.prin_readkeys;
++            stl_be_p(&data[0], out->prgeneration);
++            stl_be_p(&data[4], out->additional_length);
++            memcpy(&data[8], out->key_list, MIN(out->additional_length, sz - 8));
++            written = MIN(out->additional_length + 8, sz);
++            break;
++        }
++        case MPATH_PRIN_RCAP_SA: {
++            struct prin_capdescr *out = &resp.prin_descriptor.prin_readcap;
++            stw_be_p(&data[0], out->length);
++            data[2] = out->flags[0];
++            data[3] = out->flags[1];
++            stw_be_p(&data[4], out->pr_type_mask);
++            written = MIN(6, sz);
++            break;
++        }
++        default:
++            scsi_build_sense(sense, SENSE_CODE(INVALID_OPCODE));
++            return CHECK_CONDITION;
++        }
++        assert(written < sz);
++        memset(data + written, 0, sz - written);
++    }
++
++    return mpath_reconstruct_sense(fd, r, sense);
++}
++
++static int multipath_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
++                            const uint8_t *param, int sz)
++{
++    int rq_servact = cdb[1];
++    int rq_scope = cdb[2] >> 4;
++    int rq_type = cdb[2] & 0xf;
++    struct prout_param_descriptor paramp;
++    char transportids[PR_HELPER_DATA_SIZE];
++    int r;
++    int i, j;
++
++    switch (rq_servact) {
++    case MPATH_PROUT_REG_SA:
++    case MPATH_PROUT_RES_SA:
++    case MPATH_PROUT_REL_SA:
++    case MPATH_PROUT_CLEAR_SA:
++    case MPATH_PROUT_PREE_SA:
++    case MPATH_PROUT_PREE_AB_SA:
++    case MPATH_PROUT_REG_IGN_SA:
++    case MPATH_PROUT_REG_MOV_SA:
++        break;
++    default:
++        /* Cannot parse any other input.  */
++        scsi_build_sense(sense, SENSE_CODE(INVALID_FIELD));
++        return CHECK_CONDITION;
++    }
++
++    /* Convert input data, especially transport IDs, to the structs
++     * used by libmpathpersist (which, of course, will immediately
++     * do the opposite).
++     */
++    memset(&paramp, 0, sizeof(paramp));
++    memcpy(&paramp.key, &param[0], 8);
++    memcpy(&paramp.sa_key, &param[8], 8);
++    paramp.sa_flags = param[10];
++    for (i = PR_OUT_FIXED_PARAM_SIZE, j = 0; i < sz; ) {
++        struct transportid *id = (struct transportid *) &transportids[j];
++        int len;
++
++        id->format_code = param[i] & 0xc0;
++        id->protocol_id = param[i] & 0x0f;
++        switch (param[i] & 0xcf) {
++        case 0:
++            /* FC transport.  */
++            memcpy(id->n_port_name, &param[i + 8], 8);
++            j += offsetof(struct transportid, n_port_name[8]);
++            i += 24;
++            break;
++        case 3:
++        case 0x43:
++            /* iSCSI transport.  */
++            len = lduw_be_p(&param[i + 2]);
++            if (len > 252 || (len & 3)) {
++                /* For format code 00, the standard says the maximum is 223,
++                 * plus the NUL terminator.  For format code 01 there is no
++                 * maximum length, but libmpathpersist ignores the first byte
++                 * of id->iscsi_name so our maximum is 252.
++                 */
++                goto illegal_req;
++            }
++            if (memchr(&param[i + 4], 0, len) == NULL) {
++                goto illegal_req;
++            }
++            memcpy(id->iscsi_name, &param[i + 2], len + 2);
++            j += offsetof(struct transportid, iscsi_name[len + 2]);
++            i += len + 4;
++            break;
++        case 6:
++            /* SAS transport.  */
++            memcpy(id->sas_address, &param[i + 4], 8);
++            j += offsetof(struct transportid, sas_address[8]);
++            i += 24;
++            break;
++        default:
++        illegal_req:
++            scsi_build_sense(sense, SENSE_CODE(INVALID_PARAM));
++            return CHECK_CONDITION;
++        }
++
++        paramp.trnptid_list[paramp.num_transportid++] = id;
++    }
++
++    r = mpath_persistent_reserve_out(fd, rq_servact, rq_scope, rq_type,
++                                     &paramp, noisy, verbose);
++    return mpath_reconstruct_sense(fd, r, sense);
++}
++#endif
++
+ static int do_pr_in(int fd, const uint8_t *cdb, uint8_t *sense,
+                     uint8_t *data, int sz)
+ {
++#ifdef CONFIG_MPATH
++    if (is_mpath(fd)) {
++        return multipath_pr_in(fd, cdb, sense, data, sz);
++    }
++#endif
++
+     return do_sgio(fd, cdb, sense, data, sz,
+                    SG_DXFER_FROM_DEV);
+ }
+@@ -172,6 +462,12 @@ static int do_pr_in(int fd, const uint8_t *cdb, uint8_t *sense,
+ static int do_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
+                      const uint8_t *param, int sz)
+ {
++#ifdef CONFIG_MPATH
++    if (is_mpath(fd)) {
++        return multipath_pr_out(fd, cdb, sense, param, sz);
++    }
++#endif
++
+     return do_sgio(fd, cdb, sense, (uint8_t *)param, sz,
+                    SG_DXFER_TO_DEV);
+ }
+@@ -444,6 +740,11 @@ static int drop_privileges(void)
+                      CAP_SYS_RAWIO) < 0) {
+         return -1;
+     }
++    /* For /dev/mapper/control ioctls */
++    if (capng_update(CAPNG_ADD, CAPNG_EFFECTIVE | CAPNG_PERMITTED,
++                     CAP_SYS_ADMIN) < 0) {
++        return -1;
++    }
+ 
+     /* Change user/group id, retaining the capabilities.  Because file descriptors
+      * are passed via SCM_RIGHTS, we don't need supplementary groups (and in
+@@ -461,7 +762,7 @@ static int drop_privileges(void)
+ 
+ int main(int argc, char **argv)
+ {
+-    const char *sopt = "hVk:fdT:u:g:q";
++    const char *sopt = "hVk:fdT:u:g:vq";
+     struct option lopt[] = {
+         { "help", no_argument, NULL, 'h' },
+         { "version", no_argument, NULL, 'V' },
+@@ -471,10 +772,12 @@ int main(int argc, char **argv)
+         { "trace", required_argument, NULL, 'T' },
+         { "user", required_argument, NULL, 'u' },
+         { "group", required_argument, NULL, 'g' },
++        { "verbose", no_argument, NULL, 'v' },
+         { "quiet", no_argument, NULL, 'q' },
+         { NULL, 0, NULL, 0 }
+     };
+     int opt_ind = 0;
++    int loglevel = 1;
+     int quiet = 0;
+     char ch;
+     Error *local_err = NULL;
+@@ -551,6 +854,9 @@ int main(int argc, char **argv)
+         case 'q':
+             quiet = 1;
+             break;
++        case 'v':
++            ++loglevel;
++            break;
+         case 'T':
+             g_free(trace_file);
+             trace_file = trace_opt_parse(optarg);
+@@ -570,7 +876,8 @@ int main(int argc, char **argv)
+     }
+ 
+     /* set verbosity */
+-    verbose = !quiet;
++    noisy = !quiet && (loglevel >= 3);
++    verbose = quiet ? 0 : MIN(loglevel, 3);
+ 
+     if (!trace_init_backends()) {
+         exit(1);
+diff --git a/scsi/utils.c b/scsi/utils.c
+index eedd5f45b4..b5c0e05408 100644
+--- a/scsi/utils.c
++++ b/scsi/utils.c
+@@ -116,6 +116,11 @@ const struct SCSISense sense_code_NOT_READY_REMOVAL_PREVENTED = {
+     .key = NOT_READY, .asc = 0x53, .ascq = 0x02
+ };
+ 
++/* Medium Error, Unrecoverable Read Error */
++const struct SCSISense sense_code_READ_ERROR = {
++    .key = MEDIUM_ERROR, .asc = 0x11, .ascq = 0x00
++};
++
+ /* Hardware error, internal target failure */
+ const struct SCSISense sense_code_TARGET_FAILURE = {
+     .key = HARDWARE_ERROR, .asc = 0x44, .ascq = 0x00
+@@ -191,6 +196,11 @@ const struct SCSISense sense_code_OVERLAPPED_COMMANDS = {
+     .key = ABORTED_COMMAND, .asc = 0x4e, .ascq = 0x00
+ };
+ 
++/* Command aborted, LUN Communication Failure */
++const struct SCSISense sense_code_LUN_COMM_FAILURE = {
++    .key = ABORTED_COMMAND, .asc = 0x08, .ascq = 0x00
++};
++
+ /* Unit attention, Capacity data has changed */
+ const struct SCSISense sense_code_CAPACITY_CHANGED = {
+     .key = UNIT_ATTENTION, .asc = 0x2a, .ascq = 0x09
+@@ -201,6 +211,11 @@ const struct SCSISense sense_code_RESET = {
+     .key = UNIT_ATTENTION, .asc = 0x29, .ascq = 0x00
+ };
+ 
++/* Unit attention, SCSI bus reset */
++const struct SCSISense sense_code_SCSI_BUS_RESET = {
++    .key = UNIT_ATTENTION, .asc = 0x29, .ascq = 0x02
++};
++
+ /* Unit attention, No medium */
+ const struct SCSISense sense_code_UNIT_ATTENTION_NO_MEDIUM = {
+     .key = UNIT_ATTENTION, .asc = 0x3a, .ascq = 0x00
 -- 
 2.13.5
