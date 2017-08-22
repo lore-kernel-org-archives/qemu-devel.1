@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkDiE-0004Os-S8
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 14:15:41 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1dkDiQ-0004YD-Ve
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 14:15:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkDiC-00059g-O7
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 14:15:38 -0400
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <59a56959-ca12-ea75-33fa-ff07eba1b090@redhat.com>
-Date: Tue, 22 Aug 2017 20:15:24 +0200
+	(envelope-from <frederic.konrad@adacore.com>) id 1dkDiP-0005eR-Va
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 14:15:50 -0400
+References: <1503414375-21009-1-git-send-email-thuth@redhat.com>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <27da1dae-1e2f-559a-d8f0-c7e15289363e@adacore.com>
+Date: Tue, 22 Aug 2017 20:15:41 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1503414375-21009-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] Use after free problem somewhere in ahci.c or ich.c
- code
+Subject: Re: [Qemu-devel] [PATCH] hw/misc/auxbus.c: Mark the
+ aux-to-i2c-bridge device as non-hotpluggable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,276 +24,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>, John Snow <jsnow@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, qemu-trivial@nongnu.org
 
+Hi Thomas,
 
- Hi!
+Looking to this seems there is a second issue:
+The aux-to-i2c-bridge device should connect on a TYPE_AUX_BUS.
 
-Looks like there is a use-after-free problem somewhere in
-the ahci.c or ich.c code when trying to add the ich9-ahci
-on a old PC machine. Using valgrind, I get:
+I don't think there isn't any on integratorcp..
 
-$ valgrind x86_64-softmmu/qemu-system-x86_64 -M pc-1.2 -nographic -S
-==6604== Memcheck, a memory error detector
-==6604== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
-==6604== Using Valgrind-3.12.0 and LibVEX; rerun with -h for copyright info
-==6604== Command: x86_64-softmmu/qemu-system-x86_64 -M pc-1.2 -nographic -S
-==6604== 
-QEMU 2.9.93 monitor - type 'help' for more information
-(qemu) device_add ich9-ahci,id=ich9-ahci
-==6604== Invalid read of size 8
-==6604==    at 0x609AB0: object_unparent (object.c:445)
-==6604==    by 0x4C4478: device_unparent (qdev.c:1095)
-==6604==    by 0x60A364: object_finalize_child_property (object.c:1396)
-==6604==    by 0x6092A6: object_property_del_child.isra.7 (object.c:427)
-==6604==    by 0x451728: qdev_device_add (qdev-monitor.c:634)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604==    by 0x364083: handle_hmp_command (monitor.c:3119)
-==6604==    by 0x365439: monitor_command_cb (monitor.c:3922)
-==6604==    by 0x6E5D27: readline_handle_byte (readline.c:393)
-==6604==    by 0x364311: monitor_read (monitor.c:3905)
-==6604==    by 0x67C573: mux_chr_read (char-mux.c:216)
-==6604==  Address 0x15fc5448 is 30,328 bytes inside a block of size 36,288 free'd
-==6604==    at 0x4C2ACDD: free (vg_replace_malloc.c:530)
-==6604==    by 0xA04EBCD: g_free (in /usr/lib64/libglib-2.0.so.0.5000.3)
-==6604==    by 0x50100E: pci_ich9_uninit (ich.c:161)
-==6604==    by 0x5428AB: pci_qdev_unrealize (pci.c:1083)
-==6604==    by 0x4C5EE9: device_set_realized (qdev.c:988)
-==6604==    by 0x608DCD: property_set_bool (object.c:1886)
-==6604==    by 0x60CEBE: object_property_set_qobject (qom-qobject.c:27)
-==6604==    by 0x60AB6F: object_property_set_bool (object.c:1162)
-==6604==    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604==    by 0x364083: handle_hmp_command (monitor.c:3119)
-==6604==  Block was alloc'd at
-==6604==    at 0x4C2B975: calloc (vg_replace_malloc.c:711)
-==6604==    by 0xA04EB15: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.5000.3)
-==6604==    by 0x50094F: ahci_realize (ahci.c:1468)
-==6604==    by 0x501098: pci_ich9_ahci_realize (ich.c:115)
-==6604==    by 0x543E6D: pci_qdev_realize (pci.c:2002)
-==6604==    by 0x4C5E69: device_set_realized (qdev.c:914)
-==6604==    by 0x608DCD: property_set_bool (object.c:1886)
-==6604==    by 0x60CEBE: object_property_set_qobject (qom-qobject.c:27)
-==6604==    by 0x60AB6F: object_property_set_bool (object.c:1162)
-==6604==    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604== 
-==6604== Invalid read of size 8
-==6604==    at 0x60A350: object_finalize_child_property (object.c:1395)
-==6604==    by 0x6092A6: object_property_del_child.isra.7 (object.c:427)
-==6604==    by 0x4C4478: device_unparent (qdev.c:1095)
-==6604==    by 0x60A364: object_finalize_child_property (object.c:1396)
-==6604==    by 0x6092A6: object_property_del_child.isra.7 (object.c:427)
-==6604==    by 0x451728: qdev_device_add (qdev-monitor.c:634)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604==    by 0x364083: handle_hmp_command (monitor.c:3119)
-==6604==    by 0x365439: monitor_command_cb (monitor.c:3922)
-==6604==    by 0x6E5D27: readline_handle_byte (readline.c:393)
-==6604==    by 0x364311: monitor_read (monitor.c:3905)
-==6604==  Address 0x15fc5428 is 30,296 bytes inside a block of size 36,288 free'd
-==6604==    at 0x4C2ACDD: free (vg_replace_malloc.c:530)
-==6604==    by 0xA04EBCD: g_free (in /usr/lib64/libglib-2.0.so.0.5000.3)
-==6604==    by 0x50100E: pci_ich9_uninit (ich.c:161)
-==6604==    by 0x5428AB: pci_qdev_unrealize (pci.c:1083)
-==6604==    by 0x4C5EE9: device_set_realized (qdev.c:988)
-==6604==    by 0x608DCD: property_set_bool (object.c:1886)
-==6604==    by 0x60CEBE: object_property_set_qobject (qom-qobject.c:27)
-==6604==    by 0x60AB6F: object_property_set_bool (object.c:1162)
-==6604==    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604==    by 0x364083: handle_hmp_command (monitor.c:3119)
-==6604==  Block was alloc'd at
-==6604==    at 0x4C2B975: calloc (vg_replace_malloc.c:711)
-==6604==    by 0xA04EB15: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.5000.3)
-==6604==    by 0x50094F: ahci_realize (ahci.c:1468)
-==6604==    by 0x501098: pci_ich9_ahci_realize (ich.c:115)
-==6604==    by 0x543E6D: pci_qdev_realize (pci.c:2002)
-==6604==    by 0x4C5E69: device_set_realized (qdev.c:914)
-==6604==    by 0x608DCD: property_set_bool (object.c:1886)
-==6604==    by 0x60CEBE: object_property_set_qobject (qom-qobject.c:27)
-==6604==    by 0x60AB6F: object_property_set_bool (object.c:1162)
-==6604==    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604== 
-==6604== Invalid read of size 8
-==6604==    at 0x609CA9: object_dynamic_cast_assert (object.c:614)
-==6604==    by 0x4C879F: bus_unparent (bus.c:115)
-==6604==    by 0x60A364: object_finalize_child_property (object.c:1396)
-==6604==    by 0x6092A6: object_property_del_child.isra.7 (object.c:427)
-==6604==    by 0x4C4478: device_unparent (qdev.c:1095)
-==6604==    by 0x60A364: object_finalize_child_property (object.c:1396)
-==6604==    by 0x6092A6: object_property_del_child.isra.7 (object.c:427)
-==6604==    by 0x451728: qdev_device_add (qdev-monitor.c:634)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604==    by 0x364083: handle_hmp_command (monitor.c:3119)
-==6604==    by 0x365439: monitor_command_cb (monitor.c:3922)
-==6604==  Address 0x15fc5428 is 30,296 bytes inside a block of size 36,288 free'd
-==6604==    at 0x4C2ACDD: free (vg_replace_malloc.c:530)
-==6604==    by 0xA04EBCD: g_free (in /usr/lib64/libglib-2.0.so.0.5000.3)
-==6604==    by 0x50100E: pci_ich9_uninit (ich.c:161)
-==6604==    by 0x5428AB: pci_qdev_unrealize (pci.c:1083)
-==6604==    by 0x4C5EE9: device_set_realized (qdev.c:988)
-==6604==    by 0x608DCD: property_set_bool (object.c:1886)
-==6604==    by 0x60CEBE: object_property_set_qobject (qom-qobject.c:27)
-==6604==    by 0x60AB6F: object_property_set_bool (object.c:1162)
-==6604==    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604==    by 0x364083: handle_hmp_command (monitor.c:3119)
-==6604==  Block was alloc'd at
-==6604==    at 0x4C2B975: calloc (vg_replace_malloc.c:711)
-==6604==    by 0xA04EB15: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.5000.3)
-==6604==    by 0x50094F: ahci_realize (ahci.c:1468)
-==6604==    by 0x501098: pci_ich9_ahci_realize (ich.c:115)
-==6604==    by 0x543E6D: pci_qdev_realize (pci.c:2002)
-==6604==    by 0x4C5E69: device_set_realized (qdev.c:914)
-==6604==    by 0x608DCD: property_set_bool (object.c:1886)
-==6604==    by 0x60CEBE: object_property_set_qobject (qom-qobject.c:27)
-==6604==    by 0x60AB6F: object_property_set_bool (object.c:1162)
-==6604==    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604== 
-==6604== Invalid read of size 8
-==6604==    at 0x609CCB: object_dynamic_cast_assert (object.c:621)
-==6604==    by 0x4C879F: bus_unparent (bus.c:115)
-==6604==    by 0x60A364: object_finalize_child_property (object.c:1396)
-==6604==    by 0x6092A6: object_property_del_child.isra.7 (object.c:427)
-==6604==    by 0x4C4478: device_unparent (qdev.c:1095)
-==6604==    by 0x60A364: object_finalize_child_property (object.c:1396)
-==6604==    by 0x6092A6: object_property_del_child.isra.7 (object.c:427)
-==6604==    by 0x451728: qdev_device_add (qdev-monitor.c:634)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604==    by 0x364083: handle_hmp_command (monitor.c:3119)
-==6604==    by 0x365439: monitor_command_cb (monitor.c:3922)
-==6604==  Address 0x15fc5428 is 30,296 bytes inside a block of size 36,288 free'd
-==6604==    at 0x4C2ACDD: free (vg_replace_malloc.c:530)
-==6604==    by 0xA04EBCD: g_free (in /usr/lib64/libglib-2.0.so.0.5000.3)
-==6604==    by 0x50100E: pci_ich9_uninit (ich.c:161)
-==6604==    by 0x5428AB: pci_qdev_unrealize (pci.c:1083)
-==6604==    by 0x4C5EE9: device_set_realized (qdev.c:988)
-==6604==    by 0x608DCD: property_set_bool (object.c:1886)
-==6604==    by 0x60CEBE: object_property_set_qobject (qom-qobject.c:27)
-==6604==    by 0x60AB6F: object_property_set_bool (object.c:1162)
-==6604==    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604==    by 0x364083: handle_hmp_command (monitor.c:3119)
-==6604==  Block was alloc'd at
-==6604==    at 0x4C2B975: calloc (vg_replace_malloc.c:711)
-==6604==    by 0xA04EB15: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.5000.3)
-==6604==    by 0x50094F: ahci_realize (ahci.c:1468)
-==6604==    by 0x501098: pci_ich9_ahci_realize (ich.c:115)
-==6604==    by 0x543E6D: pci_qdev_realize (pci.c:2002)
-==6604==    by 0x4C5E69: device_set_realized (qdev.c:914)
-==6604==    by 0x608DCD: property_set_bool (object.c:1886)
-==6604==    by 0x60CEBE: object_property_set_qobject (qom-qobject.c:27)
-==6604==    by 0x60AB6F: object_property_set_bool (object.c:1162)
-==6604==    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604== 
-==6604== Invalid read of size 8
-==6604==    at 0x4C87A0: bus_unparent (bus.c:118)
-==6604==    by 0x60A364: object_finalize_child_property (object.c:1396)
-==6604==    by 0x6092A6: object_property_del_child.isra.7 (object.c:427)
-==6604==    by 0x4C4478: device_unparent (qdev.c:1095)
-==6604==    by 0x60A364: object_finalize_child_property (object.c:1396)
-==6604==    by 0x6092A6: object_property_del_child.isra.7 (object.c:427)
-==6604==    by 0x451728: qdev_device_add (qdev-monitor.c:634)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604==    by 0x364083: handle_hmp_command (monitor.c:3119)
-==6604==    by 0x365439: monitor_command_cb (monitor.c:3922)
-==6604==    by 0x6E5D27: readline_handle_byte (readline.c:393)
-==6604==  Address 0x15fc5470 is 30,368 bytes inside a block of size 36,288 free'd
-==6604==    at 0x4C2ACDD: free (vg_replace_malloc.c:530)
-==6604==    by 0xA04EBCD: g_free (in /usr/lib64/libglib-2.0.so.0.5000.3)
-==6604==    by 0x50100E: pci_ich9_uninit (ich.c:161)
-==6604==    by 0x5428AB: pci_qdev_unrealize (pci.c:1083)
-==6604==    by 0x4C5EE9: device_set_realized (qdev.c:988)
-==6604==    by 0x608DCD: property_set_bool (object.c:1886)
-==6604==    by 0x60CEBE: object_property_set_qobject (qom-qobject.c:27)
-==6604==    by 0x60AB6F: object_property_set_bool (object.c:1162)
-==6604==    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604==    by 0x364083: handle_hmp_command (monitor.c:3119)
-==6604==  Block was alloc'd at
-==6604==    at 0x4C2B975: calloc (vg_replace_malloc.c:711)
-==6604==    by 0xA04EB15: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.5000.3)
-==6604==    by 0x50094F: ahci_realize (ahci.c:1468)
-==6604==    by 0x501098: pci_ich9_ahci_realize (ich.c:115)
-==6604==    by 0x543E6D: pci_qdev_realize (pci.c:2002)
-==6604==    by 0x4C5E69: device_set_realized (qdev.c:914)
-==6604==    by 0x608DCD: property_set_bool (object.c:1886)
-==6604==    by 0x60CEBE: object_property_set_qobject (qom-qobject.c:27)
-==6604==    by 0x60AB6F: object_property_set_bool (object.c:1162)
-==6604==    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604== 
-==6604== Invalid read of size 8
-==6604==    at 0x4C87C1: bus_unparent (bus.c:122)
-==6604==    by 0x60A364: object_finalize_child_property (object.c:1396)
-==6604==    by 0x6092A6: object_property_del_child.isra.7 (object.c:427)
-==6604==    by 0x4C4478: device_unparent (qdev.c:1095)
-==6604==    by 0x60A364: object_finalize_child_property (object.c:1396)
-==6604==    by 0x6092A6: object_property_del_child.isra.7 (object.c:427)
-==6604==    by 0x451728: qdev_device_add (qdev-monitor.c:634)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604==    by 0x364083: handle_hmp_command (monitor.c:3119)
-==6604==    by 0x365439: monitor_command_cb (monitor.c:3922)
-==6604==    by 0x6E5D27: readline_handle_byte (readline.c:393)
-==6604==  Address 0x15fc5450 is 30,336 bytes inside a block of size 36,288 free'd
-==6604==    at 0x4C2ACDD: free (vg_replace_malloc.c:530)
-==6604==    by 0xA04EBCD: g_free (in /usr/lib64/libglib-2.0.so.0.5000.3)
-==6604==    by 0x50100E: pci_ich9_uninit (ich.c:161)
-==6604==    by 0x5428AB: pci_qdev_unrealize (pci.c:1083)
-==6604==    by 0x4C5EE9: device_set_realized (qdev.c:988)
-==6604==    by 0x608DCD: property_set_bool (object.c:1886)
-==6604==    by 0x60CEBE: object_property_set_qobject (qom-qobject.c:27)
-==6604==    by 0x60AB6F: object_property_set_bool (object.c:1162)
-==6604==    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604==    by 0x364083: handle_hmp_command (monitor.c:3119)
-==6604==  Block was alloc'd at
-==6604==    at 0x4C2B975: calloc (vg_replace_malloc.c:711)
-==6604==    by 0xA04EB15: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.5000.3)
-==6604==    by 0x50094F: ahci_realize (ahci.c:1468)
-==6604==    by 0x501098: pci_ich9_ahci_realize (ich.c:115)
-==6604==    by 0x543E6D: pci_qdev_realize (pci.c:2002)
-==6604==    by 0x4C5E69: device_set_realized (qdev.c:914)
-==6604==    by 0x608DCD: property_set_bool (object.c:1886)
-==6604==    by 0x60CEBE: object_property_set_qobject (qom-qobject.c:27)
-==6604==    by 0x60AB6F: object_property_set_bool (object.c:1162)
-==6604==    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
-==6604== 
-==6604== Invalid read of size 8
-==6604==    at 0x4C87C8: bus_unparent (bus.c:123)
-==6604==    by 0x60A364: object_finalize_child_property (object.c:1396)
-==6604==    by 0x6092A6: object_property_del_child.isra.7 (object.c:427)
-==6604==    by 0x4C4478: device_unparent (qdev.c:1095)
-==6604==    by 0x60A364: object_finalize_child_property (object.c:1396)
-==6604==    by 0x6092A6: object_property_del_child.isra.7 (object.c:427)
-==6604==    by 0x451728: qdev_device_add (qdev-monitor.c:634)
-==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
-Unsupported bus. Bus doesn't have property 'acpi-pcihp-bsel' set
+Anyway the patch you sent fix this issue indirectly and as far as
+I remember I wasn't able to make this I2C bridge an
+TYPE_AUX_DEVICE as it's a special device and it is internal (only 
+instantiated at the bus creation).
 
-Does anybody have an idea what could be wrong here?
+Thanks,
+Fred
 
- Thanks,
-  Thomas
+On 08/22/2017 05:06 PM, Thomas Huth wrote:
+> QEMU currently aborts if the user tries to do something like this:
+> 
+> $ aarch64-softmmu/qemu-system-aarch64 -S -M integratorcp -nographic
+> QEMU 2.9.93 monitor - type 'help' for more information
+> (qemu) device_add aux-to-i2c-bridge,id=x
+> (qemu) device_del x
+> **
+> ERROR:qemu/qdev-monitor.c:872:qdev_unplug: assertion failed: (hotplug_ctrl)
+> Aborted (core dumped)
+> 
+> Looks like the device is not hot-pluggable, so let's mark it
+> accordingly.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   hw/misc/auxbus.c | 8 ++++++++
+>   1 file changed, 8 insertions(+)
+> 
+> diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
+> index 8a90ddd..2c62515 100644
+> --- a/hw/misc/auxbus.c
+> +++ b/hw/misc/auxbus.c
+> @@ -222,9 +222,17 @@ static inline I2CBus *aux_bridge_get_i2c_bus(AUXTOI2CState *bridge)
+>       return bridge->i2c_bus;
+>   }
+>   
+> +static void aux_bridge_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +
+> +    dc->hotpluggable = false;
+> +}
+> +
+>   static const TypeInfo aux_to_i2c_type_info = {
+>       .name = TYPE_AUXTOI2C,
+>       .parent = TYPE_DEVICE,
+> +    .class_init = aux_bridge_class_init,
+>       .instance_size = sizeof(AUXTOI2CState),
+>       .instance_init = aux_bridge_init
+>   };
+> 
