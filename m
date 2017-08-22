@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkAl6-0003aJ-Ss
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:06:30 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dkAnp-0006Va-Qn
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkAl6-0001nf-0a
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:06:24 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 22 Aug 2017 17:06:15 +0200
-Message-Id: <1503414375-21009-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/misc/auxbus.c: Mark the aux-to-i2c-bridge
- device as non-hotpluggable
+	(envelope-from <pm215@archaic.org.uk>) id 1dkAno-0003EK-A2
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:13 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 22 Aug 2017 16:08:51 +0100
+Message-Id: <1503414539-28762-13-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
+References: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 12/20] target/arm: Make MPU_MAIR0,
+ MPU_MAIR1 registers banked for v8M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,48 +20,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, KONRAD Frederic <frederic.konrad@adacore.com>, qemu-trivial@nongnu.org
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-QEMU currently aborts if the user tries to do something like this:
+Make the MPU registers MPU_MAIR0 and MPU_MAIR1 banked if v8M security
+extensions are enabled.
 
-$ aarch64-softmmu/qemu-system-aarch64 -S -M integratorcp -nographic
-QEMU 2.9.93 monitor - type 'help' for more information
-(qemu) device_add aux-to-i2c-bridge,id=x
-(qemu) device_del x
-**
-ERROR:qemu/qdev-monitor.c:872:qdev_unplug: assertion failed: (hotplug_ctrl)
-Aborted (core dumped)
-
-Looks like the device is not hot-pluggable, so let's mark it
-accordingly.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/misc/auxbus.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ target/arm/cpu.h      | 4 ++--
+ hw/intc/armv7m_nvic.c | 8 ++++----
+ target/arm/cpu.c      | 4 ++--
+ target/arm/machine.c  | 6 ++++--
+ 4 files changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
-index 8a90ddd..2c62515 100644
---- a/hw/misc/auxbus.c
-+++ b/hw/misc/auxbus.c
-@@ -222,9 +222,17 @@ static inline I2CBus *aux_bridge_get_i2c_bus(AUXTOI2CState *bridge)
-     return bridge->i2c_bus;
- }
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index d0b0936..2f59828 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -545,8 +545,8 @@ typedef struct CPUARMState {
+          */
+         uint32_t *rbar;
+         uint32_t *rlar;
+-        uint32_t mair0;
+-        uint32_t mair1;
++        uint32_t mair0[2];
++        uint32_t mair1[2];
+     } pmsav8;
  
-+static void aux_bridge_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->hotpluggable = false;
-+}
-+
- static const TypeInfo aux_to_i2c_type_info = {
-     .name = TYPE_AUXTOI2C,
-     .parent = TYPE_DEVICE,
-+    .class_init = aux_bridge_class_init,
-     .instance_size = sizeof(AUXTOI2CState),
-     .instance_init = aux_bridge_init
+     void *nvic;
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index 3a1f02d..e98eb95 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -604,12 +604,12 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
+         if (!arm_feature(&cpu->env, ARM_FEATURE_V8)) {
+             goto bad_offset;
+         }
+-        return cpu->env.pmsav8.mair0;
++        return cpu->env.pmsav8.mair0[attrs.secure];
+     case 0xdc4: /* MPU_MAIR1 */
+         if (!arm_feature(&cpu->env, ARM_FEATURE_V8)) {
+             goto bad_offset;
+         }
+-        return cpu->env.pmsav8.mair1;
++        return cpu->env.pmsav8.mair1[attrs.secure];
+     default:
+     bad_offset:
+         qemu_log_mask(LOG_GUEST_ERROR, "NVIC: Bad read offset 0x%x\n", offset);
+@@ -826,7 +826,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
+         }
+         if (cpu->pmsav7_dregion) {
+             /* Register is RES0 if no MPU regions are implemented */
+-            cpu->env.pmsav8.mair0 = value;
++            cpu->env.pmsav8.mair0[attrs.secure] = value;
+         }
+         /* We don't need to do anything else because memory attributes
+          * only affect cacheability, and we don't implement caching.
+@@ -838,7 +838,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
+         }
+         if (cpu->pmsav7_dregion) {
+             /* Register is RES0 if no MPU regions are implemented */
+-            cpu->env.pmsav8.mair1 = value;
++            cpu->env.pmsav8.mair1[attrs.secure] = value;
+         }
+         /* We don't need to do anything else because memory attributes
+          * only affect cacheability, and we don't implement caching.
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index ae866be..ae8af19 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -249,8 +249,8 @@ static void arm_cpu_reset(CPUState *s)
+             }
+         }
+         env->pmsav7.rnr = 0;
+-        env->pmsav8.mair0 = 0;
+-        env->pmsav8.mair1 = 0;
++        memset(env->pmsav8.mair0, 0, sizeof(env->pmsav8.mair0));
++        memset(env->pmsav8.mair1, 0, sizeof(env->pmsav8.mair1));
+     }
+ 
+     set_flush_to_zero(1, &env->vfp.standard_fp_status);
+diff --git a/target/arm/machine.c b/target/arm/machine.c
+index cd6b6af..414a879 100644
+--- a/target/arm/machine.c
++++ b/target/arm/machine.c
+@@ -229,8 +229,8 @@ static const VMStateDescription vmstate_pmsav8 = {
+                               vmstate_info_uint32, uint32_t),
+         VMSTATE_VARRAY_UINT32(env.pmsav8.rlar, ARMCPU, pmsav7_dregion, 0,
+                               vmstate_info_uint32, uint32_t),
+-        VMSTATE_UINT32(env.pmsav8.mair0, ARMCPU),
+-        VMSTATE_UINT32(env.pmsav8.mair1, ARMCPU),
++        VMSTATE_UINT32(env.pmsav8.mair0[M_REG_NS], ARMCPU),
++        VMSTATE_UINT32(env.pmsav8.mair1[M_REG_NS], ARMCPU),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+@@ -255,6 +255,8 @@ static const VMStateDescription vmstate_m_security = {
+         VMSTATE_UINT32(env.v7m.faultmask[M_REG_S], ARMCPU),
+         VMSTATE_UINT32(env.v7m.control[M_REG_S], ARMCPU),
+         VMSTATE_UINT32(env.v7m.vecbase[M_REG_S], ARMCPU),
++        VMSTATE_UINT32(env.pmsav8.mair0[M_REG_S], ARMCPU),
++        VMSTATE_UINT32(env.pmsav8.mair1[M_REG_S], ARMCPU),
+         VMSTATE_END_OF_LIST()
+     }
  };
 -- 
-1.8.3.1
+2.7.4
