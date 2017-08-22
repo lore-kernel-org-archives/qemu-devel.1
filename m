@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk5DP-0006vn-VI
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:17 -0400
+	(envelope-from <bounces@canonical.com>) id 1dk5DR-0006wk-RM
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk5DL-0006fi-U1
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:15 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36908)
+	(envelope-from <bounces@canonical.com>) id 1dk5DQ-0006lJ-Kn
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:17 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36984)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dk5DL-0006fQ-O4
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:11 -0400
+	id 1dk5DQ-0006is-Dl
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:16 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dk5DK-00023Q-Md
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:11:10 +0000
+	id 1dk5DP-00026G-7Q
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:11:15 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AA0762E80C3
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:11:10 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 34AAA2E80CB
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:11:15 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Aug 2017 08:51:58 -0000
+Date: Tue, 22 Aug 2017 08:54:10 -0000
 From: ChristianEhrhardt <1711602@bugs.launchpad.net>
 Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
-Message-Id: <150339191842.19255.16599993819158951883.malone@chaenomeles.canonical.com>
+Message-Id: <150339205095.10750.5063429381666274296.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
  2.10
@@ -39,32 +39,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Sure, but initially I wanted to see what is going on overall so I let it
-pop up.
+Via a watchpoints I found that the error is set by qemu_fill_buffer.
 
-Started a debugging another session today.
-First I confirmed with
-  (gdb) catch syscall exit exit_group
-That this is the "normal" exit along the error message we knew:
-     migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,               =
-   =
+b qemu_loadvm_state
+handle SIGUSR1 nostop noprint pass
+c
+# on the break check and watch the status
+(gdb) p f
+$1 =3D (QEMUFile *) 0xb9babb3c00
+(gdb) p *f
+$2 =3D {ops =3D 0xb9b89880a0 <channel_input_ops>, hooks =3D 0x0, opaque =3D=
+ 0xb9bbabfe00, bytes_xfer =3D 0, xfer_limit =3D 0, pos =3D 0, buf_index =3D=
+ 0, =
 
-                       MIGRATION_STATUS_FAILED);                           =
-   =
+  buf_size =3D 0, buf =3D '\000' <repeats 32767 times>, may_free =3D {0}, i=
+ov =3D {{iov_base =3D 0x0, iov_len =3D 0} <repeats 64 times>}, iovcnt =3D 0=
+, =
 
-     error_report("load of migration failed: %s", strerror(-ret));         =
-   =
+  last_error =3D 0}
 
-     qemu_fclose(mis->from_src_file);                                      =
-   =
+# ok still no err, set watchpoint
+(gdb) p &(f->last_error)
+$4 =3D (int *) 0xb9babbc044
+(gdb) watch *(int *) 0xb9babbc044
+Hardware watchpoint 2: *(int *) 0xb9babbc044
 
-     exit(EXIT_FAILURE);
+# This catches the following
+Thread 1 "qemu-system-x86" hit Hardware watchpoint 2: *(int *) 0xb9babbc044
 
-I found that already the retval of qemu_loadvm_state it -5.
-Every thing else afterwards is cleanup.
-
-Inside qemu_loadvm_state the first 2/3 pass and then that ret=3D-5 is from
-"ret =3D qemu_file_get_error(f);".
+Old value =3D 0
+New value =3D -5
+0x000000b9b82bd0ec in qemu_file_set_error (ret=3D-5, f=3D0xb9babb3c00) at .=
+/migration/qemu-file.c:125
+warning: Source file is more recent than executable.
+125             f->last_error =3D ret;
+(gdb) bt
+#0  0x000000b9b82bd0ec in qemu_file_set_error (ret=3D-5, f=3D0xb9babb3c00) =
+at ./migration/qemu-file.c:125
+#1  qemu_fill_buffer (f=3D0xb9babb3c00) at ./migration/qemu-file.c:299
+#2  0x000000b9b82bdbb1 in qemu_peek_byte (f=3D0xb9babb3c00, offset=3D0) at =
+./migration/qemu-file.c:553
+#3  0x000000b9b82bdc1b in qemu_get_byte (f=3Df@entry=3D0xb9babb3c00) at ./m=
+igration/qemu-file.c:566
+#4  0x000000b9b82b5853 in qemu_loadvm_state_main (f=3Df@entry=3D0xb9babb3c0=
+0, mis=3D0xb9b8a4f700 <mis_current>) at ./migration/savevm.c:1947
+#5  0x000000b9b82b864f in qemu_loadvm_state (f=3Df@entry=3D0xb9babb3c00) at=
+ ./migration/savevm.c:2032
+#6  0x000000b9b82af5c3 in process_incoming_migration_co (opaque=3D0xb9babb3=
+c00) at ./migration/migration.c:320
+#7  0x000000b9b83e42a6 in coroutine_trampoline (i0=3D<optimized out>, i1=3D=
+<optimized out>) at ./util/coroutine-ucontext.c:79
+#8  0x00007fbf3702fac0 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
+#9  0x00007fffe3f9f800 in ?? ()
+#10 0x0000000000000000 in ?? ()
 
 -- =
 
