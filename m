@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dkDY8-0006HG-G4
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 14:05:13 -0400
+	(envelope-from <bounces@canonical.com>) id 1dkDZ3-0006kl-Vn
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 14:06:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dkDY0-0007IB-TR
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 14:05:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54514)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1dkDY0-0007Gr-NE
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 14:05:04 -0400
-Date: Tue, 22 Aug 2017 11:05:01 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <e56c3b75-332d-4876-2d45-fd2f4edc4d69@citrix.com>
-Message-ID: <alpine.DEB.2.10.1708221104440.12143@sstabellini-ThinkPad-X260>
-References: <20170821140138.27421-1-ross.lagerwall@citrix.com>
-	<alpine.DEB.2.10.1708211528350.12143@sstabellini-ThinkPad-X260>
-	<e56c3b75-332d-4876-2d45-fd2f4edc4d69@citrix.com>
+	(envelope-from <bounces@canonical.com>) id 1dkDYz-0008FC-5k
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 14:06:09 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42068)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dkDYy-0008F3-Vi
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 14:06:05 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dkDYw-00008S-7n
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 18:06:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 925B92E80D6
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 18:06:00 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH] xen: Emit RTC_CHANGE upon TIMEOFFSET ioreq
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 22 Aug 2017 17:57:36 -0000
+From: ChristianEhrhardt <1711602@bugs.launchpad.net>
+Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
+Message-Id: <150342465627.16848.2885685663883853682.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
+ 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +37,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ross Lagerwall <ross.lagerwall@citrix.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Anthony Perard <anthony.perard@citrix.com>
+To: qemu-devel@nongnu.org
 
-On Tue, 22 Aug 2017, Ross Lagerwall wrote:
-> On 08/21/2017 11:30 PM, Stefano Stabellini wrote:
-> > On Mon, 21 Aug 2017, Ross Lagerwall wrote:
-> > > When the guest writes to the RTC, Xen emulates it and broadcasts a
-> > > TIMEOFFSET ioreq. Emit an RTC_CHANGE QMP message when this happens
-> > > rather than ignoring it so that something useful can be done with the
-> > > information.
-> > 
-> > Are there any handlers of the RTC_CHANGE QMP message today? What happens
-> > if there are no handlers?
-> 
-> The libxl toolstack doesn't handle it nor does the XAPI project currently,
-> although we plan on modifying XAPI to handle it.
-> 
-> It is simply an event that is broadcast to any QMP monitors. If nothing
-> handles the event, then it is the same behavior as before. If something is
-> interested in the event, then it can make use of the time offset however it
-> wants.
+I didn't add Stefans patch yet.
+Note: the Mentioned patch is at: Note: http://lists.nongnu.org/archive/html=
+/qemu-devel/2017-08/msg04027.html
 
-OK, please expland the patch description and repost.
+With your debug patch applied I get:
+2017-08-22 17:57:04.486+0000: initiating migration
+bdrv_inactivate_recurse: entry for drive-virtio-disk0
+bdrv_inactivate_recurse: entry for #block145
+bdrv_inactivate_recurse: entry for #block328
+bdrv_inactivate_recurse: entry for #block210
+bdrv_inactivate_recurse: exit end good for #block210
+bdrv_inactivate_recurse: exit end good for #block328
+bdrv_inactivate_recurse: entry for #block082
+bdrv_inactivate_recurse: exit end good for #block082
+bdrv_inactivate_recurse: exit end good for #block145
+bdrv_inactivate_recurse: exit end good for drive-virtio-disk0
+bdrv_inactivate_recurse: entry for #block763
+bdrv_inactivate_recurse: entry for #block631
+bdrv_inactivate_recurse: exit end good for #block631
+bdrv_inactivate_recurse: exit end good for #block763
+bdrv_inactivate_recurse: entry for drive-virtio-disk1
+bdrv_inactivate_recurse: entry for #block544
+bdrv_inactivate_recurse: entry for #block405
+bdrv_inactivate_recurse: exit end good for #block405
+bdrv_inactivate_recurse: exit end good for #block544
+bdrv_inactivate_recurse: exit end good for drive-virtio-disk1
+bdrv_inactivate_recurse: entry for #block1086
+bdrv_inactivate_recurse: entry for #block919
+bdrv_inactivate_recurse: exit end good for #block919
+bdrv_inactivate_recurse: exit end good for #block1086
+bdrv_inactivate_recurse: entry for drive-virtio-disk0
+bdrv_inactivate_recurse: exit 2(-1) for drive-virtio-disk0
+
+I'm currently building one with Stefans patch applied as well over (my)
+night, but let me know if there is more that makes sense to try.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1711602
+
+Title:
+  --copy-storage-all failing with qemu 2.10
+
+Status in QEMU:
+  New
+Status in libvirt package in Ubuntu:
+  Confirmed
+Status in qemu package in Ubuntu:
+  Confirmed
+
+Bug description:
+  We fixed an issue around disk locking already in regard to qemu-nbd
+  [1], but there still seem to be issues.
+
+  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
+://10.22.69.196/system
+  error: internal error: qemu unexpectedly closed the monitor: 2017-08-18T1=
+2:10:29.800397Z qemu-system-x86_64: -chardev pty,id=3Dcharserial0: char dev=
+ice redirected to /dev/pts/0 (label charserial0)
+  2017-08-18T12:10:48.545776Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+
+  Source libvirt log for the guest:
+  2017-08-18 12:09:08.251+0000: initiating migration
+  2017-08-18T12:09:08.809023Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+  2017-08-18T12:09:08.809481Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+
+  Target libvirt log for the guest:
+  2017-08-18T12:09:08.730911Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+  2017-08-18 12:09:09.010+0000: shutting down, reason=3Dcrashed
+
+  Given the timing it seems that the actual copy now works (it is busy ~10 =
+seconds on my environment which would be the copy).
+  Also we don't see the old errors we saw before, but afterwards on the act=
+ual take-over it fails.
+
+  Dmesg has no related denials as often apparmor is in the mix.
+
+  Need to check libvirt logs of source [2] and target [3] in Detail.
+
+  [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02200.html
+  [2]: http://paste.ubuntu.com/25339356/
+  [3]: http://paste.ubuntu.com/25339358/
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1711602/+subscriptions
