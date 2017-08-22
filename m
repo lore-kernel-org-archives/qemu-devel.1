@@ -1,14 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dk0jo-0000rD-TU
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 00:24:25 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dk0jp-0000rP-Na
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 00:24:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dk0jn-00081K-NS
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 00:24:24 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dk0jm-0007zq-JK
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 00:24:25 -0400
+Received: from ozlabs.org ([103.22.144.67]:39007)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1dk0jm-0007xl-6x
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 00:24:22 -0400
+Date: Tue, 22 Aug 2017 14:06:21 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 22 Aug 2017 14:24:09 +1000
-Message-Id: <20170822042416.26758-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 0/7] ppc-for-2.10 queue 20170822
+Message-ID: <20170822040621.GB12356@umbus.fritz.box>
+References: <CAFEAcA94_GuyZXRq_WSoD7No3h6AeHSJwbZoPdhRpiniJpdW6g@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="TJ9V72hR/LoebVea"
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA94_GuyZXRq_WSoD7No3h6AeHSJwbZoPdhRpiniJpdW6g@mail.gmail.com>
+Subject: Re: [Qemu-devel] Any release-critical issues for 2.10 ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,66 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: agraf@suse.de, thuth@redhat.com, mdroth@linux.vnet.ibm.com, cohuck@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-The following changes since commit 1f296733876434118fd766cfef5eb6f29ecab6a8:
 
-  Update version for v2.10.0-rc3 release (2017-08-15 18:53:31 +0100)
+--TJ9V72hR/LoebVea
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-are available in the git repository at:
+On Mon, Aug 21, 2017 at 11:51:00AM +0100, Peter Maydell wrote:
+> Last call -- are there any release critical issues for 2.10?
+> If not then I'll tag the current rc3 as the final release tomorrow,
+> so please reply here to let me know if there's anything we should
+> be considering as needing an rc4.
 
-  git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170822
+Uh.. kind of, yeah.  I have some real-guest-affecting regressions from
+2.9 that I have fixes for.  Sorry they're so late - that's partly my
+fault, but then they were delayed further as I tried to do my usual
+pre-pull tests by the change in boot-serial-test which breaks make
+check on a ppc host.
 
-for you to fetch changes up to d3234e2851f1630c695c681beac1e87ac0881260:
+I'm just finishing up my final tests now, then I'll send the pull
+request.
 
-  hw/ppc/spapr_iommu: Fix crash when removing the "spapr-tce-table" device (2017-08-22 11:11:30 +1000)
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-----------------------------------------------------------------
-ppc patch queue 2017-08-22
+--TJ9V72hR/LoebVea
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Last minute ppc related fixes for qemu-2.10.  I'm not sure if these
-are critical enough to prompt another rc, but I'm submitting them for
-consideration.
+-----BEGIN PGP SIGNATURE-----
 
-First, is Cornelia's fix for 480bc11e6 which meant "make check" would
-always fail on a ppc host.  Tracking that down delayed submission of
-the rest of these patches, sorry.
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmbrb0ACgkQbDjKyiDZ
+s5JHcw//ZTQeedwbzZcUBGIVXER+HnCgJTaN3k+b/qzbQW5F+9LKdZeHslZujHe8
+bVfQqU+EubFA/t6er/sFRaeEtSfjat3jb9K+mTjr6ZjAWvGNhK3BQmIepyKf98eP
+GjICU3mbrSBzaJ6k2cxR91MZPnM1lJHzIiBcHR26L93PlSjPtUY+jSx+MmZ8zW4E
+ItCP3cycWMuI9UsDyFd06eKsDXJ4yVE8trnh8WmF/2ulrvZUJnTjYdVjI5Wkb9JY
+ryL40wB6r26Wch2k5Xy3urnuoB1yd1uB/JXLgY26Y9L/eKnFv4n21actTfTIqpit
+Nw7DeNWLCQ63NozKDySC7XEFWiKKjCJy+J3/Fy1N9JNwfkfk8H/uAFvxX4m2hnZU
+xUDOmhoqorTk5UrKwIAEEIJOtzdMr/cuTAyuPmSjg29sai1amDrfXP5PU16n7qMC
+0q5fA2FrlDXG65I+Be7HkkWnKb4yowCK33UkU8uLo0mNLwJXgJ6QpbvkYUMHgto3
+zJSWNpZClzl8ewdNcaT8gLXGatcr03Q2QZ23s+/M3q0NnVtNiMlSEmiKgZx3X522
+mXBGsS2IRcvd4X3utLAFaSYDStSzcN/A+3df5Heje2RXtMUgYl6R5BIlsYjZ1Zpt
+2cA/oqXFVJLNVX5HkvNrGbwtL47if1wpmTovzkQCioUzScE7oQ4=
+=TUcw
+-----END PGP SIGNATURE-----
 
-The rest are all fairly important bugfixes for qemu crashes or guest
-behaviour regression on ppc.  Patches 2-4 specifically are fixes for
-regressions from qemu-2.9, caused by the compatibility mode and
-hotplug handling cleanups for the pseries machine type.
-
-----------------------------------------------------------------
-Bharata B Rao (1):
-      spapr: Allow configure-connector to be called multiple times
-
-Cornelia Huck (1):
-      boot-serial-test: prefer tcg accelerator
-
-Daniel Henrique Barboza (1):
-      target/ppc: 'PVR != host PVR' in KVM_SET_SREGS workaround
-
-Greg Kurz (1):
-      ppc: fix ppc_set_compat() with KVM PR
-
-Thomas Huth (3):
-      hw/ppc/spapr: Fix segfault when instantiating a 'pc-dimm' without 'memdev'
-      hw/ppc/spapr_rtc: Mark the RTC device with user_creatable = false
-      hw/ppc/spapr_iommu: Fix crash when removing the "spapr-tce-table" device
-
- hw/i386/pc.c             | 14 ++++++++++++--
- hw/mem/nvdimm.c          |  2 +-
- hw/mem/pc-dimm.c         | 14 +++++++++++---
- hw/ppc/spapr.c           | 42 ++++++++++++++++++++++++++++++------------
- hw/ppc/spapr_drc.c       | 30 +++++++++++++++++++++++-------
- hw/ppc/spapr_iommu.c     |  2 ++
- hw/ppc/spapr_rtc.c       |  2 ++
- include/hw/mem/pc-dimm.h |  2 +-
- target/ppc/compat.c      |  9 +++++----
- target/ppc/kvm.c         | 34 ++++++++++++++++++++++++++++++++++
- target/ppc/kvm_ppc.h     |  1 +
- target/ppc/machine.c     | 22 ++++++++++++++++++++++
- tests/boot-serial-test.c |  6 +++++-
- 13 files changed, 149 insertions(+), 31 deletions(-)
+--TJ9V72hR/LoebVea--
