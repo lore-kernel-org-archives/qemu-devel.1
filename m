@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dk953-0002gI-6P
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:19:00 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dk95B-0002pe-C1
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:19:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dk951-0005ta-4M
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:18:53 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dk95A-00062U-7R
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:19:01 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 22 Aug 2017 15:18:28 +0200
-Message-Id: <20170822131832.20191-7-pbonzini@redhat.com>
+Date: Tue, 22 Aug 2017 15:18:29 +0200
+Message-Id: <20170822131832.20191-8-pbonzini@redhat.com>
 In-Reply-To: <20170822131832.20191-1-pbonzini@redhat.com>
 References: <20170822131832.20191-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 06/10] scsi,
- file-posix: add support for persistent reservation management
+Subject: [Qemu-devel] [PATCH 07/10] io: add qio_channel_read/write_all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,428 +20,144 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, famz@redhat.com
+Cc: qemu-block@nongnu.org, famz@redhat.com, "Daniel P . Berrange" <berrange@redhat.com>
 
-It is a common requirement for virtual machine to send persistent
-reservations, but this currently requires either running QEMU with
-CAP_SYS_RAWIO, or using out-of-tree patches that let an unprivileged
-QEMU bypass Linux's filter on SG_IO commands.
+It is pretty common to read a fixed-size buffer from a socket.  Add a
+function that does this, either with multiple reads (on blocking sockets)
+or by yielding if called from a coroutine.
 
-As an alternative mechanism, the next patches will introduce a
-privileged helper to run persistent reservation commands without
-expanding QEMU's attack surface unnecessarily.
-
-The helper is invoked through a "pr-manager" QOM object, to which
-file-posix.c passes SG_IO requests for PERSISTENT RESERVE OUT and
-PERSISTENT RESERVE IN commands.  For example:
-
-  $ qemu-system-x86_64
-      -device virtio-scsi \
-      -object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock
-      -drive if=none,id=hd,driver=raw,file.filename=/dev/sdb,file.pr-manager=helper0
-      -device scsi-block,drive=hd
-
-or:
-
-  $ qemu-system-x86_64
-      -device virtio-scsi \
-      -object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock
-      -blockdev node-name=hd,driver=raw,file.driver=host_device,file.filename=/dev/sdb,file.pr-manager=helper0
-      -device scsi-block,drive=hd
-
-Multiple pr-manager implementations are conceivable and possible, though
-only one is implemented right now.  For example, a pr-manager could:
-
-- talk directly to the multipath daemon from a privileged QEMU
-  (i.e. QEMU links to libmpathpersist); this makes reservation work
-  properly with multipath, but still requires CAP_SYS_RAWIO
-
-- use the Linux IOC_PR_* ioctls (they require CAP_SYS_ADMIN though)
-
-- more interestingly, implement reservations directly in QEMU
-  through file system locks or a shared database (e.g. sqlite)
-
+Cc: Daniel P. Berrange <berrange@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile.objs             |   1 +
- block/file-posix.c        |  30 +++++++++++++
- docs/pr-manager.rst       |  51 ++++++++++++++++++++++
- include/scsi/pr-manager.h |  57 ++++++++++++++++++++++++
- qapi/block-core.json      |   4 ++
- scsi/Makefile.objs        |   2 +
- scsi/pr-manager.c         | 109 ++++++++++++++++++++++++++++++++++++++++++++++
- vl.c                      |   3 +-
- 8 files changed, 256 insertions(+), 1 deletion(-)
- create mode 100644 docs/pr-manager.rst
- create mode 100644 include/scsi/pr-manager.h
- create mode 100644 scsi/pr-manager.c
+ include/io/channel.h | 36 ++++++++++++++++++++++++++++++++++-
+ io/channel.c         | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 89 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index f68aa3b60d..64bebd05db 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -168,6 +168,7 @@ trace-events-subdirs += qapi
- trace-events-subdirs += accel/tcg
- trace-events-subdirs += accel/kvm
- trace-events-subdirs += nbd
-+trace-events-subdirs += scsi
+diff --git a/include/io/channel.h b/include/io/channel.h
+index db9bb022a1..9cfb4d081f 100644
+--- a/include/io/channel.h
++++ b/include/io/channel.h
+@@ -299,7 +299,7 @@ ssize_t qio_channel_writev(QIOChannel *ioc,
+                            Error **errp);
  
- trace-events-files = $(SRC_PATH)/trace-events $(trace-events-subdirs:%=$(SRC_PATH)/%/trace-events)
+ /**
+- * qio_channel_readv:
++ * qio_channel_read:
+  * @ioc: the channel object
+  * @buf: the memory region to read data into
+  * @buflen: the length of @buf
+@@ -315,6 +315,23 @@ ssize_t qio_channel_read(QIOChannel *ioc,
+                          Error **errp);
  
-diff --git a/block/file-posix.c b/block/file-posix.c
-index f4de022ae0..47aadbf45d 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -34,6 +34,9 @@
- #include "qapi/util.h"
- #include "qapi/qmp/qstring.h"
- 
-+#include "scsi/pr-manager.h"
-+#include "scsi/constants.h"
-+
- #if defined(__APPLE__) && (__MACH__)
- #include <paths.h>
- #include <sys/param.h>
-@@ -156,6 +159,8 @@ typedef struct BDRVRawState {
-     bool page_cache_inconsistent:1;
-     bool has_fallocate;
-     bool needs_alignment;
-+
-+    PRManager *pr_mgr;
- } BDRVRawState;
- 
- typedef struct BDRVRawReopenState {
-@@ -403,6 +408,11 @@ static QemuOptsList raw_runtime_opts = {
-             .type = QEMU_OPT_STRING,
-             .help = "file locking mode (on/off/auto, default: auto)",
-         },
-+        {
-+            .name = "pr-manager",
-+            .type = QEMU_OPT_STRING,
-+            .help = "id of persistent reservation manager object (default: none)",
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -414,6 +424,7 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-     QemuOpts *opts;
-     Error *local_err = NULL;
-     const char *filename = NULL;
-+    const char *str;
-     BlockdevAioOptions aio, aio_default;
-     int fd, ret;
-     struct stat st;
-@@ -478,6 +489,16 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-         abort();
-     }
- 
-+    str = qemu_opt_get(opts, "pr-manager");
-+    if (str) {
-+        s->pr_mgr = pr_manager_lookup(str, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            ret = -EINVAL;
-+            goto fail;
-+        }
-+    }
-+
-     s->open_flags = open_flags;
-     raw_parse_flags(bdrv_flags, &s->open_flags);
- 
-@@ -2600,6 +2621,15 @@ static BlockAIOCB *hdev_aio_ioctl(BlockDriverState *bs,
-     if (fd_open(bs) < 0)
-         return NULL;
- 
-+    if (req == SG_IO && s->pr_mgr) {
-+        struct sg_io_hdr *io_hdr = buf;
-+        if (io_hdr->cmdp[0] == PERSISTENT_RESERVE_OUT ||
-+            io_hdr->cmdp[0] == PERSISTENT_RESERVE_IN) {
-+            return pr_manager_execute(s->pr_mgr, bdrv_get_aio_context(bs),
-+                                      s->fd, io_hdr, cb, opaque);
-+        }
-+    }
-+
-     acb = g_new(RawPosixAIOData, 1);
-     acb->bs = bs;
-     acb->aio_type = QEMU_AIO_IOCTL;
-diff --git a/docs/pr-manager.rst b/docs/pr-manager.rst
-new file mode 100644
-index 0000000000..b6089fb57c
---- /dev/null
-+++ b/docs/pr-manager.rst
-@@ -0,0 +1,51 @@
-+======================================
-+Persistent reservation managers
-+======================================
-+
-+SCSI persistent Reservations allow restricting access to block devices
-+to specific initiators in a shared storage setup.  When implementing
-+clustering of virtual machines, it is a common requirement for virtual
-+machines to send persistent reservation SCSI commands.  However,
-+the operating system restricts sending these commands to unprivileged
-+programs because incorrect usage can disrupt regular operation of the
-+storage fabric.
-+
-+For this reason, QEMU's SCSI passthrough devices, ``scsi-block``
-+and ``scsi-generic`` (both are only available on Linux) can delegate
-+implementation of persistent reservations to a separate object,
-+the "persistent reservation manager".  Only PERSISTENT RESERVE OUT and
-+PERSISTENT RESERVE IN commands are passed to the persistent reservation
-+manager object; other commands are processed by QEMU as usual.
-+
-+-----------------------------------------
-+Defining a persistent reservation manager
-+-----------------------------------------
-+
-+A persistent reservation manager is an instance of a subclass of the
-+"pr-manager" QOM class.
-+
-+Right now only one subclass is defined, ``pr-manager-helper``, which
-+forwards the commands to an external privileged helper program
-+over Unix sockets.  The helper program only allows sending persistent
-+reservation commands to devices for which QEMU has a file descriptor,
-+so that QEMU will not be able to effect persistent reservations
-+unless it has access to both the socket and the device.
-+
-+``pr-manager-helper`` has a single string property, ``path``, which
-+accepts the path to the helper program's Unix socket.  For example,
-+the following command line defines a ``pr-manager-helper`` object and
-+attaches it to a SCSI passthrough device::
-+
-+      $ qemu-system-x86_64
-+          -device virtio-scsi \
-+          -object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock
-+          -drive if=none,id=hd,driver=raw,file.filename=/dev/sdb,file.pr-manager=helper0
-+          -device scsi-block,drive=hd
-+
-+Alternatively, using ``-blockdev``::
-+
-+      $ qemu-system-x86_64
-+          -device virtio-scsi \
-+          -object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock
-+          -blockdev node-name=hd,driver=raw,file.driver=host_device,file.filename=/dev/sdb,file.pr-manager=helper0
-+          -device scsi-block,drive=hd
-diff --git a/include/scsi/pr-manager.h b/include/scsi/pr-manager.h
-new file mode 100644
-index 0000000000..d523be218f
---- /dev/null
-+++ b/include/scsi/pr-manager.h
-@@ -0,0 +1,57 @@
-+#ifndef PR_MANAGER_H
-+#define PR_MANAGER_H
-+
-+#include "qom/object.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qapi/visitor.h"
-+#include "qom/object_interfaces.h"
-+#include "block/aio.h"
-+
-+#define TYPE_PR_MANAGER "pr-manager"
-+
-+#define PR_MANAGER_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(PRManagerClass, (klass), TYPE_PR_MANAGER)
-+#define PR_MANAGER_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(PRManagerClass, (obj), TYPE_PR_MANAGER)
-+#define PR_MANAGER(obj) \
-+     OBJECT_CHECK(PRManager, (obj), TYPE_PR_MANAGER)
-+
-+struct sg_io_hdr;
-+
-+typedef struct PRManager {
-+    /* <private> */
-+    Object parent;
-+} PRManager;
+ /**
++ * qio_channel_read_all:
++ * @ioc: the channel object
++ * @buf: the memory region to read data into
++ * @buflen: the number of bytes to @buf
++ * @errp: pointer to a NULL-initialized error object
++ *
++ * Reads @buflen bytes into @buf, possibly blocking or (if the
++ * channel is non-blocking) yielding from the current coroutine
++ * multiple times until the entire content is read.  Otherwise
++ * behaves as qio_channel_read().
++ */
++ssize_t coroutine_fn qio_channel_read_all(QIOChannel *ioc,
++                                          char *buf,
++                                          size_t buflen,
++                                          Error **errp);
 +
 +/**
-+ * PRManagerClass:
-+ * @parent_class: the base class
-+ * @run: callback invoked in thread pool context
-+ */
-+typedef struct PRManagerClass {
-+    /* <private> */
-+    ObjectClass parent_class;
-+
-+    /* <public> */
-+    int (*run)(PRManager *pr_mgr, int fd, struct sg_io_hdr *hdr);
-+} PRManagerClass;
-+
-+BlockAIOCB *pr_manager_execute(PRManager *pr_mgr,
-+                               AioContext *ctx, int fd,
-+                               struct sg_io_hdr *hdr,
-+                               BlockCompletionFunc *complete,
-+                               void *opaque);
-+
-+#ifdef CONFIG_LINUX
-+PRManager *pr_manager_lookup(const char *id, Error **errp);
-+#else
-+static inline PRManager *pr_manager_lookup(const char *id,
-+                                                              Error **errp)
-+{
-+    /* The classes do not exist at all!  */
-+    error_setg(errp, "No persistent reservation manager with id '%s'", id);
-+    return NULL;
-+}
-+#endif
-+
-+#endif
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 833c602150..5ec663ab0d 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2191,6 +2191,9 @@
- # Driver specific block device options for the file backend.
- #
- # @filename:    path to the image file
-+# @pr-manager:  the if for the object that will handle persistent reservations
-+#               for this device (default: forward the commands via SG_IO,
-+#               since 2.11)
- # @aio:         AIO backend (default: threads) (since: 2.8)
- # @locking:     whether to enable file locking. If set to 'auto', only enable
- #               when Open File Descriptor (OFD) locking API is available
-@@ -2200,6 +2203,7 @@
- ##
- { 'struct': 'BlockdevOptionsFile',
-   'data': { 'filename': 'str',
-+            '*pr-manager': 'str',
-             '*locking': 'OnOffAuto',
-             '*aio': 'BlockdevAioOptions' } }
+  * qio_channel_write:
+  * @ioc: the channel object
+  * @buf: the memory regions to send data from
+@@ -331,6 +348,23 @@ ssize_t qio_channel_write(QIOChannel *ioc,
+                           Error **errp);
  
-diff --git a/scsi/Makefile.objs b/scsi/Makefile.objs
-index 31b82a5a36..5496d2ae6a 100644
---- a/scsi/Makefile.objs
-+++ b/scsi/Makefile.objs
-@@ -1 +1,3 @@
- block-obj-y += utils.o
-+
-+block-obj-$(CONFIG_LINUX) += pr-manager.o
-diff --git a/scsi/pr-manager.c b/scsi/pr-manager.c
-new file mode 100644
-index 0000000000..e80f8d9b31
---- /dev/null
-+++ b/scsi/pr-manager.c
-@@ -0,0 +1,109 @@
-+/*
-+ * Persistent reservation manager abstract class
+ /**
++ * qio_channel_write_all:
++ * @ioc: the channel object
++ * @buf: the memory region to write data into
++ * @buflen: the number of bytes to @buf
++ * @errp: pointer to a NULL-initialized error object
 + *
-+ * Copyright (c) 2017 Red Hat, Inc.
-+ *
-+ * Author: Paolo Bonzini <pbonzini@redhat.com>
-+ *
-+ * This code is licensed under the LGPL.
-+ *
++ * Writes @buflen bytes from @buf, possibly blocking or (if the
++ * channel is non-blocking) yielding from the current coroutine
++ * multiple times until the entire content is written.  Otherwise
++ * behaves as qio_channel_write().
 + */
++ssize_t coroutine_fn qio_channel_write_all(QIOChannel *ioc,
++                                           const char *buf,
++                                           size_t buflen,
++                                           Error **errp);
 +
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "block/aio.h"
-+#include "block/thread-pool.h"
-+#include "scsi/pr-manager.h"
-+#include "scsi/trace.h"
-+
-+#include <scsi/sg.h>
-+
-+typedef struct PRManagerData {
-+    PRManager *pr_mgr;
-+    struct sg_io_hdr *hdr;
-+    int fd;
-+} PRManagerData;
-+
-+static int pr_manager_worker(void *opaque)
-+{
-+    PRManagerData *data = opaque;
-+    PRManager *pr_mgr = data->pr_mgr;
-+    PRManagerClass *pr_mgr_class =
-+        PR_MANAGER_GET_CLASS(pr_mgr);
-+    struct sg_io_hdr *hdr = data->hdr;
-+    int fd = data->fd;
-+    int r;
-+
-+    g_free(data);
-+    trace_pr_manager_run(fd, hdr->cmdp[0], hdr->cmdp[1]);
-+
-+    /* The is was taken in pr_manager_execute.  */
-+    r = pr_mgr_class->run(pr_mgr, fd, hdr);
-+    object_unref(OBJECT(pr_mgr));
-+    return r;
-+}
-+
-+
-+BlockAIOCB *pr_manager_execute(PRManager *pr_mgr,
-+                               AioContext *ctx, int fd,
-+                               struct sg_io_hdr *hdr,
-+                               BlockCompletionFunc *complete,
-+                               void *opaque)
-+{
-+    PRManagerData *data = g_new(PRManagerData, 1);
-+    ThreadPool *pool = aio_get_thread_pool(ctx);
-+
-+    trace_pr_manager_execute(fd, hdr->cmdp[0], hdr->cmdp[1], opaque);
-+    data->pr_mgr = pr_mgr;
-+    data->fd = fd;
-+    data->hdr = hdr;
-+
-+    /* The matching object_unref is in pr_manager_worker.  */
-+    object_ref(OBJECT(pr_mgr));
-+    return thread_pool_submit_aio(pool, pr_manager_worker,
-+                                  data, complete, opaque);
-+}
-+
-+static const TypeInfo pr_manager_info = {
-+    .parent = TYPE_OBJECT,
-+    .name = TYPE_PR_MANAGER,
-+    .class_size = sizeof(PRManagerClass),
-+    .abstract = true,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_USER_CREATABLE },
-+        { }
-+    }
-+};
-+
-+PRManager *pr_manager_lookup(const char *id, Error **errp)
-+{
-+    Object *obj;
-+    PRManager *pr_mgr;
-+
-+    obj = object_resolve_path_component(object_get_objects_root(), id);
-+    if (!obj) {
-+        error_setg(errp, "No persistent reservation manager with id '%s'", id);
-+        return NULL;
-+    }
-+
-+    pr_mgr = (PRManager *)
-+        object_dynamic_cast(obj,
-+                            TYPE_PR_MANAGER);
-+    if (!pr_mgr) {
-+        error_setg(errp,
-+                   "Object with id '%s' is not a persistent reservation manager",
-+                   id);
-+        return NULL;
-+    }
-+
-+    return pr_mgr;
-+}
-+
-+static void
-+pr_manager_register_types(void)
-+{
-+    type_register_static(&pr_manager_info);
-+}
-+
-+
-+type_init(pr_manager_register_types);
-diff --git a/vl.c b/vl.c
-index 8e247cc2a2..af0e6576ab 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2811,7 +2811,8 @@ static int machine_set_property(void *opaque,
-  */
- static bool object_create_initial(const char *type)
- {
--    if (g_str_equal(type, "rng-egd")) {
-+    if (g_str_equal(type, "rng-egd") ||
-+        g_str_has_prefix(type, "pr-manager-")) {
-         return false;
-     }
++/**
+  * qio_channel_set_blocking:
+  * @ioc: the channel object
+  * @enabled: the blocking flag state
+diff --git a/io/channel.c b/io/channel.c
+index 1cfb8b33a2..7ab3f4eede 100644
+--- a/io/channel.c
++++ b/io/channel.c
+@@ -113,6 +113,60 @@ ssize_t qio_channel_read(QIOChannel *ioc,
+ }
  
+ 
++ssize_t qio_channel_read_all(QIOChannel *ioc,
++                             char *buf,
++                             size_t buflen,
++                             Error **errp)
++{
++    ssize_t total = 0;
++    while (buflen > 0) {
++        ssize_t n_read = qio_channel_read(ioc, buf, buflen, errp);
++
++        if (n_read == QIO_CHANNEL_ERR_BLOCK) {
++            assert(ioc->ctx);
++            qio_channel_yield(ioc, G_IO_IN);
++            continue;
++        }
++        if (n_read < 0) {
++            return n_read;
++        }
++
++        buf += n_read;
++        total += n_read;
++        buflen -= n_read;
++    }
++
++    return total;
++}
++
++
++ssize_t qio_channel_write_all(QIOChannel *ioc,
++                              const char *buf,
++                              size_t buflen,
++                              Error **errp)
++{
++    ssize_t total = 0;
++    while (buflen > 0) {
++        ssize_t n_written = qio_channel_write(ioc, buf, buflen, errp);
++
++        if (n_written == QIO_CHANNEL_ERR_BLOCK) {
++            assert(ioc->ctx);
++            qio_channel_yield(ioc, G_IO_OUT);
++            continue;
++        }
++        if (n_written < 0) {
++            return n_written;
++        }
++
++        buf += n_written;
++        total += n_written;
++        buflen -= n_written;
++    }
++
++    return total;
++}
++
++
+ ssize_t qio_channel_write(QIOChannel *ioc,
+                           const char *buf,
+                           size_t buflen,
 -- 
 2.13.5
