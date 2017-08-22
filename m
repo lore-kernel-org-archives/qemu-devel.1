@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45633)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1dkAOn-00081P-J7
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:43:25 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45943)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <brijesh.singh@amd.com>) id 1dkAPq-0000QX-Ol
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:44:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1dkAOj-0001HB-Hh
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:43:21 -0400
-Received: from mout.gmx.net ([212.227.17.22]:61057)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1dkAOj-0001Gm-5H
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:43:17 -0400
-References: <20170822044155.2451-1-famz@redhat.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <b9454dbb-1663-6198-3f7e-4fbd5eb492fa@gmx.com>
-Date: Tue, 22 Aug 2017 16:33:12 +0200
+	(envelope-from <brijesh.singh@amd.com>) id 1dkAPm-0001cK-PP
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:44:26 -0400
+Received: from mail-bl2nam02on0068.outbound.protection.outlook.com
+	([104.47.38.68]:14099
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
+	id 1dkAPm-0001br-Ft
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:44:22 -0400
+References: <20170815170051.127257-1-brijesh.singh@amd.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <9ab5d26f-a35d-eae6-6d68-60dabc2c5238@amd.com>
+Date: Tue, 22 Aug 2017 09:44:15 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170822044155.2451-1-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="i3lR2iMcHgrNVRjvCNcN6xgR5EBSDtiWj"
-Subject: Re: [Qemu-devel] [PATCH v3 00/10] tests: Add VM based build tests
- (for non-x86_64 and/or non-Linux)
+In-Reply-To: <20170815170051.127257-1-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] target-i386/cpu: Add new EPYC CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,137 +30,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com
+To: qemu-devel@nongnu.org
+Cc: brijesh.singh@amd.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Tom Lendacky <Thomas.Lendacky@amd.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---i3lR2iMcHgrNVRjvCNcN6xgR5EBSDtiWj
-From: Kamil Rytarowski <n54@gmx.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, pbonzini@redhat.com, stefanha@redhat.com,
- Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- eblake@redhat.com
-Message-ID: <b9454dbb-1663-6198-3f7e-4fbd5eb492fa@gmx.com>
-Subject: Re: [PATCH v3 00/10] tests: Add VM based build tests (for non-x86_64
- and/or non-Linux)
-References: <20170822044155.2451-1-famz@redhat.com>
-In-Reply-To: <20170822044155.2451-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Eduardo and Paolo,
 
-I propose to rename *bsd.img.xz (like netbsd.img.xz) to
-*bsd-version-arch.img.xz, like netbsd-7.1-amd64.img.xz. This will be
-more verbose about the version and leave room for image upgrades in futur=
-e.
+Please let me know if want me to address something else in this patch.
 
-On 22.08.2017 06:41, Fam Zheng wrote:
-> v3: Drop RFC.
->     Add Stefan's and Kamil's reviewed-bys.
->     Use optparse. [Stefan]
->     Drop the VGA patch. [Paolo, Stefan]
->     Improve exit/exit code/doc. [Stefan]
->     Drop unused line from basevm.py. [Stefan]
->     Drop "--target-list" form Makefile.
->     More intelligent '-j'.
->     Add README. [Stefan]
->=20
-> v2: - Add docstring. [Stefan]
->     - Call self._load_io_lod. [Stefan]
->     - Use "info usernet" and dynamic ssh_port forwarding. [Stefan]
->     - Add image checksum.
->     - Use os.rename() and os.makedirs(). [Stefan]
->     - Fix NetBSD URL. [Kamil]
->=20
-> Build tests in one 32 bit Linux guest and three BSD images are defined =
-in this
-> series. This is a more managable way than the manually maintained virtu=
-al
-> machines in patchew. Also, one big advantage of ephemeral VMs over long=
- running
-> guests is the reduced RAM usage of host, which makes it possible to hav=
-e one
-> host test all these BSD variants and probably more.
->=20
-> The BSD guest templates are manually prepared following
->=20
-> https://wiki.qemu.org/Hosts/BSD
->=20
-> as it is not easy to automate. (The ideal approach is like the ubuntu.i=
-386
-> script, which configures the guest on top of an official released image=
-, fully
-> automatically.)
->=20
-> Need for help: "gmake check" in the added OpenBSD image fails with -ENO=
-MEM
-> errors, even if I change "-m 2G" to "-m 8G" when starting VM. Ideas? An=
-d there
-> is a warning from ./configure about OpenBSD going to be unsupported in =
-coming
-> releases, is it still the case?
->=20
-> Fam
->=20
-> Fam Zheng (10):
->   gitignore: Ignore vm test images
->   qemu.py: Add "wait()" method
->   tests: Add vm test lib
->   tests: Add ubuntu.i386 image
->   tests: Add FreeBSD image
->   tests: Add NetBSD image
->   tests: Add OpenBSD image
->   Makefile: Add rules to run vm tests
->   MAINTAINERS: Add tests/vm entry
->   tests: Add README for vm tests
->=20
->  .gitignore                |   2 +
->  MAINTAINERS               |   1 +
->  Makefile                  |   2 +
->  configure                 |   2 +-
->  scripts/qemu.py           |   7 ++
->  tests/vm/Makefile.include |  40 +++++++
->  tests/vm/README           |  63 +++++++++++
->  tests/vm/basevm.py        | 278 ++++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/vm/freebsd          |  45 ++++++++
->  tests/vm/netbsd           |  45 ++++++++
->  tests/vm/openbsd          |  46 ++++++++
->  tests/vm/ubuntu.i386      |  88 +++++++++++++++
->  12 files changed, 618 insertions(+), 1 deletion(-)
->  create mode 100644 tests/vm/Makefile.include
->  create mode 100644 tests/vm/README
->  create mode 100755 tests/vm/basevm.py
->  create mode 100755 tests/vm/freebsd
->  create mode 100755 tests/vm/netbsd
->  create mode 100755 tests/vm/openbsd
->  create mode 100755 tests/vm/ubuntu.i386
->=20
+After this patch is accepted, I am planning to submit similar patch to
+to libvirt to create EPYC CPU.
 
+- Brijesh
 
-
---i3lR2iMcHgrNVRjvCNcN6xgR5EBSDtiWj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZnECuAAoJEEuzCOmwLnZsZiQP/joT3hLpW5xAhdtwswS5yZiF
-7DCCBCUAtsPZFx1voBgFDwiDtmqaLJg4jPJMBlpqjT7vxGh1e8ax5eJIks8jdcuC
-nl06qTWpzDAxv2jIRBu2MY1Wcc3jiHdg3THF5HC/YSwmcJauVJmzUopshAvr9fby
-qDbFZ4OxkkJ422MmFjM+/O2O22i+BoqC+nnDUgMbEvVwNbl5Hj0eGrCC+4+27SEM
-5hRIDwTj7e0FVuRxL++HkUHeWxyOQaNCx4zH2RYz2n6tT7M23vKv29oN/+XHA8OU
-6tXI7+rTyktfU+PC/bn7JK2lB9fvjvLrHKevGF6l8txcW54ZJJ0yqBdyCkY+7x7A
-vqhSbVKxuZr6svgmTBHNCYG3o6NJusOs5jP2itl28LueBUbfxixo9UljFNbnhiQC
-kdgLY+28nwpW4WU6Jvrb+NLS1vSXJelavse0I1qfxJE2h7Y2unUPkD7HmWg4Y7VL
-MyV4IB3xubo3rjQnU7NiGZkiOtP/zjR6s5CePKsFmgIaVVlnkbwfsvz2o8rWRF3M
-17YOvKl+7c86oOKR2YRwn4BBHgmeofE7GCgJNubXGFJ2lejrK4sdUq2wtvqAGAsq
-JOEtV5LDMmaOMkmaEF4tZoFNDyotObw8kJLfGiviM2N8tHELVsA7HkNSCaZC2ssj
-cQr4iCxbjCN9MoaHGFtr
-=2c+w
------END PGP SIGNATURE-----
-
---i3lR2iMcHgrNVRjvCNcN6xgR5EBSDtiWj--
+On 08/15/2017 12:00 PM, Brijesh Singh wrote:
+> Add a new base CPU model called 'EPYC' to model processors from AMD EPYC
+> family (which includes EPYC 76xx,75xx,74xx, 73xx and 72xx).
+> 
+> The following features bits have been added/removed compare to Opteron_G5
+> 
+> Added: monitor, movbe, rdrand, mmxext, ffxsr, rdtscp, cr8legacy, osvw,
+>         fsgsbase, bmi1, avx2, smep, bmi2, rdseed, adx, smap, clfshopt, sha
+>         xsaveopt, xsavec, xgetbv1, arat
+> 
+> Removed: xop, fma4, tbm
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+> 
+> Changes since v2:
+>   * limit the xlevel to 0x8000000a
+> 
+> Changes since v1:
+>   * fix typo EYPC -> EPYC to reflect the correct branding name
+> 
+>   target/i386/cpu.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 44 insertions(+)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index ddc45ab..6617e01 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -1522,6 +1522,50 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>           .xlevel = 0x8000001A,
+>           .model_id = "AMD Opteron 63xx class CPU",
+>       },
+> +    {
+> +        .name = "EPYC",
+> +        .level = 0xd,
+> +        .vendor = CPUID_VENDOR_AMD,
+> +        .family = 23,
+> +        .model = 1,
+> +        .stepping = 2,
+> +        .features[FEAT_1_EDX] =
+> +            CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX | CPUID_CLFLUSH |
+> +            CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
+> +            CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 | CPUID_MCE |
+> +            CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE | CPUID_DE |
+> +            CPUID_VME | CPUID_FP87,
+> +        .features[FEAT_1_ECX] =
+> +            CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX |
+> +            CPUID_EXT_XSAVE | CPUID_EXT_AES |  CPUID_EXT_POPCNT |
+> +            CPUID_EXT_MOVBE | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
+> +            CPUID_EXT_CX16 | CPUID_EXT_FMA | CPUID_EXT_SSSE3 |
+> +            CPUID_EXT_MONITOR | CPUID_EXT_PCLMULQDQ | CPUID_EXT_SSE3,
+> +        .features[FEAT_8000_0001_EDX] =
+> +            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_PDPE1GB |
+> +            CPUID_EXT2_FFXSR | CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
+> +            CPUID_EXT2_SYSCALL,
+> +        .features[FEAT_8000_0001_ECX] =
+> +            CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
+> +            CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
+> +            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
+> +        .features[FEAT_7_0_EBX] =
+> +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
+> +            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
+> +            CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT |
+> +            CPUID_7_0_EBX_SHA_NI,
+> +        /* Missing: XSAVES (not supported by some Linux versions,
+> +         * including v4.1 to v4.12).
+> +         * KVM doesn't yet expose any XSAVES state save component.
+> +         */
+> +        .features[FEAT_XSAVE] =
+> +            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
+> +            CPUID_XSAVE_XGETBV1,
+> +        .features[FEAT_6_EAX] =
+> +            CPUID_6_EAX_ARAT,
+> +        .xlevel = 0x8000000A,
+> +        .model_id = "AMD EPYC Processor",
+> +    },
+>   };
+>   
+>   typedef struct PropValue {
+> 
