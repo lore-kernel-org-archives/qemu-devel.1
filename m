@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk5DV-0006zz-Ul
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:26 -0400
+	(envelope-from <bounces@canonical.com>) id 1dk5De-00075e-4c
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk5DU-0006nS-Fo
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:21 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37056)
+	(envelope-from <bounces@canonical.com>) id 1dk5DY-0006oh-2s
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:30 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37128)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dk5DU-0006nG-9g
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:20 -0400
+	id 1dk5DX-0006oT-So
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:24 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dk5DT-00029I-8V
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:11:19 +0000
+	id 1dk5DW-0002CS-Ny
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:11:22 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3F5B62E80CB
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:11:19 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 9D71A2E80D7
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:11:22 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Aug 2017 08:58:52 -0000
+Date: Tue, 22 Aug 2017 09:01:20 -0000
 From: ChristianEhrhardt <1711602@bugs.launchpad.net>
 Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
-Message-Id: <150339233236.8725.2618271632756711348.malone@soybean.canonical.com>
+Message-Id: <150339248011.8283.13263938229046983817.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
  2.10
@@ -39,55 +39,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-So this is failing I/O that iterates over a channel.
-I was tracking down the len, pending and pos used.
+(gdb) handle SIGUSR1 nostop noprint pass
+(gdb) b migration/qemu-file.c:295
+(gdb) command
+p f->pos
+c
+end
 
-I found that this is not completely broken (like no access or generla I/O e=
-rror)
-It starts at pos 0 and iterated with varying offsets, but works for quite s=
-ome time.
-Example:
-
+That showed the pos is ever increasing and fails at an offset it never read=
+ before. Yet the absolute number was different.
+$1 =3D 0
+$2 =3D 8948
+$3 =3D 41423
 [...]
-Thread 1 "qemu-system-x86" hit Breakpoint 2, qemu_fill_buffer (f=3Df@entry=
-=3D0xd3b66f3c00) at ./migration/qemu-file.c:295
-295         if (len > 0) {
-$11183 =3D 28728
-$11184 =3D 4040
-$11185 =3D {ops =3D 0xd3b3d740a0 <channel_input_ops>, hooks =3D 0x0, opaque=
- =3D 0xd3b75ee490, bytes_xfer =3D 0, xfer_limit =3D 0, pos =3D 107130146, =
+$11359 =3D 326387440
+$11360 =3D 326420208 =3D> This was the one failing this time
 
-  buf_index =3D 0, buf_size =3D 4040, =
 
-  buf =3D "\v\327\a\000\021\000\[...]\000"..., =
+This was a different f->pos than last time, so I wondered if this would cha=
+nge every time.
+With a less interactive gdb config I got in three tries:
+1. 313153311
+2. 313313376
+3. 313571856
+So a different f->pos to fail each time.
 
-  may_free =3D {0}, iov =3D {{iov_base =3D 0x0, iov_len =3D 0} <repeats 64 =
-times>}, iovcnt =3D 0, last_error =3D 0}
-[...]
+Different but rather close.
+I wondered if the reasons I got a higher one when tracing in more detail pr=
+inting all offsets could be that there still is something copied/synced and=
+ only slowly gets available.
 
-Well you could see the whole file read passing by one by one buffer
-Yet this isn't particularly fast, so track the one that has len=3D=3D0
- (gdb) b ./migration/qemu-file.c:295 if len =3D=3D 0
+I stepped through rather slowly and got to 322429260 this time.
+So slower continuing on the iteration over qemu_fill_buffer makes it fail "=
+later"?
 
-And I got it as:
-(gdb) p *f
-$11195 =3D {ops =3D 0xd3b3d740a0 <channel_input_ops>, hooks =3D 0x0, opaque=
- =3D 0xd3b75ee490, bytes_xfer =3D 0, xfer_limit =3D 0, pos =3D 319638837, =
-
-  buf_index =3D 0, buf_size =3D 0, buf =3D '\000' <repeats 5504 times>..., =
-may_free =3D {0}, iov =3D {{iov_base =3D 0x0, iov_len =3D 0} <repeats 64 ti=
-mes>}, =
-
-  iovcnt =3D 0, last_error =3D 0}
-
-Here pending =3D=3D 0 so buf_size =3D 0 as well also pos is further down
-incremented to 319638837.
-
-Checking in detail I found that I had pending=3D0 and buf_size=3D0 as well =
-as non aligned pos entried, but they worked.
-So I excluded the buf_size=3D0/pending=3D0 as well as the alignment as reas=
-ons.
-Maybe it just iterates pos out of the range that is working?
+Finally it is surely interesting which channel that actually is- likely the=
+ migration socket?
+And yes, ioc->name in qio_channel_read is:
+ $8 =3D 0x56ab78e5c0 "migration-socket-incoming
 
 -- =
 
