@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dkDZ4-0006le-RC
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 14:06:11 -0400
+	(envelope-from <mst@redhat.com>) id 1dkDZb-0007An-4v
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 14:06:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dkDZ3-0008Gv-VU
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 14:06:10 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:36816)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dkDZ3-0008GU-O3
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 14:06:09 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id f8so93694553wrf.3
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 11:06:09 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1dkDZW-0008Pz-6a
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 14:06:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53486)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dkDZV-0008Pf-Tl
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 14:06:38 -0400
+Date: Tue, 22 Aug 2017 21:06:30 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170822205940-mutt-send-email-mst@kernel.org>
+References: <20170726113222.52aad9a6@w520.home>
+	<CAMxP3BTFgwJtjh78hNBCoxBp1WsnZMZLsqzb3McqCq=-SX0a4g@mail.gmail.com>
+	<20170731234626.7664be18@w520.home>
+	<CAMxP3BTfMad-ycWHqmW+aVM7rv2CJSv-dmEFUveGBqAWvfbBjQ@mail.gmail.com>
+	<20170801090158.35d18f10@w520.home>
+	<CAMxP3BRkzXBRPZw9fpCu-w4Fusn6ng_knk1cAz=EDBAiw9UnqA@mail.gmail.com>
+	<20170807095224.5438ef8c@w520.home>
+	<20170808230043-mutt-send-email-mst@kernel.org>
+	<CAMxP3BR=WHKJxcWKH27dcC7DTKGD2y7r12teAUSmMkwp1VDafA@mail.gmail.com>
+	<20170822105659.75b5c7e0@w520.home>
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKOH8G1LzLHksfuxQLBskFB0KsCy7zP5pPtbtvUmQcZORQ@mail.gmail.com>
-References: <cover.1502993370.git.alistair.francis@xilinx.com>
-	<20170822172438.GF3205@toto>
-	<CAKmqyKOH8G1LzLHksfuxQLBskFB0KsCy7zP5pPtbtvUmQcZORQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Aug 2017 19:05:48 +0100
-Message-ID: <CAFEAcA9RXagwj4fvpy=bFahoZ95Or83PiozJmLwYmobxRkVTvg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 0/5] Expose the secure property to the
- machine
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170822105659.75b5c7e0@w520.home>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
+ =?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +37,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@gmail.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Bob Chen <a175818323@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>, =?utf-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, qemu-devel@nongnu.org
 
-On 22 August 2017 at 18:57, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> On Tue, Aug 22, 2017 at 10:24 AM, Edgar E. Iglesias
-> <edgar.iglesias@xilinx.com> wrote:
->> On Thu, Aug 17, 2017 at 11:51:59AM -0700, Alistair Francis wrote:
->>> The EL2 and EL3 work is working well now and interanlly we now have
->>> tests that expect to start in EL3 and transition through EL2 to EL1. To
->>> make this easy to run let's expose the secure property to the machine
->>> and then use that to enable EL2.
->>>
->>> This series also does some machine/name tidying up and makes the first
->>> move to deprecating the EP108 machine, which was just an early access
->>> development board.
->>
->> Hi Alistair,
->>
->> Reconsidering this, I tend to agree that we're probably better off with
->> EL2/no-GICv2-virt compared to the possible confusiong of having EL2
->> without GICv2-virt..
->>
->> But I wonder if we should have similar options as the virt machine?
->> I.e, a virtualization option to enable EL2.
->
-> That's fine with me.
->
-> Just to clarify do you think we should keep the secure option for EL3
-> and add a virt option for EL2?
+On Tue, Aug 22, 2017 at 10:56:59AM -0600, Alex Williamson wrote:
+> On Tue, 22 Aug 2017 15:04:55 +0800
+> Bob Chen <a175818323@gmail.com> wrote:
+>=20
+> > Hi,
+> >=20
+> > I got a spec from Nvidia which illustrates how to enable GPU p2p in
+> > virtualization environment. (See attached)
+>=20
+> Neat, looks like we should implement a new QEMU vfio-pci option,
+> something like nvidia-gpudirect-p2p-id=3D.  I don't think I'd want to
+> code the policy of where to enable it into QEMU or the kernel, so we'd
+> push it up to management layers or users to decide.
+> =20
+> > The key is to append the legacy pci capabilities list when setting up=
+ the
+> > hypervisor, with a Nvidia customized capability config.
+> >=20
+> > I added some hack in hw/vfio/pci.c and managed to implement that.
+> >=20
+> > Then I found the GPU was able to recognize its peer, and the latency =
+has
+> > dropped. =E2=9C=85
+> >=20
+> > However the bandwidth didn't improve, but decreased instead. =E2=9D=8C
+> >=20
+> > Any suggestions?
+>=20
+> What's the VM topology?  I've found that in a Q35 configuration with
+> GPUs downstream of an emulated root port, the NVIDIA driver in the
+> guest will downshift the physical link rate to 2.5GT/s and never
+> increase it back to 8GT/s.  I believe this is because the virtual
+> downstream port only advertises Gen1 link speeds.
 
-I think unless you have a really strong reason to be different
-(eg back-compat with existing guests) then following what
-the 'virt' board does for machine options is probably going
-to be least confusing. NB that that does include letting you
-specify some combos that don't work, like gicv2 + virt...
 
-(We should really get round to implementing virt support in
-the GICv2, though.)
+Fixing that would be nice, and it's great that you now actually have a
+reproducer that can be used to test it properly.
 
-thanks
--- PMM
+Exposing higher link speeds is a bit of work since there are now all
+kind of corner cases to cover as guests may play with link speeds and we
+must pretend we change it accordingly.  An especially interesting
+question is what to do with the assigned device when guest tries to play
+with port link speed. It's kind of similar to AER in that respect.
+
+I guess we can just ignore it for starters.
+
+>  If the GPUs are on
+> the root complex (ie. pcie.0) the physical link will run at 2.5GT/s
+> when the GPU is idle and upshift to 8GT/s under load.  This also
+> happens if the GPU is exposed in a conventional PCI topology to the
+> VM.  Another interesting data point is that an older Kepler GRID card
+> does not have this issue, dynamically shifting the link speed under
+> load regardless of the VM PCI/e topology, while a new M60 using the
+> same driver experiences this problem.  I've filed a bug with NVIDIA as
+> this seems to be a regression, but it appears (untested) that the
+> hypervisor should take the approach of exposing full, up-to-date PCIe
+> link capabilities and report a link status matching the downstream
+> devices.
+
+
+> I'd suggest during your testing, watch lspci info for the GPU from the
+> host, noting the behavior of LnkSta (Link Status) to check if the
+> devices gets stuck at 2.5GT/s in your VM configuration and adjust the
+> topology until it works, likely placing the GPUs on pcie.0 for a Q35
+> based machine.  Thanks,
+>=20
+> Alex
