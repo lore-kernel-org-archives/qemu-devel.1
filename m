@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dk9Lo-0001ie-TN
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:36:17 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dk9M3-0001su-D8
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:36:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dk9Ll-00008k-Js
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:36:12 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170822131832.20191-1-pbonzini@redhat.com>
-	<20170822131832.20191-4-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b90e1a11-610f-8a54-8d75-fa39ee6eff08@amsat.org>
-Date: Tue, 22 Aug 2017 10:35:52 -0300
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dk9M0-0000Ct-4n
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:36:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:21760)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dk9Lp-00009J-2N
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:36:24 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8C87A7E44B
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 13:26:24 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 22 Aug 2017 15:22:41 +0200
+Message-Id: <20170822132255.23945-41-marcandre.lureau@redhat.com>
+In-Reply-To: <20170822132255.23945-1-marcandre.lureau@redhat.com>
+References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170822131832.20191-4-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 03/10] scsi: introduce scsi_build_sense
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 40/54] docs: document schema configuration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +33,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 08/22/2017 10:18 AM, Paolo Bonzini wrote:
-> Move more knowledge of sense data format out of hw/scsi/scsi-bus.c
-> for reusability.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ docs/devel/qapi-code-gen.txt | 47 ++++++++++++++++++++++++++++++++++++++=
+++++++
+ 1 file changed, 47 insertions(+)
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->   hw/scsi/scsi-bus.c   |  8 +-------
->   include/scsi/utils.h |  2 ++
->   scsi/utils.c         | 11 +++++++++++
->   3 files changed, 14 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-> index 300912d213..f71218f02a 100644
-> --- a/hw/scsi/scsi-bus.c
-> +++ b/hw/scsi/scsi-bus.c
-> @@ -797,13 +797,7 @@ void scsi_req_build_sense(SCSIRequest *req, SCSISense sense)
->   {
->       trace_scsi_req_build_sense(req->dev->id, req->lun, req->tag,
->                                  sense.key, sense.asc, sense.ascq);
-> -    memset(req->sense, 0, 18);
-> -    req->sense[0] = 0x70;
-> -    req->sense[2] = sense.key;
-> -    req->sense[7] = 10;
-> -    req->sense[12] = sense.asc;
-> -    req->sense[13] = sense.ascq;
-> -    req->sense_len = 18;
-> +    req->sense_len = scsi_build_sense(req->sense, sense);
->   }
->   
->   static void scsi_req_enqueue_internal(SCSIRequest *req)
-> diff --git a/include/scsi/utils.h b/include/scsi/utils.h
-> index 35a74436bf..76c3db98c0 100644
-> --- a/include/scsi/utils.h
-> +++ b/include/scsi/utils.h
-> @@ -30,6 +30,8 @@ typedef struct SCSISense {
->       uint8_t ascq;
->   } SCSISense;
->   
-> +int scsi_build_sense(uint8_t *buf, SCSISense sense);
-> +
->   /*
->    * Predefined sense codes
->    */
-> diff --git a/scsi/utils.c b/scsi/utils.c
-> index 0db727591f..54d6d4486a 100644
-> --- a/scsi/utils.c
-> +++ b/scsi/utils.c
-> @@ -81,6 +81,17 @@ int scsi_cdb_length(uint8_t *buf)
->       return cdb_len;
->   }
->   
-> +int scsi_build_sense(uint8_t *buf, SCSISense sense)
-> +{
-> +    memset(buf, 0, 18);
-> +    buf[0] = 0x70;
-> +    buf[2] = sense.key;
-> +    buf[7] = 10;
-> +    buf[12] = sense.asc;
-> +    buf[13] = sense.ascq;
-> +    return 18;
-> +}
-> +
->   /*
->    * Predefined sense codes
->    */
-> 
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index b653e86bff..94555c01eb 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -682,6 +682,53 @@ Example: Red Hat, Inc. controls redhat.com, and may =
+therefore add a
+ downstream command __com.redhat_drive-mirror.
+=20
+=20
++=3D=3D=3D Configuring the schema =3D=3D=3D
++
++'struct', 'enum', 'union', 'alternate', 'command' and 'event'
++top-level QAPI expressions can take a 'if' keyword like:
++
++{ 'struct': 'IfStruct', 'data': { 'foo': 'int' },
++  'if': 'defined(IF_STRUCT) && defined(FOO)' }
++
++Members can be exploded as dictionnary with 'type' & 'if' keys:
++
++{ 'struct': 'IfStruct', 'data':
++  { 'foo': 'int',
++    'bar': { 'type': 'int', 'if': 'defined(IF_STRUCT_BAR)'} } }
++
++Enum values can be exploded as dictionnary with 'name' & 'if' keys:
++
++{ 'enum': 'IfEnum', 'data':
++  [ 'foo',
++    { 'name' : 'bar', 'if': 'defined(IF_ENUM_BAR)' } ] }
++
++The C code generators will wrap the corresponding lines with #if / #endi=
+f
++pre-processor conditions for a given 'if' value.
++
++Example for enum values:
++
++enum IfEnum {
++     IF_ENUM_FOO,
++#if defined(IF_ENUM_BAR)
++     IF_ENUM_BAR,
++#endif /* defined(IF_ENUM_BAR) */
++     IF_ENUM__MAX
++}
++
++Please note that you are responsbile to ensure that the C code will
++compile with an arbitrary combination of conditions, since the
++generators are unable to check it at this point.
++
++Poisoined symbols like TARGET_I386 can be wrapped around a preliminary
++NEED_CPU_H condition, using a list value, like so:
++
++{ ..., 'if': ['defined(NEED_CPU_H)', 'defined(TARGET_I386)'] }
++
++This will generate two consecutive #if lines to silence the C error
++when compiling common code. FIXME: split the schema in various units
++instead.
++
++
+ =3D=3D Client JSON Protocol introspection =3D=3D
+=20
+ Clients of a Client JSON Protocol commonly need to figure out what
+--=20
+2.14.1.146.gd35faa819
