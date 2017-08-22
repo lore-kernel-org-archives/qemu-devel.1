@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dk9o4-0001wM-FQ
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:05:25 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dk9p7-0002pb-Sy
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:06:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dk9ny-0000s5-Os
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:05:24 -0400
-References: <1503407712-9894-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA-V1igN7Sz3SusczcPadtZC-z4fyw-pvPggGT5VFFMvRA@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8fb75274-09a6-dbd3-5dba-1069d790b689@redhat.com>
-Date: Tue, 22 Aug 2017 16:05:02 +0200
+	(envelope-from <cohuck@redhat.com>) id 1dk9p4-0001jW-1G
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:06:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59972)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dk9p3-0001hb-QK
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:06:25 -0400
+Date: Tue, 22 Aug 2017 16:06:21 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170822160621.6efb55aa.cohuck@redhat.com>
+In-Reply-To: <20170822152434.068b5038.cohuck@redhat.com>
+References: <20170821091614.28251-1-cohuck@redhat.com>
+	<20170821091614.28251-8-cohuck@redhat.com>
+	<0d8dcac1-f536-5d69-0187-23656d003348@linux.vnet.ibm.com>
+	<17cb7925-e4eb-d174-2886-49ab9af0852c@linux.vnet.ibm.com>
+	<20170822103955.1cbc0714.cohuck@redhat.com>
+	<b7e7810c-7822-2fb8-2a2e-d67c08126639@linux.vnet.ibm.com>
+	<20170822113914.3ff24d75.cohuck@redhat.com>
+	<ff247730-9d10-352c-b6dc-8d98198181cf@linux.vnet.ibm.com>
+	<20170822152434.068b5038.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-V1igN7Sz3SusczcPadtZC-z4fyw-pvPggGT5VFFMvRA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/digic: Mark device with
- user_creatable = false
+Subject: Re: [Qemu-devel] [PATCH v4 07/10] s390x/sclp: properly guard
+ pci-specific functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +35,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Antony Pavlov <antonynpavlov@gmail.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On 22.08.2017 15:52, Peter Maydell wrote:
-> On 22 August 2017 at 14:15, Thomas Huth <thuth@redhat.com> wrote:
->> QEMU currently hangs completely when the user is trying to do a
->> "device_add digic" on an unrelated ARM machine like integratorcp.
->> Looks like this device is not meant to be hot-pluggable at all, so
->> let's simply mark it with "user_creatable = false" to avoid the hang.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  hw/arm/digic.c | 2 ++
->>  1 file changed, 2 insertions(+)
->>
->> diff --git a/hw/arm/digic.c b/hw/arm/digic.c
->> index 94f3263..208dfb3 100644
->> --- a/hw/arm/digic.c
->> +++ b/hw/arm/digic.c
->> @@ -101,6 +101,8 @@ static void digic_class_init(ObjectClass *oc, void *data)
->>      DeviceClass *dc = DEVICE_CLASS(oc);
->>
->>      dc->realize = digic_realize;
->> +    /* Reason: Hangs QEMU when trying to device_add this directly */
->> +    dc->user_creatable = false;
->>  }
+On Tue, 22 Aug 2017 15:24:34 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> On Tue, 22 Aug 2017 14:58:37 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 > 
-> Maybe "uses serial_hds[]" is a better reason, or does it hang for
-> some other reason?
+> > On 08/22/2017 11:39 AM, Cornelia Huck wrote:  
+> > > On Tue, 22 Aug 2017 11:20:51 +0200
+> > > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-When I kill the hanging QEMU, the stack trace looks like this:
+> > >> Well, the QEMU name of the command is misleading misleading. In the AR
+> > >> it's called 'Configure I/O Adapter'. The PCI comes into the picture via
+> > >> byte 8 of the SCCB, the so called adapter type. Valid values for the
+> > >> adapter type are: 00-01 reserved; 02 PCI function; 03-FF reserved. So
+> > >> at this point we only have PCI.   
 
-#0  0x00007ffff13afaff in ppoll () at /lib64/libc.so.6
-#1  0x0000555555bb3179 in qemu_poll_ns (__ss=0x0, __timeout=0x7fffffffda60, __nfds=<optimized out>, __fds=<optimized out>)
-    at /usr/include/bits/poll2.h:77
-#2  0x0000555555bb3179 in qemu_poll_ns (fds=<optimized out>, nfds=<optimized out>, timeout=timeout@entry=1000000000)
-    at /home/thuth/devel/qemu/util/qemu-timer.c:334
-#3  0x0000555555bb3f88 in main_loop_wait (timeout=1000000000) at /home/thuth/devel/qemu/util/main-loop.c:255
-#4  0x0000555555bb3f88 in main_loop_wait (nonblocking=nonblocking@entry=0) at /home/thuth/devel/qemu/util/main-loop.c:515
-#5  0x000055555578d927 in main () at /home/thuth/devel/qemu/vl.c:1917
-#6  0x000055555578d927 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at /home/thuth/devel/qemu/vl.c:4791
+OK, I need one more piece of information. 
 
-I haven't investigated any further, but the usage of serial_hds
-in the realize function could certainly be the reason. At least
-it certainly is a reason that this device should not be creatable
-by the user - so let me send a v2 with the comment changed
-accordingly.
+We obviously need to check whether the sccb we got is long enough
+before we try to access the command-specific field. How long is the
+sccb supposed to be for configure I/O adapter? For pci, 16 bytes; in
+general, I would guess that it needs to include at least atype and some
+placeholder for the payload. What does the AR say?
 
- Thomas
+Looking at the pci code, I also noted that it cheerfully uses the aid
+field of the sccb before checking whether it is actually long enough...
