@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk7F5-0002GD-RF
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:21:10 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7Gj-0003ii-1F
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:22:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk7F1-0005IM-Ss
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:21:07 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57970)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dk7F1-0005Hy-Mo
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:21:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dk7Ey-0002aB-D5
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 11:21:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 00EC92E81BC
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 11:20:57 +0000 (UTC)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7Gh-0006ef-U6
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:22:49 -0400
+Received: from mail-vk0-x22f.google.com ([2607:f8b0:400c:c05::22f]:34108)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dk7Gh-0006eX-Pc
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:22:47 -0400
+Received: by mail-vk0-x22f.google.com with SMTP id s199so3328706vke.1
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 04:22:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <87efsab8ns.fsf@dusky.pond.sub.org>
+References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
+	<87efsab8ns.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 22 Aug 2017 13:22:46 +0200
+Message-ID: <CAJ+F1C+SojvOyEn2iHzNF2sQ31KwEUKvw-ZDqRwvPpJQik=beg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Aug 2017 11:13:17 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
-Message-Id: <150340039709.19146.2899797681960789921.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
- 2.10
+Subject: Re: [Qemu-devel] [PATCH 00/26] qapi: add #if pre-processor
+ conditions to generated code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,62 +31,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-OK, 3rd try and I've hit the same behaviour as Christian.
+Hi
 
--- =
+On Thu, Aug 17, 2017 at 3:55 PM, Markus Armbruster <armbru@redhat.com> wrot=
+e:
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+>> Hi,
+>>
+>> In order to clean-up some hacks in qapi (having to unregister commands
+>> at runtime), I proposed a "[PATCH v5 02/20] qapi.py: add a simple #ifdef=
+ condition"
+>>
+>> (see http://lists.gnu.org/archive/html/qemu-devel/2016-08/msg03106.html)=
+.
+>>
+>> However, we decided to drop that patch from the series and solve the
+>> problem later. The main issues were:
+>> - the syntax was awkward to the JSON schema and documentation
+>> - the evaluation of the condition was done in the qapi scripts, with
+>>   very limited capability
+>> - each target/config would need different generated files.
+>>
+>> Instead, it could defer the #if evaluation to the C-preprocessor.
+>>
+>> With this series, top-level qapi JSON entity can take 'if' keys:
+>>
+>> { 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
+>>   'if': 'defined(TEST_IF_STRUCT)' }
+>>
+>> Members can be exploded as dictionnary with 'type'/'if' keys:
+>>
+>> { 'struct': 'TestIfStruct', 'data':
+>>   { 'foo': 'int',
+>>     'bar': { 'type': 'int', 'if': 'defined(TEST_IF_STRUCT_BAR)'} } }
+>>
+>> Enum values can be exploded as dictionnary with 'type'/'if' keys:
+>>
+>> { 'enum': 'TestIfEnum', 'data':
+>>   [ 'foo',
+>>     { 'name' : 'bar', 'if': 'defined(TEST_IF_ENUM_BAR)' } ] }
+>>
+>> A good benefit from having conditional schema is that introspection
+>> will reflect more accurately the capability of the server. Another
+>> benefit is that it may help to remove some dead code when disabling a
+>> functionality.
+>
+> This is the main benefit.  Until we realize it, introspection remains
+> seriously hobbled.
+>
+> A few closing remarks.
+>
+> The general approach "generate the #if for the compiler to evaluate"
+> looks sound.
+>
+> I haven't been able to fully review how it's integrated into the QAPI
+> language and how the generators implement it.  I hope a bit of judicious
+> patch splitting will help me over the hump.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1711602
+I have done some patch splitting, that doubles the number of patches though=
+ ;)
 
-Title:
-  --copy-storage-all failing with qemu 2.10
+>
+> As so often, solving one problem makes other problems more visible.  In
+> this case, the problem that we generate a monolith, and pay for that
+> with compile time.  More of it once we compile the monolith per target.
 
-Status in QEMU:
-  New
-Status in libvirt package in Ubuntu:
-  Confirmed
-Status in qemu package in Ubuntu:
-  Confirmed
+Indeed, it would be nice to improve that soon after.
 
-Bug description:
-  We fixed an issue around disk locking already in regard to qemu-nbd
-  [1], but there still seem to be issues.
+>
+>> Starting from patch "qapi: add conditions to VNC type/commands/events
+>> on the schema", the series demonstrate adding conditions, in order to
+>> remove qmp_unregister_commands_hack(). However, it feels like I
+>> cheated a little bit by using per-target NEED_CPU_H in the headers to
+>> avoid #define poison. The alternative could be to split the headers in
+>> common/target?
+>
+> Yup, we could really use a way to modularize the generated code.
+>
+> If your work leads us to ideas on how to crack the monolith, great.  If
+> not, we'll have to decide whether we can live with the compile time hit.
+> I'd rather not block your work on cracking the monolith.
 
-  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
-://10.22.69.196/system
-  error: internal error: qemu unexpectedly closed the monitor: 2017-08-18T1=
-2:10:29.800397Z qemu-system-x86_64: -chardev pty,id=3Dcharserial0: char dev=
-ice redirected to /dev/pts/0 (label charserial0)
-  2017-08-18T12:10:48.545776Z qemu-system-x86_64: load of migration failed:=
- Input/output error
+I think we could start by splitting the json schemas.
 
-  Source libvirt log for the guest:
-  2017-08-18 12:09:08.251+0000: initiating migration
-  2017-08-18T12:09:08.809023Z qemu-system-x86_64: Unable to read from socke=
-t: Connection reset by peer
-  2017-08-18T12:09:08.809481Z qemu-system-x86_64: Unable to read from socke=
-t: Connection reset by peer
+>
+>> There are a lot more things we could make conditional in the QAPI
+>> schema, like pci/kvm/xen/numa/vde/slirp/posix/win32/vsock/lzo etc etc,
+>> however I am still evaluating the implication of such changes both
+>> externally and internally, for those interested, I can share my wip
+>> branch.
+>
+> You provide the infrastructure and useful examples of use.  Good enough,
+> no need to hunt down *all* uses right away.
+>
 
-  Target libvirt log for the guest:
-  2017-08-18T12:09:08.730911Z qemu-system-x86_64: load of migration failed:=
- Input/output error
-  2017-08-18 12:09:09.010+0000: shutting down, reason=3Dcrashed
+I am sending a new version,
 
-  Given the timing it seems that the actual copy now works (it is busy ~10 =
-seconds on my environment which would be the copy).
-  Also we don't see the old errors we saw before, but afterwards on the act=
-ual take-over it fails.
+thanks
 
-  Dmesg has no related denials as often apparmor is in the mix.
-
-  Need to check libvirt logs of source [2] and target [3] in Detail.
-
-  [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02200.html
-  [2]: http://paste.ubuntu.com/25339356/
-  [3]: http://paste.ubuntu.com/25339358/
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1711602/+subscriptions
+--=20
+Marc-Andr=C3=A9 Lureau
