@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dk94y-0002dC-UG
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:18:54 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dk94y-0002dD-Us
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:18:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dk94v-0005n7-KJ
+	(envelope-from <pbonzini@redhat.com>) id 1dk94x-0005ow-4i
 	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:18:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34486)
+Received: from mx1.redhat.com ([209.132.183.28]:34560)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dk94v-0005jR-9T
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:18:45 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dk94w-0005kt-PZ
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:18:47 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 22 Aug 2017 15:18:26 +0200
-Message-Id: <20170822131832.20191-5-pbonzini@redhat.com>
+Date: Tue, 22 Aug 2017 15:18:27 +0200
+Message-Id: <20170822131832.20191-6-pbonzini@redhat.com>
 In-Reply-To: <20170822131832.20191-1-pbonzini@redhat.com>
 References: <20170822131832.20191-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 04/10] scsi: introduce sg_io_sense_from_errno
+Subject: [Qemu-devel] [PATCH 05/10] scsi: move block/scsi.h to
+ include/scsi/constants.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,133 +27,240 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, famz@redhat.com
 
-Move more knowledge of SG_IO out of hw/scsi/scsi-generic.c, for
-reusability.
+Complete the transition by renaming this header, which was
+shared by block/iscsi.c and the SCSI emulation code.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/scsi-generic.c | 40 +++++++---------------------------------
- include/scsi/utils.h   |  3 +++
- scsi/utils.c           | 35 +++++++++++++++++++++++++++++++++++
- 3 files changed, 45 insertions(+), 33 deletions(-)
+ block/iscsi.c                              | 2 +-
+ hw/block/virtio-blk.c                      | 2 +-
+ hw/scsi/megasas.c                          | 2 +-
+ hw/scsi/mptendian.c                        | 2 +-
+ hw/scsi/mptsas.c                           | 2 +-
+ hw/scsi/scsi-bus.c                         | 2 +-
+ hw/scsi/scsi-disk.c                        | 2 +-
+ hw/scsi/scsi-generic.c                     | 2 +-
+ hw/scsi/spapr_vscsi.c                      | 2 +-
+ hw/scsi/virtio-scsi-dataplane.c            | 2 +-
+ hw/scsi/virtio-scsi.c                      | 2 +-
+ hw/scsi/vmw_pvscsi.c                       | 2 +-
+ hw/usb/dev-uas.c                           | 2 +-
+ include/hw/ide/internal.h                  | 2 +-
+ include/{block/scsi.h => scsi/constants.h} | 0
+ scsi/utils.c                               | 2 +-
+ tests/virtio-scsi-test.c                   | 2 +-
+ 17 files changed, 16 insertions(+), 16 deletions(-)
+ rename include/{block/scsi.h => scsi/constants.h} (100%)
 
+diff --git a/block/iscsi.c b/block/iscsi.c
+index d557c99668..c43c0953e1 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -34,7 +34,7 @@
+ #include "qemu/bitops.h"
+ #include "qemu/bitmap.h"
+ #include "block/block_int.h"
+-#include "block/scsi.h"
++#include "scsi/constants.h"
+ #include "qemu/iov.h"
+ #include "qemu/uuid.h"
+ #include "qmp-commands.h"
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index a16ac75090..05d1440786 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -22,7 +22,7 @@
+ #include "sysemu/blockdev.h"
+ #include "hw/virtio/virtio-blk.h"
+ #include "dataplane/virtio-blk.h"
+-#include "block/scsi.h"
++#include "scsi/constants.h"
+ #ifdef __linux__
+ # include <scsi/sg.h>
+ #endif
+diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+index 734fdaef90..0db68aacee 100644
+--- a/hw/scsi/megasas.c
++++ b/hw/scsi/megasas.c
+@@ -27,7 +27,7 @@
+ #include "hw/pci/msix.h"
+ #include "qemu/iov.h"
+ #include "hw/scsi/scsi.h"
+-#include "block/scsi.h"
++#include "scsi/constants.h"
+ #include "trace.h"
+ #include "qapi/error.h"
+ #include "mfi.h"
+diff --git a/hw/scsi/mptendian.c b/hw/scsi/mptendian.c
+index b7fe2a2a36..3415229b5e 100644
+--- a/hw/scsi/mptendian.c
++++ b/hw/scsi/mptendian.c
+@@ -28,7 +28,7 @@
+ #include "hw/pci/msi.h"
+ #include "qemu/iov.h"
+ #include "hw/scsi/scsi.h"
+-#include "block/scsi.h"
++#include "scsi/constants.h"
+ #include "trace.h"
+ 
+ #include "mptsas.h"
+diff --git a/hw/scsi/mptsas.c b/hw/scsi/mptsas.c
+index 765ab53c34..8bae8f543e 100644
+--- a/hw/scsi/mptsas.c
++++ b/hw/scsi/mptsas.c
+@@ -30,7 +30,7 @@
+ #include "hw/pci/msi.h"
+ #include "qemu/iov.h"
+ #include "hw/scsi/scsi.h"
+-#include "block/scsi.h"
++#include "scsi/constants.h"
+ #include "trace.h"
+ #include "qapi/error.h"
+ #include "mptsas.h"
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index f71218f02a..b9244606f8 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -3,7 +3,7 @@
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "hw/scsi/scsi.h"
+-#include "block/scsi.h"
++#include "scsi/constants.h"
+ #include "hw/qdev.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 0a1f4ef0c7..5faf6682c5 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -32,7 +32,7 @@ do { printf("scsi-disk: " fmt , ## __VA_ARGS__); } while (0)
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "hw/scsi/scsi.h"
+-#include "block/scsi.h"
++#include "scsi/constants.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
 diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
-index 7a8f500934..04c687ee76 100644
+index 04c687ee76..bd0d9ff355 100644
 --- a/hw/scsi/scsi-generic.c
 +++ b/hw/scsi/scsi-generic.c
-@@ -81,6 +81,7 @@ static void scsi_free_request(SCSIRequest *req)
- static void scsi_command_complete_noio(SCSIGenericReq *r, int ret)
- {
-     int status;
-+    SCSISense sense;
+@@ -34,7 +34,7 @@ do { printf("scsi-generic: " fmt , ## __VA_ARGS__); } while (0)
+ do { fprintf(stderr, "scsi-generic: " fmt , ## __VA_ARGS__); } while (0)
  
-     assert(r->req.aiocb == NULL);
+ #include <scsi/sg.h>
+-#include "block/scsi.h"
++#include "scsi/constants.h"
  
-@@ -88,42 +89,15 @@ static void scsi_command_complete_noio(SCSIGenericReq *r, int ret)
-         scsi_req_cancel_complete(&r->req);
-         goto done;
-     }
--    if (r->io_header.driver_status & SG_ERR_DRIVER_SENSE) {
--        r->req.sense_len = r->io_header.sb_len_wr;
--    }
--
--    if (ret != 0) {
--        switch (ret) {
--        case -EDOM:
--            status = TASK_SET_FULL;
--            break;
--        case -ENOMEM:
--            status = CHECK_CONDITION;
--            scsi_req_build_sense(&r->req, SENSE_CODE(TARGET_FAILURE));
--            break;
--        default:
--            status = CHECK_CONDITION;
--            scsi_req_build_sense(&r->req, SENSE_CODE(IO_ERROR));
--            break;
--        }
--    } else {
--        if (r->io_header.host_status == SG_ERR_DID_NO_CONNECT ||
--            r->io_header.host_status == SG_ERR_DID_BUS_BUSY ||
--            r->io_header.host_status == SG_ERR_DID_TIME_OUT ||
--            (r->io_header.driver_status & SG_ERR_DRIVER_TIMEOUT)) {
--            status = BUSY;
--            BADF("Driver Timeout\n");
--        } else if (r->io_header.host_status) {
--            status = CHECK_CONDITION;
--            scsi_req_build_sense(&r->req, SENSE_CODE(I_T_NEXUS_LOSS));
--        } else if (r->io_header.status) {
--            status = r->io_header.status;
--        } else if (r->io_header.driver_status & SG_ERR_DRIVER_SENSE) {
--            status = CHECK_CONDITION;
-+    status = sg_io_sense_from_errno(-ret, &r->io_header, &sense);
-+    if (status == CHECK_CONDITION) {
-+        if (r->io_header.driver_status & SG_ERR_DRIVER_SENSE) {
-+            r->req.sense_len = r->io_header.sb_len_wr;
-         } else {
--            status = GOOD;
-+            scsi_req_build_sense(&r->req, sense);
-         }
-     }
-+
-     DPRINTF("Command complete 0x%p tag=0x%x status=%d\n",
-             r, r->req.tag, status);
+ #ifndef MAX_UINT
+ #define MAX_UINT ((unsigned int)-1)
+diff --git a/hw/scsi/spapr_vscsi.c b/hw/scsi/spapr_vscsi.c
+index 55ee48c4da..360db53ac8 100644
+--- a/hw/scsi/spapr_vscsi.c
++++ b/hw/scsi/spapr_vscsi.c
+@@ -36,7 +36,7 @@
+ #include "cpu.h"
+ #include "hw/hw.h"
+ #include "hw/scsi/scsi.h"
+-#include "block/scsi.h"
++#include "scsi/constants.h"
+ #include "srp.h"
+ #include "hw/qdev.h"
+ #include "hw/ppc/spapr.h"
+diff --git a/hw/scsi/virtio-scsi-dataplane.c b/hw/scsi/virtio-scsi-dataplane.c
+index 944ea4eb53..add4b3f4a4 100644
+--- a/hw/scsi/virtio-scsi-dataplane.c
++++ b/hw/scsi/virtio-scsi-dataplane.c
+@@ -17,7 +17,7 @@
+ #include "qemu/error-report.h"
+ #include "sysemu/block-backend.h"
+ #include "hw/scsi/scsi.h"
+-#include "block/scsi.h"
++#include "scsi/constants.h"
+ #include "hw/virtio/virtio-bus.h"
+ #include "hw/virtio/virtio-access.h"
  
-diff --git a/include/scsi/utils.h b/include/scsi/utils.h
-index 76c3db98c0..c12b34f2e5 100644
---- a/include/scsi/utils.h
-+++ b/include/scsi/utils.h
-@@ -113,6 +113,9 @@ int scsi_cdb_length(uint8_t *buf);
- #define SG_ERR_DID_TIME_OUT    0x03
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index eb639442d1..823a1e9a42 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -21,7 +21,7 @@
+ #include "qemu/iov.h"
+ #include "sysemu/block-backend.h"
+ #include "hw/scsi/scsi.h"
+-#include "block/scsi.h"
++#include "scsi/constants.h"
+ #include "hw/virtio/virtio-bus.h"
+ #include "hw/virtio/virtio-access.h"
  
- #define SG_ERR_DRIVER_SENSE    0x08
-+
-+int sg_io_sense_from_errno(int errno_value, struct sg_io_hdr *io_hdr,
-+                           SCSISense *sense);
- #endif
+diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
+index 77d8b6f9e2..6d3f0bf11d 100644
+--- a/hw/scsi/vmw_pvscsi.c
++++ b/hw/scsi/vmw_pvscsi.c
+@@ -28,7 +28,7 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "hw/scsi/scsi.h"
+-#include "block/scsi.h"
++#include "scsi/constants.h"
+ #include "hw/pci/msi.h"
+ #include "vmw_pvscsi.h"
+ #include "trace.h"
+diff --git a/hw/usb/dev-uas.c b/hw/usb/dev-uas.c
+index fffc424396..c218b53f09 100644
+--- a/hw/usb/dev-uas.c
++++ b/hw/usb/dev-uas.c
+@@ -19,7 +19,7 @@
+ #include "hw/usb.h"
+ #include "hw/usb/desc.h"
+ #include "hw/scsi/scsi.h"
+-#include "block/scsi.h"
++#include "scsi/constants.h"
  
- #endif
+ /* --------------------------------------------------------------------- */
+ 
+diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+index 482a9512be..63a99e0366 100644
+--- a/include/hw/ide/internal.h
++++ b/include/hw/ide/internal.h
+@@ -11,7 +11,7 @@
+ #include "sysemu/dma.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/block/block.h"
+-#include "block/scsi.h"
++#include "scsi/constants.h"
+ 
+ /* debug IDE devices */
+ //#define DEBUG_IDE
+diff --git a/include/block/scsi.h b/include/scsi/constants.h
+similarity index 100%
+rename from include/block/scsi.h
+rename to include/scsi/constants.h
 diff --git a/scsi/utils.c b/scsi/utils.c
-index 54d6d4486a..ca5b058a73 100644
+index ca5b058a73..eedd5f45b4 100644
 --- a/scsi/utils.c
 +++ b/scsi/utils.c
-@@ -412,3 +412,38 @@ const char *scsi_command_name(uint8_t cmd)
-     }
-     return names[cmd];
- }
-+
-+#ifdef CONFIG_LINUX
-+int sg_io_sense_from_errno(int errno_value, struct sg_io_hdr *io_hdr,
-+                           SCSISense *sense)
-+{
-+    if (errno_value != 0) {
-+        switch (errno_value) {
-+        case EDOM:
-+            return TASK_SET_FULL;
-+        case ENOMEM:
-+            *sense = SENSE_CODE(TARGET_FAILURE);
-+            return CHECK_CONDITION;
-+        default:
-+            *sense = SENSE_CODE(IO_ERROR);
-+            return CHECK_CONDITION;
-+        }
-+    } else {
-+        if (io_hdr->host_status == SG_ERR_DID_NO_CONNECT ||
-+            io_hdr->host_status == SG_ERR_DID_BUS_BUSY ||
-+            io_hdr->host_status == SG_ERR_DID_TIME_OUT ||
-+            (io_hdr->driver_status & SG_ERR_DRIVER_TIMEOUT)) {
-+            return BUSY;
-+        } else if (io_hdr->host_status) {
-+            *sense = SENSE_CODE(I_T_NEXUS_LOSS);
-+            return CHECK_CONDITION;
-+        } else if (io_hdr->status) {
-+            return io_hdr->status;
-+        } else if (io_hdr->driver_status & SG_ERR_DRIVER_SENSE) {
-+            return CHECK_CONDITION;
-+        } else {
-+            return GOOD;
-+        }
-+    }
-+}
-+#endif
+@@ -1,5 +1,5 @@
+ #include "qemu/osdep.h"
+-#include "block/scsi.h"
++#include "scsi/constants.h"
+ #include "scsi/utils.h"
+ #include "qemu/bswap.h"
+ 
+diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
+index 87a3b6e81a..082d323541 100644
+--- a/tests/virtio-scsi-test.c
++++ b/tests/virtio-scsi-test.c
+@@ -10,7 +10,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "libqtest.h"
+-#include "block/scsi.h"
++#include "scsi/constants.h"
+ #include "libqos/libqos-pc.h"
+ #include "libqos/libqos-spapr.h"
+ #include "libqos/virtio.h"
 -- 
 2.13.5
