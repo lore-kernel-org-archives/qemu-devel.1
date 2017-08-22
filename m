@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dk6nI-0003Y8-RU
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:52:25 -0400
+	(envelope-from <berto@igalia.com>) id 1dk6th-000690-Ma
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:59:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dk6nI-0003P0-0L
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:52:24 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:34420)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dk6nH-0003ML-PH
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:52:23 -0400
-Received: by mail-wr0-x234.google.com with SMTP id p14so53185943wrg.1
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 03:52:22 -0700 (PDT)
+	(envelope-from <berto@igalia.com>) id 1dk6tc-0007j7-SR
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:59:01 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170822103126.3aeusdpvr55iwhym@postretch>
+References: <20170809140256.25584-1-el13635@mail.ntua.gr>
+	<20170809140256.25584-4-el13635@mail.ntua.gr>
+	<w51ziatm05h.fsf@maestria.local.igalia.com>
+	<20170821153948.agdtsvy3m5u4jfip@postretch>
+	<w51bmn7hqlz.fsf@maestria.local.igalia.com>
+	<20170822103126.3aeusdpvr55iwhym@postretch>
+Date: Tue, 22 Aug 2017 12:58:54 +0200
+Message-ID: <w518tibhnrl.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <329bff28-5804-2d39-7bd8-9336eaaf9d26@redhat.com>
-References: <20170822042416.26758-1-david@gibson.dropbear.id.au>
-	<CAFEAcA-iuizr9eh3=ZkPPT+YxfWzvUFzbWB-aA_Mo5BiDkrzQQ@mail.gmail.com>
-	<b1167424-0f05-aad7-f456-22ca0aee2000@redhat.com>
-	<CAFEAcA8dJe5uB-tUoeF=dE_q8HG_LLAmLUHdfR0XZihGN5JFXA@mail.gmail.com>
-	<329bff28-5804-2d39-7bd8-9336eaaf9d26@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Aug 2017 11:52:00 +0100
-Message-ID: <CAFEAcA9LUgCEAnMxuk_4Pdn9_rUuzTdyqH66Sp-VZy9K0gz-_g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/7] ppc-for-2.10 queue 20170822
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] block: require job-id when device
+ is a node name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +27,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On 22 August 2017 at 11:41, Laurent Vivier <lvivier@redhat.com> wrote:
-> On 22/08/2017 11:53, Peter Maydell wrote:
->> On 22 August 2017 at 10:43, Laurent Vivier <lvivier@redhat.com> wrote:
->>> On 22/08/2017 11:34, Peter Maydell wrote:
->>>> I get a make check failure on ppc64 Linux:
+On Tue 22 Aug 2017 12:31:26 PM CEST, Manos Pitsidianakis wrote:
+> On Tue, Aug 22, 2017 at 11:57:28AM +0200, Alberto Garcia wrote:
+>>On Mon 21 Aug 2017 05:39:48 PM CEST, Manos Pitsidianakis wrote:
+>>>>> -    if (job_id == NULL && !(flags & BLOCK_JOB_INTERNAL)) {
+>>>>> -        job_id = bdrv_get_device_name(bs);
+>>>>> -        if (!*job_id) {
+>>>>> -            error_setg(errp, "An explicit job ID is required for this node");
+>>>>> -            return NULL;
+>>>>> -        }
+>>>>> -    }
+>>>>> -
+>>>>> -    if (job_id) {
+>>>>> -        if (flags & BLOCK_JOB_INTERNAL) {
+>>>>> +    if (flags & BLOCK_JOB_INTERNAL) {
+>>>>> +        if (job_id) {
+>>>>>              error_setg(errp, "Cannot specify job ID for internal block job");
+>>>>>              return NULL;
+>>>>>          }
 >>>>
->>>> TEST: tests/postcopy-test... (pid=12468)
->>>>   /ppc64/postcopy:
->>>> Broken pipe
->>>> qemu-system-ppc64: RP: Received invalid message 0x0000 length 0x0000
->>>> FAIL
->>>> GTester: last random seed: R02Se5468e06f561627824306d95b0566d2b
->>>> (pid=13011)
->>>> FAIL: tests/postcopy-test
+>>>>When BLOCK_JOB_INTERNAL is set, then job_id must be NULL...
+>>>>
+>>>>> -
+>>>>> +    } else {
+>>>>> +        /* Require job-id. */
+>>>>> +        assert(job_id);
+>>>>>          if (!id_wellformed(job_id)) {
+>>>>>              error_setg(errp, "Invalid job ID '%s'", job_id);
+>>>>>              return NULL;
+>>>>> diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
+>>>>> index f13ad05c0d..ff906808a6 100644
+>>>>> --- a/include/block/blockjob_int.h
+>>>>> +++ b/include/block/blockjob_int.h
+>>>>> @@ -112,8 +112,7 @@ struct BlockJobDriver {
+>>>>>
+>>>>>  /**
+>>>>>   * block_job_create:
+>>>>> - * @job_id: The id of the newly-created job, or %NULL to have one
+>>>>> - * generated automatically.
+>>>>> + * @job_id: The id of the newly-created job, must be non %NULL.
+>>>>
+>>>>...but here you say that it must not be NULL.
+>>>>
+>>>>And since job_id can be NULL in some cases I think I'd replace the
+>>>>assert(job_id) that you added to block_job_create() with a normal
+>>>>pointer check + error_setg().
+>>>>
+>>>>> @@ -93,9 +93,6 @@ static void test_job_ids(void)
+>>>>>      blk[1] = create_blk("drive1");
+>>>>>      blk[2] = create_blk("drive2");
+>>>>>
+>>>>> -    /* No job ID provided and the block backend has no name */
+>>>>> -    job[0] = do_test_id(blk[0], NULL, false);
+>>>>> -
+>>>>
+>>>>If you decide to handle NULL ids by returning and error instead of
+>>>>asserting, we should keep a couple of tests for that scenario.
+>>>>
+>>>>Berto
+>>>>
+>>>
+>>> Thanks, I will change that. What cases are you thinking of besides
+>>> internal jobs though?
+>>
+>>Both cases (external job with a NULL id and internal job with non-NULL
+>>id), checking that block_job_create() does return an error.
 >
-> The problem is in:
->
-> bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu)
-> {
->     CPUState *cs = CPU(cpu);
->
->     if (cap_ppc_pvr_compat) {
->         return false;
->     }
->
->     return !kvmppc_is_pr(cs->kvm_state);
-> }
->
-> It guesses !kvm pr means kvm_hv. That is not true, it can be TCG.
->
-> This fixes the problem for me:
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2817,5 +2817,5 @@ bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu)
->          return false;
->      }
->
-> -    return !kvmppc_is_pr(cs->kvm_state);
-> +    return kvm_enabled() && !kvmppc_is_pr(cs->kvm_state);
->  }
+> I thought we handled the external job case by requiring job_id is set 
+> before calling block_job_create(). I will check my patch again.
 
-Yep, fixes the failure for me too. David, can you respin your
-pull request, please?
+Yes, that appears to be checked correctly, I don't think you can call
+block_job_create() directly with a NULL id for external block job.
 
-thanks
--- PMM
+But I also don't see how you can create an internal job with a non-NULL
+id, so you could assert() there as well.
+
+Either assert on both places or use error_setg() in both places. I think
+I prefer the latter.
+
+Berto
