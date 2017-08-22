@@ -1,17 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dk6GS-0000j7-9Q
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:18:30 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dk6Hr-0001tm-TK
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:19:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dk6GQ-0003sE-KL
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:18:28 -0400
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Tue, 22 Aug 2017 13:15:35 +0300
-Message-Id: <20170822101535.4695-7-el13635@mail.ntua.gr>
-In-Reply-To: <20170822101535.4695-1-el13635@mail.ntua.gr>
-References: <20170822101535.4695-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH v7 6/6] qemu-iotests: add 184 for throttle
- filter driver
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dk6Ho-0006N8-Np
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:19:55 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34946)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dk6Ho-0006MT-IS
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:19:52 -0400
+Received: by mail-qt0-x244.google.com with SMTP id e2so3326296qta.2
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 03:19:52 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170818142613.32394-1-ldoktor@redhat.com>
+	<f8f1684a-0684-7261-57c3-63aa58892000@redhat.com>
+	<87bmn8qd3z.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c560b757-6bb1-2ded-a25b-193e5f9318c2@amsat.org>
+Date: Tue, 22 Aug 2017 07:19:45 -0300
+MIME-Version: 1.0
+In-Reply-To: <87bmn8qd3z.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 00/10] qemu.py: Pylint/style fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,546 +36,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, qemu-devel@nongnu.org, famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, mreitz@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
----
- tests/qemu-iotests/184     | 205 +++++++++++++++++++++++++++++++
- tests/qemu-iotests/184.out | 300 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 506 insertions(+)
- create mode 100755 tests/qemu-iotests/184
- create mode 100644 tests/qemu-iotests/184.out
+On 08/22/2017 04:24 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
+[...]
+>>
+>> Looks like all ten patches have an R-B despite changes; but it looks
+>> like nothing particularly major was changed anyway.
+>>
+>> Does this fall under Markus's jurisdiction?
+>>
+>> (Well, except for qtest.py which seemingly has double-extra-no
+>> maintainer...!)
+> 
+> qemu.py is about starting and controlling QEMU, commonly for testing
+> purposes.  It's related to QMP only by virtue of using QMP for control
+> (well, what else could it use?); if that makes me maintainer, I'll soon
+> maintain basically all tests :)
+> 
+> As far as I can tell, qemu.py's main user is still qemu-iotests, via
+> qtest.py.  Dan factored it out to make it available for
+> tests/migration/guestperf/.
+> 
+> Options for maintaining qemu.py and qtest.py:
+> 
+> * Maintain them with qemu-iotest
+> 
+>    Currently mainained with the block layer core, by Kevin and Max.
+> 
+>    - Keep it that way
+> 
+>    - Appoint qemu-iotest maintainer(s).
+> 
+> * Maintain them separately, say as "Python qtest support", appoint
+>    maintainer(s)
+> 
+>    Dan appears to be a hot contender:
+> 
+>      $ scripts/get_maintainer.pl -f --git-blame scripts/qtest.py
+>      Fam Zheng <famz@redhat.com> (authored lines:71/110=65%,commits:1/3=33%)
+>      "Daniel P. Berrange" <berrange@redhat.com> (authored lines:39/110=35%,commits:2/3=67%)
+>      Max Reitz <mreitz@redhat.com> (commits:2/3=67%)
+>      Amit Shah <amit.shah@redhat.com> (commits:1/3=33%)
+>      Stefan Hajnoczi <stefanha@redhat.com> (commits:1/3=33%)
+>      qemu-devel@nongnu.org (open list:All patches CC here)
+>      $ scripts/get_maintainer.pl -f --git-blame scripts/qemu.py
+>      "Daniel P. Berrange" <berrange@redhat.com> (authored lines:217/229=95%,commits:2/4=50%)
+>      Eduardo Habkost <ehabkost@redhat.com> (authored lines:12/229=5%,commits:4/4=100%)
+>      Markus Armbruster <armbru@redhat.com> (commits:1/4=25%)
+>      Max Reitz <mreitz@redhat.com> (commits:1/4=25%)
+>      Amit Shah <amit.shah@redhat.com> (commits:1/4=25%)
+>      qemu-devel@nongnu.org (open list:All patches CC here)
+> 
+>    Eduardo made the mistake^W^W^Wgraciously volunteered to maintain
+>    scripts/qmp/qmp-shell, which is also used for testing.  Perhaps he'd
+>    be willing to maintain these guys as well.
+> 
+> * Do nothing
+> 
+>    Hope "somebody" will take pity and merge patches.  A common value of
+>    "somebody" would be Paolo.
 
-diff --git a/tests/qemu-iotests/184 b/tests/qemu-iotests/184
-new file mode 100755
-index 0000000000..704f38f936
---- /dev/null
-+++ b/tests/qemu-iotests/184
-@@ -0,0 +1,205 @@
-+#!/bin/bash
-+#
-+# Test I/O throttle block filter driver interface
-+#
-+# Copyright (C) 2017 Manos Pitsidianakis
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner="Manos Pitsidianakis"
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+function do_run_qemu()
-+{
-+    echo Testing: "$@" | _filter_imgfmt
-+    $QEMU -nographic -qmp-pretty stdio -serial none "$@"
-+    echo
-+}
-+
-+function run_qemu()
-+{
-+    do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qemu | _filter_qmp\
-+                          | _filter_qemu_io | _filter_generated_node_ids
-+}
-+
-+_make_test_img 64M
-+test_throttle=$($QEMU_IMG --help|grep throttle)
-+[ "$test_throttle" = "" ] && _supported_fmt throttle
-+
-+echo
-+echo "== checking interface =="
-+
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "blockdev-add",
-+  "arguments": {
-+    "driver": "$IMGFMT",
-+    "node-name": "disk0",
-+    "file": {
-+      "driver": "file",
-+      "filename": "$TEST_IMG"
-+    }
-+  }
-+}
-+{ "execute": "object-add",
-+  "arguments": {
-+    "qom-type": "throttle-group",
-+    "id": "group0",
-+    "props": {
-+      "limits" : {
-+        "iops-total": 1000
-+      }
-+    }
-+  }
-+}
-+{ "execute": "blockdev-add",
-+  "arguments": {
-+    "driver": "throttle",
-+    "node-name": "throttle0",
-+    "throttle-group": "group0",
-+    "file": "disk0"
-+  }
-+}
-+{ "execute": "query-named-block-nodes" }
-+{ "execute": "query-block" }
-+{ "execute": "quit" }
-+EOF
-+
-+echo
-+echo "== property changes in ThrottleGroup =="
-+
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "object-add",
-+  "arguments": {
-+    "qom-type": "throttle-group",
-+    "id": "group0",
-+    "props" : {
-+      "limits": {
-+          "iops-total": 1000
-+      }
-+    }
-+  }
-+}
-+{ "execute" : "qom-get",
-+  "arguments" : {
-+    "path" : "group0",
-+    "property" : "limits"
-+  }
-+}
-+{ "execute" : "qom-set",
-+    "arguments" : {
-+        "path" : "group0",
-+        "property" : "limits",
-+        "value" : {
-+            "iops-total" : 0
-+        }
-+    }
-+}
-+{ "execute" : "qom-get",
-+  "arguments" : {
-+    "path" : "group0",
-+    "property" : "limits"
-+  }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+echo
-+echo "== object creation/set errors  =="
-+
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "object-add",
-+  "arguments": {
-+    "qom-type": "throttle-group",
-+    "id": "group0",
-+    "props" : {
-+      "limits": {
-+          "iops-total": 1000
-+      }
-+    }
-+  }
-+}
-+{ "execute" : "qom-set",
-+  "arguments" : {
-+    "path" : "group0",
-+    "property" : "x-iops-total",
-+    "value" : 0
-+  }
-+}
-+{ "execute" : "qom-set",
-+    "arguments" : {
-+        "path" : "group0",
-+        "property" : "limits",
-+        "value" : {
-+            "iops-total" : 10,
-+            "iops-read" : 10
-+        }
-+    }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+echo
-+echo "== don't specify group =="
-+
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "blockdev-add",
-+  "arguments": {
-+    "driver": "$IMGFMT",
-+    "node-name": "disk0",
-+    "file": {
-+      "driver": "file",
-+      "filename": "$TEST_IMG"
-+    }
-+  }
-+}
-+{ "execute": "blockdev-add",
-+  "arguments": {
-+    "driver": "throttle",
-+    "node-name": "throttle0",
-+    "file": "disk0"
-+  }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+echo
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/184.out b/tests/qemu-iotests/184.out
-new file mode 100644
-index 0000000000..d895a52d96
---- /dev/null
-+++ b/tests/qemu-iotests/184.out
-@@ -0,0 +1,300 @@
-+QA output created by 184
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+
-+== checking interface ==
-+Testing:
-+{
-+    QMP_VERSION
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": [
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 67108864,
-+                "filename": "json:{\"throttle-group\": \"group0\", \"driver\": \"throttle\", \"file\": {\"driver\": \"qcow2\", \"file\": {\"driver\": \"file\", \"filename\": \"TEST_DIR/t.qcow2\"}}}",
-+                "format": "throttle",
-+                "actual-size": 200704
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "throttle0",
-+            "backing_file_depth": 0,
-+            "drv": "throttle",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "json:{\"throttle-group\": \"group0\", \"driver\": \"throttle\", \"file\": {\"driver\": \"qcow2\", \"file\": {\"driver\": \"file\", \"filename\": \"TEST_DIR/t.qcow2\"}}}",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 200704,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "disk0",
-+            "backing_file_depth": 0,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 197120,
-+                "filename": "TEST_DIR/t.qcow2",
-+                "format": "file",
-+                "actual-size": 200704,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2",
-+            "encryption_key_missing": false
-+        }
-+    ]
-+}
-+{
-+    "return": [
-+    ]
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "SHUTDOWN",
-+    "data": {
-+        "guest": false
-+    }
-+}
-+
-+
-+== property changes in ThrottleGroup ==
-+Testing:
-+{
-+    QMP_VERSION
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": {
-+        "bps-read-max-length": 1,
-+        "iops-read-max-length": 1,
-+        "bps-read-max": 0,
-+        "bps-total": 0,
-+        "iops-total-max-length": 1,
-+        "iops-total": 1000,
-+        "iops-write-max": 0,
-+        "bps-write": 0,
-+        "bps-total-max": 0,
-+        "bps-write-max": 0,
-+        "iops-size": 0,
-+        "iops-read": 0,
-+        "iops-write-max-length": 1,
-+        "iops-write": 0,
-+        "bps-total-max-length": 1,
-+        "iops-read-max": 0,
-+        "bps-read": 0,
-+        "bps-write-max-length": 1,
-+        "iops-total-max": 0
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": {
-+        "bps-read-max-length": 1,
-+        "iops-read-max-length": 1,
-+        "bps-read-max": 0,
-+        "bps-total": 0,
-+        "iops-total-max-length": 1,
-+        "iops-total": 0,
-+        "iops-write-max": 0,
-+        "bps-write": 0,
-+        "bps-total-max": 0,
-+        "bps-write-max": 0,
-+        "iops-size": 0,
-+        "iops-read": 0,
-+        "iops-write-max-length": 1,
-+        "iops-write": 0,
-+        "bps-total-max-length": 1,
-+        "iops-read-max": 0,
-+        "bps-read": 0,
-+        "bps-write-max-length": 1,
-+        "iops-total-max": 0
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "SHUTDOWN",
-+    "data": {
-+        "guest": false
-+    }
-+}
-+
-+
-+== object creation/set errors  ==
-+Testing:
-+{
-+    QMP_VERSION
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "error": {
-+        "class": "GenericError",
-+        "desc": "Property cannot be set after initialization"
-+    }
-+}
-+{
-+    "error": {
-+        "class": "GenericError",
-+        "desc": "bps/iops/max total values and read/write values cannot be used at the same time"
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "SHUTDOWN",
-+    "data": {
-+        "guest": false
-+    }
-+}
-+
-+
-+== don't specify group ==
-+Testing:
-+{
-+    QMP_VERSION
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "error": {
-+        "class": "GenericError",
-+        "desc": "Please specify a throttle group."
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "SHUTDOWN",
-+    "data": {
-+        "guest": false
-+    }
-+}
-+
-+
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index afbdc427ea..fee98440a5 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -180,6 +180,7 @@
- 181 rw auto migration
- 182 rw auto quick
- 183 rw auto migration
-+184 rw auto quick
- 185 rw auto
- 186 rw auto
- 187 rw auto
--- 
-2.11.0
+:'(
+
+* Fam is also a good candidate for scripts/qemu.py with VM testing
+
+* trivial queue?
+
+* Add global Python maintainers
+
+Mostly to review/merge...
+
+Can we predict how the python scripts will evolve? Only fast-testing?
+
+Is there some users hacking on qemu.py unaware they can/should use 
+libvirt-python?
+If so, shouldn't we think about running more tests through libvirt and 
+add effort there?
