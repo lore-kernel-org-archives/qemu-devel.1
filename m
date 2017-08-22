@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dkAnr-0006Vm-DI
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:20 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dkAnz-0006iZ-U9
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dkAnm-0003Ca-Jb
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:15 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dkAnx-0003Mo-MO
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:23 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Aug 2017 16:08:47 +0100
-Message-Id: <1503414539-28762-9-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 22 Aug 2017 16:08:40 +0100
+Message-Id: <1503414539-28762-2-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
 References: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 08/20] target/arm: Make FAULTMASK register
- banked for v8M
+Subject: [Qemu-devel] [PATCH 01/20] target/arm: Implement ARMv8M's PMSAv8
+ registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,172 +23,332 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Make the FAULTMASK register banked if v8M security extensions are enabled.
+As part of ARMv8M, we need to add support for the PMSAv8 MPU
+architecture.
 
-Note that we do not yet implement the functionality of the new
-AIRCR.PRIS bit (which allows the effect of the NS copy of FAULTMASK to
-be restricted).
+PMSAv8 differs from PMSAv7 both in register/data layout (for instance
+using base and limit registers rather than base and size) and also in
+behaviour (for example it does not have subregions); rather than
+trying to wedge it into the existing PMSAv7 code and data structures,
+we define separate ones.
 
-This patch includes the code to determine for v8M which copy
-of FAULTMASK should be updated on exception exit; further
-changes will be required to the exception exit code in general
-to support v8M, so this is just a small piece of that.
-
-The v8M ARM ARM introduces a notation where individual paragraphs
-are labelled with R (for rule) or I (for information) followed
-by a random group of subscript letters. In comments where we want
-to refer to a particular part of the manual we use this convention,
-which should be more stable across document revisions than using
-section or page numbers.
+This commit adds the data structures which hold the state for a
+PMSAv8 MPU and the register interface to it.  The implementation of
+the MPU behaviour will be added in a subsequent commit.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h      | 14 ++++++++++++--
- hw/intc/armv7m_nvic.c |  9 ++++++++-
- target/arm/helper.c   | 20 ++++++++++++++++----
- target/arm/machine.c  |  5 +++--
- 4 files changed, 39 insertions(+), 9 deletions(-)
+ target/arm/cpu.h      |  13 ++++++
+ hw/intc/armv7m_nvic.c | 122 ++++++++++++++++++++++++++++++++++++++++++++++----
+ target/arm/cpu.c      |  36 ++++++++++-----
+ target/arm/machine.c  |  28 +++++++++++-
+ 4 files changed, 179 insertions(+), 20 deletions(-)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index fee337b..edd4c9e 100644
+index fe6edb7..b6bb78a 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -432,7 +432,7 @@ typedef struct CPUARMState {
-         unsigned mpu_ctrl; /* MPU_CTRL */
-         int exception;
-         uint32_t primask[2];
--        uint32_t faultmask;
-+        uint32_t faultmask[2];
-         uint32_t secure; /* Is CPU in Secure state? (not guest visible) */
-     } v7m;
+@@ -522,6 +522,19 @@ typedef struct CPUARMState {
+         uint32_t rnr;
+     } pmsav7;
  
-@@ -1443,6 +1443,16 @@ void armv7m_nvic_acknowledge_irq(void *opaque);
-  * (Ignoring -1, this is the same as the RETTOBASE value before completion.)
-  */
- int armv7m_nvic_complete_irq(void *opaque, int irq);
-+/**
-+ * armv7m_nvic_raw_execution_priority: return the raw execution priority
-+ * @opaque: the NVIC
-+ *
-+ * Returns: the raw execution priority as defined by the v8M architecture.
-+ * This is the execution priority minus the effects of AIRCR.PRIS,
-+ * and minus any PRIMASK/FAULTMASK/BASEPRI priority boosting.
-+ * (v8M ARM ARM I_PKLD.)
-+ */
-+int armv7m_nvic_raw_execution_priority(void *opaque);
- 
- /* Interface for defining coprocessor registers.
-  * Registers are defined in tables of arm_cp_reginfo structs
-@@ -2228,7 +2238,7 @@ static inline int cpu_mmu_index(CPUARMState *env, bool ifetch)
-          * we're in a HardFault or NMI handler.
-          */
-         if ((env->v7m.exception > 0 && env->v7m.exception <= 3)
--            || env->v7m.faultmask) {
-+            || env->v7m.faultmask[env->v7m.secure]) {
-             mmu_idx = ARMMMUIdx_MNegPri;
-         }
- 
++    /* PMSAv8 MPU */
++    struct {
++        /* The PMSAv8 implementation also shares some PMSAv7 config
++         * and state:
++         *  pmsav7.rnr (region number register)
++         *  pmsav7_dregion (number of configured regions)
++         */
++        uint32_t *rbar;
++        uint32_t *rlar;
++        uint32_t mair0;
++        uint32_t mair1;
++    } pmsav8;
++
+     void *nvic;
+     const struct arm_boot_info *boot_info;
+     /* Store GICv3CPUState to access from this struct */
 diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index a654792..babdc3b 100644
+index bbfe2d5..c0dbbad 100644
 --- a/hw/intc/armv7m_nvic.c
 +++ b/hw/intc/armv7m_nvic.c
-@@ -167,7 +167,7 @@ static inline int nvic_exec_prio(NVICState *s)
-     CPUARMState *env = &s->cpu->env;
-     int running;
+@@ -544,25 +544,67 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset)
+     {
+         int region = cpu->env.pmsav7.rnr;
  
--    if (env->v7m.faultmask) {
-+    if (env->v7m.faultmask[env->v7m.secure]) {
-         running = -1;
-     } else if (env->v7m.primask[env->v7m.secure]) {
-         running = 0;
-@@ -187,6 +187,13 @@ bool armv7m_nvic_can_take_pending_exception(void *opaque)
-     return nvic_exec_prio(s) > nvic_pending_prio(s);
- }
- 
-+int armv7m_nvic_raw_execution_priority(void *opaque)
-+{
-+    NVICState *s = opaque;
-+
-+    return s->exception_prio;
-+}
-+
- /* caller must call nvic_irq_update() after this */
- static void set_prio(NVICState *s, unsigned irq, uint8_t prio)
- {
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index c0a6dbd..b8f3b23 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -6171,8 +6171,20 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-     }
- 
-     if (env->v7m.exception != ARMV7M_EXCP_NMI) {
--        /* Auto-clear FAULTMASK on return from other than NMI */
--        env->v7m.faultmask = 0;
-+        /* Auto-clear FAULTMASK on return from other than NMI.
-+         * If the security extension is implemented then this only
-+         * happens if the raw execution priority is >= 0; the
-+         * value of the ES bit in the exception return value indicates
-+         * which security state's faultmask to clear. (v8M ARM ARM R_KBNF.)
-+         */
-+        if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-+            int es = type & 1;
-+            if (armv7m_nvic_raw_execution_priority(env->nvic) >= 0) {
-+                env->v7m.faultmask[es] = 0;
++        if (arm_feature(&cpu->env, ARM_FEATURE_V8)) {
++            /* PMSAv8M handling of the aliases is different from v7M:
++             * aliases A1, A2, A3 override the low two bits of the region
++             * number in MPU_RNR, and there is no 'region' field in the
++             * RBAR register.
++             */
++            int aliasno = (offset - 0xd9c) / 8; /* 0..3 */
++            if (aliasno) {
++                region = deposit32(region, 0, 2, aliasno);
 +            }
-+        } else {
-+            env->v7m.faultmask[M_REG_NS] = 0;
++            if (region >= cpu->pmsav7_dregion) {
++                return 0;
++            }
++            return cpu->env.pmsav8.rbar[region];
 +        }
++
+         if (region >= cpu->pmsav7_dregion) {
+             return 0;
+         }
+         return (cpu->env.pmsav7.drbar[region] & 0x1f) | (region & 0xf);
+     }
+-    case 0xda0: /* MPU_RASR */
+-    case 0xda8: /* MPU_RASR_A1 */
+-    case 0xdb0: /* MPU_RASR_A2 */
+-    case 0xdb8: /* MPU_RASR_A3 */
++    case 0xda0: /* MPU_RASR (v7M), MPU_RLAR (v8M) */
++    case 0xda8: /* MPU_RASR_A1 (v7M), MPU_RLAR_A1 (v8M) */
++    case 0xdb0: /* MPU_RASR_A2 (v7M), MPU_RLAR_A2 (v8M) */
++    case 0xdb8: /* MPU_RASR_A3 (v7M), MPU_RLAR_A3 (v8M) */
+     {
+         int region = cpu->env.pmsav7.rnr;
+ 
++        if (arm_feature(&cpu->env, ARM_FEATURE_V8)) {
++            /* PMSAv8M handling of the aliases is different from v7M:
++             * aliases A1, A2, A3 override the low two bits of the region
++             * number in MPU_RNR.
++             */
++            int aliasno = (offset - 0xda0) / 8; /* 0..3 */
++            if (aliasno) {
++                region = deposit32(region, 0, 2, aliasno);
++            }
++            if (region >= cpu->pmsav7_dregion) {
++                return 0;
++            }
++            return cpu->env.pmsav8.rlar[region];
++        }
++
+         if (region >= cpu->pmsav7_dregion) {
+             return 0;
+         }
+         return ((cpu->env.pmsav7.dracr[region] & 0xffff) << 16) |
+             (cpu->env.pmsav7.drsr[region] & 0xffff);
+     }
++    case 0xdc0: /* MPU_MAIR0 */
++        if (!arm_feature(&cpu->env, ARM_FEATURE_V8)) {
++            goto bad_offset;
++        }
++        return cpu->env.pmsav8.mair0;
++    case 0xdc4: /* MPU_MAIR1 */
++        if (!arm_feature(&cpu->env, ARM_FEATURE_V8)) {
++            goto bad_offset;
++        }
++        return cpu->env.pmsav8.mair1;
+     default:
++    bad_offset:
+         qemu_log_mask(LOG_GUEST_ERROR, "NVIC: Bad read offset 0x%x\n", offset);
+         return 0;
+     }
+@@ -691,6 +733,26 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
+     {
+         int region;
+ 
++        if (arm_feature(&cpu->env, ARM_FEATURE_V8)) {
++            /* PMSAv8M handling of the aliases is different from v7M:
++             * aliases A1, A2, A3 override the low two bits of the region
++             * number in MPU_RNR, and there is no 'region' field in the
++             * RBAR register.
++             */
++            int aliasno = (offset - 0xd9c) / 8; /* 0..3 */
++
++            region = cpu->env.pmsav7.rnr;
++            if (aliasno) {
++                region = deposit32(region, 0, 2, aliasno);
++            }
++            if (region >= cpu->pmsav7_dregion) {
++                return;
++            }
++            cpu->env.pmsav8.rbar[region] = value;
++            tlb_flush(CPU(cpu));
++            return;
++        }
++
+         if (value & (1 << 4)) {
+             /* VALID bit means use the region number specified in this
+              * value and also update MPU_RNR.REGION with that value.
+@@ -715,13 +777,32 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
+         tlb_flush(CPU(cpu));
+         break;
+     }
+-    case 0xda0: /* MPU_RASR */
+-    case 0xda8: /* MPU_RASR_A1 */
+-    case 0xdb0: /* MPU_RASR_A2 */
+-    case 0xdb8: /* MPU_RASR_A3 */
++    case 0xda0: /* MPU_RASR (v7M), MPU_RLAR (v8M) */
++    case 0xda8: /* MPU_RASR_A1 (v7M), MPU_RLAR_A1 (v8M) */
++    case 0xdb0: /* MPU_RASR_A2 (v7M), MPU_RLAR_A2 (v8M) */
++    case 0xdb8: /* MPU_RASR_A3 (v7M), MPU_RLAR_A3 (v8M) */
+     {
+         int region = cpu->env.pmsav7.rnr;
+ 
++        if (arm_feature(&cpu->env, ARM_FEATURE_V8)) {
++            /* PMSAv8M handling of the aliases is different from v7M:
++             * aliases A1, A2, A3 override the low two bits of the region
++             * number in MPU_RNR.
++             */
++            int aliasno = (offset - 0xd9c) / 8; /* 0..3 */
++
++            region = cpu->env.pmsav7.rnr;
++            if (aliasno) {
++                region = deposit32(region, 0, 2, aliasno);
++            }
++            if (region >= cpu->pmsav7_dregion) {
++                return;
++            }
++            cpu->env.pmsav8.rlar[region] = value;
++            tlb_flush(CPU(cpu));
++            return;
++        }
++
+         if (region >= cpu->pmsav7_dregion) {
+             return;
+         }
+@@ -731,6 +812,30 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
+         tlb_flush(CPU(cpu));
+         break;
+     }
++    case 0xdc0: /* MPU_MAIR0 */
++        if (!arm_feature(&cpu->env, ARM_FEATURE_V8)) {
++            goto bad_offset;
++        }
++        if (cpu->pmsav7_dregion) {
++            /* Register is RES0 if no MPU regions are implemented */
++            cpu->env.pmsav8.mair0 = value;
++        }
++        /* We don't need to do anything else because memory attributes
++         * only affect cacheability, and we don't implement caching.
++         */
++        break;
++    case 0xdc4: /* MPU_MAIR1 */
++        if (!arm_feature(&cpu->env, ARM_FEATURE_V8)) {
++            goto bad_offset;
++        }
++        if (cpu->pmsav7_dregion) {
++            /* Register is RES0 if no MPU regions are implemented */
++            cpu->env.pmsav8.mair1 = value;
++        }
++        /* We don't need to do anything else because memory attributes
++         * only affect cacheability, and we don't implement caching.
++         */
++        break;
+     case 0xf00: /* Software Triggered Interrupt Register */
+     {
+         int excnum = (value & 0x1ff) + NVIC_FIRST_IRQ;
+@@ -740,6 +845,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
+         break;
+     }
+     default:
++    bad_offset:
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "NVIC: Bad write offset 0x%x\n", offset);
+     }
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 41ae6ba..8b610de 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -228,17 +228,25 @@ static void arm_cpu_reset(CPUState *s)
+     env->vfp.xregs[ARM_VFP_FPEXC] = 0;
+ #endif
+ 
+-    if (arm_feature(env, ARM_FEATURE_PMSA) &&
+-        arm_feature(env, ARM_FEATURE_V7)) {
++    if (arm_feature(env, ARM_FEATURE_PMSA)) {
+         if (cpu->pmsav7_dregion > 0) {
+-            memset(env->pmsav7.drbar, 0,
+-                   sizeof(*env->pmsav7.drbar) * cpu->pmsav7_dregion);
+-            memset(env->pmsav7.drsr, 0,
+-                   sizeof(*env->pmsav7.drsr) * cpu->pmsav7_dregion);
+-            memset(env->pmsav7.dracr, 0,
+-                   sizeof(*env->pmsav7.dracr) * cpu->pmsav7_dregion);
++            if (arm_feature(env, ARM_FEATURE_V8)) {
++                memset(env->pmsav8.rbar, 0,
++                       sizeof(*env->pmsav8.rbar) * cpu->pmsav7_dregion);
++                memset(env->pmsav8.rlar, 0,
++                       sizeof(*env->pmsav8.rlar) * cpu->pmsav7_dregion);
++            } else if (arm_feature(env, ARM_FEATURE_V7)) {
++                memset(env->pmsav7.drbar, 0,
++                       sizeof(*env->pmsav7.drbar) * cpu->pmsav7_dregion);
++                memset(env->pmsav7.drsr, 0,
++                       sizeof(*env->pmsav7.drsr) * cpu->pmsav7_dregion);
++                memset(env->pmsav7.dracr, 0,
++                       sizeof(*env->pmsav7.dracr) * cpu->pmsav7_dregion);
++            }
+         }
+         env->pmsav7.rnr = 0;
++        env->pmsav8.mair0 = 0;
++        env->pmsav8.mair1 = 0;
      }
  
-     switch (armv7m_nvic_complete_irq(env->nvic, env->v7m.exception)) {
-@@ -8840,7 +8852,7 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
-     case 18: /* BASEPRI_MAX */
-         return env->v7m.basepri[env->v7m.secure];
-     case 19: /* FAULTMASK */
--        return env->v7m.faultmask;
-+        return env->v7m.faultmask[env->v7m.secure];
-     default:
-         qemu_log_mask(LOG_GUEST_ERROR, "Attempt to read unknown special"
-                                        " register %d\n", reg);
-@@ -8908,7 +8920,7 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+     set_flush_to_zero(1, &env->vfp.standard_fp_status);
+@@ -809,9 +817,15 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
          }
-         break;
-     case 19: /* FAULTMASK */
--        env->v7m.faultmask = val & 1;
-+        env->v7m.faultmask[env->v7m.secure] = val & 1;
-         break;
-     case 20: /* CONTROL */
-         /* Writing to the SPSEL bit only has an effect if we are in
+ 
+         if (nr) {
+-            env->pmsav7.drbar = g_new0(uint32_t, nr);
+-            env->pmsav7.drsr = g_new0(uint32_t, nr);
+-            env->pmsav7.dracr = g_new0(uint32_t, nr);
++            if (arm_feature(env, ARM_FEATURE_V8)) {
++                /* PMSAv8 */
++                env->pmsav8.rbar = g_new0(uint32_t, nr);
++                env->pmsav8.rlar = g_new0(uint32_t, nr);
++            } else {
++                env->pmsav7.drbar = g_new0(uint32_t, nr);
++                env->pmsav7.drsr = g_new0(uint32_t, nr);
++                env->pmsav7.dracr = g_new0(uint32_t, nr);
++            }
+         }
+     }
+ 
 diff --git a/target/arm/machine.c b/target/arm/machine.c
-index 6f0f6c9..bd7aba1 100644
+index 3193b00..05e2909 100644
 --- a/target/arm/machine.c
 +++ b/target/arm/machine.c
-@@ -102,7 +102,7 @@ static const VMStateDescription vmstate_m_faultmask_primask = {
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .fields = (VMStateField[]) {
--        VMSTATE_UINT32(env.v7m.faultmask, ARMCPU),
-+        VMSTATE_UINT32(env.v7m.faultmask[M_REG_NS], ARMCPU),
-         VMSTATE_UINT32(env.v7m.primask[M_REG_NS], ARMCPU),
-         VMSTATE_END_OF_LIST()
-     }
-@@ -252,6 +252,7 @@ static const VMStateDescription vmstate_m_security = {
-         VMSTATE_UINT32(env.v7m.secure, ARMCPU),
-         VMSTATE_UINT32(env.v7m.basepri[M_REG_S], ARMCPU),
-         VMSTATE_UINT32(env.v7m.primask[M_REG_S], ARMCPU),
-+        VMSTATE_UINT32(env.v7m.faultmask[M_REG_S], ARMCPU),
-         VMSTATE_END_OF_LIST()
+@@ -159,7 +159,8 @@ static bool pmsav7_needed(void *opaque)
+     CPUARMState *env = &cpu->env;
+ 
+     return arm_feature(env, ARM_FEATURE_PMSA) &&
+-           arm_feature(env, ARM_FEATURE_V7);
++           arm_feature(env, ARM_FEATURE_V7) &&
++           !arm_feature(env, ARM_FEATURE_V8);
+ }
+ 
+ static bool pmsav7_rgnr_vmstate_validate(void *opaque, int version_id)
+@@ -209,6 +210,31 @@ static const VMStateDescription vmstate_pmsav7_rnr = {
      }
  };
-@@ -289,7 +290,7 @@ static int get_cpsr(QEMUFile *f, void *opaque, size_t size,
-              * transferred using the vmstate_m_faultmask_primask subsection.
-              */
-             if (val & CPSR_F) {
--                env->v7m.faultmask = 1;
-+                env->v7m.faultmask[M_REG_NS] = 1;
-             }
-             if (val & CPSR_I) {
-                 env->v7m.primask[M_REG_NS] = 1;
+ 
++static bool pmsav8_needed(void *opaque)
++{
++    ARMCPU *cpu = opaque;
++    CPUARMState *env = &cpu->env;
++
++    return arm_feature(env, ARM_FEATURE_PMSA) &&
++        arm_feature(env, ARM_FEATURE_V8);
++}
++
++static const VMStateDescription vmstate_pmsav8 = {
++    .name = "cpu/pmsav8",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = pmsav8_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_VARRAY_UINT32(env.pmsav8.rbar, ARMCPU, pmsav7_dregion, 0,
++                              vmstate_info_uint32, uint32_t),
++        VMSTATE_VARRAY_UINT32(env.pmsav8.rlar, ARMCPU, pmsav7_dregion, 0,
++                              vmstate_info_uint32, uint32_t),
++        VMSTATE_UINT32(env.pmsav8.mair0, ARMCPU),
++        VMSTATE_UINT32(env.pmsav8.mair1, ARMCPU),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static int get_cpsr(QEMUFile *f, void *opaque, size_t size,
+                     VMStateField *field)
+ {
 -- 
 2.7.4
