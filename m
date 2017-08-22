@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dk95B-0002pe-C1
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:19:02 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dk95B-0002ph-DC
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:19:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dk95A-00062U-7R
+	(envelope-from <pbonzini@redhat.com>) id 1dk95A-00062J-0y
 	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:19:01 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 22 Aug 2017 15:18:29 +0200
-Message-Id: <20170822131832.20191-8-pbonzini@redhat.com>
+Date: Tue, 22 Aug 2017 15:18:32 +0200
+Message-Id: <20170822131832.20191-11-pbonzini@redhat.com>
 In-Reply-To: <20170822131832.20191-1-pbonzini@redhat.com>
 References: <20170822131832.20191-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 07/10] io: add qio_channel_read/write_all
+Subject: [Qemu-devel] [PATCH 10/10] scsi: add persistent reservation manager
+ using qemu-pr-helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,144 +21,319 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, famz@redhat.com, "Daniel P . Berrange" <berrange@redhat.com>
+Cc: qemu-block@nongnu.org, famz@redhat.com
 
-It is pretty common to read a fixed-size buffer from a socket.  Add a
-function that does this, either with multiple reads (on blocking sockets)
-or by yielding if called from a coroutine.
+This adds a concrete subclass of pr-manager that talks to qemu-pr-helper.
 
-Cc: Daniel P. Berrange <berrange@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/io/channel.h | 36 ++++++++++++++++++++++++++++++++++-
- io/channel.c         | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 89 insertions(+), 1 deletion(-)
+ scsi/Makefile.objs       |   2 +-
+ scsi/pr-manager-helper.c | 288 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 289 insertions(+), 1 deletion(-)
+ create mode 100644 scsi/pr-manager-helper.c
 
-diff --git a/include/io/channel.h b/include/io/channel.h
-index db9bb022a1..9cfb4d081f 100644
---- a/include/io/channel.h
-+++ b/include/io/channel.h
-@@ -299,7 +299,7 @@ ssize_t qio_channel_writev(QIOChannel *ioc,
-                            Error **errp);
+diff --git a/scsi/Makefile.objs b/scsi/Makefile.objs
+index 5496d2ae6a..4d25e476cf 100644
+--- a/scsi/Makefile.objs
++++ b/scsi/Makefile.objs
+@@ -1,3 +1,3 @@
+ block-obj-y += utils.o
  
- /**
-- * qio_channel_readv:
-+ * qio_channel_read:
-  * @ioc: the channel object
-  * @buf: the memory region to read data into
-  * @buflen: the length of @buf
-@@ -315,6 +315,23 @@ ssize_t qio_channel_read(QIOChannel *ioc,
-                          Error **errp);
- 
- /**
-+ * qio_channel_read_all:
-+ * @ioc: the channel object
-+ * @buf: the memory region to read data into
-+ * @buflen: the number of bytes to @buf
-+ * @errp: pointer to a NULL-initialized error object
+-block-obj-$(CONFIG_LINUX) += pr-manager.o
++block-obj-$(CONFIG_LINUX) += pr-manager.o pr-manager-helper.o
+diff --git a/scsi/pr-manager-helper.c b/scsi/pr-manager-helper.c
+new file mode 100644
+index 0000000000..c9d9606696
+--- /dev/null
++++ b/scsi/pr-manager-helper.c
+@@ -0,0 +1,288 @@
++/*
++ * Persistent reservation manager that talks to qemu-mpath-helper
 + *
-+ * Reads @buflen bytes into @buf, possibly blocking or (if the
-+ * channel is non-blocking) yielding from the current coroutine
-+ * multiple times until the entire content is read.  Otherwise
-+ * behaves as qio_channel_read().
-+ */
-+ssize_t coroutine_fn qio_channel_read_all(QIOChannel *ioc,
-+                                          char *buf,
-+                                          size_t buflen,
-+                                          Error **errp);
-+
-+/**
-  * qio_channel_write:
-  * @ioc: the channel object
-  * @buf: the memory regions to send data from
-@@ -331,6 +348,23 @@ ssize_t qio_channel_write(QIOChannel *ioc,
-                           Error **errp);
- 
- /**
-+ * qio_channel_write_all:
-+ * @ioc: the channel object
-+ * @buf: the memory region to write data into
-+ * @buflen: the number of bytes to @buf
-+ * @errp: pointer to a NULL-initialized error object
++ * Copyright (c) 2017 Red Hat, Inc.
 + *
-+ * Writes @buflen bytes from @buf, possibly blocking or (if the
-+ * channel is non-blocking) yielding from the current coroutine
-+ * multiple times until the entire content is written.  Otherwise
-+ * behaves as qio_channel_write().
++ * Author: Paolo Bonzini <pbonzini@redhat.com>
++ *
++ * This code is licensed under the LGPL.
++ *
 + */
-+ssize_t coroutine_fn qio_channel_write_all(QIOChannel *ioc,
-+                                           const char *buf,
-+                                           size_t buflen,
-+                                           Error **errp);
 +
-+/**
-  * qio_channel_set_blocking:
-  * @ioc: the channel object
-  * @enabled: the blocking flag state
-diff --git a/io/channel.c b/io/channel.c
-index 1cfb8b33a2..7ab3f4eede 100644
---- a/io/channel.c
-+++ b/io/channel.c
-@@ -113,6 +113,60 @@ ssize_t qio_channel_read(QIOChannel *ioc,
- }
- 
- 
-+ssize_t qio_channel_read_all(QIOChannel *ioc,
-+                             char *buf,
-+                             size_t buflen,
-+                             Error **errp)
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "scsi/constants.h"
++#include "scsi/pr-manager.h"
++#include "scsi/utils.h"
++#include "io/channel.h"
++#include "io/channel-socket.h"
++#include "pr-helper.h"
++
++#include <scsi/sg.h>
++
++#define PR_MAX_RECONNECT_ATTEMPTS 5
++
++#define TYPE_PR_MANAGER_HELPER "pr-manager-helper"
++
++#define PR_MANAGER_HELPER(obj) \
++     INTERFACE_CHECK(PRManagerHelper, (obj), \
++                     TYPE_PR_MANAGER_HELPER)
++
++typedef struct PRManagerHelper {
++    /* <private> */
++    PRManager parent;
++
++    char *path;
++
++    QemuMutex lock;
++    QIOChannel *ioc;
++} PRManagerHelper;
++
++/* Called with lock held.  */
++static int pr_manager_helper_read(PRManagerHelper *pr_mgr,
++                                  void *buf, int sz, Error **errp)
 +{
-+    ssize_t total = 0;
-+    while (buflen > 0) {
-+        ssize_t n_read = qio_channel_read(ioc, buf, buflen, errp);
++    ssize_t r = qio_channel_read_all(pr_mgr->ioc, buf, sz, errp);
 +
-+        if (n_read == QIO_CHANNEL_ERR_BLOCK) {
-+            assert(ioc->ctx);
-+            qio_channel_yield(ioc, G_IO_IN);
-+            continue;
-+        }
-+        if (n_read < 0) {
-+            return n_read;
-+        }
-+
-+        buf += n_read;
-+        total += n_read;
-+        buflen -= n_read;
++    if (r < 0) {
++        object_unref(OBJECT(pr_mgr->ioc));
++        pr_mgr->ioc = NULL;
++        return r;
 +    }
 +
-+    return total;
++    return r < 0 ? r : 0;
 +}
 +
-+
-+ssize_t qio_channel_write_all(QIOChannel *ioc,
-+                              const char *buf,
-+                              size_t buflen,
-+                              Error **errp)
++/* Called with lock held.  */
++static int pr_manager_helper_write(PRManagerHelper *pr_mgr,
++                                   int fd,
++                                   const void *buf, int sz, Error **errp)
 +{
-+    ssize_t total = 0;
-+    while (buflen > 0) {
-+        ssize_t n_written = qio_channel_write(ioc, buf, buflen, errp);
++    size_t nfds = (fd != -1);
++    while (sz > 0) {
++        struct iovec iov;
++        ssize_t n_written;
 +
-+        if (n_written == QIO_CHANNEL_ERR_BLOCK) {
-+            assert(ioc->ctx);
-+            qio_channel_yield(ioc, G_IO_OUT);
-+            continue;
-+        }
-+        if (n_written < 0) {
++        iov.iov_base = (void *)buf;
++        iov.iov_len = sz;
++        n_written = qio_channel_writev_full(QIO_CHANNEL(pr_mgr->ioc), &iov, 1,
++                                            nfds ? &fd : NULL, nfds, errp);
++
++        if (n_written <= 0) {
++            assert(n_written != QIO_CHANNEL_ERR_BLOCK);
++            object_unref(OBJECT(pr_mgr->ioc));
++            pr_mgr->ioc = NULL;
 +            return n_written;
 +        }
 +
++        nfds = 0;
 +        buf += n_written;
-+        total += n_written;
-+        buflen -= n_written;
++        sz -= n_written;
 +    }
 +
-+    return total;
++    return 0;
 +}
 +
++/* Called with lock held.  */
++static int pr_manager_helper_initialize(PRManagerHelper *pr_mgr,
++                                        Error **errp)
++{
++    uint32_t flags;
 +
- ssize_t qio_channel_write(QIOChannel *ioc,
-                           const char *buf,
-                           size_t buflen,
++    SocketAddress saddr = {
++        .type = SOCKET_ADDRESS_TYPE_UNIX,
++        .u.q_unix.path = g_strdup(pr_mgr->path)
++    };
++    QIOChannelSocket *sioc = qio_channel_socket_new();
++    Error *local_err = NULL;
++
++    qio_channel_set_name(QIO_CHANNEL(sioc), "pr-manager-helper");
++    qio_channel_socket_connect_sync(sioc,
++                                    &saddr,
++                                    &local_err);
++    if (local_err) {
++        object_unref(OBJECT(sioc));
++        error_propagate(errp, local_err);
++        return -ENOTCONN;
++    }
++
++    qio_channel_set_delay(QIO_CHANNEL(sioc), false);
++    pr_mgr->ioc = QIO_CHANNEL(sioc);
++
++    /* A simple feature negotation protocol, even though there is
++     * no optional feature right now.
++     */
++    if (pr_manager_helper_read(pr_mgr, &flags, sizeof(flags), errp) < 0) {
++        return -EINVAL;
++    }
++
++    flags = 0;
++    if (pr_manager_helper_write(pr_mgr, -1, &flags, sizeof(flags), errp) < 0) {
++        return -EINVAL;
++    }
++
++    return 0;
++}
++
++static int pr_manager_helper_run(PRManager *p,
++                                 int fd, struct sg_io_hdr *io_hdr)
++{
++    PRManagerHelper *pr_mgr = PR_MANAGER_HELPER(p);
++
++    uint32_t len;
++    PRHelperResponse resp;
++    int ret;
++    int expected_dir;
++    int attempts;
++    uint8_t cdb[PR_HELPER_CDB_SIZE] = { 0 };
++
++    if (!io_hdr->cmd_len || io_hdr->cmd_len > PR_HELPER_CDB_SIZE) {
++        return -EINVAL;
++    }
++
++    memcpy(cdb, io_hdr->cmdp, io_hdr->cmd_len);
++    assert(cdb[0] == PERSISTENT_RESERVE_OUT || cdb[0] == PERSISTENT_RESERVE_IN);
++    expected_dir =
++        (cdb[0] == PERSISTENT_RESERVE_OUT ? SG_DXFER_TO_DEV : SG_DXFER_FROM_DEV);
++    if (io_hdr->dxfer_direction != expected_dir) {
++        return -EINVAL;
++    }
++
++    len = scsi_cdb_xfer(cdb);
++    if (io_hdr->dxfer_len < len || len > PR_HELPER_DATA_SIZE) {
++        return -EINVAL;
++    }
++
++    ret = 0;
++    qemu_mutex_lock(&pr_mgr->lock);
++
++    /* Try to reconnect while sending the CDB.  */
++    for (attempts = 0; attempts < PR_MAX_RECONNECT_ATTEMPTS; attempts++) {
++        if (!pr_mgr->ioc) {
++            if (pr_manager_helper_initialize(pr_mgr, NULL) < 0) {
++                qemu_mutex_unlock(&pr_mgr->lock);
++                g_usleep(G_USEC_PER_SEC);
++                qemu_mutex_lock(&pr_mgr->lock);
++            }
++        }
++
++        if (pr_mgr->ioc) {
++            if (pr_manager_helper_write(pr_mgr, fd, cdb,
++                                        ARRAY_SIZE(cdb), NULL) >= 0) {
++                break;
++            }
++        }
++    }
++    if (attempts == PR_MAX_RECONNECT_ATTEMPTS) {
++        ret = -EINVAL;
++        goto out;
++    }
++
++    /* After sending the CDB, any communications failure causes the
++     * command to fail.  The failure is transient, retrying the command
++     * will invoke pr_manager_helper_initialize again.
++     */
++    if (expected_dir == SG_DXFER_TO_DEV) {
++        if (pr_manager_helper_write(pr_mgr, -1, io_hdr->dxferp,
++                                    len, NULL) < 0) {
++            ret = -EINVAL;
++            goto out;
++        }
++    }
++    if (pr_manager_helper_read(pr_mgr, &resp, sizeof(resp), NULL) < 0) {
++        ret = -EINVAL;
++        goto out;
++    }
++    if (expected_dir == SG_DXFER_FROM_DEV && resp.result == 0) {
++        if (pr_manager_helper_read(pr_mgr, io_hdr->dxferp, len, NULL) < 0) {
++            ret = -EINVAL;
++            goto out;
++        }
++    }
++
++    io_hdr->status = resp.result;
++    if (resp.result == CHECK_CONDITION) {
++        io_hdr->driver_status = SG_ERR_DRIVER_SENSE;
++        io_hdr->sb_len_wr = MIN(io_hdr->mx_sb_len, PR_HELPER_SENSE_SIZE);
++        memcpy(io_hdr->sbp, resp.sense, io_hdr->sb_len_wr);
++    }
++
++out:
++    if (ret < 0) {
++        int sense_len = scsi_build_sense(io_hdr->sbp,
++                                         SENSE_CODE(LUN_COMM_FAILURE));
++        io_hdr->driver_status = SG_ERR_DRIVER_SENSE;
++        io_hdr->sb_len_wr = MIN(io_hdr->mx_sb_len, sense_len);
++        io_hdr->status = CHECK_CONDITION;
++    }
++    qemu_mutex_unlock(&pr_mgr->lock);
++    return ret;
++}
++
++static void pr_manager_helper_complete(UserCreatable *uc, Error **errp)
++{
++    PRManagerHelper *pr_mgr = PR_MANAGER_HELPER(uc);
++
++    qemu_mutex_lock(&pr_mgr->lock);
++    pr_manager_helper_initialize(pr_mgr, errp);
++    qemu_mutex_unlock(&pr_mgr->lock);
++}
++
++static char *get_path(Object *obj, Error **errp)
++{
++    PRManagerHelper *pr_mgr = PR_MANAGER_HELPER(obj);
++
++    return g_strdup(pr_mgr->path);
++}
++
++static void set_path(Object *obj, const char *str, Error **errp)
++{
++    PRManagerHelper *pr_mgr = PR_MANAGER_HELPER(obj);
++
++    g_free(pr_mgr->path);
++    pr_mgr->path = g_strdup(str);
++}
++
++static void pr_manager_helper_instance_finalize(Object *obj)
++{
++    PRManagerHelper *pr_mgr = PR_MANAGER_HELPER(obj);
++
++    g_free(pr_mgr->path);
++    object_unref(OBJECT(pr_mgr->ioc));
++    qemu_mutex_destroy(&pr_mgr->lock);
++}
++
++static void pr_manager_helper_instance_init(Object *obj)
++{
++    PRManagerHelper *pr_mgr = PR_MANAGER_HELPER(obj);
++
++    qemu_mutex_init(&pr_mgr->lock);
++}
++
++static void pr_manager_helper_class_init(ObjectClass *klass,
++                                         void *class_data G_GNUC_UNUSED)
++{
++    PRManagerClass *prmgr_klass = PR_MANAGER_CLASS(klass);
++    UserCreatableClass *uc_klass = USER_CREATABLE_CLASS(klass);
++
++    object_class_property_add_str(klass, "path", get_path, set_path,
++                                  &error_abort);
++    uc_klass->complete = pr_manager_helper_complete;
++    prmgr_klass->run = pr_manager_helper_run;
++}
++
++static const TypeInfo pr_manager_helper_info = {
++    .parent = TYPE_PR_MANAGER,
++    .name = TYPE_PR_MANAGER_HELPER,
++    .instance_size = sizeof(PRManagerHelper),
++    .instance_init = pr_manager_helper_instance_init,
++    .instance_finalize = pr_manager_helper_instance_finalize,
++    .class_init = pr_manager_helper_class_init,
++};
++
++static void pr_manager_helper_register_types(void)
++{
++    type_register_static(&pr_manager_helper_info);
++}
++
++type_init(pr_manager_helper_register_types);
 -- 
 2.13.5
