@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dk4re-00020G-LB
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:50 -0400
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dk4ri-00021y-Cw
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dk4rb-0004oH-J8
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:46 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:59643)
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dk4rh-00050j-Hj
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:50 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:59755)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dk4ra-0004jZ-VM
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:43 -0400
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dk4rg-0004xv-UE
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:49 -0400
 From: Wang yong <wang.yong155@zte.com.cn>
-Date: Tue, 22 Aug 2017 16:46:18 +0800
-Message-Id: <1503391578-6121-4-git-send-email-wang.yong155@zte.com.cn>
-In-Reply-To: <1503391578-6121-1-git-send-email-wang.yong155@zte.com.cn>
-References: <1503391578-6121-1-git-send-email-wang.yong155@zte.com.cn>
-Subject: [Qemu-devel] [PATCHv4 03/03] colo-compare: Update the COLO document
- to add the IOThread configuration
+Date: Tue, 22 Aug 2017 16:46:15 +0800
+Message-Id: <1503391578-6121-1-git-send-email-wang.yong155@zte.com.cn>
+Subject: [Qemu-devel] [PATCHv4 00/03] Replace the COLO comparing thread with
+ IOThread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +27,27 @@ Cc: wang.yong155@zte.com.cn, wang.guang55@zte.com.cn, lizhijian@cn.fujitsu.com, 
 
 From: Wang Yong <wang.yong155@zte.com.cn>
 
-Update colo-proxy.txt,add IOThread configuration.
-Later we have to configure IOThread,if not COLO can not work.
+It's a good idea to use IOThread instead of COLO comparing thread.
+comparing thread can be completely replaced by IOThread, so this idea came.
 
-Signed-off-by: Wang Yong <wang.yong155@zte.com.cn>
-Signed-off-by: Wang Guang <wang.guang55@zte.com.cn>
----
- docs/colo-proxy.txt | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+This series of updates mainly include IOThread supports the GMainContext
+event loop, then the old packet regularly check and primary/secondary network
+packets compare all into the IOThread processing.
 
-diff --git a/docs/colo-proxy.txt b/docs/colo-proxy.txt
-index c4941de..ce3f783 100644
---- a/docs/colo-proxy.txt
-+++ b/docs/colo-proxy.txt
-@@ -170,10 +170,11 @@ Primary(ip:3.3.3.3):
- -chardev socket,id=compare0-0,host=3.3.3.3,port=9001
- -chardev socket,id=compare_out,host=3.3.3.3,port=9005,server,nowait
- -chardev socket,id=compare_out0,host=3.3.3.3,port=9005
-+-object iothread,id=iothread1
- -object filter-mirror,id=m0,netdev=hn0,queue=tx,outdev=mirror0
- -object filter-redirector,netdev=hn0,id=redire0,queue=rx,indev=compare_out
- -object filter-redirector,netdev=hn0,id=redire1,queue=rx,outdev=compare0
---object colo-compare,id=comp0,primary_in=compare0-0,secondary_in=compare1,outdev=compare_out0
-+-object colo-compare,id=comp0,primary_in=compare0-0,secondary_in=compare1,outdev=compare_out0,iothread=iothread1
- 
- Secondary(ip:3.3.3.8):
- -netdev tap,id=hn0,vhost=off,script=/etc/qemu-ifup,down script=/etc/qemu-ifdown
--- 
+Please review,thanks.
+
+wangyong(3):
+qemu-iothread: IOThread supports the GMainContext event loop
+colo-compare: Use IOThread to Check old packet regularly and
+ Process pactkets of the primary
+colo-compare: Update the COLO document to add the IOThread
+ configuration
+
+ include/sysemu/iothread.h | 10 +++++++++
+ iothread.c                | 54 +++++++++++++++++++++++++++++++++++++++++++++++
+ net/colo-compare.c | 75 ++++++++++++++++++++++++++++--------------------------
+ docs/colo-proxy.txt | 3 ++- 
+ 4 file changed, 86 insertions(+), 37 deletions(-)
+
+--
 1.8.3.1
