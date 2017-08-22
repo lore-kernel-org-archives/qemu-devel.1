@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dk116-0004HP-Cg
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 00:42:17 -0400
+	(envelope-from <famz@redhat.com>) id 1dk11G-0004PI-Co
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 00:42:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dk115-0001bs-P0
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 00:42:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47688)
+	(envelope-from <famz@redhat.com>) id 1dk11D-0001dV-BJ
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 00:42:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60474)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dk115-0001bg-J3
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 00:42:15 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dk11D-0001dH-4w
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 00:42:23 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue, 22 Aug 2017 12:41:46 +0800
-Message-Id: <20170822044155.2451-2-famz@redhat.com>
+Date: Tue, 22 Aug 2017 12:41:47 +0800
+Message-Id: <20170822044155.2451-3-famz@redhat.com>
 In-Reply-To: <20170822044155.2451-1-famz@redhat.com>
 References: <20170822044155.2451-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 01/10] gitignore: Ignore vm test images
+Subject: [Qemu-devel] [PATCH v3 02/10] qemu.py: Add "wait()" method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,21 +29,26 @@ Cc: berrange@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- .gitignore | 2 ++
- 1 file changed, 2 insertions(+)
+ scripts/qemu.py | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/.gitignore b/.gitignore
-index cf65316863..693e2f3009 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -52,6 +52,8 @@
- /vscclient
- /vhost-user-scsi
- /fsdev/virtfs-proxy-helper
-+/tests/vm/*.img
-+/tests/vm/*.tmp
- *.[1-9]
- *.a
- *.aux
+diff --git a/scripts/qemu.py b/scripts/qemu.py
+index 880e3e8219..153f2d1564 100644
+--- a/scripts/qemu.py
++++ b/scripts/qemu.py
+@@ -143,6 +143,13 @@ class QEMUMachine(object):
+             self._post_shutdown()
+             raise
+ 
++    def wait(self):
++        '''Wait for the VM to power off'''
++        self._popen.wait()
++        self._qmp.close()
++        self._load_io_log()
++        self._post_shutdown()
++
+     def shutdown(self):
+         '''Terminate the VM and clean up'''
+         if self.is_running():
 -- 
 2.13.5
