@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk7Os-0002Kg-Jg
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:31:16 -0400
+	(envelope-from <bounces@canonical.com>) id 1dk7Ow-0002Oa-Ry
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:31:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk7Or-0002ME-Dx
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:31:14 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58867)
+	(envelope-from <bounces@canonical.com>) id 1dk7Ot-0002N1-J5
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:31:18 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58923)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dk7Or-0002Lv-8J
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:31:13 -0400
+	id 1dk7Ot-0002Ml-Cz
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:31:15 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dk7Oo-0003e7-7y
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 11:31:10 +0000
+	id 1dk7Oq-0003ec-CB
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 11:31:12 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D34DC2E81A8
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 11:31:06 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 109282E8193
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 11:31:08 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Aug 2017 11:23:14 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
+Date: Tue, 22 Aug 2017 11:16:11 -0000
+From: Gerd Hoffmann <1708551@bugs.launchpad.net>
+Reply-To: Bug 1708551 <1708551@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
-Message-Id: <150340099450.8620.8913559922306083.malone@soybean.canonical.com>
+References: <150180124657.25828.11815849760914128130.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150340057117.8395.12223081246021949060.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
- 2.10
+Subject: [Qemu-devel] [Bug 1708551] Re: macOS Guest Reading USB 3.0 Bus as
+ USB 2.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,72 +39,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-(4th try) breakpoint on qemu_file_set_error,  it's bdrv_inactivate_all
-that's returning the error.
-
-(gdb) list
-1155	    if (inactivate_disks) {
-1156	        /* Inactivate before sending QEMU_VM_EOF so that the
-1157	         * bdrv_invalidate_cache_all() on the other end won't fail. */
-1158	        ret =3D bdrv_inactivate_all();
-1159	        if (ret) {
-1160	            qemu_file_set_error(f, ret);
-1161	            return ret;
-1162	        }
-1163	    }
+xhci doesn't work with macos because macos has a white list of supported
+xhci controllers and ignores the xhci adapters emulated by qemu.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1711602
+https://bugs.launchpad.net/bugs/1708551
 
 Title:
-  --copy-storage-all failing with qemu 2.10
+  macOS Guest Reading USB 3.0 Bus as USB 2.0
 
 Status in QEMU:
-  New
-Status in libvirt package in Ubuntu:
-  Confirmed
-Status in qemu package in Ubuntu:
-  Confirmed
+  Triaged
 
 Bug description:
-  We fixed an issue around disk locking already in regard to qemu-nbd
-  [1], but there still seem to be issues.
+  Description:
+  I'm having trouble with USB Passthrough. Running `system_profiler SPUSBDa=
+taType` on macOS guest confirms that the system "sees" my device, and that =
+qemu is passing *something* through. However, the system sees my connection=
+ as USB 2.0, even though i'm passing through XHCI controllers (nec-usb-xhci=
+/qemu-xhci). I suspect this is the reason why my guest is unable to recogni=
+ze my iPhone in XCode & iTunes.
 
-  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
-://10.22.69.196/system
-  error: internal error: qemu unexpectedly closed the monitor: 2017-08-18T1=
-2:10:29.800397Z qemu-system-x86_64: -chardev pty,id=3Dcharserial0: char dev=
-ice redirected to /dev/pts/0 (label charserial0)
-  2017-08-18T12:10:48.545776Z qemu-system-x86_64: load of migration failed:=
- Input/output error
+  Parameters:
+  QEMU release version: 2.10.0-rc0
+  Bios: [patched version of OVMF](https://github.com/gsomlo/edk2/tree/macbo=
+ot)]
+  Command Line: https://pastebin.com/pBSYbrW1
+  Host: Arch Linux
+  Guest: macOS v10.12.6
+  Guest System Info: https://pastebin.com/U1Tihxei
 
-  Source libvirt log for the guest:
-  2017-08-18 12:09:08.251+0000: initiating migration
-  2017-08-18T12:09:08.809023Z qemu-system-x86_64: Unable to read from socke=
-t: Connection reset by peer
-  2017-08-18T12:09:08.809481Z qemu-system-x86_64: Unable to read from socke=
-t: Connection reset by peer
+  Notes:
+  1. Observed sometime after late-May-early-June of this year.
 
-  Target libvirt log for the guest:
-  2017-08-18T12:09:08.730911Z qemu-system-x86_64: load of migration failed:=
- Input/output error
-  2017-08-18 12:09:09.010+0000: shutting down, reason=3Dcrashed
-
-  Given the timing it seems that the actual copy now works (it is busy ~10 =
-seconds on my environment which would be the copy).
-  Also we don't see the old errors we saw before, but afterwards on the act=
-ual take-over it fails.
-
-  Dmesg has no related denials as often apparmor is in the mix.
-
-  Need to check libvirt logs of source [2] and target [3] in Detail.
-
-  [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02200.html
-  [2]: http://paste.ubuntu.com/25339356/
-  [3]: http://paste.ubuntu.com/25339358/
+  2. Due to [a defect in qemu v2.8 which affected GTK
+  users](https://bugs.launchpad.net/qemu/+bug/1578192), and [a recent
+  change to macOS' booting process conflicting with qemu
+  v2.9](https://lists.nongnu.org/archive/html/qemu-
+  devel/2017-03/msg06366.html), i'm forced to use qemu v2.10.0-rc0 (as
+  -rc1 fails to load OVMF right now).
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1711602/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1708551/+subscriptions
