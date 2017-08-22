@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42615)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dkGKP-0004tL-8a
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 17:03:17 -0400
+	id 1dkGxn-0005kt-O8
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 17:43:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dkGKJ-0008Da-8m
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 17:03:13 -0400
+	id 1dkGxk-0003pS-KP
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 17:43:55 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <59a56959-ca12-ea75-33fa-ff07eba1b090@redhat.com>
-	<5b835c12-04c2-b1f9-4768-0f443742eb07@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5a85f2a6-feb7-dd11-53f2-91df6262a827@amsat.org>
-Date: Tue, 22 Aug 2017 18:02:54 -0300
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Tue, 22 Aug 2017 18:43:43 -0300
+Message-Id: <20170822214343.31385-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <5b835c12-04c2-b1f9-4768-0f443742eb07@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Use after free problem somewhere in ahci.c or
- ich.c code
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH for-2.10-rc4?] acpi: pcihp: fix use-after-free
+ for machines previous pc-1.7 compat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +25,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>
 
-On 08/22/2017 03:39 PM, John Snow wrote:
-> On 08/22/2017 02:15 PM, Thomas Huth wrote:
->>
->> Looks like there is a use-after-free problem somewhere in
->> the ahci.c or ich.c code when trying to add the ich9-ahci
->> on a old PC machine. Using valgrind, I get:
->>
+9e047b982452 "piix4: add acpi pci hotplug support" introduced a new property
+'use_acpi_pci_hotplug' for pc-1.7 and older machines.
+c24d5e0b91d1 "convert ACPI PCI hotplug to use hotplug-handler API" added the
+qbus hotplug handlers but forgot to check for the 'use_acpi_pci_hotplug'
+property.
 
-those old PC don't support AHCI hotplug, so realize() fails then 
-unparent() is called.
+Check for use_acpi_pci_hotplug before calling acpi_pcihp_device_[un]plug_cb().
 
-> I'll look; it looks like it works okay for pc-i440fx-2.9 as well as 2.0
-> and 1.7.
-> 
-> 1.6 appears to be the most modern board that has issues, as well as 1.4
-> and the pc-1.2 board you specify.
+If Xen is enabled, piix4_pm_init() disables use_acpi_pci_hotplug.
 
-commit 9e047b982452 "piix4: add acpi pci hotplug support"
+The following valgrind Trace equivs:
 
-"Add support for acpi pci hotplug using the new infrastructure.
-PIIX4 legacy interface is maintained as is for machine types 1.7 and older."
+  qdev_device_add( "ich9-ahci" )
+   -> device_set_realized()
+    -> hotplug_handler_plug()
+     -> piix4_device_plug_cb()
+      -> acpi_pcihp_device_plug_cb()
+       -> acpi_pcihp_get_bsel() "Property ACPI_PCIHP_PROP_BSEL not found"
+   -> object_unparent()
+     <- "Bus doesn't have property ACPI_PCIHP_PROP_BSEL set"
 
-I see piix4_pm_init() disabling use_acpi_pci_hotplug if xen_enabled(),
-later when piix4_device_plug_cb() is called for TYPE_PCI_DEVICE it 
-checks xen_enabled() instead of checking use_acpi_pci_hotplug.
-Same happens in piix4_device_unplug_request_cb(), not sure it can be 
-reached although.
+$ valgrind x86_64-softmmu/qemu-system-x86_64 -M pc-1.2 -nographic -S
+(qemu) device_add ich9-ahci,id=ich9-ahci
+==6604== Invalid read of size 8
+==6604==    at 0x609AB0: object_unparent (object.c:445)
+==6604==    by 0x4C4478: device_unparent (qdev.c:1095)
+==6604==    by 0x60A364: object_finalize_child_property (object.c:1396)
+==6604==    by 0x6092A6: object_property_del_child.isra.7 (object.c:427)
+==6604==    by 0x451728: qdev_device_add (qdev-monitor.c:634)
+==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
+==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
+==6604==    by 0x364083: handle_hmp_command (monitor.c:3119)
+==6604==    by 0x365439: monitor_command_cb (monitor.c:3922)
+==6604==    by 0x6E5D27: readline_handle_byte (readline.c:393)
+==6604==    by 0x364311: monitor_read (monitor.c:3905)
+==6604==    by 0x67C573: mux_chr_read (char-mux.c:216)
+==6604==  Address 0x15fc5448 is 30,328 bytes inside a block of size 36,288 free'd
+==6604==    at 0x4C2ACDD: free (vg_replace_malloc.c:530)
+==6604==    by 0xA04EBCD: g_free (in /usr/lib64/libglib-2.0.so.0.5000.3)
+==6604==    by 0x50100E: pci_ich9_uninit (ich.c:161)
+==6604==    by 0x5428AB: pci_qdev_unrealize (pci.c:1083)
+==6604==    by 0x4C5EE9: device_set_realized (qdev.c:988)
+==6604==    by 0x608DCD: property_set_bool (object.c:1886)
+==6604==    by 0x60CEBE: object_property_set_qobject (qom-qobject.c:27)
+==6604==    by 0x60AB6F: object_property_set_bool (object.c:1162)
+==6604==    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
+==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
+==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
+==6604==    by 0x364083: handle_hmp_command (monitor.c:3119)
+==6604==  Block was alloc'd at
+==6604==    at 0x4C2B975: calloc (vg_replace_malloc.c:711)
+==6604==    by 0xA04EB15: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.5000.3)
+==6604==    by 0x50094F: ahci_realize (ahci.c:1468)
+==6604==    by 0x501098: pci_ich9_ahci_realize (ich.c:115)
+==6604==    by 0x543E6D: pci_qdev_realize (pci.c:2002)
+==6604==    by 0x4C5E69: device_set_realized (qdev.c:914)
+==6604==    by 0x608DCD: property_set_bool (object.c:1886)
+==6604==    by 0x60CEBE: object_property_set_qobject (qom-qobject.c:27)
+==6604==    by 0x60AB6F: object_property_set_bool (object.c:1162)
+==6604==    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
+==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
+==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
 
-My guess is changing !xen_enabled() -> s->use_acpi_pci_hotplug fixes 
-this issue, but I'm not sure this is the safest way to fix it.
+Reported-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <59a56959-ca12-ea75-33fa-ff07eba1b090@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/acpi/piix4.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-I'll send a patch.
-
-Regards,
-
-Phil.
+diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+index f276967365..d4df209a2e 100644
+--- a/hw/acpi/piix4.c
++++ b/hw/acpi/piix4.c
+@@ -385,7 +385,7 @@ static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
+                                 dev, errp);
+         }
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+-        if (!xen_enabled()) {
++        if (s->use_acpi_pci_hotplug) {
+             acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
+                                       errp);
+         }
+@@ -411,7 +411,7 @@ static void piix4_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+         acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotplug,
+                                       dev, errp);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+-        if (!xen_enabled()) {
++        if (s->use_acpi_pci_hotplug) {
+             acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
+                                         errp);
+         }
+-- 
+2.14.1
