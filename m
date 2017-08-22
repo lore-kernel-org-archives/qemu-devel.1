@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dkCti-0008Be-HN
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 13:23:27 -0400
+	(envelope-from <edgar@xilinx.com>) id 1dkCvC-0000uj-RV
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 13:24:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dkCth-0008So-Hg
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 13:23:26 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:37405)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dkCth-0008Sg-9t
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 13:23:25 -0400
-Received: by mail-wm0-x236.google.com with SMTP id b189so2799220wmd.0
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 10:23:25 -0700 (PDT)
+	(envelope-from <edgar@xilinx.com>) id 1dkCv8-0000eN-Br
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 13:24:57 -0400
+Received: from mail-cys01nam02on0079.outbound.protection.outlook.com
+	([104.47.37.79]:61072
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <edgar@xilinx.com>) id 1dkCv8-0000bp-1X
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 13:24:54 -0400
+Date: Wed, 23 Aug 2017 00:24:38 +0700
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Message-ID: <20170822172438.GF3205@toto>
+References: <cover.1502993370.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <7506ab15-7fc8-d46d-12fd-40e4d8820575@freebsd.org>
-References: <9a2562ad-5e8b-52bc-1a59-9e7b7e854ebf@freebsd.org>
-	<CAFEAcA9FOVoTZNr66Y7-Jdq8k6hfnXM4-vAaxaghKTiRcq+mRg@mail.gmail.com>
-	<7506ab15-7fc8-d46d-12fd-40e4d8820575@freebsd.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Aug 2017 18:23:01 +0100
-Message-ID: <CAFEAcA_B7d4SLnZA7zZsnZBAKeMFQEVJU-1okX8EL1vTt3b4oQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] QEMU -> Github Exporter down?
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <cover.1502993370.git.alistair.francis@xilinx.com>
+Subject: Re: [Qemu-devel] [PATCH v1 0/5] Expose the secure property to the
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sean Bruno <sbruno@freebsd.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, alistair23@gmail.com, edgar.iglesias@gmail.com
 
-On 22 August 2017 at 18:04, Sean Bruno <sbruno@freebsd.org> wrote:
->
->
-> On 08/22/17 10:57, Peter Maydell wrote:
->> On 22 August 2017 at 17:52, Sean Bruno <sbruno@freebsd.org> wrote:
->>> I note that there hasn't been any updates to the github copy of the main
->>> project repo.  Just curious if I missed a thing or if someone can go
->>> look to see what's up.
->>
->> Hmm? https://github.com/qemu/qemu has 1f29673 as its head,
->> which is indeed the most recent commit to master.
+On Thu, Aug 17, 2017 at 11:51:59AM -0700, Alistair Francis wrote:
+> The EL2 and EL3 work is working well now and interanlly we now have
+> tests that expect to start in EL3 and transition through EL2 to EL1. To
+> make this easy to run let's expose the secure property to the machine
+> and then use that to enable EL2.
+> 
+> This series also does some machine/name tidying up and makes the first
+> move to deprecating the EP108 machine, which was just an early access
+> development board.
 
-> Huh ... Ok.  I guess I should have checked the head revision.  Sorry for
-> the noise.
+Hi Alistair,
 
-No problem. Master's very quiet at the moment because we're close to
-releasing 2.10.
+Reconsidering this, I tend to agree that we're probably better off with
+EL2/no-GICv2-virt compared to the possible confusiong of having EL2
+without GICv2-virt..
 
-thanks
--- PMM
+But I wonder if we should have similar options as the virt machine?
+I.e, a virtualization option to enable EL2.
+
+Cheers,
+Edgar
+
+
+> 
+> Alistair Francis (5):
+>   xlnx-ep108: Rename to ZCU102
+>   xlnx-zcu102: Manually create the machines
+>   xlnx-zcu102: Add a machine level secure property
+>   xlnx-zynqmp: Allow the secure prop to enable EL2
+>   xlnx-zcu102: Mark the EP108 machine as deprecated
+> 
+>  hw/arm/Makefile.objs                   |   2 +-
+>  hw/arm/{xlnx-ep108.c => xlnx-zcu102.c} | 131 ++++++++++++++++++++++++++++-----
+>  hw/arm/xlnx-zynqmp.c                   |   2 +-
+>  3 files changed, 114 insertions(+), 21 deletions(-)
+>  rename hw/arm/{xlnx-ep108.c => xlnx-zcu102.c} (51%)
+> 
+> -- 
+> 2.11.0
+> 
