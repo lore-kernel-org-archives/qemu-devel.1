@@ -1,22 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dk662-00046m-TA
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:07:43 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dk6Fp-0000CS-NY
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:17:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dk661-0001Ou-Sp
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:07:42 -0400
-References: <1503076096-14220-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA_F1iFu8cbKCyxnjZP+hVY9DkrJZXHqZ65G10BqzcapQw@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f7b75c78-1db3-7e82-d5cb-9cd8266077a9@redhat.com>
-Date: Tue, 22 Aug 2017 12:07:29 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_F1iFu8cbKCyxnjZP+hVY9DkrJZXHqZ65G10BqzcapQw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/allwinner: Fix crash with
- -nodefaults -M cubieboard
+	(envelope-from <el13635@mail.ntua.gr>) id 1dk6Fo-0002zI-Mr
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:17:49 -0400
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Date: Tue, 22 Aug 2017 13:15:29 +0300
+Message-Id: <20170822101535.4695-1-el13635@mail.ntua.gr>
+Subject: [Qemu-devel] [PATCH v7 0/6] add throttle block driver filter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +17,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Li Guang <lig.fnst@cn.fujitsu.com>
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-On 18.08.2017 19:14, Peter Maydell wrote:
-> On 18 August 2017 at 18:08, Thomas Huth <thuth@redhat.com> wrote:
->> The allwinner-a10 device uses serial_hds[0] without checking whether
->> it is available or not. So using the cubieboard with -nodefaults
->> currently results in a segmentation fault. Fix it by adding a
->> proper check here.
->> And while we're at it, mark the device as "user_creatable = false"
->> since this apparently can not directly be used by the users but has
->> to be wired up in code instead.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  hw/arm/allwinner-a10.c | 8 ++++++--
->>  1 file changed, 6 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
->> index f62a9a3..e152566 100644
->> --- a/hw/arm/allwinner-a10.c
->> +++ b/hw/arm/allwinner-a10.c
->> @@ -109,8 +109,10 @@ static void aw_a10_realize(DeviceState *dev, Error **errp)
->>      sysbus_connect_irq(SYS_BUS_DEVICE(&s->sata), 0, s->irq[56]);
->>
->>      /* FIXME use a qdev chardev prop instead of serial_hds[] */
->> -    serial_mm_init(get_system_memory(), AW_A10_UART0_REG_BASE, 2, s->irq[1],
->> -                   115200, serial_hds[0], DEVICE_NATIVE_ENDIAN);
->> +    if (serial_hds[0]) {
->> +        serial_mm_init(get_system_memory(), AW_A10_UART0_REG_BASE, 2, s->irq[1],
->> +                       115200, serial_hds[0], DEVICE_NATIVE_ENDIAN);
->> +    }
-> 
-> This doesn't look like the right fix, because it means that
-> there won't be a UART device at that point in system memory
-> at all. What you want is for there to be a UART device there
-> but not connected to anything, ie serial_mm_init() should cope
-> with being passed a NULL Chardev*.
+This series adds a throttle block driver filter. Currently throttling is done
+at the BlockBackend level. Using block driver interfaces we can move the
+throttling to any point in the BDS graph using a throttle node which uses the
+existing throttling code. This allows for potentially more complex
+configurations (throttling at any point in the graph, chained filters)
 
-OK, makes sense. ... but I guess the patch to fix serial_mm_init() is
-going to be a bigger patch, since serial_realize_core() currently
-expects a char device, too, and thus needs to be reworked, too ... I'll
-try to come up with something when I've got some more spare time...
+v7:
+  remove anonymous groups
+  error on missing throttle-group option on block/throttle.c
+  change switch case format in block/throttle-groups.c (berto)
 
- Thomas
+v6:
+  don't allow named group limit configuration in block/throttle.c; allow either
+        -drive driver=throttle,file.filename=foo.qcow2, \
+            limits.iops-total=...
+      or
+        -drive driver=throttle,file.filename=foo.qcow2,throttle-group=bar
+  fixes suggested by berto
+
+v5:
+  fix crash in 'add aio_context field in ThrottleGroupMember'
+  fix suggestions in block/throttle.c
+
+v4:
+  fix suggestions in block/throttle.c
+  fix suggestions in block/throttle_groups.c
+  add doc note in BlockDevOptionsThrottle
+
+v3:
+  fix style error in 'add aio_context field in ThrottleGroupMember'
+
+v2:
+  change QOM throttle group object name
+  print valid ranges for uint on error
+  move frees in throttle_group_obj_finalize()
+  split throttle_group_{set,get}()
+  add throttle_recurse_is_first_non_filter()
+
+Manos Pitsidianakis (6):
+  block: move ThrottleGroup membership to ThrottleGroupMember
+  block: add aio_context field in ThrottleGroupMember
+  block: tidy ThrottleGroupMember initializations
+  block: convert ThrottleGroup to object with QOM
+  block: add throttle block filter driver
+  qemu-iotests: add 184 for throttle filter driver
+
+ qapi/block-core.json            |  66 +++-
+ include/block/throttle-groups.h |  48 ++-
+ include/qemu/throttle-options.h |  60 ++--
+ include/qemu/throttle.h         |   3 +
+ include/sysemu/block-backend.h  |  20 +-
+ block/block-backend.c           |  62 ++--
+ block/qapi.c                    |   8 +-
+ block/throttle-groups.c         | 737 +++++++++++++++++++++++++++++-----------
+ block/throttle.c                | 250 ++++++++++++++
+ blockdev.c                      |   4 +-
+ tests/test-throttle.c           | 111 +++---
+ util/throttle.c                 | 151 ++++++++
+ block/Makefile.objs             |   1 +
+ tests/qemu-iotests/184          | 205 +++++++++++
+ tests/qemu-iotests/184.out      | 300 ++++++++++++++++
+ tests/qemu-iotests/group        |   1 +
+ 16 files changed, 1706 insertions(+), 321 deletions(-)
+ create mode 100644 block/throttle.c
+ create mode 100755 tests/qemu-iotests/184
+ create mode 100644 tests/qemu-iotests/184.out
+
+-- 
+2.11.0
