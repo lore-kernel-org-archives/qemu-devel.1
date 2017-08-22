@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkA0z-0003tS-BD
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:18:46 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dkA5w-0008CB-NW
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:23:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkA0y-0002xh-EF
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:18:45 -0400
-References: <1503407712-9894-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA-V1igN7Sz3SusczcPadtZC-z4fyw-pvPggGT5VFFMvRA@mail.gmail.com>
-	<8fb75274-09a6-dbd3-5dba-1069d790b689@redhat.com>
-	<CAFEAcA9PdXkh4t7gCT=3GNbD8V+_Abtqe31p2DV+=emyR1chcQ@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6bdaf758-98d1-d99d-20ae-b0f25747d6b1@redhat.com>
-Date: Tue, 22 Aug 2017 16:18:35 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dkA5r-0006Fg-OU
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:23:52 -0400
+Received: from mail-qk0-x234.google.com ([2607:f8b0:400d:c09::234]:34807)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dkA5r-0006FI-K7
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:23:47 -0400
+Received: by mail-qk0-x234.google.com with SMTP id u139so97799996qka.1
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 07:23:47 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170822044155.2451-1-famz@redhat.com>
+	<20170822044155.2451-4-famz@redhat.com>
+	<51a26b62-8ce8-6733-908b-3481a110663e@amsat.org>
+	<20170822140000.GF3210@lemon>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <cf40501d-a61f-6e48-687c-fff4b9db47c4@amsat.org>
+Date: Tue, 22 Aug 2017 11:23:42 -0300
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9PdXkh4t7gCT=3GNbD8V+_Abtqe31p2DV+=emyR1chcQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170822140000.GF3210@lemon>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/digic: Mark device with
- user_creatable = false
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 03/10] tests: Add vm test lib
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +37,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Antony Pavlov <antonynpavlov@gmail.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
 
-On 22.08.2017 16:07, Peter Maydell wrote:
-> On 22 August 2017 at 15:05, Thomas Huth <thuth@redhat.com> wrote:
->> On 22.08.2017 15:52, Peter Maydell wrote:
->>> On 22 August 2017 at 14:15, Thomas Huth <thuth@redhat.com> wrote:
->>>> QEMU currently hangs completely when the user is trying to do a
->>>> "device_add digic" on an unrelated ARM machine like integratorcp.
->>>> Looks like this device is not meant to be hot-pluggable at all, so
->>>> let's simply mark it with "user_creatable =3D false" to avoid the ha=
-ng.
->>>>
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>> ---
->>>>  hw/arm/digic.c | 2 ++
->>>>  1 file changed, 2 insertions(+)
->>>>
->>>> diff --git a/hw/arm/digic.c b/hw/arm/digic.c
->>>> index 94f3263..208dfb3 100644
->>>> --- a/hw/arm/digic.c
->>>> +++ b/hw/arm/digic.c
->>>> @@ -101,6 +101,8 @@ static void digic_class_init(ObjectClass *oc, vo=
-id *data)
->>>>      DeviceClass *dc =3D DEVICE_CLASS(oc);
->>>>
->>>>      dc->realize =3D digic_realize;
->>>> +    /* Reason: Hangs QEMU when trying to device_add this directly *=
-/
->>>> +    dc->user_creatable =3D false;
->>>>  }
->>>
->>> Maybe "uses serial_hds[]" is a better reason, or does it hang for
->>> some other reason?
+On 08/22/2017 11:00 AM, Fam Zheng wrote:
+> On Tue, 08/22 08:19, Philippe Mathieu-Daudé wrote:
+>>> +    def add_source_dir(self, data_dir):
+>>> +        name = "data-" + hashlib.sha1(data_dir).hexdigest()[:5]
+>>> +        tarfile = os.path.join(self._tmpdir, name + ".tar")
+>>> +        logging.debug("Creating archive %s for data dir: %s", tarfile, data_dir)
+>>> +        subprocess.check_call(["tar", "--exclude-vcs",
 >>
->> When I kill the hanging QEMU, the stack trace looks like this:
+>> --exclude-vcs-ignores will process .gitignore,
+> 
+> Sounds useful, thanks!
+> 
+>> you can also list with 'git ls-files',
+>> or generate tarball with scripts/make-release
+> 
+> They won't handle submodules, will they?
+
+"git ls-files --recurse-submodules"
+
+This way you can avoid the --exclude-vcs-ignores which is too recent for 
+NetBSD as remarked Kamil, and avoid the tar --exclude=
+
 >>
->> #0  0x00007ffff13afaff in ppoll () at /lib64/libc.so.6
->> #1  0x0000555555bb3179 in qemu_poll_ns (__ss=3D0x0, __timeout=3D0x7fff=
-ffffda60, __nfds=3D<optimized out>, __fds=3D<optimized out>)
->>     at /usr/include/bits/poll2.h:77
->> #2  0x0000555555bb3179 in qemu_poll_ns (fds=3D<optimized out>, nfds=3D=
-<optimized out>, timeout=3Dtimeout@entry=3D1000000000)
->>     at /home/thuth/devel/qemu/util/qemu-timer.c:334
->> #3  0x0000555555bb3f88 in main_loop_wait (timeout=3D1000000000) at /ho=
-me/thuth/devel/qemu/util/main-loop.c:255
->> #4  0x0000555555bb3f88 in main_loop_wait (nonblocking=3Dnonblocking@en=
-try=3D0) at /home/thuth/devel/qemu/util/main-loop.c:515
->> #5  0x000055555578d927 in main () at /home/thuth/devel/qemu/vl.c:1917
->> #6  0x000055555578d927 in main (argc=3D<optimized out>, argv=3D<optimi=
-zed out>, envp=3D<optimized out>) at /home/thuth/devel/qemu/vl.c:4791
+>>> +                               "--exclude=tests/vm/*.img",
+>>> +                               "--exclude=tests/vm/*.img.*",
+>>> +                               "--exclude=*.d",
+>>> +                               "--exclude=*.o",
+>>> +                               "--exclude=docker-src.*",
+>>> +                               "-cf", tarfile, '.'], cwd=data_dir,
+>>> +                              stdin=self._devnull, stdout=self._stdout)
+>>> +        self._data_args += ["-drive",
+>>> +                            "file=%s,if=none,id=%s,cache=writeback,format=raw" % \
+>>> +                                    (tarfile, name),
+>>> +                            "-device",
+>>> +                            "virtio-blk,drive=%s,serial=%s,bootindex=1" % (name, name)]
 >>
->> I haven't investigated any further, but the usage of serial_hds
->> in the realize function could certainly be the reason. At least
->> it certainly is a reason that this device should not be creatable
->> by the user - so let me send a v2 with the comment changed
->> accordingly.
->=20
-> Has QEMU itself actually hung (no response to monitor etc), or is
-> that just the guest sitting doing nothing? "QEMU is sat in the main
-> loop waiting for something to happen" is what you'd expect in the
-> latter case. The backtraces for the other threads might be of
-> interest or might also be unhelpful.
+>> what about mounting readonly via '-device virtio-9p-pci' (not using
+>> tarball)?
+>>
+> 
+> It doesn't work. That way an out-of-tree build is required in the guest, but if
+> an in-tree build has been done in host side, out-of-tree builds fail.  Also the
+> performance will be much worse, I believe: untar is sequential read, and after
+> that everything is in the guest page cache; with virtio-9p, there will be a
+> large amount of "random" requests between guest and host.
 
-I thought that QEMU would hang ... but now I checked again, and it's
-just that it does not return to the monitor prompt as expected. If I
-press CTRL-a c again, I can get to the monitor again.
-Anyway, QEMU then dies if I try to remove the device with device_del:
-
-qemu/qdev-monitor.c:872:qdev_unplug: assertion failed: (hotplug_ctrl)
-
-... so let's simply mark it with user_creatable =3D false and call it a
-day... ;-)
-
- Thomas
+Indeed you are correct, I didn't think of it, thank to remember me that :)
