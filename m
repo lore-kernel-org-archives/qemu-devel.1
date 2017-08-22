@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7Bu-0007wz-Bb
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:17:52 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7C9-00089z-VL
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:18:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7Br-0002zE-TN
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:17:50 -0400
-Received: from mail-ua0-x230.google.com ([2607:f8b0:400c:c08::230]:36967)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7C1-0003Ct-TK
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:18:05 -0400
+Received: from mail-vk0-x22f.google.com ([2607:f8b0:400c:c05::22f]:37832)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dk7Br-0002y2-NF
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:17:47 -0400
-Received: by mail-ua0-x230.google.com with SMTP id e28so10414714uah.4
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 04:17:47 -0700 (PDT)
+	id 1dk7C1-0003Ca-Kx
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:17:57 -0400
+Received: by mail-vk0-x22f.google.com with SMTP id r199so58122382vke.4
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 04:17:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <8760dn8ygv.fsf@dusky.pond.sub.org>
+In-Reply-To: <87mv6z4ix5.fsf@dusky.pond.sub.org>
 References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
-	<20170727154126.11339-6-marcandre.lureau@redhat.com>
-	<8760dn8ygv.fsf@dusky.pond.sub.org>
+	<20170727154126.11339-8-marcandre.lureau@redhat.com>
+	<87mv6z4ix5.fsf@dusky.pond.sub.org>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 22 Aug 2017 13:17:46 +0200
-Message-ID: <CAJ+F1C+gkZ7MTftTiFSwyLNa23CSyg_q05x8h35F_MyYzTAH7g@mail.gmail.com>
+Date: Tue, 22 Aug 2017 13:17:55 +0200
+Message-ID: <CAJ+F1CKT8MXVSP+UTu6C50Ue18GhiuXAE9rCQbTiB54iw6_YPA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 05/26] visitor: pass size of strings array
- to enum visitor
+Subject: Re: [Qemu-devel] [PATCH 07/26] qapi: add 'if' condition on
+ top-level schema elements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,509 +33,917 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Jason Wang <jasowang@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-hi
+Hi
 
-On Wed, Aug 16, 2017 at 2:54 PM, Markus Armbruster <armbru@redhat.com> wrot=
+On Wed, Aug 16, 2017 at 5:43 PM, Markus Armbruster <armbru@redhat.com> wrot=
 e:
 > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 >
->> The size is known at compile time, this avoids having to compute to
->> check array boundaries.
+>> Add 'if' c-preprocessor condition on top-level schema elements:
+>> struct, enum, union, alternate, command, event.
+>
+> An example would be useful here.  Your cover letter has nice ones, would
+> be a shame not to preserve them for posterity in the commit log.
+>
+
+ok
+
+>> Variants objects types are created outside of #if blocks, since they
+>
+> What are "variants objects types"?
+>
+
+I think I meant implicit objects types, that may be created by variant.
+
+>> may be shared by various types. Even if unused, this shouldn't be an
+>> issue, since those are internal types.
 >>
->> Additionally, the following conditional enum entry change will create
->> "hole" in the generated _lookup tables, that should be skipped.
->>
+>> Note that there is no checks in qapi scripts to verify that elements
+>
+> there are
+>
+>> have compatible conditions (ex: if-struct used by a if-foo
+>> command). This may thus fail at C build time if they don't share the
+>> same subset of conditions.
+>
+> Fair enough.
+>
 >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 >> ---
->>  include/qapi/visitor.h             |  3 ++-
->>  scripts/qapi-visit.py              | 10 +++++-----
->>  include/hw/qdev-core.h             |  1 +
->>  include/qom/object.h               |  4 ++++
->>  qapi/qapi-visit-core.c             | 23 ++++++++++++-----------
->>  backends/hostmem.c                 |  1 +
->>  crypto/secret.c                    |  1 +
->>  crypto/tlscreds.c                  |  1 +
->>  hw/core/qdev-properties.c          | 11 +++++++++--
->>  net/filter.c                       |  1 +
->>  qom/object.c                       | 11 ++++++++---
->>  tests/check-qom-proplist.c         |  1 +
->>  tests/test-qobject-input-visitor.c |  2 +-
->>  13 files changed, 47 insertions(+), 23 deletions(-)
+>>  scripts/qapi.py                         | 153 +++++++++++++++++++++++++=
+-------
+>>  scripts/qapi-commands.py                |   4 +-
+>>  scripts/qapi-event.py                   |   4 +-
+>>  scripts/qapi-introspect.py              |  46 ++++++----
+>>  scripts/qapi-types.py                   |  51 +++++++----
+>>  scripts/qapi-visit.py                   |  13 ++-
+>>  scripts/qapi2texi.py                    |  10 +--
+>>  tests/Makefile.include                  |   1 +
+>>  tests/qapi-schema/bad-if.err            |   1 +
+>>  tests/qapi-schema/bad-if.exit           |   1 +
+>>  tests/qapi-schema/bad-if.json           |   3 +
+>>  tests/qapi-schema/bad-if.out            |   0
+>>  tests/qapi-schema/qapi-schema-test.json |  20 +++++
+>>  tests/qapi-schema/qapi-schema-test.out  |  31 +++++++
+>>  tests/qapi-schema/test-qapi.py          |  21 +++--
+>>  15 files changed, 272 insertions(+), 87 deletions(-)
+>>  create mode 100644 tests/qapi-schema/bad-if.err
+>>  create mode 100644 tests/qapi-schema/bad-if.exit
+>>  create mode 100644 tests/qapi-schema/bad-if.json
+>>  create mode 100644 tests/qapi-schema/bad-if.out
+>>
+>> diff --git a/scripts/qapi.py b/scripts/qapi.py
+>> index 4ecc19e944..79ba1e93da 100644
+>> --- a/scripts/qapi.py
+>> +++ b/scripts/qapi.py
+>> @@ -639,6 +639,16 @@ def add_name(name, info, meta, implicit=3DFalse):
+>>      all_names[name] =3D meta
+>>
+>>
+>> +def check_if(expr, info):
+>> +    ifcond =3D expr.get('if')
+>> +    if not ifcond or isinstance(ifcond, str):
+>> +        return
+>> +    if (not isinstance(ifcond, list) or
+>> +        any([not isinstance(elt, str) for elt in ifcond])):
+>> +        raise QAPISemError(info, "'if' condition requires a string or "
+>> +                           "a list of string")
 >
-> No change to scripts/qapi-types.c.  The generated lookup tables continue
-> to contain the NULL sentinel.  Possibly intentional, because it saves
-> you the trouble of searching for uses of FOO_lookup[FOO__MAX].
+> Wait a second!  What's this list business?  The commit message doesn't
+> say.
+
+Updated commit message, and documented in docs/devel/qapi-code-gen.txt
+
 >
->> diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
->> index fe9faf469f..a2d9786c52 100644
->> --- a/include/qapi/visitor.h
->> +++ b/include/qapi/visitor.h
->> @@ -469,7 +469,8 @@ bool visit_optional(Visitor *v, const char *name, bo=
-ol *present);
->>   * that visit_type_str() must have no unwelcome side effects.
->>   */
->>  void visit_type_enum(Visitor *v, const char *name, int *obj,
->> -                     const char *const strings[], Error **errp);
->> +                     const char *const strings[], int nstrings,
->> +                     Error **errp);
->>
->>  /*
->>   * Check if visitor is an input visitor.
->> diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
->> index bd0b742236..60850a6cdd 100644
->> --- a/scripts/qapi-visit.py
->> +++ b/scripts/qapi-visit.py
->> @@ -147,17 +147,17 @@ out:
->>                   c_name=3Dc_name(name), c_elt_type=3Delement_type.c_nam=
-e())
->>
->>
->> -def gen_visit_enum(name):
->> +def gen_visit_enum(name, prefix):
->>      return mcgen('''
->>
->>  void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s *ob=
-j, Error **errp)
->>  {
->>      int value =3D *obj;
->> -    visit_type_enum(v, name, &value, %(c_name)s_lookup, errp);
->> +    visit_type_enum(v, name, &value, %(c_name)s_lookup, %(c_max)s, errp=
-);
->>      *obj =3D value;
->>  }
->>  ''',
->> -                 c_name=3Dc_name(name))
->> +                 c_name=3Dc_name(name), c_max=3Dc_enum_const(name, '_MA=
-X', prefix))
->>
->>
->>  def gen_visit_alternate(name, variants):
->> @@ -288,10 +288,10 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor)=
-:
->>          if not info:
->>              self._btin +=3D gen_visit_decl(name, scalar=3DTrue)
->>              if do_builtins:
->> -                self.defn +=3D gen_visit_enum(name)
->> +                self.defn +=3D gen_visit_enum(name, prefix)
->>          else:
->>              self.decl +=3D gen_visit_decl(name, scalar=3DTrue)
->> -            self.defn +=3D gen_visit_enum(name)
->> +            self.defn +=3D gen_visit_enum(name, prefix)
->>
->>      def visit_array_type(self, name, info, element_type):
->>          decl =3D gen_visit_decl(name)
->> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
->> index ae317286a4..f86a0e1a75 100644
->> --- a/include/hw/qdev-core.h
->> +++ b/include/hw/qdev-core.h
->> @@ -250,6 +250,7 @@ struct PropertyInfo {
->>      const char *name;
->>      const char *description;
->>      const char * const *enum_table;
->> +    int enum_table_size;
->>      int (*print)(DeviceState *dev, Property *prop, char *dest, size_t l=
-en);
->>      void (*set_default_value)(Object *obj, const Property *prop);
->>      void (*create)(Object *obj, Property *prop, Error **errp);
->> diff --git a/include/qom/object.h b/include/qom/object.h
->> index 1b828994fa..53d807e1e6 100644
->> --- a/include/qom/object.h
->> +++ b/include/qom/object.h
->> @@ -1406,6 +1406,8 @@ void object_class_property_add_bool(ObjectClass *k=
-lass, const char *name,
->>   * @obj: the object to add a property to
->>   * @name: the name of the property
->>   * @typename: the name of the enum data type
->> + * @strings: an array of strings for the enum
+> Also, pep8 gripes:
 >
-> Fixes a preexisting doc buglet.
+>     scripts/qapi.py:647:9: E129 visually indented line with same indent a=
+s next logical line
 >
->> + * @nstrings: the size of @strings
->>   * @get: the getter or %NULL if the property is write-only.
->>   * @set: the setter or %NULL if the property is read-only
->>   * @errp: if an error occurs, a pointer to an area to store the error
->> @@ -1416,6 +1418,7 @@ void object_class_property_add_bool(ObjectClass *k=
-lass, const char *name,
->>  void object_property_add_enum(Object *obj, const char *name,
->>                                const char *typename,
->>                                const char * const *strings,
->> +                              int nstrings,
->>                                int (*get)(Object *, Error **),
->>                                void (*set)(Object *, int, Error **),
->>                                Error **errp);
->> @@ -1423,6 +1426,7 @@ void object_property_add_enum(Object *obj, const c=
-har *name,
->>  void object_class_property_add_enum(ObjectClass *klass, const char *nam=
+
+fixed
+
+>> +
+>> +
+>>  def check_type(info, source, value, allow_array=3DFalse,
+>>                 allow_dict=3DFalse, allow_optional=3DFalse,
+>>                 allow_metas=3D[]):
+>> @@ -865,6 +875,7 @@ def check_keys(expr_elem, meta, required, optional=
+=3D[]):
+>>      expr =3D expr_elem['expr']
+>>      info =3D expr_elem['info']
+>>      name =3D expr[meta]
+>> +    optional.append('if')
+>
+> Caution!
+>
+>     $ python
+>     Python 2.7.13 (default, May 10 2017, 20:04:36)
+>     >>> def surprise(arg=3D[]):
+>     ...     arg.append('if')
+>     ...     return arg
+>     ...
+>     >>> surprise()
+>     ['if']
+>     >>> surprise()
+>     ['if', 'if']
+>     >>> surprise()
+>     ['if', 'if', 'if']
+>
+> Never modify an argument that has list or dictionary default value.  To
+> avoid the temptation, never use such defaul values.
+
+Oops! Without bad consequences here, but fixed anyway.
+
+>
+>>      if not isinstance(name, str):
+>>          raise QAPISemError(info, "'%s' key must have a string value" % =
+meta)
+>>      required =3D required + [meta]
+>> @@ -880,6 +891,8 @@ def check_keys(expr_elem, meta, required, optional=
+=3D[]):
+>>              raise QAPISemError(info,
+>>                                 "'%s' of %s '%s' should only use true va=
+lue"
+>>                                 % (key, meta, name))
+>> +        if key =3D=3D 'if':
+>> +            check_if(expr, info)
+>>      for key in required:
+>>          if key not in expr:
+>>              raise QAPISemError(info, "Key '%s' is missing from %s '%s'"
+>> @@ -989,6 +1002,10 @@ class QAPISchemaEntity(object):
+>>          # such place).
+>>          self.info =3D info
+>>          self.doc =3D doc
+>> +        self.ifcond =3D None
+>> +
+>> +    def set_ifcond(self, ifcond):
+>> +        self.ifcond =3D ifcond
+>
+> @ifcond is an awkward name, but I don't have better ideas.
+
+Yeah, I got used to it now ;)
+
+>
+>>
+>>      def c_name(self):
+>>          return c_name(self.name)
+>> @@ -1017,26 +1034,26 @@ class QAPISchemaVisitor(object):
+>>      def visit_builtin_type(self, name, info, json_type):
+>>          pass
+>>
+>> -    def visit_enum_type(self, name, info, values, prefix):
+>> +    def visit_enum_type(self, name, info, values, prefix, ifcond):
+>>          pass
+>>
+>> -    def visit_array_type(self, name, info, element_type):
+>> +    def visit_array_type(self, name, info, element_type, ifcond):
+>>          pass
+>>
+>> -    def visit_object_type(self, name, info, base, members, variants):
+>> +    def visit_object_type(self, name, info, base, members, variants, if=
+cond):
+>>          pass
+>>
+>> -    def visit_object_type_flat(self, name, info, members, variants):
+>> +    def visit_object_type_flat(self, name, info, members, variants, ifc=
+ond):
+>>          pass
+>>
+>> -    def visit_alternate_type(self, name, info, variants):
+>> +    def visit_alternate_type(self, name, info, variants, ifcond):
+>>          pass
+>>
+>>      def visit_command(self, name, info, arg_type, ret_type,
+>> -                      gen, success_response, boxed):
+>> +                      gen, success_response, boxed, ifcond):
+>>          pass
+>>
+>> -    def visit_event(self, name, info, arg_type, boxed):
+>> +    def visit_event(self, name, info, arg_type, boxed, ifcond):
+>>          pass
+>>
+>>
+>> @@ -1136,7 +1153,7 @@ class QAPISchemaEnumType(QAPISchemaType):
+>>
+>>      def visit(self, visitor):
+>>          visitor.visit_enum_type(self.name, self.info,
+>> -                                self.member_names(), self.prefix)
+>> +                                self.member_names(), self.prefix, self.=
+ifcond)
+>>
+>>
+>>  class QAPISchemaArrayType(QAPISchemaType):
+>> @@ -1149,6 +1166,7 @@ class QAPISchemaArrayType(QAPISchemaType):
+>>      def check(self, schema):
+>>          self.element_type =3D schema.lookup_type(self._element_type_nam=
+e)
+>>          assert self.element_type
+>> +        self.ifcond =3D self.element_type.ifcond
+>>
+>>      def is_implicit(self):
+>>          return True
+>> @@ -1166,7 +1184,8 @@ class QAPISchemaArrayType(QAPISchemaType):
+>>          return 'array of ' + elt_doc_type
+>>
+>>      def visit(self, visitor):
+>> -        visitor.visit_array_type(self.name, self.info, self.element_typ=
+e)
+>> +        visitor.visit_array_type(self.name, self.info, self.element_typ=
 e,
->>                                      const char *typename,
->>                                      const char * const *strings,
->> +                                    int nstrings,
->>                                      int (*get)(Object *, Error **),
->>                                      void (*set)(Object *, int, Error **=
+>> +                                 self.ifcond)
+>>
+>>
+>>  class QAPISchemaObjectType(QAPISchemaType):
+>> @@ -1247,9 +1266,10 @@ class QAPISchemaObjectType(QAPISchemaType):
+>>
+>>      def visit(self, visitor):
+>>          visitor.visit_object_type(self.name, self.info,
+>> -                                  self.base, self.local_members, self.v=
+ariants)
+>> +                                  self.base, self.local_members, self.v=
+ariants,
+>> +                                  self.ifcond)
+>>          visitor.visit_object_type_flat(self.name, self.info,
+>> -                                       self.members, self.variants)
+>> +                                       self.members, self.variants, sel=
+f.ifcond)
+>
+> You break the line before self.ifcond almost everywhere, and when you
+> don't, the line gets long.  This one goes over the limit:
+>
+>     scripts/qapi.py:1285:80: E501 line too long (80 > 79 characters)
+>
+> Suggest to break it before self.ifcond everywhere.
+>
+
+ok
+
+>>
+>>
+>>  class QAPISchemaMember(object):
+>> @@ -1392,7 +1412,8 @@ class QAPISchemaAlternateType(QAPISchemaType):
+>>          return 'value'
+>>
+>>      def visit(self, visitor):
+>> -        visitor.visit_alternate_type(self.name, self.info, self.variant=
+s)
+>> +        visitor.visit_alternate_type(self.name, self.info,
+>> +                                     self.variants, self.ifcond)
+>>
+>>      def is_empty(self):
+>>          return False
+>> @@ -1434,7 +1455,8 @@ class QAPISchemaCommand(QAPISchemaEntity):
+>>      def visit(self, visitor):
+>>          visitor.visit_command(self.name, self.info,
+>>                                self.arg_type, self.ret_type,
+>> -                              self.gen, self.success_response, self.box=
+ed)
+>> +                              self.gen, self.success_response, self.box=
+ed,
+>> +                              self.ifcond)
+>>
+>>
+>>  class QAPISchemaEvent(QAPISchemaEntity):
+>> @@ -1462,7 +1484,8 @@ class QAPISchemaEvent(QAPISchemaEntity):
+>>              raise QAPISemError(self.info, "Use of 'boxed' requires 'dat=
+a'")
+>>
+>>      def visit(self, visitor):
+>> -        visitor.visit_event(self.name, self.info, self.arg_type, self.b=
+oxed)
+>> +        visitor.visit_event(self.name, self.info, self.arg_type, self.b=
+oxed,
+>> +                            self.ifcond)
+>>
+>>
+>>  class QAPISchema(object):
+>> @@ -1481,11 +1504,12 @@ class QAPISchema(object):
+>>              print >>sys.stderr, err
+>>              exit(1)
+>>
+>> -    def _def_entity(self, ent):
+>> +    def _def_entity(self, ent, ifcond=3DNone):
+>>          # Only the predefined types are allowed to not have info
+>>          assert ent.info or self._predefining
+>>          assert ent.name not in self._entity_dict
+>>          self._entity_dict[ent.name] =3D ent
+>> +        ent.set_ifcond(ifcond)
+>
+> .set_ifcond(None) does the right thing.
+>
+> However:
+>
+>>
+>>      def lookup_entity(self, name, typ=3DNone):
+>>          ent =3D self._entity_dict.get(name)
+>> @@ -1534,11 +1558,11 @@ class QAPISchema(object):
+>>      def _make_enum_members(self, values):
+>>          return [QAPISchemaMember(v) for v in values]
+>>
+>> -    def _make_implicit_enum_type(self, name, info, values):
+>> +    def _make_implicit_enum_type(self, name, info, values, ifcond):
+>>          # See also QAPISchemaObjectTypeMember._pretty_owner()
+>>          name =3D name + 'Kind'   # Use namespace reserved by add_name()
+>>          self._def_entity(QAPISchemaEnumType(
+>> -            name, info, None, self._make_enum_members(values), None))
+>> +            name, info, None, self._make_enum_members(values), None), i=
+fcond)
+>>          return name
+>
+> Why is ifcond not a constructor argument like name, info, and so forth?
+> What makes it special?
+>
+
+I think it was easier that way (builder pattern), but it make sense as
+constructor too. Changed
+
+>>
+>>      def _make_array_type(self, element_type, info):
+>> @@ -1547,22 +1571,26 @@ class QAPISchema(object):
+>>              self._def_entity(QAPISchemaArrayType(name, info, element_ty=
+pe))
+>>          return name
+>>
+>> -    def _make_implicit_object_type(self, name, info, doc, role, members=
+):
+>> +    def _make_implicit_object_type(self, name, info, doc, role, members=
+,
+>> +                                   ifcond=3DNone):
+>>          if not members:
+>>              return None
+>>          # See also QAPISchemaObjectTypeMember._pretty_owner()
+>>          name =3D 'q_obj_%s-%s' % (name, role)
+>> -        if not self.lookup_entity(name, QAPISchemaObjectType):
+>> +        if self.lookup_entity(name, QAPISchemaObjectType):
+>> +            assert ifcond is None
+>> +        else:
+>>              self._def_entity(QAPISchemaObjectType(name, info, doc, None=
+,
+>> -                                                  members, None))
+>> +                                                  members, None), ifcon=
+d)
+>>          return name
+>
+> Hmm, this smells like it might be the "variants objects types" mentioned
+> in the commit message.
+>
+> Types made with _make_implicit_object_type():
+>
+> * The wrapper around "simple" union members, by _make_simple_variant()
+>
+> * A flat union's base type when it's implicit, by _def_union_type()
+>
+> * A command's argument type when it's implicit, by _def_command()
+>
+> * An event's argument type when it's implicit, by _def_event()
+>
+> Only the first one can be used more than once, namely when a type occurs
+> in more than one simple union.  The "correct" ifcond is the disjunction
+> of all its user's ifconds.  You make it use the *first* ifcond instead.
+> Wrong: breaks when one of the other simple unions has a condition that
+> is true when the first one's is false.
+>
+> Your commit message suggests you intended to make it unconditional
+> instead.  That would work: the worst that can happen is compiling a few
+> q_obj_FOO_wrapper typedefs and visit_type_q_FOO_wrapper() functions that
+> aren't actually used.  Tolerable, in particular since I hope to get rid
+> of "simple" unions some day.
+>
+> Sadly, it would prevent us from making the visit functions for implicit
+> types static, because unused static functions trigger warnings.  Let's
+> not worry about that now.
+>
+> Generating the disjunction of all conditions wouldn't be terribly hard.
+> I'm not asking for it, though.
+
+I suggest to tackle it as follow-up then. Added a FIXME
+
+
+>
+> You assert that implicit types are unconditional from the second use on.
+> I guess you mean to assert the ones used more than once are
+> unconditional:
+>
+>            typ =3D self.lookup_entity(name, QAPISchemaObjectType)
+>            if typ:
+>                assert ifcond is None and typ.ifcond is None
+>
+> But what you *should* assert is that the conditions are the same:
+>
+>            typ =3D self.lookup_entity(name, QAPISchemaObjectType)
+>            if typ:
+>                assert ifcond =3D=3D typ.ifcond
+>
+>>
+
+ok
+
+>>      def _def_enum_type(self, expr, info, doc):
+>>          name =3D expr['enum']
+>>          data =3D expr['data']
+>>          prefix =3D expr.get('prefix')
+>> -        self._def_entity(QAPISchemaEnumType(
+>> -            name, info, doc, self._make_enum_members(data), prefix))
+>> +        return self._def_entity(QAPISchemaEnumType(
+>> +            name, info, doc, self._make_enum_members(data), prefix),
+>> +                                expr.get('if'))
+>
+> Covers enumeration types.
+>
+> Why return?  The (only) caller throws the value away...
+
+left-over, fixed
+
+>
+>>
+>>      def _make_member(self, name, typ, info):
+>>          optional =3D False
+>> @@ -1584,7 +1612,8 @@ class QAPISchema(object):
+>>          data =3D expr['data']
+>>          self._def_entity(QAPISchemaObjectType(name, info, doc, base,
+>>                                                self._make_members(data, =
+info),
+>> -                                              None))
+>> +                                              None),
+>> +                         expr.get('if'))
+>
+> Covers struct types.
+>
+>>
+>>      def _make_variant(self, case, typ):
+>>          return QAPISchemaObjectTypeVariant(case, typ)
+>> @@ -1593,8 +1622,10 @@ class QAPISchema(object):
+>>          if isinstance(typ, list):
+>>              assert len(typ) =3D=3D 1
+>>              typ =3D self._make_array_type(typ[0], info)
+>> +        type_entity =3D self.lookup_type(typ)
+>>          typ =3D self._make_implicit_object_type(
+>> -            typ, info, None, 'wrapper', [self._make_member('data', typ,=
+ info)])
+>> +            typ, info, None, 'wrapper',
+>> +            [self._make_member('data', typ, info)], type_entity.ifcond)
+>>          return QAPISchemaObjectTypeVariant(case, typ)
+>
+> A simple union member's wrapper type inherits its condition from the
+> member type.
+>
+> I think you need to pass None instead of type_entity.ifcond here.
+
+That doesn't work, visitor symbols are missing in generated code. Why
+shouldn't the wrapper share the same condition as the underlying type?
+
+>
+>>
+>>      def _def_union_type(self, expr, info, doc):
+>> @@ -1604,8 +1635,9 @@ class QAPISchema(object):
+>>          tag_name =3D expr.get('discriminator')
+>>          tag_member =3D None
+>>          if isinstance(base, dict):
+>> -            base =3D (self._make_implicit_object_type(
+>> -                name, info, doc, 'base', self._make_members(base, info)=
+))
+>> +            base =3D self._make_implicit_object_type(
+>> +                name, info, doc, 'base', self._make_members(base, info)=
+,
+>> +                expr.get('if'))
+>
+> A flat union's implicit base type inherits its condition from the flat
+> union.  Good.
+>
+>>          if tag_name:
+>>              variants =3D [self._make_variant(key, value)
+>>                          for (key, value) in data.iteritems()]
+>> @@ -1614,14 +1646,16 @@ class QAPISchema(object):
+>>              variants =3D [self._make_simple_variant(key, value, info)
+>>                          for (key, value) in data.iteritems()]
+>>              typ =3D self._make_implicit_enum_type(name, info,
+>> -                                                [v.name for v in varian=
+ts])
+>> +                                                [v.name for v in varian=
+ts],
+>> +                                                expr.get('if'))
+>
+> A flat union's implicit enumeration type inherits its condition from the
+> flat union.  Good.
+>
+>>              tag_member =3D QAPISchemaObjectTypeMember('type', typ, Fals=
+e)
+>>              members =3D [tag_member]
+>>          self._def_entity(
+>>              QAPISchemaObjectType(name, info, doc, base, members,
+>>                                   QAPISchemaObjectTypeVariants(tag_name,
+>>                                                                tag_membe=
+r,
+>> -                                                              variants)=
+))
+>> +                                                              variants)=
 ),
->>                                      Error **errp);
->> diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
->> index ed6d2af462..dc0b9f2cee 100644
->> --- a/qapi/qapi-visit-core.c
->> +++ b/qapi/qapi-visit-core.c
->> @@ -333,14 +333,13 @@ void visit_type_null(Visitor *v, const char *name,=
- QNull **obj,
->>  }
+>> +            expr.get('if'))
+>
+> Covers union types.
+>
+> Third use of expr.get('if') in this function.  Please put it in a
+> variable.
+>
+> Actually, do that for *all* uses of expr[X] and expr.get(X) in class
+> QAPISchema, because that's how the existing code works.
+
+done
+
+>
 >>
->>  static void output_type_enum(Visitor *v, const char *name, int *obj,
->> -                             const char *const strings[], Error **errp)
->> +                             const char *const strings[],
->> +                             int nstrings, Error **errp)
->>  {
->> -    int i =3D 0;
->>      int value =3D *obj;
->>      char *enum_str;
+>>      def _def_alternate_type(self, expr, info, doc):
+>>          name =3D expr['alternate']
+>> @@ -1633,7 +1667,8 @@ class QAPISchema(object):
+>>              QAPISchemaAlternateType(name, info, doc,
+>>                                      QAPISchemaObjectTypeVariants(None,
+>>                                                                   tag_me=
+mber,
+>> -                                                                 varian=
+ts)))
+>> +                                                                 varian=
+ts)),
+>> +            expr.get('if'))
+>
+> Covers alternate types.
+>
 >>
->> -    while (strings[i++] !=3D NULL);
+>>      def _def_command(self, expr, info, doc):
+>>          name =3D expr['command']
+>> @@ -1644,12 +1679,14 @@ class QAPISchema(object):
+>>          boxed =3D expr.get('boxed', False)
+>>          if isinstance(data, OrderedDict):
+>>              data =3D self._make_implicit_object_type(
+>> -                name, info, doc, 'arg', self._make_members(data, info))
+>> +                name, info, doc, 'arg', self._make_members(data, info),
+>> +                expr.get('if'))
 >
-> This is the computation we save.
+> A command's implicit argument type inherits its condition from the
+> command.  Good.
 >
->> -    if (value < 0 || value >=3D i - 1) {
->> +    if (value < 0 || value >=3D nstrings) {
->>          error_setg(errp, QERR_INVALID_PARAMETER, name ? name : "null");
->>          return;
->>      }
->> @@ -350,7 +349,8 @@ static void output_type_enum(Visitor *v, const char =
-*name, int *obj,
->>  }
+>>          if isinstance(rets, list):
+>>              assert len(rets) =3D=3D 1
+>>              rets =3D self._make_array_type(rets[0], info)
+>>          self._def_entity(QAPISchemaCommand(name, info, doc, data, rets,
+>> -                                           gen, success_response, boxed=
+))
+>> +                                           gen, success_response, boxed=
+),
+>> +                         expr.get('if'))
+>
+> Covers commands.
+>
 >>
->>  static void input_type_enum(Visitor *v, const char *name, int *obj,
->> -                            const char *const strings[], Error **errp)
->> +                            const char *const strings[],
->> +                            int nstrings, Error **errp)
->>  {
->>      Error *local_err =3D NULL;
->>      int64_t value =3D 0;
->> @@ -362,14 +362,14 @@ static void input_type_enum(Visitor *v, const char=
- *name, int *obj,
->>          return;
->>      }
+>>      def _def_event(self, expr, info, doc):
+>>          name =3D expr['event']
+>> @@ -1657,8 +1694,10 @@ class QAPISchema(object):
+>>          boxed =3D expr.get('boxed', False)
+>>          if isinstance(data, OrderedDict):
+>>              data =3D self._make_implicit_object_type(
+>> -                name, info, doc, 'arg', self._make_members(data, info))
+>> -        self._def_entity(QAPISchemaEvent(name, info, doc, data, boxed))
+>> +                name, info, doc, 'arg', self._make_members(data, info),
+>> +                expr.get('if'))
+>
+> An event's implicit argument type inherits its condition from the
+> command.  Good.
+>
+>> +        self._def_entity(QAPISchemaEvent(name, info, doc, data, boxed),
+>> +                         expr.get('if'))
+>
+> Covers events.  You got them all.  Good.
+>
 >>
->> -    while (strings[value] !=3D NULL) {
->
-> This is the predicate that becomes invalid when we put holes into
-> strings[].
->
->> -        if (strcmp(strings[value], enum_str) =3D=3D 0) {
->> +    while (value < nstrings) {
->> +        if (strings[value] && strcmp(strings[value], enum_str) =3D=3D 0=
-) {
->
-> I'd prefer !strcmp().
->
->>              break;
->>          }
->>          value++;
->>      }
+>>      def _def_exprs(self):
+>>          for expr_elem in self.exprs:
+>> @@ -1848,6 +1887,54 @@ def guardend(name):
+>>                   name=3Dguardname(name))
 >>
->> -    if (strings[value] =3D=3D NULL) {
->> +    if (value >=3D nstrings || strings[value] =3D=3D NULL) {
+>>
+>> +def gen_if(ifcond, func=3D''):
+>> +    if not ifcond:
+>> +        return ''
+>> +    if isinstance(ifcond, str):
+>> +        ifcond =3D [ifcond]
+>> +    ret =3D '\n'
+>> +    for ifc in ifcond:
+>> +        ret +=3D mcgen('#if %(ifcond)s /* %(func)s */\n', ifcond=3Difc,=
+ func=3Dfunc)
+>> +    ret +=3D '\n'
+>> +    return ret
+>
+> Please use mcgen() like the existing code:
+>
+
+mcgen() does indent and fails with pre-processor lines. I added a comment
+
+>            ret +=3D mcgen('''
+>    #if %(ifcond)s /* %(func)s */
+>    ''', ifcond=3Difc, func=3Dfunc)
+>
+> With the default value of @func, we get a useless, ugly comment /* */.
+> If this can happen, please suppress the comment.  Else, drop @func's
+> default value.
+>
+> Lists appear to be conjunctions.  What for?
+
+I added some doc in qapi-code-gen.txt
+
+>
+>> +
+>> +
+>> +def gen_endif(ifcond, func=3D''):
+>> +    if not ifcond:
+>> +        return ''
+>> +    if isinstance(ifcond, str):
+>> +        ifcond =3D [ifcond]
+>> +    ret =3D '\n'
+>> +    for ifc in reversed(ifcond):
+>> +        ret +=3D mcgen('#endif /* %(ifcond)s %(func)s */\n',
+>> +                     ifcond=3Difc, func=3Dfunc)
+>> +    ret +=3D '\n'
+>> +    return ret
+>
+> Likewise.
+>
+>> +
+>> +
+>> +# wrap a method to add #if / #endif to generated code
+>> +# self must have 'if_members' listing the attributes to wrap
+>> +# the last argument of the wrapped function must be the 'ifcond'
+>
+> Start your sentences with a capital letter, and end them with a period,
+> please.
+
+ok
+
+>
+>> +def if_wrap(func):
+>
+> Blank line, please.
+
+ok
+
+>
+>> +    def func_wrapper(self, *args, **kwargs):
+>> +        funcname =3D self.__class__.__name__ + '.' + func.__name__
+>> +        ifcond =3D args[-1]
+>> +        save =3D {}
+>> +        for mem in self.if_members:
+>> +            save[mem] =3D getattr(self, mem)
+>> +        func(self, *args, **kwargs)
+>> +        for mem, val in save.items():
+>> +            newval =3D getattr(self, mem)
+>> +            if newval !=3D val:
+>> +                assert newval.startswith(val)
+>> +                newval =3D newval[len(val):]
+>> +                val +=3D gen_if(ifcond, funcname)
+>
+> Emitting comments pointing to the QAPI schema into the generated code is
+> often helpful.  But this one points to QAPI generator code.  Why is that
+> useful?
+
+That was mostly useful during development, removed
+
+>
+>> +                val +=3D newval
+>> +                val +=3D gen_endif(ifcond, funcname)
+>> +            setattr(self, mem, val)
+>> +
+>> +    return func_wrapper
+>> +
+>
+> pep8 again:
+>
+>     scripts/qapi.py:1955:1: E302 expected 2 blank lines, found 1
+>
+> Peeking ahead: this function is used as a decorator.  Let's help the
+> reader and mention that in the function comment, or by naming the
+> function suitably.  ifcond_decorator?
+
+done
+
+>
+> Messing with the wrapped method's class's attributes is naughty.  Worse,
+> it's hard to understand.  What alternatives have you considered?
+
+Well, I started writing the code that checked if members got code
+added, I had to put some enter()/leave() code everywhere. Then I
+realize this could easily be the job for a decorator. I think the end
+result is pretty neat. If you have a better idea, can you do it in a
+follow-up?
+
+>
+>>  def gen_enum_lookup(name, values, prefix=3DNone):
+>>      ret =3D mcgen('''
+>>
+>> diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
+>> index 974d0a4a80..19b1bb9b88 100644
+>> --- a/scripts/qapi-commands.py
+>> +++ b/scripts/qapi-commands.py
+>> @@ -228,6 +228,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor)=
+:
+>>          self.defn =3D None
+>>          self._regy =3D None
+>>          self._visited_ret_types =3D None
+>> +        self.if_members =3D ['decl', 'defn', '_regy']
+>>
+>>      def visit_begin(self, schema):
+>>          self.decl =3D ''
+>> @@ -240,8 +241,9 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor)=
+:
+>>          self._regy =3D None
+>>          self._visited_ret_types =3D None
+>>
+>> +    @if_wrap
+>>      def visit_command(self, name, info, arg_type, ret_type,
+>> -                      gen, success_response, boxed):
+>> +                      gen, success_response, boxed, ifcond):
+>>          if not gen:
+>>              return
+>>          self.decl +=3D gen_command_decl(name, arg_type, boxed, ret_type=
+)
+>> diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
+>> index bcbef1035f..cad9ece790 100644
+>> --- a/scripts/qapi-event.py
+>> +++ b/scripts/qapi-event.py
+>> @@ -152,6 +152,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
+>>          self.decl =3D None
+>>          self.defn =3D None
+>>          self._event_names =3D None
+>> +        self.if_members =3D ['decl', 'defn']
+>>
+>>      def visit_begin(self, schema):
+>>          self.decl =3D ''
+>> @@ -163,7 +164,8 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
+>>          self.defn +=3D gen_enum_lookup(event_enum_name, self._event_nam=
+es)
+>>          self._event_names =3D None
+>>
+>> -    def visit_event(self, name, info, arg_type, boxed):
+>> +    @if_wrap
+>> +    def visit_event(self, name, info, arg_type, boxed, ifcond):
+>>          self.decl +=3D gen_event_send_decl(name, arg_type, boxed)
+>>          self.defn +=3D gen_event_send(name, arg_type, boxed)
+>>          self._event_names.append(name)
+>> diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
+>> index fc72cdb66d..ecfb0f2752 100644
+>> --- a/scripts/qapi-introspect.py
+>> +++ b/scripts/qapi-introspect.py
+>> @@ -12,7 +12,7 @@
+>>  from qapi import *
+>>
+>>
+>> -def to_qlit(obj, level=3D0, first_indent=3DTrue):
+>> +def to_qlit(obj, level=3D0, first_indent=3DTrue, suffix=3D''):
+>>      def indent(level):
+>>          return level * 4 * ' '
+>>      ret =3D ''
+>> @@ -20,14 +20,20 @@ def to_qlit(obj, level=3D0, first_indent=3DTrue):
+>>          ret +=3D indent(level)
+>>      if obj is None:
+>>          ret +=3D 'QLIT_QNULL'
+>> +    elif isinstance(obj, tuple):
+>> +        obj, ifcond =3D  obj
+>> +        ret +=3D gen_if(ifcond)
+>> +        ret +=3D to_qlit(obj, level, False) + suffix
+>
+> Keyword argument instead of bare False, please.
+
+ok
+
+>
+>> +        ret +=3D gen_endif(ifcond)
+>> +        suffix =3D ''
+>
+> New case tuple, for generating conditionals.  Okay.
+>
+>>      elif isinstance(obj, str):
+>>          ret +=3D 'QLIT_QSTR(' + '"' + obj.replace('"', r'\"') + '"' + '=
+)'
+>>      elif isinstance(obj, list):
+>> -        elts =3D [to_qlit(elt, level + 1)
+>> +        elts =3D [to_qlit(elt, level + 1, True, ",")
 >
 > Make that
 >
->        if (value =3D=3D nstrings) {
+>            elts =3D [to_qlit(elt, level + 1, suffix=3D",")
+
+ok
+
 >
-> to match the loop above.
+>>                  for elt in obj]
+>>          elts.append(indent(level + 1) + "{ }")
+>>          ret +=3D 'QLIT_QLIST(((QLitObject[]) {\n'
+>> -        ret +=3D ',\n'.join(elts) + '\n'
+>> +        ret +=3D '\n'.join(elts) + '\n'
+>>          ret +=3D indent(level) + '}))'
+>>      elif isinstance(obj, dict):
+>>          elts =3D [ indent(level + 1) + '{ "%s", %s }' %
+>> @@ -39,7 +45,7 @@ def to_qlit(obj, level=3D0, first_indent=3DTrue):
+>>          ret +=3D indent(level) + '}))'
+>>      else:
+>>          assert False                # not implemented
+>> -    return ret
+>> +    return ret + suffix
 >
->>          error_setg(errp, QERR_INVALID_PARAMETER, enum_str);
->>          g_free(enum_str);
->>          return;
->> @@ -380,16 +380,17 @@ static void input_type_enum(Visitor *v, const char=
- *name, int *obj,
->>  }
->>
->>  void visit_type_enum(Visitor *v, const char *name, int *obj,
->> -                     const char *const strings[], Error **errp)
->> +                     const char *const strings[], int nstrings,
->> +                     Error **errp)
->>  {
->>      assert(obj && strings);
->>      trace_visit_type_enum(v, name, obj);
->>      switch (v->type) {
->>      case VISITOR_INPUT:
->> -        input_type_enum(v, name, obj, strings, errp);
->> +        input_type_enum(v, name, obj, strings, nstrings, errp);
->>          break;
->>      case VISITOR_OUTPUT:
->> -        output_type_enum(v, name, obj, strings, errp);
->> +        output_type_enum(v, name, obj, strings, nstrings, errp);
->>          break;
->>      case VISITOR_CLONE:
->>          /* nothing further to do, scalar value was already copied by
->> diff --git a/backends/hostmem.c b/backends/hostmem.c
->> index 4606b73849..fc475a5387 100644
->> --- a/backends/hostmem.c
->> +++ b/backends/hostmem.c
->> @@ -396,6 +396,7 @@ host_memory_backend_class_init(ObjectClass *oc, void=
- *data)
->>          NULL, NULL, &error_abort);
->>      object_class_property_add_enum(oc, "policy", "HostMemPolicy",
->>          HostMemPolicy_lookup,
->> +        HOST_MEM_POLICY__MAX,
->>          host_memory_backend_get_policy,
->>          host_memory_backend_set_policy, &error_abort);
->>      object_class_property_add_str(oc, "id", get_id, set_id, &error_abor=
-t);
->> diff --git a/crypto/secret.c b/crypto/secret.c
->> index 285ab7a63c..b5382cb7e3 100644
->> --- a/crypto/secret.c
->> +++ b/crypto/secret.c
->> @@ -379,6 +379,7 @@ qcrypto_secret_class_init(ObjectClass *oc, void *dat=
-a)
->>      object_class_property_add_enum(oc, "format",
->>                                     "QCryptoSecretFormat",
->>                                     QCryptoSecretFormat_lookup,
->> +                                   QCRYPTO_SECRET_FORMAT__MAX,
->>                                     qcrypto_secret_prop_get_format,
->>                                     qcrypto_secret_prop_set_format,
->>                                     NULL);
->> diff --git a/crypto/tlscreds.c b/crypto/tlscreds.c
->> index a8965531b6..8c060127ea 100644
->> --- a/crypto/tlscreds.c
->> +++ b/crypto/tlscreds.c
->> @@ -234,6 +234,7 @@ qcrypto_tls_creds_class_init(ObjectClass *oc, void *=
-data)
->>      object_class_property_add_enum(oc, "endpoint",
->>                                     "QCryptoTLSCredsEndpoint",
->>                                     QCryptoTLSCredsEndpoint_lookup,
->> +                                   QCRYPTO_TLS_CREDS_ENDPOINT__MAX,
->>                                     qcrypto_tls_creds_prop_get_endpoint,
->>                                     qcrypto_tls_creds_prop_set_endpoint,
->>                                     NULL);
->> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
->> index 078fc5d239..696fed5b5b 100644
->> --- a/hw/core/qdev-properties.c
->> +++ b/hw/core/qdev-properties.c
->> @@ -52,7 +52,8 @@ static void get_enum(Object *obj, Visitor *v, const ch=
-ar *name, void *opaque,
->>      Property *prop =3D opaque;
->>      int *ptr =3D qdev_get_prop_ptr(dev, prop);
->>
->> -    visit_type_enum(v, prop->name, ptr, prop->info->enum_table, errp);
->> +    visit_type_enum(v, prop->name, ptr, prop->info->enum_table,
->> +                    prop->info->enum_table_size, errp);
->>  }
->>
->>  static void set_enum(Object *obj, Visitor *v, const char *name, void *o=
-paque,
->> @@ -67,7 +68,8 @@ static void set_enum(Object *obj, Visitor *v, const ch=
-ar *name, void *opaque,
->>          return;
->>      }
->>
->> -    visit_type_enum(v, prop->name, ptr, prop->info->enum_table, errp);
->> +    visit_type_enum(v, prop->name, ptr, prop->info->enum_table,
->> +                    prop->info->enum_table_size, errp);
->>  }
->>
->>  static void set_default_value_enum(Object *obj, const Property *prop)
->> @@ -586,6 +588,7 @@ const PropertyInfo qdev_prop_on_off_auto =3D {
->>      .name =3D "OnOffAuto",
->>      .description =3D "on/off/auto",
->>      .enum_table =3D OnOffAuto_lookup,
->> +    .enum_table_size =3D ON_OFF_AUTO__MAX,
->>      .get =3D get_enum,
->>      .set =3D set_enum,
->>      .set_default_value =3D set_default_value_enum,
->> @@ -598,6 +601,7 @@ QEMU_BUILD_BUG_ON(sizeof(LostTickPolicy) !=3D sizeof=
-(int));
->>  const PropertyInfo qdev_prop_losttickpolicy =3D {
->>      .name  =3D "LostTickPolicy",
->>      .enum_table  =3D LostTickPolicy_lookup,
->> +    .enum_table_size =3D LOST_TICK_POLICY__MAX,
->>      .get   =3D get_enum,
->>      .set   =3D set_enum,
->>      .set_default_value =3D set_default_value_enum,
->> @@ -612,6 +616,7 @@ const PropertyInfo qdev_prop_blockdev_on_error =3D {
->>      .description =3D "Error handling policy, "
->>                     "report/ignore/enospc/stop/auto",
->>      .enum_table =3D BlockdevOnError_lookup,
->> +    .enum_table_size =3D BLOCKDEV_ON_ERROR__MAX,
->>      .get =3D get_enum,
->>      .set =3D set_enum,
->>      .set_default_value =3D set_default_value_enum,
->> @@ -626,6 +631,7 @@ const PropertyInfo qdev_prop_bios_chs_trans =3D {
->>      .description =3D "Logical CHS translation algorithm, "
->>                     "auto/none/lba/large/rechs",
->>      .enum_table =3D BiosAtaTranslation_lookup,
->> +    .enum_table_size =3D BIOS_ATA_TRANSLATION__MAX,
->>      .get =3D get_enum,
->>      .set =3D set_enum,
->>      .set_default_value =3D set_default_value_enum,
->> @@ -638,6 +644,7 @@ const PropertyInfo qdev_prop_fdc_drive_type =3D {
->>      .description =3D "FDC drive type, "
->>                     "144/288/120/none/auto",
->>      .enum_table =3D FloppyDriveType_lookup,
->> +    .enum_table_size =3D FLOPPY_DRIVE_TYPE__MAX,
->>      .get =3D get_enum,
->>      .set =3D set_enum,
->>      .set_default_value =3D set_default_value_enum,
->> diff --git a/net/filter.c b/net/filter.c
->> index 1dfd2caa23..cf62851344 100644
->> --- a/net/filter.c
->> +++ b/net/filter.c
->> @@ -180,6 +180,7 @@ static void netfilter_init(Object *obj)
->>                              NULL);
->>      object_property_add_enum(obj, "queue", "NetFilterDirection",
->>                               NetFilterDirection_lookup,
->> +                             NET_FILTER_DIRECTION__MAX,
->>                               netfilter_get_direction, netfilter_set_dir=
-ection,
->>                               NULL);
->>      object_property_add_str(obj, "status",
->> diff --git a/qom/object.c b/qom/object.c
->> index fe6e744b4d..425bae3a2a 100644
->> --- a/qom/object.c
->> +++ b/qom/object.c
->> @@ -1247,6 +1247,7 @@ uint64_t object_property_get_uint(Object *obj, con=
-st char *name,
->>
->>  typedef struct EnumProperty {
->>      const char * const *strings;
->> +    int nstrings;
->>      int (*get)(Object *, Error **);
->>      void (*set)(Object *, int, Error **);
->>  } EnumProperty;
->> @@ -1284,7 +1285,7 @@ int object_property_get_enum(Object *obj, const ch=
-ar *name,
->>      visit_complete(v, &str);
->>      visit_free(v);
->>      v =3D string_input_visitor_new(str);
->> -    visit_type_enum(v, name, &ret, enumprop->strings, errp);
->> +    visit_type_enum(v, name, &ret, enumprop->strings, enumprop->nstring=
-s, errp);
->
-> Long line.
+> This is getting really hard to review --- my brain is about to overflow
+> and shut down for the day.  Can you split off some preparatory work?
+> The introduction of suffix here, perhaps?
+
+ok
+
 >
 >>
->>      g_free(str);
->>      visit_free(v);
->> @@ -1950,7 +1951,7 @@ static void property_get_enum(Object *obj, Visitor=
- *v, const char *name,
->>          return;
->>      }
 >>
->> -    visit_type_enum(v, name, &value, prop->strings, errp);
->> +    visit_type_enum(v, name, &value, prop->strings, prop->nstrings, err=
-p);
->>  }
+>>  class QAPISchemaGenIntrospectVisitor(QAPISchemaVisitor):
+>> @@ -113,12 +119,12 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+>>              return '[' + self._use_type(typ.element_type) + ']'
+>>          return self._name(typ.name)
 >>
->>  static void property_set_enum(Object *obj, Visitor *v, const char *name=
-,
->> @@ -1960,7 +1961,7 @@ static void property_set_enum(Object *obj, Visitor=
- *v, const char *name,
->>      int value;
->>      Error *err =3D NULL;
+>> -    def _gen_qlit(self, name, mtype, obj):
+>> +    def _gen_qlit(self, name, mtype, obj, ifcond):
+>>          if mtype not in ('command', 'event', 'builtin', 'array'):
+>>              name =3D self._name(name)
+>>          obj['name'] =3D name
+>>          obj['meta-type'] =3D mtype
+>> -        self._qlits.append(obj)
+>> +        self._qlits.append((obj, ifcond))
 >>
->> -    visit_type_enum(v, name, &value, prop->strings, &err);
->> +    visit_type_enum(v, name, &value, prop->strings, prop->nstrings, &er=
-r);
->>      if (err) {
->>          error_propagate(errp, err);
->>          return;
->> @@ -1978,6 +1979,7 @@ static void property_release_enum(Object *obj, con=
-st char *name,
->>  void object_property_add_enum(Object *obj, const char *name,
->>                                const char *typename,
->>                                const char * const *strings,
->> +                              int nstrings,
->>                                int (*get)(Object *, Error **),
->>                                void (*set)(Object *, int, Error **),
->>                                Error **errp)
->> @@ -1986,6 +1988,7 @@ void object_property_add_enum(Object *obj, const c=
-har *name,
->>      EnumProperty *prop =3D g_malloc(sizeof(*prop));
+>>      def _gen_member(self, member):
+>>          ret =3D {'name': member.name, 'type': self._use_type(member.typ=
+e)}
+>> @@ -134,38 +140,40 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+>>          return {'case': variant.name, 'type': self._use_type(variant.ty=
+pe)}
 >>
->>      prop->strings =3D strings;
->> +    prop->nstrings =3D nstrings;
->>      prop->get =3D get;
->>      prop->set =3D set;
+>>      def visit_builtin_type(self, name, info, json_type):
+>> -        self._gen_qlit(name, 'builtin', {'json-type': json_type})
+>> +        self._gen_qlit(name, 'builtin', {'json-type': json_type}, None)
 >>
->> @@ -2003,6 +2006,7 @@ void object_property_add_enum(Object *obj, const c=
-har *name,
->>  void object_class_property_add_enum(ObjectClass *klass, const char *nam=
-e,
->>                                      const char *typename,
->>                                      const char * const *strings,
->> +                                    int nstrings,
->>                                      int (*get)(Object *, Error **),
->>                                      void (*set)(Object *, int, Error **=
-),
->>                                      Error **errp)
->> @@ -2011,6 +2015,7 @@ void object_class_property_add_enum(ObjectClass *k=
-lass, const char *name,
->>      EnumProperty *prop =3D g_malloc(sizeof(*prop));
+>> -    def visit_enum_type(self, name, info, values, prefix):
+>> -        self._gen_qlit(name, 'enum', {'values': values})
+>> +    def visit_enum_type(self, name, info, values, prefix, ifcond):
+>> +        self._gen_qlit(name, 'enum', {'values': values}, ifcond)
 >>
->>      prop->strings =3D strings;
->> +    prop->nstrings =3D nstrings;
->>      prop->get =3D get;
->>      prop->set =3D set;
+>> -    def visit_array_type(self, name, info, element_type):
+>> +    def visit_array_type(self, name, info, element_type, ifcond):
+>>          element =3D self._use_type(element_type)
+>> -        self._gen_qlit('[' + element + ']', 'array', {'element-type': e=
+lement})
+>> +        self._gen_qlit('[' + element + ']', 'array', {'element-type': e=
+lement},
+>> +                       ifcond)
 >>
->> diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
->> index 432b66585f..1179030248 100644
->> --- a/tests/check-qom-proplist.c
->> +++ b/tests/check-qom-proplist.c
->> @@ -143,6 +143,7 @@ static void dummy_class_init(ObjectClass *cls, void =
-*data)
->>      object_class_property_add_enum(cls, "av",
->>                                     "DummyAnimal",
->>                                     dummy_animal_map,
->> +                                   DUMMY_LAST,
->>                                     dummy_get_av,
->>                                     dummy_set_av,
->>                                     NULL);
->> diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-inp=
-ut-visitor.c
->> index 1969733971..4da5d02c35 100644
->> --- a/tests/test-qobject-input-visitor.c
->> +++ b/tests/test-qobject-input-visitor.c
->> @@ -1110,7 +1110,7 @@ static void test_visitor_in_fail_struct_missing(Te=
-stInputVisitorData *data,
->>      error_free_or_abort(&err);
->>      visit_optional(v, "optional", &present);
->>      g_assert(!present);
->> -    visit_type_enum(v, "enum", &en, EnumOne_lookup, &err);
->> +    visit_type_enum(v, "enum", &en, EnumOne_lookup, ENUM_ONE__MAX, &err=
-);
->>      error_free_or_abort(&err);
->>      visit_type_int(v, "i64", &i64, &err);
->>      error_free_or_abort(&err);
+>> -    def visit_object_type_flat(self, name, info, members, variants):
+>> +    def visit_object_type_flat(self, name, info, members, variants, ifc=
+ond):
+>>          obj =3D {'members': [self._gen_member(m) for m in members]}
+>>          if variants:
+>>              obj.update(self._gen_variants(variants.tag_member.name,
+>>                                            variants.variants))
+>> -        self._gen_qlit(name, 'object', obj)
+>> +        self._gen_qlit(name, 'object', obj, ifcond)
+>>
+>> -    def visit_alternate_type(self, name, info, variants):
+>> +    def visit_alternate_type(self, name, info, variants, ifcond):
+>>          self._gen_qlit(name, 'alternate',
+>>                         {'members': [{'type': self._use_type(m.type)}
+>> -                                    for m in variants.variants]})
+>> +                                    for m in variants.variants]}, ifcon=
+d)
+>>
+>>      def visit_command(self, name, info, arg_type, ret_type,
+>> -                      gen, success_response, boxed):
+>> +                      gen, success_response, boxed, ifcond):
+>>          arg_type =3D arg_type or self._schema.the_empty_object_type
+>>          ret_type =3D ret_type or self._schema.the_empty_object_type
+>>          self._gen_qlit(name, 'command',
+>>                         {'arg-type': self._use_type(arg_type),
+>> -                        'ret-type': self._use_type(ret_type)})
+>> +                        'ret-type': self._use_type(ret_type)}, ifcond)
+>>
+>> -    def visit_event(self, name, info, arg_type, boxed):
+>> +    def visit_event(self, name, info, arg_type, boxed, ifcond):
+>>          arg_type =3D arg_type or self._schema.the_empty_object_type
+>> -        self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_t=
+ype)})
+>> +        self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_t=
+ype)},
+>> +                       ifcond)
+>>
+>>  # Debugging aid: unmask QAPI schema's type names
+>>  # We normally mask them, because they're not QMP wire ABI
 >
-> Missing: a review of FOO_lookup[] uses outside these two, to make sure
-> none of them fall into holes like input_type_enum() would.  From the top
-> of my head: qapi_enum_parse().  A quick grep for loops counting up to
-> FOO__MAX additionally finds get_event_by_name() in blkdebug.c,
-> parse_read_pattern() in quorum.c, hmp_migrate_set_capability() in hmp.c,
-> and then I stopped looking.  Most (or all?) of them should use
-> qapi_enum_parse().
+> Out of review brainpower for today.  Hope to resume tomorrow.
 >
-> There's one patch hunk to make input_type_enum() cope with holes, one
-> patch hunk to opportunistically simplify output_type_enum(), and all the
-> others are for plumbing the table size to these two.  That's a lot of
-> plumbing.  Can't say I like it.
->
-> Alternatives:
->
-> (1) Use a value other than NULL for holes, say ""
->
-> (2) Use a value other than NULL for the sentinel, say ""
->
-> (3) Store the length in the lookup table, i.e. change it from
->     const char *const[] to struct { int n, const char *const s[] }.
->
-> The least work is probably (1).  Slightly ugly.
->
-> If you do (3), please consider getting rid of the sentinel.
+> [...]
 >
 
-I have done (3)
+
 
 --=20
 Marc-Andr=C3=A9 Lureau
