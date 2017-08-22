@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dk8ie-00061K-1P
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:55:49 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dk8kE-00071V-KK
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:57:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dk8iY-0007Df-Iu
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:55:44 -0400
-Date: Tue, 22 Aug 2017 14:55:05 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170822145505.643f74fa@nial.brq.redhat.com>
-In-Reply-To: <1502117160-24655-13-git-send-email-armbru@redhat.com>
-References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-	<1502117160-24655-13-git-send-email-armbru@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1dk8k9-0008NJ-LZ
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:57:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36126)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dk8k9-0008N2-Ey
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:57:17 -0400
+Date: Tue, 22 Aug 2017 14:57:13 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170822145713.7f2da9cf.cohuck@redhat.com>
+In-Reply-To: <20170822113914.3ff24d75.cohuck@redhat.com>
+References: <20170821091614.28251-1-cohuck@redhat.com>
+	<20170821091614.28251-8-cohuck@redhat.com>
+	<0d8dcac1-f536-5d69-0187-23656d003348@linux.vnet.ibm.com>
+	<17cb7925-e4eb-d174-2886-49ab9af0852c@linux.vnet.ibm.com>
+	<20170822103955.1cbc0714.cohuck@redhat.com>
+	<b7e7810c-7822-2fb8-2a2e-d67c08126639@linux.vnet.ibm.com>
+	<20170822113914.3ff24d75.cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 12/56] pc-dimm: Make size and address
- unsigned in QAPI/QMP
+Subject: Re: [Qemu-devel] [PATCH v4 07/10] s390x/sclp: properly guard
+ pci-specific functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +33,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, jcody@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On Mon,  7 Aug 2017 16:45:16 +0200
-Markus Armbruster <armbru@redhat.com> wrote:
+On Tue, 22 Aug 2017 11:39:14 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-> Sizes and addresses should use QAPI type 'size' (uint64_t).
-> PCDIMMDeviceInfo members @addr and @size are 'int' (int64_t).
-> qmp_pc_dimm_device_list() implicitly converts from uint64_t.
+> On Tue, 22 Aug 2017 11:20:51 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 > 
-> Change these PCDIMMDeviceInfo members to 'size'.
+> > On 08/22/2017 10:39 AM, Cornelia Huck wrote:  
+> > >> I'm fine either way. If I imagine having a lots of adapter types, then I
+> > >> would expect a switch or a jumptable on the type before handling control
+> > >> to the pci specific function. In this case statically not supported types
+> > >> would probably get caught by the default branch of the switch and for a
+> > >> jumptable it could even handle the dynamic case (based on the facilities)
+> > >> trivially. In short both approaches can make sense.    
+> > > I'm also wondering at the naming (the command sounds very
+> > > pci-specific). I'd just stick with this approach (modulo a possible
+> > > change of the response code, for which I need to rely on you guys).
+> > >     
+> > 
+> > 
+> > Well, the QEMU name of the command is misleading misleading. In the AR
+> > it's called 'Configure I/O Adapter'. The PCI comes into the picture via
+> > byte 8 of the SCCB, the so called adapter type. Valid values for the
+> > adapter type are: 00-01 reserved; 02 PCI function; 03-FF reserved. So
+> > at this point we only have PCI.  
 > 
-> query-memory-devices now reports sizes and addresses above 2^63-1
-> correctly instead of their (negative) two's complement.
+> OK, misleading naming combined with missing documentation leads to
+> confusion...
 > 
-> HMP's "info memory-devices" already reported them correctly, because
-> it printed the signed integers with PRIx64 and PRIu32.
-s/signed/unsigned/
+> So:
+> 
+> - s/PCI/IOA/ for SCLP_CMDW_{CONFIGURE,DECONFIGURE}_PCI
+> - have a switch/case over byte 8 with only one case (pci)
 
- 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+- switch to response code 0x06f0 instead of invalid command
 
-> ---
->  qapi-schema.json | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> - move the pci feature check into the pci code(? - not sure)
 > 
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 23eb60d..6aa6be9 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -6057,8 +6057,8 @@
->  ##
->  { 'struct': 'PCDIMMDeviceInfo',
->    'data': { '*id': 'str',
-> -            'addr': 'int',
-> -            'size': 'int',
-> +            'addr': 'size',
-> +            'size': 'size',
->              'slot': 'int',
->              'node': 'int',
->              'memdev': 'str',
+> There's still the question of when this sclp command first became
+> available...
+
+...because we probably want to indicate invalid command for older
+machine types (or is there another facility bit?)
+
+Another question: There's the sclp facilities bit SCLP_HAS_PCI_RECONFIG
+- is that really pci, or I/O adapter as for the actual commands?
+
+[The Linux kernel uses the _PCI naming scheme, so I can't derive
+anything from that.]
