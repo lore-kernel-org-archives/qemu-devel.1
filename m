@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7Ar-00078M-19
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:16:47 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7BW-0007cM-6u
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:17:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7Ao-0002Lr-LT
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:16:45 -0400
-Received: from mail-ua0-x242.google.com ([2607:f8b0:400c:c08::242]:32848)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7BS-0002bU-Um
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:17:26 -0400
+Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:35988)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dk7Ao-0002LC-FN
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:16:42 -0400
-Received: by mail-ua0-x242.google.com with SMTP id r23so249844uag.0
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 04:16:41 -0700 (PDT)
+	id 1dk7BS-0002bL-OG
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:17:22 -0400
+Received: by mail-ua0-x241.google.com with SMTP id l47so346392uai.3
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 04:17:22 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87efsbevmt.fsf@dusky.pond.sub.org>
+In-Reply-To: <87shgrbyou.fsf@dusky.pond.sub.org>
 References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
-	<20170727154126.11339-4-marcandre.lureau@redhat.com>
-	<87efsbevmt.fsf@dusky.pond.sub.org>
+	<20170727154126.11339-5-marcandre.lureau@redhat.com>
+	<87shgrbyou.fsf@dusky.pond.sub.org>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 22 Aug 2017 13:16:39 +0200
-Message-ID: <CAJ+F1CLgczQtHZnLnuKOjDXGAigHy-z3pB2EVuuUwQsfyXJeRQ@mail.gmail.com>
+Date: Tue, 22 Aug 2017 13:17:21 +0200
+Message-ID: <CAJ+F1CKr-jh9XjcAF-vmU3nsjuRKG-b-3MUUKrs9HzSqg70N6Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 03/26] qboject: add literal qobject type
+Subject: Re: [Qemu-devel] [PATCH 04/26] qapi: generate a literal qobject for
+ introspection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,546 +33,431 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+Cc: QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
 Hi
 
-On Wed, Aug 16, 2017 at 10:59 AM, Markus Armbruster <armbru@redhat.com> wro=
+On Wed, Aug 16, 2017 at 12:21 PM, Markus Armbruster <armbru@redhat.com> wro=
 te:
-> In the subject: s/qboject: add/qobject: Add/
->
 > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 >
->> Promote LiteralQObject from tests/check-qjson.c to qobject/qlit.c,
->> allowing to statically declare complex qobjects.
->>
->> Add a helper qobject_from_qlit() to instantiate a literal qobject to a
->> real QObject. Add some simple test.
+>> Replace the generated json string with a literal qobject. The later is
+>> easier to deal with, at run time, as well as compile time:
 >
-> Suggest
+> at run time as well as compile time
 >
-> * to also move the existing function making use of LiteralQObject
->   compare_litqobj_to_qobj(), so other tests can use it to verify a
->   QObject matches expectations, and
+>>                                                            #if blocks
+>> can be more easily added than in a json string.
 >
-> * to split the patch into the move and the addition of
->   qobject_from_qlit().
->
+> Future tense, e.g. "adding #if conditionals will be easier".
 
 ok
 
+>
 >>
 >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 >> ---
->>  include/qapi/qmp/qlit.h | 53 ++++++++++++++++++++++++++++++++++++
->>  qobject/qlit.c          | 53 ++++++++++++++++++++++++++++++++++++
->>  tests/check-qjson.c     | 72 +++++++++++++++++-------------------------=
+>>  scripts/qapi-introspect.py         | 83 +++++++++++++++++++++----------=
 -------
->>  tests/check-qlit.c      | 52 +++++++++++++++++++++++++++++++++++
->>  qobject/Makefile.objs   |  2 +-
->>  tests/Makefile.include  |  5 +++-
->>  6 files changed, 187 insertions(+), 50 deletions(-)
->>  create mode 100644 include/qapi/qmp/qlit.h
->>  create mode 100644 qobject/qlit.c
->>  create mode 100644 tests/check-qlit.c
+>>  monitor.c                          |  2 +-
+>>  tests/test-qobject-input-visitor.c | 10 +++--
+>>  docs/devel/qapi-code-gen.txt       | 29 ++++++++-----
+>>  4 files changed, 72 insertions(+), 52 deletions(-)
 >>
->> diff --git a/include/qapi/qmp/qlit.h b/include/qapi/qmp/qlit.h
->> new file mode 100644
->> index 0000000000..fd6bfc3e69
->> --- /dev/null
->> +++ b/include/qapi/qmp/qlit.h
->> @@ -0,0 +1,53 @@
->> +/*
->> + * Copyright IBM, Corp. 2009
->> + * Copyright (c) 2013, 2015 Red Hat Inc.
->> + *
->> + * Authors:
->> + *  Anthony Liguori   <aliguori@us.ibm.com>
->> + *  Markus Armbruster <armbru@redhat.com>
->> + *
->> + * This work is licensed under the terms of the GNU LGPL, version 2.1 o=
-r later.
->> + * See the COPYING.LIB file in the top-level directory.
->> + *
->> + */
->> +#ifndef QLIT_H_
->> +#define QLIT_H_
->> +
->> +#include "qapi-types.h"
->> +#include "qobject.h"
->> +
->> +typedef struct QLitDictEntry QLitDictEntry;
->> +typedef struct QLitObject QLitObject;
->> +
->> +struct QLitObject {
->> +    int type;
->> +    union {
->> +        bool qbool;
->> +        int64_t qnum;
+>> diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
+>> index 032bcea491..fc72cdb66d 100644
+>> --- a/scripts/qapi-introspect.py
+>> +++ b/scripts/qapi-introspect.py
+>> @@ -12,72 +12,74 @@
+>>  from qapi import *
+>>
+>>
+>> -# Caveman's json.dumps() replacement (we're stuck at Python 2.4)
+>> -# TODO try to use json.dumps() once we get unstuck
+>> -def to_json(obj, level=3D0):
+>> +def to_qlit(obj, level=3D0, first_indent=3DTrue):
 >
-> Not this patch's fault: QLitObject restricts numbers to signed integers.
+> Suggest suppress_indent=3DFalse.  I prefer defaulting to False.
+
+It's not about suppressing whole indent, just the first.
+
+I suggest you rewrite the code in a follow-up patch if you have an
+idea how to do it.
+
+I'd like this apporach in general for the whole series, since it is
+long and tedious to deal with that many patches, and not always easy
+to understand what you want.  If something works, it will be easier to
+get it done and improve the code as follow-up. This approach worked
+better when we ended qapi-doc for ex, and you followed up soon after
+with 50 more patches ;).
+
 >
->> +        const char *qstr;
->> +        QLitDictEntry *qdict;
->> +        QLitObject *qlist;
->> +    } value;
->> +};
->> +
->> +struct QLitDictEntry {
->> +    const char *key;
->> +    QLitObject value;
->> +};
->> +
->> +#define QLIT_QNULL \
->> +    { .type =3D QTYPE_QNULL }
->> +#define QLIT_QBOOL(val) \
->> +    { .type =3D QTYPE_QBOOL, .value.qbool =3D (val) }
->> +#define QLIT_QNUM(val) \
->> +    { .type =3D QTYPE_QNUM, .value.qnum =3D (val) }
->> +#define QLIT_QSTR(val) \
->> +    { .type =3D QTYPE_QSTRING, .value.qstr =3D (val) }
->> +#define QLIT_QDICT(val) \
->> +    { .type =3D QTYPE_QDICT, .value.qdict =3D (val) }
->> +#define QLIT_QLIST(val) \
->> +    { .type =3D QTYPE_QLIST, .value.qlist =3D (val) }
->> +
->> +QObject *qobject_from_qlit(const QLitObject *qlit);
->> +
->> +#endif /* QLIT_H_ */
->> diff --git a/qobject/qlit.c b/qobject/qlit.c
->> new file mode 100644
->> index 0000000000..d7407b4b34
->> --- /dev/null
->> +++ b/qobject/qlit.c
->> @@ -0,0 +1,53 @@
->> +/*
->> + * QLit literal qobject
->> + *
->> + * Copyright (C) 2017 Red Hat Inc.
->> + *
->> + * Authors:
->> + *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> + *
->> + * This work is licensed under the terms of the GNU LGPL, version 2.1 o=
-r later.
->> + * See the COPYING.LIB file in the top-level directory.
->> + */
->> +
+>> +    def indent(level):
+>> +        return level * 4 * ' '
+>
+> Blank line before and after nested function definition, please.
+
+ok
+
+>
+>> +    ret =3D ''
+>> +    if first_indent:
+>> +        ret +=3D indent(level)
+>>      if obj is None:
+>> -        ret =3D 'null'
+>> +        ret +=3D 'QLIT_QNULL'
+>>      elif isinstance(obj, str):
+>> -        ret =3D '"' + obj.replace('"', r'\"') + '"'
+>> +        ret +=3D 'QLIT_QSTR(' + '"' + obj.replace('"', r'\"') + '"' + '=
+)'
+>
+> Why not
+>
+>            ret +=3D 'QLIT_QSTR("' + obj.replace('"', r'\"') + '")'
+>
+> Hmm, make that
+>
+>            ret +=3D 'QLIT_QSTR(' + to_c_string(obj) + ')'
+>
+> because it makes the meaning more obvious, and it's also more robust: it
+> doubles backslashes.
+
+I can't find to_c_string(), I added one
+
+>
+>>      elif isinstance(obj, list):
+>> -        elts =3D [to_json(elt, level + 1)
+>> +        elts =3D [to_qlit(elt, level + 1)
+>>                  for elt in obj]
+>> -        ret =3D '[' + ', '.join(elts) + ']'
+>> +        elts.append(indent(level + 1) + "{ }")
+>
+> I'd prefer "{}".  More of the same below.
+
+ok
+
+>
+>> +        ret +=3D 'QLIT_QLIST(((QLitObject[]) {\n'
+>> +        ret +=3D ',\n'.join(elts) + '\n'
+>> +        ret +=3D indent(level) + '}))'
+>
+> The extra pair of parenthesis in QLIT_QLIST(( ... )) is slightly ugly.
+> Not this patch's fault.  Same for QLIT_QDICT(( ... )) below.
+>
+>>      elif isinstance(obj, dict):
+>> -        elts =3D ['"%s": %s' % (key.replace('"', r'\"'),
+>> -                              to_json(obj[key], level + 1))
+>> -                for key in sorted(obj.keys())]
+>> -        ret =3D '{' + ', '.join(elts) + '}'
+>> +        elts =3D [ indent(level + 1) + '{ "%s", %s }' %
+>> +                 (key.replace('"', r'\"'), to_qlit(obj[key], level + 1,=
+ False))
+>
+> $ pep8 scripts/qapi-introspect.py
+> scripts/qapi-introspect.py:33:17: E201 whitespace after '['
+>
+> Also, break lines at operators with the least precedence, not in the
+> middle of sub-expressions.
+>
+> However
+>
+>            elts =3D [indent(level + 1)
+>                    + ('{ "%s", %s }'
+>                       % (to_c_string(key),
+>                          to_qlit(obj[key], level + 1, suppress_indent=3DT=
+rue)))
+>                    for key in sorted(obj.keys())]
+>
+> is still illegible.  I'm afraid this is simply too complex for a list
+> comprehension.  Try rewriting as a loop.
+>
+
+ok
+
+> Another option would be separating off indentation: generate the C
+> initializer unindented, then feed it to a stupid indenter that counts
+> parentheses (round, square and curly).
+
+hmm
+
+>
+>> +                 for key in sorted(obj.keys())]
+>> +        elts.append(indent(level + 1) + '{ }')
+>> +        ret +=3D 'QLIT_QDICT(((QLitDictEntry[]) {\n'
+>> +        ret +=3D ',\n'.join(elts) + '\n'
+>> +        ret +=3D indent(level) + '}))'
+>>      else:
+>>          assert False                # not implemented
+>> -    if level =3D=3D 1:
+>> -        ret =3D '\n' + ret
+>>      return ret
+>>
+>>
+>> -def to_c_string(string):
+>> -    return '"' + string.replace('\\', r'\\').replace('"', r'\"') + '"'
+>> -
+>> -
+>>  class QAPISchemaGenIntrospectVisitor(QAPISchemaVisitor):
+>>      def __init__(self, unmask):
+>>          self._unmask =3D unmask
+>>          self.defn =3D None
+>>          self.decl =3D None
+>>          self._schema =3D None
+>> -        self._jsons =3D None
+>> +        self._qlits =3D None
+>>          self._used_types =3D None
+>>          self._name_map =3D None
+>>
+>>      def visit_begin(self, schema):
+>>          self._schema =3D schema
+>> -        self._jsons =3D []
+>> +        self._qlits =3D []
+>>          self._used_types =3D []
+>>          self._name_map =3D {}
+>>
+>>      def visit_end(self):
+>>          # visit the types that are actually used
+>> -        jsons =3D self._jsons
+>> -        self._jsons =3D []
+>> +        qlits =3D self._qlits
+>> +        self._qlits =3D []
+>>          for typ in self._used_types:
+>>              typ.visit(self)
+>>          # generate C
+>>          # TODO can generate awfully long lines
+>> -        jsons.extend(self._jsons)
+>> -        name =3D c_name(prefix, protect=3DFalse) + 'qmp_schema_json'
+>> +        qlits.extend(self._qlits)
+>> +        name =3D c_name(prefix, protect=3DFalse) + 'qmp_schema_qlit'
+>>          self.decl =3D mcgen('''
+>> -extern const char %(c_name)s[];
+>> +extern const QLitObject %(c_name)s;
+>>  ''',
+>>                            c_name=3Dc_name(name))
+>> -        lines =3D to_json(jsons).split('\n')
+>> -        c_string =3D '\n    '.join([to_c_string(line) for line in lines=
+])
+>> +        c_string =3D to_qlit(qlits)
+>
+> The value is simple, and it's used just once.  Let's eliminate the
+> variable.
+>
+>>          self.defn =3D mcgen('''
+>> -const char %(c_name)s[] =3D %(c_string)s;
+>> +const QLitObject %(c_name)s =3D %(c_string)s;
+>>  ''',
+>>                            c_name=3Dc_name(name),
+>>                            c_string=3Dc_string)
+>>          self._schema =3D None
+>> -        self._jsons =3D None
+>> +        self._qlits =3D None
+>>          self._used_types =3D None
+>>          self._name_map =3D None
+>>
+>> @@ -111,12 +113,12 @@ const char %(c_name)s[] =3D %(c_string)s;
+>>              return '[' + self._use_type(typ.element_type) + ']'
+>>          return self._name(typ.name)
+>>
+>> -    def _gen_json(self, name, mtype, obj):
+>> +    def _gen_qlit(self, name, mtype, obj):
+>>          if mtype not in ('command', 'event', 'builtin', 'array'):
+>>              name =3D self._name(name)
+>>          obj['name'] =3D name
+>>          obj['meta-type'] =3D mtype
+>> -        self._jsons.append(obj)
+>> +        self._qlits.append(obj)
+>>
+>>      def _gen_member(self, member):
+>>          ret =3D {'name': member.name, 'type': self._use_type(member.typ=
+e)}
+>> @@ -132,24 +134,24 @@ const char %(c_name)s[] =3D %(c_string)s;
+>>          return {'case': variant.name, 'type': self._use_type(variant.ty=
+pe)}
+>>
+>>      def visit_builtin_type(self, name, info, json_type):
+>> -        self._gen_json(name, 'builtin', {'json-type': json_type})
+>> +        self._gen_qlit(name, 'builtin', {'json-type': json_type})
+>>
+>>      def visit_enum_type(self, name, info, values, prefix):
+>> -        self._gen_json(name, 'enum', {'values': values})
+>> +        self._gen_qlit(name, 'enum', {'values': values})
+>>
+>>      def visit_array_type(self, name, info, element_type):
+>>          element =3D self._use_type(element_type)
+>> -        self._gen_json('[' + element + ']', 'array', {'element-type': e=
+lement})
+>> +        self._gen_qlit('[' + element + ']', 'array', {'element-type': e=
+lement})
+>>
+>>      def visit_object_type_flat(self, name, info, members, variants):
+>>          obj =3D {'members': [self._gen_member(m) for m in members]}
+>>          if variants:
+>>              obj.update(self._gen_variants(variants.tag_member.name,
+>>                                            variants.variants))
+>> -        self._gen_json(name, 'object', obj)
+>> +        self._gen_qlit(name, 'object', obj)
+>>
+>>      def visit_alternate_type(self, name, info, variants):
+>> -        self._gen_json(name, 'alternate',
+>> +        self._gen_qlit(name, 'alternate',
+>>                         {'members': [{'type': self._use_type(m.type)}
+>>                                      for m in variants.variants]})
+>>
+>> @@ -157,13 +159,13 @@ const char %(c_name)s[] =3D %(c_string)s;
+>>                        gen, success_response, boxed):
+>>          arg_type =3D arg_type or self._schema.the_empty_object_type
+>>          ret_type =3D ret_type or self._schema.the_empty_object_type
+>> -        self._gen_json(name, 'command',
+>> +        self._gen_qlit(name, 'command',
+>>                         {'arg-type': self._use_type(arg_type),
+>>                          'ret-type': self._use_type(ret_type)})
+>>
+>>      def visit_event(self, name, info, arg_type, boxed):
+>>          arg_type =3D arg_type or self._schema.the_empty_object_type
+>> -        self._gen_json(name, 'event', {'arg-type': self._use_type(arg_t=
+ype)})
+>> +        self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_t=
+ype)})
+>>
+>>  # Debugging aid: unmask QAPI schema's type names
+>>  # We normally mask them, because they're not QMP wire ABI
+>> @@ -205,11 +207,18 @@ h_comment =3D '''
+>>
+>>  fdef.write(mcgen('''
+>>  #include "qemu/osdep.h"
+>> +#include "qapi/qmp/qlit.h"
+>>  #include "%(prefix)sqmp-introspect.h"
+>>
+>>  ''',
+>>                   prefix=3Dprefix))
+>>
+>> +fdecl.write(mcgen('''
 >> +#include "qemu/osdep.h"
->> +
 >> +#include "qapi/qmp/qlit.h"
->> +#include "qapi/qmp/types.h"
 >> +
->> +QObject *qobject_from_qlit(const QLitObject *qlit)
->> +{
->> +    int i;
+>> +'''))
 >> +
->> +    switch (qlit->type) {
->> +    case QTYPE_QNULL:
->> +        return QOBJECT(qnull());
->> +    case QTYPE_QNUM:
->> +        return QOBJECT(qnum_from_int(qlit->value.qnum));
->> +    case QTYPE_QSTRING:
->> +        return QOBJECT(qstring_from_str(qlit->value.qstr));
->> +    case QTYPE_QDICT: {
->> +        QDict *qdict =3D qdict_new();
->> +        for (i =3D 0; qlit->value.qdict[i].value.type !=3D QTYPE_NONE; =
-i++) {
->> +            QLitDictEntry *e =3D &qlit->value.qdict[i];
->> +
->> +            qdict_put_obj(qdict, e->key, qobject_from_qlit(&e->value));
->> +        }
->> +        return QOBJECT(qdict);
->> +    }
->> +    case QTYPE_QLIST: {
->> +        QList *qlist =3D qlist_new();
->> +
->> +        for (i =3D 0; qlit->value.qlist[i].type !=3D QTYPE_NONE; i++) {
->> +            qlist_append_obj(qlist, qobject_from_qlit(&qlit->value.qlis=
-t[i]));
->> +        }
->> +        return QOBJECT(qlist);
->> +    }
->> +    case QTYPE_QBOOL:
->> +        return QOBJECT(qbool_from_bool(qlit->value.qbool));
->> +    case QTYPE_NONE:
->> +        assert(0);
->> +    }
->> +
->> +    return NULL;
->> +}
->> diff --git a/tests/check-qjson.c b/tests/check-qjson.c
->> index 9c42a46b7d..1a95aff2ba 100644
->> --- a/tests/check-qjson.c
->> +++ b/tests/check-qjson.c
->> @@ -16,6 +16,7 @@
->>  #include "qapi/error.h"
->>  #include "qapi/qmp/types.h"
->>  #include "qapi/qmp/qjson.h"
->> +#include "qapi/qmp/qlit.h"
->>  #include "qemu-common.h"
->>
->>  static void escaped_string(void)
->> @@ -1059,39 +1060,14 @@ static void keyword_literal(void)
->>      QDECREF(null);
+>>  schema =3D QAPISchema(input_file)
+>>  gen =3D QAPISchemaGenIntrospectVisitor(opt_unmask)
+>>  schema.visit(gen)
+>> diff --git a/monitor.c b/monitor.c
+>> index 6d040e620f..a1773d5bc7 100644
+>> --- a/monitor.c
+>> +++ b/monitor.c
+>> @@ -953,7 +953,7 @@ EventInfoList *qmp_query_events(Error **errp)
+>>  static void qmp_query_qmp_schema(QDict *qdict, QObject **ret_data,
+>>                                   Error **errp)
+>>  {
+>> -    *ret_data =3D qobject_from_json(qmp_schema_json, &error_abort);
+>> +    *ret_data =3D qobject_from_qlit(&qmp_schema_qlit);
 >>  }
 >>
->> -typedef struct LiteralQDictEntry LiteralQDictEntry;
->> -typedef struct LiteralQObject LiteralQObject;
->> -
->> -struct LiteralQObject
->> -{
->> -    int type;
->> -    union {
->> -        int64_t qnum;
->> -        const char *qstr;
->> -        LiteralQDictEntry *qdict;
->> -        LiteralQObject *qlist;
->> -    } value;
->> -};
->> -
->> -struct LiteralQDictEntry
->> -{
->> -    const char *key;
->> -    LiteralQObject value;
->> -};
->> -
->> -#define QLIT_QNUM(val) (LiteralQObject){.type =3D QTYPE_QNUM, .value.qn=
-um =3D (val)}
->> -#define QLIT_QSTR(val) (LiteralQObject){.type =3D QTYPE_QSTRING, .value=
-.qstr =3D (val)}
->> -#define QLIT_QDICT(val) (LiteralQObject){.type =3D QTYPE_QDICT, .value.=
-qdict =3D (val)}
->> -#define QLIT_QLIST(val) (LiteralQObject){.type =3D QTYPE_QLIST, .value.=
-qlist =3D (val)}
->> -
->>  typedef struct QListCompareHelper
->>  {
->>      int index;
->> -    LiteralQObject *objs;
->> +    QLitObject *objs;
->>      int result;
->>  } QListCompareHelper;
->>
->> -static int compare_litqobj_to_qobj(LiteralQObject *lhs, QObject *rhs);
->> +static int compare_litqobj_to_qobj(QLitObject *lhs, QObject *rhs);
->>
->>  static void compare_helper(QObject *obj, void *opaque)
->>  {
->> @@ -1109,7 +1085,7 @@ static void compare_helper(QObject *obj, void *opa=
-que)
->>      helper->result =3D compare_litqobj_to_qobj(&helper->objs[helper->in=
-dex++], obj);
+>>  /*
+>> diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-inp=
+ut-visitor.c
+>> index bcf02617dc..1969733971 100644
+>> --- a/tests/test-qobject-input-visitor.c
+>> +++ b/tests/test-qobject-input-visitor.c
+>> @@ -1247,24 +1247,26 @@ static void test_visitor_in_fail_alternate(TestI=
+nputVisitorData *data,
 >>  }
 >>
->> -static int compare_litqobj_to_qobj(LiteralQObject *lhs, QObject *rhs)
->> +static int compare_litqobj_to_qobj(QLitObject *lhs, QObject *rhs)
+>>  static void do_test_visitor_in_qmp_introspect(TestInputVisitorData *dat=
+a,
+>> -                                              const char *schema_json)
+>> +                                              const QLitObject *qlit)
 >>  {
->>      int64_t val;
+>>      SchemaInfoList *schema =3D NULL;
+>> +    QObject *obj =3D qobject_from_qlit(qlit);
+>>      Visitor *v;
 >>
->> @@ -1159,23 +1135,23 @@ static void simple_dict(void)
->>      int i;
->>      struct {
->>          const char *encoded;
->> -        LiteralQObject decoded;
->> +        QLitObject decoded;
->>      } test_cases[] =3D {
->>          {
->>              .encoded =3D "{\"foo\": 42, \"bar\": \"hello world\"}",
->> -            .decoded =3D QLIT_QDICT(((LiteralQDictEntry[]){
->> +            .decoded =3D QLIT_QDICT(((QLitDictEntry[]){
->>                          { "foo", QLIT_QNUM(42) },
->>                          { "bar", QLIT_QSTR("hello world") },
->>                          { }
->>                      })),
->>          }, {
->>              .encoded =3D "{}",
->> -            .decoded =3D QLIT_QDICT(((LiteralQDictEntry[]){
->> +            .decoded =3D QLIT_QDICT(((QLitDictEntry[]){
->>                          { }
->>                      })),
->>          }, {
->>              .encoded =3D "{\"foo\": 43}",
->> -            .decoded =3D QLIT_QDICT(((LiteralQDictEntry[]){
->> +            .decoded =3D QLIT_QDICT(((QLitDictEntry[]){
->>                          { "foo", QLIT_QNUM(43) },
->>                          { }
->>                      })),
->> @@ -1257,11 +1233,11 @@ static void simple_list(void)
->>      int i;
->>      struct {
->>          const char *encoded;
->> -        LiteralQObject decoded;
->> +        QLitObject decoded;
->>      } test_cases[] =3D {
->>          {
->>              .encoded =3D "[43,42]",
->> -            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
->> +            .decoded =3D QLIT_QLIST(((QLitObject[]){
->>                          QLIT_QNUM(43),
->>                          QLIT_QNUM(42),
->>                          { }
->> @@ -1269,21 +1245,21 @@ static void simple_list(void)
->>          },
->>          {
->>              .encoded =3D "[43]",
->> -            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
->> +            .decoded =3D QLIT_QLIST(((QLitObject[]){
->>                          QLIT_QNUM(43),
->>                          { }
->>                      })),
->>          },
->>          {
->>              .encoded =3D "[]",
->> -            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
->> +            .decoded =3D QLIT_QLIST(((QLitObject[]){
->>                          { }
->>                      })),
->>          },
->>          {
->>              .encoded =3D "[{}]",
->> -            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
->> -                        QLIT_QDICT(((LiteralQDictEntry[]){
->> +            .decoded =3D QLIT_QLIST(((QLitObject[]){
->> +                        QLIT_QDICT(((QLitDictEntry[]){
->>                                      {},
->>                                          })),
->>                          {},
->> @@ -1314,11 +1290,11 @@ static void simple_whitespace(void)
->>      int i;
->>      struct {
->>          const char *encoded;
->> -        LiteralQObject decoded;
->> +        QLitObject decoded;
->>      } test_cases[] =3D {
->>          {
->>              .encoded =3D " [ 43 , 42 ]",
->> -            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
->> +            .decoded =3D QLIT_QLIST(((QLitObject[]){
->>                          QLIT_QNUM(43),
->>                          QLIT_QNUM(42),
->>                          { }
->> @@ -1326,12 +1302,12 @@ static void simple_whitespace(void)
->>          },
->>          {
->>              .encoded =3D " [ 43 , { 'h' : 'b' }, [ ], 42 ]",
->> -            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
->> +            .decoded =3D QLIT_QLIST(((QLitObject[]){
->>                          QLIT_QNUM(43),
->> -                        QLIT_QDICT(((LiteralQDictEntry[]){
->> +                        QLIT_QDICT(((QLitDictEntry[]){
->>                                      { "h", QLIT_QSTR("b") },
->>                                      { }})),
->> -                        QLIT_QLIST(((LiteralQObject[]){
->> +                        QLIT_QLIST(((QLitObject[]){
->>                                      { }})),
->>                          QLIT_QNUM(42),
->>                          { }
->> @@ -1339,13 +1315,13 @@ static void simple_whitespace(void)
->>          },
->>          {
->>              .encoded =3D " [ 43 , { 'h' : 'b' , 'a' : 32 }, [ ], 42 ]",
->> -            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
->> +            .decoded =3D QLIT_QLIST(((QLitObject[]){
->>                          QLIT_QNUM(43),
->> -                        QLIT_QDICT(((LiteralQDictEntry[]){
->> +                        QLIT_QDICT(((QLitDictEntry[]){
->>                                      { "h", QLIT_QSTR("b") },
->>                                      { "a", QLIT_QNUM(32) },
->>                                      { }})),
->> -                        QLIT_QLIST(((LiteralQObject[]){
->> +                        QLIT_QLIST(((QLitObject[]){
->>                                      { }})),
->>                          QLIT_QNUM(42),
->>                          { }
->> @@ -1393,10 +1369,10 @@ static void simple_varargs(void)
+>> -    v =3D visitor_input_test_init_raw(data, schema_json);
+>> +    v =3D qobject_input_visitor_new(obj);
+>>
+>>      visit_type_SchemaInfoList(v, NULL, &schema, &error_abort);
+>>      g_assert(schema);
+>>
+>>      qapi_free_SchemaInfoList(schema);
+>> +    qobject_decref(obj);
+>>  }
+>>
+>>  static void test_visitor_in_qmp_introspect(TestInputVisitorData *data,
+>>                                             const void *unused)
 >>  {
->>      QObject *embedded_obj;
->>      QObject *obj;
->> -    LiteralQObject decoded =3D QLIT_QLIST(((LiteralQObject[]){
->> +    QLitObject decoded =3D QLIT_QLIST(((QLitObject[]){
->>              QLIT_QNUM(1),
->>              QLIT_QNUM(2),
->> -            QLIT_QLIST(((LiteralQObject[]){
->> +            QLIT_QLIST(((QLitObject[]){
->>                          QLIT_QNUM(32),
->>                          QLIT_QNUM(42),
->>                          {}})),
->> diff --git a/tests/check-qlit.c b/tests/check-qlit.c
->> new file mode 100644
->> index 0000000000..cda4620f92
->> --- /dev/null
->> +++ b/tests/check-qlit.c
->> @@ -0,0 +1,52 @@
->> +/*
->> + * QLit unit-tests.
->> + *
->> + * Copyright (C) 2017 Red Hat Inc.
->> + *
->> + * This work is licensed under the terms of the GNU LGPL, version 2.1 o=
-r later.
->> + * See the COPYING.LIB file in the top-level directory.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +
->> +#include "qapi/qmp/qlit.h"
->> +
->> +static void qobject_from_qlit_test(void)
->> +{
->> +    char *str;
->> +    QObject *qobj =3D NULL;
->> +    QLitObject qlit =3D QLIT_QDICT((
->> +        (QLitDictEntry[]) {
->> +            { "foo", QLIT_QNUM(42) },
->> +            { "bar", QLIT_QSTR("hello world") },
->> +            { "baz", QLIT_QNULL },
->> +            { "bee", QLIT_QLIST((
->> +                (QLitObject[]) {
->> +                    QLIT_QNUM(43),
->> +                    QLIT_QNUM(44),
->> +                    QLIT_QBOOL(true),
->> +                    { },
->> +                }))
->> +            },
->> +            { },
->> +        }));
->> +
->> +    qobj =3D qobject_from_qlit(&qlit);
->> +
->> +    str =3D qobject_to_string(qobj);
->> +    g_assert_cmpstr(str, =3D=3D,
->> +                    "bee:\n    [0]: 43\n    [1]: 44\n    [2]: true\n"  =
- \
->> +                    "baz: null\nbar: hello world\nfoo: 42\n");
->
-> I don't like this.  The order of QDict members in @str depends on
-> qdict_first()/qdict_next() iteration order, which is unspecified.
->
-> Here's how we check elsewhere that a QObject matches expectations:
->
->     static void qobject_from_qlit_test(void)
->     {
->         QLitObject qlit =3D QLIT_QDICT((
->             (QLitDictEntry[]) {
->                 { "foo", QLIT_QNUM(42) },
->                 { "bar", QLIT_QSTR("hello world") },
->                 { "baz", QLIT_QNULL },
->                 { "bee", QLIT_QLIST((
->                     (QLitObject[]) {
->                         QLIT_QNUM(43),
->                         QLIT_QNUM(44),
->                         QLIT_QBOOL(true),
->                         { },
->                     }))
->                 },
->                 { },
->             }));
->         QObject *qobj =3D qobject_from_qlit(&qlit);
->         QDict *qdict;
->         QList *baz;
->
->         qdict =3D qobject_to_qdict(qobj);
->         g_assert_cmpint(qdict_get_int(qdict, "foo"), =3D=3D, 42);
->         g_assert_cmpstr(qdict_get_str(qdict, "bar"), =3D=3D, "hello world=
-");
->         g_assert(qobject_type(qdict_get(qdict, "baz")) =3D=3D QTYPE_QNULL=
-);
->         baz =3D qdict_get_qlist(qdict, "bee");
->         g_assert_cmpint(qnum_get_int(qobject_to_qnum(qlist_pop(baz))), =
-=3D=3D, 43);
->         g_assert_cmpint(qnum_get_int(qobject_to_qnum(qlist_pop(baz))), =
-=3D=3D, 44);
->         g_assert_cmpint(qbool_get_bool(qobject_to_qbool(qlist_pop(baz))),=
- =3D=3D, 1);
->
->         qobject_decref(qobj);
->     }
->
-> Robust, just tedious.
-
-done the tedious way
-
->
-> check-qjson.c uses a differently tedious technique: compare expected
-> QLitObject to actual QObject with compare_litqobj_to_qobj().  I like
-> that better, because I find the QLIT... initializers easier to read, and
-> less error prone to write.  You might prefer not to use QLit to test
-> QLit, though.
->
-
-ok
-
->> +
->> +    g_free(str);
->> +    qobject_decref(qobj);
->> +}
->> +
->> +int main(int argc, char **argv)
->> +{
->> +    g_test_init(&argc, &argv, NULL);
->> +
->> +    g_test_add_func("/qlit/qobject_from_qlit", qobject_from_qlit_test);
->> +
->> +    return g_test_run();
->> +}
->> diff --git a/qobject/Makefile.objs b/qobject/Makefile.objs
->> index fc8885c9a4..002d25873a 100644
->> --- a/qobject/Makefile.objs
->> +++ b/qobject/Makefile.objs
->> @@ -1,2 +1,2 @@
->> -util-obj-y =3D qnull.o qnum.o qstring.o qdict.o qlist.o qbool.o
->> +util-obj-y =3D qnull.o qnum.o qstring.o qdict.o qlist.o qbool.o qlit.o
->>  util-obj-y +=3D qjson.o qobject.o json-lexer.o json-streamer.o json-par=
-ser.o
->> diff --git a/tests/Makefile.include b/tests/Makefile.include
->> index 7af278db55..960ab8c6dd 100644
->> --- a/tests/Makefile.include
->> +++ b/tests/Makefile.include
->> @@ -12,6 +12,8 @@ check-unit-y +=3D tests/test-char$(EXESUF)
->>  gcov-files-check-qdict-y =3D chardev/char.c
->>  check-unit-y +=3D tests/check-qnum$(EXESUF)
->>  gcov-files-check-qnum-y =3D qobject/qnum.c
->> +check-unit-y +=3D tests/check-qlit$(EXESUF)
->> +gcov-files-check-qlit-y =3D qobject/qlit.c
->>  check-unit-y +=3D tests/check-qstring$(EXESUF)
->>  gcov-files-check-qstring-y =3D qobject/qstring.c
->>  check-unit-y +=3D tests/check-qlist$(EXESUF)
->> @@ -523,7 +525,7 @@ test-obj-y =3D tests/check-qnum.o tests/check-qstrin=
-g.o tests/check-qdict.o \
->>       tests/rcutorture.o tests/test-rcu-list.o \
->>       tests/test-qdist.o tests/test-shift128.o \
->>       tests/test-qht.o tests/qht-bench.o tests/test-qht-par.o \
->> -     tests/atomic_add-bench.o
->> +     tests/atomic_add-bench.o tests/check-qlit.o
->
-> Please add it right next to the other qobject-related tests:
->
-
-ok
-
->    test-obj-y =3D tests/check-qnum.o tests/check-qstring.o tests/check-qd=
-ict.o \
->         tests/check-qlist.o tests/check-qnull.o \
-> -       tests/check-qjson.o \
-> +       tests/check-qjson.o tests/check-qlit.o \
->
+>> -    do_test_visitor_in_qmp_introspect(data, test_qmp_schema_json);
+>> -    do_test_visitor_in_qmp_introspect(data, qmp_schema_json);
+>> +    do_test_visitor_in_qmp_introspect(data, &test_qmp_schema_qlit);
+>> +    do_test_visitor_in_qmp_introspect(data, &qmp_schema_qlit);
+>>  }
 >>
->>  $(test-obj-y): QEMU_INCLUDES +=3D -Itests
->>  QEMU_CFLAGS +=3D -I$(SRC_PATH)/tests
->> @@ -541,6 +543,7 @@ test-io-obj-y =3D $(io-obj-y) $(test-crypto-obj-y)
->>  test-block-obj-y =3D $(block-obj-y) $(test-io-obj-y) tests/iothread.o
->>
->>  tests/check-qnum$(EXESUF): tests/check-qnum.o $(test-util-obj-y)
->> +tests/check-qlit$(EXESUF): tests/check-qlit.o $(test-util-obj-y)
->>  tests/check-qstring$(EXESUF): tests/check-qstring.o $(test-util-obj-y)
->>  tests/check-qdict$(EXESUF): tests/check-qdict.o $(test-util-obj-y)
->>  tests/check-qlist$(EXESUF): tests/check-qlist.o $(test-util-obj-y)
 >
-> Same order as in test-obj-y, please.
+> These tests are only marginally useful now.  Before, they ensured that a
+> qapi-introspect.py generating invalid JSON fails at "make check" compile
+> time.  Such bugs should now fail when we compile the generated
+> qapi-introspect.c.
+>
+>>  int main(int argc, char **argv)
+>> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+>> index 9903ac4c19..885c61b52f 100644
+>> --- a/docs/devel/qapi-code-gen.txt
+>> +++ b/docs/devel/qapi-code-gen.txt
+>> @@ -1295,18 +1295,27 @@ Example:
+>>      #ifndef EXAMPLE_QMP_INTROSPECT_H
+>>      #define EXAMPLE_QMP_INTROSPECT_H
+>>
+>> -    extern const char example_qmp_schema_json[];
+>> +    extern const QLitObject qmp_schema_qlit;
+>>
+>>      #endif
+>>      $ cat qapi-generated/example-qmp-introspect.c
+>>  [Uninteresting stuff omitted...]
+>>
+>> -    const char example_qmp_schema_json[] =3D "["
+>> -        "{\"arg-type\": \"0\", \"meta-type\": \"event\", \"name\": \"MY=
+_EVENT\"}, "
+>> -        "{\"arg-type\": \"1\", \"meta-type\": \"command\", \"name\": \"=
+my-command\", \"ret-type\": \"2\"}, "
+>> -        "{\"members\": [], \"meta-type\": \"object\", \"name\": \"0\"},=
+ "
+>> -        "{\"members\": [{\"name\": \"arg1\", \"type\": \"[2]\"}], \"met=
+a-type\": \"object\", \"name\": \"1\"}, "
+>> -        "{\"members\": [{\"name\": \"integer\", \"type\": \"int\"}, {\"=
+default\": null, \"name\": \"string\", \"type\": \"str\"}], \"meta-type\": =
+\"object\", \"name\": \"2\"}, "
+>> -        "{\"element-type\": \"2\", \"meta-type\": \"array\", \"name\": =
+\"[2]\"}, "
+>> -        "{\"json-type\": \"int\", \"meta-type\": \"builtin\", \"name\":=
+ \"int\"}, "
+>> -        "{\"json-type\": \"string\", \"meta-type\": \"builtin\", \"name=
+\": \"str\"}]";
+>> +    const QLitObject example_qmp_schema_qlit =3D QLIT_QLIST(((QLitObjec=
+t[]) {
+>> +        QLIT_QDICT(((QLitDictEntry[]) {
+>> +            { "arg-type", QLIT_QSTR("0") },
+>> +            { "meta-type", QLIT_QSTR("event") },
+>> +            { "name", QLIT_QSTR("Event") },
+>> +            { }
+>> +        })),
+>> +        QLIT_QDICT(((QLitDictEntry[]) {
+>> +            { "members", QLIT_QLIST(((QLitObject[]) {
+>> +                { }
+>> +            })) },
+>> +            { "meta-type", QLIT_QSTR("object") },
+>> +            { "name", QLIT_QSTR("0") },
+>> +            { }
+>> +        })),
+>> +        ....
+>
+> Ellipsis is three dots, not four :)
+>
+> Output is no longer complete (less file boilerplate).  Not an issue now,
+> but it might become one when we make the examples testable.  We can
+> restore the deleted output then.
 >
 
 ok
+
+
 
 --=20
 Marc-Andr=C3=A9 Lureau
