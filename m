@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43283)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1dkAFT-00085k-QO
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:33:44 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43489)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <cohuck@redhat.com>) id 1dkAG2-0008VF-7O
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:34:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1dkAFO-0003u0-Tk
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:33:43 -0400
-Received: from mout.gmx.net ([212.227.17.22]:55981)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1dkAFO-0003ti-HD
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:33:38 -0400
-References: <20170822044155.2451-1-famz@redhat.com>
-	<40d04f21-011e-1736-ed62-1d205926d60a@redhat.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <7a823db0-4fb1-8a47-bd8b-c0a4cc77fa9e@gmx.com>
-Date: Tue, 22 Aug 2017 16:23:29 +0200
+	(envelope-from <cohuck@redhat.com>) id 1dkAFw-00048H-9X
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:34:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47046)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dkAFw-00047e-44
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:34:12 -0400
+Date: Tue, 22 Aug 2017 16:34:08 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170822163408.434268b9.cohuck@redhat.com>
+In-Reply-To: <f6ec4f46-9b55-709d-a7e6-67224fe93834@linux.vnet.ibm.com>
+References: <20170821091614.28251-1-cohuck@redhat.com>
+	<20170821091614.28251-8-cohuck@redhat.com>
+	<0d8dcac1-f536-5d69-0187-23656d003348@linux.vnet.ibm.com>
+	<17cb7925-e4eb-d174-2886-49ab9af0852c@linux.vnet.ibm.com>
+	<20170822103955.1cbc0714.cohuck@redhat.com>
+	<b7e7810c-7822-2fb8-2a2e-d67c08126639@linux.vnet.ibm.com>
+	<20170822113914.3ff24d75.cohuck@redhat.com>
+	<ff247730-9d10-352c-b6dc-8d98198181cf@linux.vnet.ibm.com>
+	<20170822152434.068b5038.cohuck@redhat.com>
+	<20170822160621.6efb55aa.cohuck@redhat.com>
+	<f6ec4f46-9b55-709d-a7e6-67224fe93834@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <40d04f21-011e-1736-ed62-1d205926d60a@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="aQLI9NbSBnkk4BXAvnjbvvg7knJjSh0mh"
-Subject: Re: [Qemu-devel] [PATCH v3 00/10] tests: Add VM based build tests
- (for non-x86_64 and/or non-Linux)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 07/10] s390x/sclp: properly guard
+ pci-specific functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +37,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aQLI9NbSBnkk4BXAvnjbvvg7knJjSh0mh
-From: Kamil Rytarowski <n54@gmx.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>,
- qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com
-Message-ID: <7a823db0-4fb1-8a47-bd8b-c0a4cc77fa9e@gmx.com>
-Subject: Re: [PATCH v3 00/10] tests: Add VM based build tests (for non-x86_64
- and/or non-Linux)
-References: <20170822044155.2451-1-famz@redhat.com>
- <40d04f21-011e-1736-ed62-1d205926d60a@redhat.com>
-In-Reply-To: <40d04f21-011e-1736-ed62-1d205926d60a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, 22 Aug 2017 16:27:38 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-On 22.08.2017 15:58, Paolo Bonzini wrote:
-> On 22/08/2017 06:41, Fam Zheng wrote:
->> as it is not easy to automate. (The ideal approach is like the ubuntu.=
-i386
->> script, which configures the guest on top of an official released imag=
-e, fully
->> automatically.)
->=20
-> Out of curiosity, why can't the 32-bit test use containers instead?
->=20
-> Paolo
->=20
+> On 08/22/2017 04:06 PM, Cornelia Huck wrote:
+> > On Tue, 22 Aug 2017 15:24:34 +0200
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> >   
+> >> On Tue, 22 Aug 2017 14:58:37 +0200
+> >> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> >>  
+> >>> On 08/22/2017 11:39 AM, Cornelia Huck wrote:    
+> >>>> On Tue, 22 Aug 2017 11:20:51 +0200
+> >>>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:  
+> >   
+> >>>>> Well, the QEMU name of the command is misleading misleading. In the AR
+> >>>>> it's called 'Configure I/O Adapter'. The PCI comes into the picture via
+> >>>>> byte 8 of the SCCB, the so called adapter type. Valid values for the
+> >>>>> adapter type are: 00-01 reserved; 02 PCI function; 03-FF reserved. So
+> >>>>> at this point we only have PCI.     
+> > 
+> > OK, I need one more piece of information. 
+> > 
+> > We obviously need to check whether the sccb we got is long enough
+> > before we try to access the command-specific field. How long is the
+> > sccb supposed to be for configure I/O adapter? For pci, 16 bytes; in
+> > general, I would guess that it needs to include at least atype and some
+> > placeholder for the payload. What does the AR say?
+> >  
+> 
+> The first 2 bytes of the SCCB designate it's length. For this particular
+> command it's at least 16 bytes (regardless of pci). The length is
+> marked as may be changed by the SCLP.
 
-At least this is more friendly to !Linux users.
+Thanks for the info, this makes implementing it correctly much easier!
 
-
---aQLI9NbSBnkk4BXAvnjbvvg7knJjSh0mh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZnD5oAAoJEEuzCOmwLnZs8EIP/jWz/mQBHcpiLyypFTFUPasM
-JjcE2UHeDGJHzgca7eQWKkfdCBHZ9AoA/Hw/Z53hDCDSpPSnja+WErQUOL9w6+at
-oMHMGTNKPUtFerGqFcHYLTsbfmwXFwI8YXuXVavJAXeQpsze62qnirtk1HpKsWCY
-c0mKVFXI8zrULbvnzFD9NrhJd4R1KrnZZAxoquad2GN37cQ6ZlagLK/X7pbWHMkw
-Ib87LYV/JBQvwBfL1fo+vVwhpHl3WmQppAp6JfrOdKJYJsHPiTdQuvC2+ML7RDGJ
-JgoradQM2V8RUgHxCEx6BXm+MxvESKEUQyRLnhbo41Ep/nUiMa0Z3ZgYC6Z7r7yb
-vWpjcVLto4xWqi/sH6s2qhptDRMtssJoa+pwafoUfeky2uqQ7lFTCuwucqWaW1Pp
-vmO3jUI4HMfVncqHTKJ0Ko7glSEkFrnkbaTkY+AW1fRFlTSDBMemvXzaT7HVG4Ce
-bkj48cJag5v3OvCY3bKUuumPBevuUz5bbVjHhZhhsjMfH2QKuWHvN8goB+kR6AN5
-KTfkqO11RORLK06PhpwcRKiOuCVCdO2qxM276WRhuMaPi6DpgztOzJuaovoQyPJ0
-vXzltITt9JhkuL/BaxJW6hultxOvXYCTUVxGlDcIlF2Bp1v9LjBYTDorXoIg1ltW
-bv9B8SGc0/3SRhw70plL
-=/BQY
------END PGP SIGNATURE-----
-
---aQLI9NbSBnkk4BXAvnjbvvg7knJjSh0mh--
+>  
+>  
+> > Looking at the pci code, I also noted that it cheerfully uses the aid
+> > field of the sccb before checking whether it is actually long enough...
+> >   
+> 
