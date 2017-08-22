@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7QO-0003f9-0z
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:32:49 -0400
+	(envelope-from <bounces@canonical.com>) id 1dk7Ya-0001Z1-Op
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:41:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7QK-0003i2-25
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:32:48 -0400
+	(envelope-from <bounces@canonical.com>) id 1dk7YX-00012G-Gj
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:41:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60077)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dk7YX-00011l-At
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:41:13 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dk7YV-0002ft-RH
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 11:41:11 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id CD1022E8031
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 11:41:11 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1502117160-24655-5-git-send-email-armbru@redhat.com>
-References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-	<1502117160-24655-5-git-send-email-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 22 Aug 2017 13:32:42 +0200
-Message-ID: <CAJ+F1CLhMBQuKFT1w9Q-U1xAts4zpERNd_CZB7V2Yg4w0Q+m3g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 04/56] char: Make ringbuf-read size
- unsigned in QAPI/QMP
+Date: Tue, 22 Aug 2017 11:33:51 -0000
+From: ChristianEhrhardt <1711602@bugs.launchpad.net>
+Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
+Message-Id: <150340163132.11507.14527181207906680523.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
+ 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,101 +37,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, jcody <jcody@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
 
-Hi
+For me qemu_file_set_error was always called from qemu_fill_buffer, interes=
+ting that it seems different for you.
+I'll rerun a few times to ensure it really always is always from qemu_fill_=
+buffer for me.
 
-On Mon, Aug 7, 2017 at 4:45 PM, Markus Armbruster <armbru@redhat.com> wrote=
-:
-> Sizes should use QAPI type 'size' (uint64_t).  ringbuf-read parameter
-> @size is 'int' (int64_t).  qmp_ringbuf_read() rejects negative values,
-> then implicitly converts to size_t.
->
-> Change the parameter to 'size' and drop the check for negative values.
->
-> ringbuf-read now accepts size values between 2^63 and 2^64-1.  It
-> accepts negative values as before, because that's how the QObject
-> input visitor works for backward compatibility.
->
+-- =
 
-Negative values over json will be implicitly converted to positive
-values with this change, right? Or are they rejected earlier?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1711602
 
-If so that is a change of behaviour that I am not sure is worth doing
-now (without explicit protocol break), but I don't mind.
+Title:
+  --copy-storage-all failing with qemu 2.10
 
-> The HMP command's size parameter remains uint32_t, as HMP args_type
-> strings can't do uint64_t byte counts: 'l' is signed, and 'o'
-> multiplies by 2^20.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Status in QEMU:
+  New
+Status in libvirt package in Ubuntu:
+  Confirmed
+Status in qemu package in Ubuntu:
+  Confirmed
 
-> ---
->  chardev/char-ringbuf.c | 11 +++--------
->  qapi-schema.json       |  2 +-
->  2 files changed, 4 insertions(+), 9 deletions(-)
->
-> diff --git a/chardev/char-ringbuf.c b/chardev/char-ringbuf.c
-> index df52b04..a9205ea 100644
-> --- a/chardev/char-ringbuf.c
-> +++ b/chardev/char-ringbuf.c
-> @@ -65,10 +65,10 @@ static int ringbuf_chr_write(Chardev *chr, const uint=
-8_t *buf, int len)
->      return len;
->  }
->
-> -static int ringbuf_chr_read(Chardev *chr, uint8_t *buf, int len)
-> +static int ringbuf_chr_read(Chardev *chr, uint8_t *buf, size_t len)
->  {
->      RingBufChardev *d =3D RINGBUF_CHARDEV(chr);
-> -    int i;
-> +    size_t i;
->
->      qemu_mutex_lock(&chr->chr_write_lock);
->      for (i =3D 0; i < len && d->cons !=3D d->prod; i++) {
-> @@ -151,7 +151,7 @@ void qmp_ringbuf_write(const char *device, const char=
- *data,
->      }
->  }
->
-> -char *qmp_ringbuf_read(const char *device, int64_t size,
-> +char *qmp_ringbuf_read(const char *device, uint64_t size,
->                         bool has_format, enum DataFormat format,
->                         Error **errp)
->  {
-> @@ -171,11 +171,6 @@ char *qmp_ringbuf_read(const char *device, int64_t s=
-ize,
->          return NULL;
->      }
->
-> -    if (size <=3D 0) {
-> -        error_setg(errp, "size must be greater than zero");
-> -        return NULL;
-> -    }
-> -
->      count =3D ringbuf_count(chr);
->      size =3D size > count ? count : size;
->      read_data =3D g_malloc(size + 1);
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index febe70e..18ec301 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -543,7 +543,7 @@
->  #
->  ##
->  { 'command': 'ringbuf-read',
-> -  'data': {'device': 'str', 'size': 'int', '*format': 'DataFormat'},
-> +  'data': {'device': 'str', 'size': 'size', '*format': 'DataFormat'},
->    'returns': 'str' }
->
->  ##
-> --
-> 2.7.5
->
->
+Bug description:
+  We fixed an issue around disk locking already in regard to qemu-nbd
+  [1], but there still seem to be issues.
 
+  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
+://10.22.69.196/system
+  error: internal error: qemu unexpectedly closed the monitor: 2017-08-18T1=
+2:10:29.800397Z qemu-system-x86_64: -chardev pty,id=3Dcharserial0: char dev=
+ice redirected to /dev/pts/0 (label charserial0)
+  2017-08-18T12:10:48.545776Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
 
+  Source libvirt log for the guest:
+  2017-08-18 12:09:08.251+0000: initiating migration
+  2017-08-18T12:09:08.809023Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+  2017-08-18T12:09:08.809481Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
 
---=20
-Marc-Andr=C3=A9 Lureau
+  Target libvirt log for the guest:
+  2017-08-18T12:09:08.730911Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+  2017-08-18 12:09:09.010+0000: shutting down, reason=3Dcrashed
+
+  Given the timing it seems that the actual copy now works (it is busy ~10 =
+seconds on my environment which would be the copy).
+  Also we don't see the old errors we saw before, but afterwards on the act=
+ual take-over it fails.
+
+  Dmesg has no related denials as often apparmor is in the mix.
+
+  Need to check libvirt logs of source [2] and target [3] in Detail.
+
+  [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02200.html
+  [2]: http://paste.ubuntu.com/25339356/
+  [3]: http://paste.ubuntu.com/25339358/
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1711602/+subscriptions
