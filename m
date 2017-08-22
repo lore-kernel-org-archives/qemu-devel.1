@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dk4rU-0001sB-6E
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:37 -0400
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dk4re-00020F-L9
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dk4rR-0004T9-3o
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38426)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dk4rQ-0004Qv-PX
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:33 -0400
-Date: Tue, 22 Aug 2017 16:48:25 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170822084825.GA3210@lemon>
-References: <20170821135743.GC4371@lemon> <20170821153622.GG2231@work-vm>
-	<20170821165450.GE4371@lemon> <20170821172852.GA3236@work-vm>
-	<20170822021556.GA2146@lemon>
-	<20170822025654.GE30356@pxdev.xzpeter.org>
-	<20170822041519.GC2146@lemon>
-	<20170822055903.GF30356@pxdev.xzpeter.org>
-	<20170822063348.GE2146@lemon> <20170822082940.GB2109@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170822082940.GB2109@work-vm>
-Subject: Re: [Qemu-devel] [RFC 0/6] monitor: allow per-monitor thread
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dk4rb-0004oP-LQ
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:46 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:59634)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dk4ra-0004jF-VI
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:48:43 -0400
+From: Wang yong <wang.yong155@zte.com.cn>
+Date: Tue, 22 Aug 2017 16:46:16 +0800
+Message-Id: <1503391578-6121-2-git-send-email-wang.yong155@zte.com.cn>
+In-Reply-To: <1503391578-6121-1-git-send-email-wang.yong155@zte.com.cn>
+References: <1503391578-6121-1-git-send-email-wang.yong155@zte.com.cn>
+Subject: [Qemu-devel] [PATCHv4 01/03] qemu-iothread: IOThread supports the
+ GMainContext event loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,93 +24,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: pbonzini@redhat.com, stefanha@redhat.com, famz@redhat.com, jasowang@redhat.com, zhangchen.fnst@cn.fujitsu.com, zhang.zhanghailiang@huawei.com
+Cc: wang.yong155@zte.com.cn, wang.guang55@zte.com.cn, lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org
 
-On Tue, 08/22 09:29, Dr. David Alan Gilbert wrote:
-> * Fam Zheng (famz@redhat.com) wrote:
-> > On Tue, 08/22 13:59, Peter Xu wrote:
-> > > On Tue, Aug 22, 2017 at 12:15:19PM +0800, Fam Zheng wrote:
-> > > > On Tue, 08/22 10:56, Peter Xu wrote:
-> > > > > I haven't really encountered (c), but I think it's the migrate_cancel
-> > > > > command that matters, which should not need BQL as well.
-> > > > 
-> > > > There is bdrv_invalidate_cache_all() in migrate_cancel which clearly isn't safe.
-> > > > Is that if block unreachable in this case? If so we should assert, otherwise
-> > > > this command is not okay to run without BQL.
-> > > 
-> > > Ah. I see.  Even if so, if that is the only usage of BQL, IMHO we can
-> > > still mark migrate_cancel as "without-bql=true", instead we take the
-> > > BQL before calling bdrv_invalidate_cache_all().  Then migrate_cancel
-> > > can be BQL-free at least when block migration is not active.
-> > > 
-> > > > 
-> > > > Generically, what guarantee the thread-safety of a qmp command when you decide
-> > > > BQL is not needed? In other words, how do you prove commands are safe without
-> > > > BQL? I think almost every command accesses global state, but lock-free data
-> > > > structures are rare AFAICT.
-> > > 
-> > > I would suggest we split the problem into at least three parts.  IMHO
-> > > we need to answer below questions one by one to know what we should do
-> > > next:
-> > > 
-> > > 1. whether we can handle monitor commands outside iothread, or say, in
-> > >    an isolated thread?
-> > > 
-> > >    This is basically what patch 2 does, the "per-monitor threads".
-> > > 
-> > >    IMHO this is the very first question to ask.  So now I know that at
-> > >    least current code cannot do it.  We need to at least do something
-> > >    to remove/replace the assertion to make this happen.  Can we?  I
-> > >    don't really know the answer yet.  If this is undoable, we can skip
-> > >    question 2/3 below and may need to rethink on how to solve the
-> > >    problem that postcopy recovery encounters.
-> > > 
-> > > 2. whether there is any monitor commands can run without BQL?
-> > > 
-> > >    This is basically what patch 3/5 does, one for QMP, one for HMP.
-> > > 
-> > >    If we can settle question 1, then we can possibly start consider
-> > >    this question.  This step does not really allow any command to run
-> > >    without BQL, but we need to know whether it's possible in general,
-> > >    and if possible, we provide a framework to allow QMP/HMP developers
-> > >    to specify that.  If you see patch 3/5, the default behavior is
-> > >    still taking the BQL for all commands.
-> > > 
-> > >    IMHO doing this whole thing is generally good in the sense that
-> > >    this is actually forcing ourselves to break the BQL into smaller
-> > >    locks.  Take the migration commands for example: migrate_incoming
-> > >    do not need BQL, and when we write codes around it we know that we
-> > >    don't need to think about thread-safety.  That's not good IMHO.  I
-> > >    think it's time we should start consider thread-safety always.
-> > >    Again, for migrate_incoming to do this, actually we'll possibly at
-> > >    least need a migration management lock (the smaller lock) to make
-> > >    sure e.g. the user is not running two migrate_incoming commands in
-> > >    parallel (after per-monitor threads, it can happen).  But it's
-> > >    better than BQL, because BQL is for sure too big, so even a guest
-> > >    page access (as long as it held the BQL) can block migration
-> > >    commands.
-> > 
-> > Yes, this is my point. You cannot just declare a command "BQL-free" without
-> > adding small locks first, and I think this is actually missing in this series.
-> > As you said, two per-monitor threads can race if they do migrate_incoming in
-> > parallel.  This is also the answer to 3.
-> 
-> Some commands really could be lock-free.  For example an 'info status'
-> should just be a read without any locking.
+From: Wang Yong <wang.yong155@zte.com.cn>
 
-Indeed, it makes sense to enable as many info (query-*) commands as possible on
-non-mainloop monitors.
+IOThread uses AioContext event loop and does not run a GMainContext.
+Therefore,chardev cannot work in IOThread,such as the chardev is
+used for colo-compare packets reception.
 
-> It might also be possible to make a version of migrate_cancel lock-free;
-> in particular the critical part is being able to do a shutdown() on the
-> socket - that's enough to cause any of the migration threads to 
-> unblock and take their failure path.
-> 
-> Also in the case of COLO; there should be an equivalent place to
-> do the shutdown() on the migration thread and then set a flag to cause
-> failover.
-> (It's currently qmp_x_colo_lost_heartbeat but I think the eventual
-> version would be more complex).
+This patch makes the IOThread run the GMainContext event loop,
+chardev and IOThread can work together.
 
-Fam
+Signed-off-by: Wang Yong <wang.yong155@zte.com.cn>
+Signed-off-by: Wang Guang <wang.guang55@zte.com.cn>
+---
+ include/sysemu/iothread.h |  4 ++++
+ iothread.c                | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 47 insertions(+)
+
+diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
+index e6da1a4..d2985b3 100644
+--- a/include/sysemu/iothread.h
++++ b/include/sysemu/iothread.h
+@@ -24,6 +24,9 @@ typedef struct {
+ 
+     QemuThread thread;
+     AioContext *ctx;
++    GMainContext *worker_context;
++    GMainLoop *main_loop;
++    GOnce once;
+     QemuMutex init_done_lock;
+     QemuCond init_done_cond;    /* is thread initialization done? */
+     bool stopping;
+@@ -41,5 +44,6 @@ typedef struct {
+ char *iothread_get_id(IOThread *iothread);
+ AioContext *iothread_get_aio_context(IOThread *iothread);
+ void iothread_stop_all(void);
++GMainContext *iothread_get_g_main_context(IOThread *iothread);
+ 
+ #endif /* IOTHREAD_H */
+diff --git a/iothread.c b/iothread.c
+index beeb870..fb1c55b 100644
+--- a/iothread.c
++++ b/iothread.c
+@@ -57,6 +57,20 @@ static void *iothread_run(void *opaque)
+ 
+     while (!atomic_read(&iothread->stopping)) {
+         aio_poll(iothread->ctx, true);
++
++        if (atomic_read(&iothread->worker_context)) {
++            g_main_context_push_thread_default(iothread->worker_context);
++            iothread->main_loop =
++                g_main_loop_new(iothread->worker_context, TRUE);
++            g_main_loop_run(iothread->main_loop);
++
++            g_main_loop_unref(iothread->main_loop);
++            iothread->main_loop = NULL;
++
++            g_main_context_pop_thread_default(iothread->worker_context);
++            g_main_context_unref(iothread->worker_context);
++            iothread->worker_context = NULL;
++        }
+     }
+ 
+     rcu_unregister_thread();
+@@ -73,6 +87,9 @@ static int iothread_stop(Object *object, void *opaque)
+     }
+     iothread->stopping = true;
+     aio_notify(iothread->ctx);
++    if (atomic_read(&iothread->main_loop)) {
++        g_main_loop_quit(iothread->main_loop);
++    }
+     qemu_thread_join(&iothread->thread);
+     return 0;
+ }
+@@ -125,6 +142,7 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
+ 
+     qemu_mutex_init(&iothread->init_done_lock);
+     qemu_cond_init(&iothread->init_done_cond);
++    iothread->once = (GOnce) G_ONCE_INIT;
+ 
+     /* This assumes we are called from a thread with useful CPU affinity for us
+      * to inherit.
+@@ -309,3 +327,28 @@ void iothread_stop_all(void)
+ 
+     object_child_foreach(container, iothread_stop, NULL);
+ }
++
++static gpointer iothread_g_main_context_init(gpointer opaque)
++{
++    AioContext *ctx;
++    IOThread *iothread = opaque;
++    GSource *source;
++
++    iothread->worker_context = g_main_context_new();
++
++    ctx = iothread_get_aio_context(iothread);
++    source = aio_get_g_source(ctx);
++    g_source_attach(source, iothread->worker_context);
++    g_source_unref(source);
++
++    aio_notify(iothread->ctx);
++
++    return NULL;
++}
++
++GMainContext *iothread_get_g_main_context(IOThread *iothread)
++{
++    g_once(&iothread->once, iothread_g_main_context_init, iothread);
++
++    return iothread->worker_context;
++}
+-- 
+1.8.3.1
