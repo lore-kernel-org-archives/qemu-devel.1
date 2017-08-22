@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk7rz-0003hJ-EJ
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:01:20 -0400
+	(envelope-from <bounces@canonical.com>) id 1dk7s5-0003mC-BE
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:01:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk7rv-0003kR-BC
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:01:19 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37777)
+	(envelope-from <bounces@canonical.com>) id 1dk7s1-0003mL-60
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:01:25 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37930)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dk7rv-0003kB-5R
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:01:15 -0400
+	id 1dk7s1-0003m6-01
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:01:21 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dk7rt-0006on-Jk
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 12:01:13 +0000
+	id 1dk7rz-0006ol-4k
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 12:01:19 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8B9622E80D7
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 12:01:13 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id DBEB42E80D2
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 12:01:18 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Aug 2017 11:44:20 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Date: Tue, 22 Aug 2017 11:50:43 -0000
+From: ChristianEhrhardt <1711602@bugs.launchpad.net>
 Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
-Message-Id: <150340226005.16782.15057914336745441784.malone@gac.canonical.com>
+Message-Id: <150340264362.16601.850871687319877276.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
  2.10
@@ -39,10 +39,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The difference with the qemu_file_set_error is I'm looking on the source
-- because what's happening is the source is erroring so closing the
-socket, and so the error you're seeing on the destination is real - the
-socket just EOF'd!
+In 5/5 tries this was on qemu_fill_buffer for my case.
+
+But that was on the receiving side, and what you found is closer to the roo=
+t cause on the source of the migration.
+I checked on qemu_file_set_error on the source and can confirm your finding=
+ that on the source it is from bdrv_inactivate_all.
+
+#0  qemu_file_set_error (f=3Df@entry=3D0x6b76b46c00, ret=3Dret@entry=3D-1) =
+at ./migration/qemu-file.c:124
+#1  0x0000006b727140cb in qemu_savevm_state_complete_precopy (f=3D0x6b76b46=
+c00, iterable_only=3Diterable_only@entry=3Dfalse, =
+
+    inactivate_disks=3Dinactivate_disks@entry=3Dtrue) at ./migration/savevm=
+.c:1160
+#2  0x0000006b7270c84b in migration_completion (start_time=3D<synthetic poi=
+nter>, old_vm_running=3D<synthetic pointer>, current_active_state=3D4, =
+
+    s=3D0x6b74ef53b0) at ./migration/migration.c:1858
+#3  migration_thread (opaque=3D0x6b74ef53b0) at ./migration/migration.c:2023
+#4  0x00007f61a740e74a in start_thread (arg=3D0x7f61467fc700) at pthread_cr=
+eate.c:456
+#5  0x00007f61a714acaf in clone () at ../sysdeps/unix/sysv/linux/x86_64/clo=
+ne.S:97
+
+Also as I outlined - what seems ages ago in comment #6 - if the source
+is a qemu 2.8 the migration works for me which would kind of match
+assuming the root cause is in the source.
 
 -- =
 
