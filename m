@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1djyjc-0008DI-T5
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 22:16:06 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1djys2-0003Ne-9F
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 22:24:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1djyjZ-0002JO-OA
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 22:16:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35240)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1djyjZ-0002J5-Eb
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 22:16:01 -0400
-Date: Tue, 22 Aug 2017 10:15:56 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170822021556.GA2146@lemon>
-References: <1503301464-27886-1-git-send-email-peterx@redhat.com>
-	<20170821085851.GA4371@lemon>
-	<20170821100555.GC30356@pxdev.xzpeter.org>
-	<20170821135743.GC4371@lemon> <20170821153622.GG2231@work-vm>
-	<20170821165450.GE4371@lemon> <20170821172852.GA3236@work-vm>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1djyrx-0006V6-Bg
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 22:24:46 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:36806)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1djyrx-0006Up-6W
+	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 22:24:41 -0400
+Received: by mail-qt0-x241.google.com with SMTP id c15so15904260qta.3
+	for <qemu-devel@nongnu.org>; Mon, 21 Aug 2017 19:24:39 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170731085110.1050-1-apahim@redhat.com>
+	<20170731085110.1050-6-apahim@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <620a8751-556a-48d1-d35d-6855faa02eec@amsat.org>
+Date: Mon, 21 Aug 2017 23:24:29 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170821172852.GA3236@work-vm>
-Subject: Re: [Qemu-devel] [RFC 0/6] monitor: allow per-monitor thread
+In-Reply-To: <20170731085110.1050-6-apahim@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v6 5/7] qemu.py: use os.path.null instead
+ of /dev/null
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +36,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, mdroth@linux.vnet.ibm.com, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, stefanha@gmail.com, armbru@redhat.com, mreitz@redhat.com, crosa@redhat.com
 
-On Mon, 08/21 18:28, Dr. David Alan Gilbert wrote:
-> > It's not much more than asserting qemu_mutex_iothread_locked(), the problem is
-> > the new monitor thread breaks certain assumptions that was true.
-> > 
-> > What is interesting in this is that block layer's nested aio_poll() now not only
-> > run in the main thread but also in the monitor thread. Bugs may hide there.  :)
-> > 
-> > That's why I suggested a "safe by default" strategy.
+On 07/31/2017 05:51 AM, Amador Pahim wrote:
+> For increased portability, let's use os.path.devnull.
 > 
-> OK, that's going to need some more flags somewhere; we've now
-> effectively got three types of command:
->    a) Commands that can only run in the main thread
->    b) Commands that can run in other monitor threads, but must have the bql
->    c) Commands that can run in other monitor threads but don't take the
->    bql
-> 
->    The class (a) that you point out are a pain; arguably if we have to
-> split them up then perhaps we should initially only allow (c).
-> 
-> > One step back, is it possible to "unblock" main thread even upon network issue?
-> > What is the scenario that causes main thread hang? Is there a backtrace?
-> 
-> There are at least 3 scenarious I know of:
-> 
->   a) Postcopy: An IO operation takes the lock and accesses guest memory;
->      the guest memory is missing due to userfault'd memory.
->      Unfortunately the network connection to the source happens to fail;
->       so we never receive that page and the thread stays stuck in the userfault.
->      We can't issue a recovery command to reopen a network connection
->      because the monitor is blocked.
->   b) Postcopy: A monitor command either accesses guest memory or has
->      to wait on another thread that is doing; e.g. info cpu  waits
->      for the CPU threads to exit the loop, but they might be blocked
->      waiting on userfault.
->   c) COLO or migration: The network fails during the critical bit
->      at the end of migration when we have the bql held.  You can't
->      issue a migration_cancel or a colo-failover via the monitor
->      because it's blocked.
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
 
-Thanks for explainaing!
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-What commands are in class (c)? From the cover letter it seems migrate-incoming
-is the only one in mind, I'm not sure how it resolves any of the three
-scenarios?
-
+> ---
+>   scripts/qemu.py | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> There are other advantages of being able to do bql'less commands;
-> things like an 'info status' or the like should be doable without bql,
-> so just avoding taking the bql when the management layer is doing
-> stuff (or alternatively getting faster replies on management)
-> are both useful.
-
-Agreed. It is very useful not just for migration.
-
-Fam
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index 9434ccc30b..d313c6d4db 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -80,7 +80,7 @@ class QEMUMachine(object):
+>           fd_param = ["%s" % self._socket_scm_helper,
+>                       "%d" % self._qmp.get_sock_fd(),
+>                       "%s" % fd_file_path]
+> -        devnull = open('/dev/null', 'rb')
+> +        devnull = open(os.path.devnull, 'rb')
+>           p = subprocess.Popen(fd_param, stdin=devnull, stdout=sys.stdout,
+>                                stderr=sys.stderr)
+>           return p.wait()
+> @@ -137,7 +137,7 @@ class QEMUMachine(object):
+>   
+>       def launch(self):
+>           '''Launch the VM and establish a QMP connection'''
+> -        devnull = open('/dev/null', 'rb')
+> +        devnull = open(os.path.devnull, 'rb')
+>           qemulog = open(self._qemu_log_path, 'wb')
+>           try:
+>               self._pre_launch()
+> 
