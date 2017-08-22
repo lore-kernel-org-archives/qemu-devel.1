@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1dkAKW-0004Fw-3k
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:38:56 -0400
+	(envelope-from <mlureau@redhat.com>) id 1dkANS-0006mT-H7
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:41:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiaoguangrong.eric@gmail.com>) id 1dkAKS-0006un-6g
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:38:56 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:36210)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <xiaoguangrong.eric@gmail.com>)
-	id 1dkAKR-0006tY-WD
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:38:52 -0400
-Received: by mail-pf0-x243.google.com with SMTP id c15so380922pfm.3
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 07:38:50 -0700 (PDT)
-References: <1490074437-17059-1-git-send-email-guangrong.xiao@linux.intel.com>
-	<20170323083610.GH16717@stefanha-x1.localdomain>
-	<20170526031244.xegyypr5vblnmslu@hz-desktop>
-From: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Message-ID: <d7e624c1-bfb6-0d18-ca33-8e0a18a9a1a9@gmail.com>
-Date: Tue, 22 Aug 2017 22:38:46 +0800
+	(envelope-from <mlureau@redhat.com>) id 1dkANO-0000np-IL
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:41:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57830)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dkANO-0000k5-9H
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:41:54 -0400
+Date: Tue, 22 Aug 2017 10:41:34 -0400 (EDT)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <1880955910.1845734.1503412894881.JavaMail.zimbra@redhat.com>
+In-Reply-To: <d1574f35-ebe5-8ede-180a-e584834e9d9a@redhat.com>
+References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
+	<20170822132255.23945-52-marcandre.lureau@redhat.com>
+	<20170822162400.51f07d89.cohuck@redhat.com>
+	<d1574f35-ebe5-8ede-180a-e584834e9d9a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170526031244.xegyypr5vblnmslu@hz-desktop>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: update mail address for NVDIMM
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 51/54] qapi: make s390 commands depend
+ on TARGET_S390X
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +30,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, pbonzini@redhat.com, imammedo@redhat.com, ehabkost@redhat.com, kvm@vger.kernel.org, mst@redhat.com, gleb@kernel.org, mtosatti@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, rth@twiddle.net, Thomas Huth <thuth@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
+Hi
 
-[ CC Thomas. ]
+----- Original Message -----
+> On 22.08.2017 16:24, Cornelia Huck wrote:
+> > On Tue, 22 Aug 2017 15:22:52 +0200
+> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+> >=20
+> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> >> ---
+> >>  qapi-schema.json                        | 10 +++++++---
+> >>  include/sysemu/arch_init.h              |  6 ------
+> >>  monitor.c                               | 14 --------------
+> >>  qmp.c                                   | 14 --------------
+> >>  stubs/arch-query-cpu-model-baseline.c   | 12 ------------
+> >>  stubs/arch-query-cpu-model-comparison.c | 12 ------------
+> >>  target/s390x/cpu_models.c               |  4 ++--
+> >>  stubs/Makefile.objs                     |  2 --
+> >>  8 files changed, 9 insertions(+), 65 deletions(-)
+> >>  delete mode 100644 stubs/arch-query-cpu-model-baseline.c
+> >>  delete mode 100644 stubs/arch-query-cpu-model-comparison.c
+> >>
+> >> diff --git a/qapi-schema.json b/qapi-schema.json
+> >> index 58574b3044..d4e1552ddc 100644
+> >> --- a/qapi-schema.json
+> >> +++ b/qapi-schema.json
+> >> @@ -3577,7 +3577,8 @@
+> >>  #
+> >>  ##
+> >>  { 'command': 'dump-skeys',
+> >> -  'data': { 'filename': 'str' } }
+> >> +  'data': { 'filename': 'str' },
+> >> +  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_S390X)']}
+> >=20
+> > I agree with making this s390x specific...
+> >> =20
+> >>  ##
+> >>  # @netdev_add:
+> >> @@ -4621,7 +4622,9 @@
+> >>  ##
+> >>  { 'command': 'query-cpu-model-comparison',
+> >>    'data': { 'modela': 'CpuModelInfo', 'modelb': 'CpuModelInfo' },
+> >> -  'returns': 'CpuModelCompareInfo' }
+> >> +  'returns': 'CpuModelCompareInfo',
+> >> +  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_S390X)']}
+> >> +
+> >> =20
+> >>  ##
+> >>  # @CpuModelBaselineInfo:
+> >> @@ -4673,7 +4676,8 @@
+> >>  { 'command': 'query-cpu-model-baseline',
+> >>    'data': { 'modela': 'CpuModelInfo',
+> >>              'modelb': 'CpuModelInfo' },
+> >> -  'returns': 'CpuModelBaselineInfo' }
+> >> +  'returns': 'CpuModelBaselineInfo',
+> >> +  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_S390X)']}
+> >=20
+> > ...but I'm not sure about the cpu model stuff. Wasn't the idea to move
+> > to this model for all architectures later? (Given that we have stubs
+> > for architectures not implementing this, instead of ifdeffing it in
+> > monitor.c)
+> >=20
+>=20
+> +1, not architecture specific (in contrast to skey), simply not
+> supported _yet_ on other architectures.
 
-Ping.
+We can add other archs once they implement it. See for example:
+"qapi: make query-cpu-model-expansion depend on s390 or x86"
 
-Thomas complained that the mail address does not work and the failed notification
-is really annoyed. Could Paolo or Michael or anyone else merge this patch please?
-
-Thanks!
-
-On 05/26/2017 11:12 AM, Haozhong Zhang wrote:
-> On 03/23/17 08:36 +0000, Stefan Hajnoczi wrote:
->> On Tue, Mar 21, 2017 at 01:33:57PM +0800, Xiao Guangrong wrote:
->>> From: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
->>>
->>> My Intel mail account will be disabled soon, update the mail info
->>> to my private mail
->>>
->>> Signed-off-by: Xiao Guangrong <xiaoguangrong.eric@gmail.com>
->>> ---
->>>   MAINTAINERS | 2 +-
->>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> 
-> Ping, I noticed that Guangrong's email has not been updated in
-> MAINTAINERS. Was this patch missed?
-> 
-> Thanks,
-> Haozhong
-> 
+Thanks
