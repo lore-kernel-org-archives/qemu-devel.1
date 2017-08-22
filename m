@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkBKg-0004Cp-KC
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:43:11 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dkBNe-00070z-Dg
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:46:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkBKf-0003Mn-Ou
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:43:10 -0400
-References: <1503414375-21009-1-git-send-email-thuth@redhat.com>
-	<CAFEAcA-92Jjz2uCC387oX2u0NWfijPwB_8zGaagC1m=sKD8zhQ@mail.gmail.com>
-	<443135b4-4b36-bae6-b50a-12fb4a55a858@redhat.com>
-	<CAFEAcA-AG5XoOJr3p_UU9dACjawp3OtKDy8GMRMpdFfE8foqTA@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <06c16109-cdd2-0732-176d-6ec80b1f7f4e@redhat.com>
-Date: Tue, 22 Aug 2017 17:42:59 +0200
+	(envelope-from <imammedo@redhat.com>) id 1dkBNd-0005TF-NL
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:46:14 -0400
+Date: Tue, 22 Aug 2017 17:45:58 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170822174558.5db57e9f@nial.brq.redhat.com>
+In-Reply-To: <87shgjaezt.fsf@dusky.pond.sub.org>
+References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
+	<1502117160-24655-13-git-send-email-armbru@redhat.com>
+	<20170822145505.643f74fa@nial.brq.redhat.com>
+	<87shgjaezt.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-AG5XoOJr3p_UU9dACjawp3OtKDy8GMRMpdFfE8foqTA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/misc/auxbus.c: Mark the
- aux-to-i2c-bridge device as non-hotpluggable
+Subject: Re: [Qemu-devel] [RFC PATCH 12/56] pc-dimm: Make size and address
+ unsigned in QAPI/QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, KONRAD Frederic <frederic.konrad@adacore.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, mreitz@redhat.com, jsnow@redhat.com
 
-On 22.08.2017 17:30, Peter Maydell wrote:
-> On 22 August 2017 at 16:26, Thomas Huth <thuth@redhat.com> wrote:
->> On 22.08.2017 17:12, Peter Maydell wrote:
->>> Why is our default "hotpluggable" rather than "not hotpluggable" ?
->>> We must have way more non-hotpluggable devices than hotpluggable
->>> ones, and it takes active effort to make a hotpluggable device
->>> model, so it seems like it would be much less bug-prone to
->>> require hotpluggable devices to set dc->hotpluggable true
->>> rather than all the non-hotpluggable ones to set it false...
->>
->> I think most devices are already non-hotpluggable automatically because
->> they sit on a bus that is not hot-pluggable (e.g. sysbus devices). The
->> problematic ones are the devices with .parent = TYPE_DEVICE. And for
->> these, I think it is quite hard to say whether they should be
->> hot-pluggable by default or not?
-> 
-> To implement hotplug you need to write extra code (notably some
-> kind of unrealize method to undo whatever you did in realize),
-> at which point also setting the hotpluggable flag is trivial.
-> 
->> Anyway, according to my tests (I'm currently working on a test that
->> automatically does device_add + device_del for all devices, as you might
->> have guessed already), there are not that many devices that cause
->> problems here, so I guess marking some few with hotpluggable = false
->> should be OK?
-> 
-> The problem is not the devices we have today but the ones we're
-> going to write tomorrow. Having hotpluggable default to false
-> "fails safe" -- the worst that happens is that somebody writing
-> a hotpluggable device finds in their testing that they need to
-> set the flag to make it work. Having it default to true fails
-> non-safely -- as you've found, people writing devices that
-> were never expected to be hotplugged don't try to test the
-> error case of attempting hotplug anyway, and in code review
-> the absence of a line of code is very hard to reliably spot,
-> so we get devices in tree that crash QEMU if you try to
-> hotplug them. If we make the default be not-hotpluggable
-> we fix this not just today but forever.
+On Tue, 22 Aug 2017 15:50:14 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
 
-OK, you've got a point. I'll ponder about this a little bit and will try
-to come up with a patch / some patches ...
+> Igor Mammedov <imammedo@redhat.com> writes:
+> 
+> > On Mon,  7 Aug 2017 16:45:16 +0200
+> > Markus Armbruster <armbru@redhat.com> wrote:
+> >  
+> >> Sizes and addresses should use QAPI type 'size' (uint64_t).
+> >> PCDIMMDeviceInfo members @addr and @size are 'int' (int64_t).
+> >> qmp_pc_dimm_device_list() implicitly converts from uint64_t.
+> >> 
+> >> Change these PCDIMMDeviceInfo members to 'size'.
+> >> 
+> >> query-memory-devices now reports sizes and addresses above 2^63-1
+> >> correctly instead of their (negative) two's complement.
+> >> 
+> >> HMP's "info memory-devices" already reported them correctly, because
+> >> it printed the signed integers with PRIx64 and PRIu32.  
+> > s/signed/unsigned/  
+> 
+> Before this patch: signed.  Afterwards: unsigned.  Would
+> 
+>    HMP's "info memory-devices" already reported them correctly, because
+>    it printed the signed (before the patch) integers with PRIx64 and
+>    PRIu32.
+> 
+> be clearer?
+yes, that's more clear
 
- Thomas
+Thanks.
+
+> 
+> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>  
+> > Reviewed-by: Igor Mammedov <imammedo@redhat.com>  
+> 
+> Thanks!
