@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dkEWK-0005xM-GL
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 15:07:25 -0400
+	(envelope-from <bounces@canonical.com>) id 1dkEth-0000HE-Pa
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 15:31:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dkEWH-0008K2-BL
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 15:07:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48754)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dkEWH-0008JN-6A
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 15:07:21 -0400
-Date: Tue, 22 Aug 2017 16:07:09 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170822190709.GJ19998@localhost.localdomain>
-References: <20170818142613.32394-1-ldoktor@redhat.com>
-	<f8f1684a-0684-7261-57c3-63aa58892000@redhat.com>
-	<87bmn8qd3z.fsf@dusky.pond.sub.org>
-	<c560b757-6bb1-2ded-a25b-193e5f9318c2@amsat.org>
+	(envelope-from <bounces@canonical.com>) id 1dkEtd-0006gM-Q8
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 15:31:33 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33844)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dkEtd-0006ft-KC
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 15:31:29 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dkEta-0007i3-At
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 19:31:26 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 28FA32E8206
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 19:31:21 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <c560b757-6bb1-2ded-a25b-193e5f9318c2@amsat.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 00/10] qemu.py: Pylint/style fixes
+Date: Tue, 22 Aug 2017 19:21:22 -0000
+From: ChristianEhrhardt <1711602@bugs.launchpad.net>
+Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
+Message-Id: <150342968264.8584.334454986060819752.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
+ 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +37,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, qemu-devel@nongnu.org, famz@redhat.com, apahim@redhat.com, mreitz@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Cleber Rosa <crosa@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
 
-(CCing Cleber and Stefan)
+With the patch from Stefan and your debug applied source and target I still=
+ run into the same issue I'd say.
+Id's are slightly off, but they are different on every try anyway.
 
-On Tue, Aug 22, 2017 at 07:19:45AM -0300, Philippe Mathieu-Daud=E9 wrote:
-[...]
-> Can we predict how the python scripts will evolve? Only fast-testing?
->=20
+Still looks the same for me:
+bdrv_inactivate_recurse: entry for drive-virtio-disk0
+bdrv_inactivate_recurse: entry for #block184
+bdrv_inactivate_recurse: entry for #block319
+bdrv_inactivate_recurse: entry for #block218
+bdrv_inactivate_recurse: exit end good for #block218
+bdrv_inactivate_recurse: exit end good for #block319
+bdrv_inactivate_recurse: entry for #block092
+bdrv_inactivate_recurse: exit end good for #block092
+bdrv_inactivate_recurse: exit end good for #block184
+bdrv_inactivate_recurse: exit end good for drive-virtio-disk0
+bdrv_inactivate_recurse: entry for #block1905
+bdrv_inactivate_recurse: entry for #block1889
+bdrv_inactivate_recurse: exit end good for #block1889
+bdrv_inactivate_recurse: exit end good for #block1905
+bdrv_inactivate_recurse: entry for drive-virtio-disk1
+bdrv_inactivate_recurse: entry for #block551
+bdrv_inactivate_recurse: entry for #block423
+bdrv_inactivate_recurse: exit end good for #block423
+bdrv_inactivate_recurse: exit end good for #block551
+bdrv_inactivate_recurse: exit end good for drive-virtio-disk1
+bdrv_inactivate_recurse: entry for #block2246
+bdrv_inactivate_recurse: entry for #block2106
+bdrv_inactivate_recurse: exit end good for #block2106
+bdrv_inactivate_recurse: exit end good for #block2246
+bdrv_inactivate_recurse: entry for drive-virtio-disk0
+bdrv_inactivate_recurse: exit 2(-1) for drive-virtio-disk0
 
-I guess it depends on how you define "fast".  Does "fast-testing"
-include a full device-crash-test run (that could take ~30
-minutes) or the full set of iotests?
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1711602
 
-> Is there some users hacking on qemu.py unaware they can/should use
-> libvirt-python?
+Title:
+  --copy-storage-all failing with qemu 2.10
 
-I believe the existing users of qemu.py wouldn't want to have
-dependencies on libvirt or other external modules (e.g. code that
-test specific QMP commands and/or is run by "make check").
+Status in QEMU:
+  New
+Status in libvirt package in Ubuntu:
+  Confirmed
+Status in qemu package in Ubuntu:
+  Confirmed
 
+Bug description:
+  We fixed an issue around disk locking already in regard to qemu-nbd
+  [1], but there still seem to be issues.
 
-> If so, shouldn't we think about running more tests through libvirt and =
-add
-> effort there?
+  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
+://10.22.69.196/system
+  error: internal error: qemu unexpectedly closed the monitor: 2017-08-18T1=
+2:10:29.800397Z qemu-system-x86_64: -chardev pty,id=3Dcharserial0: char dev=
+ice redirected to /dev/pts/0 (label charserial0)
+  2017-08-18T12:10:48.545776Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
 
-Even if the existing test code wouldn't benefit from libvirt, I
-agree there is some value in writing test code that uses libvirt.
-But in this case would the test code belong to the QEMU source
-tree, or somewhere else?
+  Source libvirt log for the guest:
+  2017-08-18 12:09:08.251+0000: initiating migration
+  2017-08-18T12:09:08.809023Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+  2017-08-18T12:09:08.809481Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
 
---=20
-Eduardo
+  Target libvirt log for the guest:
+  2017-08-18T12:09:08.730911Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+  2017-08-18 12:09:09.010+0000: shutting down, reason=3Dcrashed
+
+  Given the timing it seems that the actual copy now works (it is busy ~10 =
+seconds on my environment which would be the copy).
+  Also we don't see the old errors we saw before, but afterwards on the act=
+ual take-over it fails.
+
+  Dmesg has no related denials as often apparmor is in the mix.
+
+  Need to check libvirt logs of source [2] and target [3] in Detail.
+
+  [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02200.html
+  [2]: http://paste.ubuntu.com/25339356/
+  [3]: http://paste.ubuntu.com/25339358/
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1711602/+subscriptions
