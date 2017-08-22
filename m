@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1dk7CB-0008Ay-3h
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:18:13 -0400
+	(envelope-from <sameeh@daynix.com>) id 1dk7CV-0008Tw-Uc
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:18:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1dk7C7-0003Ng-Uo
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:18:07 -0400
-Date: Tue, 22 Aug 2017 13:18:02 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20170822023521.GZ12356@umbus.fritz.box>
-Message-ID: <alpine.BSF.2.21.1708221310280.67133@zero.eik.bme.hu>
-References: <cover.1502643878.git.balaton@eik.bme.hu>
-	<5e493fd14e60d92d4fd80492ceff5ba13eb7b558.1502643878.git.balaton@eik.bme.hu>
-	<20170818061028.GU5509@umbus.fritz.box>
-	<alpine.BSF.2.21.1708181436550.19483@zero.eik.bme.hu>
-	<20170822023521.GZ12356@umbus.fritz.box>
+	(envelope-from <sameeh@daynix.com>) id 1dk7CS-0003YY-Pi
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:18:27 -0400
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:35507)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1dk7CS-0003Xs-IY
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:18:24 -0400
+Received: by mail-io0-x242.google.com with SMTP id l190so3505020iol.2
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 04:18:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 12/12] ppc: Add aCube Sam460ex board
+In-Reply-To: <20170813155849.11368-1-sameeh@daynix.com>
+References: <20170813155849.11368-1-sameeh@daynix.com>
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Tue, 22 Aug 2017 14:18:21 +0300
+Message-ID: <CAKPgXcHH=H6OzbLKen3q21Rmx9iwdg7C_jzApmqin7NDR6XMxQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 0/3]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,78 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
+To: QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Yan Vugenfirer <yan@daynix.com>
 
-On Tue, 22 Aug 2017, David Gibson wrote:
-> On Fri, Aug 18, 2017 at 02:46:42PM +0200, BALATON Zoltan wrote:
->> On Fri, 18 Aug 2017, David Gibson wrote:
->>> On Sun, Aug 13, 2017 at 07:04:38PM +0200, BALATON Zoltan wrote:
->>>> Add emulation of aCube Sam460ex board based on AMCC 460EX embedded S=
-oC.
->>>> This is not a full implementation yet with a lot of components still
->>>> missing but enough to start a Linux kernel and the U-Boot firmware.
->>>>
->>>> Signed-off-by: Fran=E7ois Revol <revol@free.fr>
->>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->>>
->>> There are a *lot* of devices defined here.  Most of them look like
->>> they belong to the SoC, not the board (since they use DCRs), so it
->>> doesn't really make sense to define them in a board file.  It would
->>> also make it easier to review if they were split up into separate
->>> patches.
->>
->> I thought it's simpler to review a series with 12 reasonably sized pat=
-ches
->> than one with twice as many which only modify a few lines here and the=
-re
->> each. Also adding a lot of code scattered in hw directories is probabl=
-y less
->> clear than having them all at one place. But of course each approach c=
-an be
->> reasoned. I thought this might have to be split up but I've left it on=
-e
->> place for now for first review to get some advice on what's preferred.
->
-> Well, it depends on the content of the patches.  If splitting it up
-> means a lot of looking between patches to make sense of what's going
-> on then that's certainly not good.  But if the small patches are
-> independent of each other and can be assessed on their own merits,
-> then that usually makes it easier.
->
-> In this case the various new 440 devices should be pretty much
-> independent of each other, so I think splitting is the better option.
->
->> Maybe I should put things that belong to the SoC in ppc440_uc.c (simil=
-ar to
->> ppc405uc.c we already have) and move common devices used by both to
->> ppc4xx_devs.c (which already seems to serve that purpose). If more cle=
-anup
->> is needed that could be done separately afterwards, I don't think it's=
- a
->> good idea to mix in too much cleanup now to keep patches relatively si=
-mple.
->> (I already have some moving around included as clean up patches but I'=
-d like
->> to focus on actual functions than clean up at this point).
->>
->> Does putting these devices from board code to ppc440_uc.c sound
->> acceptable?
->
-> That'd be ok - though again, I'd prefer to see each device as a
-> separate patch.  It would probably be preferable to put each device in
-> a separate file as well though, unless they're _really_ tiny.  Nothing
-> inherently wrong with small .c files, if they're still more or less
-> self contained.
+Ping.
 
-Since most of these are just stubs for now and not really full emulation=20
-of the device I'd leave them in one file similar to ppc405 for now. They=20
-both could be cleaned up later if it's found necessary or devices that ar=
-e=20
-deemed ready and big enough to be moved out could be split off (like I di=
-d=20
-with i2c and pcix). If you insist, I can split it now but I think it's=20
-more difficult to work with a lot of small files scattered in hw instead=20
-of everything related to ppc440 in one place until there's still missing=20
-fucntionality. I consider splitting it up cleanup which could be done=20
-later separately unless it's a requirement to get this series in.
+On Sun, Aug 13, 2017 at 6:58 PM, Sameeh Jubran <sameeh@daynix.com> wrote:
+
+> From: Sameeh Jubran <sjubran@redhat.com>
+>
+> This series fixes qemu-ga's behaviour upon facing a missing serial/serial
+> driver by listening to the serial device's events.
+>
+> For more info on why this series is needed checkout the commit message
+> of the third patch and the following bugzilla:
+> https://bugzilla.redhat.com/show_bug.cgi?id=990629.
+>
+> Sameeh Jubran (3):
+>   qga: Channel: Add functions for checking serial status
+>   qga: main: make qga config and socket activation global
+>   qga: Prevent qemu-ga exit if serial doesn't exist
+>
+>  Makefile            |   4 +
+>  qga/channel-posix.c |  54 ++++++++++
+>  qga/channel-win32.c |  60 +++++++++++
+>  qga/channel.h       |   9 ++
+>  qga/main.c          | 284 ++++++++++++++++++++++++++++++
+> ++++++++++++++++------
+>  qga/service-win32.h |   4 +
+>  6 files changed, 385 insertions(+), 30 deletions(-)
+>
+> --
+> 2.9.4
+>
+>
+
+
+-- 
+Respectfully,
+*Sameeh Jubran*
+*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+*Software Engineer @ Daynix <http://www.daynix.com>.*
