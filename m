@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dk9wS-0000QP-76
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:14:05 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dk9yO-00023D-DK
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:16:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dk9wP-0007AW-1W
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:14:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53144)
+	(envelope-from <cohuck@redhat.com>) id 1dk9yI-0000LS-1p
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:16:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54208)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dk9wO-00079v-OS
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:14:00 -0400
-Date: Tue, 22 Aug 2017 22:13:54 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170822141354.GG3210@lemon>
-References: <20170822044155.2451-1-famz@redhat.com>
-	<20170822044155.2451-11-famz@redhat.com>
-	<20170822133827.GA5398@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dk9yH-0000Ki-Os
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:15:57 -0400
+Date: Tue, 22 Aug 2017 16:15:53 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170822161553.03faaab4.cohuck@redhat.com>
+In-Reply-To: <4a85cfd0-7b36-175c-4671-f8dbc10f4d9e@linux.vnet.ibm.com>
+References: <20170821091614.28251-1-cohuck@redhat.com>
+	<20170821091614.28251-8-cohuck@redhat.com>
+	<0d8dcac1-f536-5d69-0187-23656d003348@linux.vnet.ibm.com>
+	<17cb7925-e4eb-d174-2886-49ab9af0852c@linux.vnet.ibm.com>
+	<20170822103955.1cbc0714.cohuck@redhat.com>
+	<b7e7810c-7822-2fb8-2a2e-d67c08126639@linux.vnet.ibm.com>
+	<20170822113914.3ff24d75.cohuck@redhat.com>
+	<ff247730-9d10-352c-b6dc-8d98198181cf@linux.vnet.ibm.com>
+	<20170822152434.068b5038.cohuck@redhat.com>
+	<4a85cfd0-7b36-175c-4671-f8dbc10f4d9e@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170822133827.GA5398@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v3 10/10] tests: Add README for vm tests
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 07/10] s390x/sclp: properly guard
+ pci-specific functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,122 +36,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, pbonzini@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-Thanks for the grammar corrections! All make sense.
+On Tue, 22 Aug 2017 15:54:32 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-On Tue, 08/22 14:38, Stefan Hajnoczi wrote:
-> On Tue, Aug 22, 2017 at 12:41:55PM +0800, Fam Zheng wrote:
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > ---
-> >  tests/vm/README | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 63 insertions(+)
-> >  create mode 100644 tests/vm/README
+> On 08/22/2017 03:24 PM, Cornelia Huck wrote:
+> > On Tue, 22 Aug 2017 14:58:37 +0200
+> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+
+> >> The availability of SCLP_CMDW_{,DE}CONFIGURE_IOA is indicated
+> >> by the result of the read scp info command read info in
+> >> ReadInfo.facilities. I think we should assume that the read scp
+> >> info command is always there.  
 > > 
-> > diff --git a/tests/vm/README b/tests/vm/README
-> > new file mode 100644
-> > index 0000000000..a18b285507
-> > --- /dev/null
-> > +++ b/tests/vm/README
-> > @@ -0,0 +1,63 @@
-> > +=== VM test suite to run build in guests ===
-> > +
-> > +== Intro ==
-> > +
-> > +This test suite contains scripts that bootstrap various guest images that has
+> > Sure. But see the question in my other mail regarding the sclp
+> > facilities bit (does it cover pci or adapter reconfiguration?)  
 > 
-> s/that has/that have/ (because "images" is plural)
+> It (SCLP_HAS_PCI_RECONFIG) exactly  covers adapter reconfiguration.
+> That's what I tried to say with the paragraph above.
 
-Yes.
+Sorry, I did not get that before. So we have another confusing name...
+
+I'll just provide SCLP_HAS_PCI_RECONFIG unconditionally. Maybe
+s/PCI/IOA/ here as well?
 
 > 
-> > +necessary packages to build QEMU. The basic usage is documented in Makefile
-> > +help which is displayed with "make vm-test".
-> > +
-> > +== Quick start ==
-> > +
-> > +Run "make vm-test" to list available make targets.
-> > +
-> > +== Manual invocation ==
-> > +
-> > +Each guest script is an executable script with the same uage. For example to
-> 
-> s/uage/usage/
-> 
-> I would say "command-line options" instead though.
-
-"Command-line options" sounds better.
-
-> 
-> > +work with the netbsd guest, use $QEMU_SRC/tests/vm/netbsd:
-> > +
-> > +    $ cd $QEMU_SRC/tests/vm
-> > +
-> > +    # To bootstrap the image
-> > +    $ ./netbsd --build-image --image /var/tmp/netbsd.img
-> > +    <...>
-> > +
-> > +    # To run an arbitrary command in guest (the output will not be echoed unless
-> > +    # --debug is added)
-> > +    $ ./netbsd --debug --image /tmp/netbsd.img uname -a
-> > +
-> > +    # To build QEMU in guest
-> > +    $ ./netbsd --debug --image /tmp/netbsd.img --build-qemu $QEMU_SRC
-> > +
-> > +    # To get to an interactive shell
-> > +    $ ./netbsd --interactive --image /tmp/netbsd.img sh
-> > +
-> > +== Adding new guests ==
-> > +
-> > +Please look at existing guest scripts for how to add new guests.
-> > +
-> > +Most importantly, create a subclass of BaseVM and implement build_image()
-> > +method and define BUILD_SCRIPT, then finally call basevm.main() from the
-> > +scripts main().
-> 
-> s/scripts/script's/ (possessive form)
-
-Little finger is feeling lazy. :)
-
-> 
-> > +
-> > +  - Usually in build_image(), a template image is downloaded from a predefined
-> > +    URL. BaseVM._download_with_cache() takes care of cache the checksum, so
-> 
-> s/cache/caching/ (verb)
-
-I intended to say "caching and the checksum".
-
-> 
-> > +    consider using it.
-> > +
-> > +  - Once the image is downloaded, users, SSH server and QEMU build deps should
-> > +    be set up:
-> > +
-> > +    * Root password set to BaseVM.ROOT_PASS
-> > +    * User BaseVM.GUEST_USER is create, and password set to BaseVM.GUEST_PASS
-> 
-> s/create/created/ (participle)
-
-Yes.
-
-> 
-> > +    * SSH service is enabled and started on boot, BaseVM.SSH_PUB_KEY is added
-> > +      to authorized_keys of both root and the normal user
-> > +    * DHCP client service is enabled and started on boot, so that it can
-> > +      automatically configure the virtio-net-pci NIC and communicate with QEMU
-> > +      user net (10.0.2.2)
-> > +    * Necessary packages are installed to untar the source tarball and build
-> > +      QEMU
-> > +
-> > +  - Write a proper BUILD_SCRIPT template, which should be a shell script that
-> > +    untars a raw virtio-blk block device, which is the tarball data blob of the
-> > +    QEMU source tree, then configure/build it. Running "make check" is also
-> > +    recommended.
-> > +
-> > -- 
-> > 2.13.5
+> >   
+> >>
+> >> I would appreciate someone with AR access double checking.  
 > > 
+> > I'd have hoped you had AR access :p  
+> 
+> Yes, my statements are based solely on my reading of the AR (me
+> still lacks druid-knowledge). What I've asked for is a second
+> opinion (because AR-s are a twisty maze).
 
-Fam
+Be careful that you don't get eaten by a grue.
+
+> 
+> >   
+> >>  
+> >>>
+> >>> There's still the question of when this sclp command first became
+> >>> available...
+> >>>     
+> >>
+> >> I would argue that it should not be important for AR
+> >> compliance. Currently it operates only on PCI so I doubt it
+> >> pre-dates PCI. But I don't think the current implementation
+> >> is buggy because it offers the sclp command regardless
+> >> of the zPCI facility.  
+> > 
+> > I'm just wondering if there's another facility we're missing. The zpci
+> > facility might imply presence of adapter reconfiguration, but are there
+> > other facilities implying that as well, or even a dedicated facility?  
+> 
+> Yes. The SCLP facility with the facility code 33 (aka SCLP_HAS_PCI_RECONFIG).
+> It is the dedicated facility.
+
+OK.
+
+> 
+> I don't think zPCI architecturally implies the presence of this SCLP
+> command. And logically I would say it's either the other way around
+> adapter reconfiguration implies zPCI (because otherwise adapter
+> reconfiguration would be completely useless) or bidirectional. 
+
+Not sure how useful pci would be without this. I'll just assume that we
+have the facility, regardless whether pci is enabled for that
+particular machine or not.
+
+> 
+> >   
+> >>
+> >> I don't know where should I look for the historical details
+> >> which go beyond the AR.  
+> > 
+> > If there is no independent facility, it is probably best to just always
+> > provide the command, but fail for pci adapter type if the zpci facility
+> > is off.  
+> 
+> IMHO we should SCLP_RC_INVALID_SCLP_COMMAND iff we don't provide
+> SCLP_HAS_PCI_RECONFIG (which has bad name again s/PCI/IOA).
+
+Nod.
+
+> 
+> I don't know of any facility except basic SCLP on which 
+> SCLP_HAS_PCI_RECONFIG depends on. 
+> 
+> For me both presenting and not presenting SCLP_HAS_PCI_RECONFIG
+> to the guest (via read SCP info SCLP command) in the absence of
+> the zPCI feature makes sense. The late because of the likely historical
+> reasons, the former because I think the AR allows it and it gives us more
+> flexibility.
+
+I'll go with always presenting it. We'll just fail with invalid adapter
+type for !pci.
+
+Thanks for digging through the AR!
