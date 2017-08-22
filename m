@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dk6Z0-0005VC-C9
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:37:39 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dk6d2-0008WV-I8
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:41:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dk6Yx-0003X7-3D
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:37:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51846)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dk6Yw-0003Wl-Sg
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:37:35 -0400
-Date: Tue, 22 Aug 2017 11:37:31 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170822103731.GD16799@stefanha-x1.localdomain>
-References: <20170528130649.28168-1-dan@kernelim.com>
+	(envelope-from <lvivier@redhat.com>) id 1dk6cz-0005qq-Ef
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 06:41:48 -0400
+References: <20170822042416.26758-1-david@gibson.dropbear.id.au>
+	<CAFEAcA-iuizr9eh3=ZkPPT+YxfWzvUFzbWB-aA_Mo5BiDkrzQQ@mail.gmail.com>
+	<b1167424-0f05-aad7-f456-22ca0aee2000@redhat.com>
+	<CAFEAcA8dJe5uB-tUoeF=dE_q8HG_LLAmLUHdfR0XZihGN5JFXA@mail.gmail.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <329bff28-5804-2d39-7bd8-9336eaaf9d26@redhat.com>
+Date: Tue, 22 Aug 2017 12:41:39 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170528130649.28168-1-dan@kernelim.com>
-Subject: Re: [Qemu-devel] [PATCH] nvme: Fix get/set number of queues feature, again
+In-Reply-To: <CAFEAcA8dJe5uB-tUoeF=dE_q8HG_LLAmLUHdfR0XZihGN5JFXA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 0/7] ppc-for-2.10 queue 20170822
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +26,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Aloni <dan@kernelim.com>
-Cc: qemu-devel@nongnu.org, Alex Friedman <alex@e8storage.com>, Keith Busch <keith.busch@intel.com>, Christoph Hellwig <hch@lst.de>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-On Sun, May 28, 2017 at 04:06:49PM +0300, Dan Aloni wrote:
-> The number of queues that should be return by the admin command should:
-> 
->   1) Only mention the number of non-admin queues.
->   2) It is zero-based, meaning that '0 == one non-admin queue',
->      '1 == two non-admin queues', and so forth.
-> 
-> Because our `num_queues` means the number of queues _plus_ the admin
-> queue, then the right calculation for the number returned from the admin
-> command is `num_queues - 2`, combining the two requirements mentioned.
-> 
-> The issue was discovered by reducing num_queues from 64 to 8 and running
-> a Linux VM with an SMP parameter larger than that (e.g. 22). It tries to
-> utilize all queues, and therefore fails with an invalid queue number
-> when trying to queue I/Os on the last queue.
-> 
-> Signed-off-by: Dan Aloni <dan@kernelim.com>
-> CC: Alex Friedman <alex@e8storage.com>
-> CC: Keith Busch <keith.busch@intel.com>
-> CC: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  hw/block/nvme.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+On 22/08/2017 11:53, Peter Maydell wrote:
+> On 22 August 2017 at 10:43, Laurent Vivier <lvivier@redhat.com> wrote:
+>> On 22/08/2017 11:34, Peter Maydell wrote:
+>>> On 22 August 2017 at 05:24, David Gibson <david@gibson.dropbear.id.au> wrote:
+>>>> The following changes since commit 1f296733876434118fd766cfef5eb6f29ecab6a8:
+>>>>
+>>>>   Update version for v2.10.0-rc3 release (2017-08-15 18:53:31 +0100)
+>>>>
+>>>> are available in the git repository at:
+>>>>
+>>>>   git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170822
+>>>>
+>>>> for you to fetch changes up to d3234e2851f1630c695c681beac1e87ac0881260:
+>>>>
+>>>>   hw/ppc/spapr_iommu: Fix crash when removing the "spapr-tce-table" device (2017-08-22 11:11:30 +1000)
+>>>>
+>>>> ----------------------------------------------------------------
+>>>> ppc patch queue 2017-08-22
+>>>>
+>>>> Last minute ppc related fixes for qemu-2.10.  I'm not sure if these
+>>>> are critical enough to prompt another rc, but I'm submitting them for
+>>>> consideration.
+>>>>
+>>>> First, is Cornelia's fix for 480bc11e6 which meant "make check" would
+>>>> always fail on a ppc host.  Tracking that down delayed submission of
+>>>> the rest of these patches, sorry.
+>>>>
+>>>> The rest are all fairly important bugfixes for qemu crashes or guest
+>>>> behaviour regression on ppc.  Patches 2-4 specifically are fixes for
+>>>> regressions from qemu-2.9, caused by the compatibility mode and
+>>>> hotplug handling cleanups for the pseries machine type.
+>>>>
+>>>> ----------------------------------------------------------------
+>>>
+>>> I get a make check failure on ppc64 Linux:
+>>>
+>>> TEST: tests/postcopy-test... (pid=12468)
+>>>   /ppc64/postcopy:
+>>> Broken pipe
+>>> qemu-system-ppc64: RP: Received invalid message 0x0000 length 0x0000
+>>> FAIL
+>>> GTester: last random seed: R02Se5468e06f561627824306d95b0566d2b
+>>> (pid=13011)
+>>> FAIL: tests/postcopy-test
 
-Sorry for the delay.  Please send future nvme.c patches through Kevin
-Wolf:
+The problem is in:
 
-$ scripts/get_maintainer.pl -f hw/block/nvme.c
-Keith Busch <keith.busch@intel.com> (supporter:nvme)
-Kevin Wolf <kwolf@redhat.com> (supporter:Block layer core)
-Max Reitz <mreitz@redhat.com> (supporter:Block layer core)
-qemu-block@nongnu.org (open list:nvme)
-qemu-devel@nongnu.org (open list:All patches CC here)
+bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu)
+{
+    CPUState *cs = CPU(cpu);
 
-This patch will be in QEMU 2.11.
+    if (cap_ppc_pvr_compat) {
+        return false;
+    }
 
-Thanks, applied to my block-next tree:
-https://github.com/stefanha/qemu/commits/block-next
+    return !kvmppc_is_pr(cs->kvm_state);
+}
 
-Stefan
+It guesses !kvm pr means kvm_hv. That is not true, it can be TCG.
+
+This fixes the problem for me:
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2817,5 +2817,5 @@ bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu)
+         return false;
+     }
+
+-    return !kvmppc_is_pr(cs->kvm_state);
++    return kvm_enabled() && !kvmppc_is_pr(cs->kvm_state);
+ }
+
+[CC' Daniel]
+Thanks,
+Laurent
