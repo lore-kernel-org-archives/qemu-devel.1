@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dkAno-0006QJ-Da
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:15 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dkAnp-0006Vb-Vx
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dkAnm-0003D1-VV
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:12 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dkAnj-00039I-J0
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:13 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Aug 2017 16:08:46 +0100
-Message-Id: <1503414539-28762-8-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
-References: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 07/20] target/arm: Make PRIMASK register banked
- for v8M
+Date: Tue, 22 Aug 2017 16:08:39 +0100
+Message-Id: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 00/20] first steps towards v8M support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,111 +20,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Make the PRIMASK register banked if v8M security extensions are enabled.
+Hi; this patchset is the first slice of work aiming at support
+of the ARM v8M architecture. It doesn't do anything by itself
+(there's no CPU yet that enables the new feature) and there's
+a lot more work still to do to get something actually functional,
+but it seems better to push the work out for review a slice
+at a time rather than hanging onto it and sending a 100-patch
+set at the end.
 
-Note that we do not yet implement the functionality of the new
-AIRCR.PRIS bit (which allows the effect of the NS copy of PRIMASK to
-be restricted).
+This patchset sits on top of my target-arm.next tree, which
+has the 'preliminary patchset' I sent out a while back in it.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/cpu.h      | 2 +-
- hw/intc/armv7m_nvic.c | 2 +-
- target/arm/helper.c   | 4 ++--
- target/arm/machine.c  | 9 +++++++--
- 4 files changed, 11 insertions(+), 6 deletions(-)
+It includes:
+ * implementation of PMSAv8
+ * banking of most of the main CPU registers which need it
+   (the NVIC proper also gets banked exceptions, and the
+   systick device is banked, but neither of those are done here)
+ * the "let secure access the NS view of the NVIC" alias region
+ * an implementation of the BXNS instruction, mostly as the
+   simplest thing that needs the banking of stack pointers
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 0c28dfd..fee337b 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -431,7 +431,7 @@ typedef struct CPUARMState {
-         uint32_t bfar; /* BusFault Address */
-         unsigned mpu_ctrl; /* MPU_CTRL */
-         int exception;
--        uint32_t primask;
-+        uint32_t primask[2];
-         uint32_t faultmask;
-         uint32_t secure; /* Is CPU in Secure state? (not guest visible) */
-     } v7m;
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 2a41e5d..a654792 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -169,7 +169,7 @@ static inline int nvic_exec_prio(NVICState *s)
- 
-     if (env->v7m.faultmask) {
-         running = -1;
--    } else if (env->v7m.primask) {
-+    } else if (env->v7m.primask[env->v7m.secure]) {
-         running = 0;
-     } else if (env->v7m.basepri[env->v7m.secure] > 0) {
-         running = env->v7m.basepri[env->v7m.secure] & nvic_gprio_mask(s);
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 1087f19..c0a6dbd 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -8835,7 +8835,7 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
-         return (env->v7m.control & R_V7M_CONTROL_SPSEL_MASK) ?
-             env->regs[13] : env->v7m.other_sp;
-     case 16: /* PRIMASK */
--        return env->v7m.primask;
-+        return env->v7m.primask[env->v7m.secure];
-     case 17: /* BASEPRI */
-     case 18: /* BASEPRI_MAX */
-         return env->v7m.basepri[env->v7m.secure];
-@@ -8895,7 +8895,7 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
-         }
-         break;
-     case 16: /* PRIMASK */
--        env->v7m.primask = val & 1;
-+        env->v7m.primask[env->v7m.secure] = val & 1;
-         break;
-     case 17: /* BASEPRI */
-         env->v7m.basepri[env->v7m.secure] = val & 0xff;
-diff --git a/target/arm/machine.c b/target/arm/machine.c
-index 8476efd..6f0f6c9 100644
---- a/target/arm/machine.c
-+++ b/target/arm/machine.c
-@@ -103,7 +103,7 @@ static const VMStateDescription vmstate_m_faultmask_primask = {
-     .minimum_version_id = 1,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32(env.v7m.faultmask, ARMCPU),
--        VMSTATE_UINT32(env.v7m.primask, ARMCPU),
-+        VMSTATE_UINT32(env.v7m.primask[M_REG_NS], ARMCPU),
-         VMSTATE_END_OF_LIST()
-     }
- };
-@@ -251,6 +251,7 @@ static const VMStateDescription vmstate_m_security = {
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32(env.v7m.secure, ARMCPU),
-         VMSTATE_UINT32(env.v7m.basepri[M_REG_S], ARMCPU),
-+        VMSTATE_UINT32(env.v7m.primask[M_REG_S], ARMCPU),
-         VMSTATE_END_OF_LIST()
-     }
- };
-@@ -271,9 +272,13 @@ static int get_cpsr(QEMUFile *f, void *opaque, size_t size,
-              * differences are that the T bit is not in the same place, the
-              * primask/faultmask info may be in the CPSR I and F bits, and
-              * we do not want the mode bits.
-+             * We know that this cleanup happened before v8M, so there
-+             * is no complication with banked primask/faultmask.
-              */
-             uint32_t newval = val;
- 
-+            assert(!arm_feature(env, ARM_FEATURE_M_SECURITY));
-+
-             newval &= (CPSR_NZCV | CPSR_Q | CPSR_IT | CPSR_GE);
-             if (val & CPSR_T) {
-                 newval |= XPSR_T;
-@@ -287,7 +292,7 @@ static int get_cpsr(QEMUFile *f, void *opaque, size_t size,
-                 env->v7m.faultmask = 1;
-             }
-             if (val & CPSR_I) {
--                env->v7m.primask = 1;
-+                env->v7m.primask[M_REG_NS] = 1;
-             }
-             val = newval;
-         }
+We don't yet actually properly swap the stack pointer around
+on other kinds of S<->NS transition including exception
+entry and exit. I have some patches working in that direction,
+so if the BXNS patch doesn't have enough context yet to make
+sense I can keep it around and resend it with those later.
+
+Next thing probably will be the NVIC changes, once I've
+got my head around the priority related changes v8M brings...
+
+Series available also at 
+https://git.linaro.org/people/peter.maydell/qemu-arm.git v8m
+(on top of the target-arm.next stuff.)
+
+thanks
+-- PMM
+
+Peter Maydell (20):
+  target/arm: Implement ARMv8M's PMSAv8 registers
+  target/arm: Implement new PMSAv8 behaviour
+  target/arm: Add state field, feature bit and migration for v8M secure
+    state
+  target/arm: Register second AddressSpace for secure v8M CPUs
+  target/arm: Add MMU indexes for secure v8M
+  target/arm: Make BASEPRI register banked for v8M
+  target/arm: Make PRIMASK register banked for v8M
+  target/arm: Make FAULTMASK register banked for v8M
+  target/arm: Make CONTROL register banked for v8M
+  nvic: Add NS alias SCS region
+  target/arm: Make VTOR register banked for v8M
+  target/arm: Make MPU_MAIR0, MPU_MAIR1 registers banked for v8M
+  target/arm: Make MPU_RBAR, MPU_RLAR banked for v8M
+  target/arm: Make MPU_RNR register banked for v8M
+  target/arm: Make MPU_CTRL register banked for v8M
+  target/arm: Make CCR register banked for v8M
+  target/arm: Make MMFAR banked for v8M
+  target/arm: Make CFSR register banked for v8M
+  target/arm: Move regime_is_secure() to target/arm/internals.h
+  target/arm: Implement BXNS, and banked stack pointers
+
+ include/hw/intc/armv7m_nvic.h |   1 +
+ target/arm/cpu.h              | 100 ++++++++++++--
+ target/arm/helper.h           |   2 +
+ target/arm/internals.h        |  26 ++++
+ target/arm/translate.h        |   1 +
+ hw/intc/armv7m_nvic.c         | 294 +++++++++++++++++++++++++++++++++------
+ target/arm/cpu.c              |  82 ++++++++---
+ target/arm/helper.c           | 315 +++++++++++++++++++++++++++++++++---------
+ target/arm/machine.c          | 104 ++++++++++++--
+ target/arm/translate.c        |  52 ++++++-
+ 10 files changed, 820 insertions(+), 157 deletions(-)
+
 -- 
 2.7.4
