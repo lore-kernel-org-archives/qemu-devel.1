@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dk4gb-0003mH-Pv
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:37:22 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dk4jD-0005KF-Gj
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:40:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dk4ga-0006db-U7
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:37:21 -0400
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:37670)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dk4ga-0006d1-N2
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:37:20 -0400
-Received: by mail-wr0-x235.google.com with SMTP id z91so116976961wrc.4
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 01:37:20 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1dk4jA-0007Ax-Dv
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:40:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53120)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dk4jA-0007Af-4t
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 04:40:00 -0400
+Date: Tue, 22 Aug 2017 10:39:55 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170822103955.1cbc0714.cohuck@redhat.com>
+In-Reply-To: <17cb7925-e4eb-d174-2886-49ab9af0852c@linux.vnet.ibm.com>
+References: <20170821091614.28251-1-cohuck@redhat.com>
+	<20170821091614.28251-8-cohuck@redhat.com>
+	<0d8dcac1-f536-5d69-0187-23656d003348@linux.vnet.ibm.com>
+	<17cb7925-e4eb-d174-2886-49ab9af0852c@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <aa6caac1-e06c-9e1c-2aba-18d672fafb55@amsat.org>
-References: <1501867249-1924-1-git-send-email-peter.maydell@linaro.org>
-	<1501867249-1924-5-git-send-email-peter.maydell@linaro.org>
-	<50d6ba4d-cfa3-5b5f-5da1-dca2326d4f5d@amsat.org>
-	<c38728a0-da49-635e-2954-1030b223e3c9@linaro.org>
-	<CAFEAcA_nPya92Vatwt7RiZnhKTH4_GKypSrX_KgPj3GitxV0Tg@mail.gmail.com>
-	<CAFEAcA97eXYPABgaE8Y_+EkWscR7CCH2WUHoM7ttZ6gVWQrqxw@mail.gmail.com>
-	<aa6caac1-e06c-9e1c-2aba-18d672fafb55@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Aug 2017 09:36:59 +0100
-Message-ID: <CAFEAcA9Ci+0cjFORmzL7-73Jj4pm4jST3iEbXmHjXuPyiyt03g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 4/8] boards.h: Define new flag
- ignore_memory_transaction_failures
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 07/10] s390x/sclp: properly guard
+ pci-specific functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,58 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On 22 August 2017 at 04:45, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> w=
-rote:
-> On 08/17/2017 07:25 AM, Peter Maydell wrote:
->>
->> On 5 August 2017 at 11:13, Peter Maydell <peter.maydell@linaro.org> wrot=
-e:
->> So, this question (should we have a board flag to disable reporting
->> of tx failures to the CPU hook, or use unimplemented_device as a
->> sort of background region) seems to be the main unanswered question
->> for this series. I think (as outlined above) that the board flag
->> is simpler and safer; are people happy for me to put this series
->> in target-arm.next with that approach, or should I rethink this bit?
->
-> As remarked previously in this thread, the current QEMU behavior on
-> transaction error isn't always matching real hardware.
-> Matching correctly throwing errors is likely to break various
-> current users.
+On Mon, 21 Aug 2017 18:24:15 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-Yes, hence this patchseries keeping the wrong but back compatible
-behaviour...
+> On 08/21/2017 04:58 PM, Pierre Morel wrote:
+> > On 21/08/2017 11:16, Cornelia Huck wrote:  
+> >> If we do not provide zpci, pci reconfiguration via sclp is not available
+> >> either. Don't indicate it in the sclp facilities and return an invalid
+> >> command if the guest tries to issue pci configure/deconfigure.
+> >>
+> >> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> >> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> >> ---
+> >>   hw/s390x/sclp.c | 19 +++++++++++++++----
+> >>   1 file changed, 15 insertions(+), 4 deletions(-)
+> >>
 
-> If we are worried about being backward compatible, defaulting background
-> region to unimp() won't throw any transaction error.
+> >> @@ -385,10 +388,18 @@ static void sclp_execute(SCLPDevice *sclp, SCCB *sccb, uint32_t code)
+> >>           sclp_c->unassign_storage(sclp, sccb);
+> >>           break;
+> >>       case SCLP_CMDW_CONFIGURE_PCI:
+> >> -        s390_pci_sclp_configure(sccb);
+> >> +        if (s390_has_feat(S390_FEAT_ZPCI)) {
+> >> +            s390_pci_sclp_configure(sccb);
+> >> +        } else {
+> >> +            sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);  
+> > 
+> > Hello Conny,
+> > 
+> > I find more logical if the response would be 0x06F0 : "Adapter type in SCCB not recognized"
+> > Since we could have more than one adapter type... someday.
+> > then the SCLP command would be valid but not the adapter type.  
+> 
+> I agree, 01F0 does not seem to be the correct answer, based on
+> the AR as it seems to be tied to the command code.
 
-As I said, it will, for the cases of device model directly
-returning a MEMTX_ERROR, or a transaction dispatched to
-a memory region whose MemoryRegionOps valid settings
-prohibit it (eg byte accesses to a word-access-only device), etc.
-The only simple way to guarantee that we don't generate exceptions
-on transaction errors is to cause the hook not to be called
-(or to have the hook decide to do nothing, I suppose).
+What I'm wondering here: SCLP_CMDW_CONFIGURE_PCI was introduced at some
+point in time (probably when pci was first introduced). On older
+machines, invalid command sounds like the most logical response. Do you
+know whether there's some tie-in to the machine version?
 
-> I'm somehow afraid that "ignore_memory_transaction_failures" ends up like
-> the "cannot_instantiate_with_device_add_yet" flag - a hard to remove klud=
-ge
-> outliving his purpose.
+> Verifying what the machine does would be great though -- frankly
+> I cant tell with absolute confidence what's the right thing to
+> do based on my understanding of the AR. 
 
-I agree that it's going to be around for a long time, possibly
-forever, but that's life when we have so many old boards.
-Any approach we take is almost certainly going to be hanging
-around forever.
+Multiply this by not having access to the AR :)
 
-> Anyway I'm not unhappy with this approach, but I'd be very happy to have
-> unimp() covering the whole background region.
+> > However, I will try to find a real hardware to test this since I noticed that my logic sometime... :) .
+> > 
+> > Another point is that don't you think that this test on S390_FEAT_ZPCI better belong to the dedicated PCI code inside of the s390_pci_sclp_configure().
+> >  
+> 
+> I'm fine either way. If I imagine having a lots of adapter types, then I
+> would expect a switch or a jumptable on the type before handling control
+> to the pci specific function. In this case statically not supported types
+> would probably get caught by the default branch of the switch and for a
+> jumptable it could even handle the dynamic case (based on the facilities)
+> trivially. In short both approaches can make sense.
 
-I think this would be a reasonable approach for converting
-boards away from this ignore_memory_transaction_failures hook
-on a board-by-board basis but you'd still want to test some
-common guest software for each conversion.
-
-thanks
--- PMM
+I'm also wondering at the naming (the command sounds very
+pci-specific). I'd just stick with this approach (modulo a possible
+change of the response code, for which I need to rely on you guys).
