@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dkB4P-0004fm-4Q
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:26:24 -0400
+	(envelope-from <thuth@redhat.com>) id 1dkB4T-0004j5-J2
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:26:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dkB4O-0000wz-78
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:26:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52812)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dkB4O-0000wQ-1M
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:26:20 -0400
-Date: Tue, 22 Aug 2017 16:26:13 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170822152613.GE5398@stefanha-x1.localdomain>
-References: <1503313839-10258-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-	<1503313839-10258-4-git-send-email-chugh.ishani@research.iiit.ac.in>
+	(envelope-from <thuth@redhat.com>) id 1dkB4S-0000zC-J7
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:26:25 -0400
+References: <1503414375-21009-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA-92Jjz2uCC387oX2u0NWfijPwB_8zGaagC1m=sKD8zhQ@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <443135b4-4b36-bae6-b50a-12fb4a55a858@redhat.com>
+Date: Tue, 22 Aug 2017 17:26:11 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1503313839-10258-4-git-send-email-chugh.ishani@research.iiit.ac.in>
-Subject: Re: [Qemu-devel] [PATCH 3/3] Add manpage for QEMU Backup Tool
+In-Reply-To: <CAFEAcA-92Jjz2uCC387oX2u0NWfijPwB_8zGaagC1m=sKD8zhQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/misc/auxbus.c: Mark the
+ aux-to-i2c-bridge device as non-hotpluggable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, KONRAD Frederic <frederic.konrad@adacore.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Mon, Aug 21, 2017 at 04:40:39PM +0530, Ishani Chugh wrote:
-> +@node  List of Commands
-> +@chapter  List of Commands
-> +@itemize
-> +@item qemu-backup guest add --guest guestname --qmp socketpath
-> +@item qemu-backup guest list
-> +@item qemu-backup drive add --id driveid --guest guestname --target target
-> +@item qemu-backup drive add --all --guest guestname --target target
-> +@item qemu-backup drive list --guest guestname
-> +@item qemu-backup backup [--inc] --guest guestname
-> +@item qemu-backup restore --guest guestname
-> +@item qemu-backup guest remove --guest guestname
-> +@item qemu-backup drive remove --guest guestname --id driveid
-> +@end itemize
-> +@node  Command Parameters
-> +@chapter  Command Parameters
-> +@itemize
-> +@item --all: Add all the drives present in a guest which are suitable for backup.
-> +@item --guest: Name of the guest.
-> +@item --id: id of guest or drive.
-> +@item --inc: (Optional) For incremental backup.
-> +@item --qmp: Path of qmp socket.
-> +@item --target: Destination path on which you want your backup to be made.
-> +@end itemize
+On 22.08.2017 17:12, Peter Maydell wrote:
+> On 22 August 2017 at 16:06, Thomas Huth <thuth@redhat.com> wrote:
+>> QEMU currently aborts if the user tries to do something like this:
+>>
+>> $ aarch64-softmmu/qemu-system-aarch64 -S -M integratorcp -nographic
+>> QEMU 2.9.93 monitor - type 'help' for more information
+>> (qemu) device_add aux-to-i2c-bridge,id=3Dx
+>> (qemu) device_del x
+>> **
+>> ERROR:qemu/qdev-monitor.c:872:qdev_unplug: assertion failed: (hotplug_=
+ctrl)
+>> Aborted (core dumped)
+>>
+>> Looks like the device is not hot-pluggable, so let's mark it
+>> accordingly.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  hw/misc/auxbus.c | 8 ++++++++
+>>  1 file changed, 8 insertions(+)
+>>
+>> diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
+>> index 8a90ddd..2c62515 100644
+>> --- a/hw/misc/auxbus.c
+>> +++ b/hw/misc/auxbus.c
+>> @@ -222,9 +222,17 @@ static inline I2CBus *aux_bridge_get_i2c_bus(AUXT=
+OI2CState *bridge)
+>>      return bridge->i2c_bus;
+>>  }
+>>
+>> +static void aux_bridge_class_init(ObjectClass *oc, void *data)
+>> +{
+>> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
+>> +
+>> +    dc->hotpluggable =3D false;
+>> +}
+>=20
+> Why is our default "hotpluggable" rather than "not hotpluggable" ?
+> We must have way more non-hotpluggable devices than hotpluggable
+> ones, and it takes active effort to make a hotpluggable device
+> model, so it seems like it would be much less bug-prone to
+> require hotpluggable devices to set dc->hotpluggable true
+> rather than all the non-hotpluggable ones to set it false...
 
-It would be helpful to give an example that demonstrates the workflow.
-That way new users will know which sub-commands to use and in which
-order.  Something like:
+I think most devices are already non-hotpluggable automatically because
+they sit on a bus that is not hot-pluggable (e.g. sysbus devices). The
+problematic ones are the devices with .parent =3D TYPE_DEVICE. And for
+these, I think it is quite hard to say whether they should be
+hot-pluggable by default or not?
+Anyway, according to my tests (I'm currently working on a test that
+automatically does device_add + device_del for all devices, as you might
+have guessed already), there are not that many devices that cause
+problems here, so I guess marking some few with hotpluggable =3D false
+should be OK?
 
-Perform a full backup of 'vm001', which has one drive:
-
-  $ qemu-backup guest add --guest vm001 --qmp /path/to/vm001.sock
-  $ qemu-backup add --id drive0 --guest vm001 --target /backups/vm001-drive0.img
-  $ qemu-backup backup --guest vm001
-
-Stefan
+ Thomas
