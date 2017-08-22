@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkBZe-0000iE-M3
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:58:40 -0400
+	(envelope-from <bounces@canonical.com>) id 1dkBcH-0003BJ-1K
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 12:01:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkBZb-0005Wk-L5
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:58:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43664)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dkBZb-0005W8-B4
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:58:35 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-52-marcandre.lureau@redhat.com>
-	<20170822162400.51f07d89.cohuck@redhat.com>
-	<d1574f35-ebe5-8ede-180a-e584834e9d9a@redhat.com>
-Date: Tue, 22 Aug 2017 17:58:28 +0200
-In-Reply-To: <d1574f35-ebe5-8ede-180a-e584834e9d9a@redhat.com> (David
-	Hildenbrand's message of "Tue, 22 Aug 2017 16:25:42 +0200")
-Message-ID: <87d17n61cr.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1dkBcE-0007zB-10
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 12:01:21 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37514)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dkBcD-0007y7-RA
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 12:01:17 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dkBcC-0002BQ-4o
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 16:01:16 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 215DB2E8076
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 16:01:16 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 51/54] qapi: make s390 commands depend
- on TARGET_S390X
+Date: Tue, 22 Aug 2017 15:47:15 -0000
+From: ChristianEhrhardt <1711602@bugs.launchpad.net>
+Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
+Message-Id: <150341683579.11238.2896398738007539284.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
+ 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +37,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr. David
-	Alan Gilbert" <dgilbert@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-David Hildenbrand <david@redhat.com> writes:
+Building with the attached debug patch ...
 
-> On 22.08.2017 16:24, Cornelia Huck wrote:
->> On Tue, 22 Aug 2017 15:22:52 +0200
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
->>=20
->>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>> ---
->>>  qapi-schema.json                        | 10 +++++++---
->>>  include/sysemu/arch_init.h              |  6 ------
->>>  monitor.c                               | 14 --------------
->>>  qmp.c                                   | 14 --------------
->>>  stubs/arch-query-cpu-model-baseline.c   | 12 ------------
->>>  stubs/arch-query-cpu-model-comparison.c | 12 ------------
->>>  target/s390x/cpu_models.c               |  4 ++--
->>>  stubs/Makefile.objs                     |  2 --
->>>  8 files changed, 9 insertions(+), 65 deletions(-)
->>>  delete mode 100644 stubs/arch-query-cpu-model-baseline.c
->>>  delete mode 100644 stubs/arch-query-cpu-model-comparison.c
->>>
->>> diff --git a/qapi-schema.json b/qapi-schema.json
->>> index 58574b3044..d4e1552ddc 100644
->>> --- a/qapi-schema.json
->>> +++ b/qapi-schema.json
->>> @@ -3577,7 +3577,8 @@
->>>  #
->>>  ##
->>>  { 'command': 'dump-skeys',
->>> -  'data': { 'filename': 'str' } }
->>> +  'data': { 'filename': 'str' },
->>> +  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_S390X)']}
->>=20
->> I agree with making this s390x specific...
->>>=20=20
->>>  ##
->>>  # @netdev_add:
->>> @@ -4621,7 +4622,9 @@
->>>  ##
->>>  { 'command': 'query-cpu-model-comparison',
->>>    'data': { 'modela': 'CpuModelInfo', 'modelb': 'CpuModelInfo' },
->>> -  'returns': 'CpuModelCompareInfo' }
->>> +  'returns': 'CpuModelCompareInfo',
->>> +  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_S390X)']}
->>> +
->>>=20=20
->>>  ##
->>>  # @CpuModelBaselineInfo:
->>> @@ -4673,7 +4676,8 @@
->>>  { 'command': 'query-cpu-model-baseline',
->>>    'data': { 'modela': 'CpuModelInfo',
->>>              'modelb': 'CpuModelInfo' },
->>> -  'returns': 'CpuModelBaselineInfo' }
->>> +  'returns': 'CpuModelBaselineInfo',
->>> +  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_S390X)']}
->>=20
->> ...but I'm not sure about the cpu model stuff. Wasn't the idea to move
->> to this model for all architectures later? (Given that we have stubs
->> for architectures not implementing this, instead of ifdeffing it in
->> monitor.c)
->>=20
->
-> +1, not architecture specific (in contrast to skey), simply not
-> supported _yet_ on other architectures.
+-- =
 
-Yes, but Marc-Andr=C3=A9's patch makes the "not supported yet" information
-available in query-qmp-schema.  Carrying such information is pretty much
-the point of schema introspection.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1711602
 
-We could add a comment explaining this command isn't target-specific,
-but just happens not to be implemented for some targets.  Would that
-help?
+Title:
+  --copy-storage-all failing with qemu 2.10
+
+Status in QEMU:
+  New
+Status in libvirt package in Ubuntu:
+  Confirmed
+Status in qemu package in Ubuntu:
+  Confirmed
+
+Bug description:
+  We fixed an issue around disk locking already in regard to qemu-nbd
+  [1], but there still seem to be issues.
+
+  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
+://10.22.69.196/system
+  error: internal error: qemu unexpectedly closed the monitor: 2017-08-18T1=
+2:10:29.800397Z qemu-system-x86_64: -chardev pty,id=3Dcharserial0: char dev=
+ice redirected to /dev/pts/0 (label charserial0)
+  2017-08-18T12:10:48.545776Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+
+  Source libvirt log for the guest:
+  2017-08-18 12:09:08.251+0000: initiating migration
+  2017-08-18T12:09:08.809023Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+  2017-08-18T12:09:08.809481Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+
+  Target libvirt log for the guest:
+  2017-08-18T12:09:08.730911Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+  2017-08-18 12:09:09.010+0000: shutting down, reason=3Dcrashed
+
+  Given the timing it seems that the actual copy now works (it is busy ~10 =
+seconds on my environment which would be the copy).
+  Also we don't see the old errors we saw before, but afterwards on the act=
+ual take-over it fails.
+
+  Dmesg has no related denials as often apparmor is in the mix.
+
+  Need to check libvirt logs of source [2] and target [3] in Detail.
+
+  [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02200.html
+  [2]: http://paste.ubuntu.com/25339356/
+  [3]: http://paste.ubuntu.com/25339358/
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1711602/+subscriptions
