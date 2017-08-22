@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dk9I3-0006w0-T0
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:32:25 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dk9I6-0006yH-84
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:32:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dk9Hy-0006Fc-2Y
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:32:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51648)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dk9Hx-0006F1-S5
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:32:13 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dk9I5-0006JV-C7
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:32:22 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 22 Aug 2017 15:22:43 +0200
-Message-Id: <20170822132255.23945-43-marcandre.lureau@redhat.com>
+Date: Tue, 22 Aug 2017 15:22:12 +0200
+Message-Id: <20170822132255.23945-12-marcandre.lureau@redhat.com>
 In-Reply-To: <20170822132255.23945-1-marcandre.lureau@redhat.com>
 References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 42/54] qapi2texi: add 'If:' condition to
- enum values
+Subject: [Qemu-devel] [PATCH v2 11/54] quorum: use qapi_enum_parse() in
+ quorum_open
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +24,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Quorum" <qemu-block@nongnu.org>
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi2texi.py | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ block/quorum.c | 27 ++++++++-------------------
+ 1 file changed, 8 insertions(+), 19 deletions(-)
 
-diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index 3a923ce438..8959cb0cdf 100755
---- a/scripts/qapi2texi.py
-+++ b/scripts/qapi2texi.py
-@@ -130,7 +130,9 @@ def texi_body(doc):
+diff --git a/block/quorum.c b/block/quorum.c
+index d04da4f430..e4271caa7a 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -22,6 +22,7 @@
+ #include "qapi/qmp/qjson.h"
+ #include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qstring.h"
++#include "qapi/util.h"
+ #include "qapi-event.h"
+ #include "crypto/hash.h"
 =20
- def texi_enum_value(value):
-     """Format a table of members item for an enumeration value"""
--    return '@item @code{%s}\n' % value.name
-+    return '@item @code{%s}%s\n' % (
-+        value.name,
-+        '\n@b{If:} @code{%s}\n' % value.ifcond if value.ifcond else '')
+@@ -867,24 +868,6 @@ static QemuOptsList quorum_runtime_opts =3D {
+     },
+ };
 =20
- def texi_member(member, suffix=3D''):
-     """Format a table of members item for an object type member"""
+-static int parse_read_pattern(const char *opt)
+-{
+-    int i;
+-
+-    if (!opt) {
+-        /* Set quorum as default */
+-        return QUORUM_READ_PATTERN_QUORUM;
+-    }
+-
+-    for (i =3D 0; i < QUORUM_READ_PATTERN__MAX; i++) {
+-        if (!strcmp(opt, QuorumReadPattern_lookup[i])) {
+-            return i;
+-        }
+-    }
+-
+-    return -EINVAL;
+-}
+-
+ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
+                        Error **errp)
+ {
+@@ -925,7 +908,13 @@ static int quorum_open(BlockDriverState *bs, QDict *=
+options, int flags,
+         goto exit;
+     }
+=20
+-    ret =3D parse_read_pattern(qemu_opt_get(opts, QUORUM_OPT_READ_PATTER=
+N));
++    if (!qemu_opt_get(opts, QUORUM_OPT_READ_PATTERN)) {
++        ret =3D QUORUM_READ_PATTERN_QUORUM;
++    } else {
++        ret =3D qapi_enum_parse(QuorumReadPattern_lookup,
++                              qemu_opt_get(opts, QUORUM_OPT_READ_PATTERN=
+),
++                              QUORUM_READ_PATTERN__MAX, -EINVAL, NULL);
++    }
+     if (ret < 0) {
+         error_setg(&local_err, "Please set read-pattern as fifo or quoru=
+m");
+         goto exit;
 --=20
 2.14.1.146.gd35faa819
