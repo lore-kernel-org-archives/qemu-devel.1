@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dk5ef-0006hg-Cm
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:39:26 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dk5j8-0001L5-2w
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:44:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dk5ea-0005JU-6N
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:39:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45558)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dk5ea-0005Iz-0Q
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:39:20 -0400
-Date: Tue, 22 Aug 2017 11:39:14 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170822113914.3ff24d75.cohuck@redhat.com>
-In-Reply-To: <b7e7810c-7822-2fb8-2a2e-d67c08126639@linux.vnet.ibm.com>
-References: <20170821091614.28251-1-cohuck@redhat.com>
-	<20170821091614.28251-8-cohuck@redhat.com>
-	<0d8dcac1-f536-5d69-0187-23656d003348@linux.vnet.ibm.com>
-	<17cb7925-e4eb-d174-2886-49ab9af0852c@linux.vnet.ibm.com>
-	<20170822103955.1cbc0714.cohuck@redhat.com>
-	<b7e7810c-7822-2fb8-2a2e-d67c08126639@linux.vnet.ibm.com>
+	(envelope-from <lvivier@redhat.com>) id 1dk5j2-00086o-Tx
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:44:00 -0400
+References: <20170822042416.26758-1-david@gibson.dropbear.id.au>
+	<CAFEAcA-iuizr9eh3=ZkPPT+YxfWzvUFzbWB-aA_Mo5BiDkrzQQ@mail.gmail.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <b1167424-0f05-aad7-f456-22ca0aee2000@redhat.com>
+Date: Tue, 22 Aug 2017 11:43:51 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAFEAcA-iuizr9eh3=ZkPPT+YxfWzvUFzbWB-aA_Mo5BiDkrzQQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 07/10] s390x/sclp: properly guard
- pci-specific functions
+Subject: Re: [Qemu-devel] [PULL 0/7] ppc-for-2.10 queue 20170822
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>
 
-On Tue, 22 Aug 2017 11:20:51 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-
-> On 08/22/2017 10:39 AM, Cornelia Huck wrote:
-> >> I'm fine either way. If I imagine having a lots of adapter types, then I
-> >> would expect a switch or a jumptable on the type before handling control
-> >> to the pci specific function. In this case statically not supported types
-> >> would probably get caught by the default branch of the switch and for a
-> >> jumptable it could even handle the dynamic case (based on the facilities)
-> >> trivially. In short both approaches can make sense.  
-> > I'm also wondering at the naming (the command sounds very
-> > pci-specific). I'd just stick with this approach (modulo a possible
-> > change of the response code, for which I need to rely on you guys).
-> >   
+On 22/08/2017 11:34, Peter Maydell wrote:
+> On 22 August 2017 at 05:24, David Gibson <david@gibson.dropbear.id.au> wrote:
+>> The following changes since commit 1f296733876434118fd766cfef5eb6f29ecab6a8:
+>>
+>>   Update version for v2.10.0-rc3 release (2017-08-15 18:53:31 +0100)
+>>
+>> are available in the git repository at:
+>>
+>>   git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170822
+>>
+>> for you to fetch changes up to d3234e2851f1630c695c681beac1e87ac0881260:
+>>
+>>   hw/ppc/spapr_iommu: Fix crash when removing the "spapr-tce-table" device (2017-08-22 11:11:30 +1000)
+>>
+>> ----------------------------------------------------------------
+>> ppc patch queue 2017-08-22
+>>
+>> Last minute ppc related fixes for qemu-2.10.  I'm not sure if these
+>> are critical enough to prompt another rc, but I'm submitting them for
+>> consideration.
+>>
+>> First, is Cornelia's fix for 480bc11e6 which meant "make check" would
+>> always fail on a ppc host.  Tracking that down delayed submission of
+>> the rest of these patches, sorry.
+>>
+>> The rest are all fairly important bugfixes for qemu crashes or guest
+>> behaviour regression on ppc.  Patches 2-4 specifically are fixes for
+>> regressions from qemu-2.9, caused by the compatibility mode and
+>> hotplug handling cleanups for the pseries machine type.
+>>
+>> ----------------------------------------------------------------
 > 
+> I get a make check failure on ppc64 Linux:
 > 
-> Well, the QEMU name of the command is misleading misleading. In the AR
-> it's called 'Configure I/O Adapter'. The PCI comes into the picture via
-> byte 8 of the SCCB, the so called adapter type. Valid values for the
-> adapter type are: 00-01 reserved; 02 PCI function; 03-FF reserved. So
-> at this point we only have PCI.
+> TEST: tests/postcopy-test... (pid=12468)
+>   /ppc64/postcopy:
+> Broken pipe
+> qemu-system-ppc64: RP: Received invalid message 0x0000 length 0x0000
+> FAIL
+> GTester: last random seed: R02Se5468e06f561627824306d95b0566d2b
+> (pid=13011)
+> FAIL: tests/postcopy-test
 
-OK, misleading naming combined with missing documentation leads to
-confusion...
+This test should fail with KVM PR, but it is explicitly disabled by:
 
-So:
+tests/postcopy-test.c:
 
-- s/PCI/IOA/ for SCLP_CMDW_{CONFIGURE,DECONFIGURE}_PCI
-- have a switch/case over byte 8 with only one case (pci)
-- move the pci feature check into the pci code(? - not sure)
+386         accel = access("/sys/module/kvm_hv", F_OK) ? "tcg" : "kvm:tcg";
 
-There's still the question of when this sclp command first became
-available...
+What is your test machine?
+
+[CC' Greg]
+Thanks,
+Laurent
