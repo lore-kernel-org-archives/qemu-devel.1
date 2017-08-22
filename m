@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58106)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk7Ya-0001Z1-Op
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:41:18 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dk7fW-0004Tm-P2
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:48:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk7YX-00012G-Gj
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:41:16 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60077)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dk7YX-00011l-At
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:41:13 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dk7YV-0002ft-RH
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 11:41:11 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CD1022E8031
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 11:41:11 +0000 (UTC)
+	(envelope-from <cohuck@redhat.com>) id 1dk7fT-00052V-N7
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:48:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47564)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dk7fT-00052J-GO
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:48:23 -0400
+Date: Tue, 22 Aug 2017 13:48:15 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170822134815.77020eb8.cohuck@redhat.com>
+In-Reply-To: <20170822112046.GC12356@umbus.fritz.box>
+References: <20170816082650.21880-1-cohuck@redhat.com>
+	<223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
+	<CAFEAcA_UfM_XNKdc5zfHsehoRE6Q+EszRZX3FByskir7c+0Lww@mail.gmail.com>
+	<20170822010917.GO12356@umbus.fritz.box>
+	<CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
+	<3f0dc918-0f55-e2f4-bf47-fe4abf5453bb@redhat.com>
+	<CAFEAcA_ezKWweEuUB-cXTer0LLaeuiGDkSdfhApedhw4ykDT0Q@mail.gmail.com>
+	<20170822112046.GC12356@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Aug 2017 11:33:51 -0000
-From: ChristianEhrhardt <1711602@bugs.launchpad.net>
-Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
-Message-Id: <150340163132.11507.14527181207906680523.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
- 2.10
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.10] boot-serial-test: prefer tcg
+ accelerator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,65 +34,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-For me qemu_file_set_error was always called from qemu_fill_buffer, interes=
-ting that it seems different for you.
-I'll rerun a few times to ensure it really always is always from qemu_fill_=
-buffer for me.
+On Tue, 22 Aug 2017 21:20:46 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
--- =
+> Obviously it's not a thing to fix right now, but I've really been
+> thinking that none of the tests should use this "TCG or KVM" stuff.
+> They should instead be run with *both* options - or at least the ones
+> that are available on the host.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1711602
+Having one test as a 'smoke test' that is run for everything available
+sounds like a good idea, and the boot-serial test may be a good
+candidate for that.
 
-Title:
-  --copy-storage-all failing with qemu 2.10
+I would not want to run every test with every accelerator, however, as
+this makes 'make check' even slower than it is now. (Although it may be
+useful to be able to trigger 'run everything' tests on some dedicated
+test machines.)
 
-Status in QEMU:
-  New
-Status in libvirt package in Ubuntu:
-  Confirmed
-Status in qemu package in Ubuntu:
-  Confirmed
+> 
+> That would have caught the bug in the pull request I sent you, and
+> would at least have given you a chance at seeing the problem with
+> boot-serial-test.
 
-Bug description:
-  We fixed an issue around disk locking already in regard to qemu-nbd
-  [1], but there still seem to be issues.
-
-  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
-://10.22.69.196/system
-  error: internal error: qemu unexpectedly closed the monitor: 2017-08-18T1=
-2:10:29.800397Z qemu-system-x86_64: -chardev pty,id=3Dcharserial0: char dev=
-ice redirected to /dev/pts/0 (label charserial0)
-  2017-08-18T12:10:48.545776Z qemu-system-x86_64: load of migration failed:=
- Input/output error
-
-  Source libvirt log for the guest:
-  2017-08-18 12:09:08.251+0000: initiating migration
-  2017-08-18T12:09:08.809023Z qemu-system-x86_64: Unable to read from socke=
-t: Connection reset by peer
-  2017-08-18T12:09:08.809481Z qemu-system-x86_64: Unable to read from socke=
-t: Connection reset by peer
-
-  Target libvirt log for the guest:
-  2017-08-18T12:09:08.730911Z qemu-system-x86_64: load of migration failed:=
- Input/output error
-  2017-08-18 12:09:09.010+0000: shutting down, reason=3Dcrashed
-
-  Given the timing it seems that the actual copy now works (it is busy ~10 =
-seconds on my environment which would be the copy).
-  Also we don't see the old errors we saw before, but afterwards on the act=
-ual take-over it fails.
-
-  Dmesg has no related denials as often apparmor is in the mix.
-
-  Need to check libvirt logs of source [2] and target [3] in Detail.
-
-  [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02200.html
-  [2]: http://paste.ubuntu.com/25339356/
-  [3]: http://paste.ubuntu.com/25339358/
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1711602/+subscriptions
+I don't think that would have been caught unless you have the right
+host available... and given that most developers will only have a
+x86_64 machine and whatever other architecture they are working on (if
+any) available, they will run most of 'make check' with tcg only.
