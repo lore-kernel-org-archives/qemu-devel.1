@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkBze-00082p-3t
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 12:25:31 -0400
+	(envelope-from <armbru@redhat.com>) id 1dkC7y-0006YG-RB
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 12:34:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkBza-0005rS-42
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 12:25:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32776)
+	(envelope-from <armbru@redhat.com>) id 1dkC7u-0002sW-QY
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 12:34:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43968)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dkBzZ-0005rN-TX
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 12:25:26 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dkC7u-0002rz-HO
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 12:34:02 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-52-marcandre.lureau@redhat.com>
-	<20170822162400.51f07d89.cohuck@redhat.com>
-	<d1574f35-ebe5-8ede-180a-e584834e9d9a@redhat.com>
-	<87d17n61cr.fsf@dusky.pond.sub.org>
-	<1dfa5fc1-5981-4283-eb36-eb29194bdb8a@redhat.com>
-Date: Tue, 22 Aug 2017 18:25:19 +0200
-In-Reply-To: <1dfa5fc1-5981-4283-eb36-eb29194bdb8a@redhat.com> (David
-	Hildenbrand's message of "Tue, 22 Aug 2017 18:01:59 +0200")
-Message-ID: <87k21v36z4.fsf@dusky.pond.sub.org>
+	<20170822132255.23945-6-marcandre.lureau@redhat.com>
+Date: Tue, 22 Aug 2017 18:33:57 +0200
+In-Reply-To: <20170822132255.23945-6-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Tue, 22 Aug 2017 15:22:06 +0200")
+Message-ID: <877exvimtm.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 51/54] qapi: make s390 commands depend
- on TARGET_S390X
+Subject: Re: [Qemu-devel] [PATCH v2 05/54] qapi: generate a literal qobject
+ for introspection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,22 +30,338 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, "Dr. David
-	Alan Gilbert" <dgilbert@redhat.com>, Alexander Graf <agraf@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-David Hildenbrand <david@redhat.com> writes:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
->> Yes, but Marc-Andr=C3=A9's patch makes the "not supported yet" informati=
-on
->> available in query-qmp-schema.  Carrying such information is pretty much
->> the point of schema introspection.
->>=20
->> We could add a comment explaining this command isn't target-specific,
->> but just happens not to be implemented for some targets.  Would that
->> help?
->>=20
+> Replace the generated json string with a literal qobject. The later is
+> easier to deal with, at run time as well as compile time: adding #if
+> conditionals will be easier than in a json string.
 >
-> Certainly!
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi-introspect.py         | 91 ++++++++++++++++++++++----------=
+------
+>  monitor.c                          |  2 +-
+>  tests/test-qobject-input-visitor.c | 11 +++--
+>  docs/devel/qapi-code-gen.txt       | 29 +++++++-----
+>  4 files changed, 80 insertions(+), 53 deletions(-)
+>
+> diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
+> index 032bcea491..1b96926fa7 100644
+> --- a/scripts/qapi-introspect.py
+> +++ b/scripts/qapi-introspect.py
+> @@ -12,72 +12,80 @@
+>  from qapi import *
+>=20=20
+>=20=20
+> -# Caveman's json.dumps() replacement (we're stuck at Python 2.4)
+> -# TODO try to use json.dumps() once we get unstuck
+> -def to_json(obj, level=3D0):
+> +def to_c_string(s):
+> +    return '"' + s.replace('\\', r'\\').replace('"', r'\"') + '"'
+> +
+> +
+> +def to_qlit(obj, level=3D0, first_indent=3DTrue):
 
-Let's do it then.
+I still think suppress_first_indent=3DFalse would be nicer, but it's not
+worth arguing now.
+
+> +
+> +    def indent(level):
+> +        return level * 4 * ' '
+> +
+> +    ret =3D ''
+> +    if first_indent:
+> +        ret +=3D indent(level)
+>      if obj is None:
+> -        ret =3D 'null'
+> +        ret +=3D 'QLIT_QNULL'
+>      elif isinstance(obj, str):
+> -        ret =3D '"' + obj.replace('"', r'\"') + '"'
+> +        ret +=3D 'QLIT_QSTR(' + to_c_string(obj) + ')'
+>      elif isinstance(obj, list):
+> -        elts =3D [to_json(elt, level + 1)
+> +        elts =3D [to_qlit(elt, level + 1)
+>                  for elt in obj]
+> -        ret =3D '[' + ', '.join(elts) + ']'
+> +        elts.append(indent(level + 1) + "{}")
+> +        ret +=3D 'QLIT_QLIST(((QLitObject[]) {\n'
+> +        ret +=3D ',\n'.join(elts) + '\n'
+> +        ret +=3D indent(level) + '}))'
+>      elif isinstance(obj, dict):
+> -        elts =3D ['"%s": %s' % (key.replace('"', r'\"'),
+> -                              to_json(obj[key], level + 1))
+> -                for key in sorted(obj.keys())]
+> -        ret =3D '{' + ', '.join(elts) + '}'
+> +        elts =3D []
+> +        for key, value in sorted(obj.iteritems()):
+> +            elts.append(indent(level + 1) + '{ %s, %s }' %
+> +                        (to_c_string(key), to_qlit(value, level + 1, Fal=
+se)))
+> +        elts.append(indent(level + 1) + '{}')
+> +        ret +=3D 'QLIT_QDICT(((QLitDictEntry[]) {\n'
+> +        ret +=3D ',\n'.join(elts) + '\n'
+> +        ret +=3D indent(level) + '}))'
+>      else:
+>          assert False                # not implemented
+> -    if level =3D=3D 1:
+> -        ret =3D '\n' + ret
+>      return ret
+
+Note to self: is there simple a way to get rid of the extra pair of
+parenthesis in QLIT_QLIST(( ... )) and QLIT_QDICT(( ... ))?
+
+>=20=20
+>=20=20
+> -def to_c_string(string):
+> -    return '"' + string.replace('\\', r'\\').replace('"', r'\"') + '"'
+> -
+> -
+
+Let's not move to_c_string() without need.
+
+>  class QAPISchemaGenIntrospectVisitor(QAPISchemaVisitor):
+>      def __init__(self, unmask):
+>          self._unmask =3D unmask
+>          self.defn =3D None
+>          self.decl =3D None
+>          self._schema =3D None
+> -        self._jsons =3D None
+> +        self._qlits =3D None
+>          self._used_types =3D None
+>          self._name_map =3D None
+>=20=20
+>      def visit_begin(self, schema):
+>          self._schema =3D schema
+> -        self._jsons =3D []
+> +        self._qlits =3D []
+>          self._used_types =3D []
+>          self._name_map =3D {}
+>=20=20
+>      def visit_end(self):
+>          # visit the types that are actually used
+> -        jsons =3D self._jsons
+> -        self._jsons =3D []
+> +        qlits =3D self._qlits
+> +        self._qlits =3D []
+>          for typ in self._used_types:
+>              typ.visit(self)
+>          # generate C
+>          # TODO can generate awfully long lines
+> -        jsons.extend(self._jsons)
+> -        name =3D c_name(prefix, protect=3DFalse) + 'qmp_schema_json'
+> +        qlits.extend(self._qlits)
+> +        name =3D c_name(prefix, protect=3DFalse) + 'qmp_schema_qlit'
+>          self.decl =3D mcgen('''
+> -extern const char %(c_name)s[];
+> +extern const QLitObject %(c_name)s;
+>  ''',
+>                            c_name=3Dc_name(name))
+> -        lines =3D to_json(jsons).split('\n')
+> -        c_string =3D '\n    '.join([to_c_string(line) for line in lines])
+>          self.defn =3D mcgen('''
+> -const char %(c_name)s[] =3D %(c_string)s;
+> +const QLitObject %(c_name)s =3D %(c_string)s;
+>  ''',
+>                            c_name=3Dc_name(name),
+> -                          c_string=3Dc_string)
+> +                          c_string=3Dto_qlit(qlits))
+>          self._schema =3D None
+> -        self._jsons =3D None
+> +        self._qlits =3D None
+>          self._used_types =3D None
+>          self._name_map =3D None
+>=20=20
+> @@ -111,12 +119,12 @@ const char %(c_name)s[] =3D %(c_string)s;
+>              return '[' + self._use_type(typ.element_type) + ']'
+>          return self._name(typ.name)
+>=20=20
+> -    def _gen_json(self, name, mtype, obj):
+> +    def _gen_qlit(self, name, mtype, obj):
+>          if mtype not in ('command', 'event', 'builtin', 'array'):
+>              name =3D self._name(name)
+>          obj['name'] =3D name
+>          obj['meta-type'] =3D mtype
+> -        self._jsons.append(obj)
+> +        self._qlits.append(obj)
+>=20=20
+>      def _gen_member(self, member):
+>          ret =3D {'name': member.name, 'type': self._use_type(member.type=
+)}
+> @@ -132,24 +140,24 @@ const char %(c_name)s[] =3D %(c_string)s;
+>          return {'case': variant.name, 'type': self._use_type(variant.typ=
+e)}
+>=20=20
+>      def visit_builtin_type(self, name, info, json_type):
+> -        self._gen_json(name, 'builtin', {'json-type': json_type})
+> +        self._gen_qlit(name, 'builtin', {'json-type': json_type})
+>=20=20
+>      def visit_enum_type(self, name, info, values, prefix):
+> -        self._gen_json(name, 'enum', {'values': values})
+> +        self._gen_qlit(name, 'enum', {'values': values})
+>=20=20
+>      def visit_array_type(self, name, info, element_type):
+>          element =3D self._use_type(element_type)
+> -        self._gen_json('[' + element + ']', 'array', {'element-type': el=
+ement})
+> +        self._gen_qlit('[' + element + ']', 'array', {'element-type': el=
+ement})
+>=20=20
+>      def visit_object_type_flat(self, name, info, members, variants):
+>          obj =3D {'members': [self._gen_member(m) for m in members]}
+>          if variants:
+>              obj.update(self._gen_variants(variants.tag_member.name,
+>                                            variants.variants))
+> -        self._gen_json(name, 'object', obj)
+> +        self._gen_qlit(name, 'object', obj)
+>=20=20
+>      def visit_alternate_type(self, name, info, variants):
+> -        self._gen_json(name, 'alternate',
+> +        self._gen_qlit(name, 'alternate',
+>                         {'members': [{'type': self._use_type(m.type)}
+>                                      for m in variants.variants]})
+>=20=20
+> @@ -157,13 +165,13 @@ const char %(c_name)s[] =3D %(c_string)s;
+>                        gen, success_response, boxed):
+>          arg_type =3D arg_type or self._schema.the_empty_object_type
+>          ret_type =3D ret_type or self._schema.the_empty_object_type
+> -        self._gen_json(name, 'command',
+> +        self._gen_qlit(name, 'command',
+>                         {'arg-type': self._use_type(arg_type),
+>                          'ret-type': self._use_type(ret_type)})
+>=20=20
+>      def visit_event(self, name, info, arg_type, boxed):
+>          arg_type =3D arg_type or self._schema.the_empty_object_type
+> -        self._gen_json(name, 'event', {'arg-type': self._use_type(arg_ty=
+pe)})
+> +        self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_ty=
+pe)})
+>=20=20
+>  # Debugging aid: unmask QAPI schema's type names
+>  # We normally mask them, because they're not QMP wire ABI
+> @@ -205,11 +213,18 @@ h_comment =3D '''
+>=20=20
+>  fdef.write(mcgen('''
+>  #include "qemu/osdep.h"
+> +#include "qapi/qmp/qlit.h"
+>  #include "%(prefix)sqmp-introspect.h"
+>=20=20
+>  ''',
+>                   prefix=3Dprefix))
+>=20=20
+> +fdecl.write(mcgen('''
+> +#include "qemu/osdep.h"
+> +#include "qapi/qmp/qlit.h"
+> +
+> +'''))
+> +
+>  schema =3D QAPISchema(input_file)
+>  gen =3D QAPISchemaGenIntrospectVisitor(opt_unmask)
+>  schema.visit(gen)
+> diff --git a/monitor.c b/monitor.c
+> index e0f880107f..14c27d4b6f 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -953,7 +953,7 @@ EventInfoList *qmp_query_events(Error **errp)
+>  static void qmp_query_qmp_schema(QDict *qdict, QObject **ret_data,
+>                                   Error **errp)
+>  {
+> -    *ret_data =3D qobject_from_json(qmp_schema_json, &error_abort);
+> +    *ret_data =3D qobject_from_qlit(&qmp_schema_qlit);
+>  }
+>=20=20
+>  /*
+> diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-inpu=
+t-visitor.c
+> index bcf02617dc..bdd00f6bd8 100644
+> --- a/tests/test-qobject-input-visitor.c
+> +++ b/tests/test-qobject-input-visitor.c
+> @@ -1247,24 +1247,27 @@ static void test_visitor_in_fail_alternate(TestIn=
+putVisitorData *data,
+>  }
+>=20=20
+>  static void do_test_visitor_in_qmp_introspect(TestInputVisitorData *data,
+> -                                              const char *schema_json)
+> +                                              const QLitObject *qlit)
+>  {
+>      SchemaInfoList *schema =3D NULL;
+> +    QObject *obj =3D qobject_from_qlit(qlit);
+>      Visitor *v;
+>=20=20
+> -    v =3D visitor_input_test_init_raw(data, schema_json);
+> +    v =3D qobject_input_visitor_new(obj);
+>=20=20
+>      visit_type_SchemaInfoList(v, NULL, &schema, &error_abort);
+>      g_assert(schema);
+>=20=20
+>      qapi_free_SchemaInfoList(schema);
+> +    qobject_decref(obj);
+> +    visit_free(v);
+>  }
+>=20=20
+>  static void test_visitor_in_qmp_introspect(TestInputVisitorData *data,
+>                                             const void *unused)
+>  {
+> -    do_test_visitor_in_qmp_introspect(data, test_qmp_schema_json);
+> -    do_test_visitor_in_qmp_introspect(data, qmp_schema_json);
+> +    do_test_visitor_in_qmp_introspect(data, &test_qmp_schema_qlit);
+> +    do_test_visitor_in_qmp_introspect(data, &qmp_schema_qlit);
+>  }
+>=20=20
+>  int main(int argc, char **argv)
+> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+> index 9903ac4c19..b653e86bff 100644
+> --- a/docs/devel/qapi-code-gen.txt
+> +++ b/docs/devel/qapi-code-gen.txt
+> @@ -1295,18 +1295,27 @@ Example:
+>      #ifndef EXAMPLE_QMP_INTROSPECT_H
+>      #define EXAMPLE_QMP_INTROSPECT_H
+>=20=20
+> -    extern const char example_qmp_schema_json[];
+> +    extern const QLitObject qmp_schema_qlit;
+>=20=20
+>      #endif
+>      $ cat qapi-generated/example-qmp-introspect.c
+>  [Uninteresting stuff omitted...]
+>=20=20
+> -    const char example_qmp_schema_json[] =3D "["
+> -        "{\"arg-type\": \"0\", \"meta-type\": \"event\", \"name\": \"MY_=
+EVENT\"}, "
+> -        "{\"arg-type\": \"1\", \"meta-type\": \"command\", \"name\": \"m=
+y-command\", \"ret-type\": \"2\"}, "
+> -        "{\"members\": [], \"meta-type\": \"object\", \"name\": \"0\"}, "
+> -        "{\"members\": [{\"name\": \"arg1\", \"type\": \"[2]\"}], \"meta=
+-type\": \"object\", \"name\": \"1\"}, "
+> -        "{\"members\": [{\"name\": \"integer\", \"type\": \"int\"}, {\"d=
+efault\": null, \"name\": \"string\", \"type\": \"str\"}], \"meta-type\": \=
+"object\", \"name\": \"2\"}, "
+> -        "{\"element-type\": \"2\", \"meta-type\": \"array\", \"name\": \=
+"[2]\"}, "
+> -        "{\"json-type\": \"int\", \"meta-type\": \"builtin\", \"name\": =
+\"int\"}, "
+> -        "{\"json-type\": \"string\", \"meta-type\": \"builtin\", \"name\=
+": \"str\"}]";
+> +    const QLitObject example_qmp_schema_qlit =3D QLIT_QLIST(((QLitObject=
+[]) {
+> +        QLIT_QDICT(((QLitDictEntry[]) {
+> +            { "arg-type", QLIT_QSTR("0") },
+> +            { "meta-type", QLIT_QSTR("event") },
+> +            { "name", QLIT_QSTR("Event") },
+> +            { }
+> +        })),
+> +        QLIT_QDICT(((QLitDictEntry[]) {
+> +            { "members", QLIT_QLIST(((QLitObject[]) {
+> +                { }
+> +            })) },
+> +            { "meta-type", QLIT_QSTR("object") },
+> +            { "name", QLIT_QSTR("0") },
+> +            { }
+> +        })),
+> +        ...
+> +        { }
+> +    }));
+
+Preferably without the to_c_string() move:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
