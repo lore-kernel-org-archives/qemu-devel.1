@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk5DR-0006wk-RM
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:19 -0400
+	(envelope-from <bounces@canonical.com>) id 1dk5DV-0006zz-Ul
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk5DQ-0006lJ-Kn
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:17 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36984)
+	(envelope-from <bounces@canonical.com>) id 1dk5DU-0006nS-Fo
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:21 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37056)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dk5DQ-0006is-Dl
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:16 -0400
+	id 1dk5DU-0006nG-9g
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 05:11:20 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dk5DP-00026G-7Q
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:11:15 +0000
+	id 1dk5DT-00029I-8V
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:11:19 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 34AAA2E80CB
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:11:15 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 3F5B62E80CB
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 09:11:19 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Aug 2017 08:54:10 -0000
+Date: Tue, 22 Aug 2017 08:58:52 -0000
 From: ChristianEhrhardt <1711602@bugs.launchpad.net>
 Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
-Message-Id: <150339205095.10750.5063429381666274296.malone@wampee.canonical.com>
+Message-Id: <150339233236.8725.2618271632756711348.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
  2.10
@@ -39,59 +39,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Via a watchpoints I found that the error is set by qemu_fill_buffer.
+So this is failing I/O that iterates over a channel.
+I was tracking down the len, pending and pos used.
 
-b qemu_loadvm_state
-handle SIGUSR1 nostop noprint pass
-c
-# on the break check and watch the status
-(gdb) p f
-$1 =3D (QEMUFile *) 0xb9babb3c00
+I found that this is not completely broken (like no access or generla I/O e=
+rror)
+It starts at pos 0 and iterated with varying offsets, but works for quite s=
+ome time.
+Example:
+
+[...]
+Thread 1 "qemu-system-x86" hit Breakpoint 2, qemu_fill_buffer (f=3Df@entry=
+=3D0xd3b66f3c00) at ./migration/qemu-file.c:295
+295         if (len > 0) {
+$11183 =3D 28728
+$11184 =3D 4040
+$11185 =3D {ops =3D 0xd3b3d740a0 <channel_input_ops>, hooks =3D 0x0, opaque=
+ =3D 0xd3b75ee490, bytes_xfer =3D 0, xfer_limit =3D 0, pos =3D 107130146, =
+
+  buf_index =3D 0, buf_size =3D 4040, =
+
+  buf =3D "\v\327\a\000\021\000\[...]\000"..., =
+
+  may_free =3D {0}, iov =3D {{iov_base =3D 0x0, iov_len =3D 0} <repeats 64 =
+times>}, iovcnt =3D 0, last_error =3D 0}
+[...]
+
+Well you could see the whole file read passing by one by one buffer
+Yet this isn't particularly fast, so track the one that has len=3D=3D0
+ (gdb) b ./migration/qemu-file.c:295 if len =3D=3D 0
+
+And I got it as:
 (gdb) p *f
-$2 =3D {ops =3D 0xb9b89880a0 <channel_input_ops>, hooks =3D 0x0, opaque =3D=
- 0xb9bbabfe00, bytes_xfer =3D 0, xfer_limit =3D 0, pos =3D 0, buf_index =3D=
- 0, =
+$11195 =3D {ops =3D 0xd3b3d740a0 <channel_input_ops>, hooks =3D 0x0, opaque=
+ =3D 0xd3b75ee490, bytes_xfer =3D 0, xfer_limit =3D 0, pos =3D 319638837, =
 
-  buf_size =3D 0, buf =3D '\000' <repeats 32767 times>, may_free =3D {0}, i=
-ov =3D {{iov_base =3D 0x0, iov_len =3D 0} <repeats 64 times>}, iovcnt =3D 0=
-, =
+  buf_index =3D 0, buf_size =3D 0, buf =3D '\000' <repeats 5504 times>..., =
+may_free =3D {0}, iov =3D {{iov_base =3D 0x0, iov_len =3D 0} <repeats 64 ti=
+mes>}, =
 
-  last_error =3D 0}
+  iovcnt =3D 0, last_error =3D 0}
 
-# ok still no err, set watchpoint
-(gdb) p &(f->last_error)
-$4 =3D (int *) 0xb9babbc044
-(gdb) watch *(int *) 0xb9babbc044
-Hardware watchpoint 2: *(int *) 0xb9babbc044
+Here pending =3D=3D 0 so buf_size =3D 0 as well also pos is further down
+incremented to 319638837.
 
-# This catches the following
-Thread 1 "qemu-system-x86" hit Hardware watchpoint 2: *(int *) 0xb9babbc044
-
-Old value =3D 0
-New value =3D -5
-0x000000b9b82bd0ec in qemu_file_set_error (ret=3D-5, f=3D0xb9babb3c00) at .=
-/migration/qemu-file.c:125
-warning: Source file is more recent than executable.
-125             f->last_error =3D ret;
-(gdb) bt
-#0  0x000000b9b82bd0ec in qemu_file_set_error (ret=3D-5, f=3D0xb9babb3c00) =
-at ./migration/qemu-file.c:125
-#1  qemu_fill_buffer (f=3D0xb9babb3c00) at ./migration/qemu-file.c:299
-#2  0x000000b9b82bdbb1 in qemu_peek_byte (f=3D0xb9babb3c00, offset=3D0) at =
-./migration/qemu-file.c:553
-#3  0x000000b9b82bdc1b in qemu_get_byte (f=3Df@entry=3D0xb9babb3c00) at ./m=
-igration/qemu-file.c:566
-#4  0x000000b9b82b5853 in qemu_loadvm_state_main (f=3Df@entry=3D0xb9babb3c0=
-0, mis=3D0xb9b8a4f700 <mis_current>) at ./migration/savevm.c:1947
-#5  0x000000b9b82b864f in qemu_loadvm_state (f=3Df@entry=3D0xb9babb3c00) at=
- ./migration/savevm.c:2032
-#6  0x000000b9b82af5c3 in process_incoming_migration_co (opaque=3D0xb9babb3=
-c00) at ./migration/migration.c:320
-#7  0x000000b9b83e42a6 in coroutine_trampoline (i0=3D<optimized out>, i1=3D=
-<optimized out>) at ./util/coroutine-ucontext.c:79
-#8  0x00007fbf3702fac0 in ?? () from /lib/x86_64-linux-gnu/libc.so.6
-#9  0x00007fffe3f9f800 in ?? ()
-#10 0x0000000000000000 in ?? ()
+Checking in detail I found that I had pending=3D0 and buf_size=3D0 as well =
+as non aligned pos entried, but they worked.
+So I excluded the buf_size=3D0/pending=3D0 as well as the alignment as reas=
+ons.
+Maybe it just iterates pos out of the range that is working?
 
 -- =
 
