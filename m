@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dkBNe-00070z-Dg
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:46:15 -0400
+	(envelope-from <mlureau@redhat.com>) id 1dkBNq-0007Ar-Re
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:46:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dkBNd-0005TF-NL
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:46:14 -0400
-Date: Tue, 22 Aug 2017 17:45:58 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170822174558.5db57e9f@nial.brq.redhat.com>
-In-Reply-To: <87shgjaezt.fsf@dusky.pond.sub.org>
-References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-	<1502117160-24655-13-git-send-email-armbru@redhat.com>
-	<20170822145505.643f74fa@nial.brq.redhat.com>
-	<87shgjaezt.fsf@dusky.pond.sub.org>
+	(envelope-from <mlureau@redhat.com>) id 1dkBNn-0005Xu-Je
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:46:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42825)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dkBNn-0005XW-Ae
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:46:23 -0400
+Date: Tue, 22 Aug 2017 11:46:19 -0400 (EDT)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <1256985773.1887717.1503416779700.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170822171404.7b11bca6.cohuck@redhat.com>
+References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
+	<20170822132255.23945-52-marcandre.lureau@redhat.com>
+	<20170822162400.51f07d89.cohuck@redhat.com>
+	<d1574f35-ebe5-8ede-180a-e584834e9d9a@redhat.com>
+	<1880955910.1845734.1503412894881.JavaMail.zimbra@redhat.com>
+	<20170822171404.7b11bca6.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 12/56] pc-dimm: Make size and address
- unsigned in QAPI/QMP
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 51/54] qapi: make s390 commands depend
+ on TARGET_S390X
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,43 +32,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, mreitz@redhat.com, jsnow@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Tue, 22 Aug 2017 15:50:14 +0200
-Markus Armbruster <armbru@redhat.com> wrote:
+Hi
 
-> Igor Mammedov <imammedo@redhat.com> writes:
-> 
-> > On Mon,  7 Aug 2017 16:45:16 +0200
-> > Markus Armbruster <armbru@redhat.com> wrote:
-> >  
-> >> Sizes and addresses should use QAPI type 'size' (uint64_t).
-> >> PCDIMMDeviceInfo members @addr and @size are 'int' (int64_t).
-> >> qmp_pc_dimm_device_list() implicitly converts from uint64_t.
-> >> 
-> >> Change these PCDIMMDeviceInfo members to 'size'.
-> >> 
-> >> query-memory-devices now reports sizes and addresses above 2^63-1
-> >> correctly instead of their (negative) two's complement.
-> >> 
-> >> HMP's "info memory-devices" already reported them correctly, because
-> >> it printed the signed integers with PRIx64 and PRIu32.  
-> > s/signed/unsigned/  
-> 
-> Before this patch: signed.  Afterwards: unsigned.  Would
-> 
->    HMP's "info memory-devices" already reported them correctly, because
->    it printed the signed (before the patch) integers with PRIx64 and
->    PRIu32.
-> 
-> be clearer?
-yes, that's more clear
+----- Original Message -----
+> On Tue, 22 Aug 2017 10:41:34 -0400 (EDT)
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+>=20
+> > Hi
+> >=20
+> > ----- Original Message -----
+> > > On 22.08.2017 16:24, Cornelia Huck wrote:
+> > > > On Tue, 22 Aug 2017 15:22:52 +0200
+> > > > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+>=20
+> > > >> @@ -4621,7 +4622,9 @@
+> > > >>  ##
+> > > >>  { 'command': 'query-cpu-model-comparison',
+> > > >>    'data': { 'modela': 'CpuModelInfo', 'modelb': 'CpuModelInfo' },
+> > > >> -  'returns': 'CpuModelCompareInfo' }
+> > > >> +  'returns': 'CpuModelCompareInfo',
+> > > >> +  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_S390X)']}
+> > > >> +
+> > > >> =20
+> > > >>  ##
+> > > >>  # @CpuModelBaselineInfo:
+> > > >> @@ -4673,7 +4676,8 @@
+> > > >>  { 'command': 'query-cpu-model-baseline',
+> > > >>    'data': { 'modela': 'CpuModelInfo',
+> > > >>              'modelb': 'CpuModelInfo' },
+> > > >> -  'returns': 'CpuModelBaselineInfo' }
+> > > >> +  'returns': 'CpuModelBaselineInfo',
+> > > >> +  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_S390X)']}
+> > > >=20
+> > > > ...but I'm not sure about the cpu model stuff. Wasn't the idea to m=
+ove
+> > > > to this model for all architectures later? (Given that we have stub=
+s
+> > > > for architectures not implementing this, instead of ifdeffing it in
+> > > > monitor.c)
+> > > >  =20
+> > >=20
+> > > +1, not architecture specific (in contrast to skey), simply not
+> > > supported _yet_ on other architectures.
+> >=20
+> > We can add other archs once they implement it. See for example:
+> > "qapi: make query-cpu-model-expansion depend on s390 or x86"
+>=20
+> That seems a bit like whack-a-mole, though. Depending on something like
+> "provides cpumodel feature xy" makes it clearer that this is supposed
+> to be non-architecture-specific.
 
-Thanks.
-
-> 
-> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>  
-> > Reviewed-by: Igor Mammedov <imammedo@redhat.com>  
-> 
-> Thanks!
+I would say the function name and documentation should say if it's architec=
+ture specific. The #ifdef in qapi generation or in qemu code base is just a=
+n implementation detail. I suggest to add FIXME in the schema so people loo=
+king at this realize it's not yet there (instead of error stubs in qemu cod=
+e / runtime).
+>=20
