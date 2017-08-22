@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkAfn-0006s9-Gm
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:01:01 -0400
+	(envelope-from <david@redhat.com>) id 1dkAh1-0007t6-B3
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:02:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkAfk-0006X7-7H
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:00:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36650)
+	(envelope-from <david@redhat.com>) id 1dkAgv-0007Zx-Jw
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:02:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42270)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dkAfj-0006UB-U3
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:00:52 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-2-marcandre.lureau@redhat.com>
-Date: Tue, 22 Aug 2017 17:00:45 +0200
-In-Reply-To: <20170822132255.23945-2-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Tue, 22 Aug 2017 15:22:02 +0200")
-Message-ID: <87h8wz8x5u.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dkAgv-0007Zl-BZ
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:02:05 -0400
+References: <1503413250-18432-1-git-send-email-borntraeger@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <c3e49a8a-8dec-51a4-f160-65a89abf9b8e@redhat.com>
+Date: Tue, 22 Aug 2017 17:02:01 +0200
 MIME-Version: 1.0
+In-Reply-To: <1503413250-18432-1-git-send-email-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 01/54] qapi: fix type_seen key error
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH/RFC] configure: enable --s390-pgste linker
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +28,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Christian Ehrhardt <christian.ehrhardt@canonical.com>, Dan Horak <dhorak@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> The type_seen member can be of a different type than the 'qtype' being
-> checked, since a string create several conflicts. Lookup the real
-> conflicting type in the conflict set, that one must be present in
-> type_seen.
->
-> This fixes the following error, reproducible with the modified test:
->
-> Traceback (most recent call last):
->   File "/home/elmarco/src/qq/tests/qapi-schema/test-qapi.py", line 56, in=
- <module>
->     schema =3D QAPISchema(sys.argv[1])
->   File "/home/elmarco/src/qq/scripts/qapi.py", line 1470, in __init__
->     self.exprs =3D check_exprs(parser.exprs)
->   File "/home/elmarco/src/qq/scripts/qapi.py", line 959, in check_exprs
->     check_alternate(expr, info)
->   File "/home/elmarco/src/qq/scripts/qapi.py", line 831, in check_alterna=
-te
->     % (name, key, types_seen[qtype]))
-> KeyError: 'QTYPE_QSTRING'
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On 22.08.2017 16:47, Christian Borntraeger wrote:
+> KVM guests on s390 need a different page table layout than normal
+> processes (2kb page table + 2kb page status extensions vs 2kb page table
+> only). As of today this has to be enabled via the vm.allocate_pgste
+> sysctl.
+> 
+> Newer kernels (>= 4.12) on s390 check for an S390_PGSTE program header
+> and enable the pgste page table extensions in that case. This makes the
+> vm.allocate_pgste sysctl unnecessary. We enable this program header for
+> the s390 system emulation (qemu-system-s390x) if
+> - the linker supports --s390-pgste (binutils >= 2.29)
+> - KVM is enabled
+> 
+> This will allow distributions to disable the global vm.allocate_pgste
+> sysctl, which will improve the page table allocation for non KVM
+> processes as only 2kb chunks are necessary.
+> 
+> Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: Dan Horak <dhorak@redhat.com>
+> Cc: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
 > ---
->  scripts/qapi.py                                  | 6 ++++--
->  tests/qapi-schema/alternate-conflict-string.json | 4 ++--
->  2 files changed, 6 insertions(+), 4 deletions(-)
->
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index 8aa2775f12..a3ac799535 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -825,10 +825,12 @@ def check_alternate(expr, info):
->              else:
->                  conflicting.add('QTYPE_QNUM')
->                  conflicting.add('QTYPE_QBOOL')
-> -        if conflicting & set(types_seen):
-> +        conflict =3D conflicting & set(types_seen)
-> +        if conflict:
-> +            conflict_qtype =3D list(conflict)[0]
+>  configure | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/configure b/configure
+> index dd73cce..4c9084b 100755
+> --- a/configure
+> +++ b/configure
+> @@ -6522,6 +6522,19 @@ if test "$target_linux_user" = "yes" -o "$target_bsd_user" = "yes" ; then
+>    ldflags="$ldflags $textseg_ldflags"
+>  fi
+>  
+> +# Newer kernels on s390 check for an S390_PGSTE program header and
+> +# enable the pgste page table extensions in that case. This makes
+> +# the vm.allocate_pgste sysctl unnecessary. We enable this program
+> +# header if
+> +#  - the linker support --s390-pgste
+> +#  - we build the system emulation (qemu-system-s390x)
+> +#  - KVM is enabled
+> +if $ld --help 2>/dev/null | grep ".--s390-pgste" >/dev/null 2>/dev/null ; then
 
-Converting from set to list just to extract an element is clumsly.
-Let's use conflict.pop(), and eliminate the variable.  Can do on commit.
+>/dev/null 2>&1
+(from has(){} definiton)
 
->              raise QAPISemError(info, "Alternate '%s' member '%s' can't "
->                                 "be distinguished from member '%s'"
-> -                               % (name, key, types_seen[qtype]))
-> +                               % (name, key, types_seen[conflict_qtype]))
->          for qt in conflicting:
->              types_seen[qt] =3D key
->=20=20
-> diff --git a/tests/qapi-schema/alternate-conflict-string.json b/tests/qap=
-i-schema/alternate-conflict-string.json
-> index 85adbd4adc..bb2702978e 100644
-> --- a/tests/qapi-schema/alternate-conflict-string.json
-> +++ b/tests/qapi-schema/alternate-conflict-string.json
-> @@ -1,4 +1,4 @@
->  # alternate branches of 'str' type conflict with all scalar types
->  { 'alternate': 'Alt',
-> -  'data': { 'one': 'str',
-> -            'two': 'int' } }
-> +  'data': { 'one': 'int',
-> +            'two': 'str' } }
+maybe even introduce
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+ld_has() {
+    $ld --help 2>/dev/null | grep ".$1" >/dev/null 2>&1
+}
+
+I guess it also makes sense to test for s390x first, before checking for
+ld support.
+
+> +    if test "$target_softmmu" = "yes"  -a "$ARCH" = "s390x" -a "$kvm" = "yes" ; then
+> +        ldflags="-Wl,--s390-pgste $ldflags"
+> +    fi
+> +fi
+> +
+>  echo "LDFLAGS+=$ldflags" >> $config_target_mak
+>  echo "QEMU_CFLAGS+=$cflags" >> $config_target_mak
+>  
+> 
+
+Happy to see this change :)
+
+-- 
+
+Thanks,
+
+David
