@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dkAo4-0006pQ-3Z
+	(envelope-from <pm215@archaic.org.uk>) id 1dkAo4-0006pq-83
 	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dkAnz-0003OL-BH
+	(envelope-from <pm215@archaic.org.uk>) id 1dkAo2-0003QX-HH
 	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:09:28 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 Aug 2017 16:08:53 +0100
-Message-Id: <1503414539-28762-15-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 22 Aug 2017 16:08:57 +0100
+Message-Id: <1503414539-28762-19-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
 References: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 14/20] target/arm: Make MPU_RNR register banked
+Subject: [Qemu-devel] [PATCH 18/20] target/arm: Make CFSR register banked
  for v8M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,195 +23,165 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Make the MPU_RNR register banked if v8M security extensions are
-enabled.
+Make the CFSR register banked if v8M security extensions are enabled.
+
+Not all the bits in this register are banked: the BFSR
+bits [15:8] are shared between S and NS, and we store them
+in the NS copy of the register.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h      |  2 +-
- hw/intc/armv7m_nvic.c | 18 +++++++++---------
- target/arm/cpu.c      |  3 ++-
- target/arm/helper.c   |  6 +++---
- target/arm/machine.c  | 13 +++++++++++--
- 5 files changed, 26 insertions(+), 16 deletions(-)
+ target/arm/cpu.h      |  7 ++++++-
+ hw/intc/armv7m_nvic.c | 15 +++++++++++++--
+ target/arm/helper.c   | 18 +++++++++---------
+ target/arm/machine.c  |  3 ++-
+ 4 files changed, 30 insertions(+), 13 deletions(-)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 12fa95e..43d36d6 100644
+index 21c68d7..3683537 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -533,7 +533,7 @@ typedef struct CPUARMState {
-         uint32_t *drbar;
-         uint32_t *drsr;
-         uint32_t *dracr;
--        uint32_t rnr;
-+        uint32_t rnr[2];
-     } pmsav7;
+@@ -424,7 +424,7 @@ typedef struct CPUARMState {
+         uint32_t basepri[2];
+         uint32_t control[2];
+         uint32_t ccr[2]; /* Configuration and Control */
+-        uint32_t cfsr; /* Configurable Fault Status */
++        uint32_t cfsr[2]; /* Configurable Fault Status */
+         uint32_t hfsr; /* HardFault Status */
+         uint32_t dfsr; /* Debug Fault Status Register */
+         uint32_t mmfar[2]; /* MemManage Fault Address */
+@@ -1210,6 +1210,11 @@ FIELD(V7M_CFSR, NOCP, 16 + 3, 1)
+ FIELD(V7M_CFSR, UNALIGNED, 16 + 8, 1)
+ FIELD(V7M_CFSR, DIVBYZERO, 16 + 9, 1)
  
-     /* PMSAv8 MPU */
++/* V7M CFSR bit masks covering all of the subregister bits */
++FIELD(V7M_CFSR, MMFSR, 0, 8)
++FIELD(V7M_CFSR, BFSR, 8, 8)
++FIELD(V7M_CFSR, UFSR, 16, 16)
++
+ /* V7M HFSR bits */
+ FIELD(V7M_HFSR, VECTTBL, 1, 1)
+ FIELD(V7M_HFSR, FORCED, 30, 1)
 diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 9ced7af..c3c214c 100644
+index 99b62ac..3c14cc8 100644
 --- a/hw/intc/armv7m_nvic.c
 +++ b/hw/intc/armv7m_nvic.c
-@@ -543,13 +543,13 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-     case 0xd94: /* MPU_CTRL */
-         return cpu->env.v7m.mpu_ctrl;
-     case 0xd98: /* MPU_RNR */
--        return cpu->env.pmsav7.rnr;
-+        return cpu->env.pmsav7.rnr[attrs.secure];
-     case 0xd9c: /* MPU_RBAR */
-     case 0xda4: /* MPU_RBAR_A1 */
-     case 0xdac: /* MPU_RBAR_A2 */
-     case 0xdb4: /* MPU_RBAR_A3 */
-     {
--        int region = cpu->env.pmsav7.rnr;
-+        int region = cpu->env.pmsav7.rnr[attrs.secure];
- 
-         if (arm_feature(&cpu->env, ARM_FEATURE_V8)) {
-             /* PMSAv8M handling of the aliases is different from v7M:
-@@ -577,7 +577,7 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-     case 0xdb0: /* MPU_RASR_A2 (v7M), MPU_RLAR_A2 (v8M) */
-     case 0xdb8: /* MPU_RASR_A3 (v7M), MPU_RLAR_A3 (v8M) */
-     {
--        int region = cpu->env.pmsav7.rnr;
-+        int region = cpu->env.pmsav7.rnr[attrs.secure];
- 
-         if (arm_feature(&cpu->env, ARM_FEATURE_V8)) {
-             /* PMSAv8M handling of the aliases is different from v7M:
-@@ -731,7 +731,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-                           PRIu32 "/%" PRIu32 "\n",
-                           value, cpu->pmsav7_dregion);
-         } else {
--            cpu->env.pmsav7.rnr = value;
-+            cpu->env.pmsav7.rnr[attrs.secure] = value;
+@@ -500,7 +500,12 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
          }
+         return val;
+     case 0xd28: /* Configurable Fault Status.  */
+-        return cpu->env.v7m.cfsr;
++        /* The BFSR bits [15:8] are shared between security states
++         * and we store them in the NS copy
++         */
++        val = cpu->env.v7m.cfsr[attrs.secure];
++        val |= cpu->env.v7m.cfsr[M_REG_NS] & R_V7M_CFSR_BFSR_MASK;
++        return val;
+     case 0xd2c: /* Hard Fault Status.  */
+         return cpu->env.v7m.hfsr;
+     case 0xd30: /* Debug Fault Status.  */
+@@ -714,7 +719,13 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
+         nvic_irq_update(s);
          break;
-     case 0xd9c: /* MPU_RBAR */
-@@ -749,7 +749,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-              */
-             int aliasno = (offset - 0xd9c) / 8; /* 0..3 */
- 
--            region = cpu->env.pmsav7.rnr;
-+            region = cpu->env.pmsav7.rnr[attrs.secure];
-             if (aliasno) {
-                 region = deposit32(region, 0, 2, aliasno);
-             }
-@@ -772,9 +772,9 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-                               region, cpu->pmsav7_dregion);
-                 return;
-             }
--            cpu->env.pmsav7.rnr = region;
-+            cpu->env.pmsav7.rnr[attrs.secure] = region;
-         } else {
--            region = cpu->env.pmsav7.rnr;
-+            region = cpu->env.pmsav7.rnr[attrs.secure];
-         }
- 
-         if (region >= cpu->pmsav7_dregion) {
-@@ -790,7 +790,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-     case 0xdb0: /* MPU_RASR_A2 (v7M), MPU_RLAR_A2 (v8M) */
-     case 0xdb8: /* MPU_RASR_A3 (v7M), MPU_RLAR_A3 (v8M) */
-     {
--        int region = cpu->env.pmsav7.rnr;
-+        int region = cpu->env.pmsav7.rnr[attrs.secure];
- 
-         if (arm_feature(&cpu->env, ARM_FEATURE_V8)) {
-             /* PMSAv8M handling of the aliases is different from v7M:
-@@ -799,7 +799,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-              */
-             int aliasno = (offset - 0xd9c) / 8; /* 0..3 */
- 
--            region = cpu->env.pmsav7.rnr;
-+            region = cpu->env.pmsav7.rnr[attrs.secure];
-             if (aliasno) {
-                 region = deposit32(region, 0, 2, aliasno);
-             }
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 333029c..11038b8 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -258,7 +258,8 @@ static void arm_cpu_reset(CPUState *s)
-                        sizeof(*env->pmsav7.dracr) * cpu->pmsav7_dregion);
-             }
-         }
--        env->pmsav7.rnr = 0;
-+        env->pmsav7.rnr[M_REG_NS] = 0;
-+        env->pmsav7.rnr[M_REG_S] = 0;
-         memset(env->pmsav8.mair0, 0, sizeof(env->pmsav8.mair0));
-         memset(env->pmsav8.mair1, 0, sizeof(env->pmsav8.mair1));
-     }
+     case 0xd28: /* Configurable Fault Status.  */
+-        cpu->env.v7m.cfsr &= ~value; /* W1C */
++        cpu->env.v7m.cfsr[attrs.secure] &= ~value; /* W1C */
++        if (attrs.secure) {
++            /* The BFSR bits [15:8] are shared between security states
++             * and we store them in the NS copy.
++             */
++            cpu->env.v7m.cfsr[M_REG_NS] &= ~(value & R_V7M_CFSR_BFSR_MASK);
++        }
+         break;
+     case 0xd2c: /* Hard Fault Status.  */
+         cpu->env.v7m.hfsr &= ~value; /* W1C */
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 5394cef..48e0fc6 100644
+index e587e85..67b3874 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -2385,7 +2385,7 @@ static uint64_t pmsav7_read(CPUARMState *env, const ARMCPRegInfo *ri)
-         return 0;
-     }
- 
--    u32p += env->pmsav7.rnr;
-+    u32p += env->pmsav7.rnr[M_REG_NS];
-     return *u32p;
- }
- 
-@@ -2399,7 +2399,7 @@ static void pmsav7_write(CPUARMState *env, const ARMCPRegInfo *ri,
-         return;
-     }
- 
--    u32p += env->pmsav7.rnr;
-+    u32p += env->pmsav7.rnr[M_REG_NS];
-     tlb_flush(CPU(cpu)); /* Mappings may have changed - purge! */
-     *u32p = value;
- }
-@@ -2442,7 +2442,7 @@ static const ARMCPRegInfo pmsav7_cp_reginfo[] = {
-       .resetfn = arm_cp_reset_ignore },
-     { .name = "RGNR", .cp = 15, .crn = 6, .opc1 = 0, .crm = 2, .opc2 = 0,
-       .access = PL1_RW,
--      .fieldoffset = offsetof(CPUARMState, pmsav7.rnr),
-+      .fieldoffset = offsetof(CPUARMState, pmsav7.rnr[M_REG_NS]),
-       .writefn = pmsav7_rgnr_write,
-       .resetfn = arm_cp_reset_ignore },
-     REGINFO_SENTINEL
+@@ -6229,7 +6229,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+         /* Bad exception return: instead of popping the exception
+          * stack, directly take a usage fault on the current stack.
+          */
+-        env->v7m.cfsr |= R_V7M_CFSR_INVPC_MASK;
++        env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
+         v7m_exception_taken(cpu, type | 0xf0000000);
+         qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on existing "
+@@ -6271,7 +6271,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+     if (return_to_handler != arm_v7m_is_handler_mode(env)) {
+         /* Take an INVPC UsageFault by pushing the stack again. */
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
+-        env->v7m.cfsr |= R_V7M_CFSR_INVPC_MASK;
++        env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
+         v7m_push_stack(cpu);
+         v7m_exception_taken(cpu, type | 0xf0000000);
+         qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on new stackframe: "
+@@ -6330,15 +6330,15 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+     switch (cs->exception_index) {
+     case EXCP_UDEF:
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
+-        env->v7m.cfsr |= R_V7M_CFSR_UNDEFINSTR_MASK;
++        env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_UNDEFINSTR_MASK;
+         break;
+     case EXCP_NOCP:
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
+-        env->v7m.cfsr |= R_V7M_CFSR_NOCP_MASK;
++        env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_NOCP_MASK;
+         break;
+     case EXCP_INVSTATE:
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
+-        env->v7m.cfsr |= R_V7M_CFSR_INVSTATE_MASK;
++        env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVSTATE_MASK;
+         break;
+     case EXCP_SWI:
+         /* The PC already points to the next instruction.  */
+@@ -6354,11 +6354,11 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+         case 0x8: /* External Abort */
+             switch (cs->exception_index) {
+             case EXCP_PREFETCH_ABORT:
+-                env->v7m.cfsr |= R_V7M_CFSR_PRECISERR_MASK;
++                env->v7m.cfsr[M_REG_NS] |= R_V7M_CFSR_PRECISERR_MASK;
+                 qemu_log_mask(CPU_LOG_INT, "...with CFSR.PRECISERR\n");
+                 break;
+             case EXCP_DATA_ABORT:
+-                env->v7m.cfsr |=
++                env->v7m.cfsr[M_REG_NS] |=
+                     (R_V7M_CFSR_IBUSERR_MASK | R_V7M_CFSR_BFARVALID_MASK);
+                 env->v7m.bfar = env->exception.vaddress;
+                 qemu_log_mask(CPU_LOG_INT,
+@@ -6374,11 +6374,11 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+              */
+             switch (cs->exception_index) {
+             case EXCP_PREFETCH_ABORT:
+-                env->v7m.cfsr |= R_V7M_CFSR_IACCVIOL_MASK;
++                env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_IACCVIOL_MASK;
+                 qemu_log_mask(CPU_LOG_INT, "...with CFSR.IACCVIOL\n");
+                 break;
+             case EXCP_DATA_ABORT:
+-                env->v7m.cfsr |=
++                env->v7m.cfsr[env->v7m.secure] |=
+                     (R_V7M_CFSR_DACCVIOL_MASK | R_V7M_CFSR_MMARVALID_MASK);
+                 env->v7m.mmfar[env->v7m.secure] = env->exception.vaddress;
+                 qemu_log_mask(CPU_LOG_INT,
 diff --git a/target/arm/machine.c b/target/arm/machine.c
-index 05c6c7a..6941e35 100644
+index 5122e58..3cc94b4 100644
 --- a/target/arm/machine.c
 +++ b/target/arm/machine.c
-@@ -167,7 +167,7 @@ static bool pmsav7_rgnr_vmstate_validate(void *opaque, int version_id)
- {
-     ARMCPU *cpu = opaque;
- 
--    return cpu->env.pmsav7.rnr < cpu->pmsav7_dregion;
-+    return cpu->env.pmsav7.rnr[M_REG_NS] < cpu->pmsav7_dregion;
- }
- 
- static const VMStateDescription vmstate_pmsav7 = {
-@@ -205,7 +205,7 @@ static const VMStateDescription vmstate_pmsav7_rnr = {
-     .minimum_version_id = 1,
-     .needed = pmsav7_rnr_needed,
-     .fields = (VMStateField[]) {
--        VMSTATE_UINT32(env.pmsav7.rnr, ARMCPU),
-+        VMSTATE_UINT32(env.pmsav7.rnr[M_REG_NS], ARMCPU),
-         VMSTATE_END_OF_LIST()
-     }
- };
-@@ -235,6 +235,13 @@ static const VMStateDescription vmstate_pmsav8 = {
-     }
- };
- 
-+static bool s_rnr_vmstate_validate(void *opaque, int version_id)
-+{
-+    ARMCPU *cpu = opaque;
-+
-+    return cpu->env.pmsav7.rnr[M_REG_S] < cpu->pmsav7_dregion;
-+}
-+
- static bool m_security_needed(void *opaque)
- {
-     ARMCPU *cpu = opaque;
-@@ -261,6 +268,8 @@ static const VMStateDescription vmstate_m_security = {
-                               0, vmstate_info_uint32, uint32_t),
-         VMSTATE_VARRAY_UINT32(env.pmsav8.rlar[M_REG_S], ARMCPU, pmsav7_dregion,
-                               0, vmstate_info_uint32, uint32_t),
-+        VMSTATE_UINT32(env.pmsav7.rnr[M_REG_S], ARMCPU),
-+        VMSTATE_VALIDATE("secure MPU_RNR is valid", s_rnr_vmstate_validate),
+@@ -118,7 +118,7 @@ static const VMStateDescription vmstate_m = {
+         VMSTATE_UINT32(env.v7m.basepri[M_REG_NS], ARMCPU),
+         VMSTATE_UINT32(env.v7m.control[M_REG_NS], ARMCPU),
+         VMSTATE_UINT32(env.v7m.ccr[M_REG_NS], ARMCPU),
+-        VMSTATE_UINT32(env.v7m.cfsr, ARMCPU),
++        VMSTATE_UINT32(env.v7m.cfsr[M_REG_NS], ARMCPU),
+         VMSTATE_UINT32(env.v7m.hfsr, ARMCPU),
+         VMSTATE_UINT32(env.v7m.dfsr, ARMCPU),
+         VMSTATE_UINT32(env.v7m.mmfar[M_REG_NS], ARMCPU),
+@@ -273,6 +273,7 @@ static const VMStateDescription vmstate_m_security = {
+         VMSTATE_UINT32(env.v7m.mpu_ctrl[M_REG_S], ARMCPU),
+         VMSTATE_UINT32(env.v7m.ccr[M_REG_S], ARMCPU),
+         VMSTATE_UINT32(env.v7m.mmfar[M_REG_S], ARMCPU),
++        VMSTATE_UINT32(env.v7m.cfsr[M_REG_S], ARMCPU),
          VMSTATE_END_OF_LIST()
      }
  };
