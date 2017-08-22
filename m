@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dk08n-0003Kb-Uq
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 23:46:10 -0400
+	(envelope-from <famz@redhat.com>) id 1dk0bB-0005VY-Ir
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 00:15:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dk08j-0003bz-2J
-	for qemu-devel@nongnu.org; Mon, 21 Aug 2017 23:46:09 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1501867249-1924-1-git-send-email-peter.maydell@linaro.org>
-	<1501867249-1924-5-git-send-email-peter.maydell@linaro.org>
-	<50d6ba4d-cfa3-5b5f-5da1-dca2326d4f5d@amsat.org>
-	<c38728a0-da49-635e-2954-1030b223e3c9@linaro.org>
-	<CAFEAcA_nPya92Vatwt7RiZnhKTH4_GKypSrX_KgPj3GitxV0Tg@mail.gmail.com>
-	<CAFEAcA97eXYPABgaE8Y_+EkWscR7CCH2WUHoM7ttZ6gVWQrqxw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <aa6caac1-e06c-9e1c-2aba-18d672fafb55@amsat.org>
-Date: Tue, 22 Aug 2017 00:45:59 -0300
+	(envelope-from <famz@redhat.com>) id 1dk0b8-0003dH-EG
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 00:15:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50758)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dk0b8-0003cj-7b
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 00:15:26 -0400
+Date: Tue, 22 Aug 2017 12:15:19 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170822041519.GC2146@lemon>
+References: <1503301464-27886-1-git-send-email-peterx@redhat.com>
+	<20170821085851.GA4371@lemon>
+	<20170821100555.GC30356@pxdev.xzpeter.org>
+	<20170821135743.GC4371@lemon> <20170821153622.GG2231@work-vm>
+	<20170821165450.GE4371@lemon> <20170821172852.GA3236@work-vm>
+	<20170822021556.GA2146@lemon>
+	<20170822025654.GE30356@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA97eXYPABgaE8Y_+EkWscR7CCH2WUHoM7ttZ6gVWQrqxw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 4/8] boards.h: Define new flag
- ignore_memory_transaction_failures
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170822025654.GE30356@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC 0/6] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,63 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi Peter,
+On Tue, 08/22 10:56, Peter Xu wrote:
+> I haven't really encountered (c), but I think it's the migrate_cancel
+> command that matters, which should not need BQL as well.
 
-On 08/17/2017 07:25 AM, Peter Maydell wrote:
-> On 5 August 2017 at 11:13, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 4 August 2017 at 20:23, Richard Henderson
->> <richard.henderson@linaro.org> wrote:
->>> On 08/04/2017 11:09 AM, Philippe Mathieu-Daudé wrote:
->>>> Since create_unimplemented_device() register overlapped with low priority, why
->>>> not register it as default device directly, over the whole address space?
->>>
->>> That's a good suggestion.  It makes more sense to me than adding a flag on the
->>> MachineClass.
->>
->> Yeah, I did think about implementing it that way, but...
->>
->> That wouldn't handle the case of a device model directly
->> returning a MEMTX_ERROR, or a transaction dispatched to
->> a memory region whose MemoryRegionOps valid settings
->> prohibit it (eg byte accesses to a word-access-only device),
->> or accesses to a MemoryRegion that was created by passing
->> a NULL MemoryRegionOps pointer to memory_region_init_io
->> (I dunno why you'd do that but some code does).
->>
->> In short, there are lots of ways the memory subsystem might
->> end up returning a transaction error -- this mechanism
->> ensures that none of them start generating exceptions
->> when they previously did not, and is (I hope) easy to
->> review in the sense of being sure that it does what it
->> intends to do without the need to audit a lot of corner
->> cases.
-> 
-> So, this question (should we have a board flag to disable reporting
-> of tx failures to the CPU hook, or use unimplemented_device as a
-> sort of background region) seems to be the main unanswered question
-> for this series. I think (as outlined above) that the board flag
-> is simpler and safer; are people happy for me to put this series
-> in target-arm.next with that approach, or should I rethink this bit?
-As remarked previously in this thread, the current QEMU behavior on 
-transaction error isn't always matching real hardware.
-Matching correctly throwing errors is likely to break various current users.
+There is bdrv_invalidate_cache_all() in migrate_cancel which clearly isn't safe.
+Is that if block unreachable in this case? If so we should assert, otherwise
+this command is not okay to run without BQL.
 
-If we are worried about being backward compatible, defaulting background 
-region to unimp() won't throw any transaction error.
+Generically, what guarantee the thread-safety of a qmp command when you decide
+BQL is not needed? In other words, how do you prove commands are safe without
+BQL? I think almost every command accesses global state, but lock-free data
+structures are rare AFAICT.
 
-Since the default is no transaction error, users who expect hardware 
-error can implement the correct behavior, per region/bus transaction errors.
-
-I'm somehow afraid that "ignore_memory_transaction_failures" ends up 
-like the "cannot_instantiate_with_device_add_yet" flag - a hard to 
-remove kludge outliving his purpose.
-
-Anyway I'm not unhappy with this approach, but I'd be very happy to have 
-unimp() covering the whole background region.
-
-Regards,
-
-Phil.
+Fam
