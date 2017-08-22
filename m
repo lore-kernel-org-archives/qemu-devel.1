@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dkBRa-00022k-5S
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:50:19 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dkBVd-0005Tv-7y
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:54:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dkBRW-0007eB-Tt
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:50:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53576)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dkBRW-0007dw-LC
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:50:14 -0400
-Date: Tue, 22 Aug 2017 11:50:13 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <494634424.1900896.1503417013134.JavaMail.zimbra@redhat.com>
-In-Reply-To: <87h8wz8x5u.fsf@dusky.pond.sub.org>
-References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-2-marcandre.lureau@redhat.com>
-	<87h8wz8x5u.fsf@dusky.pond.sub.org>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dkBVc-00022L-FI
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 11:54:29 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <87ziarep0c.fsf@dusky.pond.sub.org>
+References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
+	<1502117160-24655-5-git-send-email-armbru@redhat.com>
+	<CAJ+F1CLhMBQuKFT1w9Q-U1xAts4zpERNd_CZB7V2Yg4w0Q+m3g@mail.gmail.com>
+	<87ziarep0c.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 22 Aug 2017 17:54:21 +0200
+Message-ID: <CAJ+F1CK2Rx=vS3yNH_6bnYEZXwFycgmTT4a407fu0xMR6_DFPA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 01/54] qapi: fix type_seen key error
+Subject: Re: [Qemu-devel] [RFC PATCH 04/56] char: Make ringbuf-read size
+ unsigned in QAPI/QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +27,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, jcody <jcody@redhat.com>, QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
 Hi
 
------ Original Message -----
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->=20
-> > The type_seen member can be of a different type than the 'qtype' being
-> > checked, since a string create several conflicts. Lookup the real
-> > conflicting type in the conflict set, that one must be present in
-> > type_seen.
-> >
-> > This fixes the following error, reproducible with the modified test:
-> >
-> > Traceback (most recent call last):
-> >   File "/home/elmarco/src/qq/tests/qapi-schema/test-qapi.py", line 56, =
-in
-> >   <module>
-> >     schema =3D QAPISchema(sys.argv[1])
-> >   File "/home/elmarco/src/qq/scripts/qapi.py", line 1470, in __init__
-> >     self.exprs =3D check_exprs(parser.exprs)
-> >   File "/home/elmarco/src/qq/scripts/qapi.py", line 959, in check_exprs
-> >     check_alternate(expr, info)
-> >   File "/home/elmarco/src/qq/scripts/qapi.py", line 831, in check_alter=
-nate
-> >     % (name, key, types_seen[qtype]))
-> > KeyError: 'QTYPE_QSTRING'
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  scripts/qapi.py                                  | 6 ++++--
-> >  tests/qapi-schema/alternate-conflict-string.json | 4 ++--
-> >  2 files changed, 6 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/scripts/qapi.py b/scripts/qapi.py
-> > index 8aa2775f12..a3ac799535 100644
-> > --- a/scripts/qapi.py
-> > +++ b/scripts/qapi.py
-> > @@ -825,10 +825,12 @@ def check_alternate(expr, info):
-> >              else:
-> >                  conflicting.add('QTYPE_QNUM')
-> >                  conflicting.add('QTYPE_QBOOL')
-> > -        if conflicting & set(types_seen):
-> > +        conflict =3D conflicting & set(types_seen)
-> > +        if conflict:
-> > +            conflict_qtype =3D list(conflict)[0]
->=20
-> Converting from set to list just to extract an element is clumsly.
-> Let's use conflict.pop(), and eliminate the variable.  Can do on commit.
+On Tue, Aug 22, 2017 at 3:00 PM, Markus Armbruster <armbru@redhat.com> wrot=
+e:
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+>
+>> Hi
+>>
+>> On Mon, Aug 7, 2017 at 4:45 PM, Markus Armbruster <armbru@redhat.com> wr=
+ote:
+>>> Sizes should use QAPI type 'size' (uint64_t).  ringbuf-read parameter
+>>> @size is 'int' (int64_t).  qmp_ringbuf_read() rejects negative values,
+>>> then implicitly converts to size_t.
+>>>
+>>> Change the parameter to 'size' and drop the check for negative values.
+>>>
+>>> ringbuf-read now accepts size values between 2^63 and 2^64-1.  It
+>>> accepts negative values as before, because that's how the QObject
+>>> input visitor works for backward compatibility.
+>>>
+>>
+>> Negative values over json will be implicitly converted to positive
+>> values with this change, right? Or are they rejected earlier?
+>
+> Yes.  For details, see my reply to Juan's review of PATCH 15.
+>
+>> If so that is a change of behaviour that I am not sure is worth doing
+>> now (without explicit protocol break), but I don't mind.
 
-I didn't realize that. thanks
+So before this change:
 
->=20
-> >              raise QAPISemError(info, "Alternate '%s' member '%s' can't=
- "
-> >                                 "be distinguished from member '%s'"
-> > -                               % (name, key, types_seen[qtype]))
-> > +                               % (name, key, types_seen[conflict_qtype=
-]))
-> >          for qt in conflicting:
-> >              types_seen[qt] =3D key
-> > =20
-> > diff --git a/tests/qapi-schema/alternate-conflict-string.json
-> > b/tests/qapi-schema/alternate-conflict-string.json
-> > index 85adbd4adc..bb2702978e 100644
-> > --- a/tests/qapi-schema/alternate-conflict-string.json
-> > +++ b/tests/qapi-schema/alternate-conflict-string.json
-> > @@ -1,4 +1,4 @@
-> >  # alternate branches of 'str' type conflict with all scalar types
-> >  { 'alternate': 'Alt',
-> > -  'data': { 'one': 'str',
-> > -            'two': 'int' } }
-> > +  'data': { 'one': 'int',
-> > +            'two': 'str' } }
->=20
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->=20
+(QEMU) ringbuf-read device=3Dfoo size=3D-1
+{"error": {"class": "GenericError", "desc": "size must be greater than zero=
+"}}
+
+after:
+
+(QEMU) ringbuf-read device=3Dfoo size=3D-1
+{"return": ""}
+
+Is this really what we want?
+
+--=20
+Marc-Andr=C3=A9 Lureau
