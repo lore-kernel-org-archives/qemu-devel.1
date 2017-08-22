@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dk7LA-0007b5-Qh
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:27:26 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dk7Lz-0008JE-UX
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:28:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dk7L9-0000jB-MS
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:27:24 -0400
-Date: Tue, 22 Aug 2017 07:27:06 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <34249654.1469680.1503401226890.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1502117160-24655-3-git-send-email-armbru@redhat.com>
-References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-	<1502117160-24655-3-git-send-email-armbru@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1dk7Ly-0000wl-S9
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:28:15 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:45945)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1dk7Ly-0000vT-Ff
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:28:14 -0400
+Date: Tue, 22 Aug 2017 21:20:46 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170822112046.GC12356@umbus.fritz.box>
+References: <20170816082650.21880-1-cohuck@redhat.com>
+	<223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
+	<CAFEAcA_UfM_XNKdc5zfHsehoRE6Q+EszRZX3FByskir7c+0Lww@mail.gmail.com>
+	<20170822010917.GO12356@umbus.fritz.box>
+	<CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
+	<3f0dc918-0f55-e2f4-bf47-fe4abf5453bb@redhat.com>
+	<CAFEAcA_ezKWweEuUB-cXTer0LLaeuiGDkSdfhApedhw4ykDT0Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 02/56] qdict: New helpers to put and
- get unsigned integers
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="i483Pv/KqyjCUwB1"
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_ezKWweEuUB-cXTer0LLaeuiGDkSdfhApedhw4ykDT0Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10] boot-serial-test: prefer tcg
+ accelerator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,136 +34,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, quintela@redhat.com, berrange@redhat.com, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi
 
-Is this based on https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg01894.html ?
+--i483Pv/KqyjCUwB1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-If so, you should probably keep me signed-off.
+On Tue, Aug 22, 2017 at 10:35:17AM +0100, Peter Maydell wrote:
+> On 22 August 2017 at 09:49, Laurent Vivier <lvivier@redhat.com> wrote:
+> > On 22/08/2017 10:47, Peter Maydell wrote:
+> >> On 22 August 2017 at 02:09, David Gibson <david@gibson.dropbear.id.au>=
+ wrote:
+> >>> On Wed, Aug 16, 2017 at 12:18:07PM +0100, Peter Maydell wrote:
+> >>>> On 16 August 2017 at 11:51, Paolo Bonzini <pbonzini@redhat.com> wrot=
+e:
+> >>>>> On 16/08/2017 10:26, Cornelia Huck wrote:
+> >>>>>> Prefer to use the tcg accelarator if it is available: This is our =
+only
+> >>>>>> real smoke test for tcg, and fast enough to use it for that.
+> >>>>>
+> >>>>> I'm not sure this is required for 2.10.  Yes, it means the coverage=
+ from
+> >>>>> "make check" is worse, but that's it.
+> >>>>
+> >>>> Yes, I'd put it under "if we need to roll an rc4 anyway for
+> >>>> some more significant bug we might as well put this in too,
+> >>>> but it doesn't merit cutting rc4 by itself."
+> >>>
+> >>> It does entirely break "make check" on a ppc host.  And that in turn
+> >>> has held up my testing cycle for a couple of ppc regressions from 2.9
+> >>> that I was hoping to squeeze in.  Does that change your calculations?
+> >>
+> >> I have a PPC64 box in my standard set of build tests, and it
+> >> runs 'make check' without problems...
+> >
+> > You need to use KVM HV to have the problem, not KVM PR.
+> > Is that the case?
+>=20
+> I don't have access to KVM at all on that box, so it will be
+> using TCG only.
 
-My patch had also a test :)
- 
------ Original Message -----
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  include/qapi/qmp/qdict.h |  5 +++++
->  qobject/qdict.c          | 43 ++++++++++++++++++++++++++++++++++++-------
->  2 files changed, 41 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
-> index 363e431..3b52481 100644
-> --- a/include/qapi/qmp/qdict.h
-> +++ b/include/qapi/qmp/qdict.h
-> @@ -56,6 +56,8 @@ void qdict_destroy_obj(QObject *obj);
->  /* Helpers for int, bool, and string */
->  #define qdict_put_int(qdict, key, value) \
->          qdict_put(qdict, key, qnum_from_int(value))
-> +#define qdict_put_uint(qdict, key, value) \
-> +        qdict_put(qdict, key, qnum_from_uint(value))
->  #define qdict_put_bool(qdict, key, value) \
->          qdict_put(qdict, key, qbool_from_bool(value))
->  #define qdict_put_str(qdict, key, value) \
-> @@ -64,12 +66,15 @@ void qdict_destroy_obj(QObject *obj);
->  /* High level helpers */
->  double qdict_get_double(const QDict *qdict, const char *key);
->  int64_t qdict_get_int(const QDict *qdict, const char *key);
-> +uint64_t qdict_get_uint(const QDict *qdict, const char *key);
->  bool qdict_get_bool(const QDict *qdict, const char *key);
->  QList *qdict_get_qlist(const QDict *qdict, const char *key);
->  QDict *qdict_get_qdict(const QDict *qdict, const char *key);
->  const char *qdict_get_str(const QDict *qdict, const char *key);
->  int64_t qdict_get_try_int(const QDict *qdict, const char *key,
->                            int64_t def_value);
-> +uint64_t qdict_get_try_uint(const QDict *qdict, const char *key,
-> +                            uint64_t def_value);
->  bool qdict_get_try_bool(const QDict *qdict, const char *key, bool
->  def_value);
->  const char *qdict_get_try_str(const QDict *qdict, const char *key);
->  
-> diff --git a/qobject/qdict.c b/qobject/qdict.c
-> index d795079..be919b9 100644
-> --- a/qobject/qdict.c
-> +++ b/qobject/qdict.c
-> @@ -189,10 +189,9 @@ double qdict_get_double(const QDict *qdict, const char
-> *key)
->  }
->  
->  /**
-> - * qdict_get_int(): Get an integer mapped by @key
-> + * qdict_get_int(): Get a signed integer mapped by @key
->   *
-> - * This function assumes that @key exists and it stores a
-> - * QNum representable as int.
-> + * @qdict must map @key to an integer QNum that fits into int64_t.
->   *
->   * Return integer mapped by @key.
->   */
-> @@ -202,6 +201,18 @@ int64_t qdict_get_int(const QDict *qdict, const char
-> *key)
->  }
->  
->  /**
-> + * qdict_get_uint(): Get an unsigned integer mapped by 'key'
-> + *
-> + * @qdict must map @key to an integer QNum that fits into uint64_t.
-> + *
-> + * Return integer mapped by 'key'.
-> + */
-> +uint64_t qdict_get_uint(const QDict *qdict, const char *key)
-> +{
-> +    return qnum_get_uint(qobject_to_qnum(qdict_get(qdict, key)));
-> +}
-> +
-> +/**
->   * qdict_get_bool(): Get a bool mapped by @key
->   *
->   * This function assumes that @key exists and it stores a
-> @@ -245,11 +256,10 @@ const char *qdict_get_str(const QDict *qdict, const
-> char *key)
->  }
->  
->  /**
-> - * qdict_get_try_int(): Try to get integer mapped by @key
-> + * qdict_get_try_int(): Try to get signed integer mapped by @key
->   *
-> - * Return integer mapped by @key, if it is not present in the
-> - * dictionary or if the stored object is not a QNum representing an
-> - * integer, @def_value will be returned.
-> + * If @qdict maps @key to an integer QNum that fits into int64_t,
-> + * return it.  Else return @def_value.
->   */
->  int64_t qdict_get_try_int(const QDict *qdict, const char *key,
->                            int64_t def_value)
-> @@ -265,6 +275,25 @@ int64_t qdict_get_try_int(const QDict *qdict, const char
-> *key,
->  }
->  
->  /**
-> + * qdict_get_try_uint(): Try to get unsigned integer mapped by 'key'
-> + *
-> + * If @qdict maps @key to an integer QNum that fits into uint64_t,
-> + * return it.  Else return @def_value.
-> + */
-> +uint64_t qdict_get_try_uint(const QDict *qdict, const char *key,
-> +                            uint64_t def_value)
-> +{
-> +    QNum *qnum = qobject_to_qnum(qdict_get(qdict, key));
-> +    uint64_t val;
-> +
-> +    if (!qnum || !qnum_get_try_uint(qnum, &val)) {
-> +        return def_value;
-> +    }
-> +
-> +    return val;
-> +}
-> +
-> +/**
->   * qdict_get_try_bool(): Try to get a bool mapped by @key
->   *
->   * Return bool mapped by @key, if it is not present in the
-> --
-> 2.7.5
-> 
-> 
+That would explain it, it's the attempt to use KVM that triggers the
+problem.
+
+Obviously it's not a thing to fix right now, but I've really been
+thinking that none of the tests should use this "TCG or KVM" stuff.
+They should instead be run with *both* options - or at least the ones
+that are available on the host.
+
+That would have caught the bug in the pull request I sent you, and
+would at least have given you a chance at seeing the problem with
+boot-serial-test.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--i483Pv/KqyjCUwB1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmcE4sACgkQbDjKyiDZ
+s5LSUg/+Lw0B4lp6MYd5NJNWvJ58NPt06WO5ya1qMBz4y+9UyTLSSgoxcw2i6UCt
+eAbu5uVdHFVbvp7Q2PXC0LSOcTglZY7eIs+VQSv0XXDWniDFfdznHXzkJBekR1WH
+KbGFlUllJbemxiQueSmOkuBRZcV9JcmKu+M3YeZSJseix9O5v8QOp6vaq6ThP0wS
+G5ZLh1yNE6okmCUDZyLz00WDI97AWLsY2ZZfARU3VNGNP1KnAqL0LDDbTBS79DL8
+HUnjJBc0Mfl7nmHnN2Z0UNSZGRMsGYly5w92Ge2XSS7014X+RwcRZTGsV5KSle4D
+1SqNT60olrhHL1Wrf2L/1QyOU6nx7s3HbEpg2dbBz5WVgPlE8pqeVPTgWMhLWwrs
+k1AL0DNE4MMj20yLfkw69OcmwyCkw6MSGg/m+pp8BGJjTsBYxipPMODGdOsjWl25
+PJU6i2gQ94aeAnJseXRwgnBX7X9BtCIDojAzUvy3eoYoCNoRQbE76NcrWhe1o2zx
+X3R1NHbb8+YK0WvDJPDYpppc/9GLJ6b1P7vZjB4EfnpFOeGgx0wPNA09UH5pnXcG
+D9EBVspo98ic/taMh7QouLW50RFkB+qhEDCwdgwUUaXP8NVEu5hvK7kko63Xq3r1
+XHCY6KhAvS5Sj+LRNBW56Bgg1HjVhNf7QknAS6Iit4VOyU8tdkE=
+=CT3h
+-----END PGP SIGNATURE-----
+
+--i483Pv/KqyjCUwB1--
