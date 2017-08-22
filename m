@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dk8ay-0001Us-Vd
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:47:49 -0400
+	(envelope-from <armbru@redhat.com>) id 1dk8d5-0002iz-Iy
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:50:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dk8ay-0002hh-AI
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:47:49 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 22 Aug 2017 14:47:39 +0200
-Message-Id: <1503406059-7280-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/arm/aspeed_soc: Mark devices as
- user_creatable = false
+	(envelope-from <armbru@redhat.com>) id 1dk8d4-0003rY-Oe
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 08:49:59 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
+	<1502117160-24655-3-git-send-email-armbru@redhat.com>
+	<34249654.1469680.1503401226890.JavaMail.zimbra@redhat.com>
+Date: Tue, 22 Aug 2017 14:49:35 +0200
+In-Reply-To: <34249654.1469680.1503401226890.JavaMail.zimbra@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 22 Aug 2017
+	07:27:06 -0400 (EDT)")
+Message-ID: <874lszg42o.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 02/56] qdict: New helpers to put and
+ get unsigned integers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,40 +27,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>, Jeremy Kerr <jk@ozlabs.org>, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com
 
-QEMU currently aborts if the user is accidentially trying to
-do something like this:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-$ aarch64-softmmu/qemu-system-aarch64 -S -M integratorcp -nographic
-QEMU 2.9.93 monitor - type 'help' for more information
-(qemu) device_add ast2400
-Unexpected error in error_set_from_qdev_prop_error()
- at hw/core/qdev-properties.c:1032:
-Aborted (core dumped)
+> Hi
+>
+> Is this based on https://lists.gnu.org/archive/html/qemu-devel/2017-06/ms=
+g01894.html ?
 
-The ast2400 SoC devices are clearly not creatable by the user since
-they are using the serial_hds and nd_table arrays directly in their
-realize function, so mark them with user_creatable = false.
+I guess not, because I forgot it exists.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/arm/aspeed_soc.c | 2 ++
- 1 file changed, 2 insertions(+)
+> If so, you should probably keep me signed-off.
 
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index 5529024..7f1be04 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -338,6 +338,8 @@ static void aspeed_soc_class_init(ObjectClass *oc, void *data)
- 
-     sc->info = (AspeedSoCInfo *) data;
-     dc->realize = aspeed_soc_realize;
-+    /* Reason: Uses serial_hds and nd_table in realize() directly */
-+    dc->user_creatable = false;
- }
- 
- static const TypeInfo aspeed_soc_type_info = {
--- 
-1.8.3.1
+I'll replace my patch by yours.
+
+> My patch had also a test :)
+
+Always welcome.
