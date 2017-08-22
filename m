@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk7Ow-0002Oa-Ry
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:31:20 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7QO-0003f9-0z
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:32:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dk7Ot-0002N1-J5
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:31:18 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58923)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dk7Ot-0002Ml-Cz
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:31:15 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dk7Oq-0003ec-CB
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 11:31:12 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 109282E8193
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 11:31:08 +0000 (UTC)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7QK-0003i2-25
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:32:48 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1502117160-24655-5-git-send-email-armbru@redhat.com>
+References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
+	<1502117160-24655-5-git-send-email-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 22 Aug 2017 13:32:42 +0200
+Message-ID: <CAJ+F1CLhMBQuKFT1w9Q-U1xAts4zpERNd_CZB7V2Yg4w0Q+m3g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 Aug 2017 11:16:11 -0000
-From: Gerd Hoffmann <1708551@bugs.launchpad.net>
-Reply-To: Bug 1708551 <1708551@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150180124657.25828.11815849760914128130.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150340057117.8395.12223081246021949060.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1708551] Re: macOS Guest Reading USB 3.0 Bus as
- USB 2.0
+Subject: Re: [Qemu-devel] [RFC PATCH 04/56] char: Make ringbuf-read size
+ unsigned in QAPI/QMP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +24,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, jcody <jcody@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 
-xhci doesn't work with macos because macos has a white list of supported
-xhci controllers and ignores the xhci adapters emulated by qemu.
+Hi
 
--- =
+On Mon, Aug 7, 2017 at 4:45 PM, Markus Armbruster <armbru@redhat.com> wrote=
+:
+> Sizes should use QAPI type 'size' (uint64_t).  ringbuf-read parameter
+> @size is 'int' (int64_t).  qmp_ringbuf_read() rejects negative values,
+> then implicitly converts to size_t.
+>
+> Change the parameter to 'size' and drop the check for negative values.
+>
+> ringbuf-read now accepts size values between 2^63 and 2^64-1.  It
+> accepts negative values as before, because that's how the QObject
+> input visitor works for backward compatibility.
+>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1708551
+Negative values over json will be implicitly converted to positive
+values with this change, right? Or are they rejected earlier?
 
-Title:
-  macOS Guest Reading USB 3.0 Bus as USB 2.0
+If so that is a change of behaviour that I am not sure is worth doing
+now (without explicit protocol break), but I don't mind.
 
-Status in QEMU:
-  Triaged
+> The HMP command's size parameter remains uint32_t, as HMP args_type
+> strings can't do uint64_t byte counts: 'l' is signed, and 'o'
+> multiplies by 2^20.
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Bug description:
-  Description:
-  I'm having trouble with USB Passthrough. Running `system_profiler SPUSBDa=
-taType` on macOS guest confirms that the system "sees" my device, and that =
-qemu is passing *something* through. However, the system sees my connection=
- as USB 2.0, even though i'm passing through XHCI controllers (nec-usb-xhci=
-/qemu-xhci). I suspect this is the reason why my guest is unable to recogni=
-ze my iPhone in XCode & iTunes.
+> ---
+>  chardev/char-ringbuf.c | 11 +++--------
+>  qapi-schema.json       |  2 +-
+>  2 files changed, 4 insertions(+), 9 deletions(-)
+>
+> diff --git a/chardev/char-ringbuf.c b/chardev/char-ringbuf.c
+> index df52b04..a9205ea 100644
+> --- a/chardev/char-ringbuf.c
+> +++ b/chardev/char-ringbuf.c
+> @@ -65,10 +65,10 @@ static int ringbuf_chr_write(Chardev *chr, const uint=
+8_t *buf, int len)
+>      return len;
+>  }
+>
+> -static int ringbuf_chr_read(Chardev *chr, uint8_t *buf, int len)
+> +static int ringbuf_chr_read(Chardev *chr, uint8_t *buf, size_t len)
+>  {
+>      RingBufChardev *d =3D RINGBUF_CHARDEV(chr);
+> -    int i;
+> +    size_t i;
+>
+>      qemu_mutex_lock(&chr->chr_write_lock);
+>      for (i =3D 0; i < len && d->cons !=3D d->prod; i++) {
+> @@ -151,7 +151,7 @@ void qmp_ringbuf_write(const char *device, const char=
+ *data,
+>      }
+>  }
+>
+> -char *qmp_ringbuf_read(const char *device, int64_t size,
+> +char *qmp_ringbuf_read(const char *device, uint64_t size,
+>                         bool has_format, enum DataFormat format,
+>                         Error **errp)
+>  {
+> @@ -171,11 +171,6 @@ char *qmp_ringbuf_read(const char *device, int64_t s=
+ize,
+>          return NULL;
+>      }
+>
+> -    if (size <=3D 0) {
+> -        error_setg(errp, "size must be greater than zero");
+> -        return NULL;
+> -    }
+> -
+>      count =3D ringbuf_count(chr);
+>      size =3D size > count ? count : size;
+>      read_data =3D g_malloc(size + 1);
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index febe70e..18ec301 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -543,7 +543,7 @@
+>  #
+>  ##
+>  { 'command': 'ringbuf-read',
+> -  'data': {'device': 'str', 'size': 'int', '*format': 'DataFormat'},
+> +  'data': {'device': 'str', 'size': 'size', '*format': 'DataFormat'},
+>    'returns': 'str' }
+>
+>  ##
+> --
+> 2.7.5
+>
+>
 
-  Parameters:
-  QEMU release version: 2.10.0-rc0
-  Bios: [patched version of OVMF](https://github.com/gsomlo/edk2/tree/macbo=
-ot)]
-  Command Line: https://pastebin.com/pBSYbrW1
-  Host: Arch Linux
-  Guest: macOS v10.12.6
-  Guest System Info: https://pastebin.com/U1Tihxei
 
-  Notes:
-  1. Observed sometime after late-May-early-June of this year.
 
-  2. Due to [a defect in qemu v2.8 which affected GTK
-  users](https://bugs.launchpad.net/qemu/+bug/1578192), and [a recent
-  change to macOS' booting process conflicting with qemu
-  v2.9](https://lists.nongnu.org/archive/html/qemu-
-  devel/2017-03/msg06366.html), i'm forced to use qemu v2.10.0-rc0 (as
-  -rc1 fails to load OVMF right now).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1708551/+subscriptions
+--=20
+Marc-Andr=C3=A9 Lureau
