@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <asegundo@redhat.com>) id 1dk75z-0004YW-N8
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:11:44 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7Ar-00078M-19
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:16:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <asegundo@redhat.com>) id 1dk75w-0007h4-C7
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:11:43 -0400
-Received: from mail-it0-f54.google.com ([209.85.214.54]:36049)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dk7Ao-0002Lr-LT
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:16:45 -0400
+Received: from mail-ua0-x242.google.com ([2607:f8b0:400c:c08::242]:32848)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <asegundo@redhat.com>) id 1dk75w-0007fJ-7n
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:11:40 -0400
-Received: by mail-it0-f54.google.com with SMTP id 77so42720631itj.1
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 04:11:38 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dk7Ao-0002LC-FN
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 07:16:42 -0400
+Received: by mail-ua0-x242.google.com with SMTP id r23so249844uag.0
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 04:16:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170822102456.GC3210@lemon>
-References: <20170818170526.13496-1-apahim@redhat.com>
-	<20170818170526.13496-3-apahim@redhat.com>
-	<20170822102456.GC3210@lemon>
-From: Amador Pahim <apahim@redhat.com>
-Date: Tue, 22 Aug 2017 13:11:37 +0200
-Message-ID: <CALAZnb2sgT+er96jA79nG7+bK3H2kN4MMjrPT+6wm9HF_ZT7pw@mail.gmail.com>
+In-Reply-To: <87efsbevmt.fsf@dusky.pond.sub.org>
+References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
+	<20170727154126.11339-4-marcandre.lureau@redhat.com>
+	<87efsbevmt.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 22 Aug 2017 13:16:39 +0200
+Message-ID: <CAJ+F1CLgczQtHZnLnuKOjDXGAigHy-z3pB2EVuuUwQsfyXJeRQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v7 02/11] qemu.py: avoid writing to
- stdout/stderr
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 03/26] qboject: add literal qobject type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,120 +31,547 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>, Daniel Berrange <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-On Tue, Aug 22, 2017 at 12:24 PM, Fam Zheng <famz@redhat.com> wrote:
-> On Fri, 08/18 19:05, Amador Pahim wrote:
->> This module should not write directly to stdout/stderr. Instead, it
->> should either raise exceptions or just log the messages and let the
->> callers handle them and decide what to do. For example, scripts could
->> choose to send the log messages stderr or/and write them to a file if
->> verbose or debugging mode is enabled.
+Hi
+
+On Wed, Aug 16, 2017 at 10:59 AM, Markus Armbruster <armbru@redhat.com> wro=
+te:
+> In the subject: s/qboject: add/qobject: Add/
+>
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+>> Promote LiteralQObject from tests/check-qjson.c to qobject/qlit.c,
+>> allowing to statically declare complex qobjects.
 >>
->> This patch replaces the writes to stderr by an exception in the
->> send_fd_scm() when _socket_scm_helper is not set or not present. In the
->> same method, the subprocess Popen will now redirect the stdout/stderr to
->> logging.debug instead of writing to system stderr. As consequence, since
->> the Popen.communicate() is now used (in order to get the stdout), the
->> further call to wait() became redundant and was replaced by
->> Popen.returncode.
+>> Add a helper qobject_from_qlit() to instantiate a literal qobject to a
+>> real QObject. Add some simple test.
+>
+> Suggest
+>
+> * to also move the existing function making use of LiteralQObject
+>   compare_litqobj_to_qobj(), so other tests can use it to verify a
+>   QObject matches expectations, and
+>
+> * to split the patch into the move and the addition of
+>   qobject_from_qlit().
+>
+
+ok
+
 >>
->> The shutdown() message on negative exit code will now be logged
->> to logging.debug instead of written to system stderr.
->>
->> Signed-off-by: Amador Pahim <apahim@redhat.com>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 >> ---
->>  scripts/qemu.py | 29 +++++++++++++++++++++--------
->>  1 file changed, 21 insertions(+), 8 deletions(-)
+>>  include/qapi/qmp/qlit.h | 53 ++++++++++++++++++++++++++++++++++++
+>>  qobject/qlit.c          | 53 ++++++++++++++++++++++++++++++++++++
+>>  tests/check-qjson.c     | 72 +++++++++++++++++-------------------------=
+-------
+>>  tests/check-qlit.c      | 52 +++++++++++++++++++++++++++++++++++
+>>  qobject/Makefile.objs   |  2 +-
+>>  tests/Makefile.include  |  5 +++-
+>>  6 files changed, 187 insertions(+), 50 deletions(-)
+>>  create mode 100644 include/qapi/qmp/qlit.h
+>>  create mode 100644 qobject/qlit.c
+>>  create mode 100644 tests/check-qlit.c
 >>
->> diff --git a/scripts/qemu.py b/scripts/qemu.py
->> index 0ae5d39414..ef531bb23b 100644
->> --- a/scripts/qemu.py
->> +++ b/scripts/qemu.py
->> @@ -13,6 +13,7 @@
->>  #
->>
->>  import errno
->> +import logging
->>  import string
->>  import os
->>  import sys
->> @@ -20,6 +21,15 @@ import subprocess
->>  import qmp.qmp
->>
->>
->> +LOG = logging.getLogger(__name__)
+>> diff --git a/include/qapi/qmp/qlit.h b/include/qapi/qmp/qlit.h
+>> new file mode 100644
+>> index 0000000000..fd6bfc3e69
+>> --- /dev/null
+>> +++ b/include/qapi/qmp/qlit.h
+>> @@ -0,0 +1,53 @@
+>> +/*
+>> + * Copyright IBM, Corp. 2009
+>> + * Copyright (c) 2013, 2015 Red Hat Inc.
+>> + *
+>> + * Authors:
+>> + *  Anthony Liguori   <aliguori@us.ibm.com>
+>> + *  Markus Armbruster <armbru@redhat.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU LGPL, version 2.1 o=
+r later.
+>> + * See the COPYING.LIB file in the top-level directory.
+>> + *
+>> + */
+>> +#ifndef QLIT_H_
+>> +#define QLIT_H_
+>> +
+>> +#include "qapi-types.h"
+>> +#include "qobject.h"
+>> +
+>> +typedef struct QLitDictEntry QLitDictEntry;
+>> +typedef struct QLitObject QLitObject;
+>> +
+>> +struct QLitObject {
+>> +    int type;
+>> +    union {
+>> +        bool qbool;
+>> +        int64_t qnum;
 >
-> Previously the messages written to sys.stderr always get printed, now it depends
-> on the log level and IIUC debug messages are not printed by default. Should
-> LOG.warn be used to replace sys.stderr instead of LOG.debug?
+> Not this patch's fault: QLitObject restricts numbers to signed integers.
+>
+>> +        const char *qstr;
+>> +        QLitDictEntry *qdict;
+>> +        QLitObject *qlist;
+>> +    } value;
+>> +};
+>> +
+>> +struct QLitDictEntry {
+>> +    const char *key;
+>> +    QLitObject value;
+>> +};
+>> +
+>> +#define QLIT_QNULL \
+>> +    { .type =3D QTYPE_QNULL }
+>> +#define QLIT_QBOOL(val) \
+>> +    { .type =3D QTYPE_QBOOL, .value.qbool =3D (val) }
+>> +#define QLIT_QNUM(val) \
+>> +    { .type =3D QTYPE_QNUM, .value.qnum =3D (val) }
+>> +#define QLIT_QSTR(val) \
+>> +    { .type =3D QTYPE_QSTRING, .value.qstr =3D (val) }
+>> +#define QLIT_QDICT(val) \
+>> +    { .type =3D QTYPE_QDICT, .value.qdict =3D (val) }
+>> +#define QLIT_QLIST(val) \
+>> +    { .type =3D QTYPE_QLIST, .value.qlist =3D (val) }
+>> +
+>> +QObject *qobject_from_qlit(const QLitObject *qlit);
+>> +
+>> +#endif /* QLIT_H_ */
+>> diff --git a/qobject/qlit.c b/qobject/qlit.c
+>> new file mode 100644
+>> index 0000000000..d7407b4b34
+>> --- /dev/null
+>> +++ b/qobject/qlit.c
+>> @@ -0,0 +1,53 @@
+>> +/*
+>> + * QLit literal qobject
+>> + *
+>> + * Copyright (C) 2017 Red Hat Inc.
+>> + *
+>> + * Authors:
+>> + *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU LGPL, version 2.1 o=
+r later.
+>> + * See the COPYING.LIB file in the top-level directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +
+>> +#include "qapi/qmp/qlit.h"
+>> +#include "qapi/qmp/types.h"
+>> +
+>> +QObject *qobject_from_qlit(const QLitObject *qlit)
+>> +{
+>> +    int i;
+>> +
+>> +    switch (qlit->type) {
+>> +    case QTYPE_QNULL:
+>> +        return QOBJECT(qnull());
+>> +    case QTYPE_QNUM:
+>> +        return QOBJECT(qnum_from_int(qlit->value.qnum));
+>> +    case QTYPE_QSTRING:
+>> +        return QOBJECT(qstring_from_str(qlit->value.qstr));
+>> +    case QTYPE_QDICT: {
+>> +        QDict *qdict =3D qdict_new();
+>> +        for (i =3D 0; qlit->value.qdict[i].value.type !=3D QTYPE_NONE; =
+i++) {
+>> +            QLitDictEntry *e =3D &qlit->value.qdict[i];
+>> +
+>> +            qdict_put_obj(qdict, e->key, qobject_from_qlit(&e->value));
+>> +        }
+>> +        return QOBJECT(qdict);
+>> +    }
+>> +    case QTYPE_QLIST: {
+>> +        QList *qlist =3D qlist_new();
+>> +
+>> +        for (i =3D 0; qlit->value.qlist[i].type !=3D QTYPE_NONE; i++) {
+>> +            qlist_append_obj(qlist, qobject_from_qlit(&qlit->value.qlis=
+t[i]));
+>> +        }
+>> +        return QOBJECT(qlist);
+>> +    }
+>> +    case QTYPE_QBOOL:
+>> +        return QOBJECT(qbool_from_bool(qlit->value.qbool));
+>> +    case QTYPE_NONE:
+>> +        assert(0);
+>> +    }
+>> +
+>> +    return NULL;
+>> +}
+>> diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+>> index 9c42a46b7d..1a95aff2ba 100644
+>> --- a/tests/check-qjson.c
+>> +++ b/tests/check-qjson.c
+>> @@ -16,6 +16,7 @@
+>>  #include "qapi/error.h"
+>>  #include "qapi/qmp/types.h"
+>>  #include "qapi/qmp/qjson.h"
+>> +#include "qapi/qmp/qlit.h"
+>>  #include "qemu-common.h"
+>>
+>>  static void escaped_string(void)
+>> @@ -1059,39 +1060,14 @@ static void keyword_literal(void)
+>>      QDECREF(null);
+>>  }
+>>
+>> -typedef struct LiteralQDictEntry LiteralQDictEntry;
+>> -typedef struct LiteralQObject LiteralQObject;
+>> -
+>> -struct LiteralQObject
+>> -{
+>> -    int type;
+>> -    union {
+>> -        int64_t qnum;
+>> -        const char *qstr;
+>> -        LiteralQDictEntry *qdict;
+>> -        LiteralQObject *qlist;
+>> -    } value;
+>> -};
+>> -
+>> -struct LiteralQDictEntry
+>> -{
+>> -    const char *key;
+>> -    LiteralQObject value;
+>> -};
+>> -
+>> -#define QLIT_QNUM(val) (LiteralQObject){.type =3D QTYPE_QNUM, .value.qn=
+um =3D (val)}
+>> -#define QLIT_QSTR(val) (LiteralQObject){.type =3D QTYPE_QSTRING, .value=
+.qstr =3D (val)}
+>> -#define QLIT_QDICT(val) (LiteralQObject){.type =3D QTYPE_QDICT, .value.=
+qdict =3D (val)}
+>> -#define QLIT_QLIST(val) (LiteralQObject){.type =3D QTYPE_QLIST, .value.=
+qlist =3D (val)}
+>> -
+>>  typedef struct QListCompareHelper
+>>  {
+>>      int index;
+>> -    LiteralQObject *objs;
+>> +    QLitObject *objs;
+>>      int result;
+>>  } QListCompareHelper;
+>>
+>> -static int compare_litqobj_to_qobj(LiteralQObject *lhs, QObject *rhs);
+>> +static int compare_litqobj_to_qobj(QLitObject *lhs, QObject *rhs);
+>>
+>>  static void compare_helper(QObject *obj, void *opaque)
+>>  {
+>> @@ -1109,7 +1085,7 @@ static void compare_helper(QObject *obj, void *opa=
+que)
+>>      helper->result =3D compare_litqobj_to_qobj(&helper->objs[helper->in=
+dex++], obj);
+>>  }
+>>
+>> -static int compare_litqobj_to_qobj(LiteralQObject *lhs, QObject *rhs)
+>> +static int compare_litqobj_to_qobj(QLitObject *lhs, QObject *rhs)
+>>  {
+>>      int64_t val;
+>>
+>> @@ -1159,23 +1135,23 @@ static void simple_dict(void)
+>>      int i;
+>>      struct {
+>>          const char *encoded;
+>> -        LiteralQObject decoded;
+>> +        QLitObject decoded;
+>>      } test_cases[] =3D {
+>>          {
+>>              .encoded =3D "{\"foo\": 42, \"bar\": \"hello world\"}",
+>> -            .decoded =3D QLIT_QDICT(((LiteralQDictEntry[]){
+>> +            .decoded =3D QLIT_QDICT(((QLitDictEntry[]){
+>>                          { "foo", QLIT_QNUM(42) },
+>>                          { "bar", QLIT_QSTR("hello world") },
+>>                          { }
+>>                      })),
+>>          }, {
+>>              .encoded =3D "{}",
+>> -            .decoded =3D QLIT_QDICT(((LiteralQDictEntry[]){
+>> +            .decoded =3D QLIT_QDICT(((QLitDictEntry[]){
+>>                          { }
+>>                      })),
+>>          }, {
+>>              .encoded =3D "{\"foo\": 43}",
+>> -            .decoded =3D QLIT_QDICT(((LiteralQDictEntry[]){
+>> +            .decoded =3D QLIT_QDICT(((QLitDictEntry[]){
+>>                          { "foo", QLIT_QNUM(43) },
+>>                          { }
+>>                      })),
+>> @@ -1257,11 +1233,11 @@ static void simple_list(void)
+>>      int i;
+>>      struct {
+>>          const char *encoded;
+>> -        LiteralQObject decoded;
+>> +        QLitObject decoded;
+>>      } test_cases[] =3D {
+>>          {
+>>              .encoded =3D "[43,42]",
+>> -            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
+>> +            .decoded =3D QLIT_QLIST(((QLitObject[]){
+>>                          QLIT_QNUM(43),
+>>                          QLIT_QNUM(42),
+>>                          { }
+>> @@ -1269,21 +1245,21 @@ static void simple_list(void)
+>>          },
+>>          {
+>>              .encoded =3D "[43]",
+>> -            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
+>> +            .decoded =3D QLIT_QLIST(((QLitObject[]){
+>>                          QLIT_QNUM(43),
+>>                          { }
+>>                      })),
+>>          },
+>>          {
+>>              .encoded =3D "[]",
+>> -            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
+>> +            .decoded =3D QLIT_QLIST(((QLitObject[]){
+>>                          { }
+>>                      })),
+>>          },
+>>          {
+>>              .encoded =3D "[{}]",
+>> -            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
+>> -                        QLIT_QDICT(((LiteralQDictEntry[]){
+>> +            .decoded =3D QLIT_QLIST(((QLitObject[]){
+>> +                        QLIT_QDICT(((QLitDictEntry[]){
+>>                                      {},
+>>                                          })),
+>>                          {},
+>> @@ -1314,11 +1290,11 @@ static void simple_whitespace(void)
+>>      int i;
+>>      struct {
+>>          const char *encoded;
+>> -        LiteralQObject decoded;
+>> +        QLitObject decoded;
+>>      } test_cases[] =3D {
+>>          {
+>>              .encoded =3D " [ 43 , 42 ]",
+>> -            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
+>> +            .decoded =3D QLIT_QLIST(((QLitObject[]){
+>>                          QLIT_QNUM(43),
+>>                          QLIT_QNUM(42),
+>>                          { }
+>> @@ -1326,12 +1302,12 @@ static void simple_whitespace(void)
+>>          },
+>>          {
+>>              .encoded =3D " [ 43 , { 'h' : 'b' }, [ ], 42 ]",
+>> -            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
+>> +            .decoded =3D QLIT_QLIST(((QLitObject[]){
+>>                          QLIT_QNUM(43),
+>> -                        QLIT_QDICT(((LiteralQDictEntry[]){
+>> +                        QLIT_QDICT(((QLitDictEntry[]){
+>>                                      { "h", QLIT_QSTR("b") },
+>>                                      { }})),
+>> -                        QLIT_QLIST(((LiteralQObject[]){
+>> +                        QLIT_QLIST(((QLitObject[]){
+>>                                      { }})),
+>>                          QLIT_QNUM(42),
+>>                          { }
+>> @@ -1339,13 +1315,13 @@ static void simple_whitespace(void)
+>>          },
+>>          {
+>>              .encoded =3D " [ 43 , { 'h' : 'b' , 'a' : 32 }, [ ], 42 ]",
+>> -            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
+>> +            .decoded =3D QLIT_QLIST(((QLitObject[]){
+>>                          QLIT_QNUM(43),
+>> -                        QLIT_QDICT(((LiteralQDictEntry[]){
+>> +                        QLIT_QDICT(((QLitDictEntry[]){
+>>                                      { "h", QLIT_QSTR("b") },
+>>                                      { "a", QLIT_QNUM(32) },
+>>                                      { }})),
+>> -                        QLIT_QLIST(((LiteralQObject[]){
+>> +                        QLIT_QLIST(((QLitObject[]){
+>>                                      { }})),
+>>                          QLIT_QNUM(42),
+>>                          { }
+>> @@ -1393,10 +1369,10 @@ static void simple_varargs(void)
+>>  {
+>>      QObject *embedded_obj;
+>>      QObject *obj;
+>> -    LiteralQObject decoded =3D QLIT_QLIST(((LiteralQObject[]){
+>> +    QLitObject decoded =3D QLIT_QLIST(((QLitObject[]){
+>>              QLIT_QNUM(1),
+>>              QLIT_QNUM(2),
+>> -            QLIT_QLIST(((LiteralQObject[]){
+>> +            QLIT_QLIST(((QLitObject[]){
+>>                          QLIT_QNUM(32),
+>>                          QLIT_QNUM(42),
+>>                          {}})),
+>> diff --git a/tests/check-qlit.c b/tests/check-qlit.c
+>> new file mode 100644
+>> index 0000000000..cda4620f92
+>> --- /dev/null
+>> +++ b/tests/check-qlit.c
+>> @@ -0,0 +1,52 @@
+>> +/*
+>> + * QLit unit-tests.
+>> + *
+>> + * Copyright (C) 2017 Red Hat Inc.
+>> + *
+>> + * This work is licensed under the terms of the GNU LGPL, version 2.1 o=
+r later.
+>> + * See the COPYING.LIB file in the top-level directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +
+>> +#include "qapi/qmp/qlit.h"
+>> +
+>> +static void qobject_from_qlit_test(void)
+>> +{
+>> +    char *str;
+>> +    QObject *qobj =3D NULL;
+>> +    QLitObject qlit =3D QLIT_QDICT((
+>> +        (QLitDictEntry[]) {
+>> +            { "foo", QLIT_QNUM(42) },
+>> +            { "bar", QLIT_QSTR("hello world") },
+>> +            { "baz", QLIT_QNULL },
+>> +            { "bee", QLIT_QLIST((
+>> +                (QLitObject[]) {
+>> +                    QLIT_QNUM(43),
+>> +                    QLIT_QNUM(44),
+>> +                    QLIT_QBOOL(true),
+>> +                    { },
+>> +                }))
+>> +            },
+>> +            { },
+>> +        }));
+>> +
+>> +    qobj =3D qobject_from_qlit(&qlit);
+>> +
+>> +    str =3D qobject_to_string(qobj);
+>> +    g_assert_cmpstr(str, =3D=3D,
+>> +                    "bee:\n    [0]: 43\n    [1]: 44\n    [2]: true\n"  =
+ \
+>> +                    "baz: null\nbar: hello world\nfoo: 42\n");
+>
+> I don't like this.  The order of QDict members in @str depends on
+> qdict_first()/qdict_next() iteration order, which is unspecified.
+>
+> Here's how we check elsewhere that a QObject matches expectations:
+>
+>     static void qobject_from_qlit_test(void)
+>     {
+>         QLitObject qlit =3D QLIT_QDICT((
+>             (QLitDictEntry[]) {
+>                 { "foo", QLIT_QNUM(42) },
+>                 { "bar", QLIT_QSTR("hello world") },
+>                 { "baz", QLIT_QNULL },
+>                 { "bee", QLIT_QLIST((
+>                     (QLitObject[]) {
+>                         QLIT_QNUM(43),
+>                         QLIT_QNUM(44),
+>                         QLIT_QBOOL(true),
+>                         { },
+>                     }))
+>                 },
+>                 { },
+>             }));
+>         QObject *qobj =3D qobject_from_qlit(&qlit);
+>         QDict *qdict;
+>         QList *baz;
+>
+>         qdict =3D qobject_to_qdict(qobj);
+>         g_assert_cmpint(qdict_get_int(qdict, "foo"), =3D=3D, 42);
+>         g_assert_cmpstr(qdict_get_str(qdict, "bar"), =3D=3D, "hello world=
+");
+>         g_assert(qobject_type(qdict_get(qdict, "baz")) =3D=3D QTYPE_QNULL=
+);
+>         baz =3D qdict_get_qlist(qdict, "bee");
+>         g_assert_cmpint(qnum_get_int(qobject_to_qnum(qlist_pop(baz))), =
+=3D=3D, 43);
+>         g_assert_cmpint(qnum_get_int(qobject_to_qnum(qlist_pop(baz))), =
+=3D=3D, 44);
+>         g_assert_cmpint(qbool_get_bool(qobject_to_qbool(qlist_pop(baz))),=
+ =3D=3D, 1);
+>
+>         qobject_decref(qobj);
+>     }
+>
+> Robust, just tedious.
 
-I don't think that the 'keep the behavior' principle should overcome
-what the messages actually are. The question is: are they warning
-messages? The way I see, the messages I changed in this commit to use
-the logging system are both debug messages.
-
-Btw, notice that scripts have to take an action to see these messages
-anyway, even if it's just calling logging.basicConfig() (which adds by
-default the logging.StreamHandler, if no handler is specified).
-Meaning that the same behavior will not happen out-of-the-box, even if
-we use logging.warn(). So, what your question really asks is if users
-should use (at least) logging.basicConfig() or
-logging.basicConfig(level=logging.DEBUG) to see those messages.
+done the tedious way
 
 >
->> +
->> +
->> +class QEMUMachineError(Exception):
->> +    """
->> +    Exception called when an error in QEMUMachine happens.
->> +    """
->> +
->> +
->>  class QEMUMachine(object):
->>      '''A QEMU VM'''
->>
->> @@ -62,18 +72,20 @@ class QEMUMachine(object):
->>          # In iotest.py, the qmp should always use unix socket.
->>          assert self._qmp.is_scm_available()
->>          if self._socket_scm_helper is None:
->> -            print >>sys.stderr, "No path to socket_scm_helper set"
->> -            return -1
->> +            raise QEMUMachineError("No path to socket_scm_helper set")
->>          if os.path.exists(self._socket_scm_helper) == False:
->> -            print >>sys.stderr, "%s does not exist" % self._socket_scm_helper
->> -            return -1
->> +            raise QEMUMachineError("%s does not exist" % self._socket_scm_helper)
->>          fd_param = ["%s" % self._socket_scm_helper,
->>                      "%d" % self._qmp.get_sock_fd(),
->>                      "%s" % fd_file_path]
->>          devnull = open('/dev/null', 'rb')
->> -        p = subprocess.Popen(fd_param, stdin=devnull, stdout=sys.stdout,
->> -                             stderr=sys.stderr)
->> -        return p.wait()
->> +        p = subprocess.Popen(fd_param, stdin=devnull, stdout=subprocess.PIPE,
->> +                             stderr=subprocess.STDOUT)
->> +        output = p.communicate()[0]
->> +        if output:
->> +            LOG.debug(output)
->> +
->> +        return p.returncode
->>
->>      @staticmethod
->>      def _remove_if_exists(path):
->> @@ -154,7 +166,8 @@ class QEMUMachine(object):
->>
->>              exitcode = self._popen.wait()
->>              if exitcode < 0:
->> -                sys.stderr.write('qemu received signal %i: %s\n' % (-exitcode, ' '.join(self._args)))
->> +                LOG.debug('qemu received signal %i: %s', -exitcode,
->> +                          ' '.join(self._args))
->>              self._load_io_log()
->>              self._post_shutdown()
->>
->> --
->> 2.13.5
->>
+> check-qjson.c uses a differently tedious technique: compare expected
+> QLitObject to actual QObject with compare_litqobj_to_qobj().  I like
+> that better, because I find the QLIT... initializers easier to read, and
+> less error prone to write.  You might prefer not to use QLit to test
+> QLit, though.
 >
-> Fam
+
+ok
+
+>> +
+>> +    g_free(str);
+>> +    qobject_decref(qobj);
+>> +}
+>> +
+>> +int main(int argc, char **argv)
+>> +{
+>> +    g_test_init(&argc, &argv, NULL);
+>> +
+>> +    g_test_add_func("/qlit/qobject_from_qlit", qobject_from_qlit_test);
+>> +
+>> +    return g_test_run();
+>> +}
+>> diff --git a/qobject/Makefile.objs b/qobject/Makefile.objs
+>> index fc8885c9a4..002d25873a 100644
+>> --- a/qobject/Makefile.objs
+>> +++ b/qobject/Makefile.objs
+>> @@ -1,2 +1,2 @@
+>> -util-obj-y =3D qnull.o qnum.o qstring.o qdict.o qlist.o qbool.o
+>> +util-obj-y =3D qnull.o qnum.o qstring.o qdict.o qlist.o qbool.o qlit.o
+>>  util-obj-y +=3D qjson.o qobject.o json-lexer.o json-streamer.o json-par=
+ser.o
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index 7af278db55..960ab8c6dd 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -12,6 +12,8 @@ check-unit-y +=3D tests/test-char$(EXESUF)
+>>  gcov-files-check-qdict-y =3D chardev/char.c
+>>  check-unit-y +=3D tests/check-qnum$(EXESUF)
+>>  gcov-files-check-qnum-y =3D qobject/qnum.c
+>> +check-unit-y +=3D tests/check-qlit$(EXESUF)
+>> +gcov-files-check-qlit-y =3D qobject/qlit.c
+>>  check-unit-y +=3D tests/check-qstring$(EXESUF)
+>>  gcov-files-check-qstring-y =3D qobject/qstring.c
+>>  check-unit-y +=3D tests/check-qlist$(EXESUF)
+>> @@ -523,7 +525,7 @@ test-obj-y =3D tests/check-qnum.o tests/check-qstrin=
+g.o tests/check-qdict.o \
+>>       tests/rcutorture.o tests/test-rcu-list.o \
+>>       tests/test-qdist.o tests/test-shift128.o \
+>>       tests/test-qht.o tests/qht-bench.o tests/test-qht-par.o \
+>> -     tests/atomic_add-bench.o
+>> +     tests/atomic_add-bench.o tests/check-qlit.o
+>
+> Please add it right next to the other qobject-related tests:
+>
+
+ok
+
+>    test-obj-y =3D tests/check-qnum.o tests/check-qstring.o tests/check-qd=
+ict.o \
+>         tests/check-qlist.o tests/check-qnull.o \
+> -       tests/check-qjson.o \
+> +       tests/check-qjson.o tests/check-qlit.o \
+>
+>>
+>>  $(test-obj-y): QEMU_INCLUDES +=3D -Itests
+>>  QEMU_CFLAGS +=3D -I$(SRC_PATH)/tests
+>> @@ -541,6 +543,7 @@ test-io-obj-y =3D $(io-obj-y) $(test-crypto-obj-y)
+>>  test-block-obj-y =3D $(block-obj-y) $(test-io-obj-y) tests/iothread.o
+>>
+>>  tests/check-qnum$(EXESUF): tests/check-qnum.o $(test-util-obj-y)
+>> +tests/check-qlit$(EXESUF): tests/check-qlit.o $(test-util-obj-y)
+>>  tests/check-qstring$(EXESUF): tests/check-qstring.o $(test-util-obj-y)
+>>  tests/check-qdict$(EXESUF): tests/check-qdict.o $(test-util-obj-y)
+>>  tests/check-qlist$(EXESUF): tests/check-qlist.o $(test-util-obj-y)
+>
+> Same order as in test-obj-y, please.
+>
+
+ok
+
+--=20
+Marc-Andr=C3=A9 Lureau
