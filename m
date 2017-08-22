@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dk9E3-0003BN-QE
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:28:13 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dk9EV-0003eN-I8
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:28:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dk9E2-0003PB-F1
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:28:11 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dk9ES-0003bK-6A
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:28:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53563)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dk9ER-0003av-SM
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 09:28:36 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 21EA3C047B9D
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 13:23:01 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 22 Aug 2017 15:22:55 +0200
-Message-Id: <20170822132255.23945-55-marcandre.lureau@redhat.com>
-In-Reply-To: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
+Date: Tue, 22 Aug 2017 15:22:01 +0200
+Message-Id: <20170822132255.23945-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 54/54] qapi: make query-cpu-definitions
- depend on specific targets
+Subject: [Qemu-devel] [PATCH v2 00/54] qapi: add #if pre-processor
+ conditions to generated code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,218 +33,301 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-It depends on TARGET_PPC || TARGET_ARM || TARGET_I386 || TARGET_S390X.
+Hi,
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+In order to clean-up some hacks in qapi (having to unregister commands
+at runtime), I proposed a "[PATCH v5 02/20] qapi.py: add a simple #ifdef =
+condition"
+
+(see http://lists.gnu.org/archive/html/qemu-devel/2016-08/msg03106.html).
+
+However, we decided to drop that patch from the series and solve the
+problem later. The main issues were:
+- the syntax was awkward to the JSON schema and documentation
+- the evaluation of the condition was done in the qapi scripts, with
+  very limited capability
+- each target/config would need different generated files.
+
+Instead, it could defer the #if evaluation to the C-preprocessor.
+
+With this series, top-level qapi JSON entity can take 'if' keys:
+
+{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
+  'if': 'defined(TEST_IF_STRUCT)' }
+
+Members can be exploded as dictionnary with 'type'/'if' keys:
+
+{ 'struct': 'TestIfStruct', 'data':
+  { 'foo': 'int',
+    'bar': { 'type': 'int', 'if': 'defined(TEST_IF_STRUCT_BAR)'} } }
+
+Enum values can be exploded as dictionnary with 'type'/'if' keys:
+
+{ 'enum': 'TestIfEnum', 'data':
+  [ 'foo',
+    { 'name' : 'bar', 'if': 'defined(TEST_IF_ENUM_BAR)' } ] }
+
+A good benefit from having conditional schema is that introspection
+will reflect more accurately the capability of the server. Another
+benefit is that it may help to remove some dead code when disabling a
+functionality.
+
+Starting from patch "qapi: add conditions to VNC type/commands/events
+on the schema", the series demonstrate adding conditions, in order to
+remove qmp_unregister_commands_hack(). However, it feels like I
+cheated a little bit by using per-target NEED_CPU_H in the headers to
+avoid #define poison. The alternative could be to split the headers in
+common/target?
+
+There are a lot more things we could make conditional in the QAPI
+schema, like pci/kvm/xen/numa/vde/slirp/posix/win32/vsock/lzo etc etc,
+however I am still evaluating the implication of such changes both
+externally and internally, for those interested, I can share my wip
+branch.
+
+Comments welcome,
+
+v2: after Markus review
+ - "qboject: add literal qobject type", splitted & many updates
+ - "qapi: generate a literal qobject for introspection", fixed leak
+ - "visitor: pass size of strings array to enum visitor", rewrote as a
+  series of patches to change char*[] to struct { int n, char *[] }.
+ - split the "if" patches in parsing, tests, generation
+ - added a docs/devel/qapi-code-gen.txt patch
+ - added a patch to remove enum value assignment, to avoid "holes"
+   with #if values
+ - update #if VNC patch, compile out "info vnc", compile out des-rfb
+ - dropped "qobject: replace dump_qobject() by qobject_to_string()" patch
+ - dropped qapi.mk patch
+ - other smaller changes
+
+Marc-Andr=C3=A9 Lureau (54):
+  qapi: fix type_seen key error
+  qdict: add qdict_put_null() helper
+  qobject: add literal qobject type
+  qlit: add qobject_form_qlit()
+  qapi: generate a literal qobject for introspection
+  qapi: introduce qapi_enum_lookup()
+  tpm: simplify driver registration & lookup
+  hmp: use qapi_enum_parse() in hmp_migrate_set_capability
+  hmp: use qapi_enum_parse() in hmp_migrate_set_parameter
+  block: use qemu_enum_parse() in blkdebug_debug_breakpoint
+  quorum: use qapi_enum_parse() in quorum_open
+  qapi: change enum lookup structure
+  qapi: drop the sentinel in enum array
+  qapi2texi: minor python code simplification
+  qapi: add 'if' to top-level expressions
+  qapi: add a test for invalid 'if'
+  qapi: add 'if' condition on entity objects
+  qapi: add 'ifcond' to visitor methods
+  qapi: add #if/#endif helpers
+  qapi-introspect: modify to_qlit() to take an optional suffix
+  qapi-introspect: modify to_qlit() to generate #if code
+  qapi-introspect: add preprocessor conditions to generated QLit
+  qapi-commands: add #if conditions to commands
+  qapi-event: add #if conditions to events
+  qapi-visit: add #if conditions to visitors
+  qapi-types: refactor variants handling
+  qapi-types: add #if conditions to types
+  qapi: do not define enumeration value explicitely
+  qapi: add 'if' to enum members
+  qapi: add #if conditions on generated enum values
+  tests: add some enum members tests
+  qapi: add 'if' to struct members
+  qapi: add some struct member tests
+  qapi: add #if conditions to generated struct members
+  qapi: add 'if' on union variants
+  qapi: add #if conditions to generated variants
+  qapi: 'if' to alternate variant
+  qapi: add tests for invalid alternate
+  qapi: add #if conditions to generated alternate variants
+  docs: document schema configuration
+  qapi2texi: add 'If:' section to generated documentation
+  qapi2texi: add 'If:' condition to enum values
+  qapi2texi: add 'If:' condition to struct members
+  qapi2texi: add condition to variants
+  qapi: add conditions to VNC type/commands/events on the schema
+  qapi: add conditions to SPICE type/commands/events on the schema
+  qapi: add conditions to REPLICATION type/commands on the schema
+  tests/qmp-test: add query-qmp-schema test
+  build-sys: make qemu qapi objects per-target
+  qapi: make rtc-reset-reinjection depend on TARGET_I386
+  qapi: make s390 commands depend on TARGET_S390X
+  qapi: make query-gic-capabilities depend on TARGET_ARM
+  qapi: make query-cpu-model-expansion depend on s390 or x86
+  qapi: make query-cpu-definitions depend on specific targets
+
+ qapi-schema.json                                 |  98 +++++---
+ qapi/block-core.json                             |  13 +-
+ qapi/crypto.json                                 |   3 +-
+ qapi/event.json                                  |  21 +-
+ include/qapi/visitor.h                           |   2 +-
+ scripts/qapi.py                                  | 279 +++++++++++++++++=
+------
+ scripts/qapi-commands.py                         |   4 +-
+ scripts/qapi-event.py                            |   4 +-
+ scripts/qapi-introspect.py                       | 124 ++++++----
+ scripts/qapi-types.py                            |  62 +++--
+ scripts/qapi-visit.py                            |  21 +-
+ scripts/qapi2texi.py                             |  51 +++--
+ include/hw/qdev-core.h                           |   2 +-
+ include/qapi/qmp/qdict.h                         |   2 +
+ include/qapi/qmp/qlit.h                          |  56 +++++
+ include/qapi/util.h                              |   6 +-
+ include/qom/object.h                             |   4 +-
+ include/sysemu/arch_init.h                       |  11 -
+ include/sysemu/tpm_backend.h                     |   2 +-
+ qapi/qapi-visit-core.c                           |  24 +-
+ backends/hostmem.c                               |   5 +-
+ block.c                                          |   3 +-
+ block/backup.c                                   |   3 +-
+ block/blkdebug.c                                 |  28 +--
+ block/file-posix.c                               |  18 +-
+ block/file-win32.c                               |   6 +-
+ block/gluster.c                                  |  12 +-
+ block/iscsi.c                                    |   3 +-
+ block/nfs.c                                      |   3 +-
+ block/parallels.c                                |  11 +-
+ block/qcow2.c                                    |  15 +-
+ block/qed.c                                      |   3 +-
+ block/quorum.c                                   |  27 +--
+ block/rbd.c                                      |   3 +-
+ block/sheepdog.c                                 |   3 +-
+ blockdev.c                                       |   9 +-
+ blockjob.c                                       |   9 +-
+ chardev/char.c                                   |   7 +-
+ crypto/block-luks.c                              |  43 ++--
+ crypto/block.c                                   |   5 +-
+ crypto/cipher-afalg.c                            |   2 +-
+ crypto/cipher-builtin.c                          |  17 +-
+ crypto/cipher-gcrypt.c                           |  14 +-
+ crypto/cipher-nettle.c                           |  22 +-
+ crypto/cipher.c                                  |  14 +-
+ crypto/hmac-gcrypt.c                             |   2 +-
+ crypto/hmac-glib.c                               |   3 +-
+ crypto/hmac-nettle.c                             |   3 +-
+ crypto/pbkdf-gcrypt.c                            |   3 +-
+ crypto/pbkdf-nettle.c                            |   4 +-
+ crypto/secret.c                                  |   2 +-
+ crypto/tlscreds.c                                |   2 +-
+ hmp.c                                            | 252 ++++++++++-------=
 ---
- qapi-schema.json            |  4 +++-
- include/sysemu/arch_init.h  |  2 --
- monitor.c                   | 22 ----------------------
- qmp.c                       |  5 -----
- stubs/arch-query-cpu-def.c  | 10 ----------
- target/arm/helper.c         |  3 ++-
- target/i386/cpu.c           |  3 ++-
- target/ppc/translate_init.c |  3 ++-
- target/s390x/cpu_models.c   |  2 +-
- stubs/Makefile.objs         |  1 -
- 10 files changed, 10 insertions(+), 45 deletions(-)
+ hw/block/fdc.c                                   |   9 +-
+ hw/char/escc.c                                   |   3 +-
+ hw/core/qdev-properties.c                        |  19 +-
+ hw/input/virtio-input-hid.c                      |   5 +-
+ migration/colo-failover.c                        |   6 +-
+ migration/colo.c                                 |  31 +--
+ migration/global_state.c                         |   5 +-
+ monitor.c                                        |  94 ++------
+ net/filter.c                                     |   2 +-
+ net/net.c                                        |   5 +-
+ qapi/qapi-util.c                                 |  16 +-
+ qapi/qmp-dispatch.c                              |   4 +-
+ qemu-img.c                                       |   6 +-
+ qemu-nbd.c                                       |   3 +-
+ qmp.c                                            |  72 +-----
+ qobject/qlit.c                                   | 143 ++++++++++++
+ qom/object.c                                     |  16 +-
+ stubs/arch-query-cpu-def.c                       |  10 -
+ stubs/arch-query-cpu-model-baseline.c            |  12 -
+ stubs/arch-query-cpu-model-comparison.c          |  12 -
+ stubs/arch-query-cpu-model-expansion.c           |  12 -
+ stubs/qapi-event.c                               |  74 ++++++
+ target/arm/helper.c                              |   3 +-
+ target/i386/cpu.c                                |   5 +-
+ target/ppc/translate_init.c                      |   3 +-
+ target/s390x/cpu_models.c                        |   9 +-
+ tests/check-qjson.c                              | 150 +++---------
+ tests/check-qlit.c                               |  94 ++++++++
+ tests/check-qom-proplist.c                       |   7 +-
+ tests/qmp-test.c                                 |  21 ++
+ tests/test-qapi-util.c                           |  17 +-
+ tests/test-qmp-commands.c                        |   6 +
+ tests/test-qobject-input-visitor.c               |  18 +-
+ tests/test-qobject-output-visitor.c              |   4 +-
+ tests/test-string-input-visitor.c                |   4 +-
+ tests/test-string-output-visitor.c               |   6 +-
+ tpm.c                                            |  44 ++--
+ ui/input-legacy.c                                |   6 +-
+ ui/input.c                                       |  13 +-
+ ui/vnc.c                                         |   8 +-
+ vl.c                                             |   7 +-
+ Makefile.objs                                    |   9 +-
+ Makefile.target                                  |   4 +
+ docs/devel/qapi-code-gen.txt                     |  76 +++++-
+ hmp-commands-info.hx                             |   2 +
+ qobject/Makefile.objs                            |   2 +-
+ stubs/Makefile.objs                              |   5 +-
+ tests/Makefile.include                           |  11 +-
+ tests/qapi-schema/alternate-conflict-string.json |   4 +-
+ tests/qapi-schema/alternate-dict-invalid.err     |   1 +
+ tests/qapi-schema/alternate-dict-invalid.exit    |   1 +
+ tests/qapi-schema/alternate-dict-invalid.json    |   4 +
+ tests/qapi-schema/alternate-dict-invalid.out     |   0
+ tests/qapi-schema/bad-if.err                     |   1 +
+ tests/qapi-schema/bad-if.exit                    |   1 +
+ tests/qapi-schema/bad-if.json                    |   3 +
+ tests/qapi-schema/bad-if.out                     |   0
+ tests/qapi-schema/enum-dict-member-invalid.err   |   1 +
+ tests/qapi-schema/enum-dict-member-invalid.exit  |   1 +
+ tests/qapi-schema/enum-dict-member-invalid.json  |   2 +
+ tests/qapi-schema/enum-dict-member-invalid.out   |   0
+ tests/qapi-schema/enum-dict-member.err           |   1 -
+ tests/qapi-schema/enum-dict-member.exit          |   2 +-
+ tests/qapi-schema/enum-dict-member.json          |   3 +-
+ tests/qapi-schema/enum-dict-member.out           |   4 +
+ tests/qapi-schema/enum-if-invalid.err            |   1 +
+ tests/qapi-schema/enum-if-invalid.exit           |   1 +
+ tests/qapi-schema/enum-if-invalid.json           |   3 +
+ tests/qapi-schema/enum-if-invalid.out            |   0
+ tests/qapi-schema/qapi-schema-test.json          |  32 +++
+ tests/qapi-schema/qapi-schema-test.out           |  47 ++++
+ tests/qapi-schema/struct-if-invalid.err          |   1 +
+ tests/qapi-schema/struct-if-invalid.exit         |   1 +
+ tests/qapi-schema/struct-if-invalid.json         |   3 +
+ tests/qapi-schema/struct-if-invalid.out          |   0
+ tests/qapi-schema/struct-member-type.err         |   0
+ tests/qapi-schema/struct-member-type.exit        |   1 +
+ tests/qapi-schema/struct-member-type.json        |   1 +
+ tests/qapi-schema/struct-member-type.out         |   5 +
+ tests/qapi-schema/test-qapi.py                   |  31 ++-
+ trace/Makefile.objs                              |   2 +-
+ 134 files changed, 1606 insertions(+), 990 deletions(-)
+ create mode 100644 include/qapi/qmp/qlit.h
+ create mode 100644 qobject/qlit.c
  delete mode 100644 stubs/arch-query-cpu-def.c
+ delete mode 100644 stubs/arch-query-cpu-model-baseline.c
+ delete mode 100644 stubs/arch-query-cpu-model-comparison.c
+ delete mode 100644 stubs/arch-query-cpu-model-expansion.c
+ create mode 100644 stubs/qapi-event.c
+ create mode 100644 tests/check-qlit.c
+ create mode 100644 tests/qapi-schema/alternate-dict-invalid.err
+ create mode 100644 tests/qapi-schema/alternate-dict-invalid.exit
+ create mode 100644 tests/qapi-schema/alternate-dict-invalid.json
+ create mode 100644 tests/qapi-schema/alternate-dict-invalid.out
+ create mode 100644 tests/qapi-schema/bad-if.err
+ create mode 100644 tests/qapi-schema/bad-if.exit
+ create mode 100644 tests/qapi-schema/bad-if.json
+ create mode 100644 tests/qapi-schema/bad-if.out
+ create mode 100644 tests/qapi-schema/enum-dict-member-invalid.err
+ create mode 100644 tests/qapi-schema/enum-dict-member-invalid.exit
+ create mode 100644 tests/qapi-schema/enum-dict-member-invalid.json
+ create mode 100644 tests/qapi-schema/enum-dict-member-invalid.out
+ create mode 100644 tests/qapi-schema/enum-if-invalid.err
+ create mode 100644 tests/qapi-schema/enum-if-invalid.exit
+ create mode 100644 tests/qapi-schema/enum-if-invalid.json
+ create mode 100644 tests/qapi-schema/enum-if-invalid.out
+ create mode 100644 tests/qapi-schema/struct-if-invalid.err
+ create mode 100644 tests/qapi-schema/struct-if-invalid.exit
+ create mode 100644 tests/qapi-schema/struct-if-invalid.json
+ create mode 100644 tests/qapi-schema/struct-if-invalid.out
+ create mode 100644 tests/qapi-schema/struct-member-type.err
+ create mode 100644 tests/qapi-schema/struct-member-type.exit
+ create mode 100644 tests/qapi-schema/struct-member-type.json
+ create mode 100644 tests/qapi-schema/struct-member-type.out
 
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 127a2c71c6..194859f683 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -4433,7 +4433,9 @@
- #
- # Since: 1.2.0
- ##
--{ 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'] }
-+{ 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
-+  'if': ['defined(NEED_CPU_H)',
-+         'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I=
-386) || defined(TARGET_S390X)'] }
-=20
- ##
- # @CpuModelInfo:
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index fb3d20a1b8..e9721b9ce8 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -31,6 +31,4 @@ extern const uint32_t arch_type;
- int kvm_available(void);
- int xen_available(void);
-=20
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp);
--
- #endif
-diff --git a/monitor.c b/monitor.c
-index ca67a584d2..ac400e65ee 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -957,26 +957,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QObje=
-ct **ret_data,
-     *ret_data =3D qobject_from_qlit(&qmp_schema_qlit);
- }
-=20
--/*
-- * We used to define commands in qmp-commands.hx in addition to the
-- * QAPI schema.  This permitted defining some of them only in certain
-- * configurations.  query-commands has always reflected that (good,
-- * because it lets QMP clients figure out what's actually available),
-- * while query-qmp-schema never did (not so good).  This function is a
-- * hack to keep the configuration-specific commands defined exactly as
-- * before, even though qmp-commands.hx is gone.
-- *
-- * FIXME Educate the QAPI schema on configuration-specific commands,
-- * and drop this hack.
-- */
--static void qmp_unregister_commands_hack(void)
--{
--#if !defined(TARGET_PPC) && !defined(TARGET_ARM) && !defined(TARGET_I386=
-) \
--    && !defined(TARGET_S390X)
--    qmp_unregister_command(&qmp_commands, "query-cpu-definitions");
--#endif
--}
--
- void monitor_init_qmp_commands(void)
- {
-     /*
-@@ -996,8 +976,6 @@ void monitor_init_qmp_commands(void)
-     qmp_register_command(&qmp_commands, "netdev_add", qmp_netdev_add,
-                          QCO_NO_OPTIONS);
-=20
--    qmp_unregister_commands_hack();
--
-     QTAILQ_INIT(&qmp_cap_negotiation_commands);
-     qmp_register_command(&qmp_cap_negotiation_commands, "qmp_capabilitie=
-s",
-                          qmp_marshal_qmp_capabilities, QCO_NO_OPTIONS);
-diff --git a/qmp.c b/qmp.c
-index afa266ec1e..d57ccf1251 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -541,11 +541,6 @@ DevicePropertyInfoList *qmp_device_list_properties(c=
-onst char *typename,
-     return prop_list;
- }
-=20
--CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
--{
--    return arch_query_cpu_definitions(errp);
--}
--
- void qmp_add_client(const char *protocol, const char *fdname,
-                     bool has_skipauth, bool skipauth, bool has_tls, bool=
- tls,
-                     Error **errp)
-diff --git a/stubs/arch-query-cpu-def.c b/stubs/arch-query-cpu-def.c
-deleted file mode 100644
-index cefe4beb82..0000000000
---- a/stubs/arch-query-cpu-def.c
-+++ /dev/null
-@@ -1,10 +0,0 @@
--#include "qemu/osdep.h"
--#include "qemu-common.h"
--#include "sysemu/arch_init.h"
--#include "qapi/qmp/qerror.h"
--
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
--{
--    error_setg(errp, QERR_UNSUPPORTED);
--    return NULL;
--}
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index fa60040361..54543a0b01 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -15,6 +15,7 @@
- #include <zlib.h> /* For crc32 */
- #include "exec/semihost.h"
- #include "sysemu/kvm.h"
-+#include "qmp-commands.h"
-=20
- #define ARM_CPU_FREQ 1000000000 /* FIXME: 1 GHz, should be configurable =
-*/
-=20
-@@ -5332,7 +5333,7 @@ static void arm_cpu_add_definition(gpointer data, g=
-pointer user_data)
-     *cpu_list =3D entry;
- }
-=20
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
-+CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
- {
-     CpuDefinitionInfoList *cpu_list =3D NULL;
-     GSList *list;
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index d683e70a13..e5f61f6bff 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -36,6 +36,7 @@
- #include "qapi/visitor.h"
- #include "qom/qom-qobject.h"
- #include "sysemu/arch_init.h"
-+#include "qmp-commands.h"
-=20
- #if defined(CONFIG_KVM)
- #include <linux/kvm_para.h>
-@@ -2318,7 +2319,7 @@ static void x86_cpu_definition_entry(gpointer data,=
- gpointer user_data)
-     *cpu_list =3D entry;
- }
-=20
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
-+CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
- {
-     CpuDefinitionInfoList *cpu_list =3D NULL;
-     GSList *list =3D get_sorted_cpu_model_list();
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 8fb407ed73..5845a15296 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -34,6 +34,7 @@
- #include "hw/ppc/ppc.h"
- #include "mmu-book3s-v3.h"
- #include "sysemu/qtest.h"
-+#include "qmp-commands.h"
-=20
- //#define PPC_DUMP_CPU
- //#define PPC_DEBUG_SPR
-@@ -10401,7 +10402,7 @@ static void ppc_cpu_defs_entry(gpointer data, gpo=
-inter user_data)
-     *first =3D entry;
- }
-=20
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
-+CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
- {
-     CpuDefinitionInfoList *cpu_list =3D NULL;
-     GSList *list;
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 863dce064f..8021dda341 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -387,7 +387,7 @@ static void create_cpu_model_list(ObjectClass *klass,=
- void *opaque)
-     *cpu_list =3D entry;
- }
-=20
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
-+CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
- {
-     struct CpuDefinitionInfoListData list_data =3D {
-         .list =3D NULL,
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index eb17628ede..67bf15261d 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -1,4 +1,3 @@
--stub-obj-y +=3D arch-query-cpu-def.o
- stub-obj-y +=3D bdrv-next-monitor-owned.o
- stub-obj-y +=3D blk-commit-all.o
- stub-obj-y +=3D blockdev-close-all-bdrv-states.o
 --=20
 2.14.1.146.gd35faa819
