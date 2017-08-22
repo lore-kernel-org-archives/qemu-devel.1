@@ -1,18 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dkEWE-0005sg-Cz
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 15:07:19 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dkEWK-0005xM-GL
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 15:07:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dkEWD-0008Hr-8L
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 15:07:18 -0400
-From: John Snow <jsnow@redhat.com>
-Message-ID: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
-Date: Tue, 22 Aug 2017 15:07:04 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dkEWH-0008K2-BL
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 15:07:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48754)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dkEWH-0008JN-6A
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 15:07:21 -0400
+Date: Tue, 22 Aug 2017 16:07:09 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170822190709.GJ19998@localhost.localdomain>
+References: <20170818142613.32394-1-ldoktor@redhat.com>
+	<f8f1684a-0684-7261-57c3-63aa58892000@redhat.com>
+	<87bmn8qd3z.fsf@dusky.pond.sub.org>
+	<c560b757-6bb1-2ded-a25b-193e5f9318c2@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] Persistent bitmaps for non-qcow2 formats
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <c560b757-6bb1-2ded-a25b-193e5f9318c2@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 00/10] qemu.py: Pylint/style fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,64 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu-block <qemu-block@nongnu.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, qemu-devel@nongnu.org, famz@redhat.com, apahim@redhat.com, mreitz@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Cleber Rosa <crosa@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Well, we knew we'd want this sooner or later. I've got some pings
-downstream over whether or not we support persistent bitmaps for
-non-qcow2 formats.
+(CCing Cleber and Stefan)
 
-Currently: no, we don't.
+On Tue, Aug 22, 2017 at 07:19:45AM -0300, Philippe Mathieu-Daud=E9 wrote:
+[...]
+> Can we predict how the python scripts will evolve? Only fast-testing?
+>=20
 
-We tried two different ideas for storage agnostic bitmap persistence:
-
-
-(1) Using qcow2 as a storage container format (similar to VM save
-states) for information not associated with that particular drive.
-
-This didn't go over so well; we decided it was too messy logistically to
-manage data in any meaningful sense in a file that didn't share any
-semantic relationship to the qcow2 in question.
-
-Well, "We" decided is more like "Kevin and Max" decided. They are right,
-though.
+I guess it depends on how you define "fast".  Does "fast-testing"
+include a full device-crash-test run (that could take ~30
+minutes) or the full set of iotests?
 
 
-(2) Using a new proto-wrapper format that Fam Zheng designed that serves
-as a simple top-layer redirect for metadata that allows us to associate
-raw bitmap data with an arbitrary backing image.
+> Is there some users hacking on qemu.py unaware they can/should use
+> libvirt-python?
 
-This also didn't go over so well, the desire for a "new format" was
-pretty thin, even if it was only a pseudo-format.
-
-
-We'd still like to be able to use bitmaps with non-qcow2 formats
-however, and people are going to keep asking. So here's a third thought:
+I believe the existing users of qemu.py wouldn't want to have
+dependencies on libvirt or other external modules (e.g. code that
+test specific QMP commands and/or is run by "make check").
 
 
-(3) Add either a new flag that turns qcow2's backing file into a full
-R/W backing file, or add a new extension to qcow2 entirely (bypassing
-the traditional backing file mechanism to avoid confusion for older
-tooling) that adds a new read-write backing file field.
+> If so, shouldn't we think about running more tests through libvirt and =
+add
+> effort there?
 
-This RW backing file field will be used for all reads AND writes; the
-qcow2 in question becomes a metadata container on top of the BDS chain.
-We can re-use Vladimir's bitmap persistence extension to save bitmaps in
-a qcow2 shell.
+Even if the existing test code wouldn't benefit from libvirt, I
+agree there is some value in writing test code that uses libvirt.
+But in this case would the test code belong to the QEMU source
+tree, or somewhere else?
 
-The qcow2 becomes effectively a metadata cache for a new (essentially)
-filter node that handles features such as bitmaps. This could also be
-used to provide allocation map data for RAW files and other goodies down
-the road.
-
-Hopefully this achieves our desire to not create new formats AND our
-desire to concentrate features (and debugging, testing, etc) into qcow2,
-while allowing users to "have bitmaps with raw files."
-
-Of course, in this scenario, users now have two files: a qcow2 wrapper
-and the actual raw file in question; but regardless of how we were going
-to solve this, a raw file necessitates an external file of some sort,
-else we give up the idea that it was a raw file.
-
-
-Sound good?
+--=20
+Eduardo
