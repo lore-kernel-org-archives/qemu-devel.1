@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dkDCg-00036K-1E
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 13:43:02 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dkDR3-0002iT-V4
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 13:57:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dkDCd-0002QI-0i
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 13:43:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59894)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1dkDCc-0002Oz-PN
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 13:42:58 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 65F3E61475
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 17:42:57 +0000 (UTC)
-References: <1503384739-17207-1-git-send-email-armbru@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <e120901a-9c70-6953-0f4c-321ee571de1e@redhat.com>
-Date: Tue, 22 Aug 2017 19:42:52 +0200
+	(envelope-from <alistair23@gmail.com>) id 1dkDR3-000396-0G
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 13:57:54 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:38307)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dkDR2-000376-Q9
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 13:57:52 -0400
+Received: by mail-wm0-x242.google.com with SMTP id y206so9238505wmd.5
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 10:57:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1503384739-17207-1-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="BgGDMabPB0A4tbDKNagGHQj7lSTiTrrcU"
-Subject: Re: [Qemu-devel] [PATCH] qobject: Explain how QNum works, and why
+Sender: alistair23@gmail.com
+In-Reply-To: <20170822172438.GF3205@toto>
+References: <cover.1502993370.git.alistair.francis@xilinx.com>
+	<20170822172438.GF3205@toto>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 22 Aug 2017 10:57:18 -0700
+Message-ID: <CAKmqyKOH8G1LzLHksfuxQLBskFB0KsCy7zP5pPtbtvUmQcZORQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 0/5] Expose the secure property to the
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,48 +31,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com
+To: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Edgar Iglesias <edgar.iglesias@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BgGDMabPB0A4tbDKNagGHQj7lSTiTrrcU
-From: Max Reitz <mreitz@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com
-Message-ID: <e120901a-9c70-6953-0f4c-321ee571de1e@redhat.com>
-Subject: Re: [PATCH] qobject: Explain how QNum works, and why
-References: <1503384739-17207-1-git-send-email-armbru@redhat.com>
-In-Reply-To: <1503384739-17207-1-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Aug 22, 2017 at 10:24 AM, Edgar E. Iglesias
+<edgar.iglesias@xilinx.com> wrote:
+> On Thu, Aug 17, 2017 at 11:51:59AM -0700, Alistair Francis wrote:
+>> The EL2 and EL3 work is working well now and interanlly we now have
+>> tests that expect to start in EL3 and transition through EL2 to EL1. To
+>> make this easy to run let's expose the secure property to the machine
+>> and then use that to enable EL2.
+>>
+>> This series also does some machine/name tidying up and makes the first
+>> move to deprecating the EP108 machine, which was just an early access
+>> development board.
+>
+> Hi Alistair,
+>
+> Reconsidering this, I tend to agree that we're probably better off with
+> EL2/no-GICv2-virt compared to the possible confusiong of having EL2
+> without GICv2-virt..
+>
+> But I wonder if we should have similar options as the virt machine?
+> I.e, a virtualization option to enable EL2.
 
-On 2017-08-22 08:52, Markus Armbruster wrote:
-> Suggested-by: Max Reitz <mreitz@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  include/qapi/qmp/qnum.h | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
+That's fine with me.
 
-Thanks again!
+Just to clarify do you think we should keep the secure option for EL3
+and add a virt option for EL2?
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Thanks,
+Alistair
 
-
---BgGDMabPB0A4tbDKNagGHQj7lSTiTrrcU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlmcbRwSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A8KsIAJgBLrbUnH3fRy6RhDCl1OJBKENyDUh9
-fifYBOtxxB0NpUYNwMbJWl538GpTtmfjKdMYFlcfb8K+AfrRA24dzfqlDEpsOtzb
-99hqeIVWjO5Syc1F7UmkV3SWOEZaalQRxhrRoNEPAWWkiMqx2h9Oh5F58x/2NTlZ
-XJCvmS/4nUFt34NbY93WhZ18i2t7KupV8aSC5fYtnWnIk+S8lbiVEylkpF/Mt92M
-Mi/ApO/52cBfCumT3GV2rJfuY2mi14zHR6a8Im1gX1kdz+XdDRslwznPBb2DqERF
-wvJLOmHQfzP4r4HnDdLbCvbmbgRKChXn4AmLuEu7HOVVZ9UlkuHYfMM=
-=DQM+
------END PGP SIGNATURE-----
-
---BgGDMabPB0A4tbDKNagGHQj7lSTiTrrcU--
+>
+> Cheers,
+> Edgar
+>
+>
+>>
+>> Alistair Francis (5):
+>>   xlnx-ep108: Rename to ZCU102
+>>   xlnx-zcu102: Manually create the machines
+>>   xlnx-zcu102: Add a machine level secure property
+>>   xlnx-zynqmp: Allow the secure prop to enable EL2
+>>   xlnx-zcu102: Mark the EP108 machine as deprecated
+>>
+>>  hw/arm/Makefile.objs                   |   2 +-
+>>  hw/arm/{xlnx-ep108.c => xlnx-zcu102.c} | 131 ++++++++++++++++++++++++++++-----
+>>  hw/arm/xlnx-zynqmp.c                   |   2 +-
+>>  3 files changed, 114 insertions(+), 21 deletions(-)
+>>  rename hw/arm/{xlnx-ep108.c => xlnx-zcu102.c} (51%)
+>>
+>> --
+>> 2.11.0
+>>
