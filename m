@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dk9mS-0000Xm-Ng
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:03:45 -0400
+	(envelope-from <thuth@redhat.com>) id 1dk9o4-0001wM-FQ
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:05:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dk9mP-0008L5-L5
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:03:44 -0400
-References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-	<1502117160-24655-14-git-send-email-armbru@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <525521a8-d1f8-0550-82db-c2bd5fa70a7e@redhat.com>
-Date: Tue, 22 Aug 2017 17:03:17 +0300
+	(envelope-from <thuth@redhat.com>) id 1dk9ny-0000s5-Os
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 10:05:24 -0400
+References: <1503407712-9894-1-git-send-email-thuth@redhat.com>
+	<CAFEAcA-V1igN7Sz3SusczcPadtZC-z4fyw-pvPggGT5VFFMvRA@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <8fb75274-09a6-dbd3-5dba-1069d790b689@redhat.com>
+Date: Tue, 22 Aug 2017 16:05:02 +0200
 MIME-Version: 1.0
-In-Reply-To: <1502117160-24655-14-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAFEAcA-V1igN7Sz3SusczcPadtZC-z4fyw-pvPggGT5VFFMvRA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 13/56] pci: Make PCI addresses and
- sizes unsigned in QAPI/QMP
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/digic: Mark device with
+ user_creatable = false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,46 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: eblake@redhat.com, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com, dgilbert@redhat.com, quintela@redhat.com, berrange@redhat.com, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Antony Pavlov <antonynpavlov@gmail.com>
 
-Hi Markus,
+On 22.08.2017 15:52, Peter Maydell wrote:
+> On 22 August 2017 at 14:15, Thomas Huth <thuth@redhat.com> wrote:
+>> QEMU currently hangs completely when the user is trying to do a
+>> "device_add digic" on an unrelated ARM machine like integratorcp.
+>> Looks like this device is not meant to be hot-pluggable at all, so
+>> let's simply mark it with "user_creatable = false" to avoid the hang.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  hw/arm/digic.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/hw/arm/digic.c b/hw/arm/digic.c
+>> index 94f3263..208dfb3 100644
+>> --- a/hw/arm/digic.c
+>> +++ b/hw/arm/digic.c
+>> @@ -101,6 +101,8 @@ static void digic_class_init(ObjectClass *oc, void *data)
+>>      DeviceClass *dc = DEVICE_CLASS(oc);
+>>
+>>      dc->realize = digic_realize;
+>> +    /* Reason: Hangs QEMU when trying to device_add this directly */
+>> +    dc->user_creatable = false;
+>>  }
+> 
+> Maybe "uses serial_hds[]" is a better reason, or does it hang for
+> some other reason?
 
-On 07/08/2017 17:45, Markus Armbruster wrote:
-> Sizes and addresses should use QAPI type 'size' (uint64_t).
-> PciMemoryRegion members @address and @size are 'int' (int64_t).
-> qmp_query_pci_regions() implicitly converts from pcibus_t,
-> i.e. uint64_t.
-> 
-> Change these PciMemoryRegion members to 'size'.
-> 
-> query-pci now reports sizes and addresses above 2^63-1 correctly
-> instead of their (negative) two's complement.
-> 
-> HMP's "info pci" already reported them correctly, because it
-> implicitly converted back to uint64_t.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   qapi-schema.json | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 6aa6be9..c8cceb9 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -2062,7 +2062,7 @@
->   # Since: 0.14.0
->   ##
->   { 'struct': 'PciMemoryRegion',
-> -  'data': {'bar': 'int', 'type': 'str', 'address': 'int', 'size': 'int',
-> +  'data': {'bar': 'int', 'type': 'str', 'address': 'size', 'size': 'size',
->              '*prefetch': 'bool', '*mem_type_64': 'bool' } }
->   
->   ##
-> 
+When I kill the hanging QEMU, the stack trace looks like this:
 
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+#0  0x00007ffff13afaff in ppoll () at /lib64/libc.so.6
+#1  0x0000555555bb3179 in qemu_poll_ns (__ss=0x0, __timeout=0x7fffffffda60, __nfds=<optimized out>, __fds=<optimized out>)
+    at /usr/include/bits/poll2.h:77
+#2  0x0000555555bb3179 in qemu_poll_ns (fds=<optimized out>, nfds=<optimized out>, timeout=timeout@entry=1000000000)
+    at /home/thuth/devel/qemu/util/qemu-timer.c:334
+#3  0x0000555555bb3f88 in main_loop_wait (timeout=1000000000) at /home/thuth/devel/qemu/util/main-loop.c:255
+#4  0x0000555555bb3f88 in main_loop_wait (nonblocking=nonblocking@entry=0) at /home/thuth/devel/qemu/util/main-loop.c:515
+#5  0x000055555578d927 in main () at /home/thuth/devel/qemu/vl.c:1917
+#6  0x000055555578d927 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at /home/thuth/devel/qemu/vl.c:4791
 
-Thanks,
-Marcel
+I haven't investigated any further, but the usage of serial_hds
+in the realize function could certainly be the reason. At least
+it certainly is a reason that this device should not be creatable
+by the user - so let me send a v2 with the comment changed
+accordingly.
+
+ Thomas
