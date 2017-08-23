@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dkZFv-0007Fr-FK
+	(envelope-from <bounces@canonical.com>) id 1dkZFv-0007Fo-FB
 	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:15:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dkZFq-0004Un-EN
+	(envelope-from <bounces@canonical.com>) id 1dkZFs-0004W6-Lj
 	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:15:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43084)
+Received: from indium.canonical.com ([91.189.90.7]:43154)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dkZFq-0004Tp-72
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:15:46 -0400
+	id 1dkZFs-0004Ve-Al
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:15:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dkZFo-0000TG-DM
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 17:15:44 +0000
+	id 1dkZFq-0000cC-TN
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 17:15:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5EDAB2E80CD
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 17:15:44 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id D25B52E80DB
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 17:15:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 23 Aug 2017 16:56:20 -0000
+Date: Wed, 23 Aug 2017 17:01:14 -0000
 From: ChristianEhrhardt <1711602@bugs.launchpad.net>
 Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
-Message-Id: <150350738053.7999.1516503078105572953.malone@soybean.canonical.com>
+Message-Id: <150350767457.8320.16260683107811272106.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
  2.10
@@ -39,41 +39,13 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Hmm,
-it gets further but can still not complete this kind of migration:
+That was rc3 +:
+- nbd-client-avoid-spurious-qio_channel_yield.patch
+- the four patches mentioned in comment #43
 
-$ virsh migrate --live --copy-storage-all kvmguest-artful-normal
-qemu+ssh://10.22.69.30/system
-
-Source:
-2017-08-23 16:49:23.022+0000: initiating migration
-Unexpected error in bdrv_check_perm() at /build/qemu-VjSgVJ/qemu-2.10~rc3+d=
-fsg/block.c:1574:
-2017-08-23T16:49:23.203181Z qemu-system-x86_64: Block node is read-only
-2017-08-23 16:49:23.762+0000: shutting down, reason=3Dcrashed
-
-Target:
-2017-08-23T16:49:23.495478Z qemu-system-x86_64: Failed to load virtio_pci/m=
-odern_state:modern_state
-2017-08-23T16:49:23.495505Z qemu-system-x86_64: Failed to load virtio/extra=
-_state:extra_state
-2017-08-23T16:49:23.495510Z qemu-system-x86_64: Failed to load virtio-ballo=
-on:virtio
-2017-08-23T16:49:23.495515Z qemu-system-x86_64: error while loading state f=
-or instance 0x0 of device '0000:00:06.0/virtio-balloon'
-2017-08-23T16:49:23.496071Z qemu-system-x86_64: load of migration failed: I=
-nput/output error
-2017-08-23 16:49:23.797+0000: shutting down, reason=3Dcrashed
-
-I was to eager to get this close-to-real so I don't have Davids fprintf's a=
-pplied anymore - I'll build those and then run it in the debugger, but unti=
-l then what I can see is that behavior slightly changes (worse).
-It now crashes the guest on the source as well when aborting the migration.
-
-I need to debug to confirm, but it seems it still aborts the migration
- -> qemu-system-x86_64: load of migration failed: Input/output error
-But then can't fall back to the source and crashes at
- -> qemu-system-x86_64: Block node is read-only
+I could also re-base onto master + pacthes or rc4 if there is one soon.
+For now building with Davids debug statements applied again to check if we =
+still abort around that assert.
 
 -- =
 
