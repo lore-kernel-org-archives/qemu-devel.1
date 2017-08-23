@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dkZo1-00008O-6i
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:51:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dkZom-0000eO-2M
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:51:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dkZny-0006Aw-5P
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:51:05 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34554)
+	(envelope-from <peter.maydell@linaro.org>) id 1dkZol-0006gA-0O
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:51:52 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:36464)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dkZny-0006Ah-1B
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:51:02 -0400
-Received: by mail-qk0-x241.google.com with SMTP id s3so225049qkd.1
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 10:51:01 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170823162004.27337-1-marcandre.lureau@redhat.com>
-	<20170823162004.27337-5-marcandre.lureau@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <000ec010-9c82-149f-5de0-6fcf193512df@amsat.org>
-Date: Wed, 23 Aug 2017 14:50:57 -0300
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dkZok-0006fa-Qh
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:51:50 -0400
+Received: by mail-wr0-x232.google.com with SMTP id f8so2657584wrf.3
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 10:51:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170823162004.27337-5-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 04/27] vhost-user-scsi: use g_strdup()
+In-Reply-To: <20170823172118.GQ19998@localhost.localdomain>
+References: <1503416789-32080-1-git-send-email-thuth@redhat.com>
+	<20170823172118.GQ19998@localhost.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 23 Aug 2017 18:51:28 +0100
+Message-ID: <CAFEAcA-DoQtTwCBFq-_JKPRMxcGq8-2QNnEJBu9STxtPWkB0bw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/allwinner-a10: Mark the
+ allwinner-a10 device with user_creatable = false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,50 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: changpeng.liu@intel.com, felipe@nutanix.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Beniamino Galvani <b.galvani@gmail.com>
 
-On 08/23/2017 01:19 PM, Marc-André Lureau wrote:
-> Since vhost-user-scsi uses glib.
-> 
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+On 23 August 2017 at 18:21, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> On Tue, Aug 22, 2017 at 05:46:29PM +0200, Thomas Huth wrote:
+>> QEMU currently exits unexpectedly when the user accidentially
+>> tries to do something like this:
+>>
+>> $ aarch64-softmmu/qemu-system-aarch64 -S -M integratorcp -nographic
+>> QEMU 2.9.93 monitor - type 'help' for more information
+>> (qemu) device_add allwinner-a10
+>> Unsupported NIC model: smc91c111
+>>
+>> Exiting just due to a "device_add" should not happen. Looking closer
+>> at the the realize and instance_init function of this device also
+>> reveals that it is using serial_hds and nd_table directly there, so
+>> this device is clearly not creatable by the user and should be marked
+>> accordingly.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  hw/arm/allwinner-a10.c    | 2 ++
+>>  scripts/device-crash-test | 1 -
+>>  2 files changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
+>> index f62a9a3..43a3f01 100644
+>> --- a/hw/arm/allwinner-a10.c
+>> +++ b/hw/arm/allwinner-a10.c
+>> @@ -118,6 +118,8 @@ static void aw_a10_class_init(ObjectClass *oc, void *data)
+>>      DeviceClass *dc = DEVICE_CLASS(oc);
+>>
+>>      dc->realize = aw_a10_realize;
+>> +    /* Reason: Uses serial_hds in realize and nd_table in instance_init */
+>> +    dc->user_creatable = false;
+>
+> I assume this patch will be replaced by one changing TYPE_DEVICE
+> to default to user_creatable=false, based on the replies to the
+> hw/misc/auxbus.c patch?
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+user-creatable and hotplug are different things -- most
+devices are user-creatable, many fewer are hotpluggable.
+So the tradeoff for the default doesn't *necessarily* go
+the same way.
 
-> ---
->   contrib/vhost-user-scsi/vhost-user-scsi.c | 12 ++++--------
->   1 file changed, 4 insertions(+), 8 deletions(-)
-> 
-> diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-user-scsi/vhost-user-scsi.c
-> index 78bcc65f5a..1fb57da2da 100644
-> --- a/contrib/vhost-user-scsi/vhost-user-scsi.c
-> +++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
-> @@ -822,10 +822,10 @@ int main(int argc, char **argv)
->           case 'h':
->               goto help;
->           case 'u':
-> -            unix_fn = strdup(optarg);
-> +            unix_fn = g_strdup(optarg);
->               break;
->           case 'i':
-> -            iscsi_uri = strdup(optarg);
-> +            iscsi_uri = g_strdup(optarg);
->               break;
->           default:
->               goto help;
-> @@ -854,12 +854,8 @@ out:
->           vdev_scsi_deinit(vdev_scsi);
->           free(vdev_scsi);
->       }
-> -    if (unix_fn) {
-> -        free(unix_fn);
-> -    }
-> -    if (iscsi_uri) {
-> -        free(iscsi_uri);
-> -    }
-> +    g_free(unix_fn);
-> +    g_free(iscsi_uri);
->   
->       return err;
->   
-> 
+thanks
+-- PMM
