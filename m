@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dkW2k-0008Mq-71
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:50:06 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dkW4E-0000l0-Io
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:51:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dkW2j-0005Oh-8p
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:50:02 -0400
-Date: Wed, 23 Aug 2017 19:20:17 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170823092017.GS5379@umbus.fritz.box>
-References: <cover.1503249785.git.balaton@eik.bme.hu>
-	<f34dbaefd1224bca33a9052107cd32b628400106.1503249785.git.balaton@eik.bme.hu>
-	<20170823022833.GK5379@umbus.fritz.box>
-	<alpine.BSF.2.21.1708231104210.76247@zero.eik.bme.hu>
+	(envelope-from <kraxel@redhat.com>) id 1dkW4B-00075K-92
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:51:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33307)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dkW4B-00071J-07
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:51:31 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 15DBB80B29
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 13:51:28 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 23 Aug 2017 15:51:13 +0200
+Message-Id: <20170823135113.25769-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="7WENQHN97/U9vH7R"
-Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.1708231104210.76247@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH 11/15] ppc: Add 460EX embedded CPU
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] virtio-input: send rel-wheel events for wheel
+ buttons
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,60 +31,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
+qemu uses wheel-up/down button events for mouse wheel input, however
+linux applications typically want REL_WHEEL events.
 
---7WENQHN97/U9vH7R
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This fixes wheel with linux guests. Tested with X11/wayland, and
+windows virtio-input driver.
 
-On Wed, Aug 23, 2017 at 11:08:16AM +0200, BALATON Zoltan wrote:
-> On Wed, 23 Aug 2017, David Gibson wrote:
-> > On Sun, Aug 20, 2017 at 07:23:05PM +0200, BALATON Zoltan wrote:
-> > > Despite its name it is a 440 core CPU
-> >=20
-> > As I recall 460 was supposed to be a 440 with SMP support.  Except
-> > they screwed up the cache coherence, so it's basically unusable for
-> > SMP (at least with Linux).  They finally got 440 SMP right in 470
-> > IIRC.
-> >=20
-> > Or are you saying that the 460EX is more 440 like than other 460 cpus?
->=20
-> AFAIK this SoC really has a 440 core with some of the embedded devices (s=
-uch
-> as PCIe and SDRAM controller) similar to real 460 core SoCs, so its name =
-is
-> a bit misleading. It definitely does not have a 460 CPU core so it's more
-> like 440 than other 460 core SoCs.
+Based on a patch from Marc.
+Added property to enable/disable wheel axis.
+TODO: add compat properties for old machine types.
 
-Ok, noted.
+Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ include/hw/virtio/virtio-input.h |   1 +
+ hw/input/virtio-input-hid.c      | 119 +++++++++++++++++++++++++++++++++=
+++++--
+ 2 files changed, 115 insertions(+), 5 deletions(-)
 
+diff --git a/include/hw/virtio/virtio-input.h b/include/hw/virtio/virtio-=
+input.h
+index 91df57eca4..054c38836f 100644
+--- a/include/hw/virtio/virtio-input.h
++++ b/include/hw/virtio/virtio-input.h
+@@ -89,6 +89,7 @@ struct VirtIOInputHID {
+     QemuInputHandler                  *handler;
+     QemuInputHandlerState             *hs;
+     int                               ledstate;
++    bool                              wheel_axis;
+ };
+=20
+ struct VirtIOInputHost {
+diff --git a/hw/input/virtio-input-hid.c b/hw/input/virtio-input-hid.c
+index 46c038110c..79ab92e89f 100644
+--- a/hw/input/virtio-input-hid.c
++++ b/hw/input/virtio-input-hid.c
+@@ -190,6 +190,7 @@ static void virtio_input_key_config(VirtIOInput *vinp=
+ut,
+ static void virtio_input_handle_event(DeviceState *dev, QemuConsole *src=
+,
+                                       InputEvent *evt)
+ {
++    VirtIOInputHID *vhid =3D VIRTIO_INPUT_HID(dev);
+     VirtIOInput *vinput =3D VIRTIO_INPUT(dev);
+     virtio_input_event event;
+     int qcode;
+@@ -215,7 +216,14 @@ static void virtio_input_handle_event(DeviceState *d=
+ev, QemuConsole *src,
+         break;
+     case INPUT_EVENT_KIND_BTN:
+         btn =3D evt->u.btn.data;
+-        if (keymap_button[btn->button]) {
++        if (vhid->wheel_axis && (btn->button =3D=3D INPUT_BUTTON_WHEEL_U=
+P ||
++                                 btn->button =3D=3D INPUT_BUTTON_WHEEL_D=
+OWN)) {
++            event.type  =3D cpu_to_le16(EV_REL);
++            event.code  =3D cpu_to_le16(REL_WHEEL);
++            event.value =3D cpu_to_le32(btn->button =3D=3D INPUT_BUTTON_=
+WHEEL_UP
++                                      ? 1 : -1);
++            virtio_input_send(vinput, &event);
++        } else if (keymap_button[btn->button]) {
+             event.type  =3D cpu_to_le16(EV_KEY);
+             event.code  =3D cpu_to_le16(keymap_button[btn->button]);
+             event.value =3D cpu_to_le32(btn->down ? 1 : 0);
+@@ -407,7 +415,7 @@ static QemuInputHandler virtio_mouse_handler =3D {
+     .sync  =3D virtio_input_handle_sync,
+ };
+=20
+-static struct virtio_input_config virtio_mouse_config[] =3D {
++static struct virtio_input_config virtio_mouse_config_v1[] =3D {
+     {
+         .select    =3D VIRTIO_INPUT_CFG_ID_NAME,
+         .size      =3D sizeof(VIRTIO_ID_NAME_MOUSE),
+@@ -432,13 +440,53 @@ static struct virtio_input_config virtio_mouse_conf=
+ig[] =3D {
+     { /* end of list */ },
+ };
+=20
++static struct virtio_input_config virtio_mouse_config_v2[] =3D {
++    {
++        .select    =3D VIRTIO_INPUT_CFG_ID_NAME,
++        .size      =3D sizeof(VIRTIO_ID_NAME_MOUSE),
++        .u.string  =3D VIRTIO_ID_NAME_MOUSE,
++    },{
++        .select    =3D VIRTIO_INPUT_CFG_ID_DEVIDS,
++        .size      =3D sizeof(struct virtio_input_devids),
++        .u.ids     =3D {
++            .bustype =3D const_le16(BUS_VIRTUAL),
++            .vendor  =3D const_le16(0x0627), /* same we use for usb hid =
+devices */
++            .product =3D const_le16(0x0002),
++            .version =3D const_le16(0x0002),
++        },
++    },{
++        .select    =3D VIRTIO_INPUT_CFG_EV_BITS,
++        .subsel    =3D EV_REL,
++        .size      =3D 2,
++        .u.bitmap  =3D {
++            (1 << REL_X) | (1 << REL_Y),
++            (1 << (REL_WHEEL - 8))
++        },
++    },
++    { /* end of list */ },
++};
++
++static Property virtio_mouse_properties[] =3D {
++    DEFINE_PROP_BOOL("wheel-axis", VirtIOInputHID, wheel_axis, true),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void virtio_mouse_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->props  =3D virtio_mouse_properties;
++}
++
+ static void virtio_mouse_init(Object *obj)
+ {
+     VirtIOInputHID *vhid =3D VIRTIO_INPUT_HID(obj);
+     VirtIOInput *vinput =3D VIRTIO_INPUT(obj);
+=20
+     vhid->handler =3D &virtio_mouse_handler;
+-    virtio_input_init_config(vinput, virtio_mouse_config);
++    virtio_input_init_config(vinput, vhid->wheel_axis
++                             ? virtio_mouse_config_v2
++                             : virtio_mouse_config_v1);
+     virtio_input_key_config(vinput, keymap_button,
+                             ARRAY_SIZE(keymap_button));
+ }
+@@ -448,6 +496,7 @@ static const TypeInfo virtio_mouse_info =3D {
+     .parent        =3D TYPE_VIRTIO_INPUT_HID,
+     .instance_size =3D sizeof(VirtIOInputHID),
+     .instance_init =3D virtio_mouse_init,
++    .class_init    =3D virtio_mouse_class_init,
+ };
+=20
+ /* ----------------------------------------------------------------- */
+@@ -459,7 +508,7 @@ static QemuInputHandler virtio_tablet_handler =3D {
+     .sync  =3D virtio_input_handle_sync,
+ };
+=20
+-static struct virtio_input_config virtio_tablet_config[] =3D {
++static struct virtio_input_config virtio_tablet_config_v1[] =3D {
+     {
+         .select    =3D VIRTIO_INPUT_CFG_ID_NAME,
+         .size      =3D sizeof(VIRTIO_ID_NAME_TABLET),
+@@ -496,13 +545,72 @@ static struct virtio_input_config virtio_tablet_con=
+fig[] =3D {
+     { /* end of list */ },
+ };
+=20
++static struct virtio_input_config virtio_tablet_config_v2[] =3D {
++    {
++        .select    =3D VIRTIO_INPUT_CFG_ID_NAME,
++        .size      =3D sizeof(VIRTIO_ID_NAME_TABLET),
++        .u.string  =3D VIRTIO_ID_NAME_TABLET,
++    },{
++        .select    =3D VIRTIO_INPUT_CFG_ID_DEVIDS,
++        .size      =3D sizeof(struct virtio_input_devids),
++        .u.ids     =3D {
++            .bustype =3D const_le16(BUS_VIRTUAL),
++            .vendor  =3D const_le16(0x0627), /* same we use for usb hid =
+devices */
++            .product =3D const_le16(0x0003),
++            .version =3D const_le16(0x0002),
++        },
++    },{
++        .select    =3D VIRTIO_INPUT_CFG_EV_BITS,
++        .subsel    =3D EV_ABS,
++        .size      =3D 1,
++        .u.bitmap  =3D {
++            (1 << ABS_X) | (1 << ABS_Y),
++        },
++    },{
++        .select    =3D VIRTIO_INPUT_CFG_EV_BITS,
++        .subsel    =3D EV_REL,
++        .size      =3D 2,
++        .u.bitmap  =3D {
++            0,
++            (1 << (REL_WHEEL - 8))
++        },
++    },{
++        .select    =3D VIRTIO_INPUT_CFG_ABS_INFO,
++        .subsel    =3D ABS_X,
++        .size      =3D sizeof(virtio_input_absinfo),
++        .u.abs.min =3D const_le32(INPUT_EVENT_ABS_MIN),
++        .u.abs.max =3D const_le32(INPUT_EVENT_ABS_MAX),
++    },{
++        .select    =3D VIRTIO_INPUT_CFG_ABS_INFO,
++        .subsel    =3D ABS_Y,
++        .size      =3D sizeof(virtio_input_absinfo),
++        .u.abs.min =3D const_le32(INPUT_EVENT_ABS_MIN),
++        .u.abs.max =3D const_le32(INPUT_EVENT_ABS_MAX),
++    },
++    { /* end of list */ },
++};
++
++static Property virtio_tablet_properties[] =3D {
++    DEFINE_PROP_BOOL("wheel-axis", VirtIOInputHID, wheel_axis, true),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void virtio_tablet_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->props  =3D virtio_tablet_properties;
++}
++
+ static void virtio_tablet_init(Object *obj)
+ {
+     VirtIOInputHID *vhid =3D VIRTIO_INPUT_HID(obj);
+     VirtIOInput *vinput =3D VIRTIO_INPUT(obj);
+=20
+     vhid->handler =3D &virtio_tablet_handler;
+-    virtio_input_init_config(vinput, virtio_tablet_config);
++    virtio_input_init_config(vinput, vhid->wheel_axis
++                             ? virtio_tablet_config_v2
++                             : virtio_tablet_config_v1);
+     virtio_input_key_config(vinput, keymap_button,
+                             ARRAY_SIZE(keymap_button));
+ }
+@@ -512,6 +620,7 @@ static const TypeInfo virtio_tablet_info =3D {
+     .parent        =3D TYPE_VIRTIO_INPUT_HID,
+     .instance_size =3D sizeof(VirtIOInputHID),
+     .instance_init =3D virtio_tablet_init,
++    .class_init    =3D virtio_tablet_class_init,
+ };
+=20
+ /* ----------------------------------------------------------------- */
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---7WENQHN97/U9vH7R
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmdSM8ACgkQbDjKyiDZ
-s5L25w//bsv1Qkjjpvh2AN+AOmLZyOHUv4Jjhugq+07ATHGUayHhKAhe06HwasqZ
-Wmuov9UIRnNEp6p8wkPhWtl3W7fH9nBRyFCWDyRt4/8XLdkOLrnxMvDgVjrm2Xip
-pI9PYqJtqwJo2vHTml/nK7IFby9gckd7Ic+02dpiCEdy4sZzQYiMd18kn4UFDMTo
-sVQjZYUeTsknVR3uf6dRgv/TID/0mhAlOiGKNygAwHwXOLhMVcI8sPFPrg+49UwC
-GqeZSSXBXKyawrbhMeeoFMNMcn7xepqLwPTo7RVCJdj13GUjP3XhOBLeqIO/GA6r
-SqY9idlSu70v7x1xaBT+JrWsCQWcryAxk88uykFtigSBGqD2CLzKjxCzV3p9y5wg
-xZY17xFHd8SJ6e78NtfattUcPlaPzl8jpM5tYgBUpMIXys68B3kDARJ6HL5xm3hS
-ERjd3IAwZozr49NZtqksNFUelHX7dx0oVYDoEU/4KkWYd+09eQpHFn1FUIudJW60
-HdLEQhIdMPYy38M2rh6Xfg+Swfj7cnmwYfBAf7F8ieHDOKD5bd8zN0IO39ooOaA7
-RUR/IhJmzYOfdtWdEk9x+SMf81TYLMwrfTGY+TJnV6UsTgNPNFUetlP5T+FwdCGB
-FArJJzMHIhJIKxLfAGz/VKKrBYrDRB7/mlCwAmmeJ2yuOkUDxXM=
-=5TWv
------END PGP SIGNATURE-----
-
---7WENQHN97/U9vH7R--
+2.9.3
