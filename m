@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dkalU-00074P-Th
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 14:52:33 -0400
+	(envelope-from <bounces@canonical.com>) id 1dkauB-0000Tl-Fw
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 15:01:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dkalT-0004oy-Uv
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 14:52:32 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:34686)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dkalT-0004oL-NM
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 14:52:31 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id p14so3232720wrg.1
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 11:52:31 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1dkau7-0002nf-K3
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 15:01:31 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60592)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dkau7-0002nE-Bl
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 15:01:27 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dkau5-0004Tj-Pc
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 19:01:25 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A4FE62E80CB
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 19:01:25 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170823163349.11663-1-eblake@redhat.com>
-References: <20170823163349.11663-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 23 Aug 2017 19:52:09 +0100
-Message-ID: <CAFEAcA-Jj=vqac25VRBrB4ECS01kRox5OQTtvQ75U0fGiKiD+Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/6] NBD pull request for 2.10-rc4
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 23 Aug 2017 18:55:52 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
+Message-Id: <150351455220.11098.4501478332519904793.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
+ 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +37,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 23 August 2017 at 17:33, Eric Blake <eblake@redhat.com> wrote:
-> The following changes since commit 3da2bd8c4a80178fb115c70b858cecbfb1eb1067:
->
->   numa: Move numa_legacy_auto_assign_ram to pc-i440fx-2.9 (2017-08-23 13:53:15 +0100)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-08-23
->
-> for you to fetch changes up to 40f4a21895b5a7eae4011593837069f63460d983:
->
->   nbd-client: avoid spurious qio_channel_yield() re-entry (2017-08-23 11:22:15 -0500)
->
-> ----------------------------------------------------------------
-> nbd patches for 2017-08-23
->
-> - Fam Zheng: 0/4 block: Fix non-shared storage migration
-> - Stefan Hajnoczi: qemu-iotests: add 194 non-shared storage migration test
-> - Stefan Hajnoczi: nbd-client: avoid spurious qio_channel_yield() re-entry
->
-> ----------------------------------------------------------------
-> Fam Zheng (3):
->       block-backend: Refactor inactivate check
->       block-backend: Allow more "can inactivate" cases
->       mirror: Mark target BB as "force allow inactivate"
->
-> Stefan Hajnoczi (3):
->       block: Update open_flags after ->inactivate() callback
->       qemu-iotests: add 194 non-shared storage migration test
->       nbd-client: avoid spurious qio_channel_yield() re-entry
+Looks good here, just retested:
 
-Applied, thanks.
+here's teh top of my git:
 
--- PMM
+f89f59fad5119f878aaedf711af90802ddcb99c7 nbd-client: avoid spurious qio_cha=
+nnel_yield() re-entry
+cf26039a2b50f078b4ad90b88eea5bb28971c0d8 block: Update open_flags after ->i=
+nactivate() callback
+8ccc527d84ec9a5052cfae19edbc44abb5ac03ae mirror: Mark target BB as "force a=
+llow inactivate"
+34c3f17c99a43f261560edbd3da1188dd0c398ab block-backend: Allow more "can ina=
+ctivate" cases
+952ad9fd9dd43e92016d5bfc0ff93bdeaec13bf9 block-backend: Refactor inactivate=
+ check
+1f296733876434118fd766cfef5eb6f29ecab6a8 Update version for v2.10.0-rc3 rel=
+ease
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1711602
+
+Title:
+  --copy-storage-all failing with qemu 2.10
+
+Status in QEMU:
+  New
+Status in libvirt package in Ubuntu:
+  Confirmed
+Status in qemu package in Ubuntu:
+  Confirmed
+
+Bug description:
+  We fixed an issue around disk locking already in regard to qemu-nbd
+  [1], but there still seem to be issues.
+
+  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
+://10.22.69.196/system
+  error: internal error: qemu unexpectedly closed the monitor: 2017-08-18T1=
+2:10:29.800397Z qemu-system-x86_64: -chardev pty,id=3Dcharserial0: char dev=
+ice redirected to /dev/pts/0 (label charserial0)
+  2017-08-18T12:10:48.545776Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+
+  Source libvirt log for the guest:
+  2017-08-18 12:09:08.251+0000: initiating migration
+  2017-08-18T12:09:08.809023Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+  2017-08-18T12:09:08.809481Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+
+  Target libvirt log for the guest:
+  2017-08-18T12:09:08.730911Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+  2017-08-18 12:09:09.010+0000: shutting down, reason=3Dcrashed
+
+  Given the timing it seems that the actual copy now works (it is busy ~10 =
+seconds on my environment which would be the copy).
+  Also we don't see the old errors we saw before, but afterwards on the act=
+ual take-over it fails.
+
+  Dmesg has no related denials as often apparmor is in the mix.
+
+  Need to check libvirt logs of source [2] and target [3] in Detail.
+
+  [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02200.html
+  [2]: http://paste.ubuntu.com/25339356/
+  [3]: http://paste.ubuntu.com/25339358/
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1711602/+subscriptions
