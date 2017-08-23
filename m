@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dkTkb-0007wk-EC
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 07:23:10 -0400
+	(envelope-from <armbru@redhat.com>) id 1dkTlk-0008Ve-8K
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 07:24:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dkTka-0004E0-Hl
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 07:23:09 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:34789)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dkTka-0004D2-Bd
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 07:23:08 -0400
-Received: by mail-wr0-x231.google.com with SMTP id p14so4625468wrg.1
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 04:23:06 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1dkTlj-0004gX-Bg
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 07:24:20 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
+	<20170822132255.23945-12-marcandre.lureau@redhat.com>
+Date: Wed, 23 Aug 2017 13:24:09 +0200
+In-Reply-To: <20170822132255.23945-12-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 22 Aug 2017
+	15:22:12 +0200")
+Message-ID: <87efs21q92.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170823003217.6769-1-david@gibson.dropbear.id.au>
-References: <20170823003217.6769-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 23 Aug 2017 12:22:45 +0100
-Message-ID: <CAFEAcA-9K5GdFYGavgVvnv62T_K8AvwbzQPTUFrAvenCShqzLQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/7] ppc-for-2.10 queue 20170823
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 11/54] quorum: use qapi_enum_parse() in
+ quorum_open
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +26,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, "open list:Quorum" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On 23 August 2017 at 01:32, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit 1f296733876434118fd766cfef5eb6f29ecab6a8:
->
->   Update version for v2.10.0-rc3 release (2017-08-15 18:53:31 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.10-20170823
->
-> for you to fetch changes up to 1f98e55385d11da1dc0de6440e66f19d191d2a1b:
->
->   hw/ppc/spapr_iommu: Fix crash when removing the "spapr-tce-table" device (2017-08-22 21:26:46 +1000)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2017-08-23
->
-> This is identical to the pull request from yesterday (20180822),
-> except that a bug in one patch is fixed so that it doesn't break TCG
-> on a ppc host.
->
-> Last minute ppc related fixes for qemu-2.10.  I'm not sure if these
-> are critical enough to prompt another rc, but I'm submitting them for
-> consideration.
->
-> First, is Cornelia's fix for 480bc11e6 which meant "make check" would
-> always fail on a ppc host.  Tracking that down delayed submission of
-> the rest of these patches, sorry.
->
-> The rest are all fairly important bugfixes for qemu crashes or guest
-> behaviour regression on ppc.  Patches 2-4 specifically are fixes for
-> regressions from qemu-2.9, caused by the compatibility mode and
-> hotplug handling cleanups for the pseries machine type.
->
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Applied, thanks.
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  block/quorum.c | 27 ++++++++-------------------
+>  1 file changed, 8 insertions(+), 19 deletions(-)
+>
+> diff --git a/block/quorum.c b/block/quorum.c
+> index d04da4f430..e4271caa7a 100644
+> --- a/block/quorum.c
+> +++ b/block/quorum.c
+> @@ -22,6 +22,7 @@
+>  #include "qapi/qmp/qjson.h"
+>  #include "qapi/qmp/qlist.h"
+>  #include "qapi/qmp/qstring.h"
+> +#include "qapi/util.h"
+>  #include "qapi-event.h"
+>  #include "crypto/hash.h"
+>=20=20
+> @@ -867,24 +868,6 @@ static QemuOptsList quorum_runtime_opts =3D {
+>      },
+>  };
+>=20=20
+> -static int parse_read_pattern(const char *opt)
+> -{
+> -    int i;
+> -
+> -    if (!opt) {
+> -        /* Set quorum as default */
+> -        return QUORUM_READ_PATTERN_QUORUM;
+> -    }
+> -
+> -    for (i =3D 0; i < QUORUM_READ_PATTERN__MAX; i++) {
+> -        if (!strcmp(opt, QuorumReadPattern_lookup[i])) {
+> -            return i;
+> -        }
+> -    }
+> -
+> -    return -EINVAL;
+> -}
+> -
+>  static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
+>                         Error **errp)
+>  {
+> @@ -925,7 +908,13 @@ static int quorum_open(BlockDriverState *bs, QDict *=
+options, int flags,
+>          goto exit;
+>      }
+>=20=20
+> -    ret =3D parse_read_pattern(qemu_opt_get(opts, QUORUM_OPT_READ_PATTER=
+N));
+> +    if (!qemu_opt_get(opts, QUORUM_OPT_READ_PATTERN)) {
+> +        ret =3D QUORUM_READ_PATTERN_QUORUM;
+> +    } else {
+> +        ret =3D qapi_enum_parse(QuorumReadPattern_lookup,
+> +                              qemu_opt_get(opts, QUORUM_OPT_READ_PATTERN=
+),
+> +                              QUORUM_READ_PATTERN__MAX, -EINVAL, NULL);
+> +    }
+>      if (ret < 0) {
+>          error_setg(&local_err, "Please set read-pattern as fifo or quoru=
+m");
+>          goto exit;
 
--- PMM
+qapi_enum_parse() copes with null input: it returns its fourth argument
+then.  I don't like that also returns it on error, but that shouldn't be
+a problem here.
+
+If we can live with qapi_enum_parse()'s sub-par error message, then this
+should do:
+
+       ret =3D qapi_enum_parse(QuorumReadPattern_lookup,
+                             qemu_opt_get(opts, QUORUM_OPT_READ_PATTERN),
+                             QUORUM_READ_PATTERN__MAX,
+                             QUORUM_READ_PATTERN_QUORUM, &local_err);
+       if (local_err) {
+           goto exit;
+       }
+
+If not, we'd have to replace @local_err:
+
+       if (local_err) {
+           error_free(local_err);
+           error_setg(&local_err, "Please set read-pattern as fifo or quoru=
+m");
+           goto exit;
+       }
+
+or amend it with error_append_hint() or error_prepend().
+
+Berto, what do you think?
