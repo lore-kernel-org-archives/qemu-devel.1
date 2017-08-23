@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dkXHx-0000zN-4r
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:09:50 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dkXI9-000183-JU
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:10:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dkXHs-0003Cv-Pi
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:09:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60956)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dkXHs-0003CT-KD
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:09:44 -0400
-Date: Wed, 23 Aug 2017 17:09:17 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170823170917.7bf55837.cohuck@redhat.com>
-In-Reply-To: <1503483383-199649-1-git-send-email-borntraeger@de.ibm.com>
-References: <1503483383-199649-1-git-send-email-borntraeger@de.ibm.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dkXI4-0003Jh-Jf
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:10:01 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20170815150907.21495-1-eblake@redhat.com>
+	<20170815150907.21495-8-eblake@redhat.com>
+	<aca0bbb8-0893-c02a-c3cb-b85fa431437b@virtuozzo.com>
+	<7e7d839d-7ae7-9b92-7830-d568eb8f1be2@virtuozzo.com>
+Message-ID: <a206b659-b7b7-912a-bbb3-e9b5edee8635@virtuozzo.com>
+Date: Wed, 23 Aug 2017 18:09:50 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] configure: enable --s390-pgste linker
- option
+In-Reply-To: <7e7d839d-7ae7-9b92-7830-d568eb8f1be2@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] nbd-client: Fix regression when server sends
+ garbage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +27,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Christian Ehrhardt <christian.ehrhardt@canonical.com>, Dan Horak <dhorak@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On Wed, 23 Aug 2017 12:16:23 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-
-> KVM guests on s390 need a different page table layout than normal
-> processes (2kb page table + 2kb page status extensions vs 2kb page table
-> only). As of today this has to be enabled via the vm.allocate_pgste
-> sysctl.
-> 
-> Newer kernels (>= 4.12) on s390 check for an S390_PGSTE program header
-> and enable the pgste page table extensions in that case. This makes the
-> vm.allocate_pgste sysctl unnecessary. We enable this program header for
-> the s390 system emulation (qemu-system-s390x) if we build on s390
-> - for s390 system emulation
-> - the linker supports --s390-pgste (binutils >= 2.29)
-> - KVM is enabled
-> 
-> This will allow distributions to disable the global vm.allocate_pgste
-> sysctl, which will improve the page table allocation for non KVM
-> processes as only 2kb chunks are necessary.
-> 
-> Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: Dan Horak <dhorak@redhat.com>
-> Cc: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
-> ---
-> V1->V2:
-> 	- provide ld_has function
-> 	- use ld_has to replace some open coded variants
-> 	- check target arch and arch for s390
-> 	- check for s390x before calling the linker
-> V2->V3: 
-> 	- fix typos
->  configure | 21 ++++++++++++++++++++-
->  1 file changed, 20 insertions(+), 1 deletion(-)
-
-Thanks, applied.
+cGluZw0KDQoyMS4wOC4yMDE3IDEzOjEzLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5
+IHdyb3RlOg0KPiAyMS4wOC4yMDE3IDEzOjExLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZz
+a2l5IHdyb3RlOg0KPj4gMTUuMDguMjAxNyAxODowOSwgRXJpYyBCbGFrZSB3cm90ZToNCj4+
+PiBXaGVuIHdlIHN3aXRjaGVkIE5CRCB0byB1c2UgY29yb3V0aW5lcyBmb3IgcWVtdSAyLjkg
+KGluIHBhcnRpY3VsYXIsDQo+Pj4gY29tbWl0IGExMmE3MTJhKSwgd2UgaW50cm9kdWNlZCBh
+IHJlZ3Jlc3Npb246IGlmIGEgc2VydmVyIHNlbmRzIHVzDQo+Pj4gZ2FyYmFnZSAoc3VjaCBh
+cyBhIGNvcnJ1cHRlZCBtYWdpYyBudW1iZXIpLCB3ZSBxdWl0IHRoZSByZWFkIGxvb3ANCj4+
+PiBidXQgZG8gbm90IHN0b3Agc2VuZGluZyBmdXJ0aGVyIHF1ZXVlZCBjb21tYW5kcywgcmVz
+dWx0aW5nIGluIHRoZQ0KPj4+IGNsaWVudCBoYW5naW5nIHdoZW4gaXQgbmV2ZXIgcmVhZHMg
+dGhlIHJlc3BvbnNlIHRvIHRob3NlIGFkZGl0aW9uYWwNCj4+PiBjb21tYW5kcy7CoCBJbiBx
+ZW11IDIuOCwgd2UgcHJvcGVybHkgZGV0ZWN0ZWQgdGhhdCB0aGUgc2VydmVyIGlzIG5vDQo+
+Pj4gbG9uZ2VyIHJlbGlhYmxlLCBhbmQgY2FuY2VsbGVkIGFsbCBleGlzdGluZyBwZW5kaW5n
+IGNvbW1hbmRzIHdpdGgNCj4+PiBFSU8sIHRoZW4gdG9yZSBkb3duIHRoZSBzb2NrZXQgc28g
+dGhhdCBhbGwgZnVydGhlciBjb21tYW5kIGF0dGVtcHRzDQo+Pj4gZ2V0IEVQSVBFLg0KPj4+
+DQo+Pj4gUmVzdG9yZSB0aGUgcHJvcGVyIGJlaGF2aW9yIG9mIHF1aXR0aW5nIChhbG1vc3Qp
+IGFsbCBjb21tdW5pY2F0aW9uDQo+Pj4gd2l0aCBhIGJyb2tlbiBzZXJ2ZXI6IE9uY2Ugd2Ug
+a25vdyB3ZSBhcmUgb3V0IG9mIHN5bmMgb3Igb3RoZXJ3aXNlDQo+Pj4gY2FuJ3QgdHJ1c3Qg
+dGhlIHNlcnZlciwgd2UgbXVzdCBhc3N1bWUgdGhhdCBhbnkgZnVydGhlciBpbmNvbWluZw0K
+Pj4+IGRhdGEgaXMgdW5yZWxpYWJsZSBhbmQgdGhlcmVmb3JlIGVuZCBhbGwgcGVuZGluZyBj
+b21tYW5kcyB3aXRoIEVJTywNCj4+PiBhbmQgcXVpdCB0cnlpbmcgdG8gc2VuZCBhbnkgZnVy
+dGhlciBjb21tYW5kcy7CoCBBcyBhbiBleGNlcHRpb24sIHdlDQo+Pj4gc3RpbGwgKHRyeSB0
+bykgc2VuZCBOQkRfQ01EX0RJU0MgdG8gbGV0IHRoZSBzZXJ2ZXIga25vdyB3ZSBhcmUgZ29p
+bmcNCj4+PiBhd2F5IChpbiBwYXJ0LCBiZWNhdXNlIGl0IGlzIGVhc2llciB0byBkbyB0aGF0
+IHRoYW4gdG8gZnVydGhlcg0KPj4+IHJlZmFjdG9yIG5iZF90ZWFyZG93bl9jb25uZWN0aW9u
+LCBhbmQgaW4gcGFydCBiZWNhdXNlIGl0IGlzIHRoZQ0KPj4+IG9ubHkgY29tbWFuZCB3aGVy
+ZSB3ZSBkbyBub3QgaGF2ZSB0byB3YWl0IGZvciBhIHJlcGx5KS4NCj4+Pg0KPj4+IEJhc2Vk
+IG9uIGEgcGF0Y2ggYnkgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeS4NCj4+Pg0KPj4+
+IEEgbWFsaWNpb3VzIHNlcnZlciBjYW4gYmUgY3JlYXRlZCB3aXRoIHRoZSBmb2xsb3dpbmcg
+aGFjaywNCj4+PiBmb2xsb3dlZCBieSBzZXR0aW5nIE5CRF9TRVJWRVJfREVCVUcgdG8gYSBu
+b24temVybyB2YWx1ZSBpbiB0aGUNCj4+PiBlbnZpcm9ubWVudCB3aGVuIHJ1bm5pbmcgcWVt
+dS1uYmQ6DQo+Pj4NCj4+PiB8IC0tLSBhL25iZC9zZXJ2ZXIuYw0KPj4+IHwgKysrIGIvbmJk
+L3NlcnZlci5jDQo+Pj4gfCBAQCAtOTE5LDYgKzkxOSwxNyBAQCBzdGF0aWMgaW50IG5iZF9z
+ZW5kX3JlcGx5KFFJT0NoYW5uZWwgKmlvYywgDQo+Pj4gTkJEUmVwbHkgKnJlcGx5LCBFcnJv
+ciAqKmVycnApDQo+Pj4gfMKgwqDCoMKgwqAgc3RsX2JlX3AoYnVmICsgNCwgcmVwbHktPmVy
+cm9yKTsNCj4+PiB8wqDCoMKgwqDCoCBzdHFfYmVfcChidWYgKyA4LCByZXBseS0+aGFuZGxl
+KTsNCj4+PiB8DQo+Pj4gfCArwqDCoMKgIHN0YXRpYyBpbnQgZGVidWc7DQo+Pj4gfCArwqDC
+oMKgIHN0YXRpYyBpbnQgY291bnQ7DQo+Pj4gfCArwqDCoMKgIGlmICghY291bnQrKykgew0K
+Pj4+IHwgK8KgwqDCoMKgwqDCoMKgIGNvbnN0IGNoYXIgKnN0ciA9IGdldGVudigiTkJEX1NF
+UlZFUl9ERUJVRyIpOw0KPj4+IHwgK8KgwqDCoMKgwqDCoMKgIGlmIChzdHIpIHsNCj4+PiB8
+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGRlYnVnID0gYXRvaShzdHIpOw0KPj4+IHwgK8Kg
+wqDCoMKgwqDCoMKgIH0NCj4+PiB8ICvCoMKgwqAgfQ0KPj4+IHwgK8KgwqDCoCBpZiAoZGVi
+dWcgJiYgIShjb3VudCAlIGRlYnVnKSkgew0KPj4+IHwgK8KgwqDCoMKgwqDCoMKgIGJ1Zlsw
+XSA9IDA7DQo+Pj4gfCArwqDCoMKgIH0NCj4+PiB8wqDCoMKgwqDCoCByZXR1cm4gbmJkX3dy
+aXRlKGlvYywgYnVmLCBzaXplb2YoYnVmKSwgZXJycCk7DQo+Pj4gfMKgIH0NCj4+Pg0KPj4+
+IFJlcG9ydGVkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292
+QHZpcnR1b3p6by5jb20+DQo+Pj4gU2lnbmVkLW9mZi1ieTogRXJpYyBCbGFrZSA8ZWJsYWtl
+QHJlZGhhdC5jb20+DQo+Pj4gTWVzc2FnZS1JZDogPDIwMTcwODE0MjEzNDI2LjI0NjgxLTEt
+ZWJsYWtlQHJlZGhhdC5jb20+DQo+Pj4gUmV2aWV3ZWQtYnk6IFN0ZWZhbiBIYWpub2N6aSA8
+c3RlZmFuaGFAcmVkaGF0LmNvbT4NCj4+PiAtLS0NCj4+PiDCoCBibG9jay9uYmQtY2xpZW50
+LmggfMKgIDEgKw0KPj4+IMKgIGJsb2NrL25iZC1jbGllbnQuYyB8IDE3ICsrKysrKysrKysr
+KystLS0tDQo+Pj4gwqAgMiBmaWxlcyBjaGFuZ2VkLCAxNCBpbnNlcnRpb25zKCspLCA0IGRl
+bGV0aW9ucygtKQ0KPj4+DQo+Pj4gZGlmZiAtLWdpdCBhL2Jsb2NrL25iZC1jbGllbnQuaCBi
+L2Jsb2NrL25iZC1jbGllbnQuaA0KPj4+IGluZGV4IGRmODA3NzEzNTcuLjE5MzVmZmJjYWEg
+MTAwNjQ0DQo+Pj4gLS0tIGEvYmxvY2svbmJkLWNsaWVudC5oDQo+Pj4gKysrIGIvYmxvY2sv
+bmJkLWNsaWVudC5oDQo+Pj4gQEAgLTI5LDYgKzI5LDcgQEAgdHlwZWRlZiBzdHJ1Y3QgTkJE
+Q2xpZW50U2Vzc2lvbiB7DQo+Pj4NCj4+PiDCoMKgwqDCoMKgIENvcm91dGluZSAqcmVjdl9j
+b3JvdXRpbmVbTUFYX05CRF9SRVFVRVNUU107DQo+Pj4gwqDCoMKgwqDCoCBOQkRSZXBseSBy
+ZXBseTsNCj4+PiArwqDCoMKgIGJvb2wgcXVpdDsNCj4+PiDCoCB9IE5CRENsaWVudFNlc3Np
+b247DQo+Pj4NCj4+PiDCoCBOQkRDbGllbnRTZXNzaW9uICpuYmRfZ2V0X2NsaWVudF9zZXNz
+aW9uKEJsb2NrRHJpdmVyU3RhdGUgKmJzKTsNCj4+PiBkaWZmIC0tZ2l0IGEvYmxvY2svbmJk
+LWNsaWVudC5jIGIvYmxvY2svbmJkLWNsaWVudC5jDQo+Pj4gaW5kZXggMjVkZDI4NDA2Yi4u
+NDIyZWNiNDMwNyAxMDA2NDQNCj4+PiAtLS0gYS9ibG9jay9uYmQtY2xpZW50LmMNCj4+PiAr
+KysgYi9ibG9jay9uYmQtY2xpZW50LmMNCj4+PiBAQCAtNzMsNyArNzMsNyBAQCBzdGF0aWMg
+Y29yb3V0aW5lX2ZuIHZvaWQgbmJkX3JlYWRfcmVwbHlfZW50cnkodm9pZCANCj4+PiAqb3Bh
+cXVlKQ0KPj4+IMKgwqDCoMKgwqAgaW50IHJldDsNCj4+PiDCoMKgwqDCoMKgIEVycm9yICps
+b2NhbF9lcnIgPSBOVUxMOw0KPj4+DQo+Pj4gLcKgwqDCoCBmb3IgKDs7KSB7DQo+Pj4gK8Kg
+wqDCoCB3aGlsZSAoIXMtPnF1aXQpIHsNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAgYXNzZXJ0
+KHMtPnJlcGx5LmhhbmRsZSA9PSAwKTsNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0ID0g
+bmJkX3JlY2VpdmVfcmVwbHkocy0+aW9jLCAmcy0+cmVwbHksICZsb2NhbF9lcnIpOw0KPj4+
+IMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAocmV0IDwgMCkgew0KPj4+IEBAIC0xMDcsNiArMTA3
+LDkgQEAgc3RhdGljIGNvcm91dGluZV9mbiB2b2lkIA0KPj4+IG5iZF9yZWFkX3JlcGx5X2Vu
+dHJ5KHZvaWQgKm9wYXF1ZSkNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAgcWVtdV9jb3JvdXRp
+bmVfeWllbGQoKTsNCj4+PiDCoMKgwqDCoMKgIH0NCj4+Pg0KPj4+ICvCoMKgwqAgaWYgKHJl
+dCA8IDApIHsNCj4+PiArwqDCoMKgwqDCoMKgwqAgcy0+cXVpdCA9IHRydWU7DQo+Pg0KPj4g
+YnV0IG9uIHdyb25nIGhhbmRsZSByZXQgaXMgMDoNCj4NCj4gcy8wL3Bvc2l0aXZlLw0KPg0K
+Pj4NCj4+IMKgwqDCoMKgwqDCoMKgIGlmIChyZXQgPD0gMCkgew0KPj4gYnJlYWs7DQo+PiB9
+DQo+Pg0KPj4gwqDCoMKgwqDCoMKgwqAgLyogVGhlcmUncyBubyBuZWVkIGZvciBhIG11dGV4
+IG9uIHRoZSByZWNlaXZlIHNpZGUsIGJlY2F1c2UgdGhlDQo+PiDCoMKgwqDCoMKgwqDCoMKg
+ICogaGFuZGxlciBhY3RzIGFzIGEgc3luY2hyb25pemF0aW9uIHBvaW50IGFuZCBlbnN1cmVz
+IHRoYXQgb25seQ0KPj4gwqDCoMKgwqDCoMKgwqDCoCAqIG9uZSBjb3JvdXRpbmUgaXMgY2Fs
+bGVkIHVudGlsIHRoZSByZXBseSBmaW5pc2hlcy4NCj4+ICovDQo+PiDCoMKgwqDCoMKgwqDC
+oCBpID0gSEFORExFX1RPX0lOREVYKHMsIHMtPnJlcGx5LmhhbmRsZSk7DQo+PiDCoMKgwqDC
+oMKgwqDCoCBpZiAoaSA+PSBNQVhfTkJEX1JFUVVFU1RTIHx8ICFzLT5yZWN2X2Nvcm91dGlu
+ZVtpXSkgew0KPj4gYnJlYWs7DQo+PiDCoMKgwqDCoMKgwqDCoCB9DQo+Pg0KPj4NCj4+IGxv
+b2tzIGxpa2Ugd2Ugc2hvdWxkIHNldCByZXQgaW4gdGhpcyBpZi1ibG9jaw0KPj4NCj4+PiAr
+wqDCoMKgIH0NCj4+PiDCoMKgwqDCoMKgIG5iZF9yZWN2X2Nvcm91dGluZXNfZW50ZXJfYWxs
+KHMpOw0KPj4+IMKgwqDCoMKgwqAgcy0+cmVhZF9yZXBseV9jbyA9IE5VTEw7DQo+Pj4gwqAg
+fQ0KPj4+IEBAIC0xMzUsNiArMTM4LDEwIEBAIHN0YXRpYyBpbnQgbmJkX2NvX3NlbmRfcmVx
+dWVzdChCbG9ja0RyaXZlclN0YXRlIA0KPj4+ICpicywNCj4+PiDCoMKgwqDCoMKgIGFzc2Vy
+dChpIDwgTUFYX05CRF9SRVFVRVNUUyk7DQo+Pj4gwqDCoMKgwqDCoCByZXF1ZXN0LT5oYW5k
+bGUgPSBJTkRFWF9UT19IQU5ETEUocywgaSk7DQo+Pj4NCj4+PiArwqDCoMKgIGlmIChzLT5x
+dWl0KSB7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIHFlbXVfY29fbXV0ZXhfdW5sb2NrKCZzLT5z
+ZW5kX211dGV4KTsNCj4+PiArwqDCoMKgwqDCoMKgwqAgcmV0dXJuIC1FSU87DQo+Pj4gK8Kg
+wqDCoCB9DQo+Pj4gwqDCoMKgwqDCoCBpZiAoIXMtPmlvYykgew0KPj4+IMKgwqDCoMKgwqDC
+oMKgwqDCoCBxZW11X2NvX211dGV4X3VubG9jaygmcy0+c2VuZF9tdXRleCk7DQo+Pj4gwqDC
+oMKgwqDCoMKgwqDCoMKgIHJldHVybiAtRVBJUEU7DQo+Pj4gQEAgLTE0Myw3ICsxNTAsNyBA
+QCBzdGF0aWMgaW50IG5iZF9jb19zZW5kX3JlcXVlc3QoQmxvY2tEcml2ZXJTdGF0ZSANCj4+
+PiAqYnMsDQo+Pj4gwqDCoMKgwqDCoCBpZiAocWlvdikgew0KPj4+IMKgwqDCoMKgwqDCoMKg
+wqDCoCBxaW9fY2hhbm5lbF9zZXRfY29yayhzLT5pb2MsIHRydWUpOw0KPj4+IMKgwqDCoMKg
+wqDCoMKgwqDCoCByYyA9IG5iZF9zZW5kX3JlcXVlc3Qocy0+aW9jLCByZXF1ZXN0KTsNCj4+
+PiAtwqDCoMKgwqDCoMKgwqAgaWYgKHJjID49IDApIHsNCj4+PiArwqDCoMKgwqDCoMKgwqAg
+aWYgKHJjID49IDAgJiYgIXMtPnF1aXQpIHsNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCByZXQgPSBuYmRfcnd2KHMtPmlvYywgcWlvdi0+aW92LCBxaW92LT5uaW92LCANCj4+
+PiByZXF1ZXN0LT5sZW4sIGZhbHNlLA0KPj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBOVUxMKTsNCj4+PiDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoCBpZiAocmV0ICE9IHJlcXVlc3QtPmxlbikgew0KPj4+IEBAIC0xNTQs
+NiArMTYxLDkgQEAgc3RhdGljIGludCBuYmRfY29fc2VuZF9yZXF1ZXN0KEJsb2NrRHJpdmVy
+U3RhdGUgDQo+Pj4gKmJzLA0KPj4+IMKgwqDCoMKgwqAgfSBlbHNlIHsNCj4+PiDCoMKgwqDC
+oMKgwqDCoMKgwqAgcmMgPSBuYmRfc2VuZF9yZXF1ZXN0KHMtPmlvYywgcmVxdWVzdCk7DQo+
+Pj4gwqDCoMKgwqDCoCB9DQo+Pj4gK8KgwqDCoCBpZiAocmMgPCAwKSB7DQo+Pj4gK8KgwqDC
+oMKgwqDCoMKgIHMtPnF1aXQgPSB0cnVlOw0KPj4+ICvCoMKgwqAgfQ0KPj4+IMKgwqDCoMKg
+wqAgcWVtdV9jb19tdXRleF91bmxvY2soJnMtPnNlbmRfbXV0ZXgpOw0KPj4+IMKgwqDCoMKg
+wqAgcmV0dXJuIHJjOw0KPj4+IMKgIH0NCj4+PiBAQCAtMTY4LDggKzE3OCw3IEBAIHN0YXRp
+YyB2b2lkIA0KPj4+IG5iZF9jb19yZWNlaXZlX3JlcGx5KE5CRENsaWVudFNlc3Npb24gKnMs
+DQo+Pj4gwqDCoMKgwqDCoCAvKiBXYWl0IHVudGlsIHdlJ3JlIHdva2VuIHVwIGJ5IG5iZF9y
+ZWFkX3JlcGx5X2VudHJ5LiAqLw0KPj4+IMKgwqDCoMKgwqAgcWVtdV9jb3JvdXRpbmVfeWll
+bGQoKTsNCj4+PiDCoMKgwqDCoMKgICpyZXBseSA9IHMtPnJlcGx5Ow0KPj4+IC3CoMKgwqAg
+aWYgKHJlcGx5LT5oYW5kbGUgIT0gcmVxdWVzdC0+aGFuZGxlIHx8DQo+Pj4gLcKgwqDCoMKg
+wqDCoMKgICFzLT5pb2MpIHsNCj4+PiArwqDCoMKgIGlmIChyZXBseS0+aGFuZGxlICE9IHJl
+cXVlc3QtPmhhbmRsZSB8fCAhcy0+aW9jIHx8IHMtPnF1aXQpIHsNCj4+PiDCoMKgwqDCoMKg
+wqDCoMKgwqAgcmVwbHktPmVycm9yID0gRUlPOw0KPj4+IMKgwqDCoMKgwqAgfSBlbHNlIHsN
+Cj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAgaWYgKHFpb3YgJiYgcmVwbHktPmVycm9yID09IDAp
+IHsNCj4+DQo+Pg0KPg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQoNCg==
