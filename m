@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dkSVI-0000S7-Nf
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 06:03:22 -0400
+	(envelope-from <armbru@redhat.com>) id 1dkSXe-0001PZ-ME
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 06:05:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dkSVH-0006Ja-Ob
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 06:03:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54496)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dkSVH-0006If-JY
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 06:03:15 -0400
-Date: Wed, 23 Aug 2017 12:03:05 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170823120305.722d2de6.cohuck@redhat.com>
-In-Reply-To: <f24dde77-5fd0-8827-7b93-d0e390f392da@linux.vnet.ibm.com>
-References: <20170821091614.28251-1-cohuck@redhat.com>
-	<20170821091614.28251-10-cohuck@redhat.com>
-	<feebff17-e4b8-2e00-9775-126055172564@linux.vnet.ibm.com>
-	<20170821141353.32a1242c.cohuck@redhat.com>
-	<aa499e7a-2692-d3b8-d3f5-c8bc1d5783d2@linux.vnet.ibm.com>
-	<91e5cbdf-9d91-fc7f-3fb5-3727d73b1419@redhat.com>
-	<f24dde77-5fd0-8827-7b93-d0e390f392da@linux.vnet.ibm.com>
+	(envelope-from <armbru@redhat.com>) id 1dkSXc-0007s7-RJ
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 06:05:42 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
+	<20170822132255.23945-11-marcandre.lureau@redhat.com>
+Date: Wed, 23 Aug 2017 12:05:27 +0200
+In-Reply-To: <20170822132255.23945-11-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 22 Aug 2017
+	15:22:11 +0200")
+Message-ID: <87fuci4n14.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 09/10] s390x/kvm: msi route fixup for
- non-pci
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 10/54] block: use qemu_enum_parse() in
+ blkdebug_debug_breakpoint
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,41 +26,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Thomas Huth <thuth@redhat.com>, zyimin@linux.vnet.ibm.com, david@redhat.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, qemu-devel@nongnu.org, borntraeger@de.ibm.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "open list:blkdebug" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On Mon, 21 Aug 2017 17:30:58 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-> On 08/21/2017 05:17 PM, Thomas Huth wrote:
-> > On 21.08.2017 17:10, Halil Pasic wrote:
-> > [...]  
-> >> The situation is just complicated by the fact that there is code which
-> >> relies on assert(true) asserting for correctness (e.g. virtio goes so far
-> >> to make builds with normal asserts disabled fail). Thus for me it's hard
-> >> to assume that the assertion is guaranteed to be disabled in production.  
-> > 
-> > FYI: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg03608.html
-> > 
-> >  Thomas
-> >   
-> 
-> Thanks, I've missed that. With that assumed it becomes either
-> assert(false) or return -ENODEV but not both.
-> 
-> Regards,
-> Halil 
-> 
+> This slightly change the error report message from "Invalid event
+> name" to "Invalid parameter".
 
-Thinking about this some more, this seems to be completely covered
-within the next statement:
+Actually from
 
-- For builds with pci completely disabled, we'll end up with NULL in
-  both s390_get_phb() and s390_pci_find_dev_by_idx() and return -ENODEV.
-- If only the zpci facility bit is not set, we'll hit the assert in
-  s390_get_phb().
+    qemu-system-x86_64: LOCATION: Invalid event name "VALUE"
 
-Without an error message, there does not really seem to be additional
-value (other than failing explicitly), so I'll drop this patch.
+to
 
-(Yeah, deja vu...)
+    qemu-system-x86_64: LOCATION: invalid parameter value: VALUE
+
+Let's get that exactly right in the commit message.
+
+Slight degradation, but the message is sub-par even before the patch.
+When complaining about a parameter value, both parameter name and value
+should be mentioned, as the value may well not be unique.  Not this
+patch's problem.
+
+Aside: LOCATION points to where the blkdebug driver is configured.  It
+should point to the error's actual location instead: the configuration
+file named with config=3D...  Also not this patch's problem.
+
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  block/blkdebug.c | 28 ++++++++--------------------
+>  1 file changed, 8 insertions(+), 20 deletions(-)
+>
+> diff --git a/block/blkdebug.c b/block/blkdebug.c
+> index c19ab28f07..50edda2a31 100644
+> --- a/block/blkdebug.c
+> +++ b/block/blkdebug.c
+> @@ -32,6 +32,7 @@
+>  #include "qapi/qmp/qbool.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qstring.h"
+> +#include "qapi/util.h"
+>  #include "sysemu/qtest.h"
+>=20=20
+>  typedef struct BDRVBlkdebugState {
+> @@ -149,20 +150,6 @@ static QemuOptsList *config_groups[] =3D {
+>      NULL
+>  };
+>=20=20
+> -static int get_event_by_name(const char *name, BlkdebugEvent *event)
+> -{
+> -    int i;
+> -
+> -    for (i =3D 0; i < BLKDBG__MAX; i++) {
+> -        if (!strcmp(BlkdebugEvent_lookup[i], name)) {
+> -            *event =3D i;
+> -            return 0;
+> -        }
+> -    }
+> -
+> -    return -1;
+> -}
+> -
+>  struct add_rule_data {
+>      BDRVBlkdebugState *s;
+>      int action;
+> @@ -173,7 +160,7 @@ static int add_rule(void *opaque, QemuOpts *opts, Err=
+or **errp)
+>      struct add_rule_data *d =3D opaque;
+>      BDRVBlkdebugState *s =3D d->s;
+>      const char* event_name;
+> -    BlkdebugEvent event;
+> +    int event;
+>      struct BlkdebugRule *rule;
+>      int64_t sector;
+>=20=20
+> @@ -182,8 +169,9 @@ static int add_rule(void *opaque, QemuOpts *opts, Err=
+or **errp)
+>      if (!event_name) {
+>          error_setg(errp, "Missing event name for rule");
+>          return -1;
+> -    } else if (get_event_by_name(event_name, &event) < 0) {
+> -        error_setg(errp, "Invalid event name \"%s\"", event_name);
+> +    }
+> +    event =3D qapi_enum_parse(BlkdebugEvent_lookup, event_name, BLKDBG__=
+MAX, -1, errp);
+
+Long line.
+
+> +    if (event < 0) {
+>          return -1;
+>      }
+>=20=20
+> @@ -743,13 +731,13 @@ static int blkdebug_debug_breakpoint(BlockDriverSta=
+te *bs, const char *event,
+>  {
+>      BDRVBlkdebugState *s =3D bs->opaque;
+>      struct BlkdebugRule *rule;
+> -    BlkdebugEvent blkdebug_event;
+> +    int blkdebug_event;
+>=20=20
+> -    if (get_event_by_name(event, &blkdebug_event) < 0) {
+> +    blkdebug_event =3D qapi_enum_parse(BlkdebugEvent_lookup, event, BLKD=
+BG__MAX, -1, NULL);
+
+Long line.
+
+> +    if (blkdebug_event < 0) {
+>          return -ENOENT;
+>      }
+>=20=20
+> -
+>      rule =3D g_malloc(sizeof(*rule));
+>      *rule =3D (struct BlkdebugRule) {
+>          .event  =3D blkdebug_event,
+
+With the nits touched up:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
