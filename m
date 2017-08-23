@@ -1,20 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dkZVm-0000Jo-V8
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:32:15 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dkZZB-0002Nq-Pp
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:35:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dkZVm-0007D5-3D
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:32:14 -0400
-References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <39bf15aa-70e0-45ad-e368-fb489ee30a7c@redhat.com>
-Date: Wed, 23 Aug 2017 19:31:56 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1dkZZ8-00038G-Cu
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:35:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60272)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dkZZ8-00035F-5M
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:35:42 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0896C85363
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 17:35:41 +0000 (UTC)
+Date: Wed, 23 Aug 2017 14:35:35 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170823173535.GS19998@localhost.localdomain>
+References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
+	<20170727154126.11339-17-marcandre.lureau@redhat.com>
+	<87d17ur7y1.fsf@dusky.pond.sub.org>
+	<87mv6yk1x3.fsf@dusky.pond.sub.org>
+	<1503500832.16071.32.camel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rq5RBUQlohqQWsJcD8hTwaOxPak3w7CqF"
-Subject: Re: [Qemu-devel] Persistent bitmaps for non-qcow2 formats
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <1503500832.16071.32.camel@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 16/26] qapi: add conditions to VNC
+ type/commands/events on the schema
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,89 +38,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Qemu-block <qemu-block@nongnu.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rq5RBUQlohqQWsJcD8hTwaOxPak3w7CqF
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, Qemu-block <qemu-block@nongnu.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Manos Pitsidianakis <el13635@mail.ntua.gr>, Fam Zheng <famz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <39bf15aa-70e0-45ad-e368-fb489ee30a7c@redhat.com>
-Subject: Re: Persistent bitmaps for non-qcow2 formats
-References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
-In-Reply-To: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2017-08-22 21:07, John Snow wrote:
-
-[...]
-
-> (3) Add either a new flag that turns qcow2's backing file into a full
-> R/W backing file, or add a new extension to qcow2 entirely (bypassing
-> the traditional backing file mechanism to avoid confusion for older
-> tooling) that adds a new read-write backing file field.
+On Wed, Aug 23, 2017 at 05:07:12PM +0200, Gerd Hoffmann wrote:
+> On Thu, 2017-08-17 at 10:56 +0200, Markus Armbruster wrote:
+> > Gerd, can we delete the vnc_init_func() stub?=A0=A0Things still compi=
+le
+> > for
+> > me when I do.
+> >=20
+> > diff --git a/include/ui/console.h b/include/ui/console.h
+> > index 7262bef..2c3b2cd 100644
+> > --- a/include/ui/console.h
+> > +++ b/include/ui/console.h
+> > @@ -484,11 +484,6 @@ static inline QemuOpts *vnc_parse(const char
+> > *str, Error **errp)
+> > =A0=A0=A0=A0=A0error_setg(errp, "VNC support is disabled");
+> > =A0=A0=A0=A0=A0return NULL;
+> > =A0}
+> > -static inline int vnc_init_func(void *opaque, QemuOpts *opts, Error
+> > **errp)
+> > -{
+> > -=A0=A0=A0=A0error_setg(errp, "VNC support is disabled");
+> > -=A0=A0=A0=A0return -1;
+> > -}
+> > =A0#endif
 >=20
-> This RW backing file field will be used for all reads AND writes; the
-> qcow2 in question becomes a metadata container on top of the BDS chain.=
+> Looking at a663fbd9e2f65fae81018d81f231ad79510cf9fb.  Guess we want fix
+> qemu_opts_foreach to not barf on NULL, then revert that commit, so
+> f8c75b2486 (adding Eduardo to Cc) works as intended.
 
-> We can re-use Vladimir's bitmap persistence extension to save bitmaps i=
-n
-> a qcow2 shell.
+I agree with that plan, but I wouldn't mind having the stub
+removed in the meantime.
+
 >=20
-> The qcow2 becomes effectively a metadata cache for a new (essentially)
-> filter node that handles features such as bitmaps. This could also be
-> used to provide allocation map data for RAW files and other goodies dow=
-n
-> the road.
->=20
-> Hopefully this achieves our desire to not create new formats AND our
-> desire to concentrate features (and debugging, testing, etc) into qcow2=
-,
-> while allowing users to "have bitmaps with raw files."
->=20
-> Of course, in this scenario, users now have two files: a qcow2 wrapper
-> and the actual raw file in question; but regardless of how we were goin=
-g
-> to solve this, a raw file necessitates an external file of some sort,
-> else we give up the idea that it was a raw file.
->=20
->=20
-> Sound good?
+> Beside that:  The inline for vnc_init_func looks pointless (it's used
+> via function pointer).  Also it can be empty as it will never be
+> actually called.  Which is fine, vnc_parse will throw an error if
+> someone tries to use vnc with a binary without vnc support.
 
-While I don't quite like the idea of R/W backing files, I guess "don't
-quite like" is still rather good.
+True.
 
-I like how this idea would allow us to use the existing code without
-putting just arbitrary binary data into the qcow2 file; the data still
-relates to the virtual disk represented by the qcow2 image.
-
-So design-wise, I don't think I have any complaints.
-
-As for Kevin, he's on PTO, though. ;-)
-
-Max
-
-
---rq5RBUQlohqQWsJcD8hTwaOxPak3w7CqF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlmdvA0SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AoVUH/j+k8/P1uOSP2O7VYOQztvdi6LcJfkaF
-8ikvJMHKhzucBl+Yr9E4vydwDP+Py5z7ZeDrRW0tj4nYGJM7302WS0jOyB/91jhZ
-ZQn+thrffXkTB+Q3ZA3SgC9zrXx08nHjdOKy5jkUpVlH0kkWtRiKdu189gdl/llM
-Zbi07MTpjOkxjqcb2embTNpb+OfDWTr9cR/LMq116mdKEekMJoaCQhJkXgDdmZks
-41SoLc0qdp6slVQBBbd6XYbgGi8r8MZknJfbgv4x/sa648SUU7wbyreZo4dslUoq
-Sl0Us++7oFomHQxZirHj62QezBYmtQ6h8ufdghypnxQ5LgIqJ8jt1k8=
-=Y2Fu
------END PGP SIGNATURE-----
-
---rq5RBUQlohqQWsJcD8hTwaOxPak3w7CqF--
+--=20
+Eduardo
