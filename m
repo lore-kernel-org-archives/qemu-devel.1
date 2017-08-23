@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dkYbf-00005R-MA
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:34:17 -0400
+	(envelope-from <eblake@redhat.com>) id 1dkYbh-00006r-32
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:34:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dkYbb-0005TC-4a
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:34:15 -0400
+	(envelope-from <eblake@redhat.com>) id 1dkYbf-0005Ut-SE
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:34:17 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 23 Aug 2017 11:33:48 -0500
-Message-Id: <20170823163349.11663-6-eblake@redhat.com>
+Date: Wed, 23 Aug 2017 11:33:49 -0500
+Message-Id: <20170823163349.11663-7-eblake@redhat.com>
 In-Reply-To: <20170823163349.11663-1-eblake@redhat.com>
 References: <20170823163349.11663-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 5/6] qemu-iotests: add 194 non-shared storage
- migration test
+Subject: [Qemu-devel] [PULL 6/6] nbd-client: avoid spurious
+ qio_channel_yield() re-entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,165 +21,172 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
 From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Non-shared storage migration with NBD and drive-mirror is currently not
-tested by qemu-iotests.  This test case covers the basic migration
-scenario.
+The following scenario leads to an assertion failure in
+qio_channel_yield():
 
+1. Request coroutine calls qio_channel_yield() successfully when sending
+   would block on the socket.  It is now yielded.
+2. nbd_read_reply_entry() calls nbd_recv_coroutines_enter_all() because
+   nbd_receive_reply() failed.
+3. Request coroutine is entered and returns from qio_channel_yield().
+   Note that the socket fd handler has not fired yet so
+   ioc->write_coroutine is still set.
+4. Request coroutine attempts to send the request body with nbd_rwv()
+   but the socket would still block.  qio_channel_yield() is called
+   again and assert(!ioc->write_coroutine) is hit.
+
+The problem is that nbd_read_reply_entry() does not distinguish between
+request coroutines that are waiting to receive a reply and those that
+are not.
+
+This patch adds a per-request bool receiving flag so
+nbd_read_reply_entry() can avoid spurious aio_wake() calls.
+
+Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Based-on: <20170823134242.12080-1-famz@redhat.com>
-Message-Id: <20170823140506.28723-1-stefanha@redhat.com>
+Message-Id: <20170822125113.5025-1-stefanha@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Tested-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/194        | 73 +++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/194.out    | 13 ++++++++
- tests/qemu-iotests/group      |  1 +
- tests/qemu-iotests/iotests.py | 13 ++++++++
- 4 files changed, 100 insertions(+)
- create mode 100755 tests/qemu-iotests/194
- create mode 100644 tests/qemu-iotests/194.out
+ block/nbd-client.h |  7 ++++++-
+ block/nbd-client.c | 35 ++++++++++++++++++++++-------------
+ 2 files changed, 28 insertions(+), 14 deletions(-)
 
-diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
-new file mode 100755
-index 0000000000..8028111e21
---- /dev/null
-+++ b/tests/qemu-iotests/194
-@@ -0,0 +1,73 @@
-+#!/usr/bin/env python
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+# Creator/Owner: Stefan Hajnoczi <stefanha@redhat.com>
-+#
-+# Non-shared storage migration test using NBD server and drive-mirror
-+
-+import os
-+import atexit
-+import iotests
-+
-+iotests.verify_platform(['linux'])
-+
-+img_size = '1G'
-+source_img_path = os.path.join(iotests.test_dir, 'source.img')
-+dest_img_path = os.path.join(iotests.test_dir, 'dest.img')
-+iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, source_img_path, img_size)
-+iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, dest_img_path, img_size)
-+
-+iotests.log('Launching VMs...')
-+migration_sock_path = os.path.join(iotests.test_dir, 'migration.sock')
-+nbd_sock_path = os.path.join(iotests.test_dir, 'nbd.sock')
-+source_vm = iotests.VM('source').add_drive(source_img_path)
-+dest_vm = (iotests.VM('dest').add_drive(dest_img_path)
-+                             .add_incoming('unix:{0}'.format(migration_sock_path)))
-+source_vm.launch()
-+atexit.register(source_vm.shutdown)
-+dest_vm.launch()
-+atexit.register(dest_vm.shutdown)
-+
-+iotests.log('Launching NBD server on destination...')
-+iotests.log(dest_vm.qmp('nbd-server-start', addr={'type': 'unix', 'data': {'path': nbd_sock_path}}))
-+iotests.log(dest_vm.qmp('nbd-server-add', device='drive0', writable=True))
-+
-+iotests.log('Starting drive-mirror on source...')
-+iotests.log(source_vm.qmp(
-+              'drive-mirror',
-+              device='drive0',
-+              target='nbd+unix:///drive0?socket={0}'.format(nbd_sock_path),
-+              sync='full',
-+              format='raw', # always raw, the server handles the format
-+              mode='existing'))
-+
-+iotests.log('Waiting for drive-mirror to complete...')
-+iotests.log(source_vm.event_wait('BLOCK_JOB_READY'),
-+            filters=[iotests.filter_qmp_event])
-+
-+iotests.log('Starting migration...')
-+source_vm.qmp('migrate-set-capabilities',
-+              capabilities=[{'capability': 'events', 'state': True}])
-+dest_vm.qmp('migrate-set-capabilities',
-+            capabilities=[{'capability': 'events', 'state': True}])
-+iotests.log(source_vm.qmp('migrate', uri='unix:{0}'.format(migration_sock_path)))
-+
-+while True:
-+    event = source_vm.event_wait('MIGRATION')
-+    iotests.log(event, filters=[iotests.filter_qmp_event])
-+    if event['data']['status'] in ('completed', 'failed'):
-+        break
-diff --git a/tests/qemu-iotests/194.out b/tests/qemu-iotests/194.out
-new file mode 100644
-index 0000000000..ae501fecac
---- /dev/null
-+++ b/tests/qemu-iotests/194.out
-@@ -0,0 +1,13 @@
-+Launching VMs...
-+Launching NBD server on destination...
-+{u'return': {}}
-+{u'return': {}}
-+Starting drive-mirror on source...
-+{u'return': {}}
-+Waiting for drive-mirror to complete...
-+{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'drive0', u'type': u'mirror', u'speed': 0, u'len': 1073741824, u'offset': 1073741824}, u'event': u'BLOCK_JOB_READY'}
-+Starting migration...
-+{u'return': {}}
-+{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'setup'}, u'event': u'MIGRATION'}
-+{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'active'}, u'event': u'MIGRATION'}
-+{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'completed'}, u'event': u'MIGRATION'}
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index afbdc427ea..4bd5017008 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -187,3 +187,4 @@
- 189 rw auto
- 190 rw auto quick
- 192 rw auto quick
-+194 rw auto migration quick
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 22439c43d3..7233983f3c 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -133,6 +133,14 @@ chown_re = re.compile(r"chown [0-9]+:[0-9]+")
- def filter_chown(msg):
-     return chown_re.sub("chown UID:GID", msg)
+diff --git a/block/nbd-client.h b/block/nbd-client.h
+index 1935ffbcaa..b435754b82 100644
+--- a/block/nbd-client.h
++++ b/block/nbd-client.h
+@@ -17,6 +17,11 @@
 
-+def filter_qmp_event(event):
-+    '''Filter a QMP event dict'''
-+    event = dict(event)
-+    if 'timestamp' in event:
-+        event['timestamp']['seconds'] = 'SECS'
-+        event['timestamp']['microseconds'] = 'USECS'
-+    return event
-+
- def log(msg, filters=[]):
-     for flt in filters:
-         msg = flt(msg)
-@@ -200,6 +208,11 @@ class VM(qtest.QEMUQtestMachine):
-             self._args.append(','.join(opts))
-         return self
+ #define MAX_NBD_REQUESTS    16
 
-+    def add_incoming(self, addr):
-+        self._args.append('-incoming')
-+        self._args.append(addr)
-+        return self
++typedef struct {
++    Coroutine *coroutine;
++    bool receiving;         /* waiting for read_reply_co? */
++} NBDClientRequest;
 +
-     def pause_drive(self, drive, event=None):
-         '''Pause drive r/w operations'''
-         if not event:
+ typedef struct NBDClientSession {
+     QIOChannelSocket *sioc; /* The master data channel */
+     QIOChannel *ioc; /* The current I/O channel which may differ (eg TLS) */
+@@ -27,7 +32,7 @@ typedef struct NBDClientSession {
+     Coroutine *read_reply_co;
+     int in_flight;
+
+-    Coroutine *recv_coroutine[MAX_NBD_REQUESTS];
++    NBDClientRequest requests[MAX_NBD_REQUESTS];
+     NBDReply reply;
+     bool quit;
+ } NBDClientSession;
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 02c8e207ef..25bcaa2346 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -39,8 +39,10 @@ static void nbd_recv_coroutines_enter_all(NBDClientSession *s)
+     int i;
+
+     for (i = 0; i < MAX_NBD_REQUESTS; i++) {
+-        if (s->recv_coroutine[i]) {
+-            aio_co_wake(s->recv_coroutine[i]);
++        NBDClientRequest *req = &s->requests[i];
++
++        if (req->coroutine && req->receiving) {
++            aio_co_wake(req->coroutine);
+         }
+     }
+ }
+@@ -88,28 +90,28 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+          * one coroutine is called until the reply finishes.
+          */
+         i = HANDLE_TO_INDEX(s, s->reply.handle);
+-        if (i >= MAX_NBD_REQUESTS || !s->recv_coroutine[i]) {
++        if (i >= MAX_NBD_REQUESTS ||
++            !s->requests[i].coroutine ||
++            !s->requests[i].receiving) {
+             break;
+         }
+
+-        /* We're woken up by the recv_coroutine itself.  Note that there
++        /* We're woken up again by the request itself.  Note that there
+          * is no race between yielding and reentering read_reply_co.  This
+          * is because:
+          *
+-         * - if recv_coroutine[i] runs on the same AioContext, it is only
++         * - if the request runs on the same AioContext, it is only
+          *   entered after we yield
+          *
+-         * - if recv_coroutine[i] runs on a different AioContext, reentering
++         * - if the request runs on a different AioContext, reentering
+          *   read_reply_co happens through a bottom half, which can only
+          *   run after we yield.
+          */
+-        aio_co_wake(s->recv_coroutine[i]);
++        aio_co_wake(s->requests[i].coroutine);
+         qemu_coroutine_yield();
+     }
+
+-    if (ret < 0) {
+-        s->quit = true;
+-    }
++    s->quit = true;
+     nbd_recv_coroutines_enter_all(s);
+     s->read_reply_co = NULL;
+ }
+@@ -128,14 +130,17 @@ static int nbd_co_send_request(BlockDriverState *bs,
+     s->in_flight++;
+
+     for (i = 0; i < MAX_NBD_REQUESTS; i++) {
+-        if (s->recv_coroutine[i] == NULL) {
+-            s->recv_coroutine[i] = qemu_coroutine_self();
++        if (s->requests[i].coroutine == NULL) {
+             break;
+         }
+     }
+
+     g_assert(qemu_in_coroutine());
+     assert(i < MAX_NBD_REQUESTS);
++
++    s->requests[i].coroutine = qemu_coroutine_self();
++    s->requests[i].receiving = false;
++
+     request->handle = INDEX_TO_HANDLE(s, i);
+
+     if (s->quit) {
+@@ -173,10 +178,13 @@ static void nbd_co_receive_reply(NBDClientSession *s,
+                                  NBDReply *reply,
+                                  QEMUIOVector *qiov)
+ {
++    int i = HANDLE_TO_INDEX(s, request->handle);
+     int ret;
+
+     /* Wait until we're woken up by nbd_read_reply_entry.  */
++    s->requests[i].receiving = true;
+     qemu_coroutine_yield();
++    s->requests[i].receiving = false;
+     *reply = s->reply;
+     if (reply->handle != request->handle || !s->ioc || s->quit) {
+         reply->error = EIO;
+@@ -186,6 +194,7 @@ static void nbd_co_receive_reply(NBDClientSession *s,
+                           NULL);
+             if (ret != request->len) {
+                 reply->error = EIO;
++                s->quit = true;
+             }
+         }
+
+@@ -200,7 +209,7 @@ static void nbd_coroutine_end(BlockDriverState *bs,
+     NBDClientSession *s = nbd_get_client_session(bs);
+     int i = HANDLE_TO_INDEX(s, request->handle);
+
+-    s->recv_coroutine[i] = NULL;
++    s->requests[i].coroutine = NULL;
+
+     /* Kick the read_reply_co to get the next reply.  */
+     if (s->read_reply_co) {
 -- 
 2.13.5
