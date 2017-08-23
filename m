@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dkPXu-0003iP-Bc
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 02:53:47 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dkPYL-00042V-V2
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 02:54:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dkPXq-0008UD-C2
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 02:53:46 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35634)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dkPXq-0008Tv-2s
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 02:53:42 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7N6qhxi114396
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 02:53:40 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ch43ptmdw-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 02:53:40 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Wed, 23 Aug 2017 07:53:37 +0100
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Wed, 23 Aug 2017 08:53:32 +0200
-Message-Id: <1503471212-109371-1-git-send-email-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH v2] configure: enable --s390-pgste linker option
+	(envelope-from <pbonzini@redhat.com>) id 1dkPYK-0000Aa-W6
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 02:54:14 -0400
+References: <20170822131832.20191-1-pbonzini@redhat.com>
+	<20170822131832.20191-8-pbonzini@redhat.com>
+	<20170823050830.GD21343@lemon>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c5243a97-2066-c556-8885-1afab349d76c@redhat.com>
+Date: Wed, 23 Aug 2017 08:54:01 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170823050830.GD21343@lemon>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 07/10] io: add qio_channel_read/write_all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,87 +25,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Christian Ehrhardt <christian.ehrhardt@canonical.com>, Dan Horak <dhorak@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>
 
-KVM guests on s390 need a different page table layout than normal
-processes (2kb page table + 2kb page status extensions vs 2kb page table
-only). As of today this has to be enabled via the vm.allocate_pgste
-sysctl.
+On 23/08/2017 07:08, Fam Zheng wrote:
+> On Tue, 08/22 15:18, Paolo Bonzini wrote:
+>> It is pretty common to read a fixed-size buffer from a socket.  Add a
+>> function that does this, either with multiple reads (on blocking sockets)
+>> or by yielding if called from a coroutine.
+>>
+>> Cc: Daniel P. Berrange <berrange@redhat.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  include/io/channel.h | 36 ++++++++++++++++++++++++++++++++++-
+>>  io/channel.c         | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 89 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/io/channel.h b/include/io/channel.h
+>> index db9bb022a1..9cfb4d081f 100644
+>> --- a/include/io/channel.h
+>> +++ b/include/io/channel.h
+>> @@ -299,7 +299,7 @@ ssize_t qio_channel_writev(QIOChannel *ioc,
+>>                             Error **errp);
+>>  
+>>  /**
+>> - * qio_channel_readv:
+>> + * qio_channel_read:
+>>   * @ioc: the channel object
+>>   * @buf: the memory region to read data into
+>>   * @buflen: the length of @buf
+>> @@ -315,6 +315,23 @@ ssize_t qio_channel_read(QIOChannel *ioc,
+>>                           Error **errp);
+>>  
+>>  /**
+>> + * qio_channel_read_all:
+>> + * @ioc: the channel object
+>> + * @buf: the memory region to read data into
+>> + * @buflen: the number of bytes to @buf
+>> + * @errp: pointer to a NULL-initialized error object
+>> + *
+>> + * Reads @buflen bytes into @buf, possibly blocking or (if the
+>> + * channel is non-blocking) yielding from the current coroutine
+>> + * multiple times until the entire content is read.  Otherwise
+>> + * behaves as qio_channel_read().
+>> + */
+>> +ssize_t coroutine_fn qio_channel_read_all(QIOChannel *ioc,
+>> +                                          char *buf,
+>> +                                          size_t buflen,
+>> +                                          Error **errp);
+>> +
+>> +/**
+>>   * qio_channel_write:
+>>   * @ioc: the channel object
+>>   * @buf: the memory regions to send data from
+>> @@ -331,6 +348,23 @@ ssize_t qio_channel_write(QIOChannel *ioc,
+>>                            Error **errp);
+>>  
+>>  /**
+>> + * qio_channel_write_all:
+>> + * @ioc: the channel object
+>> + * @buf: the memory region to write data into
+>> + * @buflen: the number of bytes to @buf
+>> + * @errp: pointer to a NULL-initialized error object
+>> + *
+>> + * Writes @buflen bytes from @buf, possibly blocking or (if the
+>> + * channel is non-blocking) yielding from the current coroutine
+>> + * multiple times until the entire content is written.  Otherwise
+>> + * behaves as qio_channel_write().
+>> + */
+>> +ssize_t coroutine_fn qio_channel_write_all(QIOChannel *ioc,
+>> +                                           const char *buf,
+>> +                                           size_t buflen,
+>> +                                           Error **errp);
+>> +
+>> +/**
+>>   * qio_channel_set_blocking:
+>>   * @ioc: the channel object
+>>   * @enabled: the blocking flag state
+>> diff --git a/io/channel.c b/io/channel.c
+>> index 1cfb8b33a2..7ab3f4eede 100644
+>> --- a/io/channel.c
+>> +++ b/io/channel.c
+>> @@ -113,6 +113,60 @@ ssize_t qio_channel_read(QIOChannel *ioc,
+>>  }
+>>  
+>>  
+>> +ssize_t qio_channel_read_all(QIOChannel *ioc,
+>> +                             char *buf,
+>> +                             size_t buflen,
+>> +                             Error **errp)
+>> +{
+>> +    ssize_t total = 0;
+>> +    while (buflen > 0) {
+>> +        ssize_t n_read = qio_channel_read(ioc, buf, buflen, errp);
+>> +
+>> +        if (n_read == QIO_CHANNEL_ERR_BLOCK) {
+>> +            assert(ioc->ctx);
+>> +            qio_channel_yield(ioc, G_IO_IN);
+>> +            continue;
+>> +        }
+>> +        if (n_read < 0) {
+>> +            return n_read;
+>> +        }
+>> +
+>> +        buf += n_read;
+>> +        total += n_read;
+>> +        buflen -= n_read;
+>> +    }
+>> +
+>> +    return total;
+>> +}
+>> +
+>> +
+>> +ssize_t qio_channel_write_all(QIOChannel *ioc,
+>> +                              const char *buf,
+>> +                              size_t buflen,
+>> +                              Error **errp)
+>> +{
+>> +    ssize_t total = 0;
+>> +    while (buflen > 0) {
+>> +        ssize_t n_written = qio_channel_write(ioc, buf, buflen, errp);
+>> +
+>> +        if (n_written == QIO_CHANNEL_ERR_BLOCK) {
+>> +            assert(ioc->ctx);
+>> +            qio_channel_yield(ioc, G_IO_OUT);
+>> +            continue;
+>> +        }
+>> +        if (n_written < 0) {
+>> +            return n_written;
+>> +        }
+>> +
+>> +        buf += n_written;
+>> +        total += n_written;
+>> +        buflen -= n_written;
+>> +    }
+>> +
+>> +    return total;
+>> +}
+>> +
+>> +
+>>  ssize_t qio_channel_write(QIOChannel *ioc,
+>>                            const char *buf,
+>>                            size_t buflen,
+>> -- 
+>> 2.13.5
+> 
+> Are there any caller depending on short read/write? Is it okay to change all (or
+> most) qio_channel_{read,write}* functions to this "full read/write" behavior?
 
-Newer kernels (>= 4.12) on s390 check for an S390_PGSTE program header
-and enable the pgste page table extensions in that case. This makes the
-vm.allocate_pgste sysctl unnecessary. We enable this program header for
-the s390 system emulation (qemu-system-s390x) if we build on s390
-- for s390 system emulation
-- the linker supports --s390-pgste (binutils >= 2.29)
-- KVM is enabled
+No, it looks like I'm the first. :)  NBD also implements something
+similar to this patch, but it uses qio_channel_{read,write}v.
 
-This will allow distributions to disable the global vm.allocate_pgste
-sysctl, which will improve the page table allocation for non KVM
-processes as only 2kb chunks are necessary.
-
-Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-Cc: Alexander Graf <agraf@suse.de>
-Cc: Dan Horak <dhorak@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
----
-V1->V2:
-	- provide ld_has function
-	- use ld_has to replace some open coded variants
-	- check target arch and arch for s390
-	- check for s390x before calling the linker
-
- configure | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
-
-diff --git a/configure b/configure
-index dd73cce..0b68b37 100755
---- a/configure
-+++ b/configure
-@@ -240,6 +240,11 @@ supported_target() {
-     return 1
- }
- 
-+
-+ld_has() {
-+    $ld --help 2>/dev/null | grep ".$1" >/dev/null 2>&1
-+}
-+
- # default parameters
- source_path=$(dirname "$0")
- cpu=""
-@@ -5043,7 +5048,7 @@ fi
- # Use ASLR, no-SEH and DEP if available
- if test "$mingw32" = "yes" ; then
-     for flag in --dynamicbase --no-seh --nxcompat; do
--        if $ld --help 2>/dev/null | grep ".$flag" >/dev/null 2>/dev/null ; then
-+        if ld_had $flag ; then
-             LDFLAGS="-Wl,$flag $LDFLAGS"
-         fi
-     done
-@@ -6522,6 +6527,20 @@ if test "$target_linux_user" = "yes" -o "$target_bsd_user" = "yes" ; then
-   ldflags="$ldflags $textseg_ldflags"
- fi
- 
-+# Newer kernels on s390 check for an S390_PGSTE program header and
-+# enable the pgste page table extensions in that case. This makes
-+# the vm.allocate_pgste sysctl unnecessary. We enable this program
-+# header if
-+#  - we build on s390x
-+#  - we build the system emulation for s390x (qemu-system-s390x)
-+#  - KVM is enabled
-+#  - the linker support --s390-pgste
-+if test "$TARGET_ARCH" = "s390x" -a "$target_softmmu" = "yes"  -a "$ARCH" = "s390x" -a "$kvm" = "yes"; then
-+    if ld_has --s390-pgste ; then
-+        ldflags="-Wl,--s390-pgste $ldflags"
-+    fi
-+fi
-+
- echo "LDFLAGS+=$ldflags" >> $config_target_mak
- echo "QEMU_CFLAGS+=$cflags" >> $config_target_mak
- 
--- 
-2.7.4
+Paolo
