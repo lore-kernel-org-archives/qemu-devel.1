@@ -1,26 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dkdzc-0000O6-7Q
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 18:19:21 -0400
+	(envelope-from <bauerman@linux.vnet.ibm.com>) id 1dkerM-0006hG-J2
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 19:14:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dkdzb-00063i-7H
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 18:19:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60960)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dkdza-000637-TX
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 18:19:19 -0400
-Date: Wed, 23 Aug 2017 19:19:14 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170823221914.GA15315@localhost.localdomain>
-References: <1503506783.3438.19.camel@redhat.com>
-	<ddb6f49e-6617-a659-08bf-cf093f658a8c@redhat.com>
+	(envelope-from <bauerman@linux.vnet.ibm.com>) id 1dkerI-0007Rb-Fa
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 19:14:52 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54181)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bauerman@linux.vnet.ibm.com>)
+	id 1dkerI-0007QX-6e
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 19:14:48 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7NNDu1v116137
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 19:14:46 -0400
+Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2chgynxtk0-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 19:14:46 -0400
+Received: from localhost
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bauerman@linux.vnet.ibm.com>;
+	Wed, 23 Aug 2017 17:14:45 -0600
+References: <20170821200036.15036-1-bauerman@linux.vnet.ibm.com>
+	<20170822020258.GX12356@umbus.fritz.box>
+From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+In-reply-to: <20170822020258.GX12356@umbus.fritz.box>
+Date: Wed, 23 Aug 2017 20:14:32 -0300
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ddb6f49e-6617-a659-08bf-cf093f658a8c@redhat.com>
+Message-Id: <87y3q9q3l3.fsf@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Number of usable slots in PCIe Root Port / PCIe
- Switch Downstream Port
+Subject: Re: [Qemu-devel] [PATCH] spapr: Add ibm,
+ processor-storage-keys property to CPU DT node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,88 +42,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Andrea Bolognani <abologna@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <mapfelba@redhat.com>, laine@laine.org, Lukas Doktor <ldoktor@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Ram Pai <linuxram@us.ibm.com>, Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>
 
-On Wed, Aug 23, 2017 at 11:16:27PM +0300, Marcel Apfelbaum wrote:
-> On 23/08/2017 19:46, Andrea Bolognani wrote:
-> > AFAIK some PCI controllers, particularly:
-> >=20
-> >    * PCIe Root Port (pcie-root-port, ioh3420)
-> >    * PCIe Switch Downstream Port (xio3130-downstream)
-> >=20
-> > only have a single usable slot. libvirt knows about this
-> > fact, and will prevent you from adding more than one
-> > device to the respective bus.
-> >=20
-> > However, as Luk=C3=A1=C5=A1 recently noticed, QEMU won't complain
-> > if you add more devices:
-> >=20
-> >    $ qemu-system-x86_64 \
-> >      -nodefaults -nographic \
-> >      -M q35 -monitor stdio \
-> >      -device pcie-root-port,id=3Dpci.1 \
-> >      -device virtio-scsi-pci,bus=3Dpci.1 \
-> >      -device virtio-scsi-pci,bus=3Dpci.1
-> >    QEMU 2.9.0 monitor - type 'help' for more information
-> >    (qemu) info qtree
-> >    bus: main-system-bus
-> >      type System
-> >      [...]
-> >      dev: q35-pcihost, id ""
-> >        [...]
-> >        bus: pcie.0
-> >          type PCIE
-> >          dev: pcie-root-port, id "pci.1"
-> >            [...]
-> >            bus: pci.1
-> >              type PCIE
-> >              dev: virtio-scsi-pci, id ""
-> >                [...]
-> >                addr =3D 01.0
-> >                bus: virtio-bus
-> >                  type virtio-pci-bus
-> >                  dev: virtio-scsi-device, id ""
-> >                    [...]
-> >                    bus: scsi.1
-> >                      type SCSI
-> >              dev: virtio-scsi-pci, id ""
-> >                [...]
-> >                addr =3D 00.0
-> >                bus: virtio-bus
-> >                  type virtio-pci-bus
-> >                  dev: virtio-scsi-device, id ""
-> >                    [...]
-> >                    bus: scsi.0
-> >                      type SCSI
-> >    (qemu)
-> >=20
->=20
-> Hi Andrea,
->=20
-> > As you can see, all devices will show up in the qtree;
-> > only the one with addr=3D00.0, however, will actually be
-> > visible to the guest OS according to my tests.
-> >=20
-> > Is such a configuration considered valid?
->=20
-> Definitely no.
->=20
-> > Should QEMU
-> > complain loudly about it and refuse to start?
->=20
-> Yes, but we need a clean way to do it. Eduardo is working
-> on a series that would expose to libvirt this info,
-> Eduardo can you please confirm?
 
-The work has two parts: 1) actually preventing invalid
-configurations; 2) providing a query interface to let libvirt
-know which configurations are valid.
+Hello David,
 
-My focus is on (2) (adding a query-device-slots interface), but
-we surely need to address bugs related to (1) first, so both the
-device-plugging code and slot-querying code are correct and agree
-with each other.
+Thank you for your input.
+
+David Gibson <david@gibson.dropbear.id.au> writes:
+
+> On Mon, Aug 21, 2017 at 05:00:36PM -0300, Thiago Jung Bauermann wrote:
+>> LoPAPR says:
+>>=20
+>>     =E2=80=9Cibm,processor-storage-keys=E2=80=9D
+>>=20
+>>     property name indicating the number of virtual storage keys suppor=
+ted
+>>     by the processor described by this node.
+>>=20
+>>     prop-encoded-array: Consists of two cells encoded as with encode-i=
+nt.
+>>     The first cell represents the number of virtual storage keys suppo=
+rted
+>>     for data accesses while the second cell represents the number of
+>>     virtual storage keys supported for instruction accesses. The cell =
+value
+>>     of zero indicates that no storage keys are supported for the acces=
+s
+>>     type.
+>>=20
+>> pHyp provides the property above but there's a bug in P8 firmware wher=
+e the
+>> second cell is zero even though POWER8 supports instruction access key=
+s.
+>> This bug will be fixed for P9.
+>>=20
+>> Tested with KVM on POWER8 Firenze machine and with TCG on x86_64 machi=
+ne.
+>>=20
+>> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+>
+> Regardless of anything else, this clearly won't go in until 2.11 opens.
+
+Ok, not a problem.
+
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -605,6 +605,80 @@ static void spapr_populate_cpu_dt(CPUState *cs, v=
+oid *fdt, int offset,
+>>                            pcc->radix_page_info->count *
+>>                            sizeof(radix_AP_encodings[0]))));
+>>      }
+>> +
+>> +    if (spapr->storage_keys) {
+>> +        uint32_t val[2];
+>> +
+>> +        val[0] =3D cpu_to_be32(spapr->storage_keys);
+>> +        val[1] =3D spapr->insn_keys ? val[0] : 0;
+>> +
+>> +        _FDT(fdt_setprop(fdt, offset, "ibm,processor-storage-keys",
+>> +                         val, sizeof(val)));
+>> +    }
+>> +}
+>> +
+>> +#define SYSFS_PROT_KEYS_PATH "/sys/kernel/mm/protection_keys/"
+>> +#define SYSFS_USABLE_STORAGE_KEYS SYSFS_PROT_KEYS_PATH "usable_keys"
+>> +#define SYSFS_DISABLE_EXEC_KEYS SYSFS_PROT_KEYS_PATH "disable_execute=
+_supported"
+>> +
+>> +static void setup_storage_keys(CPUPPCState *env, sPAPRMachineState *s=
+papr)
+>> +{
+>> +    if (!(env->mmu_model & POWERPC_MMU_AMR))
+>> +        return;
+>> +
+>> +    if (kvm_enabled()) {
+>> +        char buf[sizeof("false\n")];
+>> +        uint32_t keys;
+>> +        FILE *fd;
+>
+> For starters, reasonably complex kvm-only code like this should go
+> into target/ppc/kvm.c.
+
+Ok, will move the code there.
+
+> But, there's a more fundamental problem.  Automatically adjusting
+> guest visible parameters based on the host's capabilities is really
+> problematic: if you migrate to a host with different capabilities
+> what's usable suddenly changes, but the guest can't know.
+>
+> The usual way to deal with this is instead to have explicit machine
+> parameters to control the value, and check if those are possible on
+> the host.  It's then up to the user and/or management layer to set the
+> parameters suitable to allow migration between all machines that they
+> care about.
+
+Good point, I hadn't thought of it. I will add the machine parameter
+then and send a v2. Can the default value of the parameter be what is
+supported by the host?=20
 
 --=20
-Eduardo
+Thiago Jung Bauermann
+IBM Linux Technology Center
