@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dkPV4-0001as-E7
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 02:50:51 -0400
+	(envelope-from <peterx@redhat.com>) id 1dkPVi-0001wA-Dx
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 02:51:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dkPV3-0006l3-3f
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 02:50:50 -0400
-References: <20170822131832.20191-1-pbonzini@redhat.com>
-	<20170822131832.20191-10-pbonzini@redhat.com>
-	<20170823050156.GC21343@lemon>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8e0b0367-5920-ef02-ea7d-476507b96eb5@redhat.com>
-Date: Wed, 23 Aug 2017 08:50:35 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170823050156.GC21343@lemon>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 09/10] scsi: add multipath support to
- qemu-pr-helper
+	(envelope-from <peterx@redhat.com>) id 1dkPVh-0007Ma-OM
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 02:51:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51062)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dkPVh-0007MD-IL
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 02:51:29 -0400
+From: Peter Xu <peterx@redhat.com>
+Date: Wed, 23 Aug 2017 14:51:04 +0800
+Message-Id: <1503471071-2233-2-git-send-email-peterx@redhat.com>
+In-Reply-To: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [RFC v2 1/8] monitor: move skip_flush into
+ monitor_data_init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,170 +24,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 23/08/2017 07:01, Fam Zheng wrote:
-> On Tue, 08/22 15:18, Paolo Bonzini wrote:
->> Proper support of persistent reservation for multipath devices requires
->> communication with the multipath daemon, so that the reservation is
->> registered and applied when a path comes up.  The device mapper
->> utilities provide a library to do so; this patch makes qemu-pr-helper.c
->> detect multipath devices and, when one is found, delegate the operation
->> to libmpathpersist.
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  Makefile              |   3 +
->>  configure             |  57 ++++++++-
->>  docs/pr-manager.rst   |  27 +++++
->>  include/scsi/utils.h  |   6 +
->>  scsi/qemu-pr-helper.c | 311 +++++++++++++++++++++++++++++++++++++++++++++++++-
->>  scsi/utils.c          |  15 +++
->>  6 files changed, 414 insertions(+), 5 deletions(-)
->>
->> diff --git a/Makefile b/Makefile
->> index bfd4f69ecd..f1acaad05b 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -388,6 +388,9 @@ fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal
->>  fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
->>  
->>  scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
->> +ifdef CONFIG_MPATH
->> +scsi/qemu-pr-helper$(EXESUF): LIBS += -ludev -lmultipath -lmpathpersist
->> +endif
->>  
->>  qemu-img-cmds.h: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
->>  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
->> diff --git a/configure b/configure
->> index 772aff18d6..d3c9371f7c 100755
->> --- a/configure
->> +++ b/configure
->> @@ -286,6 +286,7 @@ pixman=""
->>  sdl=""
->>  sdlabi=""
->>  virtfs=""
->> +mpath=""
-> 
-> Whole patch: s/\<mpath\>/pr-helper/ ?
+It's part of the data init.  Collect it.
 
-No, the helper can work without multipath support.  The mpath variable
-is about supporting multipath in the helper.
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ monitor.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Paolo
-
->>  vnc="yes"
->>  sparse="no"
->>  vde=""
->> @@ -948,6 +949,10 @@ for opt do
->>    ;;
->>    --enable-virtfs) virtfs="yes"
->>    ;;
->> +  --disable-mpath) mpath="no"
->> +  ;;
->> +  --enable-mpath) mpath="yes"
->> +  ;;
->>    --disable-vnc) vnc="no"
->>    ;;
->>    --enable-vnc) vnc="yes"
->> @@ -1491,6 +1496,7 @@ disabled with --disable-FEATURE, default is enabled if available:
->>    vnc-png         PNG compression for VNC server
->>    cocoa           Cocoa UI (Mac OS X only)
->>    virtfs          VirtFS
->> +  mpath           Multipath persistent reservation passthrough
->>    xen             xen backend driver support
->>    xen-pci-passthrough
->>    brlapi          BrlAPI (Braile)
->> @@ -3336,6 +3342,29 @@ else
->>  fi
->>  
->>  ##########################################
->> +# libmpathpersist probe
->> +
->> +if test "$mpath" != "no" ; then
->> +  cat > $TMPC <<EOF
->> +#include <libudev.h>
->> +#include <mpath_persist.h>
->> +unsigned mpath_mx_alloc_len = 1024;
->> +int logsink;
->> +int main(void) {
->> +    struct udev *udev = udev_new();
->> +    mpath_lib_init(udev);
->> +}
->> +EOF
->> +  if compile_prog "" "-ludev -lmultipath -lmpathpersist" ; then
->> +    mpathpersist=yes
->> +  else
->> +    mpathpersist=no
->> +  fi
->> +else
->> +  mpathpersist=no
->> +fi
->> +
->> +##########################################
->>  # libcap probe
->>  
->>  if test "$cap" != "no" ; then
->> @@ -5070,16 +5099,34 @@ if test "$want_tools" = "yes" ; then
->>    fi
->>  fi
->>  if test "$softmmu" = yes ; then
->> -  if test "$virtfs" != no ; then
->> -    if test "$cap" = yes && test "$linux" = yes && test "$attr" = yes ; then
->> +  if test "$linux" = yes; then
->> +    if test "$virtfs" != no && test "$cap" = yes && test "$attr" = yes ; then
->>        virtfs=yes
->>        tools="$tools fsdev/virtfs-proxy-helper\$(EXESUF)"
->>      else
->>        if test "$virtfs" = yes; then
->> -        error_exit "VirtFS is supported only on Linux and requires libcap devel and libattr devel"
->> +        error_exit "VirtFS requires libcap devel and libattr devel"
->>        fi
->>        virtfs=no
->>      fi
->> +    if test "$mpath" != no && test "$mpathpersist" = yes ; then
->> +      mpath=yes
->> +      tools="$tools mpath/qemu-mpath-helper\$(EXESUF)"
-> 
-> scsi/qemu-pr-helper?
-> 
->> +    else
->> +      if test "$mpath" = yes; then
->> +        error_exit "Multipath requires libmpathpersist devel"
->> +      fi
->> +      mpath=no
->> +    fi
->> +  else
->> +    if test "$virtfs" = yes; then
->> +      error_exit "VirtFS is supported only on Linux"
->> +    fi
->> +    virtfs=no
->> +    if test "$mpath" = yes; then
->> +      error_exit "Multipath is supported only on Linux"
->> +    fi
->> +    mpath=no
->>    fi
->>  fi
->>  
->> @@ -5326,6 +5373,7 @@ echo "Audio drivers     $audio_drv_list"
->>  echo "Block whitelist (rw) $block_drv_rw_whitelist"
->>  echo "Block whitelist (ro) $block_drv_ro_whitelist"
->>  echo "VirtFS support    $virtfs"
->> +echo "Multipath support $mpath"
->>  echo "VNC support       $vnc"
->>  if test "$vnc" = "yes" ; then
->>      echo "VNC SASL support  $vnc_sasl"
->> @@ -5773,6 +5821,9 @@ fi
->>  if test "$virtfs" = "yes" ; then
->>    echo "CONFIG_VIRTFS=y" >> $config_host_mak
->>  fi
->> +if test "$mpath" = "yes" ; then
->> +  echo "CONFIG_MPATH=y" >> $config_host_mak
->> +fi
->>  if test "$vhost_scsi" = "yes" ; then
->>    echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
->>  fi
-> 
-> Fam
-> 
+diff --git a/monitor.c b/monitor.c
+index e0f8801..7c90df7 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -568,13 +568,14 @@ static void monitor_qapi_event_init(void)
+ 
+ static void handle_hmp_command(Monitor *mon, const char *cmdline);
+ 
+-static void monitor_data_init(Monitor *mon)
++static void monitor_data_init(Monitor *mon, bool skip_flush)
+ {
+     memset(mon, 0, sizeof(Monitor));
+     qemu_mutex_init(&mon->out_lock);
+     mon->outbuf = qstring_new();
+     /* Use *mon_cmds by default. */
+     mon->cmd_table = mon_cmds;
++    mon->skip_flush = skip_flush;
+ }
+ 
+ static void monitor_data_destroy(Monitor *mon)
+@@ -594,8 +595,7 @@ char *qmp_human_monitor_command(const char *command_line, bool has_cpu_index,
+     char *output = NULL;
+     Monitor *old_mon, hmp;
+ 
+-    monitor_data_init(&hmp);
+-    hmp.skip_flush = true;
++    monitor_data_init(&hmp, true);
+ 
+     old_mon = cur_mon;
+     cur_mon = &hmp;
+@@ -4098,7 +4098,7 @@ void monitor_init(Chardev *chr, int flags)
+     }
+ 
+     mon = g_malloc(sizeof(*mon));
+-    monitor_data_init(mon);
++    monitor_data_init(mon, false);
+ 
+     qemu_chr_fe_init(&mon->chr, chr, &error_abort);
+     mon->flags = flags;
+-- 
+2.7.4
