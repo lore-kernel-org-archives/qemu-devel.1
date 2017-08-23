@@ -1,32 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dkXFa-0008RA-Qn
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:07:23 -0400
+	(envelope-from <lyan@suse.com>) id 1dkXHh-0000oO-2A
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:09:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dkXFV-0001x4-Sj
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:07:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44980)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dkXFV-0001wX-N3
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:07:17 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BAA447E42E
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 15:07:15 +0000 (UTC)
-Message-ID: <1503500832.16071.32.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 23 Aug 2017 17:07:12 +0200
-In-Reply-To: <87mv6yk1x3.fsf@dusky.pond.sub.org>
-References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
-	<20170727154126.11339-17-marcandre.lureau@redhat.com>
-	<87d17ur7y1.fsf@dusky.pond.sub.org> <87mv6yk1x3.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 16/26] qapi: add conditions to VNC
- type/commands/events on the schema
+	(envelope-from <lyan@suse.com>) id 1dkXHb-000347-Sk
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:09:33 -0400
+From: Liang Yan <lyan@suse.com>
+Date: Wed, 23 Aug 2017 11:09:03 -0400
+Message-Id: <20170823150903.19982-1-lyan@suse.com>
+Subject: [Qemu-devel] [PATCH] hw/display/xenfb.c: Add trace_xenfb_key_event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,41 +17,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, "Habkost, Eduardo" <ehabkost@redhat.com>
+To: sstabellini@kernel.org, anthony.perard@citrix.com
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
 
-On Thu, 2017-08-17 at 10:56 +0200, Markus Armbruster wrote:
-> Gerd, can we delete the vnc_init_func() stub?=C2=A0=C2=A0Things still c=
-ompile
-> for
-> me when I do.
->=20
-> diff --git a/include/ui/console.h b/include/ui/console.h
-> index 7262bef..2c3b2cd 100644
-> --- a/include/ui/console.h
-> +++ b/include/ui/console.h
-> @@ -484,11 +484,6 @@ static inline QemuOpts *vnc_parse(const char
-> *str, Error **errp)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0error_setg(errp, "VNC support is disabled=
-");
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return NULL;
-> =C2=A0}
-> -static inline int vnc_init_func(void *opaque, QemuOpts *opts, Error
-> **errp)
-> -{
-> -=C2=A0=C2=A0=C2=A0=C2=A0error_setg(errp, "VNC support is disabled");
-> -=C2=A0=C2=A0=C2=A0=C2=A0return -1;
-> -}
-> =C2=A0#endif
+It may be better to add a trace event to monitor the last moment of
+a key event from QEMU to guest VM
 
-Looking at a663fbd9e2f65fae81018d81f231ad79510cf9fb.  Guess we want fix
-qemu_opts_foreach to not barf on NULL, then revert that commit, so
-f8c75b2486 (adding Eduardo to Cc) works as intended.
+Signed-off-by: Liang Yan <lyan@suse.com>
+---
+ hw/display/trace-events | 1 +
+ hw/display/xenfb.c      | 2 ++
+ 2 files changed, 3 insertions(+)
 
-Beside that:  The inline for vnc_init_func looks pointless (it's used
-via function pointer).  Also it can be empty as it will never be
-actually called.  Which is fine, vnc_parse will throw an error if
-someone tries to use vnc with a binary without vnc support.
-
-cheers,
-  Gerd
+diff --git a/hw/display/trace-events b/hw/display/trace-events
+index ed8cca0755..da498c1def 100644
+--- a/hw/display/trace-events
++++ b/hw/display/trace-events
+@@ -6,6 +6,7 @@ jazz_led_write(uint64_t addr, uint8_t new) "write addr=0x%"PRIx64": 0x%x"
+ 
+ # hw/display/xenfb.c
+ xenfb_mouse_event(void *opaque, int dx, int dy, int dz, int button_state, int abs_pointer_wanted) "%p x %d y %d z %d bs 0x%x abs %d"
++xenfb_key_event(void *opaque, int scancode, int button_state) "%p scancode %d bs 0x%x"
+ xenfb_input_connected(void *xendev, int abs_pointer_wanted) "%p abs %d"
+ 
+ # hw/display/g364fb.c
+diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
+index df8b78f6f4..afc43f33a2 100644
+--- a/hw/display/xenfb.c
++++ b/hw/display/xenfb.c
+@@ -290,6 +290,8 @@ static void xenfb_key_event(void *opaque, int scancode)
+ 	scancode |= 0x80;
+ 	xenfb->extended = 0;
+     }
++
++    trace_xenfb_key_event(opaque, scancode2linux[scancode], down);
+     xenfb_send_key(xenfb, down, scancode2linux[scancode]);
+ }
+ 
+-- 
+2.14.1
