@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dka1P-0002Kb-Pc
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 14:04:56 -0400
+	(envelope-from <bounces@canonical.com>) id 1dkaH4-0006Pf-4J
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 14:21:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dka1O-0004qo-GV
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 14:04:55 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
-	<a81c8dfb-3d98-57ad-8159-5147283433fa@virtuozzo.com>
-Message-ID: <cb783ebb-198e-1814-2f9c-aec93c83b17a@virtuozzo.com>
-Date: Wed, 23 Aug 2017 21:04:37 +0300
+	(envelope-from <bounces@canonical.com>) id 1dkaH0-0004Mt-Pn
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 14:21:06 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52532)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dkaH0-0004LX-Jt
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 14:21:02 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dkaGy-0008IV-8k
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 18:21:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A34AF2E81E7
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 18:20:55 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <a81c8dfb-3d98-57ad-8159-5147283433fa@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] Persistent bitmaps for non-qcow2 formats
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 23 Aug 2017 18:10:12 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
+Message-Id: <150351181218.16632.627715591641051248.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
+ 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +37,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Qemu-block <qemu-block@nongnu.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
 
-23.08.2017 11:59, Vladimir Sementsov-Ogievskiy wrote:
-> 22.08.2017 22:07, John Snow wrote:
->> Well, we knew we'd want this sooner or later. I've got some pings
->> downstream over whether or not we support persistent bitmaps for
->> non-qcow2 formats.
->>
->> Currently: no, we don't.
->>
->> We tried two different ideas for storage agnostic bitmap persistence:
->>
->>
->> (1) Using qcow2 as a storage container format (similar to VM save
->> states) for information not associated with that particular drive.
->>
->> This didn't go over so well; we decided it was too messy logistically to
->> manage data in any meaningful sense in a file that didn't share any
->> semantic relationship to the qcow2 in question.
->>
->> Well, "We" decided is more like "Kevin and Max" decided. They are right,
->> though.
->>
->>
->> (2) Using a new proto-wrapper format that Fam Zheng designed that serves
->> as a simple top-layer redirect for metadata that allows us to associate
->> raw bitmap data with an arbitrary backing image.
->>
->> This also didn't go over so well, the desire for a "new format" was
->> pretty thin, even if it was only a pseudo-format.
->>
->>
->> We'd still like to be able to use bitmaps with non-qcow2 formats
->> however, and people are going to keep asking. So here's a third thought:
->>
->>
->> (3) Add either a new flag that turns qcow2's backing file into a full
->> R/W backing file, or add a new extension to qcow2 entirely (bypassing
->> the traditional backing file mechanism to avoid confusion for older
->> tooling) that adds a new read-write backing file field.
->>
->> This RW backing file field will be used for all reads AND writes; the
->> qcow2 in question becomes a metadata container on top of the BDS chain.
->> We can re-use Vladimir's bitmap persistence extension to save bitmaps in
->> a qcow2 shell.
->>
->> The qcow2 becomes effectively a metadata cache for a new (essentially)
->> filter node that handles features such as bitmaps. This could also be
->> used to provide allocation map data for RAW files and other goodies down
->> the road.
->>
->> Hopefully this achieves our desire to not create new formats AND our
->> desire to concentrate features (and debugging, testing, etc) into qcow2,
->> while allowing users to "have bitmaps with raw files."
->>
->> Of course, in this scenario, users now have two files: a qcow2 wrapper
->> and the actual raw file in question; but regardless of how we were going
->> to solve this, a raw file necessitates an external file of some sort,
->> else we give up the idea that it was a raw file.
->>
->>
->> Sound good?
->
-> Looks interesting. It is a clean reusing of qcow2-bitmaps without any 
-> modifications to them.
->
-> Should there be some problems with internal snapshots and other things?
->
->
->
-Hm. looks like that this backing file should not only receive all reads 
-and writes, but almost everything ->bdrv_ handlers, except bitmap 
-related of course. This doesn't seems simple to implement. Especially if 
-imaging some not-raw feature-full format under this thin qcow2 layer.. 
-Or we can restrict this RW backing file to be raw-only?
+I need to recheck with that combo - I'd seen that error but only when
+I'd commented out 'if (!blk->dev && !blk_name(blk)[0]) {'  when
+debugging earlier.
 
+-- =
 
--- 
-Best regards,
-Vladimir
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1711602
+
+Title:
+  --copy-storage-all failing with qemu 2.10
+
+Status in QEMU:
+  New
+Status in libvirt package in Ubuntu:
+  Confirmed
+Status in qemu package in Ubuntu:
+  Confirmed
+
+Bug description:
+  We fixed an issue around disk locking already in regard to qemu-nbd
+  [1], but there still seem to be issues.
+
+  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
+://10.22.69.196/system
+  error: internal error: qemu unexpectedly closed the monitor: 2017-08-18T1=
+2:10:29.800397Z qemu-system-x86_64: -chardev pty,id=3Dcharserial0: char dev=
+ice redirected to /dev/pts/0 (label charserial0)
+  2017-08-18T12:10:48.545776Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+
+  Source libvirt log for the guest:
+  2017-08-18 12:09:08.251+0000: initiating migration
+  2017-08-18T12:09:08.809023Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+  2017-08-18T12:09:08.809481Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+
+  Target libvirt log for the guest:
+  2017-08-18T12:09:08.730911Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+  2017-08-18 12:09:09.010+0000: shutting down, reason=3Dcrashed
+
+  Given the timing it seems that the actual copy now works (it is busy ~10 =
+seconds on my environment which would be the copy).
+  Also we don't see the old errors we saw before, but afterwards on the act=
+ual take-over it fails.
+
+  Dmesg has no related denials as often apparmor is in the mix.
+
+  Need to check libvirt logs of source [2] and target [3] in Detail.
+
+  [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02200.html
+  [2]: http://paste.ubuntu.com/25339356/
+  [3]: http://paste.ubuntu.com/25339358/
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1711602/+subscriptions
