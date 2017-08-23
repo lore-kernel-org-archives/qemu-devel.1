@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkZZD-0002O0-7I
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:35:48 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dkZao-0003Qf-MH
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:37:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkZZB-0003EP-24
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:35:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60364)
+	(envelope-from <imammedo@redhat.com>) id 1dkZal-00055I-Hd
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:37:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58808)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dkZZA-0003C6-Fs
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:35:44 -0400
-Date: Wed, 23 Aug 2017 18:35:35 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170823173534.GF2648@work-vm>
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<1503471071-2233-3-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dkZal-00053W-7s
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:37:23 -0400
+Date: Wed, 23 Aug 2017 19:37:39 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170823193739.32d9bd07@Igors-MacBook-Pro.local>
+In-Reply-To: <20170823164638.GN19998@localhost.localdomain>
+References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
+	<1503050939-227939-7-git-send-email-imammedo@redhat.com>
+	<20170823143414.GI27715@localhost.localdomain>
+	<20170823182902.7c2803c7@nial.brq.redhat.com>
+	<20170823164638.GN19998@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1503471071-2233-3-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 2/8] monitor: allow monitor to create
- thread to poll
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.11 06/27] x86: extract legacy cpu
+ features format parser
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,319 +31,303 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Philippe =?UTF-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Firstly, introduce Monitor.use_thread, and set it for monitors that are
-> using non-mux typed backend chardev.  We only do this for monitors, so
-> mux-typed chardevs are not suitable (when it connects to, e.g., serials
-> and the monitor together).
-> 
-> When use_thread is set, we create standalone thread to poll the monitor
-> events, isolated from the main loop thread.  Here we still need to take
-> the BQL before dispatching the tasks since some of the monitor commands
-> are not allowed to execute without the protection of BQL.  Then this
-> gives us the chance to avoid taking the BQL for some monitor commands in
-> the future.
-> 
-> * Why this change?
-> 
-> We need these per-monitor threads to make sure we can have at least one
-> monitor that will never stuck (that can receive further monitor
-> commands).
-> 
-> * So when will monitors stuck?  And, how do they stuck?
+On Wed, 23 Aug 2017 13:46:38 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-(Minor: 'stuck' is past tense, 'stick' is probably the right word; however
-'block' is probably what you actually want)
+> On Wed, Aug 23, 2017 at 06:29:02PM +0200, Igor Mammedov wrote:
+> > On Wed, 23 Aug 2017 11:34:14 -0300
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >=20
+> > > On Fri, Aug 18, 2017 at 12:08:38PM +0200, Igor Mammedov wrote:
+> > > > Move cpu_model +-feat parsing into a separate file so that it
+> > > > could be reused later for parsing similar format of sparc target
+> > > >=20
+> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > > ---
+> > > > CC: Richard Henderson <rth@twiddle.net>
+> > > > CC: Eduardo Habkost <ehabkost@redhat.com>
+> > > > CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> > > > CC: Artyom Tarasenko <atar4qemu@gmail.com>
+> > > > CC: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > > > ---
+> > > >  include/qom/cpu.h                     |   2 +
+> > > >  default-configs/i386-bsd-user.mak     |   1 +
+> > > >  default-configs/i386-linux-user.mak   |   1 +
+> > > >  default-configs/i386-softmmu.mak      |   1 +
+> > > >  default-configs/x86_64-bsd-user.mak   |   1 +
+> > > >  default-configs/x86_64-linux-user.mak |   1 +
+> > > >  default-configs/x86_64-softmmu.mak    |   1 +
+> > > >  target/i386/cpu.c                     | 125 +---------------------=
+----
+> > > >  util/Makefile.objs                    |   1 +
+> > > >  util/legacy_cpu_features_parser.c     | 161 ++++++++++++++++++++++=
+++++++++++++
+> > > >  10 files changed, 171 insertions(+), 124 deletions(-)
+> > > >  create mode 100644 util/legacy_cpu_features_parser.c
+> > > >  =20
+> > > [...]
+> > > > diff --git a/util/legacy_cpu_features_parser.c b/util/legacy_cpu_fe=
+atures_parser.c
+> > > > new file mode 100644
+> > > > index 0000000..6b352a3
+> > > > --- /dev/null
+> > > > +++ b/util/legacy_cpu_features_parser.c
+> > > > @@ -0,0 +1,161 @@
+> > > > +/* Support for legacy -cpu cpu,features CLI option with +-feat syn=
+tax,
+> > > > + * used by x86/sparc targets
+> > > > + *
+> > > > + * Author: Andreas F=C3=A4rber <afaerber@suse.de>
+> > > > + * Author: Andre Przywara <andre.przywara@amd.com>
+> > > > + * Author: Eduardo Habkost <ehabkost@redhat.com>
+> > > > + * Author: Igor Mammedov <imammedo@redhat.com>
+> > > > + * Author: Paolo Bonzini <pbonzini@redhat.com>
+> > > > + * Author: Markus Armbruster <armbru@redhat.com> =20
+> > >=20
+> > > IANAL, but I believe a
+> > >   Copyright (c) <YEAR> <COPYRIGHT HOLDER>
+> > > line is needed here.
+> > >=20
+> > > > + *
+> > > > + * This program is free software; you can redistribute it and/or m=
+odify
+> > > > + * it under the terms of the GNU General Public License as publish=
+ed by
+> > > > + * the Free Software Foundation; either version 2 of the License, =
+or
+> > > > + * (at your option) any later version.
+> > > > +
+> > > > + * This program is distributed in the hope that it will be useful,
+> > > > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > > > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> > > > + * GNU General Public License for more details.
+> > > > +
+> > > > + * You should have received a copy of the GNU General Public Licen=
+se along
+> > > > + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> > > > + */
+> > > > +
+> > > > +#include "qemu/osdep.h"
+> > > > +#include "qapi/error.h"
+> > > > +#include "qemu/cutils.h"
+> > > > +#include "qom/cpu.h"
+> > > > +#include "qemu/error-report.h"
+> > > > +#include "hw/qdev-properties.h"
+> > > > +
+> > > > +static inline void feat2prop(char *s)
+> > > > +{
+> > > > +    while ((s =3D strchr(s, '_'))) {
+> > > > +        *s =3D '-';
+> > > > +    }
+> > > > +}
+> > > > +
+> > > > +static gint compare_string(gconstpointer a, gconstpointer b)
+> > > > +{
+> > > > +    return g_strcmp0(a, b);
+> > > > +}
+> > > > +
+> > > > +static void
+> > > > +cpu_add_feat_as_prop(const char *typename, const char *name, const=
+ char *val)
+> > > > +{
+> > > > +    GlobalProperty *prop =3D g_new0(typeof(*prop), 1);
+> > > > +    prop->driver =3D typename;
+> > > > +    prop->property =3D g_strdup(name);
+> > > > +    prop->value =3D g_strdup(val);
+> > > > +    prop->errp =3D &error_fatal;
+> > > > +    qdev_prop_register_global(prop);
+> > > > +}
+> > > > +
+> > > > +/* DO NOT USE WITH NEW CODE
+> > > > + * Parse "+feature,-feature,feature=3Dfoo" CPU feature string
+> > > > + */
+> > > > +void cpu_legacy_parse_featurestr(const char *typename, char *featu=
+res,
+> > > > +                                 Error **errp)
+> > > > +{
+> > > > +    /* Compatibily hack to maintain legacy +-feat semantic,
+> > > > +     * where +-feat overwrites any feature set by
+> > > > +     * feat=3Don|feat even if the later is parsed after +-feat
+> > > > +     * (i.e. "-x2apic,x2apic=3Don" will result in x2apic disabled)
+> > > > +     */
+> > > > +    GList *l, *plus_features =3D NULL, *minus_features =3D NULL;
+> > > > +    char *featurestr; /* Single 'key=3Dvalue" string being parsed =
+*/
+> > > > +    static bool cpu_globals_initialized;
+> > > > +    bool ambiguous =3D false;
+> > > > +
+> > > > +    if (cpu_globals_initialized) {
+> > > > +        return;
+> > > > +    }
+> > > > +    cpu_globals_initialized =3D true;
+> > > > +
+> > > > +    if (!features) {
+> > > > +        return;
+> > > > +    }
+> > > > +
+> > > > +    for (featurestr =3D strtok(features, ",");
+> > > > +         featurestr;
+> > > > +         featurestr =3D strtok(NULL, ",")) {
+> > > > +        const char *name;
+> > > > +        const char *val =3D NULL;
+> > > > +        char *eq =3D NULL;
+> > > > +        char num[32];
+> > > > +
+> > > > +        /* Compatibility syntax: */
+> > > > +        if (featurestr[0] =3D=3D '+') {
+> > > > +            plus_features =3D g_list_append(plus_features,
+> > > > +                                          g_strdup(featurestr + 1)=
+);
+> > > > +            continue;
+> > > > +        } else if (featurestr[0] =3D=3D '-') {
+> > > > +            minus_features =3D g_list_append(minus_features,
+> > > > +                                           g_strdup(featurestr + 1=
+));
+> > > > +            continue;
+> > > > +        } =20
+> > >=20
+> > > These 6 lines of code (or something equivalent to them) are
+> > > supposed to be the only difference to the generic parsing
+> > > function.  I would simply make this feature (support for
+> > > [+-]feature) enabled by a CPUClass::plus_minus_features flag
+> > > handled by cpu_common_parse_features().
+> > I'd rather keep plus/minus nonsense  under the hood separate
+> > legacy function so it get reused unintentionally and keep generic
+> > parser clean.
+> >=20
+> > I didn't have any intent of generalizing +-feat handling
+> > but rather to remove code duplication between the only users
+> > (x86/sparc) that happened to use syntax and share the same semantics.
+>=20
+> Generalizing it to be controlled by a CPUClass flag will make it
+> easier to refactor the feature parsing later to use the QemuOpts
+> parser.  But I agree there's no need to do that on this series.
+>=20
+> (We might even decide to make [+-]feat work on all other
+> architectures.  We already agreed recently that we won't
+> deprecate it in x86, we could as well enable the same syntax
+> uniformly across all architectures.)
+I'd just stick to canonical feat=3Don|off and keep legacy to x86|sparc,
+but it's this to discuss if future and relevant here.
 
-> After we have postcopy and remote page faults, it's simple to achieve a
-> stuck in the monitor (which is also a stuck in main loop thread):
-> 
-> (1) Monitor deadlock on BQL
-> 
-> As we may know, when postcopy is running on destination VM, the vcpu
-> threads can stuck merely any time as long as it tries to access an
-> uncopied guest page.  Meanwhile, when the stuck happens, it is possible
-> that the vcpu thread is holding the BQL.  If the page fault is not
-> handled quickly, you'll find that monitors stop working, which is trying
-> to take the BQL.
-> 
-> If the page fault cannot be handled correctly (one case is a paused
-> postcopy, when network is temporarily down), monitors will hang
-> forever.  Without current patch, that means the main loop hanged.  We'll
-> never find a way to talk to VM again.
-> 
-> (2) Monitor tries to run codes page-faulted vcpus
-> 
-> The HMP command "info cpus" is one of the good example - it tries to
-> kick all the vcpus and sync status from them.  However, if there is any
-> vcpu that stuck at an unhandled page fault, it can never achieve the
-> sync, then the HMP hangs.  Again, it hangs the main loop thread as well.
-> 
-> After either (1) or (2), we can see the deadlock problem:
-> 
-> - On one hand, if monitor hangs, we cannot do the postcopy recovery,
->   because postcopy recovery needs user to specify new listening port on
->   destination monitor.
-> 
-> - On the other hand, if we cannot recover the paused postcopy, then page
->   faults cannot be serviced, and the monitors will possibly hang
->   forever then.
-> 
-> * How this patch helps?
-> 
-> - Firstly, we'll have our own thread for each dedicated monitor (or say,
->   the backend chardev is only used for monitor), so even main loop
->   thread hangs (it is always possible), this monitor thread may still
->   survive.
-> 
-> - Not all monitor commands need the BQL.  We can selectively take the
->   BQL (depends on which command we are running) to avoid waiting on a
->   page-faulted vcpu thread that has taken the BQL (this will be done in
->   following up patches).
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+>=20
+> >=20
+> > As an alternative I can copy-past x86 variant into sparc
+> > (modulo x86 harmless fixups), that will add some code duplication
+> > I've tried to avoid with this patch, but it won't cause
+> > misunderstanding about generalizing legacy hacks.
+>=20
+> Works for me.  We can then cleanup the x86 code and make it use
+> cpu_legacy_parse_featurestr() later.
+Then, I'll just copy and replace sparc variant with x86 impl.
+(removing from the copy x86 only parts and making parser stricter
+where possible) and drop 5-6 patches that touched x86 for the purpose
+of sharing code.
 
-A few high level things:
-  a) I think this patch probably wants to split into
-     1) A patch that decides whether to create a new thread and
-     initialises it
-     2) One that starts to fix up the locking
+and respin v3 tomorrow.
 
-  b) I think you also need to take the bql around any of the custom
-     completion functions; (maybe in monitor_find_completion ?)
-     since they do things like walk the lists of devices.
+>=20
+> >=20
+> > > (But this can be done as a follow-up patch.)
+> > >=20
+> > > > +
+> > > > +        eq =3D strchr(featurestr, '=3D');
+> > > > +        if (eq) {
+> > > > +            *eq++ =3D 0;
+> > > > +            val =3D eq;
+> > > > +        } else {
+> > > > +            val =3D "on";
+> > > > +        }
+> > > > +
+> > > > +        feat2prop(featurestr);
+> > > > +        name =3D featurestr;
+> > > > +
+> > > > +        if (g_list_find_custom(plus_features, name, compare_string=
+)) {
+> > > > +            warn_report("Ambiguous CPU model string. "
+> > > > +                        "Don't mix both \"+%s\" and \"%s=3D%s\"",
+> > > > +                        name, name, val);
+> > > > +            ambiguous =3D true;
+> > > > +        }
+> > > > +        if (g_list_find_custom(minus_features, name, compare_strin=
+g)) {
+> > > > +            warn_report("Ambiguous CPU model string. "
+> > > > +                        "Don't mix both \"-%s\" and \"%s=3D%s\"",
+> > > > +                        name, name, val);
+> > > > +            ambiguous =3D true;
+> > > > +        }
+> > > > +
+> > > > +        /* Special case: */
+> > > > +        if (!strcmp(name, "tsc-freq")) {
+> > > > +            int ret;
+> > > > +            uint64_t tsc_freq;
+> > > > +
+> > > > +            ret =3D qemu_strtosz_metric(val, NULL, &tsc_freq);
+> > > > +            if (ret < 0 || tsc_freq > INT64_MAX) {
+> > > > +                error_setg(errp, "bad numerical value %s", val);
+> > > > +                return;
+> > > > +            }
+> > > > +            snprintf(num, sizeof(num), "%" PRId64, tsc_freq);
+> > > > +            val =3D num;
+> > > > +            name =3D "tsc-frequency";
+> > > > +        } =20
+> > >=20
+> > > This is x86-specific and should stay in x86-specific code.  It
+> > > can probably be handled by the tsc-freq setter.
+> > there was reason why it wasn't moved to tsc-frequency setter,
+> > the former is pure integer type of property,
+> > while here we can get suffixed string that scales by 1000.
+> >=20
+> > Short of creating new visitor for KHz (I don't really looking forward t=
+o it),
+> > it's simpler to leave fixup alone in legacy parser that's shared only b=
+etween
+> > x86/sparc as it doesn't conflict with sparc and won't break anything.
+>=20
+> It doesn't break anything, but it will move x86-specific cruft to
+> code that is supposed to be generic.
+>=20
+> Creating a write-only "tsc-freq" property that accepts a string
+> isn't hard to do.
+Nice idea, it might just work.
 
-  c) As mentioned on irc there's fun to be had with cur_mon and error
-     handling - in my local world I have cur_mon declared as __thread
-     but never got around to thinking aobut what should set it up.
-     There's also 'wavcapture: Convert to error_report' that I posted
-     in March that got rid of some uses of cur_mon in wavcapture.c
-     for error_report.  But there's some interesting stuff to be checked
-     with where error_reporting goes.
+>=20
+> If you are not willing to do it in this series, you can write a
+> generic parser now (without x86-specific cruft), use it only on
+> sparc, and later we can refactor x86 so it can also use the
+> generic one.
+So far, I'm inclined towards opposing +-feat generalizing and keeping
+canonical form anywhere except of x86/sparc were we have to tolerate it.
 
-  d) I wonder if it's better to have thread as a flag, so that you have
-     to explicitly ask for a monitor to have it's own thread.
 
-I'll leave it to Dan to check over the chardev mechanics in here.
-
-Dave
-
-> ---
->  monitor.c           | 75 +++++++++++++++++++++++++++++++++++++++++++++++++----
->  qapi/qmp-dispatch.c | 15 +++++++++++
->  2 files changed, 85 insertions(+), 5 deletions(-)
-> 
-> diff --git a/monitor.c b/monitor.c
-> index 7c90df7..3d4ecff 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -36,6 +36,8 @@
->  #include "net/net.h"
->  #include "net/slirp.h"
->  #include "chardev/char-fe.h"
-> +#include "chardev/char-mux.h"
-> +#include "chardev/char-io.h"
->  #include "ui/qemu-spice.h"
->  #include "sysemu/numa.h"
->  #include "monitor/monitor.h"
-> @@ -190,6 +192,8 @@ struct Monitor {
->      int flags;
->      int suspend_cnt;
->      bool skip_flush;
-> +    /* Whether the monitor wants to be polled in standalone thread */
-> +    bool use_thread;
->  
->      QemuMutex out_lock;
->      QString *outbuf;
-> @@ -206,6 +210,11 @@ struct Monitor {
->      mon_cmd_t *cmd_table;
->      QLIST_HEAD(,mon_fd_t) fds;
->      QLIST_ENTRY(Monitor) entry;
-> +
-> +    /* Only used when "use_thread" is used */
-> +    QemuThread mon_thread;
-> +    GMainContext *mon_context;
-> +    GMainLoop *mon_loop;
->  };
->  
->  /* QMP checker flags */
-> @@ -568,7 +577,7 @@ static void monitor_qapi_event_init(void)
->  
->  static void handle_hmp_command(Monitor *mon, const char *cmdline);
->  
-> -static void monitor_data_init(Monitor *mon, bool skip_flush)
-> +static void monitor_data_init(Monitor *mon, bool skip_flush, bool use_thread)
->  {
->      memset(mon, 0, sizeof(Monitor));
->      qemu_mutex_init(&mon->out_lock);
-> @@ -576,10 +585,34 @@ static void monitor_data_init(Monitor *mon, bool skip_flush)
->      /* Use *mon_cmds by default. */
->      mon->cmd_table = mon_cmds;
->      mon->skip_flush = skip_flush;
-> +    mon->use_thread = use_thread;
-> +    if (use_thread) {
-> +        /*
-> +         * For monitors that use isolated threads, they'll need their
-> +         * own GMainContext and GMainLoop.  Otherwise, these pointers
-> +         * will be NULL, which means the default context will be used.
-> +         */
-> +        mon->mon_context = g_main_context_new();
-> +        mon->mon_loop = g_main_loop_new(mon->mon_context, TRUE);
-> +    }
->  }
->  
->  static void monitor_data_destroy(Monitor *mon)
->  {
-> +    /* Destroy the thread first if there is */
-> +    if (mon->use_thread) {
-> +        /* Notify the per-monitor thread to quit. */
-> +        g_main_loop_quit(mon->mon_loop);
-> +        /*
-> +         * Make sure the context will get the quit message since it's
-> +         * in another thread.  Without this, it may not be able to
-> +         * respond to the quit message immediately.
-> +         */
-> +        g_main_context_wakeup(mon->mon_context);
-> +        qemu_thread_join(&mon->mon_thread);
-> +        g_main_loop_unref(mon->mon_loop);
-> +        g_main_context_unref(mon->mon_context);
-> +    }
->      qemu_chr_fe_deinit(&mon->chr, false);
->      if (monitor_is_qmp(mon)) {
->          json_message_parser_destroy(&mon->qmp.parser);
-> @@ -595,7 +628,7 @@ char *qmp_human_monitor_command(const char *command_line, bool has_cpu_index,
->      char *output = NULL;
->      Monitor *old_mon, hmp;
->  
-> -    monitor_data_init(&hmp, true);
-> +    monitor_data_init(&hmp, true, false);
->  
->      old_mon = cur_mon;
->      cur_mon = &hmp;
-> @@ -3101,6 +3134,11 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
->  {
->      QDict *qdict;
->      const mon_cmd_t *cmd;
-> +    /*
-> +     * If we haven't take the BQL (when called by per-monitor
-> +     * threads), we need to take care of the BQL on our own.
-> +     */
-> +    bool take_bql = !qemu_mutex_iothread_locked();
->  
->      trace_handle_hmp_command(mon, cmdline);
->  
-> @@ -3116,7 +3154,16 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
->          return;
->      }
->  
-> +    if (take_bql) {
-> +        qemu_mutex_lock_iothread();
-> +    }
-> +
->      cmd->cmd(mon, qdict);
-> +
-> +    if (take_bql) {
-> +        qemu_mutex_unlock_iothread();
-> +    }
-> +
->      QDECREF(qdict);
->  }
->  
-> @@ -4086,6 +4133,15 @@ static void __attribute__((constructor)) monitor_lock_init(void)
->      qemu_mutex_init(&monitor_lock);
->  }
->  
-> +static void *monitor_thread(void *data)
-> +{
-> +    Monitor *mon = data;
-> +
-> +    g_main_loop_run(mon->mon_loop);
-> +
-> +    return NULL;
-> +}
-> +
->  void monitor_init(Chardev *chr, int flags)
->  {
->      static int is_first_init = 1;
-> @@ -4098,7 +4154,9 @@ void monitor_init(Chardev *chr, int flags)
->      }
->  
->      mon = g_malloc(sizeof(*mon));
-> -    monitor_data_init(mon, false);
-> +
-> +    /* For non-mux typed monitors, we create dedicated threads. */
-> +    monitor_data_init(mon, false, !CHARDEV_IS_MUX(chr));
->  
->      qemu_chr_fe_init(&mon->chr, chr, &error_abort);
->      mon->flags = flags;
-> @@ -4112,12 +4170,19 @@ void monitor_init(Chardev *chr, int flags)
->  
->      if (monitor_is_qmp(mon)) {
->          qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_qmp_read,
-> -                                 monitor_qmp_event, NULL, mon, NULL, true);
-> +                                 monitor_qmp_event, NULL, mon,
-> +                                 mon->mon_context, true);
->          qemu_chr_fe_set_echo(&mon->chr, true);
->          json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
->      } else {
->          qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_read,
-> -                                 monitor_event, NULL, mon, NULL, true);
-> +                                 monitor_event, NULL, mon,
-> +                                 mon->mon_context, true);
-> +    }
-> +
-> +    if (mon->use_thread) {
-> +        qemu_thread_create(&mon->mon_thread, chr->label, monitor_thread,
-> +                           mon, QEMU_THREAD_JOINABLE);
->      }
->  
->      qemu_mutex_lock(&monitor_lock);
-> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-> index 5ad36f8..3b6b224 100644
-> --- a/qapi/qmp-dispatch.c
-> +++ b/qapi/qmp-dispatch.c
-> @@ -19,6 +19,7 @@
->  #include "qapi/qmp/qjson.h"
->  #include "qapi-types.h"
->  #include "qapi/qmp/qerror.h"
-> +#include "qemu/main-loop.h"
->  
->  static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
->  {
-> @@ -75,6 +76,11 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
->      QDict *args, *dict;
->      QmpCommand *cmd;
->      QObject *ret = NULL;
-> +    /*
-> +     * If we haven't take the BQL (when called by per-monitor
-> +     * threads), we need to take care of the BQL on our own.
-> +     */
-> +    bool take_bql = !qemu_mutex_iothread_locked();
->  
->      dict = qmp_dispatch_check_obj(request, errp);
->      if (!dict) {
-> @@ -101,7 +107,16 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
->          QINCREF(args);
->      }
->  
-> +    if (take_bql) {
-> +        qemu_mutex_lock_iothread();
-> +    }
-> +
->      cmd->fn(args, &ret, &local_err);
-> +
-> +    if (take_bql) {
-> +        qemu_mutex_unlock_iothread();
-> +    }
-> +
->      if (local_err) {
->          error_propagate(errp, local_err);
->      } else if (cmd->options & QCO_NO_SUCCESS_RESP) {
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > > > +
+> > > > +        cpu_add_feat_as_prop(typename, name, val);
+> > > > +    }
+> > > > +
+> > > > +    if (ambiguous) {
+> > > > +        warn_report("Compatibility of ambiguous CPU model "
+> > > > +                    "strings won't be kept on future QEMU versions=
+");
+> > > > +    } =20
+> > >=20
+> > > As noted in the review of the x86 patch that removes the
+> > > plus_features/minus_features static variables, this obsolete (and
+> > > confusing) property ordering misfeature should be removed before
+> > > we make this code generic and reuse it on other architectures.
+> > As it's been replied removing ordering is behavioral change for
+> > both x86 and sparc, which is not related to series.
+> > If you wish, I'll post a patch that will what you suggest
+> > on top of series.
+>=20
+> I would agree if sparc also implemented the weird ordering.  But
+> sparc does not implement it (it doesn't support feat=3D(on|off)
+> yet).  We shouldn't introduce that misfeature in sparc if we're
+> already planning to remove it.
+It didn't have canonic form but it gains this ability with this series.
+So we could do better for it by forbidding mixed syntax from starters
+(+1 for copy-past) but we have to keep minus overrides plus semantics,
+so ambiguous check is still there but it would lead to hard error instead of
+warning.
