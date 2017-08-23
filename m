@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50648)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dkX9n-0006Gh-PR
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:01:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1dkX9o-0006Gq-Mo
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:01:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dkX9m-0005gf-02
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:01:23 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38418)
+	(envelope-from <bounces@canonical.com>) id 1dkX9i-0005fS-Uv
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:01:24 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38321)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dkX9l-0005gM-Qk
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:01:21 -0400
+	id 1dkX9i-0005f6-P6
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:01:18 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dkX9j-00066I-TU
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 15:01:20 +0000
+	id 1dkX9h-0005xj-2g
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 15:01:17 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A86662E80C8
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 15:01:19 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id BCAED2E80E8
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 15:01:16 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 23 Aug 2017 14:55:22 -0000
+Date: Wed, 23 Aug 2017 14:46:57 -0000
 From: ChristianEhrhardt <1711602@bugs.launchpad.net>
 Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
-Message-Id: <150350012253.19046.4268047906681155989.malone@chaenomeles.canonical.com>
+Message-Id: <150349961741.19046.9769184906821244254.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
  2.10
@@ -39,24 +39,21 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Ok, clarified with Stefanha
-It has exactly the same title as a series of 18th August which was related =
-to a similar issue.
-It is about an hour old now on qemu-devel, quoting
+Hi Stefan,
+I was part of the report around the series in "[PATCH for-2.10 0/4] block: =
+Fix non-shared storage migration", but this is happening on rc3 which conta=
+ins this.
 
-"This fixes the issue reported as
-https://bugs.launchpad.net/bugs/1711602
+AFAIK Fam's series is:
+dd7fdaad iotests: Add non-shared storage migration case 192 (Fam)
+5f7772c4 block-backend: Defer shared_perm tightening migration completion (=
+Fam)
+3dff24f2 nbd: Fix order of bdrv_set_perm and bdrv_invalidate_cache (Kevin)
+80adf54e stubs: Add vm state change handler stubs (Fam)
 
-Fam Zheng (3):
-  block-backend: Refactor inactivate check
-  block-backend: Allow more "can inactivate" cases
-  mirror: Mark target BB as "force allow inactivate"
-
-Stefan Hajnoczi (1):
-  block: Update open_flags after ->inactivate() callback"
-
-
-I'll prep a build with that and test as well
+All these got into v2.10.0-rc3 which these tests are based on already.
+IMHO - This is not complete for qemu 2.10 and a regression since 2.9 (well =
+since 2.8 as I haven't tested 2.9 personally).
 
 -- =
 
