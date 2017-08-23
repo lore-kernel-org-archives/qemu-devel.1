@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dkKED-0005s8-Bg
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 21:13:10 -0400
+	(envelope-from <peterx@redhat.com>) id 1dkLAs-00018I-D2
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 22:13:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dkKEA-0006IB-M8
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 21:13:05 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:36850)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dkKEA-0006HC-Gp
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 21:13:02 -0400
-Received: by mail-qt0-x242.google.com with SMTP id c15so287656qta.3
-	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 18:13:02 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
-	<1503050939-227939-2-git-send-email-imammedo@redhat.com>
-	<c65c99e5-5d60-5aef-7e69-ce236f6b7d4e@amsat.org>
-	<20170821125505.37ce8935@nial.brq.redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3d17f458-8f90-e5ee-da7d-0726a2105ff0@amsat.org>
-Date: Tue, 22 Aug 2017 22:12:57 -0300
+	(envelope-from <peterx@redhat.com>) id 1dkLAo-0007hS-Dw
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 22:13:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34818)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dkLAo-0007g9-6w
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 22:13:38 -0400
+Date: Wed, 23 Aug 2017 10:13:29 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170823021329.GA19071@pxdev.xzpeter.org>
+References: <20170822170212.27347-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170821125505.37ce8935@nial.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-2.11 01/27] sparc: convert cpu models
- to SPARC cpu subclasses
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170822170212.27347-1-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: Report when bdrv_inactivate_all
+ fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,166 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, stefanha@redhat.com, christian.ehrhardt@canonical.com, lvivier@redhat.com
 
->> On 08/18/2017 07:08 AM, Igor Mammedov wrote:
->>> QOMfy cpu models handling introducing propper cpu types
->>> for each cpu model.
->>>
->>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->>> ---
->>> with this and conversion of features to properties,
->>> it would be possible to replace cpu_sparc_init() with
->>> cpu_generic_init() and reuse common -cpu handling
->>> infrastructure.
->>>
->>> CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>> CC: Artyom Tarasenko <atar4qemu@gmail.com>
->>> CC: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>
->>> v2:
->>>     * make base class abstract (Philippe Mathieu-Daudé <f4bug@amsat.org>)
->>> ---
->>>    target/sparc/cpu-qom.h |   2 +
->>>    target/sparc/cpu.c     | 121 +++++++++++++++++++++++++++++++++----------------
->>>    2 files changed, 84 insertions(+), 39 deletions(-)
->>>
->>> diff --git a/target/sparc/cpu-qom.h b/target/sparc/cpu-qom.h
->>> index f63af72..af6d57a 100644
->>> --- a/target/sparc/cpu-qom.h
->>> +++ b/target/sparc/cpu-qom.h
->>> @@ -35,6 +35,7 @@
->>>    #define SPARC_CPU_GET_CLASS(obj) \
->>>        OBJECT_GET_CLASS(SPARCCPUClass, (obj), TYPE_SPARC_CPU)
->>>    
->>> +typedef struct sparc_def_t sparc_def_t;
->>>    /**
->>>     * SPARCCPUClass:
->>>     * @parent_realize: The parent class' realize handler.
->>> @@ -49,6 +50,7 @@ typedef struct SPARCCPUClass {
->>>    
->>>        DeviceRealize parent_realize;
->>>        void (*parent_reset)(CPUState *cpu);
->>> +    sparc_def_t *cpu_def;
->>>    } SPARCCPUClass;
->>>    
->>>    typedef struct SPARCCPU SPARCCPU;
->>> diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
->>> index d606eb5..2994c09 100644
->>> --- a/target/sparc/cpu.c
->>> +++ b/target/sparc/cpu.c
->>> @@ -25,8 +25,6 @@
->>>    
->>>    //#define DEBUG_FEATURES
->>>    
->>> -static int cpu_sparc_find_by_name(sparc_def_t *cpu_def, const char *cpu_model);
->>> -
->>>    /* CPUClass::reset() */
->>>    static void sparc_cpu_reset(CPUState *s)
->>>    {
->>> @@ -111,17 +109,9 @@ static int cpu_sparc_register(SPARCCPU *cpu, const char *cpu_model)
->>>    {
->>>        CPUSPARCState *env = &cpu->env;
->>>        char *s = g_strdup(cpu_model);
->>> -    char *featurestr, *name = strtok(s, ",");
->>> -    sparc_def_t def1, *def = &def1;
->>> +    char *featurestr = strtok(s, ",");
->>>        Error *err = NULL;
->>>    
->>> -    if (cpu_sparc_find_by_name(def, name) < 0) {
->>> -        g_free(s);
->>> -        return -1;
->>> -    }
->>> -
->>> -    env->def = g_memdup(def, sizeof(*def));
->>> -
->>>        featurestr = strtok(NULL, ",");
->>>        sparc_cpu_parse_features(CPU(cpu), featurestr, &err);
->>>        g_free(s);
->>> @@ -130,18 +120,18 @@ static int cpu_sparc_register(SPARCCPU *cpu, const char *cpu_model)
->>>            return -1;
->>>        }
->>>    
->>> -    env->version = def->iu_version;
->>> -    env->fsr = def->fpu_version;
->>> -    env->nwindows = def->nwindows;
->>> +    env->version = env->def->iu_version;
->>> +    env->fsr = env->def->fpu_version;
->>> +    env->nwindows = env->def->nwindows;
->>>    #if !defined(TARGET_SPARC64)
->>> -    env->mmuregs[0] |= def->mmu_version;
->>> +    env->mmuregs[0] |= env->def->mmu_version;
->>>        cpu_sparc_set_id(env, 0);
->>> -    env->mxccregs[7] |= def->mxcc_version;
->>> +    env->mxccregs[7] |= env->def->mxcc_version;
->>>    #else
->>> -    env->mmu_version = def->mmu_version;
->>> -    env->maxtl = def->maxtl;
->>> -    env->version |= def->maxtl << 8;
->>> -    env->version |= def->nwindows - 1;
->>> +    env->mmu_version = env->def->mmu_version;
->>> +    env->maxtl = env->def->maxtl;
->>> +    env->version |= env->def->maxtl << 8;
->>> +    env->version |= env->def->nwindows - 1;
->>>    #endif
->>>        return 0;
->>>    }
->>> @@ -149,8 +139,19 @@ static int cpu_sparc_register(SPARCCPU *cpu, const char *cpu_model)
->>>    SPARCCPU *cpu_sparc_init(const char *cpu_model)
->>>    {
->>>        SPARCCPU *cpu;
->>> +    ObjectClass *oc;
->>> +    char *str, *name;
->>> +
->>> +    str = g_strdup(cpu_model);
->>> +    name = strtok(str, ",");
->>
->> you can free 'str' once here:
->>
->>          g_free(str);
->>
->>> +    oc = cpu_class_by_name(TYPE_SPARC_CPU, name);
->>> +    if (oc == NULL) {
->>> +        g_free(str);
->>
->> drop
->>
->>> +        return NULL;
->>> +    }
->>> +    g_free(str);
->>
->> drop
+On Tue, Aug 22, 2017 at 06:02:12PM +0100, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> I'll fix it up if I have to respin series (note this function is removed within series)
+> If the bdrv_inactivate_all fails near the end of the migration,
+> the migration will fail and often the only diagnostics in the log
+> are an I/O error which you can't distinguish from an error on
+> the socket connection.
 > 
-> [...]
->   
+> Add an error so we know when it's actually a block problem.
 > 
->> Anyway I can't start Aurelien's image [1] with this commit:
-> Can't reproduce it locally (either dirty/clean tree rebuild)
-> with ./configure --enable-debug
-> 
->   
->> $ sparc-softmmu/qemu-system-sparc -hda debian_etch_sparc_small.qcow2
->> qemu: Unable to find Sparc CPU definition
-> for this kind of error guest image doesn't matter as error happens during machine_init()
-> 
->> [1] https://people.debian.org/~aurel32/qemu/sparc/
-> It boots just fine with default CPU model:
-> 
-> ./sparc-softmmu/qemu-system-sparc -hda debian_etch_sparc_small.qcow2
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Sorry I'v been distracted by something else :/
-I might have done something wrong, I'll test it again tomorrow.
+IMHO it would be nice if bdrv_inactivate_all() can print some error
+message as soon as when the error occurs, then we can know more
+details (or allow caller to pass in an Error *).  But at least adding
+one more error message never hurts, so:
 
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+> ---
+>  migration/savevm.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> and with explicitly specified one:
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index fdd15fa0a7..7a55023d1a 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1157,6 +1157,8 @@ int qemu_savevm_state_complete_precopy(QEMUFile *f, bool iterable_only,
+>           * bdrv_invalidate_cache_all() on the other end won't fail. */
+>          ret = bdrv_inactivate_all();
+>          if (ret) {
+> +            error_report("%s: bdrv_inactivate_all() failed (%d)",
+> +                         __func__, ret);
+>              qemu_file_set_error(f, ret);
+>              return ret;
+>          }
+> -- 
+> 2.13.5
 > 
-> sparc-softmmu/qemu-system-sparc -cpu "Fujitsu MB86904"
-> 
-> I get from "info qom-tree"
-> ...
->   /device[0] (Fujitsu-MB86904-sparc-cpu)
-> ...
-> 
+
+-- 
+Peter Xu
