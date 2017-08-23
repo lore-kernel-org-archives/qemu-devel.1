@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkZyR-0000pe-Ns
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 14:01:52 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dka1P-0002Kb-Pc
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 14:04:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkZyM-00043U-Tv
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 14:01:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47746)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dkZyM-000436-LM
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 14:01:46 -0400
-Date: Wed, 23 Aug 2017 19:01:35 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170823180135.GI2648@work-vm>
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<1503471071-2233-9-git-send-email-peterx@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dka1O-0004qo-GV
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 14:04:55 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
+	<a81c8dfb-3d98-57ad-8159-5147283433fa@virtuozzo.com>
+Message-ID: <cb783ebb-198e-1814-2f9c-aec93c83b17a@virtuozzo.com>
+Date: Wed, 23 Aug 2017 21:04:37 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1503471071-2233-9-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 8/8] migration: add incoming mgmt lock
+In-Reply-To: <a81c8dfb-3d98-57ad-8159-5147283433fa@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] Persistent bitmaps for non-qcow2 formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +24,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: John Snow <jsnow@redhat.com>, Qemu-block <qemu-block@nongnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Now at least migrate_incoming can be run in parallel.  Let's provide a
-> migration lock to protect it.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  migration/migration.c | 6 ++++++
->  migration/migration.h | 3 +++
->  2 files changed, 9 insertions(+)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index c3fe0ed..32058f7 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -145,6 +145,7 @@ MigrationIncomingState *migration_incoming_get_current(void)
->          mis_current.state = MIGRATION_STATUS_NONE;
->          memset(&mis_current, 0, sizeof(MigrationIncomingState));
->          qemu_mutex_init(&mis_current.rp_mutex);
-> +        qemu_mutex_init(&mis_current.mgmt_mutex);
->          qemu_event_init(&mis_current.main_thread_load_event, false);
->          once = true;
->      }
-> @@ -1171,6 +1172,7 @@ void qmp_migrate_incoming(const char *uri, Error **errp)
->  {
->      Error *local_err = NULL;
->      static bool once = true;
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
+23.08.2017 11:59, Vladimir Sementsov-Ogievskiy wrote:
+> 22.08.2017 22:07, John Snow wrote:
+>> Well, we knew we'd want this sooner or later. I've got some pings
+>> downstream over whether or not we support persistent bitmaps for
+>> non-qcow2 formats.
+>>
+>> Currently: no, we don't.
+>>
+>> We tried two different ideas for storage agnostic bitmap persistence:
+>>
+>>
+>> (1) Using qcow2 as a storage container format (similar to VM save
+>> states) for information not associated with that particular drive.
+>>
+>> This didn't go over so well; we decided it was too messy logistically to
+>> manage data in any meaningful sense in a file that didn't share any
+>> semantic relationship to the qcow2 in question.
+>>
+>> Well, "We" decided is more like "Kevin and Max" decided. They are right,
+>> though.
+>>
+>>
+>> (2) Using a new proto-wrapper format that Fam Zheng designed that serves
+>> as a simple top-layer redirect for metadata that allows us to associate
+>> raw bitmap data with an arbitrary backing image.
+>>
+>> This also didn't go over so well, the desire for a "new format" was
+>> pretty thin, even if it was only a pseudo-format.
+>>
+>>
+>> We'd still like to be able to use bitmaps with non-qcow2 formats
+>> however, and people are going to keep asking. So here's a third thought:
+>>
+>>
+>> (3) Add either a new flag that turns qcow2's backing file into a full
+>> R/W backing file, or add a new extension to qcow2 entirely (bypassing
+>> the traditional backing file mechanism to avoid confusion for older
+>> tooling) that adds a new read-write backing file field.
+>>
+>> This RW backing file field will be used for all reads AND writes; the
+>> qcow2 in question becomes a metadata container on top of the BDS chain.
+>> We can re-use Vladimir's bitmap persistence extension to save bitmaps in
+>> a qcow2 shell.
+>>
+>> The qcow2 becomes effectively a metadata cache for a new (essentially)
+>> filter node that handles features such as bitmaps. This could also be
+>> used to provide allocation map data for RAW files and other goodies down
+>> the road.
+>>
+>> Hopefully this achieves our desire to not create new formats AND our
+>> desire to concentrate features (and debugging, testing, etc) into qcow2,
+>> while allowing users to "have bitmaps with raw files."
+>>
+>> Of course, in this scenario, users now have two files: a qcow2 wrapper
+>> and the actual raw file in question; but regardless of how we were going
+>> to solve this, a raw file necessitates an external file of some sort,
+>> else we give up the idea that it was a raw file.
+>>
+>>
+>> Sound good?
+>
+> Looks interesting. It is a clean reusing of qcow2-bitmaps without any 
+> modifications to them.
+>
+> Should there be some problems with internal snapshots and other things?
+>
+>
+>
+Hm. looks like that this backing file should not only receive all reads 
+and writes, but almost everything ->bdrv_ handlers, except bitmap 
+related of course. This doesn't seems simple to implement. Especially if 
+imaging some not-raw feature-full format under this thin qcow2 layer.. 
+Or we can restrict this RW backing file to be raw-only?
 
-migration_incoming_get_current isn't actually thread-safe itself unless
-you can guarantee the initial allocation has happened - otherwise both
-threads can race and do the 'once' code at the same time.
 
-Similarly, these locks - they don't protect our 'once' - so a second
-thread could come in here and both get past the !once check.
-
-Dave
-
->  
->      if (!deferred_incoming) {
->          error_setg(errp, "For use with '-incoming defer'");
-> @@ -1180,8 +1182,12 @@ void qmp_migrate_incoming(const char *uri, Error **errp)
->          error_setg(errp, "The incoming migration has already been started");
->      }
->  
-> +    qemu_mutex_lock(&mis->mgmt_mutex);
-> +
->      qemu_start_incoming_migration(uri, &local_err);
->  
-> +    qemu_mutex_unlock(&mis->mgmt_mutex);
-> +
->      if (local_err) {
->          error_propagate(errp, local_err);
->          return;
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 148c9fa..95f077b 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -58,6 +58,9 @@ struct MigrationIncomingState {
->      /* The coroutine we should enter (back) after failover */
->      Coroutine *migration_incoming_co;
->      QemuSemaphore colo_incoming_sem;
-> +
-> +    /* Migration incoming management lock */
-> +    QemuMutex mgmt_mutex;
->  };
->  
->  MigrationIncomingState *migration_incoming_get_current(void);
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+Best regards,
+Vladimir
