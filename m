@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dkWuv-0003vt-9D
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:46:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1dkWvb-0004UW-O1
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:46:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dkWuu-0005pr-F1
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:46:01 -0400
-Date: Wed, 23 Aug 2017 15:45:53 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170823144553.GE16760@stefanha-x1.localdomain>
-References: <20170822125113.5025-1-stefanha@redhat.com>
-	<8b6f5029-44e8-c14b-6730-6db69ce73f7e@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dkWva-0006lD-Q7
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:46:43 -0400
+References: <20170823134242.12080-1-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <64d71d45-39e0-9005-7e91-355e3c7881c8@redhat.com>
+Date: Wed, 23 Aug 2017 09:46:24 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8b6f5029-44e8-c14b-6730-6db69ce73f7e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] nbd-client: avoid spurious
- qio_channel_yield() re-entry
+In-Reply-To: <20170823134242.12080-1-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="BJ7Tsf8rK7vAclftFTS18vFAFb7egEtnj"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/4] block: Fix non-shared storage
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,35 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>
 
-On Tue, Aug 22, 2017 at 03:23:32PM +0200, Paolo Bonzini wrote:
-> On 22/08/2017 14:51, Stefan Hajnoczi wrote:
-> > This should fix the issue that Dave is seeing but I'm concerned that
-> > there are more problems in nbd-client.c.  We don't have good
-> > abstractions for writing coroutine socket I/O code.  Something like Go's
-> > channels would avoid manual low-level coroutine calls.  There is
-> > currently no way to cancel qio_channel_yield() so requests doing I/O may
-> > remain in-flight indefinitely and nbd-client.c doesn't join them...
-> 
-> The idea was that shutdown(2) would force them to reenter...
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--BJ7Tsf8rK7vAclftFTS18vFAFb7egEtnj
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ stefanha@redhat.com, Max Reitz <mreitz@redhat.com>
+Message-ID: <64d71d45-39e0-9005-7e91-355e3c7881c8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/4] block: Fix non-shared storage
+ migration
+References: <20170823134242.12080-1-famz@redhat.com>
+In-Reply-To: <20170823134242.12080-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-That depends on the BDRV_POLL_WHILE() allowing all request coroutines to
-terminate before we call nbd_client_detach_aio_context():
+On 08/23/2017 08:42 AM, Fam Zheng wrote:
+> This fixes the issue reported as https://bugs.launchpad.net/bugs/171160=
+2
+>=20
+> Fam Zheng (3):
+>   block-backend: Refactor inactivate check
+>   block-backend: Allow more "can inactivate" cases
+>   mirror: Mark target BB as "force allow inactivate"
+>=20
+> Stefan Hajnoczi (1):
+>   block: Update open_flags after ->inactivate() callback
 
-    qio_channel_shutdown(client->ioc,
-                         QIO_CHANNEL_SHUTDOWN_BOTH,
-                         NULL);
-    BDRV_POLL_WHILE(bs, client->read_reply_co);
+Placing on my queue for a 2.10-rc4 pull request
 
-    nbd_client_detach_aio_context(bs);
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-I'm not sure we have any guarantee that request coroutines will have
-terminated.
 
-Once nbd_client_detach_aio_context() is called
-ioc->read_coroutine/write_coroutine are set to NULL.  At that point any
-remaining coroutine doing I/O on ioc will be in trouble.
+--BJ7Tsf8rK7vAclftFTS18vFAFb7egEtnj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Stefan
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmdlUAACgkQp6FrSiUn
+Q2pB8wf+J6WSnMmbz32BgcaNI4RDDXRw6AEU2dDBK9Y83o/PzRwXE5nkKd6FJKtE
+msQGG0w3Yck0UV+6WMwt9arQ8eFlN7oP7dsJ0QgQc5AvsvDt+Xvfsd4Rm3BRTbrg
+Mjg6ZT7qub8PRx7b4GuknDGC0bm56jMU3FXOx/eZLJrk2qttDHYDv4nfdmzXiDM3
+DLBGZcMQv2PAQ3msUh8ZnvKx3kpoaOG62Xfq1T4qLuUmxG+32REBSYSFc5QCfo8p
+vXV9uAh4/kl66jz/9lkx4EyUvxces/w7AvVBuhaYYM+VZImHk678wPFARnsSi7HG
+Wnb5h4AArvickksxra7gWljWTGudQg==
+=PvXP
+-----END PGP SIGNATURE-----
+
+--BJ7Tsf8rK7vAclftFTS18vFAFb7egEtnj--
