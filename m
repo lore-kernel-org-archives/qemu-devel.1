@@ -1,39 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1dkV9k-0000wP-CC
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:53:13 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dkVEP-0002Zv-Ev
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:58:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ldoktor@redhat.com>) id 1dkV9g-0000Zl-Bs
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:53:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60264)
+	(envelope-from <ehabkost@redhat.com>) id 1dkVEM-0002td-1r
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:58:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49474)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1dkV9g-0000ZX-29
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:53:08 -0400
-References: <20170816082650.21880-1-cohuck@redhat.com>
-	<223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
-	<CAFEAcA_UfM_XNKdc5zfHsehoRE6Q+EszRZX3FByskir7c+0Lww@mail.gmail.com>
-	<20170822010917.GO12356@umbus.fritz.box>
-	<CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
-	<3f0dc918-0f55-e2f4-bf47-fe4abf5453bb@redhat.com>
-	<CAFEAcA_ezKWweEuUB-cXTer0LLaeuiGDkSdfhApedhw4ykDT0Q@mail.gmail.com>
-	<20170822112046.GC12356@umbus.fritz.box>
-	<20170822134815.77020eb8.cohuck@redhat.com>
-	<20170823002907.GC5379@umbus.fritz.box>
-	<20170823091650.48e7c44e.cohuck@redhat.com>
-	<54526d47-b436-79d5-7a38-9516eaa727a6@redhat.com>
-	<5b0ff74a-08d6-558d-4c79-a93758e6302a@redhat.com>
-	<0bb344a3-f8f8-3365-cef1-1c68cf7d160d@redhat.com>
-	<dafbe774-2544-f64e-aad2-9cf957025e8d@redhat.com>
-	<8f085a7b-bc3d-9551-b63e-4191f9e13af6@redhat.com>
-From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
-Message-ID: <dcbe3399-91d8-d632-c77b-2cd52806e373@redhat.com>
-Date: Wed, 23 Aug 2017 14:52:55 +0200
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dkVEL-0002tB-PJ
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:57:57 -0400
+Date: Wed, 23 Aug 2017 09:57:43 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170823125743.GF27715@localhost.localdomain>
+References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
+	<20170822132255.23945-54-marcandre.lureau@redhat.com>
+	<20170822184213.GH19998@localhost.localdomain>
+	<2076518614.2481492.1503483676829.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <8f085a7b-bc3d-9551-b63e-4191f9e13af6@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hNCSeuF2m3a95MDCmRTJCXpDn77aJp1D4"
-Subject: Re: [Qemu-devel] make check speed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <2076518614.2481492.1503483676829.JavaMail.zimbra@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 53/54] qapi: make
+ query-cpu-model-expansion depend on s390 or x86
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,120 +31,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hNCSeuF2m3a95MDCmRTJCXpDn77aJp1D4
-From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, David Gibson
- <david@gibson.dropbear.id.au>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Cleber Rosa <crosa@redhat.com>
-Message-ID: <dcbe3399-91d8-d632-c77b-2cd52806e373@redhat.com>
-Subject: Re: make check speed
-References: <20170816082650.21880-1-cohuck@redhat.com>
- <223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
- <CAFEAcA_UfM_XNKdc5zfHsehoRE6Q+EszRZX3FByskir7c+0Lww@mail.gmail.com>
- <20170822010917.GO12356@umbus.fritz.box>
- <CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
- <3f0dc918-0f55-e2f4-bf47-fe4abf5453bb@redhat.com>
- <CAFEAcA_ezKWweEuUB-cXTer0LLaeuiGDkSdfhApedhw4ykDT0Q@mail.gmail.com>
- <20170822112046.GC12356@umbus.fritz.box>
- <20170822134815.77020eb8.cohuck@redhat.com>
- <20170823002907.GC5379@umbus.fritz.box>
- <20170823091650.48e7c44e.cohuck@redhat.com>
- <54526d47-b436-79d5-7a38-9516eaa727a6@redhat.com>
- <5b0ff74a-08d6-558d-4c79-a93758e6302a@redhat.com>
- <0bb344a3-f8f8-3365-cef1-1c68cf7d160d@redhat.com>
- <dafbe774-2544-f64e-aad2-9cf957025e8d@redhat.com>
- <8f085a7b-bc3d-9551-b63e-4191f9e13af6@redhat.com>
-In-Reply-To: <8f085a7b-bc3d-9551-b63e-4191f9e13af6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-Dne 23.8.2017 v 14:35 Thomas Huth napsal(a):
-> On 23.08.2017 13:51, Luk=C3=A1=C5=A1 Doktor wrote:
-> [...]
->> and all ERROR lines:
->>
->>     ERROR:tests/prom-env-test.c:42:check_guest_memory: assertion faile=
-d (signature =3D=3D MAGIC): (0x00000000 =3D=3D 0xcafec0de)
+On Wed, Aug 23, 2017 at 06:21:16AM -0400, Marc-Andr=E9 Lureau wrote:
+> Hi
 >=20
-> This test uses a timeout of 120 s, see check_guest_memory() in
-> tests/prom-env-test.c ... that's a lot already, but if you hit this on =
-a
-> real system, feel free to send a patch to increase the timeout.
+> ----- Original Message -----
+> > On Tue, Aug 22, 2017 at 03:22:54PM +0200, Marc-Andr=E9 Lureau wrote:
+> > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> > > ---
+> > >  qapi-schema.json                       |  4 +++-
+> > >  include/sysemu/arch_init.h             |  3 ---
+> > >  monitor.c                              |  3 ---
+> > >  qmp.c                                  |  7 -------
+> > >  stubs/arch-query-cpu-model-expansion.c | 12 ------------
+> > >  target/i386/cpu.c                      |  2 +-
+> > >  target/s390x/cpu_models.c              |  3 ++-
+> > >  stubs/Makefile.objs                    |  1 -
+> > >  8 files changed, 6 insertions(+), 29 deletions(-)
+> > >  delete mode 100644 stubs/arch-query-cpu-model-expansion.c
+> > >=20
+> > > diff --git a/qapi-schema.json b/qapi-schema.json
+> > > index 6c1adb35b5..127a2c71c6 100644
+> > > --- a/qapi-schema.json
+> > > +++ b/qapi-schema.json
+> > > @@ -4535,7 +4535,9 @@
+> > >  { 'command': 'query-cpu-model-expansion',
+> > >    'data': { 'type': 'CpuModelExpansionType',
+> > >              'model': 'CpuModelInfo' },
+> > > -  'returns': 'CpuModelExpansionInfo' }
+> > > +  'returns': 'CpuModelExpansionInfo',
+> > > +  'if': ['defined(NEED_CPU_H)',
+> > > +         'defined(TARGET_S390X) || defined(TARGET_I386)']}
+> >=20
+> > Maybe this is already documented somewhere in the series (I'm
+> > still going through the other patches), but: why exactly is
+> > 'defined(NEED_CPU_H)' in the list, too?
 >=20
->>     ERROR:tests/rtc-test.c:173:check_time: assertion failed (ABS(t - s=
-) <=3D wiggle): (3 <=3D 2)
+> The point of this series is to make qapi schema configurable.
 >=20
-> You might need to increase the "wiggle" variable here.
->=20
->>     ERROR:tests/vhost-user-test.c:779:test_reconnect: child process (/=
-i386/vhost-user/reconnect/subprocess [5264]) failed unexpectedly
->>     ERROR:tests/vhost-user-test.c:807:test_connect_fail: child process=
- (/x86_64/vhost-user/connect-fail/subprocess [7751]) failed unexpectedly
->>     ERROR:tests/vhost-user-test.c:835:test_flags_mismatch: child proce=
-ss (/x86_64/vhost-user/flags-mismatch/subprocess [7892]) failed unexpecte=
-dly
->=20
-> I've got no clue about what could be wrong here ... maybe Marc-Andr=C3=A9=
- can
-> advise here (who wrote these tests if I got "git blame" right).
->=20
->>     ERROR:tests/boot-sector.c:127:boot_sector_test: assertion failed (=
-signature =3D=3D SIGNATURE): (0x00000000 =3D=3D 0x0000dead)
->=20
-> Uses a timeout of 90 s ... feel free to send a patch to increase it if
-> it's necessary (the timeout can be found in boot_sector_test() in
-> tests/boot-sector.c).
->=20
->  Thomas
->=20
+> Some types/commands/events are target-specifc. In order to
+> #ifdef on poisoined symbols, we make most of QAPI generated
+> code built per-target in patch 49/54. But the common code still
+> need to compile some units, that's why #ifdef NEED_CPU_U. The
+> clean solution is probably to split the generated schema to
+> common & per-target, that's not covered in the series.
 
-Well this one was produced by the `stress` command, so it does not reflec=
-t the reality. So this time I took the time and looked at the actual fail=
-ures in David's travis results (his builds were already migrated to trust=
-y and are failing massively) https://travis-ci.org/dgibson/qemu/builds I =
-see only the `vhost-user-test` failing:
+I see.  I'm worried about one thing: what if the QMP dispatch
+code is incorrectly moved back to common code later?  It will
+silently skip all the arch-dependent commands without any
+warnings.
 
-ERROR:tests/vhost-user-test.c:779:test_reconnect: child process (/x86_64/=
-vhost-user/reconnect/subprocess [58907]) failed unexpectedly
-ERROR:tests/vhost-user-test.c:807:test_connect_fail: child process (/x86_=
-64/vhost-user/connect-fail/subprocess [58924]) failed unexpectedly
-ERROR:tests/vhost-user-test.c:835:test_flags_mismatch: child process (/i3=
-86/vhost-user/flags-mismatch/subprocess [56261]) failed unexpectedly
+e.g.: I just applied the following change on top of your series,
+and all arch-dependent commands are silently skipped:
 
-I actually looked there but I have no clue of how to fix this issue. But =
-most probably it'd make Travis happier...
+  diff --git a/Makefile.objs b/Makefile.objs
+  index 2664720..24a4ea0 100644
+  --- a/Makefile.objs
+  +++ b/Makefile.objs
+  @@ -2,7 +2,7 @@
+   # Common libraries for tools and emulators
+   stub-obj-y =3D stubs/ crypto/
+   util-obj-y =3D util/ qobject/ qapi/
+  -util-obj-y +=3D qapi-types.o qapi-visit.o
+  +util-obj-y +=3D qmp-introspect.o qapi-types.o qapi-visit.o qapi-event.=
+o
+  =20
+   chardev-obj-y =3D chardev/
+  =20
+  @@ -72,6 +72,13 @@ common-obj-y +=3D chardev/
+   common-obj-$(CONFIG_SECCOMP) +=3D qemu-seccomp.o
+  =20
+   common-obj-$(CONFIG_FDT) +=3D device_tree.o
+  +
+  +######################################################################
+  +# qapi
+  +
+  +common-obj-y +=3D qmp-marshal.o
+  +common-obj-y +=3D qmp-introspect.o
+  +common-obj-y +=3D qmp.o hmp.o
+   endif
+  =20
+   ######################################################################=
+#
+  diff --git a/Makefile.target b/Makefile.target
+  index c5f8ded..7f42c45 100644
+  --- a/Makefile.target
+  +++ b/Makefile.target
+  @@ -157,10 +157,6 @@ endif
+  =20
+   GENERATED_FILES +=3D hmp-commands.h hmp-commands-info.h
+  =20
+  -obj-y +=3D qmp-introspect.o qapi-types.o qapi-visit.o qapi-event.o
+  -obj-y +=3D qmp-marshal.o qmp-introspect.o
+  -obj-y +=3D qmp.o hmp.o
+  -
+   endif # CONFIG_SOFTMMU
+  =20
+   # Workaround for http://gcc.gnu.org/PR55489, see configure.
 
-Luk=C3=A1=C5=A1
+
+We wouldn't need to check NEED_CPU_H at all if the condition on
+QMP commands affect only the actual QMP dispatch code, and not
+the generated types or declarations.  e.g.:
 
 
---hNCSeuF2m3a95MDCmRTJCXpDn77aJp1D4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 194859f..67b46ad 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -3578,7 +3578,7 @@
+ ##
+ { 'command': 'dump-skeys',
+   'data': { 'filename': 'str' },
+-  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_S390X)']}
++  'if': ['defined(TARGET_S390X)']}
+=20
+ ##
+ # @netdev_add:
+@@ -4434,8 +4434,7 @@
+ # Since: 1.2.0
+ ##
+ { 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
+-  'if': ['defined(NEED_CPU_H)',
+-         'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I=
+386) || defined(TARGET_S390X)'] }
++  'if': ['defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I=
+386) || defined(TARGET_S390X)'] }
+=20
+ ##
+ # @CpuModelInfo:
+@@ -4538,8 +4537,7 @@
+   'data': { 'type': 'CpuModelExpansionType',
+             'model': 'CpuModelInfo' },
+   'returns': 'CpuModelExpansionInfo',
+-  'if': ['defined(NEED_CPU_H)',
+-         'defined(TARGET_S390X) || defined(TARGET_I386)']}
++  'if': ['defined(TARGET_S390X) || defined(TARGET_I386)']}
+=20
+ ##
+ # @CpuModelCompareResult:
+@@ -4627,7 +4625,7 @@
+ { 'command': 'query-cpu-model-comparison',
+   'data': { 'modela': 'CpuModelInfo', 'modelb': 'CpuModelInfo' },
+   'returns': 'CpuModelCompareInfo',
+-  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_S390X)']}
++  'if': ['defined(TARGET_S390X)']}
+=20
+=20
+ ##
+@@ -4681,7 +4679,7 @@
+   'data': { 'modela': 'CpuModelInfo',
+             'modelb': 'CpuModelInfo' },
+   'returns': 'CpuModelBaselineInfo',
+-  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_S390X)']}
++  'if': ['defined(TARGET_S390X)']}
+=20
+ ##
+ # @AddfdInfo:
+@@ -6303,7 +6301,7 @@
+ #
+ ##
+ { 'command': 'rtc-reset-reinjection',
+-  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_I386)'] }
++  'if': ['defined(TARGET_I386)'] }
+=20
+ # Rocker ethernet network switch
+ { 'include': 'qapi/rocker.json' }
+@@ -6466,7 +6464,7 @@
+ #
+ ##
+ { 'command': 'query-gic-capabilities', 'returns': ['GICCapability'],
+-  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_ARM)']}
++  'if': ['defined(TARGET_ARM)']}
+=20
+ ##
+ # @CpuInstanceProperties:
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index bcd8d37..769a730 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -1720,8 +1720,7 @@ class QAPISchema(object):
+         ifcond =3D expr.get('if')
+         if isinstance(data, OrderedDict):
+             data =3D self._make_implicit_object_type(
+-                name, info, doc, 'arg', self._make_members(data, info),
+-                ifcond)
++                name, info, doc, 'arg', self._make_members(data, info))
+         if isinstance(rets, list):
+             assert len(rets) =3D=3D 1
+             rets =3D self._make_array_type(rets[0], info)
+diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
+index db45415..2baa73f 100644
+--- a/scripts/qapi-commands.py
++++ b/scripts/qapi-commands.py
+@@ -228,7 +228,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
+         self.defn =3D None
+         self._regy =3D None
+         self._visited_ret_types =3D None
+-        self.if_members =3D ['decl', 'defn', '_regy']
++        self.if_members =3D ['defn', '_regy']
+=20
+     def visit_begin(self, schema):
+         self.decl =3D ''
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iQEwBAEBCAAaBQJZnXqnExxsZG9rdG9yQHJlZGhhdC5jb20ACgkQJrNi5H/PIsEa
-rgf+PN00TZHIg1dn0SftnLA/fKYfugbUpUDK/VqtDziL7AvbQorjdc+eYeEA+1Hs
-8eFUZjMJVUz8UxE5DC3IVXKs6q6aQguancl16c38C9ieAs5mYP/DSPm5N2Ir8gPj
-g1Qj0d1iPugKvDpG+kljYCJQ4k1O47H28ZHdac8P9Offfxeaj/G+D7dPy8i+GwOm
-j4qWcwP/ujd5RFk/jmM2BhSvRdk3C8QVWaQm/GF+v5s5ircmHoEzz6+ebGzbLRm3
-7xW4uenSWq4I2LG/At/8NG2n0YMKyUzvGUJo5pxHqcXRQAM0WeLKAmlsV/NusDaJ
-xuoiyfAJjxEORLdAKh/stYzGgQ==
-=zKRr
------END PGP SIGNATURE-----
-
---hNCSeuF2m3a95MDCmRTJCXpDn77aJp1D4--
+--=20
+Eduardo
