@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1dkReB-0001Tq-Sb
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 05:08:24 -0400
+	(envelope-from <famz@redhat.com>) id 1dkRfJ-00027w-PC
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 05:09:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1dkRe6-0005I8-Tn
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 05:08:23 -0400
-Date: Wed, 23 Aug 2017 11:08:16 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20170823022833.GK5379@umbus.fritz.box>
-Message-ID: <alpine.BSF.2.21.1708231104210.76247@zero.eik.bme.hu>
-References: <cover.1503249785.git.balaton@eik.bme.hu>
-	<f34dbaefd1224bca33a9052107cd32b628400106.1503249785.git.balaton@eik.bme.hu>
-	<20170823022833.GK5379@umbus.fritz.box>
+	(envelope-from <famz@redhat.com>) id 1dkRfF-0005z5-08
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 05:09:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57514)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dkRfE-0005yq-PR
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 05:09:28 -0400
+Date: Wed, 23 Aug 2017 17:09:21 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170823090921.GB16292@lemon>
+References: <3f0dc918-0f55-e2f4-bf47-fe4abf5453bb@redhat.com>
+	<CAFEAcA_ezKWweEuUB-cXTer0LLaeuiGDkSdfhApedhw4ykDT0Q@mail.gmail.com>
+	<20170822112046.GC12356@umbus.fritz.box>
+	<20170822134815.77020eb8.cohuck@redhat.com>
+	<20170823002907.GC5379@umbus.fritz.box>
+	<20170823091650.48e7c44e.cohuck@redhat.com>
+	<54526d47-b436-79d5-7a38-9516eaa727a6@redhat.com>
+	<5b0ff74a-08d6-558d-4c79-a93758e6302a@redhat.com>
+	<0bb344a3-f8f8-3365-cef1-1c68cf7d160d@redhat.com>
+	<20170823085219.GA16292@lemon>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH 11/15] ppc: Add 460EX embedded CPU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170823085219.GA16292@lemon>
+Subject: Re: [Qemu-devel] make check speed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,21 +35,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
 
-On Wed, 23 Aug 2017, David Gibson wrote:
-> On Sun, Aug 20, 2017 at 07:23:05PM +0200, BALATON Zoltan wrote:
->> Despite its name it is a 440 core CPU
->
-> As I recall 460 was supposed to be a 440 with SMP support.  Except
-> they screwed up the cache coherence, so it's basically unusable for
-> SMP (at least with Linux).  They finally got 440 SMP right in 470
-> IIRC.
->
-> Or are you saying that the 460EX is more 440 like than other 460 cpus?
+On Wed, 08/23 16:52, Fam Zheng wrote:
+> On Wed, 08/23 10:35, Thomas Huth wrote:
+> > Is it safe nowadays to run "make check -j4" for example? Last time I
+> > tried (maybe 1 or 2 years ago), there were still issues since some tests
+> > were using hard-coded temporary file names, so the parallel tests were
+> > disturbing each other, for example...
+> 
+> We really should fix them.
+> 
+> Last year I wanted to get some speed up in patchew's "make check" jobs so I
+> tried this:
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2016-09/msg07713.html
+> 
+> On my laptop it can save 50% time as shown in the commit message, unfortunately
+> the patch didn't get enough traction, and I've since then rarely used -j in
+> "make check" command lines (what?!).
 
-AFAIK this SoC really has a 440 core with some of the embedded devices 
-(such as PCIe and SDRAM controller) similar to real 460 core SoCs, so its 
-name is a bit misleading. It definitely does not have a 460 CPU core so 
-it's more like 440 than other 460 core SoCs.
+Spoke too soon, I forgot my git-publish hook has been doing "make check -j8" on
+all patches I post, and it seems to work well.
+
+Fam
