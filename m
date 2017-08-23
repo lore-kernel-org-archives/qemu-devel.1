@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dkVLE-0005Rk-LS
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:05:11 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dkVNR-0007Oy-1g
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:07:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dkVL7-00064X-Jd
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:05:04 -0400
-Received: from research.iiit.ac.in ([196.12.53.8]:39874)
+	(envelope-from <ehabkost@redhat.com>) id 1dkVNN-0008Fu-Ih
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:07:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42596)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dkVL6-00063r-TK
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:04:57 -0400
-From: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-Date: Wed, 23 Aug 2017 18:34:38 +0530
-Message-Id: <1503493480-21691-2-git-send-email-chugh.ishani@research.iiit.ac.in>
-In-Reply-To: <1503493480-21691-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-References: <1503493480-21691-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-Subject: [Qemu-devel] [PATCH 1/3] backup: QEMU Backup Tool
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dkVNN-0008F8-9s
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:07:17 -0400
+Date: Wed, 23 Aug 2017 10:07:14 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170823130714.GK19998@localhost.localdomain>
+References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
+	<1503050939-227939-4-git-send-email-imammedo@redhat.com>
+	<20170818182404.GC27715@localhost.localdomain>
+	<20170821130307.3cd85653@nial.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170821130307.3cd85653@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11 03/27] sparc: convert cpu features
+ to qdev properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,384 +30,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, jsnow@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-qemu-backup will be a command-line tool for performing full and
-incremental disk backups on running VMs. It is intended as a
-reference implementation for management stack and backup developers
-to see QEMU's backup features in action. The tool writes details of
-guest in a configuration file and the data is retrieved from the file
-while creating a backup. The location of config file can be set as an
-environment variable QEMU_BACKUP_CONFIG. The usage is as follows:
+On Mon, Aug 21, 2017 at 01:03:07PM +0200, Igor Mammedov wrote:
+> On Fri, 18 Aug 2017 15:24:04 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> 
+> > On Fri, Aug 18, 2017 at 12:08:35PM +0200, Igor Mammedov wrote:
+> > > SPARC is the last target that uses legacy way of parsing
+> > > and initializing cpu features, drop legacy approach and
+> > > convert features to properties so that SPARC could as minimum
+> > > benefit from generic cpu_generic_init(), common with
+> > > x86 +-feat parser
+> > > 
+> > > PS:
+> > > the main purpose is to remove legacy way of cpu creation as
+> > > a blocker for unifying cpu creation code across targets.
+> > > 
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
+> > [...]
+> > > ---
+> > > CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> > > CC: Artyom Tarasenko <atar4qemu@gmail.com>
+> > > CC: Eduardo Habkost <ehabkost@redhat.com>
+> > > ---
+> > >  target/sparc/cpu.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> > >  1 file changed, 66 insertions(+)
+> > > 
+> > > diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+> > > index f4e7343..e735d73 100644
+> > > --- a/target/sparc/cpu.c
+> > > +++ b/target/sparc/cpu.c
+> > > @@ -22,6 +22,8 @@
+> > >  #include "cpu.h"
+> > >  #include "qemu/error-report.h"
+> > >  #include "exec/exec-all.h"
+> > > +#include "hw/qdev-properties.h"
+> > > +#include "qapi/visitor.h"
+> > >  
+> > >  //#define DEBUG_FEATURES
+> > >  
+> > > @@ -853,6 +855,69 @@ static void sparc_cpu_initfn(Object *obj)
+> > >      }
+> > >  }
+> > >  
+> > > +static void sparc_get_nwindows(Object *obj, Visitor *v, const char *name,
+> > > +                               void *opaque, Error **errp)
+> > > +{
+> > > +    SPARCCPU *cpu = SPARC_CPU(obj);
+> > > +    int64_t value = cpu->env.def.nwindows;
+> > > +
+> > > +    visit_type_int(v, name, &value, errp);
+> > > +}
+> > > +
+> > > +static void sparc_set_nwindows(Object *obj, Visitor *v, const char *name,
+> > > +                               void *opaque, Error **errp)
+> > > +{
+> > > +    const int64_t min = MIN_NWINDOWS;
+> > > +    const int64_t max = MAX_NWINDOWS;
+> > > +    SPARCCPU *cpu = SPARC_CPU(obj);
+> > > +    Error *err = NULL;
+> > > +    int64_t value;
+> > > +
+> > > +    visit_type_int(v, name, &value, &err);
+> > > +    if (err) {
+> > > +        error_propagate(errp, err);
+> > > +        return;
+> > > +    }
+> > > +
+> > > +    if (value < min || value > max) {
+> > > +        error_setg(errp, "Property %s.%s doesn't take value %" PRId64
+> > > +                   " (minimum: %" PRId64 ", maximum: %" PRId64 ")",
+> > > +                   object_get_typename(obj), name ? name : "null",
+> > > +                   value, min, max);
+> > > +        return;
+> > > +    }
+> > > +    cpu->env.def.nwindows = value;  
+> > 
+> > I think it would be much simpler to just validate nwindows at
+> > realize time and use DEFINE_PROP_UINT32 below, but I won't mind
+> > if you really prefer the custom setter.
+> Indeed it would shave off ~12LOC if check is done at realize time,
+> but I prefer to throw error at the place where it's set.
+> I'd go for realize approach only if check couldn't be done
+> at property setting time.
 
-Add a guest
-python qemu-backup.py guest add --guest <guest_name> --qmp <socket_path>
+I would prefer to avoid custom getters/setters when possible, but
+I agree it is better to validate the value as soon as possible
+(on the setter instead of realize).  If we want to avoid custom
+setters, we need to improve the DEFINE_PROP_* interface.
 
-Add a drive for backup in a specified guest
-python qemu-backup.py drive add --guest <guest_name> --id <drive_id> [--target <target_file_path>]
+> 
+> 
+> > But I have another question:
+> > 
+> > > +}
+> > > +
+> > > +static PropertyInfo qdev_prop_nwindows = {
+> > > +    .name  = "int",
+> > > +    .get   = sparc_get_nwindows,
+> > > +    .set   = sparc_set_nwindows,
+> > > +};
+> > > +
+> > > +static Property sparc_cpu_properties[] = {
+> > > +    DEFINE_PROP_BIT("float",    SPARCCPU, env.def.features, 0, false),
+> > > +    DEFINE_PROP_BIT("float128", SPARCCPU, env.def.features, 1, false),
+> > > +    DEFINE_PROP_BIT("swap",     SPARCCPU, env.def.features, 2, false),
+> > > +    DEFINE_PROP_BIT("mul",      SPARCCPU, env.def.features, 3, false),
+> > > +    DEFINE_PROP_BIT("div",      SPARCCPU, env.def.features, 4, false),
+> > > +    DEFINE_PROP_BIT("flush",    SPARCCPU, env.def.features, 5, false),
+> > > +    DEFINE_PROP_BIT("fsqrt",    SPARCCPU, env.def.features, 6, false),
+> > > +    DEFINE_PROP_BIT("fmul",     SPARCCPU, env.def.features, 7, false),
+> > > +    DEFINE_PROP_BIT("vis1",     SPARCCPU, env.def.features, 8, false),
+> > > +    DEFINE_PROP_BIT("vis2",     SPARCCPU, env.def.features, 9, false),
+> > > +    DEFINE_PROP_BIT("fsmuld",   SPARCCPU, env.def.features, 10, false),
+> > > +    DEFINE_PROP_BIT("hypv",     SPARCCPU, env.def.features, 11, false),
+> > > +    DEFINE_PROP_BIT("cmt",      SPARCCPU, env.def.features, 12, false),
+> > > +    DEFINE_PROP_BIT("gl",       SPARCCPU, env.def.features, 13, false),
+> > > +    DEFINE_PROP_UNSIGNED("iu-version", SPARCCPU, env.def.iu_version, 0,
+> > > +                         qdev_prop_uint64, target_ulong),
+> > > +    DEFINE_PROP_UINT32("fpu-version", SPARCCPU, env.def.fpu_version, 0),
+> > > +    DEFINE_PROP_UINT32("mmu-version", SPARCCPU, env.def.mmu_version, 0),
+> > > +    { .name  = "nwindows", .info  = &qdev_prop_nwindows },  
+> > 
+> > What's the advantage of using a custom PropertyInfo struct if you
+> > can just call object_class_property_add() at
+> > sparc_cpu_class_init()?
+> consistentcy with the rest of properties added above
+> and instead of a zoo of ways to add property within the patch/featureset
 
-Create backup of the added drives:
-python qemu-backup.py backup --guest <guest_name>
+Well, both options (custom PropertyInfo and manual
+object_class_property_add() call) look bad to me.  But improving
+the property API to not require a custom setter is out of context
+of this series, so:
 
-List all guest configs in configuration file:
-python qemu-backup.py guest list
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Restore operation
-python qemu-backup.py restore --guest <guest-name>
+> 
+> > 
+> > > +    DEFINE_PROP_END_OF_LIST()
+> > > +};
+> > > +
+> > >  static void sparc_cpu_class_init(ObjectClass *oc, void *data)
+> > >  {
+> > >      SPARCCPUClass *scc = SPARC_CPU_CLASS(oc);
+> > > @@ -861,6 +926,7 @@ static void sparc_cpu_class_init(ObjectClass *oc, void *data)
+> > >  
+> > >      scc->parent_realize = dc->realize;
+> > >      dc->realize = sparc_cpu_realizefn;
+> > > +    dc->props = sparc_cpu_properties;
+> > >  
+> > >      scc->parent_reset = cc->reset;
+> > >      cc->reset = sparc_cpu_reset;
+> > > -- 
+> > > 2.7.4
+> > > 
+> > >   
+> > 
+> 
 
-Remove a guest
-python qemu-backup.py guest remove --guest <guest_name>
-
-Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
----
- contrib/backup/qemu-backup.py | 338 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 338 insertions(+)
- create mode 100644 contrib/backup/qemu-backup.py
-
-diff --git a/contrib/backup/qemu-backup.py b/contrib/backup/qemu-backup.py
-new file mode 100644
-index 0000000..b4a9efd
---- /dev/null
-+++ b/contrib/backup/qemu-backup.py
-@@ -0,0 +1,338 @@
-+#!/usr/bin/python
-+# -*- coding: utf-8 -*-
-+#
-+# Copyright (C) 2017 Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+"""
-+This file is an implementation of backup tool
-+"""
-+from __future__ import print_function
-+from argparse import ArgumentParser
-+import os
-+import errno
-+from socket import error as socket_error
-+try:
-+    import configparser
-+except ImportError:
-+    import ConfigParser as configparser
-+import sys
-+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..',
-+                             'scripts', 'qmp'))
-+from qmp import QEMUMonitorProtocol
-+
-+
-+class BackupTool(object):
-+    """BackupTool Class"""
-+    def __init__(self, config_file=os.path.expanduser('~') +
-+                 '/.config/qemu/qemu-backup-config'):
-+        if "QEMU_BACKUP_CONFIG" in os.environ:
-+            self.config_file = os.environ["QEMU_BACKUP_CONFIG"]
-+        else:
-+            self.config_file = config_file
-+            try:
-+                if not os.path.isdir(os.path.dirname(self.config_file)):
-+                    os.makedirs(os.path.dirname(self.config_file))
-+            except:
-+                print("Cannot create config directory", file=sys.stderr)
-+                sys.exit(1)
-+        self.config = configparser.ConfigParser()
-+        self.config.read(self.config_file)
-+
-+    def write_config(self):
-+        """
-+        Writes configuration to ini file.
-+        """
-+        config_file = open(self.config_file+".tmp", 'w')
-+        self.config.write(config_file)
-+        config_file.flush()
-+        os.fsync(config_file.fileno())
-+        config_file.close()
-+        os.rename(self.config_file+".tmp", self.config_file)
-+
-+    def get_socket_address(self, socket_address):
-+        """
-+        Return Socket address in form of string or tuple
-+        """
-+        if socket_address.startswith('tcp'):
-+            return (socket_address.split(':')[1],
-+                    int(socket_address.split(':')[2]))
-+        return socket_address.split(':', 2)[1]
-+
-+    def _full_backup(self, guest_name):
-+        """
-+        Performs full backup of guest
-+        """
-+        if guest_name not in self.config.sections():
-+            print("Cannot find specified guest", file=sys.stderr)
-+            sys.exit(1)
-+
-+        self.verify_guest_running(guest_name)
-+        connection = QEMUMonitorProtocol(
-+                                         self.get_socket_address(
-+                                             self.config[guest_name]['qmp']))
-+        connection.connect()
-+        cmd = {"execute": "transaction", "arguments": {"actions": []}}
-+        drive_list = []
-+        for key in self.config[guest_name]:
-+            if key.startswith("drive_"):
-+                drive = key[len('drive_'):]
-+                drive_list.append(drive)
-+                target = self.config[guest_name][key]
-+                sub_cmd = {"type": "drive-backup", "data": {"device": drive,
-+                                                            "target": target,
-+                                                            "sync": "full"}}
-+                cmd['arguments']['actions'].append(sub_cmd)
-+        qmp_return = connection.cmd_obj(cmd)
-+        if 'error' in qmp_return:
-+            print(qmp_return['error']['desc'], file=sys.stderr)
-+            sys.exit(1)
-+        print("Backup Started")
-+        while len(drive_list) != 0:
-+            event = connection.pull_event(wait=True)
-+            print(event)
-+            if event['event'] == 'SHUTDOWN':
-+                print("The guest was SHUT DOWN", file=sys.stderr)
-+                sys.exit(1)
-+
-+            if event['event'] == 'RESET':
-+                print("The guest was Rebooted", file=sys.stderr)
-+                sys.exit(1)
-+
-+            if event['event'] == 'BLOCK_JOB_COMPLETED':
-+                if event['data']['device'] in drive_list and \
-+                        event['data']['type'] == 'backup':
-+                        print("*"+event['data']['device'])
-+                        drive_list.remove(event['data']['device'])
-+
-+            if event['event'] == 'BLOCK_JOB_ERROR':
-+                if event['data']['device'] in drive_list and \
-+                        event['data']['type'] == 'backup':
-+                        print(event['data']['device']+" Backup Failed", file=sys.stderr)
-+        print("Backup Complete")
-+
-+    def _drive_add(self, drive_id, guest_name, target=None):
-+        """
-+        Adds drive for backup
-+        """
-+        if target is None:
-+            target = os.path.abspath(drive_id)
-+
-+        if os.path.isdir(os.path.dirname(target)) is False:
-+            print("Cannot find target directory", file=sys.stderr)
-+            sys.exit(1)
-+
-+        if guest_name not in self.config.sections():
-+            print("Cannot find specified guest", file=sys.stderr)
-+            sys.exit(1)
-+
-+        if "drive_"+drive_id in self.config[guest_name]:
-+            print("Drive already marked for backup", file=sys.stderr)
-+            sys.exit(1)
-+
-+        self.verify_guest_running(guest_name)
-+
-+        connection = QEMUMonitorProtocol(
-+                                         self.get_socket_address(
-+                                             self.config[guest_name]['qmp']))
-+        connection.connect()
-+        cmd = {'execute': 'query-block'}
-+        returned_json = connection.cmd_obj(cmd)
-+        device_present = False
-+        for device in returned_json['return']:
-+            if device['device'] == drive_id:
-+                device_present = True
-+                break
-+
-+        if not device_present:
-+            print("No such drive in guest", file=sys.stderr)
-+            sys.exit(1)
-+
-+        drive_id = "drive_" + drive_id
-+        for d_id in self.config[guest_name]:
-+            if self.config[guest_name][d_id] == target:
-+                print("Please choose different target", file=sys.stderr)
-+                sys.exit(1)
-+        self.config.set(guest_name, drive_id, target)
-+        self.write_config()
-+        print("Successfully Added Drive")
-+
-+    def verify_guest_running(self, guest_name):
-+        """
-+        Checks whether specified guest is running or not
-+        """
-+        socket_address = self.config.get(guest_name, 'qmp')
-+        try:
-+            connection = QEMUMonitorProtocol(self.get_socket_address(
-+                                             socket_address))
-+            connection.connect()
-+        except socket_error:
-+            if socket_error.errno != errno.ECONNREFUSED:
-+                print("Connection to guest refused", file=sys.stderr)
-+                sys.exit(1)
-+
-+    def _guest_add(self, guest_name, socket_address):
-+        """
-+        Adds a guest to the config file
-+        """
-+        if guest_name in self.config.sections():
-+            print("ID already exists. Please choose a different guestname",
-+                  file=sys.stderr)
-+            sys.exit(1)
-+        self.config[guest_name] = {'qmp': socket_address}
-+        self.verify_guest_running(guest_name)
-+        self.write_config()
-+        print("Successfully Added Guest")
-+
-+    def _guest_remove(self, guest_name):
-+        """
-+        Removes a guest from config file
-+        """
-+        if guest_name not in self.config.sections():
-+            print("Guest Not present", file=sys.stderr)
-+            sys.exit(1)
-+        self.config.remove_section(guest_name)
-+        print("Guest successfully deleted")
-+
-+    def _restore(self, guest_name):
-+        """
-+        Prints Steps to perform restore operation
-+        """
-+        if guest_name not in self.config.sections():
-+            print("Cannot find specified guest", file=sys.stderr)
-+            sys.exit(1)
-+
-+        self.verify_guest_running(guest_name)
-+        connection = QEMUMonitorProtocol(
-+                                         self.get_socket_address(
-+                                             self.config[guest_name]['qmp']))
-+        connection.connect()
-+        print("To perform restore:")
-+        print("Shut down guest")
-+        for key in self.config[guest_name]:
-+            if key.startswith("drive_"):
-+                drive = key[len('drive_'):]
-+                target = self.config[guest_name][key]
-+                cmd = {'execute': 'query-block'}
-+                returned_json = connection.cmd_obj(cmd)
-+                device_present = False
-+                for device in returned_json['return']:
-+                    if device['device'] == drive:
-+                        device_present = True
-+                        location = device['inserted']['image']['filename']
-+                        print("Replace "+location+" By "+target)
-+
-+                if not device_present:
-+                    print("No such drive in guest", file=sys.stderr)
-+                    sys.exit(1)
-+
-+    def guest_remove_wrapper(self, args):
-+        """
-+        Wrapper for _guest_remove method.
-+        """
-+        guest_name = args.guest
-+        self._guest_remove(guest_name)
-+        self.write_config()
-+
-+    def list(self, args):
-+        """
-+        Prints guests present in Config file
-+        """
-+        for guest_name in self.config.sections():
-+            print(guest_name)
-+
-+    def guest_add_wrapper(self, args):
-+        """
-+        Wrapper for _quest_add method
-+        """
-+        self._guest_add(args.guest, args.qmp)
-+
-+    def drive_add_wrapper(self, args):
-+        """
-+        Wrapper for _drive_add method
-+        """
-+        self._drive_add(args.id, args.guest, args.target)
-+
-+    def fullbackup_wrapper(self, args):
-+        """
-+        Wrapper for _full_backup method
-+        """
-+        self._full_backup(args.guest)
-+
-+    def restore_wrapper(self, args):
-+        """
-+        Wrapper for restore
-+        """
-+        self._restore(args.guest)
-+
-+
-+def main():
-+    backup_tool = BackupTool()
-+    parser = ArgumentParser()
-+    subparsers = parser.add_subparsers(title='Subcommands',
-+                                       description='Valid Subcommands',
-+                                       help='Subcommand help')
-+    guest_parser = subparsers.add_parser('guest', help='Adds or \
-+                                                   removes and lists guest(s)')
-+    guest_subparsers = guest_parser.add_subparsers(title='Guest Subparser')
-+    guest_list_parser = guest_subparsers.add_parser('list',
-+                                                    help='Lists all guests')
-+    guest_list_parser.set_defaults(func=backup_tool.list)
-+
-+    guest_add_parser = guest_subparsers.add_parser('add', help='Adds a guest')
-+    guest_add_parser.add_argument('--guest', action='store', type=str,
-+                                  help='Name of the guest')
-+    guest_add_parser.add_argument('--qmp', action='store', type=str,
-+                                  help='Path of socket')
-+    guest_add_parser.set_defaults(func=backup_tool.guest_add_wrapper)
-+
-+    guest_remove_parser = guest_subparsers.add_parser('remove',
-+                                                      help='removes a guest')
-+    guest_remove_parser.add_argument('--guest', action='store', type=str,
-+                                     help='Name of the guest')
-+    guest_remove_parser.set_defaults(func=backup_tool.guest_remove_wrapper)
-+
-+    drive_parser = subparsers.add_parser('drive',
-+                                         help='Adds drive(s) for backup')
-+    drive_subparsers = drive_parser.add_subparsers(title='Add subparser',
-+                                                   description='Drive \
-+                                                                subparser')
-+    drive_add_parser = drive_subparsers.add_parser('add',
-+                                                   help='Adds new \
-+                                                         drive for backup')
-+    drive_add_parser.add_argument('--guest', action='store',
-+                                  type=str, help='Name of the guest')
-+    drive_add_parser.add_argument('--id', action='store',
-+                                  type=str, help='Drive ID')
-+    drive_add_parser.add_argument('--target', nargs='?',
-+                                  default=None, help='Destination path')
-+    drive_add_parser.set_defaults(func=backup_tool.drive_add_wrapper)
-+
-+    backup_parser = subparsers.add_parser('backup', help='Creates backup')
-+    backup_parser.add_argument('--guest', action='store',
-+                               type=str, help='Name of the guest')
-+    backup_parser.set_defaults(func=backup_tool.fullbackup_wrapper)
-+
-+    backup_parser = subparsers.add_parser('restore', help='Restores drives')
-+    backup_parser.add_argument('--guest', action='store',
-+                               type=str, help='Name of the guest')
-+    backup_parser.set_defaults(func=backup_tool.restore_wrapper)
-+
-+    args = parser.parse_args()
-+    args.func(args)
-+
-+if __name__ == '__main__':
-+    main()
 -- 
-2.7.4
+Eduardo
