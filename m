@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <revol@free.fr>) id 1dkU51-0005Lt-IP
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 07:44:17 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dkUE7-0007Ze-6u
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 07:53:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <revol@free.fr>) id 1dkU4x-0007y7-7Z
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 07:44:15 -0400
-References: <cover.1503249785.git.balaton@eik.bme.hu>
-	<ab632ef70b02efb2257d9e2f08b45b097ebacb3a.1503249785.git.balaton@eik.bme.hu>
-	<20170823041644.GP5379@umbus.fritz.box>
-	<alpine.BSF.2.21.1708231217070.76247@zero.eik.bme.hu>
-From: =?UTF-8?Q?Fran=c3=a7ois_Revol?= <revol@free.fr>
-Message-ID: <8fe81d01-0a39-02cc-c7d8-59437c4f94ac@free.fr>
-Date: Wed, 23 Aug 2017 13:43:56 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1dkUE2-00046t-Bm
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 07:53:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58828)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dkUE2-000463-5F
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 07:53:34 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0B44081DEC
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 11:53:33 +0000 (UTC)
+Date: Wed, 23 Aug 2017 12:53:27 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170823115327.GC2648@work-vm>
+References: <20170823083901.852-1-quintela@redhat.com>
+	<20170823083901.852-3-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.1708231217070.76247@zero.eik.bme.hu>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Language: fr
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 15/15] ppc: Add aCube Sam460ex board
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170823083901.852-3-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] tests: Make acpid test compile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,138 +33,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com, pbonzini@redhat.com
 
-Le 23/08/2017 =E0 13:12, BALATON Zoltan a =E9crit :
->> What's the connection with mips_malta?
->=20
-> The board's firmware wants to see SPD EEPROMs of the connected memory
-> while initialising the memory controller. This is why we need to
-> implement SDRAM controller, I2C and SPD EEPROMs. MIPS malta board had
-> already SPD EEPROM implementation so this is based on that. The comment
-> just indicates where this code comes from.
+* Juan Quintela (quintela@redhat.com) wrote:
+> Compiler gets confused with the size of the struct, so move form
+> g_new0() to g_malloc0().
+> 
+> I *think* that the problem is in gcc (or glib for that matter), but
+> the documentation of the g_new0 states that 1sts first argument is an
+> struct type, and uint32_t is not an struct type.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  tests/vmgenid-test.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+> index 3d5c1c3615..032e1d465a 100644
+> --- a/tests/vmgenid-test.c
+> +++ b/tests/vmgenid-test.c
+> @@ -67,7 +67,7 @@ static uint32_t acpi_find_vgia(void)
+>      g_assert_cmpint(tables_nr, >, 0);
+>  
+>      /* get the addresses of the tables pointed by rsdt */
+> -    tables = g_new0(uint32_t, tables_nr);
+> +    tables = g_malloc0(sizeof(uint32_t) * tables_nr);
 
-Indeed, and I copy-pasted from elsewhere for this.
+I think there's an easier fix for this I think;
+try:
 
->>> +        fprintf(stderr, "qemu: Error registering flash memory.\n");
->>
->> Use error_report() instead, please.
+-    g_assert_cmpint(tables_nr, >, 0);
++    g_assert(tables_nr > 0);
 
-I guess this didn't exist back when I started writing it...
+Dave
 
->>> +/* Create reset TLB entries for BookE, mapping only the flash
->>> memory.  */
->>> +static void mmubooke_create_initial_mapping_uboot(CPUPPCState *env)
->>> +{
->>> +    ppcemb_tlb_t *tlb =3D &env->tlb.tlbe[0];
->>> +
->>> +    /* on reset the flash is mapped by a shadow TLB,
->>> +     * but since we don't implement them we need to use
->>> +     * the same values U-Boot will use to avoid a fault.
->>> +     */
->>
->> Usually the reset state of the MMU is handled in the cpu code rather
->> than the board code.  Is there a specific reason you need it in the
->> board code here?
->=20
-> I'm not sure, probably lack of a better place. The ppc440_bamboo board
-> this is based on has it the same way in the board code. Maybe this coul=
-d
-> be cleaned up when someone wants to QOMify the SoC models sometimes.
-
-Thing is, the code allows both booting with U-Boot and with a kernel
-directly, and the MMU mapping differ in those cases.
-
-Maybe the CPU reset should use the U-Boot setup and the kernel boot
-would just overwrite it?
-
->>> +        env->nip =3D bi->entry;
->>> +
->>> +        /* Create a mapping for the kernel.  */
->>> +        mmubooke_create_initial_mapping(env, 0, 0);
->>> +        env->gpr[6] =3D tswap32(EPAPR_MAGIC);
->>
->> I'm pretty sure the tswap can't be right here.  env->gpr is in host
->> native order and I'd expect the constant to be as well.
->=20
-> I know nothing about this, maybe Francois remembers why it's there. But
-> booting linux with -kernel works so it's probably either correct or doe=
-s
-> not matter.
-
-Absolutely no idea. It seems to be there from the first commit in my own
-history here.
-
-I don't recall testing booting linux at all though.
-Linux does check the magic, so it'd be weird if it booted:
-
-https://github.com/torvalds/linux/blob/master/arch/powerpc/boot/epapr.c
-
-But maybe it got added later than the version you tested?
-
-At least my current Haiku port ignores the magic for now.
-
->>> +        env->gpr[7] =3D (16 << 20) - 8; /*bi->ima_size;*/
->>
->> So, entering the kernel directly can be useful, particularly during
->> early development.  However, having both firmware and non-firmware
->> entry paths can lead to confusing bugs if there's a subtle difference
->> between the initial (to the kernel) states between the two paths.  For
->> that reason, the usual preferred way to implement -kernel is to still
->> run the usual firmware, but use some way of telling it to boot
->> immediately into the supplied kernel.
->>
->> I won't object to merging it this way - just a wanrning that this may
->> bite you in the future if you're not careful.
->=20
-> Warning taken, at this point until firmware cannot reliably boot things
-> having another way to test is useful to have. In the future when bootin=
-g
-> via firmware works well we can figure out what to do with this.
-
-Possibly we could dig the U-Boot environment...
-
->>> +    memory_region_init_alias(isa, NULL, "isa_mmio", get_system_io(),
->>> +                             0, 0x10000);
->>> +    memory_region_add_subregion(get_system_memory(), 0xc08000000, is=
-a);
->>
->> Does it really make sense to just embed the ISA IO space here, rather
->> than actually instanting a PCI<->ISA bridge?
->=20
-> I'm not sure if this is correct but I don't know how it's handled on
-> real hardware. The board does not have ISA and I don't think it has a
-> bridge but the IO space appears at this location according to the
-> datasheet (In System Memory Address Map it's listed as PCI I/O
-> 0xc08000000-0xc0800ffff) and clients expect PCI card's io registers to
-> be accessible here. If anyone knows how it's done on real hardware and
-> if there's a better way to model this please let me know.
-
-Indeed it's the PCI I/O space, maybe it's just copy-paste error.
-
-As for how to declare it, keep in mind this code is years old and I
-fixed it several times when compilation broke, without really reading
-the documentation (actually, do we have proper documentation for the
-internal API?), and it kept changing over the years.
-
->=20
->>> +    /* PCI devices */
->>> +    pci_create_simple(pci_bus, PCI_DEVFN(6, 0), "sm501");
->>> +    /* SoC has a single SATA port but we don't emulate that yet
->>> +     * However, firmware and usual clients have driver for SiI311x
->>> +     * so add one for convenience by default */
->>> +    pci_create_simple(pci_bus, -1, "sii3112");
->>
->> You should probably not create this when started with -nodefaults.
->=20
-> We don't emulate the on-board SATA port of the SoC and without this
-> there's no other way to connect disks (maybe over USB, but firmware has
-> a bug which prevents that too even on real hardware AFAIK, I've
-> backported a fix which made booting from USB work but that broke
-> keyboard) so while this is an external card it's pretty much unusable
-> without this so it's added by default.
-
-Maybe add a /*TODO*/ then?
-
-Fran=E7ois.
+>      ACPI_READ_ARRAY_PTR(tables, tables_nr, rsdt);
+>  
+>      for (i = 0; i < tables_nr; i++) {
+> -- 
+> 2.13.5
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
