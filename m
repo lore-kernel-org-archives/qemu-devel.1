@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dkWih-0004GX-2y
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:33:27 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dkWjo-0005kX-VQ
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:34:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dkWie-0007wv-Pd
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:33:23 -0400
-References: <20170823134242.12080-1-famz@redhat.com>
-	<20170823134242.12080-2-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b8b5ac60-37f2-bd85-55fa-0f2835eda7d0@redhat.com>
-Date: Wed, 23 Aug 2017 09:33:04 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1dkWja-0000Qi-G7
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:34:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56470)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dkWja-0000Q5-6g
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:34:18 -0400
+Date: Wed, 23 Aug 2017 11:34:14 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170823143414.GI27715@localhost.localdomain>
+References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
+	<1503050939-227939-7-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170823134242.12080-2-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hV1Ba946DqXxQ1cCJ9GpOJM46sJXEbj9N"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 1/4] block-backend: Refactor
- inactivate check
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <1503050939-227939-7-git-send-email-imammedo@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.11 06/27] x86: extract legacy cpu
+ features format parser
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +29,237 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hV1Ba946DqXxQ1cCJ9GpOJM46sJXEbj9N
-From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- stefanha@redhat.com, Max Reitz <mreitz@redhat.com>
-Message-ID: <b8b5ac60-37f2-bd85-55fa-0f2835eda7d0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 1/4] block-backend: Refactor
- inactivate check
-References: <20170823134242.12080-1-famz@redhat.com>
- <20170823134242.12080-2-famz@redhat.com>
-In-Reply-To: <20170823134242.12080-2-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 08/23/2017 08:42 AM, Fam Zheng wrote:
-> The logic will be fixed (extended), move it to a separete function.
-
-s/separete/separate/
-
-[can fix on pull request]
-
+On Fri, Aug 18, 2017 at 12:08:38PM +0200, Igor Mammedov wrote:
+> Move cpu_model +-feat parsing into a separate file so that it
+> could be reused later for parsing similar format of sparc target
 >=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > ---
->  block/block-backend.c | 19 ++++++++++++++-----
->  1 file changed, 14 insertions(+), 5 deletions(-)
+> CC: Richard Henderson <rth@twiddle.net>
+> CC: Eduardo Habkost <ehabkost@redhat.com>
+> CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> CC: Artyom Tarasenko <atar4qemu@gmail.com>
+> CC: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+>  include/qom/cpu.h                     |   2 +
+>  default-configs/i386-bsd-user.mak     |   1 +
+>  default-configs/i386-linux-user.mak   |   1 +
+>  default-configs/i386-softmmu.mak      |   1 +
+>  default-configs/x86_64-bsd-user.mak   |   1 +
+>  default-configs/x86_64-linux-user.mak |   1 +
+>  default-configs/x86_64-softmmu.mak    |   1 +
+>  target/i386/cpu.c                     | 125 +-------------------------
+>  util/Makefile.objs                    |   1 +
+>  util/legacy_cpu_features_parser.c     | 161 ++++++++++++++++++++++++++=
+++++++++
+>  10 files changed, 171 insertions(+), 124 deletions(-)
+>  create mode 100644 util/legacy_cpu_features_parser.c
+>=20
+[...]
+> diff --git a/util/legacy_cpu_features_parser.c b/util/legacy_cpu_featur=
+es_parser.c
+> new file mode 100644
+> index 0000000..6b352a3
+> --- /dev/null
+> +++ b/util/legacy_cpu_features_parser.c
+> @@ -0,0 +1,161 @@
+> +/* Support for legacy -cpu cpu,features CLI option with +-feat syntax,
+> + * used by x86/sparc targets
+> + *
+> + * Author: Andreas F=E4rber <afaerber@suse.de>
+> + * Author: Andre Przywara <andre.przywara@amd.com>
+> + * Author: Eduardo Habkost <ehabkost@redhat.com>
+> + * Author: Igor Mammedov <imammedo@redhat.com>
+> + * Author: Paolo Bonzini <pbonzini@redhat.com>
+> + * Author: Markus Armbruster <armbru@redhat.com>
+
+IANAL, but I believe a
+  Copyright (c) <YEAR> <COPYRIGHT HOLDER>
+line is needed here.
+
+> + *
+> + * This program is free software; you can redistribute it and/or modif=
+y
+> + * it under the terms of the GNU General Public License as published b=
+y
+> + * the Free Software Foundation; either version 2 of the License, or
+> + * (at your option) any later version.
+> +
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> +
+> + * You should have received a copy of the GNU General Public License a=
+long
+> + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "qemu/cutils.h"
+> +#include "qom/cpu.h"
+> +#include "qemu/error-report.h"
+> +#include "hw/qdev-properties.h"
+> +
+> +static inline void feat2prop(char *s)
+> +{
+> +    while ((s =3D strchr(s, '_'))) {
+> +        *s =3D '-';
+> +    }
+> +}
+> +
+> +static gint compare_string(gconstpointer a, gconstpointer b)
+> +{
+> +    return g_strcmp0(a, b);
+> +}
+> +
+> +static void
+> +cpu_add_feat_as_prop(const char *typename, const char *name, const cha=
+r *val)
+> +{
+> +    GlobalProperty *prop =3D g_new0(typeof(*prop), 1);
+> +    prop->driver =3D typename;
+> +    prop->property =3D g_strdup(name);
+> +    prop->value =3D g_strdup(val);
+> +    prop->errp =3D &error_fatal;
+> +    qdev_prop_register_global(prop);
+> +}
+> +
+> +/* DO NOT USE WITH NEW CODE
+> + * Parse "+feature,-feature,feature=3Dfoo" CPU feature string
+> + */
+> +void cpu_legacy_parse_featurestr(const char *typename, char *features,
+> +                                 Error **errp)
+> +{
+> +    /* Compatibily hack to maintain legacy +-feat semantic,
+> +     * where +-feat overwrites any feature set by
+> +     * feat=3Don|feat even if the later is parsed after +-feat
+> +     * (i.e. "-x2apic,x2apic=3Don" will result in x2apic disabled)
+> +     */
+> +    GList *l, *plus_features =3D NULL, *minus_features =3D NULL;
+> +    char *featurestr; /* Single 'key=3Dvalue" string being parsed */
+> +    static bool cpu_globals_initialized;
+> +    bool ambiguous =3D false;
+> +
+> +    if (cpu_globals_initialized) {
+> +        return;
+> +    }
+> +    cpu_globals_initialized =3D true;
+> +
+> +    if (!features) {
+> +        return;
+> +    }
+> +
+> +    for (featurestr =3D strtok(features, ",");
+> +         featurestr;
+> +         featurestr =3D strtok(NULL, ",")) {
+> +        const char *name;
+> +        const char *val =3D NULL;
+> +        char *eq =3D NULL;
+> +        char num[32];
+> +
+> +        /* Compatibility syntax: */
+> +        if (featurestr[0] =3D=3D '+') {
+> +            plus_features =3D g_list_append(plus_features,
+> +                                          g_strdup(featurestr + 1));
+> +            continue;
+> +        } else if (featurestr[0] =3D=3D '-') {
+> +            minus_features =3D g_list_append(minus_features,
+> +                                           g_strdup(featurestr + 1));
+> +            continue;
+> +        }
+
+These 6 lines of code (or something equivalent to them) are
+supposed to be the only difference to the generic parsing
+function.  I would simply make this feature (support for
+[+-]feature) enabled by a CPUClass::plus_minus_features flag
+handled by cpu_common_parse_features().
+
+(But this can be done as a follow-up patch.)
+
+> +
+> +        eq =3D strchr(featurestr, '=3D');
+> +        if (eq) {
+> +            *eq++ =3D 0;
+> +            val =3D eq;
+> +        } else {
+> +            val =3D "on";
+> +        }
+> +
+> +        feat2prop(featurestr);
+> +        name =3D featurestr;
+> +
+> +        if (g_list_find_custom(plus_features, name, compare_string)) {
+> +            warn_report("Ambiguous CPU model string. "
+> +                        "Don't mix both \"+%s\" and \"%s=3D%s\"",
+> +                        name, name, val);
+> +            ambiguous =3D true;
+> +        }
+> +        if (g_list_find_custom(minus_features, name, compare_string)) =
+{
+> +            warn_report("Ambiguous CPU model string. "
+> +                        "Don't mix both \"-%s\" and \"%s=3D%s\"",
+> +                        name, name, val);
+> +            ambiguous =3D true;
+> +        }
+> +
+> +        /* Special case: */
+> +        if (!strcmp(name, "tsc-freq")) {
+> +            int ret;
+> +            uint64_t tsc_freq;
+> +
+> +            ret =3D qemu_strtosz_metric(val, NULL, &tsc_freq);
+> +            if (ret < 0 || tsc_freq > INT64_MAX) {
+> +                error_setg(errp, "bad numerical value %s", val);
+> +                return;
+> +            }
+> +            snprintf(num, sizeof(num), "%" PRId64, tsc_freq);
+> +            val =3D num;
+> +            name =3D "tsc-frequency";
+> +        }
+
+This is x86-specific and should stay in x86-specific code.  It
+can probably be handled by the tsc-freq setter.
+
+> +
+> +        cpu_add_feat_as_prop(typename, name, val);
+> +    }
+> +
+> +    if (ambiguous) {
+> +        warn_report("Compatibility of ambiguous CPU model "
+> +                    "strings won't be kept on future QEMU versions");
+> +    }
+
+As noted in the review of the x86 patch that removes the
+plus_features/minus_features static variables, this obsolete (and
+confusing) property ordering misfeature should be removed before
+we make this code generic and reuse it on other architectures.
+
+> +
+> +    for (l =3D plus_features; l; l =3D l->next) {
+> +        const char *name =3D l->data;
+> +        cpu_add_feat_as_prop(typename, name, "on");
+> +    }
+> +    if (plus_features) {
+> +        g_list_free_full(plus_features, g_free);
+> +    }
+> +
+> +    for (l =3D minus_features; l; l =3D l->next) {
+> +        const char *name =3D l->data;
+> +        cpu_add_feat_as_prop(typename, name, "off");
+> +    }
+> +    if (minus_features) {
+> +        g_list_free_full(minus_features, g_free);
+> +    }
+> +}
+> --=20
+> 2.7.4
+>=20
+>=20
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---hV1Ba946DqXxQ1cCJ9GpOJM46sJXEbj9N
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmdkiEACgkQp6FrSiUn
-Q2qO0QgAld9hf1V6pmmWntB1gpnQQic+N0MaI8l6QKaLUgg7zdGEJNYxXCjhCSvc
-O+7P39J0QgxowcOoGvTVuppGdfRyFMAH7R42ijZYJWh6Lweb9cJRk8aKrJWiEVR6
-TmyalESEnVIY3DJ7hSM5sWyj+x+CKGO3U2H5vq64kWsxgaFKoTtGZoB9gXKJN6Cm
-eNSCW58iXG+icMAGfi+bcmPmVdo221nn17fFr5vukZPq0EVMS+kLVJ2RAQ7Au1u8
-gmClAAoMVOzeyppy2Oh71VtHIi3VNvF0ehpFO2TAuHrXwMI74GStX1kEMDepxaqk
-lYJpHt/R+2eR+wdlByQS+GTLYtcYIA==
-=5V1S
------END PGP SIGNATURE-----
-
---hV1Ba946DqXxQ1cCJ9GpOJM46sJXEbj9N--
+Eduardo
