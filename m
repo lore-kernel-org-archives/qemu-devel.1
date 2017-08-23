@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dkWqf-0001wh-Ja
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:41:38 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dkWrS-0002PK-En
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:42:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dkWqe-0004Ke-Pr
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:41:37 -0400
-References: <20170823134242.12080-1-famz@redhat.com>
-	<20170823142917.GC2100@work-vm>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <cf66082b-a08b-2c0a-4150-9ae7bc807300@redhat.com>
-Date: Wed, 23 Aug 2017 09:41:25 -0500
+	(envelope-from <stefanha@redhat.com>) id 1dkWrQ-0004UA-0i
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:42:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43800)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dkWrP-0004TK-Qi
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:42:23 -0400
+Date: Wed, 23 Aug 2017 15:42:17 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170823144217.GD16760@stefanha-x1.localdomain>
+References: <20170822170212.27347-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170823142917.GC2100@work-vm>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="1AmU9SHPixiT9mT9kq7I0fCc6fOWT1jLv"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 0/4] block: Fix non-shared storage
- migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170822170212.27347-1-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: Report when bdrv_inactivate_all
+ fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +27,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, stefanha@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, christian.ehrhardt@canonical.com, peterx@redhat.com, lvivier@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1AmU9SHPixiT9mT9kq7I0fCc6fOWT1jLv
-From: Eric Blake <eblake@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, stefanha@redhat.com,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-Message-ID: <cf66082b-a08b-2c0a-4150-9ae7bc807300@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 0/4] block: Fix non-shared storage
- migration
-References: <20170823134242.12080-1-famz@redhat.com>
- <20170823142917.GC2100@work-vm>
-In-Reply-To: <20170823142917.GC2100@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Aug 22, 2017 at 06:02:12PM +0100, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> If the bdrv_inactivate_all fails near the end of the migration,
+> the migration will fail and often the only diagnostics in the log
+> are an I/O error which you can't distinguish from an error on
+> the socket connection.
+> 
+> Add an error so we know when it's actually a block problem.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  migration/savevm.c | 2 ++
+>  1 file changed, 2 insertions(+)
 
-On 08/23/2017 09:29 AM, Dr. David Alan Gilbert wrote:
-> * Fam Zheng (famz@redhat.com) wrote:
->> This fixes the issue reported as https://bugs.launchpad.net/bugs/17116=
-02
->=20
-> Yep, that fixes it in my test setup (1 of 1 passes!)
-
-As mentioned on IRC, I'll treat this as a Tested-by: tag on 4/4 in my
-pull request.  Thanks for helping check things.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---1AmU9SHPixiT9mT9kq7I0fCc6fOWT1jLv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmdlBUACgkQp6FrSiUn
-Q2qEOwf+Iu4DKwgnS5NKZybwGPu2J92Q3C1+ql/HtaiIiEW8MmdAIgOxD/yOdXf/
-evTSx/BdawSlcm90lvEmT7V5fK+nUYANaIKX+j0s3aDdafmjkRPAylxB7dz+NJXG
-I5/Dpkm0qEocUAt5MRvKSdxGJnchr4rgA/PmqyyGxJ3cKoa/rhFcvv+w8fwkZxxK
-7JIlOb5rtlfI1j+q16+OhRDCCB0FaSQ4KMeKSLJea+xYyMDSlK09V4Bs02AJZs5f
-ZOiNc79NXQfK/ZLtEhM855DtQr0MeAMOrgiLQj0FAsIUglc46PoI8JZQTjd+wDIr
-zMDfXcKtQ72lniniCz7vcegEWyJfEQ==
-=AMR5
------END PGP SIGNATURE-----
-
---1AmU9SHPixiT9mT9kq7I0fCc6fOWT1jLv--
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
