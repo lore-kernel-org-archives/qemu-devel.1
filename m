@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dkLs0-0004Yb-AU
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 22:58:17 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dkLs3-0004Zd-7j
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 22:58:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dkLrz-0001Qi-8e
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 22:58:16 -0400
-Date: Wed, 23 Aug 2017 12:28:33 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dkLrz-0001Qy-9h
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 22:58:19 -0400
+Date: Wed, 23 Aug 2017 12:40:29 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170823022833.GK5379@umbus.fritz.box>
+Message-ID: <20170823024029.GN5379@umbus.fritz.box>
 References: <cover.1503249785.git.balaton@eik.bme.hu>
-	<f34dbaefd1224bca33a9052107cd32b628400106.1503249785.git.balaton@eik.bme.hu>
+	<ac6a19d43a6d36ae6f7cab99a1ac25d2515339ad.1503249785.git.balaton@eik.bme.hu>
+	<1f2ce36c-928b-0631-fdb0-0f413a7a5cb5@amsat.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="gBYU9MM4gf8jKg2V"
+	protocol="application/pgp-signature"; boundary="TN8pJM9vJMHHFgJc"
 Content-Disposition: inline
-In-Reply-To: <f34dbaefd1224bca33a9052107cd32b628400106.1503249785.git.balaton@eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH 11/15] ppc: Add 460EX embedded CPU
+In-Reply-To: <1f2ce36c-928b-0631-fdb0-0f413a7a5cb5@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH 13/15] ppc4xx: Add more PLB registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,119 +25,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Francois Revol <revol@free.fr>, Alexander Graf <agraf@suse.de>
 
 
---gBYU9MM4gf8jKg2V
-Content-Type: text/plain; charset=us-ascii
+--TN8pJM9vJMHHFgJc
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Aug 20, 2017 at 07:23:05PM +0200, BALATON Zoltan wrote:
-> Despite its name it is a 440 core CPU
-
-As I recall 460 was supposed to be a 440 with SMP support.  Except
-they screwed up the cache coherence, so it's basically unusable for
-SMP (at least with Linux).  They finally got 440 SMP right in 470
-IIRC.
-
-Or are you saying that the 460EX is more 440 like than other 460 cpus?
+On Sun, Aug 20, 2017 at 06:58:52PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> Hi Zoltan,
 >=20
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  target/ppc/cpu-models.c     |  3 +++
->  target/ppc/cpu-models.h     |  1 +
->  target/ppc/translate_init.c | 38 ++++++++++++++++++++++++++++++++++++++
->  3 files changed, 42 insertions(+)
+> On 08/20/2017 02:23 PM, BALATON Zoltan wrote:
+> > These registers are present in 440 SoCs (and maybe in others too) and
+> > U-Boot accesses them when printing register info. We don't emulate
+> > these but add them to avoid crashing when they are read or written.
 >=20
-> diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
-> index 4d3e635..7c368fc 100644
-> --- a/target/ppc/cpu-models.c
-> +++ b/target/ppc/cpu-models.c
-> @@ -348,6 +348,8 @@
->                  "PowerPC 440 EPb")
->      POWERPC_DEF("440EPX",        CPU_POWERPC_440EPX,                 440=
-EP,
->                  "PowerPC 440 EPX")
-> +    POWERPC_DEF("460EXb",        CPU_POWERPC_460EXb,                 460=
-EX,
-> +                "PowerPC 460 EXb")
->  #if defined(TODO_USER_ONLY)
->      POWERPC_DEF("440GPb",        CPU_POWERPC_440GPb,                 440=
-GP,
->                  "PowerPC 440 GPb")
-> @@ -1238,6 +1240,7 @@ PowerPCCPUAlias ppc_cpu_aliases[] =3D {
->      { "440GP", "440GPc" },
->      { "440GR", "440GRa" },
->      { "440GX", "440GXf" },
-> +    { "460EX", "460EXb" },
-> =20
->      { "RCPU", "MPC5xx" },
->      /* MPC5xx microcontrollers */
-> diff --git a/target/ppc/cpu-models.h b/target/ppc/cpu-models.h
-> index b563c45..92f99c0 100644
-> --- a/target/ppc/cpu-models.h
-> +++ b/target/ppc/cpu-models.h
-> @@ -241,6 +241,7 @@ enum {
->      CPU_POWERPC_440SP              =3D 0x53221850,
->      CPU_POWERPC_440SP2             =3D 0x53221891,
->      CPU_POWERPC_440SPE             =3D 0x53421890,
-> +    CPU_POWERPC_460EXb             =3D 0x130218A4, /* called 460 but 440=
- core */
->      /* PowerPC 460 family */
->  #if 0
->      /* Generic PowerPC 464 */
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index 8fb407e..1e0d566 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -3832,6 +3832,44 @@ POWERPC_FAMILY(440EP)(ObjectClass *oc, void *data)
->                   POWERPC_FLAG_DE | POWERPC_FLAG_BUS_CLK;
->  }
-> =20
-> +POWERPC_FAMILY(460EX)(ObjectClass *oc, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
-> +    PowerPCCPUClass *pcc =3D POWERPC_CPU_CLASS(oc);
-> +
-> +    dc->desc =3D "PowerPC 460 EX";
-> +    pcc->init_proc =3D init_proc_440EP;
-> +    pcc->check_pow =3D check_pow_nocheck;
-> +    pcc->insns_flags =3D PPC_INSNS_BASE | PPC_STRING |
-> +                       PPC_FLOAT | PPC_FLOAT_FRES | PPC_FLOAT_FSEL |
-> +                       PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
-> +                       PPC_FLOAT_STFIWX |
-> +                       PPC_DCR | PPC_DCRX | PPC_WRTEE | PPC_RFMCI |
-> +                       PPC_CACHE | PPC_CACHE_ICBI |
-> +                       PPC_CACHE_DCBZ | PPC_CACHE_DCBA |
-> +                       PPC_MEM_TLBSYNC | PPC_MFTB |
-> +                       PPC_BOOKE | PPC_4xx_COMMON | PPC_405_MAC |
-> +                       PPC_440_SPEC;
-> +    pcc->msr_mask =3D (1ull << MSR_POW) |
-> +                    (1ull << MSR_CE) |
-> +                    (1ull << MSR_EE) |
-> +                    (1ull << MSR_PR) |
-> +                    (1ull << MSR_FP) |
-> +                    (1ull << MSR_ME) |
-> +                    (1ull << MSR_FE0) |
-> +                    (1ull << MSR_DWE) |
-> +                    (1ull << MSR_DE) |
-> +                    (1ull << MSR_FE1) |
-> +                    (1ull << MSR_IR) |
-> +                    (1ull << MSR_DR);
-> +    pcc->mmu_model =3D POWERPC_MMU_BOOKE;
-> +    pcc->excp_model =3D POWERPC_EXCP_BOOKE;
-> +    pcc->bus_model =3D PPC_FLAGS_INPUT_BookE;
-> +    pcc->bfd_mach =3D bfd_mach_ppc_403;
-> +    pcc->flags =3D POWERPC_FLAG_CE | POWERPC_FLAG_DWE |
-> +                 POWERPC_FLAG_DE | POWERPC_FLAG_BUS_CLK;
-> +}
-> +
->  static void init_proc_440GP(CPUPPCState *env)
->  {
->      /* Time base */
+> Your code isn't incorrect but it doesn't sound the right way to fix your
+> problem. Your firmware shouldn't *crash* on unimplemented dcr.
+>=20
+> Looking at ppc_dcr_read() I see that *valp isn't updated on unimp dcrn,
+> while the dcr_read_plb() callback you are using return 0 on unimp (with an
+> "avoid gcc warning" misleading comment).
+
+Hrm.. I thought accessing a bad DCR led to a 0x700 exception rather
+than just returning a dummy value.
+
+>=20
+> What is the hardware behavior on implemented dcr? return 0? In that case
+> this should be used in ppc_dcr_read(), also adding some
+> qemu_log_mask(LOG_UNIMP,...) log entry there.
+>=20
+> Regards,
+>=20
+> Phil.
+>=20
+> >=20
+> > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> > ---
+> >   hw/ppc/ppc405_uc.c | 12 +++++++++---
+> >   1 file changed, 9 insertions(+), 3 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
+> > index e621d0a..8e58065 100644
+> > --- a/hw/ppc/ppc405_uc.c
+> > +++ b/hw/ppc/ppc405_uc.c
+> > @@ -105,9 +105,12 @@ ram_addr_t ppc405_set_bootinfo (CPUPPCState *env, =
+ppc4xx_bd_info_t *bd,
+> >   /********************************************************************=
+*********/
+> >   /* Peripheral local bus arbitrer */
+> >   enum {
+> > -    PLB0_BESR =3D 0x084,
+> > -    PLB0_BEAR =3D 0x086,
+> > -    PLB0_ACR  =3D 0x087,
+> > +    PLB3A0_ACR =3D 0x077,
+> > +    PLB4A0_ACR =3D 0x081,
+> > +    PLB0_BESR  =3D 0x084,
+> > +    PLB0_BEAR  =3D 0x086,
+> > +    PLB0_ACR   =3D 0x087,
+> > +    PLB4A1_ACR =3D 0x089,
+> >   };
+> >   typedef struct ppc4xx_plb_t ppc4xx_plb_t;
+> > @@ -179,9 +182,12 @@ void ppc4xx_plb_init(CPUPPCState *env)
+> >       ppc4xx_plb_t *plb;
+> >       plb =3D g_malloc0(sizeof(ppc4xx_plb_t));
+> > +    ppc_dcr_register(env, PLB3A0_ACR, plb, &dcr_read_plb, &dcr_write_p=
+lb);
+> > +    ppc_dcr_register(env, PLB4A0_ACR, plb, &dcr_read_plb, &dcr_write_p=
+lb);
+> >       ppc_dcr_register(env, PLB0_ACR, plb, &dcr_read_plb, &dcr_write_pl=
+b);
+> >       ppc_dcr_register(env, PLB0_BEAR, plb, &dcr_read_plb, &dcr_write_p=
+lb);
+> >       ppc_dcr_register(env, PLB0_BESR, plb, &dcr_read_plb, &dcr_write_p=
+lb);
+> > +    ppc_dcr_register(env, PLB4A1_ACR, plb, &dcr_read_plb, &dcr_write_p=
+lb);
+> >       qemu_register_reset(ppc4xx_plb_reset, plb);
+> >   }
+> >=20
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -144,24 +114,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---gBYU9MM4gf8jKg2V
+--TN8pJM9vJMHHFgJc
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmc6E8ACgkQbDjKyiDZ
-s5L3dhAArNbuchE/pFC3195GJLK2+FF4t0DbaSEcH4dA02UwH3oBraYVRVzH/waA
-wp+9oqKaM1EiyVS/JwhQT2jZMmkandRdiTKsWp7qXi6D/ZIPNRWQ3O/MKXXTwRby
-O88GG4KNsLR7lPsr3yfob/e2Pq580p24QaKWhCBhGzE+gE4prUX2UFczV2MrPz1D
-QQRI68dxBPT2ILr8Ih1xr815gRb/zq8R6NuiVKw+vOXmBnn4b8x/rx6q+iHgfLEH
-o2Pn2iH0SoUiv7yNbeseLGvQWVLTP4+6vDGeSkK2m1GBdrdE7l5+jMFsF+Ht/6vj
-pVjrOXJlhepfiDq39afYDXD+Pe2f+BrSpebO+sBDGEebvuL366owlRA+vmRj/Ns7
-P9mVVKjbC0ta3bzXllPC4bhW/g3BdCeyY4kFJJ3zZokmcWSuOF0yiCke4pNkuIVl
-dkZGiN4tCyHxUF/2wOrsr/DFTY4wWX9HoOnAx/7Hngf5IAZH6si5cVOYlhCp3ar2
-B8IESaLWyxdwVmgi5xGgP3lahzsCTiDTaAeKVLljzPHFnWzaV/l9wVoTxUcuCHaJ
-MCr7AAbQLUPhIbbo9YvvCbCG20OU9U/IAZHZ0NE6y5qQ0nhooNrmdr/D6+H11FQR
-nJmRRyawRPHbWKdWjLBdd3m9y17CIP3n1FLERC2wY6hGlut1wKA=
-=Taq7
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmc6xwACgkQbDjKyiDZ
+s5LroRAAiQB/7LHEDy8feOPE5D46H5FL5kLxP8KNuyungGh1RhRzqJHrEOQSfiYl
+O09byki5SDOAptlFPLeC7FM5PIRI0/mu+KMAO5vwESWA7/wR6x8Z7ugaMt84JVJQ
+R1eNBC8doBFACAiUESpmeGLEXbcWRezzNoK9zUq1FxrXwHV1NrqzErEe0oYLSAxY
+0lQEX4wWew5OcyNKmrpnUsRW9f+1Ki6DwJIkv2itByOz4Uv5vX2p9lEiUrM3VAvj
+r7V1WYNHFNZ79aUfgMQwe+MmWhR1g3XDMKIr84XYWbRv1pm/hYTK8bGIXtt48RLP
+XSLZNaTYIyI/aBYIg1vYjaXGRF+GcQjxvJyscdBFMfYEp5/qXcz8cewjPG1MeCJF
+rcH06MHzcaYC8i3mEwHNau19OsJunPb5vCeyfna0kkZQ0kYHaMjrohf+upL4IJLu
+ivsrQp6+iazc3K+JMPtxORxRwMCp4mBvk6NQTckOSQtiossLAaoX/lGPPSl9SvgU
+IG76IYVzY8jy4GwEvx7d83jNC5uH/TGH9diNry+YCo1u1yAOjt5p4HKlJ0E9kFRi
+WRdDXGD/+NOblc68slRpGMUGVTrUKpDQ3gKYzMo1XrAnvAaQ4CXMQdYp/S3KKpQu
+0RlHGvCokuXNMpI4EYgjMWI0Y0HVim2qUGonClpLHvAl9rUNJYI=
+=UUT7
 -----END PGP SIGNATURE-----
 
---gBYU9MM4gf8jKg2V--
+--TN8pJM9vJMHHFgJc--
