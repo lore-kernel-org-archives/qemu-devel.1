@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dkauB-0000Tl-Fw
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 15:01:32 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dkavc-00017D-3M
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 15:03:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dkau7-0002nf-K3
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 15:01:31 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60592)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dkau7-0002nE-Bl
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 15:01:27 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dkau5-0004Tj-Pc
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 19:01:25 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A4FE62E80CB
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 19:01:25 +0000 (UTC)
+	(envelope-from <richard.henderson@linaro.org>) id 1dkavY-0004jL-7L
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 15:03:00 -0400
+Received: from mail-pg0-x234.google.com ([2607:f8b0:400e:c05::234]:37887)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dkavY-0004i9-0Z
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 15:02:56 -0400
+Received: by mail-pg0-x234.google.com with SMTP id y129so3667199pgy.4
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 12:02:54 -0700 (PDT)
+References: <20170817230114.3655-1-richard.henderson@linaro.org>
+	<20170817230114.3655-9-richard.henderson@linaro.org>
+	<87valf4ub7.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <afa5cbde-a5e9-0ae3-5532-2073c3a90a57@linaro.org>
+Date: Wed, 23 Aug 2017 12:02:47 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 23 Aug 2017 18:55:52 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
-Message-Id: <150351455220.11098.4501478332519904793.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
- 2.10
+In-Reply-To: <87valf4ub7.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 8/8] tcg/i386: Add vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,77 +32,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-Looks good here, just retested:
+On 08/22/2017 06:15 AM, Alex Bennée wrote:
+>> +#ifndef have_avx2
+>> +        /* There are a number of things we must check before we can be
+>> +           sure of not hitting invalid opcode.  */
+>> +        if (c & bit_OSXSAVE) {
+>> +            unsigned xcrl, xcrh;
+>> +            asm ("xgetbv" : "=a" (xcrl), "=d" (xcrh) : "c" (0));
+>> +            if (xcrl & 6 == 6) {
+> 
+> My picky compiler complains:
+> 
+> /home/alex/lsrc/qemu/qemu.git/tcg/i386/tcg-target.inc.c: In function ‘tcg_target_init’:
+> /home/alex/lsrc/qemu/qemu.git/tcg/i386/tcg-target.inc.c:3053:22: error: suggest parentheses around comparison in operand of ‘&’ [-Werror=parentheses]
+>              if (xcrl & 6 == 6) {
 
-here's teh top of my git:
 
-f89f59fad5119f878aaedf711af90802ddcb99c7 nbd-client: avoid spurious qio_cha=
-nnel_yield() re-entry
-cf26039a2b50f078b4ad90b88eea5bb28971c0d8 block: Update open_flags after ->i=
-nactivate() callback
-8ccc527d84ec9a5052cfae19edbc44abb5ac03ae mirror: Mark target BB as "force a=
-llow inactivate"
-34c3f17c99a43f261560edbd3da1188dd0c398ab block-backend: Allow more "can ina=
-ctivate" cases
-952ad9fd9dd43e92016d5bfc0ff93bdeaec13bf9 block-backend: Refactor inactivate=
- check
-1f296733876434118fd766cfef5eb6f29ecab6a8 Update version for v2.10.0-rc3 rel=
-ease
+Bah.  I forgot that my default build uses -march=native, and my laptop has
+AVX2, so this bit wouldn't have been compile tested at all.
 
--- =
+Fixed on the branch.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1711602
 
-Title:
-  --copy-storage-all failing with qemu 2.10
-
-Status in QEMU:
-  New
-Status in libvirt package in Ubuntu:
-  Confirmed
-Status in qemu package in Ubuntu:
-  Confirmed
-
-Bug description:
-  We fixed an issue around disk locking already in regard to qemu-nbd
-  [1], but there still seem to be issues.
-
-  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
-://10.22.69.196/system
-  error: internal error: qemu unexpectedly closed the monitor: 2017-08-18T1=
-2:10:29.800397Z qemu-system-x86_64: -chardev pty,id=3Dcharserial0: char dev=
-ice redirected to /dev/pts/0 (label charserial0)
-  2017-08-18T12:10:48.545776Z qemu-system-x86_64: load of migration failed:=
- Input/output error
-
-  Source libvirt log for the guest:
-  2017-08-18 12:09:08.251+0000: initiating migration
-  2017-08-18T12:09:08.809023Z qemu-system-x86_64: Unable to read from socke=
-t: Connection reset by peer
-  2017-08-18T12:09:08.809481Z qemu-system-x86_64: Unable to read from socke=
-t: Connection reset by peer
-
-  Target libvirt log for the guest:
-  2017-08-18T12:09:08.730911Z qemu-system-x86_64: load of migration failed:=
- Input/output error
-  2017-08-18 12:09:09.010+0000: shutting down, reason=3Dcrashed
-
-  Given the timing it seems that the actual copy now works (it is busy ~10 =
-seconds on my environment which would be the copy).
-  Also we don't see the old errors we saw before, but afterwards on the act=
-ual take-over it fails.
-
-  Dmesg has no related denials as often apparmor is in the mix.
-
-  Need to check libvirt logs of source [2] and target [3] in Detail.
-
-  [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02200.html
-  [2]: http://paste.ubuntu.com/25339356/
-  [3]: http://paste.ubuntu.com/25339358/
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1711602/+subscriptions
+r~
