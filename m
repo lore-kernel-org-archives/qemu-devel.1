@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dkV27-0005EM-FM
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:45:20 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dkV2f-0005dm-Dw
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:45:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dkV1y-0004hb-Qf
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:45:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52022)
+	(envelope-from <ehabkost@redhat.com>) id 1dkV2b-00053U-CZ
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:45:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35216)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dkV1y-0004h6-IA
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:45:10 -0400
-Date: Wed, 23 Aug 2017 14:45:02 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170823144502.17203857@nial.brq.redhat.com>
-In-Reply-To: <9b19623e-55e9-ebac-11d3-6ff5fff176fe@cn.fujitsu.com>
-References: <1503372250-5092-1-git-send-email-douly.fnst@cn.fujitsu.com>
-	<1503372250-5092-3-git-send-email-douly.fnst@cn.fujitsu.com>
-	<20170823104051.36488fcb@nial.brq.redhat.com>
-	<9b19623e-55e9-ebac-11d3-6ff5fff176fe@cn.fujitsu.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dkV2b-00053I-2n
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:45:49 -0400
+Date: Wed, 23 Aug 2017 09:45:44 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170823124544.GE27715@localhost.localdomain>
+References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
+	<20170727154126.11339-8-marcandre.lureau@redhat.com>
+	<87mv6z4ix5.fsf@dusky.pond.sub.org>
+	<CAJ+F1CKT8MXVSP+UTu6C50Ue18GhiuXAE9rCQbTiB54iw6_YPA@mail.gmail.com>
+	<87h8wzfsu4.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <87h8wzfsu4.fsf@dusky.pond.sub.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 2/2] ACPI/unit-test: Add a new testcase
- for RAM allocation in numa node
+Subject: Re: [Qemu-devel] [PATCH 07/26] qapi: add 'if' condition on
+ top-level schema elements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +32,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, pbonzini@redhat.com, rth@twiddle.net, mst@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Wed, 23 Aug 2017 20:12:51 +0800
-Dou Liyang <douly.fnst@cn.fujitsu.com> wrote:
-
-> Hi Igor,
->=20
-> At 08/23/2017 04:40 PM, Igor Mammedov wrote:
-> > On Tue, 22 Aug 2017 11:24:10 +0800
-> > Dou Liyang <douly.fnst@cn.fujitsu.com> wrote:
-> > =20
-> >> As QEMU supports the memory-less node, it is possible that there is
-> >> no RAM in the first numa node(also be called as node0). eg:
-> >>   ... \
-> >>   -m 128,slots=3D3,maxmem=3D1G \
-> >>   -numa node -numa node,mem=3D128M \
+On Tue, Aug 22, 2017 at 06:52:19PM +0200, Markus Armbruster wrote:
+> Marc-Andr=E9 Lureau <marcandre.lureau@gmail.com> writes:
+[...]
+> >>> +    def func_wrapper(self, *args, **kwargs):
+> >>> +        funcname =3D self.__class__.__name__ + '.' + func.__name__
+> >>> +        ifcond =3D args[-1]
+> >>> +        save =3D {}
+> >>> +        for mem in self.if_members:
+> >>> +            save[mem] =3D getattr(self, mem)
+> >>> +        func(self, *args, **kwargs)
+> >>> +        for mem, val in save.items():
+> >>> +            newval =3D getattr(self, mem)
+> >>> +            if newval !=3D val:
+> >>> +                assert newval.startswith(val)
+> >>> +                newval =3D newval[len(val):]
+> >>> +                val +=3D gen_if(ifcond, funcname)
 > >>
-> >> But, this makes it hard for QEMU to build a known-to-work ACPI SRAT
-> >> table. Only fixing it is not enough.
+> >> Emitting comments pointing to the QAPI schema into the generated cod=
+e is
+> >> often helpful.  But this one points to QAPI generator code.  Why is =
+that
+> >> useful?
+> >
+> > That was mostly useful during development, removed
+> >
 > >>
-> >> Add a testcase for this situation to make sure the ACPI table is
-> >> correct for guest.
+> >>> +                val +=3D newval
+> >>> +                val +=3D gen_endif(ifcond, funcname)
+> >>> +            setattr(self, mem, val)
+> >>> +
+> >>> +    return func_wrapper
+> >>> +
 > >>
-> >> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> >> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
-> >> ---
-> >>  tests/acpi-test-data/pc/DSDT.numamem  | Bin 0 -> 6463 bytes
-> >>  tests/acpi-test-data/pc/SLIT.numamem  | Bin 0 -> 48 bytes
-> >>  tests/acpi-test-data/pc/SRAT.numamem  | Bin 0 -> 264 bytes
-> >>  tests/acpi-test-data/q35/DSDT.numamem | Bin 0 -> 9147 bytes
-> >>  tests/acpi-test-data/q35/SLIT.numamem | Bin 0 -> 48 bytes
-> >>  tests/acpi-test-data/q35/SRAT.numamem | Bin 0 -> 264 bytes
-> >>  tests/bios-tables-test.c              |  30 +++++++++++++++++++++++++=
-+++++
-> >>  7 files changed, 30 insertions(+)
-> >>  create mode 100644 tests/acpi-test-data/pc/DSDT.numamem
-> >>  create mode 100644 tests/acpi-test-data/pc/SLIT.numamem
-> >>  create mode 100644 tests/acpi-test-data/pc/SRAT.numamem
-> >>  create mode 100644 tests/acpi-test-data/q35/DSDT.numamem
-> >>  create mode 100644 tests/acpi-test-data/q35/SLIT.numamem
-> >>  create mode 100644 tests/acpi-test-data/q35/SRAT.numamem =20
+> >> pep8 again:
+> >>
+> >>     scripts/qapi.py:1955:1: E302 expected 2 blank lines, found 1
+> >>
+> >> Peeking ahead: this function is used as a decorator.  Let's help the
+> >> reader and mention that in the function comment, or by naming the
+> >> function suitably.  ifcond_decorator?
 > >
+> > done
 > >
-> > considering only SRAT table has been changed and the other
-> > tables match with default blobs, I'd suggest to keep only =20
->=20
->=20
-> Our testcase is=EF=BC=9A
->=20
-> +    test_acpi_one(" -m 128,slots=3D3,maxmem=3D1G"
-> +                  " -numa node -numa node,mem=3D128"
-> +                  " -numa dist,src=3D0,dst=3D1,val=3D21",
-> +                  &data);
->=20
-> The DSDT and SLIT don't match with default blobs.
-do you actually need SLIT table /i.e. -numa dist/ for test at all?
-it looks not relevant for the test case at the hand,
-I'd suggest to drop '-numa dist' option for the test.
-
->=20
-> So, they can't be dropped.
-
-I wonder what's changed, could you post DSDT diff here?
-
-(to get diff run 'make V=3D1 check' without DSDT.numamem being present)
-
-
->=20
-> Thanks,
-> 	dou.
->=20
-> >   tests/acpi-test-data/[pc|q35]/SRAT.numamem
-> > in this patch and drop the rest of *.numamem tables
-> > as test case should fallback to default tables
-> > when .numamem variant doesn't exists
+> >>
+> >> Messing with the wrapped method's class's attributes is naughty.  Wo=
+rse,
+> >> it's hard to understand.  What alternatives have you considered?
 > >
-> >
-> > =20
+> > Well, I started writing the code that checked if members got code
+> > added, I had to put some enter()/leave() code everywhere. Then I
+> > realize this could easily be the job for a decorator. I think the end
+> > result is pretty neat.
 >=20
->=20
+> I think "clever" would describe it better than "neat".  Possibly "too
+> clever".
+
+FWIW, I was investigating something else in the series and took a
+while to understand how the #if lines were magically appearing on
+self.decl and self.defn.
+
+I'd prefer something simpler like:
+
+    def cond(ifcond, s):
+        if s:
+            return gen_if(ifcond) + s + gen_endif(ifcond)
+        return s
+
+    def visit_command(self, name, info, arg_type, ret_type,
+                      gen, success_response, boxed, ifcond):
+        if not gen:
+            return
+        self.decl +=3D cond(ifcond, gen_command_decl(name, arg_type, boxe=
+d, ret_type))
+        if ret_type and ret_type not in self._visited_ret_types:
+            self._visited_ret_types.add(ret_type)
+            self.defn +=3D cond(ifcond,gen_marshal_output(ret_type))
+        self.decl +=3D cond(ifcond, gen_marshal_decl(name))
+        self.defn +=3D cond(ifcond, gen_marshal(name, arg_type, boxed, re=
+t_type))
+        self._regy +=3D cond(ifcond, gen_register_command(name, success_r=
+esponse))
+
+If all callers of some of the gen_*() functions above are wrapped
+by ifcond(), then a decorator around them could still be useful.
+But preferably if the decorator affects only the function
+arguments and return value, not messing with the object
+attributes or other state outside the function.
+
+--=20
+Eduardo
