@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dkUpH-00008Z-7e
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:32:04 -0400
+	(envelope-from <david@redhat.com>) id 1dkUqX-0000y6-SM
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:33:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dkUpC-0006xl-Tq
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:32:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34406)
+	(envelope-from <david@redhat.com>) id 1dkUqT-0007FO-ID
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:33:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49094)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dkUpC-0006xJ-Mo
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:31:58 -0400
-Date: Wed, 23 Aug 2017 14:31:28 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170823143128.7cc7ae68.cohuck@redhat.com>
-In-Reply-To: <1503483383-199649-1-git-send-email-borntraeger@de.ibm.com>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dkUqT-0007FD-Bx
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:33:17 -0400
 References: <1503483383-199649-1-git-send-email-borntraeger@de.ibm.com>
+	<20170823143128.7cc7ae68.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <9a6bc61d-c829-8e6b-2e89-a1e49de475de@redhat.com>
+Date: Wed, 23 Aug 2017 14:33:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170823143128.7cc7ae68.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v3] configure: enable --s390-pgste linker
  option
@@ -27,47 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Christian Ehrhardt <christian.ehrhardt@canonical.com>, Dan Horak <dhorak@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Christian Ehrhardt <christian.ehrhardt@canonical.com>, Dan Horak <dhorak@redhat.com>
 
-On Wed, 23 Aug 2017 12:16:23 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-
-> KVM guests on s390 need a different page table layout than normal
-> processes (2kb page table + 2kb page status extensions vs 2kb page table
-> only). As of today this has to be enabled via the vm.allocate_pgste
-> sysctl.
+On 23.08.2017 14:31, Cornelia Huck wrote:
+> On Wed, 23 Aug 2017 12:16:23 +0200
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 > 
-> Newer kernels (>= 4.12) on s390 check for an S390_PGSTE program header
-> and enable the pgste page table extensions in that case. This makes the
-> vm.allocate_pgste sysctl unnecessary. We enable this program header for
-> the s390 system emulation (qemu-system-s390x) if we build on s390
-> - for s390 system emulation
-> - the linker supports --s390-pgste (binutils >= 2.29)
-> - KVM is enabled
+>> KVM guests on s390 need a different page table layout than normal
+>> processes (2kb page table + 2kb page status extensions vs 2kb page table
+>> only). As of today this has to be enabled via the vm.allocate_pgste
+>> sysctl.
+>>
+>> Newer kernels (>= 4.12) on s390 check for an S390_PGSTE program header
+>> and enable the pgste page table extensions in that case. This makes the
+>> vm.allocate_pgste sysctl unnecessary. We enable this program header for
+>> the s390 system emulation (qemu-system-s390x) if we build on s390
+>> - for s390 system emulation
+>> - the linker supports --s390-pgste (binutils >= 2.29)
+>> - KVM is enabled
+>>
+>> This will allow distributions to disable the global vm.allocate_pgste
+>> sysctl, which will improve the page table allocation for non KVM
+>> processes as only 2kb chunks are necessary.
+>>
+>> Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+>> Cc: Alexander Graf <agraf@suse.de>
+>> Cc: Dan Horak <dhorak@redhat.com>
+>> Cc: David Hildenbrand <david@redhat.com>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+>> ---
+>> V1->V2:
+>> 	- provide ld_has function
+>> 	- use ld_has to replace some open coded variants
+>> 	- check target arch and arch for s390
+>> 	- check for s390x before calling the linker
+>> V2->V3: 
+>> 	- fix typos
+>>  configure | 21 ++++++++++++++++++++-
+>>  1 file changed, 20 insertions(+), 1 deletion(-)
 > 
-> This will allow distributions to disable the global vm.allocate_pgste
-> sysctl, which will improve the page table allocation for non KVM
-> processes as only 2kb chunks are necessary.
+> Looks sane.
 > 
-> Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: Dan Horak <dhorak@redhat.com>
-> Cc: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
-> ---
-> V1->V2:
-> 	- provide ld_has function
-> 	- use ld_has to replace some open coded variants
-> 	- check target arch and arch for s390
-> 	- check for s390x before calling the linker
-> V2->V3: 
-> 	- fix typos
->  configure | 21 ++++++++++++++++++++-
->  1 file changed, 20 insertions(+), 1 deletion(-)
+> I guess I'll wait for some more Acks or R-bs and then queue it to
+> s390-next.
+> 
 
-Looks sane.
+My r-b still holds
 
-I guess I'll wait for some more Acks or R-bs and then queue it to
-s390-next.
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+-- 
+
+Thanks,
+
+David
