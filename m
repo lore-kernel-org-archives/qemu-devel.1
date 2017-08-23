@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dkXzr-0005cB-TU
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:55:12 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dkXzw-0005h7-0k
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:55:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dkXzq-0000jr-Tz
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:55:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48414)
+	(envelope-from <cohuck@redhat.com>) id 1dkXzv-0000lR-0L
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:55:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59848)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dkXzq-0000jB-NZ
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:55:10 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dkXzu-0000l9-O0
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:55:14 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed, 23 Aug 2017 17:54:50 +0200
-Message-Id: <20170823155458.19601-2-cohuck@redhat.com>
+Date: Wed, 23 Aug 2017 17:54:51 +0200
+Message-Id: <20170823155458.19601-3-cohuck@redhat.com>
 In-Reply-To: <20170823155458.19601-1-cohuck@redhat.com>
 References: <20170823155458.19601-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 1/9] 9pfs: fix dependencies
+Subject: [Qemu-devel] [PATCH v5 2/9] kvm: remove hard dependency on pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,55 +26,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
 
-Nothing in fsdev/ or hw/9pfs/ depends on pci; it should rather depend
-on CONFIG_VIRTFS and CONFIG_VIRTIO/CONFIG_XEN only.
+The msi routing code in kvm calls some pci functions: provide
+some stubs to enable builds without pci.
 
-Acked-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Also, to make this more obvious, guard them via a pci_available boolean
+(which also can be reused in other places).
+
+Fixes: e1d4fb2de ("kvm-irqchip: x86: add msi route notify fn")
+Fixes: 767a554a0 ("kvm-all: Pass requester ID to MSI routing functions")
+Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- fsdev/Makefile.objs   | 9 +++------
- hw/9pfs/Makefile.objs | 2 +-
- hw/Makefile.objs      | 2 +-
- 3 files changed, 5 insertions(+), 8 deletions(-)
+ accel/kvm/kvm-all.c  |  6 +++---
+ hw/pci/pci-stub.c    | 16 +++++++++++++++-
+ hw/pci/pci.c         |  2 ++
+ include/hw/pci/pci.h |  2 ++
+ 4 files changed, 22 insertions(+), 4 deletions(-)
 
-diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
-index 659df6e187..fb38017c0b 100644
---- a/fsdev/Makefile.objs
-+++ b/fsdev/Makefile.objs
-@@ -1,10 +1,7 @@
--ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
- # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
--# only pull in the actual virtio-9p device if we also enabled virtio.
--common-obj-y = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
--else
--common-obj-y = qemu-fsdev-dummy.o
--endif
-+# only pull in the actual 9p backend if we also enabled virtio or xen.
-+common-obj-$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO),$(CONFIG_XEN))) = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
-+common-obj-$(call lnot,$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO),$(CONFIG_XEN)))) = qemu-fsdev-dummy.o
- common-obj-y += qemu-fsdev-opts.o qemu-fsdev-throttle.o
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 46ce479dc3..f85553a851 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -1248,7 +1248,7 @@ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
+     int virq;
+     MSIMessage msg = {0, 0};
  
- # Toplevel always builds this; targets without virtio will put it in
-diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
-index cab5e942ed..fd90b62900 100644
---- a/hw/9pfs/Makefile.objs
-+++ b/hw/9pfs/Makefile.objs
-@@ -7,4 +7,4 @@ common-obj-$(CONFIG_OPEN_BY_HANDLE) +=  9p-handle.o
- common-obj-y += 9p-proxy.o
- common-obj-$(CONFIG_XEN) += xen-9p-backend.o
+-    if (dev) {
++    if (pci_available && dev) {
+         msg = pci_get_msi_message(dev, vector);
+     }
  
--obj-y += virtio-9p-device.o
-+obj-$(CONFIG_VIRTIO) += virtio-9p-device.o
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index a2c61f6b09..cf4cb2010b 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -1,4 +1,4 @@
--devices-dirs-$(call land, $(CONFIG_VIRTIO),$(call land,$(CONFIG_VIRTFS),$(CONFIG_PCI))) += 9pfs/
-+devices-dirs-$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO),$(CONFIG_XEN))) += 9pfs/
- devices-dirs-$(CONFIG_SOFTMMU) += acpi/
- devices-dirs-$(CONFIG_SOFTMMU) += adc/
- devices-dirs-$(CONFIG_SOFTMMU) += audio/
+@@ -1271,7 +1271,7 @@ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
+     kroute.u.msi.address_lo = (uint32_t)msg.address;
+     kroute.u.msi.address_hi = msg.address >> 32;
+     kroute.u.msi.data = le32_to_cpu(msg.data);
+-    if (kvm_msi_devid_required()) {
++    if (pci_available && kvm_msi_devid_required()) {
+         kroute.flags = KVM_MSI_VALID_DEVID;
+         kroute.u.msi.devid = pci_requester_id(dev);
+     }
+@@ -1309,7 +1309,7 @@ int kvm_irqchip_update_msi_route(KVMState *s, int virq, MSIMessage msg,
+     kroute.u.msi.address_lo = (uint32_t)msg.address;
+     kroute.u.msi.address_hi = msg.address >> 32;
+     kroute.u.msi.data = le32_to_cpu(msg.data);
+-    if (kvm_msi_devid_required()) {
++    if (pci_available && kvm_msi_devid_required()) {
+         kroute.flags = KVM_MSI_VALID_DEVID;
+         kroute.u.msi.devid = pci_requester_id(dev);
+     }
+diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
+index ecad664946..2d3b32c6ab 100644
+--- a/hw/pci/pci-stub.c
++++ b/hw/pci/pci-stub.c
+@@ -23,10 +23,11 @@
+ #include "monitor/monitor.h"
+ #include "qapi/qmp/qerror.h"
+ #include "hw/pci/pci.h"
+-#include "qmp-commands.h"
+ #include "hw/pci/msi.h"
++#include "qmp-commands.h"
+ 
+ bool msi_nonbroken;
++bool pci_available;
+ 
+ PciInfoList *qmp_query_pci(Error **errp)
+ {
+@@ -38,3 +39,16 @@ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict)
+ {
+     monitor_printf(mon, "PCI devices not supported\n");
+ }
++
++/* kvm-all wants this */
++MSIMessage pci_get_msi_message(PCIDevice *dev, int vector)
++{
++    g_assert(false);
++    return (MSIMessage){};
++}
++
++uint16_t pci_requester_id(PCIDevice *dev)
++{
++    g_assert(false);
++    return 0;
++}
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 258fbe51e2..26f346db2c 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -49,6 +49,8 @@
+ # define PCI_DPRINTF(format, ...)       do { } while (0)
+ #endif
+ 
++bool pci_available = true;
++
+ static void pcibus_dev_print(Monitor *mon, DeviceState *dev, int indent);
+ static char *pcibus_get_dev_path(DeviceState *dev);
+ static char *pcibus_get_fw_dev_path(DeviceState *dev);
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index e598b095eb..8bb6449dd7 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -10,6 +10,8 @@
+ 
+ #include "hw/pci/pcie.h"
+ 
++extern bool pci_available;
++
+ /* PCI bus */
+ 
+ #define PCI_DEVFN(slot, func)   ((((slot) & 0x1f) << 3) | ((func) & 0x07))
 -- 
 2.13.5
