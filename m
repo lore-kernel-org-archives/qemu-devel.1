@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dkWrS-0002PK-En
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:42:27 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dkWud-0003nC-Ev
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:45:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dkWrQ-0004UA-0i
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:42:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43800)
+	(envelope-from <kraxel@redhat.com>) id 1dkWua-0005j6-7w
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:45:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36840)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dkWrP-0004TK-Qi
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:42:23 -0400
-Date: Wed, 23 Aug 2017 15:42:17 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170823144217.GD16760@stefanha-x1.localdomain>
-References: <20170822170212.27347-1-dgilbert@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170822170212.27347-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: Report when bdrv_inactivate_all
- fails
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dkWuZ-0005i7-P8
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:45:40 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B228AC047B78
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 14:45:38 +0000 (UTC)
+Message-ID: <1503499536.16071.27.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 23 Aug 2017 16:45:36 +0200
+In-Reply-To: <20170815100410.GH9674@redhat.com>
+References: <20170815093615.16453-1-berrange@redhat.com>
+	<20170815093615.16453-2-berrange@redhat.com>
+	<20170815100410.GH9674@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 01/12] ui: add keycodemapdb repository
+ as a GIT submodule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,22 +35,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, christian.ehrhardt@canonical.com, peterx@redhat.com, lvivier@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, Aug 22, 2017 at 06:02:12PM +0100, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> If the bdrv_inactivate_all fails near the end of the migration,
-> the migration will fail and often the only diagnostics in the log
-> are an I/O error which you can't distinguish from an error on
-> the socket connection.
-> 
-> Add an error so we know when it's actually a block problem.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  migration/savevm.c | 2 ++
->  1 file changed, 2 insertions(+)
+  Hi,
+=C2=A0
+> > +(cd $source_path && git submodule update --init ui/keycodemapdb)
+> > +
+>=20
+> Urgh, no, this won't work because of course you don't have to
+> have a git checkout when running configure.
+>=20
+> Any suggestions on the "best" way to ensure that the ui/keycodemapdb
+> git submodule is always checked out, without requiring developers to
+> do something manually ?
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Don't require it?
+
+The updates shouldn't happen that frequently, IMO we should just commit
+the generated files so checking out the submodule is only needed if you
+work on the keycodemaps.
+
+cheers,
+  Gerd
