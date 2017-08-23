@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkQgt-0005dW-TI
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:07:30 -0400
+	(envelope-from <bounces@canonical.com>) id 1dkQlN-000737-Vs
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:11:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkQgb-0005gA-S8
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:07:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46756)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dkQgb-0005fD-Ge
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:06:49 -0400
-References: <1503471212-109371-1-git-send-email-borntraeger@de.ibm.com>
-	<cc76787a-e65f-f4e4-de65-7233edc53d3a@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <aef4b38d-eeb2-5c96-32c1-fbeadb9013b5@redhat.com>
-Date: Wed, 23 Aug 2017 10:06:42 +0200
+	(envelope-from <bounces@canonical.com>) id 1dkQlJ-0000zA-1I
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:11:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dkQlI-0000yy-Rn
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:11:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dkQlH-0004fU-FQ
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 08:11:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 728572E80C8
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 08:11:39 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <cc76787a-e65f-f4e4-de65-7233edc53d3a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] configure: enable --s390-pgste linker
- option
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 23 Aug 2017 08:02:40 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
+Message-Id: <150347536091.11546.17569600092912546402.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
+ 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,91 +37,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Janosch Frank <frankja@linux.vnet.ibm.com>, Christian Ehrhardt <christian.ehrhardt@canonical.com>, Dan Horak <dhorak@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 23.08.2017 10:00, David Hildenbrand wrote:
-> On 23.08.2017 08:53, Christian Borntraeger wrote:
->> KVM guests on s390 need a different page table layout than normal
->> processes (2kb page table + 2kb page status extensions vs 2kb page table
->> only). As of today this has to be enabled via the vm.allocate_pgste
->> sysctl.
->>
->> Newer kernels (>= 4.12) on s390 check for an S390_PGSTE program header
->> and enable the pgste page table extensions in that case. This makes the
->> vm.allocate_pgste sysctl unnecessary. We enable this program header for
->> the s390 system emulation (qemu-system-s390x) if we build on s390
->> - for s390 system emulation
->> - the linker supports --s390-pgste (binutils >= 2.29)
->> - KVM is enabled
->>
->> This will allow distributions to disable the global vm.allocate_pgste
->> sysctl, which will improve the page table allocation for non KVM
->> processes as only 2kb chunks are necessary.
->>
->> Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>
->> Cc: Alexander Graf <agraf@suse.de>
->> Cc: Dan Horak <dhorak@redhat.com>
->> Cc: David Hildenbrand <david@redhat.com>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
->> ---
->> V1->V2:
->> 	- provide ld_has function
->> 	- use ld_has to replace some open coded variants
->> 	- check target arch and arch for s390
->> 	- check for s390x before calling the linker
->>
->>  configure | 21 ++++++++++++++++++++-
->>  1 file changed, 20 insertions(+), 1 deletion(-)
->>
->> diff --git a/configure b/configure
->> index dd73cce..0b68b37 100755
->> --- a/configure
->> +++ b/configure
->> @@ -240,6 +240,11 @@ supported_target() {
->>      return 1
->>  }
->>  
->> +
-> 
-> I'd drop this new line
-> 
->> +ld_has() {
->> +    $ld --help 2>/dev/null | grep ".$1" >/dev/null 2>&1
->> +}
->> +
->>  # default parameters
->>  source_path=$(dirname "$0")
->>  cpu=""
->> @@ -5043,7 +5048,7 @@ fi
->>  # Use ASLR, no-SEH and DEP if available
->>  if test "$mingw32" = "yes" ; then
->>      for flag in --dynamicbase --no-seh --nxcompat; do
->> -        if $ld --help 2>/dev/null | grep ".$flag" >/dev/null 2>/dev/null ; then
->> +        if ld_had $flag ; then
->>              LDFLAGS="-Wl,$flag $LDFLAGS"
->>          fi
->>      done
->> @@ -6522,6 +6527,20 @@ if test "$target_linux_user" = "yes" -o "$target_bsd_user" = "yes" ; then
->>    ldflags="$ldflags $textseg_ldflags"
->>  fi
->>  
->> +# Newer kernels on s390 check for an S390_PGSTE program header and
->> +# enable the pgste page table extensions in that case. This makes
->> +# the vm.allocate_pgste sysctl unnecessary. We enable this program
->> +# header if
->> +#  - we build on s390x
->> +#  - we build the system emulation for s390x (qemu-system-s390x)
->> +#  - KVM is enabled
->> +#  - the linker support --s390-pgste
->> +if test "$TARGET_ARCH" = "s390x" -a "$target_softmmu" = "yes"  -a "$ARCH" = "s390x" -a "$kvm" = "yes"; then
-> 
-> Wonder if the "$ARCH" check is really necessary: TARGET_ARCH=s390x with
-> kvm=yes should only build on s390x.
+OK, yeh that's the same symptom I saw - it's that final failure that
+causes bdrv_inactivate_all to return a failure and fail the source
+migration.
 
-Isn't kvm=yes and TARGET_ARCH=s390x also possible on a x86 host, where
-only the x86_64 target is built with CONFIG_KVM=y, but the s390x target
-with CONFIG_KVM=n ?
+-- =
 
- Thomas
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1711602
+
+Title:
+  --copy-storage-all failing with qemu 2.10
+
+Status in QEMU:
+  New
+Status in libvirt package in Ubuntu:
+  Confirmed
+Status in qemu package in Ubuntu:
+  Confirmed
+
+Bug description:
+  We fixed an issue around disk locking already in regard to qemu-nbd
+  [1], but there still seem to be issues.
+
+  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
+://10.22.69.196/system
+  error: internal error: qemu unexpectedly closed the monitor: 2017-08-18T1=
+2:10:29.800397Z qemu-system-x86_64: -chardev pty,id=3Dcharserial0: char dev=
+ice redirected to /dev/pts/0 (label charserial0)
+  2017-08-18T12:10:48.545776Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+
+  Source libvirt log for the guest:
+  2017-08-18 12:09:08.251+0000: initiating migration
+  2017-08-18T12:09:08.809023Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+  2017-08-18T12:09:08.809481Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+
+  Target libvirt log for the guest:
+  2017-08-18T12:09:08.730911Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+  2017-08-18 12:09:09.010+0000: shutting down, reason=3Dcrashed
+
+  Given the timing it seems that the actual copy now works (it is busy ~10 =
+seconds on my environment which would be the copy).
+  Also we don't see the old errors we saw before, but afterwards on the act=
+ual take-over it fails.
+
+  Dmesg has no related denials as often apparmor is in the mix.
+
+  Need to check libvirt logs of source [2] and target [3] in Detail.
+
+  [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02200.html
+  [2]: http://paste.ubuntu.com/25339356/
+  [3]: http://paste.ubuntu.com/25339358/
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1711602/+subscriptions
