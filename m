@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dkLs0-0004Yc-HX
+	(envelope-from <dgibson@ozlabs.org>) id 1dkLs0-0004Yb-AU
 	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 22:58:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dkLrz-0001R5-IK
+	(envelope-from <dgibson@ozlabs.org>) id 1dkLrz-0001Qi-8e
 	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 22:58:16 -0400
-Date: Wed, 23 Aug 2017 12:30:24 +1000
+Date: Wed, 23 Aug 2017 12:28:33 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170823023024.GL5379@umbus.fritz.box>
+Message-ID: <20170823022833.GK5379@umbus.fritz.box>
 References: <cover.1503249785.git.balaton@eik.bme.hu>
-	<86d29467038393122310cf0ba1c2547489324c61.1503249785.git.balaton@eik.bme.hu>
+	<f34dbaefd1224bca33a9052107cd32b628400106.1503249785.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="sCNd3Ivk/oijKKf1"
+	protocol="application/pgp-signature"; boundary="gBYU9MM4gf8jKg2V"
 Content-Disposition: inline
-In-Reply-To: <86d29467038393122310cf0ba1c2547489324c61.1503249785.git.balaton@eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH 12/15] ppc4xx: Export ECB and PLB emulation
+In-Reply-To: <f34dbaefd1224bca33a9052107cd32b628400106.1503249785.git.balaton@eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH 11/15] ppc: Add 460EX embedded CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +28,115 @@ To: BALATON Zoltan <balaton@eik.bme.hu>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
 
 
---sCNd3Ivk/oijKKf1
+--gBYU9MM4gf8jKg2V
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 On Sun, Aug 20, 2017 at 07:23:05PM +0200, BALATON Zoltan wrote:
-> Make these device models available outside ppc405_uc.c for reuse in
-> 460EX emulation. They are left in their current place for now because
-> they are used mostly unchanged and I'm not sure these correctly model
-> the components in 440 SoCs (but they seem to be good enough). These
-> functions could be moved in a subsequent clean up series when this is
-> confirmed.
+> Despite its name it is a 440 core CPU
 
-Your reasoning convinces me.  Applied to ppc-for-2.11.
+As I recall 460 was supposed to be a 440 with SMP support.  Except
+they screwed up the cache coherence, so it's basically unusable for
+SMP (at least with Linux).  They finally got 440 SMP right in 470
+IIRC.
 
+Or are you saying that the 460EX is more 440 like than other 460 cpus?
 >=20
 > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  hw/ppc/ppc405.h    | 3 +++
->  hw/ppc/ppc405_uc.c | 4 ++--
->  2 files changed, 5 insertions(+), 2 deletions(-)
+>  target/ppc/cpu-models.c     |  3 +++
+>  target/ppc/cpu-models.h     |  1 +
+>  target/ppc/translate_init.c | 38 ++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 42 insertions(+)
 >=20
-> diff --git a/hw/ppc/ppc405.h b/hw/ppc/ppc405.h
-> index a9ffc87..7ed25cf 100644
-> --- a/hw/ppc/ppc405.h
-> +++ b/hw/ppc/ppc405.h
-> @@ -59,6 +59,9 @@ struct ppc4xx_bd_info_t {
->  ram_addr_t ppc405_set_bootinfo (CPUPPCState *env, ppc4xx_bd_info_t *bd,
->                                  uint32_t flags);
+> diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
+> index 4d3e635..7c368fc 100644
+> --- a/target/ppc/cpu-models.c
+> +++ b/target/ppc/cpu-models.c
+> @@ -348,6 +348,8 @@
+>                  "PowerPC 440 EPb")
+>      POWERPC_DEF("440EPX",        CPU_POWERPC_440EPX,                 440=
+EP,
+>                  "PowerPC 440 EPX")
+> +    POWERPC_DEF("460EXb",        CPU_POWERPC_460EXb,                 460=
+EX,
+> +                "PowerPC 460 EXb")
+>  #if defined(TODO_USER_ONLY)
+>      POWERPC_DEF("440GPb",        CPU_POWERPC_440GPb,                 440=
+GP,
+>                  "PowerPC 440 GPb")
+> @@ -1238,6 +1240,7 @@ PowerPCCPUAlias ppc_cpu_aliases[] =3D {
+>      { "440GP", "440GPc" },
+>      { "440GR", "440GRa" },
+>      { "440GX", "440GXf" },
+> +    { "460EX", "460EXb" },
 > =20
-> +void ppc4xx_plb_init(CPUPPCState *env);
-> +void ppc405_ebc_init(CPUPPCState *env);
+>      { "RCPU", "MPC5xx" },
+>      /* MPC5xx microcontrollers */
+> diff --git a/target/ppc/cpu-models.h b/target/ppc/cpu-models.h
+> index b563c45..92f99c0 100644
+> --- a/target/ppc/cpu-models.h
+> +++ b/target/ppc/cpu-models.h
+> @@ -241,6 +241,7 @@ enum {
+>      CPU_POWERPC_440SP              =3D 0x53221850,
+>      CPU_POWERPC_440SP2             =3D 0x53221891,
+>      CPU_POWERPC_440SPE             =3D 0x53421890,
+> +    CPU_POWERPC_460EXb             =3D 0x130218A4, /* called 460 but 440=
+ core */
+>      /* PowerPC 460 family */
+>  #if 0
+>      /* Generic PowerPC 464 */
+> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> index 8fb407e..1e0d566 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -3832,6 +3832,44 @@ POWERPC_FAMILY(440EP)(ObjectClass *oc, void *data)
+>                   POWERPC_FLAG_DE | POWERPC_FLAG_BUS_CLK;
+>  }
+> =20
+> +POWERPC_FAMILY(460EX)(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
+> +    PowerPCCPUClass *pcc =3D POWERPC_CPU_CLASS(oc);
 > +
->  CPUPPCState *ppc405cr_init(MemoryRegion *address_space_mem,
->                          MemoryRegion ram_memories[4],
->                          hwaddr ram_bases[4],
-> diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
-> index 8f44cb4..e621d0a 100644
-> --- a/hw/ppc/ppc405_uc.c
-> +++ b/hw/ppc/ppc405_uc.c
-> @@ -174,7 +174,7 @@ static void ppc4xx_plb_reset (void *opaque)
->      plb->besr =3D 0x00000000;
->  }
-> =20
-> -static void ppc4xx_plb_init(CPUPPCState *env)
-> +void ppc4xx_plb_init(CPUPPCState *env)
+> +    dc->desc =3D "PowerPC 460 EX";
+> +    pcc->init_proc =3D init_proc_440EP;
+> +    pcc->check_pow =3D check_pow_nocheck;
+> +    pcc->insns_flags =3D PPC_INSNS_BASE | PPC_STRING |
+> +                       PPC_FLOAT | PPC_FLOAT_FRES | PPC_FLOAT_FSEL |
+> +                       PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
+> +                       PPC_FLOAT_STFIWX |
+> +                       PPC_DCR | PPC_DCRX | PPC_WRTEE | PPC_RFMCI |
+> +                       PPC_CACHE | PPC_CACHE_ICBI |
+> +                       PPC_CACHE_DCBZ | PPC_CACHE_DCBA |
+> +                       PPC_MEM_TLBSYNC | PPC_MFTB |
+> +                       PPC_BOOKE | PPC_4xx_COMMON | PPC_405_MAC |
+> +                       PPC_440_SPEC;
+> +    pcc->msr_mask =3D (1ull << MSR_POW) |
+> +                    (1ull << MSR_CE) |
+> +                    (1ull << MSR_EE) |
+> +                    (1ull << MSR_PR) |
+> +                    (1ull << MSR_FP) |
+> +                    (1ull << MSR_ME) |
+> +                    (1ull << MSR_FE0) |
+> +                    (1ull << MSR_DWE) |
+> +                    (1ull << MSR_DE) |
+> +                    (1ull << MSR_FE1) |
+> +                    (1ull << MSR_IR) |
+> +                    (1ull << MSR_DR);
+> +    pcc->mmu_model =3D POWERPC_MMU_BOOKE;
+> +    pcc->excp_model =3D POWERPC_EXCP_BOOKE;
+> +    pcc->bus_model =3D PPC_FLAGS_INPUT_BookE;
+> +    pcc->bfd_mach =3D bfd_mach_ppc_403;
+> +    pcc->flags =3D POWERPC_FLAG_CE | POWERPC_FLAG_DWE |
+> +                 POWERPC_FLAG_DE | POWERPC_FLAG_BUS_CLK;
+> +}
+> +
+>  static void init_proc_440GP(CPUPPCState *env)
 >  {
->      ppc4xx_plb_t *plb;
-> =20
-> @@ -585,7 +585,7 @@ static void ebc_reset (void *opaque)
->      ebc->cfg =3D 0x80400000;
->  }
-> =20
-> -static void ppc405_ebc_init(CPUPPCState *env)
-> +void ppc405_ebc_init(CPUPPCState *env)
->  {
->      ppc4xx_ebc_t *ebc;
-> =20
+>      /* Time base */
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -93,24 +144,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---sCNd3Ivk/oijKKf1
+--gBYU9MM4gf8jKg2V
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmc6MAACgkQbDjKyiDZ
-s5KnAA/+PdxB9hVoQ6FnLS7bYnlzA5tmJIX4z0HOGir5V/Vgnwv8XuPGnxhdfyvH
-eSwzCnFGmzZDJRTqu3a+VPbtt9Qoy01pvyYvo7JDEdvexx6M9o8NLFMbLBIZlnqP
-fL3T7df7IHxtotsMmpHPAhnDv2NTvFxOdeoOqkiakk3JhvkRGfASiD2m/BBygi0r
-FoCTwNICa8rWZ3Ff6ZtVL4H0ck+Gg3w/Z3jBoJIPAxADO1rpUMPSUJ9ifGGO84+X
-hUi70sAPjdWngUjRj6xdyKwYf/55TkNFuhXrA4jEube8bNjfDJBuQasEjw701I7o
-gUCNtAe1yI9HhIcPmQDv781REg0nqeQftS++UneNNyH4QnQSqQzBvkcCoRFwHvbo
-JpDurhJ5/sjJyHQy8RMmamS18Bpv7LIp6HG7I0fDcBr7S0i2iHChYpPMPLJXcy4/
-WU1GspsFmCsBydnPfspIvIW9sfBZmfouYy+LydJSXJkidi4vQfkpmK31Hr6NqLJU
-GLXIpFlVe/HzZDBTmV4l7kD9YI8wX9hisDPV8xBrbuTahRbQsieFMitAFNr46P73
-TJO84D3ecUFnOewf3CruEmpb3wjNG2AtqucaBdI5HvLrFu4+U5lorom9NMebCOvo
-SISO+iS7yK9syiIhihceWleDn1iJ9+diLdVwfj2WQxPoRoKMof0=
-=0fsB
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmc6E8ACgkQbDjKyiDZ
+s5L3dhAArNbuchE/pFC3195GJLK2+FF4t0DbaSEcH4dA02UwH3oBraYVRVzH/waA
+wp+9oqKaM1EiyVS/JwhQT2jZMmkandRdiTKsWp7qXi6D/ZIPNRWQ3O/MKXXTwRby
+O88GG4KNsLR7lPsr3yfob/e2Pq580p24QaKWhCBhGzE+gE4prUX2UFczV2MrPz1D
+QQRI68dxBPT2ILr8Ih1xr815gRb/zq8R6NuiVKw+vOXmBnn4b8x/rx6q+iHgfLEH
+o2Pn2iH0SoUiv7yNbeseLGvQWVLTP4+6vDGeSkK2m1GBdrdE7l5+jMFsF+Ht/6vj
+pVjrOXJlhepfiDq39afYDXD+Pe2f+BrSpebO+sBDGEebvuL366owlRA+vmRj/Ns7
+P9mVVKjbC0ta3bzXllPC4bhW/g3BdCeyY4kFJJ3zZokmcWSuOF0yiCke4pNkuIVl
+dkZGiN4tCyHxUF/2wOrsr/DFTY4wWX9HoOnAx/7Hngf5IAZH6si5cVOYlhCp3ar2
+B8IESaLWyxdwVmgi5xGgP3lahzsCTiDTaAeKVLljzPHFnWzaV/l9wVoTxUcuCHaJ
+MCr7AAbQLUPhIbbo9YvvCbCG20OU9U/IAZHZ0NE6y5qQ0nhooNrmdr/D6+H11FQR
+nJmRRyawRPHbWKdWjLBdd3m9y17CIP3n1FLERC2wY6hGlut1wKA=
+=Taq7
 -----END PGP SIGNATURE-----
 
---sCNd3Ivk/oijKKf1--
+--gBYU9MM4gf8jKg2V--
