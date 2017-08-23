@@ -1,23 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1dkV4W-0006t0-Ho
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:47:50 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1dkV9k-0000wP-CC
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:53:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1dkV4S-0006Q8-8K
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:47:48 -0400
-Date: Wed, 23 Aug 2017 14:47:42 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <8fe81d01-0a39-02cc-c7d8-59437c4f94ac@free.fr>
-Message-ID: <alpine.BSF.2.21.1708231422390.35800@zero.eik.bme.hu>
-References: <cover.1503249785.git.balaton@eik.bme.hu>
-	<ab632ef70b02efb2257d9e2f08b45b097ebacb3a.1503249785.git.balaton@eik.bme.hu>
-	<20170823041644.GP5379@umbus.fritz.box>
-	<alpine.BSF.2.21.1708231217070.76247@zero.eik.bme.hu>
-	<8fe81d01-0a39-02cc-c7d8-59437c4f94ac@free.fr>
+	(envelope-from <ldoktor@redhat.com>) id 1dkV9g-0000Zl-Bs
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:53:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60264)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1dkV9g-0000ZX-29
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 08:53:08 -0400
+References: <20170816082650.21880-1-cohuck@redhat.com>
+	<223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
+	<CAFEAcA_UfM_XNKdc5zfHsehoRE6Q+EszRZX3FByskir7c+0Lww@mail.gmail.com>
+	<20170822010917.GO12356@umbus.fritz.box>
+	<CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
+	<3f0dc918-0f55-e2f4-bf47-fe4abf5453bb@redhat.com>
+	<CAFEAcA_ezKWweEuUB-cXTer0LLaeuiGDkSdfhApedhw4ykDT0Q@mail.gmail.com>
+	<20170822112046.GC12356@umbus.fritz.box>
+	<20170822134815.77020eb8.cohuck@redhat.com>
+	<20170823002907.GC5379@umbus.fritz.box>
+	<20170823091650.48e7c44e.cohuck@redhat.com>
+	<54526d47-b436-79d5-7a38-9516eaa727a6@redhat.com>
+	<5b0ff74a-08d6-558d-4c79-a93758e6302a@redhat.com>
+	<0bb344a3-f8f8-3365-cef1-1c68cf7d160d@redhat.com>
+	<dafbe774-2544-f64e-aad2-9cf957025e8d@redhat.com>
+	<8f085a7b-bc3d-9551-b63e-4191f9e13af6@redhat.com>
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+Message-ID: <dcbe3399-91d8-d632-c77b-2cd52806e373@redhat.com>
+Date: Wed, 23 Aug 2017 14:52:55 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 15/15] ppc: Add aCube Sam460ex board
+In-Reply-To: <8f085a7b-bc3d-9551-b63e-4191f9e13af6@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="hNCSeuF2m3a95MDCmRTJCXpDn77aJp1D4"
+Subject: Re: [Qemu-devel] make check speed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,170 +42,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-15?Q?Fran=E7ois_Revol?= <revol@free.fr>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>
 
-On Wed, 23 Aug 2017, Fran=E7ois Revol wrote:
-> Le 23/08/2017 =E0 13:12, BALATON Zoltan a =E9crit :
->>> What's the connection with mips_malta?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hNCSeuF2m3a95MDCmRTJCXpDn77aJp1D4
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, David Gibson
+ <david@gibson.dropbear.id.au>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Cleber Rosa <crosa@redhat.com>
+Message-ID: <dcbe3399-91d8-d632-c77b-2cd52806e373@redhat.com>
+Subject: Re: make check speed
+References: <20170816082650.21880-1-cohuck@redhat.com>
+ <223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
+ <CAFEAcA_UfM_XNKdc5zfHsehoRE6Q+EszRZX3FByskir7c+0Lww@mail.gmail.com>
+ <20170822010917.GO12356@umbus.fritz.box>
+ <CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
+ <3f0dc918-0f55-e2f4-bf47-fe4abf5453bb@redhat.com>
+ <CAFEAcA_ezKWweEuUB-cXTer0LLaeuiGDkSdfhApedhw4ykDT0Q@mail.gmail.com>
+ <20170822112046.GC12356@umbus.fritz.box>
+ <20170822134815.77020eb8.cohuck@redhat.com>
+ <20170823002907.GC5379@umbus.fritz.box>
+ <20170823091650.48e7c44e.cohuck@redhat.com>
+ <54526d47-b436-79d5-7a38-9516eaa727a6@redhat.com>
+ <5b0ff74a-08d6-558d-4c79-a93758e6302a@redhat.com>
+ <0bb344a3-f8f8-3365-cef1-1c68cf7d160d@redhat.com>
+ <dafbe774-2544-f64e-aad2-9cf957025e8d@redhat.com>
+ <8f085a7b-bc3d-9551-b63e-4191f9e13af6@redhat.com>
+In-Reply-To: <8f085a7b-bc3d-9551-b63e-4191f9e13af6@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Dne 23.8.2017 v 14:35 Thomas Huth napsal(a):
+> On 23.08.2017 13:51, Luk=C3=A1=C5=A1 Doktor wrote:
+> [...]
+>> and all ERROR lines:
 >>
->> The board's firmware wants to see SPD EEPROMs of the connected memory
->> while initialising the memory controller. This is why we need to
->> implement SDRAM controller, I2C and SPD EEPROMs. MIPS malta board had
->> already SPD EEPROM implementation so this is based on that. The commen=
-t
->> just indicates where this code comes from.
->
-> Indeed, and I copy-pasted from elsewhere for this.
->
->>>> +        fprintf(stderr, "qemu: Error registering flash memory.\n");
->>>
->>> Use error_report() instead, please.
->
-> I guess this didn't exist back when I started writing it...
+>>     ERROR:tests/prom-env-test.c:42:check_guest_memory: assertion faile=
+d (signature =3D=3D MAGIC): (0x00000000 =3D=3D 0xcafec0de)
+>=20
+> This test uses a timeout of 120 s, see check_guest_memory() in
+> tests/prom-env-test.c ... that's a lot already, but if you hit this on =
+a
+> real system, feel free to send a patch to increase the timeout.
+>=20
+>>     ERROR:tests/rtc-test.c:173:check_time: assertion failed (ABS(t - s=
+) <=3D wiggle): (3 <=3D 2)
+>=20
+> You might need to increase the "wiggle" variable here.
+>=20
+>>     ERROR:tests/vhost-user-test.c:779:test_reconnect: child process (/=
+i386/vhost-user/reconnect/subprocess [5264]) failed unexpectedly
+>>     ERROR:tests/vhost-user-test.c:807:test_connect_fail: child process=
+ (/x86_64/vhost-user/connect-fail/subprocess [7751]) failed unexpectedly
+>>     ERROR:tests/vhost-user-test.c:835:test_flags_mismatch: child proce=
+ss (/x86_64/vhost-user/flags-mismatch/subprocess [7892]) failed unexpecte=
+dly
+>=20
+> I've got no clue about what could be wrong here ... maybe Marc-Andr=C3=A9=
+ can
+> advise here (who wrote these tests if I got "git blame" right).
+>=20
+>>     ERROR:tests/boot-sector.c:127:boot_sector_test: assertion failed (=
+signature =3D=3D SIGNATURE): (0x00000000 =3D=3D 0x0000dead)
+>=20
+> Uses a timeout of 90 s ... feel free to send a patch to increase it if
+> it's necessary (the timeout can be found in boot_sector_test() in
+> tests/boot-sector.c).
+>=20
+>  Thomas
+>=20
 
-No problem, I can take care of these.
+Well this one was produced by the `stress` command, so it does not reflec=
+t the reality. So this time I took the time and looked at the actual fail=
+ures in David's travis results (his builds were already migrated to trust=
+y and are failing massively) https://travis-ci.org/dgibson/qemu/builds I =
+see only the `vhost-user-test` failing:
 
->>>> +/* Create reset TLB entries for BookE, mapping only the flash
->>>> memory.  */
->>>> +static void mmubooke_create_initial_mapping_uboot(CPUPPCState *env)
->>>> +{
->>>> +    ppcemb_tlb_t *tlb =3D &env->tlb.tlbe[0];
->>>> +
->>>> +    /* on reset the flash is mapped by a shadow TLB,
->>>> +     * but since we don't implement them we need to use
->>>> +     * the same values U-Boot will use to avoid a fault.
->>>> +     */
->>>
->>> Usually the reset state of the MMU is handled in the cpu code rather
->>> than the board code.  Is there a specific reason you need it in the
->>> board code here?
->>
->> I'm not sure, probably lack of a better place. The ppc440_bamboo board
->> this is based on has it the same way in the board code. Maybe this cou=
-ld
->> be cleaned up when someone wants to QOMify the SoC models sometimes.
->
-> Thing is, the code allows both booting with U-Boot and with a kernel
-> directly, and the MMU mapping differ in those cases.
->
-> Maybe the CPU reset should use the U-Boot setup and the kernel boot
-> would just overwrite it?
->
->>>> +        env->nip =3D bi->entry;
->>>> +
->>>> +        /* Create a mapping for the kernel.  */
->>>> +        mmubooke_create_initial_mapping(env, 0, 0);
->>>> +        env->gpr[6] =3D tswap32(EPAPR_MAGIC);
->>>
->>> I'm pretty sure the tswap can't be right here.  env->gpr is in host
->>> native order and I'd expect the constant to be as well.
->>
->> I know nothing about this, maybe Francois remembers why it's there. Bu=
-t
->> booting linux with -kernel works so it's probably either correct or do=
-es
->> not matter.
->
-> Absolutely no idea. It seems to be there from the first commit in my ow=
-n
-> history here.
->
-> I don't recall testing booting linux at all though.
-> Linux does check the magic, so it'd be weird if it booted:
->
-> https://github.com/torvalds/linux/blob/master/arch/powerpc/boot/epapr.c
+ERROR:tests/vhost-user-test.c:779:test_reconnect: child process (/x86_64/=
+vhost-user/reconnect/subprocess [58907]) failed unexpectedly
+ERROR:tests/vhost-user-test.c:807:test_connect_fail: child process (/x86_=
+64/vhost-user/connect-fail/subprocess [58924]) failed unexpectedly
+ERROR:tests/vhost-user-test.c:835:test_flags_mismatch: child process (/i3=
+86/vhost-user/flags-mismatch/subprocess [56261]) failed unexpectedly
 
-Is this code used on Sam460 at all? Is U-Boot ePAPR compliant firmware?=20
-Isn't that only needed on OpenFirmware?
+I actually looked there but I have no clue of how to fix this issue. But =
+most probably it'd make Travis happier...
 
-> But maybe it got added later than the version you tested?
+Luk=C3=A1=C5=A1
 
-I've tried some of these:=20
-http://www.supertuxkart-amiga.de/amiga/sam.html#downloads
-which also have kernel 4.5 so that's fairly recent. These kernels are=20
-"u-boot legacy uImage" so maybe they don't need ePAPR magic? Are there=20
-some docs on what the kernel expects on this board or it has to be dug ou=
-t=20
-from U-Boot?
 
-> At least my current Haiku port ignores the magic for now.
->
->>>> +        env->gpr[7] =3D (16 << 20) - 8; /*bi->ima_size;*/
->>>
->>> So, entering the kernel directly can be useful, particularly during
->>> early development.  However, having both firmware and non-firmware
->>> entry paths can lead to confusing bugs if there's a subtle difference
->>> between the initial (to the kernel) states between the two paths.  Fo=
-r
->>> that reason, the usual preferred way to implement -kernel is to still
->>> run the usual firmware, but use some way of telling it to boot
->>> immediately into the supplied kernel.
->>>
->>> I won't object to merging it this way - just a wanrning that this may
->>> bite you in the future if you're not careful.
->>
->> Warning taken, at this point until firmware cannot reliably boot thing=
-s
->> having another way to test is useful to have. In the future when booti=
-ng
->> via firmware works well we can figure out what to do with this.
->
-> Possibly we could dig the U-Boot environment...
->
->>>> +    memory_region_init_alias(isa, NULL, "isa_mmio", get_system_io()=
-,
->>>> +                             0, 0x10000);
->>>> +    memory_region_add_subregion(get_system_memory(), 0xc08000000, i=
-sa);
->>>
->>> Does it really make sense to just embed the ISA IO space here, rather
->>> than actually instanting a PCI<->ISA bridge?
->>
->> I'm not sure if this is correct but I don't know how it's handled on
->> real hardware. The board does not have ISA and I don't think it has a
->> bridge but the IO space appears at this location according to the
->> datasheet (In System Memory Address Map it's listed as PCI I/O
->> 0xc08000000-0xc0800ffff) and clients expect PCI card's io registers to
->> be accessible here. If anyone knows how it's done on real hardware and
->> if there's a better way to model this please let me know.
->
-> Indeed it's the PCI I/O space, maybe it's just copy-paste error.
->
-> As for how to declare it, keep in mind this code is years old and I
-> fixed it several times when compilation broke, without really reading
-> the documentation (actually, do we have proper documentation for the
-> internal API?), and it kept changing over the years.
+--hNCSeuF2m3a95MDCmRTJCXpDn77aJp1D4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-And I've also changed it while cleaning up and getting it to work with=20
-some clients. This particular mapping was at the wrong place in your firs=
-t=20
-commits then got removed but I found it's needed but at a different=20
-address so I've added it again with the fixed address.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
->>>> +    /* PCI devices */
->>>> +    pci_create_simple(pci_bus, PCI_DEVFN(6, 0), "sm501");
->>>> +    /* SoC has a single SATA port but we don't emulate that yet
->>>> +     * However, firmware and usual clients have driver for SiI311x
->>>> +     * so add one for convenience by default */
->>>> +    pci_create_simple(pci_bus, -1, "sii3112");
->>>
->>> You should probably not create this when started with -nodefaults.
->>
->> We don't emulate the on-board SATA port of the SoC and without this
->> there's no other way to connect disks (maybe over USB, but firmware ha=
-s
->> a bug which prevents that too even on real hardware AFAIK, I've
->> backported a fix which made booting from USB work but that broke
->> keyboard) so while this is an external card it's pretty much unusable
->> without this so it's added by default.
->
-> Maybe add a /*TODO*/ then?
+iQEwBAEBCAAaBQJZnXqnExxsZG9rdG9yQHJlZGhhdC5jb20ACgkQJrNi5H/PIsEa
+rgf+PN00TZHIg1dn0SftnLA/fKYfugbUpUDK/VqtDziL7AvbQorjdc+eYeEA+1Hs
+8eFUZjMJVUz8UxE5DC3IVXKs6q6aQguancl16c38C9ieAs5mYP/DSPm5N2Ir8gPj
+g1Qj0d1iPugKvDpG+kljYCJQ4k1O47H28ZHdac8P9Offfxeaj/G+D7dPy8i+GwOm
+j4qWcwP/ujd5RFk/jmM2BhSvRdk3C8QVWaQm/GF+v5s5ircmHoEzz6+ebGzbLRm3
+7xW4uenSWq4I2LG/At/8NG2n0YMKyUzvGUJo5pxHqcXRQAM0WeLKAmlsV/NusDaJ
+xuoiyfAJjxEORLdAKh/stYzGgQ==
+=zKRr
+-----END PGP SIGNATURE-----
 
-I don't indent to implement that. Seems to be too complex and unnecessary=
-=20
-when we have sii3112 (unless you want to test drivers for it on QEMU). I'=
-d=20
-rather see an implementation of the network interfaces that seems to be=20
-more useful to spend time on than another SATA controller. So I chose to=20
-use the sii3112 by default.
+--hNCSeuF2m3a95MDCmRTJCXpDn77aJp1D4--
