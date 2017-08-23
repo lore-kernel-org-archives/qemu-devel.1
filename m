@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dkX9o-0006Gq-Mo
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:01:30 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dkXFa-0008RA-Qn
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:07:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dkX9i-0005fS-Uv
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:01:24 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38321)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dkX9i-0005f6-P6
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:01:18 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dkX9h-0005xj-2g
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 15:01:17 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BCAED2E80E8
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 15:01:16 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <kraxel@redhat.com>) id 1dkXFV-0001x4-Sj
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:07:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44980)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dkXFV-0001wX-N3
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:07:17 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BAA447E42E
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 15:07:15 +0000 (UTC)
+Message-ID: <1503500832.16071.32.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 23 Aug 2017 17:07:12 +0200
+In-Reply-To: <87mv6yk1x3.fsf@dusky.pond.sub.org>
+References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
+	<20170727154126.11339-17-marcandre.lureau@redhat.com>
+	<87d17ur7y1.fsf@dusky.pond.sub.org> <87mv6yk1x3.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 23 Aug 2017 14:46:57 -0000
-From: ChristianEhrhardt <1711602@bugs.launchpad.net>
-Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
-Message-Id: <150349961741.19046.9769184906821244254.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
- 2.10
+Subject: Re: [Qemu-devel] [PATCH 16/26] qapi: add conditions to VNC
+ type/commands/events on the schema
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,76 +35,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, "Habkost, Eduardo" <ehabkost@redhat.com>
 
-Hi Stefan,
-I was part of the report around the series in "[PATCH for-2.10 0/4] block: =
-Fix non-shared storage migration", but this is happening on rc3 which conta=
-ins this.
+On Thu, 2017-08-17 at 10:56 +0200, Markus Armbruster wrote:
+> Gerd, can we delete the vnc_init_func() stub?=C2=A0=C2=A0Things still c=
+ompile
+> for
+> me when I do.
+>=20
+> diff --git a/include/ui/console.h b/include/ui/console.h
+> index 7262bef..2c3b2cd 100644
+> --- a/include/ui/console.h
+> +++ b/include/ui/console.h
+> @@ -484,11 +484,6 @@ static inline QemuOpts *vnc_parse(const char
+> *str, Error **errp)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0error_setg(errp, "VNC support is disabled=
+");
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return NULL;
+> =C2=A0}
+> -static inline int vnc_init_func(void *opaque, QemuOpts *opts, Error
+> **errp)
+> -{
+> -=C2=A0=C2=A0=C2=A0=C2=A0error_setg(errp, "VNC support is disabled");
+> -=C2=A0=C2=A0=C2=A0=C2=A0return -1;
+> -}
+> =C2=A0#endif
 
-AFAIK Fam's series is:
-dd7fdaad iotests: Add non-shared storage migration case 192 (Fam)
-5f7772c4 block-backend: Defer shared_perm tightening migration completion (=
-Fam)
-3dff24f2 nbd: Fix order of bdrv_set_perm and bdrv_invalidate_cache (Kevin)
-80adf54e stubs: Add vm state change handler stubs (Fam)
+Looking at a663fbd9e2f65fae81018d81f231ad79510cf9fb.  Guess we want fix
+qemu_opts_foreach to not barf on NULL, then revert that commit, so
+f8c75b2486 (adding Eduardo to Cc) works as intended.
 
-All these got into v2.10.0-rc3 which these tests are based on already.
-IMHO - This is not complete for qemu 2.10 and a regression since 2.9 (well =
-since 2.8 as I haven't tested 2.9 personally).
+Beside that:  The inline for vnc_init_func looks pointless (it's used
+via function pointer).  Also it can be empty as it will never be
+actually called.  Which is fine, vnc_parse will throw an error if
+someone tries to use vnc with a binary without vnc support.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1711602
-
-Title:
-  --copy-storage-all failing with qemu 2.10
-
-Status in QEMU:
-  New
-Status in libvirt package in Ubuntu:
-  Confirmed
-Status in qemu package in Ubuntu:
-  Confirmed
-
-Bug description:
-  We fixed an issue around disk locking already in regard to qemu-nbd
-  [1], but there still seem to be issues.
-
-  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
-://10.22.69.196/system
-  error: internal error: qemu unexpectedly closed the monitor: 2017-08-18T1=
-2:10:29.800397Z qemu-system-x86_64: -chardev pty,id=3Dcharserial0: char dev=
-ice redirected to /dev/pts/0 (label charserial0)
-  2017-08-18T12:10:48.545776Z qemu-system-x86_64: load of migration failed:=
- Input/output error
-
-  Source libvirt log for the guest:
-  2017-08-18 12:09:08.251+0000: initiating migration
-  2017-08-18T12:09:08.809023Z qemu-system-x86_64: Unable to read from socke=
-t: Connection reset by peer
-  2017-08-18T12:09:08.809481Z qemu-system-x86_64: Unable to read from socke=
-t: Connection reset by peer
-
-  Target libvirt log for the guest:
-  2017-08-18T12:09:08.730911Z qemu-system-x86_64: load of migration failed:=
- Input/output error
-  2017-08-18 12:09:09.010+0000: shutting down, reason=3Dcrashed
-
-  Given the timing it seems that the actual copy now works (it is busy ~10 =
-seconds on my environment which would be the copy).
-  Also we don't see the old errors we saw before, but afterwards on the act=
-ual take-over it fails.
-
-  Dmesg has no related denials as often apparmor is in the mix.
-
-  Need to check libvirt logs of source [2] and target [3] in Detail.
-
-  [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02200.html
-  [2]: http://paste.ubuntu.com/25339356/
-  [3]: http://paste.ubuntu.com/25339358/
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1711602/+subscriptions
+cheers,
+  Gerd
