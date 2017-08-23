@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkSXe-0001PZ-ME
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 06:05:45 -0400
+	(envelope-from <mlureau@redhat.com>) id 1dkScJ-0003Cd-BJ
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 06:10:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkSXc-0007s7-RJ
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 06:05:42 -0400
-From: Markus Armbruster <armbru@redhat.com>
+	(envelope-from <mlureau@redhat.com>) id 1dkScF-0001La-2C
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 06:10:31 -0400
+Date: Wed, 23 Aug 2017 06:10:04 -0400 (EDT)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <1074469842.2477067.1503483004106.JavaMail.zimbra@redhat.com>
+In-Reply-To: <87mv6qaf0b.fsf@dusky.pond.sub.org>
 References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-11-marcandre.lureau@redhat.com>
-Date: Wed, 23 Aug 2017 12:05:27 +0200
-In-Reply-To: <20170822132255.23945-11-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 22 Aug 2017
-	15:22:11 +0200")
-Message-ID: <87fuci4n14.fsf@dusky.pond.sub.org>
+	<20170822132255.23945-7-marcandre.lureau@redhat.com>
+	<87mv6qaf0b.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 10/54] block: use qemu_enum_parse() in
- blkdebug_debug_breakpoint
+Subject: Re: [Qemu-devel] [PATCH v2 06/54] qapi: introduce qapi_enum_lookup()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,121 +24,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "open list:blkdebug" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, "open list:Sheepdog" <sheepdog@lists.wpkg.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <jcody@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Josh Durgin <jdurgin@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "open list:Block Jobs" <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, Liu Yuan <namei.unix@gmail.com>, Jason Wang <jasowang@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+Hi
 
-> This slightly change the error report message from "Invalid event
-> name" to "Invalid parameter".
+----- Original Message -----
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>=20
+> > This will help with the introduction of a new structure to handle
+> > enum lookup.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> [...]
+> >  45 files changed, 206 insertions(+), 122 deletions(-)
+>=20
+> Hmm.
+>=20
+> > diff --git a/include/qapi/util.h b/include/qapi/util.h
+> > index 7436ed815c..60733b6a80 100644
+> > --- a/include/qapi/util.h
+> > +++ b/include/qapi/util.h
+> > @@ -11,6 +11,8 @@
+> >  #ifndef QAPI_UTIL_H
+> >  #define QAPI_UTIL_H
+> > =20
+> > +const char *qapi_enum_lookup(const char * const lookup[], int val);
+> > +
+> >  int qapi_enum_parse(const char * const lookup[], const char *buf,
+> >                      int max, int def, Error **errp);
+> > =20
+> > diff --git a/backends/hostmem.c b/backends/hostmem.c
+> > index 4606b73849..c4f795475c 100644
+> > --- a/backends/hostmem.c
+> > +++ b/backends/hostmem.c
+> > @@ -13,6 +13,7 @@
+> >  #include "sysemu/hostmem.h"
+> >  #include "hw/boards.h"
+> >  #include "qapi/error.h"
+> > +#include "qapi/util.h"
+> >  #include "qapi/visitor.h"
+> >  #include "qapi-types.h"
+> >  #include "qapi-visit.h"
+> > @@ -304,7 +305,7 @@ host_memory_backend_memory_complete(UserCreatable *=
+uc,
+> > Error **errp)
+> >              return;
+> >          } else if (maxnode =3D=3D 0 && backend->policy !=3D MPOL_DEFAU=
+LT) {
+> >              error_setg(errp, "host-nodes must be set for policy %s",
+> > -                       HostMemPolicy_lookup[backend->policy]);
+> > +                qapi_enum_lookup(HostMemPolicy_lookup, backend->policy=
+));
+> >              return;
+> >          }
+> > =20
+>=20
+> Lookup becomes even more verbose.
+>=20
+> Could we claw back some readability with macros?  Say in addition to
+>=20
+>     typedef enum FOO {
+>         ...
+>     } FOO;
+>=20
+>     extern const char *const FOO_lookup[];
+>=20
+> generate
+>=20
+>     #define FOO_str(val) qapi_enum_lookup(FOO_lookup, (val))
+>=20
+> Needs a matching qapi-code-gen.txt update.
+>=20
+> With that, this patch hunk would become
+>=20
+>                error_setg(errp, "host-nodes must be set for policy %s",
+>   -                       HostMemPolicy_lookup[backend->policy]);
+>   +                       HostMemPolicy_str(backend->policy);
+>=20
+> Perhaps we could even throw in some type checking:
+>=20
+>     #define FOO_str(val) (type_check(typeof((val)), FOO) \
+>                           + qapi_enum_lookup(FOO_lookup, (val)))
+>=20
+> What do you think?  Want me to explore a fixup patch you could squash
+> in?
+>=20
 
-Actually from
+Yes, I had similar thoughts, but didn't spent too much time finding the bes=
+t proposal, that wasn't my main goal in the series.=20
 
-    qemu-system-x86_64: LOCATION: Invalid event name "VALUE"
+Indeed, I would prefer that further improvements be done as follow-up. Or i=
+f you have a ready solution, I can squash it there. I can picture the confl=
+icts with the next patch though...=20
 
-to
+> [Skipping lots of mechanical changes...]
+>=20
+> I think you missed test-qobject-input-visitor.c and
+> string-input-visitor.c.
+>=20
+> In test-qobject-input-visitor.c's test_visitor_in_enum():
+>=20
+>         v =3D visitor_input_test_init(data, "%s", EnumOne_lookup[i]);
+>=20
+> You update it in PATCH 12, but the code only works as long as EnumOne
+> has no holes.  Mapping the enum to string like we do everywhere else in
+> this patch would be cleaner.
+>=20
 
-    qemu-system-x86_64: LOCATION: invalid parameter value: VALUE
+ok
 
-Let's get that exactly right in the commit message.
+> The loop control also subscripts EnumOne_lookup[i].  You take care of
+> that one in PATCH 12.  That's okay.
+>=20
+> Same for test-string-input-visitor.c's test_visitor_in_enum().
+>=20
+> There's one more in test_native_list_integer_helper():
+>=20
+>     g_string_append_printf(gstr_union,  "{ 'type': '%s', 'data': [ %s ] }=
+",
+>                            UserDefNativeListUnionKind_lookup[kind],
+>                            gstr_list->str);
+>=20
+> Same story.
+>=20
+> The patch doesn't touch the _lookup[] subscripts you're going to replace
+> by qapi_enum_parse() in PATCH 07-11.  Understand, but I'd reorder the
+> patches: first replace by qapi_enum_parse(), because DRY (no need to
+> explain more at that point).  Then get rid of all the remaining
+> subscripting into _lookup[], i.e. this patch (explain it helps the next
+> one), then PATCH 12.
+>=20
 
-Slight degradation, but the message is sub-par even before the patch.
-When complaining about a parameter value, both parameter name and value
-should be mentioned, as the value may well not be unique.  Not this
-patch's problem.
-
-Aside: LOCATION points to where the blkdebug driver is configured.  It
-should point to the error's actual location instead: the configuration
-file named with config=3D...  Also not this patch's problem.
-
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  block/blkdebug.c | 28 ++++++++--------------------
->  1 file changed, 8 insertions(+), 20 deletions(-)
->
-> diff --git a/block/blkdebug.c b/block/blkdebug.c
-> index c19ab28f07..50edda2a31 100644
-> --- a/block/blkdebug.c
-> +++ b/block/blkdebug.c
-> @@ -32,6 +32,7 @@
->  #include "qapi/qmp/qbool.h"
->  #include "qapi/qmp/qdict.h"
->  #include "qapi/qmp/qstring.h"
-> +#include "qapi/util.h"
->  #include "sysemu/qtest.h"
->=20=20
->  typedef struct BDRVBlkdebugState {
-> @@ -149,20 +150,6 @@ static QemuOptsList *config_groups[] =3D {
->      NULL
->  };
->=20=20
-> -static int get_event_by_name(const char *name, BlkdebugEvent *event)
-> -{
-> -    int i;
-> -
-> -    for (i =3D 0; i < BLKDBG__MAX; i++) {
-> -        if (!strcmp(BlkdebugEvent_lookup[i], name)) {
-> -            *event =3D i;
-> -            return 0;
-> -        }
-> -    }
-> -
-> -    return -1;
-> -}
-> -
->  struct add_rule_data {
->      BDRVBlkdebugState *s;
->      int action;
-> @@ -173,7 +160,7 @@ static int add_rule(void *opaque, QemuOpts *opts, Err=
-or **errp)
->      struct add_rule_data *d =3D opaque;
->      BDRVBlkdebugState *s =3D d->s;
->      const char* event_name;
-> -    BlkdebugEvent event;
-> +    int event;
->      struct BlkdebugRule *rule;
->      int64_t sector;
->=20=20
-> @@ -182,8 +169,9 @@ static int add_rule(void *opaque, QemuOpts *opts, Err=
-or **errp)
->      if (!event_name) {
->          error_setg(errp, "Missing event name for rule");
->          return -1;
-> -    } else if (get_event_by_name(event_name, &event) < 0) {
-> -        error_setg(errp, "Invalid event name \"%s\"", event_name);
-> +    }
-> +    event =3D qapi_enum_parse(BlkdebugEvent_lookup, event_name, BLKDBG__=
-MAX, -1, errp);
-
-Long line.
-
-> +    if (event < 0) {
->          return -1;
->      }
->=20=20
-> @@ -743,13 +731,13 @@ static int blkdebug_debug_breakpoint(BlockDriverSta=
-te *bs, const char *event,
->  {
->      BDRVBlkdebugState *s =3D bs->opaque;
->      struct BlkdebugRule *rule;
-> -    BlkdebugEvent blkdebug_event;
-> +    int blkdebug_event;
->=20=20
-> -    if (get_event_by_name(event, &blkdebug_event) < 0) {
-> +    blkdebug_event =3D qapi_enum_parse(BlkdebugEvent_lookup, event, BLKD=
-BG__MAX, -1, NULL);
-
-Long line.
-
-> +    if (blkdebug_event < 0) {
->          return -ENOENT;
->      }
->=20=20
-> -
->      rule =3D g_malloc(sizeof(*rule));
->      *rule =3D (struct BlkdebugRule) {
->          .event  =3D blkdebug_event,
-
-With the nits touched up:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+ok
