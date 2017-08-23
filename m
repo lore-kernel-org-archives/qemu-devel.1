@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dkJb2-0007EP-Io
+	(envelope-from <dgibson@ozlabs.org>) id 1dkJb2-0007ED-3n
 	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 20:32:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dkJb1-0004bD-0Y
+	(envelope-from <dgibson@ozlabs.org>) id 1dkJb0-0004b0-Vt
 	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 20:32:36 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 23 Aug 2017 10:32:12 +1000
-Message-Id: <20170823003217.6769-3-david@gibson.dropbear.id.au>
+Date: Wed, 23 Aug 2017 10:32:14 +1000
+Message-Id: <20170823003217.6769-5-david@gibson.dropbear.id.au>
 In-Reply-To: <20170823003217.6769-1-david@gibson.dropbear.id.au>
 References: <20170823003217.6769-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 2/7] target/ppc: 'PVR != host PVR' in
- KVM_SET_SREGS workaround
+Subject: [Qemu-devel] [PULL 4/7] spapr: Allow configure-connector to be
+ called multiple times
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,159 +21,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, thuth@redhat.com, mdroth@linux.vnet.ibm.com, cohuck@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, thuth@redhat.com, mdroth@linux.vnet.ibm.com, cohuck@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com, Bharata B Rao <bharata@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-Commit d5fc133eed ("ppc: Rework CPU compatibility testing
-across migration") changed the way cpu_post_load behaves with
-the PVR setting, causing an unexpected bug in KVM-HV migrations
-between hosts that are compatible (POWER8 and POWER8E, for example).
-Even with pvr_match() returning true, the guest freezes right after
-cpu_post_load. The reason is that the guest kernel can't handle a
-different PVR value other that the running host in KVM_SET_SREGS.
+In case of in-kernel memory hot unplug, when the guest is not able
+to remove all the LMBs that are requested for removal, it will add back
+any LMBs that have been successfully removed. The DR Connectors of
+these LMBs wouldn't have been unconfigured and hence the addition of
+these LMBs will result in configure-connector call being issued on
+LMB DR connectors that are already in configured state. Such
+configure-connector calls will fail resulting in a DIMM which is
+partially unplugged.
 
-In [1] it was discussed the possibility of a new KVM capability
-that would indicate that the guest kernel can handle a different
-PVR in KVM_SET_SREGS. Even if such feature is implemented, there is
-still the problem with older kernels that will not have this capability
-and will fail to migrate.
+This however worked till recently before we overhauled the DRC
+implementation in QEMU. Commit 9d4c0f4f0a71e: "spapr: Consolidate
+DRC state variables" is the first commit where this problem shows up
+as per git bisect.
 
-This patch implements a workaround for that scenario. If running
-with KVM, check if the guest kernel does not have the capability
-(named here as 'cap_ppc_pvr_compat'). If it doesn't, calls
-kvmppc_is_pr() to see if the guest is running in KVM-HV. If all this
-happens, set env->spr[SPR_PVR] to the same value as the current
-host PVR. This ensures that we allow migrations with 'close enough'
-PVRs to still work in KVM-HV but also makes the code ready for
-this new KVM capability when it is done.
+Ideally guest shouldn't be issuing configure-connector call on an
+already configured DR connector. However for now, work around this in
+QEMU by allowing configure-connector to be called multiple times for
+all types of DR connectors.
 
-A new function called 'kvmppc_pvr_workaround_required' was created
-to encapsulate the conditions said above and to avoid calling too
-many kvm.c internals inside cpu_post_load.
-
-[1] https://lists.gnu.org/archive/html/qemu-ppc/2017-06/msg00503.html
-
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-[dwg: Fix for the case of using TCG on a PPC host]
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+[dwg: Corrected buglet that would have initialized fdt pointers ready
+ for reading on a device not present at reset]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/kvm.c     | 38 ++++++++++++++++++++++++++++++++++++++
- target/ppc/kvm_ppc.h |  1 +
- target/ppc/machine.c | 22 ++++++++++++++++++++++
- 3 files changed, 61 insertions(+)
+ hw/ppc/spapr_drc.c | 30 +++++++++++++++++++++++-------
+ 1 file changed, 23 insertions(+), 7 deletions(-)
 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 85713795de..f31c67e1b1 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -90,6 +90,7 @@ static int cap_htm;             /* Hardware transactional memory support */
- static int cap_mmu_radix;
- static int cap_mmu_hash_v3;
- static int cap_resize_hpt;
-+static int cap_ppc_pvr_compat;
- 
- static uint32_t debug_inst_opcode;
- 
-@@ -147,6 +148,13 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     cap_mmu_radix = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
-     cap_mmu_hash_v3 = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
-     cap_resize_hpt = kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HPT);
-+    /*
-+     * Note: setting it to false because there is not such capability
-+     * in KVM at this moment.
-+     *
-+     * TODO: call kvm_vm_check_extension() with the right capability
-+     * after the kernel starts implementing it.*/
-+    cap_ppc_pvr_compat = false;
- 
-     if (!cap_interrupt_level) {
-         fprintf(stderr, "KVM: Couldn't find level irq capability. Expect the "
-@@ -2785,3 +2793,33 @@ void kvmppc_update_sdr1(target_ulong sdr1)
-         run_on_cpu(cs, kvmppc_pivot_hpt_cpu, RUN_ON_CPU_TARGET_PTR(sdr1));
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index 5260b5d363..605697d8bd 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -442,12 +442,17 @@ void spapr_drc_reset(sPAPRDRConnector *drc)
+     if (drc->dev) {
+         /* A device present at reset is ready to go, same as coldplugged */
+         drc->state = drck->ready_state;
++        /*
++         * Ensure that we are able to send the FDT fragment again
++         * via configure-connector call if the guest requests.
++         */
++        drc->ccs_offset = drc->fdt_start_offset;
++        drc->ccs_depth = 0;
+     } else {
+         drc->state = drck->empty_state;
++        drc->ccs_offset = -1;
++        drc->ccs_depth = -1;
      }
+-
+-    drc->ccs_offset = -1;
+-    drc->ccs_depth = -1;
  }
-+
-+/*
-+ * This is a helper function to detect a post migration scenario
-+ * in which a guest, running as KVM-HV, freezes in cpu_post_load because
-+ * the guest kernel can't handle a PVR value other than the actual host
-+ * PVR in KVM_SET_SREGS, even if pvr_match() returns true.
-+ *
-+ * If we don't have cap_ppc_pvr_compat and we're not running in PR
-+ * (so, we're HV), return true. The workaround itself is done in
-+ * cpu_post_load.
-+ *
-+ * The order here is important: we'll only check for KVM PR as a
-+ * fallback if the guest kernel can't handle the situation itself.
-+ * We need to avoid as much as possible querying the running KVM type
-+ * in QEMU level.
-+ */
-+bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu)
-+{
-+    CPUState *cs = CPU(cpu);
-+
-+    if (!kvm_enabled()) {
-+        return false;
-+    }
-+
-+    if (cap_ppc_pvr_compat) {
-+        return false;
-+    }
-+
-+    return !kvmppc_is_pr(cs->kvm_state);
-+}
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 6bc6fb3e2d..381afe6240 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -67,6 +67,7 @@ void kvmppc_check_papr_resize_hpt(Error **errp);
- int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int shift);
- int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift);
- void kvmppc_update_sdr1(target_ulong sdr1);
-+bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
  
- bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
- 
-diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-index abe0a1cdf0..e36b7100cb 100644
---- a/target/ppc/machine.c
-+++ b/target/ppc/machine.c
-@@ -9,6 +9,7 @@
- #include "mmu-hash64.h"
- #include "migration/cpu.h"
- #include "qapi/error.h"
-+#include "kvm_ppc.h"
- 
- static int cpu_load_old(QEMUFile *f, void *opaque, int version_id)
- {
-@@ -249,6 +250,27 @@ static int cpu_post_load(void *opaque, int version_id)
-         }
+ static void drc_reset(void *opaque)
+@@ -1071,8 +1076,14 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
      }
  
-+    /*
-+     * If we're running with KVM HV, there is a chance that the guest
-+     * is running with KVM HV and its kernel does not have the
-+     * capability of dealing with a different PVR other than this
-+     * exact host PVR in KVM_SET_SREGS. If that happens, the
-+     * guest freezes after migration.
-+     *
-+     * The function kvmppc_pvr_workaround_required does this verification
-+     * by first checking if the kernel has the cap, returning true immediately
-+     * if that is the case. Otherwise, it checks if we're running in KVM PR.
-+     * If the guest kernel does not have the cap and we're not running KVM-PR
-+     * (so, it is running KVM-HV), we need to ensure that KVM_SET_SREGS will
-+     * receive the PVR it expects as a workaround.
-+     *
-+     */
-+#if defined(CONFIG_KVM)
-+    if (kvmppc_pvr_workaround_required(cpu)) {
-+        env->spr[SPR_PVR] = env->spr_cb[SPR_PVR].default_value;
-+    }
-+#endif
-+
-     env->lr = env->spr[SPR_LR];
-     env->ctr = env->spr[SPR_CTR];
-     cpu_write_xer(env, env->spr[SPR_XER]);
+     if ((drc->state != SPAPR_DRC_STATE_LOGICAL_UNISOLATE)
+-        && (drc->state != SPAPR_DRC_STATE_PHYSICAL_UNISOLATE)) {
+-        /* Need to unisolate the device before configuring */
++        && (drc->state != SPAPR_DRC_STATE_PHYSICAL_UNISOLATE)
++        && (drc->state != SPAPR_DRC_STATE_LOGICAL_CONFIGURED)
++        && (drc->state != SPAPR_DRC_STATE_PHYSICAL_CONFIGURED)) {
++        /*
++         * Need to unisolate the device before configuring
++         * or it should already be in configured state to
++         * allow configure-connector be called repeatedly.
++         */
+         rc = SPAPR_DR_CC_RESPONSE_NOT_CONFIGURABLE;
+         goto out;
+     }
+@@ -1108,8 +1119,13 @@ static void rtas_ibm_configure_connector(PowerPCCPU *cpu,
+                 /* done sending the device tree, move to configured state */
+                 trace_spapr_drc_set_configured(drc_index);
+                 drc->state = drck->ready_state;
+-                drc->ccs_offset = -1;
+-                drc->ccs_depth = -1;
++                /*
++                 * Ensure that we are able to send the FDT fragment
++                 * again via configure-connector call if the guest requests.
++                 */
++                drc->ccs_offset = drc->fdt_start_offset;
++                drc->ccs_depth = 0;
++                fdt_offset_next = drc->fdt_start_offset;
+                 resp = SPAPR_DR_CC_RESPONSE_SUCCESS;
+             } else {
+                 resp = SPAPR_DR_CC_RESPONSE_PREV_PARENT;
 -- 
 2.13.5
