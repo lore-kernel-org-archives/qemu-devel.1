@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dkXzq-0005ZU-Es
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:55:11 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dkXzr-0005cB-TU
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:55:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dkXzn-0000gO-DR
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:55:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52506)
+	(envelope-from <cohuck@redhat.com>) id 1dkXzq-0000jr-Tz
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:55:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48414)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dkXzn-0000ep-7D
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:55:07 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dkXzq-0000jB-NZ
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:55:10 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed, 23 Aug 2017 17:54:49 +0200
-Message-Id: <20170823155458.19601-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 0/9] zpci detangling
+Date: Wed, 23 Aug 2017 17:54:50 +0200
+Message-Id: <20170823155458.19601-2-cohuck@redhat.com>
+In-Reply-To: <20170823155458.19601-1-cohuck@redhat.com>
+References: <20170823155458.19601-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 1/9] 9pfs: fix dependencies
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +26,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
 
-Hopefully should be close now...
+Nothing in fsdev/ or hw/9pfs/ depends on pci; it should rather depend
+on CONFIG_VIRTFS and CONFIG_VIRTIO/CONFIG_XEN only.
 
-v4->v5:
-- dropped "s390x/kvm: msi route fixup for non-pci"
-- reworked "s390x/sclp: properly guard pci-specific functions": the
-  configure/deconfigure stuff is about I/O adapters, we were missing
-  checks, and I used an incorrect return code -- please review
-- collected more r-bs
+Acked-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ fsdev/Makefile.objs   | 9 +++------
+ hw/9pfs/Makefile.objs | 2 +-
+ hw/Makefile.objs      | 2 +-
+ 3 files changed, 5 insertions(+), 8 deletions(-)
 
-Cornelia Huck (9):
-  9pfs: fix dependencies
-  kvm: remove hard dependency on pci
-  s390x/pci: add stubs
-  s390x: chsc nt2 events are pci-only
-  s390x/pci: do not advertise pci on non-pci builds
-  s390x/ccw: create s390 phb conditionally
-  s390x/sclp: properly guard pci-specific functions
-  s390x/pci: fence off instructions for non-pci
-  s390x: refine pci dependencies
-
- accel/kvm/kvm-all.c               |  6 ++--
- default-configs/s390x-softmmu.mak |  2 +-
- fsdev/Makefile.objs               |  9 ++---
- hw/9pfs/Makefile.objs             |  2 +-
- hw/Makefile.objs                  |  2 +-
- hw/pci/pci-stub.c                 | 16 ++++++++-
- hw/pci/pci.c                      |  2 ++
- hw/s390x/Makefile.objs            |  3 +-
- hw/s390x/s390-pci-bus.c           | 18 +++-------
- hw/s390x/s390-pci-bus.h           | 12 ++-----
- hw/s390x/s390-pci-stub.c          | 76 +++++++++++++++++++++++++++++++++++++++
- hw/s390x/s390-virtio-ccw.c        | 14 ++++----
- hw/s390x/sclp.c                   | 39 +++++++++++++++++---
- include/hw/pci/pci.h              |  2 ++
- include/hw/s390x/sclp.h           | 17 ++++++---
- target/s390x/ioinst.c             | 16 +++++++++
- target/s390x/kvm.c                | 58 ++++++++++++++++++++++--------
- 17 files changed, 227 insertions(+), 67 deletions(-)
- create mode 100644 hw/s390x/s390-pci-stub.c
-
+diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
+index 659df6e187..fb38017c0b 100644
+--- a/fsdev/Makefile.objs
++++ b/fsdev/Makefile.objs
+@@ -1,10 +1,7 @@
+-ifeq ($(CONFIG_VIRTIO)$(CONFIG_VIRTFS)$(CONFIG_PCI),yyy)
+ # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
+-# only pull in the actual virtio-9p device if we also enabled virtio.
+-common-obj-y = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
+-else
+-common-obj-y = qemu-fsdev-dummy.o
+-endif
++# only pull in the actual 9p backend if we also enabled virtio or xen.
++common-obj-$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO),$(CONFIG_XEN))) = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
++common-obj-$(call lnot,$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO),$(CONFIG_XEN)))) = qemu-fsdev-dummy.o
+ common-obj-y += qemu-fsdev-opts.o qemu-fsdev-throttle.o
+ 
+ # Toplevel always builds this; targets without virtio will put it in
+diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
+index cab5e942ed..fd90b62900 100644
+--- a/hw/9pfs/Makefile.objs
++++ b/hw/9pfs/Makefile.objs
+@@ -7,4 +7,4 @@ common-obj-$(CONFIG_OPEN_BY_HANDLE) +=  9p-handle.o
+ common-obj-y += 9p-proxy.o
+ common-obj-$(CONFIG_XEN) += xen-9p-backend.o
+ 
+-obj-y += virtio-9p-device.o
++obj-$(CONFIG_VIRTIO) += virtio-9p-device.o
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index a2c61f6b09..cf4cb2010b 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -1,4 +1,4 @@
+-devices-dirs-$(call land, $(CONFIG_VIRTIO),$(call land,$(CONFIG_VIRTFS),$(CONFIG_PCI))) += 9pfs/
++devices-dirs-$(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO),$(CONFIG_XEN))) += 9pfs/
+ devices-dirs-$(CONFIG_SOFTMMU) += acpi/
+ devices-dirs-$(CONFIG_SOFTMMU) += adc/
+ devices-dirs-$(CONFIG_SOFTMMU) += audio/
 -- 
 2.13.5
