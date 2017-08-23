@@ -1,35 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dkQby-0003ux-1A
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:02:03 -0400
+	(envelope-from <armbru@redhat.com>) id 1dkQcd-0004IM-S7
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:02:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dkQbu-0003lm-Bx
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:02:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45306)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dkQbu-0003lU-5w
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:01:58 -0400
-References: <20170816082650.21880-1-cohuck@redhat.com>
-	<223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
-	<CAFEAcA_UfM_XNKdc5zfHsehoRE6Q+EszRZX3FByskir7c+0Lww@mail.gmail.com>
-	<20170822010917.GO12356@umbus.fritz.box>
-	<CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
-	<3f0dc918-0f55-e2f4-bf47-fe4abf5453bb@redhat.com>
-	<CAFEAcA_ezKWweEuUB-cXTer0LLaeuiGDkSdfhApedhw4ykDT0Q@mail.gmail.com>
-	<20170822112046.GC12356@umbus.fritz.box>
-	<20170822134815.77020eb8.cohuck@redhat.com>
-	<20170823002907.GC5379@umbus.fritz.box>
-	<20170823091650.48e7c44e.cohuck@redhat.com>
-	<54526d47-b436-79d5-7a38-9516eaa727a6@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5b0ff74a-08d6-558d-4c79-a93758e6302a@redhat.com>
-Date: Wed, 23 Aug 2017 10:01:38 +0200
+	(envelope-from <armbru@redhat.com>) id 1dkQcX-0003xf-SZ
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:02:43 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
+	<20170822132255.23945-7-marcandre.lureau@redhat.com>
+Date: Wed, 23 Aug 2017 10:02:12 +0200
+In-Reply-To: <20170822132255.23945-7-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Tue, 22 Aug 2017 15:22:07 +0200")
+Message-ID: <87mv6qaf0b.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <54526d47-b436-79d5-7a38-9516eaa727a6@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] make check speed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 06/54] qapi: introduce qapi_enum_lookup()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,31 +25,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, "open list:Sheepdog" <sheepdog@lists.wpkg.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <jcody@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Josh Durgin <jdurgin@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "open list:Block Jobs" <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, Liu Yuan <namei.unix@gmail.com>, Jason Wang <jasowang@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 23/08/2017 09:49, Thomas Huth wrote:
-> While we're at it: I'd like to have a "make check-fast", too. Sometimes
-> the normal "make check" is already too slow, e.g. while developing new
-> patches, I sometimes just want to do a very quick sanity test to see
-> whether I broke some basic things or not, and only do the "make check"
-> before I submit my patches.
-> So we would get three stages:
-> 
-> - make check-fast => For very, very quick sanity tests only
-> 
-> - make check => E.g. has to be run before submitting patches
-> 
-> - make check-harder => might run a very long time, so best suited for
->                        nightly regression tests etc.?
-> 
-> Does that sound reasonable? And the crucial question: Who is going to
-> implement the basic framework for this?
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-There's already make check-unit or make check-qtest-x86_64 depending on
-what you're working on.
+> This will help with the introduction of a new structure to handle
+> enum lookup.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+[...]
+>  45 files changed, 206 insertions(+), 122 deletions(-)
 
-If you have a many-core machine, of course, there's no simpler solution
-than throwing more CPUs at it. :)
+Hmm.
 
-Paolo
+> diff --git a/include/qapi/util.h b/include/qapi/util.h
+> index 7436ed815c..60733b6a80 100644
+> --- a/include/qapi/util.h
+> +++ b/include/qapi/util.h
+> @@ -11,6 +11,8 @@
+>  #ifndef QAPI_UTIL_H
+>  #define QAPI_UTIL_H
+>=20=20
+> +const char *qapi_enum_lookup(const char * const lookup[], int val);
+> +
+>  int qapi_enum_parse(const char * const lookup[], const char *buf,
+>                      int max, int def, Error **errp);
+>=20=20
+> diff --git a/backends/hostmem.c b/backends/hostmem.c
+> index 4606b73849..c4f795475c 100644
+> --- a/backends/hostmem.c
+> +++ b/backends/hostmem.c
+> @@ -13,6 +13,7 @@
+>  #include "sysemu/hostmem.h"
+>  #include "hw/boards.h"
+>  #include "qapi/error.h"
+> +#include "qapi/util.h"
+>  #include "qapi/visitor.h"
+>  #include "qapi-types.h"
+>  #include "qapi-visit.h"
+> @@ -304,7 +305,7 @@ host_memory_backend_memory_complete(UserCreatable *uc=
+, Error **errp)
+>              return;
+>          } else if (maxnode =3D=3D 0 && backend->policy !=3D MPOL_DEFAULT=
+) {
+>              error_setg(errp, "host-nodes must be set for policy %s",
+> -                       HostMemPolicy_lookup[backend->policy]);
+> +                qapi_enum_lookup(HostMemPolicy_lookup, backend->policy));
+>              return;
+>          }
+>=20=20
+
+Lookup becomes even more verbose.
+
+Could we claw back some readability with macros?  Say in addition to
+
+    typedef enum FOO {
+        ...
+    } FOO;
+
+    extern const char *const FOO_lookup[];
+
+generate
+
+    #define FOO_str(val) qapi_enum_lookup(FOO_lookup, (val))
+
+Needs a matching qapi-code-gen.txt update.
+
+With that, this patch hunk would become
+
+               error_setg(errp, "host-nodes must be set for policy %s",
+  -                       HostMemPolicy_lookup[backend->policy]);
+  +                       HostMemPolicy_str(backend->policy);
+
+Perhaps we could even throw in some type checking:
+
+    #define FOO_str(val) (type_check(typeof((val)), FOO) \
+                          + qapi_enum_lookup(FOO_lookup, (val)))
+
+What do you think?  Want me to explore a fixup patch you could squash
+in?
+
+[Skipping lots of mechanical changes...]
+
+I think you missed test-qobject-input-visitor.c and
+string-input-visitor.c.
+
+In test-qobject-input-visitor.c's test_visitor_in_enum():
+
+        v =3D visitor_input_test_init(data, "%s", EnumOne_lookup[i]);
+
+You update it in PATCH 12, but the code only works as long as EnumOne
+has no holes.  Mapping the enum to string like we do everywhere else in
+this patch would be cleaner.
+
+The loop control also subscripts EnumOne_lookup[i].  You take care of
+that one in PATCH 12.  That's okay.
+
+Same for test-string-input-visitor.c's test_visitor_in_enum().
+
+There's one more in test_native_list_integer_helper():
+
+    g_string_append_printf(gstr_union,  "{ 'type': '%s', 'data': [ %s ] }",
+                           UserDefNativeListUnionKind_lookup[kind],
+                           gstr_list->str);
+
+Same story.
+
+The patch doesn't touch the _lookup[] subscripts you're going to replace
+by qapi_enum_parse() in PATCH 07-11.  Understand, but I'd reorder the
+patches: first replace by qapi_enum_parse(), because DRY (no need to
+explain more at that point).  Then get rid of all the remaining
+subscripting into _lookup[], i.e. this patch (explain it helps the next
+one), then PATCH 12.
