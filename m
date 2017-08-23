@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dkN7C-0005cq-Gr
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 00:18:05 -0400
+	(envelope-from <linuc.decode@gmail.com>) id 1dkNEL-00088p-Ms
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 00:25:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dkN79-0003By-Oh
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 00:18:02 -0400
-Date: Wed, 23 Aug 2017 14:16:44 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170823041644.GP5379@umbus.fritz.box>
-References: <cover.1503249785.git.balaton@eik.bme.hu>
-	<ab632ef70b02efb2257d9e2f08b45b097ebacb3a.1503249785.git.balaton@eik.bme.hu>
+	(envelope-from <linuc.decode@gmail.com>) id 1dkNEJ-0001xQ-9q
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 00:25:25 -0400
+Date: Wed, 23 Aug 2017 09:54:53 +0530
+From: Linu Cherian <linuc.decode@gmail.com>
+Message-ID: <20170823042453.GA4682@virtx40>
+References: <1502461354-11327-1-git-send-email-eric.auger@redhat.com>
+	<1502461354-11327-9-git-send-email-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="aMDdG8xNveJz2ruI"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ab632ef70b02efb2257d9e2f08b45b097ebacb3a.1503249785.git.balaton@eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH 15/15] ppc: Add aCube Sam460ex board
+In-Reply-To: <1502461354-11327-9-git-send-email-eric.auger@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-arm] [RFC v6 8/9] hw/arm/smmuv3: VFIO
+ integration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,776 +24,448 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, alex.williamson@redhat.com, prem.mallappa@gmail.com, mohun106@gmail.com, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mst@redhat.com, jean-philippe.brucker@arm.com, tn@semihalf.com, will.deacon@arm.com, robin.murphy@arm.com, peterx@redhat.com, bharat.bhushan@nxp.com, christoffer.dall@linaro.org, linu.cherian@cavium.com
+
+Hi Eric,
 
 
---aMDdG8xNveJz2ruI
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Fri Aug 11, 2017 at 04:22:33PM +0200, Eric Auger wrote:
+> This patch allows doing PCIe passthrough with a guest exposed
+> with a vSMMUv3. It implements the replay and notify_flag_changed
+> iommu ops. Also on TLB and data structure invalidation commands,
+> we replay the mappings so that the physical IOMMU implements
+> updated stage 1 settings (Guest IOVA -> Guest PA) + stage 2 settings.
+> 
+> This works only if the guest smmuv3 driver implements the
+> "tlbi-on-map" option.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-On Sun, Aug 20, 2017 at 07:23:05PM +0200, BALATON Zoltan wrote:
-> Add emulation of aCube Sam460ex board based on AMCC 460EX embedded SoC.
-> This is not a full implementation yet with a lot of components still
-> missing but enough to start a Linux kernel and the U-Boot firmware.
->=20
-> Signed-off-by: Fran=E7ois Revol <revol@free.fr>
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Tried out launching a guest with Qemu option "-machine virt-2.10,smmu"
+and a 1G Ethernet controller as vfio-pci device. It works fine for me.
 
-As usual, only fairly superficial review here.
+Qemu source: https://github.com/eauger/qemu.git Branch: v2.10.0-rc2-SMMU-v6  
 
+But had to make this change, 
+
+--- a/hw/arm/virt.c                                                                    
++++ b/hw/arm/virt.c                                                                    
+@@ -1806,7 +1806,7 @@ static void virt_machine_2_10_options(MachineClass *mc)          
+     virt_machine_2_11_options(mc);                                                    
+     SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_10);                                         
+                                                                                       
+-    vmc->no_smmu = true;                                                              
++    vmc->no_smmu = false;                                                             
+ }                                                                                     
+ DEFINE_VIRT_MACHINE(2, 10) 
+
+so that qemu doesnt complain about "Property .smmu not found"
+
+Will let you know if i have updates on further testing.
+
+Thanks.
+
+> 
 > ---
->  default-configs/ppcemb-softmmu.mak |   3 +
->  hw/ppc/Makefile.objs               |   2 +
->  hw/ppc/sam460ex.c                  | 611 +++++++++++++++++++++++++++++++=
-++++++
->  3 files changed, 616 insertions(+)
->  create mode 100644 hw/ppc/sam460ex.c
->=20
-> diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-=
-softmmu.mak
-> index 635923a..90b42f0 100644
-> --- a/default-configs/ppcemb-softmmu.mak
-> +++ b/default-configs/ppcemb-softmmu.mak
-> @@ -17,3 +17,6 @@ CONFIG_XILINX=3Dy
->  CONFIG_XILINX_ETHLITE=3Dy
->  CONFIG_LIBDECNUMBER=3Dy
->  CONFIG_SM501=3Dy
-> +CONFIG_USB_EHCI_SYSBUS=3Dy
-> +CONFIG_IDE_SII3112=3Dy
-> +CONFIG_SAM460EX=3Dy
-> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-> index fc39fe4..0aaea5b 100644
-> --- a/hw/ppc/Makefile.objs
-> +++ b/hw/ppc/Makefile.objs
-> @@ -27,3 +27,5 @@ obj-$(CONFIG_E500) +=3D e500.o mpc8544ds.o e500plat.o
->  obj-$(CONFIG_E500) +=3D mpc8544_guts.o ppce500_spin.o
->  # PowerPC 440 Xilinx ML507 reference board.
->  obj-$(CONFIG_XILINX) +=3D virtex_ml507.o
-> +# ACube Sam460ex board.
-> +obj-$(CONFIG_SAM460EX) +=3D ppc440_uc.o sam460ex.o
-> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-> new file mode 100644
-> index 0000000..7cf4f6f
-> --- /dev/null
-> +++ b/hw/ppc/sam460ex.c
-> @@ -0,0 +1,611 @@
-> +/*
-> + * QEMU aCube Sam460ex board emulation
-> + *
-> + * Copyright (c) 2012 Fran=E7ois Revol
-> + * Copyright (c) 2016-2017 BALATON Zoltan
-> + *
-> + * This file is derived from hw/ppc440_bamboo.c,
-> + * the copyright for that material belongs to the original owners.
-> + *
-> + * This work is licensed under the GNU GPL license version 2 or later.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "qemu/cutils.h"
-> +#include "qapi/error.h"
-> +#include "hw/hw.h"
-> +#include "sysemu/blockdev.h"
-> +#include "hw/boards.h"
-> +#include "sysemu/kvm.h"
-> +#include "kvm_ppc.h"
-> +#include "sysemu/device_tree.h"
-> +#include "sysemu/block-backend.h"
-> +#include "hw/loader.h"
-> +#include "elf.h"
-> +#include "exec/address-spaces.h"
-> +#include "exec/memory.h"
-> +#include "hw/ppc/ppc440.h"
-> +#include "hw/ppc/ppc405.h"
-> +#include "hw/block/flash.h"
-> +#include "sysemu/sysemu.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/char/serial.h"
-> +#include "hw/i2c/ppc4xx_i2c.h"
-> +#include "hw/i2c/smbus.h"
-> +#include "hw/usb/hcd-ehci.h"
-> +
-> +#define BINARY_DEVICE_TREE_FILE "sam460ex.dtb"
-> +#define UBOOT_FILENAME "u-boot-sam460-20100605.bin"
-> +/* to extract the official U-Boot bin from the updater: */
-> +/* dd bs=3D1 skip=3D$(($(stat -c '%s' updater/updater-460) - 0x80000)) \
-> +     if=3Dupdater/updater-460 of=3Du-boot-sam460-20100605.bin */
-> +
-> +/* from Sam460 U-Boot include/configs/Sam460ex.h */
-> +#define FLASH_BASE             0xfff00000
-> +#define FLASH_BASE_H           0x4
-> +#define FLASH_SIZE             (1 << 20)
-> +#define UBOOT_LOAD_BASE        0xfff80000
-> +#define UBOOT_SIZE             0x00080000
-> +#define UBOOT_ENTRY            0xfffffffc
-> +
-> +/* from U-Boot */
-> +#define EPAPR_MAGIC           (0x45504150)
-> +#define KERNEL_ADDR           0x1000000
-> +#define FDT_ADDR              0x1800000
-> +#define RAMDISK_ADDR          0x1900000
-> +
-> +/* Sam460ex IRQ MAP:
-> +   IRQ0  =3D ETH_INT
-> +   IRQ1  =3D FPGA_INT
-> +   IRQ2  =3D PCI_INT (PCIA, PCIB, PCIC, PCIB)
-> +   IRQ3  =3D FPGA_INT2
-> +   IRQ11 =3D RTC_INT
-> +   IRQ12 =3D SM502_INT
-> +*/
-> +
-> +#define SDRAM_NR_BANKS 4
-> +
-> +/* FIXME: See u-boot.git 8ac41e */
-> +static const unsigned int ppc460ex_sdram_bank_sizes[] =3D {
-> +    1024 << 20, 512 << 20, 256 << 20, 128 << 20, 64 << 20, 32 << 20, 0
-> +};
-> +
-> +struct boot_info {
-> +    uint32_t dt_base;
-> +    uint32_t dt_size;
-> +    uint32_t entry;
-> +};
-> +
-> +/***********************************************************************=
-******/
-> +/* SPD eeprom content from mips_malta.c */
-
-What's the connection with mips_malta?
-
-> +struct _eeprom24c0x_t {
-> +  uint8_t tick;
-> +  uint8_t address;
-> +  uint8_t command;
-> +  uint8_t ack;
-> +  uint8_t scl;
-> +  uint8_t sda;
-> +  uint8_t data;
-> +  uint8_t contents[256];
-> +};
-> +
-> +typedef struct _eeprom24c0x_t eeprom24c0x_t;
-> +
-> +static eeprom24c0x_t spd_eeprom =3D {
-> +    .contents =3D {
-> +        /* 00000000: */ 0x80, 0x08, 0xFF, 0x0D, 0x0A, 0xFF, 0x40, 0x00,
-> +        /* 00000008: */ 0x04, 0x75, 0x54, 0x00, 0x82, 0x08, 0x00, 0x01,
-> +        /* 00000010: */ 0x8F, 0x04, 0x02, 0x01, 0x01, 0x00, 0x00, 0x00,
-> +        /* 00000018: */ 0x00, 0x00, 0x00, 0x14, 0x0F, 0x14, 0x2D, 0xFF,
-> +        /* 00000020: */ 0x15, 0x08, 0x15, 0x08, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000028: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000030: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000038: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0xD0,
-> +        /* 00000040: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000048: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000050: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000058: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000060: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000068: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000070: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        /* 00000078: */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x64, 0xF4,
-> +    },
-> +};
-> +
-> +static void generate_eeprom_spd(uint8_t *eeprom, ram_addr_t ram_size)
+> 
+> v5 -> v6:
+> - use IOMMUMemoryRegion
+> - handle implementation defined SMMU_CMD_TLBI_NH_VA_AM cmd
+>   (goes along with TLBI_ON_MAP FW quirk)
+> - replay systematically unmap the whole range first
+> - smmuv3_map_hook does not unmap anymore and the unmap is done
+>   before the replay
+> - add and use smmuv3_context_device_invalidate instead of
+>   blindly replaying everything
+> ---
+>  hw/arm/smmuv3-internal.h |   1 +
+>  hw/arm/smmuv3.c          | 265 ++++++++++++++++++++++++++++++++++++++++++++++-
+>  hw/arm/trace-events      |  14 +++
+>  3 files changed, 277 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
+> index e255df1..ac4628f 100644
+> --- a/hw/arm/smmuv3-internal.h
+> +++ b/hw/arm/smmuv3-internal.h
+> @@ -344,6 +344,7 @@ enum {
+>      SMMU_CMD_RESUME          = 0x44,
+>      SMMU_CMD_STALL_TERM,
+>      SMMU_CMD_SYNC,          /* 0x46 */
+> +    SMMU_CMD_TLBI_NH_VA_AM   = 0x8F, /* VIOMMU Impl Defined */
+>  };
+>  
+>  static const char *cmd_stringify[] = {
+> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+> index e195a0e..89fb116 100644
+> --- a/hw/arm/smmuv3.c
+> +++ b/hw/arm/smmuv3.c
+> @@ -25,6 +25,7 @@
+>  #include "exec/address-spaces.h"
+>  #include "trace.h"
+>  #include "qemu/error-report.h"
+> +#include "exec/target_page.h"
+>  
+>  #include "hw/arm/smmuv3.h"
+>  #include "smmuv3-internal.h"
+> @@ -143,6 +144,71 @@ static MemTxResult smmu_read_cmdq(SMMUV3State *s, Cmd *cmd)
+>      return ret;
+>  }
+>  
+> +static void smmuv3_replay_all(SMMUState *s)
 > +{
-> +    enum { SDR =3D 0x4, DDR1 =3D 0x7, DDR2 =3D 0x8 } type;
-> +    uint8_t *spd =3D spd_eeprom.contents;
-> +    uint8_t nbanks =3D 0;
-> +    uint16_t density =3D 0;
-> +    int i;
+> +    SMMUNotifierNode *node;
 > +
-> +    /* work in terms of MB */
-> +    ram_size >>=3D 20;
-> +
-> +    while ((ram_size >=3D 4) && (nbanks <=3D 2)) {
-> +        int sz_log2 =3D MIN(31 - clz32(ram_size), 14);
-> +        nbanks++;
-> +        density |=3D 1 << (sz_log2 - 2);
-> +        ram_size -=3D 1 << sz_log2;
-> +    }
-> +
-> +    /* split to 2 banks if possible */
-> +    if ((nbanks =3D=3D 1) && (density > 1)) {
-> +        nbanks++;
-> +        density >>=3D 1;
-> +    }
-> +
-> +    if (density & 0xff00) {
-> +        density =3D (density & 0xe0) | ((density >> 8) & 0x1f);
-> +        type =3D DDR2;
-> +    } else if (!(density & 0x1f)) {
-> +        type =3D DDR2;
-> +    } else {
-> +        type =3D SDR;
-> +    }
-> +
-> +    if (ram_size) {
-> +        fprintf(stderr, "Warning: SPD cannot represent final %dMB"
-> +                " of SDRAM\n", (int)ram_size);
-> +    }
-> +
-> +    /* fill in SPD memory information */
-> +    spd[2] =3D type;
-> +    spd[5] =3D nbanks;
-> +    spd[31] =3D density;
-> +#ifdef DEBUG_SDRAM
-> +    printf("SPD: nbanks %d density %d\n", nbanks, density);
-> +#endif
-> +    /* XXX: this is totally random */
-> +    spd[9] =3D 0x10; /* CAS tcyc */
-> +    spd[18] =3D 0x20; /* CAS bit */
-> +    spd[23] =3D 0x10; /* CAS tcyc */
-> +    spd[25] =3D 0x10; /* CAS tcyc */
-> +
-> +    /* checksum */
-> +    spd[63] =3D 0;
-> +    for (i =3D 0; i < 63; i++) {
-> +        spd[63] +=3D spd[i];
-> +    }
-> +
-> +    /* copy for SMBUS */
-> +    memcpy(eeprom, spd, sizeof(spd_eeprom.contents));
-> +}
-> +
-> +static void generate_eeprom_serial(uint8_t *eeprom)
-> +{
-> +    int i, pos =3D 0;
-> +    uint8_t mac[6] =3D { 0x00 };
-> +    uint8_t sn[5] =3D { 0x01, 0x23, 0x45, 0x67, 0x89 };
-> +
-> +    /* version */
-> +    eeprom[pos++] =3D 0x01;
-> +
-> +    /* count */
-> +    eeprom[pos++] =3D 0x02;
-> +
-> +    /* MAC address */
-> +    eeprom[pos++] =3D 0x01; /* MAC */
-> +    eeprom[pos++] =3D 0x06; /* length */
-> +    memcpy(&eeprom[pos], mac, sizeof(mac));
-> +    pos +=3D sizeof(mac);
-> +
-> +    /* serial number */
-> +    eeprom[pos++] =3D 0x02; /* serial */
-> +    eeprom[pos++] =3D 0x05; /* length */
-> +    memcpy(&eeprom[pos], sn, sizeof(sn));
-> +    pos +=3D sizeof(sn);
-> +
-> +    /* checksum */
-> +    eeprom[pos] =3D 0;
-> +    for (i =3D 0; i < pos; i++) {
-> +        eeprom[pos] +=3D eeprom[i];
+> +    QLIST_FOREACH(node, &s->notifiers_list, next) {
+> +        trace_smmuv3_replay_all(node->sdev->iommu.parent_obj.name);
+> +        memory_region_iommu_replay_all(&node->sdev->iommu);
 > +    }
 > +}
 > +
-> +/***********************************************************************=
-******/
-> +
-> +static int sam460ex_load_uboot(void)
+> +/* Replay the mappings for a given streamid */
+> +static void smmuv3_context_device_invalidate(SMMUState *s, uint16_t sid)
 > +{
-> +    DriveInfo *dinfo;
-> +    BlockBackend *blk =3D NULL;
-> +    hwaddr base =3D FLASH_BASE | ((hwaddr)FLASH_BASE_H << 32);
-> +    long bios_size =3D FLASH_SIZE;
-> +    int fl_sectors;
+> +    uint8_t bus_n, devfn;
+> +    SMMUPciBus *smmu_bus;
+> +    SMMUDevice *smmu;
 > +
-> +    dinfo =3D drive_get(IF_PFLASH, 0, 0);
-> +    if (dinfo) {
-> +        blk =3D blk_by_legacy_dinfo(dinfo);
-> +        bios_size =3D blk_getlength(blk);
+> +    trace_smmuv3_context_device_invalidate(sid);
+> +    bus_n = PCI_BUS_NUM(sid);
+> +    smmu_bus = smmu_find_as_from_bus_num(s, bus_n);
+> +    if (smmu_bus) {
+> +        devfn = PCI_FUNC(sid);
+> +        smmu = smmu_bus->pbdev[devfn];
+> +        if (smmu) {
+> +            memory_region_iommu_replay_all(&smmu->iommu);
+> +        }
 > +    }
-> +    fl_sectors =3D (bios_size + 65535) >> 16;
+> +}
 > +
-> +    if (!pflash_cfi01_register(base, NULL, "sam460ex.flash", bios_size,
-> +                               blk, (64 * 1024), fl_sectors,
-> +                               1, 0x89, 0x18, 0x0000, 0x0, 1)) {
-> +        fprintf(stderr, "qemu: Error registering flash memory.\n");
-
-Use error_report() instead, please.
-
-> +        /* XXX: return an error instead? */
-> +        exit(1);
+> +static void smmuv3_replay_single(IOMMUMemoryRegion *mr, IOMMUNotifier *n,
+> +                                 uint64_t iova);
+> +
+> +static void smmuv3_replay_range(IOMMUMemoryRegion *mr, IOMMUNotifier *n,
+> +                                 uint64_t iova, size_t nb_pages);
+> +
+> +static void smmuv3_notify_single(SMMUState *s, uint64_t iova)
+> +{
+> +    SMMUNotifierNode *node;
+> +
+> +    QLIST_FOREACH(node, &s->notifiers_list, next) {
+> +        IOMMUMemoryRegion *mr = &node->sdev->iommu;
+> +        IOMMUNotifier *n;
+> +
+> +        trace_smmuv3_notify_all(node->sdev->iommu.parent_obj.name, iova);
+> +        IOMMU_NOTIFIER_FOREACH(n, mr) {
+> +            smmuv3_replay_single(mr, n, iova);
+> +        }
 > +    }
+> +}
 > +
-> +    if (!blk) {
-> +        /*fprintf(stderr, "No flash image given with the 'pflash' parame=
-ter,"
-> +                " using default u-boot image\n");*/
-> +        base =3D UBOOT_LOAD_BASE | ((hwaddr)FLASH_BASE_H << 32);
-> +        rom_add_file_fixed(UBOOT_FILENAME, base, -1);
+> +static void smmuv3_notify_range(SMMUState *s, uint64_t iova, size_t size)
+> +{
+> +    SMMUNotifierNode *node;
+> +
+> +    QLIST_FOREACH(node, &s->notifiers_list, next) {
+> +        IOMMUMemoryRegion *mr = &node->sdev->iommu;
+> +        IOMMUNotifier *n;
+> +
+> +        trace_smmuv3_notify_all(node->sdev->iommu.parent_obj.name, iova);
+> +        IOMMU_NOTIFIER_FOREACH(n, mr) {
+> +            smmuv3_replay_range(mr, n, iova, size);
+> +        }
 > +    }
+> +}
 > +
+>  static int smmu_cmdq_consume(SMMUV3State *s)
+>  {
+>      uint32_t error = SMMU_CMD_ERR_NONE;
+> @@ -178,28 +244,38 @@ static int smmu_cmdq_consume(SMMUV3State *s)
+>              break;
+>          case SMMU_CMD_PREFETCH_CONFIG:
+>          case SMMU_CMD_PREFETCH_ADDR:
+> +            break;
+>          case SMMU_CMD_CFGI_STE:
+>          {
+>               uint32_t streamid = cmd.word[1];
+>  
+>               trace_smmuv3_cmdq_cfgi_ste(streamid);
+> -            break;
+> +             smmuv3_context_device_invalidate(&s->smmu_state, streamid);
+> +             break;
+>          }
+>          case SMMU_CMD_CFGI_STE_RANGE: /* same as SMMU_CMD_CFGI_ALL */
+>          {
+> -            uint32_t start = cmd.word[1], range, end;
+> +            uint32_t start = cmd.word[1], range, end, i;
+>  
+>              range = extract32(cmd.word[2], 0, 5);
+>              end = start + (1 << (range + 1)) - 1;
+>              trace_smmuv3_cmdq_cfgi_ste_range(start, end);
+> +            for (i = start; i <= end; i++) {
+> +                smmuv3_context_device_invalidate(&s->smmu_state, i);
+> +            }
+>              break;
+>          }
+>          case SMMU_CMD_CFGI_CD:
+>          case SMMU_CMD_CFGI_CD_ALL:
+> +        {
+> +             uint32_t streamid = cmd.word[1];
+> +
+> +            smmuv3_context_device_invalidate(&s->smmu_state, streamid);
+>              break;
+> +        }
+>          case SMMU_CMD_TLBI_NH_ALL:
+>          case SMMU_CMD_TLBI_NH_ASID:
+> -            printf("%s TLBI* replay\n", __func__);
+> +            smmuv3_replay_all(&s->smmu_state);
+>              break;
+>          case SMMU_CMD_TLBI_NH_VA:
+>          {
+> @@ -210,6 +286,20 @@ static int smmu_cmdq_consume(SMMUV3State *s)
+>              uint64_t addr = high << 32 | (low << 12);
+>  
+>              trace_smmuv3_cmdq_tlbi_nh_va(asid, vmid, addr);
+> +            smmuv3_notify_single(&s->smmu_state, addr);
+> +            break;
+> +        }
+> +        case SMMU_CMD_TLBI_NH_VA_AM:
+> +        {
+> +            int asid = extract32(cmd.word[1], 16, 16);
+> +            int am = extract32(cmd.word[1], 0, 16);
+> +            uint64_t low = extract32(cmd.word[2], 12, 20);
+> +            uint64_t high = cmd.word[3];
+> +            uint64_t addr = high << 32 | (low << 12);
+> +            size_t size = am << 12;
+> +
+> +            trace_smmuv3_cmdq_tlbi_nh_va_am(asid, am, addr, size);
+> +            smmuv3_notify_range(&s->smmu_state, addr, size);
+>              break;
+>          }
+>          case SMMU_CMD_TLBI_NH_VAA:
+> @@ -222,6 +312,7 @@ static int smmu_cmdq_consume(SMMUV3State *s)
+>          case SMMU_CMD_TLBI_S12_VMALL:
+>          case SMMU_CMD_TLBI_S2_IPA:
+>          case SMMU_CMD_TLBI_NSNH_ALL:
+> +            smmuv3_replay_all(&s->smmu_state);
+>              break;
+>          case SMMU_CMD_ATC_INV:
+>          case SMMU_CMD_PRI_RESP:
+> @@ -804,6 +895,172 @@ out:
+>      return entry;
+>  }
+>  
+> +static int smmuv3_replay_hook(IOMMUTLBEntry *entry, void *private)
+> +{
+> +    trace_smmuv3_replay_hook(entry->iova, entry->translated_addr,
+> +                             entry->addr_mask, entry->perm);
+> +    memory_region_notify_one((IOMMUNotifier *)private, entry);
 > +    return 0;
 > +}
 > +
-> +static int sam460ex_load_device_tree(hwaddr addr,
-> +                                     uint32_t ramsize,
-> +                                     hwaddr initrd_base,
-> +                                     hwaddr initrd_size,
-> +                                     const char *kernel_cmdline)
+> +static int smmuv3_map_hook(IOMMUTLBEntry *entry, void *private)
 > +{
-> +    int ret =3D -1;
-> +    uint32_t mem_reg_property[] =3D { 0, 0, cpu_to_be32(ramsize) };
-> +    char *filename;
-> +    int fdt_size;
-> +    void *fdt;
-> +    uint32_t tb_freq =3D 400000000;
-> +    uint32_t clock_freq =3D 400000000;
-> +
-> +    filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, BINARY_DEVICE_TREE_=
-FILE);
-> +    if (!filename) {
-> +        goto out;
-> +    }
-> +    fdt =3D load_device_tree(filename, &fdt_size);
-> +    g_free(filename);
-> +    if (fdt =3D=3D NULL) {
-> +        goto out;
-> +    }
-> +
-> +    /* Manipulate device tree in memory. */
-> +
-> +    ret =3D qemu_fdt_setprop(fdt, "/memory", "reg", mem_reg_property,
-> +                               sizeof(mem_reg_property));
-> +    if (ret < 0) {
-> +        fprintf(stderr, "couldn't set /memory/reg\n");
-
-And in all these places.
-
-> +    }
-> +
-> +    /* default FDT doesn't have a /chosen node... */
-> +    qemu_fdt_add_subnode(fdt, "/chosen");
-> +
-> +    ret =3D qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-start",
-> +                                    initrd_base);
-> +    if (ret < 0) {
-> +        fprintf(stderr, "couldn't set /chosen/linux,initrd-start\n");
-> +    }
-> +
-> +    ret =3D qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
-> +                                    (initrd_base + initrd_size));
-> +    if (ret < 0) {
-> +        fprintf(stderr, "couldn't set /chosen/linux,initrd-end\n");
-> +    }
-> +
-> +    ret =3D qemu_fdt_setprop_string(fdt, "/chosen", "bootargs",
-> +                                      kernel_cmdline);
-> +    if (ret < 0) {
-> +        fprintf(stderr, "couldn't set /chosen/bootargs\n");
-> +    }
-> +
-> +    /* Copy data from the host device tree into the guest. Since the gue=
-st can
-> +     * directly access the timebase without host involvement, we must ex=
-pose
-> +     * the correct frequencies. */
-> +    if (kvm_enabled()) {
-> +        tb_freq =3D kvmppc_get_tbfreq();
-> +        clock_freq =3D kvmppc_get_clockfreq();
-> +    }
-> +
-> +    qemu_fdt_setprop_cell(fdt, "/cpus/cpu@0", "clock-frequency",
-> +                              clock_freq);
-> +    qemu_fdt_setprop_cell(fdt, "/cpus/cpu@0", "timebase-frequency",
-> +                              tb_freq);
-> +
-> +    rom_add_blob_fixed(BINARY_DEVICE_TREE_FILE, fdt, fdt_size, addr);
-> +    g_free(fdt);
-> +    ret =3D fdt_size;
-> +
-> +out:
-> +
-> +    return ret;
+> +    trace_smmuv3_map_hook(entry->iova, entry->translated_addr,
+> +                          entry->addr_mask, entry->perm);
+> +    memory_region_notify_one((IOMMUNotifier *)private, entry);
+> +    return 0;
 > +}
 > +
-> +/* Create reset TLB entries for BookE, mapping only the flash memory.  */
-> +static void mmubooke_create_initial_mapping_uboot(CPUPPCState *env)
+> +/* Unmap the whole range in the notifier's scope. */
+> +static void smmuv3_unmap_notifier(SMMUDevice *sdev, IOMMUNotifier *n)
 > +{
-> +    ppcemb_tlb_t *tlb =3D &env->tlb.tlbe[0];
+> +    IOMMUTLBEntry entry;
+> +    hwaddr size;
+> +    hwaddr start = n->start;
+> +    hwaddr end = n->end;
 > +
-> +    /* on reset the flash is mapped by a shadow TLB,
-> +     * but since we don't implement them we need to use
-> +     * the same values U-Boot will use to avoid a fault.
-> +     */
-
-Usually the reset state of the MMU is handled in the cpu code rather
-than the board code.  Is there a specific reason you need it in the
-board code here?
-
-> +    tlb->attr =3D 0;
-> +    tlb->prot =3D PAGE_VALID | ((PAGE_READ | PAGE_WRITE | PAGE_EXEC) << =
-4);
-> +    tlb->size =3D 0x10000000; /* up to 0xffffffff  */
-> +    tlb->EPN =3D 0xf0000000 & TARGET_PAGE_MASK;
-> +    tlb->RPN =3D (0xf0000000 & TARGET_PAGE_MASK) | 0x4;
-> +    tlb->PID =3D 0;
+> +    size = end - start + 1;
+> +
+> +    entry.target_as = &address_space_memory;
+> +    /* Adjust iova for the size */
+> +    entry.iova = n->start & ~(size - 1);
+> +    /* This field is meaningless for unmap */
+> +    entry.translated_addr = 0;
+> +    entry.perm = IOMMU_NONE;
+> +    entry.addr_mask = size - 1;
+> +
+> +    /* TODO: check start/end/size/mask */
+> +
+> +    trace_smmuv3_unmap_notifier(pci_bus_num(sdev->bus),
+> +                                PCI_SLOT(sdev->devfn),
+> +                                PCI_FUNC(sdev->devfn),
+> +                                entry.iova, size);
+> +
+> +    memory_region_notify_one(n, &entry);
 > +}
 > +
-> +/* Create reset TLB entries for BookE, spanning the 32bit addr space.  */
-> +static void mmubooke_create_initial_mapping(CPUPPCState *env,
-> +                                     target_ulong va,
-> +                                     hwaddr pa)
+> +static void smmuv3_replay(IOMMUMemoryRegion *mr, IOMMUNotifier *n)
 > +{
-> +    ppcemb_tlb_t *tlb =3D &env->tlb.tlbe[0];
+> +    SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
+> +    SMMUV3State *s = sdev->smmu;
+> +    SMMUBaseClass *sbc = SMMU_DEVICE_GET_CLASS(s);
+> +    SMMUTransCfg cfg = {};
+> +    int ret;
 > +
-> +    tlb->attr =3D 0;
-> +    tlb->prot =3D PAGE_VALID | ((PAGE_READ | PAGE_WRITE | PAGE_EXEC) << =
-4);
-> +    tlb->size =3D 1 << 31; /* up to 0x80000000  */
-> +    tlb->EPN =3D va & TARGET_PAGE_MASK;
-> +    tlb->RPN =3D pa & TARGET_PAGE_MASK;
-> +    tlb->PID =3D 0;
+> +    smmuv3_unmap_notifier(sdev, n);
+> +
+> +    ret = smmuv3_decode_config(mr, &cfg);
+> +    if (ret) {
+> +        error_report("%s error decoding the configuration for iommu mr=%s",
+> +                     __func__, mr->parent_obj.name);
+> +    }
+> +
+> +    if (cfg.disabled || cfg.bypassed) {
+> +        return;
+> +    }
+> +    /* is the smmu enabled */
+> +    sbc->page_walk_64(&cfg, 0, (1ULL << (64 - cfg.tsz)) - 1, false,
+> +                      smmuv3_replay_hook, n);
+> +}
+> +static void smmuv3_replay_range(IOMMUMemoryRegion *mr, IOMMUNotifier *n,
+> +                                 uint64_t iova, size_t size)
+> +{
+> +    SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
+> +    SMMUV3State *s = sdev->smmu;
+> +    SMMUBaseClass *sbc = SMMU_DEVICE_GET_CLASS(s);
+> +    SMMUTransCfg cfg = {};
+> +    IOMMUTLBEntry entry;
+> +    int ret;
+> +
+> +    trace_smmuv3_replay_range(mr->parent_obj.name, iova, size, n);
+> +    ret = smmuv3_decode_config(mr, &cfg);
+> +    if (ret) {
+> +        error_report("%s error decoding the configuration for iommu mr=%s",
+> +                     __func__, mr->parent_obj.name);
+> +    }
+> +
+> +    if (cfg.disabled || cfg.bypassed) {
+> +        return;
+> +    }
+> +
+> +    /* first unmap */
+> +    entry.target_as = &address_space_memory;
+> +    entry.iova = iova & ~(size - 1);
+> +    entry.addr_mask = size - 1;
+> +    entry.perm = IOMMU_NONE;
+> +
+> +    memory_region_notify_one(n, &entry);
+> +
+> +    /* then figure out if a new mapping needs to be applied */
+> +    sbc->page_walk_64(&cfg, iova, iova + entry.addr_mask , false,
+> +                      smmuv3_map_hook, n);
 > +}
 > +
-> +static void main_cpu_reset(void *opaque)
+> +static void smmuv3_replay_single(IOMMUMemoryRegion *mr, IOMMUNotifier *n,
+> +                                 uint64_t iova)
 > +{
-> +    PowerPCCPU *cpu =3D opaque;
-> +    CPUPPCState *env =3D &cpu->env;
-> +    struct boot_info *bi =3D env->load_info;
+> +    SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
+> +    SMMUV3State *s = sdev->smmu;
+> +    size_t target_page_size = qemu_target_page_size();
+> +    SMMUBaseClass *sbc = SMMU_DEVICE_GET_CLASS(s);
+> +    SMMUTransCfg cfg = {};
+> +    IOMMUTLBEntry entry;
+> +    int ret;
 > +
-> +    cpu_reset(CPU(cpu));
-> +
-> +    /* either we have a kernel to boot or we jump to U-Boot */
-> +    if (bi->entry !=3D UBOOT_ENTRY) {
-> +        env->gpr[1] =3D (16 << 20) - 8;
-> +        env->gpr[3] =3D FDT_ADDR;
-> +
-> +        fprintf(stderr, "cpu reset: kernel entry %x\n", bi->entry);
-
-These should be tracepoints rather than bare fprintf().
-
-> +        env->nip =3D bi->entry;
-> +
-> +        /* Create a mapping for the kernel.  */
-> +        mmubooke_create_initial_mapping(env, 0, 0);
-> +        env->gpr[6] =3D tswap32(EPAPR_MAGIC);
-
-I'm pretty sure the tswap can't be right here.  env->gpr is in host
-native order and I'd expect the constant to be as well. =20
-
-> +        env->gpr[7] =3D (16 << 20) - 8; /*bi->ima_size;*/
-
-So, entering the kernel directly can be useful, particularly during
-early development.  However, having both firmware and non-firmware
-entry paths can lead to confusing bugs if there's a subtle difference
-between the initial (to the kernel) states between the two paths.  For
-that reason, the usual preferred way to implement -kernel is to still
-run the usual firmware, but use some way of telling it to boot
-immediately into the supplied kernel.
-
-I won't object to merging it this way - just a wanrning that this may
-bite you in the future if you're not careful.
-
-> +
-> +    } else {
-> +        env->nip =3D UBOOT_ENTRY;
-> +        mmubooke_create_initial_mapping_uboot(env);
-> +        fprintf(stderr, "cpu reset: U-Boot entry\n");
-
-Tracepoint.
-
+> +    trace_smmuv3_replay_single(mr->parent_obj.name, iova, n);
+> +    ret = smmuv3_decode_config(mr, &cfg);
+> +    if (ret) {
+> +        error_report("%s error decoding the configuration for iommu mr=%s",
+> +                     __func__, mr->parent_obj.name);
 > +    }
+> +
+> +    if (cfg.disabled || cfg.bypassed) {
+> +        return;
+> +    }
+> +
+> +    /* first unmap */
+> +    entry.target_as = &address_space_memory;
+> +    entry.iova = iova & ~(target_page_size - 1);
+> +    entry.addr_mask = target_page_size - 1;
+> +    entry.perm = IOMMU_NONE;
+> +
+> +    memory_region_notify_one(n, &entry);
+> +
+> +    /* then figure out if a new mapping needs to be applied */
+> +    sbc->page_walk_64(&cfg, iova, iova + 1, false,
+> +                      smmuv3_map_hook, n);
 > +}
 > +
-> +static void sam460ex_init(MachineState *machine)
+> +static void smmuv3_notify_flag_changed(IOMMUMemoryRegion *iommu,
+> +                                       IOMMUNotifierFlag old,
+> +                                       IOMMUNotifierFlag new)
 > +{
-> +    MemoryRegion *address_space_mem =3D get_system_memory();
-> +    MemoryRegion *isa =3D g_new(MemoryRegion, 1);
-> +    MemoryRegion *ram_memories =3D g_new(MemoryRegion, SDRAM_NR_BANKS);
-> +    hwaddr ram_bases[SDRAM_NR_BANKS];
-> +    hwaddr ram_sizes[SDRAM_NR_BANKS];
-> +    MemoryRegion *l2cache_ram =3D g_new(MemoryRegion, 1);
-> +    qemu_irq *irqs, *uic[4];
-> +    PCIBus *pci_bus;
-> +    PowerPCCPU *cpu;
-> +    CPUPPCState *env;
-> +    PPC4xxI2CState *i2c[2];
-> +    hwaddr entry =3D UBOOT_ENTRY;
-> +    hwaddr loadaddr =3D 0;
-> +    target_long initrd_size =3D 0;
-> +    DeviceState *dev;
-> +    SysBusDevice *sbdev;
-> +    int success;
-> +    int i;
-> +    struct boot_info *boot_info;
-> +    const size_t smbus_eeprom_size =3D 8 * 256;
-> +    uint8_t *smbus_eeprom_buf =3D g_malloc0(smbus_eeprom_size);
+> +    SMMUDevice *sdev = container_of(iommu, SMMUDevice, iommu);
+> +    SMMUV3State *s3 = sdev->smmu;
+> +    SMMUState *s = &(s3->smmu_state);
+> +    SMMUNotifierNode *node = NULL;
+> +    SMMUNotifierNode *next_node = NULL;
 > +
-> +    /* Setup CPU. */
-> +    if (machine->cpu_model =3D=3D NULL) {
-> +        machine->cpu_model =3D "460EX";
-> +    }
-> +    cpu =3D cpu_ppc_init(machine->cpu_model);
-> +    if (cpu =3D=3D NULL) {
-> +        fprintf(stderr, "Unable to initialize CPU!\n");
-> +        exit(1);
-> +    }
-> +    env =3D &cpu->env;
-> +
-> +    qemu_register_reset(main_cpu_reset, cpu);
-> +    boot_info =3D g_malloc0(sizeof(*boot_info));
-> +    env->load_info =3D boot_info;
-> +
-> +    ppc_booke_timers_init(cpu, 50000000, 0);
-> +    ppc_dcr_init(env, NULL, NULL);
-> +
-> +    /* PLB arbitrer */
-> +    ppc4xx_plb_init(env);
-> +
-> +    /* interrupt controllers */
-> +    irqs =3D g_malloc0(sizeof(*irqs) * PPCUIC_OUTPUT_NB);
-> +    irqs[PPCUIC_OUTPUT_INT] =3D ((qemu_irq *)env->irq_inputs)[PPC40x_INP=
-UT_INT];
-> +    irqs[PPCUIC_OUTPUT_CINT] =3D ((qemu_irq *)env->irq_inputs)[PPC40x_IN=
-PUT_CINT];
-> +    uic[0] =3D ppcuic_init(env, irqs, 0x0C0, 0, 1);
-> +    uic[1] =3D ppcuic_init(env, &uic[0][30], 0x0D0, 0, 1);
-> +    uic[2] =3D ppcuic_init(env, &uic[0][10], 0x0E0, 0, 1);
-> +    uic[3] =3D ppcuic_init(env, &uic[0][16], 0x0F0, 0, 1);
-> +
-> +    /* SDRAM controller */
-> +    memset(ram_bases, 0, sizeof(ram_bases));
-> +    memset(ram_sizes, 0, sizeof(ram_sizes));
-> +    /* put all RAM on first bank because board has one slot
-> +     * and firmware only checks that */
-> +    machine->ram_size =3D ppc4xx_sdram_adjust(machine->ram_size,
-> +                                   1/*SDRAM_NR_BANKS*/,
-> +                                   ram_memories,
-> +                                   ram_bases, ram_sizes,
-> +                                   ppc460ex_sdram_bank_sizes);
-> +#ifdef DEBUG_SDRAM
-> +    printf("RAMSIZE %dMB\n", (int)(machine->ram_size / M_BYTE));
-> +#endif
-> +
-> +    /* XXX does 460EX have ECC interrupts? */
-> +    ppc440_sdram_init(env, SDRAM_NR_BANKS, ram_memories,
-> +                      ram_bases, ram_sizes, 1);
-> +
-> +    /* generate SPD EEPROM data */
-> +    for (i =3D 0; i < SDRAM_NR_BANKS; i++) {
-> +#ifdef DEBUG_SDRAM
-> +        printf("bank %d: %" HWADDR_PRIx "\n", i, ram_sizes[i]);
-> +#endif
-
-Tracepoint.
-
-> +        generate_eeprom_spd(&smbus_eeprom_buf[i * 256], ram_sizes[i]);
-> +    }
-> +    generate_eeprom_serial(&smbus_eeprom_buf[4 * 256]);
-> +    generate_eeprom_serial(&smbus_eeprom_buf[6 * 256]);
-> +
-> +    /* IIC controllers */
-> +    dev =3D sysbus_create_simple(TYPE_PPC4xx_I2C, 0x4ef600700, uic[0][2]=
-);
-> +    i2c[0] =3D PPC4xx_I2C(dev);
-> +    object_property_set_bool(OBJECT(dev), true, "realized", NULL);
-> +    smbus_eeprom_init(i2c[0]->bus, 8, smbus_eeprom_buf, smbus_eeprom_siz=
-e);
-> +    g_free(smbus_eeprom_buf);
-> +
-> +    dev =3D sysbus_create_simple(TYPE_PPC4xx_I2C, 0x4ef600800, uic[0][3]=
-);
-> +    i2c[1] =3D PPC4xx_I2C(dev);
-> +
-> +    /* External bus controller */
-> +    ppc405_ebc_init(env);
-> +
-> +    /* CPR */
-> +    ppc4xx_cpr_init(env);
-> +
-> +    /* PLB to AHB bridge */
-> +    ppc4xx_ahb_init(env);
-> +
-> +    /* System DCRs */
-> +    ppc4xx_sdr_init(env);
-> +
-> +    /* MAL */
-> +    ppc4xx_mal_init(env, 4, 16, &uic[2][3]);
-> +
-> +    /* 256K of L2 cache as memory */
-> +    ppc4xx_l2sram_init(env);
-
-Seems like a lot of this peripheral setup should be handled by a SoC
-helper function, since it's not really board specific (I'm guessing).
-I'm ok with that being a later clean up though.
-
-> +    /* FIXME: remove this after fixing l2sram mapping in ppc440_uc.c? */
-> +    memory_region_init_ram(l2cache_ram, NULL, "ppc440.l2cache_ram", 256 =
-<< 10,
-> +                           &error_abort);
-> +    memory_region_add_subregion(address_space_mem, 0x400000000LL, l2cach=
-e_ram);
-> +
-> +    /* USB */
-> +    sysbus_create_simple(TYPE_PPC4xx_EHCI, 0x4bffd0400, uic[2][29]);
-> +    dev =3D qdev_create(NULL, "sysbus-ohci");
-> +    qdev_prop_set_string(dev, "masterbus", "usb-bus.0");
-> +    qdev_prop_set_uint32(dev, "num-ports", 6);
-> +    qdev_init_nofail(dev);
-> +    sbdev =3D SYS_BUS_DEVICE(dev);
-> +    sysbus_mmio_map(sbdev, 0, 0x4bffd0000);
-> +    sysbus_connect_irq(sbdev, 0, uic[2][30]);
-> +    usb_create_simple(usb_bus_find(-1), "usb-kbd");
-> +    usb_create_simple(usb_bus_find(-1), "usb-mouse");
-> +
-> +    /* PCI bus */
-> +    ppc460ex_pcie_init(env);
-> +    /*XXX: FIXME: is this correct? */
-> +    dev =3D sysbus_create_varargs("ppc440-pcix-host", 0xc0ec00000,
-> +                                uic[1][0], uic[1][20], uic[1][21], uic[1=
-][22],
-> +                                NULL);
-> +    pci_bus =3D (PCIBus *)qdev_get_child_bus(dev, "pci.0");
-> +    if (!pci_bus) {
-> +        fprintf(stderr, "couldn't create PCI controller!\n");
-> +        exit(1);
-> +    }
-> +    memory_region_init_alias(isa, NULL, "isa_mmio", get_system_io(),
-> +                             0, 0x10000);
-> +    memory_region_add_subregion(get_system_memory(), 0xc08000000, isa);
-
-Does it really make sense to just embed the ISA IO space here, rather
-than actually instanting a PCI<->ISA bridge?
-
-> +    /* PCI devices */
-> +    pci_create_simple(pci_bus, PCI_DEVFN(6, 0), "sm501");
-> +    /* SoC has a single SATA port but we don't emulate that yet
-> +     * However, firmware and usual clients have driver for SiI311x
-> +     * so add one for convenience by default */
-> +    pci_create_simple(pci_bus, -1, "sii3112");
-
-You should probably not create this when started with -nodefaults.
-
-> +    /* SoC has 4 UARTs
-> +     * but board has only one wired and two are present in fdt */
-> +    if (serial_hds[0] !=3D NULL) {
-> +        serial_mm_init(address_space_mem, 0x4ef600300, 0, uic[1][1],
-> +                       PPC_SERIAL_MM_BAUDBASE, serial_hds[0],
-> +                       DEVICE_BIG_ENDIAN);
-> +    }
-> +    if (serial_hds[1] !=3D NULL) {
-> +        serial_mm_init(address_space_mem, 0x4ef600400, 0, uic[0][1],
-> +                       PPC_SERIAL_MM_BAUDBASE, serial_hds[1],
-> +                       DEVICE_BIG_ENDIAN);
+> +    if (old == IOMMU_NOTIFIER_NONE) {
+> +        trace_smmuv3_notify_flag_add(iommu->parent_obj.name);
+> +        node = g_malloc0(sizeof(*node));
+> +        node->sdev = sdev;
+> +        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
+> +        return;
 > +    }
 > +
-> +    /* Load U-Boot image. */
-> +    if (!machine->kernel_filename) {
-> +        success =3D sam460ex_load_uboot();
-> +        if (success < 0) {
-> +            fprintf(stderr, "qemu: could not load firmware\n");
-> +            exit(1);
+> +    /* update notifier node with new flags */
+> +    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
+> +        if (node->sdev == sdev) {
+> +            if (new == IOMMU_NOTIFIER_NONE) {
+> +                trace_smmuv3_notify_flag_del(iommu->parent_obj.name);
+> +                QLIST_REMOVE(node, next);
+> +                g_free(node);
+> +            }
+> +            return;
 > +        }
 > +    }
-> +
-> +    /* Load kernel. */
-> +    if (machine->kernel_filename) {
-> +        success =3D load_uimage(machine->kernel_filename, &entry, &loada=
-ddr, NULL,
-> +            NULL, NULL);
-> +        fprintf(stderr, "load_uimage: %d\n", success);
-
-tracepoint
-
-> +        if (success < 0) {
-> +            uint64_t elf_entry, elf_lowaddr;
-> +
-> +            success =3D load_elf(machine->kernel_filename, NULL, NULL, &=
-elf_entry,
-> +                               &elf_lowaddr, NULL, 1, PPC_ELF_MACHINE, 0=
-, 0);
-> +            fprintf(stderr, "load_elf: %d\n", success);
-
-tracepoint
-
-> +            entry =3D elf_entry;
-> +            loadaddr =3D elf_lowaddr;
-> +        }
-> +        /* XXX try again as binary */
-> +        if (success < 0) {
-> +            fprintf(stderr, "qemu: could not load kernel '%s'\n",
-> +                    machine->kernel_filename);
-
-error_report().
-
-> +            exit(1);
-> +        }
-> +    }
-> +
-> +    /* Load initrd. */
-> +    if (machine->initrd_filename) {
-> +        initrd_size =3D load_image_targphys(machine->initrd_filename,
-> +                                          RAMDISK_ADDR,
-> +                                          machine->ram_size - RAMDISK_AD=
-DR);
-> +        fprintf(stderr, "load_image: %d\n", initrd_size);
-> +        if (initrd_size < 0) {
-> +            fprintf(stderr, "qemu: could not load ram disk '%s' at %x\n",
-> +                    machine->initrd_filename, RAMDISK_ADDR);
-> +            exit(1);
-> +        }
-> +    }
-> +
-> +    /* If we're loading a kernel directly, we must load the device tree =
-too. */
-> +    if (machine->kernel_filename) {
-> +        int dt_size;
-> +
-> +        dt_size =3D sam460ex_load_device_tree(FDT_ADDR, machine->ram_siz=
-e,
-> +                                    RAMDISK_ADDR, initrd_size,
-> +                                    machine->kernel_cmdline);
-> +        if (dt_size < 0) {
-> +            fprintf(stderr, "couldn't load device tree\n");
-> +            exit(1);
-> +        }
-> +
-> +        boot_info->dt_base =3D FDT_ADDR;
-> +        boot_info->dt_size =3D dt_size;
-> +    }
-> +
-> +    boot_info->entry =3D entry;
 > +}
+>  
+>  static inline void smmu_update_base_reg(SMMUV3State *s, uint64_t *base,
+>                                          uint64_t val)
+> @@ -1125,6 +1382,8 @@ static void smmuv3_iommu_memory_region_class_init(ObjectClass *klass,
+>      IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
+>  
+>      imrc->translate = smmuv3_translate;
+> +    imrc->notify_flag_changed = smmuv3_notify_flag_changed;
+> +    imrc->replay = smmuv3_replay;
+>  }
+>  
+>  static const TypeInfo smmuv3_type_info = {
+> diff --git a/hw/arm/trace-events b/hw/arm/trace-events
+> index f9b9cbe..8228e26 100644
+> --- a/hw/arm/trace-events
+> +++ b/hw/arm/trace-events
+> @@ -27,6 +27,7 @@ smmuv3_cmdq_opcode(const char *opcode) "<--- %s"
+>  smmuv3_cmdq_cfgi_ste(int streamid) "     |_ streamid =%d"
+>  smmuv3_cmdq_cfgi_ste_range(int start, int end) "     |_ start=0x%d - end=0x%d"
+>  smmuv3_cmdq_tlbi_nh_va(int asid, int vmid, uint64_t addr) "     |_ asid =%d vmid =%d addr=0x%"PRIx64
+> +smmuv3_cmdq_tlbi_nh_va_am(int asid, int am, size_t size, uint64_t addr) "     |_ asid =%d am =%d size=0x%lx addr=0x%"PRIx64
+>  smmuv3_cmdq_consume_sev(void) "CMD_SYNC CS=SEV not supported, ignoring"
+>  smmuv3_cmdq_consume_out(uint8_t prod_wrap, uint32_t prod, uint8_t cons_wrap, uint32_t cons) "prod_wrap:%d, prod:0x%x cons_wrap:%d cons:0x%x"
+>  smmuv3_update(bool is_empty, uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "q empty:%d prod:%d cons:%d p.wrap:%d p.cons:%d"
+> @@ -50,3 +51,16 @@ smmuv3_dump_ste(int i, uint32_t word0, int j,  uint32_t word1) "STE[%2d]: 0x%x\t
+>  smmuv3_dump_cd(int i, uint32_t word0, int j,  uint32_t word1) "CD[%2d]: 0x%x\t CD[%2d]: 0x%x"
+>  smmuv3_dump_cmd(int i, uint32_t word0, int j,  uint32_t word1) "CMD[%2d]: 0x%x\t CMD[%2d]: 0x%x"
+>  smmuv3_cfg_stage(int s, uint32_t oas, uint32_t tsz, uint64_t ttbr, bool aa64, uint32_t granule_sz, int initial_level) "TransCFG stage:%d oas:%d tsz:%d ttbr:0x%"PRIx64"  aa64:%d granule_sz:%d, initial_level = %d"
 > +
-> +static void sam460ex_machine_init(MachineClass *mc)
-> +{
-> +    mc->desc =3D "aCube Sam460ex";
-> +    mc->init =3D sam460ex_init;
-> +    mc->default_ram_size =3D 512 * M_BYTE;
-> +}
+> +smmuv3_replay(uint16_t sid, bool enabled) "sid=%d, enabled=%d"
+> +smmuv3_replay_hook(hwaddr iova, hwaddr pa, hwaddr mask, int perm) "iova=0x%"PRIx64" pa=0x%" PRIx64" mask=0x%"PRIx64" perm=%d"
+> +smmuv3_map_hook(hwaddr iova, hwaddr pa, hwaddr mask, int perm) "iova=0x%"PRIx64" pa=0x%" PRIx64" mask=0x%"PRIx64" perm=%d"
+> +smmuv3_notify_flag_add(const char *iommu) "ADD SMMUNotifier node for iommu mr=%s"
+> +smmuv3_notify_flag_del(const char *iommu) "DEL SMMUNotifier node for iommu mr=%s"
+> +smmuv3_replay_single(const char *name, uint64_t iova, void *n) "iommu mr=%s iova=0x%"PRIx64" n=%p"
+> +smmuv3_replay_range(const char *name, uint64_t iova, size_t size, void *n) "iommu mr=%s iova=0x%"PRIx64" size=0x%lx n=%p"
+> +smmuv3_replay_all(const char *name) "iommu mr=%s"
+> +smmuv3_notify_all(const char *name, uint64_t iova) "iommu mr=%s iova=0x%"PRIx64
+> +smmuv3_unmap_notifier(uint8_t bus, uint8_t slot, uint8_t fn, uint64_t iova, uint64_t size) "Device %02x:%02x.%x start 0x%"PRIx64" size 0x%"PRIx64
+> +smmuv3_context_device_invalidate(uint32_t sid) "sid=%d"
 > +
-> +DEFINE_MACHINE("sam460ex", sam460ex_machine_init)
+> -- 
+> 2.5.5
+> 
+> 
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---aMDdG8xNveJz2ruI
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmdAakACgkQbDjKyiDZ
-s5LjDBAAvomg0Mi1d4neYjJY6P1nperAzU76rkXHYOFG2/Y517g+grXUu5jN2MAI
-JRMa5gr5tk4wrr4CphOygUvO7AefbCpZnT0qIbtfKsp3v1bcdNvwcZj5dPc0OBzY
-wXyxP5KNBK/DOpykq6Q41DfBM0psJtJbns6ZXQ/F6hvMxsHVZe5bVwb1+dOpMrOp
-vyp2msIvtAltcP2pE7vUIdFWeCm4kdIH2puDzXG1Fyd2FVnidfb32njm2+Q/Nfbe
-7fkw8yTEW3GILFKh1yk02Ubyca8gNE4PEpDW1vhc+0+V10Wuc13fzAFhcuNQ/NnI
-murZzLDiVIK9xux8cna8XKR+QCPD0zWH4EtNIIQtWT1GOr9akYJ1VXkQMgNmCzrZ
-6DBUJKK5wXIZ0XG13uumNiO1aA7Ane8qMQLvjdCHQmDcmkWbULlRN/af7GAsh9te
-3adwr1Dk7TKhQ4NoHlGFC0n7dT2QrvEnnCMjpgovChJ0X6h4x2NAEIvyf9ejsVn3
-EkDNhSuJEq7GADCsOZ2vCais3hmCg7UcWJ/2EWxW72lnRI2MzXHuMhgnpLYvGjNO
-5HzypB9QjBR/zY92X0QM9HNNkn7dFQ1YipvRXNGgD1jwXvOsLfft7m3rw/ld61sW
-d0IBgpYCpAtKz7OerdSvgSuv9p4/P2PH9uWISSiF6VmcfpAiVO0=
-=3EdN
------END PGP SIGNATURE-----
-
---aMDdG8xNveJz2ruI--
+-- 
+Linu cherian
