@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dkVNR-0007Oy-1g
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:07:22 -0400
+	(envelope-from <mst@redhat.com>) id 1dkVXS-00050Q-6d
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:17:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dkVNN-0008Fu-Ih
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:07:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42596)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dkVNN-0008F8-9s
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:07:17 -0400
-Date: Wed, 23 Aug 2017 10:07:14 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170823130714.GK19998@localhost.localdomain>
-References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
-	<1503050939-227939-4-git-send-email-imammedo@redhat.com>
-	<20170818182404.GC27715@localhost.localdomain>
-	<20170821130307.3cd85653@nial.brq.redhat.com>
+	(envelope-from <mst@redhat.com>) id 1dkVXR-0005Zk-Aq
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:17:42 -0400
+Date: Wed, 23 Aug 2017 16:17:30 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170823161718-mutt-send-email-mst@kernel.org>
+References: <20170822214343.31385-1-f4bug@amsat.org>
+	<20170823014025-mutt-send-email-mst@kernel.org>
+	<6661274e-c797-1aac-14b9-43dcf4c2f336@amsat.org>
+	<887ee497-5518-f6bc-56ec-2c2626cdf1f2@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20170821130307.3cd85653@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11 03/27] sparc: convert cpu features
- to qdev properties
+In-Reply-To: <887ee497-5518-f6bc-56ec-2c2626cdf1f2@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.10-rc4?] acpi: pcihp: fix
+ use-after-free for machines previous pc-1.7 compat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,165 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-stable@nongnu.org
 
-On Mon, Aug 21, 2017 at 01:03:07PM +0200, Igor Mammedov wrote:
-> On Fri, 18 Aug 2017 15:24:04 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> > On Fri, Aug 18, 2017 at 12:08:35PM +0200, Igor Mammedov wrote:
-> > > SPARC is the last target that uses legacy way of parsing
-> > > and initializing cpu features, drop legacy approach and
-> > > convert features to properties so that SPARC could as minimum
-> > > benefit from generic cpu_generic_init(), common with
-> > > x86 +-feat parser
-> > > 
-> > > PS:
-> > > the main purpose is to remove legacy way of cpu creation as
-> > > a blocker for unifying cpu creation code across targets.
-> > > 
-> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
-> > [...]
-> > > ---
-> > > CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> > > CC: Artyom Tarasenko <atar4qemu@gmail.com>
-> > > CC: Eduardo Habkost <ehabkost@redhat.com>
-> > > ---
-> > >  target/sparc/cpu.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> > >  1 file changed, 66 insertions(+)
-> > > 
-> > > diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-> > > index f4e7343..e735d73 100644
-> > > --- a/target/sparc/cpu.c
-> > > +++ b/target/sparc/cpu.c
-> > > @@ -22,6 +22,8 @@
-> > >  #include "cpu.h"
-> > >  #include "qemu/error-report.h"
-> > >  #include "exec/exec-all.h"
-> > > +#include "hw/qdev-properties.h"
-> > > +#include "qapi/visitor.h"
-> > >  
-> > >  //#define DEBUG_FEATURES
-> > >  
-> > > @@ -853,6 +855,69 @@ static void sparc_cpu_initfn(Object *obj)
-> > >      }
-> > >  }
-> > >  
-> > > +static void sparc_get_nwindows(Object *obj, Visitor *v, const char *name,
-> > > +                               void *opaque, Error **errp)
-> > > +{
-> > > +    SPARCCPU *cpu = SPARC_CPU(obj);
-> > > +    int64_t value = cpu->env.def.nwindows;
-> > > +
-> > > +    visit_type_int(v, name, &value, errp);
-> > > +}
-> > > +
-> > > +static void sparc_set_nwindows(Object *obj, Visitor *v, const char *name,
-> > > +                               void *opaque, Error **errp)
-> > > +{
-> > > +    const int64_t min = MIN_NWINDOWS;
-> > > +    const int64_t max = MAX_NWINDOWS;
-> > > +    SPARCCPU *cpu = SPARC_CPU(obj);
-> > > +    Error *err = NULL;
-> > > +    int64_t value;
-> > > +
-> > > +    visit_type_int(v, name, &value, &err);
-> > > +    if (err) {
-> > > +        error_propagate(errp, err);
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    if (value < min || value > max) {
-> > > +        error_setg(errp, "Property %s.%s doesn't take value %" PRId64
-> > > +                   " (minimum: %" PRId64 ", maximum: %" PRId64 ")",
-> > > +                   object_get_typename(obj), name ? name : "null",
-> > > +                   value, min, max);
-> > > +        return;
-> > > +    }
-> > > +    cpu->env.def.nwindows = value;  
-> > 
-> > I think it would be much simpler to just validate nwindows at
-> > realize time and use DEFINE_PROP_UINT32 below, but I won't mind
-> > if you really prefer the custom setter.
-> Indeed it would shave off ~12LOC if check is done at realize time,
-> but I prefer to throw error at the place where it's set.
-> I'd go for realize approach only if check couldn't be done
-> at property setting time.
+On Wed, Aug 23, 2017 at 07:40:39AM +0200, Thomas Huth wrote:
+> On 23.08.2017 02:10, Philippe Mathieu-Daud=E9 wrote:
+> > On 08/22/2017 07:42 PM, Michael S. Tsirkin wrote:
+> >> On Tue, Aug 22, 2017 at 06:43:43PM -0300, Philippe Mathieu-Daud=E9 w=
+rote:
+> >>> 9e047b982452 "piix4: add acpi pci hotplug support" introduced a new
+> >>> property
+> >>> 'use_acpi_pci_hotplug' for pc-1.7 and older machines.
+> >>> c24d5e0b91d1 "convert ACPI PCI hotplug to use hotplug-handler API"
+> >>> added the
+> >>> qbus hotplug handlers but forgot to check for the 'use_acpi_pci_hot=
+plug'
+> >>> property.
+> >>>
+> >>> Check for use_acpi_pci_hotplug before calling
+> >>> acpi_pcihp_device_[un]plug_cb().
+> [...]
+> >>> Reported-by: Thomas Huth <thuth@redhat.com>
+> >>> Message-Id: <59a56959-ca12-ea75-33fa-ff07eba1b090@redhat.com>
+> >>> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> >>
+> >> Looks like this is a very old bug, isn't it?
+> >> Objections to merging this after the release?
+> >=20
+> > Yes, I'm also inclined to delay it so we can release 2.10, I tagged
+> > "2.10-rc4" since Thomas sent it as a bug within the 2.10 window so I'=
+ll
+> > let him decide if it is worth crying wolf :) It's very likely no-one =
+but
+> > him used pre-pc-i440fx-1.7 the last 3 years, not even thinking about =
+hot
+> > plugging AHCI devices :D
+>=20
+> I'm fine if this gets included in 2.11 - it's quite unlikely that a use=
+r
+> tries hot-plug ahci on such an old machine type, I think. But we maybe
+> should include this in the 2.10.1 stable release, so I'm putting
+> qemu-stable on CC now.
+>=20
+> Anyway, your patch seems to fix the issue for me, thanks!
+>=20
+> Tested-by: Thomas Huth <thuth@redhat.com>
 
-I would prefer to avoid custom getters/setters when possible, but
-I agree it is better to validate the value as soon as possible
-(on the setter instead of realize).  If we want to avoid custom
-setters, we need to improve the DEFINE_PROP_* interface.
-
-> 
-> 
-> > But I have another question:
-> > 
-> > > +}
-> > > +
-> > > +static PropertyInfo qdev_prop_nwindows = {
-> > > +    .name  = "int",
-> > > +    .get   = sparc_get_nwindows,
-> > > +    .set   = sparc_set_nwindows,
-> > > +};
-> > > +
-> > > +static Property sparc_cpu_properties[] = {
-> > > +    DEFINE_PROP_BIT("float",    SPARCCPU, env.def.features, 0, false),
-> > > +    DEFINE_PROP_BIT("float128", SPARCCPU, env.def.features, 1, false),
-> > > +    DEFINE_PROP_BIT("swap",     SPARCCPU, env.def.features, 2, false),
-> > > +    DEFINE_PROP_BIT("mul",      SPARCCPU, env.def.features, 3, false),
-> > > +    DEFINE_PROP_BIT("div",      SPARCCPU, env.def.features, 4, false),
-> > > +    DEFINE_PROP_BIT("flush",    SPARCCPU, env.def.features, 5, false),
-> > > +    DEFINE_PROP_BIT("fsqrt",    SPARCCPU, env.def.features, 6, false),
-> > > +    DEFINE_PROP_BIT("fmul",     SPARCCPU, env.def.features, 7, false),
-> > > +    DEFINE_PROP_BIT("vis1",     SPARCCPU, env.def.features, 8, false),
-> > > +    DEFINE_PROP_BIT("vis2",     SPARCCPU, env.def.features, 9, false),
-> > > +    DEFINE_PROP_BIT("fsmuld",   SPARCCPU, env.def.features, 10, false),
-> > > +    DEFINE_PROP_BIT("hypv",     SPARCCPU, env.def.features, 11, false),
-> > > +    DEFINE_PROP_BIT("cmt",      SPARCCPU, env.def.features, 12, false),
-> > > +    DEFINE_PROP_BIT("gl",       SPARCCPU, env.def.features, 13, false),
-> > > +    DEFINE_PROP_UNSIGNED("iu-version", SPARCCPU, env.def.iu_version, 0,
-> > > +                         qdev_prop_uint64, target_ulong),
-> > > +    DEFINE_PROP_UINT32("fpu-version", SPARCCPU, env.def.fpu_version, 0),
-> > > +    DEFINE_PROP_UINT32("mmu-version", SPARCCPU, env.def.mmu_version, 0),
-> > > +    { .name  = "nwindows", .info  = &qdev_prop_nwindows },  
-> > 
-> > What's the advantage of using a custom PropertyInfo struct if you
-> > can just call object_class_property_add() at
-> > sparc_cpu_class_init()?
-> consistentcy with the rest of properties added above
-> and instead of a zoo of ways to add property within the patch/featureset
-
-Well, both options (custom PropertyInfo and manual
-object_class_property_add() call) look bad to me.  But improving
-the property API to not require a custom setter is out of context
-of this series, so:
-
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-
-> 
-> > 
-> > > +    DEFINE_PROP_END_OF_LIST()
-> > > +};
-> > > +
-> > >  static void sparc_cpu_class_init(ObjectClass *oc, void *data)
-> > >  {
-> > >      SPARCCPUClass *scc = SPARC_CPU_CLASS(oc);
-> > > @@ -861,6 +926,7 @@ static void sparc_cpu_class_init(ObjectClass *oc, void *data)
-> > >  
-> > >      scc->parent_realize = dc->realize;
-> > >      dc->realize = sparc_cpu_realizefn;
-> > > +    dc->props = sparc_cpu_properties;
-> > >  
-> > >      scc->parent_reset = cc->reset;
-> > >      cc->reset = sparc_cpu_reset;
-> > > -- 
-> > > 2.7.4
-> > > 
-> > >   
-> > 
-> 
-
--- 
-Eduardo
+ok, pls remember to repost or ping after the release.
