@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dkWud-0003nC-Ev
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:45:44 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dkWuv-0003vt-9D
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:46:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dkWua-0005j6-7w
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:45:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36840)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dkWuZ-0005i7-P8
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:45:40 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B228AC047B78
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 14:45:38 +0000 (UTC)
-Message-ID: <1503499536.16071.27.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 23 Aug 2017 16:45:36 +0200
-In-Reply-To: <20170815100410.GH9674@redhat.com>
-References: <20170815093615.16453-1-berrange@redhat.com>
-	<20170815093615.16453-2-berrange@redhat.com>
-	<20170815100410.GH9674@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 01/12] ui: add keycodemapdb repository
- as a GIT submodule
+	(envelope-from <stefanha@redhat.com>) id 1dkWuu-0005pr-F1
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:46:01 -0400
+Date: Wed, 23 Aug 2017 15:45:53 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170823144553.GE16760@stefanha-x1.localdomain>
+References: <20170822125113.5025-1-stefanha@redhat.com>
+	<8b6f5029-44e8-c14b-6730-6db69ce73f7e@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8b6f5029-44e8-c14b-6730-6db69ce73f7e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] nbd-client: avoid spurious
+ qio_channel_yield() re-entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,25 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>
 
-  Hi,
-=C2=A0
-> > +(cd $source_path && git submodule update --init ui/keycodemapdb)
-> > +
->=20
-> Urgh, no, this won't work because of course you don't have to
-> have a git checkout when running configure.
->=20
-> Any suggestions on the "best" way to ensure that the ui/keycodemapdb
-> git submodule is always checked out, without requiring developers to
-> do something manually ?
+On Tue, Aug 22, 2017 at 03:23:32PM +0200, Paolo Bonzini wrote:
+> On 22/08/2017 14:51, Stefan Hajnoczi wrote:
+> > This should fix the issue that Dave is seeing but I'm concerned that
+> > there are more problems in nbd-client.c.  We don't have good
+> > abstractions for writing coroutine socket I/O code.  Something like Go's
+> > channels would avoid manual low-level coroutine calls.  There is
+> > currently no way to cancel qio_channel_yield() so requests doing I/O may
+> > remain in-flight indefinitely and nbd-client.c doesn't join them...
+> 
+> The idea was that shutdown(2) would force them to reenter...
 
-Don't require it?
+That depends on the BDRV_POLL_WHILE() allowing all request coroutines to
+terminate before we call nbd_client_detach_aio_context():
 
-The updates shouldn't happen that frequently, IMO we should just commit
-the generated files so checking out the submodule is only needed if you
-work on the keycodemaps.
+    qio_channel_shutdown(client->ioc,
+                         QIO_CHANNEL_SHUTDOWN_BOTH,
+                         NULL);
+    BDRV_POLL_WHILE(bs, client->read_reply_co);
 
-cheers,
-  Gerd
+    nbd_client_detach_aio_context(bs);
+
+I'm not sure we have any guarantee that request coroutines will have
+terminated.
+
+Once nbd_client_detach_aio_context() is called
+ioc->read_coroutine/write_coroutine are set to NULL.  At that point any
+remaining coroutine doing I/O on ioc will be in trouble.
+
+Stefan
