@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkOPO-0007d7-9Y
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 01:40:55 -0400
+	(envelope-from <shorne@gmail.com>) id 1dkOfq-0004HY-Sj
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 01:57:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkOPN-0008Dh-Ee
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 01:40:54 -0400
-References: <20170822214343.31385-1-f4bug@amsat.org>
-	<20170823014025-mutt-send-email-mst@kernel.org>
-	<6661274e-c797-1aac-14b9-43dcf4c2f336@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <887ee497-5518-f6bc-56ec-2c2626cdf1f2@redhat.com>
-Date: Wed, 23 Aug 2017 07:40:39 +0200
-MIME-Version: 1.0
-In-Reply-To: <6661274e-c797-1aac-14b9-43dcf4c2f336@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.10-rc4?] acpi: pcihp: fix
- use-after-free for machines previous pc-1.7 compat
+	(envelope-from <shorne@gmail.com>) id 1dkOfn-0003RU-Q2
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 01:57:54 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:34121)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1dkOfn-0003Qm-KW
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 01:57:51 -0400
+Received: by mail-pf0-x244.google.com with SMTP id m6so726143pfm.1
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 22:57:50 -0700 (PDT)
+From: Stafford Horne <shorne@gmail.com>
+Date: Wed, 23 Aug 2017 14:57:08 +0900
+Message-Id: <cover.1503467674.git.shorne@gmail.com>
+Subject: [Qemu-devel] [PATCH 0/5] OpenRISC SMP Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +23,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, qemu-stable@nongnu.org
+To: QEMU Development <qemu-devel@nongnu.org>
+Cc: Richard Henderson <rth@twiddle.net>, Openrisc <openrisc@lists.librecores.org>, Stafford Horne <shorne@gmail.com>
 
-On 23.08.2017 02:10, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 08/22/2017 07:42 PM, Michael S. Tsirkin wrote:
->> On Tue, Aug 22, 2017 at 06:43:43PM -0300, Philippe Mathieu-Daud=C3=A9 =
-wrote:
->>> 9e047b982452 "piix4: add acpi pci hotplug support" introduced a new
->>> property
->>> 'use_acpi_pci_hotplug' for pc-1.7 and older machines.
->>> c24d5e0b91d1 "convert ACPI PCI hotplug to use hotplug-handler API"
->>> added the
->>> qbus hotplug handlers but forgot to check for the 'use_acpi_pci_hotpl=
-ug'
->>> property.
->>>
->>> Check for use_acpi_pci_hotplug before calling
->>> acpi_pcihp_device_[un]plug_cb().
-[...]
->>> Reported-by: Thomas Huth <thuth@redhat.com>
->>> Message-Id: <59a56959-ca12-ea75-33fa-ff07eba1b090@redhat.com>
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>
->> Looks like this is a very old bug, isn't it?
->> Objections to merging this after the release?
->=20
-> Yes, I'm also inclined to delay it so we can release 2.10, I tagged
-> "2.10-rc4" since Thomas sent it as a bug within the 2.10 window so I'll
-> let him decide if it is worth crying wolf :) It's very likely no-one bu=
-t
-> him used pre-pc-i440fx-1.7 the last 3 years, not even thinking about ho=
-t
-> plugging AHCI devices :D
+Hello,
 
-I'm fine if this gets included in 2.11 - it's quite unlikely that a user
-tries hot-plug ahci on such an old machine type, I think. But we maybe
-should include this in the 2.10.1 stable release, so I'm putting
-qemu-stable on CC now.
+This series adds SMP support for OpenRISC.  The platform is based on the
+work that Stefan Kristiansson did around 2012 implemented in Verilog and
+run on FPGAs.  I have been working to upstream this work, these are my QEMU
+patches I have been used to help with testing.
 
-Anyway, your patch seems to fix the issue for me, thanks!
+I have documented the platform in the OpenRISC 1.2 specification proposal
+available here:
+  https://github.com/stffrdhrn/doc/raw/arch-1.2-proposal/openrisc-arch-1.2-rev0.pdf
 
-Tested-by: Thomas Huth <thuth@redhat.com>
+My latest kernel patches are available here:
+  https://github.com/stffrdhrn/linux.git openrisc-4.13-smp-qspinlock
+
+Stafford Horne (5):
+  openrisc/ompic: Add OpenRISC Multicore PIC (OMPIC)
+  target/openrisc: Make coreid and numcores configurable in state
+  openrisc/cputimer: Perparation for Multicore
+  openrisc: Initial SMP support
+  openrisc: Only kick cpu on timeout, not on update
+
+ default-configs/or1k-softmmu.mak |   1 +
+ hw/intc/Makefile.objs            |   1 +
+ hw/intc/ompic.c                  | 179 +++++++++++++++++++++++++++++++++++++++
+ hw/openrisc/cputimer.c           |  64 ++++++++++----
+ hw/openrisc/openrisc_sim.c       |  87 ++++++++++++++-----
+ target/openrisc/cpu.c            |   1 -
+ target/openrisc/cpu.h            |   7 +-
+ target/openrisc/machine.c        |   8 +-
+ target/openrisc/sys_helper.c     |   8 +-
+ 9 files changed, 308 insertions(+), 48 deletions(-)
+ create mode 100644 hw/intc/ompic.c
+
+-- 
+2.13.5
