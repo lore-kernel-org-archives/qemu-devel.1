@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dkY0M-00068L-3p
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:55:43 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dkYJo-0002kH-Ad
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:15:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dkY0L-0001CE-Cr
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:55:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52748)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dkY0L-0001B3-5E
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:55:41 -0400
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed, 23 Aug 2017 17:54:58 +0200
-Message-Id: <20170823155458.19601-10-cohuck@redhat.com>
-In-Reply-To: <20170823155458.19601-1-cohuck@redhat.com>
-References: <20170823155458.19601-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 9/9] s390x: refine pci dependencies
+	(envelope-from <pbonzini@redhat.com>) id 1dkYJn-00048b-DZ
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:15:48 -0400
+References: <20170822125113.5025-1-stefanha@redhat.com>
+	<8b6f5029-44e8-c14b-6730-6db69ce73f7e@redhat.com>
+	<20170823144553.GE16760@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1c4ee8ba-c179-0a8c-0fe3-ffa1be38e0a5@redhat.com>
+Date: Wed, 23 Aug 2017 18:15:35 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170823144553.GE16760@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] nbd-client: avoid spurious
+ qio_channel_yield() re-entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,30 +26,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>
 
-VIRTIO_PCI should properly depend on CONFIG_PCI.
-With this change, we can switch off pci for s390x by removing
-'CONFIG_PCI=y' from the default config.
+On 23/08/2017 16:45, Stefan Hajnoczi wrote:
+> That depends on the BDRV_POLL_WHILE() allowing all request coroutines to
+> terminate before we call nbd_client_detach_aio_context():
+> 
+>     qio_channel_shutdown(client->ioc,
+>                          QIO_CHANNEL_SHUTDOWN_BOTH,
+>                          NULL);
+>     BDRV_POLL_WHILE(bs, client->read_reply_co);
+> 
+>     nbd_client_detach_aio_context(bs);
+> 
+> I'm not sure we have any guarantee that request coroutines will have
+> terminated.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- default-configs/s390x-softmmu.mak | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Ok, I see my confusion, it's only because of the "receiving" flag which
+actually means "waiting for reply".  Your patch is okay.
 
-diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
-index 51191b77df..6ab2bc65ac 100644
---- a/default-configs/s390x-softmmu.mak
-+++ b/default-configs/s390x-softmmu.mak
-@@ -1,5 +1,5 @@
- CONFIG_PCI=y
--CONFIG_VIRTIO_PCI=y
-+CONFIG_VIRTIO_PCI=$(CONFIG_PCI)
- CONFIG_VHOST_USER_SCSI=$(and $(CONFIG_VHOST_USER),$(CONFIG_LINUX))
- CONFIG_VIRTIO=y
- CONFIG_SCLPCONSOLE=y
--- 
-2.13.5
+Paolo
+
+> Once nbd_client_detach_aio_context() is called
+> ioc->read_coroutine/write_coroutine are set to NULL.  At that point any
+> remaining coroutine doing I/O on ioc will be in trouble.
