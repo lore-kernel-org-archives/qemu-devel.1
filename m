@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dkNnt-00078D-Dh
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 01:02:10 -0400
+	(envelope-from <famz@redhat.com>) id 1dkNuE-0001CP-R7
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 01:08:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dkNns-00078t-BP
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 01:02:09 -0400
-Date: Wed, 23 Aug 2017 13:01:56 +0800
+	(envelope-from <famz@redhat.com>) id 1dkNuD-0004ND-Mv
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 01:08:42 -0400
+Date: Wed, 23 Aug 2017 13:08:30 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170823050156.GC21343@lemon>
+Message-ID: <20170823050830.GD21343@lemon>
 References: <20170822131832.20191-1-pbonzini@redhat.com>
-	<20170822131832.20191-10-pbonzini@redhat.com>
+	<20170822131832.20191-8-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170822131832.20191-10-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 09/10] scsi: add multipath support to
- qemu-pr-helper
+In-Reply-To: <20170822131832.20191-8-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 07/10] io: add qio_channel_read/write_all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,162 +24,152 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>
 
 On Tue, 08/22 15:18, Paolo Bonzini wrote:
-> Proper support of persistent reservation for multipath devices requires
-> communication with the multipath daemon, so that the reservation is
-> registered and applied when a path comes up.  The device mapper
-> utilities provide a library to do so; this patch makes qemu-pr-helper.c
-> detect multipath devices and, when one is found, delegate the operation
-> to libmpathpersist.
+> It is pretty common to read a fixed-size buffer from a socket.  Add a
+> function that does this, either with multiple reads (on blocking sockets)
+> or by yielding if called from a coroutine.
 > 
+> Cc: Daniel P. Berrange <berrange@redhat.com>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  Makefile              |   3 +
->  configure             |  57 ++++++++-
->  docs/pr-manager.rst   |  27 +++++
->  include/scsi/utils.h  |   6 +
->  scsi/qemu-pr-helper.c | 311 +++++++++++++++++++++++++++++++++++++++++++++++++-
->  scsi/utils.c          |  15 +++
->  6 files changed, 414 insertions(+), 5 deletions(-)
+>  include/io/channel.h | 36 ++++++++++++++++++++++++++++++++++-
+>  io/channel.c         | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 89 insertions(+), 1 deletion(-)
 > 
-> diff --git a/Makefile b/Makefile
-> index bfd4f69ecd..f1acaad05b 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -388,6 +388,9 @@ fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal
->  fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
+> diff --git a/include/io/channel.h b/include/io/channel.h
+> index db9bb022a1..9cfb4d081f 100644
+> --- a/include/io/channel.h
+> +++ b/include/io/channel.h
+> @@ -299,7 +299,7 @@ ssize_t qio_channel_writev(QIOChannel *ioc,
+>                             Error **errp);
 >  
->  scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
-> +ifdef CONFIG_MPATH
-> +scsi/qemu-pr-helper$(EXESUF): LIBS += -ludev -lmultipath -lmpathpersist
-> +endif
+>  /**
+> - * qio_channel_readv:
+> + * qio_channel_read:
+>   * @ioc: the channel object
+>   * @buf: the memory region to read data into
+>   * @buflen: the length of @buf
+> @@ -315,6 +315,23 @@ ssize_t qio_channel_read(QIOChannel *ioc,
+>                           Error **errp);
 >  
->  qemu-img-cmds.h: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
->  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
-> diff --git a/configure b/configure
-> index 772aff18d6..d3c9371f7c 100755
-> --- a/configure
-> +++ b/configure
-> @@ -286,6 +286,7 @@ pixman=""
->  sdl=""
->  sdlabi=""
->  virtfs=""
-> +mpath=""
-
-Whole patch: s/\<mpath\>/pr-helper/ ?
-
->  vnc="yes"
->  sparse="no"
->  vde=""
-> @@ -948,6 +949,10 @@ for opt do
->    ;;
->    --enable-virtfs) virtfs="yes"
->    ;;
-> +  --disable-mpath) mpath="no"
-> +  ;;
-> +  --enable-mpath) mpath="yes"
-> +  ;;
->    --disable-vnc) vnc="no"
->    ;;
->    --enable-vnc) vnc="yes"
-> @@ -1491,6 +1496,7 @@ disabled with --disable-FEATURE, default is enabled if available:
->    vnc-png         PNG compression for VNC server
->    cocoa           Cocoa UI (Mac OS X only)
->    virtfs          VirtFS
-> +  mpath           Multipath persistent reservation passthrough
->    xen             xen backend driver support
->    xen-pci-passthrough
->    brlapi          BrlAPI (Braile)
-> @@ -3336,6 +3342,29 @@ else
->  fi
->  
->  ##########################################
-> +# libmpathpersist probe
+>  /**
+> + * qio_channel_read_all:
+> + * @ioc: the channel object
+> + * @buf: the memory region to read data into
+> + * @buflen: the number of bytes to @buf
+> + * @errp: pointer to a NULL-initialized error object
+> + *
+> + * Reads @buflen bytes into @buf, possibly blocking or (if the
+> + * channel is non-blocking) yielding from the current coroutine
+> + * multiple times until the entire content is read.  Otherwise
+> + * behaves as qio_channel_read().
+> + */
+> +ssize_t coroutine_fn qio_channel_read_all(QIOChannel *ioc,
+> +                                          char *buf,
+> +                                          size_t buflen,
+> +                                          Error **errp);
 > +
-> +if test "$mpath" != "no" ; then
-> +  cat > $TMPC <<EOF
-> +#include <libudev.h>
-> +#include <mpath_persist.h>
-> +unsigned mpath_mx_alloc_len = 1024;
-> +int logsink;
-> +int main(void) {
-> +    struct udev *udev = udev_new();
-> +    mpath_lib_init(udev);
+> +/**
+>   * qio_channel_write:
+>   * @ioc: the channel object
+>   * @buf: the memory regions to send data from
+> @@ -331,6 +348,23 @@ ssize_t qio_channel_write(QIOChannel *ioc,
+>                            Error **errp);
+>  
+>  /**
+> + * qio_channel_write_all:
+> + * @ioc: the channel object
+> + * @buf: the memory region to write data into
+> + * @buflen: the number of bytes to @buf
+> + * @errp: pointer to a NULL-initialized error object
+> + *
+> + * Writes @buflen bytes from @buf, possibly blocking or (if the
+> + * channel is non-blocking) yielding from the current coroutine
+> + * multiple times until the entire content is written.  Otherwise
+> + * behaves as qio_channel_write().
+> + */
+> +ssize_t coroutine_fn qio_channel_write_all(QIOChannel *ioc,
+> +                                           const char *buf,
+> +                                           size_t buflen,
+> +                                           Error **errp);
+> +
+> +/**
+>   * qio_channel_set_blocking:
+>   * @ioc: the channel object
+>   * @enabled: the blocking flag state
+> diff --git a/io/channel.c b/io/channel.c
+> index 1cfb8b33a2..7ab3f4eede 100644
+> --- a/io/channel.c
+> +++ b/io/channel.c
+> @@ -113,6 +113,60 @@ ssize_t qio_channel_read(QIOChannel *ioc,
+>  }
+>  
+>  
+> +ssize_t qio_channel_read_all(QIOChannel *ioc,
+> +                             char *buf,
+> +                             size_t buflen,
+> +                             Error **errp)
+> +{
+> +    ssize_t total = 0;
+> +    while (buflen > 0) {
+> +        ssize_t n_read = qio_channel_read(ioc, buf, buflen, errp);
+> +
+> +        if (n_read == QIO_CHANNEL_ERR_BLOCK) {
+> +            assert(ioc->ctx);
+> +            qio_channel_yield(ioc, G_IO_IN);
+> +            continue;
+> +        }
+> +        if (n_read < 0) {
+> +            return n_read;
+> +        }
+> +
+> +        buf += n_read;
+> +        total += n_read;
+> +        buflen -= n_read;
+> +    }
+> +
+> +    return total;
 > +}
-> +EOF
-> +  if compile_prog "" "-ludev -lmultipath -lmpathpersist" ; then
-> +    mpathpersist=yes
-> +  else
-> +    mpathpersist=no
-> +  fi
-> +else
-> +  mpathpersist=no
-> +fi
 > +
-> +##########################################
->  # libcap probe
->  
->  if test "$cap" != "no" ; then
-> @@ -5070,16 +5099,34 @@ if test "$want_tools" = "yes" ; then
->    fi
->  fi
->  if test "$softmmu" = yes ; then
-> -  if test "$virtfs" != no ; then
-> -    if test "$cap" = yes && test "$linux" = yes && test "$attr" = yes ; then
-> +  if test "$linux" = yes; then
-> +    if test "$virtfs" != no && test "$cap" = yes && test "$attr" = yes ; then
->        virtfs=yes
->        tools="$tools fsdev/virtfs-proxy-helper\$(EXESUF)"
->      else
->        if test "$virtfs" = yes; then
-> -        error_exit "VirtFS is supported only on Linux and requires libcap devel and libattr devel"
-> +        error_exit "VirtFS requires libcap devel and libattr devel"
->        fi
->        virtfs=no
->      fi
-> +    if test "$mpath" != no && test "$mpathpersist" = yes ; then
-> +      mpath=yes
-> +      tools="$tools mpath/qemu-mpath-helper\$(EXESUF)"
+> +
+> +ssize_t qio_channel_write_all(QIOChannel *ioc,
+> +                              const char *buf,
+> +                              size_t buflen,
+> +                              Error **errp)
+> +{
+> +    ssize_t total = 0;
+> +    while (buflen > 0) {
+> +        ssize_t n_written = qio_channel_write(ioc, buf, buflen, errp);
+> +
+> +        if (n_written == QIO_CHANNEL_ERR_BLOCK) {
+> +            assert(ioc->ctx);
+> +            qio_channel_yield(ioc, G_IO_OUT);
+> +            continue;
+> +        }
+> +        if (n_written < 0) {
+> +            return n_written;
+> +        }
+> +
+> +        buf += n_written;
+> +        total += n_written;
+> +        buflen -= n_written;
+> +    }
+> +
+> +    return total;
+> +}
+> +
+> +
+>  ssize_t qio_channel_write(QIOChannel *ioc,
+>                            const char *buf,
+>                            size_t buflen,
+> -- 
+> 2.13.5
+> 
+> 
 
-scsi/qemu-pr-helper?
-
-> +    else
-> +      if test "$mpath" = yes; then
-> +        error_exit "Multipath requires libmpathpersist devel"
-> +      fi
-> +      mpath=no
-> +    fi
-> +  else
-> +    if test "$virtfs" = yes; then
-> +      error_exit "VirtFS is supported only on Linux"
-> +    fi
-> +    virtfs=no
-> +    if test "$mpath" = yes; then
-> +      error_exit "Multipath is supported only on Linux"
-> +    fi
-> +    mpath=no
->    fi
->  fi
->  
-> @@ -5326,6 +5373,7 @@ echo "Audio drivers     $audio_drv_list"
->  echo "Block whitelist (rw) $block_drv_rw_whitelist"
->  echo "Block whitelist (ro) $block_drv_ro_whitelist"
->  echo "VirtFS support    $virtfs"
-> +echo "Multipath support $mpath"
->  echo "VNC support       $vnc"
->  if test "$vnc" = "yes" ; then
->      echo "VNC SASL support  $vnc_sasl"
-> @@ -5773,6 +5821,9 @@ fi
->  if test "$virtfs" = "yes" ; then
->    echo "CONFIG_VIRTFS=y" >> $config_host_mak
->  fi
-> +if test "$mpath" = "yes" ; then
-> +  echo "CONFIG_MPATH=y" >> $config_host_mak
-> +fi
->  if test "$vhost_scsi" = "yes" ; then
->    echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
->  fi
+Are there any caller depending on short read/write? Is it okay to change all (or
+most) qio_channel_{read,write}* functions to this "full read/write" behavior?
 
 Fam
