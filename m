@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dkYbh-00006r-32
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:34:18 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dkYjQ-0008Br-2R
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:42:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dkYbf-0005Ut-SE
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:34:17 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Wed, 23 Aug 2017 11:33:49 -0500
-Message-Id: <20170823163349.11663-7-eblake@redhat.com>
-In-Reply-To: <20170823163349.11663-1-eblake@redhat.com>
-References: <20170823163349.11663-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 6/6] nbd-client: avoid spurious
- qio_channel_yield() re-entry
+	(envelope-from <eric.auger@redhat.com>) id 1dkYjP-00010c-5a
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:42:16 -0400
+References: <1503312534-6642-1-git-send-email-Bharat.Bhushan@nxp.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <2e23327a-3e5e-abaf-387f-d23462d8aba7@redhat.com>
+Date: Wed, 23 Aug 2017 18:41:35 +0200
+MIME-Version: 1.0
+In-Reply-To: <1503312534-6642-1-git-send-email-Bharat.Bhushan@nxp.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] virtio-iommu: VFIO integration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,173 +22,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+To: Bharat Bhushan <Bharat.Bhushan@nxp.com>, eric.auger.pro@gmail.com, peter.maydell@linaro.org, alex.williamson@redhat.com, mst@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: wei@redhat.com, kevin.tian@intel.com, marc.zyngier@arm.com, tn@semihalf.com, will.deacon@arm.com, drjones@redhat.com, robin.murphy@arm.com, christoffer.dall@linaro.org
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+Hi Bharat,
 
-The following scenario leads to an assertion failure in
-qio_channel_yield():
+On 21/08/2017 12:48, Bharat Bhushan wrote:
+> This V3 version is mainly about rebasing on v3 version on Virtio-iommu device
+> framework from Eric Augur and addresing review comments.
+s/Augur/Auger ;-)
+> 
+> This patch series allows PCI pass-through using virtio-iommu.
+>   
+> This series is based on:
+>  - virtio-iommu specification written by Jean-Philippe Brucker
+>    [RFC 0/3] virtio-iommu: a paravirtualized IOMMU,
+>  
+>  - virtio-iommu driver by Jean-Philippe Brucker
+>    [RFC PATCH linux] iommu: Add virtio-iommu driver
+>  
+>  - virtio-iommu device emulation by Eric Augur.
+>    [RFC v3 0/8] VIRTIO-IOMMU device
+> 
+> PCI device pass-through and virtio-net-pci is tested with these changes using dma-ops
 
-1. Request coroutine calls qio_channel_yield() successfully when sending
-   would block on the socket.  It is now yielded.
-2. nbd_read_reply_entry() calls nbd_recv_coroutines_enter_all() because
-   nbd_receive_reply() failed.
-3. Request coroutine is entered and returns from qio_channel_yield().
-   Note that the socket fd handler has not fired yet so
-   ioc->write_coroutine is still set.
-4. Request coroutine attempts to send the request body with nbd_rwv()
-   but the socket would still block.  qio_channel_yield() is called
-   again and assert(!ioc->write_coroutine) is hit.
+I confirm it works fine now with 2 assigned VFs.
 
-The problem is that nbd_read_reply_entry() does not distinguish between
-request coroutines that are waiting to receive a reply and those that
-are not.
+However at the moment DPDK testpmd using those 2 VFs does not work for me:
+1: [/home/augere/UPSTREAM/dpdk/install/bin/testpmd(rte_dump_stack+0x24)
+[0x4a8a78]]
 
-This patch adds a per-request bool receiving flag so
-nbd_read_reply_entry() can avoid spurious aio_wake() calls.
+I haven't investigated yet...
 
-Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20170822125113.5025-1-stefanha@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Tested-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- block/nbd-client.h |  7 ++++++-
- block/nbd-client.c | 35 ++++++++++++++++++++++-------------
- 2 files changed, 28 insertions(+), 14 deletions(-)
+Thanks
 
-diff --git a/block/nbd-client.h b/block/nbd-client.h
-index 1935ffbcaa..b435754b82 100644
---- a/block/nbd-client.h
-+++ b/block/nbd-client.h
-@@ -17,6 +17,11 @@
-
- #define MAX_NBD_REQUESTS    16
-
-+typedef struct {
-+    Coroutine *coroutine;
-+    bool receiving;         /* waiting for read_reply_co? */
-+} NBDClientRequest;
-+
- typedef struct NBDClientSession {
-     QIOChannelSocket *sioc; /* The master data channel */
-     QIOChannel *ioc; /* The current I/O channel which may differ (eg TLS) */
-@@ -27,7 +32,7 @@ typedef struct NBDClientSession {
-     Coroutine *read_reply_co;
-     int in_flight;
-
--    Coroutine *recv_coroutine[MAX_NBD_REQUESTS];
-+    NBDClientRequest requests[MAX_NBD_REQUESTS];
-     NBDReply reply;
-     bool quit;
- } NBDClientSession;
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 02c8e207ef..25bcaa2346 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -39,8 +39,10 @@ static void nbd_recv_coroutines_enter_all(NBDClientSession *s)
-     int i;
-
-     for (i = 0; i < MAX_NBD_REQUESTS; i++) {
--        if (s->recv_coroutine[i]) {
--            aio_co_wake(s->recv_coroutine[i]);
-+        NBDClientRequest *req = &s->requests[i];
-+
-+        if (req->coroutine && req->receiving) {
-+            aio_co_wake(req->coroutine);
-         }
-     }
- }
-@@ -88,28 +90,28 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
-          * one coroutine is called until the reply finishes.
-          */
-         i = HANDLE_TO_INDEX(s, s->reply.handle);
--        if (i >= MAX_NBD_REQUESTS || !s->recv_coroutine[i]) {
-+        if (i >= MAX_NBD_REQUESTS ||
-+            !s->requests[i].coroutine ||
-+            !s->requests[i].receiving) {
-             break;
-         }
-
--        /* We're woken up by the recv_coroutine itself.  Note that there
-+        /* We're woken up again by the request itself.  Note that there
-          * is no race between yielding and reentering read_reply_co.  This
-          * is because:
-          *
--         * - if recv_coroutine[i] runs on the same AioContext, it is only
-+         * - if the request runs on the same AioContext, it is only
-          *   entered after we yield
-          *
--         * - if recv_coroutine[i] runs on a different AioContext, reentering
-+         * - if the request runs on a different AioContext, reentering
-          *   read_reply_co happens through a bottom half, which can only
-          *   run after we yield.
-          */
--        aio_co_wake(s->recv_coroutine[i]);
-+        aio_co_wake(s->requests[i].coroutine);
-         qemu_coroutine_yield();
-     }
-
--    if (ret < 0) {
--        s->quit = true;
--    }
-+    s->quit = true;
-     nbd_recv_coroutines_enter_all(s);
-     s->read_reply_co = NULL;
- }
-@@ -128,14 +130,17 @@ static int nbd_co_send_request(BlockDriverState *bs,
-     s->in_flight++;
-
-     for (i = 0; i < MAX_NBD_REQUESTS; i++) {
--        if (s->recv_coroutine[i] == NULL) {
--            s->recv_coroutine[i] = qemu_coroutine_self();
-+        if (s->requests[i].coroutine == NULL) {
-             break;
-         }
-     }
-
-     g_assert(qemu_in_coroutine());
-     assert(i < MAX_NBD_REQUESTS);
-+
-+    s->requests[i].coroutine = qemu_coroutine_self();
-+    s->requests[i].receiving = false;
-+
-     request->handle = INDEX_TO_HANDLE(s, i);
-
-     if (s->quit) {
-@@ -173,10 +178,13 @@ static void nbd_co_receive_reply(NBDClientSession *s,
-                                  NBDReply *reply,
-                                  QEMUIOVector *qiov)
- {
-+    int i = HANDLE_TO_INDEX(s, request->handle);
-     int ret;
-
-     /* Wait until we're woken up by nbd_read_reply_entry.  */
-+    s->requests[i].receiving = true;
-     qemu_coroutine_yield();
-+    s->requests[i].receiving = false;
-     *reply = s->reply;
-     if (reply->handle != request->handle || !s->ioc || s->quit) {
-         reply->error = EIO;
-@@ -186,6 +194,7 @@ static void nbd_co_receive_reply(NBDClientSession *s,
-                           NULL);
-             if (ret != request->len) {
-                 reply->error = EIO;
-+                s->quit = true;
-             }
-         }
-
-@@ -200,7 +209,7 @@ static void nbd_coroutine_end(BlockDriverState *bs,
-     NBDClientSession *s = nbd_get_client_session(bs);
-     int i = HANDLE_TO_INDEX(s, request->handle);
-
--    s->recv_coroutine[i] = NULL;
-+    s->requests[i].coroutine = NULL;
-
-     /* Kick the read_reply_co to get the next reply.  */
-     if (s->read_reply_co) {
--- 
-2.13.5
+Eric
+> 
+> This patch series does not implement RESV_MEM changes proposal by Jean-Philippe "https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg01796.html"
+> 
+> v2->v3:
+>  - This series is based on "[RFC v3 0/8] VIRTIO-IOMMU device"
+>    Which is based on top of v2.10-rc0 that 
+>  - Fixed issue with two PCI devices
+>  - Addressed review comments
+> 
+> v1->v2:
+>   - Added trace events
+>   - removed vSMMU3 link in patch description
+> 
+> Bharat Bhushan (2):
+>   target/arm/kvm: Translate the MSI doorbell in kvm_arch_fixup_msi_route
+>   virtio-iommu: vfio integration with virtio-iommu
+> 
+>  hw/virtio/trace-events           |   5 ++
+>  hw/virtio/virtio-iommu.c         | 163 +++++++++++++++++++++++++++++++++++++++
+>  include/hw/virtio/virtio-iommu.h |   6 ++
+>  target/arm/kvm.c                 |  27 +++++++
+>  target/arm/trace-events          |   3 +
+>  5 files changed, 204 insertions(+)
+> 
