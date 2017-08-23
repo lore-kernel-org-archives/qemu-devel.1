@@ -1,20 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dkVvH-0003nK-As
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:42:20 -0400
+	(envelope-from <famz@redhat.com>) id 1dkVvv-0004Hy-2D
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:42:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dkVvE-0001ib-2D
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:42:19 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <1502117160-24655-32-git-send-email-armbru@redhat.com>
-References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-	<1502117160-24655-32-git-send-email-armbru@redhat.com>
-Date: Wed, 23 Aug 2017 15:42:11 +0200
-Message-ID: <w51wp5uh03w.fsf@maestria.local.igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH 31/56] block: Make
- throttle byte rates and sizes unsigned in QAPI/QMP
+	(envelope-from <famz@redhat.com>) id 1dkVvu-0001wc-BW
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:42:59 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Wed, 23 Aug 2017 21:42:38 +0800
+Message-Id: <20170823134242.12080-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.10 0/4] block: Fix non-shared storage
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +18,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, berrange@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-On Mon 07 Aug 2017 04:45:35 PM CEST, Markus Armbruster wrote:
-> Sizes and byte rates should use QAPI type 'size' (uint64_t).
-> BlockIOThrottle and BlockDeviceInfo members @bps, @bps_rd, @bps_wr,
-> @bps_max, @bps_rd_max, @bps_wr_max, @iops_size are 'int' (int64_t).
-> qmp_block_set_io_throttle() and bdrv_block_device_info() copy @bps,
-> @bps_rd, @bps_wr to / from LeakyBucket member @avg (implicit
-> conversion to / from double), @bps_max, @bps_rd_max, @bps_wr_max to /
-> from LeakyBucket member @max (implicit conversion to / from double),
-> and @iops_size to / from ThrottleConfig member op_size (implicit
-> conversion to / from uint64_t).
->
-> Change these BlockIOThrottle and BlockDeviceInfo members to 'size'.
->
-> block_set_io_throttle now accepts sizes and rates between 2^63 and
-> 2^64-1.  It accepts negative values as before, because that's how the
-> QObject input visitor works for backward compatibility.
->
-> Doing the same for HMP's block_set_io_throttle deserves its own commit
-> (the next one).
->
-> query-block and query-named-block-nodes now report sizes and rates
-> above 2^63-1 correctly instead of their (negative) two's complement.
->
-> So does HMP's "info block".
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+This fixes the issue reported as https://bugs.launchpad.net/bugs/1711602
 
-This is fine because all those parameters are limited to [0, 10^15], so
-changing int64_t -> uint64_t is not a problem.
+Fam Zheng (3):
+  block-backend: Refactor inactivate check
+  block-backend: Allow more "can inactivate" cases
+  mirror: Mark target BB as "force allow inactivate"
 
-I have already sent a patch that changes the fields in the data
-structure in throttle.h from double to uint64_t
+Stefan Hajnoczi (1):
+  block: Update open_flags after ->inactivate() callback
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+ block.c                        |  7 +++----
+ block/block-backend.c          | 30 +++++++++++++++++++++++++-----
+ block/mirror.c                 | 14 ++++++++++++--
+ include/sysemu/block-backend.h |  1 +
+ 4 files changed, 41 insertions(+), 11 deletions(-)
 
-Berto
+-- 
+2.13.5
