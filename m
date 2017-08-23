@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dkQq9-0001Cl-9f
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:16:42 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dkR5w-0007fg-Rz
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:33:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dkQq4-0003Io-B6
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:16:41 -0400
-Received: from mail-wm0-f53.google.com ([74.125.82.53]:36189)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dkQq4-0003GS-3d
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:16:36 -0400
-Received: by mail-wm0-f53.google.com with SMTP id z132so9971197wmg.1
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 01:16:36 -0700 (PDT)
-References: <1503471212-109371-1-git-send-email-borntraeger@de.ibm.com>
-	<cc76787a-e65f-f4e4-de65-7233edc53d3a@redhat.com>
-	<aef4b38d-eeb2-5c96-32c1-fbeadb9013b5@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4e463848-3be4-1b31-c2d9-04ef32d79925@redhat.com>
-Date: Wed, 23 Aug 2017 10:16:27 +0200
+	(envelope-from <imammedo@redhat.com>) id 1dkR5v-00043a-Bo
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:33:00 -0400
+Date: Wed, 23 Aug 2017 10:32:46 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170823103246.5b6029bf@nial.brq.redhat.com>
+In-Reply-To: <20170822214343.31385-1-f4bug@amsat.org>
+References: <20170822214343.31385-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <aef4b38d-eeb2-5c96-32c1-fbeadb9013b5@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] configure: enable --s390-pgste linker
- option
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.10-rc4?] acpi: pcihp: fix
+ use-after-free for machines previous pc-1.7 compat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,104 +23,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Janosch Frank <frankja@linux.vnet.ibm.com>, Dan Horak <dhorak@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Christian Ehrhardt <christian.ehrhardt@canonical.com>, Alexander Graf <agraf@suse.de>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>, Anthony PERARD <anthony.perard@citrix.com>
 
-On 23/08/2017 10:06, Thomas Huth wrote:
-> On 23.08.2017 10:00, David Hildenbrand wrote:
->> On 23.08.2017 08:53, Christian Borntraeger wrote:
->>> KVM guests on s390 need a different page table layout than normal
->>> processes (2kb page table + 2kb page status extensions vs 2kb page table
->>> only). As of today this has to be enabled via the vm.allocate_pgste
->>> sysctl.
->>>
->>> Newer kernels (>= 4.12) on s390 check for an S390_PGSTE program header
->>> and enable the pgste page table extensions in that case. This makes the
->>> vm.allocate_pgste sysctl unnecessary. We enable this program header for
->>> the s390 system emulation (qemu-system-s390x) if we build on s390
->>> - for s390 system emulation
->>> - the linker supports --s390-pgste (binutils >= 2.29)
->>> - KVM is enabled
->>>
->>> This will allow distributions to disable the global vm.allocate_pgste
->>> sysctl, which will improve the page table allocation for non KVM
->>> processes as only 2kb chunks are necessary.
->>>
->>> Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>
->>> Cc: Alexander Graf <agraf@suse.de>
->>> Cc: Dan Horak <dhorak@redhat.com>
->>> Cc: David Hildenbrand <david@redhat.com>
->>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>> Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
->>> ---
->>> V1->V2:
->>> 	- provide ld_has function
->>> 	- use ld_has to replace some open coded variants
->>> 	- check target arch and arch for s390
->>> 	- check for s390x before calling the linker
->>>
->>>  configure | 21 ++++++++++++++++++++-
->>>  1 file changed, 20 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/configure b/configure
->>> index dd73cce..0b68b37 100755
->>> --- a/configure
->>> +++ b/configure
->>> @@ -240,6 +240,11 @@ supported_target() {
->>>      return 1
->>>  }
->>>  
->>> +
->>
->> I'd drop this new line
->>
->>> +ld_has() {
->>> +    $ld --help 2>/dev/null | grep ".$1" >/dev/null 2>&1
->>> +}
->>> +
->>>  # default parameters
->>>  source_path=$(dirname "$0")
->>>  cpu=""
->>> @@ -5043,7 +5048,7 @@ fi
->>>  # Use ASLR, no-SEH and DEP if available
->>>  if test "$mingw32" = "yes" ; then
->>>      for flag in --dynamicbase --no-seh --nxcompat; do
->>> -        if $ld --help 2>/dev/null | grep ".$flag" >/dev/null 2>/dev/null ; then
->>> +        if ld_had $flag ; then
->>>              LDFLAGS="-Wl,$flag $LDFLAGS"
->>>          fi
->>>      done
->>> @@ -6522,6 +6527,20 @@ if test "$target_linux_user" = "yes" -o "$target_bsd_user" = "yes" ; then
->>>    ldflags="$ldflags $textseg_ldflags"
->>>  fi
->>>  
->>> +# Newer kernels on s390 check for an S390_PGSTE program header and
->>> +# enable the pgste page table extensions in that case. This makes
->>> +# the vm.allocate_pgste sysctl unnecessary. We enable this program
->>> +# header if
->>> +#  - we build on s390x
->>> +#  - we build the system emulation for s390x (qemu-system-s390x)
->>> +#  - KVM is enabled
->>> +#  - the linker support --s390-pgste
->>> +if test "$TARGET_ARCH" = "s390x" -a "$target_softmmu" = "yes"  -a "$ARCH" = "s390x" -a "$kvm" = "yes"; then
->>
->> Wonder if the "$ARCH" check is really necessary: TARGET_ARCH=s390x with
->> kvm=yes should only build on s390x.
-> 
-> Isn't kvm=yes and TARGET_ARCH=s390x also possible on a x86 host, where
-> only the x86_64 target is built with CONFIG_KVM=y, but the s390x target
-> with CONFIG_KVM=n ?
+On Tue, 22 Aug 2017 18:43:43 -0300
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
-Yes.  You could use
+> 9e047b982452 "piix4: add acpi pci hotplug support" introduced a new prope=
+rty
+> 'use_acpi_pci_hotplug' for pc-1.7 and older machines.
+> c24d5e0b91d1 "convert ACPI PCI hotplug to use hotplug-handler API" added =
+the
+> qbus hotplug handlers but forgot to check for the 'use_acpi_pci_hotplug'
+> property.
+>=20
+> Check for use_acpi_pci_hotplug before calling acpi_pcihp_device_[un]plug_=
+cb().
+>=20
+> If Xen is enabled, piix4_pm_init() disables use_acpi_pci_hotplug.
+>=20
+> The following valgrind Trace equivs:
+>=20
+>   qdev_device_add( "ich9-ahci" )
+>    -> device_set_realized()
+>     -> hotplug_handler_plug()
+>      -> piix4_device_plug_cb()
+>       -> acpi_pcihp_device_plug_cb()
+>        -> acpi_pcihp_get_bsel() "Property ACPI_PCIHP_PROP_BSEL not found"
+>    -> object_unparent() =20
+>      <- "Bus doesn't have property ACPI_PCIHP_PROP_BSEL set"
+>=20
+> $ valgrind x86_64-softmmu/qemu-system-x86_64 -M pc-1.2 -nographic -S
+> (qemu) device_add ich9-ahci,id=3Dich9-ahci
+> =3D=3D6604=3D=3D Invalid read of size 8
+> =3D=3D6604=3D=3D    at 0x609AB0: object_unparent (object.c:445)
+> =3D=3D6604=3D=3D    by 0x4C4478: device_unparent (qdev.c:1095)
+> =3D=3D6604=3D=3D    by 0x60A364: object_finalize_child_property (object.c=
+:1396)
+> =3D=3D6604=3D=3D    by 0x6092A6: object_property_del_child.isra.7 (object=
+.c:427)
+> =3D=3D6604=3D=3D    by 0x451728: qdev_device_add (qdev-monitor.c:634)
+> =3D=3D6604=3D=3D    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
+> =3D=3D6604=3D=3D    by 0x46B689: hmp_device_add (hmp.c:1925)
+> =3D=3D6604=3D=3D    by 0x364083: handle_hmp_command (monitor.c:3119)
+> =3D=3D6604=3D=3D    by 0x365439: monitor_command_cb (monitor.c:3922)
+> =3D=3D6604=3D=3D    by 0x6E5D27: readline_handle_byte (readline.c:393)
+> =3D=3D6604=3D=3D    by 0x364311: monitor_read (monitor.c:3905)
+> =3D=3D6604=3D=3D    by 0x67C573: mux_chr_read (char-mux.c:216)
+> =3D=3D6604=3D=3D  Address 0x15fc5448 is 30,328 bytes inside a block of si=
+ze 36,288 free'd
+> =3D=3D6604=3D=3D    at 0x4C2ACDD: free (vg_replace_malloc.c:530)
+> =3D=3D6604=3D=3D    by 0xA04EBCD: g_free (in /usr/lib64/libglib-2.0.so.0.=
+5000.3)
+> =3D=3D6604=3D=3D    by 0x50100E: pci_ich9_uninit (ich.c:161)
+> =3D=3D6604=3D=3D    by 0x5428AB: pci_qdev_unrealize (pci.c:1083)
+> =3D=3D6604=3D=3D    by 0x4C5EE9: device_set_realized (qdev.c:988)
+> =3D=3D6604=3D=3D    by 0x608DCD: property_set_bool (object.c:1886)
+> =3D=3D6604=3D=3D    by 0x60CEBE: object_property_set_qobject (qom-qobject=
+.c:27)
+> =3D=3D6604=3D=3D    by 0x60AB6F: object_property_set_bool (object.c:1162)
+> =3D=3D6604=3D=3D    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
+> =3D=3D6604=3D=3D    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
+> =3D=3D6604=3D=3D    by 0x46B689: hmp_device_add (hmp.c:1925)
+> =3D=3D6604=3D=3D    by 0x364083: handle_hmp_command (monitor.c:3119)
+> =3D=3D6604=3D=3D  Block was alloc'd at
+> =3D=3D6604=3D=3D    at 0x4C2B975: calloc (vg_replace_malloc.c:711)
+> =3D=3D6604=3D=3D    by 0xA04EB15: g_malloc0 (in /usr/lib64/libglib-2.0.so=
+.0.5000.3)
+> =3D=3D6604=3D=3D    by 0x50094F: ahci_realize (ahci.c:1468)
+> =3D=3D6604=3D=3D    by 0x501098: pci_ich9_ahci_realize (ich.c:115)
+> =3D=3D6604=3D=3D    by 0x543E6D: pci_qdev_realize (pci.c:2002)
+> =3D=3D6604=3D=3D    by 0x4C5E69: device_set_realized (qdev.c:914)
+> =3D=3D6604=3D=3D    by 0x608DCD: property_set_bool (object.c:1886)
+> =3D=3D6604=3D=3D    by 0x60CEBE: object_property_set_qobject (qom-qobject=
+.c:27)
+> =3D=3D6604=3D=3D    by 0x60AB6F: object_property_set_bool (object.c:1162)
+> =3D=3D6604=3D=3D    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
+> =3D=3D6604=3D=3D    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
+> =3D=3D6604=3D=3D    by 0x46B689: hmp_device_add (hmp.c:1925)
+>=20
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Message-Id: <59a56959-ca12-ea75-33fa-ff07eba1b090@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/acpi/piix4.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index f276967365..d4df209a2e 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -385,7 +385,7 @@ static void piix4_device_plug_cb(HotplugHandler *hotp=
+lug_dev,
+>                                  dev, errp);
+>          }
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> -        if (!xen_enabled()) {
+> +        if (s->use_acpi_pci_hotplug) {
+>              acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug,=
+ dev,
+>                                        errp);
+>          }
+s->use_acpi_pci_hotplug is a switch between legacy and current modes
+of PCI hotplug and acpi_pcihp_device_plug_cb() should be able to handle
+both.
 
-  if test "$ARCH" = "s390x" && supported_kvm_target $target; then
-    ...
-  fi
+Looking at history train-wreck started since
+ (f0c9d64 pc: pcihp: avoid adding ACPI_PCIHP_PROP_BSEL twice)
+when bsel became solely allocated by another component (acpi table builder)
+with follow up fixups to make that split brain (hw(legacy|modern)/acpi(in s=
+eabios|in qemu))
+combos work somehow.
 
-Or, in the existing "if supported_kvm_target $target" conditional, add
 
-  if test "$ARCH" = s390x && ld_has --s390-pgste; then
-    ...
-  fi
+I think Anthony's (CCed) patches is the right way to fix issues not only
+for Xen but also for legacy SeaBIOS as well.
 
-Paolo
+[PATCH for-2.10 v3 0/3] Fix hotplug of PCI passthrought dev
+https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg03216.html
+Series still needs to be fixed (broken reboot logic)
+but it might work for your case.
+
+> @@ -411,7 +411,7 @@ static void piix4_device_unplug_request_cb(HotplugHan=
+dler *hotplug_dev,
+>          acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotpl=
+ug,
+>                                        dev, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+> -        if (!xen_enabled()) {
+> +        if (s->use_acpi_pci_hotplug) {
+>              acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplu=
+g, dev,
+>                                          errp);
+>          }
