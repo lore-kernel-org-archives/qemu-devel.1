@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dkbrm-0005eK-Tt
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 16:03:07 -0400
+	(envelope-from <mtparkr@gmail.com>) id 1dkc2L-0000Jz-PC
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 16:14:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dkbrm-0003ru-6q
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 16:03:06 -0400
-References: <20170818211542.5380-1-eblake@redhat.com>
-	<20170818211542.5380-9-eblake@redhat.com>
-	<e44a3300-cbe9-c9d7-ae49-b223f638d7ea@redhat.com>
-	<da3712de-986d-8130-7a97-e9f1071d2a03@redhat.com>
-	<c665235d-8bec-627a-f750-4dc2798c3d8c@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5d84655b-d82a-956a-f434-023961b23552@redhat.com>
-Date: Wed, 23 Aug 2017 22:02:50 +0200
+	(envelope-from <mtparkr@gmail.com>) id 1dkc2K-0000Ke-MM
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 16:14:01 -0400
+Received: from mail-yw0-x243.google.com ([2607:f8b0:4002:c05::243]:33456)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mtparkr@gmail.com>) id 1dkc2K-0000KQ-IE
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 16:14:00 -0400
+Received: by mail-yw0-x243.google.com with SMTP id u133so379718ywc.0
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 13:14:00 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <c665235d-8bec-627a-f750-4dc2798c3d8c@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Cha4BgUivLM8AcEp2aNM35fkLocm735jA"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 08/13] tests: Rely more on
- global_qtest
+In-Reply-To: <20170823193703.10808-1-mtparkr@gmail.com>
+References: <20170823193703.10808-1-mtparkr@gmail.com>
+From: Matt Parker <mtparkr@gmail.com>
+Date: Wed, 23 Aug 2017 21:13:59 +0100
+Message-ID: <CAOOZdTgBfYoCxYZd0RTxcDsVb5kLDAvL1iLA14S2+0DHsA-jag@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] audio: intel-hda: do not use old_mmio
+ accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +28,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, "open list:Floppy" <qemu-block@nongnu.org>
+To: "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Cha4BgUivLM8AcEp2aNM35fkLocm735jA
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org
-Cc: armbru@redhat.com, "open list:Floppy" <qemu-block@nongnu.org>
-Message-ID: <5d84655b-d82a-956a-f434-023961b23552@redhat.com>
-Subject: Re: [Qemu-block] [PATCH v5 08/13] tests: Rely more on global_qtest
-References: <20170818211542.5380-1-eblake@redhat.com>
- <20170818211542.5380-9-eblake@redhat.com>
- <e44a3300-cbe9-c9d7-ae49-b223f638d7ea@redhat.com>
- <da3712de-986d-8130-7a97-e9f1071d2a03@redhat.com>
- <c665235d-8bec-627a-f750-4dc2798c3d8c@redhat.com>
-In-Reply-To: <c665235d-8bec-627a-f750-4dc2798c3d8c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+I've just noticed the suggested changes from the v1 patch regarding
+using MAKE_64BIT_MASK.
+This patch is can be ignored for now.
 
-On 23/08/2017 21:26, Eric Blake wrote:
->> I agree with using the short form where possible, but I disagree on
->> removing the long forms.  Rather, global_qtest in my opinion should ha=
-ve
->> been static (though I'm not proposing that you do this); inlining the
->> wrappers is not needed for performance.
-> But no one outside of libqtest.c is using the long form.  Maintaining a=
-
-> long form that isn't used is counter-productive, if the short form is
-> good enough for everything we need.
-
-Well, whatever is assigning to global_qtest should be using the long form=
-=2E
-
-Paolo
-
-
---Cha4BgUivLM8AcEp2aNM35fkLocm735jA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlmd32oACgkQv/vSX3jH
-roND1wgAmu30ZXPjmhPDuhP1cVA2zbKjzOxyozEFQzPs5rf3zM8Aer0SeTkl4u2T
-t1oHsxqfHXqN7L99I7u48gijLBw9L9Oe9wI9MgTj2blX4DjrEzOmbISHMpnlf4/L
-EsvM0HURBZt+eazvzE/FJ7h0LuhMfVq0dyrbO2DQcPy8+hXuzEkTKvcLr5GCIIgJ
-MWMgPZbCEkc66b9WAmoum0cMjP8KV4uKw/HTvrKwx9liVtrV2HZ/RZJKAn7g6Ma4
-neXsp5qWTn+A79n4W8ZNyA2MJ5dRfZPn+Iapp/88+hVsypbaTTqZvFq9+tEQK2lb
-skyp670CYIs0T3hzGxuIC8gr5rQU8w==
-=2YJq
------END PGP SIGNATURE-----
-
---Cha4BgUivLM8AcEp2aNM35fkLocm735jA--
+On 23 August 2017 at 20:37, Matt Parker <mtparkr@gmail.com> wrote:
+> intel-hda is currently using the old_mmio accessors for io.
+> This updates the device to use .read and .write accessors instead.
+>
+> Signed-off-by: Matt Parker <mtparkr@gmail.com>
+> ---
+>  hw/audio/intel-hda.c | 57 +++++++++-------------------------------------------
+>  1 file changed, 10 insertions(+), 47 deletions(-)
+>
+> diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
+> index 06acc98f7b..95e3e460fb 100644
+> --- a/hw/audio/intel-hda.c
+> +++ b/hw/audio/intel-hda.c
+> @@ -1043,66 +1043,29 @@ static void intel_hda_regs_reset(IntelHDAState *d)
+>
+>  /* --------------------------------------------------------------------- */
+>
+> -static void intel_hda_mmio_writeb(void *opaque, hwaddr addr, uint32_t val)
+> +static void intel_hda_mmio_write(void *opaque, hwaddr addr, uint64_t val,
+> +                                 unsigned size)
+>  {
+>      IntelHDAState *d = opaque;
+>      const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+>
+> -    intel_hda_reg_write(d, reg, val, 0xff);
+> +    intel_hda_reg_write(d, reg, val, (1UL << (size * 8)) - 1);
+>  }
+>
+> -static void intel_hda_mmio_writew(void *opaque, hwaddr addr, uint32_t val)
+> +static uint64_t intel_hda_mmio_read(void *opaque, hwaddr addr, unsigned size)
+>  {
+>      IntelHDAState *d = opaque;
+>      const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+>
+> -    intel_hda_reg_write(d, reg, val, 0xffff);
+> -}
+> -
+> -static void intel_hda_mmio_writel(void *opaque, hwaddr addr, uint32_t val)
+> -{
+> -    IntelHDAState *d = opaque;
+> -    const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+> -
+> -    intel_hda_reg_write(d, reg, val, 0xffffffff);
+> -}
+> -
+> -static uint32_t intel_hda_mmio_readb(void *opaque, hwaddr addr)
+> -{
+> -    IntelHDAState *d = opaque;
+> -    const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+> -
+> -    return intel_hda_reg_read(d, reg, 0xff);
+> -}
+> -
+> -static uint32_t intel_hda_mmio_readw(void *opaque, hwaddr addr)
+> -{
+> -    IntelHDAState *d = opaque;
+> -    const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+> -
+> -    return intel_hda_reg_read(d, reg, 0xffff);
+> -}
+> -
+> -static uint32_t intel_hda_mmio_readl(void *opaque, hwaddr addr)
+> -{
+> -    IntelHDAState *d = opaque;
+> -    const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+> -
+> -    return intel_hda_reg_read(d, reg, 0xffffffff);
+> +    return intel_hda_reg_read(d, reg, (1UL << (size * 8)) - 1);
+>  }
+>
+>  static const MemoryRegionOps intel_hda_mmio_ops = {
+> -    .old_mmio = {
+> -        .read = {
+> -            intel_hda_mmio_readb,
+> -            intel_hda_mmio_readw,
+> -            intel_hda_mmio_readl,
+> -        },
+> -        .write = {
+> -            intel_hda_mmio_writeb,
+> -            intel_hda_mmio_writew,
+> -            intel_hda_mmio_writel,
+> -        },
+> +    .read = intel_hda_mmio_read,
+> +    .write = intel_hda_mmio_write,
+> +    .impl = {
+> +        .min_access_size = 1,
+> +        .max_access_size = 4,
+>      },
+>      .endianness = DEVICE_NATIVE_ENDIAN,
+>  };
+> --
+> 2.13.2
+>
