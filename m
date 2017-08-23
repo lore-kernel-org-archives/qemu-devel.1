@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dkWaA-0006lZ-FF
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:24:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1dkWbh-0007ga-PL
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:26:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dkWa6-0000M7-8i
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:24:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36156)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dkWa6-0000Lb-2R
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:24:30 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 07C0A4E4D3
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 14:24:29 +0000 (UTC)
-Date: Wed, 23 Aug 2017 11:24:27 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170823142426.GH27715@localhost.localdomain>
-References: <20170816193218.GF3108@localhost.localdomain>
-	<1502978877-127751-1-git-send-email-imammedo@redhat.com>
-	<20170818174029.GA27715@localhost.localdomain>
-	<20170821103241.2651a5bc@nial.brq.redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dkWbg-0001Pw-Qe
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:26:09 -0400
+References: <20170821161539.11066-1-stefanha@redhat.com>
+	<CAJSP0QWVGVn=vZWZy9isTemndDQrnzUAMO=A7T6W6Oe93ST2DQ@mail.gmail.com>
+	<2217cc17-2638-c7ac-3ac0-6202bb2e4f4f@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <aa8ea653-0ec1-90bb-f8ef-71511dab0a9a@redhat.com>
+Date: Wed, 23 Aug 2017 09:25:55 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170821103241.2651a5bc@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] target-i386: cpu: convert plus/minus
- properties to global properties
+In-Reply-To: <2217cc17-2638-c7ac-3ac0-6202bb2e4f4f@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="HVOot58lo6nhtGP9EiDt6HugEoNNcpTrJ"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] nbd-client: fix hang after
+ server closes connection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,52 +26,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-On Mon, Aug 21, 2017 at 10:32:41AM +0200, Igor Mammedov wrote:
-> On Fri, 18 Aug 2017 14:40:29 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> > On Thu, Aug 17, 2017 at 04:07:56PM +0200, Igor Mammedov wrote:
-> > > Since
-> > >  (commit d4a606b3 i386: Don't override -cpu options on -cpu host/max)
-> > > it became possible to delete hack where it was necessary to
-> > > postpone applying plus/minus features to realize time
-> > > after max_features were applied to keep legacy +-feat
-> > > override semantics.
-> > > 
-> > > With above commit it's possible to convert +-feat to a set
-> > > of GlobalProperty items and keep +-feat override semantics,
-> > > these properties should be added to global list at the end
-> > > to override properties that were set with feat=on|off syntax.
-> > > 
-> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
-> > [...]
-> > > +/* Parse "+feature,-feature,feature=foo" CPU feature string */
-> > >  static void x86_cpu_parse_featurestr(const char *typename, char *features,
-> > >                                       Error **errp)
-> > >  {
-> > > +    /* Compatibily hack to maintain legacy +-feat semantic,
-> > > +     * where +-feat overwrites any feature set by
-> > > +     * feat=on|feat even if the later is parsed after +-feat
-> > > +     * (i.e. "-x2apic,x2apic=on" will result in x2apic disabled)
-> > > +     */
-> > > +    GList *l, *plus_features = NULL, *minus_features = NULL;  
-> > 
-> > The warning about ambiguous CPU options exists since 2.8, I think
-> > this is a good opportunity to get rid of the "[+-]feat overrides
-> > feat=on|off" rule and simplify the parsing code.  Do you want to
-> > do this in the same patch?
-> I'd prefer not to do it in this patch/series, as it's not related.
-> 
-> WE can do cleanups later on top.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HVOot58lo6nhtGP9EiDt6HugEoNNcpTrJ
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ qemu block <qemu-block@nongnu.org>
+Message-ID: <aa8ea653-0ec1-90bb-f8ef-71511dab0a9a@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] nbd-client: fix hang after
+ server closes connection
+References: <20170821161539.11066-1-stefanha@redhat.com>
+ <CAJSP0QWVGVn=vZWZy9isTemndDQrnzUAMO=A7T6W6Oe93ST2DQ@mail.gmail.com>
+ <2217cc17-2638-c7ac-3ac0-6202bb2e4f4f@redhat.com>
+In-Reply-To: <2217cc17-2638-c7ac-3ac0-6202bb2e4f4f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This is not a problem in this patch, but it is a problem when you
-create a generic cpu_legacy_parse_featurestr() function in
-another series.  We should remove that useless feature from the
-function before making it generic.  It has the additional benefit
-of making the resulting patch and code easier to review.
+On 08/21/2017 02:01 PM, Eric Blake wrote:
+> On 08/21/2017 11:27 AM, Stefan Hajnoczi wrote:
+>> On Mon, Aug 21, 2017 at 5:15 PM, Stefan Hajnoczi <stefanha@redhat.com>=
+ wrote:
+>>>   (qemu) quit
+>>>   ...hang...
+>>
+>> By the way, the same issue is present in QEMU 2.9.  This is not a 2.10=
 
--- 
-Eduardo
+>> regression.
+>=20
+> Most likely, though, it IS a regression introduced in 2.9 and not
+> present in 2.8.  I'll add this to my list of 2.11 NBD patches.
+
+Since it looks like we're doing -rc4 and including other NBD patches for
+that, I'm adding this to my 2.10 NBD queue, and will send a pull request
+shortly...
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--HVOot58lo6nhtGP9EiDt6HugEoNNcpTrJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmdkHQACgkQp6FrSiUn
+Q2od/AgAl66fd4AJ7LrkOnqwWJsfP8u+rxp7pDiRKI1CWOFiwEF7c18PFouk34i5
+YBdX8QhbTXtaZYl0pqBLp79krHw5p+IMNDi5wiASy5d3m4nZO5PUevidbV+oRE+E
+pjiWOA/coXBO24JhbwM+/t/xrFrsDfIrSFwEYhddinn6BNL5Qh/fCONLnI05jrAd
+GgKQxm3cHo96h1bWYFrgJASoq/sPrR97fcikzXvfpPohSgXE6SsIbCP17WOmzCLG
+6CTznBKvNghXiXstXDah8Wg/62XmZBDYBEUfD8MVIAAbpDBK/ia0AX8IyMd3D3po
+PSQR/7PVEb5NBOm84ZCq8FAO8ep/dA==
+=04fJ
+-----END PGP SIGNATURE-----
+
+--HVOot58lo6nhtGP9EiDt6HugEoNNcpTrJ--
