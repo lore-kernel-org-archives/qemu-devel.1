@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dkc4r-0001Sq-VF
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 16:16:38 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dkcFS-0007Mq-DL
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 16:27:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dkc4o-0002Mq-Q6
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 16:16:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33970)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dkcFR-0007b9-A0
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 16:27:34 -0400
+Received: from hera.aquilenet.fr ([2a01:474::1]:59603)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dkc4o-0002LD-Gy
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 16:16:34 -0400
-References: <1503506783.3438.19.camel@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <ddb6f49e-6617-a659-08bf-cf093f658a8c@redhat.com>
-Date: Wed, 23 Aug 2017 23:16:27 +0300
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1dkcFR-0007ag-1v
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 16:27:33 -0400
+Date: Wed, 23 Aug 2017 22:27:28 +0200
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20170823202728.dsmitbqt7bsezfgq@var.youpi.perso.aquilenet.fr>
+References: <alpine.LFD.2.20.1708031718030.16909@wniryva>
 MIME-Version: 1.0
-In-Reply-To: <1503506783.3438.19.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.2.20.1708031718030.16909@wniryva>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Number of usable slots in PCIe Root Port / PCIe
- Switch Downstream Port
+Subject: Re: [Qemu-devel] A use-after-free in slirp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,90 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <mapfelba@redhat.com>, laine@laine.org, Lukas Doktor <ldoktor@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: P J P <ppandit@redhat.com>
+Cc: Jan Kiszka <jan.kiszka@siemens.com>, wjjzhang <wjjzhang@tencent.com>, qemu-devel@nongnu.org
 
-On 23/08/2017 19:46, Andrea Bolognani wrote:
-> AFAIK some PCI controllers, particularly:
+Hello,
+
+P J P, on jeu. 03 ao=C3=BBt 2017 17:45:06 +0530, wrote:
+> =3D=3D31922=3D=3DERROR: AddressSanitizer: heap-use-after-free on addres=
+s 0x61400001ff8c at pc 0x56485de28ea0 bp 0x7f00f44fc950 sp 0x7f00f44fc940
+> READ of size 4 at 0x61400001ff8c thread T2
+>     #0 0x56485de28e9f in if_start slirp/if.c:230
+>     #1 0x56485de28a58 in if_output slirp/if.c:141
+>     #2 0x56485de35173 in ip_output slirp/ip_output.c:85
+>     #3 0x56485de57c48 in tcp_respond slirp/tcp_subr.c:218
+>     #4 0x56485de52440 in tcp_input slirp/tcp_input.c:1392
+>     #5 0x56485de329ef in ip_input slirp/ip_input.c:206
+>     #6 0x56485de3cf93 in slirp_input slirp/slirp.c:872
+>     #7 0x56485de0726d in net_slirp_receive net/slirp.c:119
+>     #8 0x56485ddee24d in nc_sendv_compat net/net.c:707
+>     #9 0x56485ddee3dd in qemu_deliver_packet_iov net/net.c:734
+>     #10 0x56485ddf422c in qemu_net_queue_deliver_iov net/queue.c:179
+>     ...
+
+Please don't strip the output :)
+The most interesting part is what exactly freed this.
+
+> A full trace output can be seen
 >=20
->    * PCIe Root Port (pcie-root-port, ioh3420)
->    * PCIe Switch Downstream Port (xio3130-downstream)
->=20
-> only have a single usable slot. libvirt knows about this
-> fact, and will prevent you from adding more than one
-> device to the respective bus.
->=20
-> However, as Luk=C3=A1=C5=A1 recently noticed, QEMU won't complain
-> if you add more devices:
->=20
->    $ qemu-system-x86_64 \
->      -nodefaults -nographic \
->      -M q35 -monitor stdio \
->      -device pcie-root-port,id=3Dpci.1 \
->      -device virtio-scsi-pci,bus=3Dpci.1 \
->      -device virtio-scsi-pci,bus=3Dpci.1
->    QEMU 2.9.0 monitor - type 'help' for more information
->    (qemu) info qtree
->    bus: main-system-bus
->      type System
->      [...]
->      dev: q35-pcihost, id ""
->        [...]
->        bus: pcie.0
->          type PCIE
->          dev: pcie-root-port, id "pci.1"
->            [...]
->            bus: pci.1
->              type PCIE
->              dev: virtio-scsi-pci, id ""
->                [...]
->                addr =3D 01.0
->                bus: virtio-bus
->                  type virtio-pci-bus
->                  dev: virtio-scsi-device, id ""
->                    [...]
->                    bus: scsi.1
->                      type SCSI
->              dev: virtio-scsi-pci, id ""
->                [...]
->                addr =3D 00.0
->                bus: virtio-bus
->                  type virtio-pci-bus
->                  dev: virtio-scsi-device, id ""
->                    [...]
->                    bus: scsi.0
->                      type SCSI
->    (qemu)
->=20
+>   here  -> https://paste.fedoraproject.org/paste/gh~hDctqUQ8uVt6UdG~zbg
 
-Hi Andrea,
+The paste is not available any more. Is it really very large? It's
+usually really better to just send it by mail, so it's archived in the
+mailing list etc.
 
-> As you can see, all devices will show up in the qtree;
-> only the one with addr=3D00.0, however, will actually be
-> visible to the guest OS according to my tests.
->=20
-> Is such a configuration considered valid?=20
-
-Definitely no.
-
->Should QEMU
-> complain loudly about it and refuse to start?=20
-
-Yes, but we need a clean way to do it. Eduardo is working
-on a series that would expose to libvirt this info,
-Eduardo can you please confirm?
-
-Or should
-> libvirt and the guest OS / firmware start allowing it?
->=20
-
-I thought libvirt does not allow it anyway and yes, is a bug,
-but considered low priority.
-I personally hoped Eduardo's work can also help in this direction
-(classifying PCI Buses, we can add a 'rule' to allow only one
-PCIe device per bus.)
-
-But maybe a simple patch preventing QEMU to start would be enough.
-
-Thanks for bringing the issue to my attention,
-Marcel
+Samuel
