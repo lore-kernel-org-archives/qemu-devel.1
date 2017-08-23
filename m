@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkQcd-0004IM-S7
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:02:45 -0400
+	(envelope-from <thuth@redhat.com>) id 1dkQgt-0005dW-TI
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:07:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkQcX-0003xf-SZ
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:02:43 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-7-marcandre.lureau@redhat.com>
-Date: Wed, 23 Aug 2017 10:02:12 +0200
-In-Reply-To: <20170822132255.23945-7-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Tue, 22 Aug 2017 15:22:07 +0200")
-Message-ID: <87mv6qaf0b.fsf@dusky.pond.sub.org>
+	(envelope-from <thuth@redhat.com>) id 1dkQgb-0005gA-S8
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:07:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46756)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dkQgb-0005fD-Ge
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:06:49 -0400
+References: <1503471212-109371-1-git-send-email-borntraeger@de.ibm.com>
+	<cc76787a-e65f-f4e4-de65-7233edc53d3a@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <aef4b38d-eeb2-5c96-32c1-fbeadb9013b5@redhat.com>
+Date: Wed, 23 Aug 2017 10:06:42 +0200
 MIME-Version: 1.0
+In-Reply-To: <cc76787a-e65f-f4e4-de65-7233edc53d3a@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 06/54] qapi: introduce qapi_enum_lookup()
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] configure: enable --s390-pgste linker
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,117 +29,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, "open list:Sheepdog" <sheepdog@lists.wpkg.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <jcody@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Josh Durgin <jdurgin@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "open list:Block Jobs" <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, Liu Yuan <namei.unix@gmail.com>, Jason Wang <jasowang@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>, Peter Lieven <pl@kamp.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Janosch Frank <frankja@linux.vnet.ibm.com>, Christian Ehrhardt <christian.ehrhardt@canonical.com>, Dan Horak <dhorak@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+On 23.08.2017 10:00, David Hildenbrand wrote:
+> On 23.08.2017 08:53, Christian Borntraeger wrote:
+>> KVM guests on s390 need a different page table layout than normal
+>> processes (2kb page table + 2kb page status extensions vs 2kb page table
+>> only). As of today this has to be enabled via the vm.allocate_pgste
+>> sysctl.
+>>
+>> Newer kernels (>= 4.12) on s390 check for an S390_PGSTE program header
+>> and enable the pgste page table extensions in that case. This makes the
+>> vm.allocate_pgste sysctl unnecessary. We enable this program header for
+>> the s390 system emulation (qemu-system-s390x) if we build on s390
+>> - for s390 system emulation
+>> - the linker supports --s390-pgste (binutils >= 2.29)
+>> - KVM is enabled
+>>
+>> This will allow distributions to disable the global vm.allocate_pgste
+>> sysctl, which will improve the page table allocation for non KVM
+>> processes as only 2kb chunks are necessary.
+>>
+>> Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+>> Cc: Alexander Graf <agraf@suse.de>
+>> Cc: Dan Horak <dhorak@redhat.com>
+>> Cc: David Hildenbrand <david@redhat.com>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+>> ---
+>> V1->V2:
+>> 	- provide ld_has function
+>> 	- use ld_has to replace some open coded variants
+>> 	- check target arch and arch for s390
+>> 	- check for s390x before calling the linker
+>>
+>>  configure | 21 ++++++++++++++++++++-
+>>  1 file changed, 20 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/configure b/configure
+>> index dd73cce..0b68b37 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -240,6 +240,11 @@ supported_target() {
+>>      return 1
+>>  }
+>>  
+>> +
+> 
+> I'd drop this new line
+> 
+>> +ld_has() {
+>> +    $ld --help 2>/dev/null | grep ".$1" >/dev/null 2>&1
+>> +}
+>> +
+>>  # default parameters
+>>  source_path=$(dirname "$0")
+>>  cpu=""
+>> @@ -5043,7 +5048,7 @@ fi
+>>  # Use ASLR, no-SEH and DEP if available
+>>  if test "$mingw32" = "yes" ; then
+>>      for flag in --dynamicbase --no-seh --nxcompat; do
+>> -        if $ld --help 2>/dev/null | grep ".$flag" >/dev/null 2>/dev/null ; then
+>> +        if ld_had $flag ; then
+>>              LDFLAGS="-Wl,$flag $LDFLAGS"
+>>          fi
+>>      done
+>> @@ -6522,6 +6527,20 @@ if test "$target_linux_user" = "yes" -o "$target_bsd_user" = "yes" ; then
+>>    ldflags="$ldflags $textseg_ldflags"
+>>  fi
+>>  
+>> +# Newer kernels on s390 check for an S390_PGSTE program header and
+>> +# enable the pgste page table extensions in that case. This makes
+>> +# the vm.allocate_pgste sysctl unnecessary. We enable this program
+>> +# header if
+>> +#  - we build on s390x
+>> +#  - we build the system emulation for s390x (qemu-system-s390x)
+>> +#  - KVM is enabled
+>> +#  - the linker support --s390-pgste
+>> +if test "$TARGET_ARCH" = "s390x" -a "$target_softmmu" = "yes"  -a "$ARCH" = "s390x" -a "$kvm" = "yes"; then
+> 
+> Wonder if the "$ARCH" check is really necessary: TARGET_ARCH=s390x with
+> kvm=yes should only build on s390x.
 
-> This will help with the introduction of a new structure to handle
-> enum lookup.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
-[...]
->  45 files changed, 206 insertions(+), 122 deletions(-)
+Isn't kvm=yes and TARGET_ARCH=s390x also possible on a x86 host, where
+only the x86_64 target is built with CONFIG_KVM=y, but the s390x target
+with CONFIG_KVM=n ?
 
-Hmm.
-
-> diff --git a/include/qapi/util.h b/include/qapi/util.h
-> index 7436ed815c..60733b6a80 100644
-> --- a/include/qapi/util.h
-> +++ b/include/qapi/util.h
-> @@ -11,6 +11,8 @@
->  #ifndef QAPI_UTIL_H
->  #define QAPI_UTIL_H
->=20=20
-> +const char *qapi_enum_lookup(const char * const lookup[], int val);
-> +
->  int qapi_enum_parse(const char * const lookup[], const char *buf,
->                      int max, int def, Error **errp);
->=20=20
-> diff --git a/backends/hostmem.c b/backends/hostmem.c
-> index 4606b73849..c4f795475c 100644
-> --- a/backends/hostmem.c
-> +++ b/backends/hostmem.c
-> @@ -13,6 +13,7 @@
->  #include "sysemu/hostmem.h"
->  #include "hw/boards.h"
->  #include "qapi/error.h"
-> +#include "qapi/util.h"
->  #include "qapi/visitor.h"
->  #include "qapi-types.h"
->  #include "qapi-visit.h"
-> @@ -304,7 +305,7 @@ host_memory_backend_memory_complete(UserCreatable *uc=
-, Error **errp)
->              return;
->          } else if (maxnode =3D=3D 0 && backend->policy !=3D MPOL_DEFAULT=
-) {
->              error_setg(errp, "host-nodes must be set for policy %s",
-> -                       HostMemPolicy_lookup[backend->policy]);
-> +                qapi_enum_lookup(HostMemPolicy_lookup, backend->policy));
->              return;
->          }
->=20=20
-
-Lookup becomes even more verbose.
-
-Could we claw back some readability with macros?  Say in addition to
-
-    typedef enum FOO {
-        ...
-    } FOO;
-
-    extern const char *const FOO_lookup[];
-
-generate
-
-    #define FOO_str(val) qapi_enum_lookup(FOO_lookup, (val))
-
-Needs a matching qapi-code-gen.txt update.
-
-With that, this patch hunk would become
-
-               error_setg(errp, "host-nodes must be set for policy %s",
-  -                       HostMemPolicy_lookup[backend->policy]);
-  +                       HostMemPolicy_str(backend->policy);
-
-Perhaps we could even throw in some type checking:
-
-    #define FOO_str(val) (type_check(typeof((val)), FOO) \
-                          + qapi_enum_lookup(FOO_lookup, (val)))
-
-What do you think?  Want me to explore a fixup patch you could squash
-in?
-
-[Skipping lots of mechanical changes...]
-
-I think you missed test-qobject-input-visitor.c and
-string-input-visitor.c.
-
-In test-qobject-input-visitor.c's test_visitor_in_enum():
-
-        v =3D visitor_input_test_init(data, "%s", EnumOne_lookup[i]);
-
-You update it in PATCH 12, but the code only works as long as EnumOne
-has no holes.  Mapping the enum to string like we do everywhere else in
-this patch would be cleaner.
-
-The loop control also subscripts EnumOne_lookup[i].  You take care of
-that one in PATCH 12.  That's okay.
-
-Same for test-string-input-visitor.c's test_visitor_in_enum().
-
-There's one more in test_native_list_integer_helper():
-
-    g_string_append_printf(gstr_union,  "{ 'type': '%s', 'data': [ %s ] }",
-                           UserDefNativeListUnionKind_lookup[kind],
-                           gstr_list->str);
-
-Same story.
-
-The patch doesn't touch the _lookup[] subscripts you're going to replace
-by qapi_enum_parse() in PATCH 07-11.  Understand, but I'd reorder the
-patches: first replace by qapi_enum_parse(), because DRY (no need to
-explain more at that point).  Then get rid of all the remaining
-subscripting into _lookup[], i.e. this patch (explain it helps the next
-one), then PATCH 12.
+ Thomas
