@@ -1,36 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkR8q-0000UQ-Fl
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:36:01 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dkRCC-0002QB-Ug
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:39:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkR8n-0005JR-De
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:36:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43258)
+	(envelope-from <cohuck@redhat.com>) id 1dkRC9-0006tj-Rg
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:39:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56576)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dkR8n-0005Ik-5H
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:35:57 -0400
-References: <20170816082650.21880-1-cohuck@redhat.com>
-	<223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
-	<CAFEAcA_UfM_XNKdc5zfHsehoRE6Q+EszRZX3FByskir7c+0Lww@mail.gmail.com>
-	<20170822010917.GO12356@umbus.fritz.box>
-	<CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
-	<3f0dc918-0f55-e2f4-bf47-fe4abf5453bb@redhat.com>
-	<CAFEAcA_ezKWweEuUB-cXTer0LLaeuiGDkSdfhApedhw4ykDT0Q@mail.gmail.com>
-	<20170822112046.GC12356@umbus.fritz.box>
-	<20170822134815.77020eb8.cohuck@redhat.com>
-	<20170823002907.GC5379@umbus.fritz.box>
-	<20170823091650.48e7c44e.cohuck@redhat.com>
-	<54526d47-b436-79d5-7a38-9516eaa727a6@redhat.com>
-	<5b0ff74a-08d6-558d-4c79-a93758e6302a@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <0bb344a3-f8f8-3365-cef1-1c68cf7d160d@redhat.com>
-Date: Wed, 23 Aug 2017 10:35:43 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dkRC9-0006tb-Kb
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:39:25 -0400
+Date: Wed, 23 Aug 2017 10:39:18 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170823103918.3a2a87a5.cohuck@redhat.com>
+In-Reply-To: <4e463848-3be4-1b31-c2d9-04ef32d79925@redhat.com>
+References: <1503471212-109371-1-git-send-email-borntraeger@de.ibm.com>
+	<cc76787a-e65f-f4e4-de65-7233edc53d3a@redhat.com>
+	<aef4b38d-eeb2-5c96-32c1-fbeadb9013b5@redhat.com>
+	<4e463848-3be4-1b31-c2d9-04ef32d79925@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5b0ff74a-08d6-558d-4c79-a93758e6302a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] make check speed
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] configure: enable --s390-pgste linker
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,49 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Dan Horak <dhorak@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Christian Ehrhardt <christian.ehrhardt@canonical.com>, Alexander Graf <agraf@suse.de>
 
-On 23.08.2017 10:01, Paolo Bonzini wrote:
-> On 23/08/2017 09:49, Thomas Huth wrote:
->> While we're at it: I'd like to have a "make check-fast", too. Sometime=
-s
->> the normal "make check" is already too slow, e.g. while developing new
->> patches, I sometimes just want to do a very quick sanity test to see
->> whether I broke some basic things or not, and only do the "make check"
->> before I submit my patches.
->> So we would get three stages:
->>
->> - make check-fast =3D> For very, very quick sanity tests only
->>
->> - make check =3D> E.g. has to be run before submitting patches
->>
->> - make check-harder =3D> might run a very long time, so best suited fo=
-r
->>                        nightly regression tests etc.?
->>
->> Does that sound reasonable? And the crucial question: Who is going to
->> implement the basic framework for this?
->=20
-> There's already make check-unit or make check-qtest-x86_64 depending on
-> what you're working on.
+On Wed, 23 Aug 2017 10:16:27 +0200
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-True. And I just learned that you can also already set the SPEED
-variable to either "quick" or "slow" and that we're already using
-g_test_quick() and g_test_slow() in a couple of places to check this. So
-the framework for running quick vs. thorough tests is already there ...
-we just might want to add this to some more tests, I guess...
+> On 23/08/2017 10:06, Thomas Huth wrote:
+> > On 23.08.2017 10:00, David Hildenbrand wrote:  
+> >> On 23.08.2017 08:53, Christian Borntraeger wrote:  
 
-Question for the maintainers and the test automation folks: Is anybody
-already running "make check SPEED=3Dslow" or is this just rather an
-unheard-of way of running the tests?
+> >>> @@ -6522,6 +6527,20 @@ if test "$target_linux_user" = "yes" -o "$target_bsd_user" = "yes" ; then
+> >>>    ldflags="$ldflags $textseg_ldflags"
+> >>>  fi
+> >>>  
+> >>> +# Newer kernels on s390 check for an S390_PGSTE program header and
+> >>> +# enable the pgste page table extensions in that case. This makes
+> >>> +# the vm.allocate_pgste sysctl unnecessary. We enable this program
+> >>> +# header if
+> >>> +#  - we build on s390x
+> >>> +#  - we build the system emulation for s390x (qemu-system-s390x)
+> >>> +#  - KVM is enabled
+> >>> +#  - the linker support --s390-pgste
+> >>> +if test "$TARGET_ARCH" = "s390x" -a "$target_softmmu" = "yes"  -a "$ARCH" = "s390x" -a "$kvm" = "yes"; then  
+> >>
+> >> Wonder if the "$ARCH" check is really necessary: TARGET_ARCH=s390x with
+> >> kvm=yes should only build on s390x.  
+> > 
+> > Isn't kvm=yes and TARGET_ARCH=s390x also possible on a x86 host, where
+> > only the x86_64 target is built with CONFIG_KVM=y, but the s390x target
+> > with CONFIG_KVM=n ?  
+> 
+> Yes.  You could use
+> 
+>   if test "$ARCH" = "s390x" && supported_kvm_target $target; then
+>     ...
+>   fi
+> 
+> Or, in the existing "if supported_kvm_target $target" conditional, add
+> 
+>   if test "$ARCH" = s390x && ld_has --s390-pgste; then
+>     ...
+>   fi
 
-> If you have a many-core machine, of course, there's no simpler solution
-> than throwing more CPUs at it. :)
-
-Is it safe nowadays to run "make check -j4" for example? Last time I
-tried (maybe 1 or 2 years ago), there were still issues since some tests
-were using hard-coded temporary file names, so the parallel tests were
-disturbing each other, for example...
-
- Thomas
+That conditional is unfortunately before the setup of ldflags; but I
+like the idea of using supported_kvm_target.
