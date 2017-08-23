@@ -1,27 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkRaI-0008Ee-Rl
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 05:04:27 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dkRc4-0000j1-A5
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 05:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkRaC-0003GN-V2
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 05:04:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47472)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dkRaC-0003GA-Lb
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 05:04:16 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-8-marcandre.lureau@redhat.com>
-Date: Wed, 23 Aug 2017 11:04:09 +0200
-In-Reply-To: <20170822132255.23945-8-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Tue, 22 Aug 2017 15:22:08 +0200")
-Message-ID: <87a82q7j06.fsf@dusky.pond.sub.org>
+	(envelope-from <borntraeger@de.ibm.com>) id 1dkRbz-0004U6-Ap
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 05:06:12 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36313)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dkRbz-0004R4-0w
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 05:06:07 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7N94VUl038072
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 05:06:05 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ch1u1het4-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 05:06:05 -0400
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 23 Aug 2017 10:06:02 +0100
+References: <1503471212-109371-1-git-send-email-borntraeger@de.ibm.com>
+	<cc76787a-e65f-f4e4-de65-7233edc53d3a@redhat.com>
+	<aef4b38d-eeb2-5c96-32c1-fbeadb9013b5@redhat.com>
+	<4e463848-3be4-1b31-c2d9-04ef32d79925@redhat.com>
+	<20170823103918.3a2a87a5.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Wed, 23 Aug 2017 11:05:59 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170823103918.3a2a87a5.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 07/54] tpm: simplify driver registration
- & lookup
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <2e1e1593-9135-7328-5b75-04e4714a3eed@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2] configure: enable --s390-pgste linker
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,167 +46,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanb@us.ibm.com
+To: Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Dan Horak <dhorak@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Christian Ehrhardt <christian.ehrhardt@canonical.com>, Alexander Graf <agraf@suse.de>
 
-Note: cc'ing the code's author.
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-> Make be_drivers[n] match order of TpmType enum.
->
-> Use qapi_enum_parse() in tpm_get_backend_driver.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  include/sysemu/tpm_backend.h |  2 +-
->  tpm.c                        | 42 ++++++++++++--------------------------=
-----
->  2 files changed, 13 insertions(+), 31 deletions(-)
+On 08/23/2017 10:39 AM, Cornelia Huck wrote:
+> On Wed, 23 Aug 2017 10:16:27 +0200
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
+>> On 23/08/2017 10:06, Thomas Huth wrote:
+>>> On 23.08.2017 10:00, David Hildenbrand wrote:  
+>>>> On 23.08.2017 08:53, Christian Borntraeger wrote:  
+> 
+>>>>> @@ -6522,6 +6527,20 @@ if test "$target_linux_user" = "yes" -o "$target_bsd_user" = "yes" ; then
+>>>>>    ldflags="$ldflags $textseg_ldflags"
+>>>>>  fi
+>>>>>  
+>>>>> +# Newer kernels on s390 check for an S390_PGSTE program header and
+>>>>> +# enable the pgste page table extensions in that case. This makes
+>>>>> +# the vm.allocate_pgste sysctl unnecessary. We enable this program
+>>>>> +# header if
+>>>>> +#  - we build on s390x
+>>>>> +#  - we build the system emulation for s390x (qemu-system-s390x)
+>>>>> +#  - KVM is enabled
+>>>>> +#  - the linker support --s390-pgste
+>>>>> +if test "$TARGET_ARCH" = "s390x" -a "$target_softmmu" = "yes"  -a "$ARCH" = "s390x" -a "$kvm" = "yes"; then  
+>>>>
+>>>> Wonder if the "$ARCH" check is really necessary: TARGET_ARCH=s390x with
+>>>> kvm=yes should only build on s390x.  
+>>>
+>>> Isn't kvm=yes and TARGET_ARCH=s390x also possible on a x86 host, where
+>>> only the x86_64 target is built with CONFIG_KVM=y, but the s390x target
+>>> with CONFIG_KVM=n ?  
+>>
+>> Yes.  You could use
+>>
+>>   if test "$ARCH" = "s390x" && supported_kvm_target $target; then
+>>     ...
+>>   fi
+>>
+>> Or, in the existing "if supported_kvm_target $target" conditional, add
+>>
+>>   if test "$ARCH" = s390x && ld_has --s390-pgste; then
+>>     ...
+>>   fi
+> 
+> That conditional is unfortunately before the setup of ldflags; but I
+> like the idea of using supported_kvm_target.
 
-Before the patch, we have a strict separation between enum TpmModel /
-tpm_models[] and enum TpmType / be_drivers[]:
+This is now bike-shedding, no? :-)
+I think I prefer to write out the the single statements as is.
+I would need to test for supported_kvm_target AND s390 anyway, to prevent
+checking ld on x86 as well.
 
-* TpmModel may have any number of members.  It just happens to have one.
+So unless there are complains, I will provide a v3 with the typo fixed.
 
-* Same for TpmType.
-
-* tpm_models[] may have any number of elements.  It just happens to have
-  the same number of elements as TpmModel has members.
-
-  If it had more, they'd be wasted: tpm_register_model() can't use more
-  than one per TpmModel member.  If it had fewer, tpm_register_model()
-  could fail.  Its caller ignores failure.
-
-* be_drivers[] is different: tpm_register_driver() happily adds drivers
-  as long as be_drivers[] has space.  Its caller ignores failure.
-
-  If you register more than one with a given TpmType,
-  tpm_driver_find_by_type(), tpm_get_backend_driver() will find only the
-  one one that registered first.  tpm_display_backend_drivers() happily
-  shows all of them.
-
-* The order of TpmModel members and tpm_models[] elements is
-  independent.  The former is fixed in the QAPI schema, the latter is
-  determined by registration order, which is unspecified.
-
-  Corollary: using a TpmModel to subscript tpm_models[] is wrong.
-=20=20
-* Same for TpmType and be_drivers[]: using a TpmType to subscript
-  be_drivers[] is wrong.
-
-Hard to tell whether this is / has become more a case of overengineering
-or more a case of under-make-sense-ing.
-
-> diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
-> index b58f52d39f..1d21c6b19b 100644
-> --- a/include/sysemu/tpm_backend.h
-> +++ b/include/sysemu/tpm_backend.h
-> @@ -227,6 +227,6 @@ TPMBackend *qemu_find_tpm(const char *id);
->=20=20
->  const TPMDriverOps *tpm_get_backend_driver(const char *type);
->  int tpm_register_model(enum TpmModel model);
-> -int tpm_register_driver(const TPMDriverOps *tdo);
-> +void tpm_register_driver(const TPMDriverOps *tdo);
->=20=20
->  #endif
-> diff --git a/tpm.c b/tpm.c
-> index c3b731b3f2..f175661bfe 100644
-> --- a/tpm.c
-> +++ b/tpm.c
-> @@ -26,9 +26,8 @@ static QLIST_HEAD(, TPMBackend) tpm_backends =3D
->=20=20
->=20=20
->  #define TPM_MAX_MODELS      1
-> -#define TPM_MAX_DRIVERS     1
->=20=20
-> -static TPMDriverOps const *be_drivers[TPM_MAX_DRIVERS] =3D {
-> +static TPMDriverOps const *be_drivers[TPM_TYPE__MAX] =3D {
->      NULL,
->  };
->=20=20
-> @@ -64,31 +63,18 @@ static bool tpm_model_is_registered(enum TpmModel mod=
-el)
->=20=20
->  const TPMDriverOps *tpm_get_backend_driver(const char *type)
->  {
-> -    int i;
-> +    int i =3D qapi_enum_parse(TpmType_lookup, type, TPM_TYPE__MAX, -1, N=
-ULL);
->=20=20
-> -    for (i =3D 0; i < TPM_MAX_DRIVERS && be_drivers[i] !=3D NULL; i++) {
-> -        if (!strcmp(TpmType_lookup[be_drivers[i]->type], type)) {
-> -            return be_drivers[i];
-> -        }
-> -    }
-> -
-> -    return NULL;
-> +    return i >=3D 0 ? be_drivers[i] : NULL;
->  }
->=20=20
->  #ifdef CONFIG_TPM
->=20=20
-> -int tpm_register_driver(const TPMDriverOps *tdo)
-> +void tpm_register_driver(const TPMDriverOps *tdo)
->  {
-> -    int i;
-> +    assert(!be_drivers[tdo->type]);
->=20=20
-> -    for (i =3D 0; i < TPM_MAX_DRIVERS; i++) {
-> -        if (!be_drivers[i]) {
-> -            be_drivers[i] =3D tdo;
-> -            return 0;
-> -        }
-> -    }
-> -    error_report("Could not register TPM driver");
-> -    return 1;
-> +    be_drivers[tdo->type] =3D tdo;
->  }
->=20=20
->  /*
-> @@ -101,9 +87,12 @@ static void tpm_display_backend_drivers(void)
->=20=20
->      fprintf(stderr, "Supported TPM types (choose only one):\n");
->=20=20
-> -    for (i =3D 0; i < TPM_MAX_DRIVERS && be_drivers[i] !=3D NULL; i++) {
-> +    for (i =3D 0; i < TPM_TYPE__MAX; i++) {
-> +        if (be_drivers[i] =3D=3D NULL) {
-> +            continue;
-> +        }
->          fprintf(stderr, "%12s   %s\n",
-> -                qapi_enum_lookup(TpmType_lookup, be_drivers[i]->type),
-> +                qapi_enum_lookup(TpmType_lookup, i),
->                  be_drivers[i]->desc());
->      }
->      fprintf(stderr, "\n");
-> @@ -241,14 +230,7 @@ int tpm_config_parse(QemuOptsList *opts_list, const =
-char *optarg)
->=20=20
->  static const TPMDriverOps *tpm_driver_find_by_type(enum TpmType type)
->  {
-> -    int i;
-> -
-> -    for (i =3D 0; i < TPM_MAX_DRIVERS && be_drivers[i] !=3D NULL; i++) {
-> -        if (be_drivers[i]->type =3D=3D type) {
-> -            return be_drivers[i];
-> -        }
-> -    }
-> -    return NULL;
-> +    return be_drivers[type];
->  }
->=20=20
->  static TPMInfo *qmp_query_tpm_inst(TPMBackend *drv)
-
-You kill the separation of TpmType and be_drivers[]: TpmType values
-become valid subscripts of be_drivers[].  Good!
-
-You don't touch TpmModel and tpm_models[].  Half of the mess remains in
-place to confuse the next reader (it certainly confused me, thus the
-long "before the patch" treatise).  Not wrong, therefore
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-
-but could you complete the cleanup job?  Pretty-please?
-
-Also: since I wrote the "before the patch" treatise already, could (some
-of) it be worked into the commit message?
+Christian
