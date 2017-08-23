@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dkTx3-0003RE-QD
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 07:36:03 -0400
+	(envelope-from <revol@free.fr>) id 1dkU51-0005Lt-IP
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 07:44:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dkTx0-0002eJ-MU
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 07:36:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:15838)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dkTx0-0002dt-Fu
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 07:35:58 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4ABE040431B
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 11:35:57 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170823111832.GC19071@pxdev.xzpeter.org> (Peter Xu's message of
-	"Wed, 23 Aug 2017 19:18:32 +0800")
-References: <20170823083901.852-1-quintela@redhat.com>
-	<20170823083901.852-2-quintela@redhat.com>
-	<20170823111832.GC19071@pxdev.xzpeter.org>
-Reply-To: quintela@redhat.com
-Date: Wed, 23 Aug 2017 13:35:53 +0200
-Message-ID: <87r2w2ldnq.fsf@secure.mitica>
+	(envelope-from <revol@free.fr>) id 1dkU4x-0007y7-7Z
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 07:44:15 -0400
+References: <cover.1503249785.git.balaton@eik.bme.hu>
+	<ab632ef70b02efb2257d9e2f08b45b097ebacb3a.1503249785.git.balaton@eik.bme.hu>
+	<20170823041644.GP5379@umbus.fritz.box>
+	<alpine.BSF.2.21.1708231217070.76247@zero.eik.bme.hu>
+From: =?UTF-8?Q?Fran=c3=a7ois_Revol?= <revol@free.fr>
+Message-ID: <8fe81d01-0a39-02cc-c7d8-59437c4f94ac@free.fr>
+Date: Wed, 23 Aug 2017 13:43:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/2] tests: Use real size for iov tests
+In-Reply-To: <alpine.BSF.2.21.1708231217070.76247@zero.eik.bme.hu>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Language: fr
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 15/15] ppc: Add aCube Sam460ex board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,71 +26,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com, pbonzini@redhat.com
+To: BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
 
-Peter Xu <peterx@redhat.com> wrote:
-> On Wed, Aug 23, 2017 at 10:39:00AM +0200, Juan Quintela wrote:
->> We were using -1 instead of the real size because the functions check
->> what is bigger, size in bytes or the size of the iov.  Recent gcc's
->> barf at this.
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> ---
->>  tests/test-iov.c | 8 ++++----
->>  1 file changed, 4 insertions(+), 4 deletions(-)
->> 
->> diff --git a/tests/test-iov.c b/tests/test-iov.c
->> index a22d71fd2c..819c410a51 100644
->> --- a/tests/test-iov.c
->> +++ b/tests/test-iov.c
->> @@ -81,17 +81,17 @@ static void test_to_from_buf_1(void)
->>            * skip whole vector and process exactly 0 bytes */
->>  
->>           /* first set bytes [i..sz) to some "random" value */
->> -         n = iov_memset(iov, niov, 0, 0xff, -1);
->> +         n = iov_memset(iov, niov, 0, 0xff, sz);
->
-> This one is not needed?
+Le 23/08/2017 =E0 13:12, BALATON Zoltan a =E9crit :
+>> What's the connection with mips_malta?
+>=20
+> The board's firmware wants to see SPD EEPROMs of the connected memory
+> while initialising the memory controller. This is why we need to
+> implement SDRAM controller, I2C and SPD EEPROMs. MIPS malta board had
+> already SPD EEPROM implementation so this is based on that. The comment
+> just indicates where this code comes from.
 
-Not, but it is for consistence.  iov_memset() has that property, that it
-memset whatever is smaller, bytes parameter or iov size.
+Indeed, and I copy-pasted from elsewhere for this.
 
+>>> +        fprintf(stderr, "qemu: Error registering flash memory.\n");
+>>
+>> Use error_report() instead, please.
 
->>                * with j in [i..sz]. */
->>  
->>               /* clear iovec */
->> -             n = iov_memset(iov, niov, 0, 0xff, -1);
->> +             n = iov_memset(iov, niov, 0, 0xff, sz);
->
-> This one as well?
+I guess this didn't exist back when I started writing it...
 
-I decided to change all of them for consistence.
+>>> +/* Create reset TLB entries for BookE, mapping only the flash
+>>> memory.  */
+>>> +static void mmubooke_create_initial_mapping_uboot(CPUPPCState *env)
+>>> +{
+>>> +    ppcemb_tlb_t *tlb =3D &env->tlb.tlbe[0];
+>>> +
+>>> +    /* on reset the flash is mapped by a shadow TLB,
+>>> +     * but since we don't implement them we need to use
+>>> +     * the same values U-Boot will use to avoid a fault.
+>>> +     */
+>>
+>> Usually the reset state of the MMU is handled in the cpu code rather
+>> than the board code.  Is there a specific reason you need it in the
+>> board code here?
+>=20
+> I'm not sure, probably lack of a better place. The ppc440_bamboo board
+> this is based on has it the same way in the board code. Maybe this coul=
+d
+> be cleaned up when someone wants to QOMify the SoC models sometimes.
 
-Using -1 is a trick that just happens to work for current
-implementation, but it is a hack.  and we have just after that an assert
-with the real size that we want to copy.  Just use them everywhere.
+Thing is, the code allows both booting with U-Boot and with a kernel
+directly, and the MMU mapping differ in those cases.
 
->
-> Actually I think we can keep the two places above, but there seems to
-> be a 3rd one below which is untouched.  If we do change the two, maybe
-> we'd better change the 3rd one as well.
+Maybe the CPU reset should use the U-Boot setup and the kernel boot
+would just overwrite it?
 
-Opps, didn't saw that other.  With this changes it fixed all for me.
+>>> +        env->nip =3D bi->entry;
+>>> +
+>>> +        /* Create a mapping for the kernel.  */
+>>> +        mmubooke_create_initial_mapping(env, 0, 0);
+>>> +        env->gpr[6] =3D tswap32(EPAPR_MAGIC);
+>>
+>> I'm pretty sure the tswap can't be right here.  env->gpr is in host
+>> native order and I'd expect the constant to be as well.
+>=20
+> I know nothing about this, maybe Francois remembers why it's there. But
+> booting linux with -kernel works so it's probably either correct or doe=
+s
+> not matter.
 
+Absolutely no idea. It seems to be there from the first commit in my own
+history here.
 
+I don't recall testing booting linux at all though.
+Linux does check the magic, so it'd be weird if it booted:
 
-> Besides:
->
-> Reviewed-by: Peter Xu <peterx@redhat.com>
+https://github.com/torvalds/linux/blob/master/arch/powerpc/boot/epapr.c
 
-Thanks, Juan.
+But maybe it got added later than the version you tested?
 
+At least my current Haiku port ignores the magic for now.
 
->
->>               g_assert(n == sz);
->>  
->>               /* copy bytes [i..j) from ibuf to iovec */
->> -- 
->> 2.13.5
->> 
+>>> +        env->gpr[7] =3D (16 << 20) - 8; /*bi->ima_size;*/
+>>
+>> So, entering the kernel directly can be useful, particularly during
+>> early development.  However, having both firmware and non-firmware
+>> entry paths can lead to confusing bugs if there's a subtle difference
+>> between the initial (to the kernel) states between the two paths.  For
+>> that reason, the usual preferred way to implement -kernel is to still
+>> run the usual firmware, but use some way of telling it to boot
+>> immediately into the supplied kernel.
+>>
+>> I won't object to merging it this way - just a wanrning that this may
+>> bite you in the future if you're not careful.
+>=20
+> Warning taken, at this point until firmware cannot reliably boot things
+> having another way to test is useful to have. In the future when bootin=
+g
+> via firmware works well we can figure out what to do with this.
+
+Possibly we could dig the U-Boot environment...
+
+>>> +    memory_region_init_alias(isa, NULL, "isa_mmio", get_system_io(),
+>>> +                             0, 0x10000);
+>>> +    memory_region_add_subregion(get_system_memory(), 0xc08000000, is=
+a);
+>>
+>> Does it really make sense to just embed the ISA IO space here, rather
+>> than actually instanting a PCI<->ISA bridge?
+>=20
+> I'm not sure if this is correct but I don't know how it's handled on
+> real hardware. The board does not have ISA and I don't think it has a
+> bridge but the IO space appears at this location according to the
+> datasheet (In System Memory Address Map it's listed as PCI I/O
+> 0xc08000000-0xc0800ffff) and clients expect PCI card's io registers to
+> be accessible here. If anyone knows how it's done on real hardware and
+> if there's a better way to model this please let me know.
+
+Indeed it's the PCI I/O space, maybe it's just copy-paste error.
+
+As for how to declare it, keep in mind this code is years old and I
+fixed it several times when compilation broke, without really reading
+the documentation (actually, do we have proper documentation for the
+internal API?), and it kept changing over the years.
+
+>=20
+>>> +    /* PCI devices */
+>>> +    pci_create_simple(pci_bus, PCI_DEVFN(6, 0), "sm501");
+>>> +    /* SoC has a single SATA port but we don't emulate that yet
+>>> +     * However, firmware and usual clients have driver for SiI311x
+>>> +     * so add one for convenience by default */
+>>> +    pci_create_simple(pci_bus, -1, "sii3112");
+>>
+>> You should probably not create this when started with -nodefaults.
+>=20
+> We don't emulate the on-board SATA port of the SoC and without this
+> there's no other way to connect disks (maybe over USB, but firmware has
+> a bug which prevents that too even on real hardware AFAIK, I've
+> backported a fix which made booting from USB work but that broke
+> keyboard) so while this is an external card it's pretty much unusable
+> without this so it's added by default.
+
+Maybe add a /*TODO*/ then?
+
+Fran=E7ois.
