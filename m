@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dkXLf-00047M-7F
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:13:40 -0400
+	(envelope-from <eblake@redhat.com>) id 1dkXM6-0004Ne-AF
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:14:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dkXLZ-0005Un-Lb
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:13:39 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:37423)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dkXLZ-0005UC-Dt
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:13:33 -0400
-Received: by mail-wm0-x229.google.com with SMTP id b189so1086440wmd.0
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 08:13:33 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1dkXM2-0005f0-BR
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:14:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58870)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dkXM2-0005eW-1j
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 11:14:02 -0400
+References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
+	<150350012253.19046.4268047906681155989.malone@chaenomeles.canonical.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d299b9c5-c380-4420-06b5-80dea66b0688@redhat.com>
+Date: Wed, 23 Aug 2017 10:13:59 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170823144734.0a5f920c@nial.brq.redhat.com>
-References: <20170818190943.23858-1-ehabkost@redhat.com>
-	<20170823144734.0a5f920c@nial.brq.redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 23 Aug 2017 16:13:11 +0100
-Message-ID: <CAFEAcA8WoyX6NcLxJPqLb1h70sSAguXykriEXR04-pJNDUYXMA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH for-2.10] numa: Move
- numa_legacy_auto_assign_ram to pc-i440fx-2.9
+In-Reply-To: <150350012253.19046.4268047906681155989.malone@chaenomeles.canonical.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="F4mmUCar1gxJvLgc4nOB11pgqusaO2gRn"
+Subject: Re: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with
+ qemu 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Bug 1711602 <1711602@bugs.launchpad.net>, qemu-devel@nongnu.org
 
-On 23 August 2017 at 13:47, Igor Mammedov <imammedo@redhat.com> wrote:
-> On Fri, 18 Aug 2017 16:09:43 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
->
->> The 'm->numa_auto_assign_ram = numa_legacy_auto_assign_ram;' line
->> was supposed to be in pc_i440fx_2_9_machine_options() (see commit
->> 3bfe5716 "numa: equally distribute memory on nodes"), but the
->> merge commit adb354dd ("Merge remote-tracking branch
->> 'mst/tags/for_upstream' into staging") moved it to the
->> pc_i440fx_2_10_machine_options().
->>
->> Move the line back to pc_i440fx_2_9_machine_options().
->>
->> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
->
->
-> Peter,
->
-> Could you merge this mis-merge fix as well for rc4?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--F4mmUCar1gxJvLgc4nOB11pgqusaO2gRn
+From: Eric Blake <eblake@redhat.com>
+To: Bug 1711602 <1711602@bugs.launchpad.net>, qemu-devel@nongnu.org
+Message-ID: <d299b9c5-c380-4420-06b5-80dea66b0688@redhat.com>
+Subject: Re: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with
+ qemu 2.10
+References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
+ <150350012253.19046.4268047906681155989.malone@chaenomeles.canonical.com>
+In-Reply-To: <150350012253.19046.4268047906681155989.malone@chaenomeles.canonical.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Sure, applied to master.
+On 08/23/2017 09:55 AM, ChristianEhrhardt wrote:
+> Ok, clarified with Stefanha
+> It has exactly the same title as a series of 18th August which was rela=
+ted to a similar issue.
+> It is about an hour old now on qemu-devel, quoting
+>=20
+> "This fixes the issue reported as
+> https://bugs.launchpad.net/bugs/1711602
+>=20
+> Fam Zheng (3):
+>   block-backend: Refactor inactivate check
+>   block-backend: Allow more "can inactivate" cases
+>   mirror: Mark target BB as "force allow inactivate"
+>=20
+> Stefan Hajnoczi (1):
+>   block: Update open_flags after ->inactivate() callback"
+>=20
+>=20
+> I'll prep a build with that and test as well
 
-thanks
--- PMM
+Here's what is brewing for my pull request, although if you can
+successfully test things, I'm happy to add a Tested-by: tag before
+actually sending the pull request:
+
+git fetch  git://repo.or.cz/qemu/ericb.git nbd
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--F4mmUCar1gxJvLgc4nOB11pgqusaO2gRn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmdm7cACgkQp6FrSiUn
+Q2ql0wgAlCxh32IoZ3PRqrn71WMohuvIxcJqoIrNlcM/MXeuWkAoNlm7y9oLhA+7
+n5Q5+2J+3woXYdChf3YfkLcsjd9iyLSE7rnsf+O8eyaF1afbv/+zwJuzonYt7ewQ
+GIlbCz03xgOTe7hKRaBqtKaTQkAq7pq6r8+p/mm2hQU08tSL/BLr+8sF2UPYFiAd
+tYnobidM2z4F2DJYTzDITP+zb7pbc19yMpAOjL2ApFeUBoEn6MS019ZIGAGrT2AN
+xvm+bjwQjhnWiIxnSnVaPPaU8GaQ5GSHqUwe5TOck7JHAjyrYPAiACIkinoQfO4y
+Y6bCsMab5waIqJcILbJTPQYP8rnhkQ==
+=mwSN
+-----END PGP SIGNATURE-----
+
+--F4mmUCar1gxJvLgc4nOB11pgqusaO2gRn--
