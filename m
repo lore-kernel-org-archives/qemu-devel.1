@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dkYOS-0005Kt-Et
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dkYOS-0005LO-Fm
 	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:20:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dkYOR-0006wK-6O
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dkYOP-0006sq-27
 	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:20:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50012)
+Received: from mx1.redhat.com ([209.132.183.28]:33542)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dkYOQ-0006uN-TU
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:20:35 -0400
+	id 1dkYOO-0006rr-Pg
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:20:32 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 23 Aug 2017 18:19:44 +0200
-Message-Id: <20170823162004.27337-8-marcandre.lureau@redhat.com>
+Date: Wed, 23 Aug 2017 18:19:43 +0200
+Message-Id: <20170823162004.27337-7-marcandre.lureau@redhat.com>
 In-Reply-To: <20170823162004.27337-1-marcandre.lureau@redhat.com>
 References: <20170823162004.27337-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 07/27] vhost-user-scsi: use glib allocation
+Subject: [Qemu-devel] [PATCH 06/27] vhost-user-scsi: code style fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,123 +30,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: changpeng.liu@intel.com, felipe@nutanix.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Use g_new/g_free instead of plain malloc. This simplify a bit memory
-handling since glib will abort if it cannot allocate.
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- contrib/vhost-user-scsi/vhost-user-scsi.c | 35 ++++++++-----------------=
-------
- 1 file changed, 9 insertions(+), 26 deletions(-)
+ contrib/vhost-user-scsi/vhost-user-scsi.c | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
 diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-us=
 er-scsi/vhost-user-scsi.c
-index 8d6ff18cc4..f3fc8c23c6 100644
+index cddaaf8995..8d6ff18cc4 100644
 --- a/contrib/vhost-user-scsi/vhost-user-scsi.c
 +++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
-@@ -312,12 +312,7 @@ static struct scsi_task *scsi_task_new(int cdb_len, =
-uint8_t *cdb, int dir,
+@@ -305,7 +305,8 @@ fail:
+ }
+=20
+ static struct scsi_task *scsi_task_new(int cdb_len, uint8_t *cdb, int di=
+r,
+-                                       int xfer_len) {
++                                       int xfer_len)
++{
+     struct scsi_task *task;
+=20
      assert(cdb_len > 0);
-     assert(cdb);
-=20
--    task =3D calloc(1, sizeof(struct scsi_task));
--    if (!task) {
--        PERR("Error allocating task: %s", strerror(errno));
--        return NULL;
--    }
--
-+    task =3D g_new0(struct scsi_task, 1);
-     memcpy(task->cdb, cdb, cdb_len);
-     task->cdb_size =3D cdb_len;
-     task->xfer_dir =3D dir;
-@@ -393,10 +388,6 @@ static int handle_cmd_sync(struct iscsi_context *ctx=
-,
-     }
-=20
-     task =3D scsi_task_new(cdb_len, req->cdb, dir, len);
--    if (!task) {
--        PERR("Unable to create iscsi task");
--        return -1;
--    }
-=20
-     if (dir =3D=3D SCSI_XFER_TO_DEV) {
-         task->iovector_out.iov =3D (struct scsi_iovec *)out;
-@@ -410,7 +401,7 @@ static int handle_cmd_sync(struct iscsi_context *ctx,
-          cdb_len, dir, task);
-     if (!iscsi_scsi_command_sync(ctx, 0, task, NULL)) {
-         PERR("Error serving SCSI command");
--        free(task);
-+        g_free(task);
-         return -1;
-     }
-=20
-@@ -425,7 +416,7 @@ static int handle_cmd_sync(struct iscsi_context *ctx,
-         memcpy(rsp->sense, &task->datain.data[2], rsp->sense_len);
-     }
-=20
--    free(task);
-+    g_free(task);
-=20
-     PDBG("Filled in rsp: status=3D%hhX, resid=3D%u, response=3D%hhX, sen=
-se_len=3D%u",
-          rsp->status, rsp->resid, rsp->response, rsp->sense_len);
-@@ -692,7 +683,7 @@ static vhost_scsi_dev_t *vdev_scsi_find_by_vu(VuDev *=
-vu_dev)
-     return NULL;
+@@ -344,7 +345,8 @@ static int handle_cmd_sync(struct iscsi_context *ctx,
+                            VirtIOSCSICmdReq *req,
+                            struct iovec *out, unsigned int out_len,
+                            VirtIOSCSICmdResp *rsp,
+-                           struct iovec *in, unsigned int in_len) {
++                           struct iovec *in, unsigned int in_len)
++{
+     struct scsi_task *task;
+     uint32_t dir;
+     uint32_t len;
+@@ -454,7 +456,8 @@ static void vus_panic_cb(VuDev *vu_dev, const char *b=
+uf)
  }
 =20
--static void vdev_scsi_deinit(vhost_scsi_dev_t *vdev_scsi)
-+static void vdev_scsi_free(vhost_scsi_dev_t *vdev_scsi)
- {
-     if (!vdev_scsi) {
+ static void vus_add_watch_cb(VuDev *vu_dev, int fd, int vu_evt, vu_watch=
+_cb cb,
+-                             void *pvt) {
++                             void *pvt)
++{
+     vhost_scsi_dev_t *vdev_scsi;
+     guint id;
+=20
+@@ -529,7 +532,7 @@ static void vus_proc_req(VuDev *vu_dev, int idx)
          return;
-@@ -716,20 +707,16 @@ static void vdev_scsi_deinit(vhost_scsi_dev_t *vdev=
-_scsi)
-         g_main_loop_unref(vdev_scsi->loop);
-         vdev_scsi->loop =3D NULL;
-     }
-+    g_free(vdev_scsi);
- }
-=20
- static vhost_scsi_dev_t *vdev_scsi_new(int server_sock)
- {
--    vhost_scsi_dev_t *vdev_scsi =3D NULL;
-+    vhost_scsi_dev_t *vdev_scsi;
-=20
-     assert(server_sock >=3D 0);
-=20
--    vdev_scsi =3D calloc(1, sizeof(vhost_scsi_dev_t));
--    if (!vdev_scsi) {
--        PERR("calloc: %s", strerror(errno));
--        return NULL;
--    }
--
-+    vdev_scsi =3D g_new0(vhost_scsi_dev_t, 1);
-     vdev_scsi->server_sock =3D server_sock;
-     vdev_scsi->loop =3D g_main_loop_new(NULL, FALSE);
-     if (!vdev_scsi->loop) {
-@@ -746,8 +733,7 @@ static vhost_scsi_dev_t *vdev_scsi_new(int server_soc=
-k)
-     return vdev_scsi;
-=20
- err:
--    vdev_scsi_deinit(vdev_scsi);
--    free(vdev_scsi);
-+    vdev_scsi_free(vdev_scsi);
-=20
-     return NULL;
- }
-@@ -854,10 +840,7 @@ int main(int argc, char **argv)
      }
 =20
- out:
--    if (vdev_scsi) {
--        vdev_scsi_deinit(vdev_scsi);
--        free(vdev_scsi);
--    }
-+    vdev_scsi_free(vdev_scsi);
-     g_free(unix_fn);
-     g_free(iscsi_uri);
+-    if ((idx < 0) || (idx >=3D VHOST_MAX_NR_VIRTQUEUE)) {
++    if (idx < 0 || idx >=3D VHOST_MAX_NR_VIRTQUEUE) {
+         PERR("VQ Index out of range: %d", idx);
+         vus_panic_cb(vu_dev, NULL);
+         return;
+@@ -556,8 +559,8 @@ static void vus_proc_req(VuDev *vu_dev, int idx)
+         }
+         PDBG("Popped elem@%p", elem);
 =20
+-        assert(!((elem->out_num > 1) && (elem->in_num > 1)));
+-        assert((elem->out_num > 0) && (elem->in_num > 0));
++        assert(!(elem->out_num > 1 && elem->in_num > 1));
++        assert(elem->out_num > 0 && elem->in_num > 0);
+=20
+         if (elem->out_sg[0].iov_len < sizeof(VirtIOSCSICmdReq)) {
+             PERR("Invalid virtio-scsi req header");
+@@ -593,7 +596,7 @@ static void vus_queue_set_started(VuDev *vu_dev, int =
+idx, bool started)
+=20
+     assert(vu_dev);
+=20
+-    if ((idx < 0) || (idx >=3D VHOST_MAX_NR_VIRTQUEUE)) {
++    if (idx < 0 || idx >=3D VHOST_MAX_NR_VIRTQUEUE) {
+         PERR("VQ Index out of range: %d", idx);
+         vus_panic_cb(vu_dev, NULL);
+         return;
+@@ -750,7 +753,8 @@ err:
+ }
+=20
+ static int vdev_scsi_add_iscsi_lun(vhost_scsi_dev_t *vdev_scsi,
+-                                   char *iscsi_uri, uint32_t lun) {
++                                   char *iscsi_uri, uint32_t lun)
++{
+     assert(vdev_scsi);
+     assert(iscsi_uri);
+     assert(lun < VUS_MAX_LUNS);
 --=20
 2.14.1.146.gd35faa819
