@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dkJb5-0007Fc-6G
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 20:32:40 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dkJcc-0000F6-8y
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 20:34:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dkJb0-0004b6-Vz
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 20:32:39 -0400
-Received: from ozlabs.org ([103.22.144.67]:51807)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1dkJb0-0004Xa-4p
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 20:32:34 -0400
-Date: Wed, 23 Aug 2017 10:29:07 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dkJcb-0006dT-DB
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 20:34:14 -0400
+Date: Wed, 23 Aug 2017 10:34:04 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170823002907.GC5379@umbus.fritz.box>
-References: <20170816082650.21880-1-cohuck@redhat.com>
-	<223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
-	<CAFEAcA_UfM_XNKdc5zfHsehoRE6Q+EszRZX3FByskir7c+0Lww@mail.gmail.com>
-	<20170822010917.GO12356@umbus.fritz.box>
-	<CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
-	<3f0dc918-0f55-e2f4-bf47-fe4abf5453bb@redhat.com>
-	<CAFEAcA_ezKWweEuUB-cXTer0LLaeuiGDkSdfhApedhw4ykDT0Q@mail.gmail.com>
-	<20170822112046.GC12356@umbus.fritz.box>
-	<20170822134815.77020eb8.cohuck@redhat.com>
+Message-ID: <20170823003404.GD5379@umbus.fritz.box>
+References: <20170822042416.26758-1-david@gibson.dropbear.id.au>
+	<CAFEAcA-iuizr9eh3=ZkPPT+YxfWzvUFzbWB-aA_Mo5BiDkrzQQ@mail.gmail.com>
+	<b1167424-0f05-aad7-f456-22ca0aee2000@redhat.com>
+	<CAFEAcA8dJe5uB-tUoeF=dE_q8HG_LLAmLUHdfR0XZihGN5JFXA@mail.gmail.com>
+	<329bff28-5804-2d39-7bd8-9336eaaf9d26@redhat.com>
+	<CAFEAcA9LUgCEAnMxuk_4Pdn9_rUuzTdyqH66Sp-VZy9K0gz-_g@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="XMCwj5IQnwKtuyBG"
+	protocol="application/pgp-signature"; boundary="3Pql8miugIZX0722"
 Content-Disposition: inline
-In-Reply-To: <20170822134815.77020eb8.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10] boot-serial-test: prefer tcg
- accelerator
+In-Reply-To: <CAFEAcA9LUgCEAnMxuk_4Pdn9_rUuzTdyqH66Sp-VZy9K0gz-_g@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 0/7] ppc-for-2.10 queue 20170822
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,53 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
 
---XMCwj5IQnwKtuyBG
+--3Pql8miugIZX0722
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 22, 2017 at 01:48:15PM +0200, Cornelia Huck wrote:
-> On Tue, 22 Aug 2017 21:20:46 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
+On Tue, Aug 22, 2017 at 11:52:00AM +0100, Peter Maydell wrote:
+> On 22 August 2017 at 11:41, Laurent Vivier <lvivier@redhat.com> wrote:
+> > On 22/08/2017 11:53, Peter Maydell wrote:
+> >> On 22 August 2017 at 10:43, Laurent Vivier <lvivier@redhat.com> wrote:
+> >>> On 22/08/2017 11:34, Peter Maydell wrote:
+> >>>> I get a make check failure on ppc64 Linux:
+> >>>>
+> >>>> TEST: tests/postcopy-test... (pid=3D12468)
+> >>>>   /ppc64/postcopy:
+> >>>> Broken pipe
+> >>>> qemu-system-ppc64: RP: Received invalid message 0x0000 length 0x0000
+> >>>> FAIL
+> >>>> GTester: last random seed: R02Se5468e06f561627824306d95b0566d2b
+> >>>> (pid=3D13011)
+> >>>> FAIL: tests/postcopy-test
+> >
+> > The problem is in:
+> >
+> > bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu)
+> > {
+> >     CPUState *cs =3D CPU(cpu);
+> >
+> >     if (cap_ppc_pvr_compat) {
+> >         return false;
+> >     }
+> >
+> >     return !kvmppc_is_pr(cs->kvm_state);
+> > }
+> >
+> > It guesses !kvm pr means kvm_hv. That is not true, it can be TCG.
+> >
+> > This fixes the problem for me:
+> > --- a/target/ppc/kvm.c
+> > +++ b/target/ppc/kvm.c
+> > @@ -2817,5 +2817,5 @@ bool kvmppc_pvr_workaround_required(PowerPCCPU *c=
+pu)
+> >          return false;
+> >      }
+> >
+> > -    return !kvmppc_is_pr(cs->kvm_state);
+> > +    return kvm_enabled() && !kvmppc_is_pr(cs->kvm_state);
+> >  }
 >=20
-> > Obviously it's not a thing to fix right now, but I've really been
-> > thinking that none of the tests should use this "TCG or KVM" stuff.
-> > They should instead be run with *both* options - or at least the ones
-> > that are available on the host.
->=20
-> Having one test as a 'smoke test' that is run for everything available
-> sounds like a good idea, and the boot-serial test may be a good
-> candidate for that.
->=20
-> I would not want to run every test with every accelerator, however, as
-> this makes 'make check' even slower than it is now. (Although it may be
-> useful to be able to trigger 'run everything' tests on some dedicated
-> test machines.)
+> Yep, fixes the failure for me too. David, can you respin your
+> pull request, please?
 
-I'd be fine with only running the full matrix on a "make check-harder"
-or whatever, target.  But I'd like the option to be there.  Sometimes
-(like when preparing a pull request) a slower check is an acceptable
-cost for better coverage.
-
-> > That would have caught the bug in the pull request I sent you, and
-> > would at least have given you a chance at seeing the problem with
-> > boot-serial-test.
->=20
-> I don't think that would have been caught unless you have the right
-> host available... and given that most developers will only have a
-> x86_64 machine and whatever other architecture they are working on (if
-> any) available, they will run most of 'make check' with tcg only.
-
-Sure, but running make check (amongst other things) on a ppc host is
-part of my standard pre-pull-request tests, so it certainly would have
-caught it in this case.  Peter Maydell has said he has a ppc host
-amongst his test systems.  At the moment it doesn't do KVM so wouldn't
-have caught the other problem, but it'd be one step closer to doing
-so.
+Done.  In the interests of getting it out quickly, I haven't done the
+full usual set of tests, though I have done a make check on a ppc host
+both with and without KVM available.  A tweaked version of the fix
+above is the only change, so I'm hoping the testing round on the
+previous pullreq should suffice.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -90,24 +95,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---XMCwj5IQnwKtuyBG
+--3Pql8miugIZX0722
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmczFMACgkQbDjKyiDZ
-s5I9Rw//V+DgeD1YxExCWCYDxYDGeRMjx3cPofivziIuEEygO7viBVsxWSllIGvE
-3ERkbze/YCQBxmoxmTksRkc70AnG8zSW9Q4/Pb+uImb+JF01LiF0OaUtnwH7Q9Fw
-h3ef8mU6sTxM9XJd0qDQaRsxbcCw3hDs6nsWw/iNNRi9EHmKIeqCVfHy8W2Kn9Ip
-bRZvJOxTIzamqr3JPv43mvqjb/E1H5jgCyj2S27ILVw6bFbB/cQQjFOecz0BZeQ3
-sXcdNTfNGWocdXF4ndZ+l4Ae2oRAsRu3xMaGyryq4NttlZx54GuS+lR9q/M4EYce
-0wOPvsmCjHzSr72WKU8sApwfjfm9ct5217GS5TuI7W9JTXxnIb9xztEaQ/5p/X+D
-ie+6IIwskOTBte8E4W+F9gQxO0ltM0ZVRE0BU8AlW10z5WvXy664KCgLiw8WacC9
-2wixYpVcy4Ti6JwsKOtJ5PgNg5cHFHnzJGWw6GnqGyD1OoRymzT5H70Zgro+phVW
-HirAtYPDb+MdjOiFJ0lyWUZYDWrFjmoJFiX6d0w27qHjWaq1I+6zctr9QpexRHqy
-nPvULZTxIgl4g/nPyiUuKQTu0TOZgkYV1oLvkE7mrYQjC0YU2WC2oJeh7IxfHHlV
-P2QAwgew3wS022Ca4na1ZskykFihqBFjsFowGpY62i3LpxBlXKA=
-=UIof
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmczXwACgkQbDjKyiDZ
+s5IbTA//Q5nqvDWwkaOOiFZdPynaVAIpHxAwG8Yk53C+j+sHZDHZ/BS7tsni02hk
+5DasWRIQjRcw5wSgh5Mg00id+/ruRUX7uy6K+zJXvYqnCP76Kz7BfwpaOixZIupG
+E/C6vUUDNuEA7yvKYNmTj6gcRsVrhVt+NQFMYY1p2PG3+YhOIpWraeu5TdsdjzDx
+cVR2athaVRKsOs1Bq7hvZvm7in1gUTfkHZ28ND2Z6fIYU7A/3BLsQdVTx/Kya0cy
+ROAeraDly61VV+1Y6aBTA+Fo40rPzTD16n99D7IzAPAA00EtqHTImK9xevOmgIGK
+oGLU0OavDuVQamDj0CEc+kO3mfqgfYhVLzuppTQ7d29lk9TI2HKq5qOvg6edLKww
+MGSpo05ZyQMdf8YjRck3Mjxb4/fi7PjRLgrTwoLafcFhElbiNBniU0rMiJT9rxKh
+0cHvmse1HSMrB6jUixOhTxRZohfkWMW26j5gxLbUsWaJrHJup611y7guiLb5wP2E
+XhEgFFSPktMaeP2IQxhX8iD1qe99qHwtt/7jJpyjAbwPXQR+HGXQdJehly1+uqRu
+wzwJltZfgXsg0EgJ6neJEzkHv9xgOEK/R1YIP3LwhkY5msuB9VT4ooMwXYHqaRqX
+ZEHqAUvJuZ3Gg/tV0CO+AEMmllQmNCtT7ChO3juj6lGAxl/KYjU=
+=KUpP
 -----END PGP SIGNATURE-----
 
---XMCwj5IQnwKtuyBG--
+--3Pql8miugIZX0722--
