@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dkJFO-0006gv-Nk
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 20:10:16 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dkJb3-0007EW-JM
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 20:32:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dkJFN-0002EF-AY
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 20:10:14 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170822214343.31385-1-f4bug@amsat.org>
-	<20170823014025-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6661274e-c797-1aac-14b9-43dcf4c2f336@amsat.org>
-Date: Tue, 22 Aug 2017 21:10:02 -0300
+	(envelope-from <dgibson@ozlabs.org>) id 1dkJb1-0004bP-1K
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 20:32:37 -0400
+Date: Wed, 23 Aug 2017 10:24:14 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170823002414.GB5379@umbus.fritz.box>
+References: <20170815202846.24749-1-danielhb@linux.vnet.ibm.com>
+	<20170817075236.GI5509@umbus.fritz.box>
+	<bfc6e0bb-af59-f5b4-f50b-66feab7dc301@linux.vnet.ibm.com>
+	<20170818041429.GP5509@umbus.fritz.box>
+	<9ba2f12d-ee6d-419e-28e9-15143ee33e1e@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170823014025-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-2.10-rc4?] acpi: pcihp: fix
- use-after-free for machines previous pc-1.7 compat
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ftEhullJWpWg/VHq"
+Content-Disposition: inline
+In-Reply-To: <9ba2f12d-ee6d-419e-28e9-15143ee33e1e@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] hw/ppc: disable hotplug before
+ CAS is completed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,113 +28,350 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-On 08/22/2017 07:42 PM, Michael S. Tsirkin wrote:
-> On Tue, Aug 22, 2017 at 06:43:43PM -0300, Philippe Mathieu-Daudé wrote:
->> 9e047b982452 "piix4: add acpi pci hotplug support" introduced a new property
->> 'use_acpi_pci_hotplug' for pc-1.7 and older machines.
->> c24d5e0b91d1 "convert ACPI PCI hotplug to use hotplug-handler API" added the
->> qbus hotplug handlers but forgot to check for the 'use_acpi_pci_hotplug'
->> property.
->>
->> Check for use_acpi_pci_hotplug before calling acpi_pcihp_device_[un]plug_cb().
->>
->> If Xen is enabled, piix4_pm_init() disables use_acpi_pci_hotplug.
->>
->> The following valgrind Trace equivs:
->>
->>    qdev_device_add( "ich9-ahci" )
->>     -> device_set_realized()
->>      -> hotplug_handler_plug()
->>       -> piix4_device_plug_cb()
->>        -> acpi_pcihp_device_plug_cb()
->>         -> acpi_pcihp_get_bsel() "Property ACPI_PCIHP_PROP_BSEL not found"
->>     -> object_unparent()
->>       <- "Bus doesn't have property ACPI_PCIHP_PROP_BSEL set"
->>
->> $ valgrind x86_64-softmmu/qemu-system-x86_64 -M pc-1.2 -nographic -S
->> (qemu) device_add ich9-ahci,id=ich9-ahci
->> ==6604== Invalid read of size 8
->> ==6604==    at 0x609AB0: object_unparent (object.c:445)
->> ==6604==    by 0x4C4478: device_unparent (qdev.c:1095)
->> ==6604==    by 0x60A364: object_finalize_child_property (object.c:1396)
->> ==6604==    by 0x6092A6: object_property_del_child.isra.7 (object.c:427)
->> ==6604==    by 0x451728: qdev_device_add (qdev-monitor.c:634)
->> ==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
->> ==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
->> ==6604==    by 0x364083: handle_hmp_command (monitor.c:3119)
->> ==6604==    by 0x365439: monitor_command_cb (monitor.c:3922)
->> ==6604==    by 0x6E5D27: readline_handle_byte (readline.c:393)
->> ==6604==    by 0x364311: monitor_read (monitor.c:3905)
->> ==6604==    by 0x67C573: mux_chr_read (char-mux.c:216)
->> ==6604==  Address 0x15fc5448 is 30,328 bytes inside a block of size 36,288 free'd
->> ==6604==    at 0x4C2ACDD: free (vg_replace_malloc.c:530)
->> ==6604==    by 0xA04EBCD: g_free (in /usr/lib64/libglib-2.0.so.0.5000.3)
->> ==6604==    by 0x50100E: pci_ich9_uninit (ich.c:161)
->> ==6604==    by 0x5428AB: pci_qdev_unrealize (pci.c:1083)
->> ==6604==    by 0x4C5EE9: device_set_realized (qdev.c:988)
->> ==6604==    by 0x608DCD: property_set_bool (object.c:1886)
->> ==6604==    by 0x60CEBE: object_property_set_qobject (qom-qobject.c:27)
->> ==6604==    by 0x60AB6F: object_property_set_bool (object.c:1162)
->> ==6604==    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
->> ==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
->> ==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
->> ==6604==    by 0x364083: handle_hmp_command (monitor.c:3119)
->> ==6604==  Block was alloc'd at
->> ==6604==    at 0x4C2B975: calloc (vg_replace_malloc.c:711)
->> ==6604==    by 0xA04EB15: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.5000.3)
->> ==6604==    by 0x50094F: ahci_realize (ahci.c:1468)
->> ==6604==    by 0x501098: pci_ich9_ahci_realize (ich.c:115)
->> ==6604==    by 0x543E6D: pci_qdev_realize (pci.c:2002)
->> ==6604==    by 0x4C5E69: device_set_realized (qdev.c:914)
->> ==6604==    by 0x608DCD: property_set_bool (object.c:1886)
->> ==6604==    by 0x60CEBE: object_property_set_qobject (qom-qobject.c:27)
->> ==6604==    by 0x60AB6F: object_property_set_bool (object.c:1162)
->> ==6604==    by 0x4516F3: qdev_device_add (qdev-monitor.c:630)
->> ==6604==    by 0x451C82: qmp_device_add (qdev-monitor.c:807)
->> ==6604==    by 0x46B689: hmp_device_add (hmp.c:1925)
->>
->> Reported-by: Thomas Huth <thuth@redhat.com>
->> Message-Id: <59a56959-ca12-ea75-33fa-ff07eba1b090@redhat.com>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> 
-> Looks like this is a very old bug, isn't it?
-> Objections to merging this after the release?
 
-Yes, I'm also inclined to delay it so we can release 2.10, I tagged 
-"2.10-rc4" since Thomas sent it as a bug within the 2.10 window so I'll 
-let him decide if it is worth crying wolf :) It's very likely no-one but 
-him used pre-pc-i440fx-1.7 the last 3 years, not even thinking about hot 
-plugging AHCI devices :D
+--ftEhullJWpWg/VHq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
->> ---
->>   hw/acpi/piix4.c | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
->> index f276967365..d4df209a2e 100644
->> --- a/hw/acpi/piix4.c
->> +++ b/hw/acpi/piix4.c
->> @@ -385,7 +385,7 @@ static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
->>                                   dev, errp);
->>           }
->>       } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
->> -        if (!xen_enabled()) {
->> +        if (s->use_acpi_pci_hotplug) {
->>               acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
->>                                         errp);
->>           }
->> @@ -411,7 +411,7 @@ static void piix4_device_unplug_request_cb(HotplugHandler *hotplug_dev,
->>           acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotplug,
->>                                         dev, errp);
->>       } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
->> -        if (!xen_enabled()) {
->> +        if (s->use_acpi_pci_hotplug) {
->>               acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
->>                                           errp);
->>           }
->> -- 
->> 2.14.1
+On Tue, Aug 22, 2017 at 08:50:44PM -0300, Daniel Henrique Barboza wrote:
+>=20
+>=20
+> On 08/18/2017 01:14 AM, David Gibson wrote:
+> > On Thu, Aug 17, 2017 at 06:31:28PM -0300, Daniel Henrique Barboza wrote:
+> > >=20
+> > > On 08/17/2017 04:52 AM, David Gibson wrote:
+> > > > On Tue, Aug 15, 2017 at 05:28:46PM -0300, Daniel Henrique Barboza w=
+rote:
+> > > > > This patch is a follow up on the discussions that started with
+> > > > > Laurent's patch series "spapr: disable hotplugging without OS" [1]
+> > > > > and discussions made at patch "spapr: reset DRCs on migration
+> > > > > pre_load" [2].
+> > > > >=20
+> > > > > At this moment, we do not support CPU/memory hotplug in early
+> > > > > boot stages, before CAS. The reason is that the hotplug event
+> > > > > can't be handled at SLOF level (or even in PRELAUNCH runstate) and
+> > > > > at the same time can't be canceled. This leads to devices being
+> > > > > unable to be hot unplugged and, in some cases, guest kernel Ooops.
+> > > > > After CAS, with the FDT in place, the guest can handle the hotplug
+> > > > > events and everything works as usual.
+> > > > >=20
+> > > > > An attempt to try to support hotplug before CAS was made, but not
+> > > > > successful. The key difference in the current code flow between a
+> > > > > coldplugged and a hotplugged device, in the PRELAUNCH state, is t=
+hat
+> > > > > the coldplugged device is registered at the base FDT, allowing its
+> > > > > DRC to go straight to CONFIGURED state. In theory, this can also =
+be
+> > > > > done with a hotplugged device if we can add it to the base of the
+> > > > > existing FDT. However, tampering with the FDT after writing in the
+> > > > > guest memory, besides being a dubitable idea, is also not
+> > > > > possible. The FDT is written in ppc_spapr_reset and there is no
+> > > > > way to retrieve it - we can calculate the fdt_address but the
+> > > > > fdt_size isn't stored. Storing the fdt_size to allow for
+> > > > > later retrieval is yet another state that would need to be
+> > > > > migrated. In short, it is not worth the trouble.
+> > > > >=20
+> > > > > All this said, this patch opted to disable CPU/mem hotplug at ear=
+ly
+> > > > > boot stages. CAS detection is made by checking if there are
+> > > > > any bits set in ov5_cas to avoid adding an extra state that
+> > > > > would need tracking/migration. The patch also makes sure that
+> > > > > it doesn't interfere with hotplug in the INMIGRATE state.
+> > > > >=20
+> > > > > [1] https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg0522=
+6.html
+> > > > > [2] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg0198=
+9.html
+> > > > >=20
+> > > > > Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.c=
+om>
+> > > > I don't think this is a good idea.
+> > > >=20
+> > > > 1) After my DRC cleanups, early hotplug works just fine for me.  I'm
+> > > > not sure why it isn't for you: we need to understand that before
+> > > > proceeding.
+> > > >=20
+> > > > 2) libvirt actually uses early hotplug fairly often (before even
+> > > > starting the firmware).  At the moment this works - at least in some
+> > > > cases (see above), though there are some wrinkles to work out.  This
+> > > > will break it completely and require an entirely different approach=
+ to
+> > > > fix again.
+> > > Now that you mentioned I remember having this same discussion with yo=
+u,
+> > > about the same topic. Back then we decided to leave it alone, since y=
+ou
+> > > couldn't
+> > > reproduce the behavior but I could.
+> > >=20
+> > > I still can reproduce this bug and ended up investigating a bit more =
+today:
+> > >=20
+> > >=20
+> > > - one difference in QEMU between hotplugging before and after CAS is =
+here:
+> > >=20
+> > > hw/ppc/spapr_events.c - rtas_event_log_to_source
+> > >=20
+> > >      switch (log_type) {
+> > >      case RTAS_LOG_TYPE_HOTPLUG:
+> > >          source =3D spapr_event_sources_get_source(spapr->event_sourc=
+es,
+> > > EVENT_CLASS_HOT_PLUG);
+> > >          if (spapr_ovec_test(spapr->ov5_cas, OV5_HP_EVT)) {
+> > >              g_assert(source->enabled);
+> > >              break;
+> > >          }
+> > >          /* fall back to epow for legacy hotplug interrupt source */
+> > >      case RTAS_LOG_TYPE_EPOW:
+> > >          source =3D spapr_event_sources_get_source(spapr->event_sourc=
+es,
+> > >                                                  EVENT_CLASS_EPOW);
+> > >          break;
+> > >      default:
+> > >=20
+> > >=20
+> > > Note the ovec_test for OV5_HP_EVT. When hotplugging a CPU In early bo=
+ot,
+> > > ov5_cas
+> > > doesn't have anything set, making this check fails and due to the 'br=
+eak'
+> > > position there
+> > > (that I believe it is intended), it falls back to log the event as EP=
+OW
+> > > instead of HOT_PLUG.
+> > Ah.. I'm not sure if this is the cause of the problem you're seeing,
+> > but it's a good point regardless.  We're queuing an event before we
+> > know how to queue events, which is definitely wrong.
+> >=20
+> > Urgh.. how to fix this.  Banning hotplug until after CAS seems
+> > logically sound, but will break the libvirt use case.  So we could..
+> >=20
+> > 1) Queue events internally, but only deliver them to the right actual
+> > RTAS queue after CAS.  Blech.
+> >=20
+> > 2) At CAS time, reset all the DRCs, and emit extra DT information for
+> > anything hotplugged since init.  I've suggested this before, but
+> > dropped it when early hotplug seemed to be working for me.
+>=20
+> Update: I've been trying to do the (2) solution here by adding extra
+> DT info of the hotplugged CPU, while resetting its DRC. The problem I am
+> facing is that the kernel panics at parse_numa_properties when trying to
+> find the node id of the added CPU. This is intriguing because the extra DT
+> info is enough to make the kernel start the added CPU at smp_release_cpus=
+().
+>=20
+> The DT information is being added at the CAS response, in
+> spapr_fixup_cpu_dt,
+> and it's the same information that is added for the coldplugged CPUs. I h=
+ave
+> a
+> theory that the guest (SLOF?) isn't prepared to handle a new CPU being ad=
+ded
+> at
+> this point, which might be leading to this kernel bug I am seeing. I
+> appreciate if
+> anyone with good CAS/SLOF knowledge can weight in here - there is a good
+> chance
+> that adding a new CPU element at this point in the DT isn't supported at
+> all.
+>=20
+>=20
+> Now, in other news ....
+>=20
+> >=20
+> > 3) Work around in libvirt by having it issue a system_reset after the
+> > hotplugs.
+>=20
+> ... talking with Mike about this bug he proposed a similar solution to (3=
+),
+> but with
+> a CAS induced reset. If there are hotplugged devs at that point, set
+> spapr->cas_reboot
+> to true. Doing that, QEMU reboots automatically and the hotplugged devs a=
+re
+> considered
+> coldplugged. It works.
+>=20
+> I am mentioning this because this is a simpler solution than relying on
+> libvirt issuing a system_reset. This is also solution that I would like to
+> avoid though - I
+> am not looking forward to see people bugs complaining about the machine
+> rebooting in
+> the middle of the boot. I will exhaust my attempts at (2) before proposing
+> going
+> with this CAS reboot solution.
+
+Ah!  Actually I think that's a great idea.  I mean, it's an ugly hack,
+but it should also get us something that more or less works with
+*much* less work than other approaches.  So I think it's a good
+interim solution.
+
+Do you have a patch?  It's probably too late for qemu 2.10, but if we
+can get it in as soon as 2.11 opens, then we should be able to get it
+into the RH releases at least, which will be very helpful.
+
+>=20
+>=20
+> Thanks,
+>=20
+>=20
+> Daniel
+>=20
+>=20
+>=20
+>=20
+>=20
+> >=20
+> > In the short to medium term at least, I think (2) is probably our
+> > best option.
+> >=20
+> >=20
+> > > I tried to hack this code by adding another break and ensure that the=
+ event
+> > > got logged
+> > > as HOT_PLUG (like it happens in the post-CAS) but then I got a kernel=
+ panic
+> > > at boot. So
+> > > I am not sure if this code needs any change or afterthought.
+> > >=20
+> > > - hotplugging the CPU at early stage gives me a warning message in SL=
+OF:
+> > >=20
+> > > --------------
+> > >=20
+> > > Calling ibm,client-architecture-support...Node not supported
+> > > Node not supported
+> > >   not implemented
+> > > memory layout at init:
+> > > ---------------
+> > >=20
+> > > The code that gives the 'Node not supported' message is related to the
+> > > fdt-create-cas-node
+> > > function of board-qemu/slof/fdt.fs . The code is looking for either
+> > > "memory@" or
+> > > "ibm,dynamic-reconfiguration-memory" nodes, giving this error when fi=
+nding a
+> > > CPU node.
+> > >=20
+> > >=20
+> > > - if I hotplug another CPU after the guest completes the boot, the
+> > > previously added
+> > > CPU suddenly turns online too:
+> > Right the interrupt from the new event is unjamming the queue, so the
+> > guest kernel / drmgr is then able to add the earlier cpu as well.
+> >=20
+> > > [ started VM with -S ]
+> > >=20
+> > > (qemu) device_add host-spapr-cpu-core,id=3Dcore1,core-id=3D1
+> > > (qemu) cont
+> > >=20
+> > > [ guest finishes boot ]
+> > >=20
+> > > danielhb@ubuntu1710:~$ lscpu
+> > > Architecture:        ppc64le
+> > > Byte Order:          Little Endian
+> > > CPU(s):              1
+> > > On-line CPU(s) list: 0
+> > > Thread(s) per core:  1
+> > > Core(s) per socket:  1
+> > > Socket(s):           1
+> > > NUMA node(s):        1
+> > > Model:               2.1 (pvr 004b 0201)
+> > > Model name:          POWER8E (raw), altivec supported
+> > > Hypervisor vendor:   KVM
+> > > Virtualization type: para
+> > > L1d cache:           64K
+> > > L1i cache:           32K
+> > > NUMA node0 CPU(s):   0
+> > > danielhb@ubuntu1710:~$
+> > > danielhb@ubuntu1710:~$
+> > > danielhb@ubuntu1710:~$ (qemu)
+> > > (qemu) info cpus
+> > > * CPU #0: nip=3D0xc0000000000a464c thread_id=3D131946
+> > >    CPU #1: nip=3D0x0000000000000000 (halted) thread_id=3D131954
+> > > (qemu)
+> > > (qemu) device_add host-spapr-cpu-core,id=3Dcore2,core-id=3D2
+> > > (qemu)
+> > > (qemu) info cpus
+> > > * CPU #0: nip=3D0xc0000000000a464c thread_id=3D131946
+> > >    CPU #1: nip=3D0xc0000000000a464c thread_id=3D131954
+> > >    CPU #2: nip=3D0xc0000000000a464c thread_id=3D132144
+> > > (qemu)
+> > >=20
+> > > danielhb@ubuntu1710:~$ lscpu
+> > > Architecture:        ppc64le
+> > > Byte Order:          Little Endian
+> > > CPU(s):              3
+> > > On-line CPU(s) list: 0-2
+> > > Thread(s) per core:  1
+> > > Core(s) per socket:  3
+> > > Socket(s):           1
+> > > NUMA node(s):        1
+> > > Model:               2.1 (pvr 004b 0201)
+> > > Model name:          POWER8E (raw), altivec supported
+> > > Hypervisor vendor:   KVM
+> > > Virtualization type: para
+> > > L1d cache:           64K
+> > > L1i cache:           32K
+> > > NUMA node0 CPU(s):   0-2
+> > > danielhb@ubuntu1710:~$
+> > >=20
+> > >=20
+> > > This makes me believe that the issue is that the guest isn't aware of=
+ the
+> > > CPU
+> > > presence, making me wonder whether this has something to do with the
+> > > qemu_irq_pulse
+> > > in the end of spapr_hotplug_req_event being lost. In the second hotpl=
+ug, we
+> > > re-assert the IRQ in the end of check-exception and the guest is made=
+ aware
+> > > of
+> > > the queued hotplug event that was ignored at first.
+> > Yeah, I think that's it.
+> >=20
+> >=20
+> > >=20
+> > >=20
+> > > Daniel
+> > > > 3) There's no fundamental reason early hotplug shouldn't work - the
+> > > > event will just be queued until the OS boots and processes it.
+> > > >=20
+> > > > I know I suggested disabling early hotplug earlier, but that was
+> > > > before I'd dug into the DRC layer and properly understood what was
+> > > > going on here.
+> > > >=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--ftEhullJWpWg/VHq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmcyy4ACgkQbDjKyiDZ
+s5LWZg//XRXcj3uTLE2lld/SGVDGPPLJqAVVPE+C5MWtf1HXzaaQuMvYxaTPLS7k
+B34XEkoxIKa3YLjipmjxE/GPAkdJSjtVAbM9UxDgg261zfoZuKUmtEPdcXHUuaBo
+0Ag3RGOLCnByOATfN52wyx4JW4+Y1os4359D5StDNGvBmeJ9muAKMXl3Y7xdK3vW
+RdvVotgFK0aT6Lgkmb9qj0QYkYNtHOQg8deqIVlUJJ/0BX233rmlg35EUxDkHLy6
+KmMg0HnmyNVvQ4V05aA/e+17lCwT4FB+S3DtFichBEZLXEUo7IDgRFvHGss90snp
+OETm64QMPMqfrw9Z0ncR+vA+72W9doARJlS7ASYHttwOJiqN37mUTUpjw8T97gPz
+qoO8PIP+zxqLCWyoXg9V3TIMzLcHElncLEIIC4Ot/iYYdiSOdFDP0E5UiF3hKqt0
+f8D2TwotxOhSRTKft6GMndphLhEiW4uHp6T4h5sGHmCkwnMJelkJUNSrHJJPe2SA
+7C6m/OoLvvH2r2qKZwYZ3WwpFUwWJRFfN36DSKmIQ9qT6Q6kxr8mIcktAFiSFHf1
+0WtlZvdPiv0beohmkLWrjZlYrfWqJxc05IHYfieoLaMgrV91AibSI9fHwT37h+O2
+SL59tho4nwQ9r9NRIM2860H1TF+AkcJc1AmVQWgvsh/q+XOMT+0=
+=hvYp
+-----END PGP SIGNATURE-----
+
+--ftEhullJWpWg/VHq--
