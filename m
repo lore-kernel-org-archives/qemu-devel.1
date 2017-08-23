@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dkZao-0003Qf-MH
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:37:29 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dkZhZ-0004rN-Ub
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:44:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dkZal-00055I-Hd
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:37:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58808)
+	(envelope-from <dgilbert@redhat.com>) id 1dkZhW-00021p-JZ
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:44:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49832)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dkZal-00053W-7s
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:37:23 -0400
-Date: Wed, 23 Aug 2017 19:37:39 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170823193739.32d9bd07@Igors-MacBook-Pro.local>
-In-Reply-To: <20170823164638.GN19998@localhost.localdomain>
-References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
-	<1503050939-227939-7-git-send-email-imammedo@redhat.com>
-	<20170823143414.GI27715@localhost.localdomain>
-	<20170823182902.7c2803c7@nial.brq.redhat.com>
-	<20170823164638.GN19998@localhost.localdomain>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dkZhW-00021I-9L
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:44:22 -0400
+Date: Wed, 23 Aug 2017 18:44:12 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170823174411.GG2648@work-vm>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<1503471071-2233-5-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.11 06/27] x86: extract legacy cpu
- features format parser
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1503471071-2233-5-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 4/8] QAPI: new QMP command option
+ "without-bql"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,303 +28,266 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Philippe =?UTF-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Wed, 23 Aug 2017 13:46:38 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+* Peter Xu (peterx@redhat.com) wrote:
+> Introducing this new parameter for QMP commands in general to mark out
+> when the command does not need BQL.  Normally QMP command executions are
+> done with the protection of BQL in QEMU.  However the truth is that not
+> all the QMP commands require the BQL.
+> 
+> This new parameter provides a way to allow QMP commands to run in
+> parallel when possible, without the contention on the BQL.
+> 
+> Since the default value of "without-bql" is still false, so now all QMP
+> commands are still protected by BQL still.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-> On Wed, Aug 23, 2017 at 06:29:02PM +0200, Igor Mammedov wrote:
-> > On Wed, 23 Aug 2017 11:34:14 -0300
-> > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >=20
-> > > On Fri, Aug 18, 2017 at 12:08:38PM +0200, Igor Mammedov wrote:
-> > > > Move cpu_model +-feat parsing into a separate file so that it
-> > > > could be reused later for parsing similar format of sparc target
-> > > >=20
-> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > > ---
-> > > > CC: Richard Henderson <rth@twiddle.net>
-> > > > CC: Eduardo Habkost <ehabkost@redhat.com>
-> > > > CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> > > > CC: Artyom Tarasenko <atar4qemu@gmail.com>
-> > > > CC: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > > > ---
-> > > >  include/qom/cpu.h                     |   2 +
-> > > >  default-configs/i386-bsd-user.mak     |   1 +
-> > > >  default-configs/i386-linux-user.mak   |   1 +
-> > > >  default-configs/i386-softmmu.mak      |   1 +
-> > > >  default-configs/x86_64-bsd-user.mak   |   1 +
-> > > >  default-configs/x86_64-linux-user.mak |   1 +
-> > > >  default-configs/x86_64-softmmu.mak    |   1 +
-> > > >  target/i386/cpu.c                     | 125 +---------------------=
-----
-> > > >  util/Makefile.objs                    |   1 +
-> > > >  util/legacy_cpu_features_parser.c     | 161 ++++++++++++++++++++++=
-++++++++++++
-> > > >  10 files changed, 171 insertions(+), 124 deletions(-)
-> > > >  create mode 100644 util/legacy_cpu_features_parser.c
-> > > >  =20
-> > > [...]
-> > > > diff --git a/util/legacy_cpu_features_parser.c b/util/legacy_cpu_fe=
-atures_parser.c
-> > > > new file mode 100644
-> > > > index 0000000..6b352a3
-> > > > --- /dev/null
-> > > > +++ b/util/legacy_cpu_features_parser.c
-> > > > @@ -0,0 +1,161 @@
-> > > > +/* Support for legacy -cpu cpu,features CLI option with +-feat syn=
-tax,
-> > > > + * used by x86/sparc targets
-> > > > + *
-> > > > + * Author: Andreas F=C3=A4rber <afaerber@suse.de>
-> > > > + * Author: Andre Przywara <andre.przywara@amd.com>
-> > > > + * Author: Eduardo Habkost <ehabkost@redhat.com>
-> > > > + * Author: Igor Mammedov <imammedo@redhat.com>
-> > > > + * Author: Paolo Bonzini <pbonzini@redhat.com>
-> > > > + * Author: Markus Armbruster <armbru@redhat.com> =20
-> > >=20
-> > > IANAL, but I believe a
-> > >   Copyright (c) <YEAR> <COPYRIGHT HOLDER>
-> > > line is needed here.
-> > >=20
-> > > > + *
-> > > > + * This program is free software; you can redistribute it and/or m=
-odify
-> > > > + * it under the terms of the GNU General Public License as publish=
-ed by
-> > > > + * the Free Software Foundation; either version 2 of the License, =
-or
-> > > > + * (at your option) any later version.
-> > > > +
-> > > > + * This program is distributed in the hope that it will be useful,
-> > > > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > > > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> > > > + * GNU General Public License for more details.
-> > > > +
-> > > > + * You should have received a copy of the GNU General Public Licen=
-se along
-> > > > + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> > > > + */
-> > > > +
-> > > > +#include "qemu/osdep.h"
-> > > > +#include "qapi/error.h"
-> > > > +#include "qemu/cutils.h"
-> > > > +#include "qom/cpu.h"
-> > > > +#include "qemu/error-report.h"
-> > > > +#include "hw/qdev-properties.h"
-> > > > +
-> > > > +static inline void feat2prop(char *s)
-> > > > +{
-> > > > +    while ((s =3D strchr(s, '_'))) {
-> > > > +        *s =3D '-';
-> > > > +    }
-> > > > +}
-> > > > +
-> > > > +static gint compare_string(gconstpointer a, gconstpointer b)
-> > > > +{
-> > > > +    return g_strcmp0(a, b);
-> > > > +}
-> > > > +
-> > > > +static void
-> > > > +cpu_add_feat_as_prop(const char *typename, const char *name, const=
- char *val)
-> > > > +{
-> > > > +    GlobalProperty *prop =3D g_new0(typeof(*prop), 1);
-> > > > +    prop->driver =3D typename;
-> > > > +    prop->property =3D g_strdup(name);
-> > > > +    prop->value =3D g_strdup(val);
-> > > > +    prop->errp =3D &error_fatal;
-> > > > +    qdev_prop_register_global(prop);
-> > > > +}
-> > > > +
-> > > > +/* DO NOT USE WITH NEW CODE
-> > > > + * Parse "+feature,-feature,feature=3Dfoo" CPU feature string
-> > > > + */
-> > > > +void cpu_legacy_parse_featurestr(const char *typename, char *featu=
-res,
-> > > > +                                 Error **errp)
-> > > > +{
-> > > > +    /* Compatibily hack to maintain legacy +-feat semantic,
-> > > > +     * where +-feat overwrites any feature set by
-> > > > +     * feat=3Don|feat even if the later is parsed after +-feat
-> > > > +     * (i.e. "-x2apic,x2apic=3Don" will result in x2apic disabled)
-> > > > +     */
-> > > > +    GList *l, *plus_features =3D NULL, *minus_features =3D NULL;
-> > > > +    char *featurestr; /* Single 'key=3Dvalue" string being parsed =
-*/
-> > > > +    static bool cpu_globals_initialized;
-> > > > +    bool ambiguous =3D false;
-> > > > +
-> > > > +    if (cpu_globals_initialized) {
-> > > > +        return;
-> > > > +    }
-> > > > +    cpu_globals_initialized =3D true;
-> > > > +
-> > > > +    if (!features) {
-> > > > +        return;
-> > > > +    }
-> > > > +
-> > > > +    for (featurestr =3D strtok(features, ",");
-> > > > +         featurestr;
-> > > > +         featurestr =3D strtok(NULL, ",")) {
-> > > > +        const char *name;
-> > > > +        const char *val =3D NULL;
-> > > > +        char *eq =3D NULL;
-> > > > +        char num[32];
-> > > > +
-> > > > +        /* Compatibility syntax: */
-> > > > +        if (featurestr[0] =3D=3D '+') {
-> > > > +            plus_features =3D g_list_append(plus_features,
-> > > > +                                          g_strdup(featurestr + 1)=
-);
-> > > > +            continue;
-> > > > +        } else if (featurestr[0] =3D=3D '-') {
-> > > > +            minus_features =3D g_list_append(minus_features,
-> > > > +                                           g_strdup(featurestr + 1=
-));
-> > > > +            continue;
-> > > > +        } =20
-> > >=20
-> > > These 6 lines of code (or something equivalent to them) are
-> > > supposed to be the only difference to the generic parsing
-> > > function.  I would simply make this feature (support for
-> > > [+-]feature) enabled by a CPUClass::plus_minus_features flag
-> > > handled by cpu_common_parse_features().
-> > I'd rather keep plus/minus nonsense  under the hood separate
-> > legacy function so it get reused unintentionally and keep generic
-> > parser clean.
-> >=20
-> > I didn't have any intent of generalizing +-feat handling
-> > but rather to remove code duplication between the only users
-> > (x86/sparc) that happened to use syntax and share the same semantics.
->=20
-> Generalizing it to be controlled by a CPUClass flag will make it
-> easier to refactor the feature parsing later to use the QemuOpts
-> parser.  But I agree there's no need to do that on this series.
->=20
-> (We might even decide to make [+-]feat work on all other
-> architectures.  We already agreed recently that we won't
-> deprecate it in x86, we could as well enable the same syntax
-> uniformly across all architectures.)
-I'd just stick to canonical feat=3Don|off and keep legacy to x86|sparc,
-but it's this to discuss if future and relevant here.
+We should define what a 'without-bql' command is allowed to do:
+   'Commands that have without-bql set _may_ be called without the bql
+   being taken.  They must not take the bql or any other lock that may
+   become dependent on the bql.'
+   (Do we need to say anything about RCU?)
 
->=20
-> >=20
-> > As an alternative I can copy-past x86 variant into sparc
-> > (modulo x86 harmless fixups), that will add some code duplication
-> > I've tried to avoid with this patch, but it won't cause
-> > misunderstanding about generalizing legacy hacks.
->=20
-> Works for me.  We can then cleanup the x86 code and make it use
-> cpu_legacy_parse_featurestr() later.
-Then, I'll just copy and replace sparc variant with x86 impl.
-(removing from the copy x86 only parts and making parser stricter
-where possible) and drop 5-6 patches that touched x86 for the purpose
-of sharing code.
+Also, 'no-bql' is shorter :-)
 
-and respin v3 tomorrow.
+Dave
 
->=20
-> >=20
-> > > (But this can be done as a follow-up patch.)
-> > >=20
-> > > > +
-> > > > +        eq =3D strchr(featurestr, '=3D');
-> > > > +        if (eq) {
-> > > > +            *eq++ =3D 0;
-> > > > +            val =3D eq;
-> > > > +        } else {
-> > > > +            val =3D "on";
-> > > > +        }
-> > > > +
-> > > > +        feat2prop(featurestr);
-> > > > +        name =3D featurestr;
-> > > > +
-> > > > +        if (g_list_find_custom(plus_features, name, compare_string=
-)) {
-> > > > +            warn_report("Ambiguous CPU model string. "
-> > > > +                        "Don't mix both \"+%s\" and \"%s=3D%s\"",
-> > > > +                        name, name, val);
-> > > > +            ambiguous =3D true;
-> > > > +        }
-> > > > +        if (g_list_find_custom(minus_features, name, compare_strin=
-g)) {
-> > > > +            warn_report("Ambiguous CPU model string. "
-> > > > +                        "Don't mix both \"-%s\" and \"%s=3D%s\"",
-> > > > +                        name, name, val);
-> > > > +            ambiguous =3D true;
-> > > > +        }
-> > > > +
-> > > > +        /* Special case: */
-> > > > +        if (!strcmp(name, "tsc-freq")) {
-> > > > +            int ret;
-> > > > +            uint64_t tsc_freq;
-> > > > +
-> > > > +            ret =3D qemu_strtosz_metric(val, NULL, &tsc_freq);
-> > > > +            if (ret < 0 || tsc_freq > INT64_MAX) {
-> > > > +                error_setg(errp, "bad numerical value %s", val);
-> > > > +                return;
-> > > > +            }
-> > > > +            snprintf(num, sizeof(num), "%" PRId64, tsc_freq);
-> > > > +            val =3D num;
-> > > > +            name =3D "tsc-frequency";
-> > > > +        } =20
-> > >=20
-> > > This is x86-specific and should stay in x86-specific code.  It
-> > > can probably be handled by the tsc-freq setter.
-> > there was reason why it wasn't moved to tsc-frequency setter,
-> > the former is pure integer type of property,
-> > while here we can get suffixed string that scales by 1000.
-> >=20
-> > Short of creating new visitor for KHz (I don't really looking forward t=
-o it),
-> > it's simpler to leave fixup alone in legacy parser that's shared only b=
-etween
-> > x86/sparc as it doesn't conflict with sparc and won't break anything.
->=20
-> It doesn't break anything, but it will move x86-specific cruft to
-> code that is supposed to be generic.
->=20
-> Creating a write-only "tsc-freq" property that accepts a string
-> isn't hard to do.
-Nice idea, it might just work.
+> ---
+>  docs/devel/qapi-code-gen.txt   | 10 +++++++++-
+>  include/qapi/qmp/dispatch.h    |  1 +
+>  qapi/qmp-dispatch.c            | 11 +++++++++++
+>  scripts/qapi-commands.py       | 18 +++++++++++++-----
+>  scripts/qapi-introspect.py     |  2 +-
+>  scripts/qapi.py                | 15 ++++++++++-----
+>  scripts/qapi2texi.py           |  2 +-
+>  tests/qapi-schema/test-qapi.py |  2 +-
+>  8 files changed, 47 insertions(+), 14 deletions(-)
+> 
+> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+> index 9903ac4..4960d00 100644
+> --- a/docs/devel/qapi-code-gen.txt
+> +++ b/docs/devel/qapi-code-gen.txt
+> @@ -556,7 +556,8 @@ following example objects:
+>  
+>  Usage: { 'command': STRING, '*data': COMPLEX-TYPE-NAME-OR-DICT,
+>           '*returns': TYPE-NAME, '*boxed': true,
+> -         '*gen': false, '*success-response': false }
+> +         '*gen': false, '*success-response': false,
+> +         '*without-bql': false }
+>  
+>  Commands are defined by using a dictionary containing several members,
+>  where three members are most common.  The 'command' member is a
+> @@ -636,6 +637,13 @@ possible, the command expression should include the optional key
+>  'success-response' with boolean value false.  So far, only QGA makes
+>  use of this member.
+>  
+> +Most of the commands require the Big QEMU Lock (BQL) be held during
+> +execution.  However, there is a small subset of the commands that may
+> +not really need BQL at all.  To mark out this kind of commands, we can
+> +specify "without-bql" to "true".  This parameter is only a hint for
+> +internal QMP implementation to provide possiblility to allow commands
+> +be run in parallel, or reduce the contention of the lock.  Users of QMP
+> +should not really be aware of such information.
 
->=20
-> If you are not willing to do it in this series, you can write a
-> generic parser now (without x86-specific cruft), use it only on
-> sparc, and later we can refactor x86 so it can also use the
-> generic one.
-So far, I'm inclined towards opposing +-feat generalizing and keeping
-canonical form anywhere except of x86/sparc were we have to tolerate it.
+Well, I think users of these commands might select them specifically
+because they know that they won't block.  Those who care about latency might
+look to use commands that don't take the lock because of a reduced
+effect on the performance as well.
 
+Dave
 
-> > > > +
-> > > > +        cpu_add_feat_as_prop(typename, name, val);
-> > > > +    }
-> > > > +
-> > > > +    if (ambiguous) {
-> > > > +        warn_report("Compatibility of ambiguous CPU model "
-> > > > +                    "strings won't be kept on future QEMU versions=
-");
-> > > > +    } =20
-> > >=20
-> > > As noted in the review of the x86 patch that removes the
-> > > plus_features/minus_features static variables, this obsolete (and
-> > > confusing) property ordering misfeature should be removed before
-> > > we make this code generic and reuse it on other architectures.
-> > As it's been replied removing ordering is behavioral change for
-> > both x86 and sparc, which is not related to series.
-> > If you wish, I'll post a patch that will what you suggest
-> > on top of series.
->=20
-> I would agree if sparc also implemented the weird ordering.  But
-> sparc does not implement it (it doesn't support feat=3D(on|off)
-> yet).  We shouldn't introduce that misfeature in sparc if we're
-> already planning to remove it.
-It didn't have canonic form but it gains this ability with this series.
-So we could do better for it by forbidding mixed syntax from starters
-(+1 for copy-past) but we have to keep minus overrides plus semantics,
-so ambiguous check is still there but it would lead to hard error instead of
-warning.
+>  === Events ===
+>  
+> diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+> index 20578dc..ec5c620 100644
+> --- a/include/qapi/qmp/dispatch.h
+> +++ b/include/qapi/qmp/dispatch.h
+> @@ -23,6 +23,7 @@ typedef enum QmpCommandOptions
+>  {
+>      QCO_NO_OPTIONS = 0x0,
+>      QCO_NO_SUCCESS_RESP = 0x1,
+> +    QCO_WITHOUT_BQL = 0x2,
+>  } QmpCommandOptions;
+>  
+>  typedef struct QmpCommand
+> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+> index 3b6b224..b7fba5e 100644
+> --- a/qapi/qmp-dispatch.c
+> +++ b/qapi/qmp-dispatch.c
+> @@ -107,6 +107,17 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
+>          QINCREF(args);
+>      }
+>  
+> +    if (cmd->options & QCO_WITHOUT_BQL) {
+> +        /*
+> +         * If this command can live without BQL, then we don't take
+> +         * it.  One thing to mention: we may have already taken the
+> +         * BQL before reaching here.  If so, we just keep it.  So
+> +         * generally speaking we are trying our best on reducing the
+> +         * contention of BQL.
+> +         */
+> +        take_bql = false;
+> +    }
+> +
+>      if (take_bql) {
+>          qemu_mutex_lock_iothread();
+>      }
+> diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
+> index 974d0a4..155a0a4 100644
+> --- a/scripts/qapi-commands.py
+> +++ b/scripts/qapi-commands.py
+> @@ -192,10 +192,17 @@ out:
+>      return ret
+>  
+>  
+> -def gen_register_command(name, success_response):
+> -    options = 'QCO_NO_OPTIONS'
+> +def gen_register_command(name, success_response, without_bql):
+> +    options = []
+> +
+>      if not success_response:
+> -        options = 'QCO_NO_SUCCESS_RESP'
+> +        options += ['QCO_NO_SUCCESS_RESP']
+> +    if without_bql:
+> +        options += ['QCO_WITHOUT_BQL']
+> +
+> +    if not options:
+> +        options = ['QCO_NO_OPTIONS']
+> +    options = " | ".join(options)
+>  
+>      ret = mcgen('''
+>      qmp_register_command(cmds, "%(name)s",
+> @@ -241,7 +248,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
+>          self._visited_ret_types = None
+>  
+>      def visit_command(self, name, info, arg_type, ret_type,
+> -                      gen, success_response, boxed):
+> +                      gen, success_response, boxed, without_bql):
+>          if not gen:
+>              return
+>          self.decl += gen_command_decl(name, arg_type, boxed, ret_type)
+> @@ -250,7 +257,8 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
+>              self.defn += gen_marshal_output(ret_type)
+>          self.decl += gen_marshal_decl(name)
+>          self.defn += gen_marshal(name, arg_type, boxed, ret_type)
+> -        self._regy += gen_register_command(name, success_response)
+> +        self._regy += gen_register_command(name, success_response,
+> +                                           without_bql)
+>  
+>  
+>  (input_file, output_dir, do_c, do_h, prefix, opts) = parse_command_line()
+> diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
+> index 032bcea..a523544 100644
+> --- a/scripts/qapi-introspect.py
+> +++ b/scripts/qapi-introspect.py
+> @@ -154,7 +154,7 @@ const char %(c_name)s[] = %(c_string)s;
+>                                      for m in variants.variants]})
+>  
+>      def visit_command(self, name, info, arg_type, ret_type,
+> -                      gen, success_response, boxed):
+> +                      gen, success_response, boxed, without_bql):
+>          arg_type = arg_type or self._schema.the_empty_object_type
+>          ret_type = ret_type or self._schema.the_empty_object_type
+>          self._gen_json(name, 'command',
+> diff --git a/scripts/qapi.py b/scripts/qapi.py
+> index 8aa2775..3951143 100644
+> --- a/scripts/qapi.py
+> +++ b/scripts/qapi.py
+> @@ -920,7 +920,8 @@ def check_exprs(exprs):
+>          elif 'command' in expr:
+>              meta = 'command'
+>              check_keys(expr_elem, 'command', [],
+> -                       ['data', 'returns', 'gen', 'success-response', 'boxed'])
+> +                       ['data', 'returns', 'gen', 'success-response',
+> +                        'boxed', 'without-bql'])
+>          elif 'event' in expr:
+>              meta = 'event'
+>              check_keys(expr_elem, 'event', [], ['data', 'boxed'])
+> @@ -1031,7 +1032,7 @@ class QAPISchemaVisitor(object):
+>          pass
+>  
+>      def visit_command(self, name, info, arg_type, ret_type,
+> -                      gen, success_response, boxed):
+> +                      gen, success_response, boxed, without_bql):
+>          pass
+>  
+>      def visit_event(self, name, info, arg_type, boxed):
+> @@ -1398,7 +1399,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
+>  
+>  class QAPISchemaCommand(QAPISchemaEntity):
+>      def __init__(self, name, info, doc, arg_type, ret_type,
+> -                 gen, success_response, boxed):
+> +                 gen, success_response, boxed, without_bql):
+>          QAPISchemaEntity.__init__(self, name, info, doc)
+>          assert not arg_type or isinstance(arg_type, str)
+>          assert not ret_type or isinstance(ret_type, str)
+> @@ -1408,6 +1409,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
+>          self.ret_type = None
+>          self.gen = gen
+>          self.success_response = success_response
+> +        self.without_bql = without_bql
+>          self.boxed = boxed
+>  
+>      def check(self, schema):
+> @@ -1432,7 +1434,8 @@ class QAPISchemaCommand(QAPISchemaEntity):
+>      def visit(self, visitor):
+>          visitor.visit_command(self.name, self.info,
+>                                self.arg_type, self.ret_type,
+> -                              self.gen, self.success_response, self.boxed)
+> +                              self.gen, self.success_response,
+> +                              self.boxed, self.without_bql)
+>  
+>  
+>  class QAPISchemaEvent(QAPISchemaEntity):
+> @@ -1639,6 +1642,7 @@ class QAPISchema(object):
+>          rets = expr.get('returns')
+>          gen = expr.get('gen', True)
+>          success_response = expr.get('success-response', True)
+> +        without_bql = expr.get('without-bql', False)
+>          boxed = expr.get('boxed', False)
+>          if isinstance(data, OrderedDict):
+>              data = self._make_implicit_object_type(
+> @@ -1647,7 +1651,8 @@ class QAPISchema(object):
+>              assert len(rets) == 1
+>              rets = self._make_array_type(rets[0], info)
+>          self._def_entity(QAPISchemaCommand(name, info, doc, data, rets,
+> -                                           gen, success_response, boxed))
+> +                                           gen, success_response,
+> +                                           boxed, without_bql))
+>  
+>      def _def_event(self, expr, info, doc):
+>          name = expr['event']
+> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+> index a317526..659bd83 100755
+> --- a/scripts/qapi2texi.py
+> +++ b/scripts/qapi2texi.py
+> @@ -236,7 +236,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
+>                               body=texi_entity(doc, 'Members'))
+>  
+>      def visit_command(self, name, info, arg_type, ret_type,
+> -                      gen, success_response, boxed):
+> +                      gen, success_response, boxed, without_bql):
+>          doc = self.cur_doc
+>          if self.out:
+>              self.out += '\n'
+> diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.py
+> index c7724d3..15aff29 100644
+> --- a/tests/qapi-schema/test-qapi.py
+> +++ b/tests/qapi-schema/test-qapi.py
+> @@ -36,7 +36,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+>          self._print_variants(variants)
+>  
+>      def visit_command(self, name, info, arg_type, ret_type,
+> -                      gen, success_response, boxed):
+> +                      gen, success_response, boxed, without_bql):
+>          print 'command %s %s -> %s' % \
+>              (name, arg_type and arg_type.name, ret_type and ret_type.name)
+>          print '   gen=%s success_response=%s boxed=%s' % \
+> -- 
+> 2.7.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
