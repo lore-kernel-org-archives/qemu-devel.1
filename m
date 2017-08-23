@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dkPuQ-0007Al-Np
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 03:17:03 -0400
+	(envelope-from <christian.ehrhardt@canonical.com>)
+	id 1dkQ5u-0002RS-C8
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 03:28:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dkPuM-0005nB-2P
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 03:17:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34366)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dkPuL-0005mp-Rt
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 03:16:57 -0400
-Date: Wed, 23 Aug 2017 09:16:50 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170823091650.48e7c44e.cohuck@redhat.com>
-In-Reply-To: <20170823002907.GC5379@umbus.fritz.box>
-References: <20170816082650.21880-1-cohuck@redhat.com>
-	<223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
-	<CAFEAcA_UfM_XNKdc5zfHsehoRE6Q+EszRZX3FByskir7c+0Lww@mail.gmail.com>
-	<20170822010917.GO12356@umbus.fritz.box>
-	<CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
-	<3f0dc918-0f55-e2f4-bf47-fe4abf5453bb@redhat.com>
-	<CAFEAcA_ezKWweEuUB-cXTer0LLaeuiGDkSdfhApedhw4ykDT0Q@mail.gmail.com>
-	<20170822112046.GC12356@umbus.fritz.box>
-	<20170822134815.77020eb8.cohuck@redhat.com>
-	<20170823002907.GC5379@umbus.fritz.box>
+	(envelope-from <christian.ehrhardt@canonical.com>)
+	id 1dkQ5t-0003Vf-5S
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 03:28:54 -0400
+Received: from mail-yw0-x236.google.com ([2607:f8b0:4002:c05::236]:33092)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <christian.ehrhardt@canonical.com>)
+	id 1dkQ5s-0003VP-SC
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 03:28:53 -0400
+Received: by mail-yw0-x236.google.com with SMTP id h127so5104357ywf.0
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 00:28:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.10] boot-serial-test: prefer tcg
- accelerator
+In-Reply-To: <1503471212-109371-1-git-send-email-borntraeger@de.ibm.com>
+References: <1503471212-109371-1-git-send-email-borntraeger@de.ibm.com>
+From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Date: Wed, 23 Aug 2017 09:28:21 +0200
+Message-ID: <CAATJJ0+OztkKpfD9RzK_FpGZKeUm_QbmEDr4CdajNYaiU9VnfQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] configure: enable --s390-pgste linker
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,34 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Dan Horak <dhorak@redhat.com>
 
-On Wed, 23 Aug 2017 10:29:07 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On Wed, Aug 23, 2017 at 8:53 AM, Christian Borntraeger <
+borntraeger@de.ibm.com> wrote:
 
-> On Tue, Aug 22, 2017 at 01:48:15PM +0200, Cornelia Huck wrote:
-> > On Tue, 22 Aug 2017 21:20:46 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >   
-> > > Obviously it's not a thing to fix right now, but I've really been
-> > > thinking that none of the tests should use this "TCG or KVM" stuff.
-> > > They should instead be run with *both* options - or at least the ones
-> > > that are available on the host.  
-> > 
-> > Having one test as a 'smoke test' that is run for everything available
-> > sounds like a good idea, and the boot-serial test may be a good
-> > candidate for that.
-> > 
-> > I would not want to run every test with every accelerator, however, as
-> > this makes 'make check' even slower than it is now. (Although it may be
-> > useful to be able to trigger 'run everything' tests on some dedicated
-> > test machines.)  
-> 
-> I'd be fine with only running the full matrix on a "make check-harder"
-> or whatever, target.  But I'd like the option to be there.  Sometimes
-> (like when preparing a pull request) a slower check is an acceptable
-> cost for better coverage.
+> KVM guests on s390 need a different page table layout than normal
+> processes (2kb page table + 2kb page status extensions vs 2kb page table
+> only). As of today this has to be enabled via the vm.allocate_pgste
+> sysctl.
+>
+> Newer kernels (>= 4.12) on s390 check for an S390_PGSTE program header
+> and enable the pgste page table extensions in that case. This makes the
+> vm.allocate_pgste sysctl unnecessary. We enable this program header for
+> the s390 system emulation (qemu-system-s390x) if we build on s390
+> - for s390 system emulation
+> - the linker supports --s390-pgste (binutils >= 2.29)
+> - KVM is enabled
+>
+> This will allow distributions to disable the global vm.allocate_pgste
+> sysctl, which will improve the page table allocation for non KVM
+> processes as only 2kb chunks are necessary.
+>
 
-make check with one smoke test + make check-harder (like the name :)
-sounds like a good combination.
+Hi Christian,
+it is great to see context pgste come to life.
+Currently vm.allocate_pgste defaults to 0 in the kernel but as you stated
+mostly enabled for KVM support in Distros.
+So when someone wants to disable it he has to drop the enabling
+(e.g. /etc/sysctl.d/10-arch-specific.conf for us).
+
+I want to be sure on the proper phasing of this - we can drop the
+"enabling" of global pgste once for a release we:
+- do not expect/support a kernel <4.12 to run there
+- will have only qemu versions >= the one carrying this change (and have it
+properly enabled)
+- binutils >= 2.29 to get the linking right
+
+But furthermore if we have a qemu with this enabled, there is no drawback
+and we could still run it in:
+- former releases with older kernels
+- former releases with older build environments
+That program header would just be ignored and we just would have to keep
+the sysctl enabled there right?
+
+Also for the time we want to check on the proper header, you surely have a
+one liner you can share that you run against the binary to check if it was
+generated correctly?
+Maybe even one that you can run against a pid if the status is correct?
