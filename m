@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=401f64dd5=ross.lagerwall@citrix.com>)
-	id 1dkVep-0006WN-G2
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:25:20 -0400
+	(envelope-from <intermediadc@hotmail.com>) id 1dkVmu-000054-Dq
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:33:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=401f64dd5=ross.lagerwall@citrix.com>)
-	id 1dkVem-0000jD-Tu
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:25:19 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:58634)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=401f64dd5=ross.lagerwall@citrix.com>)
-	id 1dkVem-0000hg-OP
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:25:16 -0400
-From: Ross Lagerwall <ross.lagerwall@citrix.com>
-Date: Wed, 23 Aug 2017 14:25:05 +0100
-Message-ID: <20170823132505.1505-1-ross.lagerwall@citrix.com>
+	(envelope-from <intermediadc@hotmail.com>) id 1dkVmo-0005JL-RA
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:33:40 -0400
+From: luigi burdo <intermediadc@hotmail.com>
+Date: Wed, 23 Aug 2017 13:33:14 +0000
+Message-ID: <AM5P194MB0132C6FDB93803CDD7DB634DC8850@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
+References: <cover.1503249785.git.balaton@eik.bme.hu>
+	<ab632ef70b02efb2257d9e2f08b45b097ebacb3a.1503249785.git.balaton@eik.bme.hu>
+	<20170823041644.GP5379@umbus.fritz.box>
+	<alpine.BSF.2.21.1708231217070.76247@zero.eik.bme.hu>
+	<8fe81d01-0a39-02cc-c7d8-59437c4f94ac@free.fr>,
+	<alpine.BSF.2.21.1708231422390.35800@zero.eik.bme.hu>
+In-Reply-To: <alpine.BSF.2.21.1708231422390.35800@zero.eik.bme.hu>
+Content-Language: it-IT
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] xen: Emit RTC_CHANGE upon TIMEOFFSET ioreq
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 15/15] ppc: Add aCube Sam460ex
+ board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,48 +29,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Ross Lagerwall <ross.lagerwall@citrix.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>, =?iso-8859-1?Q?Fran=E7ois_Revol?= <revol@free.fr>
+Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
 
-When the guest writes to the RTC, Xen emulates it and broadcasts a
-TIMEOFFSET ioreq. Emit an RTC_CHANGE QMP event to all QMP monitors when
-this happens rather than ignoring it so that something useful can be
-done with the information. This is the same event that QEMU generates
-when it emulates the RTC.
+Hi Zoltan,
 
-This patch by itself doesn't affect any of the toolstacks that I
-checked; the libxl toolstack doesn't currently handle this event nor
-does the XAPI toolstack. If nothing handles the event, it is simply
-ignored. We plan on modifying XAPI to handle it.
+>So I chose to
 
-Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
----
+>use the sii3112 by default.
+right chooice because internal sata on sam460 had issue and wont boot os4,m=
+orphos... only the cdrom was booting if i remember  good from internal sata=
+ 0.
+personally when i had a Sam460ex i was using a sii3114 or internal micro sd=
+ for boot... the sii was perfect compatible with sam uboot.
 
-Changed in v2:
-* Expanded commit message.
-
- hw/i386/xen/xen-hvm.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index d9ccd5d..ffd20dc 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -16,6 +16,7 @@
- #include "hw/i386/apic-msidef.h"
- #include "hw/xen/xen_common.h"
- #include "hw/xen/xen_backend.h"
-+#include "qapi-event.h"
- #include "qmp-commands.h"
- 
- #include "qemu/error-report.h"
-@@ -967,6 +968,7 @@ static void handle_ioreq(XenIOState *state, ioreq_t *req)
-             handle_vmport_ioreq(state, req);
-             break;
-         case IOREQ_TYPE_TIMEOFFSET:
-+            qapi_event_send_rtc_change((int64_t)req->data, &error_abort);
-             break;
-         case IOREQ_TYPE_INVALIDATE:
-             xen_invalidate_map_cache();
--- 
-2.9.5
+Thanks
+Luigi
