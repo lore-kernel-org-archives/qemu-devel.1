@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1dkgCd-0004Qr-9w
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 20:40:56 -0400
+	(envelope-from <rollandf@gmail.com>) id 1dkRLF-0008UI-A7
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:48:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1dkgCa-00051X-6h
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 20:40:55 -0400
-Received: from mga06.intel.com ([134.134.136.31]:2467)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
-	id 1dkgCZ-0004zr-R6
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 20:40:52 -0400
-From: "Liu, Changpeng" <changpeng.liu@intel.com>
-Date: Thu, 24 Aug 2017 00:40:42 +0000
-Message-ID: <FF7FC980937D6342B9D289F5F3C7C2625B5AEDAE@SHSMSX152.ccr.corp.intel.com>
-References: <20170823162004.27337-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20170823162004.27337-1-marcandre.lureau@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 00/27] vhost-user-scsi: code clean-up
+	(envelope-from <rollandf@gmail.com>) id 1dkRLC-0003PT-8j
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:48:49 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33358)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rollandf@gmail.com>) id 1dkRLC-0003Ol-11
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 04:48:46 -0400
+Received: by mail-wm0-x242.google.com with SMTP id q189so1634612wmd.0
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 01:48:44 -0700 (PDT)
+From: Fred Rolland <rollandf@gmail.com>
+Date: Wed, 23 Aug 2017 11:48:30 +0300
+Message-Id: <20170823084830.30500-1-frolland@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-doc: Add UUID support in initiator name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +23,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "felipe@nutanix.com" <felipe@nutanix.com>
+To: qemu-devel@nongnu.org
+Cc: Fred Rolland <frolland@redhat.com>
 
-VGhhbmtzIGZvciBoZWxwaW5nIHRoZSBleGFtcGxlIGNvZGUgY2xlYW4tdXAuIEkgY2FuIHJlYmFz
-ZSB0aGUgdmhvc3QtdXNlci1ibGsgcGF0Y2gNCnNldCBhZnRlciB5b3VyIGNvbW1pdHMuIEZvciB0
-aGUgaXNzdWUgeW91IG1lbnRpb25lZCBiZWxvdywgSSB0aGluayB0aGUgdmhvc3QtdXNlci1zY3Np
-IGV4YW1wbGUNCmNhbiBvbmx5IHN1cHBvcnQgMSBMVU4sIHNvIExVTjAgaXMgZXhpc3QsIExVTjEg
-cmVwb3J0ZWQgZXJyb3Igc2hvdWxkIGJlIG9rYXkuDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdl
-LS0tLS0NCj4gRnJvbTogTWFyYy1BbmRyw6kgTHVyZWF1IFttYWlsdG86bWFyY2FuZHJlLmx1cmVh
-dUByZWRoYXQuY29tXQ0KPiBTZW50OiBUaHVyc2RheSwgQXVndXN0IDI0LCAyMDE3IDEyOjIwIEFN
-DQo+IFRvOiBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gQ2M6IExpdSwgQ2hhbmdwZW5nIDxjaGFu
-Z3BlbmcubGl1QGludGVsLmNvbT47IGZlbGlwZUBudXRhbml4LmNvbTsgTWFyYy1BbmRyw6kNCj4g
-THVyZWF1IDxtYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20+DQo+IFN1YmplY3Q6IFtQQVRDSCAw
-MC8yN10gdmhvc3QtdXNlci1zY3NpOiBjb2RlIGNsZWFuLXVwDQo+IA0KPiBIaSwNCj4gDQo+IFdo
-aWxlIHJldmlld2luZyB2aG9zdC11c2VyLWJsaywgSSByZWFsaXplZCBhIGxvdCBvZiBjb2RlIHdh
-cyBiYXNlZCBvbg0KPiB2aG9zdC11c2VyLXNjc2ksIGFuZCBJIGZvdW5kIGEgbnVtYmVyIG9mIGlt
-cHJvdmVtZW50cyBjb3VsZCBiZQ0KPiBtYWRlLiBBcyBhIHJlc3VsdCBpbiB0aGlzIHNlcmllcywg
-SSB0cmllZCB0byBtb3ZlIGNvbW1vbiBnbGliIGNvZGUgaW4NCj4gbGlidmhvc3QtdXNlci1nbGli
-LiAoSSBvcmlnaW5hbGx5IG1hZGUgbGlidmhvc3QtdXNlciBnbGliLWZyZWUsIHNvIGlmDQo+IGV4
-dGVybmFsIHByb2plY3RzIHdhbnQgdG8gcGxheSB3aXRoIGl0LCB0aGV5IGRvbid0IGhhdmUgdG8g
-ZGVwZW5kIG9uDQo+IGdsaWIsIGZvciBleCB2aG9zdC11c2VyLWJyaWRnZSBkb2Vzbid0IHVzZSBn
-bGliKS4NCj4gDQo+IEkgaGF2ZW4ndCBkb25lIGV4dGVuc2l2ZSB0ZXN0aW5nLCBJIHRyaWVkIHRv
-IHNldHVwIGEgTFVOIHdpdGggaGVscA0KPiBmcm9tIGh0dHBzOi8vZmVkb3JhcHJvamVjdC5vcmcv
-d2lraS9TY3NpLXRhcmdldC11dGlsc19RdWlja3N0YXJ0X0d1aWRlLCBidXQNCj4gdGhlIGd1ZXN0
-IHNheXMgIlVuZXhwZWN0ZWQgcmVzcG9uc2UgZnJvbSBsdW4gMSB3aGlsZSBzY2FubmluZywgc2Nh
-bg0KPiBhYm9ydGVkIiAoYmVmb3JlIG9yIGFmdGVyIHRoZSBzZXJpZXMpLiBIZWxwIHdlbGNvbWUh
-DQo+IA0KPiBUaGFua3MNCj4gDQo+IE1hcmMtQW5kcsOpIEx1cmVhdSAoMjcpOg0KPiAgIGdsaWIt
-Y29tcGF0OiBtb3ZlIEdfU09VUkNFX0NPTlRJTlVFL1JFTU9WRSB0aGVyZQ0KPiAgIGxpYnZob3N0
-LXVzZXI6IGRyb3AgZGVwZW5kZW5jeSBvbiBnbGliDQo+ICAgbGlidmhvc3QtdXNlcjogaW1wcm92
-ZSB2dV9xdWV1ZV9wb3AoKSBkb2MNCj4gICB2aG9zdC11c2VyLXNjc2k6IHVzZSBnX3N0cmR1cCgp
-DQo+ICAgdmhvc3QtdXNlci1zY3NpOiBjb25uZWN0IHVuaXggc29ja2V0IGJlZm9yZSBhbGxvY2F0
-aW5nDQo+ICAgdmhvc3QtdXNlci1zY3NpOiBjb2RlIHN0eWxlIGZpeGVzDQo+ICAgdmhvc3QtdXNl
-ci1zY3NpOiB1c2UgZ2xpYiBhbGxvY2F0aW9uDQo+ICAgdmhvc3QtdXNlci1zY3NpOiBnbGliIGNh
-bGxzIHRoYXQgYWxsb2NhdGUgZG9uJ3QgcmV0dXJuIE5VTEwNCj4gICB2aG9zdC11c2VyLXNjc2k6
-IGFsc28gZnJlZSB0aGUgZ3RyZWUNCj4gICB2aG9zdC11c2VyLXNjc2k6IHJlbW92ZSB2ZGV2X3Nj
-c2lfZmluZF9ieV92dSgpDQo+ICAgdmhvc3QtdXNlci1zY3NpOiBzaW1wbGlmeSB1bml4IHBhdGgg
-Y2xlYW51cA0KPiAgIHZob3N0LXVzZXItc2NzaTogdXNlIE5VTEwgcG9pbnRlcg0KPiAgIHZob3N0
-LXVzZXItc2NzaTogdXNlIGdsaWIgd2F0Y2ggZGlyZWN0bHkNCj4gICB2aG9zdC11c2VyLXNjc2k6
-IGFzc2VydCgpIGluIGlzY3NpX2FkZF9sdW4oKQ0KPiAgIHZob3N0LXVzZXItc2NzaTogcmVtb3Zl
-IHZkZXZfc2NzaV9hZGRfaXNjc2lfbHVuKCkNCj4gICB2aG9zdC11c2VyLXNjc2k6IHJlbW92ZSBW
-VVNfTUFYX0xVTlMNCj4gICB2aG9zdC11c2VyLXNjc2k6IHJlbW92ZSB1bmltcGxlbWVudGVkIGZ1
-bmN0aW9ucw0KPiAgIHZob3N0LXVzZXItc2NzaTogcmVuYW1lIFZVUyB0eXBlcw0KPiAgIHZob3N0
-LXVzZXItc2NzaTogYXZvaWQgdXNlIG9mIGlzY3NpXyBuYW1lc3BhY2UNCj4gICB2aG9zdC11c2Vy
-LXNjc2k6IGRvbid0IGNvcHkgaXNjc2kvc2NzaS1sb3dsZXZlbC5oDQo+ICAgdmhvc3QtdXNlci1z
-Y3NpOiBkcm9wIGV4dHJhIGNhbGxiYWNrIHBvaW50ZXINCj4gICB2aG9zdC11c2VyLXNjc2k6IHNp
-bXBsaWZ5IHNvdXJjZSBoYW5kbGluZw0KPiAgIHZob3N0LXVzZXItc2NzaTogdXNlIGdsaWIgbG9n
-Z2luZw0KPiAgIGxpYnZob3N0LXVzZXI6IGFkZCBnbGliIHNvdXJjZSBoZWxwZXINCj4gICBidWls
-ZC1zeXM6IGZpeCBsaWJ2aG9zdC11c2VyLmEgYnVpbGQNCj4gICB2aG9zdC11c2VyLXNjc2k6IHVz
-ZSBsaWJ2aG9zdC11c2VyIGdsaWIgaGVscGVyDQo+ICAgdmhvc3QtdXNlci1zY3NpOiByZW1vdmUg
-c2VydmVyX3NvY2sgZnJvbSBWdXNEZXYNCj4gDQo+ICBjb250cmliL2xpYnZob3N0LXVzZXIvbGli
-dmhvc3QtdXNlci1nbGliLmggfCAgMzIgKysNCj4gIGNvbnRyaWIvbGlidmhvc3QtdXNlci9saWJ2
-aG9zdC11c2VyLmggICAgICB8ICAgMyArLQ0KPiAgaW5jbHVkZS9nbGliLWNvbXBhdC5oICAgICAg
-ICAgICAgICAgICAgICAgIHwgICA3ICsNCj4gIGNvbnRyaWIvbGlidmhvc3QtdXNlci9saWJ2aG9z
-dC11c2VyLWdsaWIuYyB8IDE0NSArKysrKysrDQo+ICBjb250cmliL2xpYnZob3N0LXVzZXIvbGli
-dmhvc3QtdXNlci5jICAgICAgfCAgMjUgKy0NCj4gIGNvbnRyaWIvdmhvc3QtdXNlci1zY3NpL3Zo
-b3N0LXVzZXItc2NzaS5jICB8IDYxOSArKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiAg
-TWFrZWZpbGUgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICAzICstDQo+ICBN
-YWtlZmlsZS5vYmpzICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDMgKy0NCj4gIGNv
-bnRyaWIvbGlidmhvc3QtdXNlci9NYWtlZmlsZS5vYmpzICAgICAgICB8ICAgMiArLQ0KPiAgdGVz
-dHMvTWFrZWZpbGUuaW5jbHVkZSAgICAgICAgICAgICAgICAgICAgIHwgICAyICstDQo+ICAxMCBm
-aWxlcyBjaGFuZ2VkLCAzMjAgaW5zZXJ0aW9ucygrKSwgNTIxIGRlbGV0aW9ucygtKQ0KPiAgY3Jl
-YXRlIG1vZGUgMTAwNjQ0IGNvbnRyaWIvbGlidmhvc3QtdXNlci9saWJ2aG9zdC11c2VyLWdsaWIu
-aA0KPiAgY3JlYXRlIG1vZGUgMTAwNjQ0IGNvbnRyaWIvbGlidmhvc3QtdXNlci9saWJ2aG9zdC11
-c2VyLWdsaWIuYw0KPiANCj4gLS0NCj4gMi4xNC4xLjE0Ni5nZDM1ZmFhODE5DQoNCg==
+Update doc with the usage of UUID for initiator name.
+
+Related-To: https://bugzilla.redhat.com/1006468
+Signed-off-by: Fred Rolland <frolland@redhat.com>
+---
+ qemu-doc.texi | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 9811476..4076226 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -1066,10 +1066,11 @@ in a configuration file provided via '-readconfig' or directly on the
+ command line.
+ 
+ If the initiator-name is not specified qemu will use a default name
+-of 'iqn.2008-11.org.linux-kvm[:<name>'] where <name> is the name of the
++of 'iqn.2008-11.org.linux-kvm[:<uuid>'] where <uuid> is the UUID of the
++virtual machine. If the UUID is not specified qemu will use
++'iqn.2008-11.org.linux-kvm[:<name>'] where <name> is the name of the
+ virtual machine.
+ 
+-
+ @example
+ Setting a specific initiator name to use when logging in to the target
+ -iscsi initiator-name=iqn.qemu.test:my-initiator
+-- 
+2.9.5
