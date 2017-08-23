@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dkZhl-0004xk-KE
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:44:40 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dkZjm-0006Eq-Ed
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:46:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dkZhk-0002AD-OK
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:44:37 -0400
-References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
-	<39bf15aa-70e0-45ad-e368-fb489ee30a7c@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <6fd08a23-a4f1-527f-6665-d1dbeb51a64a@redhat.com>
-Date: Wed, 23 Aug 2017 13:44:23 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dkZjj-0003gI-BJ
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:46:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35856)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dkZjj-0003g1-5R
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:46:39 -0400
+Date: Wed, 23 Aug 2017 18:46:29 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170823174629.GH2648@work-vm>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<1503471071-2233-6-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <39bf15aa-70e0-45ad-e368-fb489ee30a7c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Persistent bitmaps for non-qcow2 formats
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1503471071-2233-6-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 5/8] hmp: support "without_bql"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,61 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
+* Peter Xu (peterx@redhat.com) wrote:
+> Introducing new option "without_bql" for HMP commands.  It works just
+> like QMP "without-bql", but for HMP commands.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
+It's going to be interesting when we have hmp commands that just call
+their qmp equivalent that we need to check for no mistakes.
 
-On 08/23/2017 01:31 PM, Max Reitz wrote:
-> On 2017-08-22 21:07, John Snow wrote:
-> 
-> [...]
-> 
->> (3) Add either a new flag that turns qcow2's backing file into a full
->> R/W backing file, or add a new extension to qcow2 entirely (bypassing
->> the traditional backing file mechanism to avoid confusion for older
->> tooling) that adds a new read-write backing file field.
->>
->> This RW backing file field will be used for all reads AND writes; the
->> qcow2 in question becomes a metadata container on top of the BDS chain.
->> We can re-use Vladimir's bitmap persistence extension to save bitmaps in
->> a qcow2 shell.
->>
->> The qcow2 becomes effectively a metadata cache for a new (essentially)
->> filter node that handles features such as bitmaps. This could also be
->> used to provide allocation map data for RAW files and other goodies down
->> the road.
->>
->> Hopefully this achieves our desire to not create new formats AND our
->> desire to concentrate features (and debugging, testing, etc) into qcow2,
->> while allowing users to "have bitmaps with raw files."
->>
->> Of course, in this scenario, users now have two files: a qcow2 wrapper
->> and the actual raw file in question; but regardless of how we were going
->> to solve this, a raw file necessitates an external file of some sort,
->> else we give up the idea that it was a raw file.
->>
->>
->> Sound good?
-> 
-> While I don't quite like the idea of R/W backing files, I guess "don't
-> quite like" is still rather good.
-> 
+Dave
 
-Yeah, it's not necessarily my first pick, but it might be the least bad.
-If you have any suggestions or alternatives for a way to accomplish the
-same in a way that does not leave any, even faint, bad taste in your
-mouth you are more than welcome to suggest it.
-
-> I like how this idea would allow us to use the existing code without
-> putting just arbitrary binary data into the qcow2 file; the data still
-> relates to the virtual disk represented by the qcow2 image.
+> ---
+>  monitor.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 > 
-> So design-wise, I don't think I have any complaints.
+> diff --git a/monitor.c b/monitor.c
+> index 3d4ecff..c26c797 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -125,6 +125,8 @@ typedef struct mon_cmd_t {
+>      const char *args_type;
+>      const char *params;
+>      const char *help;
+> +    /* Whether this command can be run without taking BQL? */
+> +    bool without_bql;
+>      void (*cmd)(Monitor *mon, const QDict *qdict);
+>      /* @sub_table is a list of 2nd level of commands. If it does not exist,
+>       * cmd should be used. If it exists, sub_table[?].cmd should be
+> @@ -3154,6 +3156,14 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
+>          return;
+>      }
+>  
+> +    if (cmd->without_bql) {
+> +        /*
+> +         * This is similar to QMP's "without-bql".  See comments in
+> +         * do_qmp_dispatch().
+> +         */
+> +        take_bql = false;
+> +    }
+> +
+>      if (take_bql) {
+>          qemu_mutex_lock_iothread();
+>      }
+> -- 
+> 2.7.4
 > 
-> As for Kevin, he's on PTO, though. ;-)
-> 
-> Max
-> 
-
-Ah, right. Well... I'll just have to have something fun for him to look at.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
