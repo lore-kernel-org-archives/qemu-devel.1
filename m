@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dkZLM-0003Im-Q7
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:21:29 -0400
+	(envelope-from <anatol.pomozov@gmail.com>) id 1dkZNR-0005ew-HR
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:23:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dkZLL-0000BP-RJ
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:21:28 -0400
-Date: Wed, 23 Aug 2017 14:21:18 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170823172118.GQ19998@localhost.localdomain>
-References: <1503416789-32080-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1503416789-32080-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/allwinner-a10: Mark the
- allwinner-a10 device with user_creatable = false
+	(envelope-from <anatol.pomozov@gmail.com>) id 1dkZNQ-0001Yf-O1
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:23:37 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:36364)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <anatol.pomozov@gmail.com>)
+	id 1dkZNQ-0001Xk-HG
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:23:36 -0400
+Received: by mail-pf0-x243.google.com with SMTP id x76so106462pfa.3
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 10:23:35 -0700 (PDT)
+From: Anatol Pomozov <anatol.pomozov@gmail.com>
+Date: Wed, 23 Aug 2017 10:22:56 -0700
+Message-Id: <20170823172257.48011-2-anatol.pomozov@gmail.com>
+In-Reply-To: <20170823172257.48011-1-anatol.pomozov@gmail.com>
+References: <20170823172257.48011-1-anatol.pomozov@gmail.com>
+Subject: [Qemu-devel] [PATCH 2/3] multiboot: load any machine type of ELF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,64 +26,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, Beniamino Galvani <b.galvani@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, Anatol Pomozov <anatol.pomozov@gmail.com>
 
-On Tue, Aug 22, 2017 at 05:46:29PM +0200, Thomas Huth wrote:
-> QEMU currently exits unexpectedly when the user accidentially
-> tries to do something like this:
-> 
-> $ aarch64-softmmu/qemu-system-aarch64 -S -M integratorcp -nographic
-> QEMU 2.9.93 monitor - type 'help' for more information
-> (qemu) device_add allwinner-a10
-> Unsupported NIC model: smc91c111
-> 
-> Exiting just due to a "device_add" should not happen. Looking closer
-> at the the realize and instance_init function of this device also
-> reveals that it is using serial_hds and nd_table directly there, so
-> this device is clearly not creatable by the user and should be marked
-> accordingly.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/arm/allwinner-a10.c    | 2 ++
->  scripts/device-crash-test | 1 -
->  2 files changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
-> index f62a9a3..43a3f01 100644
-> --- a/hw/arm/allwinner-a10.c
-> +++ b/hw/arm/allwinner-a10.c
-> @@ -118,6 +118,8 @@ static void aw_a10_class_init(ObjectClass *oc, void *data)
->      DeviceClass *dc = DEVICE_CLASS(oc);
->  
->      dc->realize = aw_a10_realize;
-> +    /* Reason: Uses serial_hds in realize and nd_table in instance_init */
-> +    dc->user_creatable = false;
+x86 is not the only architecture supported by multiboot.
+For example GRUB supports MIPS architecture as well.
 
-I assume this patch will be replaced by one changing TYPE_DEVICE
-to default to user_creatable=false, based on the replies to the
-hw/misc/auxbus.c patch?
+Signed-off-by: Anatol Pomozov <anatol.pomozov@gmail.com>
+---
+ hw/i386/multiboot.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
->  }
->  
->  static const TypeInfo aw_a10_type_info = {
-> diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-> index 8eb2d02..74aee68 100755
-> --- a/scripts/device-crash-test
-> +++ b/scripts/device-crash-test
-> @@ -187,7 +187,6 @@ ERROR_WHITELIST = [
->      {'log':r"Device [\w.,-]+ can not be dynamically instantiated"},
->      {'log':r"Platform Bus: Can not fit MMIO region of size "},
->      # other more specific errors we will ignore:
-> -    {'device':'allwinner-a10', 'log':"Unsupported NIC model:"},
->      {'device':'.*-spapr-cpu-core', 'log':r"CPU core type should be"},
->      {'log':r"MSI(-X)? is not supported by interrupt controller"},
->      {'log':r"pxb-pcie? devices cannot reside on a PCIe? bus"},
-> -- 
-> 1.8.3.1
-> 
-
+diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
+index 19113c0fce..a49217ac62 100644
+--- a/hw/i386/multiboot.c
++++ b/hw/i386/multiboot.c
+@@ -173,7 +173,7 @@ int load_multiboot(FWCfgState *fw_cfg,
+         }
+ 
+         kernel_size = load_elf(kernel_filename, NULL, NULL, &elf_entry,
+-                               &elf_low, &elf_high, 0, I386_ELF_MACHINE,
++                               &elf_low, &elf_high, 0, EM_NONE,
+                                0, 0);
+         if (kernel_size < 0) {
+             fprintf(stderr, "Error while loading elf kernel\n");
 -- 
-Eduardo
+2.14.1.342.g6490525c54-goog
