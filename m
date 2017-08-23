@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dkYPS-0006Jc-UA
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dkYPS-0006Jg-Vh
 	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:21:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dkYPP-0007lY-Ov
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dkYPO-0007l8-MZ
 	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:21:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38468)
+Received: from mx1.redhat.com ([209.132.183.28]:53296)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dkYPP-0007kR-FE
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:21:35 -0400
+	id 1dkYPO-0007iy-CW
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:21:34 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 23 Aug 2017 18:20:01 +0200
-Message-Id: <20170823162004.27337-25-marcandre.lureau@redhat.com>
+Date: Wed, 23 Aug 2017 18:20:00 +0200
+Message-Id: <20170823162004.27337-24-marcandre.lureau@redhat.com>
 In-Reply-To: <20170823162004.27337-1-marcandre.lureau@redhat.com>
 References: <20170823162004.27337-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 24/27] libvhost-user: add glib source helper
+Subject: [Qemu-devel] [PATCH 23/27] vhost-user-scsi: use glib logging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,216 +30,238 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: changpeng.liu@intel.com, felipe@nutanix.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
+- PLOG is unused
+- code is compiled out unless debug is enabled
+- logging is too verbose
+- you can pipe to ts to have timestamp if needed, or use structured
+  logging with more recent glib
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user-glib.h |  32 +++++++
- contrib/libvhost-user/libvhost-user-glib.c | 145 +++++++++++++++++++++++=
-++++++
- contrib/libvhost-user/Makefile.objs        |   2 +-
- 3 files changed, 178 insertions(+), 1 deletion(-)
- create mode 100644 contrib/libvhost-user/libvhost-user-glib.h
- create mode 100644 contrib/libvhost-user/libvhost-user-glib.c
+ contrib/vhost-user-scsi/vhost-user-scsi.c | 77 +++++++++----------------=
+------
+ 1 file changed, 21 insertions(+), 56 deletions(-)
 
-diff --git a/contrib/libvhost-user/libvhost-user-glib.h b/contrib/libvhos=
-t-user/libvhost-user-glib.h
-new file mode 100644
-index 0000000000..a4b30824a1
---- /dev/null
-+++ b/contrib/libvhost-user/libvhost-user-glib.h
-@@ -0,0 +1,32 @@
-+/*
-+ * Vhost User library
-+ *
-+ * Copyright (c) 2016 Nutanix Inc. All rights reserved.
-+ * Copyright (c) 2017 Red Hat, Inc.
-+ *
-+ * Authors:
-+ *  Marc-Andr=C3=A9 Lureau <mlureau@redhat.com>
-+ *  Felipe Franciosi <felipe@nutanix.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef LIBVHOST_USER_GLIB_H
-+#define LIBVHOST_USER_GLIB_H
-+
-+#include <glib.h>
-+#include "libvhost-user.h"
-+
-+typedef struct VugDev {
-+    VuDev parent;
-+
-+    GMainLoop *loop;
-+    GHashTable *fdmap; /* fd -> gsource */
-+} VugDev;
-+
-+void vug_init(VugDev *dev, int socket, GMainLoop *loop,
-+              vu_panic_cb panic, const VuDevIface *iface);
-+void vug_deinit(VugDev *dev);
-+
-+#endif /* LIBVHOST_USER_GLIB_H */
-diff --git a/contrib/libvhost-user/libvhost-user-glib.c b/contrib/libvhos=
-t-user/libvhost-user-glib.c
-new file mode 100644
-index 0000000000..13e095b8e7
---- /dev/null
-+++ b/contrib/libvhost-user/libvhost-user-glib.c
-@@ -0,0 +1,145 @@
-+/*
-+ * Vhost User library
-+ *
-+ * Copyright (c) 2016 Nutanix Inc. All rights reserved.
-+ * Copyright (c) 2017 Red Hat, Inc.
-+ *
-+ * Authors:
-+ *  Marc-Andr=C3=A9 Lureau <mlureau@redhat.com>
-+ *  Felipe Franciosi <felipe@nutanix.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "libvhost-user-glib.h"
-+
-+/* glib event loop integration for libvhost-user and misc callbacks */
-+
-+G_STATIC_ASSERT((int)G_IO_IN =3D=3D (int)VU_WATCH_IN);
-+G_STATIC_ASSERT((int)G_IO_OUT =3D=3D (int)VU_WATCH_OUT);
-+G_STATIC_ASSERT((int)G_IO_PRI =3D=3D (int)VU_WATCH_PRI);
-+G_STATIC_ASSERT((int)G_IO_ERR =3D=3D (int)VU_WATCH_ERR);
-+G_STATIC_ASSERT((int)G_IO_HUP =3D=3D (int)VU_WATCH_HUP);
-+
-+typedef struct vus_gsrc {
-+    GSource parent;
-+    VuDev *dev;
-+    GPollFD gfd;
-+} vus_gsrc_t;
-+
-+static gboolean
-+vus_gsrc_prepare(GSource *src, gint *timeout)
-+{
-+    g_assert(timeout);
-+
-+    *timeout =3D -1;
-+    return FALSE;
-+}
-+
-+static gboolean
-+vus_gsrc_check(GSource *src)
-+{
-+    vus_gsrc_t *vus_src =3D (vus_gsrc_t *)src;
-+
-+    g_assert(vus_src);
-+
-+    return vus_src->gfd.revents & vus_src->gfd.events;
-+}
-+
-+static gboolean
-+vus_gsrc_dispatch(GSource *src, GSourceFunc cb, gpointer data)
-+{
-+    vus_gsrc_t *vus_src =3D (vus_gsrc_t *)src;
-+
-+    g_assert(vus_src);
-+
-+    ((vu_watch_cb)cb) (vus_src->dev, vus_src->gfd.revents, data);
-+
-+    return G_SOURCE_CONTINUE;
-+}
-+
-+static GSourceFuncs vus_gsrc_funcs =3D {
-+    vus_gsrc_prepare,
-+    vus_gsrc_check,
-+    vus_gsrc_dispatch,
-+    NULL
-+};
-+
-+static GSource *
-+vug_source_new(VuDev *dev, int fd, GIOCondition cond,
-+               vu_watch_cb vu_cb, gpointer data)
-+{
-+    GSource *vus_gsrc;
-+    vus_gsrc_t *vus_src;
-+    guint id;
-+
-+    g_assert(dev);
-+    g_assert(fd >=3D 0);
-+    g_assert(vu_cb);
-+
-+    vus_gsrc =3D g_source_new(&vus_gsrc_funcs, sizeof(vus_gsrc_t));
-+    g_source_set_callback(vus_gsrc, (GSourceFunc) vu_cb, data, NULL);
-+    vus_src =3D (vus_gsrc_t *)vus_gsrc;
-+    vus_src->dev =3D dev;
-+    vus_src->gfd.fd =3D fd;
-+    vus_src->gfd.events =3D cond;
-+
-+    g_source_add_poll(vus_gsrc, &vus_src->gfd);
-+    id =3D g_source_attach(vus_gsrc, NULL);
-+    g_assert(id);
-+    g_source_unref(vus_gsrc);
-+
-+    return vus_gsrc;
-+}
-+
-+static void
-+set_watch(VuDev *vu_dev, int fd, int vu_evt, vu_watch_cb cb, void *pvt)
-+{
-+    GSource *src;
-+    VugDev *dev;
-+
-+    g_assert(vu_dev);
-+    g_assert(fd >=3D 0);
-+    g_assert(cb);
-+
-+    dev =3D container_of(vu_dev, VugDev, parent);
-+    src =3D vug_source_new(vu_dev, fd, vu_evt, cb, pvt);
-+    g_hash_table_replace(dev->fdmap, GINT_TO_POINTER(fd), src);
-+}
-+
-+static void
-+remove_watch(VuDev *vu_dev, int fd)
-+{
-+    VugDev *dev;
-+
-+    g_assert(vu_dev);
-+    g_assert(fd >=3D 0);
-+
-+    dev =3D container_of(vu_dev, VugDev, parent);
-+    g_hash_table_remove(dev->fdmap, GINT_TO_POINTER(fd));
-+}
-+
-+void
-+vug_init(VugDev *dev, int socket, GMainLoop *loop,
-+         vu_panic_cb panic, const VuDevIface *iface)
-+{
-+    g_assert(dev);
-+    g_assert(loop);
-+    g_assert(iface);
-+
-+    vu_init(&dev->parent, socket, panic, set_watch, remove_watch, iface)=
-;
-+    dev->loop =3D loop;
-+    dev->fdmap =3D g_hash_table_new_full(NULL, NULL, NULL,
-+                                       (GDestroyNotify) g_source_destroy=
+diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-us=
+er-scsi/vhost-user-scsi.c
+index 516a9d3966..e3ec8b9b2c 100644
+--- a/contrib/vhost-user-scsi/vhost-user-scsi.c
++++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
+@@ -18,42 +18,6 @@
+=20
+ #include <glib.h>
+=20
+-/* #define VUS_DEBUG 1 */
+-
+-/** Log helpers **/
+-
+-#define PPRE                                                          \
+-    struct timespec ts;                                               \
+-    char   timebuf[64];                                               \
+-    struct tm tm;                                                     \
+-    (void)clock_gettime(CLOCK_REALTIME, &ts);                         \
+-    (void)strftime(timebuf, 64, "%Y%m%d %T", gmtime_r(&ts.tv_sec, &tm))
+-
+-#define PEXT(lvl, msg, ...) do {                                      \
+-    PPRE;                                                             \
+-    fprintf(stderr, "%s.%06ld " lvl ": %s:%s():%d: " msg "\n",        \
+-            timebuf, ts.tv_nsec / 1000,                               \
+-            __FILE__, __func__, __LINE__, ## __VA_ARGS__);            \
+-} while (0)
+-
+-#define PNOR(lvl, msg, ...) do {                                      \
+-    PPRE;                                                             \
+-    fprintf(stderr, "%s.%06ld " lvl ": " msg "\n",                    \
+-            timebuf, ts.tv_nsec / 1000, ## __VA_ARGS__);              \
+-} while (0)
+-
+-#ifdef VUS_DEBUG
+-#define PDBG(msg, ...) PEXT("DBG", msg, ## __VA_ARGS__)
+-#define PERR(msg, ...) PEXT("ERR", msg, ## __VA_ARGS__)
+-#define PLOG(msg, ...) PEXT("LOG", msg, ## __VA_ARGS__)
+-#else
+-#define PDBG(msg, ...) { }
+-#define PERR(msg, ...) PNOR("ERR", msg, ## __VA_ARGS__)
+-#define PLOG(msg, ...) PNOR("LOG", msg, ## __VA_ARGS__)
+-#endif
+-
+-/** vhost-user-scsi specific definitions **/
+-
+ #define VUS_ISCSI_INITIATOR "iqn.2016-11.com.nutanix:vhost-user-scsi"
+=20
+ typedef struct VusIscsiLun {
+@@ -166,27 +130,28 @@ static int vus_iscsi_add_lun(VusIscsiLun *lun, char=
+ *iscsi_uri)
+=20
+     iscsi_ctx =3D iscsi_create_context(VUS_ISCSI_INITIATOR);
+     if (!iscsi_ctx) {
+-        PERR("Unable to create iSCSI context");
++        g_warning("Unable to create iSCSI context");
+         return -1;
+     }
+=20
+     iscsi_url =3D iscsi_parse_full_url(iscsi_ctx, iscsi_uri);
+     if (!iscsi_url) {
+-        PERR("Unable to parse iSCSI URL: %s", iscsi_get_error(iscsi_ctx)=
 );
-+}
-+
-+void
-+vug_deinit(VugDev *dev)
-+{
-+    g_assert(dev);
-+
-+    g_hash_table_unref(dev->fdmap);
-+}
-diff --git a/contrib/libvhost-user/Makefile.objs b/contrib/libvhost-user/=
-Makefile.objs
-index cef1ad6e31..ef3778edd4 100644
---- a/contrib/libvhost-user/Makefile.objs
-+++ b/contrib/libvhost-user/Makefile.objs
-@@ -1 +1 @@
--libvhost-user-obj-y =3D libvhost-user.o
-+libvhost-user-obj-y +=3D libvhost-user.o libvhost-user-glib.o
++        g_warning("Unable to parse iSCSI URL: %s", iscsi_get_error(iscsi=
+_ctx));
+         goto fail;
+     }
+=20
+     iscsi_set_session_type(iscsi_ctx, ISCSI_SESSION_NORMAL);
+     iscsi_set_header_digest(iscsi_ctx, ISCSI_HEADER_DIGEST_NONE_CRC32C);
+     if (iscsi_full_connect_sync(iscsi_ctx, iscsi_url->portal, iscsi_url-=
+>lun)) {
+-        PERR("Unable to login to iSCSI portal: %s", iscsi_get_error(iscs=
+i_ctx));
++        g_warning("Unable to login to iSCSI portal: %s",
++                  iscsi_get_error(iscsi_ctx));
+         goto fail;
+     }
+=20
+     lun->iscsi_ctx =3D iscsi_ctx;
+     lun->iscsi_lun =3D iscsi_url->lun;
+=20
+-    PDBG("Context %p created for lun 0: %s", iscsi_ctx, iscsi_uri);
++    g_debug("Context %p created for lun 0: %s", iscsi_ctx, iscsi_uri);
+=20
+ out:
+     if (iscsi_url) {
+@@ -228,7 +193,7 @@ static int get_cdb_len(uint8_t *cdb)
+     case 4: return 16;
+     case 5: return 12;
+     }
+-    PERR("Unable to determine cdb len (0x%02hhX)", cdb[0] >> 5);
++    g_warning("Unable to determine cdb len (0x%02hhX)", cdb[0] >> 5);
+     return -1;
+ }
+=20
+@@ -250,7 +215,7 @@ static int handle_cmd_sync(struct iscsi_context *ctx,
+=20
+     if (!(!req->lun[1] && req->lun[2] =3D=3D 0x40 && !req->lun[3])) {
+         /* Ignore anything different than target=3D0, lun=3D0 */
+-        PDBG("Ignoring unconnected lun (0x%hhX, 0x%hhX)",
++        g_debug("Ignoring unconnected lun (0x%hhX, 0x%hhX)",
+              req->lun[1], req->lun[3]);
+         rsp->status =3D SCSI_STATUS_CHECK_CONDITION;
+         memset(rsp->sense, 0, sizeof(rsp->sense));
+@@ -293,10 +258,10 @@ static int handle_cmd_sync(struct iscsi_context *ct=
+x,
+         task->iovector_in.niov =3D in_len;
+     }
+=20
+-    PDBG("Sending iscsi cmd (cdb_len=3D%d, dir=3D%d, task=3D%p)",
++    g_debug("Sending iscsi cmd (cdb_len=3D%d, dir=3D%d, task=3D%p)",
+          cdb_len, dir, task);
+     if (!iscsi_scsi_command_sync(ctx, 0, task, NULL)) {
+-        PERR("Error serving SCSI command");
++        g_warning("Error serving SCSI command");
+         g_free(task);
+         return -1;
+     }
+@@ -314,7 +279,7 @@ static int handle_cmd_sync(struct iscsi_context *ctx,
+=20
+     g_free(task);
+=20
+-    PDBG("Filled in rsp: status=3D%hhX, resid=3D%u, response=3D%hhX, sen=
+se_len=3D%u",
++    g_debug("Filled in rsp: status=3D%hhX, resid=3D%u, response=3D%hhX, =
+sense_len=3D%u",
+          rsp->status, rsp->resid, rsp->response, rsp->sense_len);
+=20
+     return 0;
+@@ -330,7 +295,7 @@ static void vus_panic_cb(VuDev *vu_dev, const char *b=
+uf)
+=20
+     vdev_scsi =3D container_of(vu_dev, VusDev, vu_dev);
+     if (buf) {
+-        PERR("vu_panic: %s", buf);
++        g_warning("vu_panic: %s", buf);
+     }
+=20
+     g_main_loop_quit(vdev_scsi->loop);
+@@ -371,19 +336,19 @@ static void vus_proc_req(VuDev *vu_dev, int idx)
+=20
+     vdev_scsi =3D container_of(vu_dev, VusDev, vu_dev);
+     if (idx < 0 || idx >=3D VHOST_MAX_NR_VIRTQUEUE) {
+-        PERR("VQ Index out of range: %d", idx);
++        g_warning("VQ Index out of range: %d", idx);
+         vus_panic_cb(vu_dev, NULL);
+         return;
+     }
+=20
+     vq =3D vu_get_queue(vu_dev, idx);
+     if (!vq) {
+-        PERR("Error fetching VQ (dev=3D%p, idx=3D%d)", vu_dev, idx);
++        g_warning("Error fetching VQ (dev=3D%p, idx=3D%d)", vu_dev, idx)=
+;
+         vus_panic_cb(vu_dev, NULL);
+         return;
+     }
+=20
+-    PDBG("Got kicked on vq[%d]@%p", idx, vq);
++    g_debug("Got kicked on vq[%d]@%p", idx, vq);
+=20
+     while (1) {
+         VuVirtqElement *elem;
+@@ -392,23 +357,23 @@ static void vus_proc_req(VuDev *vu_dev, int idx)
+=20
+         elem =3D vu_queue_pop(vu_dev, vq, sizeof(VuVirtqElement));
+         if (!elem) {
+-            PDBG("No more elements pending on vq[%d]@%p", idx, vq);
++            g_debug("No more elements pending on vq[%d]@%p", idx, vq);
+             break;
+         }
+-        PDBG("Popped elem@%p", elem);
++        g_debug("Popped elem@%p", elem);
+=20
+         assert(!(elem->out_num > 1 && elem->in_num > 1));
+         assert(elem->out_num > 0 && elem->in_num > 0);
+=20
+         if (elem->out_sg[0].iov_len < sizeof(VirtIOSCSICmdReq)) {
+-            PERR("Invalid virtio-scsi req header");
++            g_warning("Invalid virtio-scsi req header");
+             vus_panic_cb(vu_dev, NULL);
+             break;
+         }
+         req =3D (VirtIOSCSICmdReq *)elem->out_sg[0].iov_base;
+=20
+         if (elem->in_sg[0].iov_len < sizeof(VirtIOSCSICmdResp)) {
+-            PERR("Invalid virtio-scsi rsp header");
++            g_warning("Invalid virtio-scsi rsp header");
+             vus_panic_cb(vu_dev, NULL);
+             break;
+         }
+@@ -435,7 +400,7 @@ static void vus_queue_set_started(VuDev *vu_dev, int =
+idx, bool started)
+     assert(vu_dev);
+=20
+     if (idx < 0 || idx >=3D VHOST_MAX_NR_VIRTQUEUE) {
+-        PERR("VQ Index out of range: %d", idx);
++        g_warning("VQ Index out of range: %d", idx);
+         vus_panic_cb(vu_dev, NULL);
+         return;
+     }
+@@ -443,7 +408,7 @@ static void vus_queue_set_started(VuDev *vu_dev, int =
+idx, bool started)
+     vq =3D vu_get_queue(vu_dev, idx);
+=20
+     if (idx =3D=3D 0 || idx =3D=3D 1) {
+-        PDBG("queue %d unimplemented", idx);
++        g_debug("queue %d unimplemented", idx);
+     } else {
+         vu_set_queue_handler(vu_dev, vq, started ? vus_proc_req : NULL);
+     }
+@@ -461,7 +426,7 @@ static gboolean vus_vhost_cb(GIOChannel *source, GIOC=
+ondition condition,
+     assert(vu_dev);
+=20
+     if (!vu_dispatch(vu_dev) !=3D 0) {
+-        PERR("Error processing vhost message");
++        g_warning("Error processing vhost message");
+         vus_panic_cb(vu_dev, NULL);
+         return G_SOURCE_REMOVE;
+     }
 --=20
 2.14.1.146.gd35faa819
