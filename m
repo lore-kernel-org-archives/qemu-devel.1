@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkZhZ-0004rN-Ub
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:44:27 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dkZhl-0004xk-KE
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:44:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkZhW-00021p-JZ
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:44:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49832)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dkZhW-00021I-9L
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:44:22 -0400
-Date: Wed, 23 Aug 2017 18:44:12 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170823174411.GG2648@work-vm>
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<1503471071-2233-5-git-send-email-peterx@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1dkZhk-0002AD-OK
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:44:37 -0400
+References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
+	<39bf15aa-70e0-45ad-e368-fb489ee30a7c@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <6fd08a23-a4f1-527f-6665-d1dbeb51a64a@redhat.com>
+Date: Wed, 23 Aug 2017 13:44:23 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1503471071-2233-5-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 4/8] QAPI: new QMP command option
- "without-bql"
+In-Reply-To: <39bf15aa-70e0-45ad-e368-fb489ee30a7c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Persistent bitmaps for non-qcow2 formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,266 +24,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Introducing this new parameter for QMP commands in general to mark out
-> when the command does not need BQL.  Normally QMP command executions are
-> done with the protection of BQL in QEMU.  However the truth is that not
-> all the QMP commands require the BQL.
+
+
+On 08/23/2017 01:31 PM, Max Reitz wrote:
+> On 2017-08-22 21:07, John Snow wrote:
 > 
-> This new parameter provides a way to allow QMP commands to run in
-> parallel when possible, without the contention on the BQL.
+> [...]
 > 
-> Since the default value of "without-bql" is still false, so now all QMP
-> commands are still protected by BQL still.
+>> (3) Add either a new flag that turns qcow2's backing file into a full
+>> R/W backing file, or add a new extension to qcow2 entirely (bypassing
+>> the traditional backing file mechanism to avoid confusion for older
+>> tooling) that adds a new read-write backing file field.
+>>
+>> This RW backing file field will be used for all reads AND writes; the
+>> qcow2 in question becomes a metadata container on top of the BDS chain.
+>> We can re-use Vladimir's bitmap persistence extension to save bitmaps in
+>> a qcow2 shell.
+>>
+>> The qcow2 becomes effectively a metadata cache for a new (essentially)
+>> filter node that handles features such as bitmaps. This could also be
+>> used to provide allocation map data for RAW files and other goodies down
+>> the road.
+>>
+>> Hopefully this achieves our desire to not create new formats AND our
+>> desire to concentrate features (and debugging, testing, etc) into qcow2,
+>> while allowing users to "have bitmaps with raw files."
+>>
+>> Of course, in this scenario, users now have two files: a qcow2 wrapper
+>> and the actual raw file in question; but regardless of how we were going
+>> to solve this, a raw file necessitates an external file of some sort,
+>> else we give up the idea that it was a raw file.
+>>
+>>
+>> Sound good?
 > 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-
-We should define what a 'without-bql' command is allowed to do:
-   'Commands that have without-bql set _may_ be called without the bql
-   being taken.  They must not take the bql or any other lock that may
-   become dependent on the bql.'
-   (Do we need to say anything about RCU?)
-
-Also, 'no-bql' is shorter :-)
-
-Dave
-
-> ---
->  docs/devel/qapi-code-gen.txt   | 10 +++++++++-
->  include/qapi/qmp/dispatch.h    |  1 +
->  qapi/qmp-dispatch.c            | 11 +++++++++++
->  scripts/qapi-commands.py       | 18 +++++++++++++-----
->  scripts/qapi-introspect.py     |  2 +-
->  scripts/qapi.py                | 15 ++++++++++-----
->  scripts/qapi2texi.py           |  2 +-
->  tests/qapi-schema/test-qapi.py |  2 +-
->  8 files changed, 47 insertions(+), 14 deletions(-)
+> While I don't quite like the idea of R/W backing files, I guess "don't
+> quite like" is still rather good.
 > 
-> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-> index 9903ac4..4960d00 100644
-> --- a/docs/devel/qapi-code-gen.txt
-> +++ b/docs/devel/qapi-code-gen.txt
-> @@ -556,7 +556,8 @@ following example objects:
->  
->  Usage: { 'command': STRING, '*data': COMPLEX-TYPE-NAME-OR-DICT,
->           '*returns': TYPE-NAME, '*boxed': true,
-> -         '*gen': false, '*success-response': false }
-> +         '*gen': false, '*success-response': false,
-> +         '*without-bql': false }
->  
->  Commands are defined by using a dictionary containing several members,
->  where three members are most common.  The 'command' member is a
-> @@ -636,6 +637,13 @@ possible, the command expression should include the optional key
->  'success-response' with boolean value false.  So far, only QGA makes
->  use of this member.
->  
-> +Most of the commands require the Big QEMU Lock (BQL) be held during
-> +execution.  However, there is a small subset of the commands that may
-> +not really need BQL at all.  To mark out this kind of commands, we can
-> +specify "without-bql" to "true".  This parameter is only a hint for
-> +internal QMP implementation to provide possiblility to allow commands
-> +be run in parallel, or reduce the contention of the lock.  Users of QMP
-> +should not really be aware of such information.
 
-Well, I think users of these commands might select them specifically
-because they know that they won't block.  Those who care about latency might
-look to use commands that don't take the lock because of a reduced
-effect on the performance as well.
+Yeah, it's not necessarily my first pick, but it might be the least bad.
+If you have any suggestions or alternatives for a way to accomplish the
+same in a way that does not leave any, even faint, bad taste in your
+mouth you are more than welcome to suggest it.
 
-Dave
-
->  === Events ===
->  
-> diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
-> index 20578dc..ec5c620 100644
-> --- a/include/qapi/qmp/dispatch.h
-> +++ b/include/qapi/qmp/dispatch.h
-> @@ -23,6 +23,7 @@ typedef enum QmpCommandOptions
->  {
->      QCO_NO_OPTIONS = 0x0,
->      QCO_NO_SUCCESS_RESP = 0x1,
-> +    QCO_WITHOUT_BQL = 0x2,
->  } QmpCommandOptions;
->  
->  typedef struct QmpCommand
-> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-> index 3b6b224..b7fba5e 100644
-> --- a/qapi/qmp-dispatch.c
-> +++ b/qapi/qmp-dispatch.c
-> @@ -107,6 +107,17 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
->          QINCREF(args);
->      }
->  
-> +    if (cmd->options & QCO_WITHOUT_BQL) {
-> +        /*
-> +         * If this command can live without BQL, then we don't take
-> +         * it.  One thing to mention: we may have already taken the
-> +         * BQL before reaching here.  If so, we just keep it.  So
-> +         * generally speaking we are trying our best on reducing the
-> +         * contention of BQL.
-> +         */
-> +        take_bql = false;
-> +    }
-> +
->      if (take_bql) {
->          qemu_mutex_lock_iothread();
->      }
-> diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
-> index 974d0a4..155a0a4 100644
-> --- a/scripts/qapi-commands.py
-> +++ b/scripts/qapi-commands.py
-> @@ -192,10 +192,17 @@ out:
->      return ret
->  
->  
-> -def gen_register_command(name, success_response):
-> -    options = 'QCO_NO_OPTIONS'
-> +def gen_register_command(name, success_response, without_bql):
-> +    options = []
-> +
->      if not success_response:
-> -        options = 'QCO_NO_SUCCESS_RESP'
-> +        options += ['QCO_NO_SUCCESS_RESP']
-> +    if without_bql:
-> +        options += ['QCO_WITHOUT_BQL']
-> +
-> +    if not options:
-> +        options = ['QCO_NO_OPTIONS']
-> +    options = " | ".join(options)
->  
->      ret = mcgen('''
->      qmp_register_command(cmds, "%(name)s",
-> @@ -241,7 +248,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
->          self._visited_ret_types = None
->  
->      def visit_command(self, name, info, arg_type, ret_type,
-> -                      gen, success_response, boxed):
-> +                      gen, success_response, boxed, without_bql):
->          if not gen:
->              return
->          self.decl += gen_command_decl(name, arg_type, boxed, ret_type)
-> @@ -250,7 +257,8 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
->              self.defn += gen_marshal_output(ret_type)
->          self.decl += gen_marshal_decl(name)
->          self.defn += gen_marshal(name, arg_type, boxed, ret_type)
-> -        self._regy += gen_register_command(name, success_response)
-> +        self._regy += gen_register_command(name, success_response,
-> +                                           without_bql)
->  
->  
->  (input_file, output_dir, do_c, do_h, prefix, opts) = parse_command_line()
-> diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
-> index 032bcea..a523544 100644
-> --- a/scripts/qapi-introspect.py
-> +++ b/scripts/qapi-introspect.py
-> @@ -154,7 +154,7 @@ const char %(c_name)s[] = %(c_string)s;
->                                      for m in variants.variants]})
->  
->      def visit_command(self, name, info, arg_type, ret_type,
-> -                      gen, success_response, boxed):
-> +                      gen, success_response, boxed, without_bql):
->          arg_type = arg_type or self._schema.the_empty_object_type
->          ret_type = ret_type or self._schema.the_empty_object_type
->          self._gen_json(name, 'command',
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index 8aa2775..3951143 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -920,7 +920,8 @@ def check_exprs(exprs):
->          elif 'command' in expr:
->              meta = 'command'
->              check_keys(expr_elem, 'command', [],
-> -                       ['data', 'returns', 'gen', 'success-response', 'boxed'])
-> +                       ['data', 'returns', 'gen', 'success-response',
-> +                        'boxed', 'without-bql'])
->          elif 'event' in expr:
->              meta = 'event'
->              check_keys(expr_elem, 'event', [], ['data', 'boxed'])
-> @@ -1031,7 +1032,7 @@ class QAPISchemaVisitor(object):
->          pass
->  
->      def visit_command(self, name, info, arg_type, ret_type,
-> -                      gen, success_response, boxed):
-> +                      gen, success_response, boxed, without_bql):
->          pass
->  
->      def visit_event(self, name, info, arg_type, boxed):
-> @@ -1398,7 +1399,7 @@ class QAPISchemaAlternateType(QAPISchemaType):
->  
->  class QAPISchemaCommand(QAPISchemaEntity):
->      def __init__(self, name, info, doc, arg_type, ret_type,
-> -                 gen, success_response, boxed):
-> +                 gen, success_response, boxed, without_bql):
->          QAPISchemaEntity.__init__(self, name, info, doc)
->          assert not arg_type or isinstance(arg_type, str)
->          assert not ret_type or isinstance(ret_type, str)
-> @@ -1408,6 +1409,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
->          self.ret_type = None
->          self.gen = gen
->          self.success_response = success_response
-> +        self.without_bql = without_bql
->          self.boxed = boxed
->  
->      def check(self, schema):
-> @@ -1432,7 +1434,8 @@ class QAPISchemaCommand(QAPISchemaEntity):
->      def visit(self, visitor):
->          visitor.visit_command(self.name, self.info,
->                                self.arg_type, self.ret_type,
-> -                              self.gen, self.success_response, self.boxed)
-> +                              self.gen, self.success_response,
-> +                              self.boxed, self.without_bql)
->  
->  
->  class QAPISchemaEvent(QAPISchemaEntity):
-> @@ -1639,6 +1642,7 @@ class QAPISchema(object):
->          rets = expr.get('returns')
->          gen = expr.get('gen', True)
->          success_response = expr.get('success-response', True)
-> +        without_bql = expr.get('without-bql', False)
->          boxed = expr.get('boxed', False)
->          if isinstance(data, OrderedDict):
->              data = self._make_implicit_object_type(
-> @@ -1647,7 +1651,8 @@ class QAPISchema(object):
->              assert len(rets) == 1
->              rets = self._make_array_type(rets[0], info)
->          self._def_entity(QAPISchemaCommand(name, info, doc, data, rets,
-> -                                           gen, success_response, boxed))
-> +                                           gen, success_response,
-> +                                           boxed, without_bql))
->  
->      def _def_event(self, expr, info, doc):
->          name = expr['event']
-> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-> index a317526..659bd83 100755
-> --- a/scripts/qapi2texi.py
-> +++ b/scripts/qapi2texi.py
-> @@ -236,7 +236,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
->                               body=texi_entity(doc, 'Members'))
->  
->      def visit_command(self, name, info, arg_type, ret_type,
-> -                      gen, success_response, boxed):
-> +                      gen, success_response, boxed, without_bql):
->          doc = self.cur_doc
->          if self.out:
->              self.out += '\n'
-> diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.py
-> index c7724d3..15aff29 100644
-> --- a/tests/qapi-schema/test-qapi.py
-> +++ b/tests/qapi-schema/test-qapi.py
-> @@ -36,7 +36,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
->          self._print_variants(variants)
->  
->      def visit_command(self, name, info, arg_type, ret_type,
-> -                      gen, success_response, boxed):
-> +                      gen, success_response, boxed, without_bql):
->          print 'command %s %s -> %s' % \
->              (name, arg_type and arg_type.name, ret_type and ret_type.name)
->          print '   gen=%s success_response=%s boxed=%s' % \
-> -- 
-> 2.7.4
+> I like how this idea would allow us to use the existing code without
+> putting just arbitrary binary data into the qcow2 file; the data still
+> relates to the virtual disk represented by the qcow2 image.
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> So design-wise, I don't think I have any complaints.
+> 
+> As for Kevin, he's on PTO, though. ;-)
+> 
+> Max
+> 
+
+Ah, right. Well... I'll just have to have something fun for him to look at.
