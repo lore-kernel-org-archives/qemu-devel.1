@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dkJuy-0007Hv-06
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 20:53:13 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dkKED-0005s8-Bg
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 21:13:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dkJuu-0000Nv-17
-	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 20:53:12 -0400
-Date: Wed, 23 Aug 2017 10:52:34 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170823005234.GJ5379@umbus.fritz.box>
-References: <cover.1503249785.git.balaton@eik.bme.hu>
-	<1815e11378b48532e902e0138a58557c297c3eb2.1503249785.git.balaton@eik.bme.hu>
-	<088c08f0-d4cd-e1c2-6715-3aeb33b7f4b9@redhat.com>
-	<alpine.BSF.2.21.1708221158550.67133@zero.eik.bme.hu>
-	<af0775b0-401b-81a6-7178-40e32680dc01@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dkKEA-0006IB-M8
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 21:13:05 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:36850)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dkKEA-0006HC-Gp
+	for qemu-devel@nongnu.org; Tue, 22 Aug 2017 21:13:02 -0400
+Received: by mail-qt0-x242.google.com with SMTP id c15so287656qta.3
+	for <qemu-devel@nongnu.org>; Tue, 22 Aug 2017 18:13:02 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
+	<1503050939-227939-2-git-send-email-imammedo@redhat.com>
+	<c65c99e5-5d60-5aef-7e69-ce236f6b7d4e@amsat.org>
+	<20170821125505.37ce8935@nial.brq.redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <3d17f458-8f90-e5ee-da7d-0726a2105ff0@amsat.org>
+Date: Tue, 22 Aug 2017 22:12:57 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="wHh0aNzodMFDTGdO"
-Content-Disposition: inline
-In-Reply-To: <af0775b0-401b-81a6-7178-40e32680dc01@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 09/15] hw/ide: Emulate SiI3112 SATA
- controller
+In-Reply-To: <20170821125505.37ce8935@nial.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11 01/27] sparc: convert cpu models
+ to SPARC cpu subclasses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,123 +38,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Francois Revol <revol@free.fr>, Alexander Graf <agraf@suse.de>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
+>> On 08/18/2017 07:08 AM, Igor Mammedov wrote:
+>>> QOMfy cpu models handling introducing propper cpu types
+>>> for each cpu model.
+>>>
+>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>>> ---
+>>> with this and conversion of features to properties,
+>>> it would be possible to replace cpu_sparc_init() with
+>>> cpu_generic_init() and reuse common -cpu handling
+>>> infrastructure.
+>>>
+>>> CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>> CC: Artyom Tarasenko <atar4qemu@gmail.com>
+>>> CC: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>
+>>> v2:
+>>>     * make base class abstract (Philippe Mathieu-Daudé <f4bug@amsat.org>)
+>>> ---
+>>>    target/sparc/cpu-qom.h |   2 +
+>>>    target/sparc/cpu.c     | 121 +++++++++++++++++++++++++++++++++----------------
+>>>    2 files changed, 84 insertions(+), 39 deletions(-)
+>>>
+>>> diff --git a/target/sparc/cpu-qom.h b/target/sparc/cpu-qom.h
+>>> index f63af72..af6d57a 100644
+>>> --- a/target/sparc/cpu-qom.h
+>>> +++ b/target/sparc/cpu-qom.h
+>>> @@ -35,6 +35,7 @@
+>>>    #define SPARC_CPU_GET_CLASS(obj) \
+>>>        OBJECT_GET_CLASS(SPARCCPUClass, (obj), TYPE_SPARC_CPU)
+>>>    
+>>> +typedef struct sparc_def_t sparc_def_t;
+>>>    /**
+>>>     * SPARCCPUClass:
+>>>     * @parent_realize: The parent class' realize handler.
+>>> @@ -49,6 +50,7 @@ typedef struct SPARCCPUClass {
+>>>    
+>>>        DeviceRealize parent_realize;
+>>>        void (*parent_reset)(CPUState *cpu);
+>>> +    sparc_def_t *cpu_def;
+>>>    } SPARCCPUClass;
+>>>    
+>>>    typedef struct SPARCCPU SPARCCPU;
+>>> diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+>>> index d606eb5..2994c09 100644
+>>> --- a/target/sparc/cpu.c
+>>> +++ b/target/sparc/cpu.c
+>>> @@ -25,8 +25,6 @@
+>>>    
+>>>    //#define DEBUG_FEATURES
+>>>    
+>>> -static int cpu_sparc_find_by_name(sparc_def_t *cpu_def, const char *cpu_model);
+>>> -
+>>>    /* CPUClass::reset() */
+>>>    static void sparc_cpu_reset(CPUState *s)
+>>>    {
+>>> @@ -111,17 +109,9 @@ static int cpu_sparc_register(SPARCCPU *cpu, const char *cpu_model)
+>>>    {
+>>>        CPUSPARCState *env = &cpu->env;
+>>>        char *s = g_strdup(cpu_model);
+>>> -    char *featurestr, *name = strtok(s, ",");
+>>> -    sparc_def_t def1, *def = &def1;
+>>> +    char *featurestr = strtok(s, ",");
+>>>        Error *err = NULL;
+>>>    
+>>> -    if (cpu_sparc_find_by_name(def, name) < 0) {
+>>> -        g_free(s);
+>>> -        return -1;
+>>> -    }
+>>> -
+>>> -    env->def = g_memdup(def, sizeof(*def));
+>>> -
+>>>        featurestr = strtok(NULL, ",");
+>>>        sparc_cpu_parse_features(CPU(cpu), featurestr, &err);
+>>>        g_free(s);
+>>> @@ -130,18 +120,18 @@ static int cpu_sparc_register(SPARCCPU *cpu, const char *cpu_model)
+>>>            return -1;
+>>>        }
+>>>    
+>>> -    env->version = def->iu_version;
+>>> -    env->fsr = def->fpu_version;
+>>> -    env->nwindows = def->nwindows;
+>>> +    env->version = env->def->iu_version;
+>>> +    env->fsr = env->def->fpu_version;
+>>> +    env->nwindows = env->def->nwindows;
+>>>    #if !defined(TARGET_SPARC64)
+>>> -    env->mmuregs[0] |= def->mmu_version;
+>>> +    env->mmuregs[0] |= env->def->mmu_version;
+>>>        cpu_sparc_set_id(env, 0);
+>>> -    env->mxccregs[7] |= def->mxcc_version;
+>>> +    env->mxccregs[7] |= env->def->mxcc_version;
+>>>    #else
+>>> -    env->mmu_version = def->mmu_version;
+>>> -    env->maxtl = def->maxtl;
+>>> -    env->version |= def->maxtl << 8;
+>>> -    env->version |= def->nwindows - 1;
+>>> +    env->mmu_version = env->def->mmu_version;
+>>> +    env->maxtl = env->def->maxtl;
+>>> +    env->version |= env->def->maxtl << 8;
+>>> +    env->version |= env->def->nwindows - 1;
+>>>    #endif
+>>>        return 0;
+>>>    }
+>>> @@ -149,8 +139,19 @@ static int cpu_sparc_register(SPARCCPU *cpu, const char *cpu_model)
+>>>    SPARCCPU *cpu_sparc_init(const char *cpu_model)
+>>>    {
+>>>        SPARCCPU *cpu;
+>>> +    ObjectClass *oc;
+>>> +    char *str, *name;
+>>> +
+>>> +    str = g_strdup(cpu_model);
+>>> +    name = strtok(str, ",");
+>>
+>> you can free 'str' once here:
+>>
+>>          g_free(str);
+>>
+>>> +    oc = cpu_class_by_name(TYPE_SPARC_CPU, name);
+>>> +    if (oc == NULL) {
+>>> +        g_free(str);
+>>
+>> drop
+>>
+>>> +        return NULL;
+>>> +    }
+>>> +    g_free(str);
+>>
+>> drop
+> 
+> I'll fix it up if I have to respin series (note this function is removed within series)
+> 
+> [...]
+>   
+> 
+>> Anyway I can't start Aurelien's image [1] with this commit:
+> Can't reproduce it locally (either dirty/clean tree rebuild)
+> with ./configure --enable-debug
+> 
+>   
+>> $ sparc-softmmu/qemu-system-sparc -hda debian_etch_sparc_small.qcow2
+>> qemu: Unable to find Sparc CPU definition
+> for this kind of error guest image doesn't matter as error happens during machine_init()
+> 
+>> [1] https://people.debian.org/~aurel32/qemu/sparc/
+> It boots just fine with default CPU model:
+> 
+> ./sparc-softmmu/qemu-system-sparc -hda debian_etch_sparc_small.qcow2
 
---wHh0aNzodMFDTGdO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Sorry I'v been distracted by something else :/
+I might have done something wrong, I'll test it again tomorrow.
 
-On Tue, Aug 22, 2017 at 03:01:18PM -0400, John Snow wrote:
->=20
->=20
-> On 08/22/2017 07:08 AM, BALATON Zoltan wrote:
-> > Hello,
-> >=20
-> > Thanks for the review.
-> >=20
-> > On Mon, 21 Aug 2017, John Snow wrote:
-> >> On 08/20/2017 01:23 PM, BALATON Zoltan wrote:
-> >>> This is a common generic PCI SATA conroller that is also used in PCs
-> >>> but more importantly guests running on the Sam460ex board prefer this
-> >>> card and have a driver for it (unlike for other SATA controllers
-> >>> already emulated).
-> >>
-> >> Oh, interesting. This is basically an alternative to the PCI BMDMA
-> >> interface and not really an alternative to AHCI. It doesn't really seem
-> >=20
-> > Yes, this is a simple PCI SATA interface similar to IDE and not like
-> > AHCI. I think it's an updated version of the CMD640 IDE interface or
-> > more closely related to that. The Linux driver references CMD680 as well
-> > so it's probably a SATA version of that chip.
-> >=20
-> >> to use any of the SATA-specific interfaces to SATA drives (cough, not
-> >> that we currently emulate a difference in QEMU... ATA and SATA both are
-> >> simply IDEState*) so this really seems like another PCI IDE interface
-> >> akin to the PCI BMDMA adapter we already have.
-> >>
-> >> It's just that guests will think they're using SATA, except... not. Not
-> >> a big deal, *I think*...
-> >>
-> >> ...It isn't a problem that our support for NCQ commands is tied to AHC=
-I,
-> >> is it? Some of our current "SATA" support is tied very directly to AHCI
-> >> (see is_ncq() in ahci.c) -- is that relevant here?
-> >=20
-> > I don't think any of the clients on Sam460ex tries to use NCQ so maybe
-> > it's OK. Linux might have a better driver but I'm not sure. This could
-> > be fixed later. Although I've seen a hang in Linux which I haven't
-> > debugged yet and don't know what causes it or if it's related to SATA at
-> > all.
-> >=20
-> > I'm not sure I've implemented everything correctly but at least the
-> > firmware of the board can find disks and load files to boot OSes so
-> > basic functions should be working. There are some other bugs elsewhere
-> > which prevent me from testing more OSes at the moment. One of them is
-> > QEMU crashing sometimes while accessing this SATA controller but it's
-> > triggered from TCG generated code and depends on some timing because it
-> > goes away if I change code running in the client or add some debug logs.
-> > This is described here:
-> >=20
->=20
-> "Elsewhere" as in "Not seemingly related to this controller," it seems.
->=20
-> > http://lists.nongnu.org/archive/html/qemu-ppc/2017-08/msg00249.html
-> >=20
-> > You don't happen to have an idea or seen similar before, do you? (Likely
-> > it's not related to IDE but more likely some io memory region
-> > interaction with TCG.)
-> >=20
->=20
-> Sorry, the traces look foreign to me.
->=20
-> > I intend to improve this device model later when found necessary but I
-> > don't have much free time for it now so I'd like to submit it now to get
-> > some more testing and maybe contributions from others.
-> >=20
->=20
-> Sure, but be advised that if the device causes problems outside of this
-> use case and there's nobody willing or able to review it, that it may
-> get removed again.
->=20
-> I don't have a lot of free time to go through the register list point by
-> point and make sure this is implemented correctly either, but if this
-> helps your work I'm OK not holding it up.
-
-That's been pretty much my view on most of this.  I have neither the
-at-hand knowledge of the hardware, nor time to look it up to give a
-detailed review.  But if it's replacing a complete lack of support and
-there's nothing obviously bogus, seems reasonable to let it in.
-
-Jon, do you want me to queue this driver in my tree (for 2.11,
-obviously), or do you want to take it through another tree?
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---wHh0aNzodMFDTGdO
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmc0dIACgkQbDjKyiDZ
-s5LQaBAArNpTaztuICjd5e+HZqNDi6lA4jGqbjGvzSvRrxItmjJp+dY7aOmObjl2
-6f63czPeSYeSZg6iL78q5PiEZ6H0Y/TPmfNQBAknvrWIPMO6z5xLsdlS62WKkBsQ
-OW58Wo3AEA8ko84q2reo/FbZ8lQal9XS5+S+dmwkJqAxtWgwF03PXgmd5vWzshTe
-6ZBS/XUH2L/itvT94xsKseDi13eIyw6hcThUWQF6zezEiV85EGe0zJVNxirT4aBi
-3ZZIk+ime14+VQL43gZ90TOkCDeJenyrH4PQocFwBOY/lFRyifTD30+yEq4DSq14
-HhY3yaKC9EeCp4LCPXCoPhGkeOUUovhc5S1IuDi+eVFt8SRtwbDKfKC7aJ4Ab9+5
-BKXe+L78ATl2hfrJnlUCLWj0gcDaTblCu8dDQBHinsj1T2pZ9/15ullZy9zZndYH
-dRmk3WQUZgM1Y1irZ2V5/a31g64BveWo/Hf9cHyCICfMm8ziTBtZPP/Uc3G2DQFD
-gsBHPc1uVeQA4tVV6o7uCIPm7SQlncy3vfF0h7JaFlEvRU823l3IezhB9ZIzykJM
-bgy5FQ96Mo3nB7vYKO7uF5sUyq7eHrDzBBZqz7HULXscZLiHFn5B/aEwDW9CnK7Q
-CBnS+Vq9C+AwMTa10rh/fpBldbXuSeDQ1Jxzneo88Emw0wTk8H8=
-=MNqP
------END PGP SIGNATURE-----
-
---wHh0aNzodMFDTGdO--
+> 
+> and with explicitly specified one:
+> 
+> sparc-softmmu/qemu-system-sparc -cpu "Fujitsu MB86904"
+> 
+> I get from "info qom-tree"
+> ...
+>   /device[0] (Fujitsu-MB86904-sparc-cpu)
+> ...
+> 
