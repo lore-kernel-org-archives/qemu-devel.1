@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dkWBT-0002vf-6M
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:59:09 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dkWHi-0005y6-88
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:05:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dkWBR-0002GT-9n
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:59:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:14709)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dkWBQ-0002Fr-Ur
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 09:59:01 -0400
-Date: Wed, 23 Aug 2017 09:58:59 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <1155766546.2722774.1503496739716.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20170823125743.GF27715@localhost.localdomain>
-References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-54-marcandre.lureau@redhat.com>
-	<20170822184213.GH19998@localhost.localdomain>
-	<2076518614.2481492.1503483676829.JavaMail.zimbra@redhat.com>
-	<20170823125743.GF27715@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 53/54] qapi: make
- query-cpu-model-expansion depend on s390 or x86
+	(envelope-from <stefanha@redhat.com>) id 1dkWHd-0005ih-SZ
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 10:05:30 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Wed, 23 Aug 2017 15:05:06 +0100
+Message-Id: <20170823140506.28723-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-iotests: add 194 non-shared storage
+ migration test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,226 +18,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+To: qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Hi
+Non-shared storage migration with NBD and drive-mirror is currently not
+tested by qemu-iotests.  This test case covers the basic migration
+scenario.
 
------ Original Message -----
-> On Wed, Aug 23, 2017 at 06:21:16AM -0400, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
-> >=20
-> > ----- Original Message -----
-> > > On Tue, Aug 22, 2017 at 03:22:54PM +0200, Marc-Andr=C3=A9 Lureau wrot=
-e:
-> > > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > > > ---
-> > > >  qapi-schema.json                       |  4 +++-
-> > > >  include/sysemu/arch_init.h             |  3 ---
-> > > >  monitor.c                              |  3 ---
-> > > >  qmp.c                                  |  7 -------
-> > > >  stubs/arch-query-cpu-model-expansion.c | 12 ------------
-> > > >  target/i386/cpu.c                      |  2 +-
-> > > >  target/s390x/cpu_models.c              |  3 ++-
-> > > >  stubs/Makefile.objs                    |  1 -
-> > > >  8 files changed, 6 insertions(+), 29 deletions(-)
-> > > >  delete mode 100644 stubs/arch-query-cpu-model-expansion.c
-> > > >=20
-> > > > diff --git a/qapi-schema.json b/qapi-schema.json
-> > > > index 6c1adb35b5..127a2c71c6 100644
-> > > > --- a/qapi-schema.json
-> > > > +++ b/qapi-schema.json
-> > > > @@ -4535,7 +4535,9 @@
-> > > >  { 'command': 'query-cpu-model-expansion',
-> > > >    'data': { 'type': 'CpuModelExpansionType',
-> > > >              'model': 'CpuModelInfo' },
-> > > > -  'returns': 'CpuModelExpansionInfo' }
-> > > > +  'returns': 'CpuModelExpansionInfo',
-> > > > +  'if': ['defined(NEED_CPU_H)',
-> > > > +         'defined(TARGET_S390X) || defined(TARGET_I386)']}
-> > >=20
-> > > Maybe this is already documented somewhere in the series (I'm
-> > > still going through the other patches), but: why exactly is
-> > > 'defined(NEED_CPU_H)' in the list, too?
-> >=20
-> > The point of this series is to make qapi schema configurable.
-> >=20
-> > Some types/commands/events are target-specifc. In order to
-> > #ifdef on poisoined symbols, we make most of QAPI generated
-> > code built per-target in patch 49/54. But the common code still
-> > need to compile some units, that's why #ifdef NEED_CPU_U. The
-> > clean solution is probably to split the generated schema to
-> > common & per-target, that's not covered in the series.
->=20
-> I see.  I'm worried about one thing: what if the QMP dispatch
-> code is incorrectly moved back to common code later?  It will
-> silently skip all the arch-dependent commands without any
-> warnings.
->=20
-> e.g.: I just applied the following change on top of your series,
-> and all arch-dependent commands are silently skipped:
->=20
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Based-on: <20170823134242.12080-1-famz@redhat.com>
+---
+ tests/qemu-iotests/194        | 73 +++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/194.out    | 13 ++++++++
+ tests/qemu-iotests/group      |  1 +
+ tests/qemu-iotests/iotests.py | 13 ++++++++
+ 4 files changed, 100 insertions(+)
+ create mode 100755 tests/qemu-iotests/194
+ create mode 100644 tests/qemu-iotests/194.out
 
-And it doesn't fail a full/all-arch make check? It probably should.
-
->   diff --git a/Makefile.objs b/Makefile.objs
->   index 2664720..24a4ea0 100644
->   --- a/Makefile.objs
->   +++ b/Makefile.objs
->   @@ -2,7 +2,7 @@
->    # Common libraries for tools and emulators
->    stub-obj-y =3D stubs/ crypto/
->    util-obj-y =3D util/ qobject/ qapi/
->   -util-obj-y +=3D qapi-types.o qapi-visit.o
->   +util-obj-y +=3D qmp-introspect.o qapi-types.o qapi-visit.o qapi-event.=
-o
->   =20
->    chardev-obj-y =3D chardev/
->   =20
->   @@ -72,6 +72,13 @@ common-obj-y +=3D chardev/
->    common-obj-$(CONFIG_SECCOMP) +=3D qemu-seccomp.o
->   =20
->    common-obj-$(CONFIG_FDT) +=3D device_tree.o
->   +
->   +######################################################################
->   +# qapi
->   +
->   +common-obj-y +=3D qmp-marshal.o
->   +common-obj-y +=3D qmp-introspect.o
->   +common-obj-y +=3D qmp.o hmp.o
->    endif
->   =20
->    ######################################################################=
-#
->   diff --git a/Makefile.target b/Makefile.target
->   index c5f8ded..7f42c45 100644
->   --- a/Makefile.target
->   +++ b/Makefile.target
->   @@ -157,10 +157,6 @@ endif
->   =20
->    GENERATED_FILES +=3D hmp-commands.h hmp-commands-info.h
->   =20
->   -obj-y +=3D qmp-introspect.o qapi-types.o qapi-visit.o qapi-event.o
->   -obj-y +=3D qmp-marshal.o qmp-introspect.o
->   -obj-y +=3D qmp.o hmp.o
->   -
->    endif # CONFIG_SOFTMMU
->   =20
->    # Workaround for http://gcc.gnu.org/PR55489, see configure.
->=20
->=20
-> We wouldn't need to check NEED_CPU_H at all if the condition on
-> QMP commands affect only the actual QMP dispatch code, and not
-> the generated types or declarations.  e.g.:
->=20
-
-Possible, but is it desirable? I would prefer if all the generated code wou=
-ld be configured, so we can more easily compile out dead code when disablin=
-g a feature.=20
-
->=20
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 194859f..67b46ad 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -3578,7 +3578,7 @@
->  ##
->  { 'command': 'dump-skeys',
->    'data': { 'filename': 'str' },
-> -  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_S390X)']}
-> +  'if': ['defined(TARGET_S390X)']}
-> =20
->  ##
->  # @netdev_add:
-> @@ -4434,8 +4434,7 @@
->  # Since: 1.2.0
->  ##
->  { 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
-> -  'if': ['defined(NEED_CPU_H)',
-> -         'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I=
-386)
-> || defined(TARGET_S390X)'] }
-> +  'if': ['defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I=
-386)
-> || defined(TARGET_S390X)'] }
-> =20
->  ##
->  # @CpuModelInfo:
-> @@ -4538,8 +4537,7 @@
->    'data': { 'type': 'CpuModelExpansionType',
->              'model': 'CpuModelInfo' },
->    'returns': 'CpuModelExpansionInfo',
-> -  'if': ['defined(NEED_CPU_H)',
-> -         'defined(TARGET_S390X) || defined(TARGET_I386)']}
-> +  'if': ['defined(TARGET_S390X) || defined(TARGET_I386)']}
-> =20
->  ##
->  # @CpuModelCompareResult:
-> @@ -4627,7 +4625,7 @@
->  { 'command': 'query-cpu-model-comparison',
->    'data': { 'modela': 'CpuModelInfo', 'modelb': 'CpuModelInfo' },
->    'returns': 'CpuModelCompareInfo',
-> -  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_S390X)']}
-> +  'if': ['defined(TARGET_S390X)']}
-> =20
-> =20
->  ##
-> @@ -4681,7 +4679,7 @@
->    'data': { 'modela': 'CpuModelInfo',
->              'modelb': 'CpuModelInfo' },
->    'returns': 'CpuModelBaselineInfo',
-> -  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_S390X)']}
-> +  'if': ['defined(TARGET_S390X)']}
-> =20
->  ##
->  # @AddfdInfo:
-> @@ -6303,7 +6301,7 @@
->  #
->  ##
->  { 'command': 'rtc-reset-reinjection',
-> -  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_I386)'] }
-> +  'if': ['defined(TARGET_I386)'] }
-> =20
->  # Rocker ethernet network switch
->  { 'include': 'qapi/rocker.json' }
-> @@ -6466,7 +6464,7 @@
->  #
->  ##
->  { 'command': 'query-gic-capabilities', 'returns': ['GICCapability'],
-> -  'if': ['defined(NEED_CPU_H)', 'defined(TARGET_ARM)']}
-> +  'if': ['defined(TARGET_ARM)']}
-> =20
->  ##
->  # @CpuInstanceProperties:
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index bcd8d37..769a730 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -1720,8 +1720,7 @@ class QAPISchema(object):
->          ifcond =3D expr.get('if')
->          if isinstance(data, OrderedDict):
->              data =3D self._make_implicit_object_type(
-> -                name, info, doc, 'arg', self._make_members(data, info),
-> -                ifcond)
-> +                name, info, doc, 'arg', self._make_members(data, info))
->          if isinstance(rets, list):
->              assert len(rets) =3D=3D 1
->              rets =3D self._make_array_type(rets[0], info)
-> diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
-> index db45415..2baa73f 100644
-> --- a/scripts/qapi-commands.py
-> +++ b/scripts/qapi-commands.py
-> @@ -228,7 +228,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
->          self.defn =3D None
->          self._regy =3D None
->          self._visited_ret_types =3D None
-> -        self.if_members =3D ['decl', 'defn', '_regy']
-> +        self.if_members =3D ['defn', '_regy']
-> =20
->      def visit_begin(self, schema):
->          self.decl =3D ''
->=20
->=20
-> --
-> Eduardo
->=20
+diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
+new file mode 100755
+index 0000000000..8028111e21
+--- /dev/null
++++ b/tests/qemu-iotests/194
+@@ -0,0 +1,73 @@
++#!/usr/bin/env python
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++# Creator/Owner: Stefan Hajnoczi <stefanha@redhat.com>
++#
++# Non-shared storage migration test using NBD server and drive-mirror
++
++import os
++import atexit
++import iotests
++
++iotests.verify_platform(['linux'])
++
++img_size = '1G'
++source_img_path = os.path.join(iotests.test_dir, 'source.img')
++dest_img_path = os.path.join(iotests.test_dir, 'dest.img')
++iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, source_img_path, img_size)
++iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, dest_img_path, img_size)
++
++iotests.log('Launching VMs...')
++migration_sock_path = os.path.join(iotests.test_dir, 'migration.sock')
++nbd_sock_path = os.path.join(iotests.test_dir, 'nbd.sock')
++source_vm = iotests.VM('source').add_drive(source_img_path)
++dest_vm = (iotests.VM('dest').add_drive(dest_img_path)
++                             .add_incoming('unix:{0}'.format(migration_sock_path)))
++source_vm.launch()
++atexit.register(source_vm.shutdown)
++dest_vm.launch()
++atexit.register(dest_vm.shutdown)
++
++iotests.log('Launching NBD server on destination...')
++iotests.log(dest_vm.qmp('nbd-server-start', addr={'type': 'unix', 'data': {'path': nbd_sock_path}}))
++iotests.log(dest_vm.qmp('nbd-server-add', device='drive0', writable=True))
++
++iotests.log('Starting drive-mirror on source...')
++iotests.log(source_vm.qmp(
++              'drive-mirror',
++              device='drive0',
++              target='nbd+unix:///drive0?socket={0}'.format(nbd_sock_path),
++              sync='full',
++              format='raw', # always raw, the server handles the format
++              mode='existing'))
++
++iotests.log('Waiting for drive-mirror to complete...')
++iotests.log(source_vm.event_wait('BLOCK_JOB_READY'),
++            filters=[iotests.filter_qmp_event])
++
++iotests.log('Starting migration...')
++source_vm.qmp('migrate-set-capabilities',
++              capabilities=[{'capability': 'events', 'state': True}])
++dest_vm.qmp('migrate-set-capabilities',
++            capabilities=[{'capability': 'events', 'state': True}])
++iotests.log(source_vm.qmp('migrate', uri='unix:{0}'.format(migration_sock_path)))
++
++while True:
++    event = source_vm.event_wait('MIGRATION')
++    iotests.log(event, filters=[iotests.filter_qmp_event])
++    if event['data']['status'] in ('completed', 'failed'):
++        break
+diff --git a/tests/qemu-iotests/194.out b/tests/qemu-iotests/194.out
+new file mode 100644
+index 0000000000..ae501fecac
+--- /dev/null
++++ b/tests/qemu-iotests/194.out
+@@ -0,0 +1,13 @@
++Launching VMs...
++Launching NBD server on destination...
++{u'return': {}}
++{u'return': {}}
++Starting drive-mirror on source...
++{u'return': {}}
++Waiting for drive-mirror to complete...
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'drive0', u'type': u'mirror', u'speed': 0, u'len': 1073741824, u'offset': 1073741824}, u'event': u'BLOCK_JOB_READY'}
++Starting migration...
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'setup'}, u'event': u'MIGRATION'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'active'}, u'event': u'MIGRATION'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'completed'}, u'event': u'MIGRATION'}
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index afbdc427ea..4bd5017008 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -187,3 +187,4 @@
+ 189 rw auto
+ 190 rw auto quick
+ 192 rw auto quick
++194 rw auto migration quick
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 22439c43d3..7233983f3c 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -133,6 +133,14 @@ chown_re = re.compile(r"chown [0-9]+:[0-9]+")
+ def filter_chown(msg):
+     return chown_re.sub("chown UID:GID", msg)
+ 
++def filter_qmp_event(event):
++    '''Filter a QMP event dict'''
++    event = dict(event)
++    if 'timestamp' in event:
++        event['timestamp']['seconds'] = 'SECS'
++        event['timestamp']['microseconds'] = 'USECS'
++    return event
++
+ def log(msg, filters=[]):
+     for flt in filters:
+         msg = flt(msg)
+@@ -200,6 +208,11 @@ class VM(qtest.QEMUQtestMachine):
+             self._args.append(','.join(opts))
+         return self
+ 
++    def add_incoming(self, addr):
++        self._args.append('-incoming')
++        self._args.append(addr)
++        return self
++
+     def pause_drive(self, drive, event=None):
+         '''Pause drive r/w operations'''
+         if not event:
+-- 
+2.13.5
