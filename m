@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dkZIA-0000iX-5D
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:18:13 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dkZLM-0003Im-Q7
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:21:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dkZI5-0006Lo-6G
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:18:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58569)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dkZI4-0006LG-W1
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:18:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CB7C7C0467DE
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 17:18:03 +0000 (UTC)
-Date: Wed, 23 Aug 2017 14:17:49 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1dkZLL-0000BP-RJ
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 13:21:28 -0400
+Date: Wed, 23 Aug 2017 14:21:18 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170823171749.GP19998@localhost.localdomain>
-References: <20170814215748.5158-1-ehabkost@redhat.com>
-	<20170814215748.5158-13-ehabkost@redhat.com>
-	<1503315859.26016.9.camel@redhat.com>
+Message-ID: <20170823172118.GQ19998@localhost.localdomain>
+References: <1503416789-32080-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1503315859.26016.9.camel@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v4 12/13] usb: enumerate_slots implementation
+In-Reply-To: <1503416789-32080-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/allwinner-a10: Mark the
+ allwinner-a10 device with user_creatable = false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,43 +23,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Laine Stump <laine@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, Beniamino Galvani <b.galvani@gmail.com>
 
-On Mon, Aug 21, 2017 at 01:44:19PM +0200, Gerd Hoffmann wrote:
->   Hi,
->=20
-> -ENOCONTEXT
->=20
-> What is the use case?
+On Tue, Aug 22, 2017 at 05:46:29PM +0200, Thomas Huth wrote:
+> QEMU currently exits unexpectedly when the user accidentially
+> tries to do something like this:
+> 
+> $ aarch64-softmmu/qemu-system-aarch64 -S -M integratorcp -nographic
+> QEMU 2.9.93 monitor - type 'help' for more information
+> (qemu) device_add allwinner-a10
+> Unsupported NIC model: smc91c111
+> 
+> Exiting just due to a "device_add" should not happen. Looking closer
+> at the the realize and instance_init function of this device also
+> reveals that it is using serial_hds and nd_table directly there, so
+> this device is clearly not creatable by the user and should be marked
+> accordingly.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/arm/allwinner-a10.c    | 2 ++
+>  scripts/device-crash-test | 1 -
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
+> index f62a9a3..43a3f01 100644
+> --- a/hw/arm/allwinner-a10.c
+> +++ b/hw/arm/allwinner-a10.c
+> @@ -118,6 +118,8 @@ static void aw_a10_class_init(ObjectClass *oc, void *data)
+>      DeviceClass *dc = DEVICE_CLASS(oc);
+>  
+>      dc->realize = aw_a10_realize;
+> +    /* Reason: Uses serial_hds in realize and nd_table in instance_init */
+> +    dc->user_creatable = false;
 
-I want to let libvirt know what are the available
-slots/ports/addresses for devices in a machine, before it uses
-device_add or -device.  This is useful when the machine creates
-some devices implicitly, when different machine-types provide
-different bus topologies, or when a device was created with no
-explicit slot/port/address options.
+I assume this patch will be replaced by one changing TYPE_DEVICE
+to default to user_creatable=false, based on the replies to the
+hw/misc/auxbus.c patch?
 
-Currently libvirt work around the lack of such interface by
-hardcoding information on the implicitly-created devices/buses
-and available slots for each machine-type.  See, for example,
-src/qemu/qemu_domain_address.c in the libvirt source tree.
 
->=20
-> > +=A0=A0=A0=A0QTAILQ_FOREACH(port, l, next) {
-> > +=A0=A0=A0=A0=A0=A0=A0=A0DeviceSlotInfo *slot =3D make_slot(BUS(bus))=
-;
-> > +=A0=A0=A0=A0=A0=A0=A0=A0/*
-> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0* TODO: should the "bus" option be includ=
-ed, or is
-> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0* "port" enough to identify the USB bus +=
- port?
-> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0*/
->=20
-> Yes, bus must be included, port alone isn't enough in case multiple usb
-> host adapters are present.
+>  }
+>  
+>  static const TypeInfo aw_a10_type_info = {
+> diff --git a/scripts/device-crash-test b/scripts/device-crash-test
+> index 8eb2d02..74aee68 100755
+> --- a/scripts/device-crash-test
+> +++ b/scripts/device-crash-test
+> @@ -187,7 +187,6 @@ ERROR_WHITELIST = [
+>      {'log':r"Device [\w.,-]+ can not be dynamically instantiated"},
+>      {'log':r"Platform Bus: Can not fit MMIO region of size "},
+>      # other more specific errors we will ignore:
+> -    {'device':'allwinner-a10', 'log':"Unsupported NIC model:"},
+>      {'device':'.*-spapr-cpu-core', 'log':r"CPU core type should be"},
+>      {'log':r"MSI(-X)? is not supported by interrupt controller"},
+>      {'log':r"pxb-pcie? devices cannot reside on a PCIe? bus"},
+> -- 
+> 1.8.3.1
+> 
 
-Thanks!
-
---=20
+-- 
 Eduardo
