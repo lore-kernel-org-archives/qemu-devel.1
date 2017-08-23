@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dkYbW-0008Qd-Fu
+	(envelope-from <eblake@redhat.com>) id 1dkYbW-0008Qi-I5
 	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:34:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dkYbV-0005Qd-FC
+	(envelope-from <eblake@redhat.com>) id 1dkYbV-0005Qi-G4
 	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 12:34:06 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 23 Aug 2017 11:33:45 -0500
-Message-Id: <20170823163349.11663-3-eblake@redhat.com>
+Date: Wed, 23 Aug 2017 11:33:46 -0500
+Message-Id: <20170823163349.11663-4-eblake@redhat.com>
 In-Reply-To: <20170823163349.11663-1-eblake@redhat.com>
 References: <20170823163349.11663-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 2/6] block-backend: Allow more "can inactivate"
- cases
+Subject: [Qemu-devel] [PULL 3/6] mirror: Mark target BB as "force allow
+ inactivate"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,81 +21,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+Cc: Fam Zheng <famz@redhat.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block Jobs" <qemu-block@nongnu.org>
 
 From: Fam Zheng <famz@redhat.com>
 
-These two conditions corresponds to mirror job's source and target,
-which need to be allowed as they are part of the non-shared storage
-migration workflow: failing to inactivate either will result in a
-failure during migration completion.
-
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170823134242.12080-3-famz@redhat.com>
+Message-Id: <20170823134242.12080-4-famz@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-[eblake: improve comment grammar]
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- include/sysemu/block-backend.h |  1 +
- block/block-backend.c          | 22 +++++++++++++++++-----
- 2 files changed, 18 insertions(+), 5 deletions(-)
+ block/mirror.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 4a3730596b..aadc733daf 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -241,5 +241,6 @@ void blk_set_io_limits(BlockBackend *blk, ThrottleConfig *cfg);
- void blk_io_limits_disable(BlockBackend *blk);
- void blk_io_limits_enable(BlockBackend *blk, const char *group);
- void blk_io_limits_update_group(BlockBackend *blk, const char *group);
-+void blk_set_force_allow_inactivate(BlockBackend *blk);
-
- #endif
-diff --git a/block/block-backend.c b/block/block-backend.c
-index a3984d2bec..1031742401 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -70,6 +70,7 @@ struct BlockBackend {
-
-     int quiesce_counter;
-     VMChangeStateEntry *vmsh;
-+    bool force_allow_inactivate;
- };
-
- typedef struct BlockBackendAIOCB {
-@@ -192,17 +193,28 @@ static void blk_root_activate(BdrvChild *child, Error **errp)
-     }
- }
-
-+void blk_set_force_allow_inactivate(BlockBackend *blk)
-+{
-+    blk->force_allow_inactivate = true;
-+}
-+
- static bool blk_can_inactivate(BlockBackend *blk)
+diff --git a/block/mirror.c b/block/mirror.c
+index c9a6a3ca86..429751b9fe 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1134,6 +1134,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+                              const BlockJobDriver *driver,
+                              bool is_none_mode, BlockDriverState *base,
+                              bool auto_complete, const char *filter_node_name,
++                             bool is_mirror,
+                              Error **errp)
  {
--    /* Only inactivate BlockBackends for guest devices (which are inactive at
--     * this point because the VM is stopped) and unattached monitor-owned
--     * BlockBackends. If there is still any other user like a block job, then
--     * we simply can't inactivate the image. */
-+    /* If it is a guest device, inactivate is ok. */
-     if (blk->dev || blk_name(blk)[0]) {
-         return true;
+     MirrorBlockJob *s;
+@@ -1222,6 +1223,15 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+     if (ret < 0) {
+         goto fail;
      }
-
--    return false;
-+    /* Inactivating means no more writes to the image can be done,
-+     * even if those writes would be changes invisible to the
-+     * guest.  For block job BBs that satisfy this, we can just allow
-+     * it.  This is the case for mirror job source, which is required
-+     * by libvirt non-shared block migration. */
-+    if (!(blk->perm & (BLK_PERM_WRITE | BLK_PERM_WRITE_UNCHANGED))) {
-+        return true;
++    if (is_mirror) {
++        /* XXX: Mirror target could be a NBD server of target QEMU in the case
++         * of non-shared block migration. To allow migration completion, we
++         * have to allow "inactivate" of the target BB.  When that happens, we
++         * know the job is drained, and the vcpus are stopped, so no write
++         * operation will be performed. Block layer already has assertions to
++         * ensure that. */
++        blk_set_force_allow_inactivate(s->target);
 +    }
-+
-+    return blk->force_allow_inactivate;
+
+     s->replaces = g_strdup(replaces);
+     s->on_source_error = on_source_error;
+@@ -1306,7 +1316,7 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
+                      speed, granularity, buf_size, backing_mode,
+                      on_source_error, on_target_error, unmap, NULL, NULL,
+                      &mirror_job_driver, is_none_mode, base, false,
+-                     filter_node_name, errp);
++                     filter_node_name, true, errp);
  }
 
- static int blk_root_inactivate(BdrvChild *child)
+ void commit_active_start(const char *job_id, BlockDriverState *bs,
+@@ -1329,7 +1339,7 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
+                      MIRROR_LEAVE_BACKING_CHAIN,
+                      on_error, on_error, true, cb, opaque,
+                      &commit_active_job_driver, false, base, auto_complete,
+-                     filter_node_name, &local_err);
++                     filter_node_name, false, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         goto error_restore_flags;
 -- 
 2.13.5
