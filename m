@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dkqqo-0003st-TG
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:03:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1dkqr0-0003yS-QD
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:03:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dkqqj-0001b4-BD
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:03:06 -0400
-Received: from mail-ua0-x243.google.com ([2607:f8b0:400c:c08::243]:37868)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dkqqj-0001aK-5G
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:03:01 -0400
-Received: by mail-ua0-x243.google.com with SMTP id j17so988596uae.4
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 05:03:01 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1503564371-26090-15-git-send-email-armbru@redhat.com>
-References: <1503564371-26090-1-git-send-email-armbru@redhat.com>
-	<1503564371-26090-15-git-send-email-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 24 Aug 2017 14:02:59 +0200
-Message-ID: <CAJ+F1C+XOVKBgGY0hm7h=gOvt+Laa4dGX5pegWrhDG7xYd1P_A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 14/16] qapi: Convert indirect uses of
- FOO_lookup[...] to qapi_enum_lookup()
+	(envelope-from <armbru@redhat.com>) id 1dkqqw-0001yM-OH
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:03:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57848)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dkqqw-0001y2-IT
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:03:14 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 87F74552EB
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 12:03:13 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Thu, 24 Aug 2017 14:02:57 +0200
+Message-Id: <1503576178-23966-3-git-send-email-armbru@redhat.com>
+In-Reply-To: <1503576178-23966-1-git-send-email-armbru@redhat.com>
+References: <1503576178-23966-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/3] qapi-schema: Introspection doc is in the
+ wrong section, fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, eblake@redhat.com
 
-On Thu, Aug 24, 2017 at 10:46 AM, Markus Armbruster <armbru@redhat.com> wro=
-te:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Bug: introspection documentation is in section "Tracing commands".
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Cause: sub-schema qapi/introspect.json lacks a section header, and
+therefore goes into whatever section precedes its include.
 
+Fix: add a section header.
 
-> ---
->  hw/core/qdev-properties.c | 7 +++++--
->  qapi/qapi-visit-core.c    | 2 +-
->  2 files changed, 6 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> index 078fc5d..7512bd4 100644
-> --- a/hw/core/qdev-properties.c
-> +++ b/hw/core/qdev-properties.c
-> @@ -72,7 +72,9 @@ static void set_enum(Object *obj, Visitor *v, const cha=
-r *name, void *opaque,
->
->  static void set_default_value_enum(Object *obj, const Property *prop)
->  {
-> -    object_property_set_str(obj, prop->info->enum_table[prop->defval.i],
-> +    object_property_set_str(obj,
-> +                            qapi_enum_lookup(prop->info->enum_table,
-> +                                             prop->defval.i),
->                              prop->name, &error_abort);
->  }
->
-> @@ -1095,7 +1097,8 @@ void qdev_prop_set_enum(DeviceState *dev, const cha=
-r *name, int value)
->      Property *prop;
->
->      prop =3D qdev_prop_find(dev, name);
-> -    object_property_set_str(OBJECT(dev), prop->info->enum_table[value],
-> +    object_property_set_str(OBJECT(dev),
-> +                            qapi_enum_lookup(prop->info->enum_table, val=
-ue),
->                              name, &error_abort);
->  }
->
-> diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
-> index f285879..30dc85b 100644
-> --- a/qapi/qapi-visit-core.c
-> +++ b/qapi/qapi-visit-core.c
-> @@ -345,7 +345,7 @@ static void output_type_enum(Visitor *v, const char *=
-name, int *obj,
->          return;
->      }
->
-> -    enum_str =3D (char *)strings[value];
-> +    enum_str =3D (char *)qapi_enum_lookup(strings, value);
->      visit_type_str(v, name, &enum_str, errp);
->  }
->
-> --
-> 2.7.5
->
->
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ qapi/introspect.json | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/qapi/introspect.json b/qapi/introspect.json
+index cf77ff0..5b3e6e9 100644
+--- a/qapi/introspect.json
++++ b/qapi/introspect.json
+@@ -1,7 +1,5 @@
+ # -*- Mode: Python -*-
+ #
+-# QAPI/QMP introspection
+-#
+ # Copyright (C) 2015 Red Hat, Inc.
+ #
+ # Authors:
+@@ -11,6 +9,10 @@
+ # See the COPYING file in the top-level directory.
+ 
+ ##
++# = QMP introspection
++##
++
++##
+ # @query-qmp-schema:
+ #
+ # Command query-qmp-schema exposes the QMP wire ABI as an array of
+-- 
+2.7.5
