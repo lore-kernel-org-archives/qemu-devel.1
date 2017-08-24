@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkq5z-0004LE-EF
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 07:14:44 -0400
+	(envelope-from <ppandit@redhat.com>) id 1dkqAJ-0005hF-8E
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 07:19:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkq5y-0006Od-FM
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 07:14:43 -0400
-Date: Thu, 24 Aug 2017 12:14:14 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170824111414.GD2088@work-vm>
-References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-7-marcandre.lureau@redhat.com>
-	<87mv6qaf0b.fsf@dusky.pond.sub.org>
-	<1074469842.2477067.1503483004106.JavaMail.zimbra@redhat.com>
+	(envelope-from <ppandit@redhat.com>) id 1dkqAC-0000En-LR
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 07:19:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46462)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1dkqAC-0000D1-Bu
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 07:19:04 -0400
+Date: Thu, 24 Aug 2017 16:48:53 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <20170823202728.dsmitbqt7bsezfgq@var.youpi.perso.aquilenet.fr>
+Message-ID: <alpine.LFD.2.20.1708241020570.29123@wniryva>
+References: <alpine.LFD.2.20.1708031718030.16909@wniryva>
+	<20170823202728.dsmitbqt7bsezfgq@var.youpi.perso.aquilenet.fr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <1074469842.2477067.1503483004106.JavaMail.zimbra@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 06/54] qapi: introduce qapi_enum_lookup()
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] A use-after-free in slirp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,155 +26,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, "open list:Sheepdog" <sheepdog@lists.wpkg.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jeff Cody <jcody@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Josh Durgin <jdurgin@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "open list:Block Jobs" <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>, Liu Yuan <namei.unix@gmail.com>, Jason Wang <jasowang@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>, Peter Lieven <pl@kamp.de>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Samuel Thibault <samuel.thibault@gnu.org>
+Cc: Jan Kiszka <jan.kiszka@siemens.com>, wjjzhang <wjjzhang@tencent.com>, qemu-devel@nongnu.org
 
-* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
-> Hi
->=20
-> ----- Original Message -----
-> > Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com> writes:
-> >=20
-> > > This will help with the introduction of a new structure to handle
-> > > enum lookup.
+  Hello Samuel,
 
-It would be good to make that comment explain why it's necessary.
++-- On Wed, 23 Aug 2017, Samuel Thibault wrote --+
+| The paste is not available any more. Is it really very large? It's usually 
+| really better to just send it by mail, so it's archived in the mailing list 
+| etc.
 
-> > > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> > > ---
-> > [...]
-> > >  45 files changed, 206 insertions(+), 122 deletions(-)
-> >=20
-> > Hmm.
-> >=20
-> > > diff --git a/include/qapi/util.h b/include/qapi/util.h
-> > > index 7436ed815c..60733b6a80 100644
-> > > --- a/include/qapi/util.h
-> > > +++ b/include/qapi/util.h
-> > > @@ -11,6 +11,8 @@
-> > >  #ifndef QAPI_UTIL_H
-> > >  #define QAPI_UTIL_H
-> > > =20
-> > > +const char *qapi_enum_lookup(const char * const lookup[], int val)=
-;
-> > > +
-> > >  int qapi_enum_parse(const char * const lookup[], const char *buf,
-> > >                      int max, int def, Error **errp);
-> > > =20
-> > > diff --git a/backends/hostmem.c b/backends/hostmem.c
-> > > index 4606b73849..c4f795475c 100644
-> > > --- a/backends/hostmem.c
-> > > +++ b/backends/hostmem.c
-> > > @@ -13,6 +13,7 @@
-> > >  #include "sysemu/hostmem.h"
-> > >  #include "hw/boards.h"
-> > >  #include "qapi/error.h"
-> > > +#include "qapi/util.h"
-> > >  #include "qapi/visitor.h"
-> > >  #include "qapi-types.h"
-> > >  #include "qapi-visit.h"
-> > > @@ -304,7 +305,7 @@ host_memory_backend_memory_complete(UserCreatab=
-le *uc,
-> > > Error **errp)
-> > >              return;
-> > >          } else if (maxnode =3D=3D 0 && backend->policy !=3D MPOL_D=
-EFAULT) {
-> > >              error_setg(errp, "host-nodes must be set for policy %s=
-",
-> > > -                       HostMemPolicy_lookup[backend->policy]);
-> > > +                qapi_enum_lookup(HostMemPolicy_lookup, backend->po=
-licy));
-> > >              return;
-> > >          }
-> > > =20
-> >=20
-> > Lookup becomes even more verbose.
-> >=20
-> > Could we claw back some readability with macros?  Say in addition to
-> >=20
-> >     typedef enum FOO {
-> >         ...
-> >     } FOO;
-> >=20
-> >     extern const char *const FOO_lookup[];
-> >=20
-> > generate
-> >=20
-> >     #define FOO_str(val) qapi_enum_lookup(FOO_lookup, (val))
-> >=20
-> > Needs a matching qapi-code-gen.txt update.
-> >=20
-> > With that, this patch hunk would become
-> >=20
-> >                error_setg(errp, "host-nodes must be set for policy %s=
-",
-> >   -                       HostMemPolicy_lookup[backend->policy]);
-> >   +                       HostMemPolicy_str(backend->policy);
-> >=20
-> > Perhaps we could even throw in some type checking:
-> >=20
-> >     #define FOO_str(val) (type_check(typeof((val)), FOO) \
-> >                           + qapi_enum_lookup(FOO_lookup, (val)))
-> >=20
-> > What do you think?  Want me to explore a fixup patch you could squash
-> > in?
-> >=20
->=20
-> Yes, I had similar thoughts, but didn't spent too much time finding the=
- best proposal, that wasn't my main goal in the series.=20
->=20
-> Indeed, I would prefer that further improvements be done as follow-up. =
-Or if you have a ready solution, I can squash it there. I can picture the=
- conflicts with the next patch though...=20
+Yes, stack-trace was quite long.
 
-If you did it as a separate patch it would have to be another
-huge patch changing lots of areas.
-I think the use of the macro to keep it simple should be in this one;
-you can add the type check change later.
+===
+==2704==ERROR: AddressSanitizer: heap-use-after-free on address 0x61400001018c 
+at pc 0x003921ea145d bp 0x7fd49c4fc940 sp 0x7fd49c4fc930
+READ of size 4 at 0x61400001018c thread T2
+    #0 0x3921ea145c in if_start slirp/if.c:230
+    #1 0x3921ea1015 in if_output slirp/if.c:141
+    #2 0x3921eadf1f in ip_output slirp/ip_output.c:85
+    #3 0x3921ed229e in tcp_respond slirp/tcp_subr.c:218
+    #4 0x3921ecc959 in tcp_input slirp/tcp_input.c:1392
+    #5 0x3921eab799 in ip_input slirp/ip_input.c:206
+    #6 0x3921eb6529 in slirp_input slirp/slirp.c:872
+    #7 0x3921e7c56f in net_slirp_receive net/slirp.c:119
+    #8 0x3921e60fe0 in nc_sendv_compat net/net.c:707
+    #9 0x3921e61170 in qemu_deliver_packet_iov net/net.c:734
+    #10 0x3921e67c53 in qemu_net_queue_deliver_iov net/queue.c:179
+    #11 0x3921e67e5b in qemu_net_queue_send_iov net/queue.c:224
+    #12 0x3921e61395 in qemu_sendv_packet_async net/net.c:770
+    #13 0x3921e613c2 in qemu_sendv_packet net/net.c:778
+    #14 0x3921e6961e in net_hub_receive_iov net/hub.c:72
+    #15 0x3921e69c12 in net_hub_port_receive_iov net/hub.c:123
+    #16 0x3921e61155 in qemu_deliver_packet_iov net/net.c:732
+    #17 0x3921e67ae7 in qemu_net_queue_deliver net/queue.c:164
+    #18 0x3921e67d59 in qemu_net_queue_send net/queue.c:199
+    #19 0x3921e60d58 in qemu_send_packet_async_with_flags net/net.c:661
+    #20 0x3921e60d90 in qemu_send_packet_async net/net.c:668
+    #21 0x3921e60dbd in qemu_send_packet net/net.c:674
+    #22 0x3921bef076 in ne2000_ioport_write hw/net/ne2000.c:302
+    #23 0x3921bf07c4 in ne2000_write hw/net/ne2000.c:688
+    #24 0x3921668a95 in memory_region_write_accessor /home/test/qemu/memory.c:529
+    #25 0x3921668d6e in access_with_adjusted_size /home/test/qemu/memory.c:595
+    #26 0x392166f4ca in memory_region_dispatch_write /home/test/qemu/memory.c:1337
+    #27 0x39215c633c in address_space_write_continue /home/test/qemu/exec.c:2942
+    #28 0x39215c65df in address_space_write /home/test/qemu/exec.c:2987
+    #29 0x39215c6df3 in address_space_rw /home/test/qemu/exec.c:3089
+    #30 0x39216a3159 in kvm_handle_io /home/test/qemu/accel/kvm/kvm-all.c:1795
+    #31 0x39216a4425 in kvm_cpu_exec /home/test/qemu/accel/kvm/kvm-all.c:2035
+    #32 0x3921636a6c in qemu_kvm_cpu_thread_fn /home/test/qemu/cpus.c:1128
+    #33 0x7fd4a5f4336c in start_thread (/lib64/libpthread.so.0+0x736c)
+    #34 0x7fd4a5c7bbbe in __GI___clone (/lib64/libc.so.6+0x110bbe)
 
-Dave
+0x61400001018c is located 332 bytes inside of 416-byte region 
+[0x614000010040,0x6140000101e0)
+freed by thread T2 here:
+    #0 0x7fd4a967c4b8 in __interceptor_free (/lib64/libasan.so.4+0xde4b8)
+    #1 0x3921ebf027 in sofree slirp/socket.c:106
+    #2 0x3921ed2cd5 in tcp_close slirp/tcp_subr.c:334
+    #3 0x3921eca600 in tcp_input slirp/tcp_input.c:948
+    #4 0x3921eab799 in ip_input slirp/ip_input.c:206
+    #5 0x3921eb6529 in slirp_input slirp/slirp.c:872
+    #6 0x3921e7c56f in net_slirp_receive net/slirp.c:119
+    #7 0x3921e60fe0 in nc_sendv_compat net/net.c:707
+    #8 0x3921e61170 in qemu_deliver_packet_iov net/net.c:734
+    #9 0x3921e67c53 in qemu_net_queue_deliver_iov net/queue.c:179
+    #10 0x3921e67e5b in qemu_net_queue_send_iov net/queue.c:224
+    #11 0x3921e61395 in qemu_sendv_packet_async net/net.c:770
+    #12 0x3921e613c2 in qemu_sendv_packet net/net.c:778
+    #13 0x3921e6961e in net_hub_receive_iov net/hub.c:72
+    #14 0x3921e69c12 in net_hub_port_receive_iov net/hub.c:123
+    #15 0x3921e61155 in qemu_deliver_packet_iov net/net.c:732
+    #16 0x3921e67ae7 in qemu_net_queue_deliver net/queue.c:164
+    #17 0x3921e67d59 in qemu_net_queue_send net/queue.c:199
+    #18 0x3921e60d58 in qemu_send_packet_async_with_flags net/net.c:661
+    #19 0x3921e60d90 in qemu_send_packet_async net/net.c:668
+    #20 0x3921e60dbd in qemu_send_packet net/net.c:674
+    #21 0x3921bef076 in ne2000_ioport_write hw/net/ne2000.c:302
+    #22 0x3921bf07c4 in ne2000_write hw/net/ne2000.c:688
+    #23 0x3921668a95 in memory_region_write_accessor /home/test/qemu/memory.c:529
+    #24 0x3921668d6e in access_with_adjusted_size /home/test/qemu/memory.c:595
+    #25 0x392166f4ca in memory_region_dispatch_write /home/test/qemu/memory.c:1337
+    #26 0x39215c633c in address_space_write_continue /home/test/qemu/exec.c:2942
+    #27 0x39215c65df in address_space_write /home/test/qemu/exec.c:2987
+    #28 0x39215c6df3 in address_space_rw /home/test/qemu/exec.c:3089
+    #29 0x39216a3159 in kvm_handle_io /home/test/qemu/accel/kvm/kvm-all.c:1795
 
-> > [Skipping lots of mechanical changes...]
-> >=20
-> > I think you missed test-qobject-input-visitor.c and
-> > string-input-visitor.c.
-> >=20
-> > In test-qobject-input-visitor.c's test_visitor_in_enum():
-> >=20
-> >         v =3D visitor_input_test_init(data, "%s", EnumOne_lookup[i]);
-> >=20
-> > You update it in PATCH 12, but the code only works as long as EnumOne
-> > has no holes.  Mapping the enum to string like we do everywhere else =
-in
-> > this patch would be cleaner.
-> >=20
->=20
-> ok
->=20
-> > The loop control also subscripts EnumOne_lookup[i].  You take care of
-> > that one in PATCH 12.  That's okay.
-> >=20
-> > Same for test-string-input-visitor.c's test_visitor_in_enum().
-> >=20
-> > There's one more in test_native_list_integer_helper():
-> >=20
-> >     g_string_append_printf(gstr_union,  "{ 'type': '%s', 'data': [ %s=
- ] }",
-> >                            UserDefNativeListUnionKind_lookup[kind],
-> >                            gstr_list->str);
-> >=20
-> > Same story.
-> >=20
-> > The patch doesn't touch the _lookup[] subscripts you're going to repl=
-ace
-> > by qapi_enum_parse() in PATCH 07-11.  Understand, but I'd reorder the
-> > patches: first replace by qapi_enum_parse(), because DRY (no need to
-> > explain more at that point).  Then get rid of all the remaining
-> > subscripting into _lookup[], i.e. this patch (explain it helps the ne=
-xt
-> > one), then PATCH 12.
-> >=20
->=20
-> ok
+previously allocated by thread T2 here:
+    #0 0x7fd4a967c850 in malloc (/lib64/libasan.so.4+0xde850)
+    #1 0x3921ebeaa5 in socreate slirp/socket.c:51
+    #2 0x3921ec7184 in tcp_input slirp/tcp_input.c:432
+    #3 0x3921eab799 in ip_input slirp/ip_input.c:206
+    #4 0x3921eb6529 in slirp_input slirp/slirp.c:872
+    #5 0x3921e7c56f in net_slirp_receive net/slirp.c:119
+    #6 0x3921e60fe0 in nc_sendv_compat net/net.c:707
+    #7 0x3921e61170 in qemu_deliver_packet_iov net/net.c:734
+    #8 0x3921e67c53 in qemu_net_queue_deliver_iov net/queue.c:179
+    #9 0x3921e67e5b in qemu_net_queue_send_iov net/queue.c:224
+    #10 0x3921e61395 in qemu_sendv_packet_async net/net.c:770
+    #11 0x3921e613c2 in qemu_sendv_packet net/net.c:778
+    #12 0x3921e6961e in net_hub_receive_iov net/hub.c:72
+    #13 0x3921e69c12 in net_hub_port_receive_iov net/hub.c:123
+    #14 0x3921e61155 in qemu_deliver_packet_iov net/net.c:732
+    #15 0x3921e67ae7 in qemu_net_queue_deliver net/queue.c:164
+    #16 0x3921e67d59 in qemu_net_queue_send net/queue.c:199
+    #17 0x3921e60d58 in qemu_send_packet_async_with_flags net/net.c:661
+    #18 0x3921e60d90 in qemu_send_packet_async net/net.c:668
+    #19 0x3921e60dbd in qemu_send_packet net/net.c:674
+    #20 0x3921bef076 in ne2000_ioport_write hw/net/ne2000.c:302
+    #21 0x3921bf07c4 in ne2000_write hw/net/ne2000.c:688
+    #22 0x3921668a95 in memory_region_write_accessor /home/test/qemu/memory.c:529
+    #23 0x3921668d6e in access_with_adjusted_size /home/test/qemu/memory.c:595
+    #24 0x392166f4ca in memory_region_dispatch_write /home/test/qemu/memory.c:1337
+    #25 0x39215c633c in address_space_write_continue /home/test/qemu/exec.c:2942
+    #26 0x39215c65df in address_space_write /home/test/qemu/exec.c:2987
+    #27 0x39215c6df3 in address_space_rw /home/test/qemu/exec.c:3089
+    #28 0x39216a3159 in kvm_handle_io /home/test/qemu/accel/kvm/kvm-all.c:1795
+    #29 0x39216a4425 in kvm_cpu_exec /home/test/qemu/accel/kvm/kvm-all.c:2035
+
+Thread T2 created by T0 here:
+    #0 0x7fd4a95d5a2f in pthread_create (/lib64/libasan.so.4+0x37a2f)
+    #1 0x39221e317e in qemu_thread_create util/qemu-thread-posix.c:508
+    #2 0x39216392a7 in qemu_kvm_start_vcpu /home/test/qemu/cpus.c:1734
+    #3 0x3921639868 in qemu_init_vcpu /home/test/qemu/cpus.c:1774
+    #4 0x392182ae7a in x86_cpu_realizefn /home/test/qemu/target/i386/cpu.c:3735
+    #5 0x3921ae4b71 in device_set_realized hw/core/qdev.c:914
+    #6 0x3921f66be3 in property_set_bool qom/object.c:1886
+    #7 0x3921f629f5 in object_property_set qom/object.c:1093
+    #8 0x3921f6987c in object_property_set_qobject qom/qom-qobject.c:27
+    #9 0x3921f62cc2 in object_property_set_bool qom/object.c:1162
+    #10 0x39217abf1f in pc_new_cpu /home/test/qemu/hw/i386/pc.c:1102
+    #11 0x39217ac727 in pc_cpus_init /home/test/qemu/hw/i386/pc.c:1182
+    #12 0x39217b5c34 in pc_init1 /home/test/qemu/hw/i386/pc_piix.c:151
+    #13 0x39217b79c5 in pc_init_v2_10 /home/test/qemu/hw/i386/pc_piix.c:446
+    #14 0x3921af5157 in machine_run_board_init hw/core/machine.c:760
+    #15 0x392196b37c in main /home/test/qemu/vl.c:4633
+    #16 0x7fd4a5b8b509 in __libc_start_main (/lib64/libc.so.6+0x20509)
+
+SUMMARY: AddressSanitizer: heap-use-after-free slirp/if.c:230 in if_start
+Shadow bytes around the buggy address:
+  0x0c287fff9fe0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c287fff9ff0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c287fffa000: fa fa fa fa fa fa fa fa fd fd fd fd fd fd fd fd
+  0x0c287fffa010: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+  0x0c287fffa020: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+=>0x0c287fffa030: fd[fd]fd fd fd fd fd fd fd fd fd fd fa fa fa fa
+  0x0c287fffa040: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c287fffa050: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c287fffa060: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c287fffa070: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c287fffa080: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==2704==ABORTING
+===
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
