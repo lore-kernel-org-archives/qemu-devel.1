@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkxnA-0001fB-T8
+	(envelope-from <dgilbert@redhat.com>) id 1dkxnA-0001f7-S6
 	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:27:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkxnA-00049q-2V
+	(envelope-from <dgilbert@redhat.com>) id 1dkxn7-00048D-PL
 	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:27:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53403)
+Received: from mx1.redhat.com ([209.132.183.28]:42298)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dkxn9-00049I-St
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:27:48 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dkxn7-00047g-I6
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:27:45 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu, 24 Aug 2017 20:27:00 +0100
-Message-Id: <20170824192730.8440-3-dgilbert@redhat.com>
+Date: Thu, 24 Aug 2017 20:26:59 +0100
+Message-Id: <20170824192730.8440-2-dgilbert@redhat.com>
 In-Reply-To: <20170824192730.8440-1-dgilbert@redhat.com>
 References: <20170824192730.8440-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [RFC v2 02/32] vhub: Only process received packets on
- started queues
+Subject: [Qemu-devel] [RFC v2 01/32] vhu: vu_queue_started
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +28,50 @@ Cc: quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Only process received packets if the queue has been started.
+Add a vu_queue_started method to complement vu_queue_enabled.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tests/vhost-user-bridge.c | 1 +
- 1 file changed, 1 insertion(+)
+ contrib/libvhost-user/libvhost-user.c | 6 ++++++
+ contrib/libvhost-user/libvhost-user.h | 9 +++++++++
+ 2 files changed, 15 insertions(+)
 
-diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
-index 1e5b5ca3da..324abee53d 100644
---- a/tests/vhost-user-bridge.c
-+++ b/tests/vhost-user-bridge.c
-@@ -277,6 +277,7 @@ vubr_backend_recv_cb(int sock, void *ctx)
-     DPRINT("    hdrlen = %d\n", hdrlen);
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index 35fa0c5e56..201b9846e9 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -930,6 +930,12 @@ vu_queue_enabled(VuDev *dev, VuVirtq *vq)
+     return vq->enable;
+ }
  
-     if (!vu_queue_enabled(dev, vq) ||
-+        !vu_queue_started(dev, vq) ||
-         !vu_queue_avail_bytes(dev, vq, hdrlen, 0)) {
-         DPRINT("Got UDP packet, but no available descriptors on RX virtq.\n");
-         return;
++bool
++vu_queue_started(VuDev *dev, VuVirtq *vq)
++{
++    return vq->started;
++}
++
+ static inline uint16_t
+ vring_avail_flags(VuVirtq *vq)
+ {
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
+index 53ef222c0b..acd019876d 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -328,6 +328,15 @@ void vu_queue_set_notification(VuDev *dev, VuVirtq *vq, int enable);
+ bool vu_queue_enabled(VuDev *dev, VuVirtq *vq);
+ 
+ /**
++ * vu_queue_started:
++ * @dev: a VuDev context
++ * @vq: a VuVirtq queue
++ *
++ * Returns: whether the queue is started.
++ */
++bool vu_queue_started(VuDev *dev, VuVirtq *vq);
++
++/**
+  * vu_queue_empty:
+  * @dev: a VuDev context
+  * @vq: a VuVirtq queue
 -- 
 2.13.5
