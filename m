@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dkplH-0004rG-8c
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:53:21 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dkpnV-0006OG-Rq
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:55:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dkplG-0005uC-Fh
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:53:19 -0400
-Received: from mail-ua0-x243.google.com ([2607:f8b0:400c:c08::243]:34862)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dkplG-0005ty-B0
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:53:18 -0400
-Received: by mail-ua0-x243.google.com with SMTP id c3so925023uae.2
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 03:53:18 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1503564371-26090-10-git-send-email-armbru@redhat.com>
-References: <1503564371-26090-1-git-send-email-armbru@redhat.com>
-	<1503564371-26090-10-git-send-email-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 24 Aug 2017 12:53:17 +0200
-Message-ID: <CAJ+F1CKTfjghAJxfU2FiSC3sd5ZzygDSLyEH5iOERR7k8_=aSA@mail.gmail.com>
+	(envelope-from <kraxel@redhat.com>) id 1dkpnR-0006q3-Sz
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:55:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51906)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dkpnR-0006nZ-7S
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:55:33 -0400
+Message-ID: <1503572130.22313.8.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 24 Aug 2017 12:55:30 +0200
+In-Reply-To: <CAFEAcA9Lz=pBZxYqHk7kdaU_LsvE34+DJmTm_jHSFeKzoCM3xw@mail.gmail.com>
+References: <20170807163121.797e7ad6@nial.brq.redhat.com>
+	<CAFEAcA8=+8cPjKayq3Bre7y9=6jzFgjCCjRkNUeHxArJu9Ue6A@mail.gmail.com>
+	<be880655-0c04-8369-01fc-76dd6241ca78@redhat.com>
+	<1503316706.26016.11.camel@redhat.com>
+	<CAFEAcA9Lz=pBZxYqHk7kdaU_LsvE34+DJmTm_jHSFeKzoCM3xw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 09/16] crypto: Use qapi_enum_parse() in
- qcrypto_block_luks_name_lookup()
+Subject: Re: [Qemu-devel] AVMF & OVMF blobs in QEMU tree???
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,101 +30,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-On Thu, Aug 24, 2017 at 10:46 AM, Markus Armbruster <armbru@redhat.com> wro=
-te:
-> Cc: "Daniel P. Berrange" <berrange@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+  Hi,
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Having all our precompiled blobs be in a submodule would
+> maybe be handy for properly keeping them separate from the
+> QEMU code -- would that be useful for downstream distro
+> packagers?
 
+I like the clear separation.
 
-> ---
->  crypto/block-luks.c | 19 +++++++------------
->  1 file changed, 7 insertions(+), 12 deletions(-)
->
-> diff --git a/crypto/block-luks.c b/crypto/block-luks.c
-> index afb8543..c3cacdb 100644
-> --- a/crypto/block-luks.c
-> +++ b/crypto/block-luks.c
-> @@ -20,6 +20,7 @@
->
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
-> +#include "qapi/util.h"
->  #include "qemu/bswap.h"
->
->  #include "crypto/block-luks.h"
-> @@ -265,39 +266,33 @@ qcrypto_block_luks_cipher_alg_lookup(QCryptoCipherA=
-lgorithm alg,
->   * make that function emit a more friendly error message */
->  static int qcrypto_block_luks_name_lookup(const char *name,
->                                            const char *const *map,
-> -                                          size_t maplen,
->                                            const char *type,
->                                            Error **errp)
->  {
-> -    size_t i;
-> -    for (i =3D 0; i < maplen; i++) {
-> -        if (g_str_equal(map[i], name)) {
-> -            return i;
-> -        }
-> -    }
-> +    int ret =3D qapi_enum_parse(map, name, -1, NULL);
->
-> -    error_setg(errp, "%s %s not supported", type, name);
-> -    return 0;
-> +    if (ret < 0) {
-> +        error_setg(errp, "%s %s not supported", type, name);
-> +        return 0;
-> +    }
-> +    return ret;
->  }
->
->  #define qcrypto_block_luks_cipher_mode_lookup(name, errp)               =
-\
->      qcrypto_block_luks_name_lookup(name,                                =
-\
->                                     QCryptoCipherMode_lookup,            =
-\
-> -                                   QCRYPTO_CIPHER_MODE__MAX,            =
-\
->                                     "Cipher mode",                       =
-\
->                                     errp)
->
->  #define qcrypto_block_luks_hash_name_lookup(name, errp)                 =
-\
->      qcrypto_block_luks_name_lookup(name,                                =
-\
->                                     QCryptoHashAlgorithm_lookup,         =
-\
-> -                                   QCRYPTO_HASH_ALG__MAX,               =
-\
->                                     "Hash algorithm",                    =
-\
->                                     errp)
->
->  #define qcrypto_block_luks_ivgen_name_lookup(name, errp)                =
-\
->      qcrypto_block_luks_name_lookup(name,                                =
-\
->                                     QCryptoIVGenAlgorithm_lookup,        =
-\
-> -                                   QCRYPTO_IVGEN_ALG__MAX,              =
-\
->                                     "IV generator",                      =
-\
->                                     errp)
->
-> --
-> 2.7.5
->
->
+Also you don't have to fetch the firmware submodule if you don't need
+the prebuilds.
+
+It would be a good opportunity to cleanup the mess we have in pc-bios/
+right now.
+
+Clear disadvantage is that firmware updates will become more
+complicated then as two repos must be updated.  So either two pull
+requests per firmware update, or write access to the firmware binary
+repo for all firmware maintainers.
+
+Or maybe make the firmware sources submodules of the firmware binary
+repo instead of the qemu repo.
+
+> In any case this seems like a good opportunity to write down
+> exactly what our policy about ROM blobs is (eg where they
+> are, how we update them, requirement for source, whether
+> we allow source to be in a submodule not on qemu.org...)
+
+Tried to write down the current state.
+
+cheers,
+  Gerd
+
+---------------------- docs/firmware.txt ------------------------
+
+prebuilt firmware in qemu
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+The process of building firmware isn't as easy as building qemu
+itself, for example because you must have cross compilers installed
+when building firmware for other architectures.=C2=A0=C2=A0So qemu ships
+prebuilt firmware binaries for convenience reasons.
 
 
+directories
+-----------
 
---=20
-Marc-Andr=C3=A9 Lureau
+pc-bios/
+=C2=A0=C2=A0=C2=A0=C2=A0Firmware binaries.
+=C2=A0=C2=A0=C2=A0=C2=A0Also other files like keymaps and logos which are=
+ copied to
+=C2=A0=C2=A0=C2=A0=C2=A0$prefix/share/qemu by "make install".
+
+pc-bios/optionrom/
+=C2=A0=C2=A0=C2=A0=C2=A0Firmware sources, part of the qemu project.
+
+roms/
+=C2=A0=C2=A0=C2=A0=C2=A0Firmware sources, third-party projects, as git su=
+bmodules.
+
+
+third-party git repos
+---------------------
+
+For third party firmware sources it is recommended to have a git
+mirror on git.qemu.org.=C2=A0=C2=A0In case the firmware license is GPL th=
+e git
+mirror is mandatory for GPL compilance reasons:=C2=A0=C2=A0We ship binari=
+es, so
+we must provide sources too.
+
+
+building the firmware
+---------------------
+
+Firmware builds should be done using rules in roms/Makefile.=C2=A0=C2=A0T=
+hat
+serves as documentation how the firmware is built, and it also makes
+firmware updates easier for the maintainer.
+
+"make -C roms" prints a list of firmware build targets.
+"make -C roms $target" kicks a build.
+
+
+notes for specific firmwares
+----------------------------
+
+ipxe: see https://wiki.qemu.org/IpxeDownstreamForQemu
