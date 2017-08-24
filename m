@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkxpM-0003nw-9v
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:30:10 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dkxpd-000491-MV
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:30:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkxpL-0005iU-4H
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:30:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52558)
+	(envelope-from <dgilbert@redhat.com>) id 1dkxpa-0005uY-JB
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:30:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54124)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dkxpK-0005h4-RU
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:30:03 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dkxpa-0005ty-AR
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:30:18 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu, 24 Aug 2017 20:27:29 +0100
-Message-Id: <20170824192730.8440-32-dgilbert@redhat.com>
+Date: Thu, 24 Aug 2017 20:27:30 +0100
+Message-Id: <20170824192730.8440-33-dgilbert@redhat.com>
 In-Reply-To: <20170824192730.8440-1-dgilbert@redhat.com>
 References: <20170824192730.8440-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [RFC v2 31/32] vhost: Don't break merged regions on
- small remove/non-adds
+Subject: [Qemu-devel] [RFC v2 32/32] postcopy shared docs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +28,60 @@ Cc: quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-The previous patch merges hugepage regions with small gaps
-back into one; this patch stops some of the cases that split
-them up again.
-
-vhost_set_memory avoids adding small regions that are being
-dirty-monitored (typically VGA regions), but vhost_set_memory
-does remove these regions from any region they overlap.
-
-Avoid doing that removal if we'll just merge them again.
-
-The typical case is where the VGA regions dynamically change
-at run time after we've done the merge; although the merge works, the
-result is that the memory is marked as having changed and
-a set_mem_table message is transmitted.  By avoiding the split
-we avoid the join and we avoid marking the regions as having
-changed, and thus avoid sending the set_mem_table.
+Add some notes to the migration documentation for shared memory
+postcopy.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/virtio/trace-events |  2 ++
- hw/virtio/vhost.c      | 42 +++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 43 insertions(+), 1 deletion(-)
+ docs/devel/migration.txt | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index f98efb39fd..e22d2055b0 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -10,6 +10,8 @@ vhost_huge_page_stretch_and_merge_can(void) ""
- vhost_huge_page_stretch_and_merge_size_align(int d, uint64_t gpa, uint64_t align) "%d: gpa: 0x%"PRIx64" align: 0x%"PRIx64
- vhost_huge_page_stretch_and_merge_start_align(int d, uint64_t gpa, uint64_t align) "%d: gpa: 0x%"PRIx64" align: 0x%"PRIx64
- vhost_section(const char *name, int r) "%s:%d"
-+vhost_dev_would_remerge_no(uint64_t start_addr, uint64_t size) "0x%"PRIx64" + 0x%"PRIx64
-+vhost_dev_would_remerge_yes(uint64_t start_addr, uint64_t size) "0x%"PRIx64" + 0x%"PRIx64
- 
- # hw/virtio/vhost-user.c
- vhost_user_postcopy_end_entry(void) ""
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index fb506e747f..18714f6d03 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -564,6 +564,43 @@ static bool vhost_dev_cmp_memory(struct vhost_dev *dev,
-     return uaddr != reg->userspace_addr + start_addr - reg->guest_phys_addr;
- }
- 
-+/* Called by vhost_set_memory on removal where start_addr/size have
-+ * been found to correspond to an existing region (reg).
-+ * Returns True iff removing the section would be undone later
-+ * by merging (for hugepage) and thus there's no point in removing it.
-+ */
-+static bool vhost_dev_would_remerge(struct vhost_dev *dev,
-+                                    struct vhost_memory_region *reg,
-+                                    hwaddr start_addr, ram_addr_t size)
-+{
-+    uint64_t reglast = range_get_last(reg->guest_phys_addr, reg->memory_size);
-+    uint64_t memlast = range_get_last(start_addr, size);
-+    ram_addr_t offset;
-+    RAMBlock *rb = qemu_ram_block_from_host((void *)reg->userspace_addr,
-+                                            false, &offset);
-+    size_t reg_pagesize = qemu_ram_pagesize(rb);
+diff --git a/docs/devel/migration.txt b/docs/devel/migration.txt
+index 1b940a829b..d4c344c671 100644
+--- a/docs/devel/migration.txt
++++ b/docs/devel/migration.txt
+@@ -553,3 +553,42 @@ Postcopy now works with hugetlbfs backed memory:
+      hugepages works well, however 1GB hugepages are likely to be problematic
+      since it takes ~1 second to transfer a 1GB hugepage across a 10Gbps link,
+      and until the full page is transferred the destination thread is blocked.
 +
-+    /* If the region being deleted hangs over the end of the existing
-+     * region, it's not a case we're interested in.
-+     * If it's just a normal sized page then there won't normally be any
-+     * alignment merging going on.
-+     * and if the hole being cut is larger than the pagesize of the
-+     * region then assume it won't be remerged.
-+     */
-+    if (memlast > reglast || start_addr < reg->guest_phys_addr ||
-+        reg_pagesize == getpagesize() ||
-+        size >= reg_pagesize) {
-+        trace_vhost_dev_would_remerge_no(start_addr, size);
-+        return false;
-+    }
++=== Postcopy with shared memory ===
 +
-+    /* This is a small chunk overlapping a big hugepage region,
-+     * deleting it will get remerged
-+     */
-+    trace_vhost_dev_would_remerge_yes(start_addr, size);
-+    return true;
-+}
++Postcopy migration with shared memory needs explicit support from the other
++processes that share memory and from QEMU. There are restrictions on the type of
++memory that userfault can support shared.
 +
- static void vhost_set_memory(MemoryListener *listener,
-                              MemoryRegionSection *section,
-                              bool add)
-@@ -594,7 +631,10 @@ static void vhost_set_memory(MemoryListener *listener,
-             return;
-         }
-     } else {
--        if (!vhost_dev_find_reg(dev, start_addr, size)) {
-+        struct vhost_memory_region *reg = vhost_dev_find_reg(dev,
-+                                                             start_addr,
-+                                                             size);
-+        if (!reg || vhost_dev_would_remerge(dev, reg, start_addr, size)) {
-             /* Removing region that we don't access. Nothing to do. */
-             return;
-         }
++The Linux kernel userfault support works on /dev/shm memory and on hugetlbfs
++(although the kernel doesn't provide an equivalent to madvise(MADV_DONTNEED)
++for hugetlbfs which may be a problem in some configurations).
++
++The vhost-user code in QEMU supports clients that have Postcopy support,
++and the vhost-user-bridge (in tests/) and the DPDK package have changes
++to support postcopy.
++
++The client needs to open a userfaultfd and register the areas
++of memory that it maps with userfault.  The client must then pass the
++userfaultfd back to QEMU together with a mapping table that allows
++fault addresses in the clients address space to be converted back to
++RAMBlock/offsets.  The client's userfaultfd is added to the postcopy
++fault-thread and page requests are made on behalf of the client by QEMU.
++QEMU performs 'wake' operations on the client's userfaultfd to allow it
++to continue after a page has arrived.
++
++  Note: There are two future improvements that would be nice:
++    a) Some way to make QEMU ignorant of the addresses in the clients
++      address space
++    b) Avoiding the need for QEMU to perform ufd-wake calls after the
++      pages have arrived
++
++Retro-fitting postcopy to existing clients is possible:
++  a) A mechanism is needed for the registration with userfault as above,
++     and the registration needs to be coordinated with the phases of
++     postcopy.  In vhost-user extra messages are added to the existing
++     control channel.
++  b) Any thread that can block due to guest memory accesses must be
++     identified and the implication understood; for example if the
++     guest memory access is made while holding a lock then all other
++     threads waiting for that lock will also be blocked.
 -- 
 2.13.5
