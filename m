@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dkpB4-0007Rg-70
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:15:55 -0400
+	(envelope-from <prvs=402c228e5=roger.pau@citrix.com>)
+	id 1dkpDd-0000hi-6H
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:18:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dkpB1-0005HR-1C
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:15:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47710)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dkpB0-0005Er-82
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:15:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dkpAx-0008Mt-Fk
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 10:15:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4ACB02E80DE
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 10:15:46 +0000 (UTC)
+	(envelope-from <prvs=402c228e5=roger.pau@citrix.com>)
+	id 1dkpDa-0006fE-1J
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:18:33 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:1520)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=402c228e5=roger.pau@citrix.com>)
+	id 1dkpDZ-0006es-RM
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:18:29 -0400
+From: Roger Pau Monne <roger.pau@citrix.com>
+Date: Thu, 24 Aug 2017 10:47:53 +0100
+Message-ID: <20170824094753.77795-3-roger.pau@citrix.com>
+In-Reply-To: <20170824094753.77795-1-roger.pau@citrix.com>
+References: <20170824094753.77795-1-roger.pau@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 24 Aug 2017 10:08:39 -0000
-From: Huang Yong <1712027@bugs.launchpad.net>
-Reply-To: Bug 1712027 <1712027@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150330672268.8725.17665790368733773133.malonedeb@soybean.canonical.com>
-Message-Id: <150356931972.16996.17110854192778739978.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1712027] Re: qemu: Cryptography adding encrypted
- disk with luks format failed
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH QEMU] xen/pt: allow QEMU to request MSI
+ unmasking at bind time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,81 +30,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: xen-devel@lists.xenproject.org, hfp@posteo.de
+Cc: Roger Pau Monne <roger.pau@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Jan Beulich <JBeulich@suse.com>, qemu-devel@nongnu.org
 
-If the alg is GCRY_CIPHER_AES256 and length of data to be encrypted is
-multiple of 16 (16/32/48...),the length of encryted data is equal to the
-raw data. There is no padding and the bug is triggerd.
+When a MSIX interrupt is bound to a guest using
+xc_domain_update_msi_irq (XEN_DOMCTL_bind_pt_irq) the interrupt is
+left masked by default.
 
--- =
+This causes problems with guests that first configure interrupts and
+clean the per-entry MSIX table mask bit and afterwards enable MSIX
+globally. In such scenario the Xen internal msixtbl handlers would not
+detect the unmasking of MSIX entries because vectors are not yet
+registered since MSIX is not enabled, and vectors would be left
+masked.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1712027
+Introduce a new flag in the gflags field to signal Xen whether a MSIX
+interrupt should be unmasked after being bound.
 
-Title:
-  qemu: Cryptography adding encrypted disk with luks format failed
+Signed-off-by: Roger Pau Monné <roger.pau@citrix.com>
+Reported-by: Andreas Kinzler <hfp@posteo.de>
+---
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: Jan Beulich <JBeulich@suse.com>
+Cc: qemu-devel@nongnu.org
+---
+ hw/xen/xen_pt_msi.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-Status in QEMU:
-  New
-
-Bug description:
-  I'm using libvirt to attach luks encrypted disk to a running VM. The
-  qemu-monitor-command like the
-
-  following:
-
-  {"execute":"object-add","arguments":{"qom-type":"secret","id":"virtio-
-  disk11-luks-
-  secret0","props":{"data":"El7jOYLCZwrij2Mue0q2tA=3D=3D","keyid":"masterKe=
-y0","iv":"J2je0WJjCa89L3iKc1lceg=3D=3D","format":"base64"}}
-
-  the masterKey0 specify the secret which has been created before.
-
-  command above return with error message "Incorrect number of padding
-  bytes XXX found on decrypted
-
-  data". This is triggered by the following code snippets in qemu/crypto/se=
-cret.c:
-           =
-
-  if (plaintext[ciphertextlen - 1] > 16 ||
-               plaintext[ciphertextlen - 1] > ciphertextlen) {
-               error_setg(errp, "Incorrect number of padding bytes (%d) "
-                       "found on decrypted data",
-                       (int)plaintext[ciphertextlen - 1]); =
-
-                     =E2=80=A6
-           }
-
-  The bug is: There is on padding in plaintext if the actual length of
-  the plaintext  decrypted is
-
-  equal to ciphertext.
-
-  In this case, the last element in plaintext array may be one of the
-  character in base64 code table
-
-  or other.
-
-  I would like to know why length of padding bytes cannot exceed 16 and
-  whether i can remove
-
-  judement: =E2=80=9Cplaintext[ciphertextlen - 1] > 16=E2=80=9D so that I c=
-an eliminate
-  the error above.
-
-  Much appreciate it if doubts above is cleared up.
-
-  libvirt/qemu version:
-
-  # virsh version
-  Compiled against library: libvirt 3.0.0
-  Using library: libvirt 3.0.0
-  Using API: QEMU 3.0.0
-  Running hypervisor: QEMU 2.7.1
-
-  OS: Ubuntu 12.04 LTS
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1712027/+subscriptions
+diff --git a/hw/xen/xen_pt_msi.c b/hw/xen/xen_pt_msi.c
+index ff9a79f5d2..c00ac2fd7d 100644
+--- a/hw/xen/xen_pt_msi.c
++++ b/hw/xen/xen_pt_msi.c
+@@ -24,6 +24,7 @@
+ #define XEN_PT_GFLAGS_SHIFT_DM             9
+ #define XEN_PT_GFLAGSSHIFT_DELIV_MODE     12
+ #define XEN_PT_GFLAGSSHIFT_TRG_MODE       15
++#define XEN_PT_GFLAGSSHIFT_UNMASKED       16
+ 
+ #define latch(fld) latch[PCI_MSIX_ENTRY_##fld / sizeof(uint32_t)]
+ 
+@@ -155,7 +156,8 @@ static int msi_msix_update(XenPCIPassthroughState *s,
+                            int pirq,
+                            bool is_msix,
+                            int msix_entry,
+-                           int *old_pirq)
++                           int *old_pirq,
++                           bool masked)
+ {
+     PCIDevice *d = &s->dev;
+     uint8_t gvec = msi_vector(data);
+@@ -171,6 +173,8 @@ static int msi_msix_update(XenPCIPassthroughState *s,
+         table_addr = s->msix->mmio_base_addr;
+     }
+ 
++    gflags |= masked ? 0 : (1u << XEN_PT_GFLAGSSHIFT_UNMASKED);
++
+     rc = xc_domain_update_msi_irq(xen_xc, xen_domid, gvec,
+                                   pirq, gflags, table_addr);
+ 
+@@ -274,7 +278,7 @@ int xen_pt_msi_update(XenPCIPassthroughState *s)
+ {
+     XenPTMSI *msi = s->msi;
+     return msi_msix_update(s, msi_addr64(msi), msi->data, msi->pirq,
+-                           false, 0, &msi->pirq);
++                           false, 0, &msi->pirq, false);
+ }
+ 
+ void xen_pt_msi_disable(XenPCIPassthroughState *s)
+@@ -355,7 +359,8 @@ static int xen_pt_msix_update_one(XenPCIPassthroughState *s, int entry_nr,
+     }
+ 
+     rc = msi_msix_update(s, entry->addr, entry->data, pirq, true,
+-                         entry_nr, &entry->pirq);
++                         entry_nr, &entry->pirq,
++                         vec_ctrl & PCI_MSIX_ENTRY_CTRL_MASKBIT);
+ 
+     if (!rc) {
+         entry->updated = false;
+-- 
+2.11.0 (Apple Git-81)
