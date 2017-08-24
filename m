@@ -1,38 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dkkZ7-0008SZ-Ja
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 01:20:26 -0400
+	(envelope-from <thuth@redhat.com>) id 1dkkg1-0001eR-DN
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 01:27:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dkkZ4-0004Fr-Cn
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 01:20:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46808
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
-	id 1dkkZ4-0004Fi-7v
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 01:20:22 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7O5IkQ1002582
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 01:20:19 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2chjey6vft-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 01:20:19 -0400
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
-	Thu, 24 Aug 2017 01:20:19 -0400
-References: <20170823072656.3352-1-zyimin@linux.vnet.ibm.com>
-From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Date: Thu, 24 Aug 2017 13:20:12 +0800
+	(envelope-from <thuth@redhat.com>) id 1dkkfy-0006Yr-7q
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 01:27:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36260)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dkkfx-0006YY-V2
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 01:27:30 -0400
+References: <20170816082650.21880-1-cohuck@redhat.com>
+	<223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
+	<CAFEAcA_UfM_XNKdc5zfHsehoRE6Q+EszRZX3FByskir7c+0Lww@mail.gmail.com>
+	<20170822010917.GO12356@umbus.fritz.box>
+	<CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
+	<3f0dc918-0f55-e2f4-bf47-fe4abf5453bb@redhat.com>
+	<CAFEAcA_ezKWweEuUB-cXTer0LLaeuiGDkSdfhApedhw4ykDT0Q@mail.gmail.com>
+	<20170822112046.GC12356@umbus.fritz.box>
+	<20170822134815.77020eb8.cohuck@redhat.com>
+	<20170823002907.GC5379@umbus.fritz.box>
+	<20170823091650.48e7c44e.cohuck@redhat.com>
+	<54526d47-b436-79d5-7a38-9516eaa727a6@redhat.com>
+	<5b0ff74a-08d6-558d-4c79-a93758e6302a@redhat.com>
+	<0bb344a3-f8f8-3365-cef1-1c68cf7d160d@redhat.com>
+	<20170823142047.366068f7.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <897a578e-2375-b892-10af-879b8cc6136b@redhat.com>
+Date: Thu, 24 Aug 2017 07:27:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170823072656.3352-1-zyimin@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Message-Id: <871ef0e3-ea8b-df59-0eeb-8019b350f1d2@linux.vnet.ibm.com>
+In-Reply-To: <20170823142047.366068f7.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/4] four zpci patches
+Subject: Re: [Qemu-devel] make check speed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,31 +41,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, cohuck@redhat.com, agraf@suse.de, richard.henderson@linaro.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <mlureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Cam Macdonell <cam@cs.ualberta.ca>
 
-Why can't I receive [Qemu-devel] prefixed patches?
+On 23.08.2017 14:20, Cornelia Huck wrote:
+> On Wed, 23 Aug 2017 10:35:43 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+>=20
+>> True. And I just learned that you can also already set the SPEED
+>> variable to either "quick" or "slow" and that we're already using
+>> g_test_quick() and g_test_slow() in a couple of places to check this. =
+So
+>> the framework for running quick vs. thorough tests is already there ..=
+.
+>> we just might want to add this to some more tests, I guess...
+>>
+>> Question for the maintainers and the test automation folks: Is anybody
+>> already running "make check SPEED=3Dslow" or is this just rather an
+>> unheard-of way of running the tests?
+>=20
+> So I tried this on master just for fun, and 'make V=3D1 SPEED=3Dslow
+> check-qtest-x86_64' promptly failed for some ivshmem test.
+>=20
+> On x86_86:
+> TEST: tests/ivshmem-test... (pid=3D3672)
+>   /x86_64/ivshmem/single:                                              =
+OK
+>   /x86_64/ivshmem/hotplug:                                             =
+OK
+>   /x86_64/ivshmem/memdev:                                              =
+OK
+>   /x86_64/ivshmem/pair:                                                =
+OK
+>   /x86_64/ivshmem/server-msi:                                          =
+**
+> ERROR:/home/cohuck/git/qemu/tests/ivshmem-test.c:367:test_ivshmem_serve=
+r: assertion failed (ret =3D=3D 0): (1 =3D=3D 0)
+> FAIL
+> GTester: last random seed: R02Scde8fd6835fdf17450c73e2f74f25007
+> (pid=3D3697)
+>  /x86_64/ivshmem/server-irq:                                          O=
+K
+> FAIL: tests/ivshmem-test
+>=20
+> On s390x:
+> TEST: tests/ivshmem-test... (pid=3D63617)
+>   /x86_64/ivshmem/single:                                              =
+OK
+>   /x86_64/ivshmem/hotplug:                                             =
+OK
+>   /x86_64/ivshmem/memdev:                                              =
+OK
+>   /x86_64/ivshmem/pair:                                                =
+OK
+>   /x86_64/ivshmem/server-msi:                                          =
+qemu-system-x86_64: -device ivshmem-doorbell,chardev=3Dchr0,vectors=3D2: =
+server sent invalid ID message
+> Broken pipe
+> FAIL
+> GTester: last random seed: R02Sda000f7be5ce27b3dfbb03d12f297b69
+> (pid=3D63640)
+>   /x86_64/ivshmem/server-irq:                                          =
+qemu-system-x86_64: -device ivshmem,size=3D1M,msi=3Doff,chardev=3Dchr0,ve=
+ctors=3D2: server sent invalid ID message
+> Broken pipe
+> FAIL
+> GTester: last random seed: R02S5a236dbcac35545cc34c0131fbc06162
+> (pid=3D63648)
+> FAIL: tests/ivshmem-test
+>=20
+> Both machines are on Fedora 26.
 
+The ivshmem test fails for me with SPEED=3Dslow, too (on a x86 RHEL7
+machine). Looks like it is definitely broken. Could anybody with some
+ivshmem knowledge please have a look at this?
 
-=D4=DA 2017/8/23 =CF=C2=CE=E73:26, Yi Min Zhao =D0=B4=B5=C0:
-> This patch set contains four small zpci patches to fixup different issu=
-es.
-> 1) fixup calculation of msix boundary
-> 2) remove zpci idx from msix message, instead we could use PCIDevice's =
-id to
->     find zpci device in kvm_arch_fixup_msi_route()
-> 3) fixup ind_offset calculation for adapter interrupt routing entry
-> 4) introduce our own iommu_replay callback
->
-> Yi Min Zhao (4):
->    s390x/pci: fixup trap_msix()
->    s390x/pci: remove idx from msix msg data
->    s390x/pci: fixup ind_offset of msix routing entry
->    s390x/pci: add iommu replay callback
->
->   hw/s390x/s390-pci-bus.c  | 24 +++++++++++++-----------
->   hw/s390x/s390-pci-bus.h  |  2 ++
->   hw/s390x/s390-pci-inst.c | 28 ++--------------------------
->   target/s390x/kvm.c       | 11 ++++++-----
->   4 files changed, 23 insertions(+), 42 deletions(-)
->
+ Thanks,
+  Thomas
