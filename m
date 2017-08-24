@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dkv39-0000if-CS
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:32:08 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dkv3A-0000ji-FL
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:32:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dkv38-0007XE-F2
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:32:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43700)
+	(envelope-from <imammedo@redhat.com>) id 1dkv39-0007Xo-EM
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:32:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47080)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dkv38-0007Wf-94
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:32:06 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4631DC04B958
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 16:32:05 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
-	(dell-r430-03.lab.eng.brq.redhat.com [10.34.112.60])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id BFE734139
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 16:32:04 +0000 (UTC)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dkv39-0007XK-5g
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:32:07 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu, 24 Aug 2017 18:31:37 +0200
-Message-Id: <1503592308-93913-15-git-send-email-imammedo@redhat.com>
+Date: Thu, 24 Aug 2017 18:31:38 +0200
+Message-Id: <1503592308-93913-16-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1503592308-93913-1-git-send-email-imammedo@redhat.com>
 References: <1503592308-93913-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11 v3 14/25] tilegx: replace
- cpu_tilegx_init() with cpu_generic_init()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH for-2.11 v3 15/25] xtensa: replace
+ cpu_xtensa_init() with cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,64 +28,121 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-cpu_tilegx_init() always falls back to TYPE_TILEGX_CPU object
-regardless of cpu_model. Put fallback logic into
-tilegx_cpu_class_by_name() which would translate any cpu_model
-into TYPE_TILEGX_CPU class and replace cpu_tilegx_init()
-with cpu_generic_init().
+call xtensa_irq_init() at realize time which makes
+cpu_xtensa_init() like generic cpu creation function.
+As result we can replace it with cpu_generic_init()
+which does the same job, reducing code duplication a bit.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- target/tilegx/cpu.h |  4 +---
- target/tilegx/cpu.c | 11 +++--------
- 2 files changed, 4 insertions(+), 11 deletions(-)
+CC: Max Filippov <jcmvbkbc@gmail.com>
+---
+ target/xtensa/cpu.h    |  4 +---
+ hw/xtensa/sim.c        |  2 +-
+ hw/xtensa/xtfpga.c     |  2 +-
+ target/xtensa/cpu.c    |  3 +++
+ target/xtensa/helper.c | 22 ----------------------
+ 5 files changed, 6 insertions(+), 27 deletions(-)
 
-diff --git a/target/tilegx/cpu.h b/target/tilegx/cpu.h
-index f32be49..71cea04 100644
---- a/target/tilegx/cpu.h
-+++ b/target/tilegx/cpu.h
-@@ -164,9 +164,7 @@ static inline TileGXCPU *tilegx_env_get_cpu(CPUTLGState *env)
- void tilegx_tcg_init(void);
- int cpu_tilegx_signal_handler(int host_signum, void *pinfo, void *puc);
- 
--TileGXCPU *cpu_tilegx_init(const char *cpu_model);
+diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+index ee29fb1..4803331 100644
+--- a/target/xtensa/cpu.h
++++ b/target/xtensa/cpu.h
+@@ -475,9 +475,7 @@ void xtensa_cpu_do_unaligned_access(CPUState *cpu, va=
+ddr addr,
+ #define XTENSA_DEFAULT_CPU_MODEL "dc232b"
+ #endif
+=20
+-XtensaCPU *cpu_xtensa_init(const char *cpu_model);
 -
--#define cpu_init(cpu_model) CPU(cpu_tilegx_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_TILEGX_CPU, cpu_model)
- 
- #define cpu_signal_handler cpu_tilegx_signal_handler
- 
-diff --git a/target/tilegx/cpu.c b/target/tilegx/cpu.c
-index 4532639..7345f5a 100644
---- a/target/tilegx/cpu.c
-+++ b/target/tilegx/cpu.c
-@@ -52,15 +52,9 @@ static void tilegx_cpu_dump_state(CPUState *cs, FILE *f,
-                 env->pc, env->spregs[TILEGX_SPR_CMPEXCH]);
- }
- 
--TileGXCPU *cpu_tilegx_init(const char *cpu_model)
-+static ObjectClass *tilegx_cpu_class_by_name(const char *cpu_model)
+-#define cpu_init(cpu_model) CPU(cpu_xtensa_init(cpu_model))
++#define cpu_init(cpu_model) cpu_generic_init(TYPE_XTENSA_CPU, cpu_model)
+=20
+ void xtensa_translate_init(void);
+ void xtensa_breakpoint_handler(CPUState *cs);
+diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
+index 249cd1e..1b4767f 100644
+--- a/hw/xtensa/sim.c
++++ b/hw/xtensa/sim.c
+@@ -84,7 +84,7 @@ static void xtensa_sim_init(MachineState *machine)
+     }
+=20
+     for (n =3D 0; n < smp_cpus; n++) {
+-        cpu =3D cpu_xtensa_init(cpu_model);
++        cpu =3D XTENSA_CPU(cpu_generic_init(TYPE_XTENSA_CPU, cpu_model))=
+;
+         if (cpu =3D=3D NULL) {
+             error_report("unable to find CPU definition '%s'",
+                          cpu_model);
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index 635a4d4..182ec1e 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -232,7 +232,7 @@ static void lx_init(const LxBoardDesc *board, Machine=
+State *machine)
+     }
+=20
+     for (n =3D 0; n < smp_cpus; n++) {
+-        cpu =3D cpu_xtensa_init(cpu_model);
++        cpu =3D XTENSA_CPU(cpu_generic_init(TYPE_XTENSA_CPU, cpu_model))=
+;
+         if (cpu =3D=3D NULL) {
+             error_report("unable to find CPU definition '%s'",
+                          cpu_model);
+diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
+index cd7f958..85897df 100644
+--- a/target/xtensa/cpu.c
++++ b/target/xtensa/cpu.c
+@@ -100,9 +100,12 @@ static ObjectClass *xtensa_cpu_class_by_name(const c=
+har *cpu_model)
+ static void xtensa_cpu_realizefn(DeviceState *dev, Error **errp)
  {
--    TileGXCPU *cpu;
+     CPUState *cs =3D CPU(dev);
++    XtensaCPU *cpu =3D XTENSA_CPU(dev);
+     XtensaCPUClass *xcc =3D XTENSA_CPU_GET_CLASS(dev);
+     Error *local_err =3D NULL;
+=20
++    xtensa_irq_init(&cpu->env);
++
+     cpu_exec_realizefn(cs, &local_err);
+     if (local_err !=3D NULL) {
+         error_propagate(errp, local_err);
+diff --git a/target/xtensa/helper.c b/target/xtensa/helper.c
+index bcd0b77..e8fba20 100644
+--- a/target/xtensa/helper.c
++++ b/target/xtensa/helper.c
+@@ -113,28 +113,6 @@ void xtensa_breakpoint_handler(CPUState *cs)
+     }
+ }
+=20
+-XtensaCPU *cpu_xtensa_init(const char *cpu_model)
+-{
+-    ObjectClass *oc;
+-    XtensaCPU *cpu;
+-    CPUXtensaState *env;
 -
--    cpu = TILEGX_CPU(object_new(TYPE_TILEGX_CPU));
+-    oc =3D cpu_class_by_name(TYPE_XTENSA_CPU, cpu_model);
+-    if (oc =3D=3D NULL) {
+-        return NULL;
+-    }
+-
+-    cpu =3D XTENSA_CPU(object_new(object_class_get_name(oc)));
+-    env =3D &cpu->env;
+-
+-    xtensa_irq_init(env);
 -
 -    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
 -
 -    return cpu;
-+    return object_class_by_name(TYPE_TILEGX_CPU);
- }
- 
- static void tilegx_cpu_set_pc(CPUState *cs, vaddr value)
-@@ -159,6 +153,7 @@ static void tilegx_cpu_class_init(ObjectClass *oc, void *data)
-     tcc->parent_reset = cc->reset;
-     cc->reset = tilegx_cpu_reset;
- 
-+    cc->class_by_name = tilegx_cpu_class_by_name;
-     cc->has_work = tilegx_cpu_has_work;
-     cc->do_interrupt = tilegx_cpu_do_interrupt;
-     cc->cpu_exec_interrupt = tilegx_cpu_exec_interrupt;
--- 
+-}
+-
+-
+ void xtensa_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+ {
+     XtensaConfigList *core =3D xtensa_cores;
+--=20
 2.7.4
