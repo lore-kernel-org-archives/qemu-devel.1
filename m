@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45195)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dkiAz-0002yq-V0
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 22:47:22 -0400
+	id 1dkiDd-0003tB-Hb
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 22:50:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dkiAy-0002jV-N8
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 22:47:22 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:38200)
+	id 1dkiDa-0003UZ-G6
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 22:50:05 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:37727)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dkiAy-0002jD-JA
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 22:47:20 -0400
-Received: by mail-qt0-x243.google.com with SMTP id e15so1152675qti.5
-	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 19:47:20 -0700 (PDT)
+	id 1dkiDa-0003UR-BI
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 22:50:02 -0400
+Received: by mail-qk0-x243.google.com with SMTP id b194so1224293qkc.4
+	for <qemu-devel@nongnu.org>; Wed, 23 Aug 2017 19:50:02 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
-	<1503050939-227939-5-git-send-email-imammedo@redhat.com>
+	<1503050939-227939-9-git-send-email-imammedo@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <12eda37d-c853-2c10-bc82-b4b03c98262b@amsat.org>
-Date: Wed, 23 Aug 2017 23:47:16 -0300
+Message-ID: <07e00b0b-f561-604a-4b97-0aaa06338407@amsat.org>
+Date: Wed, 23 Aug 2017 23:49:58 -0300
 MIME-Version: 1.0
-In-Reply-To: <1503050939-227939-5-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1503050939-227939-9-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-2.11 04/27] sparc: move adhoc
- CPUSPARCState initialization to realize time
+Subject: Re: [Qemu-devel] [PATCH for-2.11 08/27] sparc: replace
+ cpu_sparc_init() with cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,18 +37,10 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Fabien Chouteau <chouteau@adacore.com>
 
 On 08/18/2017 07:08 AM, Igor Mammedov wrote:
-> SPARCCPU::env was initialized from previosuly set properties
-
-"previously"
-
-> (with help of sparc_cpu_parse_features) in cpu_sparc_register().
-> However there is not reason to keep it there as this task is
-> typically done at realize time. So move post properties
-> initialization into sparc_cpu_realizefn, which brings
-> cpu_sparc_init() closer to cpu_generic_init().
+> it's just a wrapper, drop it and use cpu_generic_init() directly
 > 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
@@ -56,73 +48,91 @@ Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
+> CC: Fabien Chouteau <chouteau@adacore.com>
 > CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > CC: Artyom Tarasenko <atar4qemu@gmail.com>
 > ---
->   target/sparc/cpu.c | 30 +++++++++++++++---------------
->   1 file changed, 15 insertions(+), 15 deletions(-)
+>   target/sparc/cpu.h   | 3 +--
+>   hw/sparc/leon3.c     | 2 +-
+>   hw/sparc/sun4m.c     | 2 +-
+>   hw/sparc64/sparc64.c | 2 +-
+>   target/sparc/cpu.c   | 5 -----
+>   5 files changed, 4 insertions(+), 10 deletions(-)
 > 
-> diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-> index e735d73..7f74b1c 100644
-> --- a/target/sparc/cpu.c
-> +++ b/target/sparc/cpu.c
-> @@ -109,7 +109,6 @@ static void sparc_cpu_parse_features(CPUState *cs, char *features,
+> diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+> index 0e41916..b45cfb4 100644
+> --- a/target/sparc/cpu.h
+> +++ b/target/sparc/cpu.h
+> @@ -579,7 +579,6 @@ void cpu_raise_exception_ra(CPUSPARCState *, int, uintptr_t) QEMU_NORETURN;
 >   
->   static int cpu_sparc_register(SPARCCPU *cpu, const char *cpu_model)
->   {
-> -    CPUSPARCState *env = &cpu->env;
->       char *s = g_strdup(cpu_model);
->       char *featurestr = strtok(s, ",");
->       Error *err = NULL;
-> @@ -122,19 +121,6 @@ static int cpu_sparc_register(SPARCCPU *cpu, const char *cpu_model)
->           return -1;
->       }
+>   #ifndef NO_CPU_IO_DEFS
+>   /* cpu_init.c */
+> -SPARCCPU *cpu_sparc_init(const char *cpu_model);
+>   void cpu_sparc_set_id(CPUSPARCState *env, unsigned int cpu);
+>   void sparc_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+>   /* mmu_helper.c */
+> @@ -656,7 +655,7 @@ hwaddr cpu_get_phys_page_nofault(CPUSPARCState *env, target_ulong addr,
+>   int cpu_sparc_signal_handler(int host_signum, void *pinfo, void *puc);
 >   
-> -    env->version = env->def.iu_version;
-> -    env->fsr = env->def.fpu_version;
-> -    env->nwindows = env->def.nwindows;
-> -#if !defined(TARGET_SPARC64)
-> -    env->mmuregs[0] |= env->def.mmu_version;
-> -    cpu_sparc_set_id(env, 0);
-> -    env->mxccregs[7] |= env->def.mxcc_version;
-> -#else
-> -    env->mmu_version = env->def.mmu_version;
-> -    env->maxtl = env->def.maxtl;
-> -    env->version |= env->def.maxtl << 8;
-> -    env->version |= env->def.nwindows - 1;
-> -#endif
->       return 0;
->   }
->   
-> @@ -817,15 +803,29 @@ static void sparc_cpu_realizefn(DeviceState *dev, Error **errp)
->       CPUState *cs = CPU(dev);
->       SPARCCPUClass *scc = SPARC_CPU_GET_CLASS(dev);
->       Error *local_err = NULL;
-> -#if defined(CONFIG_USER_ONLY)
->       SPARCCPU *cpu = SPARC_CPU(dev);
->       CPUSPARCState *env = &cpu->env;
->   
-> +#if defined(CONFIG_USER_ONLY)
->       if ((env->def.features & CPU_FEATURE_FLOAT)) {
->           env->def.features |= CPU_FEATURE_FLOAT128;
->       }
+>   #ifndef NO_CPU_IO_DEFS
+> -#define cpu_init(cpu_model) CPU(cpu_sparc_init(cpu_model))
+> +#define cpu_init(cpu_model) cpu_generic_init(TYPE_SPARC_CPU, cpu_model)
 >   #endif
 >   
-> +    env->version = env->def.iu_version;
-> +    env->fsr = env->def.fpu_version;
-> +    env->nwindows = env->def.nwindows;
-> +#if !defined(TARGET_SPARC64)
-> +    env->mmuregs[0] |= env->def.mmu_version;
-> +    cpu_sparc_set_id(env, 0);
-> +    env->mxccregs[7] |= env->def.mxcc_version;
-> +#else
-> +    env->mmu_version = env->def.mmu_version;
-> +    env->maxtl = env->def.maxtl;
-> +    env->version |= env->def.maxtl << 8;
-> +    env->version |= env->def.nwindows - 1;
-> +#endif
-> +
->       cpu_exec_realizefn(cs, &local_err);
->       if (local_err != NULL) {
->           error_propagate(errp, local_err);
+>   #define cpu_signal_handler cpu_sparc_signal_handler
+> diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+> index d5ff188..56512ec 100644
+> --- a/hw/sparc/leon3.c
+> +++ b/hw/sparc/leon3.c
+> @@ -126,7 +126,7 @@ static void leon3_generic_hw_init(MachineState *machine)
+>           cpu_model = "LEON3";
+>       }
+>   
+> -    cpu = cpu_sparc_init(cpu_model);
+> +    cpu = SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+>       if (cpu == NULL) {
+>           fprintf(stderr, "qemu: Unable to find Sparc CPU definition\n");
+>           exit(1);
+> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+> index 89dd8a9..cf47dca 100644
+> --- a/hw/sparc/sun4m.c
+> +++ b/hw/sparc/sun4m.c
+> @@ -797,7 +797,7 @@ static void cpu_devinit(const char *cpu_model, unsigned int id,
+>       SPARCCPU *cpu;
+>       CPUSPARCState *env;
+>   
+> -    cpu = cpu_sparc_init(cpu_model);
+> +    cpu = SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+>       if (cpu == NULL) {
+>           fprintf(stderr, "qemu: Unable to find Sparc CPU definition\n");
+>           exit(1);
+> diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
+> index 4e4fdab..ecf38a4 100644
+> --- a/hw/sparc64/sparc64.c
+> +++ b/hw/sparc64/sparc64.c
+> @@ -353,7 +353,7 @@ SPARCCPU *sparc64_cpu_devinit(const char *cpu_model,
+>       if (cpu_model == NULL) {
+>           cpu_model = default_cpu_model;
+>       }
+> -    cpu = cpu_sparc_init(cpu_model);
+> +    cpu = SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+>       if (cpu == NULL) {
+>           fprintf(stderr, "Unable to find Sparc CPU definition\n");
+>           exit(1);
+> diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+> index fd01cbf..2917021 100644
+> --- a/target/sparc/cpu.c
+> +++ b/target/sparc/cpu.c
+> @@ -110,11 +110,6 @@ static void sparc_cpu_parse_features(const char *typename, char *features,
+>       cpu_legacy_parse_featurestr(typename, features, errp);
+>   }
+>   
+> -SPARCCPU *cpu_sparc_init(const char *cpu_model)
+> -{
+> -    return SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+> -}
+> -
+>   void cpu_sparc_set_id(CPUSPARCState *env, unsigned int cpu)
+>   {
+>   #if !defined(TARGET_SPARC64)
 > 
