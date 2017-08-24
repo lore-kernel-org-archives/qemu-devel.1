@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dkpbt-0006Rw-VJ
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:43:39 -0400
+	(envelope-from <prvs=402c228e5=roger.pau@citrix.com>)
+	id 1dkpcR-0006uW-6w
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:44:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dkpbs-0000uK-7V
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:43:38 -0400
-Received: from mail-vk0-x244.google.com ([2607:f8b0:400c:c05::244]:36643)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dkpbs-0000uE-1y
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:43:36 -0400
-Received: by mail-vk0-x244.google.com with SMTP id t4so858574vkg.3
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 03:43:35 -0700 (PDT)
+	(envelope-from <prvs=402c228e5=roger.pau@citrix.com>)
+	id 1dkpcM-00014O-G0
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:44:11 -0400
+Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:42035
+	helo=SMTP.EU.CITRIX.COM)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=402c228e5=roger.pau@citrix.com>)
+	id 1dkpcM-00013c-82
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:44:06 -0400
+Date: Thu, 24 Aug 2017 11:06:53 +0100
+From: Roger Pau Monne <roger.pau@citrix.com>
+Message-ID: <20170824100653.mqilcui6mmcqy7io@dhcp-3-128.uk.xensource.com>
+References: <20170824094753.77795-1-roger.pau@citrix.com>
+	<20170824094753.77795-3-roger.pau@citrix.com>
+	<599EBE6D020000780017310E@prv-mh.provo.novell.com>
 MIME-Version: 1.0
-References: <1503564371-26090-1-git-send-email-armbru@redhat.com>
-	<1503564371-26090-2-git-send-email-armbru@redhat.com>
-In-Reply-To: <1503564371-26090-2-git-send-email-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 24 Aug 2017 10:43:24 +0000
-Message-ID: <CAJ+F1C+tttt1rNWKw_BuNfwubE-uOVFPTrM+=MAhHZmr3e3KnQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 01/16] qapi: Update qapi-code-gen.txt
- examples to match current code
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <599EBE6D020000780017310E@prv-mh.provo.novell.com>
+Subject: Re: [Qemu-devel] [PATCH QEMU] xen/pt: allow QEMU to request MSI
+ unmasking at bind time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,177 +33,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com
+To: Jan Beulich <JBeulich@suse.com>
+Cc: Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, hfp@posteo.de
 
-On Thu, Aug 24, 2017 at 10:55 AM Markus Armbruster <armbru@redhat.com>
-wrote:
+On Thu, Aug 24, 2017 at 03:54:21AM -0600, Jan Beulich wrote:
+> >>> On 24.08.17 at 11:47, <roger.pau@citrix.com> wrote:
+> > @@ -274,7 +278,7 @@ int xen_pt_msi_update(XenPCIPassthroughState *s)
+> >  {
+> >      XenPTMSI *msi = s->msi;
+> >      return msi_msix_update(s, msi_addr64(msi), msi->data, msi->pirq,
+> > -                           false, 0, &msi->pirq);
+> > +                           false, 0, &msi->pirq, false);
+> >  }
+> 
+> I don't think this is correct when the device has mask bits.
 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->
+Right, I thought I modified this. I've already changed
+pt_irq_create_bind so that the original behavior is keep if the unmask
+bit is not set. In this case this should be 'true' in order to keep
+the previous behavior, which was correct for MSI.
 
+It also makes me wonder whether it would be better to change the name
+of the parameter to "unmask", so that false -> no change to mask, true
+-> unconditionally unmask.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-(tbh, I find it tedious and not really useful to have generated code in the
-doc though)
-
----
->  docs/devel/qapi-code-gen.txt | 47
-> +++++++++++++++++++++++++++++++++++---------
->  1 file changed, 38 insertions(+), 9 deletions(-)
->
-> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-> index 9903ac4..ae05327 100644
-> --- a/docs/devel/qapi-code-gen.txt
-> +++ b/docs/devel/qapi-code-gen.txt
-> @@ -957,6 +957,8 @@ Example:
->
->      typedef struct UserDefOneList UserDefOneList;
->
-> +    typedef struct q_obj_my_command_arg q_obj_my_command_arg;
-> +
->      struct UserDefOne {
->          int64_t integer;
->          bool has_string;
-> @@ -972,6 +974,10 @@ Example:
->
->      void qapi_free_UserDefOneList(UserDefOneList *obj);
->
-> +    struct q_obj_my_command_arg {
-> +        UserDefOneList *arg1;
-> +    };
-> +
->      #endif
->      $ cat qapi-generated/example-qapi-types.c
->  [Uninteresting stuff omitted...]
-> @@ -1036,6 +1042,8 @@ Example:
->      void visit_type_UserDefOne(Visitor *v, const char *name, UserDefOne
-> **obj, Error **errp);
->      void visit_type_UserDefOneList(Visitor *v, const char *name,
-> UserDefOneList **obj, Error **errp);
->
-> +    void visit_type_q_obj_my_command_arg_members(Visitor *v,
-> q_obj_my_command_arg *obj, Error **errp);
-> +
->      #endif
->      $ cat qapi-generated/example-qapi-visit.c
->  [Uninteresting stuff omitted...]
-> @@ -1104,6 +1112,9 @@ Example:
->              }
->          }
->
-> +        if (!err) {
-> +            visit_check_list(v, &err);
-> +        }
->          visit_end_list(v, (void **)obj);
->          if (err && visit_is_input(v)) {
->              qapi_free_UserDefOneList(*obj);
-> @@ -1113,6 +1124,19 @@ Example:
->          error_propagate(errp, err);
->      }
->
-> +    void visit_type_q_obj_my_command_arg_members(Visitor *v,
-> q_obj_my_command_arg *obj, Error **errp)
-> +    {
-> +        Error *err =3D NULL;
-> +
-> +        visit_type_UserDefOneList(v, "arg1", &obj->arg1, &err);
-> +        if (err) {
-> +            goto out;
-> +        }
-> +
-> +    out:
-> +        error_propagate(errp, err);
-> +    }
-> +
->  =3D=3D=3D scripts/qapi-commands.py =3D=3D=3D
->
->  Used to generate the marshaling/dispatch functions for the commands
-> @@ -1145,9 +1169,12 @@ Example:
->
->      #include "example-qapi-types.h"
->      #include "qapi/qmp/qdict.h"
-> +    #include "qapi/qmp/dispatch.h"
->      #include "qapi/error.h"
->
-> +    void example_qmp_init_marshal(QmpCommandList *cmds);
->      UserDefOne *qmp_my_command(UserDefOneList *arg1, Error **errp);
-> +    void qmp_marshal_my_command(QDict *args, QObject **ret, Error **errp=
-);
->
->      #endif
->      $ cat qapi-generated/example-qmp-marshal.c
-> @@ -1170,19 +1197,19 @@ Example:
->          visit_free(v);
->      }
->
-> -    static void qmp_marshal_my_command(QDict *args, QObject **ret, Error
-> **errp)
-> +    void qmp_marshal_my_command(QDict *args, QObject **ret, Error **errp=
-)
->      {
->          Error *err =3D NULL;
->          UserDefOne *retval;
->          Visitor *v;
-> -        UserDefOneList *arg1 =3D NULL;
-> +        q_obj_my_command_arg arg =3D {0};
->
->          v =3D qobject_input_visitor_new(QOBJECT(args));
->          visit_start_struct(v, NULL, NULL, 0, &err);
->          if (err) {
->              goto out;
->          }
-> -        visit_type_UserDefOneList(v, "arg1", &arg1, &err);
-> +        visit_type_q_obj_my_command_arg_members(v, &arg, &err);
->          if (!err) {
->              visit_check_struct(v, &err);
->          }
-> @@ -1191,7 +1218,7 @@ Example:
->              goto out;
->          }
->
-> -        retval =3D qmp_my_command(arg1, &err);
-> +        retval =3D qmp_my_command(arg.arg1, &err);
->          if (err) {
->              goto out;
->          }
-> @@ -1203,17 +1230,18 @@ Example:
->          visit_free(v);
->          v =3D qapi_dealloc_visitor_new();
->          visit_start_struct(v, NULL, NULL, 0, NULL);
-> -        visit_type_UserDefOneList(v, "arg1", &arg1, NULL);
-> +        visit_type_q_obj_my_command_arg_members(v, &arg, NULL);
->          visit_end_struct(v, NULL);
->          visit_free(v);
->      }
->
-> -    static void qmp_init_marshal(void)
-> +    void example_qmp_init_marshal(QmpCommandList *cmds)
->      {
-> -        qmp_register_command("my-command", qmp_marshal_my_command,
-> QCO_NO_OPTIONS);
-> -    }
-> +        QTAILQ_INIT(cmds);
->
-> -    qapi_init(qmp_init_marshal);
-> +        qmp_register_command(cmds, "my-command",
-> +                             qmp_marshal_my_command, QCO_NO_OPTIONS);
-> +    }
->
->  =3D=3D=3D scripts/qapi-event.py =3D=3D=3D
->
-> @@ -1258,6 +1286,7 @@ Example:
->          QDict *qmp;
->          Error *err =3D NULL;
->          QMPEventFuncEmit emit;
-> +
->          emit =3D qmp_event_get_func_emit();
->          if (!emit) {
->              return;
-> --
-> 2.7.5
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+Thanks, Roger.
