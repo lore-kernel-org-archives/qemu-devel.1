@@ -1,22 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1dkyju-0007TQ-6n
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 16:28:31 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dkykA-0007c6-SS
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 16:28:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1dkyjp-00024S-0b
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 16:28:30 -0400
-Date: Thu, 24 Aug 2017 22:28:15 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20170824023552.GY5379@umbus.fritz.box>
-Message-ID: <alpine.BSF.2.21.1708242222520.96438@zero.eik.bme.hu>
-References: <cover.1503249785.git.balaton@eik.bme.hu>
-	<ac6a19d43a6d36ae6f7cab99a1ac25d2515339ad.1503249785.git.balaton@eik.bme.hu>
-	<20170823023945.GM5379@umbus.fritz.box>
-	<alpine.BSF.2.21.1708231108430.76247@zero.eik.bme.hu>
-	<20170824023552.GY5379@umbus.fritz.box>
+	(envelope-from <richard.henderson@linaro.org>) id 1dkyk6-0002An-4f
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 16:28:46 -0400
+Received: from mail-pg0-x230.google.com ([2607:f8b0:400e:c05::230]:33742)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dkyk5-0002AG-TK
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 16:28:42 -0400
+Received: by mail-pg0-x230.google.com with SMTP id t3so3139800pgt.0
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 13:28:40 -0700 (PDT)
+References: <1501867249-1924-1-git-send-email-peter.maydell@linaro.org>
+	<1501867249-1924-5-git-send-email-peter.maydell@linaro.org>
+	<50d6ba4d-cfa3-5b5f-5da1-dca2326d4f5d@amsat.org>
+	<c38728a0-da49-635e-2954-1030b223e3c9@linaro.org>
+	<CAFEAcA_nPya92Vatwt7RiZnhKTH4_GKypSrX_KgPj3GitxV0Tg@mail.gmail.com>
+	<CAFEAcA97eXYPABgaE8Y_+EkWscR7CCH2WUHoM7ttZ6gVWQrqxw@mail.gmail.com>
+	<aa6caac1-e06c-9e1c-2aba-18d672fafb55@amsat.org>
+	<CAFEAcA9Ci+0cjFORmzL7-73Jj4pm4jST3iEbXmHjXuPyiyt03g@mail.gmail.com>
+	<CAFEAcA_rSqsrfd_qJijtPFRe1qKEA=JiyHE+3J5atAgxAX8NBg@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <c31cb6e9-8b50-3b4a-ab1a-27632d516c9f@linaro.org>
+Date: Thu, 24 Aug 2017 13:28:33 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH 13/15] ppc4xx: Add more PLB registers
+In-Reply-To: <CAFEAcA_rSqsrfd_qJijtPFRe1qKEA=JiyHE+3J5atAgxAX8NBg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 4/8] boards.h: Define new flag
+ ignore_memory_transaction_failures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,89 +39,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On Thu, 24 Aug 2017, David Gibson wrote:
-> On Wed, Aug 23, 2017 at 12:16:24PM +0200, BALATON Zoltan wrote:
->> On Wed, 23 Aug 2017, David Gibson wrote:
->>> On Sun, Aug 20, 2017 at 07:23:05PM +0200, BALATON Zoltan wrote:
->>>> These registers are present in 440 SoCs (and maybe in others too) and
->>>> U-Boot accesses them when printing register info. We don't emulate
->>>> these but add them to avoid crashing when they are read or written.
->>>>
->>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->>>
->>> I'm ok with stub implementation, but I'm a bit uncomfortable with
->>> registering these DCRs unconditionally rather than just on the chips
->>> that actually implement them.
->>
->> Problem is that I don't know which chips have these. I can only try to find
->> out from the U-Boot sources where a comment says these are common registers
->> for all SoCs (in u-boot/arch/powerpc/include/asm/ppc4xx.h:
->>
->> http://git.denx.de/?p=u-boot.git;a=blob;f=arch/powerpc/include/asm/ppc4xx.h;h=45ff5dbacd9243e83bb2f6551e2dd64a7e544bf5;hb=e2351d5cf1e97408b4c52bafeaa85e0ca85c920c
->>
->> while looking for this I've just noticed that u-boot has removed ppc440
->> support just before 2017.07-rc3 so this is the last version that still has
->> these files). So if that's true it should be OK for 405 too.
+On 22 August 2017 at 09:36, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 22 August 2017 at 04:45, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> If we are worried about being backward compatible, defaulting background
+>> region to unimp() won't throw any transaction error.
 >
-> Ok, just to make sure I'm understanding correctly are you saying:
+> As I said, it will, for the cases of device model directly
+> returning a MEMTX_ERROR, or a transaction dispatched to
+> a memory region whose MemoryRegionOps valid settings
+> prohibit it (eg byte accesses to a word-access-only device), etc.
+> The only simple way to guarantee that we don't generate exceptions
+> on transaction errors is to cause the hook not to be called
+> (or to have the hook decide to do nothing, I suppose).
 >
-> 1) You suspect these registers were actually on all versions of the
->   device, they just weren't implemented until now.
+>> I'm somehow afraid that "ignore_memory_transaction_failures" ends up like
+>> the "cannot_instantiate_with_device_add_yet" flag - a hard to remove kludge
+>> outliving his purpose.
+>
+> I agree that it's going to be around for a long time, possibly
+> forever, but that's life when we have so many old boards.
+> Any approach we take is almost certainly going to be hanging
+> around forever.
+>
+>> Anyway I'm not unhappy with this approach, but I'd be very happy to have
+>> unimp() covering the whole background region.
+>
+> I think this would be a reasonable approach for converting
+> boards away from this ignore_memory_transaction_failures hook
+> on a board-by-board basis but you'd still want to test some
+> common guest software for each conversion.
 
-That's what I suspect from the comment in the file quoted above but I 
-don't have any other evidence.
+Peter and I had a chat on IRC about this.
 
-> or
->
-> 2) The registers are definitely on only some versions of the device,
->   but you're not sure which ones
+While I think the background region idea is tempting, it does nothing to help
+legacy boards once devices start signaling their own errors.  Therefore some
+sort of flag is the only reasonable solution.
 
-I don't know any of these devices very well and have no definitive sources 
-to confirm so I'm not sure but I think these should be on all the versions 
-(at least on all three that QEMU emulates, namely 405, 440 and 460ex).
 
->>>> ---
->>>>  hw/ppc/ppc405_uc.c | 12 +++++++++---
->>>>  1 file changed, 9 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
->>>> index e621d0a..8e58065 100644
->>>> --- a/hw/ppc/ppc405_uc.c
->>>> +++ b/hw/ppc/ppc405_uc.c
->>>> @@ -105,9 +105,12 @@ ram_addr_t ppc405_set_bootinfo (CPUPPCState *env, ppc4xx_bd_info_t *bd,
->>>>  /*****************************************************************************/
->>>>  /* Peripheral local bus arbitrer */
->>>>  enum {
->>>> -    PLB0_BESR = 0x084,
->>>> -    PLB0_BEAR = 0x086,
->>>> -    PLB0_ACR  = 0x087,
->>>> +    PLB3A0_ACR = 0x077,
->>>> +    PLB4A0_ACR = 0x081,
->>>> +    PLB0_BESR  = 0x084,
->>>> +    PLB0_BEAR  = 0x086,
->>>> +    PLB0_ACR   = 0x087,
->>>> +    PLB4A1_ACR = 0x089,
->>>>  };
->>>>
->>>>  typedef struct ppc4xx_plb_t ppc4xx_plb_t;
->>>> @@ -179,9 +182,12 @@ void ppc4xx_plb_init(CPUPPCState *env)
->>>>      ppc4xx_plb_t *plb;
->>>>
->>>>      plb = g_malloc0(sizeof(ppc4xx_plb_t));
->>>> +    ppc_dcr_register(env, PLB3A0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
->>>> +    ppc_dcr_register(env, PLB4A0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
->>>>      ppc_dcr_register(env, PLB0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
->>>>      ppc_dcr_register(env, PLB0_BEAR, plb, &dcr_read_plb, &dcr_write_plb);
->>>>      ppc_dcr_register(env, PLB0_BESR, plb, &dcr_read_plb, &dcr_write_plb);
->>>> +    ppc_dcr_register(env, PLB4A1_ACR, plb, &dcr_read_plb, &dcr_write_plb);
->>>>      qemu_register_reset(ppc4xx_plb_reset, plb);
->>>>  }
->>>>
->>>
->>>
->>
->
->
+r~
