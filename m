@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dkutP-0005Rq-1B
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:22:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1dkuyj-0007BO-4E
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:27:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dkutO-0002rU-2O
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:22:03 -0400
-References: <20170824153345.2244-1-stefanha@redhat.com>
-	<20170824153345.2244-2-stefanha@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a839e5fa-0495-902c-5a20-6592ab07bb9e@redhat.com>
-Date: Thu, 24 Aug 2017 18:21:50 +0200
+	(envelope-from <eblake@redhat.com>) id 1dkuyg-0005Jq-0Z
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:27:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35190)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dkuyf-0005JC-Ml
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:27:29 -0400
+References: <20170823072656.3352-1-zyimin@linux.vnet.ibm.com>
+	<871ef0e3-ea8b-df59-0eeb-8019b350f1d2@linux.vnet.ibm.com>
+	<20170824091332.01ff3698.cohuck@redhat.com>
+	<26519e3e-3ef4-7b18-6d80-27941ee36df9@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <20d23300-2f98-7b38-afab-4c8971afb356@redhat.com>
+Date: Thu, 24 Aug 2017 11:27:26 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170824153345.2244-2-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] nbd-client: enter read_reply_co during
- init to avoid crash
+In-Reply-To: <26519e3e-3ef4-7b18-6d80-27941ee36df9@linux.vnet.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="whAPRqN4R05I3t2SrK7Pru2a3wJrRKS1n"
+Subject: Re: [Qemu-devel] [PATCH 0/4] four zpci patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +30,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+To: Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, richard.henderson@linaro.org, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com
 
-On 24/08/2017 17:33, Stefan Hajnoczi wrote:
-> This patch enters read_reply_co directly in
-> nbd_client_attach_aio_context().  This is safe because new_context is
-> acquired by the caller.  This ensures that read_reply_co reaches its
-> first yield point and its ctx is set up.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--whAPRqN4R05I3t2SrK7Pru2a3wJrRKS1n
+From: Eric Blake <eblake@redhat.com>
+To: Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org, agraf@suse.de,
+ borntraeger@de.ibm.com
+Message-ID: <20d23300-2f98-7b38-afab-4c8971afb356@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/4] four zpci patches
+References: <20170823072656.3352-1-zyimin@linux.vnet.ibm.com>
+ <871ef0e3-ea8b-df59-0eeb-8019b350f1d2@linux.vnet.ibm.com>
+ <20170824091332.01ff3698.cohuck@redhat.com>
+ <26519e3e-3ef4-7b18-6d80-27941ee36df9@linux.vnet.ibm.com>
+In-Reply-To: <26519e3e-3ef4-7b18-6d80-27941ee36df9@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I'm not very confident with this patch.  aio_context_acquire/release is
-going to go away, and this then becomes possible
-
-	main context			new_context
-	qemu_aio_coroutine_enter
-					send request
-					wait for reply
-	read first reply
-	wake coroutine
-
-where the "wake coroutine" part thinks it's running in new_context, and
-thus simply enters the coroutine instead of using the bottom half.
-
-But blk_co_preadv() should need the read_reply_co itself, in order to be
-woken up after reading the reply header.  The core issue here is that
-nbd_co_receive_reply was never called, I suspect.  And if it was never
-called, read_reply_co should not be woken up by nbd_coroutine_end.
-
-So the fix is:
-
-1) assign NULL to s->recv_coroutine[i] when nbd_co_send_request fails
-
-2) move this to nbd_co_receive_reply:
-
-    s->recv_coroutine[i] =3D NULL;
-
-    /* Kick the read_reply_co to get the next reply.  */
-    if (s->read_reply_co) {
-        aio_co_wake(s->read_reply_co);
-    }
-
-Does this make sense?  (Note that the read_reply_co idea actually came
-from you, or from my recollections of your proposed design :)).
-
-Paolo
-
-> Note this only happens with UNIX domain sockets on Linux.  It doesn't
-> seem possible to reproduce this with TCP sockets.
+On 08/24/2017 03:48 AM, Yi Min Zhao wrote:
 >=20
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  block/nbd-client.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> diff --git a/block/nbd-client.c b/block/nbd-client.c
-> index 25bcaa2346..0a7f32779e 100644
-> --- a/block/nbd-client.c
-> +++ b/block/nbd-client.c
-> @@ -371,7 +371,7 @@ void nbd_client_attach_aio_context(BlockDriverState=
- *bs,
->  {
->      NBDClientSession *client =3D nbd_get_client_session(bs);
->      qio_channel_attach_aio_context(QIO_CHANNEL(client->ioc), new_conte=
-xt);
-> -    aio_co_schedule(new_context, client->read_reply_co);
-> +    qemu_aio_coroutine_enter(new_context, client->read_reply_co);
->  }
+> =E5=9C=A8 2017/8/24 =E4=B8=8B=E5=8D=883:13, Cornelia Huck =E5=86=99=E9=81=
+=93:
+>> On Thu, 24 Aug 2017 13:20:12 +0800
+>> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+>>
+>>> Why can't I receive [Qemu-devel] prefixed patches?
+
+>>
+> I sent patches to qemu-devel@nongnu.org and cc you also myself.
+> But what I received looks like CC ones, no [Qemu-devel] prefix.
+
+You can tell mailman whether you want to receive copies of mails through
+the list even when you are listed in cc (defaults to on, but some people
+like myself set it off to reduce mail); if you switch that option in
+your subscription settings, then you will not see the [Qemu-devel]
+prefix on any mail where you were cc'd.  [side note: turning off copies
+of mail where you are cc'd triggers what I consider to be a mailman bug:
+it actively rewrites the to/cc of the email to omit your address in the
+copy it sends to the list, which means people who follow up to the list
+no longer cc you, and do not know that you were cc'd in the first place]
+
+Furthermore, there may be other places along the way that do data
+de-duplication.  For example, anyone subscribing via a gmail.com address
+gets at most one copy of a message based on the message-id; if they are
+subscribed to the mailing list and also get a cc of a given message,
+only one of those copies will show up (because google suppressed the
+second copy with the same message-id, even though the subject lines are
+different); the one copy is often (but not always) the one without the
+[Qemu-devel] prefix because cc'd mail goes through less processing and
+thus tends to arrive sooner than the copy sent through mailman.  [side
+note: google calls de-duplication a feature, but you can't turn it off,
+and it's one of the reasons that I don't use google for my personal email=
+]
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--whAPRqN4R05I3t2SrK7Pru2a3wJrRKS1n
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlme/m4ACgkQp6FrSiUn
+Q2rABAf/ei1xZQEaGFh75S78iGNS8pucHfsCna7zr7U9LdwpUun4xcA9IWvO2BBx
+PG13t5EWtIOCIksdD/t6nlq+sLKFgPz/1mF+uPhnDCs18/ucEQlj6qVhMZQmmV40
+/MHlU+fxvacf3SX+iQQY3+OpH1cJU4h04xdETXi05L/u2UhB9FQ4b0Eg1kacMJ39
+VD8koXPrBMrzyDtPNxFgavQ1c3A6RfdD8Kgu0UxlDcTjzKqO1gwHCQQzZOe2eApQ
+WsKdjZYpGIxc+tpGO9lmje1JLDiA64PH4iOXZHcZfVgJhyxt+zlGfMVf9zGmfm+u
+fTd/PyktL9DAPPcuLklxsVbRHY3JxQ==
+=FPIo
+-----END PGP SIGNATURE-----
+
+--whAPRqN4R05I3t2SrK7Pru2a3wJrRKS1n--
