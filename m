@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dktpe-0007RJ-Nj
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:14:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1dktyd-0001oN-Qc
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:23:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dktpb-0007Tg-IJ
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:14:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51732)
+	(envelope-from <eblake@redhat.com>) id 1dktyZ-0003mF-6m
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:23:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52764)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dktpb-0007TO-8E
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:14:03 -0400
-Date: Thu, 24 Aug 2017 17:13:55 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170824171355.29d1ec32.cohuck@redhat.com>
-In-Reply-To: <e2a1b182-83a9-2259-27f9-68b61b5061d5@linux.vnet.ibm.com>
-References: <e2a1b182-83a9-2259-27f9-68b61b5061d5@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dktyY-0003lG-Sy
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:23:19 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AF7D67EA93
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 15:23:15 +0000 (UTC)
+References: <1503384739-17207-1-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <da7c1a48-9c9e-c416-8b25-2f9a53a417b4@redhat.com>
+Date: Thu, 24 Aug 2017 10:23:07 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] S390 bios breaks in qemu 2.10.rc3
+In-Reply-To: <1503384739-17207-1-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="eHDA7S2KAQrTVEUdoOPgkwEsFPLKThEFT"
+Subject: Re: [Qemu-devel] [PATCH] qobject: Explain how QNum works, and why
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,81 +33,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mreitz@redhat.com
 
-On Thu, 24 Aug 2017 11:05:08 -0400
-Farhan Ali <alifm@linux.vnet.ibm.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--eHDA7S2KAQrTVEUdoOPgkwEsFPLKThEFT
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mreitz@redhat.com
+Message-ID: <da7c1a48-9c9e-c416-8b25-2f9a53a417b4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qobject: Explain how QNum works, and why
+References: <1503384739-17207-1-git-send-email-armbru@redhat.com>
+In-Reply-To: <1503384739-17207-1-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Hi,
-> 
-> There is an issue in QEMU bios which is exposed by commit
-> 
-> commit 198c0d1f9df8c429502cb744fc26b6ba6e71db74
-> Author: Halil Pasic <pasic@linux.vnet.ibm.com>
-> Date:   Thu Jul 27 17:48:42 2017 +0200
-> 
->      s390x/css: check ccw address validity
-> 
->      According to the PoP channel command words (CCW) must be doubleword
->      aligned and 31 bit addressable for format 1 and 24 bit addressable for
->      format 0 CCWs.
-> 
->      If the channel subsystem encounters a ccw address which does not 
-> satisfy
->      this alignment requirement a program-check condition is recognised.
-> 
->      The situation with 31 bit addressable is a bit more complicated: 
-> both the
->      ORB and a format 1 CCW TIC hold the address of (the rest of) the 
-> channel
->      program, that is the address of the next CCW in a word, and the PoP
->      mandates that bit 0 of that word shall be zero -- or a program-check
->      condition is to be recognized -- and does not belong to the field 
-> holding
->      the ccw address.
-> 
->      Since in code the corresponding fields span across the whole word 
-> (unlike
->      in PoP where these are defined as 31 bit wide) we can check this by
->      applying a mask. The 24 addressable case isn't affecting TIC 
-> because the
->      address is composed of a halfword and a byte portion (no additional 
-> zero
->      bit requirements) and just slightly complicates the ORB case where also
->      bits 1-7 need to be zero.
-> 
->      The same requirements (especially n-bit addressability) apply to the
->      ccw addresses generated while chaining.
-> 
->      Let's make our CSS implementation follow the AR more closely.
-> 
->      Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->      Message-Id: <20170727154842.23427-1-pasic@linux.vnet.ibm.com>
->      Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
->      Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> 
-> 
-> It looks like the bios does not create a double word aligned CCW. 
-> Looking at the bios code we the CCW1 struct is not aligned
-> 
-> /* channel command word (type 1) */
-> struct ccw1 {
->      __u8 cmd_code;
->      __u8 flags;
->      __u16 count;
->      __u32 cda;
-> } __attribute__ ((packed));
-> 
-> and it looks like the compiler does not guarantee a doubleword alignment.
+On 08/22/2017 01:52 AM, Markus Armbruster wrote:
+> Suggested-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  include/qapi/qmp/qnum.h | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+>=20
+> diff --git a/include/qapi/qmp/qnum.h b/include/qapi/qmp/qnum.h
+> index 09d745c..9182129 100644
+> --- a/include/qapi/qmp/qnum.h
+> +++ b/include/qapi/qmp/qnum.h
+> @@ -23,6 +23,27 @@ typedef enum {
+>      QNUM_DOUBLE
+>  } QNumKind;
+> =20
+> +/*
+> + * QNum encapsulates how our dialect of JSON fills in the blanks left
+> + * by the JSON specification (RFC 7159) regarding numbers.
+> + *
+> + * Conceptually, we treat number as an abstract type with three
+> + * concrete subtypes: floating-point, signed integer, unsigned
+> + * integer.  QNum implements this a discriminated union of double,
 
-:(
+s/this/this as/
 
-> 
-> The weird thing about it is I see it break in one of my system and works 
-> fine in another system. Trying a simple fix of aligning the struct also 
-> doesn't seem to work all the time.
+> + * int64_t, uint64_t.
+> + *
+> + * The JSON parser picks the subtype as follows.  If the number has a
+> + * decimal point or an exponent, it is floating-point.  Else if it
+> + * fits into int64_t, it's signed integer.  Else if it first into
 
-I have not seen this problem on any of the systems I tested on (well, I
-would not have merged this if I did...) - RHEL 7 and F26. Do we need a
-dynamic allocation to guarantee alignment?
+s/first/fits/
+
+> + * uint64_t, it's unsigned integer.  Else it's floating-point.
+> + *
+> + * Any number can serve as double: qnum_get_double() converts under
+> + * the hood.
+> + *
+> + * An integer can serve as signed / unsigned integer as long as it is
+> + * in range: qnum_get_try_int() / qnum_get_try_uint() check range and
+> + * convert under the hood.
+> + */
+>  typedef struct QNum {
+>      QObject base;
+>      QNumKind kind;
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--eHDA7S2KAQrTVEUdoOPgkwEsFPLKThEFT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlme71wACgkQp6FrSiUn
+Q2rZ8wf/f2LKDKDxIQDY4ND/j24xXQzRNSfuxeWfq20Kb5Nxis2e0FjkVttbNHq/
+cMrJFRVxWy+QquhGZGI2oU9p8bxzWQTb32fQ8sxV6Wu/3ijUcDrpH9Ds8JGljDSJ
+a6a72xdoZKr3OjctDqI/eA6V1Ol0/BgL6sdif4vjbUBKGisLm1iiWdiDiMOo/XT+
+RBoyMJYTBruEgXUj8T/5roz/PblIQlqYp9lXxcrqEUenjgMZudZ41p+pWe2itiHM
+6GQdNx7t1YYew4QjgQieu0T8xMGwmkW3dpMmHcB9qR8SpShMh3rW+0OfhEff47Tl
+kDZo3pZBH4hGKc+SxMTGu+QyLUcx4A==
+=Edvc
+-----END PGP SIGNATURE-----
+
+--eHDA7S2KAQrTVEUdoOPgkwEsFPLKThEFT--
