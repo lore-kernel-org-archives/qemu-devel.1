@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dkv3F-0000pG-6U
+	(envelope-from <imammedo@redhat.com>) id 1dkv3F-0000q5-FY
 	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:32:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dkv3D-0007aJ-Bn
+	(envelope-from <imammedo@redhat.com>) id 1dkv3E-0007ap-7Y
 	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:32:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54094)
+Received: from mx1.redhat.com ([209.132.183.28]:47984)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dkv3D-0007Zj-5q
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:32:11 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dkv3D-0007aG-VO
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:32:12 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 344B47F6AC
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 16:32:10 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 029286ACE
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 16:32:11 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
 	(dell-r430-03.lab.eng.brq.redhat.com [10.34.112.60])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id AEA251F8
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 16:32:09 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7C5B25D736
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 16:32:10 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu, 24 Aug 2017 18:31:43 +0200
-Message-Id: <1503592308-93913-21-git-send-email-imammedo@redhat.com>
+Date: Thu, 24 Aug 2017 18:31:44 +0200
+Message-Id: <1503592308-93913-22-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1503592308-93913-1-git-send-email-imammedo@redhat.com>
 References: <1503592308-93913-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11 v3 20/25] x86: replace cpu_x86_init()
- with cpu_generic_init()
+Subject: [Qemu-devel] [PATCH for-2.11 v3 21/25] lm32: replace
+ cpu_lm32_init() with cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,48 +39,86 @@ To: qemu-devel@nongnu.org
 it's just a wrapper, drop it and use cpu_generic_init() directly
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: Michael Walle <michael@walle.cc>
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu.h | 3 +--
- target/i386/cpu.c | 5 -----
- 2 files changed, 1 insertion(+), 7 deletions(-)
+ target/lm32/cpu.h     | 3 +--
+ hw/lm32/lm32_boards.c | 4 ++--
+ hw/lm32/milkymist.c   | 2 +-
+ target/lm32/helper.c  | 5 -----
+ 4 files changed, 4 insertions(+), 10 deletions(-)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 0518673..525d35d 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1327,7 +1327,6 @@ int x86_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
- void x86_cpu_exec_enter(CPUState *cpu);
- void x86_cpu_exec_exit(CPUState *cpu);
- 
--X86CPU *cpu_x86_init(const char *cpu_model);
- void x86_cpu_list(FILE *f, fprintf_function cpu_fprintf);
- int cpu_x86_support_mca_broadcast(CPUX86State *env);
- 
-@@ -1507,7 +1506,7 @@ uint64_t cpu_get_tsc(CPUX86State *env);
- 
- #define PHYS_ADDR_MASK MAKE_64BIT_MASK(0, TCG_PHYS_ADDR_BITS)
- 
--#define cpu_init(cpu_model) CPU(cpu_x86_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_X86_CPU, cpu_model)
- 
- #define cpu_signal_handler cpu_x86_signal_handler
- #define cpu_list x86_cpu_list
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index ddc45ab..abeaaca 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2642,11 +2642,6 @@ static gchar *x86_gdb_arch_name(CPUState *cs)
- #endif
+diff --git a/target/lm32/cpu.h b/target/lm32/cpu.h
+index 1d972cb..de265b5 100644
+--- a/target/lm32/cpu.h
++++ b/target/lm32/cpu.h
+@@ -238,7 +238,6 @@ static inline lm32_wp_t lm32_wp_type(uint32_t dc, int idx)
+     return (dc >> (idx+1)*2) & 0x3;
  }
  
--X86CPU *cpu_x86_init(const char *cpu_model)
+-LM32CPU *cpu_lm32_init(const char *cpu_model);
+ /* you can call this signal handler from your SIGBUS and SIGSEGV
+    signal handlers to inform the virtual CPU of exceptions. non zero
+    is returned if the signal was handled by the virtual CPU.  */
+@@ -256,7 +255,7 @@ void lm32_watchpoint_insert(CPULM32State *env, int index, target_ulong address,
+ void lm32_watchpoint_remove(CPULM32State *env, int index);
+ bool lm32_cpu_do_semihosting(CPUState *cs);
+ 
+-#define cpu_init(cpu_model) CPU(cpu_lm32_init(cpu_model))
++#define cpu_init(cpu_model) cpu_generic_init(TYPE_LM32_CPU, cpu_model)
+ 
+ #define cpu_list lm32_cpu_list
+ #define cpu_signal_handler cpu_lm32_signal_handler
+diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
+index 8f0c307..eccf0ac 100644
+--- a/hw/lm32/lm32_boards.c
++++ b/hw/lm32/lm32_boards.c
+@@ -104,7 +104,7 @@ static void lm32_evr_init(MachineState *machine)
+     if (cpu_model == NULL) {
+         cpu_model = "lm32-full";
+     }
+-    cpu = cpu_lm32_init(cpu_model);
++    cpu = LM32_CPU(cpu_generic_init(TYPE_LM32_CPU, cpu_model));
+     if (cpu == NULL) {
+         fprintf(stderr, "qemu: unable to find CPU '%s'\n", cpu_model);
+         exit(1);
+@@ -205,7 +205,7 @@ static void lm32_uclinux_init(MachineState *machine)
+     if (cpu_model == NULL) {
+         cpu_model = "lm32-full";
+     }
+-    cpu = cpu_lm32_init(cpu_model);
++    cpu = LM32_CPU(cpu_generic_init(TYPE_LM32_CPU, cpu_model));
+     if (cpu == NULL) {
+         fprintf(stderr, "qemu: unable to find CPU '%s'\n", cpu_model);
+         exit(1);
+diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
+index 5cae0f1..dffd879 100644
+--- a/hw/lm32/milkymist.c
++++ b/hw/lm32/milkymist.c
+@@ -111,7 +111,7 @@ milkymist_init(MachineState *machine)
+     if (cpu_model == NULL) {
+         cpu_model = "lm32-full";
+     }
+-    cpu = cpu_lm32_init(cpu_model);
++    cpu = LM32_CPU(cpu_generic_init(TYPE_LM32_CPU, cpu_model));
+     if (cpu == NULL) {
+         fprintf(stderr, "qemu: unable to find CPU '%s'\n", cpu_model);
+         exit(1);
+diff --git a/target/lm32/helper.c b/target/lm32/helper.c
+index 891da18..929cc36 100644
+--- a/target/lm32/helper.c
++++ b/target/lm32/helper.c
+@@ -219,11 +219,6 @@ bool lm32_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+     return false;
+ }
+ 
+-LM32CPU *cpu_lm32_init(const char *cpu_model)
 -{
--    return X86_CPU(cpu_generic_init(TYPE_X86_CPU, cpu_model));
+-    return LM32_CPU(cpu_generic_init(TYPE_LM32_CPU, cpu_model));
 -}
 -
- static void x86_cpu_cpudef_class_init(ObjectClass *oc, void *data)
- {
-     X86CPUDefinition *cpudef = data;
+ /* Some soc ignores the MSB on the address bus. Thus creating a shadow memory
+  * area. As a general rule, 0x00000000-0x7fffffff is cached, whereas
+  * 0x80000000-0xffffffff is not cached and used to access IO devices. */
 -- 
 2.7.4
