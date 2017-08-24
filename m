@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dko9p-00028p-E6
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:10:35 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dkoI1-0004HK-0m
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:19:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dko9m-0006Qo-30
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:10:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56522)
+	(envelope-from <imammedo@redhat.com>) id 1dkoHx-0002l4-4j
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:19:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57220)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dko9l-0006QS-Oj
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:10:30 -0400
-Date: Thu, 24 Aug 2017 10:10:24 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170824091023.GA2737@work-vm>
-References: <599E21EE.8070104@windriver.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dkoHw-0002ku-Qp
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:18:57 -0400
+Date: Thu, 24 Aug 2017 11:18:52 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170824111852.37066dce@nial.brq.redhat.com>
+In-Reply-To: <20170823175839.GT19998@localhost.localdomain>
+References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
+	<1503050939-227939-7-git-send-email-imammedo@redhat.com>
+	<20170823143414.GI27715@localhost.localdomain>
+	<20170823182902.7c2803c7@nial.brq.redhat.com>
+	<20170823164638.GN19998@localhost.localdomain>
+	<20170823193739.32d9bd07@Igors-MacBook-Pro.local>
+	<20170823175839.GT19998@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <599E21EE.8070104@windriver.com>
-Subject: Re: [Qemu-devel] anyone seen or heard of large delays/stalls
- running qemu with kvm support?
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.11 06/27] x86: extract legacy cpu
+ features format parser
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,258 +33,355 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chris Friesen <chris.friesen@windriver.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-* Chris Friesen (chris.friesen@windriver.com) wrote:
-> 
-> Hi all,
-> 
-> I need to apologize up front, this is going to be a long email.  Basically
-> the executive summary is that we're seeing issues where a VM is apparently
-> not making forward progress in the guest, while at the same time spinning in
-> a busy loop on the host.  I'm looking for any pointers/suggestions on what
-> might be going on or how to narrow it down.
-> 
-> We're using qemu-kvm-ev-2.6.0 in the context of an OpenStack compute node
-> running CentOS 7.
-> 
-> While running a test involving a cold migration of a VM from one host to
-> another (basically shutting down the guest, moving all the files over to
-> another host, then starting the guest back up) we have on a couple of cases
-> had a VM get into a state where it was displaying "Guest has not initialized
-> the display (yet)." on the console.  Running strace or gdb on the host
-> against the guest qemu process seems to allow it to make forward progress.
+On Wed, 23 Aug 2017 14:58:39 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-cc'ing in Paolo.
+> On Wed, Aug 23, 2017 at 07:37:39PM +0200, Igor Mammedov wrote:
+> > On Wed, 23 Aug 2017 13:46:38 -0300
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >  =20
+> > > On Wed, Aug 23, 2017 at 06:29:02PM +0200, Igor Mammedov wrote: =20
+> > > > On Wed, 23 Aug 2017 11:34:14 -0300
+> > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > > >  =20
+> > > > > On Fri, Aug 18, 2017 at 12:08:38PM +0200, Igor Mammedov wrote: =20
+> > > > > > Move cpu_model +-feat parsing into a separate file so that it
+> > > > > > could be reused later for parsing similar format of sparc target
+> > > > > >=20
+> > > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > > > > ---
+> > > > > > CC: Richard Henderson <rth@twiddle.net>
+> > > > > > CC: Eduardo Habkost <ehabkost@redhat.com>
+> > > > > > CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> > > > > > CC: Artyom Tarasenko <atar4qemu@gmail.com>
+> > > > > > CC: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > > > > > ---
+> > > > > >  include/qom/cpu.h                     |   2 +
+> > > > > >  default-configs/i386-bsd-user.mak     |   1 +
+> > > > > >  default-configs/i386-linux-user.mak   |   1 +
+> > > > > >  default-configs/i386-softmmu.mak      |   1 +
+> > > > > >  default-configs/x86_64-bsd-user.mak   |   1 +
+> > > > > >  default-configs/x86_64-linux-user.mak |   1 +
+> > > > > >  default-configs/x86_64-softmmu.mak    |   1 +
+> > > > > >  target/i386/cpu.c                     | 125 +-----------------=
+--------
+> > > > > >  util/Makefile.objs                    |   1 +
+> > > > > >  util/legacy_cpu_features_parser.c     | 161 ++++++++++++++++++=
+++++++++++++++++
+> > > > > >  10 files changed, 171 insertions(+), 124 deletions(-)
+> > > > > >  create mode 100644 util/legacy_cpu_features_parser.c
+> > > > > >    =20
+> > > > > [...] =20
+> > > > > > diff --git a/util/legacy_cpu_features_parser.c b/util/legacy_cp=
+u_features_parser.c
+> > > > > > new file mode 100644
+> > > > > > index 0000000..6b352a3
+> > > > > > --- /dev/null
+> > > > > > +++ b/util/legacy_cpu_features_parser.c
+> > > > > > @@ -0,0 +1,161 @@
+> > > > > > +/* Support for legacy -cpu cpu,features CLI option with +-feat=
+ syntax,
+> > > > > > + * used by x86/sparc targets
+> > > > > > + *
+> > > > > > + * Author: Andreas F=C3=A4rber <afaerber@suse.de>
+> > > > > > + * Author: Andre Przywara <andre.przywara@amd.com>
+> > > > > > + * Author: Eduardo Habkost <ehabkost@redhat.com>
+> > > > > > + * Author: Igor Mammedov <imammedo@redhat.com>
+> > > > > > + * Author: Paolo Bonzini <pbonzini@redhat.com>
+> > > > > > + * Author: Markus Armbruster <armbru@redhat.com>   =20
+> > > > >=20
+> > > > > IANAL, but I believe a
+> > > > >   Copyright (c) <YEAR> <COPYRIGHT HOLDER>
+> > > > > line is needed here.
+> > > > >  =20
+> > > > > > + *
+> > > > > > + * This program is free software; you can redistribute it and/=
+or modify
+> > > > > > + * it under the terms of the GNU General Public License as pub=
+lished by
+> > > > > > + * the Free Software Foundation; either version 2 of the Licen=
+se, or
+> > > > > > + * (at your option) any later version.
+> > > > > > +
+> > > > > > + * This program is distributed in the hope that it will be use=
+ful,
+> > > > > > + * but WITHOUT ANY WARRANTY; without even the implied warranty=
+ of
+> > > > > > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See t=
+he
+> > > > > > + * GNU General Public License for more details.
+> > > > > > +
+> > > > > > + * You should have received a copy of the GNU General Public L=
+icense along
+> > > > > > + * with this program; if not, see <http://www.gnu.org/licenses=
+/>.
+> > > > > > + */
+> > > > > > +
+> > > > > > +#include "qemu/osdep.h"
+> > > > > > +#include "qapi/error.h"
+> > > > > > +#include "qemu/cutils.h"
+> > > > > > +#include "qom/cpu.h"
+> > > > > > +#include "qemu/error-report.h"
+> > > > > > +#include "hw/qdev-properties.h"
+> > > > > > +
+> > > > > > +static inline void feat2prop(char *s)
+> > > > > > +{
+> > > > > > +    while ((s =3D strchr(s, '_'))) {
+> > > > > > +        *s =3D '-';
+> > > > > > +    }
+> > > > > > +}
+> > > > > > +
+> > > > > > +static gint compare_string(gconstpointer a, gconstpointer b)
+> > > > > > +{
+> > > > > > +    return g_strcmp0(a, b);
+> > > > > > +}
+> > > > > > +
+> > > > > > +static void
+> > > > > > +cpu_add_feat_as_prop(const char *typename, const char *name, c=
+onst char *val)
+> > > > > > +{
+> > > > > > +    GlobalProperty *prop =3D g_new0(typeof(*prop), 1);
+> > > > > > +    prop->driver =3D typename;
+> > > > > > +    prop->property =3D g_strdup(name);
+> > > > > > +    prop->value =3D g_strdup(val);
+> > > > > > +    prop->errp =3D &error_fatal;
+> > > > > > +    qdev_prop_register_global(prop);
+> > > > > > +}
+> > > > > > +
+> > > > > > +/* DO NOT USE WITH NEW CODE
+> > > > > > + * Parse "+feature,-feature,feature=3Dfoo" CPU feature string
+> > > > > > + */
+> > > > > > +void cpu_legacy_parse_featurestr(const char *typename, char *f=
+eatures,
+> > > > > > +                                 Error **errp)
+> > > > > > +{
+> > > > > > +    /* Compatibily hack to maintain legacy +-feat semantic,
+> > > > > > +     * where +-feat overwrites any feature set by
+> > > > > > +     * feat=3Don|feat even if the later is parsed after +-feat
+> > > > > > +     * (i.e. "-x2apic,x2apic=3Don" will result in x2apic disab=
+led)
+> > > > > > +     */
+> > > > > > +    GList *l, *plus_features =3D NULL, *minus_features =3D NUL=
+L;
+> > > > > > +    char *featurestr; /* Single 'key=3Dvalue" string being par=
+sed */
+> > > > > > +    static bool cpu_globals_initialized;
+> > > > > > +    bool ambiguous =3D false;
+> > > > > > +
+> > > > > > +    if (cpu_globals_initialized) {
+> > > > > > +        return;
+> > > > > > +    }
+> > > > > > +    cpu_globals_initialized =3D true;
+> > > > > > +
+> > > > > > +    if (!features) {
+> > > > > > +        return;
+> > > > > > +    }
+> > > > > > +
+> > > > > > +    for (featurestr =3D strtok(features, ",");
+> > > > > > +         featurestr;
+> > > > > > +         featurestr =3D strtok(NULL, ",")) {
+> > > > > > +        const char *name;
+> > > > > > +        const char *val =3D NULL;
+> > > > > > +        char *eq =3D NULL;
+> > > > > > +        char num[32];
+> > > > > > +
+> > > > > > +        /* Compatibility syntax: */
+> > > > > > +        if (featurestr[0] =3D=3D '+') {
+> > > > > > +            plus_features =3D g_list_append(plus_features,
+> > > > > > +                                          g_strdup(featurestr =
++ 1));
+> > > > > > +            continue;
+> > > > > > +        } else if (featurestr[0] =3D=3D '-') {
+> > > > > > +            minus_features =3D g_list_append(minus_features,
+> > > > > > +                                           g_strdup(featurestr=
+ + 1));
+> > > > > > +            continue;
+> > > > > > +        }   =20
+> > > > >=20
+> > > > > These 6 lines of code (or something equivalent to them) are
+> > > > > supposed to be the only difference to the generic parsing
+> > > > > function.  I would simply make this feature (support for
+> > > > > [+-]feature) enabled by a CPUClass::plus_minus_features flag
+> > > > > handled by cpu_common_parse_features(). =20
+> > > > I'd rather keep plus/minus nonsense  under the hood separate
+> > > > legacy function so it get reused unintentionally and keep generic
+> > > > parser clean.
+> > > >=20
+> > > > I didn't have any intent of generalizing +-feat handling
+> > > > but rather to remove code duplication between the only users
+> > > > (x86/sparc) that happened to use syntax and share the same semantic=
+s. =20
+> > >=20
+> > > Generalizing it to be controlled by a CPUClass flag will make it
+> > > easier to refactor the feature parsing later to use the QemuOpts
+> > > parser.  But I agree there's no need to do that on this series.
+> > >=20
+> > > (We might even decide to make [+-]feat work on all other
+> > > architectures.  We already agreed recently that we won't
+> > > deprecate it in x86, we could as well enable the same syntax
+> > > uniformly across all architectures.) =20
+> > I'd just stick to canonical feat=3Don|off and keep legacy to x86|sparc,
+> > but it's this to discuss if future and relevant here.
+> >  =20
+> > >  =20
+> > > >=20
+> > > > As an alternative I can copy-past x86 variant into sparc
+> > > > (modulo x86 harmless fixups), that will add some code duplication
+> > > > I've tried to avoid with this patch, but it won't cause
+> > > > misunderstanding about generalizing legacy hacks. =20
+> > >=20
+> > > Works for me.  We can then cleanup the x86 code and make it use
+> > > cpu_legacy_parse_featurestr() later. =20
+> > Then, I'll just copy and replace sparc variant with x86 impl.
+> > (removing from the copy x86 only parts and making parser stricter
+> > where possible) and drop 5-6 patches that touched x86 for the purpose
+> > of sharing code.
+> >=20
+> > and respin v3 tomorrow. =20
+>=20
+> I just have one worry about this plan, below:
+>=20
+> >  =20
+> > >  =20
+> > > >  =20
+> > > > > (But this can be done as a follow-up patch.)
+> > > > >  =20
+> > > > > > +
+> > > > > > +        eq =3D strchr(featurestr, '=3D');
+> > > > > > +        if (eq) {
+> > > > > > +            *eq++ =3D 0;
+> > > > > > +            val =3D eq;
+> > > > > > +        } else {
+> > > > > > +            val =3D "on";
+> > > > > > +        }
+> > > > > > +
+> > > > > > +        feat2prop(featurestr);
+> > > > > > +        name =3D featurestr;
+> > > > > > +
+> > > > > > +        if (g_list_find_custom(plus_features, name, compare_st=
+ring)) {
+> > > > > > +            warn_report("Ambiguous CPU model string. "
+> > > > > > +                        "Don't mix both \"+%s\" and \"%s=3D%s\=
+"",
+> > > > > > +                        name, name, val);
+> > > > > > +            ambiguous =3D true;
+> > > > > > +        }
+> > > > > > +        if (g_list_find_custom(minus_features, name, compare_s=
+tring)) {
+> > > > > > +            warn_report("Ambiguous CPU model string. "
+> > > > > > +                        "Don't mix both \"-%s\" and \"%s=3D%s\=
+"",
+> > > > > > +                        name, name, val);
+> > > > > > +            ambiguous =3D true;
+> > > > > > +        }
+> > > > > > +
+> > > > > > +        /* Special case: */
+> > > > > > +        if (!strcmp(name, "tsc-freq")) {
+> > > > > > +            int ret;
+> > > > > > +            uint64_t tsc_freq;
+> > > > > > +
+> > > > > > +            ret =3D qemu_strtosz_metric(val, NULL, &tsc_freq);
+> > > > > > +            if (ret < 0 || tsc_freq > INT64_MAX) {
+> > > > > > +                error_setg(errp, "bad numerical value %s", val=
+);
+> > > > > > +                return;
+> > > > > > +            }
+> > > > > > +            snprintf(num, sizeof(num), "%" PRId64, tsc_freq);
+> > > > > > +            val =3D num;
+> > > > > > +            name =3D "tsc-frequency";
+> > > > > > +        }   =20
+> > > > >=20
+> > > > > This is x86-specific and should stay in x86-specific code.  It
+> > > > > can probably be handled by the tsc-freq setter. =20
+> > > > there was reason why it wasn't moved to tsc-frequency setter,
+> > > > the former is pure integer type of property,
+> > > > while here we can get suffixed string that scales by 1000.
+> > > >=20
+> > > > Short of creating new visitor for KHz (I don't really looking forwa=
+rd to it),
+> > > > it's simpler to leave fixup alone in legacy parser that's shared on=
+ly between
+> > > > x86/sparc as it doesn't conflict with sparc and won't break anythin=
+g. =20
+> > >=20
+> > > It doesn't break anything, but it will move x86-specific cruft to
+> > > code that is supposed to be generic.
+> > >=20
+> > > Creating a write-only "tsc-freq" property that accepts a string
+> > > isn't hard to do. =20
+> > Nice idea, it might just work.
+> >  =20
+> > >=20
+> > > If you are not willing to do it in this series, you can write a
+> > > generic parser now (without x86-specific cruft), use it only on
+> > > sparc, and later we can refactor x86 so it can also use the
+> > > generic one. =20
+> > So far, I'm inclined towards opposing +-feat generalizing and keeping
+> > canonical form anywhere except of x86/sparc were we have to tolerate it.
+> >=20
+> >  =20
+> > > > > > +
+> > > > > > +        cpu_add_feat_as_prop(typename, name, val);
+> > > > > > +    }
+> > > > > > +
+> > > > > > +    if (ambiguous) {
+> > > > > > +        warn_report("Compatibility of ambiguous CPU model "
+> > > > > > +                    "strings won't be kept on future QEMU vers=
+ions");
+> > > > > > +    }   =20
+> > > > >=20
+> > > > > As noted in the review of the x86 patch that removes the
+> > > > > plus_features/minus_features static variables, this obsolete (and
+> > > > > confusing) property ordering misfeature should be removed before
+> > > > > we make this code generic and reuse it on other architectures. =20
+> > > > As it's been replied removing ordering is behavioral change for
+> > > > both x86 and sparc, which is not related to series.
+> > > > If you wish, I'll post a patch that will what you suggest
+> > > > on top of series. =20
+> > >=20
+> > > I would agree if sparc also implemented the weird ordering.  But
+> > > sparc does not implement it (it doesn't support feat=3D(on|off)
+> > > yet).  We shouldn't introduce that misfeature in sparc if we're
+> > > already planning to remove it. =20
+> > It didn't have canonic form but it gains this ability with this series.
+> > So we could do better for it by forbidding mixed syntax from starters =
+=20
+>=20
+> We don't need to forbid mixed syntax.  We can simply apply
+> [+-]feat and feat=3Don|off in the same order they appear in the
+> command-line.
+>=20
+> But:
+>=20
+> > (+1 for copy-past) but we have to keep minus overrides plus semantics,
+> > so ambiguous check is still there but it would lead to hard error inste=
+ad of
+> > warning. =20
+>=20
+> I forgot about this additional weird semantics
+> (minus-override-plus).  :(
+>=20
+> I think we must deprecate the minus-override-plus semantics too
+> and move to command-line-order eventually (on both x86 and
+> sparc).  But to do that, we need to make the code print a warning
+> on sparc like we do on x86.
+>=20
+> If we don't remove that weird semantics before making sparc
+> support feat=3Don|off, we will have to worry about the semantics of
+> "-feat,feat=3Don" on top of that.  I would simply wait for 2
+> releases and remove minus-override-plus, before implementing
+> feat=3Don|off on sparc, to avoid creating a new set of problems.
+> Is support for feat=3Don|off on sparc a must-have for QEMU 2.11?
+Probably it isn't must have (as far as I can tell now) but
+I won't bet on it.
 
+Supporting both ways as far as mix is forbidden is fine,
+so I'd 'introduce' feat=3Don|off (feat=3Don|off behavior is
+inherited from QOM Boolean property, so we would have
+to cripple parser intentionally).
 
-> Here's what I've got:
-> 
-> 1) The root disk seems to be fine.  The root disk for the VM is iSCSI, and
-> is accessible from the host.  Starting up a new VM with the same root disk
-> and mostly the same commandline works fine.  (The serial port of the new VM
-> was directed to stdio and the vnc option was removed.)
-> 
-> 2) Investigating the apparently-hung instance it seems 2 of its 3 vCPUs are
-> running a busy-loop:
-> 
->    PID USER PR NI VIRT RES SHR S %CPU %MEM TIME+ COMMAND
-> 192577 root 20 0 3816972 38360 10916 R 99.9 0.0 75:15.17 CPU 1/KVM
-> 192578 root -2 0 3816972 38360 10916 R 99.9 0.0 75:15.36 CPU 2/KVM
-> 
-> (Each of the vCPU threads is affined to a separate physical CPU.)
-> 
-> 
-> 3) Trying to retrieve the cpu info via libvirt didn't return within 10 seconds:
-> 
-> compute-0:/home/wrsroot# start=$SECONDS; timeout 10 virsh
-> qemu-monitor-command --hmp instance-0000006e info cpus || echo "timeout
-> after $((SECONDS - start)) seconds"
-> timeout after 10 seconds
-> 
-> 
-> 4) Running gdb on 192577 shows the following backtrace:
-
-How about getting a copy of the kernel stack for all the threads from
- /proc/(pid of qemu)/task/*/stack ?
-
-
-> Thread 1 (process 192577):
-> #0 0x00007f8c596e4537 in ioctl () from /lib64/libc.so.6
-> #1 0x00007f8c70fe0234 in kvm_vcpu_ioctl ()
-> #2 0x00007f8c70fe02ed in kvm_cpu_exec ()
-> #3 0x00007f8c70fcee76 in qemu_kvm_cpu_thread_fn ()
-> #4 0x00007f8c599bedc5 in start_thread () from /lib64/libpthread.so.0
-> #5 0x00007f8c596ed76d in clone () from /lib64/libc.so.6
-> 
-> 5) Running gdb on 192578 gives the same backtrace.
-> 
-> 6) Strace shows most of the time spent in ioctl...with 39K syscalls in 30
-> seconds across those two PIDs:
-
-I've got vague memories of a recent bug report about something stuck
-with the host eating CPU similarly, but I can't remember if it was
-during boot or any other details.
-
-> compute-0:/home/wrsroot# timeout 30 strace -c -q -T -p 192577 -p 192578
-> % time seconds usecs/call calls errors syscall
-> ------ ----------- ----------- --------- --------- ----------------
->  99.86 0.297753 9 32325 ioctl
->   0.12 0.000354 0 6730 writev
->   0.02 0.000059 0 384 60 futex
->   0.00 0.000000 0 10 write
->   0.00 0.000000 0 2 rt_sigpending
->   0.00 0.000000 0 2 2 rt_sigtimedwait
-> ------ ----------- ----------- --------- --------- ----------------
-> 100.00 0.298166 39453 62 total
-> 
-> 
-> 7) Running strace is enough to allow the VM to make forward progress, here
-> are kernel logs from within the guest:
-> 
-> [ 2540.964492] INFO: rcu_preempt self-detected stall on CPU { 0} (t=2202996
-> jiffies g=-108 c=-109 q=1676)
-> [ 2540.984656] Task dump for CPU 0:
-> [ 2540.985911] systemd R running task 0 1 0 0x00000008
-> [ 2540.988028] ffff88003b660000 0000000084d8f1f4 ffff88003e003d90 ffffffff810a8676
-> [ 2540.990869] 0000000000000000 ffffffff81a44d40 ffff88003e003da8 ffffffff810abed9
-> [ 2540.993975] 0000000000000001 ffff88003e003dd8 ffffffff8110e1a0 ffff88003e00ec40
-> [ 2540.996815] Call Trace:
-> [ 2540.997995] <IRQ> [<ffffffff810a8676>] sched_show_task+0xb6/0x120
-> [ 2540.999958] [<ffffffff810abed9>] dump_cpu_task+0x39/0x70
-> [ 2541.001559] [<ffffffff8110e1a0>] rcu_dump_cpu_stacks+0x90/0xd0
-> [ 2541.002425] [<ffffffff81111e34>] rcu_check_callbacks+0x434/0x7f0
-> [ 2541.003154] [<ffffffff810d6590>] ? tick_sched_handle.isra.13+0x60/0x60
-> [ 2541.003981] [<ffffffff8107f507>] update_process_times+0x47/0x80
-> [ 2541.004755] [<ffffffff810d6555>] tick_sched_handle.isra.13+0x25/0x60
-> [ 2541.005528] [<ffffffff810d65d1>] tick_sched_timer+0x41/0x70
-> [ 2541.006225] [<ffffffff81099c4c>] __hrtimer_run_queues+0xfc/0x320
-> [ 2541.006976] [<ffffffff8109a2b0>] hrtimer_interrupt+0xb0/0x1e0
-> [ 2541.007751] [<ffffffff810421b7>] local_apic_timer_interrupt+0x37/0x60
-> [ 2541.008541] [<ffffffff816d7b3f>] smp_apic_timer_interrupt+0x3f/0x60
-> [ 2541.009290] [<ffffffff816d621d>] apic_timer_interrupt+0x6d/0x80
-> [ 2541.009996] <EOI> [<ffffffff810ccd39>] ? get_monotonic_boottime+0xb9/0x100
-> [ 2541.010976] [<ffffffff81093cd1>] posix_get_boottime+0x11/0x20
-> [ 2541.011740] [<ffffffff810952e4>] SyS_clock_gettime+0x54/0xc0
-> [ 2541.012437] [<ffffffff816d5649>] system_call_fastpath+0x16/0x1b
-> 
-> [ 2602.140152] NMI watchdog: BUG: soft lockup - CPU#2 stuck for 22s!
-> [systemd-udevd:232]
-> [ 2602.140438] NMI watchdog: BUG: soft lockup - CPU#0 stuck for 23s! [ksoftirqd/0:3]
-> [[ 2602.140455] Modules linked in: ata_piix(+) serio_raw virtio_blk(+)
-> virtio_net floppy(+) libata sunrpc
-> [32m OK [0m] Started udev Coldplug all Devices.
-> [ 2602.140457] CPU: 0 PID: 3 Comm: ksoftirqd/0 Not tainted
-> 3.10.0-514.16.1.el7.24.tis.x86_64 #1
-> [ 2602.140458] Hardware name: Fedora Project OpenStack Nova, BIOS
-> 1.9.1-5.el7_3.2.tis.1 04/01/2014
-
-Hmm.  There were a pair of fixes that went into seabios and my reading
-of our release history is that they're in the build just after that
-(1.9.1-5.el7_3.3)
-They could cause occasional boot hangs in odd ways - but your symptoms
-dont quite seem to fit what I saw when I found them; but there again
-they were pretty random.
-
-Dave
-
-> [ 2602.140472] task: ffff88003b661620 ti: ffff88003b6a0000 task.ti: ffff88003b6a0000
-> [ 2602.140478] RIP: 0010:[<ffffffff8110f765>] [<ffffffff8110f765>]
-> rcu_process_gp_end+0x15/0x80
-> [ 2602.140488] RSP: 0018:ffff88003b6a3d70 EFLAGS: 00000202
-> [ 2602.140489] RAX: 0000000000000202 RBX: 00000000000120dd RCX: ffffffff81ae2f80
-> [ 2602.140490] RDX: ffff88003e000000 RSI: ffff88003e00ec40 RDI: ffffffff81a44d40
-> [ 2602.140490] RBP: ffff88003b6a3d90 R08: ffff88003f14f600 R09: 0000000180100005
-> [ 2602.140491] R10: ffffffff81a44d40 R11: 0000000000000000 R12: ffff88003b661688
-> [ 2602.140491] R13: ffffffff810c21c1 R14: ffff88003b6a3cf8 R15: 0000000180100005
-> [ 2602.140492] FS: 0000000000000000(0000) GS:ffff88003e000000(0000)
-> knlGS:0000000000000000
-> [ 2602.140493] CS: 0010 DS: 0000 ES: 0000 CR0: 000000008005003b
-> [ 2602.140494] CR2: 00007fea58b37628 CR3: 000000003b068000 CR4: 00000000000006f0
-> [ 2602.140504] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> [ 2602.140505] DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-> [ 2602.140505] Stack:
-> [ 2602.140516] ffffffff81a44d40 0000000000000009 ffff88003cc02300 ffffffff819f7108
-> [ 2602.140517] ffff88003b6a3df0 ffffffff8111001e ffff88003aa52e30 0000000000000000
-> [ 2602.140518] ffff88003e00ef88 ffff88003b661620 ffff88003b6a3fd8 0000000000000009
-> [ 2602.140524] Call Trace:
-> [ 2602.140534] [<ffffffff8111001e>] rcu_process_callbacks+0x9e/0x5c0
-> [ 2602.140545] [<ffffffff81075ba0>] __do_softirq+0x100/0x300
-> [ 2602.140546] [<ffffffff81075dd8>] run_ksoftirqd+0x38/0x50
-> [ 2602.140555] [<ffffffff8109e62f>] smpboot_thread_fn+0x12f/0x240
-> [ 2602.140557] [<ffffffff8109e500>] ? lg_double_unlock+0xb0/0xb0
-> [ 2602.140559] [<ffffffff8109596f>] kthread+0xcf/0xe0
-> [ 2602.140569] [<ffffffff810958a0>] ? kthread_create_on_node+0x140/0x140
-> [ 2602.140572] [<ffffffff816d5598>] ret_from_fork+0x58/0x90
-> [ 2602.140574] [<ffffffff810958a0>] ? kthread_create_on_node+0x140/0x140
-> [ 2602.140595] Code: 00 31 ff e8 fe ed ff ff 48 89 df 57 9d 0f 1f 44 00 00
-> 5b 5d c3 90 0f 1f 44 00 00 55 48 89 e5 41 56 41 55 41 54 49 89 f4 53 9c 58
-> <0f> 1f 44 00 00 48 89 c3 fa 66 0f 1f 44 00 00 4c 8b 6e 18 49 8b
-> [ 2602.146398] FDC 0 is a S82078B
-> [ 2602.290420] Modules linked in: ata_piix(+) serio_raw virtio_blk(+)
-> virtio_net floppy libata sunrpc
-> [ 2602.290422] CPU: 2 PID: 232 Comm: systemd-udevd Tainted: G L ------------
-> 3.10.0-514.16.1.el7.24.tis.x86_64 #1
-> [ 2602.290422] Hardware name: Fedora Project OpenStack Nova, BIOS
-> 1.9.1-5.el7_3.2.tis.1 04/01/2014
-> [ 2602.290423] task: ffff88003faeeea0 ti: ffff88003fad4000 task.ti: ffff88003fad4000
-> [ 2602.290428] RIP: 0010:[<ffffffff810dcd2a>] [<ffffffff810dcd2a>]
-> smp_call_function_many+0x20a/0x270
-> [ 2602.290428] RSP: 0018:ffff88003fad7740 EFLAGS: 00000202
-> [ 2602.290429] RAX: 0000000000000000 RBX: ffff88003e116280 RCX: ffff88003e018fd8
-> [ 2602.290430] RDX: 0000000000000000 RSI: 0000000000000100 RDI: 0000000000000000
-> [ 2602.290430] RBP: ffff88003fad7778 R08: ffff88003e116288 R09: 0000000000000004
-> [ 2602.290431] R10: ffff88003e116288 R11: 0000000000000000 R12: ffffffff81ae2f80
-> [ 2602.290431] R13: 000c00003e341958 R14: 00000000000000fc R15: 0000000000000292
-> [ 2602.290432] FS: 00007fb91a4648c0(0000) GS:ffff88003e100000(0000)
-> knlGS:0000000000000000
-> [ 2602.290433] CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [ 2602.290434] CR2: 00007febbb741000 CR3: 000000003f921000 CR4: 00000000000006e0
-> [ 2602.290436] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> [ 2602.290436] DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-> [ 2602.290437] Stack:
-> [ 2602.290438] 0000000100000001 0000000000016240 ffffffff81e1aa00 0000000000000000
-> [ 2602.290439] ffffffff81154e30 0000000000000002 0000000000000286 ffff88003fad77a8
-> [ 2602.290440] ffffffff810dcfaa 0000000000000002 0000000000000100 0000000000000100
-> [ 2602.290441] Call Trace:
-> [ 2602.290444] [<ffffffff81154e30>] ? drain_pages+0xb0/0xb0
-> [ 2602.290446] [<ffffffff810dcfaa>] on_each_cpu_mask+0x3a/0xa0
-> [ 2602.290448] [<ffffffff811521d5>] drain_all_pages+0xb5/0xc0
-> [ 2602.290450] [<ffffffff811b9d0f>] set_migratetype_isolate+0xaf/0xf0
-> [ 2602.290452] [<ffffffff811b9e90>] start_isolate_page_range+0x70/0xf0
-> [ 2602.290453] [<ffffffff81155632>] alloc_contig_range+0xe2/0x320
-> [ 2602.290458] [<ffffffff814130af>] dma_alloc_from_contiguous+0xaf/0x200
-> [ 2602.290461] [<ffffffff81021238>] dma_generic_alloc_coherent+0x88/0x1c0
-> [ 2602.290463] [<ffffffff8141bd42>] dmam_alloc_coherent+0xb2/0x140
-> [ 2602.290471] [<ffffffffa007d3c4>] ata_bmdma_port_start+0x44/0x60 [libata]
-> [ 2602.290474] [<ffffffffa00f034b>] piix_port_start+0x1b/0x20 [ata_piix]
-> [ 2602.290478] [<ffffffffa0069185>] ata_host_start.part.32+0xf5/0x1e0 [libata]
-> [ 2602.290483] [<ffffffffa007e6c0>] ? ata_bmdma_port_intr+0x120/0x120 [libata]
-> [ 2602.290486] [<ffffffffa0069289>] ata_host_start+0x19/0x20 [libata]
-> [ 2602.290491] [<ffffffffa007cfe5>] ata_pci_sff_activate_host+0x45/0x250 [libata]
-> [ 2602.290493] [<ffffffff8134a0ac>] ? pci_write_config_byte+0x1c/0x20
-> [ 2602.290496] [<ffffffff81352226>] ? pcibios_set_master+0x76/0xa0
-> [ 2602.290498] [<ffffffffa00f0e9e>] piix_init_one+0x57e/0x975 [ata_piix]
-> [ 2602.290500] [<ffffffff81353935>] local_pci_probe+0x45/0xa0
-> [ 2602.290501] [<ffffffff81354c75>] ? pci_match_device+0xe5/0x120
-> [ 2602.290503] [<ffffffff81354df1>] pci_device_probe+0x101/0x150
-> [ 2602.290505] [<ffffffff8140bac5>] driver_probe_device+0x145/0x3c0
-> [ 2602.290507] [<ffffffff8140be13>] __driver_attach+0x93/0xa0
-> [ 2602.290509] [<ffffffff8140bd80>] ? __device_attach+0x40/0x40
-> [ 2602.290510] [<ffffffff81409723>] bus_for_each_dev+0x73/0xc0
-> [ 2602.290511] [<ffffffff8140b40e>] driver_attach+0x1e/0x20
-> [ 2602.290513] [<ffffffff8140af60>] bus_add_driver+0x200/0x2d0
-> [ 2602.290514] [<ffffffff8140c494>] driver_register+0x64/0xf0
-> [ 2602.290516] [<ffffffff813548d5>] __pci_register_driver+0xa5/0xc0
-> [ 2602.290517] [<ffffffffa00f8000>] ? 0xffffffffa00f7fff
-> [ 2602.290519] [<ffffffffa00f801e>] piix_init+0x1e/0x2e [ata_piix]
-> [ 2602.290521] [<ffffffff810003a8>] do_one_initcall+0xb8/0x230
-> [ 2602.290523] [<ffffffff810e3201>] load_module+0x2171/0x2810
-> [ 2602.290525] [<ffffffff81337380>] ? ddebug_proc_write+0xf0/0xf0
-> [ 2602.290528] [<ffffffff810df3e3>] ? copy_module_from_fd.isra.46+0x53/0x150
-> [ 2602.290529] [<ffffffff810e3a56>] SyS_finit_module+0xa6/0xd0
-> [ 2602.290531] [<ffffffff816d5649>] system_call_fastpath+0x16/0x1b
-> 
-> 
-> 8) Running strace in a loop doesn't reliably kick qemu-kvm to run some more
-> guest code. Found another method that works better:
-> 
-> cpu_kvm_busy=$(top -b -n1 -H -o+%CPU -p $(pgrep qemu-kvm) | awk '/KVM/ &&
-> $9>50 {print $1;}'); while true; do for tid in $cpu_kvm_busy; do gdb --batch
-> --quiet -ex 'bt' -ex 'quit' /usr/libexec/qemu-kvm $tid; done; done
-> 
-> This basically just finds qemu threads that are using more than 50% CPU,
-> attaches gdb to them, prints stack trace, and exits.
-> 
-> With this running the instance can boot up to the login prompt on the vnc
-> console and access the rootfs.
-> 
-> 
-> Thanks for reading this far...if you have any pointers/suggestions I'd love
-> to hear them.
-> 
-> Chris
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Later we can drop minus-override-plus or whatever else,
+but outside of this series pls.
