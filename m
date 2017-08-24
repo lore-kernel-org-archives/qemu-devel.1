@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dkpSb-0006rV-5C
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:34:02 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dkpSe-0006sM-Bn
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:34:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dkpSW-0003zl-8l
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:34:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36700)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dkpSd-00041y-4Y
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:34:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33424)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1dkpSW-0003zZ-2J
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:33:56 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	id 1dkpSc-00041j-SB
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:34:03 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E1310C04B94B
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 10:33:54 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D82D981DE5
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 10:34:01 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 24 Aug 2017 12:33:36 +0200
-Message-Id: <20170824103350.16400-1-marcandre.lureau@redhat.com>
+Date: Thu, 24 Aug 2017 12:33:38 +0200
+Message-Id: <20170824103350.16400-3-marcandre.lureau@redhat.com>
+In-Reply-To: <20170824103350.16400-1-marcandre.lureau@redhat.com>
+References: <20170824103350.16400-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 00/14] Generate a literal qobject for
- introspection
+Subject: [Qemu-devel] [PATCH 02/14] qlit: move qlit from check-qjson to
+ qobject/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,46 +37,304 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Hi,
+Fix code style issues while at it, to please check-patch.
 
-This series is based on patches 2-5 from "[PATCH v2 00/54] qapi: add #if
-pre-processor conditions to generated code". Generating a literal qobject
-will allow to easily introduce #if conditionals from the original series.
-
-Marc-Andr=C3=A9 Lureau (14):
-  qdict: add qdict_put_null() helper
-  qlit: move qlit from check-qjson to qobject/
-  qlit: use QLit prefix consistently
-  qlit: remove needless type cast
-  qlit: rename compare_litqobj_to_qobj
-  qlit: make qlit_equal_qobject return a bool
-  qlit: make qlit_equal_qobject() take const arguments
-  qlit: add QLIT_QNULL and QLIT_BOOL
-  qlit: replace assert(qnum_get_try_int)
-  tests: add qlit tests
-  qlit: improve QLit dict vs qdict comparison
-  qlit: improve QLit list vs qlist comparison
-  qlit: add qobject_form_qlit()
-  qapi: generate a literal qobject for introspection
-
- scripts/qapi-introspect.py         |  87 +++++++++++---------
- include/qapi/qmp/qdict.h           |   4 +-
- include/qapi/qmp/qlit.h            |  56 +++++++++++++
- monitor.c                          |   2 +-
- qobject/qlit.c                     | 157 +++++++++++++++++++++++++++++++=
-++++++
- target/i386/cpu.c                  |   4 +-
- tests/check-qjson.c                | 150 +++++++------------------------=
-----
- tests/check-qlit.c                 | 100 +++++++++++++++++++++++
- tests/test-qobject-input-visitor.c |  11 ++-
- docs/devel/qapi-code-gen.txt       |  29 ++++---
- qobject/Makefile.objs              |   2 +-
- tests/Makefile.include             |   5 +-
- 12 files changed, 429 insertions(+), 178 deletions(-)
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ include/qapi/qmp/qlit.h | 49 +++++++++++++++++++++++++
+ qobject/qlit.c          | 89 +++++++++++++++++++++++++++++++++++++++++++=
+++
+ tests/check-qjson.c     | 96 +------------------------------------------=
+------
+ qobject/Makefile.objs   |  2 +-
+ 4 files changed, 140 insertions(+), 96 deletions(-)
  create mode 100644 include/qapi/qmp/qlit.h
  create mode 100644 qobject/qlit.c
- create mode 100644 tests/check-qlit.c
 
+diff --git a/include/qapi/qmp/qlit.h b/include/qapi/qmp/qlit.h
+new file mode 100644
+index 0000000000..4e2e760ef1
+--- /dev/null
++++ b/include/qapi/qmp/qlit.h
+@@ -0,0 +1,49 @@
++/*
++ * Copyright IBM, Corp. 2009
++ * Copyright (c) 2013, 2015, 2017 Red Hat Inc.
++ *
++ * Authors:
++ *  Anthony Liguori   <aliguori@us.ibm.com>
++ *  Markus Armbruster <armbru@redhat.com>
++ *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
+ later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
++ */
++#ifndef QLIT_H_
++#define QLIT_H_
++
++#include "qapi-types.h"
++#include "qobject.h"
++
++typedef struct LiteralQDictEntry LiteralQDictEntry;
++typedef struct LiteralQObject LiteralQObject;
++
++struct LiteralQObject {
++    int type;
++    union {
++        int64_t qnum;
++        const char *qstr;
++        LiteralQDictEntry *qdict;
++        LiteralQObject *qlist;
++    } value;
++};
++
++struct LiteralQDictEntry {
++    const char *key;
++    LiteralQObject value;
++};
++
++#define QLIT_QNUM(val) \
++    (LiteralQObject){.type =3D QTYPE_QNUM, .value.qnum =3D (val)}
++#define QLIT_QSTR(val) \
++    (LiteralQObject){.type =3D QTYPE_QSTRING, .value.qstr =3D (val)}
++#define QLIT_QDICT(val) \
++    (LiteralQObject){.type =3D QTYPE_QDICT, .value.qdict =3D (val)}
++#define QLIT_QLIST(val) \
++    (LiteralQObject){.type =3D QTYPE_QLIST, .value.qlist =3D (val)}
++
++int compare_litqobj_to_qobj(LiteralQObject *lhs, QObject *rhs);
++
++#endif /* QLIT_H_ */
+diff --git a/qobject/qlit.c b/qobject/qlit.c
+new file mode 100644
+index 0000000000..5917c3584e
+--- /dev/null
++++ b/qobject/qlit.c
+@@ -0,0 +1,89 @@
++/*
++ * QLit literal qobject
++ *
++ * Copyright IBM, Corp. 2009
++ * Copyright (c) 2013, 2015, 2017 Red Hat Inc.
++ *
++ * Authors:
++ *  Anthony Liguori   <aliguori@us.ibm.com>
++ *  Markus Armbruster <armbru@redhat.com>
++ *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
+ later.
++ * See the COPYING.LIB file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++
++#include "qapi/qmp/qlit.h"
++#include "qapi/qmp/types.h"
++
++typedef struct QListCompareHelper {
++    int index;
++    LiteralQObject *objs;
++    int result;
++} QListCompareHelper;
++
++static void compare_helper(QObject *obj, void *opaque)
++{
++    QListCompareHelper *helper =3D opaque;
++
++    if (helper->result =3D=3D 0) {
++        return;
++    }
++
++    if (helper->objs[helper->index].type =3D=3D QTYPE_NONE) {
++        helper->result =3D 0;
++        return;
++    }
++
++    helper->result =3D
++        compare_litqobj_to_qobj(&helper->objs[helper->index++], obj);
++}
++
++int compare_litqobj_to_qobj(LiteralQObject *lhs, QObject *rhs)
++{
++    int64_t val;
++
++    if (!rhs || lhs->type !=3D qobject_type(rhs)) {
++        return 0;
++    }
++
++    switch (lhs->type) {
++    case QTYPE_QNUM:
++        g_assert(qnum_get_try_int(qobject_to_qnum(rhs), &val));
++        return lhs->value.qnum =3D=3D val;
++    case QTYPE_QSTRING:
++        return (strcmp(lhs->value.qstr,
++                       qstring_get_str(qobject_to_qstring(rhs))) =3D=3D =
+0);
++    case QTYPE_QDICT: {
++        int i;
++
++        for (i =3D 0; lhs->value.qdict[i].key; i++) {
++            QObject *obj =3D qdict_get(qobject_to_qdict(rhs),
++                                     lhs->value.qdict[i].key);
++
++            if (!compare_litqobj_to_qobj(&lhs->value.qdict[i].value, obj=
+)) {
++                return 0;
++            }
++        }
++
++        return 1;
++    }
++    case QTYPE_QLIST: {
++        QListCompareHelper helper;
++
++        helper.index =3D 0;
++        helper.objs =3D lhs->value.qlist;
++        helper.result =3D 1;
++
++        qlist_iter(qobject_to_qlist(rhs), compare_helper, &helper);
++
++        return helper.result;
++    }
++    default:
++        break;
++    }
++
++    return 0;
++}
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index a3a97b0d99..525f79e60b 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -16,6 +16,7 @@
+ #include "qapi/error.h"
+ #include "qapi/qmp/types.h"
+ #include "qapi/qmp/qjson.h"
++#include "qapi/qmp/qlit.h"
+ #include "qemu-common.h"
+=20
+ static void escaped_string(void)
+@@ -1059,101 +1060,6 @@ static void keyword_literal(void)
+     QDECREF(null);
+ }
+=20
+-typedef struct LiteralQDictEntry LiteralQDictEntry;
+-typedef struct LiteralQObject LiteralQObject;
+-
+-struct LiteralQObject
+-{
+-    int type;
+-    union {
+-        int64_t qnum;
+-        const char *qstr;
+-        LiteralQDictEntry *qdict;
+-        LiteralQObject *qlist;
+-    } value;
+-};
+-
+-struct LiteralQDictEntry
+-{
+-    const char *key;
+-    LiteralQObject value;
+-};
+-
+-#define QLIT_QNUM(val) (LiteralQObject){.type =3D QTYPE_QNUM, .value.qnu=
+m =3D (val)}
+-#define QLIT_QSTR(val) (LiteralQObject){.type =3D QTYPE_QSTRING, .value.=
+qstr =3D (val)}
+-#define QLIT_QDICT(val) (LiteralQObject){.type =3D QTYPE_QDICT, .value.q=
+dict =3D (val)}
+-#define QLIT_QLIST(val) (LiteralQObject){.type =3D QTYPE_QLIST, .value.q=
+list =3D (val)}
+-
+-typedef struct QListCompareHelper
+-{
+-    int index;
+-    LiteralQObject *objs;
+-    int result;
+-} QListCompareHelper;
+-
+-static int compare_litqobj_to_qobj(LiteralQObject *lhs, QObject *rhs);
+-
+-static void compare_helper(QObject *obj, void *opaque)
+-{
+-    QListCompareHelper *helper =3D opaque;
+-
+-    if (helper->result =3D=3D 0) {
+-        return;
+-    }
+-
+-    if (helper->objs[helper->index].type =3D=3D QTYPE_NONE) {
+-        helper->result =3D 0;
+-        return;
+-    }
+-
+-    helper->result =3D compare_litqobj_to_qobj(&helper->objs[helper->ind=
+ex++], obj);
+-}
+-
+-static int compare_litqobj_to_qobj(LiteralQObject *lhs, QObject *rhs)
+-{
+-    int64_t val;
+-
+-    if (!rhs || lhs->type !=3D qobject_type(rhs)) {
+-        return 0;
+-    }
+-
+-    switch (lhs->type) {
+-    case QTYPE_QNUM:
+-        g_assert(qnum_get_try_int(qobject_to_qnum(rhs), &val));
+-        return lhs->value.qnum =3D=3D val;
+-    case QTYPE_QSTRING:
+-        return (strcmp(lhs->value.qstr, qstring_get_str(qobject_to_qstri=
+ng(rhs))) =3D=3D 0);
+-    case QTYPE_QDICT: {
+-        int i;
+-
+-        for (i =3D 0; lhs->value.qdict[i].key; i++) {
+-            QObject *obj =3D qdict_get(qobject_to_qdict(rhs), lhs->value=
+.qdict[i].key);
+-
+-            if (!compare_litqobj_to_qobj(&lhs->value.qdict[i].value, obj=
+)) {
+-                return 0;
+-            }
+-        }
+-
+-        return 1;
+-    }
+-    case QTYPE_QLIST: {
+-        QListCompareHelper helper;
+-
+-        helper.index =3D 0;
+-        helper.objs =3D lhs->value.qlist;
+-        helper.result =3D 1;
+-       =20
+-        qlist_iter(qobject_to_qlist(rhs), compare_helper, &helper);
+-
+-        return helper.result;
+-    }
+-    default:
+-        break;
+-    }
+-
+-    return 0;
+-}
+-
+ static void simple_dict(void)
+ {
+     int i;
+diff --git a/qobject/Makefile.objs b/qobject/Makefile.objs
+index fc8885c9a4..002d25873a 100644
+--- a/qobject/Makefile.objs
++++ b/qobject/Makefile.objs
+@@ -1,2 +1,2 @@
+-util-obj-y =3D qnull.o qnum.o qstring.o qdict.o qlist.o qbool.o
++util-obj-y =3D qnull.o qnum.o qstring.o qdict.o qlist.o qbool.o qlit.o
+ util-obj-y +=3D qjson.o qobject.o json-lexer.o json-streamer.o json-pars=
+er.o
 --=20
 2.14.1.146.gd35faa819
