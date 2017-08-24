@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkp4n-0004mE-Qq
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:09:26 -0400
+	(envelope-from <JBeulich@suse.com>) id 1dkp9H-0006ao-4u
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:14:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkp4m-0002oe-UP
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:09:25 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170818211542.5380-1-eblake@redhat.com>
-	<20170818211542.5380-9-eblake@redhat.com>
-	<e44a3300-cbe9-c9d7-ae49-b223f638d7ea@redhat.com>
-	<da3712de-986d-8130-7a97-e9f1071d2a03@redhat.com>
-	<c665235d-8bec-627a-f750-4dc2798c3d8c@redhat.com>
-	<5d84655b-d82a-956a-f434-023961b23552@redhat.com>
-	<2ffb6aab-09a0-7136-946f-f68f7478c0f7@redhat.com>
-	<bddc04d6-686e-ca5c-ef30-6df7bdb9c3bf@redhat.com>
-	<87h8wxqunl.fsf@dusky.pond.sub.org>
-	<e1c18d2a-ac5e-2892-3343-80b943345f3e@redhat.com>
-Date: Thu, 24 Aug 2017 12:09:15 +0200
-In-Reply-To: <e1c18d2a-ac5e-2892-3343-80b943345f3e@redhat.com> (Paolo
-	Bonzini's message of "Thu, 24 Aug 2017 10:52:06 +0200")
-Message-ID: <874lsxnupg.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 08/13] tests: Rely more on
- global_qtest
+	(envelope-from <JBeulich@suse.com>) id 1dkp9E-0004jl-0P
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:14:03 -0400
+Received: from prv-mh.provo.novell.com ([137.65.248.74]:48447)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <JBeulich@suse.com>) id 1dkp9D-0004jd-NS
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:13:59 -0400
+Message-Id: <599EC30602000078001731A4@prv-mh.provo.novell.com>
+Date: Thu, 24 Aug 2017 04:13:58 -0600
+From: "Jan Beulich" <JBeulich@suse.com>
+References: <20170824094753.77795-1-roger.pau@citrix.com>
+	<20170824094753.77795-3-roger.pau@citrix.com>
+	<599EBE6D020000780017310E@prv-mh.provo.novell.com>
+	<20170824100653.mqilcui6mmcqy7io@dhcp-3-128.uk.xensource.com>
+In-Reply-To: <20170824100653.mqilcui6mmcqy7io@dhcp-3-128.uk.xensource.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Subject: Re: [Qemu-devel] [PATCH QEMU] xen/pt: allow QEMU to request MSI
+ unmasking at bind time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, "open list:Floppy" <qemu-block@nongnu.org>
+To: Roger Pau Monne <roger.pau@citrix.com>
+Cc: Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, hfp@posteo.de
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+>>> On 24.08.17 at 12:06, <roger.pau@citrix.com> wrote:
+> On Thu, Aug 24, 2017 at 03:54:21AM -0600, Jan Beulich wrote:
+>> >>> On 24.08.17 at 11:47, <roger.pau@citrix.com> wrote:
+>> > @@ -274,7 +278,7 @@ int xen_pt_msi_update(XenPCIPassthroughState *s)
+>> >  {
+>> >      XenPTMSI *msi =3D s->msi;
+>> >      return msi_msix_update(s, msi_addr64(msi), msi->data, msi->pirq,
+>> > -                           false, 0, &msi->pirq);
+>> > +                           false, 0, &msi->pirq, false);
+>> >  }
+>>=20
+>> I don't think this is correct when the device has mask bits.
+>=20
+> Right, I thought I modified this. I've already changed
+> pt_irq_create_bind so that the original behavior is keep if the unmask
+> bit is not set. In this case this should be 'true' in order to keep
+> the previous behavior, which was correct for MSI.
 
-> On 24/08/2017 09:42, Markus Armbruster wrote:
->> 
->> In a language less primitive than C, I'd write it exactly that way, and
->> nobody would complain.  In old, primitive C, I have to write
->> 
->>     global_qtest = A;
->>     do this
->>     do that
->> 
->>     global_qtest = B;
->>     do something
->> 
->>     global_qtest = A;
->>     do more
->> 
->> Why's that so horrible to justify busywork on wrappers?
->
-> Because cut-and-paste is a thing. :(
+Wouldn't you want to pass the state of the mask bit here,
+rather than uniformly hard coding true or false?
 
-Cut-and-paste cuts both ways (pardon the pun):
+> It also makes me wonder whether it would be better to change the name
+> of the parameter to "unmask", so that false -> no change to mask, true
+> -> unconditionally unmask.
 
-    initialize with QTestState A
-    frobnicate with QTestState A
-    glomnify with QTestState A
-    frobnicate with QTestState A
-    initialize with QTestState B
-    boingboing with QTestState B
-    finalize with QTestState A
-    finalize with QTestState A
+I don't care much about this aspect, but perhaps the qemu
+maintainers do.
 
-Uh, forgot to frobnicate after boingboing, let me fix that real quick!
-
-    initialize with QTestState A
-    frobnicate with QTestState A
-    glomnify with QTestState A
-    frobnicate with QTestState A
-    initialize with QTestState B
-    boingboing with QTestState B
-    frobnicate with QTestState A
-    finalize with QTestState A
-    finalize with QTestState A
-
-Spot the pasto.
-
-This hasty paste would simply work with global_qtest.  I'm not claiming
-there are cases that are just the opposite.  I'm just challenging your
-apparent claim that the long forms help with avoiding or catching
-pastos.  Can you explain how they help more than they hurt?
-
-A bit of global state isn't automatically bad.  *Shared* global state is
-what gets us into trouble.  Can you point to examples where global_qtest
-is shared in ways that aren't 100% trivial?
+Jan
