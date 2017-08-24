@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dksFZ-0000oQ-7x
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:32:51 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dksQN-0005os-13
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:43:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dksFW-0007If-19
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:32:45 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:35790)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dksFV-0007Ib-SF
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:32:41 -0400
-Received: by mail-qk0-x243.google.com with SMTP id l68so2216145qke.2
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 06:32:41 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
+	(envelope-from <imammedo@redhat.com>) id 1dksQJ-0003FG-Md
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:43:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56350)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dksQJ-0003El-CT
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:43:51 -0400
+Date: Thu, 24 Aug 2017 15:43:42 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170824154342.0ae6904d@nial.brq.redhat.com>
+In-Reply-To: <20170824111852.37066dce@nial.brq.redhat.com>
 References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
-	<1503050939-227939-4-git-send-email-imammedo@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <cee98109-58da-8c1e-11c2-16cdd11b4595@amsat.org>
-Date: Thu, 24 Aug 2017 10:32:33 -0300
+	<1503050939-227939-7-git-send-email-imammedo@redhat.com>
+	<20170823143414.GI27715@localhost.localdomain>
+	<20170823182902.7c2803c7@nial.brq.redhat.com>
+	<20170823164638.GN19998@localhost.localdomain>
+	<20170823193739.32d9bd07@Igors-MacBook-Pro.local>
+	<20170823175839.GT19998@localhost.localdomain>
+	<20170824111852.37066dce@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1503050939-227939-4-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-2.11 03/27] sparc: convert cpu features
- to qdev properties
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.11 06/27] x86: extract legacy cpu
+ features format parser
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,121 +34,374 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Eduardo Habkost <ehabkost@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
 
-On 08/18/2017 07:08 AM, Igor Mammedov wrote:
-> SPARC is the last target that uses legacy way of parsing
-> and initializing cpu features, drop legacy approach and
-> convert features to properties so that SPARC could as minimum
-> benefit from generic cpu_generic_init(), common with
-> x86 +-feat parser
-> 
-> PS:
-> the main purpose is to remove legacy way of cpu creation as
-> a blocker for unifying cpu creation code across targets.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+On Thu, 24 Aug 2017 11:18:52 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> On Wed, 23 Aug 2017 14:58:39 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+>=20
+> > On Wed, Aug 23, 2017 at 07:37:39PM +0200, Igor Mammedov wrote: =20
+> > > On Wed, 23 Aug 2017 13:46:38 -0300
+> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > >    =20
+> > > > On Wed, Aug 23, 2017 at 06:29:02PM +0200, Igor Mammedov wrote:   =20
+> > > > > On Wed, 23 Aug 2017 11:34:14 -0300
+> > > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > > > >    =20
+> > > > > > On Fri, Aug 18, 2017 at 12:08:38PM +0200, Igor Mammedov wrote: =
+  =20
+> > > > > > > Move cpu_model +-feat parsing into a separate file so that it
+> > > > > > > could be reused later for parsing similar format of sparc tar=
+get
+> > > > > > >=20
+> > > > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > > > > > ---
+> > > > > > > CC: Richard Henderson <rth@twiddle.net>
+> > > > > > > CC: Eduardo Habkost <ehabkost@redhat.com>
+> > > > > > > CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> > > > > > > CC: Artyom Tarasenko <atar4qemu@gmail.com>
+> > > > > > > CC: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > > > > > > ---
+> > > > > > >  include/qom/cpu.h                     |   2 +
+> > > > > > >  default-configs/i386-bsd-user.mak     |   1 +
+> > > > > > >  default-configs/i386-linux-user.mak   |   1 +
+> > > > > > >  default-configs/i386-softmmu.mak      |   1 +
+> > > > > > >  default-configs/x86_64-bsd-user.mak   |   1 +
+> > > > > > >  default-configs/x86_64-linux-user.mak |   1 +
+> > > > > > >  default-configs/x86_64-softmmu.mak    |   1 +
+> > > > > > >  target/i386/cpu.c                     | 125 +---------------=
+----------
+> > > > > > >  util/Makefile.objs                    |   1 +
+> > > > > > >  util/legacy_cpu_features_parser.c     | 161 ++++++++++++++++=
+++++++++++++++++++
+> > > > > > >  10 files changed, 171 insertions(+), 124 deletions(-)
+> > > > > > >  create mode 100644 util/legacy_cpu_features_parser.c
+> > > > > > >      =20
+> > > > > > [...]   =20
+> > > > > > > diff --git a/util/legacy_cpu_features_parser.c b/util/legacy_=
+cpu_features_parser.c
+> > > > > > > new file mode 100644
+> > > > > > > index 0000000..6b352a3
+> > > > > > > --- /dev/null
+> > > > > > > +++ b/util/legacy_cpu_features_parser.c
+> > > > > > > @@ -0,0 +1,161 @@
+> > > > > > > +/* Support for legacy -cpu cpu,features CLI option with +-fe=
+at syntax,
+> > > > > > > + * used by x86/sparc targets
+> > > > > > > + *
+> > > > > > > + * Author: Andreas F=C3=A4rber <afaerber@suse.de>
+> > > > > > > + * Author: Andre Przywara <andre.przywara@amd.com>
+> > > > > > > + * Author: Eduardo Habkost <ehabkost@redhat.com>
+> > > > > > > + * Author: Igor Mammedov <imammedo@redhat.com>
+> > > > > > > + * Author: Paolo Bonzini <pbonzini@redhat.com>
+> > > > > > > + * Author: Markus Armbruster <armbru@redhat.com>     =20
+> > > > > >=20
+> > > > > > IANAL, but I believe a
+> > > > > >   Copyright (c) <YEAR> <COPYRIGHT HOLDER>
+> > > > > > line is needed here.
+> > > > > >    =20
+> > > > > > > + *
+> > > > > > > + * This program is free software; you can redistribute it an=
+d/or modify
+> > > > > > > + * it under the terms of the GNU General Public License as p=
+ublished by
+> > > > > > > + * the Free Software Foundation; either version 2 of the Lic=
+ense, or
+> > > > > > > + * (at your option) any later version.
+> > > > > > > +
+> > > > > > > + * This program is distributed in the hope that it will be u=
+seful,
+> > > > > > > + * but WITHOUT ANY WARRANTY; without even the implied warran=
+ty of
+> > > > > > > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See=
+ the
+> > > > > > > + * GNU General Public License for more details.
+> > > > > > > +
+> > > > > > > + * You should have received a copy of the GNU General Public=
+ License along
+> > > > > > > + * with this program; if not, see <http://www.gnu.org/licens=
+es/>.
+> > > > > > > + */
+> > > > > > > +
+> > > > > > > +#include "qemu/osdep.h"
+> > > > > > > +#include "qapi/error.h"
+> > > > > > > +#include "qemu/cutils.h"
+> > > > > > > +#include "qom/cpu.h"
+> > > > > > > +#include "qemu/error-report.h"
+> > > > > > > +#include "hw/qdev-properties.h"
+> > > > > > > +
+> > > > > > > +static inline void feat2prop(char *s)
+> > > > > > > +{
+> > > > > > > +    while ((s =3D strchr(s, '_'))) {
+> > > > > > > +        *s =3D '-';
+> > > > > > > +    }
+> > > > > > > +}
+> > > > > > > +
+> > > > > > > +static gint compare_string(gconstpointer a, gconstpointer b)
+> > > > > > > +{
+> > > > > > > +    return g_strcmp0(a, b);
+> > > > > > > +}
+> > > > > > > +
+> > > > > > > +static void
+> > > > > > > +cpu_add_feat_as_prop(const char *typename, const char *name,=
+ const char *val)
+> > > > > > > +{
+> > > > > > > +    GlobalProperty *prop =3D g_new0(typeof(*prop), 1);
+> > > > > > > +    prop->driver =3D typename;
+> > > > > > > +    prop->property =3D g_strdup(name);
+> > > > > > > +    prop->value =3D g_strdup(val);
+> > > > > > > +    prop->errp =3D &error_fatal;
+> > > > > > > +    qdev_prop_register_global(prop);
+> > > > > > > +}
+> > > > > > > +
+> > > > > > > +/* DO NOT USE WITH NEW CODE
+> > > > > > > + * Parse "+feature,-feature,feature=3Dfoo" CPU feature string
+> > > > > > > + */
+> > > > > > > +void cpu_legacy_parse_featurestr(const char *typename, char =
+*features,
+> > > > > > > +                                 Error **errp)
+> > > > > > > +{
+> > > > > > > +    /* Compatibily hack to maintain legacy +-feat semantic,
+> > > > > > > +     * where +-feat overwrites any feature set by
+> > > > > > > +     * feat=3Don|feat even if the later is parsed after +-fe=
+at
+> > > > > > > +     * (i.e. "-x2apic,x2apic=3Don" will result in x2apic dis=
+abled)
+> > > > > > > +     */
+> > > > > > > +    GList *l, *plus_features =3D NULL, *minus_features =3D N=
+ULL;
+> > > > > > > +    char *featurestr; /* Single 'key=3Dvalue" string being p=
+arsed */
+> > > > > > > +    static bool cpu_globals_initialized;
+> > > > > > > +    bool ambiguous =3D false;
+> > > > > > > +
+> > > > > > > +    if (cpu_globals_initialized) {
+> > > > > > > +        return;
+> > > > > > > +    }
+> > > > > > > +    cpu_globals_initialized =3D true;
+> > > > > > > +
+> > > > > > > +    if (!features) {
+> > > > > > > +        return;
+> > > > > > > +    }
+> > > > > > > +
+> > > > > > > +    for (featurestr =3D strtok(features, ",");
+> > > > > > > +         featurestr;
+> > > > > > > +         featurestr =3D strtok(NULL, ",")) {
+> > > > > > > +        const char *name;
+> > > > > > > +        const char *val =3D NULL;
+> > > > > > > +        char *eq =3D NULL;
+> > > > > > > +        char num[32];
+> > > > > > > +
+> > > > > > > +        /* Compatibility syntax: */
+> > > > > > > +        if (featurestr[0] =3D=3D '+') {
+> > > > > > > +            plus_features =3D g_list_append(plus_features,
+> > > > > > > +                                          g_strdup(featurest=
+r + 1));
+> > > > > > > +            continue;
+> > > > > > > +        } else if (featurestr[0] =3D=3D '-') {
+> > > > > > > +            minus_features =3D g_list_append(minus_features,
+> > > > > > > +                                           g_strdup(features=
+tr + 1));
+> > > > > > > +            continue;
+> > > > > > > +        }     =20
+> > > > > >=20
+> > > > > > These 6 lines of code (or something equivalent to them) are
+> > > > > > supposed to be the only difference to the generic parsing
+> > > > > > function.  I would simply make this feature (support for
+> > > > > > [+-]feature) enabled by a CPUClass::plus_minus_features flag
+> > > > > > handled by cpu_common_parse_features().   =20
+> > > > > I'd rather keep plus/minus nonsense  under the hood separate
+> > > > > legacy function so it get reused unintentionally and keep generic
+> > > > > parser clean.
+> > > > >=20
+> > > > > I didn't have any intent of generalizing +-feat handling
+> > > > > but rather to remove code duplication between the only users
+> > > > > (x86/sparc) that happened to use syntax and share the same semant=
+ics.   =20
+> > > >=20
+> > > > Generalizing it to be controlled by a CPUClass flag will make it
+> > > > easier to refactor the feature parsing later to use the QemuOpts
+> > > > parser.  But I agree there's no need to do that on this series.
+> > > >=20
+> > > > (We might even decide to make [+-]feat work on all other
+> > > > architectures.  We already agreed recently that we won't
+> > > > deprecate it in x86, we could as well enable the same syntax
+> > > > uniformly across all architectures.)   =20
+> > > I'd just stick to canonical feat=3Don|off and keep legacy to x86|spar=
+c,
+> > > but it's this to discuss if future and relevant here.
+> > >    =20
+> > > >    =20
+> > > > >=20
+> > > > > As an alternative I can copy-past x86 variant into sparc
+> > > > > (modulo x86 harmless fixups), that will add some code duplication
+> > > > > I've tried to avoid with this patch, but it won't cause
+> > > > > misunderstanding about generalizing legacy hacks.   =20
+> > > >=20
+> > > > Works for me.  We can then cleanup the x86 code and make it use
+> > > > cpu_legacy_parse_featurestr() later.   =20
+> > > Then, I'll just copy and replace sparc variant with x86 impl.
+> > > (removing from the copy x86 only parts and making parser stricter
+> > > where possible) and drop 5-6 patches that touched x86 for the purpose
+> > > of sharing code.
+> > >=20
+> > > and respin v3 tomorrow.   =20
+> >=20
+> > I just have one worry about this plan, below:
+> >  =20
+> > >    =20
+> > > >    =20
+> > > > >    =20
+> > > > > > (But this can be done as a follow-up patch.)
+> > > > > >    =20
+> > > > > > > +
+> > > > > > > +        eq =3D strchr(featurestr, '=3D');
+> > > > > > > +        if (eq) {
+> > > > > > > +            *eq++ =3D 0;
+> > > > > > > +            val =3D eq;
+> > > > > > > +        } else {
+> > > > > > > +            val =3D "on";
+> > > > > > > +        }
+> > > > > > > +
+> > > > > > > +        feat2prop(featurestr);
+> > > > > > > +        name =3D featurestr;
+> > > > > > > +
+> > > > > > > +        if (g_list_find_custom(plus_features, name, compare_=
+string)) {
+> > > > > > > +            warn_report("Ambiguous CPU model string. "
+> > > > > > > +                        "Don't mix both \"+%s\" and \"%s=3D%=
+s\"",
+> > > > > > > +                        name, name, val);
+> > > > > > > +            ambiguous =3D true;
+> > > > > > > +        }
+> > > > > > > +        if (g_list_find_custom(minus_features, name, compare=
+_string)) {
+> > > > > > > +            warn_report("Ambiguous CPU model string. "
+> > > > > > > +                        "Don't mix both \"-%s\" and \"%s=3D%=
+s\"",
+> > > > > > > +                        name, name, val);
+> > > > > > > +            ambiguous =3D true;
+> > > > > > > +        }
+> > > > > > > +
+> > > > > > > +        /* Special case: */
+> > > > > > > +        if (!strcmp(name, "tsc-freq")) {
+> > > > > > > +            int ret;
+> > > > > > > +            uint64_t tsc_freq;
+> > > > > > > +
+> > > > > > > +            ret =3D qemu_strtosz_metric(val, NULL, &tsc_freq=
+);
+> > > > > > > +            if (ret < 0 || tsc_freq > INT64_MAX) {
+> > > > > > > +                error_setg(errp, "bad numerical value %s", v=
+al);
+> > > > > > > +                return;
+> > > > > > > +            }
+> > > > > > > +            snprintf(num, sizeof(num), "%" PRId64, tsc_freq);
+> > > > > > > +            val =3D num;
+> > > > > > > +            name =3D "tsc-frequency";
+> > > > > > > +        }     =20
+> > > > > >=20
+> > > > > > This is x86-specific and should stay in x86-specific code.  It
+> > > > > > can probably be handled by the tsc-freq setter.   =20
+> > > > > there was reason why it wasn't moved to tsc-frequency setter,
+> > > > > the former is pure integer type of property,
+> > > > > while here we can get suffixed string that scales by 1000.
+> > > > >=20
+> > > > > Short of creating new visitor for KHz (I don't really looking for=
+ward to it),
+> > > > > it's simpler to leave fixup alone in legacy parser that's shared =
+only between
+> > > > > x86/sparc as it doesn't conflict with sparc and won't break anyth=
+ing.   =20
+> > > >=20
+> > > > It doesn't break anything, but it will move x86-specific cruft to
+> > > > code that is supposed to be generic.
+> > > >=20
+> > > > Creating a write-only "tsc-freq" property that accepts a string
+> > > > isn't hard to do.   =20
+> > > Nice idea, it might just work.
+> > >    =20
+> > > >=20
+> > > > If you are not willing to do it in this series, you can write a
+> > > > generic parser now (without x86-specific cruft), use it only on
+> > > > sparc, and later we can refactor x86 so it can also use the
+> > > > generic one.   =20
+> > > So far, I'm inclined towards opposing +-feat generalizing and keeping
+> > > canonical form anywhere except of x86/sparc were we have to tolerate =
+it.
+> > >=20
+> > >    =20
+> > > > > > > +
+> > > > > > > +        cpu_add_feat_as_prop(typename, name, val);
+> > > > > > > +    }
+> > > > > > > +
+> > > > > > > +    if (ambiguous) {
+> > > > > > > +        warn_report("Compatibility of ambiguous CPU model "
+> > > > > > > +                    "strings won't be kept on future QEMU ve=
+rsions");
+> > > > > > > +    }     =20
+> > > > > >=20
+> > > > > > As noted in the review of the x86 patch that removes the
+> > > > > > plus_features/minus_features static variables, this obsolete (a=
+nd
+> > > > > > confusing) property ordering misfeature should be removed before
+> > > > > > we make this code generic and reuse it on other architectures. =
+  =20
+> > > > > As it's been replied removing ordering is behavioral change for
+> > > > > both x86 and sparc, which is not related to series.
+> > > > > If you wish, I'll post a patch that will what you suggest
+> > > > > on top of series.   =20
+> > > >=20
+> > > > I would agree if sparc also implemented the weird ordering.  But
+> > > > sparc does not implement it (it doesn't support feat=3D(on|off)
+> > > > yet).  We shouldn't introduce that misfeature in sparc if we're
+> > > > already planning to remove it.   =20
+> > > It didn't have canonic form but it gains this ability with this serie=
+s.
+> > > So we could do better for it by forbidding mixed syntax from starters=
+   =20
+> >=20
+> > We don't need to forbid mixed syntax.  We can simply apply
+> > [+-]feat and feat=3Don|off in the same order they appear in the
+> > command-line.
+> >=20
+> > But:
+> >  =20
+> > > (+1 for copy-past) but we have to keep minus overrides plus semantics,
+> > > so ambiguous check is still there but it would lead to hard error ins=
+tead of
+> > > warning.   =20
+> >=20
+> > I forgot about this additional weird semantics
+> > (minus-override-plus).  :(
+> >=20
+> > I think we must deprecate the minus-override-plus semantics too
+> > and move to command-line-order eventually (on both x86 and
+> > sparc).  But to do that, we need to make the code print a warning
+> > on sparc like we do on x86.
+> >=20
+> > If we don't remove that weird semantics before making sparc
+> > support feat=3Don|off, we will have to worry about the semantics of
+> > "-feat,feat=3Don" on top of that.  I would simply wait for 2
+> > releases and remove minus-override-plus, before implementing
+> > feat=3Don|off on sparc, to avoid creating a new set of problems.
+> > Is support for feat=3Don|off on sparc a must-have for QEMU 2.11? =20
+> Probably it isn't must have (as far as I can tell now) but
+> I won't bet on it.
+>=20
+> Supporting both ways as far as mix is forbidden is fine,
+> so I'd 'introduce' feat=3Don|off (feat=3Don|off behavior is
+> inherited from QOM Boolean property, so we would have
+> to cripple parser intentionally).
+It looks simpler to support only +-feat with feat=3Don|off disabled
+explicitly, so I'll do it this way as you've suggested.
 
-> ---
-> CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> CC: Artyom Tarasenko <atar4qemu@gmail.com>
-> CC: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->   target/sparc/cpu.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 66 insertions(+)
-> 
-> diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-> index f4e7343..e735d73 100644
-> --- a/target/sparc/cpu.c
-> +++ b/target/sparc/cpu.c
-> @@ -22,6 +22,8 @@
->   #include "cpu.h"
->   #include "qemu/error-report.h"
->   #include "exec/exec-all.h"
-> +#include "hw/qdev-properties.h"
-> +#include "qapi/visitor.h"
->   
->   //#define DEBUG_FEATURES
->   
-> @@ -853,6 +855,69 @@ static void sparc_cpu_initfn(Object *obj)
->       }
->   }
->   
-> +static void sparc_get_nwindows(Object *obj, Visitor *v, const char *name,
-> +                               void *opaque, Error **errp)
-> +{
-> +    SPARCCPU *cpu = SPARC_CPU(obj);
-> +    int64_t value = cpu->env.def.nwindows;
-> +
-> +    visit_type_int(v, name, &value, errp);
-> +}
-> +
-> +static void sparc_set_nwindows(Object *obj, Visitor *v, const char *name,
-> +                               void *opaque, Error **errp)
-> +{
-> +    const int64_t min = MIN_NWINDOWS;
-> +    const int64_t max = MAX_NWINDOWS;
-> +    SPARCCPU *cpu = SPARC_CPU(obj);
-> +    Error *err = NULL;
-> +    int64_t value;
-> +
-> +    visit_type_int(v, name, &value, &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +
-> +    if (value < min || value > max) {
-> +        error_setg(errp, "Property %s.%s doesn't take value %" PRId64
-> +                   " (minimum: %" PRId64 ", maximum: %" PRId64 ")",
-> +                   object_get_typename(obj), name ? name : "null",
-> +                   value, min, max);
-> +        return;
-> +    }
-> +    cpu->env.def.nwindows = value;
-> +}
-> +
-> +static PropertyInfo qdev_prop_nwindows = {
-> +    .name  = "int",
-> +    .get   = sparc_get_nwindows,
-> +    .set   = sparc_set_nwindows,
-> +};
-> +
-> +static Property sparc_cpu_properties[] = {
-> +    DEFINE_PROP_BIT("float",    SPARCCPU, env.def.features, 0, false),
-> +    DEFINE_PROP_BIT("float128", SPARCCPU, env.def.features, 1, false),
-> +    DEFINE_PROP_BIT("swap",     SPARCCPU, env.def.features, 2, false),
-> +    DEFINE_PROP_BIT("mul",      SPARCCPU, env.def.features, 3, false),
-> +    DEFINE_PROP_BIT("div",      SPARCCPU, env.def.features, 4, false),
-> +    DEFINE_PROP_BIT("flush",    SPARCCPU, env.def.features, 5, false),
-> +    DEFINE_PROP_BIT("fsqrt",    SPARCCPU, env.def.features, 6, false),
-> +    DEFINE_PROP_BIT("fmul",     SPARCCPU, env.def.features, 7, false),
-> +    DEFINE_PROP_BIT("vis1",     SPARCCPU, env.def.features, 8, false),
-> +    DEFINE_PROP_BIT("vis2",     SPARCCPU, env.def.features, 9, false),
-> +    DEFINE_PROP_BIT("fsmuld",   SPARCCPU, env.def.features, 10, false),
-> +    DEFINE_PROP_BIT("hypv",     SPARCCPU, env.def.features, 11, false),
-> +    DEFINE_PROP_BIT("cmt",      SPARCCPU, env.def.features, 12, false),
-> +    DEFINE_PROP_BIT("gl",       SPARCCPU, env.def.features, 13, false),
-> +    DEFINE_PROP_UNSIGNED("iu-version", SPARCCPU, env.def.iu_version, 0,
-> +                         qdev_prop_uint64, target_ulong),
-> +    DEFINE_PROP_UINT32("fpu-version", SPARCCPU, env.def.fpu_version, 0),
-> +    DEFINE_PROP_UINT32("mmu-version", SPARCCPU, env.def.mmu_version, 0),
-> +    { .name  = "nwindows", .info  = &qdev_prop_nwindows },
-> +    DEFINE_PROP_END_OF_LIST()
-> +};
-> +
->   static void sparc_cpu_class_init(ObjectClass *oc, void *data)
->   {
->       SPARCCPUClass *scc = SPARC_CPU_CLASS(oc);
-> @@ -861,6 +926,7 @@ static void sparc_cpu_class_init(ObjectClass *oc, void *data)
->   
->       scc->parent_realize = dc->realize;
->       dc->realize = sparc_cpu_realizefn;
-> +    dc->props = sparc_cpu_properties;
->   
->       scc->parent_reset = cc->reset;
->       cc->reset = sparc_cpu_reset;
-> 
+PS:
+found 1 more bug in cpu_generic_init() while testing this,
+so +1 patch to fix it
+
+> Later we can drop minus-override-plus or whatever else,
+> but outside of this series pls.
+>=20
