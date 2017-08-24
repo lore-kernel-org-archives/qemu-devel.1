@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42714)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dks9i-0003xX-VU
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:26:44 -0400
+	id 1dksAd-0004iC-GL
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:27:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dks9e-0004Dw-Ri
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:26:42 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34268)
+	id 1dksAZ-0004pp-Dx
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:27:39 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:35334)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dks9e-0004Dm-MB
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:26:38 -0400
-Received: by mail-qt0-x242.google.com with SMTP id f63so2117522qtb.1
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 06:26:38 -0700 (PDT)
+	id 1dksAZ-0004pc-8i
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:27:35 -0400
+Received: by mail-qk0-x243.google.com with SMTP id l68so2201883qke.2
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 06:27:35 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1503050939-227939-1-git-send-email-imammedo@redhat.com>
-	<1503050939-227939-20-git-send-email-imammedo@redhat.com>
+	<1503050939-227939-8-git-send-email-imammedo@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6e12a12f-244b-c5e5-adfe-897c526596ba@amsat.org>
-Date: Thu, 24 Aug 2017 10:26:35 -0300
+Message-ID: <3c8037d7-4a74-627c-5729-f8289ce35ec6@amsat.org>
+Date: Thu, 24 Aug 2017 10:27:31 -0300
 MIME-Version: 1.0
-In-Reply-To: <1503050939-227939-20-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1503050939-227939-8-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-2.11 19/27] arm: replace cpu_arm_init()
- with cpu_generic_init()
+Subject: Re: [Qemu-devel] [PATCH for-2.11 07/27] sparc: replace custom cpu
+ feature parsing with cpu_legacy_parse_featurestr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,134 +37,272 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Laurent Vivier <laurent@vivier.eu>, Artyom Tarasenko <atar4qemu@gmail.com>
 
 On 08/18/2017 07:08 AM, Igor Mammedov wrote:
-> it's just a wrapper, drop it and use cpu_generic_init() directly
+> with features converted to properties we can reuse shared
+> with x86 cpu_legacy_parse_featurestr() for features parsing
+> and drop legacy parser that manipulated CPU directly.
+> 
+> With that in place and sparc_cpu_parse_features() providing
+> generic CPUClass::parse_features callback, the cpu_sparc_init()
+> will do the same job as cpu_generic_init() so replace content
+> of cpu_sparc_init() with it.
 > 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
 
 Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->   target/arm/cpu.h    | 3 +--
->   hw/arm/musicpal.c   | 2 +-
->   hw/arm/omap1.c      | 2 +-
->   hw/arm/omap2.c      | 2 +-
->   hw/arm/pxa2xx.c     | 4 ++--
->   hw/arm/strongarm.c  | 2 +-
->   target/arm/helper.c | 5 -----
->   7 files changed, 7 insertions(+), 13 deletions(-)
+> CC: Riku Voipio <riku.voipio@iki.fi>
+> CC: Laurent Vivier <laurent@vivier.eu>
+> CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> CC: Artyom Tarasenko <atar4qemu@gmail.com>
 > 
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index b39d64a..5932ef1 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -748,7 +748,6 @@ int aarch64_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
->   int aarch64_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+> v2:
+>    * use new cpu_legacy_parse_featurestr() without
+>      plus_features/minus_features
+>    * drop cpu_legacy_apply_features() as it's been removed in
+>      previuos patch and new cpu_legacy_parse_featurestr()
+>      does its job
+> ---
+>   default-configs/sparc-bsd-user.mak         |   1 +
+>   default-configs/sparc-linux-user.mak       |   1 +
+>   default-configs/sparc-softmmu.mak          |   1 +
+>   default-configs/sparc32plus-linux-user.mak |   1 +
+>   default-configs/sparc64-bsd-user.mak       |   1 +
+>   default-configs/sparc64-linux-user.mak     |   1 +
+>   default-configs/sparc64-softmmu.mak        |   1 +
+>   target/sparc/cpu.c                         | 146 +----------------------------
+>   8 files changed, 12 insertions(+), 141 deletions(-)
+> 
+> diff --git a/default-configs/sparc-bsd-user.mak b/default-configs/sparc-bsd-user.mak
+> index 21e0950..caea9ea 100644
+> --- a/default-configs/sparc-bsd-user.mak
+> +++ b/default-configs/sparc-bsd-user.mak
+> @@ -1 +1,2 @@
+>   # Default configuration for sparc-bsd-user
+> +CONFIG_LEGACY_CPU_FEATURES=y
+> diff --git a/default-configs/sparc-linux-user.mak b/default-configs/sparc-linux-user.mak
+> index 9c716d1..0f23504 100644
+> --- a/default-configs/sparc-linux-user.mak
+> +++ b/default-configs/sparc-linux-user.mak
+> @@ -1 +1,2 @@
+>   # Default configuration for sparc-linux-user
+> +CONFIG_LEGACY_CPU_FEATURES=y
+> diff --git a/default-configs/sparc-softmmu.mak b/default-configs/sparc-softmmu.mak
+> index 004b0f4..d8fa9fd 100644
+> --- a/default-configs/sparc-softmmu.mak
+> +++ b/default-configs/sparc-softmmu.mak
+> @@ -18,3 +18,4 @@ CONFIG_GRLIB=y
+>   CONFIG_STP2000=y
+>   CONFIG_ECCMEMCTL=y
+>   CONFIG_SUN4M=y
+> +CONFIG_LEGACY_CPU_FEATURES=y
+> diff --git a/default-configs/sparc32plus-linux-user.mak b/default-configs/sparc32plus-linux-user.mak
+> index 432e880..e3cc16b 100644
+> --- a/default-configs/sparc32plus-linux-user.mak
+> +++ b/default-configs/sparc32plus-linux-user.mak
+> @@ -1 +1,2 @@
+>   # Default configuration for sparc32plus-linux-user
+> +CONFIG_LEGACY_CPU_FEATURES=y
+> diff --git a/default-configs/sparc64-bsd-user.mak b/default-configs/sparc64-bsd-user.mak
+> index b8b9eea..25bfa1f 100644
+> --- a/default-configs/sparc64-bsd-user.mak
+> +++ b/default-configs/sparc64-bsd-user.mak
+> @@ -1 +1,2 @@
+>   # Default configuration for sparc64-bsd-user
+> +CONFIG_LEGACY_CPU_FEATURES=y
+> diff --git a/default-configs/sparc64-linux-user.mak b/default-configs/sparc64-linux-user.mak
+> index bf1bdd6..7c8a9f0 100644
+> --- a/default-configs/sparc64-linux-user.mak
+> +++ b/default-configs/sparc64-linux-user.mak
+> @@ -1 +1,2 @@
+>   # Default configuration for sparc64-linux-user
+> +CONFIG_LEGACY_CPU_FEATURES=y
+> diff --git a/default-configs/sparc64-softmmu.mak b/default-configs/sparc64-softmmu.mak
+> index d07876a..658546a 100644
+> --- a/default-configs/sparc64-softmmu.mak
+> +++ b/default-configs/sparc64-softmmu.mak
+> @@ -16,3 +16,4 @@ CONFIG_MC146818RTC=y
+>   CONFIG_ISA_TESTDEV=y
+>   CONFIG_EMPTY_SLOT=y
+>   CONFIG_SUN4V_RTC=y
+> +CONFIG_LEGACY_CPU_FEATURES=y
+> diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+> index 7f74b1c..fd01cbf 100644
+> --- a/target/sparc/cpu.c
+> +++ b/target/sparc/cpu.c
+> @@ -104,51 +104,15 @@ static void cpu_sparc_disas_set_info(CPUState *cpu, disassemble_info *info)
 >   #endif
->   
-> -ARMCPU *cpu_arm_init(const char *cpu_model);
->   target_ulong do_arm_semihosting(CPUARMState *env);
->   void aarch64_sync_32_to_64(CPUARMState *env);
->   void aarch64_sync_64_to_32(CPUARMState *env);
-> @@ -2001,7 +2000,7 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
->       return unmasked || pstate_unmasked;
 >   }
 >   
-> -#define cpu_init(cpu_model) CPU(cpu_arm_init(cpu_model))
-> +#define cpu_init(cpu_model) cpu_generic_init(TYPE_ARM_CPU, cpu_model)
+> -static void sparc_cpu_parse_features(CPUState *cs, char *features,
+> -                                     Error **errp);
+> -
+> -static int cpu_sparc_register(SPARCCPU *cpu, const char *cpu_model)
+> +static void sparc_cpu_parse_features(const char *typename, char *features,
+> +                                     Error **errp)
+>   {
+> -    char *s = g_strdup(cpu_model);
+> -    char *featurestr = strtok(s, ",");
+> -    Error *err = NULL;
+> -
+> -    featurestr = strtok(NULL, ",");
+> -    sparc_cpu_parse_features(CPU(cpu), featurestr, &err);
+> -    g_free(s);
+> -    if (err) {
+> -        error_report_err(err);
+> -        return -1;
+> -    }
+> -
+> -    return 0;
+> +    cpu_legacy_parse_featurestr(typename, features, errp);
+>   }
 >   
->   #define cpu_signal_handler cpu_arm_signal_handler
->   #define cpu_list arm_cpu_list
-> diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
-> index 7e8ab31..a8b3d46 100644
-> --- a/hw/arm/musicpal.c
-> +++ b/hw/arm/musicpal.c
-> @@ -1593,7 +1593,7 @@ static void musicpal_init(MachineState *machine)
->       if (!cpu_model) {
->           cpu_model = "arm926";
->       }
-> -    cpu = cpu_arm_init(cpu_model);
-> +    cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, cpu_model));
->       if (!cpu) {
->           fprintf(stderr, "Unable to find CPU definition\n");
->           exit(1);
-> diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
-> index 3d15ff6..400ba30 100644
-> --- a/hw/arm/omap1.c
-> +++ b/hw/arm/omap1.c
-> @@ -3863,7 +3863,7 @@ struct omap_mpu_state_s *omap310_mpu_init(MemoryRegion *system_memory,
+>   SPARCCPU *cpu_sparc_init(const char *cpu_model)
+>   {
+> -    SPARCCPU *cpu;
+> -    ObjectClass *oc;
+> -    char *str, *name;
+> -
+> -    str = g_strdup(cpu_model);
+> -    name = strtok(str, ",");
+> -    oc = cpu_class_by_name(TYPE_SPARC_CPU, name);
+> -    if (oc == NULL) {
+> -        g_free(str);
+> -        return NULL;
+> -    }
+> -    g_free(str);
+> -
+> -    cpu = SPARC_CPU(object_new(object_class_get_name(oc)));
+> -
+> -    if (cpu_sparc_register(cpu, cpu_model) < 0) {
+> -        object_unref(OBJECT(cpu));
+> -        return NULL;
+> -    }
+> -
+> -    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
+> -
+> -    return cpu;
+> +    return SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+>   }
 >   
->       /* Core */
->       s->mpu_model = omap310;
-> -    s->cpu = cpu_arm_init(core);
-> +    s->cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, core));
->       if (s->cpu == NULL) {
->           fprintf(stderr, "Unable to find CPU definition\n");
->           exit(1);
-> diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
-> index bbf0b7e..ece25ae 100644
-> --- a/hw/arm/omap2.c
-> +++ b/hw/arm/omap2.c
-> @@ -2261,7 +2261,7 @@ struct omap_mpu_state_s *omap2420_mpu_init(MemoryRegion *sysmem,
->   
->       /* Core */
->       s->mpu_model = omap2420;
-> -    s->cpu = cpu_arm_init(core ?: "arm1136-r2");
-> +    s->cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, core ?: "arm1136-r2"));
->       if (s->cpu == NULL) {
->           fprintf(stderr, "Unable to find CPU definition\n");
->           exit(1);
-> diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
-> index 194b0bc..b0ac3cf 100644
-> --- a/hw/arm/pxa2xx.c
-> +++ b/hw/arm/pxa2xx.c
-> @@ -2066,7 +2066,7 @@ PXA2xxState *pxa270_init(MemoryRegion *address_space,
->       if (!revision)
->           revision = "pxa270";
->   
-> -    s->cpu = cpu_arm_init(revision);
-> +    s->cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, revision));
->       if (s->cpu == NULL) {
->           fprintf(stderr, "Unable to find CPU definition\n");
->           exit(1);
-> @@ -2196,7 +2196,7 @@ PXA2xxState *pxa255_init(MemoryRegion *address_space, unsigned int sdram_size)
->   
->       s = g_new0(PXA2xxState, 1);
->   
-> -    s->cpu = cpu_arm_init("pxa255");
-> +    s->cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, "pxa255"));
->       if (s->cpu == NULL) {
->           fprintf(stderr, "Unable to find CPU definition\n");
->           exit(1);
-> diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
-> index 6a45dcc..884242b 100644
-> --- a/hw/arm/strongarm.c
-> +++ b/hw/arm/strongarm.c
-> @@ -1597,7 +1597,7 @@ StrongARMState *sa1110_init(MemoryRegion *sysmem,
->           exit(1);
->       }
->   
-> -    s->cpu = cpu_arm_init(rev);
-> +    s->cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, rev));
->   
->       if (!s->cpu) {
->           error_report("Unable to find CPU definition");
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index fa60040..0ec92d3 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -5233,11 +5233,6 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+>   void cpu_sparc_set_id(CPUSPARCState *env, unsigned int cpu)
+> @@ -529,107 +493,6 @@ static void print_features(FILE *f, fprintf_function cpu_fprintf,
 >       }
 >   }
 >   
-> -ARMCPU *cpu_arm_init(const char *cpu_model)
+> -static void add_flagname_to_bitmaps(const char *flagname, uint32_t *features)
 > -{
-> -    return ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, cpu_model));
+> -    unsigned int i;
+> -
+> -    for (i = 0; i < ARRAY_SIZE(feature_name); i++) {
+> -        if (feature_name[i] && !strcmp(flagname, feature_name[i])) {
+> -            *features |= 1 << i;
+> -            return;
+> -        }
+> -    }
+> -    error_report("CPU feature %s not found", flagname);
 > -}
 > -
->   void arm_cpu_register_gdb_regs_for_features(ARMCPU *cpu)
+> -static void sparc_cpu_parse_features(CPUState *cs, char *features,
+> -                                     Error **errp)
+> -{
+> -    SPARCCPU *cpu = SPARC_CPU(cs);
+> -    sparc_def_t *cpu_def = &cpu->env.def;
+> -    char *featurestr;
+> -    uint32_t plus_features = 0;
+> -    uint32_t minus_features = 0;
+> -    uint64_t iu_version;
+> -    uint32_t fpu_version, mmu_version, nwindows;
+> -
+> -    featurestr = features ? strtok(features, ",") : NULL;
+> -    while (featurestr) {
+> -        char *val;
+> -
+> -        if (featurestr[0] == '+') {
+> -            add_flagname_to_bitmaps(featurestr + 1, &plus_features);
+> -        } else if (featurestr[0] == '-') {
+> -            add_flagname_to_bitmaps(featurestr + 1, &minus_features);
+> -        } else if ((val = strchr(featurestr, '='))) {
+> -            *val = 0; val++;
+> -            if (!strcmp(featurestr, "iu_version")) {
+> -                char *err;
+> -
+> -                iu_version = strtoll(val, &err, 0);
+> -                if (!*val || *err) {
+> -                    error_setg(errp, "bad numerical value %s", val);
+> -                    return;
+> -                }
+> -                cpu_def->iu_version = iu_version;
+> -#ifdef DEBUG_FEATURES
+> -                fprintf(stderr, "iu_version %" PRIx64 "\n", iu_version);
+> -#endif
+> -            } else if (!strcmp(featurestr, "fpu_version")) {
+> -                char *err;
+> -
+> -                fpu_version = strtol(val, &err, 0);
+> -                if (!*val || *err) {
+> -                    error_setg(errp, "bad numerical value %s", val);
+> -                    return;
+> -                }
+> -                cpu_def->fpu_version = fpu_version;
+> -#ifdef DEBUG_FEATURES
+> -                fprintf(stderr, "fpu_version %x\n", fpu_version);
+> -#endif
+> -            } else if (!strcmp(featurestr, "mmu_version")) {
+> -                char *err;
+> -
+> -                mmu_version = strtol(val, &err, 0);
+> -                if (!*val || *err) {
+> -                    error_setg(errp, "bad numerical value %s", val);
+> -                    return;
+> -                }
+> -                cpu_def->mmu_version = mmu_version;
+> -#ifdef DEBUG_FEATURES
+> -                fprintf(stderr, "mmu_version %x\n", mmu_version);
+> -#endif
+> -            } else if (!strcmp(featurestr, "nwindows")) {
+> -                char *err;
+> -
+> -                nwindows = strtol(val, &err, 0);
+> -                if (!*val || *err || nwindows > MAX_NWINDOWS ||
+> -                    nwindows < MIN_NWINDOWS) {
+> -                    error_setg(errp, "bad numerical value %s", val);
+> -                    return;
+> -                }
+> -                cpu_def->nwindows = nwindows;
+> -#ifdef DEBUG_FEATURES
+> -                fprintf(stderr, "nwindows %d\n", nwindows);
+> -#endif
+> -            } else {
+> -                error_setg(errp, "unrecognized feature %s", featurestr);
+> -                return;
+> -            }
+> -        } else {
+> -            error_setg(errp, "feature string `%s' not in format "
+> -                             "(+feature|-feature|feature=xyz)", featurestr);
+> -            return;
+> -        }
+> -        featurestr = strtok(NULL, ",");
+> -    }
+> -    cpu_def->features |= plus_features;
+> -    cpu_def->features &= ~minus_features;
+> -#ifdef DEBUG_FEATURES
+> -    print_features(stderr, fprintf, cpu_def->features, NULL);
+> -#endif
+> -}
+> -
+>   void sparc_cpu_list(FILE *f, fprintf_function cpu_fprintf)
 >   {
->       CPUState *cs = CPU(cpu);
+>       unsigned int i;
+> @@ -932,6 +795,7 @@ static void sparc_cpu_class_init(ObjectClass *oc, void *data)
+>       cc->reset = sparc_cpu_reset;
+>   
+>       cc->class_by_name = sparc_cpu_class_by_name;
+> +    cc->parse_features = sparc_cpu_parse_features;
+>       cc->has_work = sparc_cpu_has_work;
+>       cc->do_interrupt = sparc_cpu_do_interrupt;
+>       cc->cpu_exec_interrupt = sparc_cpu_exec_interrupt;
 > 
