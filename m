@@ -1,21 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dkwuW-0006Ce-9r
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 14:31:21 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dkwwi-0007dK-8b
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 14:33:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dkwuQ-0001JZ-FT
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 14:31:20 -0400
-Date: Thu, 24 Aug 2017 19:31:10 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170824183110.GB4368@stefanha-x1.localdomain>
-References: <20170822101535.4695-1-el13635@mail.ntua.gr>
-	<20170822101535.4695-5-el13635@mail.ntua.gr>
+	(envelope-from <borntraeger@de.ibm.com>) id 1dkwwe-0002hP-Ai
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 14:33:36 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44687)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dkwwe-0002h1-22
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 14:33:32 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7OIX8uA129482
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 14:33:30 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cj3n71qf2-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 14:33:29 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 24 Aug 2017 19:33:27 +0100
+References: <e2a1b182-83a9-2259-27f9-68b61b5061d5@linux.vnet.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 24 Aug 2017 20:33:24 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170822101535.4695-5-el13635@mail.ntua.gr>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v7 4/6] block: convert
- ThrottleGroup to object with QOM
+In-Reply-To: <e2a1b182-83a9-2259-27f9-68b61b5061d5@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <02fd1cdd-f900-1bea-9ef9-51257e981c1e@de.ibm.com>
+Subject: Re: [Qemu-devel] S390 bios breaks in qemu 2.10.rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,99 +41,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
+To: Farhan Ali <alifm@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-On Tue, Aug 22, 2017 at 01:15:33PM +0300, Manos Pitsidianakis wrote:
->  /* Increments the reference count of a ThrottleGroup given its name.
->   *
->   * If no ThrottleGroup is found with the given name a new one is
->   * created.
->   *
-> + * This function edits throttle_groups and must be called under the global
-> + * mutex.
-> + *
->   * @name: the name of the ThrottleGroup
->   * @ret:  the ThrottleState member of the ThrottleGroup
->   */
->  ThrottleState *throttle_group_incref(const char *name)
->  {
->      ThrottleGroup *tg = NULL;
-> -    ThrottleGroup *iter;
-> -
-> -    qemu_mutex_lock(&throttle_groups_lock);
->  
->      /* Look for an existing group with that name */
-> -    QTAILQ_FOREACH(iter, &throttle_groups, list) {
-> -        if (!strcmp(name, iter->name)) {
-> -            tg = iter;
-> -            break;
-> -        }
-> -    }
-> +    tg = throttle_group_by_name(name);
->  
-> -    /* Create a new one if not found */
-> -    if (!tg) {
-> -        tg = g_new0(ThrottleGroup, 1);
-> +    if (tg) {
-> +        object_ref(OBJECT(tg));
-> +    } else {
-> +        /* Create a new one if not found */
-> +        /* new ThrottleGroup obj will have a refcnt = 1 */
-> +        tg = THROTTLE_GROUP(object_new(TYPE_THROTTLE_GROUP));
->          tg->name = g_strdup(name);
-> -        tg->clock_type = QEMU_CLOCK_REALTIME;
-> -
-> -        if (qtest_enabled()) {
-> -            /* For testing block IO throttling only */
-> -            tg->clock_type = QEMU_CLOCK_VIRTUAL;
-> -        }
-> -        qemu_mutex_init(&tg->lock);
-> -        throttle_init(&tg->ts);
-> -        QLIST_INIT(&tg->head);
-> -
-> -        QTAILQ_INSERT_TAIL(&throttle_groups, tg, list);
+Just to understand the urgency. Is the problem happening with the BIOS that is shipped in the
+upstream git tree, or a self-built one?
 
-This is where the ThrottleGroup needs to be added to the QOM tree:
 
-    object_property_add_child(object_get_objects_root(),
-                              id, obj, &local_err);
-
-> +        throttle_group_obj_complete((UserCreatable *)tg, &error_abort);
-
-This cast is risky - if UserCreatable ever adds fields it can break.
-Please use a QOM cast: USER_CREATABLE(tg).  It uses the type information
-and finds the interface.
-
-> +static ThrottleParamInfo properties[] = {
-
-This array can be const.
-
-> +{
-
-Missing indentation.  Seems unusual but I guess you're trying to avoid
-reaching 80 chars?  If checkpatch.pl doesn't complain then you can get
-away with it but normal indentation would be best.
-
-> +    switch (info->category) {
-> +    case AVG:
-> +        cfg.buckets[info->type].avg = value;
-> +        break;
-> +    case MAX:
-> +        cfg.buckets[info->type].max = value;
-> +        break;
-> +    case BURST_LENGTH:
-> +        if (value > UINT_MAX) {
-> +            error_setg(&local_err, "%s value must be in the"
-> +                    "range [0, %u]", info->name, UINT_MAX);
-> +            goto ret;
-> +        }
-> +        cfg.buckets[info->type].burst_length = value;
-> +        break;
-> +    case IOPS_SIZE:
-> +        cfg.op_size = value;
-> +    }
-
-Please use break statements even for the last case.  If another case is
-added later it might accidentally fall through without a break
-statement.
+On 08/24/2017 05:05 PM, Farhan Ali wrote:
+> Hi,
+> 
+> There is an issue in QEMU bios which is exposed by commit
+> 
+> commit 198c0d1f9df8c429502cb744fc26b6ba6e71db74
+> Author: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Date:   Thu Jul 27 17:48:42 2017 +0200
+> 
+>     s390x/css: check ccw address validity
+> 
+>     According to the PoP channel command words (CCW) must be doubleword
+>     aligned and 31 bit addressable for format 1 and 24 bit addressable for
+>     format 0 CCWs.
+> 
+>     If the channel subsystem encounters a ccw address which does not satisfy
+>     this alignment requirement a program-check condition is recognised.
+> 
+>     The situation with 31 bit addressable is a bit more complicated: both the
+>     ORB and a format 1 CCW TIC hold the address of (the rest of) the channel
+>     program, that is the address of the next CCW in a word, and the PoP
+>     mandates that bit 0 of that word shall be zero -- or a program-check
+>     condition is to be recognized -- and does not belong to the field holding
+>     the ccw address.
+> 
+>     Since in code the corresponding fields span across the whole word (unlike
+>     in PoP where these are defined as 31 bit wide) we can check this by
+>     applying a mask. The 24 addressable case isn't affecting TIC because the
+>     address is composed of a halfword and a byte portion (no additional zero
+>     bit requirements) and just slightly complicates the ORB case where also
+>     bits 1-7 need to be zero.
+> 
+>     The same requirements (especially n-bit addressability) apply to the
+>     ccw addresses generated while chaining.
+> 
+>     Let's make our CSS implementation follow the AR more closely.
+> 
+>     Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>     Message-Id: <20170727154842.23427-1-pasic@linux.vnet.ibm.com>
+>     Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+>     Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> 
+> 
+> It looks like the bios does not create a double word aligned CCW. Looking at the bios code we the CCW1 struct is not aligned
+> 
+> /* channel command word (type 1) */
+> struct ccw1 {
+>     __u8 cmd_code;
+>     __u8 flags;
+>     __u16 count;
+>     __u32 cda;
+> } __attribute__ ((packed));
+> 
+> and it looks like the compiler does not guarantee a doubleword alignment.
+> 
+> The weird thing about it is I see it break in one of my system and works fine in another system. Trying a simple fix of aligning the struct also doesn't seem to work all the time.
+> 
+> 
+> Thanks
+> Farhan
+> 
