@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <JBeulich@suse.com>) id 1dkp9H-0006ao-4u
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:14:03 -0400
+	(envelope-from <bounces@canonical.com>) id 1dkpB4-0007Rg-70
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:15:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <JBeulich@suse.com>) id 1dkp9E-0004jl-0P
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:14:03 -0400
-Received: from prv-mh.provo.novell.com ([137.65.248.74]:48447)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <JBeulich@suse.com>) id 1dkp9D-0004jd-NS
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:13:59 -0400
-Message-Id: <599EC30602000078001731A4@prv-mh.provo.novell.com>
-Date: Thu, 24 Aug 2017 04:13:58 -0600
-From: "Jan Beulich" <JBeulich@suse.com>
-References: <20170824094753.77795-1-roger.pau@citrix.com>
-	<20170824094753.77795-3-roger.pau@citrix.com>
-	<599EBE6D020000780017310E@prv-mh.provo.novell.com>
-	<20170824100653.mqilcui6mmcqy7io@dhcp-3-128.uk.xensource.com>
-In-Reply-To: <20170824100653.mqilcui6mmcqy7io@dhcp-3-128.uk.xensource.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	(envelope-from <bounces@canonical.com>) id 1dkpB1-0005HR-1C
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:15:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47710)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dkpB0-0005Er-82
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:15:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dkpAx-0008Mt-Fk
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 10:15:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4ACB02E80DE
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 10:15:46 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Subject: Re: [Qemu-devel] [PATCH QEMU] xen/pt: allow QEMU to request MSI
- unmasking at bind time
+Date: Thu, 24 Aug 2017 10:08:39 -0000
+From: Huang Yong <1712027@bugs.launchpad.net>
+Reply-To: Bug 1712027 <1712027@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150330672268.8725.17665790368733773133.malonedeb@soybean.canonical.com>
+Message-Id: <150356931972.16996.17110854192778739978.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1712027] Re: qemu: Cryptography adding encrypted
+ disk with luks format failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +37,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roger Pau Monne <roger.pau@citrix.com>
-Cc: Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, hfp@posteo.de
+To: qemu-devel@nongnu.org
 
->>> On 24.08.17 at 12:06, <roger.pau@citrix.com> wrote:
-> On Thu, Aug 24, 2017 at 03:54:21AM -0600, Jan Beulich wrote:
->> >>> On 24.08.17 at 11:47, <roger.pau@citrix.com> wrote:
->> > @@ -274,7 +278,7 @@ int xen_pt_msi_update(XenPCIPassthroughState *s)
->> >  {
->> >      XenPTMSI *msi =3D s->msi;
->> >      return msi_msix_update(s, msi_addr64(msi), msi->data, msi->pirq,
->> > -                           false, 0, &msi->pirq);
->> > +                           false, 0, &msi->pirq, false);
->> >  }
->>=20
->> I don't think this is correct when the device has mask bits.
->=20
-> Right, I thought I modified this. I've already changed
-> pt_irq_create_bind so that the original behavior is keep if the unmask
-> bit is not set. In this case this should be 'true' in order to keep
-> the previous behavior, which was correct for MSI.
+If the alg is GCRY_CIPHER_AES256 and length of data to be encrypted is
+multiple of 16 (16/32/48...),the length of encryted data is equal to the
+raw data. There is no padding and the bug is triggerd.
 
-Wouldn't you want to pass the state of the mask bit here,
-rather than uniformly hard coding true or false?
+-- =
 
-> It also makes me wonder whether it would be better to change the name
-> of the parameter to "unmask", so that false -> no change to mask, true
-> -> unconditionally unmask.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1712027
 
-I don't care much about this aspect, but perhaps the qemu
-maintainers do.
+Title:
+  qemu: Cryptography adding encrypted disk with luks format failed
 
-Jan
+Status in QEMU:
+  New
+
+Bug description:
+  I'm using libvirt to attach luks encrypted disk to a running VM. The
+  qemu-monitor-command like the
+
+  following:
+
+  {"execute":"object-add","arguments":{"qom-type":"secret","id":"virtio-
+  disk11-luks-
+  secret0","props":{"data":"El7jOYLCZwrij2Mue0q2tA=3D=3D","keyid":"masterKe=
+y0","iv":"J2je0WJjCa89L3iKc1lceg=3D=3D","format":"base64"}}
+
+  the masterKey0 specify the secret which has been created before.
+
+  command above return with error message "Incorrect number of padding
+  bytes XXX found on decrypted
+
+  data". This is triggered by the following code snippets in qemu/crypto/se=
+cret.c:
+           =
+
+  if (plaintext[ciphertextlen - 1] > 16 ||
+               plaintext[ciphertextlen - 1] > ciphertextlen) {
+               error_setg(errp, "Incorrect number of padding bytes (%d) "
+                       "found on decrypted data",
+                       (int)plaintext[ciphertextlen - 1]); =
+
+                     =E2=80=A6
+           }
+
+  The bug is: There is on padding in plaintext if the actual length of
+  the plaintext  decrypted is
+
+  equal to ciphertext.
+
+  In this case, the last element in plaintext array may be one of the
+  character in base64 code table
+
+  or other.
+
+  I would like to know why length of padding bytes cannot exceed 16 and
+  whether i can remove
+
+  judement: =E2=80=9Cplaintext[ciphertextlen - 1] > 16=E2=80=9D so that I c=
+an eliminate
+  the error above.
+
+  Much appreciate it if doubts above is cleared up.
+
+  libvirt/qemu version:
+
+  # virsh version
+  Compiled against library: libvirt 3.0.0
+  Using library: libvirt 3.0.0
+  Using API: QEMU 3.0.0
+  Running hypervisor: QEMU 2.7.1
+
+  OS: Ubuntu 12.04 LTS
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1712027/+subscriptions
