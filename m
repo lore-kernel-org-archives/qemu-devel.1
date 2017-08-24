@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkxaB-0006WY-BB
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:14:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1dkxaE-0006Yq-E7
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:14:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkxa6-0004DM-71
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:14:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41628)
+	(envelope-from <armbru@redhat.com>) id 1dkxa6-0004DU-AM
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:14:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:4995)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dkxa5-0004Bd-MO
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dkxa5-0004Bc-Mh
 	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:14:18 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B61227F7B9
+	by mx1.redhat.com (Postfix) with ESMTPS id B3FE87E44A
 	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 19:14:16 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 24 Aug 2017 21:13:58 +0200
-Message-Id: <1503602048-12268-7-git-send-email-armbru@redhat.com>
+Date: Thu, 24 Aug 2017 21:14:00 +0200
+Message-Id: <1503602048-12268-9-git-send-email-armbru@redhat.com>
 In-Reply-To: <1503602048-12268-1-git-send-email-armbru@redhat.com>
 References: <1503602048-12268-1-git-send-email-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 06/16] qapi-schema: Collect char device
- stuff in qapi/char.json
+Subject: [Qemu-devel] [PATCH v2 08/16] qapi-schema: Collect UI stuff in
+ qapi/ui.json
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,1182 +31,2053 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, eblake@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
+Cc: marcandre.lureau@redhat.com, eblake@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+UI stuff is remote desktop stuff (Spice, VNC) and input stuff (mouse,
+keyboard).
+
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- MAINTAINERS      |   1 +
- Makefile         |   1 +
- qapi-schema.json | 511 +------------------------------------------------=
----
- qapi/char.json   | 538 +++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- qapi/event.json  |  21 ---
- 5 files changed, 541 insertions(+), 531 deletions(-)
- create mode 100644 qapi/char.json
+ MAINTAINERS      |   2 +
+ Makefile         |   3 +-
+ qapi-schema.json | 784 +-------------------------------------------
+ qapi/event.json  | 175 ----------
+ qapi/ui.json     | 977 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 982 insertions(+), 959 deletions(-)
+ create mode 100644 qapi/ui.json
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 289ea8c..6a808d3 100644
+index aecde65..24c5105 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -1253,6 +1253,7 @@ M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.=
-com>
- S: Maintained
- F: chardev/
- F: include/chardev/
-+F: qapi/char.json
-=20
- Character Devices (Braille)
- M: Samuel Thibault <samuel.thibault@ens-lyon.org>
+@@ -1320,12 +1320,14 @@ F: include/ui/spice-display.h
+ F: ui/spice-*.c
+ F: audio/spiceaudio.c
+ F: hw/display/qxl*
++F: qapi/ui.json
+ 
+ Graphics
+ M: Gerd Hoffmann <kraxel@redhat.com>
+ S: Odd Fixes
+ F: ui/
+ F: include/ui/
++F: qapi/ui.json
+ 
+ Cocoa graphics
+ M: Peter Maydell <peter.maydell@linaro.org>
 diff --git a/Makefile b/Makefile
-index d3ba41a..59ef46c 100644
+index 75f3ffe..c7b6fd1 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -410,6 +410,7 @@ $(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/=
-qapi-commands.py $(qapi-py)
-=20
- qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.js=
-on \
-                $(SRC_PATH)/qapi/block.json $(SRC_PATH)/qapi/block-core.j=
-son \
-+               $(SRC_PATH)/qapi/char.json \
-                $(SRC_PATH)/qapi/crypto.json \
-                $(SRC_PATH)/qapi/event.json $(SRC_PATH)/qapi/introspect.j=
-son \
+@@ -417,7 +417,8 @@ qapi-modules = $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.json \
                 $(SRC_PATH)/qapi/rocker.json \
+                $(SRC_PATH)/qapi/run-state.json \
+                $(SRC_PATH)/qapi/sockets.json \
+-               $(SRC_PATH)/qapi/trace.json
++               $(SRC_PATH)/qapi/trace.json \
++               $(SRC_PATH)/qapi/ui.json
+ 
+ qapi-types.c qapi-types.h :\
+ $(qapi-modules) $(SRC_PATH)/scripts/qapi-types.py $(qapi-py)
 diff --git a/qapi-schema.json b/qapi-schema.json
-index f42d61b..4f30d21 100644
+index e9b61eb..6a23f59 100644
 --- a/qapi-schema.json
 +++ b/qapi-schema.json
-@@ -83,6 +83,7 @@
- { 'include': 'qapi/run-state.json' }
- { 'include': 'qapi/crypto.json' }
- { 'include': 'qapi/block.json' }
-+{ 'include': 'qapi/char.json' }
+@@ -86,6 +86,7 @@
+ { 'include': 'qapi/char.json' }
+ { 'include': 'qapi/net.json' }
  { 'include': 'qapi/rocker.json' }
++{ 'include': 'qapi/ui.json' }
  { 'include': 'qapi/event.json' }
  { 'include': 'qapi/trace.json' }
-@@ -274,189 +275,6 @@
- { 'command': 'query-uuid', 'returns': 'UuidInfo' }
-=20
+ { 'include': 'qapi/introspect.json' }
+@@ -1087,56 +1088,6 @@
+ { 'command': 'x-colo-lost-heartbeat' }
+ 
  ##
--# @ChardevInfo:
+-# @MouseInfo:
 -#
--# Information about a character device.
+-# Information about a mouse device.
 -#
--# @label: the label of the character device
+-# @name: the name of the mouse device
 -#
--# @filename: the filename of the character device
+-# @index: the index of the mouse device
 -#
--# @frontend-open: shows whether the frontend device attached to this bac=
-kend
--#                 (eg. with the chardev=3D... option) is in open or clos=
-ed state
--#                 (since 2.1)
+-# @current: true if this device is currently receiving mouse events
 -#
--# Notes: @filename is encoded using the QEMU command line character devi=
-ce
--#        encoding.  See the QEMU man page for details.
+-# @absolute: true if this device supports absolute coordinates as input
 -#
 -# Since: 0.14.0
 -##
--{ 'struct': 'ChardevInfo', 'data': {'label': 'str',
--                                  'filename': 'str',
--                                  'frontend-open': 'bool'} }
+-{ 'struct': 'MouseInfo',
+-  'data': {'name': 'str', 'index': 'int', 'current': 'bool',
+-           'absolute': 'bool'} }
 -
 -##
--# @query-chardev:
+-# @query-mice:
 -#
--# Returns information about current character devices.
+-# Returns information about each active mouse device
 -#
--# Returns: a list of @ChardevInfo
+-# Returns: a list of @MouseInfo for each device
 -#
 -# Since: 0.14.0
 -#
 -# Example:
 -#
--# -> { "execute": "query-chardev" }
--# <- {
--#       "return": [
+-# -> { "execute": "query-mice" }
+-# <- { "return": [
 -#          {
--#             "label": "charchannel0",
--#             "filename": "unix:/var/lib/libvirt/qemu/seabios.rhel6.agen=
-t,server",
--#             "frontend-open": false
+-#             "name":"QEMU Microsoft Mouse",
+-#             "index":0,
+-#             "current":false,
+-#             "absolute":false
 -#          },
 -#          {
--#             "label": "charmonitor",
--#             "filename": "unix:/var/lib/libvirt/qemu/seabios.rhel6.moni=
-tor,server",
--#             "frontend-open": true
--#          },
--#          {
--#             "label": "charserial0",
--#             "filename": "pty:/dev/pts/2",
--#             "frontend-open": true
+-#             "name":"QEMU PS/2 Mouse",
+-#             "index":1,
+-#             "current":true,
+-#             "absolute":true
 -#          }
 -#       ]
 -#    }
 -#
 -##
--{ 'command': 'query-chardev', 'returns': ['ChardevInfo'] }
+-{ 'command': 'query-mice', 'returns': ['MouseInfo'] }
 -
 -##
--# @ChardevBackendInfo:
--#
--# Information about a character device backend
--#
--# @name: The backend name
--#
--# Since: 2.0
--##
--{ 'struct': 'ChardevBackendInfo', 'data': {'name': 'str'} }
--
--##
--# @query-chardev-backends:
--#
--# Returns information about character device backends.
--#
--# Returns: a list of @ChardevBackendInfo
--#
--# Since: 2.0
--#
--# Example:
--#
--# -> { "execute": "query-chardev-backends" }
--# <- {
--#       "return":[
--#          {
--#             "name":"udp"
--#          },
--#          {
--#             "name":"tcp"
--#          },
--#          {
--#             "name":"unix"
--#          },
--#          {
--#             "name":"spiceport"
--#          }
--#       ]
--#    }
--#
--##
--{ 'command': 'query-chardev-backends', 'returns': ['ChardevBackendInfo']=
- }
--
--##
--# @DataFormat:
--#
--# An enumeration of data format.
--#
--# @utf8: Data is a UTF-8 string (RFC 3629)
--#
--# @base64: Data is Base64 encoded binary (RFC 3548)
--#
--# Since: 1.4
--##
--{ 'enum': 'DataFormat',
--  'data': [ 'utf8', 'base64' ] }
--
--##
--# @ringbuf-write:
--#
--# Write to a ring buffer character device.
--#
--# @device: the ring buffer character device name
--#
--# @data: data to write
--#
--# @format: data encoding (default 'utf8').
--#          - base64: data must be base64 encoded text.  Its binary
--#            decoding gets written.
--#          - utf8: data's UTF-8 encoding is written
--#          - data itself is always Unicode regardless of format, like
--#            any other string.
--#
--# Returns: Nothing on success
--#
--# Since: 1.4
--#
--# Example:
--#
--# -> { "execute": "ringbuf-write",
--#      "arguments": { "device": "foo",
--#                     "data": "abcdefgh",
--#                     "format": "utf8" } }
--# <- { "return": {} }
--#
--##
--{ 'command': 'ringbuf-write',
--  'data': {'device': 'str', 'data': 'str',
--           '*format': 'DataFormat'} }
--
--##
--# @ringbuf-read:
--#
--# Read from a ring buffer character device.
--#
--# @device: the ring buffer character device name
--#
--# @size: how many bytes to read at most
--#
--# @format: data encoding (default 'utf8').
--#          - base64: the data read is returned in base64 encoding.
--#          - utf8: the data read is interpreted as UTF-8.
--#            Bug: can screw up when the buffer contains invalid UTF-8
--#            sequences, NUL characters, after the ring buffer lost
--#            data, and when reading stops because the size limit is
--#            reached.
--#          - The return value is always Unicode regardless of format,
--#            like any other string.
--#
--# Returns: data read from the device
--#
--# Since: 1.4
--#
--# Example:
--#
--# -> { "execute": "ringbuf-read",
--#      "arguments": { "device": "foo",
--#                     "size": 1000,
--#                     "format": "utf8" } }
--# <- { "return": "abcdefgh" }
--#
--##
--{ 'command': 'ringbuf-read',
--  'data': {'device': 'str', 'size': 'int', '*format': 'DataFormat'},
--  'returns': 'str' }
--
--##
- # @EventInfo:
+ # @CpuInfoArch:
  #
- # Information about a QMP event
-@@ -4713,333 +4531,6 @@
-=20
-=20
+ # An enumeration of cpu types that enable additional information during
+@@ -1349,376 +1300,6 @@
+ { 'command': 'query-iothreads', 'returns': ['IOThreadInfo'] }
+ 
  ##
--# @ChardevCommon:
+-# @VncBasicInfo:
 -#
--# Configuration shared across all chardev backends
+-# The basic information for vnc network connection
 -#
--# @logfile: The name of a logfile to save output
--# @logappend: true to append instead of truncate
--#             (default to false to truncate)
+-# @host: IP address
 -#
--# Since: 2.6
+-# @service: The service name of the vnc port. This may depend on the host
+-#           system's service database so symbolic names should not be relied
+-#           on.
+-#
+-# @family: address family
+-#
+-# @websocket: true in case the socket is a websocket (since 2.3).
+-#
+-# Since: 2.1
 -##
--{ 'struct': 'ChardevCommon', 'data': { '*logfile': 'str',
--                                       '*logappend': 'bool' } }
+-{ 'struct': 'VncBasicInfo',
+-  'data': { 'host': 'str',
+-            'service': 'str',
+-            'family': 'NetworkAddressFamily',
+-            'websocket': 'bool' } }
 -
 -##
--# @ChardevFile:
+-# @VncServerInfo:
 -#
--# Configuration info for file chardevs.
+-# The network connection information for server
 -#
--# @in:  The name of the input file
--# @out: The name of the output file
--# @append: Open the file in append mode (default false to
--#          truncate) (Since 2.6)
+-# @auth: authentication method used for
+-#        the plain (non-websocket) VNC server
 -#
--# Since: 1.4
+-# Since: 2.1
 -##
--{ 'struct': 'ChardevFile', 'data': { '*in' : 'str',
--                                   'out' : 'str',
--                                   '*append': 'bool' },
--  'base': 'ChardevCommon' }
+-{ 'struct': 'VncServerInfo',
+-  'base': 'VncBasicInfo',
+-  'data': { '*auth': 'str' } }
 -
 -##
--# @ChardevHostdev:
+-# @VncClientInfo:
 -#
--# Configuration info for device and pipe chardevs.
+-# Information about a connected VNC client.
 -#
--# @device: The name of the special file for the device,
--#          i.e. /dev/ttyS0 on Unix or COM1: on Windows
+-# @x509_dname: If x509 authentication is in use, the Distinguished
+-#              Name of the client.
 -#
--# Since: 1.4
+-# @sasl_username: If SASL authentication is in use, the SASL username
+-#                 used for authentication.
+-#
+-# Since: 0.14.0
 -##
--{ 'struct': 'ChardevHostdev', 'data': { 'device' : 'str' },
--  'base': 'ChardevCommon' }
+-{ 'struct': 'VncClientInfo',
+-  'base': 'VncBasicInfo',
+-  'data': { '*x509_dname': 'str', '*sasl_username': 'str' } }
 -
 -##
--# @ChardevSocket:
+-# @VncInfo:
 -#
--# Configuration info for (stream) socket chardevs.
+-# Information about the VNC session.
 -#
--# @addr: socket address to listen on (server=3Dtrue)
--#        or connect to (server=3Dfalse)
--# @tls-creds: the ID of the TLS credentials object (since 2.6)
--# @server: create server socket (default: true)
--# @wait: wait for incoming connection on server
--#        sockets (default: false).
--# @nodelay: set TCP_NODELAY socket option (default: false)
--# @telnet: enable telnet protocol on server
--#          sockets (default: false)
--# @tn3270: enable tn3270 protocol on server
--#          sockets (default: false) (Since: 2.10)
--# @reconnect: For a client socket, if a socket is disconnected,
--#          then attempt a reconnect after the given number of seconds.
--#          Setting this to zero disables this function. (default: 0)
--#          (Since: 2.2)
+-# @enabled: true if the VNC server is enabled, false otherwise
 -#
--# Since: 1.4
+-# @host: The hostname the VNC server is bound to.  This depends on
+-#        the name resolution on the host and may be an IP address.
+-#
+-# @family: 'ipv6' if the host is listening for IPv6 connections
+-#                    'ipv4' if the host is listening for IPv4 connections
+-#                    'unix' if the host is listening on a unix domain socket
+-#                    'unknown' otherwise
+-#
+-# @service: The service name of the server's port.  This may depends
+-#           on the host system's service database so symbolic names should not
+-#           be relied on.
+-#
+-# @auth: the current authentication type used by the server
+-#        'none' if no authentication is being used
+-#        'vnc' if VNC authentication is being used
+-#        'vencrypt+plain' if VEncrypt is used with plain text authentication
+-#        'vencrypt+tls+none' if VEncrypt is used with TLS and no authentication
+-#        'vencrypt+tls+vnc' if VEncrypt is used with TLS and VNC authentication
+-#        'vencrypt+tls+plain' if VEncrypt is used with TLS and plain text auth
+-#        'vencrypt+x509+none' if VEncrypt is used with x509 and no auth
+-#        'vencrypt+x509+vnc' if VEncrypt is used with x509 and VNC auth
+-#        'vencrypt+x509+plain' if VEncrypt is used with x509 and plain text auth
+-#        'vencrypt+tls+sasl' if VEncrypt is used with TLS and SASL auth
+-#        'vencrypt+x509+sasl' if VEncrypt is used with x509 and SASL auth
+-#
+-# @clients: a list of @VncClientInfo of all currently connected clients
+-#
+-# Since: 0.14.0
 -##
--{ 'struct': 'ChardevSocket', 'data': { 'addr'       : 'SocketAddressLega=
-cy',
--                                     '*tls-creds'  : 'str',
--                                     '*server'    : 'bool',
--                                     '*wait'      : 'bool',
--                                     '*nodelay'   : 'bool',
--                                     '*telnet'    : 'bool',
--                                     '*tn3270'    : 'bool',
--                                     '*reconnect' : 'int' },
--  'base': 'ChardevCommon' }
+-{ 'struct': 'VncInfo',
+-  'data': {'enabled': 'bool', '*host': 'str',
+-           '*family': 'NetworkAddressFamily',
+-           '*service': 'str', '*auth': 'str', '*clients': ['VncClientInfo']} }
 -
 -##
--# @ChardevUdp:
+-# @VncPrimaryAuth:
 -#
--# Configuration info for datagram socket chardevs.
+-# vnc primary authentication method.
 -#
--# @remote: remote address
--# @local: local address
--#
--# Since: 1.5
+-# Since: 2.3
 -##
--{ 'struct': 'ChardevUdp', 'data': { 'remote' : 'SocketAddressLegacy',
--                                  '*local' : 'SocketAddressLegacy' },
--  'base': 'ChardevCommon' }
+-{ 'enum': 'VncPrimaryAuth',
+-  'data': [ 'none', 'vnc', 'ra2', 'ra2ne', 'tight', 'ultra',
+-            'tls', 'vencrypt', 'sasl' ] }
 -
 -##
--# @ChardevMux:
+-# @VncVencryptSubAuth:
 -#
--# Configuration info for mux chardevs.
+-# vnc sub authentication method with vencrypt.
 -#
--# @chardev: name of the base chardev.
--#
--# Since: 1.5
+-# Since: 2.3
 -##
--{ 'struct': 'ChardevMux', 'data': { 'chardev' : 'str' },
--  'base': 'ChardevCommon' }
--
--##
--# @ChardevStdio:
--#
--# Configuration info for stdio chardevs.
--#
--# @signal: Allow signals (such as SIGINT triggered by ^C)
--#          be delivered to qemu.  Default: true in -nographic mode,
--#          false otherwise.
--#
--# Since: 1.5
--##
--{ 'struct': 'ChardevStdio', 'data': { '*signal' : 'bool' },
--  'base': 'ChardevCommon' }
+-{ 'enum': 'VncVencryptSubAuth',
+-  'data': [ 'plain',
+-            'tls-none',  'x509-none',
+-            'tls-vnc',   'x509-vnc',
+-            'tls-plain', 'x509-plain',
+-            'tls-sasl',  'x509-sasl' ] }
 -
 -
 -##
--# @ChardevSpiceChannel:
+-# @VncServerInfo2:
 -#
--# Configuration info for spice vm channel chardevs.
+-# The network connection information for server
 -#
--# @type: kind of channel (for example vdagent).
+-# @auth: The current authentication type used by the servers
 -#
--# Since: 1.5
+-# @vencrypt: The vencrypt sub authentication type used by the
+-#            servers, only specified in case auth == vencrypt.
+-#
+-# Since: 2.9
 -##
--{ 'struct': 'ChardevSpiceChannel', 'data': { 'type'  : 'str' },
--  'base': 'ChardevCommon' }
+-{ 'struct': 'VncServerInfo2',
+-  'base': 'VncBasicInfo',
+-  'data': { 'auth'      : 'VncPrimaryAuth',
+-            '*vencrypt' : 'VncVencryptSubAuth' } }
+-
 -
 -##
--# @ChardevSpicePort:
+-# @VncInfo2:
 -#
--# Configuration info for spice port chardevs.
+-# Information about a vnc server
 -#
--# @fqdn: name of the channel (see docs/spice-port-fqdn.txt)
+-# @id: vnc server name.
 -#
--# Since: 1.5
+-# @server: A list of @VncBasincInfo describing all listening sockets.
+-#          The list can be empty (in case the vnc server is disabled).
+-#          It also may have multiple entries: normal + websocket,
+-#          possibly also ipv4 + ipv6 in the future.
+-#
+-# @clients: A list of @VncClientInfo of all currently connected clients.
+-#           The list can be empty, for obvious reasons.
+-#
+-# @auth: The current authentication type used by the non-websockets servers
+-#
+-# @vencrypt: The vencrypt authentication type used by the servers,
+-#            only specified in case auth == vencrypt.
+-#
+-# @display: The display device the vnc server is linked to.
+-#
+-# Since: 2.3
 -##
--{ 'struct': 'ChardevSpicePort', 'data': { 'fqdn'  : 'str' },
--  'base': 'ChardevCommon' }
+-{ 'struct': 'VncInfo2',
+-  'data': { 'id'        : 'str',
+-            'server'    : ['VncServerInfo2'],
+-            'clients'   : ['VncClientInfo'],
+-            'auth'      : 'VncPrimaryAuth',
+-            '*vencrypt' : 'VncVencryptSubAuth',
+-            '*display'  : 'str' } }
 -
 -##
--# @ChardevVC:
+-# @query-vnc:
 -#
--# Configuration info for virtual console chardevs.
+-# Returns information about the current VNC server
 -#
--# @width:  console width,  in pixels
--# @height: console height, in pixels
--# @cols:   console width,  in chars
--# @rows:   console height, in chars
+-# Returns: @VncInfo
 -#
--# Since: 1.5
--##
--{ 'struct': 'ChardevVC', 'data': { '*width'  : 'int',
--                                 '*height' : 'int',
--                                 '*cols'   : 'int',
--                                 '*rows'   : 'int' },
--  'base': 'ChardevCommon' }
--
--##
--# @ChardevRingbuf:
--#
--# Configuration info for ring buffer chardevs.
--#
--# @size: ring buffer size, must be power of two, default is 65536
--#
--# Since: 1.5
--##
--{ 'struct': 'ChardevRingbuf', 'data': { '*size'  : 'int' },
--  'base': 'ChardevCommon' }
--
--##
--# @ChardevBackend:
--#
--# Configuration info for the new chardev backend.
--#
--# Since: 1.4 (testdev since 2.2, wctablet since 2.9)
--##
--{ 'union': 'ChardevBackend', 'data': { 'file'   : 'ChardevFile',
--                                       'serial' : 'ChardevHostdev',
--                                       'parallel': 'ChardevHostdev',
--                                       'pipe'   : 'ChardevHostdev',
--                                       'socket' : 'ChardevSocket',
--                                       'udp'    : 'ChardevUdp',
--                                       'pty'    : 'ChardevCommon',
--                                       'null'   : 'ChardevCommon',
--                                       'mux'    : 'ChardevMux',
--                                       'msmouse': 'ChardevCommon',
--                                       'wctablet' : 'ChardevCommon',
--                                       'braille': 'ChardevCommon',
--                                       'testdev': 'ChardevCommon',
--                                       'stdio'  : 'ChardevStdio',
--                                       'console': 'ChardevCommon',
--                                       'spicevmc' : 'ChardevSpiceChannel=
-',
--                                       'spiceport' : 'ChardevSpicePort',
--                                       'vc'     : 'ChardevVC',
--                                       'ringbuf': 'ChardevRingbuf',
--                                       # next one is just for compatibil=
-ity
--                                       'memory' : 'ChardevRingbuf' } }
--
--##
--# @ChardevReturn:
--#
--# Return info about the chardev backend just created.
--#
--# @pty: name of the slave pseudoterminal device, present if
--#       and only if a chardev of type 'pty' was created
--#
--# Since: 1.4
--##
--{ 'struct' : 'ChardevReturn', 'data': { '*pty' : 'str' } }
--
--##
--# @chardev-add:
--#
--# Add a character device backend
--#
--# @id: the chardev's ID, must be unique
--# @backend: backend type and parameters
--#
--# Returns: ChardevReturn.
--#
--# Since: 1.4
+-# Since: 0.14.0
 -#
 -# Example:
 -#
--# -> { "execute" : "chardev-add",
--#      "arguments" : { "id" : "foo",
--#                      "backend" : { "type" : "null", "data" : {} } } }
--# <- { "return": {} }
--#
--# -> { "execute" : "chardev-add",
--#      "arguments" : { "id" : "bar",
--#                      "backend" : { "type" : "file",
--#                                    "data" : { "out" : "/tmp/bar.log" }=
- } } }
--# <- { "return": {} }
--#
--# -> { "execute" : "chardev-add",
--#      "arguments" : { "id" : "baz",
--#                      "backend" : { "type" : "pty", "data" : {} } } }
--# <- { "return": { "pty" : "/dev/pty/42" } }
+-# -> { "execute": "query-vnc" }
+-# <- { "return": {
+-#          "enabled":true,
+-#          "host":"0.0.0.0",
+-#          "service":"50402",
+-#          "auth":"vnc",
+-#          "family":"ipv4",
+-#          "clients":[
+-#             {
+-#                "host":"127.0.0.1",
+-#                "service":"50401",
+-#                "family":"ipv4"
+-#             }
+-#          ]
+-#       }
+-#    }
 -#
 -##
--{ 'command': 'chardev-add', 'data': {'id'      : 'str',
--                                     'backend' : 'ChardevBackend' },
--  'returns': 'ChardevReturn' }
+-{ 'command': 'query-vnc', 'returns': 'VncInfo' }
 -
 -##
--# @chardev-change:
+-# @query-vnc-servers:
 -#
--# Change a character device backend
+-# Returns a list of vnc servers.  The list can be empty.
 -#
--# @id: the chardev's ID, must exist
--# @backend: new backend type and parameters
+-# Returns: a list of @VncInfo2
 -#
--# Returns: ChardevReturn.
+-# Since: 2.3
+-##
+-{ 'command': 'query-vnc-servers', 'returns': ['VncInfo2'] }
+-
+-##
+-# @SpiceBasicInfo:
 -#
--# Since: 2.10
+-# The basic information for SPICE network connection
+-#
+-# @host: IP address
+-#
+-# @port: port number
+-#
+-# @family: address family
+-#
+-# Since: 2.1
+-##
+-{ 'struct': 'SpiceBasicInfo',
+-  'data': { 'host': 'str',
+-            'port': 'str',
+-            'family': 'NetworkAddressFamily' } }
+-
+-##
+-# @SpiceServerInfo:
+-#
+-# Information about a SPICE server
+-#
+-# @auth: authentication method
+-#
+-# Since: 2.1
+-##
+-{ 'struct': 'SpiceServerInfo',
+-  'base': 'SpiceBasicInfo',
+-  'data': { '*auth': 'str' } }
+-
+-##
+-# @SpiceChannel:
+-#
+-# Information about a SPICE client channel.
+-#
+-# @connection-id: SPICE connection id number.  All channels with the same id
+-#                 belong to the same SPICE session.
+-#
+-# @channel-type: SPICE channel type number.  "1" is the main control
+-#                channel, filter for this one if you want to track spice
+-#                sessions only
+-#
+-# @channel-id: SPICE channel ID number.  Usually "0", might be different when
+-#              multiple channels of the same type exist, such as multiple
+-#              display channels in a multihead setup
+-#
+-# @tls: true if the channel is encrypted, false otherwise.
+-#
+-# Since: 0.14.0
+-##
+-{ 'struct': 'SpiceChannel',
+-  'base': 'SpiceBasicInfo',
+-  'data': {'connection-id': 'int', 'channel-type': 'int', 'channel-id': 'int',
+-           'tls': 'bool'} }
+-
+-##
+-# @SpiceQueryMouseMode:
+-#
+-# An enumeration of Spice mouse states.
+-#
+-# @client: Mouse cursor position is determined by the client.
+-#
+-# @server: Mouse cursor position is determined by the server.
+-#
+-# @unknown: No information is available about mouse mode used by
+-#           the spice server.
+-#
+-# Note: spice/enums.h has a SpiceMouseMode already, hence the name.
+-#
+-# Since: 1.1
+-##
+-{ 'enum': 'SpiceQueryMouseMode',
+-  'data': [ 'client', 'server', 'unknown' ] }
+-
+-##
+-# @SpiceInfo:
+-#
+-# Information about the SPICE session.
+-#
+-# @enabled: true if the SPICE server is enabled, false otherwise
+-#
+-# @migrated: true if the last guest migration completed and spice
+-#            migration had completed as well. false otherwise. (since 1.4)
+-#
+-# @host: The hostname the SPICE server is bound to.  This depends on
+-#        the name resolution on the host and may be an IP address.
+-#
+-# @port: The SPICE server's port number.
+-#
+-# @compiled-version: SPICE server version.
+-#
+-# @tls-port: The SPICE server's TLS port number.
+-#
+-# @auth: the current authentication type used by the server
+-#        'none'  if no authentication is being used
+-#        'spice' uses SASL or direct TLS authentication, depending on command
+-#                line options
+-#
+-# @mouse-mode: The mode in which the mouse cursor is displayed currently. Can
+-#              be determined by the client or the server, or unknown if spice
+-#              server doesn't provide this information. (since: 1.1)
+-#
+-# @channels: a list of @SpiceChannel for each active spice channel
+-#
+-# Since: 0.14.0
+-##
+-{ 'struct': 'SpiceInfo',
+-  'data': {'enabled': 'bool', 'migrated': 'bool', '*host': 'str', '*port': 'int',
+-           '*tls-port': 'int', '*auth': 'str', '*compiled-version': 'str',
+-           'mouse-mode': 'SpiceQueryMouseMode', '*channels': ['SpiceChannel']} }
+-
+-##
+-# @query-spice:
+-#
+-# Returns information about the current SPICE server
+-#
+-# Returns: @SpiceInfo
+-#
+-# Since: 0.14.0
 -#
 -# Example:
 -#
--# -> { "execute" : "chardev-change",
--#      "arguments" : { "id" : "baz",
--#                      "backend" : { "type" : "pty", "data" : {} } } }
--# <- { "return": { "pty" : "/dev/pty/42" } }
--#
--# -> {"execute" : "chardev-change",
--#     "arguments" : {
--#         "id" : "charchannel2",
--#         "backend" : {
--#             "type" : "socket",
--#             "data" : {
--#                 "addr" : {
--#                     "type" : "unix" ,
--#                     "data" : {
--#                         "path" : "/tmp/charchannel2.socket"
--#                     }
--#                  },
--#                  "server" : true,
--#                  "wait" : false }}}}
--# <- {"return": {}}
+-# -> { "execute": "query-spice" }
+-# <- { "return": {
+-#          "enabled": true,
+-#          "auth": "spice",
+-#          "port": 5920,
+-#          "tls-port": 5921,
+-#          "host": "0.0.0.0",
+-#          "channels": [
+-#             {
+-#                "port": "54924",
+-#                "family": "ipv4",
+-#                "channel-type": 1,
+-#                "connection-id": 1804289383,
+-#                "host": "127.0.0.1",
+-#                "channel-id": 0,
+-#                "tls": true
+-#             },
+-#             {
+-#                "port": "36710",
+-#                "family": "ipv4",
+-#                "channel-type": 4,
+-#                "connection-id": 1804289383,
+-#                "host": "127.0.0.1",
+-#                "channel-id": 0,
+-#                "tls": false
+-#             },
+-#             [ ... more channels follow ... ]
+-#          ]
+-#       }
+-#    }
 -#
 -##
--{ 'command': 'chardev-change', 'data': {'id'      : 'str',
--                                        'backend' : 'ChardevBackend' },
--  'returns': 'ChardevReturn' }
+-{ 'command': 'query-spice', 'returns': 'SpiceInfo' }
 -
 -##
--# @chardev-remove:
+ # @BalloonInfo:
+ #
+ # Information about the guest balloon device.
+@@ -2685,83 +2266,6 @@
+   'data': { 'path': 'str', 'property': 'str', 'value': 'any' } }
+ 
+ ##
+-# @set_password:
 -#
--# Remove a character device backend
+-# Sets the password of a remote display session.
 -#
--# @id: the chardev's ID, must exist and not be in use
+-# @protocol: `vnc' to modify the VNC server password
+-#            `spice' to modify the Spice server password
+-#
+-# @password: the new password
+-#
+-# @connected: how to handle existing clients when changing the
+-#                       password.  If nothing is specified, defaults to `keep'
+-#                       `fail' to fail the command if clients are connected
+-#                       `disconnect' to disconnect existing clients
+-#                       `keep' to maintain existing clients
+-#
+-# Returns: Nothing on success
+-#          If Spice is not enabled, DeviceNotFound
+-#
+-# Since: 0.14.0
+-#
+-# Example:
+-#
+-# -> { "execute": "set_password", "arguments": { "protocol": "vnc",
+-#                                                "password": "secret" } }
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'set_password',
+-  'data': {'protocol': 'str', 'password': 'str', '*connected': 'str'} }
+-
+-##
+-# @expire_password:
+-#
+-# Expire the password of a remote display server.
+-#
+-# @protocol: the name of the remote display protocol `vnc' or `spice'
+-#
+-# @time: when to expire the password.
+-#        `now' to expire the password immediately
+-#        `never' to cancel password expiration
+-#        `+INT' where INT is the number of seconds from now (integer)
+-#        `INT' where INT is the absolute time in seconds
+-#
+-# Returns: Nothing on success
+-#          If @protocol is `spice' and Spice is not active, DeviceNotFound
+-#
+-# Since: 0.14.0
+-#
+-# Notes: Time is relative to the server and currently there is no way to
+-#        coordinate server time with client time.  It is not recommended to
+-#        use the absolute time version of the @time parameter unless you're
+-#        sure you are on the same machine as the QEMU instance.
+-#
+-# Example:
+-#
+-# -> { "execute": "expire_password", "arguments": { "protocol": "vnc",
+-#                                                   "time": "+60" } }
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'expire_password', 'data': {'protocol': 'str', 'time': 'str'} }
+-
+-##
+-# @change-vnc-password:
+-#
+-# Change the VNC server password.
+-#
+-# @password:  the new password to use with VNC authentication
+-#
+-# Since: 1.1
+-#
+-# Notes:  An empty password in this command will set the password to the empty
+-#         string.  Existing clients are unaffected by executing this command.
+-##
+-{ 'command': 'change-vnc-password', 'data': {'password': 'str'} }
+-
+-##
+ # @change:
+ #
+ # This command is multiple commands multiplexed together.
+@@ -3839,133 +3343,6 @@
+ { 'command': 'query-target', 'returns': 'TargetInfo' }
+ 
+ ##
+-# @QKeyCode:
+-#
+-# An enumeration of key name.
+-#
+-# This is used by the @send-key command.
+-#
+-# @unmapped: since 2.0
+-# @pause: since 2.0
+-# @ro: since 2.4
+-# @kp_comma: since 2.4
+-# @kp_equals: since 2.6
+-# @power: since 2.6
+-# @hiragana: since 2.9
+-# @henkan: since 2.9
+-# @yen: since 2.9
+-#
+-# @sleep: since 2.10
+-# @wake: since 2.10
+-# @audionext: since 2.10
+-# @audioprev: since 2.10
+-# @audiostop: since 2.10
+-# @audioplay: since 2.10
+-# @audiomute: since 2.10
+-# @volumeup: since 2.10
+-# @volumedown: since 2.10
+-# @mediaselect: since 2.10
+-# @mail: since 2.10
+-# @calculator: since 2.10
+-# @computer: since 2.10
+-# @ac_home: since 2.10
+-# @ac_back: since 2.10
+-# @ac_forward: since 2.10
+-# @ac_refresh: since 2.10
+-# @ac_bookmarks: since 2.10
+-# altgr, altgr_r: dropped in 2.10
+-#
+-# Since: 1.3.0
+-#
+-##
+-{ 'enum': 'QKeyCode',
+-  'data': [ 'unmapped',
+-            'shift', 'shift_r', 'alt', 'alt_r', 'ctrl',
+-            'ctrl_r', 'menu', 'esc', '1', '2', '3', '4', '5', '6', '7', '8',
+-            '9', '0', 'minus', 'equal', 'backspace', 'tab', 'q', 'w', 'e',
+-            'r', 't', 'y', 'u', 'i', 'o', 'p', 'bracket_left', 'bracket_right',
+-            'ret', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'semicolon',
+-            'apostrophe', 'grave_accent', 'backslash', 'z', 'x', 'c', 'v', 'b',
+-            'n', 'm', 'comma', 'dot', 'slash', 'asterisk', 'spc', 'caps_lock',
+-            'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10',
+-            'num_lock', 'scroll_lock', 'kp_divide', 'kp_multiply',
+-            'kp_subtract', 'kp_add', 'kp_enter', 'kp_decimal', 'sysrq', 'kp_0',
+-            'kp_1', 'kp_2', 'kp_3', 'kp_4', 'kp_5', 'kp_6', 'kp_7', 'kp_8',
+-            'kp_9', 'less', 'f11', 'f12', 'print', 'home', 'pgup', 'pgdn', 'end',
+-            'left', 'up', 'down', 'right', 'insert', 'delete', 'stop', 'again',
+-            'props', 'undo', 'front', 'copy', 'open', 'paste', 'find', 'cut',
+-            'lf', 'help', 'meta_l', 'meta_r', 'compose', 'pause',
+-            'ro', 'hiragana', 'henkan', 'yen',
+-            'kp_comma', 'kp_equals', 'power', 'sleep', 'wake',
+-            'audionext', 'audioprev', 'audiostop', 'audioplay', 'audiomute',
+-            'volumeup', 'volumedown', 'mediaselect',
+-            'mail', 'calculator', 'computer',
+-            'ac_home', 'ac_back', 'ac_forward', 'ac_refresh', 'ac_bookmarks' ] }
+-
+-##
+-# @KeyValue:
+-#
+-# Represents a keyboard key.
+-#
+-# Since: 1.3.0
+-##
+-{ 'union': 'KeyValue',
+-  'data': {
+-    'number': 'int',
+-    'qcode': 'QKeyCode' } }
+-
+-##
+-# @send-key:
+-#
+-# Send keys to guest.
+-#
+-# @keys: An array of @KeyValue elements. All @KeyValues in this array are
+-#        simultaneously sent to the guest. A @KeyValue.number value is sent
+-#        directly to the guest, while @KeyValue.qcode must be a valid
+-#        @QKeyCode value
+-#
+-# @hold-time: time to delay key up events, milliseconds. Defaults
+-#             to 100
+-#
+-# Returns: Nothing on success
+-#          If key is unknown or redundant, InvalidParameter
+-#
+-# Since: 1.3.0
+-#
+-# Example:
+-#
+-# -> { "execute": "send-key",
+-#      "arguments": { "keys": [ { "type": "qcode", "data": "ctrl" },
+-#                               { "type": "qcode", "data": "alt" },
+-#                               { "type": "qcode", "data": "delete" } ] } }
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'send-key',
+-  'data': { 'keys': ['KeyValue'], '*hold-time': 'int' } }
+-
+-##
+-# @screendump:
+-#
+-# Write a PPM of the VGA screen to a file.
+-#
+-# @filename: the path of a new PPM file to store the image
 -#
 -# Returns: Nothing on success
 -#
--# Since: 1.4
+-# Since: 0.14.0
 -#
 -# Example:
 -#
--# -> { "execute": "chardev-remove", "arguments": { "id" : "foo" } }
+-# -> { "execute": "screendump",
+-#      "arguments": { "filename": "/tmp/image" } }
 -# <- { "return": {} }
 -#
 -##
--{ 'command': 'chardev-remove', 'data': {'id': 'str'} }
--
--##
--# @chardev-send-break:
--#
--# Send a break to a character device
--#
--# @id: the chardev's ID, must exist
--#
--# Returns: Nothing on success
--#
--# Since: 2.10
--#
--# Example:
--#
--# -> { "execute": "chardev-send-break", "arguments": { "id" : "foo" } }
--# <- { "return": {} }
--#
--##
--{ 'command': 'chardev-send-break', 'data': {'id': 'str'} }
+-{ 'command': 'screendump', 'data': {'filename': 'str'} }
 -
 -
 -##
  # @TpmModel:
  #
  # An enumeration of TPM models
-diff --git a/qapi/char.json b/qapi/char.json
+@@ -4289,165 +3666,6 @@
+ 
+ 
+ ##
+-# @InputButton:
+-#
+-# Button of a pointer input device (mouse, tablet).
+-#
+-# @side: front side button of a 5-button mouse (since 2.9)
+-#
+-# @extra: rear side button of a 5-button mouse (since 2.9)
+-#
+-# Since: 2.0
+-##
+-{ 'enum'  : 'InputButton',
+-  'data'  : [ 'left', 'middle', 'right', 'wheel-up', 'wheel-down', 'side',
+-  'extra' ] }
+-
+-##
+-# @InputAxis:
+-#
+-# Position axis of a pointer input device (mouse, tablet).
+-#
+-# Since: 2.0
+-##
+-{ 'enum'  : 'InputAxis',
+-  'data'  : [ 'x', 'y' ] }
+-
+-##
+-# @InputKeyEvent:
+-#
+-# Keyboard input event.
+-#
+-# @key:    Which key this event is for.
+-# @down:   True for key-down and false for key-up events.
+-#
+-# Since: 2.0
+-##
+-{ 'struct'  : 'InputKeyEvent',
+-  'data'  : { 'key'     : 'KeyValue',
+-              'down'    : 'bool' } }
+-
+-##
+-# @InputBtnEvent:
+-#
+-# Pointer button input event.
+-#
+-# @button: Which button this event is for.
+-# @down:   True for key-down and false for key-up events.
+-#
+-# Since: 2.0
+-##
+-{ 'struct'  : 'InputBtnEvent',
+-  'data'  : { 'button'  : 'InputButton',
+-              'down'    : 'bool' } }
+-
+-##
+-# @InputMoveEvent:
+-#
+-# Pointer motion input event.
+-#
+-# @axis:   Which axis is referenced by @value.
+-# @value:  Pointer position.  For absolute coordinates the
+-#          valid range is 0 -> 0x7ffff
+-#
+-# Since: 2.0
+-##
+-{ 'struct'  : 'InputMoveEvent',
+-  'data'  : { 'axis'    : 'InputAxis',
+-              'value'   : 'int' } }
+-
+-##
+-# @InputEvent:
+-#
+-# Input event union.
+-#
+-# @type: the input type, one of:
+-#  - 'key': Input event of Keyboard
+-#  - 'btn': Input event of pointer buttons
+-#  - 'rel': Input event of relative pointer motion
+-#  - 'abs': Input event of absolute pointer motion
+-#
+-# Since: 2.0
+-##
+-{ 'union' : 'InputEvent',
+-  'data'  : { 'key'     : 'InputKeyEvent',
+-              'btn'     : 'InputBtnEvent',
+-              'rel'     : 'InputMoveEvent',
+-              'abs'     : 'InputMoveEvent' } }
+-
+-##
+-# @input-send-event:
+-#
+-# Send input event(s) to guest.
+-#
+-# @device: display device to send event(s) to.
+-# @head: head to send event(s) to, in case the
+-#        display device supports multiple scanouts.
+-# @events: List of InputEvent union.
+-#
+-# Returns: Nothing on success.
+-#
+-# The @device and @head parameters can be used to send the input event
+-# to specific input devices in case (a) multiple input devices of the
+-# same kind are added to the virtual machine and (b) you have
+-# configured input routing (see docs/multiseat.txt) for those input
+-# devices.  The parameters work exactly like the device and head
+-# properties of input devices.  If @device is missing, only devices
+-# that have no input routing config are admissible.  If @device is
+-# specified, both input devices with and without input routing config
+-# are admissible, but devices with input routing config take
+-# precedence.
+-#
+-# Since: 2.6
+-#
+-# Note: The consoles are visible in the qom tree, under
+-# /backend/console[$index]. They have a device link and head property,
+-# so it is possible to map which console belongs to which device and
+-# display.
+-#
+-# Example:
+-#
+-# 1. Press left mouse button.
+-#
+-# -> { "execute": "input-send-event",
+-#     "arguments": { "device": "video0",
+-#                    "events": [ { "type": "btn",
+-#                    "data" : { "down": true, "button": "left" } } ] } }
+-# <- { "return": {} }
+-#
+-# -> { "execute": "input-send-event",
+-#     "arguments": { "device": "video0",
+-#                    "events": [ { "type": "btn",
+-#                    "data" : { "down": false, "button": "left" } } ] } }
+-# <- { "return": {} }
+-#
+-# 2. Press ctrl-alt-del.
+-#
+-# -> { "execute": "input-send-event",
+-#      "arguments": { "events": [
+-#         { "type": "key", "data" : { "down": true,
+-#           "key": {"type": "qcode", "data": "ctrl" } } },
+-#         { "type": "key", "data" : { "down": true,
+-#           "key": {"type": "qcode", "data": "alt" } } },
+-#         { "type": "key", "data" : { "down": true,
+-#           "key": {"type": "qcode", "data": "delete" } } } ] } }
+-# <- { "return": {} }
+-#
+-# 3. Move mouse pointer to absolute coordinates (20000, 400).
+-#
+-# -> { "execute": "input-send-event" ,
+-#   "arguments": { "events": [
+-#                { "type": "abs", "data" : { "axis": "x", "value" : 20000 } },
+-#                { "type": "abs", "data" : { "axis": "y", "value" : 400 } } ] } }
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'input-send-event',
+-  'data': { '*device': 'str',
+-            '*head'  : 'int',
+-            'events' : [ 'InputEvent' ] } }
+-
+-##
+ # @NumaOptionsType:
+ #
+ # @node: NUMA nodes configuration
+diff --git a/qapi/event.json b/qapi/event.json
+index 4b32773..f49bd3d 100644
+--- a/qapi/event.json
++++ b/qapi/event.json
+@@ -51,181 +51,6 @@
+   'data': { '*device': 'str', 'path': 'str' } }
+ 
+ ##
+-# @VNC_CONNECTED:
+-#
+-# Emitted when a VNC client establishes a connection
+-#
+-# @server: server information
+-#
+-# @client: client information
+-#
+-# Note: This event is emitted before any authentication takes place, thus
+-# the authentication ID is not provided
+-#
+-# Since: 0.13.0
+-#
+-# Example:
+-#
+-# <- { "event": "VNC_CONNECTED",
+-#      "data": {
+-#            "server": { "auth": "sasl", "family": "ipv4",
+-#                        "service": "5901", "host": "0.0.0.0" },
+-#            "client": { "family": "ipv4", "service": "58425",
+-#                        "host": "127.0.0.1" } },
+-#      "timestamp": { "seconds": 1262976601, "microseconds": 975795 } }
+-#
+-##
+-{ 'event': 'VNC_CONNECTED',
+-  'data': { 'server': 'VncServerInfo',
+-            'client': 'VncBasicInfo' } }
+-
+-##
+-# @VNC_INITIALIZED:
+-#
+-# Emitted after authentication takes place (if any) and the VNC session is
+-# made active
+-#
+-# @server: server information
+-#
+-# @client: client information
+-#
+-# Since: 0.13.0
+-#
+-# Example:
+-#
+-# <-  { "event": "VNC_INITIALIZED",
+-#       "data": {
+-#            "server": { "auth": "sasl", "family": "ipv4",
+-#                        "service": "5901", "host": "0.0.0.0"},
+-#            "client": { "family": "ipv4", "service": "46089",
+-#                        "host": "127.0.0.1", "sasl_username": "luiz" } },
+-#       "timestamp": { "seconds": 1263475302, "microseconds": 150772 } }
+-#
+-##
+-{ 'event': 'VNC_INITIALIZED',
+-  'data': { 'server': 'VncServerInfo',
+-            'client': 'VncClientInfo' } }
+-
+-##
+-# @VNC_DISCONNECTED:
+-#
+-# Emitted when the connection is closed
+-#
+-# @server: server information
+-#
+-# @client: client information
+-#
+-# Since: 0.13.0
+-#
+-# Example:
+-#
+-# <- { "event": "VNC_DISCONNECTED",
+-#      "data": {
+-#            "server": { "auth": "sasl", "family": "ipv4",
+-#                        "service": "5901", "host": "0.0.0.0" },
+-#            "client": { "family": "ipv4", "service": "58425",
+-#                        "host": "127.0.0.1", "sasl_username": "luiz" } },
+-#      "timestamp": { "seconds": 1262976601, "microseconds": 975795 } }
+-#
+-##
+-{ 'event': 'VNC_DISCONNECTED',
+-  'data': { 'server': 'VncServerInfo',
+-            'client': 'VncClientInfo' } }
+-
+-##
+-# @SPICE_CONNECTED:
+-#
+-# Emitted when a SPICE client establishes a connection
+-#
+-# @server: server information
+-#
+-# @client: client information
+-#
+-# Since: 0.14.0
+-#
+-# Example:
+-#
+-# <- { "timestamp": {"seconds": 1290688046, "microseconds": 388707},
+-#      "event": "SPICE_CONNECTED",
+-#      "data": {
+-#        "server": { "port": "5920", "family": "ipv4", "host": "127.0.0.1"},
+-#        "client": {"port": "52873", "family": "ipv4", "host": "127.0.0.1"}
+-#    }}
+-#
+-##
+-{ 'event': 'SPICE_CONNECTED',
+-  'data': { 'server': 'SpiceBasicInfo',
+-            'client': 'SpiceBasicInfo' } }
+-
+-##
+-# @SPICE_INITIALIZED:
+-#
+-# Emitted after initial handshake and authentication takes place (if any)
+-# and the SPICE channel is up and running
+-#
+-# @server: server information
+-#
+-# @client: client information
+-#
+-# Since: 0.14.0
+-#
+-# Example:
+-#
+-# <- { "timestamp": {"seconds": 1290688046, "microseconds": 417172},
+-#      "event": "SPICE_INITIALIZED",
+-#      "data": {"server": {"auth": "spice", "port": "5921",
+-#                          "family": "ipv4", "host": "127.0.0.1"},
+-#               "client": {"port": "49004", "family": "ipv4", "channel-type": 3,
+-#                          "connection-id": 1804289383, "host": "127.0.0.1",
+-#                          "channel-id": 0, "tls": true}
+-#    }}
+-#
+-##
+-{ 'event': 'SPICE_INITIALIZED',
+-  'data': { 'server': 'SpiceServerInfo',
+-            'client': 'SpiceChannel' } }
+-
+-##
+-# @SPICE_DISCONNECTED:
+-#
+-# Emitted when the SPICE connection is closed
+-#
+-# @server: server information
+-#
+-# @client: client information
+-#
+-# Since: 0.14.0
+-#
+-# Example:
+-#
+-# <- { "timestamp": {"seconds": 1290688046, "microseconds": 388707},
+-#      "event": "SPICE_DISCONNECTED",
+-#      "data": {
+-#        "server": { "port": "5920", "family": "ipv4", "host": "127.0.0.1"},
+-#        "client": {"port": "52873", "family": "ipv4", "host": "127.0.0.1"}
+-#    }}
+-#
+-##
+-{ 'event': 'SPICE_DISCONNECTED',
+-  'data': { 'server': 'SpiceBasicInfo',
+-            'client': 'SpiceBasicInfo' } }
+-
+-##
+-# @SPICE_MIGRATE_COMPLETED:
+-#
+-# Emitted when SPICE migration has completed
+-#
+-# Since: 1.3
+-#
+-# Example:
+-#
+-# <- { "timestamp": {"seconds": 1290688046, "microseconds": 417172},
+-#      "event": "SPICE_MIGRATE_COMPLETED" }
+-#
+-##
+-{ 'event': 'SPICE_MIGRATE_COMPLETED' }
+-
+-##
+ # @MIGRATION:
+ #
+ # Emitted when a migration event happens
+diff --git a/qapi/ui.json b/qapi/ui.json
 new file mode 100644
-index 0000000..ae19dcd
+index 0000000..e5d6610
 --- /dev/null
-+++ b/qapi/char.json
-@@ -0,0 +1,538 @@
++++ b/qapi/ui.json
+@@ -0,0 +1,977 @@
 +# -*- Mode: Python -*-
 +#
 +
 +##
-+# =3D Character devices
++# = Remote desktop
 +##
 +
 +{ 'include': 'sockets.json' }
 +
 +##
-+# @ChardevInfo:
++# @set_password:
 +#
-+# Information about a character device.
++# Sets the password of a remote display session.
 +#
-+# @label: the label of the character device
++# @protocol: `vnc' to modify the VNC server password
++#            `spice' to modify the Spice server password
 +#
-+# @filename: the filename of the character device
++# @password: the new password
 +#
-+# @frontend-open: shows whether the frontend device attached to this bac=
-kend
-+#                 (eg. with the chardev=3D... option) is in open or clos=
-ed state
-+#                 (since 2.1)
++# @connected: how to handle existing clients when changing the
++#                       password.  If nothing is specified, defaults to `keep'
++#                       `fail' to fail the command if clients are connected
++#                       `disconnect' to disconnect existing clients
++#                       `keep' to maintain existing clients
 +#
-+# Notes: @filename is encoded using the QEMU command line character devi=
-ce
-+#        encoding.  See the QEMU man page for details.
-+#
-+# Since: 0.14.0
-+##
-+{ 'struct': 'ChardevInfo', 'data': {'label': 'str',
-+                                  'filename': 'str',
-+                                  'frontend-open': 'bool'} }
-+
-+##
-+# @query-chardev:
-+#
-+# Returns information about current character devices.
-+#
-+# Returns: a list of @ChardevInfo
++# Returns: Nothing on success
++#          If Spice is not enabled, DeviceNotFound
 +#
 +# Since: 0.14.0
 +#
 +# Example:
 +#
-+# -> { "execute": "query-chardev" }
-+# <- {
-+#       "return": [
-+#          {
-+#             "label": "charchannel0",
-+#             "filename": "unix:/var/lib/libvirt/qemu/seabios.rhel6.agen=
-t,server",
-+#             "frontend-open": false
-+#          },
-+#          {
-+#             "label": "charmonitor",
-+#             "filename": "unix:/var/lib/libvirt/qemu/seabios.rhel6.moni=
-tor,server",
-+#             "frontend-open": true
-+#          },
-+#          {
-+#             "label": "charserial0",
-+#             "filename": "pty:/dev/pts/2",
-+#             "frontend-open": true
-+#          }
-+#       ]
-+#    }
++# -> { "execute": "set_password", "arguments": { "protocol": "vnc",
++#                                                "password": "secret" } }
++# <- { "return": {} }
 +#
 +##
-+{ 'command': 'query-chardev', 'returns': ['ChardevInfo'] }
++{ 'command': 'set_password',
++  'data': {'protocol': 'str', 'password': 'str', '*connected': 'str'} }
 +
 +##
-+# @ChardevBackendInfo:
++# @expire_password:
 +#
-+# Information about a character device backend
++# Expire the password of a remote display server.
 +#
-+# @name: The backend name
++# @protocol: the name of the remote display protocol `vnc' or `spice'
 +#
-+# Since: 2.0
-+##
-+{ 'struct': 'ChardevBackendInfo', 'data': {'name': 'str'} }
-+
-+##
-+# @query-chardev-backends:
++# @time: when to expire the password.
++#        `now' to expire the password immediately
++#        `never' to cancel password expiration
++#        `+INT' where INT is the number of seconds from now (integer)
++#        `INT' where INT is the absolute time in seconds
 +#
-+# Returns information about character device backends.
++# Returns: Nothing on success
++#          If @protocol is `spice' and Spice is not active, DeviceNotFound
 +#
-+# Returns: a list of @ChardevBackendInfo
++# Since: 0.14.0
 +#
-+# Since: 2.0
++# Notes: Time is relative to the server and currently there is no way to
++#        coordinate server time with client time.  It is not recommended to
++#        use the absolute time version of the @time parameter unless you're
++#        sure you are on the same machine as the QEMU instance.
 +#
 +# Example:
 +#
-+# -> { "execute": "query-chardev-backends" }
-+# <- {
-+#       "return":[
-+#          {
-+#             "name":"udp"
-+#          },
-+#          {
-+#             "name":"tcp"
-+#          },
-+#          {
-+#             "name":"unix"
-+#          },
-+#          {
-+#             "name":"spiceport"
-+#          }
-+#       ]
-+#    }
++# -> { "execute": "expire_password", "arguments": { "protocol": "vnc",
++#                                                   "time": "+60" } }
++# <- { "return": {} }
 +#
 +##
-+{ 'command': 'query-chardev-backends', 'returns': ['ChardevBackendInfo']=
- }
++{ 'command': 'expire_password', 'data': {'protocol': 'str', 'time': 'str'} }
 +
 +##
-+# @DataFormat:
++# @screendump:
 +#
-+# An enumeration of data format.
++# Write a PPM of the VGA screen to a file.
 +#
-+# @utf8: Data is a UTF-8 string (RFC 3629)
-+#
-+# @base64: Data is Base64 encoded binary (RFC 3548)
-+#
-+# Since: 1.4
-+##
-+{ 'enum': 'DataFormat',
-+  'data': [ 'utf8', 'base64' ] }
-+
-+##
-+# @ringbuf-write:
-+#
-+# Write to a ring buffer character device.
-+#
-+# @device: the ring buffer character device name
-+#
-+# @data: data to write
-+#
-+# @format: data encoding (default 'utf8').
-+#          - base64: data must be base64 encoded text.  Its binary
-+#            decoding gets written.
-+#          - utf8: data's UTF-8 encoding is written
-+#          - data itself is always Unicode regardless of format, like
-+#            any other string.
++# @filename: the path of a new PPM file to store the image
 +#
 +# Returns: Nothing on success
 +#
-+# Since: 1.4
++# Since: 0.14.0
 +#
 +# Example:
 +#
-+# -> { "execute": "ringbuf-write",
-+#      "arguments": { "device": "foo",
-+#                     "data": "abcdefgh",
-+#                     "format": "utf8" } }
++# -> { "execute": "screendump",
++#      "arguments": { "filename": "/tmp/image" } }
 +# <- { "return": {} }
 +#
 +##
-+{ 'command': 'ringbuf-write',
-+  'data': {'device': 'str', 'data': 'str',
-+           '*format': 'DataFormat'} }
++{ 'command': 'screendump', 'data': {'filename': 'str'} }
 +
 +##
-+# @ringbuf-read:
-+#
-+# Read from a ring buffer character device.
-+#
-+# @device: the ring buffer character device name
-+#
-+# @size: how many bytes to read at most
-+#
-+# @format: data encoding (default 'utf8').
-+#          - base64: the data read is returned in base64 encoding.
-+#          - utf8: the data read is interpreted as UTF-8.
-+#            Bug: can screw up when the buffer contains invalid UTF-8
-+#            sequences, NUL characters, after the ring buffer lost
-+#            data, and when reading stops because the size limit is
-+#            reached.
-+#          - The return value is always Unicode regardless of format,
-+#            like any other string.
-+#
-+# Returns: data read from the device
-+#
-+# Since: 1.4
-+#
-+# Example:
-+#
-+# -> { "execute": "ringbuf-read",
-+#      "arguments": { "device": "foo",
-+#                     "size": 1000,
-+#                     "format": "utf8" } }
-+# <- { "return": "abcdefgh" }
-+#
++# == Spice
 +##
-+{ 'command': 'ringbuf-read',
-+  'data': {'device': 'str', 'size': 'int', '*format': 'DataFormat'},
-+  'returns': 'str' }
 +
 +##
-+# @ChardevCommon:
++# @SpiceBasicInfo:
 +#
-+# Configuration shared across all chardev backends
++# The basic information for SPICE network connection
 +#
-+# @logfile: The name of a logfile to save output
-+# @logappend: true to append instead of truncate
-+#             (default to false to truncate)
++# @host: IP address
 +#
-+# Since: 2.6
-+##
-+{ 'struct': 'ChardevCommon', 'data': { '*logfile': 'str',
-+                                       '*logappend': 'bool' } }
-+
-+##
-+# @ChardevFile:
++# @port: port number
 +#
-+# Configuration info for file chardevs.
-+#
-+# @in:  The name of the input file
-+# @out: The name of the output file
-+# @append: Open the file in append mode (default false to
-+#          truncate) (Since 2.6)
-+#
-+# Since: 1.4
-+##
-+{ 'struct': 'ChardevFile', 'data': { '*in' : 'str',
-+                                   'out' : 'str',
-+                                   '*append': 'bool' },
-+  'base': 'ChardevCommon' }
-+
-+##
-+# @ChardevHostdev:
-+#
-+# Configuration info for device and pipe chardevs.
-+#
-+# @device: The name of the special file for the device,
-+#          i.e. /dev/ttyS0 on Unix or COM1: on Windows
-+#
-+# Since: 1.4
-+##
-+{ 'struct': 'ChardevHostdev', 'data': { 'device' : 'str' },
-+  'base': 'ChardevCommon' }
-+
-+##
-+# @ChardevSocket:
-+#
-+# Configuration info for (stream) socket chardevs.
-+#
-+# @addr: socket address to listen on (server=3Dtrue)
-+#        or connect to (server=3Dfalse)
-+# @tls-creds: the ID of the TLS credentials object (since 2.6)
-+# @server: create server socket (default: true)
-+# @wait: wait for incoming connection on server
-+#        sockets (default: false).
-+# @nodelay: set TCP_NODELAY socket option (default: false)
-+# @telnet: enable telnet protocol on server
-+#          sockets (default: false)
-+# @tn3270: enable tn3270 protocol on server
-+#          sockets (default: false) (Since: 2.10)
-+# @reconnect: For a client socket, if a socket is disconnected,
-+#          then attempt a reconnect after the given number of seconds.
-+#          Setting this to zero disables this function. (default: 0)
-+#          (Since: 2.2)
-+#
-+# Since: 1.4
-+##
-+{ 'struct': 'ChardevSocket', 'data': { 'addr'       : 'SocketAddressLega=
-cy',
-+                                     '*tls-creds'  : 'str',
-+                                     '*server'    : 'bool',
-+                                     '*wait'      : 'bool',
-+                                     '*nodelay'   : 'bool',
-+                                     '*telnet'    : 'bool',
-+                                     '*tn3270'    : 'bool',
-+                                     '*reconnect' : 'int' },
-+  'base': 'ChardevCommon' }
-+
-+##
-+# @ChardevUdp:
-+#
-+# Configuration info for datagram socket chardevs.
-+#
-+# @remote: remote address
-+# @local: local address
-+#
-+# Since: 1.5
-+##
-+{ 'struct': 'ChardevUdp', 'data': { 'remote' : 'SocketAddressLegacy',
-+                                  '*local' : 'SocketAddressLegacy' },
-+  'base': 'ChardevCommon' }
-+
-+##
-+# @ChardevMux:
-+#
-+# Configuration info for mux chardevs.
-+#
-+# @chardev: name of the base chardev.
-+#
-+# Since: 1.5
-+##
-+{ 'struct': 'ChardevMux', 'data': { 'chardev' : 'str' },
-+  'base': 'ChardevCommon' }
-+
-+##
-+# @ChardevStdio:
-+#
-+# Configuration info for stdio chardevs.
-+#
-+# @signal: Allow signals (such as SIGINT triggered by ^C)
-+#          be delivered to qemu.  Default: true in -nographic mode,
-+#          false otherwise.
-+#
-+# Since: 1.5
-+##
-+{ 'struct': 'ChardevStdio', 'data': { '*signal' : 'bool' },
-+  'base': 'ChardevCommon' }
-+
-+
-+##
-+# @ChardevSpiceChannel:
-+#
-+# Configuration info for spice vm channel chardevs.
-+#
-+# @type: kind of channel (for example vdagent).
-+#
-+# Since: 1.5
-+##
-+{ 'struct': 'ChardevSpiceChannel', 'data': { 'type'  : 'str' },
-+  'base': 'ChardevCommon' }
-+
-+##
-+# @ChardevSpicePort:
-+#
-+# Configuration info for spice port chardevs.
-+#
-+# @fqdn: name of the channel (see docs/spice-port-fqdn.txt)
-+#
-+# Since: 1.5
-+##
-+{ 'struct': 'ChardevSpicePort', 'data': { 'fqdn'  : 'str' },
-+  'base': 'ChardevCommon' }
-+
-+##
-+# @ChardevVC:
-+#
-+# Configuration info for virtual console chardevs.
-+#
-+# @width:  console width,  in pixels
-+# @height: console height, in pixels
-+# @cols:   console width,  in chars
-+# @rows:   console height, in chars
-+#
-+# Since: 1.5
-+##
-+{ 'struct': 'ChardevVC', 'data': { '*width'  : 'int',
-+                                 '*height' : 'int',
-+                                 '*cols'   : 'int',
-+                                 '*rows'   : 'int' },
-+  'base': 'ChardevCommon' }
-+
-+##
-+# @ChardevRingbuf:
-+#
-+# Configuration info for ring buffer chardevs.
-+#
-+# @size: ring buffer size, must be power of two, default is 65536
-+#
-+# Since: 1.5
-+##
-+{ 'struct': 'ChardevRingbuf', 'data': { '*size'  : 'int' },
-+  'base': 'ChardevCommon' }
-+
-+##
-+# @ChardevBackend:
-+#
-+# Configuration info for the new chardev backend.
-+#
-+# Since: 1.4 (testdev since 2.2, wctablet since 2.9)
-+##
-+{ 'union': 'ChardevBackend', 'data': { 'file'   : 'ChardevFile',
-+                                       'serial' : 'ChardevHostdev',
-+                                       'parallel': 'ChardevHostdev',
-+                                       'pipe'   : 'ChardevHostdev',
-+                                       'socket' : 'ChardevSocket',
-+                                       'udp'    : 'ChardevUdp',
-+                                       'pty'    : 'ChardevCommon',
-+                                       'null'   : 'ChardevCommon',
-+                                       'mux'    : 'ChardevMux',
-+                                       'msmouse': 'ChardevCommon',
-+                                       'wctablet' : 'ChardevCommon',
-+                                       'braille': 'ChardevCommon',
-+                                       'testdev': 'ChardevCommon',
-+                                       'stdio'  : 'ChardevStdio',
-+                                       'console': 'ChardevCommon',
-+                                       'spicevmc' : 'ChardevSpiceChannel=
-',
-+                                       'spiceport' : 'ChardevSpicePort',
-+                                       'vc'     : 'ChardevVC',
-+                                       'ringbuf': 'ChardevRingbuf',
-+                                       # next one is just for compatibil=
-ity
-+                                       'memory' : 'ChardevRingbuf' } }
-+
-+##
-+# @ChardevReturn:
-+#
-+# Return info about the chardev backend just created.
-+#
-+# @pty: name of the slave pseudoterminal device, present if
-+#       and only if a chardev of type 'pty' was created
-+#
-+# Since: 1.4
-+##
-+{ 'struct' : 'ChardevReturn', 'data': { '*pty' : 'str' } }
-+
-+##
-+# @chardev-add:
-+#
-+# Add a character device backend
-+#
-+# @id: the chardev's ID, must be unique
-+# @backend: backend type and parameters
-+#
-+# Returns: ChardevReturn.
-+#
-+# Since: 1.4
-+#
-+# Example:
-+#
-+# -> { "execute" : "chardev-add",
-+#      "arguments" : { "id" : "foo",
-+#                      "backend" : { "type" : "null", "data" : {} } } }
-+# <- { "return": {} }
-+#
-+# -> { "execute" : "chardev-add",
-+#      "arguments" : { "id" : "bar",
-+#                      "backend" : { "type" : "file",
-+#                                    "data" : { "out" : "/tmp/bar.log" }=
- } } }
-+# <- { "return": {} }
-+#
-+# -> { "execute" : "chardev-add",
-+#      "arguments" : { "id" : "baz",
-+#                      "backend" : { "type" : "pty", "data" : {} } } }
-+# <- { "return": { "pty" : "/dev/pty/42" } }
-+#
-+##
-+{ 'command': 'chardev-add', 'data': {'id'      : 'str',
-+                                     'backend' : 'ChardevBackend' },
-+  'returns': 'ChardevReturn' }
-+
-+##
-+# @chardev-change:
-+#
-+# Change a character device backend
-+#
-+# @id: the chardev's ID, must exist
-+# @backend: new backend type and parameters
-+#
-+# Returns: ChardevReturn.
-+#
-+# Since: 2.10
-+#
-+# Example:
-+#
-+# -> { "execute" : "chardev-change",
-+#      "arguments" : { "id" : "baz",
-+#                      "backend" : { "type" : "pty", "data" : {} } } }
-+# <- { "return": { "pty" : "/dev/pty/42" } }
-+#
-+# -> {"execute" : "chardev-change",
-+#     "arguments" : {
-+#         "id" : "charchannel2",
-+#         "backend" : {
-+#             "type" : "socket",
-+#             "data" : {
-+#                 "addr" : {
-+#                     "type" : "unix" ,
-+#                     "data" : {
-+#                         "path" : "/tmp/charchannel2.socket"
-+#                     }
-+#                  },
-+#                  "server" : true,
-+#                  "wait" : false }}}}
-+# <- {"return": {}}
-+#
-+##
-+{ 'command': 'chardev-change', 'data': {'id'      : 'str',
-+                                        'backend' : 'ChardevBackend' },
-+  'returns': 'ChardevReturn' }
-+
-+##
-+# @chardev-remove:
-+#
-+# Remove a character device backend
-+#
-+# @id: the chardev's ID, must exist and not be in use
-+#
-+# Returns: Nothing on success
-+#
-+# Since: 1.4
-+#
-+# Example:
-+#
-+# -> { "execute": "chardev-remove", "arguments": { "id" : "foo" } }
-+# <- { "return": {} }
-+#
-+##
-+{ 'command': 'chardev-remove', 'data': {'id': 'str'} }
-+
-+##
-+# @chardev-send-break:
-+#
-+# Send a break to a character device
-+#
-+# @id: the chardev's ID, must exist
-+#
-+# Returns: Nothing on success
-+#
-+# Since: 2.10
-+#
-+# Example:
-+#
-+# -> { "execute": "chardev-send-break", "arguments": { "id" : "foo" } }
-+# <- { "return": {} }
-+#
-+##
-+{ 'command': 'chardev-send-break', 'data': {'id': 'str'} }
-+
-+##
-+# @VSERPORT_CHANGE:
-+#
-+# Emitted when the guest opens or closes a virtio-serial port.
-+#
-+# @id: device identifier of the virtio-serial port
-+#
-+# @open: true if the guest has opened the virtio-serial port
++# @family: address family
 +#
 +# Since: 2.1
++##
++{ 'struct': 'SpiceBasicInfo',
++  'data': { 'host': 'str',
++            'port': 'str',
++            'family': 'NetworkAddressFamily' } }
++
++##
++# @SpiceServerInfo:
++#
++# Information about a SPICE server
++#
++# @auth: authentication method
++#
++# Since: 2.1
++##
++{ 'struct': 'SpiceServerInfo',
++  'base': 'SpiceBasicInfo',
++  'data': { '*auth': 'str' } }
++
++##
++# @SpiceChannel:
++#
++# Information about a SPICE client channel.
++#
++# @connection-id: SPICE connection id number.  All channels with the same id
++#                 belong to the same SPICE session.
++#
++# @channel-type: SPICE channel type number.  "1" is the main control
++#                channel, filter for this one if you want to track spice
++#                sessions only
++#
++# @channel-id: SPICE channel ID number.  Usually "0", might be different when
++#              multiple channels of the same type exist, such as multiple
++#              display channels in a multihead setup
++#
++# @tls: true if the channel is encrypted, false otherwise.
++#
++# Since: 0.14.0
++##
++{ 'struct': 'SpiceChannel',
++  'base': 'SpiceBasicInfo',
++  'data': {'connection-id': 'int', 'channel-type': 'int', 'channel-id': 'int',
++           'tls': 'bool'} }
++
++##
++# @SpiceQueryMouseMode:
++#
++# An enumeration of Spice mouse states.
++#
++# @client: Mouse cursor position is determined by the client.
++#
++# @server: Mouse cursor position is determined by the server.
++#
++# @unknown: No information is available about mouse mode used by
++#           the spice server.
++#
++# Note: spice/enums.h has a SpiceMouseMode already, hence the name.
++#
++# Since: 1.1
++##
++{ 'enum': 'SpiceQueryMouseMode',
++  'data': [ 'client', 'server', 'unknown' ] }
++
++##
++# @SpiceInfo:
++#
++# Information about the SPICE session.
++#
++# @enabled: true if the SPICE server is enabled, false otherwise
++#
++# @migrated: true if the last guest migration completed and spice
++#            migration had completed as well. false otherwise. (since 1.4)
++#
++# @host: The hostname the SPICE server is bound to.  This depends on
++#        the name resolution on the host and may be an IP address.
++#
++# @port: The SPICE server's port number.
++#
++# @compiled-version: SPICE server version.
++#
++# @tls-port: The SPICE server's TLS port number.
++#
++# @auth: the current authentication type used by the server
++#        'none'  if no authentication is being used
++#        'spice' uses SASL or direct TLS authentication, depending on command
++#                line options
++#
++# @mouse-mode: The mode in which the mouse cursor is displayed currently. Can
++#              be determined by the client or the server, or unknown if spice
++#              server doesn't provide this information. (since: 1.1)
++#
++# @channels: a list of @SpiceChannel for each active spice channel
++#
++# Since: 0.14.0
++##
++{ 'struct': 'SpiceInfo',
++  'data': {'enabled': 'bool', 'migrated': 'bool', '*host': 'str', '*port': 'int',
++           '*tls-port': 'int', '*auth': 'str', '*compiled-version': 'str',
++           'mouse-mode': 'SpiceQueryMouseMode', '*channels': ['SpiceChannel']} }
++
++##
++# @query-spice:
++#
++# Returns information about the current SPICE server
++#
++# Returns: @SpiceInfo
++#
++# Since: 0.14.0
 +#
 +# Example:
 +#
-+# <- { "event": "VSERPORT_CHANGE",
-+#      "data": { "id": "channel0", "open": true },
-+#      "timestamp": { "seconds": 1401385907, "microseconds": 422329 } }
++# -> { "execute": "query-spice" }
++# <- { "return": {
++#          "enabled": true,
++#          "auth": "spice",
++#          "port": 5920,
++#          "tls-port": 5921,
++#          "host": "0.0.0.0",
++#          "channels": [
++#             {
++#                "port": "54924",
++#                "family": "ipv4",
++#                "channel-type": 1,
++#                "connection-id": 1804289383,
++#                "host": "127.0.0.1",
++#                "channel-id": 0,
++#                "tls": true
++#             },
++#             {
++#                "port": "36710",
++#                "family": "ipv4",
++#                "channel-type": 4,
++#                "connection-id": 1804289383,
++#                "host": "127.0.0.1",
++#                "channel-id": 0,
++#                "tls": false
++#             },
++#             [ ... more channels follow ... ]
++#          ]
++#       }
++#    }
 +#
 +##
-+{ 'event': 'VSERPORT_CHANGE',
-+  'data': { 'id': 'str', 'open': 'bool' } }
-diff --git a/qapi/event.json b/qapi/event.json
-index 9c6126d..b9aa6ed 100644
---- a/qapi/event.json
-+++ b/qapi/event.json
-@@ -397,27 +397,6 @@
-             'sector-num': 'int', 'sectors-count': 'int' } }
-=20
- ##
--# @VSERPORT_CHANGE:
--#
--# Emitted when the guest opens or closes a virtio-serial port.
--#
--# @id: device identifier of the virtio-serial port
--#
--# @open: true if the guest has opened the virtio-serial port
--#
--# Since: 2.1
--#
--# Example:
--#
--# <- { "event": "VSERPORT_CHANGE",
--#      "data": { "id": "channel0", "open": true },
--#      "timestamp": { "seconds": 1401385907, "microseconds": 422329 } }
--#
--##
--{ 'event': 'VSERPORT_CHANGE',
--  'data': { 'id': 'str', 'open': 'bool' } }
--
--##
- # @MEM_UNPLUG_ERROR:
- #
- # Emitted when memory hot unplug error occurs.
---=20
++{ 'command': 'query-spice', 'returns': 'SpiceInfo' }
++
++##
++# @SPICE_CONNECTED:
++#
++# Emitted when a SPICE client establishes a connection
++#
++# @server: server information
++#
++# @client: client information
++#
++# Since: 0.14.0
++#
++# Example:
++#
++# <- { "timestamp": {"seconds": 1290688046, "microseconds": 388707},
++#      "event": "SPICE_CONNECTED",
++#      "data": {
++#        "server": { "port": "5920", "family": "ipv4", "host": "127.0.0.1"},
++#        "client": {"port": "52873", "family": "ipv4", "host": "127.0.0.1"}
++#    }}
++#
++##
++{ 'event': 'SPICE_CONNECTED',
++  'data': { 'server': 'SpiceBasicInfo',
++            'client': 'SpiceBasicInfo' } }
++
++##
++# @SPICE_INITIALIZED:
++#
++# Emitted after initial handshake and authentication takes place (if any)
++# and the SPICE channel is up and running
++#
++# @server: server information
++#
++# @client: client information
++#
++# Since: 0.14.0
++#
++# Example:
++#
++# <- { "timestamp": {"seconds": 1290688046, "microseconds": 417172},
++#      "event": "SPICE_INITIALIZED",
++#      "data": {"server": {"auth": "spice", "port": "5921",
++#                          "family": "ipv4", "host": "127.0.0.1"},
++#               "client": {"port": "49004", "family": "ipv4", "channel-type": 3,
++#                          "connection-id": 1804289383, "host": "127.0.0.1",
++#                          "channel-id": 0, "tls": true}
++#    }}
++#
++##
++{ 'event': 'SPICE_INITIALIZED',
++  'data': { 'server': 'SpiceServerInfo',
++            'client': 'SpiceChannel' } }
++
++##
++# @SPICE_DISCONNECTED:
++#
++# Emitted when the SPICE connection is closed
++#
++# @server: server information
++#
++# @client: client information
++#
++# Since: 0.14.0
++#
++# Example:
++#
++# <- { "timestamp": {"seconds": 1290688046, "microseconds": 388707},
++#      "event": "SPICE_DISCONNECTED",
++#      "data": {
++#        "server": { "port": "5920", "family": "ipv4", "host": "127.0.0.1"},
++#        "client": {"port": "52873", "family": "ipv4", "host": "127.0.0.1"}
++#    }}
++#
++##
++{ 'event': 'SPICE_DISCONNECTED',
++  'data': { 'server': 'SpiceBasicInfo',
++            'client': 'SpiceBasicInfo' } }
++
++##
++# @SPICE_MIGRATE_COMPLETED:
++#
++# Emitted when SPICE migration has completed
++#
++# Since: 1.3
++#
++# Example:
++#
++# <- { "timestamp": {"seconds": 1290688046, "microseconds": 417172},
++#      "event": "SPICE_MIGRATE_COMPLETED" }
++#
++##
++{ 'event': 'SPICE_MIGRATE_COMPLETED' }
++
++##
++# == VNC
++##
++
++##
++# @VncBasicInfo:
++#
++# The basic information for vnc network connection
++#
++# @host: IP address
++#
++# @service: The service name of the vnc port. This may depend on the host
++#           system's service database so symbolic names should not be relied
++#           on.
++#
++# @family: address family
++#
++# @websocket: true in case the socket is a websocket (since 2.3).
++#
++# Since: 2.1
++##
++{ 'struct': 'VncBasicInfo',
++  'data': { 'host': 'str',
++            'service': 'str',
++            'family': 'NetworkAddressFamily',
++            'websocket': 'bool' } }
++
++##
++# @VncServerInfo:
++#
++# The network connection information for server
++#
++# @auth: authentication method used for
++#        the plain (non-websocket) VNC server
++#
++# Since: 2.1
++##
++{ 'struct': 'VncServerInfo',
++  'base': 'VncBasicInfo',
++  'data': { '*auth': 'str' } }
++
++##
++# @VncClientInfo:
++#
++# Information about a connected VNC client.
++#
++# @x509_dname: If x509 authentication is in use, the Distinguished
++#              Name of the client.
++#
++# @sasl_username: If SASL authentication is in use, the SASL username
++#                 used for authentication.
++#
++# Since: 0.14.0
++##
++{ 'struct': 'VncClientInfo',
++  'base': 'VncBasicInfo',
++  'data': { '*x509_dname': 'str', '*sasl_username': 'str' } }
++
++##
++# @VncInfo:
++#
++# Information about the VNC session.
++#
++# @enabled: true if the VNC server is enabled, false otherwise
++#
++# @host: The hostname the VNC server is bound to.  This depends on
++#        the name resolution on the host and may be an IP address.
++#
++# @family: 'ipv6' if the host is listening for IPv6 connections
++#                    'ipv4' if the host is listening for IPv4 connections
++#                    'unix' if the host is listening on a unix domain socket
++#                    'unknown' otherwise
++#
++# @service: The service name of the server's port.  This may depends
++#           on the host system's service database so symbolic names should not
++#           be relied on.
++#
++# @auth: the current authentication type used by the server
++#        'none' if no authentication is being used
++#        'vnc' if VNC authentication is being used
++#        'vencrypt+plain' if VEncrypt is used with plain text authentication
++#        'vencrypt+tls+none' if VEncrypt is used with TLS and no authentication
++#        'vencrypt+tls+vnc' if VEncrypt is used with TLS and VNC authentication
++#        'vencrypt+tls+plain' if VEncrypt is used with TLS and plain text auth
++#        'vencrypt+x509+none' if VEncrypt is used with x509 and no auth
++#        'vencrypt+x509+vnc' if VEncrypt is used with x509 and VNC auth
++#        'vencrypt+x509+plain' if VEncrypt is used with x509 and plain text auth
++#        'vencrypt+tls+sasl' if VEncrypt is used with TLS and SASL auth
++#        'vencrypt+x509+sasl' if VEncrypt is used with x509 and SASL auth
++#
++# @clients: a list of @VncClientInfo of all currently connected clients
++#
++# Since: 0.14.0
++##
++{ 'struct': 'VncInfo',
++  'data': {'enabled': 'bool', '*host': 'str',
++           '*family': 'NetworkAddressFamily',
++           '*service': 'str', '*auth': 'str', '*clients': ['VncClientInfo']} }
++
++##
++# @VncPrimaryAuth:
++#
++# vnc primary authentication method.
++#
++# Since: 2.3
++##
++{ 'enum': 'VncPrimaryAuth',
++  'data': [ 'none', 'vnc', 'ra2', 'ra2ne', 'tight', 'ultra',
++            'tls', 'vencrypt', 'sasl' ] }
++
++##
++# @VncVencryptSubAuth:
++#
++# vnc sub authentication method with vencrypt.
++#
++# Since: 2.3
++##
++{ 'enum': 'VncVencryptSubAuth',
++  'data': [ 'plain',
++            'tls-none',  'x509-none',
++            'tls-vnc',   'x509-vnc',
++            'tls-plain', 'x509-plain',
++            'tls-sasl',  'x509-sasl' ] }
++
++
++##
++# @VncServerInfo2:
++#
++# The network connection information for server
++#
++# @auth: The current authentication type used by the servers
++#
++# @vencrypt: The vencrypt sub authentication type used by the
++#            servers, only specified in case auth == vencrypt.
++#
++# Since: 2.9
++##
++{ 'struct': 'VncServerInfo2',
++  'base': 'VncBasicInfo',
++  'data': { 'auth'      : 'VncPrimaryAuth',
++            '*vencrypt' : 'VncVencryptSubAuth' } }
++
++
++##
++# @VncInfo2:
++#
++# Information about a vnc server
++#
++# @id: vnc server name.
++#
++# @server: A list of @VncBasincInfo describing all listening sockets.
++#          The list can be empty (in case the vnc server is disabled).
++#          It also may have multiple entries: normal + websocket,
++#          possibly also ipv4 + ipv6 in the future.
++#
++# @clients: A list of @VncClientInfo of all currently connected clients.
++#           The list can be empty, for obvious reasons.
++#
++# @auth: The current authentication type used by the non-websockets servers
++#
++# @vencrypt: The vencrypt authentication type used by the servers,
++#            only specified in case auth == vencrypt.
++#
++# @display: The display device the vnc server is linked to.
++#
++# Since: 2.3
++##
++{ 'struct': 'VncInfo2',
++  'data': { 'id'        : 'str',
++            'server'    : ['VncServerInfo2'],
++            'clients'   : ['VncClientInfo'],
++            'auth'      : 'VncPrimaryAuth',
++            '*vencrypt' : 'VncVencryptSubAuth',
++            '*display'  : 'str' } }
++
++##
++# @query-vnc:
++#
++# Returns information about the current VNC server
++#
++# Returns: @VncInfo
++#
++# Since: 0.14.0
++#
++# Example:
++#
++# -> { "execute": "query-vnc" }
++# <- { "return": {
++#          "enabled":true,
++#          "host":"0.0.0.0",
++#          "service":"50402",
++#          "auth":"vnc",
++#          "family":"ipv4",
++#          "clients":[
++#             {
++#                "host":"127.0.0.1",
++#                "service":"50401",
++#                "family":"ipv4"
++#             }
++#          ]
++#       }
++#    }
++#
++##
++{ 'command': 'query-vnc', 'returns': 'VncInfo' }
++
++##
++# @query-vnc-servers:
++#
++# Returns a list of vnc servers.  The list can be empty.
++#
++# Returns: a list of @VncInfo2
++#
++# Since: 2.3
++##
++{ 'command': 'query-vnc-servers', 'returns': ['VncInfo2'] }
++
++##
++# @change-vnc-password:
++#
++# Change the VNC server password.
++#
++# @password:  the new password to use with VNC authentication
++#
++# Since: 1.1
++#
++# Notes:  An empty password in this command will set the password to the empty
++#         string.  Existing clients are unaffected by executing this command.
++##
++{ 'command': 'change-vnc-password', 'data': {'password': 'str'} }
++
++##
++# @VNC_CONNECTED:
++#
++# Emitted when a VNC client establishes a connection
++#
++# @server: server information
++#
++# @client: client information
++#
++# Note: This event is emitted before any authentication takes place, thus
++# the authentication ID is not provided
++#
++# Since: 0.13.0
++#
++# Example:
++#
++# <- { "event": "VNC_CONNECTED",
++#      "data": {
++#            "server": { "auth": "sasl", "family": "ipv4",
++#                        "service": "5901", "host": "0.0.0.0" },
++#            "client": { "family": "ipv4", "service": "58425",
++#                        "host": "127.0.0.1" } },
++#      "timestamp": { "seconds": 1262976601, "microseconds": 975795 } }
++#
++##
++{ 'event': 'VNC_CONNECTED',
++  'data': { 'server': 'VncServerInfo',
++            'client': 'VncBasicInfo' } }
++
++##
++# @VNC_INITIALIZED:
++#
++# Emitted after authentication takes place (if any) and the VNC session is
++# made active
++#
++# @server: server information
++#
++# @client: client information
++#
++# Since: 0.13.0
++#
++# Example:
++#
++# <-  { "event": "VNC_INITIALIZED",
++#       "data": {
++#            "server": { "auth": "sasl", "family": "ipv4",
++#                        "service": "5901", "host": "0.0.0.0"},
++#            "client": { "family": "ipv4", "service": "46089",
++#                        "host": "127.0.0.1", "sasl_username": "luiz" } },
++#       "timestamp": { "seconds": 1263475302, "microseconds": 150772 } }
++#
++##
++{ 'event': 'VNC_INITIALIZED',
++  'data': { 'server': 'VncServerInfo',
++            'client': 'VncClientInfo' } }
++
++##
++# @VNC_DISCONNECTED:
++#
++# Emitted when the connection is closed
++#
++# @server: server information
++#
++# @client: client information
++#
++# Since: 0.13.0
++#
++# Example:
++#
++# <- { "event": "VNC_DISCONNECTED",
++#      "data": {
++#            "server": { "auth": "sasl", "family": "ipv4",
++#                        "service": "5901", "host": "0.0.0.0" },
++#            "client": { "family": "ipv4", "service": "58425",
++#                        "host": "127.0.0.1", "sasl_username": "luiz" } },
++#      "timestamp": { "seconds": 1262976601, "microseconds": 975795 } }
++#
++##
++{ 'event': 'VNC_DISCONNECTED',
++  'data': { 'server': 'VncServerInfo',
++            'client': 'VncClientInfo' } }
++
++##
++# = Input
++##
++
++##
++# @MouseInfo:
++#
++# Information about a mouse device.
++#
++# @name: the name of the mouse device
++#
++# @index: the index of the mouse device
++#
++# @current: true if this device is currently receiving mouse events
++#
++# @absolute: true if this device supports absolute coordinates as input
++#
++# Since: 0.14.0
++##
++{ 'struct': 'MouseInfo',
++  'data': {'name': 'str', 'index': 'int', 'current': 'bool',
++           'absolute': 'bool'} }
++
++##
++# @query-mice:
++#
++# Returns information about each active mouse device
++#
++# Returns: a list of @MouseInfo for each device
++#
++# Since: 0.14.0
++#
++# Example:
++#
++# -> { "execute": "query-mice" }
++# <- { "return": [
++#          {
++#             "name":"QEMU Microsoft Mouse",
++#             "index":0,
++#             "current":false,
++#             "absolute":false
++#          },
++#          {
++#             "name":"QEMU PS/2 Mouse",
++#             "index":1,
++#             "current":true,
++#             "absolute":true
++#          }
++#       ]
++#    }
++#
++##
++{ 'command': 'query-mice', 'returns': ['MouseInfo'] }
++
++##
++# @QKeyCode:
++#
++# An enumeration of key name.
++#
++# This is used by the @send-key command.
++#
++# @unmapped: since 2.0
++# @pause: since 2.0
++# @ro: since 2.4
++# @kp_comma: since 2.4
++# @kp_equals: since 2.6
++# @power: since 2.6
++# @hiragana: since 2.9
++# @henkan: since 2.9
++# @yen: since 2.9
++#
++# @sleep: since 2.10
++# @wake: since 2.10
++# @audionext: since 2.10
++# @audioprev: since 2.10
++# @audiostop: since 2.10
++# @audioplay: since 2.10
++# @audiomute: since 2.10
++# @volumeup: since 2.10
++# @volumedown: since 2.10
++# @mediaselect: since 2.10
++# @mail: since 2.10
++# @calculator: since 2.10
++# @computer: since 2.10
++# @ac_home: since 2.10
++# @ac_back: since 2.10
++# @ac_forward: since 2.10
++# @ac_refresh: since 2.10
++# @ac_bookmarks: since 2.10
++# altgr, altgr_r: dropped in 2.10
++#
++# Since: 1.3.0
++#
++##
++{ 'enum': 'QKeyCode',
++  'data': [ 'unmapped',
++            'shift', 'shift_r', 'alt', 'alt_r', 'ctrl',
++            'ctrl_r', 'menu', 'esc', '1', '2', '3', '4', '5', '6', '7', '8',
++            '9', '0', 'minus', 'equal', 'backspace', 'tab', 'q', 'w', 'e',
++            'r', 't', 'y', 'u', 'i', 'o', 'p', 'bracket_left', 'bracket_right',
++            'ret', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'semicolon',
++            'apostrophe', 'grave_accent', 'backslash', 'z', 'x', 'c', 'v', 'b',
++            'n', 'm', 'comma', 'dot', 'slash', 'asterisk', 'spc', 'caps_lock',
++            'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10',
++            'num_lock', 'scroll_lock', 'kp_divide', 'kp_multiply',
++            'kp_subtract', 'kp_add', 'kp_enter', 'kp_decimal', 'sysrq', 'kp_0',
++            'kp_1', 'kp_2', 'kp_3', 'kp_4', 'kp_5', 'kp_6', 'kp_7', 'kp_8',
++            'kp_9', 'less', 'f11', 'f12', 'print', 'home', 'pgup', 'pgdn', 'end',
++            'left', 'up', 'down', 'right', 'insert', 'delete', 'stop', 'again',
++            'props', 'undo', 'front', 'copy', 'open', 'paste', 'find', 'cut',
++            'lf', 'help', 'meta_l', 'meta_r', 'compose', 'pause',
++            'ro', 'hiragana', 'henkan', 'yen',
++            'kp_comma', 'kp_equals', 'power', 'sleep', 'wake',
++            'audionext', 'audioprev', 'audiostop', 'audioplay', 'audiomute',
++            'volumeup', 'volumedown', 'mediaselect',
++            'mail', 'calculator', 'computer',
++            'ac_home', 'ac_back', 'ac_forward', 'ac_refresh', 'ac_bookmarks' ] }
++
++##
++# @KeyValue:
++#
++# Represents a keyboard key.
++#
++# Since: 1.3.0
++##
++{ 'union': 'KeyValue',
++  'data': {
++    'number': 'int',
++    'qcode': 'QKeyCode' } }
++
++##
++# @send-key:
++#
++# Send keys to guest.
++#
++# @keys: An array of @KeyValue elements. All @KeyValues in this array are
++#        simultaneously sent to the guest. A @KeyValue.number value is sent
++#        directly to the guest, while @KeyValue.qcode must be a valid
++#        @QKeyCode value
++#
++# @hold-time: time to delay key up events, milliseconds. Defaults
++#             to 100
++#
++# Returns: Nothing on success
++#          If key is unknown or redundant, InvalidParameter
++#
++# Since: 1.3.0
++#
++# Example:
++#
++# -> { "execute": "send-key",
++#      "arguments": { "keys": [ { "type": "qcode", "data": "ctrl" },
++#                               { "type": "qcode", "data": "alt" },
++#                               { "type": "qcode", "data": "delete" } ] } }
++# <- { "return": {} }
++#
++##
++{ 'command': 'send-key',
++  'data': { 'keys': ['KeyValue'], '*hold-time': 'int' } }
++
++##
++# @InputButton:
++#
++# Button of a pointer input device (mouse, tablet).
++#
++# @side: front side button of a 5-button mouse (since 2.9)
++#
++# @extra: rear side button of a 5-button mouse (since 2.9)
++#
++# Since: 2.0
++##
++{ 'enum'  : 'InputButton',
++  'data'  : [ 'left', 'middle', 'right', 'wheel-up', 'wheel-down', 'side',
++  'extra' ] }
++
++##
++# @InputAxis:
++#
++# Position axis of a pointer input device (mouse, tablet).
++#
++# Since: 2.0
++##
++{ 'enum'  : 'InputAxis',
++  'data'  : [ 'x', 'y' ] }
++
++##
++# @InputKeyEvent:
++#
++# Keyboard input event.
++#
++# @key:    Which key this event is for.
++# @down:   True for key-down and false for key-up events.
++#
++# Since: 2.0
++##
++{ 'struct'  : 'InputKeyEvent',
++  'data'  : { 'key'     : 'KeyValue',
++              'down'    : 'bool' } }
++
++##
++# @InputBtnEvent:
++#
++# Pointer button input event.
++#
++# @button: Which button this event is for.
++# @down:   True for key-down and false for key-up events.
++#
++# Since: 2.0
++##
++{ 'struct'  : 'InputBtnEvent',
++  'data'  : { 'button'  : 'InputButton',
++              'down'    : 'bool' } }
++
++##
++# @InputMoveEvent:
++#
++# Pointer motion input event.
++#
++# @axis:   Which axis is referenced by @value.
++# @value:  Pointer position.  For absolute coordinates the
++#          valid range is 0 -> 0x7ffff
++#
++# Since: 2.0
++##
++{ 'struct'  : 'InputMoveEvent',
++  'data'  : { 'axis'    : 'InputAxis',
++              'value'   : 'int' } }
++
++##
++# @InputEvent:
++#
++# Input event union.
++#
++# @type: the input type, one of:
++#  - 'key': Input event of Keyboard
++#  - 'btn': Input event of pointer buttons
++#  - 'rel': Input event of relative pointer motion
++#  - 'abs': Input event of absolute pointer motion
++#
++# Since: 2.0
++##
++{ 'union' : 'InputEvent',
++  'data'  : { 'key'     : 'InputKeyEvent',
++              'btn'     : 'InputBtnEvent',
++              'rel'     : 'InputMoveEvent',
++              'abs'     : 'InputMoveEvent' } }
++
++##
++# @input-send-event:
++#
++# Send input event(s) to guest.
++#
++# @device: display device to send event(s) to.
++# @head: head to send event(s) to, in case the
++#        display device supports multiple scanouts.
++# @events: List of InputEvent union.
++#
++# Returns: Nothing on success.
++#
++# The @device and @head parameters can be used to send the input event
++# to specific input devices in case (a) multiple input devices of the
++# same kind are added to the virtual machine and (b) you have
++# configured input routing (see docs/multiseat.txt) for those input
++# devices.  The parameters work exactly like the device and head
++# properties of input devices.  If @device is missing, only devices
++# that have no input routing config are admissible.  If @device is
++# specified, both input devices with and without input routing config
++# are admissible, but devices with input routing config take
++# precedence.
++#
++# Since: 2.6
++#
++# Note: The consoles are visible in the qom tree, under
++# /backend/console[$index]. They have a device link and head property,
++# so it is possible to map which console belongs to which device and
++# display.
++#
++# Example:
++#
++# 1. Press left mouse button.
++#
++# -> { "execute": "input-send-event",
++#     "arguments": { "device": "video0",
++#                    "events": [ { "type": "btn",
++#                    "data" : { "down": true, "button": "left" } } ] } }
++# <- { "return": {} }
++#
++# -> { "execute": "input-send-event",
++#     "arguments": { "device": "video0",
++#                    "events": [ { "type": "btn",
++#                    "data" : { "down": false, "button": "left" } } ] } }
++# <- { "return": {} }
++#
++# 2. Press ctrl-alt-del.
++#
++# -> { "execute": "input-send-event",
++#      "arguments": { "events": [
++#         { "type": "key", "data" : { "down": true,
++#           "key": {"type": "qcode", "data": "ctrl" } } },
++#         { "type": "key", "data" : { "down": true,
++#           "key": {"type": "qcode", "data": "alt" } } },
++#         { "type": "key", "data" : { "down": true,
++#           "key": {"type": "qcode", "data": "delete" } } } ] } }
++# <- { "return": {} }
++#
++# 3. Move mouse pointer to absolute coordinates (20000, 400).
++#
++# -> { "execute": "input-send-event" ,
++#   "arguments": { "events": [
++#                { "type": "abs", "data" : { "axis": "x", "value" : 20000 } },
++#                { "type": "abs", "data" : { "axis": "y", "value" : 400 } } ] } }
++# <- { "return": {} }
++#
++##
++{ 'command': 'input-send-event',
++  'data': { '*device': 'str',
++            '*head'  : 'int',
++            'events' : [ 'InputEvent' ] } }
+-- 
 2.7.5
