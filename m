@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dknIB-0006Md-7b
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:15:10 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dknOo-0008EI-Dl
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:22:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dknI8-0003J4-3R
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:15:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48489)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dknI7-0003Im-Tk
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:15:04 -0400
-Message-ID: <1503562501.22313.3.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 24 Aug 2017 10:15:01 +0200
-In-Reply-To: <20170823193703.10808-1-mtparkr@gmail.com>
-References: <20170823193703.10808-1-mtparkr@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] audio: intel-hda: do not use old_mmio
- accesses
+	(envelope-from <imammedo@redhat.com>) id 1dknOm-0006gp-Lv
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:21:58 -0400
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Thu, 24 Aug 2017 10:21:46 +0200
+Message-Id: <1503562911-2776-2-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1503562911-2776-1-git-send-email-imammedo@redhat.com>
+References: <1503562911-2776-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11 1/6] ppc: use macros to make cpu type
+ name from string literal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,13 +20,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Matt Parker <mtparkr@gmail.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-On Wed, 2017-08-23 at 20:37 +0100, Matt Parker wrote:
-> +=C2=A0=C2=A0=C2=A0 intel_hda_reg_write(d, reg, val, (1UL << (size * 8)=
-) - 1);
+Replace
+  "-" TYPE_POWERPC_CPU
+when composing cpu type name from cpu model string literal
+and the same pattern in format strings with
+ POWERPC_CPU_TYPE_SUFFIX and POWERPC_CPU_TYPE_NAME(model)
+macroses like we do in x86.
 
-Hmm?  Same as v1, forgot to commit the changes?
+Later POWERPC_CPU_TYPE_NAME() will be used to define default
+cpu type per machine type and as bonus it will be consistent
+and easy grep-able pattern across all other targets that I'm
+plannig to treat the same way.
 
-cheers,
-  Gerd
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ target/ppc/cpu.h            | 3 +++
+ target/ppc/kvm_ppc.h        | 2 +-
+ target/ppc/cpu-models.c     | 2 +-
+ target/ppc/kvm.c            | 2 +-
+ target/ppc/translate_init.c | 6 +++---
+ 5 files changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 12f0949..0512393 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1354,6 +1354,9 @@ int ppc_dcr_write (ppc_dcr_t *dcr_env, int dcrn, uint32_t val);
+ 
+ #define cpu_init(cpu_model) cpu_generic_init(TYPE_POWERPC_CPU, cpu_model)
+ 
++#define POWERPC_CPU_TYPE_SUFFIX "-" TYPE_POWERPC_CPU
++#define POWERPC_CPU_TYPE_NAME(model) model POWERPC_CPU_TYPE_SUFFIX
++
+ #define cpu_signal_handler cpu_ppc_signal_handler
+ #define cpu_list ppc_cpu_list
+ 
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 6bc6fb3..bcb40f2 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -9,7 +9,7 @@
+ #ifndef KVM_PPC_H
+ #define KVM_PPC_H
+ 
+-#define TYPE_HOST_POWERPC_CPU "host-" TYPE_POWERPC_CPU
++#define TYPE_HOST_POWERPC_CPU POWERPC_CPU_TYPE_NAME("host")
+ 
+ #ifdef CONFIG_KVM
+ 
+diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
+index 4d3e635..8b27962 100644
+--- a/target/ppc/cpu-models.c
++++ b/target/ppc/cpu-models.c
+@@ -51,7 +51,7 @@
+                                                                             \
+     static const TypeInfo                                                   \
+     glue(POWERPC_DEF_PREFIX(_pvr, _svr, _type), _cpu_type_info) = {         \
+-        .name       = _name "-" TYPE_POWERPC_CPU,                           \
++        .name       = POWERPC_CPU_TYPE_NAME(_name),                           \
+         .parent     = stringify(_type) "-family-" TYPE_POWERPC_CPU,         \
+         .class_init =                                                       \
+             glue(POWERPC_DEF_PREFIX(_pvr, _svr, _type), _cpu_class_init),   \
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 8571379..8590809 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2484,7 +2484,7 @@ static int kvm_ppc_register_host_cpu_type(void)
+             char *suffix;
+ 
+             ppc_cpu_aliases[i].model = g_strdup(object_class_get_name(oc));
+-            suffix = strstr(ppc_cpu_aliases[i].model, "-"TYPE_POWERPC_CPU);
++            suffix = strstr(ppc_cpu_aliases[i].model, POWERPC_CPU_TYPE_SUFFIX);
+             if (suffix) {
+                 *suffix = 0;
+             }
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 43be9a8..f377cf2 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -10185,7 +10185,7 @@ static gint ppc_cpu_compare_class_name(gconstpointer a, gconstpointer b)
+     if (strncasecmp(name, object_class_get_name(oc), strlen(name)) == 0 &&
+         ppc_cpu_is_valid(pcc) &&
+         strcmp(object_class_get_name(oc) + strlen(name),
+-               "-" TYPE_POWERPC_CPU) == 0) {
++               POWERPC_CPU_TYPE_SUFFIX) == 0) {
+         return 0;
+     }
+     return -1;
+@@ -10327,7 +10327,7 @@ static void ppc_cpu_list_entry(gpointer data, gpointer user_data)
+     }
+ 
+     name = g_strndup(typename,
+-                     strlen(typename) - strlen("-" TYPE_POWERPC_CPU));
++                     strlen(typename) - strlen(POWERPC_CPU_TYPE_SUFFIX));
+     (*s->cpu_fprintf)(s->file, "PowerPC %-16s PVR %08x\n",
+                       name, pcc->pvr);
+     for (i = 0; ppc_cpu_aliases[i].alias != NULL; i++) {
+@@ -10388,7 +10388,7 @@ static void ppc_cpu_defs_entry(gpointer data, gpointer user_data)
+     typename = object_class_get_name(oc);
+     info = g_malloc0(sizeof(*info));
+     info->name = g_strndup(typename,
+-                           strlen(typename) - strlen("-" TYPE_POWERPC_CPU));
++                           strlen(typename) - strlen(POWERPC_CPU_TYPE_SUFFIX));
+ 
+     entry = g_malloc0(sizeof(*entry));
+     entry->value = info;
+-- 
+2.7.4
