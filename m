@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkwyy-0000rx-FE
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 14:35:57 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dkx2T-00030N-15
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 14:39:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkwyu-00049K-HK
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 14:35:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59400)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dkwyu-000490-BO
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 14:35:52 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1503564371-26090-1-git-send-email-armbru@redhat.com>
-	<1503564371-26090-5-git-send-email-armbru@redhat.com>
-	<CAJ+F1CKu0ewTNa2n3hY5h-n756xRDZUk4gy8y0eAGiOjVH29dQ@mail.gmail.com>
-Date: Thu, 24 Aug 2017 20:35:49 +0200
-In-Reply-To: <CAJ+F1CKu0ewTNa2n3hY5h-n756xRDZUk4gy8y0eAGiOjVH29dQ@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 24 Aug 2017
-	12:50:40 +0200")
-Message-ID: <87tw0wdda2.fsf@dusky.pond.sub.org>
+	(envelope-from <stefanha@gmail.com>) id 1dkx2P-0006Fm-3K
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 14:39:33 -0400
+Date: Thu, 24 Aug 2017 19:39:25 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170824183925.GC4368@stefanha-x1.localdomain>
+References: <20170822101535.4695-1-el13635@mail.ntua.gr>
+	<20170822101535.4695-6-el13635@mail.ntua.gr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 04/16] tpm: Clean up model registration &
- lookup
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170822101535.4695-6-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v7 5/6] block: add throttle
+ block filter driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +24,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Stefan Berger <stefanb@us.ibm.com>, QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+On Tue, Aug 22, 2017 at 01:15:34PM +0300, Manos Pitsidianakis wrote:
+> @@ -3095,6 +3096,20 @@
+>              '*tls-creds': 'str' } }
+>  
+>  ##
+> +# @BlockdevOptionsThrottle:
+> +#
+> +# Driver specific block device options for the throttle driver
+> +#
+> +# @throttle-group:   the name of the throttle-group object to use. It
+> +#                    must already exist.
+> +# @file:             reference to or definition of the data source block device
+> +# Since: 2.11
+> +##
+> +{ 'struct': 'BlockdevOptionsThrottle',
+> +  'data': { '*throttle-group': 'str',
 
-> Hi
->
-> On Thu, Aug 24, 2017 at 10:45 AM, Markus Armbruster <armbru@redhat.com> w=
-rote:
->> We have a strict separation between enum TpmModel and tpm_models[]:
->>
->> * TpmModel may have any number of members.  It just happens to have one.
->>
->> * tpm_register_model() uses the first empty slot in tmp_models[].
->>
->>   If you register more than tpm_models[] has space,
->>   tpn_register_model() fails.  Its caller silently ignores the
->>   failure.
->
-> tpm_
+This field is optional but:
 
-Will fix.
+  group_name = qemu_opt_get(opts, QEMU_OPT_THROTTLE_GROUP_NAME);
+  if (!group_name) {
+      error_setg(errp, "Please specify a throttle group.");
+      ret = EINVAL;
+      goto fin;
 
->>
->>   Register the same TpmModel more than once has no effect other than
->>   wasting tpm_models[] slots: tpm_model_is_registered() is happy with
->>   the first one it finds.
->>
->> Since we only ever register one model, and tpm_models[] has space for
->> just that one, this contraption even works.
->>
->> Turn tpm_models[] into a straight map from enum TpmType to bool.  Much
->> simpler.
->>
->> Cc: Stefan Berger <stefanb@us.ibm.com>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Should it be mandatory?
 
-Thanks!
+> +            'file' : 'BlockdevRef'
+> +             } }
+> +##
+>  # @BlockdevOptions:
+>  #
+>  # Options for creating a block device.  Many options are available for all
+> @@ -3155,6 +3170,7 @@
+>        'replication':'BlockdevOptionsReplication',
+>        'sheepdog':   'BlockdevOptionsSheepdog',
+>        'ssh':        'BlockdevOptionsSsh',
+> +      'throttle':   'BlockdevOptionsThrottle',
+>        'vdi':        'BlockdevOptionsGenericFormat',
+>        'vhdx':       'BlockdevOptionsGenericFormat',
+>        'vmdk':       'BlockdevOptionsGenericCOWFormat',
+> diff --git a/include/block/throttle-groups.h b/include/block/throttle-groups.h
+> index 82f030523f..ec969e84fe 100644
+> --- a/include/block/throttle-groups.h
+> +++ b/include/block/throttle-groups.h
+> @@ -76,5 +76,6 @@ void coroutine_fn throttle_group_co_io_limits_intercept(ThrottleGroupMember *tgm
+>  void throttle_group_attach_aio_context(ThrottleGroupMember *tgm,
+>                                         AioContext *new_context);
+>  void throttle_group_detach_aio_context(ThrottleGroupMember *tgm);
+> +bool throttle_group_exists(const char *name);
+>  
+>  #endif
+> diff --git a/include/qemu/throttle-options.h b/include/qemu/throttle-options.h
+> index 182b7896e1..3528a8f4a2 100644
+> --- a/include/qemu/throttle-options.h
+> +++ b/include/qemu/throttle-options.h
+> @@ -29,6 +29,7 @@
+>  #define QEMU_OPT_BPS_WRITE_MAX "bps-write-max"
+>  #define QEMU_OPT_BPS_WRITE_MAX_LENGTH "bps-write-max-length"
+>  #define QEMU_OPT_IOPS_SIZE "iops-size"
+> +#define QEMU_OPT_THROTTLE_GROUP_NAME "throttle-group"
+>  
+>  #define THROTTLE_OPT_PREFIX "throttling."
+>  #define THROTTLE_OPTS \
+> diff --git a/block/throttle-groups.c b/block/throttle-groups.c
+> index a4268a954e..4b483a16d4 100644
+> --- a/block/throttle-groups.c
+> +++ b/block/throttle-groups.c
+> @@ -101,7 +101,7 @@ static ThrottleGroup *throttle_group_by_name(const char *name)
+>      return NULL;
+>  }
+>  
 
-[...]
+/* Must be called with the global mutex held */
+> -static bool throttle_group_exists(const char *name)
+> +bool throttle_group_exists(const char *name)
+>  {
+>      return throttle_group_by_name(name) ? true : false;
+>  }
