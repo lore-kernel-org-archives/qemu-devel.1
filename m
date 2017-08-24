@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dknmP-0003PS-4L
+	(envelope-from <armbru@redhat.com>) id 1dknmO-0003PP-OM
 	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:46:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dknmN-0000PQ-ML
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:46:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53590)
+	(envelope-from <armbru@redhat.com>) id 1dknmM-0000O6-5i
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:46:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56390)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dknmN-0000Om-HK
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:46:19 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dknmL-0000Mv-T1
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:46:18 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 24 Aug 2017 10:46:11 +0200
-Message-Id: <1503564371-26090-17-git-send-email-armbru@redhat.com>
+Date: Thu, 24 Aug 2017 10:46:06 +0200
+Message-Id: <1503564371-26090-12-git-send-email-armbru@redhat.com>
 In-Reply-To: <1503564371-26090-1-git-send-email-armbru@redhat.com>
 References: <1503564371-26090-1-git-send-email-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 16/16] qapi: drop the sentinel in enum array
+Subject: [Qemu-devel] [PATCH 11/16] qapi: Avoid unnecessary use of enum
+ lookup table's sentinel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +27,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Currently, the FOO_lookup[] generated for QAPI enum types are
+terminated by a NULL sentinel.
 
-Now that all usages have been converted to user lookup helpers.
+A future patch will generate enums with "holes".  NULL-termination
+will cease to work then.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20170822132255.23945-14-marcandre.lureau@redhat.com>
-[Rebased, superfluous local variable dropped, missing
-check-qom-proplist.c update added]
+To prepare for that, replace "have we reached the sentinel?"
+predicates by "have we reached the FOO__MAX value?" predicates.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block/parallels.c          | 1 -
- scripts/qapi.py            | 4 +---
- tests/check-qom-proplist.c | 1 -
- 3 files changed, 1 insertion(+), 5 deletions(-)
+ monitor.c                          | 4 ++--
+ tests/test-qobject-input-visitor.c | 2 +-
+ tests/test-string-input-visitor.c  | 2 +-
+ ui/input-legacy.c                  | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/parallels.c b/block/parallels.c
-index cce7336..2b6c6e5 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -72,7 +72,6 @@ static QEnumLookup prealloc_mode_lookup =3D {
-     .array =3D (const char *const[]) {
-         "falloc",
-         "truncate",
--        NULL,
-     },
-     .size =3D PRL_PREALLOC_MODE__MAX
- };
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 61be538..a0993ee 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -1860,14 +1860,12 @@ const QEnumLookup %(c_name)s_lookup =3D {
- ''',
-                      index=3Dindex, value=3Dvalue)
-=20
--    max_index =3D c_enum_const(name, '_MAX', prefix)
-     ret +=3D mcgen('''
--        [%(max_index)s] =3D NULL,
-     },
-     .size =3D %(max_index)s
- };
- ''',
--                 max_index=3Dmax_index)
-+                 max_index=3Dc_enum_const(name, '_MAX', prefix))
-     return ret
-=20
-=20
-diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
-index 07e351f..92898e1 100644
---- a/tests/check-qom-proplist.c
-+++ b/tests/check-qom-proplist.c
-@@ -51,7 +51,6 @@ const QEnumLookup dummy_animal_map =3D {
-         [DUMMY_FROG] =3D "frog",
-         [DUMMY_ALLIGATOR] =3D "alligator",
-         [DUMMY_PLATYPUS] =3D "platypus",
--        [DUMMY_LAST] =3D NULL,
-     },
-     .size =3D DUMMY_LAST
- };
---=20
+diff --git a/monitor.c b/monitor.c
+index e0f8801..b45f55d 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -3249,7 +3249,7 @@ void netdev_add_completion(ReadLineState *rs, int nb_args, const char *str)
+     }
+     len = strlen(str);
+     readline_set_completion_index(rs, len);
+-    for (i = 0; NetClientDriver_lookup[i]; i++) {
++    for (i = 0; i < NET_CLIENT_DRIVER__MAX; i++) {
+         add_completion_option(rs, str, NetClientDriver_lookup[i]);
+     }
+ }
+@@ -3537,7 +3537,7 @@ void watchdog_action_completion(ReadLineState *rs, int nb_args, const char *str)
+         return;
+     }
+     readline_set_completion_index(rs, strlen(str));
+-    for (i = 0; WatchdogExpirationAction_lookup[i]; i++) {
++    for (i = 0; i < WATCHDOG_EXPIRATION_ACTION__MAX; i++) {
+         add_completion_option(rs, str, WatchdogExpirationAction_lookup[i]);
+     }
+ }
+diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
+index bcf0261..5bbfb65 100644
+--- a/tests/test-qobject-input-visitor.c
++++ b/tests/test-qobject-input-visitor.c
+@@ -382,7 +382,7 @@ static void test_visitor_in_enum(TestInputVisitorData *data,
+     Visitor *v;
+     EnumOne i;
+ 
+-    for (i = 0; EnumOne_lookup[i]; i++) {
++    for (i = 0; i < ENUM_ONE__MAX; i++) {
+         EnumOne res = -1;
+ 
+         v = visitor_input_test_init(data, "%s", EnumOne_lookup[i]);
+diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
+index 79313a7..e7a7b80 100644
+--- a/tests/test-string-input-visitor.c
++++ b/tests/test-string-input-visitor.c
+@@ -279,7 +279,7 @@ static void test_visitor_in_enum(TestInputVisitorData *data,
+     Visitor *v;
+     EnumOne i;
+ 
+-    for (i = 0; EnumOne_lookup[i]; i++) {
++    for (i = 0; i < ENUM_ONE__MAX; i++) {
+         EnumOne res = -1;
+ 
+         v = visitor_input_test_init(data, EnumOne_lookup[i]);
+diff --git a/ui/input-legacy.c b/ui/input-legacy.c
+index 7159747..a5f1e82 100644
+--- a/ui/input-legacy.c
++++ b/ui/input-legacy.c
+@@ -61,7 +61,7 @@ int index_from_key(const char *key, size_t key_length)
+ {
+     int i;
+ 
+-    for (i = 0; QKeyCode_lookup[i] != NULL; i++) {
++    for (i = 0; i < Q_KEY_CODE__MAX; i++) {
+         if (!strncmp(key, QKeyCode_lookup[i], key_length) &&
+             !QKeyCode_lookup[i][key_length]) {
+             break;
+-- 
 2.7.5
