@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1dl13Y-0007K8-Qn
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 18:56:57 -0400
+	(envelope-from <crosa@redhat.com>) id 1dl16c-0008D2-Nf
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 19:00:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1dl13U-0002Sv-5W
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 18:56:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45554)
+	(envelope-from <crosa@redhat.com>) id 1dl16X-00049a-So
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 19:00:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48596)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1dl13T-0002SM-Ro
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 18:56:52 -0400
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1dl16X-00048Y-Kd
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 19:00:01 -0400
 References: <20170818142613.32394-1-ldoktor@redhat.com>
-	<20170818142613.32394-4-ldoktor@redhat.com>
+	<20170818142613.32394-5-ldoktor@redhat.com>
 From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <116344ac-8075-0b6d-dd93-70d4d0fc3cc7@redhat.com>
-Date: Thu, 24 Aug 2017 18:56:43 -0400
+Message-ID: <1140e62e-6cb7-335f-fbf4-e818fdbc1343@redhat.com>
+Date: Thu, 24 Aug 2017 18:59:48 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170818142613.32394-4-ldoktor@redhat.com>
+In-Reply-To: <20170818142613.32394-5-ldoktor@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="kvidTUHbWxBbuiE6cIKWrxRwb8fADmK0w"
-Subject: Re: [Qemu-devel] [PATCH v6 03/10] qemu.py: Use iteritems rather
- than keys()
+	boundary="fdmLhTrNenvEsjAAnoSb1HbOBAcRXxR0R"
+Subject: Re: [Qemu-devel] [PATCH v6 04/10] qemu.py: Simplify QMP
+ key-conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +33,92 @@ To: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, qemu-devel@nongnu.org
 Cc: famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kvidTUHbWxBbuiE6cIKWrxRwb8fADmK0w
+--fdmLhTrNenvEsjAAnoSb1HbOBAcRXxR0R
 From: Cleber Rosa <crosa@redhat.com>
 To: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
  qemu-devel@nongnu.org
 Cc: famz@redhat.com, ehabkost@redhat.com, apahim@redhat.com,
  armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
-Message-ID: <116344ac-8075-0b6d-dd93-70d4d0fc3cc7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 03/10] qemu.py: Use iteritems rather than
- keys()
+Message-ID: <1140e62e-6cb7-335f-fbf4-e818fdbc1343@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 04/10] qemu.py: Simplify QMP
+ key-conversion
 References: <20170818142613.32394-1-ldoktor@redhat.com>
- <20170818142613.32394-4-ldoktor@redhat.com>
-In-Reply-To: <20170818142613.32394-4-ldoktor@redhat.com>
+ <20170818142613.32394-5-ldoktor@redhat.com>
+In-Reply-To: <20170818142613.32394-5-ldoktor@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 
 
 On 08/18/2017 10:26 AM, Luk=C3=A1=C5=A1 Doktor wrote:
-> Let's avoid creating an in-memory list of keys and query for each value=
+> The QMP key conversion consist of '_'s to be replaced with '-'s, which
+> can easily be done by a single `str.replace` method which is faster and=
 
-> and use `iteritems` which is an iterator of key-value pairs.
+> does not require `string` module import.
 >=20
 > Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
 > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  scripts/qemu.py | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  scripts/qemu.py | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
 >=20
 > diff --git a/scripts/qemu.py b/scripts/qemu.py
-> index 5d09de4..db21407 100644
+> index db21407..19cbd34 100644
 > --- a/scripts/qemu.py
 > +++ b/scripts/qemu.py
-> @@ -186,11 +186,11 @@ class QEMUMachine(object):
+> @@ -13,7 +13,6 @@
+>  #
+> =20
+>  import errno
+> -import string
+>  import os
+>  import sys
+>  import subprocess
+> @@ -181,14 +180,12 @@ class QEMUMachine(object):
+>              self._load_io_log()
+>              self._post_shutdown()
+> =20
+> -    underscore_to_dash =3D string.maketrans('_', '-')
+> -
 >      def qmp(self, cmd, conv_keys=3DTrue, **args):
 >          '''Invoke a QMP command and return the response dict'''
 >          qmp_args =3D dict()
-> -        for key in args.keys():
-> +        for key, value in args.iteritems():
+>          for key, value in args.iteritems():
 >              if conv_keys:
-> -                qmp_args[key.translate(self.underscore_to_dash)] =3D a=
-rgs[key]
-> +                qmp_args[key.translate(self.underscore_to_dash)] =3D v=
+> -                qmp_args[key.translate(self.underscore_to_dash)] =3D v=
 alue
+> +                qmp_args[key.replace('_', '-')] =3D value
 >              else:
-> -                qmp_args[key] =3D args[key]
-> +                qmp_args[key] =3D value
-> =20
->          return self._qmp.cmd(cmd, args=3Dqmp_args)
+>                  qmp_args[key] =3D value
 > =20
 >=20
 
-Yep, I could tell this was coming while reading patch 01.
+Right, this would only make sense if multiple (different) substitutions
+were necessary.
 
 Reviewed-by: Cleber Rosa <crosa@redhat.com>
 
 
---kvidTUHbWxBbuiE6cIKWrxRwb8fADmK0w
+--fdmLhTrNenvEsjAAnoSb1HbOBAcRXxR0R
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAlmfWasACgkQZX6NM6Xy
-CfOdQw//eruwL3yDSZ9DyR2O8jUoBvpPdnbNHfjBkyJMRjYpBnnrYISiuJUa/fGq
-VQdI7sxLCj8Ljv4Bfkn0E97U2WAX3ZXC2TRdy5ycmXKV28v0XhfIDWn9n0HhiBsn
-T9tPKfTRpjP6QOfab7fNYoEKFIJ2XX803t4qThsPenLofQKeqwHYLmZELzFWTXR1
-MdE1C5l0puwNjOFQIU/dSb42jQd4DkShyu2+LR5qm1twddPRDR8HsTWIKvcsChzs
-70VDk/v65F4LXGPS791dSW5wC60cg7JZCYOaiTqW+JRCsVtx0SvZmuLd7yqAIbx7
-X0J3CDRIoQxKfAOR3R4cDmgN31lp/qidoExSfJePUEJubfQJTmBBA95jH9D8JqZG
-xKn1vlhir+8agMto0evUZDCXDSdnywR3ljWMx3J1p5AK0ixPTPrT/iRrz2639z6U
-78puDwkpbNCAx2IkUI4Jn05GlQfiOi7JlV0q6x6snbLbhdmyQNLqZ7VA2q2UrOoC
-fEwGMO4z74O/R4kEPgytcyoVOy0W//VHfrMdYzCpKHK1obWoM70UvoPc3XlyiuYA
-BIWTr7vAQA+eAZ186HzCGqJA1yZrSbSti0/q6JGtX8x8QoJNFWDHi40c2F8ZacL0
-WasD8MWeO6aULsGQA6VXmfxMz556zOy0OJKatzAId+dZ8cgzTtI=
-=adLo
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAlmfWmQACgkQZX6NM6Xy
+CfMFkxAAuaIH0XEw1IUuTgfqEvOEwQ3SMMwosAeOIXSifaqo/SirJLkp6YgqBrYz
+hriIiUuZgkNtH4t+A15bWXcElF9LiP//l6mXIfCtMX3KxGdJGER/6w2iVb9zBT0i
+LylCnzZbsfxCUazfKkXYqK9S4yAPKIhGbMmS8pSt0vPJkuFMAsceWVLP6dI2Zac9
+u7J9yWLYqM27RY4UaRZnjOTB+CcydhD2DOILYIqbOgYFDX/5ziwsjP3J4q0svJEz
+Wu5PnrjAoZ3qL7Gqie/Rq0fadzuhC9l8pWr6wmyYN71z/qKiTpcCb4pMUcRLg0eS
+uOYHNQibQriKk8fu1zOuBmOOmRBxTeGnU3bQD0FlBJH2wgLHRNdFW/K0/1I+8qIE
+elAwuU0PTHhQvgioJcgpeEDjk/OQoXRe7lrfytklYUMcoPNVz3O9KJhdp7ZiLt34
+zv4A5Hra4GisVJCz101jRrXU96kGXHBskA5ZuJPCbgMzLXJKQenZBQ0eS1SDJUxL
+uLO48X4rgMRAVkBH0wqSqJG5E3aXeRazxu+xMzcMkEO71gIRR/liV3cIz6bFlkOR
+vVTj9BUMsLo2069/C2o/lpFbebWXumfq/QyPHCwRqoszgnpsbiHXV4MDT1BKhJ3C
+VQC7XA6+4jTgM7ltXJGPlabMU0PbA8czuIcP/cTViKQXBJOZbYk=
+=jaDk
 -----END PGP SIGNATURE-----
 
---kvidTUHbWxBbuiE6cIKWrxRwb8fADmK0w--
+--fdmLhTrNenvEsjAAnoSb1HbOBAcRXxR0R--
