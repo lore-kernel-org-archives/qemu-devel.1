@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dkr29-00058M-1a
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:14:50 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dkr2Y-000668-TI
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:15:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dkr28-0007O8-5w
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:14:49 -0400
-Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:36738)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dkr2X-0007YM-PQ
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:15:14 -0400
+Received: from mail-ua0-x243.google.com ([2607:f8b0:400c:c08::243]:34272)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dkr28-0007O1-0t
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:14:48 -0400
-Received: by mail-vk0-x242.google.com with SMTP id t4so940030vkg.3
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 05:14:48 -0700 (PDT)
+	id 1dkr2X-0007Y9-Kj
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:15:13 -0400
+Received: by mail-ua0-x243.google.com with SMTP id a10so1013550uai.1
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 05:15:13 -0700 (PDT)
 MIME-Version: 1.0
 In-Reply-To: <1503576178-23966-4-git-send-email-armbru@redhat.com>
 References: <1503576178-23966-1-git-send-email-armbru@redhat.com>
 	<1503576178-23966-4-git-send-email-armbru@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 24 Aug 2017 14:14:46 +0200
-Message-ID: <CAJ+F1CLKQouwwD52K+cDKQLh5WzyUbJAi8Bevc76uy3f_Wj3CA@mail.gmail.com>
+Date: Thu, 24 Aug 2017 14:15:12 +0200
+Message-ID: <CAJ+F1CJYqHwZKw-v3QcT0f4_Ow1aUMu-A1ayuEaVLzH-x_RsQA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH 3/3] qapi-schema: Rocker doc section
@@ -44,6 +44,10 @@ e:
 > Fix: include it in a sane place, namely next to the other sub-schemas.
 >
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
 
 > ---
 >  qapi-schema.json | 4 +---
