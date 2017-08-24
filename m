@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkmvM-0008EI-0X
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:51:33 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dknC4-00034D-So
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:08:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkmvI-0001Tn-4C
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:51:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32888)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dkmvH-0001Td-Tr
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:51:28 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170818222313.13391-1-eblake@redhat.com>
-	<1c41ef09-3e34-63ba-fc85-5aac46a5c355@linux.vnet.ibm.com>
-	<ebea7edf-6f5b-9096-552c-079bfcad71a4@redhat.com>
-Date: Thu, 24 Aug 2017 09:51:22 +0200
-In-Reply-To: <ebea7edf-6f5b-9096-552c-079bfcad71a4@redhat.com> (Eric Blake's
-	message of "Wed, 23 Aug 2017 14:21:57 -0500")
-Message-ID: <87d17lqu85.fsf@dusky.pond.sub.org>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dknC1-0000u5-Jq
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:08:48 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:23120
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dknC0-0000tC-PL
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:08:45 -0400
+References: <1503391578-6121-1-git-send-email-wang.yong155@zte.com.cn>
+	<1503391578-6121-3-git-send-email-wang.yong155@zte.com.cn>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <3606dadd-cf55-7bfa-93c4-db11ee00d6ed@cn.fujitsu.com>
+Date: Thu, 24 Aug 2017 16:10:43 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC PATCH] osdep.h: Prohibit disabling assert()
- in supported builds
+In-Reply-To: <1503391578-6121-3-git-send-email-wang.yong155@zte.com.cn>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCHv4 02/03] colo-compare: Use IOThread to
+ Check old packet regularly and Process pactkets of the primary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +29,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, f4bug@amsat.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: Wang yong <wang.yong155@zte.com.cn>, pbonzini@redhat.com, stefanha@redhat.com, famz@redhat.com, jasowang@redhat.com, zhang.zhanghailiang@huawei.com
+Cc: zhangchen.fnst@cn.fujitsu.com, wang.guang55@zte.com.cn, lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org, c zhang <zhangckid@gmail.com>
 
-Eric Blake <eblake@redhat.com> writes:
 
-> On 08/22/2017 06:19 AM, Halil Pasic wrote:
->
->> OTOH I do think this is to some degree institutionalizing a bad practice
->> (you say we do not want to do that, but IMHO refusing to build with
->> NDEBUG makes only sense if we want to alter the semantic of assert so
->> that once bad becomes acceptable). I can live with that, but I'm not
->> happy about it. Have we considered rolling our own construct which is
->> designed to exhibit the properties we desire?
->
-> I've thought about it, and it may have even been discussed on the list
-> perhaps (although I didn't go searching to verify).
->
->> 
->> I mean, if it's about the side effects we could create something like
->> q_assert(cond) and state that cond is evaluate exactly once (and
->> depending on what we want to have, make the actions on !cond (calling
->> abort(), producing a diagnostic message) compile time tweak-able or
->> not). I assume we could then convert each usage of assert to the safe
->> q_assert programmatically.
->
-> I'd prefer that if we are going to introduce our own construct that
-> always evaluates side effects, and only has a compile-time switch on
-> whether to abort() or (foolishly) plow on, that we name it something
-> without 'assert' in the name, so that reviewers don't have to be
-> confused about remembering which variant evaluates side effects.  Maybe:
->
-> q_verify(cond)
->
-> is a good name, which performs the side effects of 'cond' no matter
-> what, but also allows us to abort() if cond fails vs. ignore the
-> failure; perhaps where we make a compile-time decision between the two
-> behaviors as a configure --enable-FOO flag.
->
-> Converting all existing assert() and g_assert() to q_verify() should be
-> fairly simple, if we like the idea.
 
-About as simple as expanding tabs.
+On 08/22/2017 04:46 PM, Wang yong wrote:
+> From: Wang Yong <wang.yong155@zte.com.cn>
+>
+> Remove the task which check old packet in the comparing thread,
+> then use IOthread context timer to handle it.
+>
+> Process pactkets in the IOThread which arrived over the socket.
+> we use iothread_get_g_main_context to create a new g_main_loop in
+> the IOThread.then the packets from the primary and the secondary
+> are processed in the IOThread.
+>
+> Finally remove the colo-compare thread using the IOThread instead.
+>
+> Signed-off-by: Wang Yong <wang.yong155@zte.com.cn>
+> Signed-off-by: Wang Guang <wang.guang55@zte.com.cn>
+> ---
+>   net/colo-compare.c | 75 ++++++++++++++++++++++++++++--------------------------
+>   1 file changed, 39 insertions(+), 36 deletions(-)
+>
+> diff --git a/net/colo-compare.c b/net/colo-compare.c
+> index 5fe8e3f..69cb16e 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -29,6 +29,7 @@
+>   #include "qemu/sockets.h"
+>   #include "qapi-visit.h"
+>   #include "net/colo.h"
+> +#include "sysemu/iothread.h"
+>   
+>   #define TYPE_COLO_COMPARE "colo-compare"
+>   #define COLO_COMPARE(obj) \
+> @@ -82,11 +83,10 @@ typedef struct CompareState {
+>       GQueue conn_list;
+>       /* hashtable to save connection */
+>       GHashTable *connection_track_table;
+> -    /* compare thread, a thread for each NIC */
+> -    QemuThread thread;
+>   
+> +    IOThread *iothread;
+>       GMainContext *worker_context;
+> -    GMainLoop *compare_loop;
+> +    QEMUTimer *packet_check_timer;
+>   } CompareState;
+>   
+>   typedef struct CompareClass {
+> @@ -597,22 +597,40 @@ static void compare_sec_chr_in(void *opaque, const uint8_t *buf, int size)
+>    * Check old packet regularly so it can watch for any packets
+>    * that the secondary hasn't produced equivalents of.
+>    */
+> -static gboolean check_old_packet_regular(void *opaque)
+> +static void check_old_packet_regular(void *opaque)
+>   {
+>       CompareState *s = opaque;
+>   
+>       /* if have old packet we will notify checkpoint */
+>       colo_old_packet_check(s);
+> +    timer_mod(s->packet_check_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+> +                REGULAR_PACKET_CHECK_MS);
+> +}
+> +
+> +static void colo_compare_timer_init(CompareState *s)
+> +{
+> +    AioContext *ctx = iothread_get_aio_context(s->iothread);
+>   
+> -    return TRUE;
+> +    s->packet_check_timer = aio_timer_new(ctx, QEMU_CLOCK_VIRTUAL,
+> +                                SCALE_MS, check_old_packet_regular,
+> +                                s);
+> +    timer_mod(s->packet_check_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+> +                    REGULAR_PACKET_CHECK_MS);
+>   }
+>   
+> -static void *colo_compare_thread(void *opaque)
+> +static void colo_compare_timer_del(CompareState *s)
+>   {
+> -    CompareState *s = opaque;
+> -    GSource *timeout_source;
+> +    if (s->packet_check_timer) {
+> +        timer_del(s->packet_check_timer);
+> +        timer_free(s->packet_check_timer);
+> +        s->packet_check_timer = NULL;
+> +    }
+> + }
+>   
+> -    s->worker_context = g_main_context_new();
+> +static void colo_compare_iothread(CompareState *s)
+> +{
+> +    object_ref(OBJECT(s->iothread));
+> +    s->worker_context = iothread_get_g_main_context(s->iothread);
+>   
+>       qemu_chr_fe_set_handlers(&s->chr_pri_in, compare_chr_can_read,
+>                                compare_pri_chr_in, NULL, NULL,
+> @@ -621,20 +639,7 @@ static void *colo_compare_thread(void *opaque)
+>                                compare_sec_chr_in, NULL, NULL,
+>                                s, s->worker_context, true);
+>   
+> -    s->compare_loop = g_main_loop_new(s->worker_context, FALSE);
+> -
+> -    /* To kick any packets that the secondary doesn't match */
+> -    timeout_source = g_timeout_source_new(REGULAR_PACKET_CHECK_MS);
+> -    g_source_set_callback(timeout_source,
+> -                          (GSourceFunc)check_old_packet_regular, s, NULL);
+> -    g_source_attach(timeout_source, s->worker_context);
+> -
+> -    g_main_loop_run(s->compare_loop);
+> -
+> -    g_source_unref(timeout_source);
+> -    g_main_loop_unref(s->compare_loop);
+> -    g_main_context_unref(s->worker_context);
+> -    return NULL;
+> +    colo_compare_timer_init(s);
+>   }
+>   
+>   static char *compare_get_pri_indev(Object *obj, Error **errp)
+> @@ -759,12 +764,10 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+>   {
+>       CompareState *s = COLO_COMPARE(uc);
+>       Chardev *chr;
+> -    char thread_name[64];
+> -    static int compare_id;
+>   
+> -    if (!s->pri_indev || !s->sec_indev || !s->outdev) {
+> +    if (!s->pri_indev || !s->sec_indev || !s->outdev || !s->iothread) {
+>           error_setg(errp, "colo compare needs 'primary_in' ,"
+> -                   "'secondary_in','outdev' property set");
+> +                   "'secondary_in','outdev','iothread' property set");
 
-CODING_STYLE demands spaces rather than tabs since 2009.  455 out of
-3542 C source files have tabs.  Only a minority of them is imported from
-other projects and thus exempt from CODING_STYLE.
+If user forgot input the iothread field, they will get the segmentation 
+fault.
+Please fix this bug.
 
-I vote for frying bigger fish.
+Program received signal SIGSEGV, Segmentation fault.
+0x000055555594c319 in iothread_get_aio_context (iothread=0x0) at 
+iothread.c:271
+271        return iothread->ctx;
 
-I also vote for using standard C when standard C is servicable.
+
+Thanks
+Zhang Chen
+
+>           return;
+>       } else if (!strcmp(s->pri_indev, s->outdev) ||
+>                  !strcmp(s->sec_indev, s->outdev) ||
+> @@ -799,12 +802,7 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+>                                                         g_free,
+>                                                         connection_destroy);
+>   
+> -    sprintf(thread_name, "colo-compare %d", compare_id);
+> -    qemu_thread_create(&s->thread, thread_name,
+> -                       colo_compare_thread, s,
+> -                       QEMU_THREAD_JOINABLE);
+> -    compare_id++;
+> -
+> +    colo_compare_iothread(s);
+>       return;
+>   }
+>   
+> @@ -848,6 +846,10 @@ static void colo_compare_init(Object *obj)
+>       object_property_add_str(obj, "outdev",
+>                               compare_get_outdev, compare_set_outdev,
+>                               NULL);
+> +    object_property_add_link(obj, "iothread", TYPE_IOTHREAD,
+> +                            (Object **)&s->iothread,
+> +                            object_property_allow_set_link,
+> +                            OBJ_PROP_LINK_UNREF_ON_RELEASE, NULL);
+>   
+>       s->vnet_hdr = false;
+>       object_property_add_bool(obj, "vnet_hdr_support", compare_get_vnet_hdr,
+> @@ -861,9 +863,7 @@ static void colo_compare_finalize(Object *obj)
+>       qemu_chr_fe_deinit(&s->chr_pri_in, false);
+>       qemu_chr_fe_deinit(&s->chr_sec_in, false);
+>       qemu_chr_fe_deinit(&s->chr_out, false);
+> -
+> -    g_main_loop_quit(s->compare_loop);
+> -    qemu_thread_join(&s->thread);
+> +    colo_compare_timer_del(s);
+>   
+>       /* Release all unhandled packets after compare thead exited */
+>       g_queue_foreach(&s->conn_list, colo_flush_packets, s);
+> @@ -871,6 +871,9 @@ static void colo_compare_finalize(Object *obj)
+>       g_queue_clear(&s->conn_list);
+>   
+>       g_hash_table_destroy(s->connection_track_table);
+> +    if (s->iothread) {
+> +        object_unref(OBJECT(s->iothread));
+> +    }
+>       g_free(s->pri_indev);
+>       g_free(s->sec_indev);
+>       g_free(s->outdev);
+
+-- 
+Thanks
+Zhang Chen
