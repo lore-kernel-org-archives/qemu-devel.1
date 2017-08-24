@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkrzc-0006Ep-PX
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:16:18 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dks0D-0006Zn-4k
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:16:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkrzX-0006eR-Ju
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:16:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45374)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dkrzX-0006eC-A2
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:16:11 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B4CAE46289
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 13:16:09 +0000 (UTC)
-Date: Thu, 24 Aug 2017 14:16:04 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170824131603.GB2737@work-vm>
-References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-10-marcandre.lureau@redhat.com>
-	<87shgi4o28.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1dks09-00073T-5H
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:16:53 -0400
+Resent-Message-Id: <E1dks09-00073T-5H@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21426)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dks08-00072n-TC
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:16:49 -0400
+Message-ID: <150358058217.105.4685389509065985883@205a2245145f>
+Reply-To: <qemu-devel@nongnu.org>
+In-Reply-To: <20170824121919.78678-3-roger.pau@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <87shgi4o28.fsf@dusky.pond.sub.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 09/54] hmp: use qapi_enum_parse() in
- hmp_migrate_set_parameter
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 24 Aug 2017 06:16:23 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH QEMU v2] xen/pt: allow QEMU to request MSI
+ unmasking at bind time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,232 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+To: roger.pau@citrix.com
+Cc: famz@redhat.com, xen-devel@lists.xenproject.org, anthony.perard@citrix.com, sstabellini@kernel.org, qemu-devel@nongnu.org, JBeulich@suse.com
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com> writes:
->=20
-> > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  hmp.c | 139 ++++++++++++++++++++++++++++++++------------------------=
-----------
-> >  1 file changed, 68 insertions(+), 71 deletions(-)
-> >
-> > diff --git a/hmp.c b/hmp.c
-> > index 4ba50e8e26..ccc58e6d88 100644
-> > --- a/hmp.c
-> > +++ b/hmp.c
-> > @@ -1574,84 +1574,81 @@ void hmp_migrate_set_parameter(Monitor *mon, =
-const QDict *qdict)
-> >      MigrateSetParameters *p =3D g_new0(MigrateSetParameters, 1);
-> >      uint64_t valuebw =3D 0;
-> >      Error *err =3D NULL;
-> > -    int i, ret;
-> > -
-> > -    for (i =3D 0; i < MIGRATION_PARAMETER__MAX; i++) {
-> > -        if (strcmp(param, MigrationParameter_lookup[i]) =3D=3D 0) {
-> > -            switch (i) {
-> > -            case MIGRATION_PARAMETER_COMPRESS_LEVEL:
-> > -                p->has_compress_level =3D true;
-> > -                visit_type_int(v, param, &p->compress_level, &err);
-> > -                break;
-> > -            case MIGRATION_PARAMETER_COMPRESS_THREADS:
-> > -                p->has_compress_threads =3D true;
-> > -                visit_type_int(v, param, &p->compress_threads, &err)=
-;
-> > -                break;
-> > -            case MIGRATION_PARAMETER_DECOMPRESS_THREADS:
-> > -                p->has_decompress_threads =3D true;
-> > -                visit_type_int(v, param, &p->decompress_threads, &er=
-r);
-> > -                break;
-> > -            case MIGRATION_PARAMETER_CPU_THROTTLE_INITIAL:
-> > -                p->has_cpu_throttle_initial =3D true;
-> > -                visit_type_int(v, param, &p->cpu_throttle_initial, &=
-err);
-> > -                break;
-> > -            case MIGRATION_PARAMETER_CPU_THROTTLE_INCREMENT:
-> > -                p->has_cpu_throttle_increment =3D true;
-> > -                visit_type_int(v, param, &p->cpu_throttle_increment,=
- &err);
-> > -                break;
-> > -            case MIGRATION_PARAMETER_TLS_CREDS:
-> > -                p->has_tls_creds =3D true;
-> > -                p->tls_creds =3D g_new0(StrOrNull, 1);
-> > -                p->tls_creds->type =3D QTYPE_QSTRING;
-> > -                visit_type_str(v, param, &p->tls_creds->u.s, &err);
-> > -                break;
-> > -            case MIGRATION_PARAMETER_TLS_HOSTNAME:
-> > -                p->has_tls_hostname =3D true;
-> > -                p->tls_hostname =3D g_new0(StrOrNull, 1);
-> > -                p->tls_hostname->type =3D QTYPE_QSTRING;
-> > -                visit_type_str(v, param, &p->tls_hostname->u.s, &err=
-);
-> > -                break;
-> > -            case MIGRATION_PARAMETER_MAX_BANDWIDTH:
-> > -                p->has_max_bandwidth =3D true;
-> > -                /*
-> > -                 * Can't use visit_type_size() here, because it
-> > -                 * defaults to Bytes rather than Mebibytes.
-> > -                 */
-> > -                ret =3D qemu_strtosz_MiB(valuestr, NULL, &valuebw);
-> > -                if (ret < 0 || valuebw > INT64_MAX
-> > -                    || (size_t)valuebw !=3D valuebw) {
-> > -                    error_setg(&err, "Invalid size %s", valuestr);
-> > -                    break;
-> > -                }
-> > -                p->max_bandwidth =3D valuebw;
-> > -                break;
-> > -            case MIGRATION_PARAMETER_DOWNTIME_LIMIT:
-> > -                p->has_downtime_limit =3D true;
-> > -                visit_type_int(v, param, &p->downtime_limit, &err);
-> > -                break;
-> > -            case MIGRATION_PARAMETER_X_CHECKPOINT_DELAY:
-> > -                p->has_x_checkpoint_delay =3D true;
-> > -                visit_type_int(v, param, &p->x_checkpoint_delay, &er=
-r);
-> > -                break;
-> > -            case MIGRATION_PARAMETER_BLOCK_INCREMENTAL:
-> > -                p->has_block_incremental =3D true;
-> > -                visit_type_bool(v, param, &p->block_incremental, &er=
-r);
-> > -                break;
-> > -            }
-> > +    int val, ret;
-> > =20
-> > -            if (err) {
-> > -                goto cleanup;
-> > -            }
-> > -
-> > -            qmp_migrate_set_parameters(p, &err);
-> > +    val =3D qapi_enum_parse(MigrationParameter_lookup, param,
-> > +                          MIGRATION_PARAMETER__MAX,  -1, &err);
-> > +    if (val < 0) {
-> > +        goto cleanup;
-> > +    }
-> > +
-> > +    switch (val) {
-> > +    case MIGRATION_PARAMETER_COMPRESS_LEVEL:
-> > +        p->has_compress_level =3D true;
-> > +        visit_type_int(v, param, &p->compress_level, &err);
-> > +        break;
-> > +    case MIGRATION_PARAMETER_COMPRESS_THREADS:
-> > +        p->has_compress_threads =3D true;
-> > +        visit_type_int(v, param, &p->compress_threads, &err);
-> > +        break;
-> > +    case MIGRATION_PARAMETER_DECOMPRESS_THREADS:
-> > +        p->has_decompress_threads =3D true;
-> > +        visit_type_int(v, param, &p->decompress_threads, &err);
-> > +        break;
-> > +    case MIGRATION_PARAMETER_CPU_THROTTLE_INITIAL:
-> > +        p->has_cpu_throttle_initial =3D true;
-> > +        visit_type_int(v, param, &p->cpu_throttle_initial, &err);
-> > +        break;
-> > +    case MIGRATION_PARAMETER_CPU_THROTTLE_INCREMENT:
-> > +        p->has_cpu_throttle_increment =3D true;
-> > +        visit_type_int(v, param, &p->cpu_throttle_increment, &err);
-> > +        break;
-> > +    case MIGRATION_PARAMETER_TLS_CREDS:
-> > +        p->has_tls_creds =3D true;
-> > +        p->tls_creds =3D g_new0(StrOrNull, 1);
-> > +        p->tls_creds->type =3D QTYPE_QSTRING;
-> > +        visit_type_str(v, param, &p->tls_creds->u.s, &err);
-> > +        break;
-> > +    case MIGRATION_PARAMETER_TLS_HOSTNAME:
-> > +        p->has_tls_hostname =3D true;
-> > +        p->tls_hostname =3D g_new0(StrOrNull, 1);
-> > +        p->tls_hostname->type =3D QTYPE_QSTRING;
-> > +        visit_type_str(v, param, &p->tls_hostname->u.s, &err);
-> > +        break;
-> > +    case MIGRATION_PARAMETER_MAX_BANDWIDTH:
-> > +        p->has_max_bandwidth =3D true;
-> > +        /*
-> > +         * Can't use visit_type_size() here, because it
-> > +         * defaults to Bytes rather than Mebibytes.
-> > +         */
-> > +        ret =3D qemu_strtosz_MiB(valuestr, NULL, &valuebw);
-> > +        if (ret < 0 || valuebw > INT64_MAX
-> > +            || (size_t)valuebw !=3D valuebw) {
-> > +            error_setg(&err, "Invalid size %s", valuestr);
-> >              break;
-> >          }
-> > +        p->max_bandwidth =3D valuebw;
-> > +        break;
-> > +    case MIGRATION_PARAMETER_DOWNTIME_LIMIT:
-> > +        p->has_downtime_limit =3D true;
-> > +        visit_type_int(v, param, &p->downtime_limit, &err);
-> > +        break;
-> > +    case MIGRATION_PARAMETER_X_CHECKPOINT_DELAY:
-> > +        p->has_x_checkpoint_delay =3D true;
-> > +        visit_type_int(v, param, &p->x_checkpoint_delay, &err);
-> > +        break;
-> > +    case MIGRATION_PARAMETER_BLOCK_INCREMENTAL:
-> > +        p->has_block_incremental =3D true;
-> > +        visit_type_bool(v, param, &p->block_incremental, &err);
-> > +        break;
-> >      }
-> > =20
-> > -    if (i =3D=3D MIGRATION_PARAMETER__MAX) {
-> > -        error_setg(&err, QERR_INVALID_PARAMETER, param);
-> > +    if (err) {
-> > +        goto cleanup;
-> >      }
-> > =20
-> > +    qmp_migrate_set_parameters(p, &err);
-> > +
-> >   cleanup:
-> >      qapi_free_MigrateSetParameters(p);
-> >      visit_free(v);
->=20
-> Easier to review with space change ignored:
->=20
->   diff --git a/hmp.c b/hmp.c
->   index 4ba50e8..ccc58e6 100644
->   --- a/hmp.c
->   +++ b/hmp.c
->   @@ -1574,11 +1574,15 @@
->        MigrateSetParameters *p =3D g_new0(MigrateSetParameters, 1);
->        uint64_t valuebw =3D 0;
->        Error *err =3D NULL;
->   -    int i, ret;
->   +    int val, ret;
->=20
->   -    for (i =3D 0; i < MIGRATION_PARAMETER__MAX; i++) {
->   -        if (strcmp(param, MigrationParameter_lookup[i]) =3D=3D 0) {
->   -            switch (i) {
->   +    val =3D qapi_enum_parse(MigrationParameter_lookup, param,
->   +                          MIGRATION_PARAMETER__MAX,  -1, &err);
->   +    if (val < 0) {
->   +        goto cleanup;
->   +    }
->   +
->   +    switch (val) {
->                case MIGRATION_PARAMETER_COMPRESS_LEVEL:
->                    p->has_compress_level =3D true;
->                    visit_type_int(v, param, &p->compress_level, &err);
->   @@ -1644,13 +1648,6 @@
->                }
->=20
->                qmp_migrate_set_parameters(p, &err);
->   -            break;
->   -        }
->   -    }
->   -
->   -    if (i =3D=3D MIGRATION_PARAMETER__MAX) {
->   -        error_setg(&err, QERR_INVALID_PARAMETER, param);
->   -    }
->=20
->     cleanup:
->        qapi_free_MigrateSetParameters(p);
->   --=20
->   2.7.5
->=20
-> Looks good, although a default: abort() wouldn't hurt.
->=20
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcwODI0MTIxOTE5Ljc4Njc4LTMtcm9nZXIucGF1QGNpdHJpeC5jb20KU3Vi
+amVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCBRRU1VIHYyXSB4ZW4vcHQ6IGFsbG93IFFFTVUgdG8g
+cmVxdWVzdCBNU0kgdW5tYXNraW5nIGF0IGJpbmQgdGltZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
+ID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5l
+ICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIk
+KGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0
+czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEg
+LS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8
+IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxl
+ZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVk
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
+dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxNzA4MjQxMjE5MTku
+Nzg2NzgtMy1yb2dlci5wYXVAY2l0cml4LmNvbSAtPiBwYXRjaGV3LzIwMTcwODI0MTIxOTE5Ljc4
+Njc4LTMtcm9nZXIucGF1QGNpdHJpeC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
+JwoyYjdkNDgzMDQ0IHhlbi9wdDogYWxsb3cgUUVNVSB0byByZXF1ZXN0IE1TSSB1bm1hc2tpbmcg
+YXQgYmluZCB0aW1lCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IHhl
+bi9wdDogYWxsb3cgUUVNVSB0byByZXF1ZXN0IE1TSSB1bm1hc2tpbmcgYXQgYmluZCB0aW1lLi4u
+CkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0
+ZW1lbnQKIzU5OiBGSUxFOiBody94ZW4veGVuX3B0X2NvbmZpZ19pbml0LmM6MTMyNToKKyAgICBp
+ZiAocmMpClsuLi5dCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDg4IGxpbmVzIGNoZWNr
+ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5E
+ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
+dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
+ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
