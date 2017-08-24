@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dkxWJ-0004qn-PQ
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:10:24 -0400
+	(envelope-from <armbru@redhat.com>) id 1dkxa5-0006Se-1B
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:14:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1dkxWG-0001YD-KN
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:10:23 -0400
-Received: from mail-io0-x22c.google.com ([2607:f8b0:4001:c06::22c]:35192)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1dkxWG-0001Xg-FF
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:10:20 -0400
-Received: by mail-io0-x22c.google.com with SMTP id k22so1329436iod.2
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 12:10:19 -0700 (PDT)
-Received: from [192.168.0.7] (d199-74-164-53.col.wideopenwest.com.
-	[74.199.53.164])
-	by smtp.gmail.com with ESMTPSA id l5sm1425177itl.40.2017.08.24.12.10.16
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 24 Aug 2017 12:10:16 -0700 (PDT)
-From: Programmingkid <programmingkidx@gmail.com>
-Content-Type: text/plain; charset=us-ascii
+	(envelope-from <armbru@redhat.com>) id 1dkxa2-00049g-Cv
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:14:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33592)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dkxa2-000497-6m
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:14:14 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 61B0913AA4
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 19:14:12 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Thu, 24 Aug 2017 21:13:54 +0200
+Message-Id: <1503602048-12268-3-git-send-email-armbru@redhat.com>
+In-Reply-To: <1503602048-12268-1-git-send-email-armbru@redhat.com>
+References: <1503602048-12268-1-git-send-email-armbru@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Date: Thu, 24 Aug 2017 15:10:15 -0400
-References: <mailman.3749.1503600836.21955.qemu-devel@nongnu.org>
-In-Reply-To: <mailman.3749.1503600836.21955.qemu-devel@nongnu.org>
-Message-Id: <74846968-830E-4239-9DC7-B1252A5AC946@gmail.com>
-Subject: [Qemu-devel] Make test
+Subject: [Qemu-devel] [PATCH v2 02/16] qapi-schema: Introspection doc is in
+ the wrong section, fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,18 +34,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, eblake@redhat.com
 
-I think 'make test' is an abandoned testing option for QEMU so this =
-report might be unimportant. Here is my results for running 'make test':
+Bug: introspection documentation is in section "Tracing commands".
 
-$ make test
-make -C tests/tcg test
-  LINK    test_path
-Undefined symbols for architecture x86_64:
-  "_buffer_is_zero", referenced from:
-      _qemu_iovec_is_zero in test_path.o
-ld: symbol(s) not found for architecture x86_64
-clang: error: linker command failed with exit code 1 (use -v to see =
-invocation)
-make[1]: *** [test_path] Error 1
-make: *** [test] Error 2
+Cause: sub-schema qapi/introspect.json lacks a section header, and
+therefore goes into whatever section precedes its include.
+
+Fix: add a section header.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ qapi/introspect.json | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/qapi/introspect.json b/qapi/introspect.json
+index cf77ff0..5b3e6e9 100644
+--- a/qapi/introspect.json
++++ b/qapi/introspect.json
+@@ -1,7 +1,5 @@
+ # -*- Mode: Python -*-
+ #
+-# QAPI/QMP introspection
+-#
+ # Copyright (C) 2015 Red Hat, Inc.
+ #
+ # Authors:
+@@ -11,6 +9,10 @@
+ # See the COPYING file in the top-level directory.
+=20
+ ##
++# =3D QMP introspection
++##
++
++##
+ # @query-qmp-schema:
+ #
+ # Command query-qmp-schema exposes the QMP wire ABI as an array of
+--=20
+2.7.5
