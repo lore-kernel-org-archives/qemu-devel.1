@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkqp0-000399-Nl
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:01:15 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dkqqo-0003st-TG
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:03:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkqov-0000jF-1J
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:01:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43350)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dkqou-0000iW-RZ
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:01:08 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 24 Aug 2017 14:00:29 +0200
-Message-Id: <1503576029-24264-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11] s390x/s390-stattrib: Mark the storage
- attribute as not user_creatable
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dkqqj-0001b4-BD
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:03:06 -0400
+Received: from mail-ua0-x243.google.com ([2607:f8b0:400c:c08::243]:37868)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dkqqj-0001aK-5G
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:03:01 -0400
+Received: by mail-ua0-x243.google.com with SMTP id j17so988596uae.4
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 05:03:01 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1503564371-26090-15-git-send-email-armbru@redhat.com>
+References: <1503564371-26090-1-git-send-email-armbru@redhat.com>
+	<1503564371-26090-15-git-send-email-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 24 Aug 2017 14:02:59 +0200
+Message-ID: <CAJ+F1C+XOVKBgGY0hm7h=gOvt+Laa4dGX5pegWrhDG7xYd1P_A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 14/16] qapi: Convert indirect uses of
+ FOO_lookup[...] to qapi_enum_lookup()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,63 +31,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: David Hildenbrand <david@redhat.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Jason J Herne <jjherne@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-The storage attribute devices are only meant to be instantiated one
-time, internally. They can not be used by the user, so mark them with
-user_creatable = false.
+On Thu, Aug 24, 2017 at 10:46 AM, Markus Armbruster <armbru@redhat.com> wro=
+te:
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Suggested-by: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/s390x/s390-stattrib-kvm.c | 4 ++++
- hw/s390x/s390-stattrib.c     | 4 ++++
- 2 files changed, 8 insertions(+)
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-diff --git a/hw/s390x/s390-stattrib-kvm.c b/hw/s390x/s390-stattrib-kvm.c
-index ff3f89f..bc0274d 100644
---- a/hw/s390x/s390-stattrib-kvm.c
-+++ b/hw/s390x/s390-stattrib-kvm.c
-@@ -163,6 +163,7 @@ static int kvm_s390_stattrib_get_active(S390StAttribState *sa)
- static void kvm_s390_stattrib_class_init(ObjectClass *oc, void *data)
- {
-     S390StAttribClass *sac = S390_STATTRIB_CLASS(oc);
-+    DeviceClass *dc = DEVICE_CLASS(oc);
- 
-     sac->get_stattr = kvm_s390_stattrib_get_stattr;
-     sac->peek_stattr = kvm_s390_stattrib_peek_stattr;
-@@ -171,6 +172,9 @@ static void kvm_s390_stattrib_class_init(ObjectClass *oc, void *data)
-     sac->get_dirtycount = kvm_s390_stattrib_get_dirtycount;
-     sac->synchronize = kvm_s390_stattrib_synchronize;
-     sac->get_active = kvm_s390_stattrib_get_active;
-+
-+    /* Reason: Can only be instantiated one time (internally) */
-+    dc->user_creatable = false;
- }
- 
- static const TypeInfo kvm_s390_stattrib_info = {
-diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
-index d14923f..f75548e 100644
---- a/hw/s390x/s390-stattrib.c
-+++ b/hw/s390x/s390-stattrib.c
-@@ -306,6 +306,7 @@ static int qemu_s390_get_active(S390StAttribState *sa)
- static void qemu_s390_stattrib_class_init(ObjectClass *oc, void *data)
- {
-     S390StAttribClass *sa_cl = S390_STATTRIB_CLASS(oc);
-+    DeviceClass *dc = DEVICE_CLASS(oc);
- 
-     sa_cl->synchronize = qemu_s390_synchronize_stub;
-     sa_cl->get_stattr = qemu_s390_get_stattr_stub;
-@@ -314,6 +315,9 @@ static void qemu_s390_stattrib_class_init(ObjectClass *oc, void *data)
-     sa_cl->set_migrationmode = qemu_s390_set_migrationmode_stub;
-     sa_cl->get_dirtycount = qemu_s390_get_dirtycount_stub;
-     sa_cl->get_active = qemu_s390_get_active;
-+
-+    /* Reason: Can only be instantiated one time (internally) */
-+    dc->user_creatable = false;
- }
- 
- static const TypeInfo qemu_s390_stattrib_info = {
--- 
-1.8.3.1
+
+> ---
+>  hw/core/qdev-properties.c | 7 +++++--
+>  qapi/qapi-visit-core.c    | 2 +-
+>  2 files changed, 6 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index 078fc5d..7512bd4 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -72,7 +72,9 @@ static void set_enum(Object *obj, Visitor *v, const cha=
+r *name, void *opaque,
+>
+>  static void set_default_value_enum(Object *obj, const Property *prop)
+>  {
+> -    object_property_set_str(obj, prop->info->enum_table[prop->defval.i],
+> +    object_property_set_str(obj,
+> +                            qapi_enum_lookup(prop->info->enum_table,
+> +                                             prop->defval.i),
+>                              prop->name, &error_abort);
+>  }
+>
+> @@ -1095,7 +1097,8 @@ void qdev_prop_set_enum(DeviceState *dev, const cha=
+r *name, int value)
+>      Property *prop;
+>
+>      prop =3D qdev_prop_find(dev, name);
+> -    object_property_set_str(OBJECT(dev), prop->info->enum_table[value],
+> +    object_property_set_str(OBJECT(dev),
+> +                            qapi_enum_lookup(prop->info->enum_table, val=
+ue),
+>                              name, &error_abort);
+>  }
+>
+> diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
+> index f285879..30dc85b 100644
+> --- a/qapi/qapi-visit-core.c
+> +++ b/qapi/qapi-visit-core.c
+> @@ -345,7 +345,7 @@ static void output_type_enum(Visitor *v, const char *=
+name, int *obj,
+>          return;
+>      }
+>
+> -    enum_str =3D (char *)strings[value];
+> +    enum_str =3D (char *)qapi_enum_lookup(strings, value);
+>      visit_type_str(v, name, &enum_str, errp);
+>  }
+>
+> --
+> 2.7.5
+>
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
