@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkqvC-0007U5-DR
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:07:39 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dkqvU-0007jU-Hz
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:08:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkqvB-000482-FW
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:07:38 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170818211542.5380-1-eblake@redhat.com>
-	<20170818211542.5380-9-eblake@redhat.com>
-	<e44a3300-cbe9-c9d7-ae49-b223f638d7ea@redhat.com>
-	<da3712de-986d-8130-7a97-e9f1071d2a03@redhat.com>
-	<c665235d-8bec-627a-f750-4dc2798c3d8c@redhat.com>
-	<5d84655b-d82a-956a-f434-023961b23552@redhat.com>
-	<2ffb6aab-09a0-7136-946f-f68f7478c0f7@redhat.com>
-	<bddc04d6-686e-ca5c-ef30-6df7bdb9c3bf@redhat.com>
-	<87h8wxqunl.fsf@dusky.pond.sub.org>
-	<e1c18d2a-ac5e-2892-3343-80b943345f3e@redhat.com>
-	<874lsxnupg.fsf@dusky.pond.sub.org>
-	<221c272d-60de-1443-1471-2266b4e1c86b@redhat.com>
-Date: Thu, 24 Aug 2017 14:07:28 +0200
-In-Reply-To: <221c272d-60de-1443-1471-2266b4e1c86b@redhat.com> (Paolo
-	Bonzini's message of "Thu, 24 Aug 2017 12:20:54 +0200")
-Message-ID: <877extjhj3.fsf@dusky.pond.sub.org>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dkqvT-0004Dc-Lo
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:07:56 -0400
+Received: from mail-vk0-x241.google.com ([2607:f8b0:400c:c05::241]:32768)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dkqvT-0004DR-GI
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 08:07:55 -0400
+Received: by mail-vk0-x241.google.com with SMTP id g12so940287vkf.0
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 05:07:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 08/13] tests: Rely more on
- global_qtest
+In-Reply-To: <1503576178-23966-3-git-send-email-armbru@redhat.com>
+References: <1503576178-23966-1-git-send-email-armbru@redhat.com>
+	<1503576178-23966-3-git-send-email-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 24 Aug 2017 14:07:54 +0200
+Message-ID: <CAJ+F1CJViO6B4pf2LF2cWDoXkAugnashkw1cG1JSUcgvJXGqmQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/3] qapi-schema: Introspection doc is in
+ the wrong section, fix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,54 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, "open list:Floppy" <qemu-block@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> On 24/08/2017 12:09, Markus Armbruster wrote:
->> Cut-and-paste cuts both ways (pardon the pun):
->> 
->>     initialize with QTestState A
->>     frobnicate with QTestState A
->>     glomnify with QTestState A
->>     frobnicate with QTestState A
->>     initialize with QTestState B
->>     boingboing with QTestState B
->>     finalize with QTestState A
->>     finalize with QTestState A
->> 
->> Uh, forgot to frobnicate after boingboing, let me fix that real quick!
->> 
->>     initialize with QTestState A
->>     frobnicate with QTestState A
->>     glomnify with QTestState A
->>     frobnicate with QTestState A
->>     initialize with QTestState B
->>     boingboing with QTestState B
->>     frobnicate with QTestState A
->>     finalize with QTestState A
->>     finalize with QTestState A
->> 
->> Spot the pasto.
->>
->> This hasty paste would simply work with global_qtest.  I'm not claiming
->> there are cases that are just the opposite.  I'm just challenging your
->> apparent claim that the long forms help with avoiding or catching
->> pastos.  Can you explain how they help more than they hurt?
+On Thu, Aug 24, 2017 at 2:02 PM, Markus Armbruster <armbru@redhat.com> wrot=
+e:
+> Bug: introspection documentation is in section "Tracing commands".
 >
-> A pasto without global_qtest is local.
+> Cause: sub-schema qapi/introspect.json lacks a section header, and
+> therefore goes into whatever section precedes its include.
 >
-> But cut-and-paste that involves _assigning_ global_qtest, even if it
-> doesn't have cut-and-paste mistakes, may create a mess of functions
-> knowing^Wbelieving they know what global_qtest is.
+> Fix: add a section header.
 >
-> Assigning global_qtest means the short-form functions have effectively
-> dynamic binding.  In a perfect world, global_qtest would be static and
-> the create-and-assign-global would assert(!global_qtest).  Then >1 VM ->
-> don't use the short forms.
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-No consensus, status quo wins by default.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Since I find work of maintaining that status quo quite aggravating, I'll
-do my best to dump it one someone with different sensibilities.
+
+> ---
+>  qapi/introspect.json | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/qapi/introspect.json b/qapi/introspect.json
+> index cf77ff0..5b3e6e9 100644
+> --- a/qapi/introspect.json
+> +++ b/qapi/introspect.json
+> @@ -1,7 +1,5 @@
+>  # -*- Mode: Python -*-
+>  #
+> -# QAPI/QMP introspection
+> -#
+>  # Copyright (C) 2015 Red Hat, Inc.
+>  #
+>  # Authors:
+> @@ -11,6 +9,10 @@
+>  # See the COPYING file in the top-level directory.
+>
+>  ##
+> +# =3D QMP introspection
+> +##
+> +
+> +##
+>  # @query-qmp-schema:
+>  #
+>  # Command query-qmp-schema exposes the QMP wire ABI as an array of
+> --
+> 2.7.5
+>
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
