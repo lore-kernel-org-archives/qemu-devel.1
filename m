@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dkxis-0006Rg-6v
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:23:23 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dkxiw-0006V8-Aw
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:23:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dkxip-0001X0-39
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:23:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55610)
+	(envelope-from <ehabkost@redhat.com>) id 1dkxiu-0001c9-Mn
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:23:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49824)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dkxio-0001WK-TC
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:23:19 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dkxiu-0001bc-HC
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:23:24 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 24 Aug 2017 16:23:12 -0300
-Message-Id: <20170824192315.5897-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/3] hostmem-file: Add "discard-data" option
+Date: Thu, 24 Aug 2017 16:23:14 -0300
+Message-Id: <20170824192315.5897-3-ehabkost@redhat.com>
+In-Reply-To: <20170824192315.5897-1-ehabkost@redhat.com>
+References: <20170824192315.5897-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 2/3] osdep: Define QEMU_MADV_REMOVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +26,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Zack Cornelius <zack.cornelius@kove.net>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-This series adds a new "discard-data" option to
-memory-backend-file.  The new option will be useful if somebody
-is sharing RAM contents on a pre-existing file using share=on,
-but don't need data to be flushed to disk when QEMU exits.
+Define QEMU_MADV_REMOVE, so we can use it with qemu_madvise().
 
-Internally, it will trigger a madvise(MADV_REMOVE) call when the
-memory backend is removed or when QEMU exits.
-
-To make we actually trigger the new code when QEMU exits, the
-first patch in the series ensures we destroy all user-created
-objects when exiting QEMU.
-
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
 Changes v1 -> v2:
-* Original subject line of v1 was:
-  '[PATCH 0/5] hostmem-file: Add "persistent" option'
-* Replaced 'persistent=no' with 'discard-data=yes', to make it
-  clear that the flag will destroy data on the backing file.
-* Use qemu_madvise() instead of madvise()
-  * New patch added to series: "osdep: define QEMU_MADV_REMOVE"
-* Call qemu_madvise() directly from the backend unparent()
-  method, insteead of adding a new flag to the memory API and
-  reusing ram_block_discard_range()
-  * In addition to simplifying the code a lot, this fixes a bug,
-    because v1 relied on getting the memory region reference
-    count back to 0, which doesn't happen when QEMU is exiting
-    because there's no machine cleanup code to ensure that.
+* New patch added to series
+---
+ include/qemu/osdep.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Eduardo Habkost (3):
-  vl: Clean up user-creatable objects when exiting
-  osdep: Define QEMU_MADV_REMOVE
-  hostmem-file: Add "discard-data" option
-
- include/qemu/osdep.h            |  7 +++++++
- include/qom/object_interfaces.h |  8 ++++++++
- backends/hostmem-file.c         | 29 +++++++++++++++++++++++++++++
- qom/object_interfaces.c         |  5 +++++
- vl.c                            |  1 +
- qemu-options.hx                 |  5 ++++-
- 6 files changed, 54 insertions(+), 1 deletion(-)
-
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 6855b94..e9fa217 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -257,6 +257,11 @@ void qemu_anon_ram_free(void *ptr, size_t size);
+ #else
+ #define QEMU_MADV_NOHUGEPAGE QEMU_MADV_INVALID
+ #endif
++#ifdef MADV_REMOVE
++#define QEMU_MADV_REMOVE MADV_REMOVE
++#else
++#define QEMU_MADV_REMOVE QEMU_MADV_INVALID
++#endif
+ 
+ #elif defined(CONFIG_POSIX_MADVISE)
+ 
+@@ -269,6 +274,7 @@ void qemu_anon_ram_free(void *ptr, size_t size);
+ #define QEMU_MADV_DONTDUMP QEMU_MADV_INVALID
+ #define QEMU_MADV_HUGEPAGE  QEMU_MADV_INVALID
+ #define QEMU_MADV_NOHUGEPAGE  QEMU_MADV_INVALID
++#define QEMU_MADV_REMOVE QEMU_MADV_INVALID
+ 
+ #else /* no-op */
+ 
+@@ -281,6 +287,7 @@ void qemu_anon_ram_free(void *ptr, size_t size);
+ #define QEMU_MADV_DONTDUMP QEMU_MADV_INVALID
+ #define QEMU_MADV_HUGEPAGE  QEMU_MADV_INVALID
+ #define QEMU_MADV_NOHUGEPAGE  QEMU_MADV_INVALID
++#define QEMU_MADV_REMOVE QEMU_MADV_INVALID
+ 
+ #endif
+ 
 -- 
 2.9.4
