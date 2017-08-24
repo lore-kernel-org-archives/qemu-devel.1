@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paulus@ozlabs.org>) id 1dkiIY-0006H2-Rg
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 22:55:11 -0400
+	(envelope-from <thuth@redhat.com>) id 1dkiQP-0002OP-TU
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 23:03:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paulus@ozlabs.org>) id 1dkiIY-0005P0-0h
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 22:55:10 -0400
-Date: Thu, 24 Aug 2017 12:54:48 +1000
-From: Paul Mackerras <paulus@ozlabs.org>
-Message-ID: <20170824025448.GA27401@fergus.ozlabs.ibm.com>
-References: <20170821200036.15036-1-bauerman@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170821200036.15036-1-bauerman@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] spapr: Add ibm,
- processor-storage-keys property to CPU DT node
+	(envelope-from <thuth@redhat.com>) id 1dkiQP-0000vh-35
+	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 23:03:17 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu, 24 Aug 2017 05:03:03 +0200
+Message-Id: <1503543783-17192-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11] hw/ide/microdrive: Mark the dscm1xxxx
+ device with user_creatable = false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,61 +18,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Ram Pai <linuxram@us.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>
+To: qemu-block@nongnu.org, John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Andrzej Zaborowski <balrogg@gmail.com>
 
-On Mon, Aug 21, 2017 at 05:00:36PM -0300, Thiago Jung Bauermann wrote:
-> LoPAPR says:
->=20
->     =E2=80=9Cibm,processor-storage-keys=E2=80=9D
->=20
->     property name indicating the number of virtual storage keys support=
-ed
->     by the processor described by this node.
->=20
->     prop-encoded-array: Consists of two cells encoded as with encode-in=
-t.
->     The first cell represents the number of virtual storage keys suppor=
-ted
->     for data accesses while the second cell represents the number of
->     virtual storage keys supported for instruction accesses. The cell v=
-alue
->     of zero indicates that no storage keys are supported for the access
->     type.
->=20
-> pHyp provides the property above but there's a bug in P8 firmware where=
- the
-> second cell is zero even though POWER8 supports instruction access keys=
-.
-> This bug will be fixed for P9.
->=20
-> Tested with KVM on POWER8 Firenze machine and with TCG on x86_64 machin=
-e.
->=20
-> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-> ---
->=20
-> The sysfs files are provided by this patch for Linux:
+QEMU currently aborts with an assertion message when the user is trying
+to remove a dscm1xxxx again:
 
-Those sysfs files relate to the kernel's support for userspace
-processes using storage keys.  That is quite distinct from KVM's
-support for guests using storage keys, so I think that using those
-sysfs files to indicate what the guest can do is wrong.
+$ aarch64-softmmu/qemu-system-aarch64 -S -M integratorcp -nographic
+QEMU 2.9.93 monitor - type 'help' for more information
+(qemu) device_add dscm1xxxx,id=xyz
+(qemu) device_del xyz
+**
+ERROR:qemu/qdev-monitor.c:872:qdev_unplug: assertion failed: (hotplug_ctrl)
+Aborted (core dumped)
 
-In fact KVM allows guests to specify storage keys in the HPTE values
-that they set, except that there is a bug (for which Ram Pai has
-posted a patch) that means that KVM loses the top two bits of the key
-number.
+Looks like this device has to be wired up in code and is not meant
+to be hot-pluggable, so let's mark it with user_creatable = false.
 
-What I would suggest is that we use the 'pad' field in the struct
-kvm_ppc_smmu_info to report the number of keys supported by KVM for
-guest use.  That will be 0 in all current kernels, indicating that
-keys are not supported, which is reasonable because of the bug.  I
-will make sure the patch fixing the bug goes in first.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/ide/microdrive.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-We could either have two u16 fields for the number of keys for data
-and instruction, or we could have a u32 field for the number of keys
-and a separate bit in the flags field to indicate that instruction
-keys are supported.  Which would be preferable?
-
-Paul.
+diff --git a/hw/ide/microdrive.c b/hw/ide/microdrive.c
+index e3fd30e..17917c0 100644
+--- a/hw/ide/microdrive.c
++++ b/hw/ide/microdrive.c
+@@ -575,12 +575,15 @@ PCMCIACardState *dscm1xxxx_init(DriveInfo *dinfo)
+ static void dscm1xxxx_class_init(ObjectClass *oc, void *data)
+ {
+     PCMCIACardClass *pcc = PCMCIA_CARD_CLASS(oc);
++    DeviceClass *dc = DEVICE_CLASS(oc);
+ 
+     pcc->cis = dscm1xxxx_cis;
+     pcc->cis_len = sizeof(dscm1xxxx_cis);
+ 
+     pcc->attach = dscm1xxxx_attach;
+     pcc->detach = dscm1xxxx_detach;
++    /* Reason: Needs to be wired-up in code, see dscm1xxxx_init() */
++    dc->user_creatable = false;
+ }
+ 
+ static const TypeInfo dscm1xxxx_type_info = {
+-- 
+1.8.3.1
