@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkvTe-00081m-Ho
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:59:31 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dkvUd-0000Os-GW
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 13:00:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkvTZ-0004qL-Ly
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:59:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46284)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dkvTZ-0004og-C0
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:59:25 -0400
-Date: Thu, 24 Aug 2017 17:59:11 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170824165910.GD2737@work-vm>
-References: <20170628190047.26159-1-dgilbert@redhat.com>
-	<20170628190047.26159-3-dgilbert@redhat.com>
-	<20170710100323.GA21344@pxdev.xzpeter.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dkvUY-0005pj-Mk
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 13:00:31 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:36526)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dkvUY-0005og-IW
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 13:00:26 -0400
+Received: by mail-qt0-x244.google.com with SMTP id p10so29569qte.3
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 10:00:26 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1503592308-93913-1-git-send-email-imammedo@redhat.com>
+	<1503592308-93913-2-git-send-email-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <fed7c9be-6609-75bc-61ca-b6acc67bb092@amsat.org>
+Date: Thu, 24 Aug 2017 14:00:21 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170710100323.GA21344@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC 02/29] migrate: Update
- ram_block_discard_range for shared
+In-Reply-To: <1503592308-93913-2-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11 v3 01/25] qom: cpu: fix parsed
+ feature string length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,103 +36,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, a.perevalov@samsung.com, marcandre.lureau@redhat.com, maxime.coquelin@redhat.com, mst@redhat.com, quintela@redhat.com, lvivier@redhat.com, aarcange@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Wed, Jun 28, 2017 at 08:00:20PM +0100, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > The choice of call to discard a block is getting more complicated
-> > for other cases.   We use fallocate PUNCH_HOLE in any file cases;
-> > it works for both hugepage and for tmpfs.
-> > We use the DONTNEED for non-hugepage cases either where they're
-> > anonymous or where they're private.
-> > 
-> > Care should be taken when trying other backing files.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  exec.c       | 28 ++++++++++++++++------------
-> >  trace-events |  3 +++
-> >  2 files changed, 19 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/exec.c b/exec.c
-> > index 69fc5c9b07..4e61226a16 100644
-> > --- a/exec.c
-> > +++ b/exec.c
-> > @@ -3557,6 +3557,7 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
-> >      }
-> >  
-> >      if ((start + length) <= rb->used_length) {
-> > +        bool need_madvise, need_fallocate;
-> >          uint8_t *host_endaddr = host_startaddr + length;
-> >          if ((uintptr_t)host_endaddr & (rb->page_size - 1)) {
-> >              error_report("ram_block_discard_range: Unaligned end address: %p",
-> > @@ -3566,23 +3567,26 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
-> >  
-> >          errno = ENOTSUP; /* If we are missing MADVISE etc */
-> >  
-> > -        if (rb->page_size == qemu_host_page_size) {
-> > -#if defined(CONFIG_MADVISE)
-> > -            /* Note: We need the madvise MADV_DONTNEED behaviour of definitely
-> > -             * freeing the page.
-> > -             */
-> > -            ret = madvise(host_startaddr, length, MADV_DONTNEED);
-> > -#endif
-> > -        } else {
-> > -            /* Huge page case  - unfortunately it can't do DONTNEED, but
-> > -             * it can do the equivalent by FALLOC_FL_PUNCH_HOLE in the
-> > -             * huge page file.
-> > -             */
-> > +        /* The logic here is messy;
-> > +         *    madvise DONTNEED fails for hugepages
-> > +         *    fallocate works on hugepages and shmem
-> > +         */
-> > +        need_madvise = (rb->page_size == qemu_host_page_size) &&
-> > +                       (rb->fd == -1 || !(rb->flags & RAM_SHARED));
-> > +        need_fallocate = rb->fd != -1;
-> > +        if (ret == -1 && need_fallocate) {
+Hi Igor,
+
+On 08/24/2017 01:31 PM, Igor Mammedov wrote:
+> since commit ( 9262685b cpu: Factor out cpu_generic_init() )
+> features parsed by it were truncated only to the 1st feature
+> after CPU name due to fact that
 > 
-> (ret will always be -1 when reach here?)
-
-Yes, I was just making the code independent of order.
-
-> >  #ifdef CONFIG_FALLOCATE_PUNCH_HOLE
-> >              ret = fallocate(rb->fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
-> >                              start, length);
-> >  #endif
-> >          }
-> > +        if (need_madvise && (!need_fallocate || (ret == 0))) {
-> > +#if defined(CONFIG_MADVISE)
-> > +            ret =  madvise(host_startaddr, length, MADV_DONTNEED);
-> > +#endif
-> > +        }
-> > +        trace_ram_block_discard_range(rb->idstr, host_startaddr,
-> > +                                      need_madvise, need_fallocate, ret);
+>     featurestr = strtok(NULL, ",");
+>     cc->parse_features(cpu, featurestr, &err);
 > 
-> How about make the check easier by:
+> would extract exactly one feature and parse_features() callback
+> would parse it and only it leaving the rest of features ignored.
 > 
->   if (rb->page_size != qemu_host_page_size ||
->       rb->flags & RAM_SHARED) {
->       /* Either huge pages or shared memory will contain rb->fd */
->       assert(rb->fd);
->       fallocate(rb->fd, ...);
->   } else {
->       madvise();
->   }
-
-I've reworked this.
-There are situations where you want both (I think!) - for
-shared memory, that's not a hugepage, you do an fallocate
-to clear the underlying storage, and then do an madvise
-to force the local mappings to be cleared.
-
-Dave
-
-> Thanks,
+> Reuse approach from x86 custom impl. i.e. replace strtok() token
+> parsing with g_strsplit(), which would split feature string in
+> 2 parts name and features list and pass the later to
+> parse_features() callback.
 > 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> CC: Eduardo Habkost <ehabkost@redhat.com>
+> CC: Andreas Färber <afaerber@suse.de>
+> 
+> Probably due to existing users not actualy using/having any
+> features to parse bug were unnoticed for 2 years but switching
+> from custom cpu_foo_init() to cpu_generic_init() triggered it.
+> ---
+>   qom/cpu.c | 14 ++++++--------
+>   1 file changed, 6 insertions(+), 8 deletions(-)
+> 
+> diff --git a/qom/cpu.c b/qom/cpu.c
+> index 4f38db0..caf5c14 100644
+> --- a/qom/cpu.c
+> +++ b/qom/cpu.c
+> @@ -50,28 +50,26 @@ bool cpu_exists(int64_t id)
+>   
+>   CPUState *cpu_generic_init(const char *typename, const char *cpu_model)
+>   {
+> -    char *str, *name, *featurestr;
+>       CPUState *cpu = NULL;
+>       ObjectClass *oc;
+>       CPUClass *cc;
+>       Error *err = NULL;
+> +    gchar **model_pieces;
+>   
+> -    str = g_strdup(cpu_model);
+> -    name = strtok(str, ",");
+> +    model_pieces = g_strsplit(cpu_model, ",", 2);
+>   
+> -    oc = cpu_class_by_name(typename, name);
+> +    oc = cpu_class_by_name(typename, model_pieces[0]);
+>       if (oc == NULL) {
+> -        g_free(str);
+> +        g_strfreev(model_pieces);
+>           return NULL;
+>       }
+>   
+>       cc = CPU_CLASS(oc);
+> -    featurestr = strtok(NULL, ",");
+>       /* TODO: all callers of cpu_generic_init() need to be converted to
+>        * call parse_features() only once, before calling cpu_generic_init().
+>        */
+> -    cc->parse_features(object_class_get_name(oc), featurestr, &err);
+> -    g_free(str);
+
+I feel safer adding:
+
+        if (g_strv_length(model_pieces) > 1) {
+
+> +    cc->parse_features(object_class_get_name(oc), model_pieces[1], &err);
+
+        }
+
+> +    g_strfreev(model_pieces);
+>       if (err != NULL) {
+>           goto out;
+>       }
+> 
