@@ -1,38 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dkwwi-0007dK-8b
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 14:33:38 -0400
+	(envelope-from <armbru@redhat.com>) id 1dkwyH-0000O7-Rm
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 14:35:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dkwwe-0002hP-Ai
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 14:33:36 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44687)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dkwwe-0002h1-22
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 14:33:32 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7OIX8uA129482
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 14:33:30 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cj3n71qf2-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 14:33:29 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 24 Aug 2017 19:33:27 +0100
-References: <e2a1b182-83a9-2259-27f9-68b61b5061d5@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 24 Aug 2017 20:33:24 +0200
+	(envelope-from <armbru@redhat.com>) id 1dkwyD-0003Y2-Ti
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 14:35:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35342)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dkwyD-0003X2-Ks
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 14:35:09 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1503564371-26090-1-git-send-email-armbru@redhat.com>
+	<1503564371-26090-3-git-send-email-armbru@redhat.com>
+	<04558062-88d3-0bd2-06d2-ba8a5af8ba8e@redhat.com>
+Date: Thu, 24 Aug 2017 20:35:04 +0200
+In-Reply-To: <04558062-88d3-0bd2-06d2-ba8a5af8ba8e@redhat.com> (Eric Blake's
+	message of "Thu, 24 Aug 2017 11:38:33 -0500")
+Message-ID: <87y3q8ddbb.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <e2a1b182-83a9-2259-27f9-68b61b5061d5@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <02fd1cdd-f900-1bea-9ef9-51257e981c1e@de.ibm.com>
-Subject: Re: [Qemu-devel] S390 bios breaks in qemu 2.10.rc3
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 02/16] qapi: Drop superfluous
+ qapi_enum_parse() parameter max
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,71 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-Just to understand the urgency. Is the problem happening with the BIOS that is shipped in the
-upstream git tree, or a self-built one?
+Eric Blake <eblake@redhat.com> writes:
 
+> On 08/24/2017 03:45 AM, Markus Armbruster wrote:
+>> The lookup tables have a sentinel, no need to make callers pass their
+>> size.
+>> 
+>> Fun: the header has it in the wrong position.  Good riddance.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  block.c                  |  1 -
+>>  block/file-posix.c       |  7 +++----
+>>  block/file-win32.c       |  2 +-
+>>  block/gluster.c          |  6 ++----
+>>  block/parallels.c        |  3 ++-
+>>  block/qcow2.c            |  6 ++----
+>>  blockdev.c               |  1 -
+>>  hmp.c                    |  2 +-
+>>  include/qapi/util.h      |  2 +-
+>>  migration/global_state.c |  3 +--
+>
+> This would be a patch where using scripts/git.orderfile to highlight the
+> interface change first would make review a bit quicker :)
+>
+>> +++ b/include/qapi/util.h
+>> @@ -12,7 +12,7 @@
+>>  #define QAPI_UTIL_H
+>>  
+>>  int qapi_enum_parse(const char * const lookup[], const char *buf,
+>> -                    int max, int def, Error **errp);
+>> +                    int def, Error **errp);
+>
+> I'm not sure what you meant by wrong position; were you thinking that
+> lookup/max should be immediately adjacent (since max is a property of
+> the lookup[] parameter), and sticking 'buf' in between the two is what
+> meant 'max' was in the wrong position?
 
-On 08/24/2017 05:05 PM, Farhan Ali wrote:
-> Hi,
-> 
-> There is an issue in QEMU bios which is exposed by commit
-> 
-> commit 198c0d1f9df8c429502cb744fc26b6ba6e71db74
-> Author: Halil Pasic <pasic@linux.vnet.ibm.com>
-> Date:   Thu Jul 27 17:48:42 2017 +0200
-> 
->     s390x/css: check ccw address validity
-> 
->     According to the PoP channel command words (CCW) must be doubleword
->     aligned and 31 bit addressable for format 1 and 24 bit addressable for
->     format 0 CCWs.
-> 
->     If the channel subsystem encounters a ccw address which does not satisfy
->     this alignment requirement a program-check condition is recognised.
-> 
->     The situation with 31 bit addressable is a bit more complicated: both the
->     ORB and a format 1 CCW TIC hold the address of (the rest of) the channel
->     program, that is the address of the next CCW in a word, and the PoP
->     mandates that bit 0 of that word shall be zero -- or a program-check
->     condition is to be recognized -- and does not belong to the field holding
->     the ccw address.
-> 
->     Since in code the corresponding fields span across the whole word (unlike
->     in PoP where these are defined as 31 bit wide) we can check this by
->     applying a mask. The 24 addressable case isn't affecting TIC because the
->     address is composed of a halfword and a byte portion (no additional zero
->     bit requirements) and just slightly complicates the ORB case where also
->     bits 1-7 need to be zero.
-> 
->     The same requirements (especially n-bit addressability) apply to the
->     ccw addresses generated while chaining.
-> 
->     Let's make our CSS implementation follow the AR more closely.
-> 
->     Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->     Message-Id: <20170727154842.23427-1-pasic@linux.vnet.ibm.com>
->     Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
->     Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> 
-> 
-> It looks like the bios does not create a double word aligned CCW. Looking at the bios code we the CCW1 struct is not aligned
-> 
-> /* channel command word (type 1) */
-> struct ccw1 {
->     __u8 cmd_code;
->     __u8 flags;
->     __u16 count;
->     __u32 cda;
-> } __attribute__ ((packed));
-> 
-> and it looks like the compiler does not guarantee a doubleword alignment.
-> 
-> The weird thing about it is I see it break in one of my system and works fine in another system. Trying a simple fix of aligning the struct also doesn't seem to work all the time.
-> 
-> 
-> Thanks
-> Farhan
-> 
+Compare the declaration above with the definition below:
+
+    diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
+    index 46eda7d..ee7594f 100644
+    --- a/qapi/qapi-util.c
+    +++ b/qapi/qapi-util.c
+    @@ -16,7 +16,7 @@
+     #include "qapi/util.h"
+
+     int qapi_enum_parse(const char * const lookup[], const char *buf,
+    -                    int max, int def, Error **errp)
+    +                    int def, Error **errp)
+     {
+         int i;
+
+Declaration has max before def, definition has it the other way round.
+
+Such errors are one reason I prefer to have documentation next to
+definitions, which are authoritative, rather than declarations, which
+may or may not match the definition.
+
+> The change itself is reasonable, even if the commit message needs a
+> tweak to answer my question.
+
+Care to suggest a wording?
+
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
