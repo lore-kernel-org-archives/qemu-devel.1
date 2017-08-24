@@ -1,27 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dkmot-00041n-AR
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:44:52 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dkmu7-0007AP-JP
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:50:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dkmos-0007Kv-97
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:44:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39274)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dkmos-0007KZ-0l
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:44:50 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F1977883B6
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 07:44:48 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Thu, 24 Aug 2017 08:22:02 +0100
-Message-Id: <20170824072202.26818-4-stefanha@redhat.com>
-In-Reply-To: <20170824072202.26818-1-stefanha@redhat.com>
-References: <20170824072202.26818-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] qemu-iotests: use context managers for
- resource cleanup in 194
+	(envelope-from <borntraeger@de.ibm.com>) id 1dkmu3-0000yk-NI
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:50:15 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60890)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dkmu3-0000yc-EA
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:50:11 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7O7o8jL009245
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 03:50:09 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2chsj1n39v-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 03:50:08 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 24 Aug 2017 08:49:21 +0100
+References: <20170823155458.19601-1-cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 24 Aug 2017 09:49:18 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170823155458.19601-1-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <aa9f83b7-fa91-bfff-eb4c-e8d24f8e1358@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v5 0/9] zpci detangling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,124 +41,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Daniel Berrange <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-Switch from atexit.register() to a more elegant idiom of declaring
-resources in a with statement:
+As there are only minor things left, 
+whole series
 
-  with FilePath('monitor.sock') as monitor_path,
-       VM() as vm:
-      ...
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
-The files and VMs will be automatically cleaned up whether the test
-passes or fails.
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tests/qemu-iotests/194 | 83 +++++++++++++++++++++++++-------------------------
- 1 file changed, 41 insertions(+), 42 deletions(-)
-
-diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
-index 8028111e21..06aea661d4 100755
---- a/tests/qemu-iotests/194
-+++ b/tests/qemu-iotests/194
-@@ -19,55 +19,54 @@
- #
- # Non-shared storage migration test using NBD server and drive-mirror
- 
--import os
--import atexit
- import iotests
- 
- iotests.verify_platform(['linux'])
- 
--img_size = '1G'
--source_img_path = os.path.join(iotests.test_dir, 'source.img')
--dest_img_path = os.path.join(iotests.test_dir, 'dest.img')
--iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, source_img_path, img_size)
--iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, dest_img_path, img_size)
-+with iotests.FilePath('source.img') as source_img_path, \
-+     iotests.FilePath('dest.img') as dest_img_path, \
-+     iotests.FilePath('migration.sock') as migration_sock_path, \
-+     iotests.FilePath('nbd.sock') as nbd_sock_path, \
-+     iotests.VM('source') as source_vm, \
-+     iotests.VM('dest') as dest_vm:
- 
--iotests.log('Launching VMs...')
--migration_sock_path = os.path.join(iotests.test_dir, 'migration.sock')
--nbd_sock_path = os.path.join(iotests.test_dir, 'nbd.sock')
--source_vm = iotests.VM('source').add_drive(source_img_path)
--dest_vm = (iotests.VM('dest').add_drive(dest_img_path)
--                             .add_incoming('unix:{0}'.format(migration_sock_path)))
--source_vm.launch()
--atexit.register(source_vm.shutdown)
--dest_vm.launch()
--atexit.register(dest_vm.shutdown)
-+    img_size = '1G'
-+    iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, source_img_path, img_size)
-+    iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, dest_img_path, img_size)
- 
--iotests.log('Launching NBD server on destination...')
--iotests.log(dest_vm.qmp('nbd-server-start', addr={'type': 'unix', 'data': {'path': nbd_sock_path}}))
--iotests.log(dest_vm.qmp('nbd-server-add', device='drive0', writable=True))
-+    iotests.log('Launching VMs...')
-+    (source_vm.add_drive(source_img_path)
-+              .launch())
-+    (dest_vm.add_drive(dest_img_path)
-+            .add_incoming('unix:{0}'.format(migration_sock_path))
-+            .launch())
- 
--iotests.log('Starting drive-mirror on source...')
--iotests.log(source_vm.qmp(
--              'drive-mirror',
--              device='drive0',
--              target='nbd+unix:///drive0?socket={0}'.format(nbd_sock_path),
--              sync='full',
--              format='raw', # always raw, the server handles the format
--              mode='existing'))
-+    iotests.log('Launching NBD server on destination...')
-+    iotests.log(dest_vm.qmp('nbd-server-start', addr={'type': 'unix', 'data': {'path': nbd_sock_path}}))
-+    iotests.log(dest_vm.qmp('nbd-server-add', device='drive0', writable=True))
- 
--iotests.log('Waiting for drive-mirror to complete...')
--iotests.log(source_vm.event_wait('BLOCK_JOB_READY'),
--            filters=[iotests.filter_qmp_event])
-+    iotests.log('Starting drive-mirror on source...')
-+    iotests.log(source_vm.qmp(
-+                  'drive-mirror',
-+                  device='drive0',
-+                  target='nbd+unix:///drive0?socket={0}'.format(nbd_sock_path),
-+                  sync='full',
-+                  format='raw', # always raw, the server handles the format
-+                  mode='existing'))
- 
--iotests.log('Starting migration...')
--source_vm.qmp('migrate-set-capabilities',
--              capabilities=[{'capability': 'events', 'state': True}])
--dest_vm.qmp('migrate-set-capabilities',
--            capabilities=[{'capability': 'events', 'state': True}])
--iotests.log(source_vm.qmp('migrate', uri='unix:{0}'.format(migration_sock_path)))
-+    iotests.log('Waiting for drive-mirror to complete...')
-+    iotests.log(source_vm.event_wait('BLOCK_JOB_READY'),
-+                filters=[iotests.filter_qmp_event])
- 
--while True:
--    event = source_vm.event_wait('MIGRATION')
--    iotests.log(event, filters=[iotests.filter_qmp_event])
--    if event['data']['status'] in ('completed', 'failed'):
--        break
-+    iotests.log('Starting migration...')
-+    source_vm.qmp('migrate-set-capabilities',
-+                  capabilities=[{'capability': 'events', 'state': True}])
-+    dest_vm.qmp('migrate-set-capabilities',
-+                capabilities=[{'capability': 'events', 'state': True}])
-+    iotests.log(source_vm.qmp('migrate', uri='unix:{0}'.format(migration_sock_path)))
-+
-+    while True:
-+        event = source_vm.event_wait('MIGRATION')
-+        iotests.log(event, filters=[iotests.filter_qmp_event])
-+        if event['data']['status'] in ('completed', 'failed'):
-+            break
--- 
-2.13.5
+On 08/23/2017 05:54 PM, Cornelia Huck wrote:
+> Hopefully should be close now...
+> 
+> v4->v5:
+> - dropped "s390x/kvm: msi route fixup for non-pci"
+> - reworked "s390x/sclp: properly guard pci-specific functions": the
+>   configure/deconfigure stuff is about I/O adapters, we were missing
+>   checks, and I used an incorrect return code -- please review
+> - collected more r-bs
+> 
+> Cornelia Huck (9):
+>   9pfs: fix dependencies
+>   kvm: remove hard dependency on pci
+>   s390x/pci: add stubs
+>   s390x: chsc nt2 events are pci-only
+>   s390x/pci: do not advertise pci on non-pci builds
+>   s390x/ccw: create s390 phb conditionally
+>   s390x/sclp: properly guard pci-specific functions
+>   s390x/pci: fence off instructions for non-pci
+>   s390x: refine pci dependencies
+> 
+>  accel/kvm/kvm-all.c               |  6 ++--
+>  default-configs/s390x-softmmu.mak |  2 +-
+>  fsdev/Makefile.objs               |  9 ++---
+>  hw/9pfs/Makefile.objs             |  2 +-
+>  hw/Makefile.objs                  |  2 +-
+>  hw/pci/pci-stub.c                 | 16 ++++++++-
+>  hw/pci/pci.c                      |  2 ++
+>  hw/s390x/Makefile.objs            |  3 +-
+>  hw/s390x/s390-pci-bus.c           | 18 +++-------
+>  hw/s390x/s390-pci-bus.h           | 12 ++-----
+>  hw/s390x/s390-pci-stub.c          | 76 +++++++++++++++++++++++++++++++++++++++
+>  hw/s390x/s390-virtio-ccw.c        | 14 ++++----
+>  hw/s390x/sclp.c                   | 39 +++++++++++++++++---
+>  include/hw/pci/pci.h              |  2 ++
+>  include/hw/s390x/sclp.h           | 17 ++++++---
+>  target/s390x/ioinst.c             | 16 +++++++++
+>  target/s390x/kvm.c                | 58 ++++++++++++++++++++++--------
+>  17 files changed, 227 insertions(+), 67 deletions(-)
+>  create mode 100644 hw/s390x/s390-pci-stub.c
+> 
