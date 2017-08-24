@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1dkuCs-0007yL-EH
+	(envelope-from <crosa@redhat.com>) id 1dkuCt-0007zK-MO
 	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:38:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1dkuCq-0002PL-8S
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:38:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39406)
+	(envelope-from <crosa@redhat.com>) id 1dkuCs-0002QZ-6S
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:38:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37096)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1dkuCp-0002OX-UT
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:38:04 -0400
-References: <20170822044155.2451-1-famz@redhat.com>
-	<20170822044155.2451-6-famz@redhat.com>
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1dkuCr-0002Pt-Sk
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:38:06 -0400
 From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <f3f12cf2-193d-7207-45a8-88055060baef@redhat.com>
-Date: Thu, 24 Aug 2017 11:33:07 -0400
+References: <20170822044155.2451-1-famz@redhat.com>
+	<20170822044155.2451-8-famz@redhat.com>
+Message-ID: <81b75d30-897e-fefe-70f5-6678d6ed663b@redhat.com>
+Date: Thu, 24 Aug 2017 11:34:41 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170822044155.2451-6-famz@redhat.com>
+In-Reply-To: <20170822044155.2451-8-famz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="TqBr6KSTBBQ7Jl4xQPdbv88dE1lx7Sjh7"
-Subject: Re: [Qemu-devel] [PATCH v3 05/10] tests: Add FreeBSD image
+	boundary="IEgsNFeVaPfIrR0En6soo7mvHl79bfAKn"
+Subject: Re: [Qemu-devel] [PATCH v3 07/10] tests: Add OpenBSD image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +29,21 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, pbonzini@redhat.com, stefanha@redhat.com, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Kamil Rytarowski <kamil@netbsd.org>, stefanha@redhat.com, pbonzini@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TqBr6KSTBBQ7Jl4xQPdbv88dE1lx7Sjh7
+--IEgsNFeVaPfIrR0En6soo7mvHl79bfAKn
 From: Cleber Rosa <crosa@redhat.com>
 To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, pbonzini@redhat.com, stefanha@redhat.com,
- Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com,
- Kamil Rytarowski <kamil@netbsd.org>
-Message-ID: <f3f12cf2-193d-7207-45a8-88055060baef@redhat.com>
-Subject: Re: [PATCH v3 05/10] tests: Add FreeBSD image
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Kamil Rytarowski <kamil@netbsd.org>, stefanha@redhat.com,
+ pbonzini@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Message-ID: <81b75d30-897e-fefe-70f5-6678d6ed663b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 07/10] tests: Add OpenBSD image
 References: <20170822044155.2451-1-famz@redhat.com>
- <20170822044155.2451-6-famz@redhat.com>
-In-Reply-To: <20170822044155.2451-6-famz@redhat.com>
+ <20170822044155.2451-8-famz@redhat.com>
+In-Reply-To: <20170822044155.2451-8-famz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
@@ -57,19 +56,19 @@ On 08/22/2017 12:41 AM, Fam Zheng wrote:
 >=20
 > Signed-off-by: Fam Zheng <famz@redhat.com>
 > ---
->  tests/vm/freebsd | 45 +++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 45 insertions(+)
->  create mode 100755 tests/vm/freebsd
+>  tests/vm/openbsd | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 46 insertions(+)
+>  create mode 100755 tests/vm/openbsd
 >=20
-> diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
 > new file mode 100755
-> index 0000000000..0e4eb037d7
+> index 0000000000..b308aa252b
 > --- /dev/null
-> +++ b/tests/vm/freebsd
-> @@ -0,0 +1,45 @@
+> +++ b/tests/vm/openbsd
+> @@ -0,0 +1,46 @@
 > +#!/usr/bin/env python
 > +#
-> +# FreeBSD VM image
+> +# OpenBSD VM image
 > +#
 > +# Copyright (C) 2017 Red Hat Inc.
 > +#
@@ -84,41 +83,40 @@ e
 > +import os
 > +import sys
 > +import logging
-
-logging is not used in this module.
-
 > +import subprocess
 > +import tempfile
 > +import time
 
-tempfile and time are also not used in this module.
+logging, and tempfile are not used here.
 
 > +import basevm
 > +
-> +class FreeBSDVM(basevm.BaseVM):
-> +    name =3D "freebsd"
+> +class OpenBSDVM(basevm.BaseVM):
+> +    name =3D "openbsd"
 > +    BUILD_SCRIPT =3D """
 > +        set -e;
 > +        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-> +        tar -xf /dev/vtbd1;
-> +        ./configure {configure_opts};
+> +        tar -xf /dev/rsd1c;
+> +        ./configure --cc=3Dx86_64-unknown-openbsd6.1-gcc-4.9.4 --pytho=
+n=3Dpython2.7 {configure_opts};
 > +        gmake -j{jobs};
-> +        gmake check;
+> +        # XXX: "gmake check" seems to always hang or fail
+> +        #gmake check;
 > +    """
 > +
 > +    def build_image(self, img, rebuild=3DFalse):
 
-I don't see how "rebuild" will ever get set by using "basevm.main()".
-Also it doesn't exist in UbuntuX86VM, so it's not a uniform interface.
+Same comment as in the FreeBSDVM class: I don't see how "rebuild" will
+ever get set by using "basevm.main()".
 
 - Cleber.
 
 > +        if os.path.exists(img) and not rebuild:
 > +            return
 > +        cimg =3D self._download_with_cache("http://download.patchew.or=
-g/freebsd.img.xz",
-> +                sha256sum=3D'adcb771549b37bc63826c501f05121a206ed3d9f5=
-5f49145908f7e1432d65891')
+g/openbsd.img.xz",
+> +                sha256sum=3D'8c6cedc483e602cfee5e04f0406c64eb99138495e=
+8ca580bc0293bcf0640c1bf')
 > +        img_tmp_xz =3D img + ".tmp.xz"
 > +        img_tmp =3D img + ".tmp"
 > +        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
@@ -126,7 +124,7 @@ g/freebsd.img.xz",
 > +        os.rename(img_tmp, img)
 > +
 > +if __name__ =3D=3D "__main__":
-> +    sys.exit(basevm.main(FreeBSDVM))
+> +    sys.exit(basevm.main(OpenBSDVM))
 >=20
 
 --=20
@@ -136,26 +134,28 @@ Cleber Rosa
 [  7ABB 96EB 8B46 B94D 5E0F  E9BB 657E 8D33 A5F2 09F3  ]
 
 
---TqBr6KSTBBQ7Jl4xQPdbv88dE1lx7Sjh7
+
+
+--IEgsNFeVaPfIrR0En6soo7mvHl79bfAKn
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAlme8bQACgkQZX6NM6Xy
-CfPWtg//QuOLGB472VvlVtnO3za/7SAUivACUinxNHnwus5KWnkTjUNNbNOjflQ4
-wpKHtiARSzeSxbcjhgK46e/zZFqtWPQ+6Su224ozrYcRt2haqgDOQS9J2FfRDbrK
-ycKJ7cpc1zUX02Zna0whsGY7c1IhW06X/1f8m1H0gNuVvKl3VcDENRUPWYkkXNbZ
-QAGkOqq1j7N4HUHbQqGqP9D//VAGh18v1mmaL4yrUPuyC7iqCnfUNSuw0YcbZYxV
-Lw/ItPMPVbPOd/PnUQw35EcmgsYzVf49Wg6aw0n8PaeU2zn5AypgUHHnQUJ866/T
-Asb1CE7KNlupBNlBBmPzeoKbkCt7eSV9svXBITGZkulDytnis7TW0+igFJw8WWuE
-6v0r8uF1ABCNm7PO10Tkyk2rNbtdKqq1QPe48j3NmXd7yyDCWIUYHCqF+iS/o2MH
-rQig3HddOqwAYR+92uF3v2u9xiuW40XkjJKiERMfj4Czbcghp12rHzMW3kGbHZhL
-+f9w147U7zGawHBlaiTetmQc0VGEXmMt5JzO1xq1E3v/2zOmwsPxLfM+14bpCfgA
-3aWZCEUBRoRiBoNAc5eCrY5QpBCXf1olMhk+Fv7JcisQjWFb1QwDqnT4FUuZ6TRV
-haQHg04OtzC65gEX3TUDIrtQi+9NIBWALRmBvaEU+7GtB3km+Gg=
-=uA5D
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAlme8hEACgkQZX6NM6Xy
+CfNOrBAArlV25mOMnb3mbT3HVltdc3z5echUuEOev/vU9dZ/SFSJ0w6kjdg49u6Z
+gPnJYOp0wDuDoV647CK4nldNjPrHdjfBUkbRkthCWeOxpYtIlvpVNu//bGkO3Hx9
+JpXQEvw+eU4sB/JG05HgTsM8LRwh4b7iZvXFifsJ8TFkB3HdqA8AQF7ERXajssJK
+jxUMjBIhRPIGMCZ/LClTvlLyrrT/0OXzTpnZX5w/8785/7LjZ4bjIQ3KOl3O/pay
+bM4TF3bV+W24Q/jA/3cGtAvbfZjbElbmaNwdfKkyteE+MGxwIPdpEYHWQZEiDFtR
+WlQl3y9yWpWaxYZKBnnciEkqyMpVpqg/VPGfJdUnsAbFZWczPYmFb+jbvcOCNZGX
+TrGu3hDMJHYBqjU7HrHw9vWqI+IRRtaOr1tnIyM1+OxFbD8xMa7odRmeXQN25Gxy
+Ox5mI5WXbVrAywdekFWtthoqaOxQJ7wRCDfTJltPk36xliT1+/KF+AZ+WHvUlMLn
+QML3bcCxdHnrqFM8AoMoKHoEhw3QYnc31lr/pjyaEXqCYCWB6kxQPolSSIzpHPMh
+sjDmBLRq0Xrknk7ZYoNBah7hKlkGO4z3yC7kYuGXH6zi8I22OXBV5p/lqphoPOM5
+9ZLsg1aiZtJ8rOv3Rv5ivixE0YTg/7pTw+cYwqPT2CgxkZqUfgU=
+=cONh
 -----END PGP SIGNATURE-----
 
---TqBr6KSTBBQ7Jl4xQPdbv88dE1lx7Sjh7--
+--IEgsNFeVaPfIrR0En6soo7mvHl79bfAKn--
