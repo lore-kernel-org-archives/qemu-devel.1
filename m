@@ -1,42 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dkonA-00087E-Gn
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:51:13 -0400
+	(envelope-from <JBeulich@suse.com>) id 1dkoqI-0000X7-Fn
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:54:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dkon7-0003AY-Ap
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:51:12 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51935)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dkon7-0003A5-2G
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:51:09 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7O9nYlj007388
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 05:51:07 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2chv0vhvgf-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 05:51:07 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 24 Aug 2017 10:51:05 +0100
-References: <20170823155458.19601-1-cohuck@redhat.com>
-	<20170823155458.19601-4-cohuck@redhat.com>
-	<5c445775-eb1c-7f20-94d4-80eda7d4c623@de.ibm.com>
-	<87ab396e-437f-27f9-4b31-e4b5417bed74@de.ibm.com>
-	<20170824110959.3b9c3f72.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 24 Aug 2017 11:50:54 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170824110959.3b9c3f72.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <83230def-0eae-803b-d788-da0978ec48ec@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v5 3/9] s390x/pci: add stubs
+	(envelope-from <JBeulich@suse.com>) id 1dkoqF-0004fq-A5
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:54:26 -0400
+Received: from prv-mh.provo.novell.com ([137.65.248.74]:33865)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <JBeulich@suse.com>) id 1dkoqF-0004fK-3g
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:54:23 -0400
+Message-Id: <599EBE6D020000780017310E@prv-mh.provo.novell.com>
+Date: Thu, 24 Aug 2017 03:54:21 -0600
+From: "Jan Beulich" <JBeulich@suse.com>
+References: <20170824094753.77795-1-roger.pau@citrix.com>
+	<20170824094753.77795-3-roger.pau@citrix.com>
+In-Reply-To: <20170824094753.77795-3-roger.pau@citrix.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Subject: Re: [Qemu-devel] [PATCH QEMU] xen/pt: allow QEMU to request MSI
+ unmasking at bind time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,57 +29,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: thuth@redhat.com, zyimin@linux.vnet.ibm.com, david@redhat.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, qemu-devel@nongnu.org
+To: Roger Pau Monne <roger.pau@citrix.com>
+Cc: Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, hfp@posteo.de
 
+>>> On 24.08.17 at 11:47, <roger.pau@citrix.com> wrote:
+> @@ -274,7 +278,7 @@ int xen_pt_msi_update(XenPCIPassthroughState *s)
+>  {
+>      XenPTMSI *msi =3D s->msi;
+>      return msi_msix_update(s, msi_addr64(msi), msi->data, msi->pirq,
+> -                           false, 0, &msi->pirq);
+> +                           false, 0, &msi->pirq, false);
+>  }
 
+I don't think this is correct when the device has mask bits.
 
-On 08/24/2017 11:09 AM, Cornelia Huck wrote:
-> On Thu, 24 Aug 2017 09:43:48 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> On 08/24/2017 09:38 AM, Christian Borntraeger wrote:
->>>
->>>
->>> On 08/23/2017 05:54 PM, Cornelia Huck wrote:  
->>>> Some non-pci code calls into zpci code. Provide some stubs for builds
->>>> without pci.
->>>>
->>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>>> ---
->>>>  hw/s390x/Makefile.objs   |  3 +-
->>>>  hw/s390x/s390-pci-stub.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++
->>>>  2 files changed, 76 insertions(+), 1 deletion(-)
->>>>  create mode 100644 hw/s390x/s390-pci-stub.c
-> 
->>>> +/* hw/s390x/sclp.c */
->>>> +void s390_pci_sclp_configure(SCCB *sccb)
->>>> +{
->>>> +}
->>>> +
->>>> +void s390_pci_sclp_deconfigure(SCCB *sccb)
->>>> +{
->>>> +}  
->>>
->>> shouldnt these function set an error code in the sccb, e.g.
->>> something like
->>>
->>>    sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
->>>
->>>
->>>   
->>
->> Oh you have something like that in patch 7. Maybe move?
-> 
-> Does not really change anything in practice, but I can move it.
-> 
-
-You mean these stubs are not supposed to be reachable and are just
-for making the linker happy, or? If that's the case I would prefer
-having that expressed by something like assert(false) or even 
-#define NOT_REACHABLE assert(false).
-
-Otherwise patch looks good, but I did not a full review on it,
-so let's try this:
-Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Jan
