@@ -1,22 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkmV0-0005iS-Ky
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:24:19 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dkmjO-0000Rp-5r
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:39:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dkmUz-0006VM-Or
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:24:18 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1502117160-24655-1-git-send-email-armbru@redhat.com>
-	<1502117160-24655-32-git-send-email-armbru@redhat.com>
-	<w51wp5uh03w.fsf@maestria.local.igalia.com>
-Date: Thu, 24 Aug 2017 09:24:03 +0200
-In-Reply-To: <w51wp5uh03w.fsf@maestria.local.igalia.com> (Alberto Garcia's
-	message of "Wed, 23 Aug 2017 15:42:11 +0200")
-Message-ID: <87mv6pqvho.fsf@dusky.pond.sub.org>
+	(envelope-from <borntraeger@de.ibm.com>) id 1dkmjJ-0004WM-62
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:39:10 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57193)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dkmjI-0004Vh-T9
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:39:05 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7O7bQJP072408
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 03:38:59 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2chn6cg9r0-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 03:38:58 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 24 Aug 2017 08:38:55 +0100
+References: <20170823155458.19601-1-cohuck@redhat.com>
+	<20170823155458.19601-4-cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 24 Aug 2017 09:38:51 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH 31/56] block: Make
- throttle byte rates and sizes unsigned in QAPI/QMP
+In-Reply-To: <20170823155458.19601-4-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <5c445775-eb1c-7f20-94d4-80eda7d4c623@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v5 3/9] s390x/pci: add stubs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,47 +42,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, dgilbert@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-Alberto Garcia <berto@igalia.com> writes:
 
-> On Mon 07 Aug 2017 04:45:35 PM CEST, Markus Armbruster wrote:
->> Sizes and byte rates should use QAPI type 'size' (uint64_t).
->> BlockIOThrottle and BlockDeviceInfo members @bps, @bps_rd, @bps_wr,
->> @bps_max, @bps_rd_max, @bps_wr_max, @iops_size are 'int' (int64_t).
->> qmp_block_set_io_throttle() and bdrv_block_device_info() copy @bps,
->> @bps_rd, @bps_wr to / from LeakyBucket member @avg (implicit
->> conversion to / from double), @bps_max, @bps_rd_max, @bps_wr_max to /
->> from LeakyBucket member @max (implicit conversion to / from double),
->> and @iops_size to / from ThrottleConfig member op_size (implicit
->> conversion to / from uint64_t).
->>
->> Change these BlockIOThrottle and BlockDeviceInfo members to 'size'.
->>
->> block_set_io_throttle now accepts sizes and rates between 2^63 and
->> 2^64-1.  It accepts negative values as before, because that's how the
->> QObject input visitor works for backward compatibility.
->>
->> Doing the same for HMP's block_set_io_throttle deserves its own commit
->> (the next one).
->>
->> query-block and query-named-block-nodes now report sizes and rates
->> above 2^63-1 correctly instead of their (negative) two's complement.
->>
->> So does HMP's "info block".
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->
-> This is fine because all those parameters are limited to [0, 10^15], so
-> changing int64_t -> uint64_t is not a problem.
->
-> I have already sent a patch that changes the fields in the data
-> structure in throttle.h from double to uint64_t
 
-I expect v2 to be based on your patch.  Might simplify the commit
-message.
+On 08/23/2017 05:54 PM, Cornelia Huck wrote:
+> Some non-pci code calls into zpci code. Provide some stubs for builds
+> without pci.
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  hw/s390x/Makefile.objs   |  3 +-
+>  hw/s390x/s390-pci-stub.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 76 insertions(+), 1 deletion(-)
+>  create mode 100644 hw/s390x/s390-pci-stub.c
+> 
+> diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+> index b2aade2466..7ee19d3abc 100644
+> --- a/hw/s390x/Makefile.objs
+> +++ b/hw/s390x/Makefile.objs
+> @@ -11,7 +11,8 @@ obj-y += 3270-ccw.o
+>  obj-y += virtio-ccw.o
+>  obj-y += css-bridge.o
+>  obj-y += ccw-device.o
+> -obj-y += s390-pci-bus.o s390-pci-inst.o
+> +obj-$(CONFIG_PCI) += s390-pci-bus.o s390-pci-inst.o
+> +obj-$(call lnot,$(CONFIG_PCI)) += s390-pci-stub.o
+>  obj-y += s390-skeys.o
+>  obj-y += s390-stattrib.o
+>  obj-$(CONFIG_KVM) += s390-skeys-kvm.o
+> diff --git a/hw/s390x/s390-pci-stub.c b/hw/s390x/s390-pci-stub.c
+> new file mode 100644
+> index 0000000000..2e7e42a2af
+> --- /dev/null
+> +++ b/hw/s390x/s390-pci-stub.c
+> @@ -0,0 +1,74 @@
+> +/* stubs for non-pci builds */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "cpu.h"
+> +#include "s390-pci-inst.h"
+> +#include "s390-pci-bus.h"
+> +
+> +/* target/s390x/ioinst.c */
+> +int chsc_sei_nt2_get_event(void *res)
+> +{
+> +    return 1;
+> +}
+> +
+> +int chsc_sei_nt2_have_event(void)
+> +{
+> +    return 0;
+> +}
+> +
+> +/* hw/s390x/sclp.c */
+> +void s390_pci_sclp_configure(SCCB *sccb)
+> +{
+> +}
+> +
+> +void s390_pci_sclp_deconfigure(SCCB *sccb)
+> +{
+> +}
 
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
+shouldnt these function set an error code in the sccb, e.g.
+something like
 
-Thanks!
+   sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
