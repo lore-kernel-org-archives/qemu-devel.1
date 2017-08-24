@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=402c228e5=roger.pau@citrix.com>)
-	id 1dkpDd-0000hi-6H
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:18:37 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dkpG5-00023h-G9
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:21:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=402c228e5=roger.pau@citrix.com>)
-	id 1dkpDa-0006fE-1J
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:18:33 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:1520)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=402c228e5=roger.pau@citrix.com>)
-	id 1dkpDZ-0006es-RM
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:18:29 -0400
-From: Roger Pau Monne <roger.pau@citrix.com>
-Date: Thu, 24 Aug 2017 10:47:53 +0100
-Message-ID: <20170824094753.77795-3-roger.pau@citrix.com>
-In-Reply-To: <20170824094753.77795-1-roger.pau@citrix.com>
-References: <20170824094753.77795-1-roger.pau@citrix.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dkpG4-0007bv-Jc
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:21:05 -0400
+References: <20170818211542.5380-1-eblake@redhat.com>
+	<20170818211542.5380-9-eblake@redhat.com>
+	<e44a3300-cbe9-c9d7-ae49-b223f638d7ea@redhat.com>
+	<da3712de-986d-8130-7a97-e9f1071d2a03@redhat.com>
+	<c665235d-8bec-627a-f750-4dc2798c3d8c@redhat.com>
+	<5d84655b-d82a-956a-f434-023961b23552@redhat.com>
+	<2ffb6aab-09a0-7136-946f-f68f7478c0f7@redhat.com>
+	<bddc04d6-686e-ca5c-ef30-6df7bdb9c3bf@redhat.com>
+	<87h8wxqunl.fsf@dusky.pond.sub.org>
+	<e1c18d2a-ac5e-2892-3343-80b943345f3e@redhat.com>
+	<874lsxnupg.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <221c272d-60de-1443-1471-2266b4e1c86b@redhat.com>
+Date: Thu, 24 Aug 2017 12:20:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH QEMU] xen/pt: allow QEMU to request MSI
- unmasking at bind time
+In-Reply-To: <874lsxnupg.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 08/13] tests: Rely more on
+ global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +34,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xen-devel@lists.xenproject.org, hfp@posteo.de
-Cc: Roger Pau Monne <roger.pau@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Jan Beulich <JBeulich@suse.com>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, "open list:Floppy" <qemu-block@nongnu.org>
 
-When a MSIX interrupt is bound to a guest using
-xc_domain_update_msi_irq (XEN_DOMCTL_bind_pt_irq) the interrupt is
-left masked by default.
+On 24/08/2017 12:09, Markus Armbruster wrote:
+> Cut-and-paste cuts both ways (pardon the pun):
+>=20
+>     initialize with QTestState A
+>     frobnicate with QTestState A
+>     glomnify with QTestState A
+>     frobnicate with QTestState A
+>     initialize with QTestState B
+>     boingboing with QTestState B
+>     finalize with QTestState A
+>     finalize with QTestState A
+>=20
+> Uh, forgot to frobnicate after boingboing, let me fix that real quick!
+>=20
+>     initialize with QTestState A
+>     frobnicate with QTestState A
+>     glomnify with QTestState A
+>     frobnicate with QTestState A
+>     initialize with QTestState B
+>     boingboing with QTestState B
+>     frobnicate with QTestState A
+>     finalize with QTestState A
+>     finalize with QTestState A
+>=20
+> Spot the pasto.
+>
+> This hasty paste would simply work with global_qtest.  I'm not claiming
+> there are cases that are just the opposite.  I'm just challenging your
+> apparent claim that the long forms help with avoiding or catching
+> pastos.  Can you explain how they help more than they hurt?
 
-This causes problems with guests that first configure interrupts and
-clean the per-entry MSIX table mask bit and afterwards enable MSIX
-globally. In such scenario the Xen internal msixtbl handlers would not
-detect the unmasking of MSIX entries because vectors are not yet
-registered since MSIX is not enabled, and vectors would be left
-masked.
+A pasto without global_qtest is local.
 
-Introduce a new flag in the gflags field to signal Xen whether a MSIX
-interrupt should be unmasked after being bound.
+But cut-and-paste that involves _assigning_ global_qtest, even if it
+doesn't have cut-and-paste mistakes, may create a mess of functions
+knowing^Wbelieving they know what global_qtest is.
 
-Signed-off-by: Roger Pau Monné <roger.pau@citrix.com>
-Reported-by: Andreas Kinzler <hfp@posteo.de>
----
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: Jan Beulich <JBeulich@suse.com>
-Cc: qemu-devel@nongnu.org
----
- hw/xen/xen_pt_msi.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+Assigning global_qtest means the short-form functions have effectively
+dynamic binding.  In a perfect world, global_qtest would be static and
+the create-and-assign-global would assert(!global_qtest).  Then >1 VM ->
+don't use the short forms.
 
-diff --git a/hw/xen/xen_pt_msi.c b/hw/xen/xen_pt_msi.c
-index ff9a79f5d2..c00ac2fd7d 100644
---- a/hw/xen/xen_pt_msi.c
-+++ b/hw/xen/xen_pt_msi.c
-@@ -24,6 +24,7 @@
- #define XEN_PT_GFLAGS_SHIFT_DM             9
- #define XEN_PT_GFLAGSSHIFT_DELIV_MODE     12
- #define XEN_PT_GFLAGSSHIFT_TRG_MODE       15
-+#define XEN_PT_GFLAGSSHIFT_UNMASKED       16
- 
- #define latch(fld) latch[PCI_MSIX_ENTRY_##fld / sizeof(uint32_t)]
- 
-@@ -155,7 +156,8 @@ static int msi_msix_update(XenPCIPassthroughState *s,
-                            int pirq,
-                            bool is_msix,
-                            int msix_entry,
--                           int *old_pirq)
-+                           int *old_pirq,
-+                           bool masked)
- {
-     PCIDevice *d = &s->dev;
-     uint8_t gvec = msi_vector(data);
-@@ -171,6 +173,8 @@ static int msi_msix_update(XenPCIPassthroughState *s,
-         table_addr = s->msix->mmio_base_addr;
-     }
- 
-+    gflags |= masked ? 0 : (1u << XEN_PT_GFLAGSSHIFT_UNMASKED);
-+
-     rc = xc_domain_update_msi_irq(xen_xc, xen_domid, gvec,
-                                   pirq, gflags, table_addr);
- 
-@@ -274,7 +278,7 @@ int xen_pt_msi_update(XenPCIPassthroughState *s)
- {
-     XenPTMSI *msi = s->msi;
-     return msi_msix_update(s, msi_addr64(msi), msi->data, msi->pirq,
--                           false, 0, &msi->pirq);
-+                           false, 0, &msi->pirq, false);
- }
- 
- void xen_pt_msi_disable(XenPCIPassthroughState *s)
-@@ -355,7 +359,8 @@ static int xen_pt_msix_update_one(XenPCIPassthroughState *s, int entry_nr,
-     }
- 
-     rc = msi_msix_update(s, entry->addr, entry->data, pirq, true,
--                         entry_nr, &entry->pirq);
-+                         entry_nr, &entry->pirq,
-+                         vec_ctrl & PCI_MSIX_ENTRY_CTRL_MASKBIT);
- 
-     if (!rc) {
-         entry->updated = false;
--- 
-2.11.0 (Apple Git-81)
+Paolo
+
+> A bit of global state isn't automatically bad.  *Shared* global state i=
+s
+> what gets us into trouble.  Can you point to examples where global_qtes=
+t
+> is shared in ways that aren't 100% trivial?
