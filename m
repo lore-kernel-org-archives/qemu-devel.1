@@ -1,15 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkmlQ-0001gB-NG
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:41:17 -0400
+	(envelope-from <thuth@redhat.com>) id 1dkmll-0001qT-77
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:41:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkmlL-0005D7-RH
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:41:16 -0400
+	(envelope-from <thuth@redhat.com>) id 1dkmlk-0005Kv-B6
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 03:41:37 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 24 Aug 2017 09:41:07 +0200
-Message-Id: <1503560467-5913-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/nvram/spapr_nvram: Device can not be
- created by the users
+Date: Thu, 24 Aug 2017 09:41:33 +0200
+Message-Id: <1503560493-5961-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11] hw/nvram/spapr_nvram: Device can not
+ be created by the users
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
