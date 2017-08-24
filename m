@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dkv1Z-0008C3-Bi
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:30:30 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dkv2x-0000YL-Q7
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:31:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dkv1W-0006mc-8U
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:30:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53406)
+	(envelope-from <imammedo@redhat.com>) id 1dkv2u-0007Pz-Ub
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:31:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53238)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dkv1V-0006lq-Uq
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:30:26 -0400
-References: <20170824091907.17676-1-kraxel@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <cd7ebf5c-6d81-6cdf-f6b2-87af4cb00f85@redhat.com>
-Date: Thu, 24 Aug 2017 11:30:18 -0500
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dkv2u-0007Pd-PH
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:31:52 -0400
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Thu, 24 Aug 2017 18:31:24 +0200
+Message-Id: <1503592308-93913-2-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1503592308-93913-1-git-send-email-imammedo@redhat.com>
+References: <1503592308-93913-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170824091907.17676-1-kraxel@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="F5E6UWS3cbAS0dPfFpOv8Jx8xA40GAmRp"
-Subject: Re: [Qemu-devel] [PATCH] vga: stop passing pointers to
- vga_draw_line* functions
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH for-2.11 v3 01/25] qom: cpu: fix parsed feature
+ string length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +27,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: d@vidbuchanan.co.uk, P J P <ppandit@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---F5E6UWS3cbAS0dPfFpOv8Jx8xA40GAmRp
-From: Eric Blake <eblake@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: d@vidbuchanan.co.uk, P J P <ppandit@redhat.com>
-Message-ID: <cd7ebf5c-6d81-6cdf-f6b2-87af4cb00f85@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] vga: stop passing pointers to vga_draw_line*
- functions
-References: <20170824091907.17676-1-kraxel@redhat.com>
-In-Reply-To: <20170824091907.17676-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+since commit ( 9262685b cpu: Factor out cpu_generic_init() )
+features parsed by it were truncated only to the 1st feature
+after CPU name due to fact that
 
-On 08/24/2017 04:19 AM, Gerd Hoffmann wrote:
-> Instead pass around the address (aka offset into vga memory).
-> Add vga_read_* helper functions which apply vbe_size_mask to
-> the address, to make sure the address stays within the valid
-> range, simliar to the cirrus blitter fixes (commits ffaf857778
+   featurestr =3D strtok(NULL, ",");
+   cc->parse_features(cpu, featurestr, &err);
 
-s/simliar/similar/
+would extract exactly one feature and parse_features() callback
+would parse it and only it leaving the rest of features ignored.
 
-> and 026aeffcb4).
->=20
-> Impact:  DoS for priviledged guest users.  qemu crashes with
+Reuse approach from x86 custom impl. i.e. replace strtok() token
+parsing with g_strsplit(), which would split feature string in
+2 parts name and features list and pass the later to
+parse_features() callback.
 
-s/priviledged/privileged/
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+CC: Eduardo Habkost <ehabkost@redhat.com>
+CC: Andreas F=C3=A4rber <afaerber@suse.de>
 
-> a segfault, when hitting the guard page after vga memory
-> allocation, while reading vga memory for display updates.
->=20
-> Fixes: CVE-2017-xxxx
+Probably due to existing users not actualy using/having any
+features to parse bug were unnoticed for 2 years but switching
+from custom cpu_foo_init() to cpu_generic_init() triggered it.
+---
+ qom/cpu.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-Do we have the actual number? Are we trying to get this in 2.10-rc4, or
-is it merely 2.11 + qemu-stable (2.10.1) material?
-
-> Cc: P J P <ppandit@redhat.com>
-> Reported-by: David Buchanan <d@vidbuchanan.co.uk>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/display/vga-helpers.h | 202 ++++++++++++++++++++++++++-------------=
---------
->  hw/display/vga_int.h     |   1 +
->  hw/display/vga.c         |   5 +-
->  3 files changed, 114 insertions(+), 94 deletions(-)
+diff --git a/qom/cpu.c b/qom/cpu.c
+index 4f38db0..caf5c14 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -50,28 +50,26 @@ bool cpu_exists(int64_t id)
+=20
+ CPUState *cpu_generic_init(const char *typename, const char *cpu_model)
+ {
+-    char *str, *name, *featurestr;
+     CPUState *cpu =3D NULL;
+     ObjectClass *oc;
+     CPUClass *cc;
+     Error *err =3D NULL;
++    gchar **model_pieces;
+=20
+-    str =3D g_strdup(cpu_model);
+-    name =3D strtok(str, ",");
++    model_pieces =3D g_strsplit(cpu_model, ",", 2);
+=20
+-    oc =3D cpu_class_by_name(typename, name);
++    oc =3D cpu_class_by_name(typename, model_pieces[0]);
+     if (oc =3D=3D NULL) {
+-        g_free(str);
++        g_strfreev(model_pieces);
+         return NULL;
+     }
+=20
+     cc =3D CPU_CLASS(oc);
+-    featurestr =3D strtok(NULL, ",");
+     /* TODO: all callers of cpu_generic_init() need to be converted to
+      * call parse_features() only once, before calling cpu_generic_init(=
+).
+      */
+-    cc->parse_features(object_class_get_name(oc), featurestr, &err);
+-    g_free(str);
++    cc->parse_features(object_class_get_name(oc), model_pieces[1], &err)=
+;
++    g_strfreev(model_pieces);
+     if (err !=3D NULL) {
+         goto out;
+     }
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---F5E6UWS3cbAS0dPfFpOv8Jx8xA40GAmRp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlme/xoACgkQp6FrSiUn
-Q2q7pQf9HB9PelHXlukMeAXzdn/k8MlrqO4c755T3xEt6txNM8A54WC96KQ6iKOt
-jKXgdABUrqEUKwhsXc0PwXQoOfsz2W94wTmkPUEzl0qOFREXDSKAd3tpYUjHLWQ7
-iaygmFnWdhhKysZs4pbup0SC4xqdAZt1Uh056KFNuHyUpvdnzmZkUzQWJplVfZfl
-BXcw3Qvh+VObr+jlIcLsB/5j2Gb+TPlf5zdgoo48iywP0vc4dv2eDw+Sj8elOcK4
-9c6v0SQcwJFnXIdQu0g8TYgjsfyUVzvF/RQxJ4W4/zhE8451+WC4lkLM0YpnkCK2
-2p2gqm1Ly5kP6DJKvH3KJb/Uhf9a2A==
-=Qlgl
------END PGP SIGNATURE-----
-
---F5E6UWS3cbAS0dPfFpOv8Jx8xA40GAmRp--
+2.7.4
