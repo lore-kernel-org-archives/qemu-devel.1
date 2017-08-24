@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dkotx-0002Rb-Jl
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:58:14 -0400
+	(envelope-from <thuth@redhat.com>) id 1dkp4M-0004Yk-KJ
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:08:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dkotu-0005ib-Ez
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:58:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43974)
+	(envelope-from <thuth@redhat.com>) id 1dkp4J-0002fR-E6
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:08:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44370)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dkotu-0005iL-8D
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:58:10 -0400
-Date: Thu, 24 Aug 2017 11:58:03 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170824115803.4ca91b6a.cohuck@redhat.com>
-In-Reply-To: <83230def-0eae-803b-d788-da0978ec48ec@linux.vnet.ibm.com>
-References: <20170823155458.19601-1-cohuck@redhat.com>
-	<20170823155458.19601-4-cohuck@redhat.com>
-	<5c445775-eb1c-7f20-94d4-80eda7d4c623@de.ibm.com>
-	<87ab396e-437f-27f9-4b31-e4b5417bed74@de.ibm.com>
-	<20170824110959.3b9c3f72.cohuck@redhat.com>
-	<83230def-0eae-803b-d788-da0978ec48ec@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 3/9] s390x/pci: add stubs
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dkp4J-0002eu-8d
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 06:08:55 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu, 24 Aug 2017 12:08:48 +0200
+Message-Id: <1503569328-22197-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.11] hw/s390x/s390-skeys: Mark the storage
+ key devices with user_creatable = false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +22,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, thuth@redhat.com, zyimin@linux.vnet.ibm.com, david@redhat.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Eric Farman <farman@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Jason J Herne <jjherne@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>
 
-On Thu, 24 Aug 2017 11:50:54 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+QEMU currently aborts if the user tries to create a skey device:
 
-> On 08/24/2017 11:09 AM, Cornelia Huck wrote:
-> > On Thu, 24 Aug 2017 09:43:48 +0200
-> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> >   
-> >> On 08/24/2017 09:38 AM, Christian Borntraeger wrote:  
-> >>>
-> >>>
-> >>> On 08/23/2017 05:54 PM, Cornelia Huck wrote:    
-> >>>> Some non-pci code calls into zpci code. Provide some stubs for builds
-> >>>> without pci.
-> >>>>
-> >>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> >>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> >>>> ---
-> >>>>  hw/s390x/Makefile.objs   |  3 +-
-> >>>>  hw/s390x/s390-pci-stub.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++
-> >>>>  2 files changed, 76 insertions(+), 1 deletion(-)
-> >>>>  create mode 100644 hw/s390x/s390-pci-stub.c  
-> >   
-> >>>> +/* hw/s390x/sclp.c */
-> >>>> +void s390_pci_sclp_configure(SCCB *sccb)
-> >>>> +{
-> >>>> +}
-> >>>> +
-> >>>> +void s390_pci_sclp_deconfigure(SCCB *sccb)
-> >>>> +{
-> >>>> +}    
-> >>>
-> >>> shouldnt these function set an error code in the sccb, e.g.
-> >>> something like
-> >>>
-> >>>    sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
-> >>>
-> >>>
-> >>>     
-> >>
-> >> Oh you have something like that in patch 7. Maybe move?  
-> > 
-> > Does not really change anything in practice, but I can move it.
-> >   
-> 
-> You mean these stubs are not supposed to be reachable and are just
-> for making the linker happy, or? If that's the case I would prefer
-> having that expressed by something like assert(false) or even 
-> #define NOT_REACHABLE assert(false).
+$ s390x-softmmu/qemu-system-s390x -nographic -device s390-skeys-qemu
+qemu-system-s390x: hw/s390x/s390-skeys.c:30: s390_get_skeys_device:
+ Assertion `ss' failed.
+Aborted (core dumped)
 
-Without the last patch that makes virtio-pci depend on pci for s390x,
-you can't compile without pci anyway ;)
+The storage key devices are only meant to be instantiated one time,
+internally. They can not be used by the user, so mark them with
+user_creatable = false.
 
-> 
-> Otherwise patch looks good, but I did not a full review on it,
-> so let's try this:
-> Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> 
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/s390x/s390-skeys-kvm.c | 4 ++++
+ hw/s390x/s390-skeys.c     | 4 ++++
+ 2 files changed, 8 insertions(+)
 
-Thanks!
+diff --git a/hw/s390x/s390-skeys-kvm.c b/hw/s390x/s390-skeys-kvm.c
+index 131da56..dc54ed8 100644
+--- a/hw/s390x/s390-skeys-kvm.c
++++ b/hw/s390x/s390-skeys-kvm.c
+@@ -54,10 +54,14 @@ static int kvm_s390_skeys_set(S390SKeysState *ss, uint64_t start_gfn,
+ static void kvm_s390_skeys_class_init(ObjectClass *oc, void *data)
+ {
+     S390SKeysClass *skeyclass = S390_SKEYS_CLASS(oc);
++    DeviceClass *dc = DEVICE_CLASS(oc);
+ 
+     skeyclass->skeys_enabled = kvm_s390_skeys_enabled;
+     skeyclass->get_skeys = kvm_s390_skeys_get;
+     skeyclass->set_skeys = kvm_s390_skeys_set;
++
++    /* Reason: Internal device (only one skeys device for the whole memory) */
++    dc->user_creatable = false;
+ }
+ 
+ static const TypeInfo kvm_s390_skeys_info = {
+diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
+index c0de3b0..53ad5d3 100644
+--- a/hw/s390x/s390-skeys.c
++++ b/hw/s390x/s390-skeys.c
+@@ -229,10 +229,14 @@ static int qemu_s390_skeys_get(S390SKeysState *ss, uint64_t start_gfn,
+ static void qemu_s390_skeys_class_init(ObjectClass *oc, void *data)
+ {
+     S390SKeysClass *skeyclass = S390_SKEYS_CLASS(oc);
++    DeviceClass *dc = DEVICE_CLASS(oc);
+ 
+     skeyclass->skeys_enabled = qemu_s390_skeys_enabled;
+     skeyclass->get_skeys = qemu_s390_skeys_get;
+     skeyclass->set_skeys = qemu_s390_skeys_set;
++
++    /* Reason: Internal device (only one skeys device for the whole memory) */
++    dc->user_creatable = false;
+ }
+ 
+ static const TypeInfo qemu_s390_skeys_info = {
+-- 
+1.8.3.1
