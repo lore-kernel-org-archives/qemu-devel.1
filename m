@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dks90-0003JW-Gs
+	(envelope-from <berto@igalia.com>) id 1dks90-0003JV-H7
 	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:25:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dks8w-0003Tb-Dh
+	(envelope-from <berto@igalia.com>) id 1dks8w-0003Tk-F7
 	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 09:25:58 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu, 24 Aug 2017 16:24:43 +0300
-Message-Id: <49aab2711d02f285567f3b3b13a113847af33812.1503580370.git.berto@igalia.com>
+Date: Thu, 24 Aug 2017 16:24:49 +0300
+Message-Id: <a57dd6274e1b6dc9c28769fec4c7ea543be5c5e3.1503580370.git.berto@igalia.com>
 In-Reply-To: <cover.1503580370.git.berto@igalia.com>
 References: <cover.1503580370.git.berto@igalia.com>
 In-Reply-To: <cover.1503580370.git.berto@igalia.com>
 References: <cover.1503580370.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH v2 1/7] throttle: Fix wrong variable name in
- the header documentation
+Subject: [Qemu-devel] [PATCH v2 7/7] throttle: Test the valid range of
+ config values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,27 +25,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>
 
-The level of the burst bucket is stored in bkt.burst_level, not
-bkt.burst_length.
-
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 ---
- include/qemu/throttle.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/test-throttle.c | 77 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 77 insertions(+)
 
-diff --git a/include/qemu/throttle.h b/include/qemu/throttle.h
-index d056008c18..66a8ac10a4 100644
---- a/include/qemu/throttle.h
-+++ b/include/qemu/throttle.h
-@@ -63,7 +63,7 @@ typedef enum {
-  * - The bkt.avg rate does not apply until the bucket is full,
-  *   allowing the user to do bursts until then. The I/O limit during
-  *   bursts is bkt.max. To enforce this limit we keep an additional
-- *   bucket in bkt.burst_length that leaks at a rate of bkt.max units
-+ *   bucket in bkt.burst_level that leaks at a rate of bkt.max units
-  *   per second.
-  *
-  * - Because of all of the above, the user can perform I/O at a
+diff --git a/tests/test-throttle.c b/tests/test-throttle.c
+index 41c0dd2529..bf7a5a648a 100644
+--- a/tests/test-throttle.c
++++ b/tests/test-throttle.c
+@@ -378,6 +378,82 @@ static void test_is_valid(void)
+     test_is_valid_for_value(1, true);
+ }
+ 
++static void test_ranges(void)
++{
++    int i;
++
++    for (i = 0; i < BUCKETS_COUNT; i++) {
++        LeakyBucket *b = &cfg.buckets[i];
++        throttle_config_init(&cfg);
++
++        /* avg = 0 means throttling is disabled, but the config is valid */
++        b->avg = 0;
++        g_assert(throttle_is_valid(&cfg, NULL));
++        g_assert(!throttle_enabled(&cfg));
++
++        /* These are valid configurations (values <= THROTTLE_VALUE_MAX) */
++        b->avg = 1;
++        g_assert(throttle_is_valid(&cfg, NULL));
++
++        b->avg = THROTTLE_VALUE_MAX;
++        g_assert(throttle_is_valid(&cfg, NULL));
++
++        b->avg = THROTTLE_VALUE_MAX;
++        b->max = THROTTLE_VALUE_MAX;
++        g_assert(throttle_is_valid(&cfg, NULL));
++
++        /* Values over THROTTLE_VALUE_MAX are not allowed */
++        b->avg = THROTTLE_VALUE_MAX + 1;
++        g_assert(!throttle_is_valid(&cfg, NULL));
++
++        b->avg = THROTTLE_VALUE_MAX;
++        b->max = THROTTLE_VALUE_MAX + 1;
++        g_assert(!throttle_is_valid(&cfg, NULL));
++
++        /* burst_length must be between 1 and THROTTLE_VALUE_MAX */
++        b->avg = 1;
++        b->max = 1;
++        b->burst_length = 0;
++        g_assert(!throttle_is_valid(&cfg, NULL));
++
++        b->avg = 1;
++        b->max = 1;
++        b->burst_length = 1;
++        g_assert(throttle_is_valid(&cfg, NULL));
++
++        b->avg = 1;
++        b->max = 1;
++        b->burst_length = THROTTLE_VALUE_MAX;
++        g_assert(throttle_is_valid(&cfg, NULL));
++
++        b->avg = 1;
++        b->max = 1;
++        b->burst_length = THROTTLE_VALUE_MAX + 1;
++        g_assert(!throttle_is_valid(&cfg, NULL));
++
++        /* burst_length * max cannot exceed THROTTLE_VALUE_MAX */
++        b->avg = 1;
++        b->max = 2;
++        b->burst_length = THROTTLE_VALUE_MAX / 2;
++        g_assert(throttle_is_valid(&cfg, NULL));
++
++        b->avg = 1;
++        b->max = 3;
++        b->burst_length = THROTTLE_VALUE_MAX / 2;
++        g_assert(!throttle_is_valid(&cfg, NULL));
++
++        b->avg = 1;
++        b->max = THROTTLE_VALUE_MAX;
++        b->burst_length = 1;
++        g_assert(throttle_is_valid(&cfg, NULL));
++
++        b->avg = 1;
++        b->max = THROTTLE_VALUE_MAX;
++        b->burst_length = 2;
++        g_assert(!throttle_is_valid(&cfg, NULL));
++    }
++}
++
+ static void test_max_is_missing_limit(void)
+ {
+     int i;
+@@ -669,6 +745,7 @@ int main(int argc, char **argv)
+     g_test_add_func("/throttle/config/enabled",     test_enabled);
+     g_test_add_func("/throttle/config/conflicting", test_conflicting_config);
+     g_test_add_func("/throttle/config/is_valid",    test_is_valid);
++    g_test_add_func("/throttle/config/ranges",      test_ranges);
+     g_test_add_func("/throttle/config/max",         test_max_is_missing_limit);
+     g_test_add_func("/throttle/config/iops_size",
+                     test_iops_size_is_missing_limit);
 -- 
 2.11.0
