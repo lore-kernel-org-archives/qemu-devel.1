@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkxnA-0001f7-S6
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:27:49 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dkxnD-0001i7-Js
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:27:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dkxn7-00048D-PL
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:27:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42298)
+	(envelope-from <dgilbert@redhat.com>) id 1dkxnC-0004BT-Kn
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:27:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:10831)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dkxn7-00047g-I6
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:27:45 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dkxnC-0004Aj-Bi
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:27:50 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu, 24 Aug 2017 20:26:59 +0100
-Message-Id: <20170824192730.8440-2-dgilbert@redhat.com>
+Date: Thu, 24 Aug 2017 20:27:01 +0100
+Message-Id: <20170824192730.8440-4-dgilbert@redhat.com>
 In-Reply-To: <20170824192730.8440-1-dgilbert@redhat.com>
 References: <20170824192730.8440-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [RFC v2 01/32] vhu: vu_queue_started
+Subject: [Qemu-devel] [RFC v2 03/32] migrate: Update ram_block_discard_range
+ for shared
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +29,92 @@ Cc: quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Add a vu_queue_started method to complement vu_queue_enabled.
+The choice of call to discard a block is getting more complicated
+for other cases.   We use fallocate PUNCH_HOLE in any file cases;
+it works for both hugepage and for tmpfs.
+We use the DONTNEED for non-hugepage cases either where they're
+anonymous or where they're private.
+
+Care should be taken when trying other backing files.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.c | 6 ++++++
- contrib/libvhost-user/libvhost-user.h | 9 +++++++++
- 2 files changed, 15 insertions(+)
+ exec.c       | 35 ++++++++++++++++++++++++-----------
+ trace-events |  3 +++
+ 2 files changed, 27 insertions(+), 11 deletions(-)
 
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-index 35fa0c5e56..201b9846e9 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -930,6 +930,12 @@ vu_queue_enabled(VuDev *dev, VuVirtq *vq)
-     return vq->enable;
- }
+diff --git a/exec.c b/exec.c
+index d20c34ca83..67df2909ce 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3573,6 +3573,7 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
+     }
  
-+bool
-+vu_queue_started(VuDev *dev, VuVirtq *vq)
-+{
-+    return vq->started;
-+}
-+
- static inline uint16_t
- vring_avail_flags(VuVirtq *vq)
- {
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
-index 53ef222c0b..acd019876d 100644
---- a/contrib/libvhost-user/libvhost-user.h
-+++ b/contrib/libvhost-user/libvhost-user.h
-@@ -328,6 +328,15 @@ void vu_queue_set_notification(VuDev *dev, VuVirtq *vq, int enable);
- bool vu_queue_enabled(VuDev *dev, VuVirtq *vq);
+     if ((start + length) <= rb->used_length) {
++        bool need_madvise, need_fallocate;
+         uint8_t *host_endaddr = host_startaddr + length;
+         if ((uintptr_t)host_endaddr & (rb->page_size - 1)) {
+             error_report("ram_block_discard_range: Unaligned end address: %p",
+@@ -3582,23 +3583,35 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
  
- /**
-+ * vu_queue_started:
-+ * @dev: a VuDev context
-+ * @vq: a VuVirtq queue
-+ *
-+ * Returns: whether the queue is started.
-+ */
-+bool vu_queue_started(VuDev *dev, VuVirtq *vq);
+         errno = ENOTSUP; /* If we are missing MADVISE etc */
+ 
+-        if (rb->page_size == qemu_host_page_size) {
+-#if defined(CONFIG_MADVISE)
+-            /* Note: We need the madvise MADV_DONTNEED behaviour of definitely
+-             * freeing the page.
+-             */
+-            ret = madvise(host_startaddr, length, MADV_DONTNEED);
+-#endif
+-        } else {
+-            /* Huge page case  - unfortunately it can't do DONTNEED, but
+-             * it can do the equivalent by FALLOC_FL_PUNCH_HOLE in the
+-             * huge page file.
++        /* The logic here is messy;
++         *    madvise DONTNEED fails for hugepages
++         *    fallocate works on hugepages and shmem
++         */
++        need_madvise = (rb->page_size == qemu_host_page_size);
++        need_fallocate = rb->fd != -1;
++        if (need_fallocate) {
++            /* For a file, this causes the area of the file to be zero'd
++             * if read, and for hugetlbfs also causes it to be unmapped
++             * so a userfault will trigger.
+              */
+ #ifdef CONFIG_FALLOCATE_PUNCH_HOLE
+             ret = fallocate(rb->fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+                             start, length);
+ #endif
+         }
++        /* i.e. need madvise but skip it if the fallocate failed */
++        if (need_madvise && (!need_fallocate || (ret == 0))) {
++            /* For normal RAM this causes it to be unmapped,
++             * for shared memory it causes the local mapping to disappear
++             * and to fall back on the file contents (which we just
++             * fallocate'd away).
++             */
++#if defined(CONFIG_MADVISE)
++            ret =  madvise(host_startaddr, length, MADV_DONTNEED);
++#endif
++        }
++        trace_ram_block_discard_range(rb->idstr, host_startaddr,
++                                      need_madvise, need_fallocate, ret);
+         if (ret) {
+             ret = -errno;
+             error_report("ram_block_discard_range: Failed to discard range "
+diff --git a/trace-events b/trace-events
+index 1f50f56d9d..213ee34f89 100644
+--- a/trace-events
++++ b/trace-events
+@@ -55,6 +55,9 @@ dma_complete(void *dbs, int ret, void *cb) "dbs=%p ret=%d cb=%p"
+ dma_blk_cb(void *dbs, int ret) "dbs=%p ret=%d"
+ dma_map_wait(void *dbs) "dbs=%p"
+ 
++# exec.c
++ram_block_discard_range(const char *rbname, void *hva, bool need_madvise, bool need_fallocate, int ret) "%s@%p: madvise: %d fallocate: %d ret: %d"
 +
-+/**
-  * vu_queue_empty:
-  * @dev: a VuDev context
-  * @vq: a VuVirtq queue
+ # memory.c
+ memory_region_ops_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+ memory_region_ops_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
 -- 
 2.13.5
