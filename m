@@ -1,27 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=402c228e5=roger.pau@citrix.com>)
-	id 1dktX6-0001b7-U7
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 10:54:58 -0400
+	(envelope-from <alifm@linux.vnet.ibm.com>) id 1dkth8-0004dB-GA
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:05:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=402c228e5=roger.pau@citrix.com>)
-	id 1dktX0-0004kr-MP
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 10:54:56 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:55145)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=402c228e5=roger.pau@citrix.com>)
-	id 1dktX0-0004jW-FM
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 10:54:50 -0400
-From: Roger Pau Monne <roger.pau@citrix.com>
-Date: Thu, 24 Aug 2017 15:54:45 +0100
-Message-ID: <20170824145445.79575-2-roger.pau@citrix.com>
-In-Reply-To: <20170824145445.79575-1-roger.pau@citrix.com>
-References: <20170824145445.79575-1-roger.pau@citrix.com>
+	(envelope-from <alifm@linux.vnet.ibm.com>) id 1dkth4-00036r-H0
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:05:18 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43226
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.vnet.ibm.com>)
+	id 1dkth4-00036N-Bw
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:05:14 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7OEuSfx169661
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 11:05:13 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2chypywpmx-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 11:05:13 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.vnet.ibm.com>;
+	Thu, 24 Aug 2017 09:05:12 -0600
+From: Farhan Ali <alifm@linux.vnet.ibm.com>
+Date: Thu, 24 Aug 2017 11:05:08 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH QEMU v3] xen/pt: allow QEMU to request MSI
- unmasking at bind time
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <e2a1b182-83a9-2259-27f9-68b61b5061d5@linux.vnet.ibm.com>
+Subject: [Qemu-devel] S390 bios breaks in qemu 2.10.rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,156 +39,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Roger Pau Monne <roger.pau@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Jan Beulich <JBeulich@suse.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-When a MSI interrupt is bound to a guest using
-xc_domain_update_msi_irq (XEN_DOMCTL_bind_pt_irq) the interrupt is
-left masked by default.
+Hi,
 
-This causes problems with guests that first configure interrupts and
-clean the per-entry MSIX table mask bit and afterwards enable MSIX
-globally. In such scenario the Xen internal msixtbl handlers would not
-detect the unmasking of MSIX entries because vectors are not yet
-registered since MSIX is not enabled, and vectors would be left
-masked.
+There is an issue in QEMU bios which is exposed by commit
 
-Introduce a new flag in the gflags field to signal Xen whether a MSI
-interrupt should be unmasked after being bound.
+commit 198c0d1f9df8c429502cb744fc26b6ba6e71db74
+Author: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date:   Thu Jul 27 17:48:42 2017 +0200
 
-This also requires to track the mask register for MSI interrupts, so
-QEMU can also notify to Xen whether the MSI interrupt should be bound
-masked or unmasked
+     s390x/css: check ccw address validity
 
-Signed-off-by: Roger Pau Monné <roger.pau@citrix.com>
-Reviewed-by: Jan Beulich <jbeulich@suse.com>
-Reported-by: Andreas Kinzler <hfp@posteo.de>
----
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: Jan Beulich <JBeulich@suse.com>
-Cc: qemu-devel@nongnu.org
----
-Changes since v2:
- - Fix coding style.
+     According to the PoP channel command words (CCW) must be doubleword
+     aligned and 31 bit addressable for format 1 and 24 bit addressable for
+     format 0 CCWs.
 
-Changes since v1:
- - Track MSI mask bits.
- - Notify Xen of whether MSI interrupts should be unmasked after
-   binding, instead of hardcoding it.
----
- hw/xen/xen_pt.h             |  1 +
- hw/xen/xen_pt_config_init.c | 19 +++++++++++++++++--
- hw/xen/xen_pt_msi.c         | 13 ++++++++++---
- 3 files changed, 28 insertions(+), 5 deletions(-)
+     If the channel subsystem encounters a ccw address which does not 
+satisfy
+     this alignment requirement a program-check condition is recognised.
 
-diff --git a/hw/xen/xen_pt.h b/hw/xen/xen_pt.h
-index 191d9caea1..aa39a9aa5f 100644
---- a/hw/xen/xen_pt.h
-+++ b/hw/xen/xen_pt.h
-@@ -180,6 +180,7 @@ typedef struct XenPTMSI {
-     uint32_t addr_hi;  /* guest message upper address */
-     uint16_t data;     /* guest message data */
-     uint32_t ctrl_offset; /* saved control offset */
-+    uint32_t mask;     /* guest mask bits */
-     int pirq;          /* guest pirq corresponding */
-     bool initialized;  /* when guest MSI is initialized */
-     bool mapped;       /* when pirq is mapped */
-diff --git a/hw/xen/xen_pt_config_init.c b/hw/xen/xen_pt_config_init.c
-index 1f04ec5eec..9c724eeb62 100644
---- a/hw/xen/xen_pt_config_init.c
-+++ b/hw/xen/xen_pt_config_init.c
-@@ -1315,6 +1315,21 @@ static int xen_pt_msgdata_reg_write(XenPCIPassthroughState *s,
-     return 0;
- }
- 
-+static int xen_pt_mask_reg_write(XenPCIPassthroughState *s, XenPTReg *cfg_entry,
-+                                 uint32_t *val, uint32_t dev_value,
-+                                 uint32_t valid_mask)
-+{
-+    int rc;
-+
-+    rc = xen_pt_long_reg_write(s, cfg_entry, val, dev_value, valid_mask);
-+    if (rc)
-+        return rc;
-+
-+    s->msi->mask = *val;
-+
-+    return 0;
-+}
-+
- /* MSI Capability Structure reg static information table */
- static XenPTRegInfo xen_pt_emu_reg_msi[] = {
-     /* Next Pointer reg */
-@@ -1393,7 +1408,7 @@ static XenPTRegInfo xen_pt_emu_reg_msi[] = {
-         .emu_mask   = 0xFFFFFFFF,
-         .init       = xen_pt_mask_reg_init,
-         .u.dw.read  = xen_pt_long_reg_read,
--        .u.dw.write = xen_pt_long_reg_write,
-+        .u.dw.write = xen_pt_mask_reg_write,
-     },
-     /* Mask reg (if PCI_MSI_FLAGS_MASKBIT set, for 64-bit devices) */
-     {
-@@ -1404,7 +1419,7 @@ static XenPTRegInfo xen_pt_emu_reg_msi[] = {
-         .emu_mask   = 0xFFFFFFFF,
-         .init       = xen_pt_mask_reg_init,
-         .u.dw.read  = xen_pt_long_reg_read,
--        .u.dw.write = xen_pt_long_reg_write,
-+        .u.dw.write = xen_pt_mask_reg_write,
-     },
-     /* Pending reg (if PCI_MSI_FLAGS_MASKBIT set, for 32-bit devices) */
-     {
-diff --git a/hw/xen/xen_pt_msi.c b/hw/xen/xen_pt_msi.c
-index ff9a79f5d2..6d1e3bdeb4 100644
---- a/hw/xen/xen_pt_msi.c
-+++ b/hw/xen/xen_pt_msi.c
-@@ -24,6 +24,7 @@
- #define XEN_PT_GFLAGS_SHIFT_DM             9
- #define XEN_PT_GFLAGSSHIFT_DELIV_MODE     12
- #define XEN_PT_GFLAGSSHIFT_TRG_MODE       15
-+#define XEN_PT_GFLAGSSHIFT_UNMASKED       16
- 
- #define latch(fld) latch[PCI_MSIX_ENTRY_##fld / sizeof(uint32_t)]
- 
-@@ -155,7 +156,8 @@ static int msi_msix_update(XenPCIPassthroughState *s,
-                            int pirq,
-                            bool is_msix,
-                            int msix_entry,
--                           int *old_pirq)
-+                           int *old_pirq,
-+                           bool masked)
- {
-     PCIDevice *d = &s->dev;
-     uint8_t gvec = msi_vector(data);
-@@ -171,6 +173,8 @@ static int msi_msix_update(XenPCIPassthroughState *s,
-         table_addr = s->msix->mmio_base_addr;
-     }
- 
-+    gflags |= masked ? 0 : (1u << XEN_PT_GFLAGSSHIFT_UNMASKED);
-+
-     rc = xc_domain_update_msi_irq(xen_xc, xen_domid, gvec,
-                                   pirq, gflags, table_addr);
- 
-@@ -273,8 +277,10 @@ int xen_pt_msi_setup(XenPCIPassthroughState *s)
- int xen_pt_msi_update(XenPCIPassthroughState *s)
- {
-     XenPTMSI *msi = s->msi;
-+
-+    /* Current MSI emulation in QEMU only supports 1 vector */
-     return msi_msix_update(s, msi_addr64(msi), msi->data, msi->pirq,
--                           false, 0, &msi->pirq);
-+                           false, 0, &msi->pirq, msi->mask & 1);
- }
- 
- void xen_pt_msi_disable(XenPCIPassthroughState *s)
-@@ -355,7 +361,8 @@ static int xen_pt_msix_update_one(XenPCIPassthroughState *s, int entry_nr,
-     }
- 
-     rc = msi_msix_update(s, entry->addr, entry->data, pirq, true,
--                         entry_nr, &entry->pirq);
-+                         entry_nr, &entry->pirq,
-+                         vec_ctrl & PCI_MSIX_ENTRY_CTRL_MASKBIT);
- 
-     if (!rc) {
-         entry->updated = false;
--- 
-2.11.0 (Apple Git-81)
+     The situation with 31 bit addressable is a bit more complicated: 
+both the
+     ORB and a format 1 CCW TIC hold the address of (the rest of) the 
+channel
+     program, that is the address of the next CCW in a word, and the PoP
+     mandates that bit 0 of that word shall be zero -- or a program-check
+     condition is to be recognized -- and does not belong to the field 
+holding
+     the ccw address.
+
+     Since in code the corresponding fields span across the whole word 
+(unlike
+     in PoP where these are defined as 31 bit wide) we can check this by
+     applying a mask. The 24 addressable case isn't affecting TIC 
+because the
+     address is composed of a halfword and a byte portion (no additional 
+zero
+     bit requirements) and just slightly complicates the ORB case where also
+     bits 1-7 need to be zero.
+
+     The same requirements (especially n-bit addressability) apply to the
+     ccw addresses generated while chaining.
+
+     Let's make our CSS implementation follow the AR more closely.
+
+     Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+     Message-Id: <20170727154842.23427-1-pasic@linux.vnet.ibm.com>
+     Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+     Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+
+
+It looks like the bios does not create a double word aligned CCW. 
+Looking at the bios code we the CCW1 struct is not aligned
+
+/* channel command word (type 1) */
+struct ccw1 {
+     __u8 cmd_code;
+     __u8 flags;
+     __u16 count;
+     __u32 cda;
+} __attribute__ ((packed));
+
+and it looks like the compiler does not guarantee a doubleword alignment.
+
+The weird thing about it is I see it break in one of my system and works 
+fine in another system. Trying a simple fix of aligning the struct also 
+doesn't seem to work all the time.
+
+
+Thanks
+Farhan
