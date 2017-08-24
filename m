@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1dknty-0001aJ-VL
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:54:11 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dko9U-0001km-35
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:10:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1dkntx-0004ap-75
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:54:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49914)
+	(envelope-from <cohuck@redhat.com>) id 1dko9Q-0006Dg-8W
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:10:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57168)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1dkntx-0004aI-0X
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:54:09 -0400
-Message-ID: <1503564841.3438.23.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Thu, 24 Aug 2017 10:54:01 +0200
-In-Reply-To: <ddb6f49e-6617-a659-08bf-cf093f658a8c@redhat.com>
-References: <1503506783.3438.19.camel@redhat.com>
-	<ddb6f49e-6617-a659-08bf-cf093f658a8c@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Number of usable slots in PCIe Root Port / PCIe
- Switch Downstream Port
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dko9Q-0006C7-1u
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 05:10:08 -0400
+Date: Thu, 24 Aug 2017 11:09:59 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170824110959.3b9c3f72.cohuck@redhat.com>
+In-Reply-To: <87ab396e-437f-27f9-4b31-e4b5417bed74@de.ibm.com>
+References: <20170823155458.19601-1-cohuck@redhat.com>
+	<20170823155458.19601-4-cohuck@redhat.com>
+	<5c445775-eb1c-7f20-94d4-80eda7d4c623@de.ibm.com>
+	<87ab396e-437f-27f9-4b31-e4b5417bed74@de.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 3/9] s390x/pci: add stubs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <mapfelba@redhat.com>, laine@laine.org, Lukas Doktor <ldoktor@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com, zyimin@linux.vnet.ibm.com, david@redhat.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, pasic@linux.vnet.ibm.com
 
-On Wed, 2017-08-23 at 23:16 +0300, Marcel Apfelbaum wrote:
-> > Is such a configuration considered valid?
->=20
-> Definitely no.
->=20
-> > Or should
-> > libvirt and the guest OS / firmware start allowing it?
->=20
-> I thought libvirt does not allow it anyway and yes, is a bug,
-> but considered low priority.
+On Thu, 24 Aug 2017 09:43:48 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-That's correct, libvirt knows those controllers only have
-a single slot and will prevent you from adding more than
-one device to them. So no change needed there.
+> On 08/24/2017 09:38 AM, Christian Borntraeger wrote:
+> > 
+> > 
+> > On 08/23/2017 05:54 PM, Cornelia Huck wrote:  
+> >> Some non-pci code calls into zpci code. Provide some stubs for builds
+> >> without pci.
+> >>
+> >> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> >> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> >> ---
+> >>  hw/s390x/Makefile.objs   |  3 +-
+> >>  hw/s390x/s390-pci-stub.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++
+> >>  2 files changed, 76 insertions(+), 1 deletion(-)
+> >>  create mode 100644 hw/s390x/s390-pci-stub.c
 
-IIUC Luk=C3=A1=C5=A1 is using QEMU directly in (some parts of)
-Avocado, so I imagine emitting an error rather than
-silently accepting an invalid configuration would save
-him some debugging time :) But he knows not to do that
-now, so I guess low priority sounds about right.
+> >> +/* hw/s390x/sclp.c */
+> >> +void s390_pci_sclp_configure(SCCB *sccb)
+> >> +{
+> >> +}
+> >> +
+> >> +void s390_pci_sclp_deconfigure(SCCB *sccb)
+> >> +{
+> >> +}  
+> > 
+> > shouldnt these function set an error code in the sccb, e.g.
+> > something like
+> > 
+> >    sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
+> > 
+> > 
+> >   
+> 
+> Oh you have something like that in patch 7. Maybe move?
 
-Thanks for clarifying!
-
---=20
-Andrea Bolognani / Red Hat / Virtualization
+Does not really change anything in practice, but I can move it.
