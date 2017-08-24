@@ -1,24 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkuA8-0005yM-FM
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:35:18 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dkuCI-0007b2-D4
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:37:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dkuA4-0000dI-Gg
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:35:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:28259)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dkuA4-0000c4-8J
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:35:12 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dkuCE-0001zd-Dj
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:37:30 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36161)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dkuCE-0001yx-4I
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 11:37:26 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7OFaAbk135105
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 11:37:22 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cj0tkunbf-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 11:37:22 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Thu, 24 Aug 2017 16:37:19 +0100
 References: <e2a1b182-83a9-2259-27f9-68b61b5061d5@linux.vnet.ibm.com>
 	<20170824171355.29d1ec32.cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <30333b41-508d-f9a3-ac2d-4830a7791475@redhat.com>
-Date: Thu, 24 Aug 2017 17:35:01 +0200
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Thu, 24 Aug 2017 17:37:15 +0200
 MIME-Version: 1.0
 In-Reply-To: <20170824171355.29d1ec32.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Message-Id: <16a299e2-4c03-3b64-dfe6-15635b47d0fd@linux.vnet.ibm.com>
 Subject: Re: [Qemu-devel] S390 bios breaks in qemu 2.10.rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,9 +43,11 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Cornelia Huck <cohuck@redhat.com>, Farhan Ali <alifm@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-On 24.08.2017 17:13, Cornelia Huck wrote:
+
+
+On 08/24/2017 05:13 PM, Cornelia Huck wrote:
 > On Thu, 24 Aug 2017 11:05:08 -0400
 > Farhan Ali <alifm@linux.vnet.ibm.com> wrote:
 > 
@@ -105,14 +121,22 @@ On 24.08.2017 17:13, Cornelia Huck wrote:
 >> doesn't seem to work all the time.
 > 
 > I have not seen this problem on any of the systems I tested on (well, I
-> would not have merged this if I did...) - RHEL 7 and F26. Do we need a
+> would not have merged this if I did...) - RHEL 7 and F26.
+
+Same here, otherwise I would have mane it a series and posted a fix
+first.
+
+> Do we need a
 > dynamic allocation to guarantee alignment?
+> 
 
-I guess the problem is the __attribute__((packed)) here - AFAIK GCC then
-sometimes assumes that these structs can be byte-aligned. Does it work
-if you remove the __attribute__((packed)) here? If yes, I think that
-would be a valid fix, since there should not be any padding in this
-struct at all (and if you're afraid, you could add an
-assert(sizeof(struct ccw1) == 8) somewhere).
+I think a dynamic allocation is one way to get around the
+problem but it should be possible to keep the stuff on the
+stack. Telling the compiler about the alignment requirement
+should do the trick IMHO.
 
- Thomas
+@Farhan:
+Since it's your find you have precedence when it comes to
+fixing. Are you willing to submit a fix?
+
+Halil
