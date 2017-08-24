@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dkxix-0006WL-Ux
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:23:31 -0400
+	(envelope-from <armbru@redhat.com>) id 1dkxjh-000747-VD
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:24:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dkxiw-0001dk-VU
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:23:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60314)
+	(envelope-from <armbru@redhat.com>) id 1dkxje-0001xz-I0
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:24:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42010)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dkxiw-0001d8-NM
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:23:26 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 24 Aug 2017 16:23:15 -0300
-Message-Id: <20170824192315.5897-4-ehabkost@redhat.com>
-In-Reply-To: <20170824192315.5897-1-ehabkost@redhat.com>
-References: <20170824192315.5897-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] hostmem-file: Add "discard-data" option
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dkxje-0001xR-6N
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 15:24:10 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1503564371-26090-1-git-send-email-armbru@redhat.com>
+	<1503564371-26090-3-git-send-email-armbru@redhat.com>
+	<04558062-88d3-0bd2-06d2-ba8a5af8ba8e@redhat.com>
+	<87y3q8ddbb.fsf@dusky.pond.sub.org>
+	<0b31fbbe-1d6e-09d5-6f0d-8f55af18e08f@redhat.com>
+Date: Thu, 24 Aug 2017 21:24:05 +0200
+In-Reply-To: <0b31fbbe-1d6e-09d5-6f0d-8f55af18e08f@redhat.com> (Eric Blake's
+	message of "Thu, 24 Aug 2017 13:56:25 -0500")
+Message-ID: <871so0bwh6.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 02/16] qapi: Drop superfluous
+ qapi_enum_parse() parameter max
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,110 +31,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Zack Cornelius <zack.cornelius@kove.net>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-The new option can be used to indicate that the file contents can
-be destroyed and don't need to be flushed to disk when QEMU exits
-or when the memory backend object is removed.
+Eric Blake <eblake@redhat.com> writes:
 
-Internally, it will trigger a madvise(MADV_REMOVE) call when the
-memory backend is removed.
+> On 08/24/2017 01:35 PM, Markus Armbruster wrote:
+>> Eric Blake <eblake@redhat.com> writes:
+>> 
+>>> On 08/24/2017 03:45 AM, Markus Armbruster wrote:
+>>>> The lookup tables have a sentinel, no need to make callers pass their
+>>>> size.
+>>>>
+>>>> Fun: the header has it in the wrong position.  Good riddance.
+>>>>
+>
+>>>> +++ b/include/qapi/util.h
+>>>> @@ -12,7 +12,7 @@
+>>>>  #define QAPI_UTIL_H
+>>>>  
+>>>>  int qapi_enum_parse(const char * const lookup[], const char *buf,
+>>>> -                    int max, int def, Error **errp);
+>>>> +                    int def, Error **errp);
+>>>
+>>> I'm not sure what you meant by wrong position; were you thinking that
+>>> lookup/max should be immediately adjacent (since max is a property of
+>>> the lookup[] parameter), and sticking 'buf' in between the two is what
+>>> meant 'max' was in the wrong position?
+>> 
+>> Compare the declaration above with the definition below:
+>> 
+>>     diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
+>>     index 46eda7d..ee7594f 100644
+>>     --- a/qapi/qapi-util.c
+>>     +++ b/qapi/qapi-util.c
+>>     @@ -16,7 +16,7 @@
+>>      #include "qapi/util.h"
+>> 
+>>      int qapi_enum_parse(const char * const lookup[], const char *buf,
+>>     -                    int max, int def, Error **errp)
+>>     +                    int def, Error **errp)
+>>      {
+>>          int i;
+>> 
+>> Declaration has max before def, definition has it the other way round.
+>
+> Huh?  On current master (commit 248b2373), the two look like they match
+> to me:
+>
+> $ git grep -A1 qapi_enum_parse'.*const look'
+> include/qapi/util.h:int qapi_enum_parse(const char * const lookup[],
+> const char *buf,
+> include/qapi/util.h-                    int max, int def, Error **errp);
+> --
+> qapi/qapi-util.c:int qapi_enum_parse(const char * const lookup[], const
+> char *buf,
+> qapi/qapi-util.c-                    int max, int def, Error **errp)
+>
+>
+>> 
+>> Such errors are one reason I prefer to have documentation next to
+>> definitions, which are authoritative, rather than declarations, which
+>> may or may not match the definition.
+>> 
+>>> The change itself is reasonable, even if the commit message needs a
+>>> tweak to answer my question.
+>> 
+>> Care to suggest a wording?
+>
+> At this point, I find the claim to be bogus, so I suggest you delete the
+> 'Fun:' paragraph.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-Changes v1 -> v2:
-* Replaced 'persistent=no' with 'discard-data=yes', to make it clear
-  that the flag will destroy data on the backing file.
-* Call madvise() directly from unparent() method instead of
-  relying on low-level memory backend code to call it.
-  v1 relied on getting the memory region reference count back to
-  0, which doesn't happen when QEMU is exiting because there's no
-  machine cleanup code to ensure that.
----
- backends/hostmem-file.c | 29 +++++++++++++++++++++++++++++
- qemu-options.hx         |  5 ++++-
- 2 files changed, 33 insertions(+), 1 deletion(-)
+Sure.
 
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index fc4ef46..e44c319 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -32,6 +32,7 @@ struct HostMemoryBackendFile {
-     HostMemoryBackend parent_obj;
- 
-     bool share;
-+    bool discard_data;
-     char *mem_path;
- };
- 
-@@ -103,16 +104,44 @@ static void file_memory_backend_set_share(Object *o, bool value, Error **errp)
-     fb->share = value;
- }
- 
-+static bool file_memory_backend_get_discard_data(Object *o, Error **errp)
-+{
-+    return MEMORY_BACKEND_FILE(o)->discard_data;
-+}
-+
-+static void file_memory_backend_set_discard_data(Object *o, bool value,
-+                                               Error **errp)
-+{
-+    MEMORY_BACKEND_FILE(o)->discard_data = value;
-+}
-+
-+static void file_backend_unparent(Object *obj)
-+{
-+    HostMemoryBackend *backend = MEMORY_BACKEND(obj);
-+    HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(obj);
-+
-+    if (host_memory_backend_mr_inited(backend) && fb->discard_data) {
-+        void *ptr = memory_region_get_ram_ptr(&backend->mr);
-+        uint64_t sz = memory_region_size(&backend->mr);
-+
-+        qemu_madvise(ptr, sz, QEMU_MADV_REMOVE);
-+    }
-+}
-+
- static void
- file_backend_class_init(ObjectClass *oc, void *data)
- {
-     HostMemoryBackendClass *bc = MEMORY_BACKEND_CLASS(oc);
- 
-     bc->alloc = file_backend_memory_alloc;
-+    oc->unparent = file_backend_unparent;
- 
-     object_class_property_add_bool(oc, "share",
-         file_memory_backend_get_share, file_memory_backend_set_share,
-         &error_abort);
-+    object_class_property_add_bool(oc, "discard-data",
-+        file_memory_backend_get_discard_data, file_memory_backend_set_discard_data,
-+        &error_abort);
-     object_class_property_add_str(oc, "mem-path",
-         get_mem_path, set_mem_path,
-         &error_abort);
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 9f6e2ad..ad985e4 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4160,7 +4160,7 @@ property must be set.  These objects are placed in the
- 
- @table @option
- 
--@item -object memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off}
-+@item -object memory-backend-file,id=@var{id},size=@var{size},mem-path=@var{dir},share=@var{on|off},discard-data=@var{on|off}
- 
- Creates a memory file backend object, which can be used to back
- the guest RAM with huge pages. The @option{id} parameter is a
-@@ -4172,6 +4172,9 @@ the path to either a shared memory or huge page filesystem mount.
- The @option{share} boolean option determines whether the memory
- region is marked as private to QEMU, or shared. The latter allows
- a co-operating external process to access the QEMU memory region.
-+Setting the @option{discard-data} boolean option to @var{on}
-+indicates that file contents can be destroyed when QEMU exits,
-+to avoid unnecessarily flushing data to the backing file.
- 
- @item -object rng-random,id=@var{id},filename=@var{/dev/random}
- 
--- 
-2.9.4
+>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> 
+>> Thanks!
