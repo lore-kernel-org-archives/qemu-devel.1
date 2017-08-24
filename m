@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dkw9O-0000Pd-KL
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 13:42:39 -0400
+	(envelope-from <eblake@redhat.com>) id 1dkwCH-0002T7-Vg
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 13:45:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dkw9N-00071Z-L3
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 13:42:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1dkwCG-0000cB-F1
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 13:45:37 -0400
 References: <20170824153345.2244-1-stefanha@redhat.com>
-	<20170824153345.2244-2-stefanha@redhat.com>
-	<a839e5fa-0495-902c-5a20-6592ab07bb9e@redhat.com>
-	<12b5540c-de00-ac37-f1f6-5ed423856541@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <26fee110-ce53-6c54-275c-5550dab6d3c4@redhat.com>
-Date: Thu, 24 Aug 2017 19:42:20 +0200
+	<20170824153345.2244-4-stefanha@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c1914068-2570-2572-5d39-d81037df79c2@redhat.com>
+Date: Thu, 24 Aug 2017 12:45:21 -0500
 MIME-Version: 1.0
-In-Reply-To: <12b5540c-de00-ac37-f1f6-5ed423856541@redhat.com>
+In-Reply-To: <20170824153345.2244-4-stefanha@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="WQd7Nmb0794R7fVlqewd0rEEKmfAlxArs"
-Subject: Re: [Qemu-devel] [PATCH 1/3] nbd-client: enter read_reply_co during
- init to avoid crash
+	boundary="9ItrgC27m9JHT1x3nWn9hScbCUgxkGt4t"
+Subject: Re: [Qemu-devel] [PATCH 3/3] qemu-iotests: test NBD over UNIX
+ domain sockets in 083
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,99 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WQd7Nmb0794R7fVlqewd0rEEKmfAlxArs
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- qemu-devel@nongnu.org
+--9ItrgC27m9JHT1x3nWn9hScbCUgxkGt4t
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <26fee110-ce53-6c54-275c-5550dab6d3c4@redhat.com>
-Subject: Re: [PATCH 1/3] nbd-client: enter read_reply_co during init to avoid
- crash
+ Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c1914068-2570-2572-5d39-d81037df79c2@redhat.com>
+Subject: Re: [PATCH 3/3] qemu-iotests: test NBD over UNIX domain sockets in
+ 083
 References: <20170824153345.2244-1-stefanha@redhat.com>
- <20170824153345.2244-2-stefanha@redhat.com>
- <a839e5fa-0495-902c-5a20-6592ab07bb9e@redhat.com>
- <12b5540c-de00-ac37-f1f6-5ed423856541@redhat.com>
-In-Reply-To: <12b5540c-de00-ac37-f1f6-5ed423856541@redhat.com>
+ <20170824153345.2244-4-stefanha@redhat.com>
+In-Reply-To: <20170824153345.2244-4-stefanha@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 24/08/2017 19:37, Eric Blake wrote:
-> On 08/24/2017 11:21 AM, Paolo Bonzini wrote:
->> On 24/08/2017 17:33, Stefan Hajnoczi wrote:
->>> This patch enters read_reply_co directly in
->>> nbd_client_attach_aio_context().  This is safe because new_context is=
-
->>> acquired by the caller.  This ensures that read_reply_co reaches its
->>> first yield point and its ctx is set up.
->>
->> I'm not very confident with this patch.  aio_context_acquire/release i=
-s
->> going to go away, and this then becomes possible
->>
->> 	main context			new_context
->> 	qemu_aio_coroutine_enter
->> 					send request
->> 					wait for reply
->> 	read first reply
->> 	wake coroutine
->>
->> where the "wake coroutine" part thinks it's running in new_context, an=
-d
->> thus simply enters the coroutine instead of using the bottom half.
->>
->> But blk_co_preadv() should need the read_reply_co itself, in order to =
-be
->> woken up after reading the reply header.  The core issue here is that
->> nbd_co_receive_reply was never called, I suspect.  And if it was never=
-
->> called, read_reply_co should not be woken up by nbd_coroutine_end.
->>
->> So the fix is:
->>
->> 1) assign NULL to s->recv_coroutine[i] when nbd_co_send_request fails
->>
->> 2) move this to nbd_co_receive_reply:
->>
->>     s->recv_coroutine[i] =3D NULL;
->>
->>     /* Kick the read_reply_co to get the next reply.  */
->>     if (s->read_reply_co) {
->>         aio_co_wake(s->read_reply_co);
->>     }
->>
->> Does this make sense?  (Note that the read_reply_co idea actually came=
-
->> from you, or from my recollections of your proposed design :)).
+On 08/24/2017 10:33 AM, Stefan Hajnoczi wrote:
+> 083 only tests TCP.  Some failures might be specific to UNIX domain
+> sockets.
 >=20
-> How much of this overlaps with Vladimir's proposal?
-> https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg00846.html
+> A few adjustments are necessary:
+>=20
+> 1. Generating a port number and waiting for server startup is
+>    TCP-specific.  Use the new nbd-fault-injector.py startup protocol to=
 
-The above should be about 15 lines added, 10 removed. :)
+>    fetch the address.  This is a little more elegant because we don't
+>    need netstat anymore.
+>=20
+> 2. The NBD filter does not work for the UNIX domain sockets URIs we
+>    generate and must be extended.
+>=20
+> 3. Run all tests twice: once for TCP and once for UNIX domain sockets.
+>=20
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  tests/qemu-iotests/083           | 138 +++++++++++++++++++++++--------=
+------
+>  tests/qemu-iotests/083.out       | 145 +++++++++++++++++++++++++++++++=
++++-----
+>  tests/qemu-iotests/common.filter |   4 +-
+>  3 files changed, 215 insertions(+), 72 deletions(-)
 
-Paolo
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-
---WQd7Nmb0794R7fVlqewd0rEEKmfAlxArs
+--9ItrgC27m9JHT1x3nWn9hScbCUgxkGt4t
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlmfD/wACgkQv/vSX3jH
-roOXqwgAhUkGPu/znKnjDmnTqK5JfUo7YBRRsKESFhawDuTWaqTmIiMTx2FMdwJC
-/HiTgdgrSyzg+uxMiaElnt8VF/Ai87XplrZfe1lE2d+fcVpLs0gRrxAyjOD1K9gd
-SHjXSCJ/0anB8ESlpogdoUYfz8OPCfPP9ZSjUjtmU+rtIfrTb5k+nkP9Wmqn4RB5
-9m6UaSv+QwuIsRi2enPOsvtuDKYoVXuppKWodVOZzG4rKxWiHMyJwcdvr4OM2dp1
-aM5WpwjZsTFyI1oL4BwzveaAqyJuUT83XWKC862PSt44JhSwqKY+pd0UFITqxvSd
-P6ybt2Ic4i0l03Jgy5vGgJW7/wL3iw==
-=YSif
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmfELEACgkQp6FrSiUn
+Q2rcRwf+I5HvNj8AddELmTXlm1FUtIarVJyr/58i07Pem/APwTMetbTCZ9DRpcB6
+lLDShQNiM0JzFh76Kxd97Md9PvpwtQXnR35UmX7bDrC0OW2n+YmZJvtluMBOCOe2
+tG80C9ip2hgDcmoiH0oztVNiDRBYnEMwpRvumgqDaG1JSQTjLUJCdwesxpJXKure
+OvC9+xOE57WSWl25kNeabO572mhyca938v4GfIZIiFTOGZ0pgG+ILuyheFybw71L
++kRKwdsUCWbSi3kR08Wun0GJxcKzZ+SbpV1cxsJFR4Y6YQj01pL5iMKZSGaZb+ez
+CTWx+5lHDUDONI5DXY4sr/dVfbDOZw==
+=C5vT
 -----END PGP SIGNATURE-----
 
---WQd7Nmb0794R7fVlqewd0rEEKmfAlxArs--
+--9ItrgC27m9JHT1x3nWn9hScbCUgxkGt4t--
