@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dkns9-0000B5-Lq
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:52:18 -0400
+	(envelope-from <abologna@redhat.com>) id 1dknty-0001aJ-VL
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:54:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dkns9-0003q0-0Q
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:52:17 -0400
-References: <20170818211542.5380-1-eblake@redhat.com>
-	<20170818211542.5380-9-eblake@redhat.com>
-	<e44a3300-cbe9-c9d7-ae49-b223f638d7ea@redhat.com>
-	<da3712de-986d-8130-7a97-e9f1071d2a03@redhat.com>
-	<c665235d-8bec-627a-f750-4dc2798c3d8c@redhat.com>
-	<5d84655b-d82a-956a-f434-023961b23552@redhat.com>
-	<2ffb6aab-09a0-7136-946f-f68f7478c0f7@redhat.com>
-	<bddc04d6-686e-ca5c-ef30-6df7bdb9c3bf@redhat.com>
-	<87h8wxqunl.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e1c18d2a-ac5e-2892-3343-80b943345f3e@redhat.com>
-Date: Thu, 24 Aug 2017 10:52:06 +0200
-MIME-Version: 1.0
-In-Reply-To: <87h8wxqunl.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 08/13] tests: Rely more on
- global_qtest
+	(envelope-from <abologna@redhat.com>) id 1dkntx-0004ap-75
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:54:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49914)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1dkntx-0004aI-0X
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:54:09 -0400
+Message-ID: <1503564841.3438.23.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Thu, 24 Aug 2017 10:54:01 +0200
+In-Reply-To: <ddb6f49e-6617-a659-08bf-cf093f658a8c@redhat.com>
+References: <1503506783.3438.19.camel@redhat.com>
+	<ddb6f49e-6617-a659-08bf-cf093f658a8c@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Number of usable slots in PCIe Root Port / PCIe
+ Switch Downstream Port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, "open list:Floppy" <qemu-block@nongnu.org>
+To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <mapfelba@redhat.com>, laine@laine.org, Lukas Doktor <ldoktor@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 24/08/2017 09:42, Markus Armbruster wrote:
-> 
-> In a language less primitive than C, I'd write it exactly that way, and
-> nobody would complain.  In old, primitive C, I have to write
-> 
->     global_qtest = A;
->     do this
->     do that
-> 
->     global_qtest = B;
->     do something
-> 
->     global_qtest = A;
->     do more
-> 
-> Why's that so horrible to justify busywork on wrappers?
+On Wed, 2017-08-23 at 23:16 +0300, Marcel Apfelbaum wrote:
+> > Is such a configuration considered valid?
+>=20
+> Definitely no.
+>=20
+> > Or should
+> > libvirt and the guest OS / firmware start allowing it?
+>=20
+> I thought libvirt does not allow it anyway and yes, is a bug,
+> but considered low priority.
 
-Because cut-and-paste is a thing. :(
+That's correct, libvirt knows those controllers only have
+a single slot and will prevent you from adding more than
+one device to them. So no change needed there.
 
-Paolo
+IIUC Luk=C3=A1=C5=A1 is using QEMU directly in (some parts of)
+Avocado, so I imagine emitting an error rather than
+silently accepting an invalid configuration would save
+him some debugging time :) But he knows not to do that
+now, so I guess low priority sounds about right.
+
+Thanks for clarifying!
+
+--=20
+Andrea Bolognani / Red Hat / Virtualization
