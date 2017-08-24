@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dkqPE-0003DK-5F
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 07:34:37 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dkqgN-0007X3-S2
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 07:52:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dkqPD-0002pi-21
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 07:34:36 -0400
-Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:37317)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dkqgJ-0005wU-Cq
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 07:52:19 -0400
+Received: from mail-vk0-x22f.google.com ([2607:f8b0:400c:c05::22f]:38184)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dkqPC-0002p5-TQ
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 07:34:34 -0400
-Received: by mail-vk0-x242.google.com with SMTP id c81so896712vkd.4
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 04:34:34 -0700 (PDT)
+	id 1dkqgJ-0005wK-4J
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 07:52:15 -0400
+Received: by mail-vk0-x22f.google.com with SMTP id a76so1070346vke.5
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 04:52:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1503564371-26090-12-git-send-email-armbru@redhat.com>
+In-Reply-To: <1503564371-26090-14-git-send-email-armbru@redhat.com>
 References: <1503564371-26090-1-git-send-email-armbru@redhat.com>
-	<1503564371-26090-12-git-send-email-armbru@redhat.com>
+	<1503564371-26090-14-git-send-email-armbru@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 24 Aug 2017 13:34:33 +0200
-Message-ID: <CAJ+F1CK3pn1_TJLURmeP0B9YakReDORCc5FxW8HKvoyYqJhjbg@mail.gmail.com>
+Date: Thu, 24 Aug 2017 13:52:12 +0200
+Message-ID: <CAJ+F1CKG8xRdBWryua4_d=3JquHo916YWoDtE8YHneE=UjgfRQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 11/16] qapi: Avoid unnecessary use of enum
- lookup table's sentinel
+Subject: Re: [Qemu-devel] [PATCH 13/16] qapi: Mechanically convert
+ FOO_lookup[...] to FOO_str(...)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,95 +36,1348 @@ Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
 On Thu, Aug 24, 2017 at 10:46 AM, Markus Armbruster <armbru@redhat.com> wro=
 te:
-> Currently, the FOO_lookup[] generated for QAPI enum types are
-> terminated by a NULL sentinel.
->
-> A future patch will generate enums with "holes".  NULL-termination
-> will cease to work then.
->
-> To prepare for that, replace "have we reached the sentinel?"
-> predicates by "have we reached the FOO__MAX value?" predicates.
->
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+
+Looks like you got them all!
 
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
 > ---
->  monitor.c                          | 4 ++--
->  tests/test-qobject-input-visitor.c | 2 +-
->  tests/test-string-input-visitor.c  | 2 +-
->  ui/input-legacy.c                  | 2 +-
->  4 files changed, 5 insertions(+), 5 deletions(-)
+>  backends/hostmem.c                  |  2 +-
+>  block/backup.c                      |  2 +-
+>  block/file-posix.c                  |  4 +--
+>  block/file-win32.c                  |  2 +-
+>  block/gluster.c                     |  4 +--
+>  block/iscsi.c                       |  2 +-
+>  block/nfs.c                         |  2 +-
+>  block/qcow2.c                       |  4 +--
+>  block/qed.c                         |  2 +-
+>  block/rbd.c                         |  2 +-
+>  block/sheepdog.c                    |  2 +-
+>  blockdev.c                          |  4 +--
+>  blockjob.c                          |  6 ++---
+>  chardev/char.c                      |  4 +--
+>  crypto/block-luks.c                 | 12 ++++-----
+>  crypto/block.c                      |  4 +--
+>  crypto/cipher-afalg.c               |  2 +-
+>  crypto/cipher-builtin.c             |  8 +++---
+>  crypto/cipher-gcrypt.c              |  4 +--
+>  crypto/cipher-nettle.c              |  8 +++---
+>  crypto/hmac-gcrypt.c                |  2 +-
+>  crypto/hmac-glib.c                  |  2 +-
+>  crypto/hmac-nettle.c                |  2 +-
+>  crypto/pbkdf-gcrypt.c               |  2 +-
+>  crypto/pbkdf-nettle.c               |  2 +-
+>  hmp.c                               | 54 ++++++++++++++++++-------------=
+------
+>  hw/block/fdc.c                      |  6 ++---
+>  hw/char/escc.c                      |  2 +-
+>  hw/input/virtio-input-hid.c         |  4 +--
+>  migration/colo-failover.c           |  4 +--
+>  migration/colo.c                    | 14 +++++-----
+>  migration/global_state.c            |  2 +-
+>  monitor.c                           | 16 +++++------
+>  net/net.c                           |  4 +--
+>  qapi/qmp-dispatch.c                 |  2 +-
+>  tests/test-qapi-util.c              |  2 +-
+>  tests/test-qobject-input-visitor.c  |  4 +--
+>  tests/test-qobject-output-visitor.c |  2 +-
+>  tests/test-string-input-visitor.c   |  2 +-
+>  tests/test-string-output-visitor.c  |  4 +--
+>  tpm.c                               |  2 +-
+>  ui/input-legacy.c                   |  4 +--
+>  ui/input.c                          | 12 ++++-----
+>  ui/vnc.c                            |  6 ++---
+>  vl.c                                |  6 ++---
+>  45 files changed, 121 insertions(+), 121 deletions(-)
 >
-> diff --git a/monitor.c b/monitor.c
-> index e0f8801..b45f55d 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -3249,7 +3249,7 @@ void netdev_add_completion(ReadLineState *rs, int n=
-b_args, const char *str)
+> diff --git a/backends/hostmem.c b/backends/hostmem.c
+> index 4606b73..06e8898 100644
+> --- a/backends/hostmem.c
+> +++ b/backends/hostmem.c
+> @@ -304,7 +304,7 @@ host_memory_backend_memory_complete(UserCreatable *uc=
+, Error **errp)
+>              return;
+>          } else if (maxnode =3D=3D 0 && backend->policy !=3D MPOL_DEFAULT=
+) {
+>              error_setg(errp, "host-nodes must be set for policy %s",
+> -                       HostMemPolicy_lookup[backend->policy]);
+> +                       HostMemPolicy_str(backend->policy));
+>              return;
+>          }
+>
+> diff --git a/block/backup.c b/block/backup.c
+> index 504a089..517c300 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -596,7 +596,7 @@ BlockJob *backup_job_create(const char *job_id, Block=
+DriverState *bs,
+>          error_setg(errp,
+>                     "a sync_bitmap was provided to backup_run, "
+>                     "but received an incompatible sync_mode (%s)",
+> -                   MirrorSyncMode_lookup[sync_mode]);
+> +                   MirrorSyncMode_str(sync_mode));
+>          return NULL;
 >      }
->      len =3D strlen(str);
->      readline_set_completion_index(rs, len);
-> -    for (i =3D 0; NetClientDriver_lookup[i]; i++) {
-> +    for (i =3D 0; i < NET_CLIENT_DRIVER__MAX; i++) {
->          add_completion_option(rs, str, NetClientDriver_lookup[i]);
+>
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index d81eccc..bfef91d 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -1724,7 +1724,7 @@ static int raw_regular_truncate(int fd, int64_t off=
+set, PreallocMode prealloc,
+>      default:
+>          result =3D -ENOTSUP;
+>          error_setg(errp, "Unsupported preallocation mode: %s",
+> -                   PreallocMode_lookup[prealloc]);
+> +                   PreallocMode_str(prealloc));
+>          return result;
+>      }
+>
+> @@ -1759,7 +1759,7 @@ static int raw_truncate(BlockDriverState *bs, int64=
+_t offset,
+>
+>      if (prealloc !=3D PREALLOC_MODE_OFF) {
+>          error_setg(errp, "Preallocation mode '%s' unsupported for this "
+> -                   "non-regular file", PreallocMode_lookup[prealloc]);
+> +                   "non-regular file", PreallocMode_str(prealloc));
+>          return -ENOTSUP;
+>      }
+>
+> diff --git a/block/file-win32.c b/block/file-win32.c
+> index 192ea81..f2a1830 100644
+> --- a/block/file-win32.c
+> +++ b/block/file-win32.c
+> @@ -469,7 +469,7 @@ static int raw_truncate(BlockDriverState *bs, int64_t=
+ offset,
+>
+>      if (prealloc !=3D PREALLOC_MODE_OFF) {
+>          error_setg(errp, "Unsupported preallocation mode '%s'",
+> -                   PreallocMode_lookup[prealloc]);
+> +                   PreallocMode_str(prealloc));
+>          return -ENOTSUP;
+>      }
+>
+> diff --git a/block/gluster.c b/block/gluster.c
+> index 0614e0c..29f9427 100644
+> --- a/block/gluster.c
+> +++ b/block/gluster.c
+> @@ -1047,7 +1047,7 @@ static int qemu_gluster_create(const char *filename=
+,
+>      default:
+>          ret =3D -EINVAL;
+>          error_setg(errp, "Unsupported preallocation mode: %s",
+> -                   PreallocMode_lookup[prealloc]);
+> +                   PreallocMode_str(prealloc));
+>          break;
+>      }
+>
+> @@ -1099,7 +1099,7 @@ static int qemu_gluster_truncate(BlockDriverState *=
+bs, int64_t offset,
+>
+>      if (prealloc !=3D PREALLOC_MODE_OFF) {
+>          error_setg(errp, "Unsupported preallocation mode '%s'",
+> -                   PreallocMode_lookup[prealloc]);
+> +                   PreallocMode_str(prealloc));
+>          return -ENOTSUP;
+>      }
+>
+> diff --git a/block/iscsi.c b/block/iscsi.c
+> index d557c99..8b47d30 100644
+> --- a/block/iscsi.c
+> +++ b/block/iscsi.c
+> @@ -2087,7 +2087,7 @@ static int iscsi_truncate(BlockDriverState *bs, int=
+64_t offset,
+>
+>      if (prealloc !=3D PREALLOC_MODE_OFF) {
+>          error_setg(errp, "Unsupported preallocation mode '%s'",
+> -                   PreallocMode_lookup[prealloc]);
+> +                   PreallocMode_str(prealloc));
+>          return -ENOTSUP;
+>      }
+>
+> diff --git a/block/nfs.c b/block/nfs.c
+> index bec16b7..337fcd9 100644
+> --- a/block/nfs.c
+> +++ b/block/nfs.c
+> @@ -772,7 +772,7 @@ static int nfs_file_truncate(BlockDriverState *bs, in=
+t64_t offset,
+>
+>      if (prealloc !=3D PREALLOC_MODE_OFF) {
+>          error_setg(errp, "Unsupported preallocation mode '%s'",
+> -                   PreallocMode_lookup[prealloc]);
+> +                   PreallocMode_str(prealloc));
+>          return -ENOTSUP;
+>      }
+>
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 41e067e..eb7c154 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -2731,7 +2731,7 @@ static int qcow2_create2(const char *filename, int6=
+4_t total_size,
+>          int64_t prealloc_size =3D
+>              qcow2_calc_prealloc_size(total_size, cluster_size, refcount_=
+order);
+>          qemu_opt_set_number(opts, BLOCK_OPT_SIZE, prealloc_size, &error_=
+abort);
+> -        qemu_opt_set(opts, BLOCK_OPT_PREALLOC, PreallocMode_lookup[preal=
+loc],
+> +        qemu_opt_set(opts, BLOCK_OPT_PREALLOC, PreallocMode_str(prealloc=
+),
+>                       &error_abort);
+>      }
+>
+> @@ -3096,7 +3096,7 @@ static int qcow2_truncate(BlockDriverState *bs, int=
+64_t offset,
+>          prealloc !=3D PREALLOC_MODE_FALLOC && prealloc !=3D PREALLOC_MOD=
+E_FULL)
+>      {
+>          error_setg(errp, "Unsupported preallocation mode '%s'",
+> -                   PreallocMode_lookup[prealloc]);
+> +                   PreallocMode_str(prealloc));
+>          return -ENOTSUP;
+>      }
+>
+> diff --git a/block/qed.c b/block/qed.c
+> index dc54bf4..28e2ec8 100644
+> --- a/block/qed.c
+> +++ b/block/qed.c
+> @@ -1399,7 +1399,7 @@ static int bdrv_qed_truncate(BlockDriverState *bs, =
+int64_t offset,
+>
+>      if (prealloc !=3D PREALLOC_MODE_OFF) {
+>          error_setg(errp, "Unsupported preallocation mode '%s'",
+> -                   PreallocMode_lookup[prealloc]);
+> +                   PreallocMode_str(prealloc));
+>          return -ENOTSUP;
+>      }
+>
+> diff --git a/block/rbd.c b/block/rbd.c
+> index 9c3aa63..144f350 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -944,7 +944,7 @@ static int qemu_rbd_truncate(BlockDriverState *bs, in=
+t64_t offset,
+>
+>      if (prealloc !=3D PREALLOC_MODE_OFF) {
+>          error_setg(errp, "Unsupported preallocation mode '%s'",
+> -                   PreallocMode_lookup[prealloc]);
+> +                   PreallocMode_str(prealloc));
+>          return -ENOTSUP;
+>      }
+>
+> diff --git a/block/sheepdog.c b/block/sheepdog.c
+> index abb2e79..1052098 100644
+> --- a/block/sheepdog.c
+> +++ b/block/sheepdog.c
+> @@ -2176,7 +2176,7 @@ static int sd_truncate(BlockDriverState *bs, int64_=
+t offset,
+>
+>      if (prealloc !=3D PREALLOC_MODE_OFF) {
+>          error_setg(errp, "Unsupported preallocation mode '%s'",
+> -                   PreallocMode_lookup[prealloc]);
+> +                   PreallocMode_str(prealloc));
+>          return -ENOTSUP;
+>      }
+>
+> diff --git a/blockdev.c b/blockdev.c
+> index f90bc93..bfb2a95 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -1466,8 +1466,8 @@ static int action_check_completion_mode(BlkActionSt=
+ate *s, Error **errp)
+>          error_setg(errp,
+>                     "Action '%s' does not support Transaction property "
+>                     "completion-mode =3D %s",
+> -                   TransactionActionKind_lookup[s->action->type],
+> -                   ActionCompletionMode_lookup[s->txn_props->completion_=
+mode]);
+> +                   TransactionActionKind_str(s->action->type),
+> +                   ActionCompletionMode_str(s->txn_props->completion_mod=
+e));
+>          return -1;
+>      }
+>      return 0;
+> diff --git a/blockjob.c b/blockjob.c
+> index 70a7818..3a0c491 100644
+> --- a/blockjob.c
+> +++ b/blockjob.c
+> @@ -208,7 +208,7 @@ static char *child_job_get_parent_desc(BdrvChild *c)
+>  {
+>      BlockJob *job =3D c->opaque;
+>      return g_strdup_printf("%s job '%s'",
+> -                           BlockJobType_lookup[job->driver->job_type],
+> +                           BlockJobType_str(job->driver->job_type),
+>                             job->id);
+>  }
+>
+> @@ -553,7 +553,7 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **=
+errp)
+>          return NULL;
+>      }
+>      info =3D g_new0(BlockJobInfo, 1);
+> -    info->type      =3D g_strdup(BlockJobType_lookup[job->driver->job_ty=
+pe]);
+> +    info->type      =3D g_strdup(BlockJobType_str(job->driver->job_type)=
+);
+>      info->device    =3D g_strdup(job->id);
+>      info->len       =3D job->len;
+>      info->busy      =3D job->busy;
+> @@ -666,7 +666,7 @@ void *block_job_create(const char *job_id, const Bloc=
+kJobDriver *driver,
+>      job->refcnt        =3D 1;
+>
+>      error_setg(&job->blocker, "block device is in use by block job: %s",
+> -               BlockJobType_lookup[driver->job_type]);
+> +               BlockJobType_str(driver->job_type));
+>      block_job_add_bdrv(job, "main node", bs, 0, BLK_PERM_ALL, &error_abo=
+rt);
+>      bs->job =3D job;
+>
+> diff --git a/chardev/char.c b/chardev/char.c
+> index 5d283b9..b6fd5eb 100644
+> --- a/chardev/char.c
+> +++ b/chardev/char.c
+> @@ -931,7 +931,7 @@ ChardevReturn *qmp_chardev_add(const char *id, Charde=
+vBackend *backend,
+>      ChardevReturn *ret;
+>      Chardev *chr;
+>
+> -    cc =3D char_get_class(ChardevBackendKind_lookup[backend->type], errp=
+);
+> +    cc =3D char_get_class(ChardevBackendKind_str(backend->type), errp);
+>      if (!cc) {
+>          return NULL;
+>      }
+> @@ -989,7 +989,7 @@ ChardevReturn *qmp_chardev_change(const char *id, Cha=
+rdevBackend *backend,
+>          return NULL;
+>      }
+>
+> -    cc =3D char_get_class(ChardevBackendKind_lookup[backend->type], errp=
+);
+> +    cc =3D char_get_class(ChardevBackendKind_str(backend->type), errp);
+>      if (!cc) {
+>          return NULL;
+>      }
+> diff --git a/crypto/block-luks.c b/crypto/block-luks.c
+> index 84d189a..4e82895 100644
+> --- a/crypto/block-luks.c
+> +++ b/crypto/block-luks.c
+> @@ -257,7 +257,7 @@ qcrypto_block_luks_cipher_alg_lookup(QCryptoCipherAlg=
+orithm alg,
+>      }
+>
+>      error_setg(errp, "Algorithm '%s' not supported",
+> -               QCryptoCipherAlgorithm_lookup[alg]);
+> +               QCryptoCipherAlgorithm_str(alg));
+>      return NULL;
+>  }
+>
+> @@ -392,7 +392,7 @@ qcrypto_block_luks_essiv_cipher(QCryptoCipherAlgorith=
+m cipher,
+>          break;
+>      default:
+>          error_setg(errp, "Cipher %s not supported with essiv",
+> -                   QCryptoCipherAlgorithm_lookup[cipher]);
+> +                   QCryptoCipherAlgorithm_str(cipher));
+>          return 0;
 >      }
 >  }
-> @@ -3537,7 +3537,7 @@ void watchdog_action_completion(ReadLineState *rs, =
-int nb_args, const char *str)
+> @@ -962,16 +962,16 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+>          goto error;
+>      }
+>
+> -    cipher_mode =3D QCryptoCipherMode_lookup[luks_opts.cipher_mode];
+> -    ivgen_alg =3D QCryptoIVGenAlgorithm_lookup[luks_opts.ivgen_alg];
+> +    cipher_mode =3D QCryptoCipherMode_str(luks_opts.cipher_mode);
+> +    ivgen_alg =3D QCryptoIVGenAlgorithm_str(luks_opts.ivgen_alg);
+>      if (luks_opts.has_ivgen_hash_alg) {
+> -        ivgen_hash_alg =3D QCryptoHashAlgorithm_lookup[luks_opts.ivgen_h=
+ash_alg];
+> +        ivgen_hash_alg =3D QCryptoHashAlgorithm_str(luks_opts.ivgen_hash=
+_alg);
+>          cipher_mode_spec =3D g_strdup_printf("%s-%s:%s", cipher_mode, iv=
+gen_alg,
+>                                             ivgen_hash_alg);
+>      } else {
+>          cipher_mode_spec =3D g_strdup_printf("%s-%s", cipher_mode, ivgen=
+_alg);
+>      }
+> -    hash_alg =3D QCryptoHashAlgorithm_lookup[luks_opts.hash_alg];
+> +    hash_alg =3D QCryptoHashAlgorithm_str(luks_opts.hash_alg);
+>
+>
+>      if (strlen(cipher_alg) >=3D QCRYPTO_BLOCK_LUKS_CIPHER_NAME_LEN) {
+> diff --git a/crypto/block.c b/crypto/block.c
+> index b097d45..c382393 100644
+> --- a/crypto/block.c
+> +++ b/crypto/block.c
+> @@ -61,7 +61,7 @@ QCryptoBlock *qcrypto_block_open(QCryptoBlockOpenOption=
+s *options,
+>      if (options->format >=3D G_N_ELEMENTS(qcrypto_block_drivers) ||
+>          !qcrypto_block_drivers[options->format]) {
+>          error_setg(errp, "Unsupported block driver %s",
+> -                   QCryptoBlockFormat_lookup[options->format]);
+> +                   QCryptoBlockFormat_str(options->format));
+>          g_free(block);
+>          return NULL;
+>      }
+> @@ -92,7 +92,7 @@ QCryptoBlock *qcrypto_block_create(QCryptoBlockCreateOp=
+tions *options,
+>      if (options->format >=3D G_N_ELEMENTS(qcrypto_block_drivers) ||
+>          !qcrypto_block_drivers[options->format]) {
+>          error_setg(errp, "Unsupported block driver %s",
+> -                   QCryptoBlockFormat_lookup[options->format]);
+> +                   QCryptoBlockFormat_str(options->format));
+>          g_free(block);
+>          return NULL;
+>      }
+> diff --git a/crypto/cipher-afalg.c b/crypto/cipher-afalg.c
+> index 01343b2..cd72284 100644
+> --- a/crypto/cipher-afalg.c
+> +++ b/crypto/cipher-afalg.c
+> @@ -52,7 +52,7 @@ qcrypto_afalg_cipher_format_name(QCryptoCipherAlgorithm=
+ alg,
+>          return NULL;
+>      }
+>
+> -    mode_name =3D QCryptoCipherMode_lookup[mode];
+> +    mode_name =3D QCryptoCipherMode_str(mode);
+>      name =3D g_strdup_printf("%s(%s)", mode_name, alg_name);
+>
+>      return name;
+> diff --git a/crypto/cipher-builtin.c b/crypto/cipher-builtin.c
+> index 16a36d4..d8c811f 100644
+> --- a/crypto/cipher-builtin.c
+> +++ b/crypto/cipher-builtin.c
+> @@ -247,7 +247,7 @@ qcrypto_cipher_init_aes(QCryptoCipherMode mode,
+>          mode !=3D QCRYPTO_CIPHER_MODE_ECB &&
+>          mode !=3D QCRYPTO_CIPHER_MODE_XTS) {
+>          error_setg(errp, "Unsupported cipher mode %s",
+> -                   QCryptoCipherMode_lookup[mode]);
+> +                   QCryptoCipherMode_str(mode));
+>          return NULL;
+>      }
+>
+> @@ -379,7 +379,7 @@ qcrypto_cipher_init_des_rfb(QCryptoCipherMode mode,
+>
+>      if (mode !=3D QCRYPTO_CIPHER_MODE_ECB) {
+>          error_setg(errp, "Unsupported cipher mode %s",
+> -                   QCryptoCipherMode_lookup[mode]);
+> +                   QCryptoCipherMode_str(mode));
+>          return NULL;
+>      }
+>
+> @@ -440,7 +440,7 @@ static QCryptoCipherBuiltin *qcrypto_cipher_ctx_new(Q=
+CryptoCipherAlgorithm alg,
+>          break;
+>      default:
+>          error_setg(errp, "Unsupported cipher mode %s",
+> -                   QCryptoCipherMode_lookup[mode]);
+> +                   QCryptoCipherMode_str(mode));
+>          return NULL;
+>      }
+>
+> @@ -460,7 +460,7 @@ static QCryptoCipherBuiltin *qcrypto_cipher_ctx_new(Q=
+CryptoCipherAlgorithm alg,
+>      default:
+>          error_setg(errp,
+>                     "Unsupported cipher algorithm %s",
+> -                   QCryptoCipherAlgorithm_lookup[alg]);
+> +                   QCryptoCipherAlgorithm_str(alg));
+>          return NULL;
+>      }
+>
+> diff --git a/crypto/cipher-gcrypt.c b/crypto/cipher-gcrypt.c
+> index 0489147..10d75da 100644
+> --- a/crypto/cipher-gcrypt.c
+> +++ b/crypto/cipher-gcrypt.c
+> @@ -105,7 +105,7 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QC=
+ryptoCipherAlgorithm alg,
+>          break;
+>      default:
+>          error_setg(errp, "Unsupported cipher mode %s",
+> -                   QCryptoCipherMode_lookup[mode]);
+> +                   QCryptoCipherMode_str(mode));
+>          return NULL;
+>      }
+>
+> @@ -160,7 +160,7 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QC=
+ryptoCipherAlgorithm alg,
+>
+>      default:
+>          error_setg(errp, "Unsupported cipher algorithm %s",
+> -                   QCryptoCipherAlgorithm_lookup[alg]);
+> +                   QCryptoCipherAlgorithm_str(alg));
+>          return NULL;
+>      }
+>
+> diff --git a/crypto/cipher-nettle.c b/crypto/cipher-nettle.c
+> index c51f119..3848cb3 100644
+> --- a/crypto/cipher-nettle.c
+> +++ b/crypto/cipher-nettle.c
+> @@ -281,7 +281,7 @@ static QCryptoCipherNettle *qcrypto_cipher_ctx_new(QC=
+ryptoCipherAlgorithm alg,
+>          break;
+>      default:
+>          error_setg(errp, "Unsupported cipher mode %s",
+> -                   QCryptoCipherMode_lookup[mode]);
+> +                   QCryptoCipherMode_str(mode));
+>          return NULL;
+>      }
+>
+> @@ -420,7 +420,7 @@ static QCryptoCipherNettle *qcrypto_cipher_ctx_new(QC=
+ryptoCipherAlgorithm alg,
+>
+>      default:
+>          error_setg(errp, "Unsupported cipher algorithm %s",
+> -                   QCryptoCipherAlgorithm_lookup[alg]);
+> +                   QCryptoCipherAlgorithm_str(alg));
+>          goto error;
+>      }
+>
+> @@ -491,7 +491,7 @@ qcrypto_nettle_cipher_encrypt(QCryptoCipher *cipher,
+>
+>      default:
+>          error_setg(errp, "Unsupported cipher mode %s",
+> -                   QCryptoCipherMode_lookup[cipher->mode]);
+> +                   QCryptoCipherMode_str(cipher->mode));
+>          return -1;
+>      }
+>      return 0;
+> @@ -537,7 +537,7 @@ qcrypto_nettle_cipher_decrypt(QCryptoCipher *cipher,
+>
+>      default:
+>          error_setg(errp, "Unsupported cipher mode %s",
+> -                   QCryptoCipherMode_lookup[cipher->mode]);
+> +                   QCryptoCipherMode_str(cipher->mode));
+>          return -1;
+>      }
+>      return 0;
+> diff --git a/crypto/hmac-gcrypt.c b/crypto/hmac-gcrypt.c
+> index 76ca61b..0c6f979 100644
+> --- a/crypto/hmac-gcrypt.c
+> +++ b/crypto/hmac-gcrypt.c
+> @@ -52,7 +52,7 @@ void *qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
+>
+>      if (!qcrypto_hmac_supports(alg)) {
+>          error_setg(errp, "Unsupported hmac algorithm %s",
+> -                   QCryptoHashAlgorithm_lookup[alg]);
+> +                   QCryptoHashAlgorithm_str(alg));
+>          return NULL;
+>      }
+>
+> diff --git a/crypto/hmac-glib.c b/crypto/hmac-glib.c
+> index 8cf6b22..a6c1730 100644
+> --- a/crypto/hmac-glib.c
+> +++ b/crypto/hmac-glib.c
+> @@ -58,7 +58,7 @@ void *qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
+>
+>      if (!qcrypto_hmac_supports(alg)) {
+>          error_setg(errp, "Unsupported hmac algorithm %s",
+> -                   QCryptoHashAlgorithm_lookup[alg]);
+> +                   QCryptoHashAlgorithm_str(alg));
+>          return NULL;
+>      }
+>
+> diff --git a/crypto/hmac-nettle.c b/crypto/hmac-nettle.c
+> index 1d5a915..ec2d61b 100644
+> --- a/crypto/hmac-nettle.c
+> +++ b/crypto/hmac-nettle.c
+> @@ -106,7 +106,7 @@ void *qcrypto_hmac_ctx_new(QCryptoHashAlgorithm alg,
+>
+>      if (!qcrypto_hmac_supports(alg)) {
+>          error_setg(errp, "Unsupported hmac algorithm %s",
+> -                   QCryptoHashAlgorithm_lookup[alg]);
+> +                   QCryptoHashAlgorithm_str(alg));
+>          return NULL;
+>      }
+>
+> diff --git a/crypto/pbkdf-gcrypt.c b/crypto/pbkdf-gcrypt.c
+> index 4028985..54ca0d9 100644
+> --- a/crypto/pbkdf-gcrypt.c
+> +++ b/crypto/pbkdf-gcrypt.c
+> @@ -68,7 +68,7 @@ int qcrypto_pbkdf2(QCryptoHashAlgorithm hash,
+>          hash_map[hash] =3D=3D GCRY_MD_NONE) {
+>          error_setg_errno(errp, ENOSYS,
+>                           "PBKDF does not support hash algorithm %s",
+> -                         QCryptoHashAlgorithm_lookup[hash]);
+> +                         QCryptoHashAlgorithm_str(hash));
+>          return -1;
+>      }
+>
+> diff --git a/crypto/pbkdf-nettle.c b/crypto/pbkdf-nettle.c
+> index 6fb2671..212b3e8 100644
+> --- a/crypto/pbkdf-nettle.c
+> +++ b/crypto/pbkdf-nettle.c
+> @@ -110,7 +110,7 @@ int qcrypto_pbkdf2(QCryptoHashAlgorithm hash,
+>      default:
+>          error_setg_errno(errp, ENOSYS,
+>                           "PBKDF does not support hash algorithm %s",
+> -                         QCryptoHashAlgorithm_lookup[hash]);
+> +                         QCryptoHashAlgorithm_str(hash));
+>          return -1;
+>      }
+>      return 0;
+> diff --git a/hmp.c b/hmp.c
+> index 5d980ac..30819fe 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -106,7 +106,7 @@ void hmp_info_status(Monitor *mon, const QDict *qdict=
+)
+>                     info->singlestep ? " (single step mode)" : "");
+>
+>      if (!info->running && info->status !=3D RUN_STATE_PAUSED) {
+> -        monitor_printf(mon, " (%s)", RunState_lookup[info->status]);
+> +        monitor_printf(mon, " (%s)", RunState_str(info->status));
+>      }
+>
+>      monitor_printf(mon, "\n");
+> @@ -171,7 +171,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdic=
+t)
+>          monitor_printf(mon, "capabilities: ");
+>          for (cap =3D caps; cap; cap =3D cap->next) {
+>              monitor_printf(mon, "%s: %s ",
+> -                           MigrationCapability_lookup[cap->value->capabi=
+lity],
+> +                           MigrationCapability_str(cap->value->capabilit=
+y),
+>                             cap->value->state ? "on" : "off");
+>          }
+>          monitor_printf(mon, "\n");
+> @@ -179,7 +179,7 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdic=
+t)
+>
+>      if (info->has_status) {
+>          monitor_printf(mon, "Migration status: %s",
+> -                       MigrationStatus_lookup[info->status]);
+> +                       MigrationStatus_str(info->status));
+>          if (info->status =3D=3D MIGRATION_STATUS_FAILED &&
+>              info->has_error_desc) {
+>              monitor_printf(mon, " (%s)\n", info->error_desc);
+> @@ -277,7 +277,7 @@ void hmp_info_migrate_capabilities(Monitor *mon, cons=
+t QDict *qdict)
+>      if (caps) {
+>          for (cap =3D caps; cap; cap =3D cap->next) {
+>              monitor_printf(mon, "%s: %s\n",
+> -                           MigrationCapability_lookup[cap->value->capabi=
+lity],
+> +                           MigrationCapability_str(cap->value->capabilit=
+y),
+>                             cap->value->state ? "on" : "off");
+>          }
+>      }
+> @@ -294,48 +294,48 @@ void hmp_info_migrate_parameters(Monitor *mon, cons=
+t QDict *qdict)
+>      if (params) {
+>          assert(params->has_compress_level);
+>          monitor_printf(mon, "%s: %" PRId64 "\n",
+> -            MigrationParameter_lookup[MIGRATION_PARAMETER_COMPRESS_LEVEL=
+],
+> +            MigrationParameter_str(MIGRATION_PARAMETER_COMPRESS_LEVEL),
+>              params->compress_level);
+>          assert(params->has_compress_threads);
+>          monitor_printf(mon, "%s: %" PRId64 "\n",
+> -            MigrationParameter_lookup[MIGRATION_PARAMETER_COMPRESS_THREA=
+DS],
+> +            MigrationParameter_str(MIGRATION_PARAMETER_COMPRESS_THREADS)=
+,
+>              params->compress_threads);
+>          assert(params->has_decompress_threads);
+>          monitor_printf(mon, "%s: %" PRId64 "\n",
+> -            MigrationParameter_lookup[MIGRATION_PARAMETER_DECOMPRESS_THR=
+EADS],
+> +            MigrationParameter_str(MIGRATION_PARAMETER_DECOMPRESS_THREAD=
+S),
+>              params->decompress_threads);
+>          assert(params->has_cpu_throttle_initial);
+>          monitor_printf(mon, "%s: %" PRId64 "\n",
+> -            MigrationParameter_lookup[MIGRATION_PARAMETER_CPU_THROTTLE_I=
+NITIAL],
+> +            MigrationParameter_str(MIGRATION_PARAMETER_CPU_THROTTLE_INIT=
+IAL),
+>              params->cpu_throttle_initial);
+>          assert(params->has_cpu_throttle_increment);
+>          monitor_printf(mon, "%s: %" PRId64 "\n",
+> -            MigrationParameter_lookup[MIGRATION_PARAMETER_CPU_THROTTLE_I=
+NCREMENT],
+> +            MigrationParameter_str(MIGRATION_PARAMETER_CPU_THROTTLE_INCR=
+EMENT),
+>              params->cpu_throttle_increment);
+>          assert(params->has_tls_creds);
+>          monitor_printf(mon, "%s: '%s'\n",
+> -            MigrationParameter_lookup[MIGRATION_PARAMETER_TLS_CREDS],
+> +            MigrationParameter_str(MIGRATION_PARAMETER_TLS_CREDS),
+>              params->tls_creds);
+>          assert(params->has_tls_hostname);
+>          monitor_printf(mon, "%s: '%s'\n",
+> -            MigrationParameter_lookup[MIGRATION_PARAMETER_TLS_HOSTNAME],
+> +            MigrationParameter_str(MIGRATION_PARAMETER_TLS_HOSTNAME),
+>              params->tls_hostname);
+>          assert(params->has_max_bandwidth);
+>          monitor_printf(mon, "%s: %" PRId64 " bytes/second\n",
+> -            MigrationParameter_lookup[MIGRATION_PARAMETER_MAX_BANDWIDTH]=
+,
+> +            MigrationParameter_str(MIGRATION_PARAMETER_MAX_BANDWIDTH),
+>              params->max_bandwidth);
+>          assert(params->has_downtime_limit);
+>          monitor_printf(mon, "%s: %" PRId64 " milliseconds\n",
+> -            MigrationParameter_lookup[MIGRATION_PARAMETER_DOWNTIME_LIMIT=
+],
+> +            MigrationParameter_str(MIGRATION_PARAMETER_DOWNTIME_LIMIT),
+>              params->downtime_limit);
+>          assert(params->has_x_checkpoint_delay);
+>          monitor_printf(mon, "%s: %" PRId64 "\n",
+> -            MigrationParameter_lookup[MIGRATION_PARAMETER_X_CHECKPOINT_D=
+ELAY],
+> +            MigrationParameter_str(MIGRATION_PARAMETER_X_CHECKPOINT_DELA=
+Y),
+>              params->x_checkpoint_delay);
+>          assert(params->has_block_incremental);
+>          monitor_printf(mon, "%s: %s\n",
+> -            MigrationParameter_lookup[MIGRATION_PARAMETER_BLOCK_INCREMEN=
+TAL],
+> -                       params->block_incremental ? "on" : "off");
+> +            MigrationParameter_str(MIGRATION_PARAMETER_BLOCK_INCREMENTAL=
+),
+> +            params->block_incremental ? "on" : "off");
+>      }
+>
+>      qapi_free_MigrationParameters(params);
+> @@ -431,7 +431,7 @@ static void print_block_info(Monitor *mon, BlockInfo =
+*info,
+>          }
+>          if (info->has_io_status && info->io_status !=3D BLOCK_DEVICE_IO_=
+STATUS_OK) {
+>              monitor_printf(mon, "    I/O status:       %s\n",
+> -                           BlockDeviceIoStatus_lookup[info->io_status]);
+> +                           BlockDeviceIoStatus_str(info->io_status));
+>          }
+>
+>          if (info->removable) {
+> @@ -461,7 +461,7 @@ static void print_block_info(Monitor *mon, BlockInfo =
+*info,
+>
+>      if (inserted->detect_zeroes !=3D BLOCKDEV_DETECT_ZEROES_OPTIONS_OFF)=
+ {
+>          monitor_printf(mon, "    Detect zeroes:    %s\n",
+> -                       BlockdevDetectZeroesOptions_lookup[inserted->dete=
+ct_zeroes]);
+> +                BlockdevDetectZeroesOptions_str(inserted->detect_zeroes)=
+);
+>      }
+>
+>      if (inserted->bps  || inserted->bps_rd  || inserted->bps_wr  ||
+> @@ -612,7 +612,7 @@ static void hmp_info_VncBasicInfo(Monitor *mon, VncBa=
+sicInfo *info,
+>                     name,
+>                     info->host,
+>                     info->service,
+> -                   NetworkAddressFamily_lookup[info->family],
+> +                   NetworkAddressFamily_str(info->family),
+>                     info->websocket ? " (Websocket)" : "");
+>  }
+>
+> @@ -622,8 +622,8 @@ static void hmp_info_vnc_authcrypt(Monitor *mon, cons=
+t char *indent,
+>                                     VncVencryptSubAuth *vencrypt)
+>  {
+>      monitor_printf(mon, "%sAuth: %s (Sub: %s)\n", indent,
+> -                   VncPrimaryAuth_lookup[auth],
+> -                   vencrypt ? VncVencryptSubAuth_lookup[*vencrypt] : "no=
+ne");
+> +                   VncPrimaryAuth_str(auth),
+> +                   vencrypt ? VncVencryptSubAuth_str(*vencrypt) : "none"=
+);
+>  }
+>
+>  static void hmp_info_vnc_clients(Monitor *mon, VncClientInfoList *client=
+)
+> @@ -738,7 +738,7 @@ void hmp_info_spice(Monitor *mon, const QDict *qdict)
+>      monitor_printf(mon, "        auth: %s\n", info->auth);
+>      monitor_printf(mon, "    compiled: %s\n", info->compiled_version);
+>      monitor_printf(mon, "  mouse-mode: %s\n",
+> -                   SpiceQueryMouseMode_lookup[info->mouse_mode]);
+> +                   SpiceQueryMouseMode_str(info->mouse_mode));
+>
+>      if (!info->has_channels || info->channels =3D=3D NULL) {
+>          monitor_printf(mon, "Channels: none\n");
+> @@ -1009,10 +1009,10 @@ void hmp_info_tpm(Monitor *mon, const QDict *qdic=
+t)
+>      for (info =3D info_list; info; info =3D info->next) {
+>          TPMInfo *ti =3D info->value;
+>          monitor_printf(mon, " tpm%d: model=3D%s\n",
+> -                       c, TpmModel_lookup[ti->model]);
+> +                       c, TpmModel_str(ti->model));
+>
+>          monitor_printf(mon, "  \\ %s: type=3D%s",
+> -                       ti->id, TpmTypeOptionsKind_lookup[ti->options->ty=
+pe]);
+> +                       ti->id, TpmTypeOptionsKind_str(ti->options->type)=
+);
+>
+>          switch (ti->options->type) {
+>          case TPM_TYPE_OPTIONS_KIND_PASSTHROUGH:
+> @@ -2368,7 +2368,7 @@ void hmp_info_memdev(Monitor *mon, const QDict *qdi=
+ct)
+>          monitor_printf(mon, "  prealloc: %s\n",
+>                         m->value->prealloc ? "true" : "false");
+>          monitor_printf(mon, "  policy: %s\n",
+> -                       HostMemPolicy_lookup[m->value->policy]);
+> +                       HostMemPolicy_str(m->value->policy));
+>          visit_complete(v, &str);
+>          monitor_printf(mon, "  host nodes: %s\n", str);
+>
+> @@ -2399,7 +2399,7 @@ void hmp_info_memory_devices(Monitor *mon, const QD=
+ict *qdict)
+>                  di =3D value->u.dimm.data;
+>
+>                  monitor_printf(mon, "Memory device [%s]: \"%s\"\n",
+> -                               MemoryDeviceInfoKind_lookup[value->type],
+> +                               MemoryDeviceInfoKind_str(value->type),
+>                                 di->id ? di->id : "");
+>                  monitor_printf(mon, "  addr: 0x%" PRIx64 "\n", di->addr)=
+;
+>                  monitor_printf(mon, "  slot: %" PRId64 "\n", di->slot);
+> @@ -2793,7 +2793,7 @@ void hmp_info_dump(Monitor *mon, const QDict *qdict=
+)
+>      DumpQueryResult *result =3D qmp_query_dump(NULL);
+>
+>      assert(result && result->status < DUMP_STATUS__MAX);
+> -    monitor_printf(mon, "Status: %s\n", DumpStatus_lookup[result->status=
+]);
+> +    monitor_printf(mon, "Status: %s\n", DumpStatus_str(result->status));
+>
+>      if (result->status =3D=3D DUMP_STATUS_ACTIVE) {
+>          float percent =3D 0;
+> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+> index 4011290..db40e17 100644
+> --- a/hw/block/fdc.c
+> +++ b/hw/block/fdc.c
+> @@ -392,9 +392,9 @@ static int pick_geometry(FDrive *drv)
+>              FLOPPY_DPRINTF("User requested floppy drive type '%s', "
+>                             "but inserted medium appears to be a "
+>                             "%"PRId64" sector '%s' type\n",
+> -                           FloppyDriveType_lookup[drv->drive],
+> +                           FloppyDriveType_str(drv->drive),
+>                             nb_sectors,
+> -                           FloppyDriveType_lookup[parse->drive]);
+> +                           FloppyDriveType_str(parse->drive));
+>          }
+>          match =3D type_match;
+>      }
+> @@ -403,7 +403,7 @@ static int pick_geometry(FDrive *drv)
+>      if (match =3D=3D -1) {
+>          error_setg(&error_abort, "No candidate geometries present in tab=
+le "
+>                     " for floppy drive type '%s'",
+> -                   FloppyDriveType_lookup[drv->drive]);
+> +                   FloppyDriveType_str(drv->drive));
+>      }
+>
+>      parse =3D &(fd_formats[match]);
+> diff --git a/hw/char/escc.c b/hw/char/escc.c
+> index 1aca564..3ab831a 100644
+> --- a/hw/char/escc.c
+> +++ b/hw/char/escc.c
+> @@ -848,7 +848,7 @@ static void sunkbd_handle_event(DeviceState *dev, Qem=
+uConsole *src,
+>      assert(evt->type =3D=3D INPUT_EVENT_KIND_KEY);
+>      key =3D evt->u.key.data;
+>      qcode =3D qemu_input_key_value_to_qcode(key->key);
+> -    trace_escc_sunkbd_event_in(qcode, QKeyCode_lookup[qcode],
+> +    trace_escc_sunkbd_event_in(qcode, QKeyCode_str(qcode),
+>                                 key->down);
+>
+>      if (qcode =3D=3D Q_KEY_CODE_CAPS_LOCK) {
+> diff --git a/hw/input/virtio-input-hid.c b/hw/input/virtio-input-hid.c
+> index 46c0381..4d3afc1 100644
+> --- a/hw/input/virtio-input-hid.c
+> +++ b/hw/input/virtio-input-hid.c
+> @@ -209,7 +209,7 @@ static void virtio_input_handle_event(DeviceState *de=
+v, QemuConsole *src,
+>          } else {
+>              if (key->down) {
+>                  fprintf(stderr, "%s: unmapped key: %d [%s]\n", __func__,
+> -                        qcode, QKeyCode_lookup[qcode]);
+> +                        qcode, QKeyCode_str(qcode));
+>              }
+>          }
+>          break;
+> @@ -224,7 +224,7 @@ static void virtio_input_handle_event(DeviceState *de=
+v, QemuConsole *src,
+>              if (btn->down) {
+>                  fprintf(stderr, "%s: unmapped button: %d [%s]\n", __func=
+__,
+>                          btn->button,
+> -                        InputButton_lookup[btn->button]);
+> +                        InputButton_str(btn->button));
+>              }
+>          }
+>          break;
+> diff --git a/migration/colo-failover.c b/migration/colo-failover.c
+> index f991486..6563862 100644
+> --- a/migration/colo-failover.c
+> +++ b/migration/colo-failover.c
+> @@ -34,7 +34,7 @@ static void colo_failover_bh(void *opaque)
+>                                     FAILOVER_STATUS_ACTIVE);
+>      if (old_state !=3D FAILOVER_STATUS_REQUIRE) {
+>          error_report("Unknown error for failover, old_state =3D %s",
+> -                    FailoverStatus_lookup[old_state]);
+> +                    FailoverStatus_str(old_state));
 >          return;
 >      }
->      readline_set_completion_index(rs, strlen(str));
-> -    for (i =3D 0; WatchdogExpirationAction_lookup[i]; i++) {
-> +    for (i =3D 0; i < WATCHDOG_EXPIRATION_ACTION__MAX; i++) {
->          add_completion_option(rs, str, WatchdogExpirationAction_lookup[i=
-]);
+>
+> @@ -64,7 +64,7 @@ FailoverStatus failover_set_state(FailoverStatus old_st=
+ate,
+>
+>      old =3D atomic_cmpxchg(&failover_state, old_state, new_state);
+>      if (old =3D=3D old_state) {
+> -        trace_colo_failover_set_state(FailoverStatus_lookup[new_state]);
+> +        trace_colo_failover_set_state(FailoverStatus_str(new_state));
 >      }
+>      return old;
+>  }
+> diff --git a/migration/colo.c b/migration/colo.c
+> index a425543..dee3aa8 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -61,7 +61,7 @@ static void secondary_vm_do_failover(void)
+>                          FAILOVER_STATUS_RELAUNCH);
+>          if (old_state !=3D FAILOVER_STATUS_ACTIVE) {
+>              error_report("Unknown error while do failover for secondary =
+VM,"
+> -                         "old_state: %s", FailoverStatus_lookup[old_stat=
+e]);
+> +                         "old_state: %s", FailoverStatus_str(old_state))=
+;
+>          }
+>          return;
+>      }
+> @@ -91,7 +91,7 @@ static void secondary_vm_do_failover(void)
+>                                     FAILOVER_STATUS_COMPLETED);
+>      if (old_state !=3D FAILOVER_STATUS_ACTIVE) {
+>          error_report("Incorrect state (%s) while doing failover for "
+> -                     "secondary VM", FailoverStatus_lookup[old_state]);
+> +                     "secondary VM", FailoverStatus_str(old_state));
+>          return;
+>      }
+>      /* Notify COLO incoming thread that failover work is finished */
+> @@ -126,7 +126,7 @@ static void primary_vm_do_failover(void)
+>                                     FAILOVER_STATUS_COMPLETED);
+>      if (old_state !=3D FAILOVER_STATUS_ACTIVE) {
+>          error_report("Incorrect state (%s) while doing failover for Prim=
+ary VM",
+> -                     FailoverStatus_lookup[old_state]);
+> +                     FailoverStatus_str(old_state));
+>          return;
+>      }
+>      /* Notify COLO thread that failover work is finished */
+> @@ -222,7 +222,7 @@ static void colo_send_message(QEMUFile *f, COLOMessag=
+e msg,
+>      if (ret < 0) {
+>          error_setg_errno(errp, -ret, "Can't send COLO message");
+>      }
+> -    trace_colo_send_message(COLOMessage_lookup[msg]);
+> +    trace_colo_send_message(COLOMessage_str(msg));
+>  }
+>
+>  static void colo_send_message_value(QEMUFile *f, COLOMessage msg,
+> @@ -242,7 +242,7 @@ static void colo_send_message_value(QEMUFile *f, COLO=
+Message msg,
+>      ret =3D qemu_file_get_error(f);
+>      if (ret < 0) {
+>          error_setg_errno(errp, -ret, "Failed to send value for message:%=
+s",
+> -                         COLOMessage_lookup[msg]);
+> +                         COLOMessage_str(msg));
+>      }
+>  }
+>
+> @@ -261,7 +261,7 @@ static COLOMessage colo_receive_message(QEMUFile *f, =
+Error **errp)
+>          error_setg(errp, "%s: Invalid message", __func__);
+>          return msg;
+>      }
+> -    trace_colo_receive_message(COLOMessage_lookup[msg]);
+> +    trace_colo_receive_message(COLOMessage_str(msg));
+>      return msg;
+>  }
+>
+> @@ -299,7 +299,7 @@ static uint64_t colo_receive_message_value(QEMUFile *=
+f, uint32_t expect_msg,
+>      ret =3D qemu_file_get_error(f);
+>      if (ret < 0) {
+>          error_setg_errno(errp, -ret, "Failed to get value for COLO messa=
+ge: %s",
+> -                         COLOMessage_lookup[expect_msg]);
+> +                         COLOMessage_str(expect_msg));
+>      }
+>      return value;
+>  }
+> diff --git a/migration/global_state.c b/migration/global_state.c
+> index 76cd3a1..8db2f19 100644
+> --- a/migration/global_state.c
+> +++ b/migration/global_state.c
+> @@ -41,7 +41,7 @@ int global_state_store(void)
+>
+>  void global_state_store_running(void)
+>  {
+> -    const char *state =3D RunState_lookup[RUN_STATE_RUNNING];
+> +    const char *state =3D RunState_str(RUN_STATE_RUNNING);
+>      strncpy((char *)global_state.runstate,
+>             state, sizeof(global_state.runstate));
+>  }
+> diff --git a/monitor.c b/monitor.c
+> index b45f55d..360757c 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -928,7 +928,7 @@ EventInfoList *qmp_query_events(Error **errp)
+>      QAPIEvent e;
+>
+>      for (e =3D 0 ; e < QAPI_EVENT__MAX ; e++) {
+> -        const char *event_name =3D QAPIEvent_lookup[e];
+> +        const char *event_name =3D QAPIEvent_str(e);
+>          assert(event_name !=3D NULL);
+>          info =3D g_malloc0(sizeof(*info));
+>          info->value =3D g_malloc0(sizeof(*info->value));
+> @@ -3250,7 +3250,7 @@ void netdev_add_completion(ReadLineState *rs, int n=
+b_args, const char *str)
+>      len =3D strlen(str);
+>      readline_set_completion_index(rs, len);
+>      for (i =3D 0; i < NET_CLIENT_DRIVER__MAX; i++) {
+> -        add_completion_option(rs, str, NetClientDriver_lookup[i]);
+> +        add_completion_option(rs, str, NetClientDriver_str(i));
+>      }
+>  }
+>
+> @@ -3434,8 +3434,8 @@ void sendkey_completion(ReadLineState *rs, int nb_a=
+rgs, const char *str)
+>      len =3D strlen(str);
+>      readline_set_completion_index(rs, len);
+>      for (i =3D 0; i < Q_KEY_CODE__MAX; i++) {
+> -        if (!strncmp(str, QKeyCode_lookup[i], len)) {
+> -            readline_add_completion(rs, QKeyCode_lookup[i]);
+> +        if (!strncmp(str, QKeyCode_str(i), len)) {
+> +            readline_add_completion(rs, QKeyCode_str(i));
+>          }
+>      }
+>  }
+> @@ -3538,7 +3538,7 @@ void watchdog_action_completion(ReadLineState *rs, =
+int nb_args, const char *str)
+>      }
+>      readline_set_completion_index(rs, strlen(str));
+>      for (i =3D 0; i < WATCHDOG_EXPIRATION_ACTION__MAX; i++) {
+> -        add_completion_option(rs, str, WatchdogExpirationAction_lookup[i=
+]);
+> +        add_completion_option(rs, str, WatchdogExpirationAction_str(i));
+>      }
+>  }
+>
+> @@ -3552,7 +3552,7 @@ void migrate_set_capability_completion(ReadLineStat=
+e *rs, int nb_args,
+>      if (nb_args =3D=3D 2) {
+>          int i;
+>          for (i =3D 0; i < MIGRATION_CAPABILITY__MAX; i++) {
+> -            const char *name =3D MigrationCapability_lookup[i];
+> +            const char *name =3D MigrationCapability_str(i);
+>              if (!strncmp(str, name, len)) {
+>                  readline_add_completion(rs, name);
+>              }
+> @@ -3573,7 +3573,7 @@ void migrate_set_parameter_completion(ReadLineState=
+ *rs, int nb_args,
+>      if (nb_args =3D=3D 2) {
+>          int i;
+>          for (i =3D 0; i < MIGRATION_PARAMETER__MAX; i++) {
+> -            const char *name =3D MigrationParameter_lookup[i];
+> +            const char *name =3D MigrationParameter_str(i);
+>              if (!strncmp(str, name, len)) {
+>                  readline_add_completion(rs, name);
+>              }
+> @@ -3852,7 +3852,7 @@ static void handle_qmp_command(JSONMessageParser *p=
+arser, GQueue *tokens)
+>          qdict =3D qdict_get_qdict(qobject_to_qdict(rsp), "error");
+>          if (qdict
+>              && !g_strcmp0(qdict_get_try_str(qdict, "class"),
+> -                    QapiErrorClass_lookup[ERROR_CLASS_COMMAND_NOT_FOUND]=
+)) {
+> +                    QapiErrorClass_str(ERROR_CLASS_COMMAND_NOT_FOUND))) =
+{
+>              /* Provide a more useful error message */
+>              qdict_del(qdict, "desc");
+>              qdict_put_str(qdict, "desc", "Expecting capabilities negotia=
+tion"
+> diff --git a/net/net.c b/net/net.c
+> index 0e28099..2fa99c0 100644
+> --- a/net/net.c
+> +++ b/net/net.c
+> @@ -1064,7 +1064,7 @@ static int net_client_init1(const void *object, boo=
+l is_netdev, Error **errp)
+>          /* FIXME drop when all init functions store an Error */
+>          if (errp && !*errp) {
+>              error_setg(errp, QERR_DEVICE_INIT_FAILED,
+> -                       NetClientDriver_lookup[netdev->type]);
+> +                       NetClientDriver_str(netdev->type));
+>          }
+>          return -1;
+>      }
+> @@ -1288,7 +1288,7 @@ void print_net_client(Monitor *mon, NetClientState =
+*nc)
+>
+>      monitor_printf(mon, "%s: index=3D%d,type=3D%s,%s\n", nc->name,
+>                     nc->queue_index,
+> -                   NetClientDriver_lookup[nc->info->type],
+> +                   NetClientDriver_str(nc->info->type),
+>                     nc->info_str);
+>      if (!QTAILQ_EMPTY(&nc->filters)) {
+>          monitor_printf(mon, "filters:\n");
+> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+> index 5ad36f8..b41fa17 100644
+> --- a/qapi/qmp-dispatch.c
+> +++ b/qapi/qmp-dispatch.c
+> @@ -118,7 +118,7 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds,=
+ QObject *request,
+>  QObject *qmp_build_error_object(Error *err)
+>  {
+>      return qobject_from_jsonf("{ 'class': %s, 'desc': %s }",
+> -                              QapiErrorClass_lookup[error_get_class(err)=
+],
+> +                              QapiErrorClass_str(error_get_class(err)),
+>                                error_get_pretty(err));
+>  }
+>
+> diff --git a/tests/test-qapi-util.c b/tests/test-qapi-util.c
+> index 7e1be1d..0992bdb 100644
+> --- a/tests/test-qapi-util.c
+> +++ b/tests/test-qapi-util.c
+> @@ -31,7 +31,7 @@ static void test_qapi_enum_parse(void)
+>      ret =3D qapi_enum_parse(QType_lookup, "none", -1, &error_abort);
+>      g_assert_cmpint(ret, =3D=3D, QTYPE_NONE);
+>
+> -    ret =3D qapi_enum_parse(QType_lookup, QType_lookup[QTYPE__MAX - 1],
+> +    ret =3D qapi_enum_parse(QType_lookup, QType_str(QTYPE__MAX - 1),
+>                            QTYPE__MAX - 1, &error_abort);
+>      g_assert_cmpint(ret, =3D=3D, QTYPE__MAX - 1);
 >  }
 > diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-inpu=
 t-visitor.c
-> index bcf0261..5bbfb65 100644
+> index 5bbfb65..f8720aa 100644
 > --- a/tests/test-qobject-input-visitor.c
 > +++ b/tests/test-qobject-input-visitor.c
-> @@ -382,7 +382,7 @@ static void test_visitor_in_enum(TestInputVisitorData=
+> @@ -385,7 +385,7 @@ static void test_visitor_in_enum(TestInputVisitorData=
  *data,
->      Visitor *v;
->      EnumOne i;
->
-> -    for (i =3D 0; EnumOne_lookup[i]; i++) {
-> +    for (i =3D 0; i < ENUM_ONE__MAX; i++) {
+>      for (i =3D 0; i < ENUM_ONE__MAX; i++) {
 >          EnumOne res =3D -1;
 >
->          v =3D visitor_input_test_init(data, "%s", EnumOne_lookup[i]);
+> -        v =3D visitor_input_test_init(data, "%s", EnumOne_lookup[i]);
+> +        v =3D visitor_input_test_init(data, "%s", EnumOne_str(i));
+>
+>          visit_type_EnumOne(v, NULL, &res, &error_abort);
+>          g_assert_cmpint(i, =3D=3D, res);
+> @@ -699,7 +699,7 @@ static void test_native_list_integer_helper(TestInput=
+VisitorData *data,
+>          }
+>      }
+>      g_string_append_printf(gstr_union,  "{ 'type': '%s', 'data': [ %s ] =
+}",
+> -                           UserDefNativeListUnionKind_lookup[kind],
+> +                           UserDefNativeListUnionKind_str(kind),
+>                             gstr_list->str);
+>      v =3D visitor_input_test_init_raw(data,  gstr_union->str);
+>
+> diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-out=
+put-visitor.c
+> index 7eb1620..d375100 100644
+> --- a/tests/test-qobject-output-visitor.c
+> +++ b/tests/test-qobject-output-visitor.c
+> @@ -133,7 +133,7 @@ static void test_visitor_out_enum(TestOutputVisitorDa=
+ta *data,
+>
+>          qstr =3D qobject_to_qstring(visitor_get(data));
+>          g_assert(qstr);
+> -        g_assert_cmpstr(qstring_get_str(qstr), =3D=3D, EnumOne_lookup[i]=
+);
+> +        g_assert_cmpstr(qstring_get_str(qstr), =3D=3D, EnumOne_str(i));
+>          visitor_reset(data);
+>      }
+>  }
 > diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-=
 visitor.c
-> index 79313a7..e7a7b80 100644
+> index e7a7b80..4f9c36b 100644
 > --- a/tests/test-string-input-visitor.c
 > +++ b/tests/test-string-input-visitor.c
-> @@ -279,7 +279,7 @@ static void test_visitor_in_enum(TestInputVisitorData=
+> @@ -282,7 +282,7 @@ static void test_visitor_in_enum(TestInputVisitorData=
  *data,
->      Visitor *v;
->      EnumOne i;
->
-> -    for (i =3D 0; EnumOne_lookup[i]; i++) {
-> +    for (i =3D 0; i < ENUM_ONE__MAX; i++) {
+>      for (i =3D 0; i < ENUM_ONE__MAX; i++) {
 >          EnumOne res =3D -1;
 >
->          v =3D visitor_input_test_init(data, EnumOne_lookup[i]);
+> -        v =3D visitor_input_test_init(data, EnumOne_lookup[i]);
+> +        v =3D visitor_input_test_init(data, EnumOne_str(i));
+>
+>          visit_type_EnumOne(v, NULL, &res, &err);
+>          g_assert(!err);
+> diff --git a/tests/test-string-output-visitor.c b/tests/test-string-outpu=
+t-visitor.c
+> index e736db3..385cddb 100644
+> --- a/tests/test-string-output-visitor.c
+> +++ b/tests/test-string-output-visitor.c
+> @@ -194,12 +194,12 @@ static void test_visitor_out_enum(TestOutputVisitor=
+Data *data,
+>
+>          str =3D visitor_get(data);
+>          if (data->human) {
+> -            char *str_human =3D g_strdup_printf("\"%s\"", EnumOne_lookup=
+[i]);
+> +            char *str_human =3D g_strdup_printf("\"%s\"", EnumOne_str(i)=
+);
+>
+>              g_assert_cmpstr(str, =3D=3D, str_human);
+>              g_free(str_human);
+>          } else {
+> -            g_assert_cmpstr(str, =3D=3D, EnumOne_lookup[i]);
+> +            g_assert_cmpstr(str, =3D=3D, EnumOne_str(i));
+>          }
+>          visitor_reset(data);
+>      }
+> diff --git a/tpm.c b/tpm.c
+> index 38f3eb8..111f1ca 100644
+> --- a/tpm.c
+> +++ b/tpm.c
+> @@ -62,7 +62,7 @@ static void tpm_display_backend_drivers(void)
+>              continue;
+>          }
+>          fprintf(stderr, "%12s   %s\n",
+> -                TpmType_lookup[i], be_drivers[i]->desc());
+> +                TpmType_str(i), be_drivers[i]->desc());
+>      }
+>      fprintf(stderr, "\n");
+>  }
 > diff --git a/ui/input-legacy.c b/ui/input-legacy.c
-> index 7159747..a5f1e82 100644
+> index a5f1e82..6bc3525 100644
 > --- a/ui/input-legacy.c
 > +++ b/ui/input-legacy.c
-> @@ -61,7 +61,7 @@ int index_from_key(const char *key, size_t key_length)
->  {
+> @@ -62,8 +62,8 @@ int index_from_key(const char *key, size_t key_length)
 >      int i;
 >
-> -    for (i =3D 0; QKeyCode_lookup[i] !=3D NULL; i++) {
-> +    for (i =3D 0; i < Q_KEY_CODE__MAX; i++) {
->          if (!strncmp(key, QKeyCode_lookup[i], key_length) &&
->              !QKeyCode_lookup[i][key_length]) {
+>      for (i =3D 0; i < Q_KEY_CODE__MAX; i++) {
+> -        if (!strncmp(key, QKeyCode_lookup[i], key_length) &&
+> -            !QKeyCode_lookup[i][key_length]) {
+> +        if (!strncmp(key, QKeyCode_str(i), key_length) &&
+> +            !QKeyCode_str(i)[key_length]) {
 >              break;
+>          }
+>      }
+> diff --git a/ui/input.c b/ui/input.c
+> index af05f06..3422d4a 100644
+> --- a/ui/input.c
+> +++ b/ui/input.c
+> @@ -151,7 +151,7 @@ void qmp_input_send_event(bool has_device, const char=
+ *device,
+>          if (!qemu_input_find_handler(1 << event->type, con)) {
+>              error_setg(errp, "Input handler not found for "
+>                               "event type %s",
+> -                            InputEventKind_lookup[event->type]);
+> +                            InputEventKind_str(event->type));
+>              return;
+>          }
+>      }
+> @@ -213,12 +213,12 @@ static void qemu_input_event_trace(QemuConsole *src=
+, InputEvent *evt)
+>          switch (key->key->type) {
+>          case KEY_VALUE_KIND_NUMBER:
+>              qcode =3D qemu_input_key_number_to_qcode(key->key->u.number.=
+data);
+> -            name =3D QKeyCode_lookup[qcode];
+> +            name =3D QKeyCode_str(qcode);
+>              trace_input_event_key_number(idx, key->key->u.number.data,
+>                                           name, key->down);
+>              break;
+>          case KEY_VALUE_KIND_QCODE:
+> -            name =3D QKeyCode_lookup[key->key->u.qcode.data];
+> +            name =3D QKeyCode_str(key->key->u.qcode.data);
+>              trace_input_event_key_qcode(idx, name, key->down);
+>              break;
+>          case KEY_VALUE_KIND__MAX:
+> @@ -228,17 +228,17 @@ static void qemu_input_event_trace(QemuConsole *src=
+, InputEvent *evt)
+>          break;
+>      case INPUT_EVENT_KIND_BTN:
+>          btn =3D evt->u.btn.data;
+> -        name =3D InputButton_lookup[btn->button];
+> +        name =3D InputButton_str(btn->button);
+>          trace_input_event_btn(idx, name, btn->down);
+>          break;
+>      case INPUT_EVENT_KIND_REL:
+>          move =3D evt->u.rel.data;
+> -        name =3D InputAxis_lookup[move->axis];
+> +        name =3D InputAxis_str(move->axis);
+>          trace_input_event_rel(idx, name, move->value);
+>          break;
+>      case INPUT_EVENT_KIND_ABS:
+>          move =3D evt->u.abs.data;
+> -        name =3D InputAxis_lookup[move->axis];
+> +        name =3D InputAxis_str(move->axis);
+>          trace_input_event_abs(idx, name, move->value);
+>          break;
+>      case INPUT_EVENT_KIND__MAX:
+> diff --git a/ui/vnc.c b/ui/vnc.c
+> index 651cbb8..e1874a2 100644
+> --- a/ui/vnc.c
+> +++ b/ui/vnc.c
+> @@ -131,7 +131,7 @@ static void vnc_init_basic_info(SocketAddress *addr,
+>      case SOCKET_ADDRESS_TYPE_VSOCK:
+>      case SOCKET_ADDRESS_TYPE_FD:
+>          error_setg(errp, "Unsupported socket address type %s",
+> -                   SocketAddressType_lookup[addr->type]);
+> +                   SocketAddressType_str(addr->type));
+>          break;
+>      default:
+>          abort();
+> @@ -416,7 +416,7 @@ VncInfo *qmp_query_vnc(Error **errp)
+>          case SOCKET_ADDRESS_TYPE_VSOCK:
+>          case SOCKET_ADDRESS_TYPE_FD:
+>              error_setg(errp, "Unsupported socket address type %s",
+> -                       SocketAddressType_lookup[addr->type]);
+> +                       SocketAddressType_str(addr->type));
+>              goto out_error;
+>          default:
+>              abort();
+> @@ -1839,7 +1839,7 @@ static void vnc_release_modifiers(VncState *vs)
+>
+>  static const char *code2name(int keycode)
+>  {
+> -    return QKeyCode_lookup[qemu_input_key_number_to_qcode(keycode)];
+> +    return QKeyCode_str(qemu_input_key_number_to_qcode(keycode));
+>  }
+>
+>  static void key_event(VncState *vs, int down, uint32_t sym)
+> diff --git a/vl.c b/vl.c
+> index 8e247cc..0b45e1b 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -688,7 +688,7 @@ bool runstate_check(RunState state)
+>
+>  bool runstate_store(char *str, size_t size)
+>  {
+> -    const char *state =3D RunState_lookup[current_run_state];
+> +    const char *state =3D RunState_str(current_run_state);
+>      size_t len =3D strlen(state) + 1;
+>
+>      if (len > size) {
+> @@ -721,8 +721,8 @@ void runstate_set(RunState new_state)
+>
+>      if (!runstate_valid_transitions[current_run_state][new_state]) {
+>          error_report("invalid runstate transition: '%s' -> '%s'",
+> -                     RunState_lookup[current_run_state],
+> -                     RunState_lookup[new_state]);
+> +                     RunState_str(current_run_state),
+> +                     RunState_str(new_state));
+>          abort();
+>      }
+>      trace_runstate_set(new_state);
 > --
 > 2.7.5
 >
