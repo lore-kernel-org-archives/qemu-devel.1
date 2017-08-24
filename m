@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dkjHe-0006tz-37
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 23:58:19 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dkjM4-0008AW-LQ
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 00:02:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dkjHb-0004Fd-1e
-	for qemu-devel@nongnu.org; Wed, 23 Aug 2017 23:58:18 -0400
-Date: Thu, 24 Aug 2017 13:57:30 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dkjM3-00069s-IB
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 00:02:52 -0400
+Date: Thu, 24 Aug 2017 14:02:43 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170824035730.GE5379@umbus.fritz.box>
-References: <1503546752-24569-1-git-send-email-thuth@redhat.com>
+Message-ID: <20170824040243.GF5379@umbus.fritz.box>
+References: <20170821200036.15036-1-bauerman@linux.vnet.ibm.com>
+	<20170824025448.GA27401@fergus.ozlabs.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="3rxX7Uty8SZY8iU1"
+	protocol="application/pgp-signature"; boundary="OzigliFs3e0dNr73"
 Content-Disposition: inline
-In-Reply-To: <1503546752-24569-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.11] hw/ppc/spapr_cpu_core: Add a
- proper check for spapr machine
+In-Reply-To: <20170824025448.GA27401@fergus.ozlabs.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] spapr: Add ibm,
+ processor-storage-keys property to CPU DT node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,78 +25,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>
+To: Paul Mackerras <paulus@ozlabs.org>
+Cc: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Ram Pai <linuxram@us.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>
 
 
---3rxX7Uty8SZY8iU1
-Content-Type: text/plain; charset=us-ascii
+--OzigliFs3e0dNr73
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 24, 2017 at 05:52:32AM +0200, Thomas Huth wrote:
-> QEMU currently crashes when the user tries to add a spapr-cpu-core
-> on a non-pseries machine:
+On Thu, Aug 24, 2017 at 12:54:48PM +1000, Paul Mackerras wrote:
+> On Mon, Aug 21, 2017 at 05:00:36PM -0300, Thiago Jung Bauermann wrote:
+> > LoPAPR says:
+> >=20
+> >     =E2=80=9Cibm,processor-storage-keys=E2=80=9D
+> >=20
+> >     property name indicating the number of virtual storage keys support=
+ed
+> >     by the processor described by this node.
+> >=20
+> >     prop-encoded-array: Consists of two cells encoded as with encode-in=
+t.
+> >     The first cell represents the number of virtual storage keys suppor=
+ted
+> >     for data accesses while the second cell represents the number of
+> >     virtual storage keys supported for instruction accesses. The cell v=
+alue
+> >     of zero indicates that no storage keys are supported for the access
+> >     type.
+> >=20
+> > pHyp provides the property above but there's a bug in P8 firmware where=
+ the
+> > second cell is zero even though POWER8 supports instruction access keys.
+> > This bug will be fixed for P9.
+> >=20
+> > Tested with KVM on POWER8 Firenze machine and with TCG on x86_64 machin=
+e.
+> >=20
+> > Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+> > ---
+> >=20
+> > The sysfs files are provided by this patch for Linux:
 >=20
-> $ qemu-system-ppc64 -S -machine ppce500,accel=3Dtcg \
->                     -device POWER5+_v2.1-spapr-cpu-core
-> hw/ppc/spapr_cpu_core.c:178:spapr_cpu_core_realize_child:
-> Object 0x55cee1f55160 is not an instance of type spapr-machine
-> Aborted (core dumped)
->=20
-> So let's add a proper check for the correct machine time with
-> a more friendly error message here.
->=20
-> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Those sysfs files relate to the kernel's support for userspace
+> processes using storage keys.  That is quite distinct from KVM's
+> support for guests using storage keys, so I think that using those
+> sysfs files to indicate what the guest can do is wrong.
 
-Applied to ppc-for-2.11, thanks.
+Ah!  Glad someone pointed that out.
 
-> ---
->  v2:
->  - Add the check to spapr_cpu_core_realize() instead of adding it to
->    spapr_cpu_core_realize_child()
->  - Use device/machine whitelist for the device-crash-test instead of
->    adding a log entry there
+> In fact KVM allows guests to specify storage keys in the HPTE values
+> that they set, except that there is a bug (for which Ram Pai has
+> posted a patch) that means that KVM loses the top two bits of the key
+> number.
 >=20
->  hw/ppc/spapr_cpu_core.c   | 5 +++++
->  scripts/device-crash-test | 3 +++
->  2 files changed, 8 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index ea278ce..dd92326 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -220,6 +220,11 @@ static void spapr_cpu_core_realize(DeviceState *dev,=
- Error **errp)
->      void *obj;
->      int i, j;
-> =20
-> +    if (!object_dynamic_cast(qdev_get_machine(), TYPE_SPAPR_MACHINE)) {
-> +        error_setg(errp, "spapr-cpu-core needs a pseries machine");
-> +        return;
-> +    }
-> +
->      sc->threads =3D g_malloc0(size * cc->nr_threads);
->      for (i =3D 0; i < cc->nr_threads; i++) {
->          char id[32];
-> diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-> index 81d65b9..043b24a 100755
-> --- a/scripts/device-crash-test
-> +++ b/scripts/device-crash-test
-> @@ -160,6 +160,9 @@ ERROR_WHITELIST =3D [
->      {'machine':'q35|pc.*', 'device':'kvm-ioapic', 'expected':True}, # On=
-ly 1 ioapics allowed
->      {'machine':'q35|pc.*', 'device':'ioapic', 'expected':True},     # On=
-ly 1 ioapics allowed
-> =20
-> +    # "spapr-cpu-core needs a pseries machine"
-> +    {'machine':'(?!pseries).*', 'device':'.*-spapr-cpu-core', 'expected'=
-:True},
-> +
->      # KVM-specific devices shouldn't be tried without accel=3Dkvm:
->      {'accel':'(?!kvm).*', 'device':'kvmclock', 'expected':True},
->      {'accel':'(?!kvm).*', 'device':'kvm-pci-assign', 'expected':True},
+> What I would suggest is that we use the 'pad' field in the struct
+> kvm_ppc_smmu_info to report the number of keys supported by KVM for
+> guest use.
+
+Is there a particular reason to put it there rather than a new KVM capabili=
+ty?
+
+> That will be 0 in all current kernels, indicating that
+> keys are not supported, which is reasonable because of the bug.  I
+> will make sure the patch fixing the bug goes in first.
+
+Note that the same migration concerns still apply, so we'll still want
+machine properties to control this in qemu, which are validated
+against what the host can do.  Since current kernels are buggy, I
+suggest we have these properties default to 0 - i.e. you need to
+explicitly request storage keys on the command line if you want your
+guest to use them.  Once fixed kernels are rolled out we can look at
+changing that in a future machine type.
+
+> We could either have two u16 fields for the number of keys for data
+> and instruction, or we could have a u32 field for the number of keys
+> and a separate bit in the flags field to indicate that instruction
+> keys are supported.  Which would be preferable?
+
+I'd prefer the separate numbers for I and D.  It's more flexible and
+no harder to implement AFAICT.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -103,24 +112,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---3rxX7Uty8SZY8iU1
+--OzigliFs3e0dNr73
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmeTqkACgkQbDjKyiDZ
-s5JsLw//SIo9RhGjcbj9yN9Myx/9a19Fx5okMYAIup0vt/0dd3tVYYOLz2Jj4N8G
-z07RqgiRnU5KsIr9YNOQq/4fhm+6U/uWzIZkqwNENUFPdUjyQbUYxthqkXcERsiz
-Mz5N+Ytlmv5ppw1Kbd+cf3wtrFyBTiFedcICv7sH9T6goVeaC9OmGc0Q1rN6JXUo
-mrhkKFkuDI8DRzP/b0XFGSaAuD0BEWEv1YfPnah3EvPy6ZXhtBAp/FDq11F1jHQ+
-z8BI69kCURhsC+WQ/HOmlqgK+MtOvqYc2pKrxk3xydR0d0BLVzay0iVf+fspNr3I
-l5MenA52PIXHUbv9cHxOe+Tn5a813PDfNMicOsOt7MHiBHxgFFYxtC+StbXFigHB
-KrdGlvkO5IqElh1om3zvaKbZifVTVggj8E9Lewlq3x7nQHdcSOKguq61KCrRxSvw
-BW4rAOBi9JWzY2m978ZnsLM87uRgj53k4wLm8jdmhK1VaL1WTZvz4MT6z8qkFtXu
-TefNeHq7/WJ5ruz9U5Un469IUKpgKN1CxGK6aHQoFB7eicnkwE+Zd6F9vhOVT3ZG
-HpQIAg1/XUso1Mxj16h5UQOqQAcoomzOySQNGLPS8yTrTvxxsQsUnB8TL/GumsOC
-Dpi9GBZdrw8w3fsiWk0bwdKkviLOHOZJjtGU6drdWZujD5eEvyw=
-=m1N2
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmeT+MACgkQbDjKyiDZ
+s5JGJQ//SStb8t/IltzEt4tLUK/zKDk3Zb3eJ3LtOZNZ64Apm2YHVYaSzWQObVxp
++k4gGDZNUKz/I39YxL1ih5SSGNAj2tcZFg6YPjiQPqGe/90hh6trTUYPDDsK/NzB
+K54U35BSYz0Ba4XcyhTa9IjYf8ZFH3/JKao0NSHLSPbrL8EkmLob57phSvYwaXCX
+66azX8UDtAnhh5SRj9n2B4PEJZeZPwRyWrvFUbe9tO0bdD6r8KpBkwrJoAOKUw01
+eMrw3n80oxJyOy9APFuk6zOBYssOnZJWPxTTeHv2x/nsyKyaBxzVDawigpuRvWtt
+az1BF7mctsOlproBt88G/8rHtvni7N0/GfmDi2rHFP5KLrDmk/LFOrHq8ay2bYiX
+Z6WUi5VWDBj3DNPzkgMa0grSk7CNe9Leph/Y9OgKTqLArY0ThmrUDTDboF94SFCL
+MxNMx6V+MYW7IuJ15NH162qr9xGDJ6f5cs+3EHeiMO2wKqEZfENTyduVJrbw/CZl
+i7f9zUJPDEzsyY27RBSYKsij9D0G8RRmwxzCYjckLJxhv97EwxzmafSkFKtZBMiA
+p9kocpUr+KmW1Mg13viAWYglKZHtoiQuAwlR5bKWgoeoenIMpYUgSEzyILeebWfP
+NZqHsmcMoONdL+W9+LJulBhCbjc3oUHM1MXOsFpe/wHCOiX2l14=
+=okHE
 -----END PGP SIGNATURE-----
 
---3rxX7Uty8SZY8iU1--
+--OzigliFs3e0dNr73--
