@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dknmO-0003PM-Iu
+	(envelope-from <armbru@redhat.com>) id 1dknmO-0003PO-J2
 	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:46:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dknmK-0000MV-IS
+	(envelope-from <armbru@redhat.com>) id 1dknmL-0000NM-D4
 	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:46:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44256)
+Received: from mx1.redhat.com ([209.132.183.28]:44268)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dknmK-0000Lv-8a
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:46:16 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dknmL-0000ML-36
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 04:46:17 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 24 Aug 2017 10:45:59 +0200
-Message-Id: <1503564371-26090-5-git-send-email-armbru@redhat.com>
+Date: Thu, 24 Aug 2017 10:45:56 +0200
+Message-Id: <1503564371-26090-2-git-send-email-armbru@redhat.com>
 In-Reply-To: <1503564371-26090-1-git-send-email-armbru@redhat.com>
 References: <1503564371-26090-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 04/16] tpm: Clean up model registration & lookup
+Subject: [Qemu-devel] [PATCH 01/16] qapi: Update qapi-code-gen.txt examples
+ to match current code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,112 +25,152 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com, Stefan Berger <stefanb@us.ibm.com>
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-We have a strict separation between enum TpmModel and tpm_models[]:
-
-* TpmModel may have any number of members.  It just happens to have one.
-
-* tpm_register_model() uses the first empty slot in tmp_models[].
-
-  If you register more than tpm_models[] has space,
-  tpn_register_model() fails.  Its caller silently ignores the
-  failure.
-
-  Register the same TpmModel more than once has no effect other than
-  wasting tpm_models[] slots: tpm_model_is_registered() is happy with
-  the first one it finds.
-
-Since we only ever register one model, and tpm_models[] has space for
-just that one, this contraption even works.
-
-Turn tpm_models[] into a straight map from enum TpmType to bool.  Much
-simpler.
-
-Cc: Stefan Berger <stefanb@us.ibm.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/sysemu/tpm_backend.h |  2 +-
- tpm.c                        | 37 +++++--------------------------------
- 2 files changed, 6 insertions(+), 33 deletions(-)
+ docs/devel/qapi-code-gen.txt | 47 +++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 38 insertions(+), 9 deletions(-)
 
-diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
-index 1d21c6b..b0a9731 100644
---- a/include/sysemu/tpm_backend.h
-+++ b/include/sysemu/tpm_backend.h
-@@ -226,7 +226,7 @@ TPMVersion tpm_backend_get_tpm_version(TPMBackend *s);
- TPMBackend *qemu_find_tpm(const char *id);
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 9903ac4..ae05327 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -957,6 +957,8 @@ Example:
  
- const TPMDriverOps *tpm_get_backend_driver(const char *type);
--int tpm_register_model(enum TpmModel model);
-+void tpm_register_model(enum TpmModel model);
- void tpm_register_driver(const TPMDriverOps *tdo);
+     typedef struct UserDefOneList UserDefOneList;
  
- #endif
-diff --git a/tpm.c b/tpm.c
-index 6f39ec9..7635fc7 100644
---- a/tpm.c
-+++ b/tpm.c
-@@ -24,39 +24,12 @@
- static QLIST_HEAD(, TPMBackend) tpm_backends =
-     QLIST_HEAD_INITIALIZER(tpm_backends);
++    typedef struct q_obj_my_command_arg q_obj_my_command_arg;
++
+     struct UserDefOne {
+         int64_t integer;
+         bool has_string;
+@@ -972,6 +974,10 @@ Example:
  
--
--#define TPM_MAX_MODELS      1
--
- static TPMDriverOps const *be_drivers[TPM_TYPE__MAX];
-+static bool tpm_models[TPM_MODEL__MAX];
+     void qapi_free_UserDefOneList(UserDefOneList *obj);
  
--static enum TpmModel tpm_models[TPM_MAX_MODELS] = {
--    TPM_MODEL__MAX,
--};
--
--int tpm_register_model(enum TpmModel model)
-+void tpm_register_model(enum TpmModel model)
- {
--    int i;
--
--    for (i = 0; i < TPM_MAX_MODELS; i++) {
--        if (tpm_models[i] == TPM_MODEL__MAX) {
--            tpm_models[i] = model;
--            return 0;
--        }
--    }
--    error_report("Could not register TPM model");
--    return 1;
--}
--
--static bool tpm_model_is_registered(enum TpmModel model)
--{
--    int i;
--
--    for (i = 0; i < TPM_MAX_MODELS; i++) {
--        if (tpm_models[i] == model) {
--            return true;
--        }
--    }
--    return false;
-+    tpm_models[model] = true;
- }
++    struct q_obj_my_command_arg {
++        UserDefOneList *arg1;
++    };
++
+     #endif
+     $ cat qapi-generated/example-qapi-types.c
+ [Uninteresting stuff omitted...]
+@@ -1036,6 +1042,8 @@ Example:
+     void visit_type_UserDefOne(Visitor *v, const char *name, UserDefOne **obj, Error **errp);
+     void visit_type_UserDefOneList(Visitor *v, const char *name, UserDefOneList **obj, Error **errp);
  
- const TPMDriverOps *tpm_get_backend_driver(const char *type)
-@@ -270,7 +243,7 @@ TPMInfoList *qmp_query_tpm(Error **errp)
-     TPMInfoList *info, *head = NULL, *cur_item = NULL;
- 
-     QLIST_FOREACH(drv, &tpm_backends, list) {
--        if (!tpm_model_is_registered(drv->fe_model)) {
-+        if (!tpm_models[drv->fe_model]) {
-             continue;
++    void visit_type_q_obj_my_command_arg_members(Visitor *v, q_obj_my_command_arg *obj, Error **errp);
++
+     #endif
+     $ cat qapi-generated/example-qapi-visit.c
+ [Uninteresting stuff omitted...]
+@@ -1104,6 +1112,9 @@ Example:
+             }
          }
-         info = g_new0(TPMInfoList, 1);
-@@ -317,7 +290,7 @@ TpmModelList *qmp_query_tpm_models(Error **errp)
-     TpmModelList *head = NULL, *prev = NULL, *cur_item;
  
-     for (i = 0; i < TPM_MODEL__MAX; i++) {
--        if (!tpm_model_is_registered(i)) {
-+        if (!tpm_models[i]) {
-             continue;
++        if (!err) {
++            visit_check_list(v, &err);
++        }
+         visit_end_list(v, (void **)obj);
+         if (err && visit_is_input(v)) {
+             qapi_free_UserDefOneList(*obj);
+@@ -1113,6 +1124,19 @@ Example:
+         error_propagate(errp, err);
+     }
+ 
++    void visit_type_q_obj_my_command_arg_members(Visitor *v, q_obj_my_command_arg *obj, Error **errp)
++    {
++        Error *err = NULL;
++
++        visit_type_UserDefOneList(v, "arg1", &obj->arg1, &err);
++        if (err) {
++            goto out;
++        }
++
++    out:
++        error_propagate(errp, err);
++    }
++
+ === scripts/qapi-commands.py ===
+ 
+ Used to generate the marshaling/dispatch functions for the commands
+@@ -1145,9 +1169,12 @@ Example:
+ 
+     #include "example-qapi-types.h"
+     #include "qapi/qmp/qdict.h"
++    #include "qapi/qmp/dispatch.h"
+     #include "qapi/error.h"
+ 
++    void example_qmp_init_marshal(QmpCommandList *cmds);
+     UserDefOne *qmp_my_command(UserDefOneList *arg1, Error **errp);
++    void qmp_marshal_my_command(QDict *args, QObject **ret, Error **errp);
+ 
+     #endif
+     $ cat qapi-generated/example-qmp-marshal.c
+@@ -1170,19 +1197,19 @@ Example:
+         visit_free(v);
+     }
+ 
+-    static void qmp_marshal_my_command(QDict *args, QObject **ret, Error **errp)
++    void qmp_marshal_my_command(QDict *args, QObject **ret, Error **errp)
+     {
+         Error *err = NULL;
+         UserDefOne *retval;
+         Visitor *v;
+-        UserDefOneList *arg1 = NULL;
++        q_obj_my_command_arg arg = {0};
+ 
+         v = qobject_input_visitor_new(QOBJECT(args));
+         visit_start_struct(v, NULL, NULL, 0, &err);
+         if (err) {
+             goto out;
          }
-         cur_item = g_new0(TpmModelList, 1);
+-        visit_type_UserDefOneList(v, "arg1", &arg1, &err);
++        visit_type_q_obj_my_command_arg_members(v, &arg, &err);
+         if (!err) {
+             visit_check_struct(v, &err);
+         }
+@@ -1191,7 +1218,7 @@ Example:
+             goto out;
+         }
+ 
+-        retval = qmp_my_command(arg1, &err);
++        retval = qmp_my_command(arg.arg1, &err);
+         if (err) {
+             goto out;
+         }
+@@ -1203,17 +1230,18 @@ Example:
+         visit_free(v);
+         v = qapi_dealloc_visitor_new();
+         visit_start_struct(v, NULL, NULL, 0, NULL);
+-        visit_type_UserDefOneList(v, "arg1", &arg1, NULL);
++        visit_type_q_obj_my_command_arg_members(v, &arg, NULL);
+         visit_end_struct(v, NULL);
+         visit_free(v);
+     }
+ 
+-    static void qmp_init_marshal(void)
++    void example_qmp_init_marshal(QmpCommandList *cmds)
+     {
+-        qmp_register_command("my-command", qmp_marshal_my_command, QCO_NO_OPTIONS);
+-    }
++        QTAILQ_INIT(cmds);
+ 
+-    qapi_init(qmp_init_marshal);
++        qmp_register_command(cmds, "my-command",
++                             qmp_marshal_my_command, QCO_NO_OPTIONS);
++    }
+ 
+ === scripts/qapi-event.py ===
+ 
+@@ -1258,6 +1286,7 @@ Example:
+         QDict *qmp;
+         Error *err = NULL;
+         QMPEventFuncEmit emit;
++
+         emit = qmp_event_get_func_emit();
+         if (!emit) {
+             return;
 -- 
 2.7.5
