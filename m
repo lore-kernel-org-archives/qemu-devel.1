@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dkv37-0000gt-T5
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:32:06 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dkv39-0000if-CS
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:32:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dkv36-0007Ve-5J
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:32:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39594)
+	(envelope-from <imammedo@redhat.com>) id 1dkv38-0007XE-F2
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:32:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43700)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dkv35-0007V8-S6
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:32:04 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dkv38-0007Wf-94
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 12:32:06 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DD2215F7BE
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 16:32:02 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4631DC04B958
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 16:32:05 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
 	(dell-r430-03.lab.eng.brq.redhat.com [10.34.112.60])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6212C413D
-	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 16:32:02 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BFE734139
+	for <qemu-devel@nongnu.org>; Thu, 24 Aug 2017 16:32:04 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu, 24 Aug 2017 18:31:34 +0200
-Message-Id: <1503592308-93913-12-git-send-email-imammedo@redhat.com>
+Date: Thu, 24 Aug 2017 18:31:37 +0200
+Message-Id: <1503592308-93913-15-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1503592308-93913-1-git-send-email-imammedo@redhat.com>
 References: <1503592308-93913-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.11 v3 11/25] m68k: replace
- cpu_m68k_init() with cpu_generic_init()
+Subject: [Qemu-devel] [PATCH for-2.11 v3 14/25] tilegx: replace
+ cpu_tilegx_init() with cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,112 +36,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-call register_m68k_insns() at realize time which makes
-cpu_m68k_init() typical object creation function.
-As result we can replace it with cpu_generic_init()
-which does the same job, reducing code duplication a bit.
+cpu_tilegx_init() always falls back to TYPE_TILEGX_CPU object
+regardless of cpu_model. Put fallback logic into
+tilegx_cpu_class_by_name() which would translate any cpu_model
+into TYPE_TILEGX_CPU class and replace cpu_tilegx_init()
+with cpu_generic_init().
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Tested-by: Thomas Huth <huth@tuxfamily.org>
-Acked-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/m68k/cpu.h    |  3 +--
- hw/m68k/an5206.c     |  2 +-
- hw/m68k/mcf5208.c    |  2 +-
- target/m68k/cpu.c    |  2 ++
- target/m68k/helper.c | 20 --------------------
- 5 files changed, 5 insertions(+), 24 deletions(-)
+ target/tilegx/cpu.h |  4 +---
+ target/tilegx/cpu.c | 11 +++--------
+ 2 files changed, 4 insertions(+), 11 deletions(-)
 
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 38a7e11..d936547 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -163,7 +163,6 @@ int m68k_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+diff --git a/target/tilegx/cpu.h b/target/tilegx/cpu.h
+index f32be49..71cea04 100644
+--- a/target/tilegx/cpu.h
++++ b/target/tilegx/cpu.h
+@@ -164,9 +164,7 @@ static inline TileGXCPU *tilegx_env_get_cpu(CPUTLGState *env)
+ void tilegx_tcg_init(void);
+ int cpu_tilegx_signal_handler(int host_signum, void *pinfo, void *puc);
  
- void m68k_tcg_init(void);
- void m68k_cpu_init_gdb(M68kCPU *cpu);
--M68kCPU *cpu_m68k_init(const char *cpu_model);
- /* you can call this signal handler from your SIGBUS and SIGSEGV
-    signal handlers to inform the virtual CPU of exceptions. non zero
-    is returned if the signal was handled by the virtual CPU.  */
-@@ -322,7 +321,7 @@ void register_m68k_insns (CPUM68KState *env);
- #define TARGET_PHYS_ADDR_SPACE_BITS 32
- #define TARGET_VIRT_ADDR_SPACE_BITS 32
+-TileGXCPU *cpu_tilegx_init(const char *cpu_model);
+-
+-#define cpu_init(cpu_model) CPU(cpu_tilegx_init(cpu_model))
++#define cpu_init(cpu_model) cpu_generic_init(TYPE_TILEGX_CPU, cpu_model)
  
--#define cpu_init(cpu_model) CPU(cpu_m68k_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_M68K_CPU, cpu_model)
+ #define cpu_signal_handler cpu_tilegx_signal_handler
  
- #define cpu_signal_handler cpu_m68k_signal_handler
- #define cpu_list m68k_cpu_list
-diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
-index c762441..7b9b15d 100644
---- a/hw/m68k/an5206.c
-+++ b/hw/m68k/an5206.c
-@@ -42,7 +42,7 @@ static void an5206_init(MachineState *machine)
-     if (!cpu_model) {
-         cpu_model = "m5206";
-     }
--    cpu = cpu_m68k_init(cpu_model);
-+    cpu = M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
-     if (!cpu) {
-         error_report("Unable to find m68k CPU definition");
-         exit(1);
-diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
-index f4b1387..1a0f180 100644
---- a/hw/m68k/mcf5208.c
-+++ b/hw/m68k/mcf5208.c
-@@ -232,7 +232,7 @@ static void mcf5208evb_init(MachineState *machine)
-     if (!cpu_model) {
-         cpu_model = "m5208";
-     }
--    cpu = cpu_m68k_init(cpu_model);
-+    cpu = M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
-     if (!cpu) {
-         fprintf(stderr, "Unable to find m68k CPU definition\n");
-         exit(1);
-diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-index a14b6dd..55bf24b 100644
---- a/target/m68k/cpu.c
-+++ b/target/m68k/cpu.c
-@@ -230,6 +230,8 @@ static void m68k_cpu_realizefn(DeviceState *dev, Error **errp)
-     M68kCPUClass *mcc = M68K_CPU_GET_CLASS(dev);
-     Error *local_err = NULL;
- 
-+    register_m68k_insns(&cpu->env);
-+
-     cpu_exec_realizefn(cs, &local_err);
-     if (local_err != NULL) {
-         error_propagate(errp, local_err);
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index caae291..7e50ff5 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -156,26 +156,6 @@ static int m68k_fpu_gdb_set_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
-     return 0;
+diff --git a/target/tilegx/cpu.c b/target/tilegx/cpu.c
+index 4532639..7345f5a 100644
+--- a/target/tilegx/cpu.c
++++ b/target/tilegx/cpu.c
+@@ -52,15 +52,9 @@ static void tilegx_cpu_dump_state(CPUState *cs, FILE *f,
+                 env->pc, env->spregs[TILEGX_SPR_CMPEXCH]);
  }
  
--M68kCPU *cpu_m68k_init(const char *cpu_model)
--{
--    M68kCPU *cpu;
--    CPUM68KState *env;
--    ObjectClass *oc;
+-TileGXCPU *cpu_tilegx_init(const char *cpu_model)
++static ObjectClass *tilegx_cpu_class_by_name(const char *cpu_model)
+ {
+-    TileGXCPU *cpu;
 -
--    oc = cpu_class_by_name(TYPE_M68K_CPU, cpu_model);
--    if (oc == NULL) {
--        return NULL;
--    }
--    cpu = M68K_CPU(object_new(object_class_get_name(oc)));
--    env = &cpu->env;
--
--    register_m68k_insns(env);
+-    cpu = TILEGX_CPU(object_new(TYPE_TILEGX_CPU));
 -
 -    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
 -
 -    return cpu;
--}
--
- void m68k_cpu_init_gdb(M68kCPU *cpu)
- {
-     CPUState *cs = CPU(cpu);
++    return object_class_by_name(TYPE_TILEGX_CPU);
+ }
+ 
+ static void tilegx_cpu_set_pc(CPUState *cs, vaddr value)
+@@ -159,6 +153,7 @@ static void tilegx_cpu_class_init(ObjectClass *oc, void *data)
+     tcc->parent_reset = cc->reset;
+     cc->reset = tilegx_cpu_reset;
+ 
++    cc->class_by_name = tilegx_cpu_class_by_name;
+     cc->has_work = tilegx_cpu_has_work;
+     cc->do_interrupt = tilegx_cpu_do_interrupt;
+     cc->cpu_exec_interrupt = tilegx_cpu_exec_interrupt;
 -- 
 2.7.4
