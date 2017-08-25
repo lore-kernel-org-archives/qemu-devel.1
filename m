@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dl4Pz-0008El-7W
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 22:32:20 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dl4Q1-0008Eq-4T
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 22:32:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dl4Px-0001Ag-Uf
-	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 22:32:19 -0400
-Date: Fri, 25 Aug 2017 11:30:47 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dl4Px-0001Ab-U2
+	for qemu-devel@nongnu.org; Thu, 24 Aug 2017 22:32:21 -0400
+Date: Fri, 25 Aug 2017 11:40:07 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170825013047.GP5379@umbus.fritz.box>
+Message-ID: <20170825014007.GR5379@umbus.fritz.box>
 References: <1503562911-2776-1-git-send-email-imammedo@redhat.com>
-	<1503562911-2776-2-git-send-email-imammedo@redhat.com>
+	<1503562911-2776-4-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="AoBLyXwWXtFbU0pZ"
+	protocol="application/pgp-signature"; boundary="9ZRxqsK4bBEmgNeO"
 Content-Disposition: inline
-In-Reply-To: <1503562911-2776-2-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11 1/6] ppc: use macros to make cpu
- type name from string literal
+In-Reply-To: <1503562911-2776-4-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11 3/6] ppc: make cpu alias point
+ only to real cpu models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,140 +29,198 @@ To: Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
 
---AoBLyXwWXtFbU0pZ
+--9ZRxqsK4bBEmgNeO
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 24, 2017 at 10:21:46AM +0200, Igor Mammedov wrote:
-> Replace
->   "-" TYPE_POWERPC_CPU
-> when composing cpu type name from cpu model string literal
-> and the same pattern in format strings with
->  POWERPC_CPU_TYPE_SUFFIX and POWERPC_CPU_TYPE_NAME(model)
-> macroses like we do in x86.
+On Thu, Aug 24, 2017 at 10:21:48AM +0200, Igor Mammedov wrote:
+> alias pointing to another alias forces lookup code to
+> do recurrsive translation till real cpu model is reached.
 >=20
-> Later POWERPC_CPU_TYPE_NAME() will be used to define default
-> cpu type per machine type and as bonus it will be consistent
-> and easy grep-able pattern across all other targets that I'm
-> plannig to treat the same way.
+> Drop this nonsence and make each alias point to cpu model
+> that has corresponding CPU type. It will allow to drop
+> recurrsion in cpu model translation code and actually
+> make ppc_cpu_aliases[] content use PowerPCCPUAlias
+> fields properly
+> (i.e. alias goes into .alias and model goes into .model)
+>=20
+> While at it add TODO defines around aliases that point to
+> cpu models excluded by the same TODO defines.
 >=20
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-I'm assuming you'll stage this for 2.11.
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  target/ppc/cpu.h            | 3 +++
->  target/ppc/kvm_ppc.h        | 2 +-
->  target/ppc/cpu-models.c     | 2 +-
->  target/ppc/kvm.c            | 2 +-
->  target/ppc/translate_init.c | 6 +++---
->  5 files changed, 9 insertions(+), 6 deletions(-)
+> If it were up to me, I'd remove all TODO cpu models as dead
+> code and make whomever wants to add them back to do so
+> with actual implementation.
+
+I tend to agree, actually.  There's a lot of old cruft there that
+no-one's ever likely to work on.
+
+> ---
+>  target/ppc/cpu-models.h |  2 +-
+>  target/ppc/cpu-models.c | 56 ++++++++++++++++++++++++++-----------------=
+------
+>  2 files changed, 31 insertions(+), 27 deletions(-)
 >=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 12f0949..0512393 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1354,6 +1354,9 @@ int ppc_dcr_write (ppc_dcr_t *dcr_env, int dcrn, ui=
-nt32_t val);
-> =20
->  #define cpu_init(cpu_model) cpu_generic_init(TYPE_POWERPC_CPU, cpu_model)
-> =20
-> +#define POWERPC_CPU_TYPE_SUFFIX "-" TYPE_POWERPC_CPU
-> +#define POWERPC_CPU_TYPE_NAME(model) model POWERPC_CPU_TYPE_SUFFIX
-> +
->  #define cpu_signal_handler cpu_ppc_signal_handler
->  #define cpu_list ppc_cpu_list
-> =20
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index 6bc6fb3..bcb40f2 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -9,7 +9,7 @@
->  #ifndef KVM_PPC_H
->  #define KVM_PPC_H
-> =20
-> -#define TYPE_HOST_POWERPC_CPU "host-" TYPE_POWERPC_CPU
-> +#define TYPE_HOST_POWERPC_CPU POWERPC_CPU_TYPE_NAME("host")
-> =20
->  #ifdef CONFIG_KVM
-> =20
+> diff --git a/target/ppc/cpu-models.h b/target/ppc/cpu-models.h
+> index b563c45..d748c68 100644
+> --- a/target/ppc/cpu-models.h
+> +++ b/target/ppc/cpu-models.h
+> @@ -24,7 +24,7 @@
+>  /**
+>   * PowerPCCPUAlias:
+>   * @alias: The alias name.
+> - * @model: The CPU model @alias refers to.
+> + * @model: The CPU model @alias refers to, that directly resolves into C=
+PU type
+>   *
+>   * A mapping entry from CPU @alias to CPU @model.
+>   */
 > diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
-> index 4d3e635..8b27962 100644
+> index 346b6b1..f917b9d 100644
 > --- a/target/ppc/cpu-models.c
 > +++ b/target/ppc/cpu-models.c
-> @@ -51,7 +51,7 @@
->                                                                          =
-    \
->      static const TypeInfo                                               =
-    \
->      glue(POWERPC_DEF_PREFIX(_pvr, _svr, _type), _cpu_type_info) =3D {   =
-      \
-> -        .name       =3D _name "-" TYPE_POWERPC_CPU,                     =
-      \
-> +        .name       =3D POWERPC_CPU_TYPE_NAME(_name),                   =
-        \
->          .parent     =3D stringify(_type) "-family-" TYPE_POWERPC_CPU,   =
-      \
->          .class_init =3D                                                 =
-      \
->              glue(POWERPC_DEF_PREFIX(_pvr, _svr, _type), _cpu_class_init)=
-,   \
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 8571379..8590809 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2484,7 +2484,7 @@ static int kvm_ppc_register_host_cpu_type(void)
->              char *suffix;
+> @@ -1235,6 +1235,7 @@ PowerPCCPUAlias ppc_cpu_aliases[] =3D {
+>      { "X2VP50", "X2VP20" },
 > =20
->              ppc_cpu_aliases[i].model =3D g_strdup(object_class_get_name(=
-oc));
-> -            suffix =3D strstr(ppc_cpu_aliases[i].model, "-"TYPE_POWERPC_=
-CPU);
-> +            suffix =3D strstr(ppc_cpu_aliases[i].model, POWERPC_CPU_TYPE=
-_SUFFIX);
->              if (suffix) {
->                  *suffix =3D 0;
->              }
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index 43be9a8..f377cf2 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -10185,7 +10185,7 @@ static gint ppc_cpu_compare_class_name(gconstpoin=
-ter a, gconstpointer b)
->      if (strncasecmp(name, object_class_get_name(oc), strlen(name)) =3D=
-=3D 0 &&
->          ppc_cpu_is_valid(pcc) &&
->          strcmp(object_class_get_name(oc) + strlen(name),
-> -               "-" TYPE_POWERPC_CPU) =3D=3D 0) {
-> +               POWERPC_CPU_TYPE_SUFFIX) =3D=3D 0) {
->          return 0;
->      }
->      return -1;
-> @@ -10327,7 +10327,7 @@ static void ppc_cpu_list_entry(gpointer data, gpo=
-inter user_data)
->      }
+>      { "440EP", "440EPB" },
+> +#if defined(TODO_USER_ONLY)
+>      { "440GP", "440GPC" },
+>      { "440GR", "440GRA" },
+>      { "440GX", "440GXF" },
+> @@ -1272,36 +1273,37 @@ PowerPCCPUAlias ppc_cpu_aliases[] =3D {
+>      { "MPC875", "MPC8XX" },
+>      { "MPC880", "MPC8XX" },
+>      { "MPC885", "MPC8XX" },
+> +#endif
 > =20
->      name =3D g_strndup(typename,
-> -                     strlen(typename) - strlen("-" TYPE_POWERPC_CPU));
-> +                     strlen(typename) - strlen(POWERPC_CPU_TYPE_SUFFIX));
->      (*s->cpu_fprintf)(s->file, "PowerPC %-16s PVR %08x\n",
->                        name, pcc->pvr);
->      for (i =3D 0; ppc_cpu_aliases[i].alias !=3D NULL; i++) {
-> @@ -10388,7 +10388,7 @@ static void ppc_cpu_defs_entry(gpointer data, gpo=
-inter user_data)
->      typename =3D object_class_get_name(oc);
->      info =3D g_malloc0(sizeof(*info));
->      info->name =3D g_strndup(typename,
-> -                           strlen(typename) - strlen("-" TYPE_POWERPC_CP=
-U));
-> +                           strlen(typename) - strlen(POWERPC_CPU_TYPE_SU=
-FFIX));
+>      /* PowerPC MPC603 microcontrollers */
+>      { "MPC8240", "603" },
 > =20
->      entry =3D g_malloc0(sizeof(*entry));
->      entry->value =3D info;
+> -    { "MPC52XX", "MPC5200" },
+> +    { "MPC52XX", "MPC5200_V12" },
+>      { "MPC5200", "MPC5200_V12" },
+>      { "MPC5200B", "MPC5200B_V21" },
+> =20
+> -    { "MPC82XX", "MPC8280" },
+> -    { "POWERQUICC-II", "MPC82XX" },
+> +    { "MPC82XX", "G2LEGP3" },
+> +    { "POWERQUICC-II", "G2LEGP3" },
+>      { "MPC8241", "G2HIP4" },
+>      { "MPC8245", "G2HIP4" },
+>      { "MPC8247", "G2LEGP3" },
+>      { "MPC8248", "G2LEGP3" },
+> -    { "MPC8250", "MPC8250_HIP4" },
+> +    { "MPC8250", "G2HIP4" },
+>      { "MPC8250_HIP3", "G2HIP3" },
+>      { "MPC8250_HIP4", "G2HIP4" },
+> -    { "MPC8255", "MPC8255_HIP4" },
+> +    { "MPC8255", "G2HIP4" },
+>      { "MPC8255_HIP3", "G2HIP3" },
+>      { "MPC8255_HIP4", "G2HIP4" },
+> -    { "MPC8260", "MPC8260_HIP4" },
+> +    { "MPC8260", "G2HIP4" },
+>      { "MPC8260_HIP3", "G2HIP3" },
+>      { "MPC8260_HIP4", "G2HIP4" },
+> -    { "MPC8264", "MPC8264_HIP4" },
+> +    { "MPC8264", "G2HIP4" },
+>      { "MPC8264_HIP3", "G2HIP3" },
+>      { "MPC8264_HIP4", "G2HIP4" },
+> -    { "MPC8265", "MPC8265_HIP4" },
+> +    { "MPC8265", "G2HIP4" },
+>      { "MPC8265_HIP3", "G2HIP3" },
+>      { "MPC8265_HIP4", "G2HIP4" },
+> -    { "MPC8266", "MPC8266_HIP4" },
+> +    { "MPC8266", "G2HIP4" },
+>      { "MPC8266_HIP3", "G2HIP3" },
+>      { "MPC8266_HIP4", "G2HIP4" },
+>      { "MPC8270", "G2LEGP3" },
+> @@ -1339,18 +1341,18 @@ PowerPCCPUAlias ppc_cpu_aliases[] =3D {
+>      { "601V", "601_V2" },
+>      { "VANILLA", "603" },
+>      { "603E", "603E_V4.1" },
+> -    { "STRETCH", "603E" },
+> +    { "STRETCH", "603E_V4.1" },
+>      { "VAILLANT", "603E7V" },
+>      { "603R", "603E7T" },
+> -    { "GOLDENEYE", "603R" },
+> +    { "GOLDENEYE", "603E7T" },
+>      { "604E", "604E_V2.4" },
+> -    { "SIROCCO", "604E" },
+> +    { "SIROCCO", "604E_V2.4" },
+>      { "MACH5", "604R" },
+>      { "740", "740_V3.1" },
+> -    { "ARTHUR", "740" },
+> +    { "ARTHUR", "740_V3.1" },
+>      { "750", "750_V3.1" },
+> -    { "TYPHOON", "750" },
+> -    { "G3",      "750" },
+> +    { "TYPHOON", "750_V3.1" },
+> +    { "G3",      "750_V3.1" },
+>      { "CONAN/DOYLE", "750P" },
+>      { "750CL", "750CL_V2.0" },
+>      { "750CX", "750CX_V2.2" },
+> @@ -1358,32 +1360,34 @@ PowerPCCPUAlias ppc_cpu_aliases[] =3D {
+>      { "750FX", "750FX_V2.3" },
+>      { "750GX", "750GX_V1.2" },
+>      { "750L", "750L_V3.2" },
+> -    { "LONESTAR", "750L" },
+> +    { "LONESTAR", "750L_V3.2" },
+>      { "745", "745_V2.8" },
+>      { "755", "755_V2.8" },
+> -    { "GOLDFINGER", "755" },
+> +    { "GOLDFINGER", "755_V2.8" },
+>      { "7400", "7400_V2.9" },
+> -    { "MAX", "7400" },
+> -    { "G4",  "7400" },
+> +    { "MAX", "7400_V2.9" },
+> +    { "G4",  "7400_V2.9" },
+>      { "7410", "7410_V1.4" },
+> -    { "NITRO", "7410" },
+> +    { "NITRO", "7410_V1.4" },
+>      { "7448", "7448_V2.1" },
+>      { "7450", "7450_V2.1" },
+> -    { "VGER", "7450" },
+> +    { "VGER", "7450_V2.1" },
+>      { "7441", "7441_V2.3" },
+>      { "7451", "7451_V2.3" },
+>      { "7445", "7445_V3.2" },
+>      { "7455", "7455_V3.2" },
+> -    { "APOLLO6", "7455" },
+> +    { "APOLLO6", "7455_V3.2" },
+>      { "7447", "7447_V1.1" },
+>      { "7457", "7457_V1.2" },
+> -    { "APOLLO7", "7457" },
+> +    { "APOLLO7", "7457_V1.2" },
+>      { "7447A", "7447A_V1.2" },
+>      { "7457A", "7457A_V1.2" },
+>      { "APOLLO7PM", "7457A_V1.0" },
+>  #if defined(TARGET_PPC64)
+> +#if defined(TODO)
+>      { "POWER3", "630" },
+>      { "POWER3+", "631" },
+> +#endif
+>      { "POWER5+", "POWER5+_V2.1" },
+>      { "POWER5GS", "POWER5+_V2.1" },
+>      { "POWER7", "POWER7_V2.3" },
+> @@ -1399,10 +1403,10 @@ PowerPCCPUAlias ppc_cpu_aliases[] =3D {
+> =20
+>      /* Generic PowerPCs */
+>  #if defined(TARGET_PPC64)
+> -    { "PPC64", "970FX" },
+> +    { "PPC64", "970FX_V3.1" },
+>  #endif
+>      { "PPC32", "604" },
+> -    { "PPC", "PPC32" },
+> -    { "DEFAULT", "PPC" },
+> +    { "PPC", "604" },
+> +    { "DEFAULT", "604" },
+>      { NULL, NULL }
+>  };
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -170,24 +228,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---AoBLyXwWXtFbU0pZ
+--9ZRxqsK4bBEmgNeO
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmffcUACgkQbDjKyiDZ
-s5L5fw/+PKDXctUGyKVq8hc0kwXmW+E1BPfS4dPWP5gfgGgc0oG7QLeTR63/RFRM
-qPTE+q5vxoScqIJzWRVkIaXuVyGeMmMvbK1ft/wt45/kL+bI4F5KvHLUzaLcfkTL
-x3bKdJAEwuGPwQFSVkd0HXdXdrcUvNFBR8L96+3P+d6wGNdhHiJL1eLP5236r95U
-tfvpPLqpjyxJPQuLjOOxyQYaPdHw4aBmgQO4E8SHOBIPkGc5xx9nXpTSz8l+dvbw
-gSAeLJCff4GqOVL2Z90uxg84haqQOi8Jx9BxVpkHmubys7gYqecNqHwOgaOAyYJV
-o9aUOepvNUEHk97I9PxD7u4RTRLpm7ehSOS9vd6mBloE1c0edBm/EP815R5iUq40
-PyAsTkd7FErj3f2oMlpWSghJIM0wuMfyGwu3grCMXF2q5HKrJbhpcwDOxmGjN/F4
-pVcEvp0grEiOnXQMFPV0D+VOOE2KND/CKfOvQ26MeTibTu6O4iUMFq6qFjiNBtMu
-3zClNF8US77JRyI1eKwBOq5V3AXpQolHMdSWN8jOR2kIq8hEisJ3eoyEoJbCG6NN
-XCIIUdwe/gPW6PXpGY+axFAKduO5Qb7MCCy9wbCOmTPIWO56Fgm1nmJMn1pu9oH3
-9r8kpfSZaM+79EHraupBuAPKXwQLxSH+6lyobCn5CmfclXEtx5c=
-=IBzA
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmff/cACgkQbDjKyiDZ
+s5Lr7g/+OljsdvfdP05ThqLsyOfOU0Zng9Ms1Wx2Mko6dWVtzJXrkIpFrLpoAzIE
+jq9sQ60V/j271PvRbnA4VOZor+Se1fuESI67mOvqjmYxztCVJtRer+suqoSQks+b
+tlt7DDUys0+L9dahPA3cAgqZf+QKNStWPHQ+NsIWgTKSBJ4fWlWJswOP8keTUllG
+tbAYhWYp/haJumyn5ETUeauBRo00EmCNWd1xuXtKWowpNv0Yve/eARjAGlpQSKvi
+4wd5EKZcE3pD7gFGscHppO7a1M1xh/xQ1ygCVL5/FZanu4ORLfVgWBnAx9Ef+Sui
+DRvQ6ZbPs+b/7EmbFeKKp4mAGLoNJJ4kRa3bbc7uVG6+QI4YjVehaiyxTeLHhgAD
+jBhwJ85ZSpn5PX3RLEW6RY7BJduFDhommHt1OFQ4uiQu0uAgwRr3xnykNeqwdbxN
+9PapVYveRxP/LcEHzDwxYcEWFHPGZ5cjp7rF9BPmzCMyM6+LRuR0DOQhfPUoGhmr
+nkYUzECpLqF46tkuLUc4GxNnubywFCD8xielAXisRDr9IZe8MWGAcY9rpQNmCiQs
+hbirjK7cODupQvnQdlYIWOp1QLbeezE0xsXdMWnLgQHWHSBC6CXm9xmwGckA+L3v
+5RB7zcyfFhrNeUC6UrRe24s5DU5LtuC0c6fGF47RZYn/xK9LQNA=
+=eF+T
 -----END PGP SIGNATURE-----
 
---AoBLyXwWXtFbU0pZ--
+--9ZRxqsK4bBEmgNeO--
