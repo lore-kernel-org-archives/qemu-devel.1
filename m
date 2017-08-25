@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dlFAX-0004pA-Cc
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:01:11 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dlFDd-0005fh-Qg
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:04:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dlFAT-0002Qb-FT
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:01:05 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170808183306.27474-1-jsnow@redhat.com>
-	<20170808183306.27474-8-jsnow@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <bd435a55-7aea-2652-f67a-32e669bbfc30@amsat.org>
-Date: Fri, 25 Aug 2017 11:00:56 -0300
+	(envelope-from <cohuck@redhat.com>) id 1dlFDZ-0003ou-S8
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:04:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48134)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dlFDZ-0003oc-MM
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:04:13 -0400
+Date: Fri, 25 Aug 2017 16:04:08 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170825160408.2775c8b5.cohuck@redhat.com>
+In-Reply-To: <3ed8b810b6592daee6a775037ce21f850e40647d.1503667215.git.alifm@linux.vnet.ibm.com>
+References: <cover.1503667215.git.alifm@linux.vnet.ibm.com>
+	<3ed8b810b6592daee6a775037ce21f850e40647d.1503667215.git.alifm@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170808183306.27474-8-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 7/9] AHCI: Rework IRQ constants
+Subject: Re: [Qemu-devel] [PATCH] s390-ccw: Fix alignment for CCW1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,226 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
+To: Farhan Ali <alifm@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, farman@linux.vnet.ibm.com, walling@linux.vnet.ibm.com
 
-Hi John,
+On Fri, 25 Aug 2017 09:24:46 -0400
+Farhan Ali <alifm@linux.vnet.ibm.com> wrote:
 
-On 08/08/2017 03:33 PM, John Snow wrote:
-> Create a new enum so that we can name the IRQ bits, which will make debugging
-> them a little nicer if we can print them out. Not handled in this patch, but
-> this will make it possible to get a nice debug printf detailing exactly which
-> status bits are set, as it can be multiple at any given time.
+> The commit 198c0d1f9df8c4 s390x/css: check ccw address validity
+> exposes an alignment issue in ccw bios.
 > 
-> As a consequence of this patch, it is no longer possible to set multiple IRQ
-> codes at once, but nothing was utilizing this ability anyway.
+> According to PoP the CCW must be doubleword aligned. Let's fix
+> this in the bios.
 > 
-> Signed-off-by: John Snow <jsnow@redhat.com>
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
+> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Reviewed-by: Eric Farman <farman@linux.vnet.ibm.com>
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->   hw/ide/ahci.c          | 49 ++++++++++++++++++++++++++++++++++++++-----------
->   hw/ide/ahci_internal.h | 44 +++++++++++++++++++++++++++++++++++---------
->   hw/ide/trace-events    |  2 +-
->   3 files changed, 74 insertions(+), 21 deletions(-)
+>  pc-bios/s390-ccw/cio.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-> index d5acceb..c5a9b69 100644
-> --- a/hw/ide/ahci.c
-> +++ b/hw/ide/ahci.c
-> @@ -56,6 +56,27 @@ static bool ahci_map_fis_address(AHCIDevice *ad);
->   static void ahci_unmap_clb_address(AHCIDevice *ad);
->   static void ahci_unmap_fis_address(AHCIDevice *ad);
->   
-> +static const char *AHCIPortIRQ_lookup[AHCI_PORT_IRQ__END] = {
-> +    [AHCI_PORT_IRQ_BIT_DHRS] = "DHRS",
-> +    [AHCI_PORT_IRQ_BIT_PSS]  = "PSS",
-> +    [AHCI_PORT_IRQ_BIT_DSS]  = "DSS",
-> +    [AHCI_PORT_IRQ_BIT_SDBS] = "SDBS",
-> +    [AHCI_PORT_IRQ_BIT_UFS]  = "UFS",
-> +    [AHCI_PORT_IRQ_BIT_DPS]  = "DPS",
-> +    [AHCI_PORT_IRQ_BIT_PCS]  = "PCS",
-> +    [AHCI_PORT_IRQ_BIT_DMPS] = "DMPS",
-> +    [8 ... 21]               = "RESERVED",
-> +    [AHCI_PORT_IRQ_BIT_PRCS] = "PRCS",
-> +    [AHCI_PORT_IRQ_BIT_IPMS] = "IPMS",
-> +    [AHCI_PORT_IRQ_BIT_OFS]  = "OFS",
-> +    [25]                     = "RESERVED",
-> +    [AHCI_PORT_IRQ_BIT_INFS] = "INFS",
-> +    [AHCI_PORT_IRQ_BIT_IFS]  = "IFS",
-> +    [AHCI_PORT_IRQ_BIT_HBDS] = "HBDS",
-> +    [AHCI_PORT_IRQ_BIT_HBFS] = "HBFS",
-> +    [AHCI_PORT_IRQ_BIT_TFES] = "TFES",
-> +    [AHCI_PORT_IRQ_BIT_CPDS] = "CPDS"
-> +};
->   
->   static uint32_t  ahci_port_read(AHCIState *s, int port, int offset)
->   {
-> @@ -170,12 +191,18 @@ static void ahci_check_irq(AHCIState *s)
->   }
->   
->   static void ahci_trigger_irq(AHCIState *s, AHCIDevice *d,
-> -                             int irq_type)
-> +                             enum AHCIPortIRQ irqbit)
->   {
-> -    DPRINTF(d->port_no, "trigger irq %#x -> %x\n",
-> -            irq_type, d->port_regs.irq_mask & irq_type);
-> +    g_assert(irqbit >= 0 && irqbit < 32);
+> diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
+> index f5b4549..55eaeee 100644
+> --- a/pc-bios/s390-ccw/cio.h
+> +++ b/pc-bios/s390-ccw/cio.h
+> @@ -133,7 +133,7 @@ struct ccw1 {
+>      __u8 flags;
+>      __u16 count;
+>      __u32 cda;
+> -} __attribute__ ((packed));
+> +} __attribute__ ((packed, aligned(8)));
+>  
+>  #define CCW_FLAG_DC              0x80
+>  #define CCW_FLAG_CC              0x40
 
-Since you now use an enum this check is no more necessary.
+Currently testing.
 
-However ...
-
-> +    uint32_t irq = 1U << irqbit;
-> +    uint32_t irqstat = d->port_regs.irq_stat | irq;
->   
-> -    d->port_regs.irq_stat |= irq_type;
-> +    trace_ahci_trigger_irq(s, d->port_no,
-> +                           AHCIPortIRQ_lookup[irqbit], irq,
-> +                           d->port_regs.irq_stat, irqstat,
-> +                           irqstat & d->port_regs.irq_mask);
-> +
-
-Why not keep using masked irqs, and iterate over AHCI_PORT_IRQ__END 
-bits? Something like:
-
-     if (TRACE_AHCI_IRQ_ENABLED) {
-         int irqbit;
-         for (irqbit = 0; irqbit < AHCI_PORT_IRQ__END; irqbit++) {
-             if (irqmask & BIT(irqbit)) {
-                 trace_ahci_trigger_irq(s, d->port_no, ...
-
-> +    d->port_regs.irq_stat = irqstat;
->       ahci_check_irq(s);
->   }
->   
-> @@ -718,7 +745,7 @@ static void ahci_write_fis_sdb(AHCIState *s, NCQTransferState *ncq_tfs)
->   
->       /* Trigger IRQ if interrupt bit is set (which currently, it always is) */
->       if (sdb_fis->flags & 0x40) {
-> -        ahci_trigger_irq(s, ad, PORT_IRQ_SDB_FIS);
-> +        ahci_trigger_irq(s, ad, AHCI_PORT_IRQ_BIT_SDBS);
->       }
->   }
->   
-> @@ -761,10 +788,10 @@ static void ahci_write_fis_pio(AHCIDevice *ad, uint16_t len)
->           ad->port.ifs[0].status;
->   
->       if (pio_fis[2] & ERR_STAT) {
-> -        ahci_trigger_irq(ad->hba, ad, PORT_IRQ_TF_ERR);
-> +        ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_TFES);
->       }
->   
-> -    ahci_trigger_irq(ad->hba, ad, PORT_IRQ_PIOS_FIS);
-> +    ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_PSS);
->   }
->   
->   static bool ahci_write_fis_d2h(AHCIDevice *ad)
-> @@ -804,10 +831,10 @@ static bool ahci_write_fis_d2h(AHCIDevice *ad)
->           ad->port.ifs[0].status;
->   
->       if (d2h_fis[2] & ERR_STAT) {
-> -        ahci_trigger_irq(ad->hba, ad, PORT_IRQ_TF_ERR);
-> +        ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_TFES);
->       }
->   
-> -    ahci_trigger_irq(ad->hba, ad, PORT_IRQ_D2H_REG_FIS);
-> +    ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_DHRS);
->       return true;
->   }
->   
-> @@ -1082,7 +1109,7 @@ static void process_ncq_command(AHCIState *s, int port, uint8_t *cmd_fis,
->                        "is smaller than the requested size (0x%zx)",
->                        ncq_tfs->sglist.size, size);
->           ncq_err(ncq_tfs);
-> -        ahci_trigger_irq(ad->hba, ad, PORT_IRQ_OVERFLOW);
-> +        ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_OFS);
->           return;
->       } else if (ncq_tfs->sglist.size != size) {
->           trace_process_ncq_command_large(s, port, tag,
-> @@ -1225,7 +1252,7 @@ static int handle_cmd(AHCIState *s, int port, uint8_t slot)
->           trace_handle_cmd_badfis(s, port);
->           return -1;
->       } else if (cmd_len != 0x80) {
-> -        ahci_trigger_irq(s, &s->dev[port], PORT_IRQ_HBUS_ERR);
-> +        ahci_trigger_irq(s, &s->dev[port], AHCI_PORT_IRQ_BIT_HBFS);
->           trace_handle_cmd_badmap(s, port, cmd_len);
->           goto out;
->       }
-> diff --git a/hw/ide/ahci_internal.h b/hw/ide/ahci_internal.h
-> index 1e21169..7e67add 100644
-> --- a/hw/ide/ahci_internal.h
-> +++ b/hw/ide/ahci_internal.h
-> @@ -91,6 +91,31 @@
->   #define PORT_CMD_ISSUE            0x38 /* command issue */
->   #define PORT_RESERVED             0x3c /* reserved */
->   
-> +/* Port interrupt bit descriptors */
-> +enum AHCIPortIRQ {
-> +    AHCI_PORT_IRQ_BIT_DHRS = 0,
-> +    AHCI_PORT_IRQ_BIT_PSS  = 1,
-> +    AHCI_PORT_IRQ_BIT_DSS  = 2,
-> +    AHCI_PORT_IRQ_BIT_SDBS = 3,
-> +    AHCI_PORT_IRQ_BIT_UFS  = 4,
-> +    AHCI_PORT_IRQ_BIT_DPS  = 5,
-> +    AHCI_PORT_IRQ_BIT_PCS  = 6,
-> +    AHCI_PORT_IRQ_BIT_DMPS = 7,
-> +    /* RESERVED */
-> +    AHCI_PORT_IRQ_BIT_PRCS = 22,
-> +    AHCI_PORT_IRQ_BIT_IPMS = 23,
-> +    AHCI_PORT_IRQ_BIT_OFS  = 24,
-> +    /* RESERVED */
-> +    AHCI_PORT_IRQ_BIT_INFS = 26,
-> +    AHCI_PORT_IRQ_BIT_IFS  = 27,
-> +    AHCI_PORT_IRQ_BIT_HBDS = 28,
-> +    AHCI_PORT_IRQ_BIT_HBFS = 29,
-> +    AHCI_PORT_IRQ_BIT_TFES = 30,
-> +    AHCI_PORT_IRQ_BIT_CPDS = 31,
-> +    AHCI_PORT_IRQ__END     = 32
-> +};
-> +
-> +
->   /* PORT_IRQ_{STAT,MASK} bits */
->   #define PORT_IRQ_COLD_PRES        (1U << 31) /* cold presence detect */
->   #define PORT_IRQ_TF_ERR           (1 << 30) /* task file error */
-> @@ -98,18 +123,19 @@
->   #define PORT_IRQ_HBUS_DATA_ERR    (1 << 28) /* host bus data error */
->   #define PORT_IRQ_IF_ERR           (1 << 27) /* interface fatal error */
->   #define PORT_IRQ_IF_NONFATAL      (1 << 26) /* interface non-fatal error */
-> +                                            /* reserved */
->   #define PORT_IRQ_OVERFLOW         (1 << 24) /* xfer exhausted available S/G */
->   #define PORT_IRQ_BAD_PMP          (1 << 23) /* incorrect port multiplier */
-> -
->   #define PORT_IRQ_PHYRDY           (1 << 22) /* PhyRdy changed */
-> -#define PORT_IRQ_DEV_ILCK         (1 << 7) /* device interlock */
-> -#define PORT_IRQ_CONNECT          (1 << 6) /* port connect change status */
-> -#define PORT_IRQ_SG_DONE          (1 << 5) /* descriptor processed */
-> -#define PORT_IRQ_UNK_FIS          (1 << 4) /* unknown FIS rx'd */
-> -#define PORT_IRQ_SDB_FIS          (1 << 3) /* Set Device Bits FIS rx'd */
-> -#define PORT_IRQ_DMAS_FIS         (1 << 2) /* DMA Setup FIS rx'd */
-> -#define PORT_IRQ_PIOS_FIS         (1 << 1) /* PIO Setup FIS rx'd */
-> -#define PORT_IRQ_D2H_REG_FIS      (1 << 0) /* D2H Register FIS rx'd */
-> +                                            /* reserved */
-> +#define PORT_IRQ_DEV_ILCK         (1 << 7)  /* device interlock */
-> +#define PORT_IRQ_CONNECT          (1 << 6)  /* port connect change status */
-> +#define PORT_IRQ_SG_DONE          (1 << 5)  /* descriptor processed */
-> +#define PORT_IRQ_UNK_FIS          (1 << 4)  /* unknown FIS rx'd */
-> +#define PORT_IRQ_SDB_FIS          (1 << 3)  /* Set Device Bits FIS rx'd */
-> +#define PORT_IRQ_DMAS_FIS         (1 << 2)  /* DMA Setup FIS rx'd */
-> +#define PORT_IRQ_PIOS_FIS         (1 << 1)  /* PIO Setup FIS rx'd */
-> +#define PORT_IRQ_D2H_REG_FIS      (1 << 0)  /* D2H Register FIS rx'd */
->   
->   #define PORT_IRQ_FREEZE           (PORT_IRQ_HBUS_ERR | PORT_IRQ_IF_ERR |   \
->                                      PORT_IRQ_CONNECT | PORT_IRQ_PHYRDY |    \
-> diff --git a/hw/ide/trace-events b/hw/ide/trace-events
-> index e1a0457..5b321e1 100644
-> --- a/hw/ide/trace-events
-> +++ b/hw/ide/trace-events
-> @@ -59,7 +59,7 @@ ahci_port_read(void *s, int port, int offset, uint32_t ret) "ahci(%p)[%d]: port
->   ahci_irq_raise(void *s) "ahci(%p): raise irq"
->   ahci_irq_lower(void *s) "ahci(%p): lower irq"
->   ahci_check_irq(void *s, uint32_t old, uint32_t new) "ahci(%p): check irq 0x%08x --> 0x%08x"
-> -
-> +ahci_trigger_irq(void *s, int port, const char *name, uint32_t val, uint32_t old, uint32_t new, uint32_t effective) "ahci(%p)[%d]: trigger irq +%s (0x%08x); irqstat: 0x%08x --> 0x%08x; effective: 0x%08x"
->   ahci_port_write(void *s, int port, int offset, uint32_t val) "ahci(%p)[%d]: port write @ 0x%x: 0x%08x"
->   ahci_mem_read_32(void *s, uint64_t addr, uint32_t val) "ahci(%p): mem read @ 0x%"PRIx64": 0x%08x"
->   ahci_mem_read(void *s, unsigned size, uint64_t addr, uint64_t val) "ahci(%p): read%u @ 0x%"PRIx64": 0x%016"PRIx64
-> 
+This looks obviously right, but did you figure out what the (probably
+unrelated) other failure was?
