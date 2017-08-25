@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dlEbQ-0006kc-N0
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:24:50 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dlEbT-0006z5-I8
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:24:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dlEbP-0003Qc-1h
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:24:48 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dlEbR-0003S8-P9
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:24:51 -0400
 From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Fri, 25 Aug 2017 16:23:28 +0300
-Message-Id: <20170825132332.6734-4-el13635@mail.ntua.gr>
+Date: Fri, 25 Aug 2017 16:23:32 +0300
+Message-Id: <20170825132332.6734-8-el13635@mail.ntua.gr>
 In-Reply-To: <20170825132332.6734-1-el13635@mail.ntua.gr>
 References: <20170825132332.6734-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH v3 3/7] block: require job-id when device is a
- node name
+Subject: [Qemu-devel] [PATCH v3 7/7] qemu-iotests: add 191 for legacy
+ throttling interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,257 +23,184 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel <qemu-devel@nongnu.org>
 Cc: qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-With implicit filter nodes on the top of the graph it is not possible to
-generate job-ids with the name of the device in block_job_create()
-anymore, since the job's bs will not be a child_root.
+Check that the implicit throttle filter driver node, used for
+compatibility with the legacy throttling interface on the BlockBackend
+level, works.
 
-Instead we can require that job-id is not NULL in block_job_create(),
-and check that a job-id has been set in the callers of
-block_job_create() in blockdev.c. It is more consistent to require an
-explicit job-id when the device parameter in the job creation command,
-eg
-
- { "execute": "drive-backup",
-   "arguments": { "device": "drive0",
-                  "sync": "full",
-                  "target": "backup.img" } }
-
-is not a BlockBackend name, instead of automatically getting it from the
-root BS if device is a node name. That information is lost after calling
-block_job_create(), so we can do it in its caller instead.
-
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 ---
- include/block/blockjob_int.h |  4 +--
- blockdev.c                   | 65 +++++++++++++++++++++++++++++++++++++++-----
- blockjob.c                   | 19 ++++++-------
- tests/test-blockjob.c        |  9 +++---
- 4 files changed, 72 insertions(+), 25 deletions(-)
+ tests/qemu-iotests/191     | 138 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/191.out |   5 ++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 144 insertions(+)
+ create mode 100644 tests/qemu-iotests/191
+ create mode 100644 tests/qemu-iotests/191.out
 
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index f13ad05c0d..a4ab7f3d59 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -112,8 +112,8 @@ struct BlockJobDriver {
- 
- /**
-  * block_job_create:
-- * @job_id: The id of the newly-created job, or %NULL to have one
-- * generated automatically.
-+ * @job_id: The id of the newly-created job, must be non %NULL for external
-+ *          jobs and %NULL for internal jobs.
-  * @job_type: The class object for the newly-created job.
-  * @bs: The block
-  * @perm, @shared_perm: Permissions to request for @bs
-diff --git a/blockdev.c b/blockdev.c
-index fc7b65c3f0..6ffa5b0b04 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3004,6 +3004,16 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-         return;
-     }
- 
-+    /* Always require a job-id when device is a node name */
-+    if (!has_job_id) {
-+        if (blk_by_name(device)) {
-+            job_id = device;
-+        } else {
-+            error_setg(errp, "An explicit job ID is required for this node");
-+            return;
-+        }
-+    }
+diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
+new file mode 100644
+index 0000000000..82fd0b2fe5
+--- /dev/null
++++ b/tests/qemu-iotests/191
+@@ -0,0 +1,138 @@
++#!/usr/bin/env python
++#
++# Tests that the legacy throttling interface using an implicit throttle filter
++# driver node works
++#
++# Copyright (C) 2017 Manos Pitsidianakis
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-     /* Skip implicit filter nodes */
-     bs = bdrv_get_first_explicit(bs);
- 
-@@ -3058,7 +3068,7 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-     /* backing_file string overrides base bs filename */
-     base_name = has_backing_file ? backing_file : base_name;
- 
--    stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
-+    stream_start(job_id, bs, base_bs, base_name,
-                  has_speed ? speed : 0, on_error, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-@@ -3117,6 +3127,16 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-     /* Skip implicit filter nodes */
-     bs = bdrv_get_first_explicit(bs);
- 
-+    /* Always require a job-id when device is a node name */
-+    if (!has_job_id) {
-+        if (blk_by_name(device)) {
-+            job_id = device;
-+        } else {
-+            error_setg(errp, "An explicit job ID is required for this node");
-+            return;
-+        }
-+    }
++import os
++import iotests
 +
-     aio_context = bdrv_get_aio_context(bs);
-     aio_context_acquire(aio_context);
- 
-@@ -3171,7 +3191,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-                              " but 'top' is the active layer");
-             goto out;
-         }
--        commit_active_start(has_job_id ? job_id : NULL, bs, base_bs,
-+        commit_active_start(job_id, bs, base_bs,
-                             BLOCK_JOB_DEFAULT, speed, on_error,
-                             filter_node_name, NULL, NULL, false, &local_err);
-     } else {
-@@ -3179,7 +3199,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-         if (bdrv_op_is_blocked(overlay_bs, BLOCK_OP_TYPE_COMMIT_TARGET, errp)) {
-             goto out;
-         }
--        commit_start(has_job_id ? job_id : NULL, bs, base_bs, top_bs, speed,
-+        commit_start(job_id, bs, base_bs, top_bs, speed,
-                      on_error, has_backing_file ? backing_file : NULL,
-                      filter_node_name, &local_err);
-     }
-@@ -3220,7 +3240,13 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
-         backup->mode = NEW_IMAGE_MODE_ABSOLUTE_PATHS;
-     }
-     if (!backup->has_job_id) {
--        backup->job_id = NULL;
-+        /* Always require a job-id when device is a node name */
-+        if (blk_by_name(backup->device)) {
-+            backup->job_id = backup->device;
-+        } else {
-+            error_setg(errp, "An explicit job ID is required for this node");
-+            return NULL;
-+        }
-     }
-     if (!backup->has_compress) {
-         backup->compress = false;
-@@ -3366,7 +3392,13 @@ BlockJob *do_blockdev_backup(BlockdevBackup *backup, BlockJobTxn *txn,
-         backup->on_target_error = BLOCKDEV_ON_ERROR_REPORT;
-     }
-     if (!backup->has_job_id) {
--        backup->job_id = NULL;
-+        /* Always require a job-id when device is a node name */
-+        if (blk_by_name(backup->device)) {
-+            backup->job_id = backup->device;
-+        } else {
-+            error_setg(errp, "An explicit job ID is required for this node");
-+            return NULL;
-+        }
-     }
-     if (!backup->has_compress) {
-         backup->compress = false;
-@@ -3509,6 +3541,16 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-         return;
-     }
- 
-+    /* Always require a job-id when device is a node name */
-+    if (!arg->has_job_id) {
-+        if (blk_by_name(arg->device)) {
-+            arg->job_id = arg->device;
-+        } else {
-+            error_setg(errp, "An explicit job ID is required for this node");
-+            return;
-+        }
-+    }
++class TestLegacyThrottling(iotests.QMPTestCase):
++    test_img = os.path.join(iotests.test_dir, "test.img")
++    target_img = os.path.join(iotests.test_dir, "target.img")
++    base_img = os.path.join(iotests.test_dir, "base.img")
 +
-     /* Skip implicit filter nodes */
-     bs = bdrv_get_first_explicit(bs);
- 
-@@ -3624,7 +3666,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
- 
-     bdrv_set_aio_context(target_bs, aio_context);
- 
--    blockdev_mirror_common(arg->has_job_id ? arg->job_id : NULL, bs, target_bs,
-+    blockdev_mirror_common(arg->job_id, bs, target_bs,
-                            arg->has_replaces, arg->replaces, arg->sync,
-                            backing_mode, arg->has_speed, arg->speed,
-                            arg->has_granularity, arg->granularity,
-@@ -3674,12 +3716,21 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
-         return;
-     }
- 
-+    /* Always require a job-id when device is a node name */
-+    if (!has_job_id) {
-+        if (blk_by_name(device)) {
-+            job_id = device;
-+        } else {
-+            error_setg(errp, "An explicit job ID is required for this node");
-+            return;
-+        }
-+    }
-     aio_context = bdrv_get_aio_context(bs);
-     aio_context_acquire(aio_context);
- 
-     bdrv_set_aio_context(target_bs, aio_context);
- 
--    blockdev_mirror_common(has_job_id ? job_id : NULL, bs, target_bs,
-+    blockdev_mirror_common(job_id, bs, target_bs,
-                            has_replaces, replaces, sync, backing_mode,
-                            has_speed, speed,
-                            has_granularity, granularity,
-diff --git a/blockjob.c b/blockjob.c
-index 70a78188b7..1231be5ce3 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -622,20 +622,17 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-         return NULL;
-     }
- 
--    if (job_id == NULL && !(flags & BLOCK_JOB_INTERNAL)) {
--        job_id = bdrv_get_device_name(bs);
--        if (!*job_id) {
--            error_setg(errp, "An explicit job ID is required for this node");
--            return NULL;
--        }
--    }
--
--    if (job_id) {
--        if (flags & BLOCK_JOB_INTERNAL) {
-+    if (flags & BLOCK_JOB_INTERNAL) {
-+        if (job_id) {
-             error_setg(errp, "Cannot specify job ID for internal block job");
-             return NULL;
-         }
--
-+    } else {
-+        /* Require job-id. */
-+        if (!job_id) {
-+            error_setg(errp, "A job ID must be specified");
-+            return NULL;
-+        }
-         if (!id_wellformed(job_id)) {
-             error_setg(errp, "Invalid job ID '%s'", job_id);
-             return NULL;
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 23bdf1a932..fc41ea2147 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -93,7 +93,7 @@ static void test_job_ids(void)
-     blk[1] = create_blk("drive1");
-     blk[2] = create_blk("drive2");
- 
--    /* No job ID provided and the block backend has no name */
-+    /* No job ID provided */
-     job[0] = do_test_id(blk[0], NULL, false);
- 
-     /* These are all invalid job IDs */
-@@ -119,16 +119,15 @@ static void test_job_ids(void)
-     block_job_early_fail(job[0]);
-     job[1] = do_test_id(blk[1], "id0", true);
- 
--    /* No job ID specified, defaults to the backend name ('drive1') */
-     block_job_early_fail(job[1]);
--    job[1] = do_test_id(blk[1], NULL, true);
-+    job[1] = do_test_id(blk[1], "drive1", true);
- 
-     /* Duplicate job ID */
-     job[2] = do_test_id(blk[2], "drive1", false);
- 
--    /* The ID of job[2] would default to 'drive2' but it is already in use */
-+    /* The ID of job[2] is already in use */
-     job[0] = do_test_id(blk[0], "drive2", true);
--    job[2] = do_test_id(blk[2], NULL, false);
-+    job[2] = do_test_id(blk[2], "drive2", false);
- 
-     /* This one is valid */
-     job[2] = do_test_id(blk[2], "id_2", true);
++    def setUp(self):
++        iotests.qemu_img("create", "-f", iotests.imgfmt, self.base_img, "1G")
++        iotests.qemu_img("create", "-f", iotests.imgfmt, self.test_img, "-b", self.base_img)
++        iotests.qemu_io("-f", iotests.imgfmt, "-c", "write -P0x5d 1M 128M", self.test_img)
++        self.vm = iotests.VM().add_drive(self.test_img)
++        self.vm.launch()
++
++    def tearDown(self):
++        self.do_check_throttle_node(expect=True)
++        params = {"device": "drive0",
++                  "bps": 0,
++                  "bps_rd": 0,
++                  "bps_wr": 0,
++                  "iops": 0,
++                  "iops_rd": 0,
++                  "iops_wr": 0,
++                 }
++        """
++        This must remove the implicit throttle_node
++        """
++        result = self.vm.qmp("block_set_io_throttle", conv_keys=False,
++                             **params)
++        self.do_check_throttle_node(expect=False)
++        self.vm.shutdown()
++
++    def do_test_job(self, cmd, **args):
++        params = {"device": "drive0",
++                  "bps": 1024,
++                  "bps_rd": 0,
++                  "bps_wr": 0,
++                  "iops": 0,
++                  "iops_rd": 0,
++                  "iops_wr": 0,
++                 }
++        result = self.vm.qmp("block_set_io_throttle", conv_keys=False,
++                             **params)
++        self.assert_qmp(result, "return", {})
++        result = self.vm.qmp(cmd, **args)
++        self.assert_qmp(result, "return", {})
++        result = self.vm.qmp("query-block-jobs")
++        self.assert_qmp(result, "return[0]/device", "drive0")
++
++    def do_check_throttle_node(self, expect):
++        result = self.vm.qmp("query-named-block-nodes")
++        for r in result["return"]:
++            if r["drv"] == "throttle":
++                    self.assertTrue(expect)
++                    return
++        if expect:
++            """ throttle_node missing! """
++            self.assertTrue(False)
++
++    def do_check_params(self, file):
++        result = self.vm.qmp("query-block")
++        self.assert_qmp(result, "return[0]/inserted/bps", 1024)
++        self.assert_qmp(result, "return[0]/inserted/drv", iotests.imgfmt)
++        self.assert_qmp(result, "return[0]/inserted/file", file)
++
++    """
++    Check that query-block reports the correct throttling parameters while
++    ignoring the implicit throttle node.
++    """
++    def test_query_block(self):
++        params = {"device": "drive0",
++                  "bps": 1024,
++                  "bps_rd": 0,
++                  "bps_wr": 0,
++                  "iops": 0,
++                  "iops_rd": 0,
++                  "iops_wr": 0,
++                 }
++        result = self.vm.qmp("block_set_io_throttle", conv_keys=False,
++                             **params)
++        self.assert_qmp(result, "return", {})
++        self.do_check_params(file=self.test_img)
++
++    """
++    Check that the throttle node doesn't get removed by block jobs, and that
++    query-block reports the correct throttling parameters
++    """
++    def test_drive_mirror(self):
++        self.do_test_job("drive-mirror", device="drive0",
++                          target=self.target_img,
++                          sync="full")
++        self.vm.event_wait("BLOCK_JOB_READY")
++        self.vm.qmp("block-job-complete", device="drive0")
++        """
++        query-block should report `target_img` now
++        """
++        self.do_check_params(file=self.target_img)
++
++    def test_drive_backup(self):
++        self.do_test_job("drive-backup", device="drive0",
++                          target=self.target_img,
++                          sync="full")
++        self.vm.event_wait("BLOCK_JOB_COMPLETED")
++        self.do_check_params(file=self.test_img)
++
++    def test_block_commit(self):
++        self.do_test_job("block-commit", device="drive0")
++        self.vm.event_wait("BLOCK_JOB_READY")
++        self.vm.qmp("block-job-complete", device="drive0")
++        """
++        query-block should report the backing file `base_img` now
++        """
++        self.do_check_params(file=self.base_img)
++
++if __name__ == "__main__":
++    iotests.main(supported_fmts=["qcow2"])
+diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
+new file mode 100644
+index 0000000000..89968f35d7
+--- /dev/null
++++ b/tests/qemu-iotests/191.out
+@@ -0,0 +1,5 @@
++....
++----------------------------------------------------------------------
++Ran 4 tests
++
++OK
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index fee98440a5..ff732f0385 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -187,4 +187,5 @@
+ 188 rw auto quick
+ 189 rw auto
+ 190 rw auto quick
++191 rw auto quick
+ 192 rw auto quick
 -- 
 2.11.0
