@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dlEgH-0003AO-JF
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:29:50 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dlEkV-0006y4-HB
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:34:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dlEgD-0005mR-KL
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:29:49 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:52621)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1dlEgD-0005l9-85
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:29:45 -0400
-Date: Fri, 25 Aug 2017 23:19:56 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170825131956.GK2772@umbus.fritz.box>
-References: <20170824123006.GK5379@umbus.fritz.box>
-	<20170825083123.47432-1-aik@ozlabs.ru>
-	<4608a2c1-5c74-efea-d901-3b5cfa0519e6@redhat.com>
-	<CAFEAcA_Z3wWv3_x0kCqD0tEwP=GTV-uoCLmUr5YpWjdD1GyMew@mail.gmail.com>
-	<0e7817c4-4189-c620-e71c-d935076286ad@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dlEkS-0007ed-Aw
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:34:11 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170808183306.27474-1-jsnow@redhat.com>
+	<20170808183306.27474-2-jsnow@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8e580b70-3b68-10b2-6f7b-8eddfbed0519@amsat.org>
+Date: Fri, 25 Aug 2017 10:33:35 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="nzri8VXeXB/g5ayr"
-Content-Disposition: inline
-In-Reply-To: <0e7817c4-4189-c620-e71c-d935076286ad@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH qemu] exec: Destroy dispatch immediately
+In-Reply-To: <20170808183306.27474-2-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/9] IDE: replace DEBUG_IDE with tracing
+ system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +29,450 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
 
+Hi John,
 
---nzri8VXeXB/g5ayr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 08/08/2017 03:32 PM, John Snow wrote:
+> Out with the old, in with the new.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>   Makefile.objs             |  1 +
+>   hw/ide/cmd646.c           | 10 +++-----
+>   hw/ide/core.c             | 65 +++++++++++++++++++----------------------------
+>   hw/ide/pci.c              | 17 ++++---------
+>   hw/ide/piix.c             | 11 ++++----
+>   hw/ide/trace-events       | 33 ++++++++++++++++++++++++
+>   hw/ide/via.c              | 10 +++-----
+>   include/hw/ide/internal.h |  1 -
+>   8 files changed, 78 insertions(+), 70 deletions(-)
+>   create mode 100644 hw/ide/trace-events
+> 
+> diff --git a/Makefile.objs b/Makefile.objs
+> index 24a4ea0..967c092 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -153,6 +153,7 @@ trace-events-subdirs += hw/acpi
+>   trace-events-subdirs += hw/arm
+>   trace-events-subdirs += hw/alpha
+>   trace-events-subdirs += hw/xen
+> +trace-events-subdirs += hw/ide
+>   trace-events-subdirs += ui
+>   trace-events-subdirs += audio
+>   trace-events-subdirs += net
+> diff --git a/hw/ide/cmd646.c b/hw/ide/cmd646.c
+> index 9ebb8d4..86b2a8f 100644
+> --- a/hw/ide/cmd646.c
+> +++ b/hw/ide/cmd646.c
+> @@ -32,6 +32,7 @@
+>   #include "sysemu/dma.h"
+>   
+>   #include "hw/ide/pci.h"
+> +#include "trace.h"
+>   
+>   /* CMD646 specific */
+>   #define CFR		0x50
+> @@ -195,9 +196,8 @@ static uint64_t bmdma_read(void *opaque, hwaddr addr,
+>           val = 0xff;
+>           break;
+>       }
+> -#ifdef DEBUG_IDE
+> -    printf("bmdma: readb " TARGET_FMT_plx " : 0x%02x\n", addr, val);
+> -#endif
+> +
+> +    trace_bmdma_read_cmd646(addr, val);
+>       return val;
+>   }
+>   
+> @@ -211,9 +211,7 @@ static void bmdma_write(void *opaque, hwaddr addr,
+>           return;
+>       }
+>   
+> -#ifdef DEBUG_IDE
+> -    printf("bmdma: writeb " TARGET_FMT_plx " : 0x%" PRIx64 "\n", addr, val);
+> -#endif
+> +    trace_bmdma_write_cmd646(addr, val);
+>       switch(addr & 3) {
+>       case 0:
+>           bmdma_cmd_writeb(bm, val);
+> diff --git a/hw/ide/core.c b/hw/ide/core.c
+> index 0b48b64..53fa084 100644
+> --- a/hw/ide/core.c
+> +++ b/hw/ide/core.c
+> @@ -36,6 +36,7 @@
+>   #include "qemu/cutils.h"
+>   
+>   #include "hw/ide/internal.h"
+> +#include "trace.h"
+>   
+>   /* These values were based on a Seagate ST3500418AS but have been modified
+>      to make more sense in QEMU */
+> @@ -656,10 +657,7 @@ void ide_cancel_dma_sync(IDEState *s)
+>        * write requests) pending and we can avoid to drain. */
+>       QLIST_FOREACH(req, &s->buffered_requests, list) {
+>           if (!req->orphaned) {
+> -#ifdef DEBUG_IDE
+> -            printf("%s: invoking cb %p of buffered request %p with"
+> -                   " -ECANCELED\n", __func__, req->original_cb, req);
+> -#endif
+> +            trace_ide_cancel_dma_sync_buffered(req->original_cb, req);
+>               req->original_cb(req->original_opaque, -ECANCELED);
+>           }
+>           req->orphaned = true;
+> @@ -678,9 +676,7 @@ void ide_cancel_dma_sync(IDEState *s)
+>        * aio operation with preadv/pwritev.
+>        */
+>       if (s->bus->dma->aiocb) {
+> -#ifdef DEBUG_IDE
+> -        printf("%s: draining all remaining requests", __func__);
+> -#endif
+> +        trace_ide_cancel_dma_sync_remaining();
+>           blk_drain(s->blk);
+>           assert(s->bus->dma->aiocb == NULL);
+>       }
+> @@ -741,9 +737,7 @@ static void ide_sector_read(IDEState *s)
+>           n = s->req_nb_sectors;
+>       }
+>   
+> -#if defined(DEBUG_IDE)
+> -    printf("sector=%" PRId64 "\n", sector_num);
+> -#endif
+> +    trace_ide_sector_read(sector_num, n);
+>   
+>       if (!ide_sect_range_ok(s, sector_num, n)) {
+>           ide_rw_error(s);
+> @@ -1005,14 +999,14 @@ static void ide_sector_write(IDEState *s)
+>   
+>       s->status = READY_STAT | SEEK_STAT | BUSY_STAT;
+>       sector_num = ide_get_sector(s);
+> -#if defined(DEBUG_IDE)
+> -    printf("sector=%" PRId64 "\n", sector_num);
+> -#endif
+> +
+>       n = s->nsector;
+>       if (n > s->req_nb_sectors) {
+>           n = s->req_nb_sectors;
+>       }
+>   
+> +    trace_ide_sector_write(sector_num, n);
+> +
+>       if (!ide_sect_range_ok(s, sector_num, n)) {
+>           ide_rw_error(s);
+>           block_acct_invalid(blk_get_stats(s->blk), BLOCK_ACCT_WRITE);
+> @@ -1186,18 +1180,17 @@ static void ide_clear_hob(IDEBus *bus)
+>   void ide_ioport_write(void *opaque, uint32_t addr, uint32_t val)
+>   {
+>       IDEBus *bus = opaque;
+> +    IDEState *s = idebus_active_if(bus);
+> +    int reg_num = addr & 7;
+>   
+> -#ifdef DEBUG_IDE
+> -    printf("IDE: write addr=0x%x val=0x%02x\n", addr, val);
+> -#endif
+> -
+> -    addr &= 7;
+> +    trace_ide_ioport_write(addr, val, bus, s);
+>   
+>       /* ignore writes to command block while busy with previous command */
+> -    if (addr != 7 && (idebus_active_if(bus)->status & (BUSY_STAT|DRQ_STAT)))
+> +    if (reg_num != 7 && (s->status & (BUSY_STAT|DRQ_STAT))) {
+>           return;
+> +    }
+>   
+> -    switch(addr) {
+> +    switch(reg_num) {
+>       case 0:
+>           break;
+>       case 1:
+> @@ -1253,9 +1246,7 @@ void ide_ioport_write(void *opaque, uint32_t addr, uint32_t val)
+>   
+>   static void ide_reset(IDEState *s)
+>   {
+> -#ifdef DEBUG_IDE
+> -    printf("ide: reset\n");
+> -#endif
+> +    trace_ide_reset(s);
+>   
+>       if (s->pio_aiocb) {
+>           blk_aio_cancel(s->pio_aiocb);
+> @@ -2013,10 +2004,9 @@ void ide_exec_cmd(IDEBus *bus, uint32_t val)
+>       IDEState *s;
+>       bool complete;
+>   
+> -#if defined(DEBUG_IDE)
+> -    printf("ide: CMD=%02x\n", val);
+> -#endif
+>       s = idebus_active_if(bus);
+> +    trace_ide_exec_cmd(bus, s, val);
+> +
+>       /* ignore commands to non existent slave */
+>       if (s != bus->ifs && !s->blk) {
+>           return;
+> @@ -2054,18 +2044,18 @@ void ide_exec_cmd(IDEBus *bus, uint32_t val)
+>       }
+>   }
+>   
+> -uint32_t ide_ioport_read(void *opaque, uint32_t addr1)
+> +uint32_t ide_ioport_read(void *opaque, uint32_t addr)
+>   {
+>       IDEBus *bus = opaque;
+>       IDEState *s = idebus_active_if(bus);
+> -    uint32_t addr;
+> +    uint32_t reg_num;
+>       int ret, hob;
+>   
+> -    addr = addr1 & 7;
+> +    reg_num = addr & 7;
+>       /* FIXME: HOB readback uses bit 7, but it's always set right now */
+>       //hob = s->select & (1 << 7);
+>       hob = 0;
+> -    switch(addr) {
+> +    switch(reg_num) {
+>       case 0:
+>           ret = 0xff;
+>           break;
+> @@ -2133,9 +2123,8 @@ uint32_t ide_ioport_read(void *opaque, uint32_t addr1)
+>           qemu_irq_lower(bus->irq);
+>           break;
+>       }
+> -#ifdef DEBUG_IDE
+> -    printf("ide: read addr=0x%x val=%02x\n", addr1, ret);
+> -#endif
+> +
+> +    trace_ide_ioport_read(addr, ret, bus, s);
+>       return ret;
+>   }
+>   
+> @@ -2151,9 +2140,8 @@ uint32_t ide_status_read(void *opaque, uint32_t addr)
+>       } else {
+>           ret = s->status;
+>       }
+> -#ifdef DEBUG_IDE
+> -    printf("ide: read status addr=0x%x val=%02x\n", addr, ret);
+> -#endif
+> +
+> +    trace_ide_status_read(addr, ret, bus, s);
+>       return ret;
+>   }
+>   
+> @@ -2163,9 +2151,8 @@ void ide_cmd_write(void *opaque, uint32_t addr, uint32_t val)
+>       IDEState *s;
+>       int i;
+>   
+> -#ifdef DEBUG_IDE
+> -    printf("ide: write control addr=0x%x val=%02x\n", addr, val);
+> -#endif
+> +    trace_ide_cmd_write(addr, val, bus);
+> +
+>       /* common for both drives */
+>       if (!(bus->cmd & IDE_CMD_RESET) &&
+>           (val & IDE_CMD_RESET)) {
+> diff --git a/hw/ide/pci.c b/hw/ide/pci.c
+> index 3cfb510..f2dcc0e 100644
+> --- a/hw/ide/pci.c
+> +++ b/hw/ide/pci.c
+> @@ -31,6 +31,7 @@
+>   #include "sysemu/dma.h"
+>   #include "qemu/error-report.h"
+>   #include "hw/ide/pci.h"
+> +#include "trace.h"
+>   
+>   #define BMDMA_PAGE_SIZE 4096
+>   
+> @@ -196,9 +197,7 @@ static void bmdma_reset(IDEDMA *dma)
+>   {
+>       BMDMAState *bm = DO_UPCAST(BMDMAState, dma, dma);
+>   
+> -#ifdef DEBUG_IDE
+> -    printf("ide: dma_reset\n");
+> -#endif
+> +    trace_bmdma_reset();
+>       bmdma_cancel(bm);
+>       bm->cmd = 0;
+>       bm->status = 0;
+> @@ -227,9 +226,7 @@ static void bmdma_irq(void *opaque, int n, int level)
+>   
+>   void bmdma_cmd_writeb(BMDMAState *bm, uint32_t val)
+>   {
+> -#ifdef DEBUG_IDE
+> -    printf("%s: 0x%08x\n", __func__, val);
+> -#endif
+> +    trace_bmdma_cmd_writeb(val);
+>   
+>       /* Ignore writes to SSBM if it keeps the old value */
+>       if ((val & BM_CMD_START) != (bm->cmd & BM_CMD_START)) {
+> @@ -258,9 +255,7 @@ static uint64_t bmdma_addr_read(void *opaque, hwaddr addr,
+>       uint64_t data;
+>   
+>       data = (bm->addr >> (addr * 8)) & mask;
+> -#ifdef DEBUG_IDE
+> -    printf("%s: 0x%08x\n", __func__, (unsigned)data);
+> -#endif
+> +    trace_bmdma_addr_read(data);
+>       return data;
+>   }
+>   
+> @@ -271,9 +266,7 @@ static void bmdma_addr_write(void *opaque, hwaddr addr,
+>       int shift = addr * 8;
+>       uint32_t mask = (1ULL << (width * 8)) - 1;
+>   
+> -#ifdef DEBUG_IDE
+> -    printf("%s: 0x%08x\n", __func__, (unsigned)data);
+> -#endif
+> +    trace_bmdma_addr_write(data);
+>       bm->addr &= ~(mask << shift);
+>       bm->addr |= ((data & mask) << shift) & ~3;
+>   }
+> diff --git a/hw/ide/piix.c b/hw/ide/piix.c
+> index 7e2d767..dfb21f6 100644
+> --- a/hw/ide/piix.c
+> +++ b/hw/ide/piix.c
+> @@ -33,6 +33,7 @@
+>   #include "sysemu/dma.h"
+>   
+>   #include "hw/ide/pci.h"
+> +#include "trace.h"
+>   
+>   static uint64_t bmdma_read(void *opaque, hwaddr addr, unsigned size)
+>   {
+> @@ -54,9 +55,8 @@ static uint64_t bmdma_read(void *opaque, hwaddr addr, unsigned size)
+>           val = 0xff;
+>           break;
+>       }
+> -#ifdef DEBUG_IDE
+> -    printf("bmdma: readb 0x%02x : 0x%02x\n", (uint8_t)addr, val);
+> -#endif
+> +
+> +    trace_bmdma_read(addr, val);
+>       return val;
+>   }
+>   
+> @@ -69,9 +69,8 @@ static void bmdma_write(void *opaque, hwaddr addr,
+>           return;
+>       }
+>   
+> -#ifdef DEBUG_IDE
+> -    printf("bmdma: writeb 0x%02x : 0x%02x\n", (uint8_t)addr, (uint8_t)val);
+> -#endif
+> +    trace_bmdma_write(addr, val);
+> +
+>       switch(addr & 3) {
+>       case 0:
+>           bmdma_cmd_writeb(bm, val);
+> diff --git a/hw/ide/trace-events b/hw/ide/trace-events
+> new file mode 100644
+> index 0000000..68ad96a
+> --- /dev/null
+> +++ b/hw/ide/trace-events
+> @@ -0,0 +1,33 @@
+> +# See docs/devel/tracing.txt for syntax documentation.
+> +
+> +# hw/ide/core.c
+> +# portio
+> +ide_ioport_read(uint32_t addr, uint32_t val, void *bus, void *s)  "IDE PIO rd @ 0x%"PRIx32"; val 0x%02"PRIx32"; bus %p IDEState %p"
+> +ide_ioport_write(uint32_t addr, uint32_t val, void *bus, void *s) "IDE PIO wr @ 0x%"PRIx32"; val 0x%02"PRIx32"; bus %p IDEState %p"
 
-On Fri, Aug 25, 2017 at 11:57:26AM +0200, Paolo Bonzini wrote:
-> On 25/08/2017 11:22, Peter Maydell wrote:
-> > On 25 August 2017 at 09:53, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >> The solution is to: 1) share the FlatView structures if they refer to
-> >> the same root memory region; 2) have one AddressSpaceDispatch per
-> >> FlatView instead of one per AddressSpace, so that FlatView reference
-> >> counting takes care of clearing the AddressSpaceDispatch too.  Neither
-> >> is particularly hard.
-> > If we did this we could get rid of address_space_init_shareable(),
-> > right? (It's a bit of a cheesy hack aimed at avoiding having duplicate
-> > address space structures for the same root memory region, but if
-> > the underlying code is better at not duplicating all the data
-> > structures unless necessary then the benefit of having the
-> > separate API goes away I think.)
->=20
-> Yes, indeed.
+ide_ioport_access(char *access, uint32_t addr, uint32_t val, void *bus, 
+void *s);
 
-Hm.  Why do we need to construct full ASes for virtio-blk, rather than
-just MRs?
+> +ide_status_read(uint32_t addr, uint32_t val, void *bus, void *s)                   "IDE PIO rd @ 0x%"PRIx32" (Alt Status); val 0x%02"PRIx32"; bus %p; IDEState %p"
+> +ide_cmd_write(uint32_t addr, uint32_t val, void *bus)                              "IDE PIO wr @ 0x%"PRIx32" (Device Control); val 0x%02"PRIx32"; bus %p"
+> +# misc
+> +ide_exec_cmd(void *bus, void *state, uint32_t cmd) "IDE exec cmd: bus %p; state %p; cmd 0x%02x"
+> +ide_cancel_dma_sync_buffered(void *fn, void *req) "invoking cb %p of buffered request %p with -ECANCELED"
+> +ide_cancel_dma_sync_remaining(void) "draining all remaining requests"
+> +ide_sector_read(int64_t sector_num, int nsectors) "sector=%"PRId64" nsectors=%d"
+> +ide_sector_write(int64_t sector_num, int nsectors) "sector=%"PRId64" nsectors=%d"
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+ide_sector_access(char *access, int64_t sector_num, int nsectors) "%s 
+sector=%"PRId64" nsectors=%d"
 
---nzri8VXeXB/g5ayr
-Content-Type: application/pgp-signature; name="signature.asc"
+> +ide_reset(void *s) "IDEstate %p"
+> +
+> +# hw/ide/pci.c
+> +bmdma_reset(void) ""
+> +bmdma_cmd_writeb(uint32_t val) "val: 0x%08x"
+> +bmdma_addr_read(uint64_t data) "data: 0x%016"PRIx64
+> +bmdma_addr_write(uint64_t data) "data: 0x%016"PRIx64
 
------BEGIN PGP SIGNATURE-----
+bmdma_data_access(char *access, uint64_t data) "%s data: 0x%016"PRIx64
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmgI/wACgkQbDjKyiDZ
-s5KlzQ//cQom896baFU+dZUAQjP1OyvqLNXGI/LD3hIyLhYI4373h7P6IfpMi6eS
-bPvGBp37HZnH5zQwxAlvH+m/Oa/pj2ohFXa00oW+lcqEZTlCTS0E/gIu+m8tMdpY
-YFN+FRKf209EPbSAASUfd7Kg+iZHLstwXjtGgL7gLHyDoG4e+/hqt43Hspt7R9/v
-mjRuKEkDmeUGlywEM07rPLdChh4rnwhbygSquLPXbsp+4XVez8oZxughBLg83QOc
-9P/IFIfDds+ZgQhs9+Fe40LnhuBO5P8uTDV692x8tD+R6F1rV9p7+K0aw3VDvm2S
-GCnlD40UgOrsvXgmBQKG1hGjPtrSWohvmmycwXR/EfIApsz2TY5ac+9MYvwxCLNZ
-3egXhJ4fff4E90lqSD1C6+S7aqLYjlEyOj518i+RZBgis2V5exaDkGyGzeQgAJzW
-TllOxAS3rc20zki+XxajUbnuT6apbxnbK0d6o0cKAmeHdwhPx/ke/9nNNAwZwrJG
-jP0GaZJxkbOLeN4mpTB/69hKJgCZHqKZd1xvHN3SLNJixqQw3zYP+13o52LZWyMw
-xEKAFiNNrVLmZ5rvqYkkJpaHDoyBJUxz4mrBP3csoEfHRtbuKe5IapODvihmU1Ec
-YfSn8HzL7zFO2Ha88hfQiSXIWsSTyuy/KruSYqho5ItkXNbr0aw=
-=vDCy
------END PGP SIGNATURE-----
+> +
+> +# hw/ide/piix.c
+> +bmdma_read(uint64_t addr, uint8_t val) "bmdma: readb 0x%"PRIx64" : 0x%02x"
+> +bmdma_write(uint64_t addr, uint8_t val) "bmdma: writeb 0x%"PRIx64" : 0x%02x"
 
---nzri8VXeXB/g5ayr--
+bmdma_io_access(char *access, uint64_t addr, uint64_t val) "bmdma: %sb 
+0x%"PRIx64" : 0x%02x"
+
+> +
+> +# hw/ide/cmd646.c
+> +bmdma_read_cmd646(uint64_t addr, uint32_t val) "bmdma: readb 0x%"PRIx64" : 0x%02x"
+> +bmdma_write_cmd646(uint64_t addr, uint64_t val) "bmdma: writeb 0x%"PRIx64" : 0x%02"PRIx64
+
+use trace_bmdma_io_access()
+
+> +
+> +# hw/ide/via.c
+> +bmdma_read_via(uint64_t addr, uint32_t val) "bmdma: readb 0x%"PRIx64" : 0x%02x"
+> +bmdma_write_via(uint64_t addr, uint64_t val) "bmdma: writeb 0x%"PRIx64" : 0x%02"PRIx64
+
+use trace_bmdma_io_access()
+
+> diff --git a/hw/ide/via.c b/hw/ide/via.c
+> index 5b32ecb..35c3059 100644
+> --- a/hw/ide/via.c
+> +++ b/hw/ide/via.c
+> @@ -33,6 +33,7 @@
+>   #include "sysemu/dma.h"
+>   
+>   #include "hw/ide/pci.h"
+> +#include "trace.h"
+>   
+>   static uint64_t bmdma_read(void *opaque, hwaddr addr,
+>                              unsigned size)
+> @@ -55,9 +56,8 @@ static uint64_t bmdma_read(void *opaque, hwaddr addr,
+>           val = 0xff;
+>           break;
+>       }
+> -#ifdef DEBUG_IDE
+> -    printf("bmdma: readb 0x%02x : 0x%02x\n", addr, val);
+> -#endif
+> +
+> +    trace_bmdma_read_via(addr, val);
+>       return val;
+>   }
+>   
+> @@ -70,9 +70,7 @@ static void bmdma_write(void *opaque, hwaddr addr,
+>           return;
+>       }
+>   
+> -#ifdef DEBUG_IDE
+> -    printf("bmdma: writeb 0x%02x : 0x%02x\n", addr, val);
+> -#endif
+> +    trace_bmdma_write_via(addr, val);
+>       switch (addr & 3) {
+>       case 0:
+>           bmdma_cmd_writeb(bm, val);
+> diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+> index 482a951..4a92f0a 100644
+> --- a/include/hw/ide/internal.h
+> +++ b/include/hw/ide/internal.h
+> @@ -14,7 +14,6 @@
+>   #include "block/scsi.h"
+>   
+>   /* debug IDE devices */
+> -//#define DEBUG_IDE
+>   //#define DEBUG_IDE_ATAPI
+>   //#define DEBUG_AIO
+>   #define USE_DMA_CDROM
+> 
+
+If you agree you can add:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+Regards,
+
+Phil.
