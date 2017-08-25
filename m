@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dlEbP-0006fj-9t
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:24:48 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dlEbQ-0006hl-5E
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:24:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dlEbO-0003PU-5w
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:24:47 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dlEbO-0003Q3-Lf
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:24:48 -0400
 From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Fri, 25 Aug 2017 16:23:25 +0300
-Message-Id: <20170825132332.6734-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH v3 0/6] block: remove legacy I/O throttling
+Date: Fri, 25 Aug 2017 16:23:27 +0300
+Message-Id: <20170825132332.6734-3-el13635@mail.ntua.gr>
+In-Reply-To: <20170825132332.6734-1-el13635@mail.ntua.gr>
+References: <20170825132332.6734-1-el13635@mail.ntua.gr>
+Subject: [Qemu-devel] [PATCH v3 2/7] block: add options parameter to
+ bdrv_new_open_driver()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,59 +23,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel <qemu-devel@nongnu.org>
 Cc: qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-This series depends on my other series 'add throttle block driver filter'
-currently on v9
+Allow passing a QDict *options parameter to bdrv_new_open_driver() so
+that it can be used if a driver needs it upon creation. The previous
+behaviour (empty bs->options and bs->explicit_options) remains when
+options is NULL.
 
-Based-on: <20170825132028.6184-1-el13635@mail.ntua.gr>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+---
+ include/block/block.h |  2 +-
+ block.c               | 16 +++++++++++++---
+ block/commit.c        |  4 ++--
+ block/mirror.c        |  2 +-
+ block/vvfat.c         |  2 +-
+ 5 files changed, 18 insertions(+), 8 deletions(-)
 
-Replacing the current I/O interface means the user will use the same options as
-before and QEMU will create a hidden throttle filter node beneath the device's
-BlockBackend. 
-
-v3:
-  fix suggestions by berto
-  new commit: remove throttle-groups list
-
-v2:
-  new commit: require job-id when device is a node name
-  new commit: remove BlockBackendPublic
-  new commit: add dedicated iotest
-  cleanup reference counting in block/block-backend.c functions
-  add new function to get filter child bs
-  take ownership of options in bdrv_new_open_driver()
-
-Manos Pitsidianakis (7):
-  block: skip implicit nodes in snapshots, blockjobs
-  block: add options parameter to bdrv_new_open_driver()
-  block: require job-id when device is a node name
-  block: remove legacy I/O throttling
-  block/throttle-groups.c: remove throttle-groups list
-  block: remove BlockBackendPublic
-  qemu-iotests: add 191 for legacy throttling interface
-
- include/block/block.h           |   2 +-
- include/block/block_int.h       |  17 +++++
- include/block/blockjob_int.h    |   4 +-
- include/block/throttle-groups.h |   2 +
- include/sysemu/block-backend.h  |  16 +---
- block.c                         |  26 ++++++-
- block/block-backend.c           | 158 ++++++++++++++++++++++++----------------
- block/commit.c                  |   4 +-
- block/mirror.c                  |   2 +-
- block/qapi.c                    |  24 +++---
- block/throttle-groups.c         | 145 ++++++++++++++++++++----------------
- block/throttle.c                |   8 ++
- block/vvfat.c                   |   2 +-
- blockdev.c                      | 136 ++++++++++++++++++++++++++++++----
- blockjob.c                      |  19 ++---
- tests/test-blockjob.c           |   9 +--
- tests/test-throttle.c           |  22 ++++--
- tests/qemu-iotests/191          | 138 +++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/191.out      |   5 ++
- tests/qemu-iotests/group        |   1 +
- 20 files changed, 538 insertions(+), 202 deletions(-)
- create mode 100644 tests/qemu-iotests/191
- create mode 100644 tests/qemu-iotests/191.out
-
+diff --git a/include/block/block.h b/include/block/block.h
+index ab80195378..d1f03cb48b 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -263,7 +263,7 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+ BlockDriverState *bdrv_open(const char *filename, const char *reference,
+                             QDict *options, int flags, Error **errp);
+ BlockDriverState *bdrv_new_open_driver(BlockDriver *drv, const char *node_name,
+-                                       int flags, Error **errp);
++                                       int flags, QDict *options, Error **errp);
+ BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
+                                     BlockDriverState *bs,
+                                     QDict *options, int flags);
+diff --git a/block.c b/block.c
+index e35d546c08..2de1c29eb3 100644
+--- a/block.c
++++ b/block.c
+@@ -1153,16 +1153,26 @@ open_failed:
+     return ret;
+ }
+ 
++/*
++ * If options is not NULL, its ownership is transferred to the block layer. The
++ * caller must use QINCREF() if they wish to keep ownership.
++ */
+ BlockDriverState *bdrv_new_open_driver(BlockDriver *drv, const char *node_name,
+-                                       int flags, Error **errp)
++                                       int flags, QDict *options, Error **errp)
+ {
+     BlockDriverState *bs;
+     int ret;
+ 
+     bs = bdrv_new();
+     bs->open_flags = flags;
+-    bs->explicit_options = qdict_new();
+-    bs->options = qdict_new();
++    if (options) {
++        bs->explicit_options = qdict_clone_shallow(options);
++        bs->options = qdict_clone_shallow(options);
++        QDECREF(options);
++    } else {
++        bs->explicit_options = qdict_new();
++        bs->options = qdict_new();
++    }
+     bs->opaque = NULL;
+ 
+     update_options_from_flags(bs->options, flags);
+diff --git a/block/commit.c b/block/commit.c
+index c7857c3321..539e23c3f8 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -342,7 +342,7 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+     /* Insert commit_top block node above top, so we can block consistent read
+      * on the backing chain below it */
+     commit_top_bs = bdrv_new_open_driver(&bdrv_commit_top, filter_node_name, 0,
+-                                         errp);
++                                         NULL, errp);
+     if (commit_top_bs == NULL) {
+         goto fail;
+     }
+@@ -494,7 +494,7 @@ int bdrv_commit(BlockDriverState *bs)
+     backing_file_bs = backing_bs(bs);
+ 
+     commit_top_bs = bdrv_new_open_driver(&bdrv_commit_top, NULL, BDRV_O_RDWR,
+-                                         &local_err);
++                                         NULL, &local_err);
+     if (commit_top_bs == NULL) {
+         error_report_err(local_err);
+         goto ro_cleanup;
+diff --git a/block/mirror.c b/block/mirror.c
+index c9a6a3ca86..e1a160e6ea 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1164,7 +1164,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+      * reads on the top, while disabling it in the intermediate nodes, and make
+      * the backing chain writable. */
+     mirror_top_bs = bdrv_new_open_driver(&bdrv_mirror_top, filter_node_name,
+-                                         BDRV_O_RDWR, errp);
++                                         BDRV_O_RDWR, NULL, errp);
+     if (mirror_top_bs == NULL) {
+         return;
+     }
+diff --git a/block/vvfat.c b/block/vvfat.c
+index a9e207f7f0..6c59473baf 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -3194,7 +3194,7 @@ static int enable_write_target(BlockDriverState *bs, Error **errp)
+ #endif
+ 
+     backing = bdrv_new_open_driver(&vvfat_write_target, NULL, BDRV_O_ALLOW_RDWR,
+-                                   &error_abort);
++                                   NULL, &error_abort);
+     *(void**) backing->opaque = s;
+ 
+     bdrv_set_backing_hd(s->bs, backing, &error_abort);
 -- 
 2.11.0
