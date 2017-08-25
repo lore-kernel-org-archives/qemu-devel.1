@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1dlCgE-0000Gn-28
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:21:41 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dlChP-0001HE-Ue
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:22:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1dlCgD-0007Fj-9h
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:21:38 -0400
-References: <1503066227-18251-1-git-send-email-gengdongjiu@huawei.com>
-	<1503066227-18251-4-git-send-email-gengdongjiu@huawei.com>
-	<599ECEF3.80001@huawei.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <6afc4dfa-5ad1-8df1-7dce-4704a796d8aa@huawei.com>
-Date: Fri, 25 Aug 2017 19:20:57 +0800
-MIME-Version: 1.0
-In-Reply-To: <599ECEF3.80001@huawei.com>
-Content-Type: text/plain; charset="windows-1252"
+	(envelope-from <kraxel@redhat.com>) id 1dlChM-0007rC-PF
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:22:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41006)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dlChM-0007qx-IT
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:22:48 -0400
+Message-ID: <1503660166.9107.6.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri, 25 Aug 2017 13:22:46 +0200
+In-Reply-To: <cd7ebf5c-6d81-6cdf-f6b2-87af4cb00f85@redhat.com>
+References: <20170824091907.17676-1-kraxel@redhat.com>
+	<cd7ebf5c-6d81-6cdf-f6b2-87af4cb00f85@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 3/6] ACPI: build and enable APEI GHES
- in the Makefile and configuration
+Subject: Re: [Qemu-devel] [PATCH] vga: stop passing pointers to
+ vga_draw_line* functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,49 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shannon Zhao <zhaoshenglong@huawei.com>, lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org, edk2-devel@lists.01.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, will.deacon@arm.com, james.morse@arm.com, tbaicar@codeaurora.org, ard.biesheuvel@linaro.org, mingo@kernel.org, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, devel@acpica.org, john.garry@huawei.com, jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com, huangdaode@hisilicon.com, wangzhou1@hisilicon.com
-Cc: huangshaoyu@huawei.com, wuquanming@huawei.com, linuxarm@huawei.com, zhengqiang10@huawei.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: d@vidbuchanan.co.uk, P J P <ppandit@redhat.com>
 
+  Hi,
 
+> s/simliar/similar/
+> s/priviledged/privileged/
 
-On 2017/8/24 21:04, Shannon Zhao wrote:
-> 
-> 
-> On 2017/8/18 22:23, Dongjiu Geng wrote:
->> Add CONFIG_ACPI_APEI configuration in the Makefile and
->> enable it in the arm-softmmu.mak
->>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> ---
->>  default-configs/arm-softmmu.mak | 1 +
->>  hw/acpi/Makefile.objs           | 1 +
->>  2 files changed, 2 insertions(+)
->>
->> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
->> index bbdd3c1..c362113 100644
->> --- a/default-configs/arm-softmmu.mak
->> +++ b/default-configs/arm-softmmu.mak
->> @@ -129,3 +129,4 @@ CONFIG_ACPI=y
->>  CONFIG_SMBIOS=y
->>  CONFIG_ASPEED_SOC=y
->>  CONFIG_GPIO_KEY=y
->> +CONFIG_ACPI_APEI=y
->> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
->> index 11c35bc..bafb148 100644
->> --- a/hw/acpi/Makefile.objs
->> +++ b/hw/acpi/Makefile.objs
->> @@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
->>  common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
->>  common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
->>  common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
->> +common-obj-$(CONFIG_ACPI_APEI) += hest_ghes.o
->>  common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
->>  
->>  common-obj-y += acpi_interface.o
->>
-> Fold this patch into previous one.
-Ok, thanks
+Fixed.
 
+> > a segfault, when hitting the guard page after vga memory
+> > allocation, while reading vga memory for display updates.
+> > 
+> > Fixes: CVE-2017-xxxx
 > 
-> Thanks,
-> 
+> Do we have the actual number?
+
+Not yet, pjp still busy getting one, but will be filled for the final
+version of the patch.
+
+> Are we trying to get this in 2.10-rc4, or
+> is it merely 2.11 + qemu-stable (2.10.1) material?
+
+IMO it isn't critical enough to squeeze the non-trivial patch into 2.10
+the last minute, so qemu-stable.
+
+cheers,
+  Gerd
