@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dlFr6-0004na-SR
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:45:05 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dlFtp-0005xU-4P
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:47:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dlFr5-0005GJ-RY
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:45:04 -0400
-Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:37300)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dlFr5-0005G7-MU
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:45:03 -0400
-Received: by mail-vk0-x242.google.com with SMTP id z187so393vkd.4
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 07:45:03 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1dlFtl-0006bH-Uz
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:47:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52528)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dlFtl-0006ap-LL
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:47:49 -0400
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Fri, 25 Aug 2017 16:47:40 +0200
+Message-Id: <1503672460-109436-1-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1503592308-93913-7-git-send-email-imammedo@redhat.com>
+References: <1503592308-93913-7-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<1503471071-2233-4-git-send-email-peterx@redhat.com>
-In-Reply-To: <1503471071-2233-4-git-send-email-peterx@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 25 Aug 2017 14:44:51 +0000
-Message-ID: <CAJ+F1C+KJeybUvit4xmK_k3zbJ50sxXq6wVcECMjSLpJLwbn0A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 3/8] char-io: fix possible risk on
- IOWatchPoll
+Subject: [Qemu-devel] [PATCH for-2.11 v4 06/25] sparc: make cpu feature
+ parsing property based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,83 +27,308 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, mdroth@linux.vnet.ibm.com, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Wed, Aug 23, 2017 at 8:54 AM Peter Xu <peterx@redhat.com> wrote:
+with features converted to properties we can use the same
+approach as x86 for features parsing and drop legacy
+approach that manipulated CPU instance directly.
+New sparc_cpu_parse_features() will allow only +-feat
+and explicitly disable feat=3Don|off syntax for now.
 
-> This is not a problem if we are only having one single loop thread like
-> before.  However, after per-monitor thread is introduced, this is not
-> true any more, and the risk can happen.
->
-> The risk can be triggered with "make check -j8" sometimes:
->
->   qemu-system-x86_64: /root/git/qemu/chardev/char-io.c:91:
->   io_watch_poll_finalize: Assertion `iwp->src =3D=3D NULL' failed.
->
-> This patch keeps the reference for the watch object when creating in
-> io_add_watch_poll(), so that the object will never be released in the
-> context main loop, especially when the context loop is running in
-> another standalone thread.  Meanwhile, when we want to remove the watch
-> object, we always first detach the watch object from its owner context,
-> then we continue with the cleanup.
->
-> Without this patch, calling io_remove_watch_poll() in main loop thread
-> is not thread-safe, since the other per-monitor thread may be modifying
-> the watch object at the same time.
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
->
+With that in place and sparc_cpu_parse_features() providing
+generic CPUClass::parse_features callback, the cpu_sparc_init()
+will do the same job as cpu_generic_init() so replace content
+of cpu_sparc_init() with it.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
+CC: Riku Voipio <riku.voipio@iki.fi>
+CC: Laurent Vivier <laurent@vivier.eu>
+CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+CC: Artyom Tarasenko <atar4qemu@gmail.com>
+CC: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+CC: Eduardo Habkost <ehabkost@redhat.com>
 
+v4:
+  * add comment why feat=3Don|off isn't supported
+  * drop un-needed NULL check before freeing GList
+v3:
+  * drop cpu_legacy_parse_featurestr() and reimplement
+    sparc_cpu_parse_features() similar to x86 parser
+    but without x86 baggage.
+v2:
+  * use new cpu_legacy_parse_featurestr() without
+    plus_features/minus_features
+  * drop cpu_legacy_apply_features() as it's been removed in
+    previuos patch and new cpu_legacy_parse_featurestr()
+    does its job
+---
+ target/sparc/cpu.c | 215 ++++++++++++++++++++---------------------------=
+------
+ 1 file changed, 82 insertions(+), 133 deletions(-)
 
-
-> ---
->  chardev/char-io.c | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
->
-> diff --git a/chardev/char-io.c b/chardev/char-io.c
-> index f810524..5c52c40 100644
-> --- a/chardev/char-io.c
-> +++ b/chardev/char-io.c
-> @@ -122,7 +122,6 @@ GSource *io_add_watch_poll(Chardev *chr,
->      g_free(name);
->
->      g_source_attach(&iwp->parent, context);
-> -    g_source_unref(&iwp->parent);
->      return (GSource *)iwp;
->  }
->
-> @@ -131,12 +130,24 @@ static void io_remove_watch_poll(GSource *source)
->      IOWatchPoll *iwp;
->
->      iwp =3D io_watch_poll_from_source(source);
-> +
-> +    /*
-> +     * Here the order of destruction really matters.  We need to first
-> +     * detach the IOWatchPoll object from the context (which may still
-> +     * be running in another loop thread), only after that could we
-> +     * continue to operate on iwp->src, or there may be risk condition
-> +     * between current thread and the context loop thread.
-> +     *
-> +     * Let's blame the glib bug mentioned in commit 2b3167 (again) for
-> +     * this extra complexity.
-> +     */
-> +    g_source_destroy(&iwp->parent);
->      if (iwp->src) {
->          g_source_destroy(iwp->src);
->          g_source_unref(iwp->src);
->          iwp->src =3D NULL;
->      }
-> -    g_source_destroy(&iwp->parent);
-> +    g_source_unref(&iwp->parent);
->  }
->
->  void remove_fd_in_watch(Chardev *chr)
-> --
-> 2.7.4
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+index 9dfc150..29296b2 100644
+--- a/target/sparc/cpu.c
++++ b/target/sparc/cpu.c
+@@ -104,50 +104,99 @@ static void cpu_sparc_disas_set_info(CPUState *cpu,=
+ disassemble_info *info)
+ #endif
+ }
+=20
+-static void sparc_cpu_parse_features(CPUState *cs, char *features,
+-                                     Error **errp);
++static void
++cpu_add_feat_as_prop(const char *typename, const char *name, const char =
+*val)
++{
++    GlobalProperty *prop =3D g_new0(typeof(*prop), 1);
++    prop->driver =3D typename;
++    prop->property =3D g_strdup(name);
++    prop->value =3D g_strdup(val);
++    prop->errp =3D &error_fatal;
++    qdev_prop_register_global(prop);
++}
+=20
+-static int cpu_sparc_register(SPARCCPU *cpu, const char *cpu_model)
++/* Parse "+feature,-feature,feature=3Dfoo" CPU feature string */
++static void sparc_cpu_parse_features(const char *typename, char *feature=
+s,
++                                     Error **errp)
+ {
+-    char *s =3D g_strdup(cpu_model);
+-    char *featurestr =3D strtok(s, ",");
+-    Error *err =3D NULL;
++    GList *l, *plus_features =3D NULL, *minus_features =3D NULL;
++    char *featurestr; /* Single 'key=3Dvalue" string being parsed */
++    static bool cpu_globals_initialized;
+=20
+-    featurestr =3D strtok(NULL, ",");
+-    sparc_cpu_parse_features(CPU(cpu), featurestr, &err);
+-    g_free(s);
+-    if (err) {
+-        error_report_err(err);
+-        return -1;
++    if (cpu_globals_initialized) {
++        return;
+     }
++    cpu_globals_initialized =3D true;
+=20
+-    return 0;
+-}
++    if (!features) {
++        return;
++    }
+=20
+-SPARCCPU *cpu_sparc_init(const char *cpu_model)
+-{
+-    SPARCCPU *cpu;
+-    ObjectClass *oc;
+-    char *str, *name;
++    for (featurestr =3D strtok(features, ",");
++         featurestr;
++         featurestr =3D strtok(NULL, ",")) {
++        const char *name;
++        const char *val =3D NULL;
++        char *eq =3D NULL;
+=20
+-    str =3D g_strdup(cpu_model);
+-    name =3D strtok(str, ",");
+-    oc =3D cpu_class_by_name(TYPE_SPARC_CPU, name);
+-    g_free(str);
+-    if (oc =3D=3D NULL) {
+-        return NULL;
+-    }
++        /* Compatibility syntax: */
++        if (featurestr[0] =3D=3D '+') {
++            plus_features =3D g_list_append(plus_features,
++                                          g_strdup(featurestr + 1));
++            continue;
++        } else if (featurestr[0] =3D=3D '-') {
++            minus_features =3D g_list_append(minus_features,
++                                           g_strdup(featurestr + 1));
++            continue;
++        }
+=20
+-    cpu =3D SPARC_CPU(object_new(object_class_get_name(oc)));
++        eq =3D strchr(featurestr, '=3D');
++        name =3D featurestr;
++        if (eq) {
++            *eq++ =3D 0;
++            val =3D eq;
++
++            /*
++             * Temporarily, only +feat/-feat will be supported
++             * for boolean properties until we remove the
++             * minus-overrides-plus semantics and just follow
++             * the order options appear on the command-line.
++             *
++             * TODO: warn if user is relying on minus-override-plus sema=
+ntics
++             * TODO: remove minus-override-plus semantics after
++             *       warning for a few releases
++             */
++            if (!strcasecmp(val, "on") ||
++                !strcasecmp(val, "off") ||
++                !strcasecmp(val, "true") ||
++                !strcasecmp(val, "false")) {
++                error_setg(errp, "Boolean properties in format %s=3D%s"
++                                 " are not supported", name, val);
++                return;
++            }
++        } else {
++            error_setg(errp, "Unsupported property format: %s", name);
++            return;
++        }
++        cpu_add_feat_as_prop(typename, name, val);
++    }
+=20
+-    if (cpu_sparc_register(cpu, cpu_model) < 0) {
+-        object_unref(OBJECT(cpu));
+-        return NULL;
++    for (l =3D plus_features; l; l =3D l->next) {
++        const char *name =3D l->data;
++        cpu_add_feat_as_prop(typename, name, "on");
+     }
++    g_list_free_full(plus_features, g_free);
+=20
+-    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
++    for (l =3D minus_features; l; l =3D l->next) {
++        const char *name =3D l->data;
++        cpu_add_feat_as_prop(typename, name, "off");
++    }
++    g_list_free_full(minus_features, g_free);
++}
+=20
+-    return cpu;
++SPARCCPU *cpu_sparc_init(const char *cpu_model)
++{
++    return SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+ }
+=20
+ void cpu_sparc_set_id(CPUSPARCState *env, unsigned int cpu)
+@@ -528,107 +577,6 @@ static void print_features(FILE *f, fprintf_functio=
+n cpu_fprintf,
+     }
+ }
+=20
+-static void add_flagname_to_bitmaps(const char *flagname, uint32_t *feat=
+ures)
+-{
+-    unsigned int i;
+-
+-    for (i =3D 0; i < ARRAY_SIZE(feature_name); i++) {
+-        if (feature_name[i] && !strcmp(flagname, feature_name[i])) {
+-            *features |=3D 1 << i;
+-            return;
+-        }
+-    }
+-    error_report("CPU feature %s not found", flagname);
+-}
+-
+-static void sparc_cpu_parse_features(CPUState *cs, char *features,
+-                                     Error **errp)
+-{
+-    SPARCCPU *cpu =3D SPARC_CPU(cs);
+-    sparc_def_t *cpu_def =3D &cpu->env.def;
+-    char *featurestr;
+-    uint32_t plus_features =3D 0;
+-    uint32_t minus_features =3D 0;
+-    uint64_t iu_version;
+-    uint32_t fpu_version, mmu_version, nwindows;
+-
+-    featurestr =3D features ? strtok(features, ",") : NULL;
+-    while (featurestr) {
+-        char *val;
+-
+-        if (featurestr[0] =3D=3D '+') {
+-            add_flagname_to_bitmaps(featurestr + 1, &plus_features);
+-        } else if (featurestr[0] =3D=3D '-') {
+-            add_flagname_to_bitmaps(featurestr + 1, &minus_features);
+-        } else if ((val =3D strchr(featurestr, '=3D'))) {
+-            *val =3D 0; val++;
+-            if (!strcmp(featurestr, "iu_version")) {
+-                char *err;
+-
+-                iu_version =3D strtoll(val, &err, 0);
+-                if (!*val || *err) {
+-                    error_setg(errp, "bad numerical value %s", val);
+-                    return;
+-                }
+-                cpu_def->iu_version =3D iu_version;
+-#ifdef DEBUG_FEATURES
+-                fprintf(stderr, "iu_version %" PRIx64 "\n", iu_version);
+-#endif
+-            } else if (!strcmp(featurestr, "fpu_version")) {
+-                char *err;
+-
+-                fpu_version =3D strtol(val, &err, 0);
+-                if (!*val || *err) {
+-                    error_setg(errp, "bad numerical value %s", val);
+-                    return;
+-                }
+-                cpu_def->fpu_version =3D fpu_version;
+-#ifdef DEBUG_FEATURES
+-                fprintf(stderr, "fpu_version %x\n", fpu_version);
+-#endif
+-            } else if (!strcmp(featurestr, "mmu_version")) {
+-                char *err;
+-
+-                mmu_version =3D strtol(val, &err, 0);
+-                if (!*val || *err) {
+-                    error_setg(errp, "bad numerical value %s", val);
+-                    return;
+-                }
+-                cpu_def->mmu_version =3D mmu_version;
+-#ifdef DEBUG_FEATURES
+-                fprintf(stderr, "mmu_version %x\n", mmu_version);
+-#endif
+-            } else if (!strcmp(featurestr, "nwindows")) {
+-                char *err;
+-
+-                nwindows =3D strtol(val, &err, 0);
+-                if (!*val || *err || nwindows > MAX_NWINDOWS ||
+-                    nwindows < MIN_NWINDOWS) {
+-                    error_setg(errp, "bad numerical value %s", val);
+-                    return;
+-                }
+-                cpu_def->nwindows =3D nwindows;
+-#ifdef DEBUG_FEATURES
+-                fprintf(stderr, "nwindows %d\n", nwindows);
+-#endif
+-            } else {
+-                error_setg(errp, "unrecognized feature %s", featurestr);
+-                return;
+-            }
+-        } else {
+-            error_setg(errp, "feature string `%s' not in format "
+-                             "(+feature|-feature|feature=3Dxyz)", featur=
+estr);
+-            return;
+-        }
+-        featurestr =3D strtok(NULL, ",");
+-    }
+-    cpu_def->features |=3D plus_features;
+-    cpu_def->features &=3D ~minus_features;
+-#ifdef DEBUG_FEATURES
+-    print_features(stderr, fprintf, cpu_def->features, NULL);
+-#endif
+-}
+-
+ void sparc_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+ {
+     unsigned int i;
+@@ -931,6 +879,7 @@ static void sparc_cpu_class_init(ObjectClass *oc, voi=
+d *data)
+     cc->reset =3D sparc_cpu_reset;
+=20
+     cc->class_by_name =3D sparc_cpu_class_by_name;
++    cc->parse_features =3D sparc_cpu_parse_features;
+     cc->has_work =3D sparc_cpu_has_work;
+     cc->do_interrupt =3D sparc_cpu_do_interrupt;
+     cc->cpu_exec_interrupt =3D sparc_cpu_exec_interrupt;
+--=20
+2.7.4
