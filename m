@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dlEgF-00031c-5i
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:29:48 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dlEgG-00037B-Rp
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:29:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dlEgD-0005mL-Jt
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:29:47 -0400
-Date: Fri, 25 Aug 2017 23:28:00 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dlEgD-0005mc-Ni
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:29:48 -0400
+Date: Fri, 25 Aug 2017 23:24:11 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170825132800.GM2772@umbus.fritz.box>
+Message-ID: <20170825132411.GL2772@umbus.fritz.box>
 References: <1503562911-2776-1-git-send-email-imammedo@redhat.com>
-	<1503562911-2776-3-git-send-email-imammedo@redhat.com>
-	<20170825013819.GQ5379@umbus.fritz.box>
-	<20170825092740.239b6a82@nial.brq.redhat.com>
-	<20170825094538.GI2772@umbus.fritz.box>
-	<20170825134007.73d69fa3@nial.brq.redhat.com>
+	<1503562911-2776-2-git-send-email-imammedo@redhat.com>
+	<20170825013047.GP5379@umbus.fritz.box>
+	<20170825092822.2f987391@nial.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="DheUW4aQn8WJk6WR"
+	protocol="application/pgp-signature"; boundary="UUBKWyapWpFAak7q"
 Content-Disposition: inline
-In-Reply-To: <20170825134007.73d69fa3@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11 2/6] ppc: make cpu_model
- translation to type consistent
+In-Reply-To: <20170825092822.2f987391@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11 1/6] ppc: use macros to make cpu
+ type name from string literal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,124 +28,157 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
 
 
---DheUW4aQn8WJk6WR
-Content-Type: text/plain; charset=utf-8
+--UUBKWyapWpFAak7q
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 25, 2017 at 01:40:07PM +0200, Igor Mammedov wrote:
-> On Fri, 25 Aug 2017 19:45:38 +1000
+On Fri, Aug 25, 2017 at 09:28:22AM +0200, Igor Mammedov wrote:
+> On Fri, 25 Aug 2017 11:30:47 +1000
 > David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
-> > On Fri, Aug 25, 2017 at 09:27:40AM +0200, Igor Mammedov wrote:
-> > > On Fri, 25 Aug 2017 11:38:19 +1000
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > >  =20
-> > > > On Thu, Aug 24, 2017 at 10:21:47AM +0200, Igor Mammedov wrote: =20
-> > > > > PPC handles -cpu FOO rather incosistently,
-> > > > > i.e. it does case-insensitive matching of FOO to
-> > > > > a CPU type (see: ppc_cpu_compare_class_name) but
-> > > > > handles alias names as case-sensitive, as result:
-> > > > >=20
-> > > > >  # qemu-system-ppc64 -M mac99 -cpu g3
-> > > > >  qemu-system-ppc64: unable to find CPU model ' kN=EF=BF=BDU'
-> > > > >=20
-> > > > >  # qemu-system-ppc64 -cpu 970MP_V1.1
-> > > > >  qemu-system-ppc64: Unable to find sPAPR CPU Core definition
-> > > > >=20
-> > > > > while
-> > > > >=20
-> > > > >  # qemu-system-ppc64 -M mac99 -cpu G3
-> > > > >  # qemu-system-ppc64 -cpu 970MP_v1.1
-> > > > >=20
-> > > > > start up just fine.
-> > > > >=20
-> > > > > Considering we can't take case-insensitive matching away,
-> > > > > make it case-insensitive for  all alias/type/core_type
-> > > > > lookups.
-> > > > >=20
-> > > > > As side effect it allows to remove duplicate core types
-> > > > > which are the same but use lower-case letters in name.
-> > > > >=20
-> > > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>   =20
-> > > >=20
-> > > > Hmm.  So, I'm certainly good with making the matching more consiste=
-nt,
-> > > > and removing extra entries differing only in case.
-> > > >=20
-> > > > However, I don't like capitalizing everything in the model table.  =
-The
-> > > > "canonical" capitalization - as in how it appears in manuals and
-> > > > marketing info - is quite frequently mixed case.  So I think making
-> > > > everything caps in the table will make it harder to read in the
-> > > > context of looking at the corresponding documentation. =20
-> > > only cpu models =3D> typenames are made caps, the rest =20
-> >=20
-> > Yes, I know.  A number of the CPU model names themselves have mixed
-> > case.  Really.
-> >=20
-> > > incl. description is kept as is in mixed case.
-> > > It looks like _desc is the thing one would use for
-> > > 1:1 lookup in spec, while _name isn't direct match consistently
-> > > (i.e. sometimes it skips spaces and sometimes spaces are replaced by =
-underscore).
-> > > So keeping _name in mixed case unnecessarily complicates name->type l=
-ookup.
+> > On Thu, Aug 24, 2017 at 10:21:46AM +0200, Igor Mammedov wrote:
+> > > Replace
+> > >   "-" TYPE_POWERPC_CPU
+> > > when composing cpu type name from cpu model string literal
+> > > and the same pattern in format strings with
+> > >  POWERPC_CPU_TYPE_SUFFIX and POWERPC_CPU_TYPE_NAME(model)
+> > > macroses like we do in x86.
 > > >=20
-> > > These mixed case + case-insensitive is what made lookup
-> > > code over-engineered and overly complex. =20
+> > > Later POWERPC_CPU_TYPE_NAME() will be used to define default
+> > > cpu type per machine type and as bonus it will be consistent
+> > > and easy grep-able pattern across all other targets that I'm
+> > > plannig to treat the same way.
+> > >=20
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com> =20
 > >=20
-> > I'm fine with making all the lookups case insensitive.  I just don't
-> > want to drop the case on the names in the actual code.
-> I've tried to find a way but considering that names are statically
-> 'converted' into typenames and lack of ability to magically
-> uppercase them with preprocessor, I've gave up on this approach.
+> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> >=20
+> > I'm assuming you'll stage this for 2.11.
+> I've been hoping that it would go via your tree
 
-Ok.
+Ok, I can do that if you prefer.
 
-> Providing that there is _desc with model name that should be
-> greppable in spec and complexity of lookup code that mixed-cased
-> typenames incur, I've opted in favor of simplifying lookup
-> code at expense uniform typenames (which is inter QEMU thingy).
-> It is easier to maintain and less chances to make mistake.
-
-Yeah, I guess.  It just looks weird to have non-standard capsing in
-the table field.
-
-Any chance we could standardize on lowercase rather than upper - for
-some reason that would seem less odd to me (I guess because C-ish
-names and identifiers are usually lowercased).
-
-> Other targets use exact match for cpu_model so whether
-> they use mixed casing or not doesn't matter.
 >=20
-> > > As result it evolved (regressed) to inconsistent name handling
-> > > since it's rather hard to understand what's going on there. =20
 > >=20
-> > Yeah, I know :/.
+> > > ---
+> > >  target/ppc/cpu.h            | 3 +++
+> > >  target/ppc/kvm_ppc.h        | 2 +-
+> > >  target/ppc/cpu-models.c     | 2 +-
+> > >  target/ppc/kvm.c            | 2 +-
+> > >  target/ppc/translate_init.c | 6 +++---
+> > >  5 files changed, 9 insertions(+), 6 deletions(-)
+> > >=20
+> > > diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> > > index 12f0949..0512393 100644
+> > > --- a/target/ppc/cpu.h
+> > > +++ b/target/ppc/cpu.h
+> > > @@ -1354,6 +1354,9 @@ int ppc_dcr_write (ppc_dcr_t *dcr_env, int dcrn=
+, uint32_t val);
+> > > =20
+> > >  #define cpu_init(cpu_model) cpu_generic_init(TYPE_POWERPC_CPU, cpu_m=
+odel)
+> > > =20
+> > > +#define POWERPC_CPU_TYPE_SUFFIX "-" TYPE_POWERPC_CPU
+> > > +#define POWERPC_CPU_TYPE_NAME(model) model POWERPC_CPU_TYPE_SUFFIX
+> > > +
+> > >  #define cpu_signal_handler cpu_ppc_signal_handler
+> > >  #define cpu_list ppc_cpu_list
+> > > =20
+> > > diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> > > index 6bc6fb3..bcb40f2 100644
+> > > --- a/target/ppc/kvm_ppc.h
+> > > +++ b/target/ppc/kvm_ppc.h
+> > > @@ -9,7 +9,7 @@
+> > >  #ifndef KVM_PPC_H
+> > >  #define KVM_PPC_H
+> > > =20
+> > > -#define TYPE_HOST_POWERPC_CPU "host-" TYPE_POWERPC_CPU
+> > > +#define TYPE_HOST_POWERPC_CPU POWERPC_CPU_TYPE_NAME("host")
+> > > =20
+> > >  #ifdef CONFIG_KVM
+> > > =20
+> > > diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
+> > > index 4d3e635..8b27962 100644
+> > > --- a/target/ppc/cpu-models.c
+> > > +++ b/target/ppc/cpu-models.c
+> > > @@ -51,7 +51,7 @@
+> > >                                                                      =
+        \
+> > >      static const TypeInfo                                           =
+        \
+> > >      glue(POWERPC_DEF_PREFIX(_pvr, _svr, _type), _cpu_type_info) =3D =
+{         \
+> > > -        .name       =3D _name "-" TYPE_POWERPC_CPU,                 =
+          \
+> > > +        .name       =3D POWERPC_CPU_TYPE_NAME(_name),               =
+            \
+> > >          .parent     =3D stringify(_type) "-family-" TYPE_POWERPC_CPU=
+,         \
+> > >          .class_init =3D                                             =
+          \
+> > >              glue(POWERPC_DEF_PREFIX(_pvr, _svr, _type), _cpu_class_i=
+nit),   \
+> > > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> > > index 8571379..8590809 100644
+> > > --- a/target/ppc/kvm.c
+> > > +++ b/target/ppc/kvm.c
+> > > @@ -2484,7 +2484,7 @@ static int kvm_ppc_register_host_cpu_type(void)
+> > >              char *suffix;
+> > > =20
+> > >              ppc_cpu_aliases[i].model =3D g_strdup(object_class_get_n=
+ame(oc));
+> > > -            suffix =3D strstr(ppc_cpu_aliases[i].model, "-"TYPE_POWE=
+RPC_CPU);
+> > > +            suffix =3D strstr(ppc_cpu_aliases[i].model, POWERPC_CPU_=
+TYPE_SUFFIX);
+> > >              if (suffix) {
+> > >                  *suffix =3D 0;
+> > >              }
+> > > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> > > index 43be9a8..f377cf2 100644
+> > > --- a/target/ppc/translate_init.c
+> > > +++ b/target/ppc/translate_init.c
+> > > @@ -10185,7 +10185,7 @@ static gint ppc_cpu_compare_class_name(gconst=
+pointer a, gconstpointer b)
+> > >      if (strncasecmp(name, object_class_get_name(oc), strlen(name)) =
+=3D=3D 0 &&
+> > >          ppc_cpu_is_valid(pcc) &&
+> > >          strcmp(object_class_get_name(oc) + strlen(name),
+> > > -               "-" TYPE_POWERPC_CPU) =3D=3D 0) {
+> > > +               POWERPC_CPU_TYPE_SUFFIX) =3D=3D 0) {
+> > >          return 0;
+> > >      }
+> > >      return -1;
+> > > @@ -10327,7 +10327,7 @@ static void ppc_cpu_list_entry(gpointer data,=
+ gpointer user_data)
+> > >      }
+> > > =20
+> > >      name =3D g_strndup(typename,
+> > > -                     strlen(typename) - strlen("-" TYPE_POWERPC_CPU)=
+);
+> > > +                     strlen(typename) - strlen(POWERPC_CPU_TYPE_SUFF=
+IX));
+> > >      (*s->cpu_fprintf)(s->file, "PowerPC %-16s PVR %08x\n",
+> > >                        name, pcc->pvr);
+> > >      for (i =3D 0; ppc_cpu_aliases[i].alias !=3D NULL; i++) {
+> > > @@ -10388,7 +10388,7 @@ static void ppc_cpu_defs_entry(gpointer data,=
+ gpointer user_data)
+> > >      typename =3D object_class_get_name(oc);
+> > >      info =3D g_malloc0(sizeof(*info));
+> > >      info->name =3D g_strndup(typename,
+> > > -                           strlen(typename) - strlen("-" TYPE_POWERP=
+C_CPU));
+> > > +                           strlen(typename) - strlen(POWERPC_CPU_TYP=
+E_SUFFIX));
+> > > =20
+> > >      entry =3D g_malloc0(sizeof(*entry));
+> > >      entry->value =3D info; =20
 > >=20
-> > > > Can we instead retain mixed case in the table, and capitalize both
-> > > > sides at the comparison time? =20
-> > > it has to be the same-case since PPC has case-insensitive cpu_model
-> > > matching (sometimes :/). Normalized /same case/ typenames
-> > > are necessary for object_class_by_name() to work as it does exact mat=
-ch.
-> > > So it would be possible to replace custom fetching of CPU types
-> > > and iterating over it with custom comparator with object_class_by_nam=
-e().
-> > > As it's done in 4/6.
-> > > This patch and 3/6 are only preparatory patches for 4/6. =20
-> >=20
-> > Ah.  Hrm.  That's awkward.
-> It's fine to squash all 3 in 1 patch, but then it becomes huge and
-> unreview-able, as logic changes are buried within names normalization.
-
-Sorry, I meant it's awkward that that object_class_by_name() uses exact
-and so we'd need a custom iterator to do a case insensitive search.
-The patch structure is fine.
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -155,24 +186,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---DheUW4aQn8WJk6WR
+--UUBKWyapWpFAak7q
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmgJeAACgkQbDjKyiDZ
-s5LbeRAAhetWvMZX+p2hr82cYKKhAHfkQvbBC2xUHwJkCvBLMSvFJ8sqG/mFPaQN
-YsJy0LCPecbEqM4w5vsZ7xSwRyQQS19XZdgpq9VCLt+1Hkq1OGEWB6FiotW9RSAN
-PhDgA+zJEv1Zb0jwTF0ohK+MiX0YSrlNlAXXJ5bNpF9ON/TSXvc08IbEJzCsk4LP
-DqhIjR5GKXNenT3xOh+mfIdd/2oDJTugmXG5BXYRXr4LS/CVAh74q2+rqpEKACke
-KnzvilfrhivPCZPg8ZjCxR//QFvwyoEqyB1le6mfBM4GyZxvMOdtJ/sbeIst+v5y
-y/RcZT2lmU2RJqW1b1+kuwrw9SD8L4yUgJAJ+vUaPiZ5+Gr70gXjkQI4lYkKJnrU
-WjigKea3A4Yx870OlTKvzFyPO99P0C0CN1Sr97A+RUwzqGzwuiD4jBrFpVshiym6
-k5bwHTKYwh+K4cmkLMeiADoneKt2OVKyU2QFWCRXlLsYbi/VGpJJDr4jAAuNIzIQ
-Su6T839iruvRGDKUzNyZGvLztVgkNeVnPuI4rXYBZWnKOcJjn63jeLYpVehdeuOf
-HlVvVLZ9bG+6zuOpVuP0qvrhIhsr0Lz0+i9viuNUXL4D/YlfXTmztBNeZyXaqjvL
-/W2Gdj2ZmPMbEiYfe6bq7ZU3lgYi9bf1F2bBvBljy0BXugdtLF8=
-=ouvS
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmgJPsACgkQbDjKyiDZ
+s5LK2g/5AcqEueSoz6Xzp4N8TMa4zgzIA/JGk+0pbOXYDeJiR/hQz4Aou4kVvxK/
+KzQlXABc3nQeYQVPEYfMYnlp9BVukGyuzJ5gtbUNN3QfD9+3F6y4GaGkocngPnR/
+ibSRmQb3FaPZ0+el5aVG4j68TZz8L9MiAJC47ImV7BjBRWybSg9Ed2Grr2T8ZOue
+jzJrhyfLfLh1uyL0fcMujce6M5410wnq2fZRJwbZSuH/p6mg5hudYRsmuYIyUE3f
+RX9eKuUsJZxC6VWKAflgjO6/ojmtccxrucjuCncgYFqhYNmYOkSlgpfvUXgJiTez
+N4dNN2VVI698Ny8kVLrv9wFJgaop9LXojctt8zS2iBCDNJ+yLA3mSHROgzm1OnVG
+1lgKrwyaH2iHQobJPqbApMlU4VC7ijAFYC8dSX3atdV8nbHbWgLdCdc59EmJeTGh
+p0o/ekhNebGBwPPVz1MVlW1UGRTO1HQtaABQ3kkjJ4irR2DJS6JboxwX4nrry+Y3
+Sa/Cm+A/zOWCfe8nvIFB2yU20iAOfY4IVVXGqJX290Zr2RR1VAXxSu0TYRujfJye
+f0ST1WYzrqAhqR5ePognv3SFcOt0e3e8HniGfsRCTp5yFyJiUIMLCmznVQebamwI
+dMs7k+0BodL4LNWzWxUwjXux7bZ9SKeI5UtAZC11jK2EJDA1DVw=
+=1i8Q
 -----END PGP SIGNATURE-----
 
---DheUW4aQn8WJk6WR--
+--UUBKWyapWpFAak7q--
