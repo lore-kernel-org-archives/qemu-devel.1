@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dl98a-0004A6-Kt
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 03:34:41 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dl98p-0004pD-Nk
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 03:34:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dl98W-0002mx-Hi
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 03:34:40 -0400
-Date: Fri, 25 Aug 2017 09:34:32 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170825093432.6e0d4512@nial.brq.redhat.com>
-In-Reply-To: <20170825041208.GA2772@umbus.fritz.box>
-References: <1503562911-2776-1-git-send-email-imammedo@redhat.com>
-	<1503562911-2776-5-git-send-email-imammedo@redhat.com>
-	<20170825041208.GA2772@umbus.fritz.box>
+	(envelope-from <pbonzini@redhat.com>) id 1dl98l-0002qq-HV
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 03:34:55 -0400
+Received: from mail-wr0-f177.google.com ([209.85.128.177]:38037)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dl98l-0002qf-BB
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 03:34:51 -0400
+Received: by mail-wr0-f177.google.com with SMTP id o76so2777561wrb.5
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 00:34:51 -0700 (PDT)
+References: <150360081780.16351.6836234147404830593@loki>
+	<1a05478e-b75d-c149-eaf3-b00b4cf4a4e2@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a16b8102-bbfc-5c74-0e34-89addf786160@redhat.com>
+Date: Fri, 25 Aug 2017 09:34:46 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1a05478e-b75d-c149-eaf3-b00b4cf4a4e2@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.11 4/6] ppc: replace inter-function
- cyclic dependency/recurssion with 2 simple lookups
+Subject: Re: [Qemu-devel] [ANNOUNCE] QEMU 2.10.0-rc4 is now available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,106 +30,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Laszlo Ersek <lersek@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: peter.maydell@linaro.org, Hannes Reinecke <hare@suse.de>, qemu-devel@nongnu.org
 
-On Fri, 25 Aug 2017 14:12:08 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Thu, Aug 24, 2017 at 10:21:49AM +0200, Igor Mammedov wrote:
-> > previous patches cleaned up cpu model/alias naming which
-> > allows to simplify cpu model/alias to cpu type lookup a bit
-> > byt removing recurssion and dependency of ppc_cpu_class_by_name() /
-> > ppc_cpu_class_by_alias() on each other.
-> > Besides of simplifying code it reduces it by ~15LOC.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
+On 24/08/2017 21:06, Laszlo Ersek wrote:
+> On 08/24/17 20:53, Michael Roth wrote:
+>> Hello,
+>>
+>> On behalf of the QEMU Team, I'd like to announce the availability of the
+>> fifth release candidate for the QEMU 2.10 release.  This release is meant
+>> for testing purposes and should not be used in a production environment.
+>>
+>>   http://download.qemu-project.org/qemu-2.10.0-rc4.tar.xz
+>>   http://download.qemu-project.org/qemu-2.10.0-rc4.tar.xz.sig
+>>
+>> A note from the maintainer:
+>>
+>>   This release contains last minute fixes for some bugs affecting
+>>   PowerPC hosts and also for bugs in the QEMU network block device code.
+>>   Any final testing should therefore be concentrated on these areas.
+>>   We plan to make the final release of QEMU 2.10 on Wednesday 30th
+>>   August.
+>>   
+>>   (30th August happens to be my birthday, but this is purely
+>>   coincidental :-))
+>>
+>> You can help improve the quality of the QEMU 2.10 release by testing this
+>> release and reporting bugs on Launchpad:
+>>
+>>   https://bugs.launchpad.net/qemu/
+>>
+>> The release plan, as well a documented known issues for release
+>> candidates, are available at:
+>>
+>>   http://wiki.qemu.org/Planning/2.10
+>>
+>> Please add entries to the ChangeLog for the 2.10 release below:
+>>
+>>   http://wiki.qemu.org/ChangeLog/2.10
+>>
+>> Changes since rc3:
+>>
+>> 248b237: Update version for v2.10.0-rc4 release (Peter Maydell)
+>> 40f4a21: nbd-client: avoid spurious qio_channel_yield() re-entry (Stefan Hajnoczi)
+>> 12314f2: qemu-iotests: add 194 non-shared storage migration test (Stefan Hajnoczi)
+>> 7d5b526: block: Update open_flags after ->inactivate() callback (Stefan Hajnoczi)
+>> 045a2f8: mirror: Mark target BB as "force allow inactivate" (Fam Zheng)
+>> ca2e214: block-backend: Allow more "can inactivate" cases (Fam Zheng)
+>> c16de8f: block-backend: Refactor inactivate check (Fam Zheng)
+>> 3da2bd8: numa: Move numa_legacy_auto_assign_ram to pc-i440fx-2.9 (Eduardo Habkost)
+>> d0a1801: fix build failure in nbd_read_reply_entry() (Igor Mammedov)
+>> 1f98e55: hw/ppc/spapr_iommu: Fix crash when removing the "spapr-tce-table" device (Thomas Huth)
+>> 8ccccff: hw/ppc/spapr_rtc: Mark the RTC device with user_creatable = false (Thomas Huth)
+>> 0479097: hw/ppc/spapr: Fix segfault when instantiating a 'pc-dimm' without 'memdev' (Thomas Huth)
+>> 188bfe1: spapr: Allow configure-connector to be called multiple times (Bharata B Rao)
+>> 5dfaa53: ppc: fix ppc_set_compat() with KVM PR (Greg Kurz)
+>> c363a37: target/ppc: 'PVR != host PVR' in KVM_SET_SREGS workaround (Daniel Henrique Barboza)
+>> b96919d: boot-serial-test: prefer tcg accelerator (Cornelia Huck)
 > 
-> Urm.. I think this is probably good.  But I'm having a little trouble
-> convincing myself this really has the same effect as before.
-It's hard to wrap brain around current cyclic recursion and
-how to 2 simple linear lookups could replace it.
-
-By itself this patch won't work, it depends on 2-3/6 for
-normalized cpu type names and recursion-less alias table.
-
-The only change in behavior here is that it does alias
-translation first and only then cpu_model to type translation.
-
+> Has it not been the intent to include the following patch in 2.10:
 > 
-> > ---
-> >  target/ppc/translate_init.c | 43 +++++++++++++------------------------------
-> >  1 file changed, 13 insertions(+), 30 deletions(-)
-> > 
-> > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> > index 0325226..f1a559d 100644
-> > --- a/target/ppc/translate_init.c
-> > +++ b/target/ppc/translate_init.c
-> > @@ -10176,22 +10176,6 @@ PowerPCCPUClass *ppc_cpu_class_by_pvr_mask(uint32_t pvr)
-> >      return pcc;
-> >  }
-> >  
-> > -static gint ppc_cpu_compare_class_name(gconstpointer a, gconstpointer b)
-> > -{
-> > -    ObjectClass *oc = (ObjectClass *)a;
-> > -    const char *name = b;
-> > -    PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
-> > -
-> > -    if (strncasecmp(name, object_class_get_name(oc), strlen(name)) == 0 &&
-> > -        ppc_cpu_is_valid(pcc) &&
-> > -        strcmp(object_class_get_name(oc) + strlen(name),
-> > -               POWERPC_CPU_TYPE_SUFFIX) == 0) {
-> > -        return 0;
-> > -    }
-> > -    return -1;
-> > -}
-> > -
-> > -
-> >  static ObjectClass *ppc_cpu_class_by_name(const char *name);
-> >  
-> >  static ObjectClass *ppc_cpu_class_by_alias(PowerPCCPUAlias *alias)
-> > @@ -10216,8 +10200,8 @@ static ObjectClass *ppc_cpu_class_by_alias(PowerPCCPUAlias *alias)
-> >  
-> >  static ObjectClass *ppc_cpu_class_by_name(const char *name)
-> >  {
-> > -    GSList *list, *item;
-> > -    ObjectClass *ret = NULL;
-> > +    char *cpu_model, *typename;
-> > +    ObjectClass *oc;
-> >      const char *p;
-> >      int i, len;
-> >  
-> > @@ -10238,21 +10222,20 @@ static ObjectClass *ppc_cpu_class_by_name(const char *name)
-> >          }
-> >      }
-> >  
-> > -    list = object_class_get_list(TYPE_POWERPC_CPU, false);
-> > -    item = g_slist_find_custom(list, name, ppc_cpu_compare_class_name);
-> > -    if (item != NULL) {
-> > -        ret = OBJECT_CLASS(item->data);
-> > +    cpu_model = g_ascii_strup(name, -1);
-> > +    p = ppc_cpu_lookup_alias(cpu_model);
-> > +    if (p) {
-> > +        g_free(cpu_model);
-> > +        cpu_model = g_strdup(p);
-> >      }
-> > -    g_slist_free(list);
-> >  
-> > -    if (ret) {
-> > -        return ret;
-> > -    }
-> > +    typename = g_strdup_printf("%s" POWERPC_CPU_TYPE_SUFFIX, cpu_model);
-> > +    oc = object_class_by_name(typename);
-> > +    g_free(typename);
-> > +    g_free(cpu_model);
-> >  
-> > -    for (i = 0; ppc_cpu_aliases[i].alias != NULL; i++) {
-> > -        if (strcasecmp(ppc_cpu_aliases[i].alias, name) == 0) {
-> > -            return ppc_cpu_class_by_alias(&ppc_cpu_aliases[i]);
-> > -        }
-> > +    if (oc && ppc_cpu_is_valid(POWERPC_CPU_CLASS(oc))) {
-> > +        return oc;
-> >      }
-> >  
-> >      return NULL;  
+>   [PATCH] scsi-bus: correct responses for INQUIRY and REQUEST SENSE
+>   http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg03351.html
+>   Message-Id: <1503049022-14749-1-git-send-email-hare@suse.de>
+> 
+> Paolo CC'd it to stable.
+
+I should have sent a pull request, but I wasn't paying attention when
+people decided that there would have been an -rc4.  The qemu-stable@ CC
+means it will be picked up in 2.10.1.
+
+Thanks,
+
+Paolo
+
+> Apologies if I misunderstood.
+> 
+> Thanks,
+> Laszlo
 > 
