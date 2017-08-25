@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dlALu-0000cB-SZ
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:52:31 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dlAMu-00012N-GK
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:53:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dlALr-0005Io-R0
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:52:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53834)
+	(envelope-from <pbonzini@redhat.com>) id 1dlAMt-0005bA-JB
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:53:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39344)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dlALr-0005Ie-Hq
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:52:27 -0400
-Date: Fri, 25 Aug 2017 09:52:22 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170825085222.GA9688@stefanha-x1.localdomain>
-References: <20170824072202.26818-1-stefanha@redhat.com>
-	<20170824083843.GB1866@lemon>
-	<20170824180402.GA4368@stefanha-x1.localdomain>
-	<20170825073229.GC11465@lemon.lan>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dlAMt-0005av-9m
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:53:31 -0400
+References: <20170824123006.GK5379@umbus.fritz.box>
+	<20170825083123.47432-1-aik@ozlabs.ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4608a2c1-5c74-efea-d901-3b5cfa0519e6@redhat.com>
+Date: Fri, 25 Aug 2017 10:53:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170825073229.GC11465@lemon.lan>
-Subject: Re: [Qemu-devel] [PATCH 0/3] iotests: clean up resources using
- context managers
+In-Reply-To: <20170825083123.47432-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] exec: Destroy dispatch immediately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,81 +28,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>
 
-On Fri, Aug 25, 2017 at 03:32:29PM +0800, Fam Zheng wrote:
-> On Thu, 08/24 19:04, Stefan Hajnoczi wrote:
-> > On Thu, Aug 24, 2017 at 04:38:43PM +0800, Fam Zheng wrote:
-> > > On Thu, 08/24 08:21, Stefan Hajnoczi wrote:
-> > > > Tests should declare resources upfront in a with statement.  Resources are
-> > > > automatically cleaned up whether the test passes or fails:
-> > > > 
-> > > >   with FilePath('test.img') as img_path,
-> > > >        VM() as vm:
-> > > >       ...test...
-> > > >   # img_path is deleted and vm is shut down automatically
-> > > 
-> > > Looks good but still requires test writers to learn and remember to use FilePath
-> > > and with.
-> > 
-> > You cannot forget to use FilePath() unless you love typing at
-> > os.path.join(iotests.test_dir, 'test.img').  It's much better than open
-> > coding filename generation!
-> > 
-> > > These are still boilerplates.  Here goes my personal oppinion, so may
-> > > not be plausible:
-> > > 
-> > > - For VM() maybe add an atexit in the launch() method also makes sure the VM is
-> > >   eventually terminated.
-> > > 
-> > >   This means vm.shutdown() is still needed in tearDown() if there are multiple
-> > >   test methods and each of them expects a clean state, but that is probably
-> > >   still less typing (and also indenting) than the with approach, and also easy
-> > >   to remember (otherwise a test will fail).
-> > 
-> > I looked into atexit before going this route.  atexit does not have an
-> > unregister() API in Python 2.  This makes it ugly to use because some
-> > tests do not want the resource to remain for the duration of the
-> > process.
-> > 
-> > A related point is that the Python objects used by atexit handlers live
-> > until the end of the process.  They cannot be garbage collected because
-> > the atexit handler still has a reference to them.
+On 25/08/2017 10:31, Alexey Kardashevskiy wrote:
+> Otherwise old dispatch holds way too much memory before RCU gets
+> a chance to free old dispatches.
 > 
-> I think this shortcoming can be solved with a clean up list ("all problems in
-> computer science can be solved by another level of indirection"):
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
 > 
-> _clean_up_list = set()
-> def _clean_up_handler():
->     for i in _clean_up_list:
->         try:
->             i()
->         except:
->             pass
+> This is a follow-up to the "Memory use with >100 virtio devices"
+> thread.
 > 
-> atexit.register(_clean_up_handler)
-> 
-> class VM(...):
-> 
->     def launch():
->         ...
->         _clean_up_list.add(self.launch)
-> 
->     def shutdown():
->         _clean_up_list.remove(self.launch)
->         ...
+> I assume this is a dirty hack (which fixes the problem though)
 
-atexit is still less powerful than context managers because its scope is
-fixed.  Handler functions are only called when the process terminates.
-Many test cases do not want resources (especially the VMs) around
-forever because they run several iterations or sub-tests.
+This doesn't work.  AddressSpaceDispatch can be accessed outside the big
+QEMU lock, which is why it is destroyed via call_rcu.
 
-The with statement can be used both for process-lifetime and for more
-fine-grained scoping.  That's why I chose it.
+The solution is to: 1) share the FlatView structures if they refer to
+the same root memory region; 2) have one AddressSpaceDispatch per
+FlatView instead of one per AddressSpace, so that FlatView reference
+counting takes care of clearing the AddressSpaceDispatch too.  Neither
+is particularly hard.  The second requires getting rid of the
+as->dispatch_listener and "hard coding" the creation of the
+AddressSpaceDispatch from the FlatView in memory.c.
 
-If you stick to atexit then sub-tests or iterations require manual
-vm.shutdown() - something that is not necessary using the with
-statement.
+Paolo
 
-Stefan
+> and I wonder what the proper solution would be. Thanks.
+> 
+> 
+> What happens here is that every virtio block device creates 2 address
+> spaces - for modern config space (called "virtio-pci-cfg-as") and
+> for busmaster (common pci thing, called after the device name,
+> in my case "virtio-blk-pci").
+> 
+> Each address_space_init() updates topology for _every_ address space.
+> Every topology update (address_space_update_topology()) creates a new
+> dispatch tree - AddressSpaceDispatch with nodes (1KB) and
+> sections (48KB) and destroys the old one.
+> 
+> However the dispatch destructor is postponed via RCU which does not
+> get a chance to execute until the machine is initialized but before
+> we get there, memory is not returned to the pool, and this is a lot
+> of memory which grows n^2.
+> 
+> 
+> Interestingly, mem_add() from exec.c is called twice:
+> as as->dispatch_listener.region_add() and
+> as as->dispatch_listener.region_nop() - I did not understand
+> the trick but it does not work if I remove the .region_nop() hook.
+> How does it work? :)
+> 
+> ---
+>  exec.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index 01ac21e3cd..ea5f3eb209 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -2707,7 +2707,7 @@ static void mem_commit(MemoryListener *listener)
+>  
+>      atomic_rcu_set(&as->dispatch, next);
+>      if (cur) {
+> -        call_rcu(cur, address_space_dispatch_free, rcu);
+> +        address_space_dispatch_free(cur);
+>      }
+>  }
+>  
+> 
