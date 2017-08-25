@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dlHvs-0004br-Io
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 12:58:12 -0400
+	(envelope-from <mst@redhat.com>) id 1dlIAm-000119-PW
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 13:13:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dlHvo-00060o-NX
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 12:58:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52914)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dlHvo-0005xs-H2
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 12:58:04 -0400
-Date: Fri, 25 Aug 2017 19:57:57 +0300
+	(envelope-from <mst@redhat.com>) id 1dlIAk-0005Em-I7
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 13:13:32 -0400
+Date: Fri, 25 Aug 2017 20:13:09 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170825195746-mutt-send-email-mst@kernel.org>
-References: <1499111049-13721-1-git-send-email-mst@redhat.com>
-	<1499111049-13721-10-git-send-email-mst@redhat.com>
-	<20170825151742.GJ27715@localhost.localdomain>
+Message-ID: <20170825201005-mutt-send-email-mst@kernel.org>
+References: <1502461354-11327-1-git-send-email-eric.auger@redhat.com>
+	<1502461354-11327-9-git-send-email-eric.auger@redhat.com>
+	<20170823042453.GA4682@virtx40>
+	<b534e125-98b3-1468-cdec-9bb36fff75a4@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170825151742.GJ27715@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PULL 09/21] pci: Convert to realize
+In-Reply-To: <b534e125-98b3-1468-cdec-9bb36fff75a4@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-arm] [RFC v6 8/9] hw/arm/smmuv3: VFIO
+ integration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +26,477 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, Peter Maydell <peter.maydell@linaro.org>, Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, armbru@redhat.com
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Linu Cherian <linuc.decode@gmail.com>, peter.maydell@linaro.org, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mohun106@gmail.com, jean-philippe.brucker@arm.com, tn@semihalf.com, bharat.bhushan@nxp.com, will.deacon@arm.com, qemu-devel@nongnu.org, peterx@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org, christoffer.dall@linaro.org, linu.cherian@cavium.com, robin.murphy@arm.com, prem.mallappa@gmail.com, eric.auger.pro@gmail.com
 
-On Fri, Aug 25, 2017 at 12:17:42PM -0300, Eduardo Habkost wrote:
-> On Mon, Jul 03, 2017 at 10:45:16PM +0300, Michael S. Tsirkin wrote:
-> > From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+On Wed, Aug 23, 2017 at 08:39:18AM +0200, Auger Eric wrote:
+> Hi Linu,
+> 
+> On 23/08/2017 06:24, Linu Cherian wrote:
+> > Hi Eric,
 > > 
-> > Convert i82801b11, io3130_upstream, io3130_downstream and
-> > pcie_root_port devices to realize.
 > > 
-> > Cc: mst@redhat.com
-> > Cc: marcel@redhat.com
-> > Cc: armbru@redhat.com
-> > Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> > Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> [...]
-> > diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
-> > index cfe8a36..e706f36 100644
-> > --- a/hw/pci-bridge/xio3130_downstream.c
-> > +++ b/hw/pci-bridge/xio3130_downstream.c
-> > @@ -56,33 +56,33 @@ static void xio3130_downstream_reset(DeviceState *qdev)
-> >      pci_bridge_reset(qdev);
-> >  }
-> >  
-> > -static int xio3130_downstream_initfn(PCIDevice *d)
-> > +static void xio3130_downstream_realize(PCIDevice *d, Error **errp)
-> >  {
-> [...]
-> >      pcie_chassis_create(s->chassis);
-> >      rc = pcie_chassis_add_slot(s);
-> >      if (rc < 0) {
-> >          goto err_pcie_cap;
+> > On Fri Aug 11, 2017 at 04:22:33PM +0200, Eric Auger wrote:
+> >> This patch allows doing PCIe passthrough with a guest exposed
+> >> with a vSMMUv3. It implements the replay and notify_flag_changed
+> >> iommu ops. Also on TLB and data structure invalidation commands,
+> >> we replay the mappings so that the physical IOMMU implements
+> >> updated stage 1 settings (Guest IOVA -> Guest PA) + stage 2 settings.
+> >>
+> >> This works only if the guest smmuv3 driver implements the
+> >> "tlbi-on-map" option.
+> >>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> > 
+> > Tried out launching a guest with Qemu option "-machine virt-2.10,smmu"
+> > and a 1G Ethernet controller as vfio-pci device. It works fine for me.
 > 
-> Missing error_setg() call here.  If pcie_chassis_add_slot() fails, realize
-> won't report an error properly.  Causes crash with:
+> Hum sorry, I forgot to update the cover letter. You need to use -machine
+> virt-2.11,smmu for the instantiation as the 2.10 machine was released as
+> part of 2.10 and those changes only apply on 2.11 mach virt introduced
+> in this series. Please apologize for the pain.
 > 
-> $ ./x86_64-softmmu/qemu-system-x86_64 -device ioh3420 -device xio3130-downstream
-> qemu-system-x86_64: /home/ehabkost/rh/proj/virt/qemu/memory.c:2166: memory_region_del_subregion: Assertion `subregion->container == mr' failed.
-> Aborted (core dumped)
-> 
-> 
-> >      }
-> >  
-> >      rc = pcie_aer_init(d, PCI_ERR_VER, XIO3130_AER_OFFSET,
-> > -                       PCI_ERR_SIZEOF, &err);
-> > +                       PCI_ERR_SIZEOF, errp);
-> >      if (rc < 0) {
-> > -        error_report_err(err);
-> >          goto err;
-> >      }
-> >  
-> > -    return 0;
-> > +    return;
-> >  
-> >  err:
-> >      pcie_chassis_del_slot(s);
-> > @@ -114,7 +113,6 @@ err_msi:
-> >      msi_uninit(d);
-> >  err_bridge:
-> >      pci_bridge_exitfn(d);
-> > -    return rc;
-> >  }
-> >  
-> [...]
+> I am going to release a new version this week fixing my last DPDK bug
+> (at least I am aware of ). In this new version, the instantiation method
+> will change to -device smmuv3 which is closer to what is done on Intel.
+>
+> By the way I will also take time to provide some more info about the
+> VFIO integration as it is implemented in this series although this
+> latter may evolve due to NAK of kernel FW quirk.
 
-Good catch!  Patch?
+Yes I think changing compat string to avoid pretending this is smmuv3
+was a hard requirement. So you might need to do -device qemu-smmuv3
+if you want VFIO support with this PV quirk.
 
-> -- 
-> Eduardo
+For now, how about a subset of the functionality with VFIO disabled?
+People can use it with virtio for now.
+
+
+> Thank you for testing!
+> 
+> Best Regards
+> 
+> Eric
+> > 
+> > Qemu source: https://github.com/eauger/qemu.git Branch: v2.10.0-rc2-SMMU-v6  
+> > 
+> > But had to make this change, 
+> > 
+> > --- a/hw/arm/virt.c                                                                    
+> > +++ b/hw/arm/virt.c                                                                    
+> > @@ -1806,7 +1806,7 @@ static void virt_machine_2_10_options(MachineClass *mc)          
+> >      virt_machine_2_11_options(mc);                                                    
+> >      SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_10);                                         
+> >                                                                                        
+> > -    vmc->no_smmu = true;                                                              
+> > +    vmc->no_smmu = false;                                                             
+> >  }                                                                                     
+> >  DEFINE_VIRT_MACHINE(2, 10) 
+> > 
+> > so that qemu doesnt complain about "Property .smmu not found"
+> > 
+> > Will let you know if i have updates on further testing.
+> > 
+> > Thanks.
+> > 
+> >>
+> >> ---
+> >>
+> >> v5 -> v6:
+> >> - use IOMMUMemoryRegion
+> >> - handle implementation defined SMMU_CMD_TLBI_NH_VA_AM cmd
+> >>   (goes along with TLBI_ON_MAP FW quirk)
+> >> - replay systematically unmap the whole range first
+> >> - smmuv3_map_hook does not unmap anymore and the unmap is done
+> >>   before the replay
+> >> - add and use smmuv3_context_device_invalidate instead of
+> >>   blindly replaying everything
+> >> ---
+> >>  hw/arm/smmuv3-internal.h |   1 +
+> >>  hw/arm/smmuv3.c          | 265 ++++++++++++++++++++++++++++++++++++++++++++++-
+> >>  hw/arm/trace-events      |  14 +++
+> >>  3 files changed, 277 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
+> >> index e255df1..ac4628f 100644
+> >> --- a/hw/arm/smmuv3-internal.h
+> >> +++ b/hw/arm/smmuv3-internal.h
+> >> @@ -344,6 +344,7 @@ enum {
+> >>      SMMU_CMD_RESUME          = 0x44,
+> >>      SMMU_CMD_STALL_TERM,
+> >>      SMMU_CMD_SYNC,          /* 0x46 */
+> >> +    SMMU_CMD_TLBI_NH_VA_AM   = 0x8F, /* VIOMMU Impl Defined */
+> >>  };
+> >>  
+> >>  static const char *cmd_stringify[] = {
+> >> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+> >> index e195a0e..89fb116 100644
+> >> --- a/hw/arm/smmuv3.c
+> >> +++ b/hw/arm/smmuv3.c
+> >> @@ -25,6 +25,7 @@
+> >>  #include "exec/address-spaces.h"
+> >>  #include "trace.h"
+> >>  #include "qemu/error-report.h"
+> >> +#include "exec/target_page.h"
+> >>  
+> >>  #include "hw/arm/smmuv3.h"
+> >>  #include "smmuv3-internal.h"
+> >> @@ -143,6 +144,71 @@ static MemTxResult smmu_read_cmdq(SMMUV3State *s, Cmd *cmd)
+> >>      return ret;
+> >>  }
+> >>  
+> >> +static void smmuv3_replay_all(SMMUState *s)
+> >> +{
+> >> +    SMMUNotifierNode *node;
+> >> +
+> >> +    QLIST_FOREACH(node, &s->notifiers_list, next) {
+> >> +        trace_smmuv3_replay_all(node->sdev->iommu.parent_obj.name);
+> >> +        memory_region_iommu_replay_all(&node->sdev->iommu);
+> >> +    }
+> >> +}
+> >> +
+> >> +/* Replay the mappings for a given streamid */
+> >> +static void smmuv3_context_device_invalidate(SMMUState *s, uint16_t sid)
+> >> +{
+> >> +    uint8_t bus_n, devfn;
+> >> +    SMMUPciBus *smmu_bus;
+> >> +    SMMUDevice *smmu;
+> >> +
+> >> +    trace_smmuv3_context_device_invalidate(sid);
+> >> +    bus_n = PCI_BUS_NUM(sid);
+> >> +    smmu_bus = smmu_find_as_from_bus_num(s, bus_n);
+> >> +    if (smmu_bus) {
+> >> +        devfn = PCI_FUNC(sid);
+> >> +        smmu = smmu_bus->pbdev[devfn];
+> >> +        if (smmu) {
+> >> +            memory_region_iommu_replay_all(&smmu->iommu);
+> >> +        }
+> >> +    }
+> >> +}
+> >> +
+> >> +static void smmuv3_replay_single(IOMMUMemoryRegion *mr, IOMMUNotifier *n,
+> >> +                                 uint64_t iova);
+> >> +
+> >> +static void smmuv3_replay_range(IOMMUMemoryRegion *mr, IOMMUNotifier *n,
+> >> +                                 uint64_t iova, size_t nb_pages);
+> >> +
+> >> +static void smmuv3_notify_single(SMMUState *s, uint64_t iova)
+> >> +{
+> >> +    SMMUNotifierNode *node;
+> >> +
+> >> +    QLIST_FOREACH(node, &s->notifiers_list, next) {
+> >> +        IOMMUMemoryRegion *mr = &node->sdev->iommu;
+> >> +        IOMMUNotifier *n;
+> >> +
+> >> +        trace_smmuv3_notify_all(node->sdev->iommu.parent_obj.name, iova);
+> >> +        IOMMU_NOTIFIER_FOREACH(n, mr) {
+> >> +            smmuv3_replay_single(mr, n, iova);
+> >> +        }
+> >> +    }
+> >> +}
+> >> +
+> >> +static void smmuv3_notify_range(SMMUState *s, uint64_t iova, size_t size)
+> >> +{
+> >> +    SMMUNotifierNode *node;
+> >> +
+> >> +    QLIST_FOREACH(node, &s->notifiers_list, next) {
+> >> +        IOMMUMemoryRegion *mr = &node->sdev->iommu;
+> >> +        IOMMUNotifier *n;
+> >> +
+> >> +        trace_smmuv3_notify_all(node->sdev->iommu.parent_obj.name, iova);
+> >> +        IOMMU_NOTIFIER_FOREACH(n, mr) {
+> >> +            smmuv3_replay_range(mr, n, iova, size);
+> >> +        }
+> >> +    }
+> >> +}
+> >> +
+> >>  static int smmu_cmdq_consume(SMMUV3State *s)
+> >>  {
+> >>      uint32_t error = SMMU_CMD_ERR_NONE;
+> >> @@ -178,28 +244,38 @@ static int smmu_cmdq_consume(SMMUV3State *s)
+> >>              break;
+> >>          case SMMU_CMD_PREFETCH_CONFIG:
+> >>          case SMMU_CMD_PREFETCH_ADDR:
+> >> +            break;
+> >>          case SMMU_CMD_CFGI_STE:
+> >>          {
+> >>               uint32_t streamid = cmd.word[1];
+> >>  
+> >>               trace_smmuv3_cmdq_cfgi_ste(streamid);
+> >> -            break;
+> >> +             smmuv3_context_device_invalidate(&s->smmu_state, streamid);
+> >> +             break;
+> >>          }
+> >>          case SMMU_CMD_CFGI_STE_RANGE: /* same as SMMU_CMD_CFGI_ALL */
+> >>          {
+> >> -            uint32_t start = cmd.word[1], range, end;
+> >> +            uint32_t start = cmd.word[1], range, end, i;
+> >>  
+> >>              range = extract32(cmd.word[2], 0, 5);
+> >>              end = start + (1 << (range + 1)) - 1;
+> >>              trace_smmuv3_cmdq_cfgi_ste_range(start, end);
+> >> +            for (i = start; i <= end; i++) {
+> >> +                smmuv3_context_device_invalidate(&s->smmu_state, i);
+> >> +            }
+> >>              break;
+> >>          }
+> >>          case SMMU_CMD_CFGI_CD:
+> >>          case SMMU_CMD_CFGI_CD_ALL:
+> >> +        {
+> >> +             uint32_t streamid = cmd.word[1];
+> >> +
+> >> +            smmuv3_context_device_invalidate(&s->smmu_state, streamid);
+> >>              break;
+> >> +        }
+> >>          case SMMU_CMD_TLBI_NH_ALL:
+> >>          case SMMU_CMD_TLBI_NH_ASID:
+> >> -            printf("%s TLBI* replay\n", __func__);
+> >> +            smmuv3_replay_all(&s->smmu_state);
+> >>              break;
+> >>          case SMMU_CMD_TLBI_NH_VA:
+> >>          {
+> >> @@ -210,6 +286,20 @@ static int smmu_cmdq_consume(SMMUV3State *s)
+> >>              uint64_t addr = high << 32 | (low << 12);
+> >>  
+> >>              trace_smmuv3_cmdq_tlbi_nh_va(asid, vmid, addr);
+> >> +            smmuv3_notify_single(&s->smmu_state, addr);
+> >> +            break;
+> >> +        }
+> >> +        case SMMU_CMD_TLBI_NH_VA_AM:
+> >> +        {
+> >> +            int asid = extract32(cmd.word[1], 16, 16);
+> >> +            int am = extract32(cmd.word[1], 0, 16);
+> >> +            uint64_t low = extract32(cmd.word[2], 12, 20);
+> >> +            uint64_t high = cmd.word[3];
+> >> +            uint64_t addr = high << 32 | (low << 12);
+> >> +            size_t size = am << 12;
+> >> +
+> >> +            trace_smmuv3_cmdq_tlbi_nh_va_am(asid, am, addr, size);
+> >> +            smmuv3_notify_range(&s->smmu_state, addr, size);
+> >>              break;
+> >>          }
+> >>          case SMMU_CMD_TLBI_NH_VAA:
+> >> @@ -222,6 +312,7 @@ static int smmu_cmdq_consume(SMMUV3State *s)
+> >>          case SMMU_CMD_TLBI_S12_VMALL:
+> >>          case SMMU_CMD_TLBI_S2_IPA:
+> >>          case SMMU_CMD_TLBI_NSNH_ALL:
+> >> +            smmuv3_replay_all(&s->smmu_state);
+> >>              break;
+> >>          case SMMU_CMD_ATC_INV:
+> >>          case SMMU_CMD_PRI_RESP:
+> >> @@ -804,6 +895,172 @@ out:
+> >>      return entry;
+> >>  }
+> >>  
+> >> +static int smmuv3_replay_hook(IOMMUTLBEntry *entry, void *private)
+> >> +{
+> >> +    trace_smmuv3_replay_hook(entry->iova, entry->translated_addr,
+> >> +                             entry->addr_mask, entry->perm);
+> >> +    memory_region_notify_one((IOMMUNotifier *)private, entry);
+> >> +    return 0;
+> >> +}
+> >> +
+> >> +static int smmuv3_map_hook(IOMMUTLBEntry *entry, void *private)
+> >> +{
+> >> +    trace_smmuv3_map_hook(entry->iova, entry->translated_addr,
+> >> +                          entry->addr_mask, entry->perm);
+> >> +    memory_region_notify_one((IOMMUNotifier *)private, entry);
+> >> +    return 0;
+> >> +}
+> >> +
+> >> +/* Unmap the whole range in the notifier's scope. */
+> >> +static void smmuv3_unmap_notifier(SMMUDevice *sdev, IOMMUNotifier *n)
+> >> +{
+> >> +    IOMMUTLBEntry entry;
+> >> +    hwaddr size;
+> >> +    hwaddr start = n->start;
+> >> +    hwaddr end = n->end;
+> >> +
+> >> +    size = end - start + 1;
+> >> +
+> >> +    entry.target_as = &address_space_memory;
+> >> +    /* Adjust iova for the size */
+> >> +    entry.iova = n->start & ~(size - 1);
+> >> +    /* This field is meaningless for unmap */
+> >> +    entry.translated_addr = 0;
+> >> +    entry.perm = IOMMU_NONE;
+> >> +    entry.addr_mask = size - 1;
+> >> +
+> >> +    /* TODO: check start/end/size/mask */
+> >> +
+> >> +    trace_smmuv3_unmap_notifier(pci_bus_num(sdev->bus),
+> >> +                                PCI_SLOT(sdev->devfn),
+> >> +                                PCI_FUNC(sdev->devfn),
+> >> +                                entry.iova, size);
+> >> +
+> >> +    memory_region_notify_one(n, &entry);
+> >> +}
+> >> +
+> >> +static void smmuv3_replay(IOMMUMemoryRegion *mr, IOMMUNotifier *n)
+> >> +{
+> >> +    SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
+> >> +    SMMUV3State *s = sdev->smmu;
+> >> +    SMMUBaseClass *sbc = SMMU_DEVICE_GET_CLASS(s);
+> >> +    SMMUTransCfg cfg = {};
+> >> +    int ret;
+> >> +
+> >> +    smmuv3_unmap_notifier(sdev, n);
+> >> +
+> >> +    ret = smmuv3_decode_config(mr, &cfg);
+> >> +    if (ret) {
+> >> +        error_report("%s error decoding the configuration for iommu mr=%s",
+> >> +                     __func__, mr->parent_obj.name);
+> >> +    }
+> >> +
+> >> +    if (cfg.disabled || cfg.bypassed) {
+> >> +        return;
+> >> +    }
+> >> +    /* is the smmu enabled */
+> >> +    sbc->page_walk_64(&cfg, 0, (1ULL << (64 - cfg.tsz)) - 1, false,
+> >> +                      smmuv3_replay_hook, n);
+> >> +}
+> >> +static void smmuv3_replay_range(IOMMUMemoryRegion *mr, IOMMUNotifier *n,
+> >> +                                 uint64_t iova, size_t size)
+> >> +{
+> >> +    SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
+> >> +    SMMUV3State *s = sdev->smmu;
+> >> +    SMMUBaseClass *sbc = SMMU_DEVICE_GET_CLASS(s);
+> >> +    SMMUTransCfg cfg = {};
+> >> +    IOMMUTLBEntry entry;
+> >> +    int ret;
+> >> +
+> >> +    trace_smmuv3_replay_range(mr->parent_obj.name, iova, size, n);
+> >> +    ret = smmuv3_decode_config(mr, &cfg);
+> >> +    if (ret) {
+> >> +        error_report("%s error decoding the configuration for iommu mr=%s",
+> >> +                     __func__, mr->parent_obj.name);
+> >> +    }
+> >> +
+> >> +    if (cfg.disabled || cfg.bypassed) {
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    /* first unmap */
+> >> +    entry.target_as = &address_space_memory;
+> >> +    entry.iova = iova & ~(size - 1);
+> >> +    entry.addr_mask = size - 1;
+> >> +    entry.perm = IOMMU_NONE;
+> >> +
+> >> +    memory_region_notify_one(n, &entry);
+> >> +
+> >> +    /* then figure out if a new mapping needs to be applied */
+> >> +    sbc->page_walk_64(&cfg, iova, iova + entry.addr_mask , false,
+> >> +                      smmuv3_map_hook, n);
+> >> +}
+> >> +
+> >> +static void smmuv3_replay_single(IOMMUMemoryRegion *mr, IOMMUNotifier *n,
+> >> +                                 uint64_t iova)
+> >> +{
+> >> +    SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
+> >> +    SMMUV3State *s = sdev->smmu;
+> >> +    size_t target_page_size = qemu_target_page_size();
+> >> +    SMMUBaseClass *sbc = SMMU_DEVICE_GET_CLASS(s);
+> >> +    SMMUTransCfg cfg = {};
+> >> +    IOMMUTLBEntry entry;
+> >> +    int ret;
+> >> +
+> >> +    trace_smmuv3_replay_single(mr->parent_obj.name, iova, n);
+> >> +    ret = smmuv3_decode_config(mr, &cfg);
+> >> +    if (ret) {
+> >> +        error_report("%s error decoding the configuration for iommu mr=%s",
+> >> +                     __func__, mr->parent_obj.name);
+> >> +    }
+> >> +
+> >> +    if (cfg.disabled || cfg.bypassed) {
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    /* first unmap */
+> >> +    entry.target_as = &address_space_memory;
+> >> +    entry.iova = iova & ~(target_page_size - 1);
+> >> +    entry.addr_mask = target_page_size - 1;
+> >> +    entry.perm = IOMMU_NONE;
+> >> +
+> >> +    memory_region_notify_one(n, &entry);
+> >> +
+> >> +    /* then figure out if a new mapping needs to be applied */
+> >> +    sbc->page_walk_64(&cfg, iova, iova + 1, false,
+> >> +                      smmuv3_map_hook, n);
+> >> +}
+> >> +
+> >> +static void smmuv3_notify_flag_changed(IOMMUMemoryRegion *iommu,
+> >> +                                       IOMMUNotifierFlag old,
+> >> +                                       IOMMUNotifierFlag new)
+> >> +{
+> >> +    SMMUDevice *sdev = container_of(iommu, SMMUDevice, iommu);
+> >> +    SMMUV3State *s3 = sdev->smmu;
+> >> +    SMMUState *s = &(s3->smmu_state);
+> >> +    SMMUNotifierNode *node = NULL;
+> >> +    SMMUNotifierNode *next_node = NULL;
+> >> +
+> >> +    if (old == IOMMU_NOTIFIER_NONE) {
+> >> +        trace_smmuv3_notify_flag_add(iommu->parent_obj.name);
+> >> +        node = g_malloc0(sizeof(*node));
+> >> +        node->sdev = sdev;
+> >> +        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    /* update notifier node with new flags */
+> >> +    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
+> >> +        if (node->sdev == sdev) {
+> >> +            if (new == IOMMU_NOTIFIER_NONE) {
+> >> +                trace_smmuv3_notify_flag_del(iommu->parent_obj.name);
+> >> +                QLIST_REMOVE(node, next);
+> >> +                g_free(node);
+> >> +            }
+> >> +            return;
+> >> +        }
+> >> +    }
+> >> +}
+> >>  
+> >>  static inline void smmu_update_base_reg(SMMUV3State *s, uint64_t *base,
+> >>                                          uint64_t val)
+> >> @@ -1125,6 +1382,8 @@ static void smmuv3_iommu_memory_region_class_init(ObjectClass *klass,
+> >>      IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
+> >>  
+> >>      imrc->translate = smmuv3_translate;
+> >> +    imrc->notify_flag_changed = smmuv3_notify_flag_changed;
+> >> +    imrc->replay = smmuv3_replay;
+> >>  }
+> >>  
+> >>  static const TypeInfo smmuv3_type_info = {
+> >> diff --git a/hw/arm/trace-events b/hw/arm/trace-events
+> >> index f9b9cbe..8228e26 100644
+> >> --- a/hw/arm/trace-events
+> >> +++ b/hw/arm/trace-events
+> >> @@ -27,6 +27,7 @@ smmuv3_cmdq_opcode(const char *opcode) "<--- %s"
+> >>  smmuv3_cmdq_cfgi_ste(int streamid) "     |_ streamid =%d"
+> >>  smmuv3_cmdq_cfgi_ste_range(int start, int end) "     |_ start=0x%d - end=0x%d"
+> >>  smmuv3_cmdq_tlbi_nh_va(int asid, int vmid, uint64_t addr) "     |_ asid =%d vmid =%d addr=0x%"PRIx64
+> >> +smmuv3_cmdq_tlbi_nh_va_am(int asid, int am, size_t size, uint64_t addr) "     |_ asid =%d am =%d size=0x%lx addr=0x%"PRIx64
+> >>  smmuv3_cmdq_consume_sev(void) "CMD_SYNC CS=SEV not supported, ignoring"
+> >>  smmuv3_cmdq_consume_out(uint8_t prod_wrap, uint32_t prod, uint8_t cons_wrap, uint32_t cons) "prod_wrap:%d, prod:0x%x cons_wrap:%d cons:0x%x"
+> >>  smmuv3_update(bool is_empty, uint32_t prod, uint32_t cons, uint8_t prod_wrap, uint8_t cons_wrap) "q empty:%d prod:%d cons:%d p.wrap:%d p.cons:%d"
+> >> @@ -50,3 +51,16 @@ smmuv3_dump_ste(int i, uint32_t word0, int j,  uint32_t word1) "STE[%2d]: 0x%x\t
+> >>  smmuv3_dump_cd(int i, uint32_t word0, int j,  uint32_t word1) "CD[%2d]: 0x%x\t CD[%2d]: 0x%x"
+> >>  smmuv3_dump_cmd(int i, uint32_t word0, int j,  uint32_t word1) "CMD[%2d]: 0x%x\t CMD[%2d]: 0x%x"
+> >>  smmuv3_cfg_stage(int s, uint32_t oas, uint32_t tsz, uint64_t ttbr, bool aa64, uint32_t granule_sz, int initial_level) "TransCFG stage:%d oas:%d tsz:%d ttbr:0x%"PRIx64"  aa64:%d granule_sz:%d, initial_level = %d"
+> >> +
+> >> +smmuv3_replay(uint16_t sid, bool enabled) "sid=%d, enabled=%d"
+> >> +smmuv3_replay_hook(hwaddr iova, hwaddr pa, hwaddr mask, int perm) "iova=0x%"PRIx64" pa=0x%" PRIx64" mask=0x%"PRIx64" perm=%d"
+> >> +smmuv3_map_hook(hwaddr iova, hwaddr pa, hwaddr mask, int perm) "iova=0x%"PRIx64" pa=0x%" PRIx64" mask=0x%"PRIx64" perm=%d"
+> >> +smmuv3_notify_flag_add(const char *iommu) "ADD SMMUNotifier node for iommu mr=%s"
+> >> +smmuv3_notify_flag_del(const char *iommu) "DEL SMMUNotifier node for iommu mr=%s"
+> >> +smmuv3_replay_single(const char *name, uint64_t iova, void *n) "iommu mr=%s iova=0x%"PRIx64" n=%p"
+> >> +smmuv3_replay_range(const char *name, uint64_t iova, size_t size, void *n) "iommu mr=%s iova=0x%"PRIx64" size=0x%lx n=%p"
+> >> +smmuv3_replay_all(const char *name) "iommu mr=%s"
+> >> +smmuv3_notify_all(const char *name, uint64_t iova) "iommu mr=%s iova=0x%"PRIx64
+> >> +smmuv3_unmap_notifier(uint8_t bus, uint8_t slot, uint8_t fn, uint64_t iova, uint64_t size) "Device %02x:%02x.%x start 0x%"PRIx64" size 0x%"PRIx64
+> >> +smmuv3_context_device_invalidate(uint32_t sid) "sid=%d"
+> >> +
+> >> -- 
+> >> 2.5.5
+> >>
+> >>
+> > 
