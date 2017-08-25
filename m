@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dl8ug-0006kj-Jl
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 03:20:19 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dl920-00014C-7T
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 03:27:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dl8ud-0004n3-G1
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 03:20:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36892)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dl8ud-0004m8-8f
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 03:20:15 -0400
-Date: Fri, 25 Aug 2017 09:20:08 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170825092008.12484e6a.cohuck@redhat.com>
-In-Reply-To: <97b35c4d-e897-c18a-525f-1fa1a7560776@de.ibm.com>
-References: <e2a1b182-83a9-2259-27f9-68b61b5061d5@linux.vnet.ibm.com>
-	<20170824171355.29d1ec32.cohuck@redhat.com>
-	<30333b41-508d-f9a3-ac2d-4830a7791475@redhat.com>
-	<34f0f307-d16f-7c76-1589-fa06252f6d09@linux.vnet.ibm.com>
-	<ad0ef5a7-c0e0-9e54-a417-858c4b32a80e@redhat.com>
-	<c9a6a1ec-eb7c-08a6-82ad-87ad5412ad19@linux.vnet.ibm.com>
-	<CAFEAcA-oE=E3ydugLdVnPS2Tquqkou=BEhsB_DALqZxbVD0GDA@mail.gmail.com>
-	<e24316e0-3b6f-ef1c-7c4b-66e7b302e5b4@linux.vnet.ibm.com>
-	<97b35c4d-e897-c18a-525f-1fa1a7560776@de.ibm.com>
+	(envelope-from <imammedo@redhat.com>) id 1dl91u-0007zn-7r
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 03:27:52 -0400
+Date: Fri, 25 Aug 2017 09:27:40 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170825092740.239b6a82@nial.brq.redhat.com>
+In-Reply-To: <20170825013819.GQ5379@umbus.fritz.box>
+References: <1503562911-2776-1-git-send-email-imammedo@redhat.com>
+	<1503562911-2776-3-git-send-email-imammedo@redhat.com>
+	<20170825013819.GQ5379@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] S390 bios breaks in qemu 2.10.rc3
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.11 2/6] ppc: make cpu_model
+ translation to type consistent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,56 +25,2116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Farhan Ali <alifm@linux.vnet.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-On Thu, 24 Aug 2017 20:14:06 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On Fri, 25 Aug 2017 11:38:19 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> On 08/24/2017 07:38 PM, Farhan Ali wrote:
-> > 
-> > 
-> > On 08/24/2017 12:07 PM, Peter Maydell wrote:  
-> >> On 24 August 2017 at 16:53, Farhan Ali <alifm@linux.vnet.ibm.com> wrote:  
-> >>>
-> >>>
-> >>> On 08/24/2017 11:50 AM, Thomas Huth wrote:  
-> >>>> True, so that could still be an issue. Looking at the cio.h in the
-> >>>> kernel, they define the struct like this:
-> >>>>
-> >>>> struct ccw1 {
-> >>>>         __u8  cmd_code;
-> >>>>         __u8  flags;
-> >>>>         __u16 count;
-> >>>>         __u32 cda;
-> >>>> } __attribute__ ((packed,aligned(8)));
-> >>>>
-> >>>> So I guess adding the aligned(8) is the right way to go?  
-> >>  
-> >>> This was my initial fix and it works on my system. But for some reason this
-> >>> fix does not work on my colleague's system. So I am hesitant about
-> >>> submitting this fix  
-> >>
-> >> It seems like it ought to be the obvious fix, so I would double
-> >> check that on your colleague's system the change really did
-> >> get recompiled and it's actually using the new version (that
-> >> sort of mistake can be easy to make and very confusing...)  
-> 
-> >>
-> >> thanks
-> >> -- PMM
-> >>  
-> > 
-> > So after trying again with the fix, it seems to work on my colleague's system for most cases. It fails for LDL DASD boot case.... we are still investigating it.  
-> 
-> So chances are that this is an independent problem, I guess?
-> 
+> On Thu, Aug 24, 2017 at 10:21:47AM +0200, Igor Mammedov wrote:
+> > PPC handles -cpu FOO rather incosistently,
+> > i.e. it does case-insensitive matching of FOO to
+> > a CPU type (see: ppc_cpu_compare_class_name) but
+> > handles alias names as case-sensitive, as result:
+> >=20
+> >  # qemu-system-ppc64 -M mac99 -cpu g3
+> >  qemu-system-ppc64: unable to find CPU model ' kN=EF=BF=BDU'
+> >=20
+> >  # qemu-system-ppc64 -cpu 970MP_V1.1
+> >  qemu-system-ppc64: Unable to find sPAPR CPU Core definition
+> >=20
+> > while
+> >=20
+> >  # qemu-system-ppc64 -M mac99 -cpu G3
+> >  # qemu-system-ppc64 -cpu 970MP_v1.1
+> >=20
+> > start up just fine.
+> >=20
+> > Considering we can't take case-insensitive matching away,
+> > make it case-insensitive for  all alias/type/core_type
+> > lookups.
+> >=20
+> > As side effect it allows to remove duplicate core types
+> > which are the same but use lower-case letters in name.
+> >=20
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com> =20
+>=20
+> Hmm.  So, I'm certainly good with making the matching more consistent,
+> and removing extra entries differing only in case.
+>=20
+> However, I don't like capitalizing everything in the model table.  The
+> "canonical" capitalization - as in how it appears in manuals and
+> marketing info - is quite frequently mixed case.  So I think making
+> everything caps in the table will make it harder to read in the
+> context of looking at the corresponding documentation.
+only cpu models =3D> typenames are made caps, the rest
+incl. description is kept as is in mixed case.
+It looks like _desc is the thing one would use for
+1:1 lookup in spec, while _name isn't direct match consistently
+(i.e. sometimes it skips spaces and sometimes spaces are replaced by unders=
+core).
+So keeping _name in mixed case unnecessarily complicates name->type lookup.
 
-OK, to recap:
+These mixed case + case-insensitive is what made lookup
+code over-engineered and overly complex.
+As result it evolved (regressed) to inconsistent name handling
+since it's rather hard to understand what's going on there.
 
-- the current pre-built bios seems fine
-- rebuilding the bios may yield a version that fails on some systems
-  (different compiler?)
-- adding aligned(8) looks like the right thing to do
-- it seems to fix the problem, but on at least one system something
-  still seems off (under investigation)
+> Can we instead retain mixed case in the table, and capitalize both
+> sides at the comparison time?
+it has to be the same-case since PPC has case-insensitive cpu_model
+matching (sometimes :/). Normalized /same case/ typenames
+are necessary for object_class_by_name() to work as it does exact match.
+So it would be possible to replace custom fetching of CPU types
+and iterating over it with custom comparator with object_class_by_name().
+As it's done in 4/6.
+This patch and 3/6 are only preparatory patches for 4/6.
+
+> > ---
+> > PS:
+> >  consistent naming will be used by follow up patch to
+> >  simplify cpu_model translation code and drop ~50LOC.
+> > ---
+> >  hw/ppc/spapr_cpu_core.c     |  30 +-
+> >  target/ppc/cpu-models.c     | 866 ++++++++++++++++++++++--------------=
+--------
+> >  target/ppc/kvm.c            |   2 +-
+> >  target/ppc/translate_init.c |   2 +-
+> >  4 files changed, 450 insertions(+), 450 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> > index ea278ce..40936b4 100644
+> > --- a/hw/ppc/spapr_cpu_core.c
+> > +++ b/hw/ppc/spapr_cpu_core.c
+> > @@ -130,8 +130,10 @@ char *spapr_get_cpu_core_type(const char *model)
+> >  {
+> >      char *core_type;
+> >      gchar **model_pieces =3D g_strsplit(model, ",", 2);
+> > +    gchar *cpu_model =3D g_ascii_strup(model_pieces[0], -1);
+> > +    g_strfreev(model_pieces);
+> > =20
+> > -    core_type =3D g_strdup_printf("%s-%s", model_pieces[0], TYPE_SPAPR=
+_CPU_CORE);
+> > +    core_type =3D g_strdup_printf("%s-" TYPE_SPAPR_CPU_CORE, cpu_model=
+);
+> > =20
+> >      /* Check whether it exists or whether we have to look up an alias =
+name */
+> >      if (!object_class_by_name(core_type)) {
+> > @@ -139,13 +141,13 @@ char *spapr_get_cpu_core_type(const char *model)
+> > =20
+> >          g_free(core_type);
+> >          core_type =3D NULL;
+> > -        realmodel =3D ppc_cpu_lookup_alias(model_pieces[0]);
+> > +        realmodel =3D ppc_cpu_lookup_alias(cpu_model);
+> >          if (realmodel) {
+> >              core_type =3D spapr_get_cpu_core_type(realmodel);
+> >          }
+> >      }
+> > +    g_free(cpu_model);
+> > =20
+> > -    g_strfreev(model_pieces);
+> >      return core_type;
+> >  }
+> > =20
+> > @@ -265,34 +267,32 @@ err:
+> > =20
+> >  static const char *spapr_core_models[] =3D {
+> >      /* 970 */
+> > -    "970_v2.2",
+> > +    "970_V2.2",
+> > =20
+> >      /* 970MP variants */
+> > -    "970MP_v1.0",
+> > -    "970mp_v1.0",
+> > -    "970MP_v1.1",
+> > -    "970mp_v1.1",
+> > +    "970MP_V1.0",
+> > +    "970MP_V1.1",
+> > =20
+> >      /* POWER5+ */
+> > -    "POWER5+_v2.1",
+> > +    "POWER5+_V2.1",
+> > =20
+> >      /* POWER7 */
+> > -    "POWER7_v2.3",
+> > +    "POWER7_V2.3",
+> > =20
+> >      /* POWER7+ */
+> > -    "POWER7+_v2.1",
+> > +    "POWER7+_V2.1",
+> > =20
+> >      /* POWER8 */
+> > -    "POWER8_v2.0",
+> > +    "POWER8_V2.0",
+> > =20
+> >      /* POWER8E */
+> > -    "POWER8E_v2.1",
+> > +    "POWER8E_V2.1",
+> > =20
+> >      /* POWER8NVL */
+> > -    "POWER8NVL_v1.0",
+> > +    "POWER8NVL_V1.0",
+> > =20
+> >      /* POWER9 */
+> > -    "POWER9_v1.0",
+> > +    "POWER9_V1.0",
+> >  };
+> > =20
+> >  static Property spapr_cpu_core_properties[] =3D {
+> > diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
+> > index 8b27962..346b6b1 100644
+> > --- a/target/ppc/cpu-models.c
+> > +++ b/target/ppc/cpu-models.c
+> > @@ -101,10 +101,10 @@
+> >  #endif
+> >      POWERPC_DEF("IOP480",        CPU_POWERPC_IOP480,                 I=
+OP480,
+> >                  "IOP480 (401 microcontroller)")
+> > -    POWERPC_DEF("Cobra",         CPU_POWERPC_COBRA,                  4=
+01,
+> > +    POWERPC_DEF("COBRA",         CPU_POWERPC_COBRA,                  4=
+01,
+> >                  "IBM Processor for Network Resources")
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("Xipchip",       CPU_POWERPC_XIPCHIP,                4=
+01,
+> > +    POWERPC_DEF("XIPCHIP",       CPU_POWERPC_XIPCHIP,                4=
+01,
+> >                  NULL)
+> >  #endif
+> >      /* PowerPC 403 family                                             =
+       */
+> > @@ -176,16 +176,16 @@
+> >                  "PowerPC 405 F6")
+> >  #endif
+> >      /* PowerPC 405 microcontrollers                                   =
+       */
+> > -    POWERPC_DEF("405CRa",        CPU_POWERPC_405CRa,                 4=
+05,
+> > +    POWERPC_DEF("405CRA",        CPU_POWERPC_405CRa,                 4=
+05,
+> >                  "PowerPC 405 CRa")
+> > -    POWERPC_DEF("405CRb",        CPU_POWERPC_405CRb,                 4=
+05,
+> > +    POWERPC_DEF("405CRB",        CPU_POWERPC_405CRb,                 4=
+05,
+> >                  "PowerPC 405 CRb")
+> > -    POWERPC_DEF("405CRc",        CPU_POWERPC_405CRc,                 4=
+05,
+> > +    POWERPC_DEF("405CRC",        CPU_POWERPC_405CRc,                 4=
+05,
+> >                  "PowerPC 405 CRc")
+> >      POWERPC_DEF("405EP",         CPU_POWERPC_405EP,                  4=
+05,
+> >                  "PowerPC 405 EP")
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("405EXr",        CPU_POWERPC_405EXr,                 4=
+05,
+> > +    POWERPC_DEF("405EXR",        CPU_POWERPC_405EXr,                 4=
+05,
+> >                  "PowerPC 405 EXr")
+> >  #endif
+> >      POWERPC_DEF("405EZ",         CPU_POWERPC_405EZ,                  4=
+05,
+> > @@ -194,13 +194,13 @@
+> >      POWERPC_DEF("405FX",         CPU_POWERPC_405FX,                  4=
+05,
+> >                  "PowerPC 405 FX")
+> >  #endif
+> > -    POWERPC_DEF("405GPa",        CPU_POWERPC_405GPa,                 4=
+05,
+> > +    POWERPC_DEF("405GPA",        CPU_POWERPC_405GPa,                 4=
+05,
+> >                  "PowerPC 405 GPa")
+> > -    POWERPC_DEF("405GPb",        CPU_POWERPC_405GPb,                 4=
+05,
+> > +    POWERPC_DEF("405GPB",        CPU_POWERPC_405GPb,                 4=
+05,
+> >                  "PowerPC 405 GPb")
+> > -    POWERPC_DEF("405GPc",        CPU_POWERPC_405GPc,                 4=
+05,
+> > +    POWERPC_DEF("405GPC",        CPU_POWERPC_405GPc,                 4=
+05,
+> >                  "PowerPC 405 GPc")
+> > -    POWERPC_DEF("405GPd",        CPU_POWERPC_405GPd,                 4=
+05,
+> > +    POWERPC_DEF("405GPD",        CPU_POWERPC_405GPd,                 4=
+05,
+> >                  "PowerPC 405 GPd")
+> >      POWERPC_DEF("405GPR",        CPU_POWERPC_405GPR,                 4=
+05,
+> >                  "PowerPC 405 GPR")
+> > @@ -226,20 +226,20 @@
+> >      POWERPC_DEF("405S",          CPU_POWERPC_405S,                   4=
+05,
+> >                  "PowerPC 405 S")
+> >  #endif
+> > -    POWERPC_DEF("Npe405H",       CPU_POWERPC_NPE405H,                4=
+05,
+> > +    POWERPC_DEF("NPE405H",       CPU_POWERPC_NPE405H,                4=
+05,
+> >                  "Npe405 H")
+> > -    POWERPC_DEF("Npe405H2",      CPU_POWERPC_NPE405H2,               4=
+05,
+> > +    POWERPC_DEF("NPE405H2",      CPU_POWERPC_NPE405H2,               4=
+05,
+> >                  "Npe405 H2")
+> > -    POWERPC_DEF("Npe405L",       CPU_POWERPC_NPE405L,                4=
+05,
+> > +    POWERPC_DEF("NPE405L",       CPU_POWERPC_NPE405L,                4=
+05,
+> >                  "Npe405 L")
+> > -    POWERPC_DEF("Npe4GS3",       CPU_POWERPC_NPE4GS3,                4=
+05,
+> > +    POWERPC_DEF("NPE4GS3",       CPU_POWERPC_NPE4GS3,                4=
+05,
+> >                  "Npe4GS3")
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("Npcxx1",        CPU_POWERPC_NPCxx1,                 4=
+05,
+> > +    POWERPC_DEF("NPCXX1",        CPU_POWERPC_NPCxx1,                 4=
+05,
+> >                  NULL)
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("Npr161",        CPU_POWERPC_NPR161,                 4=
+05,
+> > +    POWERPC_DEF("NPR161",        CPU_POWERPC_NPR161,                 4=
+05,
+> >                  NULL)
+> >  #endif
+> >  #if defined(TODO)
+> > @@ -278,24 +278,24 @@
+> >                  "STB130")
+> >  #endif
+> >      /* Xilinx PowerPC 405 cores                                       =
+       */
+> > -    POWERPC_DEF("x2vp4",         CPU_POWERPC_X2VP4,                  4=
+05,
+> > +    POWERPC_DEF("X2VP4",         CPU_POWERPC_X2VP4,                  4=
+05,
+> >                  NULL)
+> > -    POWERPC_DEF("x2vp20",        CPU_POWERPC_X2VP20,                 4=
+05,
+> > +    POWERPC_DEF("X2VP20",        CPU_POWERPC_X2VP20,                 4=
+05,
+> >                  NULL)
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("zl10310",       CPU_POWERPC_ZL10310,                4=
+05,
+> > +    POWERPC_DEF("ZL10310",       CPU_POWERPC_ZL10310,                4=
+05,
+> >                  "Zarlink ZL10310")
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("zl10311",       CPU_POWERPC_ZL10311,                4=
+05,
+> > +    POWERPC_DEF("ZL10311",       CPU_POWERPC_ZL10311,                4=
+05,
+> >                  "Zarlink ZL10311")
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("zl10320",       CPU_POWERPC_ZL10320,                4=
+05,
+> > +    POWERPC_DEF("ZL10320",       CPU_POWERPC_ZL10320,                4=
+05,
+> >                  "Zarlink ZL10320")
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("zl10321",       CPU_POWERPC_ZL10321,                4=
+05,
+> > +    POWERPC_DEF("ZL10321",       CPU_POWERPC_ZL10321,                4=
+05,
+> >                  "Zarlink ZL10321")
+> >  #endif
+> >      /* PowerPC 440 family                                             =
+       */
+> > @@ -308,10 +308,10 @@
+> >      POWERPC_DEF("440A4",         CPU_POWERPC_440A4,                  4=
+40x4,
+> >                  "PowerPC 440 A4")
+> >  #endif
+> > -    POWERPC_DEF("440-Xilinx",    CPU_POWERPC_440_XILINX,             4=
+40x5,
+> > +    POWERPC_DEF("440-XILINX",    CPU_POWERPC_440_XILINX,             4=
+40x5,
+> >                  "PowerPC 440 Xilinx 5")
+> > =20
+> > -    POWERPC_DEF("440-Xilinx-w-dfpu",    CPU_POWERPC_440_XILINX, 440x5w=
+DFPU,
+> > +    POWERPC_DEF("440-XILINX-W-DFPU",    CPU_POWERPC_440_XILINX, 440x5w=
+DFPU,
+> >                  "PowerPC 440 Xilinx 5 With a Double Prec. FPU")
+> >  #if defined(TODO)
+> >      POWERPC_DEF("440A5",         CPU_POWERPC_440A5,                  4=
+40x5,
+> > @@ -342,22 +342,22 @@
+> >                  "PowerPC 440H6")
+> >  #endif
+> >      /* PowerPC 440 microcontrollers                                   =
+       */
+> > -    POWERPC_DEF("440EPa",        CPU_POWERPC_440EPa,                 4=
+40EP,
+> > +    POWERPC_DEF("440EPA",        CPU_POWERPC_440EPa,                 4=
+40EP,
+> >                  "PowerPC 440 EPa")
+> > -    POWERPC_DEF("440EPb",        CPU_POWERPC_440EPb,                 4=
+40EP,
+> > +    POWERPC_DEF("440EPB",        CPU_POWERPC_440EPb,                 4=
+40EP,
+> >                  "PowerPC 440 EPb")
+> >      POWERPC_DEF("440EPX",        CPU_POWERPC_440EPX,                 4=
+40EP,
+> >                  "PowerPC 440 EPX")
+> >  #if defined(TODO_USER_ONLY)
+> > -    POWERPC_DEF("440GPb",        CPU_POWERPC_440GPb,                 4=
+40GP,
+> > +    POWERPC_DEF("440GPB",        CPU_POWERPC_440GPb,                 4=
+40GP,
+> >                  "PowerPC 440 GPb")
+> >  #endif
+> >  #if defined(TODO_USER_ONLY)
+> > -    POWERPC_DEF("440GPc",        CPU_POWERPC_440GPc,                 4=
+40GP,
+> > +    POWERPC_DEF("440GPC",        CPU_POWERPC_440GPc,                 4=
+40GP,
+> >                  "PowerPC 440 GPc")
+> >  #endif
+> >  #if defined(TODO_USER_ONLY)
+> > -    POWERPC_DEF("440GRa",        CPU_POWERPC_440GRa,                 4=
+40x5,
+> > +    POWERPC_DEF("440GRA",        CPU_POWERPC_440GRa,                 4=
+40x5,
+> >                  "PowerPC 440 GRa")
+> >  #endif
+> >  #if defined(TODO_USER_ONLY)
+> > @@ -365,19 +365,19 @@
+> >                  "PowerPC 440 GRX")
+> >  #endif
+> >  #if defined(TODO_USER_ONLY)
+> > -    POWERPC_DEF("440GXa",        CPU_POWERPC_440GXa,                 4=
+40EP,
+> > +    POWERPC_DEF("440GXA",        CPU_POWERPC_440GXa,                 4=
+40EP,
+> >                  "PowerPC 440 GXa")
+> >  #endif
+> >  #if defined(TODO_USER_ONLY)
+> > -    POWERPC_DEF("440GXb",        CPU_POWERPC_440GXb,                 4=
+40EP,
+> > +    POWERPC_DEF("440GXB",        CPU_POWERPC_440GXb,                 4=
+40EP,
+> >                  "PowerPC 440 GXb")
+> >  #endif
+> >  #if defined(TODO_USER_ONLY)
+> > -    POWERPC_DEF("440GXc",        CPU_POWERPC_440GXc,                 4=
+40EP,
+> > +    POWERPC_DEF("440GXC",        CPU_POWERPC_440GXc,                 4=
+40EP,
+> >                  "PowerPC 440 GXc")
+> >  #endif
+> >  #if defined(TODO_USER_ONLY)
+> > -    POWERPC_DEF("440GXf",        CPU_POWERPC_440GXf,                 4=
+40EP,
+> > +    POWERPC_DEF("440GXF",        CPU_POWERPC_440GXf,                 4=
+40EP,
+> >                  "PowerPC 440 GXf")
+> >  #endif
+> >  #if defined(TODO)
+> > @@ -413,12 +413,12 @@
+> >      /* Freescale embedded PowerPC cores                               =
+       */
+> >      /* MPC5xx family (aka RCPU)                                       =
+       */
+> >  #if defined(TODO_USER_ONLY)
+> > -    POWERPC_DEF("MPC5xx",        CPU_POWERPC_MPC5xx,                 M=
+PC5xx,
+> > +    POWERPC_DEF("MPC5XX",        CPU_POWERPC_MPC5xx,                 M=
+PC5xx,
+> >                  "Generic MPC5xx core")
+> >  #endif
+> >      /* MPC8xx family (aka PowerQUICC)                                 =
+       */
+> >  #if defined(TODO_USER_ONLY)
+> > -    POWERPC_DEF("MPC8xx",        CPU_POWERPC_MPC8xx,                 M=
+PC8xx,
+> > +    POWERPC_DEF("MPC8XX",        CPU_POWERPC_MPC8xx,                 M=
+PC8xx,
+> >                  "Generic MPC8xx core")
+> >  #endif
+> >      /* MPC82xx family (aka PowerQUICC-II)                             =
+       */
+> > @@ -430,57 +430,57 @@
+> >                  "PowerPC G2 GP core")
+> >      POWERPC_DEF("G2LS",          CPU_POWERPC_G2ls,                   G=
+2,
+> >                  "PowerPC G2 LS core")
+> > -    POWERPC_DEF("G2HiP3",        CPU_POWERPC_G2_HIP3,                G=
+2,
+> > +    POWERPC_DEF("G2HIP3",        CPU_POWERPC_G2_HIP3,                G=
+2,
+> >                  "PowerPC G2 HiP3 core")
+> > -    POWERPC_DEF("G2HiP4",        CPU_POWERPC_G2_HIP4,                G=
+2,
+> > +    POWERPC_DEF("G2HIP4",        CPU_POWERPC_G2_HIP4,                G=
+2,
+> >                  "PowerPC G2 HiP4 core")
+> >      POWERPC_DEF("MPC603",        CPU_POWERPC_MPC603,                 6=
+03E,
+> >                  "PowerPC MPC603 core")
+> > -    POWERPC_DEF("G2le",          CPU_POWERPC_G2LE,                   G=
+2LE,
+> > +    POWERPC_DEF("G2LE",          CPU_POWERPC_G2LE,                   G=
+2LE,
+> >          "PowerPC G2le core (same as G2 plus little-endian mode support=
+)")
+> > -    POWERPC_DEF("G2leGP",        CPU_POWERPC_G2LEgp,                 G=
+2LE,
+> > +    POWERPC_DEF("G2LEGP",        CPU_POWERPC_G2LEgp,                 G=
+2LE,
+> >                  "PowerPC G2LE GP core")
+> > -    POWERPC_DEF("G2leLS",        CPU_POWERPC_G2LEls,                 G=
+2LE,
+> > +    POWERPC_DEF("G2LELS",        CPU_POWERPC_G2LEls,                 G=
+2LE,
+> >                  "PowerPC G2LE LS core")
+> > -    POWERPC_DEF("G2leGP1",       CPU_POWERPC_G2LEgp1,                G=
+2LE,
+> > +    POWERPC_DEF("G2LEGP1",       CPU_POWERPC_G2LEgp1,                G=
+2LE,
+> >                  "PowerPC G2LE GP1 core")
+> > -    POWERPC_DEF("G2leGP3",       CPU_POWERPC_G2LEgp3,                G=
+2LE,
+> > +    POWERPC_DEF("G2LEGP3",       CPU_POWERPC_G2LEgp3,                G=
+2LE,
+> >                  "PowerPC G2LE GP3 core")
+> >      /* PowerPC G2 microcontrollers                                    =
+       */
+> >  #if defined(TODO)
+> >      POWERPC_DEF_SVR("MPC5121", "MPC5121",
+> >                      CPU_POWERPC_MPC5121,      POWERPC_SVR_5121,      G=
+2LE)
+> >  #endif
+> > -    POWERPC_DEF_SVR("MPC5200_v10", "MPC5200 v1.0",
+> > +    POWERPC_DEF_SVR("MPC5200_V10", "MPC5200 v1.0",
+> >                      CPU_POWERPC_MPC5200_v10,  POWERPC_SVR_5200_v10,  G=
+2LE)
+> > -    POWERPC_DEF_SVR("MPC5200_v11", "MPC5200 v1.1",
+> > +    POWERPC_DEF_SVR("MPC5200_V11", "MPC5200 v1.1",
+> >                      CPU_POWERPC_MPC5200_v11,  POWERPC_SVR_5200_v11,  G=
+2LE)
+> > -    POWERPC_DEF_SVR("MPC5200_v12", "MPC5200 v1.2",
+> > +    POWERPC_DEF_SVR("MPC5200_V12", "MPC5200 v1.2",
+> >                      CPU_POWERPC_MPC5200_v12,  POWERPC_SVR_5200_v12,  G=
+2LE)
+> > -    POWERPC_DEF_SVR("MPC5200B_v20", "MPC5200B v2.0",
+> > +    POWERPC_DEF_SVR("MPC5200B_V20", "MPC5200B v2.0",
+> >                      CPU_POWERPC_MPC5200B_v20, POWERPC_SVR_5200B_v20, G=
+2LE)
+> > -    POWERPC_DEF_SVR("MPC5200B_v21", "MPC5200B v2.1",
+> > +    POWERPC_DEF_SVR("MPC5200B_V21", "MPC5200B v2.1",
+> >                      CPU_POWERPC_MPC5200B_v21, POWERPC_SVR_5200B_v21, G=
+2LE)
+> >      /* e200 family                                                    =
+       */
+> >  #if defined(TODO)
+> > -    POWERPC_DEF_SVR("MPC55xx", "Generic MPC55xx core",
+> > +    POWERPC_DEF_SVR("MPC55XX", "Generic MPC55xx core",
+> >                      CPU_POWERPC_MPC55xx,      POWERPC_SVR_55xx,      e=
+200)
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("e200z0",        CPU_POWERPC_e200z0,                 e=
+200,
+> > +    POWERPC_DEF("E200Z0",        CPU_POWERPC_e200z0,                 e=
+200,
+> >                  "PowerPC e200z0 core")
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("e200z1",        CPU_POWERPC_e200z1,                 e=
+200,
+> > +    POWERPC_DEF("E200Z1",        CPU_POWERPC_e200z1,                 e=
+200,
+> >                  "PowerPC e200z1 core")
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("e200z3",        CPU_POWERPC_e200z3,                 e=
+200,
+> > +    POWERPC_DEF("E200Z3",        CPU_POWERPC_e200z3,                 e=
+200,
+> >                  "PowerPC e200z3 core")
+> >  #endif
+> > -    POWERPC_DEF("e200z5",        CPU_POWERPC_e200z5,                 e=
+200,
+> > +    POWERPC_DEF("E200Z5",        CPU_POWERPC_e200z5,                 e=
+200,
+> >                  "PowerPC e200z5 core")
+> > -    POWERPC_DEF("e200z6",        CPU_POWERPC_e200z6,                 e=
+200,
+> > +    POWERPC_DEF("E200Z6",        CPU_POWERPC_e200z6,                 e=
+200,
+> >                  "PowerPC e200z6 core")
+> >      /* PowerPC e200 microcontrollers                                  =
+       */
+> >  #if defined(TODO)
+> > @@ -488,11 +488,11 @@
+> >                      CPU_POWERPC_MPC5514E,     POWERPC_SVR_5514E,     e=
+200)
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF_SVR("MPC5514E_v0", "MPC5514E v0",
+> > +    POWERPC_DEF_SVR("MPC5514E_V0", "MPC5514E v0",
+> >                      CPU_POWERPC_MPC5514E_v0,  POWERPC_SVR_5514E_v0,  e=
+200)
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF_SVR("MPC5514E_v1", "MPC5514E v1",
+> > +    POWERPC_DEF_SVR("MPC5514E_V1", "MPC5514E v1",
+> >                      CPU_POWERPC_MPC5514E_v1,  POWERPC_SVR_5514E_v1,  e=
+200)
+> >  #endif
+> >  #if defined(TODO)
+> > @@ -500,11 +500,11 @@
+> >                      CPU_POWERPC_MPC5514G,     POWERPC_SVR_5514G,     e=
+200)
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF_SVR("MPC5514G_v0", "MPC5514G v0",
+> > +    POWERPC_DEF_SVR("MPC5514G_V0", "MPC5514G v0",
+> >                      CPU_POWERPC_MPC5514G_v0,  POWERPC_SVR_5514G_v0,  e=
+200)
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF_SVR("MPC5514G_v1", "MPC5514G v1",
+> > +    POWERPC_DEF_SVR("MPC5514G_V1", "MPC5514G v1",
+> >                      CPU_POWERPC_MPC5514G_v1,  POWERPC_SVR_5514G_v1,  e=
+200)
+> >  #endif
+> >  #if defined(TODO)
+> > @@ -516,11 +516,11 @@
+> >                      CPU_POWERPC_MPC5516E,     POWERPC_SVR_5516E,     e=
+200)
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF_SVR("MPC5516E_v0", "MPC5516E v0",
+> > +    POWERPC_DEF_SVR("MPC5516E_V0", "MPC5516E v0",
+> >                      CPU_POWERPC_MPC5516E_v0,  POWERPC_SVR_5516E_v0,  e=
+200)
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF_SVR("MPC5516E_v1", "MPC5516E v1",
+> > +    POWERPC_DEF_SVR("MPC5516E_V1", "MPC5516E v1",
+> >                      CPU_POWERPC_MPC5516E_v1,  POWERPC_SVR_5516E_v1,  e=
+200)
+> >  #endif
+> >  #if defined(TODO)
+> > @@ -528,11 +528,11 @@
+> >                      CPU_POWERPC_MPC5516G,     POWERPC_SVR_5516G,     e=
+200)
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF_SVR("MPC5516G_v0", "MPC5516G v0",
+> > +    POWERPC_DEF_SVR("MPC5516G_V0", "MPC5516G v0",
+> >                      CPU_POWERPC_MPC5516G_v0,  POWERPC_SVR_5516G_v0,  e=
+200)
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF_SVR("MPC5516G_v1", "MPC5516G v1",
+> > +    POWERPC_DEF_SVR("MPC5516G_V1", "MPC5516G v1",
+> >                      CPU_POWERPC_MPC5516G_v1,  POWERPC_SVR_5516G_v1,  e=
+200)
+> >  #endif
+> >  #if defined(TODO)
+> > @@ -572,13 +572,13 @@
+> >                      CPU_POWERPC_MPC5567,      POWERPC_SVR_5567,      e=
+200)
+> >  #endif
+> >      /* e300 family                                                    =
+       */
+> > -    POWERPC_DEF("e300c1",        CPU_POWERPC_e300c1,                 e=
+300,
+> > +    POWERPC_DEF("E300C1",        CPU_POWERPC_e300c1,                 e=
+300,
+> >                  "PowerPC e300c1 core")
+> > -    POWERPC_DEF("e300c2",        CPU_POWERPC_e300c2,                 e=
+300,
+> > +    POWERPC_DEF("E300C2",        CPU_POWERPC_e300c2,                 e=
+300,
+> >                  "PowerPC e300c2 core")
+> > -    POWERPC_DEF("e300c3",        CPU_POWERPC_e300c3,                 e=
+300,
+> > +    POWERPC_DEF("E300C3",        CPU_POWERPC_e300c3,                 e=
+300,
+> >                  "PowerPC e300c3 core")
+> > -    POWERPC_DEF("e300c4",        CPU_POWERPC_e300c4,                 e=
+300,
+> > +    POWERPC_DEF("E300C4",        CPU_POWERPC_e300c4,                 e=
+300,
+> >                  "PowerPC e300c4 core")
+> >      /* PowerPC e300 microcontrollers                                  =
+       */
+> >  #if defined(TODO)
+> > @@ -674,114 +674,114 @@
+> >      POWERPC_DEF_SVR("MPC8379E", "MPC8379E",
+> >                      CPU_POWERPC_MPC837x,      POWERPC_SVR_8379E,     e=
+300)
+> >      /* e500 family                                                    =
+       */
+> > -    POWERPC_DEF_SVR("e500_v10", "PowerPC e500 v1.0 core",
+> > +    POWERPC_DEF_SVR("E500_V10", "PowerPC e500 v1.0 core",
+> >                      CPU_POWERPC_e500v1_v10,   POWERPC_SVR_E500,      e=
+500v1);
+> > -    POWERPC_DEF_SVR("e500_v20", "PowerPC e500 v2.0 core",
+> > +    POWERPC_DEF_SVR("E500_V20", "PowerPC e500 v2.0 core",
+> >                      CPU_POWERPC_e500v1_v20,   POWERPC_SVR_E500,      e=
+500v1);
+> > -    POWERPC_DEF_SVR("e500v2_v10", "PowerPC e500v2 v1.0 core",
+> > +    POWERPC_DEF_SVR("E500V2_V10", "PowerPC e500v2 v1.0 core",
+> >                      CPU_POWERPC_e500v2_v10,   POWERPC_SVR_E500,      e=
+500v2);
+> > -    POWERPC_DEF_SVR("e500v2_v20", "PowerPC e500v2 v2.0 core",
+> > +    POWERPC_DEF_SVR("E500V2_V20", "PowerPC e500v2 v2.0 core",
+> >                      CPU_POWERPC_e500v2_v20,   POWERPC_SVR_E500,      e=
+500v2);
+> > -    POWERPC_DEF_SVR("e500v2_v21", "PowerPC e500v2 v2.1 core",
+> > +    POWERPC_DEF_SVR("E500V2_V21", "PowerPC e500v2 v2.1 core",
+> >                      CPU_POWERPC_e500v2_v21,   POWERPC_SVR_E500,      e=
+500v2);
+> > -    POWERPC_DEF_SVR("e500v2_v22", "PowerPC e500v2 v2.2 core",
+> > +    POWERPC_DEF_SVR("E500V2_V22", "PowerPC e500v2 v2.2 core",
+> >                      CPU_POWERPC_e500v2_v22,   POWERPC_SVR_E500,      e=
+500v2);
+> > -    POWERPC_DEF_SVR("e500v2_v30", "PowerPC e500v2 v3.0 core",
+> > +    POWERPC_DEF_SVR("E500V2_V30", "PowerPC e500v2 v3.0 core",
+> >                      CPU_POWERPC_e500v2_v30,   POWERPC_SVR_E500,      e=
+500v2);
+> > -    POWERPC_DEF_SVR("e500mc", "e500mc",
+> > +    POWERPC_DEF_SVR("E500MC", "e500mc",
+> >                      CPU_POWERPC_e500mc,       POWERPC_SVR_E500,      e=
+500mc)
+> >  #ifdef TARGET_PPC64
+> > -    POWERPC_DEF_SVR("e5500", "e5500",
+> > +    POWERPC_DEF_SVR("E5500", "e5500",
+> >                      CPU_POWERPC_e5500,        POWERPC_SVR_E500,      e=
+5500)
+> >  #endif
+> >      /* PowerPC e500 microcontrollers                                  =
+       */
+> > -    POWERPC_DEF_SVR("MPC8533_v10", "MPC8533 v1.0",
+> > +    POWERPC_DEF_SVR("MPC8533_V10", "MPC8533 v1.0",
+> >                      CPU_POWERPC_MPC8533_v10,  POWERPC_SVR_8533_v10,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8533_v11", "MPC8533 v1.1",
+> > +    POWERPC_DEF_SVR("MPC8533_V11", "MPC8533 v1.1",
+> >                      CPU_POWERPC_MPC8533_v11,  POWERPC_SVR_8533_v11,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8533E_v10", "MPC8533E v1.0",
+> > +    POWERPC_DEF_SVR("MPC8533E_V10", "MPC8533E v1.0",
+> >                      CPU_POWERPC_MPC8533E_v10, POWERPC_SVR_8533E_v10, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8533E_v11", "MPC8533E v1.1",
+> > +    POWERPC_DEF_SVR("MPC8533E_V11", "MPC8533E v1.1",
+> >                      CPU_POWERPC_MPC8533E_v11, POWERPC_SVR_8533E_v11, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8540_v10", "MPC8540 v1.0",
+> > +    POWERPC_DEF_SVR("MPC8540_V10", "MPC8540 v1.0",
+> >                      CPU_POWERPC_MPC8540_v10,  POWERPC_SVR_8540_v10,  e=
+500v1)
+> > -    POWERPC_DEF_SVR("MPC8540_v20", "MPC8540 v2.0",
+> > +    POWERPC_DEF_SVR("MPC8540_V20", "MPC8540 v2.0",
+> >                      CPU_POWERPC_MPC8540_v20,  POWERPC_SVR_8540_v20,  e=
+500v1)
+> > -    POWERPC_DEF_SVR("MPC8540_v21", "MPC8540 v2.1",
+> > +    POWERPC_DEF_SVR("MPC8540_V21", "MPC8540 v2.1",
+> >                      CPU_POWERPC_MPC8540_v21,  POWERPC_SVR_8540_v21,  e=
+500v1)
+> > -    POWERPC_DEF_SVR("MPC8541_v10", "MPC8541 v1.0",
+> > +    POWERPC_DEF_SVR("MPC8541_V10", "MPC8541 v1.0",
+> >                      CPU_POWERPC_MPC8541_v10,  POWERPC_SVR_8541_v10,  e=
+500v1)
+> > -    POWERPC_DEF_SVR("MPC8541_v11", "MPC8541 v1.1",
+> > +    POWERPC_DEF_SVR("MPC8541_V11", "MPC8541 v1.1",
+> >                      CPU_POWERPC_MPC8541_v11,  POWERPC_SVR_8541_v11,  e=
+500v1)
+> > -    POWERPC_DEF_SVR("MPC8541E_v10", "MPC8541E v1.0",
+> > +    POWERPC_DEF_SVR("MPC8541E_V10", "MPC8541E v1.0",
+> >                      CPU_POWERPC_MPC8541E_v10, POWERPC_SVR_8541E_v10, e=
+500v1)
+> > -    POWERPC_DEF_SVR("MPC8541E_v11", "MPC8541E v1.1",
+> > +    POWERPC_DEF_SVR("MPC8541E_V11", "MPC8541E v1.1",
+> >                      CPU_POWERPC_MPC8541E_v11, POWERPC_SVR_8541E_v11, e=
+500v1)
+> > -    POWERPC_DEF_SVR("MPC8543_v10", "MPC8543 v1.0",
+> > +    POWERPC_DEF_SVR("MPC8543_V10", "MPC8543 v1.0",
+> >                      CPU_POWERPC_MPC8543_v10,  POWERPC_SVR_8543_v10,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8543_v11", "MPC8543 v1.1",
+> > +    POWERPC_DEF_SVR("MPC8543_V11", "MPC8543 v1.1",
+> >                      CPU_POWERPC_MPC8543_v11,  POWERPC_SVR_8543_v11,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8543_v20", "MPC8543 v2.0",
+> > +    POWERPC_DEF_SVR("MPC8543_V20", "MPC8543 v2.0",
+> >                      CPU_POWERPC_MPC8543_v20,  POWERPC_SVR_8543_v20,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8543_v21", "MPC8543 v2.1",
+> > +    POWERPC_DEF_SVR("MPC8543_V21", "MPC8543 v2.1",
+> >                      CPU_POWERPC_MPC8543_v21,  POWERPC_SVR_8543_v21,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8543E_v10", "MPC8543E v1.0",
+> > +    POWERPC_DEF_SVR("MPC8543E_V10", "MPC8543E v1.0",
+> >                      CPU_POWERPC_MPC8543E_v10, POWERPC_SVR_8543E_v10, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8543E_v11", "MPC8543E v1.1",
+> > +    POWERPC_DEF_SVR("MPC8543E_V11", "MPC8543E v1.1",
+> >                      CPU_POWERPC_MPC8543E_v11, POWERPC_SVR_8543E_v11, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8543E_v20", "MPC8543E v2.0",
+> > +    POWERPC_DEF_SVR("MPC8543E_V20", "MPC8543E v2.0",
+> >                      CPU_POWERPC_MPC8543E_v20, POWERPC_SVR_8543E_v20, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8543E_v21", "MPC8543E v2.1",
+> > +    POWERPC_DEF_SVR("MPC8543E_V21", "MPC8543E v2.1",
+> >                      CPU_POWERPC_MPC8543E_v21, POWERPC_SVR_8543E_v21, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8544_v10", "MPC8544 v1.0",
+> > +    POWERPC_DEF_SVR("MPC8544_V10", "MPC8544 v1.0",
+> >                      CPU_POWERPC_MPC8544_v10,  POWERPC_SVR_8544_v10,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8544_v11", "MPC8544 v1.1",
+> > +    POWERPC_DEF_SVR("MPC8544_V11", "MPC8544 v1.1",
+> >                      CPU_POWERPC_MPC8544_v11,  POWERPC_SVR_8544_v11,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8544E_v10", "MPC8544E v1.0",
+> > +    POWERPC_DEF_SVR("MPC8544E_V10", "MPC8544E v1.0",
+> >                      CPU_POWERPC_MPC8544E_v10, POWERPC_SVR_8544E_v10, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8544E_v11", "MPC8544E v1.1",
+> > +    POWERPC_DEF_SVR("MPC8544E_V11", "MPC8544E v1.1",
+> >                      CPU_POWERPC_MPC8544E_v11, POWERPC_SVR_8544E_v11, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8545_v20", "MPC8545 v2.0",
+> > +    POWERPC_DEF_SVR("MPC8545_V20", "MPC8545 v2.0",
+> >                      CPU_POWERPC_MPC8545_v20,  POWERPC_SVR_8545_v20,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8545_v21", "MPC8545 v2.1",
+> > +    POWERPC_DEF_SVR("MPC8545_V21", "MPC8545 v2.1",
+> >                      CPU_POWERPC_MPC8545_v21,  POWERPC_SVR_8545_v21,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8545E_v20", "MPC8545E v2.0",
+> > +    POWERPC_DEF_SVR("MPC8545E_V20", "MPC8545E v2.0",
+> >                      CPU_POWERPC_MPC8545E_v20, POWERPC_SVR_8545E_v20, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8545E_v21", "MPC8545E v2.1",
+> > +    POWERPC_DEF_SVR("MPC8545E_V21", "MPC8545E v2.1",
+> >                      CPU_POWERPC_MPC8545E_v21, POWERPC_SVR_8545E_v21, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8547E_v20", "MPC8547E v2.0",
+> > +    POWERPC_DEF_SVR("MPC8547E_V20", "MPC8547E v2.0",
+> >                      CPU_POWERPC_MPC8547E_v20, POWERPC_SVR_8547E_v20, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8547E_v21", "MPC8547E v2.1",
+> > +    POWERPC_DEF_SVR("MPC8547E_V21", "MPC8547E v2.1",
+> >                      CPU_POWERPC_MPC8547E_v21, POWERPC_SVR_8547E_v21, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8548_v10", "MPC8548 v1.0",
+> > +    POWERPC_DEF_SVR("MPC8548_V10", "MPC8548 v1.0",
+> >                      CPU_POWERPC_MPC8548_v10,  POWERPC_SVR_8548_v10,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8548_v11", "MPC8548 v1.1",
+> > +    POWERPC_DEF_SVR("MPC8548_V11", "MPC8548 v1.1",
+> >                      CPU_POWERPC_MPC8548_v11,  POWERPC_SVR_8548_v11,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8548_v20", "MPC8548 v2.0",
+> > +    POWERPC_DEF_SVR("MPC8548_V20", "MPC8548 v2.0",
+> >                      CPU_POWERPC_MPC8548_v20,  POWERPC_SVR_8548_v20,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8548_v21", "MPC8548 v2.1",
+> > +    POWERPC_DEF_SVR("MPC8548_V21", "MPC8548 v2.1",
+> >                      CPU_POWERPC_MPC8548_v21,  POWERPC_SVR_8548_v21,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8548E_v10", "MPC8548E v1.0",
+> > +    POWERPC_DEF_SVR("MPC8548E_V10", "MPC8548E v1.0",
+> >                      CPU_POWERPC_MPC8548E_v10, POWERPC_SVR_8548E_v10, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8548E_v11", "MPC8548E v1.1",
+> > +    POWERPC_DEF_SVR("MPC8548E_V11", "MPC8548E v1.1",
+> >                      CPU_POWERPC_MPC8548E_v11, POWERPC_SVR_8548E_v11, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8548E_v20", "MPC8548E v2.0",
+> > +    POWERPC_DEF_SVR("MPC8548E_V20", "MPC8548E v2.0",
+> >                      CPU_POWERPC_MPC8548E_v20, POWERPC_SVR_8548E_v20, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8548E_v21", "MPC8548E v2.1",
+> > +    POWERPC_DEF_SVR("MPC8548E_V21", "MPC8548E v2.1",
+> >                      CPU_POWERPC_MPC8548E_v21, POWERPC_SVR_8548E_v21, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8555_v10", "MPC8555 v1.0",
+> > +    POWERPC_DEF_SVR("MPC8555_V10", "MPC8555 v1.0",
+> >                      CPU_POWERPC_MPC8555_v10,  POWERPC_SVR_8555_v10,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8555_v11", "MPC8555 v1.1",
+> > +    POWERPC_DEF_SVR("MPC8555_V11", "MPC8555 v1.1",
+> >                      CPU_POWERPC_MPC8555_v11,  POWERPC_SVR_8555_v11,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8555E_v10", "MPC8555E v1.0",
+> > +    POWERPC_DEF_SVR("MPC8555E_V10", "MPC8555E v1.0",
+> >                      CPU_POWERPC_MPC8555E_v10, POWERPC_SVR_8555E_v10, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8555E_v11", "MPC8555E v1.1",
+> > +    POWERPC_DEF_SVR("MPC8555E_V11", "MPC8555E v1.1",
+> >                      CPU_POWERPC_MPC8555E_v11, POWERPC_SVR_8555E_v11, e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8560_v10", "MPC8560 v1.0",
+> > +    POWERPC_DEF_SVR("MPC8560_V10", "MPC8560 v1.0",
+> >                      CPU_POWERPC_MPC8560_v10,  POWERPC_SVR_8560_v10,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8560_v20", "MPC8560 v2.0",
+> > +    POWERPC_DEF_SVR("MPC8560_V20", "MPC8560 v2.0",
+> >                      CPU_POWERPC_MPC8560_v20,  POWERPC_SVR_8560_v20,  e=
+500v2)
+> > -    POWERPC_DEF_SVR("MPC8560_v21", "MPC8560 v2.1",
+> > +    POWERPC_DEF_SVR("MPC8560_V21", "MPC8560 v2.1",
+> >                      CPU_POWERPC_MPC8560_v21,  POWERPC_SVR_8560_v21,  e=
+500v2)
+> >      POWERPC_DEF_SVR("MPC8567", "MPC8567",
+> >                      CPU_POWERPC_MPC8567,      POWERPC_SVR_8567,      e=
+500v2)
+> > @@ -796,7 +796,7 @@
+> >      POWERPC_DEF_SVR("MPC8572E", "MPC8572E",
+> >                      CPU_POWERPC_MPC8572E,     POWERPC_SVR_8572E,     e=
+500v2)
+> >      /* e600 family                                                    =
+       */
+> > -    POWERPC_DEF("e600",          CPU_POWERPC_e600,                   e=
+600,
+> > +    POWERPC_DEF("E600",          CPU_POWERPC_e600,                   e=
+600,
+> >                  "PowerPC e600 core")
+> >      /* PowerPC e600 microcontrollers                                  =
+       */
+> >      POWERPC_DEF_SVR("MPC8610", "MPC8610",
+> > @@ -807,299 +807,299 @@
+> >                      CPU_POWERPC_MPC8641D,     POWERPC_SVR_8641D,     e=
+600)
+> >      /* 32 bits "classic" PowerPC                                      =
+       */
+> >      /* PowerPC 6xx family                                             =
+       */
+> > -    POWERPC_DEF("601_v0",        CPU_POWERPC_601_v0,                 6=
+01,
+> > +    POWERPC_DEF("601_V0",        CPU_POWERPC_601_v0,                 6=
+01,
+> >                  "PowerPC 601v0")
+> > -    POWERPC_DEF("601_v1",        CPU_POWERPC_601_v1,                 6=
+01,
+> > +    POWERPC_DEF("601_V1",        CPU_POWERPC_601_v1,                 6=
+01,
+> >                  "PowerPC 601v1")
+> > -    POWERPC_DEF("601_v2",        CPU_POWERPC_601_v2,                 6=
+01v,
+> > +    POWERPC_DEF("601_V2",        CPU_POWERPC_601_v2,                 6=
+01v,
+> >                  "PowerPC 601v2")
+> >      POWERPC_DEF("602",           CPU_POWERPC_602,                    6=
+02,
+> >                  "PowerPC 602")
+> >      POWERPC_DEF("603",           CPU_POWERPC_603,                    6=
+03,
+> >                  "PowerPC 603")
+> > -    POWERPC_DEF("603e_v1.1",     CPU_POWERPC_603E_v11,               6=
+03E,
+> > +    POWERPC_DEF("603E_V1.1",     CPU_POWERPC_603E_v11,               6=
+03E,
+> >                  "PowerPC 603e v1.1")
+> > -    POWERPC_DEF("603e_v1.2",     CPU_POWERPC_603E_v12,               6=
+03E,
+> > +    POWERPC_DEF("603E_V1.2",     CPU_POWERPC_603E_v12,               6=
+03E,
+> >                  "PowerPC 603e v1.2")
+> > -    POWERPC_DEF("603e_v1.3",     CPU_POWERPC_603E_v13,               6=
+03E,
+> > +    POWERPC_DEF("603E_V1.3",     CPU_POWERPC_603E_v13,               6=
+03E,
+> >                  "PowerPC 603e v1.3")
+> > -    POWERPC_DEF("603e_v1.4",     CPU_POWERPC_603E_v14,               6=
+03E,
+> > +    POWERPC_DEF("603E_V1.4",     CPU_POWERPC_603E_v14,               6=
+03E,
+> >                  "PowerPC 603e v1.4")
+> > -    POWERPC_DEF("603e_v2.2",     CPU_POWERPC_603E_v22,               6=
+03E,
+> > +    POWERPC_DEF("603E_V2.2",     CPU_POWERPC_603E_v22,               6=
+03E,
+> >                  "PowerPC 603e v2.2")
+> > -    POWERPC_DEF("603e_v3",       CPU_POWERPC_603E_v3,                6=
+03E,
+> > +    POWERPC_DEF("603E_V3",       CPU_POWERPC_603E_v3,                6=
+03E,
+> >                  "PowerPC 603e v3")
+> > -    POWERPC_DEF("603e_v4",       CPU_POWERPC_603E_v4,                6=
+03E,
+> > +    POWERPC_DEF("603E_V4",       CPU_POWERPC_603E_v4,                6=
+03E,
+> >                  "PowerPC 603e v4")
+> > -    POWERPC_DEF("603e_v4.1",     CPU_POWERPC_603E_v41,               6=
+03E,
+> > +    POWERPC_DEF("603E_V4.1",     CPU_POWERPC_603E_v41,               6=
+03E,
+> >                  "PowerPC 603e v4.1")
+> > -    POWERPC_DEF("603e7",         CPU_POWERPC_603E7,                  6=
+03E,
+> > +    POWERPC_DEF("603E7",         CPU_POWERPC_603E7,                  6=
+03E,
+> >                  "PowerPC 603e (aka PID7)")
+> > -    POWERPC_DEF("603e7t",        CPU_POWERPC_603E7t,                 6=
+03E,
+> > +    POWERPC_DEF("603E7T",        CPU_POWERPC_603E7t,                 6=
+03E,
+> >                  "PowerPC 603e7t")
+> > -    POWERPC_DEF("603e7v",        CPU_POWERPC_603E7v,                 6=
+03E,
+> > +    POWERPC_DEF("603E7V",        CPU_POWERPC_603E7v,                 6=
+03E,
+> >                  "PowerPC 603e7v")
+> > -    POWERPC_DEF("603e7v1",       CPU_POWERPC_603E7v1,                6=
+03E,
+> > +    POWERPC_DEF("603E7V1",       CPU_POWERPC_603E7v1,                6=
+03E,
+> >                  "PowerPC 603e7v1")
+> > -    POWERPC_DEF("603e7v2",       CPU_POWERPC_603E7v2,                6=
+03E,
+> > +    POWERPC_DEF("603E7V2",       CPU_POWERPC_603E7v2,                6=
+03E,
+> >                  "PowerPC 603e7v2")
+> > -    POWERPC_DEF("603p",          CPU_POWERPC_603P,                   6=
+03E,
+> > +    POWERPC_DEF("603P",          CPU_POWERPC_603P,                   6=
+03E,
+> >                  "PowerPC 603p (aka PID7v)")
+> >      POWERPC_DEF("604",           CPU_POWERPC_604,                    6=
+04,
+> >                  "PowerPC 604")
+> > -    POWERPC_DEF("604e_v1.0",     CPU_POWERPC_604E_v10,               6=
+04E,
+> > +    POWERPC_DEF("604E_V1.0",     CPU_POWERPC_604E_v10,               6=
+04E,
+> >                  "PowerPC 604e v1.0")
+> > -    POWERPC_DEF("604e_v2.2",     CPU_POWERPC_604E_v22,               6=
+04E,
+> > +    POWERPC_DEF("604E_V2.2",     CPU_POWERPC_604E_v22,               6=
+04E,
+> >                  "PowerPC 604e v2.2")
+> > -    POWERPC_DEF("604e_v2.4",     CPU_POWERPC_604E_v24,               6=
+04E,
+> > +    POWERPC_DEF("604E_V2.4",     CPU_POWERPC_604E_v24,               6=
+04E,
+> >                  "PowerPC 604e v2.4")
+> > -    POWERPC_DEF("604r",          CPU_POWERPC_604R,                   6=
+04E,
+> > +    POWERPC_DEF("604R",          CPU_POWERPC_604R,                   6=
+04E,
+> >                  "PowerPC 604r (aka PIDA)")
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("604ev",         CPU_POWERPC_604EV,                  6=
+04E,
+> > +    POWERPC_DEF("604EV",         CPU_POWERPC_604EV,                  6=
+04E,
+> >                  "PowerPC 604ev")
+> >  #endif
+> >      /* PowerPC 7xx family                                             =
+       */
+> > -    POWERPC_DEF("740_v1.0",      CPU_POWERPC_7x0_v10,                7=
+40,
+> > +    POWERPC_DEF("740_V1.0",      CPU_POWERPC_7x0_v10,                7=
+40,
+> >                  "PowerPC 740 v1.0 (G3)")
+> > -    POWERPC_DEF("750_v1.0",      CPU_POWERPC_7x0_v10,                7=
+50,
+> > +    POWERPC_DEF("750_V1.0",      CPU_POWERPC_7x0_v10,                7=
+50,
+> >                  "PowerPC 750 v1.0 (G3)")
+> > -    POWERPC_DEF("740_v2.0",      CPU_POWERPC_7x0_v20,                7=
+40,
+> > +    POWERPC_DEF("740_V2.0",      CPU_POWERPC_7x0_v20,                7=
+40,
+> >                  "PowerPC 740 v2.0 (G3)")
+> > -    POWERPC_DEF("750_v2.0",      CPU_POWERPC_7x0_v20,                7=
+50,
+> > +    POWERPC_DEF("750_V2.0",      CPU_POWERPC_7x0_v20,                7=
+50,
+> >                  "PowerPC 750 v2.0 (G3)")
+> > -    POWERPC_DEF("740_v2.1",      CPU_POWERPC_7x0_v21,                7=
+40,
+> > +    POWERPC_DEF("740_V2.1",      CPU_POWERPC_7x0_v21,                7=
+40,
+> >                  "PowerPC 740 v2.1 (G3)")
+> > -    POWERPC_DEF("750_v2.1",      CPU_POWERPC_7x0_v21,                7=
+50,
+> > +    POWERPC_DEF("750_V2.1",      CPU_POWERPC_7x0_v21,                7=
+50,
+> >                  "PowerPC 750 v2.1 (G3)")
+> > -    POWERPC_DEF("740_v2.2",      CPU_POWERPC_7x0_v22,                7=
+40,
+> > +    POWERPC_DEF("740_V2.2",      CPU_POWERPC_7x0_v22,                7=
+40,
+> >                  "PowerPC 740 v2.2 (G3)")
+> > -    POWERPC_DEF("750_v2.2",      CPU_POWERPC_7x0_v22,                7=
+50,
+> > +    POWERPC_DEF("750_V2.2",      CPU_POWERPC_7x0_v22,                7=
+50,
+> >                  "PowerPC 750 v2.2 (G3)")
+> > -    POWERPC_DEF("740_v3.0",      CPU_POWERPC_7x0_v30,                7=
+40,
+> > +    POWERPC_DEF("740_V3.0",      CPU_POWERPC_7x0_v30,                7=
+40,
+> >                  "PowerPC 740 v3.0 (G3)")
+> > -    POWERPC_DEF("750_v3.0",      CPU_POWERPC_7x0_v30,                7=
+50,
+> > +    POWERPC_DEF("750_V3.0",      CPU_POWERPC_7x0_v30,                7=
+50,
+> >                  "PowerPC 750 v3.0 (G3)")
+> > -    POWERPC_DEF("740_v3.1",      CPU_POWERPC_7x0_v31,                7=
+40,
+> > +    POWERPC_DEF("740_V3.1",      CPU_POWERPC_7x0_v31,                7=
+40,
+> >                  "PowerPC 740 v3.1 (G3)")
+> > -    POWERPC_DEF("750_v3.1",      CPU_POWERPC_7x0_v31,                7=
+50,
+> > +    POWERPC_DEF("750_V3.1",      CPU_POWERPC_7x0_v31,                7=
+50,
+> >                  "PowerPC 750 v3.1 (G3)")
+> > -    POWERPC_DEF("740e",          CPU_POWERPC_740E,                   7=
+40,
+> > +    POWERPC_DEF("740E",          CPU_POWERPC_740E,                   7=
+40,
+> >                  "PowerPC 740E (G3)")
+> > -    POWERPC_DEF("750e",          CPU_POWERPC_750E,                   7=
+50,
+> > +    POWERPC_DEF("750E",          CPU_POWERPC_750E,                   7=
+50,
+> >                  "PowerPC 750E (G3)")
+> > -    POWERPC_DEF("740p",          CPU_POWERPC_7x0P,                   7=
+40,
+> > +    POWERPC_DEF("740P",          CPU_POWERPC_7x0P,                   7=
+40,
+> >                  "PowerPC 740P (G3)")
+> > -    POWERPC_DEF("750p",          CPU_POWERPC_7x0P,                   7=
+50,
+> > +    POWERPC_DEF("750P",          CPU_POWERPC_7x0P,                   7=
+50,
+> >                  "PowerPC 750P (G3)")
+> > -    POWERPC_DEF("750cl_v1.0",    CPU_POWERPC_750CL_v10,              7=
+50cl,
+> > +    POWERPC_DEF("750CL_V1.0",    CPU_POWERPC_750CL_v10,              7=
+50cl,
+> >                  "PowerPC 750CL v1.0")
+> > -    POWERPC_DEF("750cl_v2.0",    CPU_POWERPC_750CL_v20,              7=
+50cl,
+> > +    POWERPC_DEF("750CL_V2.0",    CPU_POWERPC_750CL_v20,              7=
+50cl,
+> >                  "PowerPC 750CL v2.0")
+> > -    POWERPC_DEF("750cx_v1.0",    CPU_POWERPC_750CX_v10,              7=
+50cx,
+> > +    POWERPC_DEF("750CX_V1.0",    CPU_POWERPC_750CX_v10,              7=
+50cx,
+> >                  "PowerPC 750CX v1.0 (G3 embedded)")
+> > -    POWERPC_DEF("750cx_v2.0",    CPU_POWERPC_750CX_v20,              7=
+50cx,
+> > +    POWERPC_DEF("750CX_V2.0",    CPU_POWERPC_750CX_v20,              7=
+50cx,
+> >                  "PowerPC 750CX v2.1 (G3 embedded)")
+> > -    POWERPC_DEF("750cx_v2.1",    CPU_POWERPC_750CX_v21,              7=
+50cx,
+> > +    POWERPC_DEF("750CX_V2.1",    CPU_POWERPC_750CX_v21,              7=
+50cx,
+> >                  "PowerPC 750CX v2.1 (G3 embedded)")
+> > -    POWERPC_DEF("750cx_v2.2",    CPU_POWERPC_750CX_v22,              7=
+50cx,
+> > +    POWERPC_DEF("750CX_V2.2",    CPU_POWERPC_750CX_v22,              7=
+50cx,
+> >                  "PowerPC 750CX v2.2 (G3 embedded)")
+> > -    POWERPC_DEF("750cxe_v2.1",   CPU_POWERPC_750CXE_v21,             7=
+50cx,
+> > +    POWERPC_DEF("750CXE_V2.1",   CPU_POWERPC_750CXE_v21,             7=
+50cx,
+> >                  "PowerPC 750CXe v2.1 (G3 embedded)")
+> > -    POWERPC_DEF("750cxe_v2.2",   CPU_POWERPC_750CXE_v22,             7=
+50cx,
+> > +    POWERPC_DEF("750CXE_V2.2",   CPU_POWERPC_750CXE_v22,             7=
+50cx,
+> >                  "PowerPC 750CXe v2.2 (G3 embedded)")
+> > -    POWERPC_DEF("750cxe_v2.3",   CPU_POWERPC_750CXE_v23,             7=
+50cx,
+> > +    POWERPC_DEF("750CXE_V2.3",   CPU_POWERPC_750CXE_v23,             7=
+50cx,
+> >                  "PowerPC 750CXe v2.3 (G3 embedded)")
+> > -    POWERPC_DEF("750cxe_v2.4",   CPU_POWERPC_750CXE_v24,             7=
+50cx,
+> > +    POWERPC_DEF("750CXE_V2.4",   CPU_POWERPC_750CXE_v24,             7=
+50cx,
+> >                  "PowerPC 750CXe v2.4 (G3 embedded)")
+> > -    POWERPC_DEF("750cxe_v2.4b",  CPU_POWERPC_750CXE_v24b,            7=
+50cx,
+> > +    POWERPC_DEF("750CXE_V2.4B",  CPU_POWERPC_750CXE_v24b,            7=
+50cx,
+> >                  "PowerPC 750CXe v2.4b (G3 embedded)")
+> > -    POWERPC_DEF("750cxe_v3.0",   CPU_POWERPC_750CXE_v30,             7=
+50cx,
+> > +    POWERPC_DEF("750CXE_V3.0",   CPU_POWERPC_750CXE_v30,             7=
+50cx,
+> >                  "PowerPC 750CXe v3.0 (G3 embedded)")
+> > -    POWERPC_DEF("750cxe_v3.1",   CPU_POWERPC_750CXE_v31,             7=
+50cx,
+> > +    POWERPC_DEF("750CXE_V3.1",   CPU_POWERPC_750CXE_v31,             7=
+50cx,
+> >                  "PowerPC 750CXe v3.1 (G3 embedded)")
+> > -    POWERPC_DEF("750cxe_v3.1b",  CPU_POWERPC_750CXE_v31b,            7=
+50cx,
+> > +    POWERPC_DEF("750CXE_V3.1B",  CPU_POWERPC_750CXE_v31b,            7=
+50cx,
+> >                  "PowerPC 750CXe v3.1b (G3 embedded)")
+> > -    POWERPC_DEF("750cxr",        CPU_POWERPC_750CXR,                 7=
+50cx,
+> > +    POWERPC_DEF("750CXR",        CPU_POWERPC_750CXR,                 7=
+50cx,
+> >                  "PowerPC 750CXr (G3 embedded)")
+> > -    POWERPC_DEF("750fl",         CPU_POWERPC_750FL,                  7=
+50fx,
+> > +    POWERPC_DEF("750FL",         CPU_POWERPC_750FL,                  7=
+50fx,
+> >                  "PowerPC 750FL (G3 embedded)")
+> > -    POWERPC_DEF("750fx_v1.0",    CPU_POWERPC_750FX_v10,              7=
+50fx,
+> > +    POWERPC_DEF("750FX_V1.0",    CPU_POWERPC_750FX_v10,              7=
+50fx,
+> >                  "PowerPC 750FX v1.0 (G3 embedded)")
+> > -    POWERPC_DEF("750fx_v2.0",    CPU_POWERPC_750FX_v20,              7=
+50fx,
+> > +    POWERPC_DEF("750FX_V2.0",    CPU_POWERPC_750FX_v20,              7=
+50fx,
+> >                  "PowerPC 750FX v2.0 (G3 embedded)")
+> > -    POWERPC_DEF("750fx_v2.1",    CPU_POWERPC_750FX_v21,              7=
+50fx,
+> > +    POWERPC_DEF("750FX_V2.1",    CPU_POWERPC_750FX_v21,              7=
+50fx,
+> >                  "PowerPC 750FX v2.1 (G3 embedded)")
+> > -    POWERPC_DEF("750fx_v2.2",    CPU_POWERPC_750FX_v22,              7=
+50fx,
+> > +    POWERPC_DEF("750FX_V2.2",    CPU_POWERPC_750FX_v22,              7=
+50fx,
+> >                  "PowerPC 750FX v2.2 (G3 embedded)")
+> > -    POWERPC_DEF("750fx_v2.3",    CPU_POWERPC_750FX_v23,              7=
+50fx,
+> > +    POWERPC_DEF("750FX_V2.3",    CPU_POWERPC_750FX_v23,              7=
+50fx,
+> >                  "PowerPC 750FX v2.3 (G3 embedded)")
+> > -    POWERPC_DEF("750gl",         CPU_POWERPC_750GL,                  7=
+50gx,
+> > +    POWERPC_DEF("750GL",         CPU_POWERPC_750GL,                  7=
+50gx,
+> >                  "PowerPC 750GL (G3 embedded)")
+> > -    POWERPC_DEF("750gx_v1.0",    CPU_POWERPC_750GX_v10,              7=
+50gx,
+> > +    POWERPC_DEF("750GX_V1.0",    CPU_POWERPC_750GX_v10,              7=
+50gx,
+> >                  "PowerPC 750GX v1.0 (G3 embedded)")
+> > -    POWERPC_DEF("750gx_v1.1",    CPU_POWERPC_750GX_v11,              7=
+50gx,
+> > +    POWERPC_DEF("750GX_V1.1",    CPU_POWERPC_750GX_v11,              7=
+50gx,
+> >                  "PowerPC 750GX v1.1 (G3 embedded)")
+> > -    POWERPC_DEF("750gx_v1.2",    CPU_POWERPC_750GX_v12,              7=
+50gx,
+> > +    POWERPC_DEF("750GX_V1.2",    CPU_POWERPC_750GX_v12,              7=
+50gx,
+> >                  "PowerPC 750GX v1.2 (G3 embedded)")
+> > -    POWERPC_DEF("750l_v2.0",     CPU_POWERPC_750L_v20,               7=
+50,
+> > +    POWERPC_DEF("750L_V2.0",     CPU_POWERPC_750L_v20,               7=
+50,
+> >                  "PowerPC 750L v2.0 (G3 embedded)")
+> > -    POWERPC_DEF("750l_v2.1",     CPU_POWERPC_750L_v21,               7=
+50,
+> > +    POWERPC_DEF("750L_V2.1",     CPU_POWERPC_750L_v21,               7=
+50,
+> >                  "PowerPC 750L v2.1 (G3 embedded)")
+> > -    POWERPC_DEF("750l_v2.2",     CPU_POWERPC_750L_v22,               7=
+50,
+> > +    POWERPC_DEF("750L_V2.2",     CPU_POWERPC_750L_v22,               7=
+50,
+> >                  "PowerPC 750L v2.2 (G3 embedded)")
+> > -    POWERPC_DEF("750l_v3.0",     CPU_POWERPC_750L_v30,               7=
+50,
+> > +    POWERPC_DEF("750L_V3.0",     CPU_POWERPC_750L_v30,               7=
+50,
+> >                  "PowerPC 750L v3.0 (G3 embedded)")
+> > -    POWERPC_DEF("750l_v3.2",     CPU_POWERPC_750L_v32,               7=
+50,
+> > +    POWERPC_DEF("750L_V3.2",     CPU_POWERPC_750L_v32,               7=
+50,
+> >                  "PowerPC 750L v3.2 (G3 embedded)")
+> > -    POWERPC_DEF("745_v1.0",      CPU_POWERPC_7x5_v10,                7=
+45,
+> > +    POWERPC_DEF("745_V1.0",      CPU_POWERPC_7x5_v10,                7=
+45,
+> >                  "PowerPC 745 v1.0")
+> > -    POWERPC_DEF("755_v1.0",      CPU_POWERPC_7x5_v10,                7=
+55,
+> > +    POWERPC_DEF("755_V1.0",      CPU_POWERPC_7x5_v10,                7=
+55,
+> >                  "PowerPC 755 v1.0")
+> > -    POWERPC_DEF("745_v1.1",      CPU_POWERPC_7x5_v11,                7=
+45,
+> > +    POWERPC_DEF("745_V1.1",      CPU_POWERPC_7x5_v11,                7=
+45,
+> >                  "PowerPC 745 v1.1")
+> > -    POWERPC_DEF("755_v1.1",      CPU_POWERPC_7x5_v11,                7=
+55,
+> > +    POWERPC_DEF("755_V1.1",      CPU_POWERPC_7x5_v11,                7=
+55,
+> >                  "PowerPC 755 v1.1")
+> > -    POWERPC_DEF("745_v2.0",      CPU_POWERPC_7x5_v20,                7=
+45,
+> > +    POWERPC_DEF("745_V2.0",      CPU_POWERPC_7x5_v20,                7=
+45,
+> >                  "PowerPC 745 v2.0")
+> > -    POWERPC_DEF("755_v2.0",      CPU_POWERPC_7x5_v20,                7=
+55,
+> > +    POWERPC_DEF("755_V2.0",      CPU_POWERPC_7x5_v20,                7=
+55,
+> >                  "PowerPC 755 v2.0")
+> > -    POWERPC_DEF("745_v2.1",      CPU_POWERPC_7x5_v21,                7=
+45,
+> > +    POWERPC_DEF("745_V2.1",      CPU_POWERPC_7x5_v21,                7=
+45,
+> >                  "PowerPC 745 v2.1")
+> > -    POWERPC_DEF("755_v2.1",      CPU_POWERPC_7x5_v21,                7=
+55,
+> > +    POWERPC_DEF("755_V2.1",      CPU_POWERPC_7x5_v21,                7=
+55,
+> >                  "PowerPC 755 v2.1")
+> > -    POWERPC_DEF("745_v2.2",      CPU_POWERPC_7x5_v22,                7=
+45,
+> > +    POWERPC_DEF("745_V2.2",      CPU_POWERPC_7x5_v22,                7=
+45,
+> >                  "PowerPC 745 v2.2")
+> > -    POWERPC_DEF("755_v2.2",      CPU_POWERPC_7x5_v22,                7=
+55,
+> > +    POWERPC_DEF("755_V2.2",      CPU_POWERPC_7x5_v22,                7=
+55,
+> >                  "PowerPC 755 v2.2")
+> > -    POWERPC_DEF("745_v2.3",      CPU_POWERPC_7x5_v23,                7=
+45,
+> > +    POWERPC_DEF("745_V2.3",      CPU_POWERPC_7x5_v23,                7=
+45,
+> >                  "PowerPC 745 v2.3")
+> > -    POWERPC_DEF("755_v2.3",      CPU_POWERPC_7x5_v23,                7=
+55,
+> > +    POWERPC_DEF("755_V2.3",      CPU_POWERPC_7x5_v23,                7=
+55,
+> >                  "PowerPC 755 v2.3")
+> > -    POWERPC_DEF("745_v2.4",      CPU_POWERPC_7x5_v24,                7=
+45,
+> > +    POWERPC_DEF("745_V2.4",      CPU_POWERPC_7x5_v24,                7=
+45,
+> >                  "PowerPC 745 v2.4")
+> > -    POWERPC_DEF("755_v2.4",      CPU_POWERPC_7x5_v24,                7=
+55,
+> > +    POWERPC_DEF("755_V2.4",      CPU_POWERPC_7x5_v24,                7=
+55,
+> >                  "PowerPC 755 v2.4")
+> > -    POWERPC_DEF("745_v2.5",      CPU_POWERPC_7x5_v25,                7=
+45,
+> > +    POWERPC_DEF("745_V2.5",      CPU_POWERPC_7x5_v25,                7=
+45,
+> >                  "PowerPC 745 v2.5")
+> > -    POWERPC_DEF("755_v2.5",      CPU_POWERPC_7x5_v25,                7=
+55,
+> > +    POWERPC_DEF("755_V2.5",      CPU_POWERPC_7x5_v25,                7=
+55,
+> >                  "PowerPC 755 v2.5")
+> > -    POWERPC_DEF("745_v2.6",      CPU_POWERPC_7x5_v26,                7=
+45,
+> > +    POWERPC_DEF("745_V2.6",      CPU_POWERPC_7x5_v26,                7=
+45,
+> >                  "PowerPC 745 v2.6")
+> > -    POWERPC_DEF("755_v2.6",      CPU_POWERPC_7x5_v26,                7=
+55,
+> > +    POWERPC_DEF("755_V2.6",      CPU_POWERPC_7x5_v26,                7=
+55,
+> >                  "PowerPC 755 v2.6")
+> > -    POWERPC_DEF("745_v2.7",      CPU_POWERPC_7x5_v27,                7=
+45,
+> > +    POWERPC_DEF("745_V2.7",      CPU_POWERPC_7x5_v27,                7=
+45,
+> >                  "PowerPC 745 v2.7")
+> > -    POWERPC_DEF("755_v2.7",      CPU_POWERPC_7x5_v27,                7=
+55,
+> > +    POWERPC_DEF("755_V2.7",      CPU_POWERPC_7x5_v27,                7=
+55,
+> >                  "PowerPC 755 v2.7")
+> > -    POWERPC_DEF("745_v2.8",      CPU_POWERPC_7x5_v28,                7=
+45,
+> > +    POWERPC_DEF("745_V2.8",      CPU_POWERPC_7x5_v28,                7=
+45,
+> >                  "PowerPC 745 v2.8")
+> > -    POWERPC_DEF("755_v2.8",      CPU_POWERPC_7x5_v28,                7=
+55,
+> > +    POWERPC_DEF("755_V2.8",      CPU_POWERPC_7x5_v28,                7=
+55,
+> >                  "PowerPC 755 v2.8")
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("745p",          CPU_POWERPC_7x5P,                   7=
+45,
+> > +    POWERPC_DEF("745P",          CPU_POWERPC_7x5P,                   7=
+45,
+> >                  "PowerPC 745P (G3)")
+> > -    POWERPC_DEF("755p",          CPU_POWERPC_7x5P,                   7=
+55,
+> > +    POWERPC_DEF("755P",          CPU_POWERPC_7x5P,                   7=
+55,
+> >                  "PowerPC 755P (G3)")
+> >  #endif
+> >      /* PowerPC 74xx family                                            =
+       */
+> > -    POWERPC_DEF("7400_v1.0",     CPU_POWERPC_7400_v10,               7=
+400,
+> > +    POWERPC_DEF("7400_V1.0",     CPU_POWERPC_7400_v10,               7=
+400,
+> >                  "PowerPC 7400 v1.0 (G4)")
+> > -    POWERPC_DEF("7400_v1.1",     CPU_POWERPC_7400_v11,               7=
+400,
+> > +    POWERPC_DEF("7400_V1.1",     CPU_POWERPC_7400_v11,               7=
+400,
+> >                  "PowerPC 7400 v1.1 (G4)")
+> > -    POWERPC_DEF("7400_v2.0",     CPU_POWERPC_7400_v20,               7=
+400,
+> > +    POWERPC_DEF("7400_V2.0",     CPU_POWERPC_7400_v20,               7=
+400,
+> >                  "PowerPC 7400 v2.0 (G4)")
+> > -    POWERPC_DEF("7400_v2.1",     CPU_POWERPC_7400_v21,               7=
+400,
+> > +    POWERPC_DEF("7400_V2.1",     CPU_POWERPC_7400_v21,               7=
+400,
+> >                  "PowerPC 7400 v2.1 (G4)")
+> > -    POWERPC_DEF("7400_v2.2",     CPU_POWERPC_7400_v22,               7=
+400,
+> > +    POWERPC_DEF("7400_V2.2",     CPU_POWERPC_7400_v22,               7=
+400,
+> >                  "PowerPC 7400 v2.2 (G4)")
+> > -    POWERPC_DEF("7400_v2.6",     CPU_POWERPC_7400_v26,               7=
+400,
+> > +    POWERPC_DEF("7400_V2.6",     CPU_POWERPC_7400_v26,               7=
+400,
+> >                  "PowerPC 7400 v2.6 (G4)")
+> > -    POWERPC_DEF("7400_v2.7",     CPU_POWERPC_7400_v27,               7=
+400,
+> > +    POWERPC_DEF("7400_V2.7",     CPU_POWERPC_7400_v27,               7=
+400,
+> >                  "PowerPC 7400 v2.7 (G4)")
+> > -    POWERPC_DEF("7400_v2.8",     CPU_POWERPC_7400_v28,               7=
+400,
+> > +    POWERPC_DEF("7400_V2.8",     CPU_POWERPC_7400_v28,               7=
+400,
+> >                  "PowerPC 7400 v2.8 (G4)")
+> > -    POWERPC_DEF("7400_v2.9",     CPU_POWERPC_7400_v29,               7=
+400,
+> > +    POWERPC_DEF("7400_V2.9",     CPU_POWERPC_7400_v29,               7=
+400,
+> >                  "PowerPC 7400 v2.9 (G4)")
+> > -    POWERPC_DEF("7410_v1.0",     CPU_POWERPC_7410_v10,               7=
+410,
+> > +    POWERPC_DEF("7410_V1.0",     CPU_POWERPC_7410_v10,               7=
+410,
+> >                  "PowerPC 7410 v1.0 (G4)")
+> > -    POWERPC_DEF("7410_v1.1",     CPU_POWERPC_7410_v11,               7=
+410,
+> > +    POWERPC_DEF("7410_V1.1",     CPU_POWERPC_7410_v11,               7=
+410,
+> >                  "PowerPC 7410 v1.1 (G4)")
+> > -    POWERPC_DEF("7410_v1.2",     CPU_POWERPC_7410_v12,               7=
+410,
+> > +    POWERPC_DEF("7410_V1.2",     CPU_POWERPC_7410_v12,               7=
+410,
+> >                  "PowerPC 7410 v1.2 (G4)")
+> > -    POWERPC_DEF("7410_v1.3",     CPU_POWERPC_7410_v13,               7=
+410,
+> > +    POWERPC_DEF("7410_V1.3",     CPU_POWERPC_7410_v13,               7=
+410,
+> >                  "PowerPC 7410 v1.3 (G4)")
+> > -    POWERPC_DEF("7410_v1.4",     CPU_POWERPC_7410_v14,               7=
+410,
+> > +    POWERPC_DEF("7410_V1.4",     CPU_POWERPC_7410_v14,               7=
+410,
+> >                  "PowerPC 7410 v1.4 (G4)")
+> > -    POWERPC_DEF("7448_v1.0",     CPU_POWERPC_7448_v10,               7=
+400,
+> > +    POWERPC_DEF("7448_V1.0",     CPU_POWERPC_7448_v10,               7=
+400,
+> >                  "PowerPC 7448 v1.0 (G4)")
+> > -    POWERPC_DEF("7448_v1.1",     CPU_POWERPC_7448_v11,               7=
+400,
+> > +    POWERPC_DEF("7448_V1.1",     CPU_POWERPC_7448_v11,               7=
+400,
+> >                  "PowerPC 7448 v1.1 (G4)")
+> > -    POWERPC_DEF("7448_v2.0",     CPU_POWERPC_7448_v20,               7=
+400,
+> > +    POWERPC_DEF("7448_V2.0",     CPU_POWERPC_7448_v20,               7=
+400,
+> >                  "PowerPC 7448 v2.0 (G4)")
+> > -    POWERPC_DEF("7448_v2.1",     CPU_POWERPC_7448_v21,               7=
+400,
+> > +    POWERPC_DEF("7448_V2.1",     CPU_POWERPC_7448_v21,               7=
+400,
+> >                  "PowerPC 7448 v2.1 (G4)")
+> > -    POWERPC_DEF("7450_v1.0",     CPU_POWERPC_7450_v10,               7=
+450,
+> > +    POWERPC_DEF("7450_V1.0",     CPU_POWERPC_7450_v10,               7=
+450,
+> >                  "PowerPC 7450 v1.0 (G4)")
+> > -    POWERPC_DEF("7450_v1.1",     CPU_POWERPC_7450_v11,               7=
+450,
+> > +    POWERPC_DEF("7450_V1.1",     CPU_POWERPC_7450_v11,               7=
+450,
+> >                  "PowerPC 7450 v1.1 (G4)")
+> > -    POWERPC_DEF("7450_v1.2",     CPU_POWERPC_7450_v12,               7=
+450,
+> > +    POWERPC_DEF("7450_V1.2",     CPU_POWERPC_7450_v12,               7=
+450,
+> >                  "PowerPC 7450 v1.2 (G4)")
+> > -    POWERPC_DEF("7450_v2.0",     CPU_POWERPC_7450_v20,               7=
+450,
+> > +    POWERPC_DEF("7450_V2.0",     CPU_POWERPC_7450_v20,               7=
+450,
+> >                  "PowerPC 7450 v2.0 (G4)")
+> > -    POWERPC_DEF("7450_v2.1",     CPU_POWERPC_7450_v21,               7=
+450,
+> > +    POWERPC_DEF("7450_V2.1",     CPU_POWERPC_7450_v21,               7=
+450,
+> >                  "PowerPC 7450 v2.1 (G4)")
+> > -    POWERPC_DEF("7441_v2.1",     CPU_POWERPC_7450_v21,               7=
+440,
+> > +    POWERPC_DEF("7441_V2.1",     CPU_POWERPC_7450_v21,               7=
+440,
+> >                  "PowerPC 7441 v2.1 (G4)")
+> > -    POWERPC_DEF("7441_v2.3",     CPU_POWERPC_74x1_v23,               7=
+440,
+> > +    POWERPC_DEF("7441_V2.3",     CPU_POWERPC_74x1_v23,               7=
+440,
+> >                  "PowerPC 7441 v2.3 (G4)")
+> > -    POWERPC_DEF("7451_v2.3",     CPU_POWERPC_74x1_v23,               7=
+450,
+> > +    POWERPC_DEF("7451_V2.3",     CPU_POWERPC_74x1_v23,               7=
+450,
+> >                  "PowerPC 7451 v2.3 (G4)")
+> > -    POWERPC_DEF("7441_v2.10",    CPU_POWERPC_74x1_v210,              7=
+440,
+> > +    POWERPC_DEF("7441_V2.10",    CPU_POWERPC_74x1_v210,              7=
+440,
+> >                  "PowerPC 7441 v2.10 (G4)")
+> > -    POWERPC_DEF("7451_v2.10",    CPU_POWERPC_74x1_v210,              7=
+450,
+> > +    POWERPC_DEF("7451_V2.10",    CPU_POWERPC_74x1_v210,              7=
+450,
+> >                  "PowerPC 7451 v2.10 (G4)")
+> > -    POWERPC_DEF("7445_v1.0",     CPU_POWERPC_74x5_v10,               7=
+445,
+> > +    POWERPC_DEF("7445_V1.0",     CPU_POWERPC_74x5_v10,               7=
+445,
+> >                  "PowerPC 7445 v1.0 (G4)")
+> > -    POWERPC_DEF("7455_v1.0",     CPU_POWERPC_74x5_v10,               7=
+455,
+> > +    POWERPC_DEF("7455_V1.0",     CPU_POWERPC_74x5_v10,               7=
+455,
+> >                  "PowerPC 7455 v1.0 (G4)")
+> > -    POWERPC_DEF("7445_v2.1",     CPU_POWERPC_74x5_v21,               7=
+445,
+> > +    POWERPC_DEF("7445_V2.1",     CPU_POWERPC_74x5_v21,               7=
+445,
+> >                  "PowerPC 7445 v2.1 (G4)")
+> > -    POWERPC_DEF("7455_v2.1",     CPU_POWERPC_74x5_v21,               7=
+455,
+> > +    POWERPC_DEF("7455_V2.1",     CPU_POWERPC_74x5_v21,               7=
+455,
+> >                  "PowerPC 7455 v2.1 (G4)")
+> > -    POWERPC_DEF("7445_v3.2",     CPU_POWERPC_74x5_v32,               7=
+445,
+> > +    POWERPC_DEF("7445_V3.2",     CPU_POWERPC_74x5_v32,               7=
+445,
+> >                  "PowerPC 7445 v3.2 (G4)")
+> > -    POWERPC_DEF("7455_v3.2",     CPU_POWERPC_74x5_v32,               7=
+455,
+> > +    POWERPC_DEF("7455_V3.2",     CPU_POWERPC_74x5_v32,               7=
+455,
+> >                  "PowerPC 7455 v3.2 (G4)")
+> > -    POWERPC_DEF("7445_v3.3",     CPU_POWERPC_74x5_v33,               7=
+445,
+> > +    POWERPC_DEF("7445_V3.3",     CPU_POWERPC_74x5_v33,               7=
+445,
+> >                  "PowerPC 7445 v3.3 (G4)")
+> > -    POWERPC_DEF("7455_v3.3",     CPU_POWERPC_74x5_v33,               7=
+455,
+> > +    POWERPC_DEF("7455_V3.3",     CPU_POWERPC_74x5_v33,               7=
+455,
+> >                  "PowerPC 7455 v3.3 (G4)")
+> > -    POWERPC_DEF("7445_v3.4",     CPU_POWERPC_74x5_v34,               7=
+445,
+> > +    POWERPC_DEF("7445_V3.4",     CPU_POWERPC_74x5_v34,               7=
+445,
+> >                  "PowerPC 7445 v3.4 (G4)")
+> > -    POWERPC_DEF("7455_v3.4",     CPU_POWERPC_74x5_v34,               7=
+455,
+> > +    POWERPC_DEF("7455_V3.4",     CPU_POWERPC_74x5_v34,               7=
+455,
+> >                  "PowerPC 7455 v3.4 (G4)")
+> > -    POWERPC_DEF("7447_v1.0",     CPU_POWERPC_74x7_v10,               7=
+445,
+> > +    POWERPC_DEF("7447_V1.0",     CPU_POWERPC_74x7_v10,               7=
+445,
+> >                  "PowerPC 7447 v1.0 (G4)")
+> > -    POWERPC_DEF("7457_v1.0",     CPU_POWERPC_74x7_v10,               7=
+455,
+> > +    POWERPC_DEF("7457_V1.0",     CPU_POWERPC_74x7_v10,               7=
+455,
+> >                  "PowerPC 7457 v1.0 (G4)")
+> > -    POWERPC_DEF("7447_v1.1",     CPU_POWERPC_74x7_v11,               7=
+445,
+> > +    POWERPC_DEF("7447_V1.1",     CPU_POWERPC_74x7_v11,               7=
+445,
+> >                  "PowerPC 7447 v1.1 (G4)")
+> > -    POWERPC_DEF("7457_v1.1",     CPU_POWERPC_74x7_v11,               7=
+455,
+> > +    POWERPC_DEF("7457_V1.1",     CPU_POWERPC_74x7_v11,               7=
+455,
+> >                  "PowerPC 7457 v1.1 (G4)")
+> > -    POWERPC_DEF("7457_v1.2",     CPU_POWERPC_74x7_v12,               7=
+455,
+> > +    POWERPC_DEF("7457_V1.2",     CPU_POWERPC_74x7_v12,               7=
+455,
+> >                  "PowerPC 7457 v1.2 (G4)")
+> > -    POWERPC_DEF("7447A_v1.0",    CPU_POWERPC_74x7A_v10,              7=
+445,
+> > +    POWERPC_DEF("7447A_V1.0",    CPU_POWERPC_74x7A_v10,              7=
+445,
+> >                  "PowerPC 7447A v1.0 (G4)")
+> > -    POWERPC_DEF("7457A_v1.0",    CPU_POWERPC_74x7A_v10,              7=
+455,
+> > +    POWERPC_DEF("7457A_V1.0",    CPU_POWERPC_74x7A_v10,              7=
+455,
+> >                  "PowerPC 7457A v1.0 (G4)")
+> > -    POWERPC_DEF("7447A_v1.1",    CPU_POWERPC_74x7A_v11,              7=
+445,
+> > +    POWERPC_DEF("7447A_V1.1",    CPU_POWERPC_74x7A_v11,              7=
+445,
+> >                  "PowerPC 7447A v1.1 (G4)")
+> > -    POWERPC_DEF("7457A_v1.1",    CPU_POWERPC_74x7A_v11,              7=
+455,
+> > +    POWERPC_DEF("7457A_V1.1",    CPU_POWERPC_74x7A_v11,              7=
+455,
+> >                  "PowerPC 7457A v1.1 (G4)")
+> > -    POWERPC_DEF("7447A_v1.2",    CPU_POWERPC_74x7A_v12,              7=
+445,
+> > +    POWERPC_DEF("7447A_V1.2",    CPU_POWERPC_74x7A_v12,              7=
+445,
+> >                  "PowerPC 7447A v1.2 (G4)")
+> > -    POWERPC_DEF("7457A_v1.2",    CPU_POWERPC_74x7A_v12,              7=
+455,
+> > +    POWERPC_DEF("7457A_V1.2",    CPU_POWERPC_74x7A_v12,              7=
+455,
+> >                  "PowerPC 7457A v1.2 (G4)")
+> >      /* 64 bits PowerPC                                                =
+       */
+> >  #if defined (TARGET_PPC64)
+> > @@ -1125,64 +1125,64 @@
+> >      POWERPC_DEF("POWER5",        CPU_POWERPC_POWER5,                 P=
+OWER5,
+> >                  "POWER5")
+> >  #endif
+> > -    POWERPC_DEF("POWER5+_v2.1",  CPU_POWERPC_POWER5P_v21,            P=
+OWER5P,
+> > +    POWERPC_DEF("POWER5+_V2.1",  CPU_POWERPC_POWER5P_v21,            P=
+OWER5P,
+> >                  "POWER5+ v2.1")
+> >  #if defined(TODO)
+> >      POWERPC_DEF("POWER6",        CPU_POWERPC_POWER6,                 P=
+OWER6,
+> >                  "POWER6")
+> >  #endif
+> > -    POWERPC_DEF("POWER7_v2.3",   CPU_POWERPC_POWER7_v23,             P=
+OWER7,
+> > +    POWERPC_DEF("POWER7_V2.3",   CPU_POWERPC_POWER7_v23,             P=
+OWER7,
+> >                  "POWER7 v2.3")
+> > -    POWERPC_DEF("POWER7+_v2.1",  CPU_POWERPC_POWER7P_v21,            P=
+OWER7,
+> > +    POWERPC_DEF("POWER7+_V2.1",  CPU_POWERPC_POWER7P_v21,            P=
+OWER7,
+> >                  "POWER7+ v2.1")
+> > -    POWERPC_DEF("POWER8E_v2.1",  CPU_POWERPC_POWER8E_v21,            P=
+OWER8,
+> > +    POWERPC_DEF("POWER8E_V2.1",  CPU_POWERPC_POWER8E_v21,            P=
+OWER8,
+> >                  "POWER8E v2.1")
+> > -    POWERPC_DEF("POWER8_v2.0",   CPU_POWERPC_POWER8_v20,             P=
+OWER8,
+> > +    POWERPC_DEF("POWER8_V2.0",   CPU_POWERPC_POWER8_v20,             P=
+OWER8,
+> >                  "POWER8 v2.0")
+> > -    POWERPC_DEF("POWER8NVL_v1.0",CPU_POWERPC_POWER8NVL_v10,          P=
+OWER8,
+> > +    POWERPC_DEF("POWER8NVL_V1.0", CPU_POWERPC_POWER8NVL_v10,         P=
+OWER8,
+> >                  "POWER8NVL v1.0")
+> > -    POWERPC_DEF("970_v2.2",      CPU_POWERPC_970_v22,                9=
+70,
+> > +    POWERPC_DEF("970_V2.2",      CPU_POWERPC_970_v22,                9=
+70,
+> >                  "PowerPC 970 v2.2")
+> > =20
+> > -    POWERPC_DEF("POWER9_v1.0",   CPU_POWERPC_POWER9_BASE,            P=
+OWER9,
+> > +    POWERPC_DEF("POWER9_V1.0",   CPU_POWERPC_POWER9_BASE,            P=
+OWER9,
+> >                  "POWER9 v1.0")
+> > =20
+> > -    POWERPC_DEF("970fx_v1.0",    CPU_POWERPC_970FX_v10,              9=
+70,
+> > +    POWERPC_DEF("970FX_V1.0",    CPU_POWERPC_970FX_v10,              9=
+70,
+> >                  "PowerPC 970FX v1.0 (G5)")
+> > -    POWERPC_DEF("970fx_v2.0",    CPU_POWERPC_970FX_v20,              9=
+70,
+> > +    POWERPC_DEF("970FX_V2.0",    CPU_POWERPC_970FX_v20,              9=
+70,
+> >                  "PowerPC 970FX v2.0 (G5)")
+> > -    POWERPC_DEF("970fx_v2.1",    CPU_POWERPC_970FX_v21,              9=
+70,
+> > +    POWERPC_DEF("970FX_V2.1",    CPU_POWERPC_970FX_v21,              9=
+70,
+> >                  "PowerPC 970FX v2.1 (G5)")
+> > -    POWERPC_DEF("970fx_v3.0",    CPU_POWERPC_970FX_v30,              9=
+70,
+> > +    POWERPC_DEF("970FX_V3.0",    CPU_POWERPC_970FX_v30,              9=
+70,
+> >                  "PowerPC 970FX v3.0 (G5)")
+> > -    POWERPC_DEF("970fx_v3.1",    CPU_POWERPC_970FX_v31,              9=
+70,
+> > +    POWERPC_DEF("970FX_V3.1",    CPU_POWERPC_970FX_v31,              9=
+70,
+> >                  "PowerPC 970FX v3.1 (G5)")
+> > -    POWERPC_DEF("970mp_v1.0",    CPU_POWERPC_970MP_v10,              9=
+70,
+> > +    POWERPC_DEF("970MP_V1.0",    CPU_POWERPC_970MP_v10,              9=
+70,
+> >                  "PowerPC 970MP v1.0")
+> > -    POWERPC_DEF("970mp_v1.1",    CPU_POWERPC_970MP_v11,              9=
+70,
+> > +    POWERPC_DEF("970MP_V1.1",    CPU_POWERPC_970MP_v11,              9=
+70,
+> >                  "PowerPC 970MP v1.1")
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("Cell",          CPU_POWERPC_CELL,                   9=
+70,
+> > +    POWERPC_DEF("CELL",          CPU_POWERPC_CELL,                   9=
+70,
+> >                  "PowerPC Cell")
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("Cell_v1.0",     CPU_POWERPC_CELL_v10,               9=
+70,
+> > +    POWERPC_DEF("CELL_V1.0",     CPU_POWERPC_CELL_v10,               9=
+70,
+> >                  "PowerPC Cell v1.0")
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("Cell_v2.0",     CPU_POWERPC_CELL_v20,               9=
+70,
+> > +    POWERPC_DEF("CELL_V2.0",     CPU_POWERPC_CELL_v20,               9=
+70,
+> >                  "PowerPC Cell v2.0")
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("Cell_v3.0",     CPU_POWERPC_CELL_v30,               9=
+70,
+> > +    POWERPC_DEF("CELL_V3.0",     CPU_POWERPC_CELL_v30,               9=
+70,
+> >                  "PowerPC Cell v3.0")
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("Cell_v3.1",     CPU_POWERPC_CELL_v31,               9=
+70,
+> > +    POWERPC_DEF("CELL_V3.1",     CPU_POWERPC_CELL_v31,               9=
+70,
+> >                  "PowerPC Cell v3.1")
+> >  #endif
+> >  #if defined(TODO)
+> > -    POWERPC_DEF("Cell_v3.2",     CPU_POWERPC_CELL_v32,               9=
+70,
+> > +    POWERPC_DEF("CELL_V3.2",     CPU_POWERPC_CELL_v32,               9=
+70,
+> >                  "PowerPC Cell v3.2")
+> >  #endif
+> >  #if defined(TODO)
+> > @@ -1228,181 +1228,181 @@
+> >  PowerPCCPUAlias ppc_cpu_aliases[] =3D {
+> >      { "403", "403GC" },
+> >      { "405", "405D4" },
+> > -    { "405CR", "405CRc" },
+> > -    { "405GP", "405GPd" },
+> > -    { "405GPe", "405CRc" },
+> > -    { "x2vp7", "x2vp4" },
+> > -    { "x2vp50", "x2vp20" },
+> > +    { "405CR", "405CRC" },
+> > +    { "405GP", "405GPD" },
+> > +    { "405GPE", "405CRC" },
+> > +    { "X2VP7", "X2VP4" },
+> > +    { "X2VP50", "X2VP20" },
+> > =20
+> > -    { "440EP", "440EPb" },
+> > -    { "440GP", "440GPc" },
+> > -    { "440GR", "440GRa" },
+> > -    { "440GX", "440GXf" },
+> > +    { "440EP", "440EPB" },
+> > +    { "440GP", "440GPC" },
+> > +    { "440GR", "440GRA" },
+> > +    { "440GX", "440GXF" },
+> > =20
+> > -    { "RCPU", "MPC5xx" },
+> > +    { "RCPU", "MPC5XX" },
+> >      /* MPC5xx microcontrollers */
+> > -    { "MGT560", "MPC5xx" },
+> > -    { "MPC509", "MPC5xx" },
+> > -    { "MPC533", "MPC5xx" },
+> > -    { "MPC534", "MPC5xx" },
+> > -    { "MPC555", "MPC5xx" },
+> > -    { "MPC556", "MPC5xx" },
+> > -    { "MPC560", "MPC5xx" },
+> > -    { "MPC561", "MPC5xx" },
+> > -    { "MPC562", "MPC5xx" },
+> > -    { "MPC563", "MPC5xx" },
+> > -    { "MPC564", "MPC5xx" },
+> > -    { "MPC565", "MPC5xx" },
+> > -    { "MPC566", "MPC5xx" },
+> > +    { "MGT560", "MPC5XX" },
+> > +    { "MPC509", "MPC5XX" },
+> > +    { "MPC533", "MPC5XX" },
+> > +    { "MPC534", "MPC5XX" },
+> > +    { "MPC555", "MPC5XX" },
+> > +    { "MPC556", "MPC5XX" },
+> > +    { "MPC560", "MPC5XX" },
+> > +    { "MPC561", "MPC5XX" },
+> > +    { "MPC562", "MPC5XX" },
+> > +    { "MPC563", "MPC5XX" },
+> > +    { "MPC564", "MPC5XX" },
+> > +    { "MPC565", "MPC5XX" },
+> > +    { "MPC566", "MPC5XX" },
+> > =20
+> > -    { "PowerQUICC", "MPC8xx" },
+> > +    { "POWERQUICC", "MPC8XX" },
+> >      /* MPC8xx microcontrollers */
+> > -    { "MGT823", "MPC8xx" },
+> > -    { "MPC821", "MPC8xx" },
+> > -    { "MPC823", "MPC8xx" },
+> > -    { "MPC850", "MPC8xx" },
+> > -    { "MPC852T", "MPC8xx" },
+> > -    { "MPC855T", "MPC8xx" },
+> > -    { "MPC857", "MPC8xx" },
+> > -    { "MPC859", "MPC8xx" },
+> > -    { "MPC860", "MPC8xx" },
+> > -    { "MPC862", "MPC8xx" },
+> > -    { "MPC866", "MPC8xx" },
+> > -    { "MPC870", "MPC8xx" },
+> > -    { "MPC875", "MPC8xx" },
+> > -    { "MPC880", "MPC8xx" },
+> > -    { "MPC885", "MPC8xx" },
+> > +    { "MGT823", "MPC8XX" },
+> > +    { "MPC821", "MPC8XX" },
+> > +    { "MPC823", "MPC8XX" },
+> > +    { "MPC850", "MPC8XX" },
+> > +    { "MPC852T", "MPC8XX" },
+> > +    { "MPC855T", "MPC8XX" },
+> > +    { "MPC857", "MPC8XX" },
+> > +    { "MPC859", "MPC8XX" },
+> > +    { "MPC860", "MPC8XX" },
+> > +    { "MPC862", "MPC8XX" },
+> > +    { "MPC866", "MPC8XX" },
+> > +    { "MPC870", "MPC8XX" },
+> > +    { "MPC875", "MPC8XX" },
+> > +    { "MPC880", "MPC8XX" },
+> > +    { "MPC885", "MPC8XX" },
+> > =20
+> >      /* PowerPC MPC603 microcontrollers */
+> >      { "MPC8240", "603" },
+> > =20
+> > -    { "MPC52xx", "MPC5200" },
+> > -    { "MPC5200", "MPC5200_v12" },
+> > -    { "MPC5200B", "MPC5200B_v21" },
+> > +    { "MPC52XX", "MPC5200" },
+> > +    { "MPC5200", "MPC5200_V12" },
+> > +    { "MPC5200B", "MPC5200B_V21" },
+> > =20
+> > -    { "MPC82xx", "MPC8280" },
+> > -    { "PowerQUICC-II", "MPC82xx" },
+> > -    { "MPC8241", "G2HiP4" },
+> > -    { "MPC8245", "G2HiP4" },
+> > -    { "MPC8247", "G2leGP3" },
+> > -    { "MPC8248", "G2leGP3" },
+> > -    { "MPC8250", "MPC8250_HiP4" },
+> > -    { "MPC8250_HiP3", "G2HiP3" },
+> > -    { "MPC8250_HiP4", "G2HiP4" },
+> > -    { "MPC8255", "MPC8255_HiP4" },
+> > -    { "MPC8255_HiP3", "G2HiP3" },
+> > -    { "MPC8255_HiP4", "G2HiP4" },
+> > -    { "MPC8260", "MPC8260_HiP4" },
+> > -    { "MPC8260_HiP3", "G2HiP3" },
+> > -    { "MPC8260_HiP4", "G2HiP4" },
+> > -    { "MPC8264", "MPC8264_HiP4" },
+> > -    { "MPC8264_HiP3", "G2HiP3" },
+> > -    { "MPC8264_HiP4", "G2HiP4" },
+> > -    { "MPC8265", "MPC8265_HiP4" },
+> > -    { "MPC8265_HiP3", "G2HiP3" },
+> > -    { "MPC8265_HiP4", "G2HiP4" },
+> > -    { "MPC8266", "MPC8266_HiP4" },
+> > -    { "MPC8266_HiP3", "G2HiP3" },
+> > -    { "MPC8266_HiP4", "G2HiP4" },
+> > -    { "MPC8270", "G2leGP3" },
+> > -    { "MPC8271", "G2leGP3" },
+> > -    { "MPC8272", "G2leGP3" },
+> > -    { "MPC8275", "G2leGP3" },
+> > -    { "MPC8280", "G2leGP3" },
+> > -    { "e200", "e200z6" },
+> > -    { "e300", "e300c3" },
+> > +    { "MPC82XX", "MPC8280" },
+> > +    { "POWERQUICC-II", "MPC82XX" },
+> > +    { "MPC8241", "G2HIP4" },
+> > +    { "MPC8245", "G2HIP4" },
+> > +    { "MPC8247", "G2LEGP3" },
+> > +    { "MPC8248", "G2LEGP3" },
+> > +    { "MPC8250", "MPC8250_HIP4" },
+> > +    { "MPC8250_HIP3", "G2HIP3" },
+> > +    { "MPC8250_HIP4", "G2HIP4" },
+> > +    { "MPC8255", "MPC8255_HIP4" },
+> > +    { "MPC8255_HIP3", "G2HIP3" },
+> > +    { "MPC8255_HIP4", "G2HIP4" },
+> > +    { "MPC8260", "MPC8260_HIP4" },
+> > +    { "MPC8260_HIP3", "G2HIP3" },
+> > +    { "MPC8260_HIP4", "G2HIP4" },
+> > +    { "MPC8264", "MPC8264_HIP4" },
+> > +    { "MPC8264_HIP3", "G2HIP3" },
+> > +    { "MPC8264_HIP4", "G2HIP4" },
+> > +    { "MPC8265", "MPC8265_HIP4" },
+> > +    { "MPC8265_HIP3", "G2HIP3" },
+> > +    { "MPC8265_HIP4", "G2HIP4" },
+> > +    { "MPC8266", "MPC8266_HIP4" },
+> > +    { "MPC8266_HIP3", "G2HIP3" },
+> > +    { "MPC8266_HIP4", "G2HIP4" },
+> > +    { "MPC8270", "G2LEGP3" },
+> > +    { "MPC8271", "G2LEGP3" },
+> > +    { "MPC8272", "G2LEGP3" },
+> > +    { "MPC8275", "G2LEGP3" },
+> > +    { "MPC8280", "G2LEGP3" },
+> > +    { "E200", "E200Z6" },
+> > +    { "E300", "E300C3" },
+> >      { "MPC8347", "MPC8347T" },
+> >      { "MPC8347A", "MPC8347AT" },
+> >      { "MPC8347E", "MPC8347ET" },
+> >      { "MPC8347EA", "MPC8347EAT" },
+> > -    { "e500", "e500v2_v22" },
+> > -    { "e500v1", "e500_v20" },
+> > -    { "e500v2", "e500v2_v22" },
+> > -    { "MPC8533", "MPC8533_v11" },
+> > -    { "MPC8533E", "MPC8533E_v11" },
+> > -    { "MPC8540", "MPC8540_v21" },
+> > -    { "MPC8541", "MPC8541_v11" },
+> > -    { "MPC8541E", "MPC8541E_v11" },
+> > -    { "MPC8543", "MPC8543_v21" },
+> > -    { "MPC8543E", "MPC8543E_v21" },
+> > -    { "MPC8544", "MPC8544_v11" },
+> > -    { "MPC8544E", "MPC8544E_v11" },
+> > -    { "MPC8545", "MPC8545_v21" },
+> > -    { "MPC8545E", "MPC8545E_v21" },
+> > -    { "MPC8547E", "MPC8547E_v21" },
+> > -    { "MPC8548", "MPC8548_v21" },
+> > -    { "MPC8548E", "MPC8548E_v21" },
+> > -    { "MPC8555", "MPC8555_v11" },
+> > -    { "MPC8555E", "MPC8555E_v11" },
+> > -    { "MPC8560", "MPC8560_v21" },
+> > -    { "601",  "601_v2" },
+> > -    { "601v", "601_v2" },
+> > -    { "Vanilla", "603" },
+> > -    { "603e", "603e_v4.1" },
+> > -    { "Stretch", "603e" },
+> > -    { "Vaillant", "603e7v" },
+> > -    { "603r", "603e7t" },
+> > -    { "Goldeneye", "603r" },
+> > -    { "604e", "604e_v2.4" },
+> > -    { "Sirocco", "604e" },
+> > -    { "Mach5", "604r" },
+> > -    { "740", "740_v3.1" },
+> > -    { "Arthur", "740" },
+> > -    { "750", "750_v3.1" },
+> > -    { "Typhoon", "750" },
+> > +    { "E500", "E500V2_V22" },
+> > +    { "E500V1", "E500_V20" },
+> > +    { "E500V2", "E500V2_V22" },
+> > +    { "MPC8533", "MPC8533_V11" },
+> > +    { "MPC8533E", "MPC8533E_V11" },
+> > +    { "MPC8540", "MPC8540_V21" },
+> > +    { "MPC8541", "MPC8541_V11" },
+> > +    { "MPC8541E", "MPC8541E_V11" },
+> > +    { "MPC8543", "MPC8543_V21" },
+> > +    { "MPC8543E", "MPC8543E_V21" },
+> > +    { "MPC8544", "MPC8544_V11" },
+> > +    { "MPC8544E", "MPC8544E_V11" },
+> > +    { "MPC8545", "MPC8545_V21" },
+> > +    { "MPC8545E", "MPC8545E_V21" },
+> > +    { "MPC8547E", "MPC8547E_V21" },
+> > +    { "MPC8548", "MPC8548_V21" },
+> > +    { "MPC8548E", "MPC8548E_V21" },
+> > +    { "MPC8555", "MPC8555_V11" },
+> > +    { "MPC8555E", "MPC8555E_V11" },
+> > +    { "MPC8560", "MPC8560_V21" },
+> > +    { "601",  "601_V2" },
+> > +    { "601V", "601_V2" },
+> > +    { "VANILLA", "603" },
+> > +    { "603E", "603E_V4.1" },
+> > +    { "STRETCH", "603E" },
+> > +    { "VAILLANT", "603E7V" },
+> > +    { "603R", "603E7T" },
+> > +    { "GOLDENEYE", "603R" },
+> > +    { "604E", "604E_V2.4" },
+> > +    { "SIROCCO", "604E" },
+> > +    { "MACH5", "604R" },
+> > +    { "740", "740_V3.1" },
+> > +    { "ARTHUR", "740" },
+> > +    { "750", "750_V3.1" },
+> > +    { "TYPHOON", "750" },
+> >      { "G3",      "750" },
+> > -    { "Conan/Doyle", "750p" },
+> > -    { "750cl", "750cl_v2.0" },
+> > -    { "750cx", "750cx_v2.2" },
+> > -    { "750cxe", "750cxe_v3.1b" },
+> > -    { "750fx", "750fx_v2.3" },
+> > -    { "750gx", "750gx_v1.2" },
+> > -    { "750l", "750l_v3.2" },
+> > -    { "LoneStar", "750l" },
+> > -    { "745", "745_v2.8" },
+> > -    { "755", "755_v2.8" },
+> > -    { "Goldfinger", "755" },
+> > -    { "7400", "7400_v2.9" },
+> > -    { "Max", "7400" },
+> > +    { "CONAN/DOYLE", "750P" },
+> > +    { "750CL", "750CL_V2.0" },
+> > +    { "750CX", "750CX_V2.2" },
+> > +    { "750CXE", "750CXE_V3.1B" },
+> > +    { "750FX", "750FX_V2.3" },
+> > +    { "750GX", "750GX_V1.2" },
+> > +    { "750L", "750L_V3.2" },
+> > +    { "LONESTAR", "750L" },
+> > +    { "745", "745_V2.8" },
+> > +    { "755", "755_V2.8" },
+> > +    { "GOLDFINGER", "755" },
+> > +    { "7400", "7400_V2.9" },
+> > +    { "MAX", "7400" },
+> >      { "G4",  "7400" },
+> > -    { "7410", "7410_v1.4" },
+> > -    { "Nitro", "7410" },
+> > -    { "7448", "7448_v2.1" },
+> > -    { "7450", "7450_v2.1" },
+> > -    { "Vger", "7450" },
+> > -    { "7441", "7441_v2.3" },
+> > -    { "7451", "7451_v2.3" },
+> > -    { "7445", "7445_v3.2" },
+> > -    { "7455", "7455_v3.2" },
+> > -    { "Apollo6", "7455" },
+> > -    { "7447", "7447_v1.1" },
+> > -    { "7457", "7457_v1.2" },
+> > -    { "Apollo7", "7457" },
+> > -    { "7447A", "7447A_v1.2" },
+> > -    { "7457A", "7457A_v1.2" },
+> > -    { "Apollo7PM", "7457A_v1.0" },
+> > +    { "7410", "7410_V1.4" },
+> > +    { "NITRO", "7410" },
+> > +    { "7448", "7448_V2.1" },
+> > +    { "7450", "7450_V2.1" },
+> > +    { "VGER", "7450" },
+> > +    { "7441", "7441_V2.3" },
+> > +    { "7451", "7451_V2.3" },
+> > +    { "7445", "7445_V3.2" },
+> > +    { "7455", "7455_V3.2" },
+> > +    { "APOLLO6", "7455" },
+> > +    { "7447", "7447_V1.1" },
+> > +    { "7457", "7457_V1.2" },
+> > +    { "APOLLO7", "7457" },
+> > +    { "7447A", "7447A_V1.2" },
+> > +    { "7457A", "7457A_V1.2" },
+> > +    { "APOLLO7PM", "7457A_V1.0" },
+> >  #if defined(TARGET_PPC64)
+> >      { "POWER3", "630" },
+> >      { "POWER3+", "631" },
+> > -    { "POWER5+", "POWER5+_v2.1" },
+> > -    { "POWER5gs", "POWER5+_v2.1" },
+> > -    { "POWER7", "POWER7_v2.3" },
+> > -    { "POWER7+", "POWER7+_v2.1" },
+> > -    { "POWER8E", "POWER8E_v2.1" },
+> > -    { "POWER8", "POWER8_v2.0" },
+> > -    { "POWER8NVL", "POWER8NVL_v1.0" },
+> > -    { "POWER9", "POWER9_v1.0" },
+> > -    { "970", "970_v2.2" },
+> > -    { "970fx", "970fx_v3.1" },
+> > -    { "970mp", "970mp_v1.1" },
+> > +    { "POWER5+", "POWER5+_V2.1" },
+> > +    { "POWER5GS", "POWER5+_V2.1" },
+> > +    { "POWER7", "POWER7_V2.3" },
+> > +    { "POWER7+", "POWER7+_V2.1" },
+> > +    { "POWER8E", "POWER8E_V2.1" },
+> > +    { "POWER8", "POWER8_V2.0" },
+> > +    { "POWER8NVL", "POWER8NVL_V1.0" },
+> > +    { "POWER9", "POWER9_V1.0" },
+> > +    { "970", "970_V2.2" },
+> > +    { "970FX", "970FX_V3.1" },
+> > +    { "970MP", "970MP_V1.1" },
+> >  #endif
+> > =20
+> >      /* Generic PowerPCs */
+> >  #if defined(TARGET_PPC64)
+> > -    { "ppc64", "970fx" },
+> > +    { "PPC64", "970FX" },
+> >  #endif
+> > -    { "ppc32", "604" },
+> > -    { "ppc", "ppc32" },
+> > -    { "default", "ppc" },
+> > +    { "PPC32", "604" },
+> > +    { "PPC", "PPC32" },
+> > +    { "DEFAULT", "PPC" },
+> >      { NULL, NULL }
+> >  };
+> > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> > index 8590809..3f21190 100644
+> > --- a/target/ppc/kvm.c
+> > +++ b/target/ppc/kvm.c
+> > @@ -2480,7 +2480,7 @@ static int kvm_ppc_register_host_cpu_type(void)
+> >       */
+> >      dc =3D DEVICE_CLASS(ppc_cpu_get_family_class(pvr_pcc));
+> >      for (i =3D 0; ppc_cpu_aliases[i].alias !=3D NULL; i++) {
+> > -        if (strcmp(ppc_cpu_aliases[i].alias, dc->desc) =3D=3D 0) {
+> > +        if (strcasecmp(ppc_cpu_aliases[i].alias, dc->desc) =3D=3D 0) {
+> >              char *suffix;
+> > =20
+> >              ppc_cpu_aliases[i].model =3D g_strdup(object_class_get_nam=
+e(oc));
+> > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> > index f377cf2..0325226 100644
+> > --- a/target/ppc/translate_init.c
+> > +++ b/target/ppc/translate_init.c
+> > @@ -10250,7 +10250,7 @@ static ObjectClass *ppc_cpu_class_by_name(const=
+ char *name)
+> >      }
+> > =20
+> >      for (i =3D 0; ppc_cpu_aliases[i].alias !=3D NULL; i++) {
+> > -        if (strcmp(ppc_cpu_aliases[i].alias, name) =3D=3D 0) {
+> > +        if (strcasecmp(ppc_cpu_aliases[i].alias, name) =3D=3D 0) {
+> >              return ppc_cpu_class_by_alias(&ppc_cpu_aliases[i]);
+> >          }
+> >      } =20
+>=20
