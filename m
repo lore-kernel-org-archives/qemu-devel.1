@@ -1,40 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dlFlD-0001Xw-6F
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:39:00 -0400
+	(envelope-from <bounces@canonical.com>) id 1dlFnU-0002gt-68
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:41:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dlFlA-0003Li-2m
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:38:59 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:37799)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dlFl9-0003Lc-Qj
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:38:55 -0400
-Received: by mail-qk0-x242.google.com with SMTP id o184so2213119qkc.4
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 07:38:55 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <e2a1b182-83a9-2259-27f9-68b61b5061d5@linux.vnet.ibm.com>
-	<20170824171355.29d1ec32.cohuck@redhat.com>
-	<30333b41-508d-f9a3-ac2d-4830a7791475@redhat.com>
-	<34f0f307-d16f-7c76-1589-fa06252f6d09@linux.vnet.ibm.com>
-	<ad0ef5a7-c0e0-9e54-a417-858c4b32a80e@redhat.com>
-	<c9a6a1ec-eb7c-08a6-82ad-87ad5412ad19@linux.vnet.ibm.com>
-	<CAFEAcA-oE=E3ydugLdVnPS2Tquqkou=BEhsB_DALqZxbVD0GDA@mail.gmail.com>
-	<e24316e0-3b6f-ef1c-7c4b-66e7b302e5b4@linux.vnet.ibm.com>
-	<97b35c4d-e897-c18a-525f-1fa1a7560776@de.ibm.com>
-	<20170825092008.12484e6a.cohuck@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d37a8783-7575-73a1-8325-faa090119a1e@amsat.org>
-Date: Fri, 25 Aug 2017 11:38:50 -0300
+	(envelope-from <bounces@canonical.com>) id 1dlFnR-0003uK-3Q
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:41:20 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48418)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dlFnQ-0003tq-Ti
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:41:17 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dlFnN-0005kK-Kv
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 14:41:13 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5D2E12E80C7
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 14:41:12 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170825092008.12484e6a.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] S390 bios breaks in qemu 2.10.rc3
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 25 Aug 2017 14:29:40 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1712564 <1712564@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150349266290.16960.17282757508682806782.malonedeb@gac.canonical.com>
+Message-Id: <150367138099.10958.10130186791297793235.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1712564] Re: loadvm fails twice in sequence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,70 +36,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
 
-Hi Farhan,
+Posted:
+migration: Reset rather than destroy main_thread_load_event
+snapshot/tests: Try loadvm twice
 
-On 08/25/2017 04:20 AM, Cornelia Huck wrote:
-> On Thu, 24 Aug 2017 20:14:06 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> On 08/24/2017 07:38 PM, Farhan Ali wrote:
->>>
->>>
->>> On 08/24/2017 12:07 PM, Peter Maydell wrote:
->>>> On 24 August 2017 at 16:53, Farhan Ali <alifm@linux.vnet.ibm.com> wrote:
->>>>>
->>>>>
->>>>> On 08/24/2017 11:50 AM, Thomas Huth wrote:
->>>>>> True, so that could still be an issue. Looking at the cio.h in the
->>>>>> kernel, they define the struct like this:
->>>>>>
->>>>>> struct ccw1 {
->>>>>>          __u8  cmd_code;
->>>>>>          __u8  flags;
->>>>>>          __u16 count;
->>>>>>          __u32 cda;
->>>>>> } __attribute__ ((packed,aligned(8)));
->>>>>>
->>>>>> So I guess adding the aligned(8) is the right way to go?
->>>>   
->>>>> This was my initial fix and it works on my system. But for some reason this
->>>>> fix does not work on my colleague's system. So I am hesitant about
->>>>> submitting this fix
->>>>
->>>> It seems like it ought to be the obvious fix, so I would double
->>>> check that on your colleague's system the change really did
->>>> get recompiled and it's actually using the new version (that
->>>> sort of mistake can be easy to make and very confusing...)
->>
->>>>
->>>> thanks
->>>> -- PMM
->>>>   
->>>
->>> So after trying again with the fix, it seems to work on my colleague's system for most cases. It fails for LDL DASD boot case.... we are still investigating it.
+** Changed in: qemu
+       Status: New =3D> In Progress
 
-no-packed-stack is GCC default but you can test forcing it with:
+-- =
 
-   make QEMU_CFLAGS=-mno-packed-stack
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1712564
 
-Also, can you add LDFLAGS+=-Wl,-verbose in pc-bios/s390-ccw/Makefile and 
-send your and your colleague bios build output?
+Title:
+  loadvm fails twice in sequence
 
-I'm interested in comparing the internal linker scripts.
+Status in QEMU:
+  In Progress
 
->>
->> So chances are that this is an independent problem, I guess?
->>
-> 
-> OK, to recap:
-> 
-> - the current pre-built bios seems fine
-> - rebuilding the bios may yield a version that fails on some systems
->    (different compiler?)
-> - adding aligned(8) looks like the right thing to do
-> - it seems to fix the problem, but on at least one system something
->    still seems off (under investigation)
-> 
+Bug description:
+  13:38:23) shorne_: Hello, I was doing some testing with migrations for my=
+ OpenRISC SMP patch set, I noticed something that looks like a bug, wonderi=
+ng if someone else wants to confirm
+  (13:38:47) shorne_: Basically, calling loadvm 2 times causes crash
+  (13:38:54) shorne_:    migration/savevm.c:    qemu_event_set(&mis->main_t=
+hread_load_event)
+  (13:38:54) stefanha: fam: Here is my take at this change: https://paste.d=
+ebian.net/982690/
+  (13:38:56) shorne_:                             assert(ev->initialized)  =
+- fails inside
+  (13:39:32) stefanha: quintela davidgiluk: ^
+  (13:41:23) ***davidgiluk looks
+  (13:41:40) shorne_: c096358e747 util/qemu-thread-posix.c (Fam Zheng      =
+        2017-07-04 20:23:25 +0800 397)     assert(ev->initialized);
+  (13:41:51) davidgiluk: shorne_: So you're doing a loadvm to load a snapsh=
+ot and then again?
+  (13:42:02) shorne_: Looks like adding that assert() was done really recen=
+tly
+  (13:42:41) shorne_: yes, just loadvm 'a' ... then wait a bit longer, load=
+vm 'a' again (confirm clocks go back etc)
+  (13:42:50) stefanha: fam: While you're having dinner I'll work on turning=
+ my script into a qemu-iotests test case that we can merge.
+  (13:44:03) gpiccoli [~gpiccoli@0002093a.user.oftc.net] entered the room.
+  (13:44:21) davidgiluk: shorne_: Well, it looks like the c09635 assert is =
+a sanity check to make sure we didn't do anything stupid, and well.....
+  (13:44:57) pm215: migration_incoming_get_current() and migration_incoming=
+_state_destroy() seem a bit mismatched
+  (13:45:13) davidgiluk: pm215: Yep
+  (13:45:46) davidgiluk: pm215: Generally we've thought that an incoming mi=
+gration normally only happens once - shorne_'s case is the exception
+  (13:46:03) shorne_: pm215: yeah, it looked something like that I just had=
+ a few seconds to look at today
+  (13:46:03) HariharanTS left the room (quit: Ping timeout: 480 seconds).
+  (13:46:03) shorne_ is now known as shorne
+  (13:48:05) shorne: davidgiluk: pm215: thanks for having a look.  Unfortun=
+ately I need to head off to bed and put kids to sleep
+  (13:49:11) davidgiluk: shorne: Sleep well, no nightmares about event dest=
+royers....
+  (13:49:30) davidgiluk: pm215: Yeh this is fall out from b4b076daf32
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1712564/+subscriptions
