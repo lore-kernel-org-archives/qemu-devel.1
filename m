@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57718)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dlK8O-0002Bn-Kt
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 15:19:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1dlKBL-0003i3-Dp
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 15:22:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dlK8L-00017T-FC
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 15:19:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52262)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dlK8L-000179-4j
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 15:19:09 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0B2A37E423
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 19:19:08 +0000 (UTC)
-Date: Fri, 25 Aug 2017 16:18:58 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170825191858.GK27715@localhost.localdomain>
-References: <20170823221445.15243-1-ehabkost@redhat.com>
-	<20170823221445.15243-3-ehabkost@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dlKBK-0002jQ-Bg
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 15:22:15 -0400
+References: <20170804151440.320927-1-vsementsov@virtuozzo.com>
+	<20170804151440.320927-3-vsementsov@virtuozzo.com>
+	<484ffeb7-6571-af84-ee4b-0bfcb83df7ad@redhat.com>
+	<8a8054d8-a5cd-dfbb-fa28-287b63e79102@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <07fd01db-d0d1-2c7c-bbfa-895b90939749@redhat.com>
+Date: Fri, 25 Aug 2017 14:22:06 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170823221445.15243-3-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/5] pci: Add interface names to hybrid PCI
- devices
+In-Reply-To: <8a8054d8-a5cd-dfbb-fa28-287b63e79102@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="KnMMSkcqD87V2KxIEDMsnPalWCtIMHHVH"
+Subject: Re: [Qemu-devel] [PATCH 02/17] nbd/client: refactor nbd_read_eof
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,156 +26,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Laine Stump <laine@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On Wed, Aug 23, 2017 at 07:14:42PM -0300, Eduardo Habkost wrote:
-> The following devices support both PCIe and legacy PCI, by
-> including special code to handle the QEMU_PCI_CAP_EXPRESS flag:
-> 
-> * vfio-pci (is_express=1, but legacy PCI handled by
->   vfio_populate_device())
-> * vmxnet3 (is_express=0, but PCIe handled by vmxnet3_realize())
-> * pvscsi (is_express=0, but PCIe handled by pvscsi_realize())
-> * virtio-pci (is_express=0, but PCIe handled by
->   virtio_pci_dc_realize(), and additional legacy PCI code at
->   virtio_pci_realize())
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KnMMSkcqD87V2KxIEDMsnPalWCtIMHHVH
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+Message-ID: <07fd01db-d0d1-2c7c-bbfa-895b90939749@redhat.com>
+Subject: Re: [PATCH 02/17] nbd/client: refactor nbd_read_eof
+References: <20170804151440.320927-1-vsementsov@virtuozzo.com>
+ <20170804151440.320927-3-vsementsov@virtuozzo.com>
+ <484ffeb7-6571-af84-ee4b-0bfcb83df7ad@redhat.com>
+ <8a8054d8-a5cd-dfbb-fa28-287b63e79102@virtuozzo.com>
+In-Reply-To: <8a8054d8-a5cd-dfbb-fa28-287b63e79102@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Oh, the rules are even messier than that: QEMU_PCI_CAP_EXPRESS
-controls _some_ of the code that makes a device become a PCI
-Express device, but not every case.
+On 08/07/2017 07:05 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 07.08.2017 14:42, Eric Blake wrote:
+>> On 08/04/2017 10:14 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> Refactor nbd_read_eof to return 1 on success, 0 on eof, when no
+>>> data was read and <0 for other cases, because returned size of
+>>> read data is not actually used.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+>
+>>> ---
 
-In addition to vmxnet3, pvscsi and virtio-pci, PCIe caps
-initialization is conditional on hcd-xhci (see below).
+>>> + * Returns 1 on success
+>>> + *         0 on eof, when no data was read (errp is not set)
+>>> + *         -EINVAL on eof, when some data < @size was read until eof=
 
-This means xhci is also a hybrid device.  But it doesn't seem to
-clear QEMU_PCI_CAP_EXPRESS.  Doesn't it mean pci_config_size() is
-broken if xhci is plugged to a legacy PCI bus?  How does it
-affect migration?
+>>> + *         < 0 on read fail
+>> In general, mixing negative errno value and generic < 0 in the same
+>> function is most likely ambiguous.
+>=20
+> Hmm, but this is entirely what we do so often:
+>=20
+> if (,,) return -EINVAL;
+>=20
+> return some_other_func().
+>=20
+> last two lines may be rewritten like this:
+> + * < 0 on fail
 
-Full list of pci_endpoint_cap*_init() calls:
+Or even better as 'negative errno on failure'.
 
-hw/usb/hcd-xhci.c-    if (pci_bus_is_express(dev->bus) ||
-hw/usb/hcd-xhci.c-        xhci_get_flag(xhci, XHCI_FLAG_FORCE_PCIE_ENDCAP)) {
-hw/usb/hcd-xhci.c:        ret = pcie_endpoint_cap_init(dev, 0xa0);
+Here's what I'm proposing to squash in, at which point you have:
 
-hw/net/vmxnet3.c-    if (pci_is_express(pci_dev)) {
-hw/net/vmxnet3.c-        if (pci_bus_is_express(pci_dev->bus)) {
-hw/net/vmxnet3.c:            pcie_endpoint_cap_init(pci_dev, VMXNET3_EXP_EP_OFFSET);
-hw/net/vmxnet3.c-        }
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-hw/scsi/megasas.c-    if (pci_is_express(dev)) {
-hw/scsi/megasas.c:        pcie_endpoint_cap_init(dev, 0xa0);
-hw/scsi/megasas.c-    }
+diff --git i/nbd/nbd-internal.h w/nbd/nbd-internal.h
+index 3fb0b6098a..03549e3f39 100644
+--- i/nbd/nbd-internal.h
++++ w/nbd/nbd-internal.h
+@@ -80,8 +80,7 @@
+  * Tries to read @size bytes from @ioc.
+  * Returns 1 on success
+  *         0 on eof, when no data was read (errp is not set)
+- *         -EINVAL on eof, when some data < @size was read until eof
+- *         < 0 on read fail
++ *         negative errno on failure (errp is set)
+  */
+ static inline int nbd_read_eof(QIOChannel *ioc, void *buffer, size_t siz=
+e,
+                                Error **errp)
+@@ -95,7 +94,7 @@ static inline int nbd_read_eof(QIOChannel *ioc, void
+*buffer, size_t size,
+      * that this is coroutine-safe.
+      */
 
-hw/scsi/vmw_pvscsi.c-    if (pci_is_express(pci_dev) && pci_bus_is_express(pci_dev->bus)) {
-hw/scsi/vmw_pvscsi.c:        pcie_endpoint_cap_init(pci_dev, PVSCSI_EXP_EP_OFFSET);
-hw/scsi/vmw_pvscsi.c-    }
+-    assert(size > 0);
++    assert(size);
 
-hw/virtio/virtio-pci.c-    if (pcie_port && pci_is_express(pci_dev)) {
-hw/virtio/virtio-pci.c-        int pos;
-hw/virtio/virtio-pci.c-
-hw/virtio/virtio-pci.c:        pos = pcie_endpoint_cap_init(pci_dev, 0);
-
-
-Note: on megasas, pci_endpoitn_cap_init() is conditional on
-pci_is_express(), but pci_is_express() will never be false on
-megasas-gen2 (because QEMU_PCI_CAP_EXPRESS is always set).
-
-
-Full list of unconditional pci_endpoint_cap*init() calls:
-
-hw/block/nvme.c:    pcie_endpoint_cap_init(&n->parent_obj, 0x80);
-
-hw/net/e1000e.c:    if (pcie_endpoint_cap_v1_init(pci_dev, e1000e_pcie_offset) < 0) {
-
-hw/pci-bridge/pcie_root_port.c:    rc = pcie_cap_init(d, rpc->exp_offset, PCI_EXP_TYPE_ROOT_PORT,
-hw/pci-bridge/pcie_root_port.c-                       p->port, errp);
-
-hw/pci-bridge/xio3130_downstream.c:    rc = pcie_cap_init(d, XIO3130_EXP_OFFSET, PCI_EXP_TYPE_DOWNSTREAM,
-hw/pci-bridge/xio3130_downstream.c-                       p->port, errp);
-
-hw/pci-bridge/xio3130_upstream.c:    rc = pcie_cap_init(d, XIO3130_EXP_OFFSET, PCI_EXP_TYPE_UPSTREAM,
-hw/pci-bridge/xio3130_upstream.c-                       p->port, errp);
-
-hw/pci-host/xilinx-pcie.c:    if (pcie_endpoint_cap_v1_init(dev, 0x80) < 0) {
+     ret =3D nbd_rwv(ioc, &iov, 1, size, true, errp);
+     if (ret <=3D 0) {
 
 
+>>> +
+>>> +    if (ret !=3D size) {
+>>> +        error_setg(errp, "End of file");
+>>> +        return -EINVAL;
+>> and so is this. Which makes the function documentation not quite
+>> accurate; you aren't mixing a generic < 0.
+>=20
+> hmm.. my wordings are weird sometimes, sorry for that :(. and thank you=
 
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  hw/net/vmxnet3.c       | 5 +++++
->  hw/scsi/vmw_pvscsi.c   | 2 ++
->  hw/vfio/pci.c          | 5 +++++
->  hw/virtio/virtio-pci.c | 5 +++++
->  4 files changed, 17 insertions(+)
-> 
-> diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
-> index a19a7a3..61feacf 100644
-> --- a/hw/net/vmxnet3.c
-> +++ b/hw/net/vmxnet3.c
-> @@ -2651,6 +2651,11 @@ static const TypeInfo vmxnet3_info = {
->      .instance_size = sizeof(VMXNET3State),
->      .class_init    = vmxnet3_class_init,
->      .instance_init = vmxnet3_instance_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { INTERFACE_PCIE_DEVICE },
-> +        { INTERFACE_LEGACY_PCI_DEVICE },
-> +        { }
-> +    },
->  };
->  
->  static void vmxnet3_register_types(void)
-> diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
-> index 77d8b6f..40dfffa 100644
-> --- a/hw/scsi/vmw_pvscsi.c
-> +++ b/hw/scsi/vmw_pvscsi.c
-> @@ -1300,6 +1300,8 @@ static const TypeInfo pvscsi_info = {
->      .class_init    = pvscsi_class_init,
->      .interfaces = (InterfaceInfo[]) {
->          { TYPE_HOTPLUG_HANDLER },
-> +        { INTERFACE_PCIE_DEVICE },
-> +        { INTERFACE_LEGACY_PCI_DEVICE },
->          { }
->      }
->  };
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 31e1edf..2b21391 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -3023,6 +3023,11 @@ static const TypeInfo vfio_pci_dev_info = {
->      .class_init = vfio_pci_dev_class_init,
->      .instance_init = vfio_instance_init,
->      .instance_finalize = vfio_instance_finalize,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { INTERFACE_PCIE_DEVICE },
-> +        { INTERFACE_LEGACY_PCI_DEVICE },
-> +        { }
-> +    },
->  };
->  
->  static void register_vfio_pci_dev_type(void)
-> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> index 8b0d6b6..8c0b6bf 100644
-> --- a/hw/virtio/virtio-pci.c
-> +++ b/hw/virtio/virtio-pci.c
-> @@ -1958,6 +1958,11 @@ static const TypeInfo virtio_pci_info = {
->      .class_init    = virtio_pci_class_init,
->      .class_size    = sizeof(VirtioPCIClass),
->      .abstract      = true,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { INTERFACE_PCIE_DEVICE },
-> +        { INTERFACE_LEGACY_PCI_DEVICE },
-> +        { }
-> +    },
->  };
->  
->  /* virtio-blk-pci */
-> -- 
-> 2.9.4
-> 
-> 
+> for your patience.
 
--- 
-Eduardo
+Not a problem - I understand that English is not your native language,
+so you are already a leg up on me (I'm nowhere near as competent in a
+second language as you already are on English, even if review still
+gives you grammar hints and other improvements).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--KnMMSkcqD87V2KxIEDMsnPalWCtIMHHVH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmgeN4ACgkQp6FrSiUn
+Q2oBNggAr6fR0MLe1aSfqCACbhkPrZP7nOk35Ffw/qIjw787XIIIe6beDgZxb5n4
+TaybS3/3oxPdNrvjIuqrO+xvzXGQ9p6gsjY7LpvvYgcJJGz9x+kmHD+dXBfc/4bM
+8z2qvkqYP3Up4yrIedHbH03QENpgSbK5hFuSHdFrfeNJUchlAh91YfT3QiRxRVml
+DUerqGR8devc/pptw/PYqG40lrySXP/RhiRS1eJoNNLXtdELeDV/Sbn0YPzb80Ns
+o2lTCH+Yd7nJiBBsbkWC6CmtHqnNaLIo6RyFwx4HorluvN4NlI6w7Ton7Zlf+aVI
+I+vwEIbx0MGcp93L5EaglJ6ubKU4sg==
+=GDZs
+-----END PGP SIGNATURE-----
+
+--KnMMSkcqD87V2KxIEDMsnPalWCtIMHHVH--
