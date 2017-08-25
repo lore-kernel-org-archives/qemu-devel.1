@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44747)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dlDPZ-0003TZ-02
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 08:08:29 -0400
+	id 1dlDQZ-0003xK-Cj
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 08:09:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dlDPV-0004OS-MJ
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 08:08:28 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:38265)
+	id 1dlDQW-0004qx-3Y
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 08:09:31 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33480)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dlDPV-0004Na-IE
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 08:08:25 -0400
-Received: by mail-qk0-x242.google.com with SMTP id o63so1863965qkb.5
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 05:08:25 -0700 (PDT)
+	id 1dlDQV-0004qq-Vq
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 08:09:28 -0400
+Received: by mail-qk0-x242.google.com with SMTP id 130so1895804qkg.0
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 05:09:27 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20170824192315.5897-1-ehabkost@redhat.com>
-	<20170824192315.5897-2-ehabkost@redhat.com>
+References: <20170825032101.42538-1-aik@ozlabs.ru>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <97d315bf-ea9d-c9c3-cec6-58f70492c6ff@amsat.org>
-Date: Fri, 25 Aug 2017 09:08:21 -0300
+Message-ID: <8d8da4bf-feb8-5da1-cd7a-195e80d59d8a@amsat.org>
+Date: Fri, 25 Aug 2017 09:09:24 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170824192315.5897-2-ehabkost@redhat.com>
+In-Reply-To: <20170825032101.42538-1-aik@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] vl: Clean up user-creatable objects
- when exiting
+Subject: Re: [Qemu-devel] [PATCH qemu] pci: Initialize pci_dev->name before
+ use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,69 +35,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Zack Cornelius <zack.cornelius@kove.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
 
-On 08/24/2017 04:23 PM, Eduardo Habkost wrote:
-> Delete all user-creatable objects in /objects when exiting QEMU, so they
-> can perform cleanup actions.
+On 08/25/2017 12:21 AM, Alexey Kardashevskiy wrote:
+> This moves pci_dev->name initialization earlier so
+> pci_dev->bus_master_as could get a name instead of empry string.
 > 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
-> Changes v1 -> v2:
-> * (none)
-> ---
->   include/qom/object_interfaces.h | 8 ++++++++
->   qom/object_interfaces.c         | 5 +++++
->   vl.c                            | 1 +
->   3 files changed, 14 insertions(+)
+>   hw/pci/pci.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/include/qom/object_interfaces.h b/include/qom/object_interfaces.h
-> index fdd7603..3f5f206 100644
-> --- a/include/qom/object_interfaces.h
-> +++ b/include/qom/object_interfaces.h
-> @@ -148,4 +148,12 @@ int user_creatable_add_opts_foreach(void *opaque,
->    */
->   void user_creatable_del(const char *id, Error **errp);
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 258fbe51e2..852babe812 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -1000,6 +1000,7 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
 >   
-> +/**
-> + * user_creatable_cleanup:
-> + *
-> + * Delete all user-creatable objects and the user-creatable
-> + * objects container.
-> + */
-> +void user_creatable_cleanup(void);
-> +
->   #endif
-> diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-> index ff27e06..dbf8878 100644
-> --- a/qom/object_interfaces.c
-> +++ b/qom/object_interfaces.c
-> @@ -193,6 +193,11 @@ void user_creatable_del(const char *id, Error **errp)
->       object_unparent(obj);
->   }
+>       pci_dev->devfn = devfn;
+>       pci_dev->requester_id_cache = pci_req_id_cache_get(pci_dev);
+> +    pstrcpy(pci_dev->name, sizeof(pci_dev->name), name);
 >   
-> +void user_creatable_cleanup(void)
-> +{
-> +    object_unparent(object_get_objects_root());
-> +}
-> +
->   static void register_types(void)
->   {
->       static const TypeInfo uc_interface_info = {
-> diff --git a/vl.c b/vl.c
-> index 8e247cc..91d0ef0 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4801,6 +4801,7 @@ int main(int argc, char **argv, char **envp)
->       audio_cleanup();
->       monitor_cleanup();
->       qemu_chr_cleanup();
-> +    user_creatable_cleanup();
->       /* TODO: unref root container, check all devices are ok */
+>       memory_region_init(&pci_dev->bus_master_container_region, OBJECT(pci_dev),
+>                          "bus master container", UINT64_MAX);
+> @@ -1009,7 +1010,6 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
+>       if (qdev_hotplug) {
+>           pci_init_bus_master(pci_dev);
+>       }
+> -    pstrcpy(pci_dev->name, sizeof(pci_dev->name), name);
+>       pci_dev->irq_state = 0;
+>       pci_config_alloc(pci_dev);
 >   
->       return 0;
 > 
