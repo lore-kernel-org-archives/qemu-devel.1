@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dlAMu-00012N-GK
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:53:35 -0400
+	(envelope-from <famz@redhat.com>) id 1dlAO1-0001ge-Sm
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:54:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dlAMt-0005bA-JB
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:53:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39344)
+	(envelope-from <famz@redhat.com>) id 1dlAO0-000636-JI
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:54:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40824)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dlAMt-0005av-9m
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:53:31 -0400
-References: <20170824123006.GK5379@umbus.fritz.box>
-	<20170825083123.47432-1-aik@ozlabs.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4608a2c1-5c74-efea-d901-3b5cfa0519e6@redhat.com>
-Date: Fri, 25 Aug 2017 10:53:27 +0200
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dlAO0-00062v-DG
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:54:40 -0400
+Date: Fri, 25 Aug 2017 16:54:34 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170825085434.GG11465@lemon.lan>
+References: <20170822044155.2451-1-famz@redhat.com>
+	<20170822044155.2451-7-famz@redhat.com>
+	<7f5841bd-fcc9-636b-6a82-00f1ad2852aa@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170825083123.47432-1-aik@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH qemu] exec: Destroy dispatch immediately
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7f5841bd-fcc9-636b-6a82-00f1ad2852aa@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 06/10] tests: Add NetBSD image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +28,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Kamil Rytarowski <kamil@netbsd.org>, stefanha@redhat.com, pbonzini@redhat.com, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
-On 25/08/2017 10:31, Alexey Kardashevskiy wrote:
-> Otherwise old dispatch holds way too much memory before RCU gets
-> a chance to free old dispatches.
+On Thu, 08/24 11:37, Cleber Rosa wrote:
 > 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
 > 
-> This is a follow-up to the "Memory use with >100 virtio devices"
-> thread.
+> On 08/22/2017 12:41 AM, Fam Zheng wrote:
+> > The image is prepared following instructions as in:
+> > 
+> > https://wiki.qemu.org/Hosts/BSD
+> > 
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > Reviewed-by: Kamil Rytarowski <n54@gmx.com>
+> > ---
+> >  tests/vm/netbsd | 45 +++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 45 insertions(+)
+> >  create mode 100755 tests/vm/netbsd
+> > 
+> > diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+> > new file mode 100755
+> > index 0000000000..7d7dfe6586
+> > --- /dev/null
+> > +++ b/tests/vm/netbsd
+> > @@ -0,0 +1,45 @@
+> > +#!/usr/bin/env python
+> > +#
+> > +# NetBSD VM image
+> > +#
+> > +# Copyright (C) 2017 Red Hat Inc.
+> > +#
+> > +# Authors:
+> > +#  Fam Zheng <famz@redhat.com>
+> > +#
+> > +# This work is licensed under the terms of the GNU GPL, version 2.  See
+> > +# the COPYING file in the top-level directory.
+> > +#
+> > +
+> > +import os
+> > +import sys
+> > +import logging
 > 
-> I assume this is a dirty hack (which fixes the problem though)
+> logging is not used in this module.
+> 
+> > +import subprocess
+> > +import tempfile
+> > +import time
+> 
+> tempfile and time imports can also be removed.
+> 
+> > +import basevm
+> > +
+> > +class NetBSDVM(basevm.BaseVM):
+> > +    name = "netbsd"
+> > +    BUILD_SCRIPT = """
+> > +        set -e;
+> > +        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+> > +        tar -xf /dev/ld1a;
+> > +        ./configure --python=python2.7 {configure_opts};
+> > +        gmake -j{jobs};
+> > +        gmake check;
+> > +    """
+> > +
+> > +    def build_image(self, img, rebuild=False):
+> 
+> Same comment as in the FreeBSDVM class: I don't see how "rebuild" will
+> ever get set by using "basevm.main()".
+> 
 
-This doesn't work.  AddressSpaceDispatch can be accessed outside the big
-QEMU lock, which is why it is destroyed via call_rcu.
+Will drop all of them.
 
-The solution is to: 1) share the FlatView structures if they refer to
-the same root memory region; 2) have one AddressSpaceDispatch per
-FlatView instead of one per AddressSpace, so that FlatView reference
-counting takes care of clearing the AddressSpaceDispatch too.  Neither
-is particularly hard.  The second requires getting rid of the
-as->dispatch_listener and "hard coding" the creation of the
-AddressSpaceDispatch from the FlatView in memory.c.
-
-Paolo
-
-> and I wonder what the proper solution would be. Thanks.
-> 
-> 
-> What happens here is that every virtio block device creates 2 address
-> spaces - for modern config space (called "virtio-pci-cfg-as") and
-> for busmaster (common pci thing, called after the device name,
-> in my case "virtio-blk-pci").
-> 
-> Each address_space_init() updates topology for _every_ address space.
-> Every topology update (address_space_update_topology()) creates a new
-> dispatch tree - AddressSpaceDispatch with nodes (1KB) and
-> sections (48KB) and destroys the old one.
-> 
-> However the dispatch destructor is postponed via RCU which does not
-> get a chance to execute until the machine is initialized but before
-> we get there, memory is not returned to the pool, and this is a lot
-> of memory which grows n^2.
-> 
-> 
-> Interestingly, mem_add() from exec.c is called twice:
-> as as->dispatch_listener.region_add() and
-> as as->dispatch_listener.region_nop() - I did not understand
-> the trick but it does not work if I remove the .region_nop() hook.
-> How does it work? :)
-> 
-> ---
->  exec.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index 01ac21e3cd..ea5f3eb209 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -2707,7 +2707,7 @@ static void mem_commit(MemoryListener *listener)
->  
->      atomic_rcu_set(&as->dispatch, next);
->      if (cur) {
-> -        call_rcu(cur, address_space_dispatch_free, rcu);
-> +        address_space_dispatch_free(cur);
->      }
->  }
->  
-> 
+Fam
