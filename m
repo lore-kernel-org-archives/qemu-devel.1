@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCaX-0004Zn-QH
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:15:58 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCbZ-0005Pf-9H
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:16:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCaJ-0003ta-Go
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:15:45 -0400
-Received: from mail-ua0-x22b.google.com ([2607:f8b0:400c:c08::22b]:34481)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCbW-0004TZ-3y
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:16:49 -0400
+Received: from mail-ua0-x235.google.com ([2607:f8b0:400c:c08::235]:33733)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dlCaJ-0003sC-2L
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:15:31 -0400
-Received: by mail-ua0-x22b.google.com with SMTP id j46so6712852uag.1
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 04:15:31 -0700 (PDT)
+	id 1dlCbV-0004TO-SJ
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:16:46 -0400
+Received: by mail-ua0-x235.google.com with SMTP id d12so6746553uag.0
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 04:16:45 -0700 (PDT)
 MIME-Version: 1.0
 References: <1503602048-12268-1-git-send-email-armbru@redhat.com>
-	<1503602048-12268-10-git-send-email-armbru@redhat.com>
-In-Reply-To: <1503602048-12268-10-git-send-email-armbru@redhat.com>
+	<1503602048-12268-11-git-send-email-armbru@redhat.com>
+In-Reply-To: <1503602048-12268-11-git-send-email-armbru@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 25 Aug 2017 11:15:19 +0000
-Message-ID: <CAJ+F1C+tkWLC1pbuznVXW9zVOc-z06G-STNxUGRV2y_eJrMh8w@mail.gmail.com>
+Date: Fri, 25 Aug 2017 11:16:35 +0000
+Message-ID: <CAJ+F1CKt8LyAB3rEy718+K-pwppYFm3YdAj4-S9Sb1sqWCxo0A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 09/16] qapi-schema: Collect migration
- stuff in qapi/migration.json
+Subject: Re: [Qemu-devel] [PATCH v2 10/16] qapi-schema: Collect transaction
+ stuff in qapi/transaction.json
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,2130 +32,436 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On Thu, Aug 24, 2017 at 9:28 PM Markus Armbruster <armbru@redhat.com> wrote=
+On Thu, Aug 24, 2017 at 9:18 PM Markus Armbruster <armbru@redhat.com> wrote=
 :
 
-> Cc: Juan Quintela <quintela@redhat.com>
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >
 
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 ---
->  MAINTAINERS         |    1 +
->  Makefile            |    1 +
->  qapi-schema.json    | 1056
-> +------------------------------------------------
->  qapi/common.json    |   16 +
->  qapi/event.json     |   38 --
->  qapi/migration.json | 1085
-> +++++++++++++++++++++++++++++++++++++++++++++++++++
->  6 files changed, 1104 insertions(+), 1093 deletions(-)
->  create mode 100644 qapi/migration.json
+>  MAINTAINERS           |   1 +
+>  Makefile              |   1 +
+>  qapi-schema.json      | 151
+> +----------------------------------------------
+>  qapi/transaction.json | 158
+> ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 161 insertions(+), 150 deletions(-)
+>  create mode 100644 qapi/transaction.json
 >
 > diff --git a/MAINTAINERS b/MAINTAINERS
-> index 24c5105..baa9859 100644
+> index baa9859..8cebd79 100644
 > --- a/MAINTAINERS
 > +++ b/MAINTAINERS
-> @@ -1498,6 +1498,7 @@ F: migration/
->  F: scripts/vmstate-static-checker.py
->  F: tests/vmstate-static-checker-data/
->  F: docs/migration.txt
-> +F: qapi/migration.json
+> @@ -1231,6 +1231,7 @@ S: Supported
+>  F: blockdev.c
+>  F: block/qapi.c
+>  F: qapi/block*.json
+> +F: qapi/transaction.json
+>  T: git git://repo.or.cz/qemu/armbru.git block-next
 >
->  Seccomp
->  M: Eduardo Otubo <otubo@redhat.com>
+>  Dirty Bitmaps
 > diff --git a/Makefile b/Makefile
-> index c7b6fd1..18cf670 100644
+> index 18cf670..ea6de37 100644
 > --- a/Makefile
 > +++ b/Makefile
-> @@ -413,6 +413,7 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json
+> @@ -419,6 +419,7 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json
 > $(SRC_PATH)/qapi/common.json \
->                 $(SRC_PATH)/qapi/char.json \
->                 $(SRC_PATH)/qapi/crypto.json \
->                 $(SRC_PATH)/qapi/event.json
-> $(SRC_PATH)/qapi/introspect.json \
-> +               $(SRC_PATH)/qapi/migration.json \
->                 $(SRC_PATH)/qapi/net.json \
->                 $(SRC_PATH)/qapi/rocker.json \
 >                 $(SRC_PATH)/qapi/run-state.json \
+>                 $(SRC_PATH)/qapi/sockets.json \
+>                 $(SRC_PATH)/qapi/trace.json \
+> +               $(SRC_PATH)/qapi/transaction.json \
+>                 $(SRC_PATH)/qapi/ui.json
+>
+>  qapi-types.c qapi-types.h :\
 > diff --git a/qapi-schema.json b/qapi-schema.json
-> index 6a23f59..21f54ea 100644
+> index 21f54ea..4108ef0 100644
 > --- a/qapi-schema.json
 > +++ b/qapi-schema.json
-> @@ -87,6 +87,7 @@
->  { 'include': 'qapi/net.json' }
+> @@ -88,6 +88,7 @@
 >  { 'include': 'qapi/rocker.json' }
 >  { 'include': 'qapi/ui.json' }
-> +{ 'include': 'qapi/migration.json' }
+>  { 'include': 'qapi/migration.json' }
+> +{ 'include': 'qapi/transaction.json' }
 >  { 'include': 'qapi/event.json' }
 >  { 'include': 'qapi/trace.json' }
 >  { 'include': 'qapi/introspect.json' }
-> @@ -117,22 +118,6 @@
->  { 'command': 'qmp_capabilities' }
+> @@ -1097,156 +1098,6 @@
+>  { 'command': 'balloon', 'data': {'value': 'int'} }
 >
 >  ##
-> -# @StrOrNull:
+> -# @Abort:
 > -#
-> -# This is a string value or the explicit lack of a string (null
-> -# pointer in C).  Intended for cases when 'optional absent' already
-> -# has a different meaning.
+> -# This action can be used to test transaction failure.
 > -#
-> -# @s: the string value
-> -# @n: no string value
-> -#
-> -# Since: 2.10
+> -# Since: 1.6
 > -##
-> -{ 'alternate': 'StrOrNull',
-> -  'data': { 's': 'str',
-> -            'n': 'null' } }
+> -{ 'struct': 'Abort',
+> -  'data': { } }
 > -
 > -##
->  # @LostTickPolicy:
->  #
->  # Policy for handling lost ticks in timer devices.
-> @@ -316,778 +301,6 @@
->  { 'command': 'query-events', 'returns': ['EventInfo'] }
->
->  ##
-> -# @MigrationStats:
+> -# @ActionCompletionMode:
 > -#
-> -# Detailed migration status.
+> -# An enumeration of Transactional completion modes.
 > -#
-> -# @transferred: amount of bytes already transferred to the target VM
+> -# @individual: Do not attempt to cancel any other Actions if any Actions
+> fail
+> -#              after the Transaction request succeeds. All Actions that
+> -#              can complete successfully will do so without waiting on
+> others.
+> -#              This is the default.
 > -#
-> -# @remaining: amount of bytes remaining to be transferred to the target =
-VM
-> -#
-> -# @total: total amount of bytes involved in the migration process
-> -#
-> -# @duplicate: number of duplicate (zero) pages (since 1.2)
-> -#
-> -# @skipped: number of skipped zero pages (since 1.5)
-> -#
-> -# @normal: number of normal pages (since 1.2)
-> -#
-> -# @normal-bytes: number of normal bytes sent (since 1.2)
-> -#
-> -# @dirty-pages-rate: number of pages dirtied by second by the
-> -#        guest (since 1.3)
-> -#
-> -# @mbps: throughput in megabits/sec. (since 1.6)
-> -#
-> -# @dirty-sync-count: number of times that dirty ram was synchronized
-> (since 2.1)
-> -#
-> -# @postcopy-requests: The number of page requests received from the
-> destination
-> -#        (since 2.7)
-> -#
-> -# @page-size: The number of bytes per page for the various page-based
-> -#        statistics (since 2.10)
-> -#
-> -# Since: 0.14.0
-> -##
-> -{ 'struct': 'MigrationStats',
-> -  'data': {'transferred': 'int', 'remaining': 'int', 'total': 'int' ,
-> -           'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
-> -           'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
-> -           'mbps' : 'number', 'dirty-sync-count' : 'int',
-> -           'postcopy-requests' : 'int', 'page-size' : 'int' } }
-> -
-> -##
-> -# @XBZRLECacheStats:
-> -#
-> -# Detailed XBZRLE migration cache statistics
-> -#
-> -# @cache-size: XBZRLE cache size
-> -#
-> -# @bytes: amount of bytes already transferred to the target VM
-> -#
-> -# @pages: amount of pages transferred to the target VM
-> -#
-> -# @cache-miss: number of cache miss
-> -#
-> -# @cache-miss-rate: rate of cache miss (since 2.1)
-> -#
-> -# @overflow: number of overflows
-> -#
-> -# Since: 1.2
-> -##
-> -{ 'struct': 'XBZRLECacheStats',
-> -  'data': {'cache-size': 'int', 'bytes': 'int', 'pages': 'int',
-> -           'cache-miss': 'int', 'cache-miss-rate': 'number',
-> -           'overflow': 'int' } }
-> -
-> -##
-> -# @MigrationStatus:
-> -#
-> -# An enumeration of migration status.
-> -#
-> -# @none: no migration has ever happened.
-> -#
-> -# @setup: migration process has been initiated.
-> -#
-> -# @cancelling: in the process of cancelling migration.
-> -#
-> -# @cancelled: cancelling migration is finished.
-> -#
-> -# @active: in the process of doing migration.
-> -#
-> -# @postcopy-active: like active, but now in postcopy mode. (since 2.5)
-> -#
-> -# @completed: migration is finished.
-> -#
-> -# @failed: some error occurred during migration process.
-> -#
-> -# @colo: VM is in the process of fault tolerance, VM can not get into th=
-is
-> -#        state unless colo capability is enabled for migration. (since
-> 2.8)
-> -#
-> -# Since: 2.3
-> -#
-> -##
-> -{ 'enum': 'MigrationStatus',
-> -  'data': [ 'none', 'setup', 'cancelling', 'cancelled',
-> -            'active', 'postcopy-active', 'completed', 'failed', 'colo' ]=
- }
-> -
-> -##
-> -# @MigrationInfo:
-> -#
-> -# Information about current migration process.
-> -#
-> -# @status: @MigrationStatus describing the current migration status.
-> -#          If this field is not returned, no migration process
-> -#          has been initiated
-> -#
-> -# @ram: @MigrationStats containing detailed migration
-> -#       status, only returned if status is 'active' or
-> -#       'completed'(since 1.2)
-> -#
-> -# @disk: @MigrationStats containing detailed disk migration
-> -#        status, only returned if status is 'active' and it is a block
-> -#        migration
-> -#
-> -# @xbzrle-cache: @XBZRLECacheStats containing detailed XBZRLE
-> -#                migration statistics, only returned if XBZRLE feature i=
+> -# @grouped: If any Action fails after the Transaction succeeds, cancel a=
+ll
+> -#           Actions. Actions do not complete until all Actions are ready
+> to
+> -#           complete. May be rejected by Actions that do not support thi=
 s
-> on and
-> -#                status is 'active' or 'completed' (since 1.2)
-> -#
-> -# @total-time: total amount of milliseconds since migration started.
-> -#        If migration has ended, it returns the total migration
-> -#        time. (since 1.2)
-> -#
-> -# @downtime: only present when migration finishes correctly
-> -#        total downtime in milliseconds for the guest.
-> -#        (since 1.3)
-> -#
-> -# @expected-downtime: only present while migration is active
-> -#        expected downtime in milliseconds for the guest in last walk
-> -#        of the dirty bitmap. (since 1.3)
-> -#
-> -# @setup-time: amount of setup time in milliseconds _before_ the
-> -#        iterations begin but _after_ the QMP command is issued. This is
-> designed
-> -#        to provide an accounting of any activities (such as RDMA
-> pinning) which
-> -#        may be expensive, but do not actually occur during the iterativ=
-e
-> -#        migration rounds themselves. (since 1.6)
-> -#
-> -# @cpu-throttle-percentage: percentage of time guest cpus are being
-> -#        throttled during auto-converge. This is only present when
-> auto-converge
-> -#        has started throttling guest cpus. (Since 2.7)
-> -#
-> -# @error-desc: the human readable error description string, when
-> -#              @status is 'failed'. Clients should not attempt to parse
-> the
-> -#              error strings. (Since 2.7)
-> -#
-> -# Since: 0.14.0
-> -##
-> -{ 'struct': 'MigrationInfo',
-> -  'data': {'*status': 'MigrationStatus', '*ram': 'MigrationStats',
-> -           '*disk': 'MigrationStats',
-> -           '*xbzrle-cache': 'XBZRLECacheStats',
-> -           '*total-time': 'int',
-> -           '*expected-downtime': 'int',
-> -           '*downtime': 'int',
-> -           '*setup-time': 'int',
-> -           '*cpu-throttle-percentage': 'int',
-> -           '*error-desc': 'str'} }
-> -
-> -##
-> -# @query-migrate:
-> -#
-> -# Returns information about current migration process. If migration
-> -# is active there will be another json-object with RAM migration
-> -# status and if block migration is active another one with block
-> -# migration status.
-> -#
-> -# Returns: @MigrationInfo
-> -#
-> -# Since: 0.14.0
-> -#
-> -# Example:
-> -#
-> -# 1. Before the first migration
-> -#
-> -# -> { "execute": "query-migrate" }
-> -# <- { "return": {} }
-> -#
-> -# 2. Migration is done and has succeeded
-> -#
-> -# -> { "execute": "query-migrate" }
-> -# <- { "return": {
-> -#         "status": "completed",
-> -#         "ram":{
-> -#           "transferred":123,
-> -#           "remaining":123,
-> -#           "total":246,
-> -#           "total-time":12345,
-> -#           "setup-time":12345,
-> -#           "downtime":12345,
-> -#           "duplicate":123,
-> -#           "normal":123,
-> -#           "normal-bytes":123456,
-> -#           "dirty-sync-count":15
-> -#         }
-> -#      }
-> -#    }
-> -#
-> -# 3. Migration is done and has failed
-> -#
-> -# -> { "execute": "query-migrate" }
-> -# <- { "return": { "status": "failed" } }
-> -#
-> -# 4. Migration is being performed and is not a block migration:
-> -#
-> -# -> { "execute": "query-migrate" }
-> -# <- {
-> -#       "return":{
-> -#          "status":"active",
-> -#          "ram":{
-> -#             "transferred":123,
-> -#             "remaining":123,
-> -#             "total":246,
-> -#             "total-time":12345,
-> -#             "setup-time":12345,
-> -#             "expected-downtime":12345,
-> -#             "duplicate":123,
-> -#             "normal":123,
-> -#             "normal-bytes":123456,
-> -#             "dirty-sync-count":15
-> -#          }
-> -#       }
-> -#    }
-> -#
-> -# 5. Migration is being performed and is a block migration:
-> -#
-> -# -> { "execute": "query-migrate" }
-> -# <- {
-> -#       "return":{
-> -#          "status":"active",
-> -#          "ram":{
-> -#             "total":1057024,
-> -#             "remaining":1053304,
-> -#             "transferred":3720,
-> -#             "total-time":12345,
-> -#             "setup-time":12345,
-> -#             "expected-downtime":12345,
-> -#             "duplicate":123,
-> -#             "normal":123,
-> -#             "normal-bytes":123456,
-> -#             "dirty-sync-count":15
-> -#          },
-> -#          "disk":{
-> -#             "total":20971520,
-> -#             "remaining":20880384,
-> -#             "transferred":91136
-> -#          }
-> -#       }
-> -#    }
-> -#
-> -# 6. Migration is being performed and XBZRLE is active:
-> -#
-> -# -> { "execute": "query-migrate" }
-> -# <- {
-> -#       "return":{
-> -#          "status":"active",
-> -#          "capabilities" : [ { "capability": "xbzrle", "state" : true }
-> ],
-> -#          "ram":{
-> -#             "total":1057024,
-> -#             "remaining":1053304,
-> -#             "transferred":3720,
-> -#             "total-time":12345,
-> -#             "setup-time":12345,
-> -#             "expected-downtime":12345,
-> -#             "duplicate":10,
-> -#             "normal":3333,
-> -#             "normal-bytes":3412992,
-> -#             "dirty-sync-count":15
-> -#          },
-> -#          "xbzrle-cache":{
-> -#             "cache-size":67108864,
-> -#             "bytes":20971520,
-> -#             "pages":2444343,
-> -#             "cache-miss":2244,
-> -#             "cache-miss-rate":0.123,
-> -#             "overflow":34434
-> -#          }
-> -#       }
-> -#    }
-> -#
-> -##
-> -{ 'command': 'query-migrate', 'returns': 'MigrationInfo' }
-> -
-> -##
-> -# @MigrationCapability:
-> -#
-> -# Migration capabilities enumeration
-> -#
-> -# @xbzrle: Migration supports xbzrle (Xor Based Zero Run Length Encoding=
-).
-> -#          This feature allows us to minimize migration traffic for
-> certain work
-> -#          loads, by sending compressed difference of the pages
-> -#
-> -# @rdma-pin-all: Controls whether or not the entire VM memory footprint =
-is
-> -#          mlock()'d on demand or all at once. Refer to docs/rdma.txt fo=
-r
-> usage.
-> -#          Disabled by default. (since 2.0)
-> -#
-> -# @zero-blocks: During storage migration encode blocks of zeroes
-> efficiently. This
-> -#          essentially saves 1MB of zeroes per block on the wire.
-> Enabling requires
-> -#          source and target VM to support this feature. To enable it is
-> sufficient
-> -#          to enable the capability on the source VM. The feature is
-> disabled by
-> -#          default. (since 1.6)
-> -#
-> -# @compress: Use multiple compression threads to accelerate live
-> migration.
-> -#          This feature can help to reduce the migration traffic, by
-> sending
-> -#          compressed pages. Please note that if compress and xbzrle are
-> both
-> -#          on, compress only takes effect in the ram bulk stage, after
-> that,
-> -#          it will be disabled and only xbzrle takes effect, this can
-> help to
-> -#          minimize migration traffic. The feature is disabled by defaul=
-t.
-> -#          (since 2.4 )
-> -#
-> -# @events: generate events for each migration state change
-> -#          (since 2.4 )
-> -#
-> -# @auto-converge: If enabled, QEMU will automatically throttle down the
-> guest
-> -#          to speed up convergence of RAM migration. (since 1.6)
-> -#
-> -# @postcopy-ram: Start executing on the migration target before all of
-> RAM has
-> -#          been migrated, pulling the remaining pages along as needed.
-> NOTE: If
-> -#          the migration fails during postcopy the VM will fail.  (since
-> 2.6)
-> -#
-> -# @x-colo: If enabled, migration will never end, and the state of the VM
-> on the
-> -#        primary side will be migrated continuously to the VM on seconda=
-ry
-> -#        side, this process is called COarse-Grain LOck Stepping (COLO)
-> for
-> -#        Non-stop Service. (since 2.8)
-> -#
-> -# @release-ram: if enabled, qemu will free the migrated ram pages on the
-> source
-> -#        during postcopy-ram migration. (since 2.9)
-> -#
-> -# @block: If enabled, QEMU will also migrate the contents of all block
-> -#          devices.  Default is disabled.  A possible alternative uses
-> -#          mirror jobs to a builtin NBD server on the destination, which
-> -#          offers more flexibility.
-> -#          (Since 2.10)
-> -#
-> -# @return-path: If enabled, migration will use the return path even
-> -#               for precopy. (since 2.10)
-> -#
-> -# Since: 1.2
-> -##
-> -{ 'enum': 'MigrationCapability',
-> -  'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-> -           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram'=
-,
-> -           'block', 'return-path' ] }
-> -
-> -##
-> -# @MigrationCapabilityStatus:
-> -#
-> -# Migration capability information
-> -#
-> -# @capability: capability enum
-> -#
-> -# @state: capability state bool
-> -#
-> -# Since: 1.2
-> -##
-> -{ 'struct': 'MigrationCapabilityStatus',
-> -  'data': { 'capability' : 'MigrationCapability', 'state' : 'bool' } }
-> -
-> -##
-> -# @migrate-set-capabilities:
-> -#
-> -# Enable/Disable the following migration capabilities (like xbzrle)
-> -#
-> -# @capabilities: json array of capability modifications to make
-> -#
-> -# Since: 1.2
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "migrate-set-capabilities" , "arguments":
-> -#      { "capabilities": [ { "capability": "xbzrle", "state": true } ] }=
- }
-> -#
-> -##
-> -{ 'command': 'migrate-set-capabilities',
-> -  'data': { 'capabilities': ['MigrationCapabilityStatus'] } }
-> -
-> -##
-> -# @query-migrate-capabilities:
-> -#
-> -# Returns information about the current migration capabilities status
-> -#
-> -# Returns: @MigrationCapabilitiesStatus
-> -#
-> -# Since: 1.2
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "query-migrate-capabilities" }
-> -# <- { "return": [
-> -#       {"state": false, "capability": "xbzrle"},
-> -#       {"state": false, "capability": "rdma-pin-all"},
-> -#       {"state": false, "capability": "auto-converge"},
-> -#       {"state": false, "capability": "zero-blocks"},
-> -#       {"state": false, "capability": "compress"},
-> -#       {"state": true, "capability": "events"},
-> -#       {"state": false, "capability": "postcopy-ram"},
-> -#       {"state": false, "capability": "x-colo"}
-> -#    ]}
-> -#
-> -##
-> -{ 'command': 'query-migrate-capabilities', 'returns':
->  ['MigrationCapabilityStatus']}
-> -
-> -##
-> -# @MigrationParameter:
-> -#
-> -# Migration parameters enumeration
-> -#
-> -# @compress-level: Set the compression level to be used in live migratio=
-n,
-> -#          the compression level is an integer between 0 and 9, where 0
-> means
-> -#          no compression, 1 means the best compression speed, and 9
-> means best
-> -#          compression ratio which will consume more CPU.
-> -#
-> -# @compress-threads: Set compression thread count to be used in live
-> migration,
-> -#          the compression thread count is an integer between 1 and 255.
-> -#
-> -# @decompress-threads: Set decompression thread count to be used in live
-> -#          migration, the decompression thread count is an integer
-> between 1
-> -#          and 255. Usually, decompression is at least 4 times as fast a=
-s
-> -#          compression, so set the decompress-threads to the number abou=
-t
-> 1/4
-> -#          of compress-threads is adequate.
-> -#
-> -# @cpu-throttle-initial: Initial percentage of time guest cpus are
-> throttled
-> -#                        when migration auto-converge is activated. The
-> -#                        default value is 20. (Since 2.7)
-> -#
-> -# @cpu-throttle-increment: throttle percentage increase each time
-> -#                          auto-converge detects that migration is not
-> making
-> -#                          progress. The default value is 10. (Since 2.7=
-)
-> -#
-> -# @tls-creds: ID of the 'tls-creds' object that provides credentials for
-> -#             establishing a TLS connection over the migration data
-> channel.
-> -#             On the outgoing side of the migration, the credentials mus=
-t
-> -#             be for a 'client' endpoint, while for the incoming side th=
-e
-> -#             credentials must be for a 'server' endpoint. Setting this
-> -#             will enable TLS for all migrations. The default is unset,
-> -#             resulting in unsecured migration at the QEMU level. (Since
-> 2.7)
-> -#
-> -# @tls-hostname: hostname of the target host for the migration. This is
-> -#                required when using x509 based TLS credentials and the
-> -#                migration URI does not already include a hostname. For
-> -#                example if using fd: or exec: based migration, the
-> -#                hostname must be provided so that the server's x509
-> -#                certificate identity can be validated. (Since 2.7)
-> -#
-> -# @max-bandwidth: to set maximum speed for migration. maximum speed in
-> -#                 bytes per second. (Since 2.8)
-> -#
-> -# @downtime-limit: set maximum tolerated downtime for migration. maximum
-> -#                  downtime in milliseconds (Since 2.8)
-> -#
-> -# @x-checkpoint-delay: The delay time (in ms) between two COLO
-> checkpoints in
-> -#          periodic mode. (Since 2.8)
-> -#
-> -# @block-incremental: Affects how much storage is migrated when the
-> -#      block migration capability is enabled.  When false, the entire
-> -#      storage backing chain is migrated into a flattened image at
-> -#      the destination; when true, only the active qcow2 layer is
-> -#      migrated and the destination must already have access to the
-> -#      same backing chain as was used on the source.  (since 2.10)
-> -#
-> -# Since: 2.4
-> -##
-> -{ 'enum': 'MigrationParameter',
-> -  'data': ['compress-level', 'compress-threads', 'decompress-threads',
-> -           'cpu-throttle-initial', 'cpu-throttle-increment',
-> -           'tls-creds', 'tls-hostname', 'max-bandwidth',
-> -           'downtime-limit', 'x-checkpoint-delay', 'block-incremental' ]=
- }
-> -
-> -##
-> -# @MigrateSetParameters:
-> -#
-> -# @compress-level: compression level
-> -#
-> -# @compress-threads: compression thread count
-> -#
-> -# @decompress-threads: decompression thread count
-> -#
-> -# @cpu-throttle-initial: Initial percentage of time guest cpus are
-> -#                        throttled when migration auto-converge is
-> activated.
-> -#                        The default value is 20. (Since 2.7)
-> -#
-> -# @cpu-throttle-increment: throttle percentage increase each time
-> -#                          auto-converge detects that migration is not
-> making
-> -#                          progress. The default value is 10. (Since 2.7=
-)
-> -#
-> -# @tls-creds: ID of the 'tls-creds' object that provides credentials
-> -#             for establishing a TLS connection over the migration data
-> -#             channel. On the outgoing side of the migration, the
-> credentials
-> -#             must be for a 'client' endpoint, while for the incoming
-> side the
-> -#             credentials must be for a 'server' endpoint. Setting this
-> -#             to a non-empty string enables TLS for all migrations.
-> -#             An empty string means that QEMU will use plain text mode f=
-or
-> -#             migration, rather than TLS (Since 2.9)
-> -#             Previously (since 2.7), this was reported by omitting
-> -#             tls-creds instead.
-> -#
-> -# @tls-hostname: hostname of the target host for the migration. This
-> -#                is required when using x509 based TLS credentials and t=
-he
-> -#                migration URI does not already include a hostname. For
-> -#                example if using fd: or exec: based migration, the
-> -#                hostname must be provided so that the server's x509
-> -#                certificate identity can be validated. (Since 2.7)
-> -#                An empty string means that QEMU will use the hostname
-> -#                associated with the migration URI, if any. (Since 2.9)
-> -#                Previously (since 2.7), this was reported by omitting
-> -#                tls-hostname instead.
-> -#
-> -# @max-bandwidth: to set maximum speed for migration. maximum speed in
-> -#                 bytes per second. (Since 2.8)
-> -#
-> -# @downtime-limit: set maximum tolerated downtime for migration. maximum
-> -#                  downtime in milliseconds (Since 2.8)
-> -#
-> -# @x-checkpoint-delay: the delay time between two COLO checkpoints.
-> (Since 2.8)
-> -#
-> -# @block-incremental: Affects how much storage is migrated when the
-> -#      block migration capability is enabled.  When false, the entire
-> -#      storage backing chain is migrated into a flattened image at
-> -#      the destination; when true, only the active qcow2 layer is
-> -#      migrated and the destination must already have access to the
-> -#      same backing chain as was used on the source.  (since 2.10)
-> -#
-> -# Since: 2.4
-> -##
-> -# TODO either fuse back into MigrationParameters, or make
-> -# MigrationParameters members mandatory
-> -{ 'struct': 'MigrateSetParameters',
-> -  'data': { '*compress-level': 'int',
-> -            '*compress-threads': 'int',
-> -            '*decompress-threads': 'int',
-> -            '*cpu-throttle-initial': 'int',
-> -            '*cpu-throttle-increment': 'int',
-> -            '*tls-creds': 'StrOrNull',
-> -            '*tls-hostname': 'StrOrNull',
-> -            '*max-bandwidth': 'int',
-> -            '*downtime-limit': 'int',
-> -            '*x-checkpoint-delay': 'int',
-> -            '*block-incremental': 'bool' } }
-> -
-> -##
-> -# @migrate-set-parameters:
-> -#
-> -# Set various migration parameters.
-> -#
-> -# Since: 2.4
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "migrate-set-parameters" ,
-> -#      "arguments": { "compress-level": 1 } }
-> -#
-> -##
-> -{ 'command': 'migrate-set-parameters', 'boxed': true,
-> -  'data': 'MigrateSetParameters' }
-> -
-> -##
-> -# @MigrationParameters:
-> -#
-> -# The optional members aren't actually optional.
-> -#
-> -# @compress-level: compression level
-> -#
-> -# @compress-threads: compression thread count
-> -#
-> -# @decompress-threads: decompression thread count
-> -#
-> -# @cpu-throttle-initial: Initial percentage of time guest cpus are
-> -#                        throttled when migration auto-converge is
-> activated.
-> -#                        (Since 2.7)
-> -#
-> -# @cpu-throttle-increment: throttle percentage increase each time
-> -#                          auto-converge detects that migration is not
-> making
-> -#                          progress. (Since 2.7)
-> -#
-> -# @tls-creds: ID of the 'tls-creds' object that provides credentials
-> -#             for establishing a TLS connection over the migration data
-> -#             channel. On the outgoing side of the migration, the
-> credentials
-> -#             must be for a 'client' endpoint, while for the incoming
-> side the
-> -#             credentials must be for a 'server' endpoint.
-> -#             An empty string means that QEMU will use plain text mode f=
-or
-> -#             migration, rather than TLS (Since 2.7)
-> -#             Note: 2.8 reports this by omitting tls-creds instead.
-> -#
-> -# @tls-hostname: hostname of the target host for the migration. This
-> -#                is required when using x509 based TLS credentials and t=
-he
-> -#                migration URI does not already include a hostname. For
-> -#                example if using fd: or exec: based migration, the
-> -#                hostname must be provided so that the server's x509
-> -#                certificate identity can be validated. (Since 2.7)
-> -#                An empty string means that QEMU will use the hostname
-> -#                associated with the migration URI, if any. (Since 2.9)
-> -#                Note: 2.8 reports this by omitting tls-hostname instead=
-.
-> -#
-> -# @max-bandwidth: to set maximum speed for migration. maximum speed in
-> -#                 bytes per second. (Since 2.8)
-> -#
-> -# @downtime-limit: set maximum tolerated downtime for migration. maximum
-> -#                  downtime in milliseconds (Since 2.8)
-> -#
-> -# @x-checkpoint-delay: the delay time between two COLO checkpoints.
-> (Since 2.8)
-> -#
-> -# @block-incremental: Affects how much storage is migrated when the
-> -#      block migration capability is enabled.  When false, the entire
-> -#      storage backing chain is migrated into a flattened image at
-> -#      the destination; when true, only the active qcow2 layer is
-> -#      migrated and the destination must already have access to the
-> -#      same backing chain as was used on the source.  (since 2.10)
-> -#
-> -# Since: 2.4
-> -##
-> -{ 'struct': 'MigrationParameters',
-> -  'data': { '*compress-level': 'int',
-> -            '*compress-threads': 'int',
-> -            '*decompress-threads': 'int',
-> -            '*cpu-throttle-initial': 'int',
-> -            '*cpu-throttle-increment': 'int',
-> -            '*tls-creds': 'str',
-> -            '*tls-hostname': 'str',
-> -            '*max-bandwidth': 'int',
-> -            '*downtime-limit': 'int',
-> -            '*x-checkpoint-delay': 'int',
-> -            '*block-incremental': 'bool' } }
-> -
-> -##
-> -# @query-migrate-parameters:
-> -#
-> -# Returns information about the current migration parameters
-> -#
-> -# Returns: @MigrationParameters
-> -#
-> -# Since: 2.4
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "query-migrate-parameters" }
-> -# <- { "return": {
-> -#          "decompress-threads": 2,
-> -#          "cpu-throttle-increment": 10,
-> -#          "compress-threads": 8,
-> -#          "compress-level": 1,
-> -#          "cpu-throttle-initial": 20,
-> -#          "max-bandwidth": 33554432,
-> -#          "downtime-limit": 300
-> -#       }
-> -#    }
-> -#
-> -##
-> -{ 'command': 'query-migrate-parameters',
-> -  'returns': 'MigrationParameters' }
-> -
-> -##
-> -# @client_migrate_info:
-> -#
-> -# Set migration information for remote display.  This makes the server
-> -# ask the client to automatically reconnect using the new parameters
-> -# once migration finished successfully.  Only implemented for SPICE.
-> -#
-> -# @protocol:     must be "spice"
-> -# @hostname:     migration target hostname
-> -# @port:         spice tcp port for plaintext channels
-> -# @tls-port:     spice tcp port for tls-secured channels
-> -# @cert-subject: server certificate subject
-> -#
-> -# Since: 0.14.0
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "client_migrate_info",
-> -#      "arguments": { "protocol": "spice",
-> -#                     "hostname": "virt42.lab.kraxel.org",
-> -#                     "port": 1234 } }
-> -# <- { "return": {} }
-> -#
-> -##
-> -{ 'command': 'client_migrate_info',
-> -  'data': { 'protocol': 'str', 'hostname': 'str', '*port': 'int',
-> -            '*tls-port': 'int', '*cert-subject': 'str' } }
-> -
-> -##
-> -# @migrate-start-postcopy:
-> -#
-> -# Followup to a migration command to switch the migration to postcopy
-> mode.
-> -# The postcopy-ram capability must be set before the original migration
-> -# command.
+> -#           completion mode.
 > -#
 > -# Since: 2.5
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "migrate-start-postcopy" }
-> -# <- { "return": {} }
-> -#
 > -##
-> -{ 'command': 'migrate-start-postcopy' }
+> -{ 'enum': 'ActionCompletionMode',
+> -  'data': [ 'individual', 'grouped' ] }
 > -
 > -##
-> -# @COLOMessage:
+> -# @TransactionAction:
 > -#
-> -# The message transmission between Primary side and Secondary side.
+> -# A discriminated record of operations that can be performed with
+> -# @transaction. Action @type can be:
 > -#
-> -# @checkpoint-ready: Secondary VM (SVM) is ready for checkpointing
+> -# - @abort: since 1.6
+> -# - @block-dirty-bitmap-add: since 2.5
+> -# - @block-dirty-bitmap-clear: since 2.5
+> -# - @blockdev-backup: since 2.3
+> -# - @blockdev-snapshot: since 2.5
+> -# - @blockdev-snapshot-internal-sync: since 1.7
+> -# - @blockdev-snapshot-sync: since 1.1
+> -# - @drive-backup: since 1.6
 > -#
-> -# @checkpoint-request: Primary VM (PVM) tells SVM to prepare for
-> checkpointing
-> -#
-> -# @checkpoint-reply: SVM gets PVM's checkpoint request
-> -#
-> -# @vmstate-send: VM's state will be sent by PVM.
-> -#
-> -# @vmstate-size: The total size of VMstate.
-> -#
-> -# @vmstate-received: VM's state has been received by SVM.
-> -#
-> -# @vmstate-loaded: VM's state has been loaded by SVM.
-> -#
-> -# Since: 2.8
+> -# Since: 1.1
 > -##
-> -{ 'enum': 'COLOMessage',
-> -  'data': [ 'checkpoint-ready', 'checkpoint-request', 'checkpoint-reply'=
-,
-> -            'vmstate-send', 'vmstate-size', 'vmstate-received',
-> -            'vmstate-loaded' ] }
+> -{ 'union': 'TransactionAction',
+> -  'data': {
+> -       'abort': 'Abort',
+> -       'block-dirty-bitmap-add': 'BlockDirtyBitmapAdd',
+> -       'block-dirty-bitmap-clear': 'BlockDirtyBitmap',
+> -       'blockdev-backup': 'BlockdevBackup',
+> -       'blockdev-snapshot': 'BlockdevSnapshot',
+> -       'blockdev-snapshot-internal-sync': 'BlockdevSnapshotInternal',
+> -       'blockdev-snapshot-sync': 'BlockdevSnapshotSync',
+> -       'drive-backup': 'DriveBackup'
+> -   } }
 > -
 > -##
-> -# @COLOMode:
+> -# @TransactionProperties:
 > -#
-> -# The colo mode
+> -# Optional arguments to modify the behavior of a Transaction.
 > -#
-> -# @unknown: unknown mode
+> -# @completion-mode: Controls how jobs launched asynchronously by
+> -#                   Actions will complete or fail as a group.
+> -#                   See @ActionCompletionMode for details.
 > -#
-> -# @primary: master side
-> -#
-> -# @secondary: slave side
-> -#
-> -# Since: 2.8
+> -# Since: 2.5
 > -##
-> -{ 'enum': 'COLOMode',
-> -  'data': [ 'unknown', 'primary', 'secondary'] }
+> -{ 'struct': 'TransactionProperties',
+> -  'data': {
+> -       '*completion-mode': 'ActionCompletionMode'
+> -  }
+> -}
 > -
 > -##
-> -# @FailoverStatus:
+> -# @transaction:
 > -#
-> -# An enumeration of COLO failover status
+> -# Executes a number of transactionable QMP commands atomically. If any
+> -# operation fails, then the entire set of actions will be abandoned and
+> the
+> -# appropriate error returned.
 > -#
-> -# @none: no failover has ever happened
+> -# For external snapshots, the dictionary contains the device, the file t=
+o
+> use for
+> -# the new snapshot, and the format.  The default format, if not
+> specified, is
+> -# qcow2.
 > -#
-> -# @require: got failover requirement but not handled
-> -#
-> -# @active: in the process of doing failover
-> -#
-> -# @completed: finish the process of failover
-> -#
-> -# @relaunch: restart the failover process, from 'none' -> 'completed'
-> (Since 2.9)
-> -#
-> -# Since: 2.8
-> -##
-> -{ 'enum': 'FailoverStatus',
-> -  'data': [ 'none', 'require', 'active', 'completed', 'relaunch' ] }
-> -
-> -##
-> -# @x-colo-lost-heartbeat:
-> -#
-> -# Tell qemu that heartbeat is lost, request it to do takeover procedures=
-.
-> -# If this command is sent to the PVM, the Primary side will exit COLO
-> mode.
-> -# If sent to the Secondary, the Secondary side will run failover work,
-> -# then takes over server operation to become the service VM.
-> -#
-> -# Since: 2.8
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "x-colo-lost-heartbeat" }
-> -# <- { "return": {} }
-> -#
-> -##
-> -{ 'command': 'x-colo-lost-heartbeat' }
-> -
-> -##
->  # @CpuInfoArch:
->  #
->  # An enumeration of cpu types that enable additional information during
-> @@ -2072,107 +1285,6 @@
->    'returns': 'str' }
->
->  ##
-> -# @migrate_cancel:
-> -#
-> -# Cancel the current executing migration process.
-> -#
-> -# Returns: nothing on success
-> -#
-> -# Notes: This command succeeds even if there is no migration process
-> running.
-> -#
-> -# Since: 0.14.0
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "migrate_cancel" }
-> -# <- { "return": {} }
-> -#
-> -##
-> -{ 'command': 'migrate_cancel' }
-> -
-> -##
-> -# @migrate_set_downtime:
-> -#
-> -# Set maximum tolerated downtime for migration.
-> -#
-> -# @value: maximum downtime in seconds
-> -#
-> -# Returns: nothing on success
-> -#
-> -# Notes: This command is deprecated in favor of 'migrate-set-parameters'
-> -#
-> -# Since: 0.14.0
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "migrate_set_downtime", "arguments": { "value": 0.1 } =
-}
-> -# <- { "return": {} }
-> -#
-> -##
-> -{ 'command': 'migrate_set_downtime', 'data': {'value': 'number'} }
-> -
-> -##
-> -# @migrate_set_speed:
-> -#
-> -# Set maximum speed for migration.
-> -#
-> -# @value: maximum speed in bytes per second.
-> -#
-> -# Returns: nothing on success
-> -#
-> -# Notes: This command is deprecated in favor of 'migrate-set-parameters'
-> -#
-> -# Since: 0.14.0
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "migrate_set_speed", "arguments": { "value": 1024 } }
-> -# <- { "return": {} }
-> -#
-> -##
-> -{ 'command': 'migrate_set_speed', 'data': {'value': 'int'} }
-> -
-> -##
-> -# @migrate-set-cache-size:
-> -#
-> -# Set cache size to be used by XBZRLE migration
-> -#
-> -# @value: cache size in bytes
-> -#
-> -# The size will be rounded down to the nearest power of 2.
-> -# The cache size can be modified before and during ongoing migration
-> -#
-> -# Returns: nothing on success
-> -#
-> -# Since: 1.2
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "migrate-set-cache-size",
-> -#      "arguments": { "value": 536870912 } }
-> -# <- { "return": {} }
-> -#
-> -##
-> -{ 'command': 'migrate-set-cache-size', 'data': {'value': 'int'} }
-> -
-> -##
-> -# @query-migrate-cache-size:
-> -#
-> -# Query migration XBZRLE cache size
-> -#
-> -# Returns: XBZRLE cache size in bytes
-> -#
-> -# Since: 1.2
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "query-migrate-cache-size" }
-> -# <- { "return": 67108864 }
-> -#
-> -##
-> -{ 'command': 'query-migrate-cache-size', 'returns': 'int' }
-> -
-> -##
->  # @ObjectPropertyInfo:
->  #
->  # @name: the name of the property
-> @@ -2378,99 +1490,6 @@
->    'returns': [ 'DevicePropertyInfo' ] }
->
->  ##
-> -# @migrate:
-> -#
-> -# Migrates the current running guest to another Virtual Machine.
-> -#
-> -# @uri: the Uniform Resource Identifier of the destination VM
-> -#
-> -# @blk: do block migration (full disk copy)
-> -#
-> -# @inc: incremental disk copy migration
-> -#
-> -# @detach: this argument exists only for compatibility reasons and
-> -#          is ignored by QEMU
-> -#
-> -# Returns: nothing on success
-> -#
-> -# Since: 0.14.0
-> -#
-> -# Notes:
-> -#
-> -# 1. The 'query-migrate' command should be used to check migration's
-> progress
-> -#    and final result (this information is provided by the 'status'
-> member)
-> -#
-> -# 2. All boolean arguments default to false
-> -#
-> -# 3. The user Monitor's "detach" argument is invalid in QMP and should n=
+> -# Each new snapshot defaults to being created by QEMU (wiping any
+> -# contents if the file already exists), but it is also possible to reuse
+> -# an externally-created file.  In the latter case, you should ensure tha=
+t
+> -# the new image file has the same contents as the current one; QEMU cann=
 ot
-> -#    be used
+> -# perform any meaningful check.  Typically this is achieved by using the
+> -# current image file as the backing file for the new image.
 > -#
-> -# Example:
+> -# On failure, the original disks pre-snapshot attempt will be used.
 > -#
-> -# -> { "execute": "migrate", "arguments": { "uri": "tcp:0:4446" } }
-> -# <- { "return": {} }
+> -# For internal snapshots, the dictionary contains the device and the
+> snapshot's
+> -# name.  If an internal snapshot matching name already exists, the
+> request will
+> -# be rejected.  Only some image formats support it, for example, qcow2,
+> rbd,
+> -# and sheepdog.
 > -#
-> -##
-> -{ 'command': 'migrate',
-> -  'data': {'uri': 'str', '*blk': 'bool', '*inc': 'bool', '*detach':
-> 'bool' } }
-> -
-> -##
-> -# @migrate-incoming:
+> -# On failure, qemu will try delete the newly created internal snapshot i=
+n
+> the
+> -# transaction.  When an I/O error occurs during deletion, the user needs
+> to fix
+> -# it later with qemu-img or other command.
 > -#
-> -# Start an incoming migration, the qemu must have been started
-> -# with -incoming defer
+> -# @actions: List of @TransactionAction;
+> -#           information needed for the respective operations.
 > -#
-> -# @uri: The Uniform Resource Identifier identifying the source or
-> -#       address to listen on
+> -# @properties: structure of additional options to control the
+> -#              execution of the transaction. See @TransactionProperties
+> -#              for additional detail.
 > -#
 > -# Returns: nothing on success
 > -#
-> -# Since: 2.3
+> -#          Errors depend on the operations of the transaction
 > -#
-> -# Notes:
-> -#
-> -# 1. It's a bad idea to use a string for the uri, but it needs to stay
-> -#    compatible with -incoming and the format of the uri is already
-> exposed
-> -#    above libvirt.
-> -#
-> -# 2. QEMU must be started with -incoming defer to allow migrate-incoming
-> to
-> -#    be used.
-> -#
-> -# 3. The uri format is the same as for -incoming
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "migrate-incoming",
-> -#      "arguments": { "uri": "tcp::4446" } }
-> -# <- { "return": {} }
-> -#
-> -##
-> -{ 'command': 'migrate-incoming', 'data': {'uri': 'str' } }
-> -
-> -##
-> -# @xen-save-devices-state:
-> -#
-> -# Save the state of all devices to file. The RAM and the block devices
-> -# of the VM are not saved by this command.
-> -#
-> -# @filename: the file to save the state of the devices to as binary
-> -# data. See xen-save-devices-state.txt for a description of the binary
-> -# format.
-> -#
-> -# Returns: Nothing on success
+> -# Note: The transaction aborts on the first failure.  Therefore, there
+> will be
+> -# information on only one failed operation returned in an error
+> condition, and
+> -# subsequent actions will not have been attempted.
 > -#
 > -# Since: 1.1
 > -#
 > -# Example:
 > -#
-> -# -> { "execute": "xen-save-devices-state",
-> -#      "arguments": { "filename": "/tmp/save" } }
+> -# -> { "execute": "transaction",
+> -#      "arguments": { "actions": [
+> -#          { "type": "blockdev-snapshot-sync", "data" : { "device":
+> "ide-hd0",
+> -#                                      "snapshot-file":
+> "/some/place/my-image",
+> -#                                      "format": "qcow2" } },
+> -#          { "type": "blockdev-snapshot-sync", "data" : { "node-name":
+> "myfile",
+> -#                                      "snapshot-file":
+> "/some/place/my-image2",
+> -#                                      "snapshot-node-name": "node3432",
+> -#                                      "mode": "existing",
+> -#                                      "format": "qcow2" } },
+> -#          { "type": "blockdev-snapshot-sync", "data" : { "device":
+> "ide-hd1",
+> -#                                      "snapshot-file":
+> "/some/place/my-image2",
+> -#                                      "mode": "existing",
+> -#                                      "format": "qcow2" } },
+> -#          { "type": "blockdev-snapshot-internal-sync", "data" : {
+> -#                                      "device": "ide-hd2",
+> -#                                      "name": "snapshot0" } } ] } }
 > -# <- { "return": {} }
 > -#
 > -##
-> -{ 'command': 'xen-save-devices-state', 'data': {'filename': 'str'} }
+> -{ 'command': 'transaction',
+> -  'data': { 'actions': [ 'TransactionAction' ],
+> -            '*properties': 'TransactionProperties'
+> -          }
+> -}
 > -
 > -##
->  # @xen-set-global-dirty-log:
+>  # @human-monitor-command:
 >  #
->  # Enable or disable the global dirty log mode.
-> @@ -4037,79 +3056,6 @@
->  { 'command': 'xen-load-devices-state', 'data': {'filename': 'str'} }
->
->  ##
-> -# @xen-set-replication:
-> -#
-> -# Enable or disable replication.
-> -#
-> -# @enable: true to enable, false to disable.
-> -#
-> -# @primary: true for primary or false for secondary.
-> -#
-> -# @failover: true to do failover, false to stop. but cannot be
-> -#            specified if 'enable' is true. default value is false.
-> -#
-> -# Returns: nothing.
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "xen-set-replication",
-> -#      "arguments": {"enable": true, "primary": false} }
-> -# <- { "return": {} }
-> -#
-> -# Since: 2.9
-> -##
-> -{ 'command': 'xen-set-replication',
-> -  'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } =
-}
-> -
-> -##
-> -# @ReplicationStatus:
-> -#
-> -# The result format for 'query-xen-replication-status'.
-> -#
-> -# @error: true if an error happened, false if replication is normal.
-> -#
-> -# @desc: the human readable error description string, when
-> -#        @error is 'true'.
-> -#
-> -# Since: 2.9
-> -##
-> -{ 'struct': 'ReplicationStatus',
-> -  'data': { 'error': 'bool', '*desc': 'str' } }
-> -
-> -##
-> -# @query-xen-replication-status:
-> -#
-> -# Query replication status while the vm is running.
-> -#
-> -# Returns: A @ReplicationResult object showing the status.
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "query-xen-replication-status" }
-> -# <- { "return": { "error": false } }
-> -#
-> -# Since: 2.9
-> -##
-> -{ 'command': 'query-xen-replication-status',
-> -  'returns': 'ReplicationStatus' }
-> -
-> -##
-> -# @xen-colo-do-checkpoint:
-> -#
-> -# Xen uses this command to notify replication to trigger a checkpoint.
-> -#
-> -# Returns: nothing.
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "xen-colo-do-checkpoint" }
-> -# <- { "return": {} }
-> -#
-> -# Since: 2.9
-> -##
-> -{ 'command': 'xen-colo-do-checkpoint' }
-> -
-> -##
->  # @GICCapability:
->  #
->  # The struct describes capability for a specific GIC (Generic
-> diff --git a/qapi/common.json b/qapi/common.json
-> index 862e73f..e2c5856 100644
-> --- a/qapi/common.json
-> +++ b/qapi/common.json
-> @@ -173,3 +173,19 @@
->  { 'struct': 'String',
->    'data': {
->      'str': 'str' } }
-> +
-> +##
-> +# @StrOrNull:
-> +#
-> +# This is a string value or the explicit lack of a string (null
-> +# pointer in C).  Intended for cases when 'optional absent' already
-> +# has a different meaning.
-> +#
-> +# @s: the string value
-> +# @n: no string value
-> +#
-> +# Since: 2.10
-> +##
-> +{ 'alternate': 'StrOrNull',
-> +  'data': { 's': 'str',
-> +            'n': 'null' } }
-> diff --git a/qapi/event.json b/qapi/event.json
-> index f49bd3d..a043de4 100644
-> --- a/qapi/event.json
-> +++ b/qapi/event.json
-> @@ -51,44 +51,6 @@
->    'data': { '*device': 'str', 'path': 'str' } }
->
->  ##
-> -# @MIGRATION:
-> -#
-> -# Emitted when a migration event happens
-> -#
-> -# @status: @MigrationStatus describing the current migration status.
-> -#
-> -# Since: 2.4
-> -#
-> -# Example:
-> -#
-> -# <- {"timestamp": {"seconds": 1432121972, "microseconds": 744001},
-> -#     "event": "MIGRATION",
-> -#     "data": {"status": "completed"} }
-> -#
-> -##
-> -{ 'event': 'MIGRATION',
-> -  'data': {'status': 'MigrationStatus'}}
-> -
-> -##
-> -# @MIGRATION_PASS:
-> -#
-> -# Emitted from the source side of a migration at the start of each pass
-> -# (when it syncs the dirty bitmap)
-> -#
-> -# @pass: An incrementing count (starting at 1 on the first pass)
-> -#
-> -# Since: 2.6
-> -#
-> -# Example:
-> -#
-> -# { "timestamp": {"seconds": 1449669631, "microseconds": 239225},
-> -#   "event": "MIGRATION_PASS", "data": {"pass": 2} }
-> -#
-> -##
-> -{ 'event': 'MIGRATION_PASS',
-> -  'data': { 'pass': 'int' } }
-> -
-> -##
->  # @ACPI_DEVICE_OST:
->  #
->  # Emitted when guest executes ACPI _OST method.
-> diff --git a/qapi/migration.json b/qapi/migration.json
+>  # Execute a command on the human monitor and return the output.
+> diff --git a/qapi/transaction.json b/qapi/transaction.json
 > new file mode 100644
-> index 0000000..ee2b3b8
+> index 0000000..bd31279
 > --- /dev/null
-> +++ b/qapi/migration.json
-> @@ -0,0 +1,1085 @@
+> +++ b/qapi/transaction.json
+> @@ -0,0 +1,158 @@
 > +# -*- Mode: Python -*-
 > +#
 > +
 > +##
-> +# =3D Migration
+> +# =3D Transactions
 > +##
 > +
-> +{ 'include': 'common.json' }
+> +{ 'include': 'block.json' }
 > +
 > +##
-> +# @MigrationStats:
+> +# @Abort:
 > +#
-> +# Detailed migration status.
+> +# This action can be used to test transaction failure.
 > +#
-> +# @transferred: amount of bytes already transferred to the target VM
-> +#
-> +# @remaining: amount of bytes remaining to be transferred to the target =
-VM
-> +#
-> +# @total: total amount of bytes involved in the migration process
-> +#
-> +# @duplicate: number of duplicate (zero) pages (since 1.2)
-> +#
-> +# @skipped: number of skipped zero pages (since 1.5)
-> +#
-> +# @normal: number of normal pages (since 1.2)
-> +#
-> +# @normal-bytes: number of normal bytes sent (since 1.2)
-> +#
-> +# @dirty-pages-rate: number of pages dirtied by second by the
-> +#        guest (since 1.3)
-> +#
-> +# @mbps: throughput in megabits/sec. (since 1.6)
-> +#
-> +# @dirty-sync-count: number of times that dirty ram was synchronized
-> (since 2.1)
-> +#
-> +# @postcopy-requests: The number of page requests received from the
-> destination
-> +#        (since 2.7)
-> +#
-> +# @page-size: The number of bytes per page for the various page-based
-> +#        statistics (since 2.10)
-> +#
-> +# Since: 0.14.0
+> +# Since: 1.6
 > +##
-> +{ 'struct': 'MigrationStats',
-> +  'data': {'transferred': 'int', 'remaining': 'int', 'total': 'int' ,
-> +           'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
-> +           'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
-> +           'mbps' : 'number', 'dirty-sync-count' : 'int',
-> +           'postcopy-requests' : 'int', 'page-size' : 'int' } }
+> +{ 'struct': 'Abort',
+> +  'data': { } }
 > +
 > +##
-> +# @XBZRLECacheStats:
+> +# @ActionCompletionMode:
 > +#
-> +# Detailed XBZRLE migration cache statistics
+> +# An enumeration of Transactional completion modes.
 > +#
-> +# @cache-size: XBZRLE cache size
+> +# @individual: Do not attempt to cancel any other Actions if any Actions
+> fail
+> +#              after the Transaction request succeeds. All Actions that
+> +#              can complete successfully will do so without waiting on
+> others.
+> +#              This is the default.
 > +#
-> +# @bytes: amount of bytes already transferred to the target VM
-> +#
-> +# @pages: amount of pages transferred to the target VM
-> +#
-> +# @cache-miss: number of cache miss
-> +#
-> +# @cache-miss-rate: rate of cache miss (since 2.1)
-> +#
-> +# @overflow: number of overflows
-> +#
-> +# Since: 1.2
-> +##
-> +{ 'struct': 'XBZRLECacheStats',
-> +  'data': {'cache-size': 'int', 'bytes': 'int', 'pages': 'int',
-> +           'cache-miss': 'int', 'cache-miss-rate': 'number',
-> +           'overflow': 'int' } }
-> +
-> +##
-> +# @MigrationStatus:
-> +#
-> +# An enumeration of migration status.
-> +#
-> +# @none: no migration has ever happened.
-> +#
-> +# @setup: migration process has been initiated.
-> +#
-> +# @cancelling: in the process of cancelling migration.
-> +#
-> +# @cancelled: cancelling migration is finished.
-> +#
-> +# @active: in the process of doing migration.
-> +#
-> +# @postcopy-active: like active, but now in postcopy mode. (since 2.5)
-> +#
-> +# @completed: migration is finished.
-> +#
-> +# @failed: some error occurred during migration process.
-> +#
-> +# @colo: VM is in the process of fault tolerance, VM can not get into th=
-is
-> +#        state unless colo capability is enabled for migration. (since
-> 2.8)
-> +#
-> +# Since: 2.3
-> +#
-> +##
-> +{ 'enum': 'MigrationStatus',
-> +  'data': [ 'none', 'setup', 'cancelling', 'cancelled',
-> +            'active', 'postcopy-active', 'completed', 'failed', 'colo' ]=
- }
-> +
-> +##
-> +# @MigrationInfo:
-> +#
-> +# Information about current migration process.
-> +#
-> +# @status: @MigrationStatus describing the current migration status.
-> +#          If this field is not returned, no migration process
-> +#          has been initiated
-> +#
-> +# @ram: @MigrationStats containing detailed migration
-> +#       status, only returned if status is 'active' or
-> +#       'completed'(since 1.2)
-> +#
-> +# @disk: @MigrationStats containing detailed disk migration
-> +#        status, only returned if status is 'active' and it is a block
-> +#        migration
-> +#
-> +# @xbzrle-cache: @XBZRLECacheStats containing detailed XBZRLE
-> +#                migration statistics, only returned if XBZRLE feature i=
+> +# @grouped: If any Action fails after the Transaction succeeds, cancel a=
+ll
+> +#           Actions. Actions do not complete until all Actions are ready
+> to
+> +#           complete. May be rejected by Actions that do not support thi=
 s
-> on and
-> +#                status is 'active' or 'completed' (since 1.2)
-> +#
-> +# @total-time: total amount of milliseconds since migration started.
-> +#        If migration has ended, it returns the total migration
-> +#        time. (since 1.2)
-> +#
-> +# @downtime: only present when migration finishes correctly
-> +#        total downtime in milliseconds for the guest.
-> +#        (since 1.3)
-> +#
-> +# @expected-downtime: only present while migration is active
-> +#        expected downtime in milliseconds for the guest in last walk
-> +#        of the dirty bitmap. (since 1.3)
-> +#
-> +# @setup-time: amount of setup time in milliseconds _before_ the
-> +#        iterations begin but _after_ the QMP command is issued. This is
-> designed
-> +#        to provide an accounting of any activities (such as RDMA
-> pinning) which
-> +#        may be expensive, but do not actually occur during the iterativ=
-e
-> +#        migration rounds themselves. (since 1.6)
-> +#
-> +# @cpu-throttle-percentage: percentage of time guest cpus are being
-> +#        throttled during auto-converge. This is only present when
-> auto-converge
-> +#        has started throttling guest cpus. (Since 2.7)
-> +#
-> +# @error-desc: the human readable error description string, when
-> +#              @status is 'failed'. Clients should not attempt to parse
-> the
-> +#              error strings. (Since 2.7)
-> +#
-> +# Since: 0.14.0
-> +##
-> +{ 'struct': 'MigrationInfo',
-> +  'data': {'*status': 'MigrationStatus', '*ram': 'MigrationStats',
-> +           '*disk': 'MigrationStats',
-> +           '*xbzrle-cache': 'XBZRLECacheStats',
-> +           '*total-time': 'int',
-> +           '*expected-downtime': 'int',
-> +           '*downtime': 'int',
-> +           '*setup-time': 'int',
-> +           '*cpu-throttle-percentage': 'int',
-> +           '*error-desc': 'str'} }
-> +
-> +##
-> +# @query-migrate:
-> +#
-> +# Returns information about current migration process. If migration
-> +# is active there will be another json-object with RAM migration
-> +# status and if block migration is active another one with block
-> +# migration status.
-> +#
-> +# Returns: @MigrationInfo
-> +#
-> +# Since: 0.14.0
-> +#
-> +# Example:
-> +#
-> +# 1. Before the first migration
-> +#
-> +# -> { "execute": "query-migrate" }
-> +# <- { "return": {} }
-> +#
-> +# 2. Migration is done and has succeeded
-> +#
-> +# -> { "execute": "query-migrate" }
-> +# <- { "return": {
-> +#         "status": "completed",
-> +#         "ram":{
-> +#           "transferred":123,
-> +#           "remaining":123,
-> +#           "total":246,
-> +#           "total-time":12345,
-> +#           "setup-time":12345,
-> +#           "downtime":12345,
-> +#           "duplicate":123,
-> +#           "normal":123,
-> +#           "normal-bytes":123456,
-> +#           "dirty-sync-count":15
-> +#         }
-> +#      }
-> +#    }
-> +#
-> +# 3. Migration is done and has failed
-> +#
-> +# -> { "execute": "query-migrate" }
-> +# <- { "return": { "status": "failed" } }
-> +#
-> +# 4. Migration is being performed and is not a block migration:
-> +#
-> +# -> { "execute": "query-migrate" }
-> +# <- {
-> +#       "return":{
-> +#          "status":"active",
-> +#          "ram":{
-> +#             "transferred":123,
-> +#             "remaining":123,
-> +#             "total":246,
-> +#             "total-time":12345,
-> +#             "setup-time":12345,
-> +#             "expected-downtime":12345,
-> +#             "duplicate":123,
-> +#             "normal":123,
-> +#             "normal-bytes":123456,
-> +#             "dirty-sync-count":15
-> +#          }
-> +#       }
-> +#    }
-> +#
-> +# 5. Migration is being performed and is a block migration:
-> +#
-> +# -> { "execute": "query-migrate" }
-> +# <- {
-> +#       "return":{
-> +#          "status":"active",
-> +#          "ram":{
-> +#             "total":1057024,
-> +#             "remaining":1053304,
-> +#             "transferred":3720,
-> +#             "total-time":12345,
-> +#             "setup-time":12345,
-> +#             "expected-downtime":12345,
-> +#             "duplicate":123,
-> +#             "normal":123,
-> +#             "normal-bytes":123456,
-> +#             "dirty-sync-count":15
-> +#          },
-> +#          "disk":{
-> +#             "total":20971520,
-> +#             "remaining":20880384,
-> +#             "transferred":91136
-> +#          }
-> +#       }
-> +#    }
-> +#
-> +# 6. Migration is being performed and XBZRLE is active:
-> +#
-> +# -> { "execute": "query-migrate" }
-> +# <- {
-> +#       "return":{
-> +#          "status":"active",
-> +#          "capabilities" : [ { "capability": "xbzrle", "state" : true }
-> ],
-> +#          "ram":{
-> +#             "total":1057024,
-> +#             "remaining":1053304,
-> +#             "transferred":3720,
-> +#             "total-time":12345,
-> +#             "setup-time":12345,
-> +#             "expected-downtime":12345,
-> +#             "duplicate":10,
-> +#             "normal":3333,
-> +#             "normal-bytes":3412992,
-> +#             "dirty-sync-count":15
-> +#          },
-> +#          "xbzrle-cache":{
-> +#             "cache-size":67108864,
-> +#             "bytes":20971520,
-> +#             "pages":2444343,
-> +#             "cache-miss":2244,
-> +#             "cache-miss-rate":0.123,
-> +#             "overflow":34434
-> +#          }
-> +#       }
-> +#    }
-> +#
-> +##
-> +{ 'command': 'query-migrate', 'returns': 'MigrationInfo' }
-> +
-> +##
-> +# @MigrationCapability:
-> +#
-> +# Migration capabilities enumeration
-> +#
-> +# @xbzrle: Migration supports xbzrle (Xor Based Zero Run Length Encoding=
-).
-> +#          This feature allows us to minimize migration traffic for
-> certain work
-> +#          loads, by sending compressed difference of the pages
-> +#
-> +# @rdma-pin-all: Controls whether or not the entire VM memory footprint =
-is
-> +#          mlock()'d on demand or all at once. Refer to docs/rdma.txt fo=
-r
-> usage.
-> +#          Disabled by default. (since 2.0)
-> +#
-> +# @zero-blocks: During storage migration encode blocks of zeroes
-> efficiently. This
-> +#          essentially saves 1MB of zeroes per block on the wire.
-> Enabling requires
-> +#          source and target VM to support this feature. To enable it is
-> sufficient
-> +#          to enable the capability on the source VM. The feature is
-> disabled by
-> +#          default. (since 1.6)
-> +#
-> +# @compress: Use multiple compression threads to accelerate live
-> migration.
-> +#          This feature can help to reduce the migration traffic, by
-> sending
-> +#          compressed pages. Please note that if compress and xbzrle are
-> both
-> +#          on, compress only takes effect in the ram bulk stage, after
-> that,
-> +#          it will be disabled and only xbzrle takes effect, this can
-> help to
-> +#          minimize migration traffic. The feature is disabled by defaul=
-t.
-> +#          (since 2.4 )
-> +#
-> +# @events: generate events for each migration state change
-> +#          (since 2.4 )
-> +#
-> +# @auto-converge: If enabled, QEMU will automatically throttle down the
-> guest
-> +#          to speed up convergence of RAM migration. (since 1.6)
-> +#
-> +# @postcopy-ram: Start executing on the migration target before all of
-> RAM has
-> +#          been migrated, pulling the remaining pages along as needed.
-> NOTE: If
-> +#          the migration fails during postcopy the VM will fail.  (since
-> 2.6)
-> +#
-> +# @x-colo: If enabled, migration will never end, and the state of the VM
-> on the
-> +#        primary side will be migrated continuously to the VM on seconda=
-ry
-> +#        side, this process is called COarse-Grain LOck Stepping (COLO)
-> for
-> +#        Non-stop Service. (since 2.8)
-> +#
-> +# @release-ram: if enabled, qemu will free the migrated ram pages on the
-> source
-> +#        during postcopy-ram migration. (since 2.9)
-> +#
-> +# @block: If enabled, QEMU will also migrate the contents of all block
-> +#          devices.  Default is disabled.  A possible alternative uses
-> +#          mirror jobs to a builtin NBD server on the destination, which
-> +#          offers more flexibility.
-> +#          (Since 2.10)
-> +#
-> +# @return-path: If enabled, migration will use the return path even
-> +#               for precopy. (since 2.10)
-> +#
-> +# Since: 1.2
-> +##
-> +{ 'enum': 'MigrationCapability',
-> +  'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
-> +           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram'=
-,
-> +           'block', 'return-path' ] }
-> +
-> +##
-> +# @MigrationCapabilityStatus:
-> +#
-> +# Migration capability information
-> +#
-> +# @capability: capability enum
-> +#
-> +# @state: capability state bool
-> +#
-> +# Since: 1.2
-> +##
-> +{ 'struct': 'MigrationCapabilityStatus',
-> +  'data': { 'capability' : 'MigrationCapability', 'state' : 'bool' } }
-> +
-> +##
-> +# @migrate-set-capabilities:
-> +#
-> +# Enable/Disable the following migration capabilities (like xbzrle)
-> +#
-> +# @capabilities: json array of capability modifications to make
-> +#
-> +# Since: 1.2
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "migrate-set-capabilities" , "arguments":
-> +#      { "capabilities": [ { "capability": "xbzrle", "state": true } ] }=
- }
-> +#
-> +##
-> +{ 'command': 'migrate-set-capabilities',
-> +  'data': { 'capabilities': ['MigrationCapabilityStatus'] } }
-> +
-> +##
-> +# @query-migrate-capabilities:
-> +#
-> +# Returns information about the current migration capabilities status
-> +#
-> +# Returns: @MigrationCapabilitiesStatus
-> +#
-> +# Since: 1.2
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-migrate-capabilities" }
-> +# <- { "return": [
-> +#       {"state": false, "capability": "xbzrle"},
-> +#       {"state": false, "capability": "rdma-pin-all"},
-> +#       {"state": false, "capability": "auto-converge"},
-> +#       {"state": false, "capability": "zero-blocks"},
-> +#       {"state": false, "capability": "compress"},
-> +#       {"state": true, "capability": "events"},
-> +#       {"state": false, "capability": "postcopy-ram"},
-> +#       {"state": false, "capability": "x-colo"}
-> +#    ]}
-> +#
-> +##
-> +{ 'command': 'query-migrate-capabilities', 'returns':
->  ['MigrationCapabilityStatus']}
-> +
-> +##
-> +# @MigrationParameter:
-> +#
-> +# Migration parameters enumeration
-> +#
-> +# @compress-level: Set the compression level to be used in live migratio=
-n,
-> +#          the compression level is an integer between 0 and 9, where 0
-> means
-> +#          no compression, 1 means the best compression speed, and 9
-> means best
-> +#          compression ratio which will consume more CPU.
-> +#
-> +# @compress-threads: Set compression thread count to be used in live
-> migration,
-> +#          the compression thread count is an integer between 1 and 255.
-> +#
-> +# @decompress-threads: Set decompression thread count to be used in live
-> +#          migration, the decompression thread count is an integer
-> between 1
-> +#          and 255. Usually, decompression is at least 4 times as fast a=
-s
-> +#          compression, so set the decompress-threads to the number abou=
-t
-> 1/4
-> +#          of compress-threads is adequate.
-> +#
-> +# @cpu-throttle-initial: Initial percentage of time guest cpus are
-> throttled
-> +#                        when migration auto-converge is activated. The
-> +#                        default value is 20. (Since 2.7)
-> +#
-> +# @cpu-throttle-increment: throttle percentage increase each time
-> +#                          auto-converge detects that migration is not
-> making
-> +#                          progress. The default value is 10. (Since 2.7=
-)
-> +#
-> +# @tls-creds: ID of the 'tls-creds' object that provides credentials for
-> +#             establishing a TLS connection over the migration data
-> channel.
-> +#             On the outgoing side of the migration, the credentials mus=
-t
-> +#             be for a 'client' endpoint, while for the incoming side th=
-e
-> +#             credentials must be for a 'server' endpoint. Setting this
-> +#             will enable TLS for all migrations. The default is unset,
-> +#             resulting in unsecured migration at the QEMU level. (Since
-> 2.7)
-> +#
-> +# @tls-hostname: hostname of the target host for the migration. This is
-> +#                required when using x509 based TLS credentials and the
-> +#                migration URI does not already include a hostname. For
-> +#                example if using fd: or exec: based migration, the
-> +#                hostname must be provided so that the server's x509
-> +#                certificate identity can be validated. (Since 2.7)
-> +#
-> +# @max-bandwidth: to set maximum speed for migration. maximum speed in
-> +#                 bytes per second. (Since 2.8)
-> +#
-> +# @downtime-limit: set maximum tolerated downtime for migration. maximum
-> +#                  downtime in milliseconds (Since 2.8)
-> +#
-> +# @x-checkpoint-delay: The delay time (in ms) between two COLO
-> checkpoints in
-> +#          periodic mode. (Since 2.8)
-> +#
-> +# @block-incremental: Affects how much storage is migrated when the
-> +#      block migration capability is enabled.  When false, the entire
-> +#      storage backing chain is migrated into a flattened image at
-> +#      the destination; when true, only the active qcow2 layer is
-> +#      migrated and the destination must already have access to the
-> +#      same backing chain as was used on the source.  (since 2.10)
-> +#
-> +# Since: 2.4
-> +##
-> +{ 'enum': 'MigrationParameter',
-> +  'data': ['compress-level', 'compress-threads', 'decompress-threads',
-> +           'cpu-throttle-initial', 'cpu-throttle-increment',
-> +           'tls-creds', 'tls-hostname', 'max-bandwidth',
-> +           'downtime-limit', 'x-checkpoint-delay', 'block-incremental' ]=
- }
-> +
-> +##
-> +# @MigrateSetParameters:
-> +#
-> +# @compress-level: compression level
-> +#
-> +# @compress-threads: compression thread count
-> +#
-> +# @decompress-threads: decompression thread count
-> +#
-> +# @cpu-throttle-initial: Initial percentage of time guest cpus are
-> +#                        throttled when migration auto-converge is
-> activated.
-> +#                        The default value is 20. (Since 2.7)
-> +#
-> +# @cpu-throttle-increment: throttle percentage increase each time
-> +#                          auto-converge detects that migration is not
-> making
-> +#                          progress. The default value is 10. (Since 2.7=
-)
-> +#
-> +# @tls-creds: ID of the 'tls-creds' object that provides credentials
-> +#             for establishing a TLS connection over the migration data
-> +#             channel. On the outgoing side of the migration, the
-> credentials
-> +#             must be for a 'client' endpoint, while for the incoming
-> side the
-> +#             credentials must be for a 'server' endpoint. Setting this
-> +#             to a non-empty string enables TLS for all migrations.
-> +#             An empty string means that QEMU will use plain text mode f=
-or
-> +#             migration, rather than TLS (Since 2.9)
-> +#             Previously (since 2.7), this was reported by omitting
-> +#             tls-creds instead.
-> +#
-> +# @tls-hostname: hostname of the target host for the migration. This
-> +#                is required when using x509 based TLS credentials and t=
-he
-> +#                migration URI does not already include a hostname. For
-> +#                example if using fd: or exec: based migration, the
-> +#                hostname must be provided so that the server's x509
-> +#                certificate identity can be validated. (Since 2.7)
-> +#                An empty string means that QEMU will use the hostname
-> +#                associated with the migration URI, if any. (Since 2.9)
-> +#                Previously (since 2.7), this was reported by omitting
-> +#                tls-hostname instead.
-> +#
-> +# @max-bandwidth: to set maximum speed for migration. maximum speed in
-> +#                 bytes per second. (Since 2.8)
-> +#
-> +# @downtime-limit: set maximum tolerated downtime for migration. maximum
-> +#                  downtime in milliseconds (Since 2.8)
-> +#
-> +# @x-checkpoint-delay: the delay time between two COLO checkpoints.
-> (Since 2.8)
-> +#
-> +# @block-incremental: Affects how much storage is migrated when the
-> +#      block migration capability is enabled.  When false, the entire
-> +#      storage backing chain is migrated into a flattened image at
-> +#      the destination; when true, only the active qcow2 layer is
-> +#      migrated and the destination must already have access to the
-> +#      same backing chain as was used on the source.  (since 2.10)
-> +#
-> +# Since: 2.4
-> +##
-> +# TODO either fuse back into MigrationParameters, or make
-> +# MigrationParameters members mandatory
-> +{ 'struct': 'MigrateSetParameters',
-> +  'data': { '*compress-level': 'int',
-> +            '*compress-threads': 'int',
-> +            '*decompress-threads': 'int',
-> +            '*cpu-throttle-initial': 'int',
-> +            '*cpu-throttle-increment': 'int',
-> +            '*tls-creds': 'StrOrNull',
-> +            '*tls-hostname': 'StrOrNull',
-> +            '*max-bandwidth': 'int',
-> +            '*downtime-limit': 'int',
-> +            '*x-checkpoint-delay': 'int',
-> +            '*block-incremental': 'bool' } }
-> +
-> +##
-> +# @migrate-set-parameters:
-> +#
-> +# Set various migration parameters.
-> +#
-> +# Since: 2.4
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "migrate-set-parameters" ,
-> +#      "arguments": { "compress-level": 1 } }
-> +#
-> +##
-> +{ 'command': 'migrate-set-parameters', 'boxed': true,
-> +  'data': 'MigrateSetParameters' }
-> +
-> +##
-> +# @MigrationParameters:
-> +#
-> +# The optional members aren't actually optional.
-> +#
-> +# @compress-level: compression level
-> +#
-> +# @compress-threads: compression thread count
-> +#
-> +# @decompress-threads: decompression thread count
-> +#
-> +# @cpu-throttle-initial: Initial percentage of time guest cpus are
-> +#                        throttled when migration auto-converge is
-> activated.
-> +#                        (Since 2.7)
-> +#
-> +# @cpu-throttle-increment: throttle percentage increase each time
-> +#                          auto-converge detects that migration is not
-> making
-> +#                          progress. (Since 2.7)
-> +#
-> +# @tls-creds: ID of the 'tls-creds' object that provides credentials
-> +#             for establishing a TLS connection over the migration data
-> +#             channel. On the outgoing side of the migration, the
-> credentials
-> +#             must be for a 'client' endpoint, while for the incoming
-> side the
-> +#             credentials must be for a 'server' endpoint.
-> +#             An empty string means that QEMU will use plain text mode f=
-or
-> +#             migration, rather than TLS (Since 2.7)
-> +#             Note: 2.8 reports this by omitting tls-creds instead.
-> +#
-> +# @tls-hostname: hostname of the target host for the migration. This
-> +#                is required when using x509 based TLS credentials and t=
-he
-> +#                migration URI does not already include a hostname. For
-> +#                example if using fd: or exec: based migration, the
-> +#                hostname must be provided so that the server's x509
-> +#                certificate identity can be validated. (Since 2.7)
-> +#                An empty string means that QEMU will use the hostname
-> +#                associated with the migration URI, if any. (Since 2.9)
-> +#                Note: 2.8 reports this by omitting tls-hostname instead=
-.
-> +#
-> +# @max-bandwidth: to set maximum speed for migration. maximum speed in
-> +#                 bytes per second. (Since 2.8)
-> +#
-> +# @downtime-limit: set maximum tolerated downtime for migration. maximum
-> +#                  downtime in milliseconds (Since 2.8)
-> +#
-> +# @x-checkpoint-delay: the delay time between two COLO checkpoints.
-> (Since 2.8)
-> +#
-> +# @block-incremental: Affects how much storage is migrated when the
-> +#      block migration capability is enabled.  When false, the entire
-> +#      storage backing chain is migrated into a flattened image at
-> +#      the destination; when true, only the active qcow2 layer is
-> +#      migrated and the destination must already have access to the
-> +#      same backing chain as was used on the source.  (since 2.10)
-> +#
-> +# Since: 2.4
-> +##
-> +{ 'struct': 'MigrationParameters',
-> +  'data': { '*compress-level': 'int',
-> +            '*compress-threads': 'int',
-> +            '*decompress-threads': 'int',
-> +            '*cpu-throttle-initial': 'int',
-> +            '*cpu-throttle-increment': 'int',
-> +            '*tls-creds': 'str',
-> +            '*tls-hostname': 'str',
-> +            '*max-bandwidth': 'int',
-> +            '*downtime-limit': 'int',
-> +            '*x-checkpoint-delay': 'int',
-> +            '*block-incremental': 'bool' } }
-> +
-> +##
-> +# @query-migrate-parameters:
-> +#
-> +# Returns information about the current migration parameters
-> +#
-> +# Returns: @MigrationParameters
-> +#
-> +# Since: 2.4
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-migrate-parameters" }
-> +# <- { "return": {
-> +#          "decompress-threads": 2,
-> +#          "cpu-throttle-increment": 10,
-> +#          "compress-threads": 8,
-> +#          "compress-level": 1,
-> +#          "cpu-throttle-initial": 20,
-> +#          "max-bandwidth": 33554432,
-> +#          "downtime-limit": 300
-> +#       }
-> +#    }
-> +#
-> +##
-> +{ 'command': 'query-migrate-parameters',
-> +  'returns': 'MigrationParameters' }
-> +
-> +##
-> +# @client_migrate_info:
-> +#
-> +# Set migration information for remote display.  This makes the server
-> +# ask the client to automatically reconnect using the new parameters
-> +# once migration finished successfully.  Only implemented for SPICE.
-> +#
-> +# @protocol:     must be "spice"
-> +# @hostname:     migration target hostname
-> +# @port:         spice tcp port for plaintext channels
-> +# @tls-port:     spice tcp port for tls-secured channels
-> +# @cert-subject: server certificate subject
-> +#
-> +# Since: 0.14.0
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "client_migrate_info",
-> +#      "arguments": { "protocol": "spice",
-> +#                     "hostname": "virt42.lab.kraxel.org",
-> +#                     "port": 1234 } }
-> +# <- { "return": {} }
-> +#
-> +##
-> +{ 'command': 'client_migrate_info',
-> +  'data': { 'protocol': 'str', 'hostname': 'str', '*port': 'int',
-> +            '*tls-port': 'int', '*cert-subject': 'str' } }
-> +
-> +##
-> +# @migrate-start-postcopy:
-> +#
-> +# Followup to a migration command to switch the migration to postcopy
-> mode.
-> +# The postcopy-ram capability must be set before the original migration
-> +# command.
+> +#           completion mode.
 > +#
 > +# Since: 2.5
+> +##
+> +{ 'enum': 'ActionCompletionMode',
+> +  'data': [ 'individual', 'grouped' ] }
+> +
+> +##
+> +# @TransactionAction:
+> +#
+> +# A discriminated record of operations that can be performed with
+> +# @transaction. Action @type can be:
+> +#
+> +# - @abort: since 1.6
+> +# - @block-dirty-bitmap-add: since 2.5
+> +# - @block-dirty-bitmap-clear: since 2.5
+> +# - @blockdev-backup: since 2.3
+> +# - @blockdev-snapshot: since 2.5
+> +# - @blockdev-snapshot-internal-sync: since 1.7
+> +# - @blockdev-snapshot-sync: since 1.1
+> +# - @drive-backup: since 1.6
+> +#
+> +# Since: 1.1
+> +##
+> +{ 'union': 'TransactionAction',
+> +  'data': {
+> +       'abort': 'Abort',
+> +       'block-dirty-bitmap-add': 'BlockDirtyBitmapAdd',
+> +       'block-dirty-bitmap-clear': 'BlockDirtyBitmap',
+> +       'blockdev-backup': 'BlockdevBackup',
+> +       'blockdev-snapshot': 'BlockdevSnapshot',
+> +       'blockdev-snapshot-internal-sync': 'BlockdevSnapshotInternal',
+> +       'blockdev-snapshot-sync': 'BlockdevSnapshotSync',
+> +       'drive-backup': 'DriveBackup'
+> +   } }
+> +
+> +##
+> +# @TransactionProperties:
+> +#
+> +# Optional arguments to modify the behavior of a Transaction.
+> +#
+> +# @completion-mode: Controls how jobs launched asynchronously by
+> +#                   Actions will complete or fail as a group.
+> +#                   See @ActionCompletionMode for details.
+> +#
+> +# Since: 2.5
+> +##
+> +{ 'struct': 'TransactionProperties',
+> +  'data': {
+> +       '*completion-mode': 'ActionCompletionMode'
+> +  }
+> +}
+> +
+> +##
+> +# @transaction:
+> +#
+> +# Executes a number of transactionable QMP commands atomically. If any
+> +# operation fails, then the entire set of actions will be abandoned and
+> the
+> +# appropriate error returned.
+> +#
+> +# For external snapshots, the dictionary contains the device, the file t=
+o
+> use for
+> +# the new snapshot, and the format.  The default format, if not
+> specified, is
+> +# qcow2.
+> +#
+> +# Each new snapshot defaults to being created by QEMU (wiping any
+> +# contents if the file already exists), but it is also possible to reuse
+> +# an externally-created file.  In the latter case, you should ensure tha=
+t
+> +# the new image file has the same contents as the current one; QEMU cann=
+ot
+> +# perform any meaningful check.  Typically this is achieved by using the
+> +# current image file as the backing file for the new image.
+> +#
+> +# On failure, the original disks pre-snapshot attempt will be used.
+> +#
+> +# For internal snapshots, the dictionary contains the device and the
+> snapshot's
+> +# name.  If an internal snapshot matching name already exists, the
+> request will
+> +# be rejected.  Only some image formats support it, for example, qcow2,
+> rbd,
+> +# and sheepdog.
+> +#
+> +# On failure, qemu will try delete the newly created internal snapshot i=
+n
+> the
+> +# transaction.  When an I/O error occurs during deletion, the user needs
+> to fix
+> +# it later with qemu-img or other command.
+> +#
+> +# @actions: List of @TransactionAction;
+> +#           information needed for the respective operations.
+> +#
+> +# @properties: structure of additional options to control the
+> +#              execution of the transaction. See @TransactionProperties
+> +#              for additional detail.
+> +#
+> +# Returns: nothing on success
+> +#
+> +#          Errors depend on the operations of the transaction
+> +#
+> +# Note: The transaction aborts on the first failure.  Therefore, there
+> will be
+> +# information on only one failed operation returned in an error
+> condition, and
+> +# subsequent actions will not have been attempted.
+> +#
+> +# Since: 1.1
 > +#
 > +# Example:
 > +#
-> +# -> { "execute": "migrate-start-postcopy" }
+> +# -> { "execute": "transaction",
+> +#      "arguments": { "actions": [
+> +#          { "type": "blockdev-snapshot-sync", "data" : { "device":
+> "ide-hd0",
+> +#                                      "snapshot-file":
+> "/some/place/my-image",
+> +#                                      "format": "qcow2" } },
+> +#          { "type": "blockdev-snapshot-sync", "data" : { "node-name":
+> "myfile",
+> +#                                      "snapshot-file":
+> "/some/place/my-image2",
+> +#                                      "snapshot-node-name": "node3432",
+> +#                                      "mode": "existing",
+> +#                                      "format": "qcow2" } },
+> +#          { "type": "blockdev-snapshot-sync", "data" : { "device":
+> "ide-hd1",
+> +#                                      "snapshot-file":
+> "/some/place/my-image2",
+> +#                                      "mode": "existing",
+> +#                                      "format": "qcow2" } },
+> +#          { "type": "blockdev-snapshot-internal-sync", "data" : {
+> +#                                      "device": "ide-hd2",
+> +#                                      "name": "snapshot0" } } ] } }
 > +# <- { "return": {} }
 > +#
 > +##
-> +{ 'command': 'migrate-start-postcopy' }
-> +
-> +##
-> +# @MIGRATION:
-> +#
-> +# Emitted when a migration event happens
-> +#
-> +# @status: @MigrationStatus describing the current migration status.
-> +#
-> +# Since: 2.4
-> +#
-> +# Example:
-> +#
-> +# <- {"timestamp": {"seconds": 1432121972, "microseconds": 744001},
-> +#     "event": "MIGRATION",
-> +#     "data": {"status": "completed"} }
-> +#
-> +##
-> +{ 'event': 'MIGRATION',
-> +  'data': {'status': 'MigrationStatus'}}
-> +
-> +##
-> +# @MIGRATION_PASS:
-> +#
-> +# Emitted from the source side of a migration at the start of each pass
-> +# (when it syncs the dirty bitmap)
-> +#
-> +# @pass: An incrementing count (starting at 1 on the first pass)
-> +#
-> +# Since: 2.6
-> +#
-> +# Example:
+> +{ 'command': 'transaction',
+> +  'data': { 'actions': [ 'TransactionAction' ],
+> +            '*properties': 'TransactionProperties'
+> +          }
+> +}
+> --
+> 2.7.5
 >
---=20
+>
+> --
 Marc-Andr=C3=A9 Lureau
