@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dlGMt-00082V-R4
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 11:17:56 -0400
+	(envelope-from <eblake@redhat.com>) id 1dlGTy-0001sD-0q
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 11:25:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dlGMp-0003jw-R3
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 11:17:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46772)
+	(envelope-from <eblake@redhat.com>) id 1dlGTu-0006dr-Rb
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 11:25:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33096)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dlGMp-0003jf-LL
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 11:17:51 -0400
-Date: Fri, 25 Aug 2017 12:17:42 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170825151742.GJ27715@localhost.localdomain>
-References: <1499111049-13721-1-git-send-email-mst@redhat.com>
-	<1499111049-13721-10-git-send-email-mst@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dlGTu-0006cT-KZ
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 11:25:10 -0400
+References: <20170825032101.42538-1-aik@ozlabs.ru>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a08c16f0-ed01-e511-52fd-1fcaf655819e@redhat.com>
+Date: Fri, 25 Aug 2017 10:25:07 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1499111049-13721-10-git-send-email-mst@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 09/21] pci: Convert to realize
+In-Reply-To: <20170825032101.42538-1-aik@ozlabs.ru>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Hf1jXPl9Leoa5w2CeMQxF7acoWT0PBUbu"
+Subject: Re: [Qemu-devel] [PATCH qemu] pci: Initialize pci_dev->name before
+ use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, Peter Maydell <peter.maydell@linaro.org>, Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, armbru@redhat.com
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
 
-On Mon, Jul 03, 2017 at 10:45:16PM +0300, Michael S. Tsirkin wrote:
-> From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> 
-> Convert i82801b11, io3130_upstream, io3130_downstream and
-> pcie_root_port devices to realize.
-> 
-> Cc: mst@redhat.com
-> Cc: marcel@redhat.com
-> Cc: armbru@redhat.com
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Hf1jXPl9Leoa5w2CeMQxF7acoWT0PBUbu
+From: Eric Blake <eblake@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+Message-ID: <a08c16f0-ed01-e511-52fd-1fcaf655819e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH qemu] pci: Initialize pci_dev->name before
+ use
+References: <20170825032101.42538-1-aik@ozlabs.ru>
+In-Reply-To: <20170825032101.42538-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 08/24/2017 10:21 PM, Alexey Kardashevskiy wrote:
+> This moves pci_dev->name initialization earlier so
+> pci_dev->bus_master_as could get a name instead of empry string.
+
+s/empry/an empty/
+
+>=20
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 > ---
-[...]
-> diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
-> index cfe8a36..e706f36 100644
-> --- a/hw/pci-bridge/xio3130_downstream.c
-> +++ b/hw/pci-bridge/xio3130_downstream.c
-> @@ -56,33 +56,33 @@ static void xio3130_downstream_reset(DeviceState *qdev)
->      pci_bridge_reset(qdev);
->  }
->  
-> -static int xio3130_downstream_initfn(PCIDevice *d)
-> +static void xio3130_downstream_realize(PCIDevice *d, Error **errp)
->  {
-[...]
->      pcie_chassis_create(s->chassis);
->      rc = pcie_chassis_add_slot(s);
->      if (rc < 0) {
->          goto err_pcie_cap;
 
-Missing error_setg() call here.  If pcie_chassis_add_slot() fails, realize
-won't report an error properly.  Causes crash with:
-
-$ ./x86_64-softmmu/qemu-system-x86_64 -device ioh3420 -device xio3130-downstream
-qemu-system-x86_64: /home/ehabkost/rh/proj/virt/qemu/memory.c:2166: memory_region_del_subregion: Assertion `subregion->container == mr' failed.
-Aborted (core dumped)
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
->      }
->  
->      rc = pcie_aer_init(d, PCI_ERR_VER, XIO3130_AER_OFFSET,
-> -                       PCI_ERR_SIZEOF, &err);
-> +                       PCI_ERR_SIZEOF, errp);
->      if (rc < 0) {
-> -        error_report_err(err);
->          goto err;
->      }
->  
-> -    return 0;
-> +    return;
->  
->  err:
->      pcie_chassis_del_slot(s);
-> @@ -114,7 +113,6 @@ err_msi:
->      msi_uninit(d);
->  err_bridge:
->      pci_bridge_exitfn(d);
-> -    return rc;
->  }
->  
-[...]
+--Hf1jXPl9Leoa5w2CeMQxF7acoWT0PBUbu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
-Eduardo
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmgQVMACgkQp6FrSiUn
+Q2r7+gf+L8zamrfa/T10m+VphOIPaxnn2OzLt4s0Db+uZcF19WcbrdC4wlL22uyi
+IHME4q2HeRTejH3/7i3+MmdT2hTRdwZaHnPipERnB3JTQuvXhQoSukafKI8gt5Zl
+Qjp9ZdJZ9kUaJWhtqakq/SpNImZTRoYXLN8/pD8Y+qgcYxncUpQxZo7lSFjGCUA3
+e6oLvSsIO1KckVjesQ6naQiqMsEveRU3/aFoWHtRFvIrUlJ4CBVZ8MLXP4pXA0BK
+Bud0sZblHJxcZHbJQC9pQ781sVBvE5d4foOLYMlK7jYIO0Mp1vTn9Qj8lyAwpqNF
+QtBsWok272FrPGmxm3ijnMP6wgM4Qg==
+=jqeT
+-----END PGP SIGNATURE-----
+
+--Hf1jXPl9Leoa5w2CeMQxF7acoWT0PBUbu--
