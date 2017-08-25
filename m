@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dlLZe-0004uh-A6
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 16:51:27 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dlLtC-0003HL-0y
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 17:11:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dlLZc-0003Qc-W5
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 16:51:26 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40567)
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dlLt8-0004jv-Ok
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 17:11:37 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44723)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dlLZc-0003QK-PI
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 16:51:24 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dlLZb-0006jT-HR
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 20:51:23 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 225002E80D8
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 20:51:23 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 25 Aug 2017 20:41:37 -0000
-From: Gergely Czuczy <1711316@bugs.launchpad.net>
-Reply-To: Bug 1711316 <1711316@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150295978030.10991.1444485507094830571.malonedeb@wampee.canonical.com>
-Message-Id: <150369369890.8549.10647697858878182447.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1711316] Re: fbsd strip(1) segfaults on aarch64
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1dlLt8-0004jS-FD
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 17:11:34 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7PLB7Vp067277
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 17:11:33 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cjpwyewcd-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 17:11:32 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Fri, 25 Aug 2017 15:11:32 -0600
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Fri, 25 Aug 2017 18:11:18 -0300
+Message-Id: <20170825211119.474-1-danielhb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH for-2.11 v2] hw/ppc: CAS reset on early device
+ hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,134 +37,25 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
 
-*** This bug is a duplicate of bug 1713066 ***
-    https://bugs.launchpad.net/bugs/1713066
+v2:
+- rebased with ppc-for-2.11
+- function 'spapr_cas_completed' dropped
+- function 'spapr_drc_needed' made public and it's now used inside
+  'spapr_hotplugged_dev_before_cas'
+- 'spapr_drc_needed' was changed to support the migration of logical
+  DRCs with devs attached in UNUSED state
+- new function: 'spapr_clear_pending_events'. This function is used
+  inside ppc_spapr_reset to reset the pending_events QTAILQ
 
-** This bug has been marked a duplicate of bug 1713066
-   Incorrect handling of aarch64 ldp in some cases
+Daniel Henrique Barboza (1):
+  hw/ppc: CAS reset on early device hotplug
 
--- =
+ hw/ppc/spapr.c             | 34 ++++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_drc.c         |  5 ++---
+ include/hw/ppc/spapr_drc.h |  1 +
+ 3 files changed, 37 insertions(+), 3 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1711316
-
-Title:
-  fbsd strip(1) segfaults on aarch64
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-
-  During port builds ld.lld(devel/boost-libs, www/node), and strip
-  (textproc/libxml2 on xmlcatalog) are segfaulting. On physical boxes
-  these things do work, as they should:
-
-  root@build-aarch64:~ # strip xmlcatalog
-  Segmentation fault (core dumped)
-
-  All the cores fail at the same assembly instruction, here's strip's backt=
-race:
-  # lldb -c strip.core strip
-  (lldb) target create "strip" --core "strip.core"
-  Core file '/root/strip.core' (aarch64) was loaded.
-  (lldb) t 1
-  * thread #1, name =3D 'strip', stop reason =3D signal SIGSEGV
-      frame #0: 0x0000000040312f40 libc.so.7`memcpy + 192
-  libc.so.7`memcpy:
-  ->  0x40312f40 <+192>: ldp    x4, x3, [x4, #-0x10]
-      0x40312f44 <+196>: stp    x6, x7, [x0]
-      0x40312f48 <+200>: stp    x8, x9, [x0, #0x10]
-      0x40312f4c <+204>: stp    x10, x11, [x0, #0x20]
-  (lldb) bt
-  * thread #1, name =3D 'strip', stop reason =3D signal SIGSEGV
-    * frame #0: 0x0000000040312f40 libc.so.7`memcpy + 192
-      frame #1: 0x000000004017ac70 libelf.so.2`_libelf_cvt_HALF_tom(dst=3D<=
-unavailable>, dsz=3D<unavailable>, src=3D<unavailable>, count=3D<unavailabl=
-e>, byteswap=3D<unavailable>) at libelf_convert.c:794
-      frame #2: 0x0000000040177b34 libelf.so.2`elf_getdata(s=3D0x0000000040=
-f355a0, ed=3D<unavailable>) at elf_data.c:155
-      frame #3: 0x00000000000283d4 strip`copy_data(s=3D0x0000000040f36a40) =
-at sections.c:1176
-      frame #4: 0x0000000000027ea4 strip`copy_content(ecp=3D<unavailable>) =
-at sections.c:594
-      frame #5: 0x0000000000023ff4 strip`create_elf(ecp=3D0x0000000040ed600=
-0) at main.c:381
-      frame #6: 0x000000000002558c strip`create_file(ecp=3D<unavailable>, s=
-rc=3D<unavailable>, dst=3D<unavailable>) at main.c:705
-      frame #7: 0x0000000000024e20 strip`main [inlined] strip_main(argc=3D<=
-unavailable>, argv=3D<unavailable>) at main.c:1192
-      frame #8: 0x0000000000024cc8 strip`main(argc=3D<unavailable>, argv=3D=
-<unavailable>) at main.c:1590
-      frame #9: 0x0000000000020190 strip`__start + 376
-      frame #10: 0x0000000040050018 ld-elf.so.1`.rtld_start at rtld_start.S=
-:41
-
-  Host system information:
-  # uname -a
-  FreeBSD marvin.harmless.hu 11.0-STABLE FreeBSD 11.0-STABLE #0 r311927: We=
-d Jan 11 14:53:55 CET 2017     toor@marvin.harmless.hu:/usr/obj/usr/src/sys=
-/MARVIN  amd64
-
-  # qemu-system-aarch64 --version
-  QEMU emulator version 2.9.0
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-  # pkg info | grep qemu
-  qemu-2.9.0                     QEMU CPU Emulator
-  I also had this happening with 2.8.0 and 2.8.1
-
-  Guest information:
-  # uname -a
-  FreeBSD build-aarch64.marvin.harmless.hu 12.0-CURRENT FreeBSD 12.0-CURREN=
-T #0 r322578: Wed Aug 16 18:08:43 CEST 2017     toor@marvin.harmless.hu:/ta=
-nk/rpi3/obj/arm64.aarch64/tank/rpi3/src/sys/GENERIC-NODEBUG  arm64
-
-  Startup:
-  zdev=3D/dev/zvol/tank/rpi3/qemu-image
-  qemu-system-aarch64 -m 4096M -cpu cortex-a57 -M virt  \
-                      -accel tcg,thread=3Dsingle \
-                      -bios QEMU_EFI.fd -serial telnet::4444,server -nograp=
-hic \
-                      -drive if=3Dnone,file=3D${image},id=3Dhd0,format=3Dra=
-w \
-                      -device virtio-blk-device,drive=3Dhd0 \
-                      -device e1000,netdev=3Dnet0 \
-                      -netdev tap,id=3Dnet0,ifname=3Dtap0,script=3D/tank/rp=
-i3/build/qemu-ifup.sh
-
-  Tested with cortex A53 as well, does the same.
-
-  I've attached a test image to reproduce with (340MB), if it's too big for=
- an attachment, it can be downloaded from here:
-  http://czg.harmless.hu/qemu-bug-stripsigsegv/image.gz
-
-  Reproduction steps:
-  1) log in as root, no password
-  2) strip xmlcatalog, it will segfault
-
-  For a full reproduction with ld.lld as well, you need a ports tree, it's =
-suggested to attach a bigger volume to /usr/ports over NFS first (it might =
-need more space than the image has). Steps for it:
-  1) portsnap fetch extract
-  2) make -C /usr/ports/devel/boost-libs package-recursive
-  3) make -C /usr/ports/textproc/libxml2 package-recursive
-  4) make -C /usr/ports/www/node package-recursive
-
-  Boost and node can take a day or more in a qemu VM. The build-time
-  options I've be set already, /var/db/ports is populated, so you
-  shouldn't have questions asked during the builds.
-
-  I've saved the core dumps, those can be found at /root/cores/ in the
-  image.
-
-  I hope I've submitted all the required information. If anything else
-  is needed, please let me know.
-
-  Best regards,
-  Gergely
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1711316/+subscriptions
+-- 
+2.9.4
