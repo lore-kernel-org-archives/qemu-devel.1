@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dlFSk-0002OI-BT
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:19:55 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dlFWz-0004mf-BL
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:24:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dlFSj-0002Ge-AZ
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:19:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33350)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dlFSj-0002GO-35
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:19:53 -0400
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri, 25 Aug 2017 15:19:40 +0100
-Message-Id: <20170825141940.20740-3-dgilbert@redhat.com>
-In-Reply-To: <20170825141940.20740-1-dgilbert@redhat.com>
-References: <20170825141940.20740-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] snapshot/tests: Try loadvm twice
+	(envelope-from <stefanha@gmail.com>) id 1dlFWu-0004GE-AQ
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:24:17 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:37575)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dlFWu-0004Fv-3x
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:24:12 -0400
+Received: by mail-wm0-x229.google.com with SMTP id b189so4096920wmd.0
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 07:24:12 -0700 (PDT)
+Date: Fri, 25 Aug 2017 15:24:08 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170825142408.GB11641@stefanha-x1.localdomain>
+References: <1503493480-21691-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+	<1503493480-21691-3-git-send-email-chugh.ishani@research.iiit.ac.in>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1503493480-21691-3-git-send-email-chugh.ishani@research.iiit.ac.in>
+Subject: Re: [Qemu-devel] [PATCH 2/3] Test for full Backup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +29,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, shorne@gmail.com, quintela@redhat.com, mreitz@redhat.com
-Cc: peterx@redhat.com, lvivier@redhat.com
+To: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, stefanha@redhat.com
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Wed, Aug 23, 2017 at 06:34:39PM +0530, Ishani Chugh wrote:
+> +CONFIG_FILE=$TEST_DIR/backup-config
+> +SOCKET=unix:$TEST_DIR/backup_socket
+> +size=128M
+> +
+> +_make_test_img $size
+> +export QEMU_BACKUP_CONFIG=$CONFIG_FILE
+> +qemu_comm_method="monitor"
+> +echo
+> +_launch_qemu -drive if=virtio,file=$TEST_IMG -qmp $SOCKET,server,nowait
 
-It's legal to loadvm twice, modify the existing save/loadvm test
-to do it twice.
+I tend to put doublequotes around any variable expansion unless the
+variable is trivially guaranteed to contain no spaces.  Imagine
+TEST_DIR="a b", then your command expands to:
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- tests/qemu-iotests/068     | 2 +-
- tests/qemu-iotests/068.out | 4 ++++
- 2 files changed, 5 insertions(+), 1 deletion(-)
+  '-qmp' 'unix:a' 'b/backup_socket,server,nowait'
 
-diff --git a/tests/qemu-iotests/068 b/tests/qemu-iotests/068
-index cfa0f2aed5..e7fca6a494 100755
---- a/tests/qemu-iotests/068
-+++ b/tests/qemu-iotests/068
-@@ -78,7 +78,7 @@ for extra_args in \
-     # Give qemu some time to boot before saving the VM state
-     { sleep 1; printf "savevm 0\nquit\n"; } | _qemu $extra_args
-     # Now try to continue from that VM state (this should just work)
--    echo quit | _qemu $extra_args -loadvm 0
-+    { sleep 1; printf "loadvm 0\nloadvm 0\nquit\n"; } | _qemu $extra_args -S
- done
- 
- # success, all done
-diff --git a/tests/qemu-iotests/068.out b/tests/qemu-iotests/068.out
-index aa063cf711..f07a938a38 100644
---- a/tests/qemu-iotests/068.out
-+++ b/tests/qemu-iotests/068.out
-@@ -7,6 +7,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm 0
- (qemu) quit
- QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) loadvm 0
-+(qemu) loadvm 0
- (qemu) quit
- 
- === Saving and reloading a VM state to/from a qcow2 image (-object iothread,id=iothread0 -set device.hba0.iothread=iothread0) ===
-@@ -16,5 +18,7 @@ QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm 0
- (qemu) quit
- QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) loadvm 0
-+(qemu) loadvm 0
- (qemu) quit
- *** done
--- 
-2.13.5
+QEMU will think the option is -qmp unix:a only.
+
+If you use doublequotes then the space will not split the argument into
+multiple arguments:
+
+  -qmp "$SOCKET",server,nowait
+
+expands to:
+
+  '-qmp' 'unix:a b/backup_socket,server,nowait'
+
+Please use doublequotes around all variable expansion.
+
+> +$PYTHON ../../contrib/backup/qemu-backup.py guest add --guest adad --qmp $SOCKET
+> +$PYTHON ../../contrib/backup/qemu-backup.py drive add --id virtio0 --guest adad --target $TEST_DIR/virtio0
+> +echo
+> +echo "== Creating backup =="
+> +$PYTHON ../../contrib/backup/qemu-backup.py backup --guest adad
+> +_send_qemu_cmd $QEMU_HANDLE 'quit' ''
+> +wait=1 _cleanup_qemu
+> +echo
+> +echo "== Comparing images =="
+> +$QEMU_IMG compare $TEST_DIR/virtio0 $TEST_IMG
+> +rm $TEST_DIR/virtio0
+> +
+> +_launch_qemu -drive if=virtio,id=virtio0,file=$TEST_IMG -qmp $SOCKET,server,nowait
+> +echo
+> +echo "== Writing Pattern =="
+> +_send_qemu_cmd $QEMU_HANDLE 'qemu-io virtio0 "write -P 0x22 0 1M"' "(qemu)" | _filter_qemu_io
+> +echo
+> +echo "== Creating backup =="
+> +$PYTHON ../../contrib/backup/qemu-backup.py backup --guest adad
+> +_send_qemu_cmd $QEMU_HANDLE 'quit' ''
+> +wait=1 _cleanup_qemu
+> +echo
+> +echo "== Comparing images =="
+> +$QEMU_IMG compare $TEST_DIR/virtio0 $TEST_IMG
+> +rm $TEST_DIR/virtio0
+> +rm $CONFIG_FILE
+
+All cleanup should be done from a trap handler function.  This way the
+cleanup happens even if the process terminates early:
+
+_cleanup()
+{
+	rm -f "$TEST_DIR"/virtio0
+	rm -f "$CONFIG_FILE"
+	_cleanup_test_img
+}
+trap "_cleanup; exit \$status" 0 1 2 3 15
