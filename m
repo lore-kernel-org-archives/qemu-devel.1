@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dlG43-0008Rb-SQ
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:58:29 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dlG7u-00020B-9e
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 11:02:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dlG3z-0002uM-1Q
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:58:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56534)
+	(envelope-from <dgilbert@redhat.com>) id 1dlG7p-0004sx-FK
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 11:02:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40396)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dlG3y-0002tt-Qu
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:58:22 -0400
-Date: Fri, 25 Aug 2017 15:58:10 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dlG7p-0004sV-9f
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 11:02:21 -0400
+Date: Fri, 25 Aug 2017 16:02:15 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170825145810.GG2090@work-vm>
-References: <20170824192730.8440-1-dgilbert@redhat.com>
-	<20170824192730.8440-2-dgilbert@redhat.com>
-	<CAJ+F1CJes1RPzwC18GdgmHMLfN9OhCMA+-8DwHnfzrzztkwH5w@mail.gmail.com>
+Message-ID: <20170825150215.GH2090@work-vm>
+References: <20170824192315.5897-1-ehabkost@redhat.com>
+	<20170824192315.5897-3-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAJ+F1CJes1RPzwC18GdgmHMLfN9OhCMA+-8DwHnfzrzztkwH5w@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 01/32] vhu: vu_queue_started
+In-Reply-To: <20170824192315.5897-3-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] osdep: Define QEMU_MADV_REMOVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,88 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, a.perevalov@samsung.com, mst@redhat.com, lvivier@redhat.com, aarcange@redhat.com, felipe@nutanix.com, peterx@redhat.com, quintela@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Zack Cornelius <zack.cornelius@kove.net>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-* Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
-> Hi
->=20
-> On Thu, Aug 24, 2017 at 9:39 PM Dr. David Alan Gilbert (git) <
-> dgilbert@redhat.com> wrote:
->=20
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >
-> > Add a vu_queue_started method to complement vu_queue_enabled.
-> >
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >
->=20
-> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+* Eduardo Habkost (ehabkost@redhat.com) wrote:
+> Define QEMU_MADV_REMOVE, so we can use it with qemu_madvise().
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Thanks.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
->=20
-> > ---
-> >  contrib/libvhost-user/libvhost-user.c | 6 ++++++
-> >  contrib/libvhost-user/libvhost-user.h | 9 +++++++++
-> >  2 files changed, 15 insertions(+)
-> >
-> > diff --git a/contrib/libvhost-user/libvhost-user.c
-> > b/contrib/libvhost-user/libvhost-user.c
-> > index 35fa0c5e56..201b9846e9 100644
-> > --- a/contrib/libvhost-user/libvhost-user.c
-> > +++ b/contrib/libvhost-user/libvhost-user.c
-> > @@ -930,6 +930,12 @@ vu_queue_enabled(VuDev *dev, VuVirtq *vq)
-> >      return vq->enable;
-> >  }
-> >
-> > +bool
-> > +vu_queue_started(VuDev *dev, VuVirtq *vq)
-> >
->=20
-> I guess we could make it const, but this is true for many other functio=
-ns.
-> Could be done later in one go.
-
-Thanks; I've added the consts.
-
-Dave
-
-> > +{
-> > +    return vq->started;
-> > +}
-> > +
-> >  static inline uint16_t
-> >  vring_avail_flags(VuVirtq *vq)
-> >  {
-> > diff --git a/contrib/libvhost-user/libvhost-user.h
-> > b/contrib/libvhost-user/libvhost-user.h
-> > index 53ef222c0b..acd019876d 100644
-> > --- a/contrib/libvhost-user/libvhost-user.h
-> > +++ b/contrib/libvhost-user/libvhost-user.h
-> > @@ -328,6 +328,15 @@ void vu_queue_set_notification(VuDev *dev, VuVir=
-tq
-> > *vq, int enable);
-> >  bool vu_queue_enabled(VuDev *dev, VuVirtq *vq);
-> >
-> >  /**
-> > + * vu_queue_started:
-> > + * @dev: a VuDev context
-> > + * @vq: a VuVirtq queue
-> > + *
-> > + * Returns: whether the queue is started.
-> > + */
-> > +bool vu_queue_started(VuDev *dev, VuVirtq *vq);
-> > +
-> > +/**
-> >   * vu_queue_empty:
-> >   * @dev: a VuDev context
-> >   * @vq: a VuVirtq queue
-> > --
-> > 2.13.5
-> >
-> >
-> > --
-> Marc-Andr=E9 Lureau
+> ---
+> Changes v1 -> v2:
+> * New patch added to series
+> ---
+>  include/qemu/osdep.h | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index 6855b94..e9fa217 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -257,6 +257,11 @@ void qemu_anon_ram_free(void *ptr, size_t size);
+>  #else
+>  #define QEMU_MADV_NOHUGEPAGE QEMU_MADV_INVALID
+>  #endif
+> +#ifdef MADV_REMOVE
+> +#define QEMU_MADV_REMOVE MADV_REMOVE
+> +#else
+> +#define QEMU_MADV_REMOVE QEMU_MADV_INVALID
+> +#endif
+>  
+>  #elif defined(CONFIG_POSIX_MADVISE)
+>  
+> @@ -269,6 +274,7 @@ void qemu_anon_ram_free(void *ptr, size_t size);
+>  #define QEMU_MADV_DONTDUMP QEMU_MADV_INVALID
+>  #define QEMU_MADV_HUGEPAGE  QEMU_MADV_INVALID
+>  #define QEMU_MADV_NOHUGEPAGE  QEMU_MADV_INVALID
+> +#define QEMU_MADV_REMOVE QEMU_MADV_INVALID
+>  
+>  #else /* no-op */
+>  
+> @@ -281,6 +287,7 @@ void qemu_anon_ram_free(void *ptr, size_t size);
+>  #define QEMU_MADV_DONTDUMP QEMU_MADV_INVALID
+>  #define QEMU_MADV_HUGEPAGE  QEMU_MADV_INVALID
+>  #define QEMU_MADV_NOHUGEPAGE  QEMU_MADV_INVALID
+> +#define QEMU_MADV_REMOVE QEMU_MADV_INVALID
+>  
+>  #endif
+>  
+> -- 
+> 2.9.4
+> 
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
