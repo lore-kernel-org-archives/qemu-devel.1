@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dl68Q-0000e4-Dv
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 00:22:23 -0400
+	(envelope-from <peterx@redhat.com>) id 1dl6BE-0002qs-6d
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 00:25:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dl68N-0005Ox-8E
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 00:22:18 -0400
-Date: Fri, 25 Aug 2017 14:12:08 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170825041208.GA2772@umbus.fritz.box>
-References: <1503562911-2776-1-git-send-email-imammedo@redhat.com>
-	<1503562911-2776-5-git-send-email-imammedo@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1dl6BB-0006Kt-0n
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 00:25:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33144)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dl6BA-0006Ic-O5
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 00:25:08 -0400
+Date: Fri, 25 Aug 2017 12:25:02 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170825042502.GD14174@pxdev.xzpeter.org>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<1503471071-2233-3-git-send-email-peterx@redhat.com>
+	<20170823173534.GF2648@work-vm>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ReaqsoxgOBHFXBhH"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1503562911-2776-5-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11 4/6] ppc: replace inter-function
- cyclic dependency/recurssion with 2 simple lookups
+In-Reply-To: <20170823173534.GF2648@work-vm>
+Subject: Re: [Qemu-devel] [RFC v2 2/8] monitor: allow monitor to create
+ thread to poll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,133 +29,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
+On Wed, Aug 23, 2017 at 06:35:35PM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > Firstly, introduce Monitor.use_thread, and set it for monitors that are
+> > using non-mux typed backend chardev.  We only do this for monitors, so
+> > mux-typed chardevs are not suitable (when it connects to, e.g., serials
+> > and the monitor together).
+> > 
+> > When use_thread is set, we create standalone thread to poll the monitor
+> > events, isolated from the main loop thread.  Here we still need to take
+> > the BQL before dispatching the tasks since some of the monitor commands
+> > are not allowed to execute without the protection of BQL.  Then this
+> > gives us the chance to avoid taking the BQL for some monitor commands in
+> > the future.
+> > 
+> > * Why this change?
+> > 
+> > We need these per-monitor threads to make sure we can have at least one
+> > monitor that will never stuck (that can receive further monitor
+> > commands).
+> > 
+> > * So when will monitors stuck?  And, how do they stuck?
+> 
+> (Minor: 'stuck' is past tense, 'stick' is probably the right word; however
+> 'block' is probably what you actually want)
 
---ReaqsoxgOBHFXBhH
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yet another English error.  Thanks! :-)
 
-On Thu, Aug 24, 2017 at 10:21:49AM +0200, Igor Mammedov wrote:
-> previous patches cleaned up cpu model/alias naming which
-> allows to simplify cpu model/alias to cpu type lookup a bit
-> byt removing recurssion and dependency of ppc_cpu_class_by_name() /
-> ppc_cpu_class_by_alias() on each other.
-> Besides of simplifying code it reduces it by ~15LOC.
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+(I guess "monitors get stuck" should also work?)
 
-Urm.. I think this is probably good.  But I'm having a little trouble
-convincing myself this really has the same effect as before.
+> 
+> > After we have postcopy and remote page faults, it's simple to achieve a
+> > stuck in the monitor (which is also a stuck in main loop thread):
+> > 
+> > (1) Monitor deadlock on BQL
+> > 
+> > As we may know, when postcopy is running on destination VM, the vcpu
+> > threads can stuck merely any time as long as it tries to access an
+> > uncopied guest page.  Meanwhile, when the stuck happens, it is possible
+> > that the vcpu thread is holding the BQL.  If the page fault is not
+> > handled quickly, you'll find that monitors stop working, which is trying
+> > to take the BQL.
+> > 
+> > If the page fault cannot be handled correctly (one case is a paused
+> > postcopy, when network is temporarily down), monitors will hang
+> > forever.  Without current patch, that means the main loop hanged.  We'll
+> > never find a way to talk to VM again.
+> > 
+> > (2) Monitor tries to run codes page-faulted vcpus
+> > 
+> > The HMP command "info cpus" is one of the good example - it tries to
+> > kick all the vcpus and sync status from them.  However, if there is any
+> > vcpu that stuck at an unhandled page fault, it can never achieve the
+> > sync, then the HMP hangs.  Again, it hangs the main loop thread as well.
+> > 
+> > After either (1) or (2), we can see the deadlock problem:
+> > 
+> > - On one hand, if monitor hangs, we cannot do the postcopy recovery,
+> >   because postcopy recovery needs user to specify new listening port on
+> >   destination monitor.
+> > 
+> > - On the other hand, if we cannot recover the paused postcopy, then page
+> >   faults cannot be serviced, and the monitors will possibly hang
+> >   forever then.
+> > 
+> > * How this patch helps?
+> > 
+> > - Firstly, we'll have our own thread for each dedicated monitor (or say,
+> >   the backend chardev is only used for monitor), so even main loop
+> >   thread hangs (it is always possible), this monitor thread may still
+> >   survive.
+> > 
+> > - Not all monitor commands need the BQL.  We can selectively take the
+> >   BQL (depends on which command we are running) to avoid waiting on a
+> >   page-faulted vcpu thread that has taken the BQL (this will be done in
+> >   following up patches).
+> > 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> 
+> A few high level things:
+>   a) I think this patch probably wants to split into
+>      1) A patch that decides whether to create a new thread and
+>      initialises it
+>      2) One that starts to fix up the locking
 
-> ---
->  target/ppc/translate_init.c | 43 +++++++++++++--------------------------=
-----
->  1 file changed, 13 insertions(+), 30 deletions(-)
->=20
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index 0325226..f1a559d 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -10176,22 +10176,6 @@ PowerPCCPUClass *ppc_cpu_class_by_pvr_mask(uint3=
-2_t pvr)
->      return pcc;
->  }
-> =20
-> -static gint ppc_cpu_compare_class_name(gconstpointer a, gconstpointer b)
-> -{
-> -    ObjectClass *oc =3D (ObjectClass *)a;
-> -    const char *name =3D b;
-> -    PowerPCCPUClass *pcc =3D POWERPC_CPU_CLASS(oc);
-> -
-> -    if (strncasecmp(name, object_class_get_name(oc), strlen(name)) =3D=
-=3D 0 &&
-> -        ppc_cpu_is_valid(pcc) &&
-> -        strcmp(object_class_get_name(oc) + strlen(name),
-> -               POWERPC_CPU_TYPE_SUFFIX) =3D=3D 0) {
-> -        return 0;
-> -    }
-> -    return -1;
-> -}
-> -
-> -
->  static ObjectClass *ppc_cpu_class_by_name(const char *name);
-> =20
->  static ObjectClass *ppc_cpu_class_by_alias(PowerPCCPUAlias *alias)
-> @@ -10216,8 +10200,8 @@ static ObjectClass *ppc_cpu_class_by_alias(PowerP=
-CCPUAlias *alias)
-> =20
->  static ObjectClass *ppc_cpu_class_by_name(const char *name)
->  {
-> -    GSList *list, *item;
-> -    ObjectClass *ret =3D NULL;
-> +    char *cpu_model, *typename;
-> +    ObjectClass *oc;
->      const char *p;
->      int i, len;
-> =20
-> @@ -10238,21 +10222,20 @@ static ObjectClass *ppc_cpu_class_by_name(const=
- char *name)
->          }
->      }
-> =20
-> -    list =3D object_class_get_list(TYPE_POWERPC_CPU, false);
-> -    item =3D g_slist_find_custom(list, name, ppc_cpu_compare_class_name);
-> -    if (item !=3D NULL) {
-> -        ret =3D OBJECT_CLASS(item->data);
-> +    cpu_model =3D g_ascii_strup(name, -1);
-> +    p =3D ppc_cpu_lookup_alias(cpu_model);
-> +    if (p) {
-> +        g_free(cpu_model);
-> +        cpu_model =3D g_strdup(p);
->      }
-> -    g_slist_free(list);
-> =20
-> -    if (ret) {
-> -        return ret;
-> -    }
-> +    typename =3D g_strdup_printf("%s" POWERPC_CPU_TYPE_SUFFIX, cpu_model=
-);
-> +    oc =3D object_class_by_name(typename);
-> +    g_free(typename);
-> +    g_free(cpu_model);
-> =20
-> -    for (i =3D 0; ppc_cpu_aliases[i].alias !=3D NULL; i++) {
-> -        if (strcasecmp(ppc_cpu_aliases[i].alias, name) =3D=3D 0) {
-> -            return ppc_cpu_class_by_alias(&ppc_cpu_aliases[i]);
-> -        }
-> +    if (oc && ppc_cpu_is_valid(POWERPC_CPU_CLASS(oc))) {
-> +        return oc;
->      }
-> =20
->      return NULL;
+Sure.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+> 
+>   b) I think you also need to take the bql around any of the custom
+>      completion functions; (maybe in monitor_find_completion ?)
+>      since they do things like walk the lists of devices.
 
---ReaqsoxgOBHFXBhH
-Content-Type: application/pgp-signature; name="signature.asc"
+Ah, yes.  Actually IMHO those completions should be protected by
+smaller locks as well.  Considering this only affects HMP, how about
+this: when "without-bql" is set for a command, it should mean that the
+whole command does not need BQL, this should include not only the
+command execution part, but also the command auto completion routine.
+So I take the BQL in the completion only for those whose "without-bql"
+is unset, like the trick played for the command execution part.
 
------BEGIN PGP SIGNATURE-----
+For the only command "migrate_incoming", it does not have completion
+routine, so "without-bql=true" still applies.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmfo5YACgkQbDjKyiDZ
-s5Kneg//V3CBWv56M2pCggJFI51lEpD38NQ8eh5vVGO5mNgmNYL0FQAkOhziP3W+
-cH3q425wO7buu+6Dvd/rLR1oiAx3X0k11HHJTJThGYjlJb1mrZ9ItLcIqVunY5b4
-7jlMy0J54mJ2O8jlKGeP/2ZdI+LLViJQ1+5aappaj4iRhwlgSpoGwOZJ1t3M5/cP
-o2ZGFR/Vb7TYtBiMErqeL0WOSJ9Z0ZMff6WvMudJnrVsYoQ6mkXxJhLqODfHtsDR
-VqDR6cfUsdS2ZY5BFHv1W7tvnk0a0FKdhT7ALOOR1mJBijcwG3NEG9t+GECUQAz8
-MINiii5cBmKwM2F2cT3rdoPsxhQJrNYoafCqFBiMF/wGoxkd8ktW4s9s93HbMyYR
-RL5lr3MqmAKQnje5/x8tzhb9NuKCYdLHJ5k9BBG6XrrSQ2YwfHNAtb56JMKC4cOP
-UUEG2kPou/3Iz0KycjcORvKKWrPgQXY6PvcZNZNn0l8lugoZupUxjMIbl6ctEoF8
-oeoUj5AHSTg7LjkN2O5EVWhlmRictBKUKNN0czs2+5lHfW1wuXVSD/+vFhQbkyD4
-QufIoR7kPxT1dTbpwP/d3hZkWQUsNydy29ngVNoSQaCK7a7J3cYc+61/Jb5l/vYj
-+F3b89xAvhSIDPwL8Xqufumbv96gTS2y7bSqr+/E6Hg5KvdEECY=
-=gzN6
------END PGP SIGNATURE-----
+Or would you prefer I just take the lock unconditionally?
 
---ReaqsoxgOBHFXBhH--
+> 
+>   c) As mentioned on irc there's fun to be had with cur_mon and error
+>      handling - in my local world I have cur_mon declared as __thread
+>      but never got around to thinking aobut what should set it up.
+>      There's also 'wavcapture: Convert to error_report' that I posted
+>      in March that got rid of some uses of cur_mon in wavcapture.c
+>      for error_report.
+
+Yeh.  I at least also see a positive ACK from Markus in the other
+thread for per-thread cur_mon, sounds like this is the right way to
+go.
+
+To setup cur_mon, what I can think of is create wrapper for
+pthread_create() in qemu_thread_create().  I see that we have done
+similar thing in util/qemu-thread-win32.c for Windows.  With that we
+can setup the cur_mon before going into real thread function but in
+the right context, though we may need one more parameter for current
+qemu_thread_create():
+
+void qemu_thread_create(QemuThread *thread, const char *name,
+                       void *(*start_routine)(void*),
+                       void *arg, int mode, Monitor *mon);
+
+Then we can specify monitor for any new thread (default to cur_mon).
+For per-monitor threads, I think we need to pass in that specific mon.
+
+Is this doable?
+
+> But there's some interesting stuff to be checked
+>      with where error_reporting goes.
+
+Do you mean the case when e.g. we only have one HMP and that HMP is
+threaded?  If so, I guess the error_report()s will be directed mostly
+to stderr.
+
+I believe it'll break some HMP users, but IIUC HMP behavior is allowed
+to be changed and after all people can still catch the error message
+somewhere, though outside that HMP console.  So I think it might be ok.
+
+> 
+>   d) I wonder if it's better to have thread as a flag, so that you have
+>      to explicitly ask for a monitor to have it's own thread.
+
+This should be doable.  Would a new parameter for "-qmp" and "-hmp"
+suffice?
+
+-- 
+Peter Xu
