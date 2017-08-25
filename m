@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCmc-000580-9s
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:28:15 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dlCyG-0008RZ-MR
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:40:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCma-0001WS-Rj
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:28:14 -0400
-Received: from mail-vk0-x243.google.com ([2607:f8b0:400c:c05::243]:35862)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dlCma-0001WI-L0
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:28:12 -0400
-Received: by mail-vk0-x243.google.com with SMTP id d124so825739vkf.3
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 04:28:12 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1dlCyB-0006YU-WF
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:40:16 -0400
+Date: Fri, 25 Aug 2017 13:40:07 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170825134007.73d69fa3@nial.brq.redhat.com>
+In-Reply-To: <20170825094538.GI2772@umbus.fritz.box>
+References: <1503562911-2776-1-git-send-email-imammedo@redhat.com>
+	<1503562911-2776-3-git-send-email-imammedo@redhat.com>
+	<20170825013819.GQ5379@umbus.fritz.box>
+	<20170825092740.239b6a82@nial.brq.redhat.com>
+	<20170825094538.GI2772@umbus.fritz.box>
 MIME-Version: 1.0
-References: <1503602048-12268-1-git-send-email-armbru@redhat.com>
-	<1503602048-12268-17-git-send-email-armbru@redhat.com>
-In-Reply-To: <1503602048-12268-17-git-send-email-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 25 Aug 2017 11:28:01 +0000
-Message-ID: <CAJ+F1C+XWuqpEXSozvdpgivrgv--9UXVts4Vp_VAKGA_r=U_cA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 16/16] qapi-schema: Improve section
- headings
+Subject: Re: [Qemu-devel] [PATCH for-2.11 2/6] ppc: make cpu_model
+ translation to type consistent
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,145 +27,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-On Thu, Aug 24, 2017 at 9:14 PM Markus Armbruster <armbru@redhat.com> wrote=
-:
+On Fri, 25 Aug 2017 19:45:38 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> The generated QEMU QMP reference is now structured as follows:
->
->     1.1 Introduction
->     1.2 Stability Considerations
->     1.3 Common data types
->     1.4 Socket data types
->     1.5 VM run state
->     1.6 Cryptography
->     1.7 Block devices
->     1.7.1 Block core (VM unrelated)
->     1.7.2 QAPI block definitions (vm unrelated)
->     1.8 Character devices
->     1.9 Net devices
->     1.10 Rocker switch device
->     1.11 TPM (trusted platform module) devices
->     1.12 Remote desktop
->     1.12.1 Spice
->     1.12.2 VNC
->     1.13 Input
->     1.14 Migration
->     1.15 Transactions
->     1.16 Tracing
->     1.17 QMP introspection
->     1.18 Miscellanea
->
-> Section "1.18 Miscellanea" is still too big: it documents 134 symbols.
-> Section "1.7.1 Block core (VM unrelated)" is also rather big: 128
-> symbols.  All the others are of reasonable size.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->
+> On Fri, Aug 25, 2017 at 09:27:40AM +0200, Igor Mammedov wrote:
+> > On Fri, 25 Aug 2017 11:38:19 +1000
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >  =20
+> > > On Thu, Aug 24, 2017 at 10:21:47AM +0200, Igor Mammedov wrote: =20
+> > > > PPC handles -cpu FOO rather incosistently,
+> > > > i.e. it does case-insensitive matching of FOO to
+> > > > a CPU type (see: ppc_cpu_compare_class_name) but
+> > > > handles alias names as case-sensitive, as result:
+> > > >=20
+> > > >  # qemu-system-ppc64 -M mac99 -cpu g3
+> > > >  qemu-system-ppc64: unable to find CPU model ' kN=EF=BF=BDU'
+> > > >=20
+> > > >  # qemu-system-ppc64 -cpu 970MP_V1.1
+> > > >  qemu-system-ppc64: Unable to find sPAPR CPU Core definition
+> > > >=20
+> > > > while
+> > > >=20
+> > > >  # qemu-system-ppc64 -M mac99 -cpu G3
+> > > >  # qemu-system-ppc64 -cpu 970MP_v1.1
+> > > >=20
+> > > > start up just fine.
+> > > >=20
+> > > > Considering we can't take case-insensitive matching away,
+> > > > make it case-insensitive for  all alias/type/core_type
+> > > > lookups.
+> > > >=20
+> > > > As side effect it allows to remove duplicate core types
+> > > > which are the same but use lower-case letters in name.
+> > > >=20
+> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>   =20
+> > >=20
+> > > Hmm.  So, I'm certainly good with making the matching more consistent,
+> > > and removing extra entries differing only in case.
+> > >=20
+> > > However, I don't like capitalizing everything in the model table.  The
+> > > "canonical" capitalization - as in how it appears in manuals and
+> > > marketing info - is quite frequently mixed case.  So I think making
+> > > everything caps in the table will make it harder to read in the
+> > > context of looking at the corresponding documentation. =20
+> > only cpu models =3D> typenames are made caps, the rest =20
+>=20
+> Yes, I know.  A number of the CPU model names themselves have mixed
+> case.  Really.
+>=20
+> > incl. description is kept as is in mixed case.
+> > It looks like _desc is the thing one would use for
+> > 1:1 lookup in spec, while _name isn't direct match consistently
+> > (i.e. sometimes it skips spaces and sometimes spaces are replaced by un=
+derscore).
+> > So keeping _name in mixed case unnecessarily complicates name->type loo=
+kup.
+> >=20
+> > These mixed case + case-insensitive is what made lookup
+> > code over-engineered and overly complex. =20
+>=20
+> I'm fine with making all the lookups case insensitive.  I just don't
+> want to drop the case on the names in the actual code.
+I've tried to find a way but considering that names are statically
+'converted' into typenames and lack of ability to magically
+uppercase them with preprocessor, I've gave up on this approach.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Providing that there is _desc with model name that should be
+greppable in spec and complexity of lookup code that mixed-cased
+typenames incur, I've opted in favor of simplifying lookup
+code at expense uniform typenames (which is inter QEMU thingy).
+It is easier to maintain and less chances to make mistake.
 
+Other targets use exact match for cpu_model so whether
+they use mixed casing or not doesn't matter.
 
-
-> ---
->  qapi-schema.json     | 2 +-
->  qapi/block-core.json | 2 +-
->  qapi/block.json      | 5 ++---
->  qapi/common.json     | 2 +-
->  qapi/crypto.json     | 2 +-
->  qapi/trace.json      | 2 +-
->  6 files changed, 7 insertions(+), 8 deletions(-)
->
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 7a393ec..f3af2cb 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -94,7 +94,7 @@
->  { 'include': 'qapi/introspect.json' }
->
->  ##
-> -# =3D QMP commands
-> +# =3D Miscellanea
->  ##
->
->  ##
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index f4caa5c..28abb9e 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -1,7 +1,7 @@
->  # -*- Mode: Python -*-
->
->  ##
-> -# =3D=3D QAPI block core definitions (vm unrelated)
-> +# =3D=3D Block core (VM unrelated)
->  ##
->
->  { 'include': 'common.json' }
-> diff --git a/qapi/block.json b/qapi/block.json
-> index 8ce3357..f093fa3 100644
-> --- a/qapi/block.json
-> +++ b/qapi/block.json
-> @@ -1,14 +1,13 @@
->  # -*- Mode: Python -*-
->
->  ##
-> -# =3D QAPI block definitions
-> +# =3D Block devices
->  ##
->
-> -# QAPI block core definitions
->  { 'include': 'block-core.json' }
->
->  ##
-> -# =3D=3D QAPI block definitions (vm unrelated)
-> +# =3D=3D Additional block stuff (VM related)
->  ##
->
->  ##
-> diff --git a/qapi/common.json b/qapi/common.json
-> index 0c67e4a..6eb0182 100644
-> --- a/qapi/common.json
-> +++ b/qapi/common.json
-> @@ -1,7 +1,7 @@
->  # -*- Mode: Python -*-
->
->  ##
-> -# =3D QAPI common definitions
-> +# =3D Common data types
->  ##
->
->  ##
-> diff --git a/qapi/crypto.json b/qapi/crypto.json
-> index 6b6fde3..288bc05 100644
-> --- a/qapi/crypto.json
-> +++ b/qapi/crypto.json
-> @@ -2,7 +2,7 @@
->  #
->
->  ##
-> -# =3D QAPI crypto definitions
-> +# =3D Cryptography
->  ##
->
->  ##
-> diff --git a/qapi/trace.json b/qapi/trace.json
-> index de6588d..799b254 100644
-> --- a/qapi/trace.json
-> +++ b/qapi/trace.json
-> @@ -6,7 +6,7 @@
->  # See the COPYING file in the top-level directory.
->
->  ##
-> -# =3D Tracing commands
-> +# =3D Tracing
->  ##
->
->  ##
-> --
-> 2.7.5
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+> > As result it evolved (regressed) to inconsistent name handling
+> > since it's rather hard to understand what's going on there. =20
+>=20
+> Yeah, I know :/.
+>=20
+> > > Can we instead retain mixed case in the table, and capitalize both
+> > > sides at the comparison time? =20
+> > it has to be the same-case since PPC has case-insensitive cpu_model
+> > matching (sometimes :/). Normalized /same case/ typenames
+> > are necessary for object_class_by_name() to work as it does exact match.
+> > So it would be possible to replace custom fetching of CPU types
+> > and iterating over it with custom comparator with object_class_by_name(=
+).
+> > As it's done in 4/6.
+> > This patch and 3/6 are only preparatory patches for 4/6. =20
+>=20
+> Ah.  Hrm.  That's awkward.
+It's fine to squash all 3 in 1 patch, but then it becomes huge and
+unreview-able, as logic changes are buried within names normalization.
