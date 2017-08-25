@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dl96e-0003Tx-0Z
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 03:32:41 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dl98a-0004A6-Kt
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 03:34:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dl96Z-000246-RB
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 03:32:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35366)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dl96Z-00023R-If
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 03:32:35 -0400
-Date: Fri, 25 Aug 2017 15:32:29 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170825073229.GC11465@lemon.lan>
-References: <20170824072202.26818-1-stefanha@redhat.com>
-	<20170824083843.GB1866@lemon>
-	<20170824180402.GA4368@stefanha-x1.localdomain>
+	(envelope-from <imammedo@redhat.com>) id 1dl98W-0002mx-Hi
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 03:34:40 -0400
+Date: Fri, 25 Aug 2017 09:34:32 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170825093432.6e0d4512@nial.brq.redhat.com>
+In-Reply-To: <20170825041208.GA2772@umbus.fritz.box>
+References: <1503562911-2776-1-git-send-email-imammedo@redhat.com>
+	<1503562911-2776-5-git-send-email-imammedo@redhat.com>
+	<20170825041208.GA2772@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170824180402.GA4368@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 0/3] iotests: clean up resources using
- context managers
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11 4/6] ppc: replace inter-function
+ cyclic dependency/recurssion with 2 simple lookups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +25,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
 
-On Thu, 08/24 19:04, Stefan Hajnoczi wrote:
-> On Thu, Aug 24, 2017 at 04:38:43PM +0800, Fam Zheng wrote:
-> > On Thu, 08/24 08:21, Stefan Hajnoczi wrote:
-> > > Tests should declare resources upfront in a with statement.  Resources are
-> > > automatically cleaned up whether the test passes or fails:
-> > > 
-> > >   with FilePath('test.img') as img_path,
-> > >        VM() as vm:
-> > >       ...test...
-> > >   # img_path is deleted and vm is shut down automatically
+On Fri, 25 Aug 2017 14:12:08 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> On Thu, Aug 24, 2017 at 10:21:49AM +0200, Igor Mammedov wrote:
+> > previous patches cleaned up cpu model/alias naming which
+> > allows to simplify cpu model/alias to cpu type lookup a bit
+> > byt removing recurssion and dependency of ppc_cpu_class_by_name() /
+> > ppc_cpu_class_by_alias() on each other.
+> > Besides of simplifying code it reduces it by ~15LOC.
 > > 
-> > Looks good but still requires test writers to learn and remember to use FilePath
-> > and with.
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
 > 
-> You cannot forget to use FilePath() unless you love typing at
-> os.path.join(iotests.test_dir, 'test.img').  It's much better than open
-> coding filename generation!
+> Urm.. I think this is probably good.  But I'm having a little trouble
+> convincing myself this really has the same effect as before.
+It's hard to wrap brain around current cyclic recursion and
+how to 2 simple linear lookups could replace it.
+
+By itself this patch won't work, it depends on 2-3/6 for
+normalized cpu type names and recursion-less alias table.
+
+The only change in behavior here is that it does alias
+translation first and only then cpu_model to type translation.
+
 > 
-> > These are still boilerplates.  Here goes my personal oppinion, so may
-> > not be plausible:
+> > ---
+> >  target/ppc/translate_init.c | 43 +++++++++++++------------------------------
+> >  1 file changed, 13 insertions(+), 30 deletions(-)
 > > 
-> > - For VM() maybe add an atexit in the launch() method also makes sure the VM is
-> >   eventually terminated.
-> > 
-> >   This means vm.shutdown() is still needed in tearDown() if there are multiple
-> >   test methods and each of them expects a clean state, but that is probably
-> >   still less typing (and also indenting) than the with approach, and also easy
-> >   to remember (otherwise a test will fail).
-> 
-> I looked into atexit before going this route.  atexit does not have an
-> unregister() API in Python 2.  This makes it ugly to use because some
-> tests do not want the resource to remain for the duration of the
-> process.
-> 
-> A related point is that the Python objects used by atexit handlers live
-> until the end of the process.  They cannot be garbage collected because
-> the atexit handler still has a reference to them.
-
-I think this shortcoming can be solved with a clean up list ("all problems in
-computer science can be solved by another level of indirection"):
-
-_clean_up_list = set()
-def _clean_up_handler():
-    for i in _clean_up_list:
-        try:
-            i()
-        except:
-            pass
-
-atexit.register(_clean_up_handler)
-
-class VM(...):
-
-    def launch():
-        ...
-        _clean_up_list.add(self.launch)
-
-    def shutdown():
-        _clean_up_list.remove(self.launch)
-        ...
-
-> 
-> The with statement's identation is annoying for straightforward scripts.
-> More complex tests use functions anyway, so the indentation doesn't
-> matter there - it can be hidden by a parent function or even a
-> decorator.
-> 
-> > - For scratch how about adding atexit in iotests.main to clean up everything in
-> >   the scratch directory? The rationale is similar to above.
-> 
-> If we decide to clear out TEST_DIR then it should be done in ./check,
-> not by iotests.py, so that all tests get the same file cleanup behavior,
-> regardless of the language they are written in.
-> 
-> Also, we can then chdir(iotests.test_dir) so filename generation isn't
-> necessary at all.  Tests can simply use 'test.img'.  I guess there may
-> be some cases where absolute paths are necessary, but for the most part
-> this would be a win.
-
-Good point, ./check can even invoke scripts with scratch as their working
-directory.
-
-Fam
-
-> 
-> Kevin may have an opinion on whether TEST_DIR should be cleared out or
-> not.
-> 
-> Stefan
+> > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> > index 0325226..f1a559d 100644
+> > --- a/target/ppc/translate_init.c
+> > +++ b/target/ppc/translate_init.c
+> > @@ -10176,22 +10176,6 @@ PowerPCCPUClass *ppc_cpu_class_by_pvr_mask(uint32_t pvr)
+> >      return pcc;
+> >  }
+> >  
+> > -static gint ppc_cpu_compare_class_name(gconstpointer a, gconstpointer b)
+> > -{
+> > -    ObjectClass *oc = (ObjectClass *)a;
+> > -    const char *name = b;
+> > -    PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
+> > -
+> > -    if (strncasecmp(name, object_class_get_name(oc), strlen(name)) == 0 &&
+> > -        ppc_cpu_is_valid(pcc) &&
+> > -        strcmp(object_class_get_name(oc) + strlen(name),
+> > -               POWERPC_CPU_TYPE_SUFFIX) == 0) {
+> > -        return 0;
+> > -    }
+> > -    return -1;
+> > -}
+> > -
+> > -
+> >  static ObjectClass *ppc_cpu_class_by_name(const char *name);
+> >  
+> >  static ObjectClass *ppc_cpu_class_by_alias(PowerPCCPUAlias *alias)
+> > @@ -10216,8 +10200,8 @@ static ObjectClass *ppc_cpu_class_by_alias(PowerPCCPUAlias *alias)
+> >  
+> >  static ObjectClass *ppc_cpu_class_by_name(const char *name)
+> >  {
+> > -    GSList *list, *item;
+> > -    ObjectClass *ret = NULL;
+> > +    char *cpu_model, *typename;
+> > +    ObjectClass *oc;
+> >      const char *p;
+> >      int i, len;
+> >  
+> > @@ -10238,21 +10222,20 @@ static ObjectClass *ppc_cpu_class_by_name(const char *name)
+> >          }
+> >      }
+> >  
+> > -    list = object_class_get_list(TYPE_POWERPC_CPU, false);
+> > -    item = g_slist_find_custom(list, name, ppc_cpu_compare_class_name);
+> > -    if (item != NULL) {
+> > -        ret = OBJECT_CLASS(item->data);
+> > +    cpu_model = g_ascii_strup(name, -1);
+> > +    p = ppc_cpu_lookup_alias(cpu_model);
+> > +    if (p) {
+> > +        g_free(cpu_model);
+> > +        cpu_model = g_strdup(p);
+> >      }
+> > -    g_slist_free(list);
+> >  
+> > -    if (ret) {
+> > -        return ret;
+> > -    }
+> > +    typename = g_strdup_printf("%s" POWERPC_CPU_TYPE_SUFFIX, cpu_model);
+> > +    oc = object_class_by_name(typename);
+> > +    g_free(typename);
+> > +    g_free(cpu_model);
+> >  
+> > -    for (i = 0; ppc_cpu_aliases[i].alias != NULL; i++) {
+> > -        if (strcasecmp(ppc_cpu_aliases[i].alias, name) == 0) {
+> > -            return ppc_cpu_class_by_alias(&ppc_cpu_aliases[i]);
+> > -        }
+> > +    if (oc && ppc_cpu_is_valid(POWERPC_CPU_CLASS(oc))) {
+> > +        return oc;
+> >      }
+> >  
+> >      return NULL;  
 > 
