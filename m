@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dlIqM-0003cg-9h
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 13:56:31 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dlJFi-0001R2-GX
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 14:22:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dlIqI-0006YP-DS
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 13:56:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60910)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dlIqI-0006Y6-6s
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 13:56:26 -0400
-Date: Fri, 25 Aug 2017 14:56:22 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170825175622.GM15315@localhost.localdomain>
-References: <1503592308-93913-7-git-send-email-imammedo@redhat.com>
-	<1503672460-109436-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1dlJFh-0004tm-CB
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 14:22:42 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:37398)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dlJFh-0004ll-5Z
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 14:22:41 -0400
+Received: by mail-wr0-x242.google.com with SMTP id p14so307075wrg.4
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 11:22:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <1503672460-109436-1-git-send-email-imammedo@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.11 v4 06/25] sparc: make cpu feature
- parsing property based
+In-Reply-To: <20170823221445.15243-2-ehabkost@redhat.com>
+References: <20170823221445.15243-1-ehabkost@redhat.com>
+	<20170823221445.15243-2-ehabkost@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 25 Aug 2017 11:22:08 -0700
+Message-ID: <CAKmqyKMDQKQARPjs+uEE5DBoetQin0t2w0XXAzHpTiZ=55k=6w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 1/5] pci: INTERFACE_LEGACY_PCI_DEVICE and
+ INTERFACE_PCIE_DEVICE interfaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +30,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Laine Stump <laine@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Fri, Aug 25, 2017 at 04:47:40PM +0200, Igor Mammedov wrote:
-> with features converted to properties we can use the same
-> approach as x86 for features parsing and drop legacy
-> approach that manipulated CPU instance directly.
-> New sparc_cpu_parse_features() will allow only +-feat
-> and explicitly disable feat=3Don|off syntax for now.
->=20
-> With that in place and sparc_cpu_parse_features() providing
-> generic CPUClass::parse_features callback, the cpu_sparc_init()
-> will do the same job as cpu_generic_init() so replace content
-> of cpu_sparc_init() with it.
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Acked-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> Tested-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+On Wed, Aug 23, 2017 at 3:14 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> Those two interfaces will be used to indicate which device types
+> support legacy PCI or PCI-express buses.  Management software
+> will be able to use the qom-list-types QMP command to query that
+> information.
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
---=20
-Eduardo
+Thanks,
+Alistair
+
+> ---
+>  include/hw/pci/pci.h |  6 ++++++
+>  hw/pci/pci.c         | 12 ++++++++++++
+>  2 files changed, 18 insertions(+)
+>
+> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> index e598b09..f5e8ab9 100644
+> --- a/include/hw/pci/pci.h
+> +++ b/include/hw/pci/pci.h
+> @@ -195,6 +195,12 @@ enum {
+>  #define PCI_DEVICE_GET_CLASS(obj) \
+>       OBJECT_GET_CLASS(PCIDeviceClass, (obj), TYPE_PCI_DEVICE)
+>
+> +/* Interface implemented by devices that can be plugged on PCIe buses */
+> +#define INTERFACE_PCIE_DEVICE "pci-express-device"
+> +
+> +/* Interface implemented by devices that can be plugged on legacy PCI buses */
+> +#define INTERFACE_LEGACY_PCI_DEVICE "legacy-pci-device"
+> +
+>  typedef struct PCIINTxRoute {
+>      enum {
+>          PCI_INTX_ENABLED,
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 258fbe5..baa3429 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -168,6 +168,16 @@ static const TypeInfo pci_bus_info = {
+>      .class_init = pci_bus_class_init,
+>  };
+>
+> +static const TypeInfo pcie_interface_info = {
+> +    .name          = INTERFACE_PCIE_DEVICE,
+> +    .parent        = TYPE_INTERFACE,
+> +};
+> +
+> +static const TypeInfo legacy_pci_interface_info = {
+> +    .name          = INTERFACE_LEGACY_PCI_DEVICE,
+> +    .parent        = TYPE_INTERFACE,
+> +};
+> +
+>  static const TypeInfo pcie_bus_info = {
+>      .name = TYPE_PCIE_BUS,
+>      .parent = TYPE_PCI_BUS,
+> @@ -2645,6 +2655,8 @@ static void pci_register_types(void)
+>  {
+>      type_register_static(&pci_bus_info);
+>      type_register_static(&pcie_bus_info);
+> +    type_register_static(&legacy_pci_interface_info);
+> +    type_register_static(&pcie_interface_info);
+>      type_register_static(&pci_device_type_info);
+>  }
+>
+> --
+> 2.9.4
+>
+>
