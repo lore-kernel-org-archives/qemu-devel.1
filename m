@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dlNEN-000146-1f
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 18:37:36 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dlNIM-0002BR-N0
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 18:41:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dlNEI-000573-JG
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 18:37:35 -0400
-Received: from hera.aquilenet.fr ([141.255.128.1]:33178)
+	(envelope-from <ehabkost@redhat.com>) id 1dlNIJ-0007P9-LH
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 18:41:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39344)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1dlNEI-000558-C1
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 18:37:30 -0400
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Sat, 26 Aug 2017 00:37:21 +0200
-Message-Id: <20170825223721.2052-1-samuel.thibault@ens-lyon.org>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dlNIJ-0007Oo-Ex
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 18:41:39 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EB2957E423
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 22:41:37 +0000 (UTC)
+Date: Fri, 25 Aug 2017 19:41:28 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170825224128.GO15315@localhost.localdomain>
+References: <20170823221445.15243-1-ehabkost@redhat.com>
+	<20170823221445.15243-2-ehabkost@redhat.com>
+	<20170825141900.08e2a089@w520.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] slirp: fix clearing ifq_so from pending packets
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170825141900.08e2a089@w520.home>
+Subject: Re: [Qemu-devel] [PATCH 1/5] pci: INTERFACE_LEGACY_PCI_DEVICE and
+ INTERFACE_PCIE_DEVICE interfaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,79 +35,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, f4bug@amsat.org, ppandit@redhat.com, jan.kiszka@siemens.com, thuth@redhat.com, wjjzhang@tencent.com
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Laine Stump <laine@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-The if_fastq and if_batchq contain not only packets, but queues of packet=
-s
-for the same socket. When sofree frees a socket, it thus has to clear ifq=
-_so
-from all the packets from the queues, not only the first.
+On Fri, Aug 25, 2017 at 02:19:00PM -0600, Alex Williamson wrote:
+> On Wed, 23 Aug 2017 19:14:41 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> 
+> > Those two interfaces will be used to indicate which device types
+> > support legacy PCI or PCI-express buses.  Management software
+> > will be able to use the qom-list-types QMP command to query that
+> > information.
+> 
+> Nit, while "legacy PCI" and "conventional PCI" have about the same
+> number of google hits, I believe the latter is the more correct term.
+> The quality of hits is certainly a lot better with "conventional".
+> Calling something "legacy" also spurs an immediate negative reaction
+> for some folks, "conventional" is more neutral.  Thanks,
 
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
- slirp/socket.c | 39 +++++++++++++++++++++++----------------
- 1 file changed, 23 insertions(+), 16 deletions(-)
+Oh, Conventional PCI even has a Wikipedia article.  I agree.  I
+will change it in v2.  Thanks!
 
-diff --git a/slirp/socket.c b/slirp/socket.c
-index ecec0295a9..cb7b5b608d 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -59,6 +59,27 @@ socreate(Slirp *slirp)
-   return(so);
- }
-=20
-+/*
-+ * Remove references to so from the given message queue.
-+ */
-+static void
-+soqfree(struct socket *so, struct quehead *qh)
-+{
-+    struct mbuf *ifq;
-+
-+    for (ifq =3D (struct mbuf *) qh->qh_link;
-+             (struct quehead *) ifq !=3D qh;
-+             ifq =3D ifq->ifq_next) {
-+        if (ifq->ifq_so =3D=3D so) {
-+            struct mbuf *ifm;
-+            ifq->ifq_so =3D NULL;
-+            for (ifm =3D ifq->ifs_next; ifm !=3D ifq; ifm =3D ifm->ifs_n=
-ext) {
-+                ifm->ifq_so =3D NULL;
-+            }
-+        }
-+    }
-+}
-+
- /*
-  * remque and free a socket, clobber cache
-  */
-@@ -66,23 +87,9 @@ void
- sofree(struct socket *so)
- {
-   Slirp *slirp =3D so->slirp;
--  struct mbuf *ifm;
-=20
--  for (ifm =3D (struct mbuf *) slirp->if_fastq.qh_link;
--       (struct quehead *) ifm !=3D &slirp->if_fastq;
--       ifm =3D ifm->ifq_next) {
--    if (ifm->ifq_so =3D=3D so) {
--      ifm->ifq_so =3D NULL;
--    }
--  }
--
--  for (ifm =3D (struct mbuf *) slirp->if_batchq.qh_link;
--       (struct quehead *) ifm !=3D &slirp->if_batchq;
--       ifm =3D ifm->ifq_next) {
--    if (ifm->ifq_so =3D=3D so) {
--      ifm->ifq_so =3D NULL;
--    }
--  }
-+  soqfree(so, &slirp->if_fastq);
-+  soqfree(so, &slirp->if_batchq);
-=20
-   if (so->so_emu=3D=3DEMU_RSH && so->extra) {
- 	sofree(so->extra);
---=20
-2.14.1
+-- 
+Eduardo
