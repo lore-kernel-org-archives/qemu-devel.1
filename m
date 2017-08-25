@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dlBRH-0003MG-Bn
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 06:02:08 -0400
+	(envelope-from <batmanustc@gmail.com>) id 1dlBWc-0004vy-8w
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 06:07:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dlBRE-0005E3-8c
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 06:02:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38304)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dlBRE-0005DL-1w
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 06:02:04 -0400
-References: <20170822044155.2451-1-famz@redhat.com>
-	<8805ba9c-a509-ed81-70e3-16b33bb1135c@redhat.com>
-	<20170825092549.GH11465@lemon.lan>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b3a24c0b-a339-7599-62ed-2d6601ec3da5@redhat.com>
-Date: Fri, 25 Aug 2017 12:01:54 +0200
+	(envelope-from <batmanustc@gmail.com>) id 1dlBWa-0007uA-Tz
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 06:07:38 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33083)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <batmanustc@gmail.com>)
+	id 1dlBWa-0007u2-P7
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 06:07:36 -0400
+Received: by mail-qt0-x243.google.com with SMTP id q53so1635815qtq.0
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 03:07:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170825092549.GH11465@lemon.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 00/10] tests: Add VM based build tests
- (for non-x86_64 and/or non-Linux)
+In-Reply-To: <ebe4b0f3-9b50-2fc8-6238-d40f32d6e0b3@redhat.com>
+References: <CAOE=1Z0trKFwm__wTKHSTAUSt+r9SBjCwft3tA=i5vJaixuX8w@mail.gmail.com>
+	<ebe4b0f3-9b50-2fc8-6238-d40f32d6e0b3@redhat.com>
+From: Sam <batmanustc@gmail.com>
+Date: Fri, 25 Aug 2017 18:07:35 +0800
+Message-ID: <CAOE=1Z0nfxKwAXDUbMsiD6L+3f3M9RVdGL237GBr-c5K9L_yUA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Why got no response of vnc?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,19 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, Cleber Rosa <crosa@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, stefanha@redhat.com, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 25/08/2017 11:25, Fam Zheng wrote:
->> I'm no expert in ansible, but I can give it that a try if you fancy the
->> idea.
->>
-> I have no objection if you want to give it a try. However it is basically a
-> separate problem, and I don't think this series would depend on that. The reason
-> is that setting up guest ssh is not part of the "build env setup" task, but is
-> the trickiest part here. 
+No firewall, as another vm could be connect by vnc, this is the start
+command used by that vm, and the disk(*.img) is copied from other place.
 
-Indeed, and worse this is also needed for ansible.  So it's a
-chicken-and-egg problem.
+$QEMU -smp 4 -m 4096 -enable-kvm $SCRIPT_PATH/$IMG -cdrom $CD -daemonize
+-vnc 0.0.0.0:2520 \
+ -chardev
+socket,id=char-$IF,path=/usr/local/var/run/openvswitch/$IF,server=on \
+ -netdev type=vhost-user,id=$IF,chardev=char-$IF \
+ -device virtio-net-pci,mac=00:00:af:07:03:02,netdev=$IF \
+ -object memory-backend-file,id=mem,size=4096M,mem-path=$MEM_PATH,share=on \
+ -numa node,memdev=mem -mem-prealloc \
+ -chardev socket,path=$SCRIPT_PATH/qga.sock,server,nowait,id=qga0 \
+ -device virtio-serial \
+ -device virtserialport,chardev=qga0,name=org.qemu.guest_agent.0 \
+ -incoming tcp:0:80818
 
-Paolo
+2017-08-25 16:21 GMT+08:00 Thomas Huth <thuth@redhat.com>:
+
+> On 25.08.2017 08:31, Sam wrote:
+> > Hi all,
+> >
+> > I'm starting vm using:
+> >
+> > kvm]$ sudo /usr/local/bin/qemu-system-x86_64 -m 256 -hda test.qcow2
+> -cdrom
+> >> CentOS-7-x86_64-DVD-1503-01.iso -boot d
+> >> VNC server running on '127.0.0.1:5900'
+> >
+> > then I start vnc client in another PC to connect 10.253.23.24:11800 and
+> > 10.253.23.24:5900, I got time out, why?
+>
+> Do you have a firewall running on the host system? It might be blocking
+> the VNC connection - in that case you could use port forwarding of ssh
+> (the -L parameter for example), or try to reconfigure your firewall on
+> the host.
+>
+>  Thomas
+>
+>
+> PS: Don't forget to specify --enable-kvm in case you want to use
+> hardware virtualization.
+>
+>
+>
