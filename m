@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCX0-0001k3-4t
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:12:12 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCZh-0003jo-Cf
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:15:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCWq-00024O-RV
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:12:06 -0400
-Received: from mail-vk0-x230.google.com ([2607:f8b0:400c:c05::230]:33480)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCZZ-0003Qo-2b
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:14:53 -0400
+Received: from mail-vk0-x233.google.com ([2607:f8b0:400c:c05::233]:35607)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dlCWq-00024J-HW
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:11:56 -0400
-Received: by mail-vk0-x230.google.com with SMTP id j189so6442370vka.0
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 04:11:56 -0700 (PDT)
+	id 1dlCZY-0003QM-PI
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:14:45 -0400
+Received: by mail-vk0-x233.google.com with SMTP id z187so6361270vkd.2
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 04:14:44 -0700 (PDT)
 MIME-Version: 1.0
 References: <1503602048-12268-1-git-send-email-armbru@redhat.com>
-	<1503602048-12268-7-git-send-email-armbru@redhat.com>
-In-Reply-To: <1503602048-12268-7-git-send-email-armbru@redhat.com>
+	<1503602048-12268-8-git-send-email-armbru@redhat.com>
+In-Reply-To: <1503602048-12268-8-git-send-email-armbru@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 25 Aug 2017 11:11:45 +0000
-Message-ID: <CAJ+F1CKORHr77fZ8OrsJc44TQL++Eazu-t0mV2+uhpW31HQSYQ@mail.gmail.com>
+Date: Fri, 25 Aug 2017 11:14:33 +0000
+Message-ID: <CAJ+F1CJMBCQK0Y1Ox2L1DhsYQS55myLMkjDX=G=0mhkH_k1uJA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 06/16] qapi-schema: Collect char device
- stuff in qapi/char.json
+Subject: Re: [Qemu-devel] [PATCH v2 07/16] qapi-schema: Collect net device
+ stuff in qapi/net.json
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,13 +32,12 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
 
-On Thu, Aug 24, 2017 at 9:24 PM Markus Armbruster <armbru@redhat.com> wrote=
+On Thu, Aug 24, 2017 at 9:25 PM Markus Armbruster <armbru@redhat.com> wrote=
 :
 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >
 
@@ -47,1182 +46,1523 @@ Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
 >  MAINTAINERS      |   1 +
 >  Makefile         |   1 +
->  qapi-schema.json | 511
+>  qapi-schema.json | 675
 > +---------------------------------------------------
->  qapi/char.json   | 538
+>  qapi/event.json  |  24 --
+>  qapi/net.json    | 706
 > +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  qapi/event.json  |  21 ---
->  5 files changed, 541 insertions(+), 531 deletions(-)
->  create mode 100644 qapi/char.json
+>  5 files changed, 709 insertions(+), 698 deletions(-)
+>  create mode 100644 qapi/net.json
 >
 > diff --git a/MAINTAINERS b/MAINTAINERS
-> index 289ea8c..6a808d3 100644
+> index 6a808d3..aecde65 100644
 > --- a/MAINTAINERS
 > +++ b/MAINTAINERS
-> @@ -1253,6 +1253,7 @@ M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.=
-com>
->  S: Maintained
->  F: chardev/
->  F: include/chardev/
-> +F: qapi/char.json
+> @@ -1356,6 +1356,7 @@ S: Maintained
+>  F: net/
+>  F: include/net/
+>  T: git git://github.com/jasowang/qemu.git net
+> +F: qapi/net.json
 >
->  Character Devices (Braille)
->  M: Samuel Thibault <samuel.thibault@ens-lyon.org>
+>  Netmap network backend
+>  M: Luigi Rizzo <rizzo@iet.unipi.it>
 > diff --git a/Makefile b/Makefile
-> index d3ba41a..59ef46c 100644
+> index 59ef46c..75f3ffe 100644
 > --- a/Makefile
 > +++ b/Makefile
-> @@ -410,6 +410,7 @@ $(SRC_PATH)/qga/qapi-schema.json
-> $(SRC_PATH)/scripts/qapi-commands.py $(qapi-py)
->
->  qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.js=
-on \
->                 $(SRC_PATH)/qapi/block.json
-> $(SRC_PATH)/qapi/block-core.json \
-> +               $(SRC_PATH)/qapi/char.json \
+> @@ -413,6 +413,7 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json
+> $(SRC_PATH)/qapi/common.json \
+>                 $(SRC_PATH)/qapi/char.json \
 >                 $(SRC_PATH)/qapi/crypto.json \
 >                 $(SRC_PATH)/qapi/event.json
 > $(SRC_PATH)/qapi/introspect.json \
+> +               $(SRC_PATH)/qapi/net.json \
 >                 $(SRC_PATH)/qapi/rocker.json \
+>                 $(SRC_PATH)/qapi/run-state.json \
+>                 $(SRC_PATH)/qapi/sockets.json \
 > diff --git a/qapi-schema.json b/qapi-schema.json
-> index f42d61b..4f30d21 100644
+> index 4f30d21..e9b61eb 100644
 > --- a/qapi-schema.json
 > +++ b/qapi-schema.json
-> @@ -83,6 +83,7 @@
->  { 'include': 'qapi/run-state.json' }
+> @@ -84,6 +84,7 @@
 >  { 'include': 'qapi/crypto.json' }
 >  { 'include': 'qapi/block.json' }
-> +{ 'include': 'qapi/char.json' }
+>  { 'include': 'qapi/char.json' }
+> +{ 'include': 'qapi/net.json' }
 >  { 'include': 'qapi/rocker.json' }
 >  { 'include': 'qapi/event.json' }
 >  { 'include': 'qapi/trace.json' }
-> @@ -274,189 +275,6 @@
->  { 'command': 'query-uuid', 'returns': 'UuidInfo' }
+> @@ -2276,33 +2277,6 @@
+>  { 'command': 'inject-nmi' }
 >
 >  ##
-> -# @ChardevInfo:
+> -# @set_link:
 > -#
-> -# Information about a character device.
+> -# Sets the link status of a virtual network adapter.
 > -#
-> -# @label: the label of the character device
+> -# @name: the device name of the virtual network adapter
 > -#
-> -# @filename: the filename of the character device
+> -# @up: true to set the link status to be up
 > -#
-> -# @frontend-open: shows whether the frontend device attached to this
-> backend
-> -#                 (eg. with the chardev=3D... option) is in open or clos=
-ed
-> state
-> -#                 (since 2.1)
-> -#
-> -# Notes: @filename is encoded using the QEMU command line character devi=
-ce
-> -#        encoding.  See the QEMU man page for details.
+> -# Returns: Nothing on success
+> -#          If @name is not a valid network device, DeviceNotFound
 > -#
 > -# Since: 0.14.0
+> -#
+> -# Notes: Not all network adapters support setting link status.  This
+> command
+> -#        will succeed even if the network adapter does not support link
+> status
+> -#        notification.
+> -#
+> -# Example:
+> -#
+> -# -> { "execute": "set_link",
+> -#      "arguments": { "name": "e1000.0", "up": false } }
+> -# <- { "return": {} }
+> -#
 > -##
-> -{ 'struct': 'ChardevInfo', 'data': {'label': 'str',
-> -                                  'filename': 'str',
-> -                                  'frontend-open': 'bool'} }
+> -{ 'command': 'set_link', 'data': {'name': 'str', 'up': 'bool'} }
 > -
 > -##
-> -# @query-chardev:
+>  # @balloon:
+>  #
+>  # Request the balloon driver to change its balloon size.
+> @@ -3272,60 +3246,6 @@
+>    'data': { 'filename': 'str' } }
+>
+>  ##
+> -# @netdev_add:
 > -#
-> -# Returns information about current character devices.
+> -# Add a network backend.
 > -#
-> -# Returns: a list of @ChardevInfo
+> -# @type: the type of network backend.  Current valid values are 'user',
+> 'tap',
+> -#        'vde', 'socket', 'dump' and 'bridge'
+> -#
+> -# @id: the name of the new network backend
+> -#
+> -# Additional arguments depend on the type.
+> -#
+> -# TODO: This command effectively bypasses QAPI completely due to its
+> -# "additional arguments" business.  It shouldn't have been added to
+> -# the schema in this form.  It should be qapified properly, or
+> -# replaced by a properly qapified command.
+> -#
+> -# Since: 0.14.0
+> -#
+> -# Returns: Nothing on success
+> -#          If @type is not a valid network backend, DeviceNotFound
+> -#
+> -# Example:
+> -#
+> -# -> { "execute": "netdev_add",
+> -#      "arguments": { "type": "user", "id": "netdev1",
+> -#                     "dnssearch": "example.org" } }
+> -# <- { "return": {} }
+> -#
+> -##
+> -{ 'command': 'netdev_add',
+> -  'data': {'type': 'str', 'id': 'str'},
+> -  'gen': false }                # so we can get the additional arguments
+> -
+> -##
+> -# @netdev_del:
+> -#
+> -# Remove a network backend.
+> -#
+> -# @id: the name of the network backend to remove
+> -#
+> -# Returns: Nothing on success
+> -#          If @id is not a valid network backend, DeviceNotFound
 > -#
 > -# Since: 0.14.0
 > -#
 > -# Example:
 > -#
-> -# -> { "execute": "query-chardev" }
-> -# <- {
-> -#       "return": [
-> -#          {
-> -#             "label": "charchannel0",
-> -#             "filename":
-> "unix:/var/lib/libvirt/qemu/seabios.rhel6.agent,server",
-> -#             "frontend-open": false
-> -#          },
-> -#          {
-> -#             "label": "charmonitor",
-> -#             "filename":
-> "unix:/var/lib/libvirt/qemu/seabios.rhel6.monitor,server",
-> -#             "frontend-open": true
-> -#          },
-> -#          {
-> -#             "label": "charserial0",
-> -#             "filename": "pty:/dev/pts/2",
-> -#             "frontend-open": true
-> -#          }
+> -# -> { "execute": "netdev_del", "arguments": { "id": "netdev1" } }
+> -# <- { "return": {} }
+> -#
+> -##
+> -{ 'command': 'netdev_del', 'data': {'id': 'str'} }
+> -
+> -##
+>  # @object-add:
+>  #
+>  # Create a QOM object.
+> @@ -3373,491 +3293,6 @@
+>  { 'command': 'object-del', 'data': {'id': 'str'} }
+>
+>  ##
+> -# @NetdevNoneOptions:
+> -#
+> -# Use it alone to have zero network devices.
+> -#
+> -# Since: 1.2
+> -##
+> -{ 'struct': 'NetdevNoneOptions',
+> -  'data': { } }
+> -
+> -##
+> -# @NetLegacyNicOptions:
+> -#
+> -# Create a new Network Interface Card.
+> -#
+> -# @netdev: id of -netdev to connect to
+> -#
+> -# @macaddr: MAC address
+> -#
+> -# @model: device model (e1000, rtl8139, virtio etc.)
+> -#
+> -# @addr: PCI device address
+> -#
+> -# @vectors: number of MSI-x vectors, 0 to disable MSI-X
+> -#
+> -# Since: 1.2
+> -##
+> -{ 'struct': 'NetLegacyNicOptions',
+> -  'data': {
+> -    '*netdev':  'str',
+> -    '*macaddr': 'str',
+> -    '*model':   'str',
+> -    '*addr':    'str',
+> -    '*vectors': 'uint32' } }
+> -
+> -##
+> -# @NetdevUserOptions:
+> -#
+> -# Use the user mode network stack which requires no administrator
+> privilege to
+> -# run.
+> -#
+> -# @hostname: client hostname reported by the builtin DHCP server
+> -#
+> -# @restrict: isolate the guest from the host
+> -#
+> -# @ipv4: whether to support IPv4, default true for enabled
+> -#        (since 2.6)
+> -#
+> -# @ipv6: whether to support IPv6, default true for enabled
+> -#        (since 2.6)
+> -#
+> -# @ip: legacy parameter, use net=3D instead
+> -#
+> -# @net: IP network address that the guest will see, in the
+> -#       form addr[/netmask] The netmask is optional, and can be
+> -#       either in the form a.b.c.d or as a number of valid top-most
+> -#       bits. Default is 10.0.2.0/24.
+> -#
+> -# @host: guest-visible address of the host
+> -#
+> -# @tftp: root directory of the built-in TFTP server
+> -#
+> -# @bootfile: BOOTP filename, for use with tftp=3D
+> -#
+> -# @dhcpstart: the first of the 16 IPs the built-in DHCP server can
+> -#             assign
+> -#
+> -# @dns: guest-visible address of the virtual nameserver
+> -#
+> -# @dnssearch: list of DNS suffixes to search, passed as DHCP option
+> -#             to the guest
+> -#
+> -# @ipv6-prefix: IPv6 network prefix (default is fec0::) (since
+> -#               2.6). The network prefix is given in the usual
+> -#               hexadecimal IPv6 address notation.
+> -#
+> -# @ipv6-prefixlen: IPv6 network prefix length (default is 64)
+> -#                  (since 2.6)
+> -#
+> -# @ipv6-host: guest-visible IPv6 address of the host (since 2.6)
+> -#
+> -# @ipv6-dns: guest-visible IPv6 address of the virtual
+> -#            nameserver (since 2.6)
+> -#
+> -# @smb: root directory of the built-in SMB server
+> -#
+> -# @smbserver: IP address of the built-in SMB server
+> -#
+> -# @hostfwd: redirect incoming TCP or UDP host connections to guest
+> -#           endpoints
+> -#
+> -# @guestfwd: forward guest TCP connections
+> -#
+> -# Since: 1.2
+> -##
+> -{ 'struct': 'NetdevUserOptions',
+> -  'data': {
+> -    '*hostname':  'str',
+> -    '*restrict':  'bool',
+> -    '*ipv4':      'bool',
+> -    '*ipv6':      'bool',
+> -    '*ip':        'str',
+> -    '*net':       'str',
+> -    '*host':      'str',
+> -    '*tftp':      'str',
+> -    '*bootfile':  'str',
+> -    '*dhcpstart': 'str',
+> -    '*dns':       'str',
+> -    '*dnssearch': ['String'],
+> -    '*ipv6-prefix':      'str',
+> -    '*ipv6-prefixlen':   'int',
+> -    '*ipv6-host':        'str',
+> -    '*ipv6-dns':         'str',
+> -    '*smb':       'str',
+> -    '*smbserver': 'str',
+> -    '*hostfwd':   ['String'],
+> -    '*guestfwd':  ['String'] } }
+> -
+> -##
+> -# @NetdevTapOptions:
+> -#
+> -# Connect the host TAP network interface name to the VLAN.
+> -#
+> -# @ifname: interface name
+> -#
+> -# @fd: file descriptor of an already opened tap
+> -#
+> -# @fds: multiple file descriptors of already opened multiqueue capable
+> -# tap
+> -#
+> -# @script: script to initialize the interface
+> -#
+> -# @downscript: script to shut down the interface
+> -#
+> -# @br: bridge name (since 2.8)
+> -#
+> -# @helper: command to execute to configure bridge
+> -#
+> -# @sndbuf: send buffer limit. Understands [TGMKkb] suffixes.
+> -#
+> -# @vnet_hdr: enable the IFF_VNET_HDR flag on the tap interface
+> -#
+> -# @vhost: enable vhost-net network accelerator
+> -#
+> -# @vhostfd: file descriptor of an already opened vhost net device
+> -#
+> -# @vhostfds: file descriptors of multiple already opened vhost net
+> -# devices
+> -#
+> -# @vhostforce: vhost on for non-MSIX virtio guests
+> -#
+> -# @queues: number of queues to be created for multiqueue capable tap
+> -#
+> -# @poll-us: maximum number of microseconds that could
+> -# be spent on busy polling for tap (since 2.7)
+> -#
+> -# Since: 1.2
+> -##
+> -{ 'struct': 'NetdevTapOptions',
+> -  'data': {
+> -    '*ifname':     'str',
+> -    '*fd':         'str',
+> -    '*fds':        'str',
+> -    '*script':     'str',
+> -    '*downscript': 'str',
+> -    '*br':         'str',
+> -    '*helper':     'str',
+> -    '*sndbuf':     'size',
+> -    '*vnet_hdr':   'bool',
+> -    '*vhost':      'bool',
+> -    '*vhostfd':    'str',
+> -    '*vhostfds':   'str',
+> -    '*vhostforce': 'bool',
+> -    '*queues':     'uint32',
+> -    '*poll-us':    'uint32'} }
+> -
+> -##
+> -# @NetdevSocketOptions:
+> -#
+> -# Connect the VLAN to a remote VLAN in another QEMU virtual machine usin=
+g
+> a TCP
+> -# socket connection.
+> -#
+> -# @fd: file descriptor of an already opened socket
+> -#
+> -# @listen: port number, and optional hostname, to listen on
+> -#
+> -# @connect: port number, and optional hostname, to connect to
+> -#
+> -# @mcast: UDP multicast address and port number
+> -#
+> -# @localaddr: source address and port for multicast and udp packets
+> -#
+> -# @udp: UDP unicast address and port number
+> -#
+> -# Since: 1.2
+> -##
+> -{ 'struct': 'NetdevSocketOptions',
+> -  'data': {
+> -    '*fd':        'str',
+> -    '*listen':    'str',
+> -    '*connect':   'str',
+> -    '*mcast':     'str',
+> -    '*localaddr': 'str',
+> -    '*udp':       'str' } }
+> -
+> -##
+> -# @NetdevL2TPv3Options:
+> -#
+> -# Connect the VLAN to Ethernet over L2TPv3 Static tunnel
+> -#
+> -# @src: source address
+> -#
+> -# @dst: destination address
+> -#
+> -# @srcport: source port - mandatory for udp, optional for ip
+> -#
+> -# @dstport: destination port - mandatory for udp, optional for ip
+> -#
+> -# @ipv6: force the use of ipv6
+> -#
+> -# @udp: use the udp version of l2tpv3 encapsulation
+> -#
+> -# @cookie64: use 64 bit coookies
+> -#
+> -# @counter: have sequence counter
+> -#
+> -# @pincounter: pin sequence counter to zero -
+> -#              workaround for buggy implementations or
+> -#              networks with packet reorder
+> -#
+> -# @txcookie: 32 or 64 bit transmit cookie
+> -#
+> -# @rxcookie: 32 or 64 bit receive cookie
+> -#
+> -# @txsession: 32 bit transmit session
+> -#
+> -# @rxsession: 32 bit receive session - if not specified
+> -#             set to the same value as transmit
+> -#
+> -# @offset: additional offset - allows the insertion of
+> -#          additional application-specific data before the packet payloa=
+d
+> -#
+> -# Since: 2.1
+> -##
+> -{ 'struct': 'NetdevL2TPv3Options',
+> -  'data': {
+> -    'src':          'str',
+> -    'dst':          'str',
+> -    '*srcport':     'str',
+> -    '*dstport':     'str',
+> -    '*ipv6':        'bool',
+> -    '*udp':         'bool',
+> -    '*cookie64':    'bool',
+> -    '*counter':     'bool',
+> -    '*pincounter':  'bool',
+> -    '*txcookie':    'uint64',
+> -    '*rxcookie':    'uint64',
+> -    'txsession':    'uint32',
+> -    '*rxsession':   'uint32',
+> -    '*offset':      'uint32' } }
+> -
+> -##
+> -# @NetdevVdeOptions:
+> -#
+> -# Connect the VLAN to a vde switch running on the host.
+> -#
+> -# @sock: socket path
+> -#
+> -# @port: port number
+> -#
+> -# @group: group owner of socket
+> -#
+> -# @mode: permissions for socket
+> -#
+> -# Since: 1.2
+> -##
+> -{ 'struct': 'NetdevVdeOptions',
+> -  'data': {
+> -    '*sock':  'str',
+> -    '*port':  'uint16',
+> -    '*group': 'str',
+> -    '*mode':  'uint16' } }
+> -
+> -##
+> -# @NetdevDumpOptions:
+> -#
+> -# Dump VLAN network traffic to a file.
+> -#
+> -# @len: per-packet size limit (64k default). Understands [TGMKkb]
+> -# suffixes.
+> -#
+> -# @file: dump file path (default is qemu-vlan0.pcap)
+> -#
+> -# Since: 1.2
+> -##
+> -{ 'struct': 'NetdevDumpOptions',
+> -  'data': {
+> -    '*len':  'size',
+> -    '*file': 'str' } }
+> -
+> -##
+> -# @NetdevBridgeOptions:
+> -#
+> -# Connect a host TAP network interface to a host bridge device.
+> -#
+> -# @br: bridge name
+> -#
+> -# @helper: command to execute to configure bridge
+> -#
+> -# Since: 1.2
+> -##
+> -{ 'struct': 'NetdevBridgeOptions',
+> -  'data': {
+> -    '*br':     'str',
+> -    '*helper': 'str' } }
+> -
+> -##
+> -# @NetdevHubPortOptions:
+> -#
+> -# Connect two or more net clients through a software hub.
+> -#
+> -# @hubid: hub identifier number
+> -#
+> -# Since: 1.2
+> -##
+> -{ 'struct': 'NetdevHubPortOptions',
+> -  'data': {
+> -    'hubid':     'int32' } }
+> -
+> -##
+> -# @NetdevNetmapOptions:
+> -#
+> -# Connect a client to a netmap-enabled NIC or to a VALE switch port
+> -#
+> -# @ifname: Either the name of an existing network interface supported by
+> -#          netmap, or the name of a VALE port (created on the fly).
+> -#          A VALE port name is in the form 'valeXXX:YYY', where XXX and
+> -#          YYY are non-negative integers. XXX identifies a switch and
+> -#          YYY identifies a port of the switch. VALE ports having the
+> -#          same XXX are therefore connected to the same switch.
+> -#
+> -# @devname: path of the netmap device (default: '/dev/netmap').
+> -#
+> -# Since: 2.0
+> -##
+> -{ 'struct': 'NetdevNetmapOptions',
+> -  'data': {
+> -    'ifname':     'str',
+> -    '*devname':    'str' } }
+> -
+> -##
+> -# @NetdevVhostUserOptions:
+> -#
+> -# Vhost-user network backend
+> -#
+> -# @chardev: name of a unix socket chardev
+> -#
+> -# @vhostforce: vhost on for non-MSIX virtio guests (default: false).
+> -#
+> -# @queues: number of queues to be created for multiqueue vhost-user
+> -#          (default: 1) (Since 2.5)
+> -#
+> -# Since: 2.1
+> -##
+> -{ 'struct': 'NetdevVhostUserOptions',
+> -  'data': {
+> -    'chardev':        'str',
+> -    '*vhostforce':    'bool',
+> -    '*queues':        'int' } }
+> -
+> -##
+> -# @NetClientDriver:
+> -#
+> -# Available netdev drivers.
+> -#
+> -# Since: 2.7
+> -##
+> -{ 'enum': 'NetClientDriver',
+> -  'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
+> 'dump',
+> -            'bridge', 'hubport', 'netmap', 'vhost-user' ] }
+> -
+> -##
+> -# @Netdev:
+> -#
+> -# Captures the configuration of a network device.
+> -#
+> -# @id: identifier for monitor commands.
+> -#
+> -# @type: Specify the driver used for interpreting remaining arguments.
+> -#
+> -# Since: 1.2
+> -#
+> -# 'l2tpv3' - since 2.1
+> -##
+> -{ 'union': 'Netdev',
+> -  'base': { 'id': 'str', 'type': 'NetClientDriver' },
+> -  'discriminator': 'type',
+> -  'data': {
+> -    'none':     'NetdevNoneOptions',
+> -    'nic':      'NetLegacyNicOptions',
+> -    'user':     'NetdevUserOptions',
+> -    'tap':      'NetdevTapOptions',
+> -    'l2tpv3':   'NetdevL2TPv3Options',
+> -    'socket':   'NetdevSocketOptions',
+> -    'vde':      'NetdevVdeOptions',
+> -    'dump':     'NetdevDumpOptions',
+> -    'bridge':   'NetdevBridgeOptions',
+> -    'hubport':  'NetdevHubPortOptions',
+> -    'netmap':   'NetdevNetmapOptions',
+> -    'vhost-user': 'NetdevVhostUserOptions' } }
+> -
+> -##
+> -# @NetLegacy:
+> -#
+> -# Captures the configuration of a network device; legacy.
+> -#
+> -# @vlan: vlan number
+> -#
+> -# @id: identifier for monitor commands
+> -#
+> -# @name: identifier for monitor commands, ignored if @id is present
+> -#
+> -# @opts: device type specific properties (legacy)
+> -#
+> -# Since: 1.2
+> -##
+> -{ 'struct': 'NetLegacy',
+> -  'data': {
+> -    '*vlan': 'int32',
+> -    '*id':   'str',
+> -    '*name': 'str',
+> -    'opts':  'NetLegacyOptions' } }
+> -
+> -##
+> -# @NetLegacyOptionsType:
+> -#
+> -# Since: 1.2
+> -##
+> -{ 'enum': 'NetLegacyOptionsType',
+> -  'data': ['none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
+> -           'dump', 'bridge', 'netmap', 'vhost-user'] }
+> -
+> -##
+> -# @NetLegacyOptions:
+> -#
+> -# Like Netdev, but for use only by the legacy command line options
+> -#
+> -# Since: 1.2
+> -##
+> -{ 'union': 'NetLegacyOptions',
+> -  'base': { 'type': 'NetLegacyOptionsType' },
+> -  'discriminator': 'type',
+> -  'data': {
+> -    'none':     'NetdevNoneOptions',
+> -    'nic':      'NetLegacyNicOptions',
+> -    'user':     'NetdevUserOptions',
+> -    'tap':      'NetdevTapOptions',
+> -    'l2tpv3':   'NetdevL2TPv3Options',
+> -    'socket':   'NetdevSocketOptions',
+> -    'vde':      'NetdevVdeOptions',
+> -    'dump':     'NetdevDumpOptions',
+> -    'bridge':   'NetdevBridgeOptions',
+> -    'netmap':   'NetdevNetmapOptions',
+> -    'vhost-user': 'NetdevVhostUserOptions' } }
+> -
+> -##
+> -# @NetFilterDirection:
+> -#
+> -# Indicates whether a netfilter is attached to a netdev's transmit queue
+> or
+> -# receive queue or both.
+> -#
+> -# @all: the filter is attached both to the receive and the transmit
+> -#       queue of the netdev (default).
+> -#
+> -# @rx: the filter is attached to the receive queue of the netdev,
+> -#      where it will receive packets sent to the netdev.
+> -#
+> -# @tx: the filter is attached to the transmit queue of the netdev,
+> -#      where it will receive packets sent by the netdev.
+> -#
+> -# Since: 2.5
+> -##
+> -{ 'enum': 'NetFilterDirection',
+> -  'data': [ 'all', 'rx', 'tx' ] }
+> -
+> -##
+>  # @getfd:
+>  #
+>  # Receive a file descriptor via SCM rights and assign it a name
+> @@ -4854,114 +4289,6 @@
+>
+>
+>  ##
+> -# @RxState:
+> -#
+> -# Packets receiving state
+> -#
+> -# @normal: filter assigned packets according to the mac-table
+> -#
+> -# @none: don't receive any assigned packet
+> -#
+> -# @all: receive all assigned packets
+> -#
+> -# Since: 1.6
+> -##
+> -{ 'enum': 'RxState', 'data': [ 'normal', 'none', 'all' ] }
+> -
+> -##
+> -# @RxFilterInfo:
+> -#
+> -# Rx-filter information for a NIC.
+> -#
+> -# @name: net client name
+> -#
+> -# @promiscuous: whether promiscuous mode is enabled
+> -#
+> -# @multicast: multicast receive state
+> -#
+> -# @unicast: unicast receive state
+> -#
+> -# @vlan: vlan receive state (Since 2.0)
+> -#
+> -# @broadcast-allowed: whether to receive broadcast
+> -#
+> -# @multicast-overflow: multicast table is overflowed or not
+> -#
+> -# @unicast-overflow: unicast table is overflowed or not
+> -#
+> -# @main-mac: the main macaddr string
+> -#
+> -# @vlan-table: a list of active vlan id
+> -#
+> -# @unicast-table: a list of unicast macaddr string
+> -#
+> -# @multicast-table: a list of multicast macaddr string
+> -#
+> -# Since: 1.6
+> -##
+> -{ 'struct': 'RxFilterInfo',
+> -  'data': {
+> -    'name':               'str',
+> -    'promiscuous':        'bool',
+> -    'multicast':          'RxState',
+> -    'unicast':            'RxState',
+> -    'vlan':               'RxState',
+> -    'broadcast-allowed':  'bool',
+> -    'multicast-overflow': 'bool',
+> -    'unicast-overflow':   'bool',
+> -    'main-mac':           'str',
+> -    'vlan-table':         ['int'],
+> -    'unicast-table':      ['str'],
+> -    'multicast-table':    ['str'] }}
+> -
+> -##
+> -# @query-rx-filter:
+> -#
+> -# Return rx-filter information for all NICs (or for the given NIC).
+> -#
+> -# @name: net client name
+> -#
+> -# Returns: list of @RxFilterInfo for all NICs (or for the given NIC).
+> -#          Returns an error if the given @name doesn't exist, or given
+> -#          NIC doesn't support rx-filter querying, or given net client
+> -#          isn't a NIC.
+> -#
+> -# Since: 1.6
+> -#
+> -# Example:
+> -#
+> -# -> { "execute": "query-rx-filter", "arguments": { "name": "vnet0" } }
+> -# <- { "return": [
+> -#         {
+> -#             "promiscuous": true,
+> -#             "name": "vnet0",
+> -#             "main-mac": "52:54:00:12:34:56",
+> -#             "unicast": "normal",
+> -#             "vlan": "normal",
+> -#             "vlan-table": [
+> -#                 4,
+> -#                 0
+> -#             ],
+> -#             "unicast-table": [
+> -#             ],
+> -#             "multicast": "normal",
+> -#             "multicast-overflow": false,
+> -#             "unicast-overflow": false,
+> -#             "multicast-table": [
+> -#                 "01:00:5e:00:00:01",
+> -#                 "33:33:00:00:00:01",
+> -#                 "33:33:ff:12:34:56"
+> -#             ],
+> -#             "broadcast-allowed": false
+> -#         }
 > -#       ]
 > -#    }
 > -#
 > -##
-> -{ 'command': 'query-chardev', 'returns': ['ChardevInfo'] }
+> -{ 'command': 'query-rx-filter', 'data': { '*name': 'str' },
+> -  'returns': ['RxFilterInfo'] }
 > -
 > -##
-> -# @ChardevBackendInfo:
+>  # @InputButton:
+>  #
+>  # Button of a pointer input device (mouse, tablet).
+> diff --git a/qapi/event.json b/qapi/event.json
+> index b9aa6ed..4b32773 100644
+> --- a/qapi/event.json
+> +++ b/qapi/event.json
+> @@ -51,30 +51,6 @@
+>    'data': { '*device': 'str', 'path': 'str' } }
+>
+>  ##
+> -# @NIC_RX_FILTER_CHANGED:
 > -#
-> -# Information about a character device backend
+> -# Emitted once until the 'query-rx-filter' command is executed, the firs=
+t
+> event
+> -# will always be emitted
 > -#
-> -# @name: The backend name
+> -# @name: net client name
 > -#
-> -# Since: 2.0
-> -##
-> -{ 'struct': 'ChardevBackendInfo', 'data': {'name': 'str'} }
-> -
-> -##
-> -# @query-chardev-backends:
+> -# @path: device path
 > -#
-> -# Returns information about character device backends.
-> -#
-> -# Returns: a list of @ChardevBackendInfo
-> -#
-> -# Since: 2.0
+> -# Since: 1.6
 > -#
 > -# Example:
 > -#
-> -# -> { "execute": "query-chardev-backends" }
-> -# <- {
-> -#       "return":[
-> -#          {
-> -#             "name":"udp"
-> -#          },
-> -#          {
-> -#             "name":"tcp"
-> -#          },
-> -#          {
-> -#             "name":"unix"
-> -#          },
-> -#          {
-> -#             "name":"spiceport"
-> -#          }
-> -#       ]
+> -# <- { "event": "NIC_RX_FILTER_CHANGED",
+> -#      "data": { "name": "vnet0",
+> -#                "path": "/machine/peripheral/vnet0/virtio-backend" },
+> -#      "timestamp": { "seconds": 1368697518, "microseconds": 326866 } }
 > -#    }
 > -#
 > -##
-> -{ 'command': 'query-chardev-backends', 'returns': ['ChardevBackendInfo']=
- }
+> -{ 'event': 'NIC_RX_FILTER_CHANGED',
+> -  'data': { '*name': 'str', 'path': 'str' } }
 > -
 > -##
-> -# @DataFormat:
-> -#
-> -# An enumeration of data format.
-> -#
-> -# @utf8: Data is a UTF-8 string (RFC 3629)
-> -#
-> -# @base64: Data is Base64 encoded binary (RFC 3548)
-> -#
-> -# Since: 1.4
-> -##
-> -{ 'enum': 'DataFormat',
-> -  'data': [ 'utf8', 'base64' ] }
-> -
-> -##
-> -# @ringbuf-write:
-> -#
-> -# Write to a ring buffer character device.
-> -#
-> -# @device: the ring buffer character device name
-> -#
-> -# @data: data to write
-> -#
-> -# @format: data encoding (default 'utf8').
-> -#          - base64: data must be base64 encoded text.  Its binary
-> -#            decoding gets written.
-> -#          - utf8: data's UTF-8 encoding is written
-> -#          - data itself is always Unicode regardless of format, like
-> -#            any other string.
-> -#
-> -# Returns: Nothing on success
-> -#
-> -# Since: 1.4
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "ringbuf-write",
-> -#      "arguments": { "device": "foo",
-> -#                     "data": "abcdefgh",
-> -#                     "format": "utf8" } }
-> -# <- { "return": {} }
-> -#
-> -##
-> -{ 'command': 'ringbuf-write',
-> -  'data': {'device': 'str', 'data': 'str',
-> -           '*format': 'DataFormat'} }
-> -
-> -##
-> -# @ringbuf-read:
-> -#
-> -# Read from a ring buffer character device.
-> -#
-> -# @device: the ring buffer character device name
-> -#
-> -# @size: how many bytes to read at most
-> -#
-> -# @format: data encoding (default 'utf8').
-> -#          - base64: the data read is returned in base64 encoding.
-> -#          - utf8: the data read is interpreted as UTF-8.
-> -#            Bug: can screw up when the buffer contains invalid UTF-8
-> -#            sequences, NUL characters, after the ring buffer lost
-> -#            data, and when reading stops because the size limit is
-> -#            reached.
-> -#          - The return value is always Unicode regardless of format,
-> -#            like any other string.
-> -#
-> -# Returns: data read from the device
-> -#
-> -# Since: 1.4
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "ringbuf-read",
-> -#      "arguments": { "device": "foo",
-> -#                     "size": 1000,
-> -#                     "format": "utf8" } }
-> -# <- { "return": "abcdefgh" }
-> -#
-> -##
-> -{ 'command': 'ringbuf-read',
-> -  'data': {'device': 'str', 'size': 'int', '*format': 'DataFormat'},
-> -  'returns': 'str' }
-> -
-> -##
->  # @EventInfo:
+>  # @VNC_CONNECTED:
 >  #
->  # Information about a QMP event
-> @@ -4713,333 +4531,6 @@
->
->
->  ##
-> -# @ChardevCommon:
-> -#
-> -# Configuration shared across all chardev backends
-> -#
-> -# @logfile: The name of a logfile to save output
-> -# @logappend: true to append instead of truncate
-> -#             (default to false to truncate)
-> -#
-> -# Since: 2.6
-> -##
-> -{ 'struct': 'ChardevCommon', 'data': { '*logfile': 'str',
-> -                                       '*logappend': 'bool' } }
-> -
-> -##
-> -# @ChardevFile:
-> -#
-> -# Configuration info for file chardevs.
-> -#
-> -# @in:  The name of the input file
-> -# @out: The name of the output file
-> -# @append: Open the file in append mode (default false to
-> -#          truncate) (Since 2.6)
-> -#
-> -# Since: 1.4
-> -##
-> -{ 'struct': 'ChardevFile', 'data': { '*in' : 'str',
-> -                                   'out' : 'str',
-> -                                   '*append': 'bool' },
-> -  'base': 'ChardevCommon' }
-> -
-> -##
-> -# @ChardevHostdev:
-> -#
-> -# Configuration info for device and pipe chardevs.
-> -#
-> -# @device: The name of the special file for the device,
-> -#          i.e. /dev/ttyS0 on Unix or COM1: on Windows
-> -#
-> -# Since: 1.4
-> -##
-> -{ 'struct': 'ChardevHostdev', 'data': { 'device' : 'str' },
-> -  'base': 'ChardevCommon' }
-> -
-> -##
-> -# @ChardevSocket:
-> -#
-> -# Configuration info for (stream) socket chardevs.
-> -#
-> -# @addr: socket address to listen on (server=3Dtrue)
-> -#        or connect to (server=3Dfalse)
-> -# @tls-creds: the ID of the TLS credentials object (since 2.6)
-> -# @server: create server socket (default: true)
-> -# @wait: wait for incoming connection on server
-> -#        sockets (default: false).
-> -# @nodelay: set TCP_NODELAY socket option (default: false)
-> -# @telnet: enable telnet protocol on server
-> -#          sockets (default: false)
-> -# @tn3270: enable tn3270 protocol on server
-> -#          sockets (default: false) (Since: 2.10)
-> -# @reconnect: For a client socket, if a socket is disconnected,
-> -#          then attempt a reconnect after the given number of seconds.
-> -#          Setting this to zero disables this function. (default: 0)
-> -#          (Since: 2.2)
-> -#
-> -# Since: 1.4
-> -##
-> -{ 'struct': 'ChardevSocket', 'data': { 'addr'       :
-> 'SocketAddressLegacy',
-> -                                     '*tls-creds'  : 'str',
-> -                                     '*server'    : 'bool',
-> -                                     '*wait'      : 'bool',
-> -                                     '*nodelay'   : 'bool',
-> -                                     '*telnet'    : 'bool',
-> -                                     '*tn3270'    : 'bool',
-> -                                     '*reconnect' : 'int' },
-> -  'base': 'ChardevCommon' }
-> -
-> -##
-> -# @ChardevUdp:
-> -#
-> -# Configuration info for datagram socket chardevs.
-> -#
-> -# @remote: remote address
-> -# @local: local address
-> -#
-> -# Since: 1.5
-> -##
-> -{ 'struct': 'ChardevUdp', 'data': { 'remote' : 'SocketAddressLegacy',
-> -                                  '*local' : 'SocketAddressLegacy' },
-> -  'base': 'ChardevCommon' }
-> -
-> -##
-> -# @ChardevMux:
-> -#
-> -# Configuration info for mux chardevs.
-> -#
-> -# @chardev: name of the base chardev.
-> -#
-> -# Since: 1.5
-> -##
-> -{ 'struct': 'ChardevMux', 'data': { 'chardev' : 'str' },
-> -  'base': 'ChardevCommon' }
-> -
-> -##
-> -# @ChardevStdio:
-> -#
-> -# Configuration info for stdio chardevs.
-> -#
-> -# @signal: Allow signals (such as SIGINT triggered by ^C)
-> -#          be delivered to qemu.  Default: true in -nographic mode,
-> -#          false otherwise.
-> -#
-> -# Since: 1.5
-> -##
-> -{ 'struct': 'ChardevStdio', 'data': { '*signal' : 'bool' },
-> -  'base': 'ChardevCommon' }
-> -
-> -
-> -##
-> -# @ChardevSpiceChannel:
-> -#
-> -# Configuration info for spice vm channel chardevs.
-> -#
-> -# @type: kind of channel (for example vdagent).
-> -#
-> -# Since: 1.5
-> -##
-> -{ 'struct': 'ChardevSpiceChannel', 'data': { 'type'  : 'str' },
-> -  'base': 'ChardevCommon' }
-> -
-> -##
-> -# @ChardevSpicePort:
-> -#
-> -# Configuration info for spice port chardevs.
-> -#
-> -# @fqdn: name of the channel (see docs/spice-port-fqdn.txt)
-> -#
-> -# Since: 1.5
-> -##
-> -{ 'struct': 'ChardevSpicePort', 'data': { 'fqdn'  : 'str' },
-> -  'base': 'ChardevCommon' }
-> -
-> -##
-> -# @ChardevVC:
-> -#
-> -# Configuration info for virtual console chardevs.
-> -#
-> -# @width:  console width,  in pixels
-> -# @height: console height, in pixels
-> -# @cols:   console width,  in chars
-> -# @rows:   console height, in chars
-> -#
-> -# Since: 1.5
-> -##
-> -{ 'struct': 'ChardevVC', 'data': { '*width'  : 'int',
-> -                                 '*height' : 'int',
-> -                                 '*cols'   : 'int',
-> -                                 '*rows'   : 'int' },
-> -  'base': 'ChardevCommon' }
-> -
-> -##
-> -# @ChardevRingbuf:
-> -#
-> -# Configuration info for ring buffer chardevs.
-> -#
-> -# @size: ring buffer size, must be power of two, default is 65536
-> -#
-> -# Since: 1.5
-> -##
-> -{ 'struct': 'ChardevRingbuf', 'data': { '*size'  : 'int' },
-> -  'base': 'ChardevCommon' }
-> -
-> -##
-> -# @ChardevBackend:
-> -#
-> -# Configuration info for the new chardev backend.
-> -#
-> -# Since: 1.4 (testdev since 2.2, wctablet since 2.9)
-> -##
-> -{ 'union': 'ChardevBackend', 'data': { 'file'   : 'ChardevFile',
-> -                                       'serial' : 'ChardevHostdev',
-> -                                       'parallel': 'ChardevHostdev',
-> -                                       'pipe'   : 'ChardevHostdev',
-> -                                       'socket' : 'ChardevSocket',
-> -                                       'udp'    : 'ChardevUdp',
-> -                                       'pty'    : 'ChardevCommon',
-> -                                       'null'   : 'ChardevCommon',
-> -                                       'mux'    : 'ChardevMux',
-> -                                       'msmouse': 'ChardevCommon',
-> -                                       'wctablet' : 'ChardevCommon',
-> -                                       'braille': 'ChardevCommon',
-> -                                       'testdev': 'ChardevCommon',
-> -                                       'stdio'  : 'ChardevStdio',
-> -                                       'console': 'ChardevCommon',
-> -                                       'spicevmc' : 'ChardevSpiceChannel=
-',
-> -                                       'spiceport' : 'ChardevSpicePort',
-> -                                       'vc'     : 'ChardevVC',
-> -                                       'ringbuf': 'ChardevRingbuf',
-> -                                       # next one is just for
-> compatibility
-> -                                       'memory' : 'ChardevRingbuf' } }
-> -
-> -##
-> -# @ChardevReturn:
-> -#
-> -# Return info about the chardev backend just created.
-> -#
-> -# @pty: name of the slave pseudoterminal device, present if
-> -#       and only if a chardev of type 'pty' was created
-> -#
-> -# Since: 1.4
-> -##
-> -{ 'struct' : 'ChardevReturn', 'data': { '*pty' : 'str' } }
-> -
-> -##
-> -# @chardev-add:
-> -#
-> -# Add a character device backend
-> -#
-> -# @id: the chardev's ID, must be unique
-> -# @backend: backend type and parameters
-> -#
-> -# Returns: ChardevReturn.
-> -#
-> -# Since: 1.4
-> -#
-> -# Example:
-> -#
-> -# -> { "execute" : "chardev-add",
-> -#      "arguments" : { "id" : "foo",
-> -#                      "backend" : { "type" : "null", "data" : {} } } }
-> -# <- { "return": {} }
-> -#
-> -# -> { "execute" : "chardev-add",
-> -#      "arguments" : { "id" : "bar",
-> -#                      "backend" : { "type" : "file",
-> -#                                    "data" : { "out" : "/tmp/bar.log" }
-> } } }
-> -# <- { "return": {} }
-> -#
-> -# -> { "execute" : "chardev-add",
-> -#      "arguments" : { "id" : "baz",
-> -#                      "backend" : { "type" : "pty", "data" : {} } } }
-> -# <- { "return": { "pty" : "/dev/pty/42" } }
-> -#
-> -##
-> -{ 'command': 'chardev-add', 'data': {'id'      : 'str',
-> -                                     'backend' : 'ChardevBackend' },
-> -  'returns': 'ChardevReturn' }
-> -
-> -##
-> -# @chardev-change:
-> -#
-> -# Change a character device backend
-> -#
-> -# @id: the chardev's ID, must exist
-> -# @backend: new backend type and parameters
-> -#
-> -# Returns: ChardevReturn.
-> -#
-> -# Since: 2.10
-> -#
-> -# Example:
-> -#
-> -# -> { "execute" : "chardev-change",
-> -#      "arguments" : { "id" : "baz",
-> -#                      "backend" : { "type" : "pty", "data" : {} } } }
-> -# <- { "return": { "pty" : "/dev/pty/42" } }
-> -#
-> -# -> {"execute" : "chardev-change",
-> -#     "arguments" : {
-> -#         "id" : "charchannel2",
-> -#         "backend" : {
-> -#             "type" : "socket",
-> -#             "data" : {
-> -#                 "addr" : {
-> -#                     "type" : "unix" ,
-> -#                     "data" : {
-> -#                         "path" : "/tmp/charchannel2.socket"
-> -#                     }
-> -#                  },
-> -#                  "server" : true,
-> -#                  "wait" : false }}}}
-> -# <- {"return": {}}
-> -#
-> -##
-> -{ 'command': 'chardev-change', 'data': {'id'      : 'str',
-> -                                        'backend' : 'ChardevBackend' },
-> -  'returns': 'ChardevReturn' }
-> -
-> -##
-> -# @chardev-remove:
-> -#
-> -# Remove a character device backend
-> -#
-> -# @id: the chardev's ID, must exist and not be in use
-> -#
-> -# Returns: Nothing on success
-> -#
-> -# Since: 1.4
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "chardev-remove", "arguments": { "id" : "foo" } }
-> -# <- { "return": {} }
-> -#
-> -##
-> -{ 'command': 'chardev-remove', 'data': {'id': 'str'} }
-> -
-> -##
-> -# @chardev-send-break:
-> -#
-> -# Send a break to a character device
-> -#
-> -# @id: the chardev's ID, must exist
-> -#
-> -# Returns: Nothing on success
-> -#
-> -# Since: 2.10
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "chardev-send-break", "arguments": { "id" : "foo" } }
-> -# <- { "return": {} }
-> -#
-> -##
-> -{ 'command': 'chardev-send-break', 'data': {'id': 'str'} }
-> -
-> -
-> -##
->  # @TpmModel:
->  #
->  # An enumeration of TPM models
-> diff --git a/qapi/char.json b/qapi/char.json
+>  # Emitted when a VNC client establishes a connection
+> diff --git a/qapi/net.json b/qapi/net.json
 > new file mode 100644
-> index 0000000..ae19dcd
+> index 0000000..4beff5d
 > --- /dev/null
-> +++ b/qapi/char.json
-> @@ -0,0 +1,538 @@
+> +++ b/qapi/net.json
+> @@ -0,0 +1,706 @@
 > +# -*- Mode: Python -*-
 > +#
 > +
 > +##
-> +# =3D Character devices
+> +# =3D Net devices
 > +##
 > +
-> +{ 'include': 'sockets.json' }
+> +{ 'include': 'common.json' }
 > +
 > +##
-> +# @ChardevInfo:
+> +# @set_link:
 > +#
-> +# Information about a character device.
+> +# Sets the link status of a virtual network adapter.
 > +#
-> +# @label: the label of the character device
+> +# @name: the device name of the virtual network adapter
 > +#
-> +# @filename: the filename of the character device
+> +# @up: true to set the link status to be up
 > +#
-> +# @frontend-open: shows whether the frontend device attached to this
-> backend
-> +#                 (eg. with the chardev=3D... option) is in open or clos=
-ed
-> state
-> +#                 (since 2.1)
-> +#
-> +# Notes: @filename is encoded using the QEMU command line character devi=
-ce
-> +#        encoding.  See the QEMU man page for details.
-> +#
-> +# Since: 0.14.0
-> +##
-> +{ 'struct': 'ChardevInfo', 'data': {'label': 'str',
-> +                                  'filename': 'str',
-> +                                  'frontend-open': 'bool'} }
-> +
-> +##
-> +# @query-chardev:
-> +#
-> +# Returns information about current character devices.
-> +#
-> +# Returns: a list of @ChardevInfo
+> +# Returns: Nothing on success
+> +#          If @name is not a valid network device, DeviceNotFound
 > +#
 > +# Since: 0.14.0
 > +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-chardev" }
-> +# <- {
-> +#       "return": [
-> +#          {
-> +#             "label": "charchannel0",
-> +#             "filename":
-> "unix:/var/lib/libvirt/qemu/seabios.rhel6.agent,server",
-> +#             "frontend-open": false
-> +#          },
-> +#          {
-> +#             "label": "charmonitor",
-> +#             "filename":
-> "unix:/var/lib/libvirt/qemu/seabios.rhel6.monitor,server",
-> +#             "frontend-open": true
-> +#          },
-> +#          {
-> +#             "label": "charserial0",
-> +#             "filename": "pty:/dev/pts/2",
-> +#             "frontend-open": true
-> +#          }
-> +#       ]
-> +#    }
-> +#
-> +##
-> +{ 'command': 'query-chardev', 'returns': ['ChardevInfo'] }
-> +
-> +##
-> +# @ChardevBackendInfo:
-> +#
-> +# Information about a character device backend
-> +#
-> +# @name: The backend name
-> +#
-> +# Since: 2.0
-> +##
-> +{ 'struct': 'ChardevBackendInfo', 'data': {'name': 'str'} }
-> +
-> +##
-> +# @query-chardev-backends:
-> +#
-> +# Returns information about character device backends.
-> +#
-> +# Returns: a list of @ChardevBackendInfo
-> +#
-> +# Since: 2.0
+> +# Notes: Not all network adapters support setting link status.  This
+> command
+> +#        will succeed even if the network adapter does not support link
+> status
+> +#        notification.
 > +#
 > +# Example:
 > +#
-> +# -> { "execute": "query-chardev-backends" }
-> +# <- {
-> +#       "return":[
-> +#          {
-> +#             "name":"udp"
-> +#          },
-> +#          {
-> +#             "name":"tcp"
-> +#          },
-> +#          {
-> +#             "name":"unix"
-> +#          },
-> +#          {
-> +#             "name":"spiceport"
-> +#          }
-> +#       ]
-> +#    }
+> +# -> { "execute": "set_link",
+> +#      "arguments": { "name": "e1000.0", "up": false } }
+> +# <- { "return": {} }
 > +#
 > +##
-> +{ 'command': 'query-chardev-backends', 'returns': ['ChardevBackendInfo']=
- }
+> +{ 'command': 'set_link', 'data': {'name': 'str', 'up': 'bool'} }
 > +
 > +##
-> +# @DataFormat:
+> +# @netdev_add:
 > +#
-> +# An enumeration of data format.
+> +# Add a network backend.
 > +#
-> +# @utf8: Data is a UTF-8 string (RFC 3629)
+> +# @type: the type of network backend.  Current valid values are 'user',
+> 'tap',
+> +#        'vde', 'socket', 'dump' and 'bridge'
 > +#
-> +# @base64: Data is Base64 encoded binary (RFC 3548)
+> +# @id: the name of the new network backend
 > +#
-> +# Since: 1.4
-> +##
-> +{ 'enum': 'DataFormat',
-> +  'data': [ 'utf8', 'base64' ] }
-> +
-> +##
-> +# @ringbuf-write:
+> +# Additional arguments depend on the type.
 > +#
-> +# Write to a ring buffer character device.
+> +# TODO: This command effectively bypasses QAPI completely due to its
+> +# "additional arguments" business.  It shouldn't have been added to
+> +# the schema in this form.  It should be qapified properly, or
+> +# replaced by a properly qapified command.
 > +#
-> +# @device: the ring buffer character device name
-> +#
-> +# @data: data to write
-> +#
-> +# @format: data encoding (default 'utf8').
-> +#          - base64: data must be base64 encoded text.  Its binary
-> +#            decoding gets written.
-> +#          - utf8: data's UTF-8 encoding is written
-> +#          - data itself is always Unicode regardless of format, like
-> +#            any other string.
+> +# Since: 0.14.0
 > +#
 > +# Returns: Nothing on success
-> +#
-> +# Since: 1.4
+> +#          If @type is not a valid network backend, DeviceNotFound
 > +#
 > +# Example:
 > +#
-> +# -> { "execute": "ringbuf-write",
-> +#      "arguments": { "device": "foo",
-> +#                     "data": "abcdefgh",
-> +#                     "format": "utf8" } }
+> +# -> { "execute": "netdev_add",
+> +#      "arguments": { "type": "user", "id": "netdev1",
+> +#                     "dnssearch": "example.org" } }
 > +# <- { "return": {} }
 > +#
 > +##
-> +{ 'command': 'ringbuf-write',
-> +  'data': {'device': 'str', 'data': 'str',
-> +           '*format': 'DataFormat'} }
+> +{ 'command': 'netdev_add',
+> +  'data': {'type': 'str', 'id': 'str'},
+> +  'gen': false }                # so we can get the additional arguments
 > +
 > +##
-> +# @ringbuf-read:
+> +# @netdev_del:
 > +#
-> +# Read from a ring buffer character device.
+> +# Remove a network backend.
 > +#
-> +# @device: the ring buffer character device name
-> +#
-> +# @size: how many bytes to read at most
-> +#
-> +# @format: data encoding (default 'utf8').
-> +#          - base64: the data read is returned in base64 encoding.
-> +#          - utf8: the data read is interpreted as UTF-8.
-> +#            Bug: can screw up when the buffer contains invalid UTF-8
-> +#            sequences, NUL characters, after the ring buffer lost
-> +#            data, and when reading stops because the size limit is
-> +#            reached.
-> +#          - The return value is always Unicode regardless of format,
-> +#            like any other string.
-> +#
-> +# Returns: data read from the device
-> +#
-> +# Since: 1.4
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "ringbuf-read",
-> +#      "arguments": { "device": "foo",
-> +#                     "size": 1000,
-> +#                     "format": "utf8" } }
-> +# <- { "return": "abcdefgh" }
-> +#
-> +##
-> +{ 'command': 'ringbuf-read',
-> +  'data': {'device': 'str', 'size': 'int', '*format': 'DataFormat'},
-> +  'returns': 'str' }
-> +
-> +##
-> +# @ChardevCommon:
-> +#
-> +# Configuration shared across all chardev backends
-> +#
-> +# @logfile: The name of a logfile to save output
-> +# @logappend: true to append instead of truncate
-> +#             (default to false to truncate)
-> +#
-> +# Since: 2.6
-> +##
-> +{ 'struct': 'ChardevCommon', 'data': { '*logfile': 'str',
-> +                                       '*logappend': 'bool' } }
-> +
-> +##
-> +# @ChardevFile:
-> +#
-> +# Configuration info for file chardevs.
-> +#
-> +# @in:  The name of the input file
-> +# @out: The name of the output file
-> +# @append: Open the file in append mode (default false to
-> +#          truncate) (Since 2.6)
-> +#
-> +# Since: 1.4
-> +##
-> +{ 'struct': 'ChardevFile', 'data': { '*in' : 'str',
-> +                                   'out' : 'str',
-> +                                   '*append': 'bool' },
-> +  'base': 'ChardevCommon' }
-> +
-> +##
-> +# @ChardevHostdev:
-> +#
-> +# Configuration info for device and pipe chardevs.
-> +#
-> +# @device: The name of the special file for the device,
-> +#          i.e. /dev/ttyS0 on Unix or COM1: on Windows
-> +#
-> +# Since: 1.4
-> +##
-> +{ 'struct': 'ChardevHostdev', 'data': { 'device' : 'str' },
-> +  'base': 'ChardevCommon' }
-> +
-> +##
-> +# @ChardevSocket:
-> +#
-> +# Configuration info for (stream) socket chardevs.
-> +#
-> +# @addr: socket address to listen on (server=3Dtrue)
-> +#        or connect to (server=3Dfalse)
-> +# @tls-creds: the ID of the TLS credentials object (since 2.6)
-> +# @server: create server socket (default: true)
-> +# @wait: wait for incoming connection on server
-> +#        sockets (default: false).
-> +# @nodelay: set TCP_NODELAY socket option (default: false)
-> +# @telnet: enable telnet protocol on server
-> +#          sockets (default: false)
-> +# @tn3270: enable tn3270 protocol on server
-> +#          sockets (default: false) (Since: 2.10)
-> +# @reconnect: For a client socket, if a socket is disconnected,
-> +#          then attempt a reconnect after the given number of seconds.
-> +#          Setting this to zero disables this function. (default: 0)
-> +#          (Since: 2.2)
-> +#
-> +# Since: 1.4
-> +##
-> +{ 'struct': 'ChardevSocket', 'data': { 'addr'       :
-> 'SocketAddressLegacy',
-> +                                     '*tls-creds'  : 'str',
-> +                                     '*server'    : 'bool',
-> +                                     '*wait'      : 'bool',
-> +                                     '*nodelay'   : 'bool',
-> +                                     '*telnet'    : 'bool',
-> +                                     '*tn3270'    : 'bool',
-> +                                     '*reconnect' : 'int' },
-> +  'base': 'ChardevCommon' }
-> +
-> +##
-> +# @ChardevUdp:
-> +#
-> +# Configuration info for datagram socket chardevs.
-> +#
-> +# @remote: remote address
-> +# @local: local address
-> +#
-> +# Since: 1.5
-> +##
-> +{ 'struct': 'ChardevUdp', 'data': { 'remote' : 'SocketAddressLegacy',
-> +                                  '*local' : 'SocketAddressLegacy' },
-> +  'base': 'ChardevCommon' }
-> +
-> +##
-> +# @ChardevMux:
-> +#
-> +# Configuration info for mux chardevs.
-> +#
-> +# @chardev: name of the base chardev.
-> +#
-> +# Since: 1.5
-> +##
-> +{ 'struct': 'ChardevMux', 'data': { 'chardev' : 'str' },
-> +  'base': 'ChardevCommon' }
-> +
-> +##
-> +# @ChardevStdio:
-> +#
-> +# Configuration info for stdio chardevs.
-> +#
-> +# @signal: Allow signals (such as SIGINT triggered by ^C)
-> +#          be delivered to qemu.  Default: true in -nographic mode,
-> +#          false otherwise.
-> +#
-> +# Since: 1.5
-> +##
-> +{ 'struct': 'ChardevStdio', 'data': { '*signal' : 'bool' },
-> +  'base': 'ChardevCommon' }
-> +
-> +
-> +##
-> +# @ChardevSpiceChannel:
-> +#
-> +# Configuration info for spice vm channel chardevs.
-> +#
-> +# @type: kind of channel (for example vdagent).
-> +#
-> +# Since: 1.5
-> +##
-> +{ 'struct': 'ChardevSpiceChannel', 'data': { 'type'  : 'str' },
-> +  'base': 'ChardevCommon' }
-> +
-> +##
-> +# @ChardevSpicePort:
-> +#
-> +# Configuration info for spice port chardevs.
-> +#
-> +# @fqdn: name of the channel (see docs/spice-port-fqdn.txt)
-> +#
-> +# Since: 1.5
-> +##
-> +{ 'struct': 'ChardevSpicePort', 'data': { 'fqdn'  : 'str' },
-> +  'base': 'ChardevCommon' }
-> +
-> +##
-> +# @ChardevVC:
-> +#
-> +# Configuration info for virtual console chardevs.
-> +#
-> +# @width:  console width,  in pixels
-> +# @height: console height, in pixels
-> +# @cols:   console width,  in chars
-> +# @rows:   console height, in chars
-> +#
-> +# Since: 1.5
-> +##
-> +{ 'struct': 'ChardevVC', 'data': { '*width'  : 'int',
-> +                                 '*height' : 'int',
-> +                                 '*cols'   : 'int',
-> +                                 '*rows'   : 'int' },
-> +  'base': 'ChardevCommon' }
-> +
-> +##
-> +# @ChardevRingbuf:
-> +#
-> +# Configuration info for ring buffer chardevs.
-> +#
-> +# @size: ring buffer size, must be power of two, default is 65536
-> +#
-> +# Since: 1.5
-> +##
-> +{ 'struct': 'ChardevRingbuf', 'data': { '*size'  : 'int' },
-> +  'base': 'ChardevCommon' }
-> +
-> +##
-> +# @ChardevBackend:
-> +#
-> +# Configuration info for the new chardev backend.
-> +#
-> +# Since: 1.4 (testdev since 2.2, wctablet since 2.9)
-> +##
-> +{ 'union': 'ChardevBackend', 'data': { 'file'   : 'ChardevFile',
-> +                                       'serial' : 'ChardevHostdev',
-> +                                       'parallel': 'ChardevHostdev',
-> +                                       'pipe'   : 'ChardevHostdev',
-> +                                       'socket' : 'ChardevSocket',
-> +                                       'udp'    : 'ChardevUdp',
-> +                                       'pty'    : 'ChardevCommon',
-> +                                       'null'   : 'ChardevCommon',
-> +                                       'mux'    : 'ChardevMux',
-> +                                       'msmouse': 'ChardevCommon',
-> +                                       'wctablet' : 'ChardevCommon',
-> +                                       'braille': 'ChardevCommon',
-> +                                       'testdev': 'ChardevCommon',
-> +                                       'stdio'  : 'ChardevStdio',
-> +                                       'console': 'ChardevCommon',
-> +                                       'spicevmc' : 'ChardevSpiceChannel=
-',
-> +                                       'spiceport' : 'ChardevSpicePort',
-> +                                       'vc'     : 'ChardevVC',
-> +                                       'ringbuf': 'ChardevRingbuf',
-> +                                       # next one is just for
-> compatibility
-> +                                       'memory' : 'ChardevRingbuf' } }
-> +
-> +##
-> +# @ChardevReturn:
-> +#
-> +# Return info about the chardev backend just created.
-> +#
-> +# @pty: name of the slave pseudoterminal device, present if
-> +#       and only if a chardev of type 'pty' was created
-> +#
-> +# Since: 1.4
-> +##
-> +{ 'struct' : 'ChardevReturn', 'data': { '*pty' : 'str' } }
-> +
-> +##
-> +# @chardev-add:
-> +#
-> +# Add a character device backend
-> +#
-> +# @id: the chardev's ID, must be unique
-> +# @backend: backend type and parameters
-> +#
-> +# Returns: ChardevReturn.
-> +#
-> +# Since: 1.4
-> +#
-> +# Example:
-> +#
-> +# -> { "execute" : "chardev-add",
-> +#      "arguments" : { "id" : "foo",
-> +#                      "backend" : { "type" : "null", "data" : {} } } }
-> +# <- { "return": {} }
-> +#
-> +# -> { "execute" : "chardev-add",
-> +#      "arguments" : { "id" : "bar",
-> +#                      "backend" : { "type" : "file",
-> +#                                    "data" : { "out" : "/tmp/bar.log" }
-> } } }
-> +# <- { "return": {} }
-> +#
-> +# -> { "execute" : "chardev-add",
-> +#      "arguments" : { "id" : "baz",
-> +#                      "backend" : { "type" : "pty", "data" : {} } } }
-> +# <- { "return": { "pty" : "/dev/pty/42" } }
-> +#
-> +##
-> +{ 'command': 'chardev-add', 'data': {'id'      : 'str',
-> +                                     'backend' : 'ChardevBackend' },
-> +  'returns': 'ChardevReturn' }
-> +
-> +##
-> +# @chardev-change:
-> +#
-> +# Change a character device backend
-> +#
-> +# @id: the chardev's ID, must exist
-> +# @backend: new backend type and parameters
-> +#
-> +# Returns: ChardevReturn.
-> +#
-> +# Since: 2.10
-> +#
-> +# Example:
-> +#
-> +# -> { "execute" : "chardev-change",
-> +#      "arguments" : { "id" : "baz",
-> +#                      "backend" : { "type" : "pty", "data" : {} } } }
-> +# <- { "return": { "pty" : "/dev/pty/42" } }
-> +#
-> +# -> {"execute" : "chardev-change",
-> +#     "arguments" : {
-> +#         "id" : "charchannel2",
-> +#         "backend" : {
-> +#             "type" : "socket",
-> +#             "data" : {
-> +#                 "addr" : {
-> +#                     "type" : "unix" ,
-> +#                     "data" : {
-> +#                         "path" : "/tmp/charchannel2.socket"
-> +#                     }
-> +#                  },
-> +#                  "server" : true,
-> +#                  "wait" : false }}}}
-> +# <- {"return": {}}
-> +#
-> +##
-> +{ 'command': 'chardev-change', 'data': {'id'      : 'str',
-> +                                        'backend' : 'ChardevBackend' },
-> +  'returns': 'ChardevReturn' }
-> +
-> +##
-> +# @chardev-remove:
-> +#
-> +# Remove a character device backend
-> +#
-> +# @id: the chardev's ID, must exist and not be in use
+> +# @id: the name of the network backend to remove
 > +#
 > +# Returns: Nothing on success
+> +#          If @id is not a valid network backend, DeviceNotFound
 > +#
-> +# Since: 1.4
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "chardev-remove", "arguments": { "id" : "foo" } }
-> +# <- { "return": {} }
-> +#
-> +##
-> +{ 'command': 'chardev-remove', 'data': {'id': 'str'} }
-> +
-> +##
-> +# @chardev-send-break:
-> +#
-> +# Send a break to a character device
-> +#
-> +# @id: the chardev's ID, must exist
-> +#
-> +# Returns: Nothing on success
-> +#
-> +# Since: 2.10
+> +# Since: 0.14.0
 > +#
 > +# Example:
 > +#
-> +# -> { "execute": "chardev-send-break", "arguments": { "id" : "foo" } }
+> +# -> { "execute": "netdev_del", "arguments": { "id": "netdev1" } }
 > +# <- { "return": {} }
 > +#
 > +##
-> +{ 'command': 'chardev-send-break', 'data': {'id': 'str'} }
+> +{ 'command': 'netdev_del', 'data': {'id': 'str'} }
 > +
 > +##
-> +# @VSERPORT_CHANGE:
+> +# @NetdevNoneOptions:
 > +#
-> +# Emitted when the guest opens or closes a virtio-serial port.
+> +# Use it alone to have zero network devices.
 > +#
-> +# @id: device identifier of the virtio-serial port
+> +# Since: 1.2
+> +##
+> +{ 'struct': 'NetdevNoneOptions',
+> +  'data': { } }
+> +
+> +##
+> +# @NetLegacyNicOptions:
 > +#
-> +# @open: true if the guest has opened the virtio-serial port
+> +# Create a new Network Interface Card.
+> +#
+> +# @netdev: id of -netdev to connect to
+> +#
+> +# @macaddr: MAC address
+> +#
+> +# @model: device model (e1000, rtl8139, virtio etc.)
+> +#
+> +# @addr: PCI device address
+> +#
+> +# @vectors: number of MSI-x vectors, 0 to disable MSI-X
+> +#
+> +# Since: 1.2
+> +##
+> +{ 'struct': 'NetLegacyNicOptions',
+> +  'data': {
+> +    '*netdev':  'str',
+> +    '*macaddr': 'str',
+> +    '*model':   'str',
+> +    '*addr':    'str',
+> +    '*vectors': 'uint32' } }
+> +
+> +##
+> +# @NetdevUserOptions:
+> +#
+> +# Use the user mode network stack which requires no administrator
+> privilege to
+> +# run.
+> +#
+> +# @hostname: client hostname reported by the builtin DHCP server
+> +#
+> +# @restrict: isolate the guest from the host
+> +#
+> +# @ipv4: whether to support IPv4, default true for enabled
+> +#        (since 2.6)
+> +#
+> +# @ipv6: whether to support IPv6, default true for enabled
+> +#        (since 2.6)
+> +#
+> +# @ip: legacy parameter, use net=3D instead
+> +#
+> +# @net: IP network address that the guest will see, in the
+> +#       form addr[/netmask] The netmask is optional, and can be
+> +#       either in the form a.b.c.d or as a number of valid top-most
+> +#       bits. Default is 10.0.2.0/24.
+> +#
+> +# @host: guest-visible address of the host
+> +#
+> +# @tftp: root directory of the built-in TFTP server
+> +#
+> +# @bootfile: BOOTP filename, for use with tftp=3D
+> +#
+> +# @dhcpstart: the first of the 16 IPs the built-in DHCP server can
+> +#             assign
+> +#
+> +# @dns: guest-visible address of the virtual nameserver
+> +#
+> +# @dnssearch: list of DNS suffixes to search, passed as DHCP option
+> +#             to the guest
+> +#
+> +# @ipv6-prefix: IPv6 network prefix (default is fec0::) (since
+> +#               2.6). The network prefix is given in the usual
+> +#               hexadecimal IPv6 address notation.
+> +#
+> +# @ipv6-prefixlen: IPv6 network prefix length (default is 64)
+> +#                  (since 2.6)
+> +#
+> +# @ipv6-host: guest-visible IPv6 address of the host (since 2.6)
+> +#
+> +# @ipv6-dns: guest-visible IPv6 address of the virtual
+> +#            nameserver (since 2.6)
+> +#
+> +# @smb: root directory of the built-in SMB server
+> +#
+> +# @smbserver: IP address of the built-in SMB server
+> +#
+> +# @hostfwd: redirect incoming TCP or UDP host connections to guest
+> +#           endpoints
+> +#
+> +# @guestfwd: forward guest TCP connections
+> +#
+> +# Since: 1.2
+> +##
+> +{ 'struct': 'NetdevUserOptions',
+> +  'data': {
+> +    '*hostname':  'str',
+> +    '*restrict':  'bool',
+> +    '*ipv4':      'bool',
+> +    '*ipv6':      'bool',
+> +    '*ip':        'str',
+> +    '*net':       'str',
+> +    '*host':      'str',
+> +    '*tftp':      'str',
+> +    '*bootfile':  'str',
+> +    '*dhcpstart': 'str',
+> +    '*dns':       'str',
+> +    '*dnssearch': ['String'],
+> +    '*ipv6-prefix':      'str',
+> +    '*ipv6-prefixlen':   'int',
+> +    '*ipv6-host':        'str',
+> +    '*ipv6-dns':         'str',
+> +    '*smb':       'str',
+> +    '*smbserver': 'str',
+> +    '*hostfwd':   ['String'],
+> +    '*guestfwd':  ['String'] } }
+> +
+> +##
+> +# @NetdevTapOptions:
+> +#
+> +# Connect the host TAP network interface name to the VLAN.
+> +#
+> +# @ifname: interface name
+> +#
+> +# @fd: file descriptor of an already opened tap
+> +#
+> +# @fds: multiple file descriptors of already opened multiqueue capable
+> +# tap
+> +#
+> +# @script: script to initialize the interface
+> +#
+> +# @downscript: script to shut down the interface
+> +#
+> +# @br: bridge name (since 2.8)
+> +#
+> +# @helper: command to execute to configure bridge
+> +#
+> +# @sndbuf: send buffer limit. Understands [TGMKkb] suffixes.
+> +#
+> +# @vnet_hdr: enable the IFF_VNET_HDR flag on the tap interface
+> +#
+> +# @vhost: enable vhost-net network accelerator
+> +#
+> +# @vhostfd: file descriptor of an already opened vhost net device
+> +#
+> +# @vhostfds: file descriptors of multiple already opened vhost net
+> +# devices
+> +#
+> +# @vhostforce: vhost on for non-MSIX virtio guests
+> +#
+> +# @queues: number of queues to be created for multiqueue capable tap
+> +#
+> +# @poll-us: maximum number of microseconds that could
+> +# be spent on busy polling for tap (since 2.7)
+> +#
+> +# Since: 1.2
+> +##
+> +{ 'struct': 'NetdevTapOptions',
+> +  'data': {
+> +    '*ifname':     'str',
+> +    '*fd':         'str',
+> +    '*fds':        'str',
+> +    '*script':     'str',
+> +    '*downscript': 'str',
+> +    '*br':         'str',
+> +    '*helper':     'str',
+> +    '*sndbuf':     'size',
+> +    '*vnet_hdr':   'bool',
+> +    '*vhost':      'bool',
+> +    '*vhostfd':    'str',
+> +    '*vhostfds':   'str',
+> +    '*vhostforce': 'bool',
+> +    '*queues':     'uint32',
+> +    '*poll-us':    'uint32'} }
+> +
+> +##
+> +# @NetdevSocketOptions:
+> +#
+> +# Connect the VLAN to a remote VLAN in another QEMU virtual machine usin=
+g
+> a TCP
+> +# socket connection.
+> +#
+> +# @fd: file descriptor of an already opened socket
+> +#
+> +# @listen: port number, and optional hostname, to listen on
+> +#
+> +# @connect: port number, and optional hostname, to connect to
+> +#
+> +# @mcast: UDP multicast address and port number
+> +#
+> +# @localaddr: source address and port for multicast and udp packets
+> +#
+> +# @udp: UDP unicast address and port number
+> +#
+> +# Since: 1.2
+> +##
+> +{ 'struct': 'NetdevSocketOptions',
+> +  'data': {
+> +    '*fd':        'str',
+> +    '*listen':    'str',
+> +    '*connect':   'str',
+> +    '*mcast':     'str',
+> +    '*localaddr': 'str',
+> +    '*udp':       'str' } }
+> +
+> +##
+> +# @NetdevL2TPv3Options:
+> +#
+> +# Connect the VLAN to Ethernet over L2TPv3 Static tunnel
+> +#
+> +# @src: source address
+> +#
+> +# @dst: destination address
+> +#
+> +# @srcport: source port - mandatory for udp, optional for ip
+> +#
+> +# @dstport: destination port - mandatory for udp, optional for ip
+> +#
+> +# @ipv6: force the use of ipv6
+> +#
+> +# @udp: use the udp version of l2tpv3 encapsulation
+> +#
+> +# @cookie64: use 64 bit coookies
+> +#
+> +# @counter: have sequence counter
+> +#
+> +# @pincounter: pin sequence counter to zero -
+> +#              workaround for buggy implementations or
+> +#              networks with packet reorder
+> +#
+> +# @txcookie: 32 or 64 bit transmit cookie
+> +#
+> +# @rxcookie: 32 or 64 bit receive cookie
+> +#
+> +# @txsession: 32 bit transmit session
+> +#
+> +# @rxsession: 32 bit receive session - if not specified
+> +#             set to the same value as transmit
+> +#
+> +# @offset: additional offset - allows the insertion of
+> +#          additional application-specific data before the packet payloa=
+d
 > +#
 > +# Since: 2.1
+> +##
+> +{ 'struct': 'NetdevL2TPv3Options',
+> +  'data': {
+> +    'src':          'str',
+> +    'dst':          'str',
+> +    '*srcport':     'str',
+> +    '*dstport':     'str',
+> +    '*ipv6':        'bool',
+> +    '*udp':         'bool',
+> +    '*cookie64':    'bool',
+> +    '*counter':     'bool',
+> +    '*pincounter':  'bool',
+> +    '*txcookie':    'uint64',
+> +    '*rxcookie':    'uint64',
+> +    'txsession':    'uint32',
+> +    '*rxsession':   'uint32',
+> +    '*offset':      'uint32' } }
+> +
+> +##
+> +# @NetdevVdeOptions:
+> +#
+> +# Connect the VLAN to a vde switch running on the host.
+> +#
+> +# @sock: socket path
+> +#
+> +# @port: port number
+> +#
+> +# @group: group owner of socket
+> +#
+> +# @mode: permissions for socket
+> +#
+> +# Since: 1.2
+> +##
+> +{ 'struct': 'NetdevVdeOptions',
+> +  'data': {
+> +    '*sock':  'str',
+> +    '*port':  'uint16',
+> +    '*group': 'str',
+> +    '*mode':  'uint16' } }
+> +
+> +##
+> +# @NetdevDumpOptions:
+> +#
+> +# Dump VLAN network traffic to a file.
+> +#
+> +# @len: per-packet size limit (64k default). Understands [TGMKkb]
+> +# suffixes.
+> +#
+> +# @file: dump file path (default is qemu-vlan0.pcap)
+> +#
+> +# Since: 1.2
+> +##
+> +{ 'struct': 'NetdevDumpOptions',
+> +  'data': {
+> +    '*len':  'size',
+> +    '*file': 'str' } }
+> +
+> +##
+> +# @NetdevBridgeOptions:
+> +#
+> +# Connect a host TAP network interface to a host bridge device.
+> +#
+> +# @br: bridge name
+> +#
+> +# @helper: command to execute to configure bridge
+> +#
+> +# Since: 1.2
+> +##
+> +{ 'struct': 'NetdevBridgeOptions',
+> +  'data': {
+> +    '*br':     'str',
+> +    '*helper': 'str' } }
+> +
+> +##
+> +# @NetdevHubPortOptions:
+> +#
+> +# Connect two or more net clients through a software hub.
+> +#
+> +# @hubid: hub identifier number
+> +#
+> +# Since: 1.2
+> +##
+> +{ 'struct': 'NetdevHubPortOptions',
+> +  'data': {
+> +    'hubid':     'int32' } }
+> +
+> +##
+> +# @NetdevNetmapOptions:
+> +#
+> +# Connect a client to a netmap-enabled NIC or to a VALE switch port
+> +#
+> +# @ifname: Either the name of an existing network interface supported by
+> +#          netmap, or the name of a VALE port (created on the fly).
+> +#          A VALE port name is in the form 'valeXXX:YYY', where XXX and
+> +#          YYY are non-negative integers. XXX identifies a switch and
+> +#          YYY identifies a port of the switch. VALE ports having the
+> +#          same XXX are therefore connected to the same switch.
+> +#
+> +# @devname: path of the netmap device (default: '/dev/netmap').
+> +#
+> +# Since: 2.0
+> +##
+> +{ 'struct': 'NetdevNetmapOptions',
+> +  'data': {
+> +    'ifname':     'str',
+> +    '*devname':    'str' } }
+> +
+> +##
+> +# @NetdevVhostUserOptions:
+> +#
+> +# Vhost-user network backend
+> +#
+> +# @chardev: name of a unix socket chardev
+> +#
+> +# @vhostforce: vhost on for non-MSIX virtio guests (default: false).
+> +#
+> +# @queues: number of queues to be created for multiqueue vhost-user
+> +#          (default: 1) (Since 2.5)
+> +#
+> +# Since: 2.1
+> +##
+> +{ 'struct': 'NetdevVhostUserOptions',
+> +  'data': {
+> +    'chardev':        'str',
+> +    '*vhostforce':    'bool',
+> +    '*queues':        'int' } }
+> +
+> +##
+> +# @NetClientDriver:
+> +#
+> +# Available netdev drivers.
+> +#
+> +# Since: 2.7
+> +##
+> +{ 'enum': 'NetClientDriver',
+> +  'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
+> 'dump',
+> +            'bridge', 'hubport', 'netmap', 'vhost-user' ] }
+> +
+> +##
+> +# @Netdev:
+> +#
+> +# Captures the configuration of a network device.
+> +#
+> +# @id: identifier for monitor commands.
+> +#
+> +# @type: Specify the driver used for interpreting remaining arguments.
+> +#
+> +# Since: 1.2
+> +#
+> +# 'l2tpv3' - since 2.1
+> +##
+> +{ 'union': 'Netdev',
+> +  'base': { 'id': 'str', 'type': 'NetClientDriver' },
+> +  'discriminator': 'type',
+> +  'data': {
+> +    'none':     'NetdevNoneOptions',
+> +    'nic':      'NetLegacyNicOptions',
+> +    'user':     'NetdevUserOptions',
+> +    'tap':      'NetdevTapOptions',
+> +    'l2tpv3':   'NetdevL2TPv3Options',
+> +    'socket':   'NetdevSocketOptions',
+> +    'vde':      'NetdevVdeOptions',
+> +    'dump':     'NetdevDumpOptions',
+> +    'bridge':   'NetdevBridgeOptions',
+> +    'hubport':  'NetdevHubPortOptions',
+> +    'netmap':   'NetdevNetmapOptions',
+> +    'vhost-user': 'NetdevVhostUserOptions' } }
+> +
+> +##
+> +# @NetLegacy:
+> +#
+> +# Captures the configuration of a network device; legacy.
+> +#
+> +# @vlan: vlan number
+> +#
+> +# @id: identifier for monitor commands
+> +#
+> +# @name: identifier for monitor commands, ignored if @id is present
+> +#
+> +# @opts: device type specific properties (legacy)
+> +#
+> +# Since: 1.2
+> +##
+> +{ 'struct': 'NetLegacy',
+> +  'data': {
+> +    '*vlan': 'int32',
+> +    '*id':   'str',
+> +    '*name': 'str',
+> +    'opts':  'NetLegacyOptions' } }
+> +
+> +##
+> +# @NetLegacyOptionsType:
+> +#
+> +# Since: 1.2
+> +##
+> +{ 'enum': 'NetLegacyOptionsType',
+> +  'data': ['none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
+> +           'dump', 'bridge', 'netmap', 'vhost-user'] }
+> +
+> +##
+> +# @NetLegacyOptions:
+> +#
+> +# Like Netdev, but for use only by the legacy command line options
+> +#
+> +# Since: 1.2
+> +##
+> +{ 'union': 'NetLegacyOptions',
+> +  'base': { 'type': 'NetLegacyOptionsType' },
+> +  'discriminator': 'type',
+> +  'data': {
+> +    'none':     'NetdevNoneOptions',
+> +    'nic':      'NetLegacyNicOptions',
+> +    'user':     'NetdevUserOptions',
+> +    'tap':      'NetdevTapOptions',
+> +    'l2tpv3':   'NetdevL2TPv3Options',
+> +    'socket':   'NetdevSocketOptions',
+> +    'vde':      'NetdevVdeOptions',
+> +    'dump':     'NetdevDumpOptions',
+> +    'bridge':   'NetdevBridgeOptions',
+> +    'netmap':   'NetdevNetmapOptions',
+> +    'vhost-user': 'NetdevVhostUserOptions' } }
+> +
+> +##
+> +# @NetFilterDirection:
+> +#
+> +# Indicates whether a netfilter is attached to a netdev's transmit queue
+> or
+> +# receive queue or both.
+> +#
+> +# @all: the filter is attached both to the receive and the transmit
+> +#       queue of the netdev (default).
+> +#
+> +# @rx: the filter is attached to the receive queue of the netdev,
+> +#      where it will receive packets sent to the netdev.
+> +#
+> +# @tx: the filter is attached to the transmit queue of the netdev,
+> +#      where it will receive packets sent by the netdev.
+> +#
+> +# Since: 2.5
+> +##
+> +{ 'enum': 'NetFilterDirection',
+> +  'data': [ 'all', 'rx', 'tx' ] }
+> +
+> +##
+> +# @RxState:
+> +#
+> +# Packets receiving state
+> +#
+> +# @normal: filter assigned packets according to the mac-table
+> +#
+> +# @none: don't receive any assigned packet
+> +#
+> +# @all: receive all assigned packets
+> +#
+> +# Since: 1.6
+> +##
+> +{ 'enum': 'RxState', 'data': [ 'normal', 'none', 'all' ] }
+> +
+> +##
+> +# @RxFilterInfo:
+> +#
+> +# Rx-filter information for a NIC.
+> +#
+> +# @name: net client name
+> +#
+> +# @promiscuous: whether promiscuous mode is enabled
+> +#
+> +# @multicast: multicast receive state
+> +#
+> +# @unicast: unicast receive state
+> +#
+> +# @vlan: vlan receive state (Since 2.0)
+> +#
+> +# @broadcast-allowed: whether to receive broadcast
+> +#
+> +# @multicast-overflow: multicast table is overflowed or not
+> +#
+> +# @unicast-overflow: unicast table is overflowed or not
+> +#
+> +# @main-mac: the main macaddr string
+> +#
+> +# @vlan-table: a list of active vlan id
+> +#
+> +# @unicast-table: a list of unicast macaddr string
+> +#
+> +# @multicast-table: a list of multicast macaddr string
+> +#
+> +# Since: 1.6
+> +##
+> +{ 'struct': 'RxFilterInfo',
+> +  'data': {
+> +    'name':               'str',
+> +    'promiscuous':        'bool',
+> +    'multicast':          'RxState',
+> +    'unicast':            'RxState',
+> +    'vlan':               'RxState',
+> +    'broadcast-allowed':  'bool',
+> +    'multicast-overflow': 'bool',
+> +    'unicast-overflow':   'bool',
+> +    'main-mac':           'str',
+> +    'vlan-table':         ['int'],
+> +    'unicast-table':      ['str'],
+> +    'multicast-table':    ['str'] }}
+> +
+> +##
+> +# @query-rx-filter:
+> +#
+> +# Return rx-filter information for all NICs (or for the given NIC).
+> +#
+> +# @name: net client name
+> +#
+> +# Returns: list of @RxFilterInfo for all NICs (or for the given NIC).
+> +#          Returns an error if the given @name doesn't exist, or given
+> +#          NIC doesn't support rx-filter querying, or given net client
+> +#          isn't a NIC.
+> +#
+> +# Since: 1.6
 > +#
 > +# Example:
 > +#
-> +# <- { "event": "VSERPORT_CHANGE",
-> +#      "data": { "id": "channel0", "open": true },
-> +#      "timestamp": { "seconds": 1401385907, "microseconds": 422329 } }
+> +# -> { "execute": "query-rx-filter", "arguments": { "name": "vnet0" } }
+> +# <- { "return": [
+> +#         {
+> +#             "promiscuous": true,
+> +#             "name": "vnet0",
+> +#             "main-mac": "52:54:00:12:34:56",
+> +#             "unicast": "normal",
+> +#             "vlan": "normal",
+> +#             "vlan-table": [
+> +#                 4,
+> +#                 0
+> +#             ],
+> +#             "unicast-table": [
+> +#             ],
+> +#             "multicast": "normal",
+> +#             "multicast-overflow": false,
+> +#             "unicast-overflow": false,
+> +#             "multicast-table": [
+> +#                 "01:00:5e:00:00:01",
+> +#                 "33:33:00:00:00:01",
+> +#                 "33:33:ff:12:34:56"
+> +#             ],
+> +#             "broadcast-allowed": false
+> +#         }
+> +#       ]
+> +#    }
 > +#
 > +##
-> +{ 'event': 'VSERPORT_CHANGE',
-> +  'data': { 'id': 'str', 'open': 'bool' } }
-> diff --git a/qapi/event.json b/qapi/event.json
-> index 9c6126d..b9aa6ed 100644
-> --- a/qapi/event.json
-> +++ b/qapi/event.json
-> @@ -397,27 +397,6 @@
->              'sector-num': 'int', 'sectors-count': 'int' } }
->
->  ##
-> -# @VSERPORT_CHANGE:
-> -#
-> -# Emitted when the guest opens or closes a virtio-serial port.
-> -#
-> -# @id: device identifier of the virtio-serial port
-> -#
-> -# @open: true if the guest has opened the virtio-serial port
-> -#
-> -# Since: 2.1
-> -#
-> -# Example:
-> -#
-> -# <- { "event": "VSERPORT_CHANGE",
-> -#      "data": { "id": "channel0", "open": true },
-> -#      "timestamp": { "seconds": 1401385907, "microseconds": 422329 } }
-> -#
-> -##
-> -{ 'event': 'VSERPORT_CHANGE',
-> -  'data': { 'id': 'str', 'open': 'bool' } }
->
-
-That one is a bit special (since it's for virtio-serial), but it is
-char-related stuff, ok.
-
--
-> -##
->  # @MEM_UNPLUG_ERROR:
->  #
->  # Emitted when memory hot unplug error occurs.
+> +{ 'command': 'query-rx-filter', 'data': { '*name': 'str' },
+> +  'returns': ['RxFilterInfo'] }
+> +
+> +##
+> +# @NIC_RX_FILTER_CHANGED:
+> +#
+> +# Emitted once until the 'query-rx-filter' command is executed, the firs=
+t
+> event
+> +# will always be emitted
+> +#
+> +# @name: net client name
+> +#
+> +# @path: device path
+> +#
+> +# Since: 1.6
+> +#
+> +# Example:
+> +#
+> +# <- { "event": "NIC_RX_FILTER_CHANGED",
+> +#      "data": { "name": "vnet0",
+> +#                "path": "/machine/peripheral/vnet0/virtio-backend" },
+> +#      "timestamp": { "seconds": 1368697518, "microseconds": 326866 } }
+> +#    }
+> +#
+> +##
+> +{ 'event': 'NIC_RX_FILTER_CHANGED',
+> +  'data': { '*name': 'str', 'path': 'str' } }
 > --
 > 2.7.5
 >
