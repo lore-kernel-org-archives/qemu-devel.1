@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dlAZc-0006gU-0h
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 05:06:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dlAdK-00087A-5b
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 05:10:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dlAZY-00037w-Sl
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 05:06:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41788)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dlAZY-00036Q-M3
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 05:06:36 -0400
-Date: Fri, 25 Aug 2017 10:06:27 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170825090626.GA2090@work-vm>
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<1503471071-2233-5-git-send-email-peterx@redhat.com>
-	<20170823174411.GG2648@work-vm>
-	<20170825053526.GE14174@pxdev.xzpeter.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1dlAdJ-0005Ik-Al
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 05:10:30 -0400
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:37697)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dlAdJ-0005I5-4t
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 05:10:29 -0400
+Received: by mail-wm0-x22d.google.com with SMTP id b189so7742341wmd.0
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 02:10:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170825053526.GE14174@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC v2 4/8] QAPI: new QMP command option
- "without-bql"
+In-Reply-To: <1adde8d7-762f-8e89-7192-32d370b72af6@redhat.com>
+References: <mailman.3749.1503600836.21955.qemu-devel@nongnu.org>
+	<74846968-830E-4239-9DC7-B1252A5AC946@gmail.com>
+	<60e13112-931d-a517-ddb1-20c2f2de736e@redhat.com>
+	<9CE89958-B59C-4D3C-91C5-ECB4B153C43D@gmail.com>
+	<89d8b7b1-fb0f-a967-927e-8795c7d2b324@redhat.com>
+	<1adde8d7-762f-8e89-7192-32d370b72af6@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 25 Aug 2017 10:10:07 +0100
+Message-ID: <CAFEAcA-OiC_BxpK3_aBrkqie9B2AuefQRupJrnnfSq_asfQLNw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Make test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +33,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Cleber Rosa <crosa@redhat.com>, Programmingkid <programmingkidx@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Wed, Aug 23, 2017 at 06:44:12PM +0100, Dr. David Alan Gilbert wrote:
-> 
-> [...]
-> 
-> > > +Most of the commands require the Big QEMU Lock (BQL) be held during
-> > > +execution.  However, there is a small subset of the commands that may
-> > > +not really need BQL at all.  To mark out this kind of commands, we can
-> > > +specify "without-bql" to "true".  This parameter is only a hint for
-> > > +internal QMP implementation to provide possiblility to allow commands
-> > > +be run in parallel, or reduce the contention of the lock.  Users of QMP
-> > > +should not really be aware of such information.
-> > 
-> > Well, I think users of these commands might select them specifically
-> > because they know that they won't block.  Those who care about latency might
-> > look to use commands that don't take the lock because of a reduced
-> > effect on the performance as well.
-> 
-> What would be the best way to tell user?  I think again this should
-> mostly for HMP only, right?
+On 25 August 2017 at 06:49, Thomas Huth <thuth@redhat.com> wrote:
+> On 25.08.2017 00:16, Cleber Rosa wrote:
+>>
+>> On 08/24/2017 05:50 PM, Programmingkid wrote:
+>>>
+>>> Thank you for the patches. I will test them. I was wondering what is the point to having both 'make check' and 'make test'. It looks like everyone is using 'make check'. Maybe we are better off removing the 'make test' target.
+>>>
+>>
+>> I think the removing the `make test` target is a good thing, if its
+>> tests are either absorbed by an existing `make check*` one.  Now that
+>> depends on what people think the tcg tests (and others) deserve... TLC?
+>> Total annihilation?
+>
+> Since we do not have very good test coverage for TCG yet, I'd like to
+> see this rather fixed than removed! Could you please CC: me on future
+> versions of your patch series (I missed v1)?
 
-It needs to be docuemnted for QMP users as well so that those developing
-management code know what's safe.
+The problem is that we don't have a good framework for building
+guest binaries to run under TCG. We should sort out one of those
+so that it's easy for a new test to say "this is the .c file,
+build it with an ARM gcc [eg using our docker stuff], then
+run it with this QEMU command". When we have that it should
+be straightforward to convert the 'make test' tests to use
+that, and they can be run under 'make check'.
 
-> Maybe we can add a new command to list these lock-free commands.  Or,
-> I can dump something in "help" and "help info" like:
-> 
-> (qemu) help migrate_incoming
-> migrate_incoming uri -- Continue an incoming migration from an -incoming defer (BQL-less)
-
-'lock free' might be better?
-
-Dave
-
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
