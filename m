@@ -1,40 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.poctavek@erigones.com>) id 1dlD17-000276-L6
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:43:14 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1dlD4b-00054r-6M
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:46:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.poctavek@erigones.com>) id 1dlD12-00081D-RB
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:43:13 -0400
-Received: from zimbra.entira.sk ([93.184.68.160]:33346)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jan.poctavek@erigones.com>)
-	id 1dlD12-0007xA-Fe
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:43:08 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.entira.sk (Postfix) with ESMTP id A80ED567ADD
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 13:42:59 +0200 (CEST)
-Received: from zimbra.entira.sk ([127.0.0.1])
-	by localhost (zimbra.entira.sk [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id rVZG_ZTvnbG2 for <qemu-devel@nongnu.org>;
-	Fri, 25 Aug 2017 13:42:58 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.entira.sk (Postfix) with ESMTP id C4ED0567AE1
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 13:42:58 +0200 (CEST)
-Received: from zimbra.entira.sk ([127.0.0.1])
-	by localhost (zimbra.entira.sk [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id u6wTMexLB2bK for <qemu-devel@nongnu.org>;
-	Fri, 25 Aug 2017 13:42:58 +0200 (CEST)
-Received: from [10.0.1.28] (gw-vnet.erigones.com [86.110.232.234])
-	by zimbra.entira.sk (Postfix) with ESMTPSA id 94725567ADD
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 13:42:58 +0200 (CEST)
-From: =?UTF-8?Q?J=c3=a1n_Poctavek?= <jan.poctavek@erigones.com>
-Message-ID: <8c62454c-828b-0f16-76dd-227d9c52af1d@erigones.com>
-Date: Fri, 25 Aug 2017 13:42:55 +0200
-MIME-Version: 1.0
-Content-Language: en-US
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] wrong ioctl error handling on dirty pages sync?
+	(envelope-from <frederic.konrad@adacore.com>) id 1dlD4W-0001Rn-Oi
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:46:49 -0400
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Date: Fri, 25 Aug 2017 13:46:09 +0200
+Message-Id: <1503661569-11408-1-git-send-email-frederic.konrad@adacore.com>
+Subject: [Qemu-devel] [PATCH for-2.11] aux-to-i2c-bridge: don't allow user
+ to create one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,20 +19,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, thuth@redhat.com, frederic.konrad@adacore.com
 
-Hi guys,
+This device is private and is created once per aux-bus.
+So don't allow the user to create one from command-line.
 
-Maybe it is just my lack of understanding, this seems like a bug to me:
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+---
+ hw/misc/auxbus.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-To get list of dirty pages, qemu calls kvm_vm_ioctl() with 
-KVM_GET_DIRTY_LOG:
-https://github.com/qemu/qemu/blob/v2.10.0-rc4/accel/kvm/kvm-all.c#L494
-
-and considers the ioctl call failed when -1 is returned.
-
-But the kvm_vm_ioctl() itself returns -errno, not the -1 on error:
-https://github.com/qemu/qemu/blob/v2.10.0-rc4/accel/kvm/kvm-all.c#L2142
-
-Thanks in advance for sheding some light into this for me.
-
-Jan
+diff --git a/hw/misc/auxbus.c b/hw/misc/auxbus.c
+index 8a90ddd..1182745 100644
+--- a/hw/misc/auxbus.c
++++ b/hw/misc/auxbus.c
+@@ -210,6 +210,16 @@ struct AUXTOI2CState {
+     I2CBus *i2c_bus;
+ };
+ 
++static void aux_bridge_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++
++    /* This device is private and is created only once for each
++     * aux-bus in aux_init_bus(..). So don't allow the user to add one.
++     */
++    dc->user_creatable = false;
++}
++
+ static void aux_bridge_init(Object *obj)
+ {
+     AUXTOI2CState *s = AUXTOI2C(obj);
+@@ -225,6 +235,7 @@ static inline I2CBus *aux_bridge_get_i2c_bus(AUXTOI2CState *bridge)
+ static const TypeInfo aux_to_i2c_type_info = {
+     .name = TYPE_AUXTOI2C,
+     .parent = TYPE_DEVICE,
++    .class_init = aux_bridge_class_init,
+     .instance_size = sizeof(AUXTOI2CState),
+     .instance_init = aux_bridge_init
+ };
+-- 
+1.8.3.1
