@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dlClk-0004cM-Bf
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:27:25 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCmc-000580-9s
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:28:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCli-000188-4W
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:27:20 -0400
-Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:37419)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCma-0001WS-Rj
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:28:14 -0400
+Received: from mail-vk0-x243.google.com ([2607:f8b0:400c:c05::243]:35862)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dlClh-00017y-UV
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:27:18 -0400
-Received: by mail-ua0-x241.google.com with SMTP id e10so623426uah.4
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 04:27:17 -0700 (PDT)
+	id 1dlCma-0001WI-L0
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:28:12 -0400
+Received: by mail-vk0-x243.google.com with SMTP id d124so825739vkf.3
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 04:28:12 -0700 (PDT)
 MIME-Version: 1.0
 References: <1503602048-12268-1-git-send-email-armbru@redhat.com>
-	<1503602048-12268-16-git-send-email-armbru@redhat.com>
-In-Reply-To: <1503602048-12268-16-git-send-email-armbru@redhat.com>
+	<1503602048-12268-17-git-send-email-armbru@redhat.com>
+In-Reply-To: <1503602048-12268-17-git-send-email-armbru@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 25 Aug 2017 11:27:07 +0000
-Message-ID: <CAJ+F1CL0S-wngP5Oj=zX5FUUA311iLXZ477nVxpWgZFoX=FnnA@mail.gmail.com>
+Date: Fri, 25 Aug 2017 11:28:01 +0000
+Message-ID: <CAJ+F1C+XWuqpEXSozvdpgivrgv--9UXVts4Vp_VAKGA_r=U_cA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 15/16] qapi-schema: Move queries from
- common.json to qapi-schema.json
+Subject: Re: [Qemu-devel] [PATCH v2 16/16] qapi-schema: Improve section
+ headings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,274 +33,140 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-Hi
-
-On Thu, Aug 24, 2017 at 9:20 PM Markus Armbruster <armbru@redhat.com> wrote=
+On Thu, Aug 24, 2017 at 9:14 PM Markus Armbruster <armbru@redhat.com> wrote=
 :
 
-> query-version and query-commands are in common.json for no good
-> reason.  Several similar queries are in qapi-schema.json.  Move them
-> there.
+> The generated QEMU QMP reference is now structured as follows:
 >
-> I suppose it was initially meant to be shared with all QMP users, qga etc=
-?
-That didn't happen, and is not planned either
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>     1.1 Introduction
+>     1.2 Stability Considerations
+>     1.3 Common data types
+>     1.4 Socket data types
+>     1.5 VM run state
+>     1.6 Cryptography
+>     1.7 Block devices
+>     1.7.1 Block core (VM unrelated)
+>     1.7.2 QAPI block definitions (vm unrelated)
+>     1.8 Character devices
+>     1.9 Net devices
+>     1.10 Rocker switch device
+>     1.11 TPM (trusted platform module) devices
+>     1.12 Remote desktop
+>     1.12.1 Spice
+>     1.12.2 VNC
+>     1.13 Input
+>     1.14 Migration
+>     1.15 Transactions
+>     1.16 Tracing
+>     1.17 QMP introspection
+>     1.18 Miscellanea
+>
+> Section "1.18 Miscellanea" is still too big: it documents 134 symbols.
+> Section "1.7.1 Block core (VM unrelated)" is also rather big: 128
+> symbols.  All the others are of reasonable size.
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >
 
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
+
 > ---
->  qapi-schema.json | 103
-> +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  qapi/common.json | 103
-> -------------------------------------------------------
->  2 files changed, 103 insertions(+), 103 deletions(-)
+>  qapi-schema.json     | 2 +-
+>  qapi/block-core.json | 2 +-
+>  qapi/block.json      | 5 ++---
+>  qapi/common.json     | 2 +-
+>  qapi/crypto.json     | 2 +-
+>  qapi/trace.json      | 2 +-
+>  6 files changed, 7 insertions(+), 8 deletions(-)
 >
 > diff --git a/qapi-schema.json b/qapi-schema.json
-> index 80c15da..7a393ec 100644
+> index 7a393ec..f3af2cb 100644
 > --- a/qapi-schema.json
 > +++ b/qapi-schema.json
-> @@ -119,6 +119,109 @@
->  { 'command': 'qmp_capabilities' }
+> @@ -94,7 +94,7 @@
+>  { 'include': 'qapi/introspect.json' }
 >
 >  ##
-> +# @VersionTriple:
-> +#
-> +# A three-part version number.
-> +#
-> +# @major:  The major version number.
-> +#
-> +# @minor:  The minor version number.
-> +#
-> +# @micro:  The micro version number.
-> +#
-> +# Since: 2.4
-> +##
-> +{ 'struct': 'VersionTriple',
-> +  'data': {'major': 'int', 'minor': 'int', 'micro': 'int'} }
-> +
-> +
-> +##
-> +# @VersionInfo:
-> +#
-> +# A description of QEMU's version.
-> +#
-> +# @qemu:        The version of QEMU.  By current convention, a micro
-> +#               version of 50 signifies a development branch.  A micro
-> version
-> +#               greater than or equal to 90 signifies a release candidat=
-e
-> for
-> +#               the next minor version.  A micro version of less than 50
-> +#               signifies a stable release.
-> +#
-> +# @package:     QEMU will always set this field to an empty string.
-> Downstream
-> +#               versions of QEMU should set this to a non-empty string.
-> The
-> +#               exact format depends on the downstream however it highly
-> +#               recommended that a unique name is used.
-> +#
-> +# Since: 0.14.0
-> +##
-> +{ 'struct': 'VersionInfo',
-> +  'data': {'qemu': 'VersionTriple', 'package': 'str'} }
-> +
-> +##
-> +# @query-version:
-> +#
-> +# Returns the current version of QEMU.
-> +#
-> +# Returns:  A @VersionInfo object describing the current version of QEMU=
-.
-> +#
-> +# Since: 0.14.0
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-version" }
-> +# <- {
-> +#       "return":{
-> +#          "qemu":{
-> +#             "major":0,
-> +#             "minor":11,
-> +#             "micro":5
-> +#          },
-> +#          "package":""
-> +#       }
-> +#    }
-> +#
-> +##
-> +{ 'command': 'query-version', 'returns': 'VersionInfo' }
-> +
-> +##
-> +# @CommandInfo:
-> +#
-> +# Information about a QMP command
-> +#
-> +# @name: The command name
-> +#
-> +# Since: 0.14.0
-> +##
-> +{ 'struct': 'CommandInfo', 'data': {'name': 'str'} }
-> +
-> +##
-> +# @query-commands:
-> +#
-> +# Return a list of supported QMP commands by this server
-> +#
-> +# Returns: A list of @CommandInfo for all supported commands
-> +#
-> +# Since: 0.14.0
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-commands" }
-> +# <- {
-> +#      "return":[
-> +#         {
-> +#            "name":"query-balloon"
-> +#         },
-> +#         {
-> +#            "name":"system_powerdown"
-> +#         }
-> +#      ]
-> +#    }
-> +#
-> +# Note: This example has been shortened as the real response is too long=
-.
-> +#
-> +##
-> +{ 'command': 'query-commands', 'returns': ['CommandInfo'] }
-> +
-> +##
->  # @LostTickPolicy:
->  #
->  # Policy for handling lost ticks in timer devices.
+> -# =3D QMP commands
+> +# =3D Miscellanea
+>  ##
+>
+>  ##
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index f4caa5c..28abb9e 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -1,7 +1,7 @@
+>  # -*- Mode: Python -*-
+>
+>  ##
+> -# =3D=3D QAPI block core definitions (vm unrelated)
+> +# =3D=3D Block core (VM unrelated)
+>  ##
+>
+>  { 'include': 'common.json' }
+> diff --git a/qapi/block.json b/qapi/block.json
+> index 8ce3357..f093fa3 100644
+> --- a/qapi/block.json
+> +++ b/qapi/block.json
+> @@ -1,14 +1,13 @@
+>  # -*- Mode: Python -*-
+>
+>  ##
+> -# =3D QAPI block definitions
+> +# =3D Block devices
+>  ##
+>
+> -# QAPI block core definitions
+>  { 'include': 'block-core.json' }
+>
+>  ##
+> -# =3D=3D QAPI block definitions (vm unrelated)
+> +# =3D=3D Additional block stuff (VM related)
+>  ##
+>
+>  ##
 > diff --git a/qapi/common.json b/qapi/common.json
-> index fc72d7e..0c67e4a 100644
+> index 0c67e4a..6eb0182 100644
 > --- a/qapi/common.json
 > +++ b/qapi/common.json
-> @@ -29,109 +29,6 @@
->              'DeviceNotActive', 'DeviceNotFound', 'KVMMissingCap' ] }
+> @@ -1,7 +1,7 @@
+>  # -*- Mode: Python -*-
 >
 >  ##
-> -# @VersionTriple:
-> -#
-> -# A three-part version number.
-> -#
-> -# @major:  The major version number.
-> -#
-> -# @minor:  The minor version number.
-> -#
-> -# @micro:  The micro version number.
-> -#
-> -# Since: 2.4
-> -##
-> -{ 'struct': 'VersionTriple',
-> -  'data': {'major': 'int', 'minor': 'int', 'micro': 'int'} }
-> -
-> -
-> -##
-> -# @VersionInfo:
-> -#
-> -# A description of QEMU's version.
-> -#
-> -# @qemu:        The version of QEMU.  By current convention, a micro
-> -#               version of 50 signifies a development branch.  A micro
-> version
-> -#               greater than or equal to 90 signifies a release candidat=
-e
-> for
-> -#               the next minor version.  A micro version of less than 50
-> -#               signifies a stable release.
-> -#
-> -# @package:     QEMU will always set this field to an empty string.
-> Downstream
-> -#               versions of QEMU should set this to a non-empty string.
-> The
-> -#               exact format depends on the downstream however it highly
-> -#               recommended that a unique name is used.
-> -#
-> -# Since: 0.14.0
-> -##
-> -{ 'struct': 'VersionInfo',
-> -  'data': {'qemu': 'VersionTriple', 'package': 'str'} }
-> -
-> -##
-> -# @query-version:
-> -#
-> -# Returns the current version of QEMU.
-> -#
-> -# Returns:  A @VersionInfo object describing the current version of QEMU=
-.
-> -#
-> -# Since: 0.14.0
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "query-version" }
-> -# <- {
-> -#       "return":{
-> -#          "qemu":{
-> -#             "major":0,
-> -#             "minor":11,
-> -#             "micro":5
-> -#          },
-> -#          "package":""
-> -#       }
-> -#    }
-> -#
-> -##
-> -{ 'command': 'query-version', 'returns': 'VersionInfo' }
-> -
-> -##
-> -# @CommandInfo:
-> -#
-> -# Information about a QMP command
-> -#
-> -# @name: The command name
-> -#
-> -# Since: 0.14.0
-> -##
-> -{ 'struct': 'CommandInfo', 'data': {'name': 'str'} }
-> -
-> -##
-> -# @query-commands:
-> -#
-> -# Return a list of supported QMP commands by this server
-> -#
-> -# Returns: A list of @CommandInfo for all supported commands
-> -#
-> -# Since: 0.14.0
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "query-commands" }
-> -# <- {
-> -#      "return":[
-> -#         {
-> -#            "name":"query-balloon"
-> -#         },
-> -#         {
-> -#            "name":"system_powerdown"
-> -#         }
-> -#      ]
-> -#    }
-> -#
-> -# Note: This example has been shortened as the real response is too long=
-.
-> -#
-> -##
-> -{ 'command': 'query-commands', 'returns': ['CommandInfo'] }
-> -
-> -##
->  # @IoOperationType:
+> -# =3D QAPI common definitions
+> +# =3D Common data types
+>  ##
+>
+>  ##
+> diff --git a/qapi/crypto.json b/qapi/crypto.json
+> index 6b6fde3..288bc05 100644
+> --- a/qapi/crypto.json
+> +++ b/qapi/crypto.json
+> @@ -2,7 +2,7 @@
 >  #
->  # An enumeration of the I/O operation types
+>
+>  ##
+> -# =3D QAPI crypto definitions
+> +# =3D Cryptography
+>  ##
+>
+>  ##
+> diff --git a/qapi/trace.json b/qapi/trace.json
+> index de6588d..799b254 100644
+> --- a/qapi/trace.json
+> +++ b/qapi/trace.json
+> @@ -6,7 +6,7 @@
+>  # See the COPYING file in the top-level directory.
+>
+>  ##
+> -# =3D Tracing commands
+> +# =3D Tracing
+>  ##
+>
+>  ##
 > --
 > 2.7.5
 >
