@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dlCAf-00052w-Gy
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 06:49:02 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dlCKl-0007A9-8R
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 06:59:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dlCAc-0007yr-G5
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 06:49:01 -0400
-Received: from mail-wm0-f41.google.com ([74.125.82.41]:35390)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dlCAc-0007yi-9C
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 06:48:58 -0400
-Received: by mail-wm0-f41.google.com with SMTP id y71so68181wmd.0
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 03:48:58 -0700 (PDT)
-References: <283a2a27-7fb5-5fa7-4921-60ba91f13666@ozlabs.ru>
-	<20170818131853.GB17654@stefanha-x1.localdomain>
-	<20170821043125.GH12356@umbus.fritz.box>
-	<6e2ae379-9cff-9615-c19f-747867328cb5@ozlabs.ru>
-	<acb8a5b9-559f-665c-9072-582f3ddc593b@ozlabs.ru>
-	<20170824123006.GK5379@umbus.fritz.box>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7ee077ae-4e7e-8baf-9caa-9378f4a7b604@redhat.com>
-Date: Fri, 25 Aug 2017 12:48:54 +0200
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dlCKg-0004iW-Dl
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 06:59:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43494)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dlCKg-0004hx-8G
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 06:59:22 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D583C285B5
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 10:59:19 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri, 25 Aug 2017 12:58:59 +0200
+Message-Id: <20170825105913.4060-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170824123006.GK5379@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Memory use with >100 virtio devices
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 00/14] Generate a literal qobject for
+ introspection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,27 +32,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 24/08/2017 14:30, David Gibson wrote:
->>
->> Ideas what to tweak or what valgrind tool to try?
-> valgrind probably isn't that useful at this point.  I think we need to
-> instrument bits of the code to find what the O(n^2) algo is and fix it.
-> 
-> Seems to me checking if the address_spaces list is growing to O(n^2)
-> entries would be a good place to start.
+Hi,
 
+This series is based on patches 2-5 from "[PATCH v2 00/54] qapi: add #if
+pre-processor conditions to generated code". Generating a literal qobject
+will allow to easily introduce #if conditionals from the original series.
 
-The address spaces are O(n) (and so are the FlatView and the dispatch
-tries), but each of them has O(n) size.
+v2:
+- use QLIST_FOREACH_ENTRY for list comparison
+- update qdict comparison to check for the size instead of doing a
+  qdict copy
+- commit message update
+- add r-b tags
 
-Eventually we use O(n^2) memory, but we build them O(n) times---which is
-expensive and also means, due to RCU, that there can be a short amount
-of time where it is between O(n^2) and O(n^3).
+Marc-Andr=C3=A9 Lureau (14):
+  qdict: add qdict_put_null() helper
+  qlit: move qlit from check-qjson to qobject/
+  qlit: use QLit prefix consistently
+  qlit: remove compound literals
+  qlit: rename compare_litqobj_to_qobj() to qlit_equal_qobject()
+  qlit: make qlit_equal_qobject return a bool
+  qlit: make qlit_equal_qobject() take const arguments
+  qlit: add QLIT_QNULL and QLIT_BOOL
+  qlit: Replace open-coded qnum_get_int() by call
+  tests: add qlit tests
+  qlit: improve QLit dict vs qdict comparison
+  qlit: improve QLit list vs qlist comparison
+  qlit: add qobject_form_qlit()
+  qapi: generate a literal qobject for introspection
 
-The scheme I suggested elsewhere in the thread should cut one "n", by
-sharing one FlatViews and dispatch trie across all AddressSpaces.
+ scripts/qapi-introspect.py         |  87 ++++++++++++---------
+ include/qapi/qmp/qdict.h           |   4 +-
+ include/qapi/qmp/qlit.h            |  56 ++++++++++++++
+ monitor.c                          |   2 +-
+ qobject/qlit.c                     | 121 ++++++++++++++++++++++++++++++
+ target/i386/cpu.c                  |   4 +-
+ tests/check-qjson.c                | 150 +++++++------------------------=
+------
+ tests/check-qlit.c                 | 100 +++++++++++++++++++++++++
+ tests/test-qobject-input-visitor.c |  11 ++-
+ docs/devel/qapi-code-gen.txt       |  29 ++++---
+ qobject/Makefile.objs              |   2 +-
+ tests/Makefile.include             |   5 +-
+ 12 files changed, 393 insertions(+), 178 deletions(-)
+ create mode 100644 include/qapi/qmp/qlit.h
+ create mode 100644 qobject/qlit.c
+ create mode 100644 tests/check-qlit.c
 
-Paolo
+--=20
+2.14.1.146.gd35faa819
