@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dlA1d-0004UU-0O
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:31:33 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dlALu-0000cB-SZ
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:52:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dlA1Z-0005UI-3A
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:31:33 -0400
-Received: from ozlabs.ru ([107.173.13.209]:34762)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dlA1Y-0005Ts-T8
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:31:29 -0400
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Fri, 25 Aug 2017 18:31:23 +1000
-Message-Id: <20170825083123.47432-1-aik@ozlabs.ru>
-In-Reply-To: <20170824123006.GK5379@umbus.fritz.box>
-References: <20170824123006.GK5379@umbus.fritz.box>
-Subject: [Qemu-devel] [RFC PATCH qemu] exec: Destroy dispatch immediately
+	(envelope-from <stefanha@redhat.com>) id 1dlALr-0005Io-R0
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:52:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53834)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dlALr-0005Ie-Hq
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 04:52:27 -0400
+Date: Fri, 25 Aug 2017 09:52:22 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170825085222.GA9688@stefanha-x1.localdomain>
+References: <20170824072202.26818-1-stefanha@redhat.com>
+	<20170824083843.GB1866@lemon>
+	<20170824180402.GA4368@stefanha-x1.localdomain>
+	<20170825073229.GC11465@lemon.lan>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170825073229.GC11465@lemon.lan>
+Subject: Re: [Qemu-devel] [PATCH 0/3] iotests: clean up resources using
+ context managers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +30,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-Otherwise old dispatch holds way too much memory before RCU gets
-a chance to free old dispatches.
+On Fri, Aug 25, 2017 at 03:32:29PM +0800, Fam Zheng wrote:
+> On Thu, 08/24 19:04, Stefan Hajnoczi wrote:
+> > On Thu, Aug 24, 2017 at 04:38:43PM +0800, Fam Zheng wrote:
+> > > On Thu, 08/24 08:21, Stefan Hajnoczi wrote:
+> > > > Tests should declare resources upfront in a with statement.  Resources are
+> > > > automatically cleaned up whether the test passes or fails:
+> > > > 
+> > > >   with FilePath('test.img') as img_path,
+> > > >        VM() as vm:
+> > > >       ...test...
+> > > >   # img_path is deleted and vm is shut down automatically
+> > > 
+> > > Looks good but still requires test writers to learn and remember to use FilePath
+> > > and with.
+> > 
+> > You cannot forget to use FilePath() unless you love typing at
+> > os.path.join(iotests.test_dir, 'test.img').  It's much better than open
+> > coding filename generation!
+> > 
+> > > These are still boilerplates.  Here goes my personal oppinion, so may
+> > > not be plausible:
+> > > 
+> > > - For VM() maybe add an atexit in the launch() method also makes sure the VM is
+> > >   eventually terminated.
+> > > 
+> > >   This means vm.shutdown() is still needed in tearDown() if there are multiple
+> > >   test methods and each of them expects a clean state, but that is probably
+> > >   still less typing (and also indenting) than the with approach, and also easy
+> > >   to remember (otherwise a test will fail).
+> > 
+> > I looked into atexit before going this route.  atexit does not have an
+> > unregister() API in Python 2.  This makes it ugly to use because some
+> > tests do not want the resource to remain for the duration of the
+> > process.
+> > 
+> > A related point is that the Python objects used by atexit handlers live
+> > until the end of the process.  They cannot be garbage collected because
+> > the atexit handler still has a reference to them.
+> 
+> I think this shortcoming can be solved with a clean up list ("all problems in
+> computer science can be solved by another level of indirection"):
+> 
+> _clean_up_list = set()
+> def _clean_up_handler():
+>     for i in _clean_up_list:
+>         try:
+>             i()
+>         except:
+>             pass
+> 
+> atexit.register(_clean_up_handler)
+> 
+> class VM(...):
+> 
+>     def launch():
+>         ...
+>         _clean_up_list.add(self.launch)
+> 
+>     def shutdown():
+>         _clean_up_list.remove(self.launch)
+>         ...
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
+atexit is still less powerful than context managers because its scope is
+fixed.  Handler functions are only called when the process terminates.
+Many test cases do not want resources (especially the VMs) around
+forever because they run several iterations or sub-tests.
 
-This is a follow-up to the "Memory use with >100 virtio devices"
-thread.
+The with statement can be used both for process-lifetime and for more
+fine-grained scoping.  That's why I chose it.
 
+If you stick to atexit then sub-tests or iterations require manual
+vm.shutdown() - something that is not necessary using the with
+statement.
 
-I assume this is a dirty hack (which fixes the problem though)
-and I wonder what the proper solution would be. Thanks.
-
-
-What happens here is that every virtio block device creates 2 address
-spaces - for modern config space (called "virtio-pci-cfg-as") and
-for busmaster (common pci thing, called after the device name,
-in my case "virtio-blk-pci").
-
-Each address_space_init() updates topology for _every_ address space.
-Every topology update (address_space_update_topology()) creates a new
-dispatch tree - AddressSpaceDispatch with nodes (1KB) and
-sections (48KB) and destroys the old one.
-
-However the dispatch destructor is postponed via RCU which does not
-get a chance to execute until the machine is initialized but before
-we get there, memory is not returned to the pool, and this is a lot
-of memory which grows n^2.
-
-
-Interestingly, mem_add() from exec.c is called twice:
-as as->dispatch_listener.region_add() and
-as as->dispatch_listener.region_nop() - I did not understand
-the trick but it does not work if I remove the .region_nop() hook.
-How does it work? :)
-
----
- exec.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/exec.c b/exec.c
-index 01ac21e3cd..ea5f3eb209 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2707,7 +2707,7 @@ static void mem_commit(MemoryListener *listener)
- 
-     atomic_rcu_set(&as->dispatch, next);
-     if (cur) {
--        call_rcu(cur, address_space_dispatch_free, rcu);
-+        address_space_dispatch_free(cur);
-     }
- }
- 
--- 
-2.11.0
+Stefan
