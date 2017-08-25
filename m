@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dlEbT-0006z5-I8
+	(envelope-from <el13635@mail.ntua.gr>) id 1dlEbT-0006zP-K2
 	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:24:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dlEbR-0003S8-P9
+	(envelope-from <el13635@mail.ntua.gr>) id 1dlEbO-0003QO-Qq
 	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:24:51 -0400
 From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Fri, 25 Aug 2017 16:23:32 +0300
-Message-Id: <20170825132332.6734-8-el13635@mail.ntua.gr>
+Date: Fri, 25 Aug 2017 16:23:26 +0300
+Message-Id: <20170825132332.6734-2-el13635@mail.ntua.gr>
 In-Reply-To: <20170825132332.6734-1-el13635@mail.ntua.gr>
 References: <20170825132332.6734-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH v3 7/7] qemu-iotests: add 191 for legacy
- throttling interface
+Subject: [Qemu-devel] [PATCH v3 1/7] block: skip implicit nodes in snapshots,
+ blockjobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,184 +23,230 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel <qemu-devel@nongnu.org>
 Cc: qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Check that the implicit throttle filter driver node, used for
-compatibility with the legacy throttling interface on the BlockBackend
-level, works.
+Implicit filter nodes added at the top of nodes can interfere with block
+jobs. This is not a problem when they are added by other jobs since
+adding another job will issue a QERR_DEVICE_IN_USE, but it can happen in
+the next commit which introduces an implicitly created throttle filter
+node below BlockBackend, which we want to be skipped during automatic
+operations on the graph since the user does not necessarily know about
+their existence.
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+All implicit filters will have either bs->file or bs->backing set. This
+is a needed assumption so we can know which direction we will skip down
+the graph.
+
 Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 ---
- tests/qemu-iotests/191     | 138 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/191.out |   5 ++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 144 insertions(+)
- create mode 100644 tests/qemu-iotests/191
- create mode 100644 tests/qemu-iotests/191.out
+ include/block/block_int.h | 17 +++++++++++++++++
+ block.c                   | 10 ++++++++++
+ block/qapi.c              | 14 +++++---------
+ blockdev.c                | 34 ++++++++++++++++++++++++++++++++++
+ 4 files changed, 66 insertions(+), 9 deletions(-)
 
-diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
-new file mode 100644
-index 0000000000..82fd0b2fe5
---- /dev/null
-+++ b/tests/qemu-iotests/191
-@@ -0,0 +1,138 @@
-+#!/usr/bin/env python
-+#
-+# Tests that the legacy throttling interface using an implicit throttle filter
-+# driver node works
-+#
-+# Copyright (C) 2017 Manos Pitsidianakis
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 7571c0aaaf..9e0f70e055 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -699,6 +699,21 @@ static inline BlockDriverState *backing_bs(BlockDriverState *bs)
+     return bs->backing ? bs->backing->bs : NULL;
+ }
+ 
++static inline BlockDriverState *file_bs(BlockDriverState *bs)
++{
++    return bs->file ? bs->file->bs : NULL;
++}
 +
-+import os
-+import iotests
++/* This is a convenience function to get either bs->file->bs or
++ * bs->backing->bs * */
++static inline BlockDriverState *child_bs(BlockDriverState *bs)
++{
++    BlockDriverState *backing = backing_bs(bs);
++    BlockDriverState *file = file_bs(bs);
++    assert(!(file && backing));
++    return backing ?: file;
++}
 +
-+class TestLegacyThrottling(iotests.QMPTestCase):
-+    test_img = os.path.join(iotests.test_dir, "test.img")
-+    target_img = os.path.join(iotests.test_dir, "target.img")
-+    base_img = os.path.join(iotests.test_dir, "base.img")
+ 
+ /* Essential block drivers which must always be statically linked into qemu, and
+  * which therefore can be accessed without using bdrv_find_format() */
+@@ -980,4 +995,6 @@ void bdrv_dec_in_flight(BlockDriverState *bs);
+ 
+ void blockdev_close_all_bdrv_states(void);
+ 
++BlockDriverState *bdrv_get_first_explicit(BlockDriverState *bs);
 +
-+    def setUp(self):
-+        iotests.qemu_img("create", "-f", iotests.imgfmt, self.base_img, "1G")
-+        iotests.qemu_img("create", "-f", iotests.imgfmt, self.test_img, "-b", self.base_img)
-+        iotests.qemu_io("-f", iotests.imgfmt, "-c", "write -P0x5d 1M 128M", self.test_img)
-+        self.vm = iotests.VM().add_drive(self.test_img)
-+        self.vm.launch()
+ #endif /* BLOCK_INT_H */
+diff --git a/block.c b/block.c
+index 3615a6809e..e35d546c08 100644
+--- a/block.c
++++ b/block.c
+@@ -4945,3 +4945,13 @@ bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
+ 
+     return drv->bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp);
+ }
 +
-+    def tearDown(self):
-+        self.do_check_throttle_node(expect=True)
-+        params = {"device": "drive0",
-+                  "bps": 0,
-+                  "bps_rd": 0,
-+                  "bps_wr": 0,
-+                  "iops": 0,
-+                  "iops_rd": 0,
-+                  "iops_wr": 0,
-+                 }
-+        """
-+        This must remove the implicit throttle_node
-+        """
-+        result = self.vm.qmp("block_set_io_throttle", conv_keys=False,
-+                             **params)
-+        self.do_check_throttle_node(expect=False)
-+        self.vm.shutdown()
++/* Get first explicit node down a bs chain. */
++BlockDriverState *bdrv_get_first_explicit(BlockDriverState *bs)
++{
++    while (bs && bs->drv && bs->implicit) {
++        bs = child_bs(bs);
++        assert(bs);
++    }
++    return bs;
++}
+diff --git a/block/qapi.c b/block/qapi.c
+index 7fa2437923..847b044d13 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -147,9 +147,8 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+ 
+         /* Skip automatically inserted nodes that the user isn't aware of for
+          * query-block (blk != NULL), but not for query-named-block-nodes */
+-        while (blk && bs0->drv && bs0->implicit) {
+-            bs0 = backing_bs(bs0);
+-            assert(bs0);
++        if (blk) {
++            bs0 = bdrv_get_first_explicit(bs0);
+         }
+     }
+ 
+@@ -336,9 +335,7 @@ static void bdrv_query_info(BlockBackend *blk, BlockInfo **p_info,
+     char *qdev;
+ 
+     /* Skip automatically inserted nodes that the user isn't aware of */
+-    while (bs && bs->drv && bs->implicit) {
+-        bs = backing_bs(bs);
+-    }
++    bs = bdrv_get_first_explicit(bs);
+ 
+     info->device = g_strdup(blk_name(blk));
+     info->type = g_strdup("unknown");
+@@ -465,9 +462,8 @@ static BlockStats *bdrv_query_bds_stats(BlockDriverState *bs,
+     /* Skip automatically inserted nodes that the user isn't aware of in
+      * a BlockBackend-level command. Stay at the exact node for a node-level
+      * command. */
+-    while (blk_level && bs->drv && bs->implicit) {
+-        bs = backing_bs(bs);
+-        assert(bs);
++    if (blk_level) {
++        bs = bdrv_get_first_explicit(bs);
+     }
+ 
+     if (bdrv_get_node_name(bs)[0]) {
+diff --git a/blockdev.c b/blockdev.c
+index 23475abb72..fc7b65c3f0 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1300,6 +1300,10 @@ SnapshotInfo *qmp_blockdev_snapshot_delete_internal_sync(const char *device,
+     if (!bs) {
+         return NULL;
+     }
 +
-+    def do_test_job(self, cmd, **args):
-+        params = {"device": "drive0",
-+                  "bps": 1024,
-+                  "bps_rd": 0,
-+                  "bps_wr": 0,
-+                  "iops": 0,
-+                  "iops_rd": 0,
-+                  "iops_wr": 0,
-+                 }
-+        result = self.vm.qmp("block_set_io_throttle", conv_keys=False,
-+                             **params)
-+        self.assert_qmp(result, "return", {})
-+        result = self.vm.qmp(cmd, **args)
-+        self.assert_qmp(result, "return", {})
-+        result = self.vm.qmp("query-block-jobs")
-+        self.assert_qmp(result, "return[0]/device", "drive0")
++    /* Skip implicit filter nodes */
++    bs = bdrv_get_first_explicit(bs);
 +
-+    def do_check_throttle_node(self, expect):
-+        result = self.vm.qmp("query-named-block-nodes")
-+        for r in result["return"]:
-+            if r["drv"] == "throttle":
-+                    self.assertTrue(expect)
-+                    return
-+        if expect:
-+            """ throttle_node missing! """
-+            self.assertTrue(False)
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
+ 
+@@ -1508,6 +1512,9 @@ static void internal_snapshot_prepare(BlkActionState *common,
+         return;
+     }
+ 
++    /* Skip implicit filter nodes */
++    bs = bdrv_get_first_explicit(bs);
 +
-+    def do_check_params(self, file):
-+        result = self.vm.qmp("query-block")
-+        self.assert_qmp(result, "return[0]/inserted/bps", 1024)
-+        self.assert_qmp(result, "return[0]/inserted/drv", iotests.imgfmt)
-+        self.assert_qmp(result, "return[0]/inserted/file", file)
+     /* AioContext is released in .clean() */
+     state->aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(state->aio_context);
+@@ -1664,6 +1671,9 @@ static void external_snapshot_prepare(BlkActionState *common,
+         return;
+     }
+ 
++    /* Skip implicit filter nodes */
++    state->old_bs = bdrv_get_first_explicit(state->old_bs);
 +
-+    """
-+    Check that query-block reports the correct throttling parameters while
-+    ignoring the implicit throttle node.
-+    """
-+    def test_query_block(self):
-+        params = {"device": "drive0",
-+                  "bps": 1024,
-+                  "bps_rd": 0,
-+                  "bps_wr": 0,
-+                  "iops": 0,
-+                  "iops_rd": 0,
-+                  "iops_wr": 0,
-+                 }
-+        result = self.vm.qmp("block_set_io_throttle", conv_keys=False,
-+                             **params)
-+        self.assert_qmp(result, "return", {})
-+        self.do_check_params(file=self.test_img)
+     /* Acquire AioContext now so any threads operating on old_bs stop */
+     state->aio_context = bdrv_get_aio_context(state->old_bs);
+     aio_context_acquire(state->aio_context);
+@@ -1844,6 +1854,9 @@ static void drive_backup_prepare(BlkActionState *common, Error **errp)
+         return;
+     }
+ 
++    /* Skip implicit filter nodes */
++    bs = bdrv_get_first_explicit(bs);
 +
-+    """
-+    Check that the throttle node doesn't get removed by block jobs, and that
-+    query-block reports the correct throttling parameters
-+    """
-+    def test_drive_mirror(self):
-+        self.do_test_job("drive-mirror", device="drive0",
-+                          target=self.target_img,
-+                          sync="full")
-+        self.vm.event_wait("BLOCK_JOB_READY")
-+        self.vm.qmp("block-job-complete", device="drive0")
-+        """
-+        query-block should report `target_img` now
-+        """
-+        self.do_check_params(file=self.target_img)
+     /* AioContext is released in .clean() */
+     state->aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(state->aio_context);
+@@ -1908,6 +1921,9 @@ static void blockdev_backup_prepare(BlkActionState *common, Error **errp)
+         return;
+     }
+ 
++    /* Skip implicit filter nodes */
++    bs = bdrv_get_first_explicit(bs);
 +
-+    def test_drive_backup(self):
-+        self.do_test_job("drive-backup", device="drive0",
-+                          target=self.target_img,
-+                          sync="full")
-+        self.vm.event_wait("BLOCK_JOB_COMPLETED")
-+        self.do_check_params(file=self.test_img)
+     target = bdrv_lookup_bs(backup->target, backup->target, errp);
+     if (!target) {
+         return;
+@@ -2988,6 +3004,9 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
+         return;
+     }
+ 
++    /* Skip implicit filter nodes */
++    bs = bdrv_get_first_explicit(bs);
 +
-+    def test_block_commit(self):
-+        self.do_test_job("block-commit", device="drive0")
-+        self.vm.event_wait("BLOCK_JOB_READY")
-+        self.vm.qmp("block-job-complete", device="drive0")
-+        """
-+        query-block should report the backing file `base_img` now
-+        """
-+        self.do_check_params(file=self.base_img)
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
+ 
+@@ -3095,6 +3114,9 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+         return;
+     }
+ 
++    /* Skip implicit filter nodes */
++    bs = bdrv_get_first_explicit(bs);
 +
-+if __name__ == "__main__":
-+    iotests.main(supported_fmts=["qcow2"])
-diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
-new file mode 100644
-index 0000000000..89968f35d7
---- /dev/null
-+++ b/tests/qemu-iotests/191.out
-@@ -0,0 +1,5 @@
-+....
-+----------------------------------------------------------------------
-+Ran 4 tests
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
+ 
+@@ -3209,6 +3231,9 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
+         return NULL;
+     }
+ 
++    /* Skip implicit filter nodes */
++    bs = bdrv_get_first_explicit(bs);
 +
-+OK
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index fee98440a5..ff732f0385 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -187,4 +187,5 @@
- 188 rw auto quick
- 189 rw auto
- 190 rw auto quick
-+191 rw auto quick
- 192 rw auto quick
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
+ 
+@@ -3484,6 +3509,9 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+         return;
+     }
+ 
++    /* Skip implicit filter nodes */
++    bs = bdrv_get_first_explicit(bs);
++
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
+ 
+@@ -3638,6 +3666,9 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
+         return;
+     }
+ 
++    /* Skip implicit filter nodes */
++    bs = bdrv_get_first_explicit(bs);
++
+     target_bs = bdrv_lookup_bs(target, target, errp);
+     if (!target_bs) {
+         return;
+@@ -3786,6 +3817,9 @@ void qmp_change_backing_file(const char *device,
+         return;
+     }
+ 
++    /* Skip implicit filter nodes */
++    bs = bdrv_get_first_explicit(bs);
++
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
+ 
 -- 
 2.11.0
