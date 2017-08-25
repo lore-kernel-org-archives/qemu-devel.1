@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dlFnU-0002gt-68
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:41:21 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dlFr6-0004na-SR
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:45:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dlFnR-0003uK-3Q
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:41:20 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48418)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dlFnQ-0003tq-Ti
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:41:17 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dlFnN-0005kK-Kv
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 14:41:13 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5D2E12E80C7
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 14:41:12 +0000 (UTC)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dlFr5-0005GJ-RY
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:45:04 -0400
+Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:37300)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dlFr5-0005G7-MU
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 10:45:03 -0400
+Received: by mail-vk0-x242.google.com with SMTP id z187so393vkd.4
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 07:45:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<1503471071-2233-4-git-send-email-peterx@redhat.com>
+In-Reply-To: <1503471071-2233-4-git-send-email-peterx@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 25 Aug 2017 14:44:51 +0000
+Message-ID: <CAJ+F1C+KJeybUvit4xmK_k3zbJ50sxXq6wVcECMjSLpJLwbn0A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 25 Aug 2017 14:29:40 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1712564 <1712564@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150349266290.16960.17282757508682806782.malonedeb@gac.canonical.com>
-Message-Id: <150367138099.10958.10130186791297793235.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1712564] Re: loadvm fails twice in sequence
+Subject: Re: [Qemu-devel] [RFC v2 3/8] char-io: fix possible risk on
+ IOWatchPoll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,67 +31,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, mdroth@linux.vnet.ibm.com, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Posted:
-migration: Reset rather than destroy main_thread_load_event
-snapshot/tests: Try loadvm twice
+On Wed, Aug 23, 2017 at 8:54 AM Peter Xu <peterx@redhat.com> wrote:
 
-** Changed in: qemu
-       Status: New =3D> In Progress
+> This is not a problem if we are only having one single loop thread like
+> before.  However, after per-monitor thread is introduced, this is not
+> true any more, and the risk can happen.
+>
+> The risk can be triggered with "make check -j8" sometimes:
+>
+>   qemu-system-x86_64: /root/git/qemu/chardev/char-io.c:91:
+>   io_watch_poll_finalize: Assertion `iwp->src =3D=3D NULL' failed.
+>
+> This patch keeps the reference for the watch object when creating in
+> io_add_watch_poll(), so that the object will never be released in the
+> context main loop, especially when the context loop is running in
+> another standalone thread.  Meanwhile, when we want to remove the watch
+> object, we always first detach the watch object from its owner context,
+> then we continue with the cleanup.
+>
+> Without this patch, calling io_remove_watch_poll() in main loop thread
+> is not thread-safe, since the other per-monitor thread may be modifying
+> the watch object at the same time.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+>
 
--- =
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1712564
 
-Title:
-  loadvm fails twice in sequence
 
-Status in QEMU:
-  In Progress
-
-Bug description:
-  13:38:23) shorne_: Hello, I was doing some testing with migrations for my=
- OpenRISC SMP patch set, I noticed something that looks like a bug, wonderi=
-ng if someone else wants to confirm
-  (13:38:47) shorne_: Basically, calling loadvm 2 times causes crash
-  (13:38:54) shorne_:    migration/savevm.c:    qemu_event_set(&mis->main_t=
-hread_load_event)
-  (13:38:54) stefanha: fam: Here is my take at this change: https://paste.d=
-ebian.net/982690/
-  (13:38:56) shorne_:                             assert(ev->initialized)  =
-- fails inside
-  (13:39:32) stefanha: quintela davidgiluk: ^
-  (13:41:23) ***davidgiluk looks
-  (13:41:40) shorne_: c096358e747 util/qemu-thread-posix.c (Fam Zheng      =
-        2017-07-04 20:23:25 +0800 397)     assert(ev->initialized);
-  (13:41:51) davidgiluk: shorne_: So you're doing a loadvm to load a snapsh=
-ot and then again?
-  (13:42:02) shorne_: Looks like adding that assert() was done really recen=
-tly
-  (13:42:41) shorne_: yes, just loadvm 'a' ... then wait a bit longer, load=
-vm 'a' again (confirm clocks go back etc)
-  (13:42:50) stefanha: fam: While you're having dinner I'll work on turning=
- my script into a qemu-iotests test case that we can merge.
-  (13:44:03) gpiccoli [~gpiccoli@0002093a.user.oftc.net] entered the room.
-  (13:44:21) davidgiluk: shorne_: Well, it looks like the c09635 assert is =
-a sanity check to make sure we didn't do anything stupid, and well.....
-  (13:44:57) pm215: migration_incoming_get_current() and migration_incoming=
-_state_destroy() seem a bit mismatched
-  (13:45:13) davidgiluk: pm215: Yep
-  (13:45:46) davidgiluk: pm215: Generally we've thought that an incoming mi=
-gration normally only happens once - shorne_'s case is the exception
-  (13:46:03) shorne_: pm215: yeah, it looked something like that I just had=
- a few seconds to look at today
-  (13:46:03) HariharanTS left the room (quit: Ping timeout: 480 seconds).
-  (13:46:03) shorne_ is now known as shorne
-  (13:48:05) shorne: davidgiluk: pm215: thanks for having a look.  Unfortun=
-ately I need to head off to bed and put kids to sleep
-  (13:49:11) davidgiluk: shorne: Sleep well, no nightmares about event dest=
-royers....
-  (13:49:30) davidgiluk: pm215: Yeh this is fall out from b4b076daf32
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1712564/+subscriptions
+> ---
+>  chardev/char-io.c | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
+>
+> diff --git a/chardev/char-io.c b/chardev/char-io.c
+> index f810524..5c52c40 100644
+> --- a/chardev/char-io.c
+> +++ b/chardev/char-io.c
+> @@ -122,7 +122,6 @@ GSource *io_add_watch_poll(Chardev *chr,
+>      g_free(name);
+>
+>      g_source_attach(&iwp->parent, context);
+> -    g_source_unref(&iwp->parent);
+>      return (GSource *)iwp;
+>  }
+>
+> @@ -131,12 +130,24 @@ static void io_remove_watch_poll(GSource *source)
+>      IOWatchPoll *iwp;
+>
+>      iwp =3D io_watch_poll_from_source(source);
+> +
+> +    /*
+> +     * Here the order of destruction really matters.  We need to first
+> +     * detach the IOWatchPoll object from the context (which may still
+> +     * be running in another loop thread), only after that could we
+> +     * continue to operate on iwp->src, or there may be risk condition
+> +     * between current thread and the context loop thread.
+> +     *
+> +     * Let's blame the glib bug mentioned in commit 2b3167 (again) for
+> +     * this extra complexity.
+> +     */
+> +    g_source_destroy(&iwp->parent);
+>      if (iwp->src) {
+>          g_source_destroy(iwp->src);
+>          g_source_unref(iwp->src);
+>          iwp->src =3D NULL;
+>      }
+> -    g_source_destroy(&iwp->parent);
+> +    g_source_unref(&iwp->parent);
+>  }
+>
+>  void remove_fd_in_watch(Chardev *chr)
+> --
+> 2.7.4
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
