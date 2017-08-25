@@ -1,24 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dlCzO-0001EO-Js
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:41:27 -0400
+	(envelope-from <jan.poctavek@erigones.com>) id 1dlD17-000276-L6
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:43:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dlCzK-0007GD-22
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:41:26 -0400
-Date: Fri, 25 Aug 2017 13:41:18 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170825134118.74b8e7a6@nial.brq.redhat.com>
-In-Reply-To: <20170825093229.GH2772@umbus.fritz.box>
-References: <1503562911-2776-1-git-send-email-imammedo@redhat.com>
-	<1503562911-2776-6-git-send-email-imammedo@redhat.com>
-	<20170825041644.GB2772@umbus.fritz.box>
-	<20170825094037.4973225e@nial.brq.redhat.com>
-	<20170825093229.GH2772@umbus.fritz.box>
+	(envelope-from <jan.poctavek@erigones.com>) id 1dlD12-00081D-RB
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:43:13 -0400
+Received: from zimbra.entira.sk ([93.184.68.160]:33346)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jan.poctavek@erigones.com>)
+	id 1dlD12-0007xA-Fe
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:43:08 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.entira.sk (Postfix) with ESMTP id A80ED567ADD
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 13:42:59 +0200 (CEST)
+Received: from zimbra.entira.sk ([127.0.0.1])
+	by localhost (zimbra.entira.sk [127.0.0.1]) (amavisd-new, port 10032)
+	with ESMTP id rVZG_ZTvnbG2 for <qemu-devel@nongnu.org>;
+	Fri, 25 Aug 2017 13:42:58 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.entira.sk (Postfix) with ESMTP id C4ED0567AE1
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 13:42:58 +0200 (CEST)
+Received: from zimbra.entira.sk ([127.0.0.1])
+	by localhost (zimbra.entira.sk [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id u6wTMexLB2bK for <qemu-devel@nongnu.org>;
+	Fri, 25 Aug 2017 13:42:58 +0200 (CEST)
+Received: from [10.0.1.28] (gw-vnet.erigones.com [86.110.232.234])
+	by zimbra.entira.sk (Postfix) with ESMTPSA id 94725567ADD
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 13:42:58 +0200 (CEST)
+From: =?UTF-8?Q?J=c3=a1n_Poctavek?= <jan.poctavek@erigones.com>
+Message-ID: <8c62454c-828b-0f16-76dd-227d9c52af1d@erigones.com>
+Date: Fri, 25 Aug 2017 13:42:55 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Language: en-US
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.11 5/6] ppc: simplify cpu model
- lookup by PVR
+Subject: [Qemu-devel] wrong ioctl error handling on dirty pages sync?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,81 +43,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
+To: qemu-devel@nongnu.org
 
-On Fri, 25 Aug 2017 19:32:29 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Hi guys,
 
-> On Fri, Aug 25, 2017 at 09:40:37AM +0200, Igor Mammedov wrote:
-> > On Fri, 25 Aug 2017 14:16:44 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >   
-> > > On Thu, Aug 24, 2017 at 10:21:50AM +0200, Igor Mammedov wrote:  
-> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > > ---
-> > > >  target/ppc/translate_init.c | 27 +++++++++++----------------
-> > > >  1 file changed, 11 insertions(+), 16 deletions(-)
-> > > > 
-> > > > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> > > > index f1a559d..ca9f1e3 100644
-> > > > --- a/target/ppc/translate_init.c
-> > > > +++ b/target/ppc/translate_init.c
-> > > > @@ -34,6 +34,7 @@
-> > > >  #include "hw/ppc/ppc.h"
-> > > >  #include "mmu-book3s-v3.h"
-> > > >  #include "sysemu/qtest.h"
-> > > > +#include "qemu/cutils.h"
-> > > >  
-> > > >  //#define PPC_DUMP_CPU
-> > > >  //#define PPC_DEBUG_SPR
-> > > > @@ -10203,22 +10204,16 @@ static ObjectClass *ppc_cpu_class_by_name(const char *name)
-> > > >      char *cpu_model, *typename;
-> > > >      ObjectClass *oc;
-> > > >      const char *p;
-> > > > -    int i, len;
-> > > > -
-> > > > -    /* Check if the given name is a PVR */
-> > > > -    len = strlen(name);
-> > > > -    if (len == 10 && name[0] == '0' && name[1] == 'x') {
-> > > > -        p = name + 2;
-> > > > -        goto check_pvr;
-> > > > -    } else if (len == 8) {
-> > > > -        p = name;
-> > > > -    check_pvr:
-> > > > -        for (i = 0; i < 8; i++) {
-> > > > -            if (!qemu_isxdigit(*p++))
-> > > > -                break;
-> > > > -        }
-> > > > -        if (i == 8) {
-> > > > -            return OBJECT_CLASS(ppc_cpu_class_by_pvr(strtoul(name, NULL, 16)));
-> > > > +    unsigned long pvr;
-> > > > +
-> > > > +    /* Lookup by PVR if cpu_model is valid 8 digit hex number
-> > > > +     * (excl: 0x prefix if present)
-> > > > +     */
-> > > > +    if (!qemu_strtoul(name, &p, 16, &pvr)) {
-> > > > +        int len = p - name;
-> > > > +        len = (len == 10) && (name[1] == 'x') ? len - 2 : len;
-> > > > +        if (len == 8) {
-> > > > +            return OBJECT_CLASS(ppc_cpu_class_by_pvr(pvr));    
-> > > 
-> > > This doesn't look quite right.  A hex string of a PVR followed by
-> > > other stuff isn't a valid option, so if p (endptr) doesn't point to
-> > > the end of the string, then we shouldn't be using this path  
-> > yep, my mistake, I've lost somewhere *p == '\0' check when cleaning up the patch  
-> 
-> Ok.
-> 
-> > >(from the
-> > > looks of qemu_strtoul() we can simply omit the endptr parameter to get
-> > > that behaviour).  I'm not sure what the messing around with len is
-> > > for, either.  If it's a valid hex string we can try this, I don't see
-> > > that we need further checks.  
-> > I've tried to keep current limitation here i.e. 8 hex symbols,
-> > but if any hex number is fine then doing
-> >  qemu_strtoul(name, NULL, 16, &pvr)
-> > is even better, so would you prefer to drop 8 symbol check altogether?  
-> 
-> Yeah, I don't see any value to the 8 character check.
-then I'll drop it and do as you've suggested. 
+Maybe it is just my lack of understanding, this seems like a bug to me:
+
+To get list of dirty pages, qemu calls kvm_vm_ioctl() with 
+KVM_GET_DIRTY_LOG:
+https://github.com/qemu/qemu/blob/v2.10.0-rc4/accel/kvm/kvm-all.c#L494
+
+and considers the ioctl call failed when -1 is returned.
+
+But the kvm_vm_ioctl() itself returns -errno, not the -1 on error:
+https://github.com/qemu/qemu/blob/v2.10.0-rc4/accel/kvm/kvm-all.c#L2142
+
+Thanks in advance for sheding some light into this for me.
+
+Jan
