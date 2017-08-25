@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dlCyG-0008RZ-MR
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:40:17 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dlCzO-0001EO-Js
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:41:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dlCyB-0006YU-WF
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:40:16 -0400
-Date: Fri, 25 Aug 2017 13:40:07 +0200
+	(envelope-from <imammedo@redhat.com>) id 1dlCzK-0007GD-22
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:41:26 -0400
+Date: Fri, 25 Aug 2017 13:41:18 +0200
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170825134007.73d69fa3@nial.brq.redhat.com>
-In-Reply-To: <20170825094538.GI2772@umbus.fritz.box>
+Message-ID: <20170825134118.74b8e7a6@nial.brq.redhat.com>
+In-Reply-To: <20170825093229.GH2772@umbus.fritz.box>
 References: <1503562911-2776-1-git-send-email-imammedo@redhat.com>
-	<1503562911-2776-3-git-send-email-imammedo@redhat.com>
-	<20170825013819.GQ5379@umbus.fritz.box>
-	<20170825092740.239b6a82@nial.brq.redhat.com>
-	<20170825094538.GI2772@umbus.fritz.box>
+	<1503562911-2776-6-git-send-email-imammedo@redhat.com>
+	<20170825041644.GB2772@umbus.fritz.box>
+	<20170825094037.4973225e@nial.brq.redhat.com>
+	<20170825093229.GH2772@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.11 2/6] ppc: make cpu_model
- translation to type consistent
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11 5/6] ppc: simplify cpu model
+ lookup by PVR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,98 +28,80 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
 
-On Fri, 25 Aug 2017 19:45:38 +1000
+On Fri, 25 Aug 2017 19:32:29 +1000
 David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> On Fri, Aug 25, 2017 at 09:27:40AM +0200, Igor Mammedov wrote:
-> > On Fri, 25 Aug 2017 11:38:19 +1000
+> On Fri, Aug 25, 2017 at 09:40:37AM +0200, Igor Mammedov wrote:
+> > On Fri, 25 Aug 2017 14:16:44 +1000
 > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >  =20
-> > > On Thu, Aug 24, 2017 at 10:21:47AM +0200, Igor Mammedov wrote: =20
-> > > > PPC handles -cpu FOO rather incosistently,
-> > > > i.e. it does case-insensitive matching of FOO to
-> > > > a CPU type (see: ppc_cpu_compare_class_name) but
-> > > > handles alias names as case-sensitive, as result:
-> > > >=20
-> > > >  # qemu-system-ppc64 -M mac99 -cpu g3
-> > > >  qemu-system-ppc64: unable to find CPU model ' kN=EF=BF=BDU'
-> > > >=20
-> > > >  # qemu-system-ppc64 -cpu 970MP_V1.1
-> > > >  qemu-system-ppc64: Unable to find sPAPR CPU Core definition
-> > > >=20
-> > > > while
-> > > >=20
-> > > >  # qemu-system-ppc64 -M mac99 -cpu G3
-> > > >  # qemu-system-ppc64 -cpu 970MP_v1.1
-> > > >=20
-> > > > start up just fine.
-> > > >=20
-> > > > Considering we can't take case-insensitive matching away,
-> > > > make it case-insensitive for  all alias/type/core_type
-> > > > lookups.
-> > > >=20
-> > > > As side effect it allows to remove duplicate core types
-> > > > which are the same but use lower-case letters in name.
-> > > >=20
-> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>   =20
-> > >=20
-> > > Hmm.  So, I'm certainly good with making the matching more consistent,
-> > > and removing extra entries differing only in case.
-> > >=20
-> > > However, I don't like capitalizing everything in the model table.  The
-> > > "canonical" capitalization - as in how it appears in manuals and
-> > > marketing info - is quite frequently mixed case.  So I think making
-> > > everything caps in the table will make it harder to read in the
-> > > context of looking at the corresponding documentation. =20
-> > only cpu models =3D> typenames are made caps, the rest =20
->=20
-> Yes, I know.  A number of the CPU model names themselves have mixed
-> case.  Really.
->=20
-> > incl. description is kept as is in mixed case.
-> > It looks like _desc is the thing one would use for
-> > 1:1 lookup in spec, while _name isn't direct match consistently
-> > (i.e. sometimes it skips spaces and sometimes spaces are replaced by un=
-derscore).
-> > So keeping _name in mixed case unnecessarily complicates name->type loo=
-kup.
-> >=20
-> > These mixed case + case-insensitive is what made lookup
-> > code over-engineered and overly complex. =20
->=20
-> I'm fine with making all the lookups case insensitive.  I just don't
-> want to drop the case on the names in the actual code.
-I've tried to find a way but considering that names are statically
-'converted' into typenames and lack of ability to magically
-uppercase them with preprocessor, I've gave up on this approach.
-
-Providing that there is _desc with model name that should be
-greppable in spec and complexity of lookup code that mixed-cased
-typenames incur, I've opted in favor of simplifying lookup
-code at expense uniform typenames (which is inter QEMU thingy).
-It is easier to maintain and less chances to make mistake.
-
-Other targets use exact match for cpu_model so whether
-they use mixed casing or not doesn't matter.
-
-> > As result it evolved (regressed) to inconsistent name handling
-> > since it's rather hard to understand what's going on there. =20
->=20
-> Yeah, I know :/.
->=20
-> > > Can we instead retain mixed case in the table, and capitalize both
-> > > sides at the comparison time? =20
-> > it has to be the same-case since PPC has case-insensitive cpu_model
-> > matching (sometimes :/). Normalized /same case/ typenames
-> > are necessary for object_class_by_name() to work as it does exact match.
-> > So it would be possible to replace custom fetching of CPU types
-> > and iterating over it with custom comparator with object_class_by_name(=
-).
-> > As it's done in 4/6.
-> > This patch and 3/6 are only preparatory patches for 4/6. =20
->=20
-> Ah.  Hrm.  That's awkward.
-It's fine to squash all 3 in 1 patch, but then it becomes huge and
-unreview-able, as logic changes are buried within names normalization.
+> >   
+> > > On Thu, Aug 24, 2017 at 10:21:50AM +0200, Igor Mammedov wrote:  
+> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > > ---
+> > > >  target/ppc/translate_init.c | 27 +++++++++++----------------
+> > > >  1 file changed, 11 insertions(+), 16 deletions(-)
+> > > > 
+> > > > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> > > > index f1a559d..ca9f1e3 100644
+> > > > --- a/target/ppc/translate_init.c
+> > > > +++ b/target/ppc/translate_init.c
+> > > > @@ -34,6 +34,7 @@
+> > > >  #include "hw/ppc/ppc.h"
+> > > >  #include "mmu-book3s-v3.h"
+> > > >  #include "sysemu/qtest.h"
+> > > > +#include "qemu/cutils.h"
+> > > >  
+> > > >  //#define PPC_DUMP_CPU
+> > > >  //#define PPC_DEBUG_SPR
+> > > > @@ -10203,22 +10204,16 @@ static ObjectClass *ppc_cpu_class_by_name(const char *name)
+> > > >      char *cpu_model, *typename;
+> > > >      ObjectClass *oc;
+> > > >      const char *p;
+> > > > -    int i, len;
+> > > > -
+> > > > -    /* Check if the given name is a PVR */
+> > > > -    len = strlen(name);
+> > > > -    if (len == 10 && name[0] == '0' && name[1] == 'x') {
+> > > > -        p = name + 2;
+> > > > -        goto check_pvr;
+> > > > -    } else if (len == 8) {
+> > > > -        p = name;
+> > > > -    check_pvr:
+> > > > -        for (i = 0; i < 8; i++) {
+> > > > -            if (!qemu_isxdigit(*p++))
+> > > > -                break;
+> > > > -        }
+> > > > -        if (i == 8) {
+> > > > -            return OBJECT_CLASS(ppc_cpu_class_by_pvr(strtoul(name, NULL, 16)));
+> > > > +    unsigned long pvr;
+> > > > +
+> > > > +    /* Lookup by PVR if cpu_model is valid 8 digit hex number
+> > > > +     * (excl: 0x prefix if present)
+> > > > +     */
+> > > > +    if (!qemu_strtoul(name, &p, 16, &pvr)) {
+> > > > +        int len = p - name;
+> > > > +        len = (len == 10) && (name[1] == 'x') ? len - 2 : len;
+> > > > +        if (len == 8) {
+> > > > +            return OBJECT_CLASS(ppc_cpu_class_by_pvr(pvr));    
+> > > 
+> > > This doesn't look quite right.  A hex string of a PVR followed by
+> > > other stuff isn't a valid option, so if p (endptr) doesn't point to
+> > > the end of the string, then we shouldn't be using this path  
+> > yep, my mistake, I've lost somewhere *p == '\0' check when cleaning up the patch  
+> 
+> Ok.
+> 
+> > >(from the
+> > > looks of qemu_strtoul() we can simply omit the endptr parameter to get
+> > > that behaviour).  I'm not sure what the messing around with len is
+> > > for, either.  If it's a valid hex string we can try this, I don't see
+> > > that we need further checks.  
+> > I've tried to keep current limitation here i.e. 8 hex symbols,
+> > but if any hex number is fine then doing
+> >  qemu_strtoul(name, NULL, 16, &pvr)
+> > is even better, so would you prefer to drop 8 symbol check altogether?  
+> 
+> Yeah, I don't see any value to the 8 character check.
+then I'll drop it and do as you've suggested. 
