@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCSh-0006VR-Uh
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:07:44 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCX0-0001k3-4t
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:12:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCSd-0000Jg-5K
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:07:39 -0400
-Received: from mail-ua0-x236.google.com ([2607:f8b0:400c:c08::236]:36373)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCWq-00024O-RV
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:12:06 -0400
+Received: from mail-vk0-x230.google.com ([2607:f8b0:400c:c05::230]:33480)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dlCSc-0000JU-Tb
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:07:35 -0400
-Received: by mail-ua0-x236.google.com with SMTP id e10so4735561uah.3
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 04:07:34 -0700 (PDT)
+	id 1dlCWq-00024J-HW
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:11:56 -0400
+Received: by mail-vk0-x230.google.com with SMTP id j189so6442370vka.0
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 04:11:56 -0700 (PDT)
 MIME-Version: 1.0
 References: <1503602048-12268-1-git-send-email-armbru@redhat.com>
-	<1503602048-12268-6-git-send-email-armbru@redhat.com>
-In-Reply-To: <1503602048-12268-6-git-send-email-armbru@redhat.com>
+	<1503602048-12268-7-git-send-email-armbru@redhat.com>
+In-Reply-To: <1503602048-12268-7-git-send-email-armbru@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 25 Aug 2017 11:07:23 +0000
-Message-ID: <CAJ+F1C+oehb6pXHPzFDOWD2_gmg3TFsSf=5ASJ4rB4FP+WdrDw@mail.gmail.com>
+Date: Fri, 25 Aug 2017 11:11:45 +0000
+Message-ID: <CAJ+F1CKORHr77fZ8OrsJc44TQL++Eazu-t0mV2+uhpW31HQSYQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 05/16] qapi-schema: Collect run state
- stuff in qapi/run-state.json
+Subject: Re: [Qemu-devel] [PATCH v2 06/16] qapi-schema: Collect char device
+ stuff in qapi/char.json
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,861 +34,1195 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Aug 24, 2017 at 9:20 PM Markus Armbruster <armbru@redhat.com> wrote=
+On Thu, Aug 24, 2017 at 9:24 PM Markus Armbruster <armbru@redhat.com> wrote=
 :
 
 > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >
 
-Nice one
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 ---
->  MAINTAINERS         |   1 +
->  Makefile            |   1 +
->  qapi-schema.json    | 165 +-----------------------
->  qapi/event.json     | 182 ---------------------------
->  qapi/run-state.json | 352
-> ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 355 insertions(+), 346 deletions(-)
->  create mode 100644 qapi/run-state.json
+>  MAINTAINERS      |   1 +
+>  Makefile         |   1 +
+>  qapi-schema.json | 511
+> +---------------------------------------------------
+>  qapi/char.json   | 538
+> +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  qapi/event.json  |  21 ---
+>  5 files changed, 541 insertions(+), 531 deletions(-)
+>  create mode 100644 qapi/char.json
 >
 > diff --git a/MAINTAINERS b/MAINTAINERS
-> index fb90a19..289ea8c 100644
+> index 289ea8c..6a808d3 100644
 > --- a/MAINTAINERS
 > +++ b/MAINTAINERS
-> @@ -1338,6 +1338,7 @@ F: cpus.c
->  F: util/main-loop.c
->  F: util/qemu-timer.c
->  F: vl.c
-> +F: qapi/run-state.json
+> @@ -1253,6 +1253,7 @@ M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.=
+com>
+>  S: Maintained
+>  F: chardev/
+>  F: include/chardev/
+> +F: qapi/char.json
 >
->  Human Monitor (HMP)
->  M: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>  Character Devices (Braille)
+>  M: Samuel Thibault <samuel.thibault@ens-lyon.org>
 > diff --git a/Makefile b/Makefile
-> index ca4a03c..d3ba41a 100644
+> index d3ba41a..59ef46c 100644
 > --- a/Makefile
 > +++ b/Makefile
-> @@ -413,6 +413,7 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json
-> $(SRC_PATH)/qapi/common.json \
+> @@ -410,6 +410,7 @@ $(SRC_PATH)/qga/qapi-schema.json
+> $(SRC_PATH)/scripts/qapi-commands.py $(qapi-py)
+>
+>  qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.js=
+on \
+>                 $(SRC_PATH)/qapi/block.json
+> $(SRC_PATH)/qapi/block-core.json \
+> +               $(SRC_PATH)/qapi/char.json \
 >                 $(SRC_PATH)/qapi/crypto.json \
 >                 $(SRC_PATH)/qapi/event.json
 > $(SRC_PATH)/qapi/introspect.json \
 >                 $(SRC_PATH)/qapi/rocker.json \
-> +               $(SRC_PATH)/qapi/run-state.json \
->                 $(SRC_PATH)/qapi/sockets.json \
->                 $(SRC_PATH)/qapi/trace.json
->
 > diff --git a/qapi-schema.json b/qapi-schema.json
-> index d69b6da..f42d61b 100644
+> index f42d61b..4f30d21 100644
 > --- a/qapi-schema.json
 > +++ b/qapi-schema.json
-> @@ -80,6 +80,7 @@
->
->  { 'include': 'qapi/common.json' }
->  { 'include': 'qapi/sockets.json' }
-> +{ 'include': 'qapi/run-state.json' }
+> @@ -83,6 +83,7 @@
+>  { 'include': 'qapi/run-state.json' }
 >  { 'include': 'qapi/crypto.json' }
 >  { 'include': 'qapi/block.json' }
+> +{ 'include': 'qapi/char.json' }
 >  { 'include': 'qapi/rocker.json' }
-> @@ -243,94 +244,6 @@
->  { 'command': 'query-kvm', 'returns': 'KvmInfo' }
+>  { 'include': 'qapi/event.json' }
+>  { 'include': 'qapi/trace.json' }
+> @@ -274,189 +275,6 @@
+>  { 'command': 'query-uuid', 'returns': 'UuidInfo' }
 >
 >  ##
-> -# @RunState:
+> -# @ChardevInfo:
 > -#
-> -# An enumeration of VM run states.
+> -# Information about a character device.
 > -#
-> -# @debug: QEMU is running on a debugger
+> -# @label: the label of the character device
 > -#
-> -# @finish-migrate: guest is paused to finish the migration process
+> -# @filename: the filename of the character device
 > -#
-> -# @inmigrate: guest is paused waiting for an incoming migration.  Note
-> -# that this state does not tell whether the machine will start at the
-> -# end of the migration.  This depends on the command-line -S option and
-> -# any invocation of 'stop' or 'cont' that has happened since QEMU was
-> -# started.
-> -#
-> -# @internal-error: An internal error that prevents further guest executi=
-on
-> -# has occurred
-> -#
-> -# @io-error: the last IOP has failed and the device is configured to pau=
-se
-> -# on I/O errors
-> -#
-> -# @paused: guest has been paused via the 'stop' command
-> -#
-> -# @postmigrate: guest is paused following a successful 'migrate'
-> -#
-> -# @prelaunch: QEMU was started with -S and guest has not started
-> -#
-> -# @restore-vm: guest is paused to restore VM state
-> -#
-> -# @running: guest is actively running
-> -#
-> -# @save-vm: guest is paused to save the VM state
-> -#
-> -# @shutdown: guest is shut down (and -no-shutdown is in use)
-> -#
-> -# @suspended: guest is suspended (ACPI S3)
-> -#
-> -# @watchdog: the watchdog action is configured to pause and has been
-> triggered
-> -#
-> -# @guest-panicked: guest has been panicked as a result of guest OS panic
-> -#
-> -# @colo: guest is paused to save/restore VM state under colo checkpoint,
-> -#        VM can not get into this state unless colo capability is enable=
-d
-> -#        for migration. (since 2.8)
-> -##
-> -{ 'enum': 'RunState',
-> -  'data': [ 'debug', 'inmigrate', 'internal-error', 'io-error', 'paused'=
-,
-> -            'postmigrate', 'prelaunch', 'finish-migrate', 'restore-vm',
-> -            'running', 'save-vm', 'shutdown', 'suspended', 'watchdog',
-> -            'guest-panicked', 'colo' ] }
-> -
-> -##
-> -# @StatusInfo:
-> -#
-> -# Information about VCPU run state
-> -#
-> -# @running: true if all VCPUs are runnable, false if not runnable
-> -#
-> -# @singlestep: true if VCPUs are in single-step mode
-> -#
-> -# @status: the virtual machine @RunState
-> -#
-> -# Since:  0.14.0
-> -#
-> -# Notes: @singlestep is enabled through the GDB stub
-> -##
-> -{ 'struct': 'StatusInfo',
-> -  'data': {'running': 'bool', 'singlestep': 'bool', 'status': 'RunState'=
-}
-> }
-> -
-> -##
-> -# @query-status:
-> -#
-> -# Query the run status of all VCPUs
-> -#
-> -# Returns: @StatusInfo reflecting all VCPUs
-> -#
-> -# Since:  0.14.0
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "query-status" }
-> -# <- { "return": { "running": true,
-> -#                  "singlestep": false,
-> -#                  "status": "running" } }
-> -#
-> -##
-> -{ 'command': 'query-status', 'returns': 'StatusInfo' }
-> -
-> -##
->  # @UuidInfo:
->  #
->  # Guest UUID information (Universally Unique Identifier).
-> @@ -6017,34 +5930,6 @@
->  { 'command': 'query-acpi-ospm-status', 'returns': ['ACPIOSTInfo'] }
->
->  ##
-> -# @WatchdogExpirationAction:
-> -#
-> -# An enumeration of the actions taken when the watchdog device's timer i=
-s
-> -# expired
-> -#
-> -# @reset: system resets
-> -#
-> -# @shutdown: system shutdown, note that it is similar to @powerdown, whi=
-ch
-> -#            tries to set to system status and notify guest
-> -#
-> -# @poweroff: system poweroff, the emulator program exits
-> -#
-> -# @pause: system pauses, similar to @stop
-> -#
-> -# @debug: system enters debug state
-> -#
-> -# @none: nothing is done
-> -#
-> -# @inject-nmi: a non-maskable interrupt is injected into the first VCPU
-> (all
-> -#              VCPUS on x86) (since 2.4)
-> -#
-> -# Since: 2.1
-> -##
-> -{ 'enum': 'WatchdogExpirationAction',
-> -  'data': [ 'reset', 'shutdown', 'poweroff', 'pause', 'debug', 'none',
-> -            'inject-nmi' ] }
-> -
-> -##
->  # @IoOperationType:
->  #
->  # An enumeration of the I/O operation types
-> @@ -6059,54 +5944,6 @@
->    'data': [ 'read', 'write' ] }
->
->  ##
-> -# @GuestPanicAction:
-> -#
-> -# An enumeration of the actions taken when guest OS panic is detected
-> -#
-> -# @pause: system pauses
-> -#
-> -# Since: 2.1 (poweroff since 2.8)
-> -##
-> -{ 'enum': 'GuestPanicAction',
-> -  'data': [ 'pause', 'poweroff' ] }
-> -
-> -##
-> -# @GuestPanicInformationType:
-> -#
-> -# An enumeration of the guest panic information types
-> -#
-> -# Since: 2.9
-> -##
-> -{ 'enum': 'GuestPanicInformationType',
-> -  'data': [ 'hyper-v'] }
-> -
-> -##
-> -# @GuestPanicInformation:
-> -#
-> -# Information about a guest panic
-> -#
-> -# Since: 2.9
-> -##
-> -{'union': 'GuestPanicInformation',
-> - 'base': {'type': 'GuestPanicInformationType'},
-> - 'discriminator': 'type',
-> - 'data': { 'hyper-v': 'GuestPanicInformationHyperV' } }
-> -
-> -##
-> -# @GuestPanicInformationHyperV:
-> -#
-> -# Hyper-V specific guest panic information (HV crash MSRs)
-> -#
-> -# Since: 2.9
-> -##
-> -{'struct': 'GuestPanicInformationHyperV',
-> - 'data': { 'arg1': 'uint64',
-> -           'arg2': 'uint64',
-> -           'arg3': 'uint64',
-> -           'arg4': 'uint64',
-> -           'arg5': 'uint64' } }
-> -
-> -##
->  # @rtc-reset-reinjection:
->  #
->  # This command will reset the RTC interrupt reinjection backlog.
-> diff --git a/qapi/event.json b/qapi/event.json
-> index 6d22b02..9c6126d 100644
-> --- a/qapi/event.json
-> +++ b/qapi/event.json
-> @@ -5,144 +5,6 @@
->  ##
->
->  ##
-> -# @SHUTDOWN:
-> -#
-> -# Emitted when the virtual machine has shut down, indicating that qemu i=
-s
-> -# about to exit.
-> -#
-> -# @guest: If true, the shutdown was triggered by a guest request (such a=
-s
-> -# a guest-initiated ACPI shutdown request or other hardware-specific
-> action)
-> -# rather than a host request (such as sending qemu a SIGINT). (since 2.1=
-0)
-> -#
-> -# Note: If the command-line option "-no-shutdown" has been specified,
-> qemu will
-> -# not exit, and a STOP event will eventually follow the SHUTDOWN event
-> -#
-> -# Since: 0.12.0
-> -#
-> -# Example:
-> -#
-> -# <- { "event": "SHUTDOWN", "data": { "guest": true },
-> -#      "timestamp": { "seconds": 1267040730, "microseconds": 682951 } }
-> -#
-> -##
-> -{ 'event': 'SHUTDOWN', 'data': { 'guest': 'bool' } }
-> -
-> -##
-> -# @POWERDOWN:
-> -#
-> -# Emitted when the virtual machine is powered down through the power
-> control
-> -# system, such as via ACPI.
-> -#
-> -# Since: 0.12.0
-> -#
-> -# Example:
-> -#
-> -# <- { "event": "POWERDOWN",
-> -#      "timestamp": { "seconds": 1267040730, "microseconds": 682951 } }
-> -#
-> -##
-> -{ 'event': 'POWERDOWN' }
-> -
-> -##
-> -# @RESET:
-> -#
-> -# Emitted when the virtual machine is reset
-> -#
-> -# @guest: If true, the reset was triggered by a guest request (such as
-> -# a guest-initiated ACPI reboot request or other hardware-specific actio=
-n)
-> -# rather than a host request (such as the QMP command system_reset).
-> -# (since 2.10)
-> -#
-> -# Since: 0.12.0
-> -#
-> -# Example:
-> -#
-> -# <- { "event": "RESET", "data": { "guest": false },
-> -#      "timestamp": { "seconds": 1267041653, "microseconds": 9518 } }
-> -#
-> -##
-> -{ 'event': 'RESET', 'data': { 'guest': 'bool' } }
-> -
-> -##
-> -# @STOP:
-> -#
-> -# Emitted when the virtual machine is stopped
-> -#
-> -# Since: 0.12.0
-> -#
-> -# Example:
-> -#
-> -# <- { "event": "STOP",
-> -#      "timestamp": { "seconds": 1267041730, "microseconds": 281295 } }
-> -#
-> -##
-> -{ 'event': 'STOP' }
-> -
-> -##
-> -# @RESUME:
-> -#
-> -# Emitted when the virtual machine resumes execution
-> -#
-> -# Since: 0.12.0
-> -#
-> -# Example:
-> -#
-> -# <- { "event": "RESUME",
-> -#      "timestamp": { "seconds": 1271770767, "microseconds": 582542 } }
-> -#
-> -##
-> -{ 'event': 'RESUME' }
-> -
-> -##
-> -# @SUSPEND:
-> -#
-> -# Emitted when guest enters a hardware suspension state, for example, S3
-> state,
-> -# which is sometimes called standby state
-> -#
-> -# Since: 1.1
-> -#
-> -# Example:
-> -#
-> -# <- { "event": "SUSPEND",
-> -#      "timestamp": { "seconds": 1344456160, "microseconds": 309119 } }
-> -#
-> -##
-> -{ 'event': 'SUSPEND' }
-> -
-> -##
-> -# @SUSPEND_DISK:
-> -#
-> -# Emitted when guest enters a hardware suspension state with data saved =
-on
-> -# disk, for example, S4 state, which is sometimes called hibernate state
-> -#
-> -# Note: QEMU shuts down (similar to event @SHUTDOWN) when entering this
+> -# @frontend-open: shows whether the frontend device attached to this
+> backend
+> -#                 (eg. with the chardev=3D... option) is in open or clos=
+ed
 > state
+> -#                 (since 2.1)
 > -#
-> -# Since: 1.2
+> -# Notes: @filename is encoded using the QEMU command line character devi=
+ce
+> -#        encoding.  See the QEMU man page for details.
+> -#
+> -# Since: 0.14.0
+> -##
+> -{ 'struct': 'ChardevInfo', 'data': {'label': 'str',
+> -                                  'filename': 'str',
+> -                                  'frontend-open': 'bool'} }
+> -
+> -##
+> -# @query-chardev:
+> -#
+> -# Returns information about current character devices.
+> -#
+> -# Returns: a list of @ChardevInfo
+> -#
+> -# Since: 0.14.0
 > -#
 > -# Example:
 > -#
-> -# <-   { "event": "SUSPEND_DISK",
-> -#        "timestamp": { "seconds": 1344456160, "microseconds": 309119 } =
-}
+> -# -> { "execute": "query-chardev" }
+> -# <- {
+> -#       "return": [
+> -#          {
+> -#             "label": "charchannel0",
+> -#             "filename":
+> "unix:/var/lib/libvirt/qemu/seabios.rhel6.agent,server",
+> -#             "frontend-open": false
+> -#          },
+> -#          {
+> -#             "label": "charmonitor",
+> -#             "filename":
+> "unix:/var/lib/libvirt/qemu/seabios.rhel6.monitor,server",
+> -#             "frontend-open": true
+> -#          },
+> -#          {
+> -#             "label": "charserial0",
+> -#             "filename": "pty:/dev/pts/2",
+> -#             "frontend-open": true
+> -#          }
+> -#       ]
+> -#    }
 > -#
 > -##
-> -{ 'event': 'SUSPEND_DISK' }
+> -{ 'command': 'query-chardev', 'returns': ['ChardevInfo'] }
 > -
 > -##
-> -# @WAKEUP:
+> -# @ChardevBackendInfo:
 > -#
-> -# Emitted when the guest has woken up from suspend state and is running
+> -# Information about a character device backend
 > -#
-> -# Since: 1.1
+> -# @name: The backend name
+> -#
+> -# Since: 2.0
+> -##
+> -{ 'struct': 'ChardevBackendInfo', 'data': {'name': 'str'} }
+> -
+> -##
+> -# @query-chardev-backends:
+> -#
+> -# Returns information about character device backends.
+> -#
+> -# Returns: a list of @ChardevBackendInfo
+> -#
+> -# Since: 2.0
 > -#
 > -# Example:
 > -#
-> -# <- { "event": "WAKEUP",
-> -#      "timestamp": { "seconds": 1344522075, "microseconds": 745528 } }
+> -# -> { "execute": "query-chardev-backends" }
+> -# <- {
+> -#       "return":[
+> -#          {
+> -#             "name":"udp"
+> -#          },
+> -#          {
+> -#             "name":"tcp"
+> -#          },
+> -#          {
+> -#             "name":"unix"
+> -#          },
+> -#          {
+> -#             "name":"spiceport"
+> -#          }
+> -#       ]
+> -#    }
 > -#
 > -##
-> -{ 'event': 'WAKEUP' }
+> -{ 'command': 'query-chardev-backends', 'returns': ['ChardevBackendInfo']=
+ }
 > -
 > -##
->  # @RTC_CHANGE:
+> -# @DataFormat:
+> -#
+> -# An enumeration of data format.
+> -#
+> -# @utf8: Data is a UTF-8 string (RFC 3629)
+> -#
+> -# @base64: Data is Base64 encoded binary (RFC 3548)
+> -#
+> -# Since: 1.4
+> -##
+> -{ 'enum': 'DataFormat',
+> -  'data': [ 'utf8', 'base64' ] }
+> -
+> -##
+> -# @ringbuf-write:
+> -#
+> -# Write to a ring buffer character device.
+> -#
+> -# @device: the ring buffer character device name
+> -#
+> -# @data: data to write
+> -#
+> -# @format: data encoding (default 'utf8').
+> -#          - base64: data must be base64 encoded text.  Its binary
+> -#            decoding gets written.
+> -#          - utf8: data's UTF-8 encoding is written
+> -#          - data itself is always Unicode regardless of format, like
+> -#            any other string.
+> -#
+> -# Returns: Nothing on success
+> -#
+> -# Since: 1.4
+> -#
+> -# Example:
+> -#
+> -# -> { "execute": "ringbuf-write",
+> -#      "arguments": { "device": "foo",
+> -#                     "data": "abcdefgh",
+> -#                     "format": "utf8" } }
+> -# <- { "return": {} }
+> -#
+> -##
+> -{ 'command': 'ringbuf-write',
+> -  'data': {'device': 'str', 'data': 'str',
+> -           '*format': 'DataFormat'} }
+> -
+> -##
+> -# @ringbuf-read:
+> -#
+> -# Read from a ring buffer character device.
+> -#
+> -# @device: the ring buffer character device name
+> -#
+> -# @size: how many bytes to read at most
+> -#
+> -# @format: data encoding (default 'utf8').
+> -#          - base64: the data read is returned in base64 encoding.
+> -#          - utf8: the data read is interpreted as UTF-8.
+> -#            Bug: can screw up when the buffer contains invalid UTF-8
+> -#            sequences, NUL characters, after the ring buffer lost
+> -#            data, and when reading stops because the size limit is
+> -#            reached.
+> -#          - The return value is always Unicode regardless of format,
+> -#            like any other string.
+> -#
+> -# Returns: data read from the device
+> -#
+> -# Since: 1.4
+> -#
+> -# Example:
+> -#
+> -# -> { "execute": "ringbuf-read",
+> -#      "arguments": { "device": "foo",
+> -#                     "size": 1000,
+> -#                     "format": "utf8" } }
+> -# <- { "return": "abcdefgh" }
+> -#
+> -##
+> -{ 'command': 'ringbuf-read',
+> -  'data': {'device': 'str', 'size': 'int', '*format': 'DataFormat'},
+> -  'returns': 'str' }
+> -
+> -##
+>  # @EventInfo:
 >  #
->  # Emitted when the guest changes the RTC time.
-> @@ -165,30 +27,6 @@
->    'data': { 'offset': 'int' } }
+>  # Information about a QMP event
+> @@ -4713,333 +4531,6 @@
+>
 >
 >  ##
-> -# @WATCHDOG:
+> -# @ChardevCommon:
 > -#
-> -# Emitted when the watchdog device's timer is expired
+> -# Configuration shared across all chardev backends
 > -#
-> -# @action: action that has been taken
+> -# @logfile: The name of a logfile to save output
+> -# @logappend: true to append instead of truncate
+> -#             (default to false to truncate)
 > -#
-> -# Note: If action is "reset", "shutdown", or "pause" the WATCHDOG event =
-is
-> -# followed respectively by the RESET, SHUTDOWN, or STOP events
-> -#
-> -# Note: This event is rate-limited.
-> -#
-> -# Since: 0.13.0
-> -#
-> -# Example:
-> -#
-> -# <- { "event": "WATCHDOG",
-> -#      "data": { "action": "reset" },
-> -#      "timestamp": { "seconds": 1267061043, "microseconds": 959568 } }
-> -#
+> -# Since: 2.6
 > -##
-> -{ 'event': 'WATCHDOG',
-> -  'data': { 'action': 'WatchdogExpirationAction' } }
+> -{ 'struct': 'ChardevCommon', 'data': { '*logfile': 'str',
+> -                                       '*logappend': 'bool' } }
 > -
 > -##
->  # @DEVICE_DELETED:
->  #
->  # Emitted whenever the device removal completion is acknowledged by the
-> guest.
-> @@ -491,26 +329,6 @@
->    'data': { 'actual': 'int' } }
->
->  ##
-> -# @GUEST_PANICKED:
+> -# @ChardevFile:
 > -#
-> -# Emitted when guest OS panic is detected
+> -# Configuration info for file chardevs.
 > -#
-> -# @action: action that has been taken, currently always "pause"
+> -# @in:  The name of the input file
+> -# @out: The name of the output file
+> -# @append: Open the file in append mode (default false to
+> -#          truncate) (Since 2.6)
 > -#
-> -# @info: information about a panic (since 2.9)
+> -# Since: 1.4
+> -##
+> -{ 'struct': 'ChardevFile', 'data': { '*in' : 'str',
+> -                                   'out' : 'str',
+> -                                   '*append': 'bool' },
+> -  'base': 'ChardevCommon' }
+> -
+> -##
+> -# @ChardevHostdev:
+> -#
+> -# Configuration info for device and pipe chardevs.
+> -#
+> -# @device: The name of the special file for the device,
+> -#          i.e. /dev/ttyS0 on Unix or COM1: on Windows
+> -#
+> -# Since: 1.4
+> -##
+> -{ 'struct': 'ChardevHostdev', 'data': { 'device' : 'str' },
+> -  'base': 'ChardevCommon' }
+> -
+> -##
+> -# @ChardevSocket:
+> -#
+> -# Configuration info for (stream) socket chardevs.
+> -#
+> -# @addr: socket address to listen on (server=3Dtrue)
+> -#        or connect to (server=3Dfalse)
+> -# @tls-creds: the ID of the TLS credentials object (since 2.6)
+> -# @server: create server socket (default: true)
+> -# @wait: wait for incoming connection on server
+> -#        sockets (default: false).
+> -# @nodelay: set TCP_NODELAY socket option (default: false)
+> -# @telnet: enable telnet protocol on server
+> -#          sockets (default: false)
+> -# @tn3270: enable tn3270 protocol on server
+> -#          sockets (default: false) (Since: 2.10)
+> -# @reconnect: For a client socket, if a socket is disconnected,
+> -#          then attempt a reconnect after the given number of seconds.
+> -#          Setting this to zero disables this function. (default: 0)
+> -#          (Since: 2.2)
+> -#
+> -# Since: 1.4
+> -##
+> -{ 'struct': 'ChardevSocket', 'data': { 'addr'       :
+> 'SocketAddressLegacy',
+> -                                     '*tls-creds'  : 'str',
+> -                                     '*server'    : 'bool',
+> -                                     '*wait'      : 'bool',
+> -                                     '*nodelay'   : 'bool',
+> -                                     '*telnet'    : 'bool',
+> -                                     '*tn3270'    : 'bool',
+> -                                     '*reconnect' : 'int' },
+> -  'base': 'ChardevCommon' }
+> -
+> -##
+> -# @ChardevUdp:
+> -#
+> -# Configuration info for datagram socket chardevs.
+> -#
+> -# @remote: remote address
+> -# @local: local address
 > -#
 > -# Since: 1.5
+> -##
+> -{ 'struct': 'ChardevUdp', 'data': { 'remote' : 'SocketAddressLegacy',
+> -                                  '*local' : 'SocketAddressLegacy' },
+> -  'base': 'ChardevCommon' }
+> -
+> -##
+> -# @ChardevMux:
+> -#
+> -# Configuration info for mux chardevs.
+> -#
+> -# @chardev: name of the base chardev.
+> -#
+> -# Since: 1.5
+> -##
+> -{ 'struct': 'ChardevMux', 'data': { 'chardev' : 'str' },
+> -  'base': 'ChardevCommon' }
+> -
+> -##
+> -# @ChardevStdio:
+> -#
+> -# Configuration info for stdio chardevs.
+> -#
+> -# @signal: Allow signals (such as SIGINT triggered by ^C)
+> -#          be delivered to qemu.  Default: true in -nographic mode,
+> -#          false otherwise.
+> -#
+> -# Since: 1.5
+> -##
+> -{ 'struct': 'ChardevStdio', 'data': { '*signal' : 'bool' },
+> -  'base': 'ChardevCommon' }
+> -
+> -
+> -##
+> -# @ChardevSpiceChannel:
+> -#
+> -# Configuration info for spice vm channel chardevs.
+> -#
+> -# @type: kind of channel (for example vdagent).
+> -#
+> -# Since: 1.5
+> -##
+> -{ 'struct': 'ChardevSpiceChannel', 'data': { 'type'  : 'str' },
+> -  'base': 'ChardevCommon' }
+> -
+> -##
+> -# @ChardevSpicePort:
+> -#
+> -# Configuration info for spice port chardevs.
+> -#
+> -# @fqdn: name of the channel (see docs/spice-port-fqdn.txt)
+> -#
+> -# Since: 1.5
+> -##
+> -{ 'struct': 'ChardevSpicePort', 'data': { 'fqdn'  : 'str' },
+> -  'base': 'ChardevCommon' }
+> -
+> -##
+> -# @ChardevVC:
+> -#
+> -# Configuration info for virtual console chardevs.
+> -#
+> -# @width:  console width,  in pixels
+> -# @height: console height, in pixels
+> -# @cols:   console width,  in chars
+> -# @rows:   console height, in chars
+> -#
+> -# Since: 1.5
+> -##
+> -{ 'struct': 'ChardevVC', 'data': { '*width'  : 'int',
+> -                                 '*height' : 'int',
+> -                                 '*cols'   : 'int',
+> -                                 '*rows'   : 'int' },
+> -  'base': 'ChardevCommon' }
+> -
+> -##
+> -# @ChardevRingbuf:
+> -#
+> -# Configuration info for ring buffer chardevs.
+> -#
+> -# @size: ring buffer size, must be power of two, default is 65536
+> -#
+> -# Since: 1.5
+> -##
+> -{ 'struct': 'ChardevRingbuf', 'data': { '*size'  : 'int' },
+> -  'base': 'ChardevCommon' }
+> -
+> -##
+> -# @ChardevBackend:
+> -#
+> -# Configuration info for the new chardev backend.
+> -#
+> -# Since: 1.4 (testdev since 2.2, wctablet since 2.9)
+> -##
+> -{ 'union': 'ChardevBackend', 'data': { 'file'   : 'ChardevFile',
+> -                                       'serial' : 'ChardevHostdev',
+> -                                       'parallel': 'ChardevHostdev',
+> -                                       'pipe'   : 'ChardevHostdev',
+> -                                       'socket' : 'ChardevSocket',
+> -                                       'udp'    : 'ChardevUdp',
+> -                                       'pty'    : 'ChardevCommon',
+> -                                       'null'   : 'ChardevCommon',
+> -                                       'mux'    : 'ChardevMux',
+> -                                       'msmouse': 'ChardevCommon',
+> -                                       'wctablet' : 'ChardevCommon',
+> -                                       'braille': 'ChardevCommon',
+> -                                       'testdev': 'ChardevCommon',
+> -                                       'stdio'  : 'ChardevStdio',
+> -                                       'console': 'ChardevCommon',
+> -                                       'spicevmc' : 'ChardevSpiceChannel=
+',
+> -                                       'spiceport' : 'ChardevSpicePort',
+> -                                       'vc'     : 'ChardevVC',
+> -                                       'ringbuf': 'ChardevRingbuf',
+> -                                       # next one is just for
+> compatibility
+> -                                       'memory' : 'ChardevRingbuf' } }
+> -
+> -##
+> -# @ChardevReturn:
+> -#
+> -# Return info about the chardev backend just created.
+> -#
+> -# @pty: name of the slave pseudoterminal device, present if
+> -#       and only if a chardev of type 'pty' was created
+> -#
+> -# Since: 1.4
+> -##
+> -{ 'struct' : 'ChardevReturn', 'data': { '*pty' : 'str' } }
+> -
+> -##
+> -# @chardev-add:
+> -#
+> -# Add a character device backend
+> -#
+> -# @id: the chardev's ID, must be unique
+> -# @backend: backend type and parameters
+> -#
+> -# Returns: ChardevReturn.
+> -#
+> -# Since: 1.4
 > -#
 > -# Example:
 > -#
-> -# <- { "event": "GUEST_PANICKED",
-> -#      "data": { "action": "pause" } }
+> -# -> { "execute" : "chardev-add",
+> -#      "arguments" : { "id" : "foo",
+> -#                      "backend" : { "type" : "null", "data" : {} } } }
+> -# <- { "return": {} }
+> -#
+> -# -> { "execute" : "chardev-add",
+> -#      "arguments" : { "id" : "bar",
+> -#                      "backend" : { "type" : "file",
+> -#                                    "data" : { "out" : "/tmp/bar.log" }
+> } } }
+> -# <- { "return": {} }
+> -#
+> -# -> { "execute" : "chardev-add",
+> -#      "arguments" : { "id" : "baz",
+> -#                      "backend" : { "type" : "pty", "data" : {} } } }
+> -# <- { "return": { "pty" : "/dev/pty/42" } }
 > -#
 > -##
-> -{ 'event': 'GUEST_PANICKED',
-> -  'data': { 'action': 'GuestPanicAction', '*info':
-> 'GuestPanicInformation' } }
+> -{ 'command': 'chardev-add', 'data': {'id'      : 'str',
+> -                                     'backend' : 'ChardevBackend' },
+> -  'returns': 'ChardevReturn' }
 > -
 > -##
->  # @QUORUM_FAILURE:
+> -# @chardev-change:
+> -#
+> -# Change a character device backend
+> -#
+> -# @id: the chardev's ID, must exist
+> -# @backend: new backend type and parameters
+> -#
+> -# Returns: ChardevReturn.
+> -#
+> -# Since: 2.10
+> -#
+> -# Example:
+> -#
+> -# -> { "execute" : "chardev-change",
+> -#      "arguments" : { "id" : "baz",
+> -#                      "backend" : { "type" : "pty", "data" : {} } } }
+> -# <- { "return": { "pty" : "/dev/pty/42" } }
+> -#
+> -# -> {"execute" : "chardev-change",
+> -#     "arguments" : {
+> -#         "id" : "charchannel2",
+> -#         "backend" : {
+> -#             "type" : "socket",
+> -#             "data" : {
+> -#                 "addr" : {
+> -#                     "type" : "unix" ,
+> -#                     "data" : {
+> -#                         "path" : "/tmp/charchannel2.socket"
+> -#                     }
+> -#                  },
+> -#                  "server" : true,
+> -#                  "wait" : false }}}}
+> -# <- {"return": {}}
+> -#
+> -##
+> -{ 'command': 'chardev-change', 'data': {'id'      : 'str',
+> -                                        'backend' : 'ChardevBackend' },
+> -  'returns': 'ChardevReturn' }
+> -
+> -##
+> -# @chardev-remove:
+> -#
+> -# Remove a character device backend
+> -#
+> -# @id: the chardev's ID, must exist and not be in use
+> -#
+> -# Returns: Nothing on success
+> -#
+> -# Since: 1.4
+> -#
+> -# Example:
+> -#
+> -# -> { "execute": "chardev-remove", "arguments": { "id" : "foo" } }
+> -# <- { "return": {} }
+> -#
+> -##
+> -{ 'command': 'chardev-remove', 'data': {'id': 'str'} }
+> -
+> -##
+> -# @chardev-send-break:
+> -#
+> -# Send a break to a character device
+> -#
+> -# @id: the chardev's ID, must exist
+> -#
+> -# Returns: Nothing on success
+> -#
+> -# Since: 2.10
+> -#
+> -# Example:
+> -#
+> -# -> { "execute": "chardev-send-break", "arguments": { "id" : "foo" } }
+> -# <- { "return": {} }
+> -#
+> -##
+> -{ 'command': 'chardev-send-break', 'data': {'id': 'str'} }
+> -
+> -
+> -##
+>  # @TpmModel:
 >  #
->  # Emitted by the Quorum block driver if it fails to establish a quorum
-> diff --git a/qapi/run-state.json b/qapi/run-state.json
+>  # An enumeration of TPM models
+> diff --git a/qapi/char.json b/qapi/char.json
 > new file mode 100644
-> index 0000000..d36ff49
+> index 0000000..ae19dcd
 > --- /dev/null
-> +++ b/qapi/run-state.json
-> @@ -0,0 +1,352 @@
+> +++ b/qapi/char.json
+> @@ -0,0 +1,538 @@
 > +# -*- Mode: Python -*-
 > +#
 > +
 > +##
-> +# =3D VM run state
+> +# =3D Character devices
 > +##
 > +
-> +##
-> +# @RunState:
-> +#
-> +# An enumeration of VM run states.
-> +#
-> +# @debug: QEMU is running on a debugger
-> +#
-> +# @finish-migrate: guest is paused to finish the migration process
-> +#
-> +# @inmigrate: guest is paused waiting for an incoming migration.  Note
-> +# that this state does not tell whether the machine will start at the
-> +# end of the migration.  This depends on the command-line -S option and
-> +# any invocation of 'stop' or 'cont' that has happened since QEMU was
-> +# started.
-> +#
-> +# @internal-error: An internal error that prevents further guest executi=
-on
-> +# has occurred
-> +#
-> +# @io-error: the last IOP has failed and the device is configured to pau=
-se
-> +# on I/O errors
-> +#
-> +# @paused: guest has been paused via the 'stop' command
-> +#
-> +# @postmigrate: guest is paused following a successful 'migrate'
-> +#
-> +# @prelaunch: QEMU was started with -S and guest has not started
-> +#
-> +# @restore-vm: guest is paused to restore VM state
-> +#
-> +# @running: guest is actively running
-> +#
-> +# @save-vm: guest is paused to save the VM state
-> +#
-> +# @shutdown: guest is shut down (and -no-shutdown is in use)
-> +#
-> +# @suspended: guest is suspended (ACPI S3)
-> +#
-> +# @watchdog: the watchdog action is configured to pause and has been
-> triggered
-> +#
-> +# @guest-panicked: guest has been panicked as a result of guest OS panic
-> +#
-> +# @colo: guest is paused to save/restore VM state under colo checkpoint,
-> +#        VM can not get into this state unless colo capability is enable=
-d
-> +#        for migration. (since 2.8)
-> +##
-> +{ 'enum': 'RunState',
-> +  'data': [ 'debug', 'inmigrate', 'internal-error', 'io-error', 'paused'=
-,
-> +            'postmigrate', 'prelaunch', 'finish-migrate', 'restore-vm',
-> +            'running', 'save-vm', 'shutdown', 'suspended', 'watchdog',
-> +            'guest-panicked', 'colo' ] }
+> +{ 'include': 'sockets.json' }
 > +
 > +##
-> +# @StatusInfo:
+> +# @ChardevInfo:
 > +#
-> +# Information about VCPU run state
+> +# Information about a character device.
 > +#
-> +# @running: true if all VCPUs are runnable, false if not runnable
+> +# @label: the label of the character device
 > +#
-> +# @singlestep: true if VCPUs are in single-step mode
+> +# @filename: the filename of the character device
 > +#
-> +# @status: the virtual machine @RunState
-> +#
-> +# Since:  0.14.0
-> +#
-> +# Notes: @singlestep is enabled through the GDB stub
-> +##
-> +{ 'struct': 'StatusInfo',
-> +  'data': {'running': 'bool', 'singlestep': 'bool', 'status': 'RunState'=
-}
-> }
-> +
-> +##
-> +# @query-status:
-> +#
-> +# Query the run status of all VCPUs
-> +#
-> +# Returns: @StatusInfo reflecting all VCPUs
-> +#
-> +# Since:  0.14.0
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-status" }
-> +# <- { "return": { "running": true,
-> +#                  "singlestep": false,
-> +#                  "status": "running" } }
-> +#
-> +##
-> +{ 'command': 'query-status', 'returns': 'StatusInfo' }
-> +
-> +##
-> +# @SHUTDOWN:
-> +#
-> +# Emitted when the virtual machine has shut down, indicating that qemu i=
-s
-> +# about to exit.
-> +#
-> +# @guest: If true, the shutdown was triggered by a guest request (such a=
-s
-> +# a guest-initiated ACPI shutdown request or other hardware-specific
-> action)
-> +# rather than a host request (such as sending qemu a SIGINT). (since 2.1=
-0)
-> +#
-> +# Note: If the command-line option "-no-shutdown" has been specified,
-> qemu will
-> +# not exit, and a STOP event will eventually follow the SHUTDOWN event
-> +#
-> +# Since: 0.12.0
-> +#
-> +# Example:
-> +#
-> +# <- { "event": "SHUTDOWN", "data": { "guest": true },
-> +#      "timestamp": { "seconds": 1267040730, "microseconds": 682951 } }
-> +#
-> +##
-> +{ 'event': 'SHUTDOWN', 'data': { 'guest': 'bool' } }
-> +
-> +##
-> +# @POWERDOWN:
-> +#
-> +# Emitted when the virtual machine is powered down through the power
-> control
-> +# system, such as via ACPI.
-> +#
-> +# Since: 0.12.0
-> +#
-> +# Example:
-> +#
-> +# <- { "event": "POWERDOWN",
-> +#      "timestamp": { "seconds": 1267040730, "microseconds": 682951 } }
-> +#
-> +##
-> +{ 'event': 'POWERDOWN' }
-> +
-> +##
-> +# @RESET:
-> +#
-> +# Emitted when the virtual machine is reset
-> +#
-> +# @guest: If true, the reset was triggered by a guest request (such as
-> +# a guest-initiated ACPI reboot request or other hardware-specific actio=
-n)
-> +# rather than a host request (such as the QMP command system_reset).
-> +# (since 2.10)
-> +#
-> +# Since: 0.12.0
-> +#
-> +# Example:
-> +#
-> +# <- { "event": "RESET", "data": { "guest": false },
-> +#      "timestamp": { "seconds": 1267041653, "microseconds": 9518 } }
-> +#
-> +##
-> +{ 'event': 'RESET', 'data': { 'guest': 'bool' } }
-> +
-> +##
-> +# @STOP:
-> +#
-> +# Emitted when the virtual machine is stopped
-> +#
-> +# Since: 0.12.0
-> +#
-> +# Example:
-> +#
-> +# <- { "event": "STOP",
-> +#      "timestamp": { "seconds": 1267041730, "microseconds": 281295 } }
-> +#
-> +##
-> +{ 'event': 'STOP' }
-> +
-> +##
-> +# @RESUME:
-> +#
-> +# Emitted when the virtual machine resumes execution
-> +#
-> +# Since: 0.12.0
-> +#
-> +# Example:
-> +#
-> +# <- { "event": "RESUME",
-> +#      "timestamp": { "seconds": 1271770767, "microseconds": 582542 } }
-> +#
-> +##
-> +{ 'event': 'RESUME' }
-> +
-> +##
-> +# @SUSPEND:
-> +#
-> +# Emitted when guest enters a hardware suspension state, for example, S3
-> state,
-> +# which is sometimes called standby state
-> +#
-> +# Since: 1.1
-> +#
-> +# Example:
-> +#
-> +# <- { "event": "SUSPEND",
-> +#      "timestamp": { "seconds": 1344456160, "microseconds": 309119 } }
-> +#
-> +##
-> +{ 'event': 'SUSPEND' }
-> +
-> +##
-> +# @SUSPEND_DISK:
-> +#
-> +# Emitted when guest enters a hardware suspension state with data saved =
-on
-> +# disk, for example, S4 state, which is sometimes called hibernate state
-> +#
-> +# Note: QEMU shuts down (similar to event @SHUTDOWN) when entering this
+> +# @frontend-open: shows whether the frontend device attached to this
+> backend
+> +#                 (eg. with the chardev=3D... option) is in open or clos=
+ed
 > state
+> +#                 (since 2.1)
 > +#
-> +# Since: 1.2
+> +# Notes: @filename is encoded using the QEMU command line character devi=
+ce
+> +#        encoding.  See the QEMU man page for details.
+> +#
+> +# Since: 0.14.0
+> +##
+> +{ 'struct': 'ChardevInfo', 'data': {'label': 'str',
+> +                                  'filename': 'str',
+> +                                  'frontend-open': 'bool'} }
+> +
+> +##
+> +# @query-chardev:
+> +#
+> +# Returns information about current character devices.
+> +#
+> +# Returns: a list of @ChardevInfo
+> +#
+> +# Since: 0.14.0
 > +#
 > +# Example:
 > +#
-> +# <-   { "event": "SUSPEND_DISK",
-> +#        "timestamp": { "seconds": 1344456160, "microseconds": 309119 } =
-}
+> +# -> { "execute": "query-chardev" }
+> +# <- {
+> +#       "return": [
+> +#          {
+> +#             "label": "charchannel0",
+> +#             "filename":
+> "unix:/var/lib/libvirt/qemu/seabios.rhel6.agent,server",
+> +#             "frontend-open": false
+> +#          },
+> +#          {
+> +#             "label": "charmonitor",
+> +#             "filename":
+> "unix:/var/lib/libvirt/qemu/seabios.rhel6.monitor,server",
+> +#             "frontend-open": true
+> +#          },
+> +#          {
+> +#             "label": "charserial0",
+> +#             "filename": "pty:/dev/pts/2",
+> +#             "frontend-open": true
+> +#          }
+> +#       ]
+> +#    }
 > +#
 > +##
-> +{ 'event': 'SUSPEND_DISK' }
+> +{ 'command': 'query-chardev', 'returns': ['ChardevInfo'] }
 > +
 > +##
-> +# @WAKEUP:
+> +# @ChardevBackendInfo:
 > +#
-> +# Emitted when the guest has woken up from suspend state and is running
+> +# Information about a character device backend
 > +#
-> +# Since: 1.1
+> +# @name: The backend name
+> +#
+> +# Since: 2.0
+> +##
+> +{ 'struct': 'ChardevBackendInfo', 'data': {'name': 'str'} }
+> +
+> +##
+> +# @query-chardev-backends:
+> +#
+> +# Returns information about character device backends.
+> +#
+> +# Returns: a list of @ChardevBackendInfo
+> +#
+> +# Since: 2.0
 > +#
 > +# Example:
 > +#
-> +# <- { "event": "WAKEUP",
-> +#      "timestamp": { "seconds": 1344522075, "microseconds": 745528 } }
+> +# -> { "execute": "query-chardev-backends" }
+> +# <- {
+> +#       "return":[
+> +#          {
+> +#             "name":"udp"
+> +#          },
+> +#          {
+> +#             "name":"tcp"
+> +#          },
+> +#          {
+> +#             "name":"unix"
+> +#          },
+> +#          {
+> +#             "name":"spiceport"
+> +#          }
+> +#       ]
+> +#    }
 > +#
 > +##
-> +{ 'event': 'WAKEUP' }
+> +{ 'command': 'query-chardev-backends', 'returns': ['ChardevBackendInfo']=
+ }
 > +
 > +##
-> +# @WATCHDOG:
+> +# @DataFormat:
 > +#
-> +# Emitted when the watchdog device's timer is expired
+> +# An enumeration of data format.
 > +#
-> +# @action: action that has been taken
+> +# @utf8: Data is a UTF-8 string (RFC 3629)
 > +#
-> +# Note: If action is "reset", "shutdown", or "pause" the WATCHDOG event =
-is
-> +# followed respectively by the RESET, SHUTDOWN, or STOP events
+> +# @base64: Data is Base64 encoded binary (RFC 3548)
 > +#
-> +# Note: This event is rate-limited.
+> +# Since: 1.4
+> +##
+> +{ 'enum': 'DataFormat',
+> +  'data': [ 'utf8', 'base64' ] }
+> +
+> +##
+> +# @ringbuf-write:
 > +#
-> +# Since: 0.13.0
+> +# Write to a ring buffer character device.
+> +#
+> +# @device: the ring buffer character device name
+> +#
+> +# @data: data to write
+> +#
+> +# @format: data encoding (default 'utf8').
+> +#          - base64: data must be base64 encoded text.  Its binary
+> +#            decoding gets written.
+> +#          - utf8: data's UTF-8 encoding is written
+> +#          - data itself is always Unicode regardless of format, like
+> +#            any other string.
+> +#
+> +# Returns: Nothing on success
+> +#
+> +# Since: 1.4
 > +#
 > +# Example:
 > +#
-> +# <- { "event": "WATCHDOG",
-> +#      "data": { "action": "reset" },
-> +#      "timestamp": { "seconds": 1267061043, "microseconds": 959568 } }
+> +# -> { "execute": "ringbuf-write",
+> +#      "arguments": { "device": "foo",
+> +#                     "data": "abcdefgh",
+> +#                     "format": "utf8" } }
+> +# <- { "return": {} }
 > +#
 > +##
-> +{ 'event': 'WATCHDOG',
-> +  'data': { 'action': 'WatchdogExpirationAction' } }
+> +{ 'command': 'ringbuf-write',
+> +  'data': {'device': 'str', 'data': 'str',
+> +           '*format': 'DataFormat'} }
 > +
 > +##
-> +# @WatchdogExpirationAction:
+> +# @ringbuf-read:
 > +#
-> +# An enumeration of the actions taken when the watchdog device's timer i=
-s
-> +# expired
+> +# Read from a ring buffer character device.
 > +#
-> +# @reset: system resets
+> +# @device: the ring buffer character device name
 > +#
-> +# @shutdown: system shutdown, note that it is similar to @powerdown, whi=
-ch
-> +#            tries to set to system status and notify guest
+> +# @size: how many bytes to read at most
 > +#
-> +# @poweroff: system poweroff, the emulator program exits
+> +# @format: data encoding (default 'utf8').
+> +#          - base64: the data read is returned in base64 encoding.
+> +#          - utf8: the data read is interpreted as UTF-8.
+> +#            Bug: can screw up when the buffer contains invalid UTF-8
+> +#            sequences, NUL characters, after the ring buffer lost
+> +#            data, and when reading stops because the size limit is
+> +#            reached.
+> +#          - The return value is always Unicode regardless of format,
+> +#            like any other string.
 > +#
-> +# @pause: system pauses, similar to @stop
+> +# Returns: data read from the device
 > +#
-> +# @debug: system enters debug state
+> +# Since: 1.4
 > +#
-> +# @none: nothing is done
+> +# Example:
 > +#
-> +# @inject-nmi: a non-maskable interrupt is injected into the first VCPU
-> (all
-> +#              VCPUS on x86) (since 2.4)
+> +# -> { "execute": "ringbuf-read",
+> +#      "arguments": { "device": "foo",
+> +#                     "size": 1000,
+> +#                     "format": "utf8" } }
+> +# <- { "return": "abcdefgh" }
 > +#
-> +# Since: 2.1
 > +##
-> +{ 'enum': 'WatchdogExpirationAction',
-> +  'data': [ 'reset', 'shutdown', 'poweroff', 'pause', 'debug', 'none',
-> +            'inject-nmi' ] }
+> +{ 'command': 'ringbuf-read',
+> +  'data': {'device': 'str', 'size': 'int', '*format': 'DataFormat'},
+> +  'returns': 'str' }
 > +
 > +##
-> +# @GUEST_PANICKED:
+> +# @ChardevCommon:
 > +#
-> +# Emitted when guest OS panic is detected
+> +# Configuration shared across all chardev backends
 > +#
-> +# @action: action that has been taken, currently always "pause"
+> +# @logfile: The name of a logfile to save output
+> +# @logappend: true to append instead of truncate
+> +#             (default to false to truncate)
 > +#
-> +# @info: information about a panic (since 2.9)
+> +# Since: 2.6
+> +##
+> +{ 'struct': 'ChardevCommon', 'data': { '*logfile': 'str',
+> +                                       '*logappend': 'bool' } }
+> +
+> +##
+> +# @ChardevFile:
+> +#
+> +# Configuration info for file chardevs.
+> +#
+> +# @in:  The name of the input file
+> +# @out: The name of the output file
+> +# @append: Open the file in append mode (default false to
+> +#          truncate) (Since 2.6)
+> +#
+> +# Since: 1.4
+> +##
+> +{ 'struct': 'ChardevFile', 'data': { '*in' : 'str',
+> +                                   'out' : 'str',
+> +                                   '*append': 'bool' },
+> +  'base': 'ChardevCommon' }
+> +
+> +##
+> +# @ChardevHostdev:
+> +#
+> +# Configuration info for device and pipe chardevs.
+> +#
+> +# @device: The name of the special file for the device,
+> +#          i.e. /dev/ttyS0 on Unix or COM1: on Windows
+> +#
+> +# Since: 1.4
+> +##
+> +{ 'struct': 'ChardevHostdev', 'data': { 'device' : 'str' },
+> +  'base': 'ChardevCommon' }
+> +
+> +##
+> +# @ChardevSocket:
+> +#
+> +# Configuration info for (stream) socket chardevs.
+> +#
+> +# @addr: socket address to listen on (server=3Dtrue)
+> +#        or connect to (server=3Dfalse)
+> +# @tls-creds: the ID of the TLS credentials object (since 2.6)
+> +# @server: create server socket (default: true)
+> +# @wait: wait for incoming connection on server
+> +#        sockets (default: false).
+> +# @nodelay: set TCP_NODELAY socket option (default: false)
+> +# @telnet: enable telnet protocol on server
+> +#          sockets (default: false)
+> +# @tn3270: enable tn3270 protocol on server
+> +#          sockets (default: false) (Since: 2.10)
+> +# @reconnect: For a client socket, if a socket is disconnected,
+> +#          then attempt a reconnect after the given number of seconds.
+> +#          Setting this to zero disables this function. (default: 0)
+> +#          (Since: 2.2)
+> +#
+> +# Since: 1.4
+> +##
+> +{ 'struct': 'ChardevSocket', 'data': { 'addr'       :
+> 'SocketAddressLegacy',
+> +                                     '*tls-creds'  : 'str',
+> +                                     '*server'    : 'bool',
+> +                                     '*wait'      : 'bool',
+> +                                     '*nodelay'   : 'bool',
+> +                                     '*telnet'    : 'bool',
+> +                                     '*tn3270'    : 'bool',
+> +                                     '*reconnect' : 'int' },
+> +  'base': 'ChardevCommon' }
+> +
+> +##
+> +# @ChardevUdp:
+> +#
+> +# Configuration info for datagram socket chardevs.
+> +#
+> +# @remote: remote address
+> +# @local: local address
 > +#
 > +# Since: 1.5
+> +##
+> +{ 'struct': 'ChardevUdp', 'data': { 'remote' : 'SocketAddressLegacy',
+> +                                  '*local' : 'SocketAddressLegacy' },
+> +  'base': 'ChardevCommon' }
+> +
+> +##
+> +# @ChardevMux:
+> +#
+> +# Configuration info for mux chardevs.
+> +#
+> +# @chardev: name of the base chardev.
+> +#
+> +# Since: 1.5
+> +##
+> +{ 'struct': 'ChardevMux', 'data': { 'chardev' : 'str' },
+> +  'base': 'ChardevCommon' }
+> +
+> +##
+> +# @ChardevStdio:
+> +#
+> +# Configuration info for stdio chardevs.
+> +#
+> +# @signal: Allow signals (such as SIGINT triggered by ^C)
+> +#          be delivered to qemu.  Default: true in -nographic mode,
+> +#          false otherwise.
+> +#
+> +# Since: 1.5
+> +##
+> +{ 'struct': 'ChardevStdio', 'data': { '*signal' : 'bool' },
+> +  'base': 'ChardevCommon' }
+> +
+> +
+> +##
+> +# @ChardevSpiceChannel:
+> +#
+> +# Configuration info for spice vm channel chardevs.
+> +#
+> +# @type: kind of channel (for example vdagent).
+> +#
+> +# Since: 1.5
+> +##
+> +{ 'struct': 'ChardevSpiceChannel', 'data': { 'type'  : 'str' },
+> +  'base': 'ChardevCommon' }
+> +
+> +##
+> +# @ChardevSpicePort:
+> +#
+> +# Configuration info for spice port chardevs.
+> +#
+> +# @fqdn: name of the channel (see docs/spice-port-fqdn.txt)
+> +#
+> +# Since: 1.5
+> +##
+> +{ 'struct': 'ChardevSpicePort', 'data': { 'fqdn'  : 'str' },
+> +  'base': 'ChardevCommon' }
+> +
+> +##
+> +# @ChardevVC:
+> +#
+> +# Configuration info for virtual console chardevs.
+> +#
+> +# @width:  console width,  in pixels
+> +# @height: console height, in pixels
+> +# @cols:   console width,  in chars
+> +# @rows:   console height, in chars
+> +#
+> +# Since: 1.5
+> +##
+> +{ 'struct': 'ChardevVC', 'data': { '*width'  : 'int',
+> +                                 '*height' : 'int',
+> +                                 '*cols'   : 'int',
+> +                                 '*rows'   : 'int' },
+> +  'base': 'ChardevCommon' }
+> +
+> +##
+> +# @ChardevRingbuf:
+> +#
+> +# Configuration info for ring buffer chardevs.
+> +#
+> +# @size: ring buffer size, must be power of two, default is 65536
+> +#
+> +# Since: 1.5
+> +##
+> +{ 'struct': 'ChardevRingbuf', 'data': { '*size'  : 'int' },
+> +  'base': 'ChardevCommon' }
+> +
+> +##
+> +# @ChardevBackend:
+> +#
+> +# Configuration info for the new chardev backend.
+> +#
+> +# Since: 1.4 (testdev since 2.2, wctablet since 2.9)
+> +##
+> +{ 'union': 'ChardevBackend', 'data': { 'file'   : 'ChardevFile',
+> +                                       'serial' : 'ChardevHostdev',
+> +                                       'parallel': 'ChardevHostdev',
+> +                                       'pipe'   : 'ChardevHostdev',
+> +                                       'socket' : 'ChardevSocket',
+> +                                       'udp'    : 'ChardevUdp',
+> +                                       'pty'    : 'ChardevCommon',
+> +                                       'null'   : 'ChardevCommon',
+> +                                       'mux'    : 'ChardevMux',
+> +                                       'msmouse': 'ChardevCommon',
+> +                                       'wctablet' : 'ChardevCommon',
+> +                                       'braille': 'ChardevCommon',
+> +                                       'testdev': 'ChardevCommon',
+> +                                       'stdio'  : 'ChardevStdio',
+> +                                       'console': 'ChardevCommon',
+> +                                       'spicevmc' : 'ChardevSpiceChannel=
+',
+> +                                       'spiceport' : 'ChardevSpicePort',
+> +                                       'vc'     : 'ChardevVC',
+> +                                       'ringbuf': 'ChardevRingbuf',
+> +                                       # next one is just for
+> compatibility
+> +                                       'memory' : 'ChardevRingbuf' } }
+> +
+> +##
+> +# @ChardevReturn:
+> +#
+> +# Return info about the chardev backend just created.
+> +#
+> +# @pty: name of the slave pseudoterminal device, present if
+> +#       and only if a chardev of type 'pty' was created
+> +#
+> +# Since: 1.4
+> +##
+> +{ 'struct' : 'ChardevReturn', 'data': { '*pty' : 'str' } }
+> +
+> +##
+> +# @chardev-add:
+> +#
+> +# Add a character device backend
+> +#
+> +# @id: the chardev's ID, must be unique
+> +# @backend: backend type and parameters
+> +#
+> +# Returns: ChardevReturn.
+> +#
+> +# Since: 1.4
 > +#
 > +# Example:
 > +#
-> +# <- { "event": "GUEST_PANICKED",
-> +#      "data": { "action": "pause" } }
+> +# -> { "execute" : "chardev-add",
+> +#      "arguments" : { "id" : "foo",
+> +#                      "backend" : { "type" : "null", "data" : {} } } }
+> +# <- { "return": {} }
+> +#
+> +# -> { "execute" : "chardev-add",
+> +#      "arguments" : { "id" : "bar",
+> +#                      "backend" : { "type" : "file",
+> +#                                    "data" : { "out" : "/tmp/bar.log" }
+> } } }
+> +# <- { "return": {} }
+> +#
+> +# -> { "execute" : "chardev-add",
+> +#      "arguments" : { "id" : "baz",
+> +#                      "backend" : { "type" : "pty", "data" : {} } } }
+> +# <- { "return": { "pty" : "/dev/pty/42" } }
 > +#
 > +##
-> +{ 'event': 'GUEST_PANICKED',
-> +  'data': { 'action': 'GuestPanicAction', '*info':
-> 'GuestPanicInformation' } }
+> +{ 'command': 'chardev-add', 'data': {'id'      : 'str',
+> +                                     'backend' : 'ChardevBackend' },
+> +  'returns': 'ChardevReturn' }
 > +
 > +##
-> +# @GuestPanicAction:
+> +# @chardev-change:
 > +#
-> +# An enumeration of the actions taken when guest OS panic is detected
+> +# Change a character device backend
 > +#
-> +# @pause: system pauses
+> +# @id: the chardev's ID, must exist
+> +# @backend: new backend type and parameters
 > +#
-> +# Since: 2.1 (poweroff since 2.8)
+> +# Returns: ChardevReturn.
+> +#
+> +# Since: 2.10
+> +#
+> +# Example:
+> +#
+> +# -> { "execute" : "chardev-change",
+> +#      "arguments" : { "id" : "baz",
+> +#                      "backend" : { "type" : "pty", "data" : {} } } }
+> +# <- { "return": { "pty" : "/dev/pty/42" } }
+> +#
+> +# -> {"execute" : "chardev-change",
+> +#     "arguments" : {
+> +#         "id" : "charchannel2",
+> +#         "backend" : {
+> +#             "type" : "socket",
+> +#             "data" : {
+> +#                 "addr" : {
+> +#                     "type" : "unix" ,
+> +#                     "data" : {
+> +#                         "path" : "/tmp/charchannel2.socket"
+> +#                     }
+> +#                  },
+> +#                  "server" : true,
+> +#                  "wait" : false }}}}
+> +# <- {"return": {}}
+> +#
 > +##
-> +{ 'enum': 'GuestPanicAction',
-> +  'data': [ 'pause', 'poweroff' ] }
+> +{ 'command': 'chardev-change', 'data': {'id'      : 'str',
+> +                                        'backend' : 'ChardevBackend' },
+> +  'returns': 'ChardevReturn' }
 > +
 > +##
-> +# @GuestPanicInformationType:
+> +# @chardev-remove:
 > +#
-> +# An enumeration of the guest panic information types
+> +# Remove a character device backend
 > +#
-> +# Since: 2.9
+> +# @id: the chardev's ID, must exist and not be in use
+> +#
+> +# Returns: Nothing on success
+> +#
+> +# Since: 1.4
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "chardev-remove", "arguments": { "id" : "foo" } }
+> +# <- { "return": {} }
+> +#
 > +##
-> +{ 'enum': 'GuestPanicInformationType',
-> +  'data': [ 'hyper-v'] }
+> +{ 'command': 'chardev-remove', 'data': {'id': 'str'} }
 > +
 > +##
-> +# @GuestPanicInformation:
+> +# @chardev-send-break:
 > +#
-> +# Information about a guest panic
+> +# Send a break to a character device
 > +#
-> +# Since: 2.9
+> +# @id: the chardev's ID, must exist
+> +#
+> +# Returns: Nothing on success
+> +#
+> +# Since: 2.10
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "chardev-send-break", "arguments": { "id" : "foo" } }
+> +# <- { "return": {} }
+> +#
 > +##
-> +{'union': 'GuestPanicInformation',
-> + 'base': {'type': 'GuestPanicInformationType'},
-> + 'discriminator': 'type',
-> + 'data': { 'hyper-v': 'GuestPanicInformationHyperV' } }
+> +{ 'command': 'chardev-send-break', 'data': {'id': 'str'} }
 > +
 > +##
-> +# @GuestPanicInformationHyperV:
+> +# @VSERPORT_CHANGE:
 > +#
-> +# Hyper-V specific guest panic information (HV crash MSRs)
+> +# Emitted when the guest opens or closes a virtio-serial port.
 > +#
-> +# Since: 2.9
+> +# @id: device identifier of the virtio-serial port
+> +#
+> +# @open: true if the guest has opened the virtio-serial port
+> +#
+> +# Since: 2.1
+> +#
+> +# Example:
+> +#
+> +# <- { "event": "VSERPORT_CHANGE",
+> +#      "data": { "id": "channel0", "open": true },
+> +#      "timestamp": { "seconds": 1401385907, "microseconds": 422329 } }
+> +#
 > +##
-> +{'struct': 'GuestPanicInformationHyperV',
-> + 'data': { 'arg1': 'uint64',
-> +           'arg2': 'uint64',
-> +           'arg3': 'uint64',
-> +           'arg4': 'uint64',
-> +           'arg5': 'uint64' } }
+> +{ 'event': 'VSERPORT_CHANGE',
+> +  'data': { 'id': 'str', 'open': 'bool' } }
+> diff --git a/qapi/event.json b/qapi/event.json
+> index 9c6126d..b9aa6ed 100644
+> --- a/qapi/event.json
+> +++ b/qapi/event.json
+> @@ -397,27 +397,6 @@
+>              'sector-num': 'int', 'sectors-count': 'int' } }
+>
+>  ##
+> -# @VSERPORT_CHANGE:
+> -#
+> -# Emitted when the guest opens or closes a virtio-serial port.
+> -#
+> -# @id: device identifier of the virtio-serial port
+> -#
+> -# @open: true if the guest has opened the virtio-serial port
+> -#
+> -# Since: 2.1
+> -#
+> -# Example:
+> -#
+> -# <- { "event": "VSERPORT_CHANGE",
+> -#      "data": { "id": "channel0", "open": true },
+> -#      "timestamp": { "seconds": 1401385907, "microseconds": 422329 } }
+> -#
+> -##
+> -{ 'event': 'VSERPORT_CHANGE',
+> -  'data': { 'id': 'str', 'open': 'bool' } }
+>
+
+That one is a bit special (since it's for virtio-serial), but it is
+char-related stuff, ok.
+
+-
+> -##
+>  # @MEM_UNPLUG_ERROR:
+>  #
+>  # Emitted when memory hot unplug error occurs.
 > --
 > 2.7.5
 >
