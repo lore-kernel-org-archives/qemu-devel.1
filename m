@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dlJio-0002GI-Um
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 14:52:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1dlJxm-000790-Qo
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 15:08:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dlJio-00042A-3w
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 14:52:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1dlJxl-0003Xo-S4
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 15:08:14 -0400
 References: <20170804151440.320927-1-vsementsov@virtuozzo.com>
-	<20170804151440.320927-10-vsementsov@virtuozzo.com>
+	<20170804151440.320927-8-vsementsov@virtuozzo.com>
+	<04916320-d8a4-80e2-d6b7-0fcd7b4a9cfa@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <3d184720-ee1c-f777-4ead-ad3f81318aa9@redhat.com>
-Date: Fri, 25 Aug 2017 13:52:38 -0500
+Message-ID: <77c8ea93-c65a-7d6d-18d0-7679fed0cb01@redhat.com>
+Date: Fri, 25 Aug 2017 14:08:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170804151440.320927-10-vsementsov@virtuozzo.com>
+In-Reply-To: <04916320-d8a4-80e2-d6b7-0fcd7b4a9cfa@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="brKAdkabPsjDl15NjPWb8WETmWTar9wWx"
-Subject: Re: [Qemu-devel] [PATCH 09/17] block/nbd-client: move
- nbd_co_receive_reply content into nbd_co_request
+	boundary="Ulii33OLHEiCwAX0feWgkCAhXxBDaO83h"
+Subject: Re: [Qemu-devel] [PATCH 07/17] block/nbd-client: refactor request
+ send/receive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +27,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, mreitz@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---brKAdkabPsjDl15NjPWb8WETmWTar9wWx
+--Ulii33OLHEiCwAX0feWgkCAhXxBDaO83h
 From: Eric Blake <eblake@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
-Message-ID: <3d184720-ee1c-f777-4ead-ad3f81318aa9@redhat.com>
-Subject: Re: [PATCH 09/17] block/nbd-client: move nbd_co_receive_reply content
- into nbd_co_request
+Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, mreitz@redhat.com
+Message-ID: <77c8ea93-c65a-7d6d-18d0-7679fed0cb01@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 07/17] block/nbd-client: refactor request
+ send/receive
 References: <20170804151440.320927-1-vsementsov@virtuozzo.com>
- <20170804151440.320927-10-vsementsov@virtuozzo.com>
-In-Reply-To: <20170804151440.320927-10-vsementsov@virtuozzo.com>
+ <20170804151440.320927-8-vsementsov@virtuozzo.com>
+ <04916320-d8a4-80e2-d6b7-0fcd7b4a9cfa@redhat.com>
+In-Reply-To: <04916320-d8a4-80e2-d6b7-0fcd7b4a9cfa@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08/04/2017 10:14 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Move code from nbd_co_receive_reply into nbd_co_request. This simplify
+On 08/25/2017 01:49 PM, Eric Blake wrote:
+> On 08/04/2017 10:14 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Move nbd_co_receive_reply and nbd_coroutine_end calls into
+>> nbd_co_send_request and rename the latter to just nbd_co_request.
+>>
+>> This removes code duplications in nbd_client_co_{pwrite,pread,...}
+>> functions. Also this is needed for further refactoring.
+>>
 
-s/simplify/simplifies/
-
-> things, makes further refactoring possible. Also, a function starting
-
-s/makes/and makes/
-
-> with qemu_coroutine_yield is weird.
+>> -static int nbd_co_send_request(BlockDriverState *bs,
+>> -                               NBDRequest *request,
+>> -                               QEMUIOVector *qiov)
+>> +static void nbd_co_receive_reply(NBDClientSession *s,
+>> +                                 NBDRequest *request,
+>> +                                 NBDReply *reply,
+>> +                                 QEMUIOVector *qiov);
+>> +static void nbd_coroutine_end(BlockDriverState *bs,
+>> +                              NBDRequest *request);
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/nbd-client.c | 33 ++++++++++-----------------------
->  1 file changed, 10 insertions(+), 23 deletions(-)
->=20
+> Is it possible to organize the functions in topological order so that w=
+e
+> don't need forward declarations of static functions?  (If there is
+> mutual recursion, you need the forward declaration; but other than that=
+,
+> I like reading the building blocks first rather than skipping around)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Answering myself: patch 9 inlines nbd_co_receive_reply into its lone
+caller, eliminating the need for a forward reference, and it is less
+code churn to have a temporary forward declaration than it is to move
+the function body up and then back down.  (Maybe the commit message
+could hint that nbd_co_receive_reply will later be inlined)
+
+>=20
+> Otherwise,
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -68,7 +88,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---brKAdkabPsjDl15NjPWb8WETmWTar9wWx
+--Ulii33OLHEiCwAX0feWgkCAhXxBDaO83h
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -77,14 +97,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmgcfYACgkQp6FrSiUn
-Q2rbwQf+LCHWlgs0JZm+QvkezKlYmlB+7r4VUoP/nQxj/xD7aRUuuzR1KbTUF1eU
-Vx9/ALyMqb8OrD+yT1XOBLIRfmbhf3daSjDLLZ8CUp5Ecoiss168Pl6CRGuPcs1F
-QFbI4xDKRMlOxGvf+2XGY1BCzwiJR+fhZkv6GYaEjWn7CwVK2MoR5+gPMbnERppE
-bWwCpj9MG/uHgjczLsfudYN6IbnI+lobZUPGLLHQ6jPQSFmTCig0k9jBpWZ1YBn3
-eJBs/RPlQrhh3I+cMvT8baVDZ+y5IgmEEPB8l3IojL0ZbTzf/gAZvexRp0hzP4C5
-t2MuhNkGFpkOTXzNYMqKXGlHyWwPlA==
-=j6Zb
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmgdZUACgkQp6FrSiUn
+Q2ooMwf7Bh/Pf1D5IeMp5Zd0Itfspp4AKxautML9a4oZOAFTsAkWsw1+zgVesghc
+5RWNLaOjRPHrQFVs6k1EqFGCGB7PFJRtaIdBmZWv/ied/+Y3vYVe6mJbYx6RBlKO
+/sRg/01Ilbdk5YvbTbrD8BCw7vV1TvvCBwhRPapNBlS+ji916SfdgJJ0wqUGfr7d
+E3M4/0D87YLHBe2+bBzIFHFvJAAGvY45AIHm3+3bDPFTL/4U81Diti/Lx0U0d2/r
++ugchflgK8/EIoP2YogBhUrvEc/MDfcEcaxu591vnPROzMVECl5aILTnCuUvNAw1
+82WtFUONjLevh1axJAepqIHHwEMryg==
+=1oV/
 -----END PGP SIGNATURE-----
 
---brKAdkabPsjDl15NjPWb8WETmWTar9wWx--
+--Ulii33OLHEiCwAX0feWgkCAhXxBDaO83h--
