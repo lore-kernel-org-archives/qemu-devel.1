@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dlCQQ-0004Nd-3T
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:05:18 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCR7-0004vh-52
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:06:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dlCQK-0007OE-3o
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:05:18 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCR4-0007hb-3S
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:06:01 -0400
+Received: from mail-ua0-x244.google.com ([2607:f8b0:400c:c08::244]:38696)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dlCR3-0007hP-SY
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:05:58 -0400
+Received: by mail-ua0-x244.google.com with SMTP id x18so850881uah.5
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 04:05:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170824211506.iygynkpevxemsyg2@postretch>
-References: <20170822101535.4695-1-el13635@mail.ntua.gr>
-	<20170822101535.4695-7-el13635@mail.ntua.gr>
-	<20170824184308.GD4368@stefanha-x1.localdomain>
-	<20170824211506.iygynkpevxemsyg2@postretch>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Fri, 25 Aug 2017 12:05:10 +0100
-Message-ID: <CAJSP0QWN3R=kd9299ziiHa3OEdPGGvM+1M6ZO1hkjKEgvnFmoA@mail.gmail.com>
+References: <1503602048-12268-1-git-send-email-armbru@redhat.com>
+	<1503602048-12268-5-git-send-email-armbru@redhat.com>
+In-Reply-To: <1503602048-12268-5-git-send-email-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 25 Aug 2017 11:05:46 +0000
+Message-ID: <CAJ+F1CJCPXONa7gQhQaLW3jKxuAaS2PTWh_YeegW1KEhjY1soA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v7 6/6] qemu-iotests: add 184 for throttle
- filter driver
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 04/16] qapi-schema: Collect sockets
+ stuff in qapi/sockets.json
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,33 +31,454 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block <qemu-block@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Thu, Aug 24, 2017 at 10:15 PM, Manos Pitsidianakis
-<el13635@mail.ntua.gr> wrote:
-> On Thu, Aug 24, 2017 at 07:43:08PM +0100, Stefan Hajnoczi wrote:
->>
->> On Tue, Aug 22, 2017 at 01:15:35PM +0300, Manos Pitsidianakis wrote:
->>>
->>> +_supported_fmt qcow2
->>
->>
->> What makes this test qcow2-specific?  With additional filtering for
->> IMGFMT it should be possible to run this on any image format.
+On Thu, Aug 24, 2017 at 9:18 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
+
+> Cc: "Daniel P. Berrange" <berrange@redhat.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
+
+> ---
+>  MAINTAINERS          |   1 +
+>  Makefile             |   4 +-
+>  qapi-schema.json     | 152
+> +--------------------------------------------------
+>  qapi/block-core.json |   2 +-
+>  qapi/common.json     |  11 ++++
+>  qapi/sockets.json    | 147
+> +++++++++++++++++++++++++++++++++++++++++++++++++
+>  6 files changed, 164 insertions(+), 153 deletions(-)
+>  create mode 100644 qapi/sockets.json
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index ccee28b..fb90a19 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1535,6 +1535,7 @@ M: Paolo Bonzini <pbonzini@redhat.com>
+>  S: Maintained
+>  F: include/qemu/sockets.h
+>  F: util/qemu-sockets.c
+> +F: qapi/sockets.json
+>
+>  Throttling infrastructure
+>  M: Alberto Garcia <berto@igalia.com>
+> diff --git a/Makefile b/Makefile
+> index 81447b1..ca4a03c 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -410,8 +410,10 @@ $(SRC_PATH)/qga/qapi-schema.json
+> $(SRC_PATH)/scripts/qapi-commands.py $(qapi-py)
+>
+>  qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SRC_PATH)/qapi/common.js=
+on \
+>                 $(SRC_PATH)/qapi/block.json
+> $(SRC_PATH)/qapi/block-core.json \
+> +               $(SRC_PATH)/qapi/crypto.json \
+>                 $(SRC_PATH)/qapi/event.json
+> $(SRC_PATH)/qapi/introspect.json \
+> -               $(SRC_PATH)/qapi/crypto.json $(SRC_PATH)/qapi/rocker.json=
+ \
+> +               $(SRC_PATH)/qapi/rocker.json \
+> +               $(SRC_PATH)/qapi/sockets.json \
+>                 $(SRC_PATH)/qapi/trace.json
+>
+>  qapi-types.c qapi-types.h :\
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index add4777..d69b6da 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -79,6 +79,7 @@
+>  # include it first in qapi-schema.json.
+>
+>  { 'include': 'qapi/common.json' }
+> +{ 'include': 'qapi/sockets.json' }
+>  { 'include': 'qapi/crypto.json' }
+>  { 'include': 'qapi/block.json' }
+>  { 'include': 'qapi/rocker.json' }
+> @@ -1616,26 +1617,6 @@
+>  { 'command': 'query-iothreads', 'returns': ['IOThreadInfo'] }
+>
+>  ##
+> -# @NetworkAddressFamily:
+> -#
+> -# The network address family
+> -#
+> -# @ipv4: IPV4 family
+> -#
+> -# @ipv6: IPV6 family
+> -#
+> -# @unix: unix socket
+> -#
+> -# @vsock: vsock family (since 2.8)
+> -#
+> -# @unknown: otherwise
+> -#
+> -# Since: 2.1
+> -##
+> -{ 'enum': 'NetworkAddressFamily',
+> -  'data': [ 'ipv4', 'ipv6', 'unix', 'vsock', 'unknown' ] }
+>
+
+This enum is actually only used in ui.json after your series. But I suppose
+it makes more sense in sockets.json
+
+-
+> -##
+>  # @VncBasicInfo:
+>  #
+>  # The basic information for vnc network connection
+> @@ -3696,17 +3677,6 @@
+>      '*vectors': 'uint32' } }
+>
+>  ##
+> -# @String:
+> -#
+> -# A fat type wrapping 'str', to be embedded in lists.
+> -#
+> -# Since: 1.2
+> -##
+> -{ 'struct': 'String',
+> -  'data': {
+> -    'str': 'str' } }
+> -
+> -##
+>  # @NetdevUserOptions:
+>  #
+>  # Use the user mode network stack which requires no administrator
+> privilege to
+> @@ -4157,126 +4127,6 @@
+>    'data': [ 'all', 'rx', 'tx' ] }
+>
+>  ##
+> -# @InetSocketAddressBase:
+> -#
+> -# @host: host part of the address
+> -# @port: port part of the address
+> -##
+> -{ 'struct': 'InetSocketAddressBase',
+> -  'data': {
+> -    'host': 'str',
+> -    'port': 'str' } }
+> -
+> -##
+> -# @InetSocketAddress:
+> -#
+> -# Captures a socket address or address range in the Internet namespace.
+> -#
+> -# @numeric: true if the host/port are guaranteed to be numeric,
+> -#           false if name resolution should be attempted. Defaults to
+> false.
+> -#           (Since 2.9)
+> -#
+> -# @to: If present, this is range of possible addresses, with port
+> -#      between @port and @to.
+> -#
+> -# @ipv4: whether to accept IPv4 addresses, default try both IPv4 and IPv=
+6
+> -#
+> -# @ipv6: whether to accept IPv6 addresses, default try both IPv4 and IPv=
+6
+> -#
+> -# Since: 1.3
+> -##
+> -{ 'struct': 'InetSocketAddress',
+> -  'base': 'InetSocketAddressBase',
+> -  'data': {
+> -    '*numeric':  'bool',
+> -    '*to': 'uint16',
+> -    '*ipv4': 'bool',
+> -    '*ipv6': 'bool' } }
+> -
+> -##
+> -# @UnixSocketAddress:
+> -#
+> -# Captures a socket address in the local ("Unix socket") namespace.
+> -#
+> -# @path: filesystem path to use
+> -#
+> -# Since: 1.3
+> -##
+> -{ 'struct': 'UnixSocketAddress',
+> -  'data': {
+> -    'path': 'str' } }
+> -
+> -##
+> -# @VsockSocketAddress:
+> -#
+> -# Captures a socket address in the vsock namespace.
+> -#
+> -# @cid: unique host identifier
+> -# @port: port
+> -#
+> -# Note: string types are used to allow for possible future hostname or
+> -# service resolution support.
+> -#
+> -# Since: 2.8
+> -##
+> -{ 'struct': 'VsockSocketAddress',
+> -  'data': {
+> -    'cid': 'str',
+> -    'port': 'str' } }
+> -
+> -##
+> -# @SocketAddressLegacy:
+> -#
+> -# Captures the address of a socket, which could also be a named file
+> descriptor
+> -#
+> -# Note: This type is deprecated in favor of SocketAddress.  The
+> -# difference between SocketAddressLegacy and SocketAddress is that the
+> -# latter is a flat union rather than a simple union. Flat is nicer
+> -# because it avoids nesting on the wire, i.e. that form has fewer {}.
+> -
+> -#
+> -# Since: 1.3
+> -##
+> -{ 'union': 'SocketAddressLegacy',
+> -  'data': {
+> -    'inet': 'InetSocketAddress',
+> -    'unix': 'UnixSocketAddress',
+> -    'vsock': 'VsockSocketAddress',
+> -    'fd': 'String' } }
+> -
+> -##
+> -# @SocketAddressType:
+> -#
+> -# Available SocketAddress types
+> -#
+> -# @inet:  Internet address
+> -#
+> -# @unix:  Unix domain socket
+> -#
+> -# Since: 2.9
+> -##
+> -{ 'enum': 'SocketAddressType',
+> -  'data': [ 'inet', 'unix', 'vsock', 'fd' ] }
+> -
+> -##
+> -# @SocketAddress:
+> -#
+> -# Captures the address of a socket, which could also be a named file
+> -# descriptor
+> -#
+> -# @type:       Transport type
+> -#
+> -# Since: 2.9
+> -##
+> -{ 'union': 'SocketAddress',
+> -  'base': { 'type': 'SocketAddressType' },
+> -  'discriminator': 'type',
+> -  'data': { 'inet': 'InetSocketAddress',
+> -            'unix': 'UnixSocketAddress',
+> -            'vsock': 'VsockSocketAddress',
+> -            'fd': 'String' } }
+> -
+> -##
+>  # @getfd:
+>  #
+>  # Receive a file descriptor via SCM rights and assign it a name
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 833c602..5379674 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -4,8 +4,8 @@
+>  # =3D=3D QAPI block core definitions (vm unrelated)
+>  ##
+>
+> -# QAPI common definitions
+>  { 'include': 'common.json' }
+> +{ 'include': 'sockets.json' }
+>
+>  ##
+>  # @SnapshotInfo:
+> diff --git a/qapi/common.json b/qapi/common.json
+> index 8355d5a..862e73f 100644
+> --- a/qapi/common.json
+> +++ b/qapi/common.json
+> @@ -162,3 +162,14 @@
+>  ##
+>  { 'enum': 'OnOffSplit',
+>    'data': [ 'on', 'off', 'split' ] }
+> +
+> +##
+> +# @String:
+> +#
+> +# A fat type wrapping 'str', to be embedded in lists.
+> +#
+> +# Since: 1.2
+> +##
+> +{ 'struct': 'String',
+> +  'data': {
+> +    'str': 'str' } }
+> diff --git a/qapi/sockets.json b/qapi/sockets.json
+> new file mode 100644
+> index 0000000..ac022c6
+> --- /dev/null
+> +++ b/qapi/sockets.json
+> @@ -0,0 +1,147 @@
+> +# -*- Mode: Python -*-
+> +
+> +##
+> +# =3D Socket data types
+> +##
+> +
+> +{ 'include': 'common.json' }
+> +
+> +##
+> +# @NetworkAddressFamily:
+> +#
+> +# The network address family
+> +#
+> +# @ipv4: IPV4 family
+> +#
+> +# @ipv6: IPV6 family
+> +#
+> +# @unix: unix socket
+> +#
+> +# @vsock: vsock family (since 2.8)
+> +#
+> +# @unknown: otherwise
+> +#
+> +# Since: 2.1
+> +##
+> +{ 'enum': 'NetworkAddressFamily',
+> +  'data': [ 'ipv4', 'ipv6', 'unix', 'vsock', 'unknown' ] }
+> +
+> +##
+> +# @InetSocketAddressBase:
+> +#
+> +# @host: host part of the address
+> +# @port: port part of the address
+> +##
+> +{ 'struct': 'InetSocketAddressBase',
+> +  'data': {
+> +    'host': 'str',
+> +    'port': 'str' } }
+> +
+> +##
+> +# @InetSocketAddress:
+> +#
+> +# Captures a socket address or address range in the Internet namespace.
+> +#
+> +# @numeric: true if the host/port are guaranteed to be numeric,
+> +#           false if name resolution should be attempted. Defaults to
+> false.
+> +#           (Since 2.9)
+> +#
+> +# @to: If present, this is range of possible addresses, with port
+> +#      between @port and @to.
+> +#
+> +# @ipv4: whether to accept IPv4 addresses, default try both IPv4 and IPv=
+6
+> +#
+> +# @ipv6: whether to accept IPv6 addresses, default try both IPv4 and IPv=
+6
+> +#
+> +# Since: 1.3
+> +##
+> +{ 'struct': 'InetSocketAddress',
+> +  'base': 'InetSocketAddressBase',
+> +  'data': {
+> +    '*numeric':  'bool',
+> +    '*to': 'uint16',
+> +    '*ipv4': 'bool',
+> +    '*ipv6': 'bool' } }
+> +
+> +##
+> +# @UnixSocketAddress:
+> +#
+> +# Captures a socket address in the local ("Unix socket") namespace.
+> +#
+> +# @path: filesystem path to use
+> +#
+> +# Since: 1.3
+> +##
+> +{ 'struct': 'UnixSocketAddress',
+> +  'data': {
+> +    'path': 'str' } }
+> +
+> +##
+> +# @VsockSocketAddress:
+> +#
+> +# Captures a socket address in the vsock namespace.
+> +#
+> +# @cid: unique host identifier
+> +# @port: port
+> +#
+> +# Note: string types are used to allow for possible future hostname or
+> +# service resolution support.
+> +#
+> +# Since: 2.8
+> +##
+> +{ 'struct': 'VsockSocketAddress',
+> +  'data': {
+> +    'cid': 'str',
+> +    'port': 'str' } }
+> +
+> +##
+> +# @SocketAddressLegacy:
+> +#
+> +# Captures the address of a socket, which could also be a named file
+> descriptor
+> +#
+> +# Note: This type is deprecated in favor of SocketAddress.  The
+> +# difference between SocketAddressLegacy and SocketAddress is that the
+> +# latter is a flat union rather than a simple union. Flat is nicer
+> +# because it avoids nesting on the wire, i.e. that form has fewer {}.
+> +
+> +#
+> +# Since: 1.3
+> +##
+> +{ 'union': 'SocketAddressLegacy',
+> +  'data': {
+> +    'inet': 'InetSocketAddress',
+> +    'unix': 'UnixSocketAddress',
+> +    'vsock': 'VsockSocketAddress',
+> +    'fd': 'String' } }
+> +
+> +##
+> +# @SocketAddressType:
+> +#
+> +# Available SocketAddress types
+> +#
+> +# @inet:  Internet address
+> +#
+> +# @unix:  Unix domain socket
+> +#
+> +# Since: 2.9
+> +##
+> +{ 'enum': 'SocketAddressType',
+> +  'data': [ 'inet', 'unix', 'vsock', 'fd' ] }
+> +
+> +##
+> +# @SocketAddress:
+> +#
+> +# Captures the address of a socket, which could also be a named file
+> +# descriptor
+> +#
+> +# @type:       Transport type
+> +#
+> +# Since: 2.9
+> +##
+> +{ 'union': 'SocketAddress',
+> +  'base': { 'type': 'SocketAddressType' },
+> +  'discriminator': 'type',
+> +  'data': { 'inet': 'InetSocketAddress',
+> +            'unix': 'UnixSocketAddress',
+> +            'vsock': 'VsockSocketAddress',
+> +            'fd': 'String' } }
+> --
+> 2.7.5
 >
 >
-> I think none of the available filters hide all of the image details in
-> query-block and company. _filter_imgfmt hides the image extensions but not
-> the image specific fields (eg virtual-size, actual-size and
-> format-specific). Perhaps a new filter that hides everything but "format"
-> and "filename" in the "image" subdict can be introduced later.
-
-It's a little cumbersome to filter JSON in shell.  The filters do not
-use jq(1) at the moment.
-
-Tests written in Python have an easier time of filtering certain
-fields.  I did that recently for QMP Event objects in 194.
-
-Anyway, it's okay to keep this test qcow2-only for now.
-
-Stefan
+> --
+Marc-Andr=C3=A9 Lureau
