@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dl6BE-0002qs-6d
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 00:25:13 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dl6V3-0008Bt-Ph
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 00:45:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dl6BB-0006Kt-0n
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 00:25:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33144)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dl6BA-0006Ic-O5
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 00:25:08 -0400
-Date: Fri, 25 Aug 2017 12:25:02 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170825042502.GD14174@pxdev.xzpeter.org>
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<1503471071-2233-3-git-send-email-peterx@redhat.com>
-	<20170823173534.GF2648@work-vm>
+	(envelope-from <dgibson@ozlabs.org>) id 1dl6V2-0000R6-Qk
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 00:45:41 -0400
+Date: Fri, 25 Aug 2017 14:23:13 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170825042313.GD2772@umbus.fritz.box>
+References: <20170821200036.15036-1-bauerman@linux.vnet.ibm.com>
+	<20170824025448.GA27401@fergus.ozlabs.ibm.com>
+	<20170824181122.GA5632@ram.oc3035372033.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="eheScQNz3K90DVRs"
 Content-Disposition: inline
-In-Reply-To: <20170823173534.GF2648@work-vm>
-Subject: Re: [Qemu-devel] [RFC v2 2/8] monitor: allow monitor to create
- thread to poll
+In-Reply-To: <20170824181122.GA5632@ram.oc3035372033.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] spapr: Add ibm,
+ processor-storage-keys property to CPU DT node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,158 +26,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Ram Pai <linuxram@us.ibm.com>
+Cc: Paul Mackerras <paulus@ozlabs.org>, Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Michael Ellerman <mpe@ellerman.id.au>
 
-On Wed, Aug 23, 2017 at 06:35:35PM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > Firstly, introduce Monitor.use_thread, and set it for monitors that are
-> > using non-mux typed backend chardev.  We only do this for monitors, so
-> > mux-typed chardevs are not suitable (when it connects to, e.g., serials
-> > and the monitor together).
-> > 
-> > When use_thread is set, we create standalone thread to poll the monitor
-> > events, isolated from the main loop thread.  Here we still need to take
-> > the BQL before dispatching the tasks since some of the monitor commands
-> > are not allowed to execute without the protection of BQL.  Then this
-> > gives us the chance to avoid taking the BQL for some monitor commands in
-> > the future.
-> > 
-> > * Why this change?
-> > 
-> > We need these per-monitor threads to make sure we can have at least one
-> > monitor that will never stuck (that can receive further monitor
-> > commands).
-> > 
-> > * So when will monitors stuck?  And, how do they stuck?
-> 
-> (Minor: 'stuck' is past tense, 'stick' is probably the right word; however
-> 'block' is probably what you actually want)
 
-Yet another English error.  Thanks! :-)
+--eheScQNz3K90DVRs
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-(I guess "monitors get stuck" should also work?)
+On Thu, Aug 24, 2017 at 11:11:22AM -0700, Ram Pai wrote:
+> On Thu, Aug 24, 2017 at 12:54:48PM +1000, Paul Mackerras wrote:
+> > On Mon, Aug 21, 2017 at 05:00:36PM -0300, Thiago Jung Bauermann wrote:
+> > > LoPAPR says:
+> > >=20
+> > >     =E2=80=9Cibm,processor-storage-keys=E2=80=9D
+> > >=20
+> > >     property name indicating the number of virtual storage keys suppo=
+rted
+> > >     by the processor described by this node.
+> > >=20
+> > >     prop-encoded-array: Consists of two cells encoded as with encode-=
+int.
+> > >     The first cell represents the number of virtual storage keys supp=
+orted
+> > >     for data accesses while the second cell represents the number of
+> > >     virtual storage keys supported for instruction accesses. The cell=
+ value
+> > >     of zero indicates that no storage keys are supported for the acce=
+ss
+> > >     type.
+> > >=20
+> > > pHyp provides the property above but there's a bug in P8 firmware whe=
+re the
+> > > second cell is zero even though POWER8 supports instruction access ke=
+ys.
+> > > This bug will be fixed for P9.
+> > >=20
+> > > Tested with KVM on POWER8 Firenze machine and with TCG on x86_64 mach=
+ine.
+> > >=20
+> > > Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+> > > ---
+> > >=20
+> > > The sysfs files are provided by this patch for Linux:
+> >=20
+> > Those sysfs files relate to the kernel's support for userspace
+> > processes using storage keys.  That is quite distinct from KVM's
+> > support for guests using storage keys, so I think that using those
+> > sysfs files to indicate what the guest can do is wrong.
+> >=20
+> > In fact KVM allows guests to specify storage keys in the HPTE values
+> > that they set, except that there is a bug (for which Ram Pai has
+> > posted a patch) that means that KVM loses the top two bits of the key
+> > number.
+> >=20
+> > What I would suggest is that we use the 'pad' field in the struct
+> > kvm_ppc_smmu_info to report the number of keys supported by KVM for
+> > guest use.  That will be 0 in all current kernels, indicating that
+> > keys are not supported, which is reasonable because of the bug.  I
+> > will make sure the patch fixing the bug goes in first.
+>=20
+> with the current kernels, even with the bug, KVM can still support 8
+> keys. Should we say 8 instead of 0?  It will help enable keys on KVM
+> earlier and give a jump start to its adaption by applications.
 
-> 
-> > After we have postcopy and remote page faults, it's simple to achieve a
-> > stuck in the monitor (which is also a stuck in main loop thread):
-> > 
-> > (1) Monitor deadlock on BQL
-> > 
-> > As we may know, when postcopy is running on destination VM, the vcpu
-> > threads can stuck merely any time as long as it tries to access an
-> > uncopied guest page.  Meanwhile, when the stuck happens, it is possible
-> > that the vcpu thread is holding the BQL.  If the page fault is not
-> > handled quickly, you'll find that monitors stop working, which is trying
-> > to take the BQL.
-> > 
-> > If the page fault cannot be handled correctly (one case is a paused
-> > postcopy, when network is temporarily down), monitors will hang
-> > forever.  Without current patch, that means the main loop hanged.  We'll
-> > never find a way to talk to VM again.
-> > 
-> > (2) Monitor tries to run codes page-faulted vcpus
-> > 
-> > The HMP command "info cpus" is one of the good example - it tries to
-> > kick all the vcpus and sync status from them.  However, if there is any
-> > vcpu that stuck at an unhandled page fault, it can never achieve the
-> > sync, then the HMP hangs.  Again, it hangs the main loop thread as well.
-> > 
-> > After either (1) or (2), we can see the deadlock problem:
-> > 
-> > - On one hand, if monitor hangs, we cannot do the postcopy recovery,
-> >   because postcopy recovery needs user to specify new listening port on
-> >   destination monitor.
-> > 
-> > - On the other hand, if we cannot recover the paused postcopy, then page
-> >   faults cannot be serviced, and the monitors will possibly hang
-> >   forever then.
-> > 
-> > * How this patch helps?
-> > 
-> > - Firstly, we'll have our own thread for each dedicated monitor (or say,
-> >   the backend chardev is only used for monitor), so even main loop
-> >   thread hangs (it is always possible), this monitor thread may still
-> >   survive.
-> > 
-> > - Not all monitor commands need the BQL.  We can selectively take the
-> >   BQL (depends on which command we are running) to avoid waiting on a
-> >   page-faulted vcpu thread that has taken the BQL (this will be done in
-> >   following up patches).
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> 
-> A few high level things:
->   a) I think this patch probably wants to split into
->      1) A patch that decides whether to create a new thread and
->      initialises it
->      2) One that starts to fix up the locking
+But the point isn't really what we *can* say, it's with what is
+implicitly said by kernels that don't advertise anything
+specifically.  Which is 0.
 
-Sure.
+If we're going to change the kernel to put something else in smmu
+info, we can also change it to fix the storage key stuff anyway, so we
+can put the full value in there.
 
-> 
->   b) I think you also need to take the bql around any of the custom
->      completion functions; (maybe in monitor_find_completion ?)
->      since they do things like walk the lists of devices.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Ah, yes.  Actually IMHO those completions should be protected by
-smaller locks as well.  Considering this only affects HMP, how about
-this: when "without-bql" is set for a command, it should mean that the
-whole command does not need BQL, this should include not only the
-command execution part, but also the command auto completion routine.
-So I take the BQL in the completion only for those whose "without-bql"
-is unset, like the trick played for the command execution part.
+--eheScQNz3K90DVRs
+Content-Type: application/pgp-signature; name="signature.asc"
 
-For the only command "migrate_incoming", it does not have completion
-routine, so "without-bql=true" still applies.
+-----BEGIN PGP SIGNATURE-----
 
-Or would you prefer I just take the lock unconditionally?
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmfpjAACgkQbDjKyiDZ
+s5IzaxAAv6lWTfZ2nQQW/c0LejRXHEDcVr8FjVmjqRFBwrqLdVlfUWoirSNlcEuQ
+qaT/f/94ZEbHxdRWpF+luTwxyRTHUrV1PUUS8XFiJsW53qGNoIZWSD9U8PEZVj/k
+ecczwM1U09XpuLRRInHL+iRT8yItV+ucj8b/loJpU2Wgi7hUBpX/Xoz2SkT0UIxT
+qg8eptgWpEgGm5KKO7mv8mh2g6hCObxLy0vK5sx+9aqvq69vdQhZX3A69UENBhNf
+etF/dsP8BldQOEAyiKxodI+mQZve0oUnhFYlRGGu36LVXaQHb9g3pP7mA0gB8fQ6
+MN47f8SZfNHh9G6R6nwzVmGDn2SVRxn/nnK8D5elLxQzKEGw+gMbpt70/VVWMYuI
+/3yp1vsERJBiukcVsem7WzV4KjWiLr+FmVVGYucmqcEzzA9GOUX8it5+eyqQF4Ov
+k0WkWsIi21m4FQ8uzYf5omAUlPFX70ZWVVq1MXR6PceZKnYYhfF/0OaA2dbq+duo
+YGoaQieifn/EfgDu09mjU0zgalF8/j14C8KxF2H8EcwPbw2J5Z52jQ9b9Dv8EdTw
+bT5kwAA/Lq8McvEGV6SUm0bPAhvRXDgzp6rkgcrz85LYOyGGMI03gtNPuqakr+5u
+PiMt4jzP/GthSoMtuQFOrBa0tjsZpYBM3DkjfVlTMC0laRYlKB8=
+=V1tm
+-----END PGP SIGNATURE-----
 
-> 
->   c) As mentioned on irc there's fun to be had with cur_mon and error
->      handling - in my local world I have cur_mon declared as __thread
->      but never got around to thinking aobut what should set it up.
->      There's also 'wavcapture: Convert to error_report' that I posted
->      in March that got rid of some uses of cur_mon in wavcapture.c
->      for error_report.
-
-Yeh.  I at least also see a positive ACK from Markus in the other
-thread for per-thread cur_mon, sounds like this is the right way to
-go.
-
-To setup cur_mon, what I can think of is create wrapper for
-pthread_create() in qemu_thread_create().  I see that we have done
-similar thing in util/qemu-thread-win32.c for Windows.  With that we
-can setup the cur_mon before going into real thread function but in
-the right context, though we may need one more parameter for current
-qemu_thread_create():
-
-void qemu_thread_create(QemuThread *thread, const char *name,
-                       void *(*start_routine)(void*),
-                       void *arg, int mode, Monitor *mon);
-
-Then we can specify monitor for any new thread (default to cur_mon).
-For per-monitor threads, I think we need to pass in that specific mon.
-
-Is this doable?
-
-> But there's some interesting stuff to be checked
->      with where error_reporting goes.
-
-Do you mean the case when e.g. we only have one HMP and that HMP is
-threaded?  If so, I guess the error_report()s will be directed mostly
-to stderr.
-
-I believe it'll break some HMP users, but IIUC HMP behavior is allowed
-to be changed and after all people can still catch the error message
-somewhere, though outside that HMP console.  So I think it might be ok.
-
-> 
->   d) I wonder if it's better to have thread as a flag, so that you have
->      to explicitly ask for a monitor to have it's own thread.
-
-This should be doable.  Would a new parameter for "-qmp" and "-hmp"
-suffice?
-
--- 
-Peter Xu
+--eheScQNz3K90DVRs--
