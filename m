@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dlAUw-00051L-9q
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 05:01:51 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dlAZc-0006gU-0h
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 05:06:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dlAUs-00016R-Hb
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 05:01:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49058)
+	(envelope-from <dgilbert@redhat.com>) id 1dlAZY-00037w-Sl
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 05:06:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41788)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dlAUs-00016D-B9
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 05:01:46 -0400
-References: <20170824123006.GK5379@umbus.fritz.box>
-	<20170825083123.47432-1-aik@ozlabs.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <256c5d79-d940-3a7c-89e2-19a6140f5ccd@redhat.com>
-Date: Fri, 25 Aug 2017 11:01:42 +0200
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dlAZY-00036Q-M3
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 05:06:36 -0400
+Date: Fri, 25 Aug 2017 10:06:27 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170825090626.GA2090@work-vm>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<1503471071-2233-5-git-send-email-peterx@redhat.com>
+	<20170823174411.GG2648@work-vm>
+	<20170825053526.GE14174@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <20170825083123.47432-1-aik@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH qemu] exec: Destroy dispatch immediately
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170825053526.GE14174@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC v2 4/8] QAPI: new QMP command option
+ "without-bql"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 25/08/2017 10:31, Alexey Kardashevskiy wrote:
-> Each address_space_init() updates topology for _every_ address space.
+* Peter Xu (peterx@redhat.com) wrote:
+> On Wed, Aug 23, 2017 at 06:44:12PM +0100, Dr. David Alan Gilbert wrote:
+> 
+> [...]
+> 
+> > > +Most of the commands require the Big QEMU Lock (BQL) be held during
+> > > +execution.  However, there is a small subset of the commands that may
+> > > +not really need BQL at all.  To mark out this kind of commands, we can
+> > > +specify "without-bql" to "true".  This parameter is only a hint for
+> > > +internal QMP implementation to provide possiblility to allow commands
+> > > +be run in parallel, or reduce the contention of the lock.  Users of QMP
+> > > +should not really be aware of such information.
+> > 
+> > Well, I think users of these commands might select them specifically
+> > because they know that they won't block.  Those who care about latency might
+> > look to use commands that don't take the lock because of a reduced
+> > effect on the performance as well.
+> 
+> What would be the best way to tell user?  I think again this should
+> mostly for HMP only, right?
 
-And finally, does this patch help with the above?
+It needs to be docuemnted for QMP users as well so that those developing
+management code know what's safe.
 
-diff --git a/memory.c b/memory.c
-index c0adc35..97c16cc 100644
---- a/memory.c
-+++ b/memory.c
-@@ -2607,10 +2607,16 @@ void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset,
-                           RUN_ON_CPU_HOST_PTR(invalidate_data));
- }
- 
-+static void address_space_rebuild(AddressSpace *as)
-+{
-+    MEMORY_LISTENER_CALL(as, begin, Forward);
-+    address_space_update_topology(as);
-+    MEMORY_LISTENER_CALL(as, commit, Forward);
-+}
-+
- void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name)
- {
-     memory_region_ref(root);
--    memory_region_transaction_begin();
-     as->ref_count = 1;
-     as->root = root;
-     as->malloced = false;
-@@ -2622,8 +2628,7 @@ void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name)
-     QTAILQ_INSERT_TAIL(&address_spaces, as, address_spaces_link);
-     as->name = g_strdup(name ? name : "anonymous");
-     address_space_init_dispatch(as);
--    memory_region_update_pending |= root->enabled;
--    memory_region_transaction_commit();
-+    address_space_rebuild(as);
- }
- 
- static void do_address_space_destroy(AddressSpace *as)
+> Maybe we can add a new command to list these lock-free commands.  Or,
+> I can dump something in "help" and "help info" like:
+> 
+> (qemu) help migrate_incoming
+> migrate_incoming uri -- Continue an incoming migration from an -incoming defer (BQL-less)
 
+'lock free' might be better?
 
-Completely untested because vacation is coming.
+Dave
 
-Thanks,
-
-Paolo
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
