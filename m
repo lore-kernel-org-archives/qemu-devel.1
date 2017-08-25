@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dlEYH-00045j-Bd
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:21:37 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dlEYh-0004Py-JY
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:22:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dlEYA-0002Cb-Fh
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:21:33 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dlEYf-0002N5-KP
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 09:21:59 -0400
 From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Fri, 25 Aug 2017 16:20:23 +0300
-Message-Id: <20170825132028.6184-2-el13635@mail.ntua.gr>
+Date: Fri, 25 Aug 2017 16:20:27 +0300
+Message-Id: <20170825132028.6184-6-el13635@mail.ntua.gr>
 In-Reply-To: <20170825132028.6184-1-el13635@mail.ntua.gr>
 References: <20170825132028.6184-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH v9 1/6] block: move ThrottleGroup membership to
- ThrottleGroupMember
+Subject: [Qemu-devel] [PATCH v9 5/6] block: add throttle block filter driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,1004 +22,412 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel <qemu-devel@nongnu.org>
 Cc: qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-This commit eliminates the 1:1 relationship between BlockBackend and
-throttle group state.  Users will be able to create multiple throttle
-nodes, each with its own throttle group state, in the future.  The
-throttle group state cannot be per-BlockBackend anymore, it must be
-per-throttle node. This is done by gathering ThrottleGroup membership
-details from BlockBackendPublic into ThrottleGroupMember and refactoring
-existing code to use the structure.
+block/throttle.c uses existing I/O throttle infrastructure inside a
+block filter driver. I/O operations are intercepted in the filter's
+read/write coroutines, and referred to block/throttle-groups.c
+
+The driver can be used with the syntax
+-drive driver=throttle,file.filename=foo.qcow2,throttle-group=bar
+
+which registers the throttle filter node with the ThrottleGroup 'bar'. The
+given group must be created beforehand with object-add or -object.
 
 Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 ---
- include/block/throttle-groups.h |  39 +++++-
- include/sysemu/block-backend.h  |  20 +--
- block/block-backend.c           |  66 +++++----
- block/qapi.c                    |   8 +-
- block/throttle-groups.c         | 288 ++++++++++++++++++++--------------------
- blockdev.c                      |   4 +-
- tests/test-throttle.c           |  53 ++++----
- 7 files changed, 252 insertions(+), 226 deletions(-)
+ qapi/block-core.json            |  18 ++-
+ include/block/throttle-groups.h |   5 +
+ include/qemu/throttle-options.h |   1 +
+ block/throttle-groups.c         |  15 ++-
+ block/throttle.c                | 250 ++++++++++++++++++++++++++++++++++++++++
+ block/Makefile.objs             |   1 +
+ 6 files changed, 288 insertions(+), 2 deletions(-)
+ create mode 100644 block/throttle.c
 
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 0bdc69aa5f..03724146a4 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2222,6 +2222,7 @@
+ # Drivers that are supported in block device operations.
+ #
+ # @vxhs: Since 2.10
++# @throttle: Since 2.11
+ #
+ # Since: 2.9
+ ##
+@@ -2231,7 +2232,7 @@
+             'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
+             'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed',
+             'quorum', 'raw', 'rbd', 'replication', 'sheepdog', 'ssh',
+-            'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
++            'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
+ 
+ ##
+ # @BlockdevOptionsFile:
+@@ -3095,6 +3096,20 @@
+             '*tls-creds': 'str' } }
+ 
+ ##
++# @BlockdevOptionsThrottle:
++#
++# Driver specific block device options for the throttle driver
++#
++# @throttle-group:   the name of the throttle-group object to use. It
++#                    must already exist.
++# @file:             reference to or definition of the data source block device
++# Since: 2.11
++##
++{ 'struct': 'BlockdevOptionsThrottle',
++  'data': { 'throttle-group': 'str',
++            'file' : 'BlockdevRef'
++             } }
++##
+ # @BlockdevOptions:
+ #
+ # Options for creating a block device.  Many options are available for all
+@@ -3155,6 +3170,7 @@
+       'replication':'BlockdevOptionsReplication',
+       'sheepdog':   'BlockdevOptionsSheepdog',
+       'ssh':        'BlockdevOptionsSsh',
++      'throttle':   'BlockdevOptionsThrottle',
+       'vdi':        'BlockdevOptionsGenericFormat',
+       'vhdx':       'BlockdevOptionsGenericFormat',
+       'vmdk':       'BlockdevOptionsGenericCOWFormat',
 diff --git a/include/block/throttle-groups.h b/include/block/throttle-groups.h
-index d983d34074..1a6bcdae74 100644
+index 82f030523f..e2fd0513c4 100644
 --- a/include/block/throttle-groups.h
 +++ b/include/block/throttle-groups.h
-@@ -28,19 +28,44 @@
- #include "qemu/throttle.h"
- #include "block/block_int.h"
- 
--const char *throttle_group_get_name(BlockBackend *blk);
-+/* The ThrottleGroupMember structure indicates membership in a ThrottleGroup
-+ * and holds related data.
+@@ -76,5 +76,10 @@ void coroutine_fn throttle_group_co_io_limits_intercept(ThrottleGroupMember *tgm
+ void throttle_group_attach_aio_context(ThrottleGroupMember *tgm,
+                                        AioContext *new_context);
+ void throttle_group_detach_aio_context(ThrottleGroupMember *tgm);
++/*
++ * throttle_group_exists() must be called under the global
++ * mutex.
 + */
-+
-+typedef struct ThrottleGroupMember {
-+    /* throttled_reqs_lock protects the CoQueues for throttled requests.  */
-+    CoMutex      throttled_reqs_lock;
-+    CoQueue      throttled_reqs[2];
-+
-+    /* Nonzero if the I/O limits are currently being ignored; generally
-+     * it is zero.  Accessed with atomic operations.
-+     */
-+    unsigned int io_limits_disabled;
-+
-+    /* The following fields are protected by the ThrottleGroup lock.
-+     * See the ThrottleGroup documentation for details.
-+     * throttle_state tells us if I/O limits are configured. */
-+    ThrottleState *throttle_state;
-+    ThrottleTimers throttle_timers;
-+    unsigned       pending_reqs[2];
-+    QLIST_ENTRY(ThrottleGroupMember) round_robin;
-+
-+} ThrottleGroupMember;
-+
-+const char *throttle_group_get_name(ThrottleGroupMember *tgm);
++bool throttle_group_exists(const char *name);
  
- ThrottleState *throttle_group_incref(const char *name);
- void throttle_group_unref(ThrottleState *ts);
+ #endif
+diff --git a/include/qemu/throttle-options.h b/include/qemu/throttle-options.h
+index 182b7896e1..3528a8f4a2 100644
+--- a/include/qemu/throttle-options.h
++++ b/include/qemu/throttle-options.h
+@@ -29,6 +29,7 @@
+ #define QEMU_OPT_BPS_WRITE_MAX "bps-write-max"
+ #define QEMU_OPT_BPS_WRITE_MAX_LENGTH "bps-write-max-length"
+ #define QEMU_OPT_IOPS_SIZE "iops-size"
++#define QEMU_OPT_THROTTLE_GROUP_NAME "throttle-group"
  
--void throttle_group_config(BlockBackend *blk, ThrottleConfig *cfg);
--void throttle_group_get_config(BlockBackend *blk, ThrottleConfig *cfg);
-+void throttle_group_config(ThrottleGroupMember *tgm, ThrottleConfig *cfg);
-+void throttle_group_get_config(ThrottleGroupMember *tgm, ThrottleConfig *cfg);
- 
--void throttle_group_register_blk(BlockBackend *blk, const char *groupname);
--void throttle_group_unregister_blk(BlockBackend *blk);
--void throttle_group_restart_blk(BlockBackend *blk);
-+void throttle_group_register_tgm(ThrottleGroupMember *tgm,
-+                                const char *groupname);
-+void throttle_group_unregister_tgm(ThrottleGroupMember *tgm);
-+void throttle_group_restart_tgm(ThrottleGroupMember *tgm);
- 
--void coroutine_fn throttle_group_co_io_limits_intercept(BlockBackend *blk,
-+void coroutine_fn throttle_group_co_io_limits_intercept(ThrottleGroupMember *tgm,
-                                                         unsigned int bytes,
-                                                         bool is_write);
- 
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 4a3730596b..0e0cda7521 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -70,24 +70,10 @@ typedef struct BlockDevOps {
- 
- /* This struct is embedded in (the private) BlockBackend struct and contains
-  * fields that must be public. This is in particular for QLIST_ENTRY() and
-- * friends so that BlockBackends can be kept in lists outside block-backend.c */
-+ * friends so that BlockBackends can be kept in lists outside block-backend.c
-+ * */
- typedef struct BlockBackendPublic {
--    /* throttled_reqs_lock protects the CoQueues for throttled requests.  */
--    CoMutex      throttled_reqs_lock;
--    CoQueue      throttled_reqs[2];
--
--    /* Nonzero if the I/O limits are currently being ignored; generally
--     * it is zero.  Accessed with atomic operations.
--     */
--    unsigned int io_limits_disabled;
--
--    /* The following fields are protected by the ThrottleGroup lock.
--     * See the ThrottleGroup documentation for details.
--     * throttle_state tells us if I/O limits are configured. */
--    ThrottleState *throttle_state;
--    ThrottleTimers throttle_timers;
--    unsigned       pending_reqs[2];
--    QLIST_ENTRY(BlockBackendPublic) round_robin;
-+    ThrottleGroupMember throttle_group_member;
- } BlockBackendPublic;
- 
- BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm);
-diff --git a/block/block-backend.c b/block/block-backend.c
-index e9798e897d..7b981e00bb 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -252,9 +252,9 @@ BlockBackend *blk_new(uint64_t perm, uint64_t shared_perm)
-     blk->shared_perm = shared_perm;
-     blk_set_enable_write_cache(blk, true);
- 
--    qemu_co_mutex_init(&blk->public.throttled_reqs_lock);
--    qemu_co_queue_init(&blk->public.throttled_reqs[0]);
--    qemu_co_queue_init(&blk->public.throttled_reqs[1]);
-+    qemu_co_mutex_init(&blk->public.throttle_group_member.throttled_reqs_lock);
-+    qemu_co_queue_init(&blk->public.throttle_group_member.throttled_reqs[0]);
-+    qemu_co_queue_init(&blk->public.throttle_group_member.throttled_reqs[1]);
-     block_acct_init(&blk->stats);
- 
-     notifier_list_init(&blk->remove_bs_notifiers);
-@@ -322,7 +322,7 @@ static void blk_delete(BlockBackend *blk)
-     assert(!blk->refcnt);
-     assert(!blk->name);
-     assert(!blk->dev);
--    if (blk->public.throttle_state) {
-+    if (blk->public.throttle_group_member.throttle_state) {
-         blk_io_limits_disable(blk);
-     }
-     if (blk->root) {
-@@ -637,9 +637,12 @@ BlockBackend *blk_by_public(BlockBackendPublic *public)
-  */
- void blk_remove_bs(BlockBackend *blk)
- {
-+    ThrottleTimers *tt;
-+
-     notifier_list_notify(&blk->remove_bs_notifiers, blk);
--    if (blk->public.throttle_state) {
--        throttle_timers_detach_aio_context(&blk->public.throttle_timers);
-+    if (blk->public.throttle_group_member.throttle_state) {
-+        tt = &blk->public.throttle_group_member.throttle_timers;
-+        throttle_timers_detach_aio_context(tt);
-     }
- 
-     blk_update_root_state(blk);
-@@ -661,9 +664,10 @@ int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp)
-     bdrv_ref(bs);
- 
-     notifier_list_notify(&blk->insert_bs_notifiers, blk);
--    if (blk->public.throttle_state) {
-+    if (blk->public.throttle_group_member.throttle_state) {
-         throttle_timers_attach_aio_context(
--            &blk->public.throttle_timers, bdrv_get_aio_context(bs));
-+            &blk->public.throttle_group_member.throttle_timers,
-+            bdrv_get_aio_context(bs));
-     }
- 
-     return 0;
-@@ -1025,8 +1029,9 @@ int coroutine_fn blk_co_preadv(BlockBackend *blk, int64_t offset,
-     bdrv_inc_in_flight(bs);
- 
-     /* throttling disk I/O */
--    if (blk->public.throttle_state) {
--        throttle_group_co_io_limits_intercept(blk, bytes, false);
-+    if (blk->public.throttle_group_member.throttle_state) {
-+        throttle_group_co_io_limits_intercept(&blk->public.throttle_group_member,
-+                bytes, false);
-     }
- 
-     ret = bdrv_co_preadv(blk->root, offset, bytes, qiov, flags);
-@@ -1049,10 +1054,10 @@ int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
-     }
- 
-     bdrv_inc_in_flight(bs);
--
-     /* throttling disk I/O */
--    if (blk->public.throttle_state) {
--        throttle_group_co_io_limits_intercept(blk, bytes, true);
-+    if (blk->public.throttle_group_member.throttle_state) {
-+        throttle_group_co_io_limits_intercept(&blk->public.throttle_group_member,
-+                bytes, true);
-     }
- 
-     if (!blk->enable_write_cache) {
-@@ -1721,15 +1726,17 @@ static AioContext *blk_aiocb_get_aio_context(BlockAIOCB *acb)
- void blk_set_aio_context(BlockBackend *blk, AioContext *new_context)
- {
-     BlockDriverState *bs = blk_bs(blk);
-+    ThrottleTimers *tt;
- 
-     if (bs) {
--        if (blk->public.throttle_state) {
--            throttle_timers_detach_aio_context(&blk->public.throttle_timers);
-+        if (blk->public.throttle_group_member.throttle_state) {
-+            tt = &blk->public.throttle_group_member.throttle_timers;
-+            throttle_timers_detach_aio_context(tt);
-         }
-         bdrv_set_aio_context(bs, new_context);
--        if (blk->public.throttle_state) {
--            throttle_timers_attach_aio_context(&blk->public.throttle_timers,
--                                               new_context);
-+        if (blk->public.throttle_group_member.throttle_state) {
-+            tt = &blk->public.throttle_group_member.throttle_timers;
-+            throttle_timers_attach_aio_context(tt, new_context);
-         }
-     }
- }
-@@ -1948,33 +1955,34 @@ int blk_commit_all(void)
- /* throttling disk I/O limits */
- void blk_set_io_limits(BlockBackend *blk, ThrottleConfig *cfg)
- {
--    throttle_group_config(blk, cfg);
-+    throttle_group_config(&blk->public.throttle_group_member, cfg);
- }
- 
- void blk_io_limits_disable(BlockBackend *blk)
- {
--    assert(blk->public.throttle_state);
-+    assert(blk->public.throttle_group_member.throttle_state);
-     bdrv_drained_begin(blk_bs(blk));
--    throttle_group_unregister_blk(blk);
-+    throttle_group_unregister_tgm(&blk->public.throttle_group_member);
-     bdrv_drained_end(blk_bs(blk));
- }
- 
- /* should be called before blk_set_io_limits if a limit is set */
- void blk_io_limits_enable(BlockBackend *blk, const char *group)
- {
--    assert(!blk->public.throttle_state);
--    throttle_group_register_blk(blk, group);
-+    assert(!blk->public.throttle_group_member.throttle_state);
-+    throttle_group_register_tgm(&blk->public.throttle_group_member, group);
- }
- 
- void blk_io_limits_update_group(BlockBackend *blk, const char *group)
- {
-     /* this BB is not part of any group */
--    if (!blk->public.throttle_state) {
-+    if (!blk->public.throttle_group_member.throttle_state) {
-         return;
-     }
- 
-     /* this BB is a part of the same group than the one we want */
--    if (!g_strcmp0(throttle_group_get_name(blk), group)) {
-+    if (!g_strcmp0(throttle_group_get_name(&blk->public.throttle_group_member),
-+                group)) {
-         return;
-     }
- 
-@@ -1996,8 +2004,8 @@ static void blk_root_drained_begin(BdrvChild *child)
-     /* Note that blk->root may not be accessible here yet if we are just
-      * attaching to a BlockDriverState that is drained. Use child instead. */
- 
--    if (atomic_fetch_inc(&blk->public.io_limits_disabled) == 0) {
--        throttle_group_restart_blk(blk);
-+    if (atomic_fetch_inc(&blk->public.throttle_group_member.io_limits_disabled) == 0) {
-+        throttle_group_restart_tgm(&blk->public.throttle_group_member);
-     }
- }
- 
-@@ -2006,8 +2014,8 @@ static void blk_root_drained_end(BdrvChild *child)
-     BlockBackend *blk = child->opaque;
-     assert(blk->quiesce_counter);
- 
--    assert(blk->public.io_limits_disabled);
--    atomic_dec(&blk->public.io_limits_disabled);
-+    assert(blk->public.throttle_group_member.io_limits_disabled);
-+    atomic_dec(&blk->public.throttle_group_member.io_limits_disabled);
- 
-     if (--blk->quiesce_counter == 0) {
-         if (blk->dev_ops && blk->dev_ops->drained_end) {
-diff --git a/block/qapi.c b/block/qapi.c
-index 5f1a71f5d2..7fa2437923 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -66,10 +66,11 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
- 
-     info->detect_zeroes = bs->detect_zeroes;
- 
--    if (blk && blk_get_public(blk)->throttle_state) {
-+    if (blk && blk_get_public(blk)->throttle_group_member.throttle_state) {
-         ThrottleConfig cfg;
-+        BlockBackendPublic *blkp = blk_get_public(blk);
- 
--        throttle_group_get_config(blk, &cfg);
-+        throttle_group_get_config(&blkp->throttle_group_member, &cfg);
- 
-         info->bps     = cfg.buckets[THROTTLE_BPS_TOTAL].avg;
-         info->bps_rd  = cfg.buckets[THROTTLE_BPS_READ].avg;
-@@ -117,7 +118,8 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
-         info->iops_size = cfg.op_size;
- 
-         info->has_group = true;
--        info->group = g_strdup(throttle_group_get_name(blk));
-+        info->group =
-+            g_strdup(throttle_group_get_name(&blkp->throttle_group_member));
-     }
- 
-     info->write_threshold = bdrv_write_threshold_get(bs);
+ #define THROTTLE_OPT_PREFIX "throttling."
+ #define THROTTLE_OPTS \
 diff --git a/block/throttle-groups.c b/block/throttle-groups.c
-index 890bfded3f..c8ed16ddf8 100644
+index 5993575838..454bfcb067 100644
 --- a/block/throttle-groups.c
 +++ b/block/throttle-groups.c
-@@ -30,7 +30,7 @@
- #include "sysemu/qtest.h"
- 
- /* The ThrottleGroup structure (with its ThrottleState) is shared
-- * among different BlockBackends and it's independent from
-+ * among different ThrottleGroupMembers and it's independent from
-  * AioContext, so in order to use it from different threads it needs
-  * its own locking.
-  *
-@@ -40,26 +40,26 @@
-  * The whole ThrottleGroup structure is private and invisible to
-  * outside users, that only use it through its ThrottleState.
-  *
-- * In addition to the ThrottleGroup structure, BlockBackendPublic has
-+ * In addition to the ThrottleGroup structure, ThrottleGroupMember has
-  * fields that need to be accessed by other members of the group and
-  * therefore also need to be protected by this lock. Once a
-- * BlockBackend is registered in a group those fields can be accessed
-+ * ThrottleGroupMember is registered in a group those fields can be accessed
-  * by other threads any time.
-  *
-  * Again, all this is handled internally and is mostly transparent to
-  * the outside. The 'throttle_timers' field however has an additional
-  * constraint because it may be temporarily invalid (see for example
-  * blk_set_aio_context()). Therefore in this file a thread will
-- * access some other BlockBackend's timers only after verifying that
-- * that BlockBackend has throttled requests in the queue.
-+ * access some other ThrottleGroupMember's timers only after verifying that
-+ * that ThrottleGroupMember has throttled requests in the queue.
-  */
- typedef struct ThrottleGroup {
-     char *name; /* This is constant during the lifetime of the group */
- 
-     QemuMutex lock; /* This lock protects the following four fields */
-     ThrottleState ts;
--    QLIST_HEAD(, BlockBackendPublic) head;
--    BlockBackend *tokens[2];
-+    QLIST_HEAD(, ThrottleGroupMember) head;
-+    ThrottleGroupMember *tokens[2];
-     bool any_timer_armed[2];
-     QEMUClockType clock_type;
- 
-@@ -140,114 +140,112 @@ void throttle_group_unref(ThrottleState *ts)
-     qemu_mutex_unlock(&throttle_groups_lock);
+@@ -101,6 +101,14 @@ static ThrottleGroup *throttle_group_by_name(const char *name)
+     return NULL;
  }
  
--/* Get the name from a BlockBackend's ThrottleGroup. The name (and the pointer)
-+/* Get the name from a ThrottleGroupMember's group. The name (and the pointer)
-  * is guaranteed to remain constant during the lifetime of the group.
++/* This function reads throttle_groups and must be called under the global
++ * mutex.
++ */
++bool throttle_group_exists(const char *name)
++{
++    return throttle_group_by_name(name) != NULL;
++}
++
+ /* Increments the reference count of a ThrottleGroup given its name.
   *
-- * @blk:  a BlockBackend that is member of a throttling group
-+ * @tgm:  a ThrottleGroupMember
-  * @ret:  the name of the group.
-  */
--const char *throttle_group_get_name(BlockBackend *blk)
-+const char *throttle_group_get_name(ThrottleGroupMember *tgm)
- {
--    BlockBackendPublic *blkp = blk_get_public(blk);
--    ThrottleGroup *tg = container_of(blkp->throttle_state, ThrottleGroup, ts);
-+    ThrottleGroup *tg = container_of(tgm->throttle_state, ThrottleGroup, ts);
-     return tg->name;
- }
+  * If no ThrottleGroup is found with the given name a new one is
+@@ -543,6 +551,11 @@ void throttle_group_unregister_tgm(ThrottleGroupMember *tgm)
+     ThrottleGroupMember *token;
+     int i;
  
--/* Return the next BlockBackend in the round-robin sequence, simulating a
-- * circular list.
-+/* Return the next ThrottleGroupMember in the round-robin sequence, simulating
-+ * a circular list.
-  *
-  * This assumes that tg->lock is held.
-  *
-- * @blk: the current BlockBackend
-- * @ret: the next BlockBackend in the sequence
-+ * @tgm: the current ThrottleGroupMember
-+ * @ret: the next ThrottleGroupMember in the sequence
-  */
--static BlockBackend *throttle_group_next_blk(BlockBackend *blk)
-+static ThrottleGroupMember *throttle_group_next_tgm(ThrottleGroupMember *tgm)
- {
--    BlockBackendPublic *blkp = blk_get_public(blk);
--    ThrottleState *ts = blkp->throttle_state;
-+    ThrottleState *ts = tgm->throttle_state;
-     ThrottleGroup *tg = container_of(ts, ThrottleGroup, ts);
--    BlockBackendPublic *next = QLIST_NEXT(blkp, round_robin);
-+    ThrottleGroupMember *next = QLIST_NEXT(tgm, round_robin);
++    if (!ts) {
++        /* Discard already unregistered tgm */
++        return;
++    }
++
+     assert(tgm->pending_reqs[0] == 0 && tgm->pending_reqs[1] == 0);
+     assert(qemu_co_queue_empty(&tgm->throttled_reqs[0]));
+     assert(qemu_co_queue_empty(&tgm->throttled_reqs[1]));
+@@ -709,7 +722,7 @@ static void throttle_group_obj_complete(UserCreatable *obj, Error **errp)
+     assert(tg->name);
  
-     if (!next) {
-         next = QLIST_FIRST(&tg->head);
-     }
- 
--    return blk_by_public(next);
-+    return next;
- }
- 
- /*
-- * Return whether a BlockBackend has pending requests.
-+ * Return whether a ThrottleGroupMember has pending requests.
-  *
-  * This assumes that tg->lock is held.
-  *
-- * @blk: the BlockBackend
-- * @is_write:  the type of operation (read/write)
-- * @ret:       whether the BlockBackend has pending requests.
-+ * @tgm:        the ThrottleGroupMember
-+ * @is_write:   the type of operation (read/write)
-+ * @ret:        whether the ThrottleGroupMember has pending requests.
-  */
--static inline bool blk_has_pending_reqs(BlockBackend *blk,
-+static inline bool tgm_has_pending_reqs(ThrottleGroupMember *tgm,
-                                         bool is_write)
- {
--    const BlockBackendPublic *blkp = blk_get_public(blk);
--    return blkp->pending_reqs[is_write];
-+    return tgm->pending_reqs[is_write];
- }
- 
--/* Return the next BlockBackend in the round-robin sequence with pending I/O
-- * requests.
-+/* Return the next ThrottleGroupMember in the round-robin sequence with pending
-+ * I/O requests.
-  *
-  * This assumes that tg->lock is held.
-  *
-- * @blk:       the current BlockBackend
-+ * @tgm:       the current ThrottleGroupMember
-  * @is_write:  the type of operation (read/write)
-- * @ret:       the next BlockBackend with pending requests, or blk if there is
-- *             none.
-+ * @ret:       the next ThrottleGroupMember with pending requests, or tgm if
-+ *             there is none.
-  */
--static BlockBackend *next_throttle_token(BlockBackend *blk, bool is_write)
-+static ThrottleGroupMember *next_throttle_token(ThrottleGroupMember *tgm,
-+                                                bool is_write)
- {
--    BlockBackendPublic *blkp = blk_get_public(blk);
--    ThrottleGroup *tg = container_of(blkp->throttle_state, ThrottleGroup, ts);
--    BlockBackend *token, *start;
-+    ThrottleState *ts = tgm->throttle_state;
-+    ThrottleGroup *tg = container_of(ts, ThrottleGroup, ts);
-+    ThrottleGroupMember *token, *start;
- 
-     start = token = tg->tokens[is_write];
- 
-     /* get next bs round in round robin style */
--    token = throttle_group_next_blk(token);
--    while (token != start && !blk_has_pending_reqs(token, is_write)) {
--        token = throttle_group_next_blk(token);
-+    token = throttle_group_next_tgm(token);
-+    while (token != start && !tgm_has_pending_reqs(token, is_write)) {
-+        token = throttle_group_next_tgm(token);
-     }
- 
-     /* If no IO are queued for scheduling on the next round robin token
--     * then decide the token is the current bs because chances are
--     * the current bs get the current request queued.
-+     * then decide the token is the current tgm because chances are
-+     * the current tgm got the current request queued.
-      */
--    if (token == start && !blk_has_pending_reqs(token, is_write)) {
--        token = blk;
-+    if (token == start && !tgm_has_pending_reqs(token, is_write)) {
-+        token = tgm;
-     }
- 
--    /* Either we return the original BB, or one with pending requests */
--    assert(token == blk || blk_has_pending_reqs(token, is_write));
-+    /* Either we return the original TGM, or one with pending requests */
-+    assert(token == tgm || tgm_has_pending_reqs(token, is_write));
- 
-     return token;
- }
- 
--/* Check if the next I/O request for a BlockBackend needs to be throttled or
-- * not. If there's no timer set in this group, set one and update the token
-- * accordingly.
-+/* Check if the next I/O request for a ThrottleGroupMember needs to be
-+ * throttled or not. If there's no timer set in this group, set one and update
-+ * the token accordingly.
-  *
-  * This assumes that tg->lock is held.
-  *
-- * @blk:        the current BlockBackend
-+ * @tgm:        the current ThrottleGroupMember
-  * @is_write:   the type of operation (read/write)
-  * @ret:        whether the I/O request needs to be throttled or not
-  */
--static bool throttle_group_schedule_timer(BlockBackend *blk, bool is_write)
-+static bool throttle_group_schedule_timer(ThrottleGroupMember *tgm,
-+                                          bool is_write)
- {
--    BlockBackendPublic *blkp = blk_get_public(blk);
--    ThrottleState *ts = blkp->throttle_state;
--    ThrottleTimers *tt = &blkp->throttle_timers;
-+    ThrottleState *ts = tgm->throttle_state;
-     ThrottleGroup *tg = container_of(ts, ThrottleGroup, ts);
-+    ThrottleTimers *tt = &tgm->throttle_timers;
-     bool must_wait;
- 
--    if (atomic_read(&blkp->io_limits_disabled)) {
-+    if (atomic_read(&tgm->io_limits_disabled)) {
-         return false;
-     }
- 
-@@ -258,30 +256,29 @@ static bool throttle_group_schedule_timer(BlockBackend *blk, bool is_write)
- 
-     must_wait = throttle_schedule_timer(ts, tt, is_write);
- 
--    /* If a timer just got armed, set blk as the current token */
-+    /* If a timer just got armed, set tgm as the current token */
-     if (must_wait) {
--        tg->tokens[is_write] = blk;
-+        tg->tokens[is_write] = tgm;
-         tg->any_timer_armed[is_write] = true;
-     }
- 
-     return must_wait;
- }
- 
--/* Start the next pending I/O request for a BlockBackend.  Return whether
-+/* Start the next pending I/O request for a ThrottleGroupMember. Return whether
-  * any request was actually pending.
-  *
-- * @blk:       the current BlockBackend
-+ * @tgm:       the current ThrottleGroupMember
-  * @is_write:  the type of operation (read/write)
-  */
--static bool coroutine_fn throttle_group_co_restart_queue(BlockBackend *blk,
-+static bool coroutine_fn throttle_group_co_restart_queue(ThrottleGroupMember *tgm,
-                                                          bool is_write)
- {
--    BlockBackendPublic *blkp = blk_get_public(blk);
-     bool ret;
- 
--    qemu_co_mutex_lock(&blkp->throttled_reqs_lock);
--    ret = qemu_co_queue_next(&blkp->throttled_reqs[is_write]);
--    qemu_co_mutex_unlock(&blkp->throttled_reqs_lock);
-+    qemu_co_mutex_lock(&tgm->throttled_reqs_lock);
-+    ret = qemu_co_queue_next(&tgm->throttled_reqs[is_write]);
-+    qemu_co_mutex_unlock(&tgm->throttled_reqs_lock);
- 
-     return ret;
- }
-@@ -290,19 +287,19 @@ static bool coroutine_fn throttle_group_co_restart_queue(BlockBackend *blk,
-  *
-  * This assumes that tg->lock is held.
-  *
-- * @blk:       the current BlockBackend
-+ * @tgm:       the current ThrottleGroupMember
-  * @is_write:  the type of operation (read/write)
-  */
--static void schedule_next_request(BlockBackend *blk, bool is_write)
-+static void schedule_next_request(ThrottleGroupMember *tgm, bool is_write)
- {
--    BlockBackendPublic *blkp = blk_get_public(blk);
--    ThrottleGroup *tg = container_of(blkp->throttle_state, ThrottleGroup, ts);
-+    ThrottleState *ts = tgm->throttle_state;
-+    ThrottleGroup *tg = container_of(ts, ThrottleGroup, ts);
-     bool must_wait;
--    BlockBackend *token;
-+    ThrottleGroupMember *token;
- 
-     /* Check if there's any pending request to schedule next */
--    token = next_throttle_token(blk, is_write);
--    if (!blk_has_pending_reqs(token, is_write)) {
-+    token = next_throttle_token(tgm, is_write);
-+    if (!tgm_has_pending_reqs(token, is_write)) {
+     /* error if name is duplicate */
+-    if (throttle_group_by_name(tg->name) != NULL) {
++    if (throttle_group_exists(tg->name)) {
+         error_setg(errp, "A group with this name already exists");
          return;
      }
- 
-@@ -311,12 +308,12 @@ static void schedule_next_request(BlockBackend *blk, bool is_write)
- 
-     /* If it doesn't have to wait, queue it for immediate execution */
-     if (!must_wait) {
--        /* Give preference to requests from the current blk */
-+        /* Give preference to requests from the current tgm */
-         if (qemu_in_coroutine() &&
--            throttle_group_co_restart_queue(blk, is_write)) {
--            token = blk;
-+            throttle_group_co_restart_queue(tgm, is_write)) {
-+            token = tgm;
-         } else {
--            ThrottleTimers *tt = &blk_get_public(token)->throttle_timers;
-+            ThrottleTimers *tt = &token->throttle_timers;
-             int64_t now = qemu_clock_get_ns(tg->clock_type);
-             timer_mod(tt->timers[is_write], now);
-             tg->any_timer_armed[is_write] = true;
-@@ -329,76 +326,77 @@ static void schedule_next_request(BlockBackend *blk, bool is_write)
-  * if necessary, and schedule the next request using a round robin
-  * algorithm.
-  *
-- * @blk:       the current BlockBackend
-+ * @tgm:       the current ThrottleGroupMember
-  * @bytes:     the number of bytes for this I/O
-  * @is_write:  the type of operation (read/write)
-  */
--void coroutine_fn throttle_group_co_io_limits_intercept(BlockBackend *blk,
-+void coroutine_fn throttle_group_co_io_limits_intercept(ThrottleGroupMember *tgm,
-                                                         unsigned int bytes,
-                                                         bool is_write)
- {
-     bool must_wait;
--    BlockBackend *token;
--
--    BlockBackendPublic *blkp = blk_get_public(blk);
--    ThrottleGroup *tg = container_of(blkp->throttle_state, ThrottleGroup, ts);
-+    ThrottleGroupMember *token;
-+    ThrottleGroup *tg = container_of(tgm->throttle_state, ThrottleGroup, ts);
-     qemu_mutex_lock(&tg->lock);
- 
-     /* First we check if this I/O has to be throttled. */
--    token = next_throttle_token(blk, is_write);
-+    token = next_throttle_token(tgm, is_write);
-     must_wait = throttle_group_schedule_timer(token, is_write);
- 
-     /* Wait if there's a timer set or queued requests of this type */
--    if (must_wait || blkp->pending_reqs[is_write]) {
--        blkp->pending_reqs[is_write]++;
-+    if (must_wait || tgm->pending_reqs[is_write]) {
-+        tgm->pending_reqs[is_write]++;
-         qemu_mutex_unlock(&tg->lock);
--        qemu_co_mutex_lock(&blkp->throttled_reqs_lock);
--        qemu_co_queue_wait(&blkp->throttled_reqs[is_write],
--                           &blkp->throttled_reqs_lock);
--        qemu_co_mutex_unlock(&blkp->throttled_reqs_lock);
-+        qemu_co_mutex_lock(&tgm->throttled_reqs_lock);
-+        qemu_co_queue_wait(&tgm->throttled_reqs[is_write],
-+                           &tgm->throttled_reqs_lock);
-+        qemu_co_mutex_unlock(&tgm->throttled_reqs_lock);
-         qemu_mutex_lock(&tg->lock);
--        blkp->pending_reqs[is_write]--;
-+        tgm->pending_reqs[is_write]--;
-     }
- 
-     /* The I/O will be executed, so do the accounting */
--    throttle_account(blkp->throttle_state, is_write, bytes);
-+    throttle_account(tgm->throttle_state, is_write, bytes);
- 
-     /* Schedule the next request */
--    schedule_next_request(blk, is_write);
-+    schedule_next_request(tgm, is_write);
- 
-     qemu_mutex_unlock(&tg->lock);
- }
- 
- typedef struct {
--    BlockBackend *blk;
+diff --git a/block/throttle.c b/block/throttle.c
+new file mode 100644
+index 0000000000..5ee1e2a7ca
+--- /dev/null
++++ b/block/throttle.c
+@@ -0,0 +1,250 @@
++/*
++ * QEMU block throttling filter driver infrastructure
++ *
++ * Copyright (c) 2017 Manos Pitsidianakis
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 or
++ * (at your option) version 3 of the License.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "block/throttle-groups.h"
++#include "qemu/throttle-options.h"
++#include "qapi/error.h"
++
++static QemuOptsList throttle_opts = {
++    .name = "throttle",
++    .head = QTAILQ_HEAD_INITIALIZER(throttle_opts.head),
++    .desc = {
++        {
++            .name = QEMU_OPT_THROTTLE_GROUP_NAME,
++            .type = QEMU_OPT_STRING,
++            .help = "Name of the throttle group",
++        },
++        { /* end of list */ }
++    },
++};
++
++static int throttle_configure_tgm(BlockDriverState *bs,
++                                  ThrottleGroupMember *tgm,
++                                  QDict *options, Error **errp)
++{
++    int ret;
++    const char *group_name;
++    Error *local_err = NULL;
++    QemuOpts *opts = qemu_opts_create(&throttle_opts, NULL, 0, &error_abort);
++
++    qemu_opts_absorb_qdict(opts, options, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        ret = -EINVAL;
++        goto fin;
++    }
++
++    group_name = qemu_opt_get(opts, QEMU_OPT_THROTTLE_GROUP_NAME);
++    if (!group_name) {
++        error_setg(errp, "Please specify a throttle group.");
++        ret = -EINVAL;
++        goto fin;
++    } else if (!throttle_group_exists(group_name)) {
++        error_setg(errp, "Throttle group '%s' does not exist.", group_name);
++        ret = -EINVAL;
++        goto fin;
++    }
++
++    /* Register membership to group with name group_name */
++    throttle_group_register_tgm(tgm, group_name, bdrv_get_aio_context(bs));
++    ret = 0;
++fin:
++    qemu_opts_del(opts);
++    return ret;
++}
++
++static int throttle_open(BlockDriverState *bs, QDict *options,
++                         int flags, Error **errp)
++{
++    ThrottleGroupMember *tgm = bs->opaque;
++
++    bs->file = bdrv_open_child(NULL, options, "file", bs,
++                               &child_file, false, errp);
++    if (!bs->file) {
++        return -EINVAL;
++    }
++    bs->supported_write_flags = bs->file->bs->supported_write_flags;
++    bs->supported_zero_flags = bs->file->bs->supported_zero_flags;
++
++    return throttle_configure_tgm(bs, tgm, options, errp);
++}
++
++static void throttle_close(BlockDriverState *bs)
++{
++    ThrottleGroupMember *tgm = bs->opaque;
++    throttle_group_unregister_tgm(tgm);
++}
++
++
++static int64_t throttle_getlength(BlockDriverState *bs)
++{
++    return bdrv_getlength(bs->file->bs);
++}
++
++static int coroutine_fn throttle_co_preadv(BlockDriverState *bs,
++                                           uint64_t offset, uint64_t bytes,
++                                           QEMUIOVector *qiov, int flags)
++{
++
++    ThrottleGroupMember *tgm = bs->opaque;
++    throttle_group_co_io_limits_intercept(tgm, bytes, false);
++
++    return bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
++}
++
++static int coroutine_fn throttle_co_pwritev(BlockDriverState *bs,
++                                            uint64_t offset, uint64_t bytes,
++                                            QEMUIOVector *qiov, int flags)
++{
++    ThrottleGroupMember *tgm = bs->opaque;
++    throttle_group_co_io_limits_intercept(tgm, bytes, true);
++
++    return bdrv_co_pwritev(bs->file, offset, bytes, qiov, flags);
++}
++
++static int coroutine_fn throttle_co_pwrite_zeroes(BlockDriverState *bs,
++                                                  int64_t offset, int bytes,
++                                                  BdrvRequestFlags flags)
++{
++    ThrottleGroupMember *tgm = bs->opaque;
++    throttle_group_co_io_limits_intercept(tgm, bytes, true);
++
++    return bdrv_co_pwrite_zeroes(bs->file, offset, bytes, flags);
++}
++
++static int coroutine_fn throttle_co_pdiscard(BlockDriverState *bs,
++                                             int64_t offset, int bytes)
++{
++    ThrottleGroupMember *tgm = bs->opaque;
++    throttle_group_co_io_limits_intercept(tgm, bytes, true);
++
++    return bdrv_co_pdiscard(bs->file->bs, offset, bytes);
++}
++
++static int throttle_co_flush(BlockDriverState *bs)
++{
++    return bdrv_co_flush(bs->file->bs);
++}
++
++static void throttle_detach_aio_context(BlockDriverState *bs)
++{
++    ThrottleGroupMember *tgm = bs->opaque;
++    throttle_group_detach_aio_context(tgm);
++}
++
++static void throttle_attach_aio_context(BlockDriverState *bs,
++                                        AioContext *new_context)
++{
++    ThrottleGroupMember *tgm = bs->opaque;
++    throttle_group_attach_aio_context(tgm, new_context);
++}
++
++static int throttle_reopen_prepare(BDRVReopenState *reopen_state,
++                                   BlockReopenQueue *queue, Error **errp)
++{
 +    ThrottleGroupMember *tgm;
-     bool is_write;
- } RestartData;
- 
- static void coroutine_fn throttle_group_restart_queue_entry(void *opaque)
- {
-     RestartData *data = opaque;
--    BlockBackend *blk = data->blk;
-+    ThrottleGroupMember *tgm = data->tgm;
-+    ThrottleState *ts = tgm->throttle_state;
-+    ThrottleGroup *tg = container_of(ts, ThrottleGroup, ts);
-     bool is_write = data->is_write;
--    BlockBackendPublic *blkp = blk_get_public(blk);
--    ThrottleGroup *tg = container_of(blkp->throttle_state, ThrottleGroup, ts);
-     bool empty_queue;
- 
--    empty_queue = !throttle_group_co_restart_queue(blk, is_write);
-+    empty_queue = !throttle_group_co_restart_queue(tgm, is_write);
- 
-     /* If the request queue was empty then we have to take care of
-      * scheduling the next one */
-     if (empty_queue) {
-         qemu_mutex_lock(&tg->lock);
--        schedule_next_request(blk, is_write);
-+        schedule_next_request(tgm, is_write);
-         qemu_mutex_unlock(&tg->lock);
-     }
- }
- 
--static void throttle_group_restart_queue(BlockBackend *blk, bool is_write)
-+static void throttle_group_restart_queue(ThrottleGroupMember *tgm, bool is_write)
- {
-+    BlockBackendPublic *blkp = container_of(tgm, BlockBackendPublic,
-+            throttle_group_member);
-+    BlockBackend *blk = blk_by_public(blkp);
-     Coroutine *co;
-     RestartData rd = {
--        .blk = blk,
-+        .tgm = tgm,
-         .is_write = is_write
-     };
- 
-@@ -406,13 +404,11 @@ static void throttle_group_restart_queue(BlockBackend *blk, bool is_write)
-     aio_co_enter(blk_get_aio_context(blk), co);
- }
- 
--void throttle_group_restart_blk(BlockBackend *blk)
-+void throttle_group_restart_tgm(ThrottleGroupMember *tgm)
- {
--    BlockBackendPublic *blkp = blk_get_public(blk);
--
--    if (blkp->throttle_state) {
--        throttle_group_restart_queue(blk, 0);
--        throttle_group_restart_queue(blk, 1);
-+    if (tgm->throttle_state) {
-+        throttle_group_restart_queue(tgm, 0);
-+        throttle_group_restart_queue(tgm, 1);
-     }
- }
- 
-@@ -420,32 +416,30 @@ void throttle_group_restart_blk(BlockBackend *blk)
-  * to throttle_config(), but guarantees atomicity within the
-  * throttling group.
-  *
-- * @blk: a BlockBackend that is a member of the group
-+ * @tgm:    a ThrottleGroupMember that is a member of the group
-  * @cfg: the configuration to set
-  */
--void throttle_group_config(BlockBackend *blk, ThrottleConfig *cfg)
-+void throttle_group_config(ThrottleGroupMember *tgm, ThrottleConfig *cfg)
- {
--    BlockBackendPublic *blkp = blk_get_public(blk);
--    ThrottleState *ts = blkp->throttle_state;
-+    ThrottleState *ts = tgm->throttle_state;
-     ThrottleGroup *tg = container_of(ts, ThrottleGroup, ts);
-     qemu_mutex_lock(&tg->lock);
-     throttle_config(ts, tg->clock_type, cfg);
-     qemu_mutex_unlock(&tg->lock);
- 
--    throttle_group_restart_blk(blk);
-+    throttle_group_restart_tgm(tgm);
- }
- 
- /* Get the throttle configuration from a particular group. Similar to
-  * throttle_get_config(), but guarantees atomicity within the
-  * throttling group.
-  *
-- * @blk: a BlockBackend that is a member of the group
-+ * @tgm:    a ThrottleGroupMember that is a member of the group
-  * @cfg: the configuration will be written here
-  */
--void throttle_group_get_config(BlockBackend *blk, ThrottleConfig *cfg)
-+void throttle_group_get_config(ThrottleGroupMember *tgm, ThrottleConfig *cfg)
- {
--    BlockBackendPublic *blkp = blk_get_public(blk);
--    ThrottleState *ts = blkp->throttle_state;
-+    ThrottleState *ts = tgm->throttle_state;
-     ThrottleGroup *tg = container_of(ts, ThrottleGroup, ts);
-     qemu_mutex_lock(&tg->lock);
-     throttle_get_config(ts, cfg);
-@@ -461,7 +455,8 @@ void throttle_group_get_config(BlockBackend *blk, ThrottleConfig *cfg)
- static void timer_cb(BlockBackend *blk, bool is_write)
- {
-     BlockBackendPublic *blkp = blk_get_public(blk);
--    ThrottleState *ts = blkp->throttle_state;
-+    ThrottleGroupMember *tgm = &blkp->throttle_group_member;
-+    ThrottleState *ts = tgm->throttle_state;
-     ThrottleGroup *tg = container_of(ts, ThrottleGroup, ts);
- 
-     /* The timer has just been fired, so we can update the flag */
-@@ -470,7 +465,7 @@ static void timer_cb(BlockBackend *blk, bool is_write)
-     qemu_mutex_unlock(&tg->lock);
- 
-     /* Run the request that was waiting for this timer */
--    throttle_group_restart_queue(blk, is_write);
-+    throttle_group_restart_queue(tgm, is_write);
- }
- 
- static void read_timer_cb(void *opaque)
-@@ -483,32 +478,36 @@ static void write_timer_cb(void *opaque)
-     timer_cb(opaque, true);
- }
- 
--/* Register a BlockBackend in the throttling group, also initializing its
-- * timers and updating its throttle_state pointer to point to it. If a
-+/* Register a ThrottleGroupMember from the throttling group, also initializing
-+ * its timers and updating its throttle_state pointer to point to it. If a
-  * throttling group with that name does not exist yet, it will be created.
-  *
-- * @blk:       the BlockBackend to insert
-+ * @tgm:       the ThrottleGroupMember to insert
-  * @groupname: the name of the group
-  */
--void throttle_group_register_blk(BlockBackend *blk, const char *groupname)
-+void throttle_group_register_tgm(ThrottleGroupMember *tgm,
-+                                 const char *groupname)
- {
-     int i;
--    BlockBackendPublic *blkp = blk_get_public(blk);
-+    BlockBackendPublic *blkp = container_of(tgm, BlockBackendPublic,
-+            throttle_group_member);
-+    BlockBackend *blk = blk_by_public(blkp);
-     ThrottleState *ts = throttle_group_incref(groupname);
-     ThrottleGroup *tg = container_of(ts, ThrottleGroup, ts);
--    blkp->throttle_state = ts;
 +
-+    tgm->throttle_state = ts;
- 
-     qemu_mutex_lock(&tg->lock);
--    /* If the ThrottleGroup is new set this BlockBackend as the token */
-+    /* If the ThrottleGroup is new set this ThrottleGroupMember as the token */
-     for (i = 0; i < 2; i++) {
-         if (!tg->tokens[i]) {
--            tg->tokens[i] = blk;
-+            tg->tokens[i] = tgm;
-         }
-     }
- 
--    QLIST_INSERT_HEAD(&tg->head, blkp, round_robin);
-+    QLIST_INSERT_HEAD(&tg->head, tgm, round_robin);
- 
--    throttle_timers_init(&blkp->throttle_timers,
-+    throttle_timers_init(&tgm->throttle_timers,
-                          blk_get_aio_context(blk),
-                          tg->clock_type,
-                          read_timer_cb,
-@@ -518,45 +517,46 @@ void throttle_group_register_blk(BlockBackend *blk, const char *groupname)
-     qemu_mutex_unlock(&tg->lock);
- }
- 
--/* Unregister a BlockBackend from its group, removing it from the list,
-+/* Unregister a ThrottleGroupMember from its group, removing it from the list,
-  * destroying the timers and setting the throttle_state pointer to NULL.
-  *
-- * The BlockBackend must not have pending throttled requests, so the caller has
-- * to drain them first.
-+ * The ThrottleGroupMember must not have pending throttled requests, so the
-+ * caller has to drain them first.
-  *
-  * The group will be destroyed if it's empty after this operation.
-  *
-- * @blk: the BlockBackend to remove
-+ * @tgm the ThrottleGroupMember to remove
-  */
--void throttle_group_unregister_blk(BlockBackend *blk)
-+void throttle_group_unregister_tgm(ThrottleGroupMember *tgm)
- {
--    BlockBackendPublic *blkp = blk_get_public(blk);
--    ThrottleGroup *tg = container_of(blkp->throttle_state, ThrottleGroup, ts);
-+    ThrottleState *ts = tgm->throttle_state;
-+    ThrottleGroup *tg = container_of(ts, ThrottleGroup, ts);
-+    ThrottleGroupMember *token;
-     int i;
- 
--    assert(blkp->pending_reqs[0] == 0 && blkp->pending_reqs[1] == 0);
--    assert(qemu_co_queue_empty(&blkp->throttled_reqs[0]));
--    assert(qemu_co_queue_empty(&blkp->throttled_reqs[1]));
-+    assert(tgm->pending_reqs[0] == 0 && tgm->pending_reqs[1] == 0);
-+    assert(qemu_co_queue_empty(&tgm->throttled_reqs[0]));
-+    assert(qemu_co_queue_empty(&tgm->throttled_reqs[1]));
- 
-     qemu_mutex_lock(&tg->lock);
-     for (i = 0; i < 2; i++) {
--        if (tg->tokens[i] == blk) {
--            BlockBackend *token = throttle_group_next_blk(blk);
--            /* Take care of the case where this is the last blk in the group */
--            if (token == blk) {
-+        if (tg->tokens[i] == tgm) {
-+            token = throttle_group_next_tgm(tgm);
-+            /* Take care of the case where this is the last tgm in the group */
-+            if (token == tgm) {
-                 token = NULL;
-             }
-             tg->tokens[i] = token;
-         }
-     }
- 
--    /* remove the current blk from the list */
--    QLIST_REMOVE(blkp, round_robin);
--    throttle_timers_destroy(&blkp->throttle_timers);
-+    /* remove the current tgm from the list */
-+    QLIST_REMOVE(tgm, round_robin);
-+    throttle_timers_destroy(&tgm->throttle_timers);
-     qemu_mutex_unlock(&tg->lock);
- 
-     throttle_group_unref(&tg->ts);
--    blkp->throttle_state = NULL;
-+    tgm->throttle_state = NULL;
- }
- 
- static void throttle_groups_init(void)
-diff --git a/blockdev.c b/blockdev.c
-index 02cd69bc21..23475abb72 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2688,7 +2688,7 @@ void qmp_block_set_io_throttle(BlockIOThrottle *arg, Error **errp)
-     if (throttle_enabled(&cfg)) {
-         /* Enable I/O limits if they're not enabled yet, otherwise
-          * just update the throttling group. */
--        if (!blk_get_public(blk)->throttle_state) {
-+        if (!blk_get_public(blk)->throttle_group_member.throttle_state) {
-             blk_io_limits_enable(blk,
-                                  arg->has_group ? arg->group :
-                                  arg->has_device ? arg->device :
-@@ -2698,7 +2698,7 @@ void qmp_block_set_io_throttle(BlockIOThrottle *arg, Error **errp)
-         }
-         /* Set the new throttling configuration */
-         blk_set_io_limits(blk, &cfg);
--    } else if (blk_get_public(blk)->throttle_state) {
-+    } else if (blk_get_public(blk)->throttle_group_member.throttle_state) {
-         /* If all throttling settings are set to 0, disable I/O limits */
-         blk_io_limits_disable(blk);
-     }
-diff --git a/tests/test-throttle.c b/tests/test-throttle.c
-index 768f11dfed..6e6d926883 100644
---- a/tests/test-throttle.c
-+++ b/tests/test-throttle.c
-@@ -592,6 +592,7 @@ static void test_groups(void)
-     ThrottleConfig cfg1, cfg2;
-     BlockBackend *blk1, *blk2, *blk3;
-     BlockBackendPublic *blkp1, *blkp2, *blkp3;
-+    ThrottleGroupMember *tgm1, *tgm2, *tgm3;
- 
-     /* No actual I/O is performed on these devices */
-     blk1 = blk_new(0, BLK_PERM_ALL);
-@@ -602,21 +603,25 @@ static void test_groups(void)
-     blkp2 = blk_get_public(blk2);
-     blkp3 = blk_get_public(blk3);
- 
--    g_assert(blkp1->throttle_state == NULL);
--    g_assert(blkp2->throttle_state == NULL);
--    g_assert(blkp3->throttle_state == NULL);
-+    tgm1 = &blkp1->throttle_group_member;
-+    tgm2 = &blkp2->throttle_group_member;
-+    tgm3 = &blkp3->throttle_group_member;
- 
--    throttle_group_register_blk(blk1, "bar");
--    throttle_group_register_blk(blk2, "foo");
--    throttle_group_register_blk(blk3, "bar");
-+    g_assert(tgm1->throttle_state == NULL);
-+    g_assert(tgm2->throttle_state == NULL);
-+    g_assert(tgm3->throttle_state == NULL);
- 
--    g_assert(blkp1->throttle_state != NULL);
--    g_assert(blkp2->throttle_state != NULL);
--    g_assert(blkp3->throttle_state != NULL);
-+    throttle_group_register_tgm(tgm1, "bar");
-+    throttle_group_register_tgm(tgm2, "foo");
-+    throttle_group_register_tgm(tgm3, "bar");
- 
--    g_assert(!strcmp(throttle_group_get_name(blk1), "bar"));
--    g_assert(!strcmp(throttle_group_get_name(blk2), "foo"));
--    g_assert(blkp1->throttle_state == blkp3->throttle_state);
-+    g_assert(tgm1->throttle_state != NULL);
-+    g_assert(tgm2->throttle_state != NULL);
-+    g_assert(tgm3->throttle_state != NULL);
++    assert(reopen_state != NULL);
++    assert(reopen_state->bs != NULL);
 +
-+    g_assert(!strcmp(throttle_group_get_name(tgm1), "bar"));
-+    g_assert(!strcmp(throttle_group_get_name(tgm2), "foo"));
-+    g_assert(tgm1->throttle_state == tgm3->throttle_state);
++    reopen_state->opaque = g_new0(ThrottleGroupMember, 1);
++    tgm = reopen_state->opaque;
++
++    return throttle_configure_tgm(reopen_state->bs, tgm, reopen_state->options,
++            errp);
++}
++
++static void throttle_reopen_commit(BDRVReopenState *reopen_state)
++{
++    ThrottleGroupMember *old_tgm = reopen_state->bs->opaque;
++    ThrottleGroupMember *new_tgm = reopen_state->opaque;
++
++    throttle_group_unregister_tgm(old_tgm);
++    g_free(old_tgm);
++    reopen_state->bs->opaque = new_tgm;
++    reopen_state->opaque = NULL;
++}
++
++static void throttle_reopen_abort(BDRVReopenState *reopen_state)
++{
++    ThrottleGroupMember *tgm = reopen_state->opaque;
++
++    throttle_group_unregister_tgm(tgm);
++    g_free(tgm);
++    reopen_state->opaque = NULL;
++}
++
++static bool throttle_recurse_is_first_non_filter(BlockDriverState *bs,
++                                                 BlockDriverState *candidate)
++{
++    return bdrv_recurse_is_first_non_filter(bs->file->bs, candidate);
++}
++
++static int64_t coroutine_fn throttle_co_get_block_status(BlockDriverState *bs,
++                                                         int64_t sector_num,
++                                                         int nb_sectors,
++                                                         int *pnum,
++                                                         BlockDriverState **file)
++{
++    assert(bs->file && bs->file->bs);
++    *pnum = nb_sectors;
++    *file = bs->file->bs;
++    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
++           (sector_num << BDRV_SECTOR_BITS);
++}
++
++static BlockDriver bdrv_throttle = {
++    .format_name                        =   "throttle",
++    .protocol_name                      =   "throttle",
++    .instance_size                      =   sizeof(ThrottleGroupMember),
++
++    .bdrv_file_open                     =   throttle_open,
++    .bdrv_close                         =   throttle_close,
++    .bdrv_co_flush                      =   throttle_co_flush,
++
++    .bdrv_child_perm                    =   bdrv_filter_default_perms,
++
++    .bdrv_getlength                     =   throttle_getlength,
++
++    .bdrv_co_preadv                     =   throttle_co_preadv,
++    .bdrv_co_pwritev                    =   throttle_co_pwritev,
++
++    .bdrv_co_pwrite_zeroes              =   throttle_co_pwrite_zeroes,
++    .bdrv_co_pdiscard                   =   throttle_co_pdiscard,
++
++    .bdrv_recurse_is_first_non_filter   =   throttle_recurse_is_first_non_filter,
++
++    .bdrv_attach_aio_context            =   throttle_attach_aio_context,
++    .bdrv_detach_aio_context            =   throttle_detach_aio_context,
++
++    .bdrv_reopen_prepare                =   throttle_reopen_prepare,
++    .bdrv_reopen_commit                 =   throttle_reopen_commit,
++    .bdrv_reopen_abort                  =   throttle_reopen_abort,
++    .bdrv_co_get_block_status           =   throttle_co_get_block_status,
++
++    .is_filter                          =   true,
++};
++
++static void bdrv_throttle_init(void)
++{
++    bdrv_register(&bdrv_throttle);
++}
++
++block_init(bdrv_throttle_init);
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index 2aaede4ae1..6eaf78a046 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -25,6 +25,7 @@ block-obj-y += accounting.o dirty-bitmap.o
+ block-obj-y += write-threshold.o
+ block-obj-y += backup.o
+ block-obj-$(CONFIG_REPLICATION) += replication.o
++block-obj-y += throttle.o
  
-     /* Setting the config of a group member affects the whole group */
-     throttle_config_init(&cfg1);
-@@ -624,29 +629,29 @@ static void test_groups(void)
-     cfg1.buckets[THROTTLE_BPS_WRITE].avg = 285000;
-     cfg1.buckets[THROTTLE_OPS_READ].avg  = 20000;
-     cfg1.buckets[THROTTLE_OPS_WRITE].avg = 12000;
--    throttle_group_config(blk1, &cfg1);
-+    throttle_group_config(tgm1, &cfg1);
+ block-obj-y += crypto.o
  
--    throttle_group_get_config(blk1, &cfg1);
--    throttle_group_get_config(blk3, &cfg2);
-+    throttle_group_get_config(tgm1, &cfg1);
-+    throttle_group_get_config(tgm3, &cfg2);
-     g_assert(!memcmp(&cfg1, &cfg2, sizeof(cfg1)));
- 
-     cfg2.buckets[THROTTLE_BPS_READ].avg  = 4547;
-     cfg2.buckets[THROTTLE_BPS_WRITE].avg = 1349;
-     cfg2.buckets[THROTTLE_OPS_READ].avg  = 123;
-     cfg2.buckets[THROTTLE_OPS_WRITE].avg = 86;
--    throttle_group_config(blk3, &cfg1);
-+    throttle_group_config(tgm3, &cfg1);
- 
--    throttle_group_get_config(blk1, &cfg1);
--    throttle_group_get_config(blk3, &cfg2);
-+    throttle_group_get_config(tgm1, &cfg1);
-+    throttle_group_get_config(tgm3, &cfg2);
-     g_assert(!memcmp(&cfg1, &cfg2, sizeof(cfg1)));
- 
--    throttle_group_unregister_blk(blk1);
--    throttle_group_unregister_blk(blk2);
--    throttle_group_unregister_blk(blk3);
-+    throttle_group_unregister_tgm(tgm1);
-+    throttle_group_unregister_tgm(tgm2);
-+    throttle_group_unregister_tgm(tgm3);
- 
--    g_assert(blkp1->throttle_state == NULL);
--    g_assert(blkp2->throttle_state == NULL);
--    g_assert(blkp3->throttle_state == NULL);
-+    g_assert(tgm1->throttle_state == NULL);
-+    g_assert(tgm2->throttle_state == NULL);
-+    g_assert(tgm3->throttle_state == NULL);
- }
- 
- int main(int argc, char **argv)
 -- 
 2.11.0
