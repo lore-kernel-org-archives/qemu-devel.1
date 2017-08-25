@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dlGab-0005j0-0a
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 11:32:10 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dlGbm-0006EA-HG
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 11:33:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dlGaX-00017K-SE
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 11:32:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33636)
+	(envelope-from <dgilbert@redhat.com>) id 1dlGbj-0001o2-8a
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 11:33:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43396)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dlGaX-00017B-IH
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 11:32:01 -0400
-References: <20170825105913.4060-1-marcandre.lureau@redhat.com>
-	<20170825105913.4060-2-marcandre.lureau@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8b2a2be0-cf5f-29e4-b204-1da6b20539b7@redhat.com>
-Date: Fri, 25 Aug 2017 10:31:56 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dlGbj-0001nf-0A
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 11:33:15 -0400
+Date: Fri, 25 Aug 2017 16:33:05 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170825153304.GJ2090@work-vm>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<1503471071-2233-3-git-send-email-peterx@redhat.com>
+	<CAJ+F1CKvY9iMtTQSrM2xVUwXYb0pcHjtFf8x4xpxG5ke-FPf3g@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170825105913.4060-2-marcandre.lureau@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="HjsWJVWg2BIRDrbo4qf5OT8Lfhv9RJoG9"
-Subject: Re: [Qemu-devel] [PATCH v2 01/14] qdict: add qdict_put_null() helper
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CKvY9iMtTQSrM2xVUwXYb0pcHjtFf8x4xpxG5ke-FPf3g@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v2 2/8] monitor: allow monitor to create
+ thread to poll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +30,359 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, armbru@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, mdroth@linux.vnet.ibm.com, Paolo Bonzini <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HjsWJVWg2BIRDrbo4qf5OT8Lfhv9RJoG9
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, armbru@redhat.com,
- Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8b2a2be0-cf5f-29e4-b204-1da6b20539b7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 01/14] qdict: add qdict_put_null() helper
-References: <20170825105913.4060-1-marcandre.lureau@redhat.com>
- <20170825105913.4060-2-marcandre.lureau@redhat.com>
-In-Reply-To: <20170825105913.4060-2-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 08/25/2017 05:59 AM, Marc-Andr=C3=A9 Lureau wrote:
-> A step towards completeness.
+* Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
+> Hi
 >=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  include/qapi/qmp/qdict.h | 4 +++-
->  target/i386/cpu.c        | 4 ++--
->  2 files changed, 5 insertions(+), 3 deletions(-)
+> On Wed, Aug 23, 2017 at 8:52 AM Peter Xu <peterx@redhat.com> wrote:
+>=20
+> > Firstly, introduce Monitor.use_thread, and set it for monitors that a=
+re
+> > using non-mux typed backend chardev.  We only do this for monitors, s=
+o
+> > mux-typed chardevs are not suitable (when it connects to, e.g., seria=
+ls
+> > and the monitor together).
+> >
+> > When use_thread is set, we create standalone thread to poll the monit=
+or
+> > events, isolated from the main loop thread.  Here we still need to ta=
+ke
+> > the BQL before dispatching the tasks since some of the monitor comman=
+ds
+> > are not allowed to execute without the protection of BQL.  Then this
+> > gives us the chance to avoid taking the BQL for some monitor commands=
+ in
+> > the future.
+> >
+> > * Why this change?
+> >
+> > We need these per-monitor threads to make sure we can have at least o=
+ne
+> > monitor that will never stuck (that can receive further monitor
+> > commands).
+> >
+> > * So when will monitors stuck?  And, how do they stuck?
+> >
+> > After we have postcopy and remote page faults, it's simple to achieve=
+ a
+> > stuck in the monitor (which is also a stuck in main loop thread):
+> >
+> > (1) Monitor deadlock on BQL
+> >
+> > As we may know, when postcopy is running on destination VM, the vcpu
+> > threads can stuck merely any time as long as it tries to access an
+> > uncopied guest page.  Meanwhile, when the stuck happens, it is possib=
+le
+> > that the vcpu thread is holding the BQL.  If the page fault is not
+> > handled quickly, you'll find that monitors stop working, which is try=
+ing
+> > to take the BQL.
+> >
+> > If the page fault cannot be handled correctly (one case is a paused
+> > postcopy, when network is temporarily down), monitors will hang
+> > forever.  Without current patch, that means the main loop hanged.  We=
+'ll
+> > never find a way to talk to VM again.
+> >
+>=20
+> Could the BQL be pushed down to the monitor commands level instead? Tha=
+t
+> way we wouldn't need a seperate thread to solve the hang on commands th=
+at
+> do not need BQL.
 
-Is it worth touching up scripts/coccinelle/qobject.cocci at the same time=
-?
+If the main thread is stuck though I don't see how that helps you; you
+have to be able to run these commands on another thread.
 
-I guess we don't care about a qlist_append_null() variant?
+Dave
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---HjsWJVWg2BIRDrbo4qf5OT8Lfhv9RJoG9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmgQuwACgkQp6FrSiUn
-Q2o0Pwf8DIsx7u8Jgy2D1Es9qciLnq97911CBQx57JtkXKdtxI4E1lHY6oupbylt
-asSGxgxpT83H8VCioJGnf94UiodP2y6CyE8+NT9Wo8YchvNvsti2O4F6TYheA5IN
-N7lN1xIlz/VxL8RP23mDb1tHBLSVMqvjyrRgh7gd/emXimUr+x2w+0qAQWCogOJ9
-gXpm+JWhHaQw4tpVE1lnugxASoXJvq5et5Se78B4M3Wo+e55q3VGkbdS0zgfL7oH
-0zYhC1PDFu7appa5073YnGFEqa0w/GSu6H3XwRr6Ss35kuh64ts23upyPiTH+w0h
-BsBTD2hbO1Y0+M34/8K7Ng5tFH5wCw==
-=Vuqk
------END PGP SIGNATURE-----
-
---HjsWJVWg2BIRDrbo4qf5OT8Lfhv9RJoG9--
+> We could also optionnally make command that need the BQL to fail if loc=
+k is
+> held (after a timeout)?
+>=20
+>=20
+>=20
+> > (2) Monitor tries to run codes page-faulted vcpus
+> >
+> > The HMP command "info cpus" is one of the good example - it tries to
+> > kick all the vcpus and sync status from them.  However, if there is a=
+ny
+> > vcpu that stuck at an unhandled page fault, it can never achieve the
+> > sync, then the HMP hangs.  Again, it hangs the main loop thread as we=
+ll.
+> >
+> > After either (1) or (2), we can see the deadlock problem:
+> >
+> > - On one hand, if monitor hangs, we cannot do the postcopy recovery,
+> >   because postcopy recovery needs user to specify new listening port =
+on
+> >   destination monitor.
+> >
+> > - On the other hand, if we cannot recover the paused postcopy, then p=
+age
+> >   faults cannot be serviced, and the monitors will possibly hang
+> >   forever then.
+> >
+> > * How this patch helps?
+> >
+> > - Firstly, we'll have our own thread for each dedicated monitor (or s=
+ay,
+> >   the backend chardev is only used for monitor), so even main loop
+> >   thread hangs (it is always possible), this monitor thread may still
+> >   survive.
+> >
+> > - Not all monitor commands need the BQL.  We can selectively take the
+> >   BQL (depends on which command we are running) to avoid waiting on a
+> >   page-faulted vcpu thread that has taken the BQL (this will be done =
+in
+> >   following up patches).
+> >
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  monitor.c           | 75
+> > +++++++++++++++++++++++++++++++++++++++++++++++++----
+> >  qapi/qmp-dispatch.c | 15 +++++++++++
+> >  2 files changed, 85 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/monitor.c b/monitor.c
+> > index 7c90df7..3d4ecff 100644
+> > --- a/monitor.c
+> > +++ b/monitor.c
+> > @@ -36,6 +36,8 @@
+> >  #include "net/net.h"
+> >  #include "net/slirp.h"
+> >  #include "chardev/char-fe.h"
+> > +#include "chardev/char-mux.h"
+> > +#include "chardev/char-io.h"
+> >  #include "ui/qemu-spice.h"
+> >  #include "sysemu/numa.h"
+> >  #include "monitor/monitor.h"
+> > @@ -190,6 +192,8 @@ struct Monitor {
+> >      int flags;
+> >      int suspend_cnt;
+> >      bool skip_flush;
+> > +    /* Whether the monitor wants to be polled in standalone thread *=
+/
+> > +    bool use_thread;
+> >
+> >      QemuMutex out_lock;
+> >      QString *outbuf;
+> > @@ -206,6 +210,11 @@ struct Monitor {
+> >      mon_cmd_t *cmd_table;
+> >      QLIST_HEAD(,mon_fd_t) fds;
+> >      QLIST_ENTRY(Monitor) entry;
+> > +
+> > +    /* Only used when "use_thread" is used */
+> > +    QemuThread mon_thread;
+> > +    GMainContext *mon_context;
+> > +    GMainLoop *mon_loop;
+> >  };
+> >
+> >  /* QMP checker flags */
+> > @@ -568,7 +577,7 @@ static void monitor_qapi_event_init(void)
+> >
+> >  static void handle_hmp_command(Monitor *mon, const char *cmdline);
+> >
+> > -static void monitor_data_init(Monitor *mon, bool skip_flush)
+> > +static void monitor_data_init(Monitor *mon, bool skip_flush, bool
+> > use_thread)
+> >  {
+> >      memset(mon, 0, sizeof(Monitor));
+> >      qemu_mutex_init(&mon->out_lock);
+> > @@ -576,10 +585,34 @@ static void monitor_data_init(Monitor *mon, boo=
+l
+> > skip_flush)
+> >      /* Use *mon_cmds by default. */
+> >      mon->cmd_table =3D mon_cmds;
+> >      mon->skip_flush =3D skip_flush;
+> > +    mon->use_thread =3D use_thread;
+> > +    if (use_thread) {
+> > +        /*
+> > +         * For monitors that use isolated threads, they'll need thei=
+r
+> > +         * own GMainContext and GMainLoop.  Otherwise, these pointer=
+s
+> > +         * will be NULL, which means the default context will be use=
+d.
+> > +         */
+> > +        mon->mon_context =3D g_main_context_new();
+> > +        mon->mon_loop =3D g_main_loop_new(mon->mon_context, TRUE);
+> > +    }
+> >  }
+> >
+> >  static void monitor_data_destroy(Monitor *mon)
+> >  {
+> > +    /* Destroy the thread first if there is */
+> > +    if (mon->use_thread) {
+> > +        /* Notify the per-monitor thread to quit. */
+> > +        g_main_loop_quit(mon->mon_loop);
+> > +        /*
+> > +         * Make sure the context will get the quit message since it'=
+s
+> > +         * in another thread.  Without this, it may not be able to
+> > +         * respond to the quit message immediately.
+> > +         */
+> > +        g_main_context_wakeup(mon->mon_context);
+> > +        qemu_thread_join(&mon->mon_thread);
+> > +        g_main_loop_unref(mon->mon_loop);
+> > +        g_main_context_unref(mon->mon_context);
+> > +    }
+> >      qemu_chr_fe_deinit(&mon->chr, false);
+> >      if (monitor_is_qmp(mon)) {
+> >          json_message_parser_destroy(&mon->qmp.parser);
+> > @@ -595,7 +628,7 @@ char *qmp_human_monitor_command(const char
+> > *command_line, bool has_cpu_index,
+> >      char *output =3D NULL;
+> >      Monitor *old_mon, hmp;
+> >
+> > -    monitor_data_init(&hmp, true);
+> > +    monitor_data_init(&hmp, true, false);
+> >
+> >      old_mon =3D cur_mon;
+> >      cur_mon =3D &hmp;
+> > @@ -3101,6 +3134,11 @@ static void handle_hmp_command(Monitor *mon, c=
+onst
+> > char *cmdline)
+> >  {
+> >      QDict *qdict;
+> >      const mon_cmd_t *cmd;
+> > +    /*
+> > +     * If we haven't take the BQL (when called by per-monitor
+> > +     * threads), we need to take care of the BQL on our own.
+> > +     */
+> > +    bool take_bql =3D !qemu_mutex_iothread_locked();
+> >
+> >      trace_handle_hmp_command(mon, cmdline);
+> >
+> > @@ -3116,7 +3154,16 @@ static void handle_hmp_command(Monitor *mon, c=
+onst
+> > char *cmdline)
+> >          return;
+> >      }
+> >
+> > +    if (take_bql) {
+> > +        qemu_mutex_lock_iothread();
+> > +    }
+> > +
+> >      cmd->cmd(mon, qdict);
+> > +
+> > +    if (take_bql) {
+> > +        qemu_mutex_unlock_iothread();
+> > +    }
+> > +
+> >      QDECREF(qdict);
+> >  }
+> >
+> > @@ -4086,6 +4133,15 @@ static void __attribute__((constructor))
+> > monitor_lock_init(void)
+> >      qemu_mutex_init(&monitor_lock);
+> >  }
+> >
+> > +static void *monitor_thread(void *data)
+> > +{
+> > +    Monitor *mon =3D data;
+> > +
+> > +    g_main_loop_run(mon->mon_loop);
+> > +
+> > +    return NULL;
+> > +}
+> > +
+> >  void monitor_init(Chardev *chr, int flags)
+> >  {
+> >      static int is_first_init =3D 1;
+> > @@ -4098,7 +4154,9 @@ void monitor_init(Chardev *chr, int flags)
+> >      }
+> >
+> >      mon =3D g_malloc(sizeof(*mon));
+> > -    monitor_data_init(mon, false);
+> > +
+> > +    /* For non-mux typed monitors, we create dedicated threads. */
+> > +    monitor_data_init(mon, false, !CHARDEV_IS_MUX(chr));
+> >
+> >      qemu_chr_fe_init(&mon->chr, chr, &error_abort);
+> >      mon->flags =3D flags;
+> > @@ -4112,12 +4170,19 @@ void monitor_init(Chardev *chr, int flags)
+> >
+> >      if (monitor_is_qmp(mon)) {
+> >          qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read,
+> > monitor_qmp_read,
+> > -                                 monitor_qmp_event, NULL, mon, NULL,
+> > true);
+> > +                                 monitor_qmp_event, NULL, mon,
+> > +                                 mon->mon_context, true);
+> >          qemu_chr_fe_set_echo(&mon->chr, true);
+> >          json_message_parser_init(&mon->qmp.parser, handle_qmp_comman=
+d);
+> >      } else {
+> >          qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read,
+> > monitor_read,
+> > -                                 monitor_event, NULL, mon, NULL, tru=
+e);
+> > +                                 monitor_event, NULL, mon,
+> > +                                 mon->mon_context, true);
+> > +    }
+> > +
+> > +    if (mon->use_thread) {
+> > +        qemu_thread_create(&mon->mon_thread, chr->label, monitor_thr=
+ead,
+> > +                           mon, QEMU_THREAD_JOINABLE);
+> >      }
+> >
+> >      qemu_mutex_lock(&monitor_lock);
+> > diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+> > index 5ad36f8..3b6b224 100644
+> > --- a/qapi/qmp-dispatch.c
+> > +++ b/qapi/qmp-dispatch.c
+> > @@ -19,6 +19,7 @@
+> >  #include "qapi/qmp/qjson.h"
+> >  #include "qapi-types.h"
+> >  #include "qapi/qmp/qerror.h"
+> > +#include "qemu/main-loop.h"
+> >
+> >  static QDict *qmp_dispatch_check_obj(const QObject *request, Error *=
+*errp)
+> >  {
+> > @@ -75,6 +76,11 @@ static QObject *do_qmp_dispatch(QmpCommandList *cm=
+ds,
+> > QObject *request,
+> >      QDict *args, *dict;
+> >      QmpCommand *cmd;
+> >      QObject *ret =3D NULL;
+> > +    /*
+> > +     * If we haven't take the BQL (when called by per-monitor
+> > +     * threads), we need to take care of the BQL on our own.
+> > +     */
+> > +    bool take_bql =3D !qemu_mutex_iothread_locked();
+> >
+> >      dict =3D qmp_dispatch_check_obj(request, errp);
+> >      if (!dict) {
+> > @@ -101,7 +107,16 @@ static QObject *do_qmp_dispatch(QmpCommandList *=
+cmds,
+> > QObject *request,
+> >          QINCREF(args);
+> >      }
+> >
+> > +    if (take_bql) {
+> > +        qemu_mutex_lock_iothread();
+> > +    }
+> > +
+> >      cmd->fn(args, &ret, &local_err);
+> > +
+> > +    if (take_bql) {
+> > +        qemu_mutex_unlock_iothread();
+> > +    }
+> > +
+> >      if (local_err) {
+> >          error_propagate(errp, local_err);
+> >      } else if (cmd->options & QCO_NO_SUCCESS_RESP) {
+> > --
+> > 2.7.4
+> >
+> >
+> > --
+> Marc-Andr=E9 Lureau
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
