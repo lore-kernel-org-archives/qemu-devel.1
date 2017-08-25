@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dlC2J-0003aE-RO
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 06:40:24 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dlCAf-00052w-Gy
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 06:49:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dlC2J-00046o-1b
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 06:40:23 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dlCAc-0007yr-G5
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 06:49:01 -0400
+Received: from mail-wm0-f41.google.com ([74.125.82.41]:35390)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dlCAc-0007yi-9C
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 06:48:58 -0400
+Received: by mail-wm0-f41.google.com with SMTP id y71so68181wmd.0
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 03:48:58 -0700 (PDT)
+References: <283a2a27-7fb5-5fa7-4921-60ba91f13666@ozlabs.ru>
+	<20170818131853.GB17654@stefanha-x1.localdomain>
+	<20170821043125.GH12356@umbus.fritz.box>
+	<6e2ae379-9cff-9615-c19f-747867328cb5@ozlabs.ru>
+	<acb8a5b9-559f-665c-9072-582f3ddc593b@ozlabs.ru>
+	<20170824123006.GK5379@umbus.fritz.box>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7ee077ae-4e7e-8baf-9caa-9378f4a7b604@redhat.com>
+Date: Fri, 25 Aug 2017 12:48:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <a839e5fa-0495-902c-5a20-6592ab07bb9e@redhat.com>
-References: <20170824153345.2244-1-stefanha@redhat.com>
-	<20170824153345.2244-2-stefanha@redhat.com>
-	<a839e5fa-0495-902c-5a20-6592ab07bb9e@redhat.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Fri, 25 Aug 2017 11:40:20 +0100
-Message-ID: <CAJSP0QW-yX-cw0-Nhen6HTkpm6fATWCpyfsu8eokdg_9aMAuGg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/3] nbd-client: enter
- read_reply_co during init to avoid crash
+In-Reply-To: <20170824123006.GK5379@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Memory use with >100 virtio devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +34,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Thu, Aug 24, 2017 at 5:21 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 24/08/2017 17:33, Stefan Hajnoczi wrote:
->> This patch enters read_reply_co directly in
->> nbd_client_attach_aio_context().  This is safe because new_context is
->> acquired by the caller.  This ensures that read_reply_co reaches its
->> first yield point and its ctx is set up.
->
-> I'm not very confident with this patch.  aio_context_acquire/release is
-> going to go away, and this then becomes possible
->
->         main context                    new_context
->         qemu_aio_coroutine_enter
->                                         send request
->                                         wait for reply
->         read first reply
->         wake coroutine
->
-> where the "wake coroutine" part thinks it's running in new_context, and
-> thus simply enters the coroutine instead of using the bottom half.
->
-> But blk_co_preadv() should need the read_reply_co itself, in order to be
-> woken up after reading the reply header.  The core issue here is that
-> nbd_co_receive_reply was never called, I suspect.  And if it was never
-> called, read_reply_co should not be woken up by nbd_coroutine_end.
->
-> So the fix is:
->
-> 1) assign NULL to s->recv_coroutine[i] when nbd_co_send_request fails
->
-> 2) move this to nbd_co_receive_reply:
->
->     s->recv_coroutine[i] = NULL;
->
->     /* Kick the read_reply_co to get the next reply.  */
->     if (s->read_reply_co) {
->         aio_co_wake(s->read_reply_co);
->     }
->
-> Does this make sense?  (Note that the read_reply_co idea actually came
-> from you, or from my recollections of your proposed design :)).
+On 24/08/2017 14:30, David Gibson wrote:
+>>
+>> Ideas what to tweak or what valgrind tool to try?
+> valgrind probably isn't that useful at this point.  I think we need to
+> instrument bits of the code to find what the O(n^2) algo is and fix it.
+> 
+> Seems to me checking if the address_spaces list is growing to O(n^2)
+> entries would be a good place to start.
 
-Yes, I think that would work.
 
-Stefan
+The address spaces are O(n) (and so are the FlatView and the dispatch
+tries), but each of them has O(n) size.
+
+Eventually we use O(n^2) memory, but we build them O(n) times---which is
+expensive and also means, due to RCU, that there can be a short amount
+of time where it is between O(n^2) and O(n^3).
+
+The scheme I suggested elsewhere in the thread should cut one "n", by
+sharing one FlatViews and dispatch trie across all AddressSpaces.
+
+Paolo
