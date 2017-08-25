@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dlL4Y-0003ya-03
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 16:19:19 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dlLIe-0007oT-2z
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 16:33:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dlL4U-0006M8-0t
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 16:19:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33682)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1dlL4T-0006KB-Nz
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 16:19:13 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7CF697EA9D
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 20:19:11 +0000 (UTC)
-Date: Fri, 25 Aug 2017 14:19:00 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170825141900.08e2a089@w520.home>
-In-Reply-To: <20170823221445.15243-2-ehabkost@redhat.com>
-References: <20170823221445.15243-1-ehabkost@redhat.com>
-	<20170823221445.15243-2-ehabkost@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1dlLId-0007Gs-4Y
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 16:33:52 -0400
+References: <20170824153345.2244-1-stefanha@redhat.com>
+	<440320ce-5bd1-bb3d-fedd-2e2ed00f1f19@redhat.com>
+	<CAJSP0QVse1f9S8ZmXsysfaT85mCSCtzsufAOHx38KZ250NVbEA@mail.gmail.com>
+	<8d1501f2-d545-dbcf-9482-d993fd16a021@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1bd56c2a-7361-370d-05d7-2aad80ae0470@redhat.com>
+Date: Fri, 25 Aug 2017 22:33:36 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/5] pci: INTERFACE_LEGACY_PCI_DEVICE and
- INTERFACE_PCIE_DEVICE interfaces
+In-Reply-To: <8d1501f2-d545-dbcf-9482-d993fd16a021@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="J8PmJd603ebjsmvcWrQsbkgOIqEU9vLdn"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/3] nbd-client: enter
+ read_reply_co during init to avoid crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,76 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Laine Stump <laine@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>
 
-On Wed, 23 Aug 2017 19:14:41 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--J8PmJd603ebjsmvcWrQsbkgOIqEU9vLdn
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel
+ <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
+ qemu block <qemu-block@nongnu.org>
+Message-ID: <1bd56c2a-7361-370d-05d7-2aad80ae0470@redhat.com>
+Subject: Re: [Qemu-block] [PATCH 0/3] nbd-client: enter read_reply_co during
+ init to avoid crash
+References: <20170824153345.2244-1-stefanha@redhat.com>
+ <440320ce-5bd1-bb3d-fedd-2e2ed00f1f19@redhat.com>
+ <CAJSP0QVse1f9S8ZmXsysfaT85mCSCtzsufAOHx38KZ250NVbEA@mail.gmail.com>
+ <8d1501f2-d545-dbcf-9482-d993fd16a021@redhat.com>
+In-Reply-To: <8d1501f2-d545-dbcf-9482-d993fd16a021@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Those two interfaces will be used to indicate which device types
-> support legacy PCI or PCI-express buses.  Management software
-> will be able to use the qom-list-types QMP command to query that
-> information.
+On 25/08/2017 17:08, Eric Blake wrote:
+> On 08/24/2017 11:05 AM, Stefan Hajnoczi wrote:
+>> On Thu, Aug 24, 2017 at 4:52 PM, Eric Blake <eblake@redhat.com> wrote:=
 
-Nit, while "legacy PCI" and "conventional PCI" have about the same
-number of google hits, I believe the latter is the more correct term.
-The quality of hits is certainly a lot better with "conventional".
-Calling something "legacy" also spurs an immediate negative reaction
-for some folks, "conventional" is more neutral.  Thanks,
+>>> On 08/24/2017 10:33 AM, Stefan Hajnoczi wrote:
+>>>> See Patch 1 for the segfault fix.  Patches 2 & 3 add qemu-iotests co=
+verage.
+>>>>
+>>>> This is a rare crash that we'll probably only see in testing.  It on=
+ly seems to
+>>>> happen with UNIX domain sockets.
+>>>
+>>> Rare enough that I don't think it is 2.10-rc4 material.  I'll review,=
 
-Alex
+>>> and if I don't find anything needing a respin, I'll add it to my NBD
+>>> queue for 2.11.
+>>
+>> Great.  This is 2.11 material.
+>=20
+> Hmm - I wonder if https://bugs.launchpad.net/qemu/+bug/1712818 is
+> related to this.  I really don't want to delay 2.10 further (downstream=
 
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  include/hw/pci/pci.h |  6 ++++++
->  hw/pci/pci.c         | 12 ++++++++++++
->  2 files changed, 18 insertions(+)
-> 
-> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index e598b09..f5e8ab9 100644
-> --- a/include/hw/pci/pci.h
-> +++ b/include/hw/pci/pci.h
-> @@ -195,6 +195,12 @@ enum {
->  #define PCI_DEVICE_GET_CLASS(obj) \
->       OBJECT_GET_CLASS(PCIDeviceClass, (obj), TYPE_PCI_DEVICE)
->  
-> +/* Interface implemented by devices that can be plugged on PCIe buses */
-> +#define INTERFACE_PCIE_DEVICE "pci-express-device"
-> +
-> +/* Interface implemented by devices that can be plugged on legacy PCI buses */
-> +#define INTERFACE_LEGACY_PCI_DEVICE "legacy-pci-device"
-> +
->  typedef struct PCIINTxRoute {
->      enum {
->          PCI_INTX_ENABLED,
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 258fbe5..baa3429 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -168,6 +168,16 @@ static const TypeInfo pci_bus_info = {
->      .class_init = pci_bus_class_init,
->  };
->  
-> +static const TypeInfo pcie_interface_info = {
-> +    .name          = INTERFACE_PCIE_DEVICE,
-> +    .parent        = TYPE_INTERFACE,
-> +};
-> +
-> +static const TypeInfo legacy_pci_interface_info = {
-> +    .name          = INTERFACE_LEGACY_PCI_DEVICE,
-> +    .parent        = TYPE_INTERFACE,
-> +};
-> +
->  static const TypeInfo pcie_bus_info = {
->      .name = TYPE_PCIE_BUS,
->      .parent = TYPE_PCI_BUS,
-> @@ -2645,6 +2655,8 @@ static void pci_register_types(void)
->  {
->      type_register_static(&pci_bus_info);
->      type_register_static(&pcie_bus_info);
-> +    type_register_static(&legacy_pci_interface_info);
-> +    type_register_static(&pcie_interface_info);
->      type_register_static(&pci_device_type_info);
->  }
->  
+> distros can backport fixes) - but comment 3 stating that crashes are
+> less frequent but still possible with -rc4 is not good.
+
+Well, I won't be able to review or write the patch, so I think it's
+better to wait.
+
+Paolo
+
+
+--J8PmJd603ebjsmvcWrQsbkgOIqEU9vLdn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAlmgiaAACgkQv/vSX3jH
+roO5gAf+M264qV0fj9MjrnSfw986CwTeOSqPPMExdzhXQ4b5VVMSPSM4jnvWbrBb
+t+M4OxA4QsAh0iOr3Yx9mJe4nN2EV8qKggsR8K5KnoGb0Z+pUdrcBEv4eHmW0NDl
+PT3db3B00nBMH018uvo1Smeiuosie7UxVdTAaBM5cO+t44Rpka0tXXXbj2nJWifj
+eCjKsQ8Ez2eIbvx5jCbqdvk1ZDxouuAQYY0wYtcQKPmJY/7Jfplx0QwIZJxqyExX
+uaS5juABG0vOdm/iq0hAv/beewWXE98KB2qWtMXEnueNE5lvHOROuFQ95/N10NuW
+rhALDPuN2ozF8R6hINPjEIBdwPwbBw==
+=vRkP
+-----END PGP SIGNATURE-----
+
+--J8PmJd603ebjsmvcWrQsbkgOIqEU9vLdn--
