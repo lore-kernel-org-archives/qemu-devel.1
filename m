@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCf6-0007zA-5V
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:20:30 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCfZ-0008Eo-Fh
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:20:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCf0-0006WN-IC
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:20:28 -0400
-Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:37650)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dlCfX-0006iE-Lp
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:20:57 -0400
+Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:33130)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dlCf0-0006WF-C1
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:20:22 -0400
-Received: by mail-vk0-x242.google.com with SMTP id z187so812855vkd.4
-	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 04:20:22 -0700 (PDT)
+	id 1dlCfX-0006hS-Dc
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 07:20:55 -0400
+Received: by mail-ua0-x241.google.com with SMTP id d12so878558uag.0
+	for <qemu-devel@nongnu.org>; Fri, 25 Aug 2017 04:20:55 -0700 (PDT)
 MIME-Version: 1.0
 References: <1503602048-12268-1-git-send-email-armbru@redhat.com>
-	<1503602048-12268-12-git-send-email-armbru@redhat.com>
-In-Reply-To: <1503602048-12268-12-git-send-email-armbru@redhat.com>
+	<1503602048-12268-13-git-send-email-armbru@redhat.com>
+In-Reply-To: <1503602048-12268-13-git-send-email-armbru@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 25 Aug 2017 11:20:11 +0000
-Message-ID: <CAJ+F1C+JyRBxc-cv0ko1zqNnNt6N0h5OhrLM2GdVT3yLocgNKw@mail.gmail.com>
+Date: Fri, 25 Aug 2017 11:20:44 +0000
+Message-ID: <CAJ+F1C+Q8UHdBGaS1sDS7Eg4onzthw7W_HShaCG0v_9DQssTLw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 11/16] qapi-schema: Collect TPM stuff in
- qapi/tpm.json
+Subject: Re: [Qemu-devel] [PATCH v2 12/16] qapi-schema: Move block events
+ from event.json to block.json
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,364 +31,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>
 
-On Thu, Aug 24, 2017 at 9:23 PM Markus Armbruster <armbru@redhat.com> wrote=
+On Thu, Aug 24, 2017 at 9:25 PM Markus Armbruster <armbru@redhat.com> wrote=
 :
 
-> Sadly, we don't have a TPM maintainer, not even a MAINTAINERS entry.
-> Create one, and mark it orphaned.
->
->
-This is also proposed in:
-http://patchew.org/QEMU/20170728053610.15770-1-f4bug@amsat.org/
-
-Stefan Berger, any chance you declare yourself a TPM maintainer?
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Cc: Alberto Garcia <berto@igalia.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >
 
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
----
->  MAINTAINERS      |   8 ++++
->  Makefile         |   1 +
->  qapi-schema.json | 132
-> +----------------------------------------------------
->  qapi/tpm.json    | 137
-> +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 147 insertions(+), 131 deletions(-)
->  create mode 100644 qapi/tpm.json
+
+
+> ---
+>  qapi/block.json | 68
+> +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  qapi/event.json | 68
+> ---------------------------------------------------------
+>  2 files changed, 68 insertions(+), 68 deletions(-)
 >
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 8cebd79..5ec945c 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1486,6 +1486,14 @@ F: scripts/tracetool/
->  F: docs/tracing.txt
->  T: git git://github.com/stefanha/qemu.git tracing
->
-> +TPM
-> +S: Orphan
-> +F: tpm.c
-> +F: hw/tpm/*
-> +F: include/hw/acpi/tpm.h
-> +F: include/sysemu/tpm*
-> +F: qapi/tpm.json
+> diff --git a/qapi/block.json b/qapi/block.json
+> index 414b61b..8ce3357 100644
+> --- a/qapi/block.json
+> +++ b/qapi/block.json
+> @@ -277,3 +277,71 @@
+>  ##
+>  { 'enum': 'QuorumOpType',
+>    'data': [ 'read', 'write', 'flush' ] }
 > +
->  Checkpatch
->  S: Odd Fixes
->  F: scripts/checkpatch.pl
-> diff --git a/Makefile b/Makefile
-> index ea6de37..3dde210 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -418,6 +418,7 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json
-> $(SRC_PATH)/qapi/common.json \
->                 $(SRC_PATH)/qapi/rocker.json \
->                 $(SRC_PATH)/qapi/run-state.json \
->                 $(SRC_PATH)/qapi/sockets.json \
-> +               $(SRC_PATH)/qapi/tpm.json \
->                 $(SRC_PATH)/qapi/trace.json \
->                 $(SRC_PATH)/qapi/transaction.json \
->                 $(SRC_PATH)/qapi/ui.json
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 4108ef0..0ad4e02 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -86,6 +86,7 @@
->  { 'include': 'qapi/char.json' }
->  { 'include': 'qapi/net.json' }
->  { 'include': 'qapi/rocker.json' }
-> +{ 'include': 'qapi/tpm.json' }
->  { 'include': 'qapi/ui.json' }
->  { 'include': 'qapi/migration.json' }
->  { 'include': 'qapi/transaction.json' }
-> @@ -2213,137 +2214,6 @@
->  { 'command': 'query-target', 'returns': 'TargetInfo' }
+> +##
+> +# @QUORUM_FAILURE:
+> +#
+> +# Emitted by the Quorum block driver if it fails to establish a quorum
+> +#
+> +# @reference: device name if defined else node name
+> +#
+> +# @sector-num: number of the first sector of the failed read operation
+> +#
+> +# @sectors-count: failed read operation sector count
+> +#
+> +# Note: This event is rate-limited.
+> +#
+> +# Since: 2.0
+> +#
+> +# Example:
+> +#
+> +# <- { "event": "QUORUM_FAILURE",
+> +#      "data": { "reference": "usr1", "sector-num": 345435,
+> "sectors-count": 5 },
+> +#      "timestamp": { "seconds": 1344522075, "microseconds": 745528 } }
+> +#
+> +##
+> +{ 'event': 'QUORUM_FAILURE',
+> +  'data': { 'reference': 'str', 'sector-num': 'int', 'sectors-count':
+> 'int' } }
+> +
+> +##
+> +# @QUORUM_REPORT_BAD:
+> +#
+> +# Emitted to report a corruption of a Quorum file
+> +#
+> +# @type: quorum operation type (Since 2.6)
+> +#
+> +# @error: error message. Only present on failure. This field
+> +#         contains a human-readable error message. There are no semantic=
+s
+> other
+> +#         than that the block layer reported an error and clients should
+> not
+> +#         try to interpret the error string.
+> +#
+> +# @node-name: the graph node name of the block driver state
+> +#
+> +# @sector-num: number of the first sector of the failed read operation
+> +#
+> +# @sectors-count: failed read operation sector count
+> +#
+> +# Note: This event is rate-limited.
+> +#
+> +# Since: 2.0
+> +#
+> +# Example:
+> +#
+> +# 1. Read operation
+> +#
+> +# { "event": "QUORUM_REPORT_BAD",
+> +#      "data": { "node-name": "node0", "sector-num": 345435,
+> "sectors-count": 5,
+> +#                "type": "read" },
+> +#      "timestamp": { "seconds": 1344522075, "microseconds": 745528 } }
+> +#
+> +# 2. Flush operation
+> +#
+> +# { "event": "QUORUM_REPORT_BAD",
+> +#      "data": { "node-name": "node0", "sector-num": 0, "sectors-count":
+> 2097120,
+> +#                "type": "flush", "error": "Broken pipe" },
+> +#      "timestamp": { "seconds": 1456406829, "microseconds": 291763 } }
+> +#
+> +##
+> +{ 'event': 'QUORUM_REPORT_BAD',
+> +  'data': { 'type': 'QuorumOpType', '*error': 'str', 'node-name': 'str',
+> +            'sector-num': 'int', 'sectors-count': 'int' } }
+> diff --git a/qapi/event.json b/qapi/event.json
+> index a043de4..48a5d8f 100644
+> --- a/qapi/event.json
+> +++ b/qapi/event.json
+> @@ -92,74 +92,6 @@
+>    'data': { 'actual': 'int' } }
 >
 >  ##
-> -# @TpmModel:
+> -# @QUORUM_FAILURE:
 > -#
-> -# An enumeration of TPM models
+> -# Emitted by the Quorum block driver if it fails to establish a quorum
 > -#
-> -# @tpm-tis: TPM TIS model
+> -# @reference: device name if defined else node name
 > -#
-> -# Since: 1.5
-> -##
-> -{ 'enum': 'TpmModel', 'data': [ 'tpm-tis' ] }
-> -
-> -##
-> -# @query-tpm-models:
+> -# @sector-num: number of the first sector of the failed read operation
 > -#
-> -# Return a list of supported TPM models
+> -# @sectors-count: failed read operation sector count
 > -#
-> -# Returns: a list of TpmModel
+> -# Note: This event is rate-limited.
 > -#
-> -# Since: 1.5
+> -# Since: 2.0
 > -#
 > -# Example:
 > -#
-> -# -> { "execute": "query-tpm-models" }
-> -# <- { "return": [ "tpm-tis" ] }
+> -# <- { "event": "QUORUM_FAILURE",
+> -#      "data": { "reference": "usr1", "sector-num": 345435,
+> "sectors-count": 5 },
+> -#      "timestamp": { "seconds": 1344522075, "microseconds": 745528 } }
 > -#
 > -##
-> -{ 'command': 'query-tpm-models', 'returns': ['TpmModel'] }
+> -{ 'event': 'QUORUM_FAILURE',
+> -  'data': { 'reference': 'str', 'sector-num': 'int', 'sectors-count':
+> 'int' } }
 > -
 > -##
-> -# @TpmType:
+> -# @QUORUM_REPORT_BAD:
 > -#
-> -# An enumeration of TPM types
+> -# Emitted to report a corruption of a Quorum file
 > -#
-> -# @passthrough: TPM passthrough type
+> -# @type: quorum operation type (Since 2.6)
 > -#
-> -# Since: 1.5
-> -##
-> -{ 'enum': 'TpmType', 'data': [ 'passthrough' ] }
-> -
-> -##
-> -# @query-tpm-types:
+> -# @error: error message. Only present on failure. This field
+> -#         contains a human-readable error message. There are no semantic=
+s
+> other
+> -#         than that the block layer reported an error and clients should
+> not
+> -#         try to interpret the error string.
 > -#
-> -# Return a list of supported TPM types
+> -# @node-name: the graph node name of the block driver state
 > -#
-> -# Returns: a list of TpmType
+> -# @sector-num: number of the first sector of the failed read operation
 > -#
-> -# Since: 1.5
+> -# @sectors-count: failed read operation sector count
+> -#
+> -# Note: This event is rate-limited.
+> -#
+> -# Since: 2.0
 > -#
 > -# Example:
 > -#
-> -# -> { "execute": "query-tpm-types" }
-> -# <- { "return": [ "passthrough" ] }
+> -# 1. Read operation
+> -#
+> -# { "event": "QUORUM_REPORT_BAD",
+> -#      "data": { "node-name": "node0", "sector-num": 345435,
+> "sectors-count": 5,
+> -#                "type": "read" },
+> -#      "timestamp": { "seconds": 1344522075, "microseconds": 745528 } }
+> -#
+> -# 2. Flush operation
+> -#
+> -# { "event": "QUORUM_REPORT_BAD",
+> -#      "data": { "node-name": "node0", "sector-num": 0, "sectors-count":
+> 2097120,
+> -#                "type": "flush", "error": "Broken pipe" },
+> -#      "timestamp": { "seconds": 1456406829, "microseconds": 291763 } }
 > -#
 > -##
-> -{ 'command': 'query-tpm-types', 'returns': ['TpmType'] }
+> -{ 'event': 'QUORUM_REPORT_BAD',
+> -  'data': { 'type': 'QuorumOpType', '*error': 'str', 'node-name': 'str',
+> -            'sector-num': 'int', 'sectors-count': 'int' } }
 > -
 > -##
-> -# @TPMPassthroughOptions:
-> -#
-> -# Information about the TPM passthrough type
-> -#
-> -# @path: string describing the path used for accessing the TPM device
-> -#
-> -# @cancel-path: string showing the TPM's sysfs cancel file
-> -#               for cancellation of TPM commands while they are executin=
-g
-> -#
-> -# Since: 1.5
-> -##
-> -{ 'struct': 'TPMPassthroughOptions', 'data': { '*path' : 'str',
-> -                                             '*cancel-path' : 'str'} }
-> -
-> -##
-> -# @TpmTypeOptions:
-> -#
-> -# A union referencing different TPM backend types' configuration options
-> -#
-> -# @type: 'passthrough' The configuration options for the TPM passthrough
-> type
-> -#
-> -# Since: 1.5
-> -##
-> -{ 'union': 'TpmTypeOptions',
-> -   'data': { 'passthrough' : 'TPMPassthroughOptions' } }
-> -
-> -##
-> -# @TPMInfo:
-> -#
-> -# Information about the TPM
-> -#
-> -# @id: The Id of the TPM
-> -#
-> -# @model: The TPM frontend model
-> -#
-> -# @options: The TPM (backend) type configuration options
-> -#
-> -# Since: 1.5
-> -##
-> -{ 'struct': 'TPMInfo',
-> -  'data': {'id': 'str',
-> -           'model': 'TpmModel',
-> -           'options': 'TpmTypeOptions' } }
-> -
-> -##
-> -# @query-tpm:
-> -#
-> -# Return information about the TPM device
-> -#
-> -# Returns: @TPMInfo on success
-> -#
-> -# Since: 1.5
-> -#
-> -# Example:
-> -#
-> -# -> { "execute": "query-tpm" }
-> -# <- { "return":
-> -#      [
-> -#        { "model": "tpm-tis",
-> -#          "options":
-> -#            { "type": "passthrough",
-> -#              "data":
-> -#                { "cancel-path": "/sys/class/misc/tpm0/device/cancel",
-> -#                  "path": "/dev/tpm0"
-> -#                }
-> -#            },
-> -#          "id": "tpm0"
-> -#        }
-> -#      ]
-> -#    }
-> -#
-> -##
-> -{ 'command': 'query-tpm', 'returns': ['TPMInfo'] }
-> -
-> -##
->  # @AcpiTableOptions:
+>  # @MEM_UNPLUG_ERROR:
 >  #
->  # Specify an ACPI table on the command line to load.
-> diff --git a/qapi/tpm.json b/qapi/tpm.json
-> new file mode 100644
-> index 0000000..e8b2d8d
-> --- /dev/null
-> +++ b/qapi/tpm.json
-> @@ -0,0 +1,137 @@
-> +# -*- Mode: Python -*-
-> +#
-> +
-> +##
-> +# =3D TPM (trusted platform module) devices
-> +##
-> +
-> +##
-> +# @TpmModel:
-> +#
-> +# An enumeration of TPM models
-> +#
-> +# @tpm-tis: TPM TIS model
-> +#
-> +# Since: 1.5
-> +##
-> +{ 'enum': 'TpmModel', 'data': [ 'tpm-tis' ] }
-> +
-> +##
-> +# @query-tpm-models:
-> +#
-> +# Return a list of supported TPM models
-> +#
-> +# Returns: a list of TpmModel
-> +#
-> +# Since: 1.5
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-tpm-models" }
-> +# <- { "return": [ "tpm-tis" ] }
-> +#
-> +##
-> +{ 'command': 'query-tpm-models', 'returns': ['TpmModel'] }
-> +
-> +##
-> +# @TpmType:
-> +#
-> +# An enumeration of TPM types
-> +#
-> +# @passthrough: TPM passthrough type
-> +#
-> +# Since: 1.5
-> +##
-> +{ 'enum': 'TpmType', 'data': [ 'passthrough' ] }
-> +
-> +##
-> +# @query-tpm-types:
-> +#
-> +# Return a list of supported TPM types
-> +#
-> +# Returns: a list of TpmType
-> +#
-> +# Since: 1.5
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-tpm-types" }
-> +# <- { "return": [ "passthrough" ] }
-> +#
-> +##
-> +{ 'command': 'query-tpm-types', 'returns': ['TpmType'] }
-> +
-> +##
-> +# @TPMPassthroughOptions:
-> +#
-> +# Information about the TPM passthrough type
-> +#
-> +# @path: string describing the path used for accessing the TPM device
-> +#
-> +# @cancel-path: string showing the TPM's sysfs cancel file
-> +#               for cancellation of TPM commands while they are executin=
-g
-> +#
-> +# Since: 1.5
-> +##
-> +{ 'struct': 'TPMPassthroughOptions', 'data': { '*path' : 'str',
-> +                                             '*cancel-path' : 'str'} }
-> +
-> +##
-> +# @TpmTypeOptions:
-> +#
-> +# A union referencing different TPM backend types' configuration options
-> +#
-> +# @type: 'passthrough' The configuration options for the TPM passthrough
-> type
-> +#
-> +# Since: 1.5
-> +##
-> +{ 'union': 'TpmTypeOptions',
-> +   'data': { 'passthrough' : 'TPMPassthroughOptions' } }
-> +
-> +##
-> +# @TPMInfo:
-> +#
-> +# Information about the TPM
-> +#
-> +# @id: The Id of the TPM
-> +#
-> +# @model: The TPM frontend model
-> +#
-> +# @options: The TPM (backend) type configuration options
-> +#
-> +# Since: 1.5
-> +##
-> +{ 'struct': 'TPMInfo',
-> +  'data': {'id': 'str',
-> +           'model': 'TpmModel',
-> +           'options': 'TpmTypeOptions' } }
-> +
-> +##
-> +# @query-tpm:
-> +#
-> +# Return information about the TPM device
-> +#
-> +# Returns: @TPMInfo on success
-> +#
-> +# Since: 1.5
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-tpm" }
-> +# <- { "return":
-> +#      [
-> +#        { "model": "tpm-tis",
-> +#          "options":
-> +#            { "type": "passthrough",
-> +#              "data":
-> +#                { "cancel-path": "/sys/class/misc/tpm0/device/cancel",
-> +#                  "path": "/dev/tpm0"
-> +#                }
-> +#            },
-> +#          "id": "tpm0"
-> +#        }
-> +#      ]
-> +#    }
-> +#
-> +##
-> +{ 'command': 'query-tpm', 'returns': ['TPMInfo'] }
+>  # Emitted when memory hot unplug error occurs.
 > --
 > 2.7.5
 >
