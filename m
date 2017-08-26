@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dlP41-0003gh-81
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 20:35:02 -0400
+	(envelope-from <zhaoshenglong@huawei.com>) id 1dlPUH-0000Rw-Uk
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 21:02:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dlP3w-0004IP-IS
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 20:35:01 -0400
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:51351)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dlP3v-0004I3-Tu
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 20:34:56 -0400
-Date: Fri, 25 Aug 2017 20:34:54 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170826003454.GA23546@flamenco>
-References: <150142369849.12995.11229612194223213120.stgit@frigg.lan>
+	(envelope-from <zhaoshenglong@huawei.com>) id 1dlPUH-0007iq-3d
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 21:02:10 -0400
+Message-ID: <59A0C813.2060201@huawei.com>
+Date: Sat, 26 Aug 2017 09:00:03 +0800
+From: Shannon Zhao <zhaoshenglong@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <150142369849.12995.11229612194223213120.stgit@frigg.lan>
-Subject: Re: [Qemu-devel] [PATCH v8 0/5] hypertrace: Lightweight
- guest-to-QEMU trace channel
+References: <1503066227-18251-1-git-send-email-gengdongjiu@huawei.com>
+	<1503066227-18251-2-git-send-email-gengdongjiu@huawei.com>
+	<599EC7AB.3080604@huawei.com>
+	<69090a96-ce90-4b2b-a419-c8d847d56093@huawei.com>
+In-Reply-To: <69090a96-ce90-4b2b-a419-c8d847d56093@huawei.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v11 1/6] ACPI: add APEI/HEST/CPER
+ structures and macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +26,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>
+To: gengdongjiu <gengdongjiu@huawei.com>, lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org, edk2-devel@lists.01.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, will.deacon@arm.com, james.morse@arm.com, tbaicar@codeaurora.org, ard.biesheuvel@linaro.org, mingo@kernel.org, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, devel@acpica.org, john.garry@huawei.com, jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com, huangdaode@hisilicon.com, wangzhou1@hisilicon.com
+Cc: huangshaoyu@huawei.com, wuquanming@huawei.com, linuxarm@huawei.com, zhengqiang10@huawei.com
 
-On Sun, Jul 30, 2017 at 17:08:18 +0300, Lluís Vilanova wrote:
-> The hypertrace channel allows guest code to emit events in QEMU (the host) using
-> its tracing infrastructure (see "docs/trace.txt"). This works in both 'system'
-> and 'user' modes, is architecture-agnostic and introduces minimal noise on the
-> guest.
+
+
+On 2017/8/25 18:37, gengdongjiu wrote:
+>>> +
+>>> >> +/* From the ACPI 6.1 spec, "18.3.2.9 Hardware Error Notification" */
+>>> >> +
+>> > It's better to refer to the first spec version of this structure and
+>> > same with others you define.
+>  do you mean which spec version? the definition is aligned with the linux kernel.
+What I mean here is that it's better to refer to the ACPI spec version
+which introduces Hardware Error Notification first time.
+
+>> > 
+>>> >> +enum AcpiHestNotifyType {
+>>> >> +    ACPI_HEST_NOTIFY_POLLED = 0,
+>>> >> +    ACPI_HEST_NOTIFY_EXTERNAL = 1,
+>>> >> +    ACPI_HEST_NOTIFY_LOCAL = 2,
+>>> >> +    ACPI_HEST_NOTIFY_SCI = 3,
+>>> >> +    ACPI_HEST_NOTIFY_NMI = 4,
+>>> >> +    ACPI_HEST_NOTIFY_CMCI = 5,  /* ACPI 5.0 */
+>>> >> +    ACPI_HEST_NOTIFY_MCE = 6,   /* ACPI 5.0 */
+>>> >> +    ACPI_HEST_NOTIFY_GPIO = 7,  /* ACPI 6.0 */
+>>> >> +    ACPI_HEST_NOTIFY_SEA = 8,   /* ACPI 6.1 */
+>>> >> +    ACPI_HEST_NOTIFY_SEI = 9,   /* ACPI 6.1 */
+>>> >> +    ACPI_HEST_NOTIFY_GSIV = 10, /* ACPI 6.1 */
+>>> >> +    ACPI_HEST_NOTIFY_RESERVED = 11  /* 11 and greater are reserved */
+>> > In ACPI 6.2, 11 is for Software Delegated Exception, is this useful for
+>> > your patchset?
+>   it is usefull, for all the error source, I reserved the space for them.
+> Because the space is allocated one time, is not dynamically allocated.
+> so I use the ACPI_HEST_NOTIFY_RESERVED to specify that there is 11 error source.
 > 
-> See first commit for a full description, use-cases and an example.
-> 
-> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-
-This would be indeed very useful once TCG instrumentation is in place.
-
-However, I'm not very excited about this being PCI-only and Linux-only for
-system mode
-I wonder how we could make this work on all hosts -- did you consider using
-"magic" instructions? We'd need a different magic instruction for each
-guest ISA, but the library would hide that anyway (and the library code
-would be the same for user and system modes).
+I mean whether the new type Software Delegated Exception is useful for
+RAS. If so, we could add this new type here.
 
 Thanks,
-
-		Emilio
+-- 
+Shannon
