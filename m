@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1dlQDu-00010y-0n
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 21:49:19 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1dlRBM-0003ls-QN
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 22:50:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1dlQDt-0006LV-5j
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 21:49:18 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1dlRBL-0002CJ-Sn
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 22:50:44 -0400
 References: <1503066227-18251-1-git-send-email-gengdongjiu@huawei.com>
-	<1503066227-18251-2-git-send-email-gengdongjiu@huawei.com>
-	<599EC7AB.3080604@huawei.com>
-	<69090a96-ce90-4b2b-a419-c8d847d56093@huawei.com>
-	<59A0C813.2060201@huawei.com>
+	<1503066227-18251-3-git-send-email-gengdongjiu@huawei.com>
+	<599ECE95.10205@huawei.com>
+	<9a878b42-c480-2c7b-0f04-202193d8c56b@huawei.com>
+	<59A0C9FE.5010204@huawei.com>
 From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <03f2f404-2718-75c7-d0eb-7bdeba146a2e@huawei.com>
-Date: Sat, 26 Aug 2017 09:45:02 +0800
+Message-ID: <27894653-ff09-7839-a46d-b41b9ee8ae48@huawei.com>
+Date: Sat, 26 Aug 2017 10:49:44 +0800
 MIME-Version: 1.0
-In-Reply-To: <59A0C813.2060201@huawei.com>
+In-Reply-To: <59A0C9FE.5010204@huawei.com>
 Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 1/6] ACPI: add APEI/HEST/CPER
- structures and macros
+Subject: Re: [Qemu-devel] [PATCH v11 2/6] ACPI: Add APEI GHES Table
+ Generation support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +30,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Shannon Zhao <zhaoshenglong@huawei.com>, lersek@redhat.com, mst@redhat.com, imammedo@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org, edk2-devel@lists.01.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, will.deacon@arm.com, james.morse@arm.com, tbaicar@codeaurora.org, ard.biesheuvel@linaro.org, mingo@kernel.org, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, devel@acpica.org, john.garry@huawei.com, jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com, huangdaode@hisilicon.com, wangzhou1@hisilicon.com
 Cc: huangshaoyu@huawei.com, wuquanming@huawei.com, linuxarm@huawei.com, zhengqiang10@huawei.com
 
+Hi Shannon,
 
-
-On 2017/8/26 9:00, Shannon Zhao wrote:
+On 2017/8/26 9:08, Shannon Zhao wrote:
 > 
 > 
-> On 2017/8/25 18:37, gengdongjiu wrote:
->>>> +
->>>>>> +/* From the ACPI 6.1 spec, "18.3.2.9 Hardware Error Notification" */
+> On 2017/8/25 19:20, gengdongjiu wrote:
+>>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>>>>>> index 3d78ff6..def1ec1 100644
+>>>>>> --- a/hw/arm/virt-acpi-build.c
+>>>>>> +++ b/hw/arm/virt-acpi-build.c
+>>>>>> @@ -45,6 +45,7 @@
+>>>>>>  #include "hw/arm/virt.h"
+>>>>>>  #include "sysemu/numa.h"
+>>>>>>  #include "kvm_arm.h"
+>>>>>> +#include "hw/acpi/hest_ghes.h"
+>>>>>>  
+>>>>>>  #define ARM_SPI_BASE 32
+>>>>>>  #define ACPI_POWER_BUTTON_DEVICE "PWRB"
+>>>>>> @@ -771,6 +772,9 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+>>>>>>      acpi_add_table(table_offsets, tables_blob);
+>>>>>>      build_spcr(tables_blob, tables->linker, vms);
+>>>>>>  
+>>>>>> +    acpi_add_table(table_offsets, tables_blob);
+>>>>>> +    ghes_build_acpi(tables_blob, tables->hardware_errors, tables->linker);
 >>>>>> +
->>>> It's better to refer to the first spec version of this structure and
->>>> same with others you define.
->>  do you mean which spec version? the definition is aligned with the linux kernel.
-> What I mean here is that it's better to refer to the ACPI spec version
-> which introduces Hardware Error Notification first time.
-Ok, I basically understand your meaning. I will clear that. thanks.
+>>>> So we add this table unconditionally. Is there any bad impact if QEMU
+>>>> runs on old kvm? Does it need to check whether KVM supports RAS?
+>> this table is added before guest OS boot. so can not use KVM to check it.
+> No, we can check the RAS capability when we create vcpus like you done
+> in another patch ans can use that in table generation.
+understand your meaning.
+
+ARM James ever have below comments about the table generation.
+----------------------------------------------------------------------------------
+But you can use APEI in a guest on CPUs without the RAS extensions: the host may
+signal memory errors to Qemu for any number of reasons, user-space shouldn't
+care how it knows. Examples are PCI-AER, any APEI event notified by polling or
+one of the flavours of irq.
+
+I would expect Qemu to generate a HEST based on its abilities, i.e. if it
+supports any mechanism of notifying the guest about errors. Choosing the
+mechanism then depends on the type of error.
+
+Ideally the Qemu code for HEST/GHES/CPER generation code using some of the irqs
+and polling could be shared with x86, as these should be possible using common
+KVM APIs.
+-----------------------------------------------------------------------------------
+
+He means we can use APEI on CPUs without RAS and may be share this code with x86,
+if Qemu can support any mechanism of notifying the guest about errors, it should be
+generate the table.
+Now we depend on the macro KVM_HAVE_MCE_INJECTION to decide whether Qemu can support
+notifying the guest.
+
+what do you think which we should be dependent on to generate the table?
 
 > 
->>>>
->>>>>> +enum AcpiHestNotifyType {
->>>>>> +    ACPI_HEST_NOTIFY_POLLED = 0,
->>>>>> +    ACPI_HEST_NOTIFY_EXTERNAL = 1,
->>>>>> +    ACPI_HEST_NOTIFY_LOCAL = 2,
->>>>>> +    ACPI_HEST_NOTIFY_SCI = 3,
->>>>>> +    ACPI_HEST_NOTIFY_NMI = 4,
->>>>>> +    ACPI_HEST_NOTIFY_CMCI = 5,  /* ACPI 5.0 */
->>>>>> +    ACPI_HEST_NOTIFY_MCE = 6,   /* ACPI 5.0 */
->>>>>> +    ACPI_HEST_NOTIFY_GPIO = 7,  /* ACPI 6.0 */
->>>>>> +    ACPI_HEST_NOTIFY_SEA = 8,   /* ACPI 6.1 */
->>>>>> +    ACPI_HEST_NOTIFY_SEI = 9,   /* ACPI 6.1 */
->>>>>> +    ACPI_HEST_NOTIFY_GSIV = 10, /* ACPI 6.1 */
->>>>>> +    ACPI_HEST_NOTIFY_RESERVED = 11  /* 11 and greater are reserved */
->>>> In ACPI 6.2, 11 is for Software Delegated Exception, is this useful for
->>>> your patchset?
->>   it is usefull, for all the error source, I reserved the space for them.
->> Because the space is allocated one time, is not dynamically allocated.
->> so I use the ACPI_HEST_NOTIFY_RESERVED to specify that there is 11 error source.
+>> if the old kvm does not support RAS, it does not have bad impact. only waste table memory.
+>> May be we can make it as device? if this device is enabled in the qemu
+>> boot parameters, then we will add this table?
 >>
-> I mean whether the new type Software Delegated Exception is useful for
-> RAS. If so, we could add this new type here.
-Just now I check the ACPI 6.2 spec, it indeed introduced the new type SDEI.
-
-currently we do not use the type Software Delegated Exception which introduced by ACPI 6.2,
-so may not need to add a new type.
+> 
+> And you need to add a option to virt machine for (migration)
+> compatibility. On new virt machine it's on by default while off for old
+> ones.
+ok.
 
 > 
 > Thanks,
