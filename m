@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dlOYf-00047m-QJ
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 20:02:39 -0400
+	(envelope-from <cota@braap.org>) id 1dlOjy-0006tr-FA
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 20:14:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dlOYc-0001zR-Ky
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 20:02:37 -0400
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:47059)
+	(envelope-from <cota@braap.org>) id 1dlOjv-0006BH-8i
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 20:14:18 -0400
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:57389)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dlOYc-0001yz-CH
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 20:02:34 -0400
-Date: Fri, 25 Aug 2017 20:02:32 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dlOjv-0006B5-3A
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 20:14:15 -0400
+Date: Fri, 25 Aug 2017 20:14:11 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170826000232.GB29654@flamenco>
-References: <CAFEAcA_pXX6ZCsBwAQnzQbTSbxzAh=nFpPeEzZoRBhBDt2r+vA@mail.gmail.com>
-	<20170727104302.GI2555@redhat.com>
-	<CAFEAcA8oyHi+7NVCE8YWHY+v0UXLbt2tWHGE4AP_V8TtDBc89g@mail.gmail.com>
-	<20170727152137.GW2555@redhat.com>
-	<CAFEAcA-eH7J+fFXYgFo6Wx58zgD8=kqhrGE5BqR+NrhHjipsFw@mail.gmail.com>
-	<20170727154535.GY2555@redhat.com>
-	<20170728133430.GS12364@stefanha-x1.localdomain>
-	<CAFEAcA9p38P2x3s4grvFPkGaH+JEmwqyAC9SsLWqqFL8k+Eiww@mail.gmail.com>
+Message-ID: <20170826001411.GC29654@flamenco>
+References: <CAFEAcA9p38P2x3s4grvFPkGaH+JEmwqyAC9SsLWqqFL8k+Eiww@mail.gmail.com>
 	<20170728140623.GQ31495@redhat.com> <87vamclf6w.fsf@frigg.lan>
+	<20170801134825.GC22017@stefanha-x1.localdomain>
+	<CAFEAcA9KKqyiNfsfjSDVhhE7hMMsAZ==TuSjgtqb6pB=fVF+_w@mail.gmail.com>
+	<20170802110400.GI5531@stefanha-x1.localdomain>
+	<CAFEAcA82EBmOF3k=fXN4tAAL2=J6s8avUoQGXKrBwchh1rmMCQ@mail.gmail.com>
+	<20170802144943.GF10101@stefanha-x1.localdomain>
+	<87lgn2q9oe.fsf@frigg.lan>
+	<20170803115457.GD22685@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87vamclf6w.fsf@frigg.lan>
+In-Reply-To: <20170803115457.GD22685@stefanha-x1.localdomain>
 Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
  instrumentation
 List-Id: <qemu-devel.nongnu.org>
@@ -36,53 +35,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alessandro Di Federico <ale+qemu@clearmind.me>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Jul 28, 2017 at 19:05:43 +0300, Lluís Vilanova wrote:
-> As for the (minimum) requirements I've collected:
+On Thu, Aug 03, 2017 at 12:54:57 +0100, Stefan Hajnoczi wrote:
+> > > Please post an example of the API you'd like.
+> > 
+> > In my opinion, the instrumentation support in this series provides an API that
+> > works in the opposite way you're suggesting (let's ignore the fact that it's
+> > built on tracing events).
+> > 
+> > When QEMU loads an instrumentation library (which can happen at any time), some
+> > initialization function is called on the library so that it can establish what
+> > events to instrument. This also has the advantage that a user can hook into a
+> > running QEMU instance at any time to perform some instrumentation.
+> > 
+> > I think this is the bare minimum necessary to make it work, and has the upside
+> > of being completely orthogonal to the libqemu approach. We could reuse most of
+> > the stable instrumentation API there too, except for the instrumentation code
+> > initialization.
+> > 
+> > That being said, the libqemu approach *might* make it a bit easier to provide an
+> > API for things such as "run for this many instructions and return control to
+> > instrumentor", but I don't think that's mandatory for a first prototype (and can
+> > definitely be implemented using both approaches).
 > 
-> * Peek at register values and guest memory.
-> * Enumerate guest cpus.
-> * Control when events are raised to minimize overheads (e.g., avoid generating
->   TCG code to trace a guest code event we don't care about just now).
-> * When a guest code event is raised at translation time, let instrumentor decide
->   if it needs to be raised at execution time too (e.g., might be decided on
->   instruction opcode)
-> * Minimum overhead when instrumenting (I think the proposed fifo/socket approach
->   does not meet this; point 2 helps a lot here, which is what the current
->   tracing code does)
-> * Let instrumentor know when TBs are being freed (i.e., to free internal per-TB
->   structures; I have a patch queued adding this event).
+> The main concern I have is that a feature for loading shared libraries
+> and hooking QEMU will be abused.  This can be mostly solved by offering
+> only a stable API without the ability to hook trace events.  There are
+> still ways to abuse this and that's why I prefer the libqemu approach.
 > 
-> Nice to have:
-> 
-> * Avoid recompilation for each new instrumentation logic.
-> * Poke at register values and guest memory.
-> * [synchronous for sure] Let user annotate guest programs to raise additional
->   events with guest-specified information (the hypertrace series I sent).
-> * [synchronous for sure] Make guest breakpoints/watchpoints raise an event (for
->   when we cannot annotate the guest code; I have some patches).
-> * Trigger QEMU's event tracing routine when the instrumentation code
->   decides. This is what this series does now, as then lazy instrumentors don't
->   need to write their own tracing-to-disk code. Otherwise, per-event tracing
->   states would need to be independent of instrumentation states (but the logic
->   is exactly the same).
-> * Let instrumentor define additional arguments to execution-time events during
->   translation-time (e.g., to quickly index into an instrumentor struct when the
->   execution-time event comes that references info collected during translation).
-> * Attach an instrumentor-specified value to each guest CPU (e.g., pointing to
->   the instrumentor's cpu state). Might be less necessary if the point above is
->   met (if we only look at overall performance).
+> The libqemu approach also avoids the "how do I enable my
+> instrumentation?" step for new users because they just need to run their
+> program after compiling it.  The workflow is simpler.
 
-Agreed.
+Widely used instrumentation tools, such as DynamoRIO and Pin, follow the
+same approach Lluis took here, i.e. your plugin is loaded at run-time by the tool.
+So from a usability viewpoint I don't think this approach would be controversial.
 
-An additional "nice to have" would be:
+> As a next step I suggest defining the stable instrumentation API and
+> dropping the tracing hooks.  We can still work out whether shared
+> library loading or libqemu is okay later but the stable API is most
+> important.
 
-* Allow inlining of TCG code by the instrumenter. Example use case:
-  the instrumenter wants to increment a counter every time a
-  basic block is executed. Instead of calling a callback function on every block's
-  execution, we could just have a translation-time callback to emit at the beginning
-  of the translated block the counter increment. This would be much faster, and
-  is something that all other tools (e.g. DynamoRIO/Pin) implement.
+I agree with dropping the tracing hooks. However, I wonder whether we'd
+want to add another field to struct TranslationBlock to keep track of
+the dynamic instrumentation state, or just reuse trace_vcpu_dstate.
 
-		E.
+I gravitate towards the former approach--would be nice to have the
+instrumentation code completely separate from the tracing code, and
+hopefully not rely on python nor trace-events files :-)
+
+		Emilio
