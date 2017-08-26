@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dlNwR-00058p-Tw
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 19:23:09 -0400
+	(envelope-from <cota@braap.org>) id 1dlOYf-00047m-QJ
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 20:02:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dlNwO-0006Yh-Oj
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 19:23:07 -0400
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:54673)
+	(envelope-from <cota@braap.org>) id 1dlOYc-0001zR-Ky
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 20:02:37 -0400
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:47059)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dlNwO-0006Y7-Hb
-	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 19:23:04 -0400
-Date: Fri, 25 Aug 2017 19:23:02 -0400
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dlOYc-0001yz-CH
+	for qemu-devel@nongnu.org; Fri, 25 Aug 2017 20:02:34 -0400
+Date: Fri, 25 Aug 2017 20:02:32 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170825232302.GA29654@flamenco>
-References: <1502149958-23381-1-git-send-email-cota@braap.org>
+Message-ID: <20170826000232.GB29654@flamenco>
+References: <CAFEAcA_pXX6ZCsBwAQnzQbTSbxzAh=nFpPeEzZoRBhBDt2r+vA@mail.gmail.com>
+	<20170727104302.GI2555@redhat.com>
+	<CAFEAcA8oyHi+7NVCE8YWHY+v0UXLbt2tWHGE4AP_V8TtDBc89g@mail.gmail.com>
+	<20170727152137.GW2555@redhat.com>
+	<CAFEAcA-eH7J+fFXYgFo6Wx58zgD8=kqhrGE5BqR+NrhHjipsFw@mail.gmail.com>
+	<20170727154535.GY2555@redhat.com>
+	<20170728133430.GS12364@stefanha-x1.localdomain>
+	<CAFEAcA9p38P2x3s4grvFPkGaH+JEmwqyAC9SsLWqqFL8k+Eiww@mail.gmail.com>
+	<20170728140623.GQ31495@redhat.com> <87vamclf6w.fsf@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1502149958-23381-1-git-send-email-cota@braap.org>
-Subject: Re: [Qemu-devel] [PATCH 00/22] tcg: tb_lock removal
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87vamclf6w.fsf@frigg.lan>
+Subject: Re: [Qemu-devel] [PATCH 00/13] instrument: Add basic event
+ instrumentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,51 +36,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>
+To: "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Aug 07, 2017 at 19:52:16 -0400, Emilio G. Cota wrote:
-> This series applies on top of the "multiple TCG contexts" series, v4:
->   https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg06769.html
+On Fri, Jul 28, 2017 at 19:05:43 +0300, Lluís Vilanova wrote:
+> As for the (minimum) requirements I've collected:
 > 
-> Highlights:
+> * Peek at register values and guest memory.
+> * Enumerate guest cpus.
+> * Control when events are raised to minimize overheads (e.g., avoid generating
+>   TCG code to trace a guest code event we don't care about just now).
+> * When a guest code event is raised at translation time, let instrumentor decide
+>   if it needs to be raised at execution time too (e.g., might be decided on
+>   instruction opcode)
+> * Minimum overhead when instrumenting (I think the proposed fifo/socket approach
+>   does not meet this; point 2 helps a lot here, which is what the current
+>   tracing code does)
+> * Let instrumentor know when TBs are being freed (i.e., to free internal per-TB
+>   structures; I have a patch queued adding this event).
 > 
-> - First, fix a few typos I encountered while working on this (patches 1-3).
->   I could send them separately to qemu-trivial if you prefer.
-> - QHT: use a proper cmp function, instead of just checking pointer values
->   to determine equality of matches.
-> - Use a binary search tree for each TCG region.
-> - Make l1_map lockless by using cmpxchg
-> - Introduce page locks (for !user-mode), so that tb_lock is not
->   needed when operating on a page
->   - Introduce page_collection, to lock a range of pages
-> - Introduce tb->jmp_lock to protect TB jump lists.
-> - Remove tb_lock. User-mode uses just mmap_lock and tb->jmp_lock's;
->   !user-mode uses the same jump locks as well as page locks.
+> Nice to have:
 > 
-> Performance numbers are in patch 22. We get nice speedups, but I still
-> see a lot of idling when booting many cores. I suspect it comes from
-> cross-CPU events (e.g. TLB invalidations), but I need to profile it
-> better (perf is not good for this; mutrace doesn't quite work). But
-> anyway that's for another patchset.
+> * Avoid recompilation for each new instrumentation logic.
+> * Poke at register values and guest memory.
+> * [synchronous for sure] Let user annotate guest programs to raise additional
+>   events with guest-specified information (the hypertrace series I sent).
+> * [synchronous for sure] Make guest breakpoints/watchpoints raise an event (for
+>   when we cannot annotate the guest code; I have some patches).
+> * Trigger QEMU's event tracing routine when the instrumentation code
+>   decides. This is what this series does now, as then lazy instrumentors don't
+>   need to write their own tracing-to-disk code. Otherwise, per-event tracing
+>   states would need to be independent of instrumentation states (but the logic
+>   is exactly the same).
+> * Let instrumentor define additional arguments to execution-time events during
+>   translation-time (e.g., to quickly index into an instrumentor struct when the
+>   execution-time event comes that references info collected during translation).
+> * Attach an instrumentor-specified value to each guest CPU (e.g., pointing to
+>   the instrumentor's cpu state). Might be less necessary if the point above is
+>   met (if we only look at overall performance).
 
-The idling is due to BQL contention related to interrupt handling. In the
-case of ARM, this boils down to the GICv3 code being single-threaded.
-I don't have time right now to make it multi-threaded, but at least we
-know where the scalability bottleneck is.
+Agreed.
 
-BTW if there's interest I can submit the lock profiler to the list. The code
-is in this branch:
-  https://github.com/cota/qemu/tree/lock-profiler
-The first commit has sample output: https://github.com/cota/qemu/commit/c5bda634
+An additional "nice to have" would be:
 
-Also, any feedback on the parent (tb_lock removal) patchset would be appreciated.
+* Allow inlining of TCG code by the instrumenter. Example use case:
+  the instrumenter wants to increment a counter every time a
+  basic block is executed. Instead of calling a callback function on every block's
+  execution, we could just have a translation-time callback to emit at the beginning
+  of the translated block the counter increment. This would be much faster, and
+  is something that all other tools (e.g. DynamoRIO/Pin) implement.
 
-To make the 2.11 merge easier, I rebased this patchset (as well as the
-multi-tcg-v4 set it is based on) on top of rth's tcg-generic-15, fixing a good
-bunch of annoying conflicts. The resulting branch is available at:
-  https://github.com/cota/qemu/tree/tcg-generic-15%2Bmulti-tcg-v4-parallel
-
-Thanks,
-
-		Emilio
+		E.
