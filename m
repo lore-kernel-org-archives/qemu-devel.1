@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dlVNk-0006p5-DF
-	for qemu-devel@nongnu.org; Sat, 26 Aug 2017 03:19:49 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1dlVwp-0008Sk-3V
+	for qemu-devel@nongnu.org; Sat, 26 Aug 2017 03:56:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dlVNh-0003ke-4F
-	for qemu-devel@nongnu.org; Sat, 26 Aug 2017 03:19:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37028)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dlVNg-0003kM-Qn
-	for qemu-devel@nongnu.org; Sat, 26 Aug 2017 03:19:45 -0400
-Date: Sat, 26 Aug 2017 15:19:39 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170826071939.GA9564@lemon.lan>
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<1503471071-2233-4-git-send-email-peterx@redhat.com>
+	(envelope-from <longpeng2@huawei.com>) id 1dlVwl-0006Km-Qt
+	for qemu-devel@nongnu.org; Sat, 26 Aug 2017 03:56:03 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2246)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1dlVwl-0006Ha-7X
+	for qemu-devel@nongnu.org; Sat, 26 Aug 2017 03:55:59 -0400
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
+Date: Sat, 26 Aug 2017 15:53:32 +0800
+Message-ID: <1503734014-239116-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1503471071-2233-4-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 3/8] char-io: fix possible risk on
- IOWatchPoll
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v19 0/2] virtio-crypto: virtio crypto device
+ specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +24,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+Cc: luonengjun@huawei.com, mst@redhat.com, cohuck@redhat.com, stefanha@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, weidong.huang@huawei.com, mike.caraman@nxp.com, agraf@suse.de, jasowang@redhat.com, nmorey@kalray.eu, vincent.jardin@6wind.com, arei.gonglei@hotmail.com, pasic@linux.vnet.ibm.com, wangxinxin.wang@huawei.com, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-s/risk/race/ for $subject and the whole patch?
+Hi guys,
 
-Fam
+I'll work on the virtio-crypto spec with Gonglei together, Because He is
+so busy on the inner production project.
 
-On Wed, 08/23 14:51, Peter Xu wrote:
-> This is not a problem if we are only having one single loop thread like
-> before.  However, after per-monitor thread is introduced, this is not
-> true any more, and the risk can happen.
-> 
-> The risk can be triggered with "make check -j8" sometimes:
-> 
->   qemu-system-x86_64: /root/git/qemu/chardev/char-io.c:91:
->   io_watch_poll_finalize: Assertion `iwp->src == NULL' failed.
-> 
-> This patch keeps the reference for the watch object when creating in
-> io_add_watch_poll(), so that the object will never be released in the
-> context main loop, especially when the context loop is running in
-> another standalone thread.  Meanwhile, when we want to remove the watch
-> object, we always first detach the watch object from its owner context,
-> then we continue with the cleanup.
-> 
-> Without this patch, calling io_remove_watch_poll() in main loop thread
-> is not thread-safe, since the other per-monitor thread may be modifying
-> the watch object at the same time.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  chardev/char-io.c | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/chardev/char-io.c b/chardev/char-io.c
-> index f810524..5c52c40 100644
-> --- a/chardev/char-io.c
-> +++ b/chardev/char-io.c
-> @@ -122,7 +122,6 @@ GSource *io_add_watch_poll(Chardev *chr,
->      g_free(name);
->  
->      g_source_attach(&iwp->parent, context);
-> -    g_source_unref(&iwp->parent);
->      return (GSource *)iwp;
->  }
->  
-> @@ -131,12 +130,24 @@ static void io_remove_watch_poll(GSource *source)
->      IOWatchPoll *iwp;
->  
->      iwp = io_watch_poll_from_source(source);
-> +
-> +    /*
-> +     * Here the order of destruction really matters.  We need to first
-> +     * detach the IOWatchPoll object from the context (which may still
-> +     * be running in another loop thread), only after that could we
-> +     * continue to operate on iwp->src, or there may be risk condition
-> +     * between current thread and the context loop thread.
-> +     *
-> +     * Let's blame the glib bug mentioned in commit 2b3167 (again) for
-> +     * this extra complexity.
-> +     */
-> +    g_source_destroy(&iwp->parent);
->      if (iwp->src) {
->          g_source_destroy(iwp->src);
->          g_source_unref(iwp->src);
->          iwp->src = NULL;
->      }
-> -    g_source_destroy(&iwp->parent);
-> +    g_source_unref(&iwp->parent);
->  }
->  
->  void remove_fd_in_watch(Chardev *chr)
-> -- 
-> 2.7.4
-> 
+---
+v19 -> v18:
+ - fix some typos and grammar fixes [Stefan, Halil]
+ - rename VIRTIO_CRYPTO_F_STATELESS_MODE to VIRTIO_CRYPTO_F_MUX_MODE
+ - describe the VIRTIO_CRYPTO_STATUS in detial. [Halil]
+ - refactor and redescribe the controlq/dataq request's format
+   of mux mode. [Halil]
+ - other small fixes. [Halil]
+
+v18 -> v17:
+ - fix many English grammar problems suggested by Stefan, Thanks a lot!
+
+v17 -> v16:
+ - Some grammar fixes [Stefan, Halil, Michael]
+ - add a section named "Supported crypto services" in order to explain bit
+   numbers and valuse clearly. [Halil, Cornelia]
+ - avoid word reptition [Halil]
+ - rename non-session mode to stateless mode [Halil]
+ - change descriptions for all elements in struct virtio_crypto_config [Halil]
+ - add Halil as a reviewer in the ackonwledgement part, thanks for his work.
+ - other fixes here and there.
+
+Changes since v15:
+ - use feature bits for non-session mode in order to keep compatibility with
+   pre-existing code. [Halil & Michael]
+ - introduce VIRTIO_CRYPTO_F_ NON_SESSION_MODE feature bit to control all other
+   non-session mode feature bits.
+ - fix some typos. [Stefan]
+ - introduce struct virtio_crypto_op_data_req_mux to support both session
+   and non-session based crypto operations and keep compatibility with
+   pre-existing code.
+
+Changes since v14:
+ - drop VIRTIO_CRYPTO_S_STARTED status [Halil & Cornelia]
+ - correct a sentence about dataqueue and controlq in the first paragraph. 
+[Halil]
+ - change a MAY to MUST about max_dataqueues. [Halil]
+ - add non-session mode support
+   a) add four features for different crypto services to identify wheather 
+support session mode.
+   b) rewrite some
+
+For pervious versions of virtio crypto spec, Pls see:
+
+[v18]:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg444897.html
+
+[v14]:
+https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg02212.html
+
+[v13]:
+https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07348.html
+
+For more information, please see:
+ http://qemu-project.org/Features/VirtioCrypto
+
+---
+Gonglei (2):
+  virtio-crypto: Add virtio crypto device specification
+  virtio-crypto: Add conformance clauses
+
+ acknowledgements.tex |    3 +
+ conformance.tex      |   29 +
+ content.tex          |    2 +
+ virtio-crypto.tex    | 1470 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 1504 insertions(+)
+ create mode 100644 virtio-crypto.tex
+
+-- 
+2.7.4
