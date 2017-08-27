@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dm2iW-0004Nb-MU
-	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 14:55:29 -0400
+	(envelope-from <mtparkr@gmail.com>) id 1dm37E-0002I0-Jz
+	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 15:21:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dm2iS-0005GQ-RE
-	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 14:55:28 -0400
-Received: from mail-lf0-f47.google.com ([209.85.215.47]:34647)
+	(envelope-from <mtparkr@gmail.com>) id 1dm37B-0001zk-En
+	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 15:21:00 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34851)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dm2iS-0005Fi-Jm
-	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 14:55:24 -0400
-Received: by mail-lf0-f47.google.com with SMTP id d17so14921714lfe.1
-	for <qemu-devel@nongnu.org>; Sun, 27 Aug 2017 11:55:24 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <0e69cbad-f658-03be-0191-1b6fe588147b@wiesinger.com>
-References: <35eda6a9-086e-f899-e131-288f2346effe@wiesinger.com>
-	<ce477c53-25bc-e6dd-3e05-c74af1f33c2d@wiesinger.com>
-	<3e1f41a8-faff-1858-6f0d-154694dff02d@wiesinger.com>
-	<CABgObfYzngJPgS9agXMrRENVD_e+3Hm=y+KD5dp9na8jNwuumw@mail.gmail.com>
-	<CABgObfZFwJMpU_D8SMkuiEhb0qBokHL0jpwmuzdE73TReHMFkg@mail.gmail.com>
-	<0e69cbad-f658-03be-0191-1b6fe588147b@wiesinger.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sun, 27 Aug 2017 20:55:22 +0200
-Message-ID: <CABgObfaw_bMQ=Dpfs=vh_AweaidqCZSBy4bDtsddk5DSKpRP8A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] kvm_intel fails to load on Conroe CPUs running
- Linux 4.12
+	(Exim 4.71) (envelope-from <mtparkr@gmail.com>) id 1dm37B-0001zN-8I
+	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 15:20:57 -0400
+Received: by mail-wm0-x243.google.com with SMTP id r187so4995105wma.2
+	for <qemu-devel@nongnu.org>; Sun, 27 Aug 2017 12:20:55 -0700 (PDT)
+From: Matt Parker <mtparkr@gmail.com>
+Date: Sun, 27 Aug 2017 20:20:38 +0100
+Message-Id: <20170827192038.28930-1-mtparkr@gmail.com>
+Subject: [Qemu-devel] [PATCH v3] audio: intel-hda: do not use old_mmio
+ accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,22 +24,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Wiesinger, Gerhard" <lists@wiesinger.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 
-Il 27 ago 2017 4:48 PM, "Gerhard Wiesinger" <lists@wiesinger.com> ha
-scritto:
+intel-hda is currently using the old_mmio accessors for io.
+This updates the device to use .read and .write accessors instead.
 
-On 27.08.2017 14:03, Paolo Bonzini wrote:
+Signed-off-by: Matt Parker <mtparkr@gmail.com>
+---
+v3:
+ * use MAKE_64BIT_MASK
+---
+ hw/audio/intel-hda.c | 58 ++++++++++------------------------------------------
+ 1 file changed, 11 insertions(+), 47 deletions(-)
 
->
-> We will revert the patch, but 4.13.0 will not have the fix. Expect it in
-> later stable kernels (because vacations).
->
->
-Thnx. Why will 4.13.0 NOT have the fix?
-
-
-Because maintainers are on vacation! :-)
-
-Paolo
+diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
+index 06acc98f7b..18a50a8f83 100644
+--- a/hw/audio/intel-hda.c
++++ b/hw/audio/intel-hda.c
+@@ -22,6 +22,7 @@
+ #include "hw/pci/pci.h"
+ #include "hw/pci/msi.h"
+ #include "qemu/timer.h"
++#include "qemu/bitops.h"
+ #include "hw/audio/soundhw.h"
+ #include "intel-hda.h"
+ #include "intel-hda-defs.h"
+@@ -1043,66 +1044,29 @@ static void intel_hda_regs_reset(IntelHDAState *d)
+ 
+ /* --------------------------------------------------------------------- */
+ 
+-static void intel_hda_mmio_writeb(void *opaque, hwaddr addr, uint32_t val)
++static void intel_hda_mmio_write(void *opaque, hwaddr addr, uint64_t val,
++                                 unsigned size)
+ {
+     IntelHDAState *d = opaque;
+     const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+ 
+-    intel_hda_reg_write(d, reg, val, 0xff);
++    intel_hda_reg_write(d, reg, val, MAKE_64BIT_MASK(0, size * 8));
+ }
+ 
+-static void intel_hda_mmio_writew(void *opaque, hwaddr addr, uint32_t val)
++static uint64_t intel_hda_mmio_read(void *opaque, hwaddr addr, unsigned size)
+ {
+     IntelHDAState *d = opaque;
+     const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+ 
+-    intel_hda_reg_write(d, reg, val, 0xffff);
+-}
+-
+-static void intel_hda_mmio_writel(void *opaque, hwaddr addr, uint32_t val)
+-{
+-    IntelHDAState *d = opaque;
+-    const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+-
+-    intel_hda_reg_write(d, reg, val, 0xffffffff);
+-}
+-
+-static uint32_t intel_hda_mmio_readb(void *opaque, hwaddr addr)
+-{
+-    IntelHDAState *d = opaque;
+-    const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+-
+-    return intel_hda_reg_read(d, reg, 0xff);
+-}
+-
+-static uint32_t intel_hda_mmio_readw(void *opaque, hwaddr addr)
+-{
+-    IntelHDAState *d = opaque;
+-    const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+-
+-    return intel_hda_reg_read(d, reg, 0xffff);
+-}
+-
+-static uint32_t intel_hda_mmio_readl(void *opaque, hwaddr addr)
+-{
+-    IntelHDAState *d = opaque;
+-    const IntelHDAReg *reg = intel_hda_reg_find(d, addr);
+-
+-    return intel_hda_reg_read(d, reg, 0xffffffff);
++    return intel_hda_reg_read(d, reg, MAKE_64BIT_MASK(0, size * 8));
+ }
+ 
+ static const MemoryRegionOps intel_hda_mmio_ops = {
+-    .old_mmio = {
+-        .read = {
+-            intel_hda_mmio_readb,
+-            intel_hda_mmio_readw,
+-            intel_hda_mmio_readl,
+-        },
+-        .write = {
+-            intel_hda_mmio_writeb,
+-            intel_hda_mmio_writew,
+-            intel_hda_mmio_writel,
+-        },
++    .read = intel_hda_mmio_read,
++    .write = intel_hda_mmio_write,
++    .impl = {
++        .min_access_size = 1,
++        .max_access_size = 4,
+     },
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
+-- 
+2.13.2
