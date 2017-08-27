@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dlwHf-0000O8-7w
-	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 08:03:20 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1dlwlo-0007TS-88
+	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 08:34:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dlwHb-0003k3-9d
-	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 08:03:19 -0400
-Received: from mail-lf0-f45.google.com ([209.85.215.45]:36800)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dlwHb-0003jq-2f
-	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 08:03:15 -0400
-Received: by mail-lf0-f45.google.com with SMTP id z12so9692433lfd.3
-	for <qemu-devel@nongnu.org>; Sun, 27 Aug 2017 05:03:14 -0700 (PDT)
+	(envelope-from <balaton@eik.bme.hu>) id 1dlwlj-0005lT-89
+	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 08:34:28 -0400
+Date: Sun, 27 Aug 2017 14:34:14 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <cover.1503249785.git.balaton@eik.bme.hu>
+Message-ID: <alpine.BSF.2.21.1708271402040.1289@zero.eik.bme.hu>
+References: <cover.1503249785.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
-In-Reply-To: <CABgObfYzngJPgS9agXMrRENVD_e+3Hm=y+KD5dp9na8jNwuumw@mail.gmail.com>
-References: <35eda6a9-086e-f899-e131-288f2346effe@wiesinger.com>
-	<ce477c53-25bc-e6dd-3e05-c74af1f33c2d@wiesinger.com>
-	<3e1f41a8-faff-1858-6f0d-154694dff02d@wiesinger.com>
-	<CABgObfYzngJPgS9agXMrRENVD_e+3Hm=y+KD5dp9na8jNwuumw@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sun, 27 Aug 2017 14:03:11 +0200
-Message-ID: <CABgObfZFwJMpU_D8SMkuiEhb0qBokHL0jpwmuzdE73TReHMFkg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] kvm_intel fails to load on Conroe CPUs running
- Linux 4.12
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 00/15] Sam460ex emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +21,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Wiesinger, Gerhard" <lists@wiesinger.com>
-Cc: "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>, qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: Francois Revol <revol@free.fr>, David Gibson <david@gibson.dropbear.id.au>
 
-Il 27 ago 2017 9:49 AM, "Gerhard Wiesinger" <lists@wiesinger.com> ha
-scritto:
+Hello,
 
-On 17.08.2017 23:14, Gerhard Wiesinger wrote:
+Just to confirm where we are with this series, let me summarise what I got 
+from the replies and what's my plan for this based on that. Here's the 
+list of patches for reference:
 
-> On 17.08.2017 22:58, Gerhard Wiesinger wrote:
-> >
-> > On 07.08.2017 19:50, Paolo Bonzini wrote:
-> >
-> > >Not much to say, unfortunately. It's pretty much the same capabilities
-> > >as a Prescott/Cedar Mill processor, except that it has MSR bitmaps. It
-> > >also lacks FlexPriority compared to the Conroe I had checked.
-> > >
-> > >It's not great that even the revert patch doesn't apply cleanly---this
-> > >is *not* necessarily a boring area of the hypervisor...
-> > >
-> > >Given the rarity of your machine I'm currently leaning towards _not_
-> > >reverting the change. I'll check another non-Xeon Core 2 tomorrow that
-> > >is from December 2008 (IIRC). If that one also lacks vNMI, or if I get
-> > >other reports, I suppose I will have to reconsider that.
->
-> Hello Paolo,
->
-> Can you please revert the patch.
->
-> CPU is a Core 2 Extreme QX6700: SL9UL (B3) running VERY stable with ECC
-> RAM for years now.
-> https://ark.intel.com/products/28028/Intel-Core2-Extreme-
-> Processor-QX6700-8M-Cache-2_66-GHz-1066-MHz-FSB?q=Core%
-> 202%20Extreme%20QX6700
-> https://en.wikipedia.org/wiki/List_of_Intel_Core_2_microprocessors
->
-> CPU details below.
->
-> Thank you.
->
-> Ciao,
-> Gerhard
->
+[PATCH 01/15] ppc4xx: Move MAL from ppc405_uc to ppc4xx_devs
+[PATCH 02/15] ppc4xx: Make MAL emulation more generic
+[PATCH 03/15] ohci: Allow sysbus version to be used as a companion
+[PATCH 04/15] ehci: Add ppc4xx-ehci for the USB 2.0 controller in embedded PPC SoCs
+[PATCH 05/15] ppc4xx: Split off 4xx I2C emulation from ppc405_uc to its own file
+[PATCH 06/15] ppc4xx_i2c: QOMify
+[PATCH 07/15] ppc4xx_i2c: Move to hw/i2c
+[PATCH 08/15] ppc4xx_i2c: Implement basic I2C functions
+[PATCH 09/15] hw/ide: Emulate SiI3112 SATA controller
+[PATCH 10/15] ppc440: Add emulation of plb-pcix controller found in some 440 SoCs
+[PATCH 11/15] ppc: Add 460EX embedded CPU
+[PATCH 12/15] ppc4xx: Export ECB and PLB emulation
+[PATCH 13/15] ppc4xx: Add more PLB registers
+[PATCH 14/15] ppc4xx: Add device models found in PPC440 core SoCs
+[PATCH 15/15] ppc: Add aCube Sam460ex board
 
-Hello Paolo,
+- I think 1-7 is either already queued for 2.11 or could be applied as is 
+having got reviews without need to change so I don't need to resend them. 
+So are 11-13 if I got that right. That leaves 8-10 and 14-15 that I'll 
+resend.
 
-Any update on this major issue?
+- I'm not sure if 8 was reviewed or do I need to make any modifications to 
+it.
 
+- I know I should change 9-10 and 14-15 based on review comments and 
+resend.
 
-We will revert the patch, but 4.13.0 will not have the fix. Expect it in
-later stable kernels (because vacations).
+Since I'll likely also need to change those patches to fix the bugs we 
+know about currently, I thought I should probably resend after those bugs 
+are fixed to avoid subsequent fixup patches. Since this will not be before 
+next week (because I don't have time for it before that) I hope 
+development should be open again and those patches that are already OK 
+could be merged by then so I can rebase on that and only resend the 
+missing ones as described above. Is that OK or did I miss something?
 
-Paolo
+David, in case you want to stage all of this in your for-2.11 branch 
+before all patches are ready and send them together, then where is this 
+branch I should rebase to?
 
-Thnx.
-
-Ciao,
-Gerhard
+Regards,
+BALATON Zoltan
