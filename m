@@ -1,25 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dmLaF-0007Tb-Rv
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:04:13 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dmLaL-0007VI-1N
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:04:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dmLaA-00038Z-25
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dmLaF-0003BM-Uz
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:04:17 -0400
+Received: from mail-qk0-x22a.google.com ([2607:f8b0:400d:c09::22a]:38356)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dmLaF-0003Ap-Pa
 	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:04:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47902)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dmLa9-00037y-S1
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:04:05 -0400
-Date: Mon, 28 Aug 2017 17:04:00 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170828170400.0a23b2fe.cohuck@redhat.com>
-In-Reply-To: <1503907487-2764-3-git-send-email-zyimin@linux.vnet.ibm.com>
-References: <1503907487-2764-1-git-send-email-zyimin@linux.vnet.ibm.com>
-	<1503907487-2764-3-git-send-email-zyimin@linux.vnet.ibm.com>
+Received: by mail-qk0-x22a.google.com with SMTP id m4so3364564qke.5
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 08:04:11 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <cover.1503667215.git.alifm@linux.vnet.ibm.com>
+	<3ed8b810b6592daee6a775037ce21f850e40647d.1503667215.git.alifm@linux.vnet.ibm.com>
+	<20170825160408.2775c8b5.cohuck@redhat.com>
+	<00d41b2b-cf22-c9e2-8d9f-de947f4d3f18@linux.vnet.ibm.com>
+	<20170828102214.7aad9112.cohuck@redhat.com>
+	<caab4ec1-763a-8dfb-5e88-295a43a41e68@linux.vnet.ibm.com>
+	<20170828150653.7cdc8c5a.cohuck@redhat.com>
+	<c7e3a1cb-10e6-4c2d-0225-2bcbe9c97de6@linux.vnet.ibm.com>
+	<c61c8ee1-3bca-41db-33a7-b65186a80d25@de.ibm.com>
+	<b5a9ab05-4e3c-66bc-33ce-d953d7f911e2@linux.vnet.ibm.com>
+	<20170828160554.45855dfa.cohuck@redhat.com>
+	<e3f0c9c1-b576-b9bb-66e2-53c2ef94b91b@linux.vnet.ibm.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0154068e-9f8c-bbb4-cd75-2e175fd5ebc7@amsat.org>
+Date: Mon, 28 Aug 2017 12:04:05 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <e3f0c9c1-b576-b9bb-66e2-53c2ef94b91b@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/4] s390x/pci: remove idx from msix msg
- data
+Subject: Re: [Qemu-devel] [PATCH] s390-ccw: Fix alignment for CCW1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +45,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, richard.henderson@linaro.org
+To: Farhan Ali <alifm@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: farman@linux.vnet.ibm.com, Christian Borntraeger <borntraeger@de.ibm.com>, pasic@linux.vnet.ibm.com, walling@linux.vnet.ibm.com, qemu-devel@nongnu.org
 
-On Mon, 28 Aug 2017 10:04:45 +0200
-Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+Hi Farhan,
 
-> PCIDevcie pointer has been a parameter of kvm_arch_fixup_msi_route().
-
-s/PCIDevcie/PCIDevice/
-
-> So we don't need to store zpci idx in msix message data to find out the
-> specific zpci device. Instead, we could use pci device id to find its
-> corresponding zpci device.
+On 08/28/2017 11:15 AM, Farhan Ali wrote:
+> On 08/28/2017 10:05 AM, Cornelia Huck wrote:
+>>>>> It's the alignment of the CCW which causes the problem.
+>>>>>
+>>>>> The exact error message when starting the guest was:
+>>>>>
+>>>>> ! No virtio device found !
+>>>>>
+>>>>> Since it worked for SCSI and CDL, and failed for LDL disks on that 
+>>>>> particular system, we are not really sure what caused the failure.
+>>>>> Debugging it further showed the CCW for LDL disks were not aligned 
+>>>>> at double word boundary.
+>> This is really, really odd, as the low-level ccw code is the same for
+>> any disk type...
+>>
+> Exactly!
 > 
-> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-> ---
->  hw/s390x/s390-pci-bus.c  | 16 +++++-----------
->  hw/s390x/s390-pci-bus.h  |  2 ++
->  hw/s390x/s390-pci-inst.c | 24 ------------------------
->  target/s390x/kvm.c       |  7 +++++--
->  4 files changed, 12 insertions(+), 37 deletions(-)
+>>>>> Trying the test on a different system with LDL disks worked fine, 
+>>>>> with the aligned(8) fix.
+>>>> Do you happen to have an old s390-ccw.img laying around in the test 
+>>>> folder? QEMU might pick up
+>>>> this one (e.g. when calling it without libvirt from the command line).
+>>>>
+>>> I explicitly mention the bios to use with '-bios' option and pick up the
+>>> latest bios. Without the aligned fix I see the error and with the fix it
+>>> works fine.
+>> Wait, so the fix fixes it? Or am I confused now?
+>>
+> 
+> It fixes in my system and one other system we tried on. But fails on a 
+> system where this issue was first noticed.
 
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 1c68c36663..e348bfb7cc 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -2503,10 +2503,13 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
->                               uint64_t address, uint32_t data, PCIDevice *dev)
->  {
->      S390PCIBusDevice *pbdev;
-> -    uint32_t idx = data >> ZPCI_MSI_VEC_BITS;
->      uint32_t vec = data & ZPCI_MSI_VEC_MASK;
->  
-> -    pbdev = s390_pci_find_dev_by_idx(s390_get_phb(), idx);
-> +    if (!dev) {
-> +        return -ENODEV;
-> +    }
-> +
-> +    pbdev = s390_pci_find_dev_by_target(s390_get_phb(), DEVICE(dev)->id);
+Can you provide the link script used in both systems?
 
-You need to replace the stub for s390_pci_find_dev_by_idx() with a stub
-for s390_pci_find_dev_by_target() in s390-pci-stubs.c (on my s390-next
-branch), so that it compiles without CONFIG_PCI.
+See on the previous thread:
+http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg05134.html
 
->      if (!pbdev) {
->          DPRINTF("add_msi_route no dev\n");
->          return -ENODEV;
+Regards,
+
+Phil.
