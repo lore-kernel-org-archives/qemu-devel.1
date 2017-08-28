@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dm9J0-0004tc-5B
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dm9Iz-0004st-7V
 	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dm9Iz-000133-ET
-	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:34 -0400
-Received: from mail-vk0-x243.google.com ([2607:f8b0:400c:c05::243]:37141)
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dm9Iy-000127-1J
+	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:33 -0400
+Received: from mail-vk0-x244.google.com ([2607:f8b0:400c:c05::244]:38039)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
-	id 1dm9Iz-00012j-9r
-	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:33 -0400
-Received: by mail-vk0-x243.google.com with SMTP id z187so1877434vkd.4
-	for <qemu-devel@nongnu.org>; Sun, 27 Aug 2017 18:57:33 -0700 (PDT)
+	id 1dm9Ix-00011j-SZ
+	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:31 -0400
+Received: by mail-vk0-x244.google.com with SMTP id w84so1879899vkd.5
+	for <qemu-devel@nongnu.org>; Sun, 27 Aug 2017 18:57:31 -0700 (PDT)
 From: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
-Date: Sun, 27 Aug 2017 20:56:46 -0500
-Message-Id: <20170828015654.2530-7-Sergio.G.DelReal@gmail.com>
+Date: Sun, 27 Aug 2017 20:56:45 -0500
+Message-Id: <20170828015654.2530-6-Sergio.G.DelReal@gmail.com>
 In-Reply-To: <20170828015654.2530-1-Sergio.G.DelReal@gmail.com>
 References: <20170828015654.2530-1-Sergio.G.DelReal@gmail.com>
-Subject: [Qemu-devel] [PATCH 06/14] hvf: add compilation rules to
- Makefile.objs
+Subject: [Qemu-devel] [PATCH 05/14] hvf: use new helper functions for
+ put/get xsave
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +30,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 
-This commit adds to target/i386/Makefile.objs the necessary rules so
-that the new files for hvf are compiled by the build system.
-It also adds handling of the -enable-hvf argument in the main function
-in vl.c.
+This commit makes use of the helper functions for handling xsave in
+xsave_helper.c, which are shared with kvm.
 
 Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 ---
- target/i386/Makefile.objs | 1 +
- vl.c                      | 7 +++++++
- 2 files changed, 8 insertions(+)
+ target/i386/hvf-utils/x86hvf.c | 63 ++++++------------------------------------
+ 1 file changed, 8 insertions(+), 55 deletions(-)
 
-diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
-index 6a26e9d9f0..0bef89c099 100644
---- a/target/i386/Makefile.objs
-+++ b/target/i386/Makefile.objs
-@@ -12,4 +12,5 @@ obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-windows.o
- endif
- ifdef CONFIG_DARWIN
- obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-darwin.o
-+obj-$(CONFIG_HVF) += hvf-utils/ hvf-all.o
- endif
-diff --git a/vl.c b/vl.c
-index 8e247cc2a2..de7d2a3858 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3751,6 +3751,13 @@ int main(int argc, char **argv, char **envp)
-                 olist = qemu_find_opts("machine");
-                 qemu_opts_parse_noisily(olist, "accel=hax", false);
-                 break;
-+#if defined(__APPLE__)
-+            case QEMU_OPTION_enable_hvf:
-+                olist = qemu_find_opts("machine");
-+                qemu_opts_parse_noisily(olist, "accel=hvf", false);
-+                hvf_disable(0);
-+                break;
-+#endif
-             case QEMU_OPTION_M:
-             case QEMU_OPTION_machine:
-                 olist = qemu_find_opts("machine");
+diff --git a/target/i386/hvf-utils/x86hvf.c b/target/i386/hvf-utils/x86hvf.c
+index d5668df37f..5c1d5ece36 100644
+--- a/target/i386/hvf-utils/x86hvf.c
++++ b/target/i386/hvf-utils/x86hvf.c
+@@ -76,36 +76,13 @@ void hvf_get_segment(SegmentCache *qseg, struct vmx_segment *vmx_seg)
+ void hvf_put_xsave(CPUState *cpu_state)
+ {
+ 
+-    int x;
+     struct hvf_xsave_buf *xsave;
+-    
++
+     xsave = X86_CPU(cpu_state)->env.kvm_xsave_buf;
+-    memset(xsave, 0, sizeof(*xsave)); 
+-    
+-    memcpy(&xsave->data[4], &X86_CPU(cpu_state)->env.fpdp, sizeof(X86_CPU(cpu_state)->env.fpdp));
+-    memcpy(&xsave->data[2], &X86_CPU(cpu_state)->env.fpip, sizeof(X86_CPU(cpu_state)->env.fpip));
+-    memcpy(&xsave->data[8], &X86_CPU(cpu_state)->env.fpregs, sizeof(X86_CPU(cpu_state)->env.fpregs));
+-    memcpy(&xsave->data[144], &X86_CPU(cpu_state)->env.ymmh_regs, sizeof(X86_CPU(cpu_state)->env.ymmh_regs));
+-    memcpy(&xsave->data[288], &X86_CPU(cpu_state)->env.zmmh_regs, sizeof(X86_CPU(cpu_state)->env.zmmh_regs));
+-    memcpy(&xsave->data[272], &X86_CPU(cpu_state)->env.opmask_regs, sizeof(X86_CPU(cpu_state)->env.opmask_regs));
+-    memcpy(&xsave->data[240], &X86_CPU(cpu_state)->env.bnd_regs, sizeof(X86_CPU(cpu_state)->env.bnd_regs));
+-    memcpy(&xsave->data[256], &X86_CPU(cpu_state)->env.bndcs_regs, sizeof(X86_CPU(cpu_state)->env.bndcs_regs));
+-    memcpy(&xsave->data[416], &X86_CPU(cpu_state)->env.hi16_zmm_regs, sizeof(X86_CPU(cpu_state)->env.hi16_zmm_regs));
+-    
+-    xsave->data[0] = (uint16_t)X86_CPU(cpu_state)->env.fpuc;
+-    xsave->data[0] |= (X86_CPU(cpu_state)->env.fpus << 16);
+-    xsave->data[0] |= (X86_CPU(cpu_state)->env.fpstt & 7) << 11;
+-    
+-    for (x = 0; x < 8; ++x)
+-        xsave->data[1] |= ((!X86_CPU(cpu_state)->env.fptags[x]) << x);
+-    xsave->data[1] |= (uint32_t)(X86_CPU(cpu_state)->env.fpop << 16);
+-    
+-    memcpy(&xsave->data[40], &X86_CPU(cpu_state)->env.xmm_regs, sizeof(X86_CPU(cpu_state)->env.xmm_regs));
+-    
+-    xsave->data[6] = X86_CPU(cpu_state)->env.mxcsr;
+-    *(uint64_t *)&xsave->data[128] = X86_CPU(cpu_state)->env.xstate_bv;
+-    
+-    if (hv_vcpu_write_fpstate(cpu_state->hvf_fd, xsave->data, 4096)){
++
++    x86_cpu_xsave_all_areas(X86_CPU(cpu_state), xsave);
++
++    if (hv_vcpu_write_fpstate(cpu_state->hvf_fd, xsave->data, 4096)) {
+         abort();
+     }
+ }
+@@ -185,39 +162,15 @@ void hvf_put_msrs(CPUState *cpu_state)
+ 
+ void hvf_get_xsave(CPUState *cpu_state)
+ {
+-    int x;
+     struct hvf_xsave_buf *xsave;
+-    
++
+     xsave = X86_CPU(cpu_state)->env.kvm_xsave_buf;
+-    
++
+     if (hv_vcpu_read_fpstate(cpu_state->hvf_fd, xsave->data, 4096)) {
+         abort();
+     }
+ 
+-    memcpy(&X86_CPU(cpu_state)->env.fpdp, &xsave->data[4], sizeof(X86_CPU(cpu_state)->env.fpdp));
+-    memcpy(&X86_CPU(cpu_state)->env.fpip, &xsave->data[2], sizeof(X86_CPU(cpu_state)->env.fpip));
+-    memcpy(&X86_CPU(cpu_state)->env.fpregs, &xsave->data[8], sizeof(X86_CPU(cpu_state)->env.fpregs));
+-    memcpy(&X86_CPU(cpu_state)->env.ymmh_regs, &xsave->data[144], sizeof(X86_CPU(cpu_state)->env.ymmh_regs));
+-    memcpy(&X86_CPU(cpu_state)->env.zmmh_regs, &xsave->data[288], sizeof(X86_CPU(cpu_state)->env.zmmh_regs));
+-    memcpy(&X86_CPU(cpu_state)->env.opmask_regs, &xsave->data[272], sizeof(X86_CPU(cpu_state)->env.opmask_regs));
+-    memcpy(&X86_CPU(cpu_state)->env.bnd_regs, &xsave->data[240], sizeof(X86_CPU(cpu_state)->env.bnd_regs));
+-    memcpy(&X86_CPU(cpu_state)->env.bndcs_regs, &xsave->data[256], sizeof(X86_CPU(cpu_state)->env.bndcs_regs));
+-    memcpy(&X86_CPU(cpu_state)->env.hi16_zmm_regs, &xsave->data[416], sizeof(X86_CPU(cpu_state)->env.hi16_zmm_regs));
+-    
+-    
+-    X86_CPU(cpu_state)->env.fpuc = (uint16_t)xsave->data[0];
+-    X86_CPU(cpu_state)->env.fpus = (uint16_t)(xsave->data[0] >> 16);
+-    X86_CPU(cpu_state)->env.fpstt = (X86_CPU(cpu_state)->env.fpus >> 11) & 7;
+-    X86_CPU(cpu_state)->env.fpop = (uint16_t)(xsave->data[1] >> 16);
+-    
+-    for (x = 0; x < 8; ++x)
+-       X86_CPU(cpu_state)->env.fptags[x] =
+-        ((((uint16_t)xsave->data[1] >> x) & 1) == 0);
+-    
+-    memcpy(&X86_CPU(cpu_state)->env.xmm_regs, &xsave->data[40], sizeof(X86_CPU(cpu_state)->env.xmm_regs));
+-
+-    X86_CPU(cpu_state)->env.mxcsr = xsave->data[6];
+-    X86_CPU(cpu_state)->env.xstate_bv = *(uint64_t *)&xsave->data[128];
++    x86_cpu_xrstor_all_areas(X86_CPU(cpu_state), xsave);
+ }
+ 
+ void hvf_get_segments(CPUState *cpu_state)
 -- 
 2.14.1
