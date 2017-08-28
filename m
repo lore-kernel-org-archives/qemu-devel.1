@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dmH1E-0007VA-P2
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:11:47 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dmH9j-0001xa-6v
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:20:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dmH1B-000235-5R
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:11:44 -0400
-Received: from mail-ua0-x22d.google.com ([2607:f8b0:400c:c08::22d]:36285)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dmH1A-00020x-VS
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:11:41 -0400
-Received: by mail-ua0-x22d.google.com with SMTP id 105so180557uad.3
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 03:11:39 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170828030538.GI14174@pxdev.xzpeter.org>
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<1503471071-2233-3-git-send-email-peterx@redhat.com>
-	<CAJ+F1CKvY9iMtTQSrM2xVUwXYb0pcHjtFf8x4xpxG5ke-FPf3g@mail.gmail.com>
-	<20170825153304.GJ2090@work-vm>
-	<CAJ+F1CJR3UWv4zaGg_6aAyC7WWsVd35=UiRWyWkbGm-gEN2O9A@mail.gmail.com>
-	<20170828030538.GI14174@pxdev.xzpeter.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 28 Aug 2017 12:11:38 +0200
-Message-ID: <CAJ+F1CJ34uwxrbZ6zmp0Z+7baWh-uSxYJNvj2QJE1ryyUpOi3Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 2/8] monitor: allow monitor to create
- thread to poll
+	(envelope-from <wei.w.wang@intel.com>) id 1dmH9f-0005ug-6N
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:20:31 -0400
+Received: from mga04.intel.com ([192.55.52.120]:11758)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dmH9e-0005rT-NR
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:20:27 -0400
+From: Wei Wang <wei.w.wang@intel.com>
+Date: Mon, 28 Aug 2017 18:08:28 +0800
+Message-Id: <1503914913-28893-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [PATCH v15 0/5] Virtio-balloon Enhancement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,114 +22,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com
+Cc: david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, wei.w.wang@intel.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-Hi
+This patch series enhances the existing virtio-balloon with the following
+new features:
+1) fast ballooning: transfer ballooned pages between the guest and host in
+chunks using sgs, instead of one by one; and
+2) free page block reporting: a new virtqueue to report guest free pages
+to the host.
 
-On Mon, Aug 28, 2017 at 5:05 AM, Peter Xu <peterx@redhat.com> wrote:
-> On Fri, Aug 25, 2017 at 04:07:34PM +0000, Marc-Andr=C3=A9 Lureau wrote:
->> On Fri, Aug 25, 2017 at 5:33 PM Dr. David Alan Gilbert <dgilbert@redhat.=
-com>
->> wrote:
->>
->> > * Marc-Andr=C3=A9 Lureau (marcandre.lureau@gmail.com) wrote:
->> > > Hi
->> > >
->> > > On Wed, Aug 23, 2017 at 8:52 AM Peter Xu <peterx@redhat.com> wrote:
->> > >
->> > > > Firstly, introduce Monitor.use_thread, and set it for monitors tha=
-t are
->> > > > using non-mux typed backend chardev.  We only do this for monitors=
-, so
->> > > > mux-typed chardevs are not suitable (when it connects to, e.g., se=
-rials
->> > > > and the monitor together).
->> > > >
->> > > > When use_thread is set, we create standalone thread to poll the mo=
-nitor
->> > > > events, isolated from the main loop thread.  Here we still need to=
- take
->> > > > the BQL before dispatching the tasks since some of the monitor com=
-mands
->> > > > are not allowed to execute without the protection of BQL.  Then th=
-is
->> > > > gives us the chance to avoid taking the BQL for some monitor comma=
-nds
->> > in
->> > > > the future.
->> > > >
->> > > > * Why this change?
->> > > >
->> > > > We need these per-monitor threads to make sure we can have at leas=
-t one
->> > > > monitor that will never stuck (that can receive further monitor
->> > > > commands).
->> > > >
->> > > > * So when will monitors stuck?  And, how do they stuck?
->> > > >
->> > > > After we have postcopy and remote page faults, it's simple to achi=
-eve a
->> > > > stuck in the monitor (which is also a stuck in main loop thread):
->> > > >
->> > > > (1) Monitor deadlock on BQL
->> > > >
->> > > > As we may know, when postcopy is running on destination VM, the vc=
-pu
->> > > > threads can stuck merely any time as long as it tries to access an
->> > > > uncopied guest page.  Meanwhile, when the stuck happens, it is pos=
-sible
->> > > > that the vcpu thread is holding the BQL.  If the page fault is not
->> > > > handled quickly, you'll find that monitors stop working, which is
->> > trying
->> > > > to take the BQL.
->> > > >
->> > > > If the page fault cannot be handled correctly (one case is a pause=
-d
->> > > > postcopy, when network is temporarily down), monitors will hang
->> > > > forever.  Without current patch, that means the main loop hanged.
->> > We'll
->> > > > never find a way to talk to VM again.
->> > > >
->> > >
->> > > Could the BQL be pushed down to the monitor commands level instead? =
-That
->> > > way we wouldn't need a seperate thread to solve the hang on commands=
- that
->> > > do not need BQL.
->> >
->> > If the main thread is stuck though I don't see how that helps you; you
->> > have to be able to run these commands on another thread.
->> >
->>
->> Why would the main thread be stuck? In (1) If the vcpu thread takes the =
-BQL
->> and the command doesn't need it, it would work.  In (2),  info cpus
->> shouldn't keep the BQL (my qapi-async series would probably help here)
->
-> (Thanks for joining the discussion)
->
-> AFAIK the main thread can be stuck for many reasons.  I have seen one
-> stack when the VGA code (IIUC) was trying to writting to guest graphic
-> memory in main loop thread but luckily that guest page is still not
-> copied yet from source.  As long as the main thread is stuck for any
-> reason, no chance for monitor commands, even if the commands support
-> async operations.
+The second feature can be used to accelerate live migration of VMs. Here
+are some details:
 
-If that command becomes async (it probably should, any command doing
-IO probaly should), then the main loop can keep running.
+Live migration needs to transfer the VM's memory from the source machine
+to the destination round by round. For the 1st round, all the VM's memory
+is transferred. From the 2nd round, only the pieces of memory that were
+written by the guest (after the 1st round) are transferred. One method
+that is popularly used by the hypervisor to track which part of memory is
+written is to write-protect all the guest memory.
 
->
-> So IMHO the only solution is doing these things in separate threads,
-> rather than all in a single one.
+The second feature  enables the optimization of the 1st round memory
+transfer - the hypervisor can skip the transfer of guest free pages in the
+1st round. It is not concerned that the memory pages are used after they
+are given to the hypervisor as a hint of the free pages, because they will
+be tracked by the hypervisor and transferred in the next round if they are
+used and written.
 
-I wouldn't say it's the only solution. I think the monitor can touch
-many areas that haven't been written with multi-threading in mind. My
-proposal is probably safer, although I don't know how hard it would be
-to push the BQL down to QMP commands, and make async existing IO
-commands. The benefits of this work are quite interesting imho,
-because a stuck mainloop is basically a stuck qemu, and an additional
-thread will not solve it...
+Change Log:
+v14->v15:
+1) mm: make the report callback return a bool value - returning 1 to stop
+walking through the free page list.
+2) virtio-balloon: batching sgs of balloon pages till the vq is full
+3) virtio-balloon: create a new workqueue, rather than using the default
+system_wq, to queue the free page reporting work item.
+4) virtio-balloon: add a ctrl_vq to be a central control plane which will
+handle all the future control related commands between the host and guest.
+Add free page report as the first feature controlled under ctrl_vq, and
+the free_page_vq is a data plane vq dedicated to the transmission of free
+page blocks.
 
---=20
-Marc-Andr=C3=A9 Lureau
+v13->v14:
+1) xbitmap: move the code from lib/radix-tree.c to lib/xbitmap.c.
+2) xbitmap: consolidate the implementation of xb_bit_set/clear/test into
+one xb_bit_ops.
+3) xbitmap: add documents for the exported APIs.
+4) mm: rewrite the function to walk through free page blocks.
+5) virtio-balloon: when reporting a free page blcok to the device, if the
+vq is full (less likey to happen in practice), just skip reporting this
+block, instead of busywaiting till an entry gets released.
+6) virtio-balloon: fail the probe function if adding the signal buf in
+init_vqs fails.
+
+v12->v13:
+1) mm: use a callback function to handle the the free page blocks from the
+report function. This avoids exposing the zone internal to a kernel
+module.
+2) virtio-balloon: send balloon pages or a free page block using a single
+sg each time. This has the benefits of simpler implementation with no new
+APIs.
+3) virtio-balloon: the free_page_vq is used to report free pages only (no
+multiple usages interleaving)
+4) virtio-balloon: Balloon pages and free page blocks are sent via input
+sgs, and the completion signal to the host is sent via an output sg.
+
+v11->v12:
+1) xbitmap: use the xbitmap from Matthew Wilcox to record ballooned pages.
+2) virtio-ring: enable the driver to build up a desc chain using vring
+desc.
+3) virtio-ring: Add locking to the existing START_USE() and END_USE()
+macro to lock/unlock the vq when a vq operation starts/ends.
+4) virtio-ring: add virtqueue_kick_sync() and virtqueue_kick_async()
+5) virtio-balloon: describe chunks of ballooned pages and free pages
+blocks directly using one or more chains of desc from the vq.
+
+v10->v11:
+1) virtio_balloon: use vring_desc to describe a chunk;
+2) virtio_ring: support to add an indirect desc table to virtqueue;
+3)  virtio_balloon: use cmdq to report guest memory statistics.
+
+v9->v10:
+1) mm: put report_unused_page_block() under CONFIG_VIRTIO_BALLOON;
+2) virtio-balloon: add virtballoon_validate();
+3) virtio-balloon: msg format change;
+4) virtio-balloon: move miscq handling to a task on system_freezable_wq;
+5) virtio-balloon: code cleanup.
+
+v8->v9:
+1) Split the two new features, VIRTIO_BALLOON_F_BALLOON_CHUNKS and
+VIRTIO_BALLOON_F_MISC_VQ, which were mixed together in the previous
+implementation;
+2) Simpler function to get the free page block.
+
+v7->v8:
+1) Use only one chunk format, instead of two.
+2) re-write the virtio-balloon implementation patch.
+3) commit changes
+4) patch re-org
+
+
+Matthew Wilcox (1):
+  lib/xbitmap: Introduce xbitmap
+
+Wei Wang (4):
+  lib/xbitmap: add xb_find_next_bit() and xb_zero()
+  virtio-balloon: VIRTIO_BALLOON_F_SG
+  mm: support reporting free page blocks
+  virtio-balloon: VIRTIO_BALLOON_F_CTRL_VQ
+
+ drivers/virtio/virtio_balloon.c     | 418 ++++++++++++++++++++++++++++++++----
+ include/linux/mm.h                  |   5 +
+ include/linux/radix-tree.h          |   3 +
+ include/linux/xbitmap.h             |  64 ++++++
+ include/uapi/linux/virtio_balloon.h |  16 ++
+ lib/Makefile                        |   2 +-
+ lib/radix-tree.c                    |  22 +-
+ lib/xbitmap.c                       | 215 +++++++++++++++++++
+ mm/page_alloc.c                     |  65 ++++++
+ 9 files changed, 769 insertions(+), 41 deletions(-)
+ create mode 100644 include/linux/xbitmap.h
+ create mode 100644 lib/xbitmap.c
+
+-- 
+2.7.4
