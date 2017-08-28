@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dm9JD-00054b-Vc
-	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:49 -0400
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dm9JD-00054a-Vb
+	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dm9JC-0001FR-SU
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dm9JB-0001EZ-O4
 	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:48 -0400
-Received: from mail-ua0-x243.google.com ([2607:f8b0:400c:c08::243]:37337)
+Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:34979)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
-	id 1dm9JC-0001FH-Ng
-	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:46 -0400
-Received: by mail-ua0-x243.google.com with SMTP id 104so848971uas.4
-	for <qemu-devel@nongnu.org>; Sun, 27 Aug 2017 18:57:46 -0700 (PDT)
+	id 1dm9JB-0001EF-Hc
+	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:45 -0400
+Received: by mail-ua0-x241.google.com with SMTP id j45so2016921uaf.2
+	for <qemu-devel@nongnu.org>; Sun, 27 Aug 2017 18:57:45 -0700 (PDT)
 From: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
-Date: Sun, 27 Aug 2017 20:56:51 -0500
-Message-Id: <20170828015654.2530-12-Sergio.G.DelReal@gmail.com>
+Date: Sun, 27 Aug 2017 20:56:50 -0500
+Message-Id: <20170828015654.2530-11-Sergio.G.DelReal@gmail.com>
 In-Reply-To: <20170828015654.2530-1-Sergio.G.DelReal@gmail.com>
 References: <20170828015654.2530-1-Sergio.G.DelReal@gmail.com>
-Subject: [Qemu-devel] [PATCH 11/14] hvf: implement vga dirty page tracking
+Subject: [Qemu-devel] [PATCH 10/14] hvf: refactor cpuid code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,161 +29,432 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 
-This commit implements setting the tracking of dirty pages, using hvf's
-interface to protect guest memory. It uses the MemoryListener callback
-mechanism through .log_start/stop/sync
+This commit adds code to request the cpuid features supported by the
+host and hvf; it calls hvf_get_supported_cpuid if hvf is compiled with
+QEMU and enabled.
 
 Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 ---
- include/sysemu/hvf.h  |  5 ++++
- target/i386/hvf-all.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 70 insertions(+), 7 deletions(-)
+ cpus.c                |   2 +
+ include/qom/cpu.h     |   6 +--
+ include/sysemu/hvf.h  |  18 ++++++---
+ target/i386/cpu-qom.h |   4 +-
+ target/i386/cpu.c     | 108 ++++++++++++++++++++++++++++++++++++++++----------
+ target/i386/hvf-all.c |  20 +++++-----
+ 6 files changed, 113 insertions(+), 45 deletions(-)
 
-diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
-index 5b92769b16..90e9ec174e 100644
---- a/include/sysemu/hvf.h
-+++ b/include/sysemu/hvf.h
-@@ -27,11 +27,16 @@
- #include <Hypervisor/hv_error.h>
- #endif
+diff --git a/cpus.c b/cpus.c
+index 6754ce17cc..2411dfcd3f 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -37,7 +37,9 @@
+ #include "sysemu/hw_accel.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/hax.h"
++#ifdef CONFIG_HVF
+ #include "sysemu/hvf.h"
++#endif
+ #include "qmp-commands.h"
+ #include "exec/exec-all.h"
  
-+/* hvf_slot flags */
-+#define HVF_SLOT_LOG (1 << 0)
-+
- typedef struct hvf_slot {
-     uint64_t start;
-     uint64_t size;
-     uint8_t *mem;
-     int slot_id;
-+    uint32_t flags;
-+    MemoryRegion *region;
- } hvf_slot;
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index c46eb61240..ef74c2ce3c 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -408,13 +408,9 @@ struct CPUState {
+      */
+     uint16_t pending_tlb_flush;
  
- struct hvf_vcpu_caps {
-diff --git a/target/i386/hvf-all.c b/target/i386/hvf-all.c
-index 11d20671f7..20c796089d 100644
---- a/target/i386/hvf-all.c
-+++ b/target/i386/hvf-all.c
-@@ -172,6 +172,7 @@ void hvf_set_phys_mem(MemoryRegionSection *section, bool add)
-     mem->size = int128_get64(section->size);
-     mem->mem = memory_region_get_ram_ptr(area) + section->offset_within_region;
-     mem->start = section->offset_within_address_space;
-+    mem->region = area;
- 
-     if (do_hvf_set_memory(mem)) {
-         fprintf(stderr, "Error registering new memory slot\n");
-@@ -441,8 +442,7 @@ void hvf_cpu_synchronize_post_init(CPUState *cpu_state)
-     run_on_cpu(cpu_state, _hvf_cpu_synchronize_post_init, RUN_ON_CPU_NULL);
- }
- 
--/* TODO: ept fault handlig */
--static bool ept_emulation_fault(uint64_t ept_qual)
-+static bool ept_emulation_fault(hvf_slot *slot, addr_t gpa, uint64_t ept_qual)
- {
-     int read, write;
- 
-@@ -458,6 +458,14 @@ static bool ept_emulation_fault(uint64_t ept_qual)
-         return false;
-     }
- 
-+    if (write && slot) {
-+        if (slot->flags & HVF_SLOT_LOG) {
-+            memory_region_set_dirty(slot->region, gpa - slot->start, 1);
-+            hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
-+                          HV_MEMORY_READ | HV_MEMORY_WRITE);
-+        }
-+    }
-+
-     /*
-      * The EPT violation must have been caused by accessing a
-      * guest-physical address that is a translation of a guest-linear
-@@ -468,7 +476,57 @@ static bool ept_emulation_fault(uint64_t ept_qual)
-         return false;
-     }
- 
--    return true;
-+    return !slot;
-+}
-+
-+static void hvf_set_dirty_tracking(MemoryRegionSection *section, bool on)
-+{
-+    struct mac_slot *macslot;
-+    hvf_slot *slot;
-+
-+    slot = hvf_find_overlap_slot(
-+            section->offset_within_address_space,
-+            section->offset_within_address_space + int128_get64(section->size));
-+
-+    /* protect region against writes; begin tracking it */
-+    if (on) {
-+        slot->flags |= HVF_SLOT_LOG;
-+        hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
-+                      HV_MEMORY_READ);
-+    /* stop tracking region*/
-+    } else {
-+        slot->flags &= ~HVF_SLOT_LOG;
-+        hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
-+                      HV_MEMORY_READ | HV_MEMORY_WRITE);
-+    }
-+}
-+
-+static void hvf_log_start(MemoryListener *listener,
-+                          MemoryRegionSection *section, int old, int new)
-+{
-+    if (old != 0)
-+        return;
-+
-+    hvf_set_dirty_tracking(section, 1);
-+}
-+
-+static void hvf_log_stop(MemoryListener *listener,
-+                         MemoryRegionSection *section, int old, int new)
-+{
-+    if (new != 0)
-+        return;
-+
-+    hvf_set_dirty_tracking(section, 0);
-+}
-+
-+static void hvf_log_sync(MemoryListener *listener,
-+                         MemoryRegionSection *section)
-+{
-+    /*
-+     * sync of dirty pages is handled elsewhere; just make sure we keep
-+     * tracking the region.
-+     */
-+    hvf_set_dirty_tracking(section, 1);
- }
- 
- static void hvf_region_add(MemoryListener *listener,
-@@ -487,6 +545,9 @@ static MemoryListener hvf_memory_listener = {
-     .priority = 10,
-     .region_add = hvf_region_add,
-     .region_del = hvf_region_del,
-+    .log_start = hvf_log_start,
-+    .log_stop = hvf_log_stop,
-+    .log_sync = hvf_log_sync,
+-    // HVF
+     bool hvf_vcpu_dirty;
+     uint64_t hvf_fd; // fd of vcpu created by HVF
+-    // Supporting data structures for VMCS capabilities
+-    // and x86 emulation state
+-    struct hvf_vcpu_caps* hvf_caps;
+-    struct hvf_x86_state* hvf_x86;
++    struct hvf_x86_state *hvf_x86;
  };
  
- void vmx_reset_vcpu(CPUState *cpu) {
-@@ -763,7 +824,7 @@ int hvf_vcpu_exec(CPUState *cpu)
+ QTAILQ_HEAD(CPUTailQ, CPUState);
+diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
+index f9a5a9c5d3..5b92769b16 100644
+--- a/include/sysemu/hvf.h
++++ b/include/sysemu/hvf.h
+@@ -34,12 +34,6 @@ typedef struct hvf_slot {
+     int slot_id;
+ } hvf_slot;
  
-             slot = hvf_find_overlap_slot(gpa, gpa);
-             /* mmio */
--            if (ept_emulation_fault(exit_qual) && !slot) {
-+            if (ept_emulation_fault(slot, gpa, exit_qual)) {
-                 struct x86_decode decode;
+-typedef struct HVFState {
+-    AccelState parent;
+-    hvf_slot slots[32];
+-    int num_slots;
+-} HVFState;
+-
+ struct hvf_vcpu_caps {
+     uint64_t vmx_cap_pinbased;
+     uint64_t vmx_cap_procbased;
+@@ -49,6 +43,15 @@ struct hvf_vcpu_caps {
+     uint64_t vmx_cap_preemption_timer;
+ };
  
-                 load_regs(cpu);
-@@ -774,9 +835,6 @@ int hvf_vcpu_exec(CPUState *cpu)
-                 store_regs(cpu);
-                 break;
-             }
--#ifdef DIRTY_VGA_TRACKING
--            /* TODO: handle dirty page tracking */
--#endif
-             break;
++typedef struct HVFState {
++    AccelState parent;
++    hvf_slot slots[32];
++    int num_slots;
++
++    struct hvf_vcpu_caps *hvf_caps;
++} HVFState;
++extern HVFState *hvf_state;
++
+ void hvf_set_phys_mem(MemoryRegionSection *, bool);
+ void hvf_handle_io(CPUArchState *, uint16_t, void *,
+                   int, int, int);
+@@ -87,6 +90,9 @@ void update_apic_tpr(CPUState *);
+ int hvf_put_registers(CPUState *);
+ void vmx_clear_int_window_exiting(CPUState *cpu);
+ 
++uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
++                                 int reg);
++
+ #define TYPE_HVF_ACCEL ACCEL_CLASS_NAME("hvf")
+ 
+ #define HVF_STATE(obj) \
+diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
+index c2205e6077..22f95eb3a4 100644
+--- a/target/i386/cpu-qom.h
++++ b/target/i386/cpu-qom.h
+@@ -47,7 +47,7 @@ typedef struct X86CPUDefinition X86CPUDefinition;
+ /**
+  * X86CPUClass:
+  * @cpu_def: CPU model definition
+- * @kvm_required: Whether CPU model requires KVM to be enabled.
++ * @host_cpuid_required: Whether CPU model requires cpuid from host.
+  * @ordering: Ordering on the "-cpu help" CPU model list.
+  * @migration_safe: See CpuDefinitionInfo::migration_safe
+  * @static_model: See CpuDefinitionInfo::static
+@@ -66,7 +66,7 @@ typedef struct X86CPUClass {
+      */
+     X86CPUDefinition *cpu_def;
+ 
+-    bool kvm_required;
++    bool host_cpuid_required;
+     int ordering;
+     bool migration_safe;
+     bool static_model;
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index ddc45abd70..8c531a0ffa 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -22,6 +22,9 @@
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+ #include "sysemu/kvm.h"
++#ifdef CONFIG_HVF
++#include "sysemu/hvf.h"
++#endif
+ #include "sysemu/cpus.h"
+ #include "kvm_i386.h"
+ 
+@@ -613,6 +616,23 @@ static uint32_t xsave_area_size(uint64_t mask)
+     return ret;
+ }
+ 
++static inline bool accel_uses_host_cpuid(void)
++{
++    bool enabled;
++#if defined(CONFIG_KVM)
++    enabled = kvm_enabled();
++#elif defined(CONFIG_HVF)
++    enabled = hvf_enabled();
++#else
++    enabled = 0;
++#endif
++    if (enabled) {
++        return true;
++    } else {
++        return false;
++    }
++}
++
+ static inline uint64_t x86_cpu_xsave_components(X86CPU *cpu)
+ {
+     return ((uint64_t)cpu->env.features[FEAT_XSAVE_COMP_HI]) << 32 |
+@@ -1643,10 +1663,15 @@ static void max_x86_cpu_initfn(Object *obj)
+      */
+     cpu->max_features = true;
+ 
+-    if (kvm_enabled()) {
++    if (accel_uses_host_cpuid()) {
+         char vendor[CPUID_VENDOR_SZ + 1] = { 0 };
+         char model_id[CPUID_MODEL_ID_SZ + 1] = { 0 };
+         int family, model, stepping;
++        X86CPUDefinition host_cpudef = { };
++        uint32_t eax = 0, ebx = 0, ecx = 0, edx = 0;
++
++        host_cpuid(0x0, 0, &eax, &ebx, &ecx, &edx);
++        x86_cpu_vendor_words2str(host_cpudef.vendor, ebx, edx, ecx);
+ 
+         host_vendor_fms(vendor, &family, &model, &stepping);
+ 
+@@ -1660,12 +1685,23 @@ static void max_x86_cpu_initfn(Object *obj)
+         object_property_set_str(OBJECT(cpu), model_id, "model-id",
+                                 &error_abort);
+ 
+-        env->cpuid_min_level =
+-            kvm_arch_get_supported_cpuid(s, 0x0, 0, R_EAX);
+-        env->cpuid_min_xlevel =
+-            kvm_arch_get_supported_cpuid(s, 0x80000000, 0, R_EAX);
+-        env->cpuid_min_xlevel2 =
+-            kvm_arch_get_supported_cpuid(s, 0xC0000000, 0, R_EAX);
++        if (kvm_enabled()) {
++            env->cpuid_min_level =
++                kvm_arch_get_supported_cpuid(s, 0x0, 0, R_EAX);
++            env->cpuid_min_xlevel =
++                kvm_arch_get_supported_cpuid(s, 0x80000000, 0, R_EAX);
++            env->cpuid_min_xlevel2 =
++                kvm_arch_get_supported_cpuid(s, 0xC0000000, 0, R_EAX);
++        } else {
++#if defined(CONFIG_HVF)
++            env->cpuid_min_level =
++                hvf_get_supported_cpuid(0x0, 0, R_EAX);
++            env->cpuid_min_xlevel =
++                hvf_get_supported_cpuid(0x80000000, 0, R_EAX);
++            env->cpuid_min_xlevel2 =
++                hvf_get_supported_cpuid(0xC0000000, 0, R_EAX);
++#endif
++        }
+ 
+         if (lmce_supported()) {
+             object_property_set_bool(OBJECT(cpu), true, "lmce", &error_abort);
+@@ -1691,18 +1727,25 @@ static const TypeInfo max_x86_cpu_type_info = {
+     .class_init = max_x86_cpu_class_init,
+ };
+ 
+-#ifdef CONFIG_KVM
+-
++#if defined(CONFIG_KVM) || defined(CONFIG_HVF)
+ static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
+ {
+     X86CPUClass *xcc = X86_CPU_CLASS(oc);
+ 
+-    xcc->kvm_required = true;
++    xcc->host_cpuid_required = true;
+     xcc->ordering = 8;
+ 
+-    xcc->model_description =
+-        "KVM processor with all supported host features "
+-        "(only available in KVM mode)";
++#if defined(CONFIG_KVM)
++    if (kvm_enabled()) {
++        xcc->model_description =
++            "KVM processor with all supported host features ";
++    } 
++#elif defined(CONFIG_HVF)
++    if (hvf_enabled()) {
++        xcc->model_description =
++            "HVF processor with all supported host features ";
++    }
++#endif
+ }
+ 
+ static const TypeInfo host_x86_cpu_type_info = {
+@@ -1724,7 +1767,7 @@ static void report_unavailable_features(FeatureWord w, uint32_t mask)
+             assert(reg);
+             fprintf(stderr, "warning: %s doesn't support requested feature: "
+                 "CPUID.%02XH:%s%s%s [bit %d]\n",
+-                kvm_enabled() ? "host" : "TCG",
++                accel_uses_host_cpuid() ? "host" : "TCG",
+                 f->cpuid_eax, reg,
+                 f->feat_names[i] ? "." : "",
+                 f->feat_names[i] ? f->feat_names[i] : "", i);
+@@ -2175,7 +2218,7 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
+     Error *err = NULL;
+     strList **next = missing_feats;
+ 
+-    if (xcc->kvm_required && !kvm_enabled()) {
++    if (xcc->host_cpuid_required && !accel_uses_host_cpuid()) {
+         strList *new = g_new0(strList, 1);
+         new->value = g_strdup("kvm");;
+         *missing_feats = new;
+@@ -2337,7 +2380,15 @@ static uint32_t x86_cpu_get_supported_feature_word(FeatureWord w,
+         r = kvm_arch_get_supported_cpuid(kvm_state, wi->cpuid_eax,
+                                                     wi->cpuid_ecx,
+                                                     wi->cpuid_reg);
+-    } else if (tcg_enabled()) {
++    }
++#if defined(CONFIG_HVF)
++    else if (hvf_enabled()) {
++        r = hvf_get_supported_cpuid(wi->cpuid_eax,
++                                    wi->cpuid_ecx,
++                                    wi->cpuid_reg);
++    }
++#endif
++    else if (tcg_enabled()) {
+         r = wi->tcg_features;
+     } else {
+         return ~0;
+@@ -2396,6 +2447,7 @@ static void x86_cpu_load_def(X86CPU *cpu, X86CPUDefinition *def, Error **errp)
+     }
+ 
+     /* Special cases not set in the X86CPUDefinition structs: */
++    /* TODO: implement for hvf */
+     if (kvm_enabled()) {
+         if (!kvm_irqchip_in_kernel()) {
+             x86_cpu_change_kvm_default("x2apic", "off");
+@@ -2416,7 +2468,7 @@ static void x86_cpu_load_def(X86CPU *cpu, X86CPUDefinition *def, Error **errp)
+      * when doing cross vendor migration
+      */
+     vendor = def->vendor;
+-    if (kvm_enabled()) {
++    if (accel_uses_host_cpuid()) {
+         uint32_t  ebx = 0, ecx = 0, edx = 0;
+         host_cpuid(0, 0, NULL, &ebx, &ecx, &edx);
+         x86_cpu_vendor_words2str(host_vendor, ebx, edx, ecx);
+@@ -2872,7 +2924,16 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             *ebx = kvm_arch_get_supported_cpuid(s, 0xA, count, R_EBX);
+             *ecx = kvm_arch_get_supported_cpuid(s, 0xA, count, R_ECX);
+             *edx = kvm_arch_get_supported_cpuid(s, 0xA, count, R_EDX);
+-        } else {
++        }
++#if defined(CONFIG_HVF)
++        else if (hvf_enabled() && cpu->enable_pmu) {
++            *eax = hvf_get_supported_cpuid(0xA, count, R_EAX);
++            *ebx = hvf_get_supported_cpuid(0xA, count, R_EBX);
++            *ecx = hvf_get_supported_cpuid(0xA, count, R_ECX);
++            *edx = hvf_get_supported_cpuid(0xA, count, R_EDX);
++        }
++#endif
++        else {
+             *eax = 0;
+             *ebx = 0;
+             *ecx = 0;
+@@ -3220,6 +3281,7 @@ static void x86_cpu_reset(CPUState *s)
+ 
+     s->halted = !cpu_is_bsp(cpu);
+ 
++    /* TODO: implement for hvf */
+     if (kvm_enabled()) {
+         kvm_arch_reset_vcpu(cpu);
+     }
+@@ -3262,6 +3324,7 @@ APICCommonClass *apic_get_class(void)
+ {
+     const char *apic_type = "apic";
+ 
++    /* TODO: implement for hvf */
+     if (kvm_apic_in_kernel()) {
+         apic_type = "kvm-apic";
+     } else if (xen_enabled()) {
+@@ -3492,6 +3555,7 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
          }
-         case EXIT_REASON_INOUT:
+     }
+ 
++    /* TODO: implement for hvf */
+     if (!kvm_enabled() || !cpu->expose_kvm) {
+         env->features[FEAT_KVM] = 0;
+     }
+@@ -3575,7 +3639,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+     Error *local_err = NULL;
+     static bool ht_warned;
+ 
+-    if (xcc->kvm_required && !kvm_enabled()) {
++    if (xcc->host_cpuid_required && !accel_uses_host_cpuid()) {
+         char *name = x86_cpu_class_get_model_name(xcc);
+         error_setg(&local_err, "CPU model '%s' requires KVM", name);
+         g_free(name);
+@@ -3597,7 +3661,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+         x86_cpu_report_filtered_features(cpu);
+         if (cpu->enforce_cpuid) {
+             error_setg(&local_err,
+-                       kvm_enabled() ?
++                       accel_uses_host_cpuid() ?
+                            "Host doesn't support requested features" :
+                            "TCG doesn't support requested features");
+             goto out;
+@@ -3620,7 +3684,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+      * consumer AMD devices but nothing else.
+      */
+     if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_LM) {
+-        if (kvm_enabled()) {
++        if (accel_uses_host_cpuid()) {
+             uint32_t host_phys_bits = x86_host_phys_bits();
+             static bool warned;
+ 
+@@ -4207,7 +4271,7 @@ static void x86_cpu_register_types(void)
+     }
+     type_register_static(&max_x86_cpu_type_info);
+     type_register_static(&x86_base_cpu_type_info);
+-#ifdef CONFIG_KVM
++#if defined(CONFIG_KVM) || defined(CONFIG_HVF)
+     type_register_static(&host_x86_cpu_type_info);
+ #endif
+ }
+diff --git a/target/i386/hvf-all.c b/target/i386/hvf-all.c
+index 88b5281975..11d20671f7 100644
+--- a/target/i386/hvf-all.c
++++ b/target/i386/hvf-all.c
+@@ -604,7 +604,7 @@ int hvf_init_vcpu(CPUState *cpu)
+     init_decoder(cpu);
+     init_cpuid(cpu);
+ 
+-    cpu->hvf_caps = (struct hvf_vcpu_caps *)g_malloc0(sizeof(struct hvf_vcpu_caps));
++    hvf_state->hvf_caps = (struct hvf_vcpu_caps *)g_malloc0(sizeof(struct hvf_vcpu_caps));
+     cpu->hvf_x86 = (struct hvf_x86_state *)g_malloc0(sizeof(struct hvf_x86_state));
+ 
+     r = hv_vcpu_create((hv_vcpuid_t *)&cpu->hvf_fd, HV_VCPU_DEFAULT);
+@@ -612,37 +612,37 @@ int hvf_init_vcpu(CPUState *cpu)
+     assert_hvf_ok(r);
+ 
+     if (hv_vmx_read_capability(HV_VMX_CAP_PINBASED,
+-        &cpu->hvf_caps->vmx_cap_pinbased)) {
++        &hvf_state->hvf_caps->vmx_cap_pinbased)) {
+         abort();
+     }
+     if (hv_vmx_read_capability(HV_VMX_CAP_PROCBASED,
+-        &cpu->hvf_caps->vmx_cap_procbased)) {
++        &hvf_state->hvf_caps->vmx_cap_procbased)) {
+         abort();
+     }
+     if (hv_vmx_read_capability(HV_VMX_CAP_PROCBASED2,
+-        &cpu->hvf_caps->vmx_cap_procbased2)) {
++        &hvf_state->hvf_caps->vmx_cap_procbased2)) {
+         abort();
+     }
+     if (hv_vmx_read_capability(HV_VMX_CAP_ENTRY,
+-        &cpu->hvf_caps->vmx_cap_entry)) {
++        &hvf_state->hvf_caps->vmx_cap_entry)) {
+         abort();
+     }
+ 
+     /* set VMCS control fields */
+     wvmcs(cpu->hvf_fd, VMCS_PIN_BASED_CTLS,
+-          cap2ctrl(cpu->hvf_caps->vmx_cap_pinbased, 0));
++          cap2ctrl(hvf_state->hvf_caps->vmx_cap_pinbased, 0));
+     wvmcs(cpu->hvf_fd, VMCS_PRI_PROC_BASED_CTLS,
+-          cap2ctrl(cpu->hvf_caps->vmx_cap_procbased,
++          cap2ctrl(hvf_state->hvf_caps->vmx_cap_procbased,
+           VMCS_PRI_PROC_BASED_CTLS_HLT |
+           VMCS_PRI_PROC_BASED_CTLS_MWAIT |
+           VMCS_PRI_PROC_BASED_CTLS_TSC_OFFSET |
+           VMCS_PRI_PROC_BASED_CTLS_TPR_SHADOW) |
+           VMCS_PRI_PROC_BASED_CTLS_SEC_CONTROL);
+     wvmcs(cpu->hvf_fd, VMCS_SEC_PROC_BASED_CTLS,
+-          cap2ctrl(cpu->hvf_caps->vmx_cap_procbased2,
++          cap2ctrl(hvf_state->hvf_caps->vmx_cap_procbased2,
+                    VMCS_PRI_PROC_BASED2_CTLS_APIC_ACCESSES));
+ 
+-    wvmcs(cpu->hvf_fd, VMCS_ENTRY_CTLS, cap2ctrl(cpu->hvf_caps->vmx_cap_entry,
++    wvmcs(cpu->hvf_fd, VMCS_ENTRY_CTLS, cap2ctrl(hvf_state->hvf_caps->vmx_cap_entry,
+           0));
+     wvmcs(cpu->hvf_fd, VMCS_EXCEPTION_BITMAP, 0); /* Double fault */
+ 
+@@ -829,7 +829,7 @@ int hvf_vcpu_exec(CPUState *cpu)
+             uint32_t rcx = (uint32_t)rreg(cpu->hvf_fd, HV_X86_RCX);
+             uint32_t rdx = (uint32_t)rreg(cpu->hvf_fd, HV_X86_RDX);
+ 
+-            cpu_x86_cpuid(cpu, rax, rcx, &rax, &rbx, &rcx, &rdx);
++            cpu_x86_cpuid(env, rax, rcx, &rax, &rbx, &rcx, &rdx);
+ 
+             wreg(cpu->hvf_fd, HV_X86_RAX, rax);
+             wreg(cpu->hvf_fd, HV_X86_RBX, rbx);
 -- 
 2.14.1
