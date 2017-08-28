@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dmJA2-0002u6-N8
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 08:29:00 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dmJAN-000339-TA
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 08:29:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dmJA0-0004Nh-Tw
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 08:28:58 -0400
-Received: from mail-vk0-x232.google.com ([2607:f8b0:400c:c05::232]:36627)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dmJA0-0004NR-Na
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 08:28:56 -0400
-Received: by mail-vk0-x232.google.com with SMTP id d124so866850vkf.3
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 05:28:56 -0700 (PDT)
-MIME-Version: 1.0
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<1503471071-2233-3-git-send-email-peterx@redhat.com>
-	<CAJ+F1CKvY9iMtTQSrM2xVUwXYb0pcHjtFf8x4xpxG5ke-FPf3g@mail.gmail.com>
-	<20170825153304.GJ2090@work-vm>
-	<CAJ+F1CJR3UWv4zaGg_6aAyC7WWsVd35=UiRWyWkbGm-gEN2O9A@mail.gmail.com>
-	<87fucc3q78.fsf@dusky.pond.sub.org>
-In-Reply-To: <87fucc3q78.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 28 Aug 2017 12:28:45 +0000
-Message-ID: <CAJ+F1CK-srFaVCEA1iQurSayDc2u9QVSU9RYnV_uxK_iYTDE-A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 2/8] monitor: allow monitor to create
- thread to poll
+	(envelope-from <kraxel@redhat.com>) id 1dmJAI-0004U6-Uy
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 08:29:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55026)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dmJAI-0004TP-LJ
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 08:29:14 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 28 Aug 2017 14:29:06 +0200
+Message-Id: <20170828122906.18993-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] vga: stop passing pointers to
+ vga_draw_line* functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,124 +22,496 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, mdroth@linux.vnet.ibm.com, Juan Quintela <quintela@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: d@vidbuchanan.co.uk, Gerd Hoffmann <kraxel@redhat.com>, P J P <ppandit@redhat.com>
 
-Hi
+Instead pass around the address (aka offset into vga memory).
+Add vga_read_* helper functions which apply vbe_size_mask to
+the address, to make sure the address stays within the valid
+range, similar to the cirrus blitter fixes (commits ffaf857778
+and 026aeffcb4).
 
-On Mon, Aug 28, 2017 at 1:08 PM Markus Armbruster <armbru@redhat.com> wrote=
-:
+Impact:  DoS for privileged guest users.  qemu crashes with
+a segfault, when hitting the guard page after vga memory
+allocation, while reading vga memory for display updates.
 
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
->
-> > On Fri, Aug 25, 2017 at 5:33 PM Dr. David Alan Gilbert <
-> dgilbert@redhat.com>
-> > wrote:
-> >
-> >> * Marc-Andr=C3=A9 Lureau (marcandre.lureau@gmail.com) wrote:
-> >> > Hi
-> >> >
-> >> > On Wed, Aug 23, 2017 at 8:52 AM Peter Xu <peterx@redhat.com> wrote:
-> >> >
-> >> > > Firstly, introduce Monitor.use_thread, and set it for monitors tha=
-t
-> are
-> >> > > using non-mux typed backend chardev.  We only do this for monitors=
-,
-> so
-> >> > > mux-typed chardevs are not suitable (when it connects to, e.g.,
-> serials
-> >> > > and the monitor together).
-> >> > >
-> >> > > When use_thread is set, we create standalone thread to poll the
-> monitor
-> >> > > events, isolated from the main loop thread.  Here we still need to
-> take
-> >> > > the BQL before dispatching the tasks since some of the monitor
-> commands
-> >> > > are not allowed to execute without the protection of BQL.  Then th=
-is
-> >> > > gives us the chance to avoid taking the BQL for some monitor
-> commands in
-> >> > > the future.
-> >> > >
-> >> > > * Why this change?
-> >> > >
-> >> > > We need these per-monitor threads to make sure we can have at leas=
-t
-> one
-> >> > > monitor that will never stuck (that can receive further monitor
-> >> > > commands).
-> >> > >
-> >> > > * So when will monitors stuck?  And, how do they stuck?
-> >> > >
-> >> > > After we have postcopy and remote page faults, it's simple to
-> achieve a
-> >> > > stuck in the monitor (which is also a stuck in main loop thread):
-> >> > >
-> >> > > (1) Monitor deadlock on BQL
-> >> > >
-> >> > > As we may know, when postcopy is running on destination VM, the vc=
-pu
-> >> > > threads can stuck merely any time as long as it tries to access an
-> >> > > uncopied guest page.  Meanwhile, when the stuck happens, it is
-> possible
-> >> > > that the vcpu thread is holding the BQL.  If the page fault is not
-> >> > > handled quickly, you'll find that monitors stop working, which is
-> trying
-> >> > > to take the BQL.
-> >> > >
-> >> > > If the page fault cannot be handled correctly (one case is a pause=
-d
-> >> > > postcopy, when network is temporarily down), monitors will hang
-> >> > > forever.  Without current patch, that means the main loop hanged.
-> We'll
-> >> > > never find a way to talk to VM again.
-> >> > >
-> >> >
-> >> > Could the BQL be pushed down to the monitor commands level instead?
-> That
-> >> > way we wouldn't need a seperate thread to solve the hang on commands
-> that
-> >> > do not need BQL.
-> >>
-> >> If the main thread is stuck though I don't see how that helps you; you
-> >> have to be able to run these commands on another thread.
-> >>
-> >
-> > Why would the main thread be stuck? In (1) If the vcpu thread takes the
-> BQL
-> > and the command doesn't need it, it would work.  In (2),  info cpus
-> > shouldn't keep the BQL (my qapi-async series would probably help here)
->
-> This has been discussed several times[*], but of course not with
-> everybody, so I'll summarize once more: asynchronous commands are not a
-> actually *required* for anything.  They are *one* way to package the
-> "kick off task, receive an asynchronous message when it's done" pattern.
-> Another way is synchronous command for the kick off, event for the
-> "done".
->
+Fixes: CVE-2017-13672
+Cc: P J P <ppandit@redhat.com>
+Reported-by: David Buchanan <d@vidbuchanan.co.uk>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/vga-helpers.h | 202 ++++++++++++++++++++++++++---------------------
+ hw/display/vga_int.h     |   1 +
+ hw/display/vga.c         |   5 +-
+ 3 files changed, 114 insertions(+), 94 deletions(-)
 
-But you would have to break or duplicate the QMP APIs. My proposal doesn't
-need that, a command can reenter the main loop, and keep current QMP API.
-
-
-> For better or worse, synchronous command + event is what we have today.
-> Whether adding another way to package the the same thing improves the
-> QMP interface is doubtful.
->
-
-I would argue my series is mostly about internal refactoring for the
-benefit mentionned above. The fact that you can do (optionnaly) concurrent
-QMP commands is a nice bonus. Furthermore, it simplifies the API compared
-to CMD / dummy reply + EVENT. And it gives a meaning to the exisiting
-command "id"..
-
-
->
-> [*] Try this one:
-> Message-ID: <87o9yv890z.fsf@dusky.pond.sub.org>
-> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05483.html
->
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/hw/display/vga-helpers.h b/hw/display/vga-helpers.h
+index 94f6de2046..5a752b3f9e 100644
+--- a/hw/display/vga-helpers.h
++++ b/hw/display/vga-helpers.h
+@@ -95,20 +95,46 @@ static void vga_draw_glyph9(uint8_t *d, int linesize,
+     } while (--h);
+ }
+ 
++static inline uint8_t vga_read_byte(VGACommonState *vga, uint32_t addr)
++{
++    return vga->vram_ptr[addr & vga->vbe_size_mask];
++}
++
++static inline uint16_t vga_read_word_le(VGACommonState *vga, uint32_t addr)
++{
++    uint32_t offset = addr & vga->vbe_size_mask & ~1;
++    uint16_t *ptr = (uint16_t *)(vga->vram_ptr + offset);
++    return lduw_le_p(ptr);
++}
++
++static inline uint16_t vga_read_word_be(VGACommonState *vga, uint32_t addr)
++{
++    uint32_t offset = addr & vga->vbe_size_mask & ~1;
++    uint16_t *ptr = (uint16_t *)(vga->vram_ptr + offset);
++    return lduw_be_p(ptr);
++}
++
++static inline uint32_t vga_read_dword_le(VGACommonState *vga, uint32_t addr)
++{
++    uint32_t offset = addr & vga->vbe_size_mask & ~3;
++    uint32_t *ptr = (uint32_t *)(vga->vram_ptr + offset);
++    return ldl_le_p(ptr);
++}
++
+ /*
+  * 4 color mode
+  */
+-static void vga_draw_line2(VGACommonState *s1, uint8_t *d,
+-                           const uint8_t *s, int width)
++static void vga_draw_line2(VGACommonState *vga, uint8_t *d,
++                           uint32_t addr, int width)
+ {
+     uint32_t plane_mask, *palette, data, v;
+     int x;
+ 
+-    palette = s1->last_palette;
+-    plane_mask = mask16[s1->ar[VGA_ATC_PLANE_ENABLE] & 0xf];
++    palette = vga->last_palette;
++    plane_mask = mask16[vga->ar[VGA_ATC_PLANE_ENABLE] & 0xf];
+     width >>= 3;
+     for(x = 0; x < width; x++) {
+-        data = ((uint32_t *)s)[0];
++        data = vga_read_dword_le(vga, addr);
+         data &= plane_mask;
+         v = expand2[GET_PLANE(data, 0)];
+         v |= expand2[GET_PLANE(data, 2)] << 2;
+@@ -124,7 +150,7 @@ static void vga_draw_line2(VGACommonState *s1, uint8_t *d,
+         ((uint32_t *)d)[6] = palette[(v >> 4) & 0xf];
+         ((uint32_t *)d)[7] = palette[(v >> 0) & 0xf];
+         d += 32;
+-        s += 4;
++        addr += 4;
+     }
+ }
+ 
+@@ -134,17 +160,17 @@ static void vga_draw_line2(VGACommonState *s1, uint8_t *d,
+ /*
+  * 4 color mode, dup2 horizontal
+  */
+-static void vga_draw_line2d2(VGACommonState *s1, uint8_t *d,
+-                             const uint8_t *s, int width)
++static void vga_draw_line2d2(VGACommonState *vga, uint8_t *d,
++                             uint32_t addr, int width)
+ {
+     uint32_t plane_mask, *palette, data, v;
+     int x;
+ 
+-    palette = s1->last_palette;
+-    plane_mask = mask16[s1->ar[VGA_ATC_PLANE_ENABLE] & 0xf];
++    palette = vga->last_palette;
++    plane_mask = mask16[vga->ar[VGA_ATC_PLANE_ENABLE] & 0xf];
+     width >>= 3;
+     for(x = 0; x < width; x++) {
+-        data = ((uint32_t *)s)[0];
++        data = vga_read_dword_le(vga, addr);
+         data &= plane_mask;
+         v = expand2[GET_PLANE(data, 0)];
+         v |= expand2[GET_PLANE(data, 2)] << 2;
+@@ -160,24 +186,24 @@ static void vga_draw_line2d2(VGACommonState *s1, uint8_t *d,
+         PUT_PIXEL2(d, 6, palette[(v >> 4) & 0xf]);
+         PUT_PIXEL2(d, 7, palette[(v >> 0) & 0xf]);
+         d += 64;
+-        s += 4;
++        addr += 4;
+     }
+ }
+ 
+ /*
+  * 16 color mode
+  */
+-static void vga_draw_line4(VGACommonState *s1, uint8_t *d,
+-                           const uint8_t *s, int width)
++static void vga_draw_line4(VGACommonState *vga, uint8_t *d,
++                           uint32_t addr, int width)
+ {
+     uint32_t plane_mask, data, v, *palette;
+     int x;
+ 
+-    palette = s1->last_palette;
+-    plane_mask = mask16[s1->ar[VGA_ATC_PLANE_ENABLE] & 0xf];
++    palette = vga->last_palette;
++    plane_mask = mask16[vga->ar[VGA_ATC_PLANE_ENABLE] & 0xf];
+     width >>= 3;
+     for(x = 0; x < width; x++) {
+-        data = ((uint32_t *)s)[0];
++        data = vga_read_dword_le(vga, addr);
+         data &= plane_mask;
+         v = expand4[GET_PLANE(data, 0)];
+         v |= expand4[GET_PLANE(data, 1)] << 1;
+@@ -192,24 +218,24 @@ static void vga_draw_line4(VGACommonState *s1, uint8_t *d,
+         ((uint32_t *)d)[6] = palette[(v >> 4) & 0xf];
+         ((uint32_t *)d)[7] = palette[(v >> 0) & 0xf];
+         d += 32;
+-        s += 4;
++        addr += 4;
+     }
+ }
+ 
+ /*
+  * 16 color mode, dup2 horizontal
+  */
+-static void vga_draw_line4d2(VGACommonState *s1, uint8_t *d,
+-                             const uint8_t *s, int width)
++static void vga_draw_line4d2(VGACommonState *vga, uint8_t *d,
++                             uint32_t addr, int width)
+ {
+     uint32_t plane_mask, data, v, *palette;
+     int x;
+ 
+-    palette = s1->last_palette;
+-    plane_mask = mask16[s1->ar[VGA_ATC_PLANE_ENABLE] & 0xf];
++    palette = vga->last_palette;
++    plane_mask = mask16[vga->ar[VGA_ATC_PLANE_ENABLE] & 0xf];
+     width >>= 3;
+     for(x = 0; x < width; x++) {
+-        data = ((uint32_t *)s)[0];
++        data = vga_read_dword_le(vga, addr);
+         data &= plane_mask;
+         v = expand4[GET_PLANE(data, 0)];
+         v |= expand4[GET_PLANE(data, 1)] << 1;
+@@ -224,7 +250,7 @@ static void vga_draw_line4d2(VGACommonState *s1, uint8_t *d,
+         PUT_PIXEL2(d, 6, palette[(v >> 4) & 0xf]);
+         PUT_PIXEL2(d, 7, palette[(v >> 0) & 0xf]);
+         d += 64;
+-        s += 4;
++        addr += 4;
+     }
+ }
+ 
+@@ -233,21 +259,21 @@ static void vga_draw_line4d2(VGACommonState *s1, uint8_t *d,
+  *
+  * XXX: add plane_mask support (never used in standard VGA modes)
+  */
+-static void vga_draw_line8d2(VGACommonState *s1, uint8_t *d,
+-                             const uint8_t *s, int width)
++static void vga_draw_line8d2(VGACommonState *vga, uint8_t *d,
++                             uint32_t addr, int width)
+ {
+     uint32_t *palette;
+     int x;
+ 
+-    palette = s1->last_palette;
++    palette = vga->last_palette;
+     width >>= 3;
+     for(x = 0; x < width; x++) {
+-        PUT_PIXEL2(d, 0, palette[s[0]]);
+-        PUT_PIXEL2(d, 1, palette[s[1]]);
+-        PUT_PIXEL2(d, 2, palette[s[2]]);
+-        PUT_PIXEL2(d, 3, palette[s[3]]);
++        PUT_PIXEL2(d, 0, palette[vga_read_byte(vga, addr + 0)]);
++        PUT_PIXEL2(d, 1, palette[vga_read_byte(vga, addr + 1)]);
++        PUT_PIXEL2(d, 2, palette[vga_read_byte(vga, addr + 2)]);
++        PUT_PIXEL2(d, 3, palette[vga_read_byte(vga, addr + 3)]);
+         d += 32;
+-        s += 4;
++        addr += 4;
+     }
+ }
+ 
+@@ -256,63 +282,63 @@ static void vga_draw_line8d2(VGACommonState *s1, uint8_t *d,
+  *
+  * XXX: add plane_mask support (never used in standard VGA modes)
+  */
+-static void vga_draw_line8(VGACommonState *s1, uint8_t *d,
+-                           const uint8_t *s, int width)
++static void vga_draw_line8(VGACommonState *vga, uint8_t *d,
++                           uint32_t addr, int width)
+ {
+     uint32_t *palette;
+     int x;
+ 
+-    palette = s1->last_palette;
++    palette = vga->last_palette;
+     width >>= 3;
+     for(x = 0; x < width; x++) {
+-        ((uint32_t *)d)[0] = palette[s[0]];
+-        ((uint32_t *)d)[1] = palette[s[1]];
+-        ((uint32_t *)d)[2] = palette[s[2]];
+-        ((uint32_t *)d)[3] = palette[s[3]];
+-        ((uint32_t *)d)[4] = palette[s[4]];
+-        ((uint32_t *)d)[5] = palette[s[5]];
+-        ((uint32_t *)d)[6] = palette[s[6]];
+-        ((uint32_t *)d)[7] = palette[s[7]];
++        ((uint32_t *)d)[0] = palette[vga_read_byte(vga, addr + 0)];
++        ((uint32_t *)d)[1] = palette[vga_read_byte(vga, addr + 1)];
++        ((uint32_t *)d)[2] = palette[vga_read_byte(vga, addr + 2)];
++        ((uint32_t *)d)[3] = palette[vga_read_byte(vga, addr + 3)];
++        ((uint32_t *)d)[4] = palette[vga_read_byte(vga, addr + 4)];
++        ((uint32_t *)d)[5] = palette[vga_read_byte(vga, addr + 5)];
++        ((uint32_t *)d)[6] = palette[vga_read_byte(vga, addr + 6)];
++        ((uint32_t *)d)[7] = palette[vga_read_byte(vga, addr + 7)];
+         d += 32;
+-        s += 8;
++        addr += 8;
+     }
+ }
+ 
+ /*
+  * 15 bit color
+  */
+-static void vga_draw_line15_le(VGACommonState *s1, uint8_t *d,
+-                               const uint8_t *s, int width)
++static void vga_draw_line15_le(VGACommonState *vga, uint8_t *d,
++                               uint32_t addr, int width)
+ {
+     int w;
+     uint32_t v, r, g, b;
+ 
+     w = width;
+     do {
+-        v = lduw_le_p((void *)s);
++        v = vga_read_word_le(vga, addr);
+         r = (v >> 7) & 0xf8;
+         g = (v >> 2) & 0xf8;
+         b = (v << 3) & 0xf8;
+         ((uint32_t *)d)[0] = rgb_to_pixel32(r, g, b);
+-        s += 2;
++        addr += 2;
+         d += 4;
+     } while (--w != 0);
+ }
+ 
+-static void vga_draw_line15_be(VGACommonState *s1, uint8_t *d,
+-                               const uint8_t *s, int width)
++static void vga_draw_line15_be(VGACommonState *vga, uint8_t *d,
++                               uint32_t addr, int width)
+ {
+     int w;
+     uint32_t v, r, g, b;
+ 
+     w = width;
+     do {
+-        v = lduw_be_p((void *)s);
++        v = vga_read_word_be(vga, addr);
+         r = (v >> 7) & 0xf8;
+         g = (v >> 2) & 0xf8;
+         b = (v << 3) & 0xf8;
+         ((uint32_t *)d)[0] = rgb_to_pixel32(r, g, b);
+-        s += 2;
++        addr += 2;
+         d += 4;
+     } while (--w != 0);
+ }
+@@ -320,38 +346,38 @@ static void vga_draw_line15_be(VGACommonState *s1, uint8_t *d,
+ /*
+  * 16 bit color
+  */
+-static void vga_draw_line16_le(VGACommonState *s1, uint8_t *d,
+-                               const uint8_t *s, int width)
++static void vga_draw_line16_le(VGACommonState *vga, uint8_t *d,
++                               uint32_t addr, int width)
+ {
+     int w;
+     uint32_t v, r, g, b;
+ 
+     w = width;
+     do {
+-        v = lduw_le_p((void *)s);
++        v = vga_read_word_le(vga, addr);
+         r = (v >> 8) & 0xf8;
+         g = (v >> 3) & 0xfc;
+         b = (v << 3) & 0xf8;
+         ((uint32_t *)d)[0] = rgb_to_pixel32(r, g, b);
+-        s += 2;
++        addr += 2;
+         d += 4;
+     } while (--w != 0);
+ }
+ 
+-static void vga_draw_line16_be(VGACommonState *s1, uint8_t *d,
+-                               const uint8_t *s, int width)
++static void vga_draw_line16_be(VGACommonState *vga, uint8_t *d,
++                               uint32_t addr, int width)
+ {
+     int w;
+     uint32_t v, r, g, b;
+ 
+     w = width;
+     do {
+-        v = lduw_be_p((void *)s);
++        v = vga_read_word_be(vga, addr);
+         r = (v >> 8) & 0xf8;
+         g = (v >> 3) & 0xfc;
+         b = (v << 3) & 0xf8;
+         ((uint32_t *)d)[0] = rgb_to_pixel32(r, g, b);
+-        s += 2;
++        addr += 2;
+         d += 4;
+     } while (--w != 0);
+ }
+@@ -359,36 +385,36 @@ static void vga_draw_line16_be(VGACommonState *s1, uint8_t *d,
+ /*
+  * 24 bit color
+  */
+-static void vga_draw_line24_le(VGACommonState *s1, uint8_t *d,
+-                               const uint8_t *s, int width)
++static void vga_draw_line24_le(VGACommonState *vga, uint8_t *d,
++                               uint32_t addr, int width)
+ {
+     int w;
+     uint32_t r, g, b;
+ 
+     w = width;
+     do {
+-        b = s[0];
+-        g = s[1];
+-        r = s[2];
++        b = vga_read_byte(vga, addr + 0);
++        g = vga_read_byte(vga, addr + 1);
++        r = vga_read_byte(vga, addr + 2);
+         ((uint32_t *)d)[0] = rgb_to_pixel32(r, g, b);
+-        s += 3;
++        addr += 3;
+         d += 4;
+     } while (--w != 0);
+ }
+ 
+-static void vga_draw_line24_be(VGACommonState *s1, uint8_t *d,
+-                               const uint8_t *s, int width)
++static void vga_draw_line24_be(VGACommonState *vga, uint8_t *d,
++                               uint32_t addr, int width)
+ {
+     int w;
+     uint32_t r, g, b;
+ 
+     w = width;
+     do {
+-        r = s[0];
+-        g = s[1];
+-        b = s[2];
++        r = vga_read_byte(vga, addr + 0);
++        g = vga_read_byte(vga, addr + 1);
++        b = vga_read_byte(vga, addr + 2);
+         ((uint32_t *)d)[0] = rgb_to_pixel32(r, g, b);
+-        s += 3;
++        addr += 3;
+         d += 4;
+     } while (--w != 0);
+ }
+@@ -396,44 +422,36 @@ static void vga_draw_line24_be(VGACommonState *s1, uint8_t *d,
+ /*
+  * 32 bit color
+  */
+-static void vga_draw_line32_le(VGACommonState *s1, uint8_t *d,
+-                               const uint8_t *s, int width)
++static void vga_draw_line32_le(VGACommonState *vga, uint8_t *d,
++                               uint32_t addr, int width)
+ {
+-#ifndef HOST_WORDS_BIGENDIAN
+-    memcpy(d, s, width * 4);
+-#else
+     int w;
+     uint32_t r, g, b;
+ 
+     w = width;
+     do {
+-        b = s[0];
+-        g = s[1];
+-        r = s[2];
++        b = vga_read_byte(vga, addr + 0);
++        g = vga_read_byte(vga, addr + 1);
++        r = vga_read_byte(vga, addr + 2);
+         ((uint32_t *)d)[0] = rgb_to_pixel32(r, g, b);
+-        s += 4;
++        addr += 4;
+         d += 4;
+     } while (--w != 0);
+-#endif
+ }
+ 
+-static void vga_draw_line32_be(VGACommonState *s1, uint8_t *d,
+-                               const uint8_t *s, int width)
++static void vga_draw_line32_be(VGACommonState *vga, uint8_t *d,
++                               uint32_t addr, int width)
+ {
+-#ifdef HOST_WORDS_BIGENDIAN
+-    memcpy(d, s, width * 4);
+-#else
+     int w;
+     uint32_t r, g, b;
+ 
+     w = width;
+     do {
+-        r = s[1];
+-        g = s[2];
+-        b = s[3];
++        r = vga_read_byte(vga, addr + 1);
++        g = vga_read_byte(vga, addr + 2);
++        b = vga_read_byte(vga, addr + 3);
+         ((uint32_t *)d)[0] = rgb_to_pixel32(r, g, b);
+-        s += 4;
++        addr += 4;
+         d += 4;
+     } while (--w != 0);
+-#endif
+ }
+diff --git a/hw/display/vga_int.h b/hw/display/vga_int.h
+index dd6c958da3..ad34a1f048 100644
+--- a/hw/display/vga_int.h
++++ b/hw/display/vga_int.h
+@@ -94,6 +94,7 @@ typedef struct VGACommonState {
+     uint32_t vram_size;
+     uint32_t vram_size_mb; /* property */
+     uint32_t vbe_size;
++    uint32_t vbe_size_mask;
+     uint32_t latch;
+     bool has_chain4_alias;
+     MemoryRegion chain4_alias;
+diff --git a/hw/display/vga.c b/hw/display/vga.c
+index 63421f9ee8..4c2ee0be28 100644
+--- a/hw/display/vga.c
++++ b/hw/display/vga.c
+@@ -1005,7 +1005,7 @@ void vga_mem_writeb(VGACommonState *s, hwaddr addr, uint32_t val)
+ }
+ 
+ typedef void vga_draw_line_func(VGACommonState *s1, uint8_t *d,
+-                                const uint8_t *s, int width);
++                                uint32_t srcaddr, int width);
+ 
+ #include "vga-helpers.h"
+ 
+@@ -1660,7 +1660,7 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+             if (y_start < 0)
+                 y_start = y;
+             if (!(is_buffer_shared(surface))) {
+-                vga_draw_line(s, d, s->vram_ptr + addr, width);
++                vga_draw_line(s, d, addr, width);
+                 if (s->cursor_draw_line)
+                     s->cursor_draw_line(s, d, y);
+             }
+@@ -2164,6 +2164,7 @@ void vga_common_init(VGACommonState *s, Object *obj, bool global_vmstate)
+     if (!s->vbe_size) {
+         s->vbe_size = s->vram_size;
+     }
++    s->vbe_size_mask = s->vbe_size - 1;
+ 
+     s->is_vbe_vmstate = 1;
+     memory_region_init_ram_nomigrate(&s->vram, obj, "vga.vram", s->vram_size,
+-- 
+2.9.3
