@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <intermediadc@hotmail.com>) id 1dmHxb-0002re-RO
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 07:12:07 -0400
+	(envelope-from <intermediadc@hotmail.com>) id 1dmHzB-0003TQ-65
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 07:13:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <intermediadc@hotmail.com>) id 1dmHxV-0005Fl-PG
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 07:12:03 -0400
+	(envelope-from <intermediadc@hotmail.com>) id 1dmHz8-00060T-0L
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 07:13:41 -0400
 From: luigi burdo <intermediadc@hotmail.com>
-Date: Mon, 28 Aug 2017 11:11:50 +0000
-Message-ID: <AM5P194MB01322F148414154D28AFF2F2C89E0@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
-References: <mailman.4191.1503853034.21953.qemu-ppc@nongnu.org>
-	<AC464994-B6AC-4DBC-942D-8C5EA8ECCE0E@gmail.com>
-	<AM5P194MB0132478A4ED8333EA2FFA940C89E0@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
-	<20170828111039.4b5a280a@nial.brq.redhat.com>
-	<AM5P194MB013219B88ABEA53957934752C89E0@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>,
-	<20170828113212.53d8cac1@nial.brq.redhat.com>
-In-Reply-To: <20170828113212.53d8cac1@nial.brq.redhat.com>
+Date: Mon, 28 Aug 2017 11:13:36 +0000
+Message-ID: <AM5P194MB0132429A2A1999FEF3251524C89E0@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
+References: <cover.1503249785.git.balaton@eik.bme.hu>
+	<alpine.BSF.2.21.1708271402040.1289@zero.eik.bme.hu>
+	<AM5P194MB01323322D359DF607B54C19EC8990@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>,
+	<ffb13f14-0a72-f3cc-baa7-c17355d00730@redhat.com>
+In-Reply-To: <ffb13f14-0a72-f3cc-baa7-c17355d00730@redhat.com>
 Content-Language: it-IT
 MIME-Version: 1.0
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Qemu 2.10 rc4 build issue on BE (luigi burdo)
+Subject: Re: [Qemu-devel] [Qemu-ppc] Qemu 2.10 rc4 build issue on BE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +26,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Programmingkid <programmingkidx@gmail.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
 
-Ok igor,
+Hi Thomas,
 
-i will download and build again and report
+i will check again and report.
 
 Luigi
 
 
-________________________________
-Da: Igor Mammedov <imammedo@redhat.com>
-Inviato: luned=EC 28 agosto 2017 11:32
-A: luigi burdo
-Cc: Programmingkid; qemu-ppc@nongnu.org; qemu-devel@nongnu.org qemu-devel
-Oggetto: Re: [Qemu-devel] Qemu 2.10 rc4 build issue on BE (luigi burdo)
 
-On Mon, 28 Aug 2017 09:14:48 +0000
-luigi burdo <intermediadc@hotmail.com> wrote:
+In your log there is:
 
-> Hi Igor,
->
->
-> below errors look like corrupted source files
->
-> >
->
->
-> i ust dowloaded the compressed file from qemu website,unzipped with tar f=
-rom console (like i usually did)  and run configure and make.
->
-> can be the file of rc4 from qemu website not right and need a repack?
-I've just downloaded it from http://download.qemu-project.org/qemu-2.10.0-r=
-c4.tar.xz
-and unpacked, it works for me (i.e. hw/i386/pc.c isn't corrupted).
 
->
-> Luigi
->
+But if you have a look at the freshly unpacked sources, that line
+clearly reads "goto out;" and not "gCto out;" ... so it looks like
+something messed up your sources very badly.
+Can you reproduce this problem when starting again from scratch?
+
+ Thomas
