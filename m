@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dmOKS-0000As-4z
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 14:00:08 -0400
+	(envelope-from <mst@redhat.com>) id 1dmOO2-0002aS-2m
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 14:03:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dmOKO-0008IP-6O
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 14:00:04 -0400
-Resent-Message-Id: <E1dmOKO-0008IP-6O@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21326)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dmOKN-0008Hu-UI
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 14:00:00 -0400
-In-Reply-To: <20170828174707.20786-1-famz@redhat.com>
-Message-ID: <150394317426.30.4061505269299378548@b5667b65043c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <mst@redhat.com>) id 1dmOO0-0001mq-90
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 14:03:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36292)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dmONz-0001lv-VA
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 14:03:44 -0400
+Date: Mon, 28 Aug 2017 21:03:34 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170828204659-mutt-send-email-mst@kernel.org>
+References: <1503914913-28893-1-git-send-email-wei.w.wang@intel.com>
+	<1503914913-28893-4-git-send-email-wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 28 Aug 2017 10:59:36 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v4 00/10] tests: Add VM based build tests
- (for non-x86_64 and/or non-Linux)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1503914913-28893-4-git-send-email-wei.w.wang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v15 3/5] virtio-balloon: VIRTIO_BALLOON_F_SG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +27,356 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, crosa@redhat.com, f4bug@amsat.org, kamil@netbsd.org, stefanha@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA4MjgxNzQ3MDcuMjA3ODYtMS1mYW16QHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxd
-IFtQQVRDSCB2NCAwMC8xMF0gdGVzdHM6IEFkZCBWTSBiYXNlZCBidWlsZCB0ZXN0cyAoZm9yIG5v
-bi14ODZfNjQgYW5kL29yIG5vbi1MaW51eCkKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9u
-ZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1p
-dHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRj
-b21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cg
-LW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVt
-YWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAg
-ZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRm
-YWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
-MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1w
-cm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE3MDgyODE3
-NDcwNy4yMDc4Ni0xLWZhbXpAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwODI4MTc0NzA3LjIw
-Nzg2LTEtZmFtekByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZjNi
-MWJkYTg0OCB0ZXN0czogQWRkIFJFQURNRSBmb3Igdm0gdGVzdHMKMDQ3MDBiZTA3NCBNQUlOVEFJ
-TkVSUzogQWRkIHRlc3RzL3ZtIGVudHJ5CmEwY2E3MTBjOTEgTWFrZWZpbGU6IEFkZCBydWxlcyB0
-byBydW4gdm0gdGVzdHMKNGMwYjJiZDY4MyB0ZXN0czogQWRkIE9wZW5CU0QgaW1hZ2UKZDgwYzIx
-NzM0OSB0ZXN0czogQWRkIE5ldEJTRCBpbWFnZQo2NjI2ZmRmYWQ1IHRlc3RzOiBBZGQgRnJlZUJT
-RCBpbWFnZQplNWMwNGYyOTQzIHRlc3RzOiBBZGQgdWJ1bnR1LmkzODYgaW1hZ2UKYmI0MzQ1MDQ1
-OSB0ZXN0czogQWRkIHZtIHRlc3QgbGliCjNjMzJmNTZmZWEgcWVtdS5weTogQWRkICJ3YWl0KCki
-IG1ldGhvZAozNDlhMjlkNGFkIGdpdGlnbm9yZTogSWdub3JlIHZtIHRlc3QgaW1hZ2VzCgo9PT0g
-T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzEwOiBnaXRpZ25vcmU6IElnbm9yZSB2
-bSB0ZXN0IGltYWdlcy4uLgpDaGVja2luZyBQQVRDSCAyLzEwOiBxZW11LnB5OiBBZGQgIndhaXQo
-KSIgbWV0aG9kLi4uCkNoZWNraW5nIFBBVENIIDMvMTA6IHRlc3RzOiBBZGQgdm0gdGVzdCBsaWIu
-Li4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM4NTogRklMRTogdGVzdHMvdm0vYmFz
-ZXZtLnB5OjYwOgorc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFCQVFDaWtDNDZX
-WXRYb3RVZDBVR1B6OTU0N0FqMEtxQzRnaytudDRCQkptODZJSGdDRDlGeWdTR1g5RUZ1dFhsaHo5
-S1pJUGc5T2trNytJelhSSENXSTJNTnZocmNqeXJlektSRW03MXowOGo5aXdmeFkzMzQwZlkyTW8r
-MGtod3BPN2J6c2d6a2xqSElIcWNPZzdNZ3R0UEluVk1OSC9FZnFwZ1I4RURLSnVXQ0IyTnkrRUJG
-Ti8zZEFpZmYwWC9FdktsZTlQVXJZNzBFa1N5Y255VVJTOEhaUmVFcWo4bE45SjVrWHpBOEY2akJv
-LzBRNDJUdHY2ZTRrNVljYURyd21MckJXTHJhMlBDWFpMTnlIcVhFaUZrR21kWHRBMUVveDlnYy9w
-NGpJWGltNnhyUE5tcE42V3lyckVqYUNGNXhZdk52OHdYa0Q2dVNXd2JIWVUyNGxJQW4gcWVtdS12
-bS1rZXkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMDY6IEZJTEU6IHRlc3Rz
-L3ZtL2Jhc2V2bS5weToxODE6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgImZpbGU9JXMs
-aWY9bm9uZSxpZD0lcyxjYWNoZT13cml0ZWJhY2ssZm9ybWF0PXJhdyIgJSBcCgpXQVJOSU5HOiBs
-aW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjA5OiBGSUxFOiB0ZXN0cy92bS9iYXNldm0ucHk6MTg0
-OgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICJ2aXJ0aW8tYmxrLGRyaXZlPSVzLHNlcmlh
-bD0lcyxib290aW5kZXg9MSIgJSAobmFtZSwgbmFtZSldCgpFUlJPUjogbGluZSBvdmVyIDkwIGNo
-YXJhY3RlcnMKIzI1NjogRklMRTogdGVzdHMvdm0vYmFzZXZtLnB5OjIzMToKKyAgICBWTSB0ZXN0
-IHV0aWxpdHkuICBFeGl0IGNvZGVzOiAwID0gc3VjY2VzcywgMSA9IGNvbW1hbmQgbGluZSBlcnJv
-ciwgMiA9IGVudmlyb25tZW50IGluaXRpYWxpemF0aW9uIGZhaWxlZCwgMyA9IHRlc3QgY29tbWFu
-ZCBmYWlsZWQiIiIpCgp0b3RhbDogMiBlcnJvcnMsIDIgd2FybmluZ3MsIDI4NyBsaW5lcyBjaGVj
-a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
-SCA0LzEwOiB0ZXN0czogQWRkIHVidW50dS5pMzg2IGltYWdlLi4uCkNoZWNraW5nIFBBVENIIDUv
-MTA6IHRlc3RzOiBBZGQgRnJlZUJTRCBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCA2LzEwOiB0ZXN0
-czogQWRkIE5ldEJTRCBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCA3LzEwOiB0ZXN0czogQWRkIE9w
-ZW5CU0QgaW1hZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xMDogTWFrZWZpbGU6IEFkZCBydWxlcyB0
-byBydW4gdm0gdGVzdHMuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xMDogTUFJTlRBSU5FUlM6IEFkZCB0
-ZXN0cy92bSBlbnRyeS4uLgpDaGVja2luZyBQQVRDSCAxMC8xMDogdGVzdHM6IEFkZCBSRUFETUUg
-Zm9yIHZtIHRlc3RzLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
-aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
-dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
-Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Mon, Aug 28, 2017 at 06:08:31PM +0800, Wei Wang wrote:
+> Add a new feature, VIRTIO_BALLOON_F_SG, which enables the transfer
+> of balloon (i.e. inflated/deflated) pages using scatter-gather lists
+> to the host.
+> 
+> The implementation of the previous virtio-balloon is not very
+> efficient, because the balloon pages are transferred to the
+> host one by one. Here is the breakdown of the time in percentage
+> spent on each step of the balloon inflating process (inflating
+> 7GB of an 8GB idle guest).
+> 
+> 1) allocating pages (6.5%)
+> 2) sending PFNs to host (68.3%)
+> 3) address translation (6.1%)
+> 4) madvise (19%)
+> 
+> It takes about 4126ms for the inflating process to complete.
+> The above profiling shows that the bottlenecks are stage 2)
+> and stage 4).
+> 
+> This patch optimizes step 2) by transferring pages to the host in
+> sgs. An sg describes a chunk of guest physically continuous pages.
+> With this mechanism, step 4) can also be optimized by doing address
+> translation and madvise() in chunks rather than page by page.
+> 
+> With this new feature, the above ballooning process takes ~597ms
+> resulting in an improvement of ~86%.
+> 
+> TODO: optimize stage 1) by allocating/freeing a chunk of pages
+> instead of a single page each time.
+> 
+> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> Signed-off-by: Liang Li <liang.z.li@intel.com>
+> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  drivers/virtio/virtio_balloon.c     | 171 ++++++++++++++++++++++++++++++++----
+>  include/uapi/linux/virtio_balloon.h |   1 +
+>  2 files changed, 155 insertions(+), 17 deletions(-)
+> 
+> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
+> index f0b3a0b..8ecc1d4 100644
+> --- a/drivers/virtio/virtio_balloon.c
+> +++ b/drivers/virtio/virtio_balloon.c
+> @@ -32,6 +32,8 @@
+>  #include <linux/mm.h>
+>  #include <linux/mount.h>
+>  #include <linux/magic.h>
+> +#include <linux/xbitmap.h>
+> +#include <asm/page.h>
+>  
+>  /*
+>   * Balloon device works in 4K page units.  So each page is pointed to by
+> @@ -79,6 +81,9 @@ struct virtio_balloon {
+>  	/* Synchronize access/update to this struct virtio_balloon elements */
+>  	struct mutex balloon_lock;
+>  
+> +	/* The xbitmap used to record balloon pages */
+> +	struct xb page_xb;
+> +
+>  	/* The array of pfns we tell the Host about. */
+>  	unsigned int num_pfns;
+>  	__virtio32 pfns[VIRTIO_BALLOON_ARRAY_PFNS_MAX];
+> @@ -141,13 +146,111 @@ static void set_page_pfns(struct virtio_balloon *vb,
+>  					  page_to_balloon_pfn(page) + i);
+>  }
+>  
+> +static int add_one_sg(struct virtqueue *vq, void *addr, uint32_t size)
+> +{
+> +	struct scatterlist sg;
+> +
+> +	sg_init_one(&sg, addr, size);
+> +	return virtqueue_add_inbuf(vq, &sg, 1, vq, GFP_KERNEL);
+> +}
+> +
+> +static void send_balloon_page_sg(struct virtio_balloon *vb,
+> +				 struct virtqueue *vq,
+> +				 void *addr,
+> +				 uint32_t size,
+> +				 bool batch)
+> +{
+> +	unsigned int len;
+> +	int err;
+> +
+> +	err = add_one_sg(vq, addr, size);
+> +	/* Sanity check: this can't really happen */
+> +	WARN_ON(err);
+
+It might be cleaner to detect that add failed due to
+ring full and kick then. Just an idea, up to you
+whether to do it.
+
+> +
+> +	/* If batching is in use, we batch the sgs till the vq is full. */
+> +	if (!batch || !vq->num_free) {
+> +		virtqueue_kick(vq);
+> +		wait_event(vb->acked, virtqueue_get_buf(vq, &len));
+> +		/* Release all the entries if there are */
+
+Meaning
+	Account for all used entries if any
+?
+
+> +		while (virtqueue_get_buf(vq, &len))
+> +			;
+
+
+Above code is reused below. Add a function?
+
+> +	}
+> +}
+> +
+> +/*
+> + * Send balloon pages in sgs to host. The balloon pages are recorded in the
+> + * page xbitmap. Each bit in the bitmap corresponds to a page of PAGE_SIZE.
+> + * The page xbitmap is searched for continuous "1" bits, which correspond
+> + * to continuous pages, to chunk into sgs.
+> + *
+> + * @page_xb_start and @page_xb_end form the range of bits in the xbitmap that
+> + * need to be searched.
+> + */
+> +static void tell_host_sgs(struct virtio_balloon *vb,
+> +			  struct virtqueue *vq,
+> +			  unsigned long page_xb_start,
+> +			  unsigned long page_xb_end)
+> +{
+> +	unsigned long sg_pfn_start, sg_pfn_end;
+> +	void *sg_addr;
+> +	uint32_t sg_len, sg_max_len = round_down(UINT_MAX, PAGE_SIZE);
+> +
+> +	sg_pfn_start = page_xb_start;
+> +	while (sg_pfn_start < page_xb_end) {
+> +		sg_pfn_start = xb_find_next_bit(&vb->page_xb, sg_pfn_start,
+> +						page_xb_end, 1);
+> +		if (sg_pfn_start == page_xb_end + 1)
+> +			break;
+> +		sg_pfn_end = xb_find_next_bit(&vb->page_xb, sg_pfn_start + 1,
+> +					      page_xb_end, 0);
+> +		sg_addr = (void *)pfn_to_kaddr(sg_pfn_start);
+> +		sg_len = (sg_pfn_end - sg_pfn_start) << PAGE_SHIFT;
+> +		while (sg_len > sg_max_len) {
+> +			send_balloon_page_sg(vb, vq, sg_addr, sg_max_len, 1);
+
+Last argument should be true, not 1.
+
+> +			sg_addr += sg_max_len;
+> +			sg_len -= sg_max_len;
+> +		}
+> +		send_balloon_page_sg(vb, vq, sg_addr, sg_len, 1);
+> +		xb_zero(&vb->page_xb, sg_pfn_start, sg_pfn_end);
+> +		sg_pfn_start = sg_pfn_end + 1;
+> +	}
+> +
+> +	/*
+> +	 * The last few sgs may not reach the batch size, but need a kick to
+> +	 * notify the device to handle them.
+> +	 */
+> +	if (vq->num_free != virtqueue_get_vring_size(vq)) {
+> +		virtqueue_kick(vq);
+> +		wait_event(vb->acked, virtqueue_get_buf(vq, &sg_len));
+> +		while (virtqueue_get_buf(vq, &sg_len))
+> +			;
+
+Some entries can get used after a pause. Looks like they will leak then?
+One fix would be to convert above if to a while loop.
+I don't know whether to do it like this in send_balloon_page_sg too.
+
+> +	}
+> +}
+> +
+> +static inline void xb_set_page(struct virtio_balloon *vb,
+> +			       struct page *page,
+> +			       unsigned long *pfn_min,
+> +			       unsigned long *pfn_max)
+> +{
+> +	unsigned long pfn = page_to_pfn(page);
+> +
+> +	*pfn_min = min(pfn, *pfn_min);
+> +	*pfn_max = max(pfn, *pfn_max);
+> +	xb_preload(GFP_KERNEL);
+> +	xb_set_bit(&vb->page_xb, pfn);
+> +	xb_preload_end();
+> +}
+> +
+>  static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+>  {
+>  	struct balloon_dev_info *vb_dev_info = &vb->vb_dev_info;
+>  	unsigned num_allocated_pages;
+> +	bool use_sg = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
+> +	unsigned long pfn_max = 0, pfn_min = ULONG_MAX;
+>  
+>  	/* We can only do one array worth at a time. */
+> -	num = min(num, ARRAY_SIZE(vb->pfns));
+> +	if (!use_sg)
+> +		num = min(num, ARRAY_SIZE(vb->pfns));
+>  
+>  	mutex_lock(&vb->balloon_lock);
+>  	for (vb->num_pfns = 0; vb->num_pfns < num;
+> @@ -162,7 +265,12 @@ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+>  			msleep(200);
+>  			break;
+>  		}
+> -		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+> +
+> +		if (use_sg)
+> +			xb_set_page(vb, page, &pfn_min, &pfn_max);
+> +		else
+> +			set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+> +
+>  		vb->num_pages += VIRTIO_BALLOON_PAGES_PER_PAGE;
+>  		if (!virtio_has_feature(vb->vdev,
+>  					VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
+> @@ -171,8 +279,12 @@ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
+>  
+>  	num_allocated_pages = vb->num_pfns;
+>  	/* Did we get any? */
+> -	if (vb->num_pfns != 0)
+> -		tell_host(vb, vb->inflate_vq);
+> +	if (vb->num_pfns) {
+> +		if (use_sg)
+> +			tell_host_sgs(vb, vb->inflate_vq, pfn_min, pfn_max);
+> +		else
+> +			tell_host(vb, vb->inflate_vq);
+> +	}
+>  	mutex_unlock(&vb->balloon_lock);
+>  
+>  	return num_allocated_pages;
+> @@ -198,9 +310,12 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
+>  	struct page *page;
+>  	struct balloon_dev_info *vb_dev_info = &vb->vb_dev_info;
+>  	LIST_HEAD(pages);
+> +	bool use_sg = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
+> +	unsigned long pfn_max = 0, pfn_min = ULONG_MAX;
+>  
+> -	/* We can only do one array worth at a time. */
+> -	num = min(num, ARRAY_SIZE(vb->pfns));
+> +	/* Traditionally, we can only do one array worth at a time. */
+> +	if (!use_sg)
+> +		num = min(num, ARRAY_SIZE(vb->pfns));
+>  
+>  	mutex_lock(&vb->balloon_lock);
+>  	/* We can't release more pages than taken */
+> @@ -210,7 +325,11 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
+>  		page = balloon_page_dequeue(vb_dev_info);
+>  		if (!page)
+>  			break;
+> -		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+> +		if (use_sg)
+> +			xb_set_page(vb, page, &pfn_min, &pfn_max);
+> +		else
+> +			set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
+> +
+>  		list_add(&page->lru, &pages);
+>  		vb->num_pages -= VIRTIO_BALLOON_PAGES_PER_PAGE;
+>  	}
+> @@ -221,8 +340,12 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
+>  	 * virtio_has_feature(vdev, VIRTIO_BALLOON_F_MUST_TELL_HOST);
+>  	 * is true, we *have* to do it in this order
+>  	 */
+> -	if (vb->num_pfns != 0)
+> -		tell_host(vb, vb->deflate_vq);
+> +	if (vb->num_pfns) {
+> +		if (use_sg)
+> +			tell_host_sgs(vb, vb->deflate_vq, pfn_min, pfn_max);
+> +		else
+> +			tell_host(vb, vb->deflate_vq);
+> +	}
+>  	release_pages_balloon(vb, &pages);
+>  	mutex_unlock(&vb->balloon_lock);
+>  	return num_freed_pages;
+> @@ -441,6 +564,7 @@ static int init_vqs(struct virtio_balloon *vb)
+>  }
+>  
+>  #ifdef CONFIG_BALLOON_COMPACTION
+> +
+>  /*
+>   * virtballoon_migratepage - perform the balloon page migration on behalf of
+>   *			     a compation thread.     (called under page lock)
+> @@ -464,6 +588,7 @@ static int virtballoon_migratepage(struct balloon_dev_info *vb_dev_info,
+>  {
+>  	struct virtio_balloon *vb = container_of(vb_dev_info,
+>  			struct virtio_balloon, vb_dev_info);
+> +	bool use_sg = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_SG);
+>  	unsigned long flags;
+>  
+>  	/*
+> @@ -485,16 +610,24 @@ static int virtballoon_migratepage(struct balloon_dev_info *vb_dev_info,
+>  	vb_dev_info->isolated_pages--;
+>  	__count_vm_event(BALLOON_MIGRATE);
+>  	spin_unlock_irqrestore(&vb_dev_info->pages_lock, flags);
+> -	vb->num_pfns = VIRTIO_BALLOON_PAGES_PER_PAGE;
+> -	set_page_pfns(vb, vb->pfns, newpage);
+> -	tell_host(vb, vb->inflate_vq);
+> -
+> +	if (use_sg) {
+> +		send_balloon_page_sg(vb, vb->inflate_vq, page_address(newpage),
+> +				     PAGE_SIZE, 0);
+> +	} else {
+> +		vb->num_pfns = VIRTIO_BALLOON_PAGES_PER_PAGE;
+> +		set_page_pfns(vb, vb->pfns, newpage);
+> +		tell_host(vb, vb->inflate_vq);
+> +	}
+>  	/* balloon's page migration 2nd step -- deflate "page" */
+>  	balloon_page_delete(page);
+> -	vb->num_pfns = VIRTIO_BALLOON_PAGES_PER_PAGE;
+> -	set_page_pfns(vb, vb->pfns, page);
+> -	tell_host(vb, vb->deflate_vq);
+> -
+> +	if (use_sg) {
+> +		send_balloon_page_sg(vb, vb->deflate_vq, page_address(page),
+> +				     PAGE_SIZE, 0);
+> +	} else {
+> +		vb->num_pfns = VIRTIO_BALLOON_PAGES_PER_PAGE;
+> +		set_page_pfns(vb, vb->pfns, page);
+> +		tell_host(vb, vb->deflate_vq);
+> +	}
+>  	mutex_unlock(&vb->balloon_lock);
+>  
+>  	put_page(page); /* balloon reference */
+> @@ -553,6 +686,9 @@ static int virtballoon_probe(struct virtio_device *vdev)
+>  	if (err)
+>  		goto out_free_vb;
+>  
+> +	if (virtio_has_feature(vdev, VIRTIO_BALLOON_F_SG))
+> +		xb_init(&vb->page_xb);
+> +
+>  	vb->nb.notifier_call = virtballoon_oom_notify;
+>  	vb->nb.priority = VIRTBALLOON_OOM_NOTIFY_PRIORITY;
+>  	err = register_oom_notifier(&vb->nb);
+> @@ -669,6 +805,7 @@ static unsigned int features[] = {
+>  	VIRTIO_BALLOON_F_MUST_TELL_HOST,
+>  	VIRTIO_BALLOON_F_STATS_VQ,
+>  	VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
+> +	VIRTIO_BALLOON_F_SG,
+>  };
+>  
+>  static struct virtio_driver virtio_balloon_driver = {
+> diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
+> index 343d7dd..37780a7 100644
+> --- a/include/uapi/linux/virtio_balloon.h
+> +++ b/include/uapi/linux/virtio_balloon.h
+> @@ -34,6 +34,7 @@
+>  #define VIRTIO_BALLOON_F_MUST_TELL_HOST	0 /* Tell before reclaiming pages */
+>  #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue */
+>  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
+> +#define VIRTIO_BALLOON_F_SG		3 /* Use sg instead of PFN lists */
+>  
+>  /* Size of a PFN in the balloon interface. */
+>  #define VIRTIO_BALLOON_PFN_SHIFT 12
+> -- 
+> 2.7.4
