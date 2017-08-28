@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dmRol-0007ZM-Pc
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:43:36 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dmRsH-0008Vg-Ls
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:47:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dmRok-00044r-Vz
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:43:35 -0400
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:34294)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1dmRok-00044l-Ry
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:43:34 -0400
-Received: by mail-io0-x244.google.com with SMTP id d81so836095ioj.1
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 14:43:34 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1dmRsD-0005vm-PJ
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:47:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57244)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1dmRsD-0005vM-Ic
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:47:09 -0400
+References: <20170825155732.15665-1-stefanha@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <7e7711c2-1618-2212-847b-f069aabb0015@redhat.com>
+Date: Mon, 28 Aug 2017 17:47:05 -0400
 MIME-Version: 1.0
-In-Reply-To: <8f6169d2-107c-ef7b-cc6f-1ad40a25365f@linaro.org>
-References: <20170828035327.17146-1-bobby.prani@gmail.com>
-	<20170828035327.17146-2-bobby.prani@gmail.com>
-	<8f6169d2-107c-ef7b-cc6f-1ad40a25365f@linaro.org>
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Mon, 28 Aug 2017 17:43:03 -0400
-Message-ID: <CAJhHMCD-Ti84xKXh=7TCTgDKQ5YhvRtVAqfpO_iVXrU+RjfF1A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH 2/3] cpus-common: Cache allocated work
- items
+In-Reply-To: <20170825155732.15665-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] scripts: add argparse module for
+ Python 2.6 compatibility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Sergey Fedorov <serge.fdrv@gmail.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: chugh.ishani@research.iiit.ac.in
 
-On Mon, Aug 28, 2017 at 1:47 PM, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 08/27/2017 08:53 PM, Pranith Kumar wrote:
->> Using heaptrack, I found that quite a few of our temporary allocations
->> are coming from allocating work items. Instead of doing this
->> continously, we can cache the allocated items and reuse them instead
->> of freeing them.
->>
->> This reduces the number of allocations by 25% (200000 -> 150000 for
->> ARM64 boot+shutdown test).
->>
->> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
->
-> Why does this list need to record a "last" element?
-> It would seem a simple lifo would be sufficient.
->
-> (You would also be able to manage the list via cmpxchg without a separate lock,
-> but perhaps the difference between the two isn't measurable.)
->
 
-Yes, seems like a better design choice. Will fix in next iteration.
 
-Thanks,
--- 
-Pranith
+On 08/25/2017 11:57 AM, Stefan Hajnoczi wrote:
+> Many scripts can benefit from the standard library argparse module, which has
+> improvements over the older optparse module.  Unfortunately argparse was only
+> shipped in Python 2.7 so we need a fallback for Python 2.6.
+> 
+> This patch series adds a copy of argparse.py and updates scripts as necessary
+> to import it.
+> 
+> Stefan Hajnoczi (3):
+>   scripts: add argparse module for Python 2.6 compatibility
+>   docker.py: Python 2.6 argparse compatibility
+>   tests: migration/guestperf Python 2.6 argparse compatibility
+> 
+>  COPYING.PYTHON                     |  270 ++++
+>  scripts/argparse.py                | 2406 ++++++++++++++++++++++++++++++++++++
+>  tests/docker/docker.py             |    4 +-
+>  tests/migration/guestperf/shell.py |    8 +-
+>  4 files changed, 2684 insertions(+), 4 deletions(-)
+>  create mode 100644 COPYING.PYTHON
+>  create mode 100644 scripts/argparse.py
+> 
+
+Acked-by: John Snow <jsnow@redhat.com>
+
+Seems sane to me, provided it actually works in those 2.6 contexts we
+wish it to...
