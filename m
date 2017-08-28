@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dmOSX-00044M-0W
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 14:08:32 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dmOVl-000570-Nm
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 14:11:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dmOSV-0004mb-Uv
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 14:08:24 -0400
-Date: Mon, 28 Aug 2017 21:08:14 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170828210709-mutt-send-email-mst@kernel.org>
-References: <1503938085-169486-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1dmOVk-0006qj-Sg
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 14:11:45 -0400
+References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
+	<a81c8dfb-3d98-57ad-8159-5147283433fa@virtuozzo.com>
+	<cb783ebb-198e-1814-2f9c-aec93c83b17a@virtuozzo.com>
+	<0988b4ef-56e2-5ce9-ed25-40a742eadbd4@redhat.com>
+	<b0d72a26-2052-ecc6-67f5-d32572804ebf@redhat.com>
+	<20170828025706.GA18194@lemon.lan>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <923084c5-f1a8-e361-2e4e-b635249a59be@redhat.com>
+Date: Mon, 28 Aug 2017 14:11:24 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1503938085-169486-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.11] ide: ahci: unparent children
- buses before freeing their memory
+In-Reply-To: <20170828025706.GA18194@lemon.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Persistent bitmaps for non-qcow2 formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,69 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, qemu-block@nongnu.org, thuth@redhat.com, f4bug@amsat.org
+To: Nir Soffer <nsoffer@redhat.com>, Yaniv Dary <ydary@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>
 
-On Mon, Aug 28, 2017 at 06:34:45PM +0200, Igor Mammedov wrote:
-> Fixes read after freeing error reported
->   https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg04243.html
->   Message-Id: <59a56959-ca12-ea75-33fa-ff07eba1b090@redhat.com>
-> 
-> ich9-ahci device creates ide buses and attaches them as QOM children
-> at realize time, however it forgets to properly clean them up
-> at unrealize time and frees memory containing these children,
-> with following call-chain:
-> 
->    qdev_device_add()
->      object_property_set_bool('realized', true)
->        device_set_realized()
->           ...
->           pci_qdev_realize() -> pci_ich9_ahci_realize() -> ahci_realize()
->                ...
->                s->dev = g_new0(AHCIDevice, ports);
->                ...
->                   AHCIDevice *ad = &s->dev[i];
->                   ide_bus_new(&ad->port, sizeof(ad->port), qdev, i, 1);
->                   ^^^ creates bus in memory allocated by above gnew()
->                       and adds it as child propety to ahci device
->           ...
->           hotplug_handler_plug(); -> goto post_realize_fail;
->           pci_qdev_unrealize() -> pci_ich9_uninit() -> ahci_uninit()
->               ...
->                g_free(s->dev);
->                ^^^ free memory that holds children busses
-> 
->           return with error from device_set_realized()
-> 
-> As result later when qdev_device_add() tries to unparent ich9-ahci
-> after failed device_set_realized(),
->     object_unparent() -> object_property_del_child()
-> iterates over existing QOM children including buses added by
-> ide_bus_new() and tries to unparent them, which causes access to
-> freed memory where they where located.
-> 
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-Pls merge through ide tree.
-
-> ---
->  hw/ide/ahci.c | 1 +
->  1 file changed, 1 insertion(+)
+On 08/27/2017 10:57 PM, Fam Zheng wrote:
+> On Fri, 08/25 15:44, Max Reitz wrote:
+>> Well, OK.  The main argument against supporting anything but qcow2 is
+>> "if you want features, use qcow2; and we are working on making qcow2 as
+>> fast as possible."  I think that's a very good argument still.  At some
+>> point I (and probably others, too) had the idea of making qcow2 files in
+>> raw layout: 
 > 
-> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-> index 406a1b5..ccbe091 100644
-> --- a/hw/ide/ahci.c
-> +++ b/hw/ide/ahci.c
-> @@ -1495,6 +1495,7 @@ void ahci_uninit(AHCIState *s)
->  
->              ide_exit(s);
->          }
-> +        object_unparent(OBJECT(&ad->port));
->      }
->  
->      g_free(s->dev);
-> -- 
-> 2.7.4
+> 
+> Yes! I think this idea makes a whole lot of sense, too. Metadata tables can be
+> generated so old implementation can still use it.
+> 
+> Fam
+> 
+>> Have the data as a blob, just like a raw file, padded by
+>> metadata around it.  An autoclear flag would specify that the qcow2 file
+>> is in this format, and if so, you could simply access it like a raw file
+>> and should have exactly the same speed as a raw file.  Maybe that would
+>> solve this whole issue, too?
+
+I wonder if this would be sufficient to alleviate the desire to use raw
+files...
+
+(Eh, well, realistically, someone's still always going to ask if they
+can use various features with non-qcow2 files...)
+
+Nir, Yaniv; any input?
+
+(Context: We're debating how to add persistent bitmaps to raw files as I
+was informed that RHV was 'asking about it.' Max is reminding me there
+is a proposal for a style of QCOW2 that uses a raw layout for data,
+mitigating or eliminating any performance hits related to the L2 cache.
+What I am not aware of is why RHV would use raw files for any purpose.
+Is it performance? Simplicity? Could RHV use a raw-layout qcow2?)
+
+--js
