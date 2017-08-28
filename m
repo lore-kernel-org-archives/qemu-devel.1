@@ -1,42 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dmLaL-0007VI-1N
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:04:18 -0400
+	(envelope-from <bounces@canonical.com>) id 1dmLgn-0001PW-Kk
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:10:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dmLaF-0003BM-Uz
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:04:17 -0400
-Received: from mail-qk0-x22a.google.com ([2607:f8b0:400d:c09::22a]:38356)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dmLaF-0003Ap-Pa
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:04:11 -0400
-Received: by mail-qk0-x22a.google.com with SMTP id m4so3364564qke.5
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 08:04:11 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1503667215.git.alifm@linux.vnet.ibm.com>
-	<3ed8b810b6592daee6a775037ce21f850e40647d.1503667215.git.alifm@linux.vnet.ibm.com>
-	<20170825160408.2775c8b5.cohuck@redhat.com>
-	<00d41b2b-cf22-c9e2-8d9f-de947f4d3f18@linux.vnet.ibm.com>
-	<20170828102214.7aad9112.cohuck@redhat.com>
-	<caab4ec1-763a-8dfb-5e88-295a43a41e68@linux.vnet.ibm.com>
-	<20170828150653.7cdc8c5a.cohuck@redhat.com>
-	<c7e3a1cb-10e6-4c2d-0225-2bcbe9c97de6@linux.vnet.ibm.com>
-	<c61c8ee1-3bca-41db-33a7-b65186a80d25@de.ibm.com>
-	<b5a9ab05-4e3c-66bc-33ce-d953d7f911e2@linux.vnet.ibm.com>
-	<20170828160554.45855dfa.cohuck@redhat.com>
-	<e3f0c9c1-b576-b9bb-66e2-53c2ef94b91b@linux.vnet.ibm.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <0154068e-9f8c-bbb4-cd75-2e175fd5ebc7@amsat.org>
-Date: Mon, 28 Aug 2017 12:04:05 -0300
+	(envelope-from <bounces@canonical.com>) id 1dmLgi-0006BK-Gk
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:10:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46568)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dmLgi-0006B1-7D
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:10:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dmLgg-0007m8-Td
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 15:10:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D0F322E80CC
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 15:10:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <e3f0c9c1-b576-b9bb-66e2-53c2ef94b91b@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390-ccw: Fix alignment for CCW1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 28 Aug 2017 15:00:20 -0000
+From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
+Reply-To: Bug 1713516 <1713516@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <150393242075.17409.12611454342433237568.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1713516] [NEW] qemu crashes with "GLib-ERROR **:
+ gmem.c" error when a negative value passed to smp threads, cores
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,48 +36,236 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: farman@linux.vnet.ibm.com, Christian Borntraeger <borntraeger@de.ibm.com>, pasic@linux.vnet.ibm.com, walling@linux.vnet.ibm.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-Hi Farhan,
+Public bug reported:
 
-On 08/28/2017 11:15 AM, Farhan Ali wrote:
-> On 08/28/2017 10:05 AM, Cornelia Huck wrote:
->>>>> It's the alignment of the CCW which causes the problem.
->>>>>
->>>>> The exact error message when starting the guest was:
->>>>>
->>>>> ! No virtio device found !
->>>>>
->>>>> Since it worked for SCSI and CDL, and failed for LDL disks on that 
->>>>> particular system, we are not really sure what caused the failure.
->>>>> Debugging it further showed the CCW for LDL disks were not aligned 
->>>>> at double word boundary.
->> This is really, really odd, as the low-level ccw code is the same for
->> any disk type...
->>
-> Exactly!
-> 
->>>>> Trying the test on a different system with LDL disks worked fine, 
->>>>> with the aligned(8) fix.
->>>> Do you happen to have an old s390-ccw.img laying around in the test 
->>>> folder? QEMU might pick up
->>>> this one (e.g. when calling it without libvirt from the command line).
->>>>
->>> I explicitly mention the bios to use with '-bios' option and pick up the
->>> latest bios. Without the aligned fix I see the error and with the fix it
->>> works fine.
->> Wait, so the fix fixes it? Or am I confused now?
->>
-> 
-> It fixes in my system and one other system we tried on. But fails on a 
-> system where this issue was first noticed.
+After fixing other bug, =
 
-Can you provide the link script used in both systems?
+https://bugs.launchpad.net/qemu/+bug/1713408
+with the proposed patch =
 
-See on the previous thread:
-http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg05134.html
+http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg05357.html
 
-Regards,
+When tried smp core and thread as negative numbers seeing the following
+similar error. There is a need to fix for the following.
 
-Phil.
+Instead of fixing it for every variable/argument. Is there a common
+place to fix all of these issues?
+
+
+cloned today's git (i.e. 28th Aug 2017)
+
+# ppc64-softmmu/qemu-system-ppc64 --nographic -vga none -machine
+pseries,accel=3Dkvm,kvm-type=3DHV -m size=3D200g -device virtio-blk-
+pci,drive=3Drootdisk -drive file=3D/home/nasastry/avocado-fvt-wrapper/data
+/avocado-
+vt/images/pegas-1.0-ppc64le.qcow2,if=3Dnone,cache=3Dnone,id=3Drootdisk,form=
+at=3Dqcow2
+-monitor telnet:127.0.0.1:1234,server,nowait -net nic,model=3Dvirtio -net
+user -device nec-usb-xhci -smp 8,cores=3D-1,threads=3D-1,maxcpus=3D12
+
+(process:27477): GLib-ERROR **: gmem.c:130: failed to allocate 184467440737=
+09550568 bytes
+Trace/breakpoint trap
+
+[New Thread 0x3fffb63deb60 (LWP 27731)]
+[New Thread 0x3fffb5aceb60 (LWP 27734)]
+
+(process:27726): GLib-ERROR **: gmem.c:130: failed to allocate
+18446744073709550568 bytes
+
+Program received signal SIGTRAP, Trace/breakpoint trap.
+0x00003fffb75e5408 in raise () from /lib64/libpthread.so.0
+Missing separate debuginfos, use: debuginfo-install glib2-2.50.3-3.el7.ppc6=
+4le glibc-2.17-196.el7.ppc64le gnutls-3.3.26-9.el7.ppc64le krb5-libs-1.15.1=
+-8.el7.ppc64le libgcc-4.8.5-16.el7.ppc64le libstdc++-4.8.5-16.el7.ppc64le n=
+curses-libs-5.9-13.20130511.el7.ppc64le nss-3.28.4-8.el7.ppc64le nss-softok=
+n-freebl-3.28.3-6.el7.ppc64le nss-util-3.28.4-3.el7.ppc64le openldap-2.4.44=
+-5.el7.ppc64le openssl-libs-1.0.2k-8.el7.ppc64le p11-kit-0.23.5-3.el7.ppc64=
+le
+(gdb) bt
+#0  0x00003fffb75e5408 in raise () from /lib64/libpthread.so.0
+#1  0x00003fffb796be9c in _g_log_abort () from /lib64/libglib-2.0.so.0
+#2  0x00003fffb796d4c4 in g_log_default_handler () from /lib64/libglib-2.0.=
+so.0
+#3  0x00003fffb796d86c in g_logv () from /lib64/libglib-2.0.so.0
+#4  0x00003fffb796db00 in g_log () from /lib64/libglib-2.0.so.0
+#5  0x00003fffb796b694 in g_malloc0 () from /lib64/libglib-2.0.so.0
+#6  0x000000001018fa84 in spapr_possible_cpu_arch_ids (machine=3D0x111651e0=
+) at /home/nasastry/upstream/qemu/hw/ppc/spapr.c:3322
+#7  0x000000001018b444 in spapr_init_cpus (spapr=3D0x111651e0) at /home/nas=
+astry/upstream/qemu/hw/ppc/spapr.c:2096
+#8  0x000000001018bc6c in ppc_spapr_init (machine=3D0x111651e0) at /home/na=
+sastry/upstream/qemu/hw/ppc/spapr.c:2275
+#9  0x000000001041ca80 in machine_run_board_init (machine=3D0x111651e0) at =
+hw/core/machine.c:760
+#10 0x0000000010377284 in main (argc=3D22, argv=3D0x3ffffffff128, envp=3D0x=
+3ffffffff1e0) at vl.c:4638
+(gdb) i r
+r0             0xfa	250
+r1             0x3fffffffe470	70368744170608
+r2             0x3fffb7608100	70367525765376
+r3             0x0	0
+r4             0x6c4e	27726
+r5             0x5	5
+r6             0x0	0
+r7             0x3fffa8000020	70367267782688
+r8             0x6c4e	27726
+r9             0x0	0
+r10            0x0	0
+r11            0x0	0
+r12            0x0	0
+r13            0x3fffb64fccb0	70367507893424
+r14            0x0	0
+r15            0x0	0
+r16            0x0	0
+r17            0x0	0
+r18            0x1	1
+r19            0x0	0
+r20            0x3fffb796d3f0	70367529325552
+r21            0x0	0
+r22            0x20000000	536870912
+r23            0x1	1
+r24            0x3fffb7a61498	70367530325144
+r25            0x3fffb7a614e8	70367530325224
+r26            0x3fffb7a61488	70367530325128
+r27            0x3fffa80008c0	70367267784896
+r28            0x3fffb79cd2a8	70367529718440
+r29            0x3fffb79cd2a8	70367529718440
+r30            0xffffffffffffffff	18446744073709551615
+r31            0x1	1
+pc             0x3fffb75e5408	0x3fffb75e5408 <raise+56>
+msr            0x900000000000d033	10376293541461676083
+cr             0x42244842	1109674050
+lr             0x3fffb796be9c	0x3fffb796be9c <_g_log_abort+60>
+ctr            0x0	0
+xer            0x0	0
+orig_r3        0x6c4e	27726
+trap           0xc00	3072
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1713516
+
+Title:
+  qemu crashes with "GLib-ERROR **: gmem.c" error when a negative value
+  passed to smp threads, cores
+
+Status in QEMU:
+  New
+
+Bug description:
+  After fixing other bug, =
+
+  https://bugs.launchpad.net/qemu/+bug/1713408
+  with the proposed patch =
+
+  http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg05357.html
+
+  When tried smp core and thread as negative numbers seeing the
+  following similar error. There is a need to fix for the following.
+
+  Instead of fixing it for every variable/argument. Is there a common
+  place to fix all of these issues?
+
+  =
+
+  cloned today's git (i.e. 28th Aug 2017)
+
+  # ppc64-softmmu/qemu-system-ppc64 --nographic -vga none -machine
+  pseries,accel=3Dkvm,kvm-type=3DHV -m size=3D200g -device virtio-blk-
+  pci,drive=3Drootdisk -drive file=3D/home/nasastry/avocado-fvt-wrapper/data
+  /avocado-
+  vt/images/pegas-1.0-ppc64le.qcow2,if=3Dnone,cache=3Dnone,id=3Drootdisk,fo=
+rmat=3Dqcow2
+  -monitor telnet:127.0.0.1:1234,server,nowait -net nic,model=3Dvirtio
+  -net user -device nec-usb-xhci -smp 8,cores=3D-1,threads=3D-1,maxcpus=3D12
+
+  (process:27477): GLib-ERROR **: gmem.c:130: failed to allocate 1844674407=
+3709550568 bytes
+  Trace/breakpoint trap
+
+  [New Thread 0x3fffb63deb60 (LWP 27731)]
+  [New Thread 0x3fffb5aceb60 (LWP 27734)]
+
+  (process:27726): GLib-ERROR **: gmem.c:130: failed to allocate
+  18446744073709550568 bytes
+
+  Program received signal SIGTRAP, Trace/breakpoint trap.
+  0x00003fffb75e5408 in raise () from /lib64/libpthread.so.0
+  Missing separate debuginfos, use: debuginfo-install glib2-2.50.3-3.el7.pp=
+c64le glibc-2.17-196.el7.ppc64le gnutls-3.3.26-9.el7.ppc64le krb5-libs-1.15=
+.1-8.el7.ppc64le libgcc-4.8.5-16.el7.ppc64le libstdc++-4.8.5-16.el7.ppc64le=
+ ncurses-libs-5.9-13.20130511.el7.ppc64le nss-3.28.4-8.el7.ppc64le nss-soft=
+okn-freebl-3.28.3-6.el7.ppc64le nss-util-3.28.4-3.el7.ppc64le openldap-2.4.=
+44-5.el7.ppc64le openssl-libs-1.0.2k-8.el7.ppc64le p11-kit-0.23.5-3.el7.ppc=
+64le
+  (gdb) bt
+  #0  0x00003fffb75e5408 in raise () from /lib64/libpthread.so.0
+  #1  0x00003fffb796be9c in _g_log_abort () from /lib64/libglib-2.0.so.0
+  #2  0x00003fffb796d4c4 in g_log_default_handler () from /lib64/libglib-2.=
+0.so.0
+  #3  0x00003fffb796d86c in g_logv () from /lib64/libglib-2.0.so.0
+  #4  0x00003fffb796db00 in g_log () from /lib64/libglib-2.0.so.0
+  #5  0x00003fffb796b694 in g_malloc0 () from /lib64/libglib-2.0.so.0
+  #6  0x000000001018fa84 in spapr_possible_cpu_arch_ids (machine=3D0x111651=
+e0) at /home/nasastry/upstream/qemu/hw/ppc/spapr.c:3322
+  #7  0x000000001018b444 in spapr_init_cpus (spapr=3D0x111651e0) at /home/n=
+asastry/upstream/qemu/hw/ppc/spapr.c:2096
+  #8  0x000000001018bc6c in ppc_spapr_init (machine=3D0x111651e0) at /home/=
+nasastry/upstream/qemu/hw/ppc/spapr.c:2275
+  #9  0x000000001041ca80 in machine_run_board_init (machine=3D0x111651e0) a=
+t hw/core/machine.c:760
+  #10 0x0000000010377284 in main (argc=3D22, argv=3D0x3ffffffff128, envp=3D=
+0x3ffffffff1e0) at vl.c:4638
+  (gdb) i r
+  r0             0xfa	250
+  r1             0x3fffffffe470	70368744170608
+  r2             0x3fffb7608100	70367525765376
+  r3             0x0	0
+  r4             0x6c4e	27726
+  r5             0x5	5
+  r6             0x0	0
+  r7             0x3fffa8000020	70367267782688
+  r8             0x6c4e	27726
+  r9             0x0	0
+  r10            0x0	0
+  r11            0x0	0
+  r12            0x0	0
+  r13            0x3fffb64fccb0	70367507893424
+  r14            0x0	0
+  r15            0x0	0
+  r16            0x0	0
+  r17            0x0	0
+  r18            0x1	1
+  r19            0x0	0
+  r20            0x3fffb796d3f0	70367529325552
+  r21            0x0	0
+  r22            0x20000000	536870912
+  r23            0x1	1
+  r24            0x3fffb7a61498	70367530325144
+  r25            0x3fffb7a614e8	70367530325224
+  r26            0x3fffb7a61488	70367530325128
+  r27            0x3fffa80008c0	70367267784896
+  r28            0x3fffb79cd2a8	70367529718440
+  r29            0x3fffb79cd2a8	70367529718440
+  r30            0xffffffffffffffff	18446744073709551615
+  r31            0x1	1
+  pc             0x3fffb75e5408	0x3fffb75e5408 <raise+56>
+  msr            0x900000000000d033	10376293541461676083
+  cr             0x42244842	1109674050
+  lr             0x3fffb796be9c	0x3fffb796be9c <_g_log_abort+60>
+  ctr            0x0	0
+  xer            0x0	0
+  orig_r3        0x6c4e	27726
+  trap           0xc00	3072
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1713516/+subscriptions
