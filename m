@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dmRxP-00018G-W9
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:52:33 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dmRzM-0001ic-Rb
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:54:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dmRxP-0008Rz-23
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:52:32 -0400
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:36838)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1dmRxO-0008Rd-T3
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:52:30 -0400
-Received: by mail-io0-x243.google.com with SMTP id v96so1575348ioi.3
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 14:52:30 -0700 (PDT)
+	(envelope-from <alistair23@gmail.com>) id 1dmRzL-0000s7-1c
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:54:32 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170828190501.GA7312@flamenco>
-References: <20170828035327.17146-1-bobby.prani@gmail.com>
-	<20170828035327.17146-2-bobby.prani@gmail.com>
-	<20170828190501.GA7312@flamenco>
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Mon, 28 Aug 2017 17:51:59 -0400
-Message-ID: <CAJhHMCD_7YuaegiP8RciWT5DUL-9CaGSaMo_eHgCFBkEeQWqBQ@mail.gmail.com>
+In-Reply-To: <1503938283-12404-2-git-send-email-sundeep.lkml@gmail.com>
+References: <1503938283-12404-1-git-send-email-sundeep.lkml@gmail.com>
+	<1503938283-12404-2-git-send-email-sundeep.lkml@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 28 Aug 2017 14:53:55 -0700
+Message-ID: <CAKmqyKNZySCD==0TjOvDjkbWPOk_DR6w2q=MYGutZRQFSmkM6Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH 2/3] cpus-common: Cache allocated work
- items
+Subject: Re: [Qemu-devel] [Qemu devel v7 PATCH 1/5] msf2: Add Smartfusion2
+ System timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +23,408 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Sergey Fedorov <serge.fdrv@gmail.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On Mon, Aug 28, 2017 at 3:05 PM, Emilio G. Cota <cota@braap.org> wrote:
-> On Sun, Aug 27, 2017 at 23:53:25 -0400, Pranith Kumar wrote:
->> Using heaptrack, I found that quite a few of our temporary allocations
->> are coming from allocating work items. Instead of doing this
->> continously, we can cache the allocated items and reuse them instead
->> of freeing them.
->>
->> This reduces the number of allocations by 25% (200000 -> 150000 for
->> ARM64 boot+shutdown test).
->>
+On Mon, Aug 28, 2017 at 9:37 AM, Subbaraya Sundeep
+<sundeep.lkml@gmail.com> wrote:
+> Modelled System Timer in Microsemi's Smartfusion2 Soc.
+> Timer has two 32bit down counters and two interrupts.
 >
-> But what is the perf difference, if any?
->
-> Adding a lock (or a cmpxchg) here is not a great idea. However, this is not yet
-> immediately obvious because of other scalability bottlenecks. (if
-> you boot many arm64 cores you'll see most of the time is spent idling
-> on the BQL, see
->   https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg05207.html )
->
-> You're most likely better off using glib's slices, see
->   https://developer.gnome.org/glib/stable/glib-Memory-Slices.html
-> These slices use per-thread lists, so scalability should be OK.
+> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
-I think we should modify our g_malloc() to internally use this. Seems
-like an idea worth trying out.
+I had already reviewed this patch in v6. As long as you have made all
+of the changes mentioned their you can add my reviewed-by to the next
+version (as long as there are no other significant changes).
 
+Can you please ensure you do add and keep reviewed-by tags, it's a
+pain to have to do it multiple times.
+
+Thanks,
+Alistair
+
+> ---
+>  hw/timer/Makefile.objs       |   1 +
+>  hw/timer/mss-timer.c         | 289 +++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/timer/mss-timer.h |  64 ++++++++++
+>  3 files changed, 354 insertions(+)
+>  create mode 100644 hw/timer/mss-timer.c
+>  create mode 100644 include/hw/timer/mss-timer.h
 >
-> I also suggest profiling with either or both of jemalloc/tcmalloc
-> (build with --enable-jemalloc/tcmalloc) in addition to using glibc's
-> allocator, and then based on perf numbers decide whether this is something
-> worth optimizing.
+> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+> index 15cce1c..8c19eac 100644
+> --- a/hw/timer/Makefile.objs
+> +++ b/hw/timer/Makefile.objs
+> @@ -42,3 +42,4 @@ common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o
 >
-
-OK, I will try to get some perf numbers.
-
--- 
-Pranith
+>  common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
+>  common-obj-$(CONFIG_CMSDK_APB_TIMER) += cmsdk-apb-timer.o
+> +common-obj-$(CONFIG_MSF2) += mss-timer.o
+> diff --git a/hw/timer/mss-timer.c b/hw/timer/mss-timer.c
+> new file mode 100644
+> index 0000000..60f1213
+> --- /dev/null
+> +++ b/hw/timer/mss-timer.c
+> @@ -0,0 +1,289 @@
+> +/*
+> + * Block model of System timer present in
+> + * Microsemi's SmartFusion2 and SmartFusion SoCs.
+> + *
+> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/main-loop.h"
+> +#include "qemu/log.h"
+> +#include "hw/timer/mss-timer.h"
+> +
+> +#ifndef MSS_TIMER_ERR_DEBUG
+> +#define MSS_TIMER_ERR_DEBUG  0
+> +#endif
+> +
+> +#define DB_PRINT_L(lvl, fmt, args...) do { \
+> +    if (MSS_TIMER_ERR_DEBUG >= lvl) { \
+> +        qemu_log("%s: " fmt "\n", __func__, ## args); \
+> +    } \
+> +} while (0);
+> +
+> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
+> +
+> +#define R_TIM_VAL         0
+> +#define R_TIM_LOADVAL     1
+> +#define R_TIM_BGLOADVAL   2
+> +#define R_TIM_CTRL        3
+> +#define R_TIM_RIS         4
+> +#define R_TIM_MIS         5
+> +
+> +#define TIMER_CTRL_ENBL     (1 << 0)
+> +#define TIMER_CTRL_ONESHOT  (1 << 1)
+> +#define TIMER_CTRL_INTR     (1 << 2)
+> +#define TIMER_RIS_ACK       (1 << 0)
+> +#define TIMER_RST_CLR       (1 << 6)
+> +#define TIMER_MODE          (1 << 0)
+> +
+> +static void timer_update_irq(struct Msf2Timer *st)
+> +{
+> +    bool isr, ier;
+> +
+> +    isr = !!(st->regs[R_TIM_RIS] & TIMER_RIS_ACK);
+> +    ier = !!(st->regs[R_TIM_CTRL] & TIMER_CTRL_INTR);
+> +    qemu_set_irq(st->irq, (ier && isr));
+> +}
+> +
+> +static void timer_update(struct Msf2Timer *st)
+> +{
+> +    uint64_t count;
+> +
+> +    if (!(st->regs[R_TIM_CTRL] & TIMER_CTRL_ENBL)) {
+> +        ptimer_stop(st->ptimer);
+> +        return;
+> +    }
+> +
+> +    count = st->regs[R_TIM_LOADVAL];
+> +    ptimer_set_limit(st->ptimer, count, 1);
+> +    ptimer_run(st->ptimer, 1);
+> +}
+> +
+> +static uint64_t
+> +timer_read(void *opaque, hwaddr offset, unsigned int size)
+> +{
+> +    MSSTimerState *t = opaque;
+> +    hwaddr addr;
+> +    struct Msf2Timer *st;
+> +    uint32_t ret = 0;
+> +    int timer = 0;
+> +    int isr;
+> +    int ier;
+> +
+> +    addr = offset >> 2;
+> +    /*
+> +     * Two independent timers has same base address.
+> +     * Based on address passed figure out which timer is being used.
+> +     */
+> +    if ((addr >= R_TIM1_MAX) && (addr < NUM_TIMERS * R_TIM1_MAX)) {
+> +        timer = 1;
+> +        addr -= R_TIM1_MAX;
+> +    }
+> +
+> +    st = &t->timers[timer];
+> +
+> +    switch (addr) {
+> +    case R_TIM_VAL:
+> +        ret = ptimer_get_count(st->ptimer);
+> +        break;
+> +
+> +    case R_TIM_MIS:
+> +        isr = !!(st->regs[R_TIM_RIS] & TIMER_RIS_ACK);
+> +        ier = !!(st->regs[R_TIM_CTRL] & TIMER_CTRL_INTR);
+> +        ret = ier & isr;
+> +        break;
+> +
+> +    default:
+> +        if (addr < R_TIM1_MAX) {
+> +            ret = st->regs[addr];
+> +        } else {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                        TYPE_MSS_TIMER": 64-bit mode not supported\n");
+> +            return ret;
+> +        }
+> +        break;
+> +    }
+> +
+> +    DB_PRINT("timer=%d 0x%" HWADDR_PRIx "=0x%" PRIx32, timer, offset,
+> +            ret);
+> +    return ret;
+> +}
+> +
+> +static void
+> +timer_write(void *opaque, hwaddr offset,
+> +            uint64_t val64, unsigned int size)
+> +{
+> +    MSSTimerState *t = opaque;
+> +    hwaddr addr;
+> +    struct Msf2Timer *st;
+> +    int timer = 0;
+> +    uint32_t value = val64;
+> +
+> +    addr = offset >> 2;
+> +    /*
+> +     * Two independent timers has same base address.
+> +     * Based on addr passed figure out which timer is being used.
+> +     */
+> +    if ((addr >= R_TIM1_MAX) && (addr < NUM_TIMERS * R_TIM1_MAX)) {
+> +        timer = 1;
+> +        addr -= R_TIM1_MAX;
+> +    }
+> +
+> +    st = &t->timers[timer];
+> +
+> +    DB_PRINT("addr=0x%" HWADDR_PRIx " val=0x%" PRIx32 " (timer=%d)", offset,
+> +            value, timer);
+> +
+> +    switch (addr) {
+> +    case R_TIM_CTRL:
+> +        st->regs[R_TIM_CTRL] = value;
+> +        timer_update(st);
+> +        break;
+> +
+> +    case R_TIM_RIS:
+> +        if (value & TIMER_RIS_ACK) {
+> +            st->regs[R_TIM_RIS] &= ~TIMER_RIS_ACK;
+> +        }
+> +        break;
+> +
+> +    case R_TIM_LOADVAL:
+> +        st->regs[R_TIM_LOADVAL] = value;
+> +        if (st->regs[R_TIM_CTRL] & TIMER_CTRL_ENBL) {
+> +            timer_update(st);
+> +        }
+> +        break;
+> +
+> +    case R_TIM_BGLOADVAL:
+> +        st->regs[R_TIM_BGLOADVAL] = value;
+> +        st->regs[R_TIM_LOADVAL] = value;
+> +        break;
+> +
+> +    case R_TIM_VAL:
+> +    case R_TIM_MIS:
+> +        break;
+> +
+> +    default:
+> +        if (addr < R_TIM1_MAX) {
+> +            st->regs[addr] = value;
+> +        } else {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                        TYPE_MSS_TIMER": 64-bit mode not supported\n");
+> +            return;
+> +        }
+> +        break;
+> +    }
+> +    timer_update_irq(st);
+> +}
+> +
+> +static const MemoryRegionOps timer_ops = {
+> +    .read = timer_read,
+> +    .write = timer_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +    .valid = {
+> +        .min_access_size = 1,
+> +        .max_access_size = 4
+> +    }
+> +};
+> +
+> +static void timer_hit(void *opaque)
+> +{
+> +    struct Msf2Timer *st = opaque;
+> +
+> +    st->regs[R_TIM_RIS] |= TIMER_RIS_ACK;
+> +
+> +    if (!(st->regs[R_TIM_CTRL] & TIMER_CTRL_ONESHOT)) {
+> +        timer_update(st);
+> +    }
+> +    timer_update_irq(st);
+> +}
+> +
+> +static void mss_timer_init(Object *obj)
+> +{
+> +    MSSTimerState *t = MSS_TIMER(obj);
+> +    int i;
+> +
+> +    /* Init all the ptimers.  */
+> +    for (i = 0; i < NUM_TIMERS; i++) {
+> +        struct Msf2Timer *st = &t->timers[i];
+> +
+> +        st->bh = qemu_bh_new(timer_hit, st);
+> +        st->ptimer = ptimer_init(st->bh, PTIMER_POLICY_DEFAULT);
+> +        ptimer_set_freq(st->ptimer, t->freq_hz);
+> +        sysbus_init_irq(SYS_BUS_DEVICE(obj), &st->irq);
+> +    }
+> +
+> +    memory_region_init_io(&t->mmio, OBJECT(t), &timer_ops, t, TYPE_MSS_TIMER,
+> +                          NUM_TIMERS * R_TIM1_MAX * 4);
+> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &t->mmio);
+> +}
+> +
+> +static const VMStateDescription vmstate_timers = {
+> +    .name = "mss-timer-block",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_PTIMER(ptimer, struct Msf2Timer),
+> +        VMSTATE_UINT32_ARRAY(regs, struct Msf2Timer, R_TIM1_MAX),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static const VMStateDescription vmstate_mss_timer = {
+> +    .name = TYPE_MSS_TIMER,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32(freq_hz, MSSTimerState),
+> +        VMSTATE_STRUCT_ARRAY(timers, MSSTimerState, NUM_TIMERS, 0,
+> +                vmstate_timers, struct Msf2Timer),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static Property mss_timer_properties[] = {
+> +    /* Libero GUI shows 100Mhz as default for clocks */
+> +    DEFINE_PROP_UINT32("clock-frequency", MSSTimerState, freq_hz,
+> +                      100 * 1000000),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void mss_timer_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->props = mss_timer_properties;
+> +    dc->vmsd = &vmstate_mss_timer;
+> +}
+> +
+> +static const TypeInfo mss_timer_info = {
+> +    .name          = TYPE_MSS_TIMER,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(MSSTimerState),
+> +    .instance_init = mss_timer_init,
+> +    .class_init    = mss_timer_class_init,
+> +};
+> +
+> +static void mss_timer_register_types(void)
+> +{
+> +    type_register_static(&mss_timer_info);
+> +}
+> +
+> +type_init(mss_timer_register_types)
+> diff --git a/include/hw/timer/mss-timer.h b/include/hw/timer/mss-timer.h
+> new file mode 100644
+> index 0000000..d15d173
+> --- /dev/null
+> +++ b/include/hw/timer/mss-timer.h
+> @@ -0,0 +1,64 @@
+> +/*
+> + * Microsemi SmartFusion2 Timer.
+> + *
+> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef HW_MSS_TIMER_H
+> +#define HW_MSS_TIMER_H
+> +
+> +#include "hw/sysbus.h"
+> +#include "hw/ptimer.h"
+> +
+> +#define TYPE_MSS_TIMER     "mss-timer"
+> +#define MSS_TIMER(obj)     OBJECT_CHECK(MSSTimerState, \
+> +                              (obj), TYPE_MSS_TIMER)
+> +
+> +/*
+> + * There are two 32-bit down counting timers.
+> + * Timers 1 and 2 can be concatenated into a single 64-bit Timer
+> + * that operates either in Periodic mode or in One-shot mode.
+> + * Writing 1 to the TIM64_MODE register bit 0 sets the Timers in 64-bit mode.
+> + * In 64-bit mode, writing to the 32-bit registers has no effect.
+> + * Similarly, in 32-bit mode, writing to the 64-bit mode registers
+> + * has no effect. Only two 32-bit timers are supported currently.
+> + */
+> +#define NUM_TIMERS        2
+> +
+> +#define R_TIM1_MAX        6
+> +
+> +struct Msf2Timer {
+> +    QEMUBH *bh;
+> +    ptimer_state *ptimer;
+> +
+> +    uint32_t regs[R_TIM1_MAX];
+> +    qemu_irq irq;
+> +};
+> +
+> +typedef struct MSSTimerState {
+> +    SysBusDevice parent_obj;
+> +
+> +    MemoryRegion mmio;
+> +    uint32_t freq_hz;
+> +    struct Msf2Timer timers[NUM_TIMERS];
+> +} MSSTimerState;
+> +
+> +#endif /* HW_MSS_TIMER_H */
+> --
+> 2.5.0
+>
