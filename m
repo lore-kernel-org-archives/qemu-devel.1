@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1dmSGe-0005HD-BF
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 18:12:25 -0400
+	(envelope-from <portias@xilinx.com>) id 1dmSP5-0008LO-HI
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 18:21:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1dmSGb-0000Z7-3q
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 18:12:24 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:36501)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1dmSGa-0000Y7-Ts
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 18:12:21 -0400
-Received: by mail-pg0-x241.google.com with SMTP id 83so1281005pgb.3
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 15:12:19 -0700 (PDT)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Mon, 28 Aug 2017 17:12:10 -0500
-Message-Id: <1503958330-14083-4-git-send-email-minyard@acm.org>
-In-Reply-To: <1503958330-14083-1-git-send-email-minyard@acm.org>
-References: <1503958330-14083-1-git-send-email-minyard@acm.org>
+	(envelope-from <portias@xilinx.com>) id 1dmSP0-0003xH-Fp
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 18:21:07 -0400
+From: Portia Stephens <portia.stephens@xilinx.com>
+Date: Mon, 28 Aug 2017 15:19:01 -0700
+Message-ID: <20170828221901.12827-1-portia.stephens@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 3/3] ipmi: Add the platform event message
- command
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] target/arm: Remove 5J architecture
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +19,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Corey Minyard <cminyard@mvista.com>
+To: peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: qemu-devel@nongnu.org, portia.stephens@xilinx.com, stephensportia@gmail.com, alistair.francis@xilinx.com
 
-From: Corey Minyard <cminyard@mvista.com>
+This fixes the issue that any BXJ instruction will result in an illegal_op.
+This is because the 5J archiecture is always unsupported.
+5J architecture doesn't have a feature set and ENABLE_ARCH_5J is hardcoded
+to 0, causing any ARCH(5J) to result in an illegal_op. The only use of
+ARCH(5J) is in the BXJ instruction disassembly.
 
-This lets an event be added to the SEL as if a sensor had generated
-it.  The OpenIPMI driver uses it for storing panic event information.
+This patch replaces that ARCH(5J) with ARCH(6) and removes the 5J architecture,
+this isn't technically correct since the v5J ISA does support the BXJ
+instruction. This change means that running a BXJ instruction on any v5 will
+cause an illegal_op but it is better than the current state where any
+architecture running a BXJ would cause an illegal_op. The correct solution
+would be to create a feature set for v5J but that doesn't seem worth it as the
+v5J is so old.
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Portia Stephens <portia.stephens@xilinx.com>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- hw/ipmi/ipmi_bmc_sim.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ target/arm/translate.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
-index a0bbfd5..e84d710 100644
---- a/hw/ipmi/ipmi_bmc_sim.c
-+++ b/hw/ipmi/ipmi_bmc_sim.c
-@@ -38,6 +38,7 @@
- 
- #define IPMI_NETFN_SENSOR_EVENT       0x04
- 
-+#define IPMI_CMD_PLATFORM_EVENT_MSG       0x02
- #define IPMI_CMD_SET_SENSOR_EVT_ENABLE    0x28
- #define IPMI_CMD_GET_SENSOR_EVT_ENABLE    0x29
- #define IPMI_CMD_REARM_SENSOR_EVTS        0x2a
-@@ -1581,6 +1582,28 @@ static void set_sel_time(IPMIBmcSim *ibs,
-     ibs->sel.time_offset = now.tv_sec - ((long) val);
- }
- 
-+static void platform_event_msg(IPMIBmcSim *ibs,
-+                               uint8_t *cmd, unsigned int cmd_len,
-+                               RspBuffer *rsp)
-+{
-+    uint8_t event[16];
-+
-+    event[2] = 2; /* System event record */
-+    event[7] = cmd[2]; /* Generator ID */
-+    event[8] = 0;
-+    event[9] = cmd[3]; /* EvMRev */
-+    event[10] = cmd[4]; /* Sensor type */
-+    event[11] = cmd[5]; /* Sensor number */
-+    event[12] = cmd[6]; /* Event dir / Event type */
-+    event[13] = cmd[7]; /* Event data 1 */
-+    event[14] = cmd[8]; /* Event data 2 */
-+    event[15] = cmd[9]; /* Event data 3 */
-+
-+    if (sel_add_event(ibs, event)) {
-+        rsp_buffer_set_error(rsp, IPMI_CC_OUT_OF_SPACE);
-+    }
-+}
-+
- static void set_sensor_evt_enable(IPMIBmcSim *ibs,
-                                   uint8_t *cmd, unsigned int cmd_len,
-                                   RspBuffer *rsp)
-@@ -1757,6 +1780,7 @@ static const IPMINetfn chassis_netfn = {
- };
- 
- static const IPMICmdHandler sensor_event_cmds[] = {
-+    [IPMI_CMD_PLATFORM_EVENT_MSG] = { platform_event_msg, 10 },
-     [IPMI_CMD_SET_SENSOR_EVT_ENABLE] = { set_sensor_evt_enable, 4 },
-     [IPMI_CMD_GET_SENSOR_EVT_ENABLE] = { get_sensor_evt_enable, 3 },
-     [IPMI_CMD_REARM_SENSOR_EVTS] = { rearm_sensor_evts, 4 },
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index d1a5f56998..4a30c0d7e0 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -41,7 +41,6 @@
+ #define ENABLE_ARCH_5     arm_dc_feature(s, ARM_FEATURE_V5)
+ /* currently all emulated v5 cores are also v5TE, so don't bother */
+ #define ENABLE_ARCH_5TE   arm_dc_feature(s, ARM_FEATURE_V5)
+-#define ENABLE_ARCH_5J    0
+ #define ENABLE_ARCH_6     arm_dc_feature(s, ARM_FEATURE_V6)
+ #define ENABLE_ARCH_6K    arm_dc_feature(s, ARM_FEATURE_V6K)
+ #define ENABLE_ARCH_6T2   arm_dc_feature(s, ARM_FEATURE_THUMB2)
+@@ -8389,7 +8388,10 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+             break;
+         case 0x2:
+             if (op1 == 1) {
+-                ARCH(5J); /* bxj */
++                /* This should actually be ARCH(5J) but there is currently no
++                 * 5J architecture in QEMU.
++                 */
++                ARCH(6); /* bxj */
+                 /* Trivial implementation equivalent to bx.  */
+                 tmp = load_reg(s, rm);
+                 gen_bx(s, tmp);
 -- 
-2.7.4
+2.14.1
