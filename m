@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dmSh2-0002Ks-0h
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 18:39:40 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dmSiX-0003HN-4y
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 18:41:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dmSgy-0004eS-0t
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 18:39:40 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170828035327.17146-1-bobby.prani@gmail.com>
-	<20170828035327.17146-3-bobby.prani@gmail.com>
-	<03c05a60-d697-500b-c2fc-d99b24f3f64c@twiddle.net>
-	<CAJhHMCC4Y0Zos+g4M6Rms+vO8cdZ+AOupciRFWTfnbFgpRs9jw@mail.gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <45959c2a-94c3-7899-eaba-bf13ca85d052@twiddle.net>
-Date: Mon, 28 Aug 2017 15:39:31 -0700
+	(envelope-from <jsnow@redhat.com>) id 1dmSiW-0005SX-0N
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 18:41:13 -0400
+References: <1503938085-169486-1-git-send-email-imammedo@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <d9fcb6ed-cdec-ae43-6a77-be786a198ad2@redhat.com>
+Date: Mon, 28 Aug 2017 18:41:01 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAJhHMCC4Y0Zos+g4M6Rms+vO8cdZ+AOupciRFWTfnbFgpRs9jw@mail.gmail.com>
+In-Reply-To: <1503938085-169486-1-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 3/3] mttcg: Implement implicit ordering
- semantics
+Subject: Re: [Qemu-devel] [PATCH for-2.11] ide: ahci: unparent children
+ buses before freeing their memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +24,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, "open list:AArch64 target" <qemu-arm@nongnu.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, f4bug@amsat.org, qemu-block@nongnu.org, mst@redhat.com
 
-On 08/28/2017 02:41 PM, Pranith Kumar wrote:
-> On Mon, Aug 28, 2017 at 1:57 PM, Richard Henderson <rth@twiddle.net> wrote:
->> On 08/27/2017 08:53 PM, Pranith Kumar wrote:
->>> diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
->>> index 55a46ac825..b41a248bee 100644
->>> --- a/tcg/aarch64/tcg-target.h
->>> +++ b/tcg/aarch64/tcg-target.h
->>> @@ -117,4 +117,6 @@ static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
->>>      __builtin___clear_cache((char *)start, (char *)stop);
->>>  }
->>>
->>> +#define TCG_TARGET_DEFAULT_MO (0)
->>> +
->>>  #endif /* AARCH64_TCG_TARGET_H */
->>
->> Please add all of these in one patch, separate from the tcg-op.c changes.
->> We should also just make this mandatory and remove any related #ifdefs.
+
+
+On 08/28/2017 12:34 PM, Igor Mammedov wrote:
+> Fixes read after freeing error reported
+>   https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg04243.html
+>   Message-Id: <59a56959-ca12-ea75-33fa-ff07eba1b090@redhat.com>
 > 
-> I tried looking up ordering semantics for architectures like ia64 and
-> s390. It is not really clear. I think every arch but for x86 can be
-> defined as weak, even though archs like sparc can also be configured
-> as TSO. Is this right?
+> ich9-ahci device creates ide buses and attaches them as QOM children
+> at realize time, however it forgets to properly clean them up
+> at unrealize time and frees memory containing these children,
+> with following call-chain:
+> 
+>    qdev_device_add()
+>      object_property_set_bool('realized', true)
+>        device_set_realized()
+>           ...
+>           pci_qdev_realize() -> pci_ich9_ahci_realize() -> ahci_realize()
+>                ...
+>                s->dev = g_new0(AHCIDevice, ports);
+>                ...
+>                   AHCIDevice *ad = &s->dev[i];
+>                   ide_bus_new(&ad->port, sizeof(ad->port), qdev, i, 1);
+>                   ^^^ creates bus in memory allocated by above gnew()
+>                       and adds it as child propety to ahci device
+>           ...
+>           hotplug_handler_plug(); -> goto post_realize_fail;
+>           pci_qdev_unrealize() -> pci_ich9_uninit() -> ahci_uninit()
+>               ...
+>                g_free(s->dev);
+>                ^^^ free memory that holds children busses
+> 
+>           return with error from device_set_realized()
+> 
+> As result later when qdev_device_add() tries to unparent ich9-ahci
+> after failed device_set_realized(),
+>     object_unparent() -> object_property_del_child()
+> iterates over existing QOM children including buses added by
+> ide_bus_new() and tries to unparent them, which causes access to
+> freed memory where they where located.
+> 
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  hw/ide/ahci.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+> index 406a1b5..ccbe091 100644
+> --- a/hw/ide/ahci.c
+> +++ b/hw/ide/ahci.c
+> @@ -1495,6 +1495,7 @@ void ahci_uninit(AHCIState *s)
+>  
+>              ide_exit(s);
+>          }
+> +        object_unparent(OBJECT(&ad->port));
+>      }
+>  
+>      g_free(s->dev);
+> 
 
-s390 has the same memory ordering as i386.
+Nice, Thank you.
 
-But you're right that the risc chips should generally be 0.
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-I'll try and figure out when sparc can use PSO (loosest for sparc < 8, and
-modern niagara), but leave it 0 for now.
+Thanks, applied to my IDE tree:
 
+https://github.com/jnsnow/qemu/commits/ide
+https://github.com/jnsnow/qemu.git
 
-r~
+--js
