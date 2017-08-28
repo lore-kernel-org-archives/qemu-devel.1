@@ -1,34 +1,50 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmECT-0005ut-UT
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:11:11 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dmEJV-0007qG-Mu
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:18:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmECP-0001ey-Rl
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:11:09 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57926)
+	(envelope-from <borntraeger@de.ibm.com>) id 1dmEJS-0005G3-DO
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:18:25 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57046
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dmECP-0001ei-Ht
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:11:05 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dmECO-0001fK-IB
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 07:11:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 88A8B2E80C9
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 07:11:04 +0000 (UTC)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dmEJS-0005DR-5m
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:18:22 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7S7FGwU141035
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 03:18:19 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2cmcct58yb-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 03:18:19 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 28 Aug 2017 08:18:17 +0100
+References: <e2a1b182-83a9-2259-27f9-68b61b5061d5@linux.vnet.ibm.com>
+	<20170824171355.29d1ec32.cohuck@redhat.com>
+	<30333b41-508d-f9a3-ac2d-4830a7791475@redhat.com>
+	<34f0f307-d16f-7c76-1589-fa06252f6d09@linux.vnet.ibm.com>
+	<ad0ef5a7-c0e0-9e54-a417-858c4b32a80e@redhat.com>
+	<c9a6a1ec-eb7c-08a6-82ad-87ad5412ad19@linux.vnet.ibm.com>
+	<CAFEAcA-oE=E3ydugLdVnPS2Tquqkou=BEhsB_DALqZxbVD0GDA@mail.gmail.com>
+	<e24316e0-3b6f-ef1c-7c4b-66e7b302e5b4@linux.vnet.ibm.com>
+	<97b35c4d-e897-c18a-525f-1fa1a7560776@de.ibm.com>
+	<20170825092008.12484e6a.cohuck@redhat.com>
+	<d3e9d032-fd2e-6126-1774-cb8a86a219f4@de.ibm.com>
+	<20170825102950.736647be.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 28 Aug 2017 09:18:14 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 28 Aug 2017 06:56:32 -0000
-From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
-Reply-To: Bug 1713408 <1713408@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150390171227.19506.41697463404689071.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150390339224.8072.16087487933394373993.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1713408] Re: qemu crashes with "GLib-ERROR **:
- gmem.c" error when a negative value passed to "maxcpus"
+In-Reply-To: <20170825102950.736647be.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <2fdd5a70-6339-c4ec-c13c-d6f96d7abfc9@de.ibm.com>
+Subject: Re: [Qemu-devel] S390 bios breaks in qemu 2.10.rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,112 +53,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Farhan Ali <alifm@linux.vnet.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-The above I am referring from hw/ppc/spapr.c
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1713408
+On 08/25/2017 10:29 AM, Cornelia Huck wrote:
+> On Fri, 25 Aug 2017 10:21:58 +0200
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> On 08/25/2017 09:20 AM, Cornelia Huck wrote:
+> 
+>>> OK, to recap:
+>>>
+>>> - the current pre-built bios seems fine
+>>> - rebuilding the bios may yield a version that fails on some systems
+>>>   (different compiler?)
+>>> - adding aligned(8) looks like the right thing to do
+>>> - it seems to fix the problem, but on at least one system something
+>>>   still seems off (under investigation)  
+>>
+>> Yes. I am out of office today, so for any aligned(8) patch
+>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> even for 2.10.
+> 
+> I fear the 2.10 train has already left the station, but any aligned(8)
+> patch should be cc:stable.
 
-Title:
-  qemu crashes with "GLib-ERROR **: gmem.c" error when a negative value
-  passed to "maxcpus"
-
-Status in QEMU:
-  New
-
-Bug description:
-  # ppc64-softmmu/qemu-system-ppc64 --nographic -vga none -machine
-  pseries,accel=3Dkvm,kvm-type=3DHV -m size=3D20g -device virtio-blk-
-  pci,drive=3Drootdisk -drive file=3D/home/nasastry/avocado-fvt-wrapper/data
-  /avocado-
-  vt/images/pegas-1.0-ppc64le.qcow2,if=3Dnone,cache=3Dnone,id=3Drootdisk,fo=
-rmat=3Dqcow2
-  -monitor telnet:127.0.0.1:1234,server,nowait -net nic,model=3Dvirtio
-  -net user -device nec-usb-xhci -smp 8,cores=3D1,threads=3D1,maxcpus=3D-12
-
-  (process:12149): GLib-ERROR **: gmem.c:130: failed to allocate
-  18446744073709550568 bytes
-
-  From GDB:
-  [New Thread 0x3fffb5aceb60 (LWP 12190)]
-
-  (process:12184): GLib-ERROR **: gmem.c:130: failed to allocate
-  18446744073709550568 bytes
-
-  Program received signal SIGTRAP, Trace/breakpoint trap.
-  0x00003fffb75e5408 in raise () from /lib64/libpthread.so.0
-  Missing separate debuginfos, use: debuginfo-install glib2-2.50.3-3.el7.pp=
-c64le glibc-2.17-196.el7.ppc64le gnutls-3.3.26-9.el7.ppc64le krb5-libs-1.15=
-.1-8.el7.ppc64le libgcc-4.8.5-16.el7.ppc64le libstdc++-4.8.5-16.el7.ppc64le=
- ncurses-libs-5.9-13.20130511.el7.ppc64le nss-3.28.4-8.el7.ppc64le nss-soft=
-okn-freebl-3.28.3-6.el7.ppc64le nss-util-3.28.4-3.el7.ppc64le openldap-2.4.=
-44-5.el7.ppc64le openssl-libs-1.0.2k-8.el7.ppc64le p11-kit-0.23.5-3.el7.ppc=
-64le
-  (gdb) bt
-  #0  0x00003fffb75e5408 in raise () from /lib64/libpthread.so.0
-  #1  0x00003fffb796be9c in _g_log_abort () from /lib64/libglib-2.0.so.0
-  #2  0x00003fffb796d4c4 in g_log_default_handler () from /lib64/libglib-2.=
-0.so.0
-  #3  0x00003fffb796d86c in g_logv () from /lib64/libglib-2.0.so.0
-  #4  0x00003fffb796db00 in g_log () from /lib64/libglib-2.0.so.0
-  #5  0x00003fffb796b694 in g_malloc0 () from /lib64/libglib-2.0.so.0
-  #6  0x000000001018fa84 in spapr_possible_cpu_arch_ids (machine=3D0x111656=
-60) at /home/nasastry/upstream/qemu/hw/ppc/spapr.c:3322
-  #7  0x000000001018b444 in spapr_init_cpus (spapr=3D0x11165660) at /home/n=
-asastry/upstream/qemu/hw/ppc/spapr.c:2096
-  #8  0x000000001018bc6c in ppc_spapr_init (machine=3D0x11165660) at /home/=
-nasastry/upstream/qemu/hw/ppc/spapr.c:2275
-  #9  0x000000001041ca38 in machine_run_board_init (machine=3D0x11165660) a=
-t hw/core/machine.c:760
-  #10 0x000000001037723c in main (argc=3D24, argv=3D0x3ffffffff108, envp=3D=
-0x3ffffffff1d0) at vl.c:4633
-  (gdb) i r
-  r0             0xfa	250
-  r1             0x3fffffffe450	70368744170576
-  r2             0x3fffb7608100	70367525765376
-  r3             0x0	0
-  r4             0x2f98	12184
-  r5             0x5	5
-  r6             0x0	0
-  r7             0x3fffa8000020	70367267782688
-  r8             0x2f98	12184
-  r9             0x0	0
-  r10            0x0	0
-  r11            0x0	0
-  r12            0x0	0
-  r13            0x3fffb64fccb0	70367507893424
-  r14            0x0	0
-  r15            0x0	0
-  r16            0x0	0
-  r17            0x0	0
-  r18            0x1	1
-  r19            0x0	0
-  r20            0x3fffb796d3f0	70367529325552
-  r21            0x0	0
-  r22            0x20000000	536870912
-  r23            0x1	1
-  r24            0x3fffb7a61498	70367530325144
-  r25            0x3fffb7a614e8	70367530325224
-  r26            0x3fffb7a61488	70367530325128
-  r27            0x3fffa80008c0	70367267784896
-  r28            0x3fffb79cd2a8	70367529718440
-  r29            0x3fffb79cd2a8	70367529718440
-  r30            0xffffffffffffffff	18446744073709551615
-  r31            0x1	1
-  pc             0x3fffb75e5408	0x3fffb75e5408 <raise+56>
-  msr            0x900000000000d033	10376293541461676083
-  cr             0x42244842	1109674050
-  lr             0x3fffb796be9c	0x3fffb796be9c <_g_log_abort+60>
-  ctr            0x0	0
-  xer            0x0	0
-  orig_r3        0x2f98	12184
-  trap           0xc00	3072
-
-  Similar error observed on x86_64 and PPC64LE architectures.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1713408/+subscriptions
+I think this could be a topic for QEMU summit. Our process of not allowing
+fixes in rcx without requiring an rc(x+1) seems a bit odd. The Linux kernel
+style (there are fixes between the last rc and release) seems more balanced
+as long as we establish some safety nets.
