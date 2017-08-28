@@ -1,20 +1,50 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dmL0w-0004q8-Td
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 10:27:43 -0400
+	(envelope-from <alifm@linux.vnet.ibm.com>) id 1dmL2x-0005en-Ol
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 10:29:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dmL0s-0004YX-0s
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 10:27:42 -0400
-Date: Mon, 28 Aug 2017 22:27:28 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170828142728.GC18194@lemon.lan>
-References: <1503928405-19960-1-git-send-email-s1seetee@linux.vnet.ibm.com>
+	(envelope-from <alifm@linux.vnet.ibm.com>) id 1dmL2t-0005F7-IX
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 10:29:47 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36456
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.vnet.ibm.com>)
+	id 1dmL2t-0005Et-DE
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 10:29:43 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7SETaJZ133757
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 10:29:42 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2cmjn6tqr2-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 10:29:39 -0400
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.vnet.ibm.com>;
+	Mon, 28 Aug 2017 10:28:55 -0400
+References: <cover.1503667215.git.alifm@linux.vnet.ibm.com>
+	<3ed8b810b6592daee6a775037ce21f850e40647d.1503667215.git.alifm@linux.vnet.ibm.com>
+	<20170825160408.2775c8b5.cohuck@redhat.com>
+	<00d41b2b-cf22-c9e2-8d9f-de947f4d3f18@linux.vnet.ibm.com>
+	<20170828102214.7aad9112.cohuck@redhat.com>
+	<caab4ec1-763a-8dfb-5e88-295a43a41e68@linux.vnet.ibm.com>
+	<20170828150653.7cdc8c5a.cohuck@redhat.com>
+	<c7e3a1cb-10e6-4c2d-0225-2bcbe9c97de6@linux.vnet.ibm.com>
+	<c61c8ee1-3bca-41db-33a7-b65186a80d25@de.ibm.com>
+	<b5a9ab05-4e3c-66bc-33ce-d953d7f911e2@linux.vnet.ibm.com>
+	<20170828160554.45855dfa.cohuck@redhat.com>
+	<e3f0c9c1-b576-b9bb-66e2-53c2ef94b91b@linux.vnet.ibm.com>
+	<9b9880e4-71fd-4bc5-961b-ab0e2b298f03@linux.vnet.ibm.com>
+From: Farhan Ali <alifm@linux.vnet.ibm.com>
+Date: Mon, 28 Aug 2017 10:28:53 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1503928405-19960-1-git-send-email-s1seetee@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3] qemu crashes when a negative number
- used for 'maxcpus'
+In-Reply-To: <9b9880e4-71fd-4bc5-961b-ab0e2b298f03@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <3421f46f-fa82-ac23-b0ac-5a2acce26d41@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] s390-ccw: Fix alignment for CCW1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,81 +53,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com
-
-Hi Seeteena, thanks for sending the patch and fixing the coding style!
-
-I suggest to change subject to "vl: exit if maxcpus is negative". The subject of
-a patch email is going to be the summary of the commit message when applied,
-therefore it should be worded to summarize the change. Commonly there is a
-"subsystem prefix" followed by a colon, like "vl:", "net:". While there is no
-hard rule, the most suitable prefix can be guessed by inspecting the log of the
-changed files. In the case of this patch: "git log vl.c".
-
-A more detailed guide on submitting "perfect" QEMU patches can be found here,
-in case for your future reference:
-
-https://wiki.qemu.org/Contribute/SubmitAPatch
-
-On Mon, 08/28 19:23, Seeteena Thoufeek wrote:
-> ---Steps to Reproduce---
-> 
-> When passed a negative number to 'maxcpus' parameter, Qemu aborts
-> with a core dump.
-> 
-> Run the following command with maxcpus argument as negative number
-> 
-> ppc64-softmmu/qemu-system-ppc64 --nographic -vga none -machine
-> pseries,accel=kvm,kvm-type=HV -m size=200g -device virtio-blk-pci,
-> drive=rootdisk -drive file=/home/images/pegas-1.0-ppc64le.qcow2,
-> if=none,cache=none,id=rootdisk,format=qcow2 -monitor telnet
-> :127.0.0.1:1234,server,nowait -net nic,model=virtio -net
-> user -redir tcp:2000::22 -device nec-usb-xhci -smp 8,cores=1,
-> threads=1,maxcpus=-12
-> 
-> (process:12149): GLib-ERROR **: gmem.c:130: failed to allocate
->  18446744073709550568 bytes
-> 
-> Trace/breakpoint trap
-> 
-> Reported-by: R.Nageswara Sastry <rnsastry@linux.vnet.ibm.com>
-> Signed-off-by: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
-> Reviewed-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> ---
-
-Would be good if there is a comment below a "---" line on how current revision
-differs from the previous one, like:
-
----
-
-v3: Fix coding style pointed out by patchew.
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, farman@linux.vnet.ibm.com, walling@linux.vnet.ibm.com
 
 
->  vl.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/vl.c b/vl.c
-> index 8e247cc..fb45b6d 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1244,7 +1244,10 @@ static void smp_parse(QemuOpts *opts)
->          }
->  
->          max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus);
-> -
-> +        if (max_cpus <= 0) {
-> +            error_report("Invalid max_cpus : %d", max_cpus);
 
-The space before ":" can be dropped, I think.
+On 08/28/2017 10:19 AM, Halil Pasic wrote:
+>
+>
+> On 08/28/2017 04:15 PM, Farhan Ali wrote:
+>>
+>>
+>> On 08/28/2017 10:05 AM, Cornelia Huck wrote:
+>>>>>> It's the alignment of the CCW which causes the problem.
+>>>>>>
+>>>>>> The exact error message when starting the guest was:
+>>>>>>
+>>>>>> ! No virtio device found !
+>>>>>>
+>>>>>> Since it worked for SCSI and CDL, and failed for LDL disks on that particular system, we are not really sure what caused the failure.
+>>>>>> Debugging it further showed the CCW for LDL disks were not aligned at double word boundary.
+>>> This is really, really odd, as the low-level ccw code is the same for
+>>> any disk type...
+>>>
+>> Exactly!
+>>
+>>>>>> Trying the test on a different system with LDL disks worked fine, with the aligned(8) fix.
+>>>>> Do you happen to have an old s390-ccw.img laying around in the test folder? QEMU might pick up
+>>>>> this one (e.g. when calling it without libvirt from the command line).
+>>>>>
+>>>> I explicitly mention the bios to use with '-bios' option and pick up the
+>>>> latest bios. Without the aligned fix I see the error and with the fix it
+>>>> works fine.
+>>> Wait, so the fix fixes it? Or am I confused now?
+>>>
+>>
+>> It fixes in my system and one other system we tried on. But fails on a system where this issue was first noticed.
+>
+> This is very confusing. So you have tried -bios on the system
+> where the issue was first noticed and the issue still persists
+> despite of the fixed bios is specified?
+>
+Yes.
 
-> +            exit(1);
-> +        }
->          if (max_cpus < cpus) {
->              error_report("maxcpus must be equal to or greater than smp");
->              exit(1);
-> -- 
-> 1.8.3.1
-> 
+The system where the issue was first noticed, applying the fix for the 
+bios, fixes for:
 
-Fam
+1) CDL disks
+2) SCSI disks
+
+But fails for LDL disk.
+
+On my system and one other system, the fix works for all the disk types, 
+CDL, SCSI and LDL and fixes the issue.
