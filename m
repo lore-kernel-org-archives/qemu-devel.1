@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dm9Iz-0004st-7V
-	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:34 -0400
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dm9JC-00052l-3R
+	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dm9Iy-000127-1J
-	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:33 -0400
-Received: from mail-vk0-x244.google.com ([2607:f8b0:400c:c05::244]:38039)
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dm9J9-000196-2a
+	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:46 -0400
+Received: from mail-ua0-x242.google.com ([2607:f8b0:400c:c08::242]:34335)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
-	id 1dm9Ix-00011j-SZ
-	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:31 -0400
-Received: by mail-vk0-x244.google.com with SMTP id w84so1879899vkd.5
-	for <qemu-devel@nongnu.org>; Sun, 27 Aug 2017 18:57:31 -0700 (PDT)
+	id 1dm9J8-00018g-Ul
+	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:43 -0400
+Received: by mail-ua0-x242.google.com with SMTP id 105so871050uad.1
+	for <qemu-devel@nongnu.org>; Sun, 27 Aug 2017 18:57:42 -0700 (PDT)
 From: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
-Date: Sun, 27 Aug 2017 20:56:45 -0500
-Message-Id: <20170828015654.2530-6-Sergio.G.DelReal@gmail.com>
+Date: Sun, 27 Aug 2017 20:56:48 -0500
+Message-Id: <20170828015654.2530-9-Sergio.G.DelReal@gmail.com>
 In-Reply-To: <20170828015654.2530-1-Sergio.G.DelReal@gmail.com>
 References: <20170828015654.2530-1-Sergio.G.DelReal@gmail.com>
-Subject: [Qemu-devel] [PATCH 05/14] hvf: use new helper functions for
- put/get xsave
+Subject: [Qemu-devel] [PATCH 08/14] apic: add function to apic that will be
+ used by hvf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +30,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 
-This commit makes use of the helper functions for handling xsave in
-xsave_helper.c, which are shared with kvm.
+This commit moves (hides) the function apic_get_highest_priority_irr to
+apic.c and exports it through the interface in apic.h for use by hvf.
 
 Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 ---
- target/i386/hvf-utils/x86hvf.c | 63 ++++++------------------------------------
- 1 file changed, 8 insertions(+), 55 deletions(-)
+ hw/intc/apic.c         | 11 +++++++++++
+ include/hw/i386/apic.h |  1 +
+ 2 files changed, 12 insertions(+)
 
-diff --git a/target/i386/hvf-utils/x86hvf.c b/target/i386/hvf-utils/x86hvf.c
-index d5668df37f..5c1d5ece36 100644
---- a/target/i386/hvf-utils/x86hvf.c
-+++ b/target/i386/hvf-utils/x86hvf.c
-@@ -76,36 +76,13 @@ void hvf_get_segment(SegmentCache *qseg, struct vmx_segment *vmx_seg)
- void hvf_put_xsave(CPUState *cpu_state)
- {
- 
--    int x;
-     struct hvf_xsave_buf *xsave;
--    
-+
-     xsave = X86_CPU(cpu_state)->env.kvm_xsave_buf;
--    memset(xsave, 0, sizeof(*xsave)); 
--    
--    memcpy(&xsave->data[4], &X86_CPU(cpu_state)->env.fpdp, sizeof(X86_CPU(cpu_state)->env.fpdp));
--    memcpy(&xsave->data[2], &X86_CPU(cpu_state)->env.fpip, sizeof(X86_CPU(cpu_state)->env.fpip));
--    memcpy(&xsave->data[8], &X86_CPU(cpu_state)->env.fpregs, sizeof(X86_CPU(cpu_state)->env.fpregs));
--    memcpy(&xsave->data[144], &X86_CPU(cpu_state)->env.ymmh_regs, sizeof(X86_CPU(cpu_state)->env.ymmh_regs));
--    memcpy(&xsave->data[288], &X86_CPU(cpu_state)->env.zmmh_regs, sizeof(X86_CPU(cpu_state)->env.zmmh_regs));
--    memcpy(&xsave->data[272], &X86_CPU(cpu_state)->env.opmask_regs, sizeof(X86_CPU(cpu_state)->env.opmask_regs));
--    memcpy(&xsave->data[240], &X86_CPU(cpu_state)->env.bnd_regs, sizeof(X86_CPU(cpu_state)->env.bnd_regs));
--    memcpy(&xsave->data[256], &X86_CPU(cpu_state)->env.bndcs_regs, sizeof(X86_CPU(cpu_state)->env.bndcs_regs));
--    memcpy(&xsave->data[416], &X86_CPU(cpu_state)->env.hi16_zmm_regs, sizeof(X86_CPU(cpu_state)->env.hi16_zmm_regs));
--    
--    xsave->data[0] = (uint16_t)X86_CPU(cpu_state)->env.fpuc;
--    xsave->data[0] |= (X86_CPU(cpu_state)->env.fpus << 16);
--    xsave->data[0] |= (X86_CPU(cpu_state)->env.fpstt & 7) << 11;
--    
--    for (x = 0; x < 8; ++x)
--        xsave->data[1] |= ((!X86_CPU(cpu_state)->env.fptags[x]) << x);
--    xsave->data[1] |= (uint32_t)(X86_CPU(cpu_state)->env.fpop << 16);
--    
--    memcpy(&xsave->data[40], &X86_CPU(cpu_state)->env.xmm_regs, sizeof(X86_CPU(cpu_state)->env.xmm_regs));
--    
--    xsave->data[6] = X86_CPU(cpu_state)->env.mxcsr;
--    *(uint64_t *)&xsave->data[128] = X86_CPU(cpu_state)->env.xstate_bv;
--    
--    if (hv_vcpu_write_fpstate(cpu_state->hvf_fd, xsave->data, 4096)){
-+
-+    x86_cpu_xsave_all_areas(X86_CPU(cpu_state), xsave);
-+
-+    if (hv_vcpu_write_fpstate(cpu_state->hvf_fd, xsave->data, 4096)) {
-         abort();
+diff --git a/hw/intc/apic.c b/hw/intc/apic.c
+index fe15fb6024..3de59d07fd 100644
+--- a/hw/intc/apic.c
++++ b/hw/intc/apic.c
+@@ -305,6 +305,17 @@ static void apic_set_tpr(APICCommonState *s, uint8_t val)
      }
  }
-@@ -185,39 +162,15 @@ void hvf_put_msrs(CPUState *cpu_state)
  
- void hvf_get_xsave(CPUState *cpu_state)
++int apic_get_highest_priority_irr(DeviceState *dev)
++{
++    APICCommonState *s;
++
++    if (!dev) {
++        return -1;
++    }
++    s = APIC_COMMON(dev);
++    return get_highest_priority_int(s->irr);
++}
++
+ static uint8_t apic_get_tpr(APICCommonState *s)
  {
--    int x;
-     struct hvf_xsave_buf *xsave;
--    
-+
-     xsave = X86_CPU(cpu_state)->env.kvm_xsave_buf;
--    
-+
-     if (hv_vcpu_read_fpstate(cpu_state->hvf_fd, xsave->data, 4096)) {
-         abort();
-     }
+     apic_sync_vapic(s, SYNC_FROM_VAPIC);
+diff --git a/include/hw/i386/apic.h b/include/hw/i386/apic.h
+index ea48ea9389..a9f6c0aa33 100644
+--- a/include/hw/i386/apic.h
++++ b/include/hw/i386/apic.h
+@@ -20,6 +20,7 @@ void apic_init_reset(DeviceState *s);
+ void apic_sipi(DeviceState *s);
+ void apic_poll_irq(DeviceState *d);
+ void apic_designate_bsp(DeviceState *d, bool bsp);
++int apic_get_highest_priority_irr(DeviceState *dev);
  
--    memcpy(&X86_CPU(cpu_state)->env.fpdp, &xsave->data[4], sizeof(X86_CPU(cpu_state)->env.fpdp));
--    memcpy(&X86_CPU(cpu_state)->env.fpip, &xsave->data[2], sizeof(X86_CPU(cpu_state)->env.fpip));
--    memcpy(&X86_CPU(cpu_state)->env.fpregs, &xsave->data[8], sizeof(X86_CPU(cpu_state)->env.fpregs));
--    memcpy(&X86_CPU(cpu_state)->env.ymmh_regs, &xsave->data[144], sizeof(X86_CPU(cpu_state)->env.ymmh_regs));
--    memcpy(&X86_CPU(cpu_state)->env.zmmh_regs, &xsave->data[288], sizeof(X86_CPU(cpu_state)->env.zmmh_regs));
--    memcpy(&X86_CPU(cpu_state)->env.opmask_regs, &xsave->data[272], sizeof(X86_CPU(cpu_state)->env.opmask_regs));
--    memcpy(&X86_CPU(cpu_state)->env.bnd_regs, &xsave->data[240], sizeof(X86_CPU(cpu_state)->env.bnd_regs));
--    memcpy(&X86_CPU(cpu_state)->env.bndcs_regs, &xsave->data[256], sizeof(X86_CPU(cpu_state)->env.bndcs_regs));
--    memcpy(&X86_CPU(cpu_state)->env.hi16_zmm_regs, &xsave->data[416], sizeof(X86_CPU(cpu_state)->env.hi16_zmm_regs));
--    
--    
--    X86_CPU(cpu_state)->env.fpuc = (uint16_t)xsave->data[0];
--    X86_CPU(cpu_state)->env.fpus = (uint16_t)(xsave->data[0] >> 16);
--    X86_CPU(cpu_state)->env.fpstt = (X86_CPU(cpu_state)->env.fpus >> 11) & 7;
--    X86_CPU(cpu_state)->env.fpop = (uint16_t)(xsave->data[1] >> 16);
--    
--    for (x = 0; x < 8; ++x)
--       X86_CPU(cpu_state)->env.fptags[x] =
--        ((((uint16_t)xsave->data[1] >> x) & 1) == 0);
--    
--    memcpy(&X86_CPU(cpu_state)->env.xmm_regs, &xsave->data[40], sizeof(X86_CPU(cpu_state)->env.xmm_regs));
--
--    X86_CPU(cpu_state)->env.mxcsr = xsave->data[6];
--    X86_CPU(cpu_state)->env.xstate_bv = *(uint64_t *)&xsave->data[128];
-+    x86_cpu_xrstor_all_areas(X86_CPU(cpu_state), xsave);
- }
- 
- void hvf_get_segments(CPUState *cpu_state)
+ /* pc.c */
+ DeviceState *cpu_get_current_apic(void);
 -- 
 2.14.1
