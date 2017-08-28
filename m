@@ -1,25 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dmEbD-00048Z-U4
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:36:45 -0400
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dmF2i-0007yX-H5
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:05:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dmEbA-0004Gp-Mq
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:36:43 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:43227)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dmEb9-0004GF-Jm
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:36:40 -0400
-Date: Mon, 28 Aug 2017 15:36:04 +0800 (CST)
-Message-ID: <201708281536046952939@zte.com.cn>
-References: 201708231558023809685@zte.com.cn,20170823084342.GA15802@lemon
-Mime-Version: 1.0
-From: <wang.yong155@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCHv4_01/03=5D_qemu-iothread=3A_IOTh?=
- =?utf-8?q?read_supports_theGMainContext_event_loop?=
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dmF2c-000611-Ll
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:05:08 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42251)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
+	id 1dmF2c-00060F-DX
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:05:02 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7S84fmI099942
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 04:05:00 -0400
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cmagbbdmt-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 04:05:00 -0400
+Received: from localhost
+	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
+	Mon, 28 Aug 2017 18:04:58 +1000
+Received: from d23av02.au.ibm.com (d23av02.au.ibm.com [9.190.235.138])
+	by d23relay06.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v7S84tb338469762
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 18:04:55 +1000
+Received: from d23av02.au.ibm.com (localhost [127.0.0.1])
+	by d23av02.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v7S84kAN025716
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 18:04:46 +1000
+From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Date: Mon, 28 Aug 2017 10:04:43 +0200
+Message-Id: <1503907487-2764-1-git-send-email-zyimin@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 0/4] four zpci patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,93 +43,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: pbonzini@redhat.com, stefanha@redhat.com, jasowang@redhat.com, zhangchen.fnst@cn.fujitsu.com, zhang.zhanghailiang@huawei.com, wang.guang55@zte.com.cn, lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, cohuck@redhat.com, agraf@suse.de, richard.henderson@linaro.org, zyimin@linux.vnet.ibm.com
 
-PkhpIFdhbmcgWW9uZyw+PlRvIG1ha2UgdGhlIGRpc2N1c3Npb24gZWFzaWVyLCBwbGVhc2UgdHJ5
-IHRvIGZpeCB5b3VyIGVtYWlsIGNsaWVudCB0bzo+PjEpIHNldCBJbi1SZXBseS1UbzogaGVhZGVy
-IHdoZW4gcmVwbHlpbmc+MikgdXNlIHBsYWluIHRleHQgaW5zdGVhZCBvZiBodG1sPjMpIHVzZSBt
-b25vc3BhY2UgZm9udHMgdG8gdmlldyBhbmQgY29tcG9zZSBhIHJlcGx5PjQpIGF2b2lkIGF0dGFj
-aGluZyB0aGUgb3JpZ2luYWwgZW1haWwgaW4gdGhlIGVuZCwganVzdCByZXBseSBpbmxpbmU+NSkg
-bWF5YmUsIHVzZSAiUmU6IiBpbiB0aGUgc3ViamVjdCBmb3IgcmVwbHksIGF2b2lkICLnrZTlpI06
-Ij42KSBpbmNsdWRlIG5vdCBvbmx5IGVtYWlsIGFkZHJlc3NlcyBpbiBGcm9tOlRvOi9DYzogaGVh
-ZGVycywgYnV0IGFsc28+ICAgdGhlIG5hbWVzIG9mIHJlY2lwaWVudHMsIGluIHRoZSBmb3JtIG9m
-Pj4gICAgICAgU29tZSBCb2R5IDxzb21lLmJvZHlAZXhhbXBsZS5jb20+LCBBbm90aGVyIE9uZSA8
-YW5vdGhlci5vbmVAZXhhbXBsZS5jb20+LD4gICAgICAgLi4uPk9yIG1heWJlIGp1c3Qgc3dpdGNo
-IHRvIGEgZnVuY3Rpb25hbCBlbWFpbCBjbGllbnQuDQoNCkhpIEZhbSxJIGFtIHZlcnkgc29ycnkg
-dGhhdCBvdXIgY29tcGFueSdzIG1haWwgY2xpZW50IGRvZXMgbm90IHN1cHBvcnQgdGhlIHBhcnQu
-DQoNCg0KDQoNCg0KDQo+PiBJIHRoaW5rIGl0J3Mgb2ssIEkgZG9uJ3Qga25vdyB3aGV0aGVyIEkg
-dW5kZXJzdGFuZCBpdCBjb3JyZWN0bHkgb3Igbm90Pz4+WW91ciBzZXF1ZW5jZSBpcyBvay4gQnV0
-IHJlbWVtYmVyIHRoaXMgaXMgbXVsdGktdGhyZWFkZWQgYW5kIHRoZSBleGVjdXRpb24gb3JkZXI+
-YmV0d2VlbiB0d28gdGhyZWFkcyBhcmUgbm9uLWRldGVybWluaXN0aWMuIFRoZSBzZXF1ZW5jZSBJ
-IHBvaW50ZWQgb3V0IGlzIGFsc28+InBvc3NpYmxlIiBhbmQgd2lsbCBjYXVzZSB1c2UtYWZ0ZXIt
-ZnJlZSBkdWUgdG8gVE9DVE9VIHJhY2UgY29uZGl0aW9uIFsxXS4+PlsxXTogaHR0cHM6Ly9lbi53
-aWtpcGVkaWEub3JnL3dpa2kvVGltZV9vZl9jaGVja190b190aW1lX29mX3VzZQ0KDQpUaGFua3Ms
-V2hlbiBpb3RocmVhZF9zdG9wIGlzIGNhbGxlZCB0d28gdGltZXMgY29uY3VycmVudGx5LHRoaXMg
-QlVHIG1heSBiZSB0cmlnZ2VyZWQuDQoNCkkgd2lsbCBzdWJtaXQgdGhlIHBhdGNoIHY1Lg0KDQoN
-Cg0KDQpXYW5nWW9uZw0KDQoNCg0KDQoNCg0KDQoNCg0K5Y6f5aeL6YKu5Lu2DQoNCg0KDQrlj5Hk
-u7bkurrvvJogPGZhbXpAcmVkaGF0LmNvbT4NCuaUtuS7tuS6uu+8mueOi+WLhzEwMTcwNTMwDQrm
-ioTpgIHkurrvvJogPHBib256aW5pQHJlZGhhdC5jb20+IDxzdGVmYW5oYUByZWRoYXQuY29tPiA8
-amFzb3dhbmdAcmVkaGF0LmNvbT4gPHpoYW5nY2hlbi5mbnN0QGNuLmZ1aml0c3UuY29tPiA8emhh
-bmcuemhhbmdoYWlsaWFuZ0BodWF3ZWkuY29tPueOi+W5vzEwMTY1OTkyIDxsaXpoaWppYW5AY24u
-ZnVqaXRzdS5jb20+IDxxZW11LWRldmVsQG5vbmdudS5vcmc+DQrml6Ug5pyfIO+8mjIwMTflubQw
-OOaciDIz5pelIDE2OjQzDQrkuLsg6aKYIO+8mlJlOiDnrZTlpI06IFJlOiBbUEFUQ0h2NCAwMS8w
-M10gcWVtdS1pb3RocmVhZDogSU9UaHJlYWQgc3VwcG9ydHMgdGhlR01haW5Db250ZXh0IGV2ZW50
-IGxvb3ANCg0KDQoNCg0KDQpIaSBXYW5nIFlvbmcsDQoNClRvIG1ha2UgdGhlIGRpc2N1c3Npb24g
-ZWFzaWVyLCBwbGVhc2UgdHJ5IHRvIGZpeCB5b3VyIGVtYWlsIGNsaWVudCB0bzoNCg0KMSkgc2V0
-IEluLVJlcGx5LVRvOiBoZWFkZXIgd2hlbiByZXBseWluZw0KMikgdXNlIHBsYWluIHRleHQgaW5z
-dGVhZCBvZiBodG1sDQozKSB1c2UgbW9ub3NwYWNlIGZvbnRzIHRvIHZpZXcgYW5kIGNvbXBvc2Ug
-YSByZXBseQ0KNCkgYXZvaWQgYXR0YWNoaW5nIHRoZSBvcmlnaW5hbCBlbWFpbCBpbiB0aGUgZW5k
-LCBqdXN0IHJlcGx5IGlubGluZQ0KNSkgbWF5YmUsIHVzZSAiUmU6IiBpbiB0aGUgc3ViamVjdCBm
-b3IgcmVwbHksIGF2b2lkICLnrZTlpI06Ig0KNikgaW5jbHVkZSBub3Qgb25seSBlbWFpbCBhZGRy
-ZXNzZXMgaW4gRnJvbTpUbzovQ2M6IGhlYWRlcnMsIGJ1dCBhbHNvDQogICB0aGUgbmFtZXMgb2Yg
-cmVjaXBpZW50cywgaW4gdGhlIGZvcm0gb2YNCg0KICAgICAgIFNvbWUgQm9keSA8c29tZS5ib2R5
-QGV4YW1wbGUuY29tPiwgQW5vdGhlciBPbmUgPGFub3RoZXIub25lQGV4YW1wbGUuY29tPiwNCiAg
-ICAgICAuLi4NCg0KT3IgbWF5YmUganVzdCBzd2l0Y2ggdG8gYSBmdW5jdGlvbmFsIGVtYWlsIGNs
-aWVudC4NCg0KT24gV2VkLCAwOC8yMyAxNTo1OCwgd2FuZy55b25nMTU1QHp0ZS5jb20uY24gd3Jv
-dGU6DQo+ID4+IGRpZmYgLS1naXQgYS9pb3RocmVhZC5jIGIvaW90aHJlYWQuYz4+IGluZGV4IGJl
-ZWI4NzAuLmZiMWM1NWIgMTAwNjQ0Pj4gLS0tIGEvaW90aHJlYWQuYz4+ICsrKyBiL2lvdGhyZWFk
-LmM+PiBAQCAtNTcsNiArNTcsMjAgQEAgc3RhdGljIHZvaWQgKmlvdGhyZWFkX3J1bih2b2lkICpv
-cGFxdWUpPj4gID4+ICAgICAgd2hpbGUgKCFhdG9taWNfcmVhZCgmaW90aHJlYWQtPnN0b3BwaW5n
-KSkgez4+ICAgICAgICAgIGFpb19wb2xsKGlvdGhyZWFkLT5jdHgsIHRydWUpPj4gKz4+ICsgICAg
-ICAgIGlmIChhdG9taWNfcmVhZCgmaW90aHJlYWQtPndvcmtlcl9jb250ZXh0KSkgez4+ICsgICAg
-ICAgICAgICBnX21haW5fY29udGV4dF9wdXNoX3RocmVhZF9kZWZhdWx0KGlvdGhyZWFkLT53b3Jr
-ZXJfY29udGV4dCk+PiArICAgICAgICAgICAgaW90aHJlYWQtPm1haW5fbG9vcCA9Pj4gKyAgICAg
-ICAgICAgICAgICBnX21haW5fbG9vcF9uZXcoaW90aHJlYWQtPndvcmtlcl9jb250ZXh0LCBUUlVF
-KT4+ICsgICAgICAgICAgICBnX21haW5fbG9vcF9ydW4oaW90aHJlYWQtPm1haW5fbG9vcCk+PiAr
-Pj4gKyAgICAgICAgICAgIGdfbWFpbl9sb29wX3VucmVmKGlvdGhyZWFkLT5tYWluX2xvb3ApPj4g
-KyAgICAgICAgICAgIGlvdGhyZWFkLT5tYWluX2xvb3AgPSBOVUxMPg0KPiANCj4gPllvdSBzaG91
-bGQgY2xlYXIgaW90aHJlYWQtPm1haW5fbG9vcCBmaXJzdCBiZWZvcmUgY2FsbGluZyBnX21haW5f
-bG9vcF91bnJlZigpLD50byBhdm9pZCBUT0NUT1UgcmFjZSB3aXRoIGlvdGhyZWFkX3N0b3AoKTo+
-DQo+IA0KPiA+ICBpb3RocmVhZF9ydW4gKGluIElPVGhyZWFkKSAgICAgICAgICBpb3RocmVhZF9z
-dG9wIChpbiBtYWluIHRocmVhZCk+ID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT4gICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBpZiAoYXRvbWljX3JlYWQoJmlvdGhyZWFkLT5tYWluX2xvb3ApKSB7
-PiAgLyogZnJlZXMgaW90aHJlYWQtPm1haW5fbG9vcCAqLz4gIGdfbWFpbl9sb29wX3VucmVmKC4u
-Lik+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAvKiBBY2Nlc3NlcyBm
-cmVlZCBtZW1vcnkgKi8+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-Z19tYWluX2xvb3BfcXVpdChpb3RocmVhZC0+bWFpbl9sb29wKT4gICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIH0+ICBpb3RocmVhZC0+bWFpbl9sb29wID0gTlVMTA0KPiANCj4g
-V2hlbiB0aGUgZ19tYWluX2xvb3BfcXVpdCBmdW5jdGlvbiBpcyBjYWxsZWQsIHRoZSBnX21haW5f
-bG9vcF9ydW4gZnVuY3Rpb24gY2FuIGV4aXQ/DQo+IA0KPiANCj4gDQo+IA0KPiBpb3RocmVhZF9y
-dW4gKGluIElPVGhyZWFkKSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-aW90aHJlYWRfc3RvcCAoaW4gbWFpbiB0aHJlYWQpDQo+IA0KPiA9PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCj4g
-DQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgLypzdGVwMTogc2V0ICBsb29wLT5pc19ydW5u
-aW5nID0gRkFMU0UqLw0KPiANCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGdfbWFpbl9sb29w
-X3F1aXQoaW90aHJlYWQtPm1haW5fbG9vcCkNCj4gDQo+IC8qc3RlcDI6IG1haW4gbG9vcCBleGl0
-ICovICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICANCj4g
-DQo+IGdfbWFpbl9sb29wX3J1bigpDQo+IA0KPiAvKnN0ZXAzOmZyZWVzIGlvdGhyZWFkLT5tYWlu
-X2xvb3AgbWVtb3J5Ki8NCj4gDQo+IGdfbWFpbl9sb29wX3VucmVmKC4uLikNCj4gDQo+IGlvdGhy
-ZWFkLT5tYWluX2xvb3AgPSBOVUxMDQo+IA0KPiANCj4gDQo+IA0KPiBJIHRoaW5rIGl0J3Mgb2ss
-IEkgZG9uJ3Qga25vdyB3aGV0aGVyIEkgdW5kZXJzdGFuZCBpdCBjb3JyZWN0bHkgb3Igbm90Pw0K
-DQpZb3VyIHNlcXVlbmNlIGlzIG9rLiBCdXQgcmVtZW1iZXIgdGhpcyBpcyBtdWx0aS10aHJlYWRl
-ZCBhbmQgdGhlIGV4ZWN1dGlvbiBvcmRlcg0KYmV0d2VlbiB0d28gdGhyZWFkcyBhcmUgbm9uLWRl
-dGVybWluaXN0aWMuIFRoZSBzZXF1ZW5jZSBJIHBvaW50ZWQgb3V0IGlzIGFsc28NCiJwb3NzaWJs
-ZSIgYW5kIHdpbGwgY2F1c2UgdXNlLWFmdGVyLWZyZWUgZHVlIHRvIFRPQ1RPVSByYWNlIGNvbmRp
-dGlvbiBbMV0uDQoNClsxXTogaHR0cHM6Ly9lbi53aWtpcGVkaWEub3JnL3dpa2kvVGltZV9vZl9j
-aGVja190b190aW1lX29mX3VzZQ0KDQpGYW0=
+This patch set contains four small zpci patches to fixup different issues.
+1) fixup calculation of msix boundary
+2) remove zpci idx from msix message, instead we could use PCIDevice's id to
+   find zpci device in kvm_arch_fixup_msi_route()
+3) fixup ind_offset calculation for adapter interrupt routing entry
+4) introduce our own iommu_replay callback
+
+Yi Min Zhao (4):
+  s390x/pci: fixup trap_msix()
+  s390x/pci: remove idx from msix msg data
+  s390x/pci: fixup ind_offset of msix routing entry
+  s390x/pci: add iommu replay callback
+
+ hw/s390x/s390-pci-bus.c  | 24 +++++++++++++-----------
+ hw/s390x/s390-pci-bus.h  |  2 ++
+ hw/s390x/s390-pci-inst.c | 28 ++--------------------------
+ target/s390x/kvm.c       | 11 ++++++-----
+ 4 files changed, 23 insertions(+), 42 deletions(-)
+
+-- 
+2.11.0 (Apple Git-81)
