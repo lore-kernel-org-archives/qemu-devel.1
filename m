@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dmMPn-0000Ab-N8
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:57:28 -0400
+	(envelope-from <thuth@redhat.com>) id 1dmMcF-0004xp-CH
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 12:10:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dmMPm-0001su-VP
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:57:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37514)
+	(envelope-from <thuth@redhat.com>) id 1dmMcC-0000Jg-42
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 12:10:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40658)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dmMPm-0001pm-Oq
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:57:26 -0400
-Date: Mon, 28 Aug 2017 17:57:22 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170828175722.0b54b59a.cohuck@redhat.com>
-In-Reply-To: <1503907487-2764-5-git-send-email-zyimin@linux.vnet.ibm.com>
-References: <1503907487-2764-1-git-send-email-zyimin@linux.vnet.ibm.com>
-	<1503907487-2764-5-git-send-email-zyimin@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dmMcB-0000GB-Ty
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 12:10:16 -0400
+References: <20170823083901.852-1-quintela@redhat.com>
+	<20170823083901.852-2-quintela@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6f537126-f1a6-2159-d8f7-35d34b803dfa@redhat.com>
+Date: Mon, 28 Aug 2017 18:10:09 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] s390x/pci: add iommu replay callback
+In-Reply-To: <20170823083901.852-2-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/2] tests: Use real size for iov tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, richard.henderson@linaro.org
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, peterx@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 
-On Mon, 28 Aug 2017 10:04:47 +0200
-Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
-
-> Let's introduce iommu replay callback for s390 pci iommu memory region.
-> Currently we don't need any dma mapping replay. So let it return
-> directly. This implementation will avoid meaningless loops calling
-> translation callback.
-> 
-> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+On 23.08.2017 10:39, Juan Quintela wrote:
+> We were using -1 instead of the real size because the functions check
+> what is bigger, size in bytes or the size of the iov.  Recent gcc's
+> barf at this.
+>=20
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
->  hw/s390x/s390-pci-bus.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index 9e1f7ff5c5..359509ccea 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -407,6 +407,13 @@ static IOMMUTLBEntry s390_translate_iommu(IOMMUMemoryRegion *mr, hwaddr addr,
->      return ret;
->  }
->  
-> +static void s390_pci_iommu_replay(IOMMUMemoryRegion *iommu,
-> +                                  IOMMUNotifier *notifier)
-> +{
-> +    /* we don't need iommu replay currently */
+>  tests/test-iov.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 
-This really needs to be heavier on the _why_. My guess is that anything
-which would require replay goes through the rpcit instruction?
+While you're at it, could you maybe also adjust the comments in
+include/qemu/iov.h ? It currently says:
 
-> +    return;
-> +}
-> +
->  static S390PCIIOMMU *s390_pci_get_iommu(S390pciState *s, PCIBus *bus,
->                                          int devfn)
->  {
-> @@ -1055,6 +1062,7 @@ static void s390_iommu_memory_region_class_init(ObjectClass *klass, void *data)
->      IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
->  
->      imrc->translate = s390_translate_iommu;
-> +    imrc->replay = s390_pci_iommu_replay;
->  }
->  
->  static const TypeInfo s390_iommu_memory_region_info = {
+ * It is okay to use very large value for `bytes' since we're
+ * limited by the size of the iovec anyway, provided that the
+ * buffer pointed to by buf has enough space.  One possible
+ * such "large" value is -1 (sinice size_t is unsigned),
+ * so specifying `-1' as `bytes' means 'up to the end of iovec'.
+
+... and apparently -1 is not working anymore as expected. Maybe SIZE_MAX
+from stdint.h is a better choice?
+
+ Thomas
