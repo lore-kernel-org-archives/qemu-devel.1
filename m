@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmaCz-0004P5-2u
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 02:41:10 -0400
+	(envelope-from <nathan.gauer@gmail.com>) id 1dmRnl-00077B-6O
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:42:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmaCv-0006pm-Sj
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 02:41:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40478)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dmaCv-0006pf-JN
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 02:41:05 -0400
-Date: Tue, 29 Aug 2017 14:40:45 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170829064045.GW14174@pxdev.xzpeter.org>
-References: <20170824192730.8440-1-dgilbert@redhat.com>
-	<20170824192730.8440-12-dgilbert@redhat.com>
+	(envelope-from <nathan.gauer@gmail.com>) id 1dmRnk-0003eT-8k
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:42:33 -0400
+Received: from mail-vk0-x22d.google.com ([2607:f8b0:400c:c05::22d]:36927)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <nathan.gauer@gmail.com>)
+	id 1dmRnk-0003dh-3Z
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:42:32 -0400
+Received: by mail-vk0-x22d.google.com with SMTP id q189so4968171vke.4
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 14:42:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170824192730.8440-12-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 11/32] vhub: Open userfaultfd
+From: =?UTF-8?Q?Nathan_Gau=C3=ABr?= <nathan.gauer@gmail.com>
+Date: Mon, 28 Aug 2017 23:42:09 +0200
+Message-ID: <CAP4Y0TJ=pd+AdeY_5uuDaaixpA5PK4eq8C++vZss6-cgBn+6uA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [GSoC] OpenGL support on Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,91 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, a.perevalov@samsung.com, mst@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, lvivier@redhat.com, aarcange@redhat.com, felipe@nutanix.com
+To: qemu-devel@nongnu.org, spice-devel@lists.freedesktop.org
 
-On Thu, Aug 24, 2017 at 08:27:09PM +0100, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Open a userfaultfd (on a postcopy_advise) and send it back in
-> the reply to the qemu for it to monitor.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  contrib/libvhost-user/libvhost-user.c | 26 +++++++++++++++++++++++---
->  contrib/libvhost-user/libvhost-user.h |  3 +++
->  2 files changed, 26 insertions(+), 3 deletions(-)
-> 
-> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-> index 47884c0a15..f9b5b12b28 100644
-> --- a/contrib/libvhost-user/libvhost-user.c
-> +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -15,6 +15,7 @@
->  
->  #include <qemu/osdep.h>
->  #include <sys/eventfd.h>
-> +#include <sys/syscall.h>
->  #include <linux/vhost.h>
->  
->  #include "qemu/atomic.h"
-> @@ -773,11 +774,30 @@ vu_set_vring_enable_exec(VuDev *dev, VhostUserMsg *vmsg)
->  static bool
->  vu_set_postcopy_advise(VuDev *dev, VhostUserMsg *vmsg)
->  {
-> -    /* TODO: Open ufd, pass it back in the request
-> -     * TODO: Add addresses 
-> -     */
-> +    struct uffdio_api api_struct;
-> +
-> +    dev->postcopy_ufd = syscall(__NR_userfaultfd, O_CLOEXEC | O_NONBLOCK);
-> +    /* TODO: Add addresses */
->      vmsg->payload.u64 = 0xcafe;
->      vmsg->size = sizeof(vmsg->payload.u64);
-> +
-> +    if (dev->postcopy_ufd == -1) {
-> +        vu_panic(dev, "Userfaultfd not available: %s", strerror(errno));
-> +        goto out;
+Hi all,
 
-We got error but still goto out?  I feel like we should reply with
-some kind of error code when any error happens.
+I'm Nathan Gau=C3=ABr, a GSoC 17 student.
+My goal was to provide a PoC OpenGL driver for Windows.
 
-> +    }
-> +    api_struct.api = UFFD_API;
-> +    api_struct.features = 0;
-> +    if (ioctl(dev->postcopy_ufd, UFFDIO_API, &api_struct)) {
-> +        vu_panic(dev, "Failed UFFDIO_API: %s", strerror(errno));
-> +        close(dev->postcopy_ufd);
-> +        dev->postcopy_ufd = -1;
-> +        goto out;
+Status:
 
-Same here.
+This project contains two main parts: the OpenGL driver (ICD) and the
+kernel driver (DOD).
+An Escape handler had to be created on the current DOD driver, and is
+now merged on the spice repo.
+The ICD contains a basic state-tracker, supporting some OpenGL
+commands like glClear, glDrawArray, and contexts.
+As a result, we can now display some basic OpenGL.
 
-> +    }
-> +    /* TODO: Stash feature flags somewhere */
-> +out:
-> +    /* Return a ufd to the QEMU */
-> +    vmsg->fd_num = 1;
-> +    vmsg->fds[0] = dev->postcopy_ufd;
->      return true; /* = send a reply */
->  }
->  
-> diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
-> index 3987ce643d..3e8efdd919 100644
-> --- a/contrib/libvhost-user/libvhost-user.h
-> +++ b/contrib/libvhost-user/libvhost-user.h
-> @@ -234,6 +234,9 @@ struct VuDev {
->       * re-initialize */
->      vu_panic_cb panic;
->      const VuDevIface *iface;
-> +
-> +    /* Postcopy data */
-> +    int postcopy_ufd;
->  };
->  
->  typedef struct VuVirtqElement {
-> -- 
-> 2.13.5
-> 
+To get a rapid overview of the project, here is a gist:
+https://gist.github.com/Keenuts/199184f9a6d7a68d9a62cf0011147c0b
 
--- 
-Peter Xu
+Repositories:
+
+ICD: https://github.com/Keenuts/virtio-gpu-win-icd/tree/master
+DOD: https://gitlab.com/spice/virtio-gpu-wddm/virtio-gpu-wddm-dod/tree/mast=
+er
+VirGL reference: https://github.com/Keenuts/virtio-gpu-documentation/tree/m=
+aster
+
+What's left to do:
+
+- Extend the commands supported by the ICD
+- Add a real state-tracker with shader support (Mesa)
+- Add in kernel resource tracking to prevent lost resources
+- Be able to get feedback from VirGL commands
+
+All the best,
+
+--=20
+Nathan Gau=C3=ABr
