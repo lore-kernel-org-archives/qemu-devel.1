@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dmOJg-0007pN-Br
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:59:17 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dmOKS-0000As-4z
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 14:00:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dmOJc-0007s0-Ch
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:59:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51900)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dmOJc-0007rX-7F
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:59:12 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1073F80B29
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 17:59:11 +0000 (UTC)
-Date: Mon, 28 Aug 2017 14:59:01 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170828175901.GQ15315@localhost.localdomain>
-References: <20170823221445.15243-1-ehabkost@redhat.com>
-	<20170823221445.15243-3-ehabkost@redhat.com>
-	<20170825191858.GK27715@localhost.localdomain>
-	<291e006c-0fac-caa8-041a-3b2991c7171e@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1dmOKO-0008IP-6O
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 14:00:04 -0400
+Resent-Message-Id: <E1dmOKO-0008IP-6O@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21326)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dmOKN-0008Hu-UI
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 14:00:00 -0400
+In-Reply-To: <20170828174707.20786-1-famz@redhat.com>
+Message-ID: <150394317426.30.4061505269299378548@b5667b65043c>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <291e006c-0fac-caa8-041a-3b2991c7171e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/5] pci: Add interface names to hybrid PCI
- devices
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 28 Aug 2017 10:59:36 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v4 00/10] tests: Add VM based build tests
+ (for non-x86_64 and/or non-Linux)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,43 +29,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, Laine Stump <laine@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: famz@redhat.com
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, crosa@redhat.com, f4bug@amsat.org, kamil@netbsd.org, stefanha@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
 
-On Sun, Aug 27, 2017 at 11:33:46AM +0300, Marcel Apfelbaum wrote:
-> Hi Eduardo,
-> 
-> On 25/08/2017 22:18, Eduardo Habkost wrote:
-> > On Wed, Aug 23, 2017 at 07:14:42PM -0300, Eduardo Habkost wrote:
-> > > The following devices support both PCIe and legacy PCI, by
-> > > including special code to handle the QEMU_PCI_CAP_EXPRESS flag:
-> > > 
-> > > * vfio-pci (is_express=1, but legacy PCI handled by
-> > >    vfio_populate_device())
-> > > * vmxnet3 (is_express=0, but PCIe handled by vmxnet3_realize())
-> > > * pvscsi (is_express=0, but PCIe handled by pvscsi_realize())
-> > > * virtio-pci (is_express=0, but PCIe handled by
-> > >    virtio_pci_dc_realize(), and additional legacy PCI code at
-> > >    virtio_pci_realize())
-> > 
-> > Oh, the rules are even messier than that: QEMU_PCI_CAP_EXPRESS
-> > controls _some_ of the code that makes a device become a PCI
-> > Express device, but not every case.
-> > 
-> > In addition to vmxnet3, pvscsi and virtio-pci, PCIe caps
-> > initialization is conditional on hcd-xhci (see below).
-> > 
-> > This means xhci is also a hybrid device.  But it doesn't seem to
-> > clear QEMU_PCI_CAP_EXPRESS.  Doesn't it mean pci_config_size() is
-> > broken if xhci is plugged to a legacy PCI bus?  How does it
-> > affect migration?
-> > 
-> 
-> If this is the case we reserve more config space than needed.
-> Other than wasted space it should be OK, including migration.
-
-Yeah, it looks harmless, except that we need to take the
-migration format into account if refactoring that code.
-
--- 
-Eduardo
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA4MjgxNzQ3MDcuMjA3ODYtMS1mYW16QHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxd
+IFtQQVRDSCB2NCAwMC8xMF0gdGVzdHM6IEFkZCBWTSBiYXNlZCBidWlsZCB0ZXN0cyAoZm9yIG5v
+bi14ODZfNjQgYW5kL29yIG5vbi1MaW51eCkKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9u
+ZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1p
+dHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRj
+b21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cg
+LW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVt
+YWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAg
+ZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRm
+YWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
+MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1w
+cm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE3MDgyODE3
+NDcwNy4yMDc4Ni0xLWZhbXpAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwODI4MTc0NzA3LjIw
+Nzg2LTEtZmFtekByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZjNi
+MWJkYTg0OCB0ZXN0czogQWRkIFJFQURNRSBmb3Igdm0gdGVzdHMKMDQ3MDBiZTA3NCBNQUlOVEFJ
+TkVSUzogQWRkIHRlc3RzL3ZtIGVudHJ5CmEwY2E3MTBjOTEgTWFrZWZpbGU6IEFkZCBydWxlcyB0
+byBydW4gdm0gdGVzdHMKNGMwYjJiZDY4MyB0ZXN0czogQWRkIE9wZW5CU0QgaW1hZ2UKZDgwYzIx
+NzM0OSB0ZXN0czogQWRkIE5ldEJTRCBpbWFnZQo2NjI2ZmRmYWQ1IHRlc3RzOiBBZGQgRnJlZUJT
+RCBpbWFnZQplNWMwNGYyOTQzIHRlc3RzOiBBZGQgdWJ1bnR1LmkzODYgaW1hZ2UKYmI0MzQ1MDQ1
+OSB0ZXN0czogQWRkIHZtIHRlc3QgbGliCjNjMzJmNTZmZWEgcWVtdS5weTogQWRkICJ3YWl0KCki
+IG1ldGhvZAozNDlhMjlkNGFkIGdpdGlnbm9yZTogSWdub3JlIHZtIHRlc3QgaW1hZ2VzCgo9PT0g
+T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzEwOiBnaXRpZ25vcmU6IElnbm9yZSB2
+bSB0ZXN0IGltYWdlcy4uLgpDaGVja2luZyBQQVRDSCAyLzEwOiBxZW11LnB5OiBBZGQgIndhaXQo
+KSIgbWV0aG9kLi4uCkNoZWNraW5nIFBBVENIIDMvMTA6IHRlc3RzOiBBZGQgdm0gdGVzdCBsaWIu
+Li4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM4NTogRklMRTogdGVzdHMvdm0vYmFz
+ZXZtLnB5OjYwOgorc3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFCQVFDaWtDNDZX
+WXRYb3RVZDBVR1B6OTU0N0FqMEtxQzRnaytudDRCQkptODZJSGdDRDlGeWdTR1g5RUZ1dFhsaHo5
+S1pJUGc5T2trNytJelhSSENXSTJNTnZocmNqeXJlektSRW03MXowOGo5aXdmeFkzMzQwZlkyTW8r
+MGtod3BPN2J6c2d6a2xqSElIcWNPZzdNZ3R0UEluVk1OSC9FZnFwZ1I4RURLSnVXQ0IyTnkrRUJG
+Ti8zZEFpZmYwWC9FdktsZTlQVXJZNzBFa1N5Y255VVJTOEhaUmVFcWo4bE45SjVrWHpBOEY2akJv
+LzBRNDJUdHY2ZTRrNVljYURyd21MckJXTHJhMlBDWFpMTnlIcVhFaUZrR21kWHRBMUVveDlnYy9w
+NGpJWGltNnhyUE5tcE42V3lyckVqYUNGNXhZdk52OHdYa0Q2dVNXd2JIWVUyNGxJQW4gcWVtdS12
+bS1rZXkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMDY6IEZJTEU6IHRlc3Rz
+L3ZtL2Jhc2V2bS5weToxODE6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgImZpbGU9JXMs
+aWY9bm9uZSxpZD0lcyxjYWNoZT13cml0ZWJhY2ssZm9ybWF0PXJhdyIgJSBcCgpXQVJOSU5HOiBs
+aW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjA5OiBGSUxFOiB0ZXN0cy92bS9iYXNldm0ucHk6MTg0
+OgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICJ2aXJ0aW8tYmxrLGRyaXZlPSVzLHNlcmlh
+bD0lcyxib290aW5kZXg9MSIgJSAobmFtZSwgbmFtZSldCgpFUlJPUjogbGluZSBvdmVyIDkwIGNo
+YXJhY3RlcnMKIzI1NjogRklMRTogdGVzdHMvdm0vYmFzZXZtLnB5OjIzMToKKyAgICBWTSB0ZXN0
+IHV0aWxpdHkuICBFeGl0IGNvZGVzOiAwID0gc3VjY2VzcywgMSA9IGNvbW1hbmQgbGluZSBlcnJv
+ciwgMiA9IGVudmlyb25tZW50IGluaXRpYWxpemF0aW9uIGZhaWxlZCwgMyA9IHRlc3QgY29tbWFu
+ZCBmYWlsZWQiIiIpCgp0b3RhbDogMiBlcnJvcnMsIDIgd2FybmluZ3MsIDI4NyBsaW5lcyBjaGVj
+a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
+SCA0LzEwOiB0ZXN0czogQWRkIHVidW50dS5pMzg2IGltYWdlLi4uCkNoZWNraW5nIFBBVENIIDUv
+MTA6IHRlc3RzOiBBZGQgRnJlZUJTRCBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCA2LzEwOiB0ZXN0
+czogQWRkIE5ldEJTRCBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCA3LzEwOiB0ZXN0czogQWRkIE9w
+ZW5CU0QgaW1hZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xMDogTWFrZWZpbGU6IEFkZCBydWxlcyB0
+byBydW4gdm0gdGVzdHMuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xMDogTUFJTlRBSU5FUlM6IEFkZCB0
+ZXN0cy92bSBlbnRyeS4uLgpDaGVja2luZyBQQVRDSCAxMC8xMDogdGVzdHM6IEFkZCBSRUFETUUg
+Zm9yIHZtIHRlc3RzLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
+aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
+dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
+Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
