@@ -1,16 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <portias@xilinx.com>) id 1dmSP5-0008LO-HI
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 18:21:08 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dmSh2-0002Ks-0h
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 18:39:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <portias@xilinx.com>) id 1dmSP0-0003xH-Fp
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 18:21:07 -0400
-From: Portia Stephens <portia.stephens@xilinx.com>
-Date: Mon, 28 Aug 2017 15:19:01 -0700
-Message-ID: <20170828221901.12827-1-portia.stephens@xilinx.com>
+	(envelope-from <rth7680@gmail.com>) id 1dmSgy-0004eS-0t
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 18:39:40 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170828035327.17146-1-bobby.prani@gmail.com>
+	<20170828035327.17146-3-bobby.prani@gmail.com>
+	<03c05a60-d697-500b-c2fc-d99b24f3f64c@twiddle.net>
+	<CAJhHMCC4Y0Zos+g4M6Rms+vO8cdZ+AOupciRFWTfnbFgpRs9jw@mail.gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <45959c2a-94c3-7899-eaba-bf13ca85d052@twiddle.net>
+Date: Mon, 28 Aug 2017 15:39:31 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] target/arm: Remove 5J architecture
+In-Reply-To: <CAJhHMCC4Y0Zos+g4M6Rms+vO8cdZ+AOupciRFWTfnbFgpRs9jw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 3/3] mttcg: Implement implicit ordering
+ semantics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,52 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, portia.stephens@xilinx.com, stephensportia@gmail.com, alistair.francis@xilinx.com
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, "open list:AArch64 target" <qemu-arm@nongnu.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-This fixes the issue that any BXJ instruction will result in an illegal_op.
-This is because the 5J archiecture is always unsupported.
-5J architecture doesn't have a feature set and ENABLE_ARCH_5J is hardcoded
-to 0, causing any ARCH(5J) to result in an illegal_op. The only use of
-ARCH(5J) is in the BXJ instruction disassembly.
+On 08/28/2017 02:41 PM, Pranith Kumar wrote:
+> On Mon, Aug 28, 2017 at 1:57 PM, Richard Henderson <rth@twiddle.net> wrote:
+>> On 08/27/2017 08:53 PM, Pranith Kumar wrote:
+>>> diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
+>>> index 55a46ac825..b41a248bee 100644
+>>> --- a/tcg/aarch64/tcg-target.h
+>>> +++ b/tcg/aarch64/tcg-target.h
+>>> @@ -117,4 +117,6 @@ static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
+>>>      __builtin___clear_cache((char *)start, (char *)stop);
+>>>  }
+>>>
+>>> +#define TCG_TARGET_DEFAULT_MO (0)
+>>> +
+>>>  #endif /* AARCH64_TCG_TARGET_H */
+>>
+>> Please add all of these in one patch, separate from the tcg-op.c changes.
+>> We should also just make this mandatory and remove any related #ifdefs.
+> 
+> I tried looking up ordering semantics for architectures like ia64 and
+> s390. It is not really clear. I think every arch but for x86 can be
+> defined as weak, even though archs like sparc can also be configured
+> as TSO. Is this right?
 
-This patch replaces that ARCH(5J) with ARCH(6) and removes the 5J architecture,
-this isn't technically correct since the v5J ISA does support the BXJ
-instruction. This change means that running a BXJ instruction on any v5 will
-cause an illegal_op but it is better than the current state where any
-architecture running a BXJ would cause an illegal_op. The correct solution
-would be to create a feature set for v5J but that doesn't seem worth it as the
-v5J is so old.
+s390 has the same memory ordering as i386.
 
-Signed-off-by: Portia Stephens <portia.stephens@xilinx.com>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
----
- target/arm/translate.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+But you're right that the risc chips should generally be 0.
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index d1a5f56998..4a30c0d7e0 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -41,7 +41,6 @@
- #define ENABLE_ARCH_5     arm_dc_feature(s, ARM_FEATURE_V5)
- /* currently all emulated v5 cores are also v5TE, so don't bother */
- #define ENABLE_ARCH_5TE   arm_dc_feature(s, ARM_FEATURE_V5)
--#define ENABLE_ARCH_5J    0
- #define ENABLE_ARCH_6     arm_dc_feature(s, ARM_FEATURE_V6)
- #define ENABLE_ARCH_6K    arm_dc_feature(s, ARM_FEATURE_V6K)
- #define ENABLE_ARCH_6T2   arm_dc_feature(s, ARM_FEATURE_THUMB2)
-@@ -8389,7 +8388,10 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-             break;
-         case 0x2:
-             if (op1 == 1) {
--                ARCH(5J); /* bxj */
-+                /* This should actually be ARCH(5J) but there is currently no
-+                 * 5J architecture in QEMU.
-+                 */
-+                ARCH(6); /* bxj */
-                 /* Trivial implementation equivalent to bx.  */
-                 tmp = load_reg(s, rm);
-                 gen_bx(s, tmp);
--- 
-2.14.1
+I'll try and figure out when sparc can use PSO (loosest for sparc < 8, and
+modern niagara), but leave it 0 for now.
+
+
+r~
