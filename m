@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmKRX-000341-5y
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 09:51:08 -0400
+	(envelope-from <berto@igalia.com>) id 1dmKSM-0003Ti-JE
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 09:51:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmKRU-0005Iw-1i
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 09:51:07 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40910)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dmKRT-0005Ic-Qy
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 09:51:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dmKRQ-0004Rh-Bp
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 13:51:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 36C882E80CC
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 13:50:54 +0000 (UTC)
+	(envelope-from <berto@igalia.com>) id 1dmKSJ-0005r9-Er
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 09:51:58 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170825132332.6734-6-el13635@mail.ntua.gr>
+References: <20170825132332.6734-1-el13635@mail.ntua.gr>
+	<20170825132332.6734-6-el13635@mail.ntua.gr>
+Date: Mon, 28 Aug 2017 15:51:51 +0200
+Message-ID: <w51h8wrvlzc.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 28 Aug 2017 13:38:58 -0000
-From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
-Reply-To: Bug 1713434 <1713434@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150391152035.18876.7874968547091336063.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150392753840.17031.478333610754562754.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1713434] Re: prom-env-test test aborted and core
- dumped
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 5/7] block/throttle-groups.c: remove
+ throttle-groups list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,97 +23,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>
+Cc: qemu-block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Host was not loaded at that time. And can be re-producable all the times
+On Fri 25 Aug 2017 03:23:30 PM CEST, Manos Pitsidianakis wrote:
+> @@ -1957,12 +1957,18 @@ void blk_io_limits_enable(BlockBackend *blk, const char *group,  Error **errp)
+>      BlockDriverState *bs = blk_bs(blk), *throttle_node;
+>      QDict *options = qdict_new();
+>      Error *local_err = NULL;
+> -    ThrottleState *ts;
+> -
+> -    bdrv_drained_begin(bs);
+>  
+>      /* Force creation of group in case it doesn't exist */
+> -    ts = throttle_group_incref(group);
+> +    if (!throttle_group_exists(group)) {
+> +        throttle_group_new_legacy(group, &local_err);
+> +        if (local_err) {
+> +            error_propagate(errp, local_err);
+> +            return;
+> +        }
+> +    }
 
-  GTESTER check-qtest-ppc64
-**
-ERROR:tests/prom-env-test.c:42:check_guest_memory: assertion failed (signat=
-ure =3D=3D MAGIC): (0x7c7f1b78 =3D=3D 0xcafec0de)
-GTester: last random seed: R02S5625099e4ad7700238a4e83dbd6576e0
+After this, the reference count of the new group is 2 (as is already
+explained in throttle_group_new_legacy()).
 
-this is with new seed.
+> +    bdrv_drained_begin(bs);
+> +
+>      qdict_set_default_str(options, "file", bs->node_name);
+>      qdict_set_default_str(options, QEMU_OPT_THROTTLE_GROUP_NAME, group);
+>      throttle_node = bdrv_new_open_driver(bdrv_find_format("throttle"), NULL,
 
--- =
+And the implicit throttle node will hold and extra reference, making it
+3.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1713434
+How do you delete the legacy throttle group then? block_set_io_throttle
+with everything set to 0 disables I/O limits and destroys the node, but
+the reference count is still 2 and the group is not destroyed.
 
-Title:
-  prom-env-test test aborted and core dumped
+> +static int query_throttle_groups_foreach(Object *obj, void *data)
+> +{
+> +    ThrottleGroup *tg;
+> +    struct ThrottleGroupQuery *query = data;
+> +
+> +    tg = (ThrottleGroup *)object_dynamic_cast(obj, TYPE_THROTTLE_GROUP);
+> +    if (!tg) {
+> +        return 0;
+> +    }
+> +
+> +    if (!g_strcmp0(query->name, tg->name)) {
+> +        query->result = tg;
+> +        return 1;
+> +    }
+> +
+> +    return 0;
+> +}
 
-Status in QEMU:
-  In Progress
+If you want you can make this a bit shorter if you merge both ifs:
 
-Bug description:
-  On ppc64le architecture machine the following test case Aborted and
-  Core dumped.
+   if (tg && !g_strcmp0(query->name, tg->name)) {
+       query->result = tg;
+       return 1;
+   }
 
-  # tests/prom-env-test --quiet --keep-going -m=3Dquick --GTestLogFD=3D6
-  **
-  ERROR:tests/libqtest.c:628:qtest_get_arch: assertion failed: (qemu !=3D N=
-ULL)
-  Aborted (core dumped)
+   return 0;
 
-  Steps to re-produce:
-  clone from the git
-  configure & compile =
+> +void throttle_group_new_legacy(const char *name, Error **errp)
+> +{
+> +    ThrottleGroup *tg = NULL;
 
-  run the unit tests by 'make check'
+No need to initialize tg here.
 
-  (gdb) bt
-  #0  0x00003fff9d60eff0 in raise () from /lib64/libc.so.6
-  #1  0x00003fff9d61136c in abort () from /lib64/libc.so.6
-  #2  0x00003fff9de1aa04 in g_assertion_message () from /lib64/libglib-2.0.=
-so.0
-  #3  0x00003fff9de1ab0c in g_assertion_message_expr () from /lib64/libglib=
--2.0.so.0
-  #4  0x000000001000cc30 in qtest_get_arch () at tests/libqtest.c:628
-  #5  0x00000000100048f0 in main (argc=3D5, argv=3D0x3ffff2145538) at tests=
-/prom-env-test.c:82
-  (gdb) i r
-  r0             0xfa	250
-  r1             0x3ffff2144d30	70368510627120
-  r2             0x3fff9d7b9900	70367091333376
-  r3             0x0	0
-  r4             0x12a7	4775
-  r5             0x6	6
-  r6             0x8	8
-  r7             0x1	1
-  r8             0x0	0
-  r9             0x0	0
-  r10            0x0	0
-  r11            0x0	0
-  r12            0x0	0
-  r13            0x3fff9dfa1950	70367099623760
-  r14            0x0	0
-  r15            0x0	0
-  r16            0x0	0
-  r17            0x0	0
-  r18            0x0	0
-  r19            0x0	0
-  r20            0x0	0
-  r21            0x0	0
-  r22            0x0	0
-  r23            0x0	0
-  r24            0x0	0
-  r25            0x0	0
-  r26            0x0	0
-  r27            0x100287f8	268601336
-  r28            0x16841b40	377756480
-  r29            0x4c	76
-  r30            0x3ffff2144de8	70368510627304
-  r31            0x6	6
-  pc             0x3fff9d60eff0	0x3fff9d60eff0 <raise+96>
-  msr            0x900000000280f033	10376293541503627315
-  cr             0x42000842	1107298370
-  lr             0x3fff9d61136c	0x3fff9d61136c <abort+396>
-  ctr            0x0	0
-  xer            0x0	0
-  orig_r3        0x12a7	4775
-  trap           0xc00	3072
+>  ThrottleState *throttle_group_incref(const char *name)
+>  {
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1713434/+subscriptions
+I think that you can make this one static and remove it from
+throttle-groups.h (no one else is using it). Same with
+throttle_group_unref.
+
+Berto
