@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dmMOl-00087X-Bx
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:56:24 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dmMPn-0000Ab-N8
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:57:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dmMOh-0000TL-HP
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:56:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43668)
+	(envelope-from <cohuck@redhat.com>) id 1dmMPm-0001su-VP
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:57:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37514)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dmMOh-0000Qt-7m
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:56:19 -0400
-References: <cover.1503249785.git.balaton@eik.bme.hu>
-	<alpine.BSF.2.21.1708271402040.1289@zero.eik.bme.hu>
-	<AM5P194MB01323322D359DF607B54C19EC8990@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d2917c22-1a10-eb39-17c7-be5096c400db@redhat.com>
-Date: Mon, 28 Aug 2017 10:56:14 -0500
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dmMPm-0001pm-Oq
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:57:26 -0400
+Date: Mon, 28 Aug 2017 17:57:22 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170828175722.0b54b59a.cohuck@redhat.com>
+In-Reply-To: <1503907487-2764-5-git-send-email-zyimin@linux.vnet.ibm.com>
+References: <1503907487-2764-1-git-send-email-zyimin@linux.vnet.ibm.com>
+	<1503907487-2764-5-git-send-email-zyimin@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <AM5P194MB01323322D359DF607B54C19EC8990@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="b7Cx9qpj7fBuNEmm5lfmuqd2CDCKcj1dR"
-Subject: Re: [Qemu-devel] Qemu 2.10 rc4 build issue on BE
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/4] s390x/pci: add iommu replay callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: luigi burdo <intermediadc@hotmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, richard.henderson@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---b7Cx9qpj7fBuNEmm5lfmuqd2CDCKcj1dR
-From: Eric Blake <eblake@redhat.com>
-To: luigi burdo <intermediadc@hotmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Message-ID: <d2917c22-1a10-eb39-17c7-be5096c400db@redhat.com>
-Subject: Re: [Qemu-devel] Qemu 2.10 rc4 build issue on BE
-References: <cover.1503249785.git.balaton@eik.bme.hu>
- <alpine.BSF.2.21.1708271402040.1289@zero.eik.bme.hu>
- <AM5P194MB01323322D359DF607B54C19EC8990@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
-In-Reply-To: <AM5P194MB01323322D359DF607B54C19EC8990@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, 28 Aug 2017 10:04:47 +0200
+Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
 
-On 08/27/2017 11:56 AM, luigi burdo wrote:
-> Hi all,
->=20
-> the last rc4 from the qemu website fail in build in some parts on BE ha=
-rdware.
+> Let's introduce iommu replay callback for s390 pci iommu memory region.
+> Currently we don't need any dma mapping replay. So let it return
+> directly. This implementation will avoid meaningless loops calling
+> translation callback.
+> 
+> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+> ---
+>  hw/s390x/s390-pci-bus.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index 9e1f7ff5c5..359509ccea 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -407,6 +407,13 @@ static IOMMUTLBEntry s390_translate_iommu(IOMMUMemoryRegion *mr, hwaddr addr,
+>      return ret;
+>  }
+>  
+> +static void s390_pci_iommu_replay(IOMMUMemoryRegion *iommu,
+> +                                  IOMMUNotifier *notifier)
+> +{
+> +    /* we don't need iommu replay currently */
 
-Please don't commandeer unrelated threads (replying to an existing
-message sets up In-Reply-To: and References: headers that thread your
-mail to the previous one, even if you change the subject and drop all
-previous content; it would have been better to post your message as a
-top-level thread instead of buried in an unrelated thread).
+This really needs to be heavier on the _why_. My guess is that anything
+which would require replay goes through the rpcit instruction?
 
-https://lists.gnu.org/archive/html/qemu-devel/2017-08/threads.html#03659
-demonstrates how your message was inappropriately threaded to
-"[Qemu-ppc] [PATCH 00/15] Sam460ex emulation"
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---b7Cx9qpj7fBuNEmm5lfmuqd2CDCKcj1dR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmkPR4ACgkQp6FrSiUn
-Q2o+iQf/Y5h7QntXn+gRg44IMRQoLaxM0r/SJpB6HGgHGM0vAMeG+dTeEyKkK1go
-pyR6U5el187lchIU34CEWbtPrcmlCbouk3mdPOvD9pj0aRnoy1YEMS+aqUWXmxRD
-beuWHNsdzPtUfga1O8HwVXQWSdysHRvFPkGGK762Fbbc6JvVP543j7/n2LuBg2CN
-GlxxcTv2WPSbTswxrGZCnaHapRBbGyJUBcmdpyjpQkyEfj/orSjjWWhBjYtjJC+K
-04jRucQ5KaqAuXWazbHJ7Z3eVstwZiBhjxwStu4jBApTvZe1arD5TCwUR1Aisn0g
-bxi7wiSsF+gpUOT6SprtViGLe5Iodw==
-=tHGy
------END PGP SIGNATURE-----
-
---b7Cx9qpj7fBuNEmm5lfmuqd2CDCKcj1dR--
+> +    return;
+> +}
+> +
+>  static S390PCIIOMMU *s390_pci_get_iommu(S390pciState *s, PCIBus *bus,
+>                                          int devfn)
+>  {
+> @@ -1055,6 +1062,7 @@ static void s390_iommu_memory_region_class_init(ObjectClass *klass, void *data)
+>      IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
+>  
+>      imrc->translate = s390_translate_iommu;
+> +    imrc->replay = s390_pci_iommu_replay;
+>  }
+>  
+>  static const TypeInfo s390_iommu_memory_region_info = {
