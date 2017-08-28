@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmE2l-0004aF-Hg
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:01:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1dmECT-0005ut-UT
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:11:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmE2h-0007Mt-Hd
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:01:07 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56566)
+	(envelope-from <bounces@canonical.com>) id 1dmECP-0001ey-Rl
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:11:09 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57926)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dmE2h-0007MR-Ax
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:01:03 -0400
+	id 1dmECP-0001ei-Ht
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:11:05 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dmE2f-0002Pg-8D
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 07:01:01 +0000
+	id 1dmECO-0001fK-IB
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 07:11:04 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3C7B82E80C8
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 07:01:01 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 88A8B2E80C9
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 07:11:04 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 28 Aug 2017 06:46:00 -0000
+Date: Mon, 28 Aug 2017 06:56:32 -0000
 From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
 Reply-To: Bug 1713408 <1713408@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150390171227.19506.41697463404689071.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150390276135.18876.10019503852498292963.malone@chaenomeles.canonical.com>
+Message-Id: <150390339224.8072.16087487933394373993.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1713408] Re: qemu crashes with "GLib-ERROR **:
  gmem.c" error when a negative value passed to "maxcpus"
@@ -39,20 +39,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-3308 static const CPUArchIdList *spapr_possible_cpu_arch_ids(MachineState *=
-machine)
-3309 {
-3310     int i;
-3311     int spapr_max_cores =3D max_cpus / smp_threads;  <<<<<< max_cpus i=
-s -ve and spapr_max_cores will also be -ve
-
-...
-
-3321
-3322     machine->possible_cpus =3D g_malloc0(sizeof(CPUArchIdList) +
-3323                              sizeof(CPUArchId) * spapr_max_cores);
-
-g_malloc0(is getting a -ve value) and then fails with a trap.
+The above I am referring from hw/ppc/spapr.c
 
 -- =
 
