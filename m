@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dmLOR-0003GP-AW
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 10:52:01 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dmLTz-00051M-HK
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 10:57:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dmLOQ-0005XV-A3
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 10:51:59 -0400
-References: <20170828112952.22965-1-kchamart@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a80aaf11-a962-c9d6-e271-c8ad5e1365b7@redhat.com>
-Date: Mon, 28 Aug 2017 09:51:43 -0500
+	(envelope-from <el13635@mail.ntua.gr>) id 1dmLTw-0008GJ-Bu
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 10:57:43 -0400
+Received: from smtp1.ntua.gr ([2001:648:2000:de::183]:10875)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <el13635@mail.ntua.gr>) id 1dmLTv-0008DL-QY
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 10:57:40 -0400
+Date: Mon, 28 Aug 2017 17:57:28 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170828145728.dqubknb7fruy4sfu@postretch>
 MIME-Version: 1.0
-In-Reply-To: <20170828112952.22965-1-kchamart@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="sS1PJdlDWxTKdp9QgIo4rVSXp2VK145lb"
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Extend non-shared storage
- migration test (194)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="wlea66pr35rkw3dt"
+Content-Disposition: inline
+Subject: [Qemu-devel] GSOC Report: Moving I/O throttling and write notifiers
+ into block filter drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,149 +26,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, stefanha@redhat.com, famz@redhat.com, kwolf@redhat.com, dgilbert@redhat.com
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---sS1PJdlDWxTKdp9QgIo4rVSXp2VK145lb
-From: Eric Blake <eblake@redhat.com>
-To: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, stefanha@redhat.com, famz@redhat.com,
- kwolf@redhat.com, dgilbert@redhat.com
-Message-ID: <a80aaf11-a962-c9d6-e271-c8ad5e1365b7@redhat.com>
-Subject: Re: [PATCH] qemu-iotests: Extend non-shared storage migration test
- (194)
-References: <20170828112952.22965-1-kchamart@redhat.com>
-In-Reply-To: <20170828112952.22965-1-kchamart@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--wlea66pr35rkw3dt
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 08/28/2017 06:29 AM, Kashyap Chamarthy wrote:
-> This is the follow-up patch that was discussed[*] as part of feedback t=
-o
-> qemu-iotest 194.
->=20
-> Changes in this patch:
->=20
->   - Supply 'job-id' parameter to `drive-mirror` invocation.
->=20
->   - Issue `block-job-cancel` command on the source QEMU to gracefully
->     complete the mirroring operation.
->=20
->   - Stop the NBD server on the destination QEMU.
->=20
->   - Finally, exit once the event BLOCK_JOB_COMPLETED is emitted.
->=20
-> With the above, the test will also be (almost) in sync with the
-> procedure outlined in the document live-block-operations.rst[+]
-> (section: "QMP invocation for live storage migration with
-> ``drive-mirror`` + NBD").
->=20
-> [*] https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg04820.h=
-tml
->     -- qemu-iotests: add 194 non-shared storage migration test
-> [+] https://git.qemu.org/gitweb.cgi?p=3Dqemu.git;a=3Dblob;f=3Ddocs/inte=
-rop/live-block-operations.rst
->=20
-> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
-> ---
-> I wonder:
->   - Is it worth printing the MIGRATION event state change?
+This is a GSOC project summary required for the project's final=20
+submission. As part of GSOC 2017, I took the project of moving two hard=20
+coded block layer features into filter drivers. I/O Throttling is=20
+implemented in block/throttle.c and before write notifiers are split=20
+into a driver for each user of the before write notifier API:=20
+block/backup.c and block/write-threshold.c. Furthermore, work began on=20
+block-insert-node and block-remove-node commands for the QMP interface=20
+to allow runtime insertion and removal of filter drivers. [0]
 
-I think waiting for both the BLOCK_JOB_COMPLETED and MIGRATION events
-make sense (in other words, let's check both events in the expected
-order, rather than just one or the other).
+A lot of thanks to my mentors for their help: Alberto Garcia, Stefan=20
+Hajnoczi and Kevin Wolf.
 
->   - Since we're not checking on the MIGRATION event anymore, can
->     the migration state change events related code (that is triggerred
->     by setting 'migrate-set-capabilities') be simply removed?
+Terms
+=3D=3D=3D=3D=3D
 
-If we're going to mirror libvirt's non-shared storage migration
-sequence, I think we want to keep everything, rather than drop the
-migration half.
+The BlockBackend struct (block/block-backend.c) represents the backend part=
+=20
+of a storage device that a VM sees in the QEMU environment. The BlockBacken=
+d=20
+has the responsibility to forward I/O requests from the VM down to the=20
+actual underlying storage; a network block device, a qcow2 image etc.
 
-> ---
->  tests/qemu-iotests/194     | 17 ++++++++++++-----
->  tests/qemu-iotests/194.out | 14 ++++++++------
->  2 files changed, 20 insertions(+), 11 deletions(-)
->=20
-> diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
-> index 8028111e21bed5cf4a2e8e32dc04aa5a9ea9caca..8d746be9d0033f478f11886=
-ee93f95b0fa55bab0 100755
-> --- a/tests/qemu-iotests/194
-> +++ b/tests/qemu-iotests/194
-> @@ -46,16 +46,17 @@ iotests.log('Launching NBD server on destination...=
-')
->  iotests.log(dest_vm.qmp('nbd-server-start', addr=3D{'type': 'unix', 'd=
-ata': {'path': nbd_sock_path}}))
->  iotests.log(dest_vm.qmp('nbd-server-add', device=3D'drive0', writable=3D=
-True))
-> =20
-> -iotests.log('Starting drive-mirror on source...')
-> +iotests.log('Starting `drive-mirror` on source...')
->  iotests.log(source_vm.qmp(
->                'drive-mirror',
->                device=3D'drive0',
->                target=3D'nbd+unix:///drive0?socket=3D{0}'.format(nbd_so=
-ck_path),
->                sync=3D'full',
->                format=3D'raw', # always raw, the server handles the for=
-mat
-> -              mode=3D'existing'))
-> +              mode=3D'existing',
-> +              job_id=3D'mirror-job0'))
-> =20
-> -iotests.log('Waiting for drive-mirror to complete...')
-> +iotests.log('Waiting for `drive-mirror` to complete...')
+In order to allow for polymorphic storage, a BlockBackend forwards the=20
+requests to an acyclic graph in which the leaves are the terminal I/O=20
+destination, a file or network connection. The BlockDriverState struct=20
+represents a node in this graph, and each node is governed by a specific=20
+driver. Above the leaf-nodes we have format drivers that translate requests=
+=20
+for each format (ie a qcow2 driver, or a raw driver). Backing files are=20
+implemented as chains of nodes that forward read requests to their=20
+children but keep write requests to themselves. This setup allows=20
+different node drivers to intercept requests before they reach their=20
+destination by being inserted into points of interest in the graph. We=20
+call these block filter drivers.
 
-So, up to here is okay,
+An existing filter driver for example is block/blkverify.c which compares=
+=20
+two children for content parity and reports content mismatches.
 
->  iotests.log(source_vm.event_wait('BLOCK_JOB_READY'),
->              filters=3D[iotests.filter_qmp_event])
-> =20
-> @@ -66,8 +67,14 @@ dest_vm.qmp('migrate-set-capabilities',
->              capabilities=3D[{'capability': 'events', 'state': True}])
->  iotests.log(source_vm.qmp('migrate', uri=3D'unix:{0}'.format(migration=
-_sock_path)))
-> =20
-> +iotests.log('Gracefully ending the `drive-mirror` job on source...')
-> +iotests.log(source_vm.qmp('block-job-cancel', device=3D'mirror-job0'))=
+I/O Throttling
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-> +
-> +iotests.log('Stopping the NBD server on destination...')
-> +iotests.log(dest_vm.qmp('nbd-server-stop'))
-> +
->  while True:
-> -    event =3D source_vm.event_wait('MIGRATION')
-> +    event =3D source_vm.event_wait('BLOCK_JOB_COMPLETED')
+I/O throttling is done by intercepting I/O requests and throttling them=20
+based on the configured limits (docs/throttle.txt). The interface was=20
+refactored into the throttle driver [1] while the throttling primitives=20
+were left unchanged. The already existing interface of setting limits on=20
+a BlockBackend device is simulated [2] by inserting a hidden to the user=20
+throttle filter node at the root of the BlockBackend with the user's set=20
+limits. Implicitly created filter nodes is not a good solution since=20
+some of the QEMU internals are written without considering filter nodes. =
+=20
+Some patches in the throttle-remove-legacy branch are dedicated to=20
+changing existing behaviour to match the new concept of implicit=20
+filters. In the future management tools should be expected to explicitly=20
+add and remove filter nodes like throttle (except for transient block=20
+job filters which may remain implicit) and there should be no surprises=20
+about the state of the block layer graph for the user.
 
-And this event makes sense for catching the block-job-cancel, but I
-think you STILL want to keep a while loop for catching migration as well.=
+Throttle groups are categories of drives sharing the same limits with a=20
+round-robin algorithm. Additional effort was spent on making throttle group=
+s=20
+easier to configure by turning them into a separately creatable object (wit=
+h=20
+-object syntax on command line invocation or object-add in QMP). Their=20
+properties can be set with 'qom-set' commands and retrieved with 'qom-get'.
 
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Write Notifiers
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
+While a backup block job is running, it is important to have knowledge of=
+=20
+writes to the relevant image. Before write notifiers pass the write request=
+s=20
+to the backup job to perform copy on write on the target image with the new=
+=20
+data. Currently this is done on the BlockBackend level. Other block jobs=20
+(commit/mirror) already create implicit nodes in the BDS chain and this=20
+approach was copied and a backup filter driver was created [3], internal to=
+=20
+block/backup.c
 
---sS1PJdlDWxTKdp9QgIo4rVSXp2VK145lb
+The write-threshold feature once enabled via QMP, watches passing write=20
+requests and compares them to a user-given threshold offset. When that=20
+threshold is exceeded an event is delivered to the user and the feature=20
+disables itself. This is used for management tools that need to know when=
+=20
+they have to resize their images. Like backup, this was done in the=20
+BlockBackend level. However it wasn't easy to replace the existing interfac=
+e=20
+with an implicit filter node like in throttling, so only a separate driver=
+=20
+was created [4] in block/write-threshold.c. Like other filter drivers, it=
+=20
+can be inserted on runtime and removed once it delivers the event and is=20
+spent and should be removed or replaced.
+
+Branches / Patches
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+The 'throttle' and 'throttle-remove-legacy' patches should be merged soon=
+=20
+after master unfreezes from the 2.10 release. The rest of the patch series=
+=20
+are in final stages of review on qemu-devel except for block-insert-node=20
+which is an RFC [5].
+
+Already merged patches in 2.10
+  https://github.com/qemu/qemu/commits/v2.10.0-rc4?author=3Depilys
+Already merged patches for 2.11
+  https://www.mail-archive.com/qemu-devel@nongnu.org/msg470461.html
+
+[0] [insert-node] block-insert-node and block-remove-node commands
+  https://github.com/epilys/qemu/commits/insert-node?author=3Depilys
+
+[1] [throttle] add throttle filter driver
+  https://github.com/epilys/qemu/commits/throttle?author=3Depilys
+  Message-ID: <20170825132028.6184-1-el13635@mail.ntua.gr>
+  https://www.mail-archive.com/qemu-devel@nongnu.org/msg476047.html
+
+[2] [throttle-remove-legacy] remove legacy throttling interface
+  https://github.com/epilys/qemu/commits/throttle-remove-legacy?author=3Dep=
+ilys
+
+[3] [4] [notify] https://github.com/epilys/qemu/commits/notify?author=3Depi=
+lys
+
+[5] block-insert-node RFC
+  Message-ID: <20170815074513.9055-1-el13635@mail.ntua.gr>
+  https://www.mail-archive.com/qemu-devel@nongnu.org/msg473619.html
+
+--wlea66pr35rkw3dt
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmkLf8ACgkQp6FrSiUn
-Q2qfywf/WEHt9DoAzEZLGoSz7e5UUNqoaxJbYdgfCwFPObZWfUzXzSYUwvnSH4kJ
-xyv1CCnbOtf961qiduVCso/ykv4TEVuX8zL80+q1eqiN0ht5G1VQSSAQ0vn09XTE
-zZnsiXBhF9eYWK8oqmIZBoACquczLtMDucPsWbShsb8+czlHpJxs40OfSMvSrW3o
-2O9RyZ9fkeVF4V+qWCWl7IygYiF1AxlqnLzx3MVAUdHWTpDTr+dQp4gVuLr3Wgew
-DZMy3hkmfK0Yl9G31L55WE8LIUgES/rhxE65nrHn8WiS+v9NYgsaf7DnzBkNlArp
-0kH2iRzJGM+9108LJbDBIH8XO59QYg==
-=CjGj
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlmkL1gACgkQc2J8L2kN
+9xDLGhAAtaW1Os5Q6m5Ka+qMtOXgchPlWDsZytC0SzKzfLmLO9xsY9WOJCJkQh5w
+HapbHtVyopB9ZxQJy5d7XelDQ/S6EL6qeoTKANcKTtJtXgL+1hOaWWbX+iQhxsxR
+CqDMGF/n/mi/XZzh9Dh5Ps8c3Gk3T6mXK6WUXtVPxpAGAdCGEYrvdExyUwDNaCrv
+vt/hcQeDJ85aOmp9c7kaZHly6oZ9niK4YaX+1s+eyIkba2In0i8NS+a/32e8k+Tl
+MDTc1UigcjjCOj1uVofm0MiA/O0igu3gU8czNq9yVkh80w4TGuF+YFqd6Ra6g0Dx
+DECNwXrLczTUegSsKGo/L8OVhlLAAC5ASCXru3Ke9O15/lBkMfMmhRwaRZhl2Sgn
+z+g9GwAFO5yHuq78q5xVzS7ZB5Qy9ZNSEua+/g2ylTFPxmmj6UN8JGa26h2w0Uod
+VKhY8l+VB2CcF19OOcn+fp7YD22ullfoRvjrr0j224qX3KWfy2uyBVALAbSvCV8H
+GZQDGd97I0h5va2oGS+LFwuHu+0fHxuNcTN/JF0yX0kClOlZ67KuBFXYU+xjCO0z
+VfAsSkrVBXG1kjOc8rit0vwOTKgRNzKrLCWvSiYg/PXlSIGB64vTibiIV+wmQTNW
+b/QKN7Xumr/8t0We+Ct6MbqYSOUpJK9NanWE7jo8un2pAVttyN0=
+=9bR9
 -----END PGP SIGNATURE-----
 
---sS1PJdlDWxTKdp9QgIo4rVSXp2VK145lb--
+--wlea66pr35rkw3dt--
