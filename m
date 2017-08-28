@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmF67-00025S-Bd
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:08:40 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dmFJQ-0005y3-QU
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:22:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmF64-0007wx-5R
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:08:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39800)
+	(envelope-from <cohuck@redhat.com>) id 1dmFJN-0000Dz-Jw
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:22:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54294)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dmF63-0007wT-Sv
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:08:36 -0400
-Date: Mon, 28 Aug 2017 16:08:27 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170828080827.GL14174@pxdev.xzpeter.org>
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<1503471071-2233-5-git-send-email-peterx@redhat.com>
-	<20170823174411.GG2648@work-vm> <20170823233732.GA16947@lemon>
-	<20170825053718.GF14174@pxdev.xzpeter.org>
-	<20170825091412.GB2090@work-vm>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dmFJN-0000DK-DN
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:22:21 -0400
+Date: Mon, 28 Aug 2017 10:22:14 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170828102214.7aad9112.cohuck@redhat.com>
+In-Reply-To: <00d41b2b-cf22-c9e2-8d9f-de947f4d3f18@linux.vnet.ibm.com>
+References: <cover.1503667215.git.alifm@linux.vnet.ibm.com>
+	<3ed8b810b6592daee6a775037ce21f850e40647d.1503667215.git.alifm@linux.vnet.ibm.com>
+	<20170825160408.2775c8b5.cohuck@redhat.com>
+	<00d41b2b-cf22-c9e2-8d9f-de947f4d3f18@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170825091412.GB2090@work-vm>
-Subject: Re: [Qemu-devel] [RFC v2 4/8] QAPI: new QMP command option
- "without-bql"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] s390-ccw: Fix alignment for CCW1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Farhan Ali <alifm@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, farman@linux.vnet.ibm.com, walling@linux.vnet.ibm.com
 
-On Fri, Aug 25, 2017 at 10:14:12AM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > On Thu, Aug 24, 2017 at 07:37:32AM +0800, Fam Zheng wrote:
-> > > On Wed, 08/23 18:44, Dr. David Alan Gilbert wrote:
-> > > > * Peter Xu (peterx@redhat.com) wrote:
-> > > > > Introducing this new parameter for QMP commands in general to mark out
-> > > > > when the command does not need BQL.  Normally QMP command executions are
-> > > > > done with the protection of BQL in QEMU.  However the truth is that not
-> > > > > all the QMP commands require the BQL.
-> > > > > 
-> > > > > This new parameter provides a way to allow QMP commands to run in
-> > > > > parallel when possible, without the contention on the BQL.
-> > > > > 
-> > > > > Since the default value of "without-bql" is still false, so now all QMP
-> > > > > commands are still protected by BQL still.
-> > > > > 
-> > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > 
-> > > > We should define what a 'without-bql' command is allowed to do:
-> > > >    'Commands that have without-bql set _may_ be called without the bql
-> > > >    being taken.  They must not take the bql or any other lock that may
-> > > >    become dependent on the bql.'
-> > 
-> > Sure.
-> > 
-> > > >    (Do we need to say anything about RCU?)
-> > 
-> > Could I ask how is RCU related?
+On Fri, 25 Aug 2017 11:05:30 -0400
+Farhan Ali <alifm@linux.vnet.ibm.com> wrote:
+
+> On 08/25/2017 10:04 AM, Cornelia Huck wrote:
+> > On Fri, 25 Aug 2017 09:24:46 -0400
+> > Farhan Ali <alifm@linux.vnet.ibm.com> wrote:
+> >  
+> >> The commit 198c0d1f9df8c4 s390x/css: check ccw address validity
+> >> exposes an alignment issue in ccw bios.
+> >>
+> >> According to PoP the CCW must be doubleword aligned. Let's fix
+> >> this in the bios.
+> >>
+> >> Cc: qemu-stable@nongnu.org
+> >> Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
+> >> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> >> Reviewed-by: Eric Farman <farman@linux.vnet.ibm.com>
+> >> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> >> ---
+> >>  pc-bios/s390-ccw/cio.h | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
+> >> index f5b4549..55eaeee 100644
+> >> --- a/pc-bios/s390-ccw/cio.h
+> >> +++ b/pc-bios/s390-ccw/cio.h
+> >> @@ -133,7 +133,7 @@ struct ccw1 {
+> >>      __u8 flags;
+> >>      __u16 count;
+> >>      __u32 cda;
+> >> -} __attribute__ ((packed));
+> >> +} __attribute__ ((packed, aligned(8)));
+> >>
+> >>  #define CCW_FLAG_DC              0x80
+> >>  #define CCW_FLAG_CC              0x40  
+> >
+> > Currently testing.
+> >
+> > This looks obviously right, but did you figure out what the (probably
+> > unrelated) other failure was?
+> >  
 > 
-> My definition above said that anything declared without bql couldn't
-> take the bql, so couldn't block on any other thread holding the bql.
-> But is our command allowed to use synchronize_rcu or rcu_read_lock
-> that could wait for or block other threads doing rcu stuff?
-> Because if it did is there any guarantee that it wouldn't block?
+> That is still under investigation, for some reason it only fails for an 
+> LDL DASD and it works for SCSIs and CDL DASD.
 
-I see.  Shall we just ignore RCU for now?  Since currently I don't see
-a real synchronize_rcu() user yet in QEMU, except the RCU thread.  And
-rcu_read_lock() should not block itself, so IMHO calling it only in
-monitor command handlers should always be fine?
+Which are the symptoms of the failure? I'd like to understand this
+before I update the (currently working by accident) bios with an
+updated version.
 
-> 
-> 
-> > 
-> > > > 
-> > > > Also, 'no-bql' is shorter :-)
-> > > 
-> > > Or rather "need-bql" that defaults to true to avoid double negative (TM) with
-> > > "no-bql = false"?
-> > 
-> > Ok let me use "need-bql". :)
-> 
-> Fine by me.
-
-I'm switching to "need-bql" for QMP only, and used "no-bql" in HMP,
-since I failed to find a good way to init mon_cmd_t field to true by
-default.
-
--- 
-Peter Xu
+I'll just apply the patch for now.
