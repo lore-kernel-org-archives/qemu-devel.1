@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmFNG-00075I-D4
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:26:23 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dmFPC-0007kQ-Ri
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:28:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmFND-0001b1-9T
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:26:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45192)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dmFND-0001Z8-2Y
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:26:19 -0400
-Date: Mon, 28 Aug 2017 16:26:08 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170828082608.GM14174@pxdev.xzpeter.org>
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<1503471071-2233-5-git-send-email-peterx@redhat.com>
-	<20170823174411.GG2648@work-vm>
-	<20170825053526.GE14174@pxdev.xzpeter.org>
-	<20170825090626.GA2090@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170825090626.GA2090@work-vm>
-Subject: Re: [Qemu-devel] [RFC v2 4/8] QAPI: new QMP command option
- "without-bql"
+	(envelope-from <borntraeger@de.ibm.com>) id 1dmFP7-0002Ip-Vl
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:28:22 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45862
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dmFP7-0002ID-PV
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:28:17 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7S8Nwfg118523
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 04:28:17 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2cm9ubdy6v-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 04:28:16 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 28 Aug 2017 09:28:13 +0100
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 28 Aug 2017 10:28:06 +0200
+Message-Id: <1503908887-67060-1-git-send-email-borntraeger@de.ibm.com>
+Subject: [Qemu-devel] [PATCH 0/1] kernel fix for s390 postcopy hang
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +36,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, linux-s390 <linux-s390@vger.kernel.org>, KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Juan Quintela <quintela@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-On Fri, Aug 25, 2017 at 10:06:27AM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > On Wed, Aug 23, 2017 at 06:44:12PM +0100, Dr. David Alan Gilbert wrote:
-> > 
-> > [...]
-> > 
-> > > > +Most of the commands require the Big QEMU Lock (BQL) be held during
-> > > > +execution.  However, there is a small subset of the commands that may
-> > > > +not really need BQL at all.  To mark out this kind of commands, we can
-> > > > +specify "without-bql" to "true".  This parameter is only a hint for
-> > > > +internal QMP implementation to provide possiblility to allow commands
-> > > > +be run in parallel, or reduce the contention of the lock.  Users of QMP
-> > > > +should not really be aware of such information.
-> > > 
-> > > Well, I think users of these commands might select them specifically
-> > > because they know that they won't block.  Those who care about latency might
-> > > look to use commands that don't take the lock because of a reduced
-> > > effect on the performance as well.
-> > 
-> > What would be the best way to tell user?  I think again this should
-> > mostly for HMP only, right?
-> 
-> It needs to be docuemnted for QMP users as well so that those developing
-> management code know what's safe.
+Andrea, David,
 
-I see.  What's the corresponding QMP documentation I should touch up?
+here is a patch that fixes my postcopy hang 
+(https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg04129.html)
 
-> 
-> > Maybe we can add a new command to list these lock-free commands.  Or,
-> > I can dump something in "help" and "help info" like:
-> > 
-> > (qemu) help migrate_incoming
-> > migrate_incoming uri -- Continue an incoming migration from an -incoming defer (BQL-less)
-> 
-> 'lock free' might be better?
+unless there are better ideas or complains, this will go via Martins
+tree.
 
-I'm ok with it.  But would the word "lock" too general?
+Christian Borntraeger (1):
+  s390/mm: avoid empty zero pages for KVM guests to avoid postcopy hangs
+
+ arch/s390/include/asm/pgtable.h |  2 +-
+ arch/s390/mm/gmap.c             | 41 ++++++++++++++++++++++++++++++++++-------
+ 2 files changed, 35 insertions(+), 8 deletions(-)
 
 -- 
-Peter Xu
+2.7.4
