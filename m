@@ -1,26 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dmJrW-00022d-Fy
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 09:13:55 -0400
+	(envelope-from <alifm@linux.vnet.ibm.com>) id 1dmJwB-0003df-DV
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 09:18:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dmJrQ-0007Vt-Nd
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 09:13:54 -0400
-Resent-Message-Id: <E1dmJrQ-0007Vt-Nd@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21440)
+	(envelope-from <alifm@linux.vnet.ibm.com>) id 1dmJw6-0000ZK-E4
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 09:18:43 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58331)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dmJrQ-0007Vc-G5
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 09:13:48 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150392599255.51.8963072091091627194@2c699d6fd5aa>
-In-Reply-To: <1503924917-12687-1-git-send-email-s1seetee@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <alifm@linux.vnet.ibm.com>)
+	id 1dmJw6-0000Z2-53
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 09:18:38 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7SDFUrY046446
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 09:18:36 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cmgk1n635-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 09:18:36 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.vnet.ibm.com>;
+	Mon, 28 Aug 2017 07:18:32 -0600
+References: <cover.1503667215.git.alifm@linux.vnet.ibm.com>
+	<3ed8b810b6592daee6a775037ce21f850e40647d.1503667215.git.alifm@linux.vnet.ibm.com>
+	<20170825160408.2775c8b5.cohuck@redhat.com>
+	<00d41b2b-cf22-c9e2-8d9f-de947f4d3f18@linux.vnet.ibm.com>
+	<20170828102214.7aad9112.cohuck@redhat.com>
+	<caab4ec1-763a-8dfb-5e88-295a43a41e68@linux.vnet.ibm.com>
+	<20170828150653.7cdc8c5a.cohuck@redhat.com>
+From: Farhan Ali <alifm@linux.vnet.ibm.com>
+Date: Mon, 28 Aug 2017 09:18:28 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 28 Aug 2017 06:13:13 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2] qemu crashes when a negative number
- used for 'maxcpus'
+In-Reply-To: <20170828150653.7cdc8c5a.cohuck@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <c7e3a1cb-10e6-4c2d-0225-2bcbe9c97de6@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] s390-ccw: Fix alignment for CCW1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +46,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: s1seetee@linux.vnet.ibm.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, farman@linux.vnet.ibm.com, walling@linux.vnet.ibm.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjJdIHFlbXUgY3Jhc2hlcyB3aGVuIGEgbmVnYXRp
-dmUgbnVtYmVyIHVzZWQgZm9yICdtYXhjcHVzJwpNZXNzYWdlLWlkOiAxNTAzOTI0OTE3LTEyNjg3
-LTEtZ2l0LXNlbmQtZW1haWwtczFzZWV0ZWVAbGludXgudm5ldC5pYm0uY29tCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxv
-ZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUK
-CmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBj
-IGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdp
-dCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9y
-bWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAg
-ICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpl
-eGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
-ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0
-Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8xNTAz
-OTI0OTE3LTEyNjg3LTEtZ2l0LXNlbmQtZW1haWwtczFzZWV0ZWVAbGludXgudm5ldC5pYm0uY29t
-IC0+IHBhdGNoZXcvMTUwMzkyNDkxNy0xMjY4Ny0xLWdpdC1zZW5kLWVtYWlsLXMxc2VldGVlQGxp
-bnV4LnZuZXQuaWJtLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmJkYzc2NzBi
-YjIgcWVtdSBjcmFzaGVzIHdoZW4gYSBuZWdhdGl2ZSBudW1iZXIgdXNlZCBmb3IgJ21heGNwdXMn
-Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IHFlbXUgY3Jhc2hlcyB3
-aGVuIGEgbmVnYXRpdmUgbnVtYmVyIHVzZWQgZm9yICdtYXhjcHVzJy4uLgpFUlJPUjogY29kZSBp
-bmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzOTogRklMRTogdmwuYzoxMjQ4OgorXklpZiAo
-bWF4X2NwdXMgPCAwKSB7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
-cwojNDA6IEZJTEU6IHZsLmM6MTI0OToKK15JXkllcnJvcl9yZXBvcnQoIkludmFsaWQgbWF4X2Nw
-dXMgOiAlZCIsIG1heF9jcHVzKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
-ZSB0YWJzCiM0MTogRklMRTogdmwuYzoxMjUwOgorXkleSWV4aXQoMSk7JAoKRVJST1I6IGNvZGUg
-aW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDI6IEZJTEU6IHZsLmM6MTI1MToKK15JfSQK
-CnRvdGFsOiA0IGVycm9ycywgMCB3YXJuaW5ncywgMTEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
-aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
-bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
-YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+
+
+On 08/28/2017 09:06 AM, Cornelia Huck wrote:
+> On Mon, 28 Aug 2017 08:56:42 -0400
+> Farhan Ali <alifm@linux.vnet.ibm.com> wrote:
+>
+>> On 08/28/2017 04:22 AM, Cornelia Huck wrote:
+>>> On Fri, 25 Aug 2017 11:05:30 -0400
+>>> Farhan Ali <alifm@linux.vnet.ibm.com> wrote:
+>>>
+>>>> On 08/25/2017 10:04 AM, Cornelia Huck wrote:
+>>>>> On Fri, 25 Aug 2017 09:24:46 -0400
+>>>>> Farhan Ali <alifm@linux.vnet.ibm.com> wrote:
+>>>>>
+>>>>>> The commit 198c0d1f9df8c4 s390x/css: check ccw address validity
+>>>>>> exposes an alignment issue in ccw bios.
+>>>>>>
+>>>>>> According to PoP the CCW must be doubleword aligned. Let's fix
+>>>>>> this in the bios.
+>>>>>>
+>>>>>> Cc: qemu-stable@nongnu.org
+>>>>>> Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
+>>>>>> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>>>>>> Reviewed-by: Eric Farman <farman@linux.vnet.ibm.com>
+>>>>>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>>>>>> ---
+>>>>>>  pc-bios/s390-ccw/cio.h | 2 +-
+>>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
+>>>>>> index f5b4549..55eaeee 100644
+>>>>>> --- a/pc-bios/s390-ccw/cio.h
+>>>>>> +++ b/pc-bios/s390-ccw/cio.h
+>>>>>> @@ -133,7 +133,7 @@ struct ccw1 {
+>>>>>>      __u8 flags;
+>>>>>>      __u16 count;
+>>>>>>      __u32 cda;
+>>>>>> -} __attribute__ ((packed));
+>>>>>> +} __attribute__ ((packed, aligned(8)));
+>>>>>>
+>>>>>>  #define CCW_FLAG_DC              0x80
+>>>>>>  #define CCW_FLAG_CC              0x40
+>>>>>
+>>>>> Currently testing.
+>>>>>
+>>>>> This looks obviously right, but did you figure out what the (probably
+>>>>> unrelated) other failure was?
+>>>>>
+>>>>
+>>>> That is still under investigation, for some reason it only fails for an
+>>>> LDL DASD and it works for SCSIs and CDL DASD.
+>>>
+>>> Which are the symptoms of the failure? I'd like to understand this
+>>> before I update the (currently working by accident) bios with an
+>>> updated version.
+>>>
+>>> I'll just apply the patch for now.
+>>>
+>>
+>> Well it's seems like the failure for LDL DASD could be a disk setup
+>> failure. We tried the test on a different environment with LDL disks and
+>> everything worked fine with the patch applied.
+>
+> Odd that it breaks after this change, though. Do you get command
+> rejects, or what happens?
+>
+
+It's the alignment of the CCW which causes the problem.
+
+The exact error message when starting the guest was:
+
+! No virtio device found !
+
+Since it worked for SCSI and CDL, and failed for LDL disks on that 
+particular system, we are not really sure what caused the failure.
+Debugging it further showed the CCW for LDL disks were not aligned at 
+double word boundary.
+
+Trying the test on a different system with LDL disks worked fine, with 
+the aligned(8) fix.
