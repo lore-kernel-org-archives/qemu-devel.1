@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dmH9j-0001xa-6v
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:20:32 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dmH9k-0001xb-MW
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:20:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dmH9f-0005ug-6N
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:20:31 -0400
-Received: from mga04.intel.com ([192.55.52.120]:11758)
+	(envelope-from <wei.w.wang@intel.com>) id 1dmH9j-0005zu-L9
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:20:32 -0400
+Received: from mga04.intel.com ([192.55.52.120]:17236)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dmH9e-0005rT-NR
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:20:27 -0400
+	id 1dmH9j-0005ys-CR
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:20:31 -0400
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Mon, 28 Aug 2017 18:08:28 +0800
-Message-Id: <1503914913-28893-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v15 0/5] Virtio-balloon Enhancement
+Date: Mon, 28 Aug 2017 18:08:30 +0800
+Message-Id: <1503914913-28893-3-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1503914913-28893-1-git-send-email-wei.w.wang@intel.com>
+References: <1503914913-28893-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [PATCH v15 2/5] lib/xbitmap: add xb_find_next_bit()
+ and xb_zero()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,123 +28,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com
 Cc: david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, wei.w.wang@intel.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-This patch series enhances the existing virtio-balloon with the following
-new features:
-1) fast ballooning: transfer ballooned pages between the guest and host in
-chunks using sgs, instead of one by one; and
-2) free page block reporting: a new virtqueue to report guest free pages
-to the host.
+xb_find_next_bit() is used to find the next "1" or "0" bit in the
+given range. xb_zero() is used to zero the given range of bits.
 
-The second feature can be used to accelerate live migration of VMs. Here
-are some details:
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Matthew Wilcox <mawilcox@microsoft.com>
+Cc: Michal Hocko <mhocko@kernel.org>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+---
+ include/linux/xbitmap.h |  3 +++
+ lib/xbitmap.c           | 39 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 42 insertions(+)
 
-Live migration needs to transfer the VM's memory from the source machine
-to the destination round by round. For the 1st round, all the VM's memory
-is transferred. From the 2nd round, only the pieces of memory that were
-written by the guest (after the 1st round) are transferred. One method
-that is popularly used by the hypervisor to track which part of memory is
-written is to write-protect all the guest memory.
-
-The second feature  enables the optimization of the 1st round memory
-transfer - the hypervisor can skip the transfer of guest free pages in the
-1st round. It is not concerned that the memory pages are used after they
-are given to the hypervisor as a hint of the free pages, because they will
-be tracked by the hypervisor and transferred in the next round if they are
-used and written.
-
-Change Log:
-v14->v15:
-1) mm: make the report callback return a bool value - returning 1 to stop
-walking through the free page list.
-2) virtio-balloon: batching sgs of balloon pages till the vq is full
-3) virtio-balloon: create a new workqueue, rather than using the default
-system_wq, to queue the free page reporting work item.
-4) virtio-balloon: add a ctrl_vq to be a central control plane which will
-handle all the future control related commands between the host and guest.
-Add free page report as the first feature controlled under ctrl_vq, and
-the free_page_vq is a data plane vq dedicated to the transmission of free
-page blocks.
-
-v13->v14:
-1) xbitmap: move the code from lib/radix-tree.c to lib/xbitmap.c.
-2) xbitmap: consolidate the implementation of xb_bit_set/clear/test into
-one xb_bit_ops.
-3) xbitmap: add documents for the exported APIs.
-4) mm: rewrite the function to walk through free page blocks.
-5) virtio-balloon: when reporting a free page blcok to the device, if the
-vq is full (less likey to happen in practice), just skip reporting this
-block, instead of busywaiting till an entry gets released.
-6) virtio-balloon: fail the probe function if adding the signal buf in
-init_vqs fails.
-
-v12->v13:
-1) mm: use a callback function to handle the the free page blocks from the
-report function. This avoids exposing the zone internal to a kernel
-module.
-2) virtio-balloon: send balloon pages or a free page block using a single
-sg each time. This has the benefits of simpler implementation with no new
-APIs.
-3) virtio-balloon: the free_page_vq is used to report free pages only (no
-multiple usages interleaving)
-4) virtio-balloon: Balloon pages and free page blocks are sent via input
-sgs, and the completion signal to the host is sent via an output sg.
-
-v11->v12:
-1) xbitmap: use the xbitmap from Matthew Wilcox to record ballooned pages.
-2) virtio-ring: enable the driver to build up a desc chain using vring
-desc.
-3) virtio-ring: Add locking to the existing START_USE() and END_USE()
-macro to lock/unlock the vq when a vq operation starts/ends.
-4) virtio-ring: add virtqueue_kick_sync() and virtqueue_kick_async()
-5) virtio-balloon: describe chunks of ballooned pages and free pages
-blocks directly using one or more chains of desc from the vq.
-
-v10->v11:
-1) virtio_balloon: use vring_desc to describe a chunk;
-2) virtio_ring: support to add an indirect desc table to virtqueue;
-3)  virtio_balloon: use cmdq to report guest memory statistics.
-
-v9->v10:
-1) mm: put report_unused_page_block() under CONFIG_VIRTIO_BALLOON;
-2) virtio-balloon: add virtballoon_validate();
-3) virtio-balloon: msg format change;
-4) virtio-balloon: move miscq handling to a task on system_freezable_wq;
-5) virtio-balloon: code cleanup.
-
-v8->v9:
-1) Split the two new features, VIRTIO_BALLOON_F_BALLOON_CHUNKS and
-VIRTIO_BALLOON_F_MISC_VQ, which were mixed together in the previous
-implementation;
-2) Simpler function to get the free page block.
-
-v7->v8:
-1) Use only one chunk format, instead of two.
-2) re-write the virtio-balloon implementation patch.
-3) commit changes
-4) patch re-org
-
-
-Matthew Wilcox (1):
-  lib/xbitmap: Introduce xbitmap
-
-Wei Wang (4):
-  lib/xbitmap: add xb_find_next_bit() and xb_zero()
-  virtio-balloon: VIRTIO_BALLOON_F_SG
-  mm: support reporting free page blocks
-  virtio-balloon: VIRTIO_BALLOON_F_CTRL_VQ
-
- drivers/virtio/virtio_balloon.c     | 418 ++++++++++++++++++++++++++++++++----
- include/linux/mm.h                  |   5 +
- include/linux/radix-tree.h          |   3 +
- include/linux/xbitmap.h             |  64 ++++++
- include/uapi/linux/virtio_balloon.h |  16 ++
- lib/Makefile                        |   2 +-
- lib/radix-tree.c                    |  22 +-
- lib/xbitmap.c                       | 215 +++++++++++++++++++
- mm/page_alloc.c                     |  65 ++++++
- 9 files changed, 769 insertions(+), 41 deletions(-)
- create mode 100644 include/linux/xbitmap.h
- create mode 100644 lib/xbitmap.c
-
+diff --git a/include/linux/xbitmap.h b/include/linux/xbitmap.h
+index 25b05ff..0061f7a 100644
+--- a/include/linux/xbitmap.h
++++ b/include/linux/xbitmap.h
+@@ -38,6 +38,9 @@ static inline void xb_init(struct xb *xb)
+ int xb_set_bit(struct xb *xb, unsigned long bit);
+ bool xb_test_bit(struct xb *xb, unsigned long bit);
+ void xb_clear_bit(struct xb *xb, unsigned long bit);
++void xb_zero(struct xb *xb, unsigned long start, unsigned long end);
++unsigned long xb_find_next_bit(struct xb *xb, unsigned long start,
++			       unsigned long end, bool set);
+ 
+ /* Check if the xb tree is empty */
+ static inline bool xb_is_empty(const struct xb *xb)
+diff --git a/lib/xbitmap.c b/lib/xbitmap.c
+index 8c55296..b9e2a0c 100644
+--- a/lib/xbitmap.c
++++ b/lib/xbitmap.c
+@@ -174,3 +174,42 @@ void xb_preload(gfp_t gfp)
+ 	}
+ }
+ EXPORT_SYMBOL(xb_preload);
++
++/**
++ *  xb_zero - zero a range of bits in the xbitmap
++ *  @xb: the xbitmap that the bits reside in
++ *  @start: the start of the range, inclusive
++ *  @end: the end of the range, inclusive
++ */
++void xb_zero(struct xb *xb, unsigned long start, unsigned long end)
++{
++	unsigned long i;
++
++	for (i = start; i <= end; i++)
++		xb_clear_bit(xb, i);
++}
++EXPORT_SYMBOL(xb_zero);
++
++/**
++ * xb_find_next_bit - find next 1 or 0 in the give range of bits
++ * @xb: the xbitmap that the bits reside in
++ * @start: the start of the range, inclusive
++ * @end: the end of the range, inclusive
++ * @set: the polarity (1 or 0) of the next bit to find
++ *
++ * Return the index of the found bit in the xbitmap. If the returned index
++ * exceeds @end, it indicates that no such bit is found in the given range.
++ */
++unsigned long xb_find_next_bit(struct xb *xb, unsigned long start,
++			       unsigned long end, bool set)
++{
++	unsigned long i;
++
++	for (i = start; i <= end; i++) {
++		if (xb_test_bit(xb, i) == set)
++			break;
++	}
++
++	return i;
++}
++EXPORT_SYMBOL(xb_find_next_bit);
 -- 
 2.7.4
