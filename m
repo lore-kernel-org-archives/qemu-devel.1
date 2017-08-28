@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmIez-0005w6-6t
+	(envelope-from <bounces@canonical.com>) id 1dmIez-0005w3-6N
 	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 07:56:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmIeu-0008Oz-Ay
+	(envelope-from <bounces@canonical.com>) id 1dmIeu-0008Ov-AZ
 	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 07:56:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58637)
+Received: from indium.canonical.com ([91.189.90.7]:58630)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dmIeu-0008Od-4S
+	id 1dmIeu-0008Oa-43
 	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 07:56:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dmIer-0005kp-BW
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 11:56:45 +0000
+	id 1dmIer-0005iD-TY
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 11:56:46 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0CA472E80D1
+	by loganberry.canonical.com (Postfix) with ESMTP id 5CBAE2E80DB
 	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 11:56:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 28 Aug 2017 11:39:56 -0000
+Date: Mon, 28 Aug 2017 11:40:50 -0000
 From: Thomas Huth <1713408@bugs.launchpad.net>
 Reply-To: Bug 1713408 <1713408@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150390171227.19506.41697463404689071.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150392039662.8320.6319981738598288628.malone@soybean.canonical.com>
+Message-Id: <150392045089.8441.2349670613040476033.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1713408] Re: qemu crashes with "GLib-ERROR **:
  gmem.c" error when a negative value passed to "maxcpus"
@@ -39,11 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Please don't add patches to the bug tracker, post them to the qemu-devel
-(and qemu-ppc in this case) mailing list instead. You even don't have to
-join the mailing lists if you don't like to, posting to them is allowed
-for everybody. See https://www.qemu.org/contribute/report-a-bug/ and
-http://wiki.qemu.org/Contribute/SubmitAPatch for details. Thanks!
+Looking at your patch, I think you should also check for "<=3D 0" instead
+of just "< 0" ... since maxcpus =3D 0 also does not make much sense.
 
 -- =
 
