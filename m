@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dmFJQ-0005y3-QU
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:22:25 -0400
+	(envelope-from <peterx@redhat.com>) id 1dmFNG-00075I-D4
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:26:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dmFJN-0000Dz-Jw
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:22:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54294)
+	(envelope-from <peterx@redhat.com>) id 1dmFND-0001b1-9T
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:26:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45192)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dmFJN-0000DK-DN
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:22:21 -0400
-Date: Mon, 28 Aug 2017 10:22:14 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170828102214.7aad9112.cohuck@redhat.com>
-In-Reply-To: <00d41b2b-cf22-c9e2-8d9f-de947f4d3f18@linux.vnet.ibm.com>
-References: <cover.1503667215.git.alifm@linux.vnet.ibm.com>
-	<3ed8b810b6592daee6a775037ce21f850e40647d.1503667215.git.alifm@linux.vnet.ibm.com>
-	<20170825160408.2775c8b5.cohuck@redhat.com>
-	<00d41b2b-cf22-c9e2-8d9f-de947f4d3f18@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dmFND-0001Z8-2Y
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 04:26:19 -0400
+Date: Mon, 28 Aug 2017 16:26:08 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170828082608.GM14174@pxdev.xzpeter.org>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<1503471071-2233-5-git-send-email-peterx@redhat.com>
+	<20170823174411.GG2648@work-vm>
+	<20170825053526.GE14174@pxdev.xzpeter.org>
+	<20170825090626.GA2090@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390-ccw: Fix alignment for CCW1
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170825090626.GA2090@work-vm>
+Subject: Re: [Qemu-devel] [RFC v2 4/8] QAPI: new QMP command option
+ "without-bql"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, farman@linux.vnet.ibm.com, walling@linux.vnet.ibm.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Fri, 25 Aug 2017 11:05:30 -0400
-Farhan Ali <alifm@linux.vnet.ibm.com> wrote:
-
-> On 08/25/2017 10:04 AM, Cornelia Huck wrote:
-> > On Fri, 25 Aug 2017 09:24:46 -0400
-> > Farhan Ali <alifm@linux.vnet.ibm.com> wrote:
-> >  
-> >> The commit 198c0d1f9df8c4 s390x/css: check ccw address validity
-> >> exposes an alignment issue in ccw bios.
-> >>
-> >> According to PoP the CCW must be doubleword aligned. Let's fix
-> >> this in the bios.
-> >>
-> >> Cc: qemu-stable@nongnu.org
-> >> Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
-> >> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> >> Reviewed-by: Eric Farman <farman@linux.vnet.ibm.com>
-> >> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> >> ---
-> >>  pc-bios/s390-ccw/cio.h | 2 +-
-> >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >> diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
-> >> index f5b4549..55eaeee 100644
-> >> --- a/pc-bios/s390-ccw/cio.h
-> >> +++ b/pc-bios/s390-ccw/cio.h
-> >> @@ -133,7 +133,7 @@ struct ccw1 {
-> >>      __u8 flags;
-> >>      __u16 count;
-> >>      __u32 cda;
-> >> -} __attribute__ ((packed));
-> >> +} __attribute__ ((packed, aligned(8)));
-> >>
-> >>  #define CCW_FLAG_DC              0x80
-> >>  #define CCW_FLAG_CC              0x40  
-> >
-> > Currently testing.
-> >
-> > This looks obviously right, but did you figure out what the (probably
-> > unrelated) other failure was?
-> >  
+On Fri, Aug 25, 2017 at 10:06:27AM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > On Wed, Aug 23, 2017 at 06:44:12PM +0100, Dr. David Alan Gilbert wrote:
+> > 
+> > [...]
+> > 
+> > > > +Most of the commands require the Big QEMU Lock (BQL) be held during
+> > > > +execution.  However, there is a small subset of the commands that may
+> > > > +not really need BQL at all.  To mark out this kind of commands, we can
+> > > > +specify "without-bql" to "true".  This parameter is only a hint for
+> > > > +internal QMP implementation to provide possiblility to allow commands
+> > > > +be run in parallel, or reduce the contention of the lock.  Users of QMP
+> > > > +should not really be aware of such information.
+> > > 
+> > > Well, I think users of these commands might select them specifically
+> > > because they know that they won't block.  Those who care about latency might
+> > > look to use commands that don't take the lock because of a reduced
+> > > effect on the performance as well.
+> > 
+> > What would be the best way to tell user?  I think again this should
+> > mostly for HMP only, right?
 > 
-> That is still under investigation, for some reason it only fails for an 
-> LDL DASD and it works for SCSIs and CDL DASD.
+> It needs to be docuemnted for QMP users as well so that those developing
+> management code know what's safe.
 
-Which are the symptoms of the failure? I'd like to understand this
-before I update the (currently working by accident) bios with an
-updated version.
+I see.  What's the corresponding QMP documentation I should touch up?
 
-I'll just apply the patch for now.
+> 
+> > Maybe we can add a new command to list these lock-free commands.  Or,
+> > I can dump something in "help" and "help info" like:
+> > 
+> > (qemu) help migrate_incoming
+> > migrate_incoming uri -- Continue an incoming migration from an -incoming defer (BQL-less)
+> 
+> 'lock free' might be better?
+
+I'm ok with it.  But would the word "lock" too general?
+
+-- 
+Peter Xu
