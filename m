@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dmRzM-0001ic-Rb
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:54:34 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dmS3A-0002uB-6n
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:58:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dmRzL-0000s7-1c
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:54:32 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dmS38-0002vS-9z
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 17:58:28 -0400
 MIME-Version: 1.0
-In-Reply-To: <1503938283-12404-2-git-send-email-sundeep.lkml@gmail.com>
+In-Reply-To: <1503938283-12404-5-git-send-email-sundeep.lkml@gmail.com>
 References: <1503938283-12404-1-git-send-email-sundeep.lkml@gmail.com>
-	<1503938283-12404-2-git-send-email-sundeep.lkml@gmail.com>
+	<1503938283-12404-5-git-send-email-sundeep.lkml@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 28 Aug 2017 14:53:55 -0700
-Message-ID: <CAKmqyKNZySCD==0TjOvDjkbWPOk_DR6w2q=MYGutZRQFSmkM6Q@mail.gmail.com>
+Date: Mon, 28 Aug 2017 14:57:54 -0700
+Message-ID: <CAKmqyKP+Yd8-zFiy581J39gfZHCFznH_p5T2hMQw-1x=_-9LkQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu devel v7 PATCH 1/5] msf2: Add Smartfusion2
- System timer
+Subject: Re: [Qemu-devel] [Qemu devel v7 PATCH 4/5] msf2: Add Smartfusion2
+ SoC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,343 +26,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Subbaraya Sundeep <sundeep.lkml@gmail.com>
 Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On Mon, Aug 28, 2017 at 9:37 AM, Subbaraya Sundeep
+On Mon, Aug 28, 2017 at 9:38 AM, Subbaraya Sundeep
 <sundeep.lkml@gmail.com> wrote:
-> Modelled System Timer in Microsemi's Smartfusion2 Soc.
-> Timer has two 32bit down counters and two interrupts.
+> Smartfusion2 SoC has hardened Microcontroller subsystem
+> and flash based FPGA fabric. This patch adds support for
+> Microcontroller subsystem in the SoC.
 >
 > Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
-I had already reviewed this patch in v6. As long as you have made all
-of the changes mentioned their you can add my reviewed-by to the next
-version (as long as there are no other significant changes).
-
-Can you please ensure you do add and keep reviewed-by tags, it's a
-pain to have to do it multiple times.
+It looks like I have reviewed this one previously as well. Unless
+there were any major changes since then you can re-add my reviewed by
+tag.
 
 Thanks,
 Alistair
 
 > ---
->  hw/timer/Makefile.objs       |   1 +
->  hw/timer/mss-timer.c         | 289 +++++++++++++++++++++++++++++++++++++++++++
->  include/hw/timer/mss-timer.h |  64 ++++++++++
->  3 files changed, 354 insertions(+)
->  create mode 100644 hw/timer/mss-timer.c
->  create mode 100644 include/hw/timer/mss-timer.h
+>  default-configs/arm-softmmu.mak |   1 +
+>  hw/arm/Makefile.objs            |   1 +
+>  hw/arm/msf2-soc.c               | 215 ++++++++++++++++++++++++++++++++++++++++
+>  include/hw/arm/msf2-soc.h       |  66 ++++++++++++
+>  4 files changed, 283 insertions(+)
+>  create mode 100644 hw/arm/msf2-soc.c
+>  create mode 100644 include/hw/arm/msf2-soc.h
 >
-> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-> index 15cce1c..8c19eac 100644
-> --- a/hw/timer/Makefile.objs
-> +++ b/hw/timer/Makefile.objs
-> @@ -42,3 +42,4 @@ common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o
->
->  common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
->  common-obj-$(CONFIG_CMSDK_APB_TIMER) += cmsdk-apb-timer.o
-> +common-obj-$(CONFIG_MSF2) += mss-timer.o
-> diff --git a/hw/timer/mss-timer.c b/hw/timer/mss-timer.c
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+> index bbdd3c1..5059d13 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -129,3 +129,4 @@ CONFIG_ACPI=y
+>  CONFIG_SMBIOS=y
+>  CONFIG_ASPEED_SOC=y
+>  CONFIG_GPIO_KEY=y
+> +CONFIG_MSF2=y
+> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+> index a2e56ec..df36a03 100644
+> --- a/hw/arm/Makefile.objs
+> +++ b/hw/arm/Makefile.objs
+> @@ -19,3 +19,4 @@ obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
+>  obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
+>  obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
+>  obj-$(CONFIG_MPS2) += mps2.o
+> +obj-$(CONFIG_MSF2) += msf2-soc.o
+> diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
 > new file mode 100644
-> index 0000000..60f1213
+> index 0000000..276eec5
 > --- /dev/null
-> +++ b/hw/timer/mss-timer.c
-> @@ -0,0 +1,289 @@
+> +++ b/hw/arm/msf2-soc.c
+> @@ -0,0 +1,215 @@
 > +/*
-> + * Block model of System timer present in
-> + * Microsemi's SmartFusion2 and SmartFusion SoCs.
-> + *
-> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>.
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/main-loop.h"
-> +#include "qemu/log.h"
-> +#include "hw/timer/mss-timer.h"
-> +
-> +#ifndef MSS_TIMER_ERR_DEBUG
-> +#define MSS_TIMER_ERR_DEBUG  0
-> +#endif
-> +
-> +#define DB_PRINT_L(lvl, fmt, args...) do { \
-> +    if (MSS_TIMER_ERR_DEBUG >= lvl) { \
-> +        qemu_log("%s: " fmt "\n", __func__, ## args); \
-> +    } \
-> +} while (0);
-> +
-> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
-> +
-> +#define R_TIM_VAL         0
-> +#define R_TIM_LOADVAL     1
-> +#define R_TIM_BGLOADVAL   2
-> +#define R_TIM_CTRL        3
-> +#define R_TIM_RIS         4
-> +#define R_TIM_MIS         5
-> +
-> +#define TIMER_CTRL_ENBL     (1 << 0)
-> +#define TIMER_CTRL_ONESHOT  (1 << 1)
-> +#define TIMER_CTRL_INTR     (1 << 2)
-> +#define TIMER_RIS_ACK       (1 << 0)
-> +#define TIMER_RST_CLR       (1 << 6)
-> +#define TIMER_MODE          (1 << 0)
-> +
-> +static void timer_update_irq(struct Msf2Timer *st)
-> +{
-> +    bool isr, ier;
-> +
-> +    isr = !!(st->regs[R_TIM_RIS] & TIMER_RIS_ACK);
-> +    ier = !!(st->regs[R_TIM_CTRL] & TIMER_CTRL_INTR);
-> +    qemu_set_irq(st->irq, (ier && isr));
-> +}
-> +
-> +static void timer_update(struct Msf2Timer *st)
-> +{
-> +    uint64_t count;
-> +
-> +    if (!(st->regs[R_TIM_CTRL] & TIMER_CTRL_ENBL)) {
-> +        ptimer_stop(st->ptimer);
-> +        return;
-> +    }
-> +
-> +    count = st->regs[R_TIM_LOADVAL];
-> +    ptimer_set_limit(st->ptimer, count, 1);
-> +    ptimer_run(st->ptimer, 1);
-> +}
-> +
-> +static uint64_t
-> +timer_read(void *opaque, hwaddr offset, unsigned int size)
-> +{
-> +    MSSTimerState *t = opaque;
-> +    hwaddr addr;
-> +    struct Msf2Timer *st;
-> +    uint32_t ret = 0;
-> +    int timer = 0;
-> +    int isr;
-> +    int ier;
-> +
-> +    addr = offset >> 2;
-> +    /*
-> +     * Two independent timers has same base address.
-> +     * Based on address passed figure out which timer is being used.
-> +     */
-> +    if ((addr >= R_TIM1_MAX) && (addr < NUM_TIMERS * R_TIM1_MAX)) {
-> +        timer = 1;
-> +        addr -= R_TIM1_MAX;
-> +    }
-> +
-> +    st = &t->timers[timer];
-> +
-> +    switch (addr) {
-> +    case R_TIM_VAL:
-> +        ret = ptimer_get_count(st->ptimer);
-> +        break;
-> +
-> +    case R_TIM_MIS:
-> +        isr = !!(st->regs[R_TIM_RIS] & TIMER_RIS_ACK);
-> +        ier = !!(st->regs[R_TIM_CTRL] & TIMER_CTRL_INTR);
-> +        ret = ier & isr;
-> +        break;
-> +
-> +    default:
-> +        if (addr < R_TIM1_MAX) {
-> +            ret = st->regs[addr];
-> +        } else {
-> +            qemu_log_mask(LOG_GUEST_ERROR,
-> +                        TYPE_MSS_TIMER": 64-bit mode not supported\n");
-> +            return ret;
-> +        }
-> +        break;
-> +    }
-> +
-> +    DB_PRINT("timer=%d 0x%" HWADDR_PRIx "=0x%" PRIx32, timer, offset,
-> +            ret);
-> +    return ret;
-> +}
-> +
-> +static void
-> +timer_write(void *opaque, hwaddr offset,
-> +            uint64_t val64, unsigned int size)
-> +{
-> +    MSSTimerState *t = opaque;
-> +    hwaddr addr;
-> +    struct Msf2Timer *st;
-> +    int timer = 0;
-> +    uint32_t value = val64;
-> +
-> +    addr = offset >> 2;
-> +    /*
-> +     * Two independent timers has same base address.
-> +     * Based on addr passed figure out which timer is being used.
-> +     */
-> +    if ((addr >= R_TIM1_MAX) && (addr < NUM_TIMERS * R_TIM1_MAX)) {
-> +        timer = 1;
-> +        addr -= R_TIM1_MAX;
-> +    }
-> +
-> +    st = &t->timers[timer];
-> +
-> +    DB_PRINT("addr=0x%" HWADDR_PRIx " val=0x%" PRIx32 " (timer=%d)", offset,
-> +            value, timer);
-> +
-> +    switch (addr) {
-> +    case R_TIM_CTRL:
-> +        st->regs[R_TIM_CTRL] = value;
-> +        timer_update(st);
-> +        break;
-> +
-> +    case R_TIM_RIS:
-> +        if (value & TIMER_RIS_ACK) {
-> +            st->regs[R_TIM_RIS] &= ~TIMER_RIS_ACK;
-> +        }
-> +        break;
-> +
-> +    case R_TIM_LOADVAL:
-> +        st->regs[R_TIM_LOADVAL] = value;
-> +        if (st->regs[R_TIM_CTRL] & TIMER_CTRL_ENBL) {
-> +            timer_update(st);
-> +        }
-> +        break;
-> +
-> +    case R_TIM_BGLOADVAL:
-> +        st->regs[R_TIM_BGLOADVAL] = value;
-> +        st->regs[R_TIM_LOADVAL] = value;
-> +        break;
-> +
-> +    case R_TIM_VAL:
-> +    case R_TIM_MIS:
-> +        break;
-> +
-> +    default:
-> +        if (addr < R_TIM1_MAX) {
-> +            st->regs[addr] = value;
-> +        } else {
-> +            qemu_log_mask(LOG_GUEST_ERROR,
-> +                        TYPE_MSS_TIMER": 64-bit mode not supported\n");
-> +            return;
-> +        }
-> +        break;
-> +    }
-> +    timer_update_irq(st);
-> +}
-> +
-> +static const MemoryRegionOps timer_ops = {
-> +    .read = timer_read,
-> +    .write = timer_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .valid = {
-> +        .min_access_size = 1,
-> +        .max_access_size = 4
-> +    }
-> +};
-> +
-> +static void timer_hit(void *opaque)
-> +{
-> +    struct Msf2Timer *st = opaque;
-> +
-> +    st->regs[R_TIM_RIS] |= TIMER_RIS_ACK;
-> +
-> +    if (!(st->regs[R_TIM_CTRL] & TIMER_CTRL_ONESHOT)) {
-> +        timer_update(st);
-> +    }
-> +    timer_update_irq(st);
-> +}
-> +
-> +static void mss_timer_init(Object *obj)
-> +{
-> +    MSSTimerState *t = MSS_TIMER(obj);
-> +    int i;
-> +
-> +    /* Init all the ptimers.  */
-> +    for (i = 0; i < NUM_TIMERS; i++) {
-> +        struct Msf2Timer *st = &t->timers[i];
-> +
-> +        st->bh = qemu_bh_new(timer_hit, st);
-> +        st->ptimer = ptimer_init(st->bh, PTIMER_POLICY_DEFAULT);
-> +        ptimer_set_freq(st->ptimer, t->freq_hz);
-> +        sysbus_init_irq(SYS_BUS_DEVICE(obj), &st->irq);
-> +    }
-> +
-> +    memory_region_init_io(&t->mmio, OBJECT(t), &timer_ops, t, TYPE_MSS_TIMER,
-> +                          NUM_TIMERS * R_TIM1_MAX * 4);
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &t->mmio);
-> +}
-> +
-> +static const VMStateDescription vmstate_timers = {
-> +    .name = "mss-timer-block",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_PTIMER(ptimer, struct Msf2Timer),
-> +        VMSTATE_UINT32_ARRAY(regs, struct Msf2Timer, R_TIM1_MAX),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static const VMStateDescription vmstate_mss_timer = {
-> +    .name = TYPE_MSS_TIMER,
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT32(freq_hz, MSSTimerState),
-> +        VMSTATE_STRUCT_ARRAY(timers, MSSTimerState, NUM_TIMERS, 0,
-> +                vmstate_timers, struct Msf2Timer),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static Property mss_timer_properties[] = {
-> +    /* Libero GUI shows 100Mhz as default for clocks */
-> +    DEFINE_PROP_UINT32("clock-frequency", MSSTimerState, freq_hz,
-> +                      100 * 1000000),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void mss_timer_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->props = mss_timer_properties;
-> +    dc->vmsd = &vmstate_mss_timer;
-> +}
-> +
-> +static const TypeInfo mss_timer_info = {
-> +    .name          = TYPE_MSS_TIMER,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(MSSTimerState),
-> +    .instance_init = mss_timer_init,
-> +    .class_init    = mss_timer_class_init,
-> +};
-> +
-> +static void mss_timer_register_types(void)
-> +{
-> +    type_register_static(&mss_timer_info);
-> +}
-> +
-> +type_init(mss_timer_register_types)
-> diff --git a/include/hw/timer/mss-timer.h b/include/hw/timer/mss-timer.h
-> new file mode 100644
-> index 0000000..d15d173
-> --- /dev/null
-> +++ b/include/hw/timer/mss-timer.h
-> @@ -0,0 +1,64 @@
-> +/*
-> + * Microsemi SmartFusion2 Timer.
+> + * SmartFusion2 SoC emulation.
 > + *
 > + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
 > + *
@@ -385,46 +98,269 @@ Alistair
 > + * THE SOFTWARE.
 > + */
 > +
-> +#ifndef HW_MSS_TIMER_H
-> +#define HW_MSS_TIMER_H
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "qemu-common.h"
+> +#include "hw/arm/arm.h"
+> +#include "exec/address-spaces.h"
+> +#include "hw/char/serial.h"
+> +#include "hw/boards.h"
+> +#include "sysemu/block-backend.h"
+> +#include "qemu/cutils.h"
+> +#include "hw/arm/msf2-soc.h"
 > +
-> +#include "hw/sysbus.h"
-> +#include "hw/ptimer.h"
+> +#define MSF2_TIMER_BASE       0x40004000
+> +#define MSF2_SYSREG_BASE      0x40038000
 > +
-> +#define TYPE_MSS_TIMER     "mss-timer"
-> +#define MSS_TIMER(obj)     OBJECT_CHECK(MSSTimerState, \
-> +                              (obj), TYPE_MSS_TIMER)
+> +#define ENVM_BASE_ADDRESS     0x60000000
 > +
-> +/*
-> + * There are two 32-bit down counting timers.
-> + * Timers 1 and 2 can be concatenated into a single 64-bit Timer
-> + * that operates either in Periodic mode or in One-shot mode.
-> + * Writing 1 to the TIM64_MODE register bit 0 sets the Timers in 64-bit mode.
-> + * In 64-bit mode, writing to the 32-bit registers has no effect.
-> + * Similarly, in 32-bit mode, writing to the 64-bit mode registers
-> + * has no effect. Only two 32-bit timers are supported currently.
-> + */
-> +#define NUM_TIMERS        2
+> +#define SRAM_BASE_ADDRESS     0x20000000
 > +
-> +#define R_TIM1_MAX        6
+> +#define MSF2_ENVM_SIZE        (512 * K_BYTE)
+> +#define MSF2_ESRAM_SIZE       (64 * K_BYTE)
 > +
-> +struct Msf2Timer {
-> +    QEMUBH *bh;
-> +    ptimer_state *ptimer;
+> +static const uint32_t spi_addr[MSF2_NUM_SPIS] = { 0x40001000 , 0x40011000 };
+> +static const uint32_t uart_addr[MSF2_NUM_UARTS] = { 0x40000000 , 0x40010000 };
 > +
-> +    uint32_t regs[R_TIM1_MAX];
-> +    qemu_irq irq;
+> +static const int spi_irq[MSF2_NUM_SPIS] = { 2, 3 };
+> +static const int uart_irq[MSF2_NUM_UARTS] = { 10, 11 };
+> +static const int timer_irq[MSF2_NUM_TIMERS] = { 14, 15 };
+> +
+> +static void m2sxxx_soc_initfn(Object *obj)
+> +{
+> +    MSF2State *s = MSF2_SOC(obj);
+> +    int i;
+> +
+> +    object_initialize(&s->armv7m, sizeof(s->armv7m), TYPE_ARMV7M);
+> +    qdev_set_parent_bus(DEVICE(&s->armv7m), sysbus_get_default());
+> +
+> +    object_initialize(&s->sysreg, sizeof(s->sysreg), TYPE_MSF2_SYSREG);
+> +    qdev_set_parent_bus(DEVICE(&s->sysreg), sysbus_get_default());
+> +
+> +    object_initialize(&s->timer, sizeof(s->timer), TYPE_MSS_TIMER);
+> +    qdev_set_parent_bus(DEVICE(&s->timer), sysbus_get_default());
+> +
+> +    for (i = 0; i < MSF2_NUM_SPIS; i++) {
+> +        object_initialize(&s->spi[i], sizeof(s->spi[i]),
+> +                          TYPE_MSS_SPI);
+> +        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
+> +    }
+> +}
+> +
+> +static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
+> +{
+> +    MSF2State *s = MSF2_SOC(dev_soc);
+> +    DeviceState *dev, *armv7m;
+> +    SysBusDevice *busdev;
+> +    Error *err = NULL;
+> +    int i;
+> +
+> +    MemoryRegion *system_memory = get_system_memory();
+> +    MemoryRegion *nvm = g_new(MemoryRegion, 1);
+> +    MemoryRegion *nvm_alias = g_new(MemoryRegion, 1);
+> +    MemoryRegion *sram = g_new(MemoryRegion, 1);
+> +
+> +    memory_region_init_ram(nvm, NULL, "MSF2.eNVM", s->envm_size,
+> +                           &error_fatal);
+> +
+> +    /*
+> +     * On power-on, the eNVM region 0x60000000 is automatically
+> +     * remapped to the Cortex-M3 processor executable region
+> +     * start address (0x0). We do not support remapping other eNVM,
+> +     * eSRAM and DDR regions by guest(via Sysreg) currently.
+> +     */
+> +    memory_region_init_alias(nvm_alias, NULL, "MSF2.eNVM.alias",
+> +                             nvm, 0, s->envm_size);
+> +
+> +    memory_region_set_readonly(nvm, true);
+> +    memory_region_set_readonly(nvm_alias, true);
+> +
+> +    memory_region_add_subregion(system_memory, ENVM_BASE_ADDRESS, nvm);
+> +    memory_region_add_subregion(system_memory, 0, nvm_alias);
+> +
+> +    memory_region_init_ram(sram, NULL, "MSF2.eSRAM", s->esram_size,
+> +                           &error_fatal);
+> +    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
+> +
+> +    armv7m = DEVICE(&s->armv7m);
+> +    qdev_prop_set_uint32(armv7m, "num-irq", 81);
+> +    qdev_prop_set_string(armv7m, "cpu-model", "cortex-m3");
+> +    object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
+> +                                     "memory", &error_abort);
+> +    object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
+> +    if (err != NULL) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +
+> +    system_clock_scale = NANOSECONDS_PER_SECOND / s->m3clk;
+> +
+> +    for (i = 0; i < MSF2_NUM_UARTS; i++) {
+> +        if (serial_hds[i]) {
+> +            serial_mm_init(get_system_memory(), uart_addr[i], 2,
+> +                           qdev_get_gpio_in(armv7m, uart_irq[i]),
+> +                           115200, serial_hds[i], DEVICE_NATIVE_ENDIAN);
+> +        }
+> +    }
+> +
+> +    dev = DEVICE(&s->timer);
+> +    /* APB0 clock is the timer input clock */
+> +    qdev_prop_set_uint32(dev, "clock-frequency", s->m3clk / s->apb0div);
+> +    object_property_set_bool(OBJECT(&s->timer), true, "realized", &err);
+> +    if (err != NULL) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +    busdev = SYS_BUS_DEVICE(dev);
+> +    sysbus_mmio_map(busdev, 0, MSF2_TIMER_BASE);
+> +    sysbus_connect_irq(busdev, 0,
+> +                           qdev_get_gpio_in(armv7m, timer_irq[0]));
+> +    sysbus_connect_irq(busdev, 1,
+> +                           qdev_get_gpio_in(armv7m, timer_irq[1]));
+> +
+> +    dev = DEVICE(&s->sysreg);
+> +    qdev_prop_set_uint32(dev, "apb0divisor", s->apb0div);
+> +    qdev_prop_set_uint32(dev, "apb1divisor", s->apb1div);
+> +    object_property_set_bool(OBJECT(&s->sysreg), true, "realized", &err);
+> +    if (err != NULL) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +    busdev = SYS_BUS_DEVICE(dev);
+> +    sysbus_mmio_map(busdev, 0, MSF2_SYSREG_BASE);
+> +
+> +    for (i = 0; i < MSF2_NUM_SPIS; i++) {
+> +        gchar *bus_name = g_strdup_printf("spi%d", i);
+> +
+> +        object_property_set_bool(OBJECT(&s->spi[i]), true, "realized", &err);
+> +        if (err != NULL) {
+> +            g_free(bus_name);
+> +            error_propagate(errp, err);
+> +            return;
+> +        }
+> +
+> +        sysbus_mmio_map(SYS_BUS_DEVICE(&s->spi[i]), 0, spi_addr[i]);
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->spi[i]), 0,
+> +                           qdev_get_gpio_in(armv7m, spi_irq[i]));
+> +
+> +        /* Alias controller SPI bus to the SoC itself */
+> +        object_property_add_alias(OBJECT(s), bus_name,
+> +                                  OBJECT(&s->spi[i]), "spi",
+> +                                  &error_abort);
+> +        g_free(bus_name);
+> +    }
+> +}
+> +
+> +static Property m2sxxx_soc_properties[] = {
+> +    /*
+> +     * part name specifies the type of SmartFusion2 device variant(this
+> +     * property is for information purpose only.
+> +     */
+> +    DEFINE_PROP_STRING("part-name", MSF2State, part_name),
+> +    DEFINE_PROP_UINT64("eNVM-size", MSF2State, envm_size, MSF2_ENVM_SIZE),
+> +    DEFINE_PROP_UINT64("eSRAM-size", MSF2State, esram_size, MSF2_ESRAM_SIZE),
+> +    /* Libero GUI shows 100Mhz as default for clocks */
+> +    DEFINE_PROP_UINT32("m3clk", MSF2State, m3clk, 100 * 1000000),
+> +    /* default divisors in Libero GUI */
+> +    DEFINE_PROP_UINT32("apb0div", MSF2State, apb0div, 2),
+> +    DEFINE_PROP_UINT32("apb1div", MSF2State, apb1div, 2),
+> +    DEFINE_PROP_END_OF_LIST(),
 > +};
 > +
-> +typedef struct MSSTimerState {
+> +static void m2sxxx_soc_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->realize = m2sxxx_soc_realize;
+> +    dc->props = m2sxxx_soc_properties;
+> +}
+> +
+> +static const TypeInfo m2sxxx_soc_info = {
+> +    .name          = TYPE_MSF2_SOC,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(MSF2State),
+> +    .instance_init = m2sxxx_soc_initfn,
+> +    .class_init    = m2sxxx_soc_class_init,
+> +};
+> +
+> +static void m2sxxx_soc_types(void)
+> +{
+> +    type_register_static(&m2sxxx_soc_info);
+> +}
+> +
+> +type_init(m2sxxx_soc_types)
+> diff --git a/include/hw/arm/msf2-soc.h b/include/hw/arm/msf2-soc.h
+> new file mode 100644
+> index 0000000..eb239fa
+> --- /dev/null
+> +++ b/include/hw/arm/msf2-soc.h
+> @@ -0,0 +1,66 @@
+> +/*
+> + * Microsemi Smartfusion2 SoC
+> + *
+> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef HW_ARM_MSF2_SOC_H
+> +#define HW_ARM_MSF2_SOC_H
+> +
+> +#include "hw/arm/armv7m.h"
+> +#include "hw/timer/mss-timer.h"
+> +#include "hw/misc/msf2-sysreg.h"
+> +#include "hw/ssi/mss-spi.h"
+> +
+> +#define TYPE_MSF2_SOC     "msf2-soc"
+> +#define MSF2_SOC(obj)     OBJECT_CHECK(MSF2State, (obj), TYPE_MSF2_SOC)
+> +
+> +#define MSF2_NUM_SPIS         2
+> +#define MSF2_NUM_UARTS        2
+> +
+> +/*
+> + * System timer consists of two programmable 32-bit
+> + * decrementing counters that generate individual interrupts to
+> + * the Cortex-M3 processor
+> + */
+> +#define MSF2_NUM_TIMERS       2
+> +
+> +typedef struct MSF2State {
+> +    /*< private >*/
 > +    SysBusDevice parent_obj;
+> +    /*< public >*/
 > +
-> +    MemoryRegion mmio;
-> +    uint32_t freq_hz;
-> +    struct Msf2Timer timers[NUM_TIMERS];
-> +} MSSTimerState;
+> +    ARMv7MState armv7m;
 > +
-> +#endif /* HW_MSS_TIMER_H */
+> +    char *part_name;
+> +    uint64_t envm_size;
+> +    uint64_t esram_size;
+> +
+> +    uint32_t m3clk;
+> +    uint32_t apb0div;
+> +    uint32_t apb1div;
+> +
+> +    MSF2SysregState sysreg;
+> +    MSSTimerState timer;
+> +    MSSSpiState spi[MSF2_NUM_SPIS];
+> +} MSF2State;
+> +
+> +#endif
 > --
 > 2.5.0
 >
