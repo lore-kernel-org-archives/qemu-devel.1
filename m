@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dmKC4-0007LS-Uv
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 09:35:10 -0400
+	(envelope-from <bounces@canonical.com>) id 1dmKID-0001Dt-M0
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 09:41:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dmKC3-00007C-Do
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 09:35:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1dmKI7-0002Sd-FF
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 09:41:29 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33729)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dmKI7-0002SB-9I
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 09:41:23 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dmKI3-0004lC-4J
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 13:41:19 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 982812E80C9
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 13:41:17 +0000 (UTC)
 MIME-Version: 1.0
-References: <20170828113737.12199-1-f4bug@amsat.org>
-In-Reply-To: <20170828113737.12199-1-f4bug@amsat.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 28 Aug 2017 13:34:52 +0000
-Message-ID: <CAJ+F1CKL67s4eEYa5N0yy7xZj8NBsmzjRwADJJtDuhAAOiOE2A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests: fix incorrect size_t format in
- benchmark-crypto
+Date: Mon, 28 Aug 2017 13:35:24 -0000
+From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
+Reply-To: Bug 1713408 <1713408@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150390171227.19506.41697463404689071.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150392732459.7963.1727899162719234859.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1713408] Re: qemu crashes with "GLib-ERROR **:
+ gmem.c" error when a negative value passed to "maxcpus"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,117 +37,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, "Daniel P . Berrange" <berrange@redhat.com>, Longpeng <longpeng2@huawei.com>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Mon, Aug 28, 2017 at 1:38 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g>
-wrote:
+Sure will do the changes and update. Seems one of my colleague did it alrea=
+dy (sent patch to devel list)
+https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg05345.html
+I will pass your review comments to her for modification.
 
->   $ make check-speed
->   tests/benchmark-crypto-hash.c: In function 'test_hash_speed':
->   tests/benchmark-crypto-hash.c:44:5: error: format '%ld' expects argumen=
-t
-> of type 'long int', but argument 2 has type 'size_t' [-Werror=3Dformat=3D=
-]
->        g_print("Testing chunk_size %ld bytes ", chunk_size);
->        ^
->   tests/benchmark-crypto-hash.c: In function 'main':
->   tests/benchmark-crypto-hash.c:62:9: error: format '%lu' expects argumen=
-t
-> of type 'long unsigned int', but argument 4 has type 'size_t'
-> [-Werror=3Dformat=3D]
->            snprintf(name, sizeof(name), "/crypto/hash/speed-%lu", i);
->            ^
->   cc1: all warnings being treated as errors
->   rules.mak:66: recipe for target 'tests/benchmark-crypto-hash.o' failed
->   make: *** [tests/benchmark-crypto-hash.o] Error 1
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
+Thanks for your review.
 
- Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+-- =
 
----
-> testing v2.10.0-rc4
->
->  tests/benchmark-crypto-cipher.c | 4 ++--
->  tests/benchmark-crypto-hash.c   | 4 ++--
->  tests/benchmark-crypto-hmac.c   | 4 ++--
->  3 files changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/tests/benchmark-crypto-cipher.c
-> b/tests/benchmark-crypto-cipher.c
-> index c6a40929e4..cf98443468 100644
-> --- a/tests/benchmark-crypto-cipher.c
-> +++ b/tests/benchmark-crypto-cipher.c
-> @@ -59,7 +59,7 @@ static void test_cipher_speed(const void *opaque)
->      total /=3D 1024 * 1024; /* to MB */
->
->      g_print("cbc(aes128): ");
-> -    g_print("Testing chunk_size %ld bytes ", chunk_size);
-> +    g_print("Testing chunk_size %zu bytes ", chunk_size);
->      g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last());
->      g_print("%.2f MB/sec\n", total / g_test_timer_last());
->
-> @@ -80,7 +80,7 @@ int main(int argc, char **argv)
->
->      for (i =3D 512; i <=3D (64 * 1204); i *=3D 2) {
->          memset(name, 0 , sizeof(name));
-> -        snprintf(name, sizeof(name), "/crypto/cipher/speed-%lu", i);
-> +        snprintf(name, sizeof(name), "/crypto/cipher/speed-%zu", i);
->          g_test_add_data_func(name, (void *)i, test_cipher_speed);
->      }
->
-> diff --git a/tests/benchmark-crypto-hash.c b/tests/benchmark-crypto-hash.=
-c
-> index 6769d2a11b..122bfb6b85 100644
-> --- a/tests/benchmark-crypto-hash.c
-> +++ b/tests/benchmark-crypto-hash.c
-> @@ -41,7 +41,7 @@ static void test_hash_speed(const void *opaque)
->
->      total /=3D 1024 * 1024; /* to MB */
->      g_print("sha256: ");
-> -    g_print("Testing chunk_size %ld bytes ", chunk_size);
-> +    g_print("Testing chunk_size %zu bytes ", chunk_size);
->      g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last());
->      g_print("%.2f MB/sec\n", total / g_test_timer_last());
->
-> @@ -59,7 +59,7 @@ int main(int argc, char **argv)
->
->      for (i =3D 512; i <=3D (64 * 1204); i *=3D 2) {
->          memset(name, 0 , sizeof(name));
-> -        snprintf(name, sizeof(name), "/crypto/hash/speed-%lu", i);
-> +        snprintf(name, sizeof(name), "/crypto/hash/speed-%zu", i);
->          g_test_add_data_func(name, (void *)i, test_hash_speed);
->      }
->
-> diff --git a/tests/benchmark-crypto-hmac.c b/tests/benchmark-crypto-hmac.=
-c
-> index 72408be987..c30250df3e 100644
-> --- a/tests/benchmark-crypto-hmac.c
-> +++ b/tests/benchmark-crypto-hmac.c
-> @@ -56,7 +56,7 @@ static void test_hmac_speed(const void *opaque)
->      total /=3D 1024 * 1024; /* to MB */
->
->      g_print("hmac(sha256): ");
-> -    g_print("Testing chunk_size %ld bytes ", chunk_size);
-> +    g_print("Testing chunk_size %zu bytes ", chunk_size);
->      g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last());
->      g_print("%.2f MB/sec\n", total / g_test_timer_last());
->
-> @@ -74,7 +74,7 @@ int main(int argc, char **argv)
->
->      for (i =3D 512; i <=3D (64 * 1204); i *=3D 2) {
->          memset(name, 0 , sizeof(name));
-> -        snprintf(name, sizeof(name), "/crypto/hmac/speed-%lu", i);
-> +        snprintf(name, sizeof(name), "/crypto/hmac/speed-%zu", i);
->          g_test_add_data_func(name, (void *)i, test_hmac_speed);
->      }
->
-> --
-> 2.14.1
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1713408
+
+Title:
+  qemu crashes with "GLib-ERROR **: gmem.c" error when a negative value
+  passed to "maxcpus"
+
+Status in QEMU:
+  New
+
+Bug description:
+  # ppc64-softmmu/qemu-system-ppc64 --nographic -vga none -machine
+  pseries,accel=3Dkvm,kvm-type=3DHV -m size=3D20g -device virtio-blk-
+  pci,drive=3Drootdisk -drive file=3D/home/nasastry/avocado-fvt-wrapper/data
+  /avocado-
+  vt/images/pegas-1.0-ppc64le.qcow2,if=3Dnone,cache=3Dnone,id=3Drootdisk,fo=
+rmat=3Dqcow2
+  -monitor telnet:127.0.0.1:1234,server,nowait -net nic,model=3Dvirtio
+  -net user -device nec-usb-xhci -smp 8,cores=3D1,threads=3D1,maxcpus=3D-12
+
+  (process:12149): GLib-ERROR **: gmem.c:130: failed to allocate
+  18446744073709550568 bytes
+
+  From GDB:
+  [New Thread 0x3fffb5aceb60 (LWP 12190)]
+
+  (process:12184): GLib-ERROR **: gmem.c:130: failed to allocate
+  18446744073709550568 bytes
+
+  Program received signal SIGTRAP, Trace/breakpoint trap.
+  0x00003fffb75e5408 in raise () from /lib64/libpthread.so.0
+  Missing separate debuginfos, use: debuginfo-install glib2-2.50.3-3.el7.pp=
+c64le glibc-2.17-196.el7.ppc64le gnutls-3.3.26-9.el7.ppc64le krb5-libs-1.15=
+.1-8.el7.ppc64le libgcc-4.8.5-16.el7.ppc64le libstdc++-4.8.5-16.el7.ppc64le=
+ ncurses-libs-5.9-13.20130511.el7.ppc64le nss-3.28.4-8.el7.ppc64le nss-soft=
+okn-freebl-3.28.3-6.el7.ppc64le nss-util-3.28.4-3.el7.ppc64le openldap-2.4.=
+44-5.el7.ppc64le openssl-libs-1.0.2k-8.el7.ppc64le p11-kit-0.23.5-3.el7.ppc=
+64le
+  (gdb) bt
+  #0  0x00003fffb75e5408 in raise () from /lib64/libpthread.so.0
+  #1  0x00003fffb796be9c in _g_log_abort () from /lib64/libglib-2.0.so.0
+  #2  0x00003fffb796d4c4 in g_log_default_handler () from /lib64/libglib-2.=
+0.so.0
+  #3  0x00003fffb796d86c in g_logv () from /lib64/libglib-2.0.so.0
+  #4  0x00003fffb796db00 in g_log () from /lib64/libglib-2.0.so.0
+  #5  0x00003fffb796b694 in g_malloc0 () from /lib64/libglib-2.0.so.0
+  #6  0x000000001018fa84 in spapr_possible_cpu_arch_ids (machine=3D0x111656=
+60) at /home/nasastry/upstream/qemu/hw/ppc/spapr.c:3322
+  #7  0x000000001018b444 in spapr_init_cpus (spapr=3D0x11165660) at /home/n=
+asastry/upstream/qemu/hw/ppc/spapr.c:2096
+  #8  0x000000001018bc6c in ppc_spapr_init (machine=3D0x11165660) at /home/=
+nasastry/upstream/qemu/hw/ppc/spapr.c:2275
+  #9  0x000000001041ca38 in machine_run_board_init (machine=3D0x11165660) a=
+t hw/core/machine.c:760
+  #10 0x000000001037723c in main (argc=3D24, argv=3D0x3ffffffff108, envp=3D=
+0x3ffffffff1d0) at vl.c:4633
+  (gdb) i r
+  r0             0xfa	250
+  r1             0x3fffffffe450	70368744170576
+  r2             0x3fffb7608100	70367525765376
+  r3             0x0	0
+  r4             0x2f98	12184
+  r5             0x5	5
+  r6             0x0	0
+  r7             0x3fffa8000020	70367267782688
+  r8             0x2f98	12184
+  r9             0x0	0
+  r10            0x0	0
+  r11            0x0	0
+  r12            0x0	0
+  r13            0x3fffb64fccb0	70367507893424
+  r14            0x0	0
+  r15            0x0	0
+  r16            0x0	0
+  r17            0x0	0
+  r18            0x1	1
+  r19            0x0	0
+  r20            0x3fffb796d3f0	70367529325552
+  r21            0x0	0
+  r22            0x20000000	536870912
+  r23            0x1	1
+  r24            0x3fffb7a61498	70367530325144
+  r25            0x3fffb7a614e8	70367530325224
+  r26            0x3fffb7a61488	70367530325128
+  r27            0x3fffa80008c0	70367267784896
+  r28            0x3fffb79cd2a8	70367529718440
+  r29            0x3fffb79cd2a8	70367529718440
+  r30            0xffffffffffffffff	18446744073709551615
+  r31            0x1	1
+  pc             0x3fffb75e5408	0x3fffb75e5408 <raise+56>
+  msr            0x900000000000d033	10376293541461676083
+  cr             0x42244842	1109674050
+  lr             0x3fffb796be9c	0x3fffb796be9c <_g_log_abort+60>
+  ctr            0x0	0
+  xer            0x0	0
+  orig_r3        0x2f98	12184
+  trap           0xc00	3072
+
+  Similar error observed on x86_64 and PPC64LE architectures.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1713408/+subscriptions
