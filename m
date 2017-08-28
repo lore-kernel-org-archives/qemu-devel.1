@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmNFT-0007El-DL
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 12:50:52 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dmNNa-00016R-MS
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 12:59:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmNFP-0003TE-QN
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 12:50:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55000)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dmNFP-0003Nz-CS
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 12:50:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dmNFN-0005l2-99
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 16:50:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 43D9E2E80CB
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 16:50:45 +0000 (UTC)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dmNNZ-0004yy-Q6
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 12:59:14 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1503938085-169486-1-git-send-email-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0f325bf7-c137-7f6e-5f70-10910a241d54@amsat.org>
+Date: Mon, 28 Aug 2017 13:59:03 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 28 Aug 2017 16:42:43 -0000
-From: Dario Niedermann <1713328@bugs.launchpad.net>
-Reply-To: Bug 1713328 <1713328@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150383947649.18943.3208257948754280909.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150393856320.11133.10448832851421899806.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1713328] Re: Unable to C-a in -nographic if
- -serial telnet
+In-Reply-To: <1503938085-169486-1-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11] ide: ahci: unparent children
+ buses before freeing their memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,40 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, qemu-block@nongnu.org, thuth@redhat.com, mst@redhat.com
 
-With '-serial telnet' I directed the serial port to telnet, not the
-console (I call "console" the VGA tty qemu would show without the
--nographic option).
+On 08/28/2017 01:34 PM, Igor Mammedov wrote:
+> Fixes read after freeing error reported
+>    https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg04243.html
+>    Message-Id: <59a56959-ca12-ea75-33fa-ff07eba1b090@redhat.com>
+> 
+> ich9-ahci device creates ide buses and attaches them as QOM children
+> at realize time, however it forgets to properly clean them up
+> at unrealize time and frees memory containing these children,
+> with following call-chain:
+> 
+>     qdev_device_add()
+>       object_property_set_bool('realized', true)
+>         device_set_realized()
+>            ...
+>            pci_qdev_realize() -> pci_ich9_ahci_realize() -> ahci_realize()
+>                 ...
+>                 s->dev = g_new0(AHCIDevice, ports);
+>                 ...
+>                    AHCIDevice *ad = &s->dev[i];
+>                    ide_bus_new(&ad->port, sizeof(ad->port), qdev, i, 1);
+>                    ^^^ creates bus in memory allocated by above gnew()
+>                        and adds it as child propety to ahci device
+>            ...
+>            hotplug_handler_plug(); -> goto post_realize_fail;
+>            pci_qdev_unrealize() -> pci_ich9_uninit() -> ahci_uninit()
+>                ...
+>                 g_free(s->dev);
+>                 ^^^ free memory that holds children busses
+> 
+>            return with error from device_set_realized()
+> 
+> As result later when qdev_device_add() tries to unparent ich9-ahci
+> after failed device_set_realized(),
+>      object_unparent() -> object_property_del_child()
+> iterates over existing QOM children including buses added by
+> ide_bus_new() and tries to unparent them, which causes access to
+> freed memory where they where located.
+> 
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
--- =
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1713328
-
-Title:
-  Unable to C-a in -nographic if -serial telnet
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  qemu-system-i386 (version 2.6.1, running on Linux/x86_64) started
-  with:
-
-  qemu-system-i386 -m 64M -machine type=3Dpc -rtc
-  base=3Dlocaltime,clock=3Dhost -nographic -serial
-  telnet:127.0.0.1:1234,server,nowait -net nic,model=3Dne2k_pci -net
-  user,hostfwd=3Dtcp:127.0.0.1:2200-:22,tftp=3D/
-
-  does not accept the escape key (C-a) to perform functions such as
-  switching from monitor to console. Verified both in GNU screen and in
-  the Linux console.
-
-  If '-serial telnet:127.0.0.1:1234,server,nowait' is removed from the
-  command line, the escape key is accepted (and Qemu doesn't enter the
-  monitor immediately).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1713328/+subscriptions
+> ---
+>   hw/ide/ahci.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+> index 406a1b5..ccbe091 100644
+> --- a/hw/ide/ahci.c
+> +++ b/hw/ide/ahci.c
+> @@ -1495,6 +1495,7 @@ void ahci_uninit(AHCIState *s)
+>   
+>               ide_exit(s);
+>           }
+> +        object_unparent(OBJECT(&ad->port));
+>       }
+>   
+>       g_free(s->dev);
+> 
