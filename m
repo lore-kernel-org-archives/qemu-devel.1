@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dmHeb-00064Z-I4
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:52:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1dmHhj-0007rj-3H
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:55:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dmHeW-0001oS-O2
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:52:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41300)
+	(envelope-from <armbru@redhat.com>) id 1dmHhd-0003F0-Ka
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:55:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36490)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dmHeW-0001nK-IO
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:52:20 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dmHhd-0003EW-65
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 06:55:33 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-2-marcandre.lureau@redhat.com>
-	<8760dc4231.fsf@dusky.pond.sub.org>
-	<20170825125718.GG15315@localhost.localdomain>
-	<CAJ+F1CKJ19t__dbOf_ULYiEGc=xjdPhkwC2rZj-udXa=vTNa_g@mail.gmail.com>
-Date: Mon, 28 Aug 2017 12:52:16 +0200
-In-Reply-To: <CAJ+F1CKJ19t__dbOf_ULYiEGc=xjdPhkwC2rZj-udXa=vTNa_g@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Fri, 25 Aug 2017
-	14:12:21 +0000")
-Message-ID: <87y3q43qxr.fsf@dusky.pond.sub.org>
+References: <20170824072202.26818-1-stefanha@redhat.com>
+	<20170824083843.GB1866@lemon>
+	<20170824180402.GA4368@stefanha-x1.localdomain>
+	<20170825073229.GC11465@lemon.lan>
+	<20170825085222.GA9688@stefanha-x1.localdomain>
+Date: Mon, 28 Aug 2017 12:55:26 +0200
+In-Reply-To: <20170825085222.GA9688@stefanha-x1.localdomain> (Stefan
+	Hajnoczi's message of "Fri, 25 Aug 2017 09:52:22 +0100")
+Message-ID: <87pobg3qsh.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 01/54] qapi: fix type_seen key error
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 0/3] iotests: clean up resources using
+ context managers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,29 +31,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+Stefan Hajnoczi <stefanha@redhat.com> writes:
 
-> On Fri, Aug 25, 2017 at 2:57 PM Eduardo Habkost <ehabkost@redhat.com> wro=
-te:
+> On Fri, Aug 25, 2017 at 03:32:29PM +0800, Fam Zheng wrote:
+>> On Thu, 08/24 19:04, Stefan Hajnoczi wrote:
+>> > On Thu, Aug 24, 2017 at 04:38:43PM +0800, Fam Zheng wrote:
+>> > > On Thu, 08/24 08:21, Stefan Hajnoczi wrote:
+>> > > > Tests should declare resources upfront in a with statement.  Resources are
+>> > > > automatically cleaned up whether the test passes or fails:
+>> > > > 
+>> > > >   with FilePath('test.img') as img_path,
+>> > > >        VM() as vm:
+>> > > >       ...test...
+>> > > >   # img_path is deleted and vm is shut down automatically
+>> > > 
+>> > > Looks good but still requires test writers to learn and remember to use FilePath
+>> > > and with.
+>> > 
+>> > You cannot forget to use FilePath() unless you love typing at
+>> > os.path.join(iotests.test_dir, 'test.img').  It's much better than open
+>> > coding filename generation!
+>> > 
+>> > > These are still boilerplates.  Here goes my personal oppinion, so may
+>> > > not be plausible:
+>> > > 
+>> > > - For VM() maybe add an atexit in the launch() method also makes sure the VM is
+>> > >   eventually terminated.
+>> > > 
+>> > >   This means vm.shutdown() is still needed in tearDown() if there are multiple
+>> > >   test methods and each of them expects a clean state, but that is probably
+>> > >   still less typing (and also indenting) than the with approach, and also easy
+>> > >   to remember (otherwise a test will fail).
+>> > 
+>> > I looked into atexit before going this route.  atexit does not have an
+>> > unregister() API in Python 2.  This makes it ugly to use because some
+>> > tests do not want the resource to remain for the duration of the
+>> > process.
+>> > 
+>> > A related point is that the Python objects used by atexit handlers live
+>> > until the end of the process.  They cannot be garbage collected because
+>> > the atexit handler still has a reference to them.
+>> 
+>> I think this shortcoming can be solved with a clean up list ("all problems in
+>> computer science can be solved by another level of indirection"):
+>> 
+>> _clean_up_list = set()
+>> def _clean_up_handler():
+>>     for i in _clean_up_list:
+>>         try:
+>>             i()
+>>         except:
+>>             pass
+>> 
+>> atexit.register(_clean_up_handler)
+>> 
+>> class VM(...):
+>> 
+>>     def launch():
+>>         ...
+>>         _clean_up_list.add(self.launch)
+>> 
+>>     def shutdown():
+>>         _clean_up_list.remove(self.launch)
+>>         ...
 >
->> On Fri, Aug 25, 2017 at 08:02:26AM +0200, Markus Armbruster wrote:
->> > Conflicts with Eduardo's "[PATCH v2] qapi: Fix error handling code on
->> > alternate conflict".
->> > Message-Id: <20170717180926.14924-1-ehabkost@redhat.com>
->> >
->> > Marc-Andr=C3=A9, could you have a look?  You can rebase your fix on to=
-p of
->> > Eduardo's, or merge the two into one commit.
->>
->> Both patches seem to be fixing the same bug.
->>
+> atexit is still less powerful than context managers because its scope is
+> fixed.  Handler functions are only called when the process terminates.
+> Many test cases do not want resources (especially the VMs) around
+> forever because they run several iterations or sub-tests.
 >
-> Yes, it is solved differently. But take Eduardo's patch, it has more
-> extensive tests .
+> The with statement can be used both for process-lifetime and for more
+> fine-grained scoping.  That's why I chose it.
 
-Okay.
+Moreover, context managers are Pythonic.
 
-Too bad I didn't remember Eduardo's patch when I got yours.
+> If you stick to atexit then sub-tests or iterations require manual
+> vm.shutdown() - something that is not necessary using the with
+> statement.
+>
+> Stefan
