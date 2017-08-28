@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dmM3C-0007E3-Vq
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:34:12 -0400
+	(envelope-from <kchamart@redhat.com>) id 1dmM4o-0000Ae-RD
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:35:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dmM38-0005Sm-Rp
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:34:07 -0400
-Resent-Message-Id: <E1dmM38-0005Sm-Rp@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21352)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dmM38-0005S6-Jb
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:34:02 -0400
-In-Reply-To: <20170828153118.13500-1-agraf@suse.de>
-Message-ID: <150393442266.27.2514179159640044257@b5667b65043c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <kchamart@redhat.com>) id 1dmM4n-0005xr-M0
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:35:46 -0400
+Date: Mon, 28 Aug 2017 17:35:25 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170828153525.d4wgjfcqfnpxavrt@eukaryote>
+References: <20170828112952.22965-1-kchamart@redhat.com>
+	<a80aaf11-a962-c9d6-e271-c8ad5e1365b7@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 28 Aug 2017 08:33:44 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2] console: add question-mark escape
- operator
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a80aaf11-a962-c9d6-e271-c8ad5e1365b7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Extend non-shared storage
+ migration test (194)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +24,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: agraf@suse.de
-Cc: famz@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, stefanha@redhat.com, famz@redhat.com, kwolf@redhat.com, dgilbert@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA4MjgxNTMxMTguMTM1MDAtMS1hZ3JhZkBzdXNlLmRlClN1YmplY3Q6IFtRZW11LWRldmVsXSBb
-UEFUQ0ggdjJdIGNvbnNvbGU6IGFkZCBxdWVzdGlvbi1tYXJrIGVzY2FwZSBvcGVyYXRvcgpUeXBl
-OiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
-ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
-CgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2
-ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQ
-QVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlm
-ICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAt
-LW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAg
-ICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
-VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0
-dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAg
-ICAgICAgICBwYXRjaGV3LzIwMTcwODI4MTUzMTE4LjEzNTAwLTEtYWdyYWZAc3VzZS5kZSAtPiBw
-YXRjaGV3LzIwMTcwODI4MTUzMTE4LjEzNTAwLTEtYWdyYWZAc3VzZS5kZQpTd2l0Y2hlZCB0byBh
-IG5ldyBicmFuY2ggJ3Rlc3QnCmJjOGZkYjQwYjIgY29uc29sZTogYWRkIHF1ZXN0aW9uLW1hcmsg
-ZXNjYXBlIG9wZXJhdG9yCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6
-IGNvbnNvbGU6IGFkZCBxdWVzdGlvbi1tYXJrIGVzY2FwZSBvcGVyYXRvci4uLgpFUlJPUjogYnJh
-Y2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMyNjog
-RklMRTogdWkvY29uc29sZS5jOjg4MzoKKyAgICAgICAgICAgIGlmIChjaCA9PSAnOycgfHwgY2gg
-PT0gJz8nKQpbLi4uXQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA4IGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
-ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Mon, Aug 28, 2017 at 09:51:43AM -0500, Eric Blake wrote:
+> On 08/28/2017 06:29 AM, Kashyap Chamarthy wrote:
+> > This is the follow-up patch that was discussed[*] as part of feedback to
+> > qemu-iotest 194.
+> > 
+> > Changes in this patch:
+> > 
+> >   - Supply 'job-id' parameter to `drive-mirror` invocation.
+> > 
+> >   - Issue `block-job-cancel` command on the source QEMU to gracefully
+> >     complete the mirroring operation.
+> > 
+> >   - Stop the NBD server on the destination QEMU.
+> > 
+> >   - Finally, exit once the event BLOCK_JOB_COMPLETED is emitted.
+> > 
+> > With the above, the test will also be (almost) in sync with the
+> > procedure outlined in the document live-block-operations.rst[+]
+> > (section: "QMP invocation for live storage migration with
+> > ``drive-mirror`` + NBD").
+> > 
+> > [*] https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg04820.html
+> >     -- qemu-iotests: add 194 non-shared storage migration test
+> > [+] https://git.qemu.org/gitweb.cgi?p=qemu.git;a=blob;f=docs/interop/live-block-operations.rst
+> > 
+> > Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+> > ---
+> > I wonder:
+> >   - Is it worth printing the MIGRATION event state change?
+> 
+> I think waiting for both the BLOCK_JOB_COMPLETED and MIGRATION events
+> make sense (in other words, let's check both events in the expected
+> order, rather than just one or the other).
+
+That sounds more robust, will do in the next iteration.
+
+> >   - Since we're not checking on the MIGRATION event anymore, can
+> >     the migration state change events related code (that is triggerred
+> >     by setting 'migrate-set-capabilities') be simply removed?
+> 
+> If we're going to mirror libvirt's non-shared storage migration
+> sequence, I think we want to keep everything, rather than drop the
+> migration half.
+
+Yes, noted.
+
+[...]
+
+> > -iotests.log('Starting drive-mirror on source...')
+> > +iotests.log('Starting `drive-mirror` on source...')
+> >  iotests.log(source_vm.qmp(
+> >                'drive-mirror',
+> >                device='drive0',
+> >                target='nbd+unix:///drive0?socket={0}'.format(nbd_sock_path),
+> >                sync='full',
+> >                format='raw', # always raw, the server handles the format
+> > -              mode='existing'))
+> > +              mode='existing',
+> > +              job_id='mirror-job0'))
+> >  
+> > -iotests.log('Waiting for drive-mirror to complete...')
+> > +iotests.log('Waiting for `drive-mirror` to complete...')
+> 
+> So, up to here is okay,
+> 
+> >  iotests.log(source_vm.event_wait('BLOCK_JOB_READY'),
+> >              filters=[iotests.filter_qmp_event])
+> >  
+> > @@ -66,8 +67,14 @@ dest_vm.qmp('migrate-set-capabilities',
+> >              capabilities=[{'capability': 'events', 'state': True}])
+> >  iotests.log(source_vm.qmp('migrate', uri='unix:{0}'.format(migration_sock_path)))
+> >  
+> > +iotests.log('Gracefully ending the `drive-mirror` job on source...')
+> > +iotests.log(source_vm.qmp('block-job-cancel', device='mirror-job0'))
+> > +
+> > +iotests.log('Stopping the NBD server on destination...')
+> > +iotests.log(dest_vm.qmp('nbd-server-stop'))
+> > +
+> >  while True:
+> > -    event = source_vm.event_wait('MIGRATION')
+> > +    event = source_vm.event_wait('BLOCK_JOB_COMPLETED')
+> 
+> And this event makes sense for catching the block-job-cancel, but I
+> think you STILL want to keep a while loop for catching migration as well.
+
+Yes, will do.
+
+Thanks for the quick feedback.
+
+[...]
+
+-- 
+/kashyap
