@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dmJG6-0005Yr-FF
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 08:35:15 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dmJGA-0005gu-Cf
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 08:35:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dmJG0-0007ck-RK
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 08:35:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47600)
+	(envelope-from <kraxel@redhat.com>) id 1dmJG9-0007j7-Jb
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 08:35:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55452)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dmJG0-0007at-Kv
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 08:35:08 -0400
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dmJG9-0007ig-ED
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 08:35:17 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 28 Aug 2017 14:35:01 +0200
-Message-Id: <20170828123501.22317-4-kraxel@redhat.com>
+Date: Mon, 28 Aug 2017 14:35:00 +0200
+Message-Id: <20170828123501.22317-3-kraxel@redhat.com>
 In-Reply-To: <20170828123501.22317-1-kraxel@redhat.com>
 References: <20170828123501.22317-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] qxl_unpack_chunks: codestyle fixups
+Subject: [Qemu-devel] [PATCH v2 2/3] qxl: add support for chunked cursors.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,34 +26,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Ren=C3=A9=20Rebe?= <rene@exactcode.com>, Gerd Hoffmann <kraxel@redhat.com>
 
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/display/qxl-render.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ hw/display/qxl-render.c | 33 ++++++++++++++++++++++++++-------
+ 1 file changed, 26 insertions(+), 7 deletions(-)
 
 diff --git a/hw/display/qxl-render.c b/hw/display/qxl-render.c
-index b2c98f90c0..90e0865618 100644
+index e1b3f05ecb..b2c98f90c0 100644
 --- a/hw/display/qxl-render.c
 +++ b/hw/display/qxl-render.c
-@@ -215,14 +215,17 @@ static void qxl_unpack_chunks(void *dest, size_t size, PCIQXLDevice *qxl,
-         bytes = MIN(size - offset, chunk->data_size);
-         memcpy(dest + offset, chunk->data, bytes);
-         offset += bytes;
--        if (offset == size)
-+        if (offset == size) {
-             return;
-+        }
-         chunk = qxl_phys2virt(qxl, chunk->next_chunk, group_id);
--        if (!chunk)
-+        if (!chunk) {
-             return;
-+        }
-         max_chunks--;
--        if (max_chunks == 0)
-+        if (max_chunks == 0) {
-             return;
-+        }
-     }
+@@ -204,7 +204,30 @@ void qxl_render_update_area_done(PCIQXLDevice *qxl, QXLCookie *cookie)
+     g_free(cookie);
  }
  
+-static QEMUCursor *qxl_cursor(PCIQXLDevice *qxl, QXLCursor *cursor)
++static void qxl_unpack_chunks(void *dest, size_t size, PCIQXLDevice *qxl,
++                              QXLDataChunk *chunk, uint32_t group_id)
++{
++    uint32_t max_chunks = 32;
++    size_t offset = 0;
++    size_t bytes;
++
++    for (;;) {
++        bytes = MIN(size - offset, chunk->data_size);
++        memcpy(dest + offset, chunk->data, bytes);
++        offset += bytes;
++        if (offset == size)
++            return;
++        chunk = qxl_phys2virt(qxl, chunk->next_chunk, group_id);
++        if (!chunk)
++            return;
++        max_chunks--;
++        if (max_chunks == 0)
++            return;
++    }
++}
++
++static QEMUCursor *qxl_cursor(PCIQXLDevice *qxl, QXLCursor *cursor,
++                              uint32_t group_id)
+ {
+     QEMUCursor *c;
+     size_t size;
+@@ -215,7 +238,7 @@ static QEMUCursor *qxl_cursor(PCIQXLDevice *qxl, QXLCursor *cursor)
+     switch (cursor->header.type) {
+     case SPICE_CURSOR_TYPE_ALPHA:
+         size = sizeof(uint32_t) * cursor->header.width * cursor->header.height;
+-        memcpy(c->data, cursor->chunk.data, size);
++        qxl_unpack_chunks(c->data, size, qxl, &cursor->chunk, group_id);
+         if (qxl->debug > 2) {
+             cursor_print_ascii_art(c, "qxl/alpha");
+         }
+@@ -259,11 +282,7 @@ int qxl_render_cursor(PCIQXLDevice *qxl, QXLCommandExt *ext)
+         if (!cursor) {
+             return 1;
+         }
+-        if (cursor->chunk.data_size != cursor->data_size) {
+-            fprintf(stderr, "%s: multiple chunks\n", __FUNCTION__);
+-            return 1;
+-        }
+-        c = qxl_cursor(qxl, cursor);
++        c = qxl_cursor(qxl, cursor, ext->group_id);
+         if (c == NULL) {
+             c = cursor_builtin_left_ptr();
+         }
 -- 
 2.9.3
