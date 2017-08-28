@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dm6cB-0005lI-1F
-	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 19:05:11 -0400
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dm9Ig-0004l2-WD
+	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1dm6c9-0001VK-VW
-	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 19:05:10 -0400
-Received: from hera.aquilenet.fr ([2a01:474::1]:43472)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1dm6c9-0001UK-O9
-	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 19:05:09 -0400
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Mon, 28 Aug 2017 01:05:06 +0200
-Message-Id: <20170827230506.12683-2-samuel.thibault@ens-lyon.org>
-In-Reply-To: <20170827230506.12683-1-samuel.thibault@ens-lyon.org>
-References: <20170827230506.12683-1-samuel.thibault@ens-lyon.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/1] slirp: fix clearing ifq_so from pending
- packets
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dm9Id-0000qA-UJ
+	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:15 -0400
+Received: from mail-vk0-x22d.google.com ([2607:f8b0:400c:c05::22d]:37521)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
+	id 1dm9Id-0000pw-P4
+	for qemu-devel@nongnu.org; Sun, 27 Aug 2017 21:57:11 -0400
+Received: by mail-vk0-x22d.google.com with SMTP id q189so12098036vke.4
+	for <qemu-devel@nongnu.org>; Sun, 27 Aug 2017 18:57:11 -0700 (PDT)
+From: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
+Date: Sun, 27 Aug 2017 20:56:40 -0500
+Message-Id: <20170828015654.2530-1-Sergio.G.DelReal@gmail.com>
+Subject: [Qemu-devel] [PATCH 00/14] add support for Hypervisor.framework in
+ QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +26,106 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com
+Cc: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 
-The if_fastq and if_batchq contain not only packets, but queues of packet=
-s
-for the same socket. When sofree frees a socket, it thus has to clear ifq=
-_so
-from all the packets from the queues, not only the first.
+The following patchset adds to QEMU the supporting for macOS's native
+hypervisor, Hypervisor.framework (hvf). The code base is taken from
+Google's Android emulator at
+https://android.googlesource.com/platform/external/qemu/+/emu-master-dev.
 
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
- slirp/socket.c | 39 +++++++++++++++++++++++----------------
- 1 file changed, 23 insertions(+), 16 deletions(-)
+Apart from general code refactoring, some additional features were implemented:
+retrieve the set of features supported by host cpu and hvf (cpuid);
+dirty page tracking for VGA memory area; reimplementation of the event
+injection mechanism to allow injection of exceptions during vmexits, which is
+exemplified by the injection of a GP fault when the guest vmexits due to
+execution of the vmcall instruction; changing the emulator's use of CPUState
+structure in favor of CPUX86State, so as to in the future remove data structures
+that are uselessly specific to hvf and unified some of the state between kvm/tcg
+and hvf.
+Some features initially planned to implement that didn't make it include:
+page fault handling in the emulator and implementing the dummy_signal to handle
+the SIG_IPI signal without race conditions. Hopefully these can be implemented
+in the near future.
 
-diff --git a/slirp/socket.c b/slirp/socket.c
-index ecec0295a9..cb7b5b608d 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -59,6 +59,27 @@ socreate(Slirp *slirp)
-   return(so);
- }
-=20
-+/*
-+ * Remove references to so from the given message queue.
-+ */
-+static void
-+soqfree(struct socket *so, struct quehead *qh)
-+{
-+    struct mbuf *ifq;
-+
-+    for (ifq =3D (struct mbuf *) qh->qh_link;
-+             (struct quehead *) ifq !=3D qh;
-+             ifq =3D ifq->ifq_next) {
-+        if (ifq->ifq_so =3D=3D so) {
-+            struct mbuf *ifm;
-+            ifq->ifq_so =3D NULL;
-+            for (ifm =3D ifq->ifs_next; ifm !=3D ifq; ifm =3D ifm->ifs_n=
-ext) {
-+                ifm->ifq_so =3D NULL;
-+            }
-+        }
-+    }
-+}
-+
- /*
-  * remque and free a socket, clobber cache
-  */
-@@ -66,23 +87,9 @@ void
- sofree(struct socket *so)
- {
-   Slirp *slirp =3D so->slirp;
--  struct mbuf *ifm;
-=20
--  for (ifm =3D (struct mbuf *) slirp->if_fastq.qh_link;
--       (struct quehead *) ifm !=3D &slirp->if_fastq;
--       ifm =3D ifm->ifq_next) {
--    if (ifm->ifq_so =3D=3D so) {
--      ifm->ifq_so =3D NULL;
--    }
--  }
--
--  for (ifm =3D (struct mbuf *) slirp->if_batchq.qh_link;
--       (struct quehead *) ifm !=3D &slirp->if_batchq;
--       ifm =3D ifm->ifq_next) {
--    if (ifm->ifq_so =3D=3D so) {
--      ifm->ifq_so =3D NULL;
--    }
--  }
-+  soqfree(so, &slirp->if_fastq);
-+  soqfree(so, &slirp->if_batchq);
-=20
-   if (so->so_emu=3D=3DEMU_RSH && so->extra) {
- 	sofree(so->extra);
---=20
+Sergio Andres Gomez Del Real (14):
+  hvf: add support for Hypervisor.framework in the configure script
+  hvf: add code base from Google's QEMU repository
+  hvf: add conditional macros around hvf code in cpus.c
+  hvf: add fields to CPUState and CPUX86State; add definitions
+  hvf: use new helper functions for put/get xsave
+  hvf: add compilation rules to Makefile.objs
+  hvf: run hvf code through checkpatch.pl and fix style issues
+  apic: add function to apic that will be used by hvf
+  hvf: implement hvf_get_supported_cpuid
+  hvf: refactor cpuid code
+  hvf: implement vga dirty page tracking
+  hvf: move fields from CPUState to CPUX86State
+  hvf: refactor event injection code for hvf
+  hvf: inject General Protection Fault when vmexit through vmcall
+
+ configure                           |   32 +
+ cpus.c                              |  107 +-
+ hw/intc/apic.c                      |   11 +
+ include/hw/i386/apic.h              |    1 +
+ include/qom/cpu.h                   |    2 +
+ include/sysemu/hvf.h                |  106 ++
+ qemu-options.hx                     |   20 +-
+ target/i386/Makefile.objs           |    1 +
+ target/i386/cpu-qom.h               |    4 +-
+ target/i386/cpu.c                   |  111 +-
+ target/i386/cpu.h                   |   30 +
+ target/i386/hvf-all.c               | 1123 ++++++++++++++++++
+ target/i386/hvf-i386.h              |   48 +
+ target/i386/hvf-utils/Makefile.objs |    1 +
+ target/i386/hvf-utils/README.md     |    7 +
+ target/i386/hvf-utils/vmcs.h        |  371 ++++++
+ target/i386/hvf-utils/vmx.h         |  222 ++++
+ target/i386/hvf-utils/x86.c         |  184 +++
+ target/i386/hvf-utils/x86.h         |  476 ++++++++
+ target/i386/hvf-utils/x86_cpuid.c   |  417 +++++++
+ target/i386/hvf-utils/x86_cpuid.h   |   52 +
+ target/i386/hvf-utils/x86_decode.c  | 2186 +++++++++++++++++++++++++++++++++++
+ target/i386/hvf-utils/x86_decode.h  |  325 ++++++
+ target/i386/hvf-utils/x86_descr.c   |  124 ++
+ target/i386/hvf-utils/x86_descr.h   |   55 +
+ target/i386/hvf-utils/x86_emu.c     | 1536 ++++++++++++++++++++++++
+ target/i386/hvf-utils/x86_emu.h     |   32 +
+ target/i386/hvf-utils/x86_flags.c   |  333 ++++++
+ target/i386/hvf-utils/x86_flags.h   |  243 ++++
+ target/i386/hvf-utils/x86_gen.h     |   36 +
+ target/i386/hvf-utils/x86_mmu.c     |  273 +++++
+ target/i386/hvf-utils/x86_mmu.h     |   28 +
+ target/i386/hvf-utils/x86hvf.c      |  463 ++++++++
+ target/i386/hvf-utils/x86hvf.h      |   22 +
+ target/i386/kvm.c                   |    2 -
+ vl.c                                |    7 +
+ 36 files changed, 8957 insertions(+), 34 deletions(-)
+ create mode 100644 include/sysemu/hvf.h
+ create mode 100644 target/i386/hvf-all.c
+ create mode 100644 target/i386/hvf-i386.h
+ create mode 100644 target/i386/hvf-utils/Makefile.objs
+ create mode 100644 target/i386/hvf-utils/README.md
+ create mode 100644 target/i386/hvf-utils/vmcs.h
+ create mode 100644 target/i386/hvf-utils/vmx.h
+ create mode 100644 target/i386/hvf-utils/x86.c
+ create mode 100644 target/i386/hvf-utils/x86.h
+ create mode 100644 target/i386/hvf-utils/x86_cpuid.c
+ create mode 100644 target/i386/hvf-utils/x86_cpuid.h
+ create mode 100644 target/i386/hvf-utils/x86_decode.c
+ create mode 100644 target/i386/hvf-utils/x86_decode.h
+ create mode 100644 target/i386/hvf-utils/x86_descr.c
+ create mode 100644 target/i386/hvf-utils/x86_descr.h
+ create mode 100644 target/i386/hvf-utils/x86_emu.c
+ create mode 100644 target/i386/hvf-utils/x86_emu.h
+ create mode 100644 target/i386/hvf-utils/x86_flags.c
+ create mode 100644 target/i386/hvf-utils/x86_flags.h
+ create mode 100644 target/i386/hvf-utils/x86_gen.h
+ create mode 100644 target/i386/hvf-utils/x86_mmu.c
+ create mode 100644 target/i386/hvf-utils/x86_mmu.h
+ create mode 100644 target/i386/hvf-utils/x86hvf.c
+ create mode 100644 target/i386/hvf-utils/x86hvf.h
+
+-- 
 2.14.1
+
+Subject: [PATCH 00/15] 
