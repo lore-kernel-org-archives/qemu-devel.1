@@ -1,50 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dmEJV-0007qG-Mu
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:18:26 -0400
+	(envelope-from <michael@fritscher.net>) id 1dmEaO-0003kA-Ub
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:35:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dmEJS-0005G3-DO
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:18:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57046
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dmEJS-0005DR-5m
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:18:22 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7S7FGwU141035
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 03:18:19 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2cmcct58yb-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 03:18:19 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 28 Aug 2017 08:18:17 +0100
-References: <e2a1b182-83a9-2259-27f9-68b61b5061d5@linux.vnet.ibm.com>
-	<20170824171355.29d1ec32.cohuck@redhat.com>
-	<30333b41-508d-f9a3-ac2d-4830a7791475@redhat.com>
-	<34f0f307-d16f-7c76-1589-fa06252f6d09@linux.vnet.ibm.com>
-	<ad0ef5a7-c0e0-9e54-a417-858c4b32a80e@redhat.com>
-	<c9a6a1ec-eb7c-08a6-82ad-87ad5412ad19@linux.vnet.ibm.com>
-	<CAFEAcA-oE=E3ydugLdVnPS2Tquqkou=BEhsB_DALqZxbVD0GDA@mail.gmail.com>
-	<e24316e0-3b6f-ef1c-7c4b-66e7b302e5b4@linux.vnet.ibm.com>
-	<97b35c4d-e897-c18a-525f-1fa1a7560776@de.ibm.com>
-	<20170825092008.12484e6a.cohuck@redhat.com>
-	<d3e9d032-fd2e-6126-1774-cb8a86a219f4@de.ibm.com>
-	<20170825102950.736647be.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 28 Aug 2017 09:18:14 +0200
+	(envelope-from <michael@fritscher.net>) id 1dmEaL-0003wy-Qg
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:35:52 -0400
+Received: from mifritscher.de ([188.40.170.105]:45360
+	helo=mail.mifritscher.vserverkompetenz.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <michael@fritscher.net>)
+	id 1dmEaL-0003wJ-CT
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 03:35:49 -0400
+Message-ID: <786fcc685c5e840bf56e3170008eb9a2.squirrel@mifritscher.de>
+In-Reply-To: <840931cd5e646cc3ed11876ff556d032.squirrel@mifritscher.de>
+References: <1460447520-12499-1-git-send-email-michael@fritscher.net>
+	<20160509103828.6bfc5b96@bahia.huguette.org>
+	<840931cd5e646cc3ed11876ff556d032.squirrel@mifritscher.de>
+Date: Mon, 28 Aug 2017 09:35:45 +0200
+From: "Michael Fritscher" <michael@fritscher.net>
 MIME-Version: 1.0
-In-Reply-To: <20170825102950.736647be.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <2fdd5a70-6339-c4ec-c13c-d6f96d7abfc9@de.ibm.com>
-Subject: Re: [Qemu-devel] S390 bios breaks in qemu 2.10.rc3
+Content-Type: text/plain;charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] [WIP] [RFC ]Add initial 9pfs support
+ for Windows hosts v2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -53,34 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Farhan Ali <alifm@linux.vnet.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
+To: Michael Fritscher <michael@fritscher.net>
+Cc: Greg Kurz <gkurz@linux.vnet.ibm.com>, sw@weilnetz.de, aneesh.kumar@linux.vnet.ibm.com, mst@redhat.com, qemu-devel@nongnu.org
 
+Good day,
 
+only a short announcement: Sorry for the very long delay :-( But I'm
+working on this again. The biggest issue seems to be the *at stuff. I'll
+try to workaround this via getting the directories' path from the file
+descriptor with the /proc (as it is already done in the 9pfs_utils) -
+luckily,the mingw environment emulates the /proc. If this doesn't work
+I've another idea (the file descriptors needs to be "registered" with the
+path (and saved in a sparse vector or map with the fd as key and the path
+as value). The "big" solution would be to write a 9p_local_windows.c from
+scratch, but I would like to avoid it.
 
-On 08/25/2017 10:29 AM, Cornelia Huck wrote:
-> On Fri, 25 Aug 2017 10:21:58 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> On 08/25/2017 09:20 AM, Cornelia Huck wrote:
-> 
->>> OK, to recap:
->>>
->>> - the current pre-built bios seems fine
->>> - rebuilding the bios may yield a version that fails on some systems
->>>   (different compiler?)
->>> - adding aligned(8) looks like the right thing to do
->>> - it seems to fix the problem, but on at least one system something
->>>   still seems off (under investigation)  
->>
->> Yes. I am out of office today, so for any aligned(8) patch
->> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> even for 2.10.
-> 
-> I fear the 2.10 train has already left the station, but any aligned(8)
-> patch should be cc:stable.
+Additionally, I changed my approach: Instead of one big patch with
+everything in it, I split it into 2 patch series with several patches:
 
-I think this could be a topic for QEMU summit. Our process of not allowing
-fixes in rcx without requiring an rc(x+1) seems a bit odd. The Linux kernel
-style (there are fixes between the last rc and release) seems more balanced
-as long as we establish some safety nets.
+  * The first one only fixes the build via adding #ifdefs, creating stubs
+in os-win32.h etc. and introduces no regressions. Status: Ready in my
+local repo: It compiles fine with enabled 9pfs and works. If 9pfs is
+tried to use there is a clean error message that the fsdev couldn't be
+initialized - as expected.
+  * The second one actually get 9pfs working. This involves mostly
+implementing the *at functions and a few tiny things (O_BINARY and so
+on) Status: Not started yet (will be at the next weekend I hope), but is
+a combination of parts of the the old patch + the implementation of the
+*at functions.
+
+My hope is that the first series could be merged independently from the
+second. Meanings? If so I'll clean up the first patch series a bit
+(History cleaning) and send it to the list.
+
+Best regards,
+Michael Fritscher
