@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dmO8r-0006x4-Od
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:48:06 -0400
+	(envelope-from <famz@redhat.com>) id 1dmO8x-00072I-MY
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:48:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dmO8n-0002Ry-S1
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:48:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43394)
+	(envelope-from <famz@redhat.com>) id 1dmO8w-0002XS-OI
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:48:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:19200)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dmO8n-0002RO-LY
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:48:01 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dmO8w-0002Wz-Hb
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:48:10 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue, 29 Aug 2017 01:47:03 +0800
-Message-Id: <20170828174707.20786-7-famz@redhat.com>
+Date: Tue, 29 Aug 2017 01:47:04 +0800
+Message-Id: <20170828174707.20786-8-famz@redhat.com>
 In-Reply-To: <20170828174707.20786-1-famz@redhat.com>
 References: <20170828174707.20786-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 06/10] tests: Add NetBSD image
+Subject: [Qemu-devel] [PATCH v4 07/10] tests: Add OpenBSD image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,21 +31,20 @@ The image is prepared following instructions as in:
 https://wiki.qemu.org/Hosts/BSD
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Kamil Rytarowski <n54@gmx.com>
 ---
- tests/vm/netbsd | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
- create mode 100755 tests/vm/netbsd
+ tests/vm/openbsd | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
+ create mode 100755 tests/vm/openbsd
 
-diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+diff --git a/tests/vm/openbsd b/tests/vm/openbsd
 new file mode 100755
-index 0000000000..559e89c8a6
+index 0000000000..57b10105f7
 --- /dev/null
-+++ b/tests/vm/netbsd
-@@ -0,0 +1,42 @@
++++ b/tests/vm/openbsd
+@@ -0,0 +1,43 @@
 +#!/usr/bin/env python
 +#
-+# NetBSD VM image
++# OpenBSD VM image
 +#
 +# Copyright (C) 2017 Red Hat Inc.
 +#
@@ -61,20 +60,21 @@ index 0000000000..559e89c8a6
 +import subprocess
 +import basevm
 +
-+class NetBSDVM(basevm.BaseVM):
-+    name = "netbsd"
++class OpenBSDVM(basevm.BaseVM):
++    name = "openbsd"
 +    BUILD_SCRIPT = """
 +        set -e;
 +        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-+        tar -xf /dev/rld1a;
-+        ./configure --python=python2.7 {configure_opts};
++        tar -xf /dev/rsd1c;
++        ./configure --cc=x86_64-unknown-openbsd6.1-gcc-4.9.4 --python=python2.7 {configure_opts};
 +        gmake -j{jobs};
-+        gmake check;
++        # XXX: "gmake check" seems to always hang or fail
++        #gmake check;
 +    """
 +
 +    def build_image(self, img):
-+        cimg = self._download_with_cache("http://download.patchew.org/netbsd-7.1-amd64.img.xz",
-+                                         sha256sum='b633d565b0eac3d02015cd0c81440bd8a7a8df8512615ac1ee05d318be015732')
++        cimg = self._download_with_cache("http://download.patchew.org/openbsd-6.1-amd64.img.xz",
++                sha256sum='8c6cedc483e602cfee5e04f0406c64eb99138495e8ca580bc0293bcf0640c1bf')
 +        img_tmp_xz = img + ".tmp.xz"
 +        img_tmp = img + ".tmp"
 +        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
@@ -84,6 +84,6 @@ index 0000000000..559e89c8a6
 +        os.rename(img_tmp, img)
 +
 +if __name__ == "__main__":
-+    sys.exit(basevm.main(NetBSDVM))
++    sys.exit(basevm.main(OpenBSDVM))
 -- 
 2.13.5
