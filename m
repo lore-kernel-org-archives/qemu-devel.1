@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmOGV-0005IX-Pv
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:56:00 -0400
+	(envelope-from <thuth@redhat.com>) id 1dmOGu-0005em-Bs
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:56:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmOGQ-00060J-K1
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:55:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40931)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dmOGQ-0005zo-Cp
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:55:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dmOGO-0004WV-D0
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 17:55:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 66F6A2E80E9
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 17:55:50 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1dmOGt-0006Nk-8v
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:56:24 -0400
+References: <1503938085-169486-1-git-send-email-imammedo@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <a78e944b-b736-dc9e-3dd0-57468263f38e@redhat.com>
+Date: Mon, 28 Aug 2017 19:56:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 28 Aug 2017 17:49:37 -0000
-From: Thomas Huth <1713434@bugs.launchpad.net>
-Reply-To: Bug 1713434 <1713434@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150391152035.18876.7874968547091336063.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150394257755.8832.13933285266636213218.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1713434] Re: prom-env-test test aborted and core
- dumped
+In-Reply-To: <1503938085-169486-1-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11] ide: ahci: unparent children
+ buses before freeing their memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,92 +24,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, qemu-block@nongnu.org, f4bug@amsat.org, mst@redhat.com
 
-Hmm, that looks like -prom-env is working correctly with the pseries
-machine. I wonder whether the problem is somewhere else... Could you
-please run "make check-qtest-ppc64 V=3D1" to see whether it rather fails
-for the mac99 or g3beige machines?
+On 28.08.2017 18:34, Igor Mammedov wrote:
+> Fixes read after freeing error reported
+>   https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg04243.html
+>   Message-Id: <59a56959-ca12-ea75-33fa-ff07eba1b090@redhat.com>
+> 
+> ich9-ahci device creates ide buses and attaches them as QOM children
+> at realize time, however it forgets to properly clean them up
+> at unrealize time and frees memory containing these children,
+> with following call-chain:
+> 
+>    qdev_device_add()
+>      object_property_set_bool('realized', true)
+>        device_set_realized()
+>           ...
+>           pci_qdev_realize() -> pci_ich9_ahci_realize() -> ahci_realize()
+>                ...
+>                s->dev = g_new0(AHCIDevice, ports);
+>                ...
+>                   AHCIDevice *ad = &s->dev[i];
+>                   ide_bus_new(&ad->port, sizeof(ad->port), qdev, i, 1);
+>                   ^^^ creates bus in memory allocated by above gnew()
+>                       and adds it as child propety to ahci device
+>           ...
+>           hotplug_handler_plug(); -> goto post_realize_fail;
+>           pci_qdev_unrealize() -> pci_ich9_uninit() -> ahci_uninit()
+>               ...
+>                g_free(s->dev);
+>                ^^^ free memory that holds children busses
+> 
+>           return with error from device_set_realized()
+> 
+> As result later when qdev_device_add() tries to unparent ich9-ahci
+> after failed device_set_realized(),
+>     object_unparent() -> object_property_del_child()
+> iterates over existing QOM children including buses added by
+> ide_bus_new() and tries to unparent them, which causes access to
+> freed memory where they where located.
+> 
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  hw/ide/ahci.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+> index 406a1b5..ccbe091 100644
+> --- a/hw/ide/ahci.c
+> +++ b/hw/ide/ahci.c
+> @@ -1495,6 +1495,7 @@ void ahci_uninit(AHCIState *s)
+>  
+>              ide_exit(s);
+>          }
+> +        object_unparent(OBJECT(&ad->port));
+>      }
+>  
+>      g_free(s->dev);
+> 
 
--- =
+Thanks, this fixes the problem for me with both, x86_64 and mips64el!
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1713434
-
-Title:
-  prom-env-test test aborted and core dumped
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  On ppc64le architecture machine the following test case Aborted and
-  Core dumped.
-
-  # tests/prom-env-test --quiet --keep-going -m=3Dquick --GTestLogFD=3D6
-  **
-  ERROR:tests/libqtest.c:628:qtest_get_arch: assertion failed: (qemu !=3D N=
-ULL)
-  Aborted (core dumped)
-
-  Steps to re-produce:
-  clone from the git
-  configure & compile =
-
-  run the unit tests by 'make check'
-
-  (gdb) bt
-  #0  0x00003fff9d60eff0 in raise () from /lib64/libc.so.6
-  #1  0x00003fff9d61136c in abort () from /lib64/libc.so.6
-  #2  0x00003fff9de1aa04 in g_assertion_message () from /lib64/libglib-2.0.=
-so.0
-  #3  0x00003fff9de1ab0c in g_assertion_message_expr () from /lib64/libglib=
--2.0.so.0
-  #4  0x000000001000cc30 in qtest_get_arch () at tests/libqtest.c:628
-  #5  0x00000000100048f0 in main (argc=3D5, argv=3D0x3ffff2145538) at tests=
-/prom-env-test.c:82
-  (gdb) i r
-  r0             0xfa	250
-  r1             0x3ffff2144d30	70368510627120
-  r2             0x3fff9d7b9900	70367091333376
-  r3             0x0	0
-  r4             0x12a7	4775
-  r5             0x6	6
-  r6             0x8	8
-  r7             0x1	1
-  r8             0x0	0
-  r9             0x0	0
-  r10            0x0	0
-  r11            0x0	0
-  r12            0x0	0
-  r13            0x3fff9dfa1950	70367099623760
-  r14            0x0	0
-  r15            0x0	0
-  r16            0x0	0
-  r17            0x0	0
-  r18            0x0	0
-  r19            0x0	0
-  r20            0x0	0
-  r21            0x0	0
-  r22            0x0	0
-  r23            0x0	0
-  r24            0x0	0
-  r25            0x0	0
-  r26            0x0	0
-  r27            0x100287f8	268601336
-  r28            0x16841b40	377756480
-  r29            0x4c	76
-  r30            0x3ffff2144de8	70368510627304
-  r31            0x6	6
-  pc             0x3fff9d60eff0	0x3fff9d60eff0 <raise+96>
-  msr            0x900000000280f033	10376293541503627315
-  cr             0x42000842	1107298370
-  lr             0x3fff9d61136c	0x3fff9d61136c <abort+396>
-  ctr            0x0	0
-  xer            0x0	0
-  orig_r3        0x12a7	4775
-  trap           0xc00	3072
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1713434/+subscriptions
+Tested-by: Thomas Huth <thuth@redhat.com>
