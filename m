@@ -1,50 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dmKt9-0002JH-FQ
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 10:19:44 -0400
+	(envelope-from <bounces@canonical.com>) id 1dmKuh-00039v-KW
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 10:21:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dmKsy-0001TW-PW
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 10:19:33 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38005
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <bounces@canonical.com>) id 1dmKub-0002C2-Ox
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 10:21:15 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58589)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dmKsy-0001TO-J0
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 10:19:28 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7SEFJ2d136789
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 10:19:27 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cmjmxt012-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 10:19:27 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 28 Aug 2017 15:19:25 +0100
-References: <cover.1503667215.git.alifm@linux.vnet.ibm.com>
-	<3ed8b810b6592daee6a775037ce21f850e40647d.1503667215.git.alifm@linux.vnet.ibm.com>
-	<20170825160408.2775c8b5.cohuck@redhat.com>
-	<00d41b2b-cf22-c9e2-8d9f-de947f4d3f18@linux.vnet.ibm.com>
-	<20170828102214.7aad9112.cohuck@redhat.com>
-	<caab4ec1-763a-8dfb-5e88-295a43a41e68@linux.vnet.ibm.com>
-	<20170828150653.7cdc8c5a.cohuck@redhat.com>
-	<c7e3a1cb-10e6-4c2d-0225-2bcbe9c97de6@linux.vnet.ibm.com>
-	<c61c8ee1-3bca-41db-33a7-b65186a80d25@de.ibm.com>
-	<b5a9ab05-4e3c-66bc-33ce-d953d7f911e2@linux.vnet.ibm.com>
-	<20170828160554.45855dfa.cohuck@redhat.com>
-	<e3f0c9c1-b576-b9bb-66e2-53c2ef94b91b@linux.vnet.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 28 Aug 2017 16:19:21 +0200
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dmKub-0002B2-IX
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 10:21:09 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dmKuX-0002jM-L9
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 14:21:05 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 58CB92E8195
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 14:20:58 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <e3f0c9c1-b576-b9bb-66e2-53c2ef94b91b@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <9b9880e4-71fd-4bc5-961b-ab0e2b298f03@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] s390-ccw: Fix alignment for CCW1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 28 Aug 2017 14:12:16 -0000
+From: Thomas Huth <1713434@bugs.launchpad.net>
+Reply-To: Bug 1713434 <1713434@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150391152035.18876.7874968547091336063.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150392953685.19255.17725046941262557608.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1713434] Re: prom-env-test test aborted and core
+ dumped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -53,40 +37,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, farman@linux.vnet.ibm.com, walling@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
 
+That works for me - no problems with tests/prom-env-test on a POWER8
+little endian system here. What host system are you using? Could you
+also check what happens if you run QEMU directly like this, and post the
+console output here:
 
+ppc64-softmmu/qemu-system-ppc64 -nographic -M pseries,accel=3Dtcg
+-nodefaults -serial stdio -prom-env 'use-nvramrc?=3Dtrue' -prom-env
+'nvramrc=3D." Hello World!" cr power-off'
 
-On 08/28/2017 04:15 PM, Farhan Ali wrote:
-> 
-> 
-> On 08/28/2017 10:05 AM, Cornelia Huck wrote:
->>>>> It's the alignment of the CCW which causes the problem.
->>>>>
->>>>> The exact error message when starting the guest was:
->>>>>
->>>>> ! No virtio device found !
->>>>>
->>>>> Since it worked for SCSI and CDL, and failed for LDL disks on that particular system, we are not really sure what caused the failure.
->>>>> Debugging it further showed the CCW for LDL disks were not aligned at double word boundary.
->> This is really, really odd, as the low-level ccw code is the same for
->> any disk type...
->>
-> Exactly!
-> 
->>>>> Trying the test on a different system with LDL disks worked fine, with the aligned(8) fix.
->>>> Do you happen to have an old s390-ccw.img laying around in the test folder? QEMU might pick up
->>>> this one (e.g. when calling it without libvirt from the command line).
->>>>
->>> I explicitly mention the bios to use with '-bios' option and pick up the
->>> latest bios. Without the aligned fix I see the error and with the fix it
->>> works fine.
->> Wait, so the fix fixes it? Or am I confused now?
->>
-> 
-> It fixes in my system and one other system we tried on. But fails on a system where this issue was first noticed.
+-- =
 
-This is very confusing. So you have tried -bios on the system
-where the issue was first noticed and the issue still persists
-despite of the fixed bios is specified?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1713434
+
+Title:
+  prom-env-test test aborted and core dumped
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  On ppc64le architecture machine the following test case Aborted and
+  Core dumped.
+
+  # tests/prom-env-test --quiet --keep-going -m=3Dquick --GTestLogFD=3D6
+  **
+  ERROR:tests/libqtest.c:628:qtest_get_arch: assertion failed: (qemu !=3D N=
+ULL)
+  Aborted (core dumped)
+
+  Steps to re-produce:
+  clone from the git
+  configure & compile =
+
+  run the unit tests by 'make check'
+
+  (gdb) bt
+  #0  0x00003fff9d60eff0 in raise () from /lib64/libc.so.6
+  #1  0x00003fff9d61136c in abort () from /lib64/libc.so.6
+  #2  0x00003fff9de1aa04 in g_assertion_message () from /lib64/libglib-2.0.=
+so.0
+  #3  0x00003fff9de1ab0c in g_assertion_message_expr () from /lib64/libglib=
+-2.0.so.0
+  #4  0x000000001000cc30 in qtest_get_arch () at tests/libqtest.c:628
+  #5  0x00000000100048f0 in main (argc=3D5, argv=3D0x3ffff2145538) at tests=
+/prom-env-test.c:82
+  (gdb) i r
+  r0             0xfa	250
+  r1             0x3ffff2144d30	70368510627120
+  r2             0x3fff9d7b9900	70367091333376
+  r3             0x0	0
+  r4             0x12a7	4775
+  r5             0x6	6
+  r6             0x8	8
+  r7             0x1	1
+  r8             0x0	0
+  r9             0x0	0
+  r10            0x0	0
+  r11            0x0	0
+  r12            0x0	0
+  r13            0x3fff9dfa1950	70367099623760
+  r14            0x0	0
+  r15            0x0	0
+  r16            0x0	0
+  r17            0x0	0
+  r18            0x0	0
+  r19            0x0	0
+  r20            0x0	0
+  r21            0x0	0
+  r22            0x0	0
+  r23            0x0	0
+  r24            0x0	0
+  r25            0x0	0
+  r26            0x0	0
+  r27            0x100287f8	268601336
+  r28            0x16841b40	377756480
+  r29            0x4c	76
+  r30            0x3ffff2144de8	70368510627304
+  r31            0x6	6
+  pc             0x3fff9d60eff0	0x3fff9d60eff0 <raise+96>
+  msr            0x900000000280f033	10376293541503627315
+  cr             0x42000842	1107298370
+  lr             0x3fff9d61136c	0x3fff9d61136c <abort+396>
+  ctr            0x0	0
+  xer            0x0	0
+  orig_r3        0x12a7	4775
+  trap           0xc00	3072
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1713434/+subscriptions
