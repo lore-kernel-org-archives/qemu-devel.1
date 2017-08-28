@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dmNgM-00066J-FS
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:18:39 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dmNm3-0007vN-BA
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:24:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dmNgI-0004xQ-Eo
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:18:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58030)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dmNgI-0004wf-5e
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:18:34 -0400
-Date: Tue, 29 Aug 2017 01:18:27 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170828171827.GF18194@lemon.lan>
-References: <20170822044155.2451-1-famz@redhat.com>
-	<20170822044155.2451-4-famz@redhat.com>
-	<51a26b62-8ce8-6733-908b-3481a110663e@amsat.org>
-	<20170822140000.GF3210@lemon>
-	<cf40501d-a61f-6e48-687c-fff4b9db47c4@amsat.org>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dmNm1-0007u8-6x
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:24:31 -0400
+Received: from mail-vk0-x22e.google.com ([2607:f8b0:400c:c05::22e]:33384)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dmNm1-0007ty-0g
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 13:24:29 -0400
+Received: by mail-vk0-x22e.google.com with SMTP id j7so3273245vke.0
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 10:24:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <cf40501d-a61f-6e48-687c-fff4b9db47c4@amsat.org>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<1503471071-2233-3-git-send-email-peterx@redhat.com>
+	<CAJ+F1CKvY9iMtTQSrM2xVUwXYb0pcHjtFf8x4xpxG5ke-FPf3g@mail.gmail.com>
+	<20170825153304.GJ2090@work-vm>
+	<CAJ+F1CJR3UWv4zaGg_6aAyC7WWsVd35=UiRWyWkbGm-gEN2O9A@mail.gmail.com>
+	<87fucc3q78.fsf@dusky.pond.sub.org>
+	<CAJ+F1CK-srFaVCEA1iQurSayDc2u9QVSU9RYnV_uxK_iYTDE-A@mail.gmail.com>
+	<87k21ny82k.fsf@dusky.pond.sub.org>
+In-Reply-To: <87k21ny82k.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 28 Aug 2017 17:24:17 +0000
+Message-ID: <CAJ+F1C+Tc=s0PiRqcb9hrRxa6xPrKOXkiX=R5S_YSr2wLrH_cQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 03/10] tests: Add vm test lib
+Subject: Re: [Qemu-devel] [RFC v2 2/8] monitor: allow monitor to create
+ thread to poll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,116 +37,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, mdroth@linux.vnet.ibm.com, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, 08/22 11:23, Philippe Mathieu-Daud=E9 wrote:
-> On 08/22/2017 11:00 AM, Fam Zheng wrote:
-> > On Tue, 08/22 08:19, Philippe Mathieu-Daud=E9 wrote:
-> > > > +    def add_source_dir(self, data_dir):
-> > > > +        name =3D "data-" + hashlib.sha1(data_dir).hexdigest()[:5=
-]
-> > > > +        tarfile =3D os.path.join(self._tmpdir, name + ".tar")
-> > > > +        logging.debug("Creating archive %s for data dir: %s", ta=
-rfile, data_dir)
-> > > > +        subprocess.check_call(["tar", "--exclude-vcs",
-> > >=20
-> > > --exclude-vcs-ignores will process .gitignore,
-> >=20
-> > Sounds useful, thanks!
-> >=20
-> > > you can also list with 'git ls-files',
-> > > or generate tarball with scripts/make-release
-> >=20
-> > They won't handle submodules, will they?
->=20
-> "git ls-files --recurse-submodules"
+Hi
 
-Not good, I somehow hit an infinite erroneous output with
-"--recurse-submodules":
+On Mon, Aug 28, 2017 at 6:24 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
 
-$ git ls-files --recurse-submodules
-...
-pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pix=
-man/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman=
-/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/include/h=
-w/timer/imx_epit.h
-pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pix=
-man/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman=
-/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/include/h=
-w/timer/imx_gpt.h
-pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pix=
-man/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman=
-/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/include/h=
-w/timer/m48t59.h
-pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pix=
-man/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman=
-/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/include/h=
-w/timer/mc146818rtc.h
-pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pix=
-man/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman=
-/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/include/h=
-w/timer/mc146818rtc_regs.h
-pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pix=
-man/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman=
-/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/include/h=
-w/timer/mips_gictimer.h
-pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pix=
-man/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman=
-/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/include/h=
-w/timer/stm32f2xx_timer.h
-pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pix=
-man/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman=
-/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/pixman/include/h=
-w^C
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+>
+> > Hi
+> >
+> > On Mon, Aug 28, 2017 at 1:08 PM Markus Armbruster <armbru@redhat.com>
+> wrote:
+> >
+> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+> >>
+> >> > On Fri, Aug 25, 2017 at 5:33 PM Dr. David Alan Gilbert <
+> >> dgilbert@redhat.com>
+> >> > wrote:
+> >> >
+> >> >> * Marc-Andr=C3=A9 Lureau (marcandre.lureau@gmail.com) wrote:
+> [...]
+> >> >> > Could the BQL be pushed down to the monitor commands level
+> instead? That
+> >> >> > way we wouldn't need a seperate thread to solve the hang on
+> commands that
+> >> >> > do not need BQL.
+> >> >>
+> >> >> If the main thread is stuck though I don't see how that helps you;
+> you
+> >> >> have to be able to run these commands on another thread.
+> >> >>
+> >> >
+> >> > Why would the main thread be stuck? In (1) If the vcpu thread takes
+> the BQL
+> >> > and the command doesn't need it, it would work.  In (2),  info cpus
+> >> > shouldn't keep the BQL (my qapi-async series would probably help her=
+e)
+> >>
+> >> This has been discussed several times[*], but of course not with
+> >> everybody, so I'll summarize once more: asynchronous commands are not =
+a
+> >> actually *required* for anything.  They are *one* way to package the
+> >> "kick off task, receive an asynchronous message when it's done" patter=
+n.
+> >> Another way is synchronous command for the kick off, event for the
+> >> "done".
+> >>
+> >
+> > But you would have to break or duplicate the QMP APIs. My proposal
+> doesn't
+> > need that, a command can reenter the main loop, and keep current QMP AP=
+I.
+>
+> Changing an existing command from synchronous to asynchronous is
+> definitely an API change, as discussed before.
+>
 
-$ git version
+We are getting of topic, but I really feel there is a misunderstanding and
+a wrong evaluation of my -async proposal.
 
-2.13.5
+The command is in no way asynchronous from an external point of view, as
+long as the QMP user doesn't declare async capability.
 
-So it's opted out.
+There is no external API change. The "internal API" change is made optional
+too.
 
-So I'll add some detection code for gtar, use --exclude-vcs-ignores and c=
-all it a day.
 
-Fam
+> >> For better or worse, synchronous command + event is what we have today=
+.
+> >> Whether adding another way to package the the same thing improves the
+> >> QMP interface is doubtful.
+> >>
+> >
+> > I would argue my series is mostly about internal refactoring for the
+> > benefit mentionned above. The fact that you can do (optionnaly)
+> concurrent
+> > QMP commands is a nice bonus. Furthermore, it simplifies the API compar=
+ed
+> > to CMD / dummy reply + EVENT. And it gives a meaning to the exisiting
+> > command "id"..
+>
+> Call a change "mostly internal" when it fundamentally extends the QMP
+> protocol makes as much sense to me as "mostly not pregnant".
 
->=20
-> This way you can avoid the --exclude-vcs-ignores which is too recent fo=
-r
-> NetBSD as remarked Kamil, and avoid the tar --exclude=3D
->=20
-> > >=20
-> > > > +                               "--exclude=3Dtests/vm/*.img",
-> > > > +                               "--exclude=3Dtests/vm/*.img.*",
-> > > > +                               "--exclude=3D*.d",
-> > > > +                               "--exclude=3D*.o",
-> > > > +                               "--exclude=3Ddocker-src.*",
-> > > > +                               "-cf", tarfile, '.'], cwd=3Ddata_=
-dir,
-> > > > +                              stdin=3Dself._devnull, stdout=3Dse=
-lf._stdout)
-> > > > +        self._data_args +=3D ["-drive",
-> > > > +                            "file=3D%s,if=3Dnone,id=3D%s,cache=3D=
-writeback,format=3Draw" % \
-> > > > +                                    (tarfile, name),
-> > > > +                            "-device",
-> > > > +                            "virtio-blk,drive=3D%s,serial=3D%s,b=
-ootindex=3D1" % (name, name)]
-> > >=20
-> > > what about mounting readonly via '-device virtio-9p-pci' (not using
-> > > tarball)?
-> > >=20
-> >=20
-> > It doesn't work. That way an out-of-tree build is required in the gue=
-st, but if
-> > an in-tree build has been done in host side, out-of-tree builds fail.=
-  Also the
-> > performance will be much worse, I believe: untar is sequential read, =
-and after
-> > that everything is in the guest page cache; with virtio-9p, there wil=
-l be a
-> > large amount of "random" requests between guest and host.
->=20
-> Indeed you are correct, I didn't think of it, thank to remember me that=
- :)
+
+> The non-dummy nature of the command reply has also been discussed
+> several times.  So has been the relative complexity of "synchronous
+> commands + events" vs. "asynchronous commands" vs. "both".  In
+> considerable detail, in fact:
+>
+>     Message-ID: <87mvaszbsu.fsf@dusky.pond.sub.org>
+>     http://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01090.html
+>
+> Let me quote its last few lines:
+>
+>     Bottom line:
+>
+>     1. I still don't want to merge this.
+>
+
+>     2. I want us to tackle jobs sooner rather than later.
+>
+>     3. Once we got at least a jobs prototype, I'm willing to reconsider
+>        asynchronous commands implemented as special case of jobs.
+>
+
+This is not being fair tbh, my proposal is RFC for 2y, and has been ready
+for a while. I have no clear clue what the "jobs" API would look like, or
+what are the requirements, so I can't work on it or defend my work. But it
+will almost certainly benefit from my low-level -async work.
+
+
+>     One of the most important maintainer duties is saying "no".  It's als=
+o
+>     one of the least fun duties.
+>
+>
+I'm happy to reconsider this conclusion when presented with new
+> evidence.
+>
+
+ I am still convince my proposal has many merits, so I will keep proposing
+it when I see conflicts with what I have, even if you said "no" to an
+earlier merge request.
+
+
+> Asynchronous commands vs. synchronous commands + events are different
+> packaging of the same thing: neither can do anything the other could not
+> do.  If we want to make progress on the monitor hang problem (this
+> thread's topic), we should focus on the *concepts*, not how to best
+> package them for QMP.
+>
+
+Right, please ignore  the optional QMP protocol -async capability and look
+at it: one way is to make long-lived/blocking QMP commands -async
+internally, so other work can happen. This is 90% of my -async proposal.
+
+
+> >> [*] Try this one:
+> >> Message-ID: <87o9yv890z.fsf@dusky.pond.sub.org>
+> >> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05483.html
+>
+--=20
+Marc-Andr=C3=A9 Lureau
