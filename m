@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmPCO-0006vn-Q9
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 14:55:49 -0400
+	(envelope-from <cota@braap.org>) id 1dmPLP-00019B-Hs
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 15:05:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmPCJ-0000sB-NP
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 14:55:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60721)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dmPCJ-0000rT-F7
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 14:55:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dmPCI-000460-Bh
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 18:55:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 56D702E80C8
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 18:55:42 +0000 (UTC)
+	(envelope-from <cota@braap.org>) id 1dmPLM-0005RW-CW
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 15:05:07 -0400
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:47817)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dmPLM-0005Pa-6t
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 15:05:04 -0400
+Date: Mon, 28 Aug 2017 15:05:01 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170828190501.GA7312@flamenco>
+References: <20170828035327.17146-1-bobby.prani@gmail.com>
+	<20170828035327.17146-2-bobby.prani@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 28 Aug 2017 18:45:48 -0000
-From: Dario Niedermann <1713328@bugs.launchpad.net>
-Reply-To: Bug 1713328 <1713328@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150383947649.18943.3208257948754280909.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150394594885.10750.17153021329697712830.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1713328] Re: Unable to C-a in -nographic if
- -serial telnet
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170828035327.17146-2-bobby.prani@gmail.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 2/3] cpus-common: Cache allocated work
+ items
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,40 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: alex.bennee@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Sergey Fedorov <serge.fdrv@gmail.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-I tried it, but it doesn't really work well. Aside from showing 2
-cursors, the real problem is that the keymap is all messed up in the
-guest (whereas it's perfect in Qemu's VGA monitor).
+On Sun, Aug 27, 2017 at 23:53:25 -0400, Pranith Kumar wrote:
+> Using heaptrack, I found that quite a few of our temporary allocations
+> are coming from allocating work items. Instead of doing this
+> continously, we can cache the allocated items and reuse them instead
+> of freeing them.
+> 
+> This reduces the number of allocations by 25% (200000 -> 150000 for
+> ARM64 boot+shutdown test).
+> 
 
--- =
+But what is the perf difference, if any?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1713328
+Adding a lock (or a cmpxchg) here is not a great idea. However, this is not yet
+immediately obvious because of other scalability bottlenecks. (if
+you boot many arm64 cores you'll see most of the time is spent idling
+on the BQL, see
+  https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg05207.html )
 
-Title:
-  Unable to C-a in -nographic if -serial telnet
+You're most likely better off using glib's slices, see
+  https://developer.gnome.org/glib/stable/glib-Memory-Slices.html
+These slices use per-thread lists, so scalability should be OK.
 
-Status in QEMU:
-  Invalid
+I also suggest profiling with either or both of jemalloc/tcmalloc
+(build with --enable-jemalloc/tcmalloc) in addition to using glibc's
+allocator, and then based on perf numbers decide whether this is something
+worth optimizing.
 
-Bug description:
-  qemu-system-i386 (version 2.6.1, running on Linux/x86_64) started
-  with:
+Thanks,
 
-  qemu-system-i386 -m 64M -machine type=3Dpc -rtc
-  base=3Dlocaltime,clock=3Dhost -nographic -serial
-  telnet:127.0.0.1:1234,server,nowait -net nic,model=3Dne2k_pci -net
-  user,hostfwd=3Dtcp:127.0.0.1:2200-:22,tftp=3D/
-
-  does not accept the escape key (C-a) to perform functions such as
-  switching from monitor to console. Verified both in GNU screen and in
-  the Linux console.
-
-  If '-serial telnet:127.0.0.1:1234,server,nowait' is removed from the
-  command line, the escape key is accepted (and Qemu doesn't enter the
-  monitor immediately).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1713328/+subscriptions
+                Emilio
