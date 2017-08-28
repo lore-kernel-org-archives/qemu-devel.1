@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dmM4o-0000Ae-RD
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:35:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1dmM5z-0000wq-53
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:37:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dmM4n-0005xr-M0
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:35:46 -0400
-Date: Mon, 28 Aug 2017 17:35:25 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20170828153525.d4wgjfcqfnpxavrt@eukaryote>
-References: <20170828112952.22965-1-kchamart@redhat.com>
-	<a80aaf11-a962-c9d6-e271-c8ad5e1365b7@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dmM5u-0006RP-W3
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 11:36:59 -0400
+References: <1503916557-1292-1-git-send-email-thuth@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <facb59b4-6992-b7a5-7d63-bead2ff29f8a@redhat.com>
+Date: Mon, 28 Aug 2017 10:36:51 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a80aaf11-a962-c9d6-e271-c8ad5e1365b7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Extend non-shared storage
- migration test (194)
+In-Reply-To: <1503916557-1292-1-git-send-email-thuth@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="TpvhGFtdWxow6geKGk5CpoJIlSbXLjq6d"
+Subject: Re: [Qemu-devel] [PATCH] tests/libqtest: Use a proper error message
+ if QTEST_QEMU_BINARY is missing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,99 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, stefanha@redhat.com, famz@redhat.com, kwolf@redhat.com, dgilbert@redhat.com
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>
 
-On Mon, Aug 28, 2017 at 09:51:43AM -0500, Eric Blake wrote:
-> On 08/28/2017 06:29 AM, Kashyap Chamarthy wrote:
-> > This is the follow-up patch that was discussed[*] as part of feedback to
-> > qemu-iotest 194.
-> > 
-> > Changes in this patch:
-> > 
-> >   - Supply 'job-id' parameter to `drive-mirror` invocation.
-> > 
-> >   - Issue `block-job-cancel` command on the source QEMU to gracefully
-> >     complete the mirroring operation.
-> > 
-> >   - Stop the NBD server on the destination QEMU.
-> > 
-> >   - Finally, exit once the event BLOCK_JOB_COMPLETED is emitted.
-> > 
-> > With the above, the test will also be (almost) in sync with the
-> > procedure outlined in the document live-block-operations.rst[+]
-> > (section: "QMP invocation for live storage migration with
-> > ``drive-mirror`` + NBD").
-> > 
-> > [*] https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg04820.html
-> >     -- qemu-iotests: add 194 non-shared storage migration test
-> > [+] https://git.qemu.org/gitweb.cgi?p=qemu.git;a=blob;f=docs/interop/live-block-operations.rst
-> > 
-> > Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
-> > ---
-> > I wonder:
-> >   - Is it worth printing the MIGRATION event state change?
-> 
-> I think waiting for both the BLOCK_JOB_COMPLETED and MIGRATION events
-> make sense (in other words, let's check both events in the expected
-> order, rather than just one or the other).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TpvhGFtdWxow6geKGk5CpoJIlSbXLjq6d
+From: Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ qemu-trivial@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>
+Message-ID: <facb59b4-6992-b7a5-7d63-bead2ff29f8a@redhat.com>
+Subject: Re: [PATCH] tests/libqtest: Use a proper error message if
+ QTEST_QEMU_BINARY is missing
+References: <1503916557-1292-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <1503916557-1292-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-That sounds more robust, will do in the next iteration.
+On 08/28/2017 05:35 AM, Thomas Huth wrote:
+> The user can currently still cause an abort() if running certain tests
+> (like the prom-env-test) without setting the QTEST_QEMU_BINARY first.
+> A similar problem has been fixed with commit 7c933ad61b8f3f51337
+> already, but forgot to also take care of the qtest_get_arch() function,=
 
-> >   - Since we're not checking on the MIGRATION event anymore, can
-> >     the migration state change events related code (that is triggerred
-> >     by setting 'migrate-set-capabilities') be simply removed?
-> 
-> If we're going to mirror libvirt's non-shared storage migration
-> sequence, I think we want to keep everything, rather than drop the
-> migration half.
+> so let's introduce a proper wrapper around getenv("QTEST_QEMU_BINARY")
+> that can be used in both locations now.
+>=20
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1713434
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tests/libqtest.c | 24 +++++++++++++++---------
+>  1 file changed, 15 insertions(+), 9 deletions(-)
+>=20
 
-Yes, noted.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-[...]
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-> > -iotests.log('Starting drive-mirror on source...')
-> > +iotests.log('Starting `drive-mirror` on source...')
-> >  iotests.log(source_vm.qmp(
-> >                'drive-mirror',
-> >                device='drive0',
-> >                target='nbd+unix:///drive0?socket={0}'.format(nbd_sock_path),
-> >                sync='full',
-> >                format='raw', # always raw, the server handles the format
-> > -              mode='existing'))
-> > +              mode='existing',
-> > +              job_id='mirror-job0'))
-> >  
-> > -iotests.log('Waiting for drive-mirror to complete...')
-> > +iotests.log('Waiting for `drive-mirror` to complete...')
-> 
-> So, up to here is okay,
-> 
-> >  iotests.log(source_vm.event_wait('BLOCK_JOB_READY'),
-> >              filters=[iotests.filter_qmp_event])
-> >  
-> > @@ -66,8 +67,14 @@ dest_vm.qmp('migrate-set-capabilities',
-> >              capabilities=[{'capability': 'events', 'state': True}])
-> >  iotests.log(source_vm.qmp('migrate', uri='unix:{0}'.format(migration_sock_path)))
-> >  
-> > +iotests.log('Gracefully ending the `drive-mirror` job on source...')
-> > +iotests.log(source_vm.qmp('block-job-cancel', device='mirror-job0'))
-> > +
-> > +iotests.log('Stopping the NBD server on destination...')
-> > +iotests.log(dest_vm.qmp('nbd-server-stop'))
-> > +
-> >  while True:
-> > -    event = source_vm.event_wait('MIGRATION')
-> > +    event = source_vm.event_wait('BLOCK_JOB_COMPLETED')
-> 
-> And this event makes sense for catching the block-job-cancel, but I
-> think you STILL want to keep a while loop for catching migration as well.
 
-Yes, will do.
+--TpvhGFtdWxow6geKGk5CpoJIlSbXLjq6d
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Thanks for the quick feedback.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-[...]
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmkOJMACgkQp6FrSiUn
+Q2pp5Qf/aaaROzOvc8KVAnuiZWmN2vhbP63BujduyfcaCb/DBiCrmdZudEy7/0hW
+0rpn6scil7E8zaP8NvP7atIrJR+hZHy6vsk3aZjySM4okD1Ftb9VFT3Hc9XPaW8F
+RmChnSqfF0P8Z6BPyvr/prJzo1NZI/vmqNbEK2gt+qqNiundHFZOAwrYDRd09pqb
+1Pmm8jcS8z8yMA2EfpTFiKwLduRlUAYPOEWse+DE7hbCIMbEarMaHQS8MN/d6wdD
+nx6QwqnPpj25SgHJwLc2sw9+Kt2yeKo3ejPf7WXtyMKMLbLjrGWxmHW14SXwqmvN
+To9XoEN2xz8/TPEXRzjWf9mTJbS01A==
+=lHWA
+-----END PGP SIGNATURE-----
 
--- 
-/kashyap
+--TpvhGFtdWxow6geKGk5CpoJIlSbXLjq6d--
