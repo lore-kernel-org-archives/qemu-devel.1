@@ -1,36 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dmduv-0006h9-7l
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 06:38:46 -0400
+	(envelope-from <a175818323@gmail.com>) id 1dmdxt-0007gc-AX
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 06:41:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dmdur-0007aT-8l
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 06:38:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49648)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dmduq-0007aH-VR
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 06:38:41 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DD15881E1B
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 10:38:38 +0000 (UTC)
-Date: Tue, 29 Aug 2017 11:38:31 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170829103831.GE3783@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1502777827-18874-1-git-send-email-peterx@redhat.com>
-	<1502777827-18874-6-git-send-email-peterx@redhat.com>
-	<20170815083714.GA9674@redhat.com>
-	<20170815085006.GA19446@pxdev.xzpeter.org>
-	<20170815092707.GE9674@redhat.com>
-	<20170815094708.GB19446@pxdev.xzpeter.org>
-	<20170816094713.GA2294@pxdev.xzpeter.org>
+	(envelope-from <a175818323@gmail.com>) id 1dmdxr-00005C-Su
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 06:41:49 -0400
+Received: from mail-io0-x234.google.com ([2607:f8b0:4001:c06::234]:33545)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
+	id 1dmdxr-00004z-Mv
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 06:41:47 -0400
+Received: by mail-io0-x234.google.com with SMTP id s101so16812923ioe.0
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 03:41:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170816094713.GA2294@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC 5/6] migration: store listen task tag
+In-Reply-To: <20170822205940-mutt-send-email-mst@kernel.org>
+References: <20170726113222.52aad9a6@w520.home>
+	<CAMxP3BTFgwJtjh78hNBCoxBp1WsnZMZLsqzb3McqCq=-SX0a4g@mail.gmail.com>
+	<20170731234626.7664be18@w520.home>
+	<CAMxP3BTfMad-ycWHqmW+aVM7rv2CJSv-dmEFUveGBqAWvfbBjQ@mail.gmail.com>
+	<20170801090158.35d18f10@w520.home>
+	<CAMxP3BRkzXBRPZw9fpCu-w4Fusn6ng_knk1cAz=EDBAiw9UnqA@mail.gmail.com>
+	<20170807095224.5438ef8c@w520.home>
+	<20170808230043-mutt-send-email-mst@kernel.org>
+	<CAMxP3BR=WHKJxcWKH27dcC7DTKGD2y7r12teAUSmMkwp1VDafA@mail.gmail.com>
+	<20170822105659.75b5c7e0@w520.home>
+	<20170822205940-mutt-send-email-mst@kernel.org>
+From: Bob Chen <a175818323@gmail.com>
+Date: Tue, 29 Aug 2017 18:41:44 +0800
+Message-ID: <CAMxP3BSNPjRZGOULZ0zKBq8v5Rqv9f5xasx+BD57c=oAS5tSWg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
+	=?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,129 +40,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, qemu-devel@nongnu.org
 
-On Wed, Aug 16, 2017 at 05:47:13PM +0800, Peter Xu wrote:
-> On Tue, Aug 15, 2017 at 05:47:08PM +0800, Peter Xu wrote:
-> > On Tue, Aug 15, 2017 at 10:27:07AM +0100, Daniel P. Berrange wrote:
-> > > On Tue, Aug 15, 2017 at 04:50:06PM +0800, Peter Xu wrote:
-> > > > On Tue, Aug 15, 2017 at 09:37:14AM +0100, Daniel P. Berrange wrote:
-> > > > > On Tue, Aug 15, 2017 at 02:17:06PM +0800, Peter Xu wrote:
-> > > > > > Store the task tag for migration types: tcp/unix/fd/exec in current
-> > > > > > MigrationIncomingState struct.
-> > > > > > 
-> > > > > > For defered migration, no need to store task tag since there is no task
-> > > > > > running in the main loop at all. For RDMA, let's mark it as todo.
-> > > > > > 
-> > > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > > > ---
-> > > > > >  migration/migration.c | 22 ++++++++++++++++++----
-> > > > > >  migration/migration.h |  2 ++
-> > > > > >  2 files changed, 20 insertions(+), 4 deletions(-)
-> > > > > > 
-> > > > > > diff --git a/migration/migration.c b/migration/migration.c
-> > > > > > index c9b7085..daf356b 100644
-> > > > > > --- a/migration/migration.c
-> > > > > > +++ b/migration/migration.c
-> > > > > > @@ -171,6 +171,7 @@ void migration_incoming_state_destroy(void)
-> > > > > >          mis->from_src_file = NULL;
-> > > > > >      }
-> > > > > >  
-> > > > > > +    mis->listen_task_tag = 0;
-> > > > > >      qemu_event_destroy(&mis->main_thread_load_event);
-> > > > > >  }
-> > > > > >  
-> > > > > > @@ -265,25 +266,31 @@ int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
-> > > > > >  void qemu_start_incoming_migration(const char *uri, Error **errp)
-> > > > > >  {
-> > > > > >      const char *p;
-> > > > > > +    guint task_tag = 0;
-> > > > > > +    MigrationIncomingState *mis = migration_incoming_get_current();
-> > > > > >  
-> > > > > >      qapi_event_send_migration(MIGRATION_STATUS_SETUP, &error_abort);
-> > > > > >      if (!strcmp(uri, "defer")) {
-> > > > > >          deferred_incoming_migration(errp);
-> > > > > >      } else if (strstart(uri, "tcp:", &p)) {
-> > > > > > -        tcp_start_incoming_migration(p, errp);
-> > > > > > +        task_tag = tcp_start_incoming_migration(p, errp);
-> > > > > >  #ifdef CONFIG_RDMA
-> > > > > >      } else if (strstart(uri, "rdma:", &p)) {
-> > > > > > +        /* TODO: store task tag for RDMA migrations */
-> > > > > >          rdma_start_incoming_migration(p, errp);
-> > > > > >  #endif
-> > > > > >      } else if (strstart(uri, "exec:", &p)) {
-> > > > > > -        exec_start_incoming_migration(p, errp);
-> > > > > > +        task_tag = exec_start_incoming_migration(p, errp);
-> > > > > >      } else if (strstart(uri, "unix:", &p)) {
-> > > > > > -        unix_start_incoming_migration(p, errp);
-> > > > > > +        task_tag = unix_start_incoming_migration(p, errp);
-> > > > > >      } else if (strstart(uri, "fd:", &p)) {
-> > > > > > -        fd_start_incoming_migration(p, errp);
-> > > > > > +        task_tag = fd_start_incoming_migration(p, errp);
-> > > > > >      } else {
-> > > > > >          error_setg(errp, "unknown migration protocol: %s", uri);
-> > > > > > +        return;
-> > > > > >      }
-> > > > > > +
-> > > > > > +    mis->listen_task_tag = task_tag;
-> > > > > 
-> > > > > This is unsafe as currently written. The main loop watches that are
-> > > > > associated with these tags are all unregistered when incoming migration
-> > > > > starts. So if you save them, and then unregister later when postcopy
-> > > > > is "stuck", then you're likely unregistering a tag associated with
-> > > > > some other random part of QEMU, because the saved value is no longer
-> > > > > valid.
-> > > > 
-> > > > IIUC for incoming migration, the watch is not detached until
-> > > > migration_fd_process_incoming() completes. So:
-> > > > 
-> > > > - for precopy, the watch should be detached when migration completes
-> > > > 
-> > > > - for postcopy, the watch should be detached when postcopy starts,
-> > > >   then main loop thread returns, while the ram_load_thread starts to
-> > > >   continue the migration.
-> > > > 
-> > > > So basically the watch is detaching itself after
-> > > > migration_fd_process_incoming() completes. To handle that, this patch
-> > > > has this change:
-> > > > 
-> > > > @@ -422,6 +429,13 @@ void migration_fd_process_incoming(QEMUFile *f)
-> > > >          co = qemu_coroutine_create(process_incoming_migration_co, f);
-> > > >          qemu_coroutine_enter(co);
-> > > >      }
-> > > > +
-> > > > +    /*
-> > > > +     * When reach here, we should not need the listening port any
-> > > > +     * more. We'll detach the listening task soon, let's reset the
-> > > > +     * listen task tag.
-> > > > +     */
-> > > > +    mis->listen_task_tag = 0;
-> > > > 
-> > > > Would this make sure the listen_task_tag is always valid if nonzero?
-> > > 
-> > > Mixing 'return FALSE' from callbacks, with g_source_remove is a recipe
-> > > for hard to diagnose bugs, so should be avoided in general.
-> > 
-> > Makes sense.
-> > 
-> > > 
-> > > So, IMHO, you should change all the callbacks to 'return TRUE' so that
-> > > they keep the watch registered, and then explicitly call g_source_remove()
-> > > passing the listen tag, when incoming migration starts.
-> > 
-> > Yes this sounds better.  Thanks!
-> 
-> Hmm... when incoming migration starts, we are still in the handler of
-> the listening gsource. I am not sure whether it's safe to remove the
-> gsource in its own handlers.
+The topology is already having all GPUs directly attached to root bus 0. In
+this situation you can't see the LnkSta attribute in any capabilities.
 
-Yes, it should be safe to call g_source_remove from within the handler
-itself.
+The other way of using emulated switch would somehow show this attribute,
+at 8 GT/s, although the real bandwidth is low as usual.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2017-08-23 2:06 GMT+08:00 Michael S. Tsirkin <mst@redhat.com>:
+
+> On Tue, Aug 22, 2017 at 10:56:59AM -0600, Alex Williamson wrote:
+> > On Tue, 22 Aug 2017 15:04:55 +0800
+> > Bob Chen <a175818323@gmail.com> wrote:
+> >
+> > > Hi,
+> > >
+> > > I got a spec from Nvidia which illustrates how to enable GPU p2p in
+> > > virtualization environment. (See attached)
+> >
+> > Neat, looks like we should implement a new QEMU vfio-pci option,
+> > something like nvidia-gpudirect-p2p-id=3D.  I don't think I'd want to
+> > code the policy of where to enable it into QEMU or the kernel, so we'd
+> > push it up to management layers or users to decide.
+> >
+> > > The key is to append the legacy pci capabilities list when setting up
+> the
+> > > hypervisor, with a Nvidia customized capability config.
+> > >
+> > > I added some hack in hw/vfio/pci.c and managed to implement that.
+> > >
+> > > Then I found the GPU was able to recognize its peer, and the latency
+> has
+> > > dropped. =E2=9C=85
+> > >
+> > > However the bandwidth didn't improve, but decreased instead. =E2=9D=
+=8C
+> > >
+> > > Any suggestions?
+> >
+> > What's the VM topology?  I've found that in a Q35 configuration with
+> > GPUs downstream of an emulated root port, the NVIDIA driver in the
+> > guest will downshift the physical link rate to 2.5GT/s and never
+> > increase it back to 8GT/s.  I believe this is because the virtual
+> > downstream port only advertises Gen1 link speeds.
+>
+>
+> Fixing that would be nice, and it's great that you now actually have a
+> reproducer that can be used to test it properly.
+>
+> Exposing higher link speeds is a bit of work since there are now all
+> kind of corner cases to cover as guests may play with link speeds and we
+> must pretend we change it accordingly.  An especially interesting
+> question is what to do with the assigned device when guest tries to play
+> with port link speed. It's kind of similar to AER in that respect.
+>
+> I guess we can just ignore it for starters.
+>
+> >  If the GPUs are on
+> > the root complex (ie. pcie.0) the physical link will run at 2.5GT/s
+> > when the GPU is idle and upshift to 8GT/s under load.  This also
+> > happens if the GPU is exposed in a conventional PCI topology to the
+> > VM.  Another interesting data point is that an older Kepler GRID card
+> > does not have this issue, dynamically shifting the link speed under
+> > load regardless of the VM PCI/e topology, while a new M60 using the
+> > same driver experiences this problem.  I've filed a bug with NVIDIA as
+> > this seems to be a regression, but it appears (untested) that the
+> > hypervisor should take the approach of exposing full, up-to-date PCIe
+> > link capabilities and report a link status matching the downstream
+> > devices.
+>
+>
+> > I'd suggest during your testing, watch lspci info for the GPU from the
+> > host, noting the behavior of LnkSta (Link Status) to check if the
+> > devices gets stuck at 2.5GT/s in your VM configuration and adjust the
+> > topology until it works, likely placing the GPUs on pcie.0 for a Q35
+> > based machine.  Thanks,
+> >
+> > Alex
+>
