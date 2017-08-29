@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dmcuI-0002RA-DC
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:34:06 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dmcux-0002np-1H
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:34:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dmcuE-00088P-5T
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:34:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46064)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dmcuD-000887-Si
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:33:58 -0400
-Date: Tue, 29 Aug 2017 11:33:53 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170829113353.0a13f88a.cohuck@redhat.com>
-In-Reply-To: <0d7cc071-cebe-82d5-90da-9737a5f0733e@linux.vnet.ibm.com>
-References: <1503907487-2764-1-git-send-email-zyimin@linux.vnet.ibm.com>
-	<1503907487-2764-5-git-send-email-zyimin@linux.vnet.ibm.com>
-	<20170828175722.0b54b59a.cohuck@redhat.com>
-	<498a00ca-ea1a-ae09-0772-4a25c729841e@linux.vnet.ibm.com>
-	<20170829100746.66c47fd8.cohuck@redhat.com>
-	<0d7cc071-cebe-82d5-90da-9737a5f0733e@linux.vnet.ibm.com>
+	(envelope-from <stefanha@gmail.com>) id 1dmcut-0008MA-Sj
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:34:43 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:37039)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dmcut-0008M4-MN
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:34:39 -0400
+Received: by mail-wm0-x241.google.com with SMTP id x189so3090610wmg.4
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 02:34:39 -0700 (PDT)
+Date: Tue, 29 Aug 2017 10:34:36 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170829093436.GF25960@stefanha-x1.localdomain>
+References: <20170828015654.2530-1-Sergio.G.DelReal@gmail.com>
+	<20170828015654.2530-7-Sergio.G.DelReal@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/4] s390x/pci: add iommu replay callback
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170828015654.2530-7-Sergio.G.DelReal@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 06/14] hvf: add compilation rules to
+ Makefile.objs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,98 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, richard.henderson@linaro.org
+To: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-On Tue, 29 Aug 2017 16:26:10 +0800
-Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+On Sun, Aug 27, 2017 at 08:56:46PM -0500, Sergio Andres Gomez Del Real wrote:
+> This commit adds to target/i386/Makefile.objs the necessary rules so
+> that the new files for hvf are compiled by the build system.
+> It also adds handling of the -enable-hvf argument in the main function
+> in vl.c.
+> 
+> Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
+> ---
+>  target/i386/Makefile.objs | 1 +
+>  vl.c                      | 7 +++++++
+>  2 files changed, 8 insertions(+)
+> 
+> diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
+> index 6a26e9d9f0..0bef89c099 100644
+> --- a/target/i386/Makefile.objs
+> +++ b/target/i386/Makefile.objs
+> @@ -12,4 +12,5 @@ obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-windows.o
+>  endif
+>  ifdef CONFIG_DARWIN
+>  obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-darwin.o
+> +obj-$(CONFIG_HVF) += hvf-utils/ hvf-all.o
+>  endif
 
-> =E5=9C=A8 2017/8/29 =E4=B8=8B=E5=8D=884:07, Cornelia Huck =E5=86=99=E9=81=
-=93:
-> > [Restored cc:s. Please remember to do reply-all.]
-> >
-> > On Tue, 29 Aug 2017 12:46:51 +0800
-> > Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
-> > =20
-> >> =E5=9C=A8 2017/8/28 =E4=B8=8B=E5=8D=8811:57, Cornelia Huck =E5=86=99=
-=E9=81=93: =20
-> >>> On Mon, 28 Aug 2017 10:04:47 +0200
-> >>> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
-> >>> =20
-> >>>> Let's introduce iommu replay callback for s390 pci iommu memory regi=
-on.
-> >>>> Currently we don't need any dma mapping replay. So let it return
-> >>>> directly. This implementation will avoid meaningless loops calling
-> >>>> translation callback.
-> >>>>
-> >>>> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-> >>>> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> >>>> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-> >>>> ---
-> >>>>    hw/s390x/s390-pci-bus.c | 8 ++++++++
-> >>>>    1 file changed, 8 insertions(+)
-> >>>>
-> >>>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> >>>> index 9e1f7ff5c5..359509ccea 100644
-> >>>> --- a/hw/s390x/s390-pci-bus.c
-> >>>> +++ b/hw/s390x/s390-pci-bus.c
-> >>>> @@ -407,6 +407,13 @@ static IOMMUTLBEntry s390_translate_iommu(IOMMU=
-MemoryRegion *mr, hwaddr addr,
-> >>>>        return ret;
-> >>>>    }
-> >>>>   =20
-> >>>> +static void s390_pci_iommu_replay(IOMMUMemoryRegion *iommu,
-> >>>> +                                  IOMMUNotifier *notifier)
-> >>>> +{
-> >>>> +    /* we don't need iommu replay currently */ =20
-> >>> This really needs to be heavier on the _why_. My guess is that anythi=
-ng
-> >>> which would require replay goes through the rpcit instruction? =20
-> >> My understanding is:
-> >> Our arch is different from others. Each pci device has its own iommu, =
-not
-> >> like other archs' implementation. So currently there must be no existi=
-ng
-> >> mappings belonging to any newly plugged pci device whose iommu doesn't
-> >> have any mapping at the time. =20
-> > So please put that explanation into the function. (Also, "currently"?
-> > Are we expecting it to change?) =20
-> The iommu replay function is originally introduced for vfio. I think=20
-> they want to re-build
-> the existing mappings because vfio has a copy of mappings in kernel. For=
-=20
-> our case,
-> the mappings would be cleanup when a pci device unplugged, and new mappin=
-gs
-> would be created when a pci device plugged. I think replay only can=20
-> happen during
-> vfio-pci device migration.
+This should be in the commit that imported the .c files.  They should be
+compiled right away.
 
-So, the base reason is that it is impossible to plug a pci device on
-s390x that already has iommu mappings which need to be replayed, which
-is due to the "one iommu per zpci device" construct (and independent of
-which devices need replay on other architectures)?
+> diff --git a/vl.c b/vl.c
+> index 8e247cc2a2..de7d2a3858 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3751,6 +3751,13 @@ int main(int argc, char **argv, char **envp)
+>                  olist = qemu_find_opts("machine");
+>                  qemu_opts_parse_noisily(olist, "accel=hax", false);
+>                  break;
+> +#if defined(__APPLE__)
+> +            case QEMU_OPTION_enable_hvf:
+> +                olist = qemu_find_opts("machine");
+> +                qemu_opts_parse_noisily(olist, "accel=hvf", false);
+> +                hvf_disable(0);
+> +                break;
+> +#endif
 
-Then this should go into the explanation above. (And I'd still like to
-know what "currently" refers to. I don't like to rely on some kind of
-implicit assumptions - are we expecting this to break?)
+This code change is independent of the Makefile.objs change.  It should
+be a spearate commit.
 
-> > =20
-> >> In addition, it's also due to vfio blocking migration. If vfio-pci sup=
-ports
-> >> migration in future, we could implement iommu replay by that time. =20
-> > That's not an argument: This is the base zpci support, it should not
-> > depend on the supported devices and what they do. (What's the status of
-> > virtio-pci, btw? Does it work with your patches applied, or is there
-> > still more to be done?)
-> >
-> > =20
-> My understanding is virtio-pci doesn't need replay. All mappings of any=20
-> pci device are existing in
-> guest memory. Once the mappings is built, all of them could be migrated=20
-> along with the guest
-> system. But I might misunderstand it. Please correct me.
-
-My question was whether virtio-pci works with your patches on top at
-all - last time I checked on master, virtio-pci devices failed to
-realize with a "msi-x is mandatory" message.
+As mentioned in another email, -enable-hvf should be dropped.
