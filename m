@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dmodZ-0007pr-Ma
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 18:05:34 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1dmodc-0007r1-TG
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 18:05:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1dmodU-0001LJ-Jp
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 18:05:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40486)
+	(envelope-from <alex.williamson@redhat.com>) id 1dmodb-0001Tp-Tz
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 18:05:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37294)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1dmodU-0001L3-DE
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 18:05:28 -0400
+	id 1dmodb-0001TG-NL
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 18:05:35 -0400
 From: Alex Williamson <alex.williamson@redhat.com>
-Date: Tue, 29 Aug 2017 16:05:24 -0600
-Message-ID: <20170829214929.31136.21144.stgit@gimli.home>
+Date: Tue, 29 Aug 2017 16:05:32 -0600
+Message-ID: <20170829220532.31136.42932.stgit@gimli.home>
+In-Reply-To: <20170829214929.31136.21144.stgit@gimli.home>
+References: <20170829214929.31136.21144.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 0/3] vfio/pci: Add NVIDIA GPUDirect P2P clique
- support
+Subject: [Qemu-devel] [PATCH 1/3] vfio/pci: Do not unwind on error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +30,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: a175818323@gmail.com
 
-NVIDIA has a specification for exposing a virtual vendor capability
-which provides a hint to guest drivers as to which sets of GPUs can
-support direct peer-to-peer DMA.  Devices with the same clique ID are
-expected to support this.  The user can specify a clique ID for an
-NVIDIA graphics device using the new vfio-pci x-nv-gpudirect-clique=
-option, where valid clique IDs are a 4-bit integer.  It's entirely the
-user's responsibility to specify sets of devices for which P2P works
-correctly and provides some benefit.  This is only useful for DMA
-between NVIDIA GPUs, therefore it's only useful to specify cliques
-comprised of more than one GPU.  Furthermore, this does not enable DMA
-between VMs, there is no change to VM DMA mapping, this only exposes
-hints about existing DMA paths to the guest driver.  Thanks,
+If vfio_add_std_cap() errors then going to out prepends irrelevant
+errors for capabilities we haven't attempted to add as we unwind our
+recursive stack.  Just return error.
 
-Alex
-
+Fixes: 7ef165b9a8d9 ("vfio/pci: Pass an error object to vfio_add_capabilities")
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
+ hw/vfio/pci.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Alex Williamson (3):
-      vfio/pci: Do not unwind on error
-      vfio/pci: Add virtual capabilities quirk infrastructure
-      vfio/pci: Add NVIDIA GPUDirect Cliques support
-
-
- hw/vfio/pci-quirks.c |  114 ++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/vfio/pci.c        |   17 +++++++
- hw/vfio/pci.h        |    4 ++
- 3 files changed, 133 insertions(+), 2 deletions(-)
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 31e1edf44745..916d365dfab3 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -1826,7 +1826,7 @@ static int vfio_add_std_cap(VFIOPCIDevice *vdev, uint8_t pos, Error **errp)
+     if (next) {
+         ret = vfio_add_std_cap(vdev, next, errp);
+         if (ret) {
+-            goto out;
++            return ret;
+         }
+     } else {
+         /* Begin the rebuild, use QEMU emulated list bits */
+@@ -1862,7 +1862,7 @@ static int vfio_add_std_cap(VFIOPCIDevice *vdev, uint8_t pos, Error **errp)
+         ret = pci_add_capability(pdev, cap_id, pos, size, errp);
+         break;
+     }
+-out:
++
+     if (ret < 0) {
+         error_prepend(errp,
+                       "failed to add PCI capability 0x%x[0x%x]@0x%x: ",
