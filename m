@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dmbr6-0004uy-Oa
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:26:41 -0400
+	(envelope-from <peterx@redhat.com>) id 1dmbul-0006Jq-FQ
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:30:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dmbr2-000677-QL
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:26:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55250)
+	(envelope-from <peterx@redhat.com>) id 1dmbuh-0007z9-Cm
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:30:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51848)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dmbr2-00066b-GN
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:26:36 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7B6455D698
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 08:26:35 +0000 (UTC)
-References: <bc356364-fde1-bf49-d922-719847f8b152@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <bb2a358c-0aea-5e77-fc3e-b936ab6b8736@redhat.com>
-Date: Tue, 29 Aug 2017 10:26:28 +0200
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dmbuh-0007yh-39
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:30:23 -0400
+Date: Tue, 29 Aug 2017 16:30:03 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170829083003.GD2610@pxdev.xzpeter.org>
+References: <20170824192730.8440-1-dgilbert@redhat.com>
+	<20170824192730.8440-17-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <bc356364-fde1-bf49-d922-719847f8b152@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="gRsOrxCP8ctgrvLXWvMeiA2KbHnjA1tTB"
-Subject: Re: [Qemu-devel] understanding qemu devices
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170824192730.8440-17-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 16/32] vhost+postcopy: Send address back
+ to qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,66 +28,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, a.perevalov@samsung.com, mst@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, lvivier@redhat.com, aarcange@redhat.com, felipe@nutanix.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gRsOrxCP8ctgrvLXWvMeiA2KbHnjA1tTB
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On Thu, Aug 24, 2017 at 08:27:14PM +0100, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> We need a better way, but at the moment we need the address of the
+> mappings sent back to qemu so it can interpret the messages on the
+> userfaultfd it reads.
+> 
+> Note: We don't ask for the default 'ack' reply since we've got our own.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  contrib/libvhost-user/libvhost-user.c | 15 ++++++++-
+>  docs/interop/vhost-user.txt           |  6 ++++
+>  hw/virtio/trace-events                |  1 +
+>  hw/virtio/vhost-user.c                | 57 ++++++++++++++++++++++++++++++++++-
+>  4 files changed, 77 insertions(+), 2 deletions(-)
+> 
+> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+> index e6ab059a03..5ec54f7d60 100644
+> --- a/contrib/libvhost-user/libvhost-user.c
+> +++ b/contrib/libvhost-user/libvhost-user.c
+> @@ -477,13 +477,26 @@ vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg)
+>              DPRINT("%s: region %d: Registered userfault for %llx + %llx\n",
+>                      __func__, i, reg_struct.range.start, reg_struct.range.len);
+>              /* TODO: Stash 'zero' support flags somewhere */
+> -            /* TODO: Get address back to QEMU */
+>  
+> +            /* TODO: We need to find a way for the qemu not to see the virtual
+> +             * addresses of the clients, so as to keep better separation.
+> +             */
+> +            /* Return the address to QEMU so that it can translate the ufd
+> +             * fault addresses back.
+> +             */
+> +            msg_region->userspace_addr = (uintptr_t)(mmap_addr +
+> +                                                     dev_region->mmap_offset);
+>          }
+>  
+>          close(vmsg->fds[i]);
+>      }
+>  
+> +    if (dev->postcopy_listening) {
+> +        /* Need to return the addresses - send the updated message back */
+> +        vmsg->fd_num = 0;
+> +        return true;
+> +    }
+> +
+>      return false;
+>  }
+>  
+> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+> index 73c3dd74db..b2a548c94d 100644
+> --- a/docs/interop/vhost-user.txt
+> +++ b/docs/interop/vhost-user.txt
+> @@ -413,12 +413,18 @@ Master message types
+>        Id: 5
+>        Equivalent ioctl: VHOST_SET_MEM_TABLE
+>        Master payload: memory regions description
+> +      Slave payload: (postcopy only) memory regions description
+>  
+>        Sets the memory map regions on the slave so it can translate the vring
+>        addresses. In the ancillary data there is an array of file descriptors
+>        for each memory mapped region. The size and ordering of the fds matches
+>        the number and ordering of memory regions.
+>  
+> +      When postcopy-listening has been received, SET_MEM_TABLE replies with
+> +      the bases of the memory mapped regions to the master.  It must have mmap'd
+> +      the regions and enabled userfaultfd on them.  Note NEED_REPLY_MASK
+> +      is not set in this case.
+> +
+>   * VHOST_USER_SET_LOG_BASE
+>  
+>        Id: 6
+> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> index f736c7c84f..63fd4a79cf 100644
+> --- a/hw/virtio/trace-events
+> +++ b/hw/virtio/trace-events
+> @@ -2,6 +2,7 @@
+>  
+>  # hw/virtio/vhost-user.c
+>  vhost_user_postcopy_listen(void) ""
+> +vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, int reply_i, int region_i) "client:0x%"PRIx64" for hva: 0x%"PRIx64" reply %d region %d"
+>  
+>  # hw/virtio/virtio.c
+>  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index 9178271ab2..2e4eb0864a 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -19,6 +19,7 @@
+>  #include "qemu/sockets.h"
+>  #include "migration/migration.h"
+>  #include "migration/postcopy-ram.h"
+> +#include "trace.h"
+>  
+>  #include <sys/ioctl.h>
+>  #include <sys/socket.h>
+> @@ -133,6 +134,7 @@ struct vhost_user {
+>      int slave_fd;
+>      NotifierWithReturn postcopy_notifier;
+>      struct PostCopyFD  postcopy_fd;
+> +    uint64_t           postcopy_client_bases[VHOST_MEMORY_MAX_NREGIONS];
+>  };
+>  
+>  static bool ioeventfd_enabled(void)
+> @@ -300,11 +302,13 @@ static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base,
+>  static int vhost_user_set_mem_table(struct vhost_dev *dev,
+>                                      struct vhost_memory *mem)
+>  {
+> +    struct vhost_user *u = dev->opaque;
+>      int fds[VHOST_MEMORY_MAX_NREGIONS];
+>      int i, fd;
+>      size_t fd_num = 0;
+>      bool reply_supported = virtio_has_feature(dev->protocol_features,
+> -                                              VHOST_USER_PROTOCOL_F_REPLY_ACK);
+> +                                          VHOST_USER_PROTOCOL_F_REPLY_ACK) &&
+> +                           !u->postcopy_fd.handler;
 
-On 18.07.2017 23:44, Eric Blake wrote:
-> Based on an IRC conversation today, here's some notes that may help
-> newcomers understand what is actually happening with qemu devices.  The=
+(indent)
 
-> initial question was how does a guest mount a qcow2 file (the poster wa=
-s
-> wondering if it was a loop or FUSE filesystem) - does it mean the guest=
+>  
+>      VhostUserMsg msg = {
+>          .request = VHOST_USER_SET_MEM_TABLE,
+> @@ -350,6 +354,57 @@ static int vhost_user_set_mem_table(struct vhost_dev *dev,
+>          return -1;
+>      }
+>  
+> +    if (u->postcopy_fd.handler) {
 
-> has to understand qcow2?
->=20
-> (Hopefully, someone with more experience with good documentation layout=
-s
-> and time might be willing to take this and further enhance it into a
-> nice part of the qemu.org website.)
+It seems that after this handler is set, we never clean it up.  Do we
+need to unset it somewhere? (maybe vhost_user_postcopy_end?)
 
-I just found some spare minutes to read through your mail. Thanks for
-the text, I think this is a good summary for newcomers, indeed!
+> +        VhostUserMsg msg_reply;
+> +        int region_i, reply_i;
+> +        if (vhost_user_read(dev, &msg_reply) < 0) {
+> +            return -1;
+> +        }
+> +
+> +        if (msg_reply.request != VHOST_USER_SET_MEM_TABLE) {
+> +            error_report("%s: Received unexpected msg type."
+> +                         "Expected %d received %d", __func__,
+> +                         VHOST_USER_SET_MEM_TABLE, msg_reply.request);
+> +            return -1;
+> +        }
+> +        /* We're using the same structure, just reusing one of the
+> +         * fields, so it should be the same size.
+> +         */
+> +        if (msg_reply.size != msg.size) {
+> +            error_report("%s: Unexpected size for postcopy reply "
+> +                         "%d vs %d", __func__, msg_reply.size, msg.size);
+> +            return -1;
+> +        }
+> +
+> +        memset(u->postcopy_client_bases, 0,
+> +               sizeof(uint64_t) * VHOST_MEMORY_MAX_NREGIONS);
+> +
+> +        /* They're in the same order as the regions that were sent
+> +         * but some of the regions were skipped (above) if they
+> +         * didn't have fd's
+> +        */
+> +        for (reply_i = 0, region_i = 0;
+> +             region_i < dev->mem->nregions;
+> +             region_i++) {
+> +            if (reply_i < fd_num &&
+> +                msg_reply.payload.memory.regions[region_i].guest_phys_addr ==
+                                                    ^^^^^^^^
+                                          should this be reply_i?
 
-And yes, I agree, this should appear somewhere on the qemu.org website!
-I think the best place is either a page in the Wiki, or a post in the
-QEMU blog. I assume you already have a wiki account? If not, let me
-know. Or for doing a blog post, you basically have to
- git clone git://git.qemu-project.org/qemu-web.git
-and add a new file in the "_posts" directory. Have a look at the other
-files there to know how to specify the meta information. Then send a
-patch to qemu-devel, with Paolo on CC (and myself if you want to get a
-review or test with Jekyll).
+(And maybe we can use pointers for the regions for better readability?)
 
- Thomas
+> +                dev->mem->regions[region_i].guest_phys_addr) {
+> +                u->postcopy_client_bases[region_i] =
+> +                    msg_reply.payload.memory.regions[reply_i].userspace_addr;
+> +                trace_vhost_user_set_mem_table_postcopy(
+> +                    msg_reply.payload.memory.regions[reply_i].userspace_addr,
+> +                    msg.payload.memory.regions[reply_i].userspace_addr,
+> +                    reply_i, region_i);
+> +                reply_i++;
+> +            }
+> +        }
+> +        if (reply_i != fd_num) {
+> +            error_report("%s: postcopy reply not fully consumed "
+> +                         "%d vs %zd",
+> +                         __func__, reply_i, fd_num);
+> +            return -1;
+> +        }
+> +    }
+>      if (reply_supported) {
+>          return process_message_reply(dev, &msg);
+>      }
+> -- 
+> 2.13.5
+> 
 
-
---gRsOrxCP8ctgrvLXWvMeiA2KbHnjA1tTB
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJZpSU5AAoJEC7Z13T+cC21oUwP/2tOnPBzrcfjUtpvQ/unSqAF
-ayHdqQwXqPICKly0hYjagviuIi2MK8hvqEsPbAjBv/fAq4irBzjlpCRmEePszENG
-0EAfvV+R+G2K+84mdxirI7x90xL82Rdk3fuI2gJCnhhXZQTcDX/XSiPhbj315UsR
-oepuNc4UnPCjtP2mqeyA0c9pW6ySSnc4bqfcyDQ/VUbTLvz/7U1nzxIH1RDF+niS
-Mvbuf76mqWM6MQu6h7rnu37UBJS1OftChMqYCmVUZZi/PGspAiqNHVhp/hDrILqH
-NWAxW6wJrpPmvDexzaTDKpF2plBGvC6NekVruHE6kwnU6KYHyYoIyeicEElMhGST
-EttC3Te9EyvrUbrZzFUy2Z8/ZZ04CNW65Ju37CPMePBUGH1/0/x8m7maBtIWL9wx
-ptyQryqK6ReJk5VtvqCm9h3Ys/Z6O+QDnYHI+kXgZyeV8IyN4+IuJmSUczw7A3GS
-dlhimo+wPa0GI5MLOY80k89FvjxUrr/6tukBVwM0NMlhHjnaNcKup0/E47mlTmJ7
-/1CpmqCqTWZ1VZq1RWBlFyeapjfzozkiAsUZxZu0IfU8tNBDPtm5ducmnBuIfoQc
-nCKWYI+AnJdqfskleDaEMGMJE1ukiSnn+Tv8eUk6TeRRqic2yhYsATMPSfBFOOxx
-WZPH3h6Qf6BXubnECogQ
-=+bme
------END PGP SIGNATURE-----
-
---gRsOrxCP8ctgrvLXWvMeiA2KbHnjA1tTB--
+-- 
+Peter Xu
