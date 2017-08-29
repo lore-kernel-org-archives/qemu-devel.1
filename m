@@ -1,51 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dmdl9-0004Li-M6
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 06:28:45 -0400
+	(envelope-from <berrange@redhat.com>) id 1dmduv-0006h9-7l
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 06:38:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dmdl6-0003Rf-GD
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 06:28:39 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42243)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dmdl6-0003Q6-3Q
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 06:28:36 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7TASMTH126843
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 06:28:33 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cn3jf1916-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 06:28:33 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 29 Aug 2017 11:28:30 +0100
-References: <e2a1b182-83a9-2259-27f9-68b61b5061d5@linux.vnet.ibm.com>
-	<20170824171355.29d1ec32.cohuck@redhat.com>
-	<30333b41-508d-f9a3-ac2d-4830a7791475@redhat.com>
-	<34f0f307-d16f-7c76-1589-fa06252f6d09@linux.vnet.ibm.com>
-	<ad0ef5a7-c0e0-9e54-a417-858c4b32a80e@redhat.com>
-	<c9a6a1ec-eb7c-08a6-82ad-87ad5412ad19@linux.vnet.ibm.com>
-	<CAFEAcA-oE=E3ydugLdVnPS2Tquqkou=BEhsB_DALqZxbVD0GDA@mail.gmail.com>
-	<e24316e0-3b6f-ef1c-7c4b-66e7b302e5b4@linux.vnet.ibm.com>
-	<97b35c4d-e897-c18a-525f-1fa1a7560776@de.ibm.com>
-	<20170825092008.12484e6a.cohuck@redhat.com>
-	<d3e9d032-fd2e-6126-1774-cb8a86a219f4@de.ibm.com>
-	<20170825102950.736647be.cohuck@redhat.com>
-	<2fdd5a70-6339-c4ec-c13c-d6f96d7abfc9@de.ibm.com>
-	<c79ab349-116d-10d5-9310-f3ff8a6b4b81@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 29 Aug 2017 12:28:26 +0200
+	(envelope-from <berrange@redhat.com>) id 1dmdur-0007aT-8l
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 06:38:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49648)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dmduq-0007aH-VR
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 06:38:41 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DD15881E1B
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 10:38:38 +0000 (UTC)
+Date: Tue, 29 Aug 2017 11:38:31 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170829103831.GE3783@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1502777827-18874-1-git-send-email-peterx@redhat.com>
+	<1502777827-18874-6-git-send-email-peterx@redhat.com>
+	<20170815083714.GA9674@redhat.com>
+	<20170815085006.GA19446@pxdev.xzpeter.org>
+	<20170815092707.GE9674@redhat.com>
+	<20170815094708.GB19446@pxdev.xzpeter.org>
+	<20170816094713.GA2294@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <c79ab349-116d-10d5-9310-f3ff8a6b4b81@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <77977e8e-38d6-e701-dabe-de33b60da725@de.ibm.com>
-Subject: Re: [Qemu-devel] S390 bios breaks in qemu 2.10.rc3
+Content-Disposition: inline
+In-Reply-To: <20170816094713.GA2294@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC 5/6] migration: store listen task tag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -54,57 +39,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, "Collin L. Walling" <walling@linux.vnet.ibm.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
+On Wed, Aug 16, 2017 at 05:47:13PM +0800, Peter Xu wrote:
+> On Tue, Aug 15, 2017 at 05:47:08PM +0800, Peter Xu wrote:
+> > On Tue, Aug 15, 2017 at 10:27:07AM +0100, Daniel P. Berrange wrote:
+> > > On Tue, Aug 15, 2017 at 04:50:06PM +0800, Peter Xu wrote:
+> > > > On Tue, Aug 15, 2017 at 09:37:14AM +0100, Daniel P. Berrange wrote:
+> > > > > On Tue, Aug 15, 2017 at 02:17:06PM +0800, Peter Xu wrote:
+> > > > > > Store the task tag for migration types: tcp/unix/fd/exec in current
+> > > > > > MigrationIncomingState struct.
+> > > > > > 
+> > > > > > For defered migration, no need to store task tag since there is no task
+> > > > > > running in the main loop at all. For RDMA, let's mark it as todo.
+> > > > > > 
+> > > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > > > ---
+> > > > > >  migration/migration.c | 22 ++++++++++++++++++----
+> > > > > >  migration/migration.h |  2 ++
+> > > > > >  2 files changed, 20 insertions(+), 4 deletions(-)
+> > > > > > 
+> > > > > > diff --git a/migration/migration.c b/migration/migration.c
+> > > > > > index c9b7085..daf356b 100644
+> > > > > > --- a/migration/migration.c
+> > > > > > +++ b/migration/migration.c
+> > > > > > @@ -171,6 +171,7 @@ void migration_incoming_state_destroy(void)
+> > > > > >          mis->from_src_file = NULL;
+> > > > > >      }
+> > > > > >  
+> > > > > > +    mis->listen_task_tag = 0;
+> > > > > >      qemu_event_destroy(&mis->main_thread_load_event);
+> > > > > >  }
+> > > > > >  
+> > > > > > @@ -265,25 +266,31 @@ int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
+> > > > > >  void qemu_start_incoming_migration(const char *uri, Error **errp)
+> > > > > >  {
+> > > > > >      const char *p;
+> > > > > > +    guint task_tag = 0;
+> > > > > > +    MigrationIncomingState *mis = migration_incoming_get_current();
+> > > > > >  
+> > > > > >      qapi_event_send_migration(MIGRATION_STATUS_SETUP, &error_abort);
+> > > > > >      if (!strcmp(uri, "defer")) {
+> > > > > >          deferred_incoming_migration(errp);
+> > > > > >      } else if (strstart(uri, "tcp:", &p)) {
+> > > > > > -        tcp_start_incoming_migration(p, errp);
+> > > > > > +        task_tag = tcp_start_incoming_migration(p, errp);
+> > > > > >  #ifdef CONFIG_RDMA
+> > > > > >      } else if (strstart(uri, "rdma:", &p)) {
+> > > > > > +        /* TODO: store task tag for RDMA migrations */
+> > > > > >          rdma_start_incoming_migration(p, errp);
+> > > > > >  #endif
+> > > > > >      } else if (strstart(uri, "exec:", &p)) {
+> > > > > > -        exec_start_incoming_migration(p, errp);
+> > > > > > +        task_tag = exec_start_incoming_migration(p, errp);
+> > > > > >      } else if (strstart(uri, "unix:", &p)) {
+> > > > > > -        unix_start_incoming_migration(p, errp);
+> > > > > > +        task_tag = unix_start_incoming_migration(p, errp);
+> > > > > >      } else if (strstart(uri, "fd:", &p)) {
+> > > > > > -        fd_start_incoming_migration(p, errp);
+> > > > > > +        task_tag = fd_start_incoming_migration(p, errp);
+> > > > > >      } else {
+> > > > > >          error_setg(errp, "unknown migration protocol: %s", uri);
+> > > > > > +        return;
+> > > > > >      }
+> > > > > > +
+> > > > > > +    mis->listen_task_tag = task_tag;
+> > > > > 
+> > > > > This is unsafe as currently written. The main loop watches that are
+> > > > > associated with these tags are all unregistered when incoming migration
+> > > > > starts. So if you save them, and then unregister later when postcopy
+> > > > > is "stuck", then you're likely unregistering a tag associated with
+> > > > > some other random part of QEMU, because the saved value is no longer
+> > > > > valid.
+> > > > 
+> > > > IIUC for incoming migration, the watch is not detached until
+> > > > migration_fd_process_incoming() completes. So:
+> > > > 
+> > > > - for precopy, the watch should be detached when migration completes
+> > > > 
+> > > > - for postcopy, the watch should be detached when postcopy starts,
+> > > >   then main loop thread returns, while the ram_load_thread starts to
+> > > >   continue the migration.
+> > > > 
+> > > > So basically the watch is detaching itself after
+> > > > migration_fd_process_incoming() completes. To handle that, this patch
+> > > > has this change:
+> > > > 
+> > > > @@ -422,6 +429,13 @@ void migration_fd_process_incoming(QEMUFile *f)
+> > > >          co = qemu_coroutine_create(process_incoming_migration_co, f);
+> > > >          qemu_coroutine_enter(co);
+> > > >      }
+> > > > +
+> > > > +    /*
+> > > > +     * When reach here, we should not need the listening port any
+> > > > +     * more. We'll detach the listening task soon, let's reset the
+> > > > +     * listen task tag.
+> > > > +     */
+> > > > +    mis->listen_task_tag = 0;
+> > > > 
+> > > > Would this make sure the listen_task_tag is always valid if nonzero?
+> > > 
+> > > Mixing 'return FALSE' from callbacks, with g_source_remove is a recipe
+> > > for hard to diagnose bugs, so should be avoided in general.
+> > 
+> > Makes sense.
+> > 
+> > > 
+> > > So, IMHO, you should change all the callbacks to 'return TRUE' so that
+> > > they keep the watch registered, and then explicitly call g_source_remove()
+> > > passing the listen tag, when incoming migration starts.
+> > 
+> > Yes this sounds better.  Thanks!
+> 
+> Hmm... when incoming migration starts, we are still in the handler of
+> the listening gsource. I am not sure whether it's safe to remove the
+> gsource in its own handlers.
 
+Yes, it should be safe to call g_source_remove from within the handler
+itself.
 
-On 08/29/2017 11:35 AM, Thomas Huth wrote:
-> On 28.08.2017 09:18, Christian Borntraeger wrote:
->>
->>
->> On 08/25/2017 10:29 AM, Cornelia Huck wrote:
->>> On Fri, 25 Aug 2017 10:21:58 +0200
->>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
->>>
->>>> On 08/25/2017 09:20 AM, Cornelia Huck wrote:
->>>
->>>>> OK, to recap:
->>>>>
->>>>> - the current pre-built bios seems fine
->>>>> - rebuilding the bios may yield a version that fails on some systems
->>>>>   (different compiler?)
->>>>> - adding aligned(8) looks like the right thing to do
->>>>> - it seems to fix the problem, but on at least one system something
->>>>>   still seems off (under investigation)  
->>>>
->>>> Yes. I am out of office today, so for any aligned(8) patch
->>>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>>> even for 2.10.
->>>
->>> I fear the 2.10 train has already left the station, but any aligned(8)
->>> patch should be cc:stable.
->>
->> I think this could be a topic for QEMU summit. Our process of not allowing
->> fixes in rcx without requiring an rc(x+1) seems a bit odd. The Linux kernel
->> style (there are fixes between the last rc and release) seems more balanced
->> as long as we establish some safety nets.
-> 
-> This sounds like a good idea to me, yes. And maybe we could also ease
-> the situation a little bit by providing the first stable .1 release
-> already two or three weeks after the .0 release [*] ?
-
-+1
-
-> Then these "we are
-> not 100% sure whether this is a severe blocker or not" patches could
-> simply be provided to the public with that .1 release instead of
-> blocking the QEMU master branch in freeze state...
-> 
->  Thomas
-> 
-> 
-> [*] I know that means more additional work for Michael - sorry for that
-> ... but at least we should talk about this, I think. Maybe someone else
-> could also help with the releases if it's too much work for one person?
-> 
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
