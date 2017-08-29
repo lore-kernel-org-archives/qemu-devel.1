@@ -1,32 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dmfIJ-0007LT-Bk
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:07:03 -0400
+	(envelope-from <berto@igalia.com>) id 1dmfKa-00085n-6t
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:09:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dmfIG-0000hU-EE
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:06:59 -0400
-Received: from mail-qk0-x22f.google.com ([2607:f8b0:400d:c09::22f]:36087)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dmfIG-0000gh-7w
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:06:56 -0400
-Received: by mail-qk0-x22f.google.com with SMTP id o63so13958139qkb.3
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 05:06:54 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170828174707.20786-1-famz@redhat.com>
-	<20170828174707.20786-4-famz@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <de606e2a-7f5e-0625-79dd-a828ea3d5fe9@amsat.org>
-Date: Tue, 29 Aug 2017 09:06:48 -0300
-MIME-Version: 1.0
-In-Reply-To: <20170828174707.20786-4-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 03/10] tests: Add vm test lib
+	(envelope-from <berto@igalia.com>) id 1dmfKU-0001sN-AG
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:09:20 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Tue, 29 Aug 2017 15:08:36 +0300
+Message-Id: <20170829120836.16091-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH] misc: Remove unused Error variables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,337 +17,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Hi Fam,
+There's a few cases which we're passing an Error pointer to a function
+only to discard it immediately afterwards without checking it. In
+these cases we can simply remove the variable and pass NULL instead.
 
-On 08/28/2017 02:47 PM, Fam Zheng wrote:
-> This is the common code to implement a "VM test" to
-> 
->    1) Download and initialize a pre-defined VM that has necessary
->    dependencies to build QEMU and SSH access.
-> 
->    2) Archive $SRC_PATH to a .tar file.
-> 
->    3) Boot the VM, and pass the source tar file to the guest.
-> 
->    4) SSH into the VM, untar the source tarball, build from the source.
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->   tests/vm/basevm.py | 287 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 287 insertions(+)
->   create mode 100755 tests/vm/basevm.py
-> 
-> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-> new file mode 100755
-> index 0000000000..d0095c5332
-> --- /dev/null
-> +++ b/tests/vm/basevm.py
-> @@ -0,0 +1,287 @@
-> +#!/usr/bin/env python
-> +#
-> +# VM testing base class
-> +#
-> +# Copyright (C) 2017 Red Hat Inc.
-> +#
-> +# Authors:
-> +#  Fam Zheng <famz@redhat.com>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2.  See
-> +# the COPYING file in the top-level directory.
-> +#
-> +
-> +import os
-> +import sys
-> +import logging
-> +import time
-> +import datetime
-> +sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
-> +from qemu import QEMUMachine
-> +import subprocess
-> +import hashlib
-> +import optparse
-> +import atexit
-> +import tempfile
-> +import shutil
-> +import multiprocessing
-> +import traceback
-> +
-> +SSH_KEY = """\
-> +-----BEGIN RSA PRIVATE KEY-----
-> +MIIEowIBAAKCAQEAopAuOlmLV6LVHdFBj8/eeOwI9CqguIJPp7eAQSZvOiB4Ag/R
-> +coEhl/RBbrV5Yc/SmSD4PTpJO/iM10RwliNjDb4a3I8q3sykRJu9c9PI/YsH8WN9
-> ++NH2NjKPtJIcKTu287IM5JYxyB6nDoOzILbTyJ1TDR/xH6qYEfBAyiblggdjcvhA
-> +RTf93QIn39F/xLypXvT1K2O9BJEsnJ8lEUvB2UXhKo/JTfSeZF8wPBeowaP9EONk
-> +7b+nuJOWHGg68Ji6wVi62tjwl2Szch6lxIhZBpnV7QNRKMfYHP6eIyF4pusazzZq
-> +Telsq6xI2ghecWLzb/MF5A+rklsGx2FNuJSAJwIDAQABAoIBAHHi4o/8VZNivz0x
-> +cWXn8erzKV6tUoWQvW85Lj/2RiwJvSlsnYZDkx5af1CpEE2HA/pFT8PNRqsd+MWC
-> +7AEy710cVsM4BYerBFYQaYxwzblaoojo88LSjVPw3h5Z0iLM8+IMVd36nwuc9dpE
-> +R8TecMZ1+U4Tl6BgqkK+9xToZRdPKdjS8L5MoFhGN+xY0vRbbJbGaV9Q0IHxLBkB
-> +rEBV7T1mUynneCHRUQlJQEwJmKpT8MH3IjsUXlG5YvnuuvcQJSNTaW2iDLxuOKp8
-> +cxW8+qL88zpb1D5dppoIu6rlrugN0azSq70ruFJQPc/A8GQrDKoGgRQiagxNY3u+
-> +vHZzXlECgYEA0dKO3gfkSxsDBb94sQwskMScqLhcKhztEa8kPxTx6Yqh+x8/scx3
-> +XhJyOt669P8U1v8a/2Al+s81oZzzfQSzO1Q7gEwSrgBcRMSIoRBUw9uYcy02ngb/
-> +j/ng3DGivfJztjjiSJwb46FHkJ2JR8mF2UisC6UMXk3NgFY/3vWQx78CgYEAxlcG
-> +T3hfSWSmTgKRczMJuHQOX9ULfTBIqwP5VqkkkiavzigGRirzb5lgnmuTSPTpF0LB
-> +XVPjR2M4q+7gzP0Dca3pocrvLEoxjwIKnCbYKnyyvnUoE9qHv4Kr+vDbgWpa2LXG
-> +JbLmE7tgTCIp20jOPPT4xuDvlbzQZBJ5qCQSoZkCgYEAgrotSSihlCnAOFSTXbu4
-> +CHp3IKe8xIBBNENq0eK61kcJpOxTQvOha3sSsJsU4JAM6+cFaxb8kseHIqonCj1j
-> +bhOM/uJmwQJ4el/4wGDsbxriYOBKpyq1D38gGhDS1IW6kk3erl6VAb36WJ/OaGum
-> +eTpN9vNeQWM4Jj2WjdNx4QECgYAwTdd6mU1TmZCrJRL5ZG+0nYc2rbMrnQvFoqUi
-> +BvWiJovggHzur90zy73tNzPaq9Ls2FQxf5G1vCN8NCRJqEEjeYCR59OSDMu/EXc2
-> +CnvQ9SevHOdS1oEDEjcCWZCMFzPi3XpRih1gptzQDe31uuiHjf3cqcGPzTlPdfRt
-> +D8P92QKBgC4UaBvIRwREVJsdZzpIzm224Bpe8LOmA7DeTnjlT0b3lkGiBJ36/Q0p
-> +VhYh/6cjX4/iuIs7gJbGon7B+YPB8scmOi3fj0+nkJAONue1mMfBNkba6qQTc6Y2
-> +5mEKw2/O7/JpND7ucU3OK9plcw/qnrWDgHxl0Iz95+OzUIIagxne
-> +-----END RSA PRIVATE KEY-----
-> +"""
-> +SSH_PUB_KEY = """\
-> +ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCikC46WYtXotUd0UGPz9547Aj0KqC4gk+nt4BBJm86IHgCD9FygSGX9EFutXlhz9KZIPg9Okk7+IzXRHCWI2MNvhrcjyrezKREm71z08j9iwfxY3340fY2Mo+0khwpO7bzsgzkljHIHqcOg7MgttPInVMNH/EfqpgR8EDKJuWCB2Ny+EBFN/3dAiff0X/EvKle9PUrY70EkSycnyURS8HZReEqj8lN9J5kXzA8F6jBo/0Q42Ttv6e4k5YcaDrwmLrBWLra2PCXZLNyHqXEiFkGmdXtA1Eox9gc/p4jIXim6xrPNmpN6WyrrEjaCF5xYvNv8wXkD6uSWwbHYU24lIAn qemu-vm-key
-> +"""
-> +
-> +class BaseVM(object):
-> +    GUEST_USER = "qemu"
-> +    GUEST_PASS = "qemupass"
-> +    ROOT_PASS = "qemupass"
-> +
-> +    # The script to run in the guest that builds QEMU
-> +    BUILD_SCRIPT = ""
-> +    # The guest name, to be overridden by subclasses
-> +    name = "#base"
-> +    def __init__(self, debug=False, vcpus=None):
-> +        self._guest = None
-> +        self._tmpdir = tempfile.mkdtemp(prefix="qemu-vm-")
-> +        atexit.register(shutil.rmtree, self._tmpdir)
-> +
-> +        self._ssh_key_file = os.path.join(self._tmpdir, "id_rsa")
-> +        open(self._ssh_key_file, "w").write(SSH_KEY)
-> +        subprocess.check_call(["chmod", "600", self._ssh_key_file])
-> +
-> +        self._ssh_pub_key_file = os.path.join(self._tmpdir, "id_rsa.pub")
-> +        open(self._ssh_pub_key_file, "w").write(SSH_PUB_KEY)
-> +
-> +        self.debug = debug
-> +        self._stderr = sys.stderr
-> +        self._devnull = open("/dev/null", "w")
-> +        if self.debug:
-> +            self._stdout = sys.stdout
-> +        else:
-> +            self._stdout = self._devnull
-> +        self._args = [ \
-> +            "-nodefaults", "-m", "2G",
-> +            "-cpu", "host",
-> +            "-netdev", "user,id=vnet,hostfwd=:0.0.0.0:0-:22",
-> +            "-device", "virtio-net-pci,netdev=vnet",
-> +            "-vnc", ":0,to=20",
-> +            "-serial", "file:%s" % os.path.join(self._tmpdir, "serial.out")]
-> +        if vcpus:
-> +            self._args += ["-smp", str(vcpus)]
-> +        if os.access("/dev/kvm", os.R_OK | os.W_OK):
-> +            self._args += ["-enable-kvm"]
-> +        else:
-> +            logging.info("KVM not available, not using -enable-kvm")
-> +        self._data_args = []
-> +
-> +    def _download_with_cache(self, url, sha256sum=None):
-> +        def check_sha256sum(fname):
-> +            if not sha256sum:
-> +                return True
-> +            checksum = subprocess.check_output(["sha256sum", fname]).split()[0]
-> +            return sha256sum == checksum
-> +
-> +        cache_dir = os.path.expanduser("~/.cache/qemu-vm/download")
-> +        if not os.path.exists(cache_dir):
-> +            os.makedirs(cache_dir)
-> +        fname = os.path.join(cache_dir, hashlib.sha1(url).hexdigest())
-> +        if os.path.exists(fname) and check_sha256sum(fname):
-> +            return fname
-> +        logging.debug("Downloading %s to %s...", url, fname)
-> +        subprocess.check_call(["wget", "-c", url, "-O", fname + ".download"],
-> +                              stdout=self._stdout, stderr=self._stderr)
-> +        os.rename(fname + ".download", fname)
-> +        return fname
-> +
-> +    def _ssh_do(self, user, cmd, check, interactive=False):
-> +        ssh_cmd = ["ssh", "-q",
-> +                   "-o", "StrictHostKeyChecking=no",
-> +                   "-o", "UserKnownHostsFile=/dev/null",
-> +                   "-o", "ConnectTimeout=1",
-> +                   "-p", self.ssh_port, "-i", self._ssh_key_file]
-> +        if interactive:
-> +            ssh_cmd += ['-t']
-> +        assert not isinstance(cmd, str)
-> +        ssh_cmd += ["%s@127.0.0.1" % user] + list(cmd)
-> +        logging.debug("ssh_cmd: %s", " ".join(ssh_cmd))
-> +        r = subprocess.call(ssh_cmd,
-> +                            stdin=sys.stdin if interactive else self._devnull,
-> +                            stdout=sys.stdout if interactive else self._stdout,
-> +                            stderr=sys.stderr if interactive else self._stderr)
-> +        if check and r != 0:
-> +            raise Exception("SSH command failed: %s" % cmd)
-> +        return r
-> +
-> +    def ssh(self, *cmd):
-> +        return self._ssh_do(self.GUEST_USER, cmd, False)
-> +
-> +    def ssh_interactive(self, *cmd):
-> +        return self._ssh_do(self.GUEST_USER, cmd, False, True)
-> +
-> +    def ssh_root(self, *cmd):
-> +        return self._ssh_do("root", cmd, False)
-> +
-> +    def ssh_check(self, *cmd):
-> +        self._ssh_do(self.GUEST_USER, cmd, True)
-> +
-> +    def ssh_root_check(self, *cmd):
-> +        self._ssh_do("root", cmd, True)
-> +
-> +    def build_image(self, img):
-> +        raise NotImplementedError
-> +
-> +    def add_source_dir(self, data_dir):
-> +        name = "data-" + hashlib.sha1(data_dir).hexdigest()[:5]
-> +        tarfile = os.path.join(self._tmpdir, name + ".tar")
-> +        logging.debug("Creating archive %s for data dir: %s", tarfile, data_dir)
-> +        if subprocess.call("type gtar", stdout=self._devnull,
-> +                           stderr=self._devnull, shell=True) == 0:
-> +            tar_cmd = "gtar"
-> +        else:
-> +            tar_cmd = "tar"
-> +        subprocess.check_call([tar_cmd,
-> +                               "--exclude-vcs",
-> +                               "--exclude=tests/vm/*.img",
-> +                               "--exclude=tests/vm/*.img.*",
-> +                               "--exclude=*.d",
-> +                               "--exclude=*.o",
-> +                               "--exclude=docker-src.*",
-> +                               "-cf", tarfile, '.'], cwd=data_dir,
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow.c  | 12 +++---------
+ block/qcow2.c |  8 ++------
+ dump.c        |  4 +---
+ 3 files changed, 6 insertions(+), 18 deletions(-)
 
-I'm not happy with this command :/
-My distrib uses tmpfs for /tmp and suddently the whole X window became 
-irresponsive until this script failing after filling 8G of /tmp and swap:
-
-...
-DEBUG:root:Creating archive /tmp/qemu-vm-F7CY9O/data-3a52c.tar for data 
-dir: .
-tar: /tmp/qemu-vm-F7CY9O/data-3a52c.tar: Wrote only 4096 of 10240 bytes
-tar: Error is not recoverable: exiting now
-Failed to prepare guest environment
-
-Then I figured out my workdir is full of testing stuff, debug images, 
-firmwares, coredumps, etc.
-
-I'll think of another way.
-
-> +                              stdin=self._devnull, stdout=self._stdout)
-> +        self._data_args += ["-drive",
-> +                            "file=%s,if=none,id=%s,cache=writeback,format=raw" % \
-> +                                    (tarfile, name),
-> +                            "-device",
-> +                            "virtio-blk,drive=%s,serial=%s,bootindex=1" % (name, name)]
-> +
-> +    def boot(self, img, extra_args=[]):
-> +        args = self._args + [
-> +            "-device", "VGA",
-> +            "-drive", "file=%s,if=none,id=drive0,cache=writeback" % img,
-> +            "-device", "virtio-blk,drive=drive0,bootindex=0"]
-> +        args += self._data_args + extra_args
-> +        logging.debug("QEMU args: %s", " ".join(args))
-> +        guest = QEMUMachine(binary=os.environ.get("QEMU", "qemu-system-x86_64"),
-> +                            args=args)
-> +        guest.launch()
-> +        atexit.register(self.shutdown)
-> +        self._guest = guest
-> +        usernet_info = guest.qmp("human-monitor-command",
-> +                                 command_line="info usernet")
-> +        self.ssh_port = None
-> +        for l in usernet_info["return"].splitlines():
-> +            fields = l.split()
-> +            if "TCP[HOST_FORWARD]" in fields and "22" in fields:
-> +                self.ssh_port = l.split()[3]
-> +        if not self.ssh_port:
-> +            raise Exception("Cannot find ssh port from 'info usernet':\n%s" % \
-> +                            usernet_info)
-> +
-> +    def wait_ssh(self, seconds=120):
-> +        starttime = datetime.datetime.now()
-> +        guest_up = False
-> +        while (datetime.datetime.now() - starttime).total_seconds() < seconds:
-> +            if self.ssh("exit 0") == 0:
-> +                guest_up = True
-> +                break
-> +            time.sleep(1)
-> +        if not guest_up:
-> +            raise TimeoutError("Timeout while waiting for guest ssh")
-> +
-> +    def shutdown(self):
-> +        self._guest.shutdown()
-> +
-> +    def wait(self):
-> +        self._guest.wait()
-> +
-> +    def qmp(self, *args, **kwargs):
-> +        return self._guest.qmp(*args, **kwargs)
-> +
-> +def parse_args(vm_name):
-> +    parser = optparse.OptionParser(description="""
-> +    VM test utility.  Exit codes: 0 = success, 1 = command line error, 2 = environment initialization failed, 3 = test command failed""")
-> +    parser.add_option("--debug", "-D", action="store_true",
-> +                      help="enable debug output")
-> +    parser.add_option("--image", "-i", default="%s.img" % vm_name,
-> +                      help="image file name")
-> +    parser.add_option("--force", "-f", action="store_true",
-> +                      help="force build image even if image exists")
-> +    parser.add_option("--jobs", type=int, default=multiprocessing.cpu_count(),
-> +                      help="number of virtual CPUs")
-> +    parser.add_option("--build-image", "-b", action="store_true",
-> +                      help="build image")
-> +    parser.add_option("--build-qemu",
-> +                      help="build QEMU from source in guest")
-> +    parser.add_option("--interactive", "-I", action="store_true",
-> +                      help="Interactively run command")
-> +    parser.disable_interspersed_args()
-> +    return parser.parse_args()
-> +
-> +def main(vmcls):
-> +    try:
-> +        args, argv = parse_args(vmcls.name)
-> +        if not argv and not args.build_qemu and not args.build_image:
-> +            print "Nothing to do?"
-> +            return 1
-> +        if args.debug:
-> +            logging.getLogger().setLevel(logging.DEBUG)
-> +        vm = vmcls(debug=args.debug, vcpus=args.jobs)
-> +        if args.build_image:
-> +            if os.path.exists(args.image) and not args.force:
-> +                sys.stderr.writelines(["Image file exists: %s\n" % args.image,
-> +                                      "Use --force option to overwrite\n"])
-> +                return 1
-> +            return vm.build_image(args.image)
-> +        if args.build_qemu:
-> +            vm.add_source_dir(args.build_qemu)
-> +            cmd = [vm.BUILD_SCRIPT.format(
-> +                   configure_opts = " ".join(argv),
-> +                   jobs=args.jobs)]
-> +        else:
-> +            cmd = argv
-> +        vm.boot(args.image + ",snapshot=on")
-> +        vm.wait_ssh()
-> +    except Exception as e:
-> +        if isinstance(e, SystemExit) and e.code == 0:
-> +            return 0
-> +        sys.stderr.write("Failed to prepare guest environment\n")
-> +        traceback.print_exc()
-> +        return 2
-> +
-> +    if args.interactive:
-> +        if vm.ssh_interactive(*cmd) == 0:
-> +            return 0
-> +        vm.ssh_interactive()
-> +        return 3
-> +    else:
-> +        if vm.ssh(*cmd) != 0:
-> +            return 3
-> 
+diff --git a/block/qcow.c b/block/qcow.c
+index c08cdc4a7b..63904a26ee 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -454,13 +454,11 @@ static uint64_t get_cluster_offset(BlockDriverState *bs,
+                     start_sect = (offset & ~(s->cluster_size - 1)) >> 9;
+                     for(i = 0; i < s->cluster_sectors; i++) {
+                         if (i < n_start || i >= n_end) {
+-                            Error *err = NULL;
+                             memset(s->cluster_data, 0x00, 512);
+                             if (qcrypto_block_encrypt(s->crypto, start_sect + i,
+                                                       s->cluster_data,
+                                                       BDRV_SECTOR_SIZE,
+-                                                      &err) < 0) {
+-                                error_free(err);
++                                                      NULL) < 0) {
+                                 errno = EIO;
+                                 return -1;
+                             }
+@@ -572,7 +570,6 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
+     QEMUIOVector hd_qiov;
+     uint8_t *buf;
+     void *orig_buf;
+-    Error *err = NULL;
+ 
+     if (qiov->niov > 1) {
+         buf = orig_buf = qemu_try_blockalign(bs, qiov->size);
+@@ -637,7 +634,7 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
+             if (bs->encrypted) {
+                 assert(s->crypto);
+                 if (qcrypto_block_decrypt(s->crypto, sector_num, buf,
+-                                          n * BDRV_SECTOR_SIZE, &err) < 0) {
++                                          n * BDRV_SECTOR_SIZE, NULL) < 0) {
+                     goto fail;
+                 }
+             }
+@@ -660,7 +657,6 @@ done:
+     return ret;
+ 
+ fail:
+-    error_free(err);
+     ret = -EIO;
+     goto done;
+ }
+@@ -709,11 +705,9 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
+             break;
+         }
+         if (bs->encrypted) {
+-            Error *err = NULL;
+             assert(s->crypto);
+             if (qcrypto_block_encrypt(s->crypto, sector_num, buf,
+-                                      n * BDRV_SECTOR_SIZE, &err) < 0) {
+-                error_free(err);
++                                      n * BDRV_SECTOR_SIZE, NULL) < 0) {
+                 ret = -EIO;
+                 break;
+             }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 40ba26c111..fbfffadc76 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1820,15 +1820,13 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
+                 assert(s->crypto);
+                 assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
+                 assert((cur_bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
+-                Error *err = NULL;
+                 if (qcrypto_block_decrypt(s->crypto,
+                                           (s->crypt_physical_offset ?
+                                            cluster_offset + offset_in_cluster :
+                                            offset) >> BDRV_SECTOR_BITS,
+                                           cluster_data,
+                                           cur_bytes,
+-                                          &err) < 0) {
+-                    error_free(err);
++                                          NULL) < 0) {
+                     ret = -EIO;
+                     goto fail;
+                 }
+@@ -1942,7 +1940,6 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+         qemu_iovec_concat(&hd_qiov, qiov, bytes_done, cur_bytes);
+ 
+         if (bs->encrypted) {
+-            Error *err = NULL;
+             assert(s->crypto);
+             if (!cluster_data) {
+                 cluster_data = qemu_try_blockalign(bs->file->bs,
+@@ -1963,8 +1960,7 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+                                        cluster_offset + offset_in_cluster :
+                                        offset) >> BDRV_SECTOR_BITS,
+                                       cluster_data,
+-                                      cur_bytes, &err) < 0) {
+-                error_free(err);
++                                      cur_bytes, NULL) < 0) {
+                 ret = -EIO;
+                 goto fail;
+             }
+diff --git a/dump.c b/dump.c
+index d9090a24cc..a79773d0f7 100644
+--- a/dump.c
++++ b/dump.c
+@@ -1695,10 +1695,8 @@ static void dump_process(DumpState *s, Error **errp)
+ 
+ static void *dump_thread(void *data)
+ {
+-    Error *err = NULL;
+     DumpState *s = (DumpState *)data;
+-    dump_process(s, &err);
+-    error_free(err);
++    dump_process(s, NULL);
+     return NULL;
+ }
+ 
+-- 
+2.11.0
