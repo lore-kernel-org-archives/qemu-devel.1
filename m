@@ -1,34 +1,50 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmYPJ-0004GR-6d
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 00:45:46 -0400
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dmYQZ-0004ov-Aw
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 00:47:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmYPF-0000Bi-9r
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 00:45:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53252)
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dmYQW-0000ZD-7N
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 00:47:03 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36183)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dmYPF-0000BY-23
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 00:45:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dmYPD-0008I7-4q
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 04:45:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EDCE02E80CB
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 04:45:38 +0000 (UTC)
+	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
+	id 1dmYQV-0000Z7-Ux
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 00:47:00 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7T4hr4B006283
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 00:46:58 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cmx61kx50-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 00:46:58 -0400
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
+	Tue, 29 Aug 2017 00:46:57 -0400
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
+	[9.57.199.110])
+	by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v7T4krAS31588552
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 04:46:53 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6A955AE04B
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 00:47:17 -0400 (EDT)
+Received: from zyimindembp.cn.ibm.com (unknown [9.115.193.63])
+	by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP id BB513AE034
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 00:47:16 -0400 (EDT)
+References: <1503907487-2764-1-git-send-email-zyimin@linux.vnet.ibm.com>
+	<1503907487-2764-5-git-send-email-zyimin@linux.vnet.ibm.com>
+	<20170828175722.0b54b59a.cohuck@redhat.com>
+From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Date: Tue, 29 Aug 2017 12:46:51 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20170828175722.0b54b59a.cohuck@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Message-Id: <498a00ca-ea1a-ae09-0772-4a25c729841e@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 29 Aug 2017 04:39:46 -0000
-From: Thomas Huth <1713434@bugs.launchpad.net>
-Reply-To: Bug 1713434 <1713434@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150391152035.18876.7874968547091336063.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150398158648.19648.3433190744010530855.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1713434] Re: prom-env-test test aborted and core
- dumped
+Subject: Re: [Qemu-devel] [PATCH 4/4] s390x/pci: add iommu replay callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,118 +55,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Weird. I managed to run the test on a POWER9 box today, too, and it
-works for me:
 
-TEST: tests/prom-env-test... (pid=3D18912)
-  /ppc64/prom-env/mac99:                                               OK
-  /ppc64/prom-env/g3beige:                                             OK
-  /ppc64/prom-env/pseries:                                             OK
-PASS: tests/prom-env-test
 
-Which OS and C compiler are you using?
-
-Also, could you please try to add this patch (to add "-serial
-/dev/stderr") and then post the console output of the prom-env-test:
-
-diff --git a/tests/prom-env-test.c b/tests/prom-env-test.c
---- a/tests/prom-env-test.c
-+++ b/tests/prom-env-test.c
-@@ -51,7 +51,7 @@ static void test_machine(const void *machine)
-     extra_args =3D strcmp(machine, "pseries") =3D=3D 0 ? "-nodefaults" : "=
-";
- =
-
-     args =3D g_strdup_printf("-M %s,accel=3Dtcg %s -prom-env 'use-nvramrc?=
-=3Dtrue' "
--                           "-prom-env 'nvramrc=3D%x %x l!' ",
-+                           "-prom-env 'nvramrc=3D%x %x l!' -serial /dev/st=
-derr",
-                            (const char *)machine, extra_args, MAGIC, ADDRE=
-SS);
- =
-
-     qtest_start(args);
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1713434
-
-Title:
-  prom-env-test test aborted and core dumped
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  On ppc64le architecture machine the following test case Aborted and
-  Core dumped.
-
-  # tests/prom-env-test --quiet --keep-going -m=3Dquick --GTestLogFD=3D6
-  **
-  ERROR:tests/libqtest.c:628:qtest_get_arch: assertion failed: (qemu !=3D N=
-ULL)
-  Aborted (core dumped)
-
-  Steps to re-produce:
-  clone from the git
-  configure & compile =
-
-  run the unit tests by 'make check'
-
-  (gdb) bt
-  #0  0x00003fff9d60eff0 in raise () from /lib64/libc.so.6
-  #1  0x00003fff9d61136c in abort () from /lib64/libc.so.6
-  #2  0x00003fff9de1aa04 in g_assertion_message () from /lib64/libglib-2.0.=
-so.0
-  #3  0x00003fff9de1ab0c in g_assertion_message_expr () from /lib64/libglib=
--2.0.so.0
-  #4  0x000000001000cc30 in qtest_get_arch () at tests/libqtest.c:628
-  #5  0x00000000100048f0 in main (argc=3D5, argv=3D0x3ffff2145538) at tests=
-/prom-env-test.c:82
-  (gdb) i r
-  r0             0xfa	250
-  r1             0x3ffff2144d30	70368510627120
-  r2             0x3fff9d7b9900	70367091333376
-  r3             0x0	0
-  r4             0x12a7	4775
-  r5             0x6	6
-  r6             0x8	8
-  r7             0x1	1
-  r8             0x0	0
-  r9             0x0	0
-  r10            0x0	0
-  r11            0x0	0
-  r12            0x0	0
-  r13            0x3fff9dfa1950	70367099623760
-  r14            0x0	0
-  r15            0x0	0
-  r16            0x0	0
-  r17            0x0	0
-  r18            0x0	0
-  r19            0x0	0
-  r20            0x0	0
-  r21            0x0	0
-  r22            0x0	0
-  r23            0x0	0
-  r24            0x0	0
-  r25            0x0	0
-  r26            0x0	0
-  r27            0x100287f8	268601336
-  r28            0x16841b40	377756480
-  r29            0x4c	76
-  r30            0x3ffff2144de8	70368510627304
-  r31            0x6	6
-  pc             0x3fff9d60eff0	0x3fff9d60eff0 <raise+96>
-  msr            0x900000000280f033	10376293541503627315
-  cr             0x42000842	1107298370
-  lr             0x3fff9d61136c	0x3fff9d61136c <abort+396>
-  ctr            0x0	0
-  xer            0x0	0
-  orig_r3        0x12a7	4775
-  trap           0xc00	3072
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1713434/+subscriptions
+=E5=9C=A8 2017/8/28 =E4=B8=8B=E5=8D=8811:57, Cornelia Huck =E5=86=99=E9=81=
+=93:
+> On Mon, 28 Aug 2017 10:04:47 +0200
+> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+>
+>> Let's introduce iommu replay callback for s390 pci iommu memory region.
+>> Currently we don't need any dma mapping replay. So let it return
+>> directly. This implementation will avoid meaningless loops calling
+>> translation callback.
+>>
+>> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+>> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+>> ---
+>>   hw/s390x/s390-pci-bus.c | 8 ++++++++
+>>   1 file changed, 8 insertions(+)
+>>
+>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>> index 9e1f7ff5c5..359509ccea 100644
+>> --- a/hw/s390x/s390-pci-bus.c
+>> +++ b/hw/s390x/s390-pci-bus.c
+>> @@ -407,6 +407,13 @@ static IOMMUTLBEntry s390_translate_iommu(IOMMUMe=
+moryRegion *mr, hwaddr addr,
+>>       return ret;
+>>   }
+>>  =20
+>> +static void s390_pci_iommu_replay(IOMMUMemoryRegion *iommu,
+>> +                                  IOMMUNotifier *notifier)
+>> +{
+>> +    /* we don't need iommu replay currently */
+> This really needs to be heavier on the _why_. My guess is that anything
+> which would require replay goes through the rpcit instruction?
+My understanding is:
+Our arch is different from others. Each pci device has its own iommu, not
+like other archs' implementation. So currently there must be no existing
+mappings belonging to any newly plugged pci device whose iommu doesn't
+have any mapping at the time.
+In addition, it's also due to vfio blocking migration. If vfio-pci suppor=
+ts
+migration in future, we could implement iommu replay by that time.
+>
+>> +    return;
+>> +}
+>> +
+>>   static S390PCIIOMMU *s390_pci_get_iommu(S390pciState *s, PCIBus *bus=
+,
+>>                                           int devfn)
+>>   {
+>> @@ -1055,6 +1062,7 @@ static void s390_iommu_memory_region_class_init(=
+ObjectClass *klass, void *data)
+>>       IOMMUMemoryRegionClass *imrc =3D IOMMU_MEMORY_REGION_CLASS(klass=
+);
+>>  =20
+>>       imrc->translate =3D s390_translate_iommu;
+>> +    imrc->replay =3D s390_pci_iommu_replay;
+>>   }
+>>  =20
+>>   static const TypeInfo s390_iommu_memory_region_info =3D {
+>
+>
