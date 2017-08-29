@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dmndP-0005l1-95
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:01:20 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dmneb-0006wV-0l
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:02:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dmndM-0006g4-7s
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:01:19 -0400
-Resent-Message-Id: <E1dmndM-0006g4-7s@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21468)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dmndM-0006fV-1J
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:01:16 -0400
-In-Reply-To: <20170829204759.6853-1-richard.henderson@linaro.org>
-Message-ID: <150404045710.69.14317606263522124620@b5667b65043c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <jsnow@redhat.com>) id 1dmneZ-0007RF-Ps
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:02:32 -0400
+References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
+	<a81c8dfb-3d98-57ad-8159-5147283433fa@virtuozzo.com>
+	<cb783ebb-198e-1814-2f9c-aec93c83b17a@virtuozzo.com>
+	<0988b4ef-56e2-5ce9-ed25-40a742eadbd4@redhat.com>
+	<b0d72a26-2052-ecc6-67f5-d32572804ebf@redhat.com>
+	<cfcca274-9e3b-a9d5-6470-6c8917085da4@redhat.com>
+	<4f3aff4d-7277-3277-985b-27d7e6fdaedd@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <7677b7ae-5518-533e-d8ac-d1f6a2490215@redhat.com>
+Date: Tue, 29 Aug 2017 17:02:20 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 29 Aug 2017 14:00:59 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/8] tcg/s390 improvements
+In-Reply-To: <4f3aff4d-7277-3277-985b-27d7e6fdaedd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Persistent bitmaps for non-qcow2 formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,120 +29,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cohuck@redhat.com, agraf@suse.de
+To: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Qemu-block <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA4MjkyMDQ3NTkuNjg1My0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKU3ViamVjdDog
-W1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzhdIHRjZy9zMzkwIGltcHJvdmVtZW50cwpUeXBlOiBzZXJp
-ZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEK
-dG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAk
-QkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAk
-bi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0
-IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
-YWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQo
-KG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
-bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
-Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAg
-ICBwYXRjaGV3LzIwMTcwODI5MTIyNzQ1LjE0MzA5LTEtc3RlZmFuaGFAcmVkaGF0LmNvbSAtPiBw
-YXRjaGV3LzIwMTcwODI5MTIyNzQ1LjE0MzA5LTEtc3RlZmFuaGFAcmVkaGF0LmNvbQogKiBbbmV3
-IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTcwODI5MjA0NzU5LjY4NTMtMS1yaWNoYXJk
-LmhlbmRlcnNvbkBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxNzA4MjkyMDQ3NTkuNjg1My0xLXJp
-Y2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
-JwplZmNlNTJkMjY3IHRjZy9zMzkwOiBVc2Ugc2xiZ3IgZm9yIHNldGNvbmQgbGUgYW5kIGxldQoz
-NWZhZTJhYTVkIHRjZy9zMzkwOiBVc2UgbG9hZC1vbi1jb25kaXRpb24tMiBmYWNpbGl0eQo5YWUx
-NGU5M2FiIHRjZy9zMzkwOiBVc2UgZGlzdGluY3Qtb3BlcmFuZHMgZmFjaWxpdHkKNjdkNGI3Njdl
-NSB0Y2cvczM5MDogTWVyZ2Ugb3JpK3hvcmkgZmFjaWxpdGllcyBjaGVjayB0byB0Y2dfdGFyZ2V0
-X29wX2RlZgo1YTQ2Y2YyNDhmIHRjZy9zMzkwOiBNZXJnZSBhZGQyaSBmYWNpbGl0aWVzIGNoZWNr
-IHRvIHRjZ190YXJnZXRfb3BfZGVmCmY2NDY2NDZkZDUgdGNnL3MzOTA6IE1lcmdlIG11bGkgZmFj
-aWxpdGllcyBjaGVjayB0byB0Y2dfdGFyZ2V0X29wX2RlZgpjNDY5OGU4N2JiIHRjZy9zMzkwOiBN
-ZXJnZSBjbXBpIGZhY2lsaXRpZXMgY2hlY2sgdG8gdGNnX3RhcmdldF9vcF9kZWYKNGY3NWIzMTgz
-OSB0Y2cvczM5MDogRnVsbHkgY29udmVydCB0Y2dfdGFyZ2V0X29wX2RlZgoKPT09IE9VVFBVVCBC
-RUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS84OiB0Y2cvczM5MDogRnVsbHkgY29udmVydCB0Y2df
-dGFyZ2V0X29wX2RlZi4uLgpDaGVja2luZyBQQVRDSCAyLzg6IHRjZy9zMzkwOiBNZXJnZSBjbXBp
-IGZhY2lsaXRpZXMgY2hlY2sgdG8gdGNnX3RhcmdldF9vcF9kZWYuLi4KRVJST1I6IHJldHVybiBp
-cyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojMTA0OiBGSUxF
-OiB0Y2cvczM5MC90Y2ctdGFyZ2V0LmluYy5jOjIzMDg6CisgICAgICAgIHJldHVybiAoczM5MF9m
-YWNpbGl0aWVzICYgRkFDSUxJVFlfRVhUX0lNTSA/ICZyX3JpIDogJnJfclopOwoKRVJST1I6IHJl
-dHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojMTA3
-OiBGSUxFOiB0Y2cvczM5MC90Y2ctdGFyZ2V0LmluYy5jOjIzMTA6CisgICAgICAgIHJldHVybiAo
-czM5MF9mYWNpbGl0aWVzICYgRkFDSUxJVFlfRVhUX0lNTSA/ICZyX3JDIDogJnJfclopOwoKRVJS
-T1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJl
-ZAojMTIyOiBGSUxFOiB0Y2cvczM5MC90Y2ctdGFyZ2V0LmluYy5jOjIzNjA6CisgICAgICAgICAg
-ICByZXR1cm4gKHMzOTBfZmFjaWxpdGllcyAmIEZBQ0lMSVRZX0VYVF9JTU0gPyAmc2V0Y19jIDog
-JnNldGNfeik7CgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBh
-cmUgbm90IHJlcXVpcmVkCiMxMzQ6IEZJTEU6IHRjZy9zMzkwL3RjZy10YXJnZXQuaW5jLmM6MjM3
-MDoKKyAgICAgICAgICAgIHJldHVybiAoczM5MF9mYWNpbGl0aWVzICYgRkFDSUxJVFlfRVhUX0lN
-TSA/ICZtb3ZjX2MgOiAmbW92Y196KTsKCnRvdGFsOiA0IGVycm9ycywgMCB3YXJuaW5ncywgMTE4
-IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNo
-ZWNraW5nIFBBVENIIDMvODogdGNnL3MzOTA6IE1lcmdlIG11bGkgZmFjaWxpdGllcyBjaGVjayB0
-byB0Y2dfdGFyZ2V0X29wX2RlZi4uLgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBw
-YXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiM4NzogRklMRTogdGNnL3MzOTAvdGNnLXRhcmdl
-dC5pbmMuYzoyMjgxOgorICAgICAgICByZXR1cm4gKHMzOTBfZmFjaWxpdGllcyAmIEZBQ0lMSVRZ
-X0dFTl9JTlNUX0VYVCA/ICZyXzBfcmkgOiAmcl8wX3JJKTsKCkVSUk9SOiByZXR1cm4gaXMgbm90
-IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzkwOiBGSUxFOiB0Y2cv
-czM5MC90Y2ctdGFyZ2V0LmluYy5jOjIyODM6CisgICAgICAgIHJldHVybiAoczM5MF9mYWNpbGl0
-aWVzICYgRkFDSUxJVFlfR0VOX0lOU1RfRVhUID8gJnJfMF9ySiA6ICZyXzBfckkpOwoKdG90YWw6
-IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA3NyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0Lzg6IHRjZy9zMzkwOiBNZXJn
-ZSBhZGQyaSBmYWNpbGl0aWVzIGNoZWNrIHRvIHRjZ190YXJnZXRfb3BfZGVmLi4uCkVSUk9SOiBy
-ZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzg0
-OiBGSUxFOiB0Y2cvczM5MC90Y2ctdGFyZ2V0LmluYy5jOjIzODc6CisgICAgICAgIHJldHVybiAo
-czM5MF9mYWNpbGl0aWVzICYgRkFDSUxJVFlfRVhUX0lNTSA/ICZhMl9yaSA6ICZhMl9yKTsKCkVS
-Uk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWly
-ZWQKIzkyOiBGSUxFOiB0Y2cvczM5MC90Y2ctdGFyZ2V0LmluYy5jOjIzOTA6CisgICAgICAgIHJl
-dHVybiAoczM5MF9mYWNpbGl0aWVzICYgRkFDSUxJVFlfRVhUX0lNTSA/ICZhMl9yQSA6ICZhMl9y
-KTsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgNzcgbGluZXMgY2hlY2tlZAoKWW91ciBw
-YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNS84OiB0Y2cv
-czM5MDogTWVyZ2Ugb3JpK3hvcmkgZmFjaWxpdGllcyBjaGVjayB0byB0Y2dfdGFyZ2V0X29wX2Rl
-Zi4uLgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90
-IHJlcXVpcmVkCiMxNDA6IEZJTEU6IHRjZy9zMzkwL3RjZy10YXJnZXQuaW5jLmM6MjIyOToKKyAg
-ICAgICAgcmV0dXJuIChzMzkwX2ZhY2lsaXRpZXMgJiBGQUNJTElUWV9FWFRfSU1NCgpFUlJPUjog
-cmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiMx
-NDU6IEZJTEU6IHRjZy9zMzkwL3RjZy10YXJnZXQuaW5jLmM6MjIzMzoKKyAgICAgICAgcmV0dXJu
-IChzMzkwX2ZhY2lsaXRpZXMgJiBGQUNJTElUWV9FWFRfSU1NCgpFUlJPUjogcmV0dXJuIGlzIG5v
-dCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiMxNTI6IEZJTEU6IHRj
-Zy9zMzkwL3RjZy10YXJnZXQuaW5jLmM6MjI0MDoKKyAgICAgICAgcmV0dXJuIChzMzkwX2ZhY2ls
-aXRpZXMgJiBGQUNJTElUWV9FWFRfSU1NCgpFUlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9u
-LCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiMxNTc6IEZJTEU6IHRjZy9zMzkwL3RjZy10
-YXJnZXQuaW5jLmM6MjI0NDoKKyAgICAgICAgcmV0dXJuIChzMzkwX2ZhY2lsaXRpZXMgJiBGQUNJ
-TElUWV9FWFRfSU1NCgp0b3RhbDogNCBlcnJvcnMsIDAgd2FybmluZ3MsIDE0NCBsaW5lcyBjaGVj
-a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
-SCA2Lzg6IHRjZy9zMzkwOiBVc2UgZGlzdGluY3Qtb3BlcmFuZHMgZmFjaWxpdHkuLi4KRVJST1I6
-IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAoj
-MjUxOiBGSUxFOiB0Y2cvczM5MC90Y2ctdGFyZ2V0LmluYy5jOjIyNzY6CisgICAgICAgIHJldHVy
-biAoczM5MF9mYWNpbGl0aWVzICYgRkFDSUxJVFlfRElTVElOQ1RfT1BTID8gJnJfcl9yaSA6ICZy
-XzBfcmkpOwoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFyZW50aGVzZXMgYXJl
-IG5vdCByZXF1aXJlZAojMjg0OiBGSUxFOiB0Y2cvczM5MC90Y2ctdGFyZ2V0LmluYy5jOjIzMTI6
-CisgICAgICAgIHJldHVybiAoczM5MF9mYWNpbGl0aWVzICYgRkFDSUxJVFlfRElTVElOQ1RfT1BT
-ID8gJnJfcl9yaSA6ICZyXzBfcmkpOwoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwg
-cGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojMjkwOiBGSUxFOiB0Y2cvczM5MC90Y2ctdGFy
-Z2V0LmluYy5jOjIzMTc6CisgICAgICAgIHJldHVybiAoczM5MF9mYWNpbGl0aWVzICYgRkFDSUxJ
-VFlfRElTVElOQ1RfT1BTID8gJnJfcl9yaSA6ICZyXzBfcmkpOwoKdG90YWw6IDMgZXJyb3JzLCAw
-IHdhcm5pbmdzLCAyNjMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNy84OiB0Y2cvczM5MDogVXNlIGxvYWQtb24tY29u
-ZGl0aW9uLTIgZmFjaWxpdHkuLi4KRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwgcGFy
-ZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojMTg4OiBGSUxFOiB0Y2cvczM5MC90Y2ctdGFyZ2V0
-LmluYy5jOjI0MzY6CisgICAgICAgICAgICByZXR1cm4gKHMzOTBfZmFjaWxpdGllcyAmIEZBQ0lM
-SVRZX0VYVF9JTU0KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTY0IGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
-IDgvODogdGNnL3MzOTA6IFVzZSBzbGJnciBmb3Igc2V0Y29uZCBsZSBhbmQgbGV1Li4uCj09PSBP
-VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1h
-aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMu
-b3Jn
+
+
+On 08/29/2017 10:30 AM, Eric Blake wrote:
+> On 08/28/2017 08:18 PM, John Snow wrote:
+>>>> We'd have to develop a new syntax for specifying these resources that
+>>>> can be stored in a qcow2 file,
+>>>
+>>> It's called the json-pseudo-protocol and was developed exactly for this.
+>>>
+>>
+>> That's what I was hinting at for "or otherwise co-opt an existing
+>> syntax" but I was unaware that it was intended for "exactly" this.
+>>
+>> Do we actually use it in any on-disk format, currently? qcow2 only lets
+>> you specify simple filenames in the qcow2 metadata, right?
+> 
+> You can specify json-pseudo backing names both on the command line AND
+> embedded in the qcow2 file itself (within the length limits imposed by
+> the qcow2 header size).  Yes, this means it is already possible to
+> create qcow2 files that can only be opened by qemu (or else teaching
+> your alternative program how to parse qemu's json-pseudo-protocol).
+> 
+>>
+>>>>                                or otherwise co-opt an existing syntax
+>>>> in-use by QEMU. This syntax would likely be useful only to QEMU, which
+>>>> would steer the qcow2 format in a direction not too useful by other
+>>>> emulators, and qcow2 is an open format, so we may want to avoid this.
+>>>
+>>> Storing a file name in the backing link field that cannot be interpreted
+>>> by other programs is in my opinion still very much better than not
+>>> storing any information whatsoever, because in the former case other
+>>> programs can at least say "sorry, I have no idea what this means" (or
+>>> maybe they can indeed interpret it, who knows), whereas in the latter
+>>> they may not even know that the qcow2 image is incomplete.
+>>>
+>>
+>> I don't disagree personally, but I seem to recall that Kevin was adamant
+>> that the qcow2 bitmap extension should remain useful and semantically
+>> meaningful to third parties, so I try to keep that in mind. Maybe I
+>> should let him chime in instead of try to "concern troll" my own
+>> suggestions into the ground.
+> 
+> We already have that situation today, but you are right to worry about
+> whether making it even more prevalent is something we can try to minimize.
+> 
+
+Proposal distillate:
+
+(1) Specify relationship on CLI, QCOW becomes a bitmap-child of any
+arbitrary node.
+
+Pros: Easy to implement
+      Adds bitmap support to literally everything
+Cons: Bitmap has no semantic link to data it describes
+      Relationship must be re-specified every launch
+      Max and Kevin are firmly NACK
+
+(2) Raw file becomes a R/W backing file of the QCOW2, implemented as
+either a bitmap-child or a more traditional backing file that can
+additionally service writes
+
+Pros: Easy to understand
+      relationship between files exists outside of the QEMU process
+      Adds bitmap support to just about everything that can be expressed
+via JSON
+Cons: All but necessitates QEMU-specific syntax in a qcow2 file
+      Depending on implementation, possibly messy in bdrv_open
+      Adding bitmaps to non-qcow2 files after open makes the launch CLI
+invalid for future launches (Not any different to snapshots.)
+
+(3) Add a raw-like mapping mode to QCOW2 instead, skipping the whole affair
+
+Pros: Adds a nice, performant hybrid mode to qcow2
+      Solves the problem of "bitmaps for raw" more or less
+      Avoids bdrv_open() complications
+      Avoids writing qemu-specific jargon in qcow2 files
+Cons: Doesn't actually add arbitrary bitmaps to any file format
+      Users are still gonna ask for bitmaps for other formats anyway
+
+
+
+I think I like 2 or 3 -- or perhaps indeed two AND three. The qcow2-raw
+mode sounds like something we ought to have anyway. I'll try to start an
+RFC.
+
+--js
