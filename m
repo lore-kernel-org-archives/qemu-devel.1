@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dmhN4-0007v2-Do
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:20:03 -0400
+	(envelope-from <berrange@redhat.com>) id 1dmhNr-0008U3-B3
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:20:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dmhN1-0002a1-3i
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:20:02 -0400
-Date: Tue, 29 Aug 2017 15:19:54 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170829141954.GA18927@stefanha-x1.localdomain>
-References: <20170829090622.30843-1-kchamart@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1dmhNh-0002w2-O7
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:20:51 -0400
+Date: Tue, 29 Aug 2017 15:20:36 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170829142036.GD25801@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170828113737.12199-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170829090622.30843-1-kchamart@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] qemu-iotests: Extend
- non-shared storage migration test (194)
+In-Reply-To: <20170828113737.12199-1-f4bug@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tests: fix incorrect size_t format in
+ benchmark-crypto
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,134 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, dgilbert@redhat.com, stefanha@redhat.com
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Longpeng <longpeng2@huawei.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On Tue, Aug 29, 2017 at 11:06:22AM +0200, Kashyap Chamarthy wrote:
-> This is the follow-up patch that was discussed[*] as part of feedback to
-> qemu-iotest 194.
-> 
-> Changes in this patch:
-> 
->   - Supply 'job-id' parameter to `drive-mirror` invocation.
-> 
->   - Issue QMP `block-job-cancel` command on the source QEMU to
->     gracefully complete `drive-mirror` operation.
-> 
->   - Stop the NBD server on the destination QEMU.
-> 
->   - Finally, check for both the events: MIGRATION and
->     BLOCK_JOB_COMPLETED
-> 
-> With the above, the test will also be (almost) in sync with the
-> procedure outlined in the document 'live-block-operations.rst'[+]
-> (section: "QMP invocation for live storage migration with
-> ``drive-mirror`` + NBD").
-> 
-> [*] https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg04820.html
->     -- qemu-iotests: add 194 non-shared storage migration test
-> [+] https://git.qemu.org/gitweb.cgi?p=qemu.git;a=blob;f=docs/interop/live-block-operations.rst
-> 
-> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+On Mon, Aug 28, 2017 at 08:37:37AM -0300, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+>   $ make check-speed
+>   tests/benchmark-crypto-hash.c: In function 'test_hash_speed':
+>   tests/benchmark-crypto-hash.c:44:5: error: format '%ld' expects argum=
+ent of type 'long int', but argument 2 has type 'size_t' [-Werror=3Dforma=
+t=3D]
+>        g_print("Testing chunk_size %ld bytes ", chunk_size);
+>        ^
+>   tests/benchmark-crypto-hash.c: In function 'main':
+>   tests/benchmark-crypto-hash.c:62:9: error: format '%lu' expects argum=
+ent of type 'long unsigned int', but argument 4 has type 'size_t' [-Werro=
+r=3Dformat=3D]
+>            snprintf(name, sizeof(name), "/crypto/hash/speed-%lu", i);
+>            ^
+>   cc1: all warnings being treated as errors
+>   rules.mak:66: recipe for target 'tests/benchmark-crypto-hash.o' faile=
+d
+>   make: *** [tests/benchmark-crypto-hash.o] Error 1
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
-> Changes in v2:
->  - Check for both the events: MIGRATION and BLOCK_JOB_COMPLETED (Eric)
-> ---
->  tests/qemu-iotests/194     | 25 +++++++++++++++++++------
->  tests/qemu-iotests/194.out | 11 ++++++++---
->  2 files changed, 27 insertions(+), 9 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
-> index 8028111e21bed5cf4a2e8e32dc04aa5a9ea9caca..9d81189fe3e790d060da5a0fd41836f4b57f95c7 100755
-> --- a/tests/qemu-iotests/194
-> +++ b/tests/qemu-iotests/194
-> @@ -46,16 +46,17 @@ iotests.log('Launching NBD server on destination...')
->  iotests.log(dest_vm.qmp('nbd-server-start', addr={'type': 'unix', 'data': {'path': nbd_sock_path}}))
->  iotests.log(dest_vm.qmp('nbd-server-add', device='drive0', writable=True))
->  
-> -iotests.log('Starting drive-mirror on source...')
-> +iotests.log('Starting `drive-mirror` on source...')
->  iotests.log(source_vm.qmp(
->                'drive-mirror',
->                device='drive0',
->                target='nbd+unix:///drive0?socket={0}'.format(nbd_sock_path),
->                sync='full',
->                format='raw', # always raw, the server handles the format
-> -              mode='existing'))
-> +              mode='existing',
-> +              job_id='mirror-job0'))
->  
-> -iotests.log('Waiting for drive-mirror to complete...')
-> +iotests.log('Waiting for `drive-mirror` to complete...')
->  iotests.log(source_vm.event_wait('BLOCK_JOB_READY'),
->              filters=[iotests.filter_qmp_event])
->  
-> @@ -66,8 +67,20 @@ dest_vm.qmp('migrate-set-capabilities',
->              capabilities=[{'capability': 'events', 'state': True}])
->  iotests.log(source_vm.qmp('migrate', uri='unix:{0}'.format(migration_sock_path)))
->  
-> +iotests.log('Gracefully ending the `drive-mirror` job on source...')
-> +iotests.log(source_vm.qmp('block-job-cancel', device='mirror-job0'))
+> testing v2.10.0-rc4
+>=20
+>  tests/benchmark-crypto-cipher.c | 4 ++--
+>  tests/benchmark-crypto-hash.c   | 4 ++--
+>  tests/benchmark-crypto-hmac.c   | 4 ++--
+>  3 files changed, 6 insertions(+), 6 deletions(-)
 
-Two issues:
+Thanks, added to my crypto queue, unless it merges through -trivial
+first.
 
-1. Migration may not have completed yet so drive-mirror cannot be
-   stopped here.  We need to wait for migration to complete on the
-   source before cancelling the block job.
 
-2. block-job-cancel is asynchronous.  The block job may still be running
-   after this returns.  Therefore it may still be using the NBD drive...
-
-> +
-> +iotests.log('Stopping the NBD server on destination...')
-> +iotests.log(dest_vm.qmp('nbd-server-stop'))
-
-...and that races with this command on the destination.
-
-We need to wait for the BLOCK_JOB_CANCELLED/COMPLETED event on the
-source QEMU before stopping the NBD server on the destination.
-
-> +
->  while True:
-> -    event = source_vm.event_wait('MIGRATION')
-> -    iotests.log(event, filters=[iotests.filter_qmp_event])
-> -    if event['data']['status'] in ('completed', 'failed'):
-> +    event1 = source_vm.event_wait('MIGRATION')
-> +    iotests.log(event1, filters=[iotests.filter_qmp_event])
-> +    if event1['data']['status'] in ('completed', 'failed'):
-> +        break
-> +
-> +while True:
-> +    event2 = source_vm.event_wait('BLOCK_JOB_COMPLETED')
-> +    iotests.log(event2, filters=[iotests.filter_qmp_event])
-> +    if event2['event'] == 'BLOCK_JOB_COMPLETED':
->          break
-> diff --git a/tests/qemu-iotests/194.out b/tests/qemu-iotests/194.out
-> index ae501fecacb706b1851cb9063ce9c9d5a28bb7ea..a461d7e21abb2dee54d72d93d644100f9fbcb17d 100644
-> --- a/tests/qemu-iotests/194.out
-> +++ b/tests/qemu-iotests/194.out
-> @@ -2,12 +2,17 @@ Launching VMs...
->  Launching NBD server on destination...
->  {u'return': {}}
->  {u'return': {}}
-> -Starting drive-mirror on source...
-> +Starting `drive-mirror` on source...
->  {u'return': {}}
-> -Waiting for drive-mirror to complete...
-> -{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'drive0', u'type': u'mirror', u'speed': 0, u'len': 1073741824, u'offset': 1073741824}, u'event': u'BLOCK_JOB_READY'}
-> +Waiting for `drive-mirror` to complete...
-> +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'mirror-job0', u'type': u'mirror', u'speed': 0, u'len': 1073741824, u'offset': 1073741824}, u'event': u'BLOCK_JOB_READY'}
->  Starting migration...
->  {u'return': {}}
-> +Gracefully ending the `drive-mirror` job on source...
-> +{u'return': {}}
-> +Stopping the NBD server on destination...
-> +{u'return': {}}
->  {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'setup'}, u'event': u'MIGRATION'}
->  {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'active'}, u'event': u'MIGRATION'}
->  {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'completed'}, u'event': u'MIGRATION'}
-> +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'mirror-job0', u'type': u'mirror', u'speed': 0, u'len': 1073741824, u'offset': 1073741824}, u'event': u'BLOCK_JOB_COMPLETED'}
-> -- 
-> 2.9.5
-> 
-> 
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
