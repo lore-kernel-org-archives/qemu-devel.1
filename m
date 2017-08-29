@@ -1,33 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dme2B-0001A8-Pv
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 06:46:16 -0400
+	(envelope-from <famz@redhat.com>) id 1dme3P-0001pv-4O
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 06:47:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dme26-0001xu-VO
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 06:46:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60728)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dme26-0001wC-Ob
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 06:46:10 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1E8634A70E
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 10:46:09 +0000 (UTC)
-Date: Tue, 29 Aug 2017 06:46:06 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <2066977778.5222442.1504003566828.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20170829104254.GF3783@redhat.com>
-References: <20170727154126.11339-1-marcandre.lureau@redhat.com>
-	<20170727154126.11339-17-marcandre.lureau@redhat.com>
-	<87d17ur7y1.fsf@dusky.pond.sub.org>
-	<20170829104254.GF3783@redhat.com>
+	(envelope-from <famz@redhat.com>) id 1dme3O-0002UE-8s
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 06:47:31 -0400
+Date: Tue, 29 Aug 2017 18:47:26 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170829104726.GB8146@lemon>
+References: <1503985539-7205-1-git-send-email-s1seetee@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 16/26] qapi: add conditions to VNC
- type/commands/events on the schema
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1503985539-7205-1-git-send-email-s1seetee@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4] vl: exit if maxcpus is negative
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,36 +22,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com
 
-Hi
+On Tue, 08/29 11:15, Seeteena Thoufeek wrote:
+> ---Steps to Reproduce---
+> 
+> When passed a negative number to 'maxcpus' parameter, Qemu aborts
+> with a core dump.
+> 
+> Run the following command with maxcpus argument as negative number
+> 
+> ppc64-softmmu/qemu-system-ppc64 --nographic -vga none -machine
+> pseries,accel=kvm,kvm-type=HV -m size=200g -device virtio-blk-pci,
+> drive=rootdisk -drive file=/home/images/pegas-1.0-ppc64le.qcow2,
+> if=none,cache=none,id=rootdisk,format=qcow2 -monitor telnet
+> :127.0.0.1:1234,server,nowait -net nic,model=virtio -net
+> user -redir tcp:2000::22 -device nec-usb-xhci -smp 8,cores=1,
+> threads=1,maxcpus=-12
+> 
+> (process:12149): GLib-ERROR **: gmem.c:130: failed to allocate
+>  18446744073709550568 bytes
+> 
+> Trace/breakpoint trap
+> 
+> Reported-by: R.Nageswara Sastry <rnsastry@linux.vnet.ibm.com>
+> Signed-off-by: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
+> ---
+> v1 -> v2:
+>   - Fix the error check in vl.c to make it generic.
+> v2 -> v3:
+>   - Fix coding style pointed out by patchew.
+>   - Fix check for "<= 0" instead of just "< 0".
+> v3 -> v4:
+>   - Fix subject line.
+>   - Removed space before ":" from vl.c:1248
+>   - Removed Reviewed-by: flag.
+> ---
+>  vl.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/vl.c b/vl.c
+> index 8e247cc..2d9e73d 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1244,7 +1244,10 @@ static void smp_parse(QemuOpts *opts)
+>          }
+>  
+>          max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus);
+> -
+> +        if (max_cpus <= 0) {
+> +            error_report("Invalid max_cpus: %d", max_cpus);
+> +            exit(1);
+> +        }
+>          if (max_cpus < cpus) {
+>              error_report("maxcpus must be equal to or greater than smp");
+>              exit(1);
+> -- 
+> 1.8.3.1
+> 
+> 
 
------ Original Message -----
-> On Thu, Aug 17, 2017 at 09:04:38AM +0200, Markus Armbruster wrote:
-> > Copying our resident VNC maintainer^Wodd fixer Gerd.
-> > 
-> > Also copying Dan for QCryptoCipherAlgorithm.
-> > 
-> > Gerd, Dan, this patch is about making VNC support visible in
-> > query-qmp-schema, by having the QAPI generators generate suitable
-> > ifdeffery.  Bonus: no need for QMP command stubs for
-> > !defined(CONFIG_VNC).
-> 
-> [snip]
-> 
-> > * QCryptoCipherAlgorithm
-> > 
-> >   This:
-> >  
-> >     # @des-rfb: RFB specific variant of single DES. Do not use except in
-> >     VNC.
-> > 
-> >   I guess we could compile this out if we wanted to.  I doubt we do, but
-> >   Dan might have other ideas.
-> 
-> It isn't worth the effort to make that conditionally compiled. We getting
-> DES from nettle/gcrypt these days, instead of our custom in-tree desrfb.c
-> file, so its no burden to have it.
-
-fyi, the last iteration of the patch made it conditional too.
+Reviewed-by: Fam Zheng <famz@redhat.com>
