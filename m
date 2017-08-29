@@ -1,38 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dmjT4-0001YG-Pl
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:34:23 -0400
+	(envelope-from <berrange@redhat.com>) id 1dmjTI-0001hw-R2
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:34:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dmjT0-0000zQ-PJ
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:34:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46496)
+	(envelope-from <berrange@redhat.com>) id 1dmjTE-000156-U3
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:34:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43520)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dmjT0-0000yw-HA
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:34:18 -0400
-References: <20170816082650.21880-1-cohuck@redhat.com>
-	<223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
-	<CAFEAcA_UfM_XNKdc5zfHsehoRE6Q+EszRZX3FByskir7c+0Lww@mail.gmail.com>
-	<20170822010917.GO12356@umbus.fritz.box>
-	<CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
-	<3f0dc918-0f55-e2f4-bf47-fe4abf5453bb@redhat.com>
-	<CAFEAcA_ezKWweEuUB-cXTer0LLaeuiGDkSdfhApedhw4ykDT0Q@mail.gmail.com>
-	<20170822112046.GC12356@umbus.fritz.box>
-	<20170822134815.77020eb8.cohuck@redhat.com>
-	<20170823002907.GC5379@umbus.fritz.box>
-	<20170823091650.48e7c44e.cohuck@redhat.com>
-	<54526d47-b436-79d5-7a38-9516eaa727a6@redhat.com>
-	<5b0ff74a-08d6-558d-4c79-a93758e6302a@redhat.com>
-	<0bb344a3-f8f8-3365-cef1-1c68cf7d160d@redhat.com>
-	<20170823142047.366068f7.cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c4c9776a-4284-796d-2439-42ad89015098@redhat.com>
-Date: Tue, 29 Aug 2017 18:34:08 +0200
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dmjTE-00014k-NM
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:34:32 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A941F7E42F
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 16:34:31 +0000 (UTC)
+Date: Tue, 29 Aug 2017 17:34:27 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170829163427.GG25801@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170829162727.13081-1-berrange@redhat.com>
+	<a51f6738-f858-1ea2-ec08-eb68339eff90@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170823142047.366068f7.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] make check speed
+Content-Disposition: inline
+In-Reply-To: <a51f6738-f858-1ea2-ec08-eb68339eff90@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] crypto: fix test cert generation to not
+ use SHA1 algorithm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,47 +35,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 23.08.2017 14:20, Cornelia Huck wrote:
-> On Wed, 23 Aug 2017 10:35:43 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
+On Tue, Aug 29, 2017 at 11:31:24AM -0500, Eric Blake wrote:
+> On 08/29/2017 11:27 AM, Daniel P. Berrange wrote:
+> > GNUTLS 3.6.0 marked SHA1 as untrusted for certificates.
+> > Unfortunately the gnutls_x509_crt_sign() method we are
+> > using to create certificates in the test suite is fixed
+> > to always use SHA1. We must switch to a different method
+> > and explicitly ask for SHA256.
+> > 
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > ---
+> >  tests/crypto-tls-x509-helpers.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/tests/crypto-tls-x509-helpers.c b/tests/crypto-tls-x509-helpers.c
+> > index 64073d3bd3..173d4e28fb 100644
+> > --- a/tests/crypto-tls-x509-helpers.c
+> > +++ b/tests/crypto-tls-x509-helpers.c
+> > @@ -406,7 +406,8 @@ test_tls_generate_cert(QCryptoTLSTestCertReq *req,
+> >       * If no 'ca' is set then we are self signing
+> >       * the cert. This is done for the root CA certs
+> >       */
+> > -    err = gnutls_x509_crt_sign(crt, ca ? ca : crt, privkey);
+> > +    err = gnutls_x509_crt_sign2(crt, ca ? ca : crt, privkey,
+> > +                                GNUTLS_DIG_SHA256, 0);
 > 
->> True. And I just learned that you can also already set the SPEED
->> variable to either "quick" or "slow" and that we're already using
->> g_test_quick() and g_test_slow() in a couple of places to check this. So
->> the framework for running quick vs. thorough tests is already there ...
->> we just might want to add this to some more tests, I guess...
->>
->> Question for the maintainers and the test automation folks: Is anybody
->> already running "make check SPEED=slow" or is this just rather an
->> unheard-of way of running the tests?
-> 
-> So I tried this on master just for fun, and 'make V=1 SPEED=slow
-> check-qtest-x86_64' promptly failed for some ivshmem test.
-> 
-> On x86_86:
-> TEST: tests/ivshmem-test... (pid=3672)
->   /x86_64/ivshmem/single:                                              OK
->   /x86_64/ivshmem/hotplug:                                             OK
->   /x86_64/ivshmem/memdev:                                              OK
->   /x86_64/ivshmem/pair:                                                OK
->   /x86_64/ivshmem/server-msi:                                          **
-> ERROR:/home/cohuck/git/qemu/tests/ivshmem-test.c:367:test_ivshmem_server: assertion failed (ret == 0): (1 == 0)
-> FAIL
-> GTester: last random seed: R02Scde8fd6835fdf17450c73e2f74f25007
-> (pid=3697)
->  /x86_64/ivshmem/server-irq:                                          OK
-> FAIL: tests/ivshmem-test
+> Is _sign2() available on all the older versions of gnutls that we must
+> support, or do we need this to be a conditional compilation?
 
-Bisecting this problem automatically ("git bisect run" rules!) revealed
-that this test broke with this commit:
+It dates to gnutls 1.2.0 from 2005, so we're fine even if using RHEL5
+vintage :-)
 
-	commit b4ba67d9a702507793c2724e56f98e9b0f7be02b
-	Author: David Gibson <david@gibson.dropbear.id.au>
-	Title: libqos: Change PCI accessors to take opaque BAR handle
-
-David, any ideas what's going wrong here?
-
- Thomas
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
