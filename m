@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dmjbm-0007sl-Fe
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:43:23 -0400
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dmjcD-0008DW-OF
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:43:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dmjbi-00060z-Fq
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:43:22 -0400
-Date: Tue, 29 Aug 2017 17:43:14 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170829164314.GB18927@stefanha-x1.localdomain>
-References: <cover.1503580370.git.berto@igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1503580370.git.berto@igalia.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] Misc throttle fixes
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dmjc9-0006D2-PW
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:43:49 -0400
+Received: from research.iiit.ac.in ([196.12.53.8]:43436)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dmjc9-0006BO-4T
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:43:45 -0400
+From: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+Date: Tue, 29 Aug 2017 22:13:36 +0530
+Message-Id: <1504025019-16820-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+Subject: [Qemu-devel] [PATCH v2 0/3] QEMU Backup Tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,68 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, Manos Pitsidianakis <el13635@mail.ntua.gr>
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, jsnow@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 
-On Thu, Aug 24, 2017 at 04:24:42PM +0300, Alberto Garcia wrote:
-> Hi,
-> 
-> here's the new version of my patch series with misc fixes for the
-> throttling code.
-> 
-> Stefan, once this is reviewed, can you please remove the "Make
-> LeakyBucket.avg and LeakyBucket.max integer types" commit (id
-> 218f470639117a8e39) from your block-next branch? This series contains
-> a new version of that patch that replaces the one that you have.
-> 
-> v2:
-> - Patch 3: Make the code a bit more concise
-> - Patch 5: LeakyBucket.avg and LeakyBucket.max are now unsigned
-> - Patch 6: Make burst_length 64bit and check its range
-> - Patch 7: Add unit tests
-> 
-> v1: https://lists.gnu.org/archive/html/qemu-block/2017-08/msg00753.html
-> - Initial version
-> 
-> Output of backport-diff against v1:
-> 
-> Key:
-> [----] : patches are identical
-> [####] : number of functional differences between upstream/downstream patch
-> [down] : patch is downstream-only
-> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-> 
-> 001/7:[----] [--] 'throttle: Fix wrong variable name in the header documentation'
-> 002/7:[----] [--] 'throttle: Update the throttle_fix_bucket() documentation'
-> 003/7:[down] 'throttle: Make throttle_is_valid() a bit less verbose'
-> 004/7:[----] [--] 'throttle: Remove throttle_fix_bucket() / throttle_unfix_bucket()'
-> 005/7:[0010] [FC] 'throttle: Make LeakyBucket.avg and LeakyBucket.max integer types'
-> 006/7:[down] 'throttle: Make burst_length 64bit and add range checks'
-> 007/7:[down] 'throttle: Test the valid range of config values'
-> 
-> Alberto Garcia (7):
->   throttle: Fix wrong variable name in the header documentation
->   throttle: Update the throttle_fix_bucket() documentation
->   throttle: Make throttle_is_valid() a bit less verbose
->   throttle: Remove throttle_fix_bucket() / throttle_unfix_bucket()
->   throttle: Make LeakyBucket.avg and LeakyBucket.max integer types
->   throttle: Make burst_length 64bit and add range checks
->   throttle: Test the valid range of config values
-> 
->  include/qemu/throttle.h |  8 ++---
->  tests/test-throttle.c   | 80 ++++++++++++++++++++++++++++++++++++++++++++-
->  util/throttle.c         | 86 +++++++++++++++++++------------------------------
->  3 files changed, 117 insertions(+), 57 deletions(-)
-> 
-> -- 
-> 2.11.0
-> 
-> 
+This patch series is intended to introduce QEMU Backup tool.
+qemu-backup will be a command-line tool for performing full and
+incremental disk backups on running VMs. It is intended as a
+reference implementation for management stack and backup developers
+to see QEMU's backup features in action.
+This patch series contains three patches,
+               1) QEMU Backup command line tool.
+               2) Test for full backup.
+               3) Manpage for the tool.
 
-I have dropped the previous "Make LeakyBucket.avg and LeakyBucket.max
-integer types" commit and merged this series instead.
+Ishani Chugh (3):
+  backup: QEMU Backup Tool
+  Test for full Backup
+  Add manpage for QEMU Backup Tool
 
-Thanks, applied to my block-next tree:
-https://github.com/stefanha/qemu/commits/block-next
+ Makefile                        |  14 +-
+ contrib/backup/qemu-backup.py   | 335 ++++++++++++++++++++++++++++++++++++++++
+ contrib/backup/qemu-backup.texi | 144 +++++++++++++++++
+ tests/qemu-iotests/191          |  86 +++++++++++
+ tests/qemu-iotests/191.out      |  35 +++++
+ tests/qemu-iotests/group        |   2 +
+ 6 files changed, 612 insertions(+), 4 deletions(-)
+ create mode 100644 contrib/backup/qemu-backup.py
+ create mode 100644 contrib/backup/qemu-backup.texi
+ create mode 100755 tests/qemu-iotests/191
+ create mode 100644 tests/qemu-iotests/191.out
 
-Stefan
+-- 
+2.7.4
