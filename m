@@ -1,43 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dmbyH-0007Ft-2o
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:34:06 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dmcFE-00037v-GH
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:51:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dmbyD-0001SF-T6
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:34:05 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37729)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
-	id 1dmbyD-0001Rt-LE
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:34:01 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7T8UC8e078968
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 04:34:00 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cn3jeuw7p-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 04:33:59 -0400
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
-	Tue, 29 Aug 2017 02:33:58 -0600
-References: <1503907487-2764-1-git-send-email-zyimin@linux.vnet.ibm.com>
-	<1503907487-2764-2-git-send-email-zyimin@linux.vnet.ibm.com>
-	<20170828165122.041b62b2.cohuck@redhat.com>
-	<aac61d9b-4d56-2fd1-b35b-407f17cf9bd4@linux.vnet.ibm.com>
-	<20170829100025.639b0ebb.cohuck@redhat.com>
-	<2b9494d6-c2d4-5a3f-b8f8-62b63ef42e2c@linux.vnet.ibm.com>
-	<20170829102241.1274cf84.cohuck@redhat.com>
-From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Date: Tue, 29 Aug 2017 16:33:52 +0800
+	(envelope-from <stefanha@gmail.com>) id 1dmcFB-0000e8-E7
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:51:36 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:34120)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dmcFB-0000dj-7n
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:51:33 -0400
+Received: by mail-wm0-x231.google.com with SMTP id f13so18416187wme.1
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 01:51:31 -0700 (PDT)
+Date: Tue, 29 Aug 2017 09:51:28 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170829085128.GA25960@stefanha-x1.localdomain>
+References: <20170828145728.dqubknb7fruy4sfu@postretch>
 MIME-Version: 1.0
-In-Reply-To: <20170829102241.1274cf84.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <9ff42cd0-8767-5f6b-8291-3d1520f59551@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/4] s390x/pci: fixup trap_msix()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170828145728.dqubknb7fruy4sfu@postretch>
+Subject: Re: [Qemu-devel] GSOC Report: Moving I/O throttling and write
+ notifiers into block filter drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,94 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, richard.henderson@linaro.org
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
+On Mon, Aug 28, 2017 at 05:57:28PM +0300, Manos Pitsidianakis wrote:
+> Branches / Patches
+> ==================
+> 
+> The 'throttle' and 'throttle-remove-legacy' patches should be merged soon
+> after master unfreezes from the 2.10 release. The rest of the patch series
+> are in final stages of review on qemu-devel except for block-insert-node
+> which is an RFC [5].
+> 
+> Already merged patches in 2.10
+>  https://github.com/qemu/qemu/commits/v2.10.0-rc4?author=epilys
+> Already merged patches for 2.11
+>  https://www.mail-archive.com/qemu-devel@nongnu.org/msg470461.html
+> 
+> [0] [insert-node] block-insert-node and block-remove-node commands
+>  https://github.com/epilys/qemu/commits/insert-node?author=epilys
+> 
+> [1] [throttle] add throttle filter driver
+>  https://github.com/epilys/qemu/commits/throttle?author=epilys
+>  Message-ID: <20170825132028.6184-1-el13635@mail.ntua.gr>
+>  https://www.mail-archive.com/qemu-devel@nongnu.org/msg476047.html
+> 
+> [2] [throttle-remove-legacy] remove legacy throttling interface
+>  https://github.com/epilys/qemu/commits/throttle-remove-legacy?author=epilys
+> 
+> [3] [4] [notify] https://github.com/epilys/qemu/commits/notify?author=epilys
+> 
+> [5] block-insert-node RFC
+>  Message-ID: <20170815074513.9055-1-el13635@mail.ntua.gr>
+>  https://www.mail-archive.com/qemu-devel@nongnu.org/msg473619.html
 
+Thanks for your hard work, Manos!
 
-=E5=9C=A8 2017/8/29 =E4=B8=8B=E5=8D=884:22, Cornelia Huck =E5=86=99=E9=81=
-=93:
-> On Tue, 29 Aug 2017 16:12:26 +0800
-> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
->
->> =E5=9C=A8 2017/8/29 =E4=B8=8B=E5=8D=884:00, Cornelia Huck =E5=86=99=E9=
-=81=93:
->>> On Tue, 29 Aug 2017 12:32:17 +0800
->>> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
->>>  =20
->>>> =E5=9C=A8 2017/8/28 =E4=B8=8B=E5=8D=8810:51, Cornelia Huck =E5=86=99=
-=E9=81=93:
->>>>> On Mon, 28 Aug 2017 10:04:44 +0200
->>>>> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
->>>>>     =20
->>>>>> The function trap_msix() is to check if pcistg instruction would a=
-ccess
->>>>>> msix table entries. The correct boundary condition should be
->>>>>> [table_offset, table_offset+entries*entry_size). But the current
->>>>>> condition calculated misses the last entry. So let's fixup it.
->>>>>>
->>>>>> Acked-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
->>>>>> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
->>>>>> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
->>>>>> ---
->>>>>>     hw/s390x/s390-pci-inst.c | 4 ++--
->>>>>>     1 file changed, 2 insertions(+), 2 deletions(-)
->>>>>>
->>>>>> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
->>>>>> index b7beb8c36a..eba9ffb5f2 100644
->>>>>> --- a/hw/s390x/s390-pci-inst.c
->>>>>> +++ b/hw/s390x/s390-pci-inst.c
->>>>>> @@ -440,8 +440,8 @@ static int trap_msix(S390PCIBusDevice *pbdev, =
-uint64_t offset, uint8_t pcias)
->>>>>>     {
->>>>>>         if (pbdev->msix.available && pbdev->msix.table_bar =3D=3D =
-pcias &&
->>>>>>             offset >=3D pbdev->msix.table_offset &&
->>>>>> -        offset <=3D pbdev->msix.table_offset +
->>>>>> -                  (pbdev->msix.entries - 1) * PCI_MSIX_ENTRY_SIZE=
-) {
->>>>>> +        offset < (pbdev->msix.table_offset +
->>>>>> +                  pbdev->msix.entries * PCI_MSIX_ENTRY_SIZE)) {
->>>>>>             return 1;
->>>>>>         } else {
->>>>>>             return 0;
->>>>> What happened before due to the miscalculation? Write to wrong memo=
-ry
->>>>> region?
->>>>>
->>>>>     =20
->>>> We tried to plug virtio-net pci device but failed. After inspected, =
-we
->>>> found that the device uses two msix entries but the last one was
->>>> missed. Then we cannot register interrupt successfully because we
->>>> should call trap_msixi() in order to save some useful and arch
->>>> information into msix message. But what about wrong memory region
->>>> didn't happen.
->>> So, the guest just was not able to use the second msix entry, but did
->>> not get any exception?
->>>
->>>  =20
->> Forget one thing. The zpci idx is saved in msix message. The second ms=
-ix
->> entry has not been
->> trapped so that no idx has been saved, on the other hand idx 0 is save=
-d. So
->> kvm_arch_fixup_msi_route() will update irq route according to the zpci
->> device whose idx is 0.
->> So the wrong logic in trap_msix() will result that flic mixes differen=
-t
->> pci devices' adapter interrupts.
-> Ouch. So this only ever worked for the small subset of pci devices we
-> can passthrough (assuming none of them use more than one msix entry)?
-Because any passthroughed pci devices which I tested has more than 2=20
-msix entries. And not all
-entries will be used. I find that the last entry is never touched. But=20
-virtio pci is much fancy and only
-uses two entries. So I encountered the issue when I tested virtio-pci=20
-device.
->
-> I'm tempted to have this cc:ed to stable so we can fixup 2.10 (which is
-> the first version with usable zpci support).
->
->
-Thanks!
+Stefan
