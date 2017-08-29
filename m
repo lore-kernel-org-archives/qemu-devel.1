@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCn-0001eM-0l
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:36 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCV-0001KN-Hd
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCj-000615-RU
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:32 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35092
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCT-0005VW-0C
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:15 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57214
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dmUCj-0005zs-MG
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:29 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	id 1dmUCS-0005V6-Qx
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:12 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7T0EBKF017922
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:16:29 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2cmub2ww7j-1
+	v7T0E9EA099569
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:16:12 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2cmr22yk7w-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:16:29 -0400
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:16:12 -0400
 Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 28 Aug 2017 20:16:28 -0400
+	Mon, 28 Aug 2017 20:16:11 -0400
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 28 Aug 2017 19:14:36 -0500
+Date: Mon, 28 Aug 2017 19:14:17 -0500
 In-Reply-To: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1503965694-10794-62-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 61/79] blkdebug: Catch bs->exact_filename
- overflow
+Message-Id: <1503965694-10794-43-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 42/79] blkdebug: Add ability to override unmap
+ geometries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,47 +40,221 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: qemu-stable@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-From: Max Reitz <mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
 
-The bs->exact_filename field may not be sufficient to store the full
-blkdebug node filename. In this case, we should not generate a filename
-at all instead of an unusable one.
+Make it easier to simulate various unusual hardware setups (for
+example, recent commits 3482b9b and b8d0a98 affect the Dell
+Equallogic iSCSI with its 15M preferred and maximum unmap and
+write zero sizing, or b2f95fe deals with the Linux loopback
+block device having a max_transfer of 64k), by allowing blkdebug
+to wrap any other device with further restrictions on various
+alignments.
 
-Cc: qemu-stable@nongnu.org
-Reported-by: Qu Wenruo <quwenruo@cn.fujitsu.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20170429191419.30051-9-eblake@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20170613172006.19685-2-mreitz@redhat.com
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-(cherry picked from commit de81d72d3d13a19edf4d461be3b0f5a877be0234)
+(cherry picked from commit 430b26a82da61876c4eaf559ae02332582968043)
+* prereq for 81c219a
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block/blkdebug.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ block/blkdebug.c     | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ qapi/block-core.json | 33 ++++++++++++++++--
+ 2 files changed, 125 insertions(+), 4 deletions(-)
 
 diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 5ccb9ce..63bc5d4 100644
+index 2b934ef..5ccb9ce 100644
 --- a/block/blkdebug.c
 +++ b/block/blkdebug.c
-@@ -840,9 +840,13 @@ static void blkdebug_refresh_filename(BlockDriverState *bs, QDict *options)
-     }
+@@ -39,6 +39,11 @@ typedef struct BDRVBlkdebugState {
+     int state;
+     int new_state;
+     uint64_t align;
++    uint64_t max_transfer;
++    uint64_t opt_write_zero;
++    uint64_t max_write_zero;
++    uint64_t opt_discard;
++    uint64_t max_discard;
  
-     if (!force_json && bs->file->bs->exact_filename[0]) {
--        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
--                 "blkdebug:%s:%s", s->config_file ?: "",
--                 bs->file->bs->exact_filename);
-+        int ret = snprintf(bs->exact_filename, sizeof(bs->exact_filename),
-+                           "blkdebug:%s:%s", s->config_file ?: "",
-+                           bs->file->bs->exact_filename);
-+        if (ret >= sizeof(bs->exact_filename)) {
-+            /* An overflow makes the filename unusable, so do not report any */
-+            bs->exact_filename[0] = 0;
-+        }
-     }
+     /* For blkdebug_refresh_filename() */
+     char *config_file;
+@@ -343,6 +348,31 @@ static QemuOptsList runtime_opts = {
+             .type = QEMU_OPT_SIZE,
+             .help = "Required alignment in bytes",
+         },
++        {
++            .name = "max-transfer",
++            .type = QEMU_OPT_SIZE,
++            .help = "Maximum transfer size in bytes",
++        },
++        {
++            .name = "opt-write-zero",
++            .type = QEMU_OPT_SIZE,
++            .help = "Optimum write zero alignment in bytes",
++        },
++        {
++            .name = "max-write-zero",
++            .type = QEMU_OPT_SIZE,
++            .help = "Maximum write zero size in bytes",
++        },
++        {
++            .name = "opt-discard",
++            .type = QEMU_OPT_SIZE,
++            .help = "Optimum discard alignment in bytes",
++        },
++        {
++            .name = "max-discard",
++            .type = QEMU_OPT_SIZE,
++            .help = "Maximum discard size in bytes",
++        },
+         { /* end of list */ }
+     },
+ };
+@@ -354,6 +384,7 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
+     QemuOpts *opts;
+     Error *local_err = NULL;
+     int ret;
++    uint64_t align;
  
-     opts = qdict_new();
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+     qemu_opts_absorb_qdict(opts, options, &local_err);
+@@ -388,13 +419,61 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
+         bs->file->bs->supported_zero_flags;
+     ret = -EINVAL;
+ 
+-    /* Set request alignment */
++    /* Set alignment overrides */
+     s->align = qemu_opt_get_size(opts, "align", 0);
+     if (s->align && (s->align >= INT_MAX || !is_power_of_2(s->align))) {
+         error_setg(errp, "Cannot meet constraints with align %" PRIu64,
+                    s->align);
+         goto out;
+     }
++    align = MAX(s->align, bs->file->bs->bl.request_alignment);
++
++    s->max_transfer = qemu_opt_get_size(opts, "max-transfer", 0);
++    if (s->max_transfer &&
++        (s->max_transfer >= INT_MAX ||
++         !QEMU_IS_ALIGNED(s->max_transfer, align))) {
++        error_setg(errp, "Cannot meet constraints with max-transfer %" PRIu64,
++                   s->max_transfer);
++        goto out;
++    }
++
++    s->opt_write_zero = qemu_opt_get_size(opts, "opt-write-zero", 0);
++    if (s->opt_write_zero &&
++        (s->opt_write_zero >= INT_MAX ||
++         !QEMU_IS_ALIGNED(s->opt_write_zero, align))) {
++        error_setg(errp, "Cannot meet constraints with opt-write-zero %" PRIu64,
++                   s->opt_write_zero);
++        goto out;
++    }
++
++    s->max_write_zero = qemu_opt_get_size(opts, "max-write-zero", 0);
++    if (s->max_write_zero &&
++        (s->max_write_zero >= INT_MAX ||
++         !QEMU_IS_ALIGNED(s->max_write_zero,
++                          MAX(s->opt_write_zero, align)))) {
++        error_setg(errp, "Cannot meet constraints with max-write-zero %" PRIu64,
++                   s->max_write_zero);
++        goto out;
++    }
++
++    s->opt_discard = qemu_opt_get_size(opts, "opt-discard", 0);
++    if (s->opt_discard &&
++        (s->opt_discard >= INT_MAX ||
++         !QEMU_IS_ALIGNED(s->opt_discard, align))) {
++        error_setg(errp, "Cannot meet constraints with opt-discard %" PRIu64,
++                   s->opt_discard);
++        goto out;
++    }
++
++    s->max_discard = qemu_opt_get_size(opts, "max-discard", 0);
++    if (s->max_discard &&
++        (s->max_discard >= INT_MAX ||
++         !QEMU_IS_ALIGNED(s->max_discard,
++                          MAX(s->opt_discard, align)))) {
++        error_setg(errp, "Cannot meet constraints with max-discard %" PRIu64,
++                   s->max_discard);
++        goto out;
++    }
+ 
+     ret = 0;
+ out:
+@@ -789,6 +868,21 @@ static void blkdebug_refresh_limits(BlockDriverState *bs, Error **errp)
+     if (s->align) {
+         bs->bl.request_alignment = s->align;
+     }
++    if (s->max_transfer) {
++        bs->bl.max_transfer = s->max_transfer;
++    }
++    if (s->opt_write_zero) {
++        bs->bl.pwrite_zeroes_alignment = s->opt_write_zero;
++    }
++    if (s->max_write_zero) {
++        bs->bl.max_pwrite_zeroes = s->max_write_zero;
++    }
++    if (s->opt_discard) {
++        bs->bl.pdiscard_alignment = s->opt_discard;
++    }
++    if (s->max_discard) {
++        bs->bl.max_pdiscard = s->max_discard;
++    }
+ }
+ 
+ static int blkdebug_reopen_prepare(BDRVReopenState *reopen_state,
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 033457c..38edada 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2428,8 +2428,33 @@
+ #
+ # @config:          filename of the configuration file
+ #
+-# @align:           required alignment for requests in bytes,
+-#                   must be power of 2, or 0 for default
++# @align:           required alignment for requests in bytes, must be
++#                   positive power of 2, or 0 for default
++#
++# @max-transfer:    maximum size for I/O transfers in bytes, must be
++#                   positive multiple of @align and of the underlying
++#                   file's request alignment (but need not be a power of
++#                   2), or 0 for default (since 2.10)
++#
++# @opt-write-zero:  preferred alignment for write zero requests in bytes,
++#                   must be positive multiple of @align and of the
++#                   underlying file's request alignment (but need not be a
++#                   power of 2), or 0 for default (since 2.10)
++#
++# @max-write-zero:  maximum size for write zero requests in bytes, must be
++#                   positive multiple of @align, of @opt-write-zero, and of
++#                   the underlying file's request alignment (but need not
++#                   be a power of 2), or 0 for default (since 2.10)
++#
++# @opt-discard:     preferred alignment for discard requests in bytes, must
++#                   be positive multiple of @align and of the underlying
++#                   file's request alignment (but need not be a power of
++#                   2), or 0 for default (since 2.10)
++#
++# @max-discard:     maximum size for discard requests in bytes, must be
++#                   positive multiple of @align, of @opt-discard, and of
++#                   the underlying file's request alignment (but need not
++#                   be a power of 2), or 0 for default (since 2.10)
+ #
+ # @inject-error:    array of error injection descriptions
+ #
+@@ -2440,7 +2465,9 @@
+ { 'struct': 'BlockdevOptionsBlkdebug',
+   'data': { 'image': 'BlockdevRef',
+             '*config': 'str',
+-            '*align': 'int',
++            '*align': 'int', '*max-transfer': 'int32',
++            '*opt-write-zero': 'int32', '*max-write-zero': 'int32',
++            '*opt-discard': 'int32', '*max-discard': 'int32',
+             '*inject-error': ['BlkdebugInjectErrorOptions'],
+             '*set-state': ['BlkdebugSetStateOptions'] } }
+ 
 -- 
 2.7.4
