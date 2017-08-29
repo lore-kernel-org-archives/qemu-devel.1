@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dmnSH-0003dz-Av
+	(envelope-from <jsnow@redhat.com>) id 1dmnSH-0003fh-UW
 	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:49:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dmnSG-0001vk-CS
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:49:49 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dmnSG-0001vy-Lc
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:49:50 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Tue, 29 Aug 2017 16:49:30 -0400
-Message-Id: <20170829204934.9039-6-jsnow@redhat.com>
+Date: Tue, 29 Aug 2017 16:49:29 -0400
+Message-Id: <20170829204934.9039-5-jsnow@redhat.com>
 In-Reply-To: <20170829204934.9039-1-jsnow@redhat.com>
 References: <20170829204934.9039-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 5/9] IDE: replace DEBUG_AIO with trace events
+Subject: [Qemu-devel] [PATCH v2 4/9] ATAPI: Replace DEBUG_IDE_ATAPI with
+ tracing events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,120 +23,202 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: eblake@redhat.com, qemu-devel@nongnu.org, f4bug@amsat.org, John Snow <jsnow@redhat.com>
 
+Goodbye, printfs.
+Hello, fancy printfs.
+
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- hw/ide/atapi.c            |  5 +----
- hw/ide/core.c             | 17 ++++++++++-------
- hw/ide/trace-events       |  3 +++
- include/hw/ide/internal.h |  6 ++++--
- 4 files changed, 18 insertions(+), 13 deletions(-)
+ hw/ide/atapi.c            | 64 +++++++++++++++++------------------------------
+ hw/ide/trace-events       | 15 +++++++++++
+ include/hw/ide/internal.h |  1 -
+ 3 files changed, 38 insertions(+), 42 deletions(-)
 
 diff --git a/hw/ide/atapi.c b/hw/ide/atapi.c
-index 37fa699..b8fc51e 100644
+index fc1d19c..37fa699 100644
 --- a/hw/ide/atapi.c
 +++ b/hw/ide/atapi.c
-@@ -416,10 +416,7 @@ static void ide_atapi_cmd_read_dma_cb(void *opaque, int ret)
-         s->io_buffer_size = n * 2048;
-         data_offset = 0;
-     }
--#ifdef DEBUG_AIO
--    printf("aio_read_cd: lba=%u n=%d\n", s->lba, n);
--#endif
--
-+    trace_ide_atapi_cmd_read_dma_cb_aio(s, s->lba, n);
-     s->bus->dma->iov.iov_base = (void *)(s->io_buffer + data_offset);
-     s->bus->dma->iov.iov_len = n * ATAPI_SECTOR_SIZE;
-     qemu_iovec_init_external(&s->bus->dma->qiov, &s->bus->dma->iov, 1);
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index 82a19b1..a1c90e9 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -58,6 +58,13 @@ static const int smart_attributes[][12] = {
-     { 190,  0x03, 0x00, 0x45, 0x45, 0x1f, 0x00, 0x1f, 0x1f, 0x00, 0x00, 0x32},
- };
+@@ -27,6 +27,7 @@
+ #include "hw/ide/internal.h"
+ #include "hw/scsi/scsi.h"
+ #include "sysemu/block-backend.h"
++#include "trace.h"
  
-+const char *IDE_DMA_CMD_lookup[IDE_DMA__COUNT] = {
-+    [IDE_DMA_READ] = "DMA READ",
-+    [IDE_DMA_WRITE] = "DMA WRITE",
-+    [IDE_DMA_TRIM] = "DMA TRIM",
-+    [IDE_DMA_ATAPI] = "DMA ATAPI"
-+};
+ #define ATAPI_SECTOR_BITS (2 + BDRV_SECTOR_BITS)
+ #define ATAPI_SECTOR_SIZE (1 << ATAPI_SECTOR_BITS)
+@@ -116,9 +117,7 @@ cd_read_sector_sync(IDEState *s)
+     block_acct_start(blk_get_stats(s->blk), &s->acct,
+                      ATAPI_SECTOR_SIZE, BLOCK_ACCT_READ);
+ 
+-#ifdef DEBUG_IDE_ATAPI
+-    printf("cd_read_sector_sync: lba=%d\n", s->lba);
+-#endif
++    trace_cd_read_sector_sync(s->lba);
+ 
+     switch (s->cd_sector_size) {
+     case 2048:
+@@ -152,9 +151,7 @@ static void cd_read_sector_cb(void *opaque, int ret)
+ {
+     IDEState *s = opaque;
+ 
+-#ifdef DEBUG_IDE_ATAPI
+-    printf("cd_read_sector_cb: lba=%d ret=%d\n", s->lba, ret);
+-#endif
++    trace_cd_read_sector_cb(s->lba, ret);
+ 
+     if (ret < 0) {
+         block_acct_failed(blk_get_stats(s->blk), &s->acct);
+@@ -188,9 +185,7 @@ static int cd_read_sector(IDEState *s)
+     s->iov.iov_len = ATAPI_SECTOR_SIZE;
+     qemu_iovec_init_external(&s->qiov, &s->iov, 1);
+ 
+-#ifdef DEBUG_IDE_ATAPI
+-    printf("cd_read_sector: lba=%d\n", s->lba);
+-#endif
++    trace_cd_read_sector(s->lba);
+ 
+     block_acct_start(blk_get_stats(s->blk), &s->acct,
+                      ATAPI_SECTOR_SIZE, BLOCK_ACCT_READ);
+@@ -213,9 +208,7 @@ void ide_atapi_cmd_ok(IDEState *s)
+ 
+ void ide_atapi_cmd_error(IDEState *s, int sense_key, int asc)
+ {
+-#ifdef DEBUG_IDE_ATAPI
+-    printf("atapi_cmd_error: sense=0x%x asc=0x%x\n", sense_key, asc);
+-#endif
++    trace_ide_atapi_cmd_error(s, sense_key, asc);
+     s->error = sense_key << 4;
+     s->status = READY_STAT | ERR_STAT;
+     s->nsector = (s->nsector & ~7) | ATAPI_INT_REASON_IO | ATAPI_INT_REASON_CD;
+@@ -252,19 +245,14 @@ static uint16_t atapi_byte_count_limit(IDEState *s)
+ void ide_atapi_cmd_reply_end(IDEState *s)
+ {
+     int byte_count_limit, size, ret;
+-#ifdef DEBUG_IDE_ATAPI
+-    printf("reply: tx_size=%d elem_tx_size=%d index=%d\n",
+-           s->packet_transfer_size,
+-           s->elementary_transfer_size,
+-           s->io_buffer_index);
+-#endif
++    trace_ide_atapi_cmd_reply_end(s, s->packet_transfer_size,
++                                  s->elementary_transfer_size,
++                                  s->io_buffer_index);
+     if (s->packet_transfer_size <= 0) {
+         /* end of transfer */
+         ide_atapi_cmd_ok(s);
+         ide_set_irq(s->bus);
+-#ifdef DEBUG_IDE_ATAPI
+-        printf("end of transfer, status=0x%x\n", s->status);
+-#endif
++        trace_ide_atapi_cmd_reply_end_eot(s, s->status);
+     } else {
+         /* see if a new sector must be read */
+         if (s->lba != -1 && s->io_buffer_index >= s->cd_sector_size) {
+@@ -300,9 +288,7 @@ void ide_atapi_cmd_reply_end(IDEState *s)
+             /* a new transfer is needed */
+             s->nsector = (s->nsector & ~7) | ATAPI_INT_REASON_IO;
+             byte_count_limit = atapi_byte_count_limit(s);
+-#ifdef DEBUG_IDE_ATAPI
+-            printf("byte_count_limit=%d\n", byte_count_limit);
+-#endif
++            trace_ide_atapi_cmd_reply_end_bcl(s, byte_count_limit);
+             size = s->packet_transfer_size;
+             if (size > byte_count_limit) {
+                 /* byte count limit must be even if this case */
+@@ -324,9 +310,7 @@ void ide_atapi_cmd_reply_end(IDEState *s)
+             ide_transfer_start(s, s->io_buffer + s->io_buffer_index - size,
+                                size, ide_atapi_cmd_reply_end);
+             ide_set_irq(s->bus);
+-#ifdef DEBUG_IDE_ATAPI
+-            printf("status=0x%x\n", s->status);
+-#endif
++            trace_ide_atapi_cmd_reply_end_new(s, s->status);
+         }
+     }
+ }
+@@ -368,9 +352,7 @@ static void ide_atapi_cmd_read_pio(IDEState *s, int lba, int nb_sectors,
+ 
+ static void ide_atapi_cmd_check_status(IDEState *s)
+ {
+-#ifdef DEBUG_IDE_ATAPI
+-    printf("atapi_cmd_check_status\n");
+-#endif
++    trace_ide_atapi_cmd_check_status(s);
+     s->error = MC_ERR | (UNIT_ATTENTION << 4);
+     s->status = ERR_STAT;
+     s->nsector = 0;
+@@ -477,10 +459,8 @@ static void ide_atapi_cmd_read_dma(IDEState *s, int lba, int nb_sectors,
+ static void ide_atapi_cmd_read(IDEState *s, int lba, int nb_sectors,
+                                int sector_size)
+ {
+-#ifdef DEBUG_IDE_ATAPI
+-    printf("read %s: LBA=%d nb_sectors=%d\n", s->atapi_dma ? "dma" : "pio",
+-        lba, nb_sectors);
+-#endif
++    trace_ide_atapi_cmd_read(s, s->atapi_dma ? "dma" : "pio",
++                             lba, nb_sectors);
+     if (s->atapi_dma) {
+         ide_atapi_cmd_read_dma(s, lba, nb_sectors, sector_size);
+     } else {
+@@ -1330,16 +1310,18 @@ void ide_atapi_cmd(IDEState *s)
+     uint8_t *buf = s->io_buffer;
+     const struct AtapiCmd *cmd = &atapi_cmd_table[s->io_buffer[0]];
+ 
+-#ifdef DEBUG_IDE_ATAPI
+-    {
++    trace_ide_atapi_cmd(s, s->io_buffer[0]);
 +
- static void ide_dummy_transfer_stop(IDEState *s);
- 
- static void padstr(char *str, const char *src, int len)
-@@ -860,10 +867,8 @@ static void ide_dma_cb(void *opaque, int ret)
-         goto eot;
++    if (TRACE_IDE_ATAPI_CMD_PACKET_ENABLED) {
++        /* Each pretty-printed byte needs two bytes and a space; */
++        char *ppacket = g_malloc(ATAPI_PACKET_SIZE * 3 + 1);
+         int i;
+-        printf("ATAPI limit=0x%x packet:", s->lcyl | (s->hcyl << 8));
+-        for(i = 0; i < ATAPI_PACKET_SIZE; i++) {
+-            printf(" %02x", buf[i]);
++        for (i = 0; i < ATAPI_PACKET_SIZE; i++) {
++            sprintf(ppacket + (i * 3), "%02x ", buf[i]);
+         }
+-        printf("\n");
++        trace_ide_atapi_cmd_packet(s, s->lcyl | (s->hcyl << 8), ppacket);
++        g_free(ppacket);
      }
- 
--#ifdef DEBUG_AIO
--    printf("ide_dma_cb: sector_num=%" PRId64 " n=%d, cmd_cmd=%d\n",
--           sector_num, n, s->dma_cmd);
 -#endif
-+    trace_ide_dma_cb(s, sector_num, n,
-+                     IDE_DMA_CMD_lookup[s->dma_cmd]);
  
-     if ((s->dma_cmd == IDE_DMA_READ || s->dma_cmd == IDE_DMA_WRITE) &&
-         !ide_sect_range_ok(s, sector_num, n)) {
-@@ -2391,9 +2396,7 @@ void ide_bus_reset(IDEBus *bus)
- 
-     /* pending async DMA */
-     if (bus->dma->aiocb) {
--#ifdef DEBUG_AIO
--        printf("aio_cancel\n");
--#endif
-+        trace_ide_bus_reset_aio();
-         blk_aio_cancel(bus->dma->aiocb);
-         bus->dma->aiocb = NULL;
-     }
+     /*
+      * If there's a UNIT_ATTENTION condition pending, only command flagged with
 diff --git a/hw/ide/trace-events b/hw/ide/trace-events
-index 8c79a6c..cc8949c 100644
+index 17bc6f1..8c79a6c 100644
 --- a/hw/ide/trace-events
 +++ b/hw/ide/trace-events
-@@ -18,6 +18,8 @@ ide_cancel_dma_sync_remaining(void) "draining all remaining requests"
- ide_sector_read(int64_t sector_num, int nsectors) "sector=%"PRId64" nsectors=%d"
- ide_sector_write(int64_t sector_num, int nsectors) "sector=%"PRId64" nsectors=%d"
- ide_reset(void *s) "IDEstate %p"
-+ide_bus_reset_aio(void) "aio_cancel"
-+ide_dma_cb(void *s, int64_t sector_num, int n, const char *dma) "IDEState %p; sector_num=%"PRId64" n=%d cmd=%s"
- 
- # BMDMA HBAs:
- 
-@@ -51,5 +53,6 @@ ide_atapi_cmd_reply_end_new(void *s, int status) "IDEState: %p; new transfer sta
- ide_atapi_cmd_check_status(void *s) "IDEState: %p"
- ide_atapi_cmd_read(void *s, const char *method, int lba, int nb_sectors) "IDEState: %p; read %s: LBA=%d nb_sectors=%d"
- ide_atapi_cmd(void *s, uint8_t cmd) "IDEState: %p; cmd: 0x%02x"
-+ide_atapi_cmd_read_dma_cb_aio(void *s, int lba, int n) "IDEState: %p; aio read: lba=%d n=%d"
- # Warning: Verbose
- ide_atapi_cmd_packet(void *s, uint16_t limit, const char *packet) "IDEState: %p; limit=0x%x packet: %s"
+@@ -38,3 +38,18 @@ bmdma_write(uint64_t addr, uint64_t val) "bmdma: writeb 0x%"PRIx64" : 0x%02"PRIx
+ # hw/ide/via.c
+ bmdma_read_via(uint64_t addr, uint32_t val) "bmdma: readb 0x%"PRIx64" : 0x%02x"
+ bmdma_write_via(uint64_t addr, uint64_t val) "bmdma: writeb 0x%"PRIx64" : 0x%02"PRIx64
++
++# hw/ide/atapi.c
++cd_read_sector_sync(int lba) "lba=%d"
++cd_read_sector_cb(int lba, int ret) "lba=%d ret=%d"
++cd_read_sector(int lba) "lba=%d"
++ide_atapi_cmd_error(void *s, int sense_key, int asc) "IDEState: %p; sense=0x%x asc=0x%x"
++ide_atapi_cmd_reply_end(void *s, int tx_size, int elem_tx_size, int32_t index) "IDEState %p; reply: tx_size=%d elem_tx_size=%d index=%"PRId32
++ide_atapi_cmd_reply_end_eot(void *s, int status) "IDEState: %p; end of transfer, status=0x%x"
++ide_atapi_cmd_reply_end_bcl(void *s, int bcl) "IDEState: %p; byte_count_limit=%d"
++ide_atapi_cmd_reply_end_new(void *s, int status) "IDEState: %p; new transfer started, status=0x%x"
++ide_atapi_cmd_check_status(void *s) "IDEState: %p"
++ide_atapi_cmd_read(void *s, const char *method, int lba, int nb_sectors) "IDEState: %p; read %s: LBA=%d nb_sectors=%d"
++ide_atapi_cmd(void *s, uint8_t cmd) "IDEState: %p; cmd: 0x%02x"
++# Warning: Verbose
++ide_atapi_cmd_packet(void *s, uint16_t limit, const char *packet) "IDEState: %p; limit=0x%x packet: %s"
 diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
-index 74efe8a..db9fde0 100644
+index 4a92f0a..74efe8a 100644
 --- a/include/hw/ide/internal.h
 +++ b/include/hw/ide/internal.h
 @@ -14,7 +14,6 @@
  #include "block/scsi.h"
  
  /* debug IDE devices */
--//#define DEBUG_AIO
+-//#define DEBUG_IDE_ATAPI
+ //#define DEBUG_AIO
  #define USE_DMA_CDROM
- 
- typedef struct IDEBus IDEBus;
-@@ -333,12 +332,15 @@ struct unreported_events {
- };
- 
- enum ide_dma_cmd {
--    IDE_DMA_READ,
-+    IDE_DMA_READ = 0,
-     IDE_DMA_WRITE,
-     IDE_DMA_TRIM,
-     IDE_DMA_ATAPI,
-+    IDE_DMA__COUNT
- };
- 
-+extern const char *IDE_DMA_CMD_lookup[IDE_DMA__COUNT];
-+
- #define ide_cmd_is_read(s) \
- 	((s)->dma_cmd == IDE_DMA_READ)
  
 -- 
 2.9.5
