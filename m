@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dmhhB-00019G-WF
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:40:51 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dmhhP-0001FS-22
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:41:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dmhh8-0003sq-1o
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:40:49 -0400
-References: <20170829120836.16091-1-berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ac13cdf8-7725-8d5a-9c8b-49ad51eba38e@redhat.com>
-Date: Tue, 29 Aug 2017 09:40:35 -0500
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dmhhJ-00046Z-8i
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:41:03 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:22390)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dmhhI-0003yV-VT
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:40:57 -0400
+References: <1504016587-39779-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<w51fucafnk2.fsf@maestria.local.igalia.com>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <a81bc8f8-8ceb-8f92-1554-bc0d26180b1d@huawei.com>
+Date: Tue, 29 Aug 2017 16:39:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170829120836.16091-1-berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="9gTI37VWVnWTTngGR74SUkEdMgWUerS07"
-Subject: Re: [Qemu-devel] [PATCH] misc: Remove unused Error variables
+In-Reply-To: <w51fucafnk2.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 0/6] fsdev: qmp interface for io
+ throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,65 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-trivial <qemu-trivial@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
+Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9gTI37VWVnWTTngGR74SUkEdMgWUerS07
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>, qemu-trivial <qemu-trivial@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <ac13cdf8-7725-8d5a-9c8b-49ad51eba38e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] misc: Remove unused Error variables
-References: <20170829120836.16091-1-berto@igalia.com>
-In-Reply-To: <20170829120836.16091-1-berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 8/29/2017 4:36 PM, Alberto Garcia wrote:
+> On Tue 29 Aug 2017 04:23:01 PM CEST, Pradeep Jagadeesh wrote:
+>> These patches provide the qmp interface, to query the io throttle
+>> status of the all fsdev devices that are present in a vm.
+>> also, it provides an interface to set the io throttle parameters of a
+>> fsdev to a required value. some of the patches also remove the duplicate
+>> code that was present in block and fsdev files.
+>
+> Oops, I was just reviewing the previous version of this series, but it
+> looks like you just moved code around, so my comments still apply.
+>
+> Anyway, this should be v9, shouldn't it? v8 was published weeks ago:
+>
+>    https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg01043.html
 
-On 08/29/2017 07:08 AM, Alberto Garcia wrote:
-> There's a few cases which we're passing an Error pointer to a function
-> only to discard it immediately afterwards without checking it. In
-> these cases we can simply remove the variable and pass NULL instead.
+Hmm, sorry it should be v9, I missed. I will resend the patches with 
+newer version.
 
-Could also go in via qemu-trivial or Markus' error tree (both added in
-cc) if the block maintainers don't take it quickly.
-
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow.c  | 12 +++---------
->  block/qcow2.c |  8 ++------
->  dump.c        |  4 +---
->  3 files changed, 6 insertions(+), 18 deletions(-)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---9gTI37VWVnWTTngGR74SUkEdMgWUerS07
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmlfOMACgkQp6FrSiUn
-Q2qn0wf/eO7j8LYPU2hj3Tg6gfCxEVUtxc/sNzyQixGSgCo9Ud8Jan5/EVV9lJAP
-XjJPAyNYQBUl5XV7WUrfjm4HDReMCn50xXQOTHcsOCP2TNfnQ6AwWJMiL3NQJFv7
-o5Xk8MrLMyOMC3tcf13S6LIDCslZdVPhlDO0ezvP5GW/ldHrFnmtbe6fxWBxHP99
-48GinYPKZmkT7psGklZA+/rF5vy4JJu9WPE0RG5dj2b7fgUW6AiXObe7apBSWYRt
-w4z6NUO5hEkyE+TRiAzCIA6QF72WfXsWWEyrOvmSKobRvAeJjoEYJAMKqkDbtbaB
-C27D9FQjya4BGB7cdzjtr5Md550hvA==
-=qViJ
------END PGP SIGNATURE-----
-
---9gTI37VWVnWTTngGR74SUkEdMgWUerS07--
+Regards,
+Pradeep
+>
+> Berto
+>
