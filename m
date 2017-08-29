@@ -1,23 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dmhG7-0005P8-7c
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:12:52 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1dmhGU-0005cW-PC
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:13:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dmhG4-0007aO-HM
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:12:51 -0400
-Date: Tue, 29 Aug 2017 11:12:36 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170829141236.GX15315@localhost.localdomain>
-References: <20170328021651.19350-1-david@gibson.dropbear.id.au>
-	<20170328021651.19350-2-david@gibson.dropbear.id.au>
-	<20170426182155-mutt-send-email-mst@kernel.org>
-	<20170829114239.GP2578@umbus.fritz.box>
+	(envelope-from <alex.williamson@redhat.com>) id 1dmhGS-0007kY-4Q
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:13:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58536)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1dmhGR-0007jl-Ru
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:13:12 -0400
+Date: Tue, 29 Aug 2017 08:13:05 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170829081305.7a2685c6@w520.home>
+In-Reply-To: <CAMxP3BSNPjRZGOULZ0zKBq8v5Rqv9f5xasx+BD57c=oAS5tSWg@mail.gmail.com>
+References: <20170726113222.52aad9a6@w520.home>
+	<CAMxP3BTFgwJtjh78hNBCoxBp1WsnZMZLsqzb3McqCq=-SX0a4g@mail.gmail.com>
+	<20170731234626.7664be18@w520.home>
+	<CAMxP3BTfMad-ycWHqmW+aVM7rv2CJSv-dmEFUveGBqAWvfbBjQ@mail.gmail.com>
+	<20170801090158.35d18f10@w520.home>
+	<CAMxP3BRkzXBRPZw9fpCu-w4Fusn6ng_knk1cAz=EDBAiw9UnqA@mail.gmail.com>
+	<20170807095224.5438ef8c@w520.home>
+	<20170808230043-mutt-send-email-mst@kernel.org>
+	<CAMxP3BR=WHKJxcWKH27dcC7DTKGD2y7r12teAUSmMkwp1VDafA@mail.gmail.com>
+	<20170822105659.75b5c7e0@w520.home>
+	<20170822205940-mutt-send-email-mst@kernel.org>
+	<CAMxP3BSNPjRZGOULZ0zKBq8v5Rqv9f5xasx+BD57c=oAS5tSWg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170829114239.GP2578@umbus.fritz.box>
-Subject: Re: [Qemu-devel] [RFC for-2.10 1/3] pci/pcie: Make a consistent
- helper for switching PCI/PCIe "hybrid" devices
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
+ =?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,102 +39,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, marcel@redhat.com, lersek@redhat.com
+To: Bob Chen <a175818323@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, qemu-devel@nongnu.org
 
-On Tue, Aug 29, 2017 at 09:42:39PM +1000, David Gibson wrote:
-> On Wed, Apr 26, 2017 at 06:23:58PM +0300, Michael S. Tsirkin wrote:
-> > On Tue, Mar 28, 2017 at 01:16:49PM +1100, David Gibson wrote:
-> > > virtio-pci and XHCI are "hybrid" devices in the sense that they can present
-> > > themselves as either PCIe or plain PCI devices depending on the machine
-> > > and bus they're connected to.
-> > > 
-> > > For virtio-pci to present as PCIe it requires that it's connected to a PCIe
-> > > bus and that it's not a root bus - this is to ensure that the device is
-> > > connected via a PCIe root port or downstream port rather than being a
-> > > integrated endpoint.  Some guests (Windows in particular AIUI) don't really
-> > > cope with PCIe integrated endpoints.
-> > > 
-> > > For XHCI it only checks that the bus is PCIe, but that probably means it
-> > > would cause problems if attached as an integrated devices directly to a
-> > > PCIe root bus.
-> > > 
-> > > This patch makes the test consistent between XHCI and virtio-pci, and
-> > > clarifies things by having them both use a new 'pci_allow_hybrid_pcie()'
-> > > helper which performs the same check as virtio-pci.
-> > > 
-> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > ---
-> > >  hw/pci/pci.c           | 7 +++++++
-> > >  hw/usb/hcd-xhci.c      | 2 +-
-> > >  hw/virtio/virtio-pci.c | 3 +--
-> > >  include/hw/pci/pci.h   | 1 +
-> > >  4 files changed, 10 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> > > index bd8043c..779787b 100644
-> > > --- a/hw/pci/pci.c
-> > > +++ b/hw/pci/pci.c
-> > > @@ -390,6 +390,13 @@ bool pci_bus_is_root(PCIBus *bus)
-> > >      return PCI_BUS_GET_CLASS(bus)->is_root(bus);
-> > >  }
-> > >  
-> > > +bool pci_allow_hybrid_pcie(PCIDevice *pci_dev)
-> > > +{
-> > > +    PCIBus *bus = pci_dev->bus;
-> > > +
-> > > +    return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
-> > > +}
-> > > +
-> > >  void pci_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *parent,
-> > >                           const char *name,
-> > >                           MemoryRegion *address_space_mem,
-> > 
-> > I'd prefer pci_allow_hybrid_pci_pcie.
-> 
-> Ok, I've made that change for the next spin (aimed at 2.11, obviously).
+On Tue, 29 Aug 2017 18:41:44 +0800
+Bob Chen <a175818323@gmail.com> wrote:
 
-I'm a bit confused by the naming: by looking at the function
-name, I don't know if "allow hybrid" means "this bus+device can
-(also) work as Conventional PCI" or "this bus+device can (also)
-work as PCI Express".
+> The topology is already having all GPUs directly attached to root bus 0. =
+In
+> this situation you can't see the LnkSta attribute in any capabilities.
 
-What about just naming it pci_allow_pcie() or
-pci_bus_allow_pcie()?  It looks like the function doesn't care if
-the device is hybrid or PCIe-only: it's only checking if the
-device can work as PCIe on that bus.  It's up to the device to
-decide if it should switch to Conventional PCI or report an error
-if the function returns false.
+Right, this is why I suggested viewing the physical device lspci info
+from the host.  I haven't seen the suck link issue with devices on the
+root bus, but it may be worth double checking.  Thanks,
 
-> 
-> > 
-> > > diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-> > > index f0af852..a7ff4fd 100644
-> > > --- a/hw/usb/hcd-xhci.c
-> > > +++ b/hw/usb/hcd-xhci.c
-> > > @@ -3619,7 +3619,7 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
-> > >                       PCI_BASE_ADDRESS_SPACE_MEMORY|PCI_BASE_ADDRESS_MEM_TYPE_64,
-> > >                       &xhci->mem);
-> > >  
-> > > -    if (pci_bus_is_express(dev->bus) ||
-> > > +    if (pci_allow_hybrid_pcie(dev) ||
-> > >          xhci_get_flag(xhci, XHCI_FLAG_FORCE_PCIE_ENDCAP)) {
-> > >          ret = pcie_endpoint_cap_init(dev, 0xa0);
-> > >          assert(ret >= 0);
-> > 
-> > This seems to change the behaviour for xhci on a root bus - what
-> > am I missing?
-> 
-> Nothing.  I didn't consider the backwards compat implications; I'll
-> fix it for the next spin.
-> 
-> -- 
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
-
-
-
--- 
-Eduardo
+Alex
+=20
+> The other way of using emulated switch would somehow show this attribute,
+> at 8 GT/s, although the real bandwidth is low as usual.
+>=20
+> 2017-08-23 2:06 GMT+08:00 Michael S. Tsirkin <mst@redhat.com>:
+>=20
+> > On Tue, Aug 22, 2017 at 10:56:59AM -0600, Alex Williamson wrote: =20
+> > > On Tue, 22 Aug 2017 15:04:55 +0800
+> > > Bob Chen <a175818323@gmail.com> wrote:
+> > > =20
+> > > > Hi,
+> > > >
+> > > > I got a spec from Nvidia which illustrates how to enable GPU p2p in
+> > > > virtualization environment. (See attached) =20
+> > >
+> > > Neat, looks like we should implement a new QEMU vfio-pci option,
+> > > something like nvidia-gpudirect-p2p-id=3D.  I don't think I'd want to
+> > > code the policy of where to enable it into QEMU or the kernel, so we'd
+> > > push it up to management layers or users to decide.
+> > > =20
+> > > > The key is to append the legacy pci capabilities list when setting =
+up =20
+> > the =20
+> > > > hypervisor, with a Nvidia customized capability config.
+> > > >
+> > > > I added some hack in hw/vfio/pci.c and managed to implement that.
+> > > >
+> > > > Then I found the GPU was able to recognize its peer, and the latenc=
+y =20
+> > has =20
+> > > > dropped. =E2=9C=85
+> > > >
+> > > > However the bandwidth didn't improve, but decreased instead. =E2=9D=
+=8C
+> > > >
+> > > > Any suggestions? =20
+> > >
+> > > What's the VM topology?  I've found that in a Q35 configuration with
+> > > GPUs downstream of an emulated root port, the NVIDIA driver in the
+> > > guest will downshift the physical link rate to 2.5GT/s and never
+> > > increase it back to 8GT/s.  I believe this is because the virtual
+> > > downstream port only advertises Gen1 link speeds. =20
+> >
+> >
+> > Fixing that would be nice, and it's great that you now actually have a
+> > reproducer that can be used to test it properly.
+> >
+> > Exposing higher link speeds is a bit of work since there are now all
+> > kind of corner cases to cover as guests may play with link speeds and we
+> > must pretend we change it accordingly.  An especially interesting
+> > question is what to do with the assigned device when guest tries to play
+> > with port link speed. It's kind of similar to AER in that respect.
+> >
+> > I guess we can just ignore it for starters.
+> > =20
+> > >  If the GPUs are on
+> > > the root complex (ie. pcie.0) the physical link will run at 2.5GT/s
+> > > when the GPU is idle and upshift to 8GT/s under load.  This also
+> > > happens if the GPU is exposed in a conventional PCI topology to the
+> > > VM.  Another interesting data point is that an older Kepler GRID card
+> > > does not have this issue, dynamically shifting the link speed under
+> > > load regardless of the VM PCI/e topology, while a new M60 using the
+> > > same driver experiences this problem.  I've filed a bug with NVIDIA as
+> > > this seems to be a regression, but it appears (untested) that the
+> > > hypervisor should take the approach of exposing full, up-to-date PCIe
+> > > link capabilities and report a link status matching the downstream
+> > > devices. =20
+> >
+> > =20
+> > > I'd suggest during your testing, watch lspci info for the GPU from the
+> > > host, noting the behavior of LnkSta (Link Status) to check if the
+> > > devices gets stuck at 2.5GT/s in your VM configuration and adjust the
+> > > topology until it works, likely placing the GPUs on pcie.0 for a Q35
+> > > based machine.  Thanks,
+> > >
+> > > Alex =20
+> > =20
