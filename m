@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dmoC1-0005K3-GH
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:37:06 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dmoLy-0000ch-D9
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:47:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dmoBy-0003ep-AP
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:37:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41674)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dmoBy-0003eD-1K
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:37:02 -0400
-Date: Tue, 29 Aug 2017 18:36:57 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170829213657.GO27715@localhost.localdomain>
-References: <20170824192315.5897-1-ehabkost@redhat.com>
-	<20170824192315.5897-4-ehabkost@redhat.com>
-	<20170829111345.GI3783@redhat.com>
-	<20170829131258.GA30734@localhost.localdomain>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dmoLv-0000xL-71
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:47:22 -0400
+Received: from mail-qt0-x22d.google.com ([2607:f8b0:400d:c0d::22d]:34390)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dmoLv-0000ww-1j
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:47:19 -0400
+Received: by mail-qt0-x22d.google.com with SMTP id u11so20569125qtu.1
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 14:47:18 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20170828174707.20786-1-famz@redhat.com>
+	<20170828174707.20786-7-famz@redhat.com>
+	<518b29b0-654d-f438-7b18-0419987ba442@amsat.org>
+Message-ID: <9bb228d9-15ac-8721-9345-f2037635d063@amsat.org>
+Date: Tue, 29 Aug 2017 18:47:13 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170829131258.GA30734@localhost.localdomain>
-Subject: [Qemu-devel] [PATCH] fixup! hostmem-file: Add "discard-data" option
+In-Reply-To: <518b29b0-654d-f438-7b18-0419987ba442@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 06/10] tests: Add NetBSD image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +36,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Zack Cornelius <zack.cornelius@kove.net>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
 
-On Tue, Aug 29, 2017 at 10:12:58AM -0300, Eduardo Habkost wrote:
-> On Tue, Aug 29, 2017 at 12:13:45PM +0100, Daniel P. Berrange wrote:
-> > On Thu, Aug 24, 2017 at 04:23:15PM -0300, Eduardo Habkost wrote:
-[...]
-> > > @@ -4172,6 +4172,9 @@ the path to either a shared memory or huge page filesystem mount.
-> > >  The @option{share} boolean option determines whether the memory
-> > >  region is marked as private to QEMU, or shared. The latter allows
-> > >  a co-operating external process to access the QEMU memory region.
-> > > +Setting the @option{discard-data} boolean option to @var{on}
-> > > +indicates that file contents can be destroyed when QEMU exits,
-> > > +to avoid unnecessarily flushing data to the backing file.
-> > 
-> > We should note that this only works if QEMU shuts down normally. If QEMU
-> > is aggressively killed (SIGKILL) or aborts for some reason, then we'll
-> > never get a chance to invoke madvise(), so presumably the kernel will
-> > still flush the data
+Hi Fam,
+
+On 08/29/2017 09:09 AM, Philippe Mathieu-Daudé wrote:
+[...]>> +if __name__ == "__main__":
+>> +    sys.exit(basevm.main(NetBSDVM))
 > 
-> Good point.  I tried to not give any guarantees by saying
-> "contents _can_ be destroyed", but users may still have different
-> expectations.
+> This one is failing:
 > 
-> I will change it to:
+> DEBUG:root:ssh_cmd: ssh -q -o StrictHostKeyChecking=no -o 
+> UserKnownHostsFile=/dev/null -o ConnectTimeout=1 -p 34091 -i 
+> /tmp/qemu-vm-59XYOj/id_rsa qemu@127.0.0.1
+>          set -e;
+>          cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+>          tar -xf /dev/rld1a;
+>          ./configure --python=python2.7 ;
+>          gmake -j4;
+>          gmake check;
 > 
->   Setting the @option{discard-data} boolean option to @var{on}
->   indicates that file contents can be destroyed when QEMU exits,
->   to avoid unnecessarily flushing data to the backing file.  Note
->   that @option{discard-data} is only an optimization, and QEMU
->   might not discard file contents if it aborts unexpectedly or is
->   terminated using SIGKILL.
+> ...
+>    CC      bt-host.o
+>    CC      bt-vhci.o
+>    CC      dma-helpers.o
+>    CC      vl.o
+>    CC      tpm.o
+> In file included from vl.c:72:0:
+> /var/tmp/qemu-test.ht0XHU/include/hw/loader.h:4:29: fatal error: 
+> hw/nvram/fw_cfg.h: No such file or directory
+>   #include "hw/nvram/fw_cfg.h"
+>                               ^
+> compilation terminated.
+> /var/tmp/qemu-test.ht0XHU/rules.mak:66: recipe for target 'vl.o' failed
+> gmake: *** [vl.o] Error 1
+> gmake: *** Waiting for unfinished jobs....
+> tests/vm/Makefile.include:32: recipe for target 'vm-build-netbsd' failed
+> make: *** [vm-build-netbsd] Error 3
 
-Fixup patch:
+Probably false alarm, this seems to be an ENOMEM host error.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- qemu-options.hx | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+I later got:
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index ad985e4..de9a18a 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4174,7 +4174,10 @@ region is marked as private to QEMU, or shared. The latter allows
- a co-operating external process to access the QEMU memory region.
- Setting the @option{discard-data} boolean option to @var{on}
- indicates that file contents can be destroyed when QEMU exits,
--to avoid unnecessarily flushing data to the backing file.
-+to avoid unnecessarily flushing data to the backing file.  Note
-+that @option{discard-data} is only an optimization, and QEMU
-+might not discard file contents if it aborts unexpectedly or is
-+terminated using SIGKILL.
- 
- @item -object rng-random,id=@var{id},filename=@var{/dev/random}
- 
--- 
-2.9.4
+	CHK version_gen.h
+Makefile:342: recipe for target 'subdir-dtc' failed
+gmake[1]: *** No rule to make target 'dtc/libfdt/fdt.h', needed by 
+'libfdt/fdt.o'.  Stop.
+gmake: *** [subdir-dtc] Error 2
+gmake: *** Waiting for unfinished jobs....
+
+which I solved running "gmake -C dtc" after ./configure but I'm not sure 
+it is necessary or can come from my tree, this testing is veeeeeeery 
+slow and mostly kill my laptop, I ended wondering on what kind of 
+hardware you developed this series without going crazy nut :S
