@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dmfAe-0003YF-6h
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 07:59:05 -0400
+	(envelope-from <bounces@canonical.com>) id 1dmfCo-0004v0-Ip
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:01:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dmfAb-0003cX-11
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 07:59:04 -0400
-Received: from mga06.intel.com ([134.134.136.31]:10756)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dmfAa-0003a4-Mb
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 07:59:00 -0400
-Message-ID: <59A557B1.7080704@intel.com>
-Date: Tue, 29 Aug 2017 20:01:53 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <bounces@canonical.com>) id 1dmfCl-0005Cp-Dd
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:01:18 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60357)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dmfCl-0005B9-7H
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:01:15 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dmfCj-0001rn-R4
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 12:01:13 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BF46F2E80CC
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 12:01:13 +0000 (UTC)
 MIME-Version: 1.0
-References: <20170827233033.7afa49b9@fiorina>
-	<20170829095726.GL25960@stefanha-x1.localdomain>
-In-Reply-To: <20170829095726.GL25960@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC] Buffers/caches in VirtIO Balloon driver stats
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 29 Aug 2017 11:47:27 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1713066 <1713066@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150366905912.16996.8020711454083281212.malonedeb@gac.canonical.com>
+Message-Id: <150400724793.18876.6756349626634161778.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1713066] Re: Incorrect handling of aarch64 ldp in
+ some cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +37,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpbw==?= =?UTF-8?B?dnNrw70=?= <tgolembi@redhat.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 08/29/2017 05:57 PM, Stefan Hajnoczi wrote:
-> On Sun, Aug 27, 2017 at 11:30:33PM +0200, Tomáš Golembiovský wrote:
->> Hi,
-> I have CCed the relevant mailing lists and people most recently involved
-> in virtio-balloon discussions.  Hopefully this will help get the right
-> people to see your questions.
->
->> We'd like to include information about reclaimable memory into the
->> statistics in VirtiO Balloon driver. Namely, we'd like to include
->> counters for bufferes and caches of Linux kernel. The patch itself is
->> pretty trivial -- no problem there. But before we do that I'd like to
->> get some input from the QEMU community.
->>
->> 1) Is there any reason not to have the stats there?
+Richard Henderson has posted a patch which should fix this:
+http://patchwork.ozlabs.org/patch/806051/
 
-Could you please share the usages of reclaimable memory via the stats?
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1713066
 
->>
->> 2) Considering the balloon device is multiplatform (Linux, BSD,
->> Windows), is there a problem with including buffers/caches? These seem
->> to be specific to the Linux virtual memory subsystem. Of course, other
->> OSes could just report zeros. Are there some internal stats on those
->> OSes that could be filled in? I don't now if such or similar statistic
->> are available on BSD. On Windows only SystemCache stat looks like
->> something relevant. Anyone familiar with those OSes has any suggestions?
->>
->>     
+Title:
+  Incorrect handling of aarch64 ldp in some cases
 
-One of the solutions that I'm thinking about is to make virtio 
-platform-ware.
+Status in QEMU:
+  New
 
-That is, the device by default supports
-VIRTIO_F_LINUX,
-VIRTIO_F_WINDOWS,
-VIRTIO_F_BSD.
+Bug description:
+  In some cases the ldp instruction (and presumably other multi-register
+  loads and stores) can behave incorrectly.
 
-For the Linux driver, only VIRTIO_F_LINUX is supported, then we can
-have Linux specific driver implementations under that feature.
+  Given the following instruction:
+  ldp x0, x1, [x0]
 
+  This will load two 64 bit values from memory, however if each location
+  to load is on a different page and the second page is unmapped this
+  will raise an exception. When this happens x0 has already been updated
+  so after the exception handler has run the operating system will try
+  to rerun the instruction. QEMU will now try to perform an invalid load
+  and raise a new exception.
 
-Best,
-Wei
+  I believe this is incorrect as section D.1.14.5 of the ARMv8 reference
+  manual B.a states that, on taking an exception, registers used in the
+  generation of addresses are restored to their initial value, so x0
+  shouldn't be changed, where x1 can be un an unknown state.
+
+  I found the issue running FreeBSD with the cortex-strings
+  implementation of memcpy. This uses a similar instruction when copying
+  between 64 and 96 bytes.
+
+  I've observed this on:
+  QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.14), Copyright (=
+c) 2003-2008 Fabrice Bellard
+
+  And checked I still get the same behaviour on:
+  QEMU emulator version 2.9.94 (v2.10.0-rc4-dirty)
+  Git revision: 248b23735645f7cbb503d9be6f5bf825f2a603ab
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1713066/+subscriptions
