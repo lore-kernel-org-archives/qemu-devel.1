@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUC6-0000r2-GK
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUC8-0000rC-B8
 	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:15:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUC2-00053w-3p
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:15:50 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37381)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUC5-00056t-4n
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:15:52 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60523
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dmUC1-000535-Rt
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:15:46 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	id 1dmUC4-00056H-N8
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:15:48 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7T0EDJ6090293
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:15:45 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cmvyehjxw-1
+	v7T0E7Yu043799
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:15:48 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cmu3kpdsm-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:15:44 -0400
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:15:48 -0400
 Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 28 Aug 2017 20:15:43 -0400
+	Mon, 28 Aug 2017 18:15:47 -0600
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 28 Aug 2017 19:13:46 -0500
+Date: Mon, 28 Aug 2017 19:13:51 -0500
 In-Reply-To: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1503965694-10794-12-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 11/79] ACPI: don't call
- acpi_pcihp_device_plug_cb on xen
+Message-Id: <1503965694-10794-17-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 16/79] qobject: Add helper macros for common
+ scalar insertions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,55 +40,105 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Bruce Rogers <brogers@suse.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: qemu-stable@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-From: Bruce Rogers <brogers@suse.com>
+From: Eric Blake <eblake@redhat.com>
 
-Commit f0c9d64a exposed the issue that with a xenfv machine using
-pci passthrough, acpi pci hotplug code was being executed by mistake.
-Guard calls to acpi_pcihp_device_plug_cb (and corresponding
-acpi_pcihp_device_unplug_cb) with a check for xen_enabled(). Without
-this check I am seeing an error that the bus doesn't have the
-acpi-pcihp-bsel property set.
+Rather than making lots of callers wrap a scalar in a QInt, QString,
+or QBool, provide helper macros that do the wrapping automatically.
 
-Signed-off-by: Bruce Rogers <brogers@suse.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-(cherry picked from commit 153eba4726dfa1bdfc31d1fe973b2a61b9035492)
+Update the Coccinelle script to make mass conversions easy, although
+the conversion itself will be done as a separate patches to ease
+review and backport efforts.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20170427215821.19397-6-eblake@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+(cherry picked from commit a92c21591b5bb9543996538f14854ca6b528318b)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/acpi/piix4.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ include/qapi/qmp/qdict.h         |  8 ++++++++
+ include/qapi/qmp/qlist.h         |  8 ++++++++
+ scripts/coccinelle/qobject.cocci | 22 ++++++++++++++++++++++
+ 3 files changed, 38 insertions(+)
 
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index a553a7e..c409374 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -385,7 +385,10 @@ static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
-                                 dev, errp);
-         }
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
--        acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev, errp);
-+        if (!xen_enabled()) {
-+            acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
-+                                      errp);
-+        }
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         if (s->cpu_hotplug_legacy) {
-             legacy_acpi_cpu_plug_cb(hotplug_dev, &s->gpe_cpu, dev, errp);
-@@ -408,8 +411,10 @@ static void piix4_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-         acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotplug,
-                                       dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
--        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
--                                    errp);
-+        if (!xen_enabled()) {
-+            acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
-+                                        errp);
-+        }
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
-                !s->cpu_hotplug_legacy) {
-         acpi_cpu_unplug_request_cb(hotplug_dev, &s->cpuhp_state, dev, errp);
+diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
+index fe9a4c5..188440a 100644
+--- a/include/qapi/qmp/qdict.h
++++ b/include/qapi/qmp/qdict.h
+@@ -52,6 +52,14 @@ void qdict_destroy_obj(QObject *obj);
+ #define qdict_put(qdict, key, obj) \
+         qdict_put_obj(qdict, key, QOBJECT(obj))
+ 
++/* Helpers for int, bool, and string */
++#define qdict_put_int(qdict, key, value) \
++        qdict_put(qdict, key, qint_from_int(value))
++#define qdict_put_bool(qdict, key, value) \
++        qdict_put(qdict, key, qbool_from_bool(value))
++#define qdict_put_str(qdict, key, value) \
++        qdict_put(qdict, key, qstring_from_str(value))
++
+ /* High level helpers */
+ double qdict_get_double(const QDict *qdict, const char *key);
+ int64_t qdict_get_int(const QDict *qdict, const char *key);
+diff --git a/include/qapi/qmp/qlist.h b/include/qapi/qmp/qlist.h
+index a84117e..5dc4ed9 100644
+--- a/include/qapi/qmp/qlist.h
++++ b/include/qapi/qmp/qlist.h
+@@ -29,6 +29,14 @@ typedef struct QList {
+ #define qlist_append(qlist, obj) \
+         qlist_append_obj(qlist, QOBJECT(obj))
+ 
++/* Helpers for int, bool, and string */
++#define qlist_append_int(qlist, value) \
++        qlist_append(qlist, qint_from_int(value))
++#define qlist_append_bool(qlist, value) \
++        qlist_append(qlist, qbool_from_bool(value))
++#define qlist_append_str(qlist, value) \
++        qlist_append(qlist, qstring_from_str(value))
++
+ #define QLIST_FOREACH_ENTRY(qlist, var)             \
+         for ((var) = ((qlist)->head.tqh_first);     \
+             (var);                                  \
+diff --git a/scripts/coccinelle/qobject.cocci b/scripts/coccinelle/qobject.cocci
+index aa899e2..97703a4 100644
+--- a/scripts/coccinelle/qobject.cocci
++++ b/scripts/coccinelle/qobject.cocci
+@@ -2,12 +2,34 @@
+ @@
+ expression Obj, Key, E;
+ @@
++(
+ - qdict_put_obj(Obj, Key, QOBJECT(E));
+ + qdict_put(Obj, Key, E);
++|
++- qdict_put(Obj, Key, qint_from_int(E));
+++ qdict_put_int(Obj, Key, E);
++|
++- qdict_put(Obj, Key, qbool_from_bool(E));
+++ qdict_put_bool(Obj, Key, E);
++|
++- qdict_put(Obj, Key, qstring_from_str(E));
+++ qdict_put_str(Obj, Key, E);
++)
+ 
+ // Use QList macros where they make sense
+ @@
+ expression Obj, E;
+ @@
++(
+ - qlist_append_obj(Obj, QOBJECT(E));
+ + qlist_append(Obj, E);
++|
++- qlist_append(Obj, qint_from_int(E));
+++ qlist_append_int(Obj, E);
++|
++- qlist_append(Obj, qbool_from_bool(E));
+++ qlist_append_bool(Obj, E);
++|
++- qlist_append(Obj, qstring_from_str(E));
+++ qlist_append_str(Obj, E);
++)
 -- 
 2.7.4
