@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUD2-000269-Rk
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:51 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCv-0001rJ-A1
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCz-0006PJ-CY
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:48 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34611
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCs-0006I8-31
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:41 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39543)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dmUCz-0006Oi-4e
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:45 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	id 1dmUCr-0006Gl-Q9
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:37 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7T0E7ZK043799
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:16:44 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cmu3kpf0j-1
+	v7T0E8mN090143
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:16:36 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cmvyehm20-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:16:44 -0400
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:16:36 -0400
 Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 28 Aug 2017 20:16:44 -0400
+	Mon, 28 Aug 2017 20:16:35 -0400
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 28 Aug 2017 19:13:42 -0500
+Date: Mon, 28 Aug 2017 19:14:45 -0500
 In-Reply-To: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1503965694-10794-8-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 07/79] iotests/051: Add test for empty filename
+Message-Id: <1503965694-10794-71-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 70/79] spapr: fix memory leak in
+ spapr_core_pre_plug()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,61 +39,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Max Reitz <mreitz@redhat.com>
+From: Greg Kurz <groug@kaod.org>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-(cherry picked from commit 42dc10f17a7f1754d419e715114c37f5c5fde12f)
+In case of error, we must ensure the dynamically allocated base_core_type
+is freed, like it is done everywhere else in this function.
+
+This is a regression introduced in QEMU 2.9 by commit 8149e2992f78.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+(cherry picked from commit df8658de43db242ea82183d75cc957c2b0fa013a)
+ Conflicts:
+	hw/ppc/spapr.c
+* fix context dep on 459264ef2
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tests/qemu-iotests/051        | 1 +
- tests/qemu-iotests/051.out    | 3 +++
- tests/qemu-iotests/051.pc.out | 3 +++
- 3 files changed, 7 insertions(+)
+ hw/ppc/spapr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
-index 630cb7a..4fe6760 100755
---- a/tests/qemu-iotests/051
-+++ b/tests/qemu-iotests/051
-@@ -231,6 +231,7 @@ echo === Leaving out required options ===
- echo
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 58c15ef..bda3854 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2805,7 +2805,7 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     if (cc->nr_threads != smp_threads) {
+         error_setg(errp, "invalid nr-threads %d, must be %d",
+                    cc->nr_threads, smp_threads);
+-        return;
++        goto out;
+     }
  
- run_qemu -drive driver=file
-+run_qemu -drive driver=file,filename=
- run_qemu -drive driver=nbd
- run_qemu -drive driver=raw
- run_qemu -drive file.driver=file
-diff --git a/tests/qemu-iotests/051.out b/tests/qemu-iotests/051.out
-index 7524c62..57bee08 100644
---- a/tests/qemu-iotests/051.out
-+++ b/tests/qemu-iotests/051.out
-@@ -221,6 +221,9 @@ QEMU X.Y.Z monitor - type 'help' for more information
- Testing: -drive driver=file
- QEMU_PROG: -drive driver=file: The 'file' block driver requires a file name
- 
-+Testing: -drive driver=file,filename=
-+QEMU_PROG: -drive driver=file,filename=: The 'file' block driver requires a file name
-+
- Testing: -drive driver=nbd
- QEMU_PROG: -drive driver=nbd: NBD server address missing
- 
-diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
-index c6f4eef..19426e5 100644
---- a/tests/qemu-iotests/051.pc.out
-+++ b/tests/qemu-iotests/051.pc.out
-@@ -319,6 +319,9 @@ QEMU X.Y.Z monitor - type 'help' for more information
- Testing: -drive driver=file
- QEMU_PROG: -drive driver=file: The 'file' block driver requires a file name
- 
-+Testing: -drive driver=file,filename=
-+QEMU_PROG: -drive driver=file,filename=: The 'file' block driver requires a file name
-+
- Testing: -drive driver=nbd
- QEMU_PROG: -drive driver=nbd: NBD server address missing
- 
+     core_slot = spapr_find_cpu_slot(MACHINE(hotplug_dev), cc->core_id, &index);
 -- 
 2.7.4
