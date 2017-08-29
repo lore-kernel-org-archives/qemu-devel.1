@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dmcTq-00027v-CY
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:06:43 -0400
+	(envelope-from <berto@igalia.com>) id 1dmcaF-0003aX-Ih
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:13:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dmcTo-0005qI-Vf
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:06:42 -0400
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Date: Tue, 29 Aug 2017 11:06:22 +0200
-Message-Id: <20170829090622.30843-1-kchamart@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] qemu-iotests: Extend non-shared storage
- migration test (194)
+	(envelope-from <berto@igalia.com>) id 1dmcaB-0008KW-Qj
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:13:19 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:53246)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1dmcaB-0008Av-Ec
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:13:15 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170829085128.GA25960@stefanha-x1.localdomain>
+References: <20170828145728.dqubknb7fruy4sfu@postretch>
+	<20170829085128.GA25960@stefanha-x1.localdomain>
+Date: Tue, 29 Aug 2017 11:12:37 +0200
+Message-ID: <w511snuhh4q.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] GSOC Report: Moving I/O throttling and write
+ notifiers into block filter drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,115 +27,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, stefanha@redhat.com, famz@redhat.com, eblake@redhat.com, kwolf@redhat.com, dgilbert@redhat.com, Kashyap Chamarthy <kchamart@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-This is the follow-up patch that was discussed[*] as part of feedback to
-qemu-iotest 194.
+On Tue 29 Aug 2017 10:51:28 AM CEST, Stefan Hajnoczi wrote:
 
-Changes in this patch:
+>> Already merged patches in 2.10
+>>  https://github.com/qemu/qemu/commits/v2.10.0-rc4?author=epilys
+>> Already merged patches for 2.11
+>>  https://www.mail-archive.com/qemu-devel@nongnu.org/msg470461.html
+>> 
+>> [0] [insert-node] block-insert-node and block-remove-node commands
+>>  https://github.com/epilys/qemu/commits/insert-node?author=epilys
+>> 
+>> [1] [throttle] add throttle filter driver
+>>  https://github.com/epilys/qemu/commits/throttle?author=epilys
+>>  Message-ID: <20170825132028.6184-1-el13635@mail.ntua.gr>
+>>  https://www.mail-archive.com/qemu-devel@nongnu.org/msg476047.html
+>> 
+>> [2] [throttle-remove-legacy] remove legacy throttling interface
+>>  https://github.com/epilys/qemu/commits/throttle-remove-legacy?author=epilys
+>> 
+>> [3] [4] [notify] https://github.com/epilys/qemu/commits/notify?author=epilys
+>> 
+>> [5] block-insert-node RFC
+>>  Message-ID: <20170815074513.9055-1-el13635@mail.ntua.gr>
+>>  https://www.mail-archive.com/qemu-devel@nongnu.org/msg473619.html
+>
+> Thanks for your hard work, Manos!
 
-  - Supply 'job-id' parameter to `drive-mirror` invocation.
+Indeed, thanks!!
 
-  - Issue QMP `block-job-cancel` command on the source QEMU to
-    gracefully complete `drive-mirror` operation.
-
-  - Stop the NBD server on the destination QEMU.
-
-  - Finally, check for both the events: MIGRATION and
-    BLOCK_JOB_COMPLETED
-
-With the above, the test will also be (almost) in sync with the
-procedure outlined in the document 'live-block-operations.rst'[+]
-(section: "QMP invocation for live storage migration with
-``drive-mirror`` + NBD").
-
-[*] https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg04820.html
-    -- qemu-iotests: add 194 non-shared storage migration test
-[+] https://git.qemu.org/gitweb.cgi?p=qemu.git;a=blob;f=docs/interop/live-block-operations.rst
-
-Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
----
-Changes in v2:
- - Check for both the events: MIGRATION and BLOCK_JOB_COMPLETED (Eric)
----
- tests/qemu-iotests/194     | 25 +++++++++++++++++++------
- tests/qemu-iotests/194.out | 11 ++++++++---
- 2 files changed, 27 insertions(+), 9 deletions(-)
-
-diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
-index 8028111e21bed5cf4a2e8e32dc04aa5a9ea9caca..9d81189fe3e790d060da5a0fd41836f4b57f95c7 100755
---- a/tests/qemu-iotests/194
-+++ b/tests/qemu-iotests/194
-@@ -46,16 +46,17 @@ iotests.log('Launching NBD server on destination...')
- iotests.log(dest_vm.qmp('nbd-server-start', addr={'type': 'unix', 'data': {'path': nbd_sock_path}}))
- iotests.log(dest_vm.qmp('nbd-server-add', device='drive0', writable=True))
- 
--iotests.log('Starting drive-mirror on source...')
-+iotests.log('Starting `drive-mirror` on source...')
- iotests.log(source_vm.qmp(
-               'drive-mirror',
-               device='drive0',
-               target='nbd+unix:///drive0?socket={0}'.format(nbd_sock_path),
-               sync='full',
-               format='raw', # always raw, the server handles the format
--              mode='existing'))
-+              mode='existing',
-+              job_id='mirror-job0'))
- 
--iotests.log('Waiting for drive-mirror to complete...')
-+iotests.log('Waiting for `drive-mirror` to complete...')
- iotests.log(source_vm.event_wait('BLOCK_JOB_READY'),
-             filters=[iotests.filter_qmp_event])
- 
-@@ -66,8 +67,20 @@ dest_vm.qmp('migrate-set-capabilities',
-             capabilities=[{'capability': 'events', 'state': True}])
- iotests.log(source_vm.qmp('migrate', uri='unix:{0}'.format(migration_sock_path)))
- 
-+iotests.log('Gracefully ending the `drive-mirror` job on source...')
-+iotests.log(source_vm.qmp('block-job-cancel', device='mirror-job0'))
-+
-+iotests.log('Stopping the NBD server on destination...')
-+iotests.log(dest_vm.qmp('nbd-server-stop'))
-+
- while True:
--    event = source_vm.event_wait('MIGRATION')
--    iotests.log(event, filters=[iotests.filter_qmp_event])
--    if event['data']['status'] in ('completed', 'failed'):
-+    event1 = source_vm.event_wait('MIGRATION')
-+    iotests.log(event1, filters=[iotests.filter_qmp_event])
-+    if event1['data']['status'] in ('completed', 'failed'):
-+        break
-+
-+while True:
-+    event2 = source_vm.event_wait('BLOCK_JOB_COMPLETED')
-+    iotests.log(event2, filters=[iotests.filter_qmp_event])
-+    if event2['event'] == 'BLOCK_JOB_COMPLETED':
-         break
-diff --git a/tests/qemu-iotests/194.out b/tests/qemu-iotests/194.out
-index ae501fecacb706b1851cb9063ce9c9d5a28bb7ea..a461d7e21abb2dee54d72d93d644100f9fbcb17d 100644
---- a/tests/qemu-iotests/194.out
-+++ b/tests/qemu-iotests/194.out
-@@ -2,12 +2,17 @@ Launching VMs...
- Launching NBD server on destination...
- {u'return': {}}
- {u'return': {}}
--Starting drive-mirror on source...
-+Starting `drive-mirror` on source...
- {u'return': {}}
--Waiting for drive-mirror to complete...
--{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'drive0', u'type': u'mirror', u'speed': 0, u'len': 1073741824, u'offset': 1073741824}, u'event': u'BLOCK_JOB_READY'}
-+Waiting for `drive-mirror` to complete...
-+{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'mirror-job0', u'type': u'mirror', u'speed': 0, u'len': 1073741824, u'offset': 1073741824}, u'event': u'BLOCK_JOB_READY'}
- Starting migration...
- {u'return': {}}
-+Gracefully ending the `drive-mirror` job on source...
-+{u'return': {}}
-+Stopping the NBD server on destination...
-+{u'return': {}}
- {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'setup'}, u'event': u'MIGRATION'}
- {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'active'}, u'event': u'MIGRATION'}
- {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'completed'}, u'event': u'MIGRATION'}
-+{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'mirror-job0', u'type': u'mirror', u'speed': 0, u'len': 1073741824, u'offset': 1073741824}, u'event': u'BLOCK_JOB_COMPLETED'}
--- 
-2.9.5
+Berto
