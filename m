@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dmnSG-0003by-G5
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:49:50 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dmnSH-0003dz-Av
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:49:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dmnSF-0001un-00
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:49:48 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dmnSG-0001vk-CS
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:49:49 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Tue, 29 Aug 2017 16:49:27 -0400
-Message-Id: <20170829204934.9039-3-jsnow@redhat.com>
+Date: Tue, 29 Aug 2017 16:49:30 -0400
+Message-Id: <20170829204934.9039-6-jsnow@redhat.com>
 In-Reply-To: <20170829204934.9039-1-jsnow@redhat.com>
 References: <20170829204934.9039-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/9] IDE: Add register hints to tracing
+Subject: [Qemu-devel] [PATCH v2 5/9] IDE: replace DEBUG_AIO with trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,245 +22,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: eblake@redhat.com, qemu-devel@nongnu.org, f4bug@amsat.org, John Snow <jsnow@redhat.com>
 
-Name the registers for tracing purposes.
-
 Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- hw/ide/core.c       | 88 +++++++++++++++++++++++++++++++++++++++++------------
- hw/ide/trace-events |  8 ++---
- 2 files changed, 72 insertions(+), 24 deletions(-)
+ hw/ide/atapi.c            |  5 +----
+ hw/ide/core.c             | 17 ++++++++++-------
+ hw/ide/trace-events       |  3 +++
+ include/hw/ide/internal.h |  6 ++++--
+ 4 files changed, 18 insertions(+), 13 deletions(-)
 
+diff --git a/hw/ide/atapi.c b/hw/ide/atapi.c
+index 37fa699..b8fc51e 100644
+--- a/hw/ide/atapi.c
++++ b/hw/ide/atapi.c
+@@ -416,10 +416,7 @@ static void ide_atapi_cmd_read_dma_cb(void *opaque, int ret)
+         s->io_buffer_size = n * 2048;
+         data_offset = 0;
+     }
+-#ifdef DEBUG_AIO
+-    printf("aio_read_cd: lba=%u n=%d\n", s->lba, n);
+-#endif
+-
++    trace_ide_atapi_cmd_read_dma_cb_aio(s, s->lba, n);
+     s->bus->dma->iov.iov_base = (void *)(s->io_buffer + data_offset);
+     s->bus->dma->iov.iov_len = n * ATAPI_SECTOR_SIZE;
+     qemu_iovec_init_external(&s->bus->dma->qiov, &s->bus->dma->iov, 1);
 diff --git a/hw/ide/core.c b/hw/ide/core.c
-index 31fd593..cb250e6 100644
+index 82a19b1..a1c90e9 100644
 --- a/hw/ide/core.c
 +++ b/hw/ide/core.c
-@@ -1185,13 +1185,37 @@ static void ide_clear_hob(IDEBus *bus)
-     bus->ifs[1].select &= ~(1 << 7);
- }
+@@ -58,6 +58,13 @@ static const int smart_attributes[][12] = {
+     { 190,  0x03, 0x00, 0x45, 0x45, 0x1f, 0x00, 0x1f, 0x1f, 0x00, 0x00, 0x32},
+ };
  
-+/* IOport [W]rite [R]egisters */
-+enum ATA_IOPORT_WR {
-+    ATA_IOPORT_WR_DATA = 0,
-+    ATA_IOPORT_WR_FEATURES = 1,
-+    ATA_IOPORT_WR_SECTOR_COUNT = 2,
-+    ATA_IOPORT_WR_SECTOR_NUMBER = 3,
-+    ATA_IOPORT_WR_CYLINDER_LOW = 4,
-+    ATA_IOPORT_WR_CYLINDER_HIGH = 5,
-+    ATA_IOPORT_WR_DEVICE_HEAD = 6,
-+    ATA_IOPORT_WR_COMMAND = 7,
-+    ATA_IOPORT_WR_NUM_REGISTERS,
++const char *IDE_DMA_CMD_lookup[IDE_DMA__COUNT] = {
++    [IDE_DMA_READ] = "DMA READ",
++    [IDE_DMA_WRITE] = "DMA WRITE",
++    [IDE_DMA_TRIM] = "DMA TRIM",
++    [IDE_DMA_ATAPI] = "DMA ATAPI"
 +};
 +
-+const char *ATA_IOPORT_WR_lookup[ATA_IOPORT_WR_NUM_REGISTERS] = {
-+    [ATA_IOPORT_WR_DATA] = "Data",
-+    [ATA_IOPORT_WR_FEATURES] = "Features",
-+    [ATA_IOPORT_WR_SECTOR_COUNT] = "Sector Count",
-+    [ATA_IOPORT_WR_SECTOR_NUMBER] = "Sector Number",
-+    [ATA_IOPORT_WR_CYLINDER_LOW] = "Cylinder Low",
-+    [ATA_IOPORT_WR_CYLINDER_HIGH] = "Cylinder High",
-+    [ATA_IOPORT_WR_DEVICE_HEAD] = "Device/Head",
-+    [ATA_IOPORT_WR_COMMAND] = "Command"
-+};
-+
- void ide_ioport_write(void *opaque, uint32_t addr, uint32_t val)
- {
-     IDEBus *bus = opaque;
-     IDEState *s = idebus_active_if(bus);
-     int reg_num = addr & 7;
+ static void ide_dummy_transfer_stop(IDEState *s);
  
--    trace_ide_ioport_write(addr, val, bus, s);
-+    trace_ide_ioport_write(addr, ATA_IOPORT_WR_lookup[reg_num], val, bus, s);
- 
-     /* ignore writes to command block while busy with previous command */
-     if (reg_num != 7 && (s->status & (BUSY_STAT|DRQ_STAT))) {
-@@ -1201,43 +1225,43 @@ void ide_ioport_write(void *opaque, uint32_t addr, uint32_t val)
-     switch (reg_num) {
-     case 0:
-         break;
--    case 1:
--	ide_clear_hob(bus);
-+    case ATA_IOPORT_WR_FEATURES:
-+        ide_clear_hob(bus);
-         /* NOTE: data is written to the two drives */
--	bus->ifs[0].hob_feature = bus->ifs[0].feature;
--	bus->ifs[1].hob_feature = bus->ifs[1].feature;
-+        bus->ifs[0].hob_feature = bus->ifs[0].feature;
-+        bus->ifs[1].hob_feature = bus->ifs[1].feature;
-         bus->ifs[0].feature = val;
-         bus->ifs[1].feature = val;
-         break;
--    case 2:
-+    case ATA_IOPORT_WR_SECTOR_COUNT:
- 	ide_clear_hob(bus);
- 	bus->ifs[0].hob_nsector = bus->ifs[0].nsector;
- 	bus->ifs[1].hob_nsector = bus->ifs[1].nsector;
-         bus->ifs[0].nsector = val;
-         bus->ifs[1].nsector = val;
-         break;
--    case 3:
-+    case ATA_IOPORT_WR_SECTOR_NUMBER:
- 	ide_clear_hob(bus);
- 	bus->ifs[0].hob_sector = bus->ifs[0].sector;
- 	bus->ifs[1].hob_sector = bus->ifs[1].sector;
-         bus->ifs[0].sector = val;
-         bus->ifs[1].sector = val;
-         break;
--    case 4:
-+    case ATA_IOPORT_WR_CYLINDER_LOW:
- 	ide_clear_hob(bus);
- 	bus->ifs[0].hob_lcyl = bus->ifs[0].lcyl;
- 	bus->ifs[1].hob_lcyl = bus->ifs[1].lcyl;
-         bus->ifs[0].lcyl = val;
-         bus->ifs[1].lcyl = val;
-         break;
--    case 5:
-+    case ATA_IOPORT_WR_CYLINDER_HIGH:
- 	ide_clear_hob(bus);
- 	bus->ifs[0].hob_hcyl = bus->ifs[0].hcyl;
- 	bus->ifs[1].hob_hcyl = bus->ifs[1].hcyl;
-         bus->ifs[0].hcyl = val;
-         bus->ifs[1].hcyl = val;
-         break;
--    case 6:
-+    case ATA_IOPORT_WR_DEVICE_HEAD:
- 	/* FIXME: HOB readback uses bit 7 */
-         bus->ifs[0].select = (val & ~0x10) | 0xa0;
-         bus->ifs[1].select = (val | 0x10) | 0xa0;
-@@ -1245,7 +1269,7 @@ void ide_ioport_write(void *opaque, uint32_t addr, uint32_t val)
-         bus->unit = (val >> 4) & 1;
-         break;
-     default:
--    case 7:
-+    case ATA_IOPORT_WR_COMMAND:
-         /* command */
-         ide_exec_cmd(bus, val);
-         break;
-@@ -2052,6 +2076,30 @@ void ide_exec_cmd(IDEBus *bus, uint32_t val)
-     }
- }
- 
-+/* IOport [R]ead [R]egisters */
-+enum ATA_IOPORT_RR {
-+    ATA_IOPORT_RR_DATA = 0,
-+    ATA_IOPORT_RR_ERROR = 1,
-+    ATA_IOPORT_RR_SECTOR_COUNT = 2,
-+    ATA_IOPORT_RR_SECTOR_NUMBER = 3,
-+    ATA_IOPORT_RR_CYLINDER_LOW = 4,
-+    ATA_IOPORT_RR_CYLINDER_HIGH = 5,
-+    ATA_IOPORT_RR_DEVICE_HEAD = 6,
-+    ATA_IOPORT_RR_STATUS = 7,
-+    ATA_IOPORT_RR_NUM_REGISTERS,
-+};
-+
-+const char *ATA_IOPORT_RR_lookup[ATA_IOPORT_RR_NUM_REGISTERS] = {
-+    [ATA_IOPORT_RR_DATA] = "Data",
-+    [ATA_IOPORT_RR_ERROR] = "Error",
-+    [ATA_IOPORT_RR_SECTOR_COUNT] = "Sector Count",
-+    [ATA_IOPORT_RR_SECTOR_NUMBER] = "Sector Number",
-+    [ATA_IOPORT_RR_CYLINDER_LOW] = "Cylinder Low",
-+    [ATA_IOPORT_RR_CYLINDER_HIGH] = "Cylinder High",
-+    [ATA_IOPORT_RR_DEVICE_HEAD] = "Device/Head",
-+    [ATA_IOPORT_RR_STATUS] = "Status"
-+};
-+
- uint32_t ide_ioport_read(void *opaque, uint32_t addr)
- {
-     IDEBus *bus = opaque;
-@@ -2064,10 +2112,10 @@ uint32_t ide_ioport_read(void *opaque, uint32_t addr)
-     //hob = s->select & (1 << 7);
-     hob = 0;
-     switch (reg_num) {
--    case 0:
-+    case ATA_IOPORT_RR_DATA:
-         ret = 0xff;
-         break;
--    case 1:
-+    case ATA_IOPORT_RR_ERROR:
-         if ((!bus->ifs[0].blk && !bus->ifs[1].blk) ||
-             (s != bus->ifs && !s->blk)) {
-             ret = 0;
-@@ -2077,7 +2125,7 @@ uint32_t ide_ioport_read(void *opaque, uint32_t addr)
- 	    ret = s->hob_feature;
-         }
-         break;
--    case 2:
-+    case ATA_IOPORT_RR_SECTOR_COUNT:
-         if (!bus->ifs[0].blk && !bus->ifs[1].blk) {
-             ret = 0;
-         } else if (!hob) {
-@@ -2086,7 +2134,7 @@ uint32_t ide_ioport_read(void *opaque, uint32_t addr)
- 	    ret = s->hob_nsector;
-         }
-         break;
--    case 3:
-+    case ATA_IOPORT_RR_SECTOR_NUMBER:
-         if (!bus->ifs[0].blk && !bus->ifs[1].blk) {
-             ret = 0;
-         } else if (!hob) {
-@@ -2095,7 +2143,7 @@ uint32_t ide_ioport_read(void *opaque, uint32_t addr)
- 	    ret = s->hob_sector;
-         }
-         break;
--    case 4:
-+    case ATA_IOPORT_RR_CYLINDER_LOW:
-         if (!bus->ifs[0].blk && !bus->ifs[1].blk) {
-             ret = 0;
-         } else if (!hob) {
-@@ -2104,7 +2152,7 @@ uint32_t ide_ioport_read(void *opaque, uint32_t addr)
- 	    ret = s->hob_lcyl;
-         }
-         break;
--    case 5:
-+    case ATA_IOPORT_RR_CYLINDER_HIGH:
-         if (!bus->ifs[0].blk && !bus->ifs[1].blk) {
-             ret = 0;
-         } else if (!hob) {
-@@ -2113,7 +2161,7 @@ uint32_t ide_ioport_read(void *opaque, uint32_t addr)
- 	    ret = s->hob_hcyl;
-         }
-         break;
--    case 6:
-+    case ATA_IOPORT_RR_DEVICE_HEAD:
-         if (!bus->ifs[0].blk && !bus->ifs[1].blk) {
-             ret = 0;
-         } else {
-@@ -2121,7 +2169,7 @@ uint32_t ide_ioport_read(void *opaque, uint32_t addr)
-         }
-         break;
-     default:
--    case 7:
-+    case ATA_IOPORT_RR_STATUS:
-         if ((!bus->ifs[0].blk && !bus->ifs[1].blk) ||
-             (s != bus->ifs && !s->blk)) {
-             ret = 0;
-@@ -2132,7 +2180,7 @@ uint32_t ide_ioport_read(void *opaque, uint32_t addr)
-         break;
+ static void padstr(char *str, const char *src, int len)
+@@ -860,10 +867,8 @@ static void ide_dma_cb(void *opaque, int ret)
+         goto eot;
      }
  
--    trace_ide_ioport_read(addr, ret, bus, s);
-+    trace_ide_ioport_read(addr, ATA_IOPORT_RR_lookup[reg_num], ret, bus, s);
-     return ret;
- }
+-#ifdef DEBUG_AIO
+-    printf("ide_dma_cb: sector_num=%" PRId64 " n=%d, cmd_cmd=%d\n",
+-           sector_num, n, s->dma_cmd);
+-#endif
++    trace_ide_dma_cb(s, sector_num, n,
++                     IDE_DMA_CMD_lookup[s->dma_cmd]);
  
+     if ((s->dma_cmd == IDE_DMA_READ || s->dma_cmd == IDE_DMA_WRITE) &&
+         !ide_sect_range_ok(s, sector_num, n)) {
+@@ -2391,9 +2396,7 @@ void ide_bus_reset(IDEBus *bus)
+ 
+     /* pending async DMA */
+     if (bus->dma->aiocb) {
+-#ifdef DEBUG_AIO
+-        printf("aio_cancel\n");
+-#endif
++        trace_ide_bus_reset_aio();
+         blk_aio_cancel(bus->dma->aiocb);
+         bus->dma->aiocb = NULL;
+     }
 diff --git a/hw/ide/trace-events b/hw/ide/trace-events
-index b9792812..bff8f39 100644
+index 8c79a6c..cc8949c 100644
 --- a/hw/ide/trace-events
 +++ b/hw/ide/trace-events
-@@ -2,10 +2,10 @@
+@@ -18,6 +18,8 @@ ide_cancel_dma_sync_remaining(void) "draining all remaining requests"
+ ide_sector_read(int64_t sector_num, int nsectors) "sector=%"PRId64" nsectors=%d"
+ ide_sector_write(int64_t sector_num, int nsectors) "sector=%"PRId64" nsectors=%d"
+ ide_reset(void *s) "IDEstate %p"
++ide_bus_reset_aio(void) "aio_cancel"
++ide_dma_cb(void *s, int64_t sector_num, int n, const char *dma) "IDEState %p; sector_num=%"PRId64" n=%d cmd=%s"
  
- # hw/ide/core.c
- # portio
--ide_ioport_read(uint32_t addr, uint32_t val, void *bus, void *s)  "IDE PIO rd @ 0x%"PRIx32"; val 0x%02"PRIx32"; bus %p IDEState %p"
--ide_ioport_write(uint32_t addr, uint32_t val, void *bus, void *s) "IDE PIO wr @ 0x%"PRIx32"; val 0x%02"PRIx32"; bus %p IDEState %p"
--ide_status_read(uint32_t addr, uint32_t val, void *bus, void *s)  "IDE PIO rd @ 0x%"PRIx32" (Alt Status); val 0x%02"PRIx32"; bus %p; IDEState %p"
--ide_cmd_write(uint32_t addr, uint32_t val, void *bus)             "IDE PIO wr @ 0x%"PRIx32" (Device Control); val 0x%02"PRIx32"; bus %p"
-+ide_ioport_read(uint32_t addr, const char *reg, uint32_t val, void *bus, void *s)  "IDE PIO rd @ 0x%"PRIx32" (%s); val 0x%02"PRIx32"; bus %p IDEState %p"
-+ide_ioport_write(uint32_t addr, const char *reg, uint32_t val, void *bus, void *s) "IDE PIO wr @ 0x%"PRIx32" (%s); val 0x%02"PRIx32"; bus %p IDEState %p"
-+ide_status_read(uint32_t addr, uint32_t val, void *bus, void *s)                   "IDE PIO rd @ 0x%"PRIx32" (Alt Status); val 0x%02"PRIx32"; bus %p; IDEState %p"
-+ide_cmd_write(uint32_t addr, uint32_t val, void *bus)                              "IDE PIO wr @ 0x%"PRIx32" (Device Control); val 0x%02"PRIx32"; bus %p"
- # misc
- ide_exec_cmd(void *bus, void *state, uint32_t cmd) "IDE exec cmd: bus %p; state %p; cmd 0x%02x"
- ide_cancel_dma_sync_buffered(void *fn, void *req) "invoking cb %p of buffered request %p with -ECANCELED"
+ # BMDMA HBAs:
+ 
+@@ -51,5 +53,6 @@ ide_atapi_cmd_reply_end_new(void *s, int status) "IDEState: %p; new transfer sta
+ ide_atapi_cmd_check_status(void *s) "IDEState: %p"
+ ide_atapi_cmd_read(void *s, const char *method, int lba, int nb_sectors) "IDEState: %p; read %s: LBA=%d nb_sectors=%d"
+ ide_atapi_cmd(void *s, uint8_t cmd) "IDEState: %p; cmd: 0x%02x"
++ide_atapi_cmd_read_dma_cb_aio(void *s, int lba, int n) "IDEState: %p; aio read: lba=%d n=%d"
+ # Warning: Verbose
+ ide_atapi_cmd_packet(void *s, uint16_t limit, const char *packet) "IDEState: %p; limit=0x%x packet: %s"
+diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+index 74efe8a..db9fde0 100644
+--- a/include/hw/ide/internal.h
++++ b/include/hw/ide/internal.h
+@@ -14,7 +14,6 @@
+ #include "block/scsi.h"
+ 
+ /* debug IDE devices */
+-//#define DEBUG_AIO
+ #define USE_DMA_CDROM
+ 
+ typedef struct IDEBus IDEBus;
+@@ -333,12 +332,15 @@ struct unreported_events {
+ };
+ 
+ enum ide_dma_cmd {
+-    IDE_DMA_READ,
++    IDE_DMA_READ = 0,
+     IDE_DMA_WRITE,
+     IDE_DMA_TRIM,
+     IDE_DMA_ATAPI,
++    IDE_DMA__COUNT
+ };
+ 
++extern const char *IDE_DMA_CMD_lookup[IDE_DMA__COUNT];
++
+ #define ide_cmd_is_read(s) \
+ 	((s)->dma_cmd == IDE_DMA_READ)
+ 
 -- 
 2.9.5
