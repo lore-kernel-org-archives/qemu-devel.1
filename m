@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dmnsW-0005Xc-Uj
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:16:57 -0400
+	(envelope-from <eblake@redhat.com>) id 1dmnsi-0005cn-NS
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:17:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dmnsS-00007w-42
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:16:56 -0400
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:33783)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dmnsR-00006V-Tt
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:16:52 -0400
-Date: Tue, 29 Aug 2017 17:16:49 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170829211649.GA9108@flamenco>
-References: <1500616763-26560-1-git-send-email-cota@braap.org>
-	<1500616763-26560-2-git-send-email-cota@braap.org>
-	<CAJhHMCBpo1-6x9wJWE2oSv1RB=vH-WbA0RjMWYox_dtFfLAURA@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1dmnsh-0000Mv-M2
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:17:08 -0400
+References: <20170829165058.8229-1-kchamart@redhat.com>
+	<CAJSP0QUSXyb8MNVf6Tq8hLgb2wVWLX6GVAPgG-mmrGCxAEOcXg@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <defa8205-e31e-9199-c929-f2e22849e8c7@redhat.com>
+Date: Tue, 29 Aug 2017 16:16:54 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJhHMCBpo1-6x9wJWE2oSv1RB=vH-WbA0RjMWYox_dtFfLAURA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4 11/43] tcg: define CF_PARALLEL and use
- it for TB hashing along with CF_COUNT_MASK
+In-Reply-To: <CAJSP0QUSXyb8MNVf6Tq8hLgb2wVWLX6GVAPgG-mmrGCxAEOcXg@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="JdTAfmD3fQk72HU9lGFoTRM9XNFaLEjqK"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3] qemu-iotests: Extend
+ non-shared storage migration test (194)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +25,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani+qemu@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Kashyap Chamarthy <kchamart@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Dave Gilbert <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Sun, Aug 27, 2017 at 18:15:50 -0400, Pranith Kumar wrote:
-> Hi Emilio,
-> 
-> On Fri, Jul 21, 2017 at 1:59 AM, Emilio G. Cota <cota@braap.org> wrote:
-> > This will enable us to decouple code translation from the value
-> > of parallel_cpus at any given time. It will also help us minimize
-> > TB flushes when generating code via EXCP_ATOMIC.
-> >
-> > Note that the declaration of parallel_cpus is brought to exec-all.h
-> > to be able to define there the "curr_cflags" inline.
-> >
-> > Signed-off-by: Emilio G. Cota <cota@braap.org>
-> 
-> I was testing a winxp image today and I bisected a infinite loop to
-> this commit. The loop happens both with and without mttcg, so I think
-> it has got to do with something else.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JdTAfmD3fQk72HU9lGFoTRM9XNFaLEjqK
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>,
+ Kashyap Chamarthy <kchamart@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>,
+ qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>,
+ Dave Gilbert <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <defa8205-e31e-9199-c929-f2e22849e8c7@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3] qemu-iotests: Extend
+ non-shared storage migration test (194)
+References: <20170829165058.8229-1-kchamart@redhat.com>
+ <CAJSP0QUSXyb8MNVf6Tq8hLgb2wVWLX6GVAPgG-mmrGCxAEOcXg@mail.gmail.com>
+In-Reply-To: <CAJSP0QUSXyb8MNVf6Tq8hLgb2wVWLX6GVAPgG-mmrGCxAEOcXg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Can you test the below? It lets me boot ubuntu, otherwise it reliably
-chokes on a 'rep movsb' *very* early (doesn't even get to grub).
+On 08/29/2017 12:42 PM, Stefan Hajnoczi wrote:
+> On Tue, Aug 29, 2017 at 5:50 PM, Kashyap Chamarthy <kchamart@redhat.com=
+> wrote:
+>> This is the follow-up patch that was discussed[*] as part of feedback =
+to
+>> qemu-iotest 194.
+>>
 
-This discusson on v2 might be relevant (I added CF_COUNT_MASK as a
-result of it, but it seems I have to revisit that):
-  https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg06456.html
+>> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+>> ---
+>> Changes in v3:
+>>  - Wait for migration to complete before issuing `block-job-cancel`
+>>    (StefanH)
+>>  - Wait for the event BLOCK_JOB_COMPLETED on the source before stoppin=
+g
+>>    the NBD server on the destination (StefanH)
+>>
+>> Changes in v2:
+>>  - Check for both the events: MIGRATION and BLOCK_JOB_COMPLETED (EricB=
+)
+>> ---
+>>  tests/qemu-iotests/194     | 23 +++++++++++++++++------
+>>  tests/qemu-iotests/194.out | 11 ++++++++---
+>>  2 files changed, 25 insertions(+), 9 deletions(-)
+>=20
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Anyway let me know if this fixes it for you. Thanks for testing!
+Thanks; I've added this to my NBD queue (pull request to come shortly
+after 2.11 release is finalized), since the test uses NBD.
 
-		Emilio
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 025fae0..8b2f233 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -326,7 +326,7 @@ struct TranslationBlock {
- #define CF_INVALID     0x80000 /* TB is stale. Setters must acquire tb_lock */
- #define CF_PARALLEL    0x100000 /* Generate code for a parallel context */
- /* cflags' mask for hashing/comparison */
--#define CF_HASH_MASK (CF_COUNT_MASK | CF_PARALLEL)
-+#define CF_HASH_MASK (CF_PARALLEL)
 
-     /* Per-vCPU dynamic tracing state used to generate this TB */
-     uint32_t trace_vcpu_dstate;
+--JdTAfmD3fQk72HU9lGFoTRM9XNFaLEjqK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlml2cYACgkQp6FrSiUn
+Q2oSzQf/XMgPvCJ+gcomEBZUfwsf9B6wFaNdxh49Z9wdyFySpI37fyCgNktZ41NV
+65r4bcqTtdjAtrNRNgMHwO42qp8vUZP4SrJxY/ymgKjxxshhkk8Q266Fs8mF//Au
+pos7lIGyenj1DuqgXVWBH3orwwPae39kIR9KaeYYBrf8uOps+bA3dDI8JLR7Z6J+
+FefDwgFO+G8y1je251FOWoX4zJtcVC8Rr1BKoAGjJb2sU03zb1uPRGcZoqCkWqzF
+MPpzeyss50V6cGRbgaSUZDP4ujLJXYZL3hqNjgD6eiARtwzcEO3c1eJdpS2yupQK
+eb2uoJ/9DvnFPSHTwCy8M37uuZ+rlQ==
+=rpPl
+-----END PGP SIGNATURE-----
+
+--JdTAfmD3fQk72HU9lGFoTRM9XNFaLEjqK--
