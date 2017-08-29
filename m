@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keith.busch@intel.com>) id 1dmnEN-00065X-1D
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:35:28 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dmnHm-0006y4-0y
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:38:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keith.busch@intel.com>) id 1dmnEJ-00057Z-UX
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:35:27 -0400
-Received: from mga04.intel.com ([192.55.52.120]:28013)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <keith.busch@intel.com>)
-	id 1dmnEJ-00056Z-LK
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:35:23 -0400
-Date: Tue, 29 Aug 2017 16:40:55 -0400
-From: Keith Busch <keith.busch@intel.com>
-Message-ID: <20170829204055.GD4428@localhost.localdomain>
-References: <CAAeL1MGV5zSPq0OCVCsw4+xzRXm95z-yd_oN2__yskd6aUmESQ@mail.gmail.com>
-	<20170829100936.GP25960@stefanha-x1.localdomain>
+	(envelope-from <pbonzini@redhat.com>) id 1dmnHi-0006VC-Ez
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:38:57 -0400
+Received: from mail-lf0-f47.google.com ([209.85.215.47]:38604)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dmnHi-0006UW-78
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:38:54 -0400
+Received: by mail-lf0-f47.google.com with SMTP id d202so17626355lfd.5
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 13:38:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170829100936.GP25960@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] Make NVME device "migratable" (savevm)
+In-Reply-To: <CAJhHMCD-Ti84xKXh=7TCTgDKQ5YhvRtVAqfpO_iVXrU+RjfF1A@mail.gmail.com>
+References: <20170828035327.17146-1-bobby.prani@gmail.com>
+	<20170828035327.17146-2-bobby.prani@gmail.com>
+	<8f6169d2-107c-ef7b-cc6f-1ad40a25365f@linaro.org>
+	<CAJhHMCD-Ti84xKXh=7TCTgDKQ5YhvRtVAqfpO_iVXrU+RjfF1A@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 29 Aug 2017 22:38:50 +0200
+Message-ID: <CABgObfZYMfmCEUDb8Hu768r-bqw5037=mTom7mEaTdS523uh7w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC PATCH 2/3] cpus-common: Cache allocated work
+ items
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,19 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Sergei Dyshel <qyron.private@gmail.com>, qemu-devel@nongnu.org
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, richard.henderson@linaro.org, Sergey Fedorov <serge.fdrv@gmail.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-On Tue, Aug 29, 2017 at 11:09:36AM +0100, Stefan Hajnoczi wrote:
-> On Fri, Aug 25, 2017 at 11:39:30AM +0300, Sergei Dyshel wrote:
-> > Hi all,
-> > From what I understand, I can't "savevm" a VM that uses NVME device because
-> > it has ".unmigratable = 1" in the code. What support must be implemented in
-> > order to make it "migratable"?
-> 
-> CCing Keith Busch, the NVMe maintainer.
+Il 28 ago 2017 11:43 PM, "Pranith Kumar" <bobby.prani@gmail.com> ha scritto:
 
-To make it migratable, you'll need implement the VMStateDescription to
-save and restore the entire controller state, including all the queues.
-It doesn't actually look like there's a much state to track compared to
-other migratale devices, I just never got any time to write it out.
+On Mon, Aug 28, 2017 at 1:47 PM, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 08/27/2017 08:53 PM, Pranith Kumar wrote:
+>> Using heaptrack, I found that quite a few of our temporary allocations
+>> are coming from allocating work items. Instead of doing this
+>> continously, we can cache the allocated items and reuse them instead
+>> of freeing them.
+>>
+>> This reduces the number of allocations by 25% (200000 -> 150000 for
+>> ARM64 boot+shutdown test).
+>>
+>> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+>
+> Why does this list need to record a "last" element?
+> It would seem a simple lifo would be sufficient.
+>
+> (You would also be able to manage the list via cmpxchg without a separate
+lock,
+> but perhaps the difference between the two isn't measurable.)
+>
+
+Yes, seems like a better design choice. Will fix in next iteration.
+
+
+More recent glibc will also have an efficient per-thread allocator, and
+though I haven't yet benchmarked the newer glibc malloc, GSlice is slower
+than at least both tcmalloc and jemalloc. Perhaps you could instead make
+work items statically allocated?
+
+Thanks,
+
+Paolo
+
+
+Thanks,
+--
+Pranith
