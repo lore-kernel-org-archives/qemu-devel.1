@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCv-0001s8-TO
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:45 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCm-0001dx-Pk
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCu-0006K8-4q
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:41 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42917
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCj-000603-IX
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:32 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35078
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dmUCt-0006Jg-V5
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:40 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	id 1dmUCj-0005zQ-DQ
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:29 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7T0EAbU019556
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:16:39 -0400
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2cmsfn2wwu-1
+	v7T0E8qJ017779
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:16:29 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2cmub2ww78-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:16:39 -0400
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:16:28 -0400
 Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 28 Aug 2017 18:16:38 -0600
+	Mon, 28 Aug 2017 18:16:28 -0600
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 28 Aug 2017 19:14:49 -0500
+Date: Mon, 28 Aug 2017 19:13:40 -0500
 In-Reply-To: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1503965694-10794-75-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 74/79] qemu-iotests: Test automatic commit job
- cancel on hot unplug
+Message-Id: <1503965694-10794-6-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 05/79] qemu-img/convert: Move bs_n > 1 && -B
+ check down
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,91 +40,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-From: Kevin Wolf <kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-(cherry picked from commit c3971b883a596abc6af45f53d2f43fb2f59ccd3b)
-*prereq for d3c8c674
+It does not make much sense to use a backing image for the target when
+you concatenate multiple images (because then there is no correspondence
+between the source images' backing files and the target's); but it was
+still possible to give one by using -o backing_file=X instead of -B X.
+
+Fix this by moving the check.
+
+(Also, change the error message because -B is not the only way to
+ specify the backing file, evidently.)
+
+Cc: qemu-stable <qemu-stable@nongnu.org>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+* applied patch from v1 of series as suggested by author
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tests/qemu-iotests/040     | 35 +++++++++++++++++++++++++++++++++--
- tests/qemu-iotests/040.out |  4 ++--
- 2 files changed, 35 insertions(+), 4 deletions(-)
+ qemu-img.c                 | 14 +++++++-------
+ tests/qemu-iotests/122.out |  4 ++--
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
-index 5bdaf3d..9d381d9 100755
---- a/tests/qemu-iotests/040
-+++ b/tests/qemu-iotests/040
-@@ -70,7 +70,9 @@ class ImageCommitTestCase(iotests.QMPTestCase):
-         self.wait_for_complete()
+diff --git a/qemu-img.c b/qemu-img.c
+index cfc3bc3..4b2d59a 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -2113,13 +2113,6 @@ static int img_convert(int argc, char **argv)
+     }
  
- class TestSingleDrive(ImageCommitTestCase):
--    image_len = 1 * 1024 * 1024
-+    # Need some space after the copied data so that throttling is effective in
-+    # tests that use it rather than just completing the job immediately
-+    image_len = 2 * 1024 * 1024
-     test_len = 1 * 1024 * 256
  
-     def setUp(self):
-@@ -79,7 +81,9 @@ class TestSingleDrive(ImageCommitTestCase):
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % mid_img, test_img)
-         qemu_io('-f', 'raw', '-c', 'write -P 0xab 0 524288', backing_img)
-         qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0xef 524288 524288', mid_img)
--        self.vm = iotests.VM().add_drive(test_img)
-+        self.vm = iotests.VM().add_drive(test_img, interface="none")
-+        self.vm.add_device("virtio-scsi-pci")
-+        self.vm.add_device("scsi-hd,id=scsi0,drive=drive0")
-         self.vm.launch()
+-    if (bs_n > 1 && out_baseimg) {
+-        error_report("-B makes no sense when concatenating multiple input "
+-                     "images");
+-        ret = -1;
+-        goto out;
+-    }
+-
+     src_flags = 0;
+     ret = bdrv_parse_cache_mode(src_cache, &src_flags, &src_writethrough);
+     if (ret < 0) {
+@@ -2229,6 +2222,13 @@ static int img_convert(int argc, char **argv)
+         out_baseimg = out_baseimg_param;
+     }
  
-     def tearDown(self):
-@@ -131,6 +135,33 @@ class TestSingleDrive(ImageCommitTestCase):
-         self.assert_qmp(result, 'error/class', 'GenericError')
-         self.assert_qmp(result, 'error/desc', 'Base \'%s\' not found' % mid_img)
- 
-+    # When the job is running on a BB that is automatically deleted on hot
-+    # unplug, the job is cancelled when the device disappears
-+    def test_hot_unplug(self):
-+        if self.image_len == 0:
-+            return
++    if (bs_n > 1 && out_baseimg) {
++        error_report("Having a backing file for the target makes no sense when "
++                     "concatenating multiple input images");
++        ret = -1;
++        goto out;
++    }
 +
-+        self.assert_no_active_block_jobs()
-+        result = self.vm.qmp('block-commit', device='drive0', top=mid_img,
-+                             base=backing_img, speed=(self.image_len / 4))
-+        self.assert_qmp(result, 'return', {})
-+        result = self.vm.qmp('device_del', id='scsi0')
-+        self.assert_qmp(result, 'return', {})
-+
-+        cancelled = False
-+        deleted = False
-+        while not cancelled or not deleted:
-+            for event in self.vm.get_qmp_events(wait=True):
-+                if event['event'] == 'DEVICE_DELETED':
-+                    self.assert_qmp(event, 'data/device', 'scsi0')
-+                    deleted = True
-+                elif event['event'] == 'BLOCK_JOB_CANCELLED':
-+                    self.assert_qmp(event, 'data/device', 'drive0')
-+                    cancelled = True
-+                else:
-+                    self.fail("Unexpected event %s" % (event['event']))
-+
-+        self.assert_no_active_block_jobs()
+     /* Check if compression is supported */
+     if (compress) {
+         bool encryption =
+diff --git a/tests/qemu-iotests/122.out b/tests/qemu-iotests/122.out
+index 98814de..9317d80 100644
+--- a/tests/qemu-iotests/122.out
++++ b/tests/qemu-iotests/122.out
+@@ -61,8 +61,8 @@ read 65536/65536 bytes at offset 4194304
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ read 65536/65536 bytes at offset 8388608
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-qemu-img: -B makes no sense when concatenating multiple input images
+-qemu-img: -B makes no sense when concatenating multiple input images
++qemu-img: Having a backing file for the target makes no sense when concatenating multiple input images
++qemu-img: Having a backing file for the target makes no sense when concatenating multiple input images
  
- class TestRelativePaths(ImageCommitTestCase):
-     image_len = 1 * 1024 * 1024
-diff --git a/tests/qemu-iotests/040.out b/tests/qemu-iotests/040.out
-index 4fd1c2d..6d9bee1 100644
---- a/tests/qemu-iotests/040.out
-+++ b/tests/qemu-iotests/040.out
-@@ -1,5 +1,5 @@
--.........................
-+...........................
- ----------------------------------------------------------------------
--Ran 25 tests
-+Ran 27 tests
+ === Compression with misaligned allocations and image sizes ===
  
- OK
 -- 
 2.7.4
