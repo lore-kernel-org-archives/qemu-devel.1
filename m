@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dmcaF-0003aX-Ih
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:13:21 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dmcg5-00051M-VR
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:19:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dmcaB-0008KW-Qj
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:13:19 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:53246)
+	(envelope-from <stefanha@gmail.com>) id 1dmcg1-0002Kc-Jq
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:19:21 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36512)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1dmcaB-0008Av-Ec
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:13:15 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170829085128.GA25960@stefanha-x1.localdomain>
-References: <20170828145728.dqubknb7fruy4sfu@postretch>
-	<20170829085128.GA25960@stefanha-x1.localdomain>
-Date: Tue, 29 Aug 2017 11:12:37 +0200
-Message-ID: <w511snuhh4q.fsf@maestria.local.igalia.com>
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dmcg1-0002K6-Ba
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:19:17 -0400
+Received: by mail-wm0-x244.google.com with SMTP id j72so3054098wmi.3
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 02:19:17 -0700 (PDT)
+Date: Tue, 29 Aug 2017 10:19:13 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170829091913.GD25960@stefanha-x1.localdomain>
+References: <20170828015654.2530-1-Sergio.G.DelReal@gmail.com>
+	<20170828015654.2530-4-Sergio.G.DelReal@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] GSOC Report: Moving I/O throttling and write
- notifiers into block filter drivers
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170828015654.2530-4-Sergio.G.DelReal@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 03/14] hvf: add conditional macros around
+ hvf code in cpus.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-On Tue 29 Aug 2017 10:51:28 AM CEST, Stefan Hajnoczi wrote:
+On Sun, Aug 27, 2017 at 08:56:43PM -0500, Sergio Andres Gomez Del Real wrote:
+> @@ -900,6 +904,11 @@ void cpu_synchronize_all_states(void)
+>  
+>      CPU_FOREACH(cpu) {
+>          cpu_synchronize_state(cpu);
+> +#ifdef CONFIG_HVF
+> +        if (hvf_enabled()) {
+> +            hvf_cpu_synchronize_state(cpu);
+> +        }
+> +#endif
 
->> Already merged patches in 2.10
->>  https://github.com/qemu/qemu/commits/v2.10.0-rc4?author=epilys
->> Already merged patches for 2.11
->>  https://www.mail-archive.com/qemu-devel@nongnu.org/msg470461.html
->> 
->> [0] [insert-node] block-insert-node and block-remove-node commands
->>  https://github.com/epilys/qemu/commits/insert-node?author=epilys
->> 
->> [1] [throttle] add throttle filter driver
->>  https://github.com/epilys/qemu/commits/throttle?author=epilys
->>  Message-ID: <20170825132028.6184-1-el13635@mail.ntua.gr>
->>  https://www.mail-archive.com/qemu-devel@nongnu.org/msg476047.html
->> 
->> [2] [throttle-remove-legacy] remove legacy throttling interface
->>  https://github.com/epilys/qemu/commits/throttle-remove-legacy?author=epilys
->> 
->> [3] [4] [notify] https://github.com/epilys/qemu/commits/notify?author=epilys
->> 
->> [5] block-insert-node RFC
->>  Message-ID: <20170815074513.9055-1-el13635@mail.ntua.gr>
->>  https://www.mail-archive.com/qemu-devel@nongnu.org/msg473619.html
->
-> Thanks for your hard work, Manos!
+Searching for CONFIG_KVM and CONFIG_HAX in cpus.c produces no results.
+How do they solve the same problem without using #ifdef?  They define
+nop stubs in "system/$ACCEL.h" so that cpus.c does not need #ifdefs.
 
-Indeed, thanks!!
+Please follow the same approach for hvf.  Using stubs avoids "bitrot"
+because the cpus.c kvm/hax code is always compiled, even when the
+feature is disabled.  This way no compiler errors/warnings can hide in
+the #ifdef regions that aren't compiled by most people.
 
-Berto
+Please avoid #ifdef whereever possible.
