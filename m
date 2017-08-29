@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1dmeqf-0000Uj-Da
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 07:38:31 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dmfAe-0003YF-6h
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 07:59:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agraf@suse.de>) id 1dmeqb-0001sq-D3
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 07:38:25 -0400
-Received: from mx2.suse.de ([195.135.220.15]:52036 helo=mx1.suse.de)
+	(envelope-from <wei.w.wang@intel.com>) id 1dmfAb-0003cX-11
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 07:59:04 -0400
+Received: from mga06.intel.com ([134.134.136.31]:10756)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <agraf@suse.de>) id 1dmeqb-0001sW-6d
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 07:38:21 -0400
-From: Alexander Graf <agraf@suse.de>
-Date: Tue, 29 Aug 2017 13:38:18 +0200
-Message-Id: <20170829113818.42482-1-agraf@suse.de>
-Subject: [Qemu-devel] [PATCH v3] console: add question-mark escape operator
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dmfAa-0003a4-Mb
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 07:59:00 -0400
+Message-ID: <59A557B1.7080704@intel.com>
+Date: Tue, 29 Aug 2017 20:01:53 +0800
+From: Wei Wang <wei.w.wang@intel.com>
+MIME-Version: 1.0
+References: <20170827233033.7afa49b9@fiorina>
+	<20170829095726.GL25960@stefanha-x1.localdomain>
+In-Reply-To: <20170829095726.GL25960@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC] Buffers/caches in VirtIO Balloon driver stats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,45 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpbw==?= =?UTF-8?B?dnNrw70=?= <tgolembi@redhat.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-Some termcaps (found using SLES11SP1) use [? sequences. According to man
-console_codes (http://linux.die.net/man/4/console_codes) the question mark
-is a nop and should simply be ignored.
+On 08/29/2017 05:57 PM, Stefan Hajnoczi wrote:
+> On Sun, Aug 27, 2017 at 11:30:33PM +0200, Tomáš Golembiovský wrote:
+>> Hi,
+> I have CCed the relevant mailing lists and people most recently involved
+> in virtio-balloon discussions.  Hopefully this will help get the right
+> people to see your questions.
+>
+>> We'd like to include information about reclaimable memory into the
+>> statistics in VirtiO Balloon driver. Namely, we'd like to include
+>> counters for bufferes and caches of Linux kernel. The patch itself is
+>> pretty trivial -- no problem there. But before we do that I'd like to
+>> get some input from the QEMU community.
+>>
+>> 1) Is there any reason not to have the stats there?
 
-This patch does exactly that, rendering screen output readable when
-outputting guest serial consoles to the graphical console emulator.
+Could you please share the usages of reclaimable memory via the stats?
 
-Signed-off-by: Alexander Graf <agraf@suse.de>
 
----
+>>
+>> 2) Considering the balloon device is multiplatform (Linux, BSD,
+>> Windows), is there a problem with including buffers/caches? These seem
+>> to be specific to the Linux virtual memory subsystem. Of course, other
+>> OSes could just report zeros. Are there some internal stats on those
+>> OSes that could be filled in? I don't now if such or similar statistic
+>> are available on BSD. On Windows only SystemCache stat looks like
+>> something relevant. Anyone familiar with those OSes has any suggestions?
+>>
+>>     
 
-v1 -> v2:
+One of the solutions that I'm thinking about is to make virtio 
+platform-ware.
 
-  - rebase to 2.10
+That is, the device by default supports
+VIRTIO_F_LINUX,
+VIRTIO_F_WINDOWS,
+VIRTIO_F_BSD.
 
-v2 -> v3:
+For the Linux driver, only VIRTIO_F_LINUX is supported, then we can
+have Linux specific driver implementations under that feature.
 
-  - fix coding style issues
----
- ui/console.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/ui/console.c b/ui/console.c
-index d2d3534c49..37fee92001 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -880,8 +880,9 @@ static void console_putchar(QemuConsole *s, int ch)
-         } else {
-             if (s->nb_esc_params < MAX_ESC_PARAMS)
-                 s->nb_esc_params++;
--            if (ch == ';')
-+            if (ch == ';' || ch == '?') {
-                 break;
-+            }
-             trace_console_putchar_csi(s->esc_params[0], s->esc_params[1],
-                                       ch, s->nb_esc_params);
-             s->state = TTY_STATE_NORM;
--- 
-2.12.3
+Best,
+Wei
