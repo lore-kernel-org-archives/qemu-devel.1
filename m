@@ -1,40 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dmYJ6-0002o8-Q1
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 00:39:21 -0400
+	(envelope-from <bounces@canonical.com>) id 1dmYPJ-0004GR-6d
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 00:45:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dmYJ2-0006MS-Sj
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 00:39:20 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60586)
+	(envelope-from <bounces@canonical.com>) id 1dmYPF-0000Bi-9r
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 00:45:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53252)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
-	id 1dmYJ2-0006M0-JS
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 00:39:16 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7T4d9Lp017206
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 00:39:15 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cmsrsyjv1-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 00:39:14 -0400
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
-	Tue, 29 Aug 2017 00:39:13 -0400
-References: <1503907487-2764-1-git-send-email-zyimin@linux.vnet.ibm.com>
-	<1503907487-2764-4-git-send-email-zyimin@linux.vnet.ibm.com>
-	<20170828173324.5723a231.cohuck@redhat.com>
-From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Date: Tue, 29 Aug 2017 12:39:07 +0800
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dmYPF-0000BY-23
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 00:45:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dmYPD-0008I7-4q
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 04:45:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EDCE02E80CB
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 04:45:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170828173324.5723a231.cohuck@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Message-Id: <681b6a4f-f727-8f0c-47f8-84514e02c7e2@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/4] s390x/pci: fixup ind_offset of msix
- routing entry
+Date: Tue, 29 Aug 2017 04:39:46 -0000
+From: Thomas Huth <1713434@bugs.launchpad.net>
+Reply-To: Bug 1713434 <1713434@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150391152035.18876.7874968547091336063.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150398158648.19648.3433190744010530855.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1713434] Re: prom-env-test test aborted and core
+ dumped
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,66 +37,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, richard.henderson@linaro.org
+To: qemu-devel@nongnu.org
 
+Weird. I managed to run the test on a POWER9 box today, too, and it
+works for me:
 
+TEST: tests/prom-env-test... (pid=3D18912)
+  /ppc64/prom-env/mac99:                                               OK
+  /ppc64/prom-env/g3beige:                                             OK
+  /ppc64/prom-env/pseries:                                             OK
+PASS: tests/prom-env-test
 
-=E5=9C=A8 2017/8/28 =E4=B8=8B=E5=8D=8811:33, Cornelia Huck =E5=86=99=E9=81=
-=93:
-> On Mon, 28 Aug 2017 10:04:46 +0200
-> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
->
->> The aibvo of zpci device should be constant after issued mpcifc
->> registering irqs instruction. Each msix vector should offset from the
->> aibvo. But for flic adapter interrupt, we should use the absolute
->> offset within the aibv. So let's use the aibvo+vector to fixup msix
->> routing entry.
-> This makes sense, but I would tweak the description a bit.
->
-> "The guest uses the mpcifc instruction to register the aibvo of a zpci
-> device, which is the starting offset of indicators in the indicator
-> area and thus remains constant. Each msix vector is an offset from the
-> aibvo. When we map a msix route to an adapter route, we should not
-> modify the starting offset, but instead add the vector to the starting
-> offset to get the absolute offset in the specific route."
-Much better. Thanks!
->
-> I'm wondering how this was ever supposed to work?
-I investigated this. Linux kernel always uses 0 as starting offset for
-aibvo. And each msix entry is only registered one time. So we didn't
-encounter any problem. But the logic here is not right obviously. It
-is just a coincidence.
+Which OS and C compiler are you using?
 
->
->> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
->> ---
->>   target/s390x/kvm.c | 4 +---
->>   1 file changed, 1 insertion(+), 3 deletions(-)
->>
->> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->> index e348bfb7cc..c08b7757e7 100644
->> --- a/target/s390x/kvm.c
->> +++ b/target/s390x/kvm.c
->> @@ -2515,14 +2515,12 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_ro=
-uting_entry *route,
->>           return -ENODEV;
->>       }
->>  =20
->> -    pbdev->routes.adapter.ind_offset =3D vec;
->> -
->>       route->type =3D KVM_IRQ_ROUTING_S390_ADAPTER;
->>       route->flags =3D 0;
->>       route->u.adapter.summary_addr =3D pbdev->routes.adapter.summary_=
-addr;
->>       route->u.adapter.ind_addr =3D pbdev->routes.adapter.ind_addr;
->>       route->u.adapter.summary_offset =3D pbdev->routes.adapter.summar=
-y_offset;
->> -    route->u.adapter.ind_offset =3D pbdev->routes.adapter.ind_offset;
->> +    route->u.adapter.ind_offset =3D pbdev->routes.adapter.ind_offset =
-+ vec;
->>       route->u.adapter.adapter_id =3D pbdev->routes.adapter.adapter_id=
-;
->>       return 0;
->>   }
->
+Also, could you please try to add this patch (to add "-serial
+/dev/stderr") and then post the console output of the prom-env-test:
+
+diff --git a/tests/prom-env-test.c b/tests/prom-env-test.c
+--- a/tests/prom-env-test.c
++++ b/tests/prom-env-test.c
+@@ -51,7 +51,7 @@ static void test_machine(const void *machine)
+     extra_args =3D strcmp(machine, "pseries") =3D=3D 0 ? "-nodefaults" : "=
+";
+ =
+
+     args =3D g_strdup_printf("-M %s,accel=3Dtcg %s -prom-env 'use-nvramrc?=
+=3Dtrue' "
+-                           "-prom-env 'nvramrc=3D%x %x l!' ",
++                           "-prom-env 'nvramrc=3D%x %x l!' -serial /dev/st=
+derr",
+                            (const char *)machine, extra_args, MAGIC, ADDRE=
+SS);
+ =
+
+     qtest_start(args);
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1713434
+
+Title:
+  prom-env-test test aborted and core dumped
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  On ppc64le architecture machine the following test case Aborted and
+  Core dumped.
+
+  # tests/prom-env-test --quiet --keep-going -m=3Dquick --GTestLogFD=3D6
+  **
+  ERROR:tests/libqtest.c:628:qtest_get_arch: assertion failed: (qemu !=3D N=
+ULL)
+  Aborted (core dumped)
+
+  Steps to re-produce:
+  clone from the git
+  configure & compile =
+
+  run the unit tests by 'make check'
+
+  (gdb) bt
+  #0  0x00003fff9d60eff0 in raise () from /lib64/libc.so.6
+  #1  0x00003fff9d61136c in abort () from /lib64/libc.so.6
+  #2  0x00003fff9de1aa04 in g_assertion_message () from /lib64/libglib-2.0.=
+so.0
+  #3  0x00003fff9de1ab0c in g_assertion_message_expr () from /lib64/libglib=
+-2.0.so.0
+  #4  0x000000001000cc30 in qtest_get_arch () at tests/libqtest.c:628
+  #5  0x00000000100048f0 in main (argc=3D5, argv=3D0x3ffff2145538) at tests=
+/prom-env-test.c:82
+  (gdb) i r
+  r0             0xfa	250
+  r1             0x3ffff2144d30	70368510627120
+  r2             0x3fff9d7b9900	70367091333376
+  r3             0x0	0
+  r4             0x12a7	4775
+  r5             0x6	6
+  r6             0x8	8
+  r7             0x1	1
+  r8             0x0	0
+  r9             0x0	0
+  r10            0x0	0
+  r11            0x0	0
+  r12            0x0	0
+  r13            0x3fff9dfa1950	70367099623760
+  r14            0x0	0
+  r15            0x0	0
+  r16            0x0	0
+  r17            0x0	0
+  r18            0x0	0
+  r19            0x0	0
+  r20            0x0	0
+  r21            0x0	0
+  r22            0x0	0
+  r23            0x0	0
+  r24            0x0	0
+  r25            0x0	0
+  r26            0x0	0
+  r27            0x100287f8	268601336
+  r28            0x16841b40	377756480
+  r29            0x4c	76
+  r30            0x3ffff2144de8	70368510627304
+  r31            0x6	6
+  pc             0x3fff9d60eff0	0x3fff9d60eff0 <raise+96>
+  msr            0x900000000280f033	10376293541503627315
+  cr             0x42000842	1107298370
+  lr             0x3fff9d61136c	0x3fff9d61136c <abort+396>
+  ctr            0x0	0
+  xer            0x0	0
+  orig_r3        0x12a7	4775
+  trap           0xc00	3072
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1713434/+subscriptions
