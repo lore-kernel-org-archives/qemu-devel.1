@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53888)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dmimd-0005mQ-74
+	id 1dmimd-0005mG-5t
 	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:50:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dmimZ-0000Du-8f
+	id 1dmimZ-0000Dp-8Z
 	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:50:31 -0400
-Received: from research.iiit.ac.in ([196.12.53.8]:58832)
+Received: from research.iiit.ac.in ([196.12.53.8]:58842)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dmimY-0000AC-HB
+	id 1dmimY-0000AW-H7
 	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:50:27 -0400
 From: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-Date: Tue, 29 Aug 2017 21:20:15 +0530
-Message-Id: <1504021818-12128-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-Subject: [Qemu-devel] [PATCH 0/3] QEMU Backup Tool
+Date: Tue, 29 Aug 2017 21:20:17 +0530
+Message-Id: <1504021818-12128-3-git-send-email-chugh.ishani@research.iiit.ac.in>
+In-Reply-To: <1504021818-12128-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+References: <1504021818-12128-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+Subject: [Qemu-devel] [PATCH 2/3] Test for full Backup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +29,166 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@redhat.com, jsnow@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 
-This patch series is intended to introduce QEMU Backup tool.
-qemu-backup will be a command-line tool for performing full and 
-incremental disk backups on running VMs. It is intended as a
-reference implementation for management stack and backup developers
-to see QEMU's backup features in action.
-This patch series contains three patches,
-               1) QEMU Backup command line tool.
-               2) Test for full backup.
-               3) Manpage for the tool.
+This patch is the test for full backup implementation in Backup tool.
+The test employs two basic substests:
+1) Backing up an empty guest and comparing it with base image.
+2) Writing a pattern to the guest, creating backup and comparing
+   with the base image.
 
-Ishani Chugh (3):
-  backup: QEMU Backup Tool
-  Test for full Backup
-  Add manpage for QEMU Backup Tool
 
- Makefile                        |  14 +-
- contrib/backup/qemu-backup.py   | 335 ++++++++++++++++++++++++++++++++++++++++
- contrib/backup/qemu-backup.texi | 144 +++++++++++++++++
- tests/qemu-iotests/191          |  86 +++++++++++
- tests/qemu-iotests/191.out      |  35 +++++
- tests/qemu-iotests/group        |   2 +
- 6 files changed, 612 insertions(+), 4 deletions(-)
- create mode 100644 contrib/backup/qemu-backup.py
- create mode 100644 contrib/backup/qemu-backup.texi
+Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+---
+ tests/qemu-iotests/191     | 86 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/191.out | 35 +++++++++++++++++++
+ tests/qemu-iotests/group   |  2 ++
+ 3 files changed, 123 insertions(+)
  create mode 100755 tests/qemu-iotests/191
  create mode 100644 tests/qemu-iotests/191.out
 
+diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
+new file mode 100755
+index 0000000..16988d8
+--- /dev/null
++++ b/tests/qemu-iotests/191
+@@ -0,0 +1,86 @@
++#!/bin/bash
++#
++# Test full backup functionality of qemu-backup tool
++#
++# Copyright (C) 2017 Ishani Chugh <chugh.ishani@research.iiit.ac.in>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=chugh.ishani@research.iiit.ac.in
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1	# failure is the default!
++
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.qemu
++
++_supported_fmt generic
++_supported_proto generic
++_supported_os Linux
++
++_cleanup()
++{
++        rm -f "$TEST_DIR"/virtio0
++        rm -f "$CONFIG_FILE"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++CONFIG_FILE="$TEST_DIR"/backup-config
++SOCKET=unix:"$TEST_DIR"/backup_socket
++size=128M
++
++_make_test_img "$size"
++export QEMU_BACKUP_CONFIG="$CONFIG_FILE"
++qemu_comm_method="monitor"
++echo
++_launch_qemu -drive if=virtio,file="$TEST_IMG" -qmp "$SOCKET",server,nowait
++$PYTHON ../../contrib/backup/qemu-backup.py guest add --guest adad --qmp "$SOCKET"
++$PYTHON ../../contrib/backup/qemu-backup.py drive add --id virtio0 --guest adad --target "$TEST_DIR"/virtio0
++echo
++echo "== Creating backup =="
++$PYTHON ../../contrib/backup/qemu-backup.py backup --guest adad
++_send_qemu_cmd $QEMU_HANDLE 'quit' ''
++wait=1 _cleanup_qemu
++echo
++echo "== Comparing images =="
++$QEMU_IMG compare "$TEST_DIR"/virtio0 "$TEST_IMG"
++_cleanup
++
++_launch_qemu -drive if=virtio,id=virtio0,file="$TEST_IMG" -qmp "$SOCKET",server,nowait
++$PYTHON ../../contrib/backup/qemu-backup.py guest add --guest adad --qmp "$SOCKET"
++$PYTHON ../../contrib/backup/qemu-backup.py drive add --id virtio0 --guest adad --target "$TEST_DIR"/virtio0
++echo
++echo "== Writing Pattern =="
++_send_qemu_cmd $QEMU_HANDLE 'qemu-io virtio0 "write -P 0x22 0 1M"' "(qemu)" | _filter_qemu_io
++echo
++echo "== Creating backup =="
++$PYTHON ../../contrib/backup/qemu-backup.py backup --guest adad
++_send_qemu_cmd $QEMU_HANDLE 'quit' ''
++wait=1 _cleanup_qemu
++echo
++echo "== Comparing images =="
++$QEMU_IMG compare "$TEST_DIR"/virtio0 "$TEST_IMG"
++_cleanup
++_cleanup_test_img
++
++echo "*** done"
++status=0
+\ No newline at end of file
+diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
+new file mode 100644
+index 0000000..c60d47a
+--- /dev/null
++++ b/tests/qemu-iotests/191.out
+@@ -0,0 +1,35 @@
++QA output created by 191
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
++
++Successfully Added Guest
++Successfully Added Drive
++
++== Creating backup ==
++Backup Started
++*virtio0
++Backup Complete
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) Formatting 'TEST_DIR/virtio0', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
++quit
++
++== Comparing images ==
++Images are identical.
++Successfully Added Guest
++Successfully Added Drive
++
++== Writing Pattern ==
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) qemu-io virtio0 "write -P 0x22 0 1M"
++
++== Creating backup ==
++Backup Started
++*virtio0
++Backup Complete
++wrote 1048576/1048576 bytes at offset 0
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++(qemu) Formatting 'TEST_DIR/virtio0', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
++quit
++
++== Comparing images ==
++Images are identical.
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index afbdc42..66fa231 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -186,4 +186,6 @@
+ 188 rw auto quick
+ 189 rw auto
+ 190 rw auto quick
++191 rw auto
+ 192 rw auto quick
++193 rw auto
 -- 
 2.7.4
