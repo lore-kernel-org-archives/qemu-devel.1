@@ -1,16 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dmnSN-0003mM-RP
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:49:57 -0400
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dmnWz-000865-3b
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:54:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dmnSM-0001z9-Fx
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:49:55 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Tue, 29 Aug 2017 16:49:32 -0400
-Message-Id: <20170829204934.9039-8-jsnow@redhat.com>
-In-Reply-To: <20170829204934.9039-1-jsnow@redhat.com>
-References: <20170829204934.9039-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 7/9] AHCI: Rework IRQ constants
+	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dmnWw-0004RL-1W
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:54:41 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32798
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
+	id 1dmnWv-0004PH-Rr
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:54:37 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7TKsH4c146894
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 16:54:34 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2cnenpjp49-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 16:54:34 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
+	Tue, 29 Aug 2017 14:54:34 -0600
+References: <20170825211119.474-1-danielhb@linux.vnet.ibm.com>
+	<20170829072310.GJ2578@umbus.fritz.box>
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Date: Tue, 29 Aug 2017 17:54:28 -0300
+MIME-Version: 1.0
+In-Reply-To: <20170829072310.GJ2578@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Message-Id: <df49df06-caaf-81f5-7c24-f4324654a262@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for-2.11 v2] hw/ppc: CAS reset
+ on early device hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,209 +44,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: eblake@redhat.com, qemu-devel@nongnu.org, f4bug@amsat.org, John Snow <jsnow@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-Create a new enum so that we can name the IRQ bits, which will make debugging
-them a little nicer if we can print them out. Not handled in this patch, but
-this will make it possible to get a nice debug printf detailing exactly which
-status bits are set, as it can be multiple at any given time.
 
-As a consequence of this patch, it is no longer possible to set multiple IRQ
-codes at once, but nothing was utilizing this ability anyway.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- hw/ide/ahci.c          | 49 ++++++++++++++++++++++++++++++++++++++-----------
- hw/ide/ahci_internal.h | 44 +++++++++++++++++++++++++++++++++++---------
- hw/ide/trace-events    |  2 +-
- 3 files changed, 74 insertions(+), 21 deletions(-)
+On 08/29/2017 04:23 AM, David Gibson wrote:
+> On Fri, Aug 25, 2017 at 06:11:18PM -0300, Daniel Henrique Barboza wrote:
+>> v2:
+>> - rebased with ppc-for-2.11
+>> - function 'spapr_cas_completed' dropped
+>> - function 'spapr_drc_needed' made public and it's now used inside
+>>    'spapr_hotplugged_dev_before_cas'
+>> - 'spapr_drc_needed' was changed to support the migration of logical
+>>    DRCs with devs attached in UNUSED state
+>> - new function: 'spapr_clear_pending_events'. This function is used
+>>    inside ppc_spapr_reset to reset the pending_events QTAILQ
+> Thanks for the followup, unfortunately there is still an important bug
+> left, see comments on the patch itself.
+>
+> At a higher level, though, looking at the event reset code made me
+> think of a possible even simpler solution to this problem.
+>
+> The queue of events (both hotplug and epow) is already in a simple
+> internal form that's independent of the two delivery mechanisms.  The
+> only difference is what event source triggers the interrupt.  This
+> explains why an extra hotplug event after the CAS "unstuck" the queue.
+>
+> AFAICT, a spurious interrupts here should be harmless - the kernel
+> will just check the queue and find nothing there.
+>
+> So, it should be sufficient to, after CAS, pulse the hotplug queue
+> interrupt if the hotplug queue is negotiated.
+>
+This is something I've tried in my first attempts at this problem, before
+sending the first patch in which I blocked hotplug before CAS. Back then,
+the problem was that the kernel panics with sig 11 (acess of bad area) when
+receiving the pulse after CAS.
 
-diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-index c60a000..a0a4dd6 100644
---- a/hw/ide/ahci.c
-+++ b/hw/ide/ahci.c
-@@ -56,6 +56,27 @@ static bool ahci_map_fis_address(AHCIDevice *ad);
- static void ahci_unmap_clb_address(AHCIDevice *ad);
- static void ahci_unmap_fis_address(AHCIDevice *ad);
- 
-+static const char *AHCIPortIRQ_lookup[AHCI_PORT_IRQ__END] = {
-+    [AHCI_PORT_IRQ_BIT_DHRS] = "DHRS",
-+    [AHCI_PORT_IRQ_BIT_PSS]  = "PSS",
-+    [AHCI_PORT_IRQ_BIT_DSS]  = "DSS",
-+    [AHCI_PORT_IRQ_BIT_SDBS] = "SDBS",
-+    [AHCI_PORT_IRQ_BIT_UFS]  = "UFS",
-+    [AHCI_PORT_IRQ_BIT_DPS]  = "DPS",
-+    [AHCI_PORT_IRQ_BIT_PCS]  = "PCS",
-+    [AHCI_PORT_IRQ_BIT_DMPS] = "DMPS",
-+    [8 ... 21]               = "RESERVED",
-+    [AHCI_PORT_IRQ_BIT_PRCS] = "PRCS",
-+    [AHCI_PORT_IRQ_BIT_IPMS] = "IPMS",
-+    [AHCI_PORT_IRQ_BIT_OFS]  = "OFS",
-+    [25]                     = "RESERVED",
-+    [AHCI_PORT_IRQ_BIT_INFS] = "INFS",
-+    [AHCI_PORT_IRQ_BIT_IFS]  = "IFS",
-+    [AHCI_PORT_IRQ_BIT_HBDS] = "HBDS",
-+    [AHCI_PORT_IRQ_BIT_HBFS] = "HBFS",
-+    [AHCI_PORT_IRQ_BIT_TFES] = "TFES",
-+    [AHCI_PORT_IRQ_BIT_CPDS] = "CPDS"
-+};
- 
- static uint32_t  ahci_port_read(AHCIState *s, int port, int offset)
- {
-@@ -170,12 +191,18 @@ static void ahci_check_irq(AHCIState *s)
- }
- 
- static void ahci_trigger_irq(AHCIState *s, AHCIDevice *d,
--                             int irq_type)
-+                             enum AHCIPortIRQ irqbit)
- {
--    DPRINTF(d->port_no, "trigger irq %#x -> %x\n",
--            irq_type, d->port_regs.irq_mask & irq_type);
-+    g_assert(irqbit >= 0 && irqbit < 32);
-+    uint32_t irq = 1U << irqbit;
-+    uint32_t irqstat = d->port_regs.irq_stat | irq;
- 
--    d->port_regs.irq_stat |= irq_type;
-+    trace_ahci_trigger_irq(s, d->port_no,
-+                           AHCIPortIRQ_lookup[irqbit], irq,
-+                           d->port_regs.irq_stat, irqstat,
-+                           irqstat & d->port_regs.irq_mask);
-+
-+    d->port_regs.irq_stat = irqstat;
-     ahci_check_irq(s);
- }
- 
-@@ -718,7 +745,7 @@ static void ahci_write_fis_sdb(AHCIState *s, NCQTransferState *ncq_tfs)
- 
-     /* Trigger IRQ if interrupt bit is set (which currently, it always is) */
-     if (sdb_fis->flags & 0x40) {
--        ahci_trigger_irq(s, ad, PORT_IRQ_SDB_FIS);
-+        ahci_trigger_irq(s, ad, AHCI_PORT_IRQ_BIT_SDBS);
-     }
- }
- 
-@@ -761,10 +788,10 @@ static void ahci_write_fis_pio(AHCIDevice *ad, uint16_t len)
-         ad->port.ifs[0].status;
- 
-     if (pio_fis[2] & ERR_STAT) {
--        ahci_trigger_irq(ad->hba, ad, PORT_IRQ_TF_ERR);
-+        ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_TFES);
-     }
- 
--    ahci_trigger_irq(ad->hba, ad, PORT_IRQ_PIOS_FIS);
-+    ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_PSS);
- }
- 
- static bool ahci_write_fis_d2h(AHCIDevice *ad)
-@@ -804,10 +831,10 @@ static bool ahci_write_fis_d2h(AHCIDevice *ad)
-         ad->port.ifs[0].status;
- 
-     if (d2h_fis[2] & ERR_STAT) {
--        ahci_trigger_irq(ad->hba, ad, PORT_IRQ_TF_ERR);
-+        ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_TFES);
-     }
- 
--    ahci_trigger_irq(ad->hba, ad, PORT_IRQ_D2H_REG_FIS);
-+    ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_DHRS);
-     return true;
- }
- 
-@@ -1082,7 +1109,7 @@ static void process_ncq_command(AHCIState *s, int port, uint8_t *cmd_fis,
-                      "is smaller than the requested size (0x%zx)",
-                      ncq_tfs->sglist.size, size);
-         ncq_err(ncq_tfs);
--        ahci_trigger_irq(ad->hba, ad, PORT_IRQ_OVERFLOW);
-+        ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_OFS);
-         return;
-     } else if (ncq_tfs->sglist.size != size) {
-         trace_process_ncq_command_large(s, port, tag,
-@@ -1225,7 +1252,7 @@ static int handle_cmd(AHCIState *s, int port, uint8_t slot)
-         trace_handle_cmd_badfis(s, port);
-         return -1;
-     } else if (cmd_len != 0x80) {
--        ahci_trigger_irq(s, &s->dev[port], PORT_IRQ_HBUS_ERR);
-+        ahci_trigger_irq(s, &s->dev[port], AHCI_PORT_IRQ_BIT_HBFS);
-         trace_handle_cmd_badmap(s, port, cmd_len);
-         goto out;
-     }
-diff --git a/hw/ide/ahci_internal.h b/hw/ide/ahci_internal.h
-index 1e21169..7e67add 100644
---- a/hw/ide/ahci_internal.h
-+++ b/hw/ide/ahci_internal.h
-@@ -91,6 +91,31 @@
- #define PORT_CMD_ISSUE            0x38 /* command issue */
- #define PORT_RESERVED             0x3c /* reserved */
- 
-+/* Port interrupt bit descriptors */
-+enum AHCIPortIRQ {
-+    AHCI_PORT_IRQ_BIT_DHRS = 0,
-+    AHCI_PORT_IRQ_BIT_PSS  = 1,
-+    AHCI_PORT_IRQ_BIT_DSS  = 2,
-+    AHCI_PORT_IRQ_BIT_SDBS = 3,
-+    AHCI_PORT_IRQ_BIT_UFS  = 4,
-+    AHCI_PORT_IRQ_BIT_DPS  = 5,
-+    AHCI_PORT_IRQ_BIT_PCS  = 6,
-+    AHCI_PORT_IRQ_BIT_DMPS = 7,
-+    /* RESERVED */
-+    AHCI_PORT_IRQ_BIT_PRCS = 22,
-+    AHCI_PORT_IRQ_BIT_IPMS = 23,
-+    AHCI_PORT_IRQ_BIT_OFS  = 24,
-+    /* RESERVED */
-+    AHCI_PORT_IRQ_BIT_INFS = 26,
-+    AHCI_PORT_IRQ_BIT_IFS  = 27,
-+    AHCI_PORT_IRQ_BIT_HBDS = 28,
-+    AHCI_PORT_IRQ_BIT_HBFS = 29,
-+    AHCI_PORT_IRQ_BIT_TFES = 30,
-+    AHCI_PORT_IRQ_BIT_CPDS = 31,
-+    AHCI_PORT_IRQ__END     = 32
-+};
-+
-+
- /* PORT_IRQ_{STAT,MASK} bits */
- #define PORT_IRQ_COLD_PRES        (1U << 31) /* cold presence detect */
- #define PORT_IRQ_TF_ERR           (1 << 30) /* task file error */
-@@ -98,18 +123,19 @@
- #define PORT_IRQ_HBUS_DATA_ERR    (1 << 28) /* host bus data error */
- #define PORT_IRQ_IF_ERR           (1 << 27) /* interface fatal error */
- #define PORT_IRQ_IF_NONFATAL      (1 << 26) /* interface non-fatal error */
-+                                            /* reserved */
- #define PORT_IRQ_OVERFLOW         (1 << 24) /* xfer exhausted available S/G */
- #define PORT_IRQ_BAD_PMP          (1 << 23) /* incorrect port multiplier */
--
- #define PORT_IRQ_PHYRDY           (1 << 22) /* PhyRdy changed */
--#define PORT_IRQ_DEV_ILCK         (1 << 7) /* device interlock */
--#define PORT_IRQ_CONNECT          (1 << 6) /* port connect change status */
--#define PORT_IRQ_SG_DONE          (1 << 5) /* descriptor processed */
--#define PORT_IRQ_UNK_FIS          (1 << 4) /* unknown FIS rx'd */
--#define PORT_IRQ_SDB_FIS          (1 << 3) /* Set Device Bits FIS rx'd */
--#define PORT_IRQ_DMAS_FIS         (1 << 2) /* DMA Setup FIS rx'd */
--#define PORT_IRQ_PIOS_FIS         (1 << 1) /* PIO Setup FIS rx'd */
--#define PORT_IRQ_D2H_REG_FIS      (1 << 0) /* D2H Register FIS rx'd */
-+                                            /* reserved */
-+#define PORT_IRQ_DEV_ILCK         (1 << 7)  /* device interlock */
-+#define PORT_IRQ_CONNECT          (1 << 6)  /* port connect change status */
-+#define PORT_IRQ_SG_DONE          (1 << 5)  /* descriptor processed */
-+#define PORT_IRQ_UNK_FIS          (1 << 4)  /* unknown FIS rx'd */
-+#define PORT_IRQ_SDB_FIS          (1 << 3)  /* Set Device Bits FIS rx'd */
-+#define PORT_IRQ_DMAS_FIS         (1 << 2)  /* DMA Setup FIS rx'd */
-+#define PORT_IRQ_PIOS_FIS         (1 << 1)  /* PIO Setup FIS rx'd */
-+#define PORT_IRQ_D2H_REG_FIS      (1 << 0)  /* D2H Register FIS rx'd */
- 
- #define PORT_IRQ_FREEZE           (PORT_IRQ_HBUS_ERR | PORT_IRQ_IF_ERR |   \
-                                    PORT_IRQ_CONNECT | PORT_IRQ_PHYRDY |    \
-diff --git a/hw/ide/trace-events b/hw/ide/trace-events
-index 0b61c5d..e15fd77 100644
---- a/hw/ide/trace-events
-+++ b/hw/ide/trace-events
-@@ -62,7 +62,7 @@ ahci_port_read(void *s, int port, int offset, uint32_t ret) "ahci(%p)[%d]: port
- ahci_irq_raise(void *s) "ahci(%p): raise irq"
- ahci_irq_lower(void *s) "ahci(%p): lower irq"
- ahci_check_irq(void *s, uint32_t old, uint32_t new) "ahci(%p): check irq 0x%08x --> 0x%08x"
--
-+ahci_trigger_irq(void *s, int port, const char *name, uint32_t val, uint32_t old, uint32_t new, uint32_t effective) "ahci(%p)[%d]: trigger irq +%s (0x%08x); irqstat: 0x%08x --> 0x%08x; effective: 0x%08x"
- ahci_port_write(void *s, int port, int offset, uint32_t val) "ahci(%p)[%d]: port write @ 0x%x: 0x%08x"
- ahci_mem_read_32(void *s, uint64_t addr, uint32_t val) "ahci(%p): mem read @ 0x%"PRIx64": 0x%08x"
- ahci_mem_read(void *s, unsigned size, uint64_t addr, uint64_t val) "ahci(%p): read%u @ 0x%"PRIx64": 0x%016"PRIx64
--- 
-2.9.5
+I've investigated it a bit today and it seems that it still the case. 
+Firing an IRQ right
+after CAS breaks the kernel. In fact, if you time a regular CPU hotplug 
+right after
+CAS you'll get the same sig 11 kernel ooops. It looks like there is a 
+time window after
+CAS that the kernel can't handle the hotplug process and pulsing the hotplug
+queue in this window breaks the guest. I've tried some hacks such as 
+pulsing the queue
+in the first 'event_scan' call made by the guest, but apparently it is 
+still too early.
+
+I've sent an email to the linuxppc-dev mailing list talking about this 
+behavior
+and asking if there is a reliable way to know when  we can safely pulse 
+the hotplug
+queue. Meanwhile, I'll keep working in the v3 respin of this patch in 
+case this
+solution of pulsing the hotplug queue ends up being not feasible.
+
+
+Thanks,
+
+
+Daniel
