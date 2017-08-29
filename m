@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dmiWx-0004f8-LN
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:34:20 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dmiYu-0006VB-0r
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:36:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dmiWu-0005HP-IB
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:34:19 -0400
-Date: Tue, 29 Aug 2017 18:34:07 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170829183303-mutt-send-email-mst@kernel.org>
-References: <20170829152751.3174-1-marcandre.lureau@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1dmiYr-0006EH-OM
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:36:20 -0400
+Received: from mail-pf0-x230.google.com ([2607:f8b0:400e:c00::230]:36365)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dmiYr-0006DB-IR
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:36:17 -0400
+Received: by mail-pf0-x230.google.com with SMTP id z87so11224893pfi.3
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 08:36:17 -0700 (PDT)
+References: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
+	<1503414539-28762-6-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <472c8319-b1d3-c91c-c9eb-6e138d8ba82f@linaro.org>
+Date: Tue, 29 Aug 2017 08:36:13 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170829152751.3174-1-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] vhost-user-bridge reconnect
- regression
+In-Reply-To: <1503414539-28762-6-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 05/20] target/arm: Add MMU indexes for
+ secure v8M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,29 +32,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, victork@redhat.com, qemu-stable@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On Tue, Aug 29, 2017 at 05:27:49PM +0200, Marc-Andr=E9 Lureau wrote:
-> Hi,
->=20
-> libvhost-user doesn't support resuming with the same trick vubr had
-> since commit 523b018dde3b7650fe5401d0499b30cf2f117515. The following
-> two patches fix that regression.
+On 08/22/2017 08:08 AM, Peter Maydell wrote:
+> Now that MPU lookups can return different results for v8M
+> when the CPU is in secure vs non-secure state, we need to
+> have separate MMU indexes; add the secure counterparts
+> to the existing three M profile MMU indexes.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/cpu.h    | 19 +++++++++++++++++--
+>  target/arm/helper.c |  9 ++++++++-
+>  2 files changed, 25 insertions(+), 3 deletions(-)
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
-Thanks! Do we need this in 2.10? If not pls ping after 2.10 is out.
-
-> Thanks
->=20
-> Marc-Andr=E9 Lureau (2):
->   libvhost-user: support resuming vq->last_avail_idx based on used_idx
->   vhost-user-bridge: fix resume regression (since 2.9)
->=20
->  contrib/libvhost-user/libvhost-user.h |  7 +++++++
->  contrib/libvhost-user/libvhost-user.c | 13 +++++++++++++
->  tests/vhost-user-bridge.c             |  7 +++++++
->  3 files changed, 27 insertions(+)
->=20
-> --=20
-> 2.14.1.146.gd35faa819
+r~
