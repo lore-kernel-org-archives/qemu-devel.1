@@ -1,35 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCC-0000v0-IA
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:15:59 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCD-0000vn-EE
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCA-0005Bf-ET
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:15:56 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48696)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCA-0005BN-9N
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:15:57 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60778
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dmUCA-0005Af-3t
+	id 1dmUC9-0005Aq-UW
 	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:15:54 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7T0E85d005466
+	v7T0E7Lh043811
 	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:15:53 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cmvjejk4c-1
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cmu3kpdwp-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:15:52 -0400
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:15:53 -0400
 Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 28 Aug 2017 20:15:51 -0400
+	Mon, 28 Aug 2017 20:15:52 -0400
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 28 Aug 2017 19:13:54 -0500
+Date: Mon, 28 Aug 2017 19:13:55 -0500
 In-Reply-To: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1503965694-10794-20-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 19/79] block: Reuse bs as backing hd for
- drive-backup sync=none
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1503965694-10794-21-git-send-email-mdroth@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 20/79] hw/virtio: fix vhost user fails to
+ startup when MQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,75 +43,108 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-stable@nongnu.org, Zhiyong Yang <zhiyong.yang@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-From: Fam Zheng <famz@redhat.com>
+From: Zhiyong Yang <zhiyong.yang@intel.com>
 
-Opening the backing image for the second time is bad, especially here
-when it is also in use as the active image as the source. The
-drive-backup job itself doesn't read from target->backing for COW,
-instead it gets data from the write notifier, so it's not a big problem.
-However, exporting the target to NBD etc. won't work, because of the
-likely stale metadata cache.
+ Qemu2.7~2.9 and vhost user for dpdk 17.02 release work together
+to cause failures of new connection when negotiating to set MQ.
+(one queue pair works well).
+   Because there exist some bugs in qemu code when introducing
+VHOST_USER_PROTOCOL_F_REPLY_ACK to qemu. When vhost_user_set_mem_table
+is invoked to deal with the vhost message VHOST_USER_SET_MEM_TABLE
+for the second time, qemu indeed doesn't send the messge (The message
+needs to be sent only once)but still will be waiting for dpdk's reply
+ack, then, qemu is always freezing, while DPDK is always waiting for
+next vhost message from qemu.
+  The patch aims to fix the bug, MQ can work well.
+  The same bug is found in function vhost_user_net_set_mtu, it is fixed
+at the same time.
+  DPDK related patch is as following:
+  http://www.dpdk.org/dev/patchwork/patch/23955/
 
-Use BDRV_O_NO_BACKING in this case and manually set up the backing
-BdrvChild.
-
+Signed-off-by: Zhiyong Yang <zhiyong.yang@intel.com>
 Cc: qemu-stable@nongnu.org
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-(cherry picked from commit fc0932fdcfc3e5cafa3641e361b681c07f639812)
+Fixes: ca525ce5618b ("vhost-user: Introduce a new protocol feature REPLY_=
+ACK.")
+Reviewed-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Tested-by: Jens Freimann <jfreiman@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+(cherry picked from commit 60cd11024f41cc73175e651a2dfe09a3cade56bb)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- blockdev.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ hw/virtio/vhost-user.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index e2f9c1e..841200e 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3170,6 +3170,7 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
-     Error *local_err = NULL;
-     int flags;
-     int64_t size;
-+    bool set_backing_hd = false;
- 
-     if (!backup->has_speed) {
-         backup->speed = 0;
-@@ -3220,6 +3221,8 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
-     }
-     if (backup->sync == MIRROR_SYNC_MODE_NONE) {
-         source = bs;
-+        flags |= BDRV_O_NO_BACKING;
-+        set_backing_hd = true;
-     }
- 
-     size = bdrv_getlength(bs);
-@@ -3246,7 +3249,9 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
-     }
- 
-     if (backup->format) {
--        options = qdict_new();
-+        if (!options) {
-+            options = qdict_new();
-+        }
-         qdict_put_str(options, "driver", backup->format);
-     }
- 
-@@ -3257,6 +3262,14 @@ static BlockJob *do_drive_backup(DriveBackup *backup, BlockJobTxn *txn,
- 
-     bdrv_set_aio_context(target_bs, aio_context);
- 
-+    if (set_backing_hd) {
-+        bdrv_set_backing_hd(target_bs, source, &local_err);
-+        if (local_err) {
-+            bdrv_unref(target_bs);
-+            goto out;
-+        }
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 9334a8a..32a95a8c 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -163,22 +163,26 @@ fail:
+ }
+=20
+ static int process_message_reply(struct vhost_dev *dev,
+-                                 VhostUserRequest request)
++                                 VhostUserMsg msg)
+ {
+-    VhostUserMsg msg;
++    VhostUserMsg msg_reply;
+=20
+-    if (vhost_user_read(dev, &msg) < 0) {
++    if ((msg.flags & VHOST_USER_NEED_REPLY_MASK) =3D=3D 0) {
++        return 0;
 +    }
 +
-     if (backup->has_bitmap) {
-         bmap = bdrv_find_dirty_bitmap(bs, backup->bitmap);
-         if (!bmap) {
--- 
++    if (vhost_user_read(dev, &msg_reply) < 0) {
+         return -1;
+     }
+=20
+-    if (msg.request !=3D request) {
++    if (msg_reply.request !=3D msg.request) {
+         error_report("Received unexpected msg type."
+                      "Expected %d received %d",
+-                     request, msg.request);
++                     msg.request, msg_reply.request);
+         return -1;
+     }
+=20
+-    return msg.payload.u64 ? -1 : 0;
++    return msg_reply.payload.u64 ? -1 : 0;
+ }
+=20
+ static bool vhost_user_one_time_request(VhostUserRequest request)
+@@ -208,6 +212,7 @@ static int vhost_user_write(struct vhost_dev *dev, Vh=
+ostUserMsg *msg,
+      * request, we just ignore it.
+      */
+     if (vhost_user_one_time_request(msg->request) && dev->vq_index !=3D =
+0) {
++        msg->flags &=3D ~VHOST_USER_NEED_REPLY_MASK;
+         return 0;
+     }
+=20
+@@ -320,7 +325,7 @@ static int vhost_user_set_mem_table(struct vhost_dev =
+*dev,
+     }
+=20
+     if (reply_supported) {
+-        return process_message_reply(dev, msg.request);
++        return process_message_reply(dev, msg);
+     }
+=20
+     return 0;
+@@ -712,7 +717,7 @@ static int vhost_user_net_set_mtu(struct vhost_dev *d=
+ev, uint16_t mtu)
+=20
+     /* If reply_ack supported, slave has to ack specified MTU is valid *=
+/
+     if (reply_supported) {
+-        return process_message_reply(dev, msg.request);
++        return process_message_reply(dev, msg);
+     }
+=20
+     return 0;
+--=20
 2.7.4
