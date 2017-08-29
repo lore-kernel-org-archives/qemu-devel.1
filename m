@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmZuq-0006O4-LF
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 02:22:25 -0400
+	(envelope-from <armbru@redhat.com>) id 1dma0N-0007d5-4v
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 02:28:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmZum-0000Sj-Ie
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 02:22:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55654)
+	(envelope-from <armbru@redhat.com>) id 1dma0I-0002Xk-VV
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 02:28:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58338)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dmZum-0000SS-8l
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 02:22:20 -0400
-Date: Tue, 29 Aug 2017 14:22:07 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170829062207.GV14174@pxdev.xzpeter.org>
-References: <20170824192730.8440-1-dgilbert@redhat.com>
-	<20170824192730.8440-9-dgilbert@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dma0I-0002X2-LK
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 02:28:02 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<1503471071-2233-3-git-send-email-peterx@redhat.com>
+	<CAJ+F1CKvY9iMtTQSrM2xVUwXYb0pcHjtFf8x4xpxG5ke-FPf3g@mail.gmail.com>
+	<20170825153304.GJ2090@work-vm>
+	<CAJ+F1CJR3UWv4zaGg_6aAyC7WWsVd35=UiRWyWkbGm-gEN2O9A@mail.gmail.com>
+	<87fucc3q78.fsf@dusky.pond.sub.org>
+	<CAJ+F1CK-srFaVCEA1iQurSayDc2u9QVSU9RYnV_uxK_iYTDE-A@mail.gmail.com>
+	<87k21ny82k.fsf@dusky.pond.sub.org>
+	<CAJ+F1C+Tc=s0PiRqcb9hrRxa6xPrKOXkiX=R5S_YSr2wLrH_cQ@mail.gmail.com>
+Date: Tue, 29 Aug 2017 08:27:53 +0200
+In-Reply-To: <CAJ+F1C+Tc=s0PiRqcb9hrRxa6xPrKOXkiX=R5S_YSr2wLrH_cQ@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 28 Aug 2017
+	17:24:17 +0000")
+Message-ID: <878ti2riqe.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170824192730.8440-9-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 08/32] postcopy: Add vhost-user flag for
- postcopy and check it
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v2 2/8] monitor: allow monitor to create
+ thread to poll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,171 +37,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, a.perevalov@samsung.com, mst@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, lvivier@redhat.com, aarcange@redhat.com, felipe@nutanix.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, mdroth@linux.vnet.ibm.com, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Thu, Aug 24, 2017 at 08:27:06PM +0100, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Add a vhost feature flag for postcopy support, and
-> use the postcopy notifier to check it before allowing postcopy.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  contrib/libvhost-user/libvhost-user.h |  1 +
->  docs/interop/vhost-user.txt           | 10 +++++++++
->  hw/virtio/vhost-user.c                | 40 ++++++++++++++++++++++++++++++++++-
->  3 files changed, 50 insertions(+), 1 deletion(-)
-> 
-> diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
-> index acd019876d..95d0d34a28 100644
-> --- a/contrib/libvhost-user/libvhost-user.h
-> +++ b/contrib/libvhost-user/libvhost-user.h
-> @@ -34,6 +34,7 @@ enum VhostUserProtocolFeature {
->      VHOST_USER_PROTOCOL_F_MQ = 0,
->      VHOST_USER_PROTOCOL_F_LOG_SHMFD = 1,
->      VHOST_USER_PROTOCOL_F_RARP = 2,
-> +    VHOST_USER_PROTOCOL_F_PAGEFAULT = 7,
->  
->      VHOST_USER_PROTOCOL_F_MAX
->  };
-> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-> index 954771d0d8..a279560eb0 100644
-> --- a/docs/interop/vhost-user.txt
-> +++ b/docs/interop/vhost-user.txt
-> @@ -273,6 +273,15 @@ Once the source has finished migration, rings will be stopped by
->  the source. No further update must be done before rings are
->  restarted.
->  
-> +In postcopy migration the slave is started before all the memory has been
-> +received from the source host, and care must be taken to avoid accessing pages
-> +that have yet to be received.  The slave opens a 'userfault'-fd and registers
-> +the memory with it; this fd is then passed back over to the master.
-> +The master services requests on the userfaultfd for pages that are accessed
-> +and when the page is available it performs WAKE ioctl's on the userfaultfd
-> +to wake the stalled slave.  The client indicates support for this via the
-> +VHOST_USER_PROTOCOL_F_PAGEFAULT feature.
-> +
->  IOMMU support
->  -------------
->  
-> @@ -327,6 +336,7 @@ Protocol features
->  #define VHOST_USER_PROTOCOL_F_MTU            4
->  #define VHOST_USER_PROTOCOL_F_SLAVE_REQ      5
->  #define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN   6
-> +#define VHOST_USER_PROTOCOL_F_PAGEFAULT      7
->  
->  Master message types
->  --------------------
-> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> index 093675ed98..c51bbd1296 100644
-> --- a/hw/virtio/vhost-user.c
-> +++ b/hw/virtio/vhost-user.c
-> @@ -17,6 +17,8 @@
->  #include "sysemu/kvm.h"
->  #include "qemu/error-report.h"
->  #include "qemu/sockets.h"
-> +#include "migration/migration.h"
-> +#include "migration/postcopy-ram.h"
->  
->  #include <sys/ioctl.h>
->  #include <sys/socket.h>
-> @@ -34,7 +36,7 @@ enum VhostUserProtocolFeature {
->      VHOST_USER_PROTOCOL_F_NET_MTU = 4,
->      VHOST_USER_PROTOCOL_F_SLAVE_REQ = 5,
->      VHOST_USER_PROTOCOL_F_CROSS_ENDIAN = 6,
-> -
-> +    VHOST_USER_PROTOCOL_F_PAGEFAULT = 7,
->      VHOST_USER_PROTOCOL_F_MAX
->  };
->  
-> @@ -123,8 +125,10 @@ static VhostUserMsg m __attribute__ ((unused));
->  #define VHOST_USER_VERSION    (0x1)
->  
->  struct vhost_user {
-> +    struct vhost_dev *dev;
->      CharBackend *chr;
->      int slave_fd;
-> +    NotifierWithReturn postcopy_notifier;
->  };
->  
->  static bool ioeventfd_enabled(void)
-> @@ -720,6 +724,33 @@ out:
->      return ret;
->  }
->  
-> +static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
-> +                                        void *opaque)
-> +{
-> +    struct PostcopyNotifyData *pnd = opaque;
-> +    struct vhost_user *u = container_of(notifier, struct vhost_user,
-> +                                         postcopy_notifier);
-> +    struct vhost_dev *dev = u->dev;
-> +
-> +    switch (pnd->reason) {
-> +    case POSTCOPY_NOTIFY_PROBE:
-> +        if (!virtio_has_feature(dev->protocol_features,
-> +                                VHOST_USER_PROTOCOL_F_PAGEFAULT)) {
-> +            /* TODO: Get the device name into this error somehow */
-> +            error_setg(pnd->errp,
-> +                       "vhost-user backend not capable of postcopy");
-> +            return -ENOENT;
-> +        }
-> +        break;
-> +
-> +    default:
-> +        /* We ignore notifications we don't know */
-> +        break;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  static int vhost_user_init(struct vhost_dev *dev, void *opaque)
->  {
->      uint64_t features, protocol_features;
-> @@ -731,6 +762,7 @@ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
->      u = g_new0(struct vhost_user, 1);
->      u->chr = opaque;
->      u->slave_fd = -1;
-> +    u->dev = dev;
->      dev->opaque = u;
->  
->      err = vhost_user_get_features(dev, &features);
-> @@ -787,6 +819,9 @@ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
->          return err;
->      }
->  
-> +    u->postcopy_notifier.notify = vhost_user_postcopy_notifier;
-> +    postcopy_add_notifier(&u->postcopy_notifier);
-> +
->      return 0;
->  }
->  
-> @@ -797,6 +832,9 @@ static int vhost_user_cleanup(struct vhost_dev *dev)
->      assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER);
->  
->      u = dev->opaque;
-> +    if (u->postcopy_notifier.notify) {
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-Detecting init using the notify hook is slightly strange here for
-me... If so, not sure whether we also need:
+> Hi
+>
+> On Mon, Aug 28, 2017 at 6:24 PM Markus Armbruster <armbru@redhat.com> wro=
+te:
+>
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+>>
+>> > Hi
+>> >
+>> > On Mon, Aug 28, 2017 at 1:08 PM Markus Armbruster <armbru@redhat.com>
+>> wrote:
+>> >
+>> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+>> >>
+>> >> > On Fri, Aug 25, 2017 at 5:33 PM Dr. David Alan Gilbert <
+>> >> dgilbert@redhat.com>
+>> >> > wrote:
+>> >> >
+>> >> >> * Marc-Andr=C3=A9 Lureau (marcandre.lureau@gmail.com) wrote:
+>> [...]
+>> >> >> > Could the BQL be pushed down to the monitor commands level
+>> instead? That
+>> >> >> > way we wouldn't need a seperate thread to solve the hang on
+>> commands that
+>> >> >> > do not need BQL.
+>> >> >>
+>> >> >> If the main thread is stuck though I don't see how that helps you;
+>> you
+>> >> >> have to be able to run these commands on another thread.
+>> >> >>
+>> >> >
+>> >> > Why would the main thread be stuck? In (1) If the vcpu thread takes
+>> the BQL
+>> >> > and the command doesn't need it, it would work.  In (2),  info cpus
+>> >> > shouldn't keep the BQL (my qapi-async series would probably help he=
+re)
+>> >>
+>> >> This has been discussed several times[*], but of course not with
+>> >> everybody, so I'll summarize once more: asynchronous commands are not=
+ a
+>> >> actually *required* for anything.  They are *one* way to package the
+>> >> "kick off task, receive an asynchronous message when it's done" patte=
+rn.
+>> >> Another way is synchronous command for the kick off, event for the
+>> >> "done".
+>> >>
+>> >
+>> > But you would have to break or duplicate the QMP APIs. My proposal
+>> doesn't
+>> > need that, a command can reenter the main loop, and keep current QMP A=
+PI.
+>>
+>> Changing an existing command from synchronous to asynchronous is
+>> definitely an API change, as discussed before.
+>>
+>
+> We are getting of topic, but I really feel there is a misunderstanding and
+> a wrong evaluation of my -async proposal.
+>
+> The command is in no way asynchronous from an external point of view, as
+> long as the QMP user doesn't declare async capability.
+>
+> There is no external API change. The "internal API" change is made option=
+al
+> too.
 
-           u->postcopy_notifier.notify = NULL;
+Recapitulating another bit of previous discussion...
 
-Or I'm not sure whether a 2nd call to vhost_user_cleanup() can be
-dangerous since postcopy_remove_notifier() will be called twice.
+Making the change from synchronous to asynchronous opt-in is indeed
+compatible evolution.
 
-Besides that, the patch looks good to me.  Thanks,
+Another compatible evolution is an opt-in change from synchronous to
+synchronous kick off + notify.
 
-> +        postcopy_remove_notifier(&u->postcopy_notifier);
-> +    }
->      if (u->slave_fd >= 0) {
->          qemu_set_fd_handler(u->slave_fd, NULL, NULL, NULL);
->          close(u->slave_fd);
-> -- 
-> 2.13.5
-> 
+Once again, same thing, different packaging.
 
--- 
-Peter Xu
+>> >> For better or worse, synchronous command + event is what we have toda=
+y.
+>> >> Whether adding another way to package the the same thing improves the
+>> >> QMP interface is doubtful.
+>> >>
+>> >
+>> > I would argue my series is mostly about internal refactoring for the
+>> > benefit mentionned above. The fact that you can do (optionnaly)
+>> concurrent
+>> > QMP commands is a nice bonus. Furthermore, it simplifies the API compa=
+red
+>> > to CMD / dummy reply + EVENT. And it gives a meaning to the exisiting
+>> > command "id"..
+>>
+>> Call a change "mostly internal" when it fundamentally extends the QMP
+>> protocol makes as much sense to me as "mostly not pregnant".
+>
+>
+>> The non-dummy nature of the command reply has also been discussed
+>> several times.  So has been the relative complexity of "synchronous
+>> commands + events" vs. "asynchronous commands" vs. "both".  In
+>> considerable detail, in fact:
+>>
+>>     Message-ID: <87mvaszbsu.fsf@dusky.pond.sub.org>
+>>     http://lists.gnu.org/archive/html/qemu-devel/2017-05/msg01090.html
+>>
+>> Let me quote its last few lines:
+>>
+>>     Bottom line:
+>>
+>>     1. I still don't want to merge this.
+>>
+>>     2. I want us to tackle jobs sooner rather than later.
+>>
+>>     3. Once we got at least a jobs prototype, I'm willing to reconsider
+>>        asynchronous commands implemented as special case of jobs.
+>>
+>
+> This is not being fair tbh, my proposal is RFC for 2y, and has been ready
+> for a while. I have no clear clue what the "jobs" API would look like, or
+> what are the requirements, so I can't work on it or defend my work. But it
+> will almost certainly benefit from my low-level -async work.
+
+"Jobs" are even readier: it's what we use today.  The trouble is they
+aren't instances of a generic jobs API.  We have a few that are
+instances of a block jobs API, and a few more that are ad hoc, such as
+migration, PCI hotplug with ACPI, dump-guest-memory with detach=3Dtrue.
+Item 2. above is rectifying that.  John Snow (cc'ed) has played with it
+some.  I asked you to talk it over with him.  Have you done that?
+Results?  If not, perhaps talking it over in person at the KVM Forum
+would work better.
+
+Note that both block jobs and migration provide more than just "kick
+off" and "notify when done": they also let you examine and control the
+job.  These features are needed for all but the simplest of cases.
+
+>>     One of the most important maintainer duties is saying "no".  It's al=
+so
+>>     one of the least fun duties.
+>>
+>>
+>> I'm happy to reconsider this conclusion when presented with new
+>> evidence.
+>>
+>
+>  I am still convince my proposal has many merits, so I will keep proposing
+> it when I see conflicts with what I have, even if you said "no" to an
+> earlier merge request.
+
+Want me to prepare a canned reply I can paste quickly?  You could do the
+same for your counter-point, and we all save lots of time.
+
+>> Asynchronous commands vs. synchronous commands + events are different
+>> packaging of the same thing: neither can do anything the other could not
+>> do.  If we want to make progress on the monitor hang problem (this
+>> thread's topic), we should focus on the *concepts*, not how to best
+>> package them for QMP.
+>>
+>
+> Right, please ignore  the optional QMP protocol -async capability and look
+> at it: one way is to make long-lived/blocking QMP commands -async
+> internally, so other work can happen. This is 90% of my -async proposal.
+
+Certain activities that are now synchronous commands should become "kick
+off task, receive an asynchronous message when it's done".
+
+The interesting question for *this* thread is inhowfar such a change
+could help with avoiding monitor hangs.  Would changing the "right"
+commands and making clients use them correctly suffice?  If not, what
+other work is needed?
+
+>> >> [*] Try this one:
+>> >> Message-ID: <87o9yv890z.fsf@dusky.pond.sub.org>
+>> >> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05483.html
