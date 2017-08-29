@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dmdBk-0000z1-1B
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:52:05 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dmdDP-00029P-F2
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:53:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dmdBe-0006Eo-Tw
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:52:04 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:34953)
+	(envelope-from <stefanha@gmail.com>) id 1dmdDK-0006g8-H9
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:53:47 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:33758)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dmdBe-0006EV-N8
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:51:58 -0400
-Received: by mail-wm0-x233.google.com with SMTP id y71so17448076wmd.0
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 02:51:58 -0700 (PDT)
-Date: Tue, 29 Aug 2017 10:51:55 +0100
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dmdDK-0006fs-9j
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 05:53:42 -0400
+Received: by mail-wm0-x231.google.com with SMTP id b14so18900808wme.0
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 02:53:42 -0700 (PDT)
+Date: Tue, 29 Aug 2017 10:53:39 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170829095155.GJ25960@stefanha-x1.localdomain>
+Message-ID: <20170829095339.GK25960@stefanha-x1.localdomain>
 References: <20170828015654.2530-1-Sergio.G.DelReal@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -38,10 +38,8 @@ On Sun, Aug 27, 2017 at 08:56:40PM -0500, Sergio Andres Gomez Del Real wrote:
 > Google's Android emulator at
 > https://android.googlesource.com/platform/external/qemu/+/emu-master-dev.
 
-What is the status of this feature?  Is it expected to run everything
-that TCG can run or are there limitations?  Is live migration supported,
-etc?
+There is no ./MAINTAINERS entry for these new files.
 
-How do you test hvf?  Are there automated test cases?
+Who will maintain this code?
 
 Stefan
