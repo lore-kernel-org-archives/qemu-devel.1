@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dmZ5c-00025s-3O
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 01:29:29 -0400
+	(envelope-from <peterx@redhat.com>) id 1dmZ6g-00031f-CH
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 01:30:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dmZ5X-0006MO-IO
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 01:29:28 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:55367
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dmZ5X-0006L4-6d
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 01:29:23 -0400
-References: <1503478317-30869-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <b5d85c6d-7fc5-d8ad-b2a3-52f01b7ce40c@cn.fujitsu.com>
-Date: Tue, 29 Aug 2017 13:31:25 +0800
+	(envelope-from <peterx@redhat.com>) id 1dmZ6b-0006v5-7L
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 01:30:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53420)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dmZ6a-0006uB-Tx
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 01:30:29 -0400
+Date: Tue, 29 Aug 2017 13:30:11 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170829053011.GS14174@pxdev.xzpeter.org>
+References: <20170824192730.8440-1-dgilbert@redhat.com>
+	<20170824192730.8440-4-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1503478317-30869-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Update mail address for COLO
- Proxy
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170824192730.8440-4-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 03/32] migrate: Update
+ ram_block_discard_range for shared
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +28,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, Zhang Chen <zhangckid@gmail.com>, bian naimeng <biannm@cn.fujitsu.com>, Wang Yong <wang.yong155@zte.com.cn>, Wang Guang <wang.guang55@zte.com.cn>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, a.perevalov@samsung.com, mst@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, lvivier@redhat.com, aarcange@redhat.com, felipe@nutanix.com
 
-Hi~
-
-No news for long time.
-
-Ping...
-
-
-Thanks
-
-Zhang Chen
-
-
-On 08/23/2017 04:51 PM, Zhang Chen wrote:
-> My Fujitsu mail account will be disabled soon, update the mail info
-> to my private mail.
->
-> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+On Thu, Aug 24, 2017 at 08:27:01PM +0100, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> The choice of call to discard a block is getting more complicated
+> for other cases.   We use fallocate PUNCH_HOLE in any file cases;
+> it works for both hugepage and for tmpfs.
+> We use the DONTNEED for non-hugepage cases either where they're
+> anonymous or where they're private.
+> 
+> Care should be taken when trying other backing files.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
->   MAINTAINERS | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index ccee28b..3b530a7 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1561,7 +1561,7 @@ F: include/migration/failover.h
->   F: docs/COLO-FT.txt
->   
->   COLO Proxy
-> -M: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-> +M: Zhang Chen <zhangckid@gmail.com>
->   M: Li Zhijian <lizhijian@cn.fujitsu.com>
->   S: Supported
->   F: docs/colo-proxy.txt
+>  exec.c       | 35 ++++++++++++++++++++++++-----------
+>  trace-events |  3 +++
+>  2 files changed, 27 insertions(+), 11 deletions(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index d20c34ca83..67df2909ce 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -3573,6 +3573,7 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
+>      }
+>  
+>      if ((start + length) <= rb->used_length) {
+> +        bool need_madvise, need_fallocate;
+>          uint8_t *host_endaddr = host_startaddr + length;
+>          if ((uintptr_t)host_endaddr & (rb->page_size - 1)) {
+>              error_report("ram_block_discard_range: Unaligned end address: %p",
+> @@ -3582,23 +3583,35 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
+>  
+>          errno = ENOTSUP; /* If we are missing MADVISE etc */
+>  
+> -        if (rb->page_size == qemu_host_page_size) {
+> -#if defined(CONFIG_MADVISE)
+> -            /* Note: We need the madvise MADV_DONTNEED behaviour of definitely
+> -             * freeing the page.
+> -             */
+> -            ret = madvise(host_startaddr, length, MADV_DONTNEED);
+> -#endif
+> -        } else {
+> -            /* Huge page case  - unfortunately it can't do DONTNEED, but
+> -             * it can do the equivalent by FALLOC_FL_PUNCH_HOLE in the
+> -             * huge page file.
+> +        /* The logic here is messy;
+> +         *    madvise DONTNEED fails for hugepages
+> +         *    fallocate works on hugepages and shmem
+> +         */
+> +        need_madvise = (rb->page_size == qemu_host_page_size);
+> +        need_fallocate = rb->fd != -1;
+> +        if (need_fallocate) {
+> +            /* For a file, this causes the area of the file to be zero'd
+> +             * if read, and for hugetlbfs also causes it to be unmapped
+> +             * so a userfault will trigger.
+>               */
+>  #ifdef CONFIG_FALLOCATE_PUNCH_HOLE
+>              ret = fallocate(rb->fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+>                              start, length);
+>  #endif
+>          }
+> +        /* i.e. need madvise but skip it if the fallocate failed */
+> +        if (need_madvise && (!need_fallocate || (ret == 0))) {
+
+I'll slightly prefer:
+
+  trace_ram_block_discard_range();
+
+  if (need_fallocate) {
+    ret = fallocate();
+    if (ret) {
+      error_report();
+      goto err;
+    }
+  }
+
+  if (need_madvise) {
+    ret = madvise();
+    if (ret) {
+      error_report();
+      goto err;
+    }
+  }
+
+But it is personal preference.  For either way:
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+> +            /* For normal RAM this causes it to be unmapped,
+> +             * for shared memory it causes the local mapping to disappear
+> +             * and to fall back on the file contents (which we just
+> +             * fallocate'd away).
+> +             */
+> +#if defined(CONFIG_MADVISE)
+> +            ret =  madvise(host_startaddr, length, MADV_DONTNEED);
+> +#endif
+> +        }
+> +        trace_ram_block_discard_range(rb->idstr, host_startaddr,
+> +                                      need_madvise, need_fallocate, ret);
+>          if (ret) {
+>              ret = -errno;
+>              error_report("ram_block_discard_range: Failed to discard range "
+> diff --git a/trace-events b/trace-events
+> index 1f50f56d9d..213ee34f89 100644
+> --- a/trace-events
+> +++ b/trace-events
+> @@ -55,6 +55,9 @@ dma_complete(void *dbs, int ret, void *cb) "dbs=%p ret=%d cb=%p"
+>  dma_blk_cb(void *dbs, int ret) "dbs=%p ret=%d"
+>  dma_map_wait(void *dbs) "dbs=%p"
+>  
+> +# exec.c
+> +ram_block_discard_range(const char *rbname, void *hva, bool need_madvise, bool need_fallocate, int ret) "%s@%p: madvise: %d fallocate: %d ret: %d"
+> +
+>  # memory.c
+>  memory_region_ops_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+>  memory_region_ops_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+> -- 
+> 2.13.5
+> 
 
 -- 
-Thanks
-Zhang Chen
+Peter Xu
