@@ -1,33 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dmjae-00070u-77
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:42:13 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dmjbm-0007sl-Fe
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:43:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dmjaa-0005eO-7a
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:42:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36584)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dmjaZ-0005dx-Th
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:42:08 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D95744DD4B
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 16:42:06 +0000 (UTC)
-References: <20170829162727.13081-1-berrange@redhat.com>
-	<a51f6738-f858-1ea2-ec08-eb68339eff90@redhat.com>
-	<20170829163427.GG25801@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3aec24f8-b5ba-b18c-58ec-462c3483f6f0@redhat.com>
-Date: Tue, 29 Aug 2017 11:42:05 -0500
+	(envelope-from <stefanha@gmail.com>) id 1dmjbi-00060z-Fq
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:43:22 -0400
+Date: Tue, 29 Aug 2017 17:43:14 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170829164314.GB18927@stefanha-x1.localdomain>
+References: <cover.1503580370.git.berto@igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20170829163427.GG25801@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="cGfxeqFMiQ1cPOAlexRMAaqbq1G79QqmV"
-Subject: Re: [Qemu-devel] [PATCH] crypto: fix test cert generation to not
- use SHA1 algorithm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1503580370.git.berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] Misc throttle fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,87 +22,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, Manos Pitsidianakis <el13635@mail.ntua.gr>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cGfxeqFMiQ1cPOAlexRMAaqbq1G79QqmV
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
-Message-ID: <3aec24f8-b5ba-b18c-58ec-462c3483f6f0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] crypto: fix test cert generation to not use
- SHA1 algorithm
-References: <20170829162727.13081-1-berrange@redhat.com>
- <a51f6738-f858-1ea2-ec08-eb68339eff90@redhat.com>
- <20170829163427.GG25801@redhat.com>
-In-Reply-To: <20170829163427.GG25801@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Aug 24, 2017 at 04:24:42PM +0300, Alberto Garcia wrote:
+> Hi,
+> 
+> here's the new version of my patch series with misc fixes for the
+> throttling code.
+> 
+> Stefan, once this is reviewed, can you please remove the "Make
+> LeakyBucket.avg and LeakyBucket.max integer types" commit (id
+> 218f470639117a8e39) from your block-next branch? This series contains
+> a new version of that patch that replaces the one that you have.
+> 
+> v2:
+> - Patch 3: Make the code a bit more concise
+> - Patch 5: LeakyBucket.avg and LeakyBucket.max are now unsigned
+> - Patch 6: Make burst_length 64bit and check its range
+> - Patch 7: Add unit tests
+> 
+> v1: https://lists.gnu.org/archive/html/qemu-block/2017-08/msg00753.html
+> - Initial version
+> 
+> Output of backport-diff against v1:
+> 
+> Key:
+> [----] : patches are identical
+> [####] : number of functional differences between upstream/downstream patch
+> [down] : patch is downstream-only
+> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+> 
+> 001/7:[----] [--] 'throttle: Fix wrong variable name in the header documentation'
+> 002/7:[----] [--] 'throttle: Update the throttle_fix_bucket() documentation'
+> 003/7:[down] 'throttle: Make throttle_is_valid() a bit less verbose'
+> 004/7:[----] [--] 'throttle: Remove throttle_fix_bucket() / throttle_unfix_bucket()'
+> 005/7:[0010] [FC] 'throttle: Make LeakyBucket.avg and LeakyBucket.max integer types'
+> 006/7:[down] 'throttle: Make burst_length 64bit and add range checks'
+> 007/7:[down] 'throttle: Test the valid range of config values'
+> 
+> Alberto Garcia (7):
+>   throttle: Fix wrong variable name in the header documentation
+>   throttle: Update the throttle_fix_bucket() documentation
+>   throttle: Make throttle_is_valid() a bit less verbose
+>   throttle: Remove throttle_fix_bucket() / throttle_unfix_bucket()
+>   throttle: Make LeakyBucket.avg and LeakyBucket.max integer types
+>   throttle: Make burst_length 64bit and add range checks
+>   throttle: Test the valid range of config values
+> 
+>  include/qemu/throttle.h |  8 ++---
+>  tests/test-throttle.c   | 80 ++++++++++++++++++++++++++++++++++++++++++++-
+>  util/throttle.c         | 86 +++++++++++++++++++------------------------------
+>  3 files changed, 117 insertions(+), 57 deletions(-)
+> 
+> -- 
+> 2.11.0
+> 
+> 
 
-On 08/29/2017 11:34 AM, Daniel P. Berrange wrote:
-> On Tue, Aug 29, 2017 at 11:31:24AM -0500, Eric Blake wrote:
->> On 08/29/2017 11:27 AM, Daniel P. Berrange wrote:
->>> GNUTLS 3.6.0 marked SHA1 as untrusted for certificates.
->>> Unfortunately the gnutls_x509_crt_sign() method we are
->>> using to create certificates in the test suite is fixed
->>> to always use SHA1. We must switch to a different method
->>> and explicitly ask for SHA256.
->>>
->>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->>> ---
->>>  tests/crypto-tls-x509-helpers.c | 3 ++-
->>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/tests/crypto-tls-x509-helpers.c b/tests/crypto-tls-x509-=
-helpers.c
->>> index 64073d3bd3..173d4e28fb 100644
->>> --- a/tests/crypto-tls-x509-helpers.c
->>> +++ b/tests/crypto-tls-x509-helpers.c
->>> @@ -406,7 +406,8 @@ test_tls_generate_cert(QCryptoTLSTestCertReq *req=
-,
->>>       * If no 'ca' is set then we are self signing
->>>       * the cert. This is done for the root CA certs
->>>       */
->>> -    err =3D gnutls_x509_crt_sign(crt, ca ? ca : crt, privkey);
->>> +    err =3D gnutls_x509_crt_sign2(crt, ca ? ca : crt, privkey,
->>> +                                GNUTLS_DIG_SHA256, 0);
->>
->> Is _sign2() available on all the older versions of gnutls that we must=
+I have dropped the previous "Make LeakyBucket.avg and LeakyBucket.max
+integer types" commit and merged this series instead.
 
->> support, or do we need this to be a conditional compilation?
->=20
-> It dates to gnutls 1.2.0 from 2005, so we're fine even if using RHEL5
-> vintage :-)
+Thanks, applied to my block-next tree:
+https://github.com/stefanha/qemu/commits/block-next
 
-Good to know. Not sure if it's worth mentioning that in the commit
-message.  Either way,
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---cGfxeqFMiQ1cPOAlexRMAaqbq1G79QqmV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmlmV0ACgkQp6FrSiUn
-Q2qsgwf/eSMH+D+w658K8CnFOG+QK+5kVrEJaGtw4eWMysLSmXIFHZo1jG0UT2yB
-QXw2vH1RR5QY0sb9j6RcACf6stUDebum+vE/iBJYy3b6ukMG9u5lBgcPj+RzxHZ/
-D8zsClJ42xAUeS23uUYz069trbyPaWI9ZQNWhfeTor5dUHL8OrUJAu7STcBF7fU5
-XXu/oE+GWpdh20cU06c3kNSYGXXnQiUDgN/ah5UL8YzuZjyH6YWoiG0T0ARL4mV0
-SUn0Kkf+4y8Hw2Zlj3GeeRNBDwPSv05dI43AHzkFnlfQHG3y88Lv6ZwmISLWHE85
-qEvCA1YLOQjRN80Gd2Q1RCZnVJJ6dw==
-=s17N
------END PGP SIGNATURE-----
-
---cGfxeqFMiQ1cPOAlexRMAaqbq1G79QqmV--
+Stefan
