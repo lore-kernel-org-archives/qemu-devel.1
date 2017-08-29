@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCk-0001as-NQ
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:34 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCo-0001hA-H9
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCh-0005vY-AH
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:30 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34974
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUCl-00065C-03
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:34 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42607
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dmUCh-0005uM-3J
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:27 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	id 1dmUCk-00063u-Rv
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:16:30 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7T0EBKE017922
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:16:26 -0400
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2cmub2ww5p-1
+	v7T0E8cC019427
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:16:30 -0400
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2cmsfn2wr4-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:16:26 -0400
+	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:16:30 -0400
 Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 28 Aug 2017 18:16:25 -0600
+	Mon, 28 Aug 2017 20:16:29 -0400
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 28 Aug 2017 19:14:33 -0500
+Date: Mon, 28 Aug 2017 19:14:38 -0500
 In-Reply-To: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1503965694-10794-59-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 58/79] nbd: Fully initialize client in case of
- failed negotiation
+Message-Id: <1503965694-10794-64-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 63/79] nbd: fix NBD over TLS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,83 +39,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Eric Blake <eblake@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-If a non-NBD client connects to qemu-nbd, we would end up with
-a SIGSEGV in nbd_client_put() because we were trying to
-unregister the client's association to the export, even though
-we skipped inserting the client into that list.  Easy trigger
-in two terminals:
+When attaching the NBD QIOChannel to an AioContext, the TLS channel should
+be used, not the underlying socket channel.  This is because, trivially,
+the TLS channel will be the one that we read/write to and thus the one
+that will get the qio_channel_yield() call.
 
-$ qemu-nbd -p 30001 --format=raw file
-$ nmap 127.0.0.1 -p 30001
-
-nmap claims that it thinks it connected to a pago-services1
-server (which probably means nmap could be updated to learn the
-NBD protocol and give a more accurate diagnosis of the open
-port - but that's not our problem), then terminates immediately,
-so our call to nbd_negotiate() fails.  The fix is to reorder
-nbd_co_client_start() to ensure that all initialization occurs
-before we ever try talking to a client in nbd_negotiate(), so
-that the teardown sequence on negotiation failure doesn't fault
-while dereferencing a half-initialized object.
-
-While debugging this, I also noticed that nbd_update_server_watch()
-called by nbd_client_closed() was still adding a channel to accept
-the next client, even when the state was no longer RUNNING.  That
-is fixed by making nbd_can_accept() pay attention to the current
-state.
-
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1451614
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20170527030421.28366-1-eblake@redhat.com>
+Fixes: ff82911cd3f69f028f2537825c9720ff78bc3f19
+Cc: qemu-stable@nongnu.org
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Tested-by: Daniel P. Berrange <berrange@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-(cherry picked from commit df8ad9f128c15aa0a0ebc7b24e9a22c9775b67af)
+(cherry picked from commit 96d06835dc40007673cdfab6322e9042c4077113)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- nbd/server.c | 8 +++-----
- qemu-nbd.c   | 2 +-
- 2 files changed, 4 insertions(+), 6 deletions(-)
+ block/nbd-client.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index 924a1fe..edfda84 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1376,16 +1376,14 @@ static coroutine_fn void nbd_co_client_start(void *opaque)
- 
-     if (exp) {
-         nbd_export_get(exp);
-+        QTAILQ_INSERT_TAIL(&exp->clients, client, next);
-     }
-+    qemu_co_mutex_init(&client->send_lock);
-+
-     if (nbd_negotiate(data)) {
-         client_close(client);
-         goto out;
-     }
--    qemu_co_mutex_init(&client->send_lock);
--
--    if (exp) {
--        QTAILQ_INSERT_TAIL(&exp->clients, client, next);
--    }
- 
-     nbd_client_receive_next_request(client);
- 
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index e4f00e2..14e7947 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -324,7 +324,7 @@ out:
- 
- static int nbd_can_accept(void)
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 1e2952f..56eb0e2 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -352,14 +352,14 @@ int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset, int count)
+ void nbd_client_detach_aio_context(BlockDriverState *bs)
  {
--    return nb_fds < shared;
-+    return state == RUNNING && nb_fds < shared;
+     NBDClientSession *client = nbd_get_client_session(bs);
+-    qio_channel_detach_aio_context(QIO_CHANNEL(client->sioc));
++    qio_channel_detach_aio_context(QIO_CHANNEL(client->ioc));
  }
  
- static void nbd_export_closed(NBDExport *exp)
+ void nbd_client_attach_aio_context(BlockDriverState *bs,
+                                    AioContext *new_context)
+ {
+     NBDClientSession *client = nbd_get_client_session(bs);
+-    qio_channel_attach_aio_context(QIO_CHANNEL(client->sioc), new_context);
++    qio_channel_attach_aio_context(QIO_CHANNEL(client->ioc), new_context);
+     aio_co_schedule(new_context, client->read_reply_co);
+ }
+ 
 -- 
 2.7.4
