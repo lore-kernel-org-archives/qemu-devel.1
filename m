@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dmVm7-0007k1-8F
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 21:57:08 -0400
+	(envelope-from <thuth@redhat.com>) id 1dmW6l-0002Hz-Tb
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 22:18:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dmVm4-0000zE-7L
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 21:57:07 -0400
-Date: Tue, 29 Aug 2017 11:40:30 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170829014030.GD2578@umbus.fritz.box>
-References: <20170821200036.15036-1-bauerman@linux.vnet.ibm.com>
-	<20170824025448.GA27401@fergus.ozlabs.ibm.com>
-	<20170828175356.GB26893@ram.oc3035372033.ibm.com>
+	(envelope-from <thuth@redhat.com>) id 1dmW6i-0001Vr-Pz
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 22:18:27 -0400
+References: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0413bb07-bd76-20fc-f29c-9b0bd60efd1d@redhat.com>
+Date: Tue, 29 Aug 2017 04:18:20 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="SO98HVl1bnMOfKZd"
-Content-Disposition: inline
-In-Reply-To: <20170828175356.GB26893@ram.oc3035372033.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] spapr: Add ibm,
- processor-storage-keys property to CPU DT node
+In-Reply-To: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 00/79] Patch Round-up for stable 2.9.1,
+ freeze on 2017-09-04
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +24,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ram Pai <linuxram@us.ibm.com>
-Cc: Paul Mackerras <paulus@ozlabs.org>, Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Michael Ellerman <mpe@ellerman.id.au>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org
 
-
---SO98HVl1bnMOfKZd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Aug 28, 2017 at 10:53:56AM -0700, Ram Pai wrote:
-> On Thu, Aug 24, 2017 at 12:54:48PM +1000, Paul Mackerras wrote:
-> >=20
-> > We could either have two u16 fields for the number of keys for data
-> > and instruction, or we could have a u32 field for the number of keys
-> > and a separate bit in the flags field to indicate that instruction
-> > keys are supported.  Which would be preferable?
+On 29.08.2017 02:13, Michael Roth wrote:
+> Hi everyone,
 >=20
-> the second choice is more confusion-proof; to me atleast.
+> The following new patches are queued for QEMU stable v2.9.1:
 >=20
-> The first choice gives a illusion that there are 'x' number of data keys
-> and 'y' number of instruction keys; which is not exactly true.
+>   https://github.com/mdroth/qemu/commits/stable-2.9-staging
+>=20
+> The release is planned for 2017-09-07:
+>=20
+>   http://wiki.qemu.org/Planning/2.9
+>=20
+> Please respond here or CC qemu-stable@nongnu.org on any patches you
+> think should be included in the release.
 
-Ah.. can you elaborate?
+I'd like to suggest the following patches:
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+601b9a9008c5a612d76073bb - target-s390x: Mask the SIGP order_code ...
+b7da97eef74bf834be244de0 - monitor: Check whether TCG is enabled ...
+17eb587aeb492fe68f8130b0 - slirp: tftp, copy sockaddr_size
+99efaa2696caaf6182958e27 - hw/s390x/ipl: Fix crash with ...
+36bed541ca886da735bef1e8 - fix qemu-system-unicore32 crashing ...
+b190f477e29c7cd03a8fee49 - qemu-system-tricore: segfault when ...
+8ccccff9dd7ba24c7a788611 - hw/ppc/spapr_rtc: Mark the RTC device ...
+1f98e55385d11da1dc0de644 - hw/ppc/spapr_iommu: Fix crash when ...
 
---SO98HVl1bnMOfKZd
-Content-Type: application/pgp-signature; name="signature.asc"
+Not sure, but maybe the following patch should be included, too, since
+there were some bogus files in the old version of the U-Boot sources:
 
------BEGIN PGP SIGNATURE-----
+73663d71ef2bab201475d58e - PPC: E500: Update u-boot to v2017.07
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmkxgsACgkQbDjKyiDZ
-s5LNdg//Wj4N5VELWev6/ISiIslnLFP1n+sEoEYtVarf6KN6oBpMm0sng7u9DiwT
-LNag+1h29ZfZxH6otflX5RjRiPcSy/hqICk9qGNoKDgpLMxq8WEsrCDymZR2aVqZ
-wnBdh7MHMkNW3x0q81SiBFGmlyIJmC+pdXiNAAG+ItY502+MI+AhVpaqZeogsCMM
-Md/l27Umd/M6UKLq13M+T8/i+DIUZZbjvKUVGBDyGTXLJeNunOiFKo/1YTj92qkW
-zmkzVFWfN7J+ohhqhmE8SnIws/UU8bwvutcVdiaD7mx9qG6s5DnDFAHgjqMTqe2I
-2xL+ZTjKW0mNq4FPFr5yxE+ToPAq/mGL8ldpOGNRx42uPpeTuSlUA0OtiMOdkoAl
-7od/LoSZIpjgTkOrGHiYtsSowrZ9MzTAwJJtGHrFTPyDp+11jfrzhSN6tvLpwCF+
-xHepMqAqVF3/HFmNmbC4cv8E8cZBL+SNnhGbZDEgs1V2SdiT6Wn7y1hkrEsNXDrw
-szfNp20go2NBcgGmvHvnWT9ifWKrWcsudna4lAKOOuDYu9B4J3tFch12YRHBvQPk
-I4z7GyEWuZKIHEE5IHeyn2xJzRWVAiFo0Km5p/yClZPTSear0/mwT3skczwxKmla
-f0M9rVsprrTJKQtyPp1fChoRZ2A1uY+TH3zv81L4QBHyzWBQ+lw=
-=X/kI
------END PGP SIGNATURE-----
-
---SO98HVl1bnMOfKZd--
+ Thomas
