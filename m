@@ -1,30 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dmjSY-0001Bg-Tr
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:33:52 -0400
+	(envelope-from <thuth@redhat.com>) id 1dmjT4-0001YG-Pl
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:34:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dmjSS-0000pc-S6
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:33:50 -0400
-Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:37170)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dmjSS-0000pR-Ni
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:33:44 -0400
-Received: by mail-ua0-x241.google.com with SMTP id 104so1644790uas.4
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 09:33:44 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1dmjT0-0000zQ-PJ
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:34:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46496)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dmjT0-0000yw-HA
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 12:34:18 -0400
+References: <20170816082650.21880-1-cohuck@redhat.com>
+	<223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
+	<CAFEAcA_UfM_XNKdc5zfHsehoRE6Q+EszRZX3FByskir7c+0Lww@mail.gmail.com>
+	<20170822010917.GO12356@umbus.fritz.box>
+	<CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
+	<3f0dc918-0f55-e2f4-bf47-fe4abf5453bb@redhat.com>
+	<CAFEAcA_ezKWweEuUB-cXTer0LLaeuiGDkSdfhApedhw4ykDT0Q@mail.gmail.com>
+	<20170822112046.GC12356@umbus.fritz.box>
+	<20170822134815.77020eb8.cohuck@redhat.com>
+	<20170823002907.GC5379@umbus.fritz.box>
+	<20170823091650.48e7c44e.cohuck@redhat.com>
+	<54526d47-b436-79d5-7a38-9516eaa727a6@redhat.com>
+	<5b0ff74a-08d6-558d-4c79-a93758e6302a@redhat.com>
+	<0bb344a3-f8f8-3365-cef1-1c68cf7d160d@redhat.com>
+	<20170823142047.366068f7.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c4c9776a-4284-796d-2439-42ad89015098@redhat.com>
+Date: Tue, 29 Aug 2017 18:34:08 +0200
 MIME-Version: 1.0
-In-Reply-To: <1500290093.12570.6.camel@redhat.com>
-References: <20170717101700.23552-1-kraxel@redhat.com>
-	<CAJ+F1C+1pVwXxAH=g_5hx25VXBeMU7irpvkJ+guaqMEc7yS2Ag@mail.gmail.com>
-	<1500288560.12570.3.camel@redhat.com>
-	<CAJ+F1C+yg2jzSZf4PM8L=5-NBwgg25buHjTS-FBT2hF4jzpkxQ@mail.gmail.com>
-	<1500290093.12570.6.camel@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 29 Aug 2017 18:33:43 +0200
-Message-ID: <CAJ+F1C+vLvXrwNgFmCRZRgb__n-Q6WD=Ev1UZ9WLpx8Lx0SiAw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] add scripts/indent.sh
+In-Reply-To: <20170823142047.366068f7.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] make check speed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,82 +41,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
 
-Hi
-
-On Mon, Jul 17, 2017 at 1:14 PM, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> On Mon, 2017-07-17 at 10:58 +0000, Marc-Andr=C3=A9 Lureau wrote:
->> Hi
+On 23.08.2017 14:20, Cornelia Huck wrote:
+> On Wed, 23 Aug 2017 10:35:43 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+> 
+>> True. And I just learned that you can also already set the SPEED
+>> variable to either "quick" or "slow" and that we're already using
+>> g_test_quick() and g_test_slow() in a couple of places to check this. So
+>> the framework for running quick vs. thorough tests is already there ...
+>> we just might want to add this to some more tests, I guess...
 >>
->> On Mon, Jul 17, 2017 at 12:49 PM Gerd Hoffmann <kraxel@redhat.com>
->> wrote:
->> > On Mon, 2017-07-17 at 10:36 +0000, Marc-Andr=C3=A9 Lureau wrote:
->> > > Hi
->> > >
->> > > On Mon, Jul 17, 2017 at 12:18 PM Gerd Hoffmann <kraxel@redhat.com
->> > >
->> > > wrote:
->> > > > Script to reformat sources in qemu style.
->> > > >
->> > > > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->> > >
->> > > A quite powerful approach would be to use clang-format: https://l
->> > ists
->> > > .gnu.org/archive/html/qemu-devel/2015-10/msg01278.html
->> > >
->> > > It comes with a bunch of editor integration and scripts. My
->> > config
->> > > could use a bit more tweaking though, I haven't been using it for
->> > a
->> > > while, and newer version have more options.
->> >
->> > Hmm, I want reformat all audio stuff to qemu code style some day,
->> > the
->> > current situation where patches are either break qemu code style or
->> > lead to mixed-style in the audio source files isn't very good.
->> >
->> > I don't mind much which tool we use for that, I picked indent
->> > mostly
->> > because I know that one.  If clang-format can do that too, fine
->> > with
->> > me.  I'm missing documentation though, there is no man-page and
->> > there
->> > isn't anything in /usr/share/doc/clang-3.4.2 either ...
->>
->> Afaik, most of clang-tools documentation is only in html. The most
->> recent version is online at
->> https://clang.llvm.org/docs/ClangFormat.html &
->> https://clang.llvm.org/docs/ClangFormatStyleOptions.html
->
-> Can you add those links as comments to the .clang-format file?
+>> Question for the maintainers and the test automation folks: Is anybody
+>> already running "make check SPEED=slow" or is this just rather an
+>> unheard-of way of running the tests?
+> 
+> So I tried this on master just for fun, and 'make V=1 SPEED=slow
+> check-qtest-x86_64' promptly failed for some ivshmem test.
+> 
+> On x86_86:
+> TEST: tests/ivshmem-test... (pid=3672)
+>   /x86_64/ivshmem/single:                                              OK
+>   /x86_64/ivshmem/hotplug:                                             OK
+>   /x86_64/ivshmem/memdev:                                              OK
+>   /x86_64/ivshmem/pair:                                                OK
+>   /x86_64/ivshmem/server-msi:                                          **
+> ERROR:/home/cohuck/git/qemu/tests/ivshmem-test.c:367:test_ivshmem_server: assertion failed (ret == 0): (1 == 0)
+> FAIL
+> GTester: last random seed: R02Scde8fd6835fdf17450c73e2f74f25007
+> (pid=3697)
+>  /x86_64/ivshmem/server-irq:                                          OK
+> FAIL: tests/ivshmem-test
 
-Sorry for the late reply, fwiw, my best attempt so far:
-https://gist.github.com/elmarco/aa5e0b23567f46fb7f0e73cde586a0c1
+Bisecting this problem automatically ("git bisect run" rules!) revealed
+that this test broke with this commit:
 
-It's not perfect, you can easily see the result by running inplace
-with clang-format -i && git diff.
+	commit b4ba67d9a702507793c2724e56f98e9b0f7be02b
+	Author: David Gibson <david@gibson.dropbear.id.au>
+	Title: libqos: Change PCI accessors to take opaque BAR handle
 
-In particular:
-- array declaration is often much uglier (with the indendation aligned
-to open brace) - indent seems doing worse.
-  also related: https://bugs.llvm.org/show_bug.cgi?id=3D18455
-- it uses a space in "FOREACH (" macros - good/bad ?
-- long line are splitted in less friendly way than manual split - also
-true with indent
-- qemu doesn't have BinPack true/false, it uses a mix - clang-format
-should learn that - perhaps covered by
-https://bugs.llvm.org/show_bug.cgi?id=3D31907
-- we may want not to do #include ordering - I find it nicer though
+David, any ideas what's going wrong here?
 
-The point is not to apply blindly clang-format over the whole code
-base, but rather to give a decent default formatting when running
-clang-tools, or simply when making a patch. For this, .clang-format is
-necessary, and I would rather have it in qemu tree than in my own
-working directory.
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+ Thomas
