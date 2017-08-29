@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dmhnW-0003pt-Ip
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:47:23 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dmhoR-0004Jo-Gu
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:48:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1dmhnV-0000cJ-6h
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:47:22 -0400
-Date: Tue, 29 Aug 2017 16:47:01 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20170829144701.yt7t6akywnqbox7v@eukaryote>
-References: <20170829090622.30843-1-kchamart@redhat.com>
-	<20170829141954.GA18927@stefanha-x1.localdomain>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dmhoN-0000w0-LI
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:48:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41516)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dmhoN-0000vL-FL
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 10:48:15 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B646480C1F
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 14:48:13 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 29 Aug 2017 16:48:03 +0200
+Message-Id: <20170829144805.28872-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170829141954.GA18927@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] qemu-iotests: Extend
- non-shared storage migration test (194)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/2] vhost-user-bridge reconnect regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +31,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, dgilbert@redhat.com, stefanha@redhat.com
+To: qemu-devel@nongnu.org
+Cc: victork@redhat.com, mst@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Tue, Aug 29, 2017 at 03:19:54PM +0100, Stefan Hajnoczi wrote:
-> On Tue, Aug 29, 2017 at 11:06:22AM +0200, Kashyap Chamarthy wrote:
+Hi,
 
-[...]
+libvhost-user doesn't support resuming with the same trick vubr had
+since commit 523b018dde3b7650fe5401d0499b30cf2f117515. The following
+two patches fix that regression.
 
-> > +iotests.log('Gracefully ending the `drive-mirror` job on source...')
-> > +iotests.log(source_vm.qmp('block-job-cancel', device='mirror-job0'))
-> 
-> Two issues:
-> 
-> 1. Migration may not have completed yet so drive-mirror cannot be
->    stopped here.  We need to wait for migration to complete on the
->    source before cancelling the block job.
-> 
-> 2. block-job-cancel is asynchronous.  The block job may still be running
->    after this returns.  Therefore it may still be using the NBD drive...
-> 
-> > +
-> > +iotests.log('Stopping the NBD server on destination...')
-> > +iotests.log(dest_vm.qmp('nbd-server-stop'))
-> 
-> ...and that races with this command on the destination.
-> 
-> We need to wait for the BLOCK_JOB_CANCELLED/COMPLETED event on the
-> source QEMU before stopping the NBD server on the destination.
+Thanks
 
-Yes, both good points.  How about the following `diff` to address both
-the issues you raised?
+Marc-Andr=C3=A9 Lureau (2):
+  libvhost-user: support resuming vq->last_avail_idx based on used_idx
+  vhost-user-bridge: fix resume regression (since 2.9)
 
-#----------------------------------------------------------------------
-diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
-index 9d81189..a3e3bad 100755
---- a/tests/qemu-iotests/194
-+++ b/tests/qemu-iotests/194
-@@ -67,20 +67,18 @@ dest_vm.qmp('migrate-set-capabilities',
-             capabilities=[{'capability': 'events', 'state': True}])
- iotests.log(source_vm.qmp('migrate', uri='unix:{0}'.format(migration_sock_path)))
- 
--iotests.log('Gracefully ending the `drive-mirror` job on source...')
--iotests.log(source_vm.qmp('block-job-cancel', device='mirror-job0'))
--
--iotests.log('Stopping the NBD server on destination...')
--iotests.log(dest_vm.qmp('nbd-server-stop'))
--
- while True:
-     event1 = source_vm.event_wait('MIGRATION')
-     iotests.log(event1, filters=[iotests.filter_qmp_event])
-     if event1['data']['status'] in ('completed', 'failed'):
-+        iotests.log('Gracefully ending the `drive-mirror` job on source...')
-+        iotests.log(source_vm.qmp('block-job-cancel', device='mirror-job0'))
-         break
- 
- while True:
-     event2 = source_vm.event_wait('BLOCK_JOB_COMPLETED')
-     iotests.log(event2, filters=[iotests.filter_qmp_event])
-     if event2['event'] == 'BLOCK_JOB_COMPLETED':
-+        iotests.log('Stopping the NBD server on destination...')
-+        iotests.log(dest_vm.qmp('nbd-server-stop'))
-         break
-#----------------------------------------------------------------------
+ contrib/libvhost-user/libvhost-user.h |  5 +++++
+ contrib/libvhost-user/libvhost-user.c | 13 +++++++++++++
+ tests/vhost-user-bridge.c             |  7 +++++++
+ 3 files changed, 25 insertions(+)
 
-And the output would be:
-
-#----------------------------------------------------------------------
-Launching VMs...
-Launching NBD server on destination...
-{u'return': {}}
-{u'return': {}}
-Starting `drive-mirror` on source...
-{u'return': {}}
-Waiting for `drive-mirror` to complete...
-{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'mirror-job0', u'type': u'mirror', u'speed': 0, u'len': 1073741824, u'offset': 1073741824}, u'event': u'BLOCK_JOB_READY'}
-Starting migration...
-{u'return': {}}
-{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'setup'}, u'event': u'MIGRATION'}
-{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'active'}, u'event': u'MIGRATION'}
-{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'completed'}, u'event': u'MIGRATION'}
-Gracefully ending the `drive-mirror` job on source...
-{u'return': {}}
-{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'mirror-job0', u'type': u'mirror', u'speed': 0, u'len': 1073741824, u'offset': 1073741824}, u'event': u'BLOCK_JOB_COMPLETED'}
-Stopping the NBD server on destination...
-{u'return': {}}
-#----------------------------------------------------------------------
-
--- 
-/kashyap
+--=20
+2.14.1.146.gd35faa819
