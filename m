@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38373)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dmgsN-0004ty-4I
+	id 1dmgsN-0004tz-4o
 	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 09:48:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dmgsK-00033C-15
+	id 1dmgsK-000337-0u
 	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 09:48:19 -0400
-Received: from research.iiit.ac.in ([196.12.53.8]:33920)
+Received: from research.iiit.ac.in ([196.12.53.8]:33932)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dmgsJ-0002yn-7j
+	id 1dmgsJ-0002z2-7r
 	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 09:48:15 -0400
 From: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-Date: Tue, 29 Aug 2017 19:18:00 +0530
-Message-Id: <1504014481-7975-3-git-send-email-chugh.ishani@research.iiit.ac.in>
+Date: Tue, 29 Aug 2017 19:18:01 +0530
+Message-Id: <1504014481-7975-4-git-send-email-chugh.ishani@research.iiit.ac.in>
 In-Reply-To: <1504014481-7975-1-git-send-email-chugh.ishani@research.iiit.ac.in>
 References: <1504014481-7975-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-Subject: [Qemu-devel] [PATCH 2/3] Test for full Backup
+Subject: [Qemu-devel] [PATCH 3/3] Add manpage for QEMU Backup Tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,165 +29,216 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@redhat.com, jsnow@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 
-This patch is the test for full backup implementation in Backup tool.
-The test employs two basic substests:
-1) Backing up an empty guest and comparing it with base image.
-2) Writing a pattern to the guest, creating backup and comparing
-   with the base image.
+qemu-backup will be a command-line tool for performing full and
+incremental disk backups on running VMs. It is intended as a
+reference implementation for management stack and backup developers
+to see QEMU's backup features in action. The following commit is an
+initial implementation of manpage listing the commands which the
+backup tool will support. The manpage wil be build along with other
+docs when configure is provided with --enable-docs flag in the
+location contrib/backup in build directory.
 
 Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 ---
- tests/qemu-iotests/191     | 86 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/191.out | 35 +++++++++++++++++++
- tests/qemu-iotests/group   |  2 ++
- 3 files changed, 123 insertions(+)
- create mode 100755 tests/qemu-iotests/191
- create mode 100644 tests/qemu-iotests/191.out
+ Makefile                        |  14 ++--
+ contrib/backup/qemu-backup.texi | 144 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 154 insertions(+), 4 deletions(-)
+ create mode 100644 contrib/backup/qemu-backup.texi
 
-diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
-new file mode 100755
-index 0000000..16988d8
---- /dev/null
-+++ b/tests/qemu-iotests/191
-@@ -0,0 +1,86 @@
-+#!/bin/bash
-+#
-+# Test full backup functionality of qemu-backup tool
-+#
-+# Copyright (C) 2017 Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+diff --git a/Makefile b/Makefile
+index 81447b1..ba1574d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -209,6 +209,7 @@ ifdef BUILD_DOCS
+ DOCS=qemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 qemu-nbd.8 qemu-ga.8
+ DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7
+ DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7
++DOCS+=contrib/backup/qemu-backup.html contrib/backup/qemu-backup.txt
+ ifdef CONFIG_VIRTFS
+ DOCS+=fsdev/virtfs-proxy-helper.1
+ endif
+@@ -508,6 +509,8 @@ VERSION ?= $(shell cat VERSION)
+ 
+ dist: qemu-$(VERSION).tar.bz2
+ 
++qemu-backup.8: contrib/backup/qemu-backup.texi
 +
-+# creator
-+owner=chugh.ishani@research.iiit.ac.in
+ qemu-%.tar.bz2:
+ 	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar.bz2,%,$@)"
+ 
+@@ -719,16 +722,19 @@ fsdev/virtfs-proxy-helper.1: fsdev/virtfs-proxy-helper.texi
+ qemu-nbd.8: qemu-nbd.texi qemu-option-trace.texi
+ qemu-ga.8: qemu-ga.texi
+ 
+-html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
+-info: qemu-doc.info docs/interop/qemu-qmp-ref.info docs/interop/qemu-ga-ref.info
+-pdf: qemu-doc.pdf docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
+-txt: qemu-doc.txt docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt
++html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html contrib/backup/qemu-backup.html
++info: qemu-doc.info docs/interop/qemu-qmp-ref.info docs/interop/qemu-ga-ref.info contrib/backup/qemu-backup.info
++pdf: qemu-doc.pdf docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf contrib/backup/qemu-backup.pdf
++txt: qemu-doc.txt docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt contrib/backup/qemu-backup.txt
+ 
+ qemu-doc.html qemu-doc.info qemu-doc.pdf qemu-doc.txt: \
+ 	qemu-img.texi qemu-nbd.texi qemu-options.texi qemu-option-trace.texi \
+ 	qemu-monitor.texi qemu-img-cmds.texi qemu-ga.texi \
+ 	qemu-monitor-info.texi
+ 
++contrib/backup/qemu-backup.html contrib/backup/qemu-backup.pdf contrib/backup/qemu-backup.txt contrib/backup/qemu-backup.info: \
++	contrib/backup/qemu-backup.texi
 +
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1	# failure is the default!
-+
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.qemu
-+
-+_supported_fmt generic
-+_supported_proto generic
-+_supported_os Linux
-+
-+_cleanup()
-+{
-+        rm -f "$TEST_DIR"/virtio0
-+        rm -f "$CONFIG_FILE"
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+CONFIG_FILE="$TEST_DIR"/backup-config
-+SOCKET=unix:"$TEST_DIR"/backup_socket
-+size=128M
-+
-+_make_test_img "$size"
-+export QEMU_BACKUP_CONFIG="$CONFIG_FILE"
-+qemu_comm_method="monitor"
-+echo
-+_launch_qemu -drive if=virtio,file="$TEST_IMG" -qmp "$SOCKET",server,nowait
-+$PYTHON ../../contrib/backup/qemu-backup.py guest add --guest adad --qmp "$SOCKET"
-+$PYTHON ../../contrib/backup/qemu-backup.py drive add --id virtio0 --guest adad --target "$TEST_DIR"/virtio0
-+echo
-+echo "== Creating backup =="
-+$PYTHON ../../contrib/backup/qemu-backup.py backup --guest adad
-+_send_qemu_cmd $QEMU_HANDLE 'quit' ''
-+wait=1 _cleanup_qemu
-+echo
-+echo "== Comparing images =="
-+$QEMU_IMG compare "$TEST_DIR"/virtio0 "$TEST_IMG"
-+_cleanup
-+
-+_launch_qemu -drive if=virtio,id=virtio0,file="$TEST_IMG" -qmp "$SOCKET",server,nowait
-+$PYTHON ../../contrib/backup/qemu-backup.py guest add --guest adad --qmp "$SOCKET"
-+$PYTHON ../../contrib/backup/qemu-backup.py drive add --id virtio0 --guest adad --target "$TEST_DIR"/virtio0
-+echo
-+echo "== Writing Pattern =="
-+_send_qemu_cmd $QEMU_HANDLE 'qemu-io virtio0 "write -P 0x22 0 1M"' "(qemu)" | _filter_qemu_io
-+echo
-+echo "== Creating backup =="
-+$PYTHON ../../contrib/backup/qemu-backup.py backup --guest adad
-+_send_qemu_cmd $QEMU_HANDLE 'quit' ''
-+wait=1 _cleanup_qemu
-+echo
-+echo "== Comparing images =="
-+$QEMU_IMG compare "$TEST_DIR"/virtio0 "$TEST_IMG"
-+_cleanup
-+_cleanup_test_img
-+
-+echo "*** done"
-+status=0
-\ No newline at end of file
-diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
+ docs/interop/qemu-ga-ref.dvi docs/interop/qemu-ga-ref.html \
+     docs/interop/qemu-ga-ref.info docs/interop/qemu-ga-ref.pdf \
+     docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7: \
+diff --git a/contrib/backup/qemu-backup.texi b/contrib/backup/qemu-backup.texi
 new file mode 100644
-index 0000000..c60d47a
+index 0000000..68e7231
 --- /dev/null
-+++ b/tests/qemu-iotests/191.out
-@@ -0,0 +1,35 @@
-+QA output created by 191
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
++++ b/contrib/backup/qemu-backup.texi
+@@ -0,0 +1,144 @@
++\input texinfo
++@setfilename qemu-backup
 +
-+Successfully Added Guest
-+Successfully Added Drive
++@documentlanguage en
++@documentencoding UTF-8
 +
-+== Creating backup ==
-+Backup Started
-+*virtio0
-+Backup Complete
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) Formatting 'TEST_DIR/virtio0', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+quit
++@settitle QEMU Backup Tool
++@copying
 +
-+== Comparing images ==
-+Images are identical.
-+Successfully Added Guest
-+Successfully Added Drive
++Copyright @copyright{} 2017 The QEMU Project developers
++@end copying
++@ifinfo
++@direntry
++* QEMU: (QEMU-backup).    Man page for QEMU Backup Tool.
++@end direntry
++@end ifinfo
++@iftex
++@titlepage
++@sp 7
++@center @titlefont{QEMU Backup Tool}
++@sp 1
++@sp 3
++@end titlepage
++@end iftex
++@ifnottex
++@node Top
++@top Short Sample
 +
-+== Writing Pattern ==
-+QEMU X.Y.Z monitor - type 'help' for more information
-+(qemu) qemu-io virtio0 "write -P 0x22 0 1M"
++@menu
++* Name::
++* Synopsis::
++* List of Commands::
++* Command Parameters::
++* Command Descriptions::
++* License::
++@end menu
 +
-+== Creating backup ==
-+Backup Started
-+*virtio0
-+Backup Complete
-+wrote 1048576/1048576 bytes at offset 0
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+(qemu) Formatting 'TEST_DIR/virtio0', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+quit
++@end ifnottex
 +
-+== Comparing images ==
-+Images are identical.
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index afbdc42..66fa231 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -186,4 +186,6 @@
- 188 rw auto quick
- 189 rw auto
- 190 rw auto quick
-+191 rw auto
- 192 rw auto quick
-+193 rw auto
++@node Name
++@chapter Name
++
++QEMU disk backup tool.
++
++@node Synopsis
++@chapter Synopsis
++
++qemu-backup command [command options].
++
++@node  List of Commands
++@chapter  List of Commands
++@itemize
++@item qemu-backup guest add --guest guestname --qmp socketpath
++@item qemu-backup guest list
++@item qemu-backup drive add --id driveid --guest guestname --target target
++@item qemu-backup drive add --all --guest guestname --target target
++@item qemu-backup drive list --guest guestname
++@item qemu-backup backup [--inc] --guest guestname
++@item qemu-backup restore --guest guestname
++@item qemu-backup guest remove --guest guestname
++@item qemu-backup drive remove --guest guestname --id driveid
++@end itemize
++@node  Command Parameters
++@chapter  Command Parameters
++@itemize
++@item --all: Add all the drives present in a guest which are suitable for backup.
++@item --guest: Name of the guest.
++@item --id: id of guest or drive.
++@item --inc: (Optional) For incremental backup.
++@item --qmp: Path of qmp socket.
++@item --target: Destination path on which you want your backup to be made.
++@end itemize
++
++@node  Command Descriptions
++@chapter  Command Descriptions
++@itemize
++@item qemu-backup guest add --guest guestname --qmp socketpath
++This command adds a guest to the configuration file given its path to qmp socket.
++
++example:
++qemu-backup guest add --id=fedora --qmp=unix:/var/run/qemu/fedora.sock
++
++qemu-backup guest add --id=fedora --qmp=tcp:localhost:4444
++
++@item qemu-backup guest list
++This commands lists the names of guests which are added to configuration file.
++
++@item qemu-backup drive add --guest guestname --id driveid --target target
++This command adds different drives for backup in a particular guest by giving the name of drive to be backed up and target imagefile in which we want to store the drive backup.
++
++example: qemu-backup drive add --guest=fedora --id=root --target=/backup/root.img
++
++@item qemu-backup drive add --all --guest guestname --destination destination
++This command adds all the drives of the guest for backup other than CDROM drive and read-only drives. Here all the backup drives will have the same names as original drives and target will be the destination folder.
++
++example: qemu-backup drive add --all --guest fedora --destination =/backup/fedora/
++
++@item qemu-backup drive list --guest guestname
++This commands gives the names of the drive present in a guest which are added for backup.
++
++example: qemu-backup drive list --guest=fedora
++
++@item qemu-backup backup --guest guestname
++
++This command makes the backup of the drives, in their respective given destinations. The ids of drive and their destinations are taken from the configuration file.
++
++example: qemu-backup backup --guest=fedora
++
++@item qemu-backup restore --guest guestname
++This command is needed if we want to restore the backup. It will list the commands to be run for performing the same but will not perform any action.
++
++example: qemu-backup restore --guest=fedora
++
++@item qemu-backup guest remove --guest guestname
++This command removes the guest from the configuration file.
++
++example: qemu-backup guest remove --guest=fedora
++
++@item qemu-backup drive remove --guest guestname --id driveid
++This command helps remove a drive which is set for backup in configuration of given host.
++
++example: drive remove --guest=fedora --id=root
++
++@item A full backup can be performed by following the given steps:
++
++Perform a full backup of 'vm001', which has one drive:
++
++qemu-backup guest add --guest vm001 --qmp /path/to/vm001.sock
++
++qemu-backup add --id drive0 --guest vm001 --target /backups/vm001-drive0.img
++
++qemu-backup backup --guest vm001
++
++
++@end itemize
++
++@node License
++@appendix License
++QEMU is a trademark of Fabrice Bellard.
++QEMU is released under the
++@url{https://www.gnu.org/licenses/gpl-2.0.txt,GNU General Public License},
++version 2. Parts of QEMU have specific licenses, see file
++@url{http://git.qemu.org/?p=qemu.git;a=blob_plain;f=LICENSE,LICENSE}.
++@bye
 -- 
 2.7.4
