@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dmcFE-00037v-GH
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:51:37 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dmcJE-0004p0-NA
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:55:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dmcFB-0000e8-E7
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:51:36 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:34120)
+	(envelope-from <aik@ozlabs.ru>) id 1dmcJB-0001xG-DV
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:55:44 -0400
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:36410)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dmcFB-0000dj-7n
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:51:33 -0400
-Received: by mail-wm0-x231.google.com with SMTP id f13so18416187wme.1
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 01:51:31 -0700 (PDT)
-Date: Tue, 29 Aug 2017 09:51:28 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170829085128.GA25960@stefanha-x1.localdomain>
-References: <20170828145728.dqubknb7fruy4sfu@postretch>
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dmcJA-0001vb-V9
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 04:55:41 -0400
+Received: by mail-io0-x243.google.com with SMTP id v96so2909355ioi.3
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 01:55:39 -0700 (PDT)
+References: <20170824123006.GK5379@umbus.fritz.box>
+	<20170825083123.47432-1-aik@ozlabs.ru>
+	<4608a2c1-5c74-efea-d901-3b5cfa0519e6@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <faf33daf-0207-c8c2-a260-434e621dcf87@ozlabs.ru>
+Date: Tue, 29 Aug 2017 18:55:32 +1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170828145728.dqubknb7fruy4sfu@postretch>
-Subject: Re: [Qemu-devel] GSOC Report: Moving I/O throttling and write
- notifiers into block filter drivers
+In-Reply-To: <4608a2c1-5c74-efea-d901-3b5cfa0519e6@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] exec: Destroy dispatch immediately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +31,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>
 
-On Mon, Aug 28, 2017 at 05:57:28PM +0300, Manos Pitsidianakis wrote:
-> Branches / Patches
-> ==================
+On 25/08/17 18:53, Paolo Bonzini wrote:
+> On 25/08/2017 10:31, Alexey Kardashevskiy wrote:
+>> Otherwise old dispatch holds way too much memory before RCU gets
+>> a chance to free old dispatches.
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> ---
+>>
+>> This is a follow-up to the "Memory use with >100 virtio devices"
+>> thread.
+>>
+>> I assume this is a dirty hack (which fixes the problem though)
 > 
-> The 'throttle' and 'throttle-remove-legacy' patches should be merged soon
-> after master unfreezes from the 2.10 release. The rest of the patch series
-> are in final stages of review on qemu-devel except for block-insert-node
-> which is an RFC [5].
+> This doesn't work.  AddressSpaceDispatch can be accessed outside the big
+> QEMU lock, which is why it is destroyed via call_rcu.
 > 
-> Already merged patches in 2.10
->  https://github.com/qemu/qemu/commits/v2.10.0-rc4?author=epilys
-> Already merged patches for 2.11
->  https://www.mail-archive.com/qemu-devel@nongnu.org/msg470461.html
-> 
-> [0] [insert-node] block-insert-node and block-remove-node commands
->  https://github.com/epilys/qemu/commits/insert-node?author=epilys
-> 
-> [1] [throttle] add throttle filter driver
->  https://github.com/epilys/qemu/commits/throttle?author=epilys
->  Message-ID: <20170825132028.6184-1-el13635@mail.ntua.gr>
->  https://www.mail-archive.com/qemu-devel@nongnu.org/msg476047.html
-> 
-> [2] [throttle-remove-legacy] remove legacy throttling interface
->  https://github.com/epilys/qemu/commits/throttle-remove-legacy?author=epilys
-> 
-> [3] [4] [notify] https://github.com/epilys/qemu/commits/notify?author=epilys
-> 
-> [5] block-insert-node RFC
->  Message-ID: <20170815074513.9055-1-el13635@mail.ntua.gr>
->  https://www.mail-archive.com/qemu-devel@nongnu.org/msg473619.html
+> The solution is to: 1) share the FlatView structures if they refer to
+> the same root memory region; 2) have one AddressSpaceDispatch per
+> FlatView instead of one per AddressSpace, so that FlatView reference
+> counting takes care of clearing the AddressSpaceDispatch too.  Neither
+> is particularly hard.  The second requires getting rid of the
+> as->dispatch_listener and "hard coding" the creation of the
+> AddressSpaceDispatch from the FlatView in memory.c.
 
-Thanks for your hard work, Manos!
 
-Stefan
+While I am trying this approach, here is a cheap workaround -
+
+diff --git a/vl.c b/vl.c
+index 8e247cc2a2..4d95bc2a6a 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4655,12 +4655,16 @@ int main(int argc, char **argv, char **envp)
+     igd_gfx_passthru();
+
+     /* init generic devices */
++    memory_region_transaction_begin();
++
+     rom_set_order_override(FW_CFG_ORDER_OVERRIDE_DEVICE);
+     if (qemu_opts_foreach(qemu_find_opts("device"),
+                           device_init_func, NULL, NULL)) {
+         exit(1);
+     }
+
++    memory_region_transaction_commit();
++
+     cpu_synchronize_all_post_init();
+
+     rom_reset_order_override();
+
+
+
+Just for self-education - how dirty is this hack?
+
+This effectively postpones all dispatch trees allocation/disposal till MR
+transation depth is 0 (which happens in this
+memory_region_transaction_commit()), for 500 virtio devices it reduces the
+amount of resident RAM from 45GB to 11GB with 2GB guest, good for speed too
+- time to build a machine is reduced from 4:00 to 1:20.
+
+
+
+
+> 
+> Paolo
+> 
+>> and I wonder what the proper solution would be. Thanks.
+>>
+>>
+>> What happens here is that every virtio block device creates 2 address
+>> spaces - for modern config space (called "virtio-pci-cfg-as") and
+>> for busmaster (common pci thing, called after the device name,
+>> in my case "virtio-blk-pci").
+>>
+>> Each address_space_init() updates topology for _every_ address space.
+>> Every topology update (address_space_update_topology()) creates a new
+>> dispatch tree - AddressSpaceDispatch with nodes (1KB) and
+>> sections (48KB) and destroys the old one.
+>>
+>> However the dispatch destructor is postponed via RCU which does not
+>> get a chance to execute until the machine is initialized but before
+>> we get there, memory is not returned to the pool, and this is a lot
+>> of memory which grows n^2.
+>>
+>>
+>> Interestingly, mem_add() from exec.c is called twice:
+>> as as->dispatch_listener.region_add() and
+>> as as->dispatch_listener.region_nop() - I did not understand
+>> the trick but it does not work if I remove the .region_nop() hook.
+>> How does it work? :)
+>>
+>> ---
+>>  exec.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/exec.c b/exec.c
+>> index 01ac21e3cd..ea5f3eb209 100644
+>> --- a/exec.c
+>> +++ b/exec.c
+>> @@ -2707,7 +2707,7 @@ static void mem_commit(MemoryListener *listener)
+>>  
+>>      atomic_rcu_set(&as->dispatch, next);
+>>      if (cur) {
+>> -        call_rcu(cur, address_space_dispatch_free, rcu);
+>> +        address_space_dispatch_free(cur);
+>>      }
+>>  }
+>>  
+>>
+> 
+
+
+-- 
+Alexey
