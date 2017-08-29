@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liuqing@huayun.com>) id 1dmWov-0000t4-1i
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 23:04:05 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1dmWrG-0001qc-FL
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 23:06:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liuqing@huayun.com>) id 1dmWou-0006bI-7Z
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 23:04:05 -0400
-Date: Tue, 29 Aug 2017 11:05:04 +0800
-From: Liu Qing <liuqing@huayun.com>
-Message-ID: <20170829030504.GB30307@host-172-16-90-85.openstacklocal>
-References: <20170828055631.GB3258@host-172-16-90-85.openstacklocal>
-	<f3668e32-27bd-ba30-0575-1d6b3a93a151@redhat.com>
+	(envelope-from <wei.w.wang@intel.com>) id 1dmWrB-0007zg-DN
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 23:06:30 -0400
+Received: from mga14.intel.com ([192.55.52.115]:44540)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1dmWrB-0007z6-1V
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 23:06:25 -0400
+Message-ID: <59A4DADE.5050303@intel.com>
+Date: Tue, 29 Aug 2017 11:09:18 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f3668e32-27bd-ba30-0575-1d6b3a93a151@redhat.com>
-Subject: Re: [Qemu-devel] reduce write bandwidth of qcow2 driver while
- allocating new cluster
+References: <1503914913-28893-1-git-send-email-wei.w.wang@intel.com>
+	<1503914913-28893-4-git-send-email-wei.w.wang@intel.com>
+	<20170828204659-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170828204659-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v15 3/5] virtio-balloon: VIRTIO_BALLOON_F_SG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +29,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-On Mon, Aug 28, 2017 at 05:40:48PM -0400, John Snow wrote:
-> 
-> 
-> On 08/28/2017 01:56 AM, Liu Qing wrote:
-> > Dear list,
-> >     Recently I used fio to test qcow2 driver in the guest os, and found out
-> > that when a new cluster is allocated the 4K IO will occupy 64K(default cluster
-> > size) bandwith.
-> >     From the code qcow2 driver will fill the unused part of new allocated
-> > cluster with 0 in perform_cow. These 0s are set in qcow2_co_readv when the read
-> > destination is not allocated and it has no backing file. Could I forbidden any
-> > further write in copy_sectors if the copy source is not allocated and it has
-> > no backing file? So only the requested data is written to the cluster. Function
-> > copy_sectors is only used by perform_cow in the master branch.
-> >     Do you think this change is reasonable? Thanks.
-> > 
-> > 
-> 
-> CCing qemu-block.
-> 
-> If I am understanding you correctly, you're noticing an adverse
-> performance impact from initial writes to unallocated clusters through
-> the qcow2 driver, when qcow2 performs zero-fill of uninitiated clusters.
-Yes, that's it.
-> 
-> First, can you look at sources for current master branch? it hasn't been
-> named "copy_sectors" since June 2016, and the function looks a bit
-> differently than it did in the version you're looking at, I think.
-I checkout the latest master branch and the code path has some changes, but the
-zero-fill process still exists. Eric has replied a patch from Anton
-which could improve the write performance. Thanks all.
-> 
-> John
-> 
+On 08/29/2017 02:03 AM, Michael S. Tsirkin wrote:
+> On Mon, Aug 28, 2017 at 06:08:31PM +0800, Wei Wang wrote:
+>> Add a new feature, VIRTIO_BALLOON_F_SG, which enables the transfer
+>> of balloon (i.e. inflated/deflated) pages using scatter-gather lists
+>> to the host.
+>>
+>> The implementation of the previous virtio-balloon is not very
+>> efficient, because the balloon pages are transferred to the
+>> host one by one. Here is the breakdown of the time in percentage
+>> spent on each step of the balloon inflating process (inflating
+>> 7GB of an 8GB idle guest).
+>>
+>> 1) allocating pages (6.5%)
+>> 2) sending PFNs to host (68.3%)
+>> 3) address translation (6.1%)
+>> 4) madvise (19%)
+>>
+>> It takes about 4126ms for the inflating process to complete.
+>> The above profiling shows that the bottlenecks are stage 2)
+>> and stage 4).
+>>
+>> This patch optimizes step 2) by transferring pages to the host in
+>> sgs. An sg describes a chunk of guest physically continuous pages.
+>> With this mechanism, step 4) can also be optimized by doing address
+>> translation and madvise() in chunks rather than page by page.
+>>
+>> With this new feature, the above ballooning process takes ~597ms
+>> resulting in an improvement of ~86%.
+>>
+>> TODO: optimize stage 1) by allocating/freeing a chunk of pages
+>> instead of a single page each time.
+>>
+>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>> Signed-off-by: Liang Li <liang.z.li@intel.com>
+>> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+>> ---
+>>   drivers/virtio/virtio_balloon.c     | 171 ++++++++++++++++++++++++++++++++----
+>>   include/uapi/linux/virtio_balloon.h |   1 +
+>>   2 files changed, 155 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
+>> index f0b3a0b..8ecc1d4 100644
+>> --- a/drivers/virtio/virtio_balloon.c
+>> +++ b/drivers/virtio/virtio_balloon.c
+>> @@ -32,6 +32,8 @@
+>>   #include <linux/mm.h>
+>>   #include <linux/mount.h>
+>>   #include <linux/magic.h>
+>> +#include <linux/xbitmap.h>
+>> +#include <asm/page.h>
+>>   
+>>   /*
+>>    * Balloon device works in 4K page units.  So each page is pointed to by
+>> @@ -79,6 +81,9 @@ struct virtio_balloon {
+>>   	/* Synchronize access/update to this struct virtio_balloon elements */
+>>   	struct mutex balloon_lock;
+>>   
+>> +	/* The xbitmap used to record balloon pages */
+>> +	struct xb page_xb;
+>> +
+>>   	/* The array of pfns we tell the Host about. */
+>>   	unsigned int num_pfns;
+>>   	__virtio32 pfns[VIRTIO_BALLOON_ARRAY_PFNS_MAX];
+>> @@ -141,13 +146,111 @@ static void set_page_pfns(struct virtio_balloon *vb,
+>>   					  page_to_balloon_pfn(page) + i);
+>>   }
+>>   
+>> +static int add_one_sg(struct virtqueue *vq, void *addr, uint32_t size)
+>> +{
+>> +	struct scatterlist sg;
+>> +
+>> +	sg_init_one(&sg, addr, size);
+>> +	return virtqueue_add_inbuf(vq, &sg, 1, vq, GFP_KERNEL);
+>> +}
+>> +
+>> +static void send_balloon_page_sg(struct virtio_balloon *vb,
+>> +				 struct virtqueue *vq,
+>> +				 void *addr,
+>> +				 uint32_t size,
+>> +				 bool batch)
+>> +{
+>> +	unsigned int len;
+>> +	int err;
+>> +
+>> +	err = add_one_sg(vq, addr, size);
+>> +	/* Sanity check: this can't really happen */
+>> +	WARN_ON(err);
+> It might be cleaner to detect that add failed due to
+> ring full and kick then. Just an idea, up to you
+> whether to do it.
+>
+>> +
+>> +	/* If batching is in use, we batch the sgs till the vq is full. */
+>> +	if (!batch || !vq->num_free) {
+>> +		virtqueue_kick(vq);
+>> +		wait_event(vb->acked, virtqueue_get_buf(vq, &len));
+>> +		/* Release all the entries if there are */
+> Meaning
+> 	Account for all used entries if any
+> ?
+>
+>> +		while (virtqueue_get_buf(vq, &len))
+>> +			;
+>
+> Above code is reused below. Add a function?
+>
+>> +	}
+>> +}
+>> +
+>> +/*
+>> + * Send balloon pages in sgs to host. The balloon pages are recorded in the
+>> + * page xbitmap. Each bit in the bitmap corresponds to a page of PAGE_SIZE.
+>> + * The page xbitmap is searched for continuous "1" bits, which correspond
+>> + * to continuous pages, to chunk into sgs.
+>> + *
+>> + * @page_xb_start and @page_xb_end form the range of bits in the xbitmap that
+>> + * need to be searched.
+>> + */
+>> +static void tell_host_sgs(struct virtio_balloon *vb,
+>> +			  struct virtqueue *vq,
+>> +			  unsigned long page_xb_start,
+>> +			  unsigned long page_xb_end)
+>> +{
+>> +	unsigned long sg_pfn_start, sg_pfn_end;
+>> +	void *sg_addr;
+>> +	uint32_t sg_len, sg_max_len = round_down(UINT_MAX, PAGE_SIZE);
+>> +
+>> +	sg_pfn_start = page_xb_start;
+>> +	while (sg_pfn_start < page_xb_end) {
+>> +		sg_pfn_start = xb_find_next_bit(&vb->page_xb, sg_pfn_start,
+>> +						page_xb_end, 1);
+>> +		if (sg_pfn_start == page_xb_end + 1)
+>> +			break;
+>> +		sg_pfn_end = xb_find_next_bit(&vb->page_xb, sg_pfn_start + 1,
+>> +					      page_xb_end, 0);
+>> +		sg_addr = (void *)pfn_to_kaddr(sg_pfn_start);
+>> +		sg_len = (sg_pfn_end - sg_pfn_start) << PAGE_SHIFT;
+>> +		while (sg_len > sg_max_len) {
+>> +			send_balloon_page_sg(vb, vq, sg_addr, sg_max_len, 1);
+> Last argument should be true, not 1.
+>
+>> +			sg_addr += sg_max_len;
+>> +			sg_len -= sg_max_len;
+>> +		}
+>> +		send_balloon_page_sg(vb, vq, sg_addr, sg_len, 1);
+>> +		xb_zero(&vb->page_xb, sg_pfn_start, sg_pfn_end);
+>> +		sg_pfn_start = sg_pfn_end + 1;
+>> +	}
+>> +
+>> +	/*
+>> +	 * The last few sgs may not reach the batch size, but need a kick to
+>> +	 * notify the device to handle them.
+>> +	 */
+>> +	if (vq->num_free != virtqueue_get_vring_size(vq)) {
+>> +		virtqueue_kick(vq);
+>> +		wait_event(vb->acked, virtqueue_get_buf(vq, &sg_len));
+>> +		while (virtqueue_get_buf(vq, &sg_len))
+>> +			;
+> Some entries can get used after a pause. Looks like they will leak then?
+> One fix would be to convert above if to a while loop.
+> I don't know whether to do it like this in send_balloon_page_sg too.
+>
+
+Thanks for the above comments. I've re-written this part of code.
+Please have a check below if there is anything more we could improve:
+
+static void kick_and_wait(struct virtqueue *vq, wait_queue_head_t wq_head)
+{
+         unsigned int len;
+
+         virtqueue_kick(vq);
+         wait_event(wq_head, virtqueue_get_buf(vq, &len));
+         /* Detach all the used buffers from the vq */
+         while (virtqueue_get_buf(vq, &len))
+                 ;
+}
+
+static int add_one_sg(struct virtqueue *vq, void *addr, uint32_t size)
+{
+         struct scatterlist sg;
+         int ret;
+
+         sg_init_one(&sg, addr, size);
+         ret = virtqueue_add_inbuf(vq, &sg, 1, vq, GFP_KERNEL);
+         if (unlikely(ret == -ENOSPC))
+                 dev_warn(&vq->vdev->dev, "%s: failed due to ring full\n",
+                                  __func__);
+
+         return ret;
+}
+
+static void send_balloon_page_sg(struct virtio_balloon *vb,
+                                                       struct virtqueue *vq,
+                                                       void *addr,
+                                                       uint32_t size,
+                                                       bool batch)
+{
+         int err;
+
+         do {
+                 err = add_one_sg(vq, addr, size);
+                 if (err == -ENOSPC || !batch || !vq->num_free)
+                         kick_and_wait(vq, vb->acked);
+         } while (err == -ENOSPC);
+}
+
+
+Best,
+Wei
