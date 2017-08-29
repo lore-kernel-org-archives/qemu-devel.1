@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dmiJN-0003l2-O4
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:20:23 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dmiKb-0004aH-QG
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:21:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dmiJK-0006zL-J3
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:20:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52684)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dmiJK-0006yw-9N
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:20:14 -0400
-Date: Tue, 29 Aug 2017 18:20:05 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170829181921-mutt-send-email-mst@kernel.org>
-References: <20170829144805.28872-1-marcandre.lureau@redhat.com>
-	<20170829144805.28872-2-marcandre.lureau@redhat.com>
-	<20170829175820-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CLYGyJyfNB26iyiaRbf5Pq9HveW_h+rFp_ZFrrvkmATDA@mail.gmail.com>
-	<20170829180900-mutt-send-email-mst@kernel.org>
-	<CAJ+F1CJ5-s-wqWgiHTNQ_a6AvPkG4RyXy8xbCCQQHsSmhhXpNQ@mail.gmail.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1dmiKY-0007YO-NI
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:21:33 -0400
+Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:33018)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dmiKY-0007Xu-Gn
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:21:30 -0400
+Received: by mail-pg0-x22a.google.com with SMTP id t3so11774365pgt.0
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 08:21:30 -0700 (PDT)
+References: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
+	<1503414539-28762-2-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <54b68f0d-5ef2-7d1c-3c1a-5b114dfb4921@linaro.org>
+Date: Tue, 29 Aug 2017 08:21:26 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CJ5-s-wqWgiHTNQ_a6AvPkG4RyXy8xbCCQQHsSmhhXpNQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] libvhost-user: support resuming
- vq->last_avail_idx based on used_idx
+In-Reply-To: <1503414539-28762-2-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/20] target/arm: Implement ARMv8M's
+ PMSAv8 registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,84 +32,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: Victor Kaplansky <victork@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On Tue, Aug 29, 2017 at 05:18:11PM +0200, Marc-Andr=E9 Lureau wrote:
-> Hi
->=20
-> On Tue, Aug 29, 2017 at 5:09 PM, Michael S. Tsirkin <mst@redhat.com> wr=
-ote:
-> > On Tue, Aug 29, 2017 at 05:04:34PM +0200, Marc-Andr=E9 Lureau wrote:
-> >> Hi
-> >>
-> >> On Tue, Aug 29, 2017 at 5:01 PM, Michael S. Tsirkin <mst@redhat.com>=
- wrote:
-> >> > On Tue, Aug 29, 2017 at 04:48:04PM +0200, Marc-Andr=E9 Lureau wrot=
-e:
-> >> >> This is the same workaround as commit 523b018dde3b765, which was =
-lost
-> >> >> with libvhost-user transition in commit e10e798c85c2331.
-> >> >>
-> >> >> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> >> >> ---
-> >> >>  contrib/libvhost-user/libvhost-user.h |  5 +++++
-> >> >>  contrib/libvhost-user/libvhost-user.c | 13 +++++++++++++
-> >> >>  2 files changed, 18 insertions(+)
-> >> >>
-> >> >> diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libv=
-host-user/libvhost-user.h
-> >> >> index 53ef222c0b..aca71717c1 100644
-> >> >> --- a/contrib/libvhost-user/libvhost-user.h
-> >> >> +++ b/contrib/libvhost-user/libvhost-user.h
-> >> >> @@ -132,6 +132,7 @@ typedef void (*vu_set_features_cb) (VuDev *de=
-v, uint64_t features);
-> >> >>  typedef int (*vu_process_msg_cb) (VuDev *dev, VhostUserMsg *vmsg=
-,
-> >> >>                                    int *do_reply);
-> >> >>  typedef void (*vu_queue_set_started_cb) (VuDev *dev, int qidx, b=
-ool started);
-> >> >> +typedef bool (*vu_queue_resume_to_used_cb) (VuDev *dev, int qidx=
-);
-> >> >>
-> >> >>  typedef struct VuDevIface {
-> >> >>      /* called by VHOST_USER_GET_FEATURES to get the features bit=
-mask */
-> >> >> @@ -148,6 +149,10 @@ typedef struct VuDevIface {
-> >> >>      vu_process_msg_cb process_msg;
-> >> >>      /* tells when queues can be processed */
-> >> >>      vu_queue_set_started_cb queue_set_started;
-> >> >> +    /* If the queue must be resumed to vring.used->idx. */
-> >> >> +    /* This can help to support resuming on unmanaged exit/crash=
- when
-> >> >> +     * the slave/driver processes elements in order. */
-> >> >> +    vu_queue_resume_to_used_cb queue_resume_to_used;
-> >> >>  } VuDevIface;
-> >> >>
-> >> >>  typedef void (*vu_queue_handler_cb) (VuDev *dev, int qidx);
-> >> >
-> >> > Let's consider: this is only safe if queue is processed in order.
-> >> > So I think that would be a better name for the field.
-> >> >
-> >> That's what the comment say already :)
-> >>
-> >> Which name do you suggest? vu_queue_is_processed_in_order?
-> >
-> > Something like this.
-> >
-> >> Does that
-> >> imply it should always resume?
-> >
-> > Not sure I understand the question.
->=20
-> If a "queue_is_processed_in_order", does that imply libvhost-user
-> should always resume it based on used_idx? I think it does, but the
-> correlation is less obvious than explicitly saying "resume_to_used".
+On 08/22/2017 08:08 AM, Peter Maydell wrote:
+> As part of ARMv8M, we need to add support for the PMSAv8 MPU
+> architecture.
+> 
+> PMSAv8 differs from PMSAv7 both in register/data layout (for instance
+> using base and limit registers rather than base and size) and also in
+> behaviour (for example it does not have subregions); rather than
+> trying to wedge it into the existing PMSAv7 code and data structures,
+> we define separate ones.
+> 
+> This commit adds the data structures which hold the state for a
+> PMSAv8 MPU and the register interface to it.  The implementation of
+> the MPU behaviour will be added in a subsequent commit.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/cpu.h      |  13 ++++++
+>  hw/intc/armv7m_nvic.c | 122 ++++++++++++++++++++++++++++++++++++++++++++++----
+>  target/arm/cpu.c      |  36 ++++++++++-----
+>  target/arm/machine.c  |  28 +++++++++++-
+>  4 files changed, 179 insertions(+), 20 deletions(-)
 
-Just add a comment then. You do not want low level details
-like used index in all backends.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
->=20
-> --=20
-> Marc-Andr=E9 Lureau
+r~
