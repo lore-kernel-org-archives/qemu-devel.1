@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vadim.galitsyn@profitbricks.com>) id 1dmiTU-0001g2-TT
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:30:46 -0400
+	(envelope-from <vadim.galitsyn@profitbricks.com>) id 1dmiTV-0001gi-SY
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:30:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vadim.galitsyn@profitbricks.com>) id 1dmiTT-0003mD-0a
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:30:44 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:37789)
+	(envelope-from <vadim.galitsyn@profitbricks.com>) id 1dmiTR-0003jw-Oo
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:30:45 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:37785)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <vadim.galitsyn@profitbricks.com>)
-	id 1dmiTS-0003hs-Nk
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:30:42 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id n37so11244166wrf.4
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 08:30:40 -0700 (PDT)
+	id 1dmiTR-0003fb-D4
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:30:41 -0400
+Received: by mail-wr0-x231.google.com with SMTP id n37so11243896wrf.4
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 08:30:39 -0700 (PDT)
 From: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
-Date: Tue, 29 Aug 2017 17:30:20 +0200
-Message-Id: <20170829153022.27004-2-vadim.galitsyn@profitbricks.com>
-In-Reply-To: <20170829153022.27004-1-vadim.galitsyn@profitbricks.com>
-References: <20170829153022.27004-1-vadim.galitsyn@profitbricks.com>
-Subject: [Qemu-devel] [PATCH v7 1/3] hmp: extend "info numa" with hotplugged
- memory information
+Date: Tue, 29 Aug 2017 17:30:19 +0200
+Message-Id: <20170829153022.27004-1-vadim.galitsyn@profitbricks.com>
+Subject: [Qemu-devel] [PATCH v7 0/3] hmp, qmp: 'info memory_size_summary',
+ 'query-memory-size-summary', 'info numa' updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,138 +26,104 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
 
-Report amount of hotplugged memory in addition to total
-amount per NUMA node.
+Hi Guys,
 
-Signed-off-by: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org
----
- include/qemu/typedefs.h |  1 +
- include/sysemu/numa.h   |  7 ++++++-
- monitor.c               |  9 ++++++---
- numa.c                  | 18 +++++++++++++-----
- 4 files changed, 26 insertions(+), 9 deletions(-)
+Sorry for the delay. This is continuation of
+  http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg02937.html.
 
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index 39bc8351a3..163550214c 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -58,6 +58,7 @@ typedef struct MSIMessage MSIMessage;
- typedef struct NetClientState NetClientState;
- typedef struct NetFilterState NetFilterState;
- typedef struct NICInfo NICInfo;
-+typedef struct NumaNodeMem NumaNodeMem;
- typedef struct PcGuestInfo PcGuestInfo;
- typedef struct PCIBridge PCIBridge;
- typedef struct PCIBus PCIBus;
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index 610eece211..5c6df2820b 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -24,9 +24,14 @@ struct node_info {
-     uint8_t distance[MAX_NODES];
- };
- 
-+struct NumaNodeMem {
-+    uint64_t node_mem;
-+    uint64_t node_plugged_mem;
-+};
-+
- extern NodeInfo numa_info[MAX_NODES];
- void parse_numa_opts(MachineState *ms);
--void query_numa_node_mem(uint64_t node_mem[]);
-+void query_numa_node_mem(NumaNodeMem node_mem[]);
- extern QemuOptsList qemu_numa_opts;
- void numa_set_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
- void numa_unset_mem_node_id(ram_addr_t addr, uint64_t size, uint32_t node);
-diff --git a/monitor.c b/monitor.c
-index e0f880107f..6c9d183caf 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1710,11 +1710,12 @@ static void hmp_info_mtree(Monitor *mon, const QDict *qdict)
- static void hmp_info_numa(Monitor *mon, const QDict *qdict)
- {
-     int i;
--    uint64_t *node_mem;
-+    NumaNodeMem *node_mem;
-     CpuInfoList *cpu_list, *cpu;
- 
-     cpu_list = qmp_query_cpus(&error_abort);
--    node_mem = g_new0(uint64_t, nb_numa_nodes);
-+    node_mem = g_new0(NumaNodeMem, nb_numa_nodes);
-+
-     query_numa_node_mem(node_mem);
-     monitor_printf(mon, "%d nodes\n", nb_numa_nodes);
-     for (i = 0; i < nb_numa_nodes; i++) {
-@@ -1727,7 +1728,9 @@ static void hmp_info_numa(Monitor *mon, const QDict *qdict)
-         }
-         monitor_printf(mon, "\n");
-         monitor_printf(mon, "node %d size: %" PRId64 " MB\n", i,
--                       node_mem[i] >> 20);
-+                       node_mem[i].node_mem >> 20);
-+        monitor_printf(mon, "node %d plugged: %" PRId64 " MB\n", i,
-+                       node_mem[i].node_plugged_mem >> 20);
-     }
-     qapi_free_CpuInfoList(cpu_list);
-     g_free(node_mem);
-diff --git a/numa.c b/numa.c
-index e32af04cd2..fe066ad2f8 100644
---- a/numa.c
-+++ b/numa.c
-@@ -591,11 +591,12 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
-     }
- }
- 
--static void numa_stat_memory_devices(uint64_t node_mem[])
-+static void numa_stat_memory_devices(NumaNodeMem node_mem[])
- {
-     MemoryDeviceInfoList *info_list = NULL;
-     MemoryDeviceInfoList **prev = &info_list;
-     MemoryDeviceInfoList *info;
-+    PCDIMMDeviceInfo     *pcdimm_info;
- 
-     qmp_pc_dimm_device_list(qdev_get_machine(), &prev);
-     for (info = info_list; info; info = info->next) {
-@@ -603,9 +604,16 @@ static void numa_stat_memory_devices(uint64_t node_mem[])
- 
-         if (value) {
-             switch (value->type) {
--            case MEMORY_DEVICE_INFO_KIND_DIMM:
--                node_mem[value->u.dimm.data->node] += value->u.dimm.data->size;
-+            case MEMORY_DEVICE_INFO_KIND_DIMM: {
-+                pcdimm_info = value->u.dimm.data;
-+                node_mem[pcdimm_info->node].node_mem += pcdimm_info->size;
-+                if (pcdimm_info->hotpluggable && pcdimm_info->hotplugged) {
-+                    node_mem[pcdimm_info->node].node_plugged_mem +=
-+                        pcdimm_info->size;
-+                }
-                 break;
-+            }
-+
-             default:
-                 break;
-             }
-@@ -614,7 +622,7 @@ static void numa_stat_memory_devices(uint64_t node_mem[])
-     qapi_free_MemoryDeviceInfoList(info_list);
- }
- 
--void query_numa_node_mem(uint64_t node_mem[])
-+void query_numa_node_mem(NumaNodeMem node_mem[])
- {
-     int i;
- 
-@@ -624,7 +632,7 @@ void query_numa_node_mem(uint64_t node_mem[])
- 
-     numa_stat_memory_devices(node_mem);
-     for (i = 0; i < nb_numa_nodes; i++) {
--        node_mem[i] += numa_info[i].node_mem;
-+        node_mem[i].node_mem += numa_info[i].node_mem;
-     }
- }
- 
--- 
-2.13.1.394.g41dd433
+I tried to update all the things according to your input
+regarding to v6 series. I am attaching all the versions
+history here in cover letter.
+
+Best regards,
+Vadim
+
+v7:
+ * hmp: 'info numa': 'struct numa_node_mem' ->
+   'struct NumaNodeMem' (Eric);
+
+ * hmp: 'info numa': 'numa_node_mem.node_hotpluggable_mem' ->
+   'NumaNodeMem.node_plugged_mem' (in order to follow the same
+   naming schema as in the rest patches from this series);
+
+ * hmp: hmp_info_memory_size_summary() no longer
+   uses &error_abort (David);
+
+ * qmp: documented when @plugged-memory info is omitted (Eric);
+
+ * qmp: added example usage of @query-memory-size-summary (Eric);
+
+ * qmp: 'Since: 2.10.0' -> 'Since: 2.11.0' (Eric);
+
+ * All commit messages updated according to Eric's recomendation.
+
+v6:
+ * qmp: Renamed get_existing_hotpluggable_memory_size() ->
+   get_plugged_memory_size();
+
+ * qmp: Renamed MemoryInfo.hotunpluggable_memory ->
+   MemoryInfo.plugged_memory;
+
+ * qmp: Dropped superfluous parenthesis around the
+   comparison while evaluating MemoryInfo.has_plugged_memory.
+
+ * hmp: Renamed 'info memory-size-summary' ->
+   'info memory_size_summary'
+
+v5:
+ * hmp: Updated description and '.help' message for
+   'info memory-size-summary' command.
+
+ * hmp: Removed '-' characters from
+   'info memory-size-summary' output.
+
+ * Dropped ballooned memory information.
+
+ * get_existing_hotpluggable_memory_size() assumed
+   to never fail; routine now has no arguments and
+   returns uint64_t; in case if target does not support
+   memory hotplug, (uint64_t)-1 is returned.
+
+ * MemoryInfo structure:
+   * Removed @balloon-actual-memory field.
+   * Field @hotpluggable-memory renamed
+     to @hotunpluggable-memory.
+   * Updated description for fields.
+
+ * qmp: Updated description for
+   query-memory-size-summary.
+
+ * Patch v4 splitted into series.
+
+v4:
+ * Commands "info memory" and "query-memory" were renamed
+   to "info memory-size-summary" and "query-memory-size-summary"
+   correspondingly.
+ * Descriptions for both commands as well as MemoryInfo structure
+   fields were updated/renamed according to
+   http://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg05972.html.
+ * In MemoryInfo structure following fields are now optional:
+   hotpluggable-memory and balloon-actual-memory.
+ * Field "hotpluggable-memory" now not displayed in HMP if target
+   has no CONFIG_MEM_HOTPLUG enabled.
+ * Field "balloon-actual-memory" now not displayed in HMP if
+   ballooning not enabled.
+ * qapi_free_MemoryInfo() used in order to free corresponding memory
+   instead of g_free().
+ * #ifdef CONFIG_MEM_HOTPLUG was removed and replaced with stubs/ approach.
+   get_exiting_hotpluggable_memory_size() function was introduced in
+   hw/mem/pc-dimm.c (available for all targets which have CONFIG_MEM_HOTPLUG
+   enabled). For other targets, there is a stub in stubs/qmp_pc_dimm.c.
+   In addition, stubs/qmp_pc_dimm_device_list.c was renamed to
+   stubs/qmp_pc_dimm.c in order to reflect actual source file content.
+ * Commit message was updated in order to reflect what was changed.
+
+v3:
+ * Use PRIu64 instead of 'lu' when printing results via HMP.
+ * Report zero hot-plugged memory instead of reporting error
+   when target architecture has no CONFIG_MEM_HOTPLUG enabled.
+
+v2:
+ * Fixed build for targets which do not have CONFIG_MEM_HOTPLUG
+   enabled.
