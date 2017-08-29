@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dmnqi-0004Te-DG
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:15:05 -0400
+	(envelope-from <cota@braap.org>) id 1dmnsW-0005Xc-Uj
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:16:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dmnqd-0006bv-To
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:15:04 -0400
-Resent-Message-Id: <E1dmnqd-0006bv-To@eggs.gnu.org>
-In-Reply-To: <20170829204934.9039-1-jsnow@redhat.com>
-Message-ID: <150404129008.69.15341038356367048349@b5667b65043c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <cota@braap.org>) id 1dmnsS-00007w-42
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:16:56 -0400
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:33783)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dmnsR-00006V-Tt
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:16:52 -0400
+Date: Tue, 29 Aug 2017 17:16:49 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170829211649.GA9108@flamenco>
+References: <1500616763-26560-1-git-send-email-cota@braap.org>
+	<1500616763-26560-2-git-send-email-cota@braap.org>
+	<CAJhHMCBpo1-6x9wJWE2oSv1RB=vH-WbA0RjMWYox_dtFfLAURA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 29 Aug 2017 14:14:51 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/9] IDE: replace printfs with tracing
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJhHMCBpo1-6x9wJWE2oSv1RB=vH-WbA0RjMWYox_dtFfLAURA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v4 11/43] tcg: define CF_PARALLEL and use
+ it for TB hashing along with CF_COUNT_MASK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,73 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, f4bug@amsat.org
+To: Pranith Kumar <bobby.prani+qemu@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA4MjkyMDQ5MzQuOTAzOS0xLWpzbm93QHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxd
-IFtQQVRDSCB2MiAwLzldIElERTogcmVwbGFjZSBwcmludGZzIHdpdGggdHJhY2luZwpUeXBlOiBz
-ZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
-PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
-ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
-SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
-Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
-PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
-Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAg
-ICAgICBwYXRjaGV3LzIwMTcwODI5MjA0OTM0LjkwMzktMS1qc25vd0ByZWRoYXQuY29tIC0+IHBh
-dGNoZXcvMjAxNzA4MjkyMDQ5MzQuOTAzOS0xLWpzbm93QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8g
-YSBuZXcgYnJhbmNoICd0ZXN0JwozMTc1NjI2NzJkIEFIQ0k6IHJlbW92ZSBEUFJJTlRGIG1hY3Jv
-CjUxMTFmMjQ1YjUgQUhDSTogcHJldHR5LXByaW50IEZJUyB0byBidWZmZXIgaW5zdGVhZCBvZiBz
-dGRlcnIKZmQ5NDQ2NGEwOSBBSENJOiBSZXdvcmsgSVJRIGNvbnN0YW50cwphMmNiYzdhMWI5IEFI
-Q0k6IFJlcGxhY2UgRFBSSU5URiB3aXRoIHRyYWNlLWV2ZW50cwo3NjE3YTEwMGE0IElERTogcmVw
-bGFjZSBERUJVR19BSU8gd2l0aCB0cmFjZSBldmVudHMKZDBhYjlkOWFlOCBBVEFQSTogUmVwbGFj
-ZSBERUJVR19JREVfQVRBUEkgd2l0aCB0cmFjaW5nIGV2ZW50cwplYzA3YjlmNDg3IElERTogYWRk
-IHRyYWNpbmcgZm9yIGRhdGEgcG9ydHMKYWQ1MGViZDI3YiBJREU6IEFkZCByZWdpc3RlciBoaW50
-cyB0byB0cmFjaW5nCjk5YWYyY2VkOTcgSURFOiByZXBsYWNlIERFQlVHX0lERSB3aXRoIHRyYWNp
-bmcgc3lzdGVtCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzk6IElERTog
-cmVwbGFjZSBERUJVR19JREUgd2l0aCB0cmFjaW5nIHN5c3RlbS4uLgpFUlJPUjogc3BhY2VzIHJl
-cXVpcmVkIGFyb3VuZCB0aGF0ICd8JyAoY3R4OlZ4VikKIzE0MzogRklMRTogaHcvaWRlL2NvcmUu
-YzoxMTk3OgorICAgIGlmIChyZWdfbnVtICE9IDcgJiYgKHMtPnN0YXR1cyAmIChCVVNZX1NUQVR8
-RFJRX1NUQVQpKSkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBeCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDMzNyBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzk6
-IElERTogQWRkIHJlZ2lzdGVyIGhpbnRzIHRvIHRyYWNpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMy85
-OiBJREU6IGFkZCB0cmFjaW5nIGZvciBkYXRhIHBvcnRzLi4uCkNoZWNraW5nIFBBVENIIDQvOTog
-QVRBUEk6IFJlcGxhY2UgREVCVUdfSURFX0FUQVBJIHdpdGggdHJhY2luZyBldmVudHMuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggNS85OiBJREU6IHJlcGxhY2UgREVCVUdfQUlPIHdpdGggdHJhY2UgZXZlbnRz
-Li4uCkNoZWNraW5nIFBBVENIIDYvOTogQUhDSTogUmVwbGFjZSBEUFJJTlRGIHdpdGggdHJhY2Ut
-ZXZlbnRzLi4uCkVSUk9SOiBIZXggbnVtYmVycyBtdXN0IGJlIHByZWZpeGVkIHdpdGggJzB4Jwoj
-NTQwOiBGSUxFOiBody9pZGUvdHJhY2UtZXZlbnRzOjkxOgoraGFuZGxlX3JlZ19oMmRfZmlzX3Bt
-cCh2b2lkICpzLCBpbnQgcG9ydCwgY2hhciBiMCwgY2hhciBiMSwgY2hhciBiMikgImFoY2koJXAp
-WyVkXTogUG9ydCBNdWx0aXBsaWVyIG5vdCBzdXBwb3J0ZWQsIEZJUzogMHglMDJ4LSUwMngtJTAy
-eCIKCkVSUk9SOiBIZXggbnVtYmVycyBtdXN0IGJlIHByZWZpeGVkIHdpdGggJzB4JwojNTQxOiBG
-SUxFOiBody9pZGUvdHJhY2UtZXZlbnRzOjkyOgoraGFuZGxlX3JlZ19oMmRfZmlzX3Jlcyh2b2lk
-ICpzLCBpbnQgcG9ydCwgY2hhciBiMCwgY2hhciBiMSwgY2hhciBiMikgImFoY2koJXApWyVkXTog
-UmVzZXJ2ZWQgZmxhZ3Mgc2V0IGluIEgyRCBSZWdpc3RlciBGSVMsIEZJUzogMHglMDJ4LSUwMngt
-JTAyeCIKCkVSUk9SOiBIZXggbnVtYmVycyBtdXN0IGJlIHByZWZpeGVkIHdpdGggJzB4JwojNTQ3
-OiBGSUxFOiBody9pZGUvdHJhY2UtZXZlbnRzOjk4OgoraGFuZGxlX2NtZF91bmhhbmRsZWRfZmlz
-KHZvaWQgKnMsIGludCBwb3J0LCB1aW50OF90IGIwLCB1aW50OF90IGIxLCB1aW50OF90IGIyKSAi
-YWhjaSglcClbJWRdOiB1bmhhbmRsZWQgRklTIHR5cGUuIGNtZF9maXM6IDB4JTAyeC0lMDJ4LSUw
-MngiCgp0b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDQ5NiBsaW5lcyBjaGVja2VkCgpZb3Vy
-IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA3Lzk6IEFI
-Q0k6IFJld29yayBJUlEgY29uc3RhbnRzLi4uCkNoZWNraW5nIFBBVENIIDgvOTogQUhDSTogcHJl
-dHR5LXByaW50IEZJUyB0byBidWZmZXIgaW5zdGVhZCBvZiBzdGRlcnIuLi4KRVJST1I6IFVzZSBn
-X2Fzc2VydCBvciBnX2Fzc2VydF9ub3RfcmVhY2hlZAojMzU6IEZJTEU6IGh3L2lkZS9haGNpLmM6
-NjU4OgorICAgIGdfYXNzZXJ0X2NtcGludChjbWRfbGVuLCA8PSwgMHgxMDApOwoKdG90YWw6IDEg
-ZXJyb3JzLCAwIHdhcm5pbmdzLCA4NiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA5Lzk6IEFIQ0k6IHJlbW92ZSBEUFJJ
-TlRGIG1hY3JvLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
-IGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
-aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Sun, Aug 27, 2017 at 18:15:50 -0400, Pranith Kumar wrote:
+> Hi Emilio,
+> 
+> On Fri, Jul 21, 2017 at 1:59 AM, Emilio G. Cota <cota@braap.org> wrote:
+> > This will enable us to decouple code translation from the value
+> > of parallel_cpus at any given time. It will also help us minimize
+> > TB flushes when generating code via EXCP_ATOMIC.
+> >
+> > Note that the declaration of parallel_cpus is brought to exec-all.h
+> > to be able to define there the "curr_cflags" inline.
+> >
+> > Signed-off-by: Emilio G. Cota <cota@braap.org>
+> 
+> I was testing a winxp image today and I bisected a infinite loop to
+> this commit. The loop happens both with and without mttcg, so I think
+> it has got to do with something else.
+
+Can you test the below? It lets me boot ubuntu, otherwise it reliably
+chokes on a 'rep movsb' *very* early (doesn't even get to grub).
+
+This discusson on v2 might be relevant (I added CF_COUNT_MASK as a
+result of it, but it seems I have to revisit that):
+  https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg06456.html
+
+Anyway let me know if this fixes it for you. Thanks for testing!
+
+		Emilio
+
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 025fae0..8b2f233 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -326,7 +326,7 @@ struct TranslationBlock {
+ #define CF_INVALID     0x80000 /* TB is stale. Setters must acquire tb_lock */
+ #define CF_PARALLEL    0x100000 /* Generate code for a parallel context */
+ /* cflags' mask for hashing/comparison */
+-#define CF_HASH_MASK (CF_COUNT_MASK | CF_PARALLEL)
++#define CF_HASH_MASK (CF_PARALLEL)
+
+     /* Per-vCPU dynamic tracing state used to generate this TB */
+     uint32_t trace_vcpu_dstate;
