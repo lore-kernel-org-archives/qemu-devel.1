@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dmfR0-0002KD-FQ
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:16:00 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dmfYo-0003t7-O4
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:24:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dmfQv-00069p-Ch
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:15:58 -0400
-Received: from mail-qt0-x22a.google.com ([2607:f8b0:400d:c0d::22a]:36897)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dmfQv-00069E-5F
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:15:53 -0400
-Received: by mail-qt0-x22a.google.com with SMTP id t22so13714238qtg.4
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 05:15:52 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170828174707.20786-1-famz@redhat.com>
-	<20170828174707.20786-4-famz@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9658452f-c89f-43d2-07ff-5d620fd471a9@amsat.org>
-Date: Tue, 29 Aug 2017 09:15:47 -0300
+	(envelope-from <dgibson@ozlabs.org>) id 1dmfYl-00019R-KR
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:24:02 -0400
+Date: Tue, 29 Aug 2017 21:42:39 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170829114239.GP2578@umbus.fritz.box>
+References: <20170328021651.19350-1-david@gibson.dropbear.id.au>
+	<20170328021651.19350-2-david@gibson.dropbear.id.au>
+	<20170426182155-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170828174707.20786-4-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 03/10] tests: Add vm test lib
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="2/+Vq7w28QOSGzSM"
+Content-Disposition: inline
+In-Reply-To: <20170426182155-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [RFC for-2.10 1/3] pci/pcie: Make a consistent
+ helper for switching PCI/PCIe "hybrid" devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,365 +26,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: ehabkost@redhat.com, aik@ozlabs.ru, marcel@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lersek@redhat.com
 
-On 08/28/2017 02:47 PM, Fam Zheng wrote:
-> This is the common code to implement a "VM test" to
-> 
->    1) Download and initialize a pre-defined VM that has necessary
->    dependencies to build QEMU and SSH access.
-> 
->    2) Archive $SRC_PATH to a .tar file.
-> 
->    3) Boot the VM, and pass the source tar file to the guest.
-> 
->    4) SSH into the VM, untar the source tarball, build from the source.
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->   tests/vm/basevm.py | 287 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 287 insertions(+)
->   create mode 100755 tests/vm/basevm.py
-> 
-> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-> new file mode 100755
-> index 0000000000..d0095c5332
-> --- /dev/null
-> +++ b/tests/vm/basevm.py
-> @@ -0,0 +1,287 @@
-> +#!/usr/bin/env python
-> +#
-> +# VM testing base class
-> +#
-> +# Copyright (C) 2017 Red Hat Inc.
-> +#
-> +# Authors:
-> +#  Fam Zheng <famz@redhat.com>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2.  See
-> +# the COPYING file in the top-level directory.
-> +#
-> +
-> +import os
-> +import sys
-> +import logging
-> +import time
-> +import datetime
-> +sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
-> +from qemu import QEMUMachine
-> +import subprocess
-> +import hashlib
-> +import optparse
-> +import atexit
-> +import tempfile
-> +import shutil
-> +import multiprocessing
-> +import traceback
-> +
-> +SSH_KEY = """\
-> +-----BEGIN RSA PRIVATE KEY-----
-> +MIIEowIBAAKCAQEAopAuOlmLV6LVHdFBj8/eeOwI9CqguIJPp7eAQSZvOiB4Ag/R
-> +coEhl/RBbrV5Yc/SmSD4PTpJO/iM10RwliNjDb4a3I8q3sykRJu9c9PI/YsH8WN9
-> ++NH2NjKPtJIcKTu287IM5JYxyB6nDoOzILbTyJ1TDR/xH6qYEfBAyiblggdjcvhA
-> +RTf93QIn39F/xLypXvT1K2O9BJEsnJ8lEUvB2UXhKo/JTfSeZF8wPBeowaP9EONk
-> +7b+nuJOWHGg68Ji6wVi62tjwl2Szch6lxIhZBpnV7QNRKMfYHP6eIyF4pusazzZq
-> +Telsq6xI2ghecWLzb/MF5A+rklsGx2FNuJSAJwIDAQABAoIBAHHi4o/8VZNivz0x
-> +cWXn8erzKV6tUoWQvW85Lj/2RiwJvSlsnYZDkx5af1CpEE2HA/pFT8PNRqsd+MWC
-> +7AEy710cVsM4BYerBFYQaYxwzblaoojo88LSjVPw3h5Z0iLM8+IMVd36nwuc9dpE
-> +R8TecMZ1+U4Tl6BgqkK+9xToZRdPKdjS8L5MoFhGN+xY0vRbbJbGaV9Q0IHxLBkB
-> +rEBV7T1mUynneCHRUQlJQEwJmKpT8MH3IjsUXlG5YvnuuvcQJSNTaW2iDLxuOKp8
-> +cxW8+qL88zpb1D5dppoIu6rlrugN0azSq70ruFJQPc/A8GQrDKoGgRQiagxNY3u+
-> +vHZzXlECgYEA0dKO3gfkSxsDBb94sQwskMScqLhcKhztEa8kPxTx6Yqh+x8/scx3
-> +XhJyOt669P8U1v8a/2Al+s81oZzzfQSzO1Q7gEwSrgBcRMSIoRBUw9uYcy02ngb/
-> +j/ng3DGivfJztjjiSJwb46FHkJ2JR8mF2UisC6UMXk3NgFY/3vWQx78CgYEAxlcG
-> +T3hfSWSmTgKRczMJuHQOX9ULfTBIqwP5VqkkkiavzigGRirzb5lgnmuTSPTpF0LB
-> +XVPjR2M4q+7gzP0Dca3pocrvLEoxjwIKnCbYKnyyvnUoE9qHv4Kr+vDbgWpa2LXG
-> +JbLmE7tgTCIp20jOPPT4xuDvlbzQZBJ5qCQSoZkCgYEAgrotSSihlCnAOFSTXbu4
-> +CHp3IKe8xIBBNENq0eK61kcJpOxTQvOha3sSsJsU4JAM6+cFaxb8kseHIqonCj1j
-> +bhOM/uJmwQJ4el/4wGDsbxriYOBKpyq1D38gGhDS1IW6kk3erl6VAb36WJ/OaGum
-> +eTpN9vNeQWM4Jj2WjdNx4QECgYAwTdd6mU1TmZCrJRL5ZG+0nYc2rbMrnQvFoqUi
-> +BvWiJovggHzur90zy73tNzPaq9Ls2FQxf5G1vCN8NCRJqEEjeYCR59OSDMu/EXc2
-> +CnvQ9SevHOdS1oEDEjcCWZCMFzPi3XpRih1gptzQDe31uuiHjf3cqcGPzTlPdfRt
-> +D8P92QKBgC4UaBvIRwREVJsdZzpIzm224Bpe8LOmA7DeTnjlT0b3lkGiBJ36/Q0p
-> +VhYh/6cjX4/iuIs7gJbGon7B+YPB8scmOi3fj0+nkJAONue1mMfBNkba6qQTc6Y2
-> +5mEKw2/O7/JpND7ucU3OK9plcw/qnrWDgHxl0Iz95+OzUIIagxne
-> +-----END RSA PRIVATE KEY-----
-> +"""
-> +SSH_PUB_KEY = """\
-> +ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCikC46WYtXotUd0UGPz9547Aj0KqC4gk+nt4BBJm86IHgCD9FygSGX9EFutXlhz9KZIPg9Okk7+IzXRHCWI2MNvhrcjyrezKREm71z08j9iwfxY3340fY2Mo+0khwpO7bzsgzkljHIHqcOg7MgttPInVMNH/EfqpgR8EDKJuWCB2Ny+EBFN/3dAiff0X/EvKle9PUrY70EkSycnyURS8HZReEqj8lN9J5kXzA8F6jBo/0Q42Ttv6e4k5YcaDrwmLrBWLra2PCXZLNyHqXEiFkGmdXtA1Eox9gc/p4jIXim6xrPNmpN6WyrrEjaCF5xYvNv8wXkD6uSWwbHYU24lIAn qemu-vm-key
-> +"""
-> +
-> +class BaseVM(object):
-> +    GUEST_USER = "qemu"
-> +    GUEST_PASS = "qemupass"
-> +    ROOT_PASS = "qemupass"
-> +
-> +    # The script to run in the guest that builds QEMU
-> +    BUILD_SCRIPT = ""
-> +    # The guest name, to be overridden by subclasses
-> +    name = "#base"
-> +    def __init__(self, debug=False, vcpus=None):
-> +        self._guest = None
-> +        self._tmpdir = tempfile.mkdtemp(prefix="qemu-vm-")
-> +        atexit.register(shutil.rmtree, self._tmpdir)
-> +
-> +        self._ssh_key_file = os.path.join(self._tmpdir, "id_rsa")
-> +        open(self._ssh_key_file, "w").write(SSH_KEY)
-> +        subprocess.check_call(["chmod", "600", self._ssh_key_file])
-> +
-> +        self._ssh_pub_key_file = os.path.join(self._tmpdir, "id_rsa.pub")
-> +        open(self._ssh_pub_key_file, "w").write(SSH_PUB_KEY)
-> +
-> +        self.debug = debug
-> +        self._stderr = sys.stderr
-> +        self._devnull = open("/dev/null", "w")
-> +        if self.debug:
-> +            self._stdout = sys.stdout
-> +        else:
-> +            self._stdout = self._devnull
-> +        self._args = [ \
-> +            "-nodefaults", "-m", "2G",
-> +            "-cpu", "host",
-> +            "-netdev", "user,id=vnet,hostfwd=:0.0.0.0:0-:22",
 
-Testing with debian/unstable:
+--2/+Vq7w28QOSGzSM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-$ make vm-build-netbsd V=1
-./tests/vm/netbsd  --debug   --image "tests/vm/netbsd.img" --build-qemu .
-DEBUG:root:Creating archive /tmp/qemu-vm-PxfXNv/data-3a52c.tar for data 
-dir: .
-DEBUG:root:QEMU args: -nodefaults -m 2G -cpu host -netdev 
-user,id=vnet,hostfwd=:0.0.0.0:0-:22 -device virtio-net-pci,netdev=vnet 
--vnc :0,to=20 -serial file:/tmp/qemu-vm-PxfXNv/serial.out -smp 4 
--enable-kvm -device VGA -drive 
-file=tests/vm/netbsd.img,snapshot=on,if=none,id=drive0,cache=writeback 
--device virtio-blk,drive=drive0,bootindex=0 -drive 
-file=/tmp/qemu-vm-PxfXNv/data-3a52c.tar,if=none,id=data-3a52c,cache=writeback,format=raw 
--device virtio-blk,drive=data-3a52c,serial=data-3a52c,bootindex=1
-Failed to prepare guest environment
-Traceback (most recent call last):
-   File "/source/qemu/tests/vm/basevm.py", line 274, in main
-     vm.boot(args.image + ",snapshot=on")
-   File "/source/qemu/tests/vm/basevm.py", line 198, in boot
-     guest.launch()
-   File "/source/qemu/tests/vm/../../scripts/qemu.py", line 137, in launch
-     self._post_launch()
-   File "/source/qemu/tests/vm/../../scripts/qemu.py", line 121, in 
-_post_launch
-     self._qmp.accept()
-   File "/source/qemu/tests/vm/../../scripts/qmp/qmp.py", line 147, in 
-accept
-     return self.__negotiate_capabilities()
-   File "/source/qemu/tests/vm/../../scripts/qmp/qmp.py", line 60, in 
-__negotiate_capabilities
-     raise QMPConnectError
-QMPConnectError
-tests/vm/Makefile.include:32: recipe for target 'vm-build-netbsd' failed
-make: *** [vm-build-netbsd] Error 2
+On Wed, Apr 26, 2017 at 06:23:58PM +0300, Michael S. Tsirkin wrote:
+> On Tue, Mar 28, 2017 at 01:16:49PM +1100, David Gibson wrote:
+> > virtio-pci and XHCI are "hybrid" devices in the sense that they can pre=
+sent
+> > themselves as either PCIe or plain PCI devices depending on the machine
+> > and bus they're connected to.
+> >=20
+> > For virtio-pci to present as PCIe it requires that it's connected to a =
+PCIe
+> > bus and that it's not a root bus - this is to ensure that the device is
+> > connected via a PCIe root port or downstream port rather than being a
+> > integrated endpoint.  Some guests (Windows in particular AIUI) don't re=
+ally
+> > cope with PCIe integrated endpoints.
+> >=20
+> > For XHCI it only checks that the bus is PCIe, but that probably means it
+> > would cause problems if attached as an integrated devices directly to a
+> > PCIe root bus.
+> >=20
+> > This patch makes the test consistent between XHCI and virtio-pci, and
+> > clarifies things by having them both use a new 'pci_allow_hybrid_pcie()'
+> > helper which performs the same check as virtio-pci.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  hw/pci/pci.c           | 7 +++++++
+> >  hw/usb/hcd-xhci.c      | 2 +-
+> >  hw/virtio/virtio-pci.c | 3 +--
+> >  include/hw/pci/pci.h   | 1 +
+> >  4 files changed, 10 insertions(+), 3 deletions(-)
+> >=20
+> > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> > index bd8043c..779787b 100644
+> > --- a/hw/pci/pci.c
+> > +++ b/hw/pci/pci.c
+> > @@ -390,6 +390,13 @@ bool pci_bus_is_root(PCIBus *bus)
+> >      return PCI_BUS_GET_CLASS(bus)->is_root(bus);
+> >  }
+> > =20
+> > +bool pci_allow_hybrid_pcie(PCIDevice *pci_dev)
+> > +{
+> > +    PCIBus *bus =3D pci_dev->bus;
+> > +
+> > +    return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
+> > +}
+> > +
+> >  void pci_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *pa=
+rent,
+> >                           const char *name,
+> >                           MemoryRegion *address_space_mem,
+>=20
+> I'd prefer pci_allow_hybrid_pci_pcie.
 
-Having:
+Ok, I've made that change for the next spin (aimed at 2.11, obviously).
 
-$ qemu-system-x86_64 -version
-QEMU emulator version 2.8.1(Debian 1:2.8+dfsg-7)
+>=20
+> > diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+> > index f0af852..a7ff4fd 100644
+> > --- a/hw/usb/hcd-xhci.c
+> > +++ b/hw/usb/hcd-xhci.c
+> > @@ -3619,7 +3619,7 @@ static void usb_xhci_realize(struct PCIDevice *de=
+v, Error **errp)
+> >                       PCI_BASE_ADDRESS_SPACE_MEMORY|PCI_BASE_ADDRESS_ME=
+M_TYPE_64,
+> >                       &xhci->mem);
+> > =20
+> > -    if (pci_bus_is_express(dev->bus) ||
+> > +    if (pci_allow_hybrid_pcie(dev) ||
+> >          xhci_get_flag(xhci, XHCI_FLAG_FORCE_PCIE_ENDCAP)) {
+> >          ret =3D pcie_endpoint_cap_init(dev, 0xa0);
+> >          assert(ret >=3D 0);
+>=20
+> This seems to change the behaviour for xhci on a root bus - what
+> am I missing?
 
-Hopefully I could get it working with a /master build:
+Nothing.  I didn't consider the backwards compat implications; I'll
+fix it for the next spin.
 
-$ QEMU=/source/qemu/build/x86_64-softmmu/qemu-system-x86_64 make 
-vm-build-netbsd
-...
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-> +            "-device", "virtio-net-pci,netdev=vnet",
-> +            "-vnc", ":0,to=20",
-> +            "-serial", "file:%s" % os.path.join(self._tmpdir, "serial.out")]
-> +        if vcpus:
-> +            self._args += ["-smp", str(vcpus)]
-> +        if os.access("/dev/kvm", os.R_OK | os.W_OK):
-> +            self._args += ["-enable-kvm"]
-> +        else:
-> +            logging.info("KVM not available, not using -enable-kvm")
-> +        self._data_args = []
-> +
-> +    def _download_with_cache(self, url, sha256sum=None):
-> +        def check_sha256sum(fname):
-> +            if not sha256sum:
-> +                return True
-> +            checksum = subprocess.check_output(["sha256sum", fname]).split()[0]
-> +            return sha256sum == checksum
-> +
-> +        cache_dir = os.path.expanduser("~/.cache/qemu-vm/download")
-> +        if not os.path.exists(cache_dir):
-> +            os.makedirs(cache_dir)
-> +        fname = os.path.join(cache_dir, hashlib.sha1(url).hexdigest())
-> +        if os.path.exists(fname) and check_sha256sum(fname):
-> +            return fname
-> +        logging.debug("Downloading %s to %s...", url, fname)
-> +        subprocess.check_call(["wget", "-c", url, "-O", fname + ".download"],
-> +                              stdout=self._stdout, stderr=self._stderr)
-> +        os.rename(fname + ".download", fname)
-> +        return fname
-> +
-> +    def _ssh_do(self, user, cmd, check, interactive=False):
-> +        ssh_cmd = ["ssh", "-q",
-> +                   "-o", "StrictHostKeyChecking=no",
-> +                   "-o", "UserKnownHostsFile=/dev/null",
-> +                   "-o", "ConnectTimeout=1",
-> +                   "-p", self.ssh_port, "-i", self._ssh_key_file]
-> +        if interactive:
-> +            ssh_cmd += ['-t']
-> +        assert not isinstance(cmd, str)
-> +        ssh_cmd += ["%s@127.0.0.1" % user] + list(cmd)
-> +        logging.debug("ssh_cmd: %s", " ".join(ssh_cmd))
-> +        r = subprocess.call(ssh_cmd,
-> +                            stdin=sys.stdin if interactive else self._devnull,
-> +                            stdout=sys.stdout if interactive else self._stdout,
-> +                            stderr=sys.stderr if interactive else self._stderr)
-> +        if check and r != 0:
-> +            raise Exception("SSH command failed: %s" % cmd)
-> +        return r
-> +
-> +    def ssh(self, *cmd):
-> +        return self._ssh_do(self.GUEST_USER, cmd, False)
-> +
-> +    def ssh_interactive(self, *cmd):
-> +        return self._ssh_do(self.GUEST_USER, cmd, False, True)
-> +
-> +    def ssh_root(self, *cmd):
-> +        return self._ssh_do("root", cmd, False)
-> +
-> +    def ssh_check(self, *cmd):
-> +        self._ssh_do(self.GUEST_USER, cmd, True)
-> +
-> +    def ssh_root_check(self, *cmd):
-> +        self._ssh_do("root", cmd, True)
-> +
-> +    def build_image(self, img):
-> +        raise NotImplementedError
-> +
-> +    def add_source_dir(self, data_dir):
-> +        name = "data-" + hashlib.sha1(data_dir).hexdigest()[:5]
-> +        tarfile = os.path.join(self._tmpdir, name + ".tar")
-> +        logging.debug("Creating archive %s for data dir: %s", tarfile, data_dir)
-> +        if subprocess.call("type gtar", stdout=self._devnull,
-> +                           stderr=self._devnull, shell=True) == 0:
-> +            tar_cmd = "gtar"
-> +        else:
-> +            tar_cmd = "tar"
-> +        subprocess.check_call([tar_cmd,
-> +                               "--exclude-vcs",
-> +                               "--exclude=tests/vm/*.img",
-> +                               "--exclude=tests/vm/*.img.*",
-> +                               "--exclude=*.d",
-> +                               "--exclude=*.o",
-> +                               "--exclude=docker-src.*",
-> +                               "-cf", tarfile, '.'], cwd=data_dir,
-> +                              stdin=self._devnull, stdout=self._stdout)
-> +        self._data_args += ["-drive",
-> +                            "file=%s,if=none,id=%s,cache=writeback,format=raw" % \
-> +                                    (tarfile, name),
-> +                            "-device",
-> +                            "virtio-blk,drive=%s,serial=%s,bootindex=1" % (name, name)]
-> +
-> +    def boot(self, img, extra_args=[]):
-> +        args = self._args + [
-> +            "-device", "VGA",
-> +            "-drive", "file=%s,if=none,id=drive0,cache=writeback" % img,
-> +            "-device", "virtio-blk,drive=drive0,bootindex=0"]
-> +        args += self._data_args + extra_args
-> +        logging.debug("QEMU args: %s", " ".join(args))
-> +        guest = QEMUMachine(binary=os.environ.get("QEMU", "qemu-system-x86_64"),
-> +                            args=args)
-> +        guest.launch()
-> +        atexit.register(self.shutdown)
-> +        self._guest = guest
-> +        usernet_info = guest.qmp("human-monitor-command",
-> +                                 command_line="info usernet")
-> +        self.ssh_port = None
-> +        for l in usernet_info["return"].splitlines():
-> +            fields = l.split()
-> +            if "TCP[HOST_FORWARD]" in fields and "22" in fields:
-> +                self.ssh_port = l.split()[3]
-> +        if not self.ssh_port:
-> +            raise Exception("Cannot find ssh port from 'info usernet':\n%s" % \
-> +                            usernet_info)
-> +
-> +    def wait_ssh(self, seconds=120):
-> +        starttime = datetime.datetime.now()
-> +        guest_up = False
-> +        while (datetime.datetime.now() - starttime).total_seconds() < seconds:
-> +            if self.ssh("exit 0") == 0:
-> +                guest_up = True
-> +                break
-> +            time.sleep(1)
-> +        if not guest_up:
-> +            raise TimeoutError("Timeout while waiting for guest ssh")
-> +
-> +    def shutdown(self):
-> +        self._guest.shutdown()
-> +
-> +    def wait(self):
-> +        self._guest.wait()
-> +
-> +    def qmp(self, *args, **kwargs):
-> +        return self._guest.qmp(*args, **kwargs)
-> +
-> +def parse_args(vm_name):
-> +    parser = optparse.OptionParser(description="""
-> +    VM test utility.  Exit codes: 0 = success, 1 = command line error, 2 = environment initialization failed, 3 = test command failed""")
-> +    parser.add_option("--debug", "-D", action="store_true",
-> +                      help="enable debug output")
-> +    parser.add_option("--image", "-i", default="%s.img" % vm_name,
-> +                      help="image file name")
-> +    parser.add_option("--force", "-f", action="store_true",
-> +                      help="force build image even if image exists")
-> +    parser.add_option("--jobs", type=int, default=multiprocessing.cpu_count(),
-> +                      help="number of virtual CPUs")
-> +    parser.add_option("--build-image", "-b", action="store_true",
-> +                      help="build image")
-> +    parser.add_option("--build-qemu",
-> +                      help="build QEMU from source in guest")
-> +    parser.add_option("--interactive", "-I", action="store_true",
-> +                      help="Interactively run command")
-> +    parser.disable_interspersed_args()
-> +    return parser.parse_args()
-> +
-> +def main(vmcls):
-> +    try:
-> +        args, argv = parse_args(vmcls.name)
-> +        if not argv and not args.build_qemu and not args.build_image:
-> +            print "Nothing to do?"
-> +            return 1
-> +        if args.debug:
-> +            logging.getLogger().setLevel(logging.DEBUG)
-> +        vm = vmcls(debug=args.debug, vcpus=args.jobs)
-> +        if args.build_image:
-> +            if os.path.exists(args.image) and not args.force:
-> +                sys.stderr.writelines(["Image file exists: %s\n" % args.image,
-> +                                      "Use --force option to overwrite\n"])
-> +                return 1
-> +            return vm.build_image(args.image)
-> +        if args.build_qemu:
-> +            vm.add_source_dir(args.build_qemu)
-> +            cmd = [vm.BUILD_SCRIPT.format(
-> +                   configure_opts = " ".join(argv),
-> +                   jobs=args.jobs)]
-> +        else:
-> +            cmd = argv
-> +        vm.boot(args.image + ",snapshot=on")
-> +        vm.wait_ssh()
-> +    except Exception as e:
-> +        if isinstance(e, SystemExit) and e.code == 0:
-> +            return 0
-> +        sys.stderr.write("Failed to prepare guest environment\n")
-> +        traceback.print_exc()
-> +        return 2
-> +
-> +    if args.interactive:
-> +        if vm.ssh_interactive(*cmd) == 0:
-> +            return 0
-> +        vm.ssh_interactive()
-> +        return 3
-> +    else:
-> +        if vm.ssh(*cmd) != 0:
-> +            return 3
-> 
+--2/+Vq7w28QOSGzSM
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmlUy0ACgkQbDjKyiDZ
+s5K1gw//eek2Gy3xwqstfcQQnCnkaBvv3rEUnBR792WjfLsFJc/UbIK4saqEnXmo
+HcDEDBHhcNWKGGBheghCS9i6mykdBgb8jO2lN6ca9ykJ3hX8nChR2LgAxnNMTQun
+zI+QXFllqcg5eTk8QMu03fclY/287cJzHhGXtN5H9wLBgKxXvlIXJIJjydEcQiAu
+oZSal9sIA+ObZGKiWMW5PPmDlHrq6G7G4e4D3WUhNepFsFQ/UtPt/M0amMehMq5r
+LZO239RBB+YKrerbUrd2FWJUHBf0Ivof0UoogTicM5ZFFfaWwkiZGSISEYMZUz6h
+JaNxT532d+aZ0LQNRTCz6e1CmtwiBi+mFiGq9qmSA0zjZPaz4EgdSW7NLrClkIqm
+F1n6YiJvN1STYNVVEZLk95Nn196cI43JVQbX4rq8COE8fEXZwEtt2FojDMBAnpKN
+cREneU+7IWsZtfOiDIZhy9nEONw19y6AZ/MGm20EbayH4ZYUuFydKVlHOCBnqugg
+NEruaqHRiLNkKMELGt8ss3jUd5ERhFTgFEYHu52ewB9qrK08h4GT5uwTtXTFSfLH
+YqP9MP6CsKJlAZBRCdbY87ZkX4sut9bRaP7WcrvBlOjeF8QHAtC1FMs8X8AVNoR1
+WUSU2h9GqqhyYTmLzomtaIyMRBH31CqCLS1FyMUMPNT/IIymrPU=
+=Tx15
+-----END PGP SIGNATURE-----
+
+--2/+Vq7w28QOSGzSM--
