@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dmfcr-0005j5-DN
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:28:18 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dmfgO-00006K-B8
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:31:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dmfcp-0002nG-Fp
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:28:13 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 29 Aug 2017 13:27:45 +0100
-Message-Id: <20170829122745.14309-4-stefanha@redhat.com>
-In-Reply-To: <20170829122745.14309-1-stefanha@redhat.com>
-References: <20170829122745.14309-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] qemu-iotests: test NBD over UNIX domain
- sockets in 083
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dmfgI-00049z-3M
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:31:52 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170829120836.16091-1-berto@igalia.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <9c225c3c-e21c-48ad-ac36-e472c6dec84a@amsat.org>
+Date: Tue, 29 Aug 2017 09:31:35 -0300
+MIME-Version: 1.0
+In-Reply-To: <20170829120836.16091-1-berto@igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] misc: Remove unused Error variables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,437 +27,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-083 only tests TCP.  Some failures might be specific to UNIX domain
-sockets.
+Hi Alberto,
 
-A few adjustments are necessary:
+On 08/29/2017 09:08 AM, Alberto Garcia wrote:
+> There's a few cases which we're passing an Error pointer to a function
+> only to discard it immediately afterwards without checking it. In
+> these cases we can simply remove the variable and pass NULL instead.
 
-1. Generating a port number and waiting for server startup is
-   TCP-specific.  Use the new nbd-fault-injector.py startup protocol to
-   fetch the address.  This is a little more elegant because we don't
-   need netstat anymore.
+How did you notice?
 
-2. The NBD filter does not work for the UNIX domain sockets URIs we
-   generate and must be extended.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 
-3. Run all tests twice: once for TCP and once for UNIX domain sockets.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tests/qemu-iotests/083           | 138 +++++++++++++++++++++++--------------
- tests/qemu-iotests/083.out       | 145 ++++++++++++++++++++++++++++++++++-----
- tests/qemu-iotests/common.filter |   4 +-
- 3 files changed, 215 insertions(+), 72 deletions(-)
-
-diff --git a/tests/qemu-iotests/083 b/tests/qemu-iotests/083
-index bff9360048..0306f112da 100755
---- a/tests/qemu-iotests/083
-+++ b/tests/qemu-iotests/083
-@@ -27,6 +27,14 @@ echo "QA output created by $seq"
- here=`pwd`
- status=1	# failure is the default!
- 
-+_cleanup()
-+{
-+	rm -f nbd.sock
-+	rm -f nbd-fault-injector.out
-+	rm -f nbd-fault-injector.conf
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-@@ -35,81 +43,105 @@ _supported_fmt generic
- _supported_proto nbd
- _supported_os Linux
- 
--# Pick a TCP port based on our pid.  This way multiple instances of this test
--# can run in parallel without conflicting.
--choose_tcp_port() {
--	echo $((($$ % 31744) + 1024)) # 1024 <= port < 32768
--}
--
--wait_for_tcp_port() {
--	while ! (netstat --tcp --listening --numeric | \
--		 grep "$1.*0\\.0\\.0\\.0:\\*.*LISTEN") >/dev/null 2>&1; do
--		sleep 0.1
--	done
--}
--
- check_disconnect() {
-+	local event export_name=foo extra_args nbd_addr nbd_url proto when
-+
-+	while true; do
-+		case $1 in
-+		--classic-negotiation)
-+			shift
-+			extra_args=--classic-negotiation
-+			export_name=
-+			;;
-+		--tcp)
-+			shift
-+			proto=tcp
-+			;;
-+		--unix)
-+			shift
-+			proto=unix
-+			;;
-+		*)
-+			break
-+			;;
-+		esac
-+	done
-+
- 	event=$1
- 	when=$2
--	negotiation=$3
- 	echo "=== Check disconnect $when $event ==="
- 	echo
- 
--	port=$(choose_tcp_port)
--
- 	cat > "$TEST_DIR/nbd-fault-injector.conf" <<EOF
- [inject-error]
- event=$event
- when=$when
- EOF
- 
--	if [ "$negotiation" = "--classic-negotiation" ]; then
--		extra_args=--classic-negotiation
--		nbd_url="nbd:127.0.0.1:$port"
-+	if [ "$proto" = "tcp" ]; then
-+		nbd_addr="127.0.0.1:0"
- 	else
--		nbd_url="nbd:127.0.0.1:$port:exportname=foo"
-+		nbd_addr="$TEST_DIR/nbd.sock"
-+	fi
-+
-+	rm -f "$TEST_DIR/nbd.sock"
-+
-+	$PYTHON nbd-fault-injector.py $extra_args "$nbd_addr" "$TEST_DIR/nbd-fault-injector.conf" >"$TEST_DIR/nbd-fault-injector.out" 2>&1 &
-+
-+	# Wait for server to be ready
-+	while ! grep -q 'Listening on ' "$TEST_DIR/nbd-fault-injector.out"; do
-+		sleep 0.1
-+	done
-+
-+	# Extract the final address (port number has now been assigned in tcp case)
-+	nbd_addr=$(sed 's/Listening on \(.*\)$/\1/' "$TEST_DIR/nbd-fault-injector.out")
-+
-+	if [ "$proto" = "tcp" ]; then
-+		nbd_url="nbd+tcp://$nbd_addr/$export_name"
-+	else
-+		nbd_url="nbd+unix:///$export_name?socket=$nbd_addr"
- 	fi
- 
--	$PYTHON nbd-fault-injector.py $extra_args "127.0.0.1:$port" "$TEST_DIR/nbd-fault-injector.conf" >/dev/null 2>&1 &
--	wait_for_tcp_port "127\\.0\\.0\\.1:$port"
- 	$QEMU_IO -c "read 0 512" "$nbd_url" 2>&1 | _filter_qemu_io | _filter_nbd
- 
- 	echo
- }
- 
--for event in neg1 "export" neg2 request reply data; do
--	for when in before after; do
--		check_disconnect "$event" "$when"
--	done
--
--	# Also inject short replies from the NBD server
--	case "$event" in
--	neg1)
--		for when in 8 16; do
--			check_disconnect "$event" "$when"
--		done
--		;;
--	"export")
--		for when in 4 12 16; do
--			check_disconnect "$event" "$when"
--		done
--		;;
--	neg2)
--		for when in 8 10; do
--			check_disconnect "$event" "$when"
-+for proto in tcp unix; do
-+	for event in neg1 "export" neg2 request reply data; do
-+		for when in before after; do
-+			check_disconnect "--$proto" "$event" "$when"
- 		done
--		;;
--	reply)
--		for when in 4 8; do
--			check_disconnect "$event" "$when"
--		done
--		;;
--	esac
--done
- 
--# Also check classic negotiation without export information
--for when in before 8 16 24 28 after; do
--	check_disconnect "neg-classic" "$when" --classic-negotiation
-+		# Also inject short replies from the NBD server
-+		case "$event" in
-+		neg1)
-+			for when in 8 16; do
-+				check_disconnect "--$proto" "$event" "$when"
-+			done
-+			;;
-+		"export")
-+			for when in 4 12 16; do
-+				check_disconnect "--$proto" "$event" "$when"
-+			done
-+			;;
-+		neg2)
-+			for when in 8 10; do
-+				check_disconnect "--$proto" "$event" "$when"
-+			done
-+			;;
-+		reply)
-+			for when in 4 8; do
-+				check_disconnect "--$proto" "$event" "$when"
-+			done
-+			;;
-+		esac
-+	done
-+
-+	# Also check classic negotiation without export information
-+	for when in before 8 16 24 28 after; do
-+		check_disconnect "--$proto" --classic-negotiation "neg-classic" "$when"
-+	done
- done
- 
- # success, all done
-diff --git a/tests/qemu-iotests/083.out b/tests/qemu-iotests/083.out
-index a24c6bfece..a7fb081889 100644
---- a/tests/qemu-iotests/083.out
-+++ b/tests/qemu-iotests/083.out
-@@ -1,43 +1,43 @@
- QA output created by 083
- === Check disconnect before neg1 ===
- 
--can't open device nbd:127.0.0.1:PORT:exportname=foo
-+can't open device nbd+tcp://127.0.0.1:PORT/foo
- 
- === Check disconnect after neg1 ===
- 
--can't open device nbd:127.0.0.1:PORT:exportname=foo
-+can't open device nbd+tcp://127.0.0.1:PORT/foo
- 
- === Check disconnect 8 neg1 ===
- 
--can't open device nbd:127.0.0.1:PORT:exportname=foo
-+can't open device nbd+tcp://127.0.0.1:PORT/foo
- 
- === Check disconnect 16 neg1 ===
- 
--can't open device nbd:127.0.0.1:PORT:exportname=foo
-+can't open device nbd+tcp://127.0.0.1:PORT/foo
- 
- === Check disconnect before export ===
- 
--can't open device nbd:127.0.0.1:PORT:exportname=foo
-+can't open device nbd+tcp://127.0.0.1:PORT/foo
- 
- === Check disconnect after export ===
- 
--can't open device nbd:127.0.0.1:PORT:exportname=foo
-+can't open device nbd+tcp://127.0.0.1:PORT/foo
- 
- === Check disconnect 4 export ===
- 
--can't open device nbd:127.0.0.1:PORT:exportname=foo
-+can't open device nbd+tcp://127.0.0.1:PORT/foo
- 
- === Check disconnect 12 export ===
- 
--can't open device nbd:127.0.0.1:PORT:exportname=foo
-+can't open device nbd+tcp://127.0.0.1:PORT/foo
- 
- === Check disconnect 16 export ===
- 
--can't open device nbd:127.0.0.1:PORT:exportname=foo
-+can't open device nbd+tcp://127.0.0.1:PORT/foo
- 
- === Check disconnect before neg2 ===
- 
--can't open device nbd:127.0.0.1:PORT:exportname=foo
-+can't open device nbd+tcp://127.0.0.1:PORT/foo
- 
- === Check disconnect after neg2 ===
- 
-@@ -45,11 +45,11 @@ read failed: Input/output error
- 
- === Check disconnect 8 neg2 ===
- 
--can't open device nbd:127.0.0.1:PORT:exportname=foo
-+can't open device nbd+tcp://127.0.0.1:PORT/foo
- 
- === Check disconnect 10 neg2 ===
- 
--can't open device nbd:127.0.0.1:PORT:exportname=foo
-+can't open device nbd+tcp://127.0.0.1:PORT/foo
- 
- === Check disconnect before request ===
- 
-@@ -88,23 +88,134 @@ read 512/512 bytes at offset 0
- 
- === Check disconnect before neg-classic ===
- 
--can't open device nbd:127.0.0.1:PORT
-+can't open device nbd+tcp://127.0.0.1:PORT/
- 
- === Check disconnect 8 neg-classic ===
- 
--can't open device nbd:127.0.0.1:PORT
-+can't open device nbd+tcp://127.0.0.1:PORT/
- 
- === Check disconnect 16 neg-classic ===
- 
--can't open device nbd:127.0.0.1:PORT
-+can't open device nbd+tcp://127.0.0.1:PORT/
- 
- === Check disconnect 24 neg-classic ===
- 
--can't open device nbd:127.0.0.1:PORT
-+can't open device nbd+tcp://127.0.0.1:PORT/
- 
- === Check disconnect 28 neg-classic ===
- 
--can't open device nbd:127.0.0.1:PORT
-+can't open device nbd+tcp://127.0.0.1:PORT/
-+
-+=== Check disconnect after neg-classic ===
-+
-+read failed: Input/output error
-+
-+=== Check disconnect before neg1 ===
-+
-+can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
-+
-+=== Check disconnect after neg1 ===
-+
-+can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
-+
-+=== Check disconnect 8 neg1 ===
-+
-+can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
-+
-+=== Check disconnect 16 neg1 ===
-+
-+can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
-+
-+=== Check disconnect before export ===
-+
-+can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
-+
-+=== Check disconnect after export ===
-+
-+can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
-+
-+=== Check disconnect 4 export ===
-+
-+can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
-+
-+=== Check disconnect 12 export ===
-+
-+can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
-+
-+=== Check disconnect 16 export ===
-+
-+can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
-+
-+=== Check disconnect before neg2 ===
-+
-+can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
-+
-+=== Check disconnect after neg2 ===
-+
-+read failed: Input/output error
-+
-+=== Check disconnect 8 neg2 ===
-+
-+can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
-+
-+=== Check disconnect 10 neg2 ===
-+
-+can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
-+
-+=== Check disconnect before request ===
-+
-+read failed: Input/output error
-+
-+=== Check disconnect after request ===
-+
-+read failed: Input/output error
-+
-+=== Check disconnect before reply ===
-+
-+read failed: Input/output error
-+
-+=== Check disconnect after reply ===
-+
-+read failed: Input/output error
-+
-+=== Check disconnect 4 reply ===
-+
-+read failed
-+read failed: Input/output error
-+
-+=== Check disconnect 8 reply ===
-+
-+read failed
-+read failed: Input/output error
-+
-+=== Check disconnect before data ===
-+
-+read failed: Input/output error
-+
-+=== Check disconnect after data ===
-+
-+read 512/512 bytes at offset 0
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=== Check disconnect before neg-classic ===
-+
-+can't open device nbd+unix:///?socket=TEST_DIR/nbd.sock
-+
-+=== Check disconnect 8 neg-classic ===
-+
-+can't open device nbd+unix:///?socket=TEST_DIR/nbd.sock
-+
-+=== Check disconnect 16 neg-classic ===
-+
-+can't open device nbd+unix:///?socket=TEST_DIR/nbd.sock
-+
-+=== Check disconnect 24 neg-classic ===
-+
-+can't open device nbd+unix:///?socket=TEST_DIR/nbd.sock
-+
-+=== Check disconnect 28 neg-classic ===
-+
-+can't open device nbd+unix:///?socket=TEST_DIR/nbd.sock
- 
- === Check disconnect after neg-classic ===
- 
-diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
-index 7a58e57317..9d5442ecd9 100644
---- a/tests/qemu-iotests/common.filter
-+++ b/tests/qemu-iotests/common.filter
-@@ -170,9 +170,9 @@ _filter_nbd()
-     #
-     # Filter out the TCP port number since this changes between runs.
-     sed -e '/nbd\/.*\.c:/d' \
--        -e 's#nbd:\(//\)\?127\.0\.0\.1:[0-9]*#nbd:\1127.0.0.1:PORT#g' \
-+        -e 's#127\.0\.0\.1:[0-9]*#127.0.0.1:PORT#g' \
-         -e "s#?socket=$TEST_DIR#?socket=TEST_DIR#g" \
--        -e 's#\(exportname=foo\|PORT\): Failed to .*$#\1#'
-+        -e 's#\(foo\|PORT/\?\|.sock\): Failed to .*$#\1#'
- }
- 
- # make sure this script returns success
--- 
-2.13.5
+> ---
+>   block/qcow.c  | 12 +++---------
+>   block/qcow2.c |  8 ++------
+>   dump.c        |  4 +---
+>   3 files changed, 6 insertions(+), 18 deletions(-)
+> 
+> diff --git a/block/qcow.c b/block/qcow.c
+> index c08cdc4a7b..63904a26ee 100644
+> --- a/block/qcow.c
+> +++ b/block/qcow.c
+> @@ -454,13 +454,11 @@ static uint64_t get_cluster_offset(BlockDriverState *bs,
+>                       start_sect = (offset & ~(s->cluster_size - 1)) >> 9;
+>                       for(i = 0; i < s->cluster_sectors; i++) {
+>                           if (i < n_start || i >= n_end) {
+> -                            Error *err = NULL;
+>                               memset(s->cluster_data, 0x00, 512);
+>                               if (qcrypto_block_encrypt(s->crypto, start_sect + i,
+>                                                         s->cluster_data,
+>                                                         BDRV_SECTOR_SIZE,
+> -                                                      &err) < 0) {
+> -                                error_free(err);
+> +                                                      NULL) < 0) {
+>                                   errno = EIO;
+>                                   return -1;
+>                               }
+> @@ -572,7 +570,6 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
+>       QEMUIOVector hd_qiov;
+>       uint8_t *buf;
+>       void *orig_buf;
+> -    Error *err = NULL;
+>   
+>       if (qiov->niov > 1) {
+>           buf = orig_buf = qemu_try_blockalign(bs, qiov->size);
+> @@ -637,7 +634,7 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
+>               if (bs->encrypted) {
+>                   assert(s->crypto);
+>                   if (qcrypto_block_decrypt(s->crypto, sector_num, buf,
+> -                                          n * BDRV_SECTOR_SIZE, &err) < 0) {
+> +                                          n * BDRV_SECTOR_SIZE, NULL) < 0) {
+>                       goto fail;
+>                   }
+>               }
+> @@ -660,7 +657,6 @@ done:
+>       return ret;
+>   
+>   fail:
+> -    error_free(err);
+>       ret = -EIO;
+>       goto done;
+>   }
+> @@ -709,11 +705,9 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
+>               break;
+>           }
+>           if (bs->encrypted) {
+> -            Error *err = NULL;
+>               assert(s->crypto);
+>               if (qcrypto_block_encrypt(s->crypto, sector_num, buf,
+> -                                      n * BDRV_SECTOR_SIZE, &err) < 0) {
+> -                error_free(err);
+> +                                      n * BDRV_SECTOR_SIZE, NULL) < 0) {
+>                   ret = -EIO;
+>                   break;
+>               }
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 40ba26c111..fbfffadc76 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -1820,15 +1820,13 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
+>                   assert(s->crypto);
+>                   assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
+>                   assert((cur_bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
+> -                Error *err = NULL;
+>                   if (qcrypto_block_decrypt(s->crypto,
+>                                             (s->crypt_physical_offset ?
+>                                              cluster_offset + offset_in_cluster :
+>                                              offset) >> BDRV_SECTOR_BITS,
+>                                             cluster_data,
+>                                             cur_bytes,
+> -                                          &err) < 0) {
+> -                    error_free(err);
+> +                                          NULL) < 0) {
+>                       ret = -EIO;
+>                       goto fail;
+>                   }
+> @@ -1942,7 +1940,6 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+>           qemu_iovec_concat(&hd_qiov, qiov, bytes_done, cur_bytes);
+>   
+>           if (bs->encrypted) {
+> -            Error *err = NULL;
+>               assert(s->crypto);
+>               if (!cluster_data) {
+>                   cluster_data = qemu_try_blockalign(bs->file->bs,
+> @@ -1963,8 +1960,7 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+>                                          cluster_offset + offset_in_cluster :
+>                                          offset) >> BDRV_SECTOR_BITS,
+>                                         cluster_data,
+> -                                      cur_bytes, &err) < 0) {
+> -                error_free(err);
+> +                                      cur_bytes, NULL) < 0) {
+>                   ret = -EIO;
+>                   goto fail;
+>               }
+> diff --git a/dump.c b/dump.c
+> index d9090a24cc..a79773d0f7 100644
+> --- a/dump.c
+> +++ b/dump.c
+> @@ -1695,10 +1695,8 @@ static void dump_process(DumpState *s, Error **errp)
+>   
+>   static void *dump_thread(void *data)
+>   {
+> -    Error *err = NULL;
+>       DumpState *s = (DumpState *)data;
+> -    dump_process(s, &err);
+> -    error_free(err);
+> +    dump_process(s, NULL);
+>       return NULL;
+>   }
+>   
+> 
