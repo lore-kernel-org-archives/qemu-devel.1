@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dmo61-0003Cg-49
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:30:54 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1dmo9q-0004Pq-8y
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:34:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dmo60-0008Sy-7H
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:30:53 -0400
-References: <cover.1503580370.git.berto@igalia.com>
-	<1b2e3049803f71cafb2e1fa1be4fb47147a0d398.1503580370.git.berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <365e0acc-9885-2c42-365f-dfe55425747f@redhat.com>
-Date: Tue, 29 Aug 2017 16:30:44 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1dmo9n-000235-2g
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:34:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53392)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1dmo9m-00022d-Rz
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 17:34:46 -0400
+Date: Tue, 29 Aug 2017 15:34:42 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170829153442.1175f76d@w520.home>
+In-Reply-To: <20170801131618.27332-8-stefanha@redhat.com>
+References: <20170801131618.27332-1-stefanha@redhat.com>
+	<20170801131618.27332-8-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1b2e3049803f71cafb2e1fa1be4fb47147a0d398.1503580370.git.berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="sGtogeveIAdAPFsw0pCFgQeMtxaBfpaSo"
-Subject: Re: [Qemu-devel] [PATCH v2 6/7] throttle: Make burst_length 64bit
- and add range checks
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 7/9] checkpatch: check trace-events code
+ style
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, Manos Pitsidianakis <el13635@mail.ntua.gr>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---sGtogeveIAdAPFsw0pCFgQeMtxaBfpaSo
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org,
- Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <365e0acc-9885-2c42-365f-dfe55425747f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 6/7] throttle: Make burst_length 64bit and
- add range checks
-References: <cover.1503580370.git.berto@igalia.com>
- <1b2e3049803f71cafb2e1fa1be4fb47147a0d398.1503580370.git.berto@igalia.com>
-In-Reply-To: <1b2e3049803f71cafb2e1fa1be4fb47147a0d398.1503580370.git.berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue,  1 Aug 2017 14:16:16 +0100
+Stefan Hajnoczi <stefanha@redhat.com> wrote:
 
-On 08/24/2017 08:24 AM, Alberto Garcia wrote:
-> LeakyBucket.burst_length is defined as an unsigned integer but the
-> code never checks for overflows and it only makes sure that the value
-> is not 0.
->=20
-> In practice this means that the user can set something like
-> throttling.iops-total-max-length=3D4294967300 despite being larger than=
-
-> UINT_MAX and the final value after casting to unsigned int will be 4.
->=20
-> This patch changes the data type to uint64_t. This does not increase
-> the storage size of LeakyBucket, and allows us to assign the value
-> directly from qemu_opt_get_number() or BlockIOThrottle and then do the
-> checks directly in throttle_is_valid().
->=20
-> The value of burst_length does not have a specific upper limit,
-> but since the bucket size is defined by max * burst_length we have
-> to prevent overflows. Instead of going for UINT64_MAX or something
-> similar this patch reuses THROTTLE_VALUE_MAX, which allows I/O bursts
-> of 1 GiB/s for 10 days in a row.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> 
+> According to CODING_STYLE, check that in trace-events:
+> 1. hex numbers are prefixed with '0x'
+> 2. '#' flag of printf is not used
+> 3. The exclusion from 1. are period-separated groups of numbers
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Message-id: 20170731160135.12101-4-vsementsov@virtuozzo.com
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  include/qemu/throttle.h | 2 +-
->  util/throttle.c         | 5 +++++
->  2 files changed, 6 insertions(+), 1 deletion(-)
->=20
+>  scripts/checkpatch.pl | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
+> 
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index 4e91122813..fa478074b8 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -1337,6 +1337,25 @@ sub process {
+>  			$rpt_cleaners = 1;
+>  		}
+>  
+> +# checks for trace-events files
+> +		if ($realfile =~ /trace-events$/ && $line =~ /^\+/) {
+> +			if ($rawline =~ /%[-+ 0]*#/) {
+> +				ERROR("Don't use '#' flag of printf format ('%#') in " .
+> +				      "trace-events, use '0x' prefix instead\n" . $herecurr);
+> +			} else {
+> +				my $hex =
+> +					qr/%[-+ *.0-9]*([hljztL]|ll|hh)?(x|X|"\s*PRI[xX][^"]*"?)/;
+> +
+> +				# don't consider groups splitted by [.:/ ], like 2A.20:12ab
+> +				my $tmpline = $rawline =~ s/($hex[.:\/ ])+$hex//gr;
+> +
+> +				if ($tmpline =~ /(?<!0x)$hex/) {
+> +					ERROR("Hex numbers must be prefixed with '0x'\n" .
+> +					      $herecurr);
+> +				}
+> +			}
+> +		}
+> +
+>  # check we are in a valid source file if not then ignore this hunk
+>  		next if ($realfile !~ /\.(h|c|cpp|s|S|pl|py|sh)$/);
+>  
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+This broke checkpatch.pl for me:
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Bareword found where operator expected at ./scripts/checkpatch.pl line 1350, near "s/($hex[.:\/ ])+$hex//gr"
+syntax error at ./scripts/checkpatch.pl line 1350, near "s/($hex[.:\/ ])+$hex//gr"
+Execution of ./scripts/checkpatch.pl aborted due to compilation errors.
 
+$ perl -v
 
---sGtogeveIAdAPFsw0pCFgQeMtxaBfpaSo
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlml3QQACgkQp6FrSiUn
-Q2rSxAf/ZeafLsY3J1J4YYy+w6ka0WU5EtVNou6KYo/u8GnfR3eaILcYGFQXkum5
-KOFAT25oTJLDC5odBgo9Jy+HLE3+b5B+hrCSJUaT7i3OBbEiHzyBLA56HP3Cw61Y
-nGk1YvyJEeEJjKHTpbRtcCUpHOAv4jc/ugv8cKnp5a0hNaPKjSAx3JCuIK67z8B6
-u1UGkLMPGsbdaO6LWAanBoURpV7BX+Ifu/XCdVrLXqziN3U80UJgqklKlOiMVVIB
-PuV7vaM5igw50b7QAm8yvns1NFphxw78gMbuWdSh2m4Hpoy7X4UaqIjLQzD7VHpo
-k00nj+iWHueswoqugmWifhfQNwM3ZA==
-=ZTX5
------END PGP SIGNATURE-----
-
---sGtogeveIAdAPFsw0pCFgQeMtxaBfpaSo--
+This is perl, v5.10.1 (*) built for x86_64-linux-thread-multi
