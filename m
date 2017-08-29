@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dmgpT-0003gC-Tb
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 09:45:25 -0400
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dmgsN-0004tw-44
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 09:48:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dmgpN-0000uA-V3
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 09:45:19 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1503985539-7205-1-git-send-email-s1seetee@linux.vnet.ibm.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c61ae7e6-a117-a9c1-6a73-73beaede08a8@amsat.org>
-Date: Tue, 29 Aug 2017 10:45:01 -0300
-MIME-Version: 1.0
-In-Reply-To: <1503985539-7205-1-git-send-email-s1seetee@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4] vl: exit if maxcpus is negative
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dmgsJ-00032v-UB
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 09:48:19 -0400
+Received: from research.iiit.ac.in ([196.12.53.8]:33906)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dmgsJ-0002yR-7w
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 09:48:15 -0400
+From: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+Date: Tue, 29 Aug 2017 19:17:58 +0530
+Message-Id: <1504014481-7975-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+Subject: [Qemu-devel] [PATCH 0/3] QEMU Backup Tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, famz@redhat.com, pbonzini@redhat.com, Eric Blake <eblake@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, jsnow@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 
-Hi Seeteena,
+This patch series is intended to introduce QEMU Backup tool.
+qemu-backup will be a command-line tool for performing full and
+incremental disk backups on running VMs. It is intended as a
+reference implementation for management stack and backup developers
+to see QEMU's backup features in action.
+This patch series contains three patches,
+               1) QEMU Backup command line tool.
+               2) Test for full backup.
+               3) Manpage for the tool.
 
-On 08/29/2017 02:45 AM, Seeteena Thoufeek wrote:
-> ---Steps to Reproduce---
-> 
-> When passed a negative number to 'maxcpus' parameter, Qemu aborts
-> with a core dump.
-> 
-> Run the following command with maxcpus argument as negative number
-> 
-> ppc64-softmmu/qemu-system-ppc64 --nographic -vga none -machine
-> pseries,accel=kvm,kvm-type=HV -m size=200g -device virtio-blk-pci,
-> drive=rootdisk -drive file=/home/images/pegas-1.0-ppc64le.qcow2,
-> if=none,cache=none,id=rootdisk,format=qcow2 -monitor telnet
-> :127.0.0.1:1234,server,nowait -net nic,model=virtio -net
-> user -redir tcp:2000::22 -device nec-usb-xhci -smp 8,cores=1,
-> threads=1,maxcpus=-12
-> 
-> (process:12149): GLib-ERROR **: gmem.c:130: failed to allocate
->   18446744073709550568 bytes
-> 
-> Trace/breakpoint trap
-> 
-> Reported-by: R.Nageswara Sastry <rnsastry@linux.vnet.ibm.com>
-> Signed-off-by: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
-> ---
-> v1 -> v2:
->    - Fix the error check in vl.c to make it generic.
-> v2 -> v3:
->    - Fix coding style pointed out by patchew.
->    - Fix check for "<= 0" instead of just "< 0".
-> v3 -> v4:
->    - Fix subject line.
->    - Removed space before ":" from vl.c:1248
->    - Removed Reviewed-by: flag.
-> ---
->   vl.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/vl.c b/vl.c
-> index 8e247cc..2d9e73d 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1244,7 +1244,10 @@ static void smp_parse(QemuOpts *opts)
->           }
->   
->           max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus);
-> -
-> +        if (max_cpus <= 0) {
-> +            error_report("Invalid max_cpus: %d", max_cpus);
+Ishani Chugh (3):
+  backup: QEMU Backup Tool
+  Test for full Backup
+  Add manpage for QEMU Backup Tool
 
-I disagree with this patch, I think the correct fix is to declare 
-max_cpus as unsigned.
-Looking at the codebase I can't find any signed use of it.
+ Makefile                        |  14 +-
+ contrib/backup/qemu-backup.py   | 339 ++++++++++++++++++++++++++++++++++++++++
+ contrib/backup/qemu-backup.texi | 144 +++++++++++++++++
+ tests/qemu-iotests/191          |  86 ++++++++++
+ tests/qemu-iotests/191.out      |  35 +++++
+ tests/qemu-iotests/group        |   2 +
+ 6 files changed, 616 insertions(+), 4 deletions(-)
+ create mode 100644 contrib/backup/qemu-backup.py
+ create mode 100644 contrib/backup/qemu-backup.texi
+ create mode 100755 tests/qemu-iotests/191
+ create mode 100644 tests/qemu-iotests/191.out
 
-> +            exit(1);
-> +        }
->           if (max_cpus < cpus) {
->               error_report("maxcpus must be equal to or greater than smp");
->               exit(1);
-> 
-
-Regards,
-
-Phil.
+-- 
+2.7.4
