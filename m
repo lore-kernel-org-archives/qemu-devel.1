@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.vnet.ibm.com>) id 1dmfnu-00031m-Oi
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:39:39 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dmftn-0005Jf-Qj
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:45:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.vnet.ibm.com>) id 1dmfnp-0007yl-Si
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:39:38 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44390)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.vnet.ibm.com>)
-	id 1dmfnp-0007yF-J6
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:39:33 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7TCcPA7121824
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 08:39:32 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cn420xxb9-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 08:39:31 -0400
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.vnet.ibm.com>;
-	Tue, 29 Aug 2017 08:39:30 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dmfti-0002Ui-SN
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:45:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49960)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dmfti-0002UA-IP
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 08:45:38 -0400
+Date: Tue, 29 Aug 2017 14:45:33 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170829144533.54891819.cohuck@redhat.com>
+In-Reply-To: <ffe9c512-4238-7456-27d2-cdc8fa39d8e0@linux.vnet.ibm.com>
 References: <cover.1503667215.git.alifm@linux.vnet.ibm.com>
 	<3ed8b810b6592daee6a775037ce21f850e40647d.1503667215.git.alifm@linux.vnet.ibm.com>
 	<20170825160408.2775c8b5.cohuck@redhat.com>
@@ -38,13 +28,10 @@ References: <cover.1503667215.git.alifm@linux.vnet.ibm.com>
 	<9b9880e4-71fd-4bc5-961b-ab0e2b298f03@linux.vnet.ibm.com>
 	<3421f46f-fa82-ac23-b0ac-5a2acce26d41@linux.vnet.ibm.com>
 	<20170829140429.08a1731c.cohuck@redhat.com>
-From: Farhan Ali <alifm@linux.vnet.ibm.com>
-Date: Tue, 29 Aug 2017 08:39:27 -0400
+	<ffe9c512-4238-7456-27d2-cdc8fa39d8e0@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170829140429.08a1731c.cohuck@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <ffe9c512-4238-7456-27d2-cdc8fa39d8e0@linux.vnet.ibm.com>
 Subject: Re: [Qemu-devel] [PATCH] s390-ccw: Fix alignment for CCW1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -54,74 +41,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
+To: Farhan Ali <alifm@linux.vnet.ibm.com>
 Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, farman@linux.vnet.ibm.com, walling@linux.vnet.ibm.com
 
+On Tue, 29 Aug 2017 08:39:27 -0400
+Farhan Ali <alifm@linux.vnet.ibm.com> wrote:
 
+> On 08/29/2017 08:04 AM, Cornelia Huck wrote:
+> > On Mon, 28 Aug 2017 10:28:53 -0400
+> > Farhan Ali <alifm@linux.vnet.ibm.com> wrote:
+> >  
+> >> On 08/28/2017 10:19 AM, Halil Pasic wrote:  
+> >>>
+> >>>
+> >>> On 08/28/2017 04:15 PM, Farhan Ali wrote:  
+> >>>>
+> >>>>
+> >>>> On 08/28/2017 10:05 AM, Cornelia Huck wrote:  
+> >>>>>>>> It's the alignment of the CCW which causes the problem.
+> >>>>>>>>
+> >>>>>>>> The exact error message when starting the guest was:
+> >>>>>>>>
+> >>>>>>>> ! No virtio device found !
+> >>>>>>>>
+> >>>>>>>> Since it worked for SCSI and CDL, and failed for LDL disks on that particular system, we are not really sure what caused the failure.
+> >>>>>>>> Debugging it further showed the CCW for LDL disks were not aligned at double word boundary.  
+> >>>>> This is really, really odd, as the low-level ccw code is the same for
+> >>>>> any disk type...
+> >>>>>  
+> >>>> Exactly!
+> >>>>  
+> >>>>>>>> Trying the test on a different system with LDL disks worked fine, with the aligned(8) fix.  
+> >>>>>>> Do you happen to have an old s390-ccw.img laying around in the test folder? QEMU might pick up
+> >>>>>>> this one (e.g. when calling it without libvirt from the command line).
+> >>>>>>>  
+> >>>>>> I explicitly mention the bios to use with '-bios' option and pick up the
+> >>>>>> latest bios. Without the aligned fix I see the error and with the fix it
+> >>>>>> works fine.  
+> >>>>> Wait, so the fix fixes it? Or am I confused now?
+> >>>>>  
+> >>>>
+> >>>> It fixes in my system and one other system we tried on. But fails on a system where this issue was first noticed.  
+> >>>
+> >>> This is very confusing. So you have tried -bios on the system
+> >>> where the issue was first noticed and the issue still persists
+> >>> despite of the fixed bios is specified?
+> >>>  
+> >> Yes.
+> >>
+> >> The system where the issue was first noticed, applying the fix for the
+> >> bios, fixes for:
+> >>
+> >> 1) CDL disks
+> >> 2) SCSI disks
+> >>
+> >> But fails for LDL disk.
+> >>
+> >> On my system and one other system, the fix works for all the disk types,
+> >> CDL, SCSI and LDL and fixes the issue.  
+> >
+> > Are you using different toolchains on the failing and the working
+> > systems? Does it work when you copy the bios from a working system?
+> >
+> > (Clutching at straws here...)
+> >  
+> 
+> So yesterday we realized for the failing system, the bios wasn't being 
+> built on that system rather it was being built on a different system and 
+> being copied over to the failing system. :/
 
-On 08/29/2017 08:04 AM, Cornelia Huck wrote:
-> On Mon, 28 Aug 2017 10:28:53 -0400
-> Farhan Ali <alifm@linux.vnet.ibm.com> wrote:
->
->> On 08/28/2017 10:19 AM, Halil Pasic wrote:
->>>
->>>
->>> On 08/28/2017 04:15 PM, Farhan Ali wrote:
->>>>
->>>>
->>>> On 08/28/2017 10:05 AM, Cornelia Huck wrote:
->>>>>>>> It's the alignment of the CCW which causes the problem.
->>>>>>>>
->>>>>>>> The exact error message when starting the guest was:
->>>>>>>>
->>>>>>>> ! No virtio device found !
->>>>>>>>
->>>>>>>> Since it worked for SCSI and CDL, and failed for LDL disks on that particular system, we are not really sure what caused the failure.
->>>>>>>> Debugging it further showed the CCW for LDL disks were not aligned at double word boundary.
->>>>> This is really, really odd, as the low-level ccw code is the same for
->>>>> any disk type...
->>>>>
->>>> Exactly!
->>>>
->>>>>>>> Trying the test on a different system with LDL disks worked fine, with the aligned(8) fix.
->>>>>>> Do you happen to have an old s390-ccw.img laying around in the test folder? QEMU might pick up
->>>>>>> this one (e.g. when calling it without libvirt from the command line).
->>>>>>>
->>>>>> I explicitly mention the bios to use with '-bios' option and pick up the
->>>>>> latest bios. Without the aligned fix I see the error and with the fix it
->>>>>> works fine.
->>>>> Wait, so the fix fixes it? Or am I confused now?
->>>>>
->>>>
->>>> It fixes in my system and one other system we tried on. But fails on a system where this issue was first noticed.
->>>
->>> This is very confusing. So you have tried -bios on the system
->>> where the issue was first noticed and the issue still persists
->>> despite of the fixed bios is specified?
->>>
->> Yes.
->>
->> The system where the issue was first noticed, applying the fix for the
->> bios, fixes for:
->>
->> 1) CDL disks
->> 2) SCSI disks
->>
->> But fails for LDL disk.
->>
->> On my system and one other system, the fix works for all the disk types,
->> CDL, SCSI and LDL and fixes the issue.
->
-> Are you using different toolchains on the failing and the working
-> systems? Does it work when you copy the bios from a working system?
->
-> (Clutching at straws here...)
->
+Oh dear... the system it was built on hopefully was missing the fix,
+right? (I'm getting a bit paranoid here.)
 
-So yesterday we realized for the failing system, the bios wasn't being 
-built on that system rather it was being built on a different system and 
-being copied over to the failing system. :/
+> 
+> Building the bios on the failing system with the fix, resolves the issue 
+> and we did not see anymore failures.
+> So I think I can safely say this patch fixes the alignment problem.
 
-Building the bios on the failing system with the fix, resolves the issue 
-and we did not see anymore failures.
-So I think I can safely say this patch fixes the alignment problem.
+Out of interest, which toolchain are you using? My rebuild is on F26.
