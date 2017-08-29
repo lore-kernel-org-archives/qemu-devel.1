@@ -1,38 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUhQ-0005Bg-KI
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:48:16 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dmVAo-0006yw-OC
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 21:18:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dmUhM-0000mY-KW
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:48:12 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35048)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dmUhM-0000ly-BQ
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 20:48:08 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7T0kXpV108944
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:48:07 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cmur4x2wq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 28 Aug 2017 20:48:06 -0400
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 28 Aug 2017 18:48:06 -0600
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <jsnow@redhat.com>) id 1dmVAm-00084t-R2
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 21:18:34 -0400
+References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
+	<a81c8dfb-3d98-57ad-8159-5147283433fa@virtuozzo.com>
+	<cb783ebb-198e-1814-2f9c-aec93c83b17a@virtuozzo.com>
+	<0988b4ef-56e2-5ce9-ed25-40a742eadbd4@redhat.com>
+	<b0d72a26-2052-ecc6-67f5-d32572804ebf@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <cfcca274-9e3b-a9d5-6470-6c8917085da4@redhat.com>
+Date: Mon, 28 Aug 2017 21:18:18 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
-References: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Date: Mon, 28 Aug 2017 19:47:58 -0500
-Message-Id: <150396767833.32446.2427610162855990448@loki>
-Subject: Re: [Qemu-devel] [PATCH 00/79] Patch Round-up for stable 2.9.1,
- freeze on 2017-09-04
+In-Reply-To: <b0d72a26-2052-ecc6-67f5-d32572804ebf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Persistent bitmaps for non-qcow2 formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,337 +27,286 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
-
-Quoting Michael Roth (2017-08-28 19:13:35)
-> Hi everyone,
-> =
-
-> The following new patches are queued for QEMU stable v2.9.1:
-> =
-
->   https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__github.com_mdrot=
-h_qemu_commits_stable-2D2.9-2Dstaging&d=3DDwIFaQ&c=3Djf_iaSHvJObTbx-siA1ZOg=
-&r=3DsThPI1c0u5x-3sg5Nw8wNqjg_5Z5xLzfPGC18E94zn8&m=3DMw1bU8iEiV5THnZe_RluoH=
-efJMDFgKus3DOUY40AbVA&s=3DwB11-59-V11-yisUGoowZ4UvmSBfZNqhjDdEk9QwqAk&e=3D =
-
-> =
-
-> The release is planned for 2017-09-07:
-> =
-
->   https://urldefense.proofpoint.com/v2/url?u=3Dhttp-3A__wiki.qemu.org_Pla=
-nning_2.9&d=3DDwIFaQ&c=3Djf_iaSHvJObTbx-siA1ZOg&r=3DsThPI1c0u5x-3sg5Nw8wNqj=
-g_5Z5xLzfPGC18E94zn8&m=3DMw1bU8iEiV5THnZe_RluoHefJMDFgKus3DOUY40AbVA&s=3DaK=
-WE0XkaM9D2OJvn5Etwst9lR3FUDED9C_m5ue7HB6w&e=3D =
+To: Max Reitz <mreitz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Qemu-block <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
 
-Sorry for this. I've sent some other emails to see if this behavior
-continued from my SMTP relay, and it seems to have been some sort of
-temporary issue. The original URLs were (assuming I don't get bit by
-this again):
 
-  https://github.com/mdroth/qemu/commits/stable-2.9-staging
+On 08/25/2017 09:44 AM, Max Reitz wrote:
+> On 2017-08-25 02:55, John Snow wrote:
+>> Sorry in advance for :words: ...
+>>
+>> On 08/23/2017 02:04 PM, Vladimir Sementsov-Ogievskiy wrote:
+>>> 23.08.2017 11:59, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 22.08.2017 22:07, John Snow wrote:
 
-and
+[snip]
 
-  http://wiki.qemu.org/Planning/2.9
+>>>>
+>>>> Should there be some problems with internal snapshots and other things?
+> 
+> I'd suspect you get exactly the same problems when using internal
+> snapshots together with backing files.  Imagine a newly created overlay
+> file and taking a snapshot.  This should give you exactly the same
+> issue, doesn't it?
+> 
+>>>>
+>>>>
+>>>>
+>>> Hm. looks like that this backing file should not only receive all reads
+>>> and writes, but almost everything ->bdrv_ handlers, except bitmap
+>>> related of course.
+> 
+> How so?  Shouldn't it just work like a backing file, except it also
+> receives writes instead of just reads?
+> 
+>>>                    This doesn't seems simple to implement. Especially if
+>>> imaging some not-raw feature-full format under this thin qcow2 layer..
+>>> Or we can restrict this RW backing file to be raw-only?
+>>>
+>>>
+>>
+>> The idea would really be to support any arbitrary data store, so I
+>> wouldn't want to restrict it to just raw.
+>>
+>> You're right though, this might be a kind of messy approach.
+>>
+>> [From your other mail:]
+>>
+>>>
+>>> So, anyway, I see only two differences (from the outside) between this approach and just a separate bitmap-only qcow2 without a data:
+>>>
+>>
+>> It's very delicately similar, yes.
+>>
+>>> 1. in RW-backing approach qcow2-bitmap file has a link to data file (as a backing). It looks good.
+> 
+> And this is rather important to me.
+> 
 
-> =
+Good to know. Some good solid opinions to work around. ;)
 
-> Please respond here or CC qemu-stable@nongnu.org on any patches you
-> think should be included in the release.
-> =
+>> Right. The information necessary to establish a link between the bitmap
+>> data and the data being described is fully contained within a file fully
+>> specified by the QCOW2 spec.
+>>
+>>> 2. in RW-backing approach qcow2-bitmap file is a top of the virtual disk, in separate-file approach it is an option of the real data drive. In my opinion the second is more clean for users ("to add this feature you should use other file as your disk" vs "to add this feature you should add an option to your disk description")
+> 
+> I'd argue it's rather: "You cannot use this feature unless your format
+> supports it.  The only format supporting persistent bitmaps currently is
+> qcow2.  To use persistent bitmaps with other formats you can attach them
+> as R/W backing files to an empty qcow2 file, though."
+> 
+> So the difference is that you are saying it's a feature that is added to
+> a non-qcow2 image whereas I'm saying it's a feature that only a qcow2
+> image can provide (currently).
+> 
+>> This puts us a little closer to the original idea that was rejected by
+>> Kevin at the time. To recap:
+>>
+>> "1": Use qcow2 as a container. This was rejected because we didn't want
+>> qcow2 containing data with no semantic relationship to the qcow2
+>> container or to each other. The way it sounds like you're proposing it,
+>> though, it would be one-qcow2-with-bitmaps-per-drive, so the data would
+>> at least stay strictly related, but it would be meaningless outside of
+>> QEMU itself. I think this is something that Kevin wanted to avoid, but I
+>> can't speak for him.
+>>
+>> It's certainly not beyond the realm of management software to remember
+>> to correlate a qcow2 metadata file alongside its actual data stores
+>> whenever it needed to do so, but it does mean the introduction of a
+>> feature that essentially requires the use of management software, which
+>> sees resistance in the community at times.
+>>
+>> In this model, you'd probably have the raw drive at the top, with the
+>> qcow2-with-bitmaps as a child node with some kind of new named child
+>> relationship. All IO stays at the root node, but the bitmap method
+>> handlers would know to look for this special bitmap-child. It shouldn't
+>> be too hard to implement.
+> 
+> I'd still like to throw in how much I dislike this approach, and I can't
+> really think of a way to make it palatable to me.  Not even "just write
+> the file name of the image the bitmaps cover into the qcow2 file" sounds
+> good to me, because then it still is basically unrelated data.
+> 
 
-> Testing/feedback is greatly appreciated.
-> =
+Understood. It's something I'd like to avoid too, but I have some real
+concerns about implementation of that semantic link.
 
-> Thanks!
-> =
+> The only approach that I might see myself liking is to indeed add a flag
+> or whatever to say a qcow2 backing image is supposed to be R/W; and then
+> (after somehow verifying that the qcow2 image itself is empty) just make
+> qemu interpret this as "load the backing file as the real disk and
+> attach the qcow2 image as a 'metadata' child" or whatever.  But I fear
+> this gets uglier and uglier because how qemu loads the files will then
+> depend on whether the overlay is empty or not, and this may be very
+> confusing.
+> 
 
-> ----------------------------------------------------------------
-> Alberto Garcia (1):
->       stream: fix crash in stream_start() when block_job_create() fails
-> =
+Right, it makes opening a little more convoluted than it normally is.
 
-> Aleksandr Bezzubikov (1):
->       hw/i386: allow SHPC for Q35 machine
-> =
+"Oh look, it's empty and it has a RW backing file. Please stand by as we
+open the "RW backing file" and install it as our parent!"
 
-> Alexander Graf (2):
->       hid: Reset kbd modifiers on reset
->       input: Decrement queue count on kbd delay
-> =
+It may actually not be so bad, but it does add a complexity...
 
-> Anton Nefedov (1):
->       qemu-img: wait for convert coroutines to complete
-> =
+>>> I think (may be I'm not right) loading bitmaps from additional qcow2-only-bitmaps file is simpler to implement (it will be specified in command line in drive options, like bitmaps_file=/path/to/it and then attached directly to BlockDriverState). The only drawback of simple qcow2-bitmap file  is that it has not a link inside it to the data file (like backing). We can ignore it, or we can implement this link as a separate extension to qcow2.
+>>
+>> Yes, definitely easier to implement as you say.
+>>
+>> The hard part is going to come in defining that semantic link. At this
+>> point, the only difference between the approaches is whether or not we
+>> allow the qcow2 to point to the implementation of the data;
+>>
+>> (1) The qcow2 is referenced by name from the CLI as an option to the
+>> other drive.
+>>
+>> (2) The qcow2 is referenced by name on the CLI, and its backing file
+>> field intuits the location of the implementation storage.
+>>
+>>
+>> In (1), we avoid saving or specifying the relationship between these two
+>> data stores in any way. This is certainly easy to do, and will save us
+>> some headache on the CLI. As a downside, we now have random orphaned
+>> files that aren't very interesting or useful on their own. The
+>> likelihood for desync between metadata and data increases. The use of
+>> management software is all but necessitated.
+>>
+>> In (2) We have to now specify, with a dizzying long list of
+>> possibilities, the location of the implementation data. qcow2 only has a
+>> filename for backing files presently, but this is likely inadequate.
+>> What if the data store isn't a locally kept file? What if it's a socket,
+>> or a stream, or literally anything else?
+> 
+> I don't see the difference.  In (1), your data image gets a "bitmap" or
+> "metadata" child.  In (2), your qcow2 image gets the usual "backing"
+> child, or maybe call it "passthrough" or whatever, if you want to make
+> the difference more explicit than just passing an option to the qcow2
+> image to pass writes to its backing file.
+> 
 
-> Bruce Rogers (2):
->       ACPI: don't call acpi_pcihp_device_plug_cb on xen
->       9pfs: local: remove: use correct path component
-> =
+The difference in the relationship in-memory is actually kind of
+uninteresting.
 
-> Daniel P. Berrange (1):
->       migration: setup bi-directional I/O channel for exec: protocol
-> =
+The difference as I see it is primarily how we specify the relationship
+between the qcow2 and the implementation storage; in (1) It's defined
+on-disk, and in (2) It's defined via CLI only, so
 
-> Eduardo Habkost (1):
->       pc: Use "min-[x]level" on compat_props
-> =
+(1) Incurs a cost of having to define the link syntax (possibly causing
+a rather qemu-specific syntax), and
+(2) Avoids that cost, but leaves the data on-disk unrelated, which you hate.
 
-> Eric Blake (16):
->       dirty-bitmap: Report BlockDirtyInfo.count in bytes, as documented
->       coccinelle: Add script to remove useless QObject casts
->       qobject: Drop useless QObject casts
->       qobject: Add helper macros for common scalar insertions
->       s390x: Drop useless casts
->       qobject: Use simpler QDict/QList scalar insertion macros
->       blkdebug: Sanity check block layer guarantees
->       blkdebug: Refactor error injection
->       blkdebug: Add pass-through write_zero and discard support
->       blkdebug: Simplify override logic
->       blkdebug: Add ability to override unmap geometries
->       tests: Add coverage for recent block geometry fixes
->       block: Simplify BDRV_BLOCK_RAW recursion
->       block: Guarantee that *file is set on bdrv_get_block_status()
->       nbd: Fully initialize client in case of failed negotiation
->       nbd: Fix regression on resiliency to port scan
-> =
+>> We'd have to develop a new syntax for specifying these resources that
+>> can be stored in a qcow2 file,
+> 
+> It's called the json-pseudo-protocol and was developed exactly for this.
+> 
 
-> Fam Zheng (2):
->       block: Reuse bs as backing hd for drive-backup sync=3Dnone
->       virtio-scsi: Unset hotplug handler when unrealize
-> =
+That's what I was hinting at for "or otherwise co-opt an existing
+syntax" but I was unaware that it was intended for "exactly" this.
 
-> Gerd Hoffmann (1):
->       input: limit kbd queue depth
-> =
+Do we actually use it in any on-disk format, currently? qcow2 only lets
+you specify simple filenames in the qcow2 metadata, right?
 
-> Greg Kurz (7):
->       9pfs: local: fix unlink of alien files in mapped-file mode
->       virtio: allow broken device to notify guest
->       target/ppc: pass const string to kvmppc_is_mem_backend_page_size_ok=
-()
->       target/ppc: fix memory leak in kvmppc_is_mem_backend_page_size_ok()
->       spapr: fix memory leak in spapr_memory_pre_plug()
->       spapr: fix memory leak in spapr_core_pre_plug()
->       9pfs: local: fix fchmodat_nofollow() limitations
-> =
+>>                                or otherwise co-opt an existing syntax
+>> in-use by QEMU. This syntax would likely be useful only to QEMU, which
+>> would steer the qcow2 format in a direction not too useful by other
+>> emulators, and qcow2 is an open format, so we may want to avoid this.
+> 
+> Storing a file name in the backing link field that cannot be interpreted
+> by other programs is in my opinion still very much better than not
+> storing any information whatsoever, because in the former case other
+> programs can at least say "sorry, I have no idea what this means" (or
+> maybe they can indeed interpret it, who knows), whereas in the latter
+> they may not even know that the qcow2 image is incomplete.
+> 
 
-> Halil Pasic (1):
->       s390x/css: catch section mismatch on load
-> =
+I don't disagree personally, but I seem to recall that Kevin was adamant
+that the qcow2 bitmap extension should remain useful and semantically
+meaningful to third parties, so I try to keep that in mind. Maybe I
+should let him chime in instead of try to "concern troll" my own
+suggestions into the ground.
 
-> Herongguang (Stephen) (1):
->       pci: deassert intx when pci device unrealize
-> =
+> Also note that we are making an effort to be able to generate plain file
+> names (such as URLs which should be usable by other programs) whenever
+> possible.
+> 
 
-> Herv=C3=A9 Poussineau (1):
->       vvfat: fix qemu-img map and qemu-img convert
-> =
+Noted. Do we have a useful discriminator anywhere that allows us to
+easily check if a filename/locator/URI/whatever is in an accepted
+format, or if we still have QEMU-specific garbage?
 
-> Jason Wang (2):
->       virtio-scsi: finalize IOMMU support
->       virtio-net: fix offload ctrl endian
-> =
+We could always just disallow QEMU-specific protocol-talk from getting
+written and allow this only for configurations that QEMU understands to
+be universal...
 
-> Jeff Cody (1):
->       block/nfs: fix mutex assertion in nfs_file_close()
-> =
+>> I feel like what will make the difference between heading down either
+>> path would be helped along by answers to these questions:
+>>
+>> - What type of data stores do we wish to support with bitmaps? Simple
+>> file-based ones, or the full spectrum of all types? Only qcow2, and to
+>> hell with people who ask for otherwise?
+> 
+> I don't really know how this question relates to the issue other than
+> "If we only want to support qcow2, the whole discussion is moot; since
+> this discussion exists, we apparently do want to support something other
+> than qcow2 at some point."
+> 
 
-> John Snow (1):
->       blockdev: use drained_begin/end for qmp_block_resize
-> =
+Yeah, I mean, if the answer is a strong no here we can avoid the rest of
+the discussion. Worthwhile to know, right?
 
-> Kevin Wolf (6):
->       mirror: Drop permissions on s->target on completion
->       commit: Fix use after free in completion
->       commit: Fix completion with extra reference
->       commit: Add NULL check for overlay_bs
->       qemu-iotests: Test automatic commit job cancel on hot unplug
->       block: Skip implicit nodes in query-block/blockstats
-> =
+> Well, OK.  The main argument against supporting anything but qcow2 is
+> "if you want features, use qcow2; and we are working on making qcow2 as
+> fast as possible."  I think that's a very good argument still.  At some
+> point I (and probably others, too) had the idea of making qcow2 files in
+> raw layout: Have the data as a blob, just like a raw file, padded by
+> metadata around it.  An autoclear flag would specify that the qcow2 file
+> is in this format, and if so, you could simply access it like a raw file
+> and should have exactly the same speed as a raw file.  Maybe that would
+> solve this whole issue, too?
+> 
+> And as for non-file based backing files, see above.
+> 
+>> - How important is it that the qcow2 remains a fully independent file
+>> capable of describing its own relationship to the data?
+> 
+> Technically not important.  To me, very important.
+> 
+>> - Is it OK to allow robust, QEMU-specific data descriptors in a qcow2 file?
+> 
+> Depends.  At least Red Hat's QA does use json file names, so there's
+> already that.
+> 
+> I think QEMU-specific is OK as long as it still makes sense, as long as
+> there is no other way, and as long as there is some kind of
+> documentation still.
+> 
+> Technically, you can always put QEMU-specific stuff into the qcow2
+> specification and thus make it generic.
+> 
+>> Where I sit:
+> 
+> [...]
+> 
+>> - I don't think Kevin will like the idea of us using qcow2 as a
+>> container that does not get treated as a first class citizen in the
+>> backing chain, but it's the easiest option to implement and avoids a lot
+>> of the syntax-of-backing-storage questions.
+> 
+> I'd like to throw in that I was not at all opposed to Fam's approach of
+> having an independent format (tar, wasn't it?) just for storing bitmaps.
+>  I know Kevin was, but I don't quite remember why.  Probably because it
+> was a real format, but a very strange one, and then implementing it
+> through the block layer was weird...?
+> 
+> OTOH, there is one issue I have with the R/W backing approach: Every
+> request to the raw file has to go through the qcow2 layer.  And since
+> you probably want to use raw because of the speed, this is not so nice.
+> 
 
-> Ladi Prosek (1):
->       virtio-serial-bus: Unset hotplug handler when unrealize
-> =
+We probably could fix that by changing the relationship so that it isn't
+*really* a backing file, but that maybe creates other problems.
 
-> Laurent Vivier (3):
->       spapr: add pre_plug function for memory
->       spapr: fix migration to pseries machine < 2.8
->       cpu: don't allow negative core id
-> =
-
-> Markus Armbruster (1):
->       replication: Make --disable-replication compile again
-> =
-
-> Max Filippov (3):
->       target/xtensa: fix mapping direction in read/write simcalls
->       target/xtensa: fix return value of read/write simcalls
->       target/xtensa: handle unknown registers in gdbstub
-> =
-
-> Max Reitz (11):
->       qemu-img/convert: Always set ret < 0 on error
->       qemu-img/convert: Use @opts for one thing only
->       qemu-img/convert: Move bs_n > 1 && -B check down
->       block: An empty filename counts as no filename
->       iotests/051: Add test for empty filename
->       block: Do not unref bs->file on error in BD's open
->       block/vhdx: Make vhdx_create() always set errp
->       block: Add errp to b{lk,drv}_truncate()
->       blkdebug: Catch bs->exact_filename overflow
->       blkverify: Catch bs->exact_filename overflow
->       block: Do not strcmp() with NULL uri->scheme
-> =
-
-> Michael Roth (2):
->       tests: check-qom-proplist: add checks for cmdline-created objects
->       monitor: fix object_del for command-line-created objects
-> =
-
-> Paolo Bonzini (5):
->       curl: strengthen assertion in curl_clean_state
->       curl: never invoke callbacks with s->mutex held
->       curl: avoid recursive locking of BDRVCURLState mutex
->       linuxboot_dma: compile for i486
->       nbd: fix NBD over TLS
-> =
-
-> Sameeh Jubran (2):
->       qga-win: Enable 'can-offline' field in 'guest-get-vcpus' reply
->       e1000e: Fix ICR "Other" causes clear logic
-> =
-
-> Stefan Hajnoczi (1):
->       aio: add missing aio_notify() to aio_enable_external()
-> =
-
-> Yunjian Wang (1):
->       virtio-net: fix wild pointer when remove virtio-net queues
-> =
-
-> Zhiyong Yang (1):
->       hw/virtio: fix vhost user fails to startup when MQ
-> =
-
->  MAINTAINERS                         |   1 +
->  block.c                             |  82 +++++-----
->  block/blkdebug.c                    | 288 ++++++++++++++++++++++++++++--=
-------
->  block/blkreplay.c                   |   3 -
->  block/blkverify.c                   |  26 ++--
->  block/block-backend.c               |   5 +-
->  block/commit.c                      |  24 ++-
->  block/crypto.c                      |   2 +-
->  block/curl.c                        |  33 ++++-
->  block/dirty-bitmap.c                |   2 +-
->  block/file-posix.c                  |   8 +-
->  block/file-win32.c                  |   4 +-
->  block/io.c                          |   9 +-
->  block/mirror.c                      |  12 +-
->  block/nbd-client.c                  |   4 +-
->  block/nbd.c                         |  47 +++---
->  block/nfs.c                         |  56 ++++---
->  block/null.c                        |   2 +-
->  block/parallels.c                   |  13 +-
->  block/qapi.c                        |  34 ++++-
->  block/qcow.c                        |   6 +-
->  block/qcow2-refcount.c              |   5 +-
->  block/qcow2.c                       |  18 ++-
->  block/qed.c                         |   2 +-
->  block/quorum.c                      |  16 +-
->  block/raw-format.c                  |   2 +-
->  block/rbd.c                         |  16 +-
->  block/sheepdog.c                    |   6 +-
->  block/snapshot.c                    |   2 +-
->  block/ssh.c                         |  18 +--
->  block/stream.c                      |   2 +-
->  block/vdi.c                         |   4 +-
->  block/vhdx-log.c                    |   2 +-
->  block/vhdx.c                        |  29 +++-
->  block/vmdk.c                        |  13 +-
->  block/vpc.c                         |  13 +-
->  block/vvfat.c                       |  13 +-
->  blockdev-nbd.c                      |   6 +-
->  blockdev.c                          |  71 ++++-----
->  hw/9pfs/9p-local.c                  |  78 ++++++----
->  hw/9pfs/9p-util.h                   |  24 +--
->  hw/acpi/piix4.c                     |  11 +-
->  hw/block/xen_disk.c                 |   2 +-
->  hw/char/virtio-serial-bus.c         |   3 +
->  hw/cpu/core.c                       |   5 +
->  hw/i386/acpi-build.c                |   4 +-
->  hw/input/hid.c                      |   1 +
->  hw/net/e1000e_core.c                |  10 +-
->  hw/net/virtio-net.c                 |   5 +
->  hw/pci/pci.c                        |   1 +
->  hw/ppc/spapr.c                      |  46 ++++--
->  hw/ppc/spapr_pci.c                  |  28 ++--
->  hw/s390x/css.c                      |  14 ++
->  hw/s390x/virtio-ccw.c               |   6 +-
->  hw/scsi/virtio-scsi.c               |   6 +-
->  hw/usb/xen-usb.c                    |  12 +-
->  hw/virtio/vhost-user.c              |  21 ++-
->  hw/virtio/virtio.c                  |   4 +-
->  include/block/aio.h                 |  10 +-
->  include/block/block.h               |   3 +-
->  include/block/block_int.h           |   1 +
->  include/block/nbd.h                 |   2 +-
->  include/hw/i386/pc.h                |  42 +++---
->  include/qapi/qmp/qdict.h            |   8 +
->  include/qapi/qmp/qlist.h            |   8 +
->  include/sysemu/block-backend.h      |   2 +-
->  migration/colo.c                    |  12 ++
->  migration/exec.c                    |   4 +-
->  monitor.c                           |  28 ++--
->  nbd/server.c                        |  32 ++--
->  pc-bios/linuxboot_dma.bin           | Bin 1536 -> 1536 bytes
->  pc-bios/optionrom/Makefile          |   1 +
->  qapi/block-core.json                |  39 ++++-
->  qapi/qmp-event.c                    |   2 +-
->  qemu-img.c                          |  75 +++++-----
->  qemu-io-cmds.c                      |   5 +-
->  qemu-io.c                           |   2 +-
->  qemu-nbd.c                          |   8 +-
->  qga/commands-win32.c                |   2 +-
->  qobject/qdict.c                     |   2 +-
->  qom/object_interfaces.c             |   9 ++
->  scripts/coccinelle/qobject.cocci    |  35 +++++
->  target/ppc/kvm.c                    |   5 +-
->  target/ppc/kvm_ppc.h                |   4 +-
->  target/s390x/cpu_models.c           |   4 +-
->  target/xtensa/gdbstub.c             |  13 +-
->  target/xtensa/xtensa-semi.c         |  27 +++-
->  tests/check-qdict.c                 | 142 +++++++++---------
->  tests/check-qlist.c                 |   4 +-
->  tests/check-qom-proplist.c          |  56 +++++++
->  tests/device-introspect-test.c      |   4 +-
->  tests/qemu-iotests/040              |  63 +++++++-
->  tests/qemu-iotests/040.out          |   4 +-
->  tests/qemu-iotests/041              |  38 ++++-
->  tests/qemu-iotests/041.out          |   4 +-
->  tests/qemu-iotests/051              |   1 +
->  tests/qemu-iotests/051.out          |   3 +
->  tests/qemu-iotests/051.pc.out       |   3 +
->  tests/qemu-iotests/122.out          |   4 +-
->  tests/qemu-iotests/177              | 117 +++++++++++++++
->  tests/qemu-iotests/177.out          |  51 +++++++
->  tests/qemu-iotests/group            |   1 +
->  tests/test-qemu-opts.c              |   4 +-
->  tests/test-qmp-commands.c           |  30 ++--
->  tests/test-qmp-event.c              |  30 ++--
->  tests/test-qobject-output-visitor.c |   6 +-
->  tests/test-x86-cpuid-compat.c       |  38 +++++
->  ui/input.c                          |  15 +-
->  util/qemu-option.c                  |   2 +-
->  109 files changed, 1507 insertions(+), 678 deletions(-)
->  create mode 100644 scripts/coccinelle/qobject.cocci
->  create mode 100755 tests/qemu-iotests/177
->  create mode 100644 tests/qemu-iotests/177.out
-> =
-
->=20
+> Max
+> 
