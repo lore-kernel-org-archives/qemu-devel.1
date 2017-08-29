@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54555)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dmimd-0005mE-4o
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:50:33 -0400
+	id 1dmioU-0007HT-Dx
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:52:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dmimZ-0000E1-AK
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:50:31 -0400
-Received: from research.iiit.ac.in ([196.12.53.8]:58856)
+	id 1dmioT-0001rA-EK
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:52:26 -0400
+Received: from research.iiit.ac.in ([196.12.53.8]:59336)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dmimY-0000Az-HH
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:50:27 -0400
-From: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-Date: Tue, 29 Aug 2017 21:20:18 +0530
-Message-Id: <1504021818-12128-4-git-send-email-chugh.ishani@research.iiit.ac.in>
-In-Reply-To: <1504021818-12128-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-References: <1504021818-12128-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-Subject: [Qemu-devel] [PATCH 3/3] Add manpage for QEMU Backup Tool
+	id 1dmioS-0001l0-PK
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 11:52:25 -0400
+Date: Tue, 29 Aug 2017 21:22:19 +0530 (IST)
+From: Ishani <chugh.ishani@research.iiit.ac.in>
+Message-ID: <1752389727.1286230.1504021939447.JavaMail.zimbra@research.iiit.ac.in>
+In-Reply-To: <9bc66b3f-b17d-1093-1d20-5a515ea3fcd3@redhat.com>
+References: <1504014481-7975-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+	<9bc66b3f-b17d-1093-1d20-5a515ea3fcd3@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] QEMU Backup Tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,220 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, jsnow@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow <jsnow@redhat.com>, stefanha <stefanha@redhat.com>
 
-qemu-backup will be a command-line tool for performing full and 
-incremental disk backups on running VMs. It is intended as a
-reference implementation for management stack and backup developers
-to see QEMU's backup features in action. The following commit is an
-initial implementation of manpage listing the commands which the 
-backup tool will support. The manpage wil be build along with other
-docs when configure is provided with --enable-docs flag in the 
-location contrib/backup in build directory.
+I apologize for it.
+I have sent a new patch series by the same way again just now. Will correct in future patches.
 
+Regards,
+Ishani.
 
-Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
----
- Makefile                        |  14 ++--
- contrib/backup/qemu-backup.texi | 144 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 154 insertions(+), 4 deletions(-)
- create mode 100644 contrib/backup/qemu-backup.texi
+----- On Aug 29, 2017, at 8:19 PM, Eric Blake eblake@redhat.com wrote:
 
-diff --git a/Makefile b/Makefile
-index 81447b1..ba1574d 100644
---- a/Makefile
-+++ b/Makefile
-@@ -209,6 +209,7 @@ ifdef BUILD_DOCS
- DOCS=qemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 qemu-nbd.8 qemu-ga.8
- DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7
- DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7
-+DOCS+=contrib/backup/qemu-backup.html contrib/backup/qemu-backup.txt
- ifdef CONFIG_VIRTFS
- DOCS+=fsdev/virtfs-proxy-helper.1
- endif
-@@ -508,6 +509,8 @@ VERSION ?= $(shell cat VERSION)
- 
- dist: qemu-$(VERSION).tar.bz2
- 
-+qemu-backup.8: contrib/backup/qemu-backup.texi
-+
- qemu-%.tar.bz2:
- 	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar.bz2,%,$@)"
- 
-@@ -719,16 +722,19 @@ fsdev/virtfs-proxy-helper.1: fsdev/virtfs-proxy-helper.texi
- qemu-nbd.8: qemu-nbd.texi qemu-option-trace.texi
- qemu-ga.8: qemu-ga.texi
- 
--html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
--info: qemu-doc.info docs/interop/qemu-qmp-ref.info docs/interop/qemu-ga-ref.info
--pdf: qemu-doc.pdf docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
--txt: qemu-doc.txt docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt
-+html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html contrib/backup/qemu-backup.html
-+info: qemu-doc.info docs/interop/qemu-qmp-ref.info docs/interop/qemu-ga-ref.info contrib/backup/qemu-backup.info
-+pdf: qemu-doc.pdf docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf contrib/backup/qemu-backup.pdf
-+txt: qemu-doc.txt docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt contrib/backup/qemu-backup.txt
- 
- qemu-doc.html qemu-doc.info qemu-doc.pdf qemu-doc.txt: \
- 	qemu-img.texi qemu-nbd.texi qemu-options.texi qemu-option-trace.texi \
- 	qemu-monitor.texi qemu-img-cmds.texi qemu-ga.texi \
- 	qemu-monitor-info.texi
- 
-+contrib/backup/qemu-backup.html contrib/backup/qemu-backup.pdf contrib/backup/qemu-backup.txt contrib/backup/qemu-backup.info: \
-+	contrib/backup/qemu-backup.texi
-+
- docs/interop/qemu-ga-ref.dvi docs/interop/qemu-ga-ref.html \
-     docs/interop/qemu-ga-ref.info docs/interop/qemu-ga-ref.pdf \
-     docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7: \
-diff --git a/contrib/backup/qemu-backup.texi b/contrib/backup/qemu-backup.texi
-new file mode 100644
-index 0000000..68e7231
---- /dev/null
-+++ b/contrib/backup/qemu-backup.texi
-@@ -0,0 +1,144 @@
-+\input texinfo
-+@setfilename qemu-backup
-+
-+@documentlanguage en
-+@documentencoding UTF-8
-+
-+@settitle QEMU Backup Tool
-+@copying
-+
-+Copyright @copyright{} 2017 The QEMU Project developers
-+@end copying
-+@ifinfo
-+@direntry
-+* QEMU: (QEMU-backup).    Man page for QEMU Backup Tool.
-+@end direntry
-+@end ifinfo
-+@iftex
-+@titlepage
-+@sp 7
-+@center @titlefont{QEMU Backup Tool}
-+@sp 1
-+@sp 3
-+@end titlepage
-+@end iftex
-+@ifnottex
-+@node Top
-+@top Short Sample
-+
-+@menu
-+* Name::
-+* Synopsis::
-+* List of Commands::
-+* Command Parameters::
-+* Command Descriptions::
-+* License::
-+@end menu
-+
-+@end ifnottex
-+
-+@node Name
-+@chapter Name
-+
-+QEMU disk backup tool.
-+
-+@node Synopsis
-+@chapter Synopsis
-+
-+qemu-backup command [command options].
-+
-+@node  List of Commands
-+@chapter  List of Commands
-+@itemize
-+@item qemu-backup guest add --guest guestname --qmp socketpath
-+@item qemu-backup guest list
-+@item qemu-backup drive add --id driveid --guest guestname --target target
-+@item qemu-backup drive add --all --guest guestname --target target
-+@item qemu-backup drive list --guest guestname
-+@item qemu-backup backup [--inc] --guest guestname
-+@item qemu-backup restore --guest guestname
-+@item qemu-backup guest remove --guest guestname
-+@item qemu-backup drive remove --guest guestname --id driveid
-+@end itemize
-+@node  Command Parameters
-+@chapter  Command Parameters
-+@itemize
-+@item --all: Add all the drives present in a guest which are suitable for backup.
-+@item --guest: Name of the guest.
-+@item --id: id of guest or drive.
-+@item --inc: (Optional) For incremental backup.
-+@item --qmp: Path of qmp socket.
-+@item --target: Destination path on which you want your backup to be made.
-+@end itemize
-+
-+@node  Command Descriptions
-+@chapter  Command Descriptions
-+@itemize
-+@item qemu-backup guest add --guest guestname --qmp socketpath
-+This command adds a guest to the configuration file given its path to qmp socket.
-+
-+example:
-+qemu-backup guest add --id=fedora --qmp=unix:/var/run/qemu/fedora.sock
-+
-+qemu-backup guest add --id=fedora --qmp=tcp:localhost:4444
-+
-+@item qemu-backup guest list
-+This commands lists the names of guests which are added to configuration file.
-+
-+@item qemu-backup drive add --guest guestname --id driveid --target target
-+This command adds different drives for backup in a particular guest by giving the name of drive to be backed up and target imagefile in which we want to store the drive backup.
-+
-+example: qemu-backup drive add --guest=fedora --id=root --target=/backup/root.img
-+
-+@item qemu-backup drive add --all --guest guestname --destination destination
-+This command adds all the drives of the guest for backup other than CDROM drive and read-only drives. Here all the backup drives will have the same names as original drives and target will be the destination folder.
-+
-+example: qemu-backup drive add --all --guest fedora --destination =/backup/fedora/
-+
-+@item qemu-backup drive list --guest guestname
-+This commands gives the names of the drive present in a guest which are added for backup.
-+
-+example: qemu-backup drive list --guest=fedora
-+
-+@item qemu-backup backup --guest guestname
-+
-+This command makes the backup of the drives, in their respective given destinations. The ids of drive and their destinations are taken from the configuration file.
-+
-+example: qemu-backup backup --guest=fedora
-+
-+@item qemu-backup restore --guest guestname
-+This command is needed if we want to restore the backup. It will list the commands to be run for performing the same but will not perform any action.
-+
-+example: qemu-backup restore --guest=fedora
-+
-+@item qemu-backup guest remove --guest guestname
-+This command removes the guest from the configuration file.
-+
-+example: qemu-backup guest remove --guest=fedora
-+
-+@item qemu-backup drive remove --guest guestname --id driveid
-+This command helps remove a drive which is set for backup in configuration of given host.
-+
-+example: drive remove --guest=fedora --id=root
-+
-+@item A full backup can be performed by following the given steps:
-+
-+Perform a full backup of 'vm001', which has one drive:
-+
-+qemu-backup guest add --guest vm001 --qmp /path/to/vm001.sock
-+
-+qemu-backup add --id drive0 --guest vm001 --target /backups/vm001-drive0.img
-+
-+qemu-backup backup --guest vm001
-+
-+
-+@end itemize
-+
-+@node License
-+@appendix License
-+QEMU is a trademark of Fabrice Bellard.
-+QEMU is released under the
-+@url{https://www.gnu.org/licenses/gpl-2.0.txt,GNU General Public License},
-+version 2. Parts of QEMU have specific licenses, see file
-+@url{http://git.qemu.org/?p=qemu.git;a=blob_plain;f=LICENSE,LICENSE}.
-+@bye
--- 
-2.7.4
+> On 08/29/2017 08:47 AM, Ishani Chugh wrote:
+>> This patch series is intended to introduce QEMU Backup tool.
+>> qemu-backup will be a command-line tool for performing full and
+>> incremental disk backups on running VMs. It is intended as a
+>> reference implementation for management stack and backup developers
+>> to see QEMU's backup features in action.
+>> This patch series contains three patches,
+>>                1) QEMU Backup command line tool.
+>>                2) Test for full backup.
+>>                3) Manpage for the tool.
+>> 
+>> Ishani Chugh (3):
+>>   backup: QEMU Backup Tool
+>>   Test for full Backup
+>>   Add manpage for QEMU Backup Tool
+> 
+> It looks like you have previously sent series by the same title:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg03774.html
+> 
+> Please remember to use 'git send-email -v2' when sending version 2 of a
+> series; it also helps to tell reviewers in the cover letter how version
+> 2 differs from version 1.
+> 
+> More patch submission hints at
+> http://wiki.qemu.org/Contribute/SubmitAPatch
+> 
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
