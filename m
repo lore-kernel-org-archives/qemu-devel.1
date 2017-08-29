@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dmnSH-0003fh-UW
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:49:51 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dmnSO-0003mp-L5
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:49:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dmnSG-0001vy-Lc
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:49:50 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dmnSN-0001zf-ID
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 16:49:56 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Tue, 29 Aug 2017 16:49:29 -0400
-Message-Id: <20170829204934.9039-5-jsnow@redhat.com>
+Date: Tue, 29 Aug 2017 16:49:33 -0400
+Message-Id: <20170829204934.9039-9-jsnow@redhat.com>
 In-Reply-To: <20170829204934.9039-1-jsnow@redhat.com>
 References: <20170829204934.9039-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/9] ATAPI: Replace DEBUG_IDE_ATAPI with
- tracing events
+Subject: [Qemu-devel] [PATCH v2 8/9] AHCI: pretty-print FIS to buffer
+ instead of stderr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,202 +23,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: eblake@redhat.com, qemu-devel@nongnu.org, f4bug@amsat.org, John Snow <jsnow@redhat.com>
 
-Goodbye, printfs.
-Hello, fancy printfs.
+The current FIS printing routines dump the FIS to screen. adjust this
+such that it dumps to buffer instead, then use this ability to have
+FIS dump mechanisms via trace-events instead of compiled defines.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- hw/ide/atapi.c            | 64 +++++++++++++++++------------------------------
- hw/ide/trace-events       | 15 +++++++++++
- include/hw/ide/internal.h |  1 -
- 3 files changed, 38 insertions(+), 42 deletions(-)
+ hw/ide/ahci.c       | 54 +++++++++++++++++++++++++++++++++++++++++++----------
+ hw/ide/trace-events |  4 ++++
+ 2 files changed, 48 insertions(+), 10 deletions(-)
 
-diff --git a/hw/ide/atapi.c b/hw/ide/atapi.c
-index fc1d19c..37fa699 100644
---- a/hw/ide/atapi.c
-+++ b/hw/ide/atapi.c
-@@ -27,6 +27,7 @@
- #include "hw/ide/internal.h"
- #include "hw/scsi/scsi.h"
- #include "sysemu/block-backend.h"
-+#include "trace.h"
- 
- #define ATAPI_SECTOR_BITS (2 + BDRV_SECTOR_BITS)
- #define ATAPI_SECTOR_SIZE (1 << ATAPI_SECTOR_BITS)
-@@ -116,9 +117,7 @@ cd_read_sector_sync(IDEState *s)
-     block_acct_start(blk_get_stats(s->blk), &s->acct,
-                      ATAPI_SECTOR_SIZE, BLOCK_ACCT_READ);
- 
--#ifdef DEBUG_IDE_ATAPI
--    printf("cd_read_sector_sync: lba=%d\n", s->lba);
--#endif
-+    trace_cd_read_sector_sync(s->lba);
- 
-     switch (s->cd_sector_size) {
-     case 2048:
-@@ -152,9 +151,7 @@ static void cd_read_sector_cb(void *opaque, int ret)
- {
-     IDEState *s = opaque;
- 
--#ifdef DEBUG_IDE_ATAPI
--    printf("cd_read_sector_cb: lba=%d ret=%d\n", s->lba, ret);
--#endif
-+    trace_cd_read_sector_cb(s->lba, ret);
- 
-     if (ret < 0) {
-         block_acct_failed(blk_get_stats(s->blk), &s->acct);
-@@ -188,9 +185,7 @@ static int cd_read_sector(IDEState *s)
-     s->iov.iov_len = ATAPI_SECTOR_SIZE;
-     qemu_iovec_init_external(&s->qiov, &s->iov, 1);
- 
--#ifdef DEBUG_IDE_ATAPI
--    printf("cd_read_sector: lba=%d\n", s->lba);
--#endif
-+    trace_cd_read_sector(s->lba);
- 
-     block_acct_start(blk_get_stats(s->blk), &s->acct,
-                      ATAPI_SECTOR_SIZE, BLOCK_ACCT_READ);
-@@ -213,9 +208,7 @@ void ide_atapi_cmd_ok(IDEState *s)
- 
- void ide_atapi_cmd_error(IDEState *s, int sense_key, int asc)
- {
--#ifdef DEBUG_IDE_ATAPI
--    printf("atapi_cmd_error: sense=0x%x asc=0x%x\n", sense_key, asc);
--#endif
-+    trace_ide_atapi_cmd_error(s, sense_key, asc);
-     s->error = sense_key << 4;
-     s->status = READY_STAT | ERR_STAT;
-     s->nsector = (s->nsector & ~7) | ATAPI_INT_REASON_IO | ATAPI_INT_REASON_CD;
-@@ -252,19 +245,14 @@ static uint16_t atapi_byte_count_limit(IDEState *s)
- void ide_atapi_cmd_reply_end(IDEState *s)
- {
-     int byte_count_limit, size, ret;
--#ifdef DEBUG_IDE_ATAPI
--    printf("reply: tx_size=%d elem_tx_size=%d index=%d\n",
--           s->packet_transfer_size,
--           s->elementary_transfer_size,
--           s->io_buffer_index);
--#endif
-+    trace_ide_atapi_cmd_reply_end(s, s->packet_transfer_size,
-+                                  s->elementary_transfer_size,
-+                                  s->io_buffer_index);
-     if (s->packet_transfer_size <= 0) {
-         /* end of transfer */
-         ide_atapi_cmd_ok(s);
-         ide_set_irq(s->bus);
--#ifdef DEBUG_IDE_ATAPI
--        printf("end of transfer, status=0x%x\n", s->status);
--#endif
-+        trace_ide_atapi_cmd_reply_end_eot(s, s->status);
-     } else {
-         /* see if a new sector must be read */
-         if (s->lba != -1 && s->io_buffer_index >= s->cd_sector_size) {
-@@ -300,9 +288,7 @@ void ide_atapi_cmd_reply_end(IDEState *s)
-             /* a new transfer is needed */
-             s->nsector = (s->nsector & ~7) | ATAPI_INT_REASON_IO;
-             byte_count_limit = atapi_byte_count_limit(s);
--#ifdef DEBUG_IDE_ATAPI
--            printf("byte_count_limit=%d\n", byte_count_limit);
--#endif
-+            trace_ide_atapi_cmd_reply_end_bcl(s, byte_count_limit);
-             size = s->packet_transfer_size;
-             if (size > byte_count_limit) {
-                 /* byte count limit must be even if this case */
-@@ -324,9 +310,7 @@ void ide_atapi_cmd_reply_end(IDEState *s)
-             ide_transfer_start(s, s->io_buffer + s->io_buffer_index - size,
-                                size, ide_atapi_cmd_reply_end);
-             ide_set_irq(s->bus);
--#ifdef DEBUG_IDE_ATAPI
--            printf("status=0x%x\n", s->status);
--#endif
-+            trace_ide_atapi_cmd_reply_end_new(s, s->status);
-         }
-     }
+diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+index a0a4dd6..2e75f9b 100644
+--- a/hw/ide/ahci.c
++++ b/hw/ide/ahci.c
+@@ -644,20 +644,45 @@ static void ahci_reset_port(AHCIState *s, int port)
+     ahci_init_d2h(d);
  }
-@@ -368,9 +352,7 @@ static void ide_atapi_cmd_read_pio(IDEState *s, int lba, int nb_sectors,
  
- static void ide_atapi_cmd_check_status(IDEState *s)
+-static void debug_print_fis(uint8_t *fis, int cmd_len)
++/* Buffer pretty output based on a raw FIS structure. */
++static void ahci_pretty_buffer_fis(uint8_t *fis, int cmd_len, char **out)
  {
--#ifdef DEBUG_IDE_ATAPI
--    printf("atapi_cmd_check_status\n");
--#endif
-+    trace_ide_atapi_cmd_check_status(s);
-     s->error = MC_ERR | (UNIT_ATTENTION << 4);
-     s->status = ERR_STAT;
-     s->nsector = 0;
-@@ -477,10 +459,8 @@ static void ide_atapi_cmd_read_dma(IDEState *s, int lba, int nb_sectors,
- static void ide_atapi_cmd_read(IDEState *s, int lba, int nb_sectors,
-                                int sector_size)
- {
--#ifdef DEBUG_IDE_ATAPI
--    printf("read %s: LBA=%d nb_sectors=%d\n", s->atapi_dma ? "dma" : "pio",
--        lba, nb_sectors);
--#endif
-+    trace_ide_atapi_cmd_read(s, s->atapi_dma ? "dma" : "pio",
-+                             lba, nb_sectors);
-     if (s->atapi_dma) {
-         ide_atapi_cmd_read_dma(s, lba, nb_sectors, sector_size);
-     } else {
-@@ -1330,16 +1310,18 @@ void ide_atapi_cmd(IDEState *s)
-     uint8_t *buf = s->io_buffer;
-     const struct AtapiCmd *cmd = &atapi_cmd_table[s->io_buffer[0]];
+-#if DEBUG_AHCI
++    size_t bufsize;
++    char *pbuf;
++    char *pptr;
++    size_t lines = DIV_ROUND_UP(cmd_len, 16);
++    const char *preamble = "FIS:";
+     int i;
  
--#ifdef DEBUG_IDE_ATAPI
--    {
-+    trace_ide_atapi_cmd(s, s->io_buffer[0]);
+-    fprintf(stderr, "fis:");
++    /* Total amount of memory to store FISes in HBA memory */
++    g_assert_cmpint(cmd_len, <=, 0x100);
++    g_assert(out);
 +
-+    if (TRACE_IDE_ATAPI_CMD_PACKET_ENABLED) {
-+        /* Each pretty-printed byte needs two bytes and a space; */
-+        char *ppacket = g_malloc(ATAPI_PACKET_SIZE * 3 + 1);
-         int i;
--        printf("ATAPI limit=0x%x packet:", s->lcyl | (s->hcyl << 8));
--        for(i = 0; i < ATAPI_PACKET_SIZE; i++) {
--            printf(" %02x", buf[i]);
-+        for (i = 0; i < ATAPI_PACKET_SIZE; i++) {
-+            sprintf(ppacket + (i * 3), "%02x ", buf[i]);
++    /* Printed like:
++     * FIS:\n
++     * 0x00: 00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee \n
++     * 0x10: ff \n
++     * \0
++     *
++     * Four bytes for the preamble, seven for each line prefix (including a
++     * newline to start a new line), three bytes for each source byte,
++     * a trailing newline and a terminal null byte.
++     */
++
++    bufsize = strlen(preamble) + ((6 + 1) * lines) + (3 * cmd_len) + 1 + 1;
++    pbuf = g_malloc(bufsize);
++    pptr = pbuf;
++    pptr += sprintf(pptr, "%s", preamble);
+     for (i = 0; i < cmd_len; i++) {
+         if ((i & 0xf) == 0) {
+-            fprintf(stderr, "\n%02x:",i);
++            pptr += sprintf(pptr, "\n0x%02x: ", i);
          }
--        printf("\n");
-+        trace_ide_atapi_cmd_packet(s, s->lcyl | (s->hcyl << 8), ppacket);
-+        g_free(ppacket);
+-        fprintf(stderr, "%02x ",fis[i]);
++        pptr += sprintf(pptr, "%02x ", fis[i]);
      }
+-    fprintf(stderr, "\n");
 -#endif
++    pptr += sprintf(pptr, "\n");
++    pptr += 1; /* \0 */
++    g_assert(pbuf + bufsize == pptr);
++    *out = pbuf;
+ }
  
-     /*
-      * If there's a UNIT_ATTENTION condition pending, only command flagged with
+ static bool ahci_map_fis_address(AHCIDevice *ad)
+@@ -1201,7 +1226,12 @@ static void handle_reg_h2d_fis(AHCIState *s, int port,
+      * table to ide_state->io_buffer */
+     if (opts & AHCI_CMD_ATAPI) {
+         memcpy(ide_state->io_buffer, &cmd_fis[AHCI_COMMAND_TABLE_ACMD], 0x10);
+-        debug_print_fis(ide_state->io_buffer, 0x10);
++        if (TRACE_HANDLE_REG_H2D_FIS_DUMP_ENABLED) {
++            char *pretty_fis;
++            ahci_pretty_buffer_fis(ide_state->io_buffer, 0x10, &pretty_fis);
++            trace_handle_reg_h2d_fis_dump(s, port, pretty_fis);
++            g_free(pretty_fis);
++        }
+         s->dev[port].done_atapi_packet = false;
+         /* XXX send PIO setup FIS */
+     }
+@@ -1256,8 +1286,12 @@ static int handle_cmd(AHCIState *s, int port, uint8_t slot)
+         trace_handle_cmd_badmap(s, port, cmd_len);
+         goto out;
+     }
+-    debug_print_fis(cmd_fis, 0x80);
+-
++    if (TRACE_HANDLE_CMD_FIS_DUMP_ENABLED) {
++        char *pretty_fis;
++        ahci_pretty_buffer_fis(cmd_fis, 0x80, &pretty_fis);
++        trace_handle_cmd_fis_dump(s, port, pretty_fis);
++        g_free(pretty_fis);
++    }
+     switch (cmd_fis[0]) {
+         case SATA_FIS_TYPE_REGISTER_H2D:
+             handle_reg_h2d_fis(s, port, slot, cmd_fis);
 diff --git a/hw/ide/trace-events b/hw/ide/trace-events
-index 17bc6f1..8c79a6c 100644
+index e15fd77..77ed3c1 100644
 --- a/hw/ide/trace-events
 +++ b/hw/ide/trace-events
-@@ -38,3 +38,18 @@ bmdma_write(uint64_t addr, uint64_t val) "bmdma: writeb 0x%"PRIx64" : 0x%02"PRIx
- # hw/ide/via.c
- bmdma_read_via(uint64_t addr, uint32_t val) "bmdma: readb 0x%"PRIx64" : 0x%02x"
- bmdma_write_via(uint64_t addr, uint64_t val) "bmdma: writeb 0x%"PRIx64" : 0x%02"PRIx64
+@@ -105,3 +105,7 @@ ahci_cmd_done(void *s, int port) "ahci(%p)[%d]: cmd done"
+ ahci_reset(void *s) "ahci(%p): HBA reset"
+ allwinner_ahci_mem_read(void *s, void *a, uint64_t addr, uint64_t val, unsigned size) "ahci(%p): read a=%p addr=0x%"HWADDR_PRIx" val=0x%"PRIx64", size=%d"
+ allwinner_ahci_mem_write(void *s, void *a, uint64_t addr, uint64_t val, unsigned size) "ahci(%p): write a=%p addr=0x%"HWADDR_PRIx" val=0x%"PRIx64", size=%d"
 +
-+# hw/ide/atapi.c
-+cd_read_sector_sync(int lba) "lba=%d"
-+cd_read_sector_cb(int lba, int ret) "lba=%d ret=%d"
-+cd_read_sector(int lba) "lba=%d"
-+ide_atapi_cmd_error(void *s, int sense_key, int asc) "IDEState: %p; sense=0x%x asc=0x%x"
-+ide_atapi_cmd_reply_end(void *s, int tx_size, int elem_tx_size, int32_t index) "IDEState %p; reply: tx_size=%d elem_tx_size=%d index=%"PRId32
-+ide_atapi_cmd_reply_end_eot(void *s, int status) "IDEState: %p; end of transfer, status=0x%x"
-+ide_atapi_cmd_reply_end_bcl(void *s, int bcl) "IDEState: %p; byte_count_limit=%d"
-+ide_atapi_cmd_reply_end_new(void *s, int status) "IDEState: %p; new transfer started, status=0x%x"
-+ide_atapi_cmd_check_status(void *s) "IDEState: %p"
-+ide_atapi_cmd_read(void *s, const char *method, int lba, int nb_sectors) "IDEState: %p; read %s: LBA=%d nb_sectors=%d"
-+ide_atapi_cmd(void *s, uint8_t cmd) "IDEState: %p; cmd: 0x%02x"
 +# Warning: Verbose
-+ide_atapi_cmd_packet(void *s, uint16_t limit, const char *packet) "IDEState: %p; limit=0x%x packet: %s"
-diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
-index 4a92f0a..74efe8a 100644
---- a/include/hw/ide/internal.h
-+++ b/include/hw/ide/internal.h
-@@ -14,7 +14,6 @@
- #include "block/scsi.h"
- 
- /* debug IDE devices */
--//#define DEBUG_IDE_ATAPI
- //#define DEBUG_AIO
- #define USE_DMA_CDROM
- 
++handle_reg_h2d_fis_dump(void *s, int port, char *fis) "ahci(%p)[%d]: %s"
++handle_cmd_fis_dump(void *s, int port, char *fis) "ahci(%p)[%d]: %s"
 -- 
 2.9.5
