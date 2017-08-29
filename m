@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmgln-0001y3-D9
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 09:41:32 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dmgpT-0003gC-Tb
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 09:45:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dmglj-0007FS-Bj
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 09:41:31 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56929)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dmglj-0007EZ-52
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 09:41:27 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dmgle-0001qe-Sw
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 13:41:23 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B9D8E2E80CF
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 13:41:22 +0000 (UTC)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dmgpN-0000uA-V3
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 09:45:19 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1503985539-7205-1-git-send-email-s1seetee@linux.vnet.ibm.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c61ae7e6-a117-a9c1-6a73-73beaede08a8@amsat.org>
+Date: Tue, 29 Aug 2017 10:45:01 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 29 Aug 2017 13:35:43 -0000
-From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
-Reply-To: Bug 1713434 <1713434@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150391152035.18876.7874968547091336063.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150401374309.8320.13186786102532246784.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1713434] Re: prom-env-test test aborted and core
- dumped
+In-Reply-To: <1503985539-7205-1-git-send-email-s1seetee@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4] vl: exit if maxcpus is negative
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,107 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, famz@redhat.com, pbonzini@redhat.com, Eric Blake <eblake@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On other machine with same OS and gcc level, it's working fine. Not getting=
- what went wrong in the machine where I can re-produce this issue.
-I guess this bug can be closed. Thank you.
+Hi Seeteena,
 
-  /ppc64/prom-env/pseries:
+On 08/29/2017 02:45 AM, Seeteena Thoufeek wrote:
+> ---Steps to Reproduce---
+> 
+> When passed a negative number to 'maxcpus' parameter, Qemu aborts
+> with a core dump.
+> 
+> Run the following command with maxcpus argument as negative number
+> 
+> ppc64-softmmu/qemu-system-ppc64 --nographic -vga none -machine
+> pseries,accel=kvm,kvm-type=HV -m size=200g -device virtio-blk-pci,
+> drive=rootdisk -drive file=/home/images/pegas-1.0-ppc64le.qcow2,
+> if=none,cache=none,id=rootdisk,format=qcow2 -monitor telnet
+> :127.0.0.1:1234,server,nowait -net nic,model=virtio -net
+> user -redir tcp:2000::22 -device nec-usb-xhci -smp 8,cores=1,
+> threads=1,maxcpus=-12
+> 
+> (process:12149): GLib-ERROR **: gmem.c:130: failed to allocate
+>   18446744073709550568 bytes
+> 
+> Trace/breakpoint trap
+> 
+> Reported-by: R.Nageswara Sastry <rnsastry@linux.vnet.ibm.com>
+> Signed-off-by: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
+> ---
+> v1 -> v2:
+>    - Fix the error check in vl.c to make it generic.
+> v2 -> v3:
+>    - Fix coding style pointed out by patchew.
+>    - Fix check for "<= 0" instead of just "< 0".
+> v3 -> v4:
+>    - Fix subject line.
+>    - Removed space before ":" from vl.c:1248
+>    - Removed Reviewed-by: flag.
+> ---
+>   vl.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/vl.c b/vl.c
+> index 8e247cc..2d9e73d 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1244,7 +1244,10 @@ static void smp_parse(QemuOpts *opts)
+>           }
+>   
+>           max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus);
+> -
+> +        if (max_cpus <= 0) {
+> +            error_report("Invalid max_cpus: %d", max_cpus);
 
-SLOF **********************************************************************
-QEMU Starting
- Build Date =3D Jul 24 2017 15:15:46
- FW Version =3D git-89f519f09bf85091
- Press "s" to enter Open Firmware.
+I disagree with this patch, I think the correct fix is to declare 
+max_cpus as unsigned.
+Looking at the codebase I can't find any signed use of it.
 
-Populating /vdevice methods
-Populating /vdevice/vty@71000000
-Populating /vdevice/nvram@71000001
-Populating /pci@800000020000000
-(!) Executing code specified in nvramrc
- SLOF Setup =3D OK
-PASS: tests/prom-env-test
+> +            exit(1);
+> +        }
+>           if (max_cpus < cpus) {
+>               error_report("maxcpus must be equal to or greater than smp");
+>               exit(1);
+> 
 
--- =
+Regards,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1713434
-
-Title:
-  prom-env-test test aborted and core dumped
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  On ppc64le architecture machine the following test case Aborted and
-  Core dumped.
-
-  # tests/prom-env-test --quiet --keep-going -m=3Dquick --GTestLogFD=3D6
-  **
-  ERROR:tests/libqtest.c:628:qtest_get_arch: assertion failed: (qemu !=3D N=
-ULL)
-  Aborted (core dumped)
-
-  Steps to re-produce:
-  clone from the git
-  configure & compile =
-
-  run the unit tests by 'make check'
-
-  (gdb) bt
-  #0  0x00003fff9d60eff0 in raise () from /lib64/libc.so.6
-  #1  0x00003fff9d61136c in abort () from /lib64/libc.so.6
-  #2  0x00003fff9de1aa04 in g_assertion_message () from /lib64/libglib-2.0.=
-so.0
-  #3  0x00003fff9de1ab0c in g_assertion_message_expr () from /lib64/libglib=
--2.0.so.0
-  #4  0x000000001000cc30 in qtest_get_arch () at tests/libqtest.c:628
-  #5  0x00000000100048f0 in main (argc=3D5, argv=3D0x3ffff2145538) at tests=
-/prom-env-test.c:82
-  (gdb) i r
-  r0             0xfa	250
-  r1             0x3ffff2144d30	70368510627120
-  r2             0x3fff9d7b9900	70367091333376
-  r3             0x0	0
-  r4             0x12a7	4775
-  r5             0x6	6
-  r6             0x8	8
-  r7             0x1	1
-  r8             0x0	0
-  r9             0x0	0
-  r10            0x0	0
-  r11            0x0	0
-  r12            0x0	0
-  r13            0x3fff9dfa1950	70367099623760
-  r14            0x0	0
-  r15            0x0	0
-  r16            0x0	0
-  r17            0x0	0
-  r18            0x0	0
-  r19            0x0	0
-  r20            0x0	0
-  r21            0x0	0
-  r22            0x0	0
-  r23            0x0	0
-  r24            0x0	0
-  r25            0x0	0
-  r26            0x0	0
-  r27            0x100287f8	268601336
-  r28            0x16841b40	377756480
-  r29            0x4c	76
-  r30            0x3ffff2144de8	70368510627304
-  r31            0x6	6
-  pc             0x3fff9d60eff0	0x3fff9d60eff0 <raise+96>
-  msr            0x900000000280f033	10376293541503627315
-  cr             0x42000842	1107298370
-  lr             0x3fff9d61136c	0x3fff9d61136c <abort+396>
-  ctr            0x0	0
-  xer            0x0	0
-  orig_r3        0x12a7	4775
-  trap           0xc00	3072
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1713434/+subscriptions
+Phil.
