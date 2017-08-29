@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dmX5L-00044M-L9
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 23:21:04 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dmXIY-0007Bp-EK
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 23:34:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dmX5H-0007Bx-LF
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 23:21:03 -0400
-Received: from mga11.intel.com ([192.55.52.93]:7594)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dmX5H-0007AP-Bs
-	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 23:20:59 -0400
-Message-ID: <59A4DE48.9030206@intel.com>
-Date: Tue, 29 Aug 2017 11:23:52 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1dmXIX-0005WZ-4C
+	for qemu-devel@nongnu.org; Mon, 28 Aug 2017 23:34:42 -0400
+Date: Tue, 29 Aug 2017 11:57:53 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170829015753.GE2578@umbus.fritz.box>
+References: <20170821200036.15036-1-bauerman@linux.vnet.ibm.com>
+	<20170824025448.GA27401@fergus.ozlabs.ibm.com>
+	<20170824181122.GA5632@ram.oc3035372033.ibm.com>
+	<20170825042313.GD2772@umbus.fritz.box>
+	<20170828175011.GA26893@ram.oc3035372033.ibm.com>
 MIME-Version: 1.0
-References: <1503914913-28893-1-git-send-email-wei.w.wang@intel.com>
-	<1503914913-28893-5-git-send-email-wei.w.wang@intel.com>
-	<20170828133326.GN17097@dhcp22.suse.cz>
-In-Reply-To: <20170828133326.GN17097@dhcp22.suse.cz>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v15 4/5] mm: support reporting free page
- blocks
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="BZaMRJmqxGScZ8Mx"
+Content-Disposition: inline
+In-Reply-To: <20170828175011.GA26893@ram.oc3035372033.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] spapr: Add ibm,
+ processor-storage-keys property to CPU DT node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +28,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Hocko <mhocko@kernel.org>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: Ram Pai <linuxram@us.ibm.com>
+Cc: Paul Mackerras <paulus@ozlabs.org>, Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Michael Ellerman <mpe@ellerman.id.au>
 
-On 08/28/2017 09:33 PM, Michal Hocko wrote:
-> On Mon 28-08-17 18:08:32, Wei Wang wrote:
->> This patch adds support to walk through the free page blocks in the
->> system and report them via a callback function. Some page blocks may
->> leave the free list after zone->lock is released, so it is the caller's
->> responsibility to either detect or prevent the use of such pages.
->>
->> One use example of this patch is to accelerate live migration by skipping
->> the transfer of free pages reported from the guest. A popular method used
->> by the hypervisor to track which part of memory is written during live
->> migration is to write-protect all the guest memory. So, those pages that
->> are reported as free pages but are written after the report function
->> returns will be captured by the hypervisor, and they will be added to the
->> next round of memory transfer.
-> OK, looks much better. I still have few nits.
->
->> +extern void walk_free_mem_block(void *opaque,
->> +				int min_order,
->> +				bool (*report_page_block)(void *, unsigned long,
->> +							  unsigned long));
->> +
-> please add names to arguments of the prototype
->
->>   /*
->>    * Free reserved pages within range [PAGE_ALIGN(start), end & PAGE_MASK)
->>    * into the buddy system. The freed pages will be poisoned with pattern
->> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
->> index 6d00f74..81eedc7 100644
->> --- a/mm/page_alloc.c
->> +++ b/mm/page_alloc.c
->> @@ -4762,6 +4762,71 @@ void show_free_areas(unsigned int filter, nodemask_t *nodemask)
->>   	show_swap_cache_info();
->>   }
->>   
->> +/**
->> + * walk_free_mem_block - Walk through the free page blocks in the system
->> + * @opaque: the context passed from the caller
->> + * @min_order: the minimum order of free lists to check
->> + * @report_page_block: the callback function to report free page blocks
-> page_block has meaning in the core MM which doesn't strictly match its
-> usage here. Moreover we are reporting pfn ranges rather than struct page
-> range. So report_pfn_range would suit better.
->
-> [...]
->> +	for_each_populated_zone(zone) {
->> +		for (order = MAX_ORDER - 1; order >= min_order; order--) {
->> +			for (mt = 0; !stop && mt < MIGRATE_TYPES; mt++) {
->> +				spin_lock_irqsave(&zone->lock, flags);
->> +				list = &zone->free_area[order].free_list[mt];
->> +				list_for_each_entry(page, list, lru) {
->> +					pfn = page_to_pfn(page);
->> +					stop = report_page_block(opaque, pfn,
->> +								 1 << order);
->> +					if (stop)
->> +						break;
-> 					if (stop) {
-> 						spin_unlock_irqrestore(&zone->lock, flags);
-> 						return;
-> 					}
->
-> would be both easier and less error prone. E.g. You wouldn't pointlessly
-> iterate over remaining orders just to realize there is nothing to be
-> done for those...
->
 
-Yes, that's better, thanks. I will take other suggestions as well.
+--BZaMRJmqxGScZ8Mx
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Best,
-Wei
+On Mon, Aug 28, 2017 at 10:50:11AM -0700, Ram Pai wrote:
+> On Fri, Aug 25, 2017 at 02:23:13PM +1000, David Gibson wrote:
+> > On Thu, Aug 24, 2017 at 11:11:22AM -0700, Ram Pai wrote:
+> > > On Thu, Aug 24, 2017 at 12:54:48PM +1000, Paul Mackerras wrote:
+> > > > On Mon, Aug 21, 2017 at 05:00:36PM -0300, Thiago Jung Bauermann wro=
+te:
+> > > > > LoPAPR says:
+> > > > >=20
+> > > > >     =E2=80=9Cibm,processor-storage-keys=E2=80=9D
+> > > > >=20
+> > > > >     property name indicating the number of virtual storage keys s=
+upported
+> > > > >     by the processor described by this node.
+> > > > >=20
+> > > > >     prop-encoded-array: Consists of two cells encoded as with enc=
+ode-int.
+> > > > >     The first cell represents the number of virtual storage keys =
+supported
+> > > > >     for data accesses while the second cell represents the number=
+ of
+> > > > >     virtual storage keys supported for instruction accesses. The =
+cell value
+> > > > >     of zero indicates that no storage keys are supported for the =
+access
+> > > > >     type.
+> > > > >=20
+> > > > > pHyp provides the property above but there's a bug in P8 firmware=
+ where the
+> > > > > second cell is zero even though POWER8 supports instruction acces=
+s keys.
+> > > > > This bug will be fixed for P9.
+> > > > >=20
+> > > > > Tested with KVM on POWER8 Firenze machine and with TCG on x86_64 =
+machine.
+> > > > >=20
+> > > > > Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
+> > > > > ---
+> > > > >=20
+> > > > > The sysfs files are provided by this patch for Linux:
+> > > >=20
+> > > > Those sysfs files relate to the kernel's support for userspace
+> > > > processes using storage keys.  That is quite distinct from KVM's
+> > > > support for guests using storage keys, so I think that using those
+> > > > sysfs files to indicate what the guest can do is wrong.
+> > > >=20
+> > > > In fact KVM allows guests to specify storage keys in the HPTE values
+> > > > that they set, except that there is a bug (for which Ram Pai has
+> > > > posted a patch) that means that KVM loses the top two bits of the k=
+ey
+> > > > number.
+> > > >=20
+> > > > What I would suggest is that we use the 'pad' field in the struct
+> > > > kvm_ppc_smmu_info to report the number of keys supported by KVM for
+> > > > guest use.  That will be 0 in all current kernels, indicating that
+> > > > keys are not supported, which is reasonable because of the bug.  I
+> > > > will make sure the patch fixing the bug goes in first.
+> > >=20
+> > > with the current kernels, even with the bug, KVM can still support 8
+> > > keys. Should we say 8 instead of 0?  It will help enable keys on KVM
+> > > earlier and give a jump start to its adaption by applications.
+> >=20
+> > But the point isn't really what we *can* say, it's with what is
+> > implicitly said by kernels that don't advertise anything
+> > specifically.  Which is 0.
+> >=20
+>=20
+> Right. I was pointing to the case where nothing is said implicitly by
+> the kernel (no advertised values), to default to 8 instead of defaulting
+> to 0.
+
+The point is that the kernel advertising nothing is indistinguishable
+=66rom it advertising 0.  We don't get to chose that default value.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--BZaMRJmqxGScZ8Mx
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmkyh8ACgkQbDjKyiDZ
+s5IttA//YupT4qT1g5FURkGUNSsZckqnnG4b+ymTRa0ejDiZ+aooVkfo8OnZ/4/n
+9NL/MfEtqlAQM8kB2zY5+c+CWCrtrnyUiBoBvVihFoeUABJeCXQgHpe5b1063d30
+Pw84hYj9DMJgdmQeTm5ZHjW4uqrYZtYBFupMLxyW7f/ca99jGiMoJ+47IKmhbQBX
+gpNL9NyVlkLGAHH99q4Ccmf6Z6pqRKw5kgPMxJsrBlIhxZEOIAEuPnkCVmXMt3gI
+O2/WqX5fLxGcMZ39qo6GzPEgHtEP77kE3zBkJ6GWi7qeYOOcVx1n3aJ3mh72J9LL
+KNCOn5EUlXr2CRIs+OjrHh/zvCbCcYHlgb3zwgPrT+tYrVVXAnuzfigH2uMKYXG4
+CJEZ7v+g4PXU9j/APuDMPSAYmWF7WowxV2u9Oa94vZXBhQX8Py4394qkt4XOGR13
+WeBxlz68lK39inZ0nYPydSK9BVqhx7vhHN6VgX2JxRXVy9F3hWCOcvcDE4foP6Ic
++JDr3SqzWyTCJRTXPVAdAL972GKY9/Uml/N4kUdvsmSJLgnQCRK6TTEGrwDFn7Th
+++vBRC6CD57ffnAlGWCxgz/E1lPDTCXxsTJKK7HSXn3BCp291tgtbS6IwR5ET3tV
+I6b7yfipl4PpcECRfF3QUuKW5YypaxN70vK3Vpx93wcqk5i4B/g=
+=c9rj
+-----END PGP SIGNATURE-----
+
+--BZaMRJmqxGScZ8Mx--
