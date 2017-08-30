@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dmyLi-0002UC-JL
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dmyLi-0002U9-IC
 	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dmyLe-0000Mq-RQ
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dmyLd-0000MA-LM
 	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:46 -0400
-Received: from mail-ua0-x242.google.com ([2607:f8b0:400c:c08::242]:34719)
+Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:33570)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
-	id 1dmyLe-0000MV-MJ
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:42 -0400
-Received: by mail-ua0-x242.google.com with SMTP id 105so2346896uad.1
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 01:27:42 -0700 (PDT)
+	id 1dmyLd-0000M0-GU
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:41 -0400
+Received: by mail-ua0-x241.google.com with SMTP id m24so2359737uai.0
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 01:27:41 -0700 (PDT)
 From: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
-Date: Wed, 30 Aug 2017 03:26:55 -0500
-Message-Id: <20170830082702.3011-7-Sergio.G.DelReal@gmail.com>
+Date: Wed, 30 Aug 2017 03:26:54 -0500
+Message-Id: <20170830082702.3011-6-Sergio.G.DelReal@gmail.com>
 In-Reply-To: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
 References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 06/13] hvf: use new helper functions for
- put/get xsave
+Subject: [Qemu-devel] [PATCH v2 05/13] hvf: add fields to CPUState and
+ CPUX86State; add definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +30,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 
-This commit makes use of the helper functions for handling xsave in
-xsave_helper.c, which are shared with kvm.
+This commit adds some fields specific to hvf in CPUState and
+CPUX86State. It also adds some handy #defines.
 
 Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 ---
- target/i386/hvf-utils/x86hvf.c | 63 ++++++------------------------------------
- 1 file changed, 8 insertions(+), 55 deletions(-)
+ include/qom/cpu.h |  2 ++
+ target/i386/cpu.h | 23 +++++++++++++++++++++++
+ 2 files changed, 25 insertions(+)
 
-diff --git a/target/i386/hvf-utils/x86hvf.c b/target/i386/hvf-utils/x86hvf.c
-index 967be2e7fe..819d760624 100644
---- a/target/i386/hvf-utils/x86hvf.c
-+++ b/target/i386/hvf-utils/x86hvf.c
-@@ -76,36 +76,13 @@ void hvf_get_segment(SegmentCache *qseg, struct vmx_segment *vmx_seg)
- void hvf_put_xsave(CPUState *cpu_state)
- {
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 25eefea7ab..fb0e54e6d9 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -407,6 +407,8 @@ struct CPUState {
+      * unnecessary flushes.
+      */
+     uint16_t pending_tlb_flush;
++
++    uint64_t hvf_fd;
+ };
  
--    int x;
-     struct hvf_xsave_buf *xsave;
--    
-+
-     xsave = X86_CPU(cpu_state)->env.kvm_xsave_buf;
--    memset(xsave, 0, sizeof(*xsave)); 
--    
--    memcpy(&xsave->data[4], &X86_CPU(cpu_state)->env.fpdp, sizeof(X86_CPU(cpu_state)->env.fpdp));
--    memcpy(&xsave->data[2], &X86_CPU(cpu_state)->env.fpip, sizeof(X86_CPU(cpu_state)->env.fpip));
--    memcpy(&xsave->data[8], &X86_CPU(cpu_state)->env.fpregs, sizeof(X86_CPU(cpu_state)->env.fpregs));
--    memcpy(&xsave->data[144], &X86_CPU(cpu_state)->env.ymmh_regs, sizeof(X86_CPU(cpu_state)->env.ymmh_regs));
--    memcpy(&xsave->data[288], &X86_CPU(cpu_state)->env.zmmh_regs, sizeof(X86_CPU(cpu_state)->env.zmmh_regs));
--    memcpy(&xsave->data[272], &X86_CPU(cpu_state)->env.opmask_regs, sizeof(X86_CPU(cpu_state)->env.opmask_regs));
--    memcpy(&xsave->data[240], &X86_CPU(cpu_state)->env.bnd_regs, sizeof(X86_CPU(cpu_state)->env.bnd_regs));
--    memcpy(&xsave->data[256], &X86_CPU(cpu_state)->env.bndcs_regs, sizeof(X86_CPU(cpu_state)->env.bndcs_regs));
--    memcpy(&xsave->data[416], &X86_CPU(cpu_state)->env.hi16_zmm_regs, sizeof(X86_CPU(cpu_state)->env.hi16_zmm_regs));
--    
--    xsave->data[0] = (uint16_t)X86_CPU(cpu_state)->env.fpuc;
--    xsave->data[0] |= (X86_CPU(cpu_state)->env.fpus << 16);
--    xsave->data[0] |= (X86_CPU(cpu_state)->env.fpstt & 7) << 11;
--    
--    for (x = 0; x < 8; ++x)
--        xsave->data[1] |= ((!X86_CPU(cpu_state)->env.fptags[x]) << x);
--    xsave->data[1] |= (uint32_t)(X86_CPU(cpu_state)->env.fpop << 16);
--    
--    memcpy(&xsave->data[40], &X86_CPU(cpu_state)->env.xmm_regs, sizeof(X86_CPU(cpu_state)->env.xmm_regs));
--    
--    xsave->data[6] = X86_CPU(cpu_state)->env.mxcsr;
--    *(uint64_t *)&xsave->data[128] = X86_CPU(cpu_state)->env.xstate_bv;
--    
--    if (hv_vcpu_write_fpstate(cpu_state->hvf_fd, xsave->data, 4096)){
-+
-+    x86_cpu_xsave_all_areas(X86_CPU(cpu_state), xsave);
-+
-+    if (hv_vcpu_write_fpstate(cpu_state->hvf_fd, xsave->data, 4096)) {
-         abort();
-     }
- }
-@@ -187,39 +164,15 @@ void hvf_put_msrs(CPUState *cpu_state)
+ QTAILQ_HEAD(CPUTailQ, CPUState);
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 051867399b..7d90f08b98 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -82,15 +82,19 @@
+ #define R_GS 5
  
- void hvf_get_xsave(CPUState *cpu_state)
- {
--    int x;
-     struct hvf_xsave_buf *xsave;
--    
-+
-     xsave = X86_CPU(cpu_state)->env.kvm_xsave_buf;
--    
-+
-     if (hv_vcpu_read_fpstate(cpu_state->hvf_fd, xsave->data, 4096)) {
-         abort();
+ /* segment descriptor fields */
++#define DESC_G_SHIFT    23
+ #define DESC_G_MASK     (1 << 23)
+ #define DESC_B_SHIFT    22
+ #define DESC_B_MASK     (1 << DESC_B_SHIFT)
+ #define DESC_L_SHIFT    21 /* x86_64 only : 64 bit code segment */
+ #define DESC_L_MASK     (1 << DESC_L_SHIFT)
++#define DESC_AVL_SHIFT  20
+ #define DESC_AVL_MASK   (1 << 20)
++#define DESC_P_SHIFT    15
+ #define DESC_P_MASK     (1 << 15)
+ #define DESC_DPL_SHIFT  13
+ #define DESC_DPL_MASK   (3 << DESC_DPL_SHIFT)
++#define DESC_S_SHIFT    12
+ #define DESC_S_MASK     (1 << 12)
+ #define DESC_TYPE_SHIFT 8
+ #define DESC_TYPE_MASK  (15 << DESC_TYPE_SHIFT)
+@@ -631,6 +635,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_EBX_AVX512BW (1U << 30) /* AVX-512 Byte and Word Instructions */
+ #define CPUID_7_0_EBX_AVX512VL (1U << 31) /* AVX-512 Vector Length Extensions */
+ 
++#define CPUID_7_0_ECX_AVX512BMI (1U << 1)
+ #define CPUID_7_0_ECX_VBMI     (1U << 1)  /* AVX-512 Vector Byte Manipulation Instrs */
+ #define CPUID_7_0_ECX_UMIP     (1U << 2)
+ #define CPUID_7_0_ECX_PKU      (1U << 3)
+@@ -806,6 +811,20 @@ typedef struct SegmentCache {
+         float64  _d_##n[(bits)/64]; \
      }
  
--    memcpy(&X86_CPU(cpu_state)->env.fpdp, &xsave->data[4], sizeof(X86_CPU(cpu_state)->env.fpdp));
--    memcpy(&X86_CPU(cpu_state)->env.fpip, &xsave->data[2], sizeof(X86_CPU(cpu_state)->env.fpip));
--    memcpy(&X86_CPU(cpu_state)->env.fpregs, &xsave->data[8], sizeof(X86_CPU(cpu_state)->env.fpregs));
--    memcpy(&X86_CPU(cpu_state)->env.ymmh_regs, &xsave->data[144], sizeof(X86_CPU(cpu_state)->env.ymmh_regs));
--    memcpy(&X86_CPU(cpu_state)->env.zmmh_regs, &xsave->data[288], sizeof(X86_CPU(cpu_state)->env.zmmh_regs));
--    memcpy(&X86_CPU(cpu_state)->env.opmask_regs, &xsave->data[272], sizeof(X86_CPU(cpu_state)->env.opmask_regs));
--    memcpy(&X86_CPU(cpu_state)->env.bnd_regs, &xsave->data[240], sizeof(X86_CPU(cpu_state)->env.bnd_regs));
--    memcpy(&X86_CPU(cpu_state)->env.bndcs_regs, &xsave->data[256], sizeof(X86_CPU(cpu_state)->env.bndcs_regs));
--    memcpy(&X86_CPU(cpu_state)->env.hi16_zmm_regs, &xsave->data[416], sizeof(X86_CPU(cpu_state)->env.hi16_zmm_regs));
--    
--    
--    X86_CPU(cpu_state)->env.fpuc = (uint16_t)xsave->data[0];
--    X86_CPU(cpu_state)->env.fpus = (uint16_t)(xsave->data[0] >> 16);
--    X86_CPU(cpu_state)->env.fpstt = (X86_CPU(cpu_state)->env.fpus >> 11) & 7;
--    X86_CPU(cpu_state)->env.fpop = (uint16_t)(xsave->data[1] >> 16);
--    
--    for (x = 0; x < 8; ++x)
--       X86_CPU(cpu_state)->env.fptags[x] =
--        ((((uint16_t)xsave->data[1] >> x) & 1) == 0);
--    
--    memcpy(&X86_CPU(cpu_state)->env.xmm_regs, &xsave->data[40], sizeof(X86_CPU(cpu_state)->env.xmm_regs));
--
--    X86_CPU(cpu_state)->env.mxcsr = xsave->data[6];
--    X86_CPU(cpu_state)->env.xstate_bv = *(uint64_t *)&xsave->data[128];
-+    x86_cpu_xrstor_all_areas(X86_CPU(cpu_state), xsave);
- }
++typedef union {
++    uint8_t _b[16];
++    uint16_t _w[8];
++    uint32_t _l[4];
++    uint64_t _q[2];
++} XMMReg;
++
++typedef union {
++    uint8_t _b[32];
++    uint16_t _w[16];
++    uint32_t _l[8];
++    uint64_t _q[4];
++} YMMReg;
++
+ typedef MMREG_UNION(ZMMReg, 512) ZMMReg;
+ typedef MMREG_UNION(MMXReg, 64)  MMXReg;
  
- void hvf_get_segments(CPUState *cpu_state)
+@@ -1041,7 +1060,11 @@ typedef struct CPUX86State {
+     ZMMReg xmm_t0;
+     MMXReg mmx_t0;
+ 
++    XMMReg ymmh_regs[CPU_NB_REGS];
++
+     uint64_t opmask_regs[NB_OPMASK_REGS];
++    YMMReg zmmh_regs[CPU_NB_REGS];
++    ZMMReg hi16_zmm_regs[CPU_NB_REGS];
+ 
+     /* sysenter registers */
+     uint32_t sysenter_cs;
 -- 
 2.14.1
