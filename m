@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dmsTp-0005fN-6r
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 22:11:46 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dmsTr-0005fq-V7
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 22:11:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dmsTo-0006Tp-0z
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 22:11:45 -0400
-Date: Wed, 30 Aug 2017 12:07:22 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dmsTo-0006Tk-09
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 22:11:47 -0400
+Date: Wed, 30 Aug 2017 12:11:33 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170830020722.GB3386@umbus.fritz.box>
-References: <20170825211119.474-1-danielhb@linux.vnet.ibm.com>
-	<20170829072310.GJ2578@umbus.fritz.box>
-	<df49df06-caaf-81f5-7c24-f4324654a262@linux.vnet.ibm.com>
+Message-ID: <20170830021132.GC3386@umbus.fritz.box>
+References: <1504030416-18618-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="7ZAtKRhVyVSsbBD2"
+	protocol="application/pgp-signature"; boundary="z4+8/lEcDcG5Ke9S"
 Content-Disposition: inline
-In-Reply-To: <df49df06-caaf-81f5-7c24-f4324654a262@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for-2.11 v2] hw/ppc: CAS reset
- on early device hotplug
+In-Reply-To: <1504030416-18618-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11] tests: Fix broken
+ ivshmem-server-msi/-irq tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,87 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 
 
---7ZAtKRhVyVSsbBD2
+--z4+8/lEcDcG5Ke9S
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 29, 2017 at 05:54:28PM -0300, Daniel Henrique Barboza wrote:
+On Tue, Aug 29, 2017 at 08:13:36PM +0200, Thomas Huth wrote:
+> Broken with commit b4ba67d9a7025 ("libqos: Change PCI accessors to take
+> opaque BAR handle") a while ago, but nobody noticed since the tests are
+> only run in SPEED=3Dslow mode: The msix_pba_bar is not correctly initiali=
+zed
+> anymore if bir_pba has the same value as bir_table. With this fix,
+> "make check SPEED=3Dslow" should work fine again.
 >=20
+> Fixes: b4ba67d9a702507793c2724e56f98e9b0f7be02b
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  tests/libqos/pci.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 >=20
-> On 08/29/2017 04:23 AM, David Gibson wrote:
-> > On Fri, Aug 25, 2017 at 06:11:18PM -0300, Daniel Henrique Barboza wrote:
-> > > v2:
-> > > - rebased with ppc-for-2.11
-> > > - function 'spapr_cas_completed' dropped
-> > > - function 'spapr_drc_needed' made public and it's now used inside
-> > >    'spapr_hotplugged_dev_before_cas'
-> > > - 'spapr_drc_needed' was changed to support the migration of logical
-> > >    DRCs with devs attached in UNUSED state
-> > > - new function: 'spapr_clear_pending_events'. This function is used
-> > >    inside ppc_spapr_reset to reset the pending_events QTAILQ
-> > Thanks for the followup, unfortunately there is still an important bug
-> > left, see comments on the patch itself.
-> >=20
-> > At a higher level, though, looking at the event reset code made me
-> > think of a possible even simpler solution to this problem.
-> >=20
-> > The queue of events (both hotplug and epow) is already in a simple
-> > internal form that's independent of the two delivery mechanisms.  The
-> > only difference is what event source triggers the interrupt.  This
-> > explains why an extra hotplug event after the CAS "unstuck" the queue.
-> >=20
-> > AFAICT, a spurious interrupts here should be harmless - the kernel
-> > will just check the queue and find nothing there.
-> >=20
-> > So, it should be sufficient to, after CAS, pulse the hotplug queue
-> > interrupt if the hotplug queue is negotiated.
-> >=20
-> This is something I've tried in my first attempts at this problem, before
-> sending the first patch in which I blocked hotplug before CAS. Back then,
-> the problem was that the kernel panics with sig 11 (acess of bad area) wh=
-en
-> receiving the pulse after CAS.
-
-Huh.
-
-> I've investigated it a bit today and it seems that it still the case. Fir=
-ing
-> an IRQ right
-> after CAS breaks the kernel. In fact, if you time a regular CPU hotplug
-> right after
-> CAS you'll get the same sig 11 kernel ooops. It looks like there is a time
-> window after
-> CAS that the kernel can't handle the hotplug process and pulsing the hotp=
-lug
-> queue in this window breaks the guest. I've tried some hacks such as puls=
-ing
-> the queue
-> in the first 'event_scan' call made by the guest, but apparently it is st=
-ill
-> too early.
->=20
-> I've sent an email to the linuxppc-dev mailing list talking about this
-> behavior
-> and asking if there is a reliable way to know when  we can safely pulse t=
-he
-> hotplug
-> queue. Meanwhile, I'll keep working in the v3 respin of this patch in case
-> this
-> solution of pulsing the hotplug queue ends up being not feasible.
-
-Right.  As Ben's reply says that definitely looks like a guest kernel
-bug.  But, it's in enough kernels in the wild that we really need to
-work around it anyway.  I think the reset-at-CAS approach is our best
-bet to accomplish that at this stage.
-
-Note that the clear-queue-at-reset preliminary cleanup will be
-valuable even if we end up not needing the rest of the reset at CAS
-stuff.
+> diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
+> index 2dcdead..28d576c 100644
+> --- a/tests/libqos/pci.c
+> +++ b/tests/libqos/pci.c
+> @@ -120,6 +120,8 @@ void qpci_msix_enable(QPCIDevice *dev)
+>      bir_pba =3D table & PCI_MSIX_FLAGS_BIRMASK;
+>      if (bir_pba !=3D bir_table) {
+>          dev->msix_pba_bar =3D qpci_iomap(dev, bir_pba, NULL);
+> +    } else {
+> +        dev->msix_pba_bar =3D dev->msix_table_bar;
+>      }
+>      dev->msix_pba_off =3D table & ~PCI_MSIX_FLAGS_BIRMASK;
+> =20
+> @@ -138,8 +140,11 @@ void qpci_msix_disable(QPCIDevice *dev)
+>      qpci_config_writew(dev, addr + PCI_MSIX_FLAGS,
+>                                                  val & ~PCI_MSIX_FLAGS_EN=
+ABLE);
+> =20
+> +    if (dev->msix_pba_bar.addr !=3D dev->msix_table_bar.addr) {
+> +        qpci_iounmap(dev, dev->msix_pba_bar);
+> +    }
+>      qpci_iounmap(dev, dev->msix_table_bar);
+> -    qpci_iounmap(dev, dev->msix_pba_bar);
+> +
+>      dev->msix_enabled =3D 0;
+>      dev->msix_table_off =3D 0;
+>      dev->msix_pba_off =3D 0;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -114,24 +84,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---7ZAtKRhVyVSsbBD2
+--z4+8/lEcDcG5Ke9S
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmmHdgACgkQbDjKyiDZ
-s5JXyxAAoUgzVGz8KP5o4+Qm1wlL++V2vrL3/gr4e7TERSVK4DZlDHXNpHSoIZhY
-/Hpq4Fh2AEID5s3/HdHdEPedSwtRiO/L64uY9mlZ0Kho0/ECiGW8As9KZ0e3n6XG
-vP73CPOAc5aEr/oRgVSNpxl/GV/ycAYE00FLjPs3ATq8J8N0t7QUNwYmR1BFfP0y
-mcgWHMIfLi5n9v+Izld1YTAysGMYiIG3+opQLR+G2bv/vpL1FJA2TuVaFBqKOmeq
-3HoFwXsxCfV3x3BiYD2t8Lz726COMejulfPxk7akBbd0DT8qG2gtfKvKO+dLOE+d
-A43bUDac9n6JIE5fWAEzondUnKL9rFGhzZBPG6Y30jwGtetx7mbDH7CHwr8Hjka8
-5KczK4qSF+mvicYsv6jAHZuvwef/F70gE3nv0abujfN67ojLGRAApNxbbQnCJRAi
-ry8uxmDmHGmtm3xv9sLjQmENJBrKNzDqbgd8vhyuQDlO5IhjTQekbdZqoekHJbpQ
-zNIxuBgZpX5pVd3PejlDMnteBE8HeNAvdyX82ZFb0teyYrVAgDWhImIR9b5WqfRs
-/sfjpPnkPklMqk3XsAvxXDAvNzi4osRAUGBknzvjBiFCAHr6tnNjDBHIX8DnYLUX
-qssDdrtCpehRyjX5VGzBYPJn7AtuxouhNwVE08FjRctbC4Q6pNA=
-=+ZmT
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmmHtQACgkQbDjKyiDZ
+s5JHlhAAzG2Wl0hhEktQ7QbnK8rOVw3Jxr6FmLx6sE7ZiCz+a5Ia1F4eb/K8gSBu
+t2E1J5+d0CPcIu3l8te8WKKmPseQawNuSyoT4wtWUd9+mAPMvmswXMExEQGpGl9U
+gI9A4bZYNf91LV6pzYGhM6buJXWcMDqtY3o52BykrFvz4Q4sWH1hS7rV6oQNEYjr
+K4W5gF+siPo0Y4ufD0KDThERSQYkqNKsWPQDsxTh8WOTRG+e3xXwIMGsU5Ww4wU8
+2JhD1tw+oRU0Rg1YVz42uap//ba/dIC/DilDeoC964Ryv71a5Vsuh9WR+U9dYgcv
+vLC8gYb9b5UcaPv34O/X61RHVFtpTa8TLDkMkIQDwG73pWYSyNKRQn/FzGf3BTiQ
+Ml2WkzBzuE6ZwsjOIvxAPK3HqTbXJNaZWLK0/5lKOoLrbRelYNG/LhyENRY4xyzR
+Y2a1t88017L6aNez89RG+cCmVs2PUw72OuafklvNpYOBywjUBkcnuAkH8j/BFwPM
+qIEZBRV1+lTtkZj8u1Cz8Xd2uhQvIZsugEjBUZN95wfNhAXzpWVaN4iY3Yj+tfAP
+y5io2VFYnk7UG5us6SbZdq1xb3khERD/c3tWewzUtp7xyrTBKIPUthFYDyb7LnqD
+JqXCfAlzNx8LgKGHRj+vXXQ5vgrC5edIYgnADwZSGVdZbeIk+hY=
+=Wuc7
 -----END PGP SIGNATURE-----
 
---7ZAtKRhVyVSsbBD2--
+--z4+8/lEcDcG5Ke9S--
