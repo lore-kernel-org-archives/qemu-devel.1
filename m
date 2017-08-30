@@ -1,21 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmyTd-0001Hu-98
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:35:58 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dmyqD-0005Vu-22
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:59:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmyTa-0004pB-Ht
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:35:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44028)
+	(envelope-from <cohuck@redhat.com>) id 1dmyq9-0006xP-W7
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:59:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47294)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dmyTa-0004oK-Be
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:35:54 -0400
-From: Peter Xu <peterx@redhat.com>
-Date: Wed, 30 Aug 2017 16:32:30 +0800
-Message-Id: <1504081950-2528-34-git-send-email-peterx@redhat.com>
-In-Reply-To: <1504081950-2528-1-git-send-email-peterx@redhat.com>
-References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC v2 33/33] migration: init dst in
- migration_object_init too
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dmyq9-0006wg-Mp
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:59:13 -0400
+Date: Wed, 30 Aug 2017 10:59:01 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170830105901.6c1632ef.cohuck@redhat.com>
+In-Reply-To: <897a578e-2375-b892-10af-879b8cc6136b@redhat.com>
+References: <20170816082650.21880-1-cohuck@redhat.com>
+	<223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
+	<CAFEAcA_UfM_XNKdc5zfHsehoRE6Q+EszRZX3FByskir7c+0Lww@mail.gmail.com>
+	<20170822010917.GO12356@umbus.fritz.box>
+	<CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
+	<3f0dc918-0f55-e2f4-bf47-fe4abf5453bb@redhat.com>
+	<CAFEAcA_ezKWweEuUB-cXTer0LLaeuiGDkSdfhApedhw4ykDT0Q@mail.gmail.com>
+	<20170822112046.GC12356@umbus.fritz.box>
+	<20170822134815.77020eb8.cohuck@redhat.com>
+	<20170823002907.GC5379@umbus.fritz.box>
+	<20170823091650.48e7c44e.cohuck@redhat.com>
+	<54526d47-b436-79d5-7a38-9516eaa727a6@redhat.com>
+	<5b0ff74a-08d6-558d-4c79-a93758e6302a@redhat.com>
+	<0bb344a3-f8f8-3365-cef1-1c68cf7d160d@redhat.com>
+	<20170823142047.366068f7.cohuck@redhat.com>
+	<897a578e-2375-b892-10af-879b8cc6136b@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] make check speed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +41,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <mlureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Cam Macdonell <cam@cs.ualberta.ca>
 
-Though we may not need it, now we init both the src/dst migration
-objects in migration_object_init() so that even incoming migration
-object would be thread safe (it was not).
+On Thu, 24 Aug 2017 07:27:18 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- migration/migration.c | 27 ++++++++++++++-------------
- 1 file changed, 14 insertions(+), 13 deletions(-)
+> On 23.08.2017 14:20, Cornelia Huck wrote:
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 5812478..7e9ccf0 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -103,6 +103,7 @@ enum mig_rp_message_type {
-    dynamic creation of migration */
- 
- static MigrationState *current_migration;
-+static MigrationIncomingState *current_incoming;
- 
- static bool migration_object_check(MigrationState *ms, Error **errp);
- 
-@@ -128,6 +129,17 @@ void migration_object_init(void)
-     if (ms->enforce_config_section) {
-         current_migration->send_configuration = true;
-     }
-+
-+    /*
-+     * Init the migrate incoming object as well no matter whether
-+     * we'll use it or not.
-+     */
-+    current_incoming = g_new0(MigrationIncomingState, 1);
-+    current_incoming->state = MIGRATION_STATUS_NONE;
-+    qemu_mutex_init(&current_incoming->rp_mutex);
-+    qemu_event_init(&current_incoming->main_thread_load_event, false);
-+    qemu_sem_init(&current_incoming->postcopy_pause_sem_dst, 0);
-+    qemu_sem_init(&current_incoming->postcopy_pause_sem_fault, 0);
- }
- 
- /* For outgoing */
-@@ -140,19 +152,8 @@ MigrationState *migrate_get_current(void)
- 
- MigrationIncomingState *migration_incoming_get_current(void)
- {
--    static bool once;
--    static MigrationIncomingState mis_current;
--
--    if (!once) {
--        mis_current.state = MIGRATION_STATUS_NONE;
--        memset(&mis_current, 0, sizeof(MigrationIncomingState));
--        qemu_mutex_init(&mis_current.rp_mutex);
--        qemu_event_init(&mis_current.main_thread_load_event, false);
--        qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
--        qemu_sem_init(&mis_current.postcopy_pause_sem_fault, 0);
--        once = true;
--    }
--    return &mis_current;
-+    assert(current_incoming);
-+    return current_incoming;
- }
- 
- void migration_incoming_state_destroy(void)
--- 
-2.7.4
+> > So I tried this on master just for fun, and 'make V=1 SPEED=slow
+> > check-qtest-x86_64' promptly failed for some ivshmem test.
+> > 
+> > On x86_86:
+> > TEST: tests/ivshmem-test... (pid=3672)
+> >   /x86_64/ivshmem/single:                                              OK
+> >   /x86_64/ivshmem/hotplug:                                             OK
+> >   /x86_64/ivshmem/memdev:                                              OK
+> >   /x86_64/ivshmem/pair:                                                OK
+> >   /x86_64/ivshmem/server-msi:                                          **
+> > ERROR:/home/cohuck/git/qemu/tests/ivshmem-test.c:367:test_ivshmem_server: assertion failed (ret == 0): (1 == 0)
+> > FAIL
+> > GTester: last random seed: R02Scde8fd6835fdf17450c73e2f74f25007
+> > (pid=3697)
+> >  /x86_64/ivshmem/server-irq:                                          OK
+> > FAIL: tests/ivshmem-test
+
+I think this one is understood now...
+
+> > 
+> > On s390x:
+> > TEST: tests/ivshmem-test... (pid=63617)
+> >   /x86_64/ivshmem/single:                                              OK
+> >   /x86_64/ivshmem/hotplug:                                             OK
+> >   /x86_64/ivshmem/memdev:                                              OK
+> >   /x86_64/ivshmem/pair:                                                OK
+> >   /x86_64/ivshmem/server-msi:                                          qemu-system-x86_64: -device ivshmem-doorbell,chardev=chr0,vectors=2: server sent invalid ID message
+> > Broken pipe
+> > FAIL
+> > GTester: last random seed: R02Sda000f7be5ce27b3dfbb03d12f297b69
+> > (pid=63640)
+> >   /x86_64/ivshmem/server-irq:                                          qemu-system-x86_64: -device ivshmem,size=1M,msi=off,chardev=chr0,vectors=2: server sent invalid ID message
+> > Broken pipe
+> > FAIL
+> > GTester: last random seed: R02S5a236dbcac35545cc34c0131fbc06162
+> > (pid=63648)
+> > FAIL: tests/ivshmem-test
+
+...but this is a different problem (i.e., it can't be tracked down to
+commit b4ba67d9a7). I'm not sure whether that one ever worked. Might be
+an endianness problem (a quick test on another BE platform could
+confirm.)
+
+> > 
+> > Both machines are on Fedora 26.  
+> 
+> The ivshmem test fails for me with SPEED=slow, too (on a x86 RHEL7
+> machine). Looks like it is definitely broken. Could anybody with some
+> ivshmem knowledge please have a look at this?
+> 
+>  Thanks,
+>   Thomas
