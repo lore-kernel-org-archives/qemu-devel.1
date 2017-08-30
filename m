@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dn5AJ-0006iV-PN
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 11:44:28 -0400
+	(envelope-from <crosa@redhat.com>) id 1dn5Kt-0001iv-BZ
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 11:55:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dn5AD-0004u4-W6
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 11:44:27 -0400
-Date: Wed, 30 Aug 2017 16:44:16 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170830154416.GV24565@stefanha-x1.localdomain>
-References: <20170822131832.20191-1-pbonzini@redhat.com>
-	<20170822131832.20191-9-pbonzini@redhat.com>
+	(envelope-from <crosa@redhat.com>) id 1dn5Ko-0003bQ-HE
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 11:55:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59498)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1dn5Ko-0003b5-6q
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 11:55:18 -0400
+References: <20170818170526.13496-1-apahim@redhat.com>
+	<20170818170526.13496-8-apahim@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <aff4b90a-1109-8fee-43de-1e1f42f893ea@redhat.com>
+Date: Wed, 30 Aug 2017 11:55:05 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170822131832.20191-9-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 08/10] scsi: build
- qemu-pr-helper
+In-Reply-To: <20170818170526.13496-8-apahim@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="4Q3UtHsMEqHgrMbd5HtKQW8jP9eGmBIBh"
+Subject: Re: [Qemu-devel] [PATCH v7 07/11] qemu.py: include debug
+ information on launch error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,118 +29,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
+To: Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, ldoktor@redhat.com
 
-On Tue, Aug 22, 2017 at 03:18:30PM +0200, Paolo Bonzini wrote:
-> diff --git a/docs/interop/pr-helper.rst b/docs/interop/pr-helper.rst
-> new file mode 100644
-> index 0000000000..765174c31f
-> --- /dev/null
-> +++ b/docs/interop/pr-helper.rst
-> @@ -0,0 +1,78 @@
-> +..
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4Q3UtHsMEqHgrMbd5HtKQW8jP9eGmBIBh
+From: Cleber Rosa <crosa@redhat.com>
+To: Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, famz@redhat.com, berrange@redhat.com,
+ ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com,
+ ldoktor@redhat.com
+Message-ID: <aff4b90a-1109-8fee-43de-1e1f42f893ea@redhat.com>
+Subject: Re: [PATCH v7 07/11] qemu.py: include debug information on launch
+ error
+References: <20170818170526.13496-1-apahim@redhat.com>
+ <20170818170526.13496-8-apahim@redhat.com>
+In-Reply-To: <20170818170526.13496-8-apahim@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+
+
+On 08/18/2017 01:05 PM, Amador Pahim wrote:
+> When launching a VM, if an exception happens and the VM is not
+> initiated, it might be useful to see the qemu command line and
+> the qemu command output.
+>=20
+> This patch creates that message. Notice that self._iolog needs to be
+> cleaned up in the beginning of the launch() to make sure we will not
+> expose the qemu log from a previous launch if the current one fails.
+>=20
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
+> ---
+>  scripts/qemu.py | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>=20
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index 0bcec4b3b1..29fd2469f9 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -147,6 +147,7 @@ class QEMUMachine(object):
+> =20
+>      def launch(self):
+>          '''Launch the VM and establish a QMP connection'''
+> +        self._iolog =3D None
+>          self._qemu_full_args =3D None
+>          devnull =3D open(os.path.devnull, 'rb')
+>          qemulog =3D open(self._qemu_log_path, 'wb')
+> @@ -162,6 +163,13 @@ class QEMUMachine(object):
+>              self._post_launch()
+>          except:
+>              self.shutdown()
 > +
-> +======================================
-> +Persistent reservation helper protocol
-> +======================================
-> +
-> +QEMU's SCSI passthrough devices, ``scsi-block`` and ``scsi-generic``,
-> +can delegate implementation of persistent reservations to an external
-> +(and typically privilege) program.  Persistent Reservations allow
-
-privileged
-
-> diff --git a/scsi/pr-helper.h b/scsi/pr-helper.h
-> new file mode 100644
-> index 0000000000..2c7ccc9928
-> --- /dev/null
-> +++ b/scsi/pr-helper.h
-> @@ -0,0 +1,13 @@
-
-Do you want to license this file under the BSD license just in case
-someone wants to copy it into an external helper implementation?  The
-file is trivial but still.
-
-> +#ifndef QEMU_PR_HELPER_H
-> +#define QEMU_PR_HELPER_H 1
+> +            LOG.debug('Error launching VM')
+> +            if self._qemu_full_args:
+> +                LOG.debug('Command: %r', ' '.join(self._qemu_full_args=
+))
+> +            if self._iolog:
+> +                LOG.debug('Output: %r', self._iolog)
 > +
 
-Missing #include <stdint.h> for in32_t and uint8_t.
+Based on Fam's comment about the signal message being a warning (worth
+showing by default), I also think this deserves more than a "debug"
+classification.
 
-> +#include "qemu/osdep.h"
-> +#include <getopt.h>
-> +#include "qapi/error.h"
-> +#include "qemu-common.h"
-> +#include "qemu/cutils.h"
-> +#include "qemu/main-loop.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/config-file.h"
-> +#include "qemu/bswap.h"
-> +#include "qemu/log.h"
-> +#include "qemu/systemd.h"
-> +#include "qapi/util.h"
-> +#include "qapi/qmp/qstring.h"
-> +#include "io/channel-socket.h"
-> +#include "trace/control.h"
-> +#include "qemu-version.h"
-> +
-> +#include "block/aio.h"
-> +#include "block/thread-pool.h"
-> +
-> +#include "scsi/constants.h"
-> +#include "scsi/utils.h"
-> +#include "pr-helper.h"
-> +#include <sys/ioctl.h>
-> +#include <linux/dm-ioctl.h>
-> +#include <scsi/sg.h>
-> +
-> +#ifdef CONFIG_LIBCAP
-> +#include <cap-ng.h>
-> +#endif
-> +#include <pwd.h>
-> +#include <grp.h>
+- Cleber.
 
-#include ordering
+>              raise
+> =20
+>      def shutdown(self):
+>=20
 
-> +static int prh_read(PRHelperClient *client, void *buf, int sz, Error **errp)
-> +{
-> +    while (sz > 0) {
-> +        int *fds = NULL;
-> +        size_t nfds = 0;
-> +        int i;
-> +        struct iovec iov;
-> +        ssize_t n_read;
-> +
-> +        iov.iov_base = buf;
-> +        iov.iov_len = sz;
-> +        n_read = qio_channel_readv_full(QIO_CHANNEL(client->ioc), &iov, 1,
-> +                                        &fds, &nfds, errp);
-> +
-> +        if (n_read == QIO_CHANNEL_ERR_BLOCK) {
-> +            qio_channel_yield(QIO_CHANNEL(client->ioc), G_IO_IN);
-> +            continue;
-> +        }
-> +        if (n_read <= 0) {
-> +            return n_read ? n_read : -1;
 
-This assumes that client->fd == -1.  It's probably true on Linux but I'm
-not sure.  What happens if the client sends an fd with a write that is
-smaller than sz, and then follows up by closing the socket?  In the
-worst case this would leak client->fd (the caller assumes it's -1 on
-failure).
+--4Q3UtHsMEqHgrMbd5HtKQW8jP9eGmBIBh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> +        }
-> +
-> +        /* Stash one file descriptor per request.  */
-> +        if (nfds) {
-> +            for (i = 0; i < nfds; i++) {
-> +                if (client->fd == -1) {
-> +                    client->fd = fds[i++];
+-----BEGIN PGP SIGNATURE-----
 
-i++ looks like a bug.  The loop is already iterating fds[i] so we don't
-need to increment it.  This would leak the following file descriptor.
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAlmm39kACgkQZX6NM6Xy
+CfMsdBAAhIhVKDj7gGQe0HTT8xLFfsIpP/vSYyo5aXd//NW4BjAdLgQ8KetSn/se
+67/thquOfFgP0q9QUnbPJdpaeL0mPLY14yPrx5gdz/VnBV02GwzTNXfa+vINIeuz
+HkCpS3x5L74svCP+2w00QR3Iw/vmwhQDzukTw6P/qc0R2g9uhFzqf8frvzL+Sxjv
+98wr25MOW4hXiC0FPDZCMxJzRFKHtE/YWdiJv8ynIQ6m5r9abKlW1LYei4nNq3Yw
+il1nWaXujNxYjqkO+c4XsrvISakxRnGfBoCVJqkFKno8f5yRklzmLdjUcgo7uBNe
+SCU5TkfOEUEXAA+0bD4BmrFe+IHVE3gRw/cgJGHrC3JyRsMnsf7rbj/rrZ0vrChd
+9E9V842Mtm4uOXYdkPbWxBbEUStgZ8k2WkZY9Kpsb1rmFchncrkBIWsnvQ0UZLVL
+HhKvPr+6UcpWLekMuu1W1Jpcq4r0QYyaGgIV7XUefmlCipudZb+Vi9lTG4F7fNZP
+zObggkfwkE2sK0bfYzifnQQXsx6QAIRU+OuCHtLDkq3vKZpwjFr4wFjCkVmBE62P
+qCAGvoAaZ8YgjsDqRfD88RQ31zFDlktw7bGJR2xbNQpIVe9awCJ74yTvF/gmmE0G
+h0lg2Tx43lrw7vl9EnDxTFXBCLJCh9BPZra9cNVUvixpIs/gwJg=
+=wTsj
+-----END PGP SIGNATURE-----
 
-> +static void prh_co_entry(void *opaque)
-
-coroutine_fn
+--4Q3UtHsMEqHgrMbd5HtKQW8jP9eGmBIBh--
