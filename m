@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dn7Od-0001ny-2O
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:07:24 -0400
+	(envelope-from <eblake@redhat.com>) id 1dn7Oa-0001mH-A9
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:07:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dn7Ob-0001Yv-LL
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:07:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1dn7OX-0001YD-3g
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:07:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57786)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dn7OW-0001Y3-Tw
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:07:17 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 017544E4D1
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 18:07:16 +0000 (UTC)
+Received: from red.redhat.com (ovpn-122-186.rdu2.redhat.com [10.10.122.186])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9AB9E173A6
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 18:07:15 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 30 Aug 2017 13:07:01 -0500
-Message-Id: <20170830180711.7974-2-eblake@redhat.com>
-In-Reply-To: <20170830180711.7974-1-eblake@redhat.com>
-References: <20170830180711.7974-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 01/11] qemu-iotests: Extend non-shared storage
- migration test (194)
+Date: Wed, 30 Aug 2017 13:07:00 -0500
+Message-Id: <20170830180711.7974-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL 00/11] NBD patches for 2.11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,113 +31,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kashyap Chamarthy <kchamart@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-From: Kashyap Chamarthy <kchamart@redhat.com>
+The following changes since commit 1ab5eb4efb91a3d4569b0df6e824cc08ab4bd8ec:
 
-This is the follow-up patch that was discussed[*] as part of feedback to
-qemu-iotest 194.
+  Update version for v2.10.0 release (2017-08-30 17:02:54 +0100)
 
-Changes in this patch:
+are available in the git repository at:
 
-  - Supply 'job-id' parameter to `drive-mirror` invocation.
+  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-08-30
 
-  - Once migration completes, issue QMP `block-job-cancel` command on
-    the source QEMU to gracefully complete `drive-mirror` operation.
+for you to fetch changes up to f35dff7e13b84d3fffe1103c2c69afd81df5e4f5:
 
-  - Once the BLOCK_JOB_COMPLETED event is emitted, stop the NBD server
-    on the destination QEMU.
+  block/nbd-client: refactor request send/receive (2017-08-30 13:00:38 -0500)
 
-  - Check for both the events: MIGRATION and BLOCK_JOB_COMPLETED.
+----------------------------------------------------------------
+nbd patches for 2017-08-30
 
-With the above, the test will also be (almost) in sync with the
-procedure outlined in the document 'live-block-operations.rst'[+]
-(section: "QMP invocation for live storage migration with
-``drive-mirror`` + NBD").
+- Kashyap Chamarthy: qemu-iotests: Extend non-shared storage migration test (194)
+- Stefan Hajnaczi: 0/3 nbd-client: enter read_reply_co during init to avoid crash
+- Vladimir Sementsov-Ogievskiy: portions of 0/17 nbd client refactoring and fixing
 
-[*] https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg04820.html
-    -- qemu-iotests: add 194 non-shared storage migration test
-[+] https://git.qemu.org/gitweb.cgi?p=qemu.git;a=blob;f=docs/interop/live-block-operations.rst
+----------------------------------------------------------------
+Kashyap Chamarthy (1):
+      qemu-iotests: Extend non-shared storage migration test (194)
 
-Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
-Message-Id: <20170829165058.8229-1-kchamart@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- tests/qemu-iotests/194     | 23 +++++++++++++++++------
- tests/qemu-iotests/194.out | 11 ++++++++---
- 2 files changed, 25 insertions(+), 9 deletions(-)
+Stefan Hajnoczi (3):
+      nbd-client: avoid read_reply_co entry if send failed
+      qemu-iotests: improve nbd-fault-injector.py startup protocol
+      qemu-iotests: test NBD over UNIX domain sockets in 083
 
-diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
-index 8028111e21..a3e3bad664 100755
---- a/tests/qemu-iotests/194
-+++ b/tests/qemu-iotests/194
-@@ -46,16 +46,17 @@ iotests.log('Launching NBD server on destination...')
- iotests.log(dest_vm.qmp('nbd-server-start', addr={'type': 'unix', 'data': {'path': nbd_sock_path}}))
- iotests.log(dest_vm.qmp('nbd-server-add', device='drive0', writable=True))
+Vladimir Sementsov-Ogievskiy (7):
+      nbd/client: fix nbd_opt_go
+      nbd/client: refactor nbd_read_eof
+      nbd/client: refactor nbd_receive_reply
+      nbd/client: fix nbd_send_request to return int
+      block/nbd-client: get rid of ssize_t
+      block/nbd-client: rename nbd_recv_coroutines_enter_all
+      block/nbd-client: refactor request send/receive
 
--iotests.log('Starting drive-mirror on source...')
-+iotests.log('Starting `drive-mirror` on source...')
- iotests.log(source_vm.qmp(
-               'drive-mirror',
-               device='drive0',
-               target='nbd+unix:///drive0?socket={0}'.format(nbd_sock_path),
-               sync='full',
-               format='raw', # always raw, the server handles the format
--              mode='existing'))
-+              mode='existing',
-+              job_id='mirror-job0'))
+ include/block/nbd.h                      |   4 +-
+ nbd/nbd-internal.h                       |  33 +++++--
+ block/nbd-client.c                       | 102 ++++++++-------------
+ nbd/client.c                             |  21 +++--
+ tests/qemu-iotests/common.filter         |   4 +-
+ tests/qemu-iotests/083                   | 138 +++++++++++++++++-----------
+ tests/qemu-iotests/083.out               | 149 +++++++++++++++++++++++++++----
+ tests/qemu-iotests/194                   |  23 +++--
+ tests/qemu-iotests/194.out               |  11 ++-
+ tests/qemu-iotests/nbd-fault-injector.py |   4 +
+ 10 files changed, 319 insertions(+), 170 deletions(-)
 
--iotests.log('Waiting for drive-mirror to complete...')
-+iotests.log('Waiting for `drive-mirror` to complete...')
- iotests.log(source_vm.event_wait('BLOCK_JOB_READY'),
-             filters=[iotests.filter_qmp_event])
-
-@@ -67,7 +68,17 @@ dest_vm.qmp('migrate-set-capabilities',
- iotests.log(source_vm.qmp('migrate', uri='unix:{0}'.format(migration_sock_path)))
-
- while True:
--    event = source_vm.event_wait('MIGRATION')
--    iotests.log(event, filters=[iotests.filter_qmp_event])
--    if event['data']['status'] in ('completed', 'failed'):
-+    event1 = source_vm.event_wait('MIGRATION')
-+    iotests.log(event1, filters=[iotests.filter_qmp_event])
-+    if event1['data']['status'] in ('completed', 'failed'):
-+        iotests.log('Gracefully ending the `drive-mirror` job on source...')
-+        iotests.log(source_vm.qmp('block-job-cancel', device='mirror-job0'))
-+        break
-+
-+while True:
-+    event2 = source_vm.event_wait('BLOCK_JOB_COMPLETED')
-+    iotests.log(event2, filters=[iotests.filter_qmp_event])
-+    if event2['event'] == 'BLOCK_JOB_COMPLETED':
-+        iotests.log('Stopping the NBD server on destination...')
-+        iotests.log(dest_vm.qmp('nbd-server-stop'))
-         break
-diff --git a/tests/qemu-iotests/194.out b/tests/qemu-iotests/194.out
-index ae501fecac..50ac50da5e 100644
---- a/tests/qemu-iotests/194.out
-+++ b/tests/qemu-iotests/194.out
-@@ -2,12 +2,17 @@ Launching VMs...
- Launching NBD server on destination...
- {u'return': {}}
- {u'return': {}}
--Starting drive-mirror on source...
-+Starting `drive-mirror` on source...
- {u'return': {}}
--Waiting for drive-mirror to complete...
--{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'drive0', u'type': u'mirror', u'speed': 0, u'len': 1073741824, u'offset': 1073741824}, u'event': u'BLOCK_JOB_READY'}
-+Waiting for `drive-mirror` to complete...
-+{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'mirror-job0', u'type': u'mirror', u'speed': 0, u'len': 1073741824, u'offset': 1073741824}, u'event': u'BLOCK_JOB_READY'}
- Starting migration...
- {u'return': {}}
- {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'setup'}, u'event': u'MIGRATION'}
- {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'active'}, u'event': u'MIGRATION'}
- {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'completed'}, u'event': u'MIGRATION'}
-+Gracefully ending the `drive-mirror` job on source...
-+{u'return': {}}
-+{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'device': u'mirror-job0', u'type': u'mirror', u'speed': 0, u'len': 1073741824, u'offset': 1073741824}, u'event': u'BLOCK_JOB_COMPLETED'}
-+Stopping the NBD server on destination...
-+{u'return': {}}
 -- 
 2.13.5
