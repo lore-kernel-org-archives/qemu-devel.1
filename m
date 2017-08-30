@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34753)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnBr0-0003VA-51
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:52:59 -0400
+	id 1dnBr7-0003dC-H8
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:53:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnBqy-0002Gh-LE
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:52:58 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35788)
+	id 1dnBr6-0002IU-Cm
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:53:05 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35965)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnBqy-0002GW-Fc
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:52:56 -0400
-Received: by mail-qt0-x241.google.com with SMTP id u11so6363254qtu.2
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 15:52:56 -0700 (PDT)
+	id 1dnBr6-0002IL-7j
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:53:04 -0400
+Received: by mail-qt0-x242.google.com with SMTP id e2so6358782qta.3
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 15:53:04 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 30 Aug 2017 19:52:23 -0300
-Message-Id: <20170830225225.27925-6-f4bug@amsat.org>
+Date: Wed, 30 Aug 2017 19:52:25 -0300
+Message-Id: <20170830225225.27925-8-f4bug@amsat.org>
 In-Reply-To: <20170830225225.27925-1-f4bug@amsat.org>
 References: <20170830225225.27925-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 5/7] mips: MIPSCPU model subclasses
+Subject: [Qemu-devel] [PATCH v2 7/7] mips: update mips_cpu_list() to use
+ object_class_get_list()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,304 +35,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, James Hogan <james.hogan@imgtec.com>, Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>
 
-From: Igor Mammedov <imammedo@redhat.com>
+while here, move it from translate_init.c to helper.c
 
-Register separate QOM types for each mips cpu model,
-so it would be possible to reuse generic CPU creation
-routines.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-[PMD: use internal.h, use void* to hold cpu_def in MIPSCPUClass,
- mark MIPSCPU abstract]
+Tested-by: Igor Mammedov <imammedo@redhat.com>
 Tested-by: James Hogan <james.hogan@imgtec.com>
 ---
- target/mips/cpu-qom.h        |  1 +
- target/mips/internal.h       | 59 ++++++++++++++++++++++++++++++++++++++++++++
- target/mips/cpu.c            | 53 ++++++++++++++++++++++++++++++++++++++-
- target/mips/translate.c      | 13 +++++-----
- target/mips/translate_init.c | 58 ++-----------------------------------------
- 5 files changed, 120 insertions(+), 64 deletions(-)
+ target/mips/helper.c         | 46 ++++++++++++++++++++++++++++++++++++++++++++
+ target/mips/translate_init.c | 10 ----------
+ 2 files changed, 46 insertions(+), 10 deletions(-)
 
-diff --git a/target/mips/cpu-qom.h b/target/mips/cpu-qom.h
-index 3f5bf23823..085711d8f9 100644
---- a/target/mips/cpu-qom.h
-+++ b/target/mips/cpu-qom.h
-@@ -49,6 +49,7 @@ typedef struct MIPSCPUClass {
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index ea076261af..8d12b0088a 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -1093,3 +1093,49 @@ void QEMU_NORETURN do_raise_exception_err(CPUMIPSState *env,
  
-     DeviceRealize parent_realize;
-     void (*parent_reset)(CPUState *cpu);
-+    const void *cpu_def;
- } MIPSCPUClass;
- 
- typedef struct MIPSCPU MIPSCPU;
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index cf4c9db427..45ded3484c 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -7,6 +7,65 @@
- #ifndef MIPS_INTERNAL_H
- #define MIPS_INTERNAL_H
- 
-+
-+/* MMU types, the first four entries have the same layout as the
-+   CP0C0_MT field.  */
-+enum mips_mmu_types {
-+    MMU_TYPE_NONE,
-+    MMU_TYPE_R4000,
-+    MMU_TYPE_RESERVED,
-+    MMU_TYPE_FMT,
-+    MMU_TYPE_R3000,
-+    MMU_TYPE_R6000,
-+    MMU_TYPE_R8000
-+};
-+
-+struct mips_def_t {
-+    const char *name;
-+    int32_t CP0_PRid;
-+    int32_t CP0_Config0;
-+    int32_t CP0_Config1;
-+    int32_t CP0_Config2;
-+    int32_t CP0_Config3;
-+    int32_t CP0_Config4;
-+    int32_t CP0_Config4_rw_bitmask;
-+    int32_t CP0_Config5;
-+    int32_t CP0_Config5_rw_bitmask;
-+    int32_t CP0_Config6;
-+    int32_t CP0_Config7;
-+    target_ulong CP0_LLAddr_rw_bitmask;
-+    int CP0_LLAddr_shift;
-+    int32_t SYNCI_Step;
-+    int32_t CCRes;
-+    int32_t CP0_Status_rw_bitmask;
-+    int32_t CP0_TCStatus_rw_bitmask;
-+    int32_t CP0_SRSCtl;
-+    int32_t CP1_fcr0;
-+    int32_t CP1_fcr31_rw_bitmask;
-+    int32_t CP1_fcr31;
-+    int32_t MSAIR;
-+    int32_t SEGBITS;
-+    int32_t PABITS;
-+    int32_t CP0_SRSConf0_rw_bitmask;
-+    int32_t CP0_SRSConf0;
-+    int32_t CP0_SRSConf1_rw_bitmask;
-+    int32_t CP0_SRSConf1;
-+    int32_t CP0_SRSConf2_rw_bitmask;
-+    int32_t CP0_SRSConf2;
-+    int32_t CP0_SRSConf3_rw_bitmask;
-+    int32_t CP0_SRSConf3;
-+    int32_t CP0_SRSConf4_rw_bitmask;
-+    int32_t CP0_SRSConf4;
-+    int32_t CP0_PageGrain_rw_bitmask;
-+    int32_t CP0_PageGrain;
-+    target_ulong CP0_EBaseWG_rw_bitmask;
-+    int insn_flags;
-+    enum mips_mmu_types mmu_type;
-+};
-+
-+extern const struct mips_def_t mips_defs[];
-+extern const int mips_defs_number;
-+
- enum CPUMIPSMSADataFormat {
-     DF_BYTE = 0,
-     DF_HALF,
-diff --git a/target/mips/cpu.c b/target/mips/cpu.c
-index e3ef835599..84b6f8bf68 100644
---- a/target/mips/cpu.c
-+++ b/target/mips/cpu.c
-@@ -146,12 +146,37 @@ static void mips_cpu_initfn(Object *obj)
-     CPUState *cs = CPU(obj);
-     MIPSCPU *cpu = MIPS_CPU(obj);
-     CPUMIPSState *env = &cpu->env;
-+    MIPSCPUClass *mcc = MIPS_CPU_GET_CLASS(obj);
- 
-     cs->env_ptr = env;
- 
-     if (tcg_enabled()) {
-         mips_tcg_init();
-     }
-+
-+    if (mcc->cpu_def) {
-+        env->cpu_model = mcc->cpu_def;
-+    }
-+}
-+
-+static char *mips_cpu_type_name(const char *cpu_model)
-+{
-+    return g_strdup_printf("%s-" TYPE_MIPS_CPU, cpu_model);
-+}
-+
-+static ObjectClass *mips_cpu_class_by_name(const char *cpu_model)
-+{
-+    ObjectClass *oc;
-+    char *typename;
-+
-+    if (cpu_model == NULL) {
-+        return NULL;
-+    }
-+
-+    typename = mips_cpu_type_name(cpu_model);
-+    oc = object_class_by_name(typename);
-+    g_free(typename);
-+    return oc;
+     cpu_loop_exit_restore(cs, pc);
  }
- 
- static void mips_cpu_class_init(ObjectClass *c, void *data)
-@@ -166,6 +191,7 @@ static void mips_cpu_class_init(ObjectClass *c, void *data)
-     mcc->parent_reset = cc->reset;
-     cc->reset = mips_cpu_reset;
- 
-+    cc->class_by_name = mips_cpu_class_by_name;
-     cc->has_work = mips_cpu_has_work;
-     cc->do_interrupt = mips_cpu_do_interrupt;
-     cc->cpu_exec_interrupt = mips_cpu_exec_interrupt;
-@@ -193,14 +219,39 @@ static const TypeInfo mips_cpu_type_info = {
-     .parent = TYPE_CPU,
-     .instance_size = sizeof(MIPSCPU),
-     .instance_init = mips_cpu_initfn,
--    .abstract = false,
-+    .abstract = true,
-     .class_size = sizeof(MIPSCPUClass),
-     .class_init = mips_cpu_class_init,
- };
- 
-+static void mips_cpu_cpudef_class_init(ObjectClass *oc, void *data)
++
++/* Sort alphabetically by type name, except for "any". */
++static gint mips_cpu_list_compare(gconstpointer a, gconstpointer b)
 +{
-+    MIPSCPUClass *mcc = MIPS_CPU_CLASS(oc);
-+    mcc->cpu_def = data;
++    ObjectClass *class_a = (ObjectClass *)a;
++    ObjectClass *class_b = (ObjectClass *)b;
++    const char *name_a, *name_b;
++
++    name_a = object_class_get_name(class_a);
++    name_b = object_class_get_name(class_b);
++    if (strcmp(name_a, "any-" TYPE_MIPS_CPU) == 0) {
++        return 1;
++    } else if (strcmp(name_b, "any-" TYPE_MIPS_CPU) == 0) {
++        return -1;
++    } else {
++        return strcmp(name_a, name_b);
++    }
 +}
 +
-+static void mips_register_cpudef_type(const struct mips_def_t *def)
++static void mips_cpu_list_entry(gpointer data, gpointer user_data)
 +{
-+    char *typename = mips_cpu_type_name(def->name);
-+    TypeInfo ti = {
-+        .name = typename,
-+        .parent = TYPE_MIPS_CPU,
-+        .class_init = mips_cpu_cpudef_class_init,
-+        .class_data = (void *)def,
++    ObjectClass *oc = data;
++    CPUListState *s = user_data;
++    const char *typename;
++    char *name;
++
++    typename = object_class_get_name(oc);
++    name = g_strndup(typename, strlen(typename) - strlen("-" TYPE_MIPS_CPU));
++    (*s->cpu_fprintf)(s->file, "  %s\n", name);
++    g_free(name);
++}
++
++void mips_cpu_list(FILE *f, fprintf_function cpu_fprintf)
++{
++    CPUListState s = {
++        .file = f,
++        .cpu_fprintf = cpu_fprintf,
 +    };
++    GSList *list;
 +
-+    type_register(&ti);
-+    g_free(typename);
++    list = object_class_get_list(TYPE_MIPS_CPU, false);
++    list = g_slist_sort(list, mips_cpu_list_compare);
++    (*cpu_fprintf)(f, "Available CPUs:\n");
++    g_slist_foreach(list, mips_cpu_list_entry, &s);
++    g_slist_free(list);
 +}
-+
- static void mips_cpu_register_types(void)
- {
-+    int i;
-+
-     type_register_static(&mips_cpu_type_info);
-+    for (i = 0; i < mips_defs_number; i++) {
-+        mips_register_cpudef_type(&mips_defs[i]);
-+    }
- }
- 
- type_init(mips_cpu_register_types)
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 94c38e8755..f7128bc91d 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -20525,16 +20525,15 @@ void cpu_mips_realize_env(CPUMIPSState *env)
- 
- MIPSCPU *cpu_mips_init(const char *cpu_model)
- {
-+    ObjectClass *oc;
-     MIPSCPU *cpu;
--    CPUMIPSState *env;
--    const mips_def_t *def;
- 
--    def = cpu_mips_find_by_name(cpu_model);
--    if (!def)
-+    oc = cpu_class_by_name(TYPE_MIPS_CPU, cpu_model);
-+    if (oc == NULL) {
-         return NULL;
--    cpu = MIPS_CPU(object_new(TYPE_MIPS_CPU));
--    env = &cpu->env;
--    env->cpu_model = def;
-+    }
-+
-+    cpu = MIPS_CPU(object_new(object_class_get_name(oc)));
- 
-     object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
- 
 diff --git a/target/mips/translate_init.c b/target/mips/translate_init.c
-index 255d25bacd..8bbded46c4 100644
+index 8bbded46c4..b75f4c9065 100644
 --- a/target/mips/translate_init.c
 +++ b/target/mips/translate_init.c
-@@ -51,64 +51,9 @@
- #define MIPS_CONFIG5                                              \
- ((0 << CP0C5_M))
+@@ -767,16 +767,6 @@ static const mips_def_t *cpu_mips_find_by_name (const char *name)
+     return NULL;
+ }
  
--/* MMU types, the first four entries have the same layout as the
--   CP0C0_MT field.  */
--enum mips_mmu_types {
--    MMU_TYPE_NONE,
--    MMU_TYPE_R4000,
--    MMU_TYPE_RESERVED,
--    MMU_TYPE_FMT,
--    MMU_TYPE_R3000,
--    MMU_TYPE_R6000,
--    MMU_TYPE_R8000
--};
+-void mips_cpu_list (FILE *f, fprintf_function cpu_fprintf)
+-{
+-    int i;
 -
--struct mips_def_t {
--    const char *name;
--    int32_t CP0_PRid;
--    int32_t CP0_Config0;
--    int32_t CP0_Config1;
--    int32_t CP0_Config2;
--    int32_t CP0_Config3;
--    int32_t CP0_Config4;
--    int32_t CP0_Config4_rw_bitmask;
--    int32_t CP0_Config5;
--    int32_t CP0_Config5_rw_bitmask;
--    int32_t CP0_Config6;
--    int32_t CP0_Config7;
--    target_ulong CP0_LLAddr_rw_bitmask;
--    int CP0_LLAddr_shift;
--    int32_t SYNCI_Step;
--    int32_t CCRes;
--    int32_t CP0_Status_rw_bitmask;
--    int32_t CP0_TCStatus_rw_bitmask;
--    int32_t CP0_SRSCtl;
--    int32_t CP1_fcr0;
--    int32_t CP1_fcr31_rw_bitmask;
--    int32_t CP1_fcr31;
--    int32_t MSAIR;
--    int32_t SEGBITS;
--    int32_t PABITS;
--    int32_t CP0_SRSConf0_rw_bitmask;
--    int32_t CP0_SRSConf0;
--    int32_t CP0_SRSConf1_rw_bitmask;
--    int32_t CP0_SRSConf1;
--    int32_t CP0_SRSConf2_rw_bitmask;
--    int32_t CP0_SRSConf2;
--    int32_t CP0_SRSConf3_rw_bitmask;
--    int32_t CP0_SRSConf3;
--    int32_t CP0_SRSConf4_rw_bitmask;
--    int32_t CP0_SRSConf4;
--    int32_t CP0_PageGrain_rw_bitmask;
--    int32_t CP0_PageGrain;
--    target_ulong CP0_EBaseWG_rw_bitmask;
--    int insn_flags;
--    enum mips_mmu_types mmu_type;
--};
+-    for (i = 0; i < ARRAY_SIZE(mips_defs); i++) {
+-        (*cpu_fprintf)(f, "MIPS '%s'\n",
+-                       mips_defs[i].name);
+-    }
+-}
 -
- /*****************************************************************************/
- /* MIPS CPU definitions */
--static const mips_def_t mips_defs[] =
-+const mips_def_t mips_defs[] =
- {
-     {
-         .name = "4Kc",
-@@ -808,6 +753,7 @@ static const mips_def_t mips_defs[] =
- 
- #endif
- };
-+const int mips_defs_number = ARRAY_SIZE(mips_defs);
- 
- static const mips_def_t *cpu_mips_find_by_name (const char *name)
+ #ifndef CONFIG_USER_ONLY
+ static void no_mmu_init (CPUMIPSState *env, const mips_def_t *def)
  {
 -- 
 2.14.1
