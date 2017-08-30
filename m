@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dms6f-0001Yo-2U
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 21:47:50 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dmsTp-0005fN-6r
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 22:11:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dms6b-0005Lk-UD
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 21:47:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42766)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dms6b-0005LY-LA
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 21:47:45 -0400
-References: <150338618197.30.13431977153264372738@205a2245145f>
-	<d178cec4-e84f-4a1b-8f83-fa0d85d6f707@redhat.com>
-	<20170829104526.GA8146@lemon>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <a4d51cbf-1506-a38c-54b8-06d8d55e28a3@redhat.com>
-Date: Wed, 30 Aug 2017 09:47:35 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1dmsTo-0006Tp-0z
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 22:11:45 -0400
+Date: Wed, 30 Aug 2017 12:07:22 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170830020722.GB3386@umbus.fritz.box>
+References: <20170825211119.474-1-danielhb@linux.vnet.ibm.com>
+	<20170829072310.GJ2578@umbus.fritz.box>
+	<df49df06-caaf-81f5-7c24-f4324654a262@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170829104526.GA8146@lemon>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V4 0/3] Optimize COLO-compare performance
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="7ZAtKRhVyVSsbBD2"
+Content-Disposition: inline
+In-Reply-To: <df49df06-caaf-81f5-7c24-f4324654a262@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH for-2.11 v2] hw/ppc: CAS reset
+ on early device hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,109 +26,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
+To: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
 
+--7ZAtKRhVyVSsbBD2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2017=E5=B9=B408=E6=9C=8829=E6=97=A5 18:45, Fam Zheng wrote:
-> On Tue, 08/29 17:01, Jason Wang wrote:
->>
->> On 2017=E5=B9=B408=E6=9C=8822=E6=97=A5 15:16, no-reply@patchew.org wro=
-te:
->>> Hi,
->>>
->>> This series seems to have some coding style problems. See output belo=
-w for
->>> more information:
->>>
->>> Type: series
->>> Message-id: 1503305719-2512-1-git-send-email-zhangchen.fnst@cn.fujits=
-u.com
->>> Subject: [Qemu-devel] [PATCH V4 0/3] Optimize COLO-compare performanc=
-e
->>>
->>> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
->>> #!/bin/bash
->>>
->>> BASE=3Dbase
->>> n=3D1
->>> total=3D$(git log --oneline $BASE.. | wc -l)
->>> failed=3D0
->>>
->>> git config --local diff.renamelimit 0
->>> git config --local diff.renames True
->>>
->>> commits=3D"$(git log --format=3D%H --reverse $BASE..)"
->>> for c in $commits; do
->>>       echo "Checking PATCH $n/$total: $(git log -n 1 --format=3D%s $c=
-)..."
->>>       if ! git show $c --format=3Demail | ./scripts/checkpatch.pl --m=
-ailback -; then
->>>           failed=3D1
->>>           echo
->>>       fi
->>>       n=3D$((n+1))
->>> done
->>>
->>> exit $failed
->>> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
->>>
->>> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
->>> Switched to a new branch 'test'
->>> 37052358b5 net/colo-compare.c: Fix comments and scheme
->>> 46824a6565 net/colo-compare.c: Adjust net queue pop order for perform=
-ance
->>> acea048383 net/colo-compare.c: Optimize unpredictable tcp options com=
-parison
->>>
->>> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
->>> Checking PATCH 1/3: net/colo-compare.c: Optimize unpredictable tcp op=
-tions comparison...
->>> Checking PATCH 2/3: net/colo-compare.c: Adjust net queue pop order fo=
-r performance...
->>> Checking PATCH 3/3: net/colo-compare.c: Fix comments and scheme...
->>> ERROR: space prohibited after that '-' (ctx:WxW)
->>> #18: FILE: net/colo-compare.c:47:
->>> +  |   conn list   + - >      conn     + ------- >      conn     + --=
- > .......
->>>                        ^
->>>
->>> ERROR: space prohibited after that '-' (ctx:OxW)
->>> #18: FILE: net/colo-compare.c:47:
->>> +  |   conn list   + - >      conn     + ------- >      conn     + --=
- > .......
->>>                                                  ^
->>>
->>> ERROR: space required one side of that '--' (ctx:WxW)
->>> #18: FILE: net/colo-compare.c:47:
->>> +  |   conn list   + - >      conn     + ------- >      conn     + --=
- > .......
->>>                                                                      =
-^
->>>
->>> total: 3 errors, 0 warnings, 40 lines checked
->>>
->>> Your patch has style problems, please review.  If any of these errors
->>> are false positives report them to the maintainer, see
->>> CHECKPATCH in MAINTAINERS.
->>>
->>> =3D=3D=3D OUTPUT END =3D=3D=3D
->>>
->>> Test command exited with code: 1
->>>
->>>
->>> ---
->>> Email generated automatically by Patchew [http://patchew.org/].
->>> Please send your feedback to patchew-devel@freelists.org
->> Fam, this looks like a false positive since it was actually an ascii g=
-raph
->> inside a comment?
->>
-> Yes, let's just ignore this report.
->
-> Fam
+On Tue, Aug 29, 2017 at 05:54:28PM -0300, Daniel Henrique Barboza wrote:
+>=20
+>=20
+> On 08/29/2017 04:23 AM, David Gibson wrote:
+> > On Fri, Aug 25, 2017 at 06:11:18PM -0300, Daniel Henrique Barboza wrote:
+> > > v2:
+> > > - rebased with ppc-for-2.11
+> > > - function 'spapr_cas_completed' dropped
+> > > - function 'spapr_drc_needed' made public and it's now used inside
+> > >    'spapr_hotplugged_dev_before_cas'
+> > > - 'spapr_drc_needed' was changed to support the migration of logical
+> > >    DRCs with devs attached in UNUSED state
+> > > - new function: 'spapr_clear_pending_events'. This function is used
+> > >    inside ppc_spapr_reset to reset the pending_events QTAILQ
+> > Thanks for the followup, unfortunately there is still an important bug
+> > left, see comments on the patch itself.
+> >=20
+> > At a higher level, though, looking at the event reset code made me
+> > think of a possible even simpler solution to this problem.
+> >=20
+> > The queue of events (both hotplug and epow) is already in a simple
+> > internal form that's independent of the two delivery mechanisms.  The
+> > only difference is what event source triggers the interrupt.  This
+> > explains why an extra hotplug event after the CAS "unstuck" the queue.
+> >=20
+> > AFAICT, a spurious interrupts here should be harmless - the kernel
+> > will just check the queue and find nothing there.
+> >=20
+> > So, it should be sufficient to, after CAS, pulse the hotplug queue
+> > interrupt if the hotplug queue is negotiated.
+> >=20
+> This is something I've tried in my first attempts at this problem, before
+> sending the first patch in which I blocked hotplug before CAS. Back then,
+> the problem was that the kernel panics with sig 11 (acess of bad area) wh=
+en
+> receiving the pulse after CAS.
 
-Thanks.
+Huh.
 
-I've queued this series.
+> I've investigated it a bit today and it seems that it still the case. Fir=
+ing
+> an IRQ right
+> after CAS breaks the kernel. In fact, if you time a regular CPU hotplug
+> right after
+> CAS you'll get the same sig 11 kernel ooops. It looks like there is a time
+> window after
+> CAS that the kernel can't handle the hotplug process and pulsing the hotp=
+lug
+> queue in this window breaks the guest. I've tried some hacks such as puls=
+ing
+> the queue
+> in the first 'event_scan' call made by the guest, but apparently it is st=
+ill
+> too early.
+>=20
+> I've sent an email to the linuxppc-dev mailing list talking about this
+> behavior
+> and asking if there is a reliable way to know when  we can safely pulse t=
+he
+> hotplug
+> queue. Meanwhile, I'll keep working in the v3 respin of this patch in case
+> this
+> solution of pulsing the hotplug queue ends up being not feasible.
+
+Right.  As Ben's reply says that definitely looks like a guest kernel
+bug.  But, it's in enough kernels in the wild that we really need to
+work around it anyway.  I think the reset-at-CAS approach is our best
+bet to accomplish that at this stage.
+
+Note that the clear-queue-at-reset preliminary cleanup will be
+valuable even if we end up not needing the rest of the reset at CAS
+stuff.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--7ZAtKRhVyVSsbBD2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmmHdgACgkQbDjKyiDZ
+s5JXyxAAoUgzVGz8KP5o4+Qm1wlL++V2vrL3/gr4e7TERSVK4DZlDHXNpHSoIZhY
+/Hpq4Fh2AEID5s3/HdHdEPedSwtRiO/L64uY9mlZ0Kho0/ECiGW8As9KZ0e3n6XG
+vP73CPOAc5aEr/oRgVSNpxl/GV/ycAYE00FLjPs3ATq8J8N0t7QUNwYmR1BFfP0y
+mcgWHMIfLi5n9v+Izld1YTAysGMYiIG3+opQLR+G2bv/vpL1FJA2TuVaFBqKOmeq
+3HoFwXsxCfV3x3BiYD2t8Lz726COMejulfPxk7akBbd0DT8qG2gtfKvKO+dLOE+d
+A43bUDac9n6JIE5fWAEzondUnKL9rFGhzZBPG6Y30jwGtetx7mbDH7CHwr8Hjka8
+5KczK4qSF+mvicYsv6jAHZuvwef/F70gE3nv0abujfN67ojLGRAApNxbbQnCJRAi
+ry8uxmDmHGmtm3xv9sLjQmENJBrKNzDqbgd8vhyuQDlO5IhjTQekbdZqoekHJbpQ
+zNIxuBgZpX5pVd3PejlDMnteBE8HeNAvdyX82ZFb0teyYrVAgDWhImIR9b5WqfRs
+/sfjpPnkPklMqk3XsAvxXDAvNzi4osRAUGBknzvjBiFCAHr6tnNjDBHIX8DnYLUX
+qssDdrtCpehRyjX5VGzBYPJn7AtuxouhNwVE08FjRctbC4Q6pNA=
+=+ZmT
+-----END PGP SIGNATURE-----
+
+--7ZAtKRhVyVSsbBD2--
