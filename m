@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dn6cF-00078U-4S
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:17:23 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dn6fP-0001JF-Uf
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:20:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dn6cC-00067I-0Y
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:17:23 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:34615)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dn6cB-000673-Pi
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:17:19 -0400
-Received: by mail-wm0-x241.google.com with SMTP id l19so2462658wmi.1
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 10:17:19 -0700 (PDT)
-Date: Wed, 30 Aug 2017 18:17:17 +0100
+	(envelope-from <stefanha@gmail.com>) id 1dn6fM-00077d-NS
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:20:39 -0400
+Date: Wed, 30 Aug 2017 18:20:33 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170830171717.GD24565@stefanha-x1.localdomain>
-References: <7c9b2e44-ad64-99e0-cff6-87c669618b00@profihost.ag>
+Message-ID: <20170830172033.GE24565@stefanha-x1.localdomain>
+References: <20170818133118.8650-1-stefanha@redhat.com>
+	<72ab2a83-3da3-a87e-0196-6b4c533e9461@redhat.com>
+	<37256b65-cd64-e4ca-4655-b6dc8d780335@ozlabs.ru>
+	<a3fb2086-5c6c-4b0a-cb05-2061fbfea1e6@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7c9b2e44-ad64-99e0-cff6-87c669618b00@profihost.ag>
-Subject: Re: [Qemu-devel] virtio: network: lost tcp/ip packets
+In-Reply-To: <a3fb2086-5c6c-4b0a-cb05-2061fbfea1e6@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH] qcow2: allocate cluster_cache/cluster_data
+ on demand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,21 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-On Fri, Aug 18, 2017 at 04:40:36PM +0200, Stefan Priebe - Profihost AG wrote:
-> i've a problem with two VMs running on the SAME host machine using qemu
-> 2.7.1 or 2.9.0 and vhost_net + virtio.
+On Tue, Aug 22, 2017 at 02:56:00PM +1000, Alexey Kardashevskiy wrote:
+> On 19/08/17 12:46, Alexey Kardashevskiy wrote:
+> > On 19/08/17 01:18, Eric Blake wrote:
+> >> On 08/18/2017 08:31 AM, Stefan Hajnoczi wrote:
+> >>> Most qcow2 files are uncompressed so it is wasteful to allocate (32 + 1)
+> >>> * cluster_size + 512 bytes upfront.  Allocate s->cluster_cache and
+> >>> s->cluster_data when the first read operation is performance on a
+> >>> compressed cluster.
+> >>>
+> >>> The buffers are freed in .bdrv_close().  .bdrv_open() no longer has any
+> >>> code paths that can allocate these buffers, so remove the free functions
+> >>> in the error code path.
+> >>>
+> >>> Reported-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> >>> Cc: Kevin Wolf <kwolf@redhat.com>
+> >>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> >>> ---
+> >>> Alexey: Does this improve your memory profiling results?
+> >>
+> >> Is this a regression from earlier versions? 
+> > 
+> > Hm, I have not thought about this.
+> > 
+> > So. I did bisect and this started happening from
+> > 9a4c0e220d8a4f82b5665d0ee95ef94d8e1509d5
+> > "hw/virtio-pci: fix virtio behaviour"
+> > 
+> > Before that, the very same command line would take less than 1GB of
+> > resident memory. That thing basically enforces virtio-1.0 for QEMU <=2.6
+> > which means that upstream with "-machine pseries-2.6" works fine (less than
+> > 1GB), "-machine pseries-2.7" does not (close to 7GB, sometime even 9GB).
+> > 
+> > Then I tried bisecting again, with
+> > "scsi=off,disable-modern=off,disable-legacy=on" on my 150 virtio-block
+> > devices, started from
+> > e266d421490e0 "virtio-pci: add flags to enable/disable legacy/modern" (it
+> > added the disable-modern switch) which uses 2GB of memory.
+> > 
+> > I ended up with ada434cd0b44 "virtio-pci: implement cfg capability".
+> > 
+> > Then I removed proxy->modern_as on v2.10.0-rc3 (see below) and got 1.5GB of
+> > used memory (yay!)
+> > 
+> > I do not really know how to reinterpret all of this, do you?
 > 
-> Sometimes TCP packets going from machine a to machine b are simply lost.
-> I see them in VM A using tcpdump going out but they never come in on
-> machine B. Both machines have iptables and stuff turned off.
 > 
-> On the host both VMs network interfaces are connected to the same bridge.
-> 
-> Any ideas? May be a known bug?
-> 
-> Host and Guest Kernel is an OpenSuSE 42.3 kernel based on vanilla 4.4.82.
+> Anyone, ping? Should I move the conversation to the original thread? Any
+> hacks to try with libc?
 
-Have you tcpdumped the tap interfaces on the host?
+I suggest a new top-level thread with Michael Tsirkin CCed.
+
+Stefan
