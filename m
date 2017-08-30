@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dn6Gd-000321-17
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:55:04 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dn6Gs-0003Rb-7S
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:55:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dn6Gc-0005f5-6Y
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:55:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46786)
+	(envelope-from <cohuck@redhat.com>) id 1dn6Go-0005lf-BJ
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:55:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55542)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dn6Gc-0005ek-0Z
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:55:02 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dn6Go-0005lH-4g
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:55:14 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed, 30 Aug 2017 18:52:36 +0200
-Message-Id: <20170830165252.13421-29-cohuck@redhat.com>
+Date: Wed, 30 Aug 2017 18:52:37 +0200
+Message-Id: <20170830165252.13421-30-cohuck@redhat.com>
 In-Reply-To: <20170830165252.13421-1-cohuck@redhat.com>
 References: <20170830165252.13421-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 28/44] s390x/cpumodel: factor out determination
- of default model name
+Subject: [Qemu-devel] [PULL 29/44] s390x: drop inclusion of sysemu/kvm.h
+ from some files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +29,71 @@ Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, bor
 
 From: David Hildenbrand <david@redhat.com>
 
-Now we can drop inclusion of "sysemu/kvm.h" from "s390-virtio.c".
+s390-stattrib.c needs definition of TARGET_PAGE_SIZE, solve it via cpu.h.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170818114353.13455-7-david@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20170818114353.13455-8-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/s390-virtio.c    | 7 +------
- target/s390x/cpu.h        | 1 +
- target/s390x/cpu_models.c | 8 ++++++++
- 3 files changed, 10 insertions(+), 6 deletions(-)
+ hw/s390x/s390-stattrib.c | 2 +-
+ hw/s390x/sclp.c          | 1 -
+ hw/s390x/sclpcpu.c       | 1 -
+ target/s390x/arch_dump.c | 1 -
+ 4 files changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio.c b/hw/s390x/s390-virtio.c
-index afa4148e6b..da3f49e80e 100644
---- a/hw/s390x/s390-virtio.c
-+++ b/hw/s390x/s390-virtio.c
-@@ -33,7 +33,6 @@
+diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
+index d14923f099..14a02711a2 100644
+--- a/hw/s390x/s390-stattrib.c
++++ b/hw/s390x/s390-stattrib.c
+@@ -11,12 +11,12 @@
+ 
+ #include "qemu/osdep.h"
  #include "hw/boards.h"
- #include "hw/loader.h"
- #include "hw/virtio/virtio.h"
++#include "cpu.h"
+ #include "qmp-commands.h"
+ #include "migration/qemu-file.h"
+ #include "migration/register.h"
+ #include "hw/s390x/storage-attributes.h"
+ #include "qemu/error-report.h"
 -#include "sysemu/kvm.h"
+ #include "exec/ram_addr.h"
+ #include "qapi/error.h"
+ 
+diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+index ffdf4712a1..fd097262c7 100644
+--- a/hw/s390x/sclp.c
++++ b/hw/s390x/sclp.c
+@@ -15,7 +15,6 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "cpu.h"
+-#include "sysemu/kvm.h"
+ #include "exec/memory.h"
+ #include "sysemu/sysemu.h"
  #include "exec/address-spaces.h"
- #include "sysemu/qtest.h"
+diff --git a/hw/s390x/sclpcpu.c b/hw/s390x/sclpcpu.c
+index b1f3ef8c7d..023d059a46 100644
+--- a/hw/s390x/sclpcpu.c
++++ b/hw/s390x/sclpcpu.c
+@@ -18,7 +18,6 @@
+ #include "hw/s390x/event-facility.h"
+ #include "cpu.h"
+ #include "sysemu/cpus.h"
+-#include "sysemu/kvm.h"
  
-@@ -93,11 +92,7 @@ void s390_init_cpus(MachineState *machine)
-     gchar *name;
+ typedef struct ConfigMgtData {
+     EventBufferHeader ebh;
+diff --git a/target/s390x/arch_dump.c b/target/s390x/arch_dump.c
+index 96c9fb97cb..399030d118 100644
+--- a/target/s390x/arch_dump.c
++++ b/target/s390x/arch_dump.c
+@@ -16,7 +16,6 @@
+ #include "elf.h"
+ #include "exec/cpu-all.h"
+ #include "sysemu/dump.h"
+-#include "sysemu/kvm.h"
  
-     if (machine->cpu_model == NULL) {
--        if (kvm_enabled()) {
--            machine->cpu_model = "host";
--        } else {
--            machine->cpu_model = "qemu";
--        }
-+        machine->cpu_model = s390_default_cpu_model_name();
-     }
  
-     cpu_states = g_new0(S390CPU *, max_cpus);
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 798e299db1..3ce7ffc126 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -647,6 +647,7 @@ void s390_cpu_model_register_props(Object *obj);
- void s390_cpu_model_class_register_props(ObjectClass *oc);
- void s390_realize_cpu_model(CPUState *cs, Error **errp);
- ObjectClass *s390_cpu_class_by_name(const char *name);
-+const char *s390_default_cpu_model_name(void);
- 
- #define EXCP_EXT 1 /* external interrupt */
- #define EXCP_SVC 2 /* supervisor call (syscall) */
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index fa1338fc72..915f067991 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -1200,6 +1200,14 @@ ObjectClass *s390_cpu_class_by_name(const char *name)
-     return oc;
- }
- 
-+const char *s390_default_cpu_model_name(void)
-+{
-+     if (kvm_enabled()) {
-+        return "host";
-+     }
-+     return "qemu";
-+}
-+
- static const TypeInfo qemu_s390_cpu_type_info = {
-     .name = S390_CPU_TYPE_NAME("qemu"),
-     .parent = TYPE_S390_CPU,
+ struct S390xUserRegsStruct {
 -- 
 2.13.5
