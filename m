@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dn2W9-0003NT-BE
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:54:52 -0400
+	(envelope-from <ydary@redhat.com>) id 1dn2aU-0004yo-Mb
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:59:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dn2W8-0006R6-5U
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:54:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46742)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dn2W7-0006QS-Sk
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:54:48 -0400
-Date: Wed, 30 Aug 2017 20:54:27 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170830125427.GA8076@lemon.lan>
-References: <20170824072202.26818-1-stefanha@redhat.com>
-	<20170824083843.GB1866@lemon>
-	<20170824180402.GA4368@stefanha-x1.localdomain>
-	<20170825073229.GC11465@lemon.lan>
-	<20170825085222.GA9688@stefanha-x1.localdomain>
-	<20170825092914.GI11465@lemon.lan>
-	<20170830124411.GN24565@stefanha-x1.localdomain>
+	(envelope-from <ydary@redhat.com>) id 1dn2aR-0000BE-B7
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:59:18 -0400
+Received: from mail-io0-f170.google.com ([209.85.223.170]:38027)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ydary@redhat.com>) id 1dn2aR-00009o-4A
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:59:15 -0400
+Received: by mail-io0-f170.google.com with SMTP id 81so4712262ioj.5
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 05:59:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170830124411.GN24565@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 0/3] iotests: clean up resources using
- context managers
+In-Reply-To: <1491bc75-e1ee-b63b-a75b-6d5c39faab7c@redhat.com>
+References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
+	<a81c8dfb-3d98-57ad-8159-5147283433fa@virtuozzo.com>
+	<cb783ebb-198e-1814-2f9c-aec93c83b17a@virtuozzo.com>
+	<0988b4ef-56e2-5ce9-ed25-40a742eadbd4@redhat.com>
+	<b0d72a26-2052-ecc6-67f5-d32572804ebf@redhat.com>
+	<20170828025706.GA18194@lemon.lan>
+	<923084c5-f1a8-e361-2e4e-b635249a59be@redhat.com>
+	<CACKMAy-nOFc40d2n2pQ-VYX7tjDBQS-AGT=SYcxrxSrDd6enTA@mail.gmail.com>
+	<1491bc75-e1ee-b63b-a75b-6d5c39faab7c@redhat.com>
+From: "Yaniv Lavi (Dary)" <ylavi@redhat.com>
+Date: Wed, 30 Aug 2017 15:58:32 +0300
+Message-ID: <CACKMAy8QV8nFE2Awj1m49xcqB1=yXcQjmLKGRgY5-9AJ9ETgJA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Persistent bitmaps for non-qcow2 formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,103 +35,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, "Mureinik, Allon" <amureini@redhat.com>, Nir Soffer <nsoffer@redhat.com>, Fam Zheng <famz@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, Tal Nisan <tnisan@redhat.com>
 
-On Wed, 08/30 13:44, Stefan Hajnoczi wrote:
-> On Fri, Aug 25, 2017 at 05:29:14PM +0800, Fam Zheng wrote:
-> > On Fri, 08/25 09:52, Stefan Hajnoczi wrote:
-> > > On Fri, Aug 25, 2017 at 03:32:29PM +0800, Fam Zheng wrote:
-> > > > On Thu, 08/24 19:04, Stefan Hajnoczi wrote:
-> > > > > On Thu, Aug 24, 2017 at 04:38:43PM +0800, Fam Zheng wrote:
-> > > > > > On Thu, 08/24 08:21, Stefan Hajnoczi wrote:
-> > > > > > > Tests should declare resources upfront in a with statement.  Resources are
-> > > > > > > automatically cleaned up whether the test passes or fails:
-> > > > > > > 
-> > > > > > >   with FilePath('test.img') as img_path,
-> > > > > > >        VM() as vm:
-> > > > > > >       ...test...
-> > > > > > >   # img_path is deleted and vm is shut down automatically
-> > > > > > 
-> > > > > > Looks good but still requires test writers to learn and remember to use FilePath
-> > > > > > and with.
-> > > > > 
-> > > > > You cannot forget to use FilePath() unless you love typing at
-> > > > > os.path.join(iotests.test_dir, 'test.img').  It's much better than open
-> > > > > coding filename generation!
-> > > > > 
-> > > > > > These are still boilerplates.  Here goes my personal oppinion, so may
-> > > > > > not be plausible:
-> > > > > > 
-> > > > > > - For VM() maybe add an atexit in the launch() method also makes sure the VM is
-> > > > > >   eventually terminated.
-> > > > > > 
-> > > > > >   This means vm.shutdown() is still needed in tearDown() if there are multiple
-> > > > > >   test methods and each of them expects a clean state, but that is probably
-> > > > > >   still less typing (and also indenting) than the with approach, and also easy
-> > > > > >   to remember (otherwise a test will fail).
-> > > > > 
-> > > > > I looked into atexit before going this route.  atexit does not have an
-> > > > > unregister() API in Python 2.  This makes it ugly to use because some
-> > > > > tests do not want the resource to remain for the duration of the
-> > > > > process.
-> > > > > 
-> > > > > A related point is that the Python objects used by atexit handlers live
-> > > > > until the end of the process.  They cannot be garbage collected because
-> > > > > the atexit handler still has a reference to them.
-> > > > 
-> > > > I think this shortcoming can be solved with a clean up list ("all problems in
-> > > > computer science can be solved by another level of indirection"):
-> > > > 
-> > > > _clean_up_list = set()
-> > > > def _clean_up_handler():
-> > > >     for i in _clean_up_list:
-> > > >         try:
-> > > >             i()
-> > > >         except:
-> > > >             pass
-> > > > 
-> > > > atexit.register(_clean_up_handler)
-> > > > 
-> > > > class VM(...):
-> > > > 
-> > > >     def launch():
-> > > >         ...
-> > > >         _clean_up_list.add(self.launch)
-> > > > 
-> > > >     def shutdown():
-> > > >         _clean_up_list.remove(self.launch)
-> > > >         ...
-> > > 
-> > > atexit is still less powerful than context managers because its scope is
-> > > fixed.  Handler functions are only called when the process terminates.
-> > > Many test cases do not want resources (especially the VMs) around
-> > > forever because they run several iterations or sub-tests.
-> > > 
-> > > The with statement can be used both for process-lifetime and for more
-> > > fine-grained scoping.  That's why I chose it.
-> > > 
-> > > If you stick to atexit then sub-tests or iterations require manual
-> > > vm.shutdown() - something that is not necessary using the with
-> > > statement.
-> > 
-> > Sure!
-> > 
-> > I just think that if leftover VM instances are a concern and not all test code
-> > are converted to "with", having the atexit handler in addition may provide more
-> > robustness.
-> 
-> Okay, I checked this.  Existing code doesn't need to be changed (yet)
-> because:
-> 
-> 1. Most existing code uses unittest's setUp()/tearDown() and already
->    correctly handles cleanup when the test fails.
-> 
-> 2. The LUKS crypto test doesn't use unittest but also doesn't use VM(),
->    so it doesn't need.
-> 
-> Are you happy for me to merge this series?
+YANIV LAVI (YANIV DARY)
 
-Yes. Sounds good! Thanks.
+SENIOR TECHNICAL PRODUCT MANAGER
 
-Fam
+Red Hat Israel Ltd. <https://www.redhat.com/>
+
+34 Jerusalem Road, Building A, 1st floor
+
+Ra'anana, Israel 4350109
+
+ylavi@redhat.com    T: +972-9-7692306/8272306     F: +972-9-7692223    IM: ylavi
+ <https://red.ht/sig> TRIED. TESTED. TRUSTED. <https://redhat.com/trusted>
+@redhatnews <https://twitter.com/redhatnews>   Red Hat
+<https://www.linkedin.com/company/red-hat>   Red Hat
+<https://www.facebook.com/RedHatInc>
+
+
+On Wed, Aug 30, 2017 at 1:35 PM, Max Reitz <mreitz@redhat.com> wrote:
+
+> On 2017-08-29 11:26, Yaniv Lavi (Dary) wrote:
+> >
+> >
+> > YANIV LAVI (YANIV DARY)
+> >
+> > SENIOR TECHNICAL PRODUCT MANAGER
+> >
+> > Red Hat Israel Ltd. <https://www.redhat.com/>
+> >
+> > 34 Jerusalem Road, Building A, 1st floor
+> >
+> > Ra'anana, Israel 4350109
+> >
+> > ylavi@redhat.com <mailto:ylavi@redhat.com>    T: +972-9-7692306
+> > <tel:+972-9-7692306>/8272306 <tel:8272306>     F: +972-9-7692223
+> > <tel:+972-9-7692223>    IM: ylavi
+> >
+> > <https://red.ht/sig>  TRIED. TESTED. TRUSTED. <
+> https://redhat.com/trusted>
+> >
+> > @redhatnews <https://twitter.com/redhatnews>   Red Hat
+> > <https://www.linkedin.com/company/red-hat>   Red Hat
+> > <https://www.facebook.com/RedHatInc>
+> >
+> >
+> > On Mon, Aug 28, 2017 at 9:11 PM, John Snow <jsnow@redhat.com
+> > <mailto:jsnow@redhat.com>> wrote:
+> >
+> >
+> >
+> >     On 08/27/2017 10:57 PM, Fam Zheng wrote:
+> >     > On Fri, 08/25 15:44, Max Reitz wrote:
+> >     >> Well, OK.  The main argument against supporting anything but
+> qcow2 is
+> >     >> "if you want features, use qcow2; and we are working on making
+> >     qcow2 as
+> >     >> fast as possible."  I think that's a very good argument still.
+> >     At some
+> >     >> point I (and probably others, too) had the idea of making qcow2
+> >     files in
+> >     >> raw layout:
+> >     >
+> >     >
+> >     > Yes! I think this idea makes a whole lot of sense, too. Metadata
+> >     tables can be
+> >     > generated so old implementation can still use it.
+> >     >
+> >     > Fam
+> >     >
+> >     >> Have the data as a blob, just like a raw file, padded by
+> >     >> metadata around it.  An autoclear flag would specify that the
+> >     qcow2 file
+> >     >> is in this format, and if so, you could simply access it like a
+> >     raw file
+> >     >> and should have exactly the same speed as a raw file.  Maybe that
+> >     would
+> >     >> solve this whole issue, too?
+> >
+> >     I wonder if this would be sufficient to alleviate the desire to use
+> raw
+> >     files...
+> >
+> >     (Eh, well, realistically, someone's still always going to ask if they
+> >     can use various features with non-qcow2 files...)
+> >
+> >     Nir, Yaniv; any input?
+> >
+> >
+> > We are using raw format for performance reasons.
+>
+> Using raw layout for the data in a qcow2 file would give you exactly the
+> same performance as raw.
+>
+
+We had no reason to switch to anything else so far and I'm sure this option
+was not available when we started supporting raw format.
+
+
+>
+> (Or better "should", but I can't think of a reason why it would not.)
+>
+> Max
+>
+> > As we have many customers that currently use this format, not support it
+> > would be a blocker the use of the feature.
+> > At a minimum we would require ability to convert raw to qcow2 raw-layout.
+> >
+> > Please also consider that we are planning to go on the OSP route of LUN
+> > per disk and would still want the tracking to work.
+> > I makes sense that for that and raw format you will be able to save the
+> > mapping to another file other than a qcow.
+> >
+> >
+> >
+> >     (Context: We're debating how to add persistent bitmaps to raw files
+> as I
+> >     was informed that RHV was 'asking about it.' Max is reminding me
+> there
+> >     is a proposal for a style of QCOW2 that uses a raw layout for data,
+> >     mitigating or eliminating any performance hits related to the L2
+> cache.
+> >     What I am not aware of is why RHV would use raw files for any
+> purpose.
+> >     Is it performance? Simplicity? Could RHV use a raw-layout qcow2?)
+> >
+> >     --js
+> >
+> >
+>
+>
+>
