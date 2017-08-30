@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dn22A-0007vj-MO
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:23:51 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dn22Y-0008B6-6r
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:24:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dn225-0002Ov-OB
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:23:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55934)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dn225-0002Oe-En
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:23:45 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 651C9C0587F7
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 12:23:44 +0000 (UTC)
-Date: Wed, 30 Aug 2017 08:23:44 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <130508726.5983911.1504095824230.JavaMail.zimbra@redhat.com>
-In-Reply-To: <87efrtgsjv.fsf@dusky.pond.sub.org>
-References: <20170825105913.4060-1-marcandre.lureau@redhat.com>
-	<20170825105913.4060-11-marcandre.lureau@redhat.com>
-	<87efrtgsjv.fsf@dusky.pond.sub.org>
+	(envelope-from <ehabkost@redhat.com>) id 1dn22T-0002YU-U4
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:24:14 -0400
+Date: Wed, 30 Aug 2017 09:23:59 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170830122359.GC15315@localhost.localdomain>
+References: <20170328021651.19350-1-david@gibson.dropbear.id.au>
+	<20170328021651.19350-2-david@gibson.dropbear.id.au>
+	<20170426182155-mutt-send-email-mst@kernel.org>
+	<20170829114239.GP2578@umbus.fritz.box>
+	<20170829141236.GX15315@localhost.localdomain>
+	<20170830055432.GI3386@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 10/14] tests: add qlit tests
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170830055432.GI3386@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [RFC for-2.10 1/3] pci/pcie: Make a consistent
+ helper for switching PCI/PCIe "hybrid" devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,148 +28,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, marcel@redhat.com, lersek@redhat.com
 
-Hi
+On Wed, Aug 30, 2017 at 03:54:32PM +1000, David Gibson wrote:
+> On Tue, Aug 29, 2017 at 11:12:36AM -0300, Eduardo Habkost wrote:
+> > On Tue, Aug 29, 2017 at 09:42:39PM +1000, David Gibson wrote:
+> > > On Wed, Apr 26, 2017 at 06:23:58PM +0300, Michael S. Tsirkin wrote:
+> > > > On Tue, Mar 28, 2017 at 01:16:49PM +1100, David Gibson wrote:
+> > > > > virtio-pci and XHCI are "hybrid" devices in the sense that they can present
+> > > > > themselves as either PCIe or plain PCI devices depending on the machine
+> > > > > and bus they're connected to.
+> > > > > 
+> > > > > For virtio-pci to present as PCIe it requires that it's connected to a PCIe
+> > > > > bus and that it's not a root bus - this is to ensure that the device is
+> > > > > connected via a PCIe root port or downstream port rather than being a
+> > > > > integrated endpoint.  Some guests (Windows in particular AIUI) don't really
+> > > > > cope with PCIe integrated endpoints.
+> > > > > 
+> > > > > For XHCI it only checks that the bus is PCIe, but that probably means it
+> > > > > would cause problems if attached as an integrated devices directly to a
+> > > > > PCIe root bus.
+> > > > > 
+> > > > > This patch makes the test consistent between XHCI and virtio-pci, and
+> > > > > clarifies things by having them both use a new 'pci_allow_hybrid_pcie()'
+> > > > > helper which performs the same check as virtio-pci.
+> > > > > 
+> > > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > > > > ---
+> > > > >  hw/pci/pci.c           | 7 +++++++
+> > > > >  hw/usb/hcd-xhci.c      | 2 +-
+> > > > >  hw/virtio/virtio-pci.c | 3 +--
+> > > > >  include/hw/pci/pci.h   | 1 +
+> > > > >  4 files changed, 10 insertions(+), 3 deletions(-)
+> > > > > 
+> > > > > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> > > > > index bd8043c..779787b 100644
+> > > > > --- a/hw/pci/pci.c
+> > > > > +++ b/hw/pci/pci.c
+> > > > > @@ -390,6 +390,13 @@ bool pci_bus_is_root(PCIBus *bus)
+> > > > >      return PCI_BUS_GET_CLASS(bus)->is_root(bus);
+> > > > >  }
+> > > > >  
+> > > > > +bool pci_allow_hybrid_pcie(PCIDevice *pci_dev)
+> > > > > +{
+> > > > > +    PCIBus *bus = pci_dev->bus;
+> > > > > +
+> > > > > +    return pci_bus_is_express(bus) && !pci_bus_is_root(bus);
+> > > > > +}
+> > > > > +
+> > > > >  void pci_bus_new_inplace(PCIBus *bus, size_t bus_size, DeviceState *parent,
+> > > > >                           const char *name,
+> > > > >                           MemoryRegion *address_space_mem,
+> > > > 
+> > > > I'd prefer pci_allow_hybrid_pci_pcie.
+> > > 
+> > > Ok, I've made that change for the next spin (aimed at 2.11, obviously).
+> > 
+> > I'm a bit confused by the naming: by looking at the function
+> > name, I don't know if "allow hybrid" means "this bus+device can
+> > (also) work as Conventional PCI" or "this bus+device can (also)
+> > work as PCI Express".
+> 
+> Neither, actually.  It means "should this device, which is capable of
+> both PCI and PCIe operation, operate as PCIe in this context".  It's
+> only expected to be called by devices which support both modes of
+> operation.
+> 
+> I have yet to think of a succinct name which conveys that :(.
 
------ Original Message -----
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->=20
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  tests/check-qlit.c     | 64
-> >  ++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  tests/Makefile.include |  5 +++-
-> >  2 files changed, 68 insertions(+), 1 deletion(-)
-> >  create mode 100644 tests/check-qlit.c
-> >
-> > diff --git a/tests/check-qlit.c b/tests/check-qlit.c
-> > new file mode 100644
-> > index 0000000000..47fde92a46
-> > --- /dev/null
-> > +++ b/tests/check-qlit.c
-> > @@ -0,0 +1,64 @@
-> > +/*
-> > + * QLit unit-tests.
-> > + *
-> > + * Copyright (C) 2017 Red Hat Inc.
-> > + *
-> > + * This work is licensed under the terms of the GNU LGPL, version 2.1 =
-or
-> > later.
-> > + * See the COPYING.LIB file in the top-level directory.
->=20
-> Please use GPLv2+ unless you have a specific reason for something else.
-> In that case, explain your reason in the commit message.
->=20
-> May I change the copyright notice to GPLv2+ for you?
+Based on this description, maybe pci_hybrid_allow_pcie() would be
+clearer.
 
-I copied that header from some other files. Sure, feel free (although I lik=
-e LGPL better in general, so we can easily move the code to a shared librar=
-y)
+But based on the comments below, I have another suggestion:
 
->=20
-> > + */
-> > +
-> > +#include "qemu/osdep.h"
-> > +
-> > +#include "qapi/qmp/qbool.h"
-> > +#include "qapi/qmp/qdict.h"
-> > +#include "qapi/qmp/qlit.h"
-> > +#include "qapi/qmp/qnum.h"
-> > +#include "qapi/qmp/qstring.h"
-> > +
-> > +static QLitObject qlit =3D QLIT_QDICT(((QLitDictEntry[]) {
-> > +    { "foo", QLIT_QNUM(42) },
-> > +    { "bar", QLIT_QSTR("hello world") },
-> > +    { "baz", QLIT_QNULL },
-> > +    { "bee", QLIT_QLIST(((QLitObject[]) {
-> > +        QLIT_QNUM(43),
-> > +        QLIT_QNUM(44),
-> > +        QLIT_QBOOL(true),
-> > +        { },
-> > +    }))},
-> > +    { },
-> > +}));
-> > +
-> > +static QObject *make_qobject(void)
-> > +{
-> > +    QDict *qdict =3D qdict_new();
-> > +    QList *list =3D qlist_new();
-> > +
-> > +    qdict_put_int(qdict, "foo", 42);
-> > +    qdict_put_str(qdict, "bar", "hello world");
-> > +    qdict_put_null(qdict, "baz");
-> > +
-> > +    qlist_append_int(list, 43);
-> > +    qlist_append_int(list, 44);
-> > +    qlist_append_bool(list, true);
-> > +    qdict_put(qdict, "bee", list);
-> > +
-> > +    return QOBJECT(qdict);
-> > +}
-> > +
-> > +static void qlit_equal_qobject_test(void)
-> > +{
-> > +    QObject *qobj =3D make_qobject();
-> > +
-> > +    g_assert(qlit_equal_qobject(&qlit, qobj));
-> > +
-> > +    qobject_decref(qobj);
-> > +}
-> > +
-> > +int main(int argc, char **argv)
-> > +{
-> > +    g_test_init(&argc, &argv, NULL);
-> > +
-> > +    g_test_add_func("/qlit/equal_qobject", qlit_equal_qobject_test);
-> > +
-> > +    return g_test_run();
-> > +}
->=20
-> We also need negative tests.  Could be done as follow-up patch.
+> 
+> > What about just naming it pci_allow_pcie() or
+> > pci_bus_allow_pcie()?  It looks like the function doesn't care if
+> > the device is hybrid or PCIe-only: it's only checking if the
+> > device can work as PCIe on that bus.  It's up to the device to
+> > decide if it should switch to Conventional PCI or report an error
+> > if the function returns false.
+> 
+> Hmm.. that would mean changing *every* existing PCIe device to call
+> this, which I don't think I want to do.
 
-There are a few in following patches iirc, more is always welcome.
+Maybe calling it from the common PCI realize function won't be a
+bad idea.  But let's discuss that after we clean up the existing
+hybrid devices.
 
-Thanks
+> 
+> Also it's _not* really saying if a device can operate as PCIe.  AIUI,
+> a device _can_ operate as PCIe on a root bus (without a port) although
+> it's unusual.  Integrated PCIe devices would do so, IIUC.  For that
+> matter I believe current devices which only support PCIe mode will
+> also operate in PCIe mode on a root bus right now; but doing so
+> without inserting a root port might make guests unhappy, at least on
+> PC.
 
->=20
-> > diff --git a/tests/Makefile.include b/tests/Makefile.include
-> > index 37c1bed683..3653c7b40a 100644
-> > --- a/tests/Makefile.include
-> > +++ b/tests/Makefile.include
-> > @@ -43,6 +43,8 @@ check-unit-y +=3D tests/check-qnull$(EXESUF)
-> >  gcov-files-check-qnull-y =3D qobject/qnull.c
-> >  check-unit-y +=3D tests/check-qjson$(EXESUF)
-> >  gcov-files-check-qjson-y =3D qobject/qjson.c
-> > +check-unit-y +=3D tests/check-qlit$(EXESUF)
-> > +gcov-files-check-qlit-y =3D qobject/qlit.c
-> >  check-unit-y +=3D tests/test-qobject-output-visitor$(EXESUF)
-> >  gcov-files-test-qobject-output-visitor-y =3D qapi/qobject-output-visit=
-or.c
-> >  check-unit-y +=3D tests/test-clone-visitor$(EXESUF)
-> > @@ -535,7 +537,7 @@ GENERATED_FILES +=3D tests/test-qapi-types.h
-> > tests/test-qapi-visit.h \
-> > =20
-> >  test-obj-y =3D tests/check-qnum.o tests/check-qstring.o tests/check-qd=
-ict.o
-> >  \
-> >  =09tests/check-qlist.o tests/check-qnull.o \
-> > -=09tests/check-qjson.o \
-> > +=09tests/check-qjson.o tests/check-qlit.o \
-> >  =09tests/test-coroutine.o tests/test-string-output-visitor.o \
-> >  =09tests/test-string-input-visitor.o tests/test-qobject-output-visitor=
-.o \
-> >  =09tests/test-clone-visitor.o \
-> > @@ -569,6 +571,7 @@ tests/check-qdict$(EXESUF): tests/check-qdict.o
-> > $(test-util-obj-y)
-> >  tests/check-qlist$(EXESUF): tests/check-qlist.o $(test-util-obj-y)
-> >  tests/check-qnull$(EXESUF): tests/check-qnull.o $(test-util-obj-y)
-> >  tests/check-qjson$(EXESUF): tests/check-qjson.o $(test-util-obj-y)
-> > +tests/check-qlit$(EXESUF): tests/check-qlit.o $(test-util-obj-y)
-> >  tests/check-qom-interface$(EXESUF): tests/check-qom-interface.o
-> >  $(test-qom-obj-y)
-> >  tests/check-qom-proplist$(EXESUF): tests/check-qom-proplist.o
-> >  $(test-qom-obj-y)
->=20
+If that's the case, I would change the name and documentation to
+say "defaults to", "should", "recommend", or "prefer".
+
+What about pci_bus_prefers_pcie() or pci_hybrid_prefers_pcie()?
+
+In either case, we really need a doc comment clearly explaining
+the function purpose and semantics.
+
+> 
+> > 
+> > > 
+> > > > 
+> > > > > diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+> > > > > index f0af852..a7ff4fd 100644
+> > > > > --- a/hw/usb/hcd-xhci.c
+> > > > > +++ b/hw/usb/hcd-xhci.c
+> > > > > @@ -3619,7 +3619,7 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
+> > > > >                       PCI_BASE_ADDRESS_SPACE_MEMORY|PCI_BASE_ADDRESS_MEM_TYPE_64,
+> > > > >                       &xhci->mem);
+> > > > >  
+> > > > > -    if (pci_bus_is_express(dev->bus) ||
+> > > > > +    if (pci_allow_hybrid_pcie(dev) ||
+> > > > >          xhci_get_flag(xhci, XHCI_FLAG_FORCE_PCIE_ENDCAP)) {
+> > > > >          ret = pcie_endpoint_cap_init(dev, 0xa0);
+> > > > >          assert(ret >= 0);
+> > > > 
+> > > > This seems to change the behaviour for xhci on a root bus - what
+> > > > am I missing?
+> > > 
+> > > Nothing.  I didn't consider the backwards compat implications; I'll
+> > > fix it for the next spin.
+> > > 
+> > 
+> > 
+> > 
+> 
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
+
+
+
+-- 
+Eduardo
