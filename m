@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dmyLi-0002U9-IC
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:47 -0400
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dmyLl-0002Wr-6B
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dmyLd-0000MA-LM
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:46 -0400
-Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:33570)
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dmyLj-0000PZ-QW
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:49 -0400
+Received: from mail-ua0-x244.google.com ([2607:f8b0:400c:c08::244]:38585)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
-	id 1dmyLd-0000M0-GU
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:41 -0400
-Received: by mail-ua0-x241.google.com with SMTP id m24so2359737uai.0
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 01:27:41 -0700 (PDT)
+	id 1dmyLj-0000PM-Ly
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:47 -0400
+Received: by mail-ua0-x244.google.com with SMTP id j46so2338110uag.5
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 01:27:47 -0700 (PDT)
 From: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
-Date: Wed, 30 Aug 2017 03:26:54 -0500
-Message-Id: <20170830082702.3011-6-Sergio.G.DelReal@gmail.com>
+Date: Wed, 30 Aug 2017 03:26:59 -0500
+Message-Id: <20170830082702.3011-11-Sergio.G.DelReal@gmail.com>
 In-Reply-To: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
 References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 05/13] hvf: add fields to CPUState and
- CPUX86State; add definitions
+Subject: [Qemu-devel] [PATCH v2 10/13] hvf: implement vga dirty page tracking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +29,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 
-This commit adds some fields specific to hvf in CPUState and
-CPUX86State. It also adds some handy #defines.
+This commit implements setting the tracking of dirty pages, using hvf's
+interface to protect guest memory. It uses the MemoryListener callback
+mechanism through .log_start/stop/sync
 
 Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 ---
- include/qom/cpu.h |  2 ++
- target/i386/cpu.h | 23 +++++++++++++++++++++++
- 2 files changed, 25 insertions(+)
+ include/sysemu/hvf.h  |  5 ++++
+ target/i386/hvf-all.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 70 insertions(+), 7 deletions(-)
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 25eefea7ab..fb0e54e6d9 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -407,6 +407,8 @@ struct CPUState {
-      * unnecessary flushes.
-      */
-     uint16_t pending_tlb_flush;
+diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
+index 944b014596..43b02be63c 100644
+--- a/include/sysemu/hvf.h
++++ b/include/sysemu/hvf.h
+@@ -34,11 +34,16 @@ uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
+ #define hvf_get_supported_cpuid(func, idx, reg) 0
+ #endif
+ 
++/* hvf_slot flags */
++#define HVF_SLOT_LOG (1 << 0)
 +
-+    uint64_t hvf_fd;
- };
+ typedef struct hvf_slot {
+     uint64_t start;
+     uint64_t size;
+     uint8_t *mem;
+     int slot_id;
++    uint32_t flags;
++    MemoryRegion *region;
+ } hvf_slot;
  
- QTAILQ_HEAD(CPUTailQ, CPUState);
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 051867399b..7d90f08b98 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -82,15 +82,19 @@
- #define R_GS 5
+ struct hvf_vcpu_caps {
+diff --git a/target/i386/hvf-all.c b/target/i386/hvf-all.c
+index 6aba6b4eea..4b213d7f76 100644
+--- a/target/i386/hvf-all.c
++++ b/target/i386/hvf-all.c
+@@ -189,6 +189,7 @@ void hvf_set_phys_mem(MemoryRegionSection *section, bool add)
+     mem->size = int128_get64(section->size);
+     mem->mem = memory_region_get_ram_ptr(area) + section->offset_within_region;
+     mem->start = section->offset_within_address_space;
++    mem->region = area;
  
- /* segment descriptor fields */
-+#define DESC_G_SHIFT    23
- #define DESC_G_MASK     (1 << 23)
- #define DESC_B_SHIFT    22
- #define DESC_B_MASK     (1 << DESC_B_SHIFT)
- #define DESC_L_SHIFT    21 /* x86_64 only : 64 bit code segment */
- #define DESC_L_MASK     (1 << DESC_L_SHIFT)
-+#define DESC_AVL_SHIFT  20
- #define DESC_AVL_MASK   (1 << 20)
-+#define DESC_P_SHIFT    15
- #define DESC_P_MASK     (1 << 15)
- #define DESC_DPL_SHIFT  13
- #define DESC_DPL_MASK   (3 << DESC_DPL_SHIFT)
-+#define DESC_S_SHIFT    12
- #define DESC_S_MASK     (1 << 12)
- #define DESC_TYPE_SHIFT 8
- #define DESC_TYPE_MASK  (15 << DESC_TYPE_SHIFT)
-@@ -631,6 +635,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
- #define CPUID_7_0_EBX_AVX512BW (1U << 30) /* AVX-512 Byte and Word Instructions */
- #define CPUID_7_0_EBX_AVX512VL (1U << 31) /* AVX-512 Vector Length Extensions */
+     if (do_hvf_set_memory(mem)) {
+         error_report("Error registering new memory slot\n");
+@@ -458,8 +459,7 @@ void hvf_cpu_synchronize_post_init(CPUState *cpu_state)
+     run_on_cpu(cpu_state, _hvf_cpu_synchronize_post_init, RUN_ON_CPU_NULL);
+ }
  
-+#define CPUID_7_0_ECX_AVX512BMI (1U << 1)
- #define CPUID_7_0_ECX_VBMI     (1U << 1)  /* AVX-512 Vector Byte Manipulation Instrs */
- #define CPUID_7_0_ECX_UMIP     (1U << 2)
- #define CPUID_7_0_ECX_PKU      (1U << 3)
-@@ -806,6 +811,20 @@ typedef struct SegmentCache {
-         float64  _d_##n[(bits)/64]; \
+-/* TODO: ept fault handlig */
+-static bool ept_emulation_fault(uint64_t ept_qual)
++static bool ept_emulation_fault(hvf_slot *slot, addr_t gpa, uint64_t ept_qual)
+ {
+     int read, write;
+ 
+@@ -475,6 +475,14 @@ static bool ept_emulation_fault(uint64_t ept_qual)
+         return false;
      }
  
-+typedef union {
-+    uint8_t _b[16];
-+    uint16_t _w[8];
-+    uint32_t _l[4];
-+    uint64_t _q[2];
-+} XMMReg;
++    if (write && slot) {
++        if (slot->flags & HVF_SLOT_LOG) {
++            memory_region_set_dirty(slot->region, gpa - slot->start, 1);
++            hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
++                          HV_MEMORY_READ | HV_MEMORY_WRITE);
++        }
++    }
 +
-+typedef union {
-+    uint8_t _b[32];
-+    uint16_t _w[16];
-+    uint32_t _l[8];
-+    uint64_t _q[4];
-+} YMMReg;
+     /*
+      * The EPT violation must have been caused by accessing a
+      * guest-physical address that is a translation of a guest-linear
+@@ -485,7 +493,57 @@ static bool ept_emulation_fault(uint64_t ept_qual)
+         return false;
+     }
+ 
+-    return true;
++    return !slot;
++}
 +
- typedef MMREG_UNION(ZMMReg, 512) ZMMReg;
- typedef MMREG_UNION(MMXReg, 64)  MMXReg;
- 
-@@ -1041,7 +1060,11 @@ typedef struct CPUX86State {
-     ZMMReg xmm_t0;
-     MMXReg mmx_t0;
- 
-+    XMMReg ymmh_regs[CPU_NB_REGS];
++static void hvf_set_dirty_tracking(MemoryRegionSection *section, bool on)
++{
++    struct mac_slot *macslot;
++    hvf_slot *slot;
 +
-     uint64_t opmask_regs[NB_OPMASK_REGS];
-+    YMMReg zmmh_regs[CPU_NB_REGS];
-+    ZMMReg hi16_zmm_regs[CPU_NB_REGS];
++    slot = hvf_find_overlap_slot(
++            section->offset_within_address_space,
++            section->offset_within_address_space + int128_get64(section->size));
++
++    /* protect region against writes; begin tracking it */
++    if (on) {
++        slot->flags |= HVF_SLOT_LOG;
++        hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
++                      HV_MEMORY_READ);
++    /* stop tracking region*/
++    } else {
++        slot->flags &= ~HVF_SLOT_LOG;
++        hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
++                      HV_MEMORY_READ | HV_MEMORY_WRITE);
++    }
++}
++
++static void hvf_log_start(MemoryListener *listener,
++                          MemoryRegionSection *section, int old, int new)
++{
++    if (old != 0)
++        return;
++
++    hvf_set_dirty_tracking(section, 1);
++}
++
++static void hvf_log_stop(MemoryListener *listener,
++                         MemoryRegionSection *section, int old, int new)
++{
++    if (new != 0)
++        return;
++
++    hvf_set_dirty_tracking(section, 0);
++}
++
++static void hvf_log_sync(MemoryListener *listener,
++                         MemoryRegionSection *section)
++{
++    /*
++     * sync of dirty pages is handled elsewhere; just make sure we keep
++     * tracking the region.
++     */
++    hvf_set_dirty_tracking(section, 1);
+ }
  
-     /* sysenter registers */
-     uint32_t sysenter_cs;
+ static void hvf_region_add(MemoryListener *listener,
+@@ -504,6 +562,9 @@ static MemoryListener hvf_memory_listener = {
+     .priority = 10,
+     .region_add = hvf_region_add,
+     .region_del = hvf_region_del,
++    .log_start = hvf_log_start,
++    .log_stop = hvf_log_stop,
++    .log_sync = hvf_log_sync,
+ };
+ 
+ void vmx_reset_vcpu(CPUState *cpu) {
+@@ -775,7 +836,7 @@ int hvf_vcpu_exec(CPUState *cpu)
+ 
+             slot = hvf_find_overlap_slot(gpa, gpa);
+             /* mmio */
+-            if (ept_emulation_fault(exit_qual) && !slot) {
++            if (ept_emulation_fault(slot, gpa, exit_qual)) {
+                 struct x86_decode decode;
+ 
+                 load_regs(cpu);
+@@ -786,9 +847,6 @@ int hvf_vcpu_exec(CPUState *cpu)
+                 store_regs(cpu);
+                 break;
+             }
+-#ifdef DIRTY_VGA_TRACKING
+-            /* TODO: handle dirty page tracking */
+-#endif
+             break;
+         }
+         case EXIT_REASON_INOUT:
 -- 
 2.14.1
