@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dn1Ca-0005v1-8i
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 07:30:33 -0400
+	(envelope-from <quintela@redhat.com>) id 1dn1Ff-0006mb-N4
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 07:33:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dn1CZ-0006cb-Ea
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 07:30:32 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:36954)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dn1CZ-0006bB-8B
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 07:30:31 -0400
-Received: by mail-wm0-x236.google.com with SMTP id u26so8605859wma.0
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 04:30:29 -0700 (PDT)
+	(envelope-from <quintela@redhat.com>) id 1dn1Fc-0007xc-D6
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 07:33:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47628)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dn1Fc-0007wA-3t
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 07:33:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 54066C0587F5
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 11:33:37 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed, 30 Aug 2017 13:33:17 +0200
+Message-Id: <20170830113319.6749-1-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170830075243.xo6cmihon7ikzdlr@var.youpi.perso.aquilenet.fr>
-References: <20170825223721.2052-1-samuel.thibault@ens-lyon.org>
-	<42fd21ab-d7ca-da12-4f15-73660f543781@redhat.com>
-	<20170830075243.xo6cmihon7ikzdlr@var.youpi.perso.aquilenet.fr>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 30 Aug 2017 12:30:07 +0100
-Message-ID: <CAFEAcA-LG=Q-k0RMrCJ+5NofzyFHeNLmWRwpy=ZY8EtAxwwsUA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] slirp: fix clearing ifq_so from pending
- packets
+Subject: [Qemu-devel] [PATCH v2 0/2] Fix tests on recent gcc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +30,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Cc: Thomas Huth <thuth@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, qemu-stable <qemu-stable@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, P J P <ppandit@redhat.com>, Wjjzhang <wjjzhang@tencent.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, pbonzini@redhat.com
 
-On 30 August 2017 at 08:52, Samuel Thibault <samuel.thibault@gnu.org> wrote=
+
+
+Hi
+
+Changes from v1:
+- move all uses of -1 for memtest.
+- remove docs about the feature.
+- use size_t for the second patch (cedric)
+
+Please, review.
+
+
+[v1]
+
+On Fedora 26 (gcc-7.1.1 and glib2 2.52.3) tests don't compile.
+
+In file included from /usr/include/string.h:639:0,
+                 from /mnt/kvm/qemu/cleanup/include/qemu/osdep.h:69,
+                 from /mnt/kvm/qemu/cleanup/tests/test-iov.c:1:
+In function =E2=80=98memcpy=E2=80=99,
+    inlined from =E2=80=98iov_from_buf=E2=80=99 at /mnt/kvm/qemu/cleanup/=
+include/qemu/iov.h:51:9,
+    inlined from =E2=80=98test_to_from_buf_1=E2=80=99 at /mnt/kvm/qemu/cl=
+eanup/tests/test-iov.c:88:14,
+    inlined from =E2=80=98test_to_from_buf=E2=80=99 at /mnt/kvm/qemu/clea=
+nup/tests/test-iov.c:144:9:
+/usr/include/bits/string3.h:53:10: error: =E2=80=98__builtin_memcpy=E2=80=
+=99: specified size 18446744073709551615 exceeds maximum object size 9223=
+372036854775807 [-Werror=3Dstringop-overflow=3D]
+   return __builtin___memcpy_chk (__dest, __src, __len, __bos0 (__dest));
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In function =E2=80=98memcpy=E2=80=99,
+    inlined from =E2=80=98iov_to_buf=E2=80=99 at /mnt/kvm/qemu/cleanup/in=
+clude/qemu/iov.h:64:9,
+    inlined from =E2=80=98test_to_from_buf_1=E2=80=99 at /mnt/kvm/qemu/cl=
+eanup/tests/test-iov.c:94:14,
+    inlined from =E2=80=98test_to_from_buf=E2=80=99 at /mnt/kvm/qemu/clea=
+nup/tests/test-iov.c:144:9:
+/usr/include/bits/string3.h:53:10: error: =E2=80=98__builtin_memcpy=E2=80=
+=99: specified size 18446744073709551615 exceeds maximum object size 9223=
+372036854775807 [-Werror=3Dstringop-overflow=3D]
+   return __builtin___memcpy_chk (__dest, __src, __len, __bos0 (__dest));
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+
+In this case, we are abusing the functions and call a size_t argument
+with -1, which gives us a very big number.  gcc gets overzealous and
+gets confused about it.  Notice that this was introduced in 2015 by Paolo=
 :
-> Thomas Huth, on mer. 30 ao=C3=BBt 2017 09:50:45 +0200, wrote:
->> On 26.08.2017 00:37, Samuel Thibault wrote:
->> > The if_fastq and if_batchq contain not only packets, but queues of pac=
-kets
->> > for the same socket. When sofree frees a socket, it thus has to clear =
-ifq_so
->> > from all the packets from the queues, not only the first.
->>
->> I think you should CC: this to qemu-stable if it's fixing a problem that
->> can be used by the guest to crash QEMU... ?
->
-> Indeed. I thought it should first go to master.
 
-The way our cc-stable process works is that you include
-a line in the commit message "Cc: qemu-stable@nongnu.org"
-(in the same place as the signed-off-by and other lines)
-and also cc the email address when sending the patch;
-then that will go into the git history in master and can
-be fished out from there. If you don't include it in the
-original patch send then whoever puts the pull request
-together has to include it, so it's helpful to add it from
-the start if it's pretty definitely a thing that should go
-into stable.
+commit ad523bca56a7202d2498c550a41be5c986c4d33c
+Author: Paolo Bonzini <pbonzini@redhat.com>
+Date:   Tue Dec 22 12:03:33 2015 +0100
 
-thanks
--- PMM
+    iov: avoid memcpy for "simple" iov_from_buf/iov_to_buf
+
+I fixed it by using the real sizes in the tests insntead of -1.  It is al=
+ready calculated.
+
+
+
+
+In file included from /usr/include/glib-2.0/glib/glist.h:32:0,
+                 from /usr/include/glib-2.0/glib/ghash.h:33,
+                 from /usr/include/glib-2.0/glib.h:50,
+                 from /mnt/kvm/qemu/cleanup/tests/vmgenid-test.c:11:
+In function =E2=80=98acpi_find_vgia=E2=80=99,
+    inlined from =E2=80=98read_guid_from_memory=E2=80=99 at /mnt/kvm/qemu=
+/cleanup/tests/vmgenid-test.c:103:18:
+/usr/include/glib-2.0/glib/gmem.h:216:10: error: argument 1 range [184467=
+44071562067968, 18446744073709551615] exceeds maximum object size 9223372=
+036854775807 [-Werror=3Dalloc-size-larger-than=3D]
+      __p =3D g_##func##_n (__n, __s);   \
+      ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/glib-2.0/glib/gmem.h:278:42: note: in expansion of macro =E2=
+=80=98_G_NEW=E2=80=99
+ #define g_new0(struct_type, n_structs)   _G_NEW (struct_type, n_structs,=
+ malloc0)
+                                          ^~~~~~
+/mnt/kvm/qemu/cleanup/tests/vmgenid-test.c:70:14: note: in expansion of m=
+acro =E2=80=98g_new0=E2=80=99
+     tables =3D g_new0(uint32_t, tables_nr);
+              ^~~~~~
+/mnt/kvm/qemu/cleanup/tests/vmgenid-test.c: In function =E2=80=98read_gui=
+d_from_memory=E2=80=99:
+/usr/include/glib-2.0/glib/gmem.h:96:10: note: in a call to allocation fu=
+nction =E2=80=98g_malloc0_n=E2=80=99 declared here
+ gpointer g_malloc0_n      (gsize  n_blocks,
+          ^~~~~~~~~~~
+cc1: all warnings being treated as errors
+make: *** [/mnt/kvm/qemu/cleanup/rules.mak:66: tests/vmgenid-test.o] Erro=
+r 1
+
+
+this cames form line:
+
+    tables =3D g_new0(uint32_t, tables_nr);
+
+glib/gcc gets completely confused about this and think that 1st
+argument can be 2^64-1.  Documentation says that you should use g_new
+for struct types, so ...  I moved to g_malloc0() and call it a day.
+
+What do you think?
+
+Later, Juan.
+
+Juan Quintela (2):
+  tests: Use real size for iov tests
+  tests: Make vmgenid test compile
+
+ include/qemu/iov.h   |  6 ------
+ tests/test-iov.c     | 10 +++++-----
+ tests/vmgenid-test.c |  2 +-
+ 3 files changed, 6 insertions(+), 12 deletions(-)
+
+--=20
+2.13.5
