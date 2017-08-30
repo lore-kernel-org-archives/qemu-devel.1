@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dn6Ik-0005V7-QE
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:57:15 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dn6Ik-0006qR-0B
+	(envelope-from <jcody@redhat.com>) id 1dn6Ij-0005Sw-Ck
 	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:57:14 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <jcody@redhat.com>) id 1dn6Ii-0006p7-PX
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:57:13 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Wed, 30 Aug 2017 12:57:02 -0400
-Message-Id: <6ea11ae43c681181f86193352ef3527ff3f64f68.1504112061.git.jcody@redhat.com>
+Date: Wed, 30 Aug 2017 12:57:00 -0400
+Message-Id: <8fe8ddad6b924b460ca4ed4a7e401c18d24c246f.1504112061.git.jcody@redhat.com>
 In-Reply-To: <cover.1504112061.git.jcody@redhat.com>
 References: <cover.1504112061.git.jcody@redhat.com>
 In-Reply-To: <cover.1504112061.git.jcody@redhat.com>
 References: <cover.1504112061.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 5/7] block/curl: check error return of
- curl_global_init()
+Subject: [Qemu-devel] [PATCH v2 3/7] block/sheepdog: remove spurious NULL
+ check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +25,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, rjones@redhat.com, kwolf@redhat.com
 
-If curl_global_init() fails, per the documentation no other curl
-functions may be called, so make sure to check the return value.
-
-Also, some minor changes to the initialization latch variable 'inited':
-
-- Make it static in the file, for clarity
-- Change the name for clarity
-- Make it a bool
+'tag' is already checked in the lines immediately preceding this check,
+and set to non-NULL if NULL.  No need to check again, it hasn't changed.
 
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- block/curl.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+ block/sheepdog.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/curl.c b/block/curl.c
-index 2a244e2..00a9879 100644
---- a/block/curl.c
-+++ b/block/curl.c
-@@ -89,6 +89,8 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
- 
- struct BDRVCURLState;
- 
-+static bool libcurl_initialized;
-+
- typedef struct CURLAIOCB {
-     Coroutine *co;
-     QEMUIOVector *qiov;
-@@ -686,14 +688,23 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
-     double d;
-     const char *secretid;
-     const char *protocol_delimiter;
-+    int ret;
- 
--    static int inited = 0;
- 
-     if (flags & BDRV_O_RDWR) {
-         error_setg(errp, "curl block device does not support writes");
-         return -EROFS;
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index abb2e79..bbbfa72 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -1632,7 +1632,7 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
+     if (!tag) {
+         tag = "";
      }
- 
-+    if (!libcurl_initialized) {
-+        ret = curl_global_init(CURL_GLOBAL_ALL);
-+        if (ret) {
-+            error_setg(errp, "libcurl initialization failed with %d", ret);
-+            return -EIO;
-+        }
-+        libcurl_initialized = true;
-+    }
-+
-     qemu_mutex_init(&s->mutex);
-     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-     qemu_opts_absorb_qdict(opts, options, &local_err);
-@@ -772,11 +783,6 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
-         }
-     }
- 
--    if (!inited) {
--        curl_global_init(CURL_GLOBAL_ALL);
--        inited = 1;
--    }
--
-     DPRINTF("CURL: Opening %s\n", file);
-     QSIMPLEQ_INIT(&s->free_state_waitq);
-     s->aio_context = bdrv_get_aio_context(bs);
+-    if (tag && strlen(tag) >= SD_MAX_VDI_TAG_LEN) {
++    if (strlen(tag) >= SD_MAX_VDI_TAG_LEN) {
+         error_setg(errp, "value of parameter 'tag' is too long");
+         ret = -EINVAL;
+         goto err_no_fd;
 -- 
 2.9.5
