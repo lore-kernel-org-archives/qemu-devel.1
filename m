@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dmwMG-0006m3-Vk
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 02:20:14 -0400
+	(envelope-from <batmanustc@gmail.com>) id 1dmwN4-0007PZ-Ir
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 02:21:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dmwMB-00037d-Tf
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 02:20:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60120)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dmwMB-00036C-KV
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 02:20:07 -0400
-Date: Wed, 30 Aug 2017 08:20:01 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170830082001.7c9346dc@nial.brq.redhat.com>
-In-Reply-To: <20170829220337.23427-1-ehabkost@redhat.com>
-References: <20170829220337.23427-1-ehabkost@redhat.com>
+	(envelope-from <batmanustc@gmail.com>) id 1dmwN3-0003cZ-0i
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 02:21:02 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qom: Remove unused errp parameter from
- can_be_deleted()
+In-Reply-To: <CAKPgXcGJLOdSPWVfR5QY0iUGTSjwW1F-trrO-wEzQavU7VaRDA@mail.gmail.com>
+References: <CAOE=1Z2CjwTUPgREzBzkSLht9FP=g0_NsrOhVokQUgS2Sg-XOQ@mail.gmail.com>
+	<CAOE=1Z1GxtF-V8tnqpPKVNiJSyD2+yT9+u48c=V855qtwnUxoQ@mail.gmail.com>
+	<CAOE=1Z2cbY+vEpM32a1b6oGMa6Ogo==DtTY8mGV_8ncV+UduuQ@mail.gmail.com>
+	<CAOE=1Z2tU0Hqruqcca1G3JVUqX2B42Y3DG2xDPfMJT0Mrq6E1w@mail.gmail.com>
+	<CAKPgXcGJLOdSPWVfR5QY0iUGTSjwW1F-trrO-wEzQavU7VaRDA@mail.gmail.com>
+From: Sam <batmanustc@gmail.com>
+Date: Wed, 30 Aug 2017 14:20:58 +0800
+Message-ID: <CAOE=1Z28oKkkzHrXUuKPKP0fRZXouYzJUtS7JrJFKn1PK0261g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [QGA] Bug of qga?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,106 +25,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, Lin Ma <lma@suse.com>
+To: Sameeh Jubran <sameeh@daynix.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-discuss@nongnu.org
 
-On Tue, 29 Aug 2017 19:03:37 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+Hi all,
 
-> The errp argument is ignored by all implementations of the
-> method, and user_creatable_del() would break if any
-> implementation set an error (because it calls error_setg(errp) if
-> the function returns false).  Remove the unused parameter.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+I could repeat it, host os and guest os is Centos-7, qemu-ga is alive in
+guest. the step to repeat it is:
 
-> ---
->  include/qom/object_interfaces.h | 5 ++---
->  backends/cryptodev.c            | 2 +-
->  backends/hostmem.c              | 2 +-
->  qom/object_interfaces.c         | 6 +++---
->  4 files changed, 7 insertions(+), 8 deletions(-)
-> 
-> diff --git a/include/qom/object_interfaces.h b/include/qom/object_interfaces.h
-> index fdd7603..d63c1c2 100644
-> --- a/include/qom/object_interfaces.h
-> +++ b/include/qom/object_interfaces.h
-> @@ -51,7 +51,7 @@ typedef struct UserCreatableClass {
->  
->      /* <public> */
->      void (*complete)(UserCreatable *uc, Error **errp);
-> -    bool (*can_be_deleted)(UserCreatable *uc, Error **errp);
-> +    bool (*can_be_deleted)(UserCreatable *uc);
->  } UserCreatableClass;
->  
->  /**
-> @@ -68,12 +68,11 @@ void user_creatable_complete(Object *obj, Error **errp);
->  /**
->   * user_creatable_can_be_deleted:
->   * @uc: the object whose can_be_deleted() method is called if implemented
-> - * @errp: if an error occurs, a pointer to an area to store the error
->   *
->   * Wrapper to call can_be_deleted() method if one of types it's inherited
->   * from implements USER_CREATABLE interface.
->   */
-> -bool user_creatable_can_be_deleted(UserCreatable *uc, Error **errp);
-> +bool user_creatable_can_be_deleted(UserCreatable *uc);
->  
->  /**
->   * user_creatable_add_type:
-> diff --git a/backends/cryptodev.c b/backends/cryptodev.c
-> index 1764c17..67edfa5 100644
-> --- a/backends/cryptodev.c
-> +++ b/backends/cryptodev.c
-> @@ -215,7 +215,7 @@ bool cryptodev_backend_is_ready(CryptoDevBackend *backend)
->  }
->  
->  static bool
-> -cryptodev_backend_can_be_deleted(UserCreatable *uc, Error **errp)
-> +cryptodev_backend_can_be_deleted(UserCreatable *uc)
->  {
->      return !cryptodev_backend_is_used(CRYPTODEV_BACKEND(uc));
->  }
-> diff --git a/backends/hostmem.c b/backends/hostmem.c
-> index 4606b73..34550b9 100644
-> --- a/backends/hostmem.c
-> +++ b/backends/hostmem.c
-> @@ -342,7 +342,7 @@ out:
->  }
->  
->  static bool
-> -host_memory_backend_can_be_deleted(UserCreatable *uc, Error **errp)
-> +host_memory_backend_can_be_deleted(UserCreatable *uc)
->  {
->      if (host_memory_backend_is_mapped(MEMORY_BACKEND(uc))) {
->          return false;
-> diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-> index ff27e06..3bb8959 100644
-> --- a/qom/object_interfaces.c
-> +++ b/qom/object_interfaces.c
-> @@ -23,13 +23,13 @@ void user_creatable_complete(Object *obj, Error **errp)
->      }
->  }
->  
-> -bool user_creatable_can_be_deleted(UserCreatable *uc, Error **errp)
-> +bool user_creatable_can_be_deleted(UserCreatable *uc)
->  {
->  
->      UserCreatableClass *ucc = USER_CREATABLE_GET_CLASS(uc);
->  
->      if (ucc->can_be_deleted) {
-> -        return ucc->can_be_deleted(uc, errp);
-> +        return ucc->can_be_deleted(uc);
->      } else {
->          return true;
->      }
-> @@ -178,7 +178,7 @@ void user_creatable_del(const char *id, Error **errp)
->          return;
->      }
->  
-> -    if (!user_creatable_can_be_deleted(USER_CREATABLE(obj), errp)) {
-> +    if (!user_creatable_can_be_deleted(USER_CREATABLE(obj))) {
->          error_setg(errp, "object '%s' is in use, can not be deleted", id);
->          return;
->      }
+1. run python script just like the first email.
+2. send qmp command1(cmd in the python script, like `route -n` command or
+something, of course it's qmp format), and interrupt it immediately(use
+`ctrl+c`).
+3. then use that script to send command2(do not send command1) again, then
+you could get the result of command1.
+
+
+2017-08-29 17:04 GMT+08:00 Sameeh Jubran <sameeh@daynix.com>:
+
+> Hi Sam,
+>
+> Thanks for reporting this, in order to debug this efficiently I need you
+> to provide me with more info, if you can provide it that would be great.
+> Can you reproduce the issue with ncat? You can use ncat to connect to the
+> socket by running the following command:
+>
+> nc -U /tmp/qga.sock
+>
+> Which OS are you running? Which qemu-ga version are you running? can you
+> reproduce with upstream qemu-ga?
+>
+> On Tue, Aug 29, 2017 at 9:19 AM, Sam <batmanustc@gmail.com> wrote:
+>
+>> So how to fix this bug? And where should I to report bug?
+>>
+>> 2017-08-29 13:52 GMT+08:00 Sam <batmanustc@gmail.com>:
+>>
+>> > I could repeat this several times, I think it's mis-order of qmp in qga
+>> > socket.
+>> >
+>> > 2017-08-25 11:09 GMT+08:00 Sam <batmanustc@gmail.com>:
+>> >
+>> >> Also I found:
+>> >>
+>> >> when I use `socat` to take a qga socket, then I use `socat` to
+>> >> communicate it will got error.
+>> >> But also SOMETIMES, I will not got error and will communicate OK.
+>> >>
+>> >> If one user take qga socket, another user should got error, is it? But
+>> >> why sometimes, the communicate is OK?
+>> >>
+>> >> 2017-08-25 10:11 GMT+08:00 Sam <batmanustc@gmail.com>:
+>> >>
+>> >>> Hi all,
+>> >>>
+>> >>> I'm using qga to send `route -n` and `ping` command to guest. But I
+>> >>> found SOMETIMES, the second `ping` command's result is the same as
+>> `route
+>> >>> -n` command.
+>> >>>
+>> >>> So I guess is there some cache mechanism of qga command result? So
+>> when
+>> >>> I send the second command, and receive from qga socket, I receive the
+>> >>> result of first command.
+>> >>>
+>> >>> Or is this bug happened because of I use async mechanism of python
+>> code
+>> >>> to operate qga socket?
+>> >>>
+>> >>> This is the python code I use to operate on this qga socket:
+>> >>>
+>> >>> try:
+>> >>>>         sock=socket(AF_UNIX, SOCK_STREAM)
+>> >>>>         sock.settimeout(20)
+>> >>>>         sock.connect(vm_qga_sockpath)
+>> >>>>         sock.send(cmd)
+>> >>>>         while True:
+>> >>>>             res = sock.recv(1024)
+>> >>>>             if len(res):
+>> >>>>                 break
+>> >>>>     except Exception as e:
+>> >>>>         res = -1
+>> >>>>     finally:
+>> >>>>         sock.settimeout(None)
+>> >>>>         sock.close()
+>> >>>
+>> >>>
+>> >>
+>> >
+>>
+>
+>
+>
+> --
+> Respectfully,
+> *Sameeh Jubran*
+> *Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+> *Software Engineer @ Daynix <http://www.daynix.com>.*
+>
