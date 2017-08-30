@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnAC0-00049Y-Q1
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 17:06:33 -0400
+	(envelope-from <eblake@redhat.com>) id 1dnAC2-0004Bj-TI
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 17:06:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnABz-0007jz-QH
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 17:06:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1dnAC1-0007kg-J0
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 17:06:34 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 30 Aug 2017 16:05:39 -0500
-Message-Id: <20170830210542.2153-16-eblake@redhat.com>
+Date: Wed, 30 Aug 2017 16:05:40 -0500
+Message-Id: <20170830210542.2153-17-eblake@redhat.com>
 In-Reply-To: <20170830210542.2153-1-eblake@redhat.com>
 References: <20170830210542.2153-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 15/18] qcow2: Switch load_bitmap_data() to
+Subject: [Qemu-devel] [PATCH v6 16/18] qcow2: Switch store_bitmap_data() to
  byte-based iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -35,63 +35,75 @@ Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 v5: no change
 v4: new patch
 ---
- block/qcow2-bitmap.c | 22 ++++++++--------------
- 1 file changed, 8 insertions(+), 14 deletions(-)
+ block/qcow2-bitmap.c | 26 +++++++++++---------------
+ 1 file changed, 11 insertions(+), 15 deletions(-)
 
 diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index c7c60dfca2..b807298484 100644
+index b807298484..63d845e35f 100644
 --- a/block/qcow2-bitmap.c
 +++ b/block/qcow2-bitmap.c
-@@ -291,9 +291,8 @@ static int load_bitmap_data(BlockDriverState *bs,
+@@ -1072,10 +1072,9 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
  {
-     int ret = 0;
+     int ret;
      BDRVQcow2State *s = bs->opaque;
--    uint64_t sector, limit, sbc;
-+    uint64_t offset, limit;
+-    int64_t sector;
+-    uint64_t limit, sbc;
++    int64_t offset;
++    uint64_t limit;
      uint64_t bm_size = bdrv_dirty_bitmap_size(bitmap);
 -    uint64_t bm_sectors = DIV_ROUND_UP(bm_size, BDRV_SECTOR_SIZE);
+     const char *bm_name = bdrv_dirty_bitmap_name(bitmap);
      uint8_t *buf = NULL;
-     uint64_t i, tab_size =
-             size_to_clusters(s,
-@@ -305,32 +304,27 @@ static int load_bitmap_data(BlockDriverState *bs,
-
+     BdrvDirtyBitmapIter *dbi;
+@@ -1100,18 +1099,17 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
+     dbi = bdrv_dirty_iter_new(bitmap);
      buf = g_malloc(s->cluster_size);
      limit = bytes_covered_by_bitmap_cluster(s, bitmap);
 -    sbc = limit >> BDRV_SECTOR_BITS;
--    for (i = 0, sector = 0; i < tab_size; ++i, sector += sbc) {
--        uint64_t count = MIN(bm_sectors - sector, sbc);
-+    for (i = 0, offset = 0; i < tab_size; ++i, offset += limit) {
-+        uint64_t count = MIN(bm_size - offset, limit);
-         uint64_t entry = bitmap_table[i];
--        uint64_t offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
-+        uint64_t data_offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
+     assert(DIV_ROUND_UP(bm_size, limit) == tb_size);
 
-         assert(check_table_entry(entry, s->cluster_size) == 0);
+-    while ((sector = bdrv_dirty_iter_next(dbi) >> BDRV_SECTOR_BITS) != -1) {
+-        uint64_t cluster = sector / sbc;
++    while ((offset = bdrv_dirty_iter_next(dbi)) != -1) {
++        uint64_t cluster = offset / limit;
+         uint64_t end, write_size;
+         int64_t off;
 
--        if (offset == 0) {
-+        if (data_offset == 0) {
-             if (entry & BME_TABLE_ENTRY_FLAG_ALL_ONES) {
--                bdrv_dirty_bitmap_deserialize_ones(bitmap,
--                                                   sector * BDRV_SECTOR_SIZE,
--                                                   count * BDRV_SECTOR_SIZE,
-+                bdrv_dirty_bitmap_deserialize_ones(bitmap, offset, count,
-                                                    false);
-             } else {
-                 /* No need to deserialize zeros because the dirty bitmap is
-                  * already cleared */
-             }
-         } else {
--            ret = bdrv_pread(bs->file, offset, buf, s->cluster_size);
-+            ret = bdrv_pread(bs->file, data_offset, buf, s->cluster_size);
-             if (ret < 0) {
-                 goto finish;
-             }
--            bdrv_dirty_bitmap_deserialize_part(bitmap, buf,
--                                               sector * BDRV_SECTOR_SIZE,
--                                               count * BDRV_SECTOR_SIZE,
-+            bdrv_dirty_bitmap_deserialize_part(bitmap, buf, offset, count,
-                                                false);
+-        sector = cluster * sbc;
+-        end = MIN(bm_sectors, sector + sbc);
+-        write_size = bdrv_dirty_bitmap_serialization_size(bitmap,
+-            sector * BDRV_SECTOR_SIZE, (end - sector) * BDRV_SECTOR_SIZE);
++        offset = cluster * limit;
++        end = MIN(bm_size, offset + limit);
++        write_size = bdrv_dirty_bitmap_serialization_size(bitmap, offset,
++                                                          end - offset);
+         assert(write_size <= s->cluster_size);
+
+         off = qcow2_alloc_clusters(bs, s->cluster_size);
+@@ -1123,9 +1121,7 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
          }
+         tb[cluster] = off;
+
+-        bdrv_dirty_bitmap_serialize_part(bitmap, buf,
+-                                         sector * BDRV_SECTOR_SIZE,
+-                                         (end - sector) * BDRV_SECTOR_SIZE);
++        bdrv_dirty_bitmap_serialize_part(bitmap, buf, offset, end - offset);
+         if (write_size < s->cluster_size) {
+             memset(buf + write_size, 0, s->cluster_size - write_size);
+         }
+@@ -1143,11 +1139,11 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
+             goto fail;
+         }
+
+-        if (end >= bm_sectors) {
++        if (end >= bm_size) {
+             break;
+         }
+
+-        bdrv_set_dirty_iter(dbi, end * BDRV_SECTOR_SIZE);
++        bdrv_set_dirty_iter(dbi, end);
      }
+
+     *bitmap_table_size = tb_size;
 -- 
 2.13.5
