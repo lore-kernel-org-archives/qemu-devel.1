@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmyRH-0007KI-NG
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:33:32 -0400
+	(envelope-from <peterx@redhat.com>) id 1dmyRL-0007Ni-8S
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:33:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmyRG-0003Nj-E8
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:33:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48852)
+	(envelope-from <peterx@redhat.com>) id 1dmyRK-0003P7-0j
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:33:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47882)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dmyRG-0003NP-5G
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:33:30 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dmyRJ-0003Ou-ON
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:33:33 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Wed, 30 Aug 2017 16:32:09 +0800
-Message-Id: <1504081950-2528-13-git-send-email-peterx@redhat.com>
+Date: Wed, 30 Aug 2017 16:32:10 +0800
+Message-Id: <1504081950-2528-14-git-send-email-peterx@redhat.com>
 In-Reply-To: <1504081950-2528-1-git-send-email-peterx@redhat.com>
 References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC v2 12/33] migration: allow send_rq to fail
+Subject: [Qemu-devel] [RFC v2 13/33] migration: allow fault thread to pause
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,110 +26,157 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-We will not allow failures to happen when sending data from destination
-to source via the return path. However it is possible that there can be
-errors along the way.  This patch allows the migrate_send_rp_message()
-to return error when it happens, and further extended it to
-migrate_send_rp_req_pages().
+Allows the fault thread to stop handling page faults temporarily. When
+network failure happened (and if we expect a recovery afterwards), we
+should not allow the fault thread to continue sending things to source,
+instead, it should halt for a while until the connection is rebuilt.
+
+When the dest main thread noticed the failure, it kicks the fault thread
+to switch to pause state.
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c | 38 ++++++++++++++++++++++++++++++--------
- migration/migration.h |  2 +-
- 2 files changed, 31 insertions(+), 9 deletions(-)
+ migration/migration.c    |  1 +
+ migration/migration.h    |  1 +
+ migration/postcopy-ram.c | 50 ++++++++++++++++++++++++++++++++++++++++++++----
+ migration/savevm.c       |  3 +++
+ migration/trace-events   |  2 ++
+ 5 files changed, 53 insertions(+), 4 deletions(-)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index b3cd8be..d42209d 100644
+index d42209d..722f8ac 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -195,17 +195,35 @@ static void deferred_incoming_migration(Error **errp)
-  * Send a message on the return channel back to the source
-  * of the migration.
-  */
--static void migrate_send_rp_message(MigrationIncomingState *mis,
--                                    enum mig_rp_message_type message_type,
--                                    uint16_t len, void *data)
-+static int migrate_send_rp_message(MigrationIncomingState *mis,
-+                                   enum mig_rp_message_type message_type,
-+                                   uint16_t len, void *data)
- {
-+    int ret = 0;
-+
-     trace_migrate_send_rp_message((int)message_type, len);
-     qemu_mutex_lock(&mis->rp_mutex);
-+
-+    /*
-+     * It's possible that the file handle got lost due to network
-+     * failures.
-+     */
-+    if (!mis->to_src_file) {
-+        ret = -EIO;
-+        goto error;
-+    }
-+
-     qemu_put_be16(mis->to_src_file, (unsigned int)message_type);
-     qemu_put_be16(mis->to_src_file, len);
-     qemu_put_buffer(mis->to_src_file, data, len);
-     qemu_fflush(mis->to_src_file);
-+
-+    /* It's possible that qemu file got error during sending */
-+    ret = qemu_file_get_error(mis->to_src_file);
-+
-+error:
-     qemu_mutex_unlock(&mis->rp_mutex);
-+    return ret;
- }
- 
- /* Request a range of pages from the source VM at the given
-@@ -215,26 +233,30 @@ static void migrate_send_rp_message(MigrationIncomingState *mis,
-  *   Start: Address offset within the RB
-  *   Len: Length in bytes required - must be a multiple of pagesize
-  */
--void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
--                               ram_addr_t start, size_t len)
-+int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
-+                              ram_addr_t start, size_t len)
- {
-     uint8_t bufc[12 + 1 + 255]; /* start (8), len (4), rbname up to 256 */
-     size_t msglen = 12; /* start + len */
-+    int rbname_len;
-+    enum mig_rp_message_type msg_type;
- 
-     *(uint64_t *)bufc = cpu_to_be64((uint64_t)start);
-     *(uint32_t *)(bufc + 8) = cpu_to_be32((uint32_t)len);
- 
-     if (rbname) {
--        int rbname_len = strlen(rbname);
-+        rbname_len = strlen(rbname);
-         assert(rbname_len < 256);
- 
-         bufc[msglen++] = rbname_len;
-         memcpy(bufc + msglen, rbname, rbname_len);
-         msglen += rbname_len;
--        migrate_send_rp_message(mis, MIG_RP_MSG_REQ_PAGES_ID, msglen, bufc);
-+        msg_type = MIG_RP_MSG_REQ_PAGES_ID;
-     } else {
--        migrate_send_rp_message(mis, MIG_RP_MSG_REQ_PAGES, msglen, bufc);
-+        msg_type = MIG_RP_MSG_REQ_PAGES;
+@@ -147,6 +147,7 @@ MigrationIncomingState *migration_incoming_get_current(void)
+         qemu_mutex_init(&mis_current.rp_mutex);
+         qemu_event_init(&mis_current.main_thread_load_event, false);
+         qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
++        qemu_sem_init(&mis_current.postcopy_pause_sem_fault, 0);
+         once = true;
      }
-+
-+    return migrate_send_rp_message(mis, msg_type, msglen, bufc);
- }
- 
- void qemu_start_incoming_migration(const char *uri, Error **errp)
+     return &mis_current;
 diff --git a/migration/migration.h b/migration/migration.h
-index 323d88d..6333391 100644
+index 6333391..338dfe3 100644
 --- a/migration/migration.h
 +++ b/migration/migration.h
-@@ -199,7 +199,7 @@ void migrate_send_rp_shut(MigrationIncomingState *mis,
-                           uint32_t value);
- void migrate_send_rp_pong(MigrationIncomingState *mis,
-                           uint32_t value);
--void migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
-+int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char* rbname,
-                               ram_addr_t start, size_t len);
+@@ -63,6 +63,7 @@ struct MigrationIncomingState {
  
- #endif
+     /* notify PAUSED postcopy incoming migrations to try to continue */
+     QemuSemaphore postcopy_pause_sem_dst;
++    QemuSemaphore postcopy_pause_sem_fault;
+ };
+ 
+ MigrationIncomingState *migration_incoming_get_current(void);
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index c28e340..026a58e 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -418,6 +418,17 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
+     return 0;
+ }
+ 
++static bool postcopy_pause_fault_thread(MigrationIncomingState *mis)
++{
++    trace_postcopy_pause_fault_thread();
++
++    qemu_sem_wait(&mis->postcopy_pause_sem_fault);
++
++    trace_postcopy_pause_fault_thread_continued();
++
++    return true;
++}
++
+ /*
+  * Handle faults detected by the USERFAULT markings
+  */
+@@ -465,6 +476,22 @@ static void *postcopy_ram_fault_thread(void *opaque)
+             }
+         }
+ 
++        if (!mis->to_src_file) {
++            /*
++             * Possibly someone tells us that the return path is
++             * broken already using the event. We should hold until
++             * the channel is rebuilt.
++             */
++            if (postcopy_pause_fault_thread(mis)) {
++                last_rb = NULL;
++                /* Continue to read the userfaultfd */
++            } else {
++                error_report("%s: paused but don't allow to continue",
++                             __func__);
++                break;
++            }
++        }
++
+         ret = read(mis->userfault_fd, &msg, sizeof(msg));
+         if (ret != sizeof(msg)) {
+             if (errno == EAGAIN) {
+@@ -504,18 +531,33 @@ static void *postcopy_ram_fault_thread(void *opaque)
+                                                 qemu_ram_get_idstr(rb),
+                                                 rb_offset);
+ 
++retry:
+         /*
+          * Send the request to the source - we want to request one
+          * of our host page sizes (which is >= TPS)
+          */
+         if (rb != last_rb) {
+             last_rb = rb;
+-            migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
+-                                     rb_offset, qemu_ram_pagesize(rb));
++            ret = migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
++                                            rb_offset, qemu_ram_pagesize(rb));
+         } else {
+             /* Save some space */
+-            migrate_send_rp_req_pages(mis, NULL,
+-                                     rb_offset, qemu_ram_pagesize(rb));
++            ret = migrate_send_rp_req_pages(mis, NULL,
++                                            rb_offset, qemu_ram_pagesize(rb));
++        }
++
++        if (ret) {
++            /* May be network failure, try to wait for recovery */
++            if (ret == -EIO && postcopy_pause_fault_thread(mis)) {
++                /* We got reconnected somehow, try to continue */
++                last_rb = NULL;
++                goto retry;
++            } else {
++                /* This is a unavoidable fault */
++                error_report("%s: migrate_send_rp_req_pages() get %d",
++                             __func__, ret);
++                break;
++            }
+         }
+     }
+     trace_postcopy_ram_fault_thread_exit();
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 3777124..a3162c1 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1994,6 +1994,9 @@ static bool postcopy_pause_incoming(MigrationIncomingState *mis)
+     mis->to_src_file = NULL;
+     qemu_mutex_unlock(&mis->rp_mutex);
+ 
++    /* Notify the fault thread for the invalidated file handle */
++    postcopy_fault_thread_notify(mis);
++
+     error_report("Detected IO failure for postcopy. "
+                  "Migration paused.");
+ 
+diff --git a/migration/trace-events b/migration/trace-events
+index 1a83f60..42a93d9 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -100,6 +100,8 @@ open_return_path_on_source_continue(void) ""
+ postcopy_start(void) ""
+ postcopy_pause_return_path(void) ""
+ postcopy_pause_return_path_continued(void) ""
++postcopy_pause_fault_thread(void) ""
++postcopy_pause_fault_thread_continued(void) ""
+ postcopy_pause_continued(void) ""
+ postcopy_pause_incoming(void) ""
+ postcopy_pause_incoming_continued(void) ""
 -- 
 2.7.4
