@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dn1JV-0000og-KD
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 07:37:42 -0400
+	(envelope-from <quintela@redhat.com>) id 1dn1VA-000470-Ot
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 07:49:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dn1JU-0001b4-PW
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 07:37:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51040)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dn1JU-0001ak-Fc
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 07:37:40 -0400
+	(envelope-from <quintela@redhat.com>) id 1dn1V9-0005rz-O1
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 07:49:44 -0400
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170830104554.GD18526@redhat.com> (Daniel P. Berrange's message
-	of "Wed, 30 Aug 2017 11:45:54 +0100")
-References: <20170823083901.852-1-quintela@redhat.com>
-	<20170823083901.852-3-quintela@redhat.com>
-	<20170823115327.GC2648@work-vm>
-	<bbe64c5c-8906-2bf9-92a8-8fda49100505@kaod.org>
-	<6b5e898b-89d9-2323-5ca9-0cd212d39ec1@redhat.com>
-	<20170830104554.GD18526@redhat.com>
+In-Reply-To: <20170830100605.22694-1-famz@redhat.com> (Fam Zheng's message of
+	"Wed, 30 Aug 2017 18:06:05 +0800")
+References: <20170830100605.22694-1-famz@redhat.com>
 Reply-To: quintela@redhat.com
-Date: Wed, 30 Aug 2017 13:37:32 +0200
-Message-ID: <87val55ls3.fsf@secure.mitica>
+Date: Wed, 30 Aug 2017 13:49:28 +0200
+Message-ID: <87mv6h5l87.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/2] tests: Make acpid test compile
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] block: Cleanup BMDS in bdrv_close_all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,74 +23,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, lvivier@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org, peterx@redhat.com, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-"Daniel P. Berrange" <berrange@redhat.com> wrote:
-> On Tue, Aug 29, 2017 at 03:17:25PM -0500, Eric Blake wrote:
->> On 08/28/2017 09:41 AM, C=C3=A9dric Le Goater wrote:
->> > On 08/23/2017 01:53 PM, Dr. David Alan Gilbert wrote:
->> >> * Juan Quintela (quintela@redhat.com) wrote:
->> >>> Compiler gets confused with the size of the struct, so move form
->> >>> g_new0() to g_malloc0().
->> >>>
->> >>> I *think* that the problem is in gcc (or glib for that matter), but
->> >>> the documentation of the g_new0 states that 1sts first argument is an
->> >>> struct type, and uint32_t is not an struct type.
->> >>>
->> >>> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> >>> ---
->>=20
->> >>>=20=20
->> >>>      /* get the addresses of the tables pointed by rsdt */
->> >>> -    tables =3D g_new0(uint32_t, tables_nr);
->> >>> +    tables =3D g_malloc0(sizeof(uint32_t) * tables_nr);
->> >>
->>=20
->> > I fixed that one with :
->> >=20
->> > @@ -40,7 +40,7 @@ static uint32_t acpi_find_vgia(void)
->> >      AcpiRsdpDescriptor rsdp_table;
->> >      uint32_t rsdt;
->> >      AcpiRsdtDescriptorRev1 rsdt_table;
->> > -    int tables_nr;
->> > +    uint32_t tables_nr;
->>=20
->> I like this one better (multiplication in g_malloc0() makes me worry
->> about overflow; using unsigned math to avoid the problem is nicer).  Are
->> we going to see a v2 of this patch series?
+Fam Zheng <famz@redhat.com> wrote:
+> This fixes the assertion due to op blockers added by BMDS:
 >
-> It should really be size_t, because it is assigned from the result of
-> a size_t calculation, but you then also need to change a later assert
-> which was relying on it being signed:
+> block.c:3248: bdrv_delete: Assertion `bdrv_op_blocker_is_empty(bs)' failed.
 >
-> @@ -40,7 +40,7 @@ static uint32_t acpi_find_vgia(void)
->      AcpiRsdpDescriptor rsdp_table;
->      uint32_t rsdt;
->      AcpiRsdtDescriptorRev1 rsdt_table;
-> -    int tables_nr;
-> +    size_t tables_nr;
-
-I was using this already.
-
->      uint32_t *tables;
->      AcpiTableHeader ssdt_table;
->      VgidTable vgid_table;
-> @@ -62,9 +62,9 @@ static uint32_t acpi_find_vgia(void)
->      ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
->=20=20
->      /* compute the table entries in rsdt */
-> +    g_assert_cmpint(rsdt_table.length, >, sizeof(AcpiRsdtDescriptorRev1)=
-);
->      tables_nr =3D (rsdt_table.length - sizeof(AcpiRsdtDescriptorRev1)) /
->                  sizeof(uint32_t);
-> -    g_assert_cmpint(tables_nr, >, 0);
->=20=20
->      /* get the addresses of the tables pointed by rsdt */
->      tables =3D g_new0(uint32_t, tables_nr);
+> Reproducer: simply start block migration and quit QEMU before it ends.
 >
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 
-And here we are, this mail arrived after I sent my new series.  Will
-wait for more comments and resend later.
+No need for one stub, see later.
+
+
+> ---
+>  block.c                 | 2 ++
+>  migration/block.c       | 2 +-
+>  migration/block.h       | 1 +
+>  stubs/Makefile.objs     | 1 +
+>  stubs/block-migration.c | 6 ++++++
+>  5 files changed, 11 insertions(+), 1 deletion(-)
+>  create mode 100644 stubs/block-migration.c
+>
+> diff --git a/block.c b/block.c
+> index 3308814bba..508a57274d 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -43,6 +43,7 @@
+>  #include "qemu/cutils.h"
+>  #include "qemu/id.h"
+>  #include "qapi/util.h"
+> +#include "migration/block.h"
+
+this should be misc.h
+
+>  
+>  #ifdef CONFIG_BSD
+>  #include <sys/ioctl.h>
+> @@ -3111,6 +3112,7 @@ static void bdrv_close(BlockDriverState *bs)
+>  
+>  void bdrv_close_all(void)
+>  {
+> +    block_migration_cleanup_bmds();
+>      block_job_cancel_sync_all();
+>      nbd_export_close_all();
+>  
+
+> diff --git a/migration/block.h b/migration/block.h
+> index 22ebe94259..8bae1cf55a 100644
+> --- a/migration/block.h
+> +++ b/migration/block.h
+> @@ -42,4 +42,5 @@ static inline uint64_t blk_mig_bytes_total(void)
+>  #endif /* CONFIG_LIVE_BLOCK_MIGRATION */
+>  
+>  void migrate_set_block_enabled(bool value, Error **errp);
+> +void block_migration_cleanup_bmds(void);
+>  #endif /* MIGRATION_BLOCK_H */
+> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+> index e69c217aff..7540913767 100644
+> --- a/stubs/Makefile.objs
+> +++ b/stubs/Makefile.objs
+> @@ -19,6 +19,7 @@ stub-obj-y += is-daemonized.o
+>  stub-obj-$(CONFIG_LINUX_AIO) += linux-aio.o
+>  stub-obj-y += machine-init-done.o
+>  stub-obj-y += migr-blocker.o
+> +stub-obj-y += block-migration.o
+>  stub-obj-y += change-state-handler.o
+>  stub-obj-y += monitor.o
+>  stub-obj-y += notify-event.o
+> diff --git a/stubs/block-migration.c b/stubs/block-migration.c
+> new file mode 100644
+> index 0000000000..855f15c757
+> --- /dev/null
+> +++ b/stubs/block-migration.c
+> @@ -0,0 +1,6 @@
+> +#include "qemu/osdep.h"
+> +#include "migration/block.h"
+> +
+> +void block_migration_cleanup_bmds(void)
+> +{
+> +}
+
+You can add this inside include/migration/misc.h
+
+#ifdef CONFIG_LIVE_BLOCK_MIGRATION
+void blk_mig_init(void);
+#else
+static inline void blk_mig_init(void) {}
+
+// And then you add the stub here?
+
+#endif
+
+
+Once here, I would consider to give one error/warning if we quit qemu
+and we are in the middle of a block migration, no?
 
 Thanks, Juan.
