@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dn6a4-0004zw-Jt
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:15:12 -0400
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dn6aJ-0005JX-6c
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:15:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dn6a1-00055M-FH
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:15:08 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34498)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dn6a1-00055I-7n
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:15:05 -0400
-Received: by mail-wm0-x243.google.com with SMTP id l19so2456476wmi.1
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 10:15:05 -0700 (PDT)
-Date: Wed, 30 Aug 2017 18:15:02 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170830171502.GC24565@stefanha-x1.localdomain>
-References: <87r2w6eq5n.fsf@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87r2w6eq5n.fsf@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] scripts: Support building with Python 3
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dn6aG-0005Bm-Dz
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:15:23 -0400
+Received: from research.iiit.ac.in ([196.12.53.8]:59038)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dn6aF-0005BR-PU
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:15:20 -0400
+From: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+Date: Wed, 30 Aug 2017 22:44:56 +0530
+Message-Id: <1504113297-22052-3-git-send-email-chugh.ishani@research.iiit.ac.in>
+In-Reply-To: <1504113297-22052-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+References: <1504113297-22052-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+Subject: [Qemu-devel] [PATCH v3 2/3] Test for full Backup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +26,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Michael <fedora.dm0@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, jsnow@redhat.com, famz@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 
-On Sat, Aug 19, 2017 at 10:58:44PM -0700, David Michael wrote:
-> This allows building with "./configure --python=python3", where
-> the python3 program is at least version 3.6.  It preserves
-> compatibility with Python 2.  The changes include:
-> 
->   - Avoiding "print" usage
->   - Using bytes with files opened in binary mode
->   - Switching .iteritems() to .items()
->   - Adding fallback imports for functions moved to other modules
-> 
-> Signed-off-by: David Michael <fedora.dm0@gmail.com>
-> ---
-> 
-> Hi,
-> 
-> I've been applying these changes when building on Fedora 26, which does
-> not include any Python 2 packages by default.  It was tested with Python
-> 2.7 and 3.6.
-> 
-> I just saw the list of scripts that need updating on the mailing list,
-> and this doesn't cover all of them, but it is enough to build a binary
-> for running virtual machines with KVM.  Maybe it is still useful as a
-> starting point.
-> 
-> Thanks.
-> 
-> David
-> 
->  configure            |  6 ++++--
->  scripts/qapi.py      | 31 ++++++++++++++++++++-----------
->  scripts/qapi2texi.py | 10 +++++-----
->  scripts/signrom.py   |  4 ++--
->  4 files changed, 31 insertions(+), 20 deletions(-)
+This patch is the test for full backup implementation in Backup tool.
+The test employs two basic substests:
+1) Backing up an empty guest and comparing it with base image.
+2) Writing a pattern to the guest, creating backup and comparing
+   with the base image.
 
-Cool, thanks for contributing this!
+Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+---
+ tests/qemu-iotests/191     | 86 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/191.out | 35 +++++++++++++++++++
+ tests/qemu-iotests/group   |  2 ++
+ 3 files changed, 123 insertions(+)
+ create mode 100755 tests/qemu-iotests/191
+ create mode 100644 tests/qemu-iotests/191.out
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
+new file mode 100755
+index 0000000..16988d8
+--- /dev/null
++++ b/tests/qemu-iotests/191
+@@ -0,0 +1,86 @@
++#!/bin/bash
++#
++# Test full backup functionality of qemu-backup tool
++#
++# Copyright (C) 2017 Ishani Chugh <chugh.ishani@research.iiit.ac.in>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=chugh.ishani@research.iiit.ac.in
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1	# failure is the default!
++
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.qemu
++
++_supported_fmt generic
++_supported_proto generic
++_supported_os Linux
++
++_cleanup()
++{
++        rm -f "$TEST_DIR"/virtio0
++        rm -f "$CONFIG_FILE"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++CONFIG_FILE="$TEST_DIR"/backup-config
++SOCKET=unix:"$TEST_DIR"/backup_socket
++size=128M
++
++_make_test_img "$size"
++export QEMU_BACKUP_CONFIG="$CONFIG_FILE"
++qemu_comm_method="monitor"
++echo
++_launch_qemu -drive if=virtio,file="$TEST_IMG" -qmp "$SOCKET",server,nowait
++$PYTHON ../../contrib/backup/qemu-backup.py guest add --guest adad --qmp "$SOCKET"
++$PYTHON ../../contrib/backup/qemu-backup.py drive add --id virtio0 --guest adad --target "$TEST_DIR"/virtio0
++echo
++echo "== Creating backup =="
++$PYTHON ../../contrib/backup/qemu-backup.py backup --guest adad
++_send_qemu_cmd $QEMU_HANDLE 'quit' ''
++wait=1 _cleanup_qemu
++echo
++echo "== Comparing images =="
++$QEMU_IMG compare "$TEST_DIR"/virtio0 "$TEST_IMG"
++_cleanup
++
++_launch_qemu -drive if=virtio,id=virtio0,file="$TEST_IMG" -qmp "$SOCKET",server,nowait
++$PYTHON ../../contrib/backup/qemu-backup.py guest add --guest adad --qmp "$SOCKET"
++$PYTHON ../../contrib/backup/qemu-backup.py drive add --id virtio0 --guest adad --target "$TEST_DIR"/virtio0
++echo
++echo "== Writing Pattern =="
++_send_qemu_cmd $QEMU_HANDLE 'qemu-io virtio0 "write -P 0x22 0 1M"' "(qemu)" | _filter_qemu_io
++echo
++echo "== Creating backup =="
++$PYTHON ../../contrib/backup/qemu-backup.py backup --guest adad
++_send_qemu_cmd $QEMU_HANDLE 'quit' ''
++wait=1 _cleanup_qemu
++echo
++echo "== Comparing images =="
++$QEMU_IMG compare "$TEST_DIR"/virtio0 "$TEST_IMG"
++_cleanup
++_cleanup_test_img
++
++echo "*** done"
++status=0
+\ No newline at end of file
+diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
+new file mode 100644
+index 0000000..c60d47a
+--- /dev/null
++++ b/tests/qemu-iotests/191.out
+@@ -0,0 +1,35 @@
++QA output created by 191
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
++
++Successfully Added Guest
++Successfully Added Drive
++
++== Creating backup ==
++Backup Started
++*virtio0
++Backup Complete
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) Formatting 'TEST_DIR/virtio0', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
++quit
++
++== Comparing images ==
++Images are identical.
++Successfully Added Guest
++Successfully Added Drive
++
++== Writing Pattern ==
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) qemu-io virtio0 "write -P 0x22 0 1M"
++
++== Creating backup ==
++Backup Started
++*virtio0
++Backup Complete
++wrote 1048576/1048576 bytes at offset 0
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++(qemu) Formatting 'TEST_DIR/virtio0', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
++quit
++
++== Comparing images ==
++Images are identical.
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index afbdc42..66fa231 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -186,4 +186,6 @@
+ 188 rw auto quick
+ 189 rw auto
+ 190 rw auto quick
++191 rw auto
+ 192 rw auto quick
++193 rw auto
+-- 
+2.7.4
