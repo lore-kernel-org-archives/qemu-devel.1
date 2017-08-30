@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmvym-0008NY-Qu
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 01:55:57 -0400
+	(envelope-from <thuth@redhat.com>) id 1dmw6K-00027I-7t
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 02:03:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmvyj-0004Eh-PW
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 01:55:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36350)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dmvyj-0004EQ-GF
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 01:55:53 -0400
-Date: Wed, 30 Aug 2017 13:55:40 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170830055540.GD5920@pxdev.xzpeter.org>
-References: <20170824192730.8440-1-dgilbert@redhat.com>
-	<20170824192730.8440-23-dgilbert@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1dmw6G-00064F-8Q
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 02:03:44 -0400
+References: <20170828155831.4eda8c12@oO_Oo>
+	<c0020cdd-f052-6d39-d7a9-4ec36508aa0b@redhat.com>
+	<20170829212237.3fbb41ab@oO_Oo>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <fee062ce-1c82-5083-8440-ca1636cf0635@redhat.com>
+Date: Wed, 30 Aug 2017 08:03:31 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170829212237.3fbb41ab@oO_Oo>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170824192730.8440-23-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 22/32] vhost+postcopy: Add vhost waker
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-discuss] changing from net to netdev with
+ vde switches and double nics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +26,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, a.perevalov@samsung.com, mst@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, lvivier@redhat.com, aarcange@redhat.com, felipe@nutanix.com
+To: Paolo <anotheruser.mailinglist@virgilio.it>
+Cc: "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-On Thu, Aug 24, 2017 at 08:27:20PM +0100, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Register a waker function in vhost-user code to be notified when
-> pages arrive or requests to previously mapped pages get requested.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  hw/virtio/trace-events |  3 +++
->  hw/virtio/vhost-user.c | 26 ++++++++++++++++++++++++++
->  2 files changed, 29 insertions(+)
-> 
-> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> index f7d4b831fe..adebf6dc6b 100644
-> --- a/hw/virtio/trace-events
-> +++ b/hw/virtio/trace-events
-> @@ -7,6 +7,9 @@ vhost_user_postcopy_fault_handler_found(int i, uint64_t region_offset, uint64_t
->  vhost_user_postcopy_listen(void) ""
->  vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, int reply_i, int region_i) "client:0x%"PRIx64" for hva: 0x%"PRIx64" reply %d region %d"
->  vhost_user_set_mem_table_withfd(int index, const char *name, uint64_t memory_size, uint64_t guest_phys_addr, uint64_t userspace_addr, uint64_t offset) "%d:%s: size:0x%"PRIx64" GPA:0x%"PRIx64" QVA/userspace:0x%"PRIx64" RB offset:0x%"PRIx64
-> +vhost_user_postcopy_waker(const char *rb, uint64_t rb_offset) "%s + 0x%"PRIx64
-> +vhost_user_postcopy_waker_found(uint64_t client_addr) "0x%"PRIx64
-> +vhost_user_postcopy_waker_nomatch(const char *rb, uint64_t rb_offset) "%s + 0x%"PRIx64
->  
->  # hw/virtio/virtio.c
->  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
-> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> index 2897ff70b3..3bff33a1a6 100644
-> --- a/hw/virtio/vhost-user.c
-> +++ b/hw/virtio/vhost-user.c
-> @@ -847,6 +847,31 @@ static int vhost_user_postcopy_fault_handler(struct PostCopyFD *pcfd,
->      return -1;
->  }
->  
-> +static int vhost_user_postcopy_waker(struct PostCopyFD *pcfd, RAMBlock *rb,
-> +                                     uint64_t offset)
-> +{
-> +    struct vhost_dev *dev = pcfd->data;
-> +    struct vhost_user *u = dev->opaque;
-> +    int i;
-> +
-> +    trace_vhost_user_postcopy_waker(qemu_ram_get_idstr(rb), offset);
-> +    /* Translate the offset into an address in the clients address space */
-> +    for (i = 0; i < MIN(dev->mem->nregions, u->region_rb_len); i++) {
-> +        if (u->region_rb[i] == rb &&
-> +            offset >= u->region_rb_offset[i] &&
-> +            offset < (u->region_rb_offset[i] +
-> +                      dev->mem->regions[i].memory_size)) {
+On 29.08.2017 21:22, Paolo wrote:
+>=20
+> ----------------------------------------------------------------------
+>> On Tue, 29 Aug 2017 11:48:20 +0200
+>> Thomas Huth <thuth@redhat.com> wrote:
+> [cut]
+>> That's interesting, I think you're the first person I know in months o=
+r
+>> even years who really seems to be using the vlan=3Dx parameter (with x=
+ >=3D
+>> 1)...
+>=20
+> I can't see any other way to realize this topology:
+>                       =20
+>              Internet---HOST--SambaServer
+>                        |    |
+>                        |    |
+>                   pubNET    prvNET
+>                   |         |
+>    |--------------          |
+>    |                        |
+>  NIC0  NIC1-----------------|
+>    |    |
+>   machine_1                   ....  machine_N       =20
+>> You're right, you can not translate your setup 1:1 to -netdev anymore,
+>> since there are no 'vlan's (or rather hubs, since 'vlan' is rather a
+>> misnomer here) available with the -netdev parameter.
+>=20
+> This might be a problem for me, as I explain later=20
+>> Question is: Why do you need it at all? I see your point that you want
+>> to have two network cards, but why does each NIC has to be wired to tw=
+o
+>> host networks (vde *and* tap)? Isn't it sufficient if you connect each
+>> NIC to one VDE network?
+>=20
+> Easily: by ignorance.
 
-Just curious: checks against offset should only be for safety, right?
-Is there valid case that even rb is correct but the offset gets out of
-the range of that RAMBlock?
+Deja vu ... this is actually one of the reasons why we want to get rid
+of this "vlan" stuff in QEMU. Hardly anybody gets it really right, it
+mainly causes confusion and mis-configurations.
 
-> +            uint64_t client_addr = (offset - u->region_rb_offset[i]) +
-> +                                   u->postcopy_client_bases[i];
-> +            trace_vhost_user_postcopy_waker_found(client_addr);
-> +            return postcopy_wake_shared(pcfd, client_addr, rb);
-> +        }
-> +    }
-> +
-> +    trace_vhost_user_postcopy_waker_nomatch(qemu_ram_get_idstr(rb), offset);
-> +    return 0;
-> +}
-> +
->  /*
->   * Called at the start of an inbound postcopy on reception of the
->   * 'advise' command.
-> @@ -892,6 +917,7 @@ static int vhost_user_postcopy_advise(struct vhost_dev *dev, Error **errp)
->      u->postcopy_fd.fd = ufd;
->      u->postcopy_fd.data = dev;
->      u->postcopy_fd.handler = vhost_user_postcopy_fault_handler;
-> +    u->postcopy_fd.waker = vhost_user_postcopy_waker;
->      u->postcopy_fd.idstr = "vhost-user"; /* Need to find unique name */
->      postcopy_register_shared_ufd(&u->postcopy_fd);
->      return 0;
-> -- 
-> 2.13.5
-> 
+> Writing that script (about 8 years ago) with almost zero knowledge of n=
+etworking and difference between tap, vde (and much more stuff), made me =
+rely on a Frankenstein-style patchwork from midnight readings of the vari=
+ous howtos on internet. Quite a mess and a long and painful trial-and-err=
+or race. Nor that today I might be regarded as an expert in networking, I=
+ didn't progress very much (and it' not my job anyway).
+>=20
+> Back on topic, following your hint, I've tried just know that all I nee=
+d is vde, and everything works fine:
+>=20
+>  NET0=3D"-net vde,vlan=3D0,sock=3D/var/run/vde.ctl00 -net nic,vlan=3D0,=
+model=3Drtl8139,macaddr=3D$NIC0MAC"
+>  NET1=3D"-net vde,vlan=3D1,sock=3D/var/run/vde.ctl01 -net nic,vlan=3D1,=
+model=3Drtl8139,macaddr=3D$NIC1MAC"
+>=20
+> Now I guess this is impossbile to achieve with netdev?
+> How may I tell to qemu that the guest's NIC0 has to be wired to the vde=
+ switch vde.ctl00 run on host has, and NIC1 to vde.ctl01?
 
--- 
-Peter Xu
+It should be doable. Could you please try something like this:
+
+ NET0=3D"-netdev vde,id=3Dv0,sock=3D/var/run/vde.ctl00 -device rtl8139,ne=
+tdev=3Dv0,mac=3D$NIC0MAC"
+ NET1=3D"-netdev vde,id=3Dv1,sock=3D/var/run/vde.ctl01 -device rtl8139,ne=
+tdev=3Dv1,mac=3D$NIC1MAC"
+
+I haven't tested it though, so you still might have to tweak it. Run qemu
+with "-device rtl8139,?" to see the options of the rtl8139 device.
+
+> Also hubport function is unclear to me. It reproduces the previous vlan=
+ concept, but it's left orphan, because no other devices seems to be made=
+ aware that hubportN exists, nor they can be wired to it.
+
+You mean "-netdev hubport"? Forget about it, you don't need it. The hubpo=
+rt
+is only required if you want to connect a device to a legacy "vlan" hub. =
+In
+your case, you should be fine without these legacy "vlan"s.
+
+ HTH,
+  Thomas
