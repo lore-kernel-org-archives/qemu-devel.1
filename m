@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dn0YG-00085T-Ry
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:48:53 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dn0a2-0000lt-C1
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:50:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dn0YF-000660-Oo
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:48:52 -0400
-Received: from mail-ua0-x241.google.com ([2607:f8b0:400c:c08::241]:38399)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dn0YF-00065s-JY
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:48:51 -0400
-Received: by mail-ua0-x241.google.com with SMTP id j46so2443351uag.5
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 03:48:51 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1dn0Zy-00074O-Vv
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:50:42 -0400
+Date: Wed, 30 Aug 2017 12:50:33 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170830125033.340d7ca2@nial.brq.redhat.com>
+In-Reply-To: <20170825093229.GH2772@umbus.fritz.box>
+References: <1503562911-2776-1-git-send-email-imammedo@redhat.com>
+	<1503562911-2776-6-git-send-email-imammedo@redhat.com>
+	<20170825041644.GB2772@umbus.fritz.box>
+	<20170825094037.4973225e@nial.brq.redhat.com>
+	<20170825093229.GH2772@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20170824192730.8440-25-dgilbert@redhat.com>
-References: <20170824192730.8440-1-dgilbert@redhat.com>
-	<20170824192730.8440-25-dgilbert@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 30 Aug 2017 03:48:50 -0700
-Message-ID: <CAJ+F1C+SGRe8v1_+UkyOBmAKdxki-DZj6qL4qXh2eCXMODUQOA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 24/32] vub+postcopy: madvises
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11 5/6] ppc: simplify cpu model
+ lookup by PVR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +27,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, a.perevalov@samsung.com, "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>, aarcange@redhat.com, Felipe Franciosi <felipe@nutanix.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
 
-Hi
+On Fri, 25 Aug 2017 19:32:29 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-"libvhost-user: madvises for postcopy" for ex, would be nicer imho
+> On Fri, Aug 25, 2017 at 09:40:37AM +0200, Igor Mammedov wrote:
+> > On Fri, 25 Aug 2017 14:16:44 +1000
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >   
+> > > On Thu, Aug 24, 2017 at 10:21:50AM +0200, Igor Mammedov wrote:  
+> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > > ---
+> > > >  target/ppc/translate_init.c | 27 +++++++++++----------------
+> > > >  1 file changed, 11 insertions(+), 16 deletions(-)
+> > > > 
+> > > > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> > > > index f1a559d..ca9f1e3 100644
+> > > > --- a/target/ppc/translate_init.c
+> > > > +++ b/target/ppc/translate_init.c
+> > > > @@ -34,6 +34,7 @@
+> > > >  #include "hw/ppc/ppc.h"
+> > > >  #include "mmu-book3s-v3.h"
+> > > >  #include "sysemu/qtest.h"
+> > > > +#include "qemu/cutils.h"
+> > > >  
+> > > >  //#define PPC_DUMP_CPU
+> > > >  //#define PPC_DEBUG_SPR
+> > > > @@ -10203,22 +10204,16 @@ static ObjectClass *ppc_cpu_class_by_name(const char *name)
+> > > >      char *cpu_model, *typename;
+> > > >      ObjectClass *oc;
+> > > >      const char *p;
+> > > > -    int i, len;
+> > > > -
+> > > > -    /* Check if the given name is a PVR */
+> > > > -    len = strlen(name);
+> > > > -    if (len == 10 && name[0] == '0' && name[1] == 'x') {
+> > > > -        p = name + 2;
+> > > > -        goto check_pvr;
+> > > > -    } else if (len == 8) {
+> > > > -        p = name;
+> > > > -    check_pvr:
+> > > > -        for (i = 0; i < 8; i++) {
+> > > > -            if (!qemu_isxdigit(*p++))
+> > > > -                break;
+> > > > -        }
+> > > > -        if (i == 8) {
+> > > > -            return OBJECT_CLASS(ppc_cpu_class_by_pvr(strtoul(name, NULL, 16)));
+> > > > +    unsigned long pvr;
+> > > > +
+> > > > +    /* Lookup by PVR if cpu_model is valid 8 digit hex number
+> > > > +     * (excl: 0x prefix if present)
+> > > > +     */
+> > > > +    if (!qemu_strtoul(name, &p, 16, &pvr)) {
+> > > > +        int len = p - name;
+> > > > +        len = (len == 10) && (name[1] == 'x') ? len - 2 : len;
+> > > > +        if (len == 8) {
+> > > > +            return OBJECT_CLASS(ppc_cpu_class_by_pvr(pvr));    
+> > > 
+> > > This doesn't look quite right.  A hex string of a PVR followed by
+> > > other stuff isn't a valid option, so if p (endptr) doesn't point to
+> > > the end of the string, then we shouldn't be using this path  
+> > yep, my mistake, I've lost somewhere *p == '\0' check when cleaning up the patch  
+> 
+> Ok.
+> 
+> > >(from the
+> > > looks of qemu_strtoul() we can simply omit the endptr parameter to get
+> > > that behaviour).  I'm not sure what the messing around with len is
+> > > for, either.  If it's a valid hex string we can try this, I don't see
+> > > that we need further checks.  
+> > I've tried to keep current limitation here i.e. 8 hex symbols,
+> > but if any hex number is fine then doing
+> >  qemu_strtoul(name, NULL, 16, &pvr)
+> > is even better, so would you prefer to drop 8 symbol check altogether?  
+> 
+> Yeah, I don't see any value to the 8 character check.
+there are cpu models consisting of pure numbers => valid hex number
+so if check is dropped then it lookup will go PVR route,
+that will fail there.
+So check should be there to avoid regression.
 
-On Thu, Aug 24, 2017 at 12:27 PM, Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Clear the area and turn off THP.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  contrib/libvhost-user/libvhost-user.c | 32 +++++++++++++++++++++++++++++=
-+--
->  1 file changed, 30 insertions(+), 2 deletions(-)
->
-> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
-r/libvhost-user.c
-> index 5ec54f7d60..d816851c6d 100644
-> --- a/contrib/libvhost-user/libvhost-user.c
-> +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -450,11 +450,39 @@ vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vms=
-g)
->          }
->
->          if (dev->postcopy_listening) {
-> +            int ret;
->              /* We should already have an open ufd need to mark each memo=
-ry
->               * range as ufd.
-> -             * Note: Do we need any madvises? Well it's not been accesse=
-d
-> -             * yet, still probably need no THP to be safe, discard to be=
- safe?
->               */
-> +
-> +            /* Discard any mapping we have here; note I can't use MADV_R=
-EMOVE
-> +             * or fallocate to make the hole since I don't want to lose
-> +             * data that's already arrived in the shared process.
-> +             * TODO: How to do hugepage
-> +             */
-> +            ret =3D madvise((void *)dev_region->mmap_addr,
-> +                          dev_region->size + dev_region->mmap_offset,
-> +                          MADV_DONTNEED);
-> +            if (ret) {
-> +                fprintf(stderr,
-> +                        "%s: Failed to madvise(DONTNEED) region %d: %s\n=
-",
-> +                        __func__, i, strerror(errno));
-> +            }
-> +            /* Turn off transparent hugepages so we dont get lose wakeup=
-s
-> +             * in neighbouring pages.
-> +             * TODO: Turn this backon later.
-> +             */
-> +            ret =3D madvise((void *)dev_region->mmap_addr,
-> +                          dev_region->size + dev_region->mmap_offset,
-> +                          MADV_NOHUGEPAGE);
-> +            if (ret) {
-> +                /* Note: This can happen legally on kernels that are con=
-figured
-> +                 * without madvise'able hugepages
-> +                 */
-> +                fprintf(stderr,
-> +                        "%s: Failed to madvise(NOHUGEPAGE) region %d: %s=
-\n",
-> +                        __func__, i, strerror(errno));
-> +            }
->              struct uffdio_register reg_struct;
->              reg_struct.range.start =3D (uintptr_t)dev_region->mmap_addr;
->              reg_struct.range.len =3D dev_region->size + dev_region->mmap=
-_offset;
-> --
-> 2.13.5
->
-
-Errors are non-fatal? patch looks ok to me, despite the TODOs :).
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+I'll fix whole string consumption check that I've missed before
+and respin with it.
