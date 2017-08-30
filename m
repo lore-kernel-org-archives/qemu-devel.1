@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49213)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnAyE-0005rg-Nk
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 17:56:23 -0400
+	id 1dnAyI-0005xO-V5
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 17:56:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnAyD-0007xn-VU
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 17:56:22 -0400
+	id 1dnAyG-0007yO-El
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 17:56:27 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 30 Aug 2017 18:55:22 -0300
-Message-Id: <20170830215523.25278-17-f4bug@amsat.org>
+Date: Wed, 30 Aug 2017 18:55:23 -0300
+Message-Id: <20170830215523.25278-18-f4bug@amsat.org>
 In-Reply-To: <20170830215523.25278-1-f4bug@amsat.org>
 References: <20170830215523.25278-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 16/17] MAINTAINERS: update docs/devel/
+Subject: [Qemu-devel] [PATCH v2 17/17] MAINTAINERS: update docs/interop/
  entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,63 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-block@nongnu.org
 
-moved in commit ac06724a7158
+moved in commit 7746cf8aab68
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Acked-by: Fam Zheng <famz@redhat.com>
+Acked-by: John Snow <jsnow@redhat.com>
 ---
- MAINTAINERS | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ MAINTAINERS | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 7a0c00550e..452ccd71b4 100644
+index 452ccd71b4..833a7a6778 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -1414,7 +1414,7 @@ F: tests/test-qapi-*.c
- F: tests/test-qmp-*.c
- F: tests/test-visitor-serialization.c
- F: scripts/qapi*
--F: docs/qapi*
-+F: docs/devel/qapi*
- T: git git://repo.or.cz/qemu/armbru.git qapi-next
+@@ -1259,7 +1259,7 @@ F: block/dirty-bitmap.c
+ F: include/qemu/hbitmap.h
+ F: include/block/dirty-bitmap.h
+ F: tests/test-hbitmap.c
+-F: docs/bitmaps.md
++F: docs/interop/bitmaps.rst
+ T: git git://github.com/famz/qemu.git bitmaps
+ T: git git://github.com/jnsnow/qemu.git bitmaps
  
- QAPI Schema
-@@ -1466,7 +1466,7 @@ M: Markus Armbruster <armbru@redhat.com>
+@@ -1828,7 +1828,7 @@ M: Denis V. Lunev <den@openvz.org>
+ L: qemu-block@nongnu.org
  S: Supported
- F: qmp.c
- F: monitor.c
--F: docs/*qmp-*
-+F: docs/devel/*qmp-*
- F: scripts/qmp/
- F: tests/qmp-test.c
- T: git git://repo.or.cz/qemu/armbru.git qapi-next
-@@ -1497,7 +1497,7 @@ S: Maintained
- F: trace/
- F: scripts/tracetool.py
- F: scripts/tracetool/
--F: docs/tracing.txt
-+F: docs/devel/tracing.txt
- T: git git://github.com/stefanha/qemu.git tracing
+ F: block/parallels.c
+-F: docs/specs/parallels.txt
++F: docs/interop/parallels.txt
  
- Checkpatch
-@@ -1512,7 +1512,7 @@ F: include/migration/
- F: migration/
- F: scripts/vmstate-static-checker.py
- F: tests/vmstate-static-checker-data/
--F: docs/migration.txt
-+F: docs/devel/migration.txt
- 
- Seccomp
- M: Eduardo Otubo <otubo@redhat.com>
-@@ -1914,5 +1914,5 @@ Documentation
- Build system architecture
- M: Daniel P. Berrange <berrange@redhat.com>
- S: Odd Fixes
--F: docs/build-system.txt
-+F: docs/devel/build-system.txt
- 
+ qed
+ M: Stefan Hajnoczi <stefanha@redhat.com>
 -- 
 2.14.1
