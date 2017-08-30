@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dn6F5-0001Vn-1i
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:53:31 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dn6F9-0001ZN-3q
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:53:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dn6F3-00051x-WB
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:53:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35276)
+	(envelope-from <cohuck@redhat.com>) id 1dn6F6-00053U-KS
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:53:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60564)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dn6F3-00051V-Nz
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:53:25 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dn6F6-00052w-BA
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:53:28 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed, 30 Aug 2017 18:52:14 +0200
-Message-Id: <20170830165252.13421-7-cohuck@redhat.com>
+Date: Wed, 30 Aug 2017 18:52:15 +0200
+Message-Id: <20170830165252.13421-8-cohuck@redhat.com>
 In-Reply-To: <20170830165252.13421-1-cohuck@redhat.com>
 References: <20170830165252.13421-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 06/44] tests/pxe: Check virtio-net-ccw on s390x
+Subject: [Qemu-devel] [PULL 07/44] tests: Run filter-redirector and -mirror
+ test only on POSIX systems
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,94 +29,108 @@ Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, bor
 
 From: Thomas Huth <thuth@redhat.com>
 
-Now that we've got a firmware that can do TFTP booting on s390x (i.e.
-the pc-bios/s390-netboot.img), we can enable the PXE tester for this
-architecture, too.
+This way we can get rid of the ugly #ifdefs in the code which makes
+it easier to extend later.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <1502431076-22849-3-git-send-email-thuth@redhat.com>
+Message-Id: <1502951113-4246-2-git-send-email-thuth@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- tests/Makefile.include |  1 +
- tests/boot-sector.c    | 20 ++++++++++++++++++++
- tests/pxe-test.c       |  7 +++++++
- 3 files changed, 28 insertions(+)
+ tests/Makefile.include         |  8 ++++----
+ tests/test-filter-mirror.c     |  5 -----
+ tests/test-filter-redirector.c | 10 ----------
+ 3 files changed, 4 insertions(+), 19 deletions(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 37c1bed683..ea0f15f70b 100644
+index ea0f15f70b..871791d2fc 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -360,6 +360,7 @@ check-qtest-microblazeel-y = $(check-qtest-microblaze-y)
- check-qtest-xtensaeb-y = $(check-qtest-xtensa-y)
+@@ -283,8 +283,8 @@ ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
+ check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) += tests/vhost-user-test$(EXESUF)
+ endif
+ check-qtest-i386-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
+-check-qtest-i386-y += tests/test-filter-mirror$(EXESUF)
+-check-qtest-i386-y += tests/test-filter-redirector$(EXESUF)
++check-qtest-i386-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
++check-qtest-i386-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
+ check-qtest-i386-y += tests/postcopy-test$(EXESUF)
+ check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
+ check-qtest-i386-y += tests/numa-test$(EXESUF)
+@@ -325,8 +325,8 @@ check-qtest-ppc64-y += tests/usb-hcd-xhci-test$(EXESUF)
+ gcov-files-ppc64-y += hw/usb/hcd-xhci.c
+ check-qtest-ppc64-y += $(check-qtest-virtio-y)
+ check-qtest-ppc64-$(CONFIG_SLIRP) += tests/test-netfilter$(EXESUF)
+-check-qtest-ppc64-y += tests/test-filter-mirror$(EXESUF)
+-check-qtest-ppc64-y += tests/test-filter-redirector$(EXESUF)
++check-qtest-ppc64-$(CONFIG_POSIX) += tests/test-filter-mirror$(EXESUF)
++check-qtest-ppc64-$(CONFIG_POSIX) += tests/test-filter-redirector$(EXESUF)
+ check-qtest-ppc64-y += tests/display-vga-test$(EXESUF)
+ check-qtest-ppc64-y += tests/numa-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_IVSHMEM) += tests/ivshmem-test$(EXESUF)
+diff --git a/tests/test-filter-mirror.c b/tests/test-filter-mirror.c
+index 9f84402493..a1d5865ef7 100644
+--- a/tests/test-filter-mirror.c
++++ b/tests/test-filter-mirror.c
+@@ -17,9 +17,6 @@
  
- check-qtest-s390x-y = tests/boot-serial-test$(EXESUF)
-+check-qtest-s390x-$(CONFIG_SLIRP) += tests/pxe-test$(EXESUF)
- 
- check-qtest-generic-y += tests/qom-test$(EXESUF)
- check-qtest-generic-y += tests/test-hmp$(EXESUF)
-diff --git a/tests/boot-sector.c b/tests/boot-sector.c
-index 87295624d2..9ee85370b0 100644
---- a/tests/boot-sector.c
-+++ b/tests/boot-sector.c
-@@ -67,6 +67,21 @@ static uint8_t x86_boot_sector[512] = {
-     [0x1FF] = 0xAA,
- };
- 
-+/* For s390x, use a mini "kernel" with the appropriate signature */
-+static const uint8_t s390x_psw[] = {
-+    0x00, 0x08, 0x00, 0x00, 0x80, 0x01, 0x00, 0x00
-+};
-+static const uint8_t s390x_code[] = {
-+    0xa7, 0xf4, 0x00, 0x0a,                                /* j 0x10010 */
-+    0x00, 0x00, 0x00, 0x00,
-+    'S', '3', '9', '0',
-+    'E', 'P', 0x00, 0x01,
-+    0xa7, 0x38, HIGH(SIGNATURE_ADDR), LOW(SIGNATURE_ADDR), /* lhi r3,0x7c10 */
-+    0xa7, 0x48, LOW(SIGNATURE), HIGH(SIGNATURE),           /* lhi r4,0xadde */
-+    0x40, 0x40, 0x30, 0x00,                                /* sth r4,0(r3) */
-+    0xa7, 0xf4, 0xff, 0xfa                                 /* j 0x10010 */
-+};
-+
- /* Create boot disk file.  */
- int boot_sector_init(char *fname)
+ static void test_mirror(void)
  {
-@@ -92,6 +107,11 @@ int boot_sector_init(char *fname)
-                                     LOW(SIGNATURE), SIGNATURE_ADDR,
-                                     HIGH(SIGNATURE), SIGNATURE_ADDR + 1);
-         len = strlen(boot_code);
-+    } else if (g_str_equal(arch, "s390x")) {
-+        len = 0x10000 + sizeof(s390x_code);
-+        boot_code = g_malloc0(len);
-+        memcpy(boot_code, s390x_psw, sizeof(s390x_psw));
-+        memcpy(&boot_code[0x10000], s390x_code, sizeof(s390x_code));
-     } else {
-         g_assert_not_reached();
-     }
-diff --git a/tests/pxe-test.c b/tests/pxe-test.c
-index cf6e225330..0d70afccd6 100644
---- a/tests/pxe-test.c
-+++ b/tests/pxe-test.c
-@@ -51,6 +51,11 @@ static void test_pxe_spapr_vlan(void)
-     test_pxe_one("-device spapr-vlan,netdev=" NETNAME, true);
+-#ifndef _WIN32
+-/* socketpair(PF_UNIX) which does not exist on windows */
+-
+     int send_sock[2], recv_sock;
+     char *cmdline;
+     uint32_t ret = 0, len = 0;
+@@ -74,8 +71,6 @@ static void test_mirror(void)
+     g_free(recv_buf);
+     close(recv_sock);
+     unlink(sock_path);
+-
+-#endif
  }
  
-+static void test_pxe_virtio_ccw(void)
-+{
-+    test_pxe_one("-device virtio-net-ccw,bootindex=1,netdev=" NETNAME, false);
-+}
-+
- int main(int argc, char *argv[])
+ int main(int argc, char **argv)
+diff --git a/tests/test-filter-redirector.c b/tests/test-filter-redirector.c
+index 0c4b8d52ef..69c663b183 100644
+--- a/tests/test-filter-redirector.c
++++ b/tests/test-filter-redirector.c
+@@ -59,9 +59,6 @@
+ 
+ static void test_redirector_tx(void)
  {
-     int ret;
-@@ -68,6 +73,8 @@ int main(int argc, char *argv[])
-     } else if (strcmp(arch, "ppc64") == 0) {
-         qtest_add_func("pxe/virtio", test_pxe_virtio_pci);
-         qtest_add_func("pxe/spapr-vlan", test_pxe_spapr_vlan);
-+    } else if (g_str_equal(arch, "s390x")) {
-+        qtest_add_func("pxe/virtio-ccw", test_pxe_virtio_ccw);
-     }
-     ret = g_test_run();
-     boot_sector_cleanup(disk);
+-#ifndef _WIN32
+-/* socketpair(PF_UNIX) which does not exist on windows */
+-
+     int backend_sock[2], recv_sock;
+     char *cmdline;
+     uint32_t ret = 0, len = 0;
+@@ -129,15 +126,10 @@ static void test_redirector_tx(void)
+     unlink(sock_path0);
+     unlink(sock_path1);
+     qtest_end();
+-
+-#endif
+ }
+ 
+ static void test_redirector_rx(void)
+ {
+-#ifndef _WIN32
+-/* socketpair(PF_UNIX) which does not exist on windows */
+-
+     int backend_sock[2], send_sock;
+     char *cmdline;
+     uint32_t ret = 0, len = 0;
+@@ -203,8 +195,6 @@ static void test_redirector_rx(void)
+     unlink(sock_path0);
+     unlink(sock_path1);
+     qtest_end();
+-
+-#endif
+ }
+ 
+ int main(int argc, char **argv)
 -- 
 2.13.5
