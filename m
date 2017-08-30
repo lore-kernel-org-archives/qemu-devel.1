@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dnBDn-0004V7-95
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:12:28 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dnBGX-0005KX-In
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:15:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dnBDm-0005RZ-9b
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:12:27 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:35972)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dnBDm-0005RF-24
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:12:26 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id u126so17860755wmg.1
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 15:12:25 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1dnBGW-0006CJ-Ih
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:15:17 -0400
+References: <cover.1504111803.git.jcody@redhat.com>
+	<fab0dc0858ef58dd2e58ddcac3c38f9ab39d045f.1504111803.git.jcody@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <cb493e5c-0604-e572-c7e4-2276e29a6bdb@redhat.com>
+Date: Wed, 30 Aug 2017 18:15:05 -0400
 MIME-Version: 1.0
-In-Reply-To: <b35860a5f4377883fd2c2942bdb524d279a91de9.1504116039.git.alistair.francis@xilinx.com>
-References: <b35860a5f4377883fd2c2942bdb524d279a91de9.1504116039.git.alistair.francis@xilinx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 30 Aug 2017 23:12:04 +0100
-Message-ID: <CAFEAcA9N2dx6feVbw0BJ_xbs9czjJvmOCZfoOjf4ddpVk4ikbQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] target/xtensa: Use the pre-defined
- MEMTXATTRS_UNSPECIFIED macro
+In-Reply-To: <fab0dc0858ef58dd2e58ddcac3c38f9ab39d045f.1504111803.git.jcody@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/5] qemu-iotests: set TEST_DIR to a
+ unique dir for each test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +25,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <alistair23@gmail.com>
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, armbru@redhat.com, stefanha@redhat.com
 
-On 30 August 2017 at 19:02, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> Instead of using the hardcoded (MemTxAttrs){0} for no memory attributes
-> let's use the already defined MEMTXATTRS_UNSPECIFIED macro instead.
->
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+
+
+On 08/30/2017 12:52 PM, Jeff Cody wrote:
+> Right now, all qemu-iotests output data into the same scratch directory,
+> and so each test needs to be responsible for cleaning up its own files.
+> 
+> Have each test use 'scratch/$seq' as its temp directory, so the check
+> script can do simple cleanup of removing the whole temporary directory.
+> 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
 > ---
->
->  target/xtensa/op_helper.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/target/xtensa/op_helper.c b/target/xtensa/op_helper.c
-> index 519fbeddd6..3d990c0caa 100644
-> --- a/target/xtensa/op_helper.c
-> +++ b/target/xtensa/op_helper.c
-> @@ -1025,11 +1025,11 @@ void HELPER(ule_s)(CPUXtensaState *env, uint32_t br, float32 a, float32 b)
->  uint32_t HELPER(rer)(CPUXtensaState *env, uint32_t addr)
->  {
->      return address_space_ldl(env->address_space_er, addr,
-> -                             (MemTxAttrs){0}, NULL);
-> +                             MEMTXATTRS_UNSPECIFIED, NULL);
->  }
->
->  void HELPER(wer)(CPUXtensaState *env, uint32_t data, uint32_t addr)
->  {
->      address_space_stl(env->address_space_er, addr, data,
-> -                      (MemTxAttrs){0}, NULL);
-> +                      MEMTXATTRS_UNSPECIFIED, NULL);
->  }
+>  tests/qemu-iotests/check | 21 +++++++++++++++++----
+>  1 file changed, 17 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+> index d504b6e..f6ca85d 100755
+> --- a/tests/qemu-iotests/check
+> +++ b/tests/qemu-iotests/check
+> @@ -243,6 +243,7 @@ seq="check"
+>  
+>  for seq in $list
+>  do
+> +    TEST_DIR_SEQ=$TEST_DIR/$seq
+>      err=false
+>      printf %s "$seq"
+>      if [ -n "$TESTS_REMAINING_LOG" ] ; then
+> @@ -289,13 +290,23 @@ do
+>          fi
+>          export OUTPUT_DIR=$PWD
+>          if $debug; then
+> -            (cd "$source_iotests";
+> +            (
+> +            export TEST_DIR=$TEST_DIR_SEQ
+> +            . "$source_iotests/common.config"
+> +            . "$source_iotests/common.rc"
 
-Might be worth noting in the commit that this is technically
-a change of behaviour, because MEMTXATTRS_UNSPECIFIED
-sets the 'unspecified' field to 1 whereas {0} doesn't.
-I don't think anything actually checks that field, though.
+What purpose do these serve?
 
-thanks
--- PMM
+> +            cd "$source_iotests" &&
+>              MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(($RANDOM % 255 + 1))} \
+> -                    $run_command -d 2>&1 | tee $tmp.out)
+> +                    $run_command -d 2>&1 | tee $tmp.out
+> +            )
+>          else
+> -            (cd "$source_iotests";
+> +            (
+> +            export TEST_DIR=$TEST_DIR_SEQ
+> +            . "$source_iotests/common.config"
+> +            . "$source_iotests/common.rc"
+> +             cd "$source_iotests" &&
+>              MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(($RANDOM % 255 + 1))} \
+> -                    $run_command >$tmp.out 2>&1)
+> +                    $run_command >$tmp.out 2>&1
+> +            )
+>          fi
+>          sts=$?
+>          $timestamp && _timestamp
+> @@ -359,6 +370,8 @@ do
+>              fi
+>          fi
+>  
+> +        rm -rf "$TEST_DIR_SEQ"
+> +
+>      fi
+>  
+>      # come here for each test, except when $showme is true
+> 
+
+Seems OK to me, though I am not able to answer all doubts about exactly
+how this may effect the strange pipe/subshell arrangements that occur
+deeper in the bowels of the included files for launching QEMU and so
+on.. I suppose that might be related to the inclusion of those
+common.XYZ files?
+
+Tested-by: John Snow <jsnow@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
