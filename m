@@ -1,28 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dmzmM-0002iJ-JJ
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 05:59:23 -0400
+	(envelope-from <famz@redhat.com>) id 1dmztQ-0005mk-8B
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:06:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dmzmL-0006zc-Pv
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 05:59:22 -0400
-Received: from mail-ua0-x244.google.com ([2607:f8b0:400c:c08::244]:34498)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dmzmL-0006zG-LO
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 05:59:21 -0400
-Received: by mail-ua0-x244.google.com with SMTP id 105so2413448uad.1
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 02:59:21 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170824192730.8440-3-dgilbert@redhat.com>
-References: <20170824192730.8440-1-dgilbert@redhat.com>
-	<20170824192730.8440-3-dgilbert@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 30 Aug 2017 02:59:20 -0700
-Message-ID: <CAJ+F1CLA6XEoJ_guM8SbwGNYzG7tXYWQfA14+r2HYJKMMgx30w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 02/32] vhub: Only process received packets
- on started queues
+	(envelope-from <famz@redhat.com>) id 1dmztM-00045V-H2
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:06:40 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Wed, 30 Aug 2017 18:06:05 +0800
+Message-Id: <20170830100605.22694-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH] block: Cleanup BMDS in bdrv_close_all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +17,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, a.perevalov@samsung.com, "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>, aarcange@redhat.com, Felipe Franciosi <felipe@nutanix.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-stable@nongnu.org, peterx@redhat.com, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Thu, Aug 24, 2017 at 9:27 PM, Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Only process received packets if the queue has been started.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  tests/vhost-user-bridge.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
-> index 1e5b5ca3da..324abee53d 100644
-> --- a/tests/vhost-user-bridge.c
-> +++ b/tests/vhost-user-bridge.c
-> @@ -277,6 +277,7 @@ vubr_backend_recv_cb(int sock, void *ctx)
->      DPRINT("    hdrlen =3D %d\n", hdrlen);
->
->      if (!vu_queue_enabled(dev, vq) ||
-> +        !vu_queue_started(dev, vq) ||
->          !vu_queue_avail_bytes(dev, vq, hdrlen, 0)) {
->          DPRINT("Got UDP packet, but no available descriptors on RX virtq=
-.\n");
->          return;
+This fixes the assertion due to op blockers added by BMDS:
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+block.c:3248: bdrv_delete: Assertion `bdrv_op_blocker_is_empty(bs)' failed.
 
+Reproducer: simply start block migration and quit QEMU before it ends.
 
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ block.c                 | 2 ++
+ migration/block.c       | 2 +-
+ migration/block.h       | 1 +
+ stubs/Makefile.objs     | 1 +
+ stubs/block-migration.c | 6 ++++++
+ 5 files changed, 11 insertions(+), 1 deletion(-)
+ create mode 100644 stubs/block-migration.c
 
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/block.c b/block.c
+index 3308814bba..508a57274d 100644
+--- a/block.c
++++ b/block.c
+@@ -43,6 +43,7 @@
+ #include "qemu/cutils.h"
+ #include "qemu/id.h"
+ #include "qapi/util.h"
++#include "migration/block.h"
+ 
+ #ifdef CONFIG_BSD
+ #include <sys/ioctl.h>
+@@ -3111,6 +3112,7 @@ static void bdrv_close(BlockDriverState *bs)
+ 
+ void bdrv_close_all(void)
+ {
++    block_migration_cleanup_bmds();
+     block_job_cancel_sync_all();
+     nbd_export_close_all();
+ 
+diff --git a/migration/block.c b/migration/block.c
+index 9171f60028..c059e48484 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -673,7 +673,7 @@ static int64_t get_remaining_dirty(void)
+ 
+ 
+ /* Called with iothread lock taken.  */
+-static void block_migration_cleanup_bmds(void)
++void block_migration_cleanup_bmds(void)
+ {
+     BlkMigDevState *bmds;
+     AioContext *ctx;
+diff --git a/migration/block.h b/migration/block.h
+index 22ebe94259..8bae1cf55a 100644
+--- a/migration/block.h
++++ b/migration/block.h
+@@ -42,4 +42,5 @@ static inline uint64_t blk_mig_bytes_total(void)
+ #endif /* CONFIG_LIVE_BLOCK_MIGRATION */
+ 
+ void migrate_set_block_enabled(bool value, Error **errp);
++void block_migration_cleanup_bmds(void);
+ #endif /* MIGRATION_BLOCK_H */
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index e69c217aff..7540913767 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -19,6 +19,7 @@ stub-obj-y += is-daemonized.o
+ stub-obj-$(CONFIG_LINUX_AIO) += linux-aio.o
+ stub-obj-y += machine-init-done.o
+ stub-obj-y += migr-blocker.o
++stub-obj-y += block-migration.o
+ stub-obj-y += change-state-handler.o
+ stub-obj-y += monitor.o
+ stub-obj-y += notify-event.o
+diff --git a/stubs/block-migration.c b/stubs/block-migration.c
+new file mode 100644
+index 0000000000..855f15c757
+--- /dev/null
++++ b/stubs/block-migration.c
+@@ -0,0 +1,6 @@
++#include "qemu/osdep.h"
++#include "migration/block.h"
++
++void block_migration_cleanup_bmds(void)
++{
++}
+-- 
+2.13.5
