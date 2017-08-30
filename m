@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dn6Ew-0001RU-UI
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:53:22 -0400
+	(envelope-from <jcody@redhat.com>) id 1dn6F0-0001Ud-Lb
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:53:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dn6Et-0004xw-1N
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:53:19 -0400
+	(envelope-from <jcody@redhat.com>) id 1dn6Et-0004yX-Kp
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:53:22 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Wed, 30 Aug 2017 12:52:46 -0400
-Message-Id: <aba8a2b58f34b56281e63e5e9404eb0aab016836.1504111803.git.jcody@redhat.com>
+Date: Wed, 30 Aug 2017 12:52:44 -0400
+Message-Id: <9b840c1229f3e25cf8ccf0d27bfabf37c751d5e1.1504111803.git.jcody@redhat.com>
 In-Reply-To: <cover.1504111803.git.jcody@redhat.com>
 References: <cover.1504111803.git.jcody@redhat.com>
 In-Reply-To: <cover.1504111803.git.jcody@redhat.com>
 References: <cover.1504111803.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 4/5] qemu-iotests: make python tests attempt
- to leave intermediate files
+Subject: [Qemu-devel] [PATCH v3 2/5] qemu-iotests: remove file cleanup from
+ bash tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,1151 +25,2807 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, armbru@redhat.com, jsnow@redhat.com, stefanha@redhat.com, kwolf@redhat.com, eblake@redhat.com
 
-Now that 'check' will clean up after tests, try and make python
-tests leave intermediate files so that they might be inspectable
-on failure.
+All files for a given test are now self-contained in a subdirectory,
+and therefore the "./check" script can do all file-related cleanup
+without any help.
 
-This isn't perfect; the python unittest framework runs multiple
-tests, even if previous tests failed.  So we need to make sure that
-each test still begins with a "clean" slate, to prevent false
-positives or tainted test runs.
+This removes file cleanups from the bash tests.  The only cleanup left
+is whatever is needed to kill any spawned processes; e.g. _cleanup_qemu.
 
-Rather than delete images in the unittest tearDown, invert this
-and delete images to be used in that test at the beginning of the
-setUp.  This is to make sure that the test run is not inadvertently
-using file droppings from previous runs.  We must use 'blind_remove'
-then for these, as the files might not exist yet, but we don't want
-to throw an error for that.
-
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- tests/qemu-iotests/030 |  8 +++---
- tests/qemu-iotests/040 | 35 ++++++++++---------------
- tests/qemu-iotests/041 | 70 +++++++++++++++++++++-----------------------------
- tests/qemu-iotests/044 |  8 ++----
- tests/qemu-iotests/045 | 14 +++++-----
- tests/qemu-iotests/055 | 36 +++++++++-----------------
- tests/qemu-iotests/056 | 13 ++++------
- tests/qemu-iotests/057 |  6 ++---
- tests/qemu-iotests/065 |  6 ++---
- tests/qemu-iotests/096 |  5 ++--
- tests/qemu-iotests/118 | 31 ++++++++++------------
- tests/qemu-iotests/124 | 21 +++++----------
- tests/qemu-iotests/132 |  9 +++----
- tests/qemu-iotests/136 |  3 ++-
- tests/qemu-iotests/139 |  6 ++---
- tests/qemu-iotests/147 | 16 ++++--------
- tests/qemu-iotests/148 |  7 ++---
- tests/qemu-iotests/152 |  9 +++----
- tests/qemu-iotests/155 | 15 +++++------
- tests/qemu-iotests/165 |  6 ++---
- 20 files changed, 130 insertions(+), 194 deletions(-)
+ tests/qemu-iotests/001     |  6 ------
+ tests/qemu-iotests/002     |  6 ------
+ tests/qemu-iotests/003     |  6 ------
+ tests/qemu-iotests/004     |  6 ------
+ tests/qemu-iotests/005     |  6 ------
+ tests/qemu-iotests/007     |  7 -------
+ tests/qemu-iotests/008     |  6 ------
+ tests/qemu-iotests/009     |  6 ------
+ tests/qemu-iotests/010     |  6 ------
+ tests/qemu-iotests/011     |  6 ------
+ tests/qemu-iotests/012     |  6 ------
+ tests/qemu-iotests/013     |  6 ------
+ tests/qemu-iotests/014     |  6 ------
+ tests/qemu-iotests/015     |  7 -------
+ tests/qemu-iotests/017     |  6 ------
+ tests/qemu-iotests/018     |  6 ------
+ tests/qemu-iotests/019     |  8 --------
+ tests/qemu-iotests/020     |  8 --------
+ tests/qemu-iotests/021     |  6 ------
+ tests/qemu-iotests/022     |  6 ------
+ tests/qemu-iotests/023     |  6 ------
+ tests/qemu-iotests/024     |  8 --------
+ tests/qemu-iotests/025     |  6 ------
+ tests/qemu-iotests/026     |  7 -------
+ tests/qemu-iotests/027     |  6 ------
+ tests/qemu-iotests/028     |  8 --------
+ tests/qemu-iotests/029     |  7 -------
+ tests/qemu-iotests/031     |  6 ------
+ tests/qemu-iotests/032     |  6 ------
+ tests/qemu-iotests/033     |  6 ------
+ tests/qemu-iotests/034     |  6 ------
+ tests/qemu-iotests/035     |  6 ------
+ tests/qemu-iotests/036     |  6 ------
+ tests/qemu-iotests/037     |  6 ------
+ tests/qemu-iotests/038     |  6 ------
+ tests/qemu-iotests/039     |  6 ------
+ tests/qemu-iotests/042     |  6 ------
+ tests/qemu-iotests/043     |  7 -------
+ tests/qemu-iotests/046     |  6 ------
+ tests/qemu-iotests/047     |  6 ------
+ tests/qemu-iotests/048     |  8 --------
+ tests/qemu-iotests/048.out |  1 -
+ tests/qemu-iotests/049     |  6 ------
+ tests/qemu-iotests/050     |  8 --------
+ tests/qemu-iotests/051     |  6 ------
+ tests/qemu-iotests/052     |  6 ------
+ tests/qemu-iotests/053     |  7 -------
+ tests/qemu-iotests/054     |  6 ------
+ tests/qemu-iotests/058     |  8 +-------
+ tests/qemu-iotests/059     |  7 -------
+ tests/qemu-iotests/060     |  6 ------
+ tests/qemu-iotests/061     |  6 ------
+ tests/qemu-iotests/062     |  6 ------
+ tests/qemu-iotests/063     |  7 -------
+ tests/qemu-iotests/064     |  6 ------
+ tests/qemu-iotests/066     |  6 ------
+ tests/qemu-iotests/068     |  6 ------
+ tests/qemu-iotests/069     |  6 ------
+ tests/qemu-iotests/070     |  6 ------
+ tests/qemu-iotests/071     |  6 ------
+ tests/qemu-iotests/072     |  6 ------
+ tests/qemu-iotests/073     |  6 ------
+ tests/qemu-iotests/074     |  9 ---------
+ tests/qemu-iotests/074.out |  1 -
+ tests/qemu-iotests/075     |  6 ------
+ tests/qemu-iotests/076     |  6 ------
+ tests/qemu-iotests/077     |  6 ------
+ tests/qemu-iotests/078     |  6 ------
+ tests/qemu-iotests/079     |  6 ------
+ tests/qemu-iotests/080     |  7 -------
+ tests/qemu-iotests/081     |  8 --------
+ tests/qemu-iotests/082     |  6 ------
+ tests/qemu-iotests/084     |  6 ------
+ tests/qemu-iotests/085     | 13 +------------
+ tests/qemu-iotests/086     |  6 ------
+ tests/qemu-iotests/088     |  7 -------
+ tests/qemu-iotests/089     |  6 ------
+ tests/qemu-iotests/090     |  6 ------
+ tests/qemu-iotests/091     |  8 +-------
+ tests/qemu-iotests/092     |  7 -------
+ tests/qemu-iotests/094     |  9 +--------
+ tests/qemu-iotests/095     |  8 +-------
+ tests/qemu-iotests/097     |  7 -------
+ tests/qemu-iotests/098     |  7 -------
+ tests/qemu-iotests/099     |  6 ------
+ tests/qemu-iotests/101     |  6 ------
+ tests/qemu-iotests/102     |  7 +------
+ tests/qemu-iotests/103     |  6 ------
+ tests/qemu-iotests/104     |  2 --
+ tests/qemu-iotests/105     |  6 ------
+ tests/qemu-iotests/106     |  6 ------
+ tests/qemu-iotests/107     |  6 ------
+ tests/qemu-iotests/108     |  6 ------
+ tests/qemu-iotests/109     |  8 +-------
+ tests/qemu-iotests/110     |  6 ------
+ tests/qemu-iotests/111     |  6 ------
+ tests/qemu-iotests/112     |  6 ------
+ tests/qemu-iotests/113     |  6 ------
+ tests/qemu-iotests/114     |  6 ------
+ tests/qemu-iotests/115     |  6 ------
+ tests/qemu-iotests/116     |  6 ------
+ tests/qemu-iotests/117     |  7 +------
+ tests/qemu-iotests/119     |  6 ------
+ tests/qemu-iotests/120     |  6 ------
+ tests/qemu-iotests/121     |  6 ------
+ tests/qemu-iotests/122     |  7 -------
+ tests/qemu-iotests/123     |  7 -------
+ tests/qemu-iotests/125     |  6 ------
+ tests/qemu-iotests/130     |  7 +------
+ tests/qemu-iotests/131     |  6 ------
+ tests/qemu-iotests/133     |  6 ------
+ tests/qemu-iotests/134     |  6 ------
+ tests/qemu-iotests/135     |  6 ------
+ tests/qemu-iotests/137     |  6 ------
+ tests/qemu-iotests/138     |  6 ------
+ tests/qemu-iotests/140     |  8 +-------
+ tests/qemu-iotests/141     |  8 +-------
+ tests/qemu-iotests/142     |  7 -------
+ tests/qemu-iotests/143     |  7 +------
+ tests/qemu-iotests/144     |  8 +-------
+ tests/qemu-iotests/145     |  7 -------
+ tests/qemu-iotests/146     |  7 +------
+ tests/qemu-iotests/150     |  6 ------
+ tests/qemu-iotests/153     | 12 ------------
+ tests/qemu-iotests/154     |  6 ------
+ tests/qemu-iotests/156     |  7 +------
+ tests/qemu-iotests/157     |  6 ------
+ tests/qemu-iotests/158     |  6 ------
+ tests/qemu-iotests/159     |  7 -------
+ tests/qemu-iotests/160     |  7 -------
+ tests/qemu-iotests/162     |  7 -------
+ tests/qemu-iotests/170     |  7 -------
+ tests/qemu-iotests/171     |  6 ------
+ tests/qemu-iotests/172     |  8 --------
+ tests/qemu-iotests/173     |  8 +-------
+ tests/qemu-iotests/174     |  6 ------
+ tests/qemu-iotests/175     |  6 ------
+ tests/qemu-iotests/176     |  7 -------
+ tests/qemu-iotests/177     |  6 ------
+ tests/qemu-iotests/178     |  7 -------
+ tests/qemu-iotests/179     |  7 -------
+ tests/qemu-iotests/181     |  8 +-------
+ tests/qemu-iotests/182     |  6 ------
+ tests/qemu-iotests/183     |  9 +--------
+ tests/qemu-iotests/185     |  9 +--------
+ tests/qemu-iotests/186     |  6 ------
+ tests/qemu-iotests/187     |  8 --------
+ tests/qemu-iotests/188     |  6 ------
+ tests/qemu-iotests/189     |  6 ------
+ tests/qemu-iotests/190     |  7 -------
+ tests/qemu-iotests/192     |  6 ------
+ 151 files changed, 19 insertions(+), 965 deletions(-)
 
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index d745cb4..051fb0c 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -21,7 +21,7 @@
- import time
- import os
- import iotests
--from iotests import qemu_img, qemu_io
-+from iotests import qemu_img, qemu_io, blind_remove
+diff --git a/tests/qemu-iotests/001 b/tests/qemu-iotests/001
+index ffd14e2..6f71879 100755
+--- a/tests/qemu-iotests/001
++++ b/tests/qemu-iotests/001
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
  
- backing_img = os.path.join(iotests.test_dir, 'backing.img')
- mid_img = os.path.join(iotests.test_dir, 'mid.img')
-@@ -31,6 +31,9 @@ class TestSingleDrive(iotests.QMPTestCase):
-     image_len = 1 * 1024 * 1024 # MB
- 
-     def setUp(self):
-+        blind_remove(test_img)
-+        blind_remove(mid_img)
-+        blind_remove(backing_img)
-         iotests.create_image(backing_img, TestSingleDrive.image_len)
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % backing_img, mid_img)
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % mid_img, test_img)
-@@ -41,9 +44,6 @@ class TestSingleDrive(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(test_img)
--        os.remove(mid_img)
--        os.remove(backing_img)
- 
-     def test_stream(self):
-         self.assert_no_active_block_jobs()
-diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
-index 95b7510..736afa7 100755
---- a/tests/qemu-iotests/040
-+++ b/tests/qemu-iotests/040
-@@ -24,7 +24,7 @@
- import time
- import os
- import iotests
--from iotests import qemu_img, qemu_io
-+from iotests import qemu_img, qemu_io, blind_remove
- import struct
- import errno
- 
-@@ -76,6 +76,9 @@ class TestSingleDrive(ImageCommitTestCase):
-     test_len = 1 * 1024 * 256
- 
-     def setUp(self):
-+        blind_remove(test_img)
-+        blind_remove(mid_img)
-+        blind_remove(backing_img)
-         iotests.create_image(backing_img, self.image_len)
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % backing_img, mid_img)
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % mid_img, test_img)
-@@ -88,9 +91,6 @@ class TestSingleDrive(ImageCommitTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(test_img)
--        os.remove(mid_img)
--        os.remove(backing_img)
- 
-     def test_commit(self):
-         self.run_commit_test(mid_img, backing_img)
-@@ -214,6 +214,9 @@ class TestRelativePaths(ImageCommitTestCase):
-         except OSError as exception:
-             if exception.errno != errno.EEXIST:
-                 raise
-+        blind_remove(self.test_img)
-+        blind_remove(self.mid_img_abs)
-+        blind_remove(self.backing_img_abs)
-         iotests.create_image(self.backing_img_abs, TestRelativePaths.image_len)
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % self.backing_img_abs, self.mid_img_abs)
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % self.mid_img_abs, self.test_img)
-@@ -226,16 +229,6 @@ class TestRelativePaths(ImageCommitTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(self.test_img)
--        os.remove(self.mid_img_abs)
--        os.remove(self.backing_img_abs)
--        try:
--            os.rmdir(os.path.join(iotests.test_dir, self.dir1))
--            os.rmdir(os.path.join(iotests.test_dir, self.dir3))
--            os.rmdir(os.path.join(iotests.test_dir, self.dir2))
--        except OSError as exception:
--            if exception.errno != errno.EEXIST and exception.errno != errno.ENOTEMPTY:
--                raise
- 
-     def test_commit(self):
-         self.run_commit_test(self.mid_img, self.backing_img)
-@@ -280,6 +273,9 @@ class TestSetSpeed(ImageCommitTestCase):
-     image_len = 80 * 1024 * 1024 # MB
- 
-     def setUp(self):
-+        blind_remove(test_img)
-+        blind_remove(mid_img)
-+        blind_remove(backing_img)
-         qemu_img('create', backing_img, str(TestSetSpeed.image_len))
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % backing_img, mid_img)
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % mid_img, test_img)
-@@ -290,9 +286,6 @@ class TestSetSpeed(ImageCommitTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(test_img)
--        os.remove(mid_img)
--        os.remove(backing_img)
- 
-     def test_set_speed(self):
-         self.assert_no_active_block_jobs()
-@@ -319,6 +312,10 @@ class TestReopenOverlay(ImageCommitTestCase):
-     img3 = os.path.join(iotests.test_dir, '3.img')
- 
-     def setUp(self):
-+        blind_remove(self.img0)
-+        blind_remove(self.img1)
-+        blind_remove(self.img2)
-+        blind_remove(self.img3)
-         iotests.create_image(self.img0, self.image_len)
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % self.img0, self.img1)
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % self.img1, self.img2)
-@@ -329,10 +326,6 @@ class TestReopenOverlay(ImageCommitTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(self.img0)
--        os.remove(self.img1)
--        os.remove(self.img2)
--        os.remove(self.img3)
- 
-     # This tests what happens when the overlay image of the 'top' node
-     # needs to be reopened in read-write mode in order to update the
-diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-index a860a31..2654256 100755
---- a/tests/qemu-iotests/041
-+++ b/tests/qemu-iotests/041
-@@ -21,7 +21,7 @@
- import time
- import os
- import iotests
--from iotests import qemu_img, qemu_io
-+from iotests import qemu_img, qemu_io, blind_remove
- 
- backing_img = os.path.join(iotests.test_dir, 'backing.img')
- target_backing_img = os.path.join(iotests.test_dir, 'target-backing.img')
-@@ -40,6 +40,9 @@ class TestSingleDrive(iotests.QMPTestCase):
-     qmp_target = target_img
- 
-     def setUp(self):
-+        blind_remove(test_img)
-+        blind_remove(backing_img)
-+        blind_remove(target_img)
-         iotests.create_image(backing_img, self.image_len)
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % backing_img, test_img)
-         self.vm = iotests.VM().add_drive(test_img, "node-name=top,backing.node-name=base")
-@@ -49,12 +52,6 @@ class TestSingleDrive(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(test_img)
--        os.remove(backing_img)
--        try:
--            os.remove(target_img)
--        except OSError:
--            pass
- 
-     def test_complete(self):
-         self.assert_no_active_block_jobs()
-@@ -258,6 +255,10 @@ class TestMirrorNoBacking(iotests.QMPTestCase):
-     image_len = 2 * 1024 * 1024 # MB
- 
-     def setUp(self):
-+        blind_remove(test_img)
-+        blind_remove(backing_img)
-+        blind_remove(target_backing_img)
-+        blind_remove(target_img)
-         iotests.create_image(backing_img, TestMirrorNoBacking.image_len)
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % backing_img, test_img)
-         self.vm = iotests.VM().add_drive(test_img)
-@@ -265,13 +266,6 @@ class TestMirrorNoBacking(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(test_img)
--        os.remove(backing_img)
--        try:
--            os.remove(target_backing_img)
--        except:
--            pass
--        os.remove(target_img)
- 
-     def test_complete(self):
-         self.assert_no_active_block_jobs()
-@@ -328,6 +322,9 @@ class TestMirrorResized(iotests.QMPTestCase):
-     image_len = 2 * 1024 * 1024 # MB
- 
-     def setUp(self):
-+        blind_remove(test_img)
-+        blind_remove(backing_img)
-+        blind_remove(target_img)
-         iotests.create_image(backing_img, TestMirrorResized.backing_len)
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % backing_img, test_img)
-         qemu_img('resize', test_img, '2M')
-@@ -336,12 +333,6 @@ class TestMirrorResized(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(test_img)
--        os.remove(backing_img)
--        try:
--            os.remove(target_img)
--        except OSError:
--            pass
- 
-     def test_complete_top(self):
-         self.assert_no_active_block_jobs()
-@@ -403,6 +394,10 @@ new_state = "1"
- 
-     def setUp(self):
-         self.blkdebug_file = backing_img + ".blkdebug"
-+        blind_remove(test_img)
-+        blind_remove(target_img)
-+        blind_remove(backing_img)
-+        blind_remove(self.blkdebug_file)
-         iotests.create_image(backing_img, TestReadErrors.image_len)
-         self.create_blkdebug_file(self.blkdebug_file, "read_aio", 5)
-         qemu_img('create', '-f', iotests.imgfmt,
-@@ -417,10 +412,6 @@ new_state = "1"
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(test_img)
--        os.remove(target_img)
--        os.remove(backing_img)
--        os.remove(self.blkdebug_file)
- 
-     def test_report_read(self):
-         self.assert_no_active_block_jobs()
-@@ -558,6 +549,10 @@ new_state = "1"
- 
-     def setUp(self):
-         self.blkdebug_file = target_img + ".blkdebug"
-+        blind_remove(test_img)
-+        blind_remove(target_img)
-+        blind_remove(backing_img)
-+        blind_remove(self.blkdebug_file)
-         iotests.create_image(backing_img, TestWriteErrors.image_len)
-         self.create_blkdebug_file(self.blkdebug_file, "write_aio", 5)
-         qemu_img('create', '-f', iotests.imgfmt, '-obacking_file=%s' %(backing_img), test_img)
-@@ -568,10 +563,6 @@ new_state = "1"
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(test_img)
--        os.remove(target_img)
--        os.remove(backing_img)
--        os.remove(self.blkdebug_file)
- 
-     def test_report_write(self):
-         self.assert_no_active_block_jobs()
-@@ -657,6 +648,9 @@ class TestSetSpeed(iotests.QMPTestCase):
-     image_len = 80 * 1024 * 1024 # MB
- 
-     def setUp(self):
-+        blind_remove(test_img)
-+        blind_remove(backing_img)
-+        blind_remove(target_img)
-         qemu_img('create', backing_img, str(TestSetSpeed.image_len))
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % backing_img, test_img)
-         self.vm = iotests.VM().add_drive(test_img)
-@@ -664,9 +658,6 @@ class TestSetSpeed(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(test_img)
--        os.remove(backing_img)
--        os.remove(target_img)
- 
-     def test_set_speed(self):
-         self.assert_no_active_block_jobs()
-@@ -723,6 +714,8 @@ class TestUnbackedSource(iotests.QMPTestCase):
-     image_len = 2 * 1024 * 1024 # MB
- 
-     def setUp(self):
-+        blind_remove(test_img)
-+        blind_remove(target_img)
-         qemu_img('create', '-f', iotests.imgfmt, test_img,
-                  str(TestUnbackedSource.image_len))
-         self.vm = iotests.VM().add_drive(test_img)
-@@ -730,8 +723,6 @@ class TestUnbackedSource(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(test_img)
--        os.remove(target_img)
- 
-     def test_absolute_paths_full(self):
-         self.assert_no_active_block_jobs()
-@@ -764,6 +755,8 @@ class TestGranularity(iotests.QMPTestCase):
-     image_len = 10 * 1024 * 1024 # MB
- 
-     def setUp(self):
-+        blind_remove(test_img)
-+        blind_remove(target_img)
-         qemu_img('create', '-f', iotests.imgfmt, test_img,
-                  str(TestGranularity.image_len))
-         qemu_io('-c', 'write 0 %d' % (self.image_len),
-@@ -775,8 +768,6 @@ class TestGranularity(iotests.QMPTestCase):
-         self.vm.shutdown()
-         self.assertTrue(iotests.compare_images(test_img, target_img),
-                         'target image does not match source after mirroring')
--        os.remove(test_img)
--        os.remove(target_img)
- 
-     def test_granularity(self):
-         self.assert_no_active_block_jobs()
-@@ -797,6 +788,9 @@ class TestRepairQuorum(iotests.QMPTestCase):
-     IMAGES = [ quorum_img1, quorum_img2, quorum_img3 ]
- 
-     def setUp(self):
-+        for i in self.IMAGES + [ quorum_repair_img, quorum_snapshot_file ]:
-+            blind_remove(i)
-+
-         self.vm = iotests.VM()
- 
-         if iotests.qemu_default_machine == 'pc':
-@@ -823,12 +817,6 @@ class TestRepairQuorum(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        for i in self.IMAGES + [ quorum_repair_img, quorum_snapshot_file ]:
--            # Do a try/except because the test may have deleted some images
--            try:
--                os.remove(i)
--            except OSError:
--                pass
- 
-     def test_complete(self):
-         if not iotests.supports_quorum():
-diff --git a/tests/qemu-iotests/044 b/tests/qemu-iotests/044
-index 11ea0f4..6b1a897 100755
---- a/tests/qemu-iotests/044
-+++ b/tests/qemu-iotests/044
-@@ -23,7 +23,7 @@ import os
- import qcow2
- from qcow2 import QcowHeader
- import iotests
--from iotests import qemu_img, qemu_img_verbose, qemu_io
-+from iotests import qemu_img, qemu_img_verbose, qemu_io, blind_remove
- import struct
- import subprocess
- 
-@@ -99,15 +99,11 @@ class TestRefcountTableGrowth(iotests.QMPTestCase):
- 
- 
-     def setUp(self):
-+        blind_remove(test_img)
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'cluster_size=512', test_img, '16G')
-         self.preallocate(test_img)
-         pass
- 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
 -
--    def tearDown(self):
--        os.remove(test_img)
--        pass
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/002 b/tests/qemu-iotests/002
+index d4f8e91..4c9ff23 100755
+--- a/tests/qemu-iotests/002
++++ b/tests/qemu-iotests/002
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
 -
-     def test_grow_refcount_table(self):
-         qemu_io('-c', 'write 3800M 1M', test_img)
-         qemu_img_verbose('check' , test_img)
-diff --git a/tests/qemu-iotests/045 b/tests/qemu-iotests/045
-index 6be8fc4..2edb84a 100755
---- a/tests/qemu-iotests/045
-+++ b/tests/qemu-iotests/045
-@@ -20,7 +20,7 @@
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/003 b/tests/qemu-iotests/003
+index 19889b9..2648d03 100755
+--- a/tests/qemu-iotests/003
++++ b/tests/qemu-iotests/003
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
  
- import os
- import iotests
--from iotests import qemu_img
-+from iotests import qemu_img, blind_remove
- 
- image0 = os.path.join(iotests.test_dir, 'image0')
- image1 = os.path.join(iotests.test_dir, 'image1')
-@@ -31,6 +31,11 @@ image4 = os.path.join(iotests.test_dir, 'image4')
- class TestFdSets(iotests.QMPTestCase):
- 
-     def setUp(self):
-+        blind_remove(image0)
-+        blind_remove(image1)
-+        blind_remove(image2)
-+        blind_remove(image3)
-+        blind_remove(image4)
-         self.vm = iotests.VM()
-         qemu_img('create', '-f', iotests.imgfmt, image0, '128K')
-         qemu_img('create', '-f', iotests.imgfmt, image1, '128K')
-@@ -57,11 +62,6 @@ class TestFdSets(iotests.QMPTestCase):
-         self.file2.close()
-         self.file3.close()
-         self.file4.close()
--        os.remove(image0)
--        os.remove(image1)
--        os.remove(image2)
--        os.remove(image3)
--        os.remove(image4)
- 
-     def test_query_fdset(self):
-         result = self.vm.qmp('query-fdsets')
-@@ -128,6 +128,7 @@ class TestFdSets(iotests.QMPTestCase):
- # Add fd at runtime, there are two ways: monitor related or fdset related
- class TestSCMFd(iotests.QMPTestCase):
-     def setUp(self):
-+        blind_remove(image0)
-         self.vm = iotests.VM()
-         qemu_img('create', '-f', iotests.imgfmt, image0, '128K')
-         # Add an unused monitor, to verify it works fine when two monitor
-@@ -137,7 +138,6 @@ class TestSCMFd(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(image0)
- 
-     def _send_fd_by_SCM(self):
-         ret = self.vm.send_fd_scm(image0)
-diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
-index e1206ca..50588f8 100755
---- a/tests/qemu-iotests/055
-+++ b/tests/qemu-iotests/055
-@@ -23,7 +23,7 @@
- import time
- import os
- import iotests
--from iotests import qemu_img, qemu_io
-+from iotests import qemu_img, qemu_io, blind_remove
- 
- test_img = os.path.join(iotests.test_dir, 'test.img')
- target_img = os.path.join(iotests.test_dir, 'target.img')
-@@ -32,6 +32,7 @@ blockdev_target_img = os.path.join(iotests.test_dir, 'blockdev-target.img')
- image_len = 64 * 1024 * 1024 # MB
- 
- def setUpModule():
-+    blind_remove(test_img)
-     qemu_img('create', '-f', iotests.imgfmt, test_img, str(image_len))
-     qemu_io('-f', iotests.imgfmt, '-c', 'write -P0x11 0 64k', test_img)
-     qemu_io('-f', iotests.imgfmt, '-c', 'write -P0x00 64k 128k', test_img)
-@@ -40,12 +41,11 @@ def setUpModule():
-     qemu_io('-f', iotests.imgfmt, '-c', 'write -P0xdc 32M 124k', test_img)
-     qemu_io('-f', iotests.imgfmt, '-c', 'write -P0x33 67043328 64k', test_img)
- 
--def tearDownModule():
--    os.remove(test_img)
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
 -
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/004 b/tests/qemu-iotests/004
+index 6f2aa3d..99743b4 100755
+--- a/tests/qemu-iotests/004
++++ b/tests/qemu-iotests/004
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
  
- class TestSingleDrive(iotests.QMPTestCase):
-     def setUp(self):
-+        blind_remove(blockdev_target_img)
-+        blind_remove(target_img)
-         qemu_img('create', '-f', iotests.imgfmt, blockdev_target_img, str(image_len))
- 
-         self.vm = iotests.VM().add_drive(test_img)
-@@ -56,11 +56,6 @@ class TestSingleDrive(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(blockdev_target_img)
--        try:
--            os.remove(target_img)
--        except OSError:
--            pass
- 
-     def do_test_cancel(self, cmd, target):
-         self.assert_no_active_block_jobs()
-@@ -164,6 +159,8 @@ class TestSingleDrive(iotests.QMPTestCase):
- 
- class TestSetSpeed(iotests.QMPTestCase):
-     def setUp(self):
-+        blind_remove(blockdev_target_img)
-+        blind_remove(target_img)
-         qemu_img('create', '-f', iotests.imgfmt, blockdev_target_img, str(image_len))
- 
-         self.vm = iotests.VM().add_drive(test_img)
-@@ -172,11 +169,6 @@ class TestSetSpeed(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(blockdev_target_img)
--        try:
--            os.remove(target_img)
--        except OSError:
--            pass
- 
-     def do_test_set_speed(self, cmd, target):
-         self.assert_no_active_block_jobs()
-@@ -248,6 +240,8 @@ class TestSetSpeed(iotests.QMPTestCase):
- 
- class TestSingleTransaction(iotests.QMPTestCase):
-     def setUp(self):
-+        blind_remove(blockdev_target_img)
-+        blind_remove(target_img)
-         qemu_img('create', '-f', iotests.imgfmt, blockdev_target_img, str(image_len))
- 
-         self.vm = iotests.VM().add_drive(test_img)
-@@ -258,11 +252,6 @@ class TestSingleTransaction(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(blockdev_target_img)
--        try:
--            os.remove(target_img)
--        except OSError:
--            pass
- 
-     def do_test_cancel(self, cmd, target):
-         self.assert_no_active_block_jobs()
-@@ -452,13 +441,12 @@ class TestDriveCompression(iotests.QMPTestCase):
-     fmt_supports_compression = [{'type': 'qcow2', 'args': ()},
-                                 {'type': 'vmdk', 'args': ('-o', 'subformat=streamOptimized')}]
- 
-+    def setUp(self):
-+        blind_remove(blockdev_target_img)
-+        blind_remove(target_img)
-+
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(blockdev_target_img)
--        try:
--            os.remove(target_img)
--        except OSError:
--            pass
- 
-     def do_prepare_drives(self, fmt, args, attach_target):
-         self.vm = iotests.VM().add_drive(test_img)
-diff --git a/tests/qemu-iotests/056 b/tests/qemu-iotests/056
-index 04f2c3c..3aefb93 100755
---- a/tests/qemu-iotests/056
-+++ b/tests/qemu-iotests/056
-@@ -23,7 +23,7 @@
- import time
- import os
- import iotests
--from iotests import qemu_img, qemu_io, create_image
-+from iotests import qemu_img, qemu_io, create_image, blind_remove
- 
- backing_img = os.path.join(iotests.test_dir, 'backing.img')
- test_img = os.path.join(iotests.test_dir, 'test.img')
-@@ -33,6 +33,9 @@ class TestSyncModesNoneAndTop(iotests.QMPTestCase):
-     image_len = 64 * 1024 * 1024 # MB
- 
-     def setUp(self):
-+        blind_remove(test_img)
-+        blind_remove(backing_img)
-+        blind_remove(target_img)
-         create_image(backing_img, TestSyncModesNoneAndTop.image_len)
-         qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=%s' % backing_img, test_img)
-         qemu_io('-c', 'write -P0x41 0 512', test_img)
-@@ -44,12 +47,6 @@ class TestSyncModesNoneAndTop(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(test_img)
--        os.remove(backing_img)
--        try:
--            os.remove(target_img)
--        except OSError:
--            pass
- 
-     def test_complete_top(self):
-         self.assert_no_active_block_jobs()
-@@ -84,12 +81,12 @@ class TestSyncModesNoneAndTop(iotests.QMPTestCase):
- 
- class TestBeforeWriteNotifier(iotests.QMPTestCase):
-     def setUp(self):
-+        blind_remove(target_img)
-         self.vm = iotests.VM().add_drive_raw("file=blkdebug::null-co://,id=drive0,align=65536,driver=blkdebug")
-         self.vm.launch()
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(target_img)
- 
-     def test_before_write_notifier(self):
-         self.vm.pause_drive("drive0")
-diff --git a/tests/qemu-iotests/057 b/tests/qemu-iotests/057
-index 9f0a5a3..0d99959 100755
---- a/tests/qemu-iotests/057
-+++ b/tests/qemu-iotests/057
-@@ -23,7 +23,7 @@
- import time
- import os
- import iotests
--from iotests import qemu_img, qemu_io
-+from iotests import qemu_img, qemu_io, blind_remove
- 
- test_drv_base_name = 'drive'
- 
-@@ -36,6 +36,8 @@ class ImageSnapshotTestCase(iotests.QMPTestCase):
- 
-     def _setUp(self, test_img_base_name, image_num):
-         self.vm = iotests.VM()
-+        for dev_expect in self.expect:
-+            blind_remove(dev_expect['image'])
-         for i in range(0, image_num):
-             filename = '%s%d' % (test_img_base_name, i)
-             img = os.path.join(iotests.test_dir, filename)
-@@ -49,8 +51,6 @@ class ImageSnapshotTestCase(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        for dev_expect in self.expect:
--            os.remove(dev_expect['image'])
- 
-     def createSnapshotInTransaction(self, snapshot_num, abort = False):
-         actions = []
-diff --git a/tests/qemu-iotests/065 b/tests/qemu-iotests/065
-index 72aa970..b63ee13 100755
---- a/tests/qemu-iotests/065
-+++ b/tests/qemu-iotests/065
-@@ -23,7 +23,7 @@ import os
- import re
- import json
- import iotests
--from iotests import qemu_img, qemu_img_pipe
-+from iotests import qemu_img, qemu_img_pipe, blind_remove
- import unittest
- 
- test_img = os.path.join(iotests.test_dir, 'test.img')
-@@ -32,14 +32,12 @@ class TestImageInfoSpecific(iotests.QMPTestCase):
-     '''Abstract base class for ImageInfoSpecific tests'''
- 
-     def setUp(self):
-+        blind_remove(test_img)
-         if self.img_options is None:
-             self.skipTest('Skipping abstract test class')
-         qemu_img('create', '-f', iotests.imgfmt, '-o', self.img_options,
-                  test_img, '128K')
- 
--    def tearDown(self):
--        os.remove(test_img)
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
 -
- class TestQemuImgInfo(TestImageInfoSpecific):
-     '''Abstract base class for qemu-img info tests'''
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/005 b/tests/qemu-iotests/005
+index 4447377..23a77e0 100755
+--- a/tests/qemu-iotests/005
++++ b/tests/qemu-iotests/005
+@@ -30,12 +30,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
  
-diff --git a/tests/qemu-iotests/096 b/tests/qemu-iotests/096
-index aeeb375..d1c4902 100644
---- a/tests/qemu-iotests/096
-+++ b/tests/qemu-iotests/096
-@@ -21,6 +21,7 @@
- 
- import iotests
- import os
-+from iotests import blind_remove
- 
- class TestLiveSnapshot(iotests.QMPTestCase):
-     base_img = os.path.join(iotests.test_dir, 'base.img')
-@@ -30,6 +31,8 @@ class TestLiveSnapshot(iotests.QMPTestCase):
-     iops_size = 1024
- 
-     def setUp(self):
-+        blind_remove(self.base_img)
-+        blind_remove(self.target_img)
-         opts = []
-         opts.append('node-name=base')
-         opts.append('throttling.group=%s' % self.group)
-@@ -41,8 +44,6 @@ class TestLiveSnapshot(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(self.base_img)
--        os.remove(self.target_img)
- 
-     def checkConfig(self, active_layer):
-         result = self.vm.qmp('query-block')
-diff --git a/tests/qemu-iotests/118 b/tests/qemu-iotests/118
-index 8a9e838..d90ea98 100755
---- a/tests/qemu-iotests/118
-+++ b/tests/qemu-iotests/118
-@@ -23,7 +23,7 @@ import os
- import stat
- import time
- import iotests
--from iotests import qemu_img
-+from iotests import qemu_img, blind_remove
- 
- old_img = os.path.join(iotests.test_dir, 'test0.img')
- new_img = os.path.join(iotests.test_dir, 'test1.img')
-@@ -323,6 +323,8 @@ class TestInitiallyFilled(GeneralChangeTestsBaseClass):
-     was_empty = False
- 
-     def setUp(self, media, interface):
-+        blind_remove(old_img)
-+        blind_remove(new_img)
-         qemu_img('create', '-f', iotests.imgfmt, old_img, '1440k')
-         qemu_img('create', '-f', iotests.imgfmt, new_img, '1440k')
-         self.vm = iotests.VM()
-@@ -336,8 +338,6 @@ class TestInitiallyFilled(GeneralChangeTestsBaseClass):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(old_img)
--        os.remove(new_img)
- 
-     def test_insert_on_filled(self):
-         result = self.vm.qmp('blockdev-add',
-@@ -360,13 +360,13 @@ class TestInitiallyEmpty(GeneralChangeTestsBaseClass):
-     was_empty = True
- 
-     def setUp(self, media, interface):
-+        blind_remove(new_img)
-         qemu_img('create', '-f', iotests.imgfmt, new_img, '1440k')
-         self.vm = iotests.VM().add_drive(None, 'media=%s' % media, interface)
-         self.vm.launch()
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(new_img)
- 
-     def test_remove_on_empty(self):
-         result = self.vm.qmp('blockdev-open-tray', device='drive0')
-@@ -411,16 +411,16 @@ class TestFloppyInitiallyEmpty(TestInitiallyEmpty):
- 
- class TestChangeReadOnly(ChangeBaseClass):
-     def setUp(self):
--        qemu_img('create', '-f', iotests.imgfmt, old_img, '1440k')
--        qemu_img('create', '-f', iotests.imgfmt, new_img, '1440k')
--        self.vm = iotests.VM()
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
 -
--    def tearDown(self):
--        self.vm.shutdown()
-         os.chmod(old_img, 0666)
-         os.chmod(new_img, 0666)
--        os.remove(old_img)
--        os.remove(new_img)
-+        blind_remove(old_img)
-+        blind_remove(new_img)
-+        qemu_img('create', '-f', iotests.imgfmt, old_img, '1440k')
-+        qemu_img('create', '-f', iotests.imgfmt, new_img, '1440k')
-+        self.vm = iotests.VM()
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/007 b/tests/qemu-iotests/007
+index fa543ee..c8068e5 100755
+--- a/tests/qemu-iotests/007
++++ b/tests/qemu-iotests/007
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
  
-     def test_ro_ro_retain(self):
-         os.chmod(old_img, 0444)
-@@ -645,6 +645,8 @@ TestInitiallyEmpty = None
- 
- class TestBlockJobsAfterCycle(ChangeBaseClass):
-     def setUp(self):
-+        blind_remove(old_img)
-+        blind_remove(new_img)
-         qemu_img('create', '-f', iotests.imgfmt, old_img, '1M')
- 
-         self.vm = iotests.VM()
-@@ -678,11 +680,6 @@ class TestBlockJobsAfterCycle(ChangeBaseClass):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(old_img)
--        try:
--            os.remove(new_img)
--        except OSError:
--            pass
- 
-     def test_snapshot_and_commit(self):
-         # We need backing file support
-diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
-index 8e76e62..1aabe64 100644
---- a/tests/qemu-iotests/124
-+++ b/tests/qemu-iotests/124
-@@ -22,20 +22,13 @@
- 
- import os
- import iotests
-+from iotests import blind_remove
- 
- 
- def io_write_patterns(img, patterns):
-     for pattern in patterns:
-         iotests.qemu_io('-c', 'write -P%s %s %s' % pattern, img)
- 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-	true
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
 -
--def try_remove(img):
--    try:
--        os.remove(img)
--    except OSError:
--        pass
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/008 b/tests/qemu-iotests/008
+index 8e89d74..7f7f8ae 100755
+--- a/tests/qemu-iotests/008
++++ b/tests/qemu-iotests/008
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
 -
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/009 b/tests/qemu-iotests/009
+index 16e4475..e03412a 100755
+--- a/tests/qemu-iotests/009
++++ b/tests/qemu-iotests/009
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
 -
- def transaction_action(action, **kwargs):
-     return {
-         'type': action,
-@@ -82,13 +75,13 @@ class Bitmap:
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/010 b/tests/qemu-iotests/010
+index 151dac2..8608848 100755
+--- a/tests/qemu-iotests/010
++++ b/tests/qemu-iotests/010
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
  
-     def del_target(self):
-         for image in self.backups.pop():
--            try_remove(image)
-+            blind_remove(image)
-         self.num -= 1
- 
-     def cleanup(self):
-         for backup in self.backups:
-             for image in backup:
--                try_remove(image)
-+                blind_remove(image)
- 
- 
- class TestIncrementalBackupBase(iotests.QMPTestCase):
-@@ -102,6 +95,10 @@ class TestIncrementalBackupBase(iotests.QMPTestCase):
- 
- 
-     def setUp(self):
-+        for filename in self.files:
-+            blind_remove(filename)
-+        for bitmap in self.bitmaps:
-+            bitmap.cleanup()
-         # Create a base image with a distinctive patterning
-         drive0 = self.add_node('drive0')
-         self.img_create(drive0['file'], drive0['fmt'])
-@@ -273,10 +270,6 @@ class TestIncrementalBackupBase(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        for bitmap in self.bitmaps:
--            bitmap.cleanup()
--        for filename in self.files:
--            try_remove(filename)
- 
- 
- 
-diff --git a/tests/qemu-iotests/132 b/tests/qemu-iotests/132
-index f53ef6e..375d9ed 100644
---- a/tests/qemu-iotests/132
-+++ b/tests/qemu-iotests/132
-@@ -21,7 +21,7 @@
- import time
- import os
- import iotests
--from iotests import qemu_img, qemu_io
-+from iotests import qemu_img, qemu_io, blind_remove
- 
- test_img = os.path.join(iotests.test_dir, 'test.img')
- target_img = os.path.join(iotests.test_dir, 'target.img')
-@@ -30,6 +30,8 @@ class TestSingleDrive(iotests.QMPTestCase):
-     image_len = 2 * 1024 * 1024 # MB
- 
-     def setUp(self):
-+        blind_remove(test_img)
-+        blind_remove(target_img)
-         # Write data to the image so we can compare later
-         qemu_img('create', '-f', iotests.imgfmt, test_img, str(TestSingleDrive.image_len))
-         qemu_io('-f', iotests.imgfmt, '-c', 'write -P0x5d 0 2M', test_img)
-@@ -39,11 +41,6 @@ class TestSingleDrive(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(test_img)
--        try:
--            os.remove(target_img)
--        except OSError:
--            pass
- 
-     def test_mirror_discard(self):
-         result = self.vm.qmp('drive-mirror', device='drive0', sync='full',
-diff --git a/tests/qemu-iotests/136 b/tests/qemu-iotests/136
-index 4b99489..7209cfc 100644
---- a/tests/qemu-iotests/136
-+++ b/tests/qemu-iotests/136
-@@ -21,6 +21,7 @@
- 
- import iotests
- import os
-+from iotests import blind_remove
- 
- interval_length = 10
- nsec_per_sec = 1000000000
-@@ -68,6 +69,7 @@ sector = "%d"
-         file.close()
- 
-     def setUp(self):
-+        blind_remove(blkdebug_file)
-         drive_args = []
-         drive_args.append("stats-intervals.0=%d" % interval_length)
-         drive_args.append("stats-account-invalid=%s" %
-@@ -84,7 +86,6 @@ sector = "%d"
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(blkdebug_file)
- 
-     def accounted_ops(self, read = False, write = False, flush = False):
-         ops = 0
-diff --git a/tests/qemu-iotests/139 b/tests/qemu-iotests/139
-index 50cf40f..7d05bfb 100644
---- a/tests/qemu-iotests/139
-+++ b/tests/qemu-iotests/139
-@@ -22,6 +22,7 @@
- import os
- import iotests
- import time
-+from iotests import blind_remove
- 
- base_img = os.path.join(iotests.test_dir, 'base.img')
- new_img = os.path.join(iotests.test_dir, 'new.img')
-@@ -29,6 +30,8 @@ new_img = os.path.join(iotests.test_dir, 'new.img')
- class TestBlockdevDel(iotests.QMPTestCase):
- 
-     def setUp(self):
-+        blind_remove(base_img)
-+        blind_remove(new_img)
-         iotests.qemu_img('create', '-f', iotests.imgfmt, base_img, '1M')
-         self.vm = iotests.VM()
-         self.vm.add_device("virtio-scsi-pci,id=virtio-scsi")
-@@ -36,9 +39,6 @@ class TestBlockdevDel(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(base_img)
--        if os.path.isfile(new_img):
--            os.remove(new_img)
- 
-     # Check whether a BlockDriverState exists
-     def checkBlockDriverState(self, node, must_exist = True):
-diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
-index db34838..baf72d0 100755
---- a/tests/qemu-iotests/147
-+++ b/tests/qemu-iotests/147
-@@ -23,7 +23,7 @@ import socket
- import stat
- import time
- import iotests
--from iotests import cachemode, imgfmt, qemu_img, qemu_nbd
-+from iotests import cachemode, imgfmt, qemu_img, qemu_nbd, blind_remove
- 
- NBD_PORT = 10811
- 
-@@ -70,17 +70,14 @@ class NBDBlockdevAddBase(iotests.QMPTestCase):
- 
- class QemuNBD(NBDBlockdevAddBase):
-     def setUp(self):
-+        blind_remove(test_img)
-+        blind_remove(unix_socket)
-         qemu_img('create', '-f', iotests.imgfmt, test_img, '64k')
-         self.vm = iotests.VM()
-         self.vm.launch()
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(test_img)
--        try:
--            os.remove(unix_socket)
--        except OSError:
--            pass
- 
-     def _server_up(self, *args):
-         self.assertEqual(qemu_nbd('-f', imgfmt, test_img, *args), 0)
-@@ -105,6 +102,8 @@ class QemuNBD(NBDBlockdevAddBase):
- 
- class BuiltinNBD(NBDBlockdevAddBase):
-     def setUp(self):
-+        blind_remove(test_img)
-+        blind_remove(unix_socket)
-         qemu_img('create', '-f', iotests.imgfmt, test_img, '64k')
-         self.vm = iotests.VM()
-         self.vm.launch()
-@@ -118,11 +117,6 @@ class BuiltinNBD(NBDBlockdevAddBase):
-     def tearDown(self):
-         self.vm.shutdown()
-         self.server.shutdown()
--        os.remove(test_img)
--        try:
--            os.remove(unix_socket)
--        except OSError:
--            pass
- 
-     def _server_up(self, address):
-         result = self.server.qmp('nbd-server-start', addr=address)
-diff --git a/tests/qemu-iotests/148 b/tests/qemu-iotests/148
-index e01b061..562df85 100644
---- a/tests/qemu-iotests/148
-+++ b/tests/qemu-iotests/148
-@@ -21,6 +21,7 @@
- 
- import os
- import iotests
-+from iotests import blind_remove
- 
- imgs = (os.path.join(iotests.test_dir, 'quorum0.img'),
-         os.path.join(iotests.test_dir, 'quorum1.img'),
-@@ -48,6 +49,9 @@ sector = "%d"
-         file.close()
- 
-     def setUp(self):
-+        for i in range(len(imgs)):
-+            blind_remove(imgs[i])
-+            blind_remove(img_conf[i])
-         driveopts = ['driver=quorum', 'vote-threshold=2']
-         driveopts.append('read-pattern=%s' % self.read_pattern)
-         for i in range(len(imgs)):
-@@ -64,9 +68,6 @@ sector = "%d"
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        for i in range(len(imgs)):
--            os.remove(imgs[i])
--            os.remove(img_conf[i])
- 
-     def do_check_event(self, node, sector = 0):
-         if node == None:
-diff --git a/tests/qemu-iotests/152 b/tests/qemu-iotests/152
-index fec546d..b2a92db 100644
---- a/tests/qemu-iotests/152
-+++ b/tests/qemu-iotests/152
-@@ -20,24 +20,21 @@
- 
- import os
- import iotests
--from iotests import qemu_img
-+from iotests import qemu_img, blind_remove
- 
- test_img = os.path.join(iotests.test_dir, 'test.img')
- target_img = os.path.join(iotests.test_dir, 'target.img')
- 
- class TestUnaligned(iotests.QMPTestCase):
-     def setUp(self):
-+        blind_remove(test_img)
-+        blind_remove(target_img)
-         qemu_img('create', '-f', iotests.imgfmt, test_img, '512')
-         self.vm = iotests.VM().add_drive(test_img)
-         self.vm.launch()
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(test_img)
--        try:
--            os.remove(target_img)
--        except OSError:
--            pass
- 
-     def test_unaligned(self):
-         result = self.vm.qmp('drive-mirror', device='drive0', sync='full',
-diff --git a/tests/qemu-iotests/155 b/tests/qemu-iotests/155
-index 0b86ea4..4c0aa2e 100755
---- a/tests/qemu-iotests/155
-+++ b/tests/qemu-iotests/155
-@@ -23,7 +23,7 @@
- 
- import os
- import iotests
--from iotests import qemu_img
-+from iotests import qemu_img, blind_remove
- 
- back0_img = os.path.join(iotests.test_dir, 'back0.' + iotests.imgfmt)
- back1_img = os.path.join(iotests.test_dir, 'back1.' + iotests.imgfmt)
-@@ -51,6 +51,11 @@ class BaseClass(iotests.QMPTestCase):
-     target_real_backing = None
- 
-     def setUp(self):
-+        blind_remove(source_img)
-+        blind_remove(back2_img)
-+        blind_remove(back1_img)
-+        blind_remove(back0_img)
-+        blind_remove(target_img)
-         qemu_img('create', '-f', iotests.imgfmt, back0_img, '1M')
-         qemu_img('create', '-f', iotests.imgfmt, '-b', back0_img, back1_img)
-         qemu_img('create', '-f', iotests.imgfmt, '-b', back1_img, back2_img)
-@@ -95,14 +100,6 @@ class BaseClass(iotests.QMPTestCase):
- 
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(source_img)
--        os.remove(back2_img)
--        os.remove(back1_img)
--        os.remove(back0_img)
--        try:
--            os.remove(target_img)
--        except OSError:
--            pass
- 
-     def findBlockNode(self, node_name, id=None):
-         if id:
-diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
-index 74d7b79..cd6fff7 100755
---- a/tests/qemu-iotests/165
-+++ b/tests/qemu-iotests/165
-@@ -21,7 +21,7 @@
- import os
- import re
- import iotests
--from iotests import qemu_img
-+from iotests import qemu_img, blind_remove
- 
- disk = os.path.join(iotests.test_dir, 'disk')
- disk_size = 0x40000000 # 1G
-@@ -36,11 +36,9 @@ regions2 = ((0x10000000, 0x20000),
- class TestPersistentDirtyBitmap(iotests.QMPTestCase):
- 
-     def setUp(self):
-+        blind_remove(disk)
-         qemu_img('create', '-f', iotests.imgfmt, disk, str(disk_size))
- 
--    def tearDown(self):
--        os.remove(disk)
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
 -
-     def mkVm(self):
-         return iotests.VM().add_drive(disk)
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/011 b/tests/qemu-iotests/011
+index f8d044e..0c0d15f 100755
+--- a/tests/qemu-iotests/011
++++ b/tests/qemu-iotests/011
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
  
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/012 b/tests/qemu-iotests/012
+index 01a770d..aa9cfb4 100755
+--- a/tests/qemu-iotests/012
++++ b/tests/qemu-iotests/012
+@@ -29,12 +29,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/013 b/tests/qemu-iotests/013
+index d013f87..0ff9c4d 100755
+--- a/tests/qemu-iotests/013
++++ b/tests/qemu-iotests/013
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/014 b/tests/qemu-iotests/014
+index 2ea79e8..3dee9f7 100755
+--- a/tests/qemu-iotests/014
++++ b/tests/qemu-iotests/014
+@@ -29,12 +29,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/015 b/tests/qemu-iotests/015
+index aaf9c3f..d29a778 100755
+--- a/tests/qemu-iotests/015
++++ b/tests/qemu-iotests/015
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-	true
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/017 b/tests/qemu-iotests/017
+index 4f9302d..994ea0e 100755
+--- a/tests/qemu-iotests/017
++++ b/tests/qemu-iotests/017
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/018 b/tests/qemu-iotests/018
+index 1d39d35..11ad2b1 100755
+--- a/tests/qemu-iotests/018
++++ b/tests/qemu-iotests/018
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/019 b/tests/qemu-iotests/019
+index 24a789a..3728193 100755
+--- a/tests/qemu-iotests/019
++++ b/tests/qemu-iotests/019
+@@ -29,14 +29,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-    rm -f "$TEST_IMG.base"
+-    rm -f "$TEST_IMG.orig"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
+index 7a11110..37cd5d1 100755
+--- a/tests/qemu-iotests/020
++++ b/tests/qemu-iotests/020
+@@ -27,14 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-    rm -f "$TEST_IMG.base"
+-    rm -f "$TEST_IMG.orig"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/021 b/tests/qemu-iotests/021
+index 11e8ed7..5ab2acb 100755
+--- a/tests/qemu-iotests/021
++++ b/tests/qemu-iotests/021
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/022 b/tests/qemu-iotests/022
+index 2452a9f..4870b17 100755
+--- a/tests/qemu-iotests/022
++++ b/tests/qemu-iotests/022
+@@ -29,12 +29,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/023 b/tests/qemu-iotests/023
+index 497ae1e..5a2bf4e 100755
+--- a/tests/qemu-iotests/023
++++ b/tests/qemu-iotests/023
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/024 b/tests/qemu-iotests/024
+index e0d77ce..3e638d9 100755
+--- a/tests/qemu-iotests/024
++++ b/tests/qemu-iotests/024
+@@ -27,14 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-	rm -f "$TEST_DIR/t.$IMGFMT.base_old"
+-	rm -f "$TEST_DIR/t.$IMGFMT.base_new"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/025 b/tests/qemu-iotests/025
+index f5e672e..93634c1 100755
+--- a/tests/qemu-iotests/025
++++ b/tests/qemu-iotests/025
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/026 b/tests/qemu-iotests/026
+index 7fadfba..dc4ff9f 100755
+--- a/tests/qemu-iotests/026
++++ b/tests/qemu-iotests/026
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-    rm "$TEST_DIR/blkdebug.conf"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/027 b/tests/qemu-iotests/027
+index 08593da..c3f9146 100755
+--- a/tests/qemu-iotests/027
++++ b/tests/qemu-iotests/027
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
+index 97a8869..3176789 100755
+--- a/tests/qemu-iotests/028
++++ b/tests/qemu-iotests/028
+@@ -30,14 +30,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_qemu
+-    rm -f "${TEST_IMG}.copy"
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/029 b/tests/qemu-iotests/029
+index 30bab24..981a864 100755
+--- a/tests/qemu-iotests/029
++++ b/tests/qemu-iotests/029
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    rm -f $TEST_IMG.snap
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/031 b/tests/qemu-iotests/031
+index 1e08abc..6805c2c 100755
+--- a/tests/qemu-iotests/031
++++ b/tests/qemu-iotests/031
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/032 b/tests/qemu-iotests/032
+index 24bcb52..dafcfb8 100755
+--- a/tests/qemu-iotests/032
++++ b/tests/qemu-iotests/032
+@@ -29,12 +29,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/033 b/tests/qemu-iotests/033
+index 2cdfd13..bf3c59c 100755
+--- a/tests/qemu-iotests/033
++++ b/tests/qemu-iotests/033
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/034 b/tests/qemu-iotests/034
+index 1b28bda..830b0db 100755
+--- a/tests/qemu-iotests/034
++++ b/tests/qemu-iotests/034
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/035 b/tests/qemu-iotests/035
+index efc38e4..a79a4fd 100755
+--- a/tests/qemu-iotests/035
++++ b/tests/qemu-iotests/035
+@@ -28,12 +28,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/036 b/tests/qemu-iotests/036
+index ce638d6..841f347 100755
+--- a/tests/qemu-iotests/036
++++ b/tests/qemu-iotests/036
+@@ -30,12 +30,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/037 b/tests/qemu-iotests/037
+index c476b82..756fc2c 100755
+--- a/tests/qemu-iotests/037
++++ b/tests/qemu-iotests/037
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/038 b/tests/qemu-iotests/038
+index d99a150..cf730ae 100755
+--- a/tests/qemu-iotests/038
++++ b/tests/qemu-iotests/038
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/039 b/tests/qemu-iotests/039
+index 1f48339..dd483c4 100755
+--- a/tests/qemu-iotests/039
++++ b/tests/qemu-iotests/039
+@@ -30,12 +30,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/042 b/tests/qemu-iotests/042
+index a53e7cb..0efeec6 100755
+--- a/tests/qemu-iotests/042
++++ b/tests/qemu-iotests/042
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/043 b/tests/qemu-iotests/043
+index 1c6c22d..48b71fe 100755
+--- a/tests/qemu-iotests/043
++++ b/tests/qemu-iotests/043
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-    rm -f "$TEST_IMG".[123].base
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/046 b/tests/qemu-iotests/046
+index f2ebecf..362ed94 100755
+--- a/tests/qemu-iotests/046
++++ b/tests/qemu-iotests/046
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/047 b/tests/qemu-iotests/047
+index 1b8f3d4..1850035 100755
+--- a/tests/qemu-iotests/047
++++ b/tests/qemu-iotests/047
+@@ -28,12 +28,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/048 b/tests/qemu-iotests/048
+index 9ed04a0..c95bd2f 100755
+--- a/tests/qemu-iotests/048
++++ b/tests/qemu-iotests/048
+@@ -27,14 +27,6 @@ echo "QA output created by $seq"
+ 
+ status=1        # failure is the default!
+ 
+-_cleanup()
+-{
+-    echo "Cleanup"
+-    _cleanup_test_img
+-    rm "${TEST_IMG_FILE2}"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ _compare()
+ {
+     $QEMU_IMG compare $QEMU_IMG_EXTRA_ARGS "$@" "$TEST_IMG" "${TEST_IMG2}"
+diff --git a/tests/qemu-iotests/048.out b/tests/qemu-iotests/048.out
+index 0bcf663..3318eed 100644
+--- a/tests/qemu-iotests/048.out
++++ b/tests/qemu-iotests/048.out
+@@ -39,4 +39,3 @@ wrote 512/512 bytes at offset 512
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ Content mismatch at offset 512!
+ 1
+-Cleanup
+diff --git a/tests/qemu-iotests/049 b/tests/qemu-iotests/049
+index df35b6d..00733a6 100755
+--- a/tests/qemu-iotests/049
++++ b/tests/qemu-iotests/049
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/050 b/tests/qemu-iotests/050
+index 03b4a5d..e3b6d8c 100755
+--- a/tests/qemu-iotests/050
++++ b/tests/qemu-iotests/050
+@@ -27,14 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-    rm -f "$TEST_IMG.old"
+-    rm -f "$TEST_IMG.new"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
+index c8cfc76..7060c3e 100755
+--- a/tests/qemu-iotests/051
++++ b/tests/qemu-iotests/051
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/052 b/tests/qemu-iotests/052
+index 842eace..fc23fad 100755
+--- a/tests/qemu-iotests/052
++++ b/tests/qemu-iotests/052
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/053 b/tests/qemu-iotests/053
+index 2a04f5f..e8b9037 100755
+--- a/tests/qemu-iotests/053
++++ b/tests/qemu-iotests/053
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	rm -f "$TEST_IMG.orig"
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/054 b/tests/qemu-iotests/054
+index bf47ef9..e2de997 100755
+--- a/tests/qemu-iotests/054
++++ b/tests/qemu-iotests/054
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/058 b/tests/qemu-iotests/058
+index 2253c6a..a842fe4 100755
+--- a/tests/qemu-iotests/058
++++ b/tests/qemu-iotests/058
+@@ -75,13 +75,7 @@ _export_nbd_snapshot1()
+     _wait_for_nbd
+ }
+ 
+-_cleanup()
+-{
+-    _cleanup_nbd
+-    _cleanup_test_img
+-    rm -f "$converted_image"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_nbd; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/059 b/tests/qemu-iotests/059
+index a1c34ee..6ccd250 100755
+--- a/tests/qemu-iotests/059
++++ b/tests/qemu-iotests/059
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-    rm -f "$TEST_IMG.qcow2"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
+index 8e95c45..6532837 100755
+--- a/tests/qemu-iotests/060
++++ b/tests/qemu-iotests/060
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/061 b/tests/qemu-iotests/061
+index f5678b1..1346dd9 100755
+--- a/tests/qemu-iotests/061
++++ b/tests/qemu-iotests/061
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/062 b/tests/qemu-iotests/062
+index 051fb9f..3a1df0d 100755
+--- a/tests/qemu-iotests/062
++++ b/tests/qemu-iotests/062
+@@ -28,12 +28,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/063 b/tests/qemu-iotests/063
+index e4f6ea9..4a9fc44 100755
+--- a/tests/qemu-iotests/063
++++ b/tests/qemu-iotests/063
+@@ -28,13 +28,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-	rm -f "$TEST_IMG.orig" "$TEST_IMG.raw1" "$TEST_IMG.raw2"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/064 b/tests/qemu-iotests/064
+index 5792fbb..211c541 100755
+--- a/tests/qemu-iotests/064
++++ b/tests/qemu-iotests/064
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/066 b/tests/qemu-iotests/066
+index 8638217..e811f48 100755
+--- a/tests/qemu-iotests/066
++++ b/tests/qemu-iotests/066
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/068 b/tests/qemu-iotests/068
+index cfa0f2a..dd98227 100755
+--- a/tests/qemu-iotests/068
++++ b/tests/qemu-iotests/068
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/069 b/tests/qemu-iotests/069
+index 96e55ef..03d5a3c 100755
+--- a/tests/qemu-iotests/069
++++ b/tests/qemu-iotests/069
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/070 b/tests/qemu-iotests/070
+index 8d08d74..1220cc1 100755
+--- a/tests/qemu-iotests/070
++++ b/tests/qemu-iotests/070
+@@ -28,12 +28,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/071 b/tests/qemu-iotests/071
+index 48b4955..1a8d6e7 100755
+--- a/tests/qemu-iotests/071
++++ b/tests/qemu-iotests/071
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/072 b/tests/qemu-iotests/072
+index aa027c7..8aaf3fd 100755
+--- a/tests/qemu-iotests/072
++++ b/tests/qemu-iotests/072
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/073 b/tests/qemu-iotests/073
+index 40f85b1..c19ad0d 100755
+--- a/tests/qemu-iotests/073
++++ b/tests/qemu-iotests/073
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/074 b/tests/qemu-iotests/074
+index b17866b..d7888ab 100755
+--- a/tests/qemu-iotests/074
++++ b/tests/qemu-iotests/074
+@@ -27,15 +27,6 @@ echo "QA output created by $seq"
+ 
+ status=1        # failure is the default!
+ 
+-_cleanup()
+-{
+-    echo "Cleanup"
+-    _cleanup_test_img
+-    rm "${TEST_IMG2}"
+-    rm -f "$TEST_DIR/blkdebug.conf"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ _compare()
+ {
+     $QEMU_IMG compare "$@" "$TEST_IMG" "${TEST_IMG2}"
+diff --git a/tests/qemu-iotests/074.out b/tests/qemu-iotests/074.out
+index 8fba5ae..fb93965 100644
+--- a/tests/qemu-iotests/074.out
++++ b/tests/qemu-iotests/074.out
+@@ -15,4 +15,3 @@ qemu-img: Error while reading offset 0 of blkdebug:TEST_DIR/blkdebug.conf:TEST_D
+ qemu-img: Error while reading offset 0 of blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/t.IMGFMT: Input/output error
+ Warning: Image size mismatch!
+ 4
+-Cleanup
+diff --git a/tests/qemu-iotests/075 b/tests/qemu-iotests/075
+index 770d51c..c2509d1 100755
+--- a/tests/qemu-iotests/075
++++ b/tests/qemu-iotests/075
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/076 b/tests/qemu-iotests/076
+index ef9e6a4..69bccad 100755
+--- a/tests/qemu-iotests/076
++++ b/tests/qemu-iotests/076
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/077 b/tests/qemu-iotests/077
+index d2d2a2d..4a458e1 100755
+--- a/tests/qemu-iotests/077
++++ b/tests/qemu-iotests/077
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/078 b/tests/qemu-iotests/078
+index f333e9a..22d078e 100755
+--- a/tests/qemu-iotests/078
++++ b/tests/qemu-iotests/078
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/079 b/tests/qemu-iotests/079
+index b2e3f74..fba6ec6 100755
+--- a/tests/qemu-iotests/079
++++ b/tests/qemu-iotests/079
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/080 b/tests/qemu-iotests/080
+index 55044c7..be548a9 100755
+--- a/tests/qemu-iotests/080
++++ b/tests/qemu-iotests/080
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    rm -f $TEST_IMG.snap
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/081 b/tests/qemu-iotests/081
+index da3fb09..2dadc16 100755
+--- a/tests/qemu-iotests/081
++++ b/tests/qemu-iotests/081
+@@ -27,14 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    rm -rf $TEST_DIR/1.raw
+-    rm -rf $TEST_DIR/2.raw
+-    rm -rf $TEST_DIR/3.raw
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/082 b/tests/qemu-iotests/082
+index d5c83d4..aa585db 100755
+--- a/tests/qemu-iotests/082
++++ b/tests/qemu-iotests/082
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/084 b/tests/qemu-iotests/084
+index 04f2aa9..b0d42a0 100755
+--- a/tests/qemu-iotests/084
++++ b/tests/qemu-iotests/084
+@@ -28,12 +28,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
+index 5c7668c..7b69f86 100755
+--- a/tests/qemu-iotests/085
++++ b/tests/qemu-iotests/085
+@@ -37,18 +37,7 @@ snapshot_virt1="snapshot-v1.qcow2"
+ 
+ SNAPSHOTS=10
+ 
+-_cleanup()
+-{
+-    _cleanup_qemu
+-    for i in $(seq 1 ${SNAPSHOTS})
+-    do
+-        rm -f "${TEST_DIR}/${i}-${snapshot_virt0}"
+-        rm -f "${TEST_DIR}/${i}-${snapshot_virt1}"
+-    done
+-    rm -f "${TEST_IMG}" "${TEST_IMG}.1" "${TEST_IMG}.2" "${TEST_IMG}.base"
+-
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/086 b/tests/qemu-iotests/086
+index cd4494a..4d5f7db 100755
+--- a/tests/qemu-iotests/086
++++ b/tests/qemu-iotests/086
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/088 b/tests/qemu-iotests/088
+index b8076f2..72e7c68 100755
+--- a/tests/qemu-iotests/088
++++ b/tests/qemu-iotests/088
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    rm -f $TEST_IMG.snap
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/089 b/tests/qemu-iotests/089
+index 9bfe230..75151f1 100755
+--- a/tests/qemu-iotests/089
++++ b/tests/qemu-iotests/089
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/090 b/tests/qemu-iotests/090
+index 7380503..c3be13c 100755
+--- a/tests/qemu-iotests/090
++++ b/tests/qemu-iotests/090
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/091 b/tests/qemu-iotests/091
+index 10ac4a8..c4df2fb 100755
+--- a/tests/qemu-iotests/091
++++ b/tests/qemu-iotests/091
+@@ -31,13 +31,7 @@ status=1    # failure is the default!
+ 
+ MIG_FIFO="${TEST_DIR}/migrate"
+ 
+-_cleanup()
+-{
+-    rm -f "${MIG_FIFO}"
+-    _cleanup_qemu
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/092 b/tests/qemu-iotests/092
+index 5bbdd07..3b8cf8f 100755
+--- a/tests/qemu-iotests/092
++++ b/tests/qemu-iotests/092
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    rm -f $TEST_IMG.snap
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/094 b/tests/qemu-iotests/094
+index 9aa01e3..35e882c 100755
+--- a/tests/qemu-iotests/094
++++ b/tests/qemu-iotests/094
+@@ -27,14 +27,7 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_qemu
+-    _cleanup_test_img
+-    rm -f "$TEST_DIR/source.$IMGFMT"
+-}
+-
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/095 b/tests/qemu-iotests/095
+index 030adb2..75d60c4 100755
+--- a/tests/qemu-iotests/095
++++ b/tests/qemu-iotests/095
+@@ -30,13 +30,7 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_qemu
+-    rm  -f "${TEST_IMG}.base" "${TEST_IMG}.snp1"
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/097 b/tests/qemu-iotests/097
+index e22670c..81e6729 100755
+--- a/tests/qemu-iotests/097
++++ b/tests/qemu-iotests/097
+@@ -28,13 +28,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-    _rm_test_img "$TEST_IMG.itmd"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/098 b/tests/qemu-iotests/098
+index b002e96..24d8510 100755
+--- a/tests/qemu-iotests/098
++++ b/tests/qemu-iotests/098
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-    rm -f "$TEST_DIR/blkdebug.conf"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/099 b/tests/qemu-iotests/099
+index caaf58e..d811b34 100755
+--- a/tests/qemu-iotests/099
++++ b/tests/qemu-iotests/099
+@@ -28,12 +28,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/101 b/tests/qemu-iotests/101
+index ea53f8b..62faf99 100755
+--- a/tests/qemu-iotests/101
++++ b/tests/qemu-iotests/101
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
+index 87db1bb..084d2cf 100755
+--- a/tests/qemu-iotests/102
++++ b/tests/qemu-iotests/102
+@@ -27,12 +27,7 @@ echo "QA output created by $seq"
+ here=$PWD
+ status=1    # failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_qemu
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and qemu instance handling
+ . ./common.rc
+diff --git a/tests/qemu-iotests/103 b/tests/qemu-iotests/103
+index ecbd8eb..df86d4f 100755
+--- a/tests/qemu-iotests/103
++++ b/tests/qemu-iotests/103
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=$PWD
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/104 b/tests/qemu-iotests/104
+index 726d467..f10d311 100755
+--- a/tests/qemu-iotests/104
++++ b/tests/qemu-iotests/104
+@@ -27,8 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-trap "exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/105 b/tests/qemu-iotests/105
+index 3db4ce3..b469b1b 100755
+--- a/tests/qemu-iotests/105
++++ b/tests/qemu-iotests/105
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/106 b/tests/qemu-iotests/106
+index 3264957..b571971 100755
+--- a/tests/qemu-iotests/106
++++ b/tests/qemu-iotests/106
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=$PWD
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment and filters
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/107 b/tests/qemu-iotests/107
+index d7222dc..d513120 100755
+--- a/tests/qemu-iotests/107
++++ b/tests/qemu-iotests/107
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/108 b/tests/qemu-iotests/108
+index 2355d98..8371db4 100755
+--- a/tests/qemu-iotests/108
++++ b/tests/qemu-iotests/108
+@@ -28,12 +28,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
+index d70b574..d4fca99 100755
+--- a/tests/qemu-iotests/109
++++ b/tests/qemu-iotests/109
+@@ -27,13 +27,7 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_qemu
+-    rm -f $TEST_IMG.src
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
+index 9de7369..93dd09f 100755
+--- a/tests/qemu-iotests/110
++++ b/tests/qemu-iotests/110
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/111 b/tests/qemu-iotests/111
+index a1c152d..f590d82 100755
+--- a/tests/qemu-iotests/111
++++ b/tests/qemu-iotests/111
+@@ -28,12 +28,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/112 b/tests/qemu-iotests/112
+index 28eb9aa..ee3679e 100755
+--- a/tests/qemu-iotests/112
++++ b/tests/qemu-iotests/112
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/113 b/tests/qemu-iotests/113
+index 19b68b2..07437ea 100755
+--- a/tests/qemu-iotests/113
++++ b/tests/qemu-iotests/113
+@@ -28,12 +28,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/114 b/tests/qemu-iotests/114
+index 5b7dc54..5bfd473 100755
+--- a/tests/qemu-iotests/114
++++ b/tests/qemu-iotests/114
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/115 b/tests/qemu-iotests/115
+index 665c2ea..0c9aaad 100755
+--- a/tests/qemu-iotests/115
++++ b/tests/qemu-iotests/115
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/116 b/tests/qemu-iotests/116
+index df0172f..e687601 100755
+--- a/tests/qemu-iotests/116
++++ b/tests/qemu-iotests/116
+@@ -30,12 +30,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/117 b/tests/qemu-iotests/117
+index 6c83461..579cecb 100755
+--- a/tests/qemu-iotests/117
++++ b/tests/qemu-iotests/117
+@@ -27,12 +27,7 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_qemu
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/119 b/tests/qemu-iotests/119
+index 4f34fb4..8cdb404 100755
+--- a/tests/qemu-iotests/119
++++ b/tests/qemu-iotests/119
+@@ -28,12 +28,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/120 b/tests/qemu-iotests/120
+index f40b97d..bb0e2dd 100755
+--- a/tests/qemu-iotests/120
++++ b/tests/qemu-iotests/120
+@@ -28,12 +28,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/121 b/tests/qemu-iotests/121
+index 1307b4e..d75fce1 100755
+--- a/tests/qemu-iotests/121
++++ b/tests/qemu-iotests/121
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/122 b/tests/qemu-iotests/122
+index 45b359c..3942604 100755
+--- a/tests/qemu-iotests/122
++++ b/tests/qemu-iotests/122
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    rm -f "$TEST_IMG".[123]
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/123 b/tests/qemu-iotests/123
+index b18e3fc..98fd3ce 100755
+--- a/tests/qemu-iotests/123
++++ b/tests/qemu-iotests/123
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-    rm -f "$SRC_IMG"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/125 b/tests/qemu-iotests/125
+index 9424313..bca5fb5 100755
+--- a/tests/qemu-iotests/125
++++ b/tests/qemu-iotests/125
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=$PWD
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ get_image_size_on_host()
+ {
+     $QEMU_IMG info -f "$IMGFMT" "$TEST_IMG" | grep "disk size" \
+diff --git a/tests/qemu-iotests/130 b/tests/qemu-iotests/130
+index e7e43de..4aad4ea 100755
+--- a/tests/qemu-iotests/130
++++ b/tests/qemu-iotests/130
+@@ -29,12 +29,7 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_qemu
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/131 b/tests/qemu-iotests/131
+index 94a9ae7..52588ef 100755
+--- a/tests/qemu-iotests/131
++++ b/tests/qemu-iotests/131
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/133 b/tests/qemu-iotests/133
+index 9d35a6a..2d0aae9 100755
+--- a/tests/qemu-iotests/133
++++ b/tests/qemu-iotests/133
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/134 b/tests/qemu-iotests/134
+index 9914415..147ea2c 100755
+--- a/tests/qemu-iotests/134
++++ b/tests/qemu-iotests/134
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/135 b/tests/qemu-iotests/135
+index ce60831..75c160d 100755
+--- a/tests/qemu-iotests/135
++++ b/tests/qemu-iotests/135
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
+index eb91e51..6068a13 100755
+--- a/tests/qemu-iotests/137
++++ b/tests/qemu-iotests/137
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/138 b/tests/qemu-iotests/138
+index 21650d8..9682560 100755
+--- a/tests/qemu-iotests/138
++++ b/tests/qemu-iotests/138
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
+index f89d0d6..c5e1a5b 100755
+--- a/tests/qemu-iotests/140
++++ b/tests/qemu-iotests/140
+@@ -31,13 +31,7 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_qemu
+-    _cleanup_test_img
+-    rm -f "$TEST_DIR/nbd"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/141 b/tests/qemu-iotests/141
+index 2f9d7b9..cff2319 100755
+--- a/tests/qemu-iotests/141
++++ b/tests/qemu-iotests/141
+@@ -27,13 +27,7 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_qemu
+-    _cleanup_test_img
+-    rm -f "$TEST_DIR"/{b,m,o}.$IMGFMT
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/142 b/tests/qemu-iotests/142
+index 1639c83..65775be 100755
+--- a/tests/qemu-iotests/142
++++ b/tests/qemu-iotests/142
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-    rm -f $TEST_IMG.snap
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/143 b/tests/qemu-iotests/143
+index 5ff1944..b4736aa 100755
+--- a/tests/qemu-iotests/143
++++ b/tests/qemu-iotests/143
+@@ -27,12 +27,7 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_qemu
+-    rm -f "$TEST_DIR/nbd"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/144 b/tests/qemu-iotests/144
+index 00de3c3..b47c561 100755
+--- a/tests/qemu-iotests/144
++++ b/tests/qemu-iotests/144
+@@ -32,13 +32,7 @@ status=1	# failure is the default!
+ TMP_SNAP1=${TEST_DIR}/tmp.qcow2
+ TMP_SNAP2=${TEST_DIR}/tmp2.qcow2
+ 
+-_cleanup()
+-{
+-    _cleanup_qemu
+-    rm -f "${TEST_IMG}" "${TMP_SNAP1}" "${TMP_SNAP2}"
+-}
+-
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/145 b/tests/qemu-iotests/145
+index c371b3c..930628e 100755
+--- a/tests/qemu-iotests/145
++++ b/tests/qemu-iotests/145
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-	true
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/146 b/tests/qemu-iotests/146
+index 043711b..99b1e81 100755
+--- a/tests/qemu-iotests/146
++++ b/tests/qemu-iotests/146
+@@ -27,12 +27,7 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1    # failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_qemu
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/150 b/tests/qemu-iotests/150
+index ee8f637..120920e 100755
+--- a/tests/qemu-iotests/150
++++ b/tests/qemu-iotests/150
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
+index fa25eb2..42882eb 100755
+--- a/tests/qemu-iotests/153
++++ b/tests/qemu-iotests/153
+@@ -28,18 +28,6 @@ here="$PWD"
+ tmp=/tmp/$$
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-    rm -f "${TEST_IMG}.base"
+-    rm -f "${TEST_IMG}.convert"
+-    rm -f "${TEST_IMG}.a"
+-    rm -f "${TEST_IMG}.b"
+-    rm -f "${TEST_IMG}.c"
+-    rm -f "${TEST_IMG}.lnk"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/154 b/tests/qemu-iotests/154
+index fde03b0..90e7e65 100755
+--- a/tests/qemu-iotests/154
++++ b/tests/qemu-iotests/154
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/156 b/tests/qemu-iotests/156
+index e75dc4d..9dbc6d7 100755
+--- a/tests/qemu-iotests/156
++++ b/tests/qemu-iotests/156
+@@ -35,12 +35,7 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_qemu
+-    rm -f "$TEST_IMG"{,.target}{,.backing,.overlay}
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/157 b/tests/qemu-iotests/157
+index 2bf02be..bda53c8 100755
+--- a/tests/qemu-iotests/157
++++ b/tests/qemu-iotests/157
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/158 b/tests/qemu-iotests/158
+index 24ac600..a07708e 100755
+--- a/tests/qemu-iotests/158
++++ b/tests/qemu-iotests/158
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/159 b/tests/qemu-iotests/159
+index 9b0e1ec..7fcccde 100755
+--- a/tests/qemu-iotests/159
++++ b/tests/qemu-iotests/159
+@@ -26,13 +26,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-    rm -f "$TEST_IMG.out"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ . ./common.rc
+ . ./common.filter
+ . ./common.pattern
+diff --git a/tests/qemu-iotests/160 b/tests/qemu-iotests/160
+index 5c910e5..48dd25d 100755
+--- a/tests/qemu-iotests/160
++++ b/tests/qemu-iotests/160
+@@ -26,13 +26,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-    rm -f "$TEST_IMG.out" "$TEST_IMG.out.dd"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ . ./common.rc
+ . ./common.filter
+ . ./common.pattern
+diff --git a/tests/qemu-iotests/162 b/tests/qemu-iotests/162
+index 477a806..cad2bd7 100755
+--- a/tests/qemu-iotests/162
++++ b/tests/qemu-iotests/162
+@@ -28,13 +28,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    rm -f "${TEST_DIR}/qemu-nbd.pid"
+-    rm -f 42
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/170 b/tests/qemu-iotests/170
+index b79359f..5288a2d 100755
+--- a/tests/qemu-iotests/170
++++ b/tests/qemu-iotests/170
+@@ -26,13 +26,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-    rm -f "$TEST_IMG.out"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ . ./common.rc
+ . ./common.filter
+ . ./common.pattern
+diff --git a/tests/qemu-iotests/171 b/tests/qemu-iotests/171
+index bcfaaf1..2798d2f 100755
+--- a/tests/qemu-iotests/171
++++ b/tests/qemu-iotests/171
+@@ -28,12 +28,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/172 b/tests/qemu-iotests/172
+index 826d6fe..125c1d9 100755
+--- a/tests/qemu-iotests/172
++++ b/tests/qemu-iotests/172
+@@ -27,14 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-    rm -f "$TEST_IMG.2"
+-    rm -f "$TEST_IMG.3"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/173 b/tests/qemu-iotests/173
+index bdaa092..0c2fde4 100755
+--- a/tests/qemu-iotests/173
++++ b/tests/qemu-iotests/173
+@@ -27,13 +27,7 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1    # failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_qemu
+-    rm  -f "${QEMU_TEST_DIR}/image.base" "${QEMU_TEST_DIR}/image.snp1"
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/174 b/tests/qemu-iotests/174
+index 552879d..67cd785 100755
+--- a/tests/qemu-iotests/174
++++ b/tests/qemu-iotests/174
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
+index ca56e82..1407597 100755
+--- a/tests/qemu-iotests/175
++++ b/tests/qemu-iotests/175
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/176 b/tests/qemu-iotests/176
+index 950b287..56cd490 100755
+--- a/tests/qemu-iotests/176
++++ b/tests/qemu-iotests/176
+@@ -31,13 +31,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-    _rm_test_img "$TEST_IMG.itmd"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/177 b/tests/qemu-iotests/177
+index f8ed8fb..ed2e8b2 100755
+--- a/tests/qemu-iotests/177
++++ b/tests/qemu-iotests/177
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/178 b/tests/qemu-iotests/178
+index 6af52c6..fd583d1 100755
+--- a/tests/qemu-iotests/178
++++ b/tests/qemu-iotests/178
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1    # failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-    rm -f "$TEST_IMG.converted"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/179 b/tests/qemu-iotests/179
+index 115944a..f7cf129 100755
+--- a/tests/qemu-iotests/179
++++ b/tests/qemu-iotests/179
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here="$PWD"
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-    rm -f "$TEST_DIR/blkdebug.conf"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
+index 0333dda..8abc61a 100755
+--- a/tests/qemu-iotests/181
++++ b/tests/qemu-iotests/181
+@@ -29,13 +29,7 @@ status=1	# failure is the default!
+ 
+ MIG_SOCKET="${TEST_DIR}/migrate"
+ 
+-_cleanup()
+-{
+-    rm -f "${MIG_SOCKET}"
+-	_cleanup_test_img
+-    _cleanup_qemu
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/182 b/tests/qemu-iotests/182
+index 7ecbb22..a4cbb03 100755
+--- a/tests/qemu-iotests/182
++++ b/tests/qemu-iotests/182
+@@ -28,12 +28,6 @@ here="$PWD"
+ tmp=/tmp/$$
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
+index 20268ff..2e09679 100755
+--- a/tests/qemu-iotests/183
++++ b/tests/qemu-iotests/183
+@@ -29,14 +29,7 @@ status=1 # failure is the default!
+ 
+ MIG_SOCKET="${TEST_DIR}/migrate"
+ 
+-_cleanup()
+-{
+-    rm -f "${MIG_SOCKET}"
+-    rm -f "${TEST_IMG}.dest"
+-    _cleanup_test_img
+-    _cleanup_qemu
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
+index f5b47e4..7269d5e 100755
+--- a/tests/qemu-iotests/185
++++ b/tests/qemu-iotests/185
+@@ -29,14 +29,7 @@ status=1 # failure is the default!
+ 
+ MIG_SOCKET="${TEST_DIR}/migrate"
+ 
+-_cleanup()
+-{
+-    rm -f "${TEST_IMG}.mid"
+-    rm -f "${TEST_IMG}.copy"
+-    _cleanup_test_img
+-    _cleanup_qemu
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
++trap "_cleanup_qemu; exit \$status" 0 1 2 3 15
+ 
+ # get standard environment, filters and checks
+ . ./common.rc
+diff --git a/tests/qemu-iotests/186 b/tests/qemu-iotests/186
+index 2b9f618..e301871 100755
+--- a/tests/qemu-iotests/186
++++ b/tests/qemu-iotests/186
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/187 b/tests/qemu-iotests/187
+index 7bb7833..8b29df3 100755
+--- a/tests/qemu-iotests/187
++++ b/tests/qemu-iotests/187
+@@ -27,14 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-    rm -f "$TEST_IMG.2"
+-    rm -f "$TEST_IMG.3"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/188 b/tests/qemu-iotests/188
+index 83ed03e..48f855d 100755
+--- a/tests/qemu-iotests/188
++++ b/tests/qemu-iotests/188
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/189 b/tests/qemu-iotests/189
+index e695475..c5d516d 100755
+--- a/tests/qemu-iotests/189
++++ b/tests/qemu-iotests/189
+@@ -27,12 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/190 b/tests/qemu-iotests/190
+index 8f808fe..84d20c6 100755
+--- a/tests/qemu-iotests/190
++++ b/tests/qemu-iotests/190
+@@ -27,13 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1    # failure is the default!
+ 
+-_cleanup()
+-{
+-    _cleanup_test_img
+-    rm -f "$TEST_IMG.converted"
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+diff --git a/tests/qemu-iotests/192 b/tests/qemu-iotests/192
+index b50a2c0..6a95b81 100755
+--- a/tests/qemu-iotests/192
++++ b/tests/qemu-iotests/192
+@@ -28,12 +28,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+ 
+-_cleanup()
+-{
+-	_cleanup_test_img
+-}
+-trap "_cleanup; exit \$status" 0 1 2 3 15
+-
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
 -- 
 2.9.5
