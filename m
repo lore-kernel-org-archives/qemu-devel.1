@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dn6aJ-0005JQ-5t
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:15:24 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dn6cF-00078U-4S
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:17:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dn6aG-0005Be-1o
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:15:23 -0400
-Received: from research.iiit.ac.in ([196.12.53.8]:59024)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
-	id 1dn6aF-0005B7-DV
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:15:19 -0400
-From: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-Date: Wed, 30 Aug 2017 22:44:54 +0530
-Message-Id: <1504113297-22052-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-Subject: [Qemu-devel] [PATCH v3 0/3] QEMU Backup Tool
+	(envelope-from <stefanha@gmail.com>) id 1dn6cC-00067I-0Y
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:17:23 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:34615)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dn6cB-000673-Pi
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:17:19 -0400
+Received: by mail-wm0-x241.google.com with SMTP id l19so2462658wmi.1
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 10:17:19 -0700 (PDT)
+Date: Wed, 30 Aug 2017 18:17:17 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170830171717.GD24565@stefanha-x1.localdomain>
+References: <7c9b2e44-ad64-99e0-cff6-87c669618b00@profihost.ag>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7c9b2e44-ad64-99e0-cff6-87c669618b00@profihost.ag>
+Subject: Re: [Qemu-devel] virtio: network: lost tcp/ip packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +28,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, jsnow@redhat.com, famz@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+To: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-This patch series is intended to introduce QEMU Backup tool.
-qemu-backup will be a command-line tool for performing full and
-incremental disk backups on running VMs. It is intended as a
-reference implementation for management stack and backup developers
-to see QEMU's backup features in action.
-This patch series contains three patches,
-               1) QEMU Backup command line tool.
-               2) Test for full backup.
-               3) Manpage for the tool.
-v3:
-* Added versioning in config file
-* Replace location by qemu-img convert in restore
-* Removed incremental backup documentation from manpage
+On Fri, Aug 18, 2017 at 04:40:36PM +0200, Stefan Priebe - Profihost AG wrote:
+> i've a problem with two VMs running on the SAME host machine using qemu
+> 2.7.1 or 2.9.0 and vhost_net + virtio.
+> 
+> Sometimes TCP packets going from machine a to machine b are simply lost.
+> I see them in VM A using tcpdump going out but they never come in on
+> machine B. Both machines have iptables and stuff turned off.
+> 
+> On the host both VMs network interfaces are connected to the same bridge.
+> 
+> Any ideas? May be a known bug?
+> 
+> Host and Guest Kernel is an OpenSuSE 42.3 kernel based on vanilla 4.4.82.
 
-Ishani Chugh (3):
-  backup: QEMU Backup Tool
-  Test for full Backup
-  Add manpage for QEMU Backup Tool
-
- Makefile                        |  14 +-
- contrib/backup/qemu-backup.py   | 343 ++++++++++++++++++++++++++++++++++++++++
- contrib/backup/qemu-backup.texi | 142 +++++++++++++++++
- tests/qemu-iotests/191          |  86 ++++++++++
- tests/qemu-iotests/191.out      |  35 ++++
- tests/qemu-iotests/group        |   2 +
- 6 files changed, 618 insertions(+), 4 deletions(-)
- create mode 100644 contrib/backup/qemu-backup.py
- create mode 100644 contrib/backup/qemu-backup.texi
- create mode 100755 tests/qemu-iotests/191
- create mode 100644 tests/qemu-iotests/191.out
-
--- 
-2.7.4
+Have you tcpdumped the tap interfaces on the host?
