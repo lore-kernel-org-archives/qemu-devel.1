@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dn8KS-0003xh-M0
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 15:07:09 -0400
+	(envelope-from <thuth@redhat.com>) id 1dn8Ou-0006Or-58
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 15:11:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dn8KQ-0005Bd-2j
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 15:07:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42578)
+	(envelope-from <thuth@redhat.com>) id 1dn8Or-0006qE-0j
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 15:11:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38828)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dn8KP-0005BK-SK
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 15:07:06 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dn8Oq-0006q1-Px
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 15:11:40 -0400
 References: <20170830170601.15855-1-david@redhat.com>
-	<20170830170601.15855-9-david@redhat.com>
+	<20170830170601.15855-11-david@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8a7e8d96-0d32-97cd-0e5a-335aff4d9d39@redhat.com>
-Date: Wed, 30 Aug 2017 21:06:55 +0200
+Message-ID: <f20906d2-20eb-3d5f-d7b3-16e42f6def20@redhat.com>
+Date: Wed, 30 Aug 2017 21:11:30 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170830170601.15855-9-david@redhat.com>
+In-Reply-To: <20170830170601.15855-11-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 08/11] s390x: allow only 1 CPU with TCG
+Subject: Re: [Qemu-devel] [PATCH v1 10/11] target/s390x: use
+ trigger_pgm_exception() in s390_cpu_handle_mmu_fault()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,20 +30,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, cohuck@redhat.com, Alexander Graf <agraf@suse.de>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
 
-On 30.08.2017 19:05, David Hildenbrand wrote:
-> Specifying more than 1 CPU (e.g. -smp 5) leads to SIGP errors (the
-> guest tries to bring these CPUs up but fails), because we don't support
-> multiple CPUs on s390x under TCG.
+On 30.08.2017 19:06, David Hildenbrand wrote:
+> This looks cleaner.
 > 
-> Let's bail out if more than 1 are specified, so we don't raise people's
-> hope.
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/excp_helper.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+> index 2ac36535f7..f5f5967833 100644
+> --- a/target/s390x/excp_helper.c
+> +++ b/target/s390x/excp_helper.c
+> @@ -59,8 +59,7 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr address,
+>  {
+>      S390CPU *cpu = S390_CPU(cs);
+>  
+> -    cs->exception_index = EXCP_PGM;
+> -    cpu->env.int_pgm_code = PGM_ADDRESSING;
+> +    trigger_pgm_exception(&cpu->env, PGM_ADDRESSING, ILEN_AUTO);
+>      /* On real machines this value is dropped into LowMem.  Since this
+>         is userland, simply put this someplace that cpu_loop can find it.  */
+>      cpu->env.__excp_addr = address;
 
-Aurelien recently posted a patch to add that basic SIGP support:
-
- https://patchwork.kernel.org/patch/9717489/
-
-I think it would make more sense to get that included instead.
+trigger_pgm_exception() additionally sets int_pgm_ilen ... I assume
+that's OK here? A comment in the patch description would be helpful.
 
  Thomas
