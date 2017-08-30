@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dn3AM-0001On-Hl
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 09:36:23 -0400
+	(envelope-from <th.huth@posteo.de>) id 1dn044-0002wv-GJ
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:17:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dn3AL-0003Fp-G5
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 09:36:22 -0400
-Date: Wed, 30 Aug 2017 14:36:11 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170830133611.GP24565@stefanha-x1.localdomain>
-References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
+	(envelope-from <th.huth@posteo.de>) id 1dn03z-0001HW-Il
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:17:40 -0400
+Received: from mout02.posteo.de ([185.67.36.66]:39455)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <th.huth@posteo.de>) id 1dn03z-0001Ep-BM
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:17:35 -0400
+Received: from submission (posteo.de [89.146.220.130])
+	by mout02.posteo.de (Postfix) with ESMTPS id 5F9F220E54
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 12:17:24 +0200 (CEST)
+References: <1915302638.2814146.1504030043465.ref@mail.yahoo.com>
+	<1915302638.2814146.1504030043465@mail.yahoo.com>
+	<14033890-2a35-666c-2fa7-5a8727090801@tuxfamily.org>
+	<1075529669.195794.1504079702032@mail.yahoo.com>
+	<bc7bacd9-fec7-c193-6de0-99d1f7fd0f6f@tuxfamily.org>
+	<2061420835.208824.1504085337258@mail.yahoo.com>
+	<20170830121109.7fab5559@bahia>
+From: Thomas Huth <th.huth@posteo.de>
+Message-ID: <61cd0715-27e4-7e50-1e85-9da3b4a48bb1@posteo.de>
+Date: Wed, 30 Aug 2017 12:17:22 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] Persistent bitmaps for non-qcow2
- formats
+In-Reply-To: <20170830121109.7fab5559@bahia>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-discuss] Accessing a shared folder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,51 +36,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Fam Zheng <famz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Greg Kurz <groug@kaod.org>, Mahmood <nt_mahmood@yahoo.com>
+Cc: Thomas Huth <huth@tuxfamily.org>, "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, Aug 22, 2017 at 03:07:04PM -0400, John Snow wrote:
-> (3) Add either a new flag that turns qcow2's backing file into a full
-> R/W backing file, or add a new extension to qcow2 entirely (bypassing
-> the traditional backing file mechanism to avoid confusion for older
-> tooling) that adds a new read-write backing file field.
+On 30.08.2017 12:11, Greg Kurz wrote:
+[...]
+> Hi,
 > 
-> This RW backing file field will be used for all reads AND writes; the
-> qcow2 in question becomes a metadata container on top of the BDS chain.
-> We can re-use Vladimir's bitmap persistence extension to save bitmaps in
-> a qcow2 shell.
-> 
-> The qcow2 becomes effectively a metadata cache for a new (essentially)
-> filter node that handles features such as bitmaps. This could also be
-> used to provide allocation map data for RAW files and other goodies down
-> the road.
-> 
-> Hopefully this achieves our desire to not create new formats AND our
-> desire to concentrate features (and debugging, testing, etc) into qcow2,
-> while allowing users to "have bitmaps with raw files."
-> 
-> Of course, in this scenario, users now have two files: a qcow2 wrapper
-> and the actual raw file in question; but regardless of how we were going
-> to solve this, a raw file necessitates an external file of some sort,
-> else we give up the idea that it was a raw file.
+> Both -virtfs and -fsdev/-device syntaxes work for me with the current QEMU
+> master branch :) Where's your qemu-system-x86_64 binary coming from ?
 
-There is some complexity here for management tools:
+There is at least one problem with -virtfs if you forget to specify
+the "security_model=xxx" option:
 
-If the underlying image is resized, who resizes the qcow2 and how do
-they know to do it?
+$ x86_64-softmmu/qemu-system-x86_64 -virtfs local,id=shared,path=/tmp,mount_tag=tag
+qemu-system-x86_64: util/qemu-option.c:547: opt_set: Assertion `opt->str' failed.
+Aborted (core dumped)
 
-If QEMU's resize/truncate command it used, does first try to resize the
-underlying image and then resize the qcow2?  This is probably the sanest
-approach.
+According to the qemu-doc, the securit_model is optional, so it
+should be possible to run qemu without it, too, shouldn't it?
 
-If the underlying image is moved to a new location, does the qcow2 file
-need to be modified and who does that?
-
-Management tools need to figure out how to represent manage this extra
-qcow2 file.  The easiest solution is to punt it to the user and treat it
-as part of a backing file chain.  If the management tool wants to
-automatically manage the qcow2 so the user just specifies the underlying
-image and enables the persistent bitmap checkbox, then it becomes more
-complicated.
-
-Stefan
+ Thomas
