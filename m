@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dmzYo-0006ah-J5
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 05:45:23 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dmzbR-00084R-Gt
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 05:48:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dmzYl-00085M-C4
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 05:45:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45422)
+	(envelope-from <cohuck@redhat.com>) id 1dmzbN-0000xn-Rs
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 05:48:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52740)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dmzYl-00084w-6X
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 05:45:19 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <6f537126-f1a6-2159-d8f7-35d34b803dfa@redhat.com> (Thomas Huth's
-	message of "Mon, 28 Aug 2017 18:10:09 +0200")
-References: <20170823083901.852-1-quintela@redhat.com>
-	<20170823083901.852-2-quintela@redhat.com>
-	<6f537126-f1a6-2159-d8f7-35d34b803dfa@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 30 Aug 2017 11:45:07 +0200
-Message-ID: <87a82h75jw.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dmzbN-0000xU-LU
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 05:48:01 -0400
+Date: Wed, 30 Aug 2017 11:47:57 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170830114757.023e58ae.cohuck@redhat.com>
+In-Reply-To: <1503907487-2764-2-git-send-email-zyimin@linux.vnet.ibm.com>
+References: <1503907487-2764-1-git-send-email-zyimin@linux.vnet.ibm.com>
+	<1503907487-2764-2-git-send-email-zyimin@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/2] tests: Use real size for iov tests
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/4] s390x/pci: fixup trap_msix()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +27,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, peterx@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
+To: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, richard.henderson@linaro.org
 
-Thomas Huth <thuth@redhat.com> wrote:
-> On 23.08.2017 10:39, Juan Quintela wrote:
->> We were using -1 instead of the real size because the functions check
->> what is bigger, size in bytes or the size of the iov.  Recent gcc's
->> barf at this.
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> ---
->>  tests/test-iov.c | 8 ++++----
->>  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> While you're at it, could you maybe also adjust the comments in
-> include/qemu/iov.h ? It currently says:
->
->  * It is okay to use very large value for `bytes' since we're
->  * limited by the size of the iovec anyway, provided that the
->  * buffer pointed to by buf has enough space.  One possible
->  * such "large" value is -1 (sinice size_t is unsigned),
->  * so specifying `-1' as `bytes' means 'up to the end of iovec'.
+On Mon, 28 Aug 2017 10:04:44 +0200
+Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
 
-Haven't found this.  Fixing.
+> The function trap_msix() is to check if pcistg instruction would access
+> msix table entries. The correct boundary condition should be
+> [table_offset, table_offset+entries*entry_size). But the current
+> condition calculated misses the last entry. So let's fixup it.
+> 
+> Acked-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+> ---
+>  hw/s390x/s390-pci-inst.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+> index b7beb8c36a..eba9ffb5f2 100644
+> --- a/hw/s390x/s390-pci-inst.c
+> +++ b/hw/s390x/s390-pci-inst.c
+> @@ -440,8 +440,8 @@ static int trap_msix(S390PCIBusDevice *pbdev, uint64_t offset, uint8_t pcias)
+>  {
+>      if (pbdev->msix.available && pbdev->msix.table_bar == pcias &&
+>          offset >= pbdev->msix.table_offset &&
+> -        offset <= pbdev->msix.table_offset +
+> -                  (pbdev->msix.entries - 1) * PCI_MSIX_ENTRY_SIZE) {
+> +        offset < (pbdev->msix.table_offset +
+> +                  pbdev->msix.entries * PCI_MSIX_ENTRY_SIZE)) {
+>          return 1;
+>      } else {
+>          return 0;
 
->
-> ... and apparently -1 is not working anymore as expected. Maybe SIZE_MAX
-> from stdint.h is a better choice?
-
-Compiler get confused with it, because we have _new_ values, see the
-warning on the cover, I *think* that in this one, the compiler is *kind*
-of right. (*)
-
->  Thomas
-
-Later, Juan.
-
-(*) see the warning, I think that it gets a bit confused, but generaly,
-    we are just abusing the interface, and anyways, we are using in real
-    code the real size, and in the test, it was easy to change
-    everything to the real size, so I think it is better just to remove
-    *that* feature.
+Added cc:stable and applied to s390-next.
