@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dn9U6-00069V-IN
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:21:11 -0400
+	(envelope-from <bounces@canonical.com>) id 1dn9Yi-0007Ys-Q6
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:25:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dn9U1-0005X8-Jv
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:21:10 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34475)
+	(envelope-from <bounces@canonical.com>) id 1dn9Ye-0000HL-QK
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:25:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34899)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dn9U1-0005Wt-Dk
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:21:05 -0400
+	id 1dn9Ye-0000Fl-JX
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:25:52 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dn9Ty-00059c-Gl
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 20:21:02 +0000
+	id 1dn9Yd-0005j0-7Q
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 20:25:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 348C22E8197
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 20:20:59 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 3532F2E806D
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 20:25:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 30 Aug 2017 20:12:30 -0000
-From: Thomas Huth <1662468@bugs.launchpad.net>
-Reply-To: Bug 1662468 <1662468@bugs.launchpad.net>
+Date: Wed, 30 Aug 2017 20:08:45 -0000
+From: Thomas Huth <893208@bugs.launchpad.net>
+Reply-To: Bug 893208 <893208@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20170207100302.3995.67911.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150412395010.11164.9435220216974664233.malone@wampee.canonical.com>
+References: <20111121171820.16487.92704.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150412372658.17173.3745461425712156011.launchpad@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1662468] Re: [feature request] qemu-img convert
- should respond to control-T like dd
+Subject: [Qemu-devel] [Bug 893208] Re: qemu on ARM hosts can't boot i386
+ image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,28 +39,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Fix has been included in v2.10.0:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D262fbae692722d5c8b
-
 ** Changed in: qemu
-       Status: New =3D> Fix Released
+       Status: Fix Committed =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1662468
+https://bugs.launchpad.net/bugs/893208
 
 Title:
-  [feature request] qemu-img convert should respond to control-T like dd
+  qemu on ARM hosts can't boot i386 image
 
 Status in QEMU:
   Fix Released
+Status in Linaro QEMU:
+  New
 
 Bug description:
-  Since qemu-img convert is a long-running operation, it would be nice
-  if it reported progress in response to control-T (SIGINFO) to show
-  progress information, much like dd, fsck, dump, cp, etc.
+  If you apply some workarounds for bug 870990, bug 883133 and bug
+  883136 QEMU still cannot boot the i386
+  debian_squeeze_i386_standard.qcow2 image from
+  http://people.debian.org/~aurel32/qemu/i386/ -- grub starts to boot
+  but something causes the system to reset just before display of the
+  blue-background grub menu, so we go round in a loop forever. This
+  image boots OK on i386 hosted qemu so this indicates some kind of ARM-
+  host specific bug.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1662468/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/893208/+subscriptions
