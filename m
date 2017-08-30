@@ -1,16 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dn6Hc-0004SG-Ei
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:56:05 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dn6HZ-0004Lv-SH
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:56:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dn6Hb-0006HF-K5
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:56:04 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dn6HW-0006At-8Y
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:56:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42678)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dn6HV-0006AX-VW
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:55:58 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed, 30 Aug 2017 18:52:50 +0200
-Message-Id: <20170830165252.13421-43-cohuck@redhat.com>
+Date: Wed, 30 Aug 2017 18:52:48 +0200
+Message-Id: <20170830165252.13421-41-cohuck@redhat.com>
 In-Reply-To: <20170830165252.13421-1-cohuck@redhat.com>
 References: <20170830165252.13421-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 42/44] s390-ccw: Fix alignment for CCW1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 40/44] target/s390x: cleanup cpu.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,39 +27,195 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Farhan Ali <alifm@linux.vnet.ibm.com>, qemu-stable@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-From: Farhan Ali <alifm@linux.vnet.ibm.com>
+From: David Hildenbrand <david@redhat.com>
 
-The commit 198c0d1f9df8c4 s390x/css: check ccw address validity
-exposes an alignment issue in ccw bios.
+Let's reshuffle the function prototypes so we get a cleaner outline
+of the files.
 
-According to PoP the CCW must be doubleword aligned. Let's fix
-this in the bios.
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
-Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Reviewed-by: Eric Farman <farman@linux.vnet.ibm.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Message-Id: <3ed8b810b6592daee6a775037ce21f850e40647d.1503667215.git.alifm@linux.vnet.ibm.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20170818114353.13455-19-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- pc-bios/s390-ccw/cio.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/s390x/cpu.h | 137 ++++++++++++++++++++++++++---------------------=
+------
+ 1 file changed, 68 insertions(+), 69 deletions(-)
 
-diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
-index f5b4549ea3..55eaeee4b6 100644
---- a/pc-bios/s390-ccw/cio.h
-+++ b/pc-bios/s390-ccw/cio.h
-@@ -133,7 +133,7 @@ struct ccw1 {
-     __u8 flags;
-     __u16 count;
-     __u32 cda;
--} __attribute__ ((packed));
-+} __attribute__ ((packed, aligned(8)));
- 
- #define CCW_FLAG_DC              0x80
- #define CCW_FLAG_CC              0x40
--- 
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 464db3e556..4ec338077e 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -390,46 +390,6 @@ static inline void cpu_get_tb_cpu_state(CPUS390XStat=
+e* env, target_ulong *pc,
+ #define PER_CODE_EVENT_STORE_REAL      0x0800
+ #define PER_CODE_EVENT_NULLIFICATION   0x0100
+=20
+-S390CPU *cpu_s390x_init(const char *cpu_model);
+-S390CPU *s390x_new_cpu(const char *cpu_model, int64_t id, Error **errp);
+-
+-/* you can call this signal handler from your SIGBUS and SIGSEGV
+-   signal handlers to inform the virtual CPU of exceptions. non zero
+-   is returned if the signal was handled by the virtual CPU.  */
+-int cpu_s390x_signal_handler(int host_signum, void *pinfo,
+-                           void *puc);
+-
+-
+-#ifndef CONFIG_USER_ONLY
+-
+-void s390_enable_css_support(S390CPU *cpu);
+-int s390_virtio_hypercall(CPUS390XState *env);
+-
+-int s390_get_clock(uint8_t *tod_high, uint64_t *tod_low);
+-int s390_set_clock(uint8_t *tod_high, uint64_t *tod_low);
+-
+-S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
+-unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu);
+-
+-/* service interrupts are floating therefore we must not pass an cpustat=
+e */
+-void s390_sclp_extint(uint32_t parm);
+-
+-#else
+-static inline unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU=
+ *cpu)
+-{
+-    return 0;
+-}
+-#endif
+-
+-extern void subsystem_reset(void);
+-
+-#define cpu_init(model) CPU(cpu_s390x_init(model))
+-#define cpu_signal_handler cpu_s390x_signal_handler
+-
+-void s390_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+-#define cpu_list s390_cpu_list
+-const char *s390_default_cpu_model_name(void);
+-
+ #define EXCP_EXT 1 /* external interrupt */
+ #define EXCP_SVC 2 /* supervisor call (syscall) */
+ #define EXCP_PGM 3 /* program interruption */
+@@ -649,39 +609,10 @@ struct sysib_322 {
+ /* SIGP order code mask corresponding to bit positions 56-63 */
+ #define SIGP_ORDER_MASK 0x000000ff
+=20
+-int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
+-
+-int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *ho=
+stbuf,
+-                         int len, bool is_write);
+-
+-#define s390_cpu_virt_mem_read(cpu, laddr, ar, dest, len)    \
+-        s390_cpu_virt_mem_rw(cpu, laddr, ar, dest, len, false)
+-#define s390_cpu_virt_mem_write(cpu, laddr, ar, dest, len)       \
+-        s390_cpu_virt_mem_rw(cpu, laddr, ar, dest, len, true)
+-#define s390_cpu_virt_mem_check_write(cpu, laddr, ar, len)   \
+-        s390_cpu_virt_mem_rw(cpu, laddr, ar, NULL, len, true)
+-
+ /* from s390-virtio-ccw */
+ #define MEM_SECTION_SIZE             0x10000000UL
+ #define MAX_AVAIL_SLOTS              32
+=20
+-/* automatically detect the instruction length */
+-#define ILEN_AUTO                   0xff
+-void program_interrupt(CPUS390XState *env, uint32_t code, int ilen);
+-
+-
+-int s390_set_memory_limit(uint64_t new_limit, uint64_t *hw_limit);
+-void s390_cmma_reset(void);
+-int s390_cpu_restart(S390CPU *cpu);
+-int s390_get_memslot_count(void);
+-void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
+-                       uint32_t io_int_parm, uint32_t io_int_word);
+-void s390_crw_mchk(void);
+-int s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch_id=
+,
+-                                int vq, bool assign);
+-void s390_crypto_reset(void);
+-bool s390_get_squash_mcss(void);
+-
+ /* machine check interruption code */
+=20
+ /* subclasses */
+@@ -727,4 +658,72 @@ bool s390_get_squash_mcss(void);
+ #define MCIC_VB_CT 0x0000000000020000ULL
+ #define MCIC_VB_CC 0x0000000000010000ULL
+=20
++
++/* cpu.c */
++int s390_get_clock(uint8_t *tod_high, uint64_t *tod_low);
++int s390_set_clock(uint8_t *tod_high, uint64_t *tod_low);
++void s390_crypto_reset(void);
++bool s390_get_squash_mcss(void);
++int s390_get_memslot_count(void);
++int s390_set_memory_limit(uint64_t new_limit, uint64_t *hw_limit);
++void s390_cmma_reset(void);
++int s390_cpu_restart(S390CPU *cpu);
++void s390_enable_css_support(S390CPU *cpu);
++int s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch_id=
+,
++                                int vq, bool assign);
++#ifndef CONFIG_USER_ONLY
++unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu);
++#else
++static inline unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU=
+ *cpu)
++{
++    return 0;
++}
++#endif /* CONFIG_USER_ONLY */
++
++
++/* cpu_models.c */
++void s390_cpu_list(FILE *f, fprintf_function cpu_fprintf);
++#define cpu_list s390_cpu_list
++const char *s390_default_cpu_model_name(void);
++
++
++/* helper.c */
++S390CPU *cpu_s390x_init(const char *cpu_model);
++#define cpu_init(model) CPU(cpu_s390x_init(model))
++S390CPU *s390x_new_cpu(const char *cpu_model, int64_t id, Error **errp);
++/* you can call this signal handler from your SIGBUS and SIGSEGV
++   signal handlers to inform the virtual CPU of exceptions. non zero
++   is returned if the signal was handled by the virtual CPU.  */
++int cpu_s390x_signal_handler(int host_signum, void *pinfo, void *puc);
++#define cpu_signal_handler cpu_s390x_signal_handler
++
++
++/* interrupt.c */
++void s390_crw_mchk(void);
++void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
++                       uint32_t io_int_parm, uint32_t io_int_word);
++/* automatically detect the instruction length */
++#define ILEN_AUTO                   0xff
++void program_interrupt(CPUS390XState *env, uint32_t code, int ilen);
++/* service interrupts are floating therefore we must not pass an cpustat=
+e */
++void s390_sclp_extint(uint32_t parm);
++
++
++/* mmu_helper.c */
++int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *ho=
+stbuf,
++                         int len, bool is_write);
++#define s390_cpu_virt_mem_read(cpu, laddr, ar, dest, len)    \
++        s390_cpu_virt_mem_rw(cpu, laddr, ar, dest, len, false)
++#define s390_cpu_virt_mem_write(cpu, laddr, ar, dest, len)       \
++        s390_cpu_virt_mem_rw(cpu, laddr, ar, dest, len, true)
++#define s390_cpu_virt_mem_check_write(cpu, laddr, ar, len)   \
++        s390_cpu_virt_mem_rw(cpu, laddr, ar, NULL, len, true)
++
++
++/* outside of target/s390x/ */
++S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
++extern void subsystem_reset(void);
++int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
++int s390_virtio_hypercall(CPUS390XState *env);
++
+ #endif
+--=20
 2.13.5
