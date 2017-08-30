@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dnA49-0005en-TK
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:58:26 -0400
+	(envelope-from <eblake@redhat.com>) id 1dnABR-0003cO-Ur
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 17:05:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dnA46-00043q-Qn
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:58:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:23063)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dnA46-00043a-Kp
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:58:22 -0400
-References: <20170830170601.15855-1-david@redhat.com>
-	<20170830170601.15855-4-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <09179efb-0930-bd84-ff22-1f4b23fa6a8e@redhat.com>
-Date: Wed, 30 Aug 2017 22:58:16 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170830170601.15855-4-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 03/11] s390x: store cpu states inside
- machine state
+	(envelope-from <eblake@redhat.com>) id 1dnABQ-0007KO-NV
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 17:05:57 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Wed, 30 Aug 2017 16:05:25 -0500
+Message-Id: <20170830210542.2153-2-eblake@redhat.com>
+In-Reply-To: <20170830210542.2153-1-eblake@redhat.com>
+References: <20170830210542.2153-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 01/18] block: Make bdrv_img_create() size
+ selection easier to read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +20,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 30.08.2017 19:05, David Hildenbrand wrote:
-> Let's avoid global variables. While at it, move both functions using it=
-,
-> so we won't have to temporarily add includes (we'll be getting rid of
-> s390-virtio.c soon).
->=20
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/s390x/s390-virtio-ccw.c         | 39 ++++++++++++++++++++++++++++++=
-++++++++
->  hw/s390x/s390-virtio.c             | 38 ------------------------------=
--------
->  hw/s390x/s390-virtio.h             |  1 -
->  include/hw/s390x/s390-virtio-ccw.h |  3 +++
->  4 files changed, 42 insertions(+), 39 deletions(-)
->=20
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index dd504dd5ae..ffd56af834 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -32,6 +32,45 @@
->  #include "migration/register.h"
->  #include "cpu_models.h"
-> =20
-> +S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
-> +{
-> +    S390CcwMachineState *ms =3D S390_CCW_MACHINE(qdev_get_machine());
-> +
-> +    if (cpu_addr >=3D max_cpus) {
-> +        return NULL;
-> +    }
-> +
-> +    /* Fast lookup via CPU ID */
-> +    return ms->cpus[cpu_addr];
-> +}
+All callers of bdrv_img_create() pass in a size, or -1 to read the
+size from the backing file.  We then set that size as the QemuOpt
+default, which means we will reuse that default rather than the
+final parameter to qemu_opt_get_size() several lines later.  But
+it is rather confusing to read subsequent checks of 'size == -1'
+when it looks (without seeing the full context) like size defaults
+to 0; it also doesn't help that a size of 0 is valid (for some
+formats).
 
-I wonder whether that function should rather go into a file in
-target/s390x/ instead, since it is also used there and its prototype is
-in cpu.h ?
+Rework the logic to make things more legible.
 
-[...]
-> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390=
--virtio-ccw.h
-> index 41a9d2862b..4bef28ec39 100644
-> --- a/include/hw/s390x/s390-virtio-ccw.h
-> +++ b/include/hw/s390x/s390-virtio-ccw.h
-> @@ -21,11 +21,14 @@
->  #define S390_MACHINE_CLASS(klass) \
->      OBJECT_CLASS_CHECK(S390CcwMachineClass, (klass), TYPE_S390_CCW_MAC=
-HINE)
-> =20
-> +struct S390CPU;
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-You define a "struct S390CPU" here ...
+---
+v6: Combine into a series rather than being a standalone patch (more for
+ease of tracking than for being on topic)
+---
+ block.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->  typedef struct S390CcwMachineState {
->      /*< private >*/
->      MachineState parent_obj;
-> =20
->      /*< public >*/
-> +    S390CPU **cpus;
+diff --git a/block.c b/block.c
+index 3308814bba..3f84d141a7 100644
+--- a/block.c
++++ b/block.c
+@@ -4392,7 +4392,7 @@ void bdrv_img_create(const char *filename, const char *fmt,
 
-... but use the typedef'ed S390CPU here ... looks somewhat suspicious, I
-wonder whether the typedef is really in the right place?
-
->      bool aes_key_wrap;
->      bool dea_key_wrap;
->      uint8_t loadparm[8];
-
-Anyway, that were just nits, I'm also fine with the patch as it is, so:
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+     /* The size for the image must always be specified, unless we have a backing
+      * file and we have not been forbidden from opening it. */
+-    size = qemu_opt_get_size(opts, BLOCK_OPT_SIZE, 0);
++    size = qemu_opt_get_size(opts, BLOCK_OPT_SIZE, img_size);
+     if (backing_file && !(flags & BDRV_O_NO_BACKING)) {
+         BlockDriverState *bs;
+         char *full_backing = g_new0(char, PATH_MAX);
+-- 
+2.13.5
