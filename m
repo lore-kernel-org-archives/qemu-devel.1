@@ -1,14 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dmztQ-0005mk-8B
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:06:41 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dmzuZ-0006Ii-1p
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:07:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dmztM-00045V-H2
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:06:40 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Wed, 30 Aug 2017 18:06:05 +0800
-Message-Id: <20170830100605.22694-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH] block: Cleanup BMDS in bdrv_close_all
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dmzuX-0004nx-IN
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:07:51 -0400
+Received: from mail-ua0-x244.google.com ([2607:f8b0:400c:c08::244]:37467)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dmzuX-0004nf-C3
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:07:49 -0400
+Received: by mail-ua0-x244.google.com with SMTP id 104so2423252uas.4
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 03:07:49 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170824192730.8440-10-dgilbert@redhat.com>
+References: <20170824192730.8440-1-dgilbert@redhat.com>
+	<20170824192730.8440-10-dgilbert@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 30 Aug 2017 03:07:48 -0700
+Message-ID: <CAJ+F1C+SCyAUrBxa4_ivCD7xYca+T9HmO2JVcx9+VtqdKrc7Ng@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v2 09/32] vhost-user: Add
+ 'VHOST_USER_POSTCOPY_ADVISE' message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,92 +31,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-stable@nongnu.org, peterx@redhat.com, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, a.perevalov@samsung.com, "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>, aarcange@redhat.com, Felipe Franciosi <felipe@nutanix.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-This fixes the assertion due to op blockers added by BMDS:
+Hi
 
-block.c:3248: bdrv_delete: Assertion `bdrv_op_blocker_is_empty(bs)' failed.
+On Thu, Aug 24, 2017 at 12:27 PM, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> Wire up a notifier to send a VHOST_USER_POSTCOPY_ADVISE
+> message on an incoming advise.
+>
+> Later patches will fill in the behaviour/contents of the
+> message.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  contrib/libvhost-user/libvhost-user.c | 21 ++++++++++++---
+>  contrib/libvhost-user/libvhost-user.h |  6 ++++-
+>  docs/interop/vhost-user.txt           |  9 +++++++
+>  hw/virtio/vhost-user.c                | 48 +++++++++++++++++++++++++++++=
+++++++
+>  migration/postcopy-ram.h              |  1 +
+>  migration/savevm.c                    |  6 +++++
+>  6 files changed, 86 insertions(+), 5 deletions(-)
+>
+> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+> index 201b9846e9..8bbdf5fb40 100644
+> --- a/contrib/libvhost-user/libvhost-user.c
+> +++ b/contrib/libvhost-user/libvhost-user.c
+> @@ -42,9 +42,6 @@ vu_request_to_string(int req)
+>          REQ(VHOST_USER_NONE),
+>          REQ(VHOST_USER_GET_FEATURES),
+>          REQ(VHOST_USER_SET_FEATURES),
+> -        REQ(VHOST_USER_NONE),
+> -        REQ(VHOST_USER_GET_FEATURES),
+> -        REQ(VHOST_USER_SET_FEATURES),
 
-Reproducer: simply start block migration and quit QEMU before it ends.
+nice cleanup ;)
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block.c                 | 2 ++
- migration/block.c       | 2 +-
- migration/block.h       | 1 +
- stubs/Makefile.objs     | 1 +
- stubs/block-migration.c | 6 ++++++
- 5 files changed, 11 insertions(+), 1 deletion(-)
- create mode 100644 stubs/block-migration.c
+>          REQ(VHOST_USER_SET_OWNER),
+>          REQ(VHOST_USER_RESET_OWNER),
+>          REQ(VHOST_USER_SET_MEM_TABLE),
+> @@ -62,7 +59,10 @@ vu_request_to_string(int req)
+>          REQ(VHOST_USER_GET_QUEUE_NUM),
+>          REQ(VHOST_USER_SET_VRING_ENABLE),
+>          REQ(VHOST_USER_SEND_RARP),
+> -        REQ(VHOST_USER_INPUT_GET_CONFIG),
+> +        REQ(VHOST_USER_SET_SLAVE_REQ_FD),
+> +        REQ(VHOST_USER_IOTLB_MSG),
+> +        REQ(VHOST_USER_SET_VRING_ENDIAN),
+> +        REQ(VHOST_USER_POSTCOPY_ADVISE),
+>          REQ(VHOST_USER_MAX),
+>      };
+>  #undef REQ
+> @@ -744,6 +744,17 @@ vu_set_vring_enable_exec(VuDev *dev, VhostUserMsg *v=
+msg)
+>  }
+>
+>  static bool
+> +vu_set_postcopy_advise(VuDev *dev, VhostUserMsg *vmsg)
+> +{
+> +    /* TODO: Open ufd, pass it back in the request
+> +     * TODO: Add addresses
 
-diff --git a/block.c b/block.c
-index 3308814bba..508a57274d 100644
---- a/block.c
-+++ b/block.c
-@@ -43,6 +43,7 @@
- #include "qemu/cutils.h"
- #include "qemu/id.h"
- #include "qapi/util.h"
-+#include "migration/block.h"
- 
- #ifdef CONFIG_BSD
- #include <sys/ioctl.h>
-@@ -3111,6 +3112,7 @@ static void bdrv_close(BlockDriverState *bs)
- 
- void bdrv_close_all(void)
- {
-+    block_migration_cleanup_bmds();
-     block_job_cancel_sync_all();
-     nbd_export_close_all();
- 
-diff --git a/migration/block.c b/migration/block.c
-index 9171f60028..c059e48484 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -673,7 +673,7 @@ static int64_t get_remaining_dirty(void)
- 
- 
- /* Called with iothread lock taken.  */
--static void block_migration_cleanup_bmds(void)
-+void block_migration_cleanup_bmds(void)
- {
-     BlkMigDevState *bmds;
-     AioContext *ctx;
-diff --git a/migration/block.h b/migration/block.h
-index 22ebe94259..8bae1cf55a 100644
---- a/migration/block.h
-+++ b/migration/block.h
-@@ -42,4 +42,5 @@ static inline uint64_t blk_mig_bytes_total(void)
- #endif /* CONFIG_LIVE_BLOCK_MIGRATION */
- 
- void migrate_set_block_enabled(bool value, Error **errp);
-+void block_migration_cleanup_bmds(void);
- #endif /* MIGRATION_BLOCK_H */
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index e69c217aff..7540913767 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -19,6 +19,7 @@ stub-obj-y += is-daemonized.o
- stub-obj-$(CONFIG_LINUX_AIO) += linux-aio.o
- stub-obj-y += machine-init-done.o
- stub-obj-y += migr-blocker.o
-+stub-obj-y += block-migration.o
- stub-obj-y += change-state-handler.o
- stub-obj-y += monitor.o
- stub-obj-y += notify-event.o
-diff --git a/stubs/block-migration.c b/stubs/block-migration.c
-new file mode 100644
-index 0000000000..855f15c757
---- /dev/null
-+++ b/stubs/block-migration.c
-@@ -0,0 +1,6 @@
-+#include "qemu/osdep.h"
-+#include "migration/block.h"
-+
-+void block_migration_cleanup_bmds(void)
-+{
-+}
--- 
-2.13.5
+Extra EOL space
+
+> +     */
+> +    vmsg->payload.u64 =3D 0xcafe;
+> +    vmsg->size =3D sizeof(vmsg->payload.u64);
+> +    return true; /* =3D send a reply */
+> +}
+> +
+> +static bool
+>  vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
+>  {
+>      int do_reply =3D 0;
+> @@ -808,6 +819,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
+>          return vu_set_vring_enable_exec(dev, vmsg);
+>      case VHOST_USER_NONE:
+>          break;
+> +    case VHOST_USER_POSTCOPY_ADVISE:
+> +        return vu_set_postcopy_advise(dev, vmsg);
+>      default:
+>          vmsg_close_fds(vmsg);
+>          vu_panic(dev, "Unhandled request: %d", vmsg->request);
+> diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
+r/libvhost-user.h
+> index 95d0d34a28..3987ce643d 100644
+> --- a/contrib/libvhost-user/libvhost-user.h
+> +++ b/contrib/libvhost-user/libvhost-user.h
+> @@ -62,7 +62,11 @@ typedef enum VhostUserRequest {
+>      VHOST_USER_GET_QUEUE_NUM =3D 17,
+>      VHOST_USER_SET_VRING_ENABLE =3D 18,
+>      VHOST_USER_SEND_RARP =3D 19,
+> -    VHOST_USER_INPUT_GET_CONFIG =3D 20,
+> +    VHOST_USER_NET_SET_MTU      =3D 20,
+> +    VHOST_USER_SET_SLAVE_REQ_FD =3D 21,
+> +    VHOST_USER_IOTLB_MSG        =3D 22,
+> +    VHOST_USER_SET_VRING_ENDIAN =3D 23,
+> +    VHOST_USER_POSTCOPY_ADVISE  =3D 24,
+>      VHOST_USER_MAX
+>  } VhostUserRequest;
+>
+> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+> index a279560eb0..dad2a1b343 100644
+> --- a/docs/interop/vhost-user.txt
+> +++ b/docs/interop/vhost-user.txt
+> @@ -606,6 +606,15 @@ Master message types
+>        and expect this message once (per VQ) during device configuration
+>        (ie. before the master starts the VQ).
+>
+> + * VHOST_USER_POSTCOPY_ADVISE
+> +      Id: 24
+> +      Master payload: N/A
+> +      Slave payload: userfault fd + u64
+> +
+> +      Master advises slave that a migration with postcopy enabled is und=
+erway,
+> +      the slave must open a userfaultfd for later use.
+> +      Note that at this stage the migration is still in precopy mode.
+> +
+>  Slave message types
+>  -------------------
+>
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index c51bbd1296..7063e4df61 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -67,6 +67,7 @@ typedef enum VhostUserRequest {
+>      VHOST_USER_SET_SLAVE_REQ_FD =3D 21,
+>      VHOST_USER_IOTLB_MSG =3D 22,
+>      VHOST_USER_SET_VRING_ENDIAN =3D 23,
+> +    VHOST_USER_POSTCOPY_ADVISE  =3D 24,
+>      VHOST_USER_MAX
+>  } VhostUserRequest;
+>
+> @@ -724,6 +725,50 @@ out:
+>      return ret;
+>  }
+>
+> +/*
+> + * Called at the start of an inbound postcopy on reception of the
+> + * 'advise' command.
+> + */
+> +static int vhost_user_postcopy_advise(struct vhost_dev *dev, Error **err=
+p)
+> +{
+> +    struct vhost_user *u =3D dev->opaque;
+> +    CharBackend *chr =3D u->chr;
+> +    int ufd;
+> +    VhostUserMsg msg =3D {
+> +        .request =3D VHOST_USER_POSTCOPY_ADVISE,
+> +        .flags =3D VHOST_USER_VERSION,
+> +    };
+> +
+> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
+> +        error_setg(errp, "Failed to send postcopy_advise to vhost");
+> +        return -1;
+> +    }
+> +
+> +    if (vhost_user_read(dev, &msg) < 0) {
+> +        error_setg(errp, "Failed to get postcopy_advise reply from vhost=
+");
+> +        return -1;
+> +    }
+> +
+> +    if (msg.request !=3D VHOST_USER_POSTCOPY_ADVISE) {
+> +        error_setg(errp, "Unexpected msg type. Expected %d received %d",
+> +                     VHOST_USER_POSTCOPY_ADVISE, msg.request);
+> +        return -1;
+> +    }
+> +
+> +    if (msg.size !=3D sizeof(msg.payload.u64)) {
+> +        error_setg(errp, "Received bad msg size.");
+> +        return -1;
+> +    }
+> +    ufd =3D qemu_chr_fe_get_msgfd(chr);
+> +    if (ufd < 0) {
+> +        error_setg(errp, "%s: Failed to get ufd", __func__);
+> +        return -1;
+> +    }
+> +
+> +    /* TODO: register ufd with userfault thread */
+> +    return 0;
+> +}
+> +
+>  static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
+>                                          void *opaque)
+>  {
+> @@ -743,6 +788,9 @@ static int vhost_user_postcopy_notifier(NotifierWithR=
+eturn *notifier,
+>          }
+>          break;
+>
+> +    case POSTCOPY_NOTIFY_INBOUND_ADVISE:
+> +        return vhost_user_postcopy_advise(dev, pnd->errp);
+> +
+>      default:
+>          /* We ignore notifications we don't know */
+>          break;
+> diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+> index d688411674..70d4b09659 100644
+> --- a/migration/postcopy-ram.h
+> +++ b/migration/postcopy-ram.h
+> @@ -128,6 +128,7 @@ void postcopy_infrastructure_init(void);
+>   */
+>  enum PostcopyNotifyReason {
+>      POSTCOPY_NOTIFY_PROBE =3D 0,
+> +    POSTCOPY_NOTIFY_INBOUND_ADVISE,
+>  };
+>
+>  struct PostcopyNotifyData {
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index fdd15fa0a7..d35911731d 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1343,6 +1343,7 @@ static int loadvm_postcopy_handle_advise(MigrationI=
+ncomingState *mis)
+>  {
+>      PostcopyState ps =3D postcopy_state_set(POSTCOPY_INCOMING_ADVISE);
+>      uint64_t remote_pagesize_summary, local_pagesize_summary, remote_tps=
+;
+> +    Error *local_err =3D NULL;
+>
+>      trace_loadvm_postcopy_handle_advise();
+>      if (ps !=3D POSTCOPY_INCOMING_NONE) {
+> @@ -1390,6 +1391,11 @@ static int loadvm_postcopy_handle_advise(Migration=
+IncomingState *mis)
+>          return -1;
+>      }
+>
+> +    if (postcopy_notify(POSTCOPY_NOTIFY_INBOUND_ADVISE, &local_err)) {
+> +        error_report_err(local_err);
+> +        return -1;
+> +    }
+> +
+>      if (ram_postcopy_incoming_init(mis)) {
+>          return -1;
+>      }
+> --
+> 2.13.5
+>
+>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
