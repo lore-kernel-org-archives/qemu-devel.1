@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dn49s-0002yv-AD
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:39:57 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dn4Bk-0004Rw-46
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:41:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dn49r-0004rL-C4
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:39:56 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dn4Be-0005dw-MJ
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:41:52 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:35796)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dn4Be-0005cY-Hv
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:41:46 -0400
+Received: by mail-qt0-x244.google.com with SMTP id u11so5293306qtu.2
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 07:41:45 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170817043102.6322-1-f4bug@amsat.org>
+	<20170817172249.31cf5e3d@nial.brq.redhat.com>
+	<e3552801-588d-a192-1da4-0cefee5aa483@amsat.org>
+	<20170830155008.1babd407@nial.brq.redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <bef4e017-02f3-62c4-1621-ec118709717c@amsat.org>
+Date: Wed, 30 Aug 2017 11:41:38 -0300
 MIME-Version: 1.0
-References: <1504100343-26607-1-git-send-email-thuth@redhat.com>
-In-Reply-To: <1504100343-26607-1-git-send-email-thuth@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 30 Aug 2017 14:39:44 +0000
-Message-ID: <CAJ+F1CJ7r=z8mMu0kyCEtjCgAnKGLhh5WTUKVdeyzi57eYLDSA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.11] hw/misc/ivshmem: Fix
- ivshmem_recv_msg() to also work on big endian systems
+In-Reply-To: <20170830155008.1babd407@nial.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/8] QOMify MIPS cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,64 +37,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, David Gibson <david@gibson.dropbear.id.au>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, James Hogan <james.hogan@imgtec.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Yongbok Kim <yongbok.kim@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-Hi
+Hi Igor,
 
-On Wed, Aug 30, 2017 at 3:43 PM Thomas Huth <thuth@redhat.com> wrote:
+On 08/30/2017 10:50 AM, Igor Mammedov wrote:
+>> [...]
+>>>> Also I couldn't test it with KVM.
+[..]
+>>
+>> I'll wait to see if there is some KVM feedback from imgtec folks before
+>> spaming a v2.
+> 
+> Philippe,
+> 
+> Are you going to respin series soon?
 
-> The "slow" ivshmem-tests currently fail when they are running on a
-> big endian host:
->
-> $ uname -m
-> ppc64
-> $ V=3D1 QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64
-> tests/ivshmem-test -m slow
-> /x86_64/ivshmem/single: OK
-> /x86_64/ivshmem/hotplug: OK
-> /x86_64/ivshmem/memdev: OK
-> /x86_64/ivshmem/pair: OK
-> /x86_64/ivshmem/server-msi: qemu-system-x86_64:
->  -device ivshmem-doorbell,chardev=3Dchr0,vectors=3D2: server sent invalid=
- ID
-> message
-> Broken pipe
->
-> The problem is that the server side code in ivshmem_server_send_one_msg()
-> correctly translates all messages IDs into little endian 64-bit values,
-> but the client side code in the ivshmem_recv_msg() function does not swap
-> the byte order back. Fix it by passing the value through le64_to_cpu().
->
->
-ivshmem_read() is correct though
+I'm waiting 2.11 officially announced open to send it which should be 
+tomorrow, in the meaning time it is available in my git repository at:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
->
+   git://github.com/philmd/qemu.git tags/mips-qomify-20170830
 
- Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Regards,
 
----
->  hw/misc/ivshmem.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-> index 47a015f..b3ef3ec 100644
-> --- a/hw/misc/ivshmem.c
-> +++ b/hw/misc/ivshmem.c
-> @@ -653,7 +653,7 @@ static int64_t ivshmem_recv_msg(IVShmemState *s, int
-> *pfd, Error **errp)
->      } while (n < sizeof(msg));
->
->      *pfd =3D qemu_chr_fe_get_msgfd(&s->server_chr);
-> -    return msg;
-> +    return le64_to_cpu(msg);
->  }
->
->  static void ivshmem_recv_setup(IVShmemState *s, Error **errp)
-> --
-> 1.8.3.1
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+Phil.
