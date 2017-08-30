@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dnBiC-00008V-GB
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:43:53 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dnBol-0002Yo-Vr
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:50:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dnBiB-0007Xk-4y
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:43:52 -0400
-References: <20170830210542.2153-1-eblake@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1dnBok-0001UI-FU
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:50:39 -0400
+References: <20170829204934.9039-1-jsnow@redhat.com>
+	<20170829204934.9039-9-jsnow@redhat.com>
+	<20170830091757.GD24565@stefanha-x1.localdomain>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <5fc29501-2c1f-1342-fb2b-cd40cf3e8589@redhat.com>
-Date: Wed, 30 Aug 2017 18:43:42 -0400
+Message-ID: <cc0cf2e3-4811-c8f8-979c-9a82041766a8@redhat.com>
+Date: Wed, 30 Aug 2017 18:50:27 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170830210542.2153-1-eblake@redhat.com>
+In-Reply-To: <20170830091757.GD24565@stefanha-x1.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 00/18] make dirty-bitmap byte-based
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 8/9] AHCI: pretty-print FIS
+ to buffer instead of stderr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,96 +26,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, f4bug@amsat.org
 
 
 
-On 08/30/2017 05:05 PM, Eric Blake wrote:
-> There are patches floating around to add NBD_CMD_BLOCK_STATUS,
-> but NBD wants to report status on byte granularity (even if the
-> reporting will probably be naturally aligned to sectors or even
-> much higher levels).  I've therefore started the task of
-> converting our block status code to report at a byte granularity
-> rather than sectors.
-> 
-> Now that 2.11 is open, I'm rebasing/reposting the remaining patches.
-> 
-> The overall conversion currently looks like:
-> part 1: bdrv_is_allocated (merged in 2.10, commit 51b0a488)
-> part 2: dirty-bitmap (this series, v5 was here [1])
-> part 3: bdrv_get_block_status (v3 is posted [2] and is mostly reviewed, but
-> needs a rebase)
-> part 4: .bdrv_co_block_status (v2 is posted [3], but needs a rebase)
-> 
-> Available as a tag at:
-> git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-dirty-v6
-> 
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg03512.html
-> [2] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg03853.html
-> [3] https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg04370.html
-> 
-> Diff from v5:
-> - add another patch (more for ease of bookkeeping, as it was previously
-> posted independently)
-> - drop bug fixes that were hoisted into 2.10 (v5 1/18, plus 14/18)
-> 
-> 001/18:[down] 'block: Make bdrv_img_create() size selection easier to read'
-> 002/18:[----] [--] 'hbitmap: Rename serialization_granularity to serialization_align'
-> 003/18:[----] [--] 'qcow2: Ensure bitmap serialization is aligned'
-> 004/18:[----] [--] 'dirty-bitmap: Drop unused functions'
-> 005/18:[----] [--] 'dirty-bitmap: Change bdrv_dirty_bitmap_size() to report bytes'
-> 006/18:[----] [--] 'dirty-bitmap: Change bdrv_dirty_bitmap_*serialize*() to take bytes'
-> 007/18:[----] [--] 'qcow2: Switch sectors_covered_by_bitmap_cluster() to byte-based'
-> 008/18:[----] [--] 'dirty-bitmap: Set iterator start by offset, not sector'
-> 009/18:[----] [--] 'dirty-bitmap: Change bdrv_dirty_iter_next() to report byte offset'
-> 010/18:[----] [--] 'dirty-bitmap: Change bdrv_get_dirty_count() to report bytes'
-> 011/18:[----] [--] 'dirty-bitmap: Change bdrv_get_dirty_locked() to take bytes'
-> 012/18:[----] [--] 'dirty-bitmap: Change bdrv_[re]set_dirty_bitmap() to use bytes'
-> 013/18:[----] [--] 'mirror: Switch mirror_dirty_init() to byte-based iteration'
-> 014/18:[0004] [FC] 'qcow2: Switch qcow2_measure() to byte-based iteration'
-> 015/18:[----] [--] 'qcow2: Switch load_bitmap_data() to byte-based iteration'
-> 016/18:[----] [--] 'qcow2: Switch store_bitmap_data() to byte-based iteration'
-> 017/18:[----] [--] 'dirty-bitmap: Switch bdrv_set_dirty() to bytes'
-> 018/18:[----] [--] 'dirty-bitmap: Convert internal hbitmap size/granularity'
-> 
-> Eric Blake (18):
->   block: Make bdrv_img_create() size selection easier to read
->   hbitmap: Rename serialization_granularity to serialization_align
->   qcow2: Ensure bitmap serialization is aligned
->   dirty-bitmap: Drop unused functions
->   dirty-bitmap: Change bdrv_dirty_bitmap_size() to report bytes
->   dirty-bitmap: Change bdrv_dirty_bitmap_*serialize*() to take bytes
->   qcow2: Switch sectors_covered_by_bitmap_cluster() to byte-based
->   dirty-bitmap: Set iterator start by offset, not sector
->   dirty-bitmap: Change bdrv_dirty_iter_next() to report byte offset
->   dirty-bitmap: Change bdrv_get_dirty_count() to report bytes
->   dirty-bitmap: Change bdrv_get_dirty_locked() to take bytes
->   dirty-bitmap: Change bdrv_[re]set_dirty_bitmap() to use bytes
->   mirror: Switch mirror_dirty_init() to byte-based iteration
->   qcow2: Switch qcow2_measure() to byte-based iteration
->   qcow2: Switch load_bitmap_data() to byte-based iteration
->   qcow2: Switch store_bitmap_data() to byte-based iteration
->   dirty-bitmap: Switch bdrv_set_dirty() to bytes
->   dirty-bitmap: Convert internal hbitmap size/granularity
-> 
->  include/block/block_int.h    |   2 +-
->  include/block/dirty-bitmap.h |  41 +++++---------
->  include/qemu/hbitmap.h       |   8 +--
->  block/io.c                   |   6 +-
->  block.c                      |   2 +-
->  block/backup.c               |   7 +--
->  block/dirty-bitmap.c         | 130 ++++++++++++++-----------------------------
->  block/mirror.c               |  76 +++++++++++--------------
->  block/qcow2-bitmap.c         |  57 +++++++++----------
->  block/qcow2.c                |  22 ++++----
->  migration/block.c            |  12 ++--
->  tests/test-hbitmap.c         |  10 ++--
->  util/hbitmap.c               |   8 +--
->  13 files changed, 154 insertions(+), 227 deletions(-)
-> 
+On 08/30/2017 05:17 AM, Stefan Hajnoczi wrote:
+> On Tue, Aug 29, 2017 at 04:49:33PM -0400, John Snow wrote:
+>> The current FIS printing routines dump the FIS to screen. adjust this
+>> such that it dumps to buffer instead, then use this ability to have
+>> FIS dump mechanisms via trace-events instead of compiled defines.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  hw/ide/ahci.c       | 54 +++++++++++++++++++++++++++++++++++++++++++-=
+---------
+>>  hw/ide/trace-events |  4 ++++
+>>  2 files changed, 48 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+>> index a0a4dd6..2e75f9b 100644
+>> --- a/hw/ide/ahci.c
+>> +++ b/hw/ide/ahci.c
+>> @@ -644,20 +644,45 @@ static void ahci_reset_port(AHCIState *s, int po=
+rt)
+>>      ahci_init_d2h(d);
+>>  }
+>> =20
+>> -static void debug_print_fis(uint8_t *fis, int cmd_len)
+>> +/* Buffer pretty output based on a raw FIS structure. */
+>> +static void ahci_pretty_buffer_fis(uint8_t *fis, int cmd_len, char **=
+out)
+>=20
+> Simplified function using GString:
+>=20
+>   static char *ahci_pretty_buffer_fis(const uint8_t *fis, int cmd_len)
+>   {
+>       GString *s =3D g_string_new("FIS:");
+>       int i;
+>=20
+>       for (i =3D 0; i < cmd_len; i++) {
+>           if (i % 16 =3D=3D 0) {
+>               g_string_append_printf(s, "\n0x%02x:", i);
+> 	  }
+>=20
+>           g_string_append_printf(s, " %02x", fis[i]);
+>       }
+>=20
+>       g_string_append_c('\n');
+>       return g_string_free(s, FALSE);
+>   }
+>=20
+> It's less efficient due to extra mallocs but a lot easier to read.
+>=20
 
-Should this go through the bitmap tree, or since it's touching qcow2,
-I'll let Kevin/Max/Stefan stage it?
+eeeyyyyeahhhh I guess I don't need to be bleedingly efficient with debug
+printfs...
 
---js
+And in this example I don't need to worry about the math being precisely
+correct. I'll make the change :(
+
+>>  {
+>> -#if DEBUG_AHCI
+>> +    size_t bufsize;
+>> +    char *pbuf;
+>> +    char *pptr;
+>> +    size_t lines =3D DIV_ROUND_UP(cmd_len, 16);
+>> +    const char *preamble =3D "FIS:";
+>>      int i;
+>> =20
+>> -    fprintf(stderr, "fis:");
+>> +    /* Total amount of memory to store FISes in HBA memory */
+>> +    g_assert_cmpint(cmd_len, <=3D, 0x100);
+>> +    g_assert(out);
+>> +
+>> +    /* Printed like:
+>> +     * FIS:\n
+>> +     * 0x00: 00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee \n
+>> +     * 0x10: ff \n
+>> +     * \0
+>> +     *
+>> +     * Four bytes for the preamble, seven for each line prefix (inclu=
+ding a
+>> +     * newline to start a new line), three bytes for each source byte=
+,
+>> +     * a trailing newline and a terminal null byte.
+>> +     */
+>> +
+>> +    bufsize =3D strlen(preamble) + ((6 + 1) * lines) + (3 * cmd_len) =
++ 1 + 1;
+>> +    pbuf =3D g_malloc(bufsize);
+>> +    pptr =3D pbuf;
+>> +    pptr +=3D sprintf(pptr, "%s", preamble);
+>>      for (i =3D 0; i < cmd_len; i++) {
+>>          if ((i & 0xf) =3D=3D 0) {
+>> -            fprintf(stderr, "\n%02x:",i);
+>> +            pptr +=3D sprintf(pptr, "\n0x%02x: ", i);
+>>          }
+>> -        fprintf(stderr, "%02x ",fis[i]);
+>> +        pptr +=3D sprintf(pptr, "%02x ", fis[i]);
+>>      }
+>> -    fprintf(stderr, "\n");
+>> -#endif
+>> +    pptr +=3D sprintf(pptr, "\n");
+>> +    pptr +=3D 1; /* \0 */
+>> +    g_assert(pbuf + bufsize =3D=3D pptr);
+>> +    *out =3D pbuf;
+>>  }
+>> =20
+>>  static bool ahci_map_fis_address(AHCIDevice *ad)
+>> @@ -1201,7 +1226,12 @@ static void handle_reg_h2d_fis(AHCIState *s, in=
+t port,
+>>       * table to ide_state->io_buffer */
+>>      if (opts & AHCI_CMD_ATAPI) {
+>>          memcpy(ide_state->io_buffer, &cmd_fis[AHCI_COMMAND_TABLE_ACMD=
+], 0x10);
+>> -        debug_print_fis(ide_state->io_buffer, 0x10);
+>> +        if (TRACE_HANDLE_REG_H2D_FIS_DUMP_ENABLED) {
+>=20
+> This should probably be:
+>=20
+>   if (trace_event_get_state_backends(TRACE_HANDLE_REG_H2D_FIS_DUMP)) {
+>=20
+> The difference is that TRACE_HANDLE_REG_H2D_FIS_DUMP_ENABLED is set at
+> compile time while trace_event_get_state_backends() checks if the event
+> is enabled at run-time.
+>=20
+> Therefore TRACE_HANDLE_REG_H2D_FIS_DUMP_ENABLED causes the trace event
+> to fire even when the user hasn't enabled the trace event yet.  That
+> would be a waste of CPU.
+>=20
+
+Oh, cool! Nice tip!
+
+>> +            char *pretty_fis;
+>> +            ahci_pretty_buffer_fis(ide_state->io_buffer, 0x10, &prett=
+y_fis);
+>> +            trace_handle_reg_h2d_fis_dump(s, port, pretty_fis);
+>> +            g_free(pretty_fis);
+>> +        }
+>>          s->dev[port].done_atapi_packet =3D false;
+>>          /* XXX send PIO setup FIS */
+>>      }
+>> @@ -1256,8 +1286,12 @@ static int handle_cmd(AHCIState *s, int port, u=
+int8_t slot)
+>>          trace_handle_cmd_badmap(s, port, cmd_len);
+>>          goto out;
+>>      }
+>> -    debug_print_fis(cmd_fis, 0x80);
+>> -
+>> +    if (TRACE_HANDLE_CMD_FIS_DUMP_ENABLED) {
+>=20
+> Same here.
+>=20
+
+Sure thing. There's probably a block in ATAPI that needs this treatment,
+too.
+
+>> +        char *pretty_fis;
+>> +        ahci_pretty_buffer_fis(cmd_fis, 0x80, &pretty_fis);
+>> +        trace_handle_cmd_fis_dump(s, port, pretty_fis);
+>> +        g_free(pretty_fis);
+>> +    }
+>>      switch (cmd_fis[0]) {
+>>          case SATA_FIS_TYPE_REGISTER_H2D:
+>>              handle_reg_h2d_fis(s, port, slot, cmd_fis);
+>> diff --git a/hw/ide/trace-events b/hw/ide/trace-events
+>> index e15fd77..77ed3c1 100644
+>> --- a/hw/ide/trace-events
+>> +++ b/hw/ide/trace-events
+>> @@ -105,3 +105,7 @@ ahci_cmd_done(void *s, int port) "ahci(%p)[%d]: cm=
+d done"
+>>  ahci_reset(void *s) "ahci(%p): HBA reset"
+>>  allwinner_ahci_mem_read(void *s, void *a, uint64_t addr, uint64_t val=
+, unsigned size) "ahci(%p): read a=3D%p addr=3D0x%"HWADDR_PRIx" val=3D0x%=
+"PRIx64", size=3D%d"
+>>  allwinner_ahci_mem_write(void *s, void *a, uint64_t addr, uint64_t va=
+l, unsigned size) "ahci(%p): write a=3D%p addr=3D0x%"HWADDR_PRIx" val=3D0=
+x%"PRIx64", size=3D%d"
+>> +
+>> +# Warning: Verbose
+>> +handle_reg_h2d_fis_dump(void *s, int port, char *fis) "ahci(%p)[%d]: =
+%s"
+>=20
+> const char *fis
+>=20
+>> +handle_cmd_fis_dump(void *s, int port, char *fis) "ahci(%p)[%d]: %s"
+>=20
+> const char *fis
+>=20
+
+Thanks for the =F0=9F=91=80
