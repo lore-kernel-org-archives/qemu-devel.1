@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dn02F-0001di-BS
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:15:48 -0400
+	(envelope-from <famz@redhat.com>) id 1dn02V-0001p5-6k
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:16:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dn02D-0000Nc-Px
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:15:47 -0400
-References: <20170828055631.GB3258@host-172-16-90-85.openstacklocal>
-	<7327a956-aef3-a8da-13ff-53073039802f@redhat.com>
-	<20170829025645.GA30307@host-172-16-90-85.openstacklocal>
-From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Message-ID: <17126413-cb74-a633-0138-5bd4e5dab315@virtuozzo.com>
-Date: Wed, 30 Aug 2017 13:15:33 +0300
+	(envelope-from <famz@redhat.com>) id 1dn02Q-0000bT-8l
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:16:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59216)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dn02Q-0000a7-1t
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:15:58 -0400
+Date: Wed, 30 Aug 2017 18:15:52 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170830101551.GM4208@lemon.lan>
+References: <20170828174707.20786-1-famz@redhat.com>
+	<20170828174707.20786-4-famz@redhat.com>
+	<9658452f-c89f-43d2-07ff-5d620fd471a9@amsat.org>
+	<20170830032949.GC4208@lemon.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170829025645.GA30307@host-172-16-90-85.openstacklocal>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] reduce write bandwidth of qcow2 driver while
- allocating new cluster
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170830032949.GC4208@lemon.lan>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 03/10] tests: Add vm test lib
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,88 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liu Qing <liuqing@huayun.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Kamil Rytarowski <kamil@netbsd.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 
+On Wed, 08/30 11:29, Fam Zheng wrote:
+> On Tue, 08/29 09:15, Philippe Mathieu-Daud=E9 wrote:
+> > > +        self._args =3D [ \
+> > > +            "-nodefaults", "-m", "2G",
+> > > +            "-cpu", "host",
+> > > +            "-netdev", "user,id=3Dvnet,hostfwd=3D:0.0.0.0:0-:22",
+> >=20
+> > Testing with debian/unstable:
+> >=20
+> > $ make vm-build-netbsd V=3D1
+> > ./tests/vm/netbsd  --debug   --image "tests/vm/netbsd.img" --build-qe=
+mu .
+> > DEBUG:root:Creating archive /tmp/qemu-vm-PxfXNv/data-3a52c.tar for da=
+ta dir:
+> > .
+> > DEBUG:root:QEMU args: -nodefaults -m 2G -cpu host -netdev
+> > user,id=3Dvnet,hostfwd=3D:0.0.0.0:0-:22 -device virtio-net-pci,netdev=
+=3Dvnet -vnc
+> > :0,to=3D20 -serial file:/tmp/qemu-vm-PxfXNv/serial.out -smp 4 -enable=
+-kvm
+> > -device VGA -drive
+> > file=3Dtests/vm/netbsd.img,snapshot=3Don,if=3Dnone,id=3Ddrive0,cache=3D=
+writeback
+> > -device virtio-blk,drive=3Ddrive0,bootindex=3D0 -drive file=3D/tmp/qe=
+mu-vm-PxfXNv/data-3a52c.tar,if=3Dnone,id=3Ddata-3a52c,cache=3Dwriteback,f=
+ormat=3Draw
+> > -device virtio-blk,drive=3Ddata-3a52c,serial=3Ddata-3a52c,bootindex=3D=
+1
+> > Failed to prepare guest environment
+>=20
+> Can you please look into the stderr of the QEMU command line to see wha=
+t
+> arguments went wrong? (I hope the qemu.py improvement patches on the li=
+st can
+> give a better error message in such cases.)
 
-On 29/08/2017 05:56, Liu Qing wrote:
-> On Mon, Aug 28, 2017 at 10:46:34AM -0500, Eric Blake wrote:
->> [adding qemu-block]
->>
->> On 08/28/2017 12:56 AM, Liu Qing wrote:
->>> Dear list,
->>>     Recently I used fio to test qcow2 driver in the guest os, and found out
->>> that when a new cluster is allocated the 4K IO will occupy 64K(default cluster
->>> size) bandwith.
->>>     From the code qcow2 driver will fill the unused part of new allocated
->>> cluster with 0 in perform_cow. These 0s are set in qcow2_co_readv when the read
->>> destination is not allocated and it has no backing file. Could I forbidden any
->>> further write in copy_sectors if the copy source is not allocated and it has
->>> no backing file? So only the requested data is written to the cluster. Function
->>> copy_sectors is only used by perform_cow in the master branch.
->>
->> There have already been discussions on optimizing COW writes in a manner
->> similar to what you are describing; for example,
->>
->> https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg00109.html
-> Thanks Eric, this is what I am looking for.
-> The only concern I have is in patch '[Qemu-devel] [PATCH v4 12/15] qcow2: skip
-> writing zero buffers to empty' it says:
->
-> It can be detected that
->   1. COW alignment of a write request is zeroes
->   2. Respective areas on the underlying BDS already read as zeroes
->      after being preallocated previously
->   If both of these true, COW may be skipped
->
-> Will writing zero be skipped if the disk is not preallocated? @Anton
->
+I've tested with Fedora 26's qemu-system-x86-2.9.0-5.fc26.x86_64 and got =
+the
+failure due to the hostfwd syntax:
 
-Hi,
+qemu-system-x86_64: -netdev user,id=3Dvnet,hostfwd=3D:0.0.0.0:0-:22: inva=
+lid host forwarding rule ':0.0.0.0:0-:22'
+qemu-system-x86_64: -netdev user,id=3Dvnet,hostfwd=3D:0.0.0.0:0-:22: Devi=
+ce 'user' could not be initialized
 
-In short, no, it will not (with my patches), but there might be some way
-if that's what you really need.
+But it makes sense to use dynamic port allocation to avoid collision.
 
+Since it's about developing QEMU, using cutting edge QEMU features is not=
+ that
+bad. Let's keep this one.
 
-First of all, this might be undesirable as you lose the cluster-size
-data locality: now the whole cluster is written at once and is expected
-to reside in the contiguous area on the physical drive.
-
-Secondly, I think there is no guarantee that the underlying bs->file
-image reads back as zeroes if the cluster is unallocated on qcow2 level.
-
-For example, the unallocated cluster could have been used earlier but
-then discarded. Discard passthrough is configurable so discard may not
-be passed down to the underlying image. And I guess that in general,
-even if it is passed, there is no strong requirement on reading back as
-zeroes - look at qcow2 discard handling - discard head and tail which do
-not cover full clusters are ignored.
-
-_perhaps_, one may expect that there will be zeroes if the cluster is
-allocated at the end of file
-(see 'clusters_are_trailing' detection here
-https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg00122.html)
-
-but I haven't thought about all corner cases here.
-
-
-/Anton
-
-> BTW: why the code in the patch is a little different than the latest
-> master branch? For example I don't have the is_zero function but only
-> get is_zero_sectors. Is there something wrong with my settings?
->
-> My repo:
-> # git remote -v
-> origin  git://git.qemu-project.org/qemu.git (fetch)
-> origin  git://git.qemu-project.org/qemu.git (push)
->
-> Thanks.
->>
->> --
->> Eric Blake, Principal Software Engineer
->> Red Hat, Inc.           +1-919-301-3266
->> Virtualization:  qemu.org | libvirt.org
->>
->
->
+Fam
