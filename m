@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1dmyA8-0008P1-84
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:15:49 -0400
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dmyLQ-0002JZ-PA
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1dmyA4-0003l2-IJ
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:15:47 -0400
-References: <1915302638.2814146.1504030043465.ref@mail.yahoo.com>
-	<1915302638.2814146.1504030043465@mail.yahoo.com>
-	<14033890-2a35-666c-2fa7-5a8727090801@tuxfamily.org>
-	<1075529669.195794.1504079702032@mail.yahoo.com>
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <bc7bacd9-fec7-c193-6de0-99d1f7fd0f6f@tuxfamily.org>
-Date: Wed, 30 Aug 2017 10:15:41 +0200
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dmyLM-0000Ev-LO
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:28 -0400
+Received: from mail-vk0-x234.google.com ([2607:f8b0:400c:c05::234]:38259)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
+	id 1dmyLM-0000ER-FB
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:24 -0400
+Received: by mail-vk0-x234.google.com with SMTP id x85so1240497vkx.5
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 01:27:23 -0700 (PDT)
+From: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
+Date: Wed, 30 Aug 2017 03:26:49 -0500
+Message-Id: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1075529669.195794.1504079702032@mail.yahoo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-discuss] Accessing a shared folder
+Subject: [Qemu-devel] [PATCH v2 00/13] add support for Hypervisor.framework
+ in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +28,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mahmood <nt_mahmood@yahoo.com>, "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
+To: qemu-devel@nongnu.org
+Cc: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 
-On 30.08.2017 09:55, Mahmood wrote:
->> You don't have to write "fsdriver" here, but replace it with "local",
->> "handle" or "proxy".
-> 
-> Still get the same error
-> 
-> mahmood@cluster:qemu-vm$ qemu-system-x86_64 -m 4000 -cpu Opteron_G5 -smp 2 -hda centos7server.img -boot c  -usbdevice tablet -enable-kvm -device e1000,netdev=host_files -netdev user,net=10.0.2.0/24,id=host_files -virtfs local,id=shared,path=/home/mahmood/Downloads,mount_tag=Downloads 
-> qemu-system-x86_64: -virtfs local,id=shared,path=/home/mahmood/Downloads,mount_tag=Downloads: Parameter 'driver' expects device type 
+================
+Changes in v2:
+ (1) Removed legacy option "-enable-hvf" in favor of "-M accel=hvf"
+ (2) Added missing copyright headers; replace fprintfs for error_report;
+     improved commit description.
+ (3) Moved patch that adds compilation rules in Makefile.objs right after
+     the patch that adds the new files from Google's repo.
+ (4) Removed conditional macros from cpus.c and cpu.c
+ (5) Moved patch that fixes coding style to patch # 3
+ (6) Fix commit message in apic patch
+ (7) Squash some commits to avoid code churn
+================
 
-Hmm, I've got the strange feeling that the -virtfs parameter might
-currently be broken.
+The following patchset adds to QEMU the supporting for macOS's native
+hypervisor, Hypervisor.framework (hvf). The code base is taken from
+Google's Android emulator at
+https://android.googlesource.com/platform/external/qemu/+/emu-master-dev.
 
-Could you please try to replace the -virtfs option with these two options:
+Apart from general code refactoring, some additional features were implemented:
+retrieve the set of features supported by host cpu and hvf (cpuid);
+dirty page tracking for VGA memory area; reimplementation of the event
+injection mechanism to allow injection of exceptions during vmexits, which is
+exemplified by the injection of a GP fault when the guest vmexits due to
+execution of the vmcall instruction; changing the emulator's use of CPUState
+structure in favor of CPUX86State, so as to in the future remove data structures
+that are uselessly specific to hvf and unified some of the state between kvm/tcg
+and hvf.
+Some features initially planned to implement that didn't make it include:
+page fault handling in the emulator and implementing the dummy_signal to handle
+the SIG_IPI signal without race conditions. Hopefully these can be implemented
+in the near future.
 
- -fsdev local,id=shared,path=/home/mahmood/Downloads \
- -device virtio-9p-pci,fsdev=shared,mount_tag=Downloads
+Sergio Andres Gomez Del Real (13):
+  hvf: add support for Hypervisor.framework in the configure script
+  hvf: add code base from Google's QEMU repository
+  hvf: add compilation rules to Makefile.objs
+  hvf: run hvf code through checkpatch.pl and fix style issues
+  hvf: add fields to CPUState and CPUX86State; add definitions
+  hvf: use new helper functions for put/get xsave
+  apic: add function to apic that will be used by hvf
+  hvf: implement hvf_get_supported_cpuid
+  hvf: refactor cpuid code
+  hvf: implement vga dirty page tracking
+  hvf: move fields from CPUState to CPUX86State
+  hvf: refactor event injection code for hvf
+  hvf: inject General Protection Fault when vmexit through vmcall
 
-I hope that works better...
+ configure                           |   38 +
+ cpus.c                              |   92 +-
+ hw/intc/apic.c                      |   11 +
+ include/hw/i386/apic.h              |    1 +
+ include/qom/cpu.h                   |    2 +
+ include/sysemu/hvf.h                |  107 ++
+ qemu-options.hx                     |   10 +-
+ target/i386/Makefile.objs           |    1 +
+ target/i386/cpu-qom.h               |    4 +-
+ target/i386/cpu.c                   |   83 +-
+ target/i386/cpu.h                   |   30 +
+ target/i386/hvf-all.c               | 1136 ++++++++++++++++++
+ target/i386/hvf-i386.h              |   48 +
+ target/i386/hvf-utils/Makefile.objs |    1 +
+ target/i386/hvf-utils/README.md     |    7 +
+ target/i386/hvf-utils/vmcs.h        |  371 ++++++
+ target/i386/hvf-utils/vmx.h         |  222 ++++
+ target/i386/hvf-utils/x86.c         |  184 +++
+ target/i386/hvf-utils/x86.h         |  476 ++++++++
+ target/i386/hvf-utils/x86_cpuid.c   |  417 +++++++
+ target/i386/hvf-utils/x86_cpuid.h   |   52 +
+ target/i386/hvf-utils/x86_decode.c  | 2186 +++++++++++++++++++++++++++++++++++
+ target/i386/hvf-utils/x86_decode.h  |  325 ++++++
+ target/i386/hvf-utils/x86_descr.c   |  124 ++
+ target/i386/hvf-utils/x86_descr.h   |   55 +
+ target/i386/hvf-utils/x86_emu.c     | 1536 ++++++++++++++++++++++++
+ target/i386/hvf-utils/x86_emu.h     |   49 +
+ target/i386/hvf-utils/x86_flags.c   |  333 ++++++
+ target/i386/hvf-utils/x86_flags.h   |  243 ++++
+ target/i386/hvf-utils/x86_gen.h     |   53 +
+ target/i386/hvf-utils/x86_mmu.c     |  273 +++++
+ target/i386/hvf-utils/x86_mmu.h     |   45 +
+ target/i386/hvf-utils/x86hvf.c      |  463 ++++++++
+ target/i386/hvf-utils/x86hvf.h      |   39 +
+ target/i386/kvm.c                   |    2 -
+ 35 files changed, 8987 insertions(+), 32 deletions(-)
+ create mode 100644 include/sysemu/hvf.h
+ create mode 100644 target/i386/hvf-all.c
+ create mode 100644 target/i386/hvf-i386.h
+ create mode 100644 target/i386/hvf-utils/Makefile.objs
+ create mode 100644 target/i386/hvf-utils/README.md
+ create mode 100644 target/i386/hvf-utils/vmcs.h
+ create mode 100644 target/i386/hvf-utils/vmx.h
+ create mode 100644 target/i386/hvf-utils/x86.c
+ create mode 100644 target/i386/hvf-utils/x86.h
+ create mode 100644 target/i386/hvf-utils/x86_cpuid.c
+ create mode 100644 target/i386/hvf-utils/x86_cpuid.h
+ create mode 100644 target/i386/hvf-utils/x86_decode.c
+ create mode 100644 target/i386/hvf-utils/x86_decode.h
+ create mode 100644 target/i386/hvf-utils/x86_descr.c
+ create mode 100644 target/i386/hvf-utils/x86_descr.h
+ create mode 100644 target/i386/hvf-utils/x86_emu.c
+ create mode 100644 target/i386/hvf-utils/x86_emu.h
+ create mode 100644 target/i386/hvf-utils/x86_flags.c
+ create mode 100644 target/i386/hvf-utils/x86_flags.h
+ create mode 100644 target/i386/hvf-utils/x86_gen.h
+ create mode 100644 target/i386/hvf-utils/x86_mmu.c
+ create mode 100644 target/i386/hvf-utils/x86_mmu.h
+ create mode 100644 target/i386/hvf-utils/x86hvf.c
+ create mode 100644 target/i386/hvf-utils/x86hvf.h
 
- Thomas
+-- 
+2.14.1
