@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nt_mahmood@yahoo.com>) id 1dn45B-0000wH-GC
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:35:11 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dn49s-0002yv-AD
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:39:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nt_mahmood@yahoo.com>) id 1dn458-0003Os-6v
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:35:05 -0400
-Received: from sonic315-8.consmr.mail.gq1.yahoo.com ([98.137.65.32]:34845)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nt_mahmood@yahoo.com>)
-	id 1dn458-0003NP-1B
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:35:02 -0400
-Date: Wed, 30 Aug 2017 14:35:00 +0000 (UTC)
-From: Mahmood <nt_mahmood@yahoo.com>
-Reply-To: Mahmood <nt_mahmood@yahoo.com>
-Message-ID: <47171733.403781.1504103700042@mail.yahoo.com>
-In-Reply-To: <61cd0715-27e4-7e50-1e85-9da3b4a48bb1@posteo.de>
-References: <1915302638.2814146.1504030043465.ref@mail.yahoo.com>
-	<1915302638.2814146.1504030043465@mail.yahoo.com>
-	<14033890-2a35-666c-2fa7-5a8727090801@tuxfamily.org>
-	<1075529669.195794.1504079702032@mail.yahoo.com>
-	<bc7bacd9-fec7-c193-6de0-99d1f7fd0f6f@tuxfamily.org>
-	<2061420835.208824.1504085337258@mail.yahoo.com>
-	<20170830121109.7fab5559@bahia>
-	<61cd0715-27e4-7e50-1e85-9da3b4a48bb1@posteo.de>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dn49r-0004rL-C4
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:39:56 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <1504100343-26607-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <1504100343-26607-1-git-send-email-thuth@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 30 Aug 2017 14:39:44 +0000
+Message-ID: <CAJ+F1CJ7r=z8mMu0kyCEtjCgAnKGLhh5WTUKVdeyzi57eYLDSA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-discuss] Accessing a shared folder
+Subject: Re: [Qemu-devel] [PATCH for-2.11] hw/misc/ivshmem: Fix
+ ivshmem_recv_msg() to also work on big endian systems
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,22 +23,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <th.huth@posteo.de>, Greg Kurz <groug@kaod.org>
-Cc: Thomas Huth <huth@tuxfamily.org>, QEMU Developers <qemu-devel@nongnu.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, David Gibson <david@gibson.dropbear.id.au>
 
-OK. I reconfigured 2.9.0 with --enable-virtfs. Please note:
-1- If I use -virtfs option, I get=20
-=C2=A0=C2=A0=C2=A0=C2=A0 qemu-option.c:547: opt_set: Assertion `opt->str' f=
-ailed
+Hi
 
-2- If I use -fsdev and -device, then I *must* use security_model
+On Wed, Aug 30, 2017 at 3:43 PM Thomas Huth <thuth@redhat.com> wrote:
 
-3- If I use -fsdev and -device and security_model, then the guest boots nor=
-mally.
+> The "slow" ivshmem-tests currently fail when they are running on a
+> big endian host:
+>
+> $ uname -m
+> ppc64
+> $ V=3D1 QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64
+> tests/ivshmem-test -m slow
+> /x86_64/ivshmem/single: OK
+> /x86_64/ivshmem/hotplug: OK
+> /x86_64/ivshmem/memdev: OK
+> /x86_64/ivshmem/pair: OK
+> /x86_64/ivshmem/server-msi: qemu-system-x86_64:
+>  -device ivshmem-doorbell,chardev=3Dchr0,vectors=3D2: server sent invalid=
+ ID
+> message
+> Broken pipe
+>
+> The problem is that the server side code in ivshmem_server_send_one_msg()
+> correctly translates all messages IDs into little endian 64-bit values,
+> but the client side code in the ivshmem_recv_msg() function does not swap
+> the byte order back. Fix it by passing the value through le64_to_cpu().
+>
+>
+ivshmem_read() is correct though
 
-I haven't tried to see if I am able to access the shared folder nor not. Do=
- you have any note on the above items?
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+>
 
+ Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Regards,
-Mahmood
+---
+>  hw/misc/ivshmem.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+> index 47a015f..b3ef3ec 100644
+> --- a/hw/misc/ivshmem.c
+> +++ b/hw/misc/ivshmem.c
+> @@ -653,7 +653,7 @@ static int64_t ivshmem_recv_msg(IVShmemState *s, int
+> *pfd, Error **errp)
+>      } while (n < sizeof(msg));
+>
+>      *pfd =3D qemu_chr_fe_get_msgfd(&s->server_chr);
+> -    return msg;
+> +    return le64_to_cpu(msg);
+>  }
+>
+>  static void ivshmem_recv_setup(IVShmemState *s, Error **errp)
+> --
+> 1.8.3.1
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
