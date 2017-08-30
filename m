@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dn3Lm-0003Uu-O1
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 09:48:15 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dn3Nr-0005Q7-Mw
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 09:50:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dn3Ll-0002aL-QQ
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 09:48:10 -0400
-Date: Wed, 30 Aug 2017 15:48:03 +0200
+	(envelope-from <imammedo@redhat.com>) id 1dn3Nn-0003Kt-AG
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 09:50:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43404)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dn3Nn-0003KT-4P
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 09:50:15 -0400
+Date: Wed, 30 Aug 2017 15:50:08 +0200
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170830154803.46bc99fc@nial.brq.redhat.com>
-In-Reply-To: <1503941985-25657-1-git-send-email-thuth@redhat.com>
-References: <1503941985-25657-1-git-send-email-thuth@redhat.com>
+Message-ID: <20170830155008.1babd407@nial.brq.redhat.com>
+In-Reply-To: <e3552801-588d-a192-1da4-0cefee5aa483@amsat.org>
+References: <20170817043102.6322-1-f4bug@amsat.org>
+	<20170817172249.31cf5e3d@nial.brq.redhat.com>
+	<e3552801-588d-a192-1da4-0cefee5aa483@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.11] tests/bios-tables: Silence some
- messages with V=1, print them with V=2 only
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/8] QOMify MIPS cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,73 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, James Hogan <james.hogan@imgtec.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, Yongbok Kim <yongbok.kim@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Mon, 28 Aug 2017 19:39:45 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+On Fri, 18 Aug 2017 17:08:29 -0300
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
-> When running "make check-qtest-x86_64 V=1", the output is currently flooded
-> with "Looking for expected file ..." and "Using expected file ..." messages.
-> None of the other tests is doing that with V=1, so this is a little bit
-> annoying. Let's only print these debug messages when we're running the test
-> with V=2 or higher.
-well, normally make check is run without V=
-and if someone once in a while need to run it in verbose mode,
-he/she can tolerate it since it's a verbose mode after all.
+> On 08/17/2017 12:22 PM, Igor Mammedov wrote:
+> > On Thu, 17 Aug 2017 01:30:54 -0300
+> > Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote: =20
+> [...]
+> >> Also I couldn't test it with KVM. =20
+> > Tested in TCG mode (boots debian mips/mips64 kernel with different cpu =
+types),
+> > and new CPU leaf types show up on QOM tree as expected (QOMifycation is=
+ done as expected) =20
+>=20
+> you mean the "info qom-tree" output?
+>=20
+> > and '-cpu help' also works as expected,
+> > so with checkpatch issues fixed you may add to patches my
+> >=20
+> > Tested-by: Igor Mammedov <imammedo@redhat.com> =20
+>=20
+> ok thanks for the testing!
+>=20
+> I'll wait to see if there is some KVM feedback from imgtec folks before=20
+> spaming a v2.
 
-Hiding message behind V=XX is going to make us remember/recall
-at which verbosity level one needs to run tests to get needed
-diagnostic info.
+Philippe,
 
-I'd rather keep it as it is now.
-
-
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/bios-tables-test.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> index 564da45..289ee45 100644
-> --- a/tests/bios-tables-test.c
-> +++ b/tests/bios-tables-test.c
-> @@ -40,6 +40,7 @@ typedef struct {
->      int required_struct_types_len;
->  } test_data;
->  
-> +static bool really_verbose;
->  static char disk[] = "tests/acpi-test-disk-XXXXXX";
->  static const char *data_dir = "tests/acpi-test-data";
->  #ifdef CONFIG_IASL
-> @@ -395,7 +396,7 @@ static GArray *load_expected_aml(test_data *data)
->  try_again:
->          aml_file = g_strdup_printf("%s/%s/%.4s%s", data_dir, data->machine,
->                                     (gchar *)&signature, ext);
-> -        if (getenv("V")) {
-> +        if (really_verbose) {
->              fprintf(stderr, "\nLooking for expected file '%s'\n", aml_file);
->          }
->          if (g_file_test(aml_file, G_FILE_TEST_EXISTS)) {
-> @@ -407,7 +408,7 @@ try_again:
->              goto try_again;
->          }
->          g_assert(exp_sdt.aml_file);
-> -        if (getenv("V")) {
-> +        if (really_verbose) {
->              fprintf(stderr, "\nUsing expected file '%s'\n", aml_file);
->          }
->          ret = g_file_get_contents(aml_file, &exp_sdt.aml,
-> @@ -812,6 +813,11 @@ int main(int argc, char *argv[])
->  {
->      const char *arch = qtest_get_arch();
->      int ret;
-> +    const char *v_env = getenv("V");
-> +
-> +    if (v_env && *v_env >= '2') {
-> +        really_verbose = true;
-> +    }
->  
->      ret = boot_sector_init(disk);
->      if(ret)
+Are you going to respin series soon?
