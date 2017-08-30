@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dn6Ik-0005Tq-0A
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:57:14 -0400
+	(envelope-from <jcody@redhat.com>) id 1dn6Ik-0005V7-QE
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:57:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1dn6Ii-0006pV-U2
+	(envelope-from <jcody@redhat.com>) id 1dn6Ik-0006qR-0B
 	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:57:14 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Wed, 30 Aug 2017 12:56:59 -0400
-Message-Id: <393d6a245f52394f0aa094ec1e97194aef9ab0bc.1504112061.git.jcody@redhat.com>
+Date: Wed, 30 Aug 2017 12:57:02 -0400
+Message-Id: <6ea11ae43c681181f86193352ef3527ff3f64f68.1504112061.git.jcody@redhat.com>
 In-Reply-To: <cover.1504112061.git.jcody@redhat.com>
 References: <cover.1504112061.git.jcody@redhat.com>
 In-Reply-To: <cover.1504112061.git.jcody@redhat.com>
 References: <cover.1504112061.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/7] block/ssh: make compliant with coding
- guidelines
+Subject: [Qemu-devel] [PATCH v2 5/7] block/curl: check error return of
+ curl_global_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,123 +25,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, rjones@redhat.com, kwolf@redhat.com
 
+If curl_global_init() fails, per the documentation no other curl
+functions may be called, so make sure to check the return value.
+
+Also, some minor changes to the initialization latch variable 'inited':
+
+- Make it static in the file, for clarity
+- Change the name for clarity
+- Make it a bool
+
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- block/ssh.c | 32 ++++++++++++++++++--------------
- 1 file changed, 18 insertions(+), 14 deletions(-)
+ block/curl.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/block/ssh.c b/block/ssh.c
-index cbb0e34..97f7673 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -241,7 +241,7 @@ static int parse_uri(const char *filename, QDict *options, Error **errp)
-         goto err;
+diff --git a/block/curl.c b/block/curl.c
+index 2a244e2..00a9879 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -89,6 +89,8 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
+ 
+ struct BDRVCURLState;
+ 
++static bool libcurl_initialized;
++
+ typedef struct CURLAIOCB {
+     Coroutine *co;
+     QEMUIOVector *qiov;
+@@ -686,14 +688,23 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
+     double d;
+     const char *secretid;
+     const char *protocol_delimiter;
++    int ret;
+ 
+-    static int inited = 0;
+ 
+     if (flags & BDRV_O_RDWR) {
+         error_setg(errp, "curl block device does not support writes");
+         return -EROFS;
      }
  
--    if(uri->user && strcmp(uri->user, "") != 0) {
-+    if (uri->user && strcmp(uri->user, "") != 0) {
-         qdict_put_str(options, "user", uri->user);
-     }
- 
-@@ -268,7 +268,7 @@ static int parse_uri(const char *filename, QDict *options, Error **errp)
- 
-  err:
-     if (uri) {
--      uri_free(uri);
-+        uri_free(uri);
-     }
-     return -EINVAL;
- }
-@@ -342,7 +342,7 @@ static int check_host_key_knownhosts(BDRVSSHState *s,
-     libssh2_knownhost_readfile(knh, knh_file, LIBSSH2_KNOWNHOST_FILE_OPENSSH);
- 
-     r = libssh2_knownhost_checkp(knh, host, port, hostkey, len,
--                                 LIBSSH2_KNOWNHOST_TYPE_PLAIN|
-+                                 LIBSSH2_KNOWNHOST_TYPE_PLAIN |
-                                  LIBSSH2_KNOWNHOST_KEYENC_RAW,
-                                  &found);
-     switch (r) {
-@@ -405,15 +405,18 @@ static int compare_fingerprint(const unsigned char *fingerprint, size_t len,
-     unsigned c;
- 
-     while (len > 0) {
--        while (*host_key_check == ':')
-+        while (*host_key_check == ':') {
-             host_key_check++;
++    if (!libcurl_initialized) {
++        ret = curl_global_init(CURL_GLOBAL_ALL);
++        if (ret) {
++            error_setg(errp, "libcurl initialization failed with %d", ret);
++            return -EIO;
 +        }
-         if (!qemu_isxdigit(host_key_check[0]) ||
--            !qemu_isxdigit(host_key_check[1]))
-+            !qemu_isxdigit(host_key_check[1])) {
-             return 1;
-+        }
-         c = hex2decimal(host_key_check[0]) * 16 +
-             hex2decimal(host_key_check[1]);
--        if (c - *fingerprint != 0)
-+        if (c - *fingerprint != 0) {
-             return c - *fingerprint;
-+        }
-         fingerprint++;
-         len--;
-         host_key_check += 2;
-@@ -433,8 +436,8 @@ check_host_key_hash(BDRVSSHState *s, const char *hash,
-         return -EINVAL;
-     }
- 
--    if(compare_fingerprint((unsigned char *) fingerprint, fingerprint_len,
--                           hash) != 0) {
-+    if (compare_fingerprint((unsigned char *) fingerprint, fingerprint_len,
-+                            hash) != 0) {
-         error_setg(errp, "remote host key does not match host_key_check '%s'",
-                    hash);
-         return -EPERM;
-@@ -507,7 +510,7 @@ static int authenticate(BDRVSSHState *s, const char *user, Error **errp)
-         goto out;
-     }
- 
--    for(;;) {
-+    for (;;) {
-         r = libssh2_agent_get_identity(agent, &identity, prev_identity);
-         if (r == 1) {           /* end of list */
-             break;
-@@ -863,8 +866,8 @@ static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
-     }
- 
-     r = connect_to_ssh(&s, uri_options,
--                       LIBSSH2_FXF_READ|LIBSSH2_FXF_WRITE|
--                       LIBSSH2_FXF_CREAT|LIBSSH2_FXF_TRUNC,
-+                       LIBSSH2_FXF_READ  | LIBSSH2_FXF_WRITE |
-+                       LIBSSH2_FXF_CREAT | LIBSSH2_FXF_TRUNC,
-                        0644, errp);
-     if (r < 0) {
-         ret = r;
-@@ -872,7 +875,7 @@ static int ssh_create(const char *filename, QemuOpts *opts, Error **errp)
-     }
- 
-     if (total_size > 0) {
--        libssh2_sftp_seek64(s.sftp_handle, total_size-1);
-+        libssh2_sftp_seek64(s.sftp_handle, total_size - 1);
-         r2 = libssh2_sftp_write(s.sftp_handle, c, 1);
-         if (r2 < 0) {
-             sftp_error_setg(errp, &s, "truncate failed");
-@@ -1111,7 +1114,7 @@ static int ssh_write(BDRVSSHState *s, BlockDriverState *bs,
-          * works for me.
-          */
-         if (r == 0) {
--            ssh_seek(s, offset + written, SSH_SEEK_WRITE|SSH_SEEK_FORCE);
-+            ssh_seek(s, offset + written, SSH_SEEK_WRITE | SSH_SEEK_FORCE);
-             co_yield(s, bs);
-             goto again;
++        libcurl_initialized = true;
++    }
++
+     qemu_mutex_init(&s->mutex);
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+     qemu_opts_absorb_qdict(opts, options, &local_err);
+@@ -772,11 +783,6 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
          }
-@@ -1125,8 +1128,9 @@ static int ssh_write(BDRVSSHState *s, BlockDriverState *bs,
-             end_of_vec = i->iov_base + i->iov_len;
-         }
- 
--        if (offset + written > s->attrs.filesize)
-+        if (offset + written > s->attrs.filesize) {
-             s->attrs.filesize = offset + written;
-+        }
      }
  
-     return 0;
+-    if (!inited) {
+-        curl_global_init(CURL_GLOBAL_ALL);
+-        inited = 1;
+-    }
+-
+     DPRINTF("CURL: Opening %s\n", file);
+     QSIMPLEQ_INIT(&s->free_state_waitq);
+     s->aio_context = bdrv_get_aio_context(bs);
 -- 
 2.9.5
