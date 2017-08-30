@@ -1,22 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dn93q-0004aa-HL
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 15:54:03 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dn93v-0004de-92
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 15:54:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dn93p-000488-Ec
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 15:54:02 -0400
-References: <cover.1504112061.git.jcody@redhat.com>
-	<dd70daa66badee5dc2796f556c973e90cd5a3faf.1504112061.git.jcody@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <89e43927-f8aa-d12c-893b-6a5cb5e9351d@redhat.com>
-Date: Wed, 30 Aug 2017 14:53:53 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dn93s-00049C-7Z
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 15:54:07 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41872)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1dn93r-00048S-UC
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 15:54:04 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7UJrwUu121982
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 15:54:00 -0400
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cny3c9ajv-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 15:54:00 -0400
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Wed, 30 Aug 2017 15:53:56 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <dd70daa66badee5dc2796f556c973e90cd5a3faf.1504112061.git.jcody@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="mNdMetDiT0VfqsJu8dHoXBCseQ2Xhh5gL"
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] block/curl: code cleanup to comply
- with coding style
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Wed, 30 Aug 2017 14:53:44 -0500
+Message-Id: <150412282458.23002.14698600796895856506@loki>
+Subject: [Qemu-devel] [ANNOUNCE] QEMU 2.10.0 is now available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,104 +38,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, kwolf@redhat.com, rjones@redhat.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mNdMetDiT0VfqsJu8dHoXBCseQ2Xhh5gL
-From: Eric Blake <eblake@redhat.com>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, kwolf@redhat.com,
- rjones@redhat.com, qemu-block@nongnu.org
-Message-ID: <89e43927-f8aa-d12c-893b-6a5cb5e9351d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] block/curl: code cleanup to comply
- with coding style
-References: <cover.1504112061.git.jcody@redhat.com>
- <dd70daa66badee5dc2796f556c973e90cd5a3faf.1504112061.git.jcody@redhat.com>
-In-Reply-To: <dd70daa66badee5dc2796f556c973e90cd5a3faf.1504112061.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hello,
 
-On 08/30/2017 11:57 AM, Jeff Cody wrote:
-> This addresses non-functional changes to help curl.c better comply
-> with the coding styles (comments, indentation, brackets, etc.).
->=20
-> One minor code change is the combination of two if statements into
-> a single if statement.
->=20
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  block/curl.c | 100 +++++++++++++++++++++++++++++++--------------------=
---------
->  1 file changed, 52 insertions(+), 48 deletions(-)
->=20
+On behalf of the QEMU Team, I'd like to announce the availability of
+the QEMU 2.10.0 release. This release contains 2600+ commits from 208 =
 
-> -#define CURL_BLOCK_OPT_URL       "url"
-> -#define CURL_BLOCK_OPT_READAHEAD "readahead"
-> -#define CURL_BLOCK_OPT_SSLVERIFY "sslverify"
-> -#define CURL_BLOCK_OPT_TIMEOUT "timeout"
-> -#define CURL_BLOCK_OPT_COOKIE    "cookie"
-> -#define CURL_BLOCK_OPT_COOKIE_SECRET "cookie-secret"
-> -#define CURL_BLOCK_OPT_USERNAME "username"
-> -#define CURL_BLOCK_OPT_PASSWORD_SECRET "password-secret"
-> -#define CURL_BLOCK_OPT_PROXY_USERNAME "proxy-username"
+authors.
 
-Another change from inconsistent spacing,
+You can grab the tarball from our download page here:
 
-> +#define CURL_BLOCK_OPT_URL                   "url"
-> +#define CURL_BLOCK_OPT_READAHEAD             "readahead"
-> +#define CURL_BLOCK_OPT_SSLVERIFY             "sslverify"
-> +#define CURL_BLOCK_OPT_TIMEOUT               "timeout"
-> +#define CURL_BLOCK_OPT_COOKIE                "cookie"
-> +#define CURL_BLOCK_OPT_COOKIE_SECRET         "cookie-secret"
-> +#define CURL_BLOCK_OPT_USERNAME              "username"
-> +#define CURL_BLOCK_OPT_PASSWORD_SECRET       "password-secret"
-> +#define CURL_BLOCK_OPT_PROXY_USERNAME        "proxy-username"
->  #define CURL_BLOCK_OPT_PROXY_PASSWORD_SECRET "proxy-password-secret"
+  http://www.qemu.org/download/#source
 
-to something that is consistent but requires a mass-edit if we add a
-longer name.
+The full list of changes are available at:
 
+  http://wiki.qemu.org/ChangeLog/2.10
 
-> @@ -235,7 +236,7 @@ static size_t curl_header_cb(void *ptr, size_t size=
-, size_t nmemb, void *opaque)
->  /* Called from curl_multi_do_locked, with s->mutex held.  */
->  static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void =
-*opaque)
->  {
-> -    CURLState *s =3D ((CURLState*)opaque);
-> +    CURLState *s =3D ((CURLState *)opaque);
+Highlights include:
 
-Umm, this is C, so why not just:
+ * Support for ACPI NUMA distance info and control over CPU NUMA
+   assignments via '-numa cpu' parameters
+ * Support for LUKS encryption format in qcow2 images
+ * Monitor/Management interface improvments: additional debug
+   information available through 'info ramblock/cmma/register/qtree',
+   support for viewing connected clients via 'info vnc', improved
+   parsing support for QMP protocol, and other additional commands
+ * QXL and virtio-gpu support for controlling default display resolution
+ * Support for vhost-user-scsi devices
+ * NVMe emulation support for Write Zeroes command and Controller
+   Memory Buffers
+ * Guest agent support for querying guest hostname, users, timezone, and
+   OS version/release information
 
-CURLState *s =3D opaque;
+ * ARM: KVM support for Raspberry Pi 3
+ * ARM: emulation support for MPS2/MPS2+ FPGA-based dev boards
+ * ARM: zynq: SPIPS flash support
+ * ARM: exynos4210: hardware PRNG device, SDHCI, and system poweroff
+ * Microblaze: support for CPU versions 9.4, 9.5, 9.6, and 10.0
+ * MIPS: support for Enhanced Virtual Addressing (EVA)
+ * MIPS: initrd support for kaslr-enabled kernels
+ * OpenRISC: support for shadow registers, idle states, and
+   numcores/coreid/EVAR/EPH registers
+ * PowerPC: Multi-threaded TCG emulation support
+ * PowerPC: OpenBIOS VGA driver for MacOS guests
+ * PowerPC: pseries: KVM and emulation support for POWER9 guests
+ * PowerPC: pseries: support for hash page table resizing
+ * s390: channel device passthrough support via vfio-ccw
+ * s390: support for channel-attached 3270 "green screen" devices for
+   use as guest consoles or additional TTYs
+ * s390: improved support for PCI (AEN, AIS, and zPCI)
+ * s390: support for z14 CPU models and netboot/TFTP via CCW BIOS, =
 
-Those are minor findings, so whether or not you address them,
-Reviewed-by: Eric Blake <eblake@redhat.com>
+ * s390: TCG support for atomic "LOAD AND x" and "COMPARE SWAP"
+   operations, LOAD PROGRAM PARAMETER, extended facilities, CPU type,
+   and many more less-common instructions.
+ * SH: TCG support for host atomic instructions for emulating tas.b and
+   gUSA (user-space atomics), and support for fpchg/fsrra instructions
+ * SPARC: fixes for booting Solaris 2.6 on sun4m/OpenBIOS machines
+ * x86: Q35 MCH supports TSEG higher than 8MB
+ * x86: SSE register access via gdbstub
+ * Xen: support for multi-page shared rings, and 9pfs/virtfs backend
+ * Xtensa: sim machine console can be directed to chardev via -serial
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+ * and lots more...
 
-
---mNdMetDiT0VfqsJu8dHoXBCseQ2Xhh5gL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmnF9EACgkQp6FrSiUn
-Q2rjswf+NjiZlx9mBC6gUoTtiwKDHngNYSvPMHbA5xJvnCCSb9K59Zl+Ew/Vave6
-e7YdsZs7kgev/7x23z59LKPUzGWSUaAF6aG44jndmqI8cMT899T7BRAh7LkngFtr
-KQmluuIfaM+XmjUmn5MToFHdxfTTemoUb8mtQd0PtorZCaAe9J1FmDFaatG/bBUI
-V4kMKNaUQXtKuoRJF2iZt2IXfJW6OhQV2EGPaNIRRi/LDjkObeAsG0w/q5ntA6RK
-qzfAzHqU796nlki4TCwsJWr/bfgUWYmNPcNXbYSW2eqzE8tCyKfTwqk0siX+0w/0
-NkIpflQKuM5TwAXigrCDYmIsUFSa3g==
-=yHT9
------END PGP SIGNATURE-----
-
---mNdMetDiT0VfqsJu8dHoXBCseQ2Xhh5gL--
+Thank you to everyone involved!
