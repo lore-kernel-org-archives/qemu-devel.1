@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dn8rU-0005Pr-1A
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 15:41:16 -0400
+	(envelope-from <eblake@redhat.com>) id 1dn8t9-0006l3-IA
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 15:43:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dn8rT-00081b-9P
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 15:41:16 -0400
+	(envelope-from <eblake@redhat.com>) id 1dn8t8-0008VT-Dm
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 15:42:59 -0400
 References: <cover.1504112061.git.jcody@redhat.com>
-	<393d6a245f52394f0aa094ec1e97194aef9ab0bc.1504112061.git.jcody@redhat.com>
+	<8fe8ddad6b924b460ca4ed4a7e401c18d24c246f.1504112061.git.jcody@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <a9dd3482-6797-2518-16aa-ed4ba4d8f4f2@redhat.com>
-Date: Wed, 30 Aug 2017 14:41:08 -0500
+Message-ID: <cfbf937b-8619-da88-bb17-66ab1990f4bd@redhat.com>
+Date: Wed, 30 Aug 2017 14:42:51 -0500
 MIME-Version: 1.0
-In-Reply-To: <393d6a245f52394f0aa094ec1e97194aef9ab0bc.1504112061.git.jcody@redhat.com>
+In-Reply-To: <8fe8ddad6b924b460ca4ed4a7e401c18d24c246f.1504112061.git.jcody@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="ILk7Th8ie1MQAceHhHbBXC1SXRGvlF5dd"
-Subject: Re: [Qemu-devel] [PATCH v2 2/7] block/ssh: make compliant with
- coding guidelines
+	boundary="q2ebsgJ2nhVeTdx1gkuON6122PFuk9Ggq"
+Subject: Re: [Qemu-devel] [PATCH v2 3/7] block/sheepdog: remove spurious
+ NULL check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +29,30 @@ To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
 Cc: mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, kwolf@redhat.com, rjones@redhat.com, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ILk7Th8ie1MQAceHhHbBXC1SXRGvlF5dd
+--q2ebsgJ2nhVeTdx1gkuON6122PFuk9Ggq
 From: Eric Blake <eblake@redhat.com>
 To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
 Cc: mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, kwolf@redhat.com,
  rjones@redhat.com, qemu-block@nongnu.org
-Message-ID: <a9dd3482-6797-2518-16aa-ed4ba4d8f4f2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/7] block/ssh: make compliant with coding
- guidelines
+Message-ID: <cfbf937b-8619-da88-bb17-66ab1990f4bd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/7] block/sheepdog: remove spurious NULL
+ check
 References: <cover.1504112061.git.jcody@redhat.com>
- <393d6a245f52394f0aa094ec1e97194aef9ab0bc.1504112061.git.jcody@redhat.com>
-In-Reply-To: <393d6a245f52394f0aa094ec1e97194aef9ab0bc.1504112061.git.jcody@redhat.com>
+ <8fe8ddad6b924b460ca4ed4a7e401c18d24c246f.1504112061.git.jcody@redhat.com>
+In-Reply-To: <8fe8ddad6b924b460ca4ed4a7e401c18d24c246f.1504112061.git.jcody@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08/30/2017 11:56 AM, Jeff Cody wrote:
+On 08/30/2017 11:57 AM, Jeff Cody wrote:
+> 'tag' is already checked in the lines immediately preceding this check,=
+
+> and set to non-NULL if NULL.  No need to check again, it hasn't changed=
+=2E
+>=20
 > Signed-off-by: Jeff Cody <jcody@redhat.com>
 > ---
->  block/ssh.c | 32 ++++++++++++++++++--------------
->  1 file changed, 18 insertions(+), 14 deletions(-)
+>  block/sheepdog.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -57,7 +62,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---ILk7Th8ie1MQAceHhHbBXC1SXRGvlF5dd
+--q2ebsgJ2nhVeTdx1gkuON6122PFuk9Ggq
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -66,14 +71,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmnFNQACgkQp6FrSiUn
-Q2rYjgf9GxZtgtqj8pUWyQ26/uvZO+V1pmUoFpKdO1Y16HtTaDHmV2Kt5+9tKOxp
-q0SRZzWHGloZU45fagEOJgSc8me7SgY5zVLamS57Q6Gixz5jIjdLj+wPAQDvs/yT
-QaEx7/nMwtMGnBk3eCG3q0w/b3J3RJz2tIZbSEOtDxw2rNw7QKeOu0LFOH49PZ9b
-JDCZQLsWUApAFJkxcJDWL/HROVauHjo/glA+GeatqMmgmIjVu7GoXQU8eWIgUaD6
-WoggEYFozbUAmhye6qU2SfQLRYE8+sDqTSrmJLwuvitgvHqOMN9iOENGOqyzaLou
-lm8+6KGPLWvGTWUdU351VOzzII9esw==
-=Bhlv
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmnFTsACgkQp6FrSiUn
+Q2oMNAf/RbCYjZZwrnUGfUUQSOU81yYbJuMiCwIaLlbRM/Sv2YNSE97g8ybzNWxv
+rZ/gi83gSbPQ1LS6xT6l6xiovDEuQjZiqrTl94Pmkxox7/6YRgjlyLsiW3fuCTf1
+oBtQxU1OPcLIFCFKNaYcu7slXx/acmlYl2TkaxbcYxSCMtLrk0jj1Aow6dY/guTR
+r8Msrl/LqsnLna+PQ4izg7ab0Z9AeaaOupcitC8qffAhz27wrYImDU2wuO0NxAQQ
+WDVo8njMIrtxaxIT3ARKW8hbobp4tCT5KA4GmT4laSlfSPG/DcMJPPkjyaeusvrA
+hB9zYvOzJy6yKkWeQMfCsYrN9F57cQ==
+=amBe
 -----END PGP SIGNATURE-----
 
---ILk7Th8ie1MQAceHhHbBXC1SXRGvlF5dd--
+--q2ebsgJ2nhVeTdx1gkuON6122PFuk9Ggq--
