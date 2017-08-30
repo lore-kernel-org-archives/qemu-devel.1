@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dn1fi-0007m2-O4
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:00:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dn1gL-00089g-41
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:01:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dn1fd-0001ma-KJ
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:00:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48410)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dn1fd-0001lS-EP
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:00:33 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2C326B5A1
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 12:00:31 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170825105913.4060-1-marcandre.lureau@redhat.com>
-	<20170825105913.4060-5-marcandre.lureau@redhat.com>
-Date: Wed, 30 Aug 2017 14:00:03 +0200
-In-Reply-To: <20170825105913.4060-5-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Fri, 25 Aug 2017 12:59:03 +0200")
-Message-ID: <87val5gta4.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1dn1gF-0002Ci-DD
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:01:17 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:33316)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dn1gF-0002BW-6c
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:01:11 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id k94so17905934wrc.0
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 05:01:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 04/14] qlit: remove compound literals
+In-Reply-To: <838020276.255029.1504093138506@mail.yahoo.com>
+References: <1915302638.2814146.1504030043465.ref@mail.yahoo.com>
+	<1915302638.2814146.1504030043465@mail.yahoo.com>
+	<14033890-2a35-666c-2fa7-5a8727090801@tuxfamily.org>
+	<1075529669.195794.1504079702032@mail.yahoo.com>
+	<bc7bacd9-fec7-c193-6de0-99d1f7fd0f6f@tuxfamily.org>
+	<2061420835.208824.1504085337258@mail.yahoo.com>
+	<20170830121109.7fab5559@bahia>
+	<61cd0715-27e4-7e50-1e85-9da3b4a48bb1@posteo.de>
+	<1735515901.247981.1504090406495@mail.yahoo.com>
+	<838020276.255029.1504093138506@mail.yahoo.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 30 Aug 2017 13:00:49 +0100
+Message-ID: <CAFEAcA9bUktbR2iFEthjmKci=a3syS_2sjkbdfzx3ruZXWMMJw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-discuss] Accessing a shared folder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,39 +37,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Mahmood <nt_mahmood@yahoo.com>
+Cc: Thomas Huth <th.huth@posteo.de>, Greg Kurz <groug@kaod.org>, Thomas Huth <huth@tuxfamily.org>, QEMU Developers <qemu-devel@nongnu.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> They are not considered constant expressions in C, producing an error
-> when compiling a const QLit.
-
-A const QLit?  Do you mean a non-const one?
-
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  include/qapi/qmp/qlit.h | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+On 30 August 2017 at 12:38, Mahmood <nt_mahmood@yahoo.com> wrote:
+> Hello again,I installed 2.5.0 quickly and it was pretty straight forward!
 >
-> diff --git a/include/qapi/qmp/qlit.h b/include/qapi/qmp/qlit.h
-> index a4ad91321b..f1d6eed317 100644
-> --- a/include/qapi/qmp/qlit.h
-> +++ b/include/qapi/qmp/qlit.h
-> @@ -36,13 +36,13 @@ struct QLitDictEntry {
->  };
->=20=20
->  #define QLIT_QNUM(val) \
-> -    (QLitObject){.type =3D QTYPE_QNUM, .value.qnum =3D (val)}
-> +    { .type =3D QTYPE_QNUM, .value.qnum =3D (val) }
->  #define QLIT_QSTR(val) \
-> -    (QLitObject){.type =3D QTYPE_QSTRING, .value.qstr =3D (val)}
-> +    { .type =3D QTYPE_QSTRING, .value.qstr =3D (val) }
->  #define QLIT_QDICT(val) \
-> -    (QLitObject){.type =3D QTYPE_QDICT, .value.qdict =3D (val)}
-> +    { .type =3D QTYPE_QDICT, .value.qdict =3D (val) }
->  #define QLIT_QLIST(val) \
-> -    (QLitObject){.type =3D QTYPE_QLIST, .value.qlist =3D (val)}
-> +    { .type =3D QTYPE_QLIST, .value.qlist =3D (val) }
->=20=20
->  int compare_litqobj_to_qobj(QLitObject *lhs, QObject *rhs);
+> Here is the error message I get regarding the 'virtio-9p-pci'
+> 'virtio-9p-pci' is not a valid device model name
+
+Are you building your own QEMU binary or is it from somewhere
+else? I wonder if it was built without support for the 9p
+filesystem code. For this to be enabled:
+ * host machine must be Linux
+ * system building QEMU must have libcap development package installed
+
+If you're building it yourself then you can pass configure
+'--enable-virtfs' which will mean configure will stop with
+an error if it can't enable virtfs rather than just disabling
+this optional feature.
+
+QEMU ought to produce a helpful error if you try to use -virtfs
+when virtfs wasn't compiled in, but it may be that this check
+was broken accidentally at some point.
+
+Also, 2.5.0 is a couple of years old, you might try with 2.9.0
+(or even with the 2.10.0 we're about to release today).
+
+thanks
+-- PMM
