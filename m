@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dn2z9-0001ow-TK
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 09:24:48 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dn2z8-0001on-Rc
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 09:24:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dn2z8-0003Yw-Up
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 09:24:47 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dn2z7-0003Xy-PB
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 09:24:46 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed, 30 Aug 2017 15:24:33 +0200
-Message-Id: <1504099475-241036-7-git-send-email-imammedo@redhat.com>
+Date: Wed, 30 Aug 2017 15:24:32 +0200
+Message-Id: <1504099475-241036-6-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1504099475-241036-1-git-send-email-imammedo@redhat.com>
 References: <1504099475-241036-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 6/8] ppc: simplify cpu model lookup by PVR
+Subject: [Qemu-devel] [PATCH v2 5/8] ppc: replace inter-function cyclic
+ dependency/recurssion with 2 simple lookups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,59 +23,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
+previous patches cleaned up cpu model/alias naming which
+allows to simplify cpu model/alias to cpu type lookup a bit
+byt removing recurssion and dependency of ppc_cpu_class_by_name() /
+ppc_cpu_class_by_alias() on each other.
+Besides of simplifying code it reduces it by ~15LOC.
+
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
 v2:
-  - if going PVR lookup routem check that cpu_model string consumed
-    completely, as PVR number shouldn't have any stray symbol in it.
+  s/g_ascii_strup/g_ascii_strdown/ due to switch to lower-cased model names
 ---
- target/ppc/translate_init.c | 27 +++++++++++----------------
- 1 file changed, 11 insertions(+), 16 deletions(-)
+ target/ppc/translate_init.c | 43 +++++++++++++------------------------------
+ 1 file changed, 13 insertions(+), 30 deletions(-)
 
 diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index cf0d795..a803a7f 100644
+index 0325226..cf0d795 100644
 --- a/target/ppc/translate_init.c
 +++ b/target/ppc/translate_init.c
-@@ -34,6 +34,7 @@
- #include "hw/ppc/ppc.h"
- #include "mmu-book3s-v3.h"
- #include "sysemu/qtest.h"
-+#include "qemu/cutils.h"
+@@ -10176,22 +10176,6 @@ PowerPCCPUClass *ppc_cpu_class_by_pvr_mask(uint32_t pvr)
+     return pcc;
+ }
  
- //#define PPC_DUMP_CPU
- //#define PPC_DEBUG_SPR
-@@ -10203,22 +10204,16 @@ static ObjectClass *ppc_cpu_class_by_name(const char *name)
-     char *cpu_model, *typename;
-     ObjectClass *oc;
-     const char *p;
--    int i, len;
+-static gint ppc_cpu_compare_class_name(gconstpointer a, gconstpointer b)
+-{
+-    ObjectClass *oc = (ObjectClass *)a;
+-    const char *name = b;
+-    PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
 -
--    /* Check if the given name is a PVR */
--    len = strlen(name);
--    if (len == 10 && name[0] == '0' && name[1] == 'x') {
--        p = name + 2;
--        goto check_pvr;
--    } else if (len == 8) {
--        p = name;
--    check_pvr:
--        for (i = 0; i < 8; i++) {
--            if (!qemu_isxdigit(*p++))
--                break;
--        }
--        if (i == 8) {
--            return OBJECT_CLASS(ppc_cpu_class_by_pvr(strtoul(name, NULL, 16)));
-+    unsigned long pvr;
-+
-+    /* Lookup by PVR if cpu_model is valid 8 digit hex number
-+     * (excl: 0x prefix if present)
-+     */
-+    if (!qemu_strtoul(name, &p, 16, &pvr)) {
-+        int len = p - name;
-+        len = (len == 10) && (name[1] == 'x') ? len - 2 : len;
-+        if ((len == 8) && (*p == '\0')) {
-+            return OBJECT_CLASS(ppc_cpu_class_by_pvr(pvr));
+-    if (strncasecmp(name, object_class_get_name(oc), strlen(name)) == 0 &&
+-        ppc_cpu_is_valid(pcc) &&
+-        strcmp(object_class_get_name(oc) + strlen(name),
+-               POWERPC_CPU_TYPE_SUFFIX) == 0) {
+-        return 0;
+-    }
+-    return -1;
+-}
+-
+-
+ static ObjectClass *ppc_cpu_class_by_name(const char *name);
+ 
+ static ObjectClass *ppc_cpu_class_by_alias(PowerPCCPUAlias *alias)
+@@ -10216,8 +10200,8 @@ static ObjectClass *ppc_cpu_class_by_alias(PowerPCCPUAlias *alias)
+ 
+ static ObjectClass *ppc_cpu_class_by_name(const char *name)
+ {
+-    GSList *list, *item;
+-    ObjectClass *ret = NULL;
++    char *cpu_model, *typename;
++    ObjectClass *oc;
+     const char *p;
+     int i, len;
+ 
+@@ -10238,21 +10222,20 @@ static ObjectClass *ppc_cpu_class_by_name(const char *name)
          }
      }
  
+-    list = object_class_get_list(TYPE_POWERPC_CPU, false);
+-    item = g_slist_find_custom(list, name, ppc_cpu_compare_class_name);
+-    if (item != NULL) {
+-        ret = OBJECT_CLASS(item->data);
++    cpu_model = g_ascii_strdown(name, -1);
++    p = ppc_cpu_lookup_alias(cpu_model);
++    if (p) {
++        g_free(cpu_model);
++        cpu_model = g_strdup(p);
+     }
+-    g_slist_free(list);
+ 
+-    if (ret) {
+-        return ret;
+-    }
++    typename = g_strdup_printf("%s" POWERPC_CPU_TYPE_SUFFIX, cpu_model);
++    oc = object_class_by_name(typename);
++    g_free(typename);
++    g_free(cpu_model);
+ 
+-    for (i = 0; ppc_cpu_aliases[i].alias != NULL; i++) {
+-        if (strcasecmp(ppc_cpu_aliases[i].alias, name) == 0) {
+-            return ppc_cpu_class_by_alias(&ppc_cpu_aliases[i]);
+-        }
++    if (oc && ppc_cpu_is_valid(POWERPC_CPU_CLASS(oc))) {
++        return oc;
+     }
+ 
+     return NULL;
 -- 
 2.7.4
