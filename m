@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40555)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dmtzz-0003IE-BX
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 23:49:04 -0400
+	id 1dmu0A-0003NU-2x
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 23:49:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dmtzu-0001Cj-FK
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 23:49:03 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33586)
+	id 1dmu05-0001Gy-6i
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 23:49:14 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:37343)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dmtzu-0001CX-AA
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 23:48:58 -0400
-Received: by mail-qk0-x243.google.com with SMTP id k126so1085980qkb.0
-	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 20:48:58 -0700 (PDT)
+	id 1dmu05-0001Gn-0s
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 23:49:09 -0400
+Received: by mail-qk0-x243.google.com with SMTP id m4so4443620qke.4
+	for <qemu-devel@nongnu.org>; Tue, 29 Aug 2017 20:49:08 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20170829212053.6003-1-ehabkost@redhat.com>
+References: <20170829204759.6853-1-richard.henderson@linaro.org>
+	<20170829204759.6853-2-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b4dee2f8-9be8-4a3b-2942-b80a6c7f1b11@amsat.org>
-Date: Tue, 29 Aug 2017 20:30:56 -0300
+Message-ID: <f370f939-d211-77a2-d490-270df1e5aeea@amsat.org>
+Date: Tue, 29 Aug 2017 22:02:23 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170829212053.6003-1-ehabkost@redhat.com>
+In-Reply-To: <20170829204759.6853-2-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] oslib-posix: Print errors before aborting
- on qemu_alloc_stack()
+Subject: Re: [Qemu-devel] [PATCH 1/8] tcg/s390: Fully convert
+ tcg_target_op_def
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +36,313 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, agraf@suse.de, Richard Henderson <rth@twiddle.net>
 
-On 08/29/2017 06:20 PM, Eduardo Habkost wrote:
-> If QEMU is running on a system that's out of memory and mmap()
-> fails, QEMU aborts with no error message at all, making it hard
-> to debug the reason for the failure.
+On 08/29/2017 05:47 PM, Richard Henderson wrote:
+> From: Richard Henderson <rth@twiddle.net>
 > 
-> Add perror() calls that will print error information before
-> aborting.
+> Use a switch instead of searching a table.
 > 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->   util/oslib-posix.c | 2 ++
->   1 file changed, 2 insertions(+)
+>   tcg/s390/tcg-target.inc.c | 278 +++++++++++++++++++++++++---------------------
+>   1 file changed, 154 insertions(+), 124 deletions(-)
 > 
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index cacf0ef..80086c5 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -530,6 +530,7 @@ void *qemu_alloc_stack(size_t *sz)
->       ptr = mmap(NULL, *sz, PROT_READ | PROT_WRITE,
->                  MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
->       if (ptr == MAP_FAILED) {
-> +        perror("failed to allocate memory for stack");
->           abort();
+> diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
+> index 5d7083e90c..d34649eb13 100644
+> --- a/tcg/s390/tcg-target.inc.c
+> +++ b/tcg/s390/tcg-target.inc.c
+> @@ -2246,134 +2246,164 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
 >       }
+>   }
 >   
-> @@ -544,6 +545,7 @@ void *qemu_alloc_stack(size_t *sz)
->       guardpage = ptr;
->   #endif
->       if (mprotect(guardpage, pagesz, PROT_NONE) != 0) {
-> +        perror("failed to set up stack guard page");
->           abort();
+> -static const TCGTargetOpDef s390_op_defs[] = {
+> -    { INDEX_op_exit_tb, { } },
+> -    { INDEX_op_goto_tb, { } },
+> -    { INDEX_op_br, { } },
+> -    { INDEX_op_goto_ptr, { "r" } },
+> -
+> -    { INDEX_op_ld8u_i32, { "r", "r" } },
+> -    { INDEX_op_ld8s_i32, { "r", "r" } },
+> -    { INDEX_op_ld16u_i32, { "r", "r" } },
+> -    { INDEX_op_ld16s_i32, { "r", "r" } },
+> -    { INDEX_op_ld_i32, { "r", "r" } },
+> -    { INDEX_op_st8_i32, { "r", "r" } },
+> -    { INDEX_op_st16_i32, { "r", "r" } },
+> -    { INDEX_op_st_i32, { "r", "r" } },
+> -
+> -    { INDEX_op_add_i32, { "r", "r", "ri" } },
+> -    { INDEX_op_sub_i32, { "r", "0", "ri" } },
+> -    { INDEX_op_mul_i32, { "r", "0", "rK" } },
+> -
+> -    { INDEX_op_div2_i32, { "b", "a", "0", "1", "r" } },
+> -    { INDEX_op_divu2_i32, { "b", "a", "0", "1", "r" } },
+> -
+> -    { INDEX_op_and_i32, { "r", "0", "ri" } },
+> -    { INDEX_op_or_i32, { "r", "0", "rO" } },
+> -    { INDEX_op_xor_i32, { "r", "0", "rX" } },
+> -
+> -    { INDEX_op_neg_i32, { "r", "r" } },
+> -
+> -    { INDEX_op_shl_i32, { "r", "0", "ri" } },
+> -    { INDEX_op_shr_i32, { "r", "0", "ri" } },
+> -    { INDEX_op_sar_i32, { "r", "0", "ri" } },
+> -
+> -    { INDEX_op_rotl_i32, { "r", "r", "ri" } },
+> -    { INDEX_op_rotr_i32, { "r", "r", "ri" } },
+> -
+> -    { INDEX_op_ext8s_i32, { "r", "r" } },
+> -    { INDEX_op_ext8u_i32, { "r", "r" } },
+> -    { INDEX_op_ext16s_i32, { "r", "r" } },
+> -    { INDEX_op_ext16u_i32, { "r", "r" } },
+> -
+> -    { INDEX_op_bswap16_i32, { "r", "r" } },
+> -    { INDEX_op_bswap32_i32, { "r", "r" } },
+> -
+> -    { INDEX_op_add2_i32, { "r", "r", "0", "1", "rA", "r" } },
+> -    { INDEX_op_sub2_i32, { "r", "r", "0", "1", "rA", "r" } },
+> -
+> -    { INDEX_op_brcond_i32, { "r", "rC" } },
+> -    { INDEX_op_setcond_i32, { "r", "r", "rC" } },
+> -    { INDEX_op_movcond_i32, { "r", "r", "rC", "r", "0" } },
+> -    { INDEX_op_deposit_i32, { "r", "rZ", "r" } },
+> -    { INDEX_op_extract_i32, { "r", "r" } },
+> -
+> -    { INDEX_op_qemu_ld_i32, { "r", "L" } },
+> -    { INDEX_op_qemu_ld_i64, { "r", "L" } },
+> -    { INDEX_op_qemu_st_i32, { "L", "L" } },
+> -    { INDEX_op_qemu_st_i64, { "L", "L" } },
+> -
+> -    { INDEX_op_ld8u_i64, { "r", "r" } },
+> -    { INDEX_op_ld8s_i64, { "r", "r" } },
+> -    { INDEX_op_ld16u_i64, { "r", "r" } },
+> -    { INDEX_op_ld16s_i64, { "r", "r" } },
+> -    { INDEX_op_ld32u_i64, { "r", "r" } },
+> -    { INDEX_op_ld32s_i64, { "r", "r" } },
+> -    { INDEX_op_ld_i64, { "r", "r" } },
+> -
+> -    { INDEX_op_st8_i64, { "r", "r" } },
+> -    { INDEX_op_st16_i64, { "r", "r" } },
+> -    { INDEX_op_st32_i64, { "r", "r" } },
+> -    { INDEX_op_st_i64, { "r", "r" } },
+> -
+> -    { INDEX_op_add_i64, { "r", "r", "ri" } },
+> -    { INDEX_op_sub_i64, { "r", "0", "ri" } },
+> -    { INDEX_op_mul_i64, { "r", "0", "rK" } },
+> -
+> -    { INDEX_op_div2_i64, { "b", "a", "0", "1", "r" } },
+> -    { INDEX_op_divu2_i64, { "b", "a", "0", "1", "r" } },
+> -    { INDEX_op_mulu2_i64, { "b", "a", "0", "r" } },
+> -
+> -    { INDEX_op_and_i64, { "r", "0", "ri" } },
+> -    { INDEX_op_or_i64, { "r", "0", "rO" } },
+> -    { INDEX_op_xor_i64, { "r", "0", "rX" } },
+> -
+> -    { INDEX_op_neg_i64, { "r", "r" } },
+> -
+> -    { INDEX_op_shl_i64, { "r", "r", "ri" } },
+> -    { INDEX_op_shr_i64, { "r", "r", "ri" } },
+> -    { INDEX_op_sar_i64, { "r", "r", "ri" } },
+> -
+> -    { INDEX_op_rotl_i64, { "r", "r", "ri" } },
+> -    { INDEX_op_rotr_i64, { "r", "r", "ri" } },
+> -
+> -    { INDEX_op_ext8s_i64, { "r", "r" } },
+> -    { INDEX_op_ext8u_i64, { "r", "r" } },
+> -    { INDEX_op_ext16s_i64, { "r", "r" } },
+> -    { INDEX_op_ext16u_i64, { "r", "r" } },
+> -    { INDEX_op_ext32s_i64, { "r", "r" } },
+> -    { INDEX_op_ext32u_i64, { "r", "r" } },
+> -
+> -    { INDEX_op_ext_i32_i64, { "r", "r" } },
+> -    { INDEX_op_extu_i32_i64, { "r", "r" } },
+> -
+> -    { INDEX_op_bswap16_i64, { "r", "r" } },
+> -    { INDEX_op_bswap32_i64, { "r", "r" } },
+> -    { INDEX_op_bswap64_i64, { "r", "r" } },
+> -
+> -    { INDEX_op_clz_i64, { "r", "r", "ri" } },
+> -
+> -    { INDEX_op_add2_i64, { "r", "r", "0", "1", "rA", "r" } },
+> -    { INDEX_op_sub2_i64, { "r", "r", "0", "1", "rA", "r" } },
+> -
+> -    { INDEX_op_brcond_i64, { "r", "rC" } },
+> -    { INDEX_op_setcond_i64, { "r", "r", "rC" } },
+> -    { INDEX_op_movcond_i64, { "r", "r", "rC", "r", "0" } },
+> -    { INDEX_op_deposit_i64, { "r", "0", "r" } },
+> -    { INDEX_op_extract_i64, { "r", "r" } },
+> -
+> -    { INDEX_op_mb, { } },
+> -    { -1 },
+> -};
+> -
+>   static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+>   {
+> -    int i, n = ARRAY_SIZE(s390_op_defs);
+> +    static const TCGTargetOpDef r = { .args_ct_str = { "r" } };
+> +    static const TCGTargetOpDef r_r = { .args_ct_str = { "r", "r" } };
+> +    static const TCGTargetOpDef r_L = { .args_ct_str = { "r", "L" } };
+> +    static const TCGTargetOpDef L_L = { .args_ct_str = { "L", "L" } };
+> +    static const TCGTargetOpDef r_rC = { .args_ct_str = { "r", "rC" } };
+> +    static const TCGTargetOpDef r_r_ri = { .args_ct_str = { "r", "r", "ri" } };
+> +    static const TCGTargetOpDef r_0_ri = { .args_ct_str = { "r", "0", "ri" } };
+> +    static const TCGTargetOpDef r_0_rK = { .args_ct_str = { "r", "0", "rK" } };
+> +    static const TCGTargetOpDef r_0_rO = { .args_ct_str = { "r", "0", "rO" } };
+> +    static const TCGTargetOpDef r_0_rX = { .args_ct_str = { "r", "0", "rX" } };
+> +
+> +    switch (op) {
+> +    case INDEX_op_goto_ptr:
+> +        return &r;
+> +
+> +    case INDEX_op_ld8u_i32:
+> +    case INDEX_op_ld8u_i64:
+> +    case INDEX_op_ld8s_i32:
+> +    case INDEX_op_ld8s_i64:
+> +    case INDEX_op_ld16u_i32:
+> +    case INDEX_op_ld16u_i64:
+> +    case INDEX_op_ld16s_i32:
+> +    case INDEX_op_ld16s_i64:
+> +    case INDEX_op_ld_i32:
+> +    case INDEX_op_ld32u_i64:
+> +    case INDEX_op_ld32s_i64:
+> +    case INDEX_op_ld_i64:
+> +    case INDEX_op_st8_i32:
+> +    case INDEX_op_st8_i64:
+> +    case INDEX_op_st16_i32:
+> +    case INDEX_op_st16_i64:
+> +    case INDEX_op_st_i32:
+> +    case INDEX_op_st32_i64:
+> +    case INDEX_op_st_i64:
+> +        return &r_r;
+> +
+> +    case INDEX_op_add_i32:
+> +    case INDEX_op_add_i64:
+> +        return &r_r_ri;
+> +    case INDEX_op_sub_i32:
+> +    case INDEX_op_sub_i64:
+> +        return &r_0_ri;
+> +    case INDEX_op_mul_i32:
+> +    case INDEX_op_mul_i64:
+> +        return &r_0_rK;
+> +    case INDEX_op_or_i32:
+> +    case INDEX_op_or_i64:
+> +        return &r_0_rO;
+> +    case INDEX_op_xor_i32:
+> +    case INDEX_op_xor_i64:
+> +        return &r_0_rX;
+> +    case INDEX_op_and_i32:
+> +    case INDEX_op_and_i64:
+> +        return &r_0_ri;
+> +
+> +    case INDEX_op_shl_i32:
+> +    case INDEX_op_shr_i32:
+> +    case INDEX_op_sar_i32:
+> +        return &r_0_ri;
+> +
+> +    case INDEX_op_shl_i64:
+> +    case INDEX_op_shr_i64:
+> +    case INDEX_op_sar_i64:
+> +        return &r_r_ri;
+> +
+> +    case INDEX_op_rotl_i32:
+> +    case INDEX_op_rotl_i64:
+> +    case INDEX_op_rotr_i32:
+> +    case INDEX_op_rotr_i64:
+> +        return &r_r_ri;
+> +
+> +    case INDEX_op_brcond_i32:
+> +    case INDEX_op_brcond_i64:
+> +        return &r_rC;
+> +
+> +    case INDEX_op_bswap16_i32:
+> +    case INDEX_op_bswap16_i64:
+> +    case INDEX_op_bswap32_i32:
+> +    case INDEX_op_bswap32_i64:
+> +    case INDEX_op_bswap64_i64:
+> +    case INDEX_op_neg_i32:
+> +    case INDEX_op_neg_i64:
+> +    case INDEX_op_ext8s_i32:
+> +    case INDEX_op_ext8s_i64:
+> +    case INDEX_op_ext8u_i32:
+> +    case INDEX_op_ext8u_i64:
+> +    case INDEX_op_ext16s_i32:
+> +    case INDEX_op_ext16s_i64:
+> +    case INDEX_op_ext16u_i32:
+> +    case INDEX_op_ext16u_i64:
+> +    case INDEX_op_ext32s_i64:
+> +    case INDEX_op_ext32u_i64:
+> +    case INDEX_op_ext_i32_i64:
+> +    case INDEX_op_extu_i32_i64:
+> +    case INDEX_op_extract_i32:
+> +    case INDEX_op_extract_i64:
+> +        return &r_r;
+> +
+> +    case INDEX_op_clz_i64:
+> +        return &r_r_ri;
+> +
+> +    case INDEX_op_qemu_ld_i32:
+> +    case INDEX_op_qemu_ld_i64:
+> +        return &r_L;
+> +    case INDEX_op_qemu_st_i64:
+> +    case INDEX_op_qemu_st_i32:
+> +        return &L_L;
+>   
+> -    for (i = 0; i < n; ++i) {
+> -        if (s390_op_defs[i].op == op) {
+> -            return &s390_op_defs[i];
+> +    case INDEX_op_deposit_i32:
+> +    case INDEX_op_deposit_i64:
+> +        {
+> +            static const TCGTargetOpDef dep
+> +                = { .args_ct_str = { "r", "rZ", "r" } };
+> +            return &dep;
+>           }
+> +    case INDEX_op_setcond_i32:
+> +    case INDEX_op_setcond_i64:
+> +        {
+> +            static const TCGTargetOpDef setc
+> +                = { .args_ct_str = { "r", "r", "rC" } };
+> +            return &setc;
+> +        }
+> +    case INDEX_op_movcond_i32:
+> +    case INDEX_op_movcond_i64:
+> +        {
+> +            static const TCGTargetOpDef movc
+> +                = { .args_ct_str = { "r", "r", "rC", "r", "0" } };
+> +            return &movc;
+> +        }
+> +    case INDEX_op_div2_i32:
+> +    case INDEX_op_div2_i64:
+> +    case INDEX_op_divu2_i32:
+> +    case INDEX_op_divu2_i64:
+> +        {
+> +            static const TCGTargetOpDef div2
+> +                = { .args_ct_str = { "b", "a", "0", "1", "r" } };
+> +            return &div2;
+> +        }
+> +    case INDEX_op_mulu2_i64:
+> +        {
+> +            static const TCGTargetOpDef mul2
+> +                = { .args_ct_str = { "b", "a", "0", "r" } };
+> +            return &mul2;
+> +        }
+> +    case INDEX_op_add2_i32:
+> +    case INDEX_op_add2_i64:
+> +    case INDEX_op_sub2_i32:
+> +    case INDEX_op_sub2_i64:
+> +        {
+> +            static const TCGTargetOpDef arith2
+> +                = { .args_ct_str = { "r", "r", "0", "1", "rA", "r" } };
+> +            return &arith2;
+> +        }
+> +
+> +    default:
+> +        break;
 >       }
->   
+>       return NULL;
+>   }
 > 
