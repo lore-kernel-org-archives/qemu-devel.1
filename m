@@ -1,38 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dmyqD-0005Vu-22
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:59:18 -0400
+	(envelope-from <kchamart@redhat.com>) id 1dmywC-00021c-JH
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 05:05:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dmyq9-0006xP-W7
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:59:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47294)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dmyq9-0006wg-Mp
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:59:13 -0400
-Date: Wed, 30 Aug 2017 10:59:01 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170830105901.6c1632ef.cohuck@redhat.com>
-In-Reply-To: <897a578e-2375-b892-10af-879b8cc6136b@redhat.com>
-References: <20170816082650.21880-1-cohuck@redhat.com>
-	<223c4e3c-097f-5a91-37fa-df4bfb427d60@redhat.com>
-	<CAFEAcA_UfM_XNKdc5zfHsehoRE6Q+EszRZX3FByskir7c+0Lww@mail.gmail.com>
-	<20170822010917.GO12356@umbus.fritz.box>
-	<CAFEAcA8wbRjjJYtk-65NJEsu-ELVdKgtwreipabSaMtLTfS--Q@mail.gmail.com>
-	<3f0dc918-0f55-e2f4-bf47-fe4abf5453bb@redhat.com>
-	<CAFEAcA_ezKWweEuUB-cXTer0LLaeuiGDkSdfhApedhw4ykDT0Q@mail.gmail.com>
-	<20170822112046.GC12356@umbus.fritz.box>
-	<20170822134815.77020eb8.cohuck@redhat.com>
-	<20170823002907.GC5379@umbus.fritz.box>
-	<20170823091650.48e7c44e.cohuck@redhat.com>
-	<54526d47-b436-79d5-7a38-9516eaa727a6@redhat.com>
-	<5b0ff74a-08d6-558d-4c79-a93758e6302a@redhat.com>
-	<0bb344a3-f8f8-3365-cef1-1c68cf7d160d@redhat.com>
-	<20170823142047.366068f7.cohuck@redhat.com>
-	<897a578e-2375-b892-10af-879b8cc6136b@redhat.com>
+	(envelope-from <kchamart@redhat.com>) id 1dmyw8-0002C6-Me
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 05:05:28 -0400
+Date: Wed, 30 Aug 2017 11:05:08 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170830090508.pvllzkp6swbxyoip@eukaryote>
+References: <20170829165058.8229-1-kchamart@redhat.com>
+	<CAJSP0QUSXyb8MNVf6Tq8hLgb2wVWLX6GVAPgG-mmrGCxAEOcXg@mail.gmail.com>
+	<defa8205-e31e-9199-c929-f2e22849e8c7@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] make check speed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <defa8205-e31e-9199-c929-f2e22849e8c7@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3] qemu-iotests: Extend
+ non-shared storage migration test (194)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,63 +25,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <mlureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Cam Macdonell <cam@cs.ualberta.ca>
+To: Eric Blake <eblake@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Dave Gilbert <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Thu, 24 Aug 2017 07:27:18 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 23.08.2017 14:20, Cornelia Huck wrote:
-
-> > So I tried this on master just for fun, and 'make V=1 SPEED=slow
-> > check-qtest-x86_64' promptly failed for some ivshmem test.
-> > 
-> > On x86_86:
-> > TEST: tests/ivshmem-test... (pid=3672)
-> >   /x86_64/ivshmem/single:                                              OK
-> >   /x86_64/ivshmem/hotplug:                                             OK
-> >   /x86_64/ivshmem/memdev:                                              OK
-> >   /x86_64/ivshmem/pair:                                                OK
-> >   /x86_64/ivshmem/server-msi:                                          **
-> > ERROR:/home/cohuck/git/qemu/tests/ivshmem-test.c:367:test_ivshmem_server: assertion failed (ret == 0): (1 == 0)
-> > FAIL
-> > GTester: last random seed: R02Scde8fd6835fdf17450c73e2f74f25007
-> > (pid=3697)
-> >  /x86_64/ivshmem/server-irq:                                          OK
-> > FAIL: tests/ivshmem-test
-
-I think this one is understood now...
-
-> > 
-> > On s390x:
-> > TEST: tests/ivshmem-test... (pid=63617)
-> >   /x86_64/ivshmem/single:                                              OK
-> >   /x86_64/ivshmem/hotplug:                                             OK
-> >   /x86_64/ivshmem/memdev:                                              OK
-> >   /x86_64/ivshmem/pair:                                                OK
-> >   /x86_64/ivshmem/server-msi:                                          qemu-system-x86_64: -device ivshmem-doorbell,chardev=chr0,vectors=2: server sent invalid ID message
-> > Broken pipe
-> > FAIL
-> > GTester: last random seed: R02Sda000f7be5ce27b3dfbb03d12f297b69
-> > (pid=63640)
-> >   /x86_64/ivshmem/server-irq:                                          qemu-system-x86_64: -device ivshmem,size=1M,msi=off,chardev=chr0,vectors=2: server sent invalid ID message
-> > Broken pipe
-> > FAIL
-> > GTester: last random seed: R02S5a236dbcac35545cc34c0131fbc06162
-> > (pid=63648)
-> > FAIL: tests/ivshmem-test
-
-...but this is a different problem (i.e., it can't be tracked down to
-commit b4ba67d9a7). I'm not sure whether that one ever worked. Might be
-an endianness problem (a quick test on another BE platform could
-confirm.)
-
-> > 
-> > Both machines are on Fedora 26.  
+On Tue, Aug 29, 2017 at 04:16:54PM -0500, Eric Blake wrote:
+> On 08/29/2017 12:42 PM, Stefan Hajnoczi wrote:
+> > On Tue, Aug 29, 2017 at 5:50 PM, Kashyap Chamarthy <kchamart@redhat.com> wrote:
+> >> This is the follow-up patch that was discussed[*] as part of feedback to
+> >> qemu-iotest 194.
+> >>
 > 
-> The ivshmem test fails for me with SPEED=slow, too (on a x86 RHEL7
-> machine). Looks like it is definitely broken. Could anybody with some
-> ivshmem knowledge please have a look at this?
+> >> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+> >> ---
+> >> Changes in v3:
+> >>  - Wait for migration to complete before issuing `block-job-cancel`
+> >>    (StefanH)
+> >>  - Wait for the event BLOCK_JOB_COMPLETED on the source before stopping
+> >>    the NBD server on the destination (StefanH)
+> >>
+> >> Changes in v2:
+> >>  - Check for both the events: MIGRATION and BLOCK_JOB_COMPLETED (EricB)
+> >> ---
+> >>  tests/qemu-iotests/194     | 23 +++++++++++++++++------
+> >>  tests/qemu-iotests/194.out | 11 ++++++++---
+> >>  2 files changed, 25 insertions(+), 9 deletions(-)
+> > 
+> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 > 
->  Thanks,
->   Thomas
+> Thanks; I've added this to my NBD queue (pull request to come shortly
+> after 2.11 release is finalized), since the test uses NBD.
+
+Sure, thanks for the quick reviews, both!
+
+-- 
+/kashyap
