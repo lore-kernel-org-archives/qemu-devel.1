@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dn2Ez-0004zp-Sh
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:37:11 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dn2GS-0005ms-I4
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:38:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dn2Ew-0006sH-0N
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:37:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44940)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dn2Ev-0006s3-QL
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:37:01 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B4ACB552EA
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 12:37:00 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170825105913.4060-1-marcandre.lureau@redhat.com>
-	<20170825105913.4060-13-marcandre.lureau@redhat.com>
-Date: Wed, 30 Aug 2017 14:36:57 +0200
-In-Reply-To: <20170825105913.4060-13-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Fri, 25 Aug 2017 12:59:11 +0200")
-Message-ID: <87ziahfd06.fsf@dusky.pond.sub.org>
+	(envelope-from <stefanha@gmail.com>) id 1dn2GO-0007Ht-KM
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:38:36 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:36410)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dn2GO-0007Hh-C1
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:38:32 -0400
+Received: by mail-wm0-x233.google.com with SMTP id u126so8969348wmg.1
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 05:38:32 -0700 (PDT)
+Date: Wed, 30 Aug 2017 13:38:27 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170830123827.GM24565@stefanha-x1.localdomain>
+References: <CAAeL1MGV5zSPq0OCVCsw4+xzRXm95z-yd_oN2__yskd6aUmESQ@mail.gmail.com>
+	<20170829100936.GP25960@stefanha-x1.localdomain>
+	<20170829204055.GD4428@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 12/14] qlit: improve QLit list vs qlist
- comparison
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170829204055.GD4428@localhost.localdomain>
+Subject: Re: [Qemu-devel] Make NVME device "migratable" (savevm)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,17 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Keith Busch <keith.busch@intel.com>
+Cc: Sergei Dyshel <qyron.private@gmail.com>, qemu-devel@nongnu.org
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+On Tue, Aug 29, 2017 at 04:40:55PM -0400, Keith Busch wrote:
+> On Tue, Aug 29, 2017 at 11:09:36AM +0100, Stefan Hajnoczi wrote:
+> > On Fri, Aug 25, 2017 at 11:39:30AM +0300, Sergei Dyshel wrote:
+> > > Hi all,
+> > > From what I understand, I can't "savevm" a VM that uses NVME device because
+> > > it has ".unmigratable = 1" in the code. What support must be implemented in
+> > > order to make it "migratable"?
+> > 
+> > CCing Keith Busch, the NVMe maintainer.
+> 
+> To make it migratable, you'll need implement the VMStateDescription to
+> save and restore the entire controller state, including all the queues.
+> It doesn't actually look like there's a much state to track compared to
+> other migratale devices, I just never got any time to write it out.
 
-> Use QLIST_FOREACH_ENTRY() to simplify the code and break earlier.
->
-> Check that the QLit list has the same size as the qlist, this should
-> ensure that we have an exact match when iterating over qlist for
-> comparing the elements.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+One thing unique to QEMU's block layer is that the -drive
+werror=/rerror= option lets the user specify an error handling policy
+for I/O requests.
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+If the policy is 'stop' or 'enospc' then the emulated storage controller
+must hang on to the I/O request and re-submit it when VM execution
+resumes (usually when the user issues the 'cont' command at the
+monitor).
+
+For example, if QEMU hits ENOSPC while writing a previously unwritten
+sector in the disk image file, then VM execution can be paused.  The
+host system administrator can arrange for more disk space and then issue
+the 'cont' QEMU monitor command.  This resumes the VM and QEMU retries
+the I/O request without ever reporting an I/O error to the guest.
+
+You can see how this is implemented in hw/block/virtio-blk.c and other
+emulated storage controllers.  This feature requires live migration
+support so that the list of failed I/O requests can be sent to the
+destination host during live migration.
+
+If you decide to enable live migration, please consider how this should
+be implemented for NVMe.
+
+Stefan
