@@ -1,38 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1dmzUx-0003yh-PV
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 05:41:25 -0400
+	(envelope-from <quintela@redhat.com>) id 1dmzYo-0006ah-J5
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 05:45:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1dmzUw-000730-CW
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 05:41:23 -0400
-Received: from mail-io0-x22d.google.com ([2607:f8b0:4001:c06::22d]:37497)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
-	id 1dmzUw-00072s-5E
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 05:41:22 -0400
-Received: by mail-io0-x22d.google.com with SMTP id d78so1867747ioe.4
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 02:41:22 -0700 (PDT)
+	(envelope-from <quintela@redhat.com>) id 1dmzYl-00085M-C4
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 05:45:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45422)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dmzYl-00084w-6X
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 05:45:19 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <6f537126-f1a6-2159-d8f7-35d34b803dfa@redhat.com> (Thomas Huth's
+	message of "Mon, 28 Aug 2017 18:10:09 +0200")
+References: <20170823083901.852-1-quintela@redhat.com>
+	<20170823083901.852-2-quintela@redhat.com>
+	<6f537126-f1a6-2159-d8f7-35d34b803dfa@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 30 Aug 2017 11:45:07 +0200
+Message-ID: <87a82h75jw.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20170829081305.7a2685c6@w520.home>
-References: <20170726113222.52aad9a6@w520.home>
-	<CAMxP3BTFgwJtjh78hNBCoxBp1WsnZMZLsqzb3McqCq=-SX0a4g@mail.gmail.com>
-	<20170731234626.7664be18@w520.home>
-	<CAMxP3BTfMad-ycWHqmW+aVM7rv2CJSv-dmEFUveGBqAWvfbBjQ@mail.gmail.com>
-	<20170801090158.35d18f10@w520.home>
-	<CAMxP3BRkzXBRPZw9fpCu-w4Fusn6ng_knk1cAz=EDBAiw9UnqA@mail.gmail.com>
-	<20170807095224.5438ef8c@w520.home>
-	<20170808230043-mutt-send-email-mst@kernel.org>
-	<CAMxP3BR=WHKJxcWKH27dcC7DTKGD2y7r12teAUSmMkwp1VDafA@mail.gmail.com>
-	<20170822105659.75b5c7e0@w520.home>
-	<20170822205940-mutt-send-email-mst@kernel.org>
-	<CAMxP3BSNPjRZGOULZ0zKBq8v5Rqv9f5xasx+BD57c=oAS5tSWg@mail.gmail.com>
-	<20170829081305.7a2685c6@w520.home>
-From: Bob Chen <a175818323@gmail.com>
-Date: Wed, 30 Aug 2017 17:41:20 +0800
-Message-ID: <CAMxP3BRFzyyHemEW-2DFRd7r9Py-bkjY7vQRNeBfuhN0XKupJQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] =?utf-8?q?About_virtio_device_hotplug_in_Q35!_?=
-	=?utf-8?b?44CQ5aSW5Z+f6YKu5Lu2LuiwqOaFjuafpemYheOAkQ==?=
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/2] tests: Use real size for iov tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,84 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?B?6ZmI5Y2a?= <chenbo02@meituan.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, peterx@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
 
-I think I have observed what you said...
+Thomas Huth <thuth@redhat.com> wrote:
+> On 23.08.2017 10:39, Juan Quintela wrote:
+>> We were using -1 instead of the real size because the functions check
+>> what is bigger, size in bytes or the size of the iov.  Recent gcc's
+>> barf at this.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  tests/test-iov.c | 8 ++++----
+>>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> While you're at it, could you maybe also adjust the comments in
+> include/qemu/iov.h ? It currently says:
+>
+>  * It is okay to use very large value for `bytes' since we're
+>  * limited by the size of the iovec anyway, provided that the
+>  * buffer pointed to by buf has enough space.  One possible
+>  * such "large" value is -1 (sinice size_t is unsigned),
+>  * so specifying `-1' as `bytes' means 'up to the end of iovec'.
 
-The link speed on host remained 8GT/s until I finished running
-p2pBandwidthLatencyTest
-for the first time. Then it became 2.5GT/s...
+Haven't found this.  Fixing.
 
+>
+> ... and apparently -1 is not working anymore as expected. Maybe SIZE_MAX
+> from stdint.h is a better choice?
 
-# lspci -s 09:00.0 -vvv
-09:00.0 3D controller: NVIDIA Corporation GM204GL [Tesla M60] (rev a1)
-Subsystem: NVIDIA Corporation Device 115e
-Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr+
-Stepping- SERR+ FastB2B- DisINTx-
-Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort-
-<MAbort- >SERR- <PERR- INTx-
-Latency: 0, Cache Line Size: 32 bytes
-Interrupt: pin A routed to IRQ 7
-NUMA node: 0
-Region 0: Memory at 92000000 (32-bit, non-prefetchable) [size=16M]
-Region 1: Memory at 3b800000000 (64-bit, prefetchable) [size=8G]
-Region 3: Memory at 3ba00000000 (64-bit, prefetchable) [size=32M]
-Capabilities: [60] Power Management version 3
-Flags: PMEClk- DSI- D1- D2- AuxCurrent=0mA PME(D0-,D1-,D2-,D3hot-,D3cold-)
-Status: D0 NoSoftRst+ PME-Enable- DSel=0 DScale=0 PME-
-Capabilities: [68] MSI: Enable- Count=1/1 Maskable- 64bit+
-Address: 0000000000000000  Data: 0000
-Capabilities: [78] Express (v2) Endpoint, MSI 00
-DevCap: MaxPayload 256 bytes, PhantFunc 0, Latency L0s unlimited, L1 <64us
-ExtTag+ AttnBtn- AttnInd- PwrInd- RBE+ FLReset- SlotPowerLimit 25.000W
-DevCtl: Report errors: Correctable+ Non-Fatal+ Fatal+ Unsupported-
-RlxdOrd+ ExtTag- PhantFunc- AuxPwr- NoSnoop+
-MaxPayload 256 bytes, MaxReadReq 512 bytes
-DevSta: CorrErr+ UncorrErr- FatalErr- UnsuppReq+ AuxPwr- TransPend-
-LnkCap: Port #16, Speed 8GT/s, Width x16, ASPM not supported, Exit Latency
-L0s <1us, L1 <4us
-ClockPM+ Surprise- LLActRep- BwNot- ASPMOptComp+
-LnkCtl: ASPM Disabled; RCB 64 bytes Disabled- CommClk-
-ExtSynch- ClockPM- AutWidDis- BWInt- AutBWInt-
-LnkSta: Speed 8GT/s, Width x16, TrErr- Train- SlotClk+ DLActive- BWMgmt-
-ABWMgmt-
-DevCap2: Completion Timeout: Range AB, TimeoutDis+, LTR+, OBFF Via message
-DevCtl2: Completion Timeout: 50us to 50ms, TimeoutDis-, LTR-, OBFF Disabled
-LnkCtl2: Target Link Speed: 8GT/s, EnterCompliance- SpeedDis-
-Transmit Margin: Normal Operating Range, EnterModifiedCompliance-
-ComplianceSOS-
-Compliance De-emphasis: -6dB
-LnkSta2: Current De-emphasis Level: -6dB, EqualizationComplete+,
-EqualizationPhase1+
-EqualizationPhase2+, EqualizationPhase3+, LinkEqualizationRequest-
-Capabilities: [100 v1] Virtual Channel
-Caps: LPEVC=0 RefClk=100ns PATEntryBits=1
-Arb: Fixed- WRR32- WRR64- WRR128-
-Ctrl: ArbSelect=Fixed
-Status: InProgress-
-VC0: Caps: PATOffset=00 MaxTimeSlots=1 RejSnoopTrans-
-Arb: Fixed- WRR32- WRR64- WRR128- TWRR128- WRR256-
-Ctrl: Enable+ ID=0 ArbSelect=Fixed TC/VC=ff
-Status: NegoPending- InProgress-
-Capabilities: [250 v1] Latency Tolerance Reporting
-Max snoop latency: 0ns
-Max no snoop latency: 0ns
-Capabilities: [258 v1] L1 PM Substates
-L1SubCap: PCI-PM_L1.2- PCI-PM_L1.1- ASPM_L1.2- ASPM_L1.1- L1_PM_Substates+
-Capabilities: [128 v1] Power Budgeting <?>
-Capabilities: [420 v2] Advanced Error Reporting
-UESta: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP-
-ECRC- UnsupReq- ACSViol-
-UEMsk: DLP- SDES- TLP- FCP- CmpltTO- CmpltAbrt- UnxCmplt- RxOF- MalfTLP-
-ECRC- UnsupReq- ACSViol-
-UESvrt: DLP+ SDES+ TLP- FCP+ CmpltTO- CmpltAbrt- UnxCmplt- RxOF+ MalfTLP+
-ECRC- UnsupReq- ACSViol-
-CESta: RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFatalErr-
-CEMsk: RxErr- BadTLP- BadDLLP- Rollover- Timeout- NonFatalErr+
-AERCap: First Error Pointer: 00, GenCap- CGenEn- ChkCap- ChkEn-
-Capabilities: [600 v1] Vendor Specific Information: ID=0001 Rev=1 Len=024
-<?>
-Capabilities: [900 v1] #19
-Kernel driver in use: vfio-pci
-Kernel modules: nouveau
+Compiler get confused with it, because we have _new_ values, see the
+warning on the cover, I *think* that in this one, the compiler is *kind*
+of right. (*)
+
+>  Thomas
+
+Later, Juan.
+
+(*) see the warning, I think that it gets a bit confused, but generaly,
+    we are just abusing the interface, and anyways, we are using in real
+    code the real size, and in the test, it was easy to change
+    everything to the real size, so I think it is better just to remove
+    *that* feature.
