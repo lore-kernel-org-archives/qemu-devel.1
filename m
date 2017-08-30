@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dn3wf-0006I5-5O
+	(envelope-from <stefanha@gmail.com>) id 1dn3wk-0006IB-SH
 	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:26:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dn3wb-0000Mp-Sc
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:26:17 -0400
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed, 30 Aug 2017 16:26:10 +0200
-Message-Id: <1504103170-259479-1-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1504099475-241036-9-git-send-email-imammedo@redhat.com>
-References: <1504099475-241036-9-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 9/8] fixup! ppc: remove non implemented cpu
- models
+	(envelope-from <stefanha@gmail.com>) id 1dn3wh-0000OW-J6
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:26:22 -0400
+Date: Wed, 30 Aug 2017 15:26:15 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170830142615.GT24565@stefanha-x1.localdomain>
+References: <20170822131832.20191-1-pbonzini@redhat.com>
+	<20170822131832.20191-7-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170822131832.20191-7-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 06/10] scsi,
+ file-posix: add support for persistent reservation management
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,35 +24,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
 
-only TODO escaped defines were meant to be removed,
-but not TODO_USER_ONLY which are compiled in case of
-*-user targets.
+On Tue, Aug 22, 2017 at 03:18:28PM +0200, Paolo Bonzini wrote:
+> +#ifdef CONFIG_LINUX
+> +PRManager *pr_manager_lookup(const char *id, Error **errp);
+> +#else
+> +static inline PRManager *pr_manager_lookup(const char *id,
+> +                                                              Error **errp)
 
-So retirn back "440" model removed by mistake
+Indentation
 
-Spotted-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
- target/ppc/cpu-models.c | 4 ++++
- 1 file changed, 4 insertions(+)
+> diff --git a/scsi/pr-manager.c b/scsi/pr-manager.c
+> new file mode 100644
+> index 0000000000..e80f8d9b31
+> --- /dev/null
+> +++ b/scsi/pr-manager.c
+> @@ -0,0 +1,109 @@
+> +/*
+> + * Persistent reservation manager abstract class
+> + *
+> + * Copyright (c) 2017 Red Hat, Inc.
+> + *
+> + * Author: Paolo Bonzini <pbonzini@redhat.com>
+> + *
+> + * This code is licensed under the LGPL.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "block/aio.h"
+> +#include "block/thread-pool.h"
+> +#include "scsi/pr-manager.h"
+> +#include "scsi/trace.h"
+> +
+> +#include <scsi/sg.h>
 
-diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
-index 611fc1b..08fb34b 100644
---- a/target/ppc/cpu-models.c
-+++ b/target/ppc/cpu-models.c
-@@ -150,6 +150,10 @@
-     POWERPC_DEF("x2vp20",        CPU_POWERPC_X2VP20,                 405,
-                 NULL)
-     /* PowerPC 440 family                                                    */
-+#if defined(TODO_USER_ONLY)
-+    POWERPC_DEF("440",           CPU_POWERPC_440,                    440GP,
-+                "Generic PowerPC 440")
-+#endif
-     /* PowerPC 440 cores                                                     */
-     POWERPC_DEF("440-xilinx",    CPU_POWERPC_440_XILINX,             440x5,
-                 "PowerPC 440 Xilinx 5")
--- 
-2.7.4
+HACKING "1.2. Include directives" defines the order of #includes.  It
+should be "qemu/osdep.h", <scsi/sg.h>, followed by all other QEMU
+headers.
