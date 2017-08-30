@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dn4Yj-0007SR-GB
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 11:05:38 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dn4ba-00010U-0G
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 11:08:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dn4Yf-0006CR-56
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 11:05:37 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:38055)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dn4Ye-0006CH-Tr
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 11:05:33 -0400
-Received: by mail-wr0-x229.google.com with SMTP id 40so18780929wrv.5
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 08:05:32 -0700 (PDT)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dn4bW-0007el-HL
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 11:08:33 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:22458)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dn4bW-0007dB-7s
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 11:08:30 -0400
+References: <1504016587-39779-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<w51fuc98di8.fsf@maestria.local.igalia.com>
+	<9b24c28f-f891-1046-f09f-bffded9e316f@huawei.com>
+	<w51bmmx85so.fsf@maestria.local.igalia.com>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <f6cdc881-39a4-92f6-c218-a57516ca0921@huawei.com>
+Date: Wed, 30 Aug 2017 17:07:29 +0200
 MIME-Version: 1.0
-In-Reply-To: <1198198789.1361162.1504105075026.JavaMail.zimbra@research.iiit.ac.in>
-References: <1504025019-16820-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-	<1504025019-16820-2-git-send-email-chugh.ishani@research.iiit.ac.in>
-	<20170830042133.GG4208@lemon.lan>
-	<1198198789.1361162.1504105075026.JavaMail.zimbra@research.iiit.ac.in>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 30 Aug 2017 16:05:30 +0100
-Message-ID: <CAJSP0QWvOoRpNmSsw-V6jVjcc6Eyf=rSH_Qjpe3uGNAT5C7q6g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] backup: QEMU Backup Tool
+In-Reply-To: <w51bmmx85so.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v8 0/6] fsdev: qmp interface for io
+ throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ishani <chugh.ishani@research.iiit.ac.in>
-Cc: Fam Zheng <famz@redhat.com>, jsnow <jsnow@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, stefanha <stefanha@redhat.com>
+To: Alberto Garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
+Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-On Wed, Aug 30, 2017 at 3:57 PM, Ishani
-<chugh.ishani@research.iiit.ac.in> wrote:
-> ----- On Aug 30, 2017, at 9:51 AM, Fam Zheng famz@redhat.com wrote:
+On 8/30/2017 4:54 PM, Alberto Garcia wrote:
+> On Wed 30 Aug 2017 02:10:53 PM CEST, Pradeep Jagadeesh wrote:
 >
->> On Tue, 08/29 22:13, Ishani Chugh wrote:
->>> +class BackupTool(object):
->>> +    """BackupTool Class"""
->>> +    def __init__(self, config_file=os.path.expanduser('~') +
->>> +                 '/.config/qemu/qemu-backup-config'):
->>> +        if "QEMU_BACKUP_CONFIG" in os.environ:
->>> +            self.config_file = os.environ["QEMU_BACKUP_CONFIG"]
->>> +        else:
->>> +            self.config_file = config_file
->>> +            try:
->>> +                if not os.path.isdir(os.path.dirname(self.config_file)):
->>> +                    os.makedirs(os.path.dirname(self.config_file))
->>> +            except:
->>> +                print("Cannot create config directory", file=sys.stderr)
->>> +                sys.exit(1)
->>> +        self.config = configparser.ConfigParser()
->>> +        self.config.read(self.config_file)
->>
->> I suggest adding versioning to the config file, so that a future update to this
->> tool can make an incompatible change without breaking older tool:
->>
->> [general]
->> version=0.1
->>
->> [guest_1]
->> ...
->>
->> [guest_2]
->> ...
->>
->> And only continue if the version is known.
->>
->> Fam
+>>> I'm trying to read from an 9p share that has limits set with hmp
+>>> fsdev_set_io_throttle and I'm having some problems.
 >
-> I could not understand the intention behind adding versioning to config file.
-> Can you please elaborate a little on what is meant by incompatible change?
+> Here's one simple way to reproduce it:
+>
+> 1) Launch qemu with
+>
+>    -fsdev local,security_model=none,id=fs0,path=/some/files
+>    -device virtio-9p-pci,fsdev=fs0,mount_tag=fs0
+>
+> 2) In the guest, mount the fs0 share in /mnt
+>
+> 3) Run this hmp command
+>
+>    fsdev_set_io_throttle fs0 0 4096 0 0 0 0
+>
+> 4) In the guest, start reading some large file from the 9p share:
+>
+>    dd if=/mnt/large_file of=/dev/null bs=4k iflag=direct status=progress
+>
+> 5) Check the progress, reading speed should be around 4k per second.
+>
+> 6) While dd is still running, change the I/O limits:
+>
+>    fsdev_set_io_throttle fs0 0 8192 0 0 0 0
+>
+> 7) If you check the status of the dd command, reading should be faster
+>    now. Instead, it is stalled.
 
-If a new feature is added to qemu-backup in the future then it's
-possible a user might have 2 machines, one with the old qemu-backup
-version and one with the new qemu-backup.
+Thanks for the steps, I did reproduce the issue easily.
+Looking into the code, may be we also need to try the same with the 
+block devices.
 
-When the new qemu-backup adds things to the configuration file the old
-qemu-backup wouldn't know (because the code only queries the
-configuration parameters it knows about).  Running the old qemu-backup
-again could conflict with the new configuration.
-
-Fam is suggesting putting a version number into the configuration
-file.  This way the old qemu-backup can refuse to run with a newer
-configuration file.
-
-It also makes it possible for a new qemu-backup to detect that the
-last run was with an older version so it can upgrade the configuration
-file, if necessary.
-
-Stefan
+-Pradeep
+>
+> Berto
+>
