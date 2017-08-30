@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dn1gL-00089g-41
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:01:18 -0400
+	(envelope-from <armbru@redhat.com>) id 1dn1hE-0000I9-SK
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:02:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dn1gF-0002Ci-DD
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:01:17 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:33316)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dn1gF-0002BW-6c
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:01:11 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id k94so17905934wrc.0
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 05:01:10 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1dn1h9-0002yg-Ec
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:02:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36788)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dn1h9-0002yG-7z
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:02:07 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170825105913.4060-1-marcandre.lureau@redhat.com>
+	<20170825105913.4060-2-marcandre.lureau@redhat.com>
+	<8b2a2be0-cf5f-29e4-b204-1da6b20539b7@redhat.com>
+Date: Wed, 30 Aug 2017 14:01:28 +0200
+In-Reply-To: <8b2a2be0-cf5f-29e4-b204-1da6b20539b7@redhat.com> (Eric Blake's
+	message of "Fri, 25 Aug 2017 10:31:56 -0500")
+Message-ID: <87r2vtgt7r.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <838020276.255029.1504093138506@mail.yahoo.com>
-References: <1915302638.2814146.1504030043465.ref@mail.yahoo.com>
-	<1915302638.2814146.1504030043465@mail.yahoo.com>
-	<14033890-2a35-666c-2fa7-5a8727090801@tuxfamily.org>
-	<1075529669.195794.1504079702032@mail.yahoo.com>
-	<bc7bacd9-fec7-c193-6de0-99d1f7fd0f6f@tuxfamily.org>
-	<2061420835.208824.1504085337258@mail.yahoo.com>
-	<20170830121109.7fab5559@bahia>
-	<61cd0715-27e4-7e50-1e85-9da3b4a48bb1@posteo.de>
-	<1735515901.247981.1504090406495@mail.yahoo.com>
-	<838020276.255029.1504093138506@mail.yahoo.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 30 Aug 2017 13:00:49 +0100
-Message-ID: <CAFEAcA9bUktbR2iFEthjmKci=a3syS_2sjkbdfzx3ruZXWMMJw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-discuss] Accessing a shared folder
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 01/14] qdict: add qdict_put_null() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,32 +29,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mahmood <nt_mahmood@yahoo.com>
-Cc: Thomas Huth <th.huth@posteo.de>, Greg Kurz <groug@kaod.org>, Thomas Huth <huth@tuxfamily.org>, QEMU Developers <qemu-devel@nongnu.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 30 August 2017 at 12:38, Mahmood <nt_mahmood@yahoo.com> wrote:
-> Hello again,I installed 2.5.0 quickly and it was pretty straight forward!
+Eric Blake <eblake@redhat.com> writes:
+
+> On 08/25/2017 05:59 AM, Marc-Andr=C3=A9 Lureau wrote:
+>> A step towards completeness.
+>>=20
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  include/qapi/qmp/qdict.h | 4 +++-
+>>  target/i386/cpu.c        | 4 ++--
+>>  2 files changed, 5 insertions(+), 3 deletions(-)
 >
-> Here is the error message I get regarding the 'virtio-9p-pci'
-> 'virtio-9p-pci' is not a valid device model name
+> Is it worth touching up scripts/coccinelle/qobject.cocci at the same time?
 
-Are you building your own QEMU binary or is it from somewhere
-else? I wonder if it was built without support for the 9p
-filesystem code. For this to be enabled:
- * host machine must be Linux
- * system building QEMU must have libcap development package installed
+Let's keep it up-to-date.  I can do it when I apply.
 
-If you're building it yourself then you can pass configure
-'--enable-virtfs' which will mean configure will stop with
-an error if it can't enable virtfs rather than just disabling
-this optional feature.
+> I guess we don't care about a qlist_append_null() variant?
 
-QEMU ought to produce a helpful error if you try to use -virtfs
-when virtfs wasn't compiled in, but it may be that this check
-was broken accidentally at some point.
-
-Also, 2.5.0 is a couple of years old, you might try with 2.9.0
-(or even with the 2.10.0 we're about to release today).
-
-thanks
--- PMM
+Only if we have users.
