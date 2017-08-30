@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dn7Om-0001xL-Mp
+	(envelope-from <eblake@redhat.com>) id 1dn7Ol-0001wF-Op
 	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:07:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dn7Ol-0001ch-Nh
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:07:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1dn7Oj-0001bw-O2
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:07:31 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 30 Aug 2017 13:07:08 -0500
-Message-Id: <20170830180711.7974-9-eblake@redhat.com>
+Date: Wed, 30 Aug 2017 13:07:04 -0500
+Message-Id: <20170830180711.7974-5-eblake@redhat.com>
 In-Reply-To: <20170830180711.7974-1-eblake@redhat.com>
 References: <20170830180711.7974-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 08/11] nbd/client: fix nbd_send_request to
- return int
+Subject: [Qemu-devel] [PULL 04/11] qemu-iotests: test NBD over UNIX domain
+ sockets in 083
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,47 +21,440 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Fix nbd_send_request to return int, as it returns a return value
-of nbd_write (which is int), and the only user of nbd_send_request's
-return value (nbd_co_send_request) consider it as int too.
+083 only tests TCP.  Some failures might be specific to UNIX domain
+sockets.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20170804151440.320927-5-vsementsov@virtuozzo.com>
+A few adjustments are necessary:
+
+1. Generating a port number and waiting for server startup is
+   TCP-specific.  Use the new nbd-fault-injector.py startup protocol to
+   fetch the address.  This is a little more elegant because we don't
+   need netstat anymore.
+
+2. The NBD filter does not work for the UNIX domain sockets URIs we
+   generate and must be extended.
+
+3. Run all tests twice: once for TCP and once for UNIX domain sockets.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20170829122745.14309-4-stefanha@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- include/block/nbd.h | 2 +-
- nbd/client.c        | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/common.filter |   4 +-
+ tests/qemu-iotests/083           | 138 +++++++++++++++++++++++--------------
+ tests/qemu-iotests/083.out       | 145 ++++++++++++++++++++++++++++++++++-----
+ 3 files changed, 215 insertions(+), 72 deletions(-)
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index f7450608b4..040cdd2e60 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -163,7 +163,7 @@ int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-                           Error **errp);
- int nbd_init(int fd, QIOChannelSocket *sioc, NBDExportInfo *info,
-              Error **errp);
--ssize_t nbd_send_request(QIOChannel *ioc, NBDRequest *request);
-+int nbd_send_request(QIOChannel *ioc, NBDRequest *request);
- int nbd_receive_reply(QIOChannel *ioc, NBDReply *reply, Error **errp);
- int nbd_client(int fd);
- int nbd_disconnect(int fd);
-diff --git a/nbd/client.c b/nbd/client.c
-index f8c213bc96..68a0bc1ffc 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -896,7 +896,7 @@ int nbd_disconnect(int fd)
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
+index 7a58e57317..9d5442ecd9 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -170,9 +170,9 @@ _filter_nbd()
+     #
+     # Filter out the TCP port number since this changes between runs.
+     sed -e '/nbd\/.*\.c:/d' \
+-        -e 's#nbd:\(//\)\?127\.0\.0\.1:[0-9]*#nbd:\1127.0.0.1:PORT#g' \
++        -e 's#127\.0\.0\.1:[0-9]*#127.0.0.1:PORT#g' \
+         -e "s#?socket=$TEST_DIR#?socket=TEST_DIR#g" \
+-        -e 's#\(exportname=foo\|PORT\): Failed to .*$#\1#'
++        -e 's#\(foo\|PORT/\?\|.sock\): Failed to .*$#\1#'
  }
- #endif
 
--ssize_t nbd_send_request(QIOChannel *ioc, NBDRequest *request)
-+int nbd_send_request(QIOChannel *ioc, NBDRequest *request)
- {
-     uint8_t buf[NBD_REQUEST_SIZE];
+ # make sure this script returns success
+diff --git a/tests/qemu-iotests/083 b/tests/qemu-iotests/083
+index bff9360048..0306f112da 100755
+--- a/tests/qemu-iotests/083
++++ b/tests/qemu-iotests/083
+@@ -27,6 +27,14 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1	# failure is the default!
+
++_cleanup()
++{
++	rm -f nbd.sock
++	rm -f nbd-fault-injector.out
++	rm -f nbd-fault-injector.conf
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
+ # get standard environment, filters and checks
+ . ./common.rc
+ . ./common.filter
+@@ -35,81 +43,105 @@ _supported_fmt generic
+ _supported_proto nbd
+ _supported_os Linux
+
+-# Pick a TCP port based on our pid.  This way multiple instances of this test
+-# can run in parallel without conflicting.
+-choose_tcp_port() {
+-	echo $((($$ % 31744) + 1024)) # 1024 <= port < 32768
+-}
+-
+-wait_for_tcp_port() {
+-	while ! (netstat --tcp --listening --numeric | \
+-		 grep "$1.*0\\.0\\.0\\.0:\\*.*LISTEN") >/dev/null 2>&1; do
+-		sleep 0.1
+-	done
+-}
+-
+ check_disconnect() {
++	local event export_name=foo extra_args nbd_addr nbd_url proto when
++
++	while true; do
++		case $1 in
++		--classic-negotiation)
++			shift
++			extra_args=--classic-negotiation
++			export_name=
++			;;
++		--tcp)
++			shift
++			proto=tcp
++			;;
++		--unix)
++			shift
++			proto=unix
++			;;
++		*)
++			break
++			;;
++		esac
++	done
++
+ 	event=$1
+ 	when=$2
+-	negotiation=$3
+ 	echo "=== Check disconnect $when $event ==="
+ 	echo
+
+-	port=$(choose_tcp_port)
+-
+ 	cat > "$TEST_DIR/nbd-fault-injector.conf" <<EOF
+ [inject-error]
+ event=$event
+ when=$when
+ EOF
+
+-	if [ "$negotiation" = "--classic-negotiation" ]; then
+-		extra_args=--classic-negotiation
+-		nbd_url="nbd:127.0.0.1:$port"
++	if [ "$proto" = "tcp" ]; then
++		nbd_addr="127.0.0.1:0"
+ 	else
+-		nbd_url="nbd:127.0.0.1:$port:exportname=foo"
++		nbd_addr="$TEST_DIR/nbd.sock"
++	fi
++
++	rm -f "$TEST_DIR/nbd.sock"
++
++	$PYTHON nbd-fault-injector.py $extra_args "$nbd_addr" "$TEST_DIR/nbd-fault-injector.conf" >"$TEST_DIR/nbd-fault-injector.out" 2>&1 &
++
++	# Wait for server to be ready
++	while ! grep -q 'Listening on ' "$TEST_DIR/nbd-fault-injector.out"; do
++		sleep 0.1
++	done
++
++	# Extract the final address (port number has now been assigned in tcp case)
++	nbd_addr=$(sed 's/Listening on \(.*\)$/\1/' "$TEST_DIR/nbd-fault-injector.out")
++
++	if [ "$proto" = "tcp" ]; then
++		nbd_url="nbd+tcp://$nbd_addr/$export_name"
++	else
++		nbd_url="nbd+unix:///$export_name?socket=$nbd_addr"
+ 	fi
+
+-	$PYTHON nbd-fault-injector.py $extra_args "127.0.0.1:$port" "$TEST_DIR/nbd-fault-injector.conf" >/dev/null 2>&1 &
+-	wait_for_tcp_port "127\\.0\\.0\\.1:$port"
+ 	$QEMU_IO -c "read 0 512" "$nbd_url" 2>&1 | _filter_qemu_io | _filter_nbd
+
+ 	echo
+ }
+
+-for event in neg1 "export" neg2 request reply data; do
+-	for when in before after; do
+-		check_disconnect "$event" "$when"
+-	done
+-
+-	# Also inject short replies from the NBD server
+-	case "$event" in
+-	neg1)
+-		for when in 8 16; do
+-			check_disconnect "$event" "$when"
+-		done
+-		;;
+-	"export")
+-		for when in 4 12 16; do
+-			check_disconnect "$event" "$when"
+-		done
+-		;;
+-	neg2)
+-		for when in 8 10; do
+-			check_disconnect "$event" "$when"
++for proto in tcp unix; do
++	for event in neg1 "export" neg2 request reply data; do
++		for when in before after; do
++			check_disconnect "--$proto" "$event" "$when"
+ 		done
+-		;;
+-	reply)
+-		for when in 4 8; do
+-			check_disconnect "$event" "$when"
+-		done
+-		;;
+-	esac
+-done
+
+-# Also check classic negotiation without export information
+-for when in before 8 16 24 28 after; do
+-	check_disconnect "neg-classic" "$when" --classic-negotiation
++		# Also inject short replies from the NBD server
++		case "$event" in
++		neg1)
++			for when in 8 16; do
++				check_disconnect "--$proto" "$event" "$when"
++			done
++			;;
++		"export")
++			for when in 4 12 16; do
++				check_disconnect "--$proto" "$event" "$when"
++			done
++			;;
++		neg2)
++			for when in 8 10; do
++				check_disconnect "--$proto" "$event" "$when"
++			done
++			;;
++		reply)
++			for when in 4 8; do
++				check_disconnect "--$proto" "$event" "$when"
++			done
++			;;
++		esac
++	done
++
++	# Also check classic negotiation without export information
++	for when in before 8 16 24 28 after; do
++		check_disconnect "--$proto" --classic-negotiation "neg-classic" "$when"
++	done
+ done
+
+ # success, all done
+diff --git a/tests/qemu-iotests/083.out b/tests/qemu-iotests/083.out
+index a24c6bfece..a7fb081889 100644
+--- a/tests/qemu-iotests/083.out
++++ b/tests/qemu-iotests/083.out
+@@ -1,43 +1,43 @@
+ QA output created by 083
+ === Check disconnect before neg1 ===
+
+-can't open device nbd:127.0.0.1:PORT:exportname=foo
++can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ === Check disconnect after neg1 ===
+
+-can't open device nbd:127.0.0.1:PORT:exportname=foo
++can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ === Check disconnect 8 neg1 ===
+
+-can't open device nbd:127.0.0.1:PORT:exportname=foo
++can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ === Check disconnect 16 neg1 ===
+
+-can't open device nbd:127.0.0.1:PORT:exportname=foo
++can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ === Check disconnect before export ===
+
+-can't open device nbd:127.0.0.1:PORT:exportname=foo
++can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ === Check disconnect after export ===
+
+-can't open device nbd:127.0.0.1:PORT:exportname=foo
++can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ === Check disconnect 4 export ===
+
+-can't open device nbd:127.0.0.1:PORT:exportname=foo
++can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ === Check disconnect 12 export ===
+
+-can't open device nbd:127.0.0.1:PORT:exportname=foo
++can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ === Check disconnect 16 export ===
+
+-can't open device nbd:127.0.0.1:PORT:exportname=foo
++can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ === Check disconnect before neg2 ===
+
+-can't open device nbd:127.0.0.1:PORT:exportname=foo
++can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ === Check disconnect after neg2 ===
+
+@@ -45,11 +45,11 @@ read failed: Input/output error
+
+ === Check disconnect 8 neg2 ===
+
+-can't open device nbd:127.0.0.1:PORT:exportname=foo
++can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ === Check disconnect 10 neg2 ===
+
+-can't open device nbd:127.0.0.1:PORT:exportname=foo
++can't open device nbd+tcp://127.0.0.1:PORT/foo
+
+ === Check disconnect before request ===
+
+@@ -88,23 +88,134 @@ read 512/512 bytes at offset 0
+
+ === Check disconnect before neg-classic ===
+
+-can't open device nbd:127.0.0.1:PORT
++can't open device nbd+tcp://127.0.0.1:PORT/
+
+ === Check disconnect 8 neg-classic ===
+
+-can't open device nbd:127.0.0.1:PORT
++can't open device nbd+tcp://127.0.0.1:PORT/
+
+ === Check disconnect 16 neg-classic ===
+
+-can't open device nbd:127.0.0.1:PORT
++can't open device nbd+tcp://127.0.0.1:PORT/
+
+ === Check disconnect 24 neg-classic ===
+
+-can't open device nbd:127.0.0.1:PORT
++can't open device nbd+tcp://127.0.0.1:PORT/
+
+ === Check disconnect 28 neg-classic ===
+
+-can't open device nbd:127.0.0.1:PORT
++can't open device nbd+tcp://127.0.0.1:PORT/
++
++=== Check disconnect after neg-classic ===
++
++read failed: Input/output error
++
++=== Check disconnect before neg1 ===
++
++can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
++
++=== Check disconnect after neg1 ===
++
++can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
++
++=== Check disconnect 8 neg1 ===
++
++can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
++
++=== Check disconnect 16 neg1 ===
++
++can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
++
++=== Check disconnect before export ===
++
++can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
++
++=== Check disconnect after export ===
++
++can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
++
++=== Check disconnect 4 export ===
++
++can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
++
++=== Check disconnect 12 export ===
++
++can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
++
++=== Check disconnect 16 export ===
++
++can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
++
++=== Check disconnect before neg2 ===
++
++can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
++
++=== Check disconnect after neg2 ===
++
++read failed: Input/output error
++
++=== Check disconnect 8 neg2 ===
++
++can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
++
++=== Check disconnect 10 neg2 ===
++
++can't open device nbd+unix:///foo?socket=TEST_DIR/nbd.sock
++
++=== Check disconnect before request ===
++
++read failed: Input/output error
++
++=== Check disconnect after request ===
++
++read failed: Input/output error
++
++=== Check disconnect before reply ===
++
++read failed: Input/output error
++
++=== Check disconnect after reply ===
++
++read failed: Input/output error
++
++=== Check disconnect 4 reply ===
++
++read failed
++read failed: Input/output error
++
++=== Check disconnect 8 reply ===
++
++read failed
++read failed: Input/output error
++
++=== Check disconnect before data ===
++
++read failed: Input/output error
++
++=== Check disconnect after data ===
++
++read 512/512 bytes at offset 0
++512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++=== Check disconnect before neg-classic ===
++
++can't open device nbd+unix:///?socket=TEST_DIR/nbd.sock
++
++=== Check disconnect 8 neg-classic ===
++
++can't open device nbd+unix:///?socket=TEST_DIR/nbd.sock
++
++=== Check disconnect 16 neg-classic ===
++
++can't open device nbd+unix:///?socket=TEST_DIR/nbd.sock
++
++=== Check disconnect 24 neg-classic ===
++
++can't open device nbd+unix:///?socket=TEST_DIR/nbd.sock
++
++=== Check disconnect 28 neg-classic ===
++
++can't open device nbd+unix:///?socket=TEST_DIR/nbd.sock
+
+ === Check disconnect after neg-classic ===
 
 -- 
 2.13.5
