@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33595)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dn6SA-000657-0Q
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:06:58 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34483)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1dn6UH-0007gt-7w
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:09:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dn6S6-0002cD-Mi
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:06:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:17738)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dn6S6-0002bb-GZ
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:06:54 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 30 Aug 2017 19:06:01 +0200
-Message-Id: <20170830170601.15855-12-david@redhat.com>
-In-Reply-To: <20170830170601.15855-1-david@redhat.com>
-References: <20170830170601.15855-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 11/11] target/s390x: use program_interrupt()
- in per_check_exception()
+	(envelope-from <n54@gmx.com>) id 1dn6UE-0003KI-26
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:09:09 -0400
+Received: from mout.gmx.net ([212.227.15.19]:50397)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1dn6UD-0003Jj-O7
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:09:05 -0400
+From: Kamil Rytarowski <n54@gmx.com>
+Date: Wed, 30 Aug 2017 18:56:50 +0200
+Message-Id: <20170830165650.1528-1-n54@gmx.com>
+Subject: [Qemu-devel] [PATCH] Add BSD systems to the download section
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +22,82 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
+Cc: peter.maydell@linaro.org, Kamil Rytarowski <n54@gmx.com>
 
-I am not sure if we are handling ilen the right way here. ilen should
-always match the instruction triggering the exception. This is relevant
-for per exceptions triggered via EXECUTE instructions. The ilen to be
-indicated has to match the EXECUTE instruction.
+Add basic notes about FreeBSD, NetBSD and OpenBSD.
 
-Clean it up for now but leave ilen as is, we can fix that later.
+Add BSD link to source code subsection.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Kamil Rytarowski <n54@gmx.com>
 ---
- target/s390x/misc_helper.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ _download/bsd.md      | 19 +++++++++++++++++++
+ _download/source.html |  1 +
+ download.html         |  8 ++++++++
+ 3 files changed, 28 insertions(+)
+ create mode 100644 _download/bsd.md
 
-diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index eb7accc0ce..ac9657f23f 100644
---- a/target/s390x/misc_helper.c
-+++ b/target/s390x/misc_helper.c
-@@ -445,14 +445,11 @@ void HELPER(chsc)(CPUS390XState *env, uint64_t inst)
- #ifndef CONFIG_USER_ONLY
- void HELPER(per_check_exception)(CPUS390XState *env)
- {
--    CPUState *cs = CPU(s390_env_get_cpu(env));
-+    uint32_t ilen;
+diff --git a/_download/bsd.md b/_download/bsd.md
+new file mode 100644
+index 0000000..bbbd8a0
+--- /dev/null
++++ b/_download/bsd.md
+@@ -0,0 +1,19 @@
++QEMU is packaged by modern BSD systems.
++
++Installation can be performed from prebuilt packages or from package build system (aka ports).
++
++Prebuilt binary packages:
++
++* <strong>FreeBSD</strong> `pkg install qemu`
++
++* <strong>NetBSD</strong> `pkgin install qemu`
++
++* <strong>OpenBSD</strong> `pkg_add qemu`
++
++Package build system:
++
++* <strong>FreeBSD</strong> `cd /usr/ports/emulators/qemu && make install`
++
++* <strong>NetBSD</strong> `cd /usr/pkgsrc/emulators/qemu && make install`
++
++* <strong>OpenBSD</strong> `cd /usr/ports/emulators/qemu && make install`
+diff --git a/_download/source.html b/_download/source.html
+index d090a5e..6949daa 100644
+--- a/_download/source.html
++++ b/_download/source.html
+@@ -2,6 +2,7 @@
+ 	<p>Grab the source code for the latest releases and compile it yourself!
+ 	Detailed compilation instructions can be found in the wiki for
+ 		<a href="http://wiki.qemu-project.org/Hosts/Linux">Linux</a>,
++		<a href="http://wiki.qemu-project.org/Hosts/BSD">BSD</a>,
+ 		<a href="http://wiki.qemu-project.org/Hosts/Windows">Win32</a> and
+ 		<a href="http://wiki.qemu-project.org/Hosts/Mac">macOS</a>.</p>
  
-     if (env->per_perc_atmid) {
--        env->int_pgm_code = PGM_PER;
--        env->int_pgm_ilen = get_ilen(cpu_ldub_code(env, env->per_address));
--
--        cs->exception_index = EXCP_PGM;
--        cpu_loop_exit(cs);
-+        ilen = get_ilen(cpu_ldub_code(env, env->per_address));
-+        program_interrupt(env, PGM_PER, ilen);
-     }
- }
+diff --git a/download.html b/download.html
+index 5a1e4ea..2dd0044 100644
+--- a/download.html
++++ b/download.html
+@@ -6,6 +6,7 @@ permalink: /download/
+ <div class="horiz-menu">
+ <ul style="display: none;">
+ <li><a href="#linux">Linux</a></li>
++<li><a href="#bsd">BSD</a></li>
+ <li><a href="#macos">macOS</a></li>
+ <li><a href="#windows">Windows</a></li>
+ <li><a href="#source">Source code</a></li>
+@@ -18,6 +19,13 @@ permalink: /download/
+ 	{% markdown_relative _download/linux.md %}
+ </article>
  
++<article id="bsd" class="active">
++	<header>
++	<h2>BSD</h2>
++	</header>
++	{% markdown_relative _download/bsd.md %}
++</article>
++
+ <article id="macos" class="active">
+ 	<header>
+ 	<h2>macOS</h2>
 -- 
-2.13.5
+2.14.1
