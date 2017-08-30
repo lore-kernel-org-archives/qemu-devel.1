@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnBr7-0003ch-0p
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:53:06 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dnBz1-0001YD-UO
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 19:01:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnBr2-0002HQ-Kc
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:53:05 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35789)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnBr2-0002HL-F0
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 18:53:00 -0400
-Received: by mail-qt0-x242.google.com with SMTP id u11so6363325qtu.2
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 15:53:00 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 30 Aug 2017 19:52:24 -0300
-Message-Id: <20170830225225.27925-7-f4bug@amsat.org>
+	(envelope-from <no-reply@patchew.org>) id 1dnByy-00050E-1s
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 19:01:16 -0400
+Resent-Message-Id: <E1dnByy-00050E-1s@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21499)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dnByx-0004yq-Q7
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 19:01:11 -0400
 In-Reply-To: <20170830225225.27925-1-f4bug@amsat.org>
-References: <20170830225225.27925-1-f4bug@amsat.org>
+Message-ID: <150413405890.81.12489808558602609525@b5667b65043c>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 6/7] mips: replace cpu_mips_init() with
- cpu_generic_init()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 30 Aug 2017 16:01:01 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] QOMify MIPS cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,151 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, James Hogan <james.hogan@imgtec.com>, Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: f4bug@amsat.org
+Cc: famz@redhat.com, imammedo@redhat.com, ehabkost@redhat.com, marcel@redhat.com, peter.maydell@linaro.org, thuth@redhat.com, qemu-devel@nongnu.org
 
-From: Igor Mammedov <imammedo@redhat.com>
-
-now cpu_mips_init() reimplements subset of cpu_generic_init()
-tasks, so just drop it and use cpu_generic_init() directly.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-[PMD: use internal.h instead of cpu.h]
-Tested-by: James Hogan <james.hogan@imgtec.com>
----
- target/mips/cpu.h       |  3 +--
- hw/mips/cps.c           |  2 +-
- hw/mips/mips_fulong2e.c |  2 +-
- hw/mips/mips_jazz.c     |  2 +-
- hw/mips/mips_malta.c    |  2 +-
- hw/mips/mips_mipssim.c  |  2 +-
- hw/mips/mips_r4k.c      |  2 +-
- target/mips/translate.c | 17 -----------------
- 8 files changed, 7 insertions(+), 25 deletions(-)
-
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 2f81e0f950..66265e4eb6 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -737,10 +737,9 @@ enum {
-  */
- #define CPU_INTERRUPT_WAKE CPU_INTERRUPT_TGT_INT_0
- 
--MIPSCPU *cpu_mips_init(const char *cpu_model);
- int cpu_mips_signal_handler(int host_signum, void *pinfo, void *puc);
- 
--#define cpu_init(cpu_model) CPU(cpu_mips_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_MIPS_CPU, cpu_model)
- bool cpu_supports_cps_smp(const char *cpu_model);
- bool cpu_supports_isa(const char *cpu_model, unsigned int isa);
- void cpu_set_exception_base(int vp_index, target_ulong address);
-diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-index 4ef337d5c4..708899cf92 100644
---- a/hw/mips/cps.c
-+++ b/hw/mips/cps.c
-@@ -71,7 +71,7 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
-     bool itu_present = false;
- 
-     for (i = 0; i < s->num_vp; i++) {
--        cpu = cpu_mips_init(s->cpu_model);
-+        cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, s->cpu_model));
-         if (cpu == NULL) {
-             error_setg(errp, "%s: CPU initialization failed",  __func__);
-             return;
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 3532399a13..5d9462ec35 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -280,7 +280,7 @@ static void mips_fulong2e_init(MachineState *machine)
-     if (cpu_model == NULL) {
-         cpu_model = "Loongson-2E";
-     }
--    cpu = cpu_mips_init(cpu_model);
-+    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-     if (cpu == NULL) {
-         fprintf(stderr, "Unable to find CPU definition\n");
-         exit(1);
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index df2262a2a8..c1402de1ce 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -151,7 +151,7 @@ static void mips_jazz_init(MachineState *machine,
-     if (cpu_model == NULL) {
-         cpu_model = "R4000";
-     }
--    cpu = cpu_mips_init(cpu_model);
-+    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-     if (cpu == NULL) {
-         fprintf(stderr, "Unable to find CPU definition\n");
-         exit(1);
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index af678f5784..9ecdc818b1 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -931,7 +931,7 @@ static void create_cpu_without_cps(const char *cpu_model,
-     int i;
- 
-     for (i = 0; i < smp_cpus; i++) {
--        cpu = cpu_mips_init(cpu_model);
-+        cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-         if (cpu == NULL) {
-             fprintf(stderr, "Unable to find CPU definition\n");
-             exit(1);
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-index 07fc4c2300..1166834f54 100644
---- a/hw/mips/mips_mipssim.c
-+++ b/hw/mips/mips_mipssim.c
-@@ -163,7 +163,7 @@ mips_mipssim_init(MachineState *machine)
-         cpu_model = "24Kf";
- #endif
-     }
--    cpu = cpu_mips_init(cpu_model);
-+    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-     if (cpu == NULL) {
-         fprintf(stderr, "Unable to find CPU definition\n");
-         exit(1);
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index 2f5ced7409..de212f5c13 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -193,7 +193,7 @@ void mips_r4k_init(MachineState *machine)
-         cpu_model = "24Kf";
- #endif
-     }
--    cpu = cpu_mips_init(cpu_model);
-+    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-     if (cpu == NULL) {
-         fprintf(stderr, "Unable to find CPU definition\n");
-         exit(1);
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index f7128bc91d..d16d879df7 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -20523,23 +20523,6 @@ void cpu_mips_realize_env(CPUMIPSState *env)
-     mvp_init(env, env->cpu_model);
- }
- 
--MIPSCPU *cpu_mips_init(const char *cpu_model)
--{
--    ObjectClass *oc;
--    MIPSCPU *cpu;
--
--    oc = cpu_class_by_name(TYPE_MIPS_CPU, cpu_model);
--    if (oc == NULL) {
--        return NULL;
--    }
--
--    cpu = MIPS_CPU(object_new(object_class_get_name(oc)));
--
--    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
--
--    return cpu;
--}
--
- bool cpu_supports_cps_smp(const char *cpu_model)
- {
-     const mips_def_t *def = cpu_mips_find_by_name(cpu_model);
--- 
-2.14.1
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA4MzAyMjUyMjUuMjc5MjUtMS1mNGJ1Z0BhbXNhdC5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxd
+IFtQQVRDSCB2MiAwLzddIFFPTWlmeSBNSVBTIGNwdQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9n
+IC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoK
+Y29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMg
+aW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0
+IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3Jt
+YXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAg
+ICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4
+aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
+Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRj
+aGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTcw
+ODMwMjI1MjI1LjI3OTI1LTEtZjRidWdAYW1zYXQub3JnIC0+IHBhdGNoZXcvMjAxNzA4MzAyMjUy
+MjUuMjc5MjUtMS1mNGJ1Z0BhbXNhdC5vcmcKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0
+Y2hldy9jb3Zlci4xNTA0MTExODAzLmdpdC5qY29keUByZWRoYXQuY29tIC0+IHBhdGNoZXcvY292
+ZXIuMTUwNDExMTgwMy5naXQuamNvZHlAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFu
+Y2ggJ3Rlc3QnCjJlYmE4NzQwNTUgbWlwczogdXBkYXRlIG1pcHNfY3B1X2xpc3QoKSB0byB1c2Ug
+b2JqZWN0X2NsYXNzX2dldF9saXN0KCkKYzkxNzBjMjdkZiBtaXBzOiByZXBsYWNlIGNwdV9taXBz
+X2luaXQoKSB3aXRoIGNwdV9nZW5lcmljX2luaXQoKQpiZDFjMGU0M2EyIG1pcHM6IE1JUFNDUFUg
+bW9kZWwgc3ViY2xhc3NlcwplNzdkMWQ3NGVhIG1pcHM6IGNhbGwgY3B1X21pcHNfcmVhbGl6ZV9l
+bnYoKSBmcm9tIG1pcHNfY3B1X3JlYWxpemVmbigpCjRmMTA3M2Q4YmUgbWlwczogc3BsaXQgY3B1
+X21pcHNfcmVhbGl6ZV9lbnYoKSBvdXQgb2YgY3B1X21pcHNfaW5pdCgpCjIyZjc4M2ViNTAgbWlw
+czogaW50cm9kdWNlIGludGVybmFsLmggYW5kIGNsZWFudXAgY3B1LmgKZjg0NmM3YmZjNiBtaXBz
+OiBtb3ZlIGh3L21pcHMvY3B1dGltZXIuYyB0byB0YXJnZXQvbWlwcy8KCj09PSBPVVRQVVQgQkVH
+SU4gPT09CkNoZWNraW5nIFBBVENIIDEvNzogbWlwczogbW92ZSBody9taXBzL2NwdXRpbWVyLmMg
+dG8gdGFyZ2V0L21pcHMvLi4uCkNoZWNraW5nIFBBVENIIDIvNzogbWlwczogaW50cm9kdWNlIGlu
+dGVybmFsLmggYW5kIGNsZWFudXAgY3B1LmguLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0
+ZXIgdGhhdCAnJicgKGN0eDpXeFcpCiM3Mjc6IEZJTEU6IHRhcmdldC9taXBzL2ludGVybmFsLmg6
+MjMwOgorICAgIGlmICgoZW52LT5DUDBfVlBDb250cm9sID4+IENQMFZQQ3RsX0RJUykgJiAxKSB7
+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjog
+c3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0ICcmJyAoY3R4Old4VykKIzczNTogRklMRTogdGFy
+Z2V0L21pcHMvaW50ZXJuYWwuaDoyMzg6CisgICAgICAgICAgICAoKG90aGVyX2NwdS0+ZW52LkNQ
+MF9WUENvbnRyb2wgPj4gQ1AwVlBDdGxfRElTKSAmIDEpKSB7CiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2Ug
+cHJvaGliaXRlZCBhZnRlciB0aGF0ICcmJyAoY3R4Old4VykKIzc1NTogRklMRTogdGFyZ2V0L21p
+cHMvaW50ZXJuYWwuaDoyNTg6CisgICAgICAgIGVudi0+aGZsYWdzIHw9IChlbnYtPkNQMF9TdGF0
+dXMgPj4gQ1AwU3RfS1NVKSAmIE1JUFNfSEZMQUdfS1NVOwogICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDMgZXJyb3JzLCAwIHdh
+cm5pbmdzLCA4NDIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy83OiBtaXBzOiBzcGxpdCBjcHVfbWlwc19yZWFsaXpl
+X2VudigpIG91dCBvZiBjcHVfbWlwc19pbml0KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNC83OiBtaXBz
+OiBjYWxsIGNwdV9taXBzX3JlYWxpemVfZW52KCkgZnJvbSBtaXBzX2NwdV9yZWFsaXplZm4oKS4u
+LgpDaGVja2luZyBQQVRDSCA1Lzc6IG1pcHM6IE1JUFNDUFUgbW9kZWwgc3ViY2xhc3Nlcy4uLgpD
+aGVja2luZyBQQVRDSCA2Lzc6IG1pcHM6IHJlcGxhY2UgY3B1X21pcHNfaW5pdCgpIHdpdGggY3B1
+X2dlbmVyaWNfaW5pdCgpLi4uCkNoZWNraW5nIFBBVENIIDcvNzogbWlwczogdXBkYXRlIG1pcHNf
+Y3B1X2xpc3QoKSB0byB1c2Ugb2JqZWN0X2NsYXNzX2dldF9saXN0KCkuLi4KPT09IE9VVFBVVCBF
+TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5l
+cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxl
+YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
