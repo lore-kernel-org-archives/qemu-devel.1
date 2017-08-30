@@ -1,24 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dn5h5-00036D-Qk
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:18:20 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dn5yg-0007Ff-3J
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:36:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dn5h1-0007UL-SU
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:18:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41178)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dn5h1-0007Tz-Ls
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:18:15 -0400
-Date: Wed, 30 Aug 2017 18:18:10 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170830181810.1c658677.cohuck@redhat.com>
-In-Reply-To: <20170830131403.57042d42.cohuck@redhat.com>
-References: <20170829204759.6853-1-richard.henderson@linaro.org>
-	<20170830131403.57042d42.cohuck@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/8] tcg/s390 improvements
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dn5yc-0006GG-Vl
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:36:30 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54920
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dn5yc-0006Fp-Px
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:36:26 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v7UGTBMS138568
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 12:36:24 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2cnx0xp95j-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 12:36:24 -0400
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 30 Aug 2017 17:36:22 +0100
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed, 30 Aug 2017 18:36:01 +0200
+In-Reply-To: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
+References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
+Message-Id: <20170830163609.50260-2-pasic@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 1/9] s390x/css: fix cc handling for XSCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,38 +38,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-On Wed, 30 Aug 2017 13:14:03 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+The function ioinst_handle_xsch is presenting cc 2 when it's supposed to
+present cc 1 and the other way around, because css_do_xsch has the error
+codes mixed up. Fixing the error codes also fixes the priority.
 
-> On Tue, 29 Aug 2017 13:47:51 -0700
-> Richard Henderson <richard.henderson@linaro.org> wrote:
-> 
-> > This finally converts s390 to the tcg_target_op_def function, which
-> > allows constraints to vary at runtime.  Once we have that, we can
-> > 
-> > (1) Perform some facilities checks once during startup instead of
-> >     every time we evaluate the constraint,
-> > (2) Use the distinct-operands facility from z196.
-> > 
-> > In addition, two cleanups to the setcond expansion
-> > 
-> > (3) Use the load-on-condition-2 facility from z13,
-> > (4) Use a smaller expansion for LE/LEU using SLBGR.
-> > 
-> > I wrote these after soft freeze and before I changed jobs, so it has
-> > seen some testing.  Unfortunately, I no longer have access to s390
-> > hardware, so I'd appreciate it if someone could re-test this rebase.  
-> 
-> FWIW, this passes my smoketests.
-> 
-> Looking at the patches now...
+Let us fix this.
 
-That might have been a mistake :)
+Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Reported-by: Pierre Morel<pmorel@linux.vnet.ibm.com>
+---
+ hw/s390x/css.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-The parts that I managed to at least superficially understand looked
-fine, though; so feel free to add
-
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 1880b1a0ff..a50fb0727e 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -1281,12 +1281,12 @@ int css_do_xsch(SubchDev *sch)
+         (!(s->ctrl &
+            (SCSW_ACTL_RESUME_PEND | SCSW_ACTL_START_PEND | SCSW_ACTL_SUSP))) ||
+         (s->ctrl & SCSW_ACTL_SUBCH_ACTIVE)) {
+-        ret = -EINPROGRESS;
++        ret = -EBUSY;
+         goto out;
+     }
+ 
+     if (s->ctrl & SCSW_CTRL_MASK_STCTL) {
+-        ret = -EBUSY;
++        ret = -EINPROGRESS;
+         goto out;
+     }
+ 
+-- 
+2.13.5
