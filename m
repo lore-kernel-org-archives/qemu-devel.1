@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dn9zA-0004Iw-QZ
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:53:17 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dnA1r-00050o-Qi
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:56:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dn9z7-0002Cp-Pc
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:53:16 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:31789)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1dn9z7-0002CP-Jy
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:53:13 -0400
-Date: Wed, 30 Aug 2017 21:53:11 +0100
-From: James Hogan <james.hogan@imgtec.com>
-Message-ID: <20170830205311.GC979@jhogan-linux.le.imgtec.org>
-References: <20170817043102.6322-1-f4bug@amsat.org>
-	<20170817172249.31cf5e3d@nial.brq.redhat.com>
-	<e3552801-588d-a192-1da4-0cefee5aa483@amsat.org>
-	<20170830155008.1babd407@nial.brq.redhat.com>
-	<bef4e017-02f3-62c4-1621-ec118709717c@amsat.org>
-	<20170830181906.GB979@jhogan-linux.le.imgtec.org>
-	<5e3c61b4-8564-7f10-d345-5bcf68203d94@amsat.org>
+	(envelope-from <ehabkost@redhat.com>) id 1dnA1o-0003N9-NC
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:56:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47384)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dnA1o-0003Mx-Di
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:56:00 -0400
+Date: Wed, 30 Aug 2017 17:55:54 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170830205554.GA17184@localhost.localdomain>
+References: <1503372250-5092-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	<1503372250-5092-2-git-send-email-douly.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5e3c61b4-8564-7f10-d345-5bcf68203d94@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/8] QOMify MIPS cpu
+In-Reply-To: <1503372250-5092-2-git-send-email-douly.fnst@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] hw/acpi-build: Fix SRAT memory
+ building when there is no memory in node0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,25 +28,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>, Yongbok Kim <yongbok.kim@imgtec.com>, Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, pbonzini@redhat.com, mst@redhat.com, rth@twiddle.net
 
-On Wed, Aug 30, 2017 at 04:52:04PM -0300, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> Hi James,
->=20
-> On 08/30/2017 03:19 PM, James Hogan wrote:
-> [...]
-> >>     git://github.com/philmd/qemu.git tags/mips-qomify-20170830
-> >=20
-> > A sanity check of your branch doesn't reveal any obvious regressions
-> > when booting a Malta KVM guest kernel with KVM.
->=20
-> Thank you for your time to test this!
->=20
-> Does that mean I can add your Tested-by: to the series?
+On Tue, Aug 22, 2017 at 11:24:09AM +0800, Dou Liyang wrote:
+> Currently, Using the fisrt node without memory on the machine makes
+> QEMU unhappy. With this example command line:
+>   ... \
+>   -m 1024M,slots=4,maxmem=32G \
+>   -numa node,nodeid=0 \
+>   -numa node,mem=1024M,nodeid=1 \
+>   -numa node,nodeid=2 \
+>   -numa node,nodeid=3 \
+> Guest reports "No NUMA configuration found" and the NUMA topology is
+> wrong.
+> 
+> This is because when QEMU builds ACPI SRAT, it regards node0 as the
+> default node to deal with the memory hole(640K-1M). this means the
+> node0 must have some memory(>1M), but, actually it can have no
+> memory.
+> 
+> Fix this problem by replace the node0 with the first node which has
+> memory on it. Add a new function for each node. Also do some cleanup.
+> 
+> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+> ---
+>  hw/i386/acpi-build.c | 78 +++++++++++++++++++++++++++++++++-------------------
+>  1 file changed, 50 insertions(+), 28 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 98dd424..f93d712 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2318,15 +2318,43 @@ build_tpm2(GArray *table_data, BIOSLinker *linker)
+>                   (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
+>  }
+>  
+> +static uint64_t
+> +build_srat_node_entry(GArray *table_data, PCMachineState *pcms,
+> +                                int i, uint64_t mem_base, uint64_t mem_len)
+> +{
+> +    AcpiSratMemoryAffinity *numamem;
+> +    uint64_t next_base;
+> +
+> +    next_base = mem_base + mem_len;
+> +
+> +    /* Cut out the ACPI_PCI hole */
+> +    if (mem_base <= pcms->below_4g_mem_size &&
+> +        next_base > pcms->below_4g_mem_size) {
+> +        mem_len -= next_base - pcms->below_4g_mem_size;
+> +        if (mem_len > 0) {
+> +            numamem = acpi_data_push(table_data, sizeof *numamem);
+> +            build_srat_memory(numamem, mem_base, mem_len, i,
+> +                              MEM_AFFINITY_ENABLED);
+> +        }
+> +        mem_base = 1ULL << 32;
+> +        mem_len = next_base - pcms->below_4g_mem_size;
+> +        next_base += (1ULL << 32) - pcms->below_4g_mem_size;
+> +    }
+> +    numamem = acpi_data_push(table_data, sizeof *numamem);
+> +    build_srat_memory(numamem, mem_base, mem_len, i,
+> +                      MEM_AFFINITY_ENABLED);
+> +    return next_base;
+> +}
+> +
+>  static void
+>  build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>  {
+>      AcpiSystemResourceAffinityTable *srat;
+>      AcpiSratMemoryAffinity *numamem;
+>  
+> -    int i;
+> +    int i, node;
+>      int srat_start, numa_start, slots;
+> -    uint64_t mem_len, mem_base, next_base;
+> +    uint64_t mem_len, mem_base;
+>      MachineClass *mc = MACHINE_GET_CLASS(machine);
+>      const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(machine);
+>      PCMachineState *pcms = PC_MACHINE(machine);
+> @@ -2370,36 +2398,30 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>      /* the memory map is a bit tricky, it contains at least one hole
+>       * from 640k-1M and possibly another one from 3.5G-4G.
+>       */
+> -    next_base = 0;
+> +
+>      numa_start = table_data->len;
+>  
+> -    numamem = acpi_data_push(table_data, sizeof *numamem);
+> -    build_srat_memory(numamem, 0, 640 * 1024, 0, MEM_AFFINITY_ENABLED);
+> -    next_base = 1024 * 1024;
+> -    for (i = 1; i < pcms->numa_nodes + 1; ++i) {
+> -        mem_base = next_base;
+> -        mem_len = pcms->node_mem[i - 1];
+> -        if (i == 1) {
+> -            mem_len -= 1024 * 1024;
+> +    /* get the first node which has memory and map the hole from 640K-1M */
+> +    for (node = 0; node < pcms->numa_nodes; node++) {
+> +        if (pcms->node_mem[node] != 0) {
+> +            break;
+>          }
+> -        next_base = mem_base + mem_len;
+> -
+> -        /* Cut out the ACPI_PCI hole */
+> -        if (mem_base <= pcms->below_4g_mem_size &&
+> -            next_base > pcms->below_4g_mem_size) {
+> -            mem_len -= next_base - pcms->below_4g_mem_size;
+> -            if (mem_len > 0) {
+> -                numamem = acpi_data_push(table_data, sizeof *numamem);
+> -                build_srat_memory(numamem, mem_base, mem_len, i - 1,
+> -                                  MEM_AFFINITY_ENABLED);
+> -            }
+> -            mem_base = 1ULL << 32;
+> -            mem_len = next_base - pcms->below_4g_mem_size;
+> -            next_base += (1ULL << 32) - pcms->below_4g_mem_size;
+> +    }
+> +    numamem = acpi_data_push(table_data, sizeof *numamem);
+> +    build_srat_memory(numamem, 0, 640 * 1024, node, MEM_AFFINITY_ENABLED);
+> +
+> +    /* map the rest of memory from 1M */
+> +    mem_base = 1024 * 1024;
+> +    mem_len = pcms->node_mem[node] - mem_base;
+> +    mem_base = build_srat_node_entry(table_data, pcms, node,
+> +                                            mem_base, mem_len);
+> +
+> +    for (i = 0; i < pcms->numa_nodes; i++) {
+> +        if (i == node) {
+> +            continue;
+>          }
 
-Sure,
+Now the nodes will be out of order, if node 0 has no RAM.  Why?
 
-Cheers
-James
+Why not implement this in the same way the PCI 4GB hole is
+already implemented.  e.g.:
+
+#define HOLE_640K_START  (640 * 1024)
+#define HOLE_640K_END   (1024 * 1024)
+
+    for (node = 0; node < pcms->numa_nodes; node++) {
+        mem_base = next_base;
+        mem_len = pcms->node_mem[node];
+        next_base = mem_base + mem_len;
+
+        /* Cut out the 640K hole */
+        if (mem_base <= HOLE_640K_START &&
+            next_base > HOLE_640K_START) {
+            mem_len -= next_base - HOLE_640K;
+            if (mem_len > 0) {
+                numamem = acpi_data_push(table_data, sizeof *numamem);
+                build_srat_memory(numamem, mem_base, mem_len, node,
+                                  MEM_AFFINITY_ENABLED);
+            }
+            mem_base = HOLE_640K_END;
+            /* ... */
+        }
+        /* Cut out the ACPI_PCI hole */
+        if (mem_base <= pcms->below_4g_mem_size &&
+            next_base > pcms->below_4g_mem_size) {
+            mem_len -= next_base - pcms->below_4g_mem_size;
+            /* ... *]
+        }
+        numamem = acpi_data_push(table_data, sizeof *numamem);
+        build_srat_memory(numamem, mem_base, mem_len, node,
+                          MEM_AFFINITY_ENABLED);
+        /* ... */
+    }
+
+> -        numamem = acpi_data_push(table_data, sizeof *numamem);
+> -        build_srat_memory(numamem, mem_base, mem_len, i - 1,
+> -                          MEM_AFFINITY_ENABLED);
+> +        mem_base = build_srat_node_entry(table_data, pcms, i,
+> +                                            mem_base, pcms->node_mem[i]);
+>      }
+>      slots = (table_data->len - numa_start) / sizeof *numamem;
+>      for (; slots < pcms->numa_nodes + 2; slots++) {
+> -- 
+> 2.5.5
+> 
+> 
+> 
+> 
+
+-- 
+Eduardo
