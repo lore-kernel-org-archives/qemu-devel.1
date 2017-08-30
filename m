@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dn6Fa-0001za-Kw
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:54:02 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dn6Fe-00022x-Mp
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:54:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dn6FZ-0005GV-Np
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:53:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33718)
+	(envelope-from <cohuck@redhat.com>) id 1dn6Fc-0005Hv-Cd
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:54:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56948)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dn6FZ-0005GA-Fd
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:53:57 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dn6Fc-0005HJ-3A
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:54:00 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed, 30 Aug 2017 18:52:22 +0200
-Message-Id: <20170830165252.13421-15-cohuck@redhat.com>
+Date: Wed, 30 Aug 2017 18:52:23 +0200
+Message-Id: <20170830165252.13421-16-cohuck@redhat.com>
 In-Reply-To: <20170830165252.13421-1-cohuck@redhat.com>
 References: <20170830165252.13421-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 14/44] kvm: remove hard dependency on pci
+Subject: [Qemu-devel] [PULL 15/44] s390x/pci: add stubs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,110 +26,127 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-The msi routing code in kvm calls some pci functions: provide
-some stubs to enable builds without pci.
+Some non-pci code calls into zpci code. Provide some stubs for builds
+without pci.
 
-Also, to make this more obvious, guard them via a pci_available boolean
-(which also can be reused in other places).
-
-Fixes: e1d4fb2de ("kvm-irqchip: x86: add msi route notify fn")
-Fixes: 767a554a0 ("kvm-all: Pass requester ID to MSI routing functions")
-Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- accel/kvm/kvm-all.c  |  6 +++---
- hw/pci/pci-stub.c    | 14 ++++++++++++++
- hw/pci/pci.c         |  2 ++
- include/hw/pci/pci.h |  2 ++
- 4 files changed, 21 insertions(+), 3 deletions(-)
+ hw/s390x/Makefile.objs   |  3 +-
+ hw/s390x/s390-pci-stub.c | 76 ++++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/s390x/sclp.h  |  1 +
+ 3 files changed, 79 insertions(+), 1 deletion(-)
+ create mode 100644 hw/s390x/s390-pci-stub.c
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 46ce479dc3..f85553a851 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -1248,7 +1248,7 @@ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
-     int virq;
-     MSIMessage msg = {0, 0};
- 
--    if (dev) {
-+    if (pci_available && dev) {
-         msg = pci_get_msi_message(dev, vector);
-     }
- 
-@@ -1271,7 +1271,7 @@ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
-     kroute.u.msi.address_lo = (uint32_t)msg.address;
-     kroute.u.msi.address_hi = msg.address >> 32;
-     kroute.u.msi.data = le32_to_cpu(msg.data);
--    if (kvm_msi_devid_required()) {
-+    if (pci_available && kvm_msi_devid_required()) {
-         kroute.flags = KVM_MSI_VALID_DEVID;
-         kroute.u.msi.devid = pci_requester_id(dev);
-     }
-@@ -1309,7 +1309,7 @@ int kvm_irqchip_update_msi_route(KVMState *s, int virq, MSIMessage msg,
-     kroute.u.msi.address_lo = (uint32_t)msg.address;
-     kroute.u.msi.address_hi = msg.address >> 32;
-     kroute.u.msi.data = le32_to_cpu(msg.data);
--    if (kvm_msi_devid_required()) {
-+    if (pci_available && kvm_msi_devid_required()) {
-         kroute.flags = KVM_MSI_VALID_DEVID;
-         kroute.u.msi.devid = pci_requester_id(dev);
-     }
-diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
-index ecad664946..d5ce00748e 100644
---- a/hw/pci/pci-stub.c
-+++ b/hw/pci/pci-stub.c
-@@ -27,6 +27,7 @@
- #include "hw/pci/msi.h"
- 
- bool msi_nonbroken;
-+bool pci_available;
- 
- PciInfoList *qmp_query_pci(Error **errp)
- {
-@@ -38,3 +39,16 @@ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict)
- {
-     monitor_printf(mon, "PCI devices not supported\n");
- }
+diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+index b2aade2466..7ee19d3abc 100644
+--- a/hw/s390x/Makefile.objs
++++ b/hw/s390x/Makefile.objs
+@@ -11,7 +11,8 @@ obj-y += 3270-ccw.o
+ obj-y += virtio-ccw.o
+ obj-y += css-bridge.o
+ obj-y += ccw-device.o
+-obj-y += s390-pci-bus.o s390-pci-inst.o
++obj-$(CONFIG_PCI) += s390-pci-bus.o s390-pci-inst.o
++obj-$(call lnot,$(CONFIG_PCI)) += s390-pci-stub.o
+ obj-y += s390-skeys.o
+ obj-y += s390-stattrib.o
+ obj-$(CONFIG_KVM) += s390-skeys-kvm.o
+diff --git a/hw/s390x/s390-pci-stub.c b/hw/s390x/s390-pci-stub.c
+new file mode 100644
+index 0000000000..48f8b4e8a3
+--- /dev/null
++++ b/hw/s390x/s390-pci-stub.c
+@@ -0,0 +1,76 @@
++/* stubs for non-pci builds */
 +
-+/* kvm-all wants this */
-+MSIMessage pci_get_msi_message(PCIDevice *dev, int vector)
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "s390-pci-inst.h"
++#include "s390-pci-bus.h"
++
++/* target/s390x/ioinst.c */
++int chsc_sei_nt2_get_event(void *res)
 +{
-+    g_assert(false);
-+    return (MSIMessage){};
++    return 1;
 +}
 +
-+uint16_t pci_requester_id(PCIDevice *dev)
++int chsc_sei_nt2_have_event(void)
 +{
-+    g_assert(false);
 +    return 0;
 +}
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 258fbe51e2..26f346db2c 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -49,6 +49,8 @@
- # define PCI_DPRINTF(format, ...)       do { } while (0)
- #endif
- 
-+bool pci_available = true;
 +
- static void pcibus_dev_print(Monitor *mon, DeviceState *dev, int indent);
- static char *pcibus_get_dev_path(DeviceState *dev);
- static char *pcibus_get_fw_dev_path(DeviceState *dev);
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index e598b095eb..8bb6449dd7 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -10,6 +10,8 @@
- 
- #include "hw/pci/pcie.h"
- 
-+extern bool pci_available;
++/* hw/s390x/sclp.c */
++void s390_pci_sclp_configure(SCCB *sccb)
++{
++    sccb->h.response_code = cpu_to_be16(SCLP_RC_ADAPTER_TYPE_NOT_RECOGNIZED);
++}
 +
- /* PCI bus */
- 
- #define PCI_DEVFN(slot, func)   ((((slot) & 0x1f) << 3) | ((func) & 0x07))
++void s390_pci_sclp_deconfigure(SCCB *sccb)
++{
++    sccb->h.response_code = cpu_to_be16(SCLP_RC_ADAPTER_TYPE_NOT_RECOGNIZED);
++}
++
++/* target/s390x/kvm.c */
++int clp_service_call(S390CPU *cpu, uint8_t r2)
++{
++    return -1;
++}
++
++int pcilg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
++{
++    return -1;
++}
++
++int pcistg_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
++{
++    return -1;
++}
++
++int stpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar)
++{
++    return -1;
++}
++
++int rpcit_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2)
++{
++    return -1;
++}
++
++int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
++                        uint8_t ar)
++{
++    return -1;
++}
++
++int mpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar)
++{
++    return -1;
++}
++
++S390pciState *s390_get_phb(void)
++{
++    return NULL;
++}
++
++S390PCIBusDevice *s390_pci_find_dev_by_idx(S390pciState *s, uint32_t idx)
++{
++    return NULL;
++}
+diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+index e71d526605..fe54442ecd 100644
+--- a/include/hw/s390x/sclp.h
++++ b/include/hw/s390x/sclp.h
+@@ -59,6 +59,7 @@
+ #define SCLP_RC_INSUFFICIENT_SCCB_LENGTH        0x0300
+ #define SCLP_RC_STANDBY_READ_COMPLETION         0x0410
+ #define SCLP_RC_ADAPTER_IN_RESERVED_STATE       0x05f0
++#define SCLP_RC_ADAPTER_TYPE_NOT_RECOGNIZED     0x06f0
+ #define SCLP_RC_ADAPTER_ID_NOT_RECOGNIZED       0x09f0
+ #define SCLP_RC_INVALID_FUNCTION                0x40f0
+ #define SCLP_RC_NO_EVENT_BUFFERS_STORED         0x60f0
 -- 
 2.13.5
