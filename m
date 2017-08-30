@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dn4Du-0005Iz-Vs
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:44:12 -0400
+	(envelope-from <thuth@redhat.com>) id 1dn4En-0005hm-MB
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:45:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dn4Dp-0006NG-8t
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:44:07 -0400
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:37741)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1dn4Dp-0006M6-5W
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:44:01 -0400
-Received: by mail-it0-x243.google.com with SMTP id p2so1169707ite.4
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 07:43:59 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1dn4El-0006s0-3Y
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:45:01 -0400
+References: <1504099475-241036-9-git-send-email-imammedo@redhat.com>
+	<1504103170-259479-1-git-send-email-imammedo@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e877e8ca-8e4f-f102-9b51-a29df8c1db7d@redhat.com>
+Date: Wed, 30 Aug 2017 16:44:53 +0200
 MIME-Version: 1.0
-Sender: bobby.prani@gmail.com
-In-Reply-To: <20170829211649.GA9108@flamenco>
-References: <1500616763-26560-1-git-send-email-cota@braap.org>
-	<1500616763-26560-2-git-send-email-cota@braap.org>
-	<CAJhHMCBpo1-6x9wJWE2oSv1RB=vH-WbA0RjMWYox_dtFfLAURA@mail.gmail.com>
-	<20170829211649.GA9108@flamenco>
-From: Pranith Kumar <bobby.prani+qemu@gmail.com>
-Date: Wed, 30 Aug 2017 10:43:28 -0400
-Message-ID: <CAJhHMCAwpMHAiOeBZ+F2c0yKFPQxU3nU7+FGf75wOqFnYEc43w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 11/43] tcg: define CF_PARALLEL and use
- it for TB hashing along with CF_COUNT_MASK
+In-Reply-To: <1504103170-259479-1-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 9/8] fixup! ppc: remove non
+ implemented cpu models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +25,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Tue, Aug 29, 2017 at 5:16 PM, Emilio G. Cota <cota@braap.org> wrote:
-> On Sun, Aug 27, 2017 at 18:15:50 -0400, Pranith Kumar wrote:
->> Hi Emilio,
->>
->> On Fri, Jul 21, 2017 at 1:59 AM, Emilio G. Cota <cota@braap.org> wrote:
->> > This will enable us to decouple code translation from the value
->> > of parallel_cpus at any given time. It will also help us minimize
->> > TB flushes when generating code via EXCP_ATOMIC.
->> >
->> > Note that the declaration of parallel_cpus is brought to exec-all.h
->> > to be able to define there the "curr_cflags" inline.
->> >
->> > Signed-off-by: Emilio G. Cota <cota@braap.org>
->>
->> I was testing a winxp image today and I bisected a infinite loop to
->> this commit. The loop happens both with and without mttcg, so I think
->> it has got to do with something else.
->
-> Can you test the below? It lets me boot ubuntu, otherwise it reliably
-> chokes on a 'rep movsb' *very* early (doesn't even get to grub).
->
-> This discusson on v2 might be relevant (I added CF_COUNT_MASK as a
-> result of it, but it seems I have to revisit that):
->   https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg06456.html
->
-> Anyway let me know if this fixes it for you. Thanks for testing!
->
+On 30.08.2017 16:26, Igor Mammedov wrote:
+> only TODO escaped defines were meant to be removed,
+> but not TODO_USER_ONLY which are compiled in case of
+> *-user targets.
+> 
+> So retirn back "440" model removed by mistake
+> 
+> Spotted-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  target/ppc/cpu-models.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
+> index 611fc1b..08fb34b 100644
+> --- a/target/ppc/cpu-models.c
+> +++ b/target/ppc/cpu-models.c
+> @@ -150,6 +150,10 @@
+>      POWERPC_DEF("x2vp20",        CPU_POWERPC_X2VP20,                 405,
+>                  NULL)
+>      /* PowerPC 440 family                                                    */
+> +#if defined(TODO_USER_ONLY)
+> +    POWERPC_DEF("440",           CPU_POWERPC_440,                    440GP,
+> +                "Generic PowerPC 440")
+> +#endif
+>      /* PowerPC 440 cores                                                     */
+>      POWERPC_DEF("440-xilinx",    CPU_POWERPC_440_XILINX,             440x5,
+>                  "PowerPC 440 Xilinx 5")
+> 
 
-Yes, this fixes the issue for me.
+With this fixup patch added:
 
-Thanks,
---
-Pranith
+Reviewed-by: Thomas Huth <thuth@redhat.com>
