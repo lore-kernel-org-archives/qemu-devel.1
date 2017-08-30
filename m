@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dn3wk-0006IB-SH
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:26:23 -0400
+	(envelope-from <groug@kaod.org>) id 1dn3zX-0007WB-4v
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:29:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dn3wh-0000OW-J6
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:26:22 -0400
-Date: Wed, 30 Aug 2017 15:26:15 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170830142615.GT24565@stefanha-x1.localdomain>
-References: <20170822131832.20191-1-pbonzini@redhat.com>
-	<20170822131832.20191-7-pbonzini@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1dn3zT-0001MM-SC
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:29:15 -0400
+Received: from 17.mo6.mail-out.ovh.net ([46.105.36.150]:59851)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dn3zT-0001Lw-LI
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:29:11 -0400
+Received: from player735.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 145381086E8
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 16:29:09 +0200 (CEST)
+Date: Wed, 30 Aug 2017 16:28:59 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170830162859.16b5a8a3@bahia>
+In-Reply-To: <w51fuc98di8.fsf@maestria.local.igalia.com>
+References: <1504016587-39779-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<w51fuc98di8.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170822131832.20191-7-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 06/10] scsi,
- file-posix: add support for persistent reservation management
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/iJ8gq0Fa_.u+/FoGimXAt/f";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v8 0/6] fsdev: qmp interface for io
+ throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +32,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
+To: Alberto Garcia <berto@igalia.com>
+Cc: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-On Tue, Aug 22, 2017 at 03:18:28PM +0200, Paolo Bonzini wrote:
-> +#ifdef CONFIG_LINUX
-> +PRManager *pr_manager_lookup(const char *id, Error **errp);
-> +#else
-> +static inline PRManager *pr_manager_lookup(const char *id,
-> +                                                              Error **errp)
+--Sig_/iJ8gq0Fa_.u+/FoGimXAt/f
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Indentation
+On Wed, 30 Aug 2017 14:07:59 +0200
+Alberto Garcia <berto@igalia.com> wrote:
 
-> diff --git a/scsi/pr-manager.c b/scsi/pr-manager.c
-> new file mode 100644
-> index 0000000000..e80f8d9b31
-> --- /dev/null
-> +++ b/scsi/pr-manager.c
-> @@ -0,0 +1,109 @@
-> +/*
-> + * Persistent reservation manager abstract class
-> + *
-> + * Copyright (c) 2017 Red Hat, Inc.
-> + *
-> + * Author: Paolo Bonzini <pbonzini@redhat.com>
-> + *
-> + * This code is licensed under the LGPL.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "block/aio.h"
-> +#include "block/thread-pool.h"
-> +#include "scsi/pr-manager.h"
-> +#include "scsi/trace.h"
-> +
-> +#include <scsi/sg.h>
+> On Tue 29 Aug 2017 04:23:01 PM CEST, Pradeep Jagadeesh wrote:
+> > These patches provide the qmp interface, to query the io throttle=20
+> > status of the all fsdev devices that are present in a vm. =20
+>=20
+> I'm trying to read from an 9p share that has limits set with hmp
+> fsdev_set_io_throttle and I'm having some problems.
+>=20
+> For example if I'm reading a large file and I change the I/O limits
+> while the file is still being read then the guest process freezes.
+>=20
+> Can you try to reproduce that scenario?
+>=20
+> Berto
 
-HACKING "1.2. Include directives" defines the order of #includes.  It
-should be "qemu/osdep.h", <scsi/sg.h>, followed by all other QEMU
-headers.
+Thanks Berto for the review and the testing ! I'm on vacation but I'll
+jump in next week when I'm back and Pradeep has posted the next version.
+
+Cheers,
+
+--
+Greg
+
+--Sig_/iJ8gq0Fa_.u+/FoGimXAt/f
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWabLqwAKCRAC/DrrAQHb
+wkm9AKCknPAF+Irex25ZBVvDONDhN13YAQCdGHcZ1T9D0fZ8VpsZlyFIULwj2sc=
+=r7J4
+-----END PGP SIGNATURE-----
+
+--Sig_/iJ8gq0Fa_.u+/FoGimXAt/f--
