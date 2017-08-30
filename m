@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dn6H3-0003fy-E8
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:55:30 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dn6H8-0003nJ-2c
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:55:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dn6H0-0005pn-3N
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:55:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39452)
+	(envelope-from <cohuck@redhat.com>) id 1dn6H7-0005tp-5L
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:55:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60322)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dn6Gz-0005pJ-Q9
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:55:26 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dn6H6-0005t1-VR
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 12:55:33 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed, 30 Aug 2017 18:52:39 +0200
-Message-Id: <20170830165252.13421-32-cohuck@redhat.com>
+Date: Wed, 30 Aug 2017 18:52:41 +0200
+Message-Id: <20170830165252.13421-34-cohuck@redhat.com>
 In-Reply-To: <20170830165252.13421-1-cohuck@redhat.com>
 References: <20170830165252.13421-1-cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 31/44] target/s390x: move cc_name() to helper.c
+Subject: [Qemu-devel] [PULL 33/44] target/s390x: move psw_key_valid() to
+ mem_helper.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,138 +32,66 @@ Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, bor
 
 From: David Hildenbrand <david@redhat.com>
 
-While at it, move the translations into the function and properly pass
-enum cc_op as parameter. We can't move it to cc_helper.c as this would
-break --disable-tcg.
+Only used in that file.
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170818114353.13455-10-david@redhat.com>
+Message-Id: <20170818114353.13455-12-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/cpu.h    | 48 +--------------------------------------------=
----
- target/s390x/helper.c | 48 +++++++++++++++++++++++++++++++++++++++++++++=
-+++
- 2 files changed, 49 insertions(+), 47 deletions(-)
+ target/s390x/cpu.h        | 11 -----------
+ target/s390x/mem_helper.c | 11 +++++++++++
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index c40d70dd70..10208ecbbb 100644
+index c71a4bf0c4..8300cb219d 100644
 --- a/target/s390x/cpu.h
 +++ b/target/s390x/cpu.h
-@@ -742,53 +742,7 @@ enum cc_op {
-     CC_OP_MAX
- };
+@@ -366,17 +366,6 @@ void s390x_cpu_debug_excp_handler(CPUState *cs);
+ #define MMU_SECONDARY_IDX       1
+ #define MMU_HOME_IDX            2
 =20
--static const char *cc_names[] =3D {
--    [CC_OP_CONST0]    =3D "CC_OP_CONST0",
--    [CC_OP_CONST1]    =3D "CC_OP_CONST1",
--    [CC_OP_CONST2]    =3D "CC_OP_CONST2",
--    [CC_OP_CONST3]    =3D "CC_OP_CONST3",
--    [CC_OP_DYNAMIC]   =3D "CC_OP_DYNAMIC",
--    [CC_OP_STATIC]    =3D "CC_OP_STATIC",
--    [CC_OP_NZ]        =3D "CC_OP_NZ",
--    [CC_OP_LTGT_32]   =3D "CC_OP_LTGT_32",
--    [CC_OP_LTGT_64]   =3D "CC_OP_LTGT_64",
--    [CC_OP_LTUGTU_32] =3D "CC_OP_LTUGTU_32",
--    [CC_OP_LTUGTU_64] =3D "CC_OP_LTUGTU_64",
--    [CC_OP_LTGT0_32]  =3D "CC_OP_LTGT0_32",
--    [CC_OP_LTGT0_64]  =3D "CC_OP_LTGT0_64",
--    [CC_OP_ADD_64]    =3D "CC_OP_ADD_64",
--    [CC_OP_ADDU_64]   =3D "CC_OP_ADDU_64",
--    [CC_OP_ADDC_64]   =3D "CC_OP_ADDC_64",
--    [CC_OP_SUB_64]    =3D "CC_OP_SUB_64",
--    [CC_OP_SUBU_64]   =3D "CC_OP_SUBU_64",
--    [CC_OP_SUBB_64]   =3D "CC_OP_SUBB_64",
--    [CC_OP_ABS_64]    =3D "CC_OP_ABS_64",
--    [CC_OP_NABS_64]   =3D "CC_OP_NABS_64",
--    [CC_OP_ADD_32]    =3D "CC_OP_ADD_32",
--    [CC_OP_ADDU_32]   =3D "CC_OP_ADDU_32",
--    [CC_OP_ADDC_32]   =3D "CC_OP_ADDC_32",
--    [CC_OP_SUB_32]    =3D "CC_OP_SUB_32",
--    [CC_OP_SUBU_32]   =3D "CC_OP_SUBU_32",
--    [CC_OP_SUBB_32]   =3D "CC_OP_SUBB_32",
--    [CC_OP_ABS_32]    =3D "CC_OP_ABS_32",
--    [CC_OP_NABS_32]   =3D "CC_OP_NABS_32",
--    [CC_OP_COMP_32]   =3D "CC_OP_COMP_32",
--    [CC_OP_COMP_64]   =3D "CC_OP_COMP_64",
--    [CC_OP_TM_32]     =3D "CC_OP_TM_32",
--    [CC_OP_TM_64]     =3D "CC_OP_TM_64",
--    [CC_OP_NZ_F32]    =3D "CC_OP_NZ_F32",
--    [CC_OP_NZ_F64]    =3D "CC_OP_NZ_F64",
--    [CC_OP_NZ_F128]   =3D "CC_OP_NZ_F128",
--    [CC_OP_ICM]       =3D "CC_OP_ICM",
--    [CC_OP_SLA_32]    =3D "CC_OP_SLA_32",
--    [CC_OP_SLA_64]    =3D "CC_OP_SLA_64",
--    [CC_OP_FLOGR]     =3D "CC_OP_FLOGR",
--};
--
--static inline const char *cc_name(int cc_op)
+-static inline bool psw_key_valid(CPUS390XState *env, uint8_t psw_key)
 -{
--    return cc_names[cc_op];
+-    uint16_t pkm =3D env->cregs[3] >> 16;
+-
+-    if (env->psw.mask & PSW_MASK_PSTATE) {
+-        /* PSW key has range 0..15, it is valid if the bit is 1 in the P=
+KM */
+-        return pkm & (0x80 >> psw_key);
+-    }
+-    return true;
 -}
-+const char *cc_name(enum cc_op cc_op);
-=20
- static inline void setcc(S390CPU *cpu, uint64_t cc)
+-
+ static inline int cpu_mmu_index(CPUS390XState *env, bool ifetch)
  {
-diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-index 0c989b1610..e31d3e51df 100644
---- a/target/s390x/helper.c
-+++ b/target/s390x/helper.c
-@@ -352,3 +352,51 @@ void s390_cpu_dump_state(CPUState *cs, FILE *f, fpri=
-ntf_function cpu_fprintf,
+     switch (env->psw.mask & PSW_MASK_ASC) {
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index c71dce4b1e..b91c7402c4 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -56,6 +56,17 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAcce=
+ssType access_type,
+ #define HELPER_LOG(x...)
+ #endif
 =20
-     cpu_fprintf(f, "\n");
- }
-+
-+const char *cc_name(enum cc_op cc_op)
++static inline bool psw_key_valid(CPUS390XState *env, uint8_t psw_key)
 +{
-+    static const char * const cc_names[] =3D {
-+        [CC_OP_CONST0]    =3D "CC_OP_CONST0",
-+        [CC_OP_CONST1]    =3D "CC_OP_CONST1",
-+        [CC_OP_CONST2]    =3D "CC_OP_CONST2",
-+        [CC_OP_CONST3]    =3D "CC_OP_CONST3",
-+        [CC_OP_DYNAMIC]   =3D "CC_OP_DYNAMIC",
-+        [CC_OP_STATIC]    =3D "CC_OP_STATIC",
-+        [CC_OP_NZ]        =3D "CC_OP_NZ",
-+        [CC_OP_LTGT_32]   =3D "CC_OP_LTGT_32",
-+        [CC_OP_LTGT_64]   =3D "CC_OP_LTGT_64",
-+        [CC_OP_LTUGTU_32] =3D "CC_OP_LTUGTU_32",
-+        [CC_OP_LTUGTU_64] =3D "CC_OP_LTUGTU_64",
-+        [CC_OP_LTGT0_32]  =3D "CC_OP_LTGT0_32",
-+        [CC_OP_LTGT0_64]  =3D "CC_OP_LTGT0_64",
-+        [CC_OP_ADD_64]    =3D "CC_OP_ADD_64",
-+        [CC_OP_ADDU_64]   =3D "CC_OP_ADDU_64",
-+        [CC_OP_ADDC_64]   =3D "CC_OP_ADDC_64",
-+        [CC_OP_SUB_64]    =3D "CC_OP_SUB_64",
-+        [CC_OP_SUBU_64]   =3D "CC_OP_SUBU_64",
-+        [CC_OP_SUBB_64]   =3D "CC_OP_SUBB_64",
-+        [CC_OP_ABS_64]    =3D "CC_OP_ABS_64",
-+        [CC_OP_NABS_64]   =3D "CC_OP_NABS_64",
-+        [CC_OP_ADD_32]    =3D "CC_OP_ADD_32",
-+        [CC_OP_ADDU_32]   =3D "CC_OP_ADDU_32",
-+        [CC_OP_ADDC_32]   =3D "CC_OP_ADDC_32",
-+        [CC_OP_SUB_32]    =3D "CC_OP_SUB_32",
-+        [CC_OP_SUBU_32]   =3D "CC_OP_SUBU_32",
-+        [CC_OP_SUBB_32]   =3D "CC_OP_SUBB_32",
-+        [CC_OP_ABS_32]    =3D "CC_OP_ABS_32",
-+        [CC_OP_NABS_32]   =3D "CC_OP_NABS_32",
-+        [CC_OP_COMP_32]   =3D "CC_OP_COMP_32",
-+        [CC_OP_COMP_64]   =3D "CC_OP_COMP_64",
-+        [CC_OP_TM_32]     =3D "CC_OP_TM_32",
-+        [CC_OP_TM_64]     =3D "CC_OP_TM_64",
-+        [CC_OP_NZ_F32]    =3D "CC_OP_NZ_F32",
-+        [CC_OP_NZ_F64]    =3D "CC_OP_NZ_F64",
-+        [CC_OP_NZ_F128]   =3D "CC_OP_NZ_F128",
-+        [CC_OP_ICM]       =3D "CC_OP_ICM",
-+        [CC_OP_SLA_32]    =3D "CC_OP_SLA_32",
-+        [CC_OP_SLA_64]    =3D "CC_OP_SLA_64",
-+        [CC_OP_FLOGR]     =3D "CC_OP_FLOGR",
-+    };
++    uint16_t pkm =3D env->cregs[3] >> 16;
 +
-+    return cc_names[cc_op];
++    if (env->psw.mask & PSW_MASK_PSTATE) {
++        /* PSW key has range 0..15, it is valid if the bit is 1 in the P=
+KM */
++        return pkm & (0x80 >> psw_key);
++    }
++    return true;
 +}
++
+ /* Reduce the length so that addr + len doesn't cross a page boundary.  =
+*/
+ static inline uint32_t adj_len_to_page(uint32_t len, uint64_t addr)
+ {
 --=20
 2.13.5
