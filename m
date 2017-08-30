@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dn6RP-0005Pv-1K
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:06:12 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dn6RL-0002Et-1i
+	(envelope-from <david@redhat.com>) id 1dn6RP-0005Pu-1D
 	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:06:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41104)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <david@redhat.com>) id 1dn6RM-0002Fe-MK
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:06:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54290)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dn6RK-0002EP-RG
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:06:06 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dn6RM-0002FO-GI
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:06:08 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 30 Aug 2017 19:05:50 +0200
-Message-Id: <20170830170601.15855-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 00/11] next round of s390x cleanups
+Date: Wed, 30 Aug 2017 19:05:51 +0200
+Message-Id: <20170830170601.15855-2-david@redhat.com>
+In-Reply-To: <20170830170601.15855-1-david@redhat.com>
+References: <20170830170601.15855-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 01/11] exec,
+ dump: don't include exec/exec-all.h explicitly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +27,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
 
-No new functionality, only cleanups, some of the discussed during the last
-round of cleanups.
+All but two, namely exec.c and dump.c, include exec/exec-all.h via
+cpu.h only. as these files already include cpu.h, let's just drop the
+additional include.
 
-Not sure if the first two patches should be sent separatly? Anyhow, they
-are most probably not worth the trouble :)
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ dump.c | 1 -
+ exec.c | 1 -
+ 2 files changed, 2 deletions(-)
 
-The biggest part of this series is getting rid of s390-virtio.c and
-cleaning up our cpu number/id handling.
-
-Based on: git://github.com/cohuck/qemu s390-next
-
-
-David Hildenbrand (11):
-  exec,dump: don't include exec/exec-all.h explicitly
-  cpu: drop old comments describing members
-  s390x: store cpu states inside machine state
-  s390x: get rid of s390-virtio.c
-  s390x: rename s390-virtio.h to s390-virtio-hcall.h
-  target/s390x: cleanup cpu number/address handling
-  target/s390x: rename next_cpu_id to next_cpu_addr
-  s390x: allow only 1 CPU with TCG
-  target/s390x: tcg_s390_program_interrupt() will never return
-  target/s390x: use trigger_pgm_exception() in
-    s390_cpu_handle_mmu_fault()
-  target/s390x: use program_interrupt() in per_check_exception()
-
- dump.c                             |   1 -
- exec.c                             |   1 -
- hw/s390x/Makefile.objs             |   1 -
- hw/s390x/s390-virtio-ccw.c         | 169 ++++++++++++++++++++++++++++++-
- hw/s390x/s390-virtio-hcall.c       |   2 +-
- hw/s390x/s390-virtio-hcall.h       |  20 ++++
- hw/s390x/s390-virtio.c             | 201 -------------------------------------
- hw/s390x/s390-virtio.h             |  35 -------
- include/hw/s390x/s390-virtio-ccw.h |   3 +
- include/qom/cpu.h                  |   6 +-
- target/s390x/cpu-qom.h             |   2 +-
- target/s390x/cpu.c                 |  74 ++++----------
- target/s390x/cpu.h                 |   5 +-
- target/s390x/cpu_models.c          |   2 +-
- target/s390x/excp_helper.c         |   5 +-
- target/s390x/helper.c              |   8 +-
- target/s390x/interrupt.c           |   3 +-
- target/s390x/misc_helper.c         |  13 +--
- target/s390x/translate.c           |   5 +-
- 19 files changed, 230 insertions(+), 326 deletions(-)
- create mode 100644 hw/s390x/s390-virtio-hcall.h
- delete mode 100644 hw/s390x/s390-virtio.c
- delete mode 100644 hw/s390x/s390-virtio.h
-
+diff --git a/dump.c b/dump.c
+index d9090a24cc..c00094475c 100644
+--- a/dump.c
++++ b/dump.c
+@@ -15,7 +15,6 @@
+ #include "qemu/cutils.h"
+ #include "elf.h"
+ #include "cpu.h"
+-#include "exec/cpu-all.h"
+ #include "exec/hwaddr.h"
+ #include "monitor/monitor.h"
+ #include "sysemu/kvm.h"
+diff --git a/exec.c b/exec.c
+index d20c34ca83..8d8b6a0769 100644
+--- a/exec.c
++++ b/exec.c
+@@ -23,7 +23,6 @@
+ 
+ #include "qemu/cutils.h"
+ #include "cpu.h"
+-#include "exec/exec-all.h"
+ #include "exec/target_page.h"
+ #include "tcg.h"
+ #include "hw/qdev-core.h"
 -- 
 2.13.5
