@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dn3bc-0004Hy-IB
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:04:39 -0400
+	(envelope-from <berrange@redhat.com>) id 1dn3eo-0005X2-7N
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:07:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dn3bY-0000Vh-8s
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:04:32 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170830131847.GP4208@lemon.lan> (Fam Zheng's message of "Wed,
-	30 Aug 2017 21:18:47 +0800")
-References: <20170830100605.22694-1-famz@redhat.com>
-	<87mv6h5l87.fsf@secure.mitica> <20170830131847.GP4208@lemon.lan>
-Reply-To: quintela@redhat.com
-Date: Wed, 30 Aug 2017 16:04:07 +0200
-Message-ID: <87efrt5ezs.fsf@secure.mitica>
+	(envelope-from <berrange@redhat.com>) id 1dn3eh-0001n7-PE
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:07:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55875)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dn3eh-0001mu-F9
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 10:07:43 -0400
+Date: Wed, 30 Aug 2017 15:07:38 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170830140738.GS18526@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
+	<20170830082702.3011-3-Sergio.G.DelReal@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] block: Cleanup BMDS in bdrv_close_all
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170830082702.3011-3-Sergio.G.DelReal@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 02/13] hvf: add code base from Google's
+ QEMU repository
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,181 +29,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-stable@nongnu.org, qemu-devel@nongnu.org, peterx@redhat.com, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-Fam Zheng <famz@redhat.com> wrote:
-> On Wed, 08/30 13:49, Juan Quintela wrote:
->> Fam Zheng <famz@redhat.com> wrote:
->> > This fixes the assertion due to op blockers added by BMDS:
->> >
->> > block.c:3248: bdrv_delete: Assertion `bdrv_op_blocker_is_empty(bs)' failed.
->> >
->> > Reproducer: simply start block migration and quit QEMU before it ends.
->> >
->> > Cc: qemu-stable@nongnu.org
->> > Signed-off-by: Fam Zheng <famz@redhat.com>
->> 
->> No need for one stub, see later.
->> 
->> 
->> > ---
->> >  block.c                 | 2 ++
->> >  migration/block.c       | 2 +-
->> >  migration/block.h       | 1 +
->> >  stubs/Makefile.objs     | 1 +
->> >  stubs/block-migration.c | 6 ++++++
->> >  5 files changed, 11 insertions(+), 1 deletion(-)
->> >  create mode 100644 stubs/block-migration.c
->> >
->> > diff --git a/block.c b/block.c
->> > index 3308814bba..508a57274d 100644
->> > --- a/block.c
->> > +++ b/block.c
->> > @@ -43,6 +43,7 @@
->> >  #include "qemu/cutils.h"
->> >  #include "qemu/id.h"
->> >  #include "qapi/util.h"
->> > +#include "migration/block.h"
->> 
->> this should be misc.h
->> 
->> >  
->> >  #ifdef CONFIG_BSD
->> >  #include <sys/ioctl.h>
->> > @@ -3111,6 +3112,7 @@ static void bdrv_close(BlockDriverState *bs)
->> >  
->> >  void bdrv_close_all(void)
->> >  {
->> > +    block_migration_cleanup_bmds();
->> >      block_job_cancel_sync_all();
->> >      nbd_export_close_all();
->> >  
->> 
->> > diff --git a/migration/block.h b/migration/block.h
->> > index 22ebe94259..8bae1cf55a 100644
->> > --- a/migration/block.h
->> > +++ b/migration/block.h
->> > @@ -42,4 +42,5 @@ static inline uint64_t blk_mig_bytes_total(void)
->> >  #endif /* CONFIG_LIVE_BLOCK_MIGRATION */
->> >  
->> >  void migrate_set_block_enabled(bool value, Error **errp);
->> > +void block_migration_cleanup_bmds(void);
->> >  #endif /* MIGRATION_BLOCK_H */
->> > diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
->> > index e69c217aff..7540913767 100644
->> > --- a/stubs/Makefile.objs
->> > +++ b/stubs/Makefile.objs
->> > @@ -19,6 +19,7 @@ stub-obj-y += is-daemonized.o
->> >  stub-obj-$(CONFIG_LINUX_AIO) += linux-aio.o
->> >  stub-obj-y += machine-init-done.o
->> >  stub-obj-y += migr-blocker.o
->> > +stub-obj-y += block-migration.o
->> >  stub-obj-y += change-state-handler.o
->> >  stub-obj-y += monitor.o
->> >  stub-obj-y += notify-event.o
->> > diff --git a/stubs/block-migration.c b/stubs/block-migration.c
->> > new file mode 100644
->> > index 0000000000..855f15c757
->> > --- /dev/null
->> > +++ b/stubs/block-migration.c
->> > @@ -0,0 +1,6 @@
->> > +#include "qemu/osdep.h"
->> > +#include "migration/block.h"
->> > +
->> > +void block_migration_cleanup_bmds(void)
->> > +{
->> > +}
->> 
->> You can add this inside include/migration/misc.h
->> 
->> #ifdef CONFIG_LIVE_BLOCK_MIGRATION
->> void blk_mig_init(void);
->> #else
->> static inline void blk_mig_init(void) {}
->> 
->> // And then you add the stub here?
->
-> This doesn't work.  The function is not stubbed for !CONFIG_LIVE_BLOCK_MIGRATION
-> configs, but for tools that don't link to common-obj-y. For example with your
-> proposed change, I get:
->
->   LINK    qemu-nbd
-> block.o: In function `bdrv_close_all':
-> /home/fam/work/qemu/block.c:3115: undefined reference to
-> `block_migration_cleanup_bmds'
-> collect2: error: ld returned 1 exit status
-> make: *** [/home/fam/work/qemu/rules.mak:121: qemu-nbd] Error 1
-> make: Leaving directory '/home/fam/work/q/build'
+On Wed, Aug 30, 2017 at 03:26:51AM -0500, Sergio Andres Gomez Del Real wrote:
+> This file begins tracking the files that will be the code base for HVF
+> support in QEMU. This code base is part of Google's QEMU version of
+> their Android emulator, and can be found at
+> https://android.googlesource.com/platform/external/qemu/+/emu-master-dev
+> 
+> This code is based on Veertu Inc's vdhh (Veertu Desktop Hosted
+> Hypervisor), found at https://github.com/veertuinc/vdhh. Everything is
+> appropriately licensed under GPL v2.
+
+The licensing seems a little more complicated than that
+
+Per the QEMU LICENSE file new contributions must be  GPL v2-or-later
 
 
-This works for me, for both CONFIG_LIVE_BLOCK_MIGRATION enabled and not.
-For qemu-system-x86_64 and qemu-nbd.  Could you test?
+> diff --git a/target/i386/hvf-all.c b/target/i386/hvf-all.c
+> new file mode 100644
+> index 0000000000..0a1a5134f8
+> --- /dev/null
+> +++ b/target/i386/hvf-all.c
+> @@ -0,0 +1,999 @@
+> +// Copyright 2008 IBM Corporation
+> +//           2008 Red Hat, Inc.
+> +// Copyright 2011 Intel Corporation
+> +// Copyright 2016 Veertu, Inc.
+> +// Copyright 2017 The Android Open Source Project
+> +// 
+> +// QEMU Hypervisor.framework support
+> +// 
+> +// This software is licensed under the terms of the GNU General Public
+> +// License version 2, as published by the Free Software Foundation, and
+> +// may be copied, distributed, and modified under those terms.
+> +// 
+> +// This program is distributed in the hope that it will be useful,
+> +// but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +// GNU General Public License for more details.
 
-gcommit 2888b96dfe5ea9c7901990f54e14b1a7ed3e46b9
-Author: Fam Zheng <famz@redhat.com>
-Date:   Wed Aug 30 18:06:05 2017 +0800
+This is v2-only.
 
-    block: Cleanup BMDS in bdrv_close_all
-    
-    This fixes the assertion due to op blockers added by BMDS:
-    
-    block.c:3248: bdrv_delete: Assertion `bdrv_op_blocker_is_empty(bs)' failed.
-    
-    Reproducer: simply start block migration and quit QEMU before it ends.
-    
-    Cc: qemu-stable@nongnu.org
-    Signed-off-by: Fam Zheng <famz@redhat.com>
-    
-    --
-    
-    Don't use stub
+If this v2-only license is inherited due to the file being derived
+from another pre-existing file in QEMU that was v2-only, we could
+possibly make an exception to allow another v2-only file in tree.
+Preferably it should be v2-or-later though.
 
-diff --git a/block.c b/block.c
-index 3615a6809e..4268f892da 100644
---- a/block.c
-+++ b/block.c
-@@ -43,6 +43,7 @@
- #include "qemu/cutils.h"
- #include "qemu/id.h"
- #include "qapi/util.h"
-+#include "migration/misc.h"
- 
- #ifdef CONFIG_BSD
- #include <sys/ioctl.h>
-@@ -3111,6 +3112,7 @@ static void bdrv_close(BlockDriverState *bs)
- 
- void bdrv_close_all(void)
- {
-+    block_migration_cleanup_bmds();
-     block_job_cancel_sync_all();
-     nbd_export_close_all();
- 
-diff --git a/include/migration/misc.h b/include/migration/misc.h
-index c079b7771b..6ecb7068d9 100644
---- a/include/migration/misc.h
-+++ b/include/migration/misc.h
-@@ -24,8 +24,10 @@ void ram_mig_init(void);
- 
- #ifdef CONFIG_LIVE_BLOCK_MIGRATION
- void blk_mig_init(void);
-+void block_migration_cleanup_bmds(void);
- #else
- static inline void blk_mig_init(void) {}
-+static inline void block_migration_cleanup_bmds(void) {}
- #endif
- 
- #define SELF_ANNOUNCE_ROUNDS 5
-diff --git a/migration/block.c b/migration/block.c
-index 9171f60028..c059e48484 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -673,7 +673,7 @@ static int64_t get_remaining_dirty(void)
- 
- 
- /* Called with iothread lock taken.  */
--static void block_migration_cleanup_bmds(void)
-+void block_migration_cleanup_bmds(void)
- {
-     BlkMigDevState *bmds;
-     AioContext *ctx;
+> diff --git a/target/i386/hvf-utils/vmcs.h b/target/i386/hvf-utils/vmcs.h
+> new file mode 100644
+> index 0000000000..6f7ccb361a
+> --- /dev/null
+> +++ b/target/i386/hvf-utils/vmcs.h
+> @@ -0,0 +1,368 @@
+> +/*-
+> + * Copyright (c) 2011 NetApp, Inc.
+> + * All rights reserved.
+> + *
+> + * Redistribution and use in source and binary forms, with or without
+> + * modification, are permitted provided that the following conditions
+> + * are met:
+> + * 1. Redistributions of source code must retain the above copyright
+> + *    notice, this list of conditions and the following disclaimer.
+> + * 2. Redistributions in binary form must reproduce the above copyright
+> + *    notice, this list of conditions and the following disclaimer in the
+> + *    documentation and/or other materials provided with the distribution.
+> + *
+> + * THIS SOFTWARE IS PROVIDED BY NETAPP, INC ``AS IS'' AND
+> + * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+> + * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+> + * ARE DISCLAIMED.  IN NO EVENT SHALL NETAPP, INC OR CONTRIBUTORS BE LIABLE
+> + * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+> + * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+> + * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+> + * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+> + * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+> + * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+> + * SUCH DAMAGE.
+> + *
+> + * $FreeBSD$
+> + */
+
+A BSD license variant. OK since its GPL compatible and just a header file
+copied from a 3rd party project.
+
+> diff --git a/target/i386/hvf-utils/vmx.h b/target/i386/hvf-utils/vmx.h
+> new file mode 100644
+> index 0000000000..8a080e6777
+> --- /dev/null
+> +++ b/target/i386/hvf-utils/vmx.h
+> @@ -0,0 +1,200 @@
+> +/*
+> + * Copyright (C) 2016 Veertu Inc,
+> + * Copyright (C) 2017 Google Inc,
+> + * Based on Veertu vddh/vmm/vmx.h
+> + *
+> + * Interfaces to Hypervisor.framework to read/write X86 registers and VMCS.
+> + *
+> + * This program is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU General Public License as
+> + * published by the Free Software Foundation; either version 2 or
+> + * (at your option) version 3 of the License.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License along
+> + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+
+This is  v2-or-v3-only, which is not OK for QEMU.
+
+It needs to be v2-or-later
+
+
+
+> diff --git a/target/i386/hvf-utils/x86.c b/target/i386/hvf-utils/x86.c
+> new file mode 100644
+> index 0000000000..e3db2c9c8b
+> --- /dev/null
+> +++ b/target/i386/hvf-utils/x86.c
+> @@ -0,0 +1,174 @@
+> +/*
+> + * Copyright (C) 2016 Veertu Inc,
+> + * Copyright (C) 2017 Google Inc,
+> + *
+> + * This program is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU General Public License as
+> + * published by the Free Software Foundation; either version 2 or
+> + * (at your option) version 3 of the License.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License along
+> + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+
+Again  v2-or-v3-only.
+
+There's many more files with this same problem but I'll stop pointing
+them out now.
+
+If this is to be included in QEMU,  Veertu & Google (and any other
+copyright holders) would have to agree to change these files to
+v2-or-later
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
