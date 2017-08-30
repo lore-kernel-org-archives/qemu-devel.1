@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dn83s-0006Bj-B9
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:50:01 -0400
+	(envelope-from <thuth@redhat.com>) id 1dn893-0007JQ-9L
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:55:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dn83r-0007V6-CI
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:50:00 -0400
-References: <cover.1504111803.git.jcody@redhat.com>
-	<e99a5e3feefe5fdb54d64fb80b09089618a0ff49.1504111803.git.jcody@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ccb4009d-6522-f1df-57aa-c0778eec551b@redhat.com>
-Date: Wed, 30 Aug 2017 13:49:39 -0500
+	(envelope-from <thuth@redhat.com>) id 1dn890-00014W-PK
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:55:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44330)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dn890-00014H-Ia
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:55:18 -0400
+References: <20170830170601.15855-1-david@redhat.com>
+	<20170830170601.15855-2-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d05eb222-8b39-4ec6-2a2b-34a255becd43@redhat.com>
+Date: Wed, 30 Aug 2017 20:55:12 +0200
 MIME-Version: 1.0
-In-Reply-To: <e99a5e3feefe5fdb54d64fb80b09089618a0ff49.1504111803.git.jcody@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="CHchxNXHR9XVOaNg0WgjegUM4guPfJoNs"
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] qemu-iotests: add option to save
- temp files on error
+In-Reply-To: <20170830170601.15855-2-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 01/11] exec,
+ dump: don't include exec/exec-all.h explicitly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, armbru@redhat.com, jsnow@redhat.com, stefanha@redhat.com, kwolf@redhat.com
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CHchxNXHR9XVOaNg0WgjegUM4guPfJoNs
-From: Eric Blake <eblake@redhat.com>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, armbru@redhat.com, jsnow@redhat.com,
- stefanha@redhat.com, kwolf@redhat.com
-Message-ID: <ccb4009d-6522-f1df-57aa-c0778eec551b@redhat.com>
-Subject: Re: [PATCH v3 5/5] qemu-iotests: add option to save temp files on
- error
-References: <cover.1504111803.git.jcody@redhat.com>
- <e99a5e3feefe5fdb54d64fb80b09089618a0ff49.1504111803.git.jcody@redhat.com>
-In-Reply-To: <e99a5e3feefe5fdb54d64fb80b09089618a0ff49.1504111803.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 08/30/2017 11:52 AM, Jeff Cody wrote:
-> Now that ./check takes care of cleaning up after each tests, it
-> can also selectively not clean up.  Add option to leave all output from=
-
-> tests intact if that test encountered an error.
->=20
-> Note: this currently only works for bash tests, as the python tests
-> still clean up after themselves manually.
->=20
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
+On 30.08.2017 19:05, David Hildenbrand wrote:
+> All but two, namely exec.c and dump.c, include exec/exec-all.h via
+> cpu.h only. as these files already include cpu.h, let's just drop the
+> additional include.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  tests/qemu-iotests/check  | 10 +++++++++-
->  tests/qemu-iotests/common |  6 ++++++
->  2 files changed, 15 insertions(+), 1 deletion(-)
->=20
-> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-> index f6ca85d..8a5fc0d 100755
-> --- a/tests/qemu-iotests/check
-> +++ b/tests/qemu-iotests/check
-> @@ -370,7 +370,15 @@ do
->              fi
->          fi
-> =20
-> -        rm -rf "$TEST_DIR_SEQ"
-> +        #TODO: There is some intial work to save intermediate files
+>  dump.c | 1 -
+>  exec.c | 1 -
+>  2 files changed, 2 deletions(-)
+> 
+> diff --git a/dump.c b/dump.c
+> index d9090a24cc..c00094475c 100644
+> --- a/dump.c
+> +++ b/dump.c
+> @@ -15,7 +15,6 @@
+>  #include "qemu/cutils.h"
+>  #include "elf.h"
+>  #include "cpu.h"
+> -#include "exec/cpu-all.h"
 
-s/intial/initial/
+That's cpu-all.h, not exec-all.h ...
 
-> +        #      in python tests, but it is imperfect.  Having each
-> +        #      test record its test name, and the tearDown function
-> +        #      just move intermediate images to a subdirectory with
-> +        #      the test name may prove more useful.
+>  #include "exec/hwaddr.h"
+>  #include "monitor/monitor.h"
+>  #include "sysemu/kvm.h"
+> diff --git a/exec.c b/exec.c
+> index d20c34ca83..8d8b6a0769 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -23,7 +23,6 @@
+>  
+>  #include "qemu/cutils.h"
+>  #include "cpu.h"
+> -#include "exec/exec-all.h"
+>  #include "exec/target_page.h"
+>  #include "tcg.h"
+>  #include "hw/qdev-core.h"
 
-Comment works for me, and I'm fine with the idea you present here being
-in a followup patch.  So with the typo fixed,
-Reviewed-by: Eric Blake <eblake@redhat.com>
+... and if I do a grep for exec-all.h in the cpu.h files, I hardly get
+any matches. => Your patch description sounds wrong ... I guess you only
+wanted to handle cpu-all.h here?
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---CHchxNXHR9XVOaNg0WgjegUM4guPfJoNs
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmnCMMACgkQp6FrSiUn
-Q2qD0Af+KWeWscBI9Rc87EWMF8vZZyFd6aFcFFrYgbLsHVY1IAwfFs48oPn0D7Nf
-zE1/JBHocXeXC/WsEe99fptiq23u91sjGK3irs9iBO9edgKbNpxmVKhxRLmS/z6B
-MSWOQZ9f7rhaN8Q/kLjNTtU7uOv83wJSkYAvqjON4CA7uId0cx9lWVVyxZqcb3jy
-yq5b7htVyEdgg/G7wngLD9vuLHrKsjb93352VbpBN/3jWKCtIPNS2clKR/UKUjLT
-K/81dikts42UR0oHyZee7HIyxGXhlY36wUwkpM4Cf4ngogsmruWGO5xdiG1btATV
-Yvrp2HsXwoe2UJG6ZpjINBOOuPS+eQ==
-=Bsft
------END PGP SIGNATURE-----
-
---CHchxNXHR9XVOaNg0WgjegUM4guPfJoNs--
+ Thomas
