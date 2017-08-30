@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dn9o3-0000DM-Vx
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:41:49 -0400
+	(envelope-from <crosa@redhat.com>) id 1dn9q0-0000re-Mi
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:43:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dn9o0-0006r8-Q8
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:41:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37305)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dn9o0-0006qu-Gd
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:41:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dn9ny-00060r-59
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 20:41:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7A1F62E8078
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 20:41:39 +0000 (UTC)
+	(envelope-from <crosa@redhat.com>) id 1dn9px-0007Ok-Gf
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:43:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51390)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1dn9px-0007Oe-6u
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 16:43:45 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 309CD285A8
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 20:43:44 +0000 (UTC)
+References: <20170830113319.6749-1-quintela@redhat.com>
+	<20170830113319.6749-3-quintela@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <3e72d12b-2af1-a713-29a0-4832ef47474a@redhat.com>
+Date: Wed, 30 Aug 2017 16:43:36 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 30 Aug 2017 20:27:35 -0000
-From: Thomas Huth <1701971@bugs.launchpad.net>
-Reply-To: Bug 1701971 <1701971@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149903601307.6257.7341525830619997074.malonedeb@gac.canonical.com>
-Message-Id: <150412485524.16815.9216523794173492084.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1701971] Re: multithreading not working right
- under qemu user mode for sh4
+In-Reply-To: <20170830113319.6749-3-quintela@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Lx2AfGeRUdJpn38ot1QD0vg5mmsrs7QAT"
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] tests: Make vmgenid test compile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,109 +34,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-A patch for this has apparently been included in QEMU v2.10:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D4bfa602bc2227f5b5a506=
-a4
-Is this issue now completely fixed (so that we can close this ticket), or i=
-s there something left to do?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Lx2AfGeRUdJpn38ot1QD0vg5mmsrs7QAT
+From: Cleber Rosa <crosa@redhat.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com,
+ peterx@redhat.com
+Message-ID: <3e72d12b-2af1-a713-29a0-4832ef47474a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] tests: Make vmgenid test compile
+References: <20170830113319.6749-1-quintela@redhat.com>
+ <20170830113319.6749-3-quintela@redhat.com>
+In-Reply-To: <20170830113319.6749-3-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1701971
 
-Title:
-  multithreading not working right under qemu user mode for sh4
+On 08/30/2017 07:33 AM, Juan Quintela wrote:
+> Just make sure that nr_tables is size_t not int.
+>=20
+> Suggested-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>=20
+> --
+>=20
+> Drop the s/g_new0/g_malloc0/ change.
+> ---
+>  tests/vmgenid-test.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+> index 3d5c1c3615..bcd3d7ec07 100644
+> --- a/tests/vmgenid-test.c
+> +++ b/tests/vmgenid-test.c
+> @@ -40,7 +40,7 @@ static uint32_t acpi_find_vgia(void)
+>      AcpiRsdpDescriptor rsdp_table;
+>      uint32_t rsdt;
+>      AcpiRsdtDescriptorRev1 rsdt_table;
+> -    int tables_nr;
+> +    size_t tables_nr;
+>      uint32_t *tables;
+>      AcpiTableHeader ssdt_table;
+>      VgidTable vgid_table;
+>=20
 
-Status in QEMU:
-  New
+Tested-by: Cleber Rosa <crosa@redhat.com>
 
-Bug description:
-  In a multithreaded program running under qemu-sh4 (version 2.9.0),
-  thread termination and/or pthread_join is not working right.
 
-  The attached program works natively on all kinds of platforms, and
-  under qemu user mode emulation for at least alpha, armelhf, aarch64,
-  powerpc64le.
+--Lx2AfGeRUdJpn38ot1QD0vg5mmsrs7QAT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  How to reproduce:
-  - Compile the program: sh4-linux-gnu-gcc-5 -O -Wall -lpthread -o test-tls=
- test-tls.c
-  - Set environment variables for running qemu-sh4.
-  - ~/inst-qemu/2.9.0/bin/qemu-sh4 test-tls
+-----BEGIN PGP SIGNATURE-----
 
-  Expected behaviour: After the "Worker xxxxx dying" line, the main()
-  function prints "OK", and the program terminates.
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAlmnI3kACgkQZX6NM6Xy
+CfMZDw/+OC9u0es5KZNOmieZpHT9d2UTghy5WMMhManiPqkbrMRBqjUenhW28JPW
+YvaKCe2OTUEvq5l0JnusCmQHbMFcBEt+FqLZSdgFca8aZPu4TjM7DQJBE/FZUrJI
+AgoOJwQKA9JELYcLbwalCZfqJB7musMLYtgqFFBmAwHgnDQsU4hpzukU+LqMABG/
+0VpDUDmb2GhwLJ4DBg1cPG8KqEkxTAf1v/ZkbSAF4Hl7gyn6Zpv6vau2Jh5O9PZi
+Bce1Wy/GJeZGXfnzV+ZJT9Jyvs1MDHNqW1a7pow6DsoS+p0zYe/E46pujIH6MzEG
+YgHg6HQ2UCsBY+EGhyNcD67ve4tC75OZDDw50AUJCH6MjgJhCtIBa5OpDed4Fzyv
+L+4cjiNg5C3k277KgX7t1Uq4xDdLdK9uNAF/aIKrSZdWzHY9rpi1ln7OZS/ivlTt
+vH5vC0rOKBXDJ21OgvWiFpWrg+bYniQIOJdQu9SydF0Lddh3uqRikZLouRnerCvo
+u12UbJDSmXk3eT098uwMSGUo5ZKPLN8vc121VMndco98vzc0NBgg3xprZKaFDBGu
+Cz42gQQnGmk91+3cVvyjVrfhuEr9xi472AR9i+k/uHzbL+FLwm/T++24VKGKxW/w
++23Tsse9yeEn8gPzpm+B64zfv3HN38tUAK0bkHQ06ZXBZ7UIaFs=
+=oeht
+-----END PGP SIGNATURE-----
 
-  Actual behaviour (only on sh4): After the "Worker xxxxx dying" line, it h=
-angs. Attaching gdb to qemu shows 15 threads with a stack trace like
-  #0  safe_syscall_base () at /build/qemu-2.9.0/linux-user/host/x86_64/safe=
--syscall.inc.S:75
-  #1  0x00005584f86f4c48 in safe_futex (uaddr=3D<optimized out>, op=3Dop@en=
-try=3D128, val=3Dval@entry=3D2, timeout=3D<optimized out>, uaddr2=3Duaddr2@=
-entry=3D0x0, =
-
-      val3=3Dval3@entry=3D-161181992) at /build/qemu-2.9.0/linux-user/sysca=
-ll.c:921
-  #2  0x00005584f870353b in do_futex (val3=3D-161181992, uaddr2=3D413462462=
-4, timeout=3D0, val=3D<optimized out>, op=3D<optimized out>, uaddr=3D<optim=
-ized out>)
-      at /build/qemu-2.9.0/linux-user/syscall.c:7147
-  #3  do_syscall (cpu_env=3D<optimized out>, num=3D240, arg1=3D<optimized o=
-ut>, arg2=3D<optimized out>, arg3=3D<optimized out>, arg4=3D0, arg5=3D-1603=
-42672, =
-
-      arg6=3D-161181992, arg7=3D0, arg8=3D0) at /build/qemu-2.9.0/linux-use=
-r/syscall.c:11692
-  #4  0x00005584f86f454a in cpu_loop (env=3Denv@entry=3D0x5584fb3d04f8) at =
-/build/qemu-2.9.0/linux-user/main.c:2676
-  #5  0x00005584f86f5dd5 in clone_func (arg=3D0x7fff4d485c20) at /build/qem=
-u-2.9.0/linux-user/syscall.c:6234
-  #6  0x00007f08f05a46ba in start_thread (arg=3D0x7f08f1368700) at pthread_=
-create.c:333
-  #7  0x00007f08f02da3dd in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
-lone.S:109
-
-  and 1 thread with a stack trace like
-  #0  safe_syscall_base () at /build/qemu-2.9.0/linux-user/host/x86_64/safe=
--syscall.inc.S:75
-  #1  0x00005584f86f4c48 in safe_futex (uaddr=3D<optimized out>, op=3Dop@en=
-try=3D0, val=3Dval@entry=3D18875, timeout=3D<optimized out>, uaddr2=3Duaddr=
-2@entry=3D0x0, =
-
-      val3=3Dval3@entry=3D-161180376) at /build/qemu-2.9.0/linux-user/sysca=
-ll.c:921
-  #2  0x00005584f870353b in do_futex (val3=3D-161180376, uaddr2=3D413510176=
-8, timeout=3D0, val=3D<optimized out>, op=3D<optimized out>, uaddr=3D<optim=
-ized out>)
-      at /build/qemu-2.9.0/linux-user/syscall.c:7147
-  #3  do_syscall (cpu_env=3D<optimized out>, num=3D240, arg1=3D<optimized o=
-ut>, arg2=3D<optimized out>, arg3=3D<optimized out>, arg4=3D0, arg5=3D-1598=
-65528, =
-
-      arg6=3D-161180376, arg7=3D0, arg8=3D0) at /build/qemu-2.9.0/linux-use=
-r/syscall.c:11692
-  #4  0x00005584f86f454a in cpu_loop (env=3D0x5584fb3b99a8) at /build/qemu-=
-2.9.0/linux-user/main.c:2676
-  #5  0x00005584f86c12d3 in main (argc=3D<optimized out>, argv=3D0x7fff4d48=
-78b8, envp=3D<optimized out>)
-      at /build/qemu-2.9.0/linux-user/main.c:4860
-
-  and 1 thread with a stack trace like
-  #0  syscall () at ../sysdeps/unix/sysv/linux/x86_64/syscall.S:38
-  #1  0x00005584f876eab5 in qemu_futex_wait (val=3D<optimized out>, f=3D<op=
-timized out>) at /build/qemu-2.9.0/include/qemu/futex.h:26
-  #2  qemu_event_wait (ev=3Dev@entry=3D0x5584faa43d84 <rcu_call_ready_event=
->) at /build/qemu-2.9.0/util/qemu-thread-posix.c:399
-  #3  0x00005584f87748ce in call_rcu_thread (opaque=3D<optimized out>) at /=
-build/qemu-2.9.0/util/rcu.c:249
-  #4  0x00007f08f05a46ba in start_thread (arg=3D0x7f08eff62700) at pthread_=
-create.c:333
-  #5  0x00007f08f02da3dd in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
-lone.S:109
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1701971/+subscriptions
+--Lx2AfGeRUdJpn38ot1QD0vg5mmsrs7QAT--
