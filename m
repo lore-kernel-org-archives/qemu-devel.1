@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dn0Nd-0003sE-Nj
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:37:55 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dn0Om-0004ZO-6E
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:39:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dn0Nc-0002Oc-Ci
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:37:53 -0400
-Received: from mail-vk0-x241.google.com ([2607:f8b0:400c:c05::241]:35180)
+	(envelope-from <stefanha@gmail.com>) id 1dn0Oj-0002aw-34
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:39:04 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35555)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dn0Nc-0002OU-74
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:37:52 -0400
-Received: by mail-vk0-x241.google.com with SMTP id s199so2274442vke.2
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 03:37:52 -0700 (PDT)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dn0Oi-0002af-Sa
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:39:01 -0400
+Received: by mail-wm0-x241.google.com with SMTP id e204so1329859wma.2
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 03:39:00 -0700 (PDT)
+Date: Wed, 30 Aug 2017 11:38:57 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170830103857.GJ24565@stefanha-x1.localdomain>
+References: <1504025019-16820-1-git-send-email-chugh.ishani@research.iiit.ac.in>
 MIME-Version: 1.0
-In-Reply-To: <20170824192730.8440-15-dgilbert@redhat.com>
-References: <20170824192730.8440-1-dgilbert@redhat.com>
-	<20170824192730.8440-15-dgilbert@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 30 Aug 2017 03:37:50 -0700
-Message-ID: <CAJ+F1CKKiFrBLFy092d6RhEo=o9kTmOHeKgjZo2zUQtO_TtEdA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 14/32] vhost+postcopy: Transmit 'listen'
- to client
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1504025019-16820-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] QEMU Backup Tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,251 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, a.perevalov@samsung.com, "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>, aarcange@redhat.com, Felipe Franciosi <felipe@nutanix.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, stefanha@redhat.com
 
-On Thu, Aug 24, 2017 at 12:27 PM, Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Notify the vhost-user client on reception of the 'postcopy-listen'
-> event from the source.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  contrib/libvhost-user/libvhost-user.c | 21 +++++++++++++++++++++
->  contrib/libvhost-user/libvhost-user.h |  2 ++
->  docs/interop/vhost-user.txt           |  6 ++++++
->  hw/virtio/trace-events                |  3 +++
->  hw/virtio/vhost-user.c                | 30 +++++++++++++++++++++++++++++=
-+
->  migration/postcopy-ram.h              |  1 +
->  migration/savevm.c                    |  7 +++++++
->  7 files changed, 70 insertions(+)
->
-> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
-r/libvhost-user.c
-> index f9b5b12b28..e8accf11db 100644
-> --- a/contrib/libvhost-user/libvhost-user.c
-> +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -15,7 +15,9 @@
->
->  #include <qemu/osdep.h>
->  #include <sys/eventfd.h>
-> +#include <sys/ioctl.h>
->  #include <sys/syscall.h>
-> +#include <linux/userfaultfd.h>
->  #include <linux/vhost.h>
->
+On Tue, Aug 29, 2017 at 10:13:36PM +0530, Ishani Chugh wrote:
+> This patch series is intended to introduce QEMU Backup tool.
+> qemu-backup will be a command-line tool for performing full and
+> incremental disk backups on running VMs. It is intended as a
+> reference implementation for management stack and backup developers
+> to see QEMU's backup features in action.
+> This patch series contains three patches,
+>                1) QEMU Backup command line tool.
+>                2) Test for full backup.
+>                3) Manpage for the tool.
+> 
+> Ishani Chugh (3):
+>   backup: QEMU Backup Tool
+>   Test for full Backup
+>   Add manpage for QEMU Backup Tool
+> 
+>  Makefile                        |  14 +-
+>  contrib/backup/qemu-backup.py   | 335 ++++++++++++++++++++++++++++++++++++++++
+>  contrib/backup/qemu-backup.texi | 144 +++++++++++++++++
+>  tests/qemu-iotests/191          |  86 +++++++++++
+>  tests/qemu-iotests/191.out      |  35 +++++
+>  tests/qemu-iotests/group        |   2 +
+>  6 files changed, 612 insertions(+), 4 deletions(-)
+>  create mode 100644 contrib/backup/qemu-backup.py
+>  create mode 100644 contrib/backup/qemu-backup.texi
+>  create mode 100755 tests/qemu-iotests/191
+>  create mode 100644 tests/qemu-iotests/191.out
 
-Belong to an earlier patch
+When you send the next revision to address Fam's comments, please
+include a changelog like this:
 
->  #include "qemu/atomic.h"
-> @@ -64,6 +66,7 @@ vu_request_to_string(int req)
->          REQ(VHOST_USER_IOTLB_MSG),
->          REQ(VHOST_USER_SET_VRING_ENDIAN),
->          REQ(VHOST_USER_POSTCOPY_ADVISE),
-> +        REQ(VHOST_USER_POSTCOPY_LISTEN),
->          REQ(VHOST_USER_MAX),
->      };
->  #undef REQ
-> @@ -802,6 +805,22 @@ out:
->  }
->
->  static bool
-> +vu_set_postcopy_listen(VuDev *dev, VhostUserMsg *vmsg)
-> +{
-> +    vmsg->payload.u64 =3D -1;
-> +    vmsg->size =3D sizeof(vmsg->payload.u64);
-> +
-> +    if (dev->nregions) {
-> +        vu_panic(dev, "Regions already registered at postcopy-listen");
-> +        return true;
-> +    }
-> +    dev->postcopy_listening =3D true;
-> +
-> +    vmsg->flags =3D VHOST_USER_VERSION |  VHOST_USER_REPLY_MASK;
-> +    vmsg->payload.u64 =3D 0; /* Success */
-> +    return true;
-> +}
-> +static bool
->  vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
->  {
->      int do_reply =3D 0;
-> @@ -868,6 +887,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
->          break;
->      case VHOST_USER_POSTCOPY_ADVISE:
->          return vu_set_postcopy_advise(dev, vmsg);
-> +    case VHOST_USER_POSTCOPY_LISTEN:
-> +        return vu_set_postcopy_listen(dev, vmsg);
->      default:
->          vmsg_close_fds(vmsg);
->          vu_panic(dev, "Unhandled request: %d", vmsg->request);
-> diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
-r/libvhost-user.h
-> index 3e8efdd919..29c11ba56c 100644
-> --- a/contrib/libvhost-user/libvhost-user.h
-> +++ b/contrib/libvhost-user/libvhost-user.h
-> @@ -67,6 +67,7 @@ typedef enum VhostUserRequest {
->      VHOST_USER_IOTLB_MSG        =3D 22,
->      VHOST_USER_SET_VRING_ENDIAN =3D 23,
->      VHOST_USER_POSTCOPY_ADVISE  =3D 24,
-> +    VHOST_USER_POSTCOPY_LISTEN  =3D 25,
->      VHOST_USER_MAX
->  } VhostUserRequest;
->
-> @@ -237,6 +238,7 @@ struct VuDev {
->
->      /* Postcopy data */
->      int postcopy_ufd;
-> +    bool postcopy_listening;
->  };
->
->  typedef struct VuVirtqElement {
-> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
-> index dad2a1b343..73c3dd74db 100644
-> --- a/docs/interop/vhost-user.txt
-> +++ b/docs/interop/vhost-user.txt
-> @@ -615,6 +615,12 @@ Master message types
->        the slave must open a userfaultfd for later use.
->        Note that at this stage the migration is still in precopy mode.
->
-> + * VHOST_USER_POSTCOPY_LISTEN
-> +      Id: 25
-> +      Master payload: N/A
-> +
-> +      Master advises slave that a transition to postcopy mode has happen=
-ed.
-> +
->  Slave message types
->  -------------------
->
-> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> index 775461ae98..f736c7c84f 100644
-> --- a/hw/virtio/trace-events
-> +++ b/hw/virtio/trace-events
-> @@ -1,5 +1,8 @@
->  # See docs/devel/tracing.txt for syntax documentation.
->
-> +# hw/virtio/vhost-user.c
-> +vhost_user_postcopy_listen(void) ""
-> +
->  # hw/virtio/virtio.c
->  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned=
- out_num) "elem %p size %zd in_num %u out_num %u"
->  virtqueue_fill(void *vq, const void *elem, unsigned int len, unsigned in=
-t idx) "vq %p elem %p len %u idx %u"
-> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> index b7898f8939..9178271ab2 100644
-> --- a/hw/virtio/vhost-user.c
-> +++ b/hw/virtio/vhost-user.c
-> @@ -69,6 +69,7 @@ typedef enum VhostUserRequest {
->      VHOST_USER_IOTLB_MSG =3D 22,
->      VHOST_USER_SET_VRING_ENDIAN =3D 23,
->      VHOST_USER_POSTCOPY_ADVISE  =3D 24,
-> +    VHOST_USER_POSTCOPY_LISTEN  =3D 25,
->      VHOST_USER_MAX
->  } VhostUserRequest;
->
-> @@ -788,6 +789,32 @@ static int vhost_user_postcopy_advise(struct vhost_d=
-ev *dev, Error **errp)
->      return 0;
->  }
->
-> +/*
-> + * Called at the switch to postcopy on reception of the 'listen' command=
-.
-> + */
-> +static int vhost_user_postcopy_listen(struct vhost_dev *dev, Error **err=
-p)
-> +{
-> +    int ret;
-> +    VhostUserMsg msg =3D {
-> +        .request =3D VHOST_USER_POSTCOPY_LISTEN,
-> +        .flags =3D VHOST_USER_VERSION | VHOST_USER_NEED_REPLY_MASK,
-> +    };
-> +
-> +    trace_vhost_user_postcopy_listen();
-> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-> +        error_setg(errp, "Failed to send postcopy_listen to vhost");
-> +        return -1;
-> +    }
-> +
-> +    ret =3D process_message_reply(dev, &msg);
-> +    if (ret) {
-> +        error_setg(errp, "Failed to receive reply to postcopy_listen");
-> +        return ret;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
->                                          void *opaque)
->  {
-> @@ -810,6 +837,9 @@ static int vhost_user_postcopy_notifier(NotifierWithR=
-eturn *notifier,
->      case POSTCOPY_NOTIFY_INBOUND_ADVISE:
->          return vhost_user_postcopy_advise(dev, pnd->errp);
->
-> +    case POSTCOPY_NOTIFY_INBOUND_LISTEN:
-> +        return vhost_user_postcopy_listen(dev, pnd->errp);
-> +
->      default:
->          /* We ignore notifications we don't know */
->          break;
-> diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-> index 28c216cc7a..873c147b68 100644
-> --- a/migration/postcopy-ram.h
-> +++ b/migration/postcopy-ram.h
-> @@ -129,6 +129,7 @@ void postcopy_infrastructure_init(void);
->  enum PostcopyNotifyReason {
->      POSTCOPY_NOTIFY_PROBE =3D 0,
->      POSTCOPY_NOTIFY_INBOUND_ADVISE,
-> +    POSTCOPY_NOTIFY_INBOUND_LISTEN,
->  };
->
->  struct PostcopyNotifyData {
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index d35911731d..72f084e10d 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -1557,6 +1557,8 @@ static int loadvm_postcopy_handle_listen(MigrationI=
-ncomingState *mis)
->  {
->      PostcopyState ps =3D postcopy_state_set(POSTCOPY_INCOMING_LISTENING)=
-;
->      trace_loadvm_postcopy_handle_listen();
-> +    Error *local_err =3D NULL;
-> +
->      if (ps !=3D POSTCOPY_INCOMING_ADVISE && ps !=3D POSTCOPY_INCOMING_DI=
-SCARD) {
->          error_report("CMD_POSTCOPY_LISTEN in wrong postcopy state (%d)",=
- ps);
->          return -1;
-> @@ -1578,6 +1580,11 @@ static int loadvm_postcopy_handle_listen(Migration=
-IncomingState *mis)
->          return -1;
->      }
->
-> +    if (postcopy_notify(POSTCOPY_NOTIFY_INBOUND_LISTEN, &local_err)) {
-> +        error_report_err(local_err);
-> +        return -1;
-> +    }
-> +
->      if (mis->have_listen_thread) {
->          error_report("CMD_POSTCOPY_RAM_LISTEN already has a listen threa=
-d");
->          return -1;
-> --
-> 2.13.5
->
->
+v3:
+ * Fix typo in foo.py
+ * Add missing parameter to bar()
+ ...
 
+That way reviewers know what changes to look out for.  Thanks!
 
-Looks good to me otherwise,
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
