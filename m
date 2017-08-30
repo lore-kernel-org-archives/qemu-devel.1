@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dn6Rn-0005kT-6e
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:06:39 -0400
+	(envelope-from <david@redhat.com>) id 1dn6Rs-0005p3-IJ
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:06:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dn6Rj-0002Rl-8I
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:06:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39984)
+	(envelope-from <david@redhat.com>) id 1dn6Rr-0002V8-MH
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:06:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41366)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dn6Rj-0002QT-1S
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:06:31 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dn6Rr-0002Ut-DT
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 13:06:39 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 30 Aug 2017 19:05:55 +0200
-Message-Id: <20170830170601.15855-6-david@redhat.com>
+Date: Wed, 30 Aug 2017 19:05:57 +0200
+Message-Id: <20170830170601.15855-8-david@redhat.com>
 In-Reply-To: <20170830170601.15855-1-david@redhat.com>
 References: <20170830170601.15855-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 05/11] s390x: rename s390-virtio.h to
- s390-virtio-hcall.h
+Subject: [Qemu-devel] [PATCH v1 07/11] target/s390x: rename next_cpu_id to
+ next_cpu_addr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +27,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
 
-The only interface left, so let's properly rename it.
+Adapt the term address/adddr. While at it, fix the type and drop the
+initialization to 0 (which is superfluous).
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/s390x/s390-virtio-ccw.c                      | 2 +-
- hw/s390x/s390-virtio-hcall.c                    | 2 +-
- hw/s390x/{s390-virtio.h => s390-virtio-hcall.h} | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
- rename hw/s390x/{s390-virtio.h => s390-virtio-hcall.h} (92%)
+ target/s390x/cpu-qom.h | 2 +-
+ target/s390x/cpu.c     | 9 ++++-----
+ target/s390x/helper.c  | 4 ++--
+ 3 files changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 41a9e976dc..03c88a524b 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -16,7 +16,7 @@
- #include "cpu.h"
- #include "hw/boards.h"
- #include "exec/address-spaces.h"
--#include "s390-virtio.h"
-+#include "hw/s390x/s390-virtio-hcall.h"
- #include "hw/s390x/sclp.h"
- #include "hw/s390x/s390_flic.h"
- #include "hw/s390x/ioinst.h"
-diff --git a/hw/s390x/s390-virtio-hcall.c b/hw/s390x/s390-virtio-hcall.c
-index 23d67d6170..ec7cf8beb3 100644
---- a/hw/s390x/s390-virtio-hcall.c
-+++ b/hw/s390x/s390-virtio-hcall.c
-@@ -11,7 +11,7 @@
+diff --git a/target/s390x/cpu-qom.h b/target/s390x/cpu-qom.h
+index 4e936e7788..a3a3ada226 100644
+--- a/target/s390x/cpu-qom.h
++++ b/target/s390x/cpu-qom.h
+@@ -52,7 +52,7 @@ typedef struct S390CPUClass {
+     bool is_migration_safe;
+     const char *desc;
  
- #include "qemu/osdep.h"
- #include "cpu.h"
--#include "hw/s390x/s390-virtio.h"
-+#include "hw/s390x/s390-virtio-hcall.h"
+-    int64_t next_cpu_id;
++    uint32_t next_cpu_addr;
  
- #define MAX_DIAG_SUBCODES 255
+     DeviceRealize parent_realize;
+     void (*parent_reset)(CPUState *cpu);
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 156589e921..ffc1ff9a2b 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -201,10 +201,10 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
+                    cpu->env.cpu_addr);
+         goto out;
+     }
+-    if (cpu->env.cpu_addr != scc->next_cpu_id) {
++    if (cpu->env.cpu_addr != scc->next_cpu_addr) {
+         error_setg(&err, "Unable to add CPU: %" PRIu32
+-                   ", the next available nr is %" PRIi64, cpu->env.cpu_addr,
+-                   scc->next_cpu_id);
++                   ", the next available addr is %" PRIu32, cpu->env.cpu_addr,
++                   scc->next_cpu_addr);
+         goto out;
+     }
  
-diff --git a/hw/s390x/s390-virtio.h b/hw/s390x/s390-virtio-hcall.h
-similarity index 92%
-rename from hw/s390x/s390-virtio.h
-rename to hw/s390x/s390-virtio-hcall.h
-index d984cd4115..64c5bbd827 100644
---- a/hw/s390x/s390-virtio.h
-+++ b/hw/s390x/s390-virtio-hcall.h
-@@ -1,5 +1,5 @@
- /*
-- * Virtio interfaces for s390
-+ * Support for virtio hypercalls on s390x
-  *
-  * Copyright 2012 IBM Corp.
-  * Author(s): Cornelia Huck <cornelia.huck@de.ibm.com>
+@@ -214,7 +214,7 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
+     if (err != NULL) {
+         goto out;
+     }
+-    scc->next_cpu_id++;
++    scc->next_cpu_addr++;
+ 
+ #if !defined(CONFIG_USER_ONLY)
+     qemu_register_reset(s390_cpu_machine_reset_cb, cpu);
+@@ -459,7 +459,6 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
+     CPUClass *cc = CPU_CLASS(scc);
+     DeviceClass *dc = DEVICE_CLASS(oc);
+ 
+-    scc->next_cpu_id = 0;
+     scc->parent_realize = dc->realize;
+     dc->realize = s390_cpu_realizefn;
+     dc->props = s390x_cpu_properties;
+diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+index 70d1ea8cf6..d8f198cf6f 100644
+--- a/target/s390x/helper.c
++++ b/target/s390x/helper.c
+@@ -134,9 +134,9 @@ S390CPU *cpu_s390x_init(const char *cpu_model)
+     Error *err = NULL;
+     S390CPU *cpu;
+     /* Use to track CPU ID for linux-user only */
+-    static int64_t next_cpu_id;
++    static uint32_t next_cpu_addr;
+ 
+-    cpu = s390x_new_cpu(cpu_model, next_cpu_id++, &err);
++    cpu = s390x_new_cpu(cpu_model, next_cpu_addr++, &err);
+     if (err) {
+         error_report_err(err);
+     }
 -- 
 2.13.5
