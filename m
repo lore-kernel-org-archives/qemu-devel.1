@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dnBz1-0001YD-UO
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 19:01:17 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dnCBD-0004Zx-Hu
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 19:13:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dnByy-00050E-1s
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 19:01:16 -0400
-Resent-Message-Id: <E1dnByy-00050E-1s@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21499)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dnByx-0004yq-Q7
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 19:01:11 -0400
-In-Reply-To: <20170830225225.27925-1-f4bug@amsat.org>
-Message-ID: <150413405890.81.12489808558602609525@b5667b65043c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <alistair23@gmail.com>) id 1dnCBC-0007u0-Pr
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 19:13:51 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 30 Aug 2017 16:01:01 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] QOMify MIPS cpu
+Sender: alistair23@gmail.com
+In-Reply-To: <20170830215523.25278-15-f4bug@amsat.org>
+References: <20170830215523.25278-1-f4bug@amsat.org>
+	<20170830215523.25278-15-f4bug@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 30 Aug 2017 16:13:13 -0700
+Message-ID: <CAKmqyKPVcUF1q2fzdECnun04m2XryXquk67tPvLEpcXmP9c84Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 14/17] MAINTAINERS: add missing entry
+ for Generic Loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +25,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: f4bug@amsat.org
-Cc: famz@redhat.com, imammedo@redhat.com, ehabkost@redhat.com, marcel@redhat.com, peter.maydell@linaro.org, thuth@redhat.com, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Trivial <qemu-trivial@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA4MzAyMjUyMjUuMjc5MjUtMS1mNGJ1Z0BhbXNhdC5vcmcKU3ViamVjdDogW1FlbXUtZGV2ZWxd
-IFtQQVRDSCB2MiAwLzddIFFPTWlmeSBNSVBTIGNwdQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9n
-IC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoK
-Y29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMg
-aW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0
-IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3Jt
-YXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAg
-ICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4
-aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
-Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRj
-aGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTcw
-ODMwMjI1MjI1LjI3OTI1LTEtZjRidWdAYW1zYXQub3JnIC0+IHBhdGNoZXcvMjAxNzA4MzAyMjUy
-MjUuMjc5MjUtMS1mNGJ1Z0BhbXNhdC5vcmcKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0
-Y2hldy9jb3Zlci4xNTA0MTExODAzLmdpdC5qY29keUByZWRoYXQuY29tIC0+IHBhdGNoZXcvY292
-ZXIuMTUwNDExMTgwMy5naXQuamNvZHlAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFu
-Y2ggJ3Rlc3QnCjJlYmE4NzQwNTUgbWlwczogdXBkYXRlIG1pcHNfY3B1X2xpc3QoKSB0byB1c2Ug
-b2JqZWN0X2NsYXNzX2dldF9saXN0KCkKYzkxNzBjMjdkZiBtaXBzOiByZXBsYWNlIGNwdV9taXBz
-X2luaXQoKSB3aXRoIGNwdV9nZW5lcmljX2luaXQoKQpiZDFjMGU0M2EyIG1pcHM6IE1JUFNDUFUg
-bW9kZWwgc3ViY2xhc3NlcwplNzdkMWQ3NGVhIG1pcHM6IGNhbGwgY3B1X21pcHNfcmVhbGl6ZV9l
-bnYoKSBmcm9tIG1pcHNfY3B1X3JlYWxpemVmbigpCjRmMTA3M2Q4YmUgbWlwczogc3BsaXQgY3B1
-X21pcHNfcmVhbGl6ZV9lbnYoKSBvdXQgb2YgY3B1X21pcHNfaW5pdCgpCjIyZjc4M2ViNTAgbWlw
-czogaW50cm9kdWNlIGludGVybmFsLmggYW5kIGNsZWFudXAgY3B1LmgKZjg0NmM3YmZjNiBtaXBz
-OiBtb3ZlIGh3L21pcHMvY3B1dGltZXIuYyB0byB0YXJnZXQvbWlwcy8KCj09PSBPVVRQVVQgQkVH
-SU4gPT09CkNoZWNraW5nIFBBVENIIDEvNzogbWlwczogbW92ZSBody9taXBzL2NwdXRpbWVyLmMg
-dG8gdGFyZ2V0L21pcHMvLi4uCkNoZWNraW5nIFBBVENIIDIvNzogbWlwczogaW50cm9kdWNlIGlu
-dGVybmFsLmggYW5kIGNsZWFudXAgY3B1LmguLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0
-ZXIgdGhhdCAnJicgKGN0eDpXeFcpCiM3Mjc6IEZJTEU6IHRhcmdldC9taXBzL2ludGVybmFsLmg6
-MjMwOgorICAgIGlmICgoZW52LT5DUDBfVlBDb250cm9sID4+IENQMFZQQ3RsX0RJUykgJiAxKSB7
-CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjog
-c3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0ICcmJyAoY3R4Old4VykKIzczNTogRklMRTogdGFy
-Z2V0L21pcHMvaW50ZXJuYWwuaDoyMzg6CisgICAgICAgICAgICAoKG90aGVyX2NwdS0+ZW52LkNQ
-MF9WUENvbnRyb2wgPj4gQ1AwVlBDdGxfRElTKSAmIDEpKSB7CiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2Ug
-cHJvaGliaXRlZCBhZnRlciB0aGF0ICcmJyAoY3R4Old4VykKIzc1NTogRklMRTogdGFyZ2V0L21p
-cHMvaW50ZXJuYWwuaDoyNTg6CisgICAgICAgIGVudi0+aGZsYWdzIHw9IChlbnYtPkNQMF9TdGF0
-dXMgPj4gQ1AwU3RfS1NVKSAmIE1JUFNfSEZMQUdfS1NVOwogICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDMgZXJyb3JzLCAwIHdh
-cm5pbmdzLCA4NDIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy83OiBtaXBzOiBzcGxpdCBjcHVfbWlwc19yZWFsaXpl
-X2VudigpIG91dCBvZiBjcHVfbWlwc19pbml0KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNC83OiBtaXBz
-OiBjYWxsIGNwdV9taXBzX3JlYWxpemVfZW52KCkgZnJvbSBtaXBzX2NwdV9yZWFsaXplZm4oKS4u
-LgpDaGVja2luZyBQQVRDSCA1Lzc6IG1pcHM6IE1JUFNDUFUgbW9kZWwgc3ViY2xhc3Nlcy4uLgpD
-aGVja2luZyBQQVRDSCA2Lzc6IG1pcHM6IHJlcGxhY2UgY3B1X21pcHNfaW5pdCgpIHdpdGggY3B1
-X2dlbmVyaWNfaW5pdCgpLi4uCkNoZWNraW5nIFBBVENIIDcvNzogbWlwczogdXBkYXRlIG1pcHNf
-Y3B1X2xpc3QoKSB0byB1c2Ugb2JqZWN0X2NsYXNzX2dldF9saXN0KCkuLi4KPT09IE9VVFBVVCBF
-TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5l
-cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Wed, Aug 30, 2017 at 2:55 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+
+Thanks,
+Alistair
+
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index a48f633cad..0b77590dc8 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1164,6 +1164,7 @@ M: Alistair Francis <alistair.francis@xilinx.com>
+>  S: Maintained
+>  F: hw/core/generic-loader.c
+>  F: include/hw/core/generic-loader.h
+> +F: docs/generic-loader.txt
+>
+>  CHRP NVRAM
+>  M: Thomas Huth <thuth@redhat.com>
+> --
+> 2.14.1
+>
+>
