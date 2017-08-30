@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dnANY-00075s-0q
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 17:18:28 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dnAOK-0007hz-L6
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 17:19:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dnANX-0003XS-6e
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 17:18:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39026)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dnANW-0003XG-Vy
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 17:18:27 -0400
-Date: Wed, 30 Aug 2017 18:18:18 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170830211818.GB17184@localhost.localdomain>
-References: <20170818142613.32394-1-ldoktor@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dnAOH-0003il-Hl
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 17:19:16 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170728053610.15770-1-f4bug@amsat.org>
+	<87mv6k2apd.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <96185d9e-289a-3335-3b0d-d38d5522ddce@amsat.org>
+Date: Wed, 30 Aug 2017 18:19:09 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170818142613.32394-1-ldoktor@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 00/10] qemu.py: Pylint/style fixes
+In-Reply-To: <87mv6k2apd.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 00/47] add missing entries in MAINTAINERS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,26 +28,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, apahim@redhat.com, armbru@redhat.com, mreitz@redhat.com, jsnow@redhat.com, f4bug@amsat.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 
-On Fri, Aug 18, 2017 at 04:26:03PM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
-> Hello guys,
->=20
-> I'm reading the available python modules to exercise qemu and while rea=
-ding them
-> I fixed some issues that caught my attention. It usually starts with a =
-simple
-> pylint/docstring fixes and slowly graduates to more controversial ones =
-so I'm
-> open to suggestion to remove some of them.
->=20
-> Kind regards,
-> Luk=C3=A1=C5=A1
+Hi Markus,
 
-I'm queueing this series on a python-next branch at:
+On 08/28/2017 08:28 AM, Markus Armbruster wrote:
+> Where do we stand with this series?
 
-  https://github.com/ehabkost/qemu.git python-next
+I was giving time to eventual adoptive maintainers until 2.11 opening :)
 
---=20
-Eduardo
+Regards,
+
+Phil.
