@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmyR5-00078u-Qf
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:33:20 -0400
+	(envelope-from <peterx@redhat.com>) id 1dmyRA-0007DZ-Kx
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:33:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmyR0-0003HF-6T
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:33:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34570)
+	(envelope-from <peterx@redhat.com>) id 1dmyR9-0003KY-CO
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:33:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43150)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dmyR0-0003H2-0C
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:33:14 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dmyR9-0003K8-3O
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:33:23 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Wed, 30 Aug 2017 16:32:05 +0800
-Message-Id: <1504081950-2528-9-git-send-email-peterx@redhat.com>
+Date: Wed, 30 Aug 2017 16:32:07 +0800
+Message-Id: <1504081950-2528-11-git-send-email-peterx@redhat.com>
 In-Reply-To: <1504081950-2528-1-git-send-email-peterx@redhat.com>
 References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC v2 08/33] migration: new postcopy-pause state
+Subject: [Qemu-devel] [RFC v2 10/33] migration: allow dst vm pause on
+ postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,58 +27,162 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-Introducing a new state "postcopy-paused", which can be used when the
-postcopy migration is paused. It is targeted for postcopy network
-failure recovery.
+When there is IO error on the incoming channel (e.g., network down),
+instead of bailing out immediately, we allow the dst vm to switch to the
+new POSTCOPY_PAUSE state. Currently it is still simple - it waits the
+new semaphore, until someone poke it for another attempt.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c | 2 ++
- qapi-schema.json      | 5 ++++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ migration/migration.c  |  1 +
+ migration/migration.h  |  3 +++
+ migration/savevm.c     | 60 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ migration/trace-events |  2 ++
+ 4 files changed, 64 insertions(+), 2 deletions(-)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index 92bf9b8..f6130db 100644
+index 8d26ea8..80de212 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -470,6 +470,7 @@ static bool migration_is_setup_or_active(int state)
-     switch (state) {
-     case MIGRATION_STATUS_ACTIVE:
-     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-+    case MIGRATION_STATUS_POSTCOPY_PAUSED:
-     case MIGRATION_STATUS_SETUP:
-         return true;
+@@ -146,6 +146,7 @@ MigrationIncomingState *migration_incoming_get_current(void)
+         memset(&mis_current, 0, sizeof(MigrationIncomingState));
+         qemu_mutex_init(&mis_current.rp_mutex);
+         qemu_event_init(&mis_current.main_thread_load_event, false);
++        qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
+         once = true;
+     }
+     return &mis_current;
+diff --git a/migration/migration.h b/migration/migration.h
+index 0c957c9..c423682 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -60,6 +60,9 @@ struct MigrationIncomingState {
+     /* The coroutine we should enter (back) after failover */
+     Coroutine *migration_incoming_co;
+     QemuSemaphore colo_incoming_sem;
++
++    /* notify PAUSED postcopy incoming migrations to try to continue */
++    QemuSemaphore postcopy_pause_sem_dst;
+ };
  
-@@ -545,6 +546,7 @@ MigrationInfo *qmp_query_migrate(Error **errp)
-     case MIGRATION_STATUS_ACTIVE:
-     case MIGRATION_STATUS_CANCELLING:
-     case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-+    case MIGRATION_STATUS_POSTCOPY_PAUSED:
-          /* TODO add some postcopy stats */
-         info->has_status = true;
-         info->has_total_time = true;
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 802ea53..368b592 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -667,6 +667,8 @@
- #
- # @postcopy-active: like active, but now in postcopy mode. (since 2.5)
- #
-+# @postcopy-paused: during postcopy but paused. (since 2.11)
-+#
- # @completed: migration is finished.
- #
- # @failed: some error occurred during migration process.
-@@ -679,7 +681,8 @@
- ##
- { 'enum': 'MigrationStatus',
-   'data': [ 'none', 'setup', 'cancelling', 'cancelled',
--            'active', 'postcopy-active', 'completed', 'failed', 'colo' ] }
-+            'active', 'postcopy-active', 'postcopy-paused',
-+            'completed', 'failed', 'colo' ] }
+ MigrationIncomingState *migration_incoming_get_current(void);
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 7172f14..3777124 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1488,8 +1488,8 @@ static int loadvm_postcopy_ram_handle_discard(MigrationIncomingState *mis,
+  */
+ static void *postcopy_ram_listen_thread(void *opaque)
+ {
+-    QEMUFile *f = opaque;
+     MigrationIncomingState *mis = migration_incoming_get_current();
++    QEMUFile *f = mis->from_src_file;
+     int load_res;
  
- ##
- # @MigrationInfo:
+     migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+@@ -1503,6 +1503,14 @@ static void *postcopy_ram_listen_thread(void *opaque)
+      */
+     qemu_file_set_blocking(f, true);
+     load_res = qemu_loadvm_state_main(f, mis);
++
++    /*
++     * This is tricky, but, mis->from_src_file can change after it
++     * returns, when postcopy recovery happened. In the future, we may
++     * want a wrapper for the QEMUFile handle.
++     */
++    f = mis->from_src_file;
++
+     /* And non-blocking again so we don't block in any cleanup */
+     qemu_file_set_blocking(f, false);
+ 
+@@ -1581,7 +1589,7 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
+     /* Start up the listening thread and wait for it to signal ready */
+     qemu_sem_init(&mis->listen_thread_sem, 0);
+     qemu_thread_create(&mis->listen_thread, "postcopy/listen",
+-                       postcopy_ram_listen_thread, mis->from_src_file,
++                       postcopy_ram_listen_thread, NULL,
+                        QEMU_THREAD_DETACHED);
+     qemu_sem_wait(&mis->listen_thread_sem);
+     qemu_sem_destroy(&mis->listen_thread_sem);
+@@ -1966,11 +1974,44 @@ void qemu_loadvm_state_cleanup(void)
+     }
+ }
+ 
++/* Return true if we should continue the migration, or false. */
++static bool postcopy_pause_incoming(MigrationIncomingState *mis)
++{
++    trace_postcopy_pause_incoming();
++
++    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
++                      MIGRATION_STATUS_POSTCOPY_PAUSED);
++
++    assert(mis->from_src_file);
++    qemu_file_shutdown(mis->from_src_file);
++    qemu_fclose(mis->from_src_file);
++    mis->from_src_file = NULL;
++
++    assert(mis->to_src_file);
++    qemu_mutex_lock(&mis->rp_mutex);
++    qemu_file_shutdown(mis->to_src_file);
++    qemu_fclose(mis->to_src_file);
++    mis->to_src_file = NULL;
++    qemu_mutex_unlock(&mis->rp_mutex);
++
++    error_report("Detected IO failure for postcopy. "
++                 "Migration paused.");
++
++    while (mis->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
++        qemu_sem_wait(&mis->postcopy_pause_sem_dst);
++    }
++
++    trace_postcopy_pause_incoming_continued();
++
++    return true;
++}
++
+ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
+ {
+     uint8_t section_type;
+     int ret = 0;
+ 
++retry:
+     while (true) {
+         section_type = qemu_get_byte(f);
+ 
+@@ -2016,6 +2057,21 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
+ out:
+     if (ret < 0) {
+         qemu_file_set_error(f, ret);
++
++        /*
++         * Detect whether it is:
++         *
++         * 1. postcopy running
++         * 2. network failure (-EIO)
++         *
++         * If so, we try to wait for a recovery.
++         */
++        if (mis->state == MIGRATION_STATUS_POSTCOPY_ACTIVE &&
++            ret == -EIO && postcopy_pause_incoming(mis)) {
++            /* Reset f to point to the newly created channel */
++            f = mis->from_src_file;
++            goto retry;
++        }
+     }
+     return ret;
+ }
+diff --git a/migration/trace-events b/migration/trace-events
+index 907564b..7764c6f 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -99,6 +99,8 @@ open_return_path_on_source(void) ""
+ open_return_path_on_source_continue(void) ""
+ postcopy_start(void) ""
+ postcopy_pause_continued(void) ""
++postcopy_pause_incoming(void) ""
++postcopy_pause_incoming_continued(void) ""
+ postcopy_start_set_run(void) ""
+ source_return_path_thread_bad_end(void) ""
+ source_return_path_thread_end(void) ""
 -- 
 2.7.4
