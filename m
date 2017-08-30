@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dn2GS-0005ms-I4
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:38:37 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dn2M0-0007H0-Cw
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:44:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dn2GO-0007Ht-KM
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:38:36 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:36410)
+	(envelope-from <stefanha@gmail.com>) id 1dn2Lw-0000mM-GL
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:44:20 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:32880)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dn2GO-0007Hh-C1
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:38:32 -0400
-Received: by mail-wm0-x233.google.com with SMTP id u126so8969348wmg.1
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 05:38:32 -0700 (PDT)
-Date: Wed, 30 Aug 2017 13:38:27 +0100
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dn2Lw-0000ly-7h
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:44:16 -0400
+Received: by mail-wm0-x241.google.com with SMTP id m85so1172730wma.0
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 05:44:16 -0700 (PDT)
+Date: Wed, 30 Aug 2017 13:44:11 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170830123827.GM24565@stefanha-x1.localdomain>
-References: <CAAeL1MGV5zSPq0OCVCsw4+xzRXm95z-yd_oN2__yskd6aUmESQ@mail.gmail.com>
-	<20170829100936.GP25960@stefanha-x1.localdomain>
-	<20170829204055.GD4428@localhost.localdomain>
+Message-ID: <20170830124411.GN24565@stefanha-x1.localdomain>
+References: <20170824072202.26818-1-stefanha@redhat.com>
+	<20170824083843.GB1866@lemon>
+	<20170824180402.GA4368@stefanha-x1.localdomain>
+	<20170825073229.GC11465@lemon.lan>
+	<20170825085222.GA9688@stefanha-x1.localdomain>
+	<20170825092914.GI11465@lemon.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170829204055.GD4428@localhost.localdomain>
-Subject: Re: [Qemu-devel] Make NVME device "migratable" (savevm)
+In-Reply-To: <20170825092914.GI11465@lemon.lan>
+Subject: Re: [Qemu-devel] [PATCH 0/3] iotests: clean up resources using
+ context managers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +34,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Keith Busch <keith.busch@intel.com>
-Cc: Sergei Dyshel <qyron.private@gmail.com>, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, Aug 29, 2017 at 04:40:55PM -0400, Keith Busch wrote:
-> On Tue, Aug 29, 2017 at 11:09:36AM +0100, Stefan Hajnoczi wrote:
-> > On Fri, Aug 25, 2017 at 11:39:30AM +0300, Sergei Dyshel wrote:
-> > > Hi all,
-> > > From what I understand, I can't "savevm" a VM that uses NVME device because
-> > > it has ".unmigratable = 1" in the code. What support must be implemented in
-> > > order to make it "migratable"?
+On Fri, Aug 25, 2017 at 05:29:14PM +0800, Fam Zheng wrote:
+> On Fri, 08/25 09:52, Stefan Hajnoczi wrote:
+> > On Fri, Aug 25, 2017 at 03:32:29PM +0800, Fam Zheng wrote:
+> > > On Thu, 08/24 19:04, Stefan Hajnoczi wrote:
+> > > > On Thu, Aug 24, 2017 at 04:38:43PM +0800, Fam Zheng wrote:
+> > > > > On Thu, 08/24 08:21, Stefan Hajnoczi wrote:
+> > > > > > Tests should declare resources upfront in a with statement.  Resources are
+> > > > > > automatically cleaned up whether the test passes or fails:
+> > > > > > 
+> > > > > >   with FilePath('test.img') as img_path,
+> > > > > >        VM() as vm:
+> > > > > >       ...test...
+> > > > > >   # img_path is deleted and vm is shut down automatically
+> > > > > 
+> > > > > Looks good but still requires test writers to learn and remember to use FilePath
+> > > > > and with.
+> > > > 
+> > > > You cannot forget to use FilePath() unless you love typing at
+> > > > os.path.join(iotests.test_dir, 'test.img').  It's much better than open
+> > > > coding filename generation!
+> > > > 
+> > > > > These are still boilerplates.  Here goes my personal oppinion, so may
+> > > > > not be plausible:
+> > > > > 
+> > > > > - For VM() maybe add an atexit in the launch() method also makes sure the VM is
+> > > > >   eventually terminated.
+> > > > > 
+> > > > >   This means vm.shutdown() is still needed in tearDown() if there are multiple
+> > > > >   test methods and each of them expects a clean state, but that is probably
+> > > > >   still less typing (and also indenting) than the with approach, and also easy
+> > > > >   to remember (otherwise a test will fail).
+> > > > 
+> > > > I looked into atexit before going this route.  atexit does not have an
+> > > > unregister() API in Python 2.  This makes it ugly to use because some
+> > > > tests do not want the resource to remain for the duration of the
+> > > > process.
+> > > > 
+> > > > A related point is that the Python objects used by atexit handlers live
+> > > > until the end of the process.  They cannot be garbage collected because
+> > > > the atexit handler still has a reference to them.
+> > > 
+> > > I think this shortcoming can be solved with a clean up list ("all problems in
+> > > computer science can be solved by another level of indirection"):
+> > > 
+> > > _clean_up_list = set()
+> > > def _clean_up_handler():
+> > >     for i in _clean_up_list:
+> > >         try:
+> > >             i()
+> > >         except:
+> > >             pass
+> > > 
+> > > atexit.register(_clean_up_handler)
+> > > 
+> > > class VM(...):
+> > > 
+> > >     def launch():
+> > >         ...
+> > >         _clean_up_list.add(self.launch)
+> > > 
+> > >     def shutdown():
+> > >         _clean_up_list.remove(self.launch)
+> > >         ...
 > > 
-> > CCing Keith Busch, the NVMe maintainer.
+> > atexit is still less powerful than context managers because its scope is
+> > fixed.  Handler functions are only called when the process terminates.
+> > Many test cases do not want resources (especially the VMs) around
+> > forever because they run several iterations or sub-tests.
+> > 
+> > The with statement can be used both for process-lifetime and for more
+> > fine-grained scoping.  That's why I chose it.
+> > 
+> > If you stick to atexit then sub-tests or iterations require manual
+> > vm.shutdown() - something that is not necessary using the with
+> > statement.
 > 
-> To make it migratable, you'll need implement the VMStateDescription to
-> save and restore the entire controller state, including all the queues.
-> It doesn't actually look like there's a much state to track compared to
-> other migratale devices, I just never got any time to write it out.
+> Sure!
+> 
+> I just think that if leftover VM instances are a concern and not all test code
+> are converted to "with", having the atexit handler in addition may provide more
+> robustness.
 
-One thing unique to QEMU's block layer is that the -drive
-werror=/rerror= option lets the user specify an error handling policy
-for I/O requests.
+Okay, I checked this.  Existing code doesn't need to be changed (yet)
+because:
 
-If the policy is 'stop' or 'enospc' then the emulated storage controller
-must hang on to the I/O request and re-submit it when VM execution
-resumes (usually when the user issues the 'cont' command at the
-monitor).
+1. Most existing code uses unittest's setUp()/tearDown() and already
+   correctly handles cleanup when the test fails.
 
-For example, if QEMU hits ENOSPC while writing a previously unwritten
-sector in the disk image file, then VM execution can be paused.  The
-host system administrator can arrange for more disk space and then issue
-the 'cont' QEMU monitor command.  This resumes the VM and QEMU retries
-the I/O request without ever reporting an I/O error to the guest.
+2. The LUKS crypto test doesn't use unittest but also doesn't use VM(),
+   so it doesn't need.
 
-You can see how this is implemented in hw/block/virtio-blk.c and other
-emulated storage controllers.  This feature requires live migration
-support so that the list of failed I/O requests can be sent to the
-destination host during live migration.
-
-If you decide to enable live migration, please consider how this should
-be implemented for NVMe.
+Are you happy for me to merge this series?
 
 Stefan
