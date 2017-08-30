@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dn0SQ-0006L3-Gi
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:42:51 -0400
+	(envelope-from <berrange@redhat.com>) id 1dn0Ve-0007QR-W9
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:46:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dn0SP-00041q-MA
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:42:50 -0400
-Received: from mail-vk0-x241.google.com ([2607:f8b0:400c:c05::241]:38613)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dn0SP-00041b-H6
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:42:49 -0400
-Received: by mail-vk0-x241.google.com with SMTP id g21so1348424vke.5
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 03:42:49 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1dn0Vb-0005D0-SO
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:46:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55260)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dn0Vb-0005C0-Jq
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:46:07 -0400
+Date: Wed, 30 Aug 2017 11:45:54 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170830104554.GD18526@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170823083901.852-1-quintela@redhat.com>
+	<20170823083901.852-3-quintela@redhat.com>
+	<20170823115327.GC2648@work-vm>
+	<bbe64c5c-8906-2bf9-92a8-8fda49100505@kaod.org>
+	<6b5e898b-89d9-2323-5ca9-0cd212d39ec1@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170824192730.8440-16-dgilbert@redhat.com>
-References: <20170824192730.8440-1-dgilbert@redhat.com>
-	<20170824192730.8440-16-dgilbert@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 30 Aug 2017 03:42:48 -0700
-Message-ID: <CAJ+F1CKEhTQ8JSNV9OHLDchn+wn3k1240grV3uw9nis0K6GWUg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6b5e898b-89d9-2323-5ca9-0cd212d39ec1@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 15/32] vhost+postcopy: Register new
- regions with the ufd
+Subject: Re: [Qemu-devel] [PATCH 2/2] tests: Make acpid test compile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,82 +32,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, a.perevalov@samsung.com, "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>, aarcange@redhat.com, Felipe Franciosi <felipe@nutanix.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, lvivier@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com
 
-Use "libvhost-user: " commit title tag/prefix?
+On Tue, Aug 29, 2017 at 03:17:25PM -0500, Eric Blake wrote:
+> On 08/28/2017 09:41 AM, C=C3=A9dric Le Goater wrote:
+> > On 08/23/2017 01:53 PM, Dr. David Alan Gilbert wrote:
+> >> * Juan Quintela (quintela@redhat.com) wrote:
+> >>> Compiler gets confused with the size of the struct, so move form
+> >>> g_new0() to g_malloc0().
+> >>>
+> >>> I *think* that the problem is in gcc (or glib for that matter), but
+> >>> the documentation of the g_new0 states that 1sts first argument is =
+an
+> >>> struct type, and uint32_t is not an struct type.
+> >>>
+> >>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> >>> ---
+>=20
+> >>> =20
+> >>>      /* get the addresses of the tables pointed by rsdt */
+> >>> -    tables =3D g_new0(uint32_t, tables_nr);
+> >>> +    tables =3D g_malloc0(sizeof(uint32_t) * tables_nr);
+> >>
+>=20
+> > I fixed that one with :
+> >=20
+> > @@ -40,7 +40,7 @@ static uint32_t acpi_find_vgia(void)
+> >      AcpiRsdpDescriptor rsdp_table;
+> >      uint32_t rsdt;
+> >      AcpiRsdtDescriptorRev1 rsdt_table;
+> > -    int tables_nr;
+> > +    uint32_t tables_nr;
+>=20
+> I like this one better (multiplication in g_malloc0() makes me worry
+> about overflow; using unsigned math to avoid the problem is nicer).  Ar=
+e
+> we going to see a v2 of this patch series?
 
-On Thu, Aug 24, 2017 at 12:27 PM, Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> When new regions are sent to the client using SET_MEM_TABLE, register
-> them with the userfaultfd.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  contrib/libvhost-user/libvhost-user.c | 32 +++++++++++++++++++++++++++++=
-+++
->  1 file changed, 32 insertions(+)
->
-> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
-r/libvhost-user.c
-> index e8accf11db..e6ab059a03 100644
-> --- a/contrib/libvhost-user/libvhost-user.c
-> +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -449,6 +449,38 @@ vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg=
-)
->                     dev_region->mmap_addr);
->          }
->
-> +        if (dev->postcopy_listening) {
-> +            /* We should already have an open ufd need to mark each memo=
-ry
-> +             * range as ufd.
-> +             * Note: Do we need any madvises? Well it's not been accesse=
-d
-> +             * yet, still probably need no THP to be safe, discard to be=
- safe?
-> +             */
-> +            struct uffdio_register reg_struct;
-> +            reg_struct.range.start =3D (uintptr_t)dev_region->mmap_addr;
-> +            reg_struct.range.len =3D dev_region->size + dev_region->mmap=
-_offset;
-> +            reg_struct.mode =3D UFFDIO_REGISTER_MODE_MISSING;
-> +
-> +            if (ioctl(dev->postcopy_ufd, UFFDIO_REGISTER, &reg_struct)) =
-{
-> +                vu_panic(dev, "%s: Failed to userfault region %d "
-> +                              "@%p + %zx: (ufd=3D%d)%s\n",
-> +                         __func__, i,
-> +                         dev_region->mmap_addr,
-> +                         dev_region->size + dev_region->mmap_offset,
-> +                         dev->postcopy_ufd, strerror(errno));
-> +                continue;
+It should really be size_t, because it is assigned from the result of
+a size_t calculation, but you then also need to change a later assert
+which was relying on it being signed:
 
-panic is supposed to be unrecoverable errors, so I would suggest to return =
-here
-
-> +            }
-> +            if (!(reg_struct.ioctls & ((__u64)1 << _UFFDIO_COPY))) {
-> +                vu_panic(dev, "%s Region (%d) doesn't support COPY",
-> +                         __func__, i);
-> +                continue;
-> +            }
-> +            DPRINT("%s: region %d: Registered userfault for %llx + %llx\=
-n",
-> +                    __func__, i, reg_struct.range.start, reg_struct.rang=
-e.len);
-> +            /* TODO: Stash 'zero' support flags somewhere */
-> +            /* TODO: Get address back to QEMU */
-> +
-> +        }
-> +
->          close(vmsg->fds[i]);
->      }
-
-This patch would be nicer if it compiles on !Linux / without userfault.
+@@ -40,7 +40,7 @@ static uint32_t acpi_find_vgia(void)
+     AcpiRsdpDescriptor rsdp_table;
+     uint32_t rsdt;
+     AcpiRsdtDescriptorRev1 rsdt_table;
+-    int tables_nr;
++    size_t tables_nr;
+     uint32_t *tables;
+     AcpiTableHeader ssdt_table;
+     VgidTable vgid_table;
+@@ -62,9 +62,9 @@ static uint32_t acpi_find_vgia(void)
+     ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
+=20
+     /* compute the table entries in rsdt */
++    g_assert_cmpint(rsdt_table.length, >, sizeof(AcpiRsdtDescriptorRev1)=
+);
+     tables_nr =3D (rsdt_table.length - sizeof(AcpiRsdtDescriptorRev1)) /
+                 sizeof(uint32_t);
+-    g_assert_cmpint(tables_nr, >, 0);
+=20
+     /* get the addresses of the tables pointed by rsdt */
+     tables =3D g_new0(uint32_t, tables_nr);
 
 
+Regards,
+Daniel
 --=20
-Marc-Andr=C3=A9 Lureau
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
