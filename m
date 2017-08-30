@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dmyLR-0002Ja-Hu
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:30 -0400
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dmyLV-0002LQ-1U
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dmyLN-0000FK-JN
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:29 -0400
-Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:35936)
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dmyLU-0000Hx-CK
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:33 -0400
+Received: from mail-ua0-x243.google.com ([2607:f8b0:400c:c08::243]:37501)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
-	id 1dmyLN-0000Ef-Cz
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:25 -0400
-Received: by mail-vk0-x242.google.com with SMTP id d124so2188210vkf.3
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 01:27:24 -0700 (PDT)
+	id 1dmyLU-0000Hm-8e
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:27:32 -0400
+Received: by mail-ua0-x243.google.com with SMTP id 104so2350373uas.4
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 01:27:32 -0700 (PDT)
 From: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
-Date: Wed, 30 Aug 2017 03:26:50 -0500
-Message-Id: <20170830082702.3011-2-Sergio.G.DelReal@gmail.com>
+Date: Wed, 30 Aug 2017 03:26:52 -0500
+Message-Id: <20170830082702.3011-4-Sergio.G.DelReal@gmail.com>
 In-Reply-To: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
 References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 01/13] hvf: add support for
- Hypervisor.framework in the configure script
+Subject: [Qemu-devel] [PATCH v2 03/13] hvf: add compilation rules to
+ Makefile.objs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,162 +30,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 
-This patch adds to the configure script the code to support the
---enable-hvf argument. If the OS is Darwin, it checks for presence of
-HVF in the system. The patch also adds strings related to HVF in the
-file qemu-options.hx.
-QEMU will only support the modern syntax style '-M accel=hvf' no enable
-hvf; the legacy '-enable-hvf' will not be supported.
+This commit adds to target/i386/Makefile.objs the necessary rules so
+that the new files for hvf are compiled by the build system.
+It also adds handling of the -enable-hvf argument in the main function
+in vl.c.
 
 Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 ---
- configure       | 38 ++++++++++++++++++++++++++++++++++++++
- qemu-options.hx | 10 +++++-----
- 2 files changed, 43 insertions(+), 5 deletions(-)
+ target/i386/Makefile.objs | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/configure b/configure
-index dd73cce62f..5d9152b80a 100755
---- a/configure
-+++ b/configure
-@@ -211,6 +211,17 @@ supported_xen_target() {
-     return 1
- }
- 
-+supported_hvf_target() {
-+    test "$hvf" = "yes" || return 1
-+    glob "$1" "*-softmmu" || return 1
-+    case "${1%-softmmu}" in
-+        x86_64)
-+            return 0
-+        ;;
-+    esac
-+    return 1
-+}
-+
- supported_target() {
-     case "$1" in
-         *-softmmu)
-@@ -236,6 +247,7 @@ supported_target() {
-     supported_kvm_target "$1" && return 0
-     supported_xen_target "$1" && return 0
-     supported_hax_target "$1" && return 0
-+    supported_hvf_target "$1" && return 0
-     print_error "TCG disabled, but hardware accelerator not available for '$target'"
-     return 1
- }
-@@ -309,6 +321,7 @@ vhost_vsock="no"
- vhost_user=""
- kvm="no"
- hax="no"
-+hvf="no"
- rdma=""
- gprof="no"
- debug_tcg="no"
-@@ -727,6 +740,7 @@ Darwin)
-   bsd="yes"
-   darwin="yes"
-   hax="yes"
-+  hvf="yes"
-   LDFLAGS_SHARED="-bundle -undefined dynamic_lookup"
-   if [ "$cpu" = "x86_64" ] ; then
-     QEMU_CFLAGS="-arch x86_64 $QEMU_CFLAGS"
-@@ -1027,6 +1041,10 @@ for opt do
-   ;;
-   --enable-hax) hax="yes"
-   ;;
-+  --disable-hvf) hvf="no"
-+  ;;
-+  --enable-hvf) hvf="yes"
-+  ;;
-   --disable-tcg-interpreter) tcg_interpreter="no"
-   ;;
-   --enable-tcg-interpreter) tcg_interpreter="yes"
-@@ -1499,6 +1517,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   bluez           bluez stack connectivity
-   kvm             KVM acceleration support
-   hax             HAX acceleration support
-+  hvf             Hypervisor.framework acceleration support
-   rdma            RDMA-based migration support
-   vde             support for vde network
-   netmap          support for netmap network
-@@ -4900,6 +4919,21 @@ then
- fi
- 
- 
-+#################################################
-+# Check to see if we have the Hypervisor framework
-+if [ "$darwin" == "yes" ] ; then
-+  cat > $TMPC << EOF
-+#include <Hypervisor/hv.h>
-+int main() { return 0;}
-+EOF
-+  if ! compile_object ""; then
-+    hvf='no'
-+  else
-+    hvf='yes'
-+    LDFLAGS="-framework Hypervisor $LDFLAGS"
-+  fi
-+fi
-+
- #################################################
- # Sparc implicitly links with --relax, which is
- # incompatible with -r, so --no-relax should be
-@@ -5356,6 +5390,7 @@ if test "$tcg" = "yes" ; then
-     echo "TCG debug enabled $debug_tcg"
-     echo "TCG interpreter   $tcg_interpreter"
- fi
-+echo "HVF support       $hvf"
- echo "RDMA support      $rdma"
- echo "fdt support       $fdt"
- echo "preadv support    $preadv"
-@@ -6388,6 +6423,9 @@ fi
- if supported_hax_target $target; then
-     echo "CONFIG_HAX=y" >> $config_target_mak
- fi
-+if supported_hvf_target $target; then
-+    echo "CONFIG_HVF=y" >> $config_target_mak
-+fi
- if test "$target_bigendian" = "yes" ; then
-   echo "TARGET_WORDS_BIGENDIAN=y" >> $config_target_mak
- fi
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 9f6e2adfff..bcb44420ee 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -31,7 +31,7 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
-     "-machine [type=]name[,prop[=value][,...]]\n"
-     "                selects emulated machine ('-machine help' for list)\n"
-     "                property accel=accel1[:accel2[:...]] selects accelerator\n"
--    "                supported accelerators are kvm, xen, hax or tcg (default: tcg)\n"
-+    "                supported accelerators are kvm, xen, hax, hvf or tcg (default: tcg)\n"
-     "                kernel_irqchip=on|off|split controls accelerated irqchip support (default=off)\n"
-     "                vmport=on|off|auto controls emulation of vmport (default: auto)\n"
-     "                kvm_shadow_mem=size of KVM shadow MMU in bytes\n"
-@@ -66,7 +66,7 @@ Supported machine properties are:
- @table @option
- @item accel=@var{accels1}[:@var{accels2}[:...]]
- This is used to enable an accelerator. Depending on the target architecture,
--kvm, xen, hax or tcg can be available. By default, tcg is used. If there is
-+kvm, xen, hax, hvf or tcg can be available. By default, tcg is used. If there is
- more than one accelerator specified, the next one is used if the previous one
- fails to initialize.
- @item kernel_irqchip=on|off
-@@ -120,13 +120,13 @@ ETEXI
- 
- DEF("accel", HAS_ARG, QEMU_OPTION_accel,
-     "-accel [accel=]accelerator[,thread=single|multi]\n"
--    "                select accelerator (kvm, xen, hax or tcg; use 'help' for a list)\n"
--    "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
-+    "                select accelerator (kvm, xen, hax, hvf or tcg; use 'help' for a list)\n"
-+    "                thread=single|multi (enable multi-threaded TCG)", QEMU_ARCH_ALL)
- STEXI
- @item -accel @var{name}[,prop=@var{value}[,...]]
- @findex -accel
- This is used to enable an accelerator. Depending on the target architecture,
--kvm, xen, hax or tcg can be available. By default, tcg is used. If there is
-+kvm, xen, hax, hvf or tcg can be available. By default, tcg is used. If there is
- more than one accelerator specified, the next one is used if the previous one
- fails to initialize.
- @table @option
+diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
+index 6a26e9d9f0..0bef89c099 100644
+--- a/target/i386/Makefile.objs
++++ b/target/i386/Makefile.objs
+@@ -12,4 +12,5 @@ obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-windows.o
+ endif
+ ifdef CONFIG_DARWIN
+ obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-darwin.o
++obj-$(CONFIG_HVF) += hvf-utils/ hvf-all.o
+ endif
 -- 
 2.14.1
