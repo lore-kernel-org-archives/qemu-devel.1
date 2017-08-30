@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dn0an-0001Hk-Ly
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:51:30 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dn0is-0004QP-OO
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:59:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dn0ak-0007fx-Jj
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:51:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38494)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dn0ak-0007ff-DJ
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:51:26 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <bbe64c5c-8906-2bf9-92a8-8fda49100505@kaod.org>
-	(=?utf-8?Q?=22C=C3=A9dric?= Le
-	Goater"'s message of "Mon, 28 Aug 2017 16:41:16 +0200")
-References: <20170823083901.852-1-quintela@redhat.com>
-	<20170823083901.852-3-quintela@redhat.com>
-	<20170823115327.GC2648@work-vm>
-	<bbe64c5c-8906-2bf9-92a8-8fda49100505@kaod.org>
-Reply-To: quintela@redhat.com
-Date: Wed, 30 Aug 2017 12:51:23 +0200
-Message-ID: <874lsp72hg.fsf@secure.mitica>
+	(envelope-from <stefanha@gmail.com>) id 1dn0io-0002Tg-HH
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 06:59:50 -0400
+Date: Wed, 30 Aug 2017 11:59:41 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170830105941.GK24565@stefanha-x1.localdomain>
+References: <20170829120836.16091-1-berto@igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 2/2] tests: Make acpid test compile
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170829120836.16091-1-berto@igalia.com>
+Subject: Re: [Qemu-devel] [PATCH] misc: Remove unused Error variables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +22,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, lvivier@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Cedric Le Goater <clg@kaod.org> wrote:
-> On 08/23/2017 01:53 PM, Dr. David Alan Gilbert wrote:
->> * Juan Quintela (quintela@redhat.com) wrote:
->>> Compiler gets confused with the size of the struct, so move form
->>> g_new0() to g_malloc0().
->>>
->>> I *think* that the problem is in gcc (or glib for that matter), but
->>> the documentation of the g_new0 states that 1sts first argument is an
->>> struct type, and uint32_t is not an struct type.
->>>
->>> Signed-off-by: Juan Quintela <quintela@redhat.com>
->>> ---
->>>  tests/vmgenid-test.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
->>> index 3d5c1c3615..032e1d465a 100644
->>> --- a/tests/vmgenid-test.c
->>> +++ b/tests/vmgenid-test.c
->>> @@ -67,7 +67,7 @@ static uint32_t acpi_find_vgia(void)
->>>      g_assert_cmpint(tables_nr, >, 0);
->>>  
->>>      /* get the addresses of the tables pointed by rsdt */
->>> -    tables = g_new0(uint32_t, tables_nr);
->>> +    tables = g_malloc0(sizeof(uint32_t) * tables_nr);
->> 
->> I think there's an easier fix for this I think;
->> try:
->> 
->> -    g_assert_cmpint(tables_nr, >, 0);
->> +    g_assert(tables_nr > 0);
+On Tue, Aug 29, 2017 at 03:08:36PM +0300, Alberto Garcia wrote:
+> There's a few cases which we're passing an Error pointer to a function
+> only to discard it immediately afterwards without checking it. In
+> these cases we can simply remove the variable and pass NULL instead.
+> 
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow.c  | 12 +++---------
+>  block/qcow2.c |  8 ++------
+>  dump.c        |  4 +---
+>  3 files changed, 6 insertions(+), 18 deletions(-)
 
-I liked more the following one.
+Thanks, applied to my block-next tree:
+https://github.com/stefanha/qemu/commits/block-next
 
-
->
-> I fixed that one with :
->
-> @@ -40,7 +40,7 @@ static uint32_t acpi_find_vgia(void)
->      AcpiRsdpDescriptor rsdp_table;
->      uint32_t rsdt;
->      AcpiRsdtDescriptorRev1 rsdt_table;
-> -    int tables_nr;
-> +    uint32_t tables_nr;
->      uint32_t *tables;
->      AcpiTableHeader ssdt_table;
->      VgidTable vgid_table;
-
-
-This make things work for me, so moving to this one.
-
-Thanks, Juan.
+Stefan
