@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmySt-0000Sd-UT
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:35:13 -0400
+	(envelope-from <peterx@redhat.com>) id 1dmySv-0000Ti-15
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:35:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmySp-00049l-1x
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:35:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52278)
+	(envelope-from <peterx@redhat.com>) id 1dmySu-0004Ej-5F
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:35:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43944)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dmySo-000487-PC
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:35:06 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dmySt-0004EH-W1
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:35:12 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Wed, 30 Aug 2017 16:32:21 +0800
-Message-Id: <1504081950-2528-25-git-send-email-peterx@redhat.com>
+Date: Wed, 30 Aug 2017 16:32:22 +0800
+Message-Id: <1504081950-2528-26-git-send-email-peterx@redhat.com>
 In-Reply-To: <1504081950-2528-1-git-send-email-peterx@redhat.com>
 References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC v2 24/33] migration: synchronize dirty bitmap for
- resume
+Subject: [Qemu-devel] [RFC v2 25/33] migration: setup ramstate for resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,189 +26,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-This patch implements the first part of core RAM resume logic for
-postcopy. ram_resume_prepare() is provided for the work.
-
-When the migration is interrupted by network failure, the dirty bitmap
-on the source side will be meaningless, because even the dirty bit is
-cleared, it is still possible that the sent page was lost along the way
-to destination. Here instead of continue the migration with the old
-dirty bitmap on source, we ask the destination side to send back its
-received bitmap, then invert it to be our initial dirty bitmap.
-
-The source side send thread will issue the MIG_CMD_RECV_BITMAP requests,
-once per ramblock, to ask for the received bitmap. On destination side,
-MIG_RP_MSG_RECV_BITMAP will be issued, along with the requested bitmap.
-Data will be received on the return-path thread of source, and the main
-migration thread will be notified when all the ramblock bitmaps are
-synchronized.
+After we updated the dirty bitmaps of ramblocks, we also need to update
+the critical fields in RAMState to make sure it is ready for a resume.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c  |  4 +++
- migration/migration.h  |  1 +
- migration/ram.c        | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++
- migration/trace-events |  4 +++
- 4 files changed, 76 insertions(+)
+ migration/ram.c        | 37 ++++++++++++++++++++++++++++++++++++-
+ migration/trace-events |  1 +
+ 2 files changed, 37 insertions(+), 1 deletion(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 19b7f3a5..19aed72 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2605,6 +2605,8 @@ static void migration_instance_finalize(Object *obj)
- 
-     g_free(params->tls_hostname);
-     g_free(params->tls_creds);
-+
-+    qemu_sem_destroy(&ms->rp_state.rp_sem);
- }
- 
- static void migration_instance_init(Object *obj)
-@@ -2629,6 +2631,8 @@ static void migration_instance_init(Object *obj)
-     params->has_downtime_limit = true;
-     params->has_x_checkpoint_delay = true;
-     params->has_block_incremental = true;
-+
-+    qemu_sem_init(&ms->rp_state.rp_sem, 1);
- }
- 
- /*
-diff --git a/migration/migration.h b/migration/migration.h
-index a3a0582..d041369 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -107,6 +107,7 @@ struct MigrationState
-         QEMUFile     *from_dst_file;
-         QemuThread    rp_thread;
-         bool          error;
-+        QemuSemaphore rp_sem;
-     } rp_state;
- 
-     double mbps;
 diff --git a/migration/ram.c b/migration/ram.c
-index 5d938e3..afabcf5 100644
+index afabcf5..c5d9028 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -47,6 +47,7 @@
- #include "exec/target_page.h"
- #include "qemu/rcu_queue.h"
- #include "migration/colo.h"
-+#include "savevm.h"
- 
- /***********************************************************/
- /* ram save/restore */
-@@ -295,6 +296,8 @@ struct RAMState {
-     RAMBlock *last_req_rb;
-     /* Queue of outstanding page requests from the destination */
-     QemuMutex src_page_req_mutex;
-+    /* Ramblock counts to sync dirty bitmap. Only used for recovery */
-+    int ramblock_to_sync;
-     QSIMPLEQ_HEAD(src_page_requests, RAMSrcPageRequest) src_page_requests;
- };
- typedef struct RAMState RAMState;
-@@ -2770,6 +2773,56 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-     return ret;
+@@ -1986,6 +1986,33 @@ static int ram_state_init(RAMState **rsp)
+     return 0;
  }
  
-+/* Sync all the dirty bitmap with destination VM.  */
-+static int ram_dirty_bitmap_sync_all(MigrationState *s, RAMState *rs)
++static void ram_state_resume_prepare(RAMState *rs)
 +{
 +    RAMBlock *block;
-+    QEMUFile *file = s->to_dst_file;
-+    int ramblock_count = 0;
-+
-+    trace_ram_dirty_bitmap_sync_start();
++    long pages = 0;
 +
 +    /*
-+     * We do this in such order:
-+     *
-+     * 1. calculate block count
-+     * 2. fill in the count to N
-+     * 3. send MIG_CMD_RECV_BITMAP requests
-+     * 4. wait on the semaphore until N -> 0
++     * Postcopy is not using xbzrle/compression, so no need for that.
++     * Also, since source are already halted, we don't need to care
++     * about dirty page logging as well.
 +     */
 +
 +    RAMBLOCK_FOREACH(block) {
-+        ramblock_count++;
++        pages += bitmap_count_one(block->bmap,
++                                  block->used_length >> TARGET_PAGE_BITS);
 +    }
 +
-+    atomic_set(&rs->ramblock_to_sync, ramblock_count);
++    /* This may not be aligned with current bitmaps. Recalculate. */
++    rs->migration_dirty_pages = pages;
 +
-+    RAMBLOCK_FOREACH(block) {
-+        qemu_savevm_send_recv_bitmap(file, block->idstr);
-+    }
++    rs->last_seen_block = NULL;
++    rs->last_sent_block = NULL;
++    rs->last_page = 0;
++    rs->last_version = ram_list.version;
 +
-+    trace_ram_dirty_bitmap_sync_wait();
-+
-+    /* Wait until all the ramblocks' dirty bitmap synced */
-+    while (atomic_read(&rs->ramblock_to_sync)) {
-+        qemu_sem_wait(&s->rp_state.rp_sem);
-+    }
-+
-+    trace_ram_dirty_bitmap_sync_complete();
-+
-+    return 0;
-+}
-+
-+static void ram_dirty_bitmap_reload_notify(MigrationState *s)
-+{
-+    atomic_dec(&ram_state->ramblock_to_sync);
-+    if (ram_state->ramblock_to_sync == 0) {
-+        /* Make sure the other thread gets the latest */
-+        trace_ram_dirty_bitmap_sync_notify();
-+        qemu_sem_post(&s->rp_state.rp_sem);
-+    }
++    trace_ram_state_resume_prepare(pages);
 +}
 +
  /*
-  * Read the received bitmap, revert it as the initial dirty bitmap.
-  * This is only used when the postcopy migration is paused but wants
-@@ -2841,12 +2894,25 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
+  * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
+  * long-running RCU critical section.  When rcu-reclaims in the code
+@@ -2909,8 +2936,16 @@ out:
+ static int ram_resume_prepare(MigrationState *s, void *opaque)
+ {
+     RAMState *rs = *(RAMState **)opaque;
++    int ret;
  
-     trace_ram_dirty_bitmap_reload(block->idstr);
- 
-+    /*
-+     * We succeeded to sync bitmap for current ramblock. If this is
-+     * the last one to sync, we need to notify the main send thread.
-+     */
-+    ram_dirty_bitmap_reload_notify(s);
+-    return ram_dirty_bitmap_sync_all(s, rs);
++    ret = ram_dirty_bitmap_sync_all(s, rs);
++    if (ret) {
++        return ret;
++    }
 +
-     ret = 0;
- out:
-     free(le_bitmap);
-     return ret;
++    ram_state_resume_prepare(rs);
++
++    return 0;
  }
  
-+static int ram_resume_prepare(MigrationState *s, void *opaque)
-+{
-+    RAMState *rs = *(RAMState **)opaque;
-+
-+    return ram_dirty_bitmap_sync_all(s, rs);
-+}
-+
  static SaveVMHandlers savevm_ram_handlers = {
-     .save_setup = ram_save_setup,
-     .save_live_iterate = ram_save_iterate,
-@@ -2857,6 +2923,7 @@ static SaveVMHandlers savevm_ram_handlers = {
-     .save_cleanup = ram_save_cleanup,
-     .load_setup = ram_load_setup,
-     .load_cleanup = ram_load_cleanup,
-+    .resume_prepare = ram_resume_prepare,
- };
- 
- void ram_mig_init(void)
 diff --git a/migration/trace-events b/migration/trace-events
-index 61b0d49..8962916 100644
+index 8962916..6e06283 100644
 --- a/migration/trace-events
 +++ b/migration/trace-events
-@@ -81,6 +81,10 @@ ram_postcopy_send_discard_bitmap(void) ""
- ram_save_page(const char *rbname, uint64_t offset, void *host) "%s: offset: 0x%" PRIx64 " host: %p"
- ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: 0x%zx len: 0x%zx"
- ram_dirty_bitmap_reload(char *str) "%s"
-+ram_dirty_bitmap_sync_start(void) ""
-+ram_dirty_bitmap_sync_wait(void) ""
-+ram_dirty_bitmap_sync_notify(void) ""
-+ram_dirty_bitmap_sync_complete(void) ""
+@@ -85,6 +85,7 @@ ram_dirty_bitmap_sync_start(void) ""
+ ram_dirty_bitmap_sync_wait(void) ""
+ ram_dirty_bitmap_sync_notify(void) ""
+ ram_dirty_bitmap_sync_complete(void) ""
++ram_state_resume_prepare(long v) "%ld"
  
  # migration/migration.c
  await_return_path_close_on_source_close(void) ""
