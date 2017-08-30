@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmyTY-0001FE-7B
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:35:57 -0400
+	(envelope-from <peterx@redhat.com>) id 1dmyTd-0001Hu-98
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:35:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dmyTX-0004lf-3j
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:35:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43892)
+	(envelope-from <peterx@redhat.com>) id 1dmyTa-0004pB-Ht
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:35:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44028)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dmyTW-0004ki-R7
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:35:51 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dmyTa-0004oK-Be
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 04:35:54 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Wed, 30 Aug 2017 16:32:29 +0800
-Message-Id: <1504081950-2528-33-git-send-email-peterx@redhat.com>
+Date: Wed, 30 Aug 2017 16:32:30 +0800
+Message-Id: <1504081950-2528-34-git-send-email-peterx@redhat.com>
 In-Reply-To: <1504081950-2528-1-git-send-email-peterx@redhat.com>
 References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC v2 32/33] migration: allow migrate_incoming for
- paused VM
+Subject: [Qemu-devel] [RFC v2 33/33] migration: init dst in
+ migration_object_init too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,141 +27,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-migrate_incoming command is previously only used when we were providing
-"-incoming defer" in the command line, to defer the incoming migration
-channel creation.
-
-However there is similar requirement when we are paused during postcopy
-migration. The old incoming channel might have been destroyed already.
-We may need another new channel for the recovery to happen.
-
-This patch leveraged the same interface, but allows the user to specify
-incoming migration channel even for paused postcopy.
-
-Meanwhile, now migration listening ports are always detached manually
-using the tag, rather than using return values of dispatchers.
+Though we may not need it, now we init both the src/dst migration
+objects in migration_object_init() so that even incoming migration
+object would be thread safe (it was not).
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/exec.c      |  2 +-
- migration/fd.c        |  2 +-
- migration/migration.c | 39 +++++++++++++++++++++++++++++----------
- migration/socket.c    |  2 +-
- 4 files changed, 32 insertions(+), 13 deletions(-)
+ migration/migration.c | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
 
-diff --git a/migration/exec.c b/migration/exec.c
-index ef1fb4c..26fc37d 100644
---- a/migration/exec.c
-+++ b/migration/exec.c
-@@ -49,7 +49,7 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
- {
-     migration_channel_process_incoming(ioc);
-     object_unref(OBJECT(ioc));
--    return FALSE; /* unregister */
-+    return TRUE; /* keep it registered */
- }
- 
- /*
-diff --git a/migration/fd.c b/migration/fd.c
-index e9a548c..7d0aefa 100644
---- a/migration/fd.c
-+++ b/migration/fd.c
-@@ -49,7 +49,7 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
- {
-     migration_channel_process_incoming(ioc);
-     object_unref(OBJECT(ioc));
--    return FALSE; /* unregister */
-+    return TRUE; /* keep it registered */
- }
- 
- /*
 diff --git a/migration/migration.c b/migration/migration.c
-index daf356b..5812478 100644
+index 5812478..7e9ccf0 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -175,6 +175,17 @@ void migration_incoming_state_destroy(void)
-     qemu_event_destroy(&mis->main_thread_load_event);
- }
+@@ -103,6 +103,7 @@ enum mig_rp_message_type {
+    dynamic creation of migration */
  
-+static bool migrate_incoming_detach_listen(MigrationIncomingState *mis)
-+{
-+    if (mis->listen_task_tag) {
-+        /* Never fail */
-+        g_source_remove(mis->listen_task_tag);
-+        mis->listen_task_tag = 0;
-+        return true;
-+    }
-+    return false;
-+}
-+
- static void migrate_generate_event(int new_state)
- {
-     if (migrate_use_events()) {
-@@ -432,10 +443,9 @@ void migration_fd_process_incoming(QEMUFile *f)
+ static MigrationState *current_migration;
++static MigrationIncomingState *current_incoming;
  
-     /*
-      * When reach here, we should not need the listening port any
--     * more. We'll detach the listening task soon, let's reset the
--     * listen task tag.
-+     * more.  Detach the listening port explicitly.
-      */
--    mis->listen_task_tag = 0;
-+    migrate_incoming_detach_listen(mis);
- }
+ static bool migration_object_check(MigrationState *ms, Error **errp);
  
- /*
-@@ -1291,14 +1301,25 @@ void migrate_del_blocker(Error *reason)
- void qmp_migrate_incoming(const char *uri, Error **errp)
- {
-     Error *local_err = NULL;
--    static bool once = true;
-+    MigrationIncomingState *mis = migration_incoming_get_current();
- 
--    if (!deferred_incoming) {
--        error_setg(errp, "For use with '-incoming defer'");
-+    if (!deferred_incoming &&
-+        mis->state != MIGRATION_STATUS_POSTCOPY_PAUSED) {
-+        error_setg(errp, "For use with '-incoming defer'"
-+                   " or PAUSED postcopy migration only.");
-         return;
+@@ -128,6 +129,17 @@ void migration_object_init(void)
+     if (ms->enforce_config_section) {
+         current_migration->send_configuration = true;
      }
--    if (!once) {
--        error_setg(errp, "The incoming migration has already been started");
 +
 +    /*
-+     * Destroy existing listening task if exist. Logically this should
-+     * not really happen at all (for either deferred migration or
-+     * postcopy migration, we should both detached the listening
-+     * task). So raise an error but still we safely detach it.
++     * Init the migrate incoming object as well no matter whether
++     * we'll use it or not.
 +     */
-+    if (migrate_incoming_detach_listen(mis)) {
-+        error_report("%s: detected existing listen channel, "
-+                     "while it should not exist", __func__);
-+        /* Continue */
-     }
++    current_incoming = g_new0(MigrationIncomingState, 1);
++    current_incoming->state = MIGRATION_STATUS_NONE;
++    qemu_mutex_init(&current_incoming->rp_mutex);
++    qemu_event_init(&current_incoming->main_thread_load_event, false);
++    qemu_sem_init(&current_incoming->postcopy_pause_sem_dst, 0);
++    qemu_sem_init(&current_incoming->postcopy_pause_sem_fault, 0);
+ }
  
-     qemu_start_incoming_migration(uri, &local_err);
-@@ -1307,8 +1328,6 @@ void qmp_migrate_incoming(const char *uri, Error **errp)
-         error_propagate(errp, local_err);
-         return;
-     }
+ /* For outgoing */
+@@ -140,19 +152,8 @@ MigrationState *migrate_get_current(void)
+ 
+ MigrationIncomingState *migration_incoming_get_current(void)
+ {
+-    static bool once;
+-    static MigrationIncomingState mis_current;
 -
--    once = false;
+-    if (!once) {
+-        mis_current.state = MIGRATION_STATUS_NONE;
+-        memset(&mis_current, 0, sizeof(MigrationIncomingState));
+-        qemu_mutex_init(&mis_current.rp_mutex);
+-        qemu_event_init(&mis_current.main_thread_load_event, false);
+-        qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
+-        qemu_sem_init(&mis_current.postcopy_pause_sem_fault, 0);
+-        once = true;
+-    }
+-    return &mis_current;
++    assert(current_incoming);
++    return current_incoming;
  }
  
- bool migration_is_blocked(Error **errp)
-diff --git a/migration/socket.c b/migration/socket.c
-index 6ee51ef..e3e453f 100644
---- a/migration/socket.c
-+++ b/migration/socket.c
-@@ -154,7 +154,7 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
- out:
-     /* Close listening socket as its no longer needed */
-     qio_channel_close(ioc, NULL);
--    return FALSE; /* unregister */
-+    return TRUE; /* keep it registered */
- }
- 
- 
+ void migration_incoming_state_destroy(void)
 -- 
 2.7.4
