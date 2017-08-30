@@ -1,36 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dn7cv-00056P-GJ
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:22:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1dn7nx-0001YL-IA
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:33:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dn7cr-0006Rs-7m
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:22:09 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44322
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1dn7cr-0006Ra-1f
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:22:05 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7UIJliG014217
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 14:22:04 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2cnx0xu48r-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 14:22:04 -0400
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Wed, 30 Aug 2017 14:22:03 -0400
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Wed, 30 Aug 2017 15:21:41 -0300
-In-Reply-To: <20170830182141.19996-1-danielhb@linux.vnet.ibm.com>
-References: <20170830182141.19996-1-danielhb@linux.vnet.ibm.com>
-Message-Id: <20170830182141.19996-4-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH for-2.11 v3 3/3] hw/ppc: CAS reset on early
- device hotplug
+	(envelope-from <eblake@redhat.com>) id 1dn7nw-0002Lu-79
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 14:33:33 -0400
+References: <cover.1504111803.git.jcody@redhat.com>
+	<aba8a2b58f34b56281e63e5e9404eb0aab016836.1504111803.git.jcody@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1646044f-3c57-c415-f261-463c74ea45b8@redhat.com>
+Date: Wed, 30 Aug 2017 13:33:19 -0500
+MIME-Version: 1.0
+In-Reply-To: <aba8a2b58f34b56281e63e5e9404eb0aab016836.1504111803.git.jcody@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Ir754VkvMNOCfRA4h5Cw1rAsarVxTv4l8"
+Subject: Re: [Qemu-devel] [PATCH v3 4/5] qemu-iotests: make python tests
+ attempt to leave intermediate files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,141 +25,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, armbru@redhat.com, jsnow@redhat.com, stefanha@redhat.com, kwolf@redhat.com
 
-This patch is a follow up on the discussions made in patch
-"hw/ppc: disable hotplug before CAS is completed" that can be
-found at [1].
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Ir754VkvMNOCfRA4h5Cw1rAsarVxTv4l8
+From: Eric Blake <eblake@redhat.com>
+To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, armbru@redhat.com, jsnow@redhat.com,
+ stefanha@redhat.com, kwolf@redhat.com
+Message-ID: <1646044f-3c57-c415-f261-463c74ea45b8@redhat.com>
+Subject: Re: [PATCH v3 4/5] qemu-iotests: make python tests attempt to leave
+ intermediate files
+References: <cover.1504111803.git.jcody@redhat.com>
+ <aba8a2b58f34b56281e63e5e9404eb0aab016836.1504111803.git.jcody@redhat.com>
+In-Reply-To: <aba8a2b58f34b56281e63e5e9404eb0aab016836.1504111803.git.jcody@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-At this moment, we do not support CPU/memory hotplug in early
-boot stages, before CAS. When a hotplug occurs, the event is logged
-in an internal RTAS event log queue and an IRQ pulse is fired. In
-regular conditions, the guest handles the interrupt by executing
-check_exception, fetching the generated hotplug event and enabling
-the device for use.
+On 08/30/2017 11:52 AM, Jeff Cody wrote:
+> Now that 'check' will clean up after tests, try and make python
+> tests leave intermediate files so that they might be inspectable
+> on failure.
+>=20
+> This isn't perfect; the python unittest framework runs multiple
+> tests, even if previous tests failed.  So we need to make sure that
+> each test still begins with a "clean" slate, to prevent false
+> positives or tainted test runs.
+>=20
+> Rather than delete images in the unittest tearDown, invert this
+> and delete images to be used in that test at the beginning of the
+> setUp.  This is to make sure that the test run is not inadvertently
+> using file droppings from previous runs.  We must use 'blind_remove'
+> then for these, as the files might not exist yet, but we don't want
+> to throw an error for that.
+>=20
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
+> ---
 
-In early boot, this IRQ isn't caught (SLOF does not handle hotplug
-events), leaving the event in the rtas event log queue. If the guest
-executes check_exception due to another hotplug event, the re-assertion
-of the IRQ ends up de-queuing the first hotplug event as well. In short,
-a device hotplugged before CAS is considered coldplugged by SLOF.
-This leads to device misbehavior and, in some cases, guest kernel
-Ooops when trying to unplug the device.
+> +++ b/tests/qemu-iotests/030
+> @@ -21,7 +21,7 @@
+>  import time
+>  import os
+>  import iotests
+> -from iotests import qemu_img, qemu_io
+> +from iotests import qemu_img, qemu_io, blind_remove
+> =20
+>  backing_img =3D os.path.join(iotests.test_dir, 'backing.img')
+>  mid_img =3D os.path.join(iotests.test_dir, 'mid.img')
+> @@ -31,6 +31,9 @@ class TestSingleDrive(iotests.QMPTestCase):
+>      image_len =3D 1 * 1024 * 1024 # MB
+> =20
+>      def setUp(self):
+> +        blind_remove(test_img)
+> +        blind_remove(mid_img)
+> +        blind_remove(backing_img)
 
-A proper fix would be to turn every device hotplugged before CAS
-as a colplugged device. This is not trivial to do with the current
-code base though - the FDT is written in the guest memory at
-ppc_spapr_reset and can't be retrieved without adding extra state
-(fdt_size for example) that will need to managed and migrated. Adding
-the hotplugged DT in the middle of CAS negotiation via the updated DT
-tree works with CPU devs, but panics the guest kernel at boot. Additional
-analysis would be necessary for LMBs and PCI devices. There are
-questions to be made in QEMU/SLOF/kernel level about how we can make
-this change in a sustainable way.
+Would it be any more pythonic to have support for:
 
-With Linux guests, a fix would be the kernel executing check_exception
-at boot time, de-queueing the events that happened in early boot and
-processing them. However, even if/when the newer kernels start
-fetching these events at boot time, we need to take care of older
-kernels that won't be doing that.
+blind_remove(test_img, mid_img, backing_img)
 
-This patch works around the situation by issuing a CAS reset if a hotplugged
-device is detected during CAS:
+built into the previous patch?
 
-- the DRC conditions that warrant a CAS reset is the same as those that
-triggers a DRC migration - the DRC must have a device attached and
-the DRC state is not equal to its ready_state. With that in mind, this
-patch makes use of 'spapr_drc_needed' to determine if a CAS reset
-is needed.
+>      def tearDown(self):
+>          self.vm.shutdown()
+> -        os.remove(self.test_img)
+> -        os.remove(self.mid_img_abs)
+> -        os.remove(self.backing_img_abs)
+> -        try:
+> -            os.rmdir(os.path.join(iotests.test_dir, self.dir1))
+> -            os.rmdir(os.path.join(iotests.test_dir, self.dir3))
+> -            os.rmdir(os.path.join(iotests.test_dir, self.dir2))
+> -        except OSError as exception:
+> -            if exception.errno !=3D errno.EEXIST and exception.errno !=
+=3D errno.ENOTEMPTY:
+> -                raise
 
-- In the middle of CAS negotiations, the function
-'spapr_hotplugged_dev_before_cas' goes through all the DRCs to see
-if there are any DRC that requires a reset, using spapr_drc_needed. If
-that happens, returns '1' in 'spapr_h_cas_compose_response' which will set
-spapr->cas_reboot to true, causing the machine to reboot.
+The code removed here is using a syntax that differs from what you used
+in 3/5 when defining blind_remove; does that matter for 3/5?
 
-No changes are made for coldplug devices.
+> +++ b/tests/qemu-iotests/041
 
-[1] http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg02855.html
+> +        blind_remove(target_img)
+>          iotests.create_image(backing_img, self.image_len)
+>          qemu_img('create', '-f', iotests.imgfmt, '-o', 'backing_file=3D=
+%s' % backing_img, test_img)
+>          self.vm =3D iotests.VM().add_drive(test_img, "node-name=3Dtop,=
+backing.node-name=3Dbase")
+> @@ -49,12 +52,6 @@ class TestSingleDrive(iotests.QMPTestCase):
+> =20
+>      def tearDown(self):
+>          self.vm.shutdown()
+> -        os.remove(test_img)
+> -        os.remove(backing_img)
+> -        try:
+> -            os.remove(target_img)
+> -        except OSError:
+> -            pass
 
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
----
- hw/ppc/spapr.c             | 26 +++++++++++++++++++++++++-
- hw/ppc/spapr_drc.c         |  2 +-
- include/hw/ppc/spapr_drc.h |  1 +
- 3 files changed, 27 insertions(+), 2 deletions(-)
+You're changing failures other than ENOENT from ignored to explicit -
+nice little bug-fix along the way :)  I notice this pattern in multiple
+tests; is it worth mentioning in the commit message as intentional?
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 085415c..067f571 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -790,6 +790,26 @@ out:
-     return ret;
- }
- 
-+static bool spapr_hotplugged_dev_before_cas(void)
-+{
-+    Object *drc_container, *obj;
-+    ObjectProperty *prop;
-+    ObjectPropertyIterator iter;
-+
-+    drc_container = container_get(object_get_root(), "/dr-connector");
-+    object_property_iter_init(&iter, drc_container);
-+    while ((prop = object_property_iter_next(&iter))) {
-+        if (!strstart(prop->type, "link<", NULL)) {
-+            continue;
-+        }
-+        obj = object_property_get_link(drc_container, prop->name, NULL);
-+        if (spapr_drc_needed(obj)) {
-+            return true;
-+        }
-+    }
-+    return false;
-+}
-+
- int spapr_h_cas_compose_response(sPAPRMachineState *spapr,
-                                  target_ulong addr, target_ulong size,
-                                  sPAPROptionVector *ov5_updates)
-@@ -797,9 +817,13 @@ int spapr_h_cas_compose_response(sPAPRMachineState *spapr,
-     void *fdt, *fdt_skel;
-     sPAPRDeviceTreeUpdateHeader hdr = { .version_id = 1 };
- 
-+    if (spapr_hotplugged_dev_before_cas()) {
-+        return 1;
-+    }
-+
-     size -= sizeof(hdr);
- 
--    /* Create sceleton */
-+    /* Create skeleton */
-     fdt_skel = g_malloc0(size);
-     _FDT((fdt_create(fdt_skel, size)));
-     _FDT((fdt_begin_node(fdt_skel, "")));
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 6670a76..915e9b5 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -460,7 +460,7 @@ static void drc_reset(void *opaque)
-     spapr_drc_reset(SPAPR_DR_CONNECTOR(opaque));
- }
- 
--static bool spapr_drc_needed(void *opaque)
-+bool spapr_drc_needed(void *opaque)
- {
-     sPAPRDRConnector *drc = (sPAPRDRConnector *)opaque;
-     sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
-diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-index a7958d0..f8d9f5b 100644
---- a/include/hw/ppc/spapr_drc.h
-+++ b/include/hw/ppc/spapr_drc.h
-@@ -257,6 +257,7 @@ int spapr_drc_populate_dt(void *fdt, int fdt_offset, Object *owner,
- void spapr_drc_attach(sPAPRDRConnector *drc, DeviceState *d, void *fdt,
-                       int fdt_start_offset, Error **errp);
- void spapr_drc_detach(sPAPRDRConnector *drc);
-+bool spapr_drc_needed(void *opaque);
- 
- static inline bool spapr_drc_unplug_requested(sPAPRDRConnector *drc)
- {
--- 
-2.9.4
+> @@ -797,6 +788,9 @@ class TestRepairQuorum(iotests.QMPTestCase):
+>      IMAGES =3D [ quorum_img1, quorum_img2, quorum_img3 ]
+> =20
+>      def setUp(self):
+> +        for i in self.IMAGES + [ quorum_repair_img, quorum_snapshot_fi=
+le ]:
+> +            blind_remove(i)
+
+Again, would it be more pythonic if blind_remove() could take a list and
+automatically work on each element of the list, rather than having to
+make the caller iterate?
+
+> +++ b/tests/qemu-iotests/057
+> @@ -23,7 +23,7 @@
+>  import time
+>  import os
+>  import iotests
+> -from iotests import qemu_img, qemu_io
+> +from iotests import qemu_img, qemu_io, blind_remove
+> =20
+>  test_drv_base_name =3D 'drive'
+> =20
+> @@ -36,6 +36,8 @@ class ImageSnapshotTestCase(iotests.QMPTestCase):
+> =20
+>      def _setUp(self, test_img_base_name, image_num):
+>          self.vm =3D iotests.VM()
+> +        for dev_expect in self.expect:
+> +            blind_remove(dev_expect['image'])
+
+Another place where python magic could make the caller nicer?
+
+> +++ b/tests/qemu-iotests/118
+
+> @@ -411,16 +411,16 @@ class TestFloppyInitiallyEmpty(TestInitiallyEmpty=
+):
+> =20
+>  class TestChangeReadOnly(ChangeBaseClass):
+>      def setUp(self):
+> -        qemu_img('create', '-f', iotests.imgfmt, old_img, '1440k')
+> -        qemu_img('create', '-f', iotests.imgfmt, new_img, '1440k')
+> -        self.vm =3D iotests.VM()
+> -
+> -    def tearDown(self):
+> -        self.vm.shutdown()
+>          os.chmod(old_img, 0666)
+>          os.chmod(new_img, 0666)
+> -        os.remove(old_img)
+> -        os.remove(new_img)
+> +        blind_remove(old_img)
+> +        blind_remove(new_img)
+> +        qemu_img('create', '-f', iotests.imgfmt, old_img, '1440k')
+> +        qemu_img('create', '-f', iotests.imgfmt, new_img, '1440k')
+> +        self.vm =3D iotests.VM()
+> +
+> +    def tearDown(self):
+> +        self.vm.shutdown()
+
+The script framework doesn't have any problem removing left-over
+read-only files, correct?  (If it does, then earlier in the series you
+may need to add 'chmod -R u+rwx scratch/$seq' prior to its removal?)
+
+But overall, I didn't see any problems, so I'm okay with:
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--Ir754VkvMNOCfRA4h5Cw1rAsarVxTv4l8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmnBO8ACgkQp6FrSiUn
+Q2pmPwf6AyVjbf44LEggWCcYrP1cW3/WO1XrAFToB+r2QAGuVX+RZcJ3VPVZ1vC3
+QmncB54mYaUJezzaFAz7O3KtowerctyvUz2JGPUf1PrwyCDw/aPXMBdb1zQUJsg0
+BtJrCduXyu6uw9AhsjKAlBworofLqDiSnOoJW0CSGr8IGlCytITKx7Y0seTxkpQZ
+8ZxyKj9AAitkgE+mZVcx4+FPHot+re74QemMof4Q7Ox+XGECjACjKl5NDwPE1K0u
+1b1X6jeZCHgPlOJvJ5WFRhtQuQjotARjOipjPQuAkO9aSbXt7jXq+2dJBqRCrtE3
+GC7bX1+D2T0pvpBXSUd5+Inbya1bPg==
+=+rfv
+-----END PGP SIGNATURE-----
+
+--Ir754VkvMNOCfRA4h5Cw1rAsarVxTv4l8--
