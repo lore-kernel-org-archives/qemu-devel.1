@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dmteu-0005VO-NU
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 23:27:17 -0400
+	(envelope-from <famz@redhat.com>) id 1dmthW-0006TX-5z
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 23:29:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dmter-0006aY-Jk
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 23:27:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54944)
+	(envelope-from <famz@redhat.com>) id 1dmthT-0007cj-2t
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 23:29:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46854)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dmter-0006aK-A0
-	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 23:27:13 -0400
-Date: Wed, 30 Aug 2017 11:27:04 +0800
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dmthS-0007cC-Ru
+	for qemu-devel@nongnu.org; Tue, 29 Aug 2017 23:29:54 -0400
+Date: Wed, 30 Aug 2017 11:29:49 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170830032704.GB4208@lemon.lan>
+Message-ID: <20170830032949.GC4208@lemon.lan>
 References: <20170828174707.20786-1-famz@redhat.com>
 	<20170828174707.20786-4-famz@redhat.com>
-	<de606e2a-7f5e-0625-79dd-a828ea3d5fe9@amsat.org>
-	<20170829121100.GA25801@redhat.com>
+	<9658452f-c89f-43d2-07ff-5d620fd471a9@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20170829121100.GA25801@redhat.com>
+In-Reply-To: <9658452f-c89f-43d2-07ff-5d620fd471a9@amsat.org>
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH v4 03/10] tests: Add vm test lib
 List-Id: <qemu-devel.nongnu.org>
@@ -30,98 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
 
-On Tue, 08/29 13:11, Daniel P. Berrange wrote:
-> On Tue, Aug 29, 2017 at 09:06:48AM -0300, Philippe Mathieu-Daud=E9 wrot=
-e:
-> > Hi Fam,
-> >=20
-> > On 08/28/2017 02:47 PM, Fam Zheng wrote:
-> > > This is the common code to implement a "VM test" to
-> > >=20
-> > >    1) Download and initialize a pre-defined VM that has necessary
-> > >    dependencies to build QEMU and SSH access.
-> > >=20
-> > >    2) Archive $SRC_PATH to a .tar file.
-> > >=20
-> > >    3) Boot the VM, and pass the source tar file to the guest.
-> > >=20
-> > >    4) SSH into the VM, untar the source tarball, build from the sou=
-rce.
-> > >=20
-> > > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > > ---
-> > >   tests/vm/basevm.py | 287 ++++++++++++++++++++++++++++++++++++++++=
-+++++++++++++
-> > >   1 file changed, 287 insertions(+)
-> > >   create mode 100755 tests/vm/basevm.py
-> > >=20
-> > > diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-> > > new file mode 100755
-> > > index 0000000000..d0095c5332
-> > > --- /dev/null
-> > > +++ b/tests/vm/basevm.py
+On Tue, 08/29 09:15, Philippe Mathieu-Daud=E9 wrote:
+> > +        self._args =3D [ \
+> > +            "-nodefaults", "-m", "2G",
+> > +            "-cpu", "host",
+> > +            "-netdev", "user,id=3Dvnet,hostfwd=3D:0.0.0.0:0-:22",
 >=20
-> > > +    def add_source_dir(self, data_dir):
-> > > +        name =3D "data-" + hashlib.sha1(data_dir).hexdigest()[:5]
-> > > +        tarfile =3D os.path.join(self._tmpdir, name + ".tar")
-> > > +        logging.debug("Creating archive %s for data dir: %s", tarf=
-ile, data_dir)
-> > > +        if subprocess.call("type gtar", stdout=3Dself._devnull,
-> > > +                           stderr=3Dself._devnull, shell=3DTrue) =3D=
-=3D 0:
-> > > +            tar_cmd =3D "gtar"
-> > > +        else:
-> > > +            tar_cmd =3D "tar"
-> > > +        subprocess.check_call([tar_cmd,
-> > > +                               "--exclude-vcs",
-> > > +                               "--exclude=3Dtests/vm/*.img",
-> > > +                               "--exclude=3Dtests/vm/*.img.*",
-> > > +                               "--exclude=3D*.d",
-> > > +                               "--exclude=3D*.o",
-> > > +                               "--exclude=3Ddocker-src.*",
-> > > +                               "-cf", tarfile, '.'], cwd=3Ddata_di=
-r,
-> >=20
-> > I'm not happy with this command :/
-> > My distrib uses tmpfs for /tmp and suddently the whole X window becam=
-e
-> > irresponsive until this script failing after filling 8G of /tmp and s=
-wap:
-> >=20
-> > ...
-> > DEBUG:root:Creating archive /tmp/qemu-vm-F7CY9O/data-3a52c.tar for da=
-ta dir:
-> > .
-> > tar: /tmp/qemu-vm-F7CY9O/data-3a52c.tar: Wrote only 4096 of 10240 byt=
-es
-> > tar: Error is not recoverable: exiting now
-> > Failed to prepare guest environment
-> >=20
-> > Then I figured out my workdir is full of testing stuff, debug images,
-> > firmwares, coredumps, etc.
-> >=20
-> > I'll think of another way.
+> Testing with debian/unstable:
 >=20
-> Yeah, /tmp should never be used for anything which has significant
-> size. Could go for /var/tmp instead, but IMHO just use the QEMU build
-> dir, as is done for (almost) all other build & test artifacts and
-> thus avoid any global dirs.
+> $ make vm-build-netbsd V=3D1
+> ./tests/vm/netbsd  --debug   --image "tests/vm/netbsd.img" --build-qemu=
+ .
+> DEBUG:root:Creating archive /tmp/qemu-vm-PxfXNv/data-3a52c.tar for data=
+ dir:
+> .
+> DEBUG:root:QEMU args: -nodefaults -m 2G -cpu host -netdev
+> user,id=3Dvnet,hostfwd=3D:0.0.0.0:0-:22 -device virtio-net-pci,netdev=3D=
+vnet -vnc
+> :0,to=3D20 -serial file:/tmp/qemu-vm-PxfXNv/serial.out -smp 4 -enable-k=
+vm
+> -device VGA -drive
+> file=3Dtests/vm/netbsd.img,snapshot=3Don,if=3Dnone,id=3Ddrive0,cache=3D=
+writeback
+> -device virtio-blk,drive=3Ddrive0,bootindex=3D0 -drive file=3D/tmp/qemu=
+-vm-PxfXNv/data-3a52c.tar,if=3Dnone,id=3Ddata-3a52c,cache=3Dwriteback,for=
+mat=3Draw
+> -device virtio-blk,drive=3Ddata-3a52c,serial=3Ddata-3a52c,bootindex=3D1
+> Failed to prepare guest environment
 
-Thanks, I'll fix it. Using current dir would be fine.
+Can you please look into the stderr of the QEMU command line to see what
+arguments went wrong? (I hope the qemu.py improvement patches on the list=
+ can
+give a better error message in such cases.)
 
 Fam
-
->=20
->=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
