@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dn2bt-00061o-T4
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 09:00:51 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1dn2e2-0007Ed-Np
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 09:03:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dn2bp-00014b-Gz
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 09:00:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59446)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dn2bp-00014C-7B
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 09:00:41 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ED7D85D5EA
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 13:00:39 +0000 (UTC)
-Date: Wed, 30 Aug 2017 09:00:39 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <1116718182.6031777.1504098039370.JavaMail.zimbra@redhat.com>
-In-Reply-To: <87mv6hfc9c.fsf@dusky.pond.sub.org>
-References: <20170825105913.4060-1-marcandre.lureau@redhat.com>
-	<20170825105913.4060-14-marcandre.lureau@redhat.com>
-	<87mv6hfc9c.fsf@dusky.pond.sub.org>
+	(envelope-from <ashijeetacharya@gmail.com>) id 1dn2e0-0001zV-Jw
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 09:02:58 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 13/14] qlit: add qobject_form_qlit()
+In-Reply-To: <CAJSP0QWZ_5gsq06-f=kb+D5VvfjiU5Nt1ZqA2rH1mhQWNn5_Ug@mail.gmail.com>
+References: <1493280397-9622-1-git-send-email-ashijeetacharya@gmail.com>
+	<20170505135931.GH11350@stefanha-x1.localdomain>
+	<CAC2QTZaVWZYmn77LOxxKeukWO70XGNm_GmOoP6ttQOjkm7Ky-Q@mail.gmail.com>
+	<CAJSP0QWZ_5gsq06-f=kb+D5VvfjiU5Nt1ZqA2rH1mhQWNn5_Ug@mail.gmail.com>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Wed, 30 Aug 2017 18:32:52 +0530
+Message-ID: <CAC2QTZaei+m5Pp7zeCdf+RJxxLHgS+R+Jxsd83sOU1ZycP8rrw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] Refactor DMG driver to have chunk
+ size independence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,165 +25,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Peter Wu <peter@lekensteyn.nl>, QEMU Developers <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-Hi
+On Tue, Aug 29, 2017 at 8:55 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
 
------ Original Message -----
-> Eric already pointed out the typo in the title.
->=20
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->=20
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  include/qapi/qmp/qlit.h |  2 ++
-> >  qobject/qlit.c          | 37 +++++++++++++++++++++++++++++++++++++
-> >  tests/check-qlit.c      | 26 ++++++++++++++++++++++++++
-> >  3 files changed, 65 insertions(+)
+> On Sun, Aug 20, 2017 at 1:47 PM, Ashijeet Acharya
+> <ashijeetacharya@gmail.com> wrote:
+> > On Fri, May 5, 2017 at 7:29 PM, Stefan Hajnoczi <stefanha@gmail.com>
+> wrote:
+> >>
+> >> On Thu, Apr 27, 2017 at 01:36:30PM +0530, Ashijeet Acharya wrote:
+> >> > This series helps to provide chunk size independence for DMG driver to
+> >> > prevent
+> >> > denial-of-service in cases where untrusted files are being accessed by
+> >> > the user.
+> >>
+> >> The core of the chunk size dependence problem are these lines:
+> >>
+> >>     s->compressed_chunk = qemu_try_blockalign(bs->file->bs,
+> >>                                               ds.max_compressed_size +
+> 1);
+> >>     s->uncompressed_chunk = qemu_try_blockalign(bs->file->bs,
+> >>                                                 512 *
+> >> ds.max_sectors_per_chunk);
+> >>
+> >> The refactoring needs to eliminate these buffers because their size is
+> >> controlled by the untrusted input file.
 > >
-> > diff --git a/include/qapi/qmp/qlit.h b/include/qapi/qmp/qlit.h
-> > index b18406bce9..56feb25e04 100644
-> > --- a/include/qapi/qmp/qlit.h
-> > +++ b/include/qapi/qmp/qlit.h
-> > @@ -51,4 +51,6 @@ struct QLitDictEntry {
-> > =20
-> >  bool qlit_equal_qobject(const QLitObject *lhs, const QObject *rhs);
-> > =20
-> > +QObject *qobject_from_qlit(const QLitObject *qlit);
-> > +
-> >  #endif /* QLIT_H */
-> > diff --git a/qobject/qlit.c b/qobject/qlit.c
-> > index 3c4882c784..e44c09e9eb 100644
-> > --- a/qobject/qlit.c
-> > +++ b/qobject/qlit.c
-> > @@ -82,3 +82,40 @@ bool qlit_equal_qobject(const QLitObject *lhs, const
-> > QObject *rhs)
-> > =20
-> >      return false;
-> >  }
-> > +
-> > +QObject *qobject_from_qlit(const QLitObject *qlit)
-> > +{
-> > +    int i;
-> > +
-> > +    switch (qlit->type) {
-> > +    case QTYPE_QNULL:
-> > +        return QOBJECT(qnull());
-> > +    case QTYPE_QNUM:
-> > +        return QOBJECT(qnum_from_int(qlit->value.qnum));
->=20
-> This line shows that QLitObject member value.qnum should really be named
-> value.qint.  Let's not worry about that now.
->=20
-> > +    case QTYPE_QSTRING:
-> > +        return QOBJECT(qstring_from_str(qlit->value.qstr));
-> > +    case QTYPE_QDICT: {
-> > +        QDict *qdict =3D qdict_new();
->=20
-> Blank line here.  Can touch up when I apply.
->=20
-> > +        for (i =3D 0; qlit->value.qdict[i].value.type !=3D QTYPE_NONE;=
- i++) {
-> > +            QLitDictEntry *e =3D &qlit->value.qdict[i];
->=20
-> I'd prefer the laconic
->=20
->         QDict *qdict =3D qdict_new();
->         QLitDictEntry *e;
->=20
->         for (e =3D qlit->value.qdict; e->key; e++) {
->             qdict_put_obj(qdict, e->key, qobject_from_qlit(&e->value));
->         }
->         return QOBJECT(qdict);
->=20
-> Can slot that in when I apply.
->=20
+> >
+> > Oh okay, I understand now. But wouldn't I still need to allocate some
+> memory
+> > for these buffers to be able to use them for the compressed chunks case
+> you
+> > mentioned below. Instead of letting the DMG images control the size of
+> these
+> > buffers, maybe I can hard-code the size of these buffers instead?
+> >
+> >>
+> >>
+> >> After applying your patches these lines remain unchanged and we still
+> >> cannot use input files that have a 250 MB chunk size, for example.  So
+> >> I'm not sure how this series is supposed to work.
+> >>
+> >> Here is the approach I would take:
+> >>
+> >> In order to achieve this dmg_read_chunk() needs to be scrapped.  It is
+> >> designed to read a full chunk.  The new model does not read full chunks
+> >> anymore.
+> >>
+> >> Uncompressed reads or zeroes should operate directly on qiov, not
+> >> s->uncompressed_chunk.  This code will be dropped:
+> >>
+> >>     data = s->uncompressed_chunk + sector_offset_in_chunk * 512;
+> >>     qemu_iovec_from_buf(qiov, i * 512, data, 512);
+> >
+> >
+> > I have never worked with qiov before, are there any places where I can
+> refer
+> > to inside other drivers to get the idea of how to use it directly (I am
+> > searching by myself in the meantime...)?
+>
+> A QEMUIOVector is a utility type for struct iovec iov[] processing.
+> See util/iov.c.  This is called "vectored" or "scatter-gather" I/O.
+>
+> Instead of transferring data to/from a single <buffer, length> tuple,
+> they take an array [<buffer, length>].  For example, the buffer "Hello
+> world" could be split into two elements:
+> [{"Hello ", strlen("Hello ")},
+>  {"world", strlen("world")}]
+>
+> Vectored I/O is often used because it eliminates memory copies.  Say
+> you have a network packet header struct and also a data payload array.
+> Traditionally you would have to allocate a new buffer large enough for
+> both header and payload, copy the header and payload into the buffer,
+> and finally give this temporary buffer to the I/O function.  This is
+> inefficient.  With vectored I/O you can create a vector with two
+> elements, the header and the payload, and the I/O function can process
+> them without needing a temporary buffer copy.
+>
 
-Indeed!
+Thanks for the detailed explanation, I think I understood the concept now
+and how to use qiov efficiently.
+Correct me if I am wrong here. In order to use qiov directly for
+uncompressed chunks:
 
-> > +
-> > +            qdict_put_obj(qdict, e->key, qobject_from_qlit(&e->value))=
-;
-> > +        }
-> > +        return QOBJECT(qdict);
-> > +    }
-> > +    case QTYPE_QLIST: {
-> > +        QList *qlist =3D qlist_new();
-> > +
-> > +        for (i =3D 0; qlit->value.qlist[i].type !=3D QTYPE_NONE; i++) =
-{
-> > +            qlist_append_obj(qlist,
-> > qobject_from_qlit(&qlit->value.qlist[i]));
-> > +        }
-> > +        return QOBJECT(qlist);
->=20
-> Likewise
->=20
->         QList *qlist =3D qlist_new();
->         QLitObject *e;
->=20
->         for (e =3D qlit->value.qlist; e->type !=3D QTYPE_NONE; e++) {
->             qlist_append_obj(qlist, qobject_from_qlit(e));
->         }
->         return QOBJECT(qlist);
->=20
-> > +    }
-> > +    case QTYPE_QBOOL:
-> > +        return QOBJECT(qbool_from_bool(qlit->value.qbool));
-> > +    case QTYPE_NONE:
-> > +        assert(0);
-> > +    }
-> > +
-> > +    return NULL;
-> > +}
-> > diff --git a/tests/check-qlit.c b/tests/check-qlit.c
-> > index ae74bfcb83..135a399c6d 100644
-> > --- a/tests/check-qlit.c
-> > +++ b/tests/check-qlit.c
-> > @@ -64,11 +64,37 @@ static void qlit_equal_qobject_test(void)
-> >      qobject_decref(qobj);
-> >  }
-> > =20
-> > +static void qobject_from_qlit_test(void)
-> > +{
-> > +    QObject *obj, *qobj =3D qobject_from_qlit(&qlit);
-> > +    QDict *qdict;
-> > +    QList *bee;
-> > +
-> > +    qdict =3D qobject_to_qdict(qobj);
-> > +    g_assert_cmpint(qdict_get_int(qdict, "foo"), =3D=3D, 42);
-> > +    g_assert_cmpstr(qdict_get_str(qdict, "bar"), =3D=3D, "hello world"=
-);
-> > +    g_assert(qobject_type(qdict_get(qdict, "baz")) =3D=3D QTYPE_QNULL)=
-;
-> > +
-> > +    bee =3D qdict_get_qlist(qdict, "bee");
-> > +    obj =3D qlist_pop(bee);
-> > +    g_assert_cmpint(qnum_get_int(qobject_to_qnum(obj)), =3D=3D, 43);
-> > +    qobject_decref(obj);
-> > +    obj =3D qlist_pop(bee);
-> > +    g_assert_cmpint(qnum_get_int(qobject_to_qnum(obj)), =3D=3D, 44);
-> > +    qobject_decref(obj);
-> > +    obj =3D qlist_pop(bee);
-> > +    g_assert(qbool_get_bool(qobject_to_qbool(obj)));
-> > +    qobject_decref(obj);
-> > +
-> > +    qobject_decref(qobj);
-> > +}
-> > +
-> >  int main(int argc, char **argv)
-> >  {
-> >      g_test_init(&argc, &argv, NULL);
-> > =20
-> >      g_test_add_func("/qlit/equal_qobject", qlit_equal_qobject_test);
-> > +    g_test_add_func("/qlit/qobject_from_qlit", qobject_from_qlit_test)=
-;
-> > =20
-> >      return g_test_run();
-> >  }
->=20
-> With the typo fixed and preferably with the improvements I suggested:
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+1. Declare a new local_qiov inside dmg_co_preadv (let's say)
+2. Initialize it with qemu_iovec_init()
+3. Reset it with qemu_iovec_reset() (this is because we will perform this
+action in a loop and thus need to reset it before every loop?)
+4. Declare a buffer "uncompressed_buf" and allocate it with
+qemu_try_blockalign()
+5. Add this buffer to our local_qiov using qemu_iovec_add()
+6. Read data from file directly into local_qiov using bdrv_co_preadv()
+7. On success concatenate it with the qiov passed into the main
+dmg_co_preadv() function.
+
+I think this method only works for uncompressed chunks. For the compressed
+ones, I believe we will still need to do it in the existing way, i.e. read
+chunk from file -> decompress into output buffer -> use
+qemu_iovec_from_buf() because we cannot read directly since data is in
+compressed form. Makes sense?
+
+
+> > I got clearly what you are trying
+> > to say, but don't know how to implement it. I think, don't we already do
+> > that for the zeroed chunks in DMG in dmg_co_preadv()?
+>
+> Yes, dmg_co_preadv() directly zeroes the qiov.  It doesn't use
+> s->compressed_chunk/s->uncompressed_chunk.
+>
+> >
+> >>
+> >>
+> >> Compressed reads still buffers.  I suggest the following buffers:
+> >>
+> >> 1. compressed_buf - compressed data is read into this buffer from file
+> >> 2. uncompressed_buf - a place to discard decompressed data while
+> >>                       simulating a seek operation
+> >
+> >
+> > Yes, these are the buffers whose size I can hard-code as discussed above?
+> > You can suggest the preferred size to me.
+>
+> Try starting with 256 KB for both buffers.
+>
+
+Okay, I will do that. But I think we cannot use these buffer sizes for bz2
+chunks (see below)
+
+
+> >> Data is read from compressed chunks by reading a reasonable amount
+> >> (64k?) into compressed_buf.  If the user wishes to read at an offset
+> >> into this chunk then a loop decompresses data we are seeking over into
+> >> uncompressed_buf (and refills compressed_buf if it becomes empty) until
+> >> the desired offset is reached.  Then decompression can continue
+> >> directly into the user's qiov and uncompressed_buf isn't used to
+> >> decompress the data requested by the user.
+> >
+> >
+> > Yes, this series does exactly that but keeps using the "uncompressed"
+> buffer
+> > once we reach the desired offset. Once, I understand to use qiov
+> directly,
+> > we can do this. Also, Kevin did suggest me (as I remember vaguely) that
+> in
+> > reality we never actually get the read request at a particular offset
+> > because DMG driver is generally used with "qemu-img convert", which means
+> > all read requests are from the top.
+>
+> For performance it's fine to assume a sequential access pattern.  The
+> block driver should still support random access I/O though.
+>
+
+Yes, I agree. But I don't think we can add random access for the bz2 chunks
+because they need to be decompressed as a whole and not in parts. I tried
+to explain it in my cover letter as an important note (
+https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05327.html). Due
+to the limitation explained there, I guess we cannot use a loop to seek to
+the desired offset inside bz2 chunks. Also, since they need to be
+decompressed at once, we will ultimately need to allocate large buffers.
+
+If you fell I am right till now, I suggest that we can allocate small
+buffers for other cases as discussed above and separately allocate huge
+buffers according to the size of bz2 chunk we are currently reading into.
+This can be done because bz2 chunks normally expand to a max size of 46 MB
+which is below than our current limit of 64 MB.
+See this -> https://en.wikipedia.org/wiki/Bzip2#File_format
 
 Thanks
+Ashijeet
