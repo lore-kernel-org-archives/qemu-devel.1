@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dn2Sy-0001gp-3U
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:51:33 -0400
+	(envelope-from <berrange@redhat.com>) id 1dn2Th-00022i-Qo
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:52:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dn2Su-0005F2-4L
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:51:32 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47246)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dn2St-0005Et-UM
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:51:28 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dn2Sr-0005so-TO
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 12:51:26 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0A41E2E81C3
-	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 12:51:18 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1dn2Tg-0005VR-Ke
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 08:52:17 -0400
+Date: Wed, 30 Aug 2017 13:52:01 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170830125201.GO18526@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170822131832.20191-1-pbonzini@redhat.com>
+	<20170822131832.20191-8-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 30 Aug 2017 12:38:32 -0000
-From: Andrew <andrew@fubar.geek.nz>
-Reply-To: Bug 1713066 <1713066@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150366905912.16996.8020711454083281212.malonedeb@gac.canonical.com>
-Message-Id: <150409671296.17374.3688521289714945379.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1713066] Re: Incorrect handling of aarch64 ldp in
- some cases
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170822131832.20191-8-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 07/10] io: add qio_channel_read/write_all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,53 +24,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, famz@redhat.com
 
-That patch seems to have fixed the issue. I don't get the segfault I was
-previously getting without the patch.
+On Tue, Aug 22, 2017 at 03:18:29PM +0200, Paolo Bonzini wrote:
+> It is pretty common to read a fixed-size buffer from a socket.  Add a
+> function that does this, either with multiple reads (on blocking sockets)
+> or by yielding if called from a coroutine.
+> 
+> Cc: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  include/io/channel.h | 36 ++++++++++++++++++++++++++++++++++-
+>  io/channel.c         | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 89 insertions(+), 1 deletion(-)
 
--- =
+This lacks test suite coverage.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1713066
+Also this is more or less the same as code Juan has proposed too:
 
-Title:
-  Incorrect handling of aarch64 ldp in some cases
+https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg01536.html
 
-Status in QEMU:
-  New
+Rather than have dualing patch series, I'll post an update that
+addresses my concerns with both patches, so we can merge these
+new APIs independantly of your / Juan's patch series.
 
-Bug description:
-  In some cases the ldp instruction (and presumably other multi-register
-  loads and stores) can behave incorrectly.
+> 
+> diff --git a/include/io/channel.h b/include/io/channel.h
+> index db9bb022a1..9cfb4d081f 100644
+> --- a/include/io/channel.h
+> +++ b/include/io/channel.h
+> @@ -299,7 +299,7 @@ ssize_t qio_channel_writev(QIOChannel *ioc,
+>                             Error **errp);
+>  
+>  /**
+> - * qio_channel_readv:
+> + * qio_channel_read:
+>   * @ioc: the channel object
+>   * @buf: the memory region to read data into
+>   * @buflen: the length of @buf
+> @@ -315,6 +315,23 @@ ssize_t qio_channel_read(QIOChannel *ioc,
+>                           Error **errp);
+>  
+>  /**
+> + * qio_channel_read_all:
+> + * @ioc: the channel object
+> + * @buf: the memory region to read data into
+> + * @buflen: the number of bytes to @buf
+> + * @errp: pointer to a NULL-initialized error object
+> + *
+> + * Reads @buflen bytes into @buf, possibly blocking or (if the
+> + * channel is non-blocking) yielding from the current coroutine
+> + * multiple times until the entire content is read.  Otherwise
+> + * behaves as qio_channel_read().
+> + */
+> +ssize_t coroutine_fn qio_channel_read_all(QIOChannel *ioc,
+> +                                          char *buf,
+> +                                          size_t buflen,
+> +                                          Error **errp);
+> +
+> +/**
+>   * qio_channel_write:
+>   * @ioc: the channel object
+>   * @buf: the memory regions to send data from
+> @@ -331,6 +348,23 @@ ssize_t qio_channel_write(QIOChannel *ioc,
+>                            Error **errp);
+>  
+>  /**
+> + * qio_channel_write_all:
+> + * @ioc: the channel object
+> + * @buf: the memory region to write data into
+> + * @buflen: the number of bytes to @buf
+> + * @errp: pointer to a NULL-initialized error object
+> + *
+> + * Writes @buflen bytes from @buf, possibly blocking or (if the
+> + * channel is non-blocking) yielding from the current coroutine
+> + * multiple times until the entire content is written.  Otherwise
+> + * behaves as qio_channel_write().
+> + */
+> +ssize_t coroutine_fn qio_channel_write_all(QIOChannel *ioc,
+> +                                           const char *buf,
+> +                                           size_t buflen,
+> +                                           Error **errp);
+> +
+> +/**
+>   * qio_channel_set_blocking:
+>   * @ioc: the channel object
+>   * @enabled: the blocking flag state
+> diff --git a/io/channel.c b/io/channel.c
+> index 1cfb8b33a2..7ab3f4eede 100644
+> --- a/io/channel.c
+> +++ b/io/channel.c
+> @@ -113,6 +113,60 @@ ssize_t qio_channel_read(QIOChannel *ioc,
+>  }
+>  
+>  
+> +ssize_t qio_channel_read_all(QIOChannel *ioc,
+> +                             char *buf,
+> +                             size_t buflen,
+> +                             Error **errp)
+> +{
+> +    ssize_t total = 0;
+> +    while (buflen > 0) {
+> +        ssize_t n_read = qio_channel_read(ioc, buf, buflen, errp);
+> +
+> +        if (n_read == QIO_CHANNEL_ERR_BLOCK) {
+> +            assert(ioc->ctx);
+> +            qio_channel_yield(ioc, G_IO_IN);
+> +            continue;
+> +        }
+> +        if (n_read < 0) {
+> +            return n_read;
+> +        }
+> +
+> +        buf += n_read;
+> +        total += n_read;
+> +        buflen -= n_read;
+> +    }
 
-  Given the following instruction:
-  ldp x0, x1, [x0]
+This busy-loops on EOF ie when n_read == 0.
 
-  This will load two 64 bit values from memory, however if each location
-  to load is on a different page and the second page is unmapped this
-  will raise an exception. When this happens x0 has already been updated
-  so after the exception handler has run the operating system will try
-  to rerun the instruction. QEMU will now try to perform an invalid load
-  and raise a new exception.
+> +
+> +    return total;
+> +}
+> +
+> +
+> +ssize_t qio_channel_write_all(QIOChannel *ioc,
+> +                              const char *buf,
+> +                              size_t buflen,
+> +                              Error **errp)
+> +{
+> +    ssize_t total = 0;
+> +    while (buflen > 0) {
+> +        ssize_t n_written = qio_channel_write(ioc, buf, buflen, errp);
+> +
+> +        if (n_written == QIO_CHANNEL_ERR_BLOCK) {
+> +            assert(ioc->ctx);
+> +            qio_channel_yield(ioc, G_IO_OUT);
+> +            continue;
+> +        }
+> +        if (n_written < 0) {
+> +            return n_written;
+> +        }
+> +
+> +        buf += n_written;
+> +        total += n_written;
+> +        buflen -= n_written;
+> +    }
+> +
+> +    return total;
+> +}
+> +
+> +
+>  ssize_t qio_channel_write(QIOChannel *ioc,
+>                            const char *buf,
+>                            size_t buflen,
+> -- 
+> 2.13.5
+> 
+> 
 
-  I believe this is incorrect as section D.1.14.5 of the ARMv8 reference
-  manual B.a states that, on taking an exception, registers used in the
-  generation of addresses are restored to their initial value, so x0
-  shouldn't be changed, where x1 can be un an unknown state.
-
-  I found the issue running FreeBSD with the cortex-strings
-  implementation of memcpy. This uses a similar instruction when copying
-  between 64 and 96 bytes.
-
-  I've observed this on:
-  QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.14), Copyright (=
-c) 2003-2008 Fabrice Bellard
-
-  And checked I still get the same behaviour on:
-  QEMU emulator version 2.9.94 (v2.10.0-rc4-dirty)
-  Git revision: 248b23735645f7cbb503d9be6f5bf825f2a603ab
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1713066/+subscriptions
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
