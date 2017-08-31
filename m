@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dnG9Y-0002MS-Iu
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 23:28:26 -0400
+	(envelope-from <peterx@redhat.com>) id 1dnGDF-00042o-Ko
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 23:32:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dnG9V-0005Zf-8y
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 23:28:24 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:36599)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dnG9U-0005YJ-6e
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 23:28:21 -0400
-Date: Thu, 31 Aug 2017 11:27:42 +0800 (CST)
-Message-ID: <201708311127423071469@zte.com.cn>
-References: 1503991359-3353-1-git-send-email-wang.yong155@zte.com.cn,
-	20170831021838.GG17741@lemon.lan
-Mime-Version: 1.0
-From: <wang.yong155@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCHv5_01/03=5D_qemu-iothread=3A_IOTh?=
- =?utf-8?q?read_supports_theGMainContext_event_loop?=
+	(envelope-from <peterx@redhat.com>) id 1dnGDC-0006uG-7g
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 23:32:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55112)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dnGDB-0006tt-V3
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 23:32:10 -0400
+Date: Thu, 31 Aug 2017 11:31:55 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170831033155.GI5920@pxdev.xzpeter.org>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<20170829110357.GG3783@redhat.com>
+	<877exllekz.fsf@dusky.pond.sub.org>
+	<20170830101311.GB18526@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170830101311.GB18526@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,173 +29,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: pbonzini@redhat.com, stefanha@redhat.com, jasowang@redhat.com, zhangchen.fnst@cn.fujitsu.com, zhang.zhanghailiang@huawei.com, wang.guang55@zte.com.cn, lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, John Snow <jsnow@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-Pj4gRnJvbTogV2FuZyBZb25nIDx3YW5nLnlvbmcxNTVAenRlLmNvbS5jbj4NCg0KPj4gDQoNCj4+
-IElPVGhyZWFkIHVzZXMgQWlvQ29udGV4dCBldmVudCBsb29wIGFuZCBkb2VzIG5vdCBydW4gYSBH
-TWFpbkNvbnRleHQuDQoNCj4+IFRoZXJlZm9yZSxjaGFyZGV2IGNhbm5vdCB3b3JrIGluIElPVGhy
-ZWFkLHN1Y2ggYXMgdGhlIGNoYXJkZXYgaXMNCg0KPj4gdXNlZCBmb3IgY29sby1jb21wYXJlIHBh
-Y2tldHMgcmVjZXB0aW9uLg0KDQo+PiANCg0KPj4gVGhpcyBwYXRjaCBtYWtlcyB0aGUgSU9UaHJl
-YWQgcnVuIHRoZSBHTWFpbkNvbnRleHQgZXZlbnQgbG9vcCwNCg0KPj4gY2hhcmRldiBhbmQgSU9U
-aHJlYWQgY2FuIHdvcmsgdG9nZXRoZXIuDQoNCj4+IA0KDQo+PiBTaWduZWQtb2ZmLWJ5OiBXYW5n
-IFlvbmcgPHdhbmcueW9uZzE1NUB6dGUuY29tLmNuPg0KDQo+PiBTaWduZWQtb2ZmLWJ5OiBXYW5n
-IEd1YW5nIDx3YW5nLmd1YW5nNTVAenRlLmNvbS5jbj4NCg0KPj4gLS0tDQoNCj4+ICBpbmNsdWRl
-L3N5c2VtdS9pb3RocmVhZC5oIHwgIDQgKysrKw0KDQo+PiAgaW90aHJlYWQuYyAgICAgICAgICAg
-ICAgICB8IDQ1ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0K
-DQo+PiAgMiBmaWxlcyBjaGFuZ2VkLCA0OSBpbnNlcnRpb25zKCspDQoNCj4+IA0KDQo+PiBkaWZm
-IC0tZ2l0IGEvaW5jbHVkZS9zeXNlbXUvaW90aHJlYWQuaCBiL2luY2x1ZGUvc3lzZW11L2lvdGhy
-ZWFkLmgNCg0KPj4gaW5kZXggZTZkYTFhNC4uZDI5ODViMyAxMDA2NDQNCg0KPj4gLS0tIGEvaW5j
-bHVkZS9zeXNlbXUvaW90aHJlYWQuaA0KDQo+PiArKysgYi9pbmNsdWRlL3N5c2VtdS9pb3RocmVh
-ZC5oDQoNCj4+IEBAIC0yNCw2ICsyNCw5IEBAIHR5cGVkZWYgc3RydWN0IHsNCg0KPj4gIA0KDQo+
-PiAgICAgIFFlbXVUaHJlYWQgdGhyZWFkDQoNCj4+ICAgICAgQWlvQ29udGV4dCAqY3R4DQoNCj4+
-ICsgICAgR01haW5Db250ZXh0ICp3b3JrZXJfY29udGV4dA0KDQo+PiArICAgIEdNYWluTG9vcCAq
-bWFpbl9sb29wDQoNCj4+ICsgICAgR09uY2Ugb25jZQ0KDQo+PiAgICAgIFFlbXVNdXRleCBpbml0
-X2RvbmVfbG9jaw0KDQo+PiAgICAgIFFlbXVDb25kIGluaXRfZG9uZV9jb25kICAgIC8qIGlzIHRo
-cmVhZCBpbml0aWFsaXphdGlvbiBkb25lPyAqLw0KDQo+PiAgICAgIGJvb2wgc3RvcHBpbmcNCg0K
-Pj4gQEAgLTQxLDUgKzQ0LDYgQEAgdHlwZWRlZiBzdHJ1Y3Qgew0KDQo+PiAgY2hhciAqaW90aHJl
-YWRfZ2V0X2lkKElPVGhyZWFkICppb3RocmVhZCkNCg0KPj4gIEFpb0NvbnRleHQgKmlvdGhyZWFk
-X2dldF9haW9fY29udGV4dChJT1RocmVhZCAqaW90aHJlYWQpDQoNCj4+ICB2b2lkIGlvdGhyZWFk
-X3N0b3BfYWxsKHZvaWQpDQoNCj4+ICtHTWFpbkNvbnRleHQgKmlvdGhyZWFkX2dldF9nX21haW5f
-Y29udGV4dChJT1RocmVhZCAqaW90aHJlYWQpDQoNCj4+ICANCg0KPj4gICNlbmRpZiAvKiBJT1RI
-UkVBRF9IICovDQoNCj4+IGRpZmYgLS1naXQgYS9pb3RocmVhZC5jIGIvaW90aHJlYWQuYw0KDQo+
-PiBpbmRleCBiZWViODcwLi40NGM4OTQ0IDEwMDY0NA0KDQo+PiAtLS0gYS9pb3RocmVhZC5jDQoN
-Cj4+ICsrKyBiL2lvdGhyZWFkLmMNCg0KPj4gQEAgLTU3LDYgKzU3LDIzIEBAIHN0YXRpYyB2b2lk
-ICppb3RocmVhZF9ydW4odm9pZCAqb3BhcXVlKQ0KDQo+PiAgDQoNCj4+ICAgICAgd2hpbGUgKCFh
-dG9taWNfcmVhZCgmaW90aHJlYWQtPnN0b3BwaW5nKSkgew0KDQo+PiAgICAgICAgICBhaW9fcG9s
-bChpb3RocmVhZC0+Y3R4LCB0cnVlKQ0KDQo+PiArDQoNCj4+ICsgICAgICAgIGlmIChhdG9taWNf
-cmVhZCgmaW90aHJlYWQtPndvcmtlcl9jb250ZXh0KSkgew0KDQo+PiArICAgICAgICAgICAgR01h
-aW5Mb29wICpsb29wDQoNCj4+ICsNCg0KPj4gKyAgICAgICAgICAgIGdfbWFpbl9jb250ZXh0X3B1
-c2hfdGhyZWFkX2RlZmF1bHQoaW90aHJlYWQtPndvcmtlcl9jb250ZXh0KQ0KDQo+PiArICAgICAg
-ICAgICAgaW90aHJlYWQtPm1haW5fbG9vcCA9DQoNCj4+ICsgICAgICAgICAgICAgICAgZ19tYWlu
-X2xvb3BfbmV3KGlvdGhyZWFkLT53b3JrZXJfY29udGV4dCwgVFJVRSkNCg0KPj4gKyAgICAgICAg
-ICAgIGxvb3AgPSBpb3RocmVhZC0+bWFpbl9sb29wDQoNCj4+ICsNCg0KPj4gKyAgICAgICAgICAg
-IGdfbWFpbl9sb29wX3J1bihpb3RocmVhZC0+bWFpbl9sb29wKQ0KDQo+PiArICAgICAgICAgICAg
-aW90aHJlYWQtPm1haW5fbG9vcCA9IE5VTEwNCg0KPj4gKyAgICAgICAgICAgIGdfbWFpbl9sb29w
-X3VucmVmKGxvb3ApDQoNCj4+ICsNCg0KPj4gKyAgICAgICAgICAgIGdfbWFpbl9jb250ZXh0X3Bv
-cF90aHJlYWRfZGVmYXVsdChpb3RocmVhZC0+d29ya2VyX2NvbnRleHQpDQoNCj4+ICsgICAgICAg
-ICAgICBnX21haW5fY29udGV4dF91bnJlZihpb3RocmVhZC0+d29ya2VyX2NvbnRleHQpDQoNCj4+
-ICsgICAgICAgICAgICBpb3RocmVhZC0+d29ya2VyX2NvbnRleHQgPSBOVUxMDQoNCj4+ICsgICAg
-ICAgIH0NCg0KPj4gICAgICB9DQoNCj4+ICANCg0KPj4gICAgICByY3VfdW5yZWdpc3Rlcl90aHJl
-YWQoKQ0KDQo+PiBAQCAtNzMsNiArOTAsOSBAQCBzdGF0aWMgaW50IGlvdGhyZWFkX3N0b3AoT2Jq
-ZWN0ICpvYmplY3QsIHZvaWQgKm9wYXF1ZSkNCg0KPj4gICAgICB9DQoNCj4+ICAgICAgaW90aHJl
-YWQtPnN0b3BwaW5nID0gdHJ1ZQ0KDQo+PiAgICAgIGFpb19ub3RpZnkoaW90aHJlYWQtPmN0eCkN
-Cg0KPj4gKyAgICBpZiAoYXRvbWljX3JlYWQoJmlvdGhyZWFkLT5tYWluX2xvb3ApKSB7DQoNCj4+
-ICsgICAgICAgIGdfbWFpbl9sb29wX3F1aXQoaW90aHJlYWQtPm1haW5fbG9vcCkNCg0KPj4gKyAg
-ICB9DQoNCj4+ICAgICAgcWVtdV90aHJlYWRfam9pbigmaW90aHJlYWQtPnRocmVhZCkNCg0KPj4g
-ICAgICByZXR1cm4gMA0KDQo+PiAgfQ0KDQo+PiBAQCAtMTI1LDYgKzE0NSw3IEBAIHN0YXRpYyB2
-b2lkIGlvdGhyZWFkX2NvbXBsZXRlKFVzZXJDcmVhdGFibGUgKm9iaiwgRXJyb3IgKiplcnJwKQ0K
-DQo+PiAgDQoNCj4+ICAgICAgcWVtdV9tdXRleF9pbml0KCZpb3RocmVhZC0+aW5pdF9kb25lX2xv
-Y2spDQoNCj4+ICAgICAgcWVtdV9jb25kX2luaXQoJmlvdGhyZWFkLT5pbml0X2RvbmVfY29uZCkN
-Cg0KPj4gKyAgICBpb3RocmVhZC0+b25jZSA9IChHT25jZSkgR19PTkNFX0lOSVQNCg0KPg0KDQo+
-SW4gbGFzdCByZXZpZXcgSSBzdWdnZXN0ZWQgcmVtb3ZpbmcgdGhpcyB0eXBlIGNhc3QsIG90aGVy
-d2lzZSBsb29rcyBnb29kLiBEcm9wDQoNCj5pdCBhbmQgcGxlYXNlIGFkZA0KDQo+DQoNCj5SZXZp
-ZXdlZC1ieTogRmFtIFpoZW5nIDxmYW16QHJlZGhhdC5jb20+DQoNCg0KDQoNClNvcnJ5LCBUaGVy
-ZSdzIHNvbWV0aGluZyB3cm9uZyB3aXRoIG91ciBjb21wYW55J3MgbWFpbCBmb3JtYXQuDQoNClBs
-ZWFzZSBpZ25vcmUgbXkgbGFzdCByZXBseSBtYWlsLg0KDQoNCg0KDQpIaSBGYW0sDQoNCkhlcmUs
-IGlvdGhyZWFkLT5vbmNlIGNhbid0IGJlIGluaXRpYWxpemVkIHdpdGggR19PTkNFX0lOSVQgZGly
-ZWN0bHksIG11c3QgdXNlIHR5cGUgY2FzdC4NCg0KaWYgIHJlbW92ZSB0eXBlIGNhc3QgLCB3ZSB3
-aWxsIGdldCBhbiBlcnJvci4NCg0KDQoNCg0KaW90aHJlYWQuYzogSW4gZnVuY3Rpb24g4oCYaW90
-aHJlYWRfY29tcGxldGXigJk6DQoNCi91c3IvaW5jbHVkZS9nbGliLTIuMC9nbGliL2d0aHJlYWQu
-aDoxMDE6MjE6IGVycm9yOiBleHBlY3RlZCBleHByZXNzaW9uIGJlZm9yZSDigJh74oCZIHRva2Vu
-DQoNCiAjZGVmaW5lIEdfT05DRV9JTklUIHsgR19PTkNFX1NUQVRVU19OT1RDQUxMRUQsIE5VTEwg
-fQ0KDQogICAgICAgICAgICAgICAgICAgICBeDQoNCmlvdGhyZWFkLmM6MTQ5OjIyOiBub3RlOiBp
-biBleHBhbnNpb24gb2YgbWFjcm8g4oCYR19PTkNFX0lOSVTigJkNCg0KICAgICBpb3RocmVhZC0+
-b25jZSA9IEdfT05DRV9JTklUDQoNCg0KDQoNClRoYW5rcw0KDQo+DQoNCj4+ICANCg0KPj4gICAg
-ICAvKiBUaGlzIGFzc3VtZXMgd2UgYXJlIGNhbGxlZCBmcm9tIGEgdGhyZWFkIHdpdGggdXNlZnVs
-IENQVSBhZmZpbml0eSBmb3IgdXMNCg0KPj4gICAgICAgKiB0byBpbmhlcml0Lg0KDQo+PiBAQCAt
-MzA5LDMgKzMzMCwyNyBAQCB2b2lkIGlvdGhyZWFkX3N0b3BfYWxsKHZvaWQpDQoNCj4+ICANCg0K
-Pj4gICAgICBvYmplY3RfY2hpbGRfZm9yZWFjaChjb250YWluZXIsIGlvdGhyZWFkX3N0b3AsIE5V
-TEwpDQoNCj4+ICB9DQoNCj4+ICsNCg0KPj4gK3N0YXRpYyBncG9pbnRlciBpb3RocmVhZF9nX21h
-aW5fY29udGV4dF9pbml0KGdwb2ludGVyIG9wYXF1ZSkNCg0KPj4gK3sNCg0KPj4gKyAgICBBaW9D
-b250ZXh0ICpjdHgNCg0KPj4gKyAgICBJT1RocmVhZCAqaW90aHJlYWQgPSBvcGFxdWUNCg0KPj4g
-KyAgICBHU291cmNlICpzb3VyY2UNCg0KPj4gKw0KDQo+PiArICAgIGlvdGhyZWFkLT53b3JrZXJf
-Y29udGV4dCA9IGdfbWFpbl9jb250ZXh0X25ldygpDQoNCj4+ICsNCg0KPj4gKyAgICBjdHggPSBp
-b3RocmVhZF9nZXRfYWlvX2NvbnRleHQoaW90aHJlYWQpDQoNCj4+ICsgICAgc291cmNlID0gYWlv
-X2dldF9nX3NvdXJjZShjdHgpDQoNCj4+ICsgICAgZ19zb3VyY2VfYXR0YWNoKHNvdXJjZSwgaW90
-aHJlYWQtPndvcmtlcl9jb250ZXh0KQ0KDQo+PiArICAgIGdfc291cmNlX3VucmVmKHNvdXJjZSkN
-Cg0KPj4gKw0KDQo+PiArICAgIGFpb19ub3RpZnkoaW90aHJlYWQtPmN0eCkNCg0KPj4gKyAgICBy
-ZXR1cm4gTlVMTA0KDQo+PiArfQ0KDQo+PiArDQoNCj4+ICtHTWFpbkNvbnRleHQgKmlvdGhyZWFk
-X2dldF9nX21haW5fY29udGV4dChJT1RocmVhZCAqaW90aHJlYWQpDQoNCj4+ICt7DQoNCj4+ICsg
-ICAgZ19vbmNlKCZpb3RocmVhZC0+b25jZSwgaW90aHJlYWRfZ19tYWluX2NvbnRleHRfaW5pdCwg
-aW90aHJlYWQpDQoNCj4+ICsNCg0KPj4gKyAgICByZXR1cm4gaW90aHJlYWQtPndvcmtlcl9jb250
-ZXh0DQoNCj4+ICt9DQoNCj4+IC0tIA0KDQo+PiAxLjguMy4xDQoNCj4+IA0KDQo+PiANCg0KDQoN
-CuWOn+Wni+mCruS7tg0KDQoNCg0K5Y+R5Lu25Lq677yaIDxmYW16QHJlZGhhdC5jb20+DQrmlLbk
-u7bkurrvvJrnjovli4cxMDE3MDUzMA0K5oqE6YCB5Lq677yaIDxwYm9uemluaUByZWRoYXQuY29t
-PiA8c3RlZmFuaGFAcmVkaGF0LmNvbT4gPGphc293YW5nQHJlZGhhdC5jb20+IDx6aGFuZ2NoZW4u
-Zm5zdEBjbi5mdWppdHN1LmNvbT4gPHpoYW5nLnpoYW5naGFpbGlhbmdAaHVhd2VpLmNvbT7njovl
-ub8xMDE2NTk5MiA8bGl6aGlqaWFuQGNuLmZ1aml0c3UuY29tPiA8cWVtdS1kZXZlbEBub25nbnUu
-b3JnPg0K5pelIOacnyDvvJoyMDE35bm0MDjmnIgzMeaXpSAxMDoxOA0K5Li7IOmimCDvvJpSZTog
-W1BBVENIdjUgMDEvMDNdIHFlbXUtaW90aHJlYWQ6IElPVGhyZWFkIHN1cHBvcnRzIHRoZUdNYWlu
-Q29udGV4dCBldmVudCBsb29wDQoNCg0KDQoNCg0KT24gVHVlLCAwOC8yOSAxNToyMiwgV2FuZyB5
-b25nIHdyb3RlOg0KPiBGcm9tOiBXYW5nIFlvbmcgPHdhbmcueW9uZzE1NUB6dGUuY29tLmNuPg0K
-PiANCj4gSU9UaHJlYWQgdXNlcyBBaW9Db250ZXh0IGV2ZW50IGxvb3AgYW5kIGRvZXMgbm90IHJ1
-biBhIEdNYWluQ29udGV4dC4NCj4gVGhlcmVmb3JlLGNoYXJkZXYgY2Fubm90IHdvcmsgaW4gSU9U
-aHJlYWQsc3VjaCBhcyB0aGUgY2hhcmRldiBpcw0KPiB1c2VkIGZvciBjb2xvLWNvbXBhcmUgcGFj
-a2V0cyByZWNlcHRpb24uDQo+IA0KPiBUaGlzIHBhdGNoIG1ha2VzIHRoZSBJT1RocmVhZCBydW4g
-dGhlIEdNYWluQ29udGV4dCBldmVudCBsb29wLA0KPiBjaGFyZGV2IGFuZCBJT1RocmVhZCBjYW4g
-d29yayB0b2dldGhlci4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IFdhbmcgWW9uZyA8d2FuZy55b25n
-MTU1QHp0ZS5jb20uY24+DQo+IFNpZ25lZC1vZmYtYnk6IFdhbmcgR3VhbmcgPHdhbmcuZ3Vhbmc1
-NUB6dGUuY29tLmNuPg0KPiAtLS0NCj4gIGluY2x1ZGUvc3lzZW11L2lvdGhyZWFkLmggfCAgNCAr
-KysrDQo+ICBpb3RocmVhZC5jICAgICAgICAgICAgICAgIHwgNDUgKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICAyIGZpbGVzIGNoYW5nZWQsIDQ5IGluc2Vy
-dGlvbnMoKykNCj4gDQo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL3N5c2VtdS9pb3RocmVhZC5oIGIv
-aW5jbHVkZS9zeXNlbXUvaW90aHJlYWQuaA0KPiBpbmRleCBlNmRhMWE0Li5kMjk4NWIzIDEwMDY0
-NA0KPiAtLS0gYS9pbmNsdWRlL3N5c2VtdS9pb3RocmVhZC5oDQo+ICsrKyBiL2luY2x1ZGUvc3lz
-ZW11L2lvdGhyZWFkLmgNCj4gQEAgLTI0LDYgKzI0LDkgQEAgdHlwZWRlZiBzdHJ1Y3Qgew0KPiAg
-DQo+ICAgICAgUWVtdVRocmVhZCB0aHJlYWQNCj4gICAgICBBaW9Db250ZXh0ICpjdHgNCj4gKyAg
-ICBHTWFpbkNvbnRleHQgKndvcmtlcl9jb250ZXh0DQo+ICsgICAgR01haW5Mb29wICptYWluX2xv
-b3ANCj4gKyAgICBHT25jZSBvbmNlDQo+ICAgICAgUWVtdU11dGV4IGluaXRfZG9uZV9sb2NrDQo+
-ICAgICAgUWVtdUNvbmQgaW5pdF9kb25lX2NvbmQgICAgLyogaXMgdGhyZWFkIGluaXRpYWxpemF0
-aW9uIGRvbmU/ICovDQo+ICAgICAgYm9vbCBzdG9wcGluZw0KPiBAQCAtNDEsNSArNDQsNiBAQCB0
-eXBlZGVmIHN0cnVjdCB7DQo+ICBjaGFyICppb3RocmVhZF9nZXRfaWQoSU9UaHJlYWQgKmlvdGhy
-ZWFkKQ0KPiAgQWlvQ29udGV4dCAqaW90aHJlYWRfZ2V0X2Fpb19jb250ZXh0KElPVGhyZWFkICpp
-b3RocmVhZCkNCj4gIHZvaWQgaW90aHJlYWRfc3RvcF9hbGwodm9pZCkNCj4gK0dNYWluQ29udGV4
-dCAqaW90aHJlYWRfZ2V0X2dfbWFpbl9jb250ZXh0KElPVGhyZWFkICppb3RocmVhZCkNCj4gIA0K
-PiAgI2VuZGlmIC8qIElPVEhSRUFEX0ggKi8NCj4gZGlmZiAtLWdpdCBhL2lvdGhyZWFkLmMgYi9p
-b3RocmVhZC5jDQo+IGluZGV4IGJlZWI4NzAuLjQ0Yzg5NDQgMTAwNjQ0DQo+IC0tLSBhL2lvdGhy
-ZWFkLmMNCj4gKysrIGIvaW90aHJlYWQuYw0KPiBAQCAtNTcsNiArNTcsMjMgQEAgc3RhdGljIHZv
-aWQgKmlvdGhyZWFkX3J1bih2b2lkICpvcGFxdWUpDQo+ICANCj4gICAgICB3aGlsZSAoIWF0b21p
-Y19yZWFkKCZpb3RocmVhZC0+c3RvcHBpbmcpKSB7DQo+ICAgICAgICAgIGFpb19wb2xsKGlvdGhy
-ZWFkLT5jdHgsIHRydWUpDQo+ICsNCj4gKyAgICAgICAgaWYgKGF0b21pY19yZWFkKCZpb3RocmVh
-ZC0+d29ya2VyX2NvbnRleHQpKSB7DQo+ICsgICAgICAgICAgICBHTWFpbkxvb3AgKmxvb3ANCj4g
-Kw0KPiArICAgICAgICAgICAgZ19tYWluX2NvbnRleHRfcHVzaF90aHJlYWRfZGVmYXVsdChpb3Ro
-cmVhZC0+d29ya2VyX2NvbnRleHQpDQo+ICsgICAgICAgICAgICBpb3RocmVhZC0+bWFpbl9sb29w
-ID0NCj4gKyAgICAgICAgICAgICAgICBnX21haW5fbG9vcF9uZXcoaW90aHJlYWQtPndvcmtlcl9j
-b250ZXh0LCBUUlVFKQ0KPiArICAgICAgICAgICAgbG9vcCA9IGlvdGhyZWFkLT5tYWluX2xvb3AN
-Cj4gKw0KPiArICAgICAgICAgICAgZ19tYWluX2xvb3BfcnVuKGlvdGhyZWFkLT5tYWluX2xvb3Ap
-DQo+ICsgICAgICAgICAgICBpb3RocmVhZC0+bWFpbl9sb29wID0gTlVMTA0KPiArICAgICAgICAg
-ICAgZ19tYWluX2xvb3BfdW5yZWYobG9vcCkNCj4gKw0KPiArICAgICAgICAgICAgZ19tYWluX2Nv
-bnRleHRfcG9wX3RocmVhZF9kZWZhdWx0KGlvdGhyZWFkLT53b3JrZXJfY29udGV4dCkNCj4gKyAg
-ICAgICAgICAgIGdfbWFpbl9jb250ZXh0X3VucmVmKGlvdGhyZWFkLT53b3JrZXJfY29udGV4dCkN
-Cj4gKyAgICAgICAgICAgIGlvdGhyZWFkLT53b3JrZXJfY29udGV4dCA9IE5VTEwNCj4gKyAgICAg
-ICAgfQ0KPiAgICAgIH0NCj4gIA0KPiAgICAgIHJjdV91bnJlZ2lzdGVyX3RocmVhZCgpDQo+IEBA
-IC03Myw2ICs5MCw5IEBAIHN0YXRpYyBpbnQgaW90aHJlYWRfc3RvcChPYmplY3QgKm9iamVjdCwg
-dm9pZCAqb3BhcXVlKQ0KPiAgICAgIH0NCj4gICAgICBpb3RocmVhZC0+c3RvcHBpbmcgPSB0cnVl
-DQo+ICAgICAgYWlvX25vdGlmeShpb3RocmVhZC0+Y3R4KQ0KPiArICAgIGlmIChhdG9taWNfcmVh
-ZCgmaW90aHJlYWQtPm1haW5fbG9vcCkpIHsNCj4gKyAgICAgICAgZ19tYWluX2xvb3BfcXVpdChp
-b3RocmVhZC0+bWFpbl9sb29wKQ0KPiArICAgIH0NCj4gICAgICBxZW11X3RocmVhZF9qb2luKCZp
-b3RocmVhZC0+dGhyZWFkKQ0KPiAgICAgIHJldHVybiAwDQo+ICB9DQo+IEBAIC0xMjUsNiArMTQ1
-LDcgQEAgc3RhdGljIHZvaWQgaW90aHJlYWRfY29tcGxldGUoVXNlckNyZWF0YWJsZSAqb2JqLCBF
-cnJvciAqKmVycnApDQo+ICANCj4gICAgICBxZW11X211dGV4X2luaXQoJmlvdGhyZWFkLT5pbml0
-X2RvbmVfbG9jaykNCj4gICAgICBxZW11X2NvbmRfaW5pdCgmaW90aHJlYWQtPmluaXRfZG9uZV9j
-b25kKQ0KPiArICAgIGlvdGhyZWFkLT5vbmNlID0gKEdPbmNlKSBHX09OQ0VfSU5JVA0KDQpJbiBs
-YXN0IHJldmlldyBJIHN1Z2dlc3RlZCByZW1vdmluZyB0aGlzIHR5cGUgY2FzdCwgb3RoZXJ3aXNl
-IGxvb2tzIGdvb2QuIERyb3ANCml0IGFuZCBwbGVhc2UgYWRkDQoNClJldmlld2VkLWJ5OiBGYW0g
-WmhlbmcgPGZhbXpAcmVkaGF0LmNvbT4NCg0KPiAgDQo+ICAgICAgLyogVGhpcyBhc3N1bWVzIHdl
-IGFyZSBjYWxsZWQgZnJvbSBhIHRocmVhZCB3aXRoIHVzZWZ1bCBDUFUgYWZmaW5pdHkgZm9yIHVz
-DQo+ICAgICAgICogdG8gaW5oZXJpdC4NCj4gQEAgLTMwOSwzICszMzAsMjcgQEAgdm9pZCBpb3Ro
-cmVhZF9zdG9wX2FsbCh2b2lkKQ0KPiAgDQo+ICAgICAgb2JqZWN0X2NoaWxkX2ZvcmVhY2goY29u
-dGFpbmVyLCBpb3RocmVhZF9zdG9wLCBOVUxMKQ0KPiAgfQ0KPiArDQo+ICtzdGF0aWMgZ3BvaW50
-ZXIgaW90aHJlYWRfZ19tYWluX2NvbnRleHRfaW5pdChncG9pbnRlciBvcGFxdWUpDQo+ICt7DQo+
-ICsgICAgQWlvQ29udGV4dCAqY3R4DQo+ICsgICAgSU9UaHJlYWQgKmlvdGhyZWFkID0gb3BhcXVl
-DQo+ICsgICAgR1NvdXJjZSAqc291cmNlDQo+ICsNCj4gKyAgICBpb3RocmVhZC0+d29ya2VyX2Nv
-bnRleHQgPSBnX21haW5fY29udGV4dF9uZXcoKQ0KPiArDQo+ICsgICAgY3R4ID0gaW90aHJlYWRf
-Z2V0X2Fpb19jb250ZXh0KGlvdGhyZWFkKQ0KPiArICAgIHNvdXJjZSA9IGFpb19nZXRfZ19zb3Vy
-Y2UoY3R4KQ0KPiArICAgIGdfc291cmNlX2F0dGFjaChzb3VyY2UsIGlvdGhyZWFkLT53b3JrZXJf
-Y29udGV4dCkNCj4gKyAgICBnX3NvdXJjZV91bnJlZihzb3VyY2UpDQo+ICsNCj4gKyAgICBhaW9f
-bm90aWZ5KGlvdGhyZWFkLT5jdHgpDQo+ICsgICAgcmV0dXJuIE5VTEwNCj4gK30NCj4gKw0KPiAr
-R01haW5Db250ZXh0ICppb3RocmVhZF9nZXRfZ19tYWluX2NvbnRleHQoSU9UaHJlYWQgKmlvdGhy
-ZWFkKQ0KPiArew0KPiArICAgIGdfb25jZSgmaW90aHJlYWQtPm9uY2UsIGlvdGhyZWFkX2dfbWFp
-bl9jb250ZXh0X2luaXQsIGlvdGhyZWFkKQ0KPiArDQo+ICsgICAgcmV0dXJuIGlvdGhyZWFkLT53
-b3JrZXJfY29udGV4dA0KPiArfQ0KPiAtLSANCj4gMS44LjMuMQ0KPiANCj4=
+On Wed, Aug 30, 2017 at 11:13:11AM +0100, Daniel P. Berrange wrote:
+> On Wed, Aug 30, 2017 at 09:06:20AM +0200, Markus Armbruster wrote:
+> > "Daniel P. Berrange" <berrange@redhat.com> writes:
+> > 
+> > > On Wed, Aug 23, 2017 at 02:51:03PM +0800, Peter Xu wrote:
+> > 
+> > >> However, even with the series, it does not mean that per-monitor
+> > >> threads will never hang.  One example is that we can still run "info
+> > >> vcpus" in per-monitor threads during a paused postcopy (in that state,
+> > >> page faults are never handled, and "info cpus" will never return since
+> > >> it tries to sync every vcpus).  So to make sure it does not hang, we
+> > >> not only need the per-monitor thread, the user should be careful as
+> > >> well on how to use it.
+> > >> 
+> > >> For postcopy recovery, we may need dedicated monitor channel for
+> > >> recovery.  In other words, a destination VM that supports postcopy
+> > >> recovery would possibly need:
+> > >> 
+> > >>   -qmp MAIN_CHANNEL -qmp RECOVERY_CHANNEL
+> > 
+> > Where RECOVERY_CHANNEL isn't necessarily just for postcopy, but for any
+> > "emergency" QMP access.  If you use it only for commands that cannot
+> > hang (i.e. terminate in bounded time), then you'll always be able to get
+> > commands accepted there in bounded time.
+> > 
+> > > I think this is a really horrible thing to expose to management applications.
+> > > They should not need to be aware of fact that QEMU is buggy and thus requires
+> > > that certain commands be run on different monitors to work around the bug.
+> > 
+> > These are (serious) design limitations, not bugs in the narrow sense of
+> > the word.
+> > 
+> > However, I quite agree that the need for clients to know whether a
+> > monitor command can hang is impractical for the general case.  What
+> > might be practical is a QMP monitor mode that accepts only known
+> > hang-free commands.  Hang-free could be introspectable.
+> > 
+> > In case you consider that ugly: it's best to explore the design space
+> > first, and recoil from "ugly" second.
+> 
+> Actually you slightly mis-interpreted me there. I think it is ok for
+> applications to have knowledge about whether a particular command
+> may hang or not. Given that knowledge it should *not*, however, require
+> that the application issue such commands on separate monitor channels.
+> It is entirely possible to handle hang-free commands on the existing
+> channel.
+> 
+> > > I'd much prefer to see the problem described handled transparently inside
+> > > QEMU. One approach is have a dedicated thread in QEMU responsible for all
+> > > monitor I/O. This thread should never actually execute monitor commands
+> > > though, it would simply parse the command request and put data onto a queue
+> > > of pending commands, thus it could never hang. The command queue could be
+> > > processed by the main thread, or by another thread that is interested.
+> > > eg the migration thread could process any queued commands related to
+> > > migration directly.
+> > 
+> > The monitor itself can't hang then, but the thread(s) dequeuing parsed
+> > commands can.
+> 
+> If certain commands are hang-free then you can have a dedicated thread
+> that only de-queues & processes the hang-free commands. The approach I
+> outlined is exactly how libvirt deals with its own RPC dispatch. We have
+> certain commands that are guaranteed to not hang, which are processed by
+> a dedicated pool of threads. So even if all normal RPC commands have
+> hung, you can still run a subset of hang-free RPC commands.
+> 
+> > 
+> > To maintain commands' synchronous semantics, their replies need to be
+> > sent in order, which of course reintroduces the hangs.
+> 
+> The requirement for such ordering is just an arbitrary restriction that
+> QEMU currently imposes. It is reasonable to allow arbitrary ordering of
+> responses (which is what libvirt does in its RPC layer). Admittedly at
+> this stage though, we would likely require some "opt in" handshake when
+> initializing QMP for the app to tell QEMU it can cope with out of order
+> replies. It would require that each command request has a unique serial
+> number, which is included in the associated reply, so apps can match
+> them up. We used to have that but iirc it was then removed.
+> 
+> There's other ways to deal with this, such as the job starting idea you
+> mention below.
+> 
+> The key point though is that I don't think creating multiple monitor
+> servers is a desirable approach - it is just a hack to avoid dealing
+> with the root cause problems. 
+
+Yeah I kindly agree.  It's not the root problem, but AFAIU that's the
+simplest way for now to solve the problem.  But I think I understand
+the major problem here - an extra channel is an interface change, and
+it affects users of monitors.  So I agree we'd better be patient on
+choosing a good enough interface, looks like we have two:
+
+- dedicated "hang-able" and "hang-free" channel, or,
+
+- async command handling, then we will have one single dedicated
+  command parser (possibly as well in separate thread rather than main
+  thread), per-command ID, and possibly slightly more work.  For this
+  one, I believe there are different implementations.
+
+So looks like what we need to do is firstly choose an interface, and
+if we choose the 2nd, we need to further choose the implementaion.
+
+Before getting to an conclusion, just want to make sure we have got a
+consensus on that at least we should start to move the monitor command
+handling into a separate thread rather than main thread, am I correct?
+
+Thanks,
+
+> 
+> > Let's take a step back from the implementation, and talk about
+> > *behavior* instead.
+> > 
+> > You prefer to have "the problem described handled transparently inside
+> > QEMU".  I read that as "QEMU must ensure the QMP monitor is available at
+> > all times".  "Available" means it accepts commands in bounded time.
+> > Some commands will always finish in bounded time once accepted, others
+> > may not, and whether they do may depend on the commands currently in
+> > flight.
+> > 
+> > Commands that can always start and always terminate in bounded time are
+> > no problem.
+> > 
+> > All the other commands have to become "job-starting": the QMP command
+> > kicks off a "job", which runs concurrently with the QMP monitor for some
+> > (possibly unbounded) time, then finishes.  Jobs can be examined (say to
+> > monitor progress, if the job supports that) and controlled (say to
+> > cancel, if the job supports that).
+> > 
+> > A few commands are already job-starting: migrate, the block job family,
+> > dump-guest-memory with detach=true.  Whether they're already hang-free I
+> > can't say; they could do risky work in their synchronous part.
+> > 
+> > Many commands that can hang are not job-starting.
+> > 
+> > Changing a command from "do the job" to "merely start the job" is a
+> > compatibility break.
+> > 
+> > We could make the change opt-in to preserve compatibility.  But is
+> > preserving a compatible QMP monitor that is prone to hang wortwhile?
+> > 
+> > If no, we may choose to use the resulting compatibility break to also
+> > switch the packaging of jobs from the current "synchronous command +
+> > broadcast message when done" to some variation of asynchronous command.
+> > But that should be discussed in a separate thread, and only after we
+> > know how we plan to ensure monitor availability.
+> 
+> Regards,
+> Daniel
+> -- 
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
+-- 
+Peter Xu
