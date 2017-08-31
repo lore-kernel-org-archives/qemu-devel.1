@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dnQbQ-0001yF-IU
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:37:57 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dnQcP-0002dB-SZ
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:38:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dnQbP-0004d2-GT
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:37:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56154)
+	(envelope-from <cohuck@redhat.com>) id 1dnQcL-0004ul-QH
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:38:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57586)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dnQbP-0004cF-AA
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:37:51 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 884F3C0587E5
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 14:37:49 +0000 (UTC)
-Date: Thu, 31 Aug 2017 10:37:48 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <1035692873.6569490.1504190268397.JavaMail.zimbra@redhat.com>
-In-Reply-To: <87mv6fiztt.fsf@dusky.pond.sub.org>
-References: <20170825105913.4060-1-marcandre.lureau@redhat.com>
-	<20170825105913.4060-13-marcandre.lureau@redhat.com>
-	<87ziahfd06.fsf@dusky.pond.sub.org>
-	<87mv6fiztt.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dnQcL-0004uX-Jv
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:38:49 -0400
+Date: Thu, 31 Aug 2017 16:38:36 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170831163836.58a92296.cohuck@redhat.com>
+In-Reply-To: <4694a0bd-6c4e-b762-158f-1f860990448f@redhat.com>
+References: <20170830170601.15855-1-david@redhat.com>
+	<20170830170601.15855-4-david@redhat.com>
+	<09179efb-0930-bd84-ff22-1f4b23fa6a8e@redhat.com>
+	<aa375deb-69ba-e0a8-d617-bbb304207a12@redhat.com>
+	<20170831162930.17657819.cohuck@redhat.com>
+	<4694a0bd-6c4e-b762-158f-1f860990448f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 12/14] qlit: improve QLit list vs qlist
- comparison
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 03/11] s390x: store cpu states inside
+ machine state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,37 +32,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
 
-Hi
+On Thu, 31 Aug 2017 16:30:59 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
------ Original Message -----
-> Markus Armbruster <armbru@redhat.com> writes:
->=20
-> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-> >
-> >> Use QLIST_FOREACH_ENTRY() to simplify the code and break earlier.
+> On 31.08.2017 16:29, Cornelia Huck wrote:
+> > On Thu, 31 Aug 2017 15:11:28 +0200
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >>>> +S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
+> >>>> +{
+> >>>> +    S390CcwMachineState *ms = S390_CCW_MACHINE(qdev_get_machine());
+> >>>> +
+> >>>> +    if (cpu_addr >= max_cpus) {
+> >>>> +        return NULL;
+> >>>> +    }
+> >>>> +
+> >>>> +    /* Fast lookup via CPU ID */
+> >>>> +    return ms->cpus[cpu_addr];
+> >>>> +}    
+> >>>
+> >>> I wonder whether that function should rather go into a file in
+> >>> target/s390x/ instead, since it is also used there and its prototype is
+> >>> in cpu.h ?    
 > >>
-> >> Check that the QLit list has the same size as the qlist, this should
-> >> ensure that we have an exact match when iterating over qlist for
-> >> comparing the elements.
+> >> I thought about the same thing, but as it works directly on the machine,
+> >> like ri_allowed() and friends. So I decided to keep it here for now.
 > >>
-> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >
-> > Reviewed-by: Markus Armbruster <armbru@redhat.com>
->=20
-> I'm updating the commit message so it continues to match the previous
-> commit's message:
->=20
->     qlit: Tighten QLit list vs QList comparison
->=20
->     We check that all members of the QLit list are also in the QList.  We
->     neglect to check the other direction.  Fix that.
->=20
->     While there, use QLIST_FOREACH_ENTRY() to simplify the code and break
->     the loop on the first mismatch.
->=20
-> Hope that's okay with you.
+> >> I'll think about moving the definition also into
+> >> include/hw/s390x/s390-virtio-ccw.h  
+> > 
+> > It would be a bit nicer.
+> >   
+> 
+> Adding patches right now to move everything out of cpu.h that lies under
+> the "/* outside of target/s390x/ */" section. :)
+> 
 
-Works for me, thanks a lot.
+Ah, you really care about your patch count, don't you? :)
+
+(I think it's a good idea.)
