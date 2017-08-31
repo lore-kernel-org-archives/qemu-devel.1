@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dnQV0-0005cj-Ci
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:31:15 -0400
+	(envelope-from <thuth@redhat.com>) id 1dnQW1-0006gJ-VR
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:32:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dnQUv-0002IM-C9
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:31:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48834)
+	(envelope-from <thuth@redhat.com>) id 1dnQVw-00030T-U9
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:32:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57694)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dnQUv-0002Hq-6R
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:31:09 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dnQVw-0002zZ-ND
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:32:12 -0400
 References: <20170830170601.15855-1-david@redhat.com>
 	<20170830170601.15855-4-david@redhat.com>
 	<09179efb-0930-bd84-ff22-1f4b23fa6a8e@redhat.com>
-	<aa375deb-69ba-e0a8-d617-bbb304207a12@redhat.com>
-	<20170831162930.17657819.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <4694a0bd-6c4e-b762-158f-1f860990448f@redhat.com>
-Date: Thu, 31 Aug 2017 16:30:59 +0200
+	<55b99307-b817-1cb2-f5c8-901b877735cc@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <63bc0433-dd9f-2b75-7885-5460949c821b@redhat.com>
+Date: Thu, 31 Aug 2017 16:31:51 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170831162930.17657819.cohuck@redhat.com>
+In-Reply-To: <55b99307-b817-1cb2-f5c8-901b877735cc@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -32,43 +31,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
 
-On 31.08.2017 16:29, Cornelia Huck wrote:
-> On Thu, 31 Aug 2017 15:11:28 +0200
-> David Hildenbrand <david@redhat.com> wrote:
+On 31.08.2017 16:23, David Hildenbrand wrote:
 > 
->>>> +S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
->>>> +{
->>>> +    S390CcwMachineState *ms = S390_CCW_MACHINE(qdev_get_machine());
->>>> +
->>>> +    if (cpu_addr >= max_cpus) {
->>>> +        return NULL;
->>>> +    }
->>>> +
->>>> +    /* Fast lookup via CPU ID */
->>>> +    return ms->cpus[cpu_addr];
->>>> +}  
->>>
->>> I wonder whether that function should rather go into a file in
->>> target/s390x/ instead, since it is also used there and its prototype is
->>> in cpu.h ?  
+>>> +struct S390CPU;
 >>
->> I thought about the same thing, but as it works directly on the machine,
->> like ri_allowed() and friends. So I decided to keep it here for now.
+>> You define a "struct S390CPU" here ...
 >>
->> I'll think about moving the definition also into
->> include/hw/s390x/s390-virtio-ccw.h
+>>>  typedef struct S390CcwMachineState {
+>>>      /*< private >*/
+>>>      MachineState parent_obj;
+>>>  
+>>>      /*< public >*/
+>>> +    S390CPU **cpus;
+>>
+>> ... but use the typedef'ed S390CPU here ... looks somewhat suspicious, I
+>> wonder whether the typedef is really in the right place?
 > 
-> It would be a bit nicer.
+> General question: how much do we care about headers that are not consistent?
 > 
+> E.g. shall I forward declare or simply ignore if compilers don't bite me?
 
-Adding patches right now to move everything out of cpu.h that lies under
-the "/* outside of target/s390x/ */" section. :)
+My remark was not so much about your patch, but about the original
+definition instead: "struct S390CPU" is declared in target/s390x/cpu.h,
+but "typedef struct S390CPU S390CPU" is in target/s390x/cpu-qom.h. I
+think they should rather be declared in the same header file instead. Or
+your "struct S390CPU;" forward declaration should go into cpu-qom.h
+instead, right in front of the typedef.
 
--- 
-
-Thanks,
-
-David
+ Thomas
