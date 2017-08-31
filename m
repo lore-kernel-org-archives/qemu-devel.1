@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnRhQ-0006VF-RA
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 11:48:12 -0400
+	(envelope-from <jcody@redhat.com>) id 1dnRht-0006kb-CH
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 11:48:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnRhL-0003Gi-Sm
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 11:48:08 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:35891)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnRhL-0003GV-NJ
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 11:48:03 -0400
-Received: by mail-qk0-x241.google.com with SMTP id l65so15103qkc.3
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 08:48:03 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170831122925.GJ17315@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <12741481-4c23-5a17-3784-ffce326dabc8@amsat.org>
-Date: Thu, 31 Aug 2017 12:47:59 -0300
+	(envelope-from <jcody@redhat.com>) id 1dnRhn-0003u3-Ds
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 11:48:37 -0400
+Date: Thu, 31 Aug 2017 11:47:59 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170831154759.GN4770@localhost.localdomain>
+References: <cover.1504111803.git.jcody@redhat.com>
+	<aba8a2b58f34b56281e63e5e9404eb0aab016836.1504111803.git.jcody@redhat.com>
+	<1646044f-3c57-c415-f261-463c74ea45b8@redhat.com>
+	<2690a268-b5be-7974-e8ef-c5a2f09c72a5@redhat.com>
+	<c8f38ba5-5170-d3c8-99ca-24030f900e53@redhat.com>
+	<494b96d5-d2a2-957e-3169-7fb2461b59de@redhat.com>
+	<20170831153949.GA19001@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20170831122925.GJ17315@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] RFC: changing ROM bundling in tar dists for
- releases
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170831153949.GA19001@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v3 4/5] qemu-iotests: make python tests
+ attempt to leave intermediate files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,92 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, armbru@redhat.com, qemu-block@nongnu.org
 
-On 08/31/2017 09:29 AM, Daniel P. Berrange wrote:
-[...]> There are the following options I see
+On Thu, Aug 31, 2017 at 04:39:49PM +0100, Stefan Hajnoczi wrote:
+> On Wed, Aug 30, 2017 at 06:40:29PM -0400, John Snow wrote:
+> > 
+> > 
+> > On 08/30/2017 06:35 PM, Eric Blake wrote:
+> > > On 08/30/2017 05:28 PM, John Snow wrote:
+> > > 
+> > >> I'm a little iffy on this patch; I know that ./check can take care of
+> > >> our temp files for us now, but because each python test is itself a
+> > >> little mini-harness, I'm a little leery of moving the teardown to setup
+> > >> and trying to pre-clean the confetti before the test begins.
+> > >>
+> > >> What's the benefit? We still have to clean up these files per-test, but
+> > >> now it's slightly more error-prone and in a weird place.
+> > >>
+> > >> If we want to try to preserve the most-recent-failure-files, perhaps we
+> > >> can define a setting in the python test-runner that allows us to
+> > >> globally skip file cleanup.
+> > > 
+> > > On the other hand, since each test is a mini-harness, globally skipping
+> > > cleanup will make a two-part test fail on the second because of garbage
+> > > left behind by the first.
+> > > 
+> > 
+> > subtext was to have per-subtest files.
+> > 
+> > > Patch 5 adds a comment with another possible solution: teach the python
+> > > mini-harness to either clean all files in the directory, or to relocate
+> > > the directory according to test name, so that each mini-test starts with
+> > > a fresh location, and cleanup is then handled by the harness rather than
+> > > spaghetti pre-cleanup.  But any solution is better than our current
+> > > situation of nothing, so that's why I'm still okay with this patch as-is
+> > > as offering more (even if not perfect) than before.
+> > > 
+> > 
+> > I guess where I am unsure is really if this is better than what we
+> > currently do, which is to (try) to clean up after each test as best as
+> > we can. I don't see it as too different from trying to clean up before
+> > each test.
+> > 
+> > It does give us the ability to leave behind a little detritus after a
+> > failed run, but it's so imperfect that I wonder if it's worth shifting
+> > this code around to change not much.
 > 
->    1. Keep existing dist, and add a new minimal one
+> An alternative is to define iotests.QMPTestCase.setUp() so it clears out
+> iotests.test_dir.  Unfortunately this still requires touching up all
+> setUp() methods so that they call super(TheClass, self).setUp().
 > 
->         qemu-X.Y.Z.tar.bz2 - qemu source + bundled ROMS + libs
->         qemu-minimal-X.Y.Z.tar.bz2 - qemu source only
+> At least there would be no need to delete specific files by name (e.g.
+> blind_remove(my_img)).
 > 
->       Least impact for current non-distro users, distros just switch.
-> 
->    2. Change existing dist, and add a new one with everything
-> 
->         qemu-X.Y.Z.tar.bz2 - qemu source only
->         qemu-full-X.Y.Z.tar.bz2 - qemu source + bundled ROMS + libs
-> 
->       Non-distro users need to download a different dist from what they
->       have known previously, but otherwise unchanged build process.
-> 
->    3. Change existing dist, and add a new one with bundled bits
-> 
->         qemu-X.Y.Z.tar.bz2 - qemu source only
->         qemu-addons-X.Y.Z.tar.bz2 - bundled ROMS + libs
-> 
->       Non-distro users need to manually download & install an
->       extra piece compared to now.
 
-Debian style:
+One reason to only remove specific files used in the test, is that it
+increases the chance that intermediate files will be left behind in case of
+test failure of a different test case.
 
-linux-kbuild-4.9 - Kbuild infrastructure for Linux 4.9
-linux-kbuild-4.12 - Kbuild infrastructure for Linux 4.12
-linux-source - Linux kernel source (meta-package)
-linux-source-4.12 - Linux kernel source for version 4.12 with Debian patches
-firmware-linux - Binary firmware for various drivers in the Linux kernel 
-(meta-package)
-firmware-linux-nonfree - Binary firmware for various drivers in the 
-Linux kernel (meta-package)
-firmware-misc-nonfree - Binary firmware for various drivers in the Linux 
-kernel
-firmware-zd1211 - binary firmware for the zd1211rw wireless driver
-firmware-bnx2 - Binary firmware for Broadcom NetXtremeII
-...
-qemu-efi - UEFI firmware for 64-bit ARM virtual machines
-grub-firmware-qemu - GRUB firmware image for QEMU
-ipxe-qemu - PXE boot firmware - ROM images for qemu
-ovmf - UEFI firmware for 64-bit x86 virtual machines
-vgabios - VGA BIOS software for the Bochs and Qemu emulated VGA card
-seabios - Legacy BIOS implementation
-sgabios - bios option rom to provide legacy serial console for x86
+I think the real long-term solution is to run each unittest test case in its
+own subdirectory, so that no intermediate file removal is necessary, and
+each test case is self-contained.
 
-$ apt-cache show qemu-system-x86
-Package: qemu-system-x86
-Provides: qemu-system-i386, qemu-system-x86-64
-Suggests: samba, vde2, qemu-block-extra, kmod, sgabios, ovmf
-
-$ apt-cache show qemu-system-arm
-Recommends: qemu-utils, ipxe-qemu, qemu-efi
-
-This seems to me the cleaner one, the distrib choose to provide 
-dependencies in the package description, a package to build, and keep 
-exclusive licenses in different packages.
-
-> 
->    4. Change existing dist, never distribute bundled ROMs + libs at all
-> 
->         qemu-X.Y.Z.tar.bz2 - qemu source only
-> 
->       Only here for completeness, not a serious suggestion
-
-Linux style :)
-
-> 
->    5. Change nothing
-> 
->       Continue ignoring the problem I aim to solve.
-> 
-> 
-> My patch did option 2, but I really open to any of 1/2/3 without a
-> strong preference, as long as we can get some agreement on one. I
-> guess option 1 might be easiest to get agreement on given its minimal
-> impact.
-
-It would be easier to have people building from sources to answer but 
-they usually don't read this list, you might want to ask on qemu-stable.
-
-Regards,
-
-Phil.
+-Jeff
