@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnR4M-0000cr-KC
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 11:07:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1dnR4s-0000r3-7z
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 11:08:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnR4H-0000bZ-MQ
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 11:07:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57811)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dnR4H-0000ae-G4
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 11:07:41 -0400
-Date: Thu, 31 Aug 2017 17:07:33 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170831170733.7fe86dbc.cohuck@redhat.com>
-In-Reply-To: <9beeb7d0-edb8-2227-3182-9275567b2fb5@redhat.com>
-References: <20170830170601.15855-1-david@redhat.com>
-	<20170830170601.15855-9-david@redhat.com>
-	<20170831164142.607711ec.cohuck@redhat.com>
-	<9beeb7d0-edb8-2227-3182-9275567b2fb5@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dnR4k-0000u6-4c
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 11:08:18 -0400
+References: <20170831110518.10741-1-berrange@redhat.com>
+	<20170831110518.10741-4-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3867f025-5d0b-5bed-d47f-a91c706cd3aa@redhat.com>
+Date: Thu, 31 Aug 2017 10:08:00 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 08/11] s390x: allow only 1 CPU with TCG
+In-Reply-To: <20170831110518.10741-4-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="xpqp92n8x5qhVSfq10iU4eOEO8w2jsoPu"
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] block: convert crypto driver to
+ bdrv_co_preadv|pwritev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +25,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
 
-On Thu, 31 Aug 2017 17:03:21 +0200
-David Hildenbrand <david@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xpqp92n8x5qhVSfq10iU4eOEO8w2jsoPu
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <3867f025-5d0b-5bed-d47f-a91c706cd3aa@redhat.com>
+Subject: Re: [PATCH v2 3/4] block: convert crypto driver to
+ bdrv_co_preadv|pwritev
+References: <20170831110518.10741-1-berrange@redhat.com>
+ <20170831110518.10741-4-berrange@redhat.com>
+In-Reply-To: <20170831110518.10741-4-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 31.08.2017 16:41, Cornelia Huck wrote:
-> > On Wed, 30 Aug 2017 19:05:58 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> Specifying more than 1 CPU (e.g. -smp 5) leads to SIGP errors (the
-> >> guest tries to bring these CPUs up but fails), because we don't support
-> >> multiple CPUs on s390x under TCG.
-> >>
-> >> Let's bail out if more than 1 are specified, so we don't raise people's
-> >> hope.
-> >>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> >>  hw/s390x/s390-virtio-ccw.c | 6 ++++++
-> >>  1 file changed, 6 insertions(+)
-> >>
-> >> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> >> index 7754e3eaf9..eff96808c4 100644
-> >> --- a/hw/s390x/s390-virtio-ccw.c
-> >> +++ b/hw/s390x/s390-virtio-ccw.c
-> >> @@ -23,6 +23,7 @@
-> >>  #include "hw/s390x/css.h"
-> >>  #include "virtio-ccw.h"
-> >>  #include "qemu/config-file.h"
-> >> +#include "qemu/error-report.h"
-> >>  #include "s390-pci-bus.h"
-> >>  #include "hw/s390x/storage-keys.h"
-> >>  #include "hw/s390x/storage-attributes.h"
-> >> @@ -56,6 +57,11 @@ static void s390_init_cpus(MachineState *machine)
-> >>      if (machine->cpu_model == NULL) {
-> >>          machine->cpu_model = s390_default_cpu_model_name();
-> >>      }
-> >> +    if (tcg_enabled() && max_cpus > 1) {
-> >> +        error_report("Number of SMP CPUs requested (%d) exceeds max CPUs "
-> >> +                     "supported by TCG (1) on s390x", max_cpus);  
-> > 
-> > Make this a #define, so we can just flip the switch when smp support is
-> > ready?  
-> 
-> As an alternative: yield a warning?
+On 08/31/2017 06:05 AM, Daniel P. Berrange wrote:
+> Make the crypto driver implement the bdrv_co_preadv|pwritev
+> callbacks,  and also use bdrv_co_preadv|pwritev for I/O
+> with the protocol driver beneath.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  block/crypto.c | 103 +++++++++++++++++++++++++++++--------------------=
+--------
+>  1 file changed, 53 insertions(+), 50 deletions(-)
+>=20
 
-If we know that this can't work, it makes sense to stop immediately, no?
+>  static coroutine_fn int
+> -block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
+> -                      int remaining_sectors, QEMUIOVector *qiov)
+> +block_crypto_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t=
+ bytes,
+> +                       QEMUIOVector *qiov, int flags)
 
-> 
-> >   
-> >> +        exit(1);
-> >> +    }
-> >>  
-> >>      ms->cpus = g_new0(S390CPU *, max_cpus);
-> >>    
-> >   
-> 
-> 
+>  {
+>      BlockCrypto *crypto =3D bs->opaque;
+> -    int cur_nr_sectors; /* number of sectors in current iteration */
+> +    uint64_t cur_bytes; /* number of bytes in current iteration */
+>      uint64_t bytes_done =3D 0;
+>      uint8_t *cipher_data =3D NULL;
+>      QEMUIOVector hd_qiov;
+>      int ret =3D 0;
+> -    size_t payload_offset =3D
+> -        qcrypto_block_get_payload_offset(crypto->block) / BDRV_SECTOR_=
+SIZE;
+> +    size_t payload_offset =3D qcrypto_block_get_payload_offset(crypto-=
+>block);
+
+Pre-existing: is size_t the right type, or can we overflow a 64-bit
+offset on a 32-bit host?
+
+> +    uint64_t sector_num =3D offset / BDRV_SECTOR_SIZE;
+> +
+> +    assert((offset % BDRV_SECTOR_SIZE) =3D=3D 0);
+> +    assert((bytes % BDRV_SECTOR_SIZE) =3D=3D 0);
+
+The osdep.h macros might be nicer than open-coding; furthermore, if
+desired, you could shorten to:
+
+assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
+
+
+> =20
+>  static coroutine_fn int
+> -block_crypto_co_writev(BlockDriverState *bs, int64_t sector_num,
+> -                       int remaining_sectors, QEMUIOVector *qiov)
+> +block_crypto_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_=
+t bytes,
+> +                        QEMUIOVector *qiov, int flags)
+>  {
+
+Hmm - you don't set supported_write_flags.  But presumably, if the
+underlying BDS supports BDRV_REQUEST_FUA, then crypto can likewise
+support that flag by passing it through to the underlying device after
+encryption.
+
+>      BlockCrypto *crypto =3D bs->opaque;
+> -    int cur_nr_sectors; /* number of sectors in current iteration */
+> +    uint64_t cur_bytes; /* number of bytes in current iteration */
+>      uint64_t bytes_done =3D 0;
+>      uint8_t *cipher_data =3D NULL;
+>      QEMUIOVector hd_qiov;
+>      int ret =3D 0;
+> -    size_t payload_offset =3D
+> -        qcrypto_block_get_payload_offset(crypto->block) / BDRV_SECTOR_=
+SIZE;
+> +    size_t payload_offset =3D qcrypto_block_get_payload_offset(crypto-=
+>block);
+> +    uint64_t sector_num =3D offset / BDRV_SECTOR_SIZE;
+> +
+> +    assert((offset % BDRV_SECTOR_SIZE) =3D=3D 0);
+> +    assert((bytes % BDRV_SECTOR_SIZE) =3D=3D 0);
+
+Same comment as for read.
+
+> @@ -611,8 +613,9 @@ BlockDriver bdrv_crypto_luks =3D {
+>      .bdrv_truncate      =3D block_crypto_truncate,
+>      .create_opts        =3D &block_crypto_create_opts_luks,
+> =20
+> -    .bdrv_co_readv      =3D block_crypto_co_readv,
+> -    .bdrv_co_writev     =3D block_crypto_co_writev,
+> +    .bdrv_refresh_limits =3D block_crypto_refresh_limits,
+> +    .bdrv_co_preadv      =3D block_crypto_co_preadv,
+> +    .bdrv_co_pwritev     =3D block_crypto_co_pwritev,
+>      .bdrv_getlength     =3D block_crypto_getlength,
+>      .bdrv_get_info      =3D block_crypto_get_info_luks,
+>      .bdrv_get_specific_info =3D block_crypto_get_specific_info_luks,
+
+Looks weird when =3D isn't consistently aligned, but we use more than one=
+
+space.  My preference is to just use one space everywhere, as adding a
+longer name to the list doesn't require a mass re-format of all other
+entries; but I'm not opposed when people like the aligned =3D for
+legibility.  So up to you if you do anything in response to my nit.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--xpqp92n8x5qhVSfq10iU4eOEO8w2jsoPu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmoJlAACgkQp6FrSiUn
+Q2qfdgf/WwpIqbAPVhRl1qpmVsW3fmtSdhOWD+DY9AyRO9em7TWofEJGL9oIaaNQ
+WuDLhge93ZFETTMdCgnE2NH2mZAN9qDjvydKDictWxGpdm5JXbRl5zNouN1UAid2
+fzdRu9M1JTWMh2yKcxfOHPu0v2uWBRHJ0XmChXwQ+LE8w/UWReeGfQz8jE87iMbp
+E6w23EIzZFz4PmZBXqLG3Dgp6d2Bg9cxcoRHba2nMqj9x0HKhh/X1Nq4FvTyrSnU
+Y21sM2oAveG7PK4/kVzfzDg0dhnt7GUUy4ca9FbwLBF83lCiNsn4JrU3x/MOvk6X
+4Sbgt/dX51JHauS4VX6ZUYSh7obNHA==
+=oro+
+-----END PGP SIGNATURE-----
+
+--xpqp92n8x5qhVSfq10iU4eOEO8w2jsoPu--
