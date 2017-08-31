@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnP3I-0003O0-IQ
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:58:33 -0400
+	(envelope-from <david@redhat.com>) id 1dnPBG-00063W-7c
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 09:06:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnP3D-0001Af-SN
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:58:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50000)
+	(envelope-from <david@redhat.com>) id 1dnPBA-0005G6-Ir
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 09:06:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53030)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnP3D-0001AL-Ip
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:58:27 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <87r2w6eq5n.fsf@gmail.com> <87h8x1yox3.fsf@dusky.pond.sub.org>
-	<20170830170941.GB24565@stefanha-x1.localdomain>
-	<87bmmwi6r6.fsf@dusky.pond.sub.org>
-	<CAFEAcA8r-EqOjZDvP=0mYG7QQ83MU-54RL9Bu8Eb_wPzQo1M7Q@mail.gmail.com>
-Date: Thu, 31 Aug 2017 14:58:24 +0200
-In-Reply-To: <CAFEAcA8r-EqOjZDvP=0mYG7QQ83MU-54RL9Bu8Eb_wPzQo1M7Q@mail.gmail.com>
-	(Peter Maydell's message of "Thu, 31 Aug 2017 11:27:15 +0100")
-Message-ID: <87r2vrlwr3.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dnPBA-0005Fi-CK
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 09:06:40 -0400
+References: <20170830170601.15855-1-david@redhat.com>
+	<20170830170601.15855-2-david@redhat.com>
+	<d05eb222-8b39-4ec6-2a2b-34a255becd43@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <8dfd227b-1b56-4db3-4b13-1eb00602e627@redhat.com>
+Date: Thu, 31 Aug 2017 15:06:36 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] scripts: Support building with Python 3
+In-Reply-To: <d05eb222-8b39-4ec6-2a2b-34a255becd43@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 01/11] exec,
+ dump: don't include exec/exec-all.h explicitly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +30,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, David Michael <fedora.dm0@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On 31 August 2017 at 07:35, Markus Armbruster <armbru@redhat.com> wrote:
->> So, first we'll invest in work-arounds to make both 2 and 3 work.  Once
->> 2 is gone, we can invest some more to clean them up.  Which probably
->> won't happen, so we'll continue to carry work-arounds that no longer
->> make sense.
+On 30.08.2017 20:55, Thomas Huth wrote:
+> On 30.08.2017 19:05, David Hildenbrand wrote:
+>> All but two, namely exec.c and dump.c, include exec/exec-all.h via
+>> cpu.h only. as these files already include cpu.h, let's just drop the
+>> additional include.
 >>
->> I maintain roughly one fourth of all Python code in qemu, and I'm not
->> looking forward to this hoop-jumping at all.
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  dump.c | 1 -
+>>  exec.c | 1 -
+>>  2 files changed, 2 deletions(-)
 >>
->> Are we really, really sure we want to go this way?  What exactly are we
->> hoping to accomplish by it?
->
-> My take is that we have the following goals we want to achieve:
->
-> (1) We need to continue to build and run on older (long-term-support)
-> distros that still ship only Python 2.x (alas even back to 2.6)
+>> diff --git a/dump.c b/dump.c
+>> index d9090a24cc..c00094475c 100644
+>> --- a/dump.c
+>> +++ b/dump.c
+>> @@ -15,7 +15,6 @@
+>>  #include "qemu/cutils.h"
+>>  #include "elf.h"
+>>  #include "cpu.h"
+>> -#include "exec/cpu-all.h"
+> 
+> That's cpu-all.h, not exec-all.h ...
+> 
+>>  #include "exec/hwaddr.h"
+>>  #include "monitor/monitor.h"
+>>  #include "sysemu/kvm.h"
+>> diff --git a/exec.c b/exec.c
+>> index d20c34ca83..8d8b6a0769 100644
+>> --- a/exec.c
+>> +++ b/exec.c
+>> @@ -23,7 +23,6 @@
+>>  
+>>  #include "qemu/cutils.h"
+>>  #include "cpu.h"
+>> -#include "exec/exec-all.h"
+>>  #include "exec/target_page.h"
+>>  #include "tcg.h"
+>>  #include "hw/qdev-core.h"
+> 
+> ... and if I do a grep for exec-all.h in the cpu.h files, I hardly get
+> any matches. => Your patch description sounds wrong ... I guess you only
+> wanted to handle cpu-all.h here?
+> 
+>  Thomas
+> 
 
-That's an assertion, not an answer to my question :)
+exec/cpu-all.h it is. Fixed the subject+description.
 
-What exactly are we hoping to accomplish by supporting what distros
-exactly?
+I'd really love to know what my brain was doing while composing that
+message. It will remain a mystery.
 
-> (2) We need to be able to build and run on newer distros that
-> have dropped Python 2 altogether in favour of Python 3
-> (I don't know if there are any such today, but presumably by
-> 2020 there will be)
+-- 
 
-Yup.
+Thanks,
 
-> Unless we can confidently say that either (1) or (2) is the
-> empty set, we need to handle both 2 and 3 in the same codebase.
-> This is a pain, but unfortunately Python upstream have forced
-> us into it by breaking source code compatibility.
->
-> I think (1) is pretty clearly not (yet) an empty set, so the
-> only alternative I see to "support 2 and 3 now" is "keep supporting
-> only 2 for the moment and hope that no distro drops 2 support
-> before all the LTS 2-only distro versions vanish into history".
-
-I don't buy the "clearly" in "pretty clearly not (yet) an empty set",
-because I don't understand *why* we need to support "older
-(long-term-support) distros".
-
-If we can leave Python 2 behind, I'm all for porting to Python 3 now.
-
-If we can't yet, then I don't see why I should do work *now* just
-because "some" distro might drop support for Python 2 "before all the
-LTS 2-only distro versions vanish into history".
-
-If it ain't broke, don't fix it!
+David
