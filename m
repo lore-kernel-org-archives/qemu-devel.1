@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnMKc-0001fZ-N9
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:04:18 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dnMZ2-0004ZA-98
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:19:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnMKZ-0000ZO-JD
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:04:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50824)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dnMKZ-0000Z7-E3
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:04:11 -0400
-Date: Thu, 31 Aug 2017 12:04:07 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170831120407.447b0206.cohuck@redhat.com>
-In-Reply-To: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
-References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dnMZ1-0006tL-90
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:19:08 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:35665)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dnMZ1-0006sl-1o
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:19:07 -0400
+Received: by mail-wm0-x235.google.com with SMTP id v2so1682477wmf.0
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 03:19:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/9]
+In-Reply-To: <20170827230506.12683-1-samuel.thibault@ens-lyon.org>
+References: <20170827230506.12683-1-samuel.thibault@ens-lyon.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 31 Aug 2017 11:18:45 +0100
+Message-ID: <CAFEAcA9gBCArtyfgEpRM9JgRKpjXu4km+YGJ2QungK4GfrcoBQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] slirp updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
 
-On Wed, 30 Aug 2017 18:36:00 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+On 28 August 2017 at 00:05, Samuel Thibault
+<samuel.thibault@ens-lyon.org> wrote:
+> warning: redirection vers https://people.debian.org/~sthibault/qemu.git/
+> The following changes since commit 04d74e07b4542aad5aa4ad03951b38b767f5314a:
+>
+>   slirp: fix clearing ifq_so from pending packets (2017-08-26 01:04:12 +0200)
+>
+> are available in the git repository at:
+>
+>   http://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+>
+> for you to fetch changes up to 04d74e07b4542aad5aa4ad03951b38b767f5314a:
+>
+>   slirp: fix clearing ifq_so from pending packets (2017-08-26 01:04:12 +0200)
+>
+> ----------------------------------------------------------------
+> slirp updates
+>
+> ----------------------------------------------------------------
 
-> This series has a character of a refactoring, as the initial motivation
-> was improving readability and reducing complexity.
+Applied to master, thanks (I cherry-picked the patch so I
+could add the cc:stable note).
 
-But you reduced the cover letter subject too much ;)
-
-> 
-> Despite of the original intent the tree first patches buxfixes, and
-> according to Dong Jia the patch-set also has a functional value: for ccw
-> pass-through, he is planing to pass-through the instruction completion
-> information (cc or interruption condition) from the kernel, and this
-> patch set can pretty much be seen as a preparation for that.
-
-I think the first one (with the precedence fixed as well) is pretty
-uncontroversial, and I'd be happy to queue an updated version.
-
-> 
-> The basic idea is: tell how to handle an unusual conditon where it's
-> identified, instead of mapping it to an errno (more or less arbitrarily),
-> then possibly mapping these errnos around, to finally (mentally) map the
-> errno back to the condition and take appropriate action. 
-> 
-> At the end of the series we also have 125 lines of code less to maintain,
-> and the executable got a bit smaller too.
-
-I agree with the basic direction, but I think this needs more hashing
-out.
-
-> 
-> Halil Pasic (9):
->   s390x/css: fix cc handling for XSCH
->   s390x: fix invalid use of cc 1 for SSCH
->   s390x/css: be more consistent if broken beyond repair
->   s390x: refactor error handling for SSCH and RSCH
->   s390x: refactor error handling for XSCH handler
->   s390x: refactor error handling for CSCH handler
->   s390x: refactor error handling for HSCH handler
->   s390x: refactor error handling for MSCH handler
->   s390x: factor out common ioinst handler logic
-> 
->  hw/s390x/css.c              | 158 ++++++++++++--------------------------
->  hw/s390x/s390-ccw.c         |   8 +-
->  hw/vfio/ccw.c               |  32 ++++++--
->  include/hw/s390x/css.h      |  38 +++++++---
->  include/hw/s390x/s390-ccw.h |   2 +-
->  target/s390x/ioinst.c       | 181 ++++++++++----------------------------------
->  6 files changed, 147 insertions(+), 272 deletions(-)
-> 
+-- PMM
