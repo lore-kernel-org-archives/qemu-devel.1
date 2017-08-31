@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnPzZ-0004Wi-RB
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 09:58:46 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dnQ5T-0006hP-Fo
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:04:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnPzV-0007cr-V7
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 09:58:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33360)
+	(envelope-from <imammedo@redhat.com>) id 1dnQ5P-0000zS-3k
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:04:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56216)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnPzV-0007cl-OZ
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 09:58:41 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170825105913.4060-1-marcandre.lureau@redhat.com>
-	<20170825105913.4060-2-marcandre.lureau@redhat.com>
-	<8b2a2be0-cf5f-29e4-b204-1da6b20539b7@redhat.com>
-	<87r2vtgt7r.fsf@dusky.pond.sub.org>
-Date: Thu, 31 Aug 2017 15:58:35 +0200
-In-Reply-To: <87r2vtgt7r.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Wed, 30 Aug 2017 14:01:28 +0200")
-Message-ID: <87r2vrj0tw.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dnQ5O-0000zH-Qq
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:04:47 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9373781DEE
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 14:04:45 +0000 (UTC)
+Date: Thu, 31 Aug 2017 16:04:40 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170831160440.04b5827d@nial.brq.redhat.com>
+In-Reply-To: <94cbb70c-5d33-c638-9826-277a359d178e@redhat.com>
+References: <1503592308-93913-9-git-send-email-imammedo@redhat.com>
+	<1504185578-80843-1-git-send-email-imammedo@redhat.com>
+	<94cbb70c-5d33-c638-9826-277a359d178e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 01/14] qdict: add qdict_put_null() helper
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11 v4 08/25] s390x: replace
+ cpu_s390x_init() with cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +35,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-Markus Armbruster <armbru@redhat.com> writes:
+On Thu, 31 Aug 2017 15:44:38 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-> Eric Blake <eblake@redhat.com> writes:
->
->> On 08/25/2017 05:59 AM, Marc-Andr=C3=A9 Lureau wrote:
->>> A step towards completeness.
->>>=20
->>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->>> ---
->>>  include/qapi/qmp/qdict.h | 4 +++-
->>>  target/i386/cpu.c        | 4 ++--
->>>  2 files changed, 5 insertions(+), 3 deletions(-)
->>
->> Is it worth touching up scripts/coccinelle/qobject.cocci at the same tim=
-e?
->
-> Let's keep it up-to-date.  I can do it when I apply.
+> On 31.08.2017 15:19, Igor Mammedov wrote:
+> > cpu_s390x_init() is used only *-user targets indirectly
+> > via cpu_init() macro and has a hack to assign ids to created
+> > cpus (I'm not sure if 'id' really matters to *-user emulation).  
+> 
+> It only has one cpu, right? With the below mentioned patch, the default
+> "id"/ (the cpu_addr) will be 0. So you can create one CPU without any
+> hacks. Or can it create more than 1?
+As I understand it creates only one cpu,
+but then there is fork related cpu_copy() which creates a cpu
+and the rewrites new CPUArchState with old cpu data
 
-Squashing in the appended patch.  I verified it produces exactly the
-change to target/i386/cpu.c Marc-Andr=C3=A9 did manually, and no others.
+    CPUState *new_cpu = cpu_init(cpu_model);                                     
+    CPUArchState *new_env = new_cpu->env_ptr;                                    
+    ...                                                    
+    memcpy(new_env, env, sizeof(CPUArchState));
 
+so I couldn't decide if id is of importance for *-user target
+(well, I'm not really interested in *-user), and opted for
+keeping current behavior (i.e. not breaking) in this patch
+just without cpu_s390x_init().
 
-diff --git a/scripts/coccinelle/qobject.cocci b/scripts/coccinelle/qobject.=
-cocci
-index c518caf7b1..1120eb1a42 100644
---- a/scripts/coccinelle/qobject.cocci
-+++ b/scripts/coccinelle/qobject.cocci
-@@ -20,6 +20,9 @@ expression Obj, Key, E;
- |
- - qdict_put(Obj, Key, qstring_from_str(E));
- + qdict_put_str(Obj, Key, E);
-+|
-+- qdict_put(Obj, Key, qnull());
-++ qdict_put_null(Obj, Key);
- )
-=20
- // Use QList macros where they make sense
+So if 'id' isn't really needed for  *-user target, hunk 2 could be
+dropped but it ought to be another patch on top as this change isn't
+related to the topic of this patch/series.
+ 
+
+> > So to on safe side, instead of having custom wrapper to do numbering
+> > replace it with cpu_generic_init() and use S390CPUClass::next_cpu_id
+> > which could serve the same purpose as static variable and move cpu->id
+> > initialization to s390_cpu_initfn for CONFIG_USER_ONLY use-case.
+> > 
+> > PS:
+> > ifdef is ugly but it allows us to hide s390x detail that isn't
+> > set by *-user targets and reuse generic cpu creation utility
+> > for btoh machine and user emulation.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > Acked-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> > v2:
+> >   - fix merge conflict in target/s390x/cpu.h caused by moving
+> >     cpu_init/cpu_s390x_init with the file in commit
+> >     (c862bddbc target/s390x: cleanup cpu.h)
+> > 
+> > CC: Cornelia Huck <cohuck@redhat.com>
+> > CC: david@redhat.com
+> > CC: Eduardo Habkost <ehabkost@redhat.com>
+> > 
+> > perhaps cpu->id isn't need by CONFIG_USER_ONLY but I'd leave to it
+> > s390x maintainers to deal with it.  
+> 
+> Will most probably be dropped in
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg06158.html
+> 
+> > ---
+> >  target/s390x/cpu.h    |  3 +--
+> >  target/s390x/cpu.c    |  7 +++++++
+> >  target/s390x/helper.c | 14 --------------
+> >  3 files changed, 8 insertions(+), 16 deletions(-)
+> > 
+> > diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> > index 4ec3380..0bd97a5 100644
+> > --- a/target/s390x/cpu.h
+> > +++ b/target/s390x/cpu.h
+> > @@ -688,8 +688,7 @@ const char *s390_default_cpu_model_name(void);
+> >  
+> >  
+> >  /* helper.c */
+> > -S390CPU *cpu_s390x_init(const char *cpu_model);
+> > -#define cpu_init(model) CPU(cpu_s390x_init(model))
+> > +#define cpu_init(cpu_model) cpu_generic_init(TYPE_S390_CPU, cpu_model)
+> >  S390CPU *s390x_new_cpu(const char *cpu_model, int64_t id, Error **errp);
+> >  /* you can call this signal handler from your SIGBUS and SIGSEGV
+> >     signal handlers to inform the virtual CPU of exceptions. non zero
+> > diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+> > index 7267b60..74b3e4f 100644
+> > --- a/target/s390x/cpu.c
+> > +++ b/target/s390x/cpu.c
+> > @@ -306,6 +306,13 @@ static void s390_cpu_initfn(Object *obj)
+> >          inited = true;
+> >          s390x_translate_init();
+> >      }
+> > +
+> > +#if defined(CONFIG_USER_ONLY)
+> > +    {
+> > +        S390CPUClass *scc = S390_CPU_GET_CLASS(obj);
+> > +        cpu->id = scc->next_cpu_id;
+> > +    }
+> > +#endif
+> >  }
+> >  
+> >  static void s390_cpu_finalize(Object *obj)
+> > diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+> > index 3adb9de..ba29504 100644
+> > --- a/target/s390x/helper.c
+> > +++ b/target/s390x/helper.c
+> > @@ -129,20 +129,6 @@ out:
+> >      return cpu;
+> >  }
+> >  
+> > -S390CPU *cpu_s390x_init(const char *cpu_model)
+> > -{
+> > -    Error *err = NULL;
+> > -    S390CPU *cpu;
+> > -    /* Use to track CPU ID for linux-user only */
+> > -    static int64_t next_cpu_id;
+> > -
+> > -    cpu = s390x_new_cpu(cpu_model, next_cpu_id++, &err);
+> > -    if (err) {
+> > -        error_report_err(err);
+> > -    }
+> > -    return cpu;
+> > -}
+> > -
+> >  #ifndef CONFIG_USER_ONLY
+> >  
+> >  hwaddr s390_cpu_get_phys_page_debug(CPUState *cs, vaddr vaddr)
+> >   
+> 
+> 
