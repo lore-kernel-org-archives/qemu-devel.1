@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnQn9-0001hC-WF
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:50:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dnQoz-0002we-9M
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:51:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnQn6-00014V-Uj
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:50:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51796)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dnQn6-000148-NY
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:49:56 -0400
-Date: Thu, 31 Aug 2017 16:49:38 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170831164938.04410ca7.cohuck@redhat.com>
-In-Reply-To: <0cada76f-2e43-01db-7c69-ba67e1539aa3@redhat.com>
-References: <20170830170601.15855-1-david@redhat.com>
-	<20170830170601.15855-7-david@redhat.com>
-	<20170831163513.17c0a963.cohuck@redhat.com>
-	<0cada76f-2e43-01db-7c69-ba67e1539aa3@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dnQoy-0002Mp-Ec
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:51:53 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:37757)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dnQoy-0002MZ-7u
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:51:52 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id u26so6070346wma.0
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 07:51:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 06/11] target/s390x: cleanup cpu
- number/address handling
+In-Reply-To: <20170831082210.8362-1-stefanha@redhat.com>
+References: <20170831082210.8362-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 31 Aug 2017 15:51:30 +0100
+Message-ID: <CAFEAcA88AT1ksmcP1fvz2u7kG5+kjD=KRJUJoAerh=DtcCEAiA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL for-2.10 00/15] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, 31 Aug 2017 16:41:47 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On 31 August 2017 at 09:21, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> The following changes since commit 248b23735645f7cbb503d9be6f5bf825f2a603ab:
+>
+>   Update version for v2.10.0-rc4 release (2017-08-24 17:34:26 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to 3e4c705212abfe8c9882a00beb2d1466a8a53cec:
+>
+>   qcow2: allocate cluster_cache/cluster_data on demand (2017-08-30 18:02:10 +0100)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
 
-> On 31.08.2017 16:35, Cornelia Huck wrote:
-> > On Wed, 30 Aug 2017 19:05:56 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> Some time ago we discussed that using "id" as property name is not the
-> >> right thing to do, as it is a reserved property for other devices.
-> >>
-> >> Switch to the term "addr" instead, which matches the definition in the
-> >> PoP called "CPU address". There is no such thing as cpu number, so
-> >> rename env.cpu_num to env.cpu_addr.
-> >>
-> >> We can get rid of cpu->id now. Keep cpu->index and env->cpu_addr in sync.
-> >> cpu->index was already implicitly used by e.g. cpu_exists(), so keeping
-> >> both in sync seems to be the right thing to do.
-> >>
-> >> cpu->index will now no longer automatically get set via
-> >> cpu_exec_realizefn(). For now, we were lucky that both implicitly stayed
-> >> in sync.
-> >>
-> >> Our new cpu property "addr" can be a static property. Range checks can
-> >> be avoided by using the correct type and the "setting after realized"
-> >> check is done implicitly.
-> >>
-> >> AFAIK, s390x only supports cpu_add and not device_add for cpus. So we
-> >> should be able to safely rename that property (no the "id" property
-> >> could properly be used for device_add, which needs an artificial id for
-> >> identification purposes).  
-> > 
-> > I cannot parse the sentence in the brackets...  
-> 
-> Me too :)
-> 
-> ...So we should be able to safely rename that property. device_add will
-> later need the reserved "id" property. Hotplugging a CPU would then look
-> like this: "device_add host-s390-cpu id=cpu2 addr=2".
+Applied, thanks.
 
-Yup, that's understandable :)
+-- PMM
