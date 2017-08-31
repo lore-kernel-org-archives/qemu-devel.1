@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dnObG-0001GJ-73
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:29:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1dnOqM-0006Pi-O2
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:45:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dnObD-0000HM-0C
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:29:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53082)
+	(envelope-from <armbru@redhat.com>) id 1dnOqI-0003Az-SW
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:45:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43860)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dnObC-0000E0-QA
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:29:30 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EEE3F81245
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 12:29:28 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.22.189])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A8F59D5FB
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 12:29:28 +0000 (UTC)
-Date: Thu, 31 Aug 2017 13:29:25 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170831122925.GJ17315@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnOqI-00039W-MA
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:45:06 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <87r2w6eq5n.fsf@gmail.com> <87h8x1yox3.fsf@dusky.pond.sub.org>
+	<20170830170941.GB24565@stefanha-x1.localdomain>
+	<87bmmwi6r6.fsf@dusky.pond.sub.org>
+	<CAFEAcA8r-EqOjZDvP=0mYG7QQ83MU-54RL9Bu8Eb_wPzQo1M7Q@mail.gmail.com>
+	<20170831104710.GG17315@redhat.com>
+	<CAFEAcA9pk5n7z5PkLDeuLdvknPmzHqcGtG6in1E9-+BwjVOqTg@mail.gmail.com>
+	<20170831110222.GH17315@redhat.com>
+Date: Thu, 31 Aug 2017 14:44:58 +0200
+In-Reply-To: <20170831110222.GH17315@redhat.com> (Daniel P. Berrange's message
+	of "Thu, 31 Aug 2017 12:02:22 +0100")
+Message-ID: <874lsnnbxx.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Subject: [Qemu-devel] RFC: changing ROM bundling in tar dists for releases
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] scripts: Support building with Python 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,73 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, David Michael <fedora.dm0@gmail.com>
 
-A while back now I posted an RFC patch that changes qemu-X.Y.Z.tar.bz2
-archive to *not* have any ROMs or 3rd party libs bundled, and create a
-new dist qemu-bundled-X.Y.Z.tar.bz2 for the fully bundled dist:
+"Daniel P. Berrange" <berrange@redhat.com> writes:
 
-  http://lists.gnu.org/archive/html/qemu-devel/2017-04/msg03335.html
+> On Thu, Aug 31, 2017 at 11:55:18AM +0100, Peter Maydell wrote:
+>> On 31 August 2017 at 11:47, Daniel P. Berrange <berrange@redhat.com> wrote:
+>> > If we can update to python 2.7 as our minimum, then supporting py2
+>> > and py3 gets simpler, avoiding some of the nastier hacks, even
+>> > without that though it isn't too hard.
+>> 
+>> Unfortunately RHEL6 is what's holding us to retaining 2.6
+>> support, and googling suggests that doesn't go EOL until 2020...
+>
+> Who is actually requiring that we support RHEL6 until EOL though ?
+>
+> AFAIK, from Red Hat side, we don't need QEMU git master to be buildable
+> on RHEL-6 machines anymore, since QEMU there is long since in bug-fix
+> only mode, no rebases or feature backports.
 
-With 2.10 out of the way, and KVM Forum approaching, I figure now is
-a reasonable time to revive the idea to see if it has support
+Even in the unlikely case that a bug fix involves backporting some
+Python, having to port just those bits to RHEL-6's version of Python
+would be less work than making *all* upstream Python code work with both
+Python dialects.
 
-The core issues I'm aiming to solve are:
+> I assume there's probably some community interest in building git master
+> on RHEL-6, but I think it is reasonable for us to say no at some point,
+> rather than waiting until final EOL (2020 for normal subscribers, 2024
+> for people who paid for extended lifetime).
 
- - Distro vendors don't want the bundled ROMs / libs. They want to
-   fully build everything from source to ensure they are distributing
-   clean soure & builds in compliance with the licenses. Currently they
-   strip bundled bits from the build tree, but would prefer if the source
-   dist did not have them either.
+"Interest" by itself doesn't pay bills or write code.
 
- - The qemu release dists get ever larger as we add more ROMS. Adding
-   EFI ROM builds for i386, x86_64, and aarch64 will make the dists
-   larger still.
-
-There are the following options I see
-
-  1. Keep existing dist, and add a new minimal one
-
-       qemu-X.Y.Z.tar.bz2 - qemu source + bundled ROMS + libs
-       qemu-minimal-X.Y.Z.tar.bz2 - qemu source only
-
-     Least impact for current non-distro users, distros just switch.
-
-  2. Change existing dist, and add a new one with everything
-
-       qemu-X.Y.Z.tar.bz2 - qemu source only
-       qemu-full-X.Y.Z.tar.bz2 - qemu source + bundled ROMS + libs
-
-     Non-distro users need to download a different dist from what they
-     have known previously, but otherwise unchanged build process.
-
-  3. Change existing dist, and add a new one with bundled bits
-
-       qemu-X.Y.Z.tar.bz2 - qemu source only
-       qemu-addons-X.Y.Z.tar.bz2 - bundled ROMS + libs
-
-     Non-distro users need to manually download & install an
-     extra piece compared to now.
-
-  4. Change existing dist, never distribute bundled ROMs + libs at all
-
-       qemu-X.Y.Z.tar.bz2 - qemu source only
-
-     Only here for completeness, not a serious suggestion
-
-  5. Change nothing
-
-     Continue ignoring the problem I aim to solve.
-
-
-My patch did option 2, but I really open to any of 1/2/3 without a
-strong preference, as long as we can get some agreement on one. I
-guess option 1 might be easiest to get agreement on given its minimal
-impact.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+If you have to have upstream QEMU on RHEL-6, and you're fine with
+getting it by building it yourself (there being no other way), then you
+should also be fine with getting its build requirements.  Python 3.4 is
+in EPEL.
