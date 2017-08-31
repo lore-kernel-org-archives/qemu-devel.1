@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dnLu8-00013y-13
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:36:53 -0400
+	(envelope-from <thuth@redhat.com>) id 1dnLuT-0001Dp-1p
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:37:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dnLu6-0008Lq-Ue
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:36:52 -0400
-Received: from mail-vk0-x243.google.com ([2607:f8b0:400c:c05::243]:33927)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dnLu6-0008Li-P4
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:36:50 -0400
-Received: by mail-vk0-x243.google.com with SMTP id x85so60099vkx.1
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 02:36:50 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1dnLuP-0008Os-Uk
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:37:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54600)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dnLuP-0008Od-OI
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:37:09 -0400
+References: <20170830170601.15855-1-david@redhat.com>
+	<20170830170601.15855-12-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <90e51e4d-26d2-ebfd-626f-ec718e6521f3@redhat.com>
+Date: Thu, 31 Aug 2017 11:37:04 +0200
 MIME-Version: 1.0
-References: <20170831035306.29170-1-f4bug@amsat.org>
-	<20170831035306.29170-2-f4bug@amsat.org>
-	<be9ca245-f1af-e78a-aa12-c479e59b2985@redhat.com>
-In-Reply-To: <be9ca245-f1af-e78a-aa12-c479e59b2985@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 31 Aug 2017 09:36:39 +0000
-Message-ID: <CAJ+F1C+sdOFyNT9-HMEkaSTbt4diPEA-m=+Do2x7GObyyxb7fQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/7] serial: add serial_chr_nonnull() to
- use the null backend when none provided
+In-Reply-To: <20170830170601.15855-12-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 11/11] target/s390x: use
+ program_interrupt() in per_check_exception()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,68 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
 
-Hi
+On 30.08.2017 19:06, David Hildenbrand wrote:
+> I am not sure if we are handling ilen the right way here. ilen should
+> always match the instruction triggering the exception. This is relevant
+> for per exceptions triggered via EXECUTE instructions. The ilen to be
+> indicated has to match the EXECUTE instruction.
+> 
+> Clean it up for now but leave ilen as is, we can fix that later.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/misc_helper.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
+> 
+> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+> index eb7accc0ce..ac9657f23f 100644
+> --- a/target/s390x/misc_helper.c
+> +++ b/target/s390x/misc_helper.c
+> @@ -445,14 +445,11 @@ void HELPER(chsc)(CPUS390XState *env, uint64_t inst)
+>  #ifndef CONFIG_USER_ONLY
+>  void HELPER(per_check_exception)(CPUS390XState *env)
+>  {
+> -    CPUState *cs = CPU(s390_env_get_cpu(env));
+> +    uint32_t ilen;
+>  
+>      if (env->per_perc_atmid) {
+> -        env->int_pgm_code = PGM_PER;
+> -        env->int_pgm_ilen = get_ilen(cpu_ldub_code(env, env->per_address));
+> -
+> -        cs->exception_index = EXCP_PGM;
+> -        cpu_loop_exit(cs);
+> +        ilen = get_ilen(cpu_ldub_code(env, env->per_address));
+> +        program_interrupt(env, PGM_PER, ilen);
+>      }
+>  }
 
-On Thu, Aug 31, 2017 at 7:20 AM Thomas Huth <thuth@redhat.com> wrote:
+The changes basically look fine to me, but may I suggest to
+1) Add a comment to the code about your concerns with ilen
+2) Change the patch description to focus on the work that is actually
+done here instead of only talking about your ilen concerns?
 
-> On 31.08.2017 05:53, Philippe Mathieu-Daud=C3=A9 wrote:
-> > Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > ---
-> >  include/hw/char/serial.h |  1 +
-> >  hw/char/serial.c         | 13 +++++++++++++
-> >  2 files changed, 14 insertions(+)
-> >
-> > diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
-> > index c4daf11a14..96bccb39e1 100644
-> > --- a/include/hw/char/serial.h
-> > +++ b/include/hw/char/serial.h
-> > @@ -93,6 +93,7 @@ SerialState *serial_mm_init(MemoryRegion
-> *address_space,
-> >                              hwaddr base, int it_shift,
-> >                              qemu_irq irq, int baudbase,
-> >                              Chardev *chr, enum device_endian end);
-> > +Chardev *serial_chr_nonnull(Chardev *chr);
->
-> Why do you need the prototype? Please make the function static if
-> possible (otherwise please add some rationale in the patch description).
->
-
-It's being used from other units in following patches
-
-
-> >  /* serial-isa.c */
-> >  #define TYPE_ISA_SERIAL "isa-serial"
-> > diff --git a/hw/char/serial.c b/hw/char/serial.c
-> > index 9aec6c60d8..7a100db107 100644
-> > --- a/hw/char/serial.c
-> > +++ b/hw/char/serial.c
-> > @@ -1025,6 +1025,19 @@ static const MemoryRegionOps serial_mm_ops[3] =
-=3D {
-> >      },
-> >  };
-> >
-> > +Chardev *serial_chr_nonnull(Chardev *chr)
-> > +{
-> > +    static int serial_id;
-> > +    char *label;
-> > +
-> > +    label =3D g_strdup_printf("discarding-serial%d", serial_id++);
-> > +    chr =3D qemu_chr_new(label, "null");
->
-> That looks wrong - you're ignoring the input parameter and always open
-> the "null" device? Shouldn't there be a "if (chr) return chr;" in front
-> of this?
->
-
-I think its missing too.
-
-The function name and usage isn't obvious. I would rather see the caller
-use "chr ?: serial_chr_null()" rather than "serial_chr_nonnull(chr)".
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+ Thanks,
+  Thomas
