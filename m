@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dnQfL-0005J4-Kk
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:42:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1dnQfe-0005V3-ME
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:42:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dnQfG-0006K1-VF
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:41:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51202)
+	(envelope-from <eblake@redhat.com>) id 1dnQfb-0006Mr-JX
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:42:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39958)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dnQfG-0006Jk-OD
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:41:50 -0400
-References: <20170830170601.15855-1-david@redhat.com>
-	<20170830170601.15855-7-david@redhat.com>
-	<20170831163513.17c0a963.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <0cada76f-2e43-01db-7c69-ba67e1539aa3@redhat.com>
-Date: Thu, 31 Aug 2017 16:41:47 +0200
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnQfb-0006Mh-9e
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:42:11 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 41313461DC
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 14:42:10 +0000 (UTC)
+References: <20170831095057.22923-1-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c565619b-4e00-7bc1-9791-76ceebbacfe8@redhat.com>
+Date: Thu, 31 Aug 2017 09:42:08 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170831163513.17c0a963.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 06/11] target/s390x: cleanup cpu
- number/address handling
+In-Reply-To: <20170831095057.22923-1-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GBpC4aRUXiNArGF6n5RPvfrN72twXqBku"
+Subject: Re: [Qemu-devel] [PATCH] io: fix typo in docs comment for
+ qio_channel_read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +34,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 
-On 31.08.2017 16:35, Cornelia Huck wrote:
-> On Wed, 30 Aug 2017 19:05:56 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> Some time ago we discussed that using "id" as property name is not the
->> right thing to do, as it is a reserved property for other devices.
->>
->> Switch to the term "addr" instead, which matches the definition in the
->> PoP called "CPU address". There is no such thing as cpu number, so
->> rename env.cpu_num to env.cpu_addr.
->>
->> We can get rid of cpu->id now. Keep cpu->index and env->cpu_addr in sync.
->> cpu->index was already implicitly used by e.g. cpu_exists(), so keeping
->> both in sync seems to be the right thing to do.
->>
->> cpu->index will now no longer automatically get set via
->> cpu_exec_realizefn(). For now, we were lucky that both implicitly stayed
->> in sync.
->>
->> Our new cpu property "addr" can be a static property. Range checks can
->> be avoided by using the correct type and the "setting after realized"
->> check is done implicitly.
->>
->> AFAIK, s390x only supports cpu_add and not device_add for cpus. So we
->> should be able to safely rename that property (no the "id" property
->> could properly be used for device_add, which needs an artificial id for
->> identification purposes).
-> 
-> I cannot parse the sentence in the brackets...
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GBpC4aRUXiNArGF6n5RPvfrN72twXqBku
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <c565619b-4e00-7bc1-9791-76ceebbacfe8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] io: fix typo in docs comment for
+ qio_channel_read
+References: <20170831095057.22923-1-berrange@redhat.com>
+In-Reply-To: <20170831095057.22923-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Me too :)
+On 08/31/2017 04:50 AM, Daniel P. Berrange wrote:
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  include/io/channel.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-...So we should be able to safely rename that property. device_add will
-later need the reserved "id" property. Hotplugging a CPU would then look
-like this: "device_add host-s390-cpu id=cpu2 addr=2".
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> 
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/s390x/s390-virtio-ccw.c |  2 +-
->>  target/s390x/cpu.c         | 69 ++++++++++++----------------------------------
->>  target/s390x/cpu.h         |  5 ++--
->>  target/s390x/cpu_models.c  |  2 +-
->>  target/s390x/excp_helper.c |  2 +-
->>  target/s390x/helper.c      |  4 +--
->>  target/s390x/misc_helper.c |  4 +--
->>  target/s390x/translate.c   |  5 +---
->>  8 files changed, 28 insertions(+), 65 deletions(-)
-> 
-> ...the patch seems fine, though :)
-> 
+>=20
+> diff --git a/include/io/channel.h b/include/io/channel.h
+> index db9bb022a1..54f3dc252f 100644
+> --- a/include/io/channel.h
+> +++ b/include/io/channel.h
+> @@ -299,7 +299,7 @@ ssize_t qio_channel_writev(QIOChannel *ioc,
+>                             Error **errp);
+> =20
+>  /**
+> - * qio_channel_readv:
+> + * qio_channel_read:
+>   * @ioc: the channel object
+>   * @buf: the memory region to read data into
+>   * @buflen: the length of @buf
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
--- 
+--GBpC4aRUXiNArGF6n5RPvfrN72twXqBku
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Thanks,
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-David
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmoIEAACgkQp6FrSiUn
+Q2opSwf/VA8dY6WsRuZvGMacnVv96dRyAqxaw3LSjaXR79XraTtFH7LU6RPq43RT
+U8E3ZhYHRiJQlvckxT8n40JoPASgJ567lCC1ujgMuFlrC2rM9XQzSknavskL+jSj
+pRGzrzUz4GetYT4vvFERcvFVzVqYOds1tnKjFhc/lUvZq4XRfhQ7ee2knqP4EyYo
+a/vKkTfz+oO6ktAxiutqmJHX+x1KZoQSUGWbFKx6ySAz8YCJtO+g495Y8KoFPeL3
+G9UFi84qAA6BLYXJNfDIXdAyvpTJj/eSDAFYh2Vy+Pu5sKc4mZcK5T+FBLGPK6Te
+5nK/IYUKTrq45jpSBuvi1mfX9aLRrg==
+=DaR/
+-----END PGP SIGNATURE-----
+
+--GBpC4aRUXiNArGF6n5RPvfrN72twXqBku--
