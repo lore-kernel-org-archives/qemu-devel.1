@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dnOyJ-0001rf-Gb
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:53:24 -0400
+	(envelope-from <armbru@redhat.com>) id 1dnP3I-0003O0-IQ
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:58:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dnOyG-0007NL-FV
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:53:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35756)
+	(envelope-from <armbru@redhat.com>) id 1dnP3D-0001Af-SN
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:58:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50000)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dnOyG-0007Mu-8G
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:53:20 -0400
-References: <20170831121828.85885-1-pasic@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <9df365ed-4c97-34b6-e739-360866929f5d@redhat.com>
-Date: Thu, 31 Aug 2017 14:53:16 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnP3D-0001AL-Ip
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:58:27 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <87r2w6eq5n.fsf@gmail.com> <87h8x1yox3.fsf@dusky.pond.sub.org>
+	<20170830170941.GB24565@stefanha-x1.localdomain>
+	<87bmmwi6r6.fsf@dusky.pond.sub.org>
+	<CAFEAcA8r-EqOjZDvP=0mYG7QQ83MU-54RL9Bu8Eb_wPzQo1M7Q@mail.gmail.com>
+Date: Thu, 31 Aug 2017 14:58:24 +0200
+In-Reply-To: <CAFEAcA8r-EqOjZDvP=0mYG7QQ83MU-54RL9Bu8Eb_wPzQo1M7Q@mail.gmail.com>
+	(Peter Maydell's message of "Thu, 31 Aug 2017 11:27:15 +0100")
+Message-ID: <87r2vrlwr3.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170831121828.85885-1-pasic@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390x/css: fix cc handling for XSCH
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] scripts: Support building with Python 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, David Michael <fedora.dm0@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 31.08.2017 14:18, Halil Pasic wrote:
-> The function ioinst_handle_xsch is presenting cc 2 when it's supposed to
-> present cc 1 and the other way around, because css_do_xsch has the error
-> codes mixed up. Because cc 1 has precedence over cc 2 we also have to
-> swap the two checks.
-> 
-> Let us fix this.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> Reported-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-> ---
-> 
-> Was previously a part of a series (due to an accident the
-> series had no name). This version also fixes the priority
-> (aka precedence) problem.
-> 
-> ---
->  hw/s390x/css.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 1880b1a0ff..e04e0ea3a8 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -1276,16 +1276,16 @@ int css_do_xsch(SubchDev *sch)
->          goto out;
->      }
->  
-> +    if (s->ctrl & SCSW_CTRL_MASK_STCTL) {
-> +        ret = -EINPROGRESS;
-> +        goto out;
-> +    }
-> +
->      if (!(s->ctrl & SCSW_CTRL_MASK_FCTL) ||
->          ((s->ctrl & SCSW_CTRL_MASK_FCTL) != SCSW_FCTL_START_FUNC) ||
->          (!(s->ctrl &
->             (SCSW_ACTL_RESUME_PEND | SCSW_ACTL_START_PEND | SCSW_ACTL_SUSP))) ||
->          (s->ctrl & SCSW_ACTL_SUBCH_ACTIVE)) {
-> -        ret = -EINPROGRESS;
-> -        goto out;
-> -    }
-> -
-> -    if (s->ctrl & SCSW_CTRL_MASK_STCTL) {
->          ret = -EBUSY;
->          goto out;
->      }
-> 
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+> On 31 August 2017 at 07:35, Markus Armbruster <armbru@redhat.com> wrote:
+>> So, first we'll invest in work-arounds to make both 2 and 3 work.  Once
+>> 2 is gone, we can invest some more to clean them up.  Which probably
+>> won't happen, so we'll continue to carry work-arounds that no longer
+>> make sense.
+>>
+>> I maintain roughly one fourth of all Python code in qemu, and I'm not
+>> looking forward to this hoop-jumping at all.
+>>
+>> Are we really, really sure we want to go this way?  What exactly are we
+>> hoping to accomplish by it?
+>
+> My take is that we have the following goals we want to achieve:
+>
+> (1) We need to continue to build and run on older (long-term-support)
+> distros that still ship only Python 2.x (alas even back to 2.6)
+
+That's an assertion, not an answer to my question :)
+
+What exactly are we hoping to accomplish by supporting what distros
+exactly?
+
+> (2) We need to be able to build and run on newer distros that
+> have dropped Python 2 altogether in favour of Python 3
+> (I don't know if there are any such today, but presumably by
+> 2020 there will be)
+
+Yup.
+
+> Unless we can confidently say that either (1) or (2) is the
+> empty set, we need to handle both 2 and 3 in the same codebase.
+> This is a pain, but unfortunately Python upstream have forced
+> us into it by breaking source code compatibility.
+>
+> I think (1) is pretty clearly not (yet) an empty set, so the
+> only alternative I see to "support 2 and 3 now" is "keep supporting
+> only 2 for the moment and hope that no distro drops 2 support
+> before all the LTS 2-only distro versions vanish into history".
+
+I don't buy the "clearly" in "pretty clearly not (yet) an empty set",
+because I don't understand *why* we need to support "older
+(long-term-support) distros".
+
+If we can leave Python 2 behind, I'm all for porting to Python 3 now.
+
+If we can't yet, then I don't see why I should do work *now* just
+because "some" distro might drop support for Python 2 "before all the
+LTS 2-only distro versions vanish into history".
+
+If it ain't broke, don't fix it!
