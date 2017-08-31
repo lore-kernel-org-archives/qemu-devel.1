@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dnKjz-000599-N6
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:22:20 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dnKk0-00059A-5q
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:22:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dnKjv-0005li-Pq
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:22:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37908)
+	(envelope-from <stefanha@redhat.com>) id 1dnKjz-0005mX-2a
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:22:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45104)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dnKjv-0005lG-Jq
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:22:15 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dnKjy-0005mJ-T7
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:22:19 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Thu, 31 Aug 2017 09:21:55 +0100
-Message-Id: <20170831082210.8362-1-stefanha@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL for-2.10 00/15] Block patches
+Date: Thu, 31 Aug 2017 09:21:56 +0100
+Message-Id: <20170831082210.8362-2-stefanha@redhat.com>
+In-Reply-To: <20170831082210.8362-1-stefanha@redhat.com>
+References: <20170831082210.8362-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL for-2.10 01/15] nvme: Fix get/set number of
+ queues feature, again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +25,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Dan Aloni <dan@kernelim.com>, Alex Friedman <alex@e8storage.com>, Keith Busch <keith.busch@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The following changes since commit 248b23735645f7cbb503d9be6f5bf825f2a603=
-ab:
+From: Dan Aloni <dan@kernelim.com>
 
-  Update version for v2.10.0-rc4 release (2017-08-24 17:34:26 +0100)
+The number of queues that should be return by the admin command should:
 
-are available in the git repository at:
+  1) Only mention the number of non-admin queues.
+  2) It is zero-based, meaning that '0 == one non-admin queue',
+     '1 == two non-admin queues', and so forth.
 
-  git://github.com/stefanha/qemu.git tags/block-pull-request
+Because our `num_queues` means the number of queues _plus_ the admin
+queue, then the right calculation for the number returned from the admin
+command is `num_queues - 2`, combining the two requirements mentioned.
 
-for you to fetch changes up to 3e4c705212abfe8c9882a00beb2d1466a8a53cec:
+The issue was discovered by reducing num_queues from 64 to 8 and running
+a Linux VM with an SMP parameter larger than that (e.g. 22). It tries to
+utilize all queues, and therefore fails with an invalid queue number
+when trying to queue I/Os on the last queue.
 
-  qcow2: allocate cluster_cache/cluster_data on demand (2017-08-30 18:02:=
-10 +0100)
+Signed-off-by: Dan Aloni <dan@kernelim.com>
+CC: Alex Friedman <alex@e8storage.com>
+CC: Keith Busch <keith.busch@intel.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Keith Busch <keith.busch@intel.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ hw/block/nvme.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-----------------------------------------------------------------
-
-----------------------------------------------------------------
-
-Alberto Garcia (8):
-  throttle: Fix wrong variable name in the header documentation
-  throttle: Update the throttle_fix_bucket() documentation
-  throttle: Make throttle_is_valid() a bit less verbose
-  throttle: Remove throttle_fix_bucket() / throttle_unfix_bucket()
-  throttle: Make LeakyBucket.avg and LeakyBucket.max integer types
-  throttle: Make burst_length 64bit and add range checks
-  throttle: Test the valid range of config values
-  misc: Remove unused Error variables
-
-Dan Aloni (1):
-  nvme: Fix get/set number of queues feature, again
-
-Eduardo Habkost (1):
-  oslib-posix: Print errors before aborting on qemu_alloc_stack()
-
-Fred Rolland (1):
-  qemu-doc: Add UUID support in initiator name
-
-Stefan Hajnoczi (4):
-  scripts: add argparse module for Python 2.6 compatibility
-  docker.py: Python 2.6 argparse compatibility
-  tests: migration/guestperf Python 2.6 argparse compatibility
-  qcow2: allocate cluster_cache/cluster_data on demand
-
- include/qemu/throttle.h            |    8 +-
- block/qcow.c                       |   12 +-
- block/qcow2-cluster.c              |   17 +
- block/qcow2.c                      |   20 +-
- dump.c                             |    4 +-
- hw/block/nvme.c                    |    4 +-
- tests/test-throttle.c              |   80 +-
- util/oslib-posix.c                 |    2 +
- util/throttle.c                    |   86 +-
- COPYING.PYTHON                     |  270 ++++
- qemu-doc.texi                      |    5 +-
- scripts/argparse.py                | 2406 ++++++++++++++++++++++++++++++=
-++++++
- tests/docker/docker.py             |    4 +-
- tests/migration/guestperf/shell.py |    8 +-
- 14 files changed, 2831 insertions(+), 95 deletions(-)
- create mode 100644 COPYING.PYTHON
- create mode 100644 scripts/argparse.py
-
---=20
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 6071dc12d8..9aa32692a3 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -615,7 +615,7 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+         result = blk_enable_write_cache(n->conf.blk);
+         break;
+     case NVME_NUMBER_OF_QUEUES:
+-        result = cpu_to_le32((n->num_queues - 1) | ((n->num_queues - 1) << 16));
++        result = cpu_to_le32((n->num_queues - 2) | ((n->num_queues - 2) << 16));
+         break;
+     default:
+         return NVME_INVALID_FIELD | NVME_DNR;
+@@ -636,7 +636,7 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+         break;
+     case NVME_NUMBER_OF_QUEUES:
+         req->cqe.result =
+-            cpu_to_le32((n->num_queues - 1) | ((n->num_queues - 1) << 16));
++            cpu_to_le32((n->num_queues - 2) | ((n->num_queues - 2) << 16));
+         break;
+     default:
+         return NVME_INVALID_FIELD | NVME_DNR;
+-- 
 2.13.5
