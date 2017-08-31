@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnRvy-0004PA-Tk
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:03:15 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dnRwp-00050d-4X
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:04:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnRvp-0001g8-HL
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:03:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40578)
+	(envelope-from <imammedo@redhat.com>) id 1dnRwl-00021t-6l
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:04:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34068)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnRvp-0001fM-7k
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:03:01 -0400
-References: <20170831142430.16665-1-berrange@redhat.com>
-	<20170831142430.16665-4-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5aa15941-49fc-1cc3-941e-d715333df704@redhat.com>
-Date: Thu, 31 Aug 2017 11:02:53 -0500
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dnRwk-00021W-Vo
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:03:59 -0400
+Date: Thu, 31 Aug 2017 18:03:52 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170831180352.7d6e1ecf@nial.brq.redhat.com>
+In-Reply-To: <20170831163513.17c0a963.cohuck@redhat.com>
+References: <20170830170601.15855-1-david@redhat.com>
+	<20170830170601.15855-7-david@redhat.com>
+	<20170831163513.17c0a963.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170831142430.16665-4-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="V8MvJboOcaGdDUiVoB2SkoSVThfF0Hu4j"
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] qapi: Use OrderedDict from standard
- library if available
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 06/11] target/s390x: cleanup cpu
+ number/address handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, thuth@redhat.com, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com, Aurelien Jarno <aurelien@aurel32.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---V8MvJboOcaGdDUiVoB2SkoSVThfF0Hu4j
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <5aa15941-49fc-1cc3-941e-d715333df704@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] qapi: Use OrderedDict from standard
- library if available
-References: <20170831142430.16665-1-berrange@redhat.com>
- <20170831142430.16665-4-berrange@redhat.com>
-In-Reply-To: <20170831142430.16665-4-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, 31 Aug 2017 16:35:13 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-On 08/31/2017 09:24 AM, Daniel P. Berrange wrote:
-> The OrderedDict class appeared in the 'collections' module
-> from python 2.7 onwards, so use that in preference to our
-> local backport if available.
+> On Wed, 30 Aug 2017 19:05:56 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+> > Some time ago we discussed that using "id" as property name is not the
+> > right thing to do, as it is a reserved property for other devices.
+> > 
+> > Switch to the term "addr" instead, which matches the definition in the
+> > PoP called "CPU address". There is no such thing as cpu number, so
+> > rename env.cpu_num to env.cpu_addr.
+> > 
+> > We can get rid of cpu->id now. Keep cpu->index and env->cpu_addr in sync.
+> > cpu->index was already implicitly used by e.g. cpu_exists(), so keeping
+> > both in sync seems to be the right thing to do.
+> > 
+> > cpu->index will now no longer automatically get set via
+> > cpu_exec_realizefn(). For now, we were lucky that both implicitly stayed
+> > in sync.
+> > 
+> > Our new cpu property "addr" can be a static property. Range checks can
+> > be avoided by using the correct type and the "setting after realized"
+> > check is done implicitly.
+> > 
+> > AFAIK, s390x only supports cpu_add and not device_add for cpus. So we
+> > should be able to safely rename that property (no the "id" property
+> > could properly be used for device_add, which needs an artificial id for
+> > identification purposes).  
+this patch seems to somewhat conflicting with
+ https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg06505.html
+that were supposed to go via machine tree and which I've respinned today
+to fix conflicts due just merged pull req.
 
-Since we're now using argparse.py as a third-party import (commit
-47e1cb1f) also for the sake of 2.6, can we treat ordereddict.py as the
-same sort of third-party import?
+Cornelia,
 
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  scripts/qapi.py | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->=20
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index d89af7d6c6..05cb1ee38c 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -18,7 +18,10 @@ import os
->  import re
->  import string
->  import sys
-> -from ordereddict import OrderedDict
-> +try:
-> +    from collections import OrderedDict
-> +except:
-> +    from ordereddict import OrderedDict
-> =20
->  builtin_types =3D {
->      'null':     'QTYPE_QNULL',
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---V8MvJboOcaGdDUiVoB2SkoSVThfF0Hu4j
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmoMy0ACgkQp6FrSiUn
-Q2qPaggArLRiK1Q9FFjyc5A1KL/XuU1IDBcvoABodnaoKfeUITVzQfuYim3vEgWF
-UGjBau+4k4huNQHLARs5uBqcQTBzuFD07MCDI8CuflwwyJhSfYX9p7Ey5syn2mnG
-caMpyXFZ1p5e1/YpG3XHSt2vWQr5EZXbO+bXN902H51c/1UrBe8iCjjr2KSuBeuJ
-nn0Mluvvizn0/0TswekRm8GYvbYKTMR7ST65k/4qi7czpyLO9bvedcozmrU/Mc8R
-30HqpITIG9uzN+ueUlxI+oCQxBIkqCZEZOeY1OlmUDYeeGCeHSQrFeh9DI5qtuqC
-hIKD1nSKH0D7OG6SNHs7dLtYH5qPEQ==
-=xa7Z
------END PGP SIGNATURE-----
-
---V8MvJboOcaGdDUiVoB2SkoSVThfF0Hu4j--
+Could you put/merge it via s390x tree so that David and I work won't clash again?
