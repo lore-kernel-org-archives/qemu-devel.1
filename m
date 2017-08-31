@@ -1,28 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dnNcK-0007VF-Py
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:26:38 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dnN3R-0006Lu-JC
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:50:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dnNcG-0008Af-Qm
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:26:36 -0400
-Received: from mail-lf0-f52.google.com ([209.85.215.52]:37180)
+	(envelope-from <peter.maydell@linaro.org>) id 1dnN3Q-0002rn-Ul
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:50:33 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:34243)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dnNcG-0008AB-EZ
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:26:32 -0400
-Received: by mail-lf0-f52.google.com with SMTP id y128so1540442lfd.4
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 04:26:31 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dnN3Q-0002qa-P0
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:50:32 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id z91so1060444wrc.1
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 03:50:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170831074215.GA13619@stefanha-x1.localdomain>
-References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
-	<20170830082702.3011-3-Sergio.G.DelReal@gmail.com>
-	<20170830140738.GS18526@redhat.com>
-	<20170831074215.GA13619@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 31 Aug 2017 13:26:29 +0200
-Message-ID: <CABgObfYRUtdH9-7+zWx5Zur=iE_Qr5953+EOgcxRfVGnEonbmg@mail.gmail.com>
+In-Reply-To: <655077175.310569.1504175675199@mail.yahoo.com>
+References: <1915302638.2814146.1504030043465.ref@mail.yahoo.com>
+	<1915302638.2814146.1504030043465@mail.yahoo.com>
+	<14033890-2a35-666c-2fa7-5a8727090801@tuxfamily.org>
+	<1075529669.195794.1504079702032@mail.yahoo.com>
+	<bc7bacd9-fec7-c193-6de0-99d1f7fd0f6f@tuxfamily.org>
+	<2061420835.208824.1504085337258@mail.yahoo.com>
+	<20170830121109.7fab5559@bahia>
+	<61cd0715-27e4-7e50-1e85-9da3b4a48bb1@posteo.de>
+	<47171733.403781.1504103700042@mail.yahoo.com>
+	<20170830192838.5bb5a45c@bahia>
+	<655077175.310569.1504175675199@mail.yahoo.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 31 Aug 2017 11:50:10 +0100
+Message-ID: <CAFEAcA-EhBOg55azXgQfgSf-6UEOpggntYGHq+YRaVACGe=8pQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 02/13] hvf: add code base from Google's
- QEMU repository
+Subject: Re: [Qemu-devel] [Qemu-discuss] Accessing a shared folder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +38,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Hajnoczi, Stefan" <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, vpalatin@chromium.org, izik@veertu.com, sergio.g.delreal@gmail.com
+To: Mahmood <nt_mahmood@yahoo.com>
+Cc: Greg Kurz <groug@kaod.org>, Thomas Huth <huth@tuxfamily.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Thomas Huth <th.huth@posteo.de>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>
 
-Il 31 ago 2017 9:43 AM, "Stefan Hajnoczi" <stefanha@gmail.com> ha scritto:
-
-On Wed, Aug 30, 2017 at 03:07:38PM +0100, Daniel P. Berrange wrote:
-> On Wed, Aug 30, 2017 at 03:26:51AM -0500, Sergio Andres Gomez Del Real
-wrote:
-> > diff --git a/target/i386/hvf-utils/x86.c b/target/i386/hvf-utils/x86.c
-> > new file mode 100644
-> > index 0000000000..e3db2c9c8b
-> > --- /dev/null
-> > +++ b/target/i386/hvf-utils/x86.c
-> > @@ -0,0 +1,174 @@
-> > +/*
-> > + * Copyright (C) 2016 Veertu Inc,
-> > + * Copyright (C) 2017 Google Inc,
-> > + *
-> > + * This program is free software; you can redistribute it and/or
-> > + * modify it under the terms of the GNU General Public License as
-> > + * published by the Free Software Foundation; either version 2 or
-> > + * (at your option) version 3 of the License.
-> > + *
-> > + * This program is distributed in the hope that it will be useful,
-> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> > + * GNU General Public License for more details.
-> > + *
-> > + * You should have received a copy of the GNU General Public License
-along
-> > + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> > + */
+On 31 August 2017 at 11:34, Mahmood via Qemu-devel
+<qemu-devel@nongnu.org> wrote:
+> Hello again,
+> For the command
 >
-> Again  v2-or-v3-only.
+>     mount -t 9p -o trans=virtio Downloads /media/Downloads
 >
-> There's many more files with this same problem but I'll stop pointing
-> them out now.
+> inside the Centos-7 guest, I get this error
 >
-> If this is to be included in QEMU,  Veertu & Google (and any other
-> copyright holders) would have to agree to change these files to
-> v2-or-later
+> mount: unknown filesystem type '9p'
+>
+> Any thought?
 
-Sergio: Have you or Paolo had any contact with the Veertu or Google
-authors about your Hypervisor.framework project?  If you're already in
-contact with them you could raise the issue and ask them to join this
-email thread.
+That's an issue with your guest OS (probably it doesn't
+have 9p support enabled in the kernel).
 
-
-Izik, Vincent (assuming you are the right person to contact at Google), can
-you reply to Daniel and Stefan?
-
-Sergio worked on completing the QEMU port to Hypervisor.framework. The
-hvf-all.c file that Daniel pointed out as v2-only is derived from kvm-all.c
-and hax-all.c, and should be under v2-or-later license. The others seem to
-be either original or derived from Bochs, which is LGPL, so they could be
-LGPL or GPLv2+.
-
-Thanks,
-
-Paolo
-
-
-There are benefits to having this code upstream.  If they ever want to
-rebase on qemu.git there will be less work for them.
-
-Stefan
+thanks
+-- PMM
