@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnQZJ-0000W9-1p
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:35:42 -0400
+	(envelope-from <david@redhat.com>) id 1dnQZv-0000sS-Oy
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:36:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnQZE-0003pq-0f
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:35:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42879)
+	(envelope-from <david@redhat.com>) id 1dnQZq-0003v7-Pe
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:36:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:19459)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dnQZD-0003nv-RA
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:35:35 -0400
-Date: Thu, 31 Aug 2017 16:35:13 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170831163513.17c0a963.cohuck@redhat.com>
-In-Reply-To: <20170830170601.15855-7-david@redhat.com>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dnQZq-0003uw-Ji
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:36:14 -0400
 References: <20170830170601.15855-1-david@redhat.com>
-	<20170830170601.15855-7-david@redhat.com>
+	<20170830170601.15855-4-david@redhat.com>
+	<09179efb-0930-bd84-ff22-1f4b23fa6a8e@redhat.com>
+	<55b99307-b817-1cb2-f5c8-901b877735cc@redhat.com>
+	<63bc0433-dd9f-2b75-7885-5460949c821b@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <8a4d349c-33c5-0e63-d11b-274d64e854fa@redhat.com>
+Date: Thu, 31 Aug 2017 16:36:09 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <63bc0433-dd9f-2b75-7885-5460949c821b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 06/11] target/s390x: cleanup cpu
- number/address handling
+Subject: Re: [Qemu-devel] [PATCH v1 03/11] s390x: store cpu states inside
+ machine state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +32,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
 
-On Wed, 30 Aug 2017 19:05:56 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On 31.08.2017 16:31, Thomas Huth wrote:
+> On 31.08.2017 16:23, David Hildenbrand wrote:
+>>
+>>>> +struct S390CPU;
+>>>
+>>> You define a "struct S390CPU" here ...
+>>>
+>>>>  typedef struct S390CcwMachineState {
+>>>>      /*< private >*/
+>>>>      MachineState parent_obj;
+>>>>  
+>>>>      /*< public >*/
+>>>> +    S390CPU **cpus;
+>>>
+>>> ... but use the typedef'ed S390CPU here ... looks somewhat suspicious, I
+>>> wonder whether the typedef is really in the right place?
+>>
+>> General question: how much do we care about headers that are not consistent?
+>>
+>> E.g. shall I forward declare or simply ignore if compilers don't bite me?
+> 
+> My remark was not so much about your patch, but about the original
+> definition instead: "struct S390CPU" is declared in target/s390x/cpu.h,
+> but "typedef struct S390CPU S390CPU" is in target/s390x/cpu-qom.h. I
+> think they should rather be declared in the same header file instead. Or
 
-> Some time ago we discussed that using "id" as property name is not the
-> right thing to do, as it is a reserved property for other devices.
-> 
-> Switch to the term "addr" instead, which matches the definition in the
-> PoP called "CPU address". There is no such thing as cpu number, so
-> rename env.cpu_num to env.cpu_addr.
-> 
-> We can get rid of cpu->id now. Keep cpu->index and env->cpu_addr in sync.
-> cpu->index was already implicitly used by e.g. cpu_exists(), so keeping
-> both in sync seems to be the right thing to do.
-> 
-> cpu->index will now no longer automatically get set via
-> cpu_exec_realizefn(). For now, we were lucky that both implicitly stayed
-> in sync.
-> 
-> Our new cpu property "addr" can be a static property. Range checks can
-> be avoided by using the correct type and the "setting after realized"
-> check is done implicitly.
-> 
-> AFAIK, s390x only supports cpu_add and not device_add for cpus. So we
-> should be able to safely rename that property (no the "id" property
-> could properly be used for device_add, which needs an artificial id for
-> identification purposes).
+I agree, will have a look.
 
-I cannot parse the sentence in the brackets...
-
+> your "struct S390CPU;" forward declaration should go into cpu-qom.h
+> instead, right in front of the typedef.
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/s390x/s390-virtio-ccw.c |  2 +-
->  target/s390x/cpu.c         | 69 ++++++++++++----------------------------------
->  target/s390x/cpu.h         |  5 ++--
->  target/s390x/cpu_models.c  |  2 +-
->  target/s390x/excp_helper.c |  2 +-
->  target/s390x/helper.c      |  4 +--
->  target/s390x/misc_helper.c |  4 +--
->  target/s390x/translate.c   |  5 +---
->  8 files changed, 28 insertions(+), 65 deletions(-)
 
-...the patch seems fine, though :)
+Let me rephrase my question:
+
+include/hw/s390x/s390-virtio-ccw.h does not include cpu.h/cpu-qom.h
+
+If compilers don't complain, do we have to forward declare at all? (I
+think it is cleaner, but I would like to know what is suggested)
+
+>  Thomas
+> 
+
+
+-- 
+
+Thanks,
+
+David
