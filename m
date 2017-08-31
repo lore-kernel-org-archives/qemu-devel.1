@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dnSBZ-00050T-HS
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:19:20 -0400
+	(envelope-from <eblake@redhat.com>) id 1dnSC8-0005ST-NK
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:19:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dnSBV-0008Ge-P0
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:19:17 -0400
-References: <20170829204934.9039-1-jsnow@redhat.com>
-	<20170829204934.9039-6-jsnow@redhat.com>
-	<cb291f47-2fb5-8d97-ff89-c8ccaded345c@amsat.org>
-	<4564eeb6-dfcb-0cb0-bf4f-3bce117314ee@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <8deb650a-3176-4a32-4814-b819f04325f9@redhat.com>
-Date: Thu, 31 Aug 2017 18:19:01 +0200
+	(envelope-from <eblake@redhat.com>) id 1dnSC6-0008Ot-2m
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:19:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55030)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnSC5-0008OL-Q8
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:19:50 -0400
+References: <20170831131425.3953-1-marcandre.lureau@redhat.com>
+	<20170831131425.3953-2-marcandre.lureau@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c0fa5298-e696-0a44-429f-a5f87ed89564@redhat.com>
+Date: Thu, 31 Aug 2017 11:19:44 -0500
 MIME-Version: 1.0
-In-Reply-To: <4564eeb6-dfcb-0cb0-bf4f-3bce117314ee@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 5/9] IDE: replace DEBUG_AIO with trace
- events
+In-Reply-To: <20170831131425.3953-2-marcandre.lureau@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ieMFVq5tQWfacSwWKf0KlnSQnWuPQXoPF"
+Subject: Re: [Qemu-devel] [PATCH 2/2] .dir-locals.el: add json schema to
+ auto-mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,355 +29,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, armbru@redhat.com, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 08/31/17 01:25, John Snow wrote:
-> CCing Laszlo Ersek literally just for laughs, as he is the most
-> entertaining language lawyer I know of.
->=20
-> Laszlo, please feel free to ignore this if you don't care :P
->=20
-> On 08/29/2017 11:14 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> Hi John,
->>
->> On 08/29/2017 05:49 PM, John Snow wrote:
->>> Signed-off-by: John Snow <jsnow@redhat.com>
->>> ---
->>>   hw/ide/atapi.c            |  5 +----
->>>   hw/ide/core.c             | 17 ++++++++++-------
->>>   hw/ide/trace-events       |  3 +++
->>>   include/hw/ide/internal.h |  6 ++++--
->>>   4 files changed, 18 insertions(+), 13 deletions(-)
->>>
->>> diff --git a/hw/ide/atapi.c b/hw/ide/atapi.c
->>> index 37fa699..b8fc51e 100644
->>> --- a/hw/ide/atapi.c
->>> +++ b/hw/ide/atapi.c
->>> @@ -416,10 +416,7 @@ static void ide_atapi_cmd_read_dma_cb(void
->>> *opaque, int ret)
->>>           s->io_buffer_size =3D n * 2048;
->>>           data_offset =3D 0;
->>>       }
->>> -#ifdef DEBUG_AIO
->>> -    printf("aio_read_cd: lba=3D%u n=3D%d\n", s->lba, n);
->>> -#endif
->>> -
->>> +    trace_ide_atapi_cmd_read_dma_cb_aio(s, s->lba, n);
->>>       s->bus->dma->iov.iov_base =3D (void *)(s->io_buffer + data_offs=
-et);
->>>       s->bus->dma->iov.iov_len =3D n * ATAPI_SECTOR_SIZE;
->>>       qemu_iovec_init_external(&s->bus->dma->qiov, &s->bus->dma->iov,=
- 1);
->>> diff --git a/hw/ide/core.c b/hw/ide/core.c
->>> index 82a19b1..a1c90e9 100644
->>> --- a/hw/ide/core.c
->>> +++ b/hw/ide/core.c
->>> @@ -58,6 +58,13 @@ static const int smart_attributes[][12] =3D {
->>>       { 190,  0x03, 0x00, 0x45, 0x45, 0x1f, 0x00, 0x1f, 0x1f, 0x00,
->>> 0x00, 0x32},
->>>   };
->>>   +const char *IDE_DMA_CMD_lookup[IDE_DMA__COUNT] =3D {
->>> +    [IDE_DMA_READ] =3D "DMA READ",
->>> +    [IDE_DMA_WRITE] =3D "DMA WRITE",
->>> +    [IDE_DMA_TRIM] =3D "DMA TRIM",
->>> +    [IDE_DMA_ATAPI] =3D "DMA ATAPI"
->>> +};
->>> +
->>>   static void ide_dummy_transfer_stop(IDEState *s);
->>>     static void padstr(char *str, const char *src, int len)
->>> @@ -860,10 +867,8 @@ static void ide_dma_cb(void *opaque, int ret)
->>>           goto eot;
->>>       }
->>>   -#ifdef DEBUG_AIO
->>> -    printf("ide_dma_cb: sector_num=3D%" PRId64 " n=3D%d, cmd_cmd=3D%=
-d\n",
->>> -           sector_num, n, s->dma_cmd);
->>> -#endif
->>> +    trace_ide_dma_cb(s, sector_num, n,
->>> +                     IDE_DMA_CMD_lookup[s->dma_cmd]);
->>>         if ((s->dma_cmd =3D=3D IDE_DMA_READ || s->dma_cmd =3D=3D
->>> IDE_DMA_WRITE) &&
->>>           !ide_sect_range_ok(s, sector_num, n)) {
->>> @@ -2391,9 +2396,7 @@ void ide_bus_reset(IDEBus *bus)
->>>         /* pending async DMA */
->>>       if (bus->dma->aiocb) {
->>> -#ifdef DEBUG_AIO
->>> -        printf("aio_cancel\n");
->>> -#endif
->>> +        trace_ide_bus_reset_aio();
->>>           blk_aio_cancel(bus->dma->aiocb);
->>>           bus->dma->aiocb =3D NULL;
->>>       }
->>> diff --git a/hw/ide/trace-events b/hw/ide/trace-events
->>> index 8c79a6c..cc8949c 100644
->>> --- a/hw/ide/trace-events
->>> +++ b/hw/ide/trace-events
->>> @@ -18,6 +18,8 @@ ide_cancel_dma_sync_remaining(void) "draining all
->>> remaining requests"
->>>   ide_sector_read(int64_t sector_num, int nsectors) "sector=3D%"PRId6=
-4"
->>> nsectors=3D%d"
->>>   ide_sector_write(int64_t sector_num, int nsectors) "sector=3D%"PRId=
-64"
->>> nsectors=3D%d"
->>>   ide_reset(void *s) "IDEstate %p"
->>> +ide_bus_reset_aio(void) "aio_cancel"
->>> +ide_dma_cb(void *s, int64_t sector_num, int n, const char *dma)
->>> "IDEState %p; sector_num=3D%"PRId64" n=3D%d cmd=3D%s"
->>>     # BMDMA HBAs:
->>>   @@ -51,5 +53,6 @@ ide_atapi_cmd_reply_end_new(void *s, int status)
->>> "IDEState: %p; new transfer sta
->>>   ide_atapi_cmd_check_status(void *s) "IDEState: %p"
->>>   ide_atapi_cmd_read(void *s, const char *method, int lba, int
->>> nb_sectors) "IDEState: %p; read %s: LBA=3D%d nb_sectors=3D%d"
->>>   ide_atapi_cmd(void *s, uint8_t cmd) "IDEState: %p; cmd: 0x%02x"
->>> +ide_atapi_cmd_read_dma_cb_aio(void *s, int lba, int n) "IDEState: %p=
-;
->>> aio read: lba=3D%d n=3D%d"
->>>   # Warning: Verbose
->>>   ide_atapi_cmd_packet(void *s, uint16_t limit, const char *packet)
->>> "IDEState: %p; limit=3D0x%x packet: %s"
->>> diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
->>> index 74efe8a..db9fde0 100644
->>> --- a/include/hw/ide/internal.h
->>> +++ b/include/hw/ide/internal.h
->>> @@ -14,7 +14,6 @@
->>>   #include "block/scsi.h"
->>>     /* debug IDE devices */
->>> -//#define DEBUG_AIO
->>>   #define USE_DMA_CDROM
->>>     typedef struct IDEBus IDEBus;
->>> @@ -333,12 +332,15 @@ struct unreported_events {
->>>   };
->>>     enum ide_dma_cmd {
->>> -    IDE_DMA_READ,
->>> +    IDE_DMA_READ =3D 0,
->>>       IDE_DMA_WRITE,
->>>       IDE_DMA_TRIM,
->>>       IDE_DMA_ATAPI,
->>> +    IDE_DMA__COUNT
->>>   };
->>>   +extern const char *IDE_DMA_CMD_lookup[IDE_DMA__COUNT];
->>
->> I recommend you to avoid this declaring extern const array with size, =
-I
->> remember some compilers (old GCC?) ignoring array size in extern. Eric
->> will correct me!
->>
->> It is much safer to use a getter:
->>
->=20
-> Well, whether or not the compiler ignores it, you're right that it's
-> safer to use a getter. I don't think the width being declared HURTS any
-> compiler though, does it?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ieMFVq5tQWfacSwWKf0KlnSQnWuPQXoPF
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: berrange@redhat.com, armbru@redhat.com,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
+Message-ID: <c0fa5298-e696-0a44-429f-a5f87ed89564@redhat.com>
+Subject: Re: [PATCH 2/2] .dir-locals.el: add json schema to auto-mode
+References: <20170831131425.3953-1-marcandre.lureau@redhat.com>
+ <20170831131425.3953-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20170831131425.3953-2-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-If, in the above declaration, you say
+On 08/31/2017 08:14 AM, Marc-Andr=C3=A9 Lureau wrote:
+> The json schema is more friendly to python-mode since it doesn't
+> follow strictly json (comments to start with).
 
-extern const char *IDE_DMA_CMD_lookup[];
+I found that hard to read, and missing a key word of 'emacs'.  Maybe
+reword it as:
 
-then the "IDE_DMA_CMD_lookup" will have "incomplete array type". In a
-translation unit that includes this declaration, but doesn't actually
-*define* the array (thereby completing its type), you can e.g. subscript
-the array like this:
-
-  IDE_CMD_DMA_lookup[IDE_DMA_WRITE]
-
-but you cannot do anything with it that would require it to have a
-complete type, such as:
-
-  sizeof IDE_CMD_DMA_lookup
-
-
-If you declare the array as quoted above, then the type will be complete
-for all translation units that include the declaration, not just for the
-one that defines the array.
-
-Which one I'd recommend depends on the use case. If it's OK to expose
-the size of the array to all consumers (or the IDE_DMA__COUNT
-enumeration constant), then I'd go with the complete type in the
-declaration. It communicates the intent.
-
-And no, the compiler is not required to catch your out-of-bounds access
-in either case; but that's not the point. The point is that the human
-that looks at the declaration will know how to bounds-check the access.
-
-If you write a getter function, then either declaration will work just
-fine, but in that case, you don't even need the array. Just add a switch
-statement to your getter, and return the addresses of open-coded string
-literals.
+Under emacs, our QAPI files (.json suffix) are more friendly to edit
+under python-mode than the per-suffix default of json-mode (in part
+because of our use of comments).
 
 >=20
->> const char *IDE_DMA_CMD_lookup(enum ide_dma_cmd cmd)
->> {
->>     static const char *IDE_DMA_CMD_name[IDE_DMA__COUNT] =3D {
->>         [IDE_DMA_READ] =3D "DMA READ",
->>         [IDE_DMA_WRITE] =3D "DMA WRITE",
->>         [IDE_DMA_TRIM] =3D "DMA TRIM",
->>         [IDE_DMA_ATAPI] =3D "DMA ATAPI"
->>     };
->>
->>     return IDE_DMA_CMD_name[cmd];
->> };
->>
+> All schema files add file variables to set the python mode, but most
+> tests didn't. This will cover all json files now.
 >=20
-> Why is this safer...?
->=20
-> Here's my opinion of enums:
->=20
-> jhuston@probe ~/s/scratch> cat enum.c
-> enum foo {
->     FOO_A =3D 0,
->     FOO_B
-> };
->=20
-> int fn(enum foo in)
-> {
->     switch (in) {
->     case FOO_A:
->     case FOO_B:
->         return 0;
->     default:
->         return 1;
->     }
-> }
->=20
-> int main(int argc, char *argv[])
-> {
->     return fn(2);
-> }
->=20
->=20
-> jhuston@probe ~/s/scratch> gcc -ansi -Wall -pedantic -o enum enum.c
-> jhuston@probe ~/s/scratch> ./enum
-> jhuston@probe ~/s/scratch> echo $status
-> 1
->=20
->=20
-> No warnings, no messages, it just happily takes a value outside the
-> domain and in this case it doesn't explode because I caught it, but,
-> take a look:
->=20
-> jhuston@probe ~/s/scratch> cat enum.c
-> #include <stdio.h>
->=20
-> enum foo {
->     FOO_A =3D 0,
->     FOO_B,
->     FOO__COUNT
-> };
->=20
-> const char *table[FOO__COUNT] =3D {"FOO_A", "FOO_B"};
->=20
-> int fn(enum foo in)
-> {
->     fprintf(stderr, "%s\n", table[in]);
->     switch (in) {
->     case FOO_A:
->     case FOO_B:
->         return 0;
->     default:
->         return 1;
->     }
-> }
->=20
-> int main(int argc, char *argv[])
-> {
->     return fn(2);
-> }
->=20
-> Similar program, let's compile it:
->=20
-> jhuston@probe ~/s/scratch> gcc -ansi -Wall -pedantic -o enum enum.c
-> jhuston@probe ~/s/scratch> ./enum
-> =EF=BF=BD =EF=BF=BD
->=20
->=20
-> Ah, dang.
->=20
-> This is why I prefer to have my assertions and don't trust enums to be
-> checked rigorously.
->=20
-> For anyone playing along at home, yes, if you specify at least -O1 here
-> it will catch it:
->=20
-> jhuston@probe ~/s/scratch> gcc -ansi -Wall -pedantic -O3 -o enum enum.c
-> enum.c: In function =E2=80=98main=E2=80=99:
-> enum.c:13:5: warning: array subscript is above array bounds [-Warray-bo=
-unds]
->      fprintf(stderr, "%s\n", table[in]);
->      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->=20
-> Oh no, what the hell is clang up to, though?
->=20
-> jhuston@probe ~/s/scratch> clang -ansi -Wall -pedantic -O3 -o enum enum=
-.c
-> jhuston@probe ~/s/scratch>
->=20
->=20
-> Oh no...
->=20
-> http://i.imgur.com/uRvorq3.jpg
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
 
-I wouldn't like to quote all the standardese related to enums. My point
-here is that the compiler might choose "signed char", for example, for
-representing the "enum foo" type. Let's say the range of "signed char"
-is -128..127 inclusive.
+> +++ b/.dir-locals.el
+> @@ -2,6 +2,8 @@
+>              (indent-tabs-mode . nil)))
+>   (nil . ((eval . (setq auto-mode-alist (append
+>                                          '(("Makefile.*" . makefile-gma=
+ke-mode)
+> -                                          ("\\.mak\\'" . makefile-gmak=
+e-mode))
+> +                                          ("\\.mak\\'" . makefile-gmak=
+e-mode)
+> +                                          ;; json schema is not pure j=
+son
+> +                                          ("\\.json\\'" . python-mode)=
+)
+>                                          auto-mode-alist))))
+>        ))
 
-Now assume you pass value 128 (of type "int") to a function that takes
-"enum foo", such as your fn(). The argument is converted as in an
-assignment, and the following applies:
+Not sure if the comment could be worded better, maybe:
 
-  6.3 Conversions
-  6.3.1 Arithmetic operands
-  6.3.1.1 Boolean, characters, and integers
-    1 [...]
-       - The rank of any enumerated type shall equal the rank of the
-         compatible integer type (see 6.7.2.2).
-    [...]
-  6.3.1.3 Signed and unsigned integers
-    [...]
-    3 Otherwise, the new type is signed and the value cannot be
-      represented in it; either the result is implementation-defined or
-      an implementation-defined signal is raised.
+;; Our .json files are QAPI, and allow more than pure json
 
-Dependent on what the docs for your C language implementation say, you
-could get total garbage in fn(), or you could get a signal before your
-code in fn() is reached.
+Again, the idea makes sense to me, but you may want to get feedback from
+other power emacs users.
 
-IOW, if you cannot guarantee *before* the function call that the value
-you pass to fn() -- or convert to "enum foo" otherwise -- will nicely
-fit in "enum foo"'s represenative integer type, then catching it in fn()
-is too late.
+[Also, don't forget the 0/2 cover letter if you send v2]
 
-I suggest assigning to "enum foo" only
-- another "enum foo" object,
-- a matching enumeration constant (which has type "int", but will fit of
-  course),
-- any integer value that has been range-checked explicitly.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-The last point does encourage that your getter function should take,
-say, "unsigned int" rather than "enum foo"; it handles incorrect calls
-more portably.
 
-... I'm unsure if this wall of text is relevant *at all* here, but I've
-had to live up to past entertainment! ;)
+--ieMFVq5tQWfacSwWKf0KlnSQnWuPQXoPF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Laszlo
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
->=20
->> If you agree:
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>
->=20
-> Somewhat. I will write a getter that does bounds checking. It _is_ safe=
-r
-> that way, though I don't think we'll ever run into a situation where it
-> would come up.
->=20
->>> +
->>>   #define ide_cmd_is_read(s) \
->>>       ((s)->dma_cmd =3D=3D IDE_DMA_READ)
->>> =20
->>
->=20
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmoNyAACgkQp6FrSiUn
+Q2p5Agf/aUCEMJqztVxO1lGoW7zFQpNV2ziTp53I1UmqEI0D0NkvH16w5k6sUbBb
+TpLA6lT0iaul7xSjmgVKEDsZ3l/8lgySdYaUHIwUvtraiYN8GvwIUROm/lrQl3wK
+BCr/K6V4aMKj542coyMP8yYMBKKt1cmUCM2ob1xoavEM0XrHLlndDhz8HdUHh8Hz
+kTOm9G5aldcOZEi1q9T86hwB0KkR9K6YvLTDb3z9zVynegEx43wycSxujjI+Q4nM
+KvfpGGxhX15wxIaeHWKKc0aaBYKEhyyCxWlNLGb7jUQY2jb/sfgq3XYUmkfbUROG
+c4tm0uNQw5n/I4i1py/ADgLtqxgTng==
+=MtfC
+-----END PGP SIGNATURE-----
+
+--ieMFVq5tQWfacSwWKf0KlnSQnWuPQXoPF--
