@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnJB5-0006Ai-HC
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 02:42:12 -0400
+	(envelope-from <famz@redhat.com>) id 1dnJC8-0006gw-Si
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 02:43:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnJB2-0005y2-FT
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 02:42:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40198)
+	(envelope-from <famz@redhat.com>) id 1dnJC5-0006O6-Mm
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 02:43:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34688)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dnJB2-0005xc-8k
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 02:42:08 -0400
-Date: Thu, 31 Aug 2017 08:42:00 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170831084200.359bd5c7.cohuck@redhat.com>
-In-Reply-To: <8a7e8d96-0d32-97cd-0e5a-335aff4d9d39@redhat.com>
-References: <20170830170601.15855-1-david@redhat.com>
-	<20170830170601.15855-9-david@redhat.com>
-	<8a7e8d96-0d32-97cd-0e5a-335aff4d9d39@redhat.com>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dnJC5-0006Nh-DT
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 02:43:13 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Thu, 31 Aug 2017 14:42:50 +0800
+Message-Id: <20170831064302.14427-1-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 08/11] s390x: allow only 1 CPU with TCG
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 00/12] tests: Add VM based build tests (for
+ non-x86_64 and/or non-Linux)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +25,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>
+To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
 
-On Wed, 30 Aug 2017 21:06:55 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+v5: Generate source tar file with a script.
+    Fix tmpdir, use pwd.
+    Reduce default -j to half cores.
 
-> On 30.08.2017 19:05, David Hildenbrand wrote:
-> > Specifying more than 1 CPU (e.g. -smp 5) leads to SIGP errors (the
-> > guest tries to bring these CPUs up but fails), because we don't support
-> > multiple CPUs on s390x under TCG.
-> > 
-> > Let's bail out if more than 1 are specified, so we don't raise people's
-> > hope.  
-> 
-> Aurelien recently posted a patch to add that basic SIGP support:
-> 
->  https://patchwork.kernel.org/patch/9717489/
-> 
-> I think it would make more sense to get that included instead.
+v4: Drop unused imports and parameters. [Cleber]
+    Use --exclude-vcs (still no --exclude-vcs-ignores because it's too ne=
+w). [Philippe]
+    Use gtar if available. [Philippe, Kamil]
+    /dev/ld1a -> /dev/rld1a for netbsd. [Kamil]
+    Only use '-enable-kvm' if /dev/kvm is there. [Kamil]
+    Grammar fixes of README. [Stefan]
+    Rename image on the server to include version and arch. [Kamil]
+    Just ignore *.tmp. [Philippe]
 
-I'd look at it if it were reposted :)
+v3: Drop RFC.
+    Add Stefan's and Kamil's reviewed-bys.
+    Use optparse. [Stefan]
+    Drop the VGA patch. [Paolo, Stefan]
+    Improve exit/exit code/doc. [Stefan]
+    Drop unused line from basevm.py. [Stefan]
+    Drop "--target-list" form Makefile.
+    More intelligent '-j'.
+    Add README. [Stefan]
+
+v2: - Add docstring. [Stefan]
+    - Call self._load_io_lod. [Stefan]
+    - Use "info usernet" and dynamic ssh_port forwarding. [Stefan]
+    - Add image checksum.
+    - Use os.rename() and os.makedirs(). [Stefan]
+    - Fix NetBSD URL. [Kamil]
+
+Build tests in one 32 bit Linux guest and three BSD images are defined in=
+ this
+series. This is a more managable way than the manually maintained virtual
+machines in patchew. Also, one big advantage of ephemeral VMs over long r=
+unning
+guests is the reduced RAM usage of host, which makes it possible to have =
+one
+host test all these BSD variants and probably more.
+
+The BSD guest templates are manually prepared following
+
+https://wiki.qemu.org/Hosts/BSD
+
+as it is not easy to automate. (The ideal approach is like the ubuntu.i38=
+6
+script, which configures the guest on top of an official released image, =
+fully
+automatically.)
+
+Need for help: "gmake check" in the added OpenBSD image fails with -ENOME=
+M
+errors, even if I change "-m 2G" to "-m 8G" when starting VM. Ideas? And =
+there
+is a warning from ./configure about OpenBSD going to be unsupported in co=
+ming
+releases, is it still the case?
+
+Fam
+
+Fam Zheng (12):
+  gitignore: Ignore vm test images
+  qemu.py: Add "wait()" method
+  scripts: Add archive-source.sh
+  tests: Add vm test lib
+  tests: Add ubuntu.i386 image
+  tests: Add FreeBSD image
+  tests: Add NetBSD image
+  tests: Add OpenBSD image
+  Makefile: Add rules to run vm tests
+  MAINTAINERS: Add tests/vm entry
+  tests: Add README for vm tests
+  docker: Use archive-source.py
+
+ .gitignore                    |   2 +
+ MAINTAINERS                   |   1 +
+ Makefile                      |   2 +
+ configure                     |   2 +-
+ scripts/archive-source.sh     |  29 +++++
+ scripts/qemu.py               |   7 ++
+ tests/docker/Makefile.include |  15 +--
+ tests/docker/run              |   8 +-
+ tests/vm/Makefile.include     |  42 +++++++
+ tests/vm/README               |  63 ++++++++++
+ tests/vm/basevm.py            | 276 ++++++++++++++++++++++++++++++++++++=
+++++++
+ tests/vm/freebsd              |  42 +++++++
+ tests/vm/netbsd               |  42 +++++++
+ tests/vm/openbsd              |  43 +++++++
+ tests/vm/ubuntu.i386          |  88 ++++++++++++++
+ 15 files changed, 641 insertions(+), 21 deletions(-)
+ create mode 100755 scripts/archive-source.sh
+ create mode 100644 tests/vm/Makefile.include
+ create mode 100644 tests/vm/README
+ create mode 100755 tests/vm/basevm.py
+ create mode 100755 tests/vm/freebsd
+ create mode 100755 tests/vm/netbsd
+ create mode 100755 tests/vm/openbsd
+ create mode 100755 tests/vm/ubuntu.i386
+
+--=20
+2.13.5
