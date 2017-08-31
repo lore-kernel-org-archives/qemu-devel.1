@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dnMpg-0002rr-K7
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:36:21 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dnMpt-00033h-OR
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:36:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dnMpf-0006Tg-JB
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:36:20 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dnMpr-0006Zb-8W
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:36:33 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 31 Aug 2017 12:34:25 +0200
-Message-Id: <20170831103432.6007-23-marcandre.lureau@redhat.com>
+Date: Thu, 31 Aug 2017 12:34:28 +0200
+Message-Id: <20170831103432.6007-26-marcandre.lureau@redhat.com>
 In-Reply-To: <20170831103432.6007-1-marcandre.lureau@redhat.com>
 References: <20170831103432.6007-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 22/29] ppc: use DIV_ROUND_UP
+Subject: [Qemu-devel] [PULL 25/29] decnumber: use DIV_ROUND_UP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,46 +23,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, "open list:PowerPC" <qemu-ppc@nongnu.org>
+Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
 I used the clang-tidy qemu-round check to generate the fix:
 https://github.com/elmarco/clang-tools-extra
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- target/ppc/mem_helper.c | 2 +-
- target/ppc/translate.c  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ libdecnumber/decNumber.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
-index e6383c6bfa..a34e604db3 100644
---- a/target/ppc/mem_helper.c
-+++ b/target/ppc/mem_helper.c
-@@ -111,7 +111,7 @@ void helper_lswx(CPUPPCState *env, target_ulong addr,=
- uint32_t reg,
-                  uint32_t ra, uint32_t rb)
- {
-     if (likely(xer_bc !=3D 0)) {
--        int num_used_regs =3D (xer_bc + 3) / 4;
-+        int num_used_regs =3D DIV_ROUND_UP(xer_bc, 4);
-         if (unlikely((ra !=3D 0 && lsw_reg_in_range(reg, num_used_regs, =
-ra)) ||
-                      lsw_reg_in_range(reg, num_used_regs, rb))) {
-             raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 01233e8b6d..606b605ba0 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -2880,7 +2880,7 @@ static void gen_lswi(DisasContext *ctx)
-     }
-     if (nb =3D=3D 0)
-         nb =3D 32;
--    nr =3D (nb + 3) / 4;
-+    nr =3D DIV_ROUND_UP(nb, 4);
-     if (unlikely(lsw_reg_in_range(start, nr, ra))) {
-         gen_inval_exception(ctx, POWERPC_EXCP_INVAL_LSWX);
-         return;
+diff --git a/libdecnumber/decNumber.c b/libdecnumber/decNumber.c
+index c9e7807f87..8c197023f4 100644
+--- a/libdecnumber/decNumber.c
++++ b/libdecnumber/decNumber.c
+@@ -4775,7 +4775,7 @@ static decNumber * decDivideOp(decNumber *res,
+ 	    half=3D*up & 0x01;
+ 	    *up/=3D2;		   /* [shift] */
+ 	    if (!half) continue;
+-	    *(up-1)+=3D(DECDPUNMAX+1)/2;
++	    *(up-1)+=3DDIV_ROUND_UP(DECDPUNMAX, 2);
+ 	    }
+ 	  /* [accunits still describes the original remainder length] */
+=20
 --=20
 2.14.1.146.gd35faa819
