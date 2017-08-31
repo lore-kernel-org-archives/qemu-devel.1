@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dnNYE-0004kW-V8
+	(envelope-from <famz@redhat.com>) id 1dnNYE-0004kV-US
 	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:22:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dnNYA-0006OA-0t
+	(envelope-from <famz@redhat.com>) id 1dnNYC-0006OT-Ec
 	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:22:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52364)
+Received: from mx1.redhat.com ([209.132.183.28]:51972)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dnNY9-0006O2-RF
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:22:17 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dnNYC-0006ON-8P
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:22:20 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Thu, 31 Aug 2017 19:22:07 +0800
-Message-Id: <20170831112210.19921-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/3] docker: Add test-block
+Date: Thu, 31 Aug 2017 19:22:08 +0800
+Message-Id: <20170831112210.19921-2-famz@redhat.com>
+In-Reply-To: <20170831112210.19921-1-famz@redhat.com>
+References: <20170831112210.19921-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/3] docker: Use unconfined security profile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,23 +26,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-A few tweaks to the docker images and running commands allow us to run
-qemu-iotests in the fedora container. This will be added to the patchew test
-cases later.
+Some by default blocked syscalls are required to run tests for example
+userfaultfd.
 
-v2: Add nettle-devel because a few iotest cases blindly assumes the support is
-there.
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ tests/docker/Makefile.include | 1 +
+ 1 file changed, 1 insertion(+)
 
-Fam Zheng (3):
-  docker: Use unconfined security profile
-  docker: Add nettle-devel to fedora image
-  docker: Add test-block
-
- tests/docker/Makefile.include          |  1 +
- tests/docker/dockerfiles/fedora.docker |  1 +
- tests/docker/test-block                | 21 +++++++++++++++++++++
- 3 files changed, 23 insertions(+)
- create mode 100755 tests/docker/test-block
-
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index aaab1a4208..8ded838b20 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -145,6 +145,7 @@ docker-run: docker-qemu-src
+ 	$(call quiet-command,						\
+ 		$(SRC_PATH)/tests/docker/docker.py run 			\
+ 			$(if $(NOUSER),,-u $(shell id -u)) -t 		\
++			--security-opt seccomp=unconfined		\
+ 			$(if $V,,--rm) 					\
+ 			$(if $(DEBUG),-i,)				\
+ 			$(if $(NETWORK),$(if $(subst $(NETWORK),,1),--net=$(NETWORK)),--net=none) \
 -- 
 2.13.5
