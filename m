@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dnMoO-0001d9-Hr
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:35:01 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dnMob-0001s3-My
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:35:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1dnMoN-0005L7-JK
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:35:00 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dnMoV-0005So-VX
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:35:13 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 31 Aug 2017 12:34:08 +0200
-Message-Id: <20170831103432.6007-6-marcandre.lureau@redhat.com>
+Date: Thu, 31 Aug 2017 12:34:09 +0200
+Message-Id: <20170831103432.6007-7-marcandre.lureau@redhat.com>
 In-Reply-To: <20170831103432.6007-1-marcandre.lureau@redhat.com>
 References: <20170831103432.6007-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 05/29] i8254: use QEMU_ALIGN_DOWN
+Subject: [Qemu-devel] [PULL 06/29] pcspk: use QEMU_ALIGN_DOWN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,41 +23,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
 I used the clang-tidy qemu-round check to generate the fix:
 https://github.com/elmarco/clang-tools-extra
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- hw/timer/i8254_common.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/audio/pcspk.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/timer/i8254_common.c b/hw/timer/i8254_common.c
-index 976d5200f1..ee064aa819 100644
---- a/hw/timer/i8254_common.c
-+++ b/hw/timer/i8254_common.c
-@@ -93,7 +93,7 @@ int64_t pit_get_next_transition_time(PITChannelState *s=
-, int64_t current_time)
-         }
-         break;
-     case 2:
--        base =3D (d / s->count) * s->count;
-+        base =3D QEMU_ALIGN_DOWN(d, s->count);
-         if ((d - base) =3D=3D 0 && d !=3D 0) {
-             next_time =3D base + s->count;
-         } else {
-@@ -101,7 +101,7 @@ int64_t pit_get_next_transition_time(PITChannelState =
-*s, int64_t current_time)
-         }
-         break;
-     case 3:
--        base =3D (d / s->count) * s->count;
-+        base =3D QEMU_ALIGN_DOWN(d, s->count);
-         period2 =3D ((s->count + 1) >> 1);
-         if ((d - base) < period2) {
-             next_time =3D base + period2;
+diff --git a/hw/audio/pcspk.c b/hw/audio/pcspk.c
+index f643b122bb..0206f7399b 100644
+--- a/hw/audio/pcspk.c
++++ b/hw/audio/pcspk.c
+@@ -69,7 +69,7 @@ static inline void generate_samples(PCSpkState *s)
+         const uint32_t n =3D ((uint64_t)PIT_FREQ << 32) / m;
+=20
+         /* multiple of wavelength for gapless looping */
+-        s->samples =3D (PCSPK_BUF_LEN * PIT_FREQ / m * m / (PIT_FREQ >> =
+1) + 1) >> 1;
++        s->samples =3D (QEMU_ALIGN_DOWN(PCSPK_BUF_LEN * PIT_FREQ, m) / (=
+PIT_FREQ >> 1) + 1) >> 1;
+         for (i =3D 0; i < s->samples; ++i)
+             s->sample_buf[i] =3D (64 & (n * i >> 25)) - 32;
+     } else {
 --=20
 2.14.1.146.gd35faa819
