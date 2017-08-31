@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnSC8-0005ST-NK
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:19:57 -0400
+	(envelope-from <david@redhat.com>) id 1dnSCU-0005pI-Bf
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:20:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnSC6-0008Ot-2m
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:19:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55030)
+	(envelope-from <david@redhat.com>) id 1dnSCP-0008W5-Mb
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:20:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41758)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnSC5-0008OL-Q8
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:19:50 -0400
-References: <20170831131425.3953-1-marcandre.lureau@redhat.com>
-	<20170831131425.3953-2-marcandre.lureau@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c0fa5298-e696-0a44-429f-a5f87ed89564@redhat.com>
-Date: Thu, 31 Aug 2017 11:19:44 -0500
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dnSCP-0008Uj-G9
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:20:09 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 95F38C047B86
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 16:20:08 +0000 (UTC)
+References: <1503592308-93913-9-git-send-email-imammedo@redhat.com>
+	<1504185578-80843-1-git-send-email-imammedo@redhat.com>
+	<94cbb70c-5d33-c638-9826-277a359d178e@redhat.com>
+	<20170831160440.04b5827d@nial.brq.redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <f9058fac-b053-8347-da74-33d7eebed8c1@redhat.com>
+Date: Thu, 31 Aug 2017 18:20:06 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170831131425.3953-2-marcandre.lureau@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ieMFVq5tQWfacSwWKf0KlnSQnWuPQXoPF"
-Subject: Re: [Qemu-devel] [PATCH 2/2] .dir-locals.el: add json schema to
- auto-mode
+In-Reply-To: <20170831160440.04b5827d@nial.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11 v4 08/25] s390x: replace
+ cpu_s390x_init() with cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,91 +37,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, armbru@redhat.com, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ieMFVq5tQWfacSwWKf0KlnSQnWuPQXoPF
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: berrange@redhat.com, armbru@redhat.com,
- Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-ID: <c0fa5298-e696-0a44-429f-a5f87ed89564@redhat.com>
-Subject: Re: [PATCH 2/2] .dir-locals.el: add json schema to auto-mode
-References: <20170831131425.3953-1-marcandre.lureau@redhat.com>
- <20170831131425.3953-2-marcandre.lureau@redhat.com>
-In-Reply-To: <20170831131425.3953-2-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 31.08.2017 16:04, Igor Mammedov wrote:
+> On Thu, 31 Aug 2017 15:44:38 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> On 31.08.2017 15:19, Igor Mammedov wrote:
+>>> cpu_s390x_init() is used only *-user targets indirectly
+>>> via cpu_init() macro and has a hack to assign ids to created
+>>> cpus (I'm not sure if 'id' really matters to *-user emulation).  
+>>
+>> It only has one cpu, right? With the below mentioned patch, the default
+>> "id"/ (the cpu_addr) will be 0. So you can create one CPU without any
+>> hacks. Or can it create more than 1?
+> As I understand it creates only one cpu,
+> but then there is fork related cpu_copy() which creates a cpu
+> and the rewrites new CPUArchState with old cpu data
+> 
+>     CPUState *new_cpu = cpu_init(cpu_model);                                     
+>     CPUArchState *new_env = new_cpu->env_ptr;                                    
+>     ...                                                    
+>     memcpy(new_env, env, sizeof(CPUArchState));
+> 
+> so I couldn't decide if id is of importance for *-user target
+> (well, I'm not really interested in *-user), and opted for
+> keeping current behavior (i.e. not breaking) in this patch
+> just without cpu_s390x_init().
+> 
+> So if 'id' isn't really needed for  *-user target, hunk 2 could be
+> dropped but it ought to be another patch on top as this change isn't
+> related to the topic of this patch/series.
+>  
 
-On 08/31/2017 08:14 AM, Marc-Andr=C3=A9 Lureau wrote:
-> The json schema is more friendly to python-mode since it doesn't
-> follow strictly json (comments to start with).
+Indeed, it seems to create a new cpu for every fork. So this is necessary.
 
-I found that hard to read, and missing a key word of 'emacs'.  Maybe
-reword it as:
+-- 
 
-Under emacs, our QAPI files (.json suffix) are more friendly to edit
-under python-mode than the per-suffix default of json-mode (in part
-because of our use of comments).
+Thanks,
 
->=20
-> All schema files add file variables to set the python mode, but most
-> tests didn't. This will cover all json files now.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
-
-> +++ b/.dir-locals.el
-> @@ -2,6 +2,8 @@
->              (indent-tabs-mode . nil)))
->   (nil . ((eval . (setq auto-mode-alist (append
->                                          '(("Makefile.*" . makefile-gma=
-ke-mode)
-> -                                          ("\\.mak\\'" . makefile-gmak=
-e-mode))
-> +                                          ("\\.mak\\'" . makefile-gmak=
-e-mode)
-> +                                          ;; json schema is not pure j=
-son
-> +                                          ("\\.json\\'" . python-mode)=
-)
->                                          auto-mode-alist))))
->        ))
-
-Not sure if the comment could be worded better, maybe:
-
-;; Our .json files are QAPI, and allow more than pure json
-
-Again, the idea makes sense to me, but you may want to get feedback from
-other power emacs users.
-
-[Also, don't forget the 0/2 cover letter if you send v2]
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---ieMFVq5tQWfacSwWKf0KlnSQnWuPQXoPF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmoNyAACgkQp6FrSiUn
-Q2p5Agf/aUCEMJqztVxO1lGoW7zFQpNV2ziTp53I1UmqEI0D0NkvH16w5k6sUbBb
-TpLA6lT0iaul7xSjmgVKEDsZ3l/8lgySdYaUHIwUvtraiYN8GvwIUROm/lrQl3wK
-BCr/K6V4aMKj542coyMP8yYMBKKt1cmUCM2ob1xoavEM0XrHLlndDhz8HdUHh8Hz
-kTOm9G5aldcOZEi1q9T86hwB0KkR9K6YvLTDb3z9zVynegEx43wycSxujjI+Q4nM
-KvfpGGxhX15wxIaeHWKKc0aaBYKEhyyCxWlNLGb7jUQY2jb/sfgq3XYUmkfbUROG
-c4tm0uNQw5n/I4i1py/ADgLtqxgTng==
-=MtfC
------END PGP SIGNATURE-----
-
---ieMFVq5tQWfacSwWKf0KlnSQnWuPQXoPF--
+David
