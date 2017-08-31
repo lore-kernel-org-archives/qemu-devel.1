@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dnWu8-0002HB-3i
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 17:21:37 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dnX8W-0005n0-SZ
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 17:36:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dnWu3-0008Ms-5m
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 17:21:36 -0400
-Received: from mail-oi0-f46.google.com ([209.85.218.46]:32810)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dnWu2-0008Md-Uy
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 17:21:31 -0400
-Received: by mail-oi0-f46.google.com with SMTP id r203so7556481oih.0
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 14:21:30 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1dnX8T-0008Dh-PE
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 17:36:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47138)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dnX8T-0008Ao-Fc
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 17:36:25 -0400
+Date: Thu, 31 Aug 2017 18:36:18 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170831213618.GG7570@localhost.localdomain>
+References: <1504181068-17822-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	<1504181068-17822-2-git-send-email-douly.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJTBuyhJgVZ-A+AHatjAwPjsSv2Q-HxuF7nc1NpbWNmGnCOhVQ@mail.gmail.com>
-References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
-	<20170830082702.3011-3-Sergio.G.DelReal@gmail.com>
-	<20170830140738.GS18526@redhat.com>
-	<20170831074215.GA13619@stefanha-x1.localdomain>
-	<CABgObfYRUtdH9-7+zWx5Zur=iE_Qr5953+EOgcxRfVGnEonbmg@mail.gmail.com>
-	<CAJTBuyhJgVZ-A+AHatjAwPjsSv2Q-HxuF7nc1NpbWNmGnCOhVQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 31 Aug 2017 23:21:29 +0200
-Message-ID: <CABgObfaDtgixAEF8OPLuDf=21GiCwY3EUOPHujXPeLqYTup=Yw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 02/13] hvf: add code base from Google's
- QEMU repository
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1504181068-17822-2-git-send-email-douly.fnst@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH v5 1/3] hw/acpi-build: Fix SRAT memory
+ building in case of node 0 without RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,71 +28,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Izik Eidus <izik@veertu.com>
-Cc: vpalatin@chromium.org, qemu-devel <qemu-devel@nongnu.org>, "Hajnoczi, Stefan" <stefanha@gmail.com>, sergio.g.delreal@gmail.com
+To: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, mst@redhat.com, rth@twiddle.net
 
-Il 31 ago 2017 3:54 PM, "Izik Eidus" <izik@veertu.com> ha scritto:
+On Thu, Aug 31, 2017 at 08:04:26PM +0800, Dou Liyang wrote:
+> From: Eduardo Habkost <ehabkost@redhat.com>
+> 
+> Currently, Using the fisrt node without memory on the machine makes
+> QEMU unhappy. With this example command line:
+>   ... \
+>   -m 1024M,slots=4,maxmem=32G \
+>   -numa node,nodeid=0 \
+>   -numa node,mem=1024M,nodeid=1 \
+>   -numa node,nodeid=2 \
+>   -numa node,nodeid=3 \
+> Guest reports "No NUMA configuration found" and the NUMA topology is
+> wrong.
+> 
+> This is because when QEMU builds ACPI SRAT, it regards node 0 as the
+> default node to deal with the memory hole(640K-1M). this means the
+> node0 must have some memory(>1M), but, actually it can have no
+> memory.
+> 
+> Fix this problem by  cut out the 640K hole in the same way the PCI
+> 4G hole does. Also do some cleanup.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+> ---
+>  hw/i386/acpi-build.c | 30 +++++++++++++++++++++++-------
+>  1 file changed, 23 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 98dd424..48525a1 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2318,6 +2318,9 @@ build_tpm2(GArray *table_data, BIOSLinker *linker)
+>                   (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
+>  }
+>  
+> +#define HOLE_640K_START  (640 * 1024)
+> +#define HOLE_640K_END   (1024 * 1024)
+> +
+>  static void
+>  build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>  {
+> @@ -2373,17 +2376,30 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>      next_base = 0;
+>      numa_start = table_data->len;
+>  
+> -    numamem = acpi_data_push(table_data, sizeof *numamem);
+> -    build_srat_memory(numamem, 0, 640 * 1024, 0, MEM_AFFINITY_ENABLED);
+> -    next_base = 1024 * 1024;
+>      for (i = 1; i < pcms->numa_nodes + 1; ++i) {
+>          mem_base = next_base;
+>          mem_len = pcms->node_mem[i - 1];
+> -        if (i == 1) {
+> -            mem_len -= 1024 * 1024;
+> -        }
+>          next_base = mem_base + mem_len;
+>  
+> +        /* Cut out the 640K hole */
+> +        if (mem_base <= HOLE_640K_START &&
+> +            next_base > HOLE_640K_START) {
+> +            mem_len -= next_base - HOLE_640K_START;
+> +            if (mem_len > 0) {
+> +                numamem = acpi_data_push(table_data, sizeof *numamem);
+> +                build_srat_memory(numamem, mem_base, mem_len, i - 1,
+> +                                  MEM_AFFINITY_ENABLED);
+> +            }
+> +
+> +            /* Check for the rare case: 640K < RAM < 1M */
+> +            if (next_base <= HOLE_640K_END) {
+> +                next_base = HOLE_640K_END;
+> +                continue;
+> +            }
+> +            mem_base = HOLE_640K_END;
+> +            mem_len = next_base - HOLE_640K_END;
+> +        }
+> +
+>          /* Cut out the ACPI_PCI hole */
+>          if (mem_base <= pcms->below_4g_mem_size &&
+>              next_base > pcms->below_4g_mem_size) {
+> @@ -2395,7 +2411,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>              }
+>              mem_base = 1ULL << 32;
+>              mem_len = next_base - pcms->below_4g_mem_size;
+> -            next_base += (1ULL << 32) - pcms->below_4g_mem_size;
+> +            next_base = mem_base + mem_len;
 
-> Izik, Vincent (assuming you are the right person to contact at Google),
-> can you reply to Daniel and Stefan?
->
+Is this extra change intentional?
 
-Hi,
+I find the code more readable with it, but it should go in a
+separate patch because it is unrelated to the bug fix.
 
-What I suggest is that we will send our patch' again as gpl2+ and clean the
-entire stuff to make sure they are falling into the right copyright
-category as required by QEMU.
-
-
-That's not necessary. Just you and Vincent replying to this thread with a
-"Signed-off-by" line would be enough for Sergio to use the right license in
-his v3 submission. Sergio already made some non-trivial changes that are
-needed for inclusion in QEMU from a supportability (e.g. dirty page
-tracking for graphics) or maintainability perspective (e.g. -cpu support),
-so the simplest thing to do is to retrofit the right license to his
-submission. You can do so if you can confirm that the code you used only
-came from QEMU itself, Bochs or other GPLv2+/LGPL software (and the rest
-was written by Veertu).
-
-Google has already contributed the HAXN accelerator, so I am moderately
-optimistic that they can help with HVF too.
-
-BTW, another thing that need to be integrated in order to make this stuff
-useful is the vmnet patch's, it is apple NAT for vms that allow guests to
-have networking...
-
-
-People can always use slirp (or tap with some more effort), so these
-patches are already a minimum viable feature and pretty close to being
-mergeable. But of course any other contribution is welcome!
-
-Paolo
-
-
-(altho that it come with a trick, without certificate it
-will require root permission, while hypverisor framework itself can run
-without root)
-
-What do you guys think?
-
-
->
-> Sergio worked on completing the QEMU port to Hypervisor.framework. The
-> hvf-all.c file that Daniel pointed out as v2-only is derived from
-kvm-all.c
-> and hax-all.c, and should be under v2-or-later license. The others seem to
-> be either original or derived from Bochs, which is LGPL, so they could be
-> LGPL or GPLv2+.
->
-> Thanks,
->
-> Paolo
->
->
-> There are benefits to having this code upstream.  If they ever want to
-> rebase on qemu.git there will be less work for them.
->
-> Stefan
->
->
->
+-- 
+Eduardo
