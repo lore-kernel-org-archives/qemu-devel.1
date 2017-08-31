@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dnJOI-00019C-KB
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 02:55:52 -0400
+	(envelope-from <famz@redhat.com>) id 1dnJST-0004ab-IT
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 03:00:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dnJOE-0004NK-9J
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 02:55:50 -0400
-Resent-Message-Id: <E1dnJOE-0004NK-9J@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21349)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dnJOE-0004L1-0s
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 02:55:46 -0400
-In-Reply-To: <20170831064302.14427-1-famz@redhat.com>
-Message-ID: <150416252862.84.1244432860941087255@b5667b65043c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <famz@redhat.com>) id 1dnJSN-0005Yy-RC
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 03:00:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33064)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dnJSN-0005YB-La
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 03:00:03 -0400
+Date: Thu, 31 Aug 2017 14:59:59 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170831065959.GC14896@lemon.lan>
+References: <20170725133425.436-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 30 Aug 2017 23:55:31 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v5 00/12] tests: Add VM based build tests
- (for non-x86_64 and/or non-Linux)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170725133425.436-1-alex.bennee@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for 2.10 v2 0/6] Various docker fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, f4bug@amsat.org, kamil@netbsd.org, pbonzini@redhat.com, stefanha@redhat.com, crosa@redhat.com, alex.bennee@linaro.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA4MzEwNjQzMDIuMTQ0MjctMS1mYW16QHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2ZWxd
-IFtQQVRDSCB2NSAwMC8xMl0gdGVzdHM6IEFkZCBWTSBiYXNlZCBidWlsZCB0ZXN0cyAoZm9yIG5v
-bi14ODZfNjQgYW5kL29yIG5vbi1MaW51eCkKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9u
-ZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1p
-dHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRj
-b21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cg
-LW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVt
-YWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAg
-ZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRm
-YWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
-MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1w
-cm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE3MDgzMDE2
-MzYwOS41MDI2MC0xLXBhc2ljQGxpbnV4LnZuZXQuaWJtLmNvbSAtPiBwYXRjaGV3LzIwMTcwODMw
-MTYzNjA5LjUwMjYwLTEtcGFzaWNAbGludXgudm5ldC5pYm0uY29tCiB0IFt0YWcgdXBkYXRlXSAg
-ICAgICAgICAgIHBhdGNoZXcvMjAxNzA4MzAyMTU1MjMuMjUyNzgtMS1mNGJ1Z0BhbXNhdC5vcmcg
-LT4gcGF0Y2hldy8yMDE3MDgzMDIxNTUyMy4yNTI3OC0xLWY0YnVnQGFtc2F0Lm9yZwogKiBbbmV3
-IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTcwODMxMDY0MzAyLjE0NDI3LTEtZmFtekBy
-ZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxNzA4MzEwNjQzMDIuMTQ0MjctMS1mYW16QHJlZGhhdC5j
-b20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3YWQyZTY1OWNhIGRvY2tlcjogVXNl
-IGFyY2hpdmUtc291cmNlLnB5CjJkYzE3MGQwN2MgdGVzdHM6IEFkZCBSRUFETUUgZm9yIHZtIHRl
-c3RzCjE5MTcwYzRmZDcgTUFJTlRBSU5FUlM6IEFkZCB0ZXN0cy92bSBlbnRyeQo3N2FiMzA0Njdi
-IE1ha2VmaWxlOiBBZGQgcnVsZXMgdG8gcnVuIHZtIHRlc3RzCjRhNDFiYTdmY2QgdGVzdHM6IEFk
-ZCBPcGVuQlNEIGltYWdlCmQ2NTg2YjQ0MjMgdGVzdHM6IEFkZCBOZXRCU0QgaW1hZ2UKM2YxYTJk
-NjBjOSB0ZXN0czogQWRkIEZyZWVCU0QgaW1hZ2UKYjQxM2FiNDkyMSB0ZXN0czogQWRkIHVidW50
-dS5pMzg2IGltYWdlCjE2N2U5OTE1YTQgdGVzdHM6IEFkZCB2bSB0ZXN0IGxpYgo3NTgyNGMzZjg0
-IHNjcmlwdHM6IEFkZCBhcmNoaXZlLXNvdXJjZS5zaAozNWJmZjM3ZDIwIHFlbXUucHk6IEFkZCAi
-d2FpdCgpIiBtZXRob2QKZTU3MmIxODZkNSBnaXRpZ25vcmU6IElnbm9yZSB2bSB0ZXN0IGltYWdl
-cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMjogZ2l0aWdub3JlOiBJ
-Z25vcmUgdm0gdGVzdCBpbWFnZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMjogcWVtdS5weTogQWRk
-ICJ3YWl0KCkiIG1ldGhvZC4uLgpDaGVja2luZyBQQVRDSCAzLzEyOiBzY3JpcHRzOiBBZGQgYXJj
-aGl2ZS1zb3VyY2Uuc2guLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xMjogdGVzdHM6IEFkZCB2bSB0ZXN0
-IGxpYi4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzg1OiBGSUxFOiB0ZXN0cy92
-bS9iYXNldm0ucHk6NjA6Citzc2gtcnNhIEFBQUFCM056YUMxeWMyRUFBQUFEQVFBQkFBQUJBUUNp
-a0M0NldZdFhvdFVkMFVHUHo5NTQ3QWowS3FDNGdrK250NEJCSm04NklIZ0NEOUZ5Z1NHWDlFRnV0
-WGxoejlLWklQZzlPa2s3K0l6WFJIQ1dJMk1OdmhyY2p5cmV6S1JFbTcxejA4ajlpd2Z4WTMzNDBm
-WTJNbyswa2h3cE83YnpzZ3prbGpISUhxY09nN01ndHRQSW5WTU5IL0VmcXBnUjhFREtKdVdDQjJO
-eStFQkZOLzNkQWlmZjBYL0V2S2xlOVBVclk3MEVrU3ljbnlVUlM4SFpSZUVxajhsTjlKNWtYekE4
-RjZqQm8vMFE0MlR0djZlNGs1WWNhRHJ3bUxyQldMcmEyUENYWkxOeUhxWEVpRmtHbWRYdEExRW94
-OWdjL3A0aklYaW02eHJQTm1wTjZXeXJyRWphQ0Y1eFl2TnY4d1hrRDZ1U1d3YkhZVTI0bElBbiBx
-ZW11LXZtLWtleQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzk5OiBGSUxFOiB0
-ZXN0cy92bS9iYXNldm0ucHk6NzQ6CisgICAgICAgIHNlbGYuX3RtcGRpciA9IHRlbXBmaWxlLm1r
-ZHRlbXAocHJlZml4PSJ2bS10ZXN0LSIsIHN1ZmZpeD0iLnRtcCIsIGRpcj0iLiIpCgpXQVJOSU5H
-OiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTkwOiBGSUxFOiB0ZXN0cy92bS9iYXNldm0ucHk6
-MTY1OgorICAgICAgICBsb2dnaW5nLmRlYnVnKCJDcmVhdGluZyBhcmNoaXZlICVzIGZvciBzcmNf
-ZGlyIGRpcjogJXMiLCB0YXJmaWxlLCBzcmNfZGlyKQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNo
-YXJhY3RlcnMKIzE5NTogRklMRTogdGVzdHMvdm0vYmFzZXZtLnB5OjE3MDoKKyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAiZmlsZT0lcyxpZj1ub25lLGlkPSVzLGNhY2hlPXdyaXRlYmFjayxm
-b3JtYXQ9cmF3IiAlIFwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxOTg6IEZJ
-TEU6IHRlc3RzL3ZtL2Jhc2V2bS5weToxNzM6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-InZpcnRpby1ibGssZHJpdmU9JXMsc2VyaWFsPSVzLGJvb3RpbmRleD0xIiAlIChuYW1lLCBuYW1l
-KV0KCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMjQ1OiBGSUxFOiB0ZXN0cy92bS9i
-YXNldm0ucHk6MjIwOgorICAgIFZNIHRlc3QgdXRpbGl0eS4gIEV4aXQgY29kZXM6IDAgPSBzdWNj
-ZXNzLCAxID0gY29tbWFuZCBsaW5lIGVycm9yLCAyID0gZW52aXJvbm1lbnQgaW5pdGlhbGl6YXRp
-b24gZmFpbGVkLCAzID0gdGVzdCBjb21tYW5kIGZhaWxlZCIiIikKCldBUk5JTkc6IGxpbmUgb3Zl
-ciA4MCBjaGFyYWN0ZXJzCiMyNTI6IEZJTEU6IHRlc3RzL3ZtL2Jhc2V2bS5weToyMjc6CisgICAg
-cGFyc2VyLmFkZF9vcHRpb24oIi0tam9icyIsIHR5cGU9aW50LCBkZWZhdWx0PW11bHRpcHJvY2Vz
-c2luZy5jcHVfY291bnQoKSAvIDIsCgp0b3RhbDogMiBlcnJvcnMsIDUgd2FybmluZ3MsIDI3NiBs
-aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
-a2luZyBQQVRDSCA1LzEyOiB0ZXN0czogQWRkIHVidW50dS5pMzg2IGltYWdlLi4uCkNoZWNraW5n
-IFBBVENIIDYvMTI6IHRlc3RzOiBBZGQgRnJlZUJTRCBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCA3
-LzEyOiB0ZXN0czogQWRkIE5ldEJTRCBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCA4LzEyOiB0ZXN0
-czogQWRkIE9wZW5CU0QgaW1hZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xMjogTWFrZWZpbGU6IEFk
-ZCBydWxlcyB0byBydW4gdm0gdGVzdHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTI6IE1BSU5UQUlO
-RVJTOiBBZGQgdGVzdHMvdm0gZW50cnkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMTI6IHRlc3RzOiBB
-ZGQgUkVBRE1FIGZvciB2bSB0ZXN0cy4uLgpDaGVja2luZyBQQVRDSCAxMi8xMjogZG9ja2VyOiBV
-c2UgYXJjaGl2ZS1zb3VyY2UucHkuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
-ZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
-eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Tue, 07/25 14:34, Alex Benn=E9e wrote:
+> Hi,
+>=20
+> Phillipe pointed out a few anomalies with the travis.docker image
+> during review which has led to a couple more patches. As they are bug
+> fixes I didn't race to get a pull-req out today for hard-freeze. I
+> will roll a pull-req by the end of the week if there are no objections
+> as I'll be away for the rc1/2 cycles.
+>=20
+> Alex Benn=E9e (6):
+>   docker: ensure NOUSER for travis images
+>   docker: fix dirty/stash detection on some systems
+>   docker: ignore submodules when checking diff
+>   docker: docker.py make --no-cache skip checksum test
+>   docker: don't install device-tree-compiler build-deps in travis.docke=
+r
+>   docker: reduce noise when building travis.docker
+
+Thanks, I've queued patches 1, 4, 5, 6 for 2.11. I intend to drop the cod=
+e
+touched by 2 and 3 with a dedicated script:
+
+https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg06349.html
+https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg06358.html
+
+(It would be great if you can give some test/review there :)
+
+Fam
+
+>=20
+>  tests/docker/Makefile.include          | 3 ++-
+>  tests/docker/docker.py                 | 3 ++-
+>  tests/docker/dockerfiles/travis.docker | 6 ++++--
+>  3 files changed, 8 insertions(+), 4 deletions(-)
+>=20
+> --=20
+> 2.13.0
+>=20
