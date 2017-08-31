@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dnOwM-0000p9-FQ
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:51:23 -0400
+	(envelope-from <thuth@redhat.com>) id 1dnOyJ-0001rf-Gb
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:53:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dnOwL-0006Ss-BK
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:51:22 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:34556)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dnOwL-0006Sa-5B
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:51:21 -0400
-Received: by mail-wm0-x232.google.com with SMTP id 137so8337967wmj.1
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 05:51:20 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1dnOyG-0007NL-FV
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:53:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35756)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dnOyG-0007Mu-8G
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:53:20 -0400
+References: <20170831121828.85885-1-pasic@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <9df365ed-4c97-34b6-e739-360866929f5d@redhat.com>
+Date: Thu, 31 Aug 2017 14:53:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170830165252.13421-1-cohuck@redhat.com>
-References: <20170830165252.13421-1-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 31 Aug 2017 13:50:59 +0100
-Message-ID: <CAFEAcA_Enhiay0P2Q_jLJ1LVQzWVzUam6eCdKH+AcYVuQpw5AA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/44] first batch of s390x patches for 2.11
+In-Reply-To: <20170831121828.85885-1-pasic@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390x/css: fix cc handling for XSCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +27,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On 30 August 2017 at 17:52, Cornelia Huck <cohuck@redhat.com> wrote:
-> The following changes since commit 1ab5eb4efb91a3d4569b0df6e824cc08ab4bd8ec:
->
->   Update version for v2.10.0 release (2017-08-30 17:02:54 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/cohuck/qemu tags/s390x-20170830
->
-> for you to fetch changes up to 2f21b8d431030bcb7478ee9521bdfd3d0ef3901d:
->
->   s390x/pci: fixup trap_msix() (2017-08-30 18:23:26 +0200)
->
-> ----------------------------------------------------------------
-> First batch of s390x patches:
-> - 2.11 compat machine
-> - support the new --s390-pgste linker option, making it possible to
->   avoid enabling the global vm.allocate_pgste systl if all pieces
->   are in place
-> - correctly identify some devices as not hotpluggable
-> - clean up some tests and enable them for s390x
-> - wire up the diag288 watchdog in tcg
-> - clean up dependencies on CONFIG_PCI, making it possible to disable
->   it by hand
-> - lots of cleanup in target/s390x/
-> - fix alignment of the ccw1 structure in the s390-ccw bios
-> - and some more bugfixes
->
-> ----------------------------------------------------------------
+On 31.08.2017 14:18, Halil Pasic wrote:
+> The function ioinst_handle_xsch is presenting cc 2 when it's supposed to
+> present cc 1 and the other way around, because css_do_xsch has the error
+> codes mixed up. Because cc 1 has precedence over cc 2 we also have to
+> swap the two checks.
+> 
+> Let us fix this.
+> 
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Reported-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+> ---
+> 
+> Was previously a part of a series (due to an accident the
+> series had no name). This version also fixes the priority
+> (aka precedence) problem.
+> 
+> ---
+>  hw/s390x/css.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index 1880b1a0ff..e04e0ea3a8 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -1276,16 +1276,16 @@ int css_do_xsch(SubchDev *sch)
+>          goto out;
+>      }
+>  
+> +    if (s->ctrl & SCSW_CTRL_MASK_STCTL) {
+> +        ret = -EINPROGRESS;
+> +        goto out;
+> +    }
+> +
+>      if (!(s->ctrl & SCSW_CTRL_MASK_FCTL) ||
+>          ((s->ctrl & SCSW_CTRL_MASK_FCTL) != SCSW_FCTL_START_FUNC) ||
+>          (!(s->ctrl &
+>             (SCSW_ACTL_RESUME_PEND | SCSW_ACTL_START_PEND | SCSW_ACTL_SUSP))) ||
+>          (s->ctrl & SCSW_ACTL_SUBCH_ACTIVE)) {
+> -        ret = -EINPROGRESS;
+> -        goto out;
+> -    }
+> -
+> -    if (s->ctrl & SCSW_CTRL_MASK_STCTL) {
+>          ret = -EBUSY;
+>          goto out;
+>      }
+> 
 
-Applied, thanks.
-
--- PMM
+Reviewed-by: Thomas Huth <thuth@redhat.com>
