@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dnKFM-0003S6-Bj
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 03:50:41 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dnKIh-00044n-Jn
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 03:54:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dnKFJ-0008Ms-5u
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 03:50:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41060)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dnKFI-0008Lt-P8
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 03:50:37 -0400
-References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
-	<20170830163609.50260-3-pasic@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c319f072-2a00-992a-0dcb-ad68e6aee0a0@redhat.com>
-Date: Thu, 31 Aug 2017 09:50:32 +0200
+	(envelope-from <stefanha@gmail.com>) id 1dnKIe-00024t-HD
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 03:54:07 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:37388)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dnKIe-00024d-9Z
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 03:54:04 -0400
+Received: by mail-wm0-x233.google.com with SMTP id u26so23814874wma.0
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 00:54:04 -0700 (PDT)
+Date: Thu, 31 Aug 2017 08:54:01 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170831075401.GB13619@stefanha-x1.localdomain>
+References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
+	<20170830082702.3011-3-Sergio.G.DelReal@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170830163609.50260-3-pasic@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/9] s390x: fix invalid use of cc 1 for SSCH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170830082702.3011-3-Sergio.G.DelReal@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 02/13] hvf: add code base from Google's
+ QEMU repository
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,102 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-On 30.08.2017 18:36, Halil Pasic wrote:
-> According to the POP a start subchannel instruction (SSCH) returning with
-> cc 1 implies that the subchannel was status pending when SSCH executed.
+On Wed, Aug 30, 2017 at 03:26:51AM -0500, Sergio Andres Gomez Del Real wrote:
+> This file begins tracking the files that will be the code base for HVF
+> support in QEMU. This code base is part of Google's QEMU version of
+> their Android emulator, and can be found at
+> https://android.googlesource.com/platform/external/qemu/+/emu-master-dev
 > 
-> Due to a somewhat confusing error handling, where error codes are mapped
-> to cc value, sane looking error codes result in non AR compliant
-> behavior.
+> This code is based on Veertu Inc's vdhh (Veertu Desktop Hosted
+> Hypervisor), found at https://github.com/veertuinc/vdhh. Everything is
+> appropriately licensed under GPL v2.
 > 
-> Let's fix this! Instead of cc 1 we use cc 3 which means device not
-> operational, and is much closer to the truth in the given cases.
+> This code base already implements a very great deal of functionality,
+> although Google's version removed from Vertuu's the support for APIC
+> page and hyperv-related stuff. According to the Android Emulator Release
+> Notes, Revision 26.1.3 (August 2017), "Hypervisor.framework is now
+> enabled by default on macOS for 32-bit x86 images to improve performance
+> and macOS compatibility", although we better use with caution for, as the
+> same Revision warns us, "If you experience issues with it specifically,
+> please file a bug report...". The code hasn't seen much update in the
+> last 5 months, so I think that we can further develop the code with
+> occasional visiting Google's repository to see if there has been any
+> update.
 > 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> Acked-by: Pierre Morel<pmorel@linux.vnet.ibm.com>
+> The code's style isn't aligned to QEMU's standards; this will be fixed
+> in a subsequent patch in this series.
+> On top of this code base we are implementing the following features: fix
+> the code that passes the cpuid features to the guest; implementing dirty
+> page tracking for vga memory region; reimplementing the event injection
+> mechanism for exception injection and many other minor
+> fixes/refactoring that are documented in their respective patches.
+> 
+> Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 > ---
-> 
-> This patch turned out quite controversial. We did not reach a consensus
-> during the internal review.
-> 
-> The most of the discussion revolved around the ORB flag which
-> architecturally must be supported, but are currently not supported by
-> vfio-ccw (not yet, or can't be). The idea showing the most promise for
-> consensus was to handle this via device status (along the lines better a
-> strange acting device than a non-conform machine) but since it's a
-> radical change we decided to first discuss upstream and then do whatever
-> needs to be done.
-> ---
->  hw/s390x/css.c      | 15 ++++++---------
->  hw/s390x/s390-ccw.c |  2 +-
->  2 files changed, 7 insertions(+), 10 deletions(-)
-> 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index a50fb0727e..0822538cde 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -1034,7 +1034,7 @@ static int sch_handle_start_func_passthrough(SubchDev *sch)
->       */
->      if (!(orb->ctrl0 & ORB_CTRL0_MASK_PFCH) ||
->          !(orb->ctrl0 & ORB_CTRL0_MASK_C64)) {
-> -        return -EINVAL;
-> +        return -ENODEV;
 
-I don't really like ENODEV in this case (since the device is apparently
-there)... but well, since you're later change it again to set cc=3
-directly, I guess the temporary ENODEV is ok.
+This looks like a reasonable approach to getting Hypervisor.framework
+support.  I haven't reviewed the details but it contains all the pieces
+one would expect.
 
->      }
->  
->      ret = s390_ccw_cmd_request(orb, s, sch->driver_data);
-> @@ -1046,16 +1046,13 @@ static int sch_handle_start_func_passthrough(SubchDev *sch)
->          break;
->      case -ENODEV:
->          break;
-> +    case -EFAULT:
-> +         break;
+Which guest OSes have you booted successfully?
 
-I think you should mention this in the patch description. Why is EFAULT
-suddenly handled here?
-
->      case -EACCES:
->          /* Let's reflect an inaccessible host device by cc 3. */
-> -        ret = -ENODEV;
-> -        break;
->      default:
-> -       /*
-> -        * All other return codes will trigger a program check,
-> -        * or set cc to 1.
-> -        */
-> -       break;
-> +        /* Let's make all other return codes map to cc 3.  */
-> +        ret = -ENODEV;
->      };
->  
->      return ret;
-> @@ -1115,7 +1112,7 @@ static int do_subchannel_work(SubchDev *sch)
->      if (sch->do_subchannel_work) {
->          return sch->do_subchannel_work(sch);
->      } else {
-> -        return -EINVAL;
-> +        return -ENODEV;
->      }
->  }
->  
-> diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
-> index 8614dda6f8..2b0741741c 100644
-> --- a/hw/s390x/s390-ccw.c
-> +++ b/hw/s390x/s390-ccw.c
-> @@ -25,7 +25,7 @@ int s390_ccw_cmd_request(ORB *orb, SCSW *scsw, void *data)
->      if (cdc->handle_request) {
->          return cdc->handle_request(orb, scsw, data);
->      } else {
-> -        return -ENOSYS;
-> +        return -ENODEV;
->      }
->  }
-
- Thomas
+Stefan
