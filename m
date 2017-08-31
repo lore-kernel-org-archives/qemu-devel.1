@@ -1,27 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnL3u-0001nj-2l
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:42:55 -0400
+	(envelope-from <armbru@redhat.com>) id 1dnL3v-0001oK-8e
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:42:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnL3p-0004I2-3T
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:42:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49720)
+	(envelope-from <armbru@redhat.com>) id 1dnL3u-0004If-2h
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:42:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39258)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dnL3o-0004Hw-Qq
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:42:49 -0400
-Date: Thu, 31 Aug 2017 10:42:43 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170831104243.43cd8992.cohuck@redhat.com>
-In-Reply-To: <c8bbd500-c5b6-dd66-1e84-feb80978ee34@redhat.com>
-References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
-	<20170830163609.50260-2-pasic@linux.vnet.ibm.com>
-	<b5d3ac95-3811-c39a-c4d7-bb85dc4580e8@redhat.com>
-	<20170831083859.11694707.cohuck@redhat.com>
-	<c8bbd500-c5b6-dd66-1e84-feb80978ee34@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnL3t-0004IV-RU
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:42:54 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 558641B9856
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 08:42:52 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170825105913.4060-1-marcandre.lureau@redhat.com>
+	<20170825105913.4060-5-marcandre.lureau@redhat.com>
+	<87val5gta4.fsf@dusky.pond.sub.org>
+	<844220409.5983155.1504095111596.JavaMail.zimbra@redhat.com>
+	<8760d5dx8f.fsf@dusky.pond.sub.org>
+	<243440747.6086481.1504099179043.JavaMail.zimbra@redhat.com>
+Date: Thu, 31 Aug 2017 10:42:48 +0200
+In-Reply-To: <243440747.6086481.1504099179043.JavaMail.zimbra@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 30 Aug 2017
+	09:19:39 -0400 (EDT)")
+Message-ID: <878ti0ku0n.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/9] s390x/css: fix cc handling for XSCH
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 04/14] qlit: remove compound literals
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +39,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, =?utf-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>
 
-On Thu, 31 Aug 2017 09:32:49 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-> On 31.08.2017 08:38, Cornelia Huck wrote:
-> > On Thu, 31 Aug 2017 07:51:17 +0200
-> > Thomas Huth <thuth@redhat.com> wrote:
-> >   
-> >> On 30.08.2017 18:36, Halil Pasic wrote:  
-> >>> The function ioinst_handle_xsch is presenting cc 2 when it's supposed to
-> >>> present cc 1 and the other way around, because css_do_xsch has the error
-> >>> codes mixed up. Fixing the error codes also fixes the priority.
-> >>>
-> >>> Let us fix this.    
-> >>
-> >> (Nit: In case you respin, I'd suggest to remove the last sentence. You
-> >> already used "fix" two times in the previous one)  
-> > 
-> > I can also remove it on applying, if Halil agrees (I have not yet
-> > reviewed it, though).
-> >   
-> >>  
-> >>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> >>> Reported-by: Pierre Morel<pmorel@linux.vnet.ibm.com>    
-> >>
-> >> Space missing -------------^  
-> > 
-> > And I can also add that space on applying :)
-> >   
-> >>  
-> >>> ---
-> >>>  hw/s390x/css.c | 4 ++--
-> >>>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> >>> index 1880b1a0ff..a50fb0727e 100644
-> >>> --- a/hw/s390x/css.c
-> >>> +++ b/hw/s390x/css.c
-> >>> @@ -1281,12 +1281,12 @@ int css_do_xsch(SubchDev *sch)
-> >>>          (!(s->ctrl &
-> >>>             (SCSW_ACTL_RESUME_PEND | SCSW_ACTL_START_PEND | SCSW_ACTL_SUSP))) ||
-> >>>          (s->ctrl & SCSW_ACTL_SUBCH_ACTIVE)) {
-> >>> -        ret = -EINPROGRESS;
-> >>> +        ret = -EBUSY;
-> >>>          goto out;
-> >>>      }
-> >>>  
-> >>>      if (s->ctrl & SCSW_CTRL_MASK_STCTL) {
-> >>> -        ret = -EBUSY;
-> >>> +        ret = -EINPROGRESS;
-> >>>          goto out;
-> >>>      }    
-> >>
-> >> Using both, EBUSY and EINPROGRESS as error codes sounds very confusing
-> >> to me here ... what's the difference between busy and in-progress? So
-> >> while you're at it, maybe you could replace the code for CC 2 ("CANCEL
-> >> SUBCHANNEL not applicable") with a different error code?  
-> > 
-> > IIRC, I used these two as they matched my idea of what happens best
-> > (there's a difference between "subchannel is busy" and "the I/O is
-> > already in progress, too late to cancel"). "xsch not applicable" is
-> > very hard to translate to an Unix error code :/  
-> 
-> OK, the codes make more sense with your description ==> Maybe simply add
-> a proper comment for each of the return codes?
+> Hi
+>
+> ----- Original Message -----
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>=20
+>> > Hi
+>> >
+>> > ----- Original Message -----
+>> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>> >>=20
+>> >> > They are not considered constant expressions in C, producing an err=
+or
+>> >> > when compiling a const QLit.
+>> >>=20
+>> >> A const QLit?  Do you mean a non-const one?
+>> >
+>> > Really a const QLitObject:
+>> >
+>> >
+>> > const QLitObject qmp_schema_qlit =3D QLIT_QLIST(((QLitObject[]) {
+>> >              QLIT_QNULL,
+>> >              {}
+>> >          }));
+>> >
+>> > qmp-introspect.c:17:63: error: initializer element is not constant
+>> >   const QLitObject qmp_schema_qlit =3D QLIT_QLIST(((QLitObject[]) {
+>> >                                                                 ^
+>> > Removing the "compound literals" fixes this error.
+>>=20
+>> Does QLIT_QLIST(((const QLitObject[]) { ... } work?
+>
+> No. Even if I put "const" all over the place (in member, in compound type=
+ etc).
+>
+> Give it a try, see if you can make it const, I am out of luck.
 
-Taking a step back and looking at the other I/O instructions and their
-implementation in qemu:
+The commit message's explanation is wrong.  This isn't about const at
+all, it's about "constant expressions", which are something else
+entirely.
 
-- For those instructions that can set it, cc 1 is set when the
-  subchannel is status pending. That's usually the "default" branch in
-  ioinst.c.
-- cc 2 is set when the subchannel is "busy" (or, in the case of xsch,
-  "not applicable for xsch"... sigh) This is supposed to be handled via
-  -EBUSY.
+For what it's worth, clang is cool with the compound literals.  On
+Fedora 26 with a minimized test case (appended):
 
-So, there are actually two problems with the current implementation of
-xsch:
+    $ clang -c -g -O -Wall compound-lit.c
+    $ gcc -c -g -O -Wall compound-lit.c
+    compound-lit.c:30:37: error: initializer element is not constant
+         .value.qdict =3D (QLitDictEntry[]){
+                                         ^
+    compound-lit.c:30:37: note: (near initialization for =E2=80=98(anonymou=
+s).value=E2=80=99)
 
-- The return codes are switched around, which this patch fixes.
-- But "status pending" should also take precedence over "not
-  applicable", if I read the PoP correctly, so the second if needs to
-  be moved up.
+GCC bug or not?  A search of the GCC Bugzilla finds
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D71713
 
-And yes, it makes sense do add some comments...
+Copying a few notorious language lawyers^W^W^Wtrusted advisers.
+
+Even if this turns out to be a gcc bug, we'll have to work around it.
+But the work-around needs a comment then.
+
+In any case, the commit message needs fixing.
+
+
+
+enum {
+    QTYPE_NONE, QTYPE_QSTRING, QTYPE_QDICT,
+};
+
+typedef struct QLitDictEntry QLitDictEntry;
+typedef struct QLitObject QLitObject;
+
+struct QLitObject {
+    int type;
+    union {
+        const char *qstr;
+        QLitDictEntry *qdict;
+    } value;
+};
+
+struct QLitDictEntry {
+    const char *key;
+    QLitObject value;
+};
+
+QLitObject qlit1 =3D (QLitObject){
+    .type =3D QTYPE_QDICT,
+    .value.qdict =3D (QLitDictEntry[]){
+	{ "foo", {} },
+	{}
+    }};
+
+QLitObject qlit2 =3D (QLitObject){
+    .type =3D QTYPE_QDICT,
+    .value.qdict =3D (QLitDictEntry[]){
+	{ "foo", (QLitObject){} },
+	{}
+    }};
