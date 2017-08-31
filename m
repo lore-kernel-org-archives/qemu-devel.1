@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <izik@veertu.com>) id 1dnXfu-0006kV-KT
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:11:00 -0400
+	(envelope-from <bounces@canonical.com>) id 1dnXgb-0007Rw-CY
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:11:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <izik@veertu.com>) id 1dnXfs-0006vF-RZ
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:10:58 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:35656)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <izik@veertu.com>) id 1dnXfs-0006uj-Ff
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:10:56 -0400
-Received: by mail-wm0-x235.google.com with SMTP id v2so5652145wmf.0
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 15:10:56 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1dnXgX-0007If-BT
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:11:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33481)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dnXgX-0007HJ-2T
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:11:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dnXgV-0006DR-W9
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 22:11:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EE0802E80CB
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 22:11:35 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAEkmjvVmHJfgtek9XDb77n12B-cV4=hLNJ66zQBLwOGDg6gUHQ@mail.gmail.com>
-References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
-	<20170830082702.3011-3-Sergio.G.DelReal@gmail.com>
-	<20170830140738.GS18526@redhat.com>
-	<20170831074215.GA13619@stefanha-x1.localdomain>
-	<CABgObfYRUtdH9-7+zWx5Zur=iE_Qr5953+EOgcxRfVGnEonbmg@mail.gmail.com>
-	<CAJTBuyhJgVZ-A+AHatjAwPjsSv2Q-HxuF7nc1NpbWNmGnCOhVQ@mail.gmail.com>
-	<CABgObfaDtgixAEF8OPLuDf=21GiCwY3EUOPHujXPeLqYTup=Yw@mail.gmail.com>
-	<CAMzKsXuvdroUvT=6rjeTtM+FKHz6pat9Fgby5ayF_dZp9qaQaw@mail.gmail.com>
-	<CAEkmjvVmHJfgtek9XDb77n12B-cV4=hLNJ66zQBLwOGDg6gUHQ@mail.gmail.com>
-From: Izik Eidus <izik@veertu.com>
-Date: Fri, 1 Sep 2017 01:10:54 +0300
-Message-ID: <CAJTBuyj96Jd5Ys43sqVTR2y-Q2y-jRqSovHxRtQKGKKfezfZhg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 02/13] hvf: add code base from Google's
- QEMU repository
+Date: Thu, 31 Aug 2017 22:05:33 -0000
+From: Bruno Haible <bruno@clisp.org>
+Reply-To: Bug 1704638 <1704638@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150020341429.6222.13732739204722487038.malonedeb@gac.canonical.com>
+Message-Id: <150421713312.19576.17985714951735533224.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1704638] Re: weak symbol access makes qemu in
+ user mode hang for mips, mips64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,153 +37,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Frank Yang <lfy@google.com>
-Cc: =?UTF-8?Q?Sergio_Andr=C3=A9s_G=C3=B3mez_del_Real?= <sergio.g.delreal@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, vpalatin@chromium.org, qemu-devel <qemu-devel@nongnu.org>, "Hajnoczi,
-	Stefan" <stefanha@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>, "J. Eason" <easonj@google.com>
+To: qemu-devel@nongnu.org
 
-On Fri, Sep 1, 2017 at 1:02 AM, Frank Yang <lfy@google.com> wrote:
+The behaviour in qemu-2.10 is the same as in qemu-2.9.
 
-> + our product manager
->
-> If I understand correctly, we will need to reconsider things if I include=
-d
-> any additional technology in my port. However, I didn't include any
-> additional references/source in my port compared to Veertu, that was not =
-in
-> the qemu code already (e.g., hax-all/kvm-all) so I think we can just chan=
-ge
-> the QEMU upstream port to use gplv2+.
->
-> Izik, are you ok with this assessment?
->
+-- =
 
-Yes we are fine with changing everything to GPLv2+, I am just going over
-the code and confirm that all copyright attributions as I saw a file that
-was missing Bochs LGPLv2 copyright.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1704638
 
+Title:
+  weak symbol access makes qemu in user mode hang for mips, mips64
 
+Status in QEMU:
+  New
 
->
-> On Thu, Aug 31, 2017 at 2:41 PM, Sergio Andr=C3=A9s G=C3=B3mez del Real <
-> sergio.g.delreal@gmail.com> wrote:
->
->> Hello,
->> Mr. Frank Yang was the guy at Google that introduced the HVF port to
->> Google's Android Emulator QEMU branch.
->> Frank, in this thread we are discussing the licensing issue with the HVF
->> files (their being GPL v2-only). Paolo from Red Hat was asking to Veertu
->> developer Izik Eidus if the code in Veertu derived only from QEMU, Bochs
->> and other GPLv2+ or LGPL software. Because the code at Google was itself
->> derived from Veertu, I'd imagine the same licensing terms would apply in
->> your case. Any light you can throw over this issue would be much
->> appreciated.
->>
->> Thank you.
->>
->> On Thu, Aug 31, 2017 at 4:21 PM, Paolo Bonzini <pbonzini@redhat.com>
->> wrote:
->>
->>> Il 31 ago 2017 3:54 PM, "Izik Eidus" <izik@veertu.com> ha scritto:
->>>
->>> > Izik, Vincent (assuming you are the right person to contact at Google=
-),
->>> > can you reply to Daniel and Stefan?
->>> >
->>>
->>> Hi,
->>>
->>> What I suggest is that we will send our patch' again as gpl2+ and clean
->>> the
->>> entire stuff to make sure they are falling into the right copyright
->>> category as required by QEMU.
->>>
->>>
->>> That's not necessary. Just you and Vincent replying to this thread with
->>> a "Signed-off-by" line would be enough for Sergio to use the right lice=
-nse
->>> in his v3 submission. Sergio already made some non-trivial changes that=
- are
->>> needed for inclusion in QEMU from a supportability (e.g. dirty page
->>> tracking for graphics) or maintainability perspective (e.g. -cpu suppor=
-t),
->>> so the simplest thing to do is to retrofit the right license to his
->>> submission. You can do so if you can confirm that the code you used onl=
-y
->>> came from QEMU itself, Bochs or other GPLv2+/LGPL software (and the res=
-t
->>> was written by Veertu).
->>>
->>> Google has already contributed the HAXN accelerator, so I am moderately
->>> optimistic that they can help with HVF too.
->>>
->>> BTW, another thing that need to be integrated in order to make this stu=
-ff
->>> useful is the vmnet patch's, it is apple NAT for vms that allow guests =
-to
->>> have networking...
->>>
->>>
->>> People can always use slirp (or tap with some more effort), so these
->>> patches are already a minimum viable feature and pretty close to being
->>> mergeable. But of course any other contribution is welcome!
->>>
->>
-> That's what we do with networking in HVF for android emulator, btw; use
-> slirp.
->
+Bug description:
+  A program that is statically linked and invokes a weak pointer should
+  crash (because the weak pointer evaluates to NULL).
 
+  With qemu in user mode, for mips and mips64, it hangs. The process
+  needs to be killed with "kill -9".
 
-Yes, you guys can use our vmnet implemantion together proxy that we are
-having to allow to run it without root, I think this proxy is making sense
-for the android users as they won't required root, but for QEMU I think
-only the vmnet implemantion will be wanted.
-after this stuff will get merged we will send the vmnet stuff as GPLv2+ as
-now it is GPLv2/GPLv3.
+  How to reproduce for mips:
+  - Compile the program: mips-linux-gnu-gcc-5 -O -Wall -static -o testpthsi=
+gmask-mips testpthsigmask.c -pthread
+  - Set environment variables for running qemu-mips.
+  - ~/inst-qemu/2.9.0/bin/qemu-mips testpthsigmask-mips
 
-(BTW, I am pretty sure the copyright message that include GPLv2/GPLv3 and
-created all this mess was taken from QEMU itself ... :))
+  How to reproduce for mips64:
+  - Compile the program: mips64-linux-gnuabi64-gcc-5 -O -Wall -static -o te=
+stpthsigmask-mips64 testpthsigmask.c -lpthread
+  - Set environment variables for running qemu-mips64.
+  - ~/inst-qemu/2.9.0/bin/qemu-mips64 testpthsigmask-mips64
 
+  When I attach gdb to the process, I see that it is hanging inside
+  'gen_intermediate_code':
 
->
->
->>
->>> Paolo
->>>
->>>
->>> (altho that it come with a trick, without certificate it
->>> will require root permission, while hypverisor framework itself can run
->>> without root)
->>>
->>> What do you guys think?
->>>
->>>
->>> >
->>> > Sergio worked on completing the QEMU port to Hypervisor.framework. Th=
-e
->>> > hvf-all.c file that Daniel pointed out as v2-only is derived from
->>> kvm-all.c
->>> > and hax-all.c, and should be under v2-or-later license. The others
->>> seem to
->>> > be either original or derived from Bochs, which is LGPL, so they coul=
-d
->>> be
->>> > LGPL or GPLv2+.
->>> >
->>> > Thanks,
->>> >
->>> > Paolo
->>> >
->>> >
->>> > There are benefits to having this code upstream.  If they ever want t=
-o
->>> > rebase on qemu.git there will be less work for them.
->>> >
->>> > Stefan
->>> >
->>> >
->>> >
->>>
->>>
->>>
->>
->
+  $ gdb /home/bruno/inst-qemu/2.9.0/bin/qemu-mips 9726
+  ...
+  Reading symbols from /home/bruno/inst-qemu/2.9.0/bin/qemu-mips...done.
+  Attaching to program: /home/bruno/inst-qemu/2.9.0/bin/qemu-mips, process =
+9726
+  ...
+  (gdb) info threads
+    Id   Target Id         Frame =
+
+  * 1    Thread 0x7f1e7e535740 (LWP 9726) "qemu-mips" __lll_lock_wait () at=
+ ../sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:135
+    2    Thread 0x7f1e7d0ad700 (LWP 9727) "qemu-mips" syscall () at ../sysd=
+eps/unix/sysv/linux/x86_64/syscall.S:38
+  (gdb) where
+  #0  __lll_lock_wait () at ../sysdeps/unix/sysv/linux/x86_64/lowlevellock.=
+S:135
+  #1  0x00007f1e7d6f1dbd in __GI___pthread_mutex_lock (mutex=3Dmutex@entry=
+=3D0x55de1c7ff830 <tcg_ctx+272>) at ../nptl/pthread_mutex_lock.c:80
+  #2  0x000055de1c527199 in qemu_mutex_lock (mutex=3Dmutex@entry=3D0x55de1c=
+7ff830 <tcg_ctx+272>)
+      at /media/develdata/devel/build/qemu-2.9.0/util/qemu-thread-posix.c:60
+  #3  0x000055de1c435083 in tb_lock () at /media/develdata/devel/build/qemu=
+-2.9.0/translate-all.c:167
+  #4  cpu_restore_state (cpu=3Dcpu@entry=3D0x55de1e915cb0, retaddr=3Dretadd=
+r@entry=3D94412445741769) at /media/develdata/devel/build/qemu-2.9.0/transl=
+ate-all.c:350
+  #5  0x000055de1c4658d0 in handle_cpu_signal (old_set=3D0x7ffe5ffd8ea8, is=
+_write=3D0, address=3D0, pc=3D94412445741767)
+      at /media/develdata/devel/build/qemu-2.9.0/user-exec.c:124
+  #6  cpu_mips_signal_handler (host_signum=3Dhost_signum@entry=3D11, pinfo=
+=3Dpinfo@entry=3D0x7ffe5ffd8eb0, puc=3Dpuc@entry=3D0x7ffe5ffd8d80)
+      at /media/develdata/devel/build/qemu-2.9.0/user-exec.c:229
+  #7  0x000055de1c4803be in host_signal_handler (host_signum=3D11, info=3D0=
+x7ffe5ffd8eb0, puc=3D0x7ffe5ffd8d80)
+      at /media/develdata/devel/build/qemu-2.9.0/linux-user/signal.c:646
+  #8  <signal handler called>
+  #9  __bswap_32 (__bsx=3D<optimized out>) at /usr/include/x86_64-linux-gnu=
+/bits/byteswap.h:47
+  #10 bswap32 (x=3D<optimized out>) at /media/develdata/devel/build/qemu-2.=
+9.0/include/qemu/bswap.h:21
+  #11 ldl_be_p (ptr=3D<optimized out>) at /media/develdata/devel/build/qemu=
+-2.9.0/include/qemu/bswap.h:434
+  #12 cpu_ldl_code (env=3D0x55de1e91df48, ptr=3D0) at /media/develdata/deve=
+l/build/qemu-2.9.0/include/exec/cpu_ldst_useronly_template.h:68
+  #13 gen_intermediate_code (env=3Denv@entry=3D0x55de1e91df48, tb=3Dtb@entr=
+y=3D0x7f1e7b288e58)
+      at /media/develdata/devel/build/qemu-2.9.0/target/mips/translate.c:19=
+962
+  #14 0x000055de1c4352e6 in tb_gen_code (cpu=3Dcpu@entry=3D0x55de1e915cb0, =
+pc=3Dpc@entry=3D0, cs_base=3Dcs_base@entry=3D0, flags=3Dflags@entry=3D162, =
+cflags=3D<optimized out>, =
+
+      cflags@entry=3D0) at /media/develdata/devel/build/qemu-2.9.0/translat=
+e-all.c:1295
+  #15 0x000055de1c436a7a in tb_find (tb_exit=3D0, last_tb=3D0x0, cpu=3D<opt=
+imized out>) at /media/develdata/devel/build/qemu-2.9.0/cpu-exec.c:365
+  #16 cpu_exec (cpu=3D<optimized out>) at /media/develdata/devel/build/qemu=
+-2.9.0/cpu-exec.c:673
+  #17 0x000055de1c466278 in cpu_loop (env=3D0x55de1e91df48) at /media/devel=
+data/devel/build/qemu-2.9.0/linux-user/main.c:2236
+  #18 0x000055de1c433103 in main (argc=3D<optimized out>, argv=3D0x7ffe5ffd=
+9de8, envp=3D<optimized out>)
+      at /media/develdata/devel/build/qemu-2.9.0/linux-user/main.c:4860
+  (gdb) thread 2
+  [Switching to thread 2 (Thread 0x7f1e7d0ad700 (LWP 9727))]
+  #0  syscall () at ../sysdeps/unix/sysv/linux/x86_64/syscall.S:38
+  38      ../sysdeps/unix/sysv/linux/x86_64/syscall.S: Datei oder Verzeichn=
+is nicht gefunden.
+  (gdb) where
+  #0  syscall () at ../sysdeps/unix/sysv/linux/x86_64/syscall.S:38
+  #1  0x000055de1c527605 in qemu_futex_wait (val=3D<optimized out>, f=3D<op=
+timized out>) at /media/develdata/devel/build/qemu-2.9.0/include/qemu/futex=
+.h:26
+  #2  qemu_event_wait (ev=3Dev@entry=3D0x55de1e82c124 <rcu_call_ready_event=
+>) at /media/develdata/devel/build/qemu-2.9.0/util/qemu-thread-posix.c:399
+  #3  0x000055de1c52d41e in call_rcu_thread (opaque=3D<optimized out>) at /=
+media/develdata/devel/build/qemu-2.9.0/util/rcu.c:249
+  #4  0x00007f1e7d6ef6ba in start_thread (arg=3D0x7f1e7d0ad700) at pthread_=
+create.c:333
+  #5  0x00007f1e7d4253dd in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
+lone.S:109
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1704638/+subscriptions
