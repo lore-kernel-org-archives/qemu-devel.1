@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dnXpj-0004W5-KG
+	(envelope-from <bounces@canonical.com>) id 1dnXpj-0004W6-Ke
 	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:21:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dnXpg-0005KI-VW
+	(envelope-from <bounces@canonical.com>) id 1dnXpg-0005Jv-EP
 	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:21:07 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34702)
+Received: from indium.canonical.com ([91.189.90.7]:34690)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dnXpg-0005Jd-PY
+	id 1dnXpg-0005J0-7y
 	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:21:04 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dnXpd-0007pV-97
+	id 1dnXpc-0007po-N8
 	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 22:21:01 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D408B2E80E5
+	by loganberry.canonical.com (Postfix) with ESMTP id 7A0C82E80E1
 	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 22:20:54 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 31 Aug 2017 22:07:19 -0000
+Date: Thu, 31 Aug 2017 22:10:50 -0000
 From: Bruno Haible <bruno@clisp.org>
-Reply-To: Bug 1704658 <1704658@bugs.launchpad.net>
+Reply-To: Bug 1705118 <1705118@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150022185647.5906.17655055691802268187.malonedeb@gac.canonical.com>
-Message-Id: <150421723990.16601.740739165159803400.malone@gac.canonical.com>
+References: <150041005567.6544.17518405784140614257.malonedeb@gac.canonical.com>
+Message-Id: <150421745058.16565.15253930583696417412.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1704658] Re: O_CLOEXEC not handled in dup3 system
- call in user mode
+Subject: [Qemu-devel] [Bug 1705118] Re: qemu user mode does not support
+ catching SIGSEGV on some architectures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,36 +45,75 @@ The behaviour in qemu-2.10 is the same as in qemu-2.9.
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1704658
+https://bugs.launchpad.net/bugs/1705118
 
 Title:
-  O_CLOEXEC not handled in dup3 system call in user mode
+  qemu user mode does not support catching SIGSEGV on some architectures
 
 Status in QEMU:
   New
 
 Bug description:
-  In qemu user mode, for hppa and sparc64 targets, the parameter of the
-  dup3 is not passed correctly when it contains the O_CLOEXEC flag.
+  The documentation
+  <https://qemu.weilnetz.de/doc/qemu-doc.html#Features> says that
+  qemu in user mode supports POSIX signal handling.
 
-  When the attached program runs, the expected output is:
-  errno=3D9=3DEBADF
+  Catching SIGSEGV according to POSIX, however, does not work on
+    ppc, ppc64, ppc64le, s390x, sparc64.
+  It does work, however, on
+    aarch64, alpha, arm, hppa, m68k, mips, mips64, sh4.
 
-  How to reproduce on hppa:
-  - Compile the program: hppa-linux-gnu-gcc-5 -O -Wall -static testdup3.c -=
-o testdup3-hppa
-  - Set environment variables for running qemu-hppa.
-  - ~/inst-qemu/2.9.0/bin/qemu-hppa testdup3-hppa
-  errno=3D22=3DEINVAL
-  testdup3.c:54: assertion 'errno =3D=3D EBADF' failed
+  How to reproduce:
+  The attached program runs fine (exits with code 0) on
+    - real hardware Linux/PowerPC64 (in 32-bit and 64-bit mode),
+    - real hardware Linux/PowerPC64LE,
+    - qemu-system-s390x emulated Linux/s390x,
+    - real hardware Linux/SPARC64.
+  $ gcc -O -Wall testsigsegv.c; ./a.out; echo $?
+  0
 
-  How to reproduce on sparc64:
-  - Compile the program: sparc64-linux-gnu-gcc-5 -O -Wall -static testdup3.=
-c -o testdup3-sparc64
-  - Set environment variables for running qemu-sparc64.
-  - ~/inst-qemu/2.9.0/bin/qemu-sparc64 testdup3-sparc64
-  errno=3D22=3DEINVAL
-  testdup3.c:54: assertion 'errno =3D=3D EBADF' failed
+  For ppc:
+  $ powerpc-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-p=
+pc
+  $ ~/inst-qemu/2.9.0/bin/qemu-ppc testsigsegv-ppc
+  $ echo $?
+  3
+
+  For ppc64:
+  $ powerpc64-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv=
+-ppc64
+  $ ~/inst-qemu/2.9.0/bin/qemu-ppc64 testsigsegv-ppc64
+  $ echo $?
+  3
+
+  For ppc64le:
+  $ powerpc64le-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigse=
+gv-ppc64le
+  $ ~/inst-qemu/2.9.0/bin/qemu-ppc64le testsigsegv-ppc64le
+  $ echo $?
+  3
+
+  For s390x:
+  $ s390x-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-s39=
+0x
+  $ ~/inst-qemu/2.9.0/bin/qemu-s390x testsigsegv-s390x
+  $ echo $?
+  3
+  $ s390x-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -DAVOID_LINUX_S390=
+X_COMPAT -o testsigsegv-s390x-a
+  $ ~/inst-qemu/2.9.0/bin/qemu-s390x testsigsegv-s390x-a
+  $ echo $?
+  0
+  So, the test fails here because the Linux/s390x kernel omits the least
+  significant 12 bits of the fault address in the 'si_addr' field. But
+  qemu-s390x is not compatible with the Linux/s390x behaviour: it puts
+  the complete fault address in the 'si_addr' field.
+
+  For sparc64:
+  $ sparc64-linux-gnu-gcc-5 -O -Wall -static testsigsegv.c -o testsigsegv-s=
+parc64
+  $ ~/inst-qemu/2.9.0/bin/qemu-sparc64 testsigsegv-sparc64
+  Segmentation fault (core dumped)
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1704658/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1705118/+subscriptions
