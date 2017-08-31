@@ -1,41 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dnLTl-0007Kc-Gw
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:09:38 -0400
+	(envelope-from <thuth@redhat.com>) id 1dnLXq-00005N-Es
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:13:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dnLTh-0004hI-DM
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:09:37 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52354
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dnLTh-0004gs-7G
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:09:33 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v7V94Mh0059589
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 05:09:32 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2cpca8jrxm-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 05:09:32 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 31 Aug 2017 10:09:30 +0100
-References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
-	<20170830163609.50260-2-pasic@linux.vnet.ibm.com>
-	<b5d3ac95-3811-c39a-c4d7-bb85dc4580e8@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 31 Aug 2017 11:09:28 +0200
+	(envelope-from <thuth@redhat.com>) id 1dnLXn-0006A0-5O
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:13:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56016)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dnLXm-00069g-VV
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:13:47 -0400
+References: <20170830170601.15855-1-david@redhat.com>
+	<20170830170601.15855-5-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <782fdf4f-084e-9fcb-f788-d2f0c7f5340c@redhat.com>
+Date: Thu, 31 Aug 2017 11:13:40 +0200
 MIME-Version: 1.0
-In-Reply-To: <b5d3ac95-3811-c39a-c4d7-bb85dc4580e8@redhat.com>
+In-Reply-To: <20170830170601.15855-5-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <4e253d22-8b62-aaf8-f0ff-609853caf22c@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/9] s390x/css: fix cc handling for XSCH
+Subject: Re: [Qemu-devel] [PATCH v1 04/11] s390x: get rid of s390-virtio.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,70 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
 
-
-
-On 08/31/2017 07:51 AM, Thomas Huth wrote:
-> On 30.08.2017 18:36, Halil Pasic wrote:
->> The function ioinst_handle_xsch is presenting cc 2 when it's supposed to
->> present cc 1 and the other way around, because css_do_xsch has the error
->> codes mixed up. Fixing the error codes also fixes the priority.
->>
->> Let us fix this.
+On 30.08.2017 19:05, David Hildenbrand wrote:
+> It is a leftover from the days where we had still the !ccw virtio
+> machine. As this one is long gone, let's move everything to
+> s390-virtio-ccw.c.
 > 
-> (Nit: In case you respin, I'd suggest to remove the last sentence. You
-> already used "fix" two times in the previous one)
-> 
->> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->> Reported-by: Pierre Morel<pmorel@linux.vnet.ibm.com>
-> 
-> Space missing -------------^
-> 
+> Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+[...]
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index ffd56af834..41a9e976dc 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+[...]
+> +static int gtod_load(QEMUFile *f, void *opaque, int version_id)
+> +{
+> +    uint64_t tod_low;
+> +    uint8_t tod_high;
+> +    int r;
+> +
+> +    if (qemu_get_byte(f) == S390_TOD_CLOCK_VALUE_MISSING) {
+> +        fprintf(stderr, "WARNING: Guest clock was not migrated. This could "
+> +                        "cause the guest to hang.\n");
+> +        return 0;
+> +    }
+> +
+> +    tod_high = qemu_get_byte(f);
+> +    tod_low = qemu_get_be64(f);
+> +
+> +    r = s390_set_clock(&tod_high, &tod_low);
+> +    if (r) {
+> +        fprintf(stderr, "WARNING: Unable to set guest clock value. "
+> +                        "s390_get_clock returned error %d. This could cause "
+> +                        "the guest to hang.\n", r);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +
 
-copy-paste :(
+Nit: One empty line should be enough here.
 
->> ---
->>  hw/s390x/css.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
->> index 1880b1a0ff..a50fb0727e 100644
->> --- a/hw/s390x/css.c
->> +++ b/hw/s390x/css.c
->> @@ -1281,12 +1281,12 @@ int css_do_xsch(SubchDev *sch)
->>          (!(s->ctrl &
->>             (SCSW_ACTL_RESUME_PEND | SCSW_ACTL_START_PEND | SCSW_ACTL_SUSP))) ||
->>          (s->ctrl & SCSW_ACTL_SUBCH_ACTIVE)) {
->> -        ret = -EINPROGRESS;
->> +        ret = -EBUSY;
->>          goto out;
->>      }
->>  
->>      if (s->ctrl & SCSW_CTRL_MASK_STCTL) {
->> -        ret = -EBUSY;
->> +        ret = -EINPROGRESS;
->>          goto out;
->>      }
-> 
-> Using both, EBUSY and EINPROGRESS as error codes sounds very confusing
-> to me here ... what's the difference between busy and in-progress? So
-> while you're at it, maybe you could replace the code for CC 2 ("CANCEL
-> SUBCHANNEL not applicable") with a different error code?
-> 
->  Thomas
-> 
-
-Well, the idea of the series is to get rid of these artificial error codes,
-so your concern of using EBUSY and EINPROGRESS will be dealt with in patch
-5.
-
-The idea was to first do the fixes and then do the transformation without
-changing behavior.
-
-Thanks for having a look!
-
-Regards,
-
-Halil
+Reviewed-by: Thomas Huth <thuth@redhat.com>
