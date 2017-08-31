@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dnLbQ-0002Sz-7l
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:17:33 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dnLcI-0002tA-AP
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:18:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dnLbM-0007hp-US
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:17:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51116)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dnLbM-0007hg-LQ
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:17:28 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CB327267D5
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 09:17:27 +0000 (UTC)
-Date: Thu, 31 Aug 2017 10:17:23 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170831091723.GC17315@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170830135611.27678-1-berrange@redhat.com>
-	<baf58715-49f6-6608-d469-062086c4fdd0@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1dnLcF-0007vP-1Y
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:18:26 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:36391)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dnLcE-0007uY-Rf
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:18:22 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id p14so414764wrg.3
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 02:18:21 -0700 (PDT)
+Date: Thu, 31 Aug 2017 10:18:17 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170831091817.GG13619@stefanha-x1.localdomain>
+References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
+	<20170830082702.3011-12-Sergio.G.DelReal@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <baf58715-49f6-6608-d469-062086c4fdd0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] io: add new qio_channel_{readv, writev,
- read, write}_all functions
+In-Reply-To: <20170830082702.3011-12-Sergio.G.DelReal@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 11/13] hvf: move fields from CPUState to
+ CPUX86State
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,131 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-On Wed, Aug 30, 2017 at 02:34:59PM -0500, Eric Blake wrote:
-> On 08/30/2017 08:56 AM, Daniel P. Berrange wrote:
-> > These functions wait until they are able to read / write the full
-> > requested data buffer(s).
-> > 
-> 
-> Hmm, sounds like the NBD code would benefit from using this in a
-> followup patch.
-> 
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> > 
-> > This patch combines these two previous proposals:
-> > 
-> >  - https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg01536.html
-> >  - https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg04041.html
-> > 
-> > and switches the test suite over to use the new APIs so we get
-> > coverage by all the tests/test-io-channel-*  test programs
-> > 
-> 
-> >  /**
-> > + * qio_channel_readv_all:
-> > + * @ioc: the channel object
-> > + * @iov: the array of memory regions to read data into
-> > + * @niov: the length of the @iov array
-> > + * @errp: pointer to a NULL-initialized error object
-> > + *
-> > + * Read data from the IO channel, storing it in the
-> > + * memory regions referenced by @iov. Each element
-> > + * in the @iov will be fully populated with data
-> > + * before the next one is used. The @niov parameter
-> > + * specifies the total number of elements in @iov.
-> > + *
-> > + * The function will wait for all requested data
-> > + * to be read, yielding from the current couroutine
-> 
-> s/couroutine/coroutine/
-> 
-> > + * if required.
-> > + *
-> > + * If end-of-file occurrs before all requested data
-> 
-> s/occurrs/occurs/
-> 
-> > + * has been read, an error will be reported.
-> > + *
-> > + * Returns: 0 if all bytes were read, or -1 on error
-> > + */
-> 
-> > +/**
-> > + * qio_channel_writev_all:
-> > + * @ioc: the channel object
-> > + * @iov: the array of memory regions to write data from
-> > + * @niov: the length of the @iov array
-> > + * @errp: pointer to a NULL-initialized error object
-> > + *
-> > + * Write data to the IO channel, reading it from the
-> > + * memory regions referenced by @iov. Each element
-> > + * in the @iov will be fully sent, before the next
-> > + * one is used. The @niov parameter specifies the
-> > + * total number of elements in @iov.
-> > + *
-> > + * The function will wait for all requested data
-> > + * to be written, yielding from the current couroutine
-> 
-> s/couroutine/coroutine/
-> 
-> > +++ b/io/channel.c
-> 
-> > +int qio_channel_readv_all(QIOChannel *ioc,
-> 
-> > +    while (nlocal_iov > 0) {
-> > +        ssize_t len;
-> > +        len = qio_channel_readv(ioc, local_iov, nlocal_iov, errp);
-> > +        if (len == QIO_CHANNEL_ERR_BLOCK) {
-> > +            qio_channel_wait(ioc, G_IO_IN);
-> > +            continue;
-> > +        } else if (len < 0) {
-> > +            error_setg_errno(errp, EIO,
-> > +                             "Channel was not able to read full iov");
-> 
-> Should we report -len instead of EIO here?
+On Wed, Aug 30, 2017 at 03:27:00AM -0500, Sergio Andres Gomez Del Real wrote:
+> @@ -1187,11 +1190,15 @@ typedef struct CPUX86State {
+>      int32_t interrupt_injected;
+>      uint8_t soft_interrupt;
+>      uint8_t has_error_code;
+> +    uint32_t ins_len;
 
-No, QIO methods never return errno values, since channel implementations
-are not guaranteed to be calling commands that return errnos. eg the
-TLS wrapper calls gnutls which has no errno values reported.
+This field seems unused in this patch?
 
-If fact, though, we should just not call error_setg_errno() at all,
-since the qio_channel_readv method has already populated 'errp'.
+> @@ -678,15 +687,15 @@ int hvf_init_vcpu(CPUState *cpu)
+>      sigdelset(&set, SIG_IPI);
+>  
+>      int r;
+> -    init_emu(cpu);
+> -    init_decoder(cpu);
+> +    init_emu();
+> +    init_decoder();
+>      init_cpuid(cpu);
+>  
+>      hvf_state->hvf_caps = (struct hvf_vcpu_caps *)g_malloc0(sizeof(struct hvf_vcpu_caps));
+> -    cpu->hvf_x86 = (struct hvf_x86_state *)g_malloc0(sizeof(struct hvf_x86_state));
+> +    env->hvf_emul = (HVFX86EmulatorState *)g_malloc0(sizeof(HVFX86EmulatorState));
 
-> 
-> > +int qio_channel_writev_all(QIOChannel *ioc,
-> 
-> > +    while (nlocal_iov > 0) {
-> > +        ssize_t len;
-> > +        len = qio_channel_writev(ioc, local_iov, nlocal_iov, errp);
-> > +        if (len == QIO_CHANNEL_ERR_BLOCK) {
-> > +            qio_channel_wait(ioc, G_IO_OUT);
-> > +            continue;
-> > +        }
-> > +        if (len < 0) {
-> > +            error_setg_errno(errp, EIO,
-> > +                             "Channel was not able to write full iov");
-> 
-> and again
-> 
-> With the typos fixed, and either an explanation why EIO is better or
-> else a fix to preserve errno,
+Please use g_new0().  The cast isn't necessary because the C compiler
+casts void * to any other pointer type without a warning:
 
-Again, we should not call error_setg_errno at all, since errp is
-already populated.
+  env->hvf_emul = g_new0(HVFX86EmulatorState, 1);
 
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+>  
+>      r = hv_vcpu_create((hv_vcpuid_t *)&cpu->hvf_fd, HV_VCPU_DEFAULT);
+> -    cpu->hvf_vcpu_dirty = 1;
+> +    cpu->vcpu_dirty = 1;
 
+cpu->vcpu_dirty is bool.  Please use true/false consistently instead of
+1/0.
 
+> @@ -356,13 +356,14 @@ typedef struct x68_segment_selector {
+>      };
+>  } __attribute__ ((__packed__)) x68_segment_selector;
+>  
+> -/* Definition of hvf_x86_state is here */
+> -struct hvf_x86_state {
+> -    int hlt;
+> -    uint64_t init_tsc;
+> +typedef struct lazy_flags {
+> +    addr_t result;
+> +    addr_t auxbits;
+> +} lazy_flags;
+>  
+> +/* Definition of hvf_x86_state is here */
 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+hvf_x86_state no longer exists.  This comment is outdated now?
