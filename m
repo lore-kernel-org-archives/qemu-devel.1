@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dnNHy-0006bc-IE
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:05:40 -0400
+	(envelope-from <berrange@redhat.com>) id 1dnNI1-0006ea-BU
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:05:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dnNHx-0007dC-Bm
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:05:34 -0400
+	(envelope-from <berrange@redhat.com>) id 1dnNHv-0007bD-55
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:05:37 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 31 Aug 2017 12:05:16 +0100
-Message-Id: <20170831110518.10741-3-berrange@redhat.com>
+Date: Thu, 31 Aug 2017 12:05:15 +0100
+Message-Id: <20170831110518.10741-2-berrange@redhat.com>
 In-Reply-To: <20170831110518.10741-1-berrange@redhat.com>
 References: <20170831110518.10741-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/4] block: use BDRV_SECTOR_SIZE in crypto
- driver
+Subject: [Qemu-devel] [PATCH v2 1/4] block: use 1 MB bounce buffers for
+ crypto instead of 16KB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,118 +23,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
+Using 16KB bounce buffers creates a significant performance
+penalty for I/O to encrypted volumes on storage which high
+I/O latency (rotating rust & network drives), because it
+triggers lots of fairly small I/O operations.
+
+On tests with rotating rust, and cache=none|directsync,
+write speed increased from 2MiB/s to 32MiB/s, on a par
+with that achieved by the in-kernel luks driver. With
+other cache modes the in-kernel driver is still notably
+faster because it is able to report completion of the
+I/O request before any encryption is done, while the
+in-QEMU driver must encrypt the data before completion.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- block/crypto.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+ block/crypto.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
 diff --git a/block/crypto.c b/block/crypto.c
-index cc8afe0e0d..e63f094379 100644
+index 58ef6f2f52..cc8afe0e0d 100644
 --- a/block/crypto.c
 +++ b/block/crypto.c
-@@ -392,16 +392,16 @@ block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
-     QEMUIOVector hd_qiov;
-     int ret = 0;
-     size_t payload_offset =
--        qcrypto_block_get_payload_offset(crypto->block) / 512;
-+        qcrypto_block_get_payload_offset(crypto->block) / BDRV_SECTOR_SIZE;
+@@ -379,7 +379,7 @@ static void block_crypto_close(BlockDriverState *bs)
+ }
+ 
+ 
+-#define BLOCK_CRYPTO_MAX_SECTORS 32
++#define BLOCK_CRYPTO_MAX_SECTORS 2048
+ 
+ static coroutine_fn int
+ block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
+@@ -396,9 +396,8 @@ block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
  
      qemu_iovec_init(&hd_qiov, qiov->niov);
  
-     /* Bounce buffer because we don't wish to expose cipher text
-      * in qiov which points to guest memory.
+-    /* Bounce buffer so we have a linear mem region for
+-     * entire sector. XXX optimize so we avoid bounce
+-     * buffer in case that qiov->niov == 1
++    /* Bounce buffer because we don't wish to expose cipher text
++     * in qiov which points to guest memory.
       */
--    cipher_data =
--        qemu_try_blockalign(bs->file->bs, MIN(BLOCK_CRYPTO_MAX_SECTORS * 512,
--                                              qiov->size));
-+    cipher_data = qemu_try_blockalign(
-+        bs->file->bs, MIN(BLOCK_CRYPTO_MAX_SECTORS * BDRV_SECTOR_SIZE,
-+                          qiov->size));
-     if (cipher_data == NULL) {
-         ret = -ENOMEM;
-         goto cleanup;
-@@ -415,7 +415,7 @@ block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
-         }
- 
-         qemu_iovec_reset(&hd_qiov);
--        qemu_iovec_add(&hd_qiov, cipher_data, cur_nr_sectors * 512);
-+        qemu_iovec_add(&hd_qiov, cipher_data, cur_nr_sectors * BDRV_SECTOR_SIZE);
- 
-         ret = bdrv_co_readv(bs->file,
-                             payload_offset + sector_num,
-@@ -426,18 +426,18 @@ block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
- 
-         if (qcrypto_block_decrypt(crypto->block,
-                                   sector_num,
--                                  cipher_data, cur_nr_sectors * 512,
-+                                  cipher_data, cur_nr_sectors * BDRV_SECTOR_SIZE,
-                                   NULL) < 0) {
-             ret = -EIO;
-             goto cleanup;
-         }
- 
-         qemu_iovec_from_buf(qiov, bytes_done,
--                            cipher_data, cur_nr_sectors * 512);
-+                            cipher_data, cur_nr_sectors * BDRV_SECTOR_SIZE);
- 
-         remaining_sectors -= cur_nr_sectors;
-         sector_num += cur_nr_sectors;
--        bytes_done += cur_nr_sectors * 512;
-+        bytes_done += cur_nr_sectors * BDRV_SECTOR_SIZE;
-     }
- 
-  cleanup:
-@@ -459,16 +459,16 @@ block_crypto_co_writev(BlockDriverState *bs, int64_t sector_num,
-     QEMUIOVector hd_qiov;
-     int ret = 0;
-     size_t payload_offset =
--        qcrypto_block_get_payload_offset(crypto->block) / 512;
-+        qcrypto_block_get_payload_offset(crypto->block) / BDRV_SECTOR_SIZE;
+     cipher_data =
+         qemu_try_blockalign(bs->file->bs, MIN(BLOCK_CRYPTO_MAX_SECTORS * 512,
+@@ -464,9 +463,8 @@ block_crypto_co_writev(BlockDriverState *bs, int64_t sector_num,
  
      qemu_iovec_init(&hd_qiov, qiov->niov);
  
-     /* Bounce buffer because we're not permitted to touch
-      * contents of qiov - it points to guest memory.
+-    /* Bounce buffer so we have a linear mem region for
+-     * entire sector. XXX optimize so we avoid bounce
+-     * buffer in case that qiov->niov == 1
++    /* Bounce buffer because we're not permitted to touch
++     * contents of qiov - it points to guest memory.
       */
--    cipher_data =
--        qemu_try_blockalign(bs->file->bs, MIN(BLOCK_CRYPTO_MAX_SECTORS * 512,
--                                              qiov->size));
-+    cipher_data = qemu_try_blockalign(
-+        bs->file->bs, MIN(BLOCK_CRYPTO_MAX_SECTORS * BDRV_SECTOR_SIZE,
-+                          qiov->size));
-     if (cipher_data == NULL) {
-         ret = -ENOMEM;
-         goto cleanup;
-@@ -482,18 +482,18 @@ block_crypto_co_writev(BlockDriverState *bs, int64_t sector_num,
-         }
- 
-         qemu_iovec_to_buf(qiov, bytes_done,
--                          cipher_data, cur_nr_sectors * 512);
-+                          cipher_data, cur_nr_sectors * BDRV_SECTOR_SIZE);
- 
-         if (qcrypto_block_encrypt(crypto->block,
-                                   sector_num,
--                                  cipher_data, cur_nr_sectors * 512,
-+                                  cipher_data, cur_nr_sectors * BDRV_SECTOR_SIZE,
-                                   NULL) < 0) {
-             ret = -EIO;
-             goto cleanup;
-         }
- 
-         qemu_iovec_reset(&hd_qiov);
--        qemu_iovec_add(&hd_qiov, cipher_data, cur_nr_sectors * 512);
-+        qemu_iovec_add(&hd_qiov, cipher_data, cur_nr_sectors * BDRV_SECTOR_SIZE);
- 
-         ret = bdrv_co_writev(bs->file,
-                              payload_offset + sector_num,
-@@ -504,7 +504,7 @@ block_crypto_co_writev(BlockDriverState *bs, int64_t sector_num,
- 
-         remaining_sectors -= cur_nr_sectors;
-         sector_num += cur_nr_sectors;
--        bytes_done += cur_nr_sectors * 512;
-+        bytes_done += cur_nr_sectors * BDRV_SECTOR_SIZE;
-     }
- 
-  cleanup:
+     cipher_data =
+         qemu_try_blockalign(bs->file->bs, MIN(BLOCK_CRYPTO_MAX_SECTORS * 512,
 -- 
 2.13.5
