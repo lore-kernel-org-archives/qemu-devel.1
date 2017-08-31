@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dnRwp-00050d-4X
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:04:09 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dnRz5-0006r3-0m
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:06:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dnRwl-00021t-6l
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:04:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34068)
+	(envelope-from <cohuck@redhat.com>) id 1dnRz1-0003Bm-1x
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:06:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53850)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dnRwk-00021W-Vo
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:03:59 -0400
-Date: Thu, 31 Aug 2017 18:03:52 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170831180352.7d6e1ecf@nial.brq.redhat.com>
-In-Reply-To: <20170831163513.17c0a963.cohuck@redhat.com>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dnRz0-0003Av-Rm
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:06:18 -0400
+Date: Thu, 31 Aug 2017 18:06:10 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170831180610.50d089aa.cohuck@redhat.com>
+In-Reply-To: <f8d4feed-9025-534f-9344-baba1204d607@redhat.com>
 References: <20170830170601.15855-1-david@redhat.com>
-	<20170830170601.15855-7-david@redhat.com>
-	<20170831163513.17c0a963.cohuck@redhat.com>
+	<20170830170601.15855-9-david@redhat.com>
+	<20170831164142.607711ec.cohuck@redhat.com>
+	<9beeb7d0-edb8-2227-3182-9275567b2fb5@redhat.com>
+	<20170831170733.7fe86dbc.cohuck@redhat.com>
+	<f8d4feed-9025-534f-9344-baba1204d607@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 06/11] target/s390x: cleanup cpu
- number/address handling
+Subject: Re: [Qemu-devel] [PATCH v1 08/11] s390x: allow only 1 CPU with TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +31,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, thuth@redhat.com, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com, Aurelien Jarno <aurelien@aurel32.net>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
 
-On Thu, 31 Aug 2017 16:35:13 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+On Thu, 31 Aug 2017 17:33:13 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-> On Wed, 30 Aug 2017 19:05:56 +0200
-> David Hildenbrand <david@redhat.com> wrote:
+> On 31.08.2017 17:07, Cornelia Huck wrote:
+
+> > If we know that this can't work, it makes sense to stop immediately, no?  
 > 
-> > Some time ago we discussed that using "id" as property name is not the
-> > right thing to do, as it is a reserved property for other devices.
-> > 
-> > Switch to the term "addr" instead, which matches the definition in the
-> > PoP called "CPU address". There is no such thing as cpu number, so
-> > rename env.cpu_num to env.cpu_addr.
-> > 
-> > We can get rid of cpu->id now. Keep cpu->index and env->cpu_addr in sync.
-> > cpu->index was already implicitly used by e.g. cpu_exists(), so keeping
-> > both in sync seems to be the right thing to do.
-> > 
-> > cpu->index will now no longer automatically get set via
-> > cpu_exec_realizefn(). For now, we were lucky that both implicitly stayed
-> > in sync.
-> > 
-> > Our new cpu property "addr" can be a static property. Range checks can
-> > be avoided by using the correct type and the "setting after realized"
-> > check is done implicitly.
-> > 
-> > AFAIK, s390x only supports cpu_add and not device_add for cpus. So we
-> > should be able to safely rename that property (no the "id" property
-> > could properly be used for device_add, which needs an artificial id for
-> > identification purposes).  
-this patch seems to somewhat conflicting with
- https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg06505.html
-that were supposed to go via machine tree and which I've respinned today
-to fix conflicts due just merged pull req.
+> Hmm, like that than?
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 18ed0c57e3..dae848fa5f 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -23,6 +23,7 @@
+>  #include "hw/s390x/css.h"
+>  #include "virtio-ccw.h"
+>  #include "qemu/config-file.h"
+> +#include "qemu/error-report.h"
+>  #include "s390-pci-bus.h"
+>  #include "hw/s390x/storage-keys.h"
+>  #include "hw/s390x/storage-attributes.h"
+> @@ -56,6 +57,12 @@ static void s390_init_cpus(MachineState *machine)
+>      if (machine->cpu_model == NULL) {
+>          machine->cpu_model = s390_default_cpu_model_name();
+>      }
+> +    if (tcg_enabled() && max_cpus > S390_TCG_MAX_CPUS) {
+> +        error_report("Number of SMP CPUs requested (%d) exceeds max CPUs "
+> +                     "supported by TCG (%d) on s390x", max_cpus,
+> +                     S390_TCG_MAX_CPUS);
+> +        exit(1);
+> +    }
+> 
+>      ms->cpus = g_new0(S390CPU *, max_cpus);
+> 
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index 7ed9103b33..4e1de2102d 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -210,6 +210,8 @@ static inline S390CPU
+> *s390_env_get_cpu(CPUS390XState *env)
+> 
+>  #define ENV_OFFSET offsetof(S390CPU, env)
+> 
+> +#define S390_TCG_MAX_CPUS 1
+> +
+>  #ifndef CONFIG_USER_ONLY
+>  extern const struct VMStateDescription vmstate_s390_cpu;
+>  #endif
+> 
+> 
 
-Cornelia,
-
-Could you put/merge it via s390x tree so that David and I work won't clash again?
+Looks good!
