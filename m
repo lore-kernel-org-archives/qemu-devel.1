@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <izik@veertu.com>) id 1dnXBM-0006cJ-Dz
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 17:39:25 -0400
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dnXDX-0007xp-8o
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 17:41:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <izik@veertu.com>) id 1dnXBL-0000gt-AD
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 17:39:24 -0400
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:36678)
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dnXDW-0001bS-1Z
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 17:41:39 -0400
+Received: from mail-vk0-x22b.google.com ([2607:f8b0:400c:c05::22b]:33946)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <izik@veertu.com>) id 1dnXBK-0000gn-S3
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 17:39:23 -0400
-Received: by mail-wr0-x22f.google.com with SMTP id p14so2159360wrg.3
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 14:39:22 -0700 (PDT)
+	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
+	id 1dnXDV-0001bE-Ra
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 17:41:37 -0400
+Received: by mail-vk0-x22b.google.com with SMTP id s199so2562226vke.1
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 14:41:37 -0700 (PDT)
 MIME-Version: 1.0
 In-Reply-To: <CABgObfaDtgixAEF8OPLuDf=21GiCwY3EUOPHujXPeLqYTup=Yw@mail.gmail.com>
 References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
@@ -20,9 +21,10 @@ References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
 	<CABgObfYRUtdH9-7+zWx5Zur=iE_Qr5953+EOgcxRfVGnEonbmg@mail.gmail.com>
 	<CAJTBuyhJgVZ-A+AHatjAwPjsSv2Q-HxuF7nc1NpbWNmGnCOhVQ@mail.gmail.com>
 	<CABgObfaDtgixAEF8OPLuDf=21GiCwY3EUOPHujXPeLqYTup=Yw@mail.gmail.com>
-From: Izik Eidus <izik@veertu.com>
-Date: Fri, 1 Sep 2017 00:39:20 +0300
-Message-ID: <CAJTBuyhKqbXWjphh-t60TVjZfVFEYGyWFgEs4TmR+CE1q04GhQ@mail.gmail.com>
+From: =?UTF-8?Q?Sergio_Andr=C3=A9s_G=C3=B3mez_del_Real?=
+	<sergio.g.delreal@gmail.com>
+Date: Thu, 31 Aug 2017 16:41:35 -0500
+Message-ID: <CAMzKsXuvdroUvT=6rjeTtM+FKHz6pat9Fgby5ayF_dZp9qaQaw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH v2 02/13] hvf: add code base from Google's
  QEMU repository
@@ -35,9 +37,23 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: vpalatin@chromium.org, qemu-devel <qemu-devel@nongnu.org>, "Hajnoczi, Stefan" <stefanha@gmail.com>, =?UTF-8?Q?Sergio_Andr=C3=A9s_G=C3=B3mez_del_Real?= <sergio.g.delreal@gmail.com>
+Cc: Izik Eidus <izik@veertu.com>, vpalatin@chromium.org, qemu-devel <qemu-devel@nongnu.org>, "Hajnoczi,
+	Stefan" <stefanha@gmail.com>, Frank Yang <lfy@google.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Fri, Sep 1, 2017 at 12:21 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+Hello,
+Mr. Frank Yang was the guy at Google that introduced the HVF port to
+Google's Android Emulator QEMU branch.
+Frank, in this thread we are discussing the licensing issue with the HVF
+files (their being GPL v2-only). Paolo from Red Hat was asking to Veertu
+developer Izik Eidus if the code in Veertu derived only from QEMU, Bochs
+and other GPLv2+ or LGPL software. Because the code at Google was itself
+derived from Veertu, I'd imagine the same licensing terms would apply in
+your case. Any light you can throw over this issue would be much
+appreciated.
+
+Thank you.
+
+On Thu, Aug 31, 2017 at 4:21 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
 
 > Il 31 ago 2017 3:54 PM, "Izik Eidus" <izik@veertu.com> ha scritto:
 >
@@ -61,18 +77,6 @@ On Fri, Sep 1, 2017 at 12:21 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
 > submission. You can do so if you can confirm that the code you used only
 > came from QEMU itself, Bochs or other GPLv2+/LGPL software (and the rest
 > was written by Veertu).
->
-
-Hi,
-
-Sure fine with us, let me go over all the code and see that all copyright
-that are needed are there, and then you can relicense all our code to
-GPLv2+, I think I saw a a file that was missing Bochs copyright in it, so I
-want to make sure that I fix this before and that all others are fine.
-
-Thanks.
-
-
 >
 > Google has already contributed the HAXN accelerator, so I am moderately
 > optimistic that they can help with HVF too.
