@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dnPcl-0002v3-88
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 09:35:15 -0400
+	(envelope-from <thuth@redhat.com>) id 1dnPdp-0003gH-NV
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 09:36:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dnPci-0007tb-63
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 09:35:11 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:45881)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1dnPch-0007fd-PC
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 09:35:08 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <f44d823d-d7a6-1783-051f-9d754ada0475@huawei.com>
-References: <1504016587-39779-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<w51fuc98di8.fsf@maestria.local.igalia.com>
-	<9b24c28f-f891-1046-f09f-bffded9e316f@huawei.com>
-	<w51bmmx85so.fsf@maestria.local.igalia.com>
-	<f6cdc881-39a4-92f6-c218-a57516ca0921@huawei.com>
-	<w518ti1851v.fsf@maestria.local.igalia.com>
-	<f44d823d-d7a6-1783-051f-9d754ada0475@huawei.com>
-Date: Thu, 31 Aug 2017 15:34:16 +0200
-Message-ID: <w51pobb509z.fsf@maestria.local.igalia.com>
+	(envelope-from <thuth@redhat.com>) id 1dnPdm-0008Aw-LI
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 09:36:17 -0400
+References: <1503941985-25657-1-git-send-email-thuth@redhat.com>
+	<20170830154803.46bc99fc@nial.brq.redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0cf2b541-a9da-ddbf-bfe4-fe0bb24327c1@redhat.com>
+Date: Thu, 31 Aug 2017 15:35:58 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v8 0/6] fsdev: qmp interface for io
- throttling
+In-Reply-To: <20170830154803.46bc99fc@nial.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11] tests/bios-tables: Silence some
+ messages with V=1, print them with V=2 only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
-Cc: Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-On Wed 30 Aug 2017 05:12:22 PM CEST, Pradeep Jagadeesh wrote:
-> On 8/30/2017 5:10 PM, Alberto Garcia wrote:
->> On Wed 30 Aug 2017 05:07:29 PM CEST, Pradeep Jagadeesh wrote:
->>
->>> Thanks for the steps, I did reproduce the issue easily. Looking into
->>> the code, may be we also need to try the same with the block devices.
->>
->> I did some tests and it was working fine, so I'd suspect of the fsdev
->> code first.
->>
-> OK, thanks for the clarification. I will look into fsdev code.
+On 30.08.2017 15:48, Igor Mammedov wrote:
+> On Mon, 28 Aug 2017 19:39:45 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+> 
+>> When running "make check-qtest-x86_64 V=1", the output is currently flooded
+>> with "Looking for expected file ..." and "Using expected file ..." messages.
+>> None of the other tests is doing that with V=1, so this is a little bit
+>> annoying. Let's only print these debug messages when we're running the test
+>> with V=2 or higher.
+> well, normally make check is run without V=
+> and if someone once in a while need to run it in verbose mode,
+> he/she can tolerate it since it's a verbose mode after all.
+> 
+> Hiding message behind V=XX is going to make us remember/recall
+> at which verbosity level one needs to run tests to get needed
+> diagnostic info.
+> 
+> I'd rather keep it as it is now.
 
-I just took a quick look at the code, the problem is almost certainly in
-fsdev_set_io_throttle(): that doesn't simply update the config, it also
-reinitializes the FsThrottle structure completely, creates new timers
-and new throttled_reqs queues. If there were pending requests there
-they're probably lost forever.
+Well, I love to run the tests with V=1, especially as soon as one of the
+tests hangs. But the output of the bios-tables-test really breaks the
+well-formatted output of the test framework in that case, so adding a
+V=2 debug level is IMHO a good idea. But if I'm the only who's annoyed
+by the current output of the bios-tables-test, feel free to ignore me ;-)
 
-Take a look at blk_set_io_limits() and see how it is done for block
-devices.
-
-Berto
+ Thomas
