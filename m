@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dnXXJ-0004g1-Ct
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:02:06 -0400
+	(envelope-from <bounces@canonical.com>) id 1dnXXK-0004g2-BN
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:02:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dnXXF-0002Bq-F7
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:02:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59012)
+	(envelope-from <bounces@canonical.com>) id 1dnXXF-0002Bv-G0
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:02:06 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59013)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dnXXF-0002BQ-6Z
+	id 1dnXXF-0002BR-6d
 	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:02:01 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dnXXC-00057L-VS
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 22:01:59 +0000
+	id 1dnXXC-00057k-JX
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 22:01:58 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D5AB92E80C7
+	by loganberry.canonical.com (Postfix) with ESMTP id 29EEA2E80DB
 	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 22:01:58 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 31 Aug 2017 21:50:11 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1701798 <1701798@bugs.launchpad.net>
+Date: Thu, 31 Aug 2017 21:50:00 -0000
+From: Bruno Haible <bruno@clisp.org>
+Reply-To: Bug 1701821 <1701821@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <149890819992.24827.8096984642709091835.malonedeb@soybean.canonical.com>
-Message-Id: <150421621175.19681.6031736332290354146.malone@chaenomeles.canonical.com>
+References: <149892335854.26587.4297865975090837425.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150421620014.10991.11583177487353291080.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1701798] Re: dynamically linked binaries crash
- for big-endian targets
+Subject: [Qemu-devel] [Bug 1701821] Re: floating-point operation bugs in
+ qemu-sh4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,230 +39,257 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Can you check whether these work if you copy the QEMU and the dynamically l=
-inked target binary into a chroot (which does not have the x86 host ld.so o=
-r /etc in it) instead of using QEMU_LD_PREFIX ? There is a problem I've see=
-n before where:
- 1) QEMU when run with QEMU_LD_PREFIX or -L works by "first try in -L, then=
- try in the host filesystem"
- 2) files like /etc/ld.so.cache (and other things the dynamic linker uses) =
-are not in the -L directory but are in the host
- 3) the ld.so.cache format is not endian-agnostic
- 4) glibc's dynamic linker code does not ignore a wrong-endian ld.so.cache =
-but crashes instead
+With qemu-2.10, all of these tests now pass. Great!
 
-Using a chroot instead of QEMU_LD_PREFIX will work as a test of whether
-this is the kind of problem you're running into. Personally I think that
-(4) is a glibc bug...
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1701798
+https://bugs.launchpad.net/bugs/1701821
 
 Title:
-  dynamically linked binaries crash for big-endian targets
+  floating-point operation bugs in qemu-sh4
 
 Status in QEMU:
-  New
+  Fix Released
 
 Bug description:
-  On the targets
-    hppa
-    m68k
-    mips
-    mips64
-    powerpc
-    powerpc64
-    s390x
-    sparc64
-  dynamically linked binaries crash, but statically linked binaries work.
-  On the targets
-    aarch64
-    alpha
-    armhf
-    powerpc64le
-    sh4
-  both dynamically linked and statically linked binaries work.
+  When running the gnulib testsuite, I'm seeing test failures in the tests =
+for libm functions
+    asinf
+    cbrtf
+    copysignf
+    coshf
+    expm1f
+    fabsf
+    floor
+    fmaf
+    ldexpf
+    logbf
+    round
+    roundf
+    sinhf
+    tanhf
 
   How to reproduce:
+  - Using gnulib, run ./gnulib-tool --create-testdir --dir=3D../testdir-mat=
+h --single-configure asinf cbrtf copysignf coshf expm1f fabsf floor fma fma=
+f fmal ldexpf logbf round roundf sinhf tanhf
+  - Set environment variables for using qemu-sh4.
+  - cd testdir-math; mkdir build-sh4; cd build-sh4; ./configure --host=3Dsh=
+4-linux; make; make check
 
-  1) On Ubuntu 16.04, install the packages
-  g++-5-aarch64-linux-gnu
-  g++-5-alpha-linux-gnu
-  g++-5-arm-linux-gnueabihf
-  g++-5-hppa-linux-gnu
-  g++-5-m68k-linux-gnu
-  g++-5-mips-linux-gnu
-  g++-5-mips64-linux-gnuabi64
-  g++-5-powerpc-linux-gnu
-  g++-5-powerpc64-linux-gnu
-  g++-5-powerpc64le-linux-gnu
-  g++-5-s390x-linux-gnu
-  g++-5-sh4-linux-gnu
-  g++-5-sparc64-linux-gnu
-
-  2) Install qemu 2.9.0 from source (for m68k, use the 2.7.0-m68k
-  code from https://github.com/vivier/qemu-m68k.git):
-  $ ../configure --prefix=3D/home/bruno/inst-qemu/2.9.0 --target-list=3Daar=
-ch64-softmmu,alpha-softmmu,arm-softmmu,i386-softmmu,m68k-softmmu,mips-softm=
-mu,mipsel-softmmu,mips64-softmmu,mips64el-softmmu,ppc-softmmu,ppc64-softmmu=
-,s390x-softmmu,sh4-softmmu,sparc-softmmu,sparc64-softmmu,x86_64-softmmu,aar=
-ch64-linux-user,alpha-linux-user,arm-linux-user,hppa-linux-user,m68k-linux-=
-user,mips-linux-user,mipsel-linux-user,mips64-linux-user,mips64el-linux-use=
-r,ppc-linux-user,ppc64-linux-user,ppc64le-linux-user,s390x-linux-user,sh4-l=
-inux-user,sparc-linux-user,sparc64-linux-user --disable-strip --disable-wer=
-ror --enable-gtk --enable-vnc
-  $ make
-  $ make install
-
-  3) Cross-compile the programs:
-
-  $ aarch64-linux-gnu-gcc-5 -O hello.c -o hello.aarch64
-  $ alpha-linux-gnu-gcc-5 -O hello.c -o hello.alpha
-  $ arm-linux-gnueabihf-gcc-5 -O hello.c -o hello.armhf
-  $ hppa-linux-gnu-gcc-5 -O hello.c -o hello.hppa
-  $ m68k-linux-gnu-gcc-5 -O hello.c -o hello.m68k
-  $ mips-linux-gnu-gcc-5 -O hello.c -o hello.mips
-  $ mips64-linux-gnuabi64-gcc-5 -O hello.c -o hello.mips64
-  $ powerpc-linux-gnu-gcc-5 -O hello.c -o hello.powerpc
-  $ powerpc64-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64
-  $ powerpc64le-linux-gnu-gcc-5 -O hello.c -o hello.powerpc64le
-  $ s390x-linux-gnu-gcc-5 -O hello.c -o hello.s390x
-  $ sh4-linux-gnu-gcc-5 -O hello.c -o hello.sh4
-  $ sparc64-linux-gnu-gcc-5 -O hello.c -o hello.sparc64
-
-  4) Run the programs:
-
-  * aarch64 works:
-  $ QEMU_LD_PREFIX=3D/usr/aarch64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-aarc=
-h64 hello.aarch64
-  Hello world
-
-  * alpha works:
-  $ QEMU_LD_PREFIX=3D/usr/alpha-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-alpha =
-hello.alpha =
-
-  Hello world
-
-  * armhf works:
-  $ QEMU_LD_PREFIX=3D/usr/arm-linux-gnueabihf ~/inst-qemu/2.9.0/bin/qemu-ar=
-m hello.armhf
-  Hello world
-
-  * powerpc64le works:
-  $ QEMU_LD_PREFIX=3D/usr/powerpc64le-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-=
-ppc64le hello.powerpc64le
-  Hello world
-
-  * sh4 works:
-  $ QEMU_LD_PREFIX=3D/usr/sh4-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-sh4 hell=
-o.sh4
-  Hello world
-
-  * =3D=3D=3D=3D=3D sparc64 does not work:
-  $ QEMU_LD_PREFIX=3D/usr/sparc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-spar=
-c64 hello.sparc64
-  Segmentation fault (core dumped)
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 4.5.0-2-sp=
-arc64 sparc64",
-  it works:
-  $ ./hello.sparc64
-  Hello world
-
-  When I copy the file and its execution environment /usr/sparc64-linux-gnu=
- to the
-  same machine and run the binary in a chroot environment:
-  # /bin/hello.sparc64 =
-
-  Hello world
-
-  * =3D=3D=3D=3D=3D mips does not work:
-  $ QEMU_LD_PREFIX=3D/usr/mips-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-mips he=
-llo.mips
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-4=
-kc-malta mips",
-  it works:
-  $ ./hello.mips
-  Hello world
-
-  When I copy the file and its execution environment /usr/mips-linux-gnu to=
- the
-  same machine and run the binary in a chroot environment:
-  # /bin/hello.mips =
-
-  Hello world
-
-  * =3D=3D=3D=3D=3D mips64 does not work:
-  $ QEMU_LD_PREFIX=3D/usr/mips64-linux-gnuabi64 ~/inst-qemu/2.9.0/bin/qemu-=
-mips64 hello.mips64
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-5=
-kc-malta mips64",
-  it works:
-  $ ./hello.mips64
-  Hello world
-
-  * =3D=3D=3D=3D=3D powerpc does not work:
-  $ QEMU_LD_PREFIX=3D/usr/powerpc-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-ppc =
-hello.powerpc
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
-.fc20.ppc64p7 ppc64",
-  it works:
-  $ ./hello.powerpc
-  Hello world
-
-  * =3D=3D=3D=3D=3D powerpc64 does not work:
-  $ QEMU_LD_PREFIX=3D/usr/powerpc64-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-pp=
-c64 hello.powerpc64
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.17.2-200=
-.fc20.ppc64p7 ppc64",
-  it works:
-  $ ./hello.powerpc64
-  Hello world
-
-  * =3D=3D=3D=3D=3D s390x does not work:
-  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-s390x =
-hello.s390x
-  <hangs>
-  $ QEMU_LD_PREFIX=3D/usr/s390x-linux-gnu ~/inst-qemu/2.8.1/bin/qemu-s390x =
-hello.s390x
-  qemu-s390x: /media/develdata/devel/build/qemu-2.8.1/translate-all.c:175: =
-tb_lock: Assertion `!have_tb_lock' failed.
-  Segmentation fault (core dumped)
-
-  When I copy the file to a machine with `uname -srm` =3D "Linux 3.16.0-4-s=
-390x s390x",
-  it works:
-  $ ./hello.s390x
-  Hello world
-
-  * =3D=3D=3D=3D=3D hppa does not work:
-  $ QEMU_LD_PREFIX=3D/usr/hppa-linux-gnu ~/inst-qemu/2.9.0/bin/qemu-hppa he=
-llo.hppa
-  Segmentation fault (core dumped)
-
-  * =3D=3D=3D=3D=3D m68k does not work:
-  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.9.=
-0/bin/qemu-m68k hello.m68k
-  qemu: uncaught target signal 4 (Illegal instruction) - core dumped
-  $ QEMU_LD_PREFIX=3D/usr/m68k-linux-gnu QEMU_CPU=3Dm68020 ~/inst-qemu/2.7.=
-0-m68k/bin/qemu-m68k hello.m68k
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Here are the failures (from the file testdir-math/build-sh4/gltests
+  /test-suite.log):
 
   =
 
-  The set of targets where it does not work is exactly the big-endian targe=
-ts.
+  FAIL: test-asinf
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  pc=3D0xf6751cdc sr=3D0x00000101 pr=3D0xf6758e86 fpscr=3D0x00080000
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf6751cd6 fpul=3D0x3f1999=
+9a
+  r0=3D0xf6751d88 r1=3D0x00000000 r2=3D0x00080000 r3=3D0x00000000
+  r4=3D0xf6ffe21c r5=3D0xf6ffe230 r6=3D0xf6ffe2fc r7=3D0x00000000
+  r8=3D0x3f19999a r9=3D0x3f19999a r10=3D0x00000000 r11=3D0x00000000
+  r12=3D0xf67ab008 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe230
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  Unhandled trap: 0x180
+  FAIL test-asinf (exit status: 1)
+
+  FAIL: test-cbrtf
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  pc=3D0x00400980 sr=3D0x00000001 pr=3D0x00400684 fpscr=3D0x00080000
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0x00400960 fpul=3D0x000000=
+00
+  r0=3D0x00400ae8 r1=3D0x00412070 r2=3D0x3f19999a r3=3D0xf6ffe2c0
+  r4=3D0x00000001 r5=3D0xf6ffe2f4 r6=3D0xf6ffe2fc r7=3D0x00000000
+  r8=3D0x00412064 r9=3D0x00400960 r10=3D0x00000000 r11=3D0x00000000
+  r12=3D0xf671dc58 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe21c
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  Unhandled trap: 0x180
+  FAIL test-cbrtf (exit status: 1)
+
+  FAIL: test-copysignf
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  pc=3D0x004004ce sr=3D0x00000001 pr=3D0xf668d28c fpscr=3D0x00080000
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf6674678 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0x004004d2 fpul=3D0x000000=
+00
+  r0=3D0x80000000 r1=3D0x3f4ccccd r2=3D0xf6674284 r3=3D0xf6ffe2b0
+  r4=3D0x00000001 r5=3D0xf6ffe2e4 r6=3D0xf6ffe2ec r7=3D0x00000000
+  r8=3D0x00411088 r9=3D0x00411084 r10=3D0x00000000 r11=3D0x00000000
+  r12=3D0xf67a8c58 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe240
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  in conditional delay slot (delayed_pc=3D0x004004d2)
+  Unhandled trap: 0x1a0
+  FAIL test-copysignf (exit status: 1)
+
+  FAIL: test-coshf
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  pc=3D0xf675223a sr=3D0x00000101 pr=3D0xf675223c fpscr=3D0x00080000
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf675231c fpul=3D0x3f1999=
+9a
+  r0=3D0x3f19999a r1=3D0x3f19999a r2=3D0x000000e0 r3=3D0xf6ffe2c0
+  r4=3D0x00000001 r5=3D0xf6ffe2f4 r6=3D0xf6ffe2fc r7=3D0x00000000
+  r8=3D0x00400734 r9=3D0x00000000 r10=3D0x00000000 r11=3D0x00000000
+  r12=3D0xf67ab008 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe240
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  in delay slot (delayed_pc=3D0xf675231c)
+  Unhandled trap: 0x1a0
+  FAIL test-coshf (exit status: 1)
+
+  FAIL: test-expm1f
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  pc=3D0xf6757e08 sr=3D0x00000000 pr=3D0x004005ce fpscr=3D0x00081000
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf6757dfe fpul=3D0x000000=
+00
+  r0=3D0xf6757fb0 r1=3D0x00001000 r2=3D0x00080000 r3=3D0x3eb17218
+  r4=3D0x00000001 r5=3D0xf6ffe2f4 r6=3D0xf6ffe2fc r7=3D0x00000000
+  r8=3D0x00400514 r9=3D0x00000064 r10=3D0x00400514 r11=3D0x00000000
+  r12=3D0xf67ab008 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe234
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  Unhandled trap: 0x180
+  FAIL test-expm1f (exit status: 1)
+
+  FAIL: test-fabsf
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  pc=3D0x00400504 sr=3D0x00000001 pr=3D0xf660228c fpscr=3D0x00080000
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0x004004ec fpul=3D0x000000=
+00
+  r0=3D0x00400640 r1=3D0x00412074 r2=3D0x00000000 r3=3D0x00412078
+  r4=3D0x00000001 r5=3D0xf6ffe2f4 r6=3D0xf6ffe2fc r7=3D0x00080000
+  r8=3D0x004007ac r9=3D0x00000000 r10=3D0x00000000 r11=3D0x00000000
+  r12=3D0xf671dc58 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe260
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  Unhandled trap: 0x180
+  FAIL test-fabsf (exit status: 1)
+
+  FAIL: test-floor2
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  ../../gltests/test-floor2.c:130: assertion 'correct_result_p (x, referenc=
+e)' failed
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  FAIL test-floor2 (exit status: 134)
+
+  FAIL: test-fmaf2
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  pc=3D0xf675f5ac sr=3D0x00000101 pr=3D0xf675f5a6 fpscr=3D0x00080000
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf675f5a6 fpul=3D0x018000=
+00
+  r0=3D0xf675f4a4 r1=3D0x000065b0 r2=3D0x00080000 r3=3D0x3f800000
+  r4=3D0x01800000 r5=3D0x00000000 r6=3D0xffffffe9 r7=3D0x7f800000
+  r8=3D0xffffff6b r9=3D0xf6ffe1e4 r10=3D0xf6ffe1e8 r11=3D0xffffff6b
+  r12=3D0xf67ab008 r13=3D0xf6ffe1d8 r14=3D0x004004dc r15=3D0xf6ffe18c
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  Unhandled trap: 0x180
+  FAIL test-fmaf2 (exit status: 1)
+
+  FAIL: test-ldexpf
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  pc=3D0xf669efa0 sr=3D0x00000001 pr=3D0xf669ef9a fpscr=3D0x00080000
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf6674678 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf669ef9a fpul=3D0x3f9999=
+9a
+  r0=3D0xfffffdc6 r1=3D0x000c9d70 r2=3D0x00080000 r3=3D0x3f19999a
+  r4=3D0x0019999a r5=3D0x3f19999a r6=3D0xffffffe9 r7=3D0x7f800000
+  r8=3D0x00000001 r9=3D0x0040041c r10=3D0xf6ffe23c r11=3D0x00000000
+  r12=3D0xf67a8c58 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe218
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  Unhandled trap: 0x180
+  FAIL test-ldexpf (exit status: 1)
+
+  FAIL: test-logbf
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  pc=3D0xf675842c sr=3D0x00000001 pr=3D0x00400664 fpscr=3D0x00080000
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf6758422 fpul=3D0x000000=
+00
+  r0=3D0xf6758480 r1=3D0x00000000 r2=3D0x00080000 r3=3D0x00080000
+  r4=3D0x00000000 r5=3D0xf6ffe2f4 r6=3D0xf6ffe2fc r7=3D0x00000000
+  r8=3D0xf6ffe24c r9=3D0x0040054c r10=3D0x00000000 r11=3D0x00000000
+  r12=3D0xf671dc58 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe244
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  Unhandled trap: 0x180
+  FAIL test-logbf (exit status: 1)
+
+  FAIL: test-round2
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  FAIL test-round2 (exit status: 1)
+
+  FAIL: test-roundf2
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  FAIL test-roundf2 (exit status: 1)
+
+  FAIL: test-sinhf
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  pc=3D0xf675581c sr=3D0x00000101 pr=3D0xf675a784 fpscr=3D0x00080000
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf6755858 fpul=3D0x3f1999=
+9a
+  r0=3D0xf6755930 r1=3D0x317fffff r2=3D0x3f19999a r3=3D0xf6ffe2c0
+  r4=3D0x00000001 r5=3D0xf6ffe2f4 r6=3D0xf6ffe2fc r7=3D0x00000000
+  r8=3D0x3f19999a r9=3D0x00000000 r10=3D0x00000000 r11=3D0x00000000
+  r12=3D0xf67ab008 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe238
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  in conditional delay slot (delayed_pc=3D0xf6755858)
+  Unhandled trap: 0x1a0
+  FAIL test-sinhf (exit status: 1)
+
+  FAIL: test-tanhf
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  pc=3D0xf6758ca4 sr=3D0x00000100 pr=3D0x0040057c fpscr=3D0x00080000
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf6758c9a fpul=3D0x3f1999=
+9a
+  r0=3D0xf6758d00 r1=3D0x00000000 r2=3D0x00080000 r3=3D0xf6ffe2c0
+  r4=3D0x00000001 r5=3D0xf6ffe2f4 r6=3D0xf6ffe2fc r7=3D0x00000000
+  r8=3D0x3f19999a r9=3D0x00000000 r10=3D0x00000000 r11=3D0x00000000
+  r12=3D0xf67ab008 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe254
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  Unhandled trap: 0x180
+  FAIL test-tanhf (exit status: 1)
+
+  =
+
+  I don't have access to sh4 hardware, so I cannot provide this as a compar=
+ison point.
+  But most of the test failures don't look like "merely" a wrong computatio=
+n by glibc.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1701798/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1701821/+subscriptions
