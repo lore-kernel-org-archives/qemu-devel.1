@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47152)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dnOvq-0000Tx-JY
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:50:51 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dnOwM-0000p9-FQ
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:51:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dnOvp-0006EC-T6
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:50:50 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:36955)
+	(envelope-from <peter.maydell@linaro.org>) id 1dnOwL-0006Ss-BK
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:51:22 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:34556)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dnOvp-0006Cb-Ml
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:50:49 -0400
-Received: by mail-wr0-x230.google.com with SMTP id k9so1800987wre.4
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 05:50:49 -0700 (PDT)
+	id 1dnOwL-0006Sa-5B
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:51:21 -0400
+Received: by mail-wm0-x232.google.com with SMTP id 137so8337967wmj.1
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 05:51:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170831110222.GH17315@redhat.com>
-References: <87r2w6eq5n.fsf@gmail.com> <87h8x1yox3.fsf@dusky.pond.sub.org>
-	<20170830170941.GB24565@stefanha-x1.localdomain>
-	<87bmmwi6r6.fsf@dusky.pond.sub.org>
-	<CAFEAcA8r-EqOjZDvP=0mYG7QQ83MU-54RL9Bu8Eb_wPzQo1M7Q@mail.gmail.com>
-	<20170831104710.GG17315@redhat.com>
-	<CAFEAcA9pk5n7z5PkLDeuLdvknPmzHqcGtG6in1E9-+BwjVOqTg@mail.gmail.com>
-	<20170831110222.GH17315@redhat.com>
+In-Reply-To: <20170830165252.13421-1-cohuck@redhat.com>
+References: <20170830165252.13421-1-cohuck@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 31 Aug 2017 13:50:27 +0100
-Message-ID: <CAFEAcA8tNXShUHB1L2g9u02CKmmJ+mX9nytSsi-HZ6Dmu0zxYg@mail.gmail.com>
+Date: Thu, 31 Aug 2017 13:50:59 +0100
+Message-ID: <CAFEAcA_Enhiay0P2Q_jLJ1LVQzWVzUam6eCdKH+AcYVuQpw5AA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] scripts: Support building with Python 3
+Subject: Re: [Qemu-devel] [PULL 00/44] first batch of s390x patches for 2.11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,26 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, David Michael <fedora.dm0@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>
 
-On 31 August 2017 at 12:02, Daniel P. Berrange <berrange@redhat.com> wrote:
-> On Thu, Aug 31, 2017 at 11:55:18AM +0100, Peter Maydell wrote:
->> On 31 August 2017 at 11:47, Daniel P. Berrange <berrange@redhat.com> wrote:
->> > If we can update to python 2.7 as our minimum, then supporting py2
->> > and py3 gets simpler, avoiding some of the nastier hacks, even
->> > without that though it isn't too hard.
->>
->> Unfortunately RHEL6 is what's holding us to retaining 2.6
->> support, and googling suggests that doesn't go EOL until 2020...
+On 30 August 2017 at 17:52, Cornelia Huck <cohuck@redhat.com> wrote:
+> The following changes since commit 1ab5eb4efb91a3d4569b0df6e824cc08ab4bd8ec:
 >
-> Who is actually requiring that we support RHEL6 until EOL though ?
+>   Update version for v2.10.0 release (2017-08-30 17:02:54 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/cohuck/qemu tags/s390x-20170830
+>
+> for you to fetch changes up to 2f21b8d431030bcb7478ee9521bdfd3d0ef3901d:
+>
+>   s390x/pci: fixup trap_msix() (2017-08-30 18:23:26 +0200)
+>
+> ----------------------------------------------------------------
+> First batch of s390x patches:
+> - 2.11 compat machine
+> - support the new --s390-pgste linker option, making it possible to
+>   avoid enabling the global vm.allocate_pgste systl if all pieces
+>   are in place
+> - correctly identify some devices as not hotpluggable
+> - clean up some tests and enable them for s390x
+> - wire up the diag288 watchdog in tcg
+> - clean up dependencies on CONFIG_PCI, making it possible to disable
+>   it by hand
+> - lots of cleanup in target/s390x/
+> - fix alignment of the ccw1 structure in the s390-ccw bios
+> - and some more bugfixes
+>
+> ----------------------------------------------------------------
 
-OK, if we don't need to retain RHEL6 support that would help
-(we should in that case not bother pulling in that big lump
-of argument parsing code that just went past in a patchset
-purely for the benefit of 2.6 support). How are the other
-LTS distros for Python versions?
+Applied, thanks.
 
-thanks
 -- PMM
