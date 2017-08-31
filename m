@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnSS7-0003ai-Gj
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:36:24 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1dnSTZ-0004Ml-E7
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:37:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnSS1-0005q0-Ui
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:36:23 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:33816)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnSS1-0005pm-P9
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:36:17 -0400
-Received: by mail-qk0-x241.google.com with SMTP id a77so127516qkb.1
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 09:36:17 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170831112210.19921-1-famz@redhat.com>
-	<20170831112210.19921-4-famz@redhat.com>
-	<20170831161835.GQ17315@redhat.com>
-	<5f9a3540-2c90-5ded-9581-d1098070f40e@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1f59ff98-f5cb-b185-bca1-657ed6e2f807@amsat.org>
-Date: Thu, 31 Aug 2017 13:36:13 -0300
+	(envelope-from <rkagan@virtuozzo.com>) id 1dnSTU-0006Mb-Dt
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:37:53 -0400
+Received: from mail-am5eur02hn0218.outbound.protection.outlook.com
+	([104.47.4.218]:4649
+	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1dnSTT-0006Lw-Oo
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:37:48 -0400
+Date: Thu, 31 Aug 2017 19:37:28 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20170831163727.GA24261@rkaganb.sw.ru>
+References: <20170713201522.13765-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <5f9a3540-2c90-5ded-9581-d1098070f40e@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] docker: Add test-block
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170713201522.13765-1-rkagan@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] hyperv: own protocol header instead of
+ kernel's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,18 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Denis V . Lunev" <den@openvz.org>, Evgeny Yakovlev <eyakovlev@virtuozzo.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 08/31/2017 01:21 PM, Eric Blake wrote:
-> On 08/31/2017 11:18 AM, Daniel P. Berrange wrote:
->>
->> 'qcow' (v1) was also passing last time I checked, though it is
->> waaaaaay slow to run compared to qcow2, so I'd understand if you
->> were reluctant to turn that on due to speed
+On Thu, Jul 13, 2017 at 11:15:20PM +0300, Roman Kagan wrote:
+> Supersede kernel's header for Hyper-V protocol definitions with our own.
+> The reason is that, since this is a third-party protocol and not a
+> kernel API, the kernel folks are not happy exposing it in the kernel
+> uapi.
 > 
-> Even './check -qcow -g quick' might be nicer than nothing, but that is
-> also slooooooow
+> The patchset is done to allow gradual transition from the kernel's
+> hyperv.h to the new one: the first patch introduces the new header that
+> doesn't conflict with the old one, and the second makes sure the old one
+> isn't imported from the kernel any longer, so that the maintainers can
+> do the next round of kernel header import at their leisure and things
+> will keep working.
+> 
+> Once (if) this lands in QEMU I'll post patches to KVM to move its
+> hyperv.h out of uapi.
+> 
+> This is the first part split out of my former biggish "hyperv fixes and
+> enhancements" series.  The only change is the underscore replaced with a
+> dash in the header file name.
+> 
+> Roman Kagan (2):
+>   hyperv: add header with protocol definitions
+>   update-linux-headers: prepare for hyperv.h removal
+> 
+>  target/i386/cpu.h               |  10 +-
+>  target/i386/hyperv-proto.h      | 257 ++++++++++++++++++++++++++++++++++++++++
+>  target/i386/cpu.c               |   4 +-
+>  target/i386/hyperv.c            |   6 +-
+>  target/i386/kvm.c               |  57 +++++----
+>  target/i386/machine.c           |  15 +--
+>  scripts/update-linux-headers.sh |   4 +-
+>  7 files changed, 304 insertions(+), 49 deletions(-)
+>  create mode 100644 target/i386/hyperv-proto.h
+> 
+> -- 
+> 2.13.0
+> 
+> 
 
-What about having a daily job running it on /master? Better than running 
-it once before each release :)
+Ping?
+
+Roman.
