@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dnKyj-00083M-P5
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:37:34 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dnL3u-0001nj-2l
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:42:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dnKyg-0002Yd-Fj
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:37:33 -0400
-Resent-Message-Id: <E1dnKyg-0002Yd-Fj@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21396)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dnKyg-0002Y5-8r
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:37:30 -0400
-In-Reply-To: <20170831082210.8362-1-stefanha@redhat.com>
-Message-ID: <150416863243.108.2293421334337226559@b5667b65043c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <cohuck@redhat.com>) id 1dnL3p-0004I2-3T
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:42:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49720)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dnL3o-0004Hw-Qq
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:42:49 -0400
+Date: Thu, 31 Aug 2017 10:42:43 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170831104243.43cd8992.cohuck@redhat.com>
+In-Reply-To: <c8bbd500-c5b6-dd66-1e84-feb80978ee34@redhat.com>
+References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
+	<20170830163609.50260-2-pasic@linux.vnet.ibm.com>
+	<b5d3ac95-3811-c39a-c4d7-bb85dc4580e8@redhat.com>
+	<20170831083859.11694707.cohuck@redhat.com>
+	<c8bbd500-c5b6-dd66-1e84-feb80978ee34@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 31 Aug 2017 01:37:14 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL for-2.10 00/15] Block patches
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/9] s390x/css: fix cc handling for XSCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +30,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanha@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA4MzEwODIyMTAuODM2Mi0xLXN0ZWZhbmhhQHJlZGhhdC5jb20KU3ViamVjdDogW1FlbXUtZGV2
-ZWxdIFtQVUxMIGZvci0yLjEwIDAwLzE1XSBCbG9jayBwYXRjaGVzClR5cGU6IHNlcmllcwoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0k
-KGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
-cyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4p
-Igpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3Rh
-bDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAk
-YyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsg
-dGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkK
-ZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
-ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIu
-Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNo
-ZXcvMjAxNzA4MzAyMTU1MjMuMjUyNzgtMS1mNGJ1Z0BhbXNhdC5vcmcgLT4gcGF0Y2hldy8yMDE3
-MDgzMDIxNTUyMy4yNTI3OC0xLWY0YnVnQGFtc2F0Lm9yZwogKiBbbmV3IHRhZ10gICAgICAgICAg
-ICAgICBwYXRjaGV3LzIwMTcwODMxMDgyMjEwLjgzNjItMS1zdGVmYW5oYUByZWRoYXQuY29tIC0+
-IHBhdGNoZXcvMjAxNzA4MzEwODIyMTAuODM2Mi0xLXN0ZWZhbmhhQHJlZGhhdC5jb20KU3dpdGNo
-ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwplYWY4MGRhM2U0IHFjb3cyOiBhbGxvY2F0ZSBjbHVz
-dGVyX2NhY2hlL2NsdXN0ZXJfZGF0YSBvbiBkZW1hbmQKZmFiOWMwMjcyNyBxZW11LWRvYzogQWRk
-IFVVSUQgc3VwcG9ydCBpbiBpbml0aWF0b3IgbmFtZQo3NmU3MGVkMGQ5IHRlc3RzOiBtaWdyYXRp
-b24vZ3Vlc3RwZXJmIFB5dGhvbiAyLjYgYXJncGFyc2UgY29tcGF0aWJpbGl0eQozMTZiZGE3ZTdi
-IGRvY2tlci5weTogUHl0aG9uIDIuNiBhcmdwYXJzZSBjb21wYXRpYmlsaXR5CjBhN2Y4YTYyNWIg
-c2NyaXB0czogYWRkIGFyZ3BhcnNlIG1vZHVsZSBmb3IgUHl0aG9uIDIuNiBjb21wYXRpYmlsaXR5
-CjNlNmUyNmQ1MTQgbWlzYzogUmVtb3ZlIHVudXNlZCBFcnJvciB2YXJpYWJsZXMKZjAxZDE5NTM3
-NCBvc2xpYi1wb3NpeDogUHJpbnQgZXJyb3JzIGJlZm9yZSBhYm9ydGluZyBvbiBxZW11X2FsbG9j
-X3N0YWNrKCkKYjJmMDhiZTgxMiB0aHJvdHRsZTogVGVzdCB0aGUgdmFsaWQgcmFuZ2Ugb2YgY29u
-ZmlnIHZhbHVlcwpmMWNkNDNmNWU0IHRocm90dGxlOiBNYWtlIGJ1cnN0X2xlbmd0aCA2NGJpdCBh
-bmQgYWRkIHJhbmdlIGNoZWNrcwo2MDk4MTgxOGQxIHRocm90dGxlOiBNYWtlIExlYWt5QnVja2V0
-LmF2ZyBhbmQgTGVha3lCdWNrZXQubWF4IGludGVnZXIgdHlwZXMKMzAzMmY2ODdmNCB0aHJvdHRs
-ZTogUmVtb3ZlIHRocm90dGxlX2ZpeF9idWNrZXQoKSAvIHRocm90dGxlX3VuZml4X2J1Y2tldCgp
-CjczZTNkNGY1NDcgdGhyb3R0bGU6IE1ha2UgdGhyb3R0bGVfaXNfdmFsaWQoKSBhIGJpdCBsZXNz
-IHZlcmJvc2UKMGFlNWJhMDdjYSB0aHJvdHRsZTogVXBkYXRlIHRoZSB0aHJvdHRsZV9maXhfYnVj
-a2V0KCkgZG9jdW1lbnRhdGlvbgo5ZjUyZjBlYTg2IHRocm90dGxlOiBGaXggd3JvbmcgdmFyaWFi
-bGUgbmFtZSBpbiB0aGUgaGVhZGVyIGRvY3VtZW50YXRpb24KMDYyODQyYjlmMiBudm1lOiBGaXgg
-Z2V0L3NldCBudW1iZXIgb2YgcXVldWVzIGZlYXR1cmUsIGFnYWluCgo9PT0gT1VUUFVUIEJFR0lO
-ID09PQpDaGVja2luZyBQQVRDSCAxLzE1OiBudm1lOiBGaXggZ2V0L3NldCBudW1iZXIgb2YgcXVl
-dWVzIGZlYXR1cmUsIGFnYWluLi4uCkNoZWNraW5nIFBBVENIIDIvMTU6IHRocm90dGxlOiBGaXgg
-d3JvbmcgdmFyaWFibGUgbmFtZSBpbiB0aGUgaGVhZGVyIGRvY3VtZW50YXRpb24uLi4KQ2hlY2tp
-bmcgUEFUQ0ggMy8xNTogdGhyb3R0bGU6IFVwZGF0ZSB0aGUgdGhyb3R0bGVfZml4X2J1Y2tldCgp
-IGRvY3VtZW50YXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xNTogdGhyb3R0bGU6IE1ha2UgdGhy
-b3R0bGVfaXNfdmFsaWQoKSBhIGJpdCBsZXNzIHZlcmJvc2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8x
-NTogdGhyb3R0bGU6IFJlbW92ZSB0aHJvdHRsZV9maXhfYnVja2V0KCkgLyB0aHJvdHRsZV91bmZp
-eF9idWNrZXQoKS4uLgpDaGVja2luZyBQQVRDSCA2LzE1OiB0aHJvdHRsZTogTWFrZSBMZWFreUJ1
-Y2tldC5hdmcgYW5kIExlYWt5QnVja2V0Lm1heCBpbnRlZ2VyIHR5cGVzLi4uCkNoZWNraW5nIFBB
-VENIIDcvMTU6IHRocm90dGxlOiBNYWtlIGJ1cnN0X2xlbmd0aCA2NGJpdCBhbmQgYWRkIHJhbmdl
-IGNoZWNrcy4uLgpDaGVja2luZyBQQVRDSCA4LzE1OiB0aHJvdHRsZTogVGVzdCB0aGUgdmFsaWQg
-cmFuZ2Ugb2YgY29uZmlnIHZhbHVlcy4uLgpDaGVja2luZyBQQVRDSCA5LzE1OiBvc2xpYi1wb3Np
-eDogUHJpbnQgZXJyb3JzIGJlZm9yZSBhYm9ydGluZyBvbiBxZW11X2FsbG9jX3N0YWNrKCkuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMTAvMTU6IG1pc2M6IFJlbW92ZSB1bnVzZWQgRXJyb3IgdmFyaWFibGVz
-Li4uCkNoZWNraW5nIFBBVENIIDExLzE1OiBzY3JpcHRzOiBhZGQgYXJncGFyc2UgbW9kdWxlIGZv
-ciBQeXRob24gMi42IGNvbXBhdGliaWxpdHkuLi4KRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UK
-IzExODogRklMRTogQ09QWUlORy5QWVRIT046OTM6CitSZXNlcnZlZCIgYXJlIHJldGFpbmVkIGlu
-IFB5dGhvbiBhbG9uZSBvciBpbiBhbnkgZGVyaXZhdGl2ZSB2ZXJzaW9uICQKCnRvdGFsOiAxIGVy
-cm9ycywgMCB3YXJuaW5ncywgMjY3NiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxMi8xNTogZG9ja2VyLnB5OiBQeXRo
-b24gMi42IGFyZ3BhcnNlIGNvbXBhdGliaWxpdHkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMTU6IHRl
-c3RzOiBtaWdyYXRpb24vZ3Vlc3RwZXJmIFB5dGhvbiAyLjYgYXJncGFyc2UgY29tcGF0aWJpbGl0
-eS4uLgpDaGVja2luZyBQQVRDSCAxNC8xNTogcWVtdS1kb2M6IEFkZCBVVUlEIHN1cHBvcnQgaW4g
-aW5pdGlhdG9yIG5hbWUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMTU6IHFjb3cyOiBhbGxvY2F0ZSBj
-bHVzdGVyX2NhY2hlL2NsdXN0ZXJfZGF0YSBvbiBkZW1hbmQuLi4KPT09IE9VVFBVVCBFTkQgPT09
-CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQg
-YXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Thu, 31 Aug 2017 09:32:49 +0200
+Thomas Huth <thuth@redhat.com> wrote:
+
+> On 31.08.2017 08:38, Cornelia Huck wrote:
+> > On Thu, 31 Aug 2017 07:51:17 +0200
+> > Thomas Huth <thuth@redhat.com> wrote:
+> >   
+> >> On 30.08.2017 18:36, Halil Pasic wrote:  
+> >>> The function ioinst_handle_xsch is presenting cc 2 when it's supposed to
+> >>> present cc 1 and the other way around, because css_do_xsch has the error
+> >>> codes mixed up. Fixing the error codes also fixes the priority.
+> >>>
+> >>> Let us fix this.    
+> >>
+> >> (Nit: In case you respin, I'd suggest to remove the last sentence. You
+> >> already used "fix" two times in the previous one)  
+> > 
+> > I can also remove it on applying, if Halil agrees (I have not yet
+> > reviewed it, though).
+> >   
+> >>  
+> >>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> >>> Reported-by: Pierre Morel<pmorel@linux.vnet.ibm.com>    
+> >>
+> >> Space missing -------------^  
+> > 
+> > And I can also add that space on applying :)
+> >   
+> >>  
+> >>> ---
+> >>>  hw/s390x/css.c | 4 ++--
+> >>>  1 file changed, 2 insertions(+), 2 deletions(-)
+> >>>
+> >>> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> >>> index 1880b1a0ff..a50fb0727e 100644
+> >>> --- a/hw/s390x/css.c
+> >>> +++ b/hw/s390x/css.c
+> >>> @@ -1281,12 +1281,12 @@ int css_do_xsch(SubchDev *sch)
+> >>>          (!(s->ctrl &
+> >>>             (SCSW_ACTL_RESUME_PEND | SCSW_ACTL_START_PEND | SCSW_ACTL_SUSP))) ||
+> >>>          (s->ctrl & SCSW_ACTL_SUBCH_ACTIVE)) {
+> >>> -        ret = -EINPROGRESS;
+> >>> +        ret = -EBUSY;
+> >>>          goto out;
+> >>>      }
+> >>>  
+> >>>      if (s->ctrl & SCSW_CTRL_MASK_STCTL) {
+> >>> -        ret = -EBUSY;
+> >>> +        ret = -EINPROGRESS;
+> >>>          goto out;
+> >>>      }    
+> >>
+> >> Using both, EBUSY and EINPROGRESS as error codes sounds very confusing
+> >> to me here ... what's the difference between busy and in-progress? So
+> >> while you're at it, maybe you could replace the code for CC 2 ("CANCEL
+> >> SUBCHANNEL not applicable") with a different error code?  
+> > 
+> > IIRC, I used these two as they matched my idea of what happens best
+> > (there's a difference between "subchannel is busy" and "the I/O is
+> > already in progress, too late to cancel"). "xsch not applicable" is
+> > very hard to translate to an Unix error code :/  
+> 
+> OK, the codes make more sense with your description ==> Maybe simply add
+> a proper comment for each of the return codes?
+
+Taking a step back and looking at the other I/O instructions and their
+implementation in qemu:
+
+- For those instructions that can set it, cc 1 is set when the
+  subchannel is status pending. That's usually the "default" branch in
+  ioinst.c.
+- cc 2 is set when the subchannel is "busy" (or, in the case of xsch,
+  "not applicable for xsch"... sigh) This is supposed to be handled via
+  -EBUSY.
+
+So, there are actually two problems with the current implementation of
+xsch:
+
+- The return codes are switched around, which this patch fixes.
+- But "status pending" should also take precedence over "not
+  applicable", if I read the PoP correctly, so the second if needs to
+  be moved up.
+
+And yes, it makes sense do add some comments...
