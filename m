@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnPrX-0001tx-8E
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 09:50:28 -0400
+	(envelope-from <izik@veertu.com>) id 1dnOAj-00008I-3u
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:02:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnPrS-0004Z4-GN
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 09:50:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60750)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnPrS-0004Yv-75
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 09:50:22 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170825105913.4060-1-marcandre.lureau@redhat.com>
-	<20170825105913.4060-5-marcandre.lureau@redhat.com>
-	<87val5gta4.fsf@dusky.pond.sub.org>
-	<844220409.5983155.1504095111596.JavaMail.zimbra@redhat.com>
-	<8760d5dx8f.fsf@dusky.pond.sub.org>
-	<243440747.6086481.1504099179043.JavaMail.zimbra@redhat.com>
-	<878ti0ku0n.fsf@dusky.pond.sub.org>
-	<CAJ+F1CJ5b3izZgZxD4RXyq00yxi3xN+WADu-MeuyPb-3yLxiVw@mail.gmail.com>
-Date: Thu, 31 Aug 2017 15:50:12 +0200
-In-Reply-To: <CAJ+F1CJ5b3izZgZxD4RXyq00yxi3xN+WADu-MeuyPb-3yLxiVw@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Thu, 31 Aug 2017
-	09:14:36 +0000")
-Message-ID: <871snrkfsb.fsf@dusky.pond.sub.org>
+	(envelope-from <izik@veertu.com>) id 1dnOAY-0003bG-VE
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:02:09 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:35845)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <izik@veertu.com>) id 1dnOAY-0003ah-It
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 08:01:58 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id f127so3295530wmf.1
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 05:01:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 04/14] qlit: remove compound literals
+In-Reply-To: <CABgObfYRUtdH9-7+zWx5Zur=iE_Qr5953+EOgcxRfVGnEonbmg@mail.gmail.com>
+References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
+	<20170830082702.3011-3-Sergio.G.DelReal@gmail.com>
+	<20170830140738.GS18526@redhat.com>
+	<20170831074215.GA13619@stefanha-x1.localdomain>
+	<CABgObfYRUtdH9-7+zWx5Zur=iE_Qr5953+EOgcxRfVGnEonbmg@mail.gmail.com>
+From: Izik Eidus <izik@veertu.com>
+Date: Thu, 31 Aug 2017 15:01:56 +0300
+Message-ID: <CAJTBuyhJgVZ-A+AHatjAwPjsSv2Q-HxuF7nc1NpbWNmGnCOhVQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 02/13] hvf: add code base from Google's
+ QEMU repository
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,129 +32,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: =?utf-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Hajnoczi, Stefan" <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, vpalatin@chromium.org, sergio.g.delreal@gmail.com
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+On Thu, Aug 31, 2017 at 2:26 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-> Hi
 >
-> On Thu, Aug 31, 2017 at 10:43 AM Markus Armbruster <armbru@redhat.com>
+>
+> Il 31 ago 2017 9:43 AM, "Stefan Hajnoczi" <stefanha@gmail.com> ha scritto:
+>
+> On Wed, Aug 30, 2017 at 03:07:38PM +0100, Daniel P. Berrange wrote:
+> > On Wed, Aug 30, 2017 at 03:26:51AM -0500, Sergio Andres Gomez Del Real
 > wrote:
+> > > diff --git a/target/i386/hvf-utils/x86.c b/target/i386/hvf-utils/x86.c
+> > > new file mode 100644
+> > > index 0000000000..e3db2c9c8b
+> > > --- /dev/null
+> > > +++ b/target/i386/hvf-utils/x86.c
+> > > @@ -0,0 +1,174 @@
+> > > +/*
+> > > + * Copyright (C) 2016 Veertu Inc,
+> > > + * Copyright (C) 2017 Google Inc,
+> > > + *
+> > > + * This program is free software; you can redistribute it and/or
+> > > + * modify it under the terms of the GNU General Public License as
+> > > + * published by the Free Software Foundation; either version 2 or
+> > > + * (at your option) version 3 of the License.
+> > > + *
+> > > + * This program is distributed in the hope that it will be useful,
+> > > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> > > + * GNU General Public License for more details.
+> > > + *
+> > > + * You should have received a copy of the GNU General Public License
+> along
+> > > + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> > > + */
+> >
+> > Again  v2-or-v3-only.
+> >
+> > There's many more files with this same problem but I'll stop pointing
+> > them out now.
+> >
+> > If this is to be included in QEMU,  Veertu & Google (and any other
+> > copyright holders) would have to agree to change these files to
+> > v2-or-later
 >
->> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->>
->> > Hi
->> >
->> > ----- Original Message -----
->> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->> >>
->> >> > Hi
->> >> >
->> >> > ----- Original Message -----
->> >> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->> >> >>
->> >> >> > They are not considered constant expressions in C, producing an
->> error
->> >> >> > when compiling a const QLit.
->> >> >>
->> >> >> A const QLit?  Do you mean a non-const one?
->> >> >
->> >> > Really a const QLitObject:
->> >> >
->> >> >
->> >> > const QLitObject qmp_schema_qlit =3D QLIT_QLIST(((QLitObject[]) {
->> >> >              QLIT_QNULL,
->> >> >              {}
->> >> >          }));
->> >> >
->> >> > qmp-introspect.c:17:63: error: initializer element is not constant
->> >> >   const QLitObject qmp_schema_qlit =3D QLIT_QLIST(((QLitObject[]) {
->> >> >                                                                 ^
->> >> > Removing the "compound literals" fixes this error.
->> >>
->> >> Does QLIT_QLIST(((const QLitObject[]) { ... } work?
->> >
->> > No. Even if I put "const" all over the place (in member, in compound
->> type etc).
->> >
->> > Give it a try, see if you can make it const, I am out of luck.
->>
->> The commit message's explanation is wrong.  This isn't about const at
->> all, it's about "constant expressions", which are something else
->> entirely.
->>
+> Sergio: Have you or Paolo had any contact with the Veertu or Google
+> authors about your Hypervisor.framework project?  If you're already in
+> contact with them you could raise the issue and ask them to join this
+> email thread.
 >
-> The point was that declaring a non const QLit with those "compound
-> literals" worked vs with const.
-
-The keyword const is a red herring here, and that's precisely what's
-wrong with the commit message.  The minimized test case demonstrates the
-problem without const.
-
->> For what it's worth, clang is cool with the compound literals.  On
->> Fedora 26 with a minimized test case (appended):
->>
->>     $ clang -c -g -O -Wall compound-lit.c
->>     $ gcc -c -g -O -Wall compound-lit.c
->>     compound-lit.c:30:37: error: initializer element is not constant
->>          .value.qdict =3D (QLitDictEntry[]){
->>                                          ^
->>     compound-lit.c:30:37: note: (near initialization for
->> =E2=80=98(anonymous).value=E2=80=99)
->>
->> GCC bug or not?  A search of the GCC Bugzilla finds
->> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D71713
->>
->> Copying a few notorious language lawyers^W^W^Wtrusted advisers.
->>
->> Even if this turns out to be a gcc bug, we'll have to work around it.
->> But the work-around needs a comment then.
->>
->> In any case, the commit message needs fixing.
->>
 >
-> What about adapting the bug comment:
+> Izik, Vincent (assuming you are the right person to contact at Google),
+> can you reply to Daniel and Stefan?
 >
-> qlit: remove compound literals
+
+Hi,
+
+What I suggest is that we will send our patch' again as gpl2+ and clean the
+entire stuff to make sure they are falling into the right copyright
+category as required by QEMU.
+
+I think it will be easier to me to just integrate it all to QEMU  however I
+need to know if to use the Google code or not (it is anyway not a big issue
+from time perspective)
+
+BTW, another thing that need to be integrated in order to make this stuff
+useful is the vmnet patch's, it is apple NAT for vms that allow guests to
+have networking... (altho that it come with a trick, without certificate it
+will require root permission, while hypverisor framework itself can run
+without root)
+
+What do you guys think?
+
+
 >
-> A compound literal (i.e., "(struct Str1){1}"), is not a constant
-> expression, and so it cannot be used to initialize an object with static
-> storage duration.
-
-That's better.
-
-It's weird that a compound literal isn't a constant expression, but
-arguing about it here won't make gcc treat it as one.
-
-> $ gcc -c -g -O -Wall compound-lit.c
->     compound-lit.c:30:37: error: initializer element is not constant
->          .value.qdict =3D (QLitDictEntry[]){
->                                          ^
->     compound-lit.c:30:37: note: (near initialization for
-> =E2=80=98(anonymous).value=E2=80=99)
+> Sergio worked on completing the QEMU port to Hypervisor.framework. The
+> hvf-all.c file that Daniel pointed out as v2-only is derived from kvm-all.c
+> and hax-all.c, and should be under v2-or-later license. The others seem to
+> be either original or derived from Bochs, which is LGPL, so they could be
+> LGPL or GPLv2+.
 >
-> clang accepts it. In some cases, gcc accepts compound literals as
-> initializer, but not in this nested case. There is a gcc bug about it:
-> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D71713.
+> Thanks,
 >
-> Feel free to adapt on commit
-
-Using this:
-
-    qlit: Change compound literals to initializers
-
-    The QLIT_QFOO() macros expand into compound literals.  Sadly, gcc
-    doesn't recognizes these as constant expressions (clang does), which
-    makes the macros useless for initializing objects with static storage
-    duration.
-
-    There is a gcc bug about it:
-    https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D71713
-
-    Change the macros to expand into initializers.
-
-Avoids passing judgement on "bug or no bug", and avoids referring to the
-compount-lit.c example without actually including it.
-
-I might still add a comment.
+> Paolo
+>
+>
+> There are benefits to having this code upstream.  If they ever want to
+> rebase on qemu.git there will be less work for them.
+>
+> Stefan
+>
+>
+>
