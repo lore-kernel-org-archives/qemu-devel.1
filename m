@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dnM3w-000490-TU
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:47:02 -0400
+	(envelope-from <ldoktor@redhat.com>) id 1dnM4j-0004aI-IM
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:47:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dnM3q-0003IH-64
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:47:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57954)
+	(envelope-from <ldoktor@redhat.com>) id 1dnM4g-0003UW-FX
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:47:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44466)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dnM3p-0003I8-To
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:46:54 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D7CEA883AE
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 09:46:52 +0000 (UTC)
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 31 Aug 2017 10:46:43 +0100
-Message-Id: <20170831094643.22567-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] io: add new qio_channel_{readv, writev, read,
- write}_all functions
+	(Exim 4.71) (envelope-from <ldoktor@redhat.com>) id 1dnM4g-0003U6-71
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:47:46 -0400
+References: <20170818170526.13496-1-apahim@redhat.com>
+	<20170818170526.13496-8-apahim@redhat.com>
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+Message-ID: <a8cb8cb6-1c01-1838-7499-7115b89f7a0b@redhat.com>
+Date: Thu, 31 Aug 2017 11:47:36 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170818170526.13496-8-apahim@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="KSOUr2tTUA4CxnJLb2mI0JcFnd1r026xi"
+Subject: Re: [Qemu-devel] [PATCH v7 07/11] qemu.py: include debug
+ information on launch error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,389 +29,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com
 
-These functions wait until they are able to read / write the full
-requested data buffer(s).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KSOUr2tTUA4CxnJLb2mI0JcFnd1r026xi
+From: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
+To: Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org
+Cc: stefanha@gmail.com, famz@redhat.com, berrange@redhat.com,
+ ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com,
+ crosa@redhat.com
+Message-ID: <a8cb8cb6-1c01-1838-7499-7115b89f7a0b@redhat.com>
+Subject: Re: [PATCH v7 07/11] qemu.py: include debug information on launch
+ error
+References: <20170818170526.13496-1-apahim@redhat.com>
+ <20170818170526.13496-8-apahim@redhat.com>
+In-Reply-To: <20170818170526.13496-8-apahim@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
+Dne 18.8.2017 v 19:05 Amador Pahim napsal(a):
+> When launching a VM, if an exception happens and the VM is not
+> initiated, it might be useful to see the qemu command line and
+> the qemu command output.
+>=20
+> This patch creates that message. Notice that self._iolog needs to be
+> cleaned up in the beginning of the launch() to make sure we will not
+> expose the qemu log from a previous launch if the current one fails.
+>=20
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
+> ---
+>  scripts/qemu.py | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>=20
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index 0bcec4b3b1..29fd2469f9 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -147,6 +147,7 @@ class QEMUMachine(object):
+> =20
+>      def launch(self):
+>          '''Launch the VM and establish a QMP connection'''
+> +        self._iolog =3D None
+>          self._qemu_full_args =3D None
+>          devnull =3D open(os.path.devnull, 'rb')
+>          qemulog =3D open(self._qemu_log_path, 'wb')
+> @@ -162,6 +163,13 @@ class QEMUMachine(object):
+>              self._post_launch()
+>          except:
+>              self.shutdown()
+> +
+> +            LOG.debug('Error launching VM')
+> +            if self._qemu_full_args:
+> +                LOG.debug('Command: %r', ' '.join(self._qemu_full_args=
+))
+> +            if self._iolog:
+> +                LOG.debug('Output: %r', self._iolog)
+> +
+>              raise
+> =20
 
-Changed in v2:
+I don't want to open the cave, but anybody else would actually prefer cus=
+tom Exception with the qemu_full_args, iolog and details about the origin=
+al exception to this? Users who don't care would see/log all the details =
+from the `exception.__str__` and those who are interested in the original=
+ exception would query for it eg. via `exception.original_exception`.
 
- - Remove 'coroutine_fn' annotation (Stefan)
- - Fix docs typos (Eric)
- - Remove bogus error overwriting (Eric)
+Anyway even this change is IMO step into the right direction and we can (=
+and should) refine the use of exceptions in following patches (as Markus =
+spotted, pure Exceptions and other ugliness lives in those waters).
 
- include/io/channel.h       |  90 +++++++++++++++++++++++++++++++++++++++
- io/channel.c               |  94 +++++++++++++++++++++++++++++++++++++++++
- tests/io-channel-helpers.c | 102 ++++-----------------------------------------
- 3 files changed, 193 insertions(+), 93 deletions(-)
+As for the debug vs. error I'd actually stick to "debug", because in nega=
+tive testing the logged message is only an expected debug and in positive=
+ testing it expands the knowledge of the flow, but the actual error messa=
+ge should come from the exception. Not a strong opinion, though...
 
-diff --git a/include/io/channel.h b/include/io/channel.h
-index 54f3dc252f..8f25893c45 100644
---- a/include/io/channel.h
-+++ b/include/io/channel.h
-@@ -269,6 +269,58 @@ ssize_t qio_channel_writev_full(QIOChannel *ioc,
-                                 Error **errp);
- 
- /**
-+ * qio_channel_readv_all:
-+ * @ioc: the channel object
-+ * @iov: the array of memory regions to read data into
-+ * @niov: the length of the @iov array
-+ * @errp: pointer to a NULL-initialized error object
-+ *
-+ * Read data from the IO channel, storing it in the
-+ * memory regions referenced by @iov. Each element
-+ * in the @iov will be fully populated with data
-+ * before the next one is used. The @niov parameter
-+ * specifies the total number of elements in @iov.
-+ *
-+ * The function will wait for all requested data
-+ * to be read, yielding from the current coroutine
-+ * if required.
-+ *
-+ * If end-of-file occurs before all requested data
-+ * has been read, an error will be reported.
-+ *
-+ * Returns: 0 if all bytes were read, or -1 on error
-+ */
-+int qio_channel_readv_all(QIOChannel *ioc,
-+                          const struct iovec *iov,
-+                          size_t niov,
-+                          Error **errp);
-+
-+
-+/**
-+ * qio_channel_writev_all:
-+ * @ioc: the channel object
-+ * @iov: the array of memory regions to write data from
-+ * @niov: the length of the @iov array
-+ * @errp: pointer to a NULL-initialized error object
-+ *
-+ * Write data to the IO channel, reading it from the
-+ * memory regions referenced by @iov. Each element
-+ * in the @iov will be fully sent, before the next
-+ * one is used. The @niov parameter specifies the
-+ * total number of elements in @iov.
-+ *
-+ * The function will wait for all requested data
-+ * to be written, yielding from the current coroutine
-+ * if required.
-+ *
-+ * Returns: 0 if all bytes were written, or -1 on error
-+ */
-+int qio_channel_writev_all(QIOChannel *ioc,
-+                           const struct iovec *iov,
-+                           size_t niov,
-+                           Error **erp);
-+
-+/**
-  * qio_channel_readv:
-  * @ioc: the channel object
-  * @iov: the array of memory regions to read data into
-@@ -331,6 +383,44 @@ ssize_t qio_channel_write(QIOChannel *ioc,
-                           Error **errp);
- 
- /**
-+ * qio_channel_read_all:
-+ * @ioc: the channel object
-+ * @buf: the memory region to read data into
-+ * @buflen: the number of bytes to @buf
-+ * @errp: pointer to a NULL-initialized error object
-+ *
-+ * Reads @buflen bytes into @buf, possibly blocking or (if the
-+ * channel is non-blocking) yielding from the current coroutine
-+ * multiple times until the entire content is read. If end-of-file
-+ * occurs it will return an error rather than a short-read. Otherwise
-+ * behaves as qio_channel_read().
-+ *
-+ * Returns: 0 if all bytes were read, or -1 on error
-+ */
-+int qio_channel_read_all(QIOChannel *ioc,
-+                         char *buf,
-+                         size_t buflen,
-+                         Error **errp);
-+/**
-+ * qio_channel_write_all:
-+ * @ioc: the channel object
-+ * @buf: the memory region to write data into
-+ * @buflen: the number of bytes to @buf
-+ * @errp: pointer to a NULL-initialized error object
-+ *
-+ * Writes @buflen bytes from @buf, possibly blocking or (if the
-+ * channel is non-blocking) yielding from the current coroutine
-+ * multiple times until the entire content is written.  Otherwise
-+ * behaves as qio_channel_write().
-+ *
-+ * Returns: 0 if all bytes were written, or -1 on error
-+ */
-+int qio_channel_write_all(QIOChannel *ioc,
-+                          const char *buf,
-+                          size_t buflen,
-+                          Error **errp);
-+
-+/**
-  * qio_channel_set_blocking:
-  * @ioc: the channel object
-  * @enabled: the blocking flag state
-diff --git a/io/channel.c b/io/channel.c
-index 1cfb8b33a2..5e8c2f0a91 100644
---- a/io/channel.c
-+++ b/io/channel.c
-@@ -22,6 +22,7 @@
- #include "io/channel.h"
- #include "qapi/error.h"
- #include "qemu/main-loop.h"
-+#include "qemu/iov.h"
- 
- bool qio_channel_has_feature(QIOChannel *ioc,
-                              QIOChannelFeature feature)
-@@ -85,6 +86,79 @@ ssize_t qio_channel_writev_full(QIOChannel *ioc,
- }
- 
- 
-+
-+int qio_channel_readv_all(QIOChannel *ioc,
-+                          const struct iovec *iov,
-+                          size_t niov,
-+                          Error **errp)
-+{
-+    int ret = -1;
-+    struct iovec *local_iov = g_new(struct iovec, niov);
-+    struct iovec *local_iov_head = local_iov;
-+    unsigned int nlocal_iov = niov;
-+
-+    nlocal_iov = iov_copy(local_iov, nlocal_iov,
-+                          iov, niov,
-+                          0, iov_size(iov, niov));
-+
-+    while (nlocal_iov > 0) {
-+        ssize_t len;
-+        len = qio_channel_readv(ioc, local_iov, nlocal_iov, errp);
-+        if (len == QIO_CHANNEL_ERR_BLOCK) {
-+            qio_channel_wait(ioc, G_IO_IN);
-+            continue;
-+        } else if (len < 0) {
-+            goto cleanup;
-+        } else if (len == 0) {
-+            error_setg(errp,
-+                       "Unexpected end-of-file before all bytes were read");
-+            goto cleanup;
-+        }
-+
-+        iov_discard_front(&local_iov, &nlocal_iov, len);
-+    }
-+
-+    ret = 0;
-+
-+ cleanup:
-+    g_free(local_iov_head);
-+    return ret;
-+}
-+
-+int qio_channel_writev_all(QIOChannel *ioc,
-+                           const struct iovec *iov,
-+                           size_t niov,
-+                           Error **errp)
-+{
-+    int ret = -1;
-+    struct iovec *local_iov = g_new(struct iovec, niov);
-+    struct iovec *local_iov_head = local_iov;
-+    unsigned int nlocal_iov = niov;
-+
-+    nlocal_iov = iov_copy(local_iov, nlocal_iov,
-+                          iov, niov,
-+                          0, iov_size(iov, niov));
-+
-+    while (nlocal_iov > 0) {
-+        ssize_t len;
-+        len = qio_channel_writev(ioc, local_iov, nlocal_iov, errp);
-+        if (len == QIO_CHANNEL_ERR_BLOCK) {
-+            qio_channel_wait(ioc, G_IO_OUT);
-+            continue;
-+        }
-+        if (len < 0) {
-+            goto cleanup;
-+        }
-+
-+        iov_discard_front(&local_iov, &nlocal_iov, len);
-+    }
-+
-+    ret = 0;
-+ cleanup:
-+    g_free(local_iov_head);
-+    return ret;
-+}
-+
- ssize_t qio_channel_readv(QIOChannel *ioc,
-                           const struct iovec *iov,
-                           size_t niov,
-@@ -123,6 +197,26 @@ ssize_t qio_channel_write(QIOChannel *ioc,
- }
- 
- 
-+int qio_channel_read_all(QIOChannel *ioc,
-+                         char *buf,
-+                         size_t buflen,
-+                         Error **errp)
-+{
-+    struct iovec iov = { .iov_base = buf, .iov_len = buflen };
-+    return qio_channel_readv_all(ioc, &iov, 1, errp);
-+}
-+
-+
-+int qio_channel_write_all(QIOChannel *ioc,
-+                          const char *buf,
-+                          size_t buflen,
-+                          Error **errp)
-+{
-+    struct iovec iov = { .iov_base = (char *)buf, .iov_len = buflen };
-+    return qio_channel_writev_all(ioc, &iov, 1, errp);
-+}
-+
-+
- int qio_channel_set_blocking(QIOChannel *ioc,
-                               bool enabled,
-                               Error **errp)
-diff --git a/tests/io-channel-helpers.c b/tests/io-channel-helpers.c
-index 05e5579cf8..5430e1389d 100644
---- a/tests/io-channel-helpers.c
-+++ b/tests/io-channel-helpers.c
-@@ -21,6 +21,7 @@
- #include "qemu/osdep.h"
- #include "io-channel-helpers.h"
- #include "qapi/error.h"
-+#include "qemu/iov.h"
- 
- struct QIOChannelTest {
-     QIOChannel *src;
-@@ -37,77 +38,17 @@ struct QIOChannelTest {
- };
- 
- 
--static void test_skip_iovec(struct iovec **iov,
--                            size_t *niov,
--                            size_t skip,
--                            struct iovec *old)
--{
--    size_t offset = 0;
--    size_t i;
--
--    for (i = 0; i < *niov; i++) {
--        if (skip < (*iov)[i].iov_len) {
--            old->iov_len = (*iov)[i].iov_len;
--            old->iov_base = (*iov)[i].iov_base;
--
--            (*iov)[i].iov_len -= skip;
--            (*iov)[i].iov_base += skip;
--            break;
--        } else {
--            skip -= (*iov)[i].iov_len;
--
--            if (i == 0 && old->iov_base) {
--                (*iov)[i].iov_len = old->iov_len;
--                (*iov)[i].iov_base = old->iov_base;
--                old->iov_len = 0;
--                old->iov_base = NULL;
--            }
--
--            offset++;
--        }
--    }
--
--    *iov = *iov + offset;
--    *niov -= offset;
--}
--
--
- /* This thread sends all data using iovecs */
- static gpointer test_io_thread_writer(gpointer opaque)
- {
-     QIOChannelTest *data = opaque;
--    struct iovec *iov = data->inputv;
--    size_t niov = data->niov;
--    struct iovec old = { 0 };
- 
-     qio_channel_set_blocking(data->src, data->blocking, NULL);
- 
--    while (niov) {
--        ssize_t ret;
--        ret = qio_channel_writev(data->src,
--                                 iov,
--                                 niov,
--                                 &data->writeerr);
--        if (ret == QIO_CHANNEL_ERR_BLOCK) {
--            if (data->blocking) {
--                error_setg(&data->writeerr,
--                           "Unexpected I/O blocking");
--                break;
--            } else {
--                qio_channel_wait(data->src,
--                                 G_IO_OUT);
--                continue;
--            }
--        } else if (ret < 0) {
--            break;
--        } else if (ret == 0) {
--            error_setg(&data->writeerr,
--                       "Unexpected zero length write");
--            break;
--        }
--
--        test_skip_iovec(&iov, &niov, ret, &old);
--    }
-+    qio_channel_writev_all(data->src,
-+                           data->inputv,
-+                           data->niov,
-+                           &data->writeerr);
- 
-     return NULL;
- }
-@@ -117,38 +58,13 @@ static gpointer test_io_thread_writer(gpointer opaque)
- static gpointer test_io_thread_reader(gpointer opaque)
- {
-     QIOChannelTest *data = opaque;
--    struct iovec *iov = data->outputv;
--    size_t niov = data->niov;
--    struct iovec old = { 0 };
- 
-     qio_channel_set_blocking(data->dst, data->blocking, NULL);
- 
--    while (niov) {
--        ssize_t ret;
--
--        ret = qio_channel_readv(data->dst,
--                                iov,
--                                niov,
--                                &data->readerr);
--
--        if (ret == QIO_CHANNEL_ERR_BLOCK) {
--            if (data->blocking) {
--                error_setg(&data->readerr,
--                           "Unexpected I/O blocking");
--                break;
--            } else {
--                qio_channel_wait(data->dst,
--                                 G_IO_IN);
--                continue;
--            }
--        } else if (ret < 0) {
--            break;
--        } else if (ret == 0) {
--            break;
--        }
--
--        test_skip_iovec(&iov, &niov, ret, &old);
--    }
-+    qio_channel_readv_all(data->dst,
-+                          data->outputv,
-+                          data->niov,
-+                          &data->readerr);
- 
-     return NULL;
- }
--- 
-2.13.5
+Regards,
+Luk=C3=A1=C5=A1
+
+>      def shutdown(self):
+>=20
+
+
+
+--KSOUr2tTUA4CxnJLb2mI0JcFnd1r026xi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEwBAEBCAAaBQJZp9s4ExxsZG9rdG9yQHJlZGhhdC5jb20ACgkQJrNi5H/PIsFN
+MQf/YKsa2VwLq8h+GBZDjT59hISTmVefgjMezUVmd3eIyyzrDmF4OJajZjBl7kSZ
+DlDOtZqbDsPOhP6r8pD8G7Y/xwd7uSoWSJAdc2QL8ZiFlqTw4zAqwrOGsPdqnBDP
+Vw8hNEPhJ4qX82pk59TIhiPkAYsAXCXmdA+5r+X8WlWpPrHHeryv0HNqFG33IeD3
+yURV0unCqr32O5Jk1xFNTWeKR59/BruUWHOpBcmRu4qUTVFkAA8kiOf0Tkbm/cBF
+iBU7Lal1/4NYLE4S2PK4ODI6/tCbAzcUeDXkTsw72qm3C+Xe9wtSYYJp9sQJ2LOa
+myWM64NqVMvBbjBkiY7aGXOsLg==
+=0RGz
+-----END PGP SIGNATURE-----
+
+--KSOUr2tTUA4CxnJLb2mI0JcFnd1r026xi--
