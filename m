@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dnXXK-0004g2-BN
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:02:08 -0400
+	(envelope-from <izik@veertu.com>) id 1dnXfu-0006kV-KT
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:11:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dnXXF-0002Bv-G0
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:02:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59013)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dnXXF-0002BR-6d
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:02:01 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dnXXC-00057k-JX
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 22:01:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 29EEA2E80DB
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 22:01:58 +0000 (UTC)
+	(envelope-from <izik@veertu.com>) id 1dnXfs-0006vF-RZ
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:10:58 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:35656)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <izik@veertu.com>) id 1dnXfs-0006uj-Ff
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:10:56 -0400
+Received: by mail-wm0-x235.google.com with SMTP id v2so5652145wmf.0
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 15:10:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAEkmjvVmHJfgtek9XDb77n12B-cV4=hLNJ66zQBLwOGDg6gUHQ@mail.gmail.com>
+References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
+	<20170830082702.3011-3-Sergio.G.DelReal@gmail.com>
+	<20170830140738.GS18526@redhat.com>
+	<20170831074215.GA13619@stefanha-x1.localdomain>
+	<CABgObfYRUtdH9-7+zWx5Zur=iE_Qr5953+EOgcxRfVGnEonbmg@mail.gmail.com>
+	<CAJTBuyhJgVZ-A+AHatjAwPjsSv2Q-HxuF7nc1NpbWNmGnCOhVQ@mail.gmail.com>
+	<CABgObfaDtgixAEF8OPLuDf=21GiCwY3EUOPHujXPeLqYTup=Yw@mail.gmail.com>
+	<CAMzKsXuvdroUvT=6rjeTtM+FKHz6pat9Fgby5ayF_dZp9qaQaw@mail.gmail.com>
+	<CAEkmjvVmHJfgtek9XDb77n12B-cV4=hLNJ66zQBLwOGDg6gUHQ@mail.gmail.com>
+From: Izik Eidus <izik@veertu.com>
+Date: Fri, 1 Sep 2017 01:10:54 +0300
+Message-ID: <CAJTBuyj96Jd5Ys43sqVTR2y-Q2y-jRqSovHxRtQKGKKfezfZhg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 31 Aug 2017 21:50:00 -0000
-From: Bruno Haible <bruno@clisp.org>
-Reply-To: Bug 1701821 <1701821@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <149892335854.26587.4297865975090837425.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150421620014.10991.11583177487353291080.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1701821] Re: floating-point operation bugs in
- qemu-sh4
+Subject: Re: [Qemu-devel] [PATCH v2 02/13] hvf: add code base from Google's
+ QEMU repository
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,259 +37,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Frank Yang <lfy@google.com>
+Cc: =?UTF-8?Q?Sergio_Andr=C3=A9s_G=C3=B3mez_del_Real?= <sergio.g.delreal@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, vpalatin@chromium.org, qemu-devel <qemu-devel@nongnu.org>, "Hajnoczi,
+	Stefan" <stefanha@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>, "J. Eason" <easonj@google.com>
 
-With qemu-2.10, all of these tests now pass. Great!
+On Fri, Sep 1, 2017 at 1:02 AM, Frank Yang <lfy@google.com> wrote:
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+> + our product manager
+>
+> If I understand correctly, we will need to reconsider things if I include=
+d
+> any additional technology in my port. However, I didn't include any
+> additional references/source in my port compared to Veertu, that was not =
+in
+> the qemu code already (e.g., hax-all/kvm-all) so I think we can just chan=
+ge
+> the QEMU upstream port to use gplv2+.
+>
+> Izik, are you ok with this assessment?
+>
 
--- =
+Yes we are fine with changing everything to GPLv2+, I am just going over
+the code and confirm that all copyright attributions as I saw a file that
+was missing Bochs LGPLv2 copyright.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1701821
 
-Title:
-  floating-point operation bugs in qemu-sh4
 
-Status in QEMU:
-  Fix Released
+>
+> On Thu, Aug 31, 2017 at 2:41 PM, Sergio Andr=C3=A9s G=C3=B3mez del Real <
+> sergio.g.delreal@gmail.com> wrote:
+>
+>> Hello,
+>> Mr. Frank Yang was the guy at Google that introduced the HVF port to
+>> Google's Android Emulator QEMU branch.
+>> Frank, in this thread we are discussing the licensing issue with the HVF
+>> files (their being GPL v2-only). Paolo from Red Hat was asking to Veertu
+>> developer Izik Eidus if the code in Veertu derived only from QEMU, Bochs
+>> and other GPLv2+ or LGPL software. Because the code at Google was itself
+>> derived from Veertu, I'd imagine the same licensing terms would apply in
+>> your case. Any light you can throw over this issue would be much
+>> appreciated.
+>>
+>> Thank you.
+>>
+>> On Thu, Aug 31, 2017 at 4:21 PM, Paolo Bonzini <pbonzini@redhat.com>
+>> wrote:
+>>
+>>> Il 31 ago 2017 3:54 PM, "Izik Eidus" <izik@veertu.com> ha scritto:
+>>>
+>>> > Izik, Vincent (assuming you are the right person to contact at Google=
+),
+>>> > can you reply to Daniel and Stefan?
+>>> >
+>>>
+>>> Hi,
+>>>
+>>> What I suggest is that we will send our patch' again as gpl2+ and clean
+>>> the
+>>> entire stuff to make sure they are falling into the right copyright
+>>> category as required by QEMU.
+>>>
+>>>
+>>> That's not necessary. Just you and Vincent replying to this thread with
+>>> a "Signed-off-by" line would be enough for Sergio to use the right lice=
+nse
+>>> in his v3 submission. Sergio already made some non-trivial changes that=
+ are
+>>> needed for inclusion in QEMU from a supportability (e.g. dirty page
+>>> tracking for graphics) or maintainability perspective (e.g. -cpu suppor=
+t),
+>>> so the simplest thing to do is to retrofit the right license to his
+>>> submission. You can do so if you can confirm that the code you used onl=
+y
+>>> came from QEMU itself, Bochs or other GPLv2+/LGPL software (and the res=
+t
+>>> was written by Veertu).
+>>>
+>>> Google has already contributed the HAXN accelerator, so I am moderately
+>>> optimistic that they can help with HVF too.
+>>>
+>>> BTW, another thing that need to be integrated in order to make this stu=
+ff
+>>> useful is the vmnet patch's, it is apple NAT for vms that allow guests =
+to
+>>> have networking...
+>>>
+>>>
+>>> People can always use slirp (or tap with some more effort), so these
+>>> patches are already a minimum viable feature and pretty close to being
+>>> mergeable. But of course any other contribution is welcome!
+>>>
+>>
+> That's what we do with networking in HVF for android emulator, btw; use
+> slirp.
+>
 
-Bug description:
-  When running the gnulib testsuite, I'm seeing test failures in the tests =
-for libm functions
-    asinf
-    cbrtf
-    copysignf
-    coshf
-    expm1f
-    fabsf
-    floor
-    fmaf
-    ldexpf
-    logbf
-    round
-    roundf
-    sinhf
-    tanhf
 
-  How to reproduce:
-  - Using gnulib, run ./gnulib-tool --create-testdir --dir=3D../testdir-mat=
-h --single-configure asinf cbrtf copysignf coshf expm1f fabsf floor fma fma=
-f fmal ldexpf logbf round roundf sinhf tanhf
-  - Set environment variables for using qemu-sh4.
-  - cd testdir-math; mkdir build-sh4; cd build-sh4; ./configure --host=3Dsh=
-4-linux; make; make check
+Yes, you guys can use our vmnet implemantion together proxy that we are
+having to allow to run it without root, I think this proxy is making sense
+for the android users as they won't required root, but for QEMU I think
+only the vmnet implemantion will be wanted.
+after this stuff will get merged we will send the vmnet stuff as GPLv2+ as
+now it is GPLv2/GPLv3.
 
-  Here are the failures (from the file testdir-math/build-sh4/gltests
-  /test-suite.log):
+(BTW, I am pretty sure the copyright message that include GPLv2/GPLv3 and
+created all this mess was taken from QEMU itself ... :))
 
-  =
 
-  FAIL: test-asinf
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  pc=3D0xf6751cdc sr=3D0x00000101 pr=3D0xf6758e86 fpscr=3D0x00080000
-  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
-  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf6751cd6 fpul=3D0x3f1999=
-9a
-  r0=3D0xf6751d88 r1=3D0x00000000 r2=3D0x00080000 r3=3D0x00000000
-  r4=3D0xf6ffe21c r5=3D0xf6ffe230 r6=3D0xf6ffe2fc r7=3D0x00000000
-  r8=3D0x3f19999a r9=3D0x3f19999a r10=3D0x00000000 r11=3D0x00000000
-  r12=3D0xf67ab008 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe230
-  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
-  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
-  Unhandled trap: 0x180
-  FAIL test-asinf (exit status: 1)
-
-  FAIL: test-cbrtf
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  pc=3D0x00400980 sr=3D0x00000001 pr=3D0x00400684 fpscr=3D0x00080000
-  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
-  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0x00400960 fpul=3D0x000000=
-00
-  r0=3D0x00400ae8 r1=3D0x00412070 r2=3D0x3f19999a r3=3D0xf6ffe2c0
-  r4=3D0x00000001 r5=3D0xf6ffe2f4 r6=3D0xf6ffe2fc r7=3D0x00000000
-  r8=3D0x00412064 r9=3D0x00400960 r10=3D0x00000000 r11=3D0x00000000
-  r12=3D0xf671dc58 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe21c
-  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
-  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
-  Unhandled trap: 0x180
-  FAIL test-cbrtf (exit status: 1)
-
-  FAIL: test-copysignf
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  pc=3D0x004004ce sr=3D0x00000001 pr=3D0xf668d28c fpscr=3D0x00080000
-  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf6674678 vbr=3D0x00000000
-  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0x004004d2 fpul=3D0x000000=
-00
-  r0=3D0x80000000 r1=3D0x3f4ccccd r2=3D0xf6674284 r3=3D0xf6ffe2b0
-  r4=3D0x00000001 r5=3D0xf6ffe2e4 r6=3D0xf6ffe2ec r7=3D0x00000000
-  r8=3D0x00411088 r9=3D0x00411084 r10=3D0x00000000 r11=3D0x00000000
-  r12=3D0xf67a8c58 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe240
-  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
-  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
-  in conditional delay slot (delayed_pc=3D0x004004d2)
-  Unhandled trap: 0x1a0
-  FAIL test-copysignf (exit status: 1)
-
-  FAIL: test-coshf
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  pc=3D0xf675223a sr=3D0x00000101 pr=3D0xf675223c fpscr=3D0x00080000
-  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
-  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf675231c fpul=3D0x3f1999=
-9a
-  r0=3D0x3f19999a r1=3D0x3f19999a r2=3D0x000000e0 r3=3D0xf6ffe2c0
-  r4=3D0x00000001 r5=3D0xf6ffe2f4 r6=3D0xf6ffe2fc r7=3D0x00000000
-  r8=3D0x00400734 r9=3D0x00000000 r10=3D0x00000000 r11=3D0x00000000
-  r12=3D0xf67ab008 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe240
-  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
-  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
-  in delay slot (delayed_pc=3D0xf675231c)
-  Unhandled trap: 0x1a0
-  FAIL test-coshf (exit status: 1)
-
-  FAIL: test-expm1f
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  pc=3D0xf6757e08 sr=3D0x00000000 pr=3D0x004005ce fpscr=3D0x00081000
-  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
-  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf6757dfe fpul=3D0x000000=
-00
-  r0=3D0xf6757fb0 r1=3D0x00001000 r2=3D0x00080000 r3=3D0x3eb17218
-  r4=3D0x00000001 r5=3D0xf6ffe2f4 r6=3D0xf6ffe2fc r7=3D0x00000000
-  r8=3D0x00400514 r9=3D0x00000064 r10=3D0x00400514 r11=3D0x00000000
-  r12=3D0xf67ab008 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe234
-  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
-  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
-  Unhandled trap: 0x180
-  FAIL test-expm1f (exit status: 1)
-
-  FAIL: test-fabsf
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  pc=3D0x00400504 sr=3D0x00000001 pr=3D0xf660228c fpscr=3D0x00080000
-  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
-  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0x004004ec fpul=3D0x000000=
-00
-  r0=3D0x00400640 r1=3D0x00412074 r2=3D0x00000000 r3=3D0x00412078
-  r4=3D0x00000001 r5=3D0xf6ffe2f4 r6=3D0xf6ffe2fc r7=3D0x00080000
-  r8=3D0x004007ac r9=3D0x00000000 r10=3D0x00000000 r11=3D0x00000000
-  r12=3D0xf671dc58 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe260
-  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
-  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
-  Unhandled trap: 0x180
-  FAIL test-fabsf (exit status: 1)
-
-  FAIL: test-floor2
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  ../../gltests/test-floor2.c:130: assertion 'correct_result_p (x, referenc=
-e)' failed
-  qemu: uncaught target signal 6 (Aborted) - core dumped
-  FAIL test-floor2 (exit status: 134)
-
-  FAIL: test-fmaf2
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  pc=3D0xf675f5ac sr=3D0x00000101 pr=3D0xf675f5a6 fpscr=3D0x00080000
-  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
-  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf675f5a6 fpul=3D0x018000=
-00
-  r0=3D0xf675f4a4 r1=3D0x000065b0 r2=3D0x00080000 r3=3D0x3f800000
-  r4=3D0x01800000 r5=3D0x00000000 r6=3D0xffffffe9 r7=3D0x7f800000
-  r8=3D0xffffff6b r9=3D0xf6ffe1e4 r10=3D0xf6ffe1e8 r11=3D0xffffff6b
-  r12=3D0xf67ab008 r13=3D0xf6ffe1d8 r14=3D0x004004dc r15=3D0xf6ffe18c
-  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
-  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
-  Unhandled trap: 0x180
-  FAIL test-fmaf2 (exit status: 1)
-
-  FAIL: test-ldexpf
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  pc=3D0xf669efa0 sr=3D0x00000001 pr=3D0xf669ef9a fpscr=3D0x00080000
-  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf6674678 vbr=3D0x00000000
-  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf669ef9a fpul=3D0x3f9999=
-9a
-  r0=3D0xfffffdc6 r1=3D0x000c9d70 r2=3D0x00080000 r3=3D0x3f19999a
-  r4=3D0x0019999a r5=3D0x3f19999a r6=3D0xffffffe9 r7=3D0x7f800000
-  r8=3D0x00000001 r9=3D0x0040041c r10=3D0xf6ffe23c r11=3D0x00000000
-  r12=3D0xf67a8c58 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe218
-  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
-  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
-  Unhandled trap: 0x180
-  FAIL test-ldexpf (exit status: 1)
-
-  FAIL: test-logbf
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  pc=3D0xf675842c sr=3D0x00000001 pr=3D0x00400664 fpscr=3D0x00080000
-  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
-  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf6758422 fpul=3D0x000000=
-00
-  r0=3D0xf6758480 r1=3D0x00000000 r2=3D0x00080000 r3=3D0x00080000
-  r4=3D0x00000000 r5=3D0xf6ffe2f4 r6=3D0xf6ffe2fc r7=3D0x00000000
-  r8=3D0xf6ffe24c r9=3D0x0040054c r10=3D0x00000000 r11=3D0x00000000
-  r12=3D0xf671dc58 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe244
-  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
-  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
-  Unhandled trap: 0x180
-  FAIL test-logbf (exit status: 1)
-
-  FAIL: test-round2
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  FAIL test-round2 (exit status: 1)
-
-  FAIL: test-roundf2
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  FAIL test-roundf2 (exit status: 1)
-
-  FAIL: test-sinhf
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  pc=3D0xf675581c sr=3D0x00000101 pr=3D0xf675a784 fpscr=3D0x00080000
-  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
-  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf6755858 fpul=3D0x3f1999=
-9a
-  r0=3D0xf6755930 r1=3D0x317fffff r2=3D0x3f19999a r3=3D0xf6ffe2c0
-  r4=3D0x00000001 r5=3D0xf6ffe2f4 r6=3D0xf6ffe2fc r7=3D0x00000000
-  r8=3D0x3f19999a r9=3D0x00000000 r10=3D0x00000000 r11=3D0x00000000
-  r12=3D0xf67ab008 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe238
-  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
-  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
-  in conditional delay slot (delayed_pc=3D0xf6755858)
-  Unhandled trap: 0x1a0
-  FAIL test-sinhf (exit status: 1)
-
-  FAIL: test-tanhf
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  pc=3D0xf6758ca4 sr=3D0x00000100 pr=3D0x0040057c fpscr=3D0x00080000
-  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf65e98e8 vbr=3D0x00000000
-  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf6758c9a fpul=3D0x3f1999=
-9a
-  r0=3D0xf6758d00 r1=3D0x00000000 r2=3D0x00080000 r3=3D0xf6ffe2c0
-  r4=3D0x00000001 r5=3D0xf6ffe2f4 r6=3D0xf6ffe2fc r7=3D0x00000000
-  r8=3D0x3f19999a r9=3D0x00000000 r10=3D0x00000000 r11=3D0x00000000
-  r12=3D0xf67ab008 r13=3D0x00000000 r14=3D0x00000000 r15=3D0xf6ffe254
-  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
-  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
-  Unhandled trap: 0x180
-  FAIL test-tanhf (exit status: 1)
-
-  =
-
-  I don't have access to sh4 hardware, so I cannot provide this as a compar=
-ison point.
-  But most of the test failures don't look like "merely" a wrong computatio=
-n by glibc.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1701821/+subscriptions
+>
+>
+>>
+>>> Paolo
+>>>
+>>>
+>>> (altho that it come with a trick, without certificate it
+>>> will require root permission, while hypverisor framework itself can run
+>>> without root)
+>>>
+>>> What do you guys think?
+>>>
+>>>
+>>> >
+>>> > Sergio worked on completing the QEMU port to Hypervisor.framework. Th=
+e
+>>> > hvf-all.c file that Daniel pointed out as v2-only is derived from
+>>> kvm-all.c
+>>> > and hax-all.c, and should be under v2-or-later license. The others
+>>> seem to
+>>> > be either original or derived from Bochs, which is LGPL, so they coul=
+d
+>>> be
+>>> > LGPL or GPLv2+.
+>>> >
+>>> > Thanks,
+>>> >
+>>> > Paolo
+>>> >
+>>> >
+>>> > There are benefits to having this code upstream.  If they ever want t=
+o
+>>> > rebase on qemu.git there will be less work for them.
+>>> >
+>>> > Stefan
+>>> >
+>>> >
+>>> >
+>>>
+>>>
+>>>
+>>
+>
