@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akalita@cs.stonybrook.edu>) id 1dnd3T-0004tz-RK
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 23:55:40 -0400
+	(envelope-from <lfy@google.com>) id 1dnXXv-0004yf-Rz
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:02:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akalita@cs.stonybrook.edu>) id 1dnd3T-0005Xg-0o
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 23:55:39 -0400
-Received: from mail-ua0-x22a.google.com ([2607:f8b0:400c:c08::22a]:34512)
+	(envelope-from <lfy@google.com>) id 1dnXXu-0002RH-BV
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:02:43 -0400
+Received: from mail-vk0-x22d.google.com ([2607:f8b0:400c:c05::22d]:35814)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <akalita@cs.stonybrook.edu>)
-	id 1dnd3S-0005TY-Qr
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 23:55:38 -0400
-Received: by mail-ua0-x22a.google.com with SMTP id l11so4263756uaf.1
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 20:55:36 -0700 (PDT)
+	(Exim 4.71) (envelope-from <lfy@google.com>) id 1dnXXu-0002Q3-55
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 18:02:42 -0400
+Received: by mail-vk0-x22d.google.com with SMTP id z187so2638817vkd.2
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 15:02:40 -0700 (PDT)
 MIME-Version: 1.0
-From: Arnabjyoti Kalita <akalita@cs.stonybrook.edu>
-Date: Thu, 31 Aug 2017 23:55:34 -0400
-Message-ID: <CAJGDS+EKh2Vg5v+xPdafQ3zfNVSsEAd2rz3C5qHByG_7JhVeAA@mail.gmail.com>
+In-Reply-To: <CAMzKsXuvdroUvT=6rjeTtM+FKHz6pat9Fgby5ayF_dZp9qaQaw@mail.gmail.com>
+References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
+	<20170830082702.3011-3-Sergio.G.DelReal@gmail.com>
+	<20170830140738.GS18526@redhat.com>
+	<20170831074215.GA13619@stefanha-x1.localdomain>
+	<CABgObfYRUtdH9-7+zWx5Zur=iE_Qr5953+EOgcxRfVGnEonbmg@mail.gmail.com>
+	<CAJTBuyhJgVZ-A+AHatjAwPjsSv2Q-HxuF7nc1NpbWNmGnCOhVQ@mail.gmail.com>
+	<CABgObfaDtgixAEF8OPLuDf=21GiCwY3EUOPHujXPeLqYTup=Yw@mail.gmail.com>
+	<CAMzKsXuvdroUvT=6rjeTtM+FKHz6pat9Fgby5ayF_dZp9qaQaw@mail.gmail.com>
+From: Frank Yang <lfy@google.com>
+Date: Thu, 31 Aug 2017 15:02:39 -0700
+Message-ID: <CAEkmjvVmHJfgtek9XDb77n12B-cV4=hLNJ66zQBLwOGDg6gUHQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] QEMU is looping when I load a VM snapshot
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 02/13] hvf: add code base from Google's
+ QEMU repository
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +36,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Sergio_Andr=C3=A9s_G=C3=B3mez_del_Real?= <sergio.g.delreal@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Izik Eidus <izik@veertu.com>, vpalatin@chromium.org, qemu-devel <qemu-devel@nongnu.org>, "Hajnoczi,
+	Stefan" <stefanha@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>, "J. Eason" <easonj@google.com>
 
-Hello,
++ our product manager
 
-I am repeatedly facing an issue while loading a saved snapshot into QEMU.
+If I understand correctly, we will need to reconsider things if I included
+any additional technology in my port. However, I didn't include any
+additional references/source in my port compared to Veertu, that was not in
+the qemu code already (e.g., hax-all/kvm-all) so I think we can just change
+the QEMU upstream port to use gplv2+.
 
-I will detail the steps which I follow when I take a snapshot:
+Izik, are you ok with this assessment?
 
-1. I start QEMU with *-enable-kvm* option. I then run a workload(a program
-from Spec2006) on QEMU.
-2. Immediately after I start running the workload, I open the QEMU monitor
-and using "SAVEVM" command I save the QEMU state when the program just
-started to execute.
-3. Once the QEMU state is saved, I allow the program to complete. I will
-then quit QEMU.
-4. Finally, I will load this snapshot back while starting QEMU - using the
-same CPU and machine configurations. This time I do not apply the *-enable-kvm
-*option, when loading the snapshot back.
-5. I have added print statements to see the value of "PC" in the function --
-      cpu_get_tb_cpu_state()
-6. I see that the PC value does not change and keeps looping around two or
-three values every time.
-7. Hence the program which was paused(upon saving) does not complete
-execution upon loading.
+On Thu, Aug 31, 2017 at 2:41 PM, Sergio Andr=C3=A9s G=C3=B3mez del Real <
+sergio.g.delreal@gmail.com> wrote:
 
-Why would this happen ? I am looking for any inputs on how I could
-understand and tackle this problem.
+> Hello,
+> Mr. Frank Yang was the guy at Google that introduced the HVF port to
+> Google's Android Emulator QEMU branch.
+> Frank, in this thread we are discussing the licensing issue with the HVF
+> files (their being GPL v2-only). Paolo from Red Hat was asking to Veertu
+> developer Izik Eidus if the code in Veertu derived only from QEMU, Bochs
+> and other GPLv2+ or LGPL software. Because the code at Google was itself
+> derived from Veertu, I'd imagine the same licensing terms would apply in
+> your case. Any light you can throw over this issue would be much
+> appreciated.
+>
+> Thank you.
+>
+> On Thu, Aug 31, 2017 at 4:21 PM, Paolo Bonzini <pbonzini@redhat.com>
+> wrote:
+>
+>> Il 31 ago 2017 3:54 PM, "Izik Eidus" <izik@veertu.com> ha scritto:
+>>
+>> > Izik, Vincent (assuming you are the right person to contact at Google)=
+,
+>> > can you reply to Daniel and Stefan?
+>> >
+>>
+>> Hi,
+>>
+>> What I suggest is that we will send our patch' again as gpl2+ and clean
+>> the
+>> entire stuff to make sure they are falling into the right copyright
+>> category as required by QEMU.
+>>
+>>
+>> That's not necessary. Just you and Vincent replying to this thread with =
+a
+>> "Signed-off-by" line would be enough for Sergio to use the right license=
+ in
+>> his v3 submission. Sergio already made some non-trivial changes that are
+>> needed for inclusion in QEMU from a supportability (e.g. dirty page
+>> tracking for graphics) or maintainability perspective (e.g. -cpu support=
+),
+>> so the simplest thing to do is to retrofit the right license to his
+>> submission. You can do so if you can confirm that the code you used only
+>> came from QEMU itself, Bochs or other GPLv2+/LGPL software (and the rest
+>> was written by Veertu).
+>>
+>> Google has already contributed the HAXN accelerator, so I am moderately
+>> optimistic that they can help with HVF too.
+>>
+>> BTW, another thing that need to be integrated in order to make this stuf=
+f
+>> useful is the vmnet patch's, it is apple NAT for vms that allow guests t=
+o
+>> have networking...
+>>
+>>
+>> People can always use slirp (or tap with some more effort), so these
+>> patches are already a minimum viable feature and pretty close to being
+>> mergeable. But of course any other contribution is welcome!
+>>
+>
+That's what we do with networking in HVF for android emulator, btw; use
+slirp.
 
-Thanks and Regards,
-Arnab
+
+>
+>> Paolo
+>>
+>>
+>> (altho that it come with a trick, without certificate it
+>> will require root permission, while hypverisor framework itself can run
+>> without root)
+>>
+>> What do you guys think?
+>>
+>>
+>> >
+>> > Sergio worked on completing the QEMU port to Hypervisor.framework. The
+>> > hvf-all.c file that Daniel pointed out as v2-only is derived from
+>> kvm-all.c
+>> > and hax-all.c, and should be under v2-or-later license. The others see=
+m
+>> to
+>> > be either original or derived from Bochs, which is LGPL, so they could
+>> be
+>> > LGPL or GPLv2+.
+>> >
+>> > Thanks,
+>> >
+>> > Paolo
+>> >
+>> >
+>> > There are benefits to having this code upstream.  If they ever want to
+>> > rebase on qemu.git there will be less work for them.
+>> >
+>> > Stefan
+>> >
+>> >
+>> >
+>>
+>>
+>>
+>
