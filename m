@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56671)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnGZn-0002uQ-8W
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 23:55:32 -0400
+	id 1dnGbY-0004DV-Bo
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 23:57:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnGZk-0007GX-3P
-	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 23:55:31 -0400
+	id 1dnGbX-0008Fu-7p
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 23:57:20 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:37367)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dnGbX-0008Fl-3g
+	for qemu-devel@nongnu.org; Wed, 30 Aug 2017 23:57:19 -0400
+Received: by mail-qk0-x243.google.com with SMTP id a21so28145qkg.4
+	for <qemu-devel@nongnu.org>; Wed, 30 Aug 2017 20:57:18 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20170830215523.25278-1-f4bug@amsat.org>
+References: <20170830225225.27925-1-f4bug@amsat.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8208132b-26de-3c38-1d60-faeea0e2f768@amsat.org>
-Date: Thu, 31 Aug 2017 00:55:24 -0300
+Message-ID: <d59a7487-038c-faa1-fe41-3ff7068a1725@amsat.org>
+Date: Thu, 31 Aug 2017 00:57:14 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170830215523.25278-1-f4bug@amsat.org>
+In-Reply-To: <20170830225225.27925-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/17] add missing entries in MAINTAINERS
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] QOMify MIPS cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +34,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, xiaoqiang zhao <zxq_yx_007@163.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-Cc'ing Markus since I forgot to include him.
+Cc'ing Xiaoqiang Zhao, I forgot to include him.
 
-On 08/30/2017 06:55 PM, Philippe Mathieu-Daudé wrote:
+On 08/30/2017 07:52 PM, Philippe Mathieu-Daudé wrote:
 > Hi,
 > 
-> I tried to have a more helpful ./scripts/get_maintainer.pl output, filling
-> missing entries in MAINTAINERS.
+> This series is based on Igor's "complete cpu QOMification" [1] but only modify
+> the MIPS part. Igor posted an updated series [2], both series should apply
+> separately.
+> 
+> Igor suggested on IRC this series could enter via the Machine core tree, so
+> I added Eduardo and Marcel.
 > 
 > Regards,
 > 
 > Phil.
 > 
+> [1]: http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg04414.html
+> [2]: http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg03364.html
+> 
 > v2:
-> - add R-b & A-b
-> - clean ARM entries (Thomas Huth)
-> - moved files: comment since which commit (Eric Blake)
-> - drop inconsistent patches (default-configs.mak related to hw/machine, no CPU)
-> - drop unhappy patches (include/standard-headers/linux/*)
-> - drop unreplied patches
+> - added Igor and James Tested-by
+> - squashed "!fixup mips: now than MIPSCPU is QOMified, mark it abstract"
 > 
-> Philippe Mathieu-Daudé (17):
->    MAINTAINERS: add missing ARM entries
->    MAINTAINERS: add missing Versatile PB entry
->    MAINTAINERS: add missing STM32 entry
->    MAINTAINERS: add missing entry for vhost
->    MAINTAINERS: add missing VMWare entry
->    MAINTAINERS: add missing Guest Agent entries
->    MAINTAINERS: add missing qcow2 entry
->    MAINTAINERS: add missing USB entry
->    MAINTAINERS: add missing PCI entries
->    MAINTAINERS: add missing SSI entries
->    MAINTAINERS: add missing entries for throttling infra
->    MAINTAINERS: add missing megasas test entry
->    MAINTAINERS: add missing AIO entry
->    MAINTAINERS: add missing entry for Generic Loader
->    MAINTAINERS: add missing Cryptography entry
->    MAINTAINERS: update docs/devel/ entries
->    MAINTAINERS: update docs/interop/ entries
+> PS: code movement somehow triggers a "binary vs unary operators" confusion
+>      in checkpatch: "ERROR: space prohibited after that '&' (ctx:WxW)"
 > 
->   MAINTAINERS | 44 ++++++++++++++++++++++++++++++++++----------
->   1 file changed, 34 insertions(+), 10 deletions(-)
+> Igor Mammedov (2):
+>    mips: MIPSCPU model subclasses
+>    mips: replace cpu_mips_init() with cpu_generic_init()
+> 
+> Philippe Mathieu-Daudé (5):
+>    mips: move hw/mips/cputimer.c to target/mips/
+>    mips: introduce internal.h and cleanup cpu.h
+>    mips: split cpu_mips_realize_env() out of cpu_mips_init()
+>    mips: call cpu_mips_realize_env() from mips_cpu_realizefn()
+>    mips: update mips_cpu_list() to use object_class_get_list()
+> 
+>   target/mips/cpu-qom.h                         |   1 +
+>   target/mips/cpu.h                             | 357 +---------------------
+>   target/mips/internal.h                        | 422 ++++++++++++++++++++++++++
+>   hw/mips/cps.c                                 |   2 +-
+>   hw/mips/mips_fulong2e.c                       |   2 +-
+>   hw/mips/mips_jazz.c                           |   2 +-
+>   hw/mips/mips_malta.c                          |   2 +-
+>   hw/mips/mips_mipssim.c                        |   2 +-
+>   hw/mips/mips_r4k.c                            |   2 +-
+>   hw/mips/cputimer.c => target/mips/cp0_timer.c |   2 +-
+>   target/mips/cpu.c                             |  57 +++-
+>   target/mips/gdbstub.c                         |   1 +
+>   target/mips/helper.c                          |  47 +++
+>   target/mips/kvm.c                             |   1 +
+>   target/mips/machine.c                         |   1 +
+>   target/mips/msa_helper.c                      |   1 +
+>   target/mips/op_helper.c                       |   1 +
+>   target/mips/translate.c                       |  23 +-
+>   target/mips/translate_init.c                  |  68 +----
+>   hw/mips/Makefile.objs                         |   2 +-
+>   target/mips/Makefile.objs                     |   2 +-
+>   21 files changed, 549 insertions(+), 449 deletions(-)
+>   create mode 100644 target/mips/internal.h
+>   rename hw/mips/cputimer.c => target/mips/cp0_timer.c (99%)
 > 
