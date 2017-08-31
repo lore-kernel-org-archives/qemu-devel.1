@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dnNI9-0006mg-PM
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:05:52 -0400
+	(envelope-from <famz@redhat.com>) id 1dnNYG-0004kY-2w
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:22:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dnNI2-0007lF-UP
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:05:45 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 31 Aug 2017 12:05:17 +0100
-Message-Id: <20170831110518.10741-4-berrange@redhat.com>
-In-Reply-To: <20170831110518.10741-1-berrange@redhat.com>
-References: <20170831110518.10741-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/4] block: convert crypto driver to
- bdrv_co_preadv|pwritev
+	(envelope-from <famz@redhat.com>) id 1dnNYF-0006Oz-7x
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:22:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52504)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dnNYF-0006On-1W
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:22:23 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Thu, 31 Aug 2017 19:22:09 +0800
+Message-Id: <20170831112210.19921-3-famz@redhat.com>
+In-Reply-To: <20170831112210.19921-1-famz@redhat.com>
+References: <20170831112210.19921-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 2/3] docker: Add nettle-devel to fedora image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,217 +24,26 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Make the crypto driver implement the bdrv_co_preadv|pwritev
-callbacks,  and also use bdrv_co_preadv|pwritev for I/O
-with the protocol driver beneath.
+The LUKS cases in qemu-iotests requires this.
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block/crypto.c | 103 +++++++++++++++++++++++++++++----------------------------
- 1 file changed, 53 insertions(+), 50 deletions(-)
+ tests/docker/dockerfiles/fedora.docker | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/block/crypto.c b/block/crypto.c
-index e63f094379..40daa77188 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -380,19 +380,23 @@ static void block_crypto_close(BlockDriverState *bs)
- 
- 
- #define BLOCK_CRYPTO_MAX_SECTORS 2048
-+#define BLOCK_CRYPTO_MAX_LENGTH (BLOCK_CRYPTO_MAX_SECTORS * BDRV_SECTOR_SIZE)
- 
- static coroutine_fn int
--block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
--                      int remaining_sectors, QEMUIOVector *qiov)
-+block_crypto_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-+                       QEMUIOVector *qiov, int flags)
- {
-     BlockCrypto *crypto = bs->opaque;
--    int cur_nr_sectors; /* number of sectors in current iteration */
-+    uint64_t cur_bytes; /* number of bytes in current iteration */
-     uint64_t bytes_done = 0;
-     uint8_t *cipher_data = NULL;
-     QEMUIOVector hd_qiov;
-     int ret = 0;
--    size_t payload_offset =
--        qcrypto_block_get_payload_offset(crypto->block) / BDRV_SECTOR_SIZE;
-+    size_t payload_offset = qcrypto_block_get_payload_offset(crypto->block);
-+    uint64_t sector_num = offset / BDRV_SECTOR_SIZE;
-+
-+    assert((offset % BDRV_SECTOR_SIZE) == 0);
-+    assert((bytes % BDRV_SECTOR_SIZE) == 0);
- 
-     qemu_iovec_init(&hd_qiov, qiov->niov);
- 
-@@ -400,44 +404,39 @@ block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
-      * in qiov which points to guest memory.
-      */
-     cipher_data = qemu_try_blockalign(
--        bs->file->bs, MIN(BLOCK_CRYPTO_MAX_SECTORS * BDRV_SECTOR_SIZE,
--                          qiov->size));
-+        bs->file->bs, MIN(BLOCK_CRYPTO_MAX_LENGTH, qiov->size));
-     if (cipher_data == NULL) {
-         ret = -ENOMEM;
-         goto cleanup;
-     }
- 
--    while (remaining_sectors) {
--        cur_nr_sectors = remaining_sectors;
-+    while (bytes) {
-+        cur_bytes = bytes;
- 
--        if (cur_nr_sectors > BLOCK_CRYPTO_MAX_SECTORS) {
--            cur_nr_sectors = BLOCK_CRYPTO_MAX_SECTORS;
-+        if (cur_bytes > BLOCK_CRYPTO_MAX_LENGTH) {
-+            cur_bytes = BLOCK_CRYPTO_MAX_LENGTH;
-         }
- 
-         qemu_iovec_reset(&hd_qiov);
--        qemu_iovec_add(&hd_qiov, cipher_data, cur_nr_sectors * BDRV_SECTOR_SIZE);
-+        qemu_iovec_add(&hd_qiov, cipher_data, cur_bytes);
- 
--        ret = bdrv_co_readv(bs->file,
--                            payload_offset + sector_num,
--                            cur_nr_sectors, &hd_qiov);
-+        ret = bdrv_co_preadv(bs->file, payload_offset + offset + bytes_done,
-+                             cur_bytes, &hd_qiov, 0);
-         if (ret < 0) {
-             goto cleanup;
-         }
- 
--        if (qcrypto_block_decrypt(crypto->block,
--                                  sector_num,
--                                  cipher_data, cur_nr_sectors * BDRV_SECTOR_SIZE,
--                                  NULL) < 0) {
-+        if (qcrypto_block_decrypt(crypto->block, sector_num, cipher_data,
-+                                  cur_bytes, NULL) < 0) {
-             ret = -EIO;
-             goto cleanup;
-         }
- 
--        qemu_iovec_from_buf(qiov, bytes_done,
--                            cipher_data, cur_nr_sectors * BDRV_SECTOR_SIZE);
-+        qemu_iovec_from_buf(qiov, bytes_done, cipher_data, cur_bytes);
- 
--        remaining_sectors -= cur_nr_sectors;
--        sector_num += cur_nr_sectors;
--        bytes_done += cur_nr_sectors * BDRV_SECTOR_SIZE;
-+        sector_num += cur_bytes / BDRV_SECTOR_SIZE;
-+        bytes -= cur_bytes;
-+        bytes_done += cur_bytes;
-     }
- 
-  cleanup:
-@@ -449,17 +448,20 @@ block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
- 
- 
- static coroutine_fn int
--block_crypto_co_writev(BlockDriverState *bs, int64_t sector_num,
--                       int remaining_sectors, QEMUIOVector *qiov)
-+block_crypto_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-+                        QEMUIOVector *qiov, int flags)
- {
-     BlockCrypto *crypto = bs->opaque;
--    int cur_nr_sectors; /* number of sectors in current iteration */
-+    uint64_t cur_bytes; /* number of bytes in current iteration */
-     uint64_t bytes_done = 0;
-     uint8_t *cipher_data = NULL;
-     QEMUIOVector hd_qiov;
-     int ret = 0;
--    size_t payload_offset =
--        qcrypto_block_get_payload_offset(crypto->block) / BDRV_SECTOR_SIZE;
-+    size_t payload_offset = qcrypto_block_get_payload_offset(crypto->block);
-+    uint64_t sector_num = offset / BDRV_SECTOR_SIZE;
-+
-+    assert((offset % BDRV_SECTOR_SIZE) == 0);
-+    assert((bytes % BDRV_SECTOR_SIZE) == 0);
- 
-     qemu_iovec_init(&hd_qiov, qiov->niov);
- 
-@@ -467,44 +469,39 @@ block_crypto_co_writev(BlockDriverState *bs, int64_t sector_num,
-      * contents of qiov - it points to guest memory.
-      */
-     cipher_data = qemu_try_blockalign(
--        bs->file->bs, MIN(BLOCK_CRYPTO_MAX_SECTORS * BDRV_SECTOR_SIZE,
--                          qiov->size));
-+        bs->file->bs, MIN(BLOCK_CRYPTO_MAX_LENGTH, qiov->size));
-     if (cipher_data == NULL) {
-         ret = -ENOMEM;
-         goto cleanup;
-     }
- 
--    while (remaining_sectors) {
--        cur_nr_sectors = remaining_sectors;
-+    while (bytes) {
-+        cur_bytes = bytes;
- 
--        if (cur_nr_sectors > BLOCK_CRYPTO_MAX_SECTORS) {
--            cur_nr_sectors = BLOCK_CRYPTO_MAX_SECTORS;
-+        if (cur_bytes > BLOCK_CRYPTO_MAX_LENGTH) {
-+            cur_bytes = BLOCK_CRYPTO_MAX_LENGTH;
-         }
- 
--        qemu_iovec_to_buf(qiov, bytes_done,
--                          cipher_data, cur_nr_sectors * BDRV_SECTOR_SIZE);
-+        qemu_iovec_to_buf(qiov, bytes_done, cipher_data, cur_bytes);
- 
--        if (qcrypto_block_encrypt(crypto->block,
--                                  sector_num,
--                                  cipher_data, cur_nr_sectors * BDRV_SECTOR_SIZE,
--                                  NULL) < 0) {
-+        if (qcrypto_block_encrypt(crypto->block, sector_num, cipher_data,
-+                                  cur_bytes, NULL) < 0) {
-             ret = -EIO;
-             goto cleanup;
-         }
- 
-         qemu_iovec_reset(&hd_qiov);
--        qemu_iovec_add(&hd_qiov, cipher_data, cur_nr_sectors * BDRV_SECTOR_SIZE);
-+        qemu_iovec_add(&hd_qiov, cipher_data, cur_bytes);
- 
--        ret = bdrv_co_writev(bs->file,
--                             payload_offset + sector_num,
--                             cur_nr_sectors, &hd_qiov);
-+        ret = bdrv_co_pwritev(bs->file, payload_offset + offset + bytes_done,
-+                              cur_bytes, &hd_qiov, 0);
-         if (ret < 0) {
-             goto cleanup;
-         }
- 
--        remaining_sectors -= cur_nr_sectors;
--        sector_num += cur_nr_sectors;
--        bytes_done += cur_nr_sectors * BDRV_SECTOR_SIZE;
-+        sector_num += cur_bytes / BDRV_SECTOR_SIZE;
-+        bytes -= cur_bytes;
-+        bytes_done += cur_bytes;
-     }
- 
-  cleanup:
-@@ -514,6 +511,11 @@ block_crypto_co_writev(BlockDriverState *bs, int64_t sector_num,
-     return ret;
- }
- 
-+static void block_crypto_refresh_limits(BlockDriverState *bs, Error **errp)
-+{
-+    bs->bl.request_alignment = BDRV_SECTOR_SIZE; /* No sub-sector I/O */
-+}
-+
- 
- static int64_t block_crypto_getlength(BlockDriverState *bs)
- {
-@@ -611,8 +613,9 @@ BlockDriver bdrv_crypto_luks = {
-     .bdrv_truncate      = block_crypto_truncate,
-     .create_opts        = &block_crypto_create_opts_luks,
- 
--    .bdrv_co_readv      = block_crypto_co_readv,
--    .bdrv_co_writev     = block_crypto_co_writev,
-+    .bdrv_refresh_limits = block_crypto_refresh_limits,
-+    .bdrv_co_preadv      = block_crypto_co_preadv,
-+    .bdrv_co_pwritev     = block_crypto_co_pwritev,
-     .bdrv_getlength     = block_crypto_getlength,
-     .bdrv_get_info      = block_crypto_get_info_luks,
-     .bdrv_get_specific_info = block_crypto_get_specific_info_luks,
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+index 4eaa8ed2a5..27e8201c54 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -3,6 +3,7 @@ ENV PACKAGES \
+     ccache git tar PyYAML sparse flex bison python2 bzip2 hostname \
+     glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
+     gcc gcc-c++ clang make perl which bc findutils libaio-devel \
++    nettle-devel \
+     mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
+     mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
+     mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
 -- 
 2.13.5
