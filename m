@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dnRFM-0004dE-M6
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 11:19:09 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dnRHB-00066g-S2
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 11:21:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dnRFH-0005zN-Qd
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 11:19:08 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:52975)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dnRFH-0005yv-En
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 11:19:03 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <150142369849.12995.11229612194223213120.stgit@frigg.lan>
-	<20170826003454.GA23546@flamenco>
-	<20170831115935.GQ13619@stefanha-x1.localdomain>
-Date: Thu, 31 Aug 2017 18:13:21 +0300
-In-Reply-To: <20170831115935.GQ13619@stefanha-x1.localdomain> (Stefan
-	Hajnoczi's message of "Thu, 31 Aug 2017 12:59:35 +0100")
-Message-ID: <87wp5ju5wu.fsf@frigg.lan>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dnRH7-0006zK-UE
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 11:21:01 -0400
+Received: from mail-qk0-x233.google.com ([2607:f8b0:400d:c09::233]:33080)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dnRH7-0006zE-PU
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 11:20:57 -0400
+Received: by mail-qk0-x233.google.com with SMTP id l65so4233573qkc.0
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 08:20:57 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170831035306.29170-1-f4bug@amsat.org>
+	<20170831035306.29170-2-f4bug@amsat.org>
+	<be9ca245-f1af-e78a-aa12-c479e59b2985@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <800abf63-db3f-78c7-0580-8d86479fdf5a@amsat.org>
+Date: Thu, 31 Aug 2017 12:20:53 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 0/5] hypertrace: Lightweight
- guest-to-QEMU trace channel
+In-Reply-To: <be9ca245-f1af-e78a-aa12-c479e59b2985@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/7] serial: add serial_chr_nonnull() to
+ use the null backend when none provided
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +37,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org, Luiz Capitulino <lcapitulino@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Eric Blake <eblake@redhat.com>
 
-Stefan Hajnoczi writes:
+On 08/31/2017 02:19 AM, Thomas Huth wrote:
+> On 31.08.2017 05:53, Philippe Mathieu-Daudé wrote:
+[...]>> +Chardev *serial_chr_nonnull(Chardev *chr)
+>> +{
+>> +    static int serial_id;
+>> +    char *label;
+>> +
+>> +    label = g_strdup_printf("discarding-serial%d", serial_id++);
+>> +    chr = qemu_chr_new(label, "null");
+> 
+> That looks wrong - you're ignoring the input parameter and always open
+> the "null" device? Shouldn't there be a "if (chr) return chr;" in front
+> of this?
 
-> On Fri, Aug 25, 2017 at 08:34:54PM -0400, Emilio G. Cota wrote:
->> On Sun, Jul 30, 2017 at 17:08:18 +0300, Llu=C3=ADs Vilanova wrote:
->> > The hypertrace channel allows guest code to emit events in QEMU (the h=
-ost) using
->> > its tracing infrastructure (see "docs/trace.txt"). This works in both =
-'system'
->> > and 'user' modes, is architecture-agnostic and introduces minimal nois=
-e on the
->> > guest.
->> >=20
->> > See first commit for a full description, use-cases and an example.
->> >=20
->> > Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
->>=20
->> This would be indeed very useful once TCG instrumentation is in place.
->>=20
->> However, I'm not very excited about this being PCI-only and Linux-only f=
-or
->> system mode
->> I wonder how we could make this work on all hosts -- did you consider us=
-ing
->> "magic" instructions? We'd need a different magic instruction for each
->> guest ISA, but the library would hide that anyway (and the library code
->> would be the same for user and system modes).
+You right. I had this correct in my first patch when this code was 
+embedded, I then failed at extracting as another function :/
 
-> Magic instructions can potentially be implemented more efficiently in
-> TCG too.  They wouldn't work under KVM/HAX/hvf accelerators though.
+> 
+>> +    assert(chr);
+>> +    g_free(label);
+>> +
+>> +    return chr;
+>> +}
+> 
+>   Thomas
+> 
+> PS: I think you should also merge the two patches together, they are
+> small enough.
 
-Yes, we discussed this on the first version of this series long ago. The sp=
-ecial
-device makes it work on both TCG and KVM (if it were possible to implement a
-TCG-to/from-KVM mode switch that'd be awesome).
-
-Also, both approaches have negligible performance impact on the *guest* tim=
-e.
-
-
-Cheers,
-  Lluis
+Ok.
