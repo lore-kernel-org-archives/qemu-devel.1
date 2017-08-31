@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dnYTr-0001HC-TC
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 19:02:36 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dnZ1D-0002j5-2A
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 19:37:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dnYTr-0006fb-6m
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 19:02:35 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dnZ18-00037m-Aa
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 19:37:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37056)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dnZ18-00037E-4i
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 19:36:58 -0400
+Date: Thu, 31 Aug 2017 20:36:50 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170831233650.GH7570@localhost.localdomain>
+References: <20170818170526.13496-1-apahim@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <40ca8d07-75e5-e0b3-021e-5abaffd16b78@amsat.org>
-References: <1503938283-12404-1-git-send-email-sundeep.lkml@gmail.com>
-	<1503938283-12404-5-git-send-email-sundeep.lkml@gmail.com>
-	<10da5552-c90a-21e6-43ac-829932f64930@amsat.org>
-	<CAFEAcA9W=YqbeYKuAxvfNyjfCWGyAXuPdxwFrpLmoezLJ4pm-A@mail.gmail.com>
-	<40ca8d07-75e5-e0b3-021e-5abaffd16b78@amsat.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 31 Aug 2017 16:02:03 -0700
-Message-ID: <CAKmqyKOyw3w4gqyUmW8qWVz_TtEmbx61J5GEm3NwA75Rhy8kQg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu devel v7 PATCH 4/5] msf2: Add Smartfusion2
- SoC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170818170526.13496-1-apahim@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 00/11] scripts/qemu.py fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,57 +26,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Amador Pahim <apahim@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, ldoktor@redhat.com, famz@redhat.com, stefanha@gmail.com, armbru@redhat.com, mreitz@redhat.com, crosa@redhat.com
 
-On Wed, Aug 30, 2017 at 7:47 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> On 08/30/2017 09:26 AM, Peter Maydell wrote:
->>
->> On 30 August 2017 at 03:45, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
->
->> wrote:
->>>
->>> I think they might be issues if you start QEMU without -serial and then
->>> use
->>> a firmware polling for an uart, the device won't be mapped and the memo=
-ry
->>> accesses are mostly ignored.
->>>
->>> I'd rather use:
->>>
->>>      for (i =3D 0; i < MSF2_NUM_UARTS && i < MAX_SERIAL_PORTS; i++) {
->>>          static const char *serial[] =3D {"serial0", "serial1"};
->>>
->>>          if (!serial_hds[i]) {
->>>              serial_hds[i] =3D qemu_chr_new(serial[i], "null");
->>>
->>>          }
->>>
->>>> +            serial_mm_init(get_system_memory(), uart_addr[i], 2,
->>>> +                           qdev_get_gpio_in(armv7m, uart_irq[i]),
->>>> +                           115200, serial_hds[i],
->>>> DEVICE_NATIVE_ENDIAN);
->>>> +        }
->>>> +    }
->>
->>
->> It would be better to fix serial_mm_init() to handle having
->> a NULL chardev pointer, because we already have a lot of
->> SoC code that just passes it serial_hds[] regardless.
->
->
-> clever :)
->
->> I'd leave this code as it is and we can fix serial_mm_init
->> separately (somebody pointed out this issue for a xilinx
->> board recently).
+I was going to queue most of this series except patch 02/11 due
+the "qemu received signal" message log level, but a few conflicts
+prevent the rest of the series from applying cleanly.  Are you
+planning to send v8?
 
-Ah, I'll look into this then.
+On Fri, Aug 18, 2017 at 07:05:15PM +0200, Amador Pahim wrote:
+> Changes v1->v2:
+>  - Style fixes to make checkpatch.pl happy.
+>  - Rebased.
+> Changes v2->v3:
+>  - Fix typo in patch 3 ("qemu.py: make 'args' public") commit message.
+> Changes v3->v4:
+>  - Squash the 2 first commits since they are co-dependant.
+>  - Cleanup launch() and shutdown().
+>  - Reorder the commits, putting the rename of self._args first.
+>  - Rebased.
+> Changes v4->v5:
+>  - Break the cleanup commit into logical changes and include in the
+>    commit messages the rationale for making them.
+> Changes v5->v6:
+>  - Remove the commit to rename self._args.
+>  - Fix is_running() return before first call to maunch().
+>  - Use python logging system.
+>  - Include the full command line on negative exit code error message.
+>  - Use os.path.null instead of /dev/null.
+>  - Improve the control over the created/deleted files. 
+> Changes v6->v7:
+>  - Split commits in self-contained/atomic changes.
+>  - Addressed the comments from previous version, basically improving the
+>    logging messages and the control over created files. See individual
+>    commit messages for details.
+> 
+> Amador Pahim (11):
+>   qemu.py: fix is_running() return before first launch()
+>   qemu.py: avoid writing to stdout/stderr
+>   qemu.py: use os.path.null instead of /dev/null
+>   qemu.py: use poll() instead of 'returncode'
+>   qemu.py: cleanup redundant calls in launch()
+>   qemu.py: improve message on negative exit code
+>   qemu.py: include debug information on launch error
+>   qemu.py: make sure we only remove files we create
+>   qemu.py: launch vm only if it's not running
+>   qemu.py: don't launch again before shutdown()
+>   qemu.py: refactor launch()
+> 
+>  scripts/qemu.py | 141 ++++++++++++++++++++++++++++++++++++++++++--------------
+>  1 file changed, 106 insertions(+), 35 deletions(-)
+> 
+> -- 
+> 2.13.5
+> 
+> 
 
-Thanks,
-Alistair
-
->
->
-> Sure.
+-- 
+Eduardo
