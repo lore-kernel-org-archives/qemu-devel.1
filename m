@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dnKkj-0005hZ-LU
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:23:06 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dnKkl-0005jt-Lt
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:23:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dnKki-0005zs-Qa
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:23:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46192)
+	(envelope-from <stefanha@redhat.com>) id 1dnKkk-00060S-M7
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:23:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39284)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dnKki-0005zj-KV
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:23:04 -0400
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dnKkk-00060E-GE
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 04:23:06 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Thu, 31 Aug 2017 09:22:08 +0100
-Message-Id: <20170831082210.8362-14-stefanha@redhat.com>
+Date: Thu, 31 Aug 2017 09:22:09 +0100
+Message-Id: <20170831082210.8362-15-stefanha@redhat.com>
 In-Reply-To: <20170831082210.8362-1-stefanha@redhat.com>
 References: <20170831082210.8362-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.10 13/15] tests: migration/guestperf
- Python 2.6 argparse compatibility
+Subject: [Qemu-devel] [PULL for-2.10 14/15] qemu-doc: Add UUID support in
+ initiator name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +25,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Fred Rolland <rollandf@gmail.com>, Fred Rolland <frolland@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Add the scripts/ directory to sys.path so Python 2.6 will be able to
-import argparse.
+From: Fred Rolland <rollandf@gmail.com>
 
-Cc: Daniel P. Berrange <berrange@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Acked-by: John Snow <jsnow@redhat.com>
-Acked-by: Fam Zheng <famz@redhat.com>
-Message-id: 20170825155732.15665-4-stefanha@redhat.com
+Update doc with the usage of UUID for initiator name.
+
+Related-To: https://bugzilla.redhat.com/1006468
+Signed-off-by: Fred Rolland <frolland@redhat.com>
+Message-id: 20170823084830.30500-1-frolland@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/migration/guestperf/shell.py | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ qemu-doc.texi | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/tests/migration/guestperf/shell.py b/tests/migration/guestperf/shell.py
-index 185c5697a6..7992459a97 100644
---- a/tests/migration/guestperf/shell.py
-+++ b/tests/migration/guestperf/shell.py
-@@ -18,12 +18,14 @@
- #
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 9811476ac1..4076226f39 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -1066,10 +1066,11 @@ in a configuration file provided via '-readconfig' or directly on the
+ command line.
  
+ If the initiator-name is not specified qemu will use a default name
+-of 'iqn.2008-11.org.linux-kvm[:<name>'] where <name> is the name of the
++of 'iqn.2008-11.org.linux-kvm[:<uuid>'] where <uuid> is the UUID of the
++virtual machine. If the UUID is not specified qemu will use
++'iqn.2008-11.org.linux-kvm[:<name>'] where <name> is the name of the
+ virtual machine.
  
--import argparse
--import fnmatch
- import os
- import os.path
--import platform
- import sys
-+sys.path.append(os.path.join(os.path.dirname(__file__),
-+                             '..', '..', '..', 'scripts'))
-+import argparse
-+import fnmatch
-+import platform
- 
- from guestperf.hardware import Hardware
- from guestperf.engine import Engine
+-
+ @example
+ Setting a specific initiator name to use when logging in to the target
+ -iscsi initiator-name=iqn.qemu.test:my-initiator
 -- 
 2.13.5
