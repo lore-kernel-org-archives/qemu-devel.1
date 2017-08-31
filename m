@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnQfe-0005V3-ME
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:42:15 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dnQj5-0007dO-2Q
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:45:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnQfb-0006Mr-JX
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:42:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39958)
+	(envelope-from <cohuck@redhat.com>) id 1dnQj1-0007by-Vy
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:45:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52912)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnQfb-0006Mh-9e
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:42:11 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 41313461DC
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 14:42:10 +0000 (UTC)
-References: <20170831095057.22923-1-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c565619b-4e00-7bc1-9791-76ceebbacfe8@redhat.com>
-Date: Thu, 31 Aug 2017 09:42:08 -0500
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dnQj1-0007ba-MF
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:45:43 -0400
+Date: Thu, 31 Aug 2017 16:45:35 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170831164535.74070de3.cohuck@redhat.com>
+In-Reply-To: <20170830170601.15855-1-david@redhat.com>
+References: <20170830170601.15855-1-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170831095057.22923-1-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="GBpC4aRUXiNArGF6n5RPvfrN72twXqBku"
-Subject: Re: [Qemu-devel] [PATCH] io: fix typo in docs comment for
- qio_channel_read
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 00/11] next round of s390x cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,67 +26,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GBpC4aRUXiNArGF6n5RPvfrN72twXqBku
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <c565619b-4e00-7bc1-9791-76ceebbacfe8@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] io: fix typo in docs comment for
- qio_channel_read
-References: <20170831095057.22923-1-berrange@redhat.com>
-In-Reply-To: <20170831095057.22923-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, 30 Aug 2017 19:05:50 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-On 08/31/2017 04:50 AM, Daniel P. Berrange wrote:
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  include/io/channel.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> No new functionality, only cleanups, some of the discussed during the last
+> round of cleanups.
+> 
+> Not sure if the first two patches should be sent separatly? Anyhow, they
+> are most probably not worth the trouble :)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+If you want to clean up the other unneeded includes of cpu-all.h as
+well, it might make sense to send them separately. Otherwise, I'm happy
+to route them through s390-next if nobody complains.
 
->=20
-> diff --git a/include/io/channel.h b/include/io/channel.h
-> index db9bb022a1..54f3dc252f 100644
-> --- a/include/io/channel.h
-> +++ b/include/io/channel.h
-> @@ -299,7 +299,7 @@ ssize_t qio_channel_writev(QIOChannel *ioc,
->                             Error **errp);
-> =20
->  /**
-> - * qio_channel_readv:
-> + * qio_channel_read:
->   * @ioc: the channel object
->   * @buf: the memory region to read data into
->   * @buflen: the length of @buf
->=20
+> 
+> The biggest part of this series is getting rid of s390-virtio.c and
+> cleaning up our cpu number/id handling.
+> 
+> Based on: git://github.com/cohuck/qemu s390-next
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Looking forward to v2 :)
 
-
---GBpC4aRUXiNArGF6n5RPvfrN72twXqBku
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmoIEAACgkQp6FrSiUn
-Q2opSwf/VA8dY6WsRuZvGMacnVv96dRyAqxaw3LSjaXR79XraTtFH7LU6RPq43RT
-U8E3ZhYHRiJQlvckxT8n40JoPASgJ567lCC1ujgMuFlrC2rM9XQzSknavskL+jSj
-pRGzrzUz4GetYT4vvFERcvFVzVqYOds1tnKjFhc/lUvZq4XRfhQ7ee2knqP4EyYo
-a/vKkTfz+oO6ktAxiutqmJHX+x1KZoQSUGWbFKx6ySAz8YCJtO+g495Y8KoFPeL3
-G9UFi84qAA6BLYXJNfDIXdAyvpTJj/eSDAFYh2Vy+Pu5sKc4mZcK5T+FBLGPK6Te
-5nK/IYUKTrq45jpSBuvi1mfX9aLRrg==
-=DaR/
------END PGP SIGNATURE-----
-
---GBpC4aRUXiNArGF6n5RPvfrN72twXqBku--
+> 
+> 
+> David Hildenbrand (11):
+>   exec,dump: don't include exec/exec-all.h explicitly
+>   cpu: drop old comments describing members
+>   s390x: store cpu states inside machine state
+>   s390x: get rid of s390-virtio.c
+>   s390x: rename s390-virtio.h to s390-virtio-hcall.h
+>   target/s390x: cleanup cpu number/address handling
+>   target/s390x: rename next_cpu_id to next_cpu_addr
+>   s390x: allow only 1 CPU with TCG
+>   target/s390x: tcg_s390_program_interrupt() will never return
+>   target/s390x: use trigger_pgm_exception() in
+>     s390_cpu_handle_mmu_fault()
+>   target/s390x: use program_interrupt() in per_check_exception()
+> 
+>  dump.c                             |   1 -
+>  exec.c                             |   1 -
+>  hw/s390x/Makefile.objs             |   1 -
+>  hw/s390x/s390-virtio-ccw.c         | 169 ++++++++++++++++++++++++++++++-
+>  hw/s390x/s390-virtio-hcall.c       |   2 +-
+>  hw/s390x/s390-virtio-hcall.h       |  20 ++++
+>  hw/s390x/s390-virtio.c             | 201 -------------------------------------
+>  hw/s390x/s390-virtio.h             |  35 -------
+>  include/hw/s390x/s390-virtio-ccw.h |   3 +
+>  include/qom/cpu.h                  |   6 +-
+>  target/s390x/cpu-qom.h             |   2 +-
+>  target/s390x/cpu.c                 |  74 ++++----------
+>  target/s390x/cpu.h                 |   5 +-
+>  target/s390x/cpu_models.c          |   2 +-
+>  target/s390x/excp_helper.c         |   5 +-
+>  target/s390x/helper.c              |   8 +-
+>  target/s390x/interrupt.c           |   3 +-
+>  target/s390x/misc_helper.c         |  13 +--
+>  target/s390x/translate.c           |   5 +-
+>  19 files changed, 230 insertions(+), 326 deletions(-)
+>  create mode 100644 hw/s390x/s390-virtio-hcall.h
+>  delete mode 100644 hw/s390x/s390-virtio.c
+>  delete mode 100644 hw/s390x/s390-virtio.h
+> 
