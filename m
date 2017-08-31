@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dnLnK-0006Wd-7b
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:29:51 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dnLr9-0007ml-Is
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:33:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dnLnH-0004v8-3F
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:29:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33354)
+	(envelope-from <cohuck@redhat.com>) id 1dnLr6-0006qm-Fe
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:33:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39664)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dnLnG-0004uh-T9
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:29:47 -0400
-References: <20170830170601.15855-1-david@redhat.com>
-	<20170830170601.15855-6-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <98048e5d-fa10-76a3-ce11-36a78212c259@redhat.com>
-Date: Thu, 31 Aug 2017 11:29:39 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dnLr6-0006q1-8c
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 05:33:44 -0400
+Date: Thu, 31 Aug 2017 11:33:40 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170831113340.7b437fa7.cohuck@redhat.com>
+In-Reply-To: <20170830163609.50260-4-pasic@linux.vnet.ibm.com>
+References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
+	<20170830163609.50260-4-pasic@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170830170601.15855-6-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 05/11] s390x: rename s390-virtio.h to
- s390-virtio-hcall.h
+Subject: Re: [Qemu-devel] [PATCH 3/9] s390x/css: be more consistent if
+ broken beyond repair
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On 30.08.2017 19:05, David Hildenbrand wrote:
-> The only interface left, so let's properly rename it.
+On Wed, 30 Aug 2017 18:36:03 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+
+> If we detect that the internally manged state of the subchannel
+> is broken beyond repair while in do_subchannel_work in case of
+> virtual we just abort the operation and pretend all went well,
+> while in case of pass-through we honor the situation with -ENODEV
+> which results in cc 3 for the instruction whose handler triggered
+> the call.
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+> Let's be consistent on this and do the -ENODEV also for virtual
+> subchannels.
+> 
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Acked-by: Pierre Morel<pmorel@linux.vnet.ibm.com>
 > ---
->  hw/s390x/s390-virtio-ccw.c                      | 2 +-
->  hw/s390x/s390-virtio-hcall.c                    | 2 +-
->  hw/s390x/{s390-virtio.h => s390-virtio-hcall.h} | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
->  rename hw/s390x/{s390-virtio.h => s390-virtio-hcall.h} (92%)
-[...]
-> diff --git a/hw/s390x/s390-virtio.h b/hw/s390x/s390-virtio-hcall.h
-> similarity index 92%
-> rename from hw/s390x/s390-virtio.h
-> rename to hw/s390x/s390-virtio-hcall.h
-> index d984cd4115..64c5bbd827 100644
-> --- a/hw/s390x/s390-virtio.h
-> +++ b/hw/s390x/s390-virtio-hcall.h
-> @@ -1,5 +1,5 @@
->  /*
-> - * Virtio interfaces for s390
-> + * Support for virtio hypercalls on s390x
->   *
->   * Copyright 2012 IBM Corp.
->   * Author(s): Cornelia Huck <cornelia.huck@de.ibm.com>
+>  hw/s390x/css.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index 0822538cde..bc47bf5b20 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -1078,7 +1078,7 @@ int do_subchannel_work_virtual(SubchDev *sch)
+>          sch_handle_start_func_virtual(sch);
+>      } else {
+>          /* Cannot happen. */
+> -        return 0;
+> +        return -ENODEV;
 
-Maybe also rename the HW_S390_VIRTIO_H header guard? Anyway:
+No, this _really_ cannot happen. fctl is a three-bit field, which means
+that one of the branches above must have executed. fctl cannot be 0, as
+any caller of do_subchannel_work() either sets a bit there or, in the
+case of rsch, checks for a bit already set. This is an internal error,
+so an assert seems more suitable here. [We might need to keep the
+return to keep mingw happy.]
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+>      }
+>      css_inject_io_interrupt(sch);
+>      return 0;
