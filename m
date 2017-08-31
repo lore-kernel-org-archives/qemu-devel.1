@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dnN8P-0007ge-Df
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:55:42 -0400
+	(envelope-from <berrange@redhat.com>) id 1dnNI2-0006fB-4L
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:05:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dnN8O-0004Od-JZ
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:55:41 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:35814)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dnN8O-0004O1-CM
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:55:40 -0400
-Received: by mail-wm0-x234.google.com with SMTP id v2so2254031wmf.0
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 03:55:40 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170831104710.GG17315@redhat.com>
-References: <87r2w6eq5n.fsf@gmail.com> <87h8x1yox3.fsf@dusky.pond.sub.org>
-	<20170830170941.GB24565@stefanha-x1.localdomain>
-	<87bmmwi6r6.fsf@dusky.pond.sub.org>
-	<CAFEAcA8r-EqOjZDvP=0mYG7QQ83MU-54RL9Bu8Eb_wPzQo1M7Q@mail.gmail.com>
-	<20170831104710.GG17315@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 31 Aug 2017 11:55:18 +0100
-Message-ID: <CAFEAcA9pk5n7z5PkLDeuLdvknPmzHqcGtG6in1E9-+BwjVOqTg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] scripts: Support building with Python 3
+	(envelope-from <berrange@redhat.com>) id 1dnNHy-0007di-3K
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 07:05:38 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Thu, 31 Aug 2017 12:05:14 +0100
+Message-Id: <20170831110518.10741-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/4] block: improve luks driver perf &
+ switch to byte APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,16 +18,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, David Michael <fedora.dm0@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 31 August 2017 at 11:47, Daniel P. Berrange <berrange@redhat.com> wrote:
-> If we can update to python 2.7 as our minimum, then supporting py2
-> and py3 gets simpler, avoiding some of the nastier hacks, even
-> without that though it isn't too hard.
+This series includes a previously posted patch that improves performance
+of the luks crypto driver:
 
-Unfortunately RHEL6 is what's holding us to retaining 2.6
-support, and googling suggests that doesn't go EOL until 2020...
+  https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg00781.html
 
-thanks
--- PMM
+And then adds three patches that switch over to use byte based APIs for
+I/O, rather than the legacy sector based APIs.
+
+Daniel P. Berrange (4):
+  block: use 1 MB bounce buffers for crypto instead of 16KB
+  block: use BDRV_SECTOR_SIZE in crypto driver
+  block: convert crypto driver to bdrv_co_preadv|pwritev
+  block: convert qcrypto_block_encrypt|decrypt to take bytes offset
+
+ block/crypto.c         | 119 +++++++++++++++++++++++++------------------------
+ block/qcow.c           |   7 ++-
+ block/qcow2-cluster.c  |   8 ++--
+ block/qcow2.c          |   4 +-
+ crypto/block-luks.c    |  12 +++--
+ crypto/block-qcow.c    |  12 +++--
+ crypto/block.c         |  14 +++---
+ crypto/blockpriv.h     |   4 +-
+ include/crypto/block.h |  14 +++---
+ 9 files changed, 104 insertions(+), 90 deletions(-)
+
+-- 
+2.13.5
