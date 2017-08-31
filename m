@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dnHhi-0005rr-IA
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 01:07:47 -0400
+	(envelope-from <thuth@redhat.com>) id 1dnHtT-0001Cz-3t
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 01:19:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dnHhh-0006DI-PQ
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 01:07:46 -0400
-References: <20170830215523.25278-1-f4bug@amsat.org>
-	<20170830215523.25278-2-f4bug@amsat.org>
+	(envelope-from <thuth@redhat.com>) id 1dnHtO-00015D-MJ
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 01:19:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50682)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dnHtO-00014k-Fg
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 01:19:50 -0400
+References: <20170831035306.29170-1-f4bug@amsat.org>
+	<20170831035306.29170-2-f4bug@amsat.org>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3fae2ca1-90d0-b62a-d932-8c0d2cf2b62c@redhat.com>
-Date: Thu, 31 Aug 2017 07:07:36 +0200
+Message-ID: <be9ca245-f1af-e78a-aa12-c479e59b2985@redhat.com>
+Date: Thu, 31 Aug 2017 07:19:41 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170830215523.25278-2-f4bug@amsat.org>
+In-Reply-To: <20170831035306.29170-2-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 01/17] MAINTAINERS: add missing ARM
- entries
+Subject: Re: [Qemu-devel] [PATCH 1/7] serial: add serial_chr_nonnull() to
+ use the null backend when none provided
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 30.08.2017 23:55, Philippe Mathieu-Daud=C3=A9 wrote:
+On 31.08.2017 05:53, Philippe Mathieu-Daud=C3=A9 wrote:
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  MAINTAINERS | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+>  include/hw/char/serial.h |  1 +
+>  hw/char/serial.c         | 13 +++++++++++++
+>  2 files changed, 14 insertions(+)
 >=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index ccee28b12d..b363e1b9c9 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -380,6 +380,7 @@ M: Peter Maydell <peter.maydell@linaro.org>
->  L: qemu-arm@nongnu.org
->  S: Maintained
->  F: hw/char/pl011.c
-> +F: include/hw/char/pl011.h
->  F: hw/display/pl110*
->  F: hw/dma/pl080.c
->  F: hw/dma/pl330.c
-> @@ -403,13 +404,15 @@ F: hw/intc/gic_internal.h
->  F: hw/misc/a9scu.c
->  F: hw/misc/arm11scu.c
->  F: hw/timer/a9gtimer*
-> -F: hw/timer/arm_*
-> -F: include/hw/arm/arm.h
-> +F: hw/timer/arm*
-> +F: include/hw/arm/arm*.h
->  F: include/hw/intc/arm*
->  F: include/hw/misc/a9scu.h
->  F: include/hw/misc/arm11scu.h
->  F: include/hw/timer/a9gtimer.h
->  F: include/hw/timer/arm_mptimer.h
-> +F: include/hw/timer/armv7m_systick.h
-> +F: tests/test-arm-mptimer.c
-> =20
->  Exynos
->  M: Igor Mitsyanko <i.mitsyanko@gmail.com>
+> diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
+> index c4daf11a14..96bccb39e1 100644
+> --- a/include/hw/char/serial.h
+> +++ b/include/hw/char/serial.h
+> @@ -93,6 +93,7 @@ SerialState *serial_mm_init(MemoryRegion *address_spa=
+ce,
+>                              hwaddr base, int it_shift,
+>                              qemu_irq irq, int baudbase,
+>                              Chardev *chr, enum device_endian end);
+> +Chardev *serial_chr_nonnull(Chardev *chr);
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Why do you need the prototype? Please make the function static if
+possible (otherwise please add some rationale in the patch description).
+
+>  /* serial-isa.c */
+>  #define TYPE_ISA_SERIAL "isa-serial"
+> diff --git a/hw/char/serial.c b/hw/char/serial.c
+> index 9aec6c60d8..7a100db107 100644
+> --- a/hw/char/serial.c
+> +++ b/hw/char/serial.c
+> @@ -1025,6 +1025,19 @@ static const MemoryRegionOps serial_mm_ops[3] =3D=
+ {
+>      },
+>  };
+> =20
+> +Chardev *serial_chr_nonnull(Chardev *chr)
+> +{
+> +    static int serial_id;
+> +    char *label;
+> +
+> +    label =3D g_strdup_printf("discarding-serial%d", serial_id++);
+> +    chr =3D qemu_chr_new(label, "null");
+
+That looks wrong - you're ignoring the input parameter and always open
+the "null" device? Shouldn't there be a "if (chr) return chr;" in front
+of this?
+
+> +    assert(chr);
+> +    g_free(label);
+> +
+> +    return chr;
+> +}
+
+ Thomas
+
+PS: I think you should also merge the two patches together, they are
+small enough.
