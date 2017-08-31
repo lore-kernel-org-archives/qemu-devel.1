@@ -1,35 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dnN3R-0006Lu-JC
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:50:36 -0400
+	(envelope-from <berrange@redhat.com>) id 1dnN7z-0007c2-Kz
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:55:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dnN3Q-0002rn-Ul
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:50:33 -0400
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:34243)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dnN3Q-0002qa-P0
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:50:32 -0400
-Received: by mail-wr0-x22f.google.com with SMTP id z91so1060444wrc.1
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 03:50:32 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <655077175.310569.1504175675199@mail.yahoo.com>
-References: <1915302638.2814146.1504030043465.ref@mail.yahoo.com>
-	<1915302638.2814146.1504030043465@mail.yahoo.com>
-	<14033890-2a35-666c-2fa7-5a8727090801@tuxfamily.org>
-	<1075529669.195794.1504079702032@mail.yahoo.com>
-	<bc7bacd9-fec7-c193-6de0-99d1f7fd0f6f@tuxfamily.org>
-	<2061420835.208824.1504085337258@mail.yahoo.com>
-	<20170830121109.7fab5559@bahia>
-	<61cd0715-27e4-7e50-1e85-9da3b4a48bb1@posteo.de>
-	<47171733.403781.1504103700042@mail.yahoo.com>
-	<20170830192838.5bb5a45c@bahia>
-	<655077175.310569.1504175675199@mail.yahoo.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 31 Aug 2017 11:50:10 +0100
-Message-ID: <CAFEAcA-EhBOg55azXgQfgSf-6UEOpggntYGHq+YRaVACGe=8pQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-discuss] Accessing a shared folder
+	(envelope-from <berrange@redhat.com>) id 1dnN7y-0004Bk-TW
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 06:55:15 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Thu, 31 Aug 2017 11:54:56 +0100
+Message-Id: <20170831105456.9558-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v4] block: document semantics of
+ bdrv_co_preadv|pwritev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,24 +18,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mahmood <nt_mahmood@yahoo.com>
-Cc: Greg Kurz <groug@kaod.org>, Thomas Huth <huth@tuxfamily.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Thomas Huth <th.huth@posteo.de>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 31 August 2017 at 11:34, Mahmood via Qemu-devel
-<qemu-devel@nongnu.org> wrote:
-> Hello again,
-> For the command
->
->     mount -t 9p -o trans=virtio Downloads /media/Downloads
->
-> inside the Centos-7 guest, I get this error
->
-> mount: unknown filesystem type '9p'
->
-> Any thought?
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
 
-That's an issue with your guest OS (probably it doesn't
-have 9p support enabled in the kernel).
+Changed in v4:
 
-thanks
--- PMM
+  - Fix typo in commit message
+
+ include/block/block_int.h | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 7571c0aaaf..7816b43a27 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -146,12 +146,43 @@ struct BlockDriver {
+ 
+     int coroutine_fn (*bdrv_co_readv)(BlockDriverState *bs,
+         int64_t sector_num, int nb_sectors, QEMUIOVector *qiov);
++
++    /**
++     * @offset: position in bytes to read at
++     * @bytes: number of bytes to read
++     * @qiov: the buffers to fill with read data
++     * @flags: currently unused, always 0
++     *
++     * @offset and @bytes will be a multiple of 'request_alignment',
++     * but the length of individual @qiov elements does not have to
++     * be a multiple.
++     *
++     * @bytes will always equal the total size of @qiov, and will be
++     * no larger than 'max_transfer'.
++     *
++     * The buffer in @qiov may point directly to guest memory.
++     */
+     int coroutine_fn (*bdrv_co_preadv)(BlockDriverState *bs,
+         uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags);
+     int coroutine_fn (*bdrv_co_writev)(BlockDriverState *bs,
+         int64_t sector_num, int nb_sectors, QEMUIOVector *qiov);
+     int coroutine_fn (*bdrv_co_writev_flags)(BlockDriverState *bs,
+         int64_t sector_num, int nb_sectors, QEMUIOVector *qiov, int flags);
++    /**
++     * @offset: position in bytes to write at
++     * @bytes: number of bytes to write
++     * @qiov: the buffers containing data to write
++     * @flags: zero or more bits allowed by 'supported_write_flags'
++     *
++     * @offset and @bytes will be a multiple of 'request_alignment',
++     * but the length of individual @qiov elements does not have to
++     * be a multiple.
++     *
++     * @bytes will always equal the total size of @qiov, and will be
++     * no larger than 'max_transfer'.
++     *
++     * The buffer in @qiov may point directly to guest memory.
++     */
+     int coroutine_fn (*bdrv_co_pwritev)(BlockDriverState *bs,
+         uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags);
+ 
+-- 
+2.13.5
