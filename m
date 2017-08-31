@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnQfL-0005Iy-GE
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:41:56 -0400
+	(envelope-from <david@redhat.com>) id 1dnQfL-0005J4-Kk
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:42:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnQfG-0006Jr-R8
+	(envelope-from <david@redhat.com>) id 1dnQfG-0006K1-VF
 	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:41:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:20657)
+Received: from mx1.redhat.com ([209.132.183.28]:51202)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dnQfG-0006Jg-Kr
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dnQfG-0006Jk-OD
 	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:41:50 -0400
-Date: Thu, 31 Aug 2017 16:41:42 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170831164142.607711ec.cohuck@redhat.com>
-In-Reply-To: <20170830170601.15855-9-david@redhat.com>
 References: <20170830170601.15855-1-david@redhat.com>
-	<20170830170601.15855-9-david@redhat.com>
+	<20170830170601.15855-7-david@redhat.com>
+	<20170831163513.17c0a963.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <0cada76f-2e43-01db-7c69-ba67e1539aa3@redhat.com>
+Date: Thu, 31 Aug 2017 16:41:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170831163513.17c0a963.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 08/11] s390x: allow only 1 CPU with TCG
+Subject: Re: [Qemu-devel] [PATCH v1 06/11] target/s390x: cleanup cpu
+ number/address handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +30,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
 Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
 
-On Wed, 30 Aug 2017 19:05:58 +0200
-David Hildenbrand <david@redhat.com> wrote:
-
-> Specifying more than 1 CPU (e.g. -smp 5) leads to SIGP errors (the
-> guest tries to bring these CPUs up but fails), because we don't support
-> multiple CPUs on s390x under TCG.
+On 31.08.2017 16:35, Cornelia Huck wrote:
+> On Wed, 30 Aug 2017 19:05:56 +0200
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> Let's bail out if more than 1 are specified, so we don't raise people's
-> hope.
+>> Some time ago we discussed that using "id" as property name is not the
+>> right thing to do, as it is a reserved property for other devices.
+>>
+>> Switch to the term "addr" instead, which matches the definition in the
+>> PoP called "CPU address". There is no such thing as cpu number, so
+>> rename env.cpu_num to env.cpu_addr.
+>>
+>> We can get rid of cpu->id now. Keep cpu->index and env->cpu_addr in sync.
+>> cpu->index was already implicitly used by e.g. cpu_exists(), so keeping
+>> both in sync seems to be the right thing to do.
+>>
+>> cpu->index will now no longer automatically get set via
+>> cpu_exec_realizefn(). For now, we were lucky that both implicitly stayed
+>> in sync.
+>>
+>> Our new cpu property "addr" can be a static property. Range checks can
+>> be avoided by using the correct type and the "setting after realized"
+>> check is done implicitly.
+>>
+>> AFAIK, s390x only supports cpu_add and not device_add for cpus. So we
+>> should be able to safely rename that property (no the "id" property
+>> could properly be used for device_add, which needs an artificial id for
+>> identification purposes).
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/s390x/s390-virtio-ccw.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+> I cannot parse the sentence in the brackets...
+
+Me too :)
+
+...So we should be able to safely rename that property. device_add will
+later need the reserved "id" property. Hotplugging a CPU would then look
+like this: "device_add host-s390-cpu id=cpu2 addr=2".
+
 > 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 7754e3eaf9..eff96808c4 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -23,6 +23,7 @@
->  #include "hw/s390x/css.h"
->  #include "virtio-ccw.h"
->  #include "qemu/config-file.h"
-> +#include "qemu/error-report.h"
->  #include "s390-pci-bus.h"
->  #include "hw/s390x/storage-keys.h"
->  #include "hw/s390x/storage-attributes.h"
-> @@ -56,6 +57,11 @@ static void s390_init_cpus(MachineState *machine)
->      if (machine->cpu_model == NULL) {
->          machine->cpu_model = s390_default_cpu_model_name();
->      }
-> +    if (tcg_enabled() && max_cpus > 1) {
-> +        error_report("Number of SMP CPUs requested (%d) exceeds max CPUs "
-> +                     "supported by TCG (1) on s390x", max_cpus);
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/s390x/s390-virtio-ccw.c |  2 +-
+>>  target/s390x/cpu.c         | 69 ++++++++++++----------------------------------
+>>  target/s390x/cpu.h         |  5 ++--
+>>  target/s390x/cpu_models.c  |  2 +-
+>>  target/s390x/excp_helper.c |  2 +-
+>>  target/s390x/helper.c      |  4 +--
+>>  target/s390x/misc_helper.c |  4 +--
+>>  target/s390x/translate.c   |  5 +---
+>>  8 files changed, 28 insertions(+), 65 deletions(-)
+> 
+> ...the patch seems fine, though :)
+> 
 
-Make this a #define, so we can just flip the switch when smp support is
-ready?
 
-> +        exit(1);
-> +    }
->  
->      ms->cpus = g_new0(S390CPU *, max_cpus);
->  
+-- 
+
+Thanks,
+
+David
