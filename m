@@ -1,18 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dnSmO-0001Br-Ds
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:57:25 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dnSwG-0003uu-3H
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 13:07:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dnSmN-0007af-Ha
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 12:57:20 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dnSwE-0008B3-W4
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 13:07:32 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:33690)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dnSwE-00089T-Oz
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 13:07:30 -0400
+Received: by mail-wm0-x232.google.com with SMTP id r202so585727wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 10:07:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170829173226.7625-1-bobby.prani@gmail.com>
-References: <20170829173226.7625-1-bobby.prani@gmail.com>
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Thu, 31 Aug 2017 12:56:45 -0400
-Message-ID: <CAJhHMCDgm8RRO42PXDOEYE8oZf5OLSBZo+akM1Kx8bOJLTSYCA@mail.gmail.com>
+In-Reply-To: <150419776518.14429.1701568791442232463@loki>
+References: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	<0413bb07-bd76-20fc-f29c-9b0bd60efd1d@redhat.com>
+	<150419776518.14429.1701568791442232463@loki>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 31 Aug 2017 18:07:08 +0100
+Message-ID: <CAFEAcA8XQ+=N9k2QNEXHz9dJMwzw5emg1ff0Cijtv9mii74FGQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] arm_gicv3_kvm: Fix compile warning
+Subject: Re: [Qemu-devel] [PATCH 00/79] Patch Round-up for stable 2.9.1,
+ freeze on 2017-09-04
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,47 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "open list:ARM cores" <qemu-arm@nongnu.org>, "open list:All patches CC here" <qemu-devel@nongnu.org>
-Cc: qemu-stable@nongnu.org
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
 
-CC'ing stable for 2.10.
+On 31 August 2017 at 17:42, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+> Quoting Thomas Huth (2017-08-28 21:18:20)
+>> Not sure, but maybe the following patch should be included, too, since
+>> there were some bogus files in the old version of the U-Boot sources:
+>>
+>> 73663d71ef2bab201475d58e - PPC: E500: Update u-boot to v2017.07
+>
+> Do you have more background on any issues caused by these bogus files?
+> As it stands I think I would opt not to update unless there are specific
+> user-visible bugs we're trying to address which warrant the risk of any
+> regressions which might get pulled in in the process.
 
-On Tue, Aug 29, 2017 at 1:32 PM, Pranith Kumar <bobby.prani@gmail.com> wrote:
-> Fix the following warning:
->
-> /home/pranith/qemu/hw/intc/arm_gicv3_kvm.c:296:17: warning: logical not is only applied to the left hand side of this bitwise operator [-Wlogical-not-parentheses]
->             if (!c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS) {
->                 ^             ~
-> /home/pranith/qemu/hw/intc/arm_gicv3_kvm.c:296:17: note: add parentheses after the '!' to evaluate the bitwise operator first
->             if (!c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS) {
->                 ^
-> /home/pranith/qemu/hw/intc/arm_gicv3_kvm.c:296:17: note: add parentheses around left hand side expression to silence this warning
->             if (!c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS) {
->                 ^
->
-> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-> ---
->  hw/intc/arm_gicv3_kvm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-> index 6051c77705..481fe5405a 100644
-> --- a/hw/intc/arm_gicv3_kvm.c
-> +++ b/hw/intc/arm_gicv3_kvm.c
-> @@ -293,7 +293,7 @@ static void kvm_arm_gicv3_put(GICv3State *s)
->              kvm_gicr_access(s, GICR_PROPBASER + 4, ncpu, &regh, true);
->
->              reg64 = c->gicr_pendbaser;
-> -            if (!c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS) {
-> +            if (!(c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS)) {
->                  /* Setting PTZ is advised if LPIs are disabled, to reduce
->                   * GIC initialization time.
->                   */
-> --
-> 2.11.0
->
+These are the relevant threads:
+https://lists.gnu.org/archive/html/qemu-discuss/2017-07/msg00005.html
+and
+https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg02956.html
 
+The summary is
+(1) one of the u-boot source files which is distributed as part
+of the QEMU tarball has a comment which makes it a bit unclear
+whether it's something that's redistributable (the source file
+isn't actually used in the u-boot target we care about)
+(2) the u-boot binary blob we were shipping doesn't correspond
+to the sources we were shipping
 
+and we fixed those in master by updating the blob and the
+submodule to the most recent u-boot.
 
--- 
-Pranith
+I guess the low-risk fix for the stable branch would be to
+update the u-boot submodule to 79c884d7e4 as suggested in
+https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg03174.html
+which would bring the distributed sources into line with
+the binary blob in stable, so no need to change the
+blob we're distributing. I think it makes sense to do that
+for stable.
+
+thanks
+-- PMM
