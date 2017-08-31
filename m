@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnQKb-0004wd-4T
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:20:31 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dnQLv-0005nZ-0n
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:21:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnQKT-0005sj-LP
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:20:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48590)
+	(envelope-from <cohuck@redhat.com>) id 1dnQLr-0006hg-Qt
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:21:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49188)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnQKT-0005sd-En
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:20:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 608F8267C6
-	for <qemu-devel@nongnu.org>; Thu, 31 Aug 2017 14:20:20 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170825105913.4060-1-marcandre.lureau@redhat.com>
-	<20170825105913.4060-13-marcandre.lureau@redhat.com>
-	<87ziahfd06.fsf@dusky.pond.sub.org>
-Date: Thu, 31 Aug 2017 16:20:14 +0200
-In-Reply-To: <87ziahfd06.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Wed, 30 Aug 2017 14:36:57 +0200")
-Message-ID: <87mv6fiztt.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dnQLr-0006hH-KG
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:21:47 -0400
+Date: Thu, 31 Aug 2017 16:21:39 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170831162139.2065033c.cohuck@redhat.com>
+In-Reply-To: <20170830170601.15855-2-david@redhat.com>
+References: <20170830170601.15855-1-david@redhat.com>
+	<20170830170601.15855-2-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 12/14] qlit: improve QLit list vs qlist
- comparison
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 01/11] exec,
+ dump: don't include exec/exec-all.h explicitly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,32 +28,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
 
-Markus Armbruster <armbru@redhat.com> writes:
+On Wed, 30 Aug 2017 19:05:51 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->
->> Use QLIST_FOREACH_ENTRY() to simplify the code and break earlier.
->>
->> Check that the QLit list has the same size as the qlist, this should
->> ensure that we have an exact match when iterating over qlist for
->> comparing the elements.
->>
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> All but two, namely exec.c and dump.c, include exec/exec-all.h via
+> cpu.h only. as these files already include cpu.h, let's just drop the
+> additional include.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  dump.c | 1 -
+>  exec.c | 1 -
+>  2 files changed, 2 deletions(-)
+> 
 
-I'm updating the commit message so it continues to match the previous
-commit's message:
-
-    qlit: Tighten QLit list vs QList comparison
-
-    We check that all members of the QLit list are also in the QList.  We
-    neglect to check the other direction.  Fix that.
-
-    While there, use QLIST_FOREACH_ENTRY() to simplify the code and break
-    the loop on the first mismatch.
-
-Hope that's okay with you.
+I think there are some more (target/<arch>/arch_dump.c and some i386
+files) - do you want to clean up those as well?
