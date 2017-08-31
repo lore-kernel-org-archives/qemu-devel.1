@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnQj5-0007dO-2Q
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:45:48 -0400
+	(envelope-from <thuth@redhat.com>) id 1dnQjI-0007jW-Iz
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:46:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnQj1-0007by-Vy
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:45:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52912)
+	(envelope-from <thuth@redhat.com>) id 1dnQj9-0007dX-0O
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:46:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59534)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dnQj1-0007ba-MF
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:45:43 -0400
-Date: Thu, 31 Aug 2017 16:45:35 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170831164535.74070de3.cohuck@redhat.com>
-In-Reply-To: <20170830170601.15855-1-david@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dnQj8-0007dL-MR
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 10:45:50 -0400
 References: <20170830170601.15855-1-david@redhat.com>
+	<20170830170601.15855-4-david@redhat.com>
+	<09179efb-0930-bd84-ff22-1f4b23fa6a8e@redhat.com>
+	<55b99307-b817-1cb2-f5c8-901b877735cc@redhat.com>
+	<63bc0433-dd9f-2b75-7885-5460949c821b@redhat.com>
+	<8a4d349c-33c5-0e63-d11b-274d64e854fa@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5d498419-06b7-8de2-0b3e-014de0f3be71@redhat.com>
+Date: Thu, 31 Aug 2017 16:45:44 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <8a4d349c-33c5-0e63-d11b-274d64e854fa@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 00/11] next round of s390x cleanups
+Subject: Re: [Qemu-devel] [PATCH v1 03/11] s390x: store cpu states inside
+ machine state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +33,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>
 
-On Wed, 30 Aug 2017 19:05:50 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On 31.08.2017 16:36, David Hildenbrand wrote:
+> On 31.08.2017 16:31, Thomas Huth wrote:
+>> On 31.08.2017 16:23, David Hildenbrand wrote:
+>>>
+>>>>> +struct S390CPU;
+>>>>
+>>>> You define a "struct S390CPU" here ...
+>>>>
+>>>>>  typedef struct S390CcwMachineState {
+>>>>>      /*< private >*/
+>>>>>      MachineState parent_obj;
+>>>>>  
+>>>>>      /*< public >*/
+>>>>> +    S390CPU **cpus;
+>>>>
+>>>> ... but use the typedef'ed S390CPU here ... looks somewhat suspicious, I
+>>>> wonder whether the typedef is really in the right place?
+>>>
+>>> General question: how much do we care about headers that are not consistent?
+>>>
+>>> E.g. shall I forward declare or simply ignore if compilers don't bite me?
+>>
+>> My remark was not so much about your patch, but about the original
+>> definition instead: "struct S390CPU" is declared in target/s390x/cpu.h,
+>> but "typedef struct S390CPU S390CPU" is in target/s390x/cpu-qom.h. I
+>> think they should rather be declared in the same header file instead. Or
+> 
+> I agree, will have a look.
+> 
+>> your "struct S390CPU;" forward declaration should go into cpu-qom.h
+>> instead, right in front of the typedef.
+>>
+> 
+> Let me rephrase my question:
+> 
+> include/hw/s390x/s390-virtio-ccw.h does not include cpu.h/cpu-qom.h
+> 
+> If compilers don't complain, do we have to forward declare at all? (I
+> think it is cleaner, but I would like to know what is suggested)
 
-> No new functionality, only cleanups, some of the discussed during the last
-> round of cleanups.
-> 
-> Not sure if the first two patches should be sent separatly? Anyhow, they
-> are most probably not worth the trouble :)
+Well, doing a forward declaration with "struct S390CPU;" and then using
+the typedef'd "S390CPU" without "struct" does not make much sense -
+these are two "different" types. If you can use "S390CPU" here without
+the "struct S390CPU;" declaration, that means the cpu-qom.h header got
+included indirectly already - so I'd suggest to simply remove the
+"struct S390CPU;" forward declaration from your patch.
 
-If you want to clean up the other unneeded includes of cpu-all.h as
-well, it might make sense to send them separately. Otherwise, I'm happy
-to route them through s390-next if nobody complains.
-
-> 
-> The biggest part of this series is getting rid of s390-virtio.c and
-> cleaning up our cpu number/id handling.
-> 
-> Based on: git://github.com/cohuck/qemu s390-next
-
-Looking forward to v2 :)
-
-> 
-> 
-> David Hildenbrand (11):
->   exec,dump: don't include exec/exec-all.h explicitly
->   cpu: drop old comments describing members
->   s390x: store cpu states inside machine state
->   s390x: get rid of s390-virtio.c
->   s390x: rename s390-virtio.h to s390-virtio-hcall.h
->   target/s390x: cleanup cpu number/address handling
->   target/s390x: rename next_cpu_id to next_cpu_addr
->   s390x: allow only 1 CPU with TCG
->   target/s390x: tcg_s390_program_interrupt() will never return
->   target/s390x: use trigger_pgm_exception() in
->     s390_cpu_handle_mmu_fault()
->   target/s390x: use program_interrupt() in per_check_exception()
-> 
->  dump.c                             |   1 -
->  exec.c                             |   1 -
->  hw/s390x/Makefile.objs             |   1 -
->  hw/s390x/s390-virtio-ccw.c         | 169 ++++++++++++++++++++++++++++++-
->  hw/s390x/s390-virtio-hcall.c       |   2 +-
->  hw/s390x/s390-virtio-hcall.h       |  20 ++++
->  hw/s390x/s390-virtio.c             | 201 -------------------------------------
->  hw/s390x/s390-virtio.h             |  35 -------
->  include/hw/s390x/s390-virtio-ccw.h |   3 +
->  include/qom/cpu.h                  |   6 +-
->  target/s390x/cpu-qom.h             |   2 +-
->  target/s390x/cpu.c                 |  74 ++++----------
->  target/s390x/cpu.h                 |   5 +-
->  target/s390x/cpu_models.c          |   2 +-
->  target/s390x/excp_helper.c         |   5 +-
->  target/s390x/helper.c              |   8 +-
->  target/s390x/interrupt.c           |   3 +-
->  target/s390x/misc_helper.c         |  13 +--
->  target/s390x/translate.c           |   5 +-
->  19 files changed, 230 insertions(+), 326 deletions(-)
->  create mode 100644 hw/s390x/s390-virtio-hcall.h
->  delete mode 100644 hw/s390x/s390-virtio.c
->  delete mode 100644 hw/s390x/s390-virtio.h
-> 
+ Thomas
