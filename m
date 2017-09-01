@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUq-0000PR-Ih
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:34 -0400
+	(envelope-from <armbru@redhat.com>) id 1dnlUm-0000Ha-37
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUj-0007NJ-TJ
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52822)
+	(envelope-from <armbru@redhat.com>) id 1dnlUj-0007MF-Cb
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52754)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUj-0007Lh-EE
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUi-0007L9-V8
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:21 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5CDCFC047B95
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D54D3C03BD6E
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:19 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-75.ams2.redhat.com
 	[10.36.116.75])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 003657BB4F
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B7B5A63AA
 	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:19 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 14:55:56 +0200
-Message-Id: <20170901125611.29295-33-armbru@redhat.com>
+Date: Fri,  1 Sep 2017 14:55:50 +0200
+Message-Id: <20170901125611.29295-27-armbru@redhat.com>
 In-Reply-To: <20170901125611.29295-1-armbru@redhat.com>
 References: <20170901125611.29295-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 32/47] qapi: Update qapi-code-gen.txt examples
- to match current code
+Subject: [Qemu-devel] [PULL 26/47] qapi-schema: Collect TPM stuff in
+ qapi/tpm.json
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,161 +39,350 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+Sadly, we don't have a TPM maintainer, not even a MAINTAINERS entry.
+Create one, and mark it orphaned.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1503564371-26090-2-git-send-email-armbru@redhat.com>
+Message-Id: <1503602048-12268-12-git-send-email-armbru@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- docs/devel/qapi-code-gen.txt | 47 +++++++++++++++++++++++++++++++++++---=
-------
- 1 file changed, 38 insertions(+), 9 deletions(-)
+ MAINTAINERS      |   8 ++++
+ Makefile         |   1 +
+ qapi-schema.json | 132 +------------------------------------------------=
+----
+ qapi/tpm.json    | 137 +++++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ 4 files changed, 147 insertions(+), 131 deletions(-)
+ create mode 100644 qapi/tpm.json
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 9903ac4c19..ae05327869 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -957,6 +957,8 @@ Example:
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 8cebd798ef..5ec945c9af 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1486,6 +1486,14 @@ F: scripts/tracetool/
+ F: docs/tracing.txt
+ T: git git://github.com/stefanha/qemu.git tracing
 =20
-     typedef struct UserDefOneList UserDefOneList;
-=20
-+    typedef struct q_obj_my_command_arg q_obj_my_command_arg;
++TPM
++S: Orphan
++F: tpm.c
++F: hw/tpm/*
++F: include/hw/acpi/tpm.h
++F: include/sysemu/tpm*
++F: qapi/tpm.json
 +
-     struct UserDefOne {
-         int64_t integer;
-         bool has_string;
-@@ -972,6 +974,10 @@ Example:
+ Checkpatch
+ S: Odd Fixes
+ F: scripts/checkpatch.pl
+diff --git a/Makefile b/Makefile
+index ea6de37197..3dde210662 100644
+--- a/Makefile
++++ b/Makefile
+@@ -418,6 +418,7 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SRC_P=
+ATH)/qapi/common.json \
+                $(SRC_PATH)/qapi/rocker.json \
+                $(SRC_PATH)/qapi/run-state.json \
+                $(SRC_PATH)/qapi/sockets.json \
++               $(SRC_PATH)/qapi/tpm.json \
+                $(SRC_PATH)/qapi/trace.json \
+                $(SRC_PATH)/qapi/transaction.json \
+                $(SRC_PATH)/qapi/ui.json
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 4108ef0cc8..0ad4e0237d 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -86,6 +86,7 @@
+ { 'include': 'qapi/char.json' }
+ { 'include': 'qapi/net.json' }
+ { 'include': 'qapi/rocker.json' }
++{ 'include': 'qapi/tpm.json' }
+ { 'include': 'qapi/ui.json' }
+ { 'include': 'qapi/migration.json' }
+ { 'include': 'qapi/transaction.json' }
+@@ -2213,137 +2214,6 @@
+ { 'command': 'query-target', 'returns': 'TargetInfo' }
 =20
-     void qapi_free_UserDefOneList(UserDefOneList *obj);
-=20
-+    struct q_obj_my_command_arg {
-+        UserDefOneList *arg1;
-+    };
+ ##
+-# @TpmModel:
+-#
+-# An enumeration of TPM models
+-#
+-# @tpm-tis: TPM TIS model
+-#
+-# Since: 1.5
+-##
+-{ 'enum': 'TpmModel', 'data': [ 'tpm-tis' ] }
+-
+-##
+-# @query-tpm-models:
+-#
+-# Return a list of supported TPM models
+-#
+-# Returns: a list of TpmModel
+-#
+-# Since: 1.5
+-#
+-# Example:
+-#
+-# -> { "execute": "query-tpm-models" }
+-# <- { "return": [ "tpm-tis" ] }
+-#
+-##
+-{ 'command': 'query-tpm-models', 'returns': ['TpmModel'] }
+-
+-##
+-# @TpmType:
+-#
+-# An enumeration of TPM types
+-#
+-# @passthrough: TPM passthrough type
+-#
+-# Since: 1.5
+-##
+-{ 'enum': 'TpmType', 'data': [ 'passthrough' ] }
+-
+-##
+-# @query-tpm-types:
+-#
+-# Return a list of supported TPM types
+-#
+-# Returns: a list of TpmType
+-#
+-# Since: 1.5
+-#
+-# Example:
+-#
+-# -> { "execute": "query-tpm-types" }
+-# <- { "return": [ "passthrough" ] }
+-#
+-##
+-{ 'command': 'query-tpm-types', 'returns': ['TpmType'] }
+-
+-##
+-# @TPMPassthroughOptions:
+-#
+-# Information about the TPM passthrough type
+-#
+-# @path: string describing the path used for accessing the TPM device
+-#
+-# @cancel-path: string showing the TPM's sysfs cancel file
+-#               for cancellation of TPM commands while they are executin=
+g
+-#
+-# Since: 1.5
+-##
+-{ 'struct': 'TPMPassthroughOptions', 'data': { '*path' : 'str',
+-                                             '*cancel-path' : 'str'} }
+-
+-##
+-# @TpmTypeOptions:
+-#
+-# A union referencing different TPM backend types' configuration options
+-#
+-# @type: 'passthrough' The configuration options for the TPM passthrough=
+ type
+-#
+-# Since: 1.5
+-##
+-{ 'union': 'TpmTypeOptions',
+-   'data': { 'passthrough' : 'TPMPassthroughOptions' } }
+-
+-##
+-# @TPMInfo:
+-#
+-# Information about the TPM
+-#
+-# @id: The Id of the TPM
+-#
+-# @model: The TPM frontend model
+-#
+-# @options: The TPM (backend) type configuration options
+-#
+-# Since: 1.5
+-##
+-{ 'struct': 'TPMInfo',
+-  'data': {'id': 'str',
+-           'model': 'TpmModel',
+-           'options': 'TpmTypeOptions' } }
+-
+-##
+-# @query-tpm:
+-#
+-# Return information about the TPM device
+-#
+-# Returns: @TPMInfo on success
+-#
+-# Since: 1.5
+-#
+-# Example:
+-#
+-# -> { "execute": "query-tpm" }
+-# <- { "return":
+-#      [
+-#        { "model": "tpm-tis",
+-#          "options":
+-#            { "type": "passthrough",
+-#              "data":
+-#                { "cancel-path": "/sys/class/misc/tpm0/device/cancel",
+-#                  "path": "/dev/tpm0"
+-#                }
+-#            },
+-#          "id": "tpm0"
+-#        }
+-#      ]
+-#    }
+-#
+-##
+-{ 'command': 'query-tpm', 'returns': ['TPMInfo'] }
+-
+-##
+ # @AcpiTableOptions:
+ #
+ # Specify an ACPI table on the command line to load.
+diff --git a/qapi/tpm.json b/qapi/tpm.json
+new file mode 100644
+index 0000000000..e8b2d8dcb7
+--- /dev/null
++++ b/qapi/tpm.json
+@@ -0,0 +1,137 @@
++# -*- Mode: Python -*-
++#
 +
-     #endif
-     $ cat qapi-generated/example-qapi-types.c
- [Uninteresting stuff omitted...]
-@@ -1036,6 +1042,8 @@ Example:
-     void visit_type_UserDefOne(Visitor *v, const char *name, UserDefOne =
-**obj, Error **errp);
-     void visit_type_UserDefOneList(Visitor *v, const char *name, UserDef=
-OneList **obj, Error **errp);
-=20
-+    void visit_type_q_obj_my_command_arg_members(Visitor *v, q_obj_my_co=
-mmand_arg *obj, Error **errp);
++##
++# =3D TPM (trusted platform module) devices
++##
 +
-     #endif
-     $ cat qapi-generated/example-qapi-visit.c
- [Uninteresting stuff omitted...]
-@@ -1104,6 +1112,9 @@ Example:
-             }
-         }
-=20
-+        if (!err) {
-+            visit_check_list(v, &err);
-+        }
-         visit_end_list(v, (void **)obj);
-         if (err && visit_is_input(v)) {
-             qapi_free_UserDefOneList(*obj);
-@@ -1113,6 +1124,19 @@ Example:
-         error_propagate(errp, err);
-     }
-=20
-+    void visit_type_q_obj_my_command_arg_members(Visitor *v, q_obj_my_co=
-mmand_arg *obj, Error **errp)
-+    {
-+        Error *err =3D NULL;
++##
++# @TpmModel:
++#
++# An enumeration of TPM models
++#
++# @tpm-tis: TPM TIS model
++#
++# Since: 1.5
++##
++{ 'enum': 'TpmModel', 'data': [ 'tpm-tis' ] }
 +
-+        visit_type_UserDefOneList(v, "arg1", &obj->arg1, &err);
-+        if (err) {
-+            goto out;
-+        }
++##
++# @query-tpm-models:
++#
++# Return a list of supported TPM models
++#
++# Returns: a list of TpmModel
++#
++# Since: 1.5
++#
++# Example:
++#
++# -> { "execute": "query-tpm-models" }
++# <- { "return": [ "tpm-tis" ] }
++#
++##
++{ 'command': 'query-tpm-models', 'returns': ['TpmModel'] }
 +
-+    out:
-+        error_propagate(errp, err);
-+    }
++##
++# @TpmType:
++#
++# An enumeration of TPM types
++#
++# @passthrough: TPM passthrough type
++#
++# Since: 1.5
++##
++{ 'enum': 'TpmType', 'data': [ 'passthrough' ] }
 +
- =3D=3D=3D scripts/qapi-commands.py =3D=3D=3D
-=20
- Used to generate the marshaling/dispatch functions for the commands
-@@ -1145,9 +1169,12 @@ Example:
-=20
-     #include "example-qapi-types.h"
-     #include "qapi/qmp/qdict.h"
-+    #include "qapi/qmp/dispatch.h"
-     #include "qapi/error.h"
-=20
-+    void example_qmp_init_marshal(QmpCommandList *cmds);
-     UserDefOne *qmp_my_command(UserDefOneList *arg1, Error **errp);
-+    void qmp_marshal_my_command(QDict *args, QObject **ret, Error **errp=
-);
-=20
-     #endif
-     $ cat qapi-generated/example-qmp-marshal.c
-@@ -1170,19 +1197,19 @@ Example:
-         visit_free(v);
-     }
-=20
--    static void qmp_marshal_my_command(QDict *args, QObject **ret, Error=
- **errp)
-+    void qmp_marshal_my_command(QDict *args, QObject **ret, Error **errp=
-)
-     {
-         Error *err =3D NULL;
-         UserDefOne *retval;
-         Visitor *v;
--        UserDefOneList *arg1 =3D NULL;
-+        q_obj_my_command_arg arg =3D {0};
-=20
-         v =3D qobject_input_visitor_new(QOBJECT(args));
-         visit_start_struct(v, NULL, NULL, 0, &err);
-         if (err) {
-             goto out;
-         }
--        visit_type_UserDefOneList(v, "arg1", &arg1, &err);
-+        visit_type_q_obj_my_command_arg_members(v, &arg, &err);
-         if (!err) {
-             visit_check_struct(v, &err);
-         }
-@@ -1191,7 +1218,7 @@ Example:
-             goto out;
-         }
-=20
--        retval =3D qmp_my_command(arg1, &err);
-+        retval =3D qmp_my_command(arg.arg1, &err);
-         if (err) {
-             goto out;
-         }
-@@ -1203,17 +1230,18 @@ Example:
-         visit_free(v);
-         v =3D qapi_dealloc_visitor_new();
-         visit_start_struct(v, NULL, NULL, 0, NULL);
--        visit_type_UserDefOneList(v, "arg1", &arg1, NULL);
-+        visit_type_q_obj_my_command_arg_members(v, &arg, NULL);
-         visit_end_struct(v, NULL);
-         visit_free(v);
-     }
-=20
--    static void qmp_init_marshal(void)
-+    void example_qmp_init_marshal(QmpCommandList *cmds)
-     {
--        qmp_register_command("my-command", qmp_marshal_my_command, QCO_N=
-O_OPTIONS);
--    }
-+        QTAILQ_INIT(cmds);
-=20
--    qapi_init(qmp_init_marshal);
-+        qmp_register_command(cmds, "my-command",
-+                             qmp_marshal_my_command, QCO_NO_OPTIONS);
-+    }
-=20
- =3D=3D=3D scripts/qapi-event.py =3D=3D=3D
-=20
-@@ -1258,6 +1286,7 @@ Example:
-         QDict *qmp;
-         Error *err =3D NULL;
-         QMPEventFuncEmit emit;
++##
++# @query-tpm-types:
++#
++# Return a list of supported TPM types
++#
++# Returns: a list of TpmType
++#
++# Since: 1.5
++#
++# Example:
++#
++# -> { "execute": "query-tpm-types" }
++# <- { "return": [ "passthrough" ] }
++#
++##
++{ 'command': 'query-tpm-types', 'returns': ['TpmType'] }
 +
-         emit =3D qmp_event_get_func_emit();
-         if (!emit) {
-             return;
++##
++# @TPMPassthroughOptions:
++#
++# Information about the TPM passthrough type
++#
++# @path: string describing the path used for accessing the TPM device
++#
++# @cancel-path: string showing the TPM's sysfs cancel file
++#               for cancellation of TPM commands while they are executin=
+g
++#
++# Since: 1.5
++##
++{ 'struct': 'TPMPassthroughOptions', 'data': { '*path' : 'str',
++                                             '*cancel-path' : 'str'} }
++
++##
++# @TpmTypeOptions:
++#
++# A union referencing different TPM backend types' configuration options
++#
++# @type: 'passthrough' The configuration options for the TPM passthrough=
+ type
++#
++# Since: 1.5
++##
++{ 'union': 'TpmTypeOptions',
++   'data': { 'passthrough' : 'TPMPassthroughOptions' } }
++
++##
++# @TPMInfo:
++#
++# Information about the TPM
++#
++# @id: The Id of the TPM
++#
++# @model: The TPM frontend model
++#
++# @options: The TPM (backend) type configuration options
++#
++# Since: 1.5
++##
++{ 'struct': 'TPMInfo',
++  'data': {'id': 'str',
++           'model': 'TpmModel',
++           'options': 'TpmTypeOptions' } }
++
++##
++# @query-tpm:
++#
++# Return information about the TPM device
++#
++# Returns: @TPMInfo on success
++#
++# Since: 1.5
++#
++# Example:
++#
++# -> { "execute": "query-tpm" }
++# <- { "return":
++#      [
++#        { "model": "tpm-tis",
++#          "options":
++#            { "type": "passthrough",
++#              "data":
++#                { "cancel-path": "/sys/class/misc/tpm0/device/cancel",
++#                  "path": "/dev/tpm0"
++#                }
++#            },
++#          "id": "tpm0"
++#        }
++#      ]
++#    }
++#
++##
++{ 'command': 'query-tpm', 'returns': ['TPMInfo'] }
 --=20
 2.13.5
