@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dno1N-0006fK-Ly
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:17 -0400
+	(envelope-from <armbru@redhat.com>) id 1dno1N-0006eK-3K
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dno1L-0001hs-CD
+	(envelope-from <armbru@redhat.com>) id 1dno1L-0001hj-9i
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50880)
+Received: from mx1.redhat.com ([209.132.183.28]:33988)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dno1L-0001ga-1f
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dno1K-0001gV-VU
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:11 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 022F2C057FA1
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:38:10 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E627F5F7A9
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:38:09 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-75.ams2.redhat.com
 	[10.36.116.75])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9A8BA7FB9F
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8F2D317C34
 	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:38:09 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 17:37:39 +0200
-Message-Id: <20170901153758.8628-29-armbru@redhat.com>
+Date: Fri,  1 Sep 2017 17:37:37 +0200
+Message-Id: <20170901153758.8628-27-armbru@redhat.com>
 In-Reply-To: <20170901153758.8628-1-armbru@redhat.com>
 References: <20170901153758.8628-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 28/47] qapi-schema: Fold event.json back into
- qapi-schema.json
+Subject: [Qemu-devel] [PULL v2 26/47] qapi-schema: Collect TPM stuff in
+ qapi/tpm.json
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,372 +39,350 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+Sadly, we don't have a TPM maintainer, not even a MAINTAINERS entry.
+Create one, and mark it orphaned.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1503602048-12268-14-git-send-email-armbru@redhat.com>
+Message-Id: <1503602048-12268-12-git-send-email-armbru@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- Makefile         |   2 +-
- qapi-schema.json | 134 +++++++++++++++++++++++++++++++++++++++++++++++++=
-+++-
- qapi/event.json  | 138 -------------------------------------------------=
-------
- 3 files changed, 134 insertions(+), 140 deletions(-)
- delete mode 100644 qapi/event.json
+ MAINTAINERS      |   8 ++++
+ Makefile         |   1 +
+ qapi-schema.json | 132 +------------------------------------------------=
+----
+ qapi/tpm.json    | 137 +++++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ 4 files changed, 147 insertions(+), 131 deletions(-)
+ create mode 100644 qapi/tpm.json
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 8cebd798ef..5ec945c9af 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1486,6 +1486,14 @@ F: scripts/tracetool/
+ F: docs/tracing.txt
+ T: git git://github.com/stefanha/qemu.git tracing
+=20
++TPM
++S: Orphan
++F: tpm.c
++F: hw/tpm/*
++F: include/hw/acpi/tpm.h
++F: include/sysemu/tpm*
++F: qapi/tpm.json
++
+ Checkpatch
+ S: Odd Fixes
+ F: scripts/checkpatch.pl
 diff --git a/Makefile b/Makefile
-index 3dde210662..337a1f6f9b 100644
+index ea6de37197..3dde210662 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -412,7 +412,7 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SRC_P=
+@@ -418,6 +418,7 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SRC_P=
 ATH)/qapi/common.json \
-                $(SRC_PATH)/qapi/block.json $(SRC_PATH)/qapi/block-core.j=
-son \
-                $(SRC_PATH)/qapi/char.json \
-                $(SRC_PATH)/qapi/crypto.json \
--               $(SRC_PATH)/qapi/event.json $(SRC_PATH)/qapi/introspect.j=
-son \
-+               $(SRC_PATH)/qapi/introspect.json \
-                $(SRC_PATH)/qapi/migration.json \
-                $(SRC_PATH)/qapi/net.json \
                 $(SRC_PATH)/qapi/rocker.json \
+                $(SRC_PATH)/qapi/run-state.json \
+                $(SRC_PATH)/qapi/sockets.json \
++               $(SRC_PATH)/qapi/tpm.json \
+                $(SRC_PATH)/qapi/trace.json \
+                $(SRC_PATH)/qapi/transaction.json \
+                $(SRC_PATH)/qapi/ui.json
 diff --git a/qapi-schema.json b/qapi-schema.json
-index 0ad4e0237d..4964d927bd 100644
+index 4108ef0cc8..0ad4e0237d 100644
 --- a/qapi-schema.json
 +++ b/qapi-schema.json
-@@ -90,7 +90,6 @@
+@@ -86,6 +86,7 @@
+ { 'include': 'qapi/char.json' }
+ { 'include': 'qapi/net.json' }
+ { 'include': 'qapi/rocker.json' }
++{ 'include': 'qapi/tpm.json' }
  { 'include': 'qapi/ui.json' }
  { 'include': 'qapi/migration.json' }
  { 'include': 'qapi/transaction.json' }
--{ 'include': 'qapi/event.json' }
- { 'include': 'qapi/trace.json' }
- { 'include': 'qapi/introspect.json' }
-=20
-@@ -552,6 +551,28 @@
- { 'command': 'query-balloon', 'returns': 'BalloonInfo' }
+@@ -2213,137 +2214,6 @@
+ { 'command': 'query-target', 'returns': 'TargetInfo' }
 =20
  ##
-+# @BALLOON_CHANGE:
-+#
-+# Emitted when the guest changes the actual BALLOON level. This value is
-+# equivalent to the @actual field return by the 'query-balloon' command
-+#
-+# @actual: actual level of the guest memory balloon in bytes
-+#
-+# Note: this event is rate-limited.
-+#
-+# Since: 1.2
-+#
-+# Example:
-+#
-+# <- { "event": "BALLOON_CHANGE",
-+#      "data": { "actual": 944766976 },
-+#      "timestamp": { "seconds": 1267020223, "microseconds": 435656 } }
-+#
-+##
-+{ 'event': 'BALLOON_CHANGE',
-+  'data': { 'actual': 'int' } }
-+
-+##
- # @PciMemoryRange:
- #
- # A PCI device memory region
-@@ -1434,6 +1455,30 @@
- { 'command': 'device_del', 'data': {'id': 'str'} }
-=20
- ##
-+# @DEVICE_DELETED:
-+#
-+# Emitted whenever the device removal completion is acknowledged by the =
-guest.
-+# At this point, it's safe to reuse the specified device ID. Device remo=
-val can
-+# be initiated by the guest or by HMP/QMP commands.
-+#
-+# @device: device name
-+#
-+# @path: device path
-+#
-+# Since: 1.5
-+#
-+# Example:
-+#
-+# <- { "event": "DEVICE_DELETED",
-+#      "data": { "device": "virtio-net-pci-0",
-+#                "path": "/machine/peripheral/virtio-net-pci-0" },
-+#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
-+#
-+##
-+{ 'event': 'DEVICE_DELETED',
-+  'data': { '*device': 'str', 'path': 'str' } }
-+
-+##
- # @DumpGuestMemoryFormat:
- #
- # An enumeration of guest-memory-dump's format.
-@@ -1569,6 +1614,29 @@
- { 'command': 'query-dump', 'returns': 'DumpQueryResult' }
-=20
- ##
-+# @DUMP_COMPLETED:
-+#
-+# Emitted when background dump has completed
-+#
-+# @result: DumpQueryResult type described in qapi-schema.json.
-+#
-+# @error: human-readable error string that provides
-+#         hint on why dump failed. Only presents on failure. The
-+#         user should not try to interpret the error string.
-+#
-+# Since: 2.6
-+#
-+# Example:
-+#
-+# { "event": "DUMP_COMPLETED",
-+#   "data": {"result": {"total": 1090650112, "status": "completed",
-+#                       "completed": 1090650112} } }
-+#
-+##
-+{ 'event': 'DUMP_COMPLETED' ,
-+  'data': { 'result': 'DumpQueryResult', '*error': 'str' } }
-+
-+##
- # @DumpGuestMemoryCapability:
- #
- # A list of the available formats for dump-guest-memory
-@@ -2652,6 +2720,29 @@
- { 'command': 'query-memory-devices', 'returns': ['MemoryDeviceInfo'] }
-=20
- ##
-+# @MEM_UNPLUG_ERROR:
-+#
-+# Emitted when memory hot unplug error occurs.
-+#
-+# @device: device name
-+#
-+# @msg: Informative message
-+#
-+# Since: 2.4
-+#
-+# Example:
-+#
-+# <- { "event": "MEM_UNPLUG_ERROR"
-+#      "data": { "device": "dimm1",
-+#                "msg": "acpi: device unplug for unsupported device"
-+#      },
-+#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
-+#
-+##
-+{ 'event': 'MEM_UNPLUG_ERROR',
-+  'data': { 'device': 'str', 'msg': 'str' } }
-+
-+##
- # @ACPISlotType:
- #
- # @DIMM: memory slot
-@@ -2706,6 +2797,25 @@
- { 'command': 'query-acpi-ospm-status', 'returns': ['ACPIOSTInfo'] }
-=20
- ##
-+# @ACPI_DEVICE_OST:
-+#
-+# Emitted when guest executes ACPI _OST method.
-+#
-+# @info: ACPIOSTInfo type as described in qapi-schema.json
-+#
-+# Since: 2.1
-+#
-+# Example:
-+#
-+# <- { "event": "ACPI_DEVICE_OST",
-+#      "data": { "device": "d1", "slot": "0",
-+#                "slot-type": "DIMM", "source": 1, "status": 0 } }
-+#
-+##
-+{ 'event': 'ACPI_DEVICE_OST',
-+     'data': { 'info': 'ACPIOSTInfo' } }
-+
-+##
- # @IoOperationType:
- #
- # An enumeration of the I/O operation types
-@@ -2738,6 +2848,28 @@
- { 'command': 'rtc-reset-reinjection' }
-=20
- ##
-+# @RTC_CHANGE:
-+#
-+# Emitted when the guest changes the RTC time.
-+#
-+# @offset: offset between base RTC clock (as specified by -rtc base), an=
-d
-+#          new RTC clock value
-+#
-+# Note: This event is rate-limited.
-+#
-+# Since: 0.13.0
-+#
-+# Example:
-+#
-+# <-   { "event": "RTC_CHANGE",
-+#        "data": { "offset": 78 },
-+#        "timestamp": { "seconds": 1267020223, "microseconds": 435656 } =
-}
-+#
-+##
-+{ 'event': 'RTC_CHANGE',
-+  'data': { 'offset': 'int' } }
-+
-+##
- # @ReplayMode:
- #
- # Mode of the replay subsystem.
-diff --git a/qapi/event.json b/qapi/event.json
-deleted file mode 100644
-index 48a5d8fb21..0000000000
---- a/qapi/event.json
-+++ /dev/null
-@@ -1,138 +0,0 @@
--# -*- Mode: Python -*-
+-# @TpmModel:
+-#
+-# An enumeration of TPM models
+-#
+-# @tpm-tis: TPM TIS model
+-#
+-# Since: 1.5
+-##
+-{ 'enum': 'TpmModel', 'data': [ 'tpm-tis' ] }
 -
 -##
--# =3D Other events
--##
--
--##
--# @RTC_CHANGE:
+-# @query-tpm-models:
 -#
--# Emitted when the guest changes the RTC time.
+-# Return a list of supported TPM models
 -#
--# @offset: offset between base RTC clock (as specified by -rtc base), an=
-d
--#          new RTC clock value
--#
--# Note: This event is rate-limited.
--#
--# Since: 0.13.0
--#
--# Example:
--#
--# <-   { "event": "RTC_CHANGE",
--#        "data": { "offset": 78 },
--#        "timestamp": { "seconds": 1267020223, "microseconds": 435656 } =
-}
--#
--##
--{ 'event': 'RTC_CHANGE',
--  'data': { 'offset': 'int' } }
--
--##
--# @DEVICE_DELETED:
--#
--# Emitted whenever the device removal completion is acknowledged by the =
-guest.
--# At this point, it's safe to reuse the specified device ID. Device remo=
-val can
--# be initiated by the guest or by HMP/QMP commands.
--#
--# @device: device name
--#
--# @path: device path
+-# Returns: a list of TpmModel
 -#
 -# Since: 1.5
 -#
 -# Example:
 -#
--# <- { "event": "DEVICE_DELETED",
--#      "data": { "device": "virtio-net-pci-0",
--#                "path": "/machine/peripheral/virtio-net-pci-0" },
--#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
+-# -> { "execute": "query-tpm-models" }
+-# <- { "return": [ "tpm-tis" ] }
 -#
 -##
--{ 'event': 'DEVICE_DELETED',
--  'data': { '*device': 'str', 'path': 'str' } }
+-{ 'command': 'query-tpm-models', 'returns': ['TpmModel'] }
 -
 -##
--# @ACPI_DEVICE_OST:
+-# @TpmType:
 -#
--# Emitted when guest executes ACPI _OST method.
+-# An enumeration of TPM types
 -#
--# @info: ACPIOSTInfo type as described in qapi-schema.json
+-# @passthrough: TPM passthrough type
 -#
--# Since: 2.1
+-# Since: 1.5
+-##
+-{ 'enum': 'TpmType', 'data': [ 'passthrough' ] }
+-
+-##
+-# @query-tpm-types:
+-#
+-# Return a list of supported TPM types
+-#
+-# Returns: a list of TpmType
+-#
+-# Since: 1.5
 -#
 -# Example:
 -#
--# <- { "event": "ACPI_DEVICE_OST",
--#      "data": { "device": "d1", "slot": "0",
--#                "slot-type": "DIMM", "source": 1, "status": 0 } }
+-# -> { "execute": "query-tpm-types" }
+-# <- { "return": [ "passthrough" ] }
 -#
 -##
--{ 'event': 'ACPI_DEVICE_OST',
--     'data': { 'info': 'ACPIOSTInfo' } }
+-{ 'command': 'query-tpm-types', 'returns': ['TpmType'] }
 -
 -##
--# @BALLOON_CHANGE:
+-# @TPMPassthroughOptions:
 -#
--# Emitted when the guest changes the actual BALLOON level. This value is
--# equivalent to the @actual field return by the 'query-balloon' command
+-# Information about the TPM passthrough type
 -#
--# @actual: actual level of the guest memory balloon in bytes
+-# @path: string describing the path used for accessing the TPM device
 -#
--# Note: this event is rate-limited.
+-# @cancel-path: string showing the TPM's sysfs cancel file
+-#               for cancellation of TPM commands while they are executin=
+g
 -#
--# Since: 1.2
+-# Since: 1.5
+-##
+-{ 'struct': 'TPMPassthroughOptions', 'data': { '*path' : 'str',
+-                                             '*cancel-path' : 'str'} }
+-
+-##
+-# @TpmTypeOptions:
+-#
+-# A union referencing different TPM backend types' configuration options
+-#
+-# @type: 'passthrough' The configuration options for the TPM passthrough=
+ type
+-#
+-# Since: 1.5
+-##
+-{ 'union': 'TpmTypeOptions',
+-   'data': { 'passthrough' : 'TPMPassthroughOptions' } }
+-
+-##
+-# @TPMInfo:
+-#
+-# Information about the TPM
+-#
+-# @id: The Id of the TPM
+-#
+-# @model: The TPM frontend model
+-#
+-# @options: The TPM (backend) type configuration options
+-#
+-# Since: 1.5
+-##
+-{ 'struct': 'TPMInfo',
+-  'data': {'id': 'str',
+-           'model': 'TpmModel',
+-           'options': 'TpmTypeOptions' } }
+-
+-##
+-# @query-tpm:
+-#
+-# Return information about the TPM device
+-#
+-# Returns: @TPMInfo on success
+-#
+-# Since: 1.5
 -#
 -# Example:
 -#
--# <- { "event": "BALLOON_CHANGE",
--#      "data": { "actual": 944766976 },
--#      "timestamp": { "seconds": 1267020223, "microseconds": 435656 } }
+-# -> { "execute": "query-tpm" }
+-# <- { "return":
+-#      [
+-#        { "model": "tpm-tis",
+-#          "options":
+-#            { "type": "passthrough",
+-#              "data":
+-#                { "cancel-path": "/sys/class/misc/tpm0/device/cancel",
+-#                  "path": "/dev/tpm0"
+-#                }
+-#            },
+-#          "id": "tpm0"
+-#        }
+-#      ]
+-#    }
 -#
 -##
--{ 'event': 'BALLOON_CHANGE',
--  'data': { 'actual': 'int' } }
+-{ 'command': 'query-tpm', 'returns': ['TPMInfo'] }
 -
 -##
--# @MEM_UNPLUG_ERROR:
--#
--# Emitted when memory hot unplug error occurs.
--#
--# @device: device name
--#
--# @msg: Informative message
--#
--# Since: 2.4
--#
--# Example:
--#
--# <- { "event": "MEM_UNPLUG_ERROR"
--#      "data": { "device": "dimm1",
--#                "msg": "acpi: device unplug for unsupported device"
--#      },
--#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
--#
--##
--{ 'event': 'MEM_UNPLUG_ERROR',
--  'data': { 'device': 'str', 'msg': 'str' } }
--
--##
--# @DUMP_COMPLETED:
--#
--# Emitted when background dump has completed
--#
--# @result: DumpQueryResult type described in qapi-schema.json.
--#
--# @error: human-readable error string that provides
--#         hint on why dump failed. Only presents on failure. The
--#         user should not try to interpret the error string.
--#
--# Since: 2.6
--#
--# Example:
--#
--# { "event": "DUMP_COMPLETED",
--#   "data": {"result": {"total": 1090650112, "status": "completed",
--#                       "completed": 1090650112} } }
--#
--##
--{ 'event': 'DUMP_COMPLETED' ,
--  'data': { 'result': 'DumpQueryResult', '*error': 'str' } }
+ # @AcpiTableOptions:
+ #
+ # Specify an ACPI table on the command line to load.
+diff --git a/qapi/tpm.json b/qapi/tpm.json
+new file mode 100644
+index 0000000000..e8b2d8dcb7
+--- /dev/null
++++ b/qapi/tpm.json
+@@ -0,0 +1,137 @@
++# -*- Mode: Python -*-
++#
++
++##
++# =3D TPM (trusted platform module) devices
++##
++
++##
++# @TpmModel:
++#
++# An enumeration of TPM models
++#
++# @tpm-tis: TPM TIS model
++#
++# Since: 1.5
++##
++{ 'enum': 'TpmModel', 'data': [ 'tpm-tis' ] }
++
++##
++# @query-tpm-models:
++#
++# Return a list of supported TPM models
++#
++# Returns: a list of TpmModel
++#
++# Since: 1.5
++#
++# Example:
++#
++# -> { "execute": "query-tpm-models" }
++# <- { "return": [ "tpm-tis" ] }
++#
++##
++{ 'command': 'query-tpm-models', 'returns': ['TpmModel'] }
++
++##
++# @TpmType:
++#
++# An enumeration of TPM types
++#
++# @passthrough: TPM passthrough type
++#
++# Since: 1.5
++##
++{ 'enum': 'TpmType', 'data': [ 'passthrough' ] }
++
++##
++# @query-tpm-types:
++#
++# Return a list of supported TPM types
++#
++# Returns: a list of TpmType
++#
++# Since: 1.5
++#
++# Example:
++#
++# -> { "execute": "query-tpm-types" }
++# <- { "return": [ "passthrough" ] }
++#
++##
++{ 'command': 'query-tpm-types', 'returns': ['TpmType'] }
++
++##
++# @TPMPassthroughOptions:
++#
++# Information about the TPM passthrough type
++#
++# @path: string describing the path used for accessing the TPM device
++#
++# @cancel-path: string showing the TPM's sysfs cancel file
++#               for cancellation of TPM commands while they are executin=
+g
++#
++# Since: 1.5
++##
++{ 'struct': 'TPMPassthroughOptions', 'data': { '*path' : 'str',
++                                             '*cancel-path' : 'str'} }
++
++##
++# @TpmTypeOptions:
++#
++# A union referencing different TPM backend types' configuration options
++#
++# @type: 'passthrough' The configuration options for the TPM passthrough=
+ type
++#
++# Since: 1.5
++##
++{ 'union': 'TpmTypeOptions',
++   'data': { 'passthrough' : 'TPMPassthroughOptions' } }
++
++##
++# @TPMInfo:
++#
++# Information about the TPM
++#
++# @id: The Id of the TPM
++#
++# @model: The TPM frontend model
++#
++# @options: The TPM (backend) type configuration options
++#
++# Since: 1.5
++##
++{ 'struct': 'TPMInfo',
++  'data': {'id': 'str',
++           'model': 'TpmModel',
++           'options': 'TpmTypeOptions' } }
++
++##
++# @query-tpm:
++#
++# Return information about the TPM device
++#
++# Returns: @TPMInfo on success
++#
++# Since: 1.5
++#
++# Example:
++#
++# -> { "execute": "query-tpm" }
++# <- { "return":
++#      [
++#        { "model": "tpm-tis",
++#          "options":
++#            { "type": "passthrough",
++#              "data":
++#                { "cancel-path": "/sys/class/misc/tpm0/device/cancel",
++#                  "path": "/dev/tpm0"
++#                }
++#            },
++#          "id": "tpm0"
++#        }
++#      ]
++#    }
++#
++##
++{ 'command': 'query-tpm', 'returns': ['TPMInfo'] }
 --=20
 2.13.5
