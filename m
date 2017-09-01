@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnqII-0006ye-QS
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:03:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1dnqII-0006yf-S0
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:03:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnqIH-0001Sg-I0
+	(envelope-from <eblake@redhat.com>) id 1dnqIG-0001Ry-LC
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:03:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35918)
+Received: from mx1.redhat.com ([209.132.183.28]:52622)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnqIH-0001S2-9q
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:03:49 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnqIG-0001RU-Fr
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:03:48 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5B6E6267C4
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 18:03:48 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 864B781E1D
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 18:03:47 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Fri,  1 Sep 2017 13:03:14 -0500
-Message-Id: <20170901180340.30009-4-eblake@redhat.com>
+Date: Fri,  1 Sep 2017 13:03:13 -0500
+Message-Id: <20170901180340.30009-3-eblake@redhat.com>
 In-Reply-To: <20170901180340.30009-1-eblake@redhat.com>
 References: <20170901180340.30009-1-eblake@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 03/29] test-qga: Kill broken and dead
- QGA_TEST_SIDE_EFFECTING code
+Subject: [Qemu-devel] [PATCH v6 02/29] tests: Sort .gitignore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,153 +32,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, pbonzini@redhat.com
 
-Back when the test was introduced, in commit 62c39b307, the
-test was set up to run qemu-ga directly on the host performing
-the test, and defaults to limiting itself to safe commands.  At
-the time, it was envisioned that setting QGA_TEST_SIDE_EFFECTING
-in the environment could cover a few more commands, while noting
-the potential danger of those side effects running in the host.
-
-But this has NEVER been tested: if you enable the environment
-variable, the test WILL fail.  One obvious reason: if you are not
-running as root, you'll probably get a permission failure when
-trying to freeze the file systems, or when changing system time.
-Less obvious: if you run the test as root (wow, you're brave), you
-could end up hanging if the test tries to log things to a
-temporarily frozen filesystem.  But the cutest reason of all: if
-you get past the above hurdles, the test uses invalid JSON in
-test_qga_fstrim() (missing '' around the dictionary key 'minimum'),
-and will thus fail an assertion in qmp_fd().
-
-Rather than leave this untested time-bomb in place, rip it out.
-Hopefully, as originally envisioned, we can find an opportunity
-to test an actual sandboxed guest where the guest-agent has
-full permissions and will not unduly affect the host running
-the test - if so, 'git revert' can be used if desired, for
-salvaging any useful parts of this attempt.
+It doesn't matter if things are unsorted, but finding stuff in a list
+is easier when it is sorted.  (Sorted under LC_ALL=C rules, rather than
+en_US.UTF-8).
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- tests/test-qga.c | 90 --------------------------------------------------=
-------
- 1 file changed, 90 deletions(-)
+ tests/.gitignore | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/tests/test-qga.c b/tests/test-qga.c
-index 06783e7585..fd6bc7690f 100644
---- a/tests/test-qga.c
-+++ b/tests/test-qga.c
-@@ -642,65 +642,6 @@ static void test_qga_get_time(gconstpointer fix)
-     QDECREF(ret);
- }
-
--static void test_qga_set_time(gconstpointer fix)
--{
--    const TestFixture *fixture =3D fix;
--    QDict *ret;
--    int64_t current, time;
--    gchar *cmd;
--
--    /* get current time */
--    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-get-time'}");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    current =3D qdict_get_int(ret, "return");
--    g_assert_cmpint(current, >, 0);
--    QDECREF(ret);
--
--    /* set some old time */
--    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-set-time',"
--                 " 'arguments': { 'time': 1000 } }");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    QDECREF(ret);
--
--    /* check old time */
--    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-get-time'}");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    time =3D qdict_get_int(ret, "return");
--    g_assert_cmpint(time / 1000, <, G_USEC_PER_SEC * 10);
--    QDECREF(ret);
--
--    /* set back current time */
--    cmd =3D g_strdup_printf("{'execute': 'guest-set-time',"
--                          " 'arguments': { 'time': %" PRId64 " } }",
--                          current + time * 1000);
--    ret =3D qmp_fd(fixture->fd, cmd);
--    g_free(cmd);
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    QDECREF(ret);
--}
--
--static void test_qga_fstrim(gconstpointer fix)
--{
--    const TestFixture *fixture =3D fix;
--    QDict *ret;
--    QList *list;
--    const QListEntry *entry;
--
--    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-fstrim',"
--                 " arguments: { minimum: 4194304 } }");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    list =3D qdict_get_qlist(ret, "return");
--    entry =3D qlist_first(list);
--    g_assert(qdict_haskey(qobject_to_qdict(entry->value), "paths"));
--
--    QDECREF(ret);
--}
--
- static void test_qga_blacklist(gconstpointer data)
- {
-     TestFixture fix;
-@@ -831,30 +772,6 @@ static void test_qga_fsfreeze_status(gconstpointer f=
-ix)
-     QDECREF(ret);
- }
-
--static void test_qga_fsfreeze_and_thaw(gconstpointer fix)
--{
--    const TestFixture *fixture =3D fix;
--    QDict *ret;
--    const gchar *status;
--
--    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-fsfreeze-freeze'}");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    QDECREF(ret);
--
--    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-fsfreeze-status'}");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    status =3D qdict_get_try_str(ret, "return");
--    g_assert_cmpstr(status, =3D=3D, "frozen");
--    QDECREF(ret);
--
--    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-fsfreeze-thaw'}");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    QDECREF(ret);
--}
--
- static void test_qga_guest_exec(gconstpointer fix)
- {
-     const TestFixture *fixture =3D fix;
-@@ -1029,13 +946,6 @@ int main(int argc, char **argv)
-     g_test_add_data_func("/qga/guest-get-osinfo", &fix,
-                          test_qga_guest_get_osinfo);
-
--    if (g_getenv("QGA_TEST_SIDE_EFFECTING")) {
--        g_test_add_data_func("/qga/fsfreeze-and-thaw", &fix,
--                             test_qga_fsfreeze_and_thaw);
--        g_test_add_data_func("/qga/set-time", &fix, test_qga_set_time);
--        g_test_add_data_func("/qga/fstrim", &fix, test_qga_fstrim);
--    }
--
-     ret =3D g_test_run();
-
-     fixture_tear_down(&fix, NULL);
---=20
+diff --git a/tests/.gitignore b/tests/.gitignore
+index 64ecd6683b..8d35a58751 100644
+--- a/tests/.gitignore
++++ b/tests/.gitignore
+@@ -1,25 +1,27 @@
++*-test
+ atomic_add-bench
+ benchmark-crypto-cipher
+ benchmark-crypto-hash
+ benchmark-crypto-hmac
+ check-qdict
+-check-qnum
+ check-qjson
+ check-qlist
+ check-qnull
+-check-qstring
++check-qnum
+ check-qom-interface
+ check-qom-proplist
+-multiboot/test.out
++check-qstring
+ multiboot/*.elf
++multiboot/test.out
++qapi-schema/*.test.*
+ qht-bench
+ rcutorture
+ test-aio
+ test-aio-multithread
+ test-arm-mptimer
+ test-base64
+-test-bitops
+ test-bitcnt
++test-bitops
+ test-blockjob
+ test-blockjob-txn
+ test-bufferiszero
+@@ -35,18 +37,19 @@ test-crypto-ivgen
+ test-crypto-pbkdf
+ test-crypto-secret
+ test-crypto-tlscredsx509
+-test-crypto-tlscredsx509-work/
+ test-crypto-tlscredsx509-certs/
++test-crypto-tlscredsx509-work/
+ test-crypto-tlssession
+-test-crypto-tlssession-work/
+ test-crypto-tlssession-client/
+ test-crypto-tlssession-server/
++test-crypto-tlssession-work/
+ test-crypto-xts
+ test-cutils
++test-filter-mirror
++test-filter-redirector
+ test-hbitmap
+ test-hmp
+ test-int128
+-test-iov
+ test-io-channel-buffer
+ test-io-channel-command
+ test-io-channel-command.fifo
+@@ -55,27 +58,29 @@ test-io-channel-file.txt
+ test-io-channel-socket
+ test-io-channel-tls
+ test-io-task
++test-iov
+ test-keyval
+ test-logging
+ test-mul64
++test-netfilter
+ test-opts-visitor
+ test-qapi-event.[ch]
+ test-qapi-types.[ch]
+ test-qapi-util
+ test-qapi-visit.[ch]
+ test-qdev-global-props
+-test-qemu-opts
+ test-qdist
++test-qemu-opts
+ test-qga
+ test-qht
+ test-qht-par
+ test-qmp-commands
+ test-qmp-commands.h
+ test-qmp-event
+-test-qobject-input-strict
+-test-qobject-input-visitor
+ test-qmp-introspect.[ch]
+ test-qmp-marshal.c
++test-qobject-input-strict
++test-qobject-input-visitor
+ test-qobject-output-visitor
+ test-rcu-list
+ test-replication
+@@ -92,8 +97,3 @@ test-write-threshold
+ test-x86-cpuid
+ test-x86-cpuid-compat
+ test-xbzrle
+-test-netfilter
+-test-filter-mirror
+-test-filter-redirector
+-*-test
+-qapi-schema/*.test.*
+-- 
 2.13.5
