@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUi-0000Ex-0D
+	(envelope-from <armbru@redhat.com>) id 1dnlUi-0000F2-1m
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUg-0007JE-Hx
+	(envelope-from <armbru@redhat.com>) id 1dnlUg-0007Jc-Sg
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45256)
+Received: from mx1.redhat.com ([209.132.183.28]:60900)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUg-0007Iz-9R
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUg-0007J7-Nb
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:18 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 49EF5404338
+	by mx1.redhat.com (Postfix) with ESMTPS id BB43C369C4
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:17 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-75.ams2.redhat.com
+	[10.36.116.75])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 895E0A63AB
 	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:17 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 14:55:28 +0200
-Message-Id: <20170901125611.29295-5-armbru@redhat.com>
+Date: Fri,  1 Sep 2017 14:55:40 +0200
+Message-Id: <20170901125611.29295-17-armbru@redhat.com>
 In-Reply-To: <20170901125611.29295-1-armbru@redhat.com>
 References: <20170901125611.29295-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 04/47] qdict: Add qdict_put_null() helper,
- and put it to use
+Subject: [Qemu-devel] [PULL 16/47] qapi-schema: Document how generated
+ documentation is ordered
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,78 +38,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Documentation generated with qapi2texi.py is in source order, with
+included sub-schemas inserted at the first include directive
+(subsequent include directives have no effect).  To get a sane and
+stable order, it's best to include each sub-schema just once, or
+include it first in qapi-schema.json.  Document that.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20170825105913.4060-2-marcandre.lureau@redhat.com>
-[Update to qobject.cocci squashed in, commit message tweaked]
+While there, drop a few redundant comments.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <1503602048-12268-2-git-send-email-armbru@redhat.com>
 ---
- include/qapi/qmp/qdict.h         | 4 +++-
- scripts/coccinelle/qobject.cocci | 3 +++
- target/i386/cpu.c                | 4 ++--
- 3 files changed, 8 insertions(+), 3 deletions(-)
+ qapi-schema.json | 17 ++++++-----------
+ 1 file changed, 6 insertions(+), 11 deletions(-)
 
-diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
-index 363e431106..6588c7f0c8 100644
---- a/include/qapi/qmp/qdict.h
-+++ b/include/qapi/qmp/qdict.h
-@@ -53,13 +53,15 @@ void qdict_destroy_obj(QObject *obj);
- #define qdict_put(qdict, key, obj) \
-         qdict_put_obj(qdict, key, QOBJECT(obj))
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 802ea53d00..3db3d1972f 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -72,22 +72,17 @@
+         'q_obj_CpuInfo-base'    # CPU, visible through query-cpu
+     ] } }
 =20
--/* Helpers for int, bool, and string */
-+/* Helpers for int, bool, null, and string */
- #define qdict_put_int(qdict, key, value) \
-         qdict_put(qdict, key, qnum_from_int(value))
- #define qdict_put_bool(qdict, key, value) \
-         qdict_put(qdict, key, qbool_from_bool(value))
- #define qdict_put_str(qdict, key, value) \
-         qdict_put(qdict, key, qstring_from_str(value))
-+#define qdict_put_null(qdict, key) \
-+        qdict_put(qdict, key, qnull())
+-# QAPI common definitions
++# Documentation generated with qapi2texi.py is in source order, with
++# included sub-schemas inserted at the first include directive
++# (subsequent include directives have no effect).  To get a sane and
++# stable order, it's best to include each sub-schema just once, or
++# include it first in qapi-schema.json.
++
+ { 'include': 'qapi/common.json' }
+-
+-# QAPI crypto definitions
+ { 'include': 'qapi/crypto.json' }
+-
+-# QAPI block definitions
+ { 'include': 'qapi/block.json' }
+-
+-# QAPI event definitions
+ { 'include': 'qapi/event.json' }
+-
+-# Tracing commands
+ { 'include': 'qapi/trace.json' }
+-
+-# QAPI introspection
+ { 'include': 'qapi/introspect.json' }
 =20
- /* High level helpers */
- double qdict_get_double(const QDict *qdict, const char *key);
-diff --git a/scripts/coccinelle/qobject.cocci b/scripts/coccinelle/qobjec=
-t.cocci
-index c518caf7b1..1120eb1a42 100644
---- a/scripts/coccinelle/qobject.cocci
-+++ b/scripts/coccinelle/qobject.cocci
-@@ -20,6 +20,9 @@ expression Obj, Key, E;
- |
- - qdict_put(Obj, Key, qstring_from_str(E));
- + qdict_put_str(Obj, Key, E);
-+|
-+- qdict_put(Obj, Key, qnull());
-++ qdict_put_null(Obj, Key);
- )
-=20
- // Use QList macros where they make sense
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index ddc45abd70..bec2009a9c 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2454,7 +2454,7 @@ static QDict *x86_cpu_static_props(void)
-=20
-     d =3D qdict_new();
-     for (i =3D 0; props[i]; i++) {
--        qdict_put(d, props[i], qnull());
-+        qdict_put_null(d, props[i]);
-     }
-=20
-     for (w =3D 0; w < FEATURE_WORDS; w++) {
-@@ -2464,7 +2464,7 @@ static QDict *x86_cpu_static_props(void)
-             if (!fi->feat_names[bit]) {
-                 continue;
-             }
--            qdict_put(d, fi->feat_names[bit], qnull());
-+            qdict_put_null(d, fi->feat_names[bit]);
-         }
-     }
-=20
+ ##
 --=20
 2.13.5
