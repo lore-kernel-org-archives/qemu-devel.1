@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dnnUH-0008Bv-8d
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:04:09 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dnnUG-0008Aj-5T
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:04:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dnnU9-00030Z-8J
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:04:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46580)
+	(envelope-from <ehabkost@redhat.com>) id 1dnnUB-00031I-E6
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:04:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43166)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dnnU8-00030L-VY
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:03:53 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dnnUB-00030s-63
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:03:55 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri,  1 Sep 2017 12:03:03 -0300
-Message-Id: <20170901150317.10380-16-ehabkost@redhat.com>
+Date: Fri,  1 Sep 2017 12:03:04 -0300
+Message-Id: <20170901150317.10380-17-ehabkost@redhat.com>
 In-Reply-To: <20170901150317.10380-1-ehabkost@redhat.com>
 References: <20170901150317.10380-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 15/29] m68k: replace cpu_m68k_init() with
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 16/29] microblaze: replace cpu_mb_init() with
  cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,114 +32,94 @@ Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-call register_m68k_insns() at realize time which makes
-cpu_m68k_init() typical object creation function.
-As result we can replace it with cpu_generic_init()
-which does the same job, reducing code duplication a bit.
+cpu_mb_init() always falls back to TYPE_MICROBLAZE_CPU object
+regardless of cpu_model. Put fallback logic into
+mb_cpu_class_by_name() which would translate any cpu_model
+into TYPE_MICROBLAZE_CPU class and replace cpu_mb_init()
+with cpu_generic_init().
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Tested-by: Thomas Huth <huth@tuxfamily.org>
-Acked-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <1503592308-93913-12-git-send-email-imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-Id: <1503592308-93913-13-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/m68k/cpu.h    |  3 +--
- hw/m68k/an5206.c     |  2 +-
- hw/m68k/mcf5208.c    |  2 +-
- target/m68k/cpu.c    |  2 ++
- target/m68k/helper.c | 20 --------------------
- 5 files changed, 5 insertions(+), 24 deletions(-)
+ target/microblaze/cpu.h       |  3 +--
+ target/microblaze/cpu.c       |  6 ++++++
+ target/microblaze/translate.c | 11 -----------
+ 3 files changed, 7 insertions(+), 13 deletions(-)
 
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 38a7e11b92..d9365476e5 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -163,7 +163,6 @@ int m68k_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
- 
- void m68k_tcg_init(void);
- void m68k_cpu_init_gdb(M68kCPU *cpu);
--M68kCPU *cpu_m68k_init(const char *cpu_model);
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+index 5ce4c82657..52b6b6aec7 100644
+--- a/target/microblaze/cpu.h
++++ b/target/microblaze/cpu.h
+@@ -331,7 +331,6 @@ int mb_cpu_gdb_read_register(CPUState *cpu, uint8_t *=
+buf, int reg);
+ int mb_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+=20
+ void mb_tcg_init(void);
+-MicroBlazeCPU *cpu_mb_init(const char *cpu_model);
  /* you can call this signal handler from your SIGBUS and SIGSEGV
     signal handlers to inform the virtual CPU of exceptions. non zero
     is returned if the signal was handled by the virtual CPU.  */
-@@ -322,7 +321,7 @@ void register_m68k_insns (CPUM68KState *env);
+@@ -344,7 +343,7 @@ int cpu_mb_signal_handler(int host_signum, void *pinf=
+o,
  #define TARGET_PHYS_ADDR_SPACE_BITS 32
  #define TARGET_VIRT_ADDR_SPACE_BITS 32
- 
--#define cpu_init(cpu_model) CPU(cpu_m68k_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_M68K_CPU, cpu_model)
- 
- #define cpu_signal_handler cpu_m68k_signal_handler
- #define cpu_list m68k_cpu_list
-diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
-index c76244176f..7b9b15d6c4 100644
---- a/hw/m68k/an5206.c
-+++ b/hw/m68k/an5206.c
-@@ -42,7 +42,7 @@ static void an5206_init(MachineState *machine)
-     if (!cpu_model) {
-         cpu_model = "m5206";
-     }
--    cpu = cpu_m68k_init(cpu_model);
-+    cpu = M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
-     if (!cpu) {
-         error_report("Unable to find m68k CPU definition");
-         exit(1);
-diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
-index f4b1387c0d..1a0f18073a 100644
---- a/hw/m68k/mcf5208.c
-+++ b/hw/m68k/mcf5208.c
-@@ -232,7 +232,7 @@ static void mcf5208evb_init(MachineState *machine)
-     if (!cpu_model) {
-         cpu_model = "m5208";
-     }
--    cpu = cpu_m68k_init(cpu_model);
-+    cpu = M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
-     if (!cpu) {
-         fprintf(stderr, "Unable to find m68k CPU definition\n");
-         exit(1);
-diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-index a14b6dda7f..55bf24bae6 100644
---- a/target/m68k/cpu.c
-+++ b/target/m68k/cpu.c
-@@ -230,6 +230,8 @@ static void m68k_cpu_realizefn(DeviceState *dev, Error **errp)
-     M68kCPUClass *mcc = M68K_CPU_GET_CLASS(dev);
-     Error *local_err = NULL;
- 
-+    register_m68k_insns(&cpu->env);
+=20
+-#define cpu_init(cpu_model) CPU(cpu_mb_init(cpu_model))
++#define cpu_init(cpu_model) cpu_generic_init(TYPE_MICROBLAZE_CPU, cpu_mo=
+del)
+=20
+ #define cpu_signal_handler cpu_mb_signal_handler
+=20
+diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+index f85ff01b39..ddffe86e9b 100644
+--- a/target/microblaze/cpu.c
++++ b/target/microblaze/cpu.c
+@@ -253,6 +253,11 @@ static Property mb_properties[] =3D {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
++static ObjectClass *mb_cpu_class_by_name(const char *cpu_model)
++{
++    return object_class_by_name(TYPE_MICROBLAZE_CPU);
++}
 +
-     cpu_exec_realizefn(cs, &local_err);
-     if (local_err != NULL) {
-         error_propagate(errp, local_err);
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index caae29100c..7e50ff5871 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -156,26 +156,6 @@ static int m68k_fpu_gdb_set_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
-     return 0;
+ static void mb_cpu_class_init(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(oc);
+@@ -265,6 +270,7 @@ static void mb_cpu_class_init(ObjectClass *oc, void *=
+data)
+     mcc->parent_reset =3D cc->reset;
+     cc->reset =3D mb_cpu_reset;
+=20
++    cc->class_by_name =3D mb_cpu_class_by_name;
+     cc->has_work =3D mb_cpu_has_work;
+     cc->do_interrupt =3D mb_cpu_do_interrupt;
+     cc->cpu_exec_interrupt =3D mb_cpu_exec_interrupt;
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.=
+c
+index a24373c0be..83e2ef4960 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -1845,17 +1845,6 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, fpri=
+ntf_function cpu_fprintf,
+     cpu_fprintf(f, "\n\n");
  }
- 
--M68kCPU *cpu_m68k_init(const char *cpu_model)
+=20
+-MicroBlazeCPU *cpu_mb_init(const char *cpu_model)
 -{
--    M68kCPU *cpu;
--    CPUM68KState *env;
--    ObjectClass *oc;
+-    MicroBlazeCPU *cpu;
 -
--    oc = cpu_class_by_name(TYPE_M68K_CPU, cpu_model);
--    if (oc == NULL) {
--        return NULL;
--    }
--    cpu = M68K_CPU(object_new(object_class_get_name(oc)));
--    env = &cpu->env;
--
--    register_m68k_insns(env);
+-    cpu =3D MICROBLAZE_CPU(object_new(TYPE_MICROBLAZE_CPU));
 -
 -    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
 -
 -    return cpu;
 -}
 -
- void m68k_cpu_init_gdb(M68kCPU *cpu)
+ void mb_tcg_init(void)
  {
-     CPUState *cs = CPU(cpu);
--- 
+     int i;
+--=20
 2.13.5
