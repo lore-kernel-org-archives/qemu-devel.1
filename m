@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <derrick.mckee@gmail.com>) id 1dnoF0-0004iU-5E
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:52:23 -0400
+	(envelope-from <cascardo@canonical.com>) id 1dno95-0008By-9q
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:46:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <derrick.mckee@gmail.com>) id 1dnoEz-0007Zd-2t
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:52:18 -0400
-Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:36552)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <derrick.mckee@gmail.com>)
-	id 1dnoEy-0007Z8-UX
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:52:17 -0400
-Received: by mail-oi0-x230.google.com with SMTP id t75so5122902oie.3
-	for <qemu-devel@nongnu.org>; Fri, 01 Sep 2017 08:52:15 -0700 (PDT)
-MIME-Version: 1.0
-From: Derrick McKee <derrick.mckee@gmail.com>
-Date: Fri, 01 Sep 2017 15:52:03 +0000
-Message-ID: <CAJoBWHxiBU9bc-GMOxc9n=U6r3xbWQ=b7aeU0p5afhHZzm4RcA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] QEMU simpletrace.py
+	(envelope-from <cascardo@canonical.com>) id 1dno92-00052d-82
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:46:11 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:38871)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cascardo@canonical.com>)
+	id 1dno92-00051G-1L
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:46:08 -0400
+From: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+Date: Fri,  1 Sep 2017 12:45:42 -0300
+Message-Id: <20170901154542.5687-1-cascardo@canonical.com>
+Subject: [Qemu-devel] [PATCH] x86/acpi: build SRAT when memory hotplug is
+ enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +24,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-Hi,
+Linux uses SRAT to determine the maximum memory in a system, which is
+used to determine whether to use the swiotlb for IOMMU or not for a
+device that supports only 32 bits of addresses.
 
-I am having trouble using the simpleparser.py script in QEMU.  Hopefully, I
-am doing something incorrect and you can quickly set me back on course.
+When there is no NUMA configuration, qemu will not build SRAT. And when
+memory hotplug is done, some Linux device drivers start failing.
 
-I have generated a trace file as per the instructions in
-docs/devel/tracing.txt.  However, whenever I try to run the simpleparser.py
-script I get a file not found error:
+Tested by running with -m 512M,slots=8,maxmem=1G, adding the memory,
+putting that online and using the system. Without the patch, swiotlb is
+not used and ATA driver fails. With the patch, swiotlb is used, no
+driver failure is observed.
 
-<QEMU source>/build/scripts/simpletrace.py trace-events-all trace-30218
-Traceback (most recent call last):
-  File "/home/derrick/code/qemu/build/scripts/simpletrace.py", line 262, in
-<module>
-    run(Formatter())
-  File "/home/derrick/code/qemu/build/scripts/simpletrace.py", line 236, in
-run
-    events = read_events(open(sys.argv[1], 'r'))
-IOError: [Errno 2] No such file or directory: 'trace-events-all'
+Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+---
+ hw/i386/acpi-build.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-It seems like the python script is considering 'trace-events-all' as a
-file, but the directions don't make it seem like it should be a file.
-Thoughts?  Thanks
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 98dd424678..fb94249779 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2645,6 +2645,9 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+     GArray *tables_blob = tables->table_data;
+     AcpiSlicOem slic_oem = { .id = NULL, .table_id = NULL };
+     Object *vmgenid_dev;
++    ram_addr_t hotplugabble_address_space_size =
++        object_property_get_int(OBJECT(pcms), PC_MACHINE_MEMHP_REGION_SIZE,
++                                NULL);
+ 
+     acpi_get_pm_info(&pm);
+     acpi_get_misc_info(&misc);
+@@ -2708,7 +2711,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+             build_tpm2(tables_blob, tables->linker);
+         }
+     }
+-    if (pcms->numa_nodes) {
++    if (pcms->numa_nodes || hotplugabble_address_space_size) {
+         acpi_add_table(table_offsets, tables_blob);
+         build_srat(tables_blob, tables->linker, machine);
+         if (have_numa_distance) {
 -- 
-Derrick McKee
-Ph.D. Student at Purdue University
+2.11.0
