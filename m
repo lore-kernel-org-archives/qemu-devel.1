@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dna0l-0005jw-PH
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:40:40 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1dna8J-00082E-Qr
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:48:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dna0k-0007V9-JO
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:40:39 -0400
-References: <20170901001502.29915-1-jsnow@redhat.com>
-	<20170901001502.29915-6-jsnow@redhat.com>
-	<b16eaf48-2452-8f9f-547d-b9ac999be308@amsat.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <8234fbad-76d8-bb9d-6972-871578fca59e@redhat.com>
-Date: Thu, 31 Aug 2017 20:40:28 -0400
+	(envelope-from <longpeng2@huawei.com>) id 1dna8G-0001O6-Ot
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:48:27 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2306)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1dna8G-0001LI-3m
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:48:24 -0400
+Message-ID: <59A8AE20.1080409@huawei.com>
+Date: Fri, 1 Sep 2017 08:47:28 +0800
+From: "Longpeng (Mike)" <longpeng2@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <b16eaf48-2452-8f9f-547d-b9ac999be308@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 5/9] IDE: replace DEBUG_AIO with trace
- events
+References: <1503734014-239116-1-git-send-email-longpeng2@huawei.com>
+In-Reply-To: <1503734014-239116-1-git-send-email-longpeng2@huawei.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v19 0/2] virtio-crypto: virtio crypto
+ device specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,30 +27,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
+To: stefanha@redhat.com, pasic@linux.vnet.ibm.com
+Cc: "Longpeng(Mike)" <longpeng2@huawei.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, luonengjun@huawei.com, mst@redhat.com, cohuck@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, weidong.huang@huawei.com, mike.caraman@nxp.com, agraf@suse.de, jasowang@redhat.com, nmorey@kalray.eu, vincent.jardin@6wind.com, arei.gonglei@hotmail.com, wangxinxin.wang@huawei.com
+
+Ping...
+
+Stefan, Halil, do you have any suggestion ?
+
+-- 
+Regards,
+Longpeng(Mike)
+
+On 2017/8/26 15:53, Longpeng(Mike) wrote:
+
+> Hi guys,
+> 
+> I'll work on the virtio-crypto spec with Gonglei together, Because He is
+> so busy on the inner production project.
+> 
+> ---
+> v19 -> v18:
+>  - fix some typos and grammar fixes [Stefan, Halil]
+>  - rename VIRTIO_CRYPTO_F_STATELESS_MODE to VIRTIO_CRYPTO_F_MUX_MODE
+>  - describe the VIRTIO_CRYPTO_STATUS in detial. [Halil]
+>  - refactor and redescribe the controlq/dataq request's format
+>    of mux mode. [Halil]
+>  - other small fixes. [Halil]
+> 
+> v18 -> v17:
+>  - fix many English grammar problems suggested by Stefan, Thanks a lot!
+> 
+> v17 -> v16:
+>  - Some grammar fixes [Stefan, Halil, Michael]
+>  - add a section named "Supported crypto services" in order to explain bit
+>    numbers and valuse clearly. [Halil, Cornelia]
+>  - avoid word reptition [Halil]
+>  - rename non-session mode to stateless mode [Halil]
+>  - change descriptions for all elements in struct virtio_crypto_config [Halil]
+>  - add Halil as a reviewer in the ackonwledgement part, thanks for his work.
+>  - other fixes here and there.
+> 
+> Changes since v15:
+>  - use feature bits for non-session mode in order to keep compatibility with
+>    pre-existing code. [Halil & Michael]
+>  - introduce VIRTIO_CRYPTO_F_ NON_SESSION_MODE feature bit to control all other
+>    non-session mode feature bits.
+>  - fix some typos. [Stefan]
+>  - introduce struct virtio_crypto_op_data_req_mux to support both session
+>    and non-session based crypto operations and keep compatibility with
+>    pre-existing code.
+> 
+> Changes since v14:
+>  - drop VIRTIO_CRYPTO_S_STARTED status [Halil & Cornelia]
+>  - correct a sentence about dataqueue and controlq in the first paragraph. 
+> [Halil]
+>  - change a MAY to MUST about max_dataqueues. [Halil]
+>  - add non-session mode support
+>    a) add four features for different crypto services to identify wheather 
+> support session mode.
+>    b) rewrite some
+> 
+> For pervious versions of virtio crypto spec, Pls see:
+> 
+> [v18]:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg444897.html
+> 
+> [v14]:
+> https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg02212.html
+> 
+> [v13]:
+> https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07348.html
+> 
+> For more information, please see:
+>  http://qemu-project.org/Features/VirtioCrypto
+> 
+> ---
+> Gonglei (2):
+>   virtio-crypto: Add virtio crypto device specification
+>   virtio-crypto: Add conformance clauses
+> 
+>  acknowledgements.tex |    3 +
+>  conformance.tex      |   29 +
+>  content.tex          |    2 +
+>  virtio-crypto.tex    | 1470 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 1504 insertions(+)
+>  create mode 100644 virtio-crypto.tex
+> 
 
 
-
-On 08/31/2017 08:27 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 08/31/2017 09:14 PM, John Snow wrote:
->> Signed-off-by: John Snow <jsnow@redhat.com>
->=20
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->=20
-
-TY, and btw the reasoning behind what I went with:
-
-Since s->dma_cmd is itself a type `enum ide_dma_cmd` then by definition
-s->dma_cmd (even if corrupted or wrong) must fit inside the width of
-that type. Performing the range checking in the getter is adequate for
-protecting the table in this case, if I understand Laszlo's rationales
-correctly.
-
-In case case of the AHCI table, I do not use a getter since the IRQBIT
-property is passed in statically for each instance and shouldn't have a
-chance to get out-of-spec. (If it does, something MASSIVELY bad has
-corrupted everything, and then we've got worse problems.)
-
-Thanks,
-John
+-- 
+Regards,
+Longpeng(Mike)
