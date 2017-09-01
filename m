@@ -1,43 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1dnizx-0007pf-MC
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:16:27 -0400
+	(envelope-from <thuth@redhat.com>) id 1dnjMw-0007Tj-Is
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:40:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1dnizs-0005OV-D1
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:16:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60548
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <s1seetee@linux.vnet.ibm.com>)
-	id 1dnizs-0005No-7i
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:16:20 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v81ADpZ5101885
-	for <qemu-devel@nongnu.org>; Fri, 1 Sep 2017 06:16:18 -0400
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2cq5eu0w3k-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 01 Sep 2017 06:16:17 -0400
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <s1seetee@linux.vnet.ibm.com>;
-	Fri, 1 Sep 2017 04:16:16 -0600
-References: <1503985539-7205-1-git-send-email-s1seetee@linux.vnet.ibm.com>
-	<c61ae7e6-a117-a9c1-6a73-73beaede08a8@amsat.org>
-	<e70b2b00-e471-7d9b-c754-6245b723ea94@linux.vnet.ibm.com>
-	<59193a65-f1d1-4383-b776-053dce6e9746@linux.vnet.ibm.com>
-	<8947138e-fbe5-5e86-f42e-b79c2d6fb33a@amsat.org>
-From: seeteena <s1seetee@linux.vnet.ibm.com>
-Date: Fri, 1 Sep 2017 15:46:06 +0530
+	(envelope-from <thuth@redhat.com>) id 1dnjMt-0008JO-D4
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:40:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39032)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dnjMt-0008IR-4X
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:40:07 -0400
+References: <1504190408-11143-1-git-send-email-thuth@redhat.com>
+	<612870af-f8a4-039c-3e97-7590388b9e77@redhat.com>
+	<87o9qudbsk.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <96af6291-8427-89c8-c644-a3d82c3240c8@redhat.com>
+Date: Fri, 1 Sep 2017 12:39:49 +0200
 MIME-Version: 1.0
-In-Reply-To: <8947138e-fbe5-5e86-f42e-b79c2d6fb33a@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <87o9qudbsk.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Message-Id: <7625a61a-ed72-a23b-149d-7a95a90a8487@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4] vl: exit if maxcpus is negative
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] tests: Enable the drive_del test also
+ on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,213 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, famz@redhat.com, pbonzini@redhat.com, Eric Blake <eblake@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: Markus Armbruster <armbru@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: Farhan Ali <alifm@linux.vnet.ibm.com>, Jason J Herne <jjherne@linux.vnet.ibm.com>, Michael S Tsirkin <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
 
-
-
-On 08/30/2017 10:40 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Seeteena,
->
->>>> On 08/29/2017 02:45 AM, Seeteena Thoufeek wrote:
->>>>> ---Steps to Reproduce---
->>>>>
->>>>> When passed a negative number to 'maxcpus' parameter, Qemu aborts
->>>>> with a core dump.
->>>>>
->>>>> Run the following command with maxcpus argument as negative number
->>>>>
->>>>> ppc64-softmmu/qemu-system-ppc64 --nographic -vga none -machine
->>>>> pseries,accel=3Dkvm,kvm-type=3DHV -m size=3D200g -device virtio-blk=
--pci,
->>>>> drive=3Drootdisk -drive file=3D/home/images/pegas-1.0-ppc64le.qcow2=
-,
->>>>> if=3Dnone,cache=3Dnone,id=3Drootdisk,format=3Dqcow2 -monitor telnet
->>>>> :127.0.0.1:1234,server,nowait -net nic,model=3Dvirtio -net
->>>>> user -redir tcp:2000::22 -device nec-usb-xhci -smp 8,cores=3D1,
->>>>> threads=3D1,maxcpus=3D-12
->
-> Using 'extern unsigned int max_cpus;' I get:
->
-> qemu-system-ppc64: Number of SMP CPUs requested (-12) exceeds max CPUs=20
-> supported by machine 'pseries-2.10' (1024)
->
-> Which looks weird but sane :)
-:). With ''extern unsigned int max_cpus;" How about changing the message=20
-to print as follows so it is more meaningful..
-
-qemu-system-ppc64: Invalid SMP CPUs (-12) max CPUs supported by machine=20
-'pseries-artful' (1024)
-
-Tried this with various combinations - Here is the results -
-
-/qemu_ubuntu1710/qemu-2.10~rc3+dfsg# ppc64-softmmu/qemu-system-ppc64=20
---nographic -vga none -machine pseries,accel=3Dkvm,kvm-type=3DHV -m size=3D=
-20g=20
--device virtio-blk-pci,drive=3Drootdisk -drive=20
-file=3D/var/lib/libvirt/images/avocado-fvt-wrapper/data/avocado-vt/images=
-/ubuntu-17.10-ppc64le.qcow2,if=3Dnone,cache=3Dnone,id=3Drootdisk,format=3D=
-qcow2=20
--monitor telnet:127.0.0.1:1234,server,nowait -net nic,model=3Dvirtio -net=
-=20
-user -device nec-usb-xhci -smp 8,cores=3D1,threads=3D1,maxcpus=3D-12
-
-qemu-system-ppc64: Invalid SMP CPUs (-12) max CPUs supported by machine=20
-'pseries-artful' (1024)
-
-/qemu_ubuntu1710/qemu-2.10~rc3+dfsg# ppc64-softmmu/qemu-system-ppc64=20
---nographic -vga none -machine pseries,accel=3Dkvm,kvm-type=3DHV -m size=3D=
-20g=20
--device virtio-blk-pci,drive=3Drootdisk -drive=20
-file=3D/var/lib/libvirt/images/avocado-fvt-wrapper/data/avocado-vt/images=
-/ubuntu-17.10-ppc64le.qcow2,if=3Dnone,cache=3Dnone,id=3Drootdisk,format=3D=
-qcow2=20
--monitor telnet:127.0.0.1:1234,server,nowait -net nic,model=3Dvirtio -net=
-=20
-user -device nec-usb-xhci -smp 8,cores=3D1,threads=3D1,maxcpus=3D1026
-
-qemu-system-ppc64: Invalid SMP CPUs (1026) max CPUs supported by machine=20
-'pseries-artful' (1024)
-
-/qemu_ubuntu1710/qemu-2.10~rc3+dfsg# ppc64-softmmu/qemu-system-ppc64=20
---nographic -vga none -machine pseries,accel=3Dkvm,kvm-type=3DHV -m size=3D=
-20g=20
--device virtio-blk-pci,drive=3Drootdisk -drive=20
-file=3D/var/lib/libvirt/images/avocado-fvt-wrapper/data/avocado-vt/images=
-/ubuntu-17.10-ppc64le.qcow2,if=3Dnone,cache=3Dnone,id=3Drootdisk,format=3D=
-qcow2=20
--monitor telnet:127.0.0.1:1234,server,nowait -net nic,model=3Dvirtio -net=
-=20
-user -device nec-usb-xhci -smp 8,cores=3D1,threads=3D1,maxcpus=3D10
-
-
-SLOF ********************************************************************=
-**
-QEMU Starting
- =C2=A0Build Date =3D Jan=C2=A0 4 2017 05:15:48
- =C2=A0FW Version =3D buildd@ release 20161019
- =C2=A0Press "s" to enter Open Firmware.
-
-/qemu_ubuntu1710/qemu-2.10~rc3+dfsg# ppc64-softmmu/qemu-system-ppc64=20
---nographic -vga none -machine pseries,accel=3Dkvm,kvm-type=3DHV -m size=3D=
-20g=20
--device virtio-blk-pci,drive=3Drootdisk -drive=20
-file=3D/var/lib/libvirt/images/avocado-fvt-wrapper/data/avocado-vt/images=
-/ubuntu-17.10-ppc64le.qcow2,if=3Dnone,cache=3Dnone,id=3Drootdisk,format=3D=
-qcow2=20
--monitor telnet:127.0.0.1:1234,server,nowait -net nic,model=3Dvirtio -net=
-=20
-user -device nec-usb-xhci -smp 8,cores=3D-1,threads=3D-1,maxcpus=3D0
-qemu-system-ppc64: maxcpus must be equal to or greater than smp
-
-~/qemu_ubuntu1710/qemu-2.10~rc3+dfsg# ppc64-softmmu/qemu-system-ppc64=20
---nographic -vga none -machine pseries,accel=3Dkvm,kvm-type=3DHV -m size=3D=
-20g=20
--device virtio-blk-pci,drive=3Drootdisk -drive=20
-file=3D/var/lib/libvirt/images/avocado-fvt-wrapper/data/avocado-vt/images=
-/ubuntu-17.10-ppc64le.qcow2,if=3Dnone,cache=3Dnone,id=3Drootdisk,format=3D=
-qcow2=20
--monitor telnet:127.0.0.1:1234,server,nowait -net nic,model=3Dvirtio -net=
-=20
-user -device nec-usb-xhci -smp 8,cores=3D-1,threads=3D-1,maxcpus=3D-1256
-
-qemu-system-ppc64: Invalid SMP CPUs (-1256) max CPUs supported by=20
-machine 'pseries-artful' (1024)
-
-
->
->>>>>
->>>>> (process:12149): GLib-ERROR **: gmem.c:130: failed to allocate
->>>>> =C2=A0 18446744073709550568 bytes
->>>>>
->>>>> Trace/breakpoint trap
->>>>>
->>>>> Reported-by: R.Nageswara Sastry <rnsastry@linux.vnet.ibm.com>
->>>>> Signed-off-by: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
->>>>> ---
->>>>> v1 -> v2:
->>>>> =C2=A0=C2=A0 - Fix the error check in vl.c to make it generic.
->>>>> v2 -> v3:
->>>>> =C2=A0=C2=A0 - Fix coding style pointed out by patchew.
->>>>> =C2=A0=C2=A0 - Fix check for "<=3D 0" instead of just "< 0".
->>>>> v3 -> v4:
->>>>> =C2=A0=C2=A0 - Fix subject line.
->>>>> =C2=A0=C2=A0 - Removed space before ":" from vl.c:1248
->>>>> =C2=A0=C2=A0 - Removed Reviewed-by: flag.
->>>>> ---
->>>>> =C2=A0 vl.c | 5 ++++-
->>>>> =C2=A0 1 file changed, 4 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/vl.c b/vl.c
->>>>> index 8e247cc..2d9e73d 100644
->>>>> --- a/vl.c
->>>>> +++ b/vl.c
->>>>> @@ -1244,7 +1244,10 @@ static void smp_parse(QemuOpts *opts)
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 max_c=
-pus =3D qemu_opt_get_number(opts, "maxcpus", cpus);
->>>>> -
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_cpus <=3D 0) {
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- error_report("Invalid max_cpus: %d", max_cpus);
->>>>
->>>> I disagree with this patch, I think the correct fix is to declare=20
->>>> max_cpus as unsigned.
->>>> Looking at the codebase I can't find any signed use of it.
->>> =C2=A0=C2=A0 if I declare max_cpus as unsigned, the error check is no=
- more=20
->>> valid as the value max_cpus fetches is of unsigned type and hence we=20
->>> cannot do this below check.
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 if (max_cpus <=3D=20
->>> 0) {
->>> error_report("Invalid max_cpus: %d", max_cpus);
->>>
->>> When I remove the error check with max_cpus defined as unsigned, the=20
->>> code behaves as follows when negetive value is passed for maxcpus
->>> =C2=A0=C2=A0 ppc64-softmmu/qemu-system-ppc64 --nographic -vga none -m=
-achine=20
->>> pseries,accel=3Dkvm,kvm-type=3DHV -m size=3D20g -device=20
->>> virtio-blk-pci,drive=3Drootdisk -drive=20
->>> file=3D/var/lib/libvirt/images/avocado-fvt-wrapper/data/avocado-vt/im=
-ages/ubuntu-17.10-ppc64le.qcow2,if=3Dnone,cache=3Dnone,id=3Drootdisk,form=
-at=3Dqcow2=20
->>> -monitor telnet:127.0.0.1:1234,server,nowait -net nic,model=3Dvirtio=20
->>> -net user -device nec-usb-xhci -smp 8,cores=3D1,threads=3D1,maxcpus=3D=
--12
->>>
->>>
->>> SLOF=20
->>> *********************************************************************=
-*
->>> QEMU Starting
->>> =C2=A0Build Date =3D Jan=C2=A0 4 2017 05:15:48
->>> =C2=A0FW Version =3D buildd@ release 20161019
->>> =C2=A0Press "s" to enter Open Firmware.
->>>
+On 01.09.2017 11:10, Markus Armbruster wrote:
+> David Hildenbrand <david@redhat.com> writes:
+> 
+>>>  static void test_drive_del_device_del(void)
+>>>  {
+>>> +    char *args;
+>>> +
+>>>      /* Start with a drive used by a device that unplugs instantaneously */
+>>> -    qtest_start("-drive if=none,id=drive0,file=null-co://,format=raw"
+>>> -                " -device virtio-scsi-pci"
+>>> -                " -device scsi-hd,drive=drive0,id=dev0");
+>>> +    args = g_strdup_printf("-drive if=none,id=drive0,file=null-co://,format=raw"
+>>> +                           " -device virtio-scsi-%s"
+>>> +                           " -device scsi-hd,drive=drive0,id=dev0",
 >>
->> Adding .. between we have max_cpus declared as extern int max_cpus;=20
->> in sysemu.h file.
->>>>
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- exit(1);
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (max_cpus=
- < cpus) {
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 error_report("maxcpus must be equal to or greater=20
->>>>> than smp");
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 exit(1);
->>>>>
->>>>
->>>> Regards,
->>>>
->>>> Phil.
->>>>
->>>
->>
->
+>> Would look better with the spaces at the end of the previous line (so
+>> all "-device" are aligned), but just my taste.
+> 
+> The -device *are* aligned, but I get what you mean.
+> 
+> The advantage of leading rather than trailing space is that the
+> intention "this is still the same string" is locally obvious both at the
+> first part's end (no comma) and at the second part's beginning (leading
+> space).
+
+I don't mind either way, but in this case, I think I'd prefer to keep
+the original formatting with the space at the beginning, for the
+following two reasons:
+
+- The first line is already hitting the 80 columns limit, and I want to
+  avoid complaints from checkpatch.pl
+- The original author formatted it that way.
+
+ Thomas
