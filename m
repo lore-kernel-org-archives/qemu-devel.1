@@ -1,32 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dnZTu-0004xL-Q6
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:06:43 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dnZcL-0008Ra-M1
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:15:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dnZTr-0000bF-Iv
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:06:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53456)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dnZTr-0000at-DM
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:06:39 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 88DB368B7
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 00:06:38 +0000 (UTC)
-Date: Thu, 31 Aug 2017 21:06:34 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170901000634.GC17184@localhost.localdomain>
-References: <20170824103350.16400-1-marcandre.lureau@redhat.com>
-	<20170824103350.16400-3-marcandre.lureau@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1dnZcK-0004NC-M8
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:15:25 -0400
+From: John Snow <jsnow@redhat.com>
+Date: Thu, 31 Aug 2017 20:14:53 -0400
+Message-Id: <20170901001502.29915-1-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170824103350.16400-3-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 02/14] qlit: move qlit from check-qjson to
- qobject/
+Subject: [Qemu-devel] [PATCH v3 0/9] IDE: replace printfs with tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,81 +20,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: qemu-block@nongnu.org
+Cc: eblake@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, f4bug@amsat.org, John Snow <jsnow@redhat.com>
 
-On Thu, Aug 24, 2017 at 12:33:38PM +0200, Marc-Andr=E9 Lureau wrote:
-> Fix code style issues while at it, to please check-patch.
->=20
-> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  include/qapi/qmp/qlit.h | 49 +++++++++++++++++++++++++
->  qobject/qlit.c          | 89 +++++++++++++++++++++++++++++++++++++++++=
-++++
->  tests/check-qjson.c     | 96 +----------------------------------------=
---------
->  qobject/Makefile.objs   |  2 +-
->  4 files changed, 140 insertions(+), 96 deletions(-)
->  create mode 100644 include/qapi/qmp/qlit.h
->  create mode 100644 qobject/qlit.c
->=20
-> diff --git a/include/qapi/qmp/qlit.h b/include/qapi/qmp/qlit.h
-> new file mode 100644
-> index 0000000000..4e2e760ef1
-> --- /dev/null
-> +++ b/include/qapi/qmp/qlit.h
-> @@ -0,0 +1,49 @@
-> +/*
-> + * Copyright IBM, Corp. 2009
-> + * Copyright (c) 2013, 2015, 2017 Red Hat Inc.
-> + *
-> + * Authors:
-> + *  Anthony Liguori   <aliguori@us.ibm.com>
-> + *  Markus Armbruster <armbru@redhat.com>
-> + *  Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU LGPL, version 2.1 =
-or later.
-> + * See the COPYING.LIB file in the top-level directory.
-> + *
-> + */
-> +#ifndef QLIT_H_
-> +#define QLIT_H_
-> +
-> +#include "qapi-types.h"
-> +#include "qobject.h"
-> +
-> +typedef struct LiteralQDictEntry LiteralQDictEntry;
-> +typedef struct LiteralQObject LiteralQObject;
-> +
-> +struct LiteralQObject {
-> +    int type;
-> +    union {
-> +        int64_t qnum;
-> +        const char *qstr;
-> +        LiteralQDictEntry *qdict;
-> +        LiteralQObject *qlist;
-> +    } value;
-> +};
-> +
-> +struct LiteralQDictEntry {
-> +    const char *key;
-> +    LiteralQObject value;
-> +};
-> +
-> +#define QLIT_QNUM(val) \
-> +    (LiteralQObject){.type =3D QTYPE_QNUM, .value.qnum =3D (val)}
-> +#define QLIT_QSTR(val) \
-> +    (LiteralQObject){.type =3D QTYPE_QSTRING, .value.qstr =3D (val)}
-> +#define QLIT_QDICT(val) \
-> +    (LiteralQObject){.type =3D QTYPE_QDICT, .value.qdict =3D (val)}
-> +#define QLIT_QLIST(val) \
-> +    (LiteralQObject){.type =3D QTYPE_QLIST, .value.qlist =3D (val)}
+Wherever possible, replace all printfs with proper tracing.
+In most places I've tried to do a straight replacement, but
+forthcoming patches may calibrate the tracing to be a little nicer.
 
-I'm still trying to understand why this exists.  Doesn't this
-provide exactly the same functionality as QObject?
+For now, it's nice to just remove the all-or-nothing tracing.
 
-> [...]
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream pat=
+ch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
+tively
+
+001/9:[----] [--] 'IDE: replace DEBUG_IDE with tracing system'
+002/9:[----] [--] 'IDE: Add register hints to tracing'
+003/9:[----] [--] 'IDE: add tracing for data ports'
+004/9:[0002] [FC] 'ATAPI: Replace DEBUG_IDE_ATAPI with tracing events'
+005/9:[0011] [FC] 'IDE: replace DEBUG_AIO with trace events'
+006/9:[----] [--] 'AHCI: Replace DPRINTF with trace-events'
+007/9:[0004] [FC] 'AHCI: Rework IRQ constants'
+008/9:[0052] [FC] 'AHCI: pretty-print FIS to buffer instead of stderr'
+009/9:[----] [--] 'AHCI: remove DPRINTF macro'
+
+=3D=3D=3D
+v3:
+=3D=3D=3D
+
+04: Change preprocessor gate mechanism for building cmd
+           packet buffer dumps (Stefan)
+05: Add getter for IDE_DMA_CMD enumeration (Philippe)
+07: Changed AHCI enumeration to match changes in 05,
+    (But leave assert in place to guard lookup table instead
+         of adding getter.)
+08: Replace FIS buffer printer with something simpler (Stefan)
+    Change preprocessor gate mechanism for building AHCI buffer dumps (St=
+efan)
+    enconstify char parameters in trace-events file (Stefan)
+
+=3D=3D=3D
+v2:
+=3D=3D=3D
+
+01: Rehabilitate commit message.
+    Fix switch () statement spacing. (Eric)
+    Adjust spacing in ide-tracing file to maintain columns.
+    Change filename orderings in trace-events. (Eric)
+    Fixed newline issue in trace-events. (Eric)
+
+02: Context / Added R-B.
+
+03: Added trace-events items to appropriate patch (removed from 04) (Eric=
+)
+    Added a verbose warning for data tracers (Eric)
+
+04: Shifted items to 03 (Eric)
+    Fixed newline issue (Eric)
+
+05: Changed __END to __COUNT (Philippe)
+    Removed __BEGIN enumerator (Philippe)
+
+06: Added more information to unknown write (Philippe)
+
+08: Context (Entropy)
+
+John Snow (9):
+  IDE: replace DEBUG_IDE with tracing system
+  IDE: Add register hints to tracing
+  IDE: add tracing for data ports
+  ATAPI: Replace DEBUG_IDE_ATAPI with tracing events
+  IDE: replace DEBUG_AIO with trace events
+  AHCI: Replace DPRINTF with trace-events
+  AHCI: Rework IRQ constants
+  AHCI: pretty-print FIS to buffer instead of stderr
+  AHCI: remove DPRINTF macro
+
+ Makefile.objs             |   1 +
+ hw/ide/ahci.c             | 243 +++++++++++++++++++++++-----------------=
+------
+ hw/ide/ahci_internal.h    |  44 +++++++--
+ hw/ide/atapi.c            |  69 +++++--------
+ hw/ide/cmd646.c           |  10 +-
+ hw/ide/core.c             | 185 ++++++++++++++++++++++-------------
+ hw/ide/pci.c              |  17 +---
+ hw/ide/piix.c             |  11 +--
+ hw/ide/trace-events       | 111 +++++++++++++++++++++
+ hw/ide/via.c              |  10 +-
+ include/hw/ide/internal.h |   8 +-
+ 11 files changed, 437 insertions(+), 272 deletions(-)
+ create mode 100644 hw/ide/trace-events
 
 --=20
-Eduardo
+2.9.5
