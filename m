@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dnjWz-0003T6-97
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:50:34 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dnja5-0004wi-Fr
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:53:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dnjWu-00074f-CD
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:50:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45246)
+	(envelope-from <kraxel@redhat.com>) id 1dnja0-0008CR-O1
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:53:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39106)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dnjWu-00074J-1z
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:50:28 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dnja0-0008CJ-HU
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:53:40 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E33BC61481
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 10:50:26 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 81E34404333
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 10:53:39 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  1 Sep 2017 12:50:23 +0200
-Message-Id: <20170901105023.11108-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] pixman: drop submodule
+Date: Fri,  1 Sep 2017 12:53:31 +0200
+Message-Id: <20170901105331.11783-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] docs: add firmware.txt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,146 +28,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Daniel P . Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Drop pixman submodule and support for the "internal" pixman build.
-pixman should be reasonable well established meanwhile that we don't
-need the fallback submodule any more.  While being at it also drop
-some #ifdefs for pixman versions olter than what we require in
-configure anyway.
+Document how guest firmware is handled in qemu today.
 
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- configure        | 20 ++------------------
- Makefile         | 10 ----------
- ui/qemu-pixman.c |  4 ----
- .gitmodules      |  3 ---
- pixman           |  1 -
- 5 files changed, 2 insertions(+), 36 deletions(-)
- delete mode 160000 pixman
+ docs/firmware.txt | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
+ create mode 100644 docs/firmware.txt
 
-diff --git a/configure b/configure
-index dd73cce62f..73760430b0 100755
---- a/configure
-+++ b/configure
-@@ -930,8 +930,6 @@ for opt do
-   ;;
-   --with-system-pixman) pixman="system"
-   ;;
--  --without-system-pixman) pixman="internal"
--  ;;
-   --without-pixman) pixman="none"
-   ;;
-   --disable-sdl) sdl="no"
-@@ -3305,8 +3303,6 @@ if test "$pixman" = ""; then
-     pixman="none"
-   elif $pkg_config --atleast-version=0.21.8 pixman-1 > /dev/null 2>&1; then
-     pixman="system"
--  else
--    pixman="internal"
-   fi
- fi
- if test "$pixman" = "none"; then
-@@ -3323,16 +3319,8 @@ elif test "$pixman" = "system"; then
-   pixman_cflags=$($pkg_config --cflags pixman-1)
-   pixman_libs=$($pkg_config --libs pixman-1)
- else
--  if test ! -d ${source_path}/pixman/pixman; then
--    error_exit "pixman >= 0.21.8 not present. Your options:" \
--        "  (1) Preferred: Install the pixman devel package (any recent" \
--        "      distro should have packages as Xorg needs pixman too)." \
--        "  (2) Fetch the pixman submodule, using:" \
--        "      git submodule update --init pixman"
--  fi
--  mkdir -p pixman/pixman
--  pixman_cflags="-I\$(SRC_PATH)/pixman/pixman -I\$(BUILD_DIR)/pixman/pixman"
--  pixman_libs="-L\$(BUILD_DIR)/pixman/pixman/.libs -lpixman-1"
-+  error_exit "pixman >= 0.21.8 not present." \
-+      "Please install the pixman devel package."
- fi
- 
- ##########################################
-@@ -6527,10 +6515,6 @@ echo "QEMU_CFLAGS+=$cflags" >> $config_target_mak
- 
- done # for target in $targets
- 
--if [ "$pixman" = "internal" ]; then
--  echo "config-host.h: subdir-pixman" >> $config_host_mak
--fi
--
- if [ "$dtc_internal" = "yes" ]; then
-   echo "config-host.h: subdir-dtc" >> $config_host_mak
- fi
-diff --git a/Makefile b/Makefile
-index 81447b1f08..280af66628 100644
---- a/Makefile
-+++ b/Makefile
-@@ -325,15 +325,6 @@ $(SOFTMMU_SUBDIR_RULES): config-all-devices.mak
- subdir-%:
- 	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" all,)
- 
--subdir-pixman: pixman/Makefile
--	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C pixman V="$(V)" all,)
--
--pixman/Makefile: $(SRC_PATH)/pixman/configure
--	(cd pixman; CFLAGS="$(CFLAGS) -fPIC $(extra_cflags) $(extra_ldflags)" $(SRC_PATH)/pixman/configure $(AUTOCONF_HOST) --disable-gtk --disable-shared --enable-static)
--
--$(SRC_PATH)/pixman/configure:
--	(cd $(SRC_PATH)/pixman; autoreconf -v --install)
--
- DTC_MAKE_ARGS=-I$(SRC_PATH)/dtc VPATH=$(SRC_PATH)/dtc -C dtc V="$(V)" LIBFDT_srcdir=$(SRC_PATH)/dtc/libfdt
- DTC_CFLAGS=$(CFLAGS) $(QEMU_CFLAGS)
- DTC_CPPFLAGS=-I$(BUILD_DIR)/dtc -I$(SRC_PATH)/dtc -I$(SRC_PATH)/dtc/libfdt
-@@ -532,7 +523,6 @@ distclean: clean
- 	rm -rf $$d || exit 1 ; \
-         done
- 	rm -Rf .sdk
--	if test -f pixman/config.log; then $(MAKE) -C pixman distclean; fi
- 	if test -f dtc/version_gen.h; then $(MAKE) $(DTC_MAKE_ARGS) clean; fi
- 
- KEYMAPS=da     en-gb  et  fr     fr-ch  is  lt  modifiers  no  pt-br  sv \
-diff --git a/ui/qemu-pixman.c b/ui/qemu-pixman.c
-index 6e8b83add6..6e591ab821 100644
---- a/ui/qemu-pixman.c
-+++ b/ui/qemu-pixman.c
-@@ -96,17 +96,13 @@ int qemu_pixman_get_type(int rshift, int gshift, int bshift)
-         if (bshift == 0) {
-             type = PIXMAN_TYPE_ARGB;
-         } else {
--#if PIXMAN_VERSION >= PIXMAN_VERSION_ENCODE(0, 21, 8)
-             type = PIXMAN_TYPE_RGBA;
--#endif
-         }
-     } else if (rshift < gshift && gshift < bshift) {
-         if (rshift == 0) {
-             type = PIXMAN_TYPE_ABGR;
-         } else {
--#if PIXMAN_VERSION >= PIXMAN_VERSION_ENCODE(0, 16, 0)
-             type = PIXMAN_TYPE_BGRA;
--#endif
-         }
-     }
-     return type;
-diff --git a/.gitmodules b/.gitmodules
-index 5b0c212622..84c54cdc49 100644
---- a/.gitmodules
-+++ b/.gitmodules
-@@ -22,9 +22,6 @@
- [submodule "roms/sgabios"]
- 	path = roms/sgabios
- 	url = git://git.qemu-project.org/sgabios.git
--[submodule "pixman"]
--	path = pixman
--	url = git://anongit.freedesktop.org/pixman
- [submodule "dtc"]
- 	path = dtc
- 	url = git://git.qemu-project.org/dtc.git
-diff --git a/pixman b/pixman
-deleted file mode 160000
-index 87eea99e44..0000000000
---- a/pixman
-+++ /dev/null
-@@ -1 +0,0 @@
--Subproject commit 87eea99e443b389c978cf37efc52788bf03a0ee0
+diff --git a/docs/firmware.txt b/docs/firmware.txt
+new file mode 100644
+index 0000000000..e242413344
+--- /dev/null
++++ b/docs/firmware.txt
+@@ -0,0 +1,49 @@
++
++prebuilt firmware in qemu
++=========================
++
++The process of building firmware isn't as easy as building qemu
++itself, for example because you must have cross compilers installed
++when building firmware for other architectures.  So qemu ships
++prebuilt firmware binaries for convenience reasons.
++
++
++directories
++-----------
++
++pc-bios/
++    Firmware binaries.
++    Also other files like keymaps and logos which are copied to
++    $prefix/share/qemu by "make install".
++
++pc-bios/optionrom/
++    Firmware sources, part of the qemu project.
++
++roms/
++    Firmware sources, third-party projects, as git submodules.
++
++
++third-party git repos
++---------------------
++
++For third party firmware sources it is recommended to have a git
++mirror on git.qemu.org.  In case the firmware license is GPL the git
++mirror is mandatory for GPL compilance reasons:  We ship binaries, so
++we must provide sources too.
++
++
++building the firmware
++---------------------
++
++Firmware builds should be done using rules in roms/Makefile.  That
++serves as documentation how the firmware is built, and it also makes
++firmware updates easier for the maintainer.
++
++"make -C roms" prints a list of firmware build targets.
++"make -C roms $target" kicks a build.
++
++
++notes for specific firmwares
++----------------------------
++
++ipxe: see https://wiki.qemu.org/IpxeDownstreamForQemu
 -- 
 2.9.3
