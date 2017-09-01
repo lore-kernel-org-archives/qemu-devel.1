@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dnnU3-0007y5-CH
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:03:53 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dnnU5-0007zk-Jx
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:03:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dnnTy-0002xF-Jp
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:03:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40961)
+	(envelope-from <ehabkost@redhat.com>) id 1dnnU0-0002y1-H5
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:03:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46262)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dnnTy-0002x2-CH
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:03:42 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dnnU0-0002xj-8E
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:03:44 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri,  1 Sep 2017 12:02:57 -0300
-Message-Id: <20170901150317.10380-10-ehabkost@redhat.com>
+Date: Fri,  1 Sep 2017 12:02:58 -0300
+Message-Id: <20170901150317.10380-11-ehabkost@redhat.com>
 In-Reply-To: <20170901150317.10380-1-ehabkost@redhat.com>
 References: <20170901150317.10380-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 09/29] sparc: move adhoc CPUSPARCState
- initialization to realize time
+Subject: [Qemu-devel] [PULL 10/29] sparc: make cpu feature parsing property
+ based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,87 +32,287 @@ Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-SPARCCPU::env was initialized from previously set properties
-(with help of sparc_cpu_parse_features) in cpu_sparc_register().
-However there is not reason to keep it there as this task is
-typically done at realize time. So move post properties
-initialization into sparc_cpu_realizefn, which brings
-cpu_sparc_init() closer to cpu_generic_init().
+with features converted to properties we can use the same
+approach as x86 for features parsing and drop legacy
+approach that manipulated CPU instance directly.
+New sparc_cpu_parse_features() will allow only +-feat
+and explicitly disable feat=3Don|off syntax for now.
+
+With that in place and sparc_cpu_parse_features() providing
+generic CPUClass::parse_features callback, the cpu_sparc_init()
+will do the same job as cpu_generic_init() so replace content
+of cpu_sparc_init() with it.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <1503592308-93913-6-git-send-email-imammedo@redhat.com>
+Message-Id: <1503672460-109436-1-git-send-email-imammedo@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/sparc/cpu.c | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+ target/sparc/cpu.c | 215 ++++++++++++++++++++---------------------------=
+------
+ 1 file changed, 82 insertions(+), 133 deletions(-)
 
 diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-index 82ab5ad8d9..9dfc15007d 100644
+index 9dfc15007d..29296b2411 100644
 --- a/target/sparc/cpu.c
 +++ b/target/sparc/cpu.c
-@@ -109,7 +109,6 @@ static void sparc_cpu_parse_features(CPUState *cs, ch=
-ar *features,
-=20
- static int cpu_sparc_register(SPARCCPU *cpu, const char *cpu_model)
- {
--    CPUSPARCState *env =3D &cpu->env;
-     char *s =3D g_strdup(cpu_model);
-     char *featurestr =3D strtok(s, ",");
-     Error *err =3D NULL;
-@@ -122,19 +121,6 @@ static int cpu_sparc_register(SPARCCPU *cpu, const c=
-har *cpu_model)
-         return -1;
-     }
-=20
--    env->version =3D env->def.iu_version;
--    env->fsr =3D env->def.fpu_version;
--    env->nwindows =3D env->def.nwindows;
--#if !defined(TARGET_SPARC64)
--    env->mmuregs[0] |=3D env->def.mmu_version;
--    cpu_sparc_set_id(env, 0);
--    env->mxccregs[7] |=3D env->def.mxcc_version;
--#else
--    env->mmu_version =3D env->def.mmu_version;
--    env->maxtl =3D env->def.maxtl;
--    env->version |=3D env->def.maxtl << 8;
--    env->version |=3D env->def.nwindows - 1;
--#endif
-     return 0;
+@@ -104,50 +104,99 @@ static void cpu_sparc_disas_set_info(CPUState *cpu,=
+ disassemble_info *info)
+ #endif
  }
 =20
-@@ -816,15 +802,29 @@ static void sparc_cpu_realizefn(DeviceState *dev, E=
-rror **errp)
-     CPUState *cs =3D CPU(dev);
-     SPARCCPUClass *scc =3D SPARC_CPU_GET_CLASS(dev);
-     Error *local_err =3D NULL;
--#if defined(CONFIG_USER_ONLY)
-     SPARCCPU *cpu =3D SPARC_CPU(dev);
-     CPUSPARCState *env =3D &cpu->env;
+-static void sparc_cpu_parse_features(CPUState *cs, char *features,
+-                                     Error **errp);
++static void
++cpu_add_feat_as_prop(const char *typename, const char *name, const char =
+*val)
++{
++    GlobalProperty *prop =3D g_new0(typeof(*prop), 1);
++    prop->driver =3D typename;
++    prop->property =3D g_strdup(name);
++    prop->value =3D g_strdup(val);
++    prop->errp =3D &error_fatal;
++    qdev_prop_register_global(prop);
++}
 =20
-+#if defined(CONFIG_USER_ONLY)
-     if ((env->def.features & CPU_FEATURE_FLOAT)) {
-         env->def.features |=3D CPU_FEATURE_FLOAT128;
+-static int cpu_sparc_register(SPARCCPU *cpu, const char *cpu_model)
++/* Parse "+feature,-feature,feature=3Dfoo" CPU feature string */
++static void sparc_cpu_parse_features(const char *typename, char *feature=
+s,
++                                     Error **errp)
+ {
+-    char *s =3D g_strdup(cpu_model);
+-    char *featurestr =3D strtok(s, ",");
+-    Error *err =3D NULL;
++    GList *l, *plus_features =3D NULL, *minus_features =3D NULL;
++    char *featurestr; /* Single 'key=3Dvalue" string being parsed */
++    static bool cpu_globals_initialized;
+=20
+-    featurestr =3D strtok(NULL, ",");
+-    sparc_cpu_parse_features(CPU(cpu), featurestr, &err);
+-    g_free(s);
+-    if (err) {
+-        error_report_err(err);
+-        return -1;
++    if (cpu_globals_initialized) {
++        return;
      }
- #endif
++    cpu_globals_initialized =3D true;
 =20
-+    env->version =3D env->def.iu_version;
-+    env->fsr =3D env->def.fpu_version;
-+    env->nwindows =3D env->def.nwindows;
-+#if !defined(TARGET_SPARC64)
-+    env->mmuregs[0] |=3D env->def.mmu_version;
-+    cpu_sparc_set_id(env, 0);
-+    env->mxccregs[7] |=3D env->def.mxcc_version;
-+#else
-+    env->mmu_version =3D env->def.mmu_version;
-+    env->maxtl =3D env->def.maxtl;
-+    env->version |=3D env->def.maxtl << 8;
-+    env->version |=3D env->def.nwindows - 1;
-+#endif
+-    return 0;
+-}
++    if (!features) {
++        return;
++    }
+=20
+-SPARCCPU *cpu_sparc_init(const char *cpu_model)
+-{
+-    SPARCCPU *cpu;
+-    ObjectClass *oc;
+-    char *str, *name;
++    for (featurestr =3D strtok(features, ",");
++         featurestr;
++         featurestr =3D strtok(NULL, ",")) {
++        const char *name;
++        const char *val =3D NULL;
++        char *eq =3D NULL;
+=20
+-    str =3D g_strdup(cpu_model);
+-    name =3D strtok(str, ",");
+-    oc =3D cpu_class_by_name(TYPE_SPARC_CPU, name);
+-    g_free(str);
+-    if (oc =3D=3D NULL) {
+-        return NULL;
+-    }
++        /* Compatibility syntax: */
++        if (featurestr[0] =3D=3D '+') {
++            plus_features =3D g_list_append(plus_features,
++                                          g_strdup(featurestr + 1));
++            continue;
++        } else if (featurestr[0] =3D=3D '-') {
++            minus_features =3D g_list_append(minus_features,
++                                           g_strdup(featurestr + 1));
++            continue;
++        }
+=20
+-    cpu =3D SPARC_CPU(object_new(object_class_get_name(oc)));
++        eq =3D strchr(featurestr, '=3D');
++        name =3D featurestr;
++        if (eq) {
++            *eq++ =3D 0;
++            val =3D eq;
 +
-     cpu_exec_realizefn(cs, &local_err);
-     if (local_err !=3D NULL) {
-         error_propagate(errp, local_err);
++            /*
++             * Temporarily, only +feat/-feat will be supported
++             * for boolean properties until we remove the
++             * minus-overrides-plus semantics and just follow
++             * the order options appear on the command-line.
++             *
++             * TODO: warn if user is relying on minus-override-plus sema=
+ntics
++             * TODO: remove minus-override-plus semantics after
++             *       warning for a few releases
++             */
++            if (!strcasecmp(val, "on") ||
++                !strcasecmp(val, "off") ||
++                !strcasecmp(val, "true") ||
++                !strcasecmp(val, "false")) {
++                error_setg(errp, "Boolean properties in format %s=3D%s"
++                                 " are not supported", name, val);
++                return;
++            }
++        } else {
++            error_setg(errp, "Unsupported property format: %s", name);
++            return;
++        }
++        cpu_add_feat_as_prop(typename, name, val);
++    }
+=20
+-    if (cpu_sparc_register(cpu, cpu_model) < 0) {
+-        object_unref(OBJECT(cpu));
+-        return NULL;
++    for (l =3D plus_features; l; l =3D l->next) {
++        const char *name =3D l->data;
++        cpu_add_feat_as_prop(typename, name, "on");
+     }
++    g_list_free_full(plus_features, g_free);
+=20
+-    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
++    for (l =3D minus_features; l; l =3D l->next) {
++        const char *name =3D l->data;
++        cpu_add_feat_as_prop(typename, name, "off");
++    }
++    g_list_free_full(minus_features, g_free);
++}
+=20
+-    return cpu;
++SPARCCPU *cpu_sparc_init(const char *cpu_model)
++{
++    return SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+ }
+=20
+ void cpu_sparc_set_id(CPUSPARCState *env, unsigned int cpu)
+@@ -528,107 +577,6 @@ static void print_features(FILE *f, fprintf_functio=
+n cpu_fprintf,
+     }
+ }
+=20
+-static void add_flagname_to_bitmaps(const char *flagname, uint32_t *feat=
+ures)
+-{
+-    unsigned int i;
+-
+-    for (i =3D 0; i < ARRAY_SIZE(feature_name); i++) {
+-        if (feature_name[i] && !strcmp(flagname, feature_name[i])) {
+-            *features |=3D 1 << i;
+-            return;
+-        }
+-    }
+-    error_report("CPU feature %s not found", flagname);
+-}
+-
+-static void sparc_cpu_parse_features(CPUState *cs, char *features,
+-                                     Error **errp)
+-{
+-    SPARCCPU *cpu =3D SPARC_CPU(cs);
+-    sparc_def_t *cpu_def =3D &cpu->env.def;
+-    char *featurestr;
+-    uint32_t plus_features =3D 0;
+-    uint32_t minus_features =3D 0;
+-    uint64_t iu_version;
+-    uint32_t fpu_version, mmu_version, nwindows;
+-
+-    featurestr =3D features ? strtok(features, ",") : NULL;
+-    while (featurestr) {
+-        char *val;
+-
+-        if (featurestr[0] =3D=3D '+') {
+-            add_flagname_to_bitmaps(featurestr + 1, &plus_features);
+-        } else if (featurestr[0] =3D=3D '-') {
+-            add_flagname_to_bitmaps(featurestr + 1, &minus_features);
+-        } else if ((val =3D strchr(featurestr, '=3D'))) {
+-            *val =3D 0; val++;
+-            if (!strcmp(featurestr, "iu_version")) {
+-                char *err;
+-
+-                iu_version =3D strtoll(val, &err, 0);
+-                if (!*val || *err) {
+-                    error_setg(errp, "bad numerical value %s", val);
+-                    return;
+-                }
+-                cpu_def->iu_version =3D iu_version;
+-#ifdef DEBUG_FEATURES
+-                fprintf(stderr, "iu_version %" PRIx64 "\n", iu_version);
+-#endif
+-            } else if (!strcmp(featurestr, "fpu_version")) {
+-                char *err;
+-
+-                fpu_version =3D strtol(val, &err, 0);
+-                if (!*val || *err) {
+-                    error_setg(errp, "bad numerical value %s", val);
+-                    return;
+-                }
+-                cpu_def->fpu_version =3D fpu_version;
+-#ifdef DEBUG_FEATURES
+-                fprintf(stderr, "fpu_version %x\n", fpu_version);
+-#endif
+-            } else if (!strcmp(featurestr, "mmu_version")) {
+-                char *err;
+-
+-                mmu_version =3D strtol(val, &err, 0);
+-                if (!*val || *err) {
+-                    error_setg(errp, "bad numerical value %s", val);
+-                    return;
+-                }
+-                cpu_def->mmu_version =3D mmu_version;
+-#ifdef DEBUG_FEATURES
+-                fprintf(stderr, "mmu_version %x\n", mmu_version);
+-#endif
+-            } else if (!strcmp(featurestr, "nwindows")) {
+-                char *err;
+-
+-                nwindows =3D strtol(val, &err, 0);
+-                if (!*val || *err || nwindows > MAX_NWINDOWS ||
+-                    nwindows < MIN_NWINDOWS) {
+-                    error_setg(errp, "bad numerical value %s", val);
+-                    return;
+-                }
+-                cpu_def->nwindows =3D nwindows;
+-#ifdef DEBUG_FEATURES
+-                fprintf(stderr, "nwindows %d\n", nwindows);
+-#endif
+-            } else {
+-                error_setg(errp, "unrecognized feature %s", featurestr);
+-                return;
+-            }
+-        } else {
+-            error_setg(errp, "feature string `%s' not in format "
+-                             "(+feature|-feature|feature=3Dxyz)", featur=
+estr);
+-            return;
+-        }
+-        featurestr =3D strtok(NULL, ",");
+-    }
+-    cpu_def->features |=3D plus_features;
+-    cpu_def->features &=3D ~minus_features;
+-#ifdef DEBUG_FEATURES
+-    print_features(stderr, fprintf, cpu_def->features, NULL);
+-#endif
+-}
+-
+ void sparc_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+ {
+     unsigned int i;
+@@ -931,6 +879,7 @@ static void sparc_cpu_class_init(ObjectClass *oc, voi=
+d *data)
+     cc->reset =3D sparc_cpu_reset;
+=20
+     cc->class_by_name =3D sparc_cpu_class_by_name;
++    cc->parse_features =3D sparc_cpu_parse_features;
+     cc->has_work =3D sparc_cpu_has_work;
+     cc->do_interrupt =3D sparc_cpu_do_interrupt;
+     cc->cpu_exec_interrupt =3D sparc_cpu_exec_interrupt;
 --=20
 2.13.5
