@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dnkGn-0006ix-1Q
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:37:57 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dnkIW-0008Fh-6N
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:39:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dnkGi-0000Xo-CU
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:37:53 -0400
-References: <20170901110706.429-1-otubo@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <fecde0d9-8289-af04-e1aa-79d0be06ca32@redhat.com>
-Date: Fri, 1 Sep 2017 13:37:34 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dnkIT-0000w5-2s
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:39:40 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33139)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dnkIS-0000vy-UQ
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:39:37 -0400
+Received: by mail-qk0-x242.google.com with SMTP id k126so1637619qkb.0
+	for <qemu-devel@nongnu.org>; Fri, 01 Sep 2017 04:39:36 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170901112829.2571-1-apahim@redhat.com>
+	<20170901112829.2571-4-apahim@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <910515b9-5a65-2ef9-0091-21083cd0cf4e@amsat.org>
+Date: Fri, 1 Sep 2017 08:39:31 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170901110706.429-1-otubo@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170901112829.2571-4-apahim@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] isa-fdc: assert replaced by proper error
- exit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v8 03/13] qemu.py: use os.path.null instead
+ of /dev/null
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +36,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Otubo <otubo@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, jsnow@redhat.com, qemu-block@nongnu.org
+To: Amador Pahim <apahim@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, ldoktor@redhat.com, famz@redhat.com, ehabkost@redhat.com, stefanha@gmail.com, armbru@redhat.com, mreitz@redhat.com, crosa@redhat.com
 
-On 01.09.2017 13:07, Eduardo Otubo wrote:
-> When not available, isa-fdc falls into assert instead of proper error
-> exit. This patch fixes this behavior.
+On 09/01/2017 08:28 AM, Amador Pahim wrote:
+> For increased portability, let's use os.path.devnull.
 > 
-> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->  hw/block/fdc.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+>   scripts/qemu.py | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-> index 401129073b..0b6def4e1d 100644
-> --- a/hw/block/fdc.c
-> +++ b/hw/block/fdc.c
-> @@ -2699,11 +2699,15 @@ static void isabus_fdc_realize(DeviceState *dev, Error **errp)
->      fdctrl->dma_chann = isa->dma;
->      if (fdctrl->dma_chann != -1) {
->          fdctrl->dma = isa_get_dma(isa_bus_from_device(isadev), isa->dma);
-> -        assert(fdctrl->dma);
-> +        if (!fdctrl->dma) {
-> +            error_setg(errp, "isa-fdc not supported");
-> +            goto error;
-> +        }
->      }
->  
->      qdev_set_legacy_instance_id(dev, isa->iobase, 2);
->      fdctrl_realize_common(dev, fdctrl, &err);
-> +error:
->      if (err != NULL) {
->          error_propagate(errp, err);
->          return;
-
-Maybe add the reproducer to the commit message:
-
- qemu-system-ppc64 -S -machine powernv -device isa-fdc
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index aca6fa4d82..a6e06291ea 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -79,7 +79,7 @@ class QEMUMachine(object):
+>           fd_param = ["%s" % self._socket_scm_helper,
+>                       "%d" % self._qmp.get_sock_fd(),
+>                       "%s" % fd_file_path]
+> -        devnull = open('/dev/null', 'rb')
+> +        devnull = open(os.path.devnull, 'rb')
+>           p = subprocess.Popen(fd_param, stdin=devnull, stdout=subprocess.PIPE,
+>                                stderr=subprocess.STDOUT)
+>           output = p.communicate()[0]
+> @@ -140,7 +140,7 @@ class QEMUMachine(object):
+>   
+>       def launch(self):
+>           '''Launch the VM and establish a QMP connection'''
+> -        devnull = open('/dev/null', 'rb')
+> +        devnull = open(os.path.devnull, 'rb')
+>           qemulog = open(self._qemu_log_path, 'wb')
+>           try:
+>               self._pre_launch()
+> 
