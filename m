@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dnnm1-0001Uc-4x
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:22:22 -0400
+	(envelope-from <famz@redhat.com>) id 1dnnm1-0001V7-Dx
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:22:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dnnm0-000363-EC
+	(envelope-from <famz@redhat.com>) id 1dnnlw-00034v-VC
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:22:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54582)
+Received: from mx1.redhat.com ([209.132.183.28]:13017)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dnnm0-00035l-8H
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:22:20 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dnnlw-00034Z-Ps
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:22:16 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri,  1 Sep 2017 23:22:00 +0800
-Message-Id: <20170901152200.5953-4-famz@redhat.com>
+Date: Fri,  1 Sep 2017 23:21:59 +0800
+Message-Id: <20170901152200.5953-3-famz@redhat.com>
 In-Reply-To: <20170901152200.5953-1-famz@redhat.com>
 References: <20170901152200.5953-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 3/3] docker: Add test-block
+Subject: [Qemu-devel] [PATCH v3 2/3] docker: Add nettle-devel to fedora image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +26,24 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, kchamart@redhat.com, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, eblake@redhat.com
 
+The LUKS cases in qemu-iotests requires this.
+
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/docker/test-block | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
- create mode 100755 tests/docker/test-block
+ tests/docker/dockerfiles/fedora.docker | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tests/docker/test-block b/tests/docker/test-block
-new file mode 100755
-index 0000000000..efc77b4b91
---- /dev/null
-+++ b/tests/docker/test-block
-@@ -0,0 +1,22 @@
-+#!/bin/bash -e
-+#
-+# Run block test cases
-+#
-+# Copyright (c) 2017 Red Hat Inc.
-+#
-+# Authors:
-+#  Fam Zheng <famz@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2
-+# or (at your option) any later version. See the COPYING file in
-+# the top-level directory.
-+
-+. common.rc
-+
-+cd "$BUILD_DIR"
-+
-+build_qemu --target-list=x86_64-softmmu
-+cd tests/qemu-iotests
-+for t in raw qcow2 nbd luks; do
-+    ./check -g quick -$t
-+done
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+index 4eaa8ed2a5..27e8201c54 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -3,6 +3,7 @@ ENV PACKAGES \
+     ccache git tar PyYAML sparse flex bison python2 bzip2 hostname \
+     glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
+     gcc gcc-c++ clang make perl which bc findutils libaio-devel \
++    nettle-devel \
+     mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
+     mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
+     mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
 -- 
 2.13.5
