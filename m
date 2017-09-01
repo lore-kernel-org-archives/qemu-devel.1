@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUn-0000JV-Ga
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1dnlUm-0000IG-Pt
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUi-0007Ko-5Q
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52602)
+	(envelope-from <armbru@redhat.com>) id 1dnlUj-0007MW-Iu
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40920)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUh-0007Jx-Ub
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:20 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUj-0007LO-6T
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:21 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E1EEFC047B95
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:18 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 185047EA9F
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:20 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-75.ams2.redhat.com
+	[10.36.116.75])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id AFFEA78203
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:19 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 14:55:36 +0200
-Message-Id: <20170901125611.29295-13-armbru@redhat.com>
+Date: Fri,  1 Sep 2017 14:55:52 +0200
+Message-Id: <20170901125611.29295-29-armbru@redhat.com>
 In-Reply-To: <20170901125611.29295-1-armbru@redhat.com>
 References: <20170901125611.29295-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/47] qlit: Replace open-coded qnum_get_int()
- by call
+Subject: [Qemu-devel] [PULL 28/47] qapi-schema: Fold event.json back into
+ qapi-schema.json
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,46 +38,373 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-Bonus: rids us of a side effect in an assertion.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20170825105913.4060-10-marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <1503602048-12268-14-git-send-email-armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- qobject/qlit.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ Makefile         |   2 +-
+ qapi-schema.json | 134 +++++++++++++++++++++++++++++++++++++++++++++++++=
++++-
+ qapi/event.json  | 138 -------------------------------------------------=
+------
+ 3 files changed, 134 insertions(+), 140 deletions(-)
+ delete mode 100644 qapi/event.json
 
-diff --git a/qobject/qlit.c b/qobject/qlit.c
-index 07ad6b05e8..b1d9146220 100644
---- a/qobject/qlit.c
-+++ b/qobject/qlit.c
-@@ -43,8 +43,6 @@ static void compare_helper(QObject *obj, void *opaque)
+diff --git a/Makefile b/Makefile
+index 3dde210662..337a1f6f9b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -412,7 +412,7 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SRC_P=
+ATH)/qapi/common.json \
+                $(SRC_PATH)/qapi/block.json $(SRC_PATH)/qapi/block-core.j=
+son \
+                $(SRC_PATH)/qapi/char.json \
+                $(SRC_PATH)/qapi/crypto.json \
+-               $(SRC_PATH)/qapi/event.json $(SRC_PATH)/qapi/introspect.j=
+son \
++               $(SRC_PATH)/qapi/introspect.json \
+                $(SRC_PATH)/qapi/migration.json \
+                $(SRC_PATH)/qapi/net.json \
+                $(SRC_PATH)/qapi/rocker.json \
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 0ad4e0237d..4964d927bd 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -90,7 +90,6 @@
+ { 'include': 'qapi/ui.json' }
+ { 'include': 'qapi/migration.json' }
+ { 'include': 'qapi/transaction.json' }
+-{ 'include': 'qapi/event.json' }
+ { 'include': 'qapi/trace.json' }
+ { 'include': 'qapi/introspect.json' }
 =20
- bool qlit_equal_qobject(const QLitObject *lhs, const QObject *rhs)
- {
--    int64_t val;
+@@ -552,6 +551,28 @@
+ { 'command': 'query-balloon', 'returns': 'BalloonInfo' }
+=20
+ ##
++# @BALLOON_CHANGE:
++#
++# Emitted when the guest changes the actual BALLOON level. This value is
++# equivalent to the @actual field return by the 'query-balloon' command
++#
++# @actual: actual level of the guest memory balloon in bytes
++#
++# Note: this event is rate-limited.
++#
++# Since: 1.2
++#
++# Example:
++#
++# <- { "event": "BALLOON_CHANGE",
++#      "data": { "actual": 944766976 },
++#      "timestamp": { "seconds": 1267020223, "microseconds": 435656 } }
++#
++##
++{ 'event': 'BALLOON_CHANGE',
++  'data': { 'actual': 'int' } }
++
++##
+ # @PciMemoryRange:
+ #
+ # A PCI device memory region
+@@ -1434,6 +1455,30 @@
+ { 'command': 'device_del', 'data': {'id': 'str'} }
+=20
+ ##
++# @DEVICE_DELETED:
++#
++# Emitted whenever the device removal completion is acknowledged by the =
+guest.
++# At this point, it's safe to reuse the specified device ID. Device remo=
+val can
++# be initiated by the guest or by HMP/QMP commands.
++#
++# @device: device name
++#
++# @path: device path
++#
++# Since: 1.5
++#
++# Example:
++#
++# <- { "event": "DEVICE_DELETED",
++#      "data": { "device": "virtio-net-pci-0",
++#                "path": "/machine/peripheral/virtio-net-pci-0" },
++#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
++#
++##
++{ 'event': 'DEVICE_DELETED',
++  'data': { '*device': 'str', 'path': 'str' } }
++
++##
+ # @DumpGuestMemoryFormat:
+ #
+ # An enumeration of guest-memory-dump's format.
+@@ -1569,6 +1614,29 @@
+ { 'command': 'query-dump', 'returns': 'DumpQueryResult' }
+=20
+ ##
++# @DUMP_COMPLETED:
++#
++# Emitted when background dump has completed
++#
++# @result: DumpQueryResult type described in qapi-schema.json.
++#
++# @error: human-readable error string that provides
++#         hint on why dump failed. Only presents on failure. The
++#         user should not try to interpret the error string.
++#
++# Since: 2.6
++#
++# Example:
++#
++# { "event": "DUMP_COMPLETED",
++#   "data": {"result": {"total": 1090650112, "status": "completed",
++#                       "completed": 1090650112} } }
++#
++##
++{ 'event': 'DUMP_COMPLETED' ,
++  'data': { 'result': 'DumpQueryResult', '*error': 'str' } }
++
++##
+ # @DumpGuestMemoryCapability:
+ #
+ # A list of the available formats for dump-guest-memory
+@@ -2652,6 +2720,29 @@
+ { 'command': 'query-memory-devices', 'returns': ['MemoryDeviceInfo'] }
+=20
+ ##
++# @MEM_UNPLUG_ERROR:
++#
++# Emitted when memory hot unplug error occurs.
++#
++# @device: device name
++#
++# @msg: Informative message
++#
++# Since: 2.4
++#
++# Example:
++#
++# <- { "event": "MEM_UNPLUG_ERROR"
++#      "data": { "device": "dimm1",
++#                "msg": "acpi: device unplug for unsupported device"
++#      },
++#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
++#
++##
++{ 'event': 'MEM_UNPLUG_ERROR',
++  'data': { 'device': 'str', 'msg': 'str' } }
++
++##
+ # @ACPISlotType:
+ #
+ # @DIMM: memory slot
+@@ -2706,6 +2797,25 @@
+ { 'command': 'query-acpi-ospm-status', 'returns': ['ACPIOSTInfo'] }
+=20
+ ##
++# @ACPI_DEVICE_OST:
++#
++# Emitted when guest executes ACPI _OST method.
++#
++# @info: ACPIOSTInfo type as described in qapi-schema.json
++#
++# Since: 2.1
++#
++# Example:
++#
++# <- { "event": "ACPI_DEVICE_OST",
++#      "data": { "device": "d1", "slot": "0",
++#                "slot-type": "DIMM", "source": 1, "status": 0 } }
++#
++##
++{ 'event': 'ACPI_DEVICE_OST',
++     'data': { 'info': 'ACPIOSTInfo' } }
++
++##
+ # @IoOperationType:
+ #
+ # An enumeration of the I/O operation types
+@@ -2738,6 +2848,28 @@
+ { 'command': 'rtc-reset-reinjection' }
+=20
+ ##
++# @RTC_CHANGE:
++#
++# Emitted when the guest changes the RTC time.
++#
++# @offset: offset between base RTC clock (as specified by -rtc base), an=
+d
++#          new RTC clock value
++#
++# Note: This event is rate-limited.
++#
++# Since: 0.13.0
++#
++# Example:
++#
++# <-   { "event": "RTC_CHANGE",
++#        "data": { "offset": 78 },
++#        "timestamp": { "seconds": 1267020223, "microseconds": 435656 } =
+}
++#
++##
++{ 'event': 'RTC_CHANGE',
++  'data': { 'offset': 'int' } }
++
++##
+ # @ReplayMode:
+ #
+ # Mode of the replay subsystem.
+diff --git a/qapi/event.json b/qapi/event.json
+deleted file mode 100644
+index 48a5d8fb21..0000000000
+--- a/qapi/event.json
++++ /dev/null
+@@ -1,138 +0,0 @@
+-# -*- Mode: Python -*-
 -
-     if (!rhs || lhs->type !=3D qobject_type(rhs)) {
-         return false;
-     }
-@@ -53,8 +51,7 @@ bool qlit_equal_qobject(const QLitObject *lhs, const QO=
-bject *rhs)
-     case QTYPE_QBOOL:
-         return lhs->value.qbool =3D=3D qbool_get_bool(qobject_to_qbool(r=
-hs));
-     case QTYPE_QNUM:
--        g_assert(qnum_get_try_int(qobject_to_qnum(rhs), &val));
--        return lhs->value.qnum =3D=3D val;
-+        return lhs->value.qnum =3D=3D  qnum_get_int(qobject_to_qnum(rhs)=
-);
-     case QTYPE_QSTRING:
-         return (strcmp(lhs->value.qstr,
-                        qstring_get_str(qobject_to_qstring(rhs))) =3D=3D =
-0);
+-##
+-# =3D Other events
+-##
+-
+-##
+-# @RTC_CHANGE:
+-#
+-# Emitted when the guest changes the RTC time.
+-#
+-# @offset: offset between base RTC clock (as specified by -rtc base), an=
+d
+-#          new RTC clock value
+-#
+-# Note: This event is rate-limited.
+-#
+-# Since: 0.13.0
+-#
+-# Example:
+-#
+-# <-   { "event": "RTC_CHANGE",
+-#        "data": { "offset": 78 },
+-#        "timestamp": { "seconds": 1267020223, "microseconds": 435656 } =
+}
+-#
+-##
+-{ 'event': 'RTC_CHANGE',
+-  'data': { 'offset': 'int' } }
+-
+-##
+-# @DEVICE_DELETED:
+-#
+-# Emitted whenever the device removal completion is acknowledged by the =
+guest.
+-# At this point, it's safe to reuse the specified device ID. Device remo=
+val can
+-# be initiated by the guest or by HMP/QMP commands.
+-#
+-# @device: device name
+-#
+-# @path: device path
+-#
+-# Since: 1.5
+-#
+-# Example:
+-#
+-# <- { "event": "DEVICE_DELETED",
+-#      "data": { "device": "virtio-net-pci-0",
+-#                "path": "/machine/peripheral/virtio-net-pci-0" },
+-#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
+-#
+-##
+-{ 'event': 'DEVICE_DELETED',
+-  'data': { '*device': 'str', 'path': 'str' } }
+-
+-##
+-# @ACPI_DEVICE_OST:
+-#
+-# Emitted when guest executes ACPI _OST method.
+-#
+-# @info: ACPIOSTInfo type as described in qapi-schema.json
+-#
+-# Since: 2.1
+-#
+-# Example:
+-#
+-# <- { "event": "ACPI_DEVICE_OST",
+-#      "data": { "device": "d1", "slot": "0",
+-#                "slot-type": "DIMM", "source": 1, "status": 0 } }
+-#
+-##
+-{ 'event': 'ACPI_DEVICE_OST',
+-     'data': { 'info': 'ACPIOSTInfo' } }
+-
+-##
+-# @BALLOON_CHANGE:
+-#
+-# Emitted when the guest changes the actual BALLOON level. This value is
+-# equivalent to the @actual field return by the 'query-balloon' command
+-#
+-# @actual: actual level of the guest memory balloon in bytes
+-#
+-# Note: this event is rate-limited.
+-#
+-# Since: 1.2
+-#
+-# Example:
+-#
+-# <- { "event": "BALLOON_CHANGE",
+-#      "data": { "actual": 944766976 },
+-#      "timestamp": { "seconds": 1267020223, "microseconds": 435656 } }
+-#
+-##
+-{ 'event': 'BALLOON_CHANGE',
+-  'data': { 'actual': 'int' } }
+-
+-##
+-# @MEM_UNPLUG_ERROR:
+-#
+-# Emitted when memory hot unplug error occurs.
+-#
+-# @device: device name
+-#
+-# @msg: Informative message
+-#
+-# Since: 2.4
+-#
+-# Example:
+-#
+-# <- { "event": "MEM_UNPLUG_ERROR"
+-#      "data": { "device": "dimm1",
+-#                "msg": "acpi: device unplug for unsupported device"
+-#      },
+-#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
+-#
+-##
+-{ 'event': 'MEM_UNPLUG_ERROR',
+-  'data': { 'device': 'str', 'msg': 'str' } }
+-
+-##
+-# @DUMP_COMPLETED:
+-#
+-# Emitted when background dump has completed
+-#
+-# @result: DumpQueryResult type described in qapi-schema.json.
+-#
+-# @error: human-readable error string that provides
+-#         hint on why dump failed. Only presents on failure. The
+-#         user should not try to interpret the error string.
+-#
+-# Since: 2.6
+-#
+-# Example:
+-#
+-# { "event": "DUMP_COMPLETED",
+-#   "data": {"result": {"total": 1090650112, "status": "completed",
+-#                       "completed": 1090650112} } }
+-#
+-##
+-{ 'event': 'DUMP_COMPLETED' ,
+-  'data': { 'result': 'DumpQueryResult', '*error': 'str' } }
 --=20
 2.13.5
