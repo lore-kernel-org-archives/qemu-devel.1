@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dno1N-0006eK-3K
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:19 -0400
+	(envelope-from <armbru@redhat.com>) id 1dno1O-0006fw-Gr
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dno1L-0001hj-9i
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33988)
+	(envelope-from <armbru@redhat.com>) id 1dno1M-0001jk-LU
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34466)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dno1K-0001gV-VU
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:11 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E627F5F7A9
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:38:09 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-75.ams2.redhat.com
-	[10.36.116.75])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8F2D317C34
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:38:09 +0000 (UTC)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dno1M-0001ij-GE
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:12 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 17:37:37 +0200
-Message-Id: <20170901153758.8628-27-armbru@redhat.com>
+Date: Fri,  1 Sep 2017 17:37:50 +0200
+Message-Id: <20170901153758.8628-40-armbru@redhat.com>
 In-Reply-To: <20170901153758.8628-1-armbru@redhat.com>
 References: <20170901153758.8628-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 26/47] qapi-schema: Collect TPM stuff in
- qapi/tpm.json
+Subject: [Qemu-devel] [PULL v2 39/47] quorum: Use qapi_enum_parse() in
+ quorum_open()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,351 +28,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-Sadly, we don't have a TPM maintainer, not even a MAINTAINERS entry.
-Create one, and mark it orphaned.
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20170822132255.23945-12-marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+[Rebased, qemu_opt_get() factored out, commit message tweaked]
+Cc: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1503602048-12268-12-git-send-email-armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <1503564371-26090-9-git-send-email-armbru@redhat.com>
 ---
- MAINTAINERS      |   8 ++++
- Makefile         |   1 +
- qapi-schema.json | 132 +------------------------------------------------=
-----
- qapi/tpm.json    | 137 +++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- 4 files changed, 147 insertions(+), 131 deletions(-)
- create mode 100644 qapi/tpm.json
+ block/quorum.c | 28 +++++++++-------------------
+ 1 file changed, 9 insertions(+), 19 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8cebd798ef..5ec945c9af 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1486,6 +1486,14 @@ F: scripts/tracetool/
- F: docs/tracing.txt
- T: git git://github.com/stefanha/qemu.git tracing
+diff --git a/block/quorum.c b/block/quorum.c
+index d04da4f430..cb6617703c 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -22,6 +22,7 @@
+ #include "qapi/qmp/qjson.h"
+ #include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qstring.h"
++#include "qapi/util.h"
+ #include "qapi-event.h"
+ #include "crypto/hash.h"
 =20
-+TPM
-+S: Orphan
-+F: tpm.c
-+F: hw/tpm/*
-+F: include/hw/acpi/tpm.h
-+F: include/sysemu/tpm*
-+F: qapi/tpm.json
-+
- Checkpatch
- S: Odd Fixes
- F: scripts/checkpatch.pl
-diff --git a/Makefile b/Makefile
-index ea6de37197..3dde210662 100644
---- a/Makefile
-+++ b/Makefile
-@@ -418,6 +418,7 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SRC_P=
-ATH)/qapi/common.json \
-                $(SRC_PATH)/qapi/rocker.json \
-                $(SRC_PATH)/qapi/run-state.json \
-                $(SRC_PATH)/qapi/sockets.json \
-+               $(SRC_PATH)/qapi/tpm.json \
-                $(SRC_PATH)/qapi/trace.json \
-                $(SRC_PATH)/qapi/transaction.json \
-                $(SRC_PATH)/qapi/ui.json
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 4108ef0cc8..0ad4e0237d 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -86,6 +86,7 @@
- { 'include': 'qapi/char.json' }
- { 'include': 'qapi/net.json' }
- { 'include': 'qapi/rocker.json' }
-+{ 'include': 'qapi/tpm.json' }
- { 'include': 'qapi/ui.json' }
- { 'include': 'qapi/migration.json' }
- { 'include': 'qapi/transaction.json' }
-@@ -2213,137 +2214,6 @@
- { 'command': 'query-target', 'returns': 'TargetInfo' }
+@@ -867,30 +868,13 @@ static QemuOptsList quorum_runtime_opts =3D {
+     },
+ };
 =20
- ##
--# @TpmModel:
--#
--# An enumeration of TPM models
--#
--# @tpm-tis: TPM TIS model
--#
--# Since: 1.5
--##
--{ 'enum': 'TpmModel', 'data': [ 'tpm-tis' ] }
+-static int parse_read_pattern(const char *opt)
+-{
+-    int i;
 -
--##
--# @query-tpm-models:
--#
--# Return a list of supported TPM models
--#
--# Returns: a list of TpmModel
--#
--# Since: 1.5
--#
--# Example:
--#
--# -> { "execute": "query-tpm-models" }
--# <- { "return": [ "tpm-tis" ] }
--#
--##
--{ 'command': 'query-tpm-models', 'returns': ['TpmModel'] }
+-    if (!opt) {
+-        /* Set quorum as default */
+-        return QUORUM_READ_PATTERN_QUORUM;
+-    }
 -
--##
--# @TpmType:
--#
--# An enumeration of TPM types
--#
--# @passthrough: TPM passthrough type
--#
--# Since: 1.5
--##
--{ 'enum': 'TpmType', 'data': [ 'passthrough' ] }
+-    for (i =3D 0; i < QUORUM_READ_PATTERN__MAX; i++) {
+-        if (!strcmp(opt, QuorumReadPattern_lookup[i])) {
+-            return i;
+-        }
+-    }
 -
--##
--# @query-tpm-types:
--#
--# Return a list of supported TPM types
--#
--# Returns: a list of TpmType
--#
--# Since: 1.5
--#
--# Example:
--#
--# -> { "execute": "query-tpm-types" }
--# <- { "return": [ "passthrough" ] }
--#
--##
--{ 'command': 'query-tpm-types', 'returns': ['TpmType'] }
+-    return -EINVAL;
+-}
 -
--##
--# @TPMPassthroughOptions:
--#
--# Information about the TPM passthrough type
--#
--# @path: string describing the path used for accessing the TPM device
--#
--# @cancel-path: string showing the TPM's sysfs cancel file
--#               for cancellation of TPM commands while they are executin=
-g
--#
--# Since: 1.5
--##
--{ 'struct': 'TPMPassthroughOptions', 'data': { '*path' : 'str',
--                                             '*cancel-path' : 'str'} }
--
--##
--# @TpmTypeOptions:
--#
--# A union referencing different TPM backend types' configuration options
--#
--# @type: 'passthrough' The configuration options for the TPM passthrough=
- type
--#
--# Since: 1.5
--##
--{ 'union': 'TpmTypeOptions',
--   'data': { 'passthrough' : 'TPMPassthroughOptions' } }
--
--##
--# @TPMInfo:
--#
--# Information about the TPM
--#
--# @id: The Id of the TPM
--#
--# @model: The TPM frontend model
--#
--# @options: The TPM (backend) type configuration options
--#
--# Since: 1.5
--##
--{ 'struct': 'TPMInfo',
--  'data': {'id': 'str',
--           'model': 'TpmModel',
--           'options': 'TpmTypeOptions' } }
--
--##
--# @query-tpm:
--#
--# Return information about the TPM device
--#
--# Returns: @TPMInfo on success
--#
--# Since: 1.5
--#
--# Example:
--#
--# -> { "execute": "query-tpm" }
--# <- { "return":
--#      [
--#        { "model": "tpm-tis",
--#          "options":
--#            { "type": "passthrough",
--#              "data":
--#                { "cancel-path": "/sys/class/misc/tpm0/device/cancel",
--#                  "path": "/dev/tpm0"
--#                }
--#            },
--#          "id": "tpm0"
--#        }
--#      ]
--#    }
--#
--##
--{ 'command': 'query-tpm', 'returns': ['TPMInfo'] }
--
--##
- # @AcpiTableOptions:
- #
- # Specify an ACPI table on the command line to load.
-diff --git a/qapi/tpm.json b/qapi/tpm.json
-new file mode 100644
-index 0000000000..e8b2d8dcb7
---- /dev/null
-+++ b/qapi/tpm.json
-@@ -0,0 +1,137 @@
-+# -*- Mode: Python -*-
-+#
-+
-+##
-+# =3D TPM (trusted platform module) devices
-+##
-+
-+##
-+# @TpmModel:
-+#
-+# An enumeration of TPM models
-+#
-+# @tpm-tis: TPM TIS model
-+#
-+# Since: 1.5
-+##
-+{ 'enum': 'TpmModel', 'data': [ 'tpm-tis' ] }
-+
-+##
-+# @query-tpm-models:
-+#
-+# Return a list of supported TPM models
-+#
-+# Returns: a list of TpmModel
-+#
-+# Since: 1.5
-+#
-+# Example:
-+#
-+# -> { "execute": "query-tpm-models" }
-+# <- { "return": [ "tpm-tis" ] }
-+#
-+##
-+{ 'command': 'query-tpm-models', 'returns': ['TpmModel'] }
-+
-+##
-+# @TpmType:
-+#
-+# An enumeration of TPM types
-+#
-+# @passthrough: TPM passthrough type
-+#
-+# Since: 1.5
-+##
-+{ 'enum': 'TpmType', 'data': [ 'passthrough' ] }
-+
-+##
-+# @query-tpm-types:
-+#
-+# Return a list of supported TPM types
-+#
-+# Returns: a list of TpmType
-+#
-+# Since: 1.5
-+#
-+# Example:
-+#
-+# -> { "execute": "query-tpm-types" }
-+# <- { "return": [ "passthrough" ] }
-+#
-+##
-+{ 'command': 'query-tpm-types', 'returns': ['TpmType'] }
-+
-+##
-+# @TPMPassthroughOptions:
-+#
-+# Information about the TPM passthrough type
-+#
-+# @path: string describing the path used for accessing the TPM device
-+#
-+# @cancel-path: string showing the TPM's sysfs cancel file
-+#               for cancellation of TPM commands while they are executin=
-g
-+#
-+# Since: 1.5
-+##
-+{ 'struct': 'TPMPassthroughOptions', 'data': { '*path' : 'str',
-+                                             '*cancel-path' : 'str'} }
-+
-+##
-+# @TpmTypeOptions:
-+#
-+# A union referencing different TPM backend types' configuration options
-+#
-+# @type: 'passthrough' The configuration options for the TPM passthrough=
- type
-+#
-+# Since: 1.5
-+##
-+{ 'union': 'TpmTypeOptions',
-+   'data': { 'passthrough' : 'TPMPassthroughOptions' } }
-+
-+##
-+# @TPMInfo:
-+#
-+# Information about the TPM
-+#
-+# @id: The Id of the TPM
-+#
-+# @model: The TPM frontend model
-+#
-+# @options: The TPM (backend) type configuration options
-+#
-+# Since: 1.5
-+##
-+{ 'struct': 'TPMInfo',
-+  'data': {'id': 'str',
-+           'model': 'TpmModel',
-+           'options': 'TpmTypeOptions' } }
-+
-+##
-+# @query-tpm:
-+#
-+# Return information about the TPM device
-+#
-+# Returns: @TPMInfo on success
-+#
-+# Since: 1.5
-+#
-+# Example:
-+#
-+# -> { "execute": "query-tpm" }
-+# <- { "return":
-+#      [
-+#        { "model": "tpm-tis",
-+#          "options":
-+#            { "type": "passthrough",
-+#              "data":
-+#                { "cancel-path": "/sys/class/misc/tpm0/device/cancel",
-+#                  "path": "/dev/tpm0"
-+#                }
-+#            },
-+#          "id": "tpm0"
-+#        }
-+#      ]
-+#    }
-+#
-+##
-+{ 'command': 'query-tpm', 'returns': ['TPMInfo'] }
+ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
+                        Error **errp)
+ {
+     BDRVQuorumState *s =3D bs->opaque;
+     Error *local_err =3D NULL;
+     QemuOpts *opts =3D NULL;
++    const char *pattern_str;
+     bool *opened;
+     int i;
+     int ret =3D 0;
+@@ -925,7 +909,13 @@ static int quorum_open(BlockDriverState *bs, QDict *=
+options, int flags,
+         goto exit;
+     }
+=20
+-    ret =3D parse_read_pattern(qemu_opt_get(opts, QUORUM_OPT_READ_PATTER=
+N));
++    pattern_str =3D qemu_opt_get(opts, QUORUM_OPT_READ_PATTERN);
++    if (!pattern_str) {
++        ret =3D QUORUM_READ_PATTERN_QUORUM;
++    } else {
++        ret =3D qapi_enum_parse(QuorumReadPattern_lookup, pattern_str,
++                              -EINVAL, NULL);
++    }
+     if (ret < 0) {
+         error_setg(&local_err, "Please set read-pattern as fifo or quoru=
+m");
+         goto exit;
 --=20
 2.13.5
