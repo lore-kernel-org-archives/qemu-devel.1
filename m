@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36500)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnoUR-0003ag-Df
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:08:16 -0400
+	id 1dnoVO-0004XE-PL
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:09:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnoUM-00005v-MI
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:08:15 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34007)
+	id 1dnoVK-0000bL-3l
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:09:14 -0400
+Received: from mail-qk0-x236.google.com ([2607:f8b0:400d:c09::236]:33512)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnoUM-00005Z-FU
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:08:10 -0400
-Received: by mail-qk0-x244.google.com with SMTP id a77so474773qkb.1
-	for <qemu-devel@nongnu.org>; Fri, 01 Sep 2017 09:08:10 -0700 (PDT)
+	id 1dnoVJ-0000b6-VP
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:09:10 -0400
+Received: by mail-qk0-x236.google.com with SMTP id l65so2952466qkc.0
+	for <qemu-devel@nongnu.org>; Fri, 01 Sep 2017 09:09:09 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20170901125742.4249-1-kraxel@redhat.com>
+References: <20170830225225.27925-1-f4bug@amsat.org>
+	<20170901151850.GD17184@localhost.localdomain>
+	<e5407d61-b21c-8ff5-1051-f75a6221e222@amsat.org>
+	<20170901154850.GP7570@localhost.localdomain>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ff830cfa-a8fa-0852-596f-4fc535512b1c@amsat.org>
-Date: Fri, 1 Sep 2017 13:08:05 -0300
+Message-ID: <e8c0ae1e-e157-35a9-fe71-8eb5b44f8178@amsat.org>
+Date: Fri, 1 Sep 2017 13:09:05 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170901125742.4249-1-kraxel@redhat.com>
+In-Reply-To: <20170901154850.GP7570@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 0/5] Vga 20170901 patches
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] QOMify MIPS cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,52 +37,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
 
-Hi Gerd,
+On 09/01/2017 12:48 PM, Eduardo Habkost wrote:
+> On Fri, Sep 01, 2017 at 12:44:42PM -0300, Philippe Mathieu-Daudé wrote:
+>> On 09/01/2017 12:18 PM, Eduardo Habkost wrote:
+>>> On Wed, Aug 30, 2017 at 07:52:18PM -0300, Philippe Mathieu-Daudé wrote:
+>>>> Hi,
+>>>>
+>>>> This series is based on Igor's "complete cpu QOMification" [1] but only modify
+>>>> the MIPS part. Igor posted an updated series [2], both series should apply
+>>>> separately.
+>>>>
+>>>> Igor suggested on IRC this series could enter via the Machine core tree, so
+>>>> I added Eduardo and Marcel.
+>>>
+>>> I would do that only if the MIPS maintainers (CCed) aren't
+>>> willing to merge the series themselves.
+>>
+>> Aurelien told me he looked at the series but isn't comfortable with
+>> reviewing QOM code. Anyway since all patches are reviewed/tested and this is
+>> MIPS only series it also makes sens to me this enters via their tree.
+>>
+>> Eduardo can you Ack this series from the QOM part to help Aurelien?
+> 
+> Absolutely:
+> 
+> Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+> 
+> I will try to review the QOM code more closely and send
+> Reviewed-by lines too.
 
-On 09/01/2017 09:57 AM, Gerd Hoffmann wrote:
-> The following changes since commit 223cd0e13f2e46078d7b573f0b8402bfbee339be:
-> 
->    Merge remote-tracking branch 'remotes/elmarco/tags/tidy-pull-request' into staging (2017-08-31 15:52:43 +0100)
-> 
-> are available in the git repository at:
-> 
->    git://git.kraxel.org/qemu tags/vga-20170901-pull-request
-> 
-> for you to fetch changes up to 138bc2df843105edb22978284fc2e16307f16211:
-> 
->    vga/migration: Update memory map in post_load (2017-09-01 13:52:43 +0200)
-> 
-> ----------------------------------------------------------------
-> qxl: chunked cursor support.
-> stdvga: bugfixes.
-> 
-> ----------------------------------------------------------------
-> 
-> Dr. David Alan Gilbert (1):
->    vga/migration: Update memory map in post_load
-> 
-> Gerd Hoffmann (4):
->    vga: fix display update region calculation (split screen)
->    vga: stop passing pointers to vga_draw_line* functions
->    qxl: drop mono cursor support
->    qxl: add support for chunked cursors.
-
-I'v been reviewing your patches and took some notes but didn't finished, 
-since there is something bothering me.
-I see they haven't been reviewed yet, can you hold this PR and wait the 
-weekend?
-
-Thanks,
-
-Phil.
-
-> 
->   hw/display/vga-helpers.h | 202 ++++++++++++++++++++++++++---------------------
->   hw/display/vga_int.h     |   1 +
->   hw/display/qxl-render.c  |  45 +++++++----
->   hw/display/vga.c         |  16 +++-
->   4 files changed, 152 insertions(+), 112 deletions(-)
-> 
+Thank you!
