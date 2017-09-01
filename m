@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dnt7H-0000Vw-MW
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 17:04:40 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dnt7F-0000Tc-7f
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 17:04:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dnt7G-0006ur-LT
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 17:04:39 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dnt7E-0006sk-6m
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 17:04:37 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 1 Sep 2017 14:00:40 -0700
-Message-ID: <26b702658b5bf9984edaecb22b1190be0a9d7052.1504293917.git.alistair.francis@xilinx.com>
+Date: Fri, 1 Sep 2017 14:00:45 -0700
+Message-ID: <58a155d758561fd2011596b211db9080a78aa2ac.1504293917.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1504293917.git.alistair.francis@xilinx.com>
 References: <cover.1504293917.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 3/6] aarch64-softmmu.mak: Use an ARM
- specific config
+Subject: [Qemu-devel] [PATCH v2 5/6] xlnx-zynqmp-pmu: Connect the IPI device
+ to the PMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +25,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
 Cc: alistair.francis@xilinx.com, alistair23@gmail.com, qemu-arm@nongnu.org
 
-In preperation for having an ARM and MicroBlaze ZynqMP machine let's
-split out the current ARM specific config options.
-
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
 
- default-configs/aarch64-softmmu.mak | 1 +
- hw/arm/Makefile.objs                | 2 +-
- hw/display/Makefile.objs            | 2 +-
- hw/dma/Makefile.objs                | 2 +-
- 4 files changed, 4 insertions(+), 3 deletions(-)
+ hw/microblaze/xlnx-zynqmp-pmu.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/default-configs/aarch64-softmmu.mak b/default-configs/aarch64-softmmu.mak
-index 24494832cf..9ddccf855e 100644
---- a/default-configs/aarch64-softmmu.mak
-+++ b/default-configs/aarch64-softmmu.mak
-@@ -7,3 +7,4 @@ CONFIG_AUX=y
- CONFIG_DDC=y
- CONFIG_DPCD=y
- CONFIG_XLNX_ZYNQMP=y
-+CONFIG_XLNX_ZYNQMP_ARM=y
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index a2e56ecaae..95daa67836 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -13,7 +13,7 @@ obj-y += omap1.o omap2.o strongarm.o
- obj-$(CONFIG_ALLWINNER_A10) += allwinner-a10.o cubieboard.o
- obj-$(CONFIG_RASPI) += bcm2835_peripherals.o bcm2836.o raspi.o
- obj-$(CONFIG_STM32F205_SOC) += stm32f205_soc.o
--obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp.o xlnx-ep108.o
-+obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx-zynqmp.o xlnx-ep108.o
- obj-$(CONFIG_FSL_IMX25) += fsl-imx25.o imx25_pdk.o
- obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
- obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
-diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index 551c050a6a..d3a4cb396e 100644
---- a/hw/display/Makefile.objs
-+++ b/hw/display/Makefile.objs
-@@ -40,4 +40,4 @@ virtio-gpu.o-libs += $(VIRGL_LIBS)
- virtio-gpu-3d.o-cflags := $(VIRGL_CFLAGS)
- virtio-gpu-3d.o-libs += $(VIRGL_LIBS)
- obj-$(CONFIG_DPCD) += dpcd.o
--obj-$(CONFIG_XLNX_ZYNQMP) += xlnx_dp.o
-+obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx_dp.o
-diff --git a/hw/dma/Makefile.objs b/hw/dma/Makefile.objs
-index 087c8e6855..be98d5d3d8 100644
---- a/hw/dma/Makefile.objs
-+++ b/hw/dma/Makefile.objs
-@@ -9,7 +9,7 @@ common-obj-$(CONFIG_ZYNQ_DEVCFG) += xlnx-zynq-devcfg.o
- common-obj-$(CONFIG_ETRAXFS) += etraxfs_dma.o
- common-obj-$(CONFIG_STP2000) += sparc32_dma.o
- common-obj-$(CONFIG_SUN4M) += sun4m_iommu.o
--obj-$(CONFIG_XLNX_ZYNQMP) += xlnx_dpdma.o
-+obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx_dpdma.o
+diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
+index 33584cfa4d..a6c14495ec 100644
+--- a/hw/microblaze/xlnx-zynqmp-pmu.c
++++ b/hw/microblaze/xlnx-zynqmp-pmu.c
+@@ -24,6 +24,8 @@
+ #include "cpu.h"
+ #include "boot.h"
  
- obj-$(CONFIG_OMAP) += omap_dma.o soc_dma.o
- obj-$(CONFIG_PXA2XX) += pxa2xx_dma.o
++#include "hw/intc/xlnx-zynqmp-ipi.h"
++
+ /* Define the PMU device */
+ 
+ #define TYPE_XLNX_ZYNQMP_PMU "xlnx,zynqmp-pmu"
+@@ -34,27 +36,42 @@
+ #define XLNX_ZYNQMP_PMU_ROM_ADDR    0xFFD00000
+ #define XLNX_ZYNQMP_PMU_RAM_ADDR    0xFFDC0000
+ 
++#define XLNX_ZYNQMP_PMU_NUM_IPIS    4
++
++static const uint64_t ipi_addr[XLNX_ZYNQMP_PMU_NUM_IPIS] = {
++    0xFF340000, 0xFF350000, 0xFF360000, 0xFF370000,
++};
++
+ typedef struct XlnxZynqMPPMUState {
+     /*< private >*/
+     DeviceState parent_obj;
+ 
+     /*< public >*/
+     MicroBlazeCPU cpu;
++    XlnxZynqMPIPI ipi[XLNX_ZYNQMP_PMU_NUM_IPIS];
+ }  XlnxZynqMPPMUState;
+ 
+ static void xlnx_zynqmp_pmu_init(Object *obj)
+ {
+     XlnxZynqMPPMUState *s = XLNX_ZYNQMP_PMU(obj);
++    int i;
+ 
+     object_initialize(&s->cpu, sizeof(s->cpu),
+                       TYPE_MICROBLAZE_CPU);
+     object_property_add_child(obj, "pmu-cpu[*]", OBJECT(&s->cpu),
+                               &error_abort);
++
++   for (i = 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
++        object_initialize(&s->ipi[i], sizeof(s->ipi[i]), TYPE_XLNX_ZYNQMP_IPI);
++        qdev_set_parent_bus(DEVICE(&s->ipi[i]), sysbus_get_default());
++    }
+ }
+ 
+ static void xlnx_zynqmp_pmu_realize(DeviceState *dev, Error **errp)
+ {
+     XlnxZynqMPPMUState *s = XLNX_ZYNQMP_PMU(dev);
++    Error *err = NULL;
++    int i;
+ 
+     object_property_set_uint(OBJECT(&s->cpu), XLNX_ZYNQMP_PMU_ROM_ADDR,
+                              "base-vectors", &error_abort);
+@@ -75,6 +92,17 @@ static void xlnx_zynqmp_pmu_realize(DeviceState *dev, Error **errp)
+                             &error_abort);
+     object_property_set_uint(OBJECT(&s->cpu), 0, "pvr", &error_abort);
+     object_property_set_bool(OBJECT(&s->cpu), true, "realized", &error_fatal);
++
++    for (i = 0; i < XLNX_ZYNQMP_PMU_NUM_IPIS; i++) {
++        object_property_set_bool(OBJECT(&s->ipi[i]), true, "realized", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->ipi[i]), 0, ipi_addr[i]);
++        /* Need to connect this to an interrupt controller */
++    }
++
+ }
+ 
+ static void xlnx_zynqmp_pmu_class_init(ObjectClass *oc, void *data)
 -- 
 2.11.0
