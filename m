@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnsGj-0000SX-Jd
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 16:10:26 -0400
+	(envelope-from <briansteffens@gmail.com>) id 1dnsHc-0000z1-Du
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 16:11:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnsGi-0008Se-HQ
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 16:10:21 -0400
-References: <20170901105434.3288-1-berrange@redhat.com>
-	<5fff868d-4d35-ec3f-cdd8-9b7363c4e6d3@redhat.com>
-	<20170901143348.GP31680@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <92c6a48b-892b-e7de-bbe9-44618f4a94e9@redhat.com>
-Date: Fri, 1 Sep 2017 15:10:06 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170901143348.GP31680@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ESB1whq0bgAC2elgcNQk8lIanh970ncvO"
-Subject: Re: [Qemu-devel] [PATCH 0/2] Fix / skip recent iotests with LUKS
- driver
+	(envelope-from <briansteffens@gmail.com>) id 1dnsHb-0000eD-9g
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 16:11:16 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:34636)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <briansteffens@gmail.com>)
+	id 1dnsHb-0000dT-41
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 16:11:15 -0400
+Received: by mail-oi0-x242.google.com with SMTP id w10so1007195oie.1
+	for <qemu-devel@nongnu.org>; Fri, 01 Sep 2017 13:11:13 -0700 (PDT)
+From: Brian Steffens <briansteffens@gmail.com>
+Date: Fri,  1 Sep 2017 20:10:54 +0000
+Message-Id: <20170901201054.11738-1-briansteffens@gmail.com>
+Subject: [Qemu-devel] [PATCH 1/1] block: add block device shared field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,73 +24,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Brian Steffens <briansteffens@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ESB1whq0bgAC2elgcNQk8lIanh970ncvO
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
-Message-ID: <92c6a48b-892b-e7de-bbe9-44618f4a94e9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] Fix / skip recent iotests with LUKS
- driver
-References: <20170901105434.3288-1-berrange@redhat.com>
- <5fff868d-4d35-ec3f-cdd8-9b7363c4e6d3@redhat.com>
- <20170901143348.GP31680@redhat.com>
-In-Reply-To: <20170901143348.GP31680@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This adds a boolean option called 'shared' to block devices. It defaults
+to off/false. When enabled for a particular block device, the 'shared' option
+causes the block migration code to skip over syncing of that device. This
+allows controlling exactly which block devices get synced during a migration.
 
-On 09/01/2017 09:33 AM, Daniel P. Berrange wrote:
-> On Fri, Sep 01, 2017 at 09:26:30AM -0500, Eric Blake wrote:
->> On 09/01/2017 05:54 AM, Daniel P. Berrange wrote:
->>> Two recently added iotests are currently breaking 'check -luks',
->>> fix the easy one and disable the hard one.
->>>
->>> Daniel P. Berrange (2):
->>>   iotests: rewrite 192 to use _launch_qemu to fix LUKS support
->>>   iotests: blacklist 194 with the luks driver
->>
->> Since both tests involve an NBD server, I can take this series through=
+Signed-off-by: Brian Steffens <briansteffens@gmail.com>
+---
+ block.c                   | 7 +++++++
+ block/qapi.c              | 2 ++
+ include/block/block.h     | 1 +
+ include/block/block_int.h | 3 +++
+ migration/block.c         | 4 ++++
+ qapi/block-core.json      | 2 +-
+ 6 files changed, 18 insertions(+), 1 deletion(-)
 
->> my NBD queue.  Or, since both involve LUKS, you can push it in your ne=
-xt
->> crypto pull request.  Any preferences?
->=20
-> Best if either you or a block maintainer queue it i think
-
-Okay, on my NBD queue:
-http://repo.or.cz/qemu/ericb.git/shortlog/refs/heads/nbd
-
-I'll wait to see if other NBD patches land in the next few days, but
-will send a pull request within a week.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---ESB1whq0bgAC2elgcNQk8lIanh970ncvO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmpvp8ACgkQp6FrSiUn
-Q2rbxQgArR4+axS4PNYgu/PhBNWN19TsjGJTPwJAtH1EaSJXiiLqfLRdptjHHdxM
-AfFtAU0HA1rTBDI3ZAEsqwngAkgABvVd9UIapCyU9E9q92NyDyAVWxjyf1Cb54Nu
-vujMiX112XyOsvUj+bqjo1yoPSYlufpw7xQMRRSvym9tbE4lIKpkiDE0pQ9wC3Sl
-h7W1FlMrbWT6afKkO1hsYZRmustdtHI2WugZt6gI9ewh6/R7B2c44qF9NIA7Xd9P
-BbsKv+8WEdg/QIPa8uvQgdSdWfiRRdkL3mhgOHYgDbFEX/u3j8UsRNtxQqpHmA+o
-uJsh1rtR6329Th6w6174Csm32XRW/g==
-=5ZDB
------END PGP SIGNATURE-----
-
---ESB1whq0bgAC2elgcNQk8lIanh970ncvO--
+diff --git a/block.c b/block.c
+index 3308814bba..6dafcce046 100644
+--- a/block.c
++++ b/block.c
+@@ -2466,6 +2466,13 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+         bdrv_backing_options(&flags, options, flags, options);
+     }
+ 
++    /* Check for shared flag */
++    /* See cautionary note on accessing @options above */
++    bs->shared =
++        g_strcmp0(qdict_get_try_str(options, BDRV_OPT_SHARED), "on") == 0 ||
++        qdict_get_try_bool(options, BDRV_OPT_SHARED, false);
++    qdict_del(options, BDRV_OPT_SHARED);
++
+     bs->open_flags = flags;
+     bs->options = options;
+     options = qdict_clone_shallow(options);
+diff --git a/block/qapi.c b/block/qapi.c
+index 5f1a71f5d2..42e2a33008 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -66,6 +66,8 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+ 
+     info->detect_zeroes = bs->detect_zeroes;
+ 
++    info->shared = bs->shared;
++
+     if (blk && blk_get_public(blk)->throttle_state) {
+         ThrottleConfig cfg;
+ 
+diff --git a/include/block/block.h b/include/block/block.h
+index ab80195378..8f6ab743d2 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -110,6 +110,7 @@ typedef struct HDGeometry {
+ #define BDRV_OPT_READ_ONLY      "read-only"
+ #define BDRV_OPT_DISCARD        "discard"
+ #define BDRV_OPT_FORCE_SHARE    "force-share"
++#define BDRV_OPT_SHARED         "shared"
+ 
+ 
+ #define BDRV_SECTOR_BITS   9
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 7571c0aaaf..6508c90ca9 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -672,6 +672,9 @@ struct BlockDriverState {
+ 
+     /* Only read/written by whoever has set active_flush_req to true.  */
+     unsigned int flushed_gen;             /* Flushed write generation */
++
++    /* Shared devices are not migrated. */
++    bool shared;
+ };
+ 
+ struct BlockBackendRootState {
+diff --git a/migration/block.c b/migration/block.c
+index 9171f60028..b347c3dc61 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -402,6 +402,10 @@ static int init_blk_migration(QEMUFile *f)
+     bmds_bs = g_malloc0(num_bs * sizeof(*bmds_bs));
+ 
+     for (i = 0, bs = bdrv_first(&it); bs; bs = bdrv_next(&it), i++) {
++        if (bs->shared) {
++            continue;
++        }
++
+         if (bdrv_is_read_only(bs)) {
+             continue;
+         }
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 833c602150..a52e10f9cd 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -365,7 +365,7 @@
+             '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+             '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
+             '*iops_size': 'int', '*group': 'str', 'cache': 'BlockdevCacheInfo',
+-            'write_threshold': 'int' } }
++            'write_threshold': 'int', 'shared': 'bool' } }
+ 
+ ##
+ # @BlockDeviceIoStatus:
+-- 
+2.13.1
