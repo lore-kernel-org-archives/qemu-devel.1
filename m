@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlbU-0006rQ-U9
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 09:03:25 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dnlmG-0000HG-FF
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 09:14:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlbQ-0001oG-FH
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 09:03:20 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170901110706.429-1-otubo@redhat.com>
-Date: Fri, 01 Sep 2017 15:02:40 +0200
-In-Reply-To: <20170901110706.429-1-otubo@redhat.com> (Eduardo Otubo's message
-	of "Fri, 1 Sep 2017 13:07:06 +0200")
-Message-ID: <87y3py372n.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] isa-fdc: assert replaced by proper error
- exit
+	(envelope-from <kraxel@redhat.com>) id 1dnlmB-0006Gn-Vs
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 09:14:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36492)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dnlmB-0006GQ-Pc
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 09:14:23 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B7778806C1
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 13:14:22 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri,  1 Sep 2017 15:14:09 +0200
+Message-Id: <20170901131409.6712-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] wm8750: add record buffer underrun check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Otubo <otubo@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, jsnow@redhat.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Eduardo Otubo <otubo@redhat.com> writes:
+Reported-by: niuguoxiang@huawei.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/audio/wm8750.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-> When not available, isa-fdc falls into assert instead of proper error
-> exit. This patch fixes this behavior.
-
-When what exactly isn't available?
-
->
-> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
-> ---
->  hw/block/fdc.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-> index 401129073b..0b6def4e1d 100644
-> --- a/hw/block/fdc.c
-> +++ b/hw/block/fdc.c
-> @@ -2699,11 +2699,15 @@ static void isabus_fdc_realize(DeviceState *dev, Error **errp)
->      fdctrl->dma_chann = isa->dma;
->      if (fdctrl->dma_chann != -1) {
->          fdctrl->dma = isa_get_dma(isa_bus_from_device(isadev), isa->dma);
-> -        assert(fdctrl->dma);
-> +        if (!fdctrl->dma) {
-> +            error_setg(errp, "isa-fdc not supported");
-> +            goto error;
-> +        }
->      }
->  
->      qdev_set_legacy_instance_id(dev, isa->iobase, 2);
->      fdctrl_realize_common(dev, fdctrl, &err);
-> +error:
->      if (err != NULL) {
->          error_propagate(errp, err);
->          return;
-
-The actual patch makes me suspect it's "when ISA DMA isn't available".
+diff --git a/hw/audio/wm8750.c b/hw/audio/wm8750.c
+index f8b5bebfc2..d2bf2e1da1 100644
+--- a/hw/audio/wm8750.c
++++ b/hw/audio/wm8750.c
+@@ -680,8 +680,12 @@ uint32_t wm8750_adc_dat(void *opaque)
+     WM8750State *s = (WM8750State *) opaque;
+     uint32_t *data;
+ 
+-    if (s->idx_in >= sizeof(s->data_in))
++    if (s->idx_in >= sizeof(s->data_in)) {
+         wm8750_in_load(s);
++        if (s->idx_in >= sizeof(s->data_in)) {
++            return 0x80008000; /* silence in AUD_FMT_S16 sample format */
++        }
++    }
+ 
+     data = (uint32_t *) &s->data_in[s->idx_in];
+     s->req_in -= 4;
+-- 
+2.9.3
