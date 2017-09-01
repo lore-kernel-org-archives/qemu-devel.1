@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dno1E-0006Vb-63
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:08 -0400
+	(envelope-from <armbru@redhat.com>) id 1dno1J-0006aq-Df
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dno1B-0001at-2i
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60150)
+	(envelope-from <armbru@redhat.com>) id 1dno1E-0001ce-PN
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60188)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dno1A-0001aU-Ta
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:01 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dno1E-0001c7-Di
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:04 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F3D3EC0467C4
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:37:59 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-75.ams2.redhat.com
-	[10.36.116.75])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C32F27821A
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:37:59 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 532F4C047B74
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:38:03 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 17:37:14 +0200
-Message-Id: <20170901153758.8628-4-armbru@redhat.com>
+Date: Fri,  1 Sep 2017 17:37:15 +0200
+Message-Id: <20170901153758.8628-5-armbru@redhat.com>
 In-Reply-To: <20170901153758.8628-1-armbru@redhat.com>
 References: <20170901153758.8628-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 03/47] qobject: Explain how QNum works,
- and why
+Subject: [Qemu-devel] [PULL v2 04/47] qdict: Add qdict_put_null() helper,
+ and put it to use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,47 +34,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Suggested-by: Max Reitz <mreitz@redhat.com>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20170825105913.4060-2-marcandre.lureau@redhat.com>
+[Update to qobject.cocci squashed in, commit message tweaked]
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1503384739-17207-1-git-send-email-armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-[Comment typos fixed]
 ---
- include/qapi/qmp/qnum.h | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ include/qapi/qmp/qdict.h         | 4 +++-
+ scripts/coccinelle/qobject.cocci | 3 +++
+ target/i386/cpu.c                | 4 ++--
+ 3 files changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/include/qapi/qmp/qnum.h b/include/qapi/qmp/qnum.h
-index 09d745c490..d6b0791139 100644
---- a/include/qapi/qmp/qnum.h
-+++ b/include/qapi/qmp/qnum.h
-@@ -23,6 +23,27 @@ typedef enum {
-     QNUM_DOUBLE
- } QNumKind;
+diff --git a/include/qapi/qmp/qdict.h b/include/qapi/qmp/qdict.h
+index 363e431106..6588c7f0c8 100644
+--- a/include/qapi/qmp/qdict.h
++++ b/include/qapi/qmp/qdict.h
+@@ -53,13 +53,15 @@ void qdict_destroy_obj(QObject *obj);
+ #define qdict_put(qdict, key, obj) \
+         qdict_put_obj(qdict, key, QOBJECT(obj))
 =20
-+/*
-+ * QNum encapsulates how our dialect of JSON fills in the blanks left
-+ * by the JSON specification (RFC 7159) regarding numbers.
-+ *
-+ * Conceptually, we treat number as an abstract type with three
-+ * concrete subtypes: floating-point, signed integer, unsigned
-+ * integer.  QNum implements this as a discriminated union of double,
-+ * int64_t, uint64_t.
-+ *
-+ * The JSON parser picks the subtype as follows.  If the number has a
-+ * decimal point or an exponent, it is floating-point.  Else if it
-+ * fits into int64_t, it's signed integer.  Else if it fits into
-+ * uint64_t, it's unsigned integer.  Else it's floating-point.
-+ *
-+ * Any number can serve as double: qnum_get_double() converts under
-+ * the hood.
-+ *
-+ * An integer can serve as signed / unsigned integer as long as it is
-+ * in range: qnum_get_try_int() / qnum_get_try_uint() check range and
-+ * convert under the hood.
-+ */
- typedef struct QNum {
-     QObject base;
-     QNumKind kind;
+-/* Helpers for int, bool, and string */
++/* Helpers for int, bool, null, and string */
+ #define qdict_put_int(qdict, key, value) \
+         qdict_put(qdict, key, qnum_from_int(value))
+ #define qdict_put_bool(qdict, key, value) \
+         qdict_put(qdict, key, qbool_from_bool(value))
+ #define qdict_put_str(qdict, key, value) \
+         qdict_put(qdict, key, qstring_from_str(value))
++#define qdict_put_null(qdict, key) \
++        qdict_put(qdict, key, qnull())
+=20
+ /* High level helpers */
+ double qdict_get_double(const QDict *qdict, const char *key);
+diff --git a/scripts/coccinelle/qobject.cocci b/scripts/coccinelle/qobjec=
+t.cocci
+index c518caf7b1..1120eb1a42 100644
+--- a/scripts/coccinelle/qobject.cocci
++++ b/scripts/coccinelle/qobject.cocci
+@@ -20,6 +20,9 @@ expression Obj, Key, E;
+ |
+ - qdict_put(Obj, Key, qstring_from_str(E));
+ + qdict_put_str(Obj, Key, E);
++|
++- qdict_put(Obj, Key, qnull());
+++ qdict_put_null(Obj, Key);
+ )
+=20
+ // Use QList macros where they make sense
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index ddc45abd70..bec2009a9c 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -2454,7 +2454,7 @@ static QDict *x86_cpu_static_props(void)
+=20
+     d =3D qdict_new();
+     for (i =3D 0; props[i]; i++) {
+-        qdict_put(d, props[i], qnull());
++        qdict_put_null(d, props[i]);
+     }
+=20
+     for (w =3D 0; w < FEATURE_WORDS; w++) {
+@@ -2464,7 +2464,7 @@ static QDict *x86_cpu_static_props(void)
+             if (!fi->feat_names[bit]) {
+                 continue;
+             }
+-            qdict_put(d, fi->feat_names[bit], qnull());
++            qdict_put_null(d, fi->feat_names[bit]);
+         }
+     }
+=20
 --=20
 2.13.5
