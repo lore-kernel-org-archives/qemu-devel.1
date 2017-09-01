@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dnkDp-0003bo-Gc
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:34:54 -0400
+	(envelope-from <thuth@redhat.com>) id 1dnkGn-0006ix-1Q
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:37:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dnkDk-0007gM-NQ
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:34:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57144)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dnkDk-0007g1-Ey
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:34:44 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1A4007EA9B
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 11:34:43 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Fri,  1 Sep 2017 13:34:36 +0200
-Message-Id: <20170901113438.12523-1-quintela@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1dnkGi-0000Xo-CU
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:37:53 -0400
+References: <20170901110706.429-1-otubo@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <fecde0d9-8289-af04-e1aa-79d0be06ca32@redhat.com>
+Date: Fri, 1 Sep 2017 13:37:34 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 0/2] Fix tests on recent gcc
+In-Reply-To: <20170901110706.429-1-otubo@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] isa-fdc: assert replaced by proper error
+ exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,128 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Eduardo Otubo <otubo@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, jsnow@redhat.com, qemu-block@nongnu.org
 
+On 01.09.2017 13:07, Eduardo Otubo wrote:
+> When not available, isa-fdc falls into assert instead of proper error
+> exit. This patch fixes this behavior.
+> 
+> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+> ---
+>  hw/block/fdc.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+> index 401129073b..0b6def4e1d 100644
+> --- a/hw/block/fdc.c
+> +++ b/hw/block/fdc.c
+> @@ -2699,11 +2699,15 @@ static void isabus_fdc_realize(DeviceState *dev, Error **errp)
+>      fdctrl->dma_chann = isa->dma;
+>      if (fdctrl->dma_chann != -1) {
+>          fdctrl->dma = isa_get_dma(isa_bus_from_device(isadev), isa->dma);
+> -        assert(fdctrl->dma);
+> +        if (!fdctrl->dma) {
+> +            error_setg(errp, "isa-fdc not supported");
+> +            goto error;
+> +        }
+>      }
+>  
+>      qdev_set_legacy_instance_id(dev, isa->iobase, 2);
+>      fdctrl_realize_common(dev, fdctrl, &err);
+> +error:
+>      if (err != NULL) {
+>          error_propagate(errp, err);
+>          return;
 
-Hi
+Maybe add the reproducer to the commit message:
 
-changes from v2:
-- change assert from position
+ qemu-system-ppc64 -S -machine powernv -device isa-fdc
 
-Please review.
-
-[v2]
-
-- move all uses of -1 for memtest.
-- remove docs about the feature.
-- use size_t for the second patch (cedric)
-
-Please, review.
-
-
-[v1]
-
-On Fedora 26 (gcc-7.1.1 and glib2 2.52.3) tests don't compile.
-
-In file included from /usr/include/string.h:639:0,
-                 from /mnt/kvm/qemu/cleanup/include/qemu/osdep.h:69,
-                 from /mnt/kvm/qemu/cleanup/tests/test-iov.c:1:
-In function =E2=80=98memcpy=E2=80=99,
-    inlined from =E2=80=98iov_from_buf=E2=80=99 at /mnt/kvm/qemu/cleanup/=
-include/qemu/iov.h:51:9,
-    inlined from =E2=80=98test_to_from_buf_1=E2=80=99 at /mnt/kvm/qemu/cl=
-eanup/tests/test-iov.c:88:14,
-    inlined from =E2=80=98test_to_from_buf=E2=80=99 at /mnt/kvm/qemu/clea=
-nup/tests/test-iov.c:144:9:
-/usr/include/bits/string3.h:53:10: error: =E2=80=98__builtin_memcpy=E2=80=
-=99: specified size 18446744073709551615 exceeds maximum object size 9223=
-372036854775807 [-Werror=3Dstringop-overflow=3D]
-   return __builtin___memcpy_chk (__dest, __src, __len, __bos0 (__dest));
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In function =E2=80=98memcpy=E2=80=99,
-    inlined from =E2=80=98iov_to_buf=E2=80=99 at /mnt/kvm/qemu/cleanup/in=
-clude/qemu/iov.h:64:9,
-    inlined from =E2=80=98test_to_from_buf_1=E2=80=99 at /mnt/kvm/qemu/cl=
-eanup/tests/test-iov.c:94:14,
-    inlined from =E2=80=98test_to_from_buf=E2=80=99 at /mnt/kvm/qemu/clea=
-nup/tests/test-iov.c:144:9:
-/usr/include/bits/string3.h:53:10: error: =E2=80=98__builtin_memcpy=E2=80=
-=99: specified size 18446744073709551615 exceeds maximum object size 9223=
-372036854775807 [-Werror=3Dstringop-overflow=3D]
-   return __builtin___memcpy_chk (__dest, __src, __len, __bos0 (__dest));
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
-
-In this case, we are abusing the functions and call a size_t argument
-with -1, which gives us a very big number.  gcc gets overzealous and
-gets confused about it.  Notice that this was introduced in 2015 by Paolo=
-:
-
-commit ad523bca56a7202d2498c550a41be5c986c4d33c
-Author: Paolo Bonzini <pbonzini@redhat.com>
-Date:   Tue Dec 22 12:03:33 2015 +0100
-
-    iov: avoid memcpy for "simple" iov_from_buf/iov_to_buf
-
-I fixed it by using the real sizes in the tests insntead of -1.  It is al=
-ready calculated.
-
-
-
-
-In file included from /usr/include/glib-2.0/glib/glist.h:32:0,
-                 from /usr/include/glib-2.0/glib/ghash.h:33,
-                 from /usr/include/glib-2.0/glib.h:50,
-                 from /mnt/kvm/qemu/cleanup/tests/vmgenid-test.c:11:
-In function =E2=80=98acpi_find_vgia=E2=80=99,
-    inlined from =E2=80=98read_guid_from_memory=E2=80=99 at /mnt/kvm/qemu=
-/cleanup/tests/vmgenid-test.c:103:18:
-/usr/include/glib-2.0/glib/gmem.h:216:10: error: argument 1 range [184467=
-44071562067968, 18446744073709551615] exceeds maximum object size 9223372=
-036854775807 [-Werror=3Dalloc-size-larger-than=3D]
-      __p =3D g_##func##_n (__n, __s);   \
-      ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
-/usr/include/glib-2.0/glib/gmem.h:278:42: note: in expansion of macro =E2=
-=80=98_G_NEW=E2=80=99
- #define g_new0(struct_type, n_structs)   _G_NEW (struct_type, n_structs,=
- malloc0)
-                                          ^~~~~~
-/mnt/kvm/qemu/cleanup/tests/vmgenid-test.c:70:14: note: in expansion of m=
-acro =E2=80=98g_new0=E2=80=99
-     tables =3D g_new0(uint32_t, tables_nr);
-              ^~~~~~
-/mnt/kvm/qemu/cleanup/tests/vmgenid-test.c: In function =E2=80=98read_gui=
-d_from_memory=E2=80=99:
-/usr/include/glib-2.0/glib/gmem.h:96:10: note: in a call to allocation fu=
-nction =E2=80=98g_malloc0_n=E2=80=99 declared here
- gpointer g_malloc0_n      (gsize  n_blocks,
-          ^~~~~~~~~~~
-cc1: all warnings being treated as errors
-make: *** [/mnt/kvm/qemu/cleanup/rules.mak:66: tests/vmgenid-test.o] Erro=
-r 1
-
-
-this cames form line:
-
-    tables =3D g_new0(uint32_t, tables_nr);
-
-glib/gcc gets completely confused about this and think that 1st
-argument can be 2^64-1.  Documentation says that you should use g_new
-for struct types, so ...  I moved to g_malloc0() and call it a day.
-
-What do you think?
-
-Later, Juan.
-
-Juan Quintela (2):
-  tests: Use real size for iov tests
-  tests: Make vmgenid test compile
-
- include/qemu/iov.h   |  6 ------
- tests/test-iov.c     | 10 +++++-----
- tests/vmgenid-test.c |  2 +-
- 3 files changed, 6 insertions(+), 12 deletions(-)
-
---=20
-2.13.5
+Reviewed-by: Thomas Huth <thuth@redhat.com>
