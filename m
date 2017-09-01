@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnqw4-0005p3-M0
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:45:01 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dnr8l-0002KP-28
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:58:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnqw1-0003KP-K5
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:44:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43990)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnqw1-0003K9-B1
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:44:53 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3BF1CC056784
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 18:44:52 +0000 (UTC)
-References: <150429070706.231.1744967003803393863@b5667b65043c>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <246d9e59-ff55-a86d-57ab-4a3bbf26b246@redhat.com>
-Date: Fri, 1 Sep 2017 13:44:48 -0500
+	(envelope-from <jsnow@redhat.com>) id 1dnr8j-0001bT-Ql
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:58:03 -0400
+References: <20170901001502.29915-1-jsnow@redhat.com>
+	<20170901105654.GA20672@stefanha-x1.localdomain>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <105ec27c-63e1-cbac-1bca-da9b2685fe8b@redhat.com>
+Date: Fri, 1 Sep 2017 14:57:49 -0400
 MIME-Version: 1.0
-In-Reply-To: <150429070706.231.1744967003803393863@b5667b65043c>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="cujCjnhW2ufr3hdgFe4fADWnFlIQA4FK2"
-Subject: Re: [Qemu-devel] [PATCH v6 00/29] Preliminary libqtest cleanups
+In-Reply-To: <20170901105654.GA20672@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 0/9] IDE: replace printfs
+ with tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,67 +25,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, pbonzini@redhat.com, armbru@redhat.com
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cujCjnhW2ufr3hdgFe4fADWnFlIQA4FK2
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, pbonzini@redhat.com, armbru@redhat.com
-Message-ID: <246d9e59-ff55-a86d-57ab-4a3bbf26b246@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 00/29] Preliminary libqtest cleanups
-References: <150429070706.231.1744967003803393863@b5667b65043c>
-In-Reply-To: <150429070706.231.1744967003803393863@b5667b65043c>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 09/01/2017 01:31 PM, no-reply@patchew.org wrote:
-> Hi,
->=20
-> This series failed automatic build test. Please find the testing comman=
-ds and
-> their output below. If you have docker installed, you can probably repr=
-oduce it
-> locally.
->=20
->   CC      tests/libqos/pci.o
->   CC      tests/libqos/fw_cfg.o
->   CC      tests/libqos/malloc.o
-> In file included from /tmp/qemu-test/src/tests/libqos/fw_cfg.c:18:
-> /tmp/qemu-test/src/tests/libqtest.h:22: error: redefinition of typedef =
-=E2=80=98QTestState=E2=80=99
-> /tmp/qemu-test/src/tests/libqos/fw_cfg.h:18: note: previous declaration=
- of =E2=80=98QTestState=E2=80=99 was here
-> make: *** [tests/libqos/fw_cfg.o] Error 1
-> make: *** Waiting for unfinished jobs....
-
-Legitimate complaint due to different gcc version; I'll send a fixup
-patch for the offending commit.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: stefanha@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, f4bug@amsat.org
 
 
---cujCjnhW2ufr3hdgFe4fADWnFlIQA4FK2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 09/01/2017 06:56 AM, Stefan Hajnoczi wrote:
+> On Thu, Aug 31, 2017 at 08:14:53PM -0400, John Snow wrote:
+>> Wherever possible, replace all printfs with proper tracing.
+>> In most places I've tried to do a straight replacement, but
+>> forthcoming patches may calibrate the tracing to be a little nicer.
+>>
+>> For now, it's nice to just remove the all-or-nothing tracing.
+>>
+>> Key:
+>> [----] : patches are identical
+>> [####] : number of functional differences between upstream/downstream patch
+>> [down] : patch is downstream-only
+>> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+>>
+>> 001/9:[----] [--] 'IDE: replace DEBUG_IDE with tracing system'
+>> 002/9:[----] [--] 'IDE: Add register hints to tracing'
+>> 003/9:[----] [--] 'IDE: add tracing for data ports'
+>> 004/9:[0002] [FC] 'ATAPI: Replace DEBUG_IDE_ATAPI with tracing events'
+>> 005/9:[0011] [FC] 'IDE: replace DEBUG_AIO with trace events'
+>> 006/9:[----] [--] 'AHCI: Replace DPRINTF with trace-events'
+>> 007/9:[0004] [FC] 'AHCI: Rework IRQ constants'
+>> 008/9:[0052] [FC] 'AHCI: pretty-print FIS to buffer instead of stderr'
+>> 009/9:[----] [--] 'AHCI: remove DPRINTF macro'
+>>
+>> ===
+>> v3:
+>> ===
+>>
+>> 04: Change preprocessor gate mechanism for building cmd
+>>            packet buffer dumps (Stefan)
+>> 05: Add getter for IDE_DMA_CMD enumeration (Philippe)
+>> 07: Changed AHCI enumeration to match changes in 05,
+>>     (But leave assert in place to guard lookup table instead
+>>          of adding getter.)
+>> 08: Replace FIS buffer printer with something simpler (Stefan)
+>>     Change preprocessor gate mechanism for building AHCI buffer dumps (Stefan)
+>>     enconstify char parameters in trace-events file (Stefan)
+>>
+>> ===
+>> v2:
+>> ===
+>>
+>> 01: Rehabilitate commit message.
+>>     Fix switch () statement spacing. (Eric)
+>>     Adjust spacing in ide-tracing file to maintain columns.
+>>     Change filename orderings in trace-events. (Eric)
+>>     Fixed newline issue in trace-events. (Eric)
+>>
+>> 02: Context / Added R-B.
+>>
+>> 03: Added trace-events items to appropriate patch (removed from 04) (Eric)
+>>     Added a verbose warning for data tracers (Eric)
+>>
+>> 04: Shifted items to 03 (Eric)
+>>     Fixed newline issue (Eric)
+>>
+>> 05: Changed __END to __COUNT (Philippe)
+>>     Removed __BEGIN enumerator (Philippe)
+>>
+>> 06: Added more information to unknown write (Philippe)
+>>
+>> 08: Context (Entropy)
+>>
+>> John Snow (9):
+>>   IDE: replace DEBUG_IDE with tracing system
+>>   IDE: Add register hints to tracing
+>>   IDE: add tracing for data ports
+>>   ATAPI: Replace DEBUG_IDE_ATAPI with tracing events
+>>   IDE: replace DEBUG_AIO with trace events
+>>   AHCI: Replace DPRINTF with trace-events
+>>   AHCI: Rework IRQ constants
+>>   AHCI: pretty-print FIS to buffer instead of stderr
+>>   AHCI: remove DPRINTF macro
+>>
+>>  Makefile.objs             |   1 +
+>>  hw/ide/ahci.c             | 243 +++++++++++++++++++++++-----------------------
+>>  hw/ide/ahci_internal.h    |  44 +++++++--
+>>  hw/ide/atapi.c            |  69 +++++--------
+>>  hw/ide/cmd646.c           |  10 +-
+>>  hw/ide/core.c             | 185 ++++++++++++++++++++++-------------
+>>  hw/ide/pci.c              |  17 +---
+>>  hw/ide/piix.c             |  11 +--
+>>  hw/ide/trace-events       | 111 +++++++++++++++++++++
+>>  hw/ide/via.c              |  10 +-
+>>  include/hw/ide/internal.h |   8 +-
+>>  11 files changed, 437 insertions(+), 272 deletions(-)
+>>  create mode 100644 hw/ide/trace-events
+>>
+>> -- 
+>> 2.9.5
+>>
+>>
+> 
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> 
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmpqqAACgkQp6FrSiUn
-Q2psGQf/TvgzSO7THliQwfWz8ZzmwuDhL01QaWdcehHPkLglSUaK2LGvoYmnbuDc
-neWwTv5In0ZYb3CvyZzjygwbWkn5urdkiHDA6v8pLPFUgg0z5B7WqBmujccNoHdn
-igUVFf+vp4pyH9QX6Eu0Bujj5RsAWM5qrfcvQ5PuLe3E0clCG8AQjd1EOKDZFBWe
-LfQGpnU8xFv94NgYSnpynSQLTIdluRyVs/ixPvhe5XF8FewEfcX8judLp4gA6AHg
-GYrs6tt+hmqkO6CZnJhnVFoNnKws24EnaaS9JhzA5G2kKKEMBz1XaKg+rZVOYID0
-SNlWXlaWqPrWNcjakM0K2OePvKhZVA==
-=TSx/
------END PGP SIGNATURE-----
+Thank you Philippe, Eric, and Stefan.
 
---cujCjnhW2ufr3hdgFe4fADWnFlIQA4FK2--
+Thanks, applied to my IDE tree:
+
+https://github.com/jnsnow/qemu/commits/ide
+https://github.com/jnsnow/qemu.git
+
+--js
