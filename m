@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dnkBn-0001up-6h
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:32:48 -0400
+	(envelope-from <quintela@redhat.com>) id 1dnkDn-0003aN-S2
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:34:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dnkBk-0007Aa-1D
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:32:43 -0400
-Resent-Message-Id: <E1dnkBk-0007Aa-1D@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21302)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dnkBj-0007AF-Q5
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:32:39 -0400
-In-Reply-To: <20170901105818.31956-1-otubo@redhat.com>
-Message-ID: <150426555188.216.3681080346934443112@b5667b65043c>
-Reply-To: <qemu-devel@nongnu.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 1 Sep 2017 04:32:32 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCHv4 0/6] seccomp: feature refactoring
+	(envelope-from <quintela@redhat.com>) id 1dnkDl-0007gi-VI
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:34:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49102)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dnkDl-0007gS-N8
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:34:45 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C333F80C19
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 11:34:44 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Fri,  1 Sep 2017 13:34:37 +0200
+Message-Id: <20170901113438.12523-2-quintela@redhat.com>
+In-Reply-To: <20170901113438.12523-1-quintela@redhat.com>
+References: <20170901113438.12523-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/2] tests: Use real size for iov tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +29,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: otubo@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, thuth@redhat.com
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA5MDExMDU4MTguMzE5NTYtMS1vdHVib0ByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVs
-XSBbUEFUQ0h2NCAwLzZdIHNlY2NvbXA6IGZlYXR1cmUgcmVmYWN0b3JpbmcKVHlwZTogc2VyaWVz
-Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRv
-dGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJB
-U0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4v
-JHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBz
-aG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
-ayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChu
-KzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
-IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBu
-ZXcgYnJhbmNoICd0ZXN0JwpiOTNjOWU3NjQ4IHNlY2NvbXA6IGFkZGluZyBkb2N1bWVudGF0aW9u
-IHRvIG5ldyBzZWNjb21wIG1vZGVsCjE5ZjA3MTMwNjMgc2VjY29tcDogYWRkIHJlc291cmNlY29u
-dHJvbCBhcmd1bWVudCB0byBjb21tYW5kIGxpbmUKMGQyYTU1M2JjZSBzZWNjb21wOiBhZGQgc3Bh
-d24gYXJndW1lbnQgdG8gY29tbWFuZCBsaW5lCjc4OTlhMjNmYjYgc2VjY29tcDogYWRkIGVsZXZh
-dGVwcml2aWxlZ2VzIGFyZ3VtZW50IHRvIGNvbW1hbmQgbGluZQpkNDNiM2NiY2Y4IHNlY2NvbXA6
-IGFkZCBvYnNvbGV0ZSBhcmd1bWVudCB0byBjb21tYW5kIGxpbmUKMjc2NTc1MmY4ZSBzZWNjb21w
-OiBjaGFuZ2luZyBmcm9tIHdoaXRlbGlzdCB0byBibGFja2xpc3QKCj09PSBPVVRQVVQgQkVHSU4g
-PT09CkNoZWNraW5nIFBBVENIIDEvNjogc2VjY29tcDogY2hhbmdpbmcgZnJvbSB3aGl0ZWxpc3Qg
-dG8gYmxhY2tsaXN0Li4uCkNoZWNraW5nIFBBVENIIDIvNjogc2VjY29tcDogYWRkIG9ic29sZXRl
-IGFyZ3VtZW50IHRvIGNvbW1hbmQgbGluZS4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5l
-dmVyIHVzZSB0YWJzCiMxMjg6IEZJTEU6IHZsLmM6MTA0ODoKK15JXkkgKiB0byBwcm92aWRlIGEg
-bGl0dGxlIGJpdCBvZiBjb25zaXN0ZW5jeSBmb3IkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
-IG5ldmVyIHVzZSB0YWJzCiMxMjk6IEZJTEU6IHZsLmM6MTA0OToKK15JXkkgKiB0aGUgY29tbWFu
-ZCBsaW5lICovJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTMw
-OiBGSUxFOiB2bC5jOjEwNTA6CiteSSAgICB9IGVsc2UgeyQKCkVSUk9SOiBjb2RlIGluZGVudCBz
-aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzEzMTogRklMRTogdmwuYzoxMDUxOgorXkleSWVycm9yX3Jl
-cG9ydCgiaW52YWxpZCBhcmd1bWVudCBmb3Igb2Jzb2xldGUiKTskCgpFUlJPUjogY29kZSBpbmRl
-bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMzI6IEZJTEU6IHZsLmM6MTA1MjoKK15JICAgIH0k
-Cgp0b3RhbDogNSBlcnJvcnMsIDAgd2FybmluZ3MsIDEwNCBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
-dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzY6IHNlY2Nv
-bXA6IGFkZCBlbGV2YXRlcHJpdmlsZWdlcyBhcmd1bWVudCB0byBjb21tYW5kIGxpbmUuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggNC82OiBzZWNjb21wOiBhZGQgc3Bhd24gYXJndW1lbnQgdG8gY29tbWFuZCBs
-aW5lLi4uCkNoZWNraW5nIFBBVENIIDUvNjogc2VjY29tcDogYWRkIHJlc291cmNlY29udHJvbCBh
-cmd1bWVudCB0byBjb21tYW5kIGxpbmUuLi4KRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRo
-YXQgJywnIChjdHg6VnhWKQojNzg6IEZJTEU6IHFlbXUtc2VjY29tcC5jOjgzOgorICAgIHsgU0NN
-UF9TWVMoc2NoZWRfZ2V0X3ByaW9yaXR5X21heCksMTYsIFFFTVVfU0VDQ09NUF9TRVRfUkVTT1VS
-Q0VDVEwgfSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6
-IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojNzk6IEZJTEU6IHFlbXUt
-c2VjY29tcC5jOjg0OgorICAgIHsgU0NNUF9TWVMoc2NoZWRfZ2V0X3ByaW9yaXR5X21pbiksMTYs
-IFFFTVVfU0VDQ09NUF9TRVRfUkVTT1VSQ0VDVEwgfSwKICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgXgoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
-cwojMTI0OiBGSUxFOiB2bC5jOjExMDk6CiteSV5JZXJyb3JfcmVwb3J0KCJpbnZhbGlkIGFyZ3Vt
-ZW50IGZvciByZXNvdXJjZWNvbnRyb2wiKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5l
-dmVyIHVzZSB0YWJzCiMxMjU6IEZJTEU6IHZsLmM6MTExMDoKK15JXklyZXR1cm4gLTE7JAoKRVJS
-T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTI2OiBGSUxFOiB2bC5jOjEx
-MTE6CiteSSAgICB9JAoKdG90YWw6IDUgZXJyb3JzLCAwIHdhcm5pbmdzLCA5NSBsaW5lcyBjaGVj
-a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
-SCA2LzY6IHNlY2NvbXA6IGFkZGluZyBkb2N1bWVudGF0aW9uIHRvIG5ldyBzZWNjb21wIG1vZGVs
-Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
-CgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBm
-cmVlbGlzdHMub3Jn
+We were using -1 instead of the real size because the functions check
+what is bigger, size in bytes or the size of the iov.  Recent gcc's
+barf at this.
+
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Tested-by: Cleber Rosa <crosa@redhat.com>
+--
+
+Remove comments about this feature.
+Fix missing -1.
+---
+ include/qemu/iov.h |  6 ------
+ tests/test-iov.c   | 10 +++++-----
+ 2 files changed, 5 insertions(+), 11 deletions(-)
+
+diff --git a/include/qemu/iov.h b/include/qemu/iov.h
+index bd9fd55b0a..72d4c559b4 100644
+--- a/include/qemu/iov.h
++++ b/include/qemu/iov.h
+@@ -31,11 +31,6 @@ size_t iov_size(const struct iovec *iov, const unsigned int iov_cnt);
+  * Number of bytes actually copied will be returned, which is
+  *  min(bytes, iov_size(iov)-offset)
+  * `Offset' must point to the inside of iovec.
+- * It is okay to use very large value for `bytes' since we're
+- * limited by the size of the iovec anyway, provided that the
+- * buffer pointed to by buf has enough space.  One possible
+- * such "large" value is -1 (sinice size_t is unsigned),
+- * so specifying `-1' as `bytes' means 'up to the end of iovec'.
+  */
+ size_t iov_from_buf_full(const struct iovec *iov, unsigned int iov_cnt,
+                          size_t offset, const void *buf, size_t bytes);
+@@ -76,7 +71,6 @@ iov_to_buf(const struct iovec *iov, const unsigned int iov_cnt,
+  * up to the end of it, will be filled with the specified value.
+  * Function return actual number of bytes processed, which is
+  * min(size, iov_size(iov) - offset).
+- * Again, it is okay to use large value for `bytes' to mean "up to the end".
+  */
+ size_t iov_memset(const struct iovec *iov, const unsigned int iov_cnt,
+                   size_t offset, int fillc, size_t bytes);
+diff --git a/tests/test-iov.c b/tests/test-iov.c
+index fa3d75aee1..458ca25099 100644
+--- a/tests/test-iov.c
++++ b/tests/test-iov.c
+@@ -81,17 +81,17 @@ static void test_to_from_buf_1(void)
+           * skip whole vector and process exactly 0 bytes */
+ 
+          /* first set bytes [i..sz) to some "random" value */
+-         n = iov_memset(iov, niov, 0, 0xff, -1);
++         n = iov_memset(iov, niov, 0, 0xff, sz);
+          g_assert(n == sz);
+ 
+          /* next copy bytes [i..sz) from ibuf to iovec */
+-         n = iov_from_buf(iov, niov, i, ibuf + i, -1);
++         n = iov_from_buf(iov, niov, i, ibuf + i, sz - i);
+          g_assert(n == sz - i);
+ 
+          /* clear part of obuf */
+          memset(obuf + i, 0, sz - i);
+          /* and set this part of obuf to values from iovec */
+-         n = iov_to_buf(iov, niov, i, obuf + i, -1);
++         n = iov_to_buf(iov, niov, i, obuf + i, sz - i);
+          g_assert(n == sz - i);
+ 
+          /* now compare resulting buffers */
+@@ -109,7 +109,7 @@ static void test_to_from_buf_1(void)
+               * with j in [i..sz]. */
+ 
+              /* clear iovec */
+-             n = iov_memset(iov, niov, 0, 0xff, -1);
++             n = iov_memset(iov, niov, 0, 0xff, sz);
+              g_assert(n == sz);
+ 
+              /* copy bytes [i..j) from ibuf to iovec */
+@@ -225,7 +225,7 @@ static void test_io(void)
+        for (i = 0; i <= sz; ++i) {
+            for (j = i; j <= sz; ++j) {
+                k = i;
+-               iov_memset(iov, niov, 0, 0xff, -1);
++               iov_memset(iov, niov, 0, 0xff, sz);
+                do {
+                    s = g_test_rand_int_range(0, j - k + 1);
+                    r = iov_recv(sv[0], iov, niov, k, s);
+-- 
+2.13.5
