@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnsRI-0005Wi-Q6
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 16:21:21 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dnsay-0008CM-T6
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 16:31:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnsRF-00062A-NJ
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 16:21:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47496)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnsRF-00060R-Dv
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 16:21:13 -0400
-References: <20170901201054.11738-1-briansteffens@gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <832e1069-c74c-cb20-bb7b-65032df8eabe@redhat.com>
-Date: Fri, 1 Sep 2017 15:21:10 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dnsau-0003Es-3F
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 16:31:16 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34436)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dnsat-0003E0-Uc
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 16:31:12 -0400
+Received: by mail-qk0-x241.google.com with SMTP id a77so947272qkb.1
+	for <qemu-devel@nongnu.org>; Fri, 01 Sep 2017 13:31:11 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170831064302.14427-1-famz@redhat.com>
+	<20170831064302.14427-4-famz@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <3e83fff4-2a8d-f16b-51cd-9d99441f443d@amsat.org>
+Date: Fri, 1 Sep 2017 17:31:06 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170901201054.11738-1-briansteffens@gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="PPa7Ux7oGkb1ovqqgEa4iuNCXSacrH3FF"
-Subject: Re: [Qemu-devel] [PATCH 1/1] block: add block device shared field
+In-Reply-To: <20170831064302.14427-4-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 03/12] scripts: Add archive-source.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +35,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brian Steffens <briansteffens@gmail.com>, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PPa7Ux7oGkb1ovqqgEa4iuNCXSacrH3FF
-From: Eric Blake <eblake@redhat.com>
-To: Brian Steffens <briansteffens@gmail.com>, qemu-devel@nongnu.org
-Message-ID: <832e1069-c74c-cb20-bb7b-65032df8eabe@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] block: add block device shared field
-References: <20170901201054.11738-1-briansteffens@gmail.com>
-In-Reply-To: <20170901201054.11738-1-briansteffens@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 09/01/2017 03:10 PM, Brian Steffens wrote:
-> This adds a boolean option called 'shared' to block devices. It default=
-s
-> to off/false. When enabled for a particular block device, the 'shared' =
-option
-> causes the block migration code to skip over syncing of that device. Th=
-is
-> allows controlling exactly which block devices get synced during a migr=
-ation.
->=20
-> Signed-off-by: Brian Steffens <briansteffens@gmail.com>
+On 08/31/2017 03:42 AM, Fam Zheng wrote:
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 > ---
->  block.c                   | 7 +++++++
->  block/qapi.c              | 2 ++
->  include/block/block.h     | 1 +
->  include/block/block_int.h | 3 +++
->  migration/block.c         | 4 ++++
->  qapi/block-core.json      | 2 +-
->  6 files changed, 18 insertions(+), 1 deletion(-)
->=20
+>   scripts/archive-source.sh | 29 +++++++++++++++++++++++++++++
+>   1 file changed, 29 insertions(+)
+>   create mode 100755 scripts/archive-source.sh
+> 
+> diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
+> new file mode 100755
+> index 0000000000..84e84961d4
+> --- /dev/null
+> +++ b/scripts/archive-source.sh
+> @@ -0,0 +1,29 @@
+> +#!/bin/sh
+> +#
+> +# Author: Fam Zheng <famz@redhat.com>
+> +#
+> +# Create archive of source tree, including submodules
+> +#
 
-> +++ b/qapi/block-core.json
-> @@ -365,7 +365,7 @@
->              '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
->              '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int'=
-,
->              '*iops_size': 'int', '*group': 'str', 'cache': 'BlockdevCa=
-cheInfo',
-> -            'write_threshold': 'int' } }
-> +            'write_threshold': 'int', 'shared': 'bool' } }
+It seems you missed the license here.
 
-Missing documentation, which should include '(since 2.11)'.  The new
-parameter should be optional on input; but it looks like you've only
-modified a structure that is present on output - so you're missing a
-QAPI edit that mirrors the command-line edit.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---PPa7Ux7oGkb1ovqqgEa4iuNCXSacrH3FF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmpwTYACgkQp6FrSiUn
-Q2pN7gf/Xfwj8E/noTayTYX8gZHPINYn0WrjUT8p6L1jHEOeksOPkQ/owBDCHaeG
-gHvS3GKjC/Ej6NuIFFfLYA/rPiwCRnSB/GjR0dPsz8ih+bSJGa5eeNTWkolS2wLV
-KvNj9BhLAnus8kbyDE2YmaESj//Bmr9VbXADz1m7eLwmEAakxzFj/3L56FIPZLhc
-oYBDGoOORjWu8XJrdozAfx5uNGsuGAw0m5i3KBrRHvANs+jiK+xivZBmvusOklGN
-SQX2DIZBF5F6hnpakhOMYWvIT+DUJeZep5kzDicBgsL4wtfAQ30VBEcGyAVoy++0
-bS56TWk3eBkRa4ta+Zf05ptE+mEbUg==
-=Uqd2
------END PGP SIGNATURE-----
-
---PPa7Ux7oGkb1ovqqgEa4iuNCXSacrH3FF--
+> +
+> +set -e
+> +
+> +if test $# -lt 1; then
+> +    echo "Usage: $0 <output>"
+> +    exit 1
+> +fi
+> +
+> +submodules=$(git submodule foreach --recursive --quiet 'echo $name')
+> +
+> +if test -n "$submodules"; then
+> +    {
+> +        git ls-files
+> +        for sm in $submodules; do
+> +            (cd $sm; git ls-files) | sed "s:^:$sm/:"
+> +        done
+> +    } | grep -x -v $(for sm in $submodules; do echo "-e $sm"; done) > $1.list
+> +else
+> +    git ls-files > $1.list
+> +fi
+> +
+> +tar -cf $1 -T $1.list
+> +rm $1.list
+> 
