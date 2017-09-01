@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1dnkAY-0000vs-An
+	(envelope-from <apahim@redhat.com>) id 1dnkAb-0000wG-TY
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:31:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1dnkAV-0006et-48
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:31:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35358)
+	(envelope-from <apahim@redhat.com>) id 1dnkAa-0006ib-S7
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:31:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57278)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <apahim@redhat.com>) id 1dnkAU-0006eW-Uf
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:31:23 -0400
+	(Exim 4.71) (envelope-from <apahim@redhat.com>) id 1dnkAa-0006hj-J1
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:31:28 -0400
 From: Amador Pahim <apahim@redhat.com>
-Date: Fri,  1 Sep 2017 13:28:16 +0200
-Message-Id: <20170901112829.2571-1-apahim@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 00/13] scripts/qemu.py fixes and cleanups
+Date: Fri,  1 Sep 2017 13:28:18 +0200
+Message-Id: <20170901112829.2571-3-apahim@redhat.com>
+In-Reply-To: <20170901112829.2571-1-apahim@redhat.com>
+References: <20170901112829.2571-1-apahim@redhat.com>
+Subject: [Qemu-devel] [PATCH v8 02/13] qemu.py: avoid writing to
+ stdout/stderr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,61 +27,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@gmail.com, famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com, Amador Pahim <apahim@redhat.com>
 
-Changes v1->v2:
- - Style fixes to make checkpatch.pl happy.
- - Rebased.
-Changes v2->v3:
- - Fix typo in patch 3 ("qemu.py: make 'args' public") commit message.
-Changes v3->v4:
- - Squash the 2 first commits since they are co-dependant.
- - Cleanup launch() and shutdown().
- - Reorder the commits, putting the rename of self._args first.
- - Rebased.
-Changes v4->v5:
- - Break the cleanup commit into logical changes and include in the
-   commit messages the rationale for making them.
-Changes v5->v6:
- - Remove the commit to rename self._args.
- - Fix is_running() return before first call to maunch().
- - Use python logging system.
- - Include the full command line on negative exit code error message.
- - Use os.path.null instead of /dev/null.
- - Improve the control over the created/deleted files.
-Changes v6->v7:
- - Split commits in self-contained/atomic changes.
- - Addressed the comments from previous version, basically improving the
-   logging messages and the control over created files. See individual
-   commit messages for details.
-Changes v7->v8:
- - Rebased.
- - Reorder commits to avoid break->fix sequence.
- - Split commits "use poll() instead of 'returncode'" and "refactor
-   launch()".
- - Don't ignore errors in _load_io_log(). Instead, check if we created
-   the file before reading it.
- - Use LOG.warn() instead of LOG.debug() for the negative exit code
-   message.
- - Fix the exception name called in commits "launch vm only if it's not
-   running" and "don't launch again before shutdown()".
- - Minor style fixes.
+This module should not write directly to stdout/stderr. Instead, it
+should either raise exceptions or just log the messages and let the
+callers handle them and decide what to do. For example, scripts could
+choose to send the log messages stderr or/and write them to a file if
+verbose or debugging mode is enabled.
 
-Amador Pahim (13):
-  qemu.py: fix is_running() return before first launch()
-  qemu.py: avoid writing to stdout/stderr
-  qemu.py: use os.path.null instead of /dev/null
-  qemu.py: improve message on negative exit code
-  qemu.py: include debug information on launch error
-  qemu.py: make sure we only remove files we create
-  qemu.py: close _qemu_log_path on cleanup
-  qemu.py: refactor launch()
-  qemu.py: always cleanup on shutdown()
-  qemu.py: use poll() instead of 'returncode'
-  qemu.py: cleanup redundant calls in launch()
-  qemu.py: launch vm only if it's not running
-  qemu.py: don't launch again before shutdown()
+This patch replaces the writes to stderr by an exception in the
+send_fd_scm() when _socket_scm_helper is not set or not present. In the
+same method, the subprocess Popen will now redirect the stdout/stderr to
+logging.debug instead of writing to system stderr. As consequence, since
+the Popen.communicate() is now used (in order to get the stdout), the
+further call to wait() became redundant and was replaced by
+Popen.returncode.
 
- scripts/qemu.py | 136 +++++++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 101 insertions(+), 35 deletions(-)
+The shutdown() message on negative exit code will now be logged
+to logging.warn instead of written to system stderr.
 
+Signed-off-by: Amador Pahim <apahim@redhat.com>
+---
+ scripts/qemu.py | 30 ++++++++++++++++++++++--------
+ 1 file changed, 22 insertions(+), 8 deletions(-)
+
+diff --git a/scripts/qemu.py b/scripts/qemu.py
+index 0ae5d39414..aca6fa4d82 100644
+--- a/scripts/qemu.py
++++ b/scripts/qemu.py
+@@ -13,6 +13,7 @@
+ #
+ 
+ import errno
++import logging
+ import string
+ import os
+ import sys
+@@ -20,6 +21,15 @@ import subprocess
+ import qmp.qmp
+ 
+ 
++LOG = logging.getLogger(__name__)
++
++
++class QEMUMachineError(Exception):
++    """
++    Exception called when an error in QEMUMachine happens.
++    """
++
++
+ class QEMUMachine(object):
+     '''A QEMU VM'''
+ 
+@@ -62,18 +72,21 @@ class QEMUMachine(object):
+         # In iotest.py, the qmp should always use unix socket.
+         assert self._qmp.is_scm_available()
+         if self._socket_scm_helper is None:
+-            print >>sys.stderr, "No path to socket_scm_helper set"
+-            return -1
++            raise QEMUMachineError("No path to socket_scm_helper set")
+         if os.path.exists(self._socket_scm_helper) == False:
+-            print >>sys.stderr, "%s does not exist" % self._socket_scm_helper
+-            return -1
++            raise QEMUMachineError("%s does not exist" %
++                                   self._socket_scm_helper)
+         fd_param = ["%s" % self._socket_scm_helper,
+                     "%d" % self._qmp.get_sock_fd(),
+                     "%s" % fd_file_path]
+         devnull = open('/dev/null', 'rb')
+-        p = subprocess.Popen(fd_param, stdin=devnull, stdout=sys.stdout,
+-                             stderr=sys.stderr)
+-        return p.wait()
++        p = subprocess.Popen(fd_param, stdin=devnull, stdout=subprocess.PIPE,
++                             stderr=subprocess.STDOUT)
++        output = p.communicate()[0]
++        if output:
++            LOG.debug(output)
++
++        return p.returncode
+ 
+     @staticmethod
+     def _remove_if_exists(path):
+@@ -154,7 +167,8 @@ class QEMUMachine(object):
+ 
+             exitcode = self._popen.wait()
+             if exitcode < 0:
+-                sys.stderr.write('qemu received signal %i: %s\n' % (-exitcode, ' '.join(self._args)))
++                LOG.warn('qemu received signal %i: %s', -exitcode,
++                          ' '.join(self._args))
+             self._load_io_log()
+             self._post_shutdown()
+ 
 -- 
 2.13.5
