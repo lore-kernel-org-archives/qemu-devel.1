@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUo-0000Ma-Vy
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:33 -0400
+	(envelope-from <armbru@redhat.com>) id 1dnlUq-0000PR-Ih
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUh-0007KF-Pe
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50940)
+	(envelope-from <armbru@redhat.com>) id 1dnlUj-0007NJ-TJ
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52822)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUh-0007Jg-Ht
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:19 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUj-0007Lh-EE
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:21 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8E986C056828
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:18 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5CDCFC047B95
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:20 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-75.ams2.redhat.com
+	[10.36.116.75])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 003657BB4F
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:19 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 14:55:30 +0200
-Message-Id: <20170901125611.29295-7-armbru@redhat.com>
+Date: Fri,  1 Sep 2017 14:55:56 +0200
+Message-Id: <20170901125611.29295-33-armbru@redhat.com>
 In-Reply-To: <20170901125611.29295-1-armbru@redhat.com>
 References: <20170901125611.29295-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/47] qlit: use QLit prefix consistently
+Subject: [Qemu-devel] [PULL 32/47] qapi: Update qapi-code-gen.txt examples
+ to match current code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,225 +38,162 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-Rename from LiteralQ to QLit.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20170825105913.4060-4-marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <1503564371-26090-2-git-send-email-armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/qapi/qmp/qlit.h | 24 ++++++++++++------------
- qobject/qlit.c          |  4 ++--
- tests/check-qjson.c     | 40 ++++++++++++++++++++--------------------
- 3 files changed, 34 insertions(+), 34 deletions(-)
+ docs/devel/qapi-code-gen.txt | 47 +++++++++++++++++++++++++++++++++++---=
+------
+ 1 file changed, 38 insertions(+), 9 deletions(-)
 
-diff --git a/include/qapi/qmp/qlit.h b/include/qapi/qmp/qlit.h
-index 280db5064a..a4ad91321b 100644
---- a/include/qapi/qmp/qlit.h
-+++ b/include/qapi/qmp/qlit.h
-@@ -17,33 +17,33 @@
- #include "qapi-types.h"
- #include "qobject.h"
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 9903ac4c19..ae05327869 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -957,6 +957,8 @@ Example:
 =20
--typedef struct LiteralQDictEntry LiteralQDictEntry;
--typedef struct LiteralQObject LiteralQObject;
-+typedef struct QLitDictEntry QLitDictEntry;
-+typedef struct QLitObject QLitObject;
+     typedef struct UserDefOneList UserDefOneList;
 =20
--struct LiteralQObject {
-+struct QLitObject {
-     int type;
-     union {
-         int64_t qnum;
-         const char *qstr;
--        LiteralQDictEntry *qdict;
--        LiteralQObject *qlist;
-+        QLitDictEntry *qdict;
-+        QLitObject *qlist;
-     } value;
- };
++    typedef struct q_obj_my_command_arg q_obj_my_command_arg;
++
+     struct UserDefOne {
+         int64_t integer;
+         bool has_string;
+@@ -972,6 +974,10 @@ Example:
 =20
--struct LiteralQDictEntry {
-+struct QLitDictEntry {
-     const char *key;
--    LiteralQObject value;
-+    QLitObject value;
- };
+     void qapi_free_UserDefOneList(UserDefOneList *obj);
 =20
- #define QLIT_QNUM(val) \
--    (LiteralQObject){.type =3D QTYPE_QNUM, .value.qnum =3D (val)}
-+    (QLitObject){.type =3D QTYPE_QNUM, .value.qnum =3D (val)}
- #define QLIT_QSTR(val) \
--    (LiteralQObject){.type =3D QTYPE_QSTRING, .value.qstr =3D (val)}
-+    (QLitObject){.type =3D QTYPE_QSTRING, .value.qstr =3D (val)}
- #define QLIT_QDICT(val) \
--    (LiteralQObject){.type =3D QTYPE_QDICT, .value.qdict =3D (val)}
-+    (QLitObject){.type =3D QTYPE_QDICT, .value.qdict =3D (val)}
- #define QLIT_QLIST(val) \
--    (LiteralQObject){.type =3D QTYPE_QLIST, .value.qlist =3D (val)}
-+    (QLitObject){.type =3D QTYPE_QLIST, .value.qlist =3D (val)}
++    struct q_obj_my_command_arg {
++        UserDefOneList *arg1;
++    };
++
+     #endif
+     $ cat qapi-generated/example-qapi-types.c
+ [Uninteresting stuff omitted...]
+@@ -1036,6 +1042,8 @@ Example:
+     void visit_type_UserDefOne(Visitor *v, const char *name, UserDefOne =
+**obj, Error **errp);
+     void visit_type_UserDefOneList(Visitor *v, const char *name, UserDef=
+OneList **obj, Error **errp);
 =20
--int compare_litqobj_to_qobj(LiteralQObject *lhs, QObject *rhs);
-+int compare_litqobj_to_qobj(QLitObject *lhs, QObject *rhs);
++    void visit_type_q_obj_my_command_arg_members(Visitor *v, q_obj_my_co=
+mmand_arg *obj, Error **errp);
++
+     #endif
+     $ cat qapi-generated/example-qapi-visit.c
+ [Uninteresting stuff omitted...]
+@@ -1104,6 +1112,9 @@ Example:
+             }
+         }
 =20
- #endif /* QLIT_H */
-diff --git a/qobject/qlit.c b/qobject/qlit.c
-index 5917c3584e..262d64988d 100644
---- a/qobject/qlit.c
-+++ b/qobject/qlit.c
-@@ -20,7 +20,7 @@
++        if (!err) {
++            visit_check_list(v, &err);
++        }
+         visit_end_list(v, (void **)obj);
+         if (err && visit_is_input(v)) {
+             qapi_free_UserDefOneList(*obj);
+@@ -1113,6 +1124,19 @@ Example:
+         error_propagate(errp, err);
+     }
 =20
- typedef struct QListCompareHelper {
-     int index;
--    LiteralQObject *objs;
-+    QLitObject *objs;
-     int result;
- } QListCompareHelper;
++    void visit_type_q_obj_my_command_arg_members(Visitor *v, q_obj_my_co=
+mmand_arg *obj, Error **errp)
++    {
++        Error *err =3D NULL;
++
++        visit_type_UserDefOneList(v, "arg1", &obj->arg1, &err);
++        if (err) {
++            goto out;
++        }
++
++    out:
++        error_propagate(errp, err);
++    }
++
+ =3D=3D=3D scripts/qapi-commands.py =3D=3D=3D
 =20
-@@ -41,7 +41,7 @@ static void compare_helper(QObject *obj, void *opaque)
-         compare_litqobj_to_qobj(&helper->objs[helper->index++], obj);
- }
+ Used to generate the marshaling/dispatch functions for the commands
+@@ -1145,9 +1169,12 @@ Example:
 =20
--int compare_litqobj_to_qobj(LiteralQObject *lhs, QObject *rhs)
-+int compare_litqobj_to_qobj(QLitObject *lhs, QObject *rhs)
- {
-     int64_t val;
+     #include "example-qapi-types.h"
+     #include "qapi/qmp/qdict.h"
++    #include "qapi/qmp/dispatch.h"
+     #include "qapi/error.h"
 =20
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index 525f79e60b..82b3681327 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -1065,23 +1065,23 @@ static void simple_dict(void)
-     int i;
-     struct {
-         const char *encoded;
--        LiteralQObject decoded;
-+        QLitObject decoded;
-     } test_cases[] =3D {
-         {
-             .encoded =3D "{\"foo\": 42, \"bar\": \"hello world\"}",
--            .decoded =3D QLIT_QDICT(((LiteralQDictEntry[]){
-+            .decoded =3D QLIT_QDICT(((QLitDictEntry[]){
-                         { "foo", QLIT_QNUM(42) },
-                         { "bar", QLIT_QSTR("hello world") },
-                         { }
-                     })),
-         }, {
-             .encoded =3D "{}",
--            .decoded =3D QLIT_QDICT(((LiteralQDictEntry[]){
-+            .decoded =3D QLIT_QDICT(((QLitDictEntry[]){
-                         { }
-                     })),
-         }, {
-             .encoded =3D "{\"foo\": 43}",
--            .decoded =3D QLIT_QDICT(((LiteralQDictEntry[]){
-+            .decoded =3D QLIT_QDICT(((QLitDictEntry[]){
-                         { "foo", QLIT_QNUM(43) },
-                         { }
-                     })),
-@@ -1163,11 +1163,11 @@ static void simple_list(void)
-     int i;
-     struct {
-         const char *encoded;
--        LiteralQObject decoded;
-+        QLitObject decoded;
-     } test_cases[] =3D {
-         {
-             .encoded =3D "[43,42]",
--            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
-+            .decoded =3D QLIT_QLIST(((QLitObject[]){
-                         QLIT_QNUM(43),
-                         QLIT_QNUM(42),
-                         { }
-@@ -1175,21 +1175,21 @@ static void simple_list(void)
-         },
-         {
-             .encoded =3D "[43]",
--            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
-+            .decoded =3D QLIT_QLIST(((QLitObject[]){
-                         QLIT_QNUM(43),
-                         { }
-                     })),
-         },
-         {
-             .encoded =3D "[]",
--            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
-+            .decoded =3D QLIT_QLIST(((QLitObject[]){
-                         { }
-                     })),
-         },
-         {
-             .encoded =3D "[{}]",
--            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
--                        QLIT_QDICT(((LiteralQDictEntry[]){
-+            .decoded =3D QLIT_QLIST(((QLitObject[]){
-+                        QLIT_QDICT(((QLitDictEntry[]){
-                                     {},
-                                         })),
-                         {},
-@@ -1220,11 +1220,11 @@ static void simple_whitespace(void)
-     int i;
-     struct {
-         const char *encoded;
--        LiteralQObject decoded;
-+        QLitObject decoded;
-     } test_cases[] =3D {
-         {
-             .encoded =3D " [ 43 , 42 ]",
--            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
-+            .decoded =3D QLIT_QLIST(((QLitObject[]){
-                         QLIT_QNUM(43),
-                         QLIT_QNUM(42),
-                         { }
-@@ -1232,12 +1232,12 @@ static void simple_whitespace(void)
-         },
-         {
-             .encoded =3D " [ 43 , { 'h' : 'b' }, [ ], 42 ]",
--            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
-+            .decoded =3D QLIT_QLIST(((QLitObject[]){
-                         QLIT_QNUM(43),
--                        QLIT_QDICT(((LiteralQDictEntry[]){
-+                        QLIT_QDICT(((QLitDictEntry[]){
-                                     { "h", QLIT_QSTR("b") },
-                                     { }})),
--                        QLIT_QLIST(((LiteralQObject[]){
-+                        QLIT_QLIST(((QLitObject[]){
-                                     { }})),
-                         QLIT_QNUM(42),
-                         { }
-@@ -1245,13 +1245,13 @@ static void simple_whitespace(void)
-         },
-         {
-             .encoded =3D " [ 43 , { 'h' : 'b' , 'a' : 32 }, [ ], 42 ]",
--            .decoded =3D QLIT_QLIST(((LiteralQObject[]){
-+            .decoded =3D QLIT_QLIST(((QLitObject[]){
-                         QLIT_QNUM(43),
--                        QLIT_QDICT(((LiteralQDictEntry[]){
-+                        QLIT_QDICT(((QLitDictEntry[]){
-                                     { "h", QLIT_QSTR("b") },
-                                     { "a", QLIT_QNUM(32) },
-                                     { }})),
--                        QLIT_QLIST(((LiteralQObject[]){
-+                        QLIT_QLIST(((QLitObject[]){
-                                     { }})),
-                         QLIT_QNUM(42),
-                         { }
-@@ -1282,10 +1282,10 @@ static void simple_varargs(void)
- {
-     QObject *embedded_obj;
-     QObject *obj;
--    LiteralQObject decoded =3D QLIT_QLIST(((LiteralQObject[]){
-+    QLitObject decoded =3D QLIT_QLIST(((QLitObject[]){
-             QLIT_QNUM(1),
-             QLIT_QNUM(2),
--            QLIT_QLIST(((LiteralQObject[]){
-+            QLIT_QLIST(((QLitObject[]){
-                         QLIT_QNUM(32),
-                         QLIT_QNUM(42),
-                         {}})),
++    void example_qmp_init_marshal(QmpCommandList *cmds);
+     UserDefOne *qmp_my_command(UserDefOneList *arg1, Error **errp);
++    void qmp_marshal_my_command(QDict *args, QObject **ret, Error **errp=
+);
+=20
+     #endif
+     $ cat qapi-generated/example-qmp-marshal.c
+@@ -1170,19 +1197,19 @@ Example:
+         visit_free(v);
+     }
+=20
+-    static void qmp_marshal_my_command(QDict *args, QObject **ret, Error=
+ **errp)
++    void qmp_marshal_my_command(QDict *args, QObject **ret, Error **errp=
+)
+     {
+         Error *err =3D NULL;
+         UserDefOne *retval;
+         Visitor *v;
+-        UserDefOneList *arg1 =3D NULL;
++        q_obj_my_command_arg arg =3D {0};
+=20
+         v =3D qobject_input_visitor_new(QOBJECT(args));
+         visit_start_struct(v, NULL, NULL, 0, &err);
+         if (err) {
+             goto out;
+         }
+-        visit_type_UserDefOneList(v, "arg1", &arg1, &err);
++        visit_type_q_obj_my_command_arg_members(v, &arg, &err);
+         if (!err) {
+             visit_check_struct(v, &err);
+         }
+@@ -1191,7 +1218,7 @@ Example:
+             goto out;
+         }
+=20
+-        retval =3D qmp_my_command(arg1, &err);
++        retval =3D qmp_my_command(arg.arg1, &err);
+         if (err) {
+             goto out;
+         }
+@@ -1203,17 +1230,18 @@ Example:
+         visit_free(v);
+         v =3D qapi_dealloc_visitor_new();
+         visit_start_struct(v, NULL, NULL, 0, NULL);
+-        visit_type_UserDefOneList(v, "arg1", &arg1, NULL);
++        visit_type_q_obj_my_command_arg_members(v, &arg, NULL);
+         visit_end_struct(v, NULL);
+         visit_free(v);
+     }
+=20
+-    static void qmp_init_marshal(void)
++    void example_qmp_init_marshal(QmpCommandList *cmds)
+     {
+-        qmp_register_command("my-command", qmp_marshal_my_command, QCO_N=
+O_OPTIONS);
+-    }
++        QTAILQ_INIT(cmds);
+=20
+-    qapi_init(qmp_init_marshal);
++        qmp_register_command(cmds, "my-command",
++                             qmp_marshal_my_command, QCO_NO_OPTIONS);
++    }
+=20
+ =3D=3D=3D scripts/qapi-event.py =3D=3D=3D
+=20
+@@ -1258,6 +1286,7 @@ Example:
+         QDict *qmp;
+         Error *err =3D NULL;
+         QMPEventFuncEmit emit;
++
+         emit =3D qmp_event_get_func_emit();
+         if (!emit) {
+             return;
 --=20
 2.13.5
