@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnmuP-0001lv-PA
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 10:27:00 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dnmyR-0003OY-J4
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 10:31:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnmuL-0001nx-4C
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 10:26:57 -0400
-References: <20170901105434.3288-1-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5fff868d-4d35-ec3f-cdd8-9b7363c4e6d3@redhat.com>
-Date: Fri, 1 Sep 2017 09:26:30 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1dnmyN-00036k-Li
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 10:31:07 -0400
+Date: Fri, 1 Sep 2017 11:30:16 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170901143016.GK7570@localhost.localdomain>
+References: <20170901110332.32650-1-otubo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170901105434.3288-1-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="qSOTgUTTTJbC4A134cIx6C51liwG1Kcc8"
-Subject: Re: [Qemu-devel] [PATCH 0/2] Fix / skip recent iotests with LUKS
- driver
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170901110332.32650-1-otubo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] dma/i82374: avoid double creation of
+ i82374 device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +23,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Eduardo Otubo <otubo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, mst@redhat.com, pbonzini@redhat.com, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qSOTgUTTTJbC4A134cIx6C51liwG1Kcc8
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Fam Zheng <famz@redhat.com>
-Message-ID: <5fff868d-4d35-ec3f-cdd8-9b7363c4e6d3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] Fix / skip recent iotests with LUKS
- driver
-References: <20170901105434.3288-1-berrange@redhat.com>
-In-Reply-To: <20170901105434.3288-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+i82374 is compiled in only on ppc and sh4, so I'm CCing the
+maintainers for those architectures.
 
-On 09/01/2017 05:54 AM, Daniel P. Berrange wrote:
-> Two recently added iotests are currently breaking 'check -luks',
-> fix the easy one and disable the hard one.
->=20
-> Daniel P. Berrange (2):
->   iotests: rewrite 192 to use _launch_qemu to fix LUKS support
->   iotests: blacklist 194 with the luks driver
+On Fri, Sep 01, 2017 at 01:03:32PM +0200, Eduardo Otubo wrote:
+> When used with the following command line:
+> 
+>  ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device i82374
+> 
+> QEMU with machine type 40p already creates the device i82374. If
+> specified in the command line, it will try to create it again, hence
+> generating the error.
 
-Since both tests involve an NBD server, I can take this series through
-my NBD queue.  Or, since both involve LUKS, you can push it in your next
-crypto pull request.  Any preferences?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Which error?
 
 
---qSOTgUTTTJbC4A134cIx6C51liwG1Kcc8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+>                       One way to avoid this problem is to set
+> user_creatable=false.
+> 
+> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+The patch does more than just avoiding double creation: it
+prevents usage of "-device i82374" completely.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmpbhYACgkQp6FrSiUn
-Q2rJ2Af/T4ySIODAC3xjuGH7fJGRDipdHlrACmTZK/OFDHt6VtwMjzkHjsYVXfyV
-5UbjsEmW+tUFf0p1yJqS0uhYNemNmAGRyJLu59KCsR0VhlLypNWb3LGNhc3W/eOM
-lp52niVCiZ2qF21KeYLWev03Dkfo8yZeVpp1kKIyyg28cXhKCoi24nsZJ31tzkov
-DVddm4hWLA8pKM7B3ehXEgg9cY1QHRAb6lvZ5hwcF9Snk1X2NsbVJVu19omHDCsu
-P69eTl+l02ngpZgVG1hR8/4ZqvEQrP07KRuoedNK3XRP7N0Txj3YT8fOp4vnPwsL
-+P5y8NEfMbii4hASZIrX+Rm38oIylg==
-=SsIT
------END PGP SIGNATURE-----
+Maybe nobody needs it to work with -device today (would the
+device even work?) and it is OK to set user_creatable=false until
+we fix the crash.  But we need to be sure of that.
 
---qSOTgUTTTJbC4A134cIx6C51liwG1Kcc8--
+> ---
+>  hw/dma/i82374.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
+> index 6c0f975df0..5275d822e0 100644
+> --- a/hw/dma/i82374.c
+> +++ b/hw/dma/i82374.c
+> @@ -139,6 +139,7 @@ static void i82374_class_init(ObjectClass *klass, void *data)
+>      dc->realize = i82374_realize;
+>      dc->vmsd = &vmstate_i82374;
+>      dc->props = i82374_properties;
+> +    dc->user_creatable = false;
+
+A "Reason:" comment explaining why user_creatable=false is
+mandatory.  See the comment above user_creatable declaration in
+qdev-core.h for reference.
+
+I suggest the following:
+
+    /*
+     * Reason: i82374_realize() crashes (assertion failure inside isa_bus_dma()
+     *         if the device is instantiated twice.
+     */
+
+-- 
+Eduardo
