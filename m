@@ -1,28 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dng2P-0003M6-Cj
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 03:06:46 -0400
+	(envelope-from <christian.ehrhardt@canonical.com>)
+	id 1dng30-0003lv-D4
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 03:07:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dng2M-0008TY-8U
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 03:06:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54198)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dng2M-0008RW-28
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 03:06:42 -0400
-Date: Fri, 1 Sep 2017 15:06:38 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170901070638.GB4330@lemon.lan>
-References: <20170831112210.19921-1-famz@redhat.com>
-	<20170831112210.19921-4-famz@redhat.com>
-	<20170831161835.GQ17315@redhat.com>
-	<5f9a3540-2c90-5ded-9581-d1098070f40e@redhat.com>
-	<1f59ff98-f5cb-b185-bca1-657ed6e2f807@amsat.org>
+	(envelope-from <christian.ehrhardt@canonical.com>)
+	id 1dng2w-0000Hd-Dd
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 03:07:21 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:57957)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <christian.ehrhardt@canonical.com>)
+	id 1dng2w-0000H3-47
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 03:07:18 -0400
+Received: from mail-yw0-f200.google.com ([209.85.161.200])
+	by youngberry.canonical.com with esmtps
+	(TLS1.0:RSA_AES_128_CBC_SHA1:16) (Exim 4.76)
+	(envelope-from <christian.ehrhardt@canonical.com>)
+	id 1dng2u-0001xD-Bh
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:07:16 +0000
+Received: by mail-yw0-f200.google.com with SMTP id w138so4236051yww.2
+	for <qemu-devel@nongnu.org>; Fri, 01 Sep 2017 00:07:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <1f59ff98-f5cb-b185-bca1-657ed6e2f807@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] docker: Add test-block
+In-Reply-To: <150420147254.3063.2667079729715778036@loki>
+References: <e2a1b182-83a9-2259-27f9-68b61b5061d5@linux.vnet.ibm.com>
+	<c9a6a1ec-eb7c-08a6-82ad-87ad5412ad19@linux.vnet.ibm.com>
+	<CAFEAcA-oE=E3ydugLdVnPS2Tquqkou=BEhsB_DALqZxbVD0GDA@mail.gmail.com>
+	<e24316e0-3b6f-ef1c-7c4b-66e7b302e5b4@linux.vnet.ibm.com>
+	<97b35c4d-e897-c18a-525f-1fa1a7560776@de.ibm.com>
+	<20170825092008.12484e6a.cohuck@redhat.com>
+	<d3e9d032-fd2e-6126-1774-cb8a86a219f4@de.ibm.com>
+	<20170825102950.736647be.cohuck@redhat.com>
+	<2fdd5a70-6339-c4ec-c13c-d6f96d7abfc9@de.ibm.com>
+	<c79ab349-116d-10d5-9310-f3ff8a6b4b81@redhat.com>
+	<150420147254.3063.2667079729715778036@loki>
+From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Date: Fri, 1 Sep 2017 09:06:44 +0200
+Message-ID: <CAATJJ0+icNedEKO0HK54Wv=V7NQ67TYwJtNXfR+KBpHJ77m-Sg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] S390 bios breaks in qemu 2.10.rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +46,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, "Collin L. Walling" <walling@linux.vnet.ibm.com>
 
-On Thu, 08/31 13:36, Philippe Mathieu-Daud=E9 wrote:
-> On 08/31/2017 01:21 PM, Eric Blake wrote:
-> > On 08/31/2017 11:18 AM, Daniel P. Berrange wrote:
-> > >=20
-> > > 'qcow' (v1) was also passing last time I checked, though it is
-> > > waaaaaay slow to run compared to qcow2, so I'd understand if you
-> > > were reluctant to turn that on due to speed
-> >=20
-> > Even './check -qcow -g quick' might be nicer than nothing, but that i=
-s
-> > also slooooooow
->=20
-> What about having a daily job running it on /master? Better than runnin=
-g it
-> once before each release :)
->=20
+On Thu, Aug 31, 2017 at 7:44 PM, Michael Roth <mdroth@linux.vnet.ibm.com>
+wrote:
 
-Can Shippable or Travis cover that?
+> Quoting Thomas Huth (2017-08-29 04:35:22)
+> > On 28.08.2017 09:18, Christian Borntraeger wrote:
+> > >
+> > >
+> > > On 08/25/2017 10:29 AM, Cornelia Huck wrote:
+> > >> On Fri, 25 Aug 2017 10:21:58 +0200
+> > >> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> > >>
+> > >>> On 08/25/2017 09:20 AM, Cornelia Huck wrote:
+> > >>
+> > >>>> OK, to recap:
+> > >>>>
+> > >>>> - the current pre-built bios seems fine
+> > >>>> - rebuilding the bios may yield a version that fails on some systems
+> > >>>>   (different compiler?)
+> > >>>> - adding aligned(8) looks like the right thing to do
+> > >>>> - it seems to fix the problem, but on at least one system something
+> > >>>>   still seems off (under investigation)
+> > >>>
+> > >>> Yes. I am out of office today, so for any aligned(8) patch
+> > >>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> > >>> even for 2.10.
+> > >>
+> > >> I fear the 2.10 train has already left the station, but any aligned(8)
+> > >> patch should be cc:stable.
+> > >
+> > > I think this could be a topic for QEMU summit. Our process of not
+> allowing
+> > > fixes in rcx without requiring an rc(x+1) seems a bit odd. The Linux
+> kernel
+> > > style (there are fixes between the last rc and release) seems more
+> balanced
+> > > as long as we establish some safety nets.
+> >
+> > This sounds like a good idea to me, yes. And maybe we could also ease
+> > the situation a little bit by providing the first stable .1 release
+> > already two or three weeks after the .0 release [*] ? Then these "we are
+> > not 100% sure whether this is a severe blocker or not" patches could
+> > simply be provided to the public with that .1 release instead of
+> > blocking the QEMU master branch in freeze state...
+>
+> I can give it a try for 2.10.1.
+>
+> At least initially, I would prefer to not have there be a set expectation
+> that there will be a quick .1 release though, but rather anything tagged
+> for-2.10, for instance, that doesn't make it in, will then fall into
+> the "expedited 2.10.1" bucket, and for that to be the *only* way to get
+> into that bucket (we'd still do the normal round-up and pull in any
+> "Cc: qemu-stable@nongnu.org" patches at that point though).
+>
 
-Fam
+Hi Michael,
+To check if I got that correctly:
+- a 2.10.1 could happen rather soon (like end of september as suggested) as
+several things seem still up in the air?
+- but to "get in" you'd still expect all changes that should be considered
+to hit "Cc: qemu-stable@nongnu.org" and be bugfix only?
+
+This would help ensure we don't steal focus from the .0 releases and allow
+> those "is this a blocker?" discussions to happen in the proper context.
+>
+> >
+> >  Thomas
+> >
+> >
+> > [*] I know that means more additional work for Michael - sorry for that
+> > ... but at least we should talk about this, I think. Maybe someone else
+> > could also help with the releases if it's too much work for one person?
+> >
+>
+>
+>
