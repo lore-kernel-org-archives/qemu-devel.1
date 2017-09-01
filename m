@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dnZnu-0000Pj-J8
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:27:24 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dnZoS-0000jQ-DE
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:27:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dnZnr-0001Bf-CB
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:27:22 -0400
-Resent-Message-Id: <E1dnZnr-0001Bf-CB@eggs.gnu.org>
-In-Reply-To: <20170901001502.29915-1-jsnow@redhat.com>
-Message-ID: <150422562278.204.10709806603962737796@b5667b65043c>
-Reply-To: <qemu-devel@nongnu.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dnZoN-0001gQ-A1
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:27:56 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170901001502.29915-1-jsnow@redhat.com>
+	<20170901001502.29915-6-jsnow@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b16eaf48-2452-8f9f-547d-b9ac999be308@amsat.org>
+Date: Thu, 31 Aug 2017 21:27:46 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 31 Aug 2017 17:27:04 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 0/9] IDE: replace printfs with tracing
+In-Reply-To: <20170901001502.29915-6-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 5/9] IDE: replace DEBUG_AIO with trace
+ events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +29,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, stefanha@redhat.com, f4bug@amsat.org
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzA5MDEwMDE1MDIuMjk5MTUtMS1qc25vd0ByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVs
-XSBbUEFUQ0ggdjMgMC85XSBJREU6IHJlcGxhY2UgcHJpbnRmcyB3aXRoIHRyYWNpbmcKVHlwZTog
-c2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
-bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
-c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
-Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
-IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
-YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
-bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
-ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRw
-czovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAg
-ICAgICAgcGF0Y2hldy8xNTAzOTM4MjgzLTEyNDA0LTEtZ2l0LXNlbmQtZW1haWwtc3VuZGVlcC5s
-a21sQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzE1MDM5MzgyODMtMTI0MDQtMS1naXQtc2VuZC1lbWFp
-bC1zdW5kZWVwLmxrbWxAZ21haWwuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNo
-ZXcvMTUwNDE5MDQwOC0xMTE0My0xLWdpdC1zZW5kLWVtYWlsLXRodXRoQHJlZGhhdC5jb20gLT4g
-cGF0Y2hldy8xNTA0MTkwNDA4LTExMTQzLTEtZ2l0LXNlbmQtZW1haWwtdGh1dGhAcmVkaGF0LmNv
-bQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTcwOTAxMDAxNTAyLjI5OTE1
-LTEtanNub3dAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwOTAxMDAxNTAyLjI5OTE1LTEtanNu
-b3dAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmI0NWJjNzEzNWQg
-QUhDSTogcmVtb3ZlIERQUklOVEYgbWFjcm8KNTJhMTE0ZWE5NCBBSENJOiBwcmV0dHktcHJpbnQg
-RklTIHRvIGJ1ZmZlciBpbnN0ZWFkIG9mIHN0ZGVycgpkYzFmYjlkZjA3IEFIQ0k6IFJld29yayBJ
-UlEgY29uc3RhbnRzCjAxZWIyNjI5YjcgQUhDSTogUmVwbGFjZSBEUFJJTlRGIHdpdGggdHJhY2Ut
-ZXZlbnRzCmI2NDIyNGMzMTMgSURFOiByZXBsYWNlIERFQlVHX0FJTyB3aXRoIHRyYWNlIGV2ZW50
-cwowYTU0MjIyZTE1IEFUQVBJOiBSZXBsYWNlIERFQlVHX0lERV9BVEFQSSB3aXRoIHRyYWNpbmcg
-ZXZlbnRzCjFjOTc2ZDQ1NGIgSURFOiBhZGQgdHJhY2luZyBmb3IgZGF0YSBwb3J0cwpiNDZiM2My
-MTQxIElERTogQWRkIHJlZ2lzdGVyIGhpbnRzIHRvIHRyYWNpbmcKMWRhOWZlNjdlYyBJREU6IHJl
-cGxhY2UgREVCVUdfSURFIHdpdGggdHJhY2luZyBzeXN0ZW0KCj09PSBPVVRQVVQgQkVHSU4gPT09
-CkNoZWNraW5nIFBBVENIIDEvOTogSURFOiByZXBsYWNlIERFQlVHX0lERSB3aXRoIHRyYWNpbmcg
-c3lzdGVtLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJ3wnIChjdHg6VnhW
-KQojMTQzOiBGSUxFOiBody9pZGUvY29yZS5jOjExOTc6CisgICAgaWYgKHJlZ19udW0gIT0gNyAm
-JiAocy0+c3RhdHVzICYgKEJVU1lfU1RBVHxEUlFfU1RBVCkpKSB7CiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
-aW5ncywgMzM3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KCkNoZWNraW5nIFBBVENIIDIvOTogSURFOiBBZGQgcmVnaXN0ZXIgaGludHMgdG8gdHJh
-Y2luZy4uLgpDaGVja2luZyBQQVRDSCAzLzk6IElERTogYWRkIHRyYWNpbmcgZm9yIGRhdGEgcG9y
-dHMuLi4KQ2hlY2tpbmcgUEFUQ0ggNC85OiBBVEFQSTogUmVwbGFjZSBERUJVR19JREVfQVRBUEkg
-d2l0aCB0cmFjaW5nIGV2ZW50cy4uLgpDaGVja2luZyBQQVRDSCA1Lzk6IElERTogcmVwbGFjZSBE
-RUJVR19BSU8gd2l0aCB0cmFjZSBldmVudHMuLi4KQ2hlY2tpbmcgUEFUQ0ggNi85OiBBSENJOiBS
-ZXBsYWNlIERQUklOVEYgd2l0aCB0cmFjZS1ldmVudHMuLi4KRVJST1I6IEhleCBudW1iZXJzIG11
-c3QgYmUgcHJlZml4ZWQgd2l0aCAnMHgnCiM1NDQ6IEZJTEU6IGh3L2lkZS90cmFjZS1ldmVudHM6
-OTE6CitoYW5kbGVfcmVnX2gyZF9maXNfcG1wKHZvaWQgKnMsIGludCBwb3J0LCBjaGFyIGIwLCBj
-aGFyIGIxLCBjaGFyIGIyKSAiYWhjaSglcClbJWRdOiBQb3J0IE11bHRpcGxpZXIgbm90IHN1cHBv
-cnRlZCwgRklTOiAweCUwMngtJTAyeC0lMDJ4IgoKRVJST1I6IEhleCBudW1iZXJzIG11c3QgYmUg
-cHJlZml4ZWQgd2l0aCAnMHgnCiM1NDU6IEZJTEU6IGh3L2lkZS90cmFjZS1ldmVudHM6OTI6Cito
-YW5kbGVfcmVnX2gyZF9maXNfcmVzKHZvaWQgKnMsIGludCBwb3J0LCBjaGFyIGIwLCBjaGFyIGIx
-LCBjaGFyIGIyKSAiYWhjaSglcClbJWRdOiBSZXNlcnZlZCBmbGFncyBzZXQgaW4gSDJEIFJlZ2lz
-dGVyIEZJUywgRklTOiAweCUwMngtJTAyeC0lMDJ4IgoKRVJST1I6IEhleCBudW1iZXJzIG11c3Qg
-YmUgcHJlZml4ZWQgd2l0aCAnMHgnCiM1NTE6IEZJTEU6IGh3L2lkZS90cmFjZS1ldmVudHM6OTg6
-CitoYW5kbGVfY21kX3VuaGFuZGxlZF9maXModm9pZCAqcywgaW50IHBvcnQsIHVpbnQ4X3QgYjAs
-IHVpbnQ4X3QgYjEsIHVpbnQ4X3QgYjIpICJhaGNpKCVwKVslZF06IHVuaGFuZGxlZCBGSVMgdHlw
-ZS4gY21kX2ZpczogMHglMDJ4LSUwMngtJTAyeCIKCnRvdGFsOiAzIGVycm9ycywgMCB3YXJuaW5n
-cywgNDk2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCkNoZWNraW5nIFBBVENIIDcvOTogQUhDSTogUmV3b3JrIElSUSBjb25zdGFudHMuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggOC85OiBBSENJOiBwcmV0dHktcHJpbnQgRklTIHRvIGJ1ZmZlciBpbnN0ZWFk
-IG9mIHN0ZGVyci4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNTI6IEZJTEU6
-IGh3L2lkZS9haGNpLmM6MTIwNjoKKyAgICAgICAgICAgIGNoYXIgKnByZXR0eV9maXMgPSBhaGNp
-X3ByZXR0eV9idWZmZXJfZmlzKGlkZV9zdGF0ZS0+aW9fYnVmZmVyLCAweDEwKTsKCnRvdGFsOiAw
-IGVycm9ycywgMSB3YXJuaW5ncywgNjAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA5Lzk6IEFIQ0k6IHJlbW92ZSBEUFJJ
-TlRGIG1hY3JvLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
-IGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
-aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On 08/31/2017 09:14 PM, John Snow wrote:
+> Signed-off-by: John Snow <jsnow@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>   hw/ide/atapi.c            |  5 +----
+>   hw/ide/core.c             | 24 +++++++++++++++++-------
+>   hw/ide/trace-events       |  3 +++
+>   include/hw/ide/internal.h |  6 ++++--
+>   4 files changed, 25 insertions(+), 13 deletions(-)
+> 
+> diff --git a/hw/ide/atapi.c b/hw/ide/atapi.c
+> index 9b84a1b..c0509c8 100644
+> --- a/hw/ide/atapi.c
+> +++ b/hw/ide/atapi.c
+> @@ -416,10 +416,7 @@ static void ide_atapi_cmd_read_dma_cb(void *opaque, int ret)
+>           s->io_buffer_size = n * 2048;
+>           data_offset = 0;
+>       }
+> -#ifdef DEBUG_AIO
+> -    printf("aio_read_cd: lba=%u n=%d\n", s->lba, n);
+> -#endif
+> -
+> +    trace_ide_atapi_cmd_read_dma_cb_aio(s, s->lba, n);
+>       s->bus->dma->iov.iov_base = (void *)(s->io_buffer + data_offset);
+>       s->bus->dma->iov.iov_len = n * ATAPI_SECTOR_SIZE;
+>       qemu_iovec_init_external(&s->bus->dma->qiov, &s->bus->dma->iov, 1);
+> diff --git a/hw/ide/core.c b/hw/ide/core.c
+> index 82a19b1..2cc2a08 100644
+> --- a/hw/ide/core.c
+> +++ b/hw/ide/core.c
+> @@ -58,6 +58,21 @@ static const int smart_attributes[][12] = {
+>       { 190,  0x03, 0x00, 0x45, 0x45, 0x1f, 0x00, 0x1f, 0x1f, 0x00, 0x00, 0x32},
+>   };
+>   
+> +const char *IDE_DMA_CMD_lookup[IDE_DMA__COUNT] = {
+> +    [IDE_DMA_READ] = "DMA READ",
+> +    [IDE_DMA_WRITE] = "DMA WRITE",
+> +    [IDE_DMA_TRIM] = "DMA TRIM",
+> +    [IDE_DMA_ATAPI] = "DMA ATAPI"
+> +};
+> +
+> +static const char *IDE_DMA_CMD_str(enum ide_dma_cmd enval)
+> +{
+> +    if (enval >= 0 && enval < IDE_DMA__COUNT) {
+> +        return IDE_DMA_CMD_lookup[enval];
+> +    }
+> +    return "DMA UNKNOWN CMD";
+> +}
+> +
+>   static void ide_dummy_transfer_stop(IDEState *s);
+>   
+>   static void padstr(char *str, const char *src, int len)
+> @@ -860,10 +875,7 @@ static void ide_dma_cb(void *opaque, int ret)
+>           goto eot;
+>       }
+>   
+> -#ifdef DEBUG_AIO
+> -    printf("ide_dma_cb: sector_num=%" PRId64 " n=%d, cmd_cmd=%d\n",
+> -           sector_num, n, s->dma_cmd);
+> -#endif
+> +    trace_ide_dma_cb(s, sector_num, n, IDE_DMA_CMD_str(s->dma_cmd));
+>   
+>       if ((s->dma_cmd == IDE_DMA_READ || s->dma_cmd == IDE_DMA_WRITE) &&
+>           !ide_sect_range_ok(s, sector_num, n)) {
+> @@ -2391,9 +2403,7 @@ void ide_bus_reset(IDEBus *bus)
+>   
+>       /* pending async DMA */
+>       if (bus->dma->aiocb) {
+> -#ifdef DEBUG_AIO
+> -        printf("aio_cancel\n");
+> -#endif
+> +        trace_ide_bus_reset_aio();
+>           blk_aio_cancel(bus->dma->aiocb);
+>           bus->dma->aiocb = NULL;
+>       }
+> diff --git a/hw/ide/trace-events b/hw/ide/trace-events
+> index 8c79a6c..cc8949c 100644
+> --- a/hw/ide/trace-events
+> +++ b/hw/ide/trace-events
+> @@ -18,6 +18,8 @@ ide_cancel_dma_sync_remaining(void) "draining all remaining requests"
+>   ide_sector_read(int64_t sector_num, int nsectors) "sector=%"PRId64" nsectors=%d"
+>   ide_sector_write(int64_t sector_num, int nsectors) "sector=%"PRId64" nsectors=%d"
+>   ide_reset(void *s) "IDEstate %p"
+> +ide_bus_reset_aio(void) "aio_cancel"
+> +ide_dma_cb(void *s, int64_t sector_num, int n, const char *dma) "IDEState %p; sector_num=%"PRId64" n=%d cmd=%s"
+>   
+>   # BMDMA HBAs:
+>   
+> @@ -51,5 +53,6 @@ ide_atapi_cmd_reply_end_new(void *s, int status) "IDEState: %p; new transfer sta
+>   ide_atapi_cmd_check_status(void *s) "IDEState: %p"
+>   ide_atapi_cmd_read(void *s, const char *method, int lba, int nb_sectors) "IDEState: %p; read %s: LBA=%d nb_sectors=%d"
+>   ide_atapi_cmd(void *s, uint8_t cmd) "IDEState: %p; cmd: 0x%02x"
+> +ide_atapi_cmd_read_dma_cb_aio(void *s, int lba, int n) "IDEState: %p; aio read: lba=%d n=%d"
+>   # Warning: Verbose
+>   ide_atapi_cmd_packet(void *s, uint16_t limit, const char *packet) "IDEState: %p; limit=0x%x packet: %s"
+> diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+> index 74efe8a..db9fde0 100644
+> --- a/include/hw/ide/internal.h
+> +++ b/include/hw/ide/internal.h
+> @@ -14,7 +14,6 @@
+>   #include "block/scsi.h"
+>   
+>   /* debug IDE devices */
+> -//#define DEBUG_AIO
+>   #define USE_DMA_CDROM
+>   
+>   typedef struct IDEBus IDEBus;
+> @@ -333,12 +332,15 @@ struct unreported_events {
+>   };
+>   
+>   enum ide_dma_cmd {
+> -    IDE_DMA_READ,
+> +    IDE_DMA_READ = 0,
+>       IDE_DMA_WRITE,
+>       IDE_DMA_TRIM,
+>       IDE_DMA_ATAPI,
+> +    IDE_DMA__COUNT
+>   };
+>   
+> +extern const char *IDE_DMA_CMD_lookup[IDE_DMA__COUNT];
+> +
+>   #define ide_cmd_is_read(s) \
+>   	((s)->dma_cmd == IDE_DMA_READ)
+>   
+> 
