@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dnnm1-0001V7-Dx
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:22:26 -0400
+	(envelope-from <famz@redhat.com>) id 1dnnps-0004wa-Qc
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:26:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dnnlw-00034v-VC
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:22:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:13017)
+	(envelope-from <famz@redhat.com>) id 1dnnpq-0004OP-F7
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:26:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58294)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dnnlw-00034Z-Ps
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:22:16 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dnnpq-0004OB-8f
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:26:18 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 485B4267F5
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:26:17 +0000 (UTC)
+Date: Fri, 1 Sep 2017 23:26:10 +0800
 From: Fam Zheng <famz@redhat.com>
-Date: Fri,  1 Sep 2017 23:21:59 +0800
-Message-Id: <20170901152200.5953-3-famz@redhat.com>
-In-Reply-To: <20170901152200.5953-1-famz@redhat.com>
-References: <20170901152200.5953-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/3] docker: Add nettle-devel to fedora image
+Message-ID: <20170901152610.GA5845@lemon.lan>
+References: <20170901105023.11108-1-kraxel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170901105023.11108-1-kraxel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] pixman: drop submodule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,27 +32,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, kchamart@redhat.com, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, eblake@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-The LUKS cases in qemu-iotests requires this.
+On Fri, 09/01 12:50, Gerd Hoffmann wrote:
+> Drop pixman submodule and support for the "internal" pixman build.
+> pixman should be reasonable well established meanwhile that we don't
+> need the fallback submodule any more.  While being at it also drop
+> some #ifdefs for pixman versions olter than what we require in
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- tests/docker/dockerfiles/fedora.docker | 1 +
- 1 file changed, 1 insertion(+)
+s/olter/older/ ?
 
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-index 4eaa8ed2a5..27e8201c54 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -3,6 +3,7 @@ ENV PACKAGES \
-     ccache git tar PyYAML sparse flex bison python2 bzip2 hostname \
-     glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
-     gcc gcc-c++ clang make perl which bc findutils libaio-devel \
-+    nettle-devel \
-     mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
-     mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
-     mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
--- 
-2.13.5
+> configure anyway.
+
+Fam
