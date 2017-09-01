@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnjQ4-0000tK-8c
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:43:28 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dnjWz-0003T6-97
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:50:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dnjPz-0003k5-LI
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:43:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43756)
+	(envelope-from <kraxel@redhat.com>) id 1dnjWu-00074f-CD
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:50:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45246)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dnjPz-0003iw-EY
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:43:19 -0400
-Date: Fri, 1 Sep 2017 12:43:02 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170901124302.3c7c27c6.cohuck@redhat.com>
-In-Reply-To: <96af6291-8427-89c8-c644-a3d82c3240c8@redhat.com>
-References: <1504190408-11143-1-git-send-email-thuth@redhat.com>
-	<612870af-f8a4-039c-3e97-7590388b9e77@redhat.com>
-	<87o9qudbsk.fsf@dusky.pond.sub.org>
-	<96af6291-8427-89c8-c644-a3d82c3240c8@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] tests: Enable the drive_del test also
- on s390x
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dnjWu-00074J-1z
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:50:28 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E33BC61481
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 10:50:26 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri,  1 Sep 2017 12:50:23 +0200
+Message-Id: <20170901105023.11108-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] pixman: drop submodule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +27,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, David Hildenbrand <david@redhat.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Jason J Herne <jjherne@linux.vnet.ibm.com>, Michael S Tsirkin <mst@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: "Daniel P . Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Fri, 1 Sep 2017 12:39:49 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+Drop pixman submodule and support for the "internal" pixman build.
+pixman should be reasonable well established meanwhile that we don't
+need the fallback submodule any more.  While being at it also drop
+some #ifdefs for pixman versions olter than what we require in
+configure anyway.
 
-> On 01.09.2017 11:10, Markus Armbruster wrote:
-> > David Hildenbrand <david@redhat.com> writes:
-> >   
-> >>>  static void test_drive_del_device_del(void)
-> >>>  {
-> >>> +    char *args;
-> >>> +
-> >>>      /* Start with a drive used by a device that unplugs instantaneously */
-> >>> -    qtest_start("-drive if=none,id=drive0,file=null-co://,format=raw"
-> >>> -                " -device virtio-scsi-pci"
-> >>> -                " -device scsi-hd,drive=drive0,id=dev0");
-> >>> +    args = g_strdup_printf("-drive if=none,id=drive0,file=null-co://,format=raw"
-> >>> +                           " -device virtio-scsi-%s"
-> >>> +                           " -device scsi-hd,drive=drive0,id=dev0",  
-> >>
-> >> Would look better with the spaces at the end of the previous line (so
-> >> all "-device" are aligned), but just my taste.  
-> > 
-> > The -device *are* aligned, but I get what you mean.
-> > 
-> > The advantage of leading rather than trailing space is that the
-> > intention "this is still the same string" is locally obvious both at the
-> > first part's end (no comma) and at the second part's beginning (leading
-> > space).  
-> 
-> I don't mind either way, but in this case, I think I'd prefer to keep
-> the original formatting with the space at the beginning, for the
-> following two reasons:
-> 
-> - The first line is already hitting the 80 columns limit, and I want to
->   avoid complaints from checkpatch.pl
-> - The original author formatted it that way.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ configure        | 20 ++------------------
+ Makefile         | 10 ----------
+ ui/qemu-pixman.c |  4 ----
+ .gitmodules      |  3 ---
+ pixman           |  1 -
+ 5 files changed, 2 insertions(+), 36 deletions(-)
+ delete mode 160000 pixman
 
-I'd keep it that way as well.
+diff --git a/configure b/configure
+index dd73cce62f..73760430b0 100755
+--- a/configure
++++ b/configure
+@@ -930,8 +930,6 @@ for opt do
+   ;;
+   --with-system-pixman) pixman="system"
+   ;;
+-  --without-system-pixman) pixman="internal"
+-  ;;
+   --without-pixman) pixman="none"
+   ;;
+   --disable-sdl) sdl="no"
+@@ -3305,8 +3303,6 @@ if test "$pixman" = ""; then
+     pixman="none"
+   elif $pkg_config --atleast-version=0.21.8 pixman-1 > /dev/null 2>&1; then
+     pixman="system"
+-  else
+-    pixman="internal"
+   fi
+ fi
+ if test "$pixman" = "none"; then
+@@ -3323,16 +3319,8 @@ elif test "$pixman" = "system"; then
+   pixman_cflags=$($pkg_config --cflags pixman-1)
+   pixman_libs=$($pkg_config --libs pixman-1)
+ else
+-  if test ! -d ${source_path}/pixman/pixman; then
+-    error_exit "pixman >= 0.21.8 not present. Your options:" \
+-        "  (1) Preferred: Install the pixman devel package (any recent" \
+-        "      distro should have packages as Xorg needs pixman too)." \
+-        "  (2) Fetch the pixman submodule, using:" \
+-        "      git submodule update --init pixman"
+-  fi
+-  mkdir -p pixman/pixman
+-  pixman_cflags="-I\$(SRC_PATH)/pixman/pixman -I\$(BUILD_DIR)/pixman/pixman"
+-  pixman_libs="-L\$(BUILD_DIR)/pixman/pixman/.libs -lpixman-1"
++  error_exit "pixman >= 0.21.8 not present." \
++      "Please install the pixman devel package."
+ fi
+ 
+ ##########################################
+@@ -6527,10 +6515,6 @@ echo "QEMU_CFLAGS+=$cflags" >> $config_target_mak
+ 
+ done # for target in $targets
+ 
+-if [ "$pixman" = "internal" ]; then
+-  echo "config-host.h: subdir-pixman" >> $config_host_mak
+-fi
+-
+ if [ "$dtc_internal" = "yes" ]; then
+   echo "config-host.h: subdir-dtc" >> $config_host_mak
+ fi
+diff --git a/Makefile b/Makefile
+index 81447b1f08..280af66628 100644
+--- a/Makefile
++++ b/Makefile
+@@ -325,15 +325,6 @@ $(SOFTMMU_SUBDIR_RULES): config-all-devices.mak
+ subdir-%:
+ 	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" all,)
+ 
+-subdir-pixman: pixman/Makefile
+-	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C pixman V="$(V)" all,)
+-
+-pixman/Makefile: $(SRC_PATH)/pixman/configure
+-	(cd pixman; CFLAGS="$(CFLAGS) -fPIC $(extra_cflags) $(extra_ldflags)" $(SRC_PATH)/pixman/configure $(AUTOCONF_HOST) --disable-gtk --disable-shared --enable-static)
+-
+-$(SRC_PATH)/pixman/configure:
+-	(cd $(SRC_PATH)/pixman; autoreconf -v --install)
+-
+ DTC_MAKE_ARGS=-I$(SRC_PATH)/dtc VPATH=$(SRC_PATH)/dtc -C dtc V="$(V)" LIBFDT_srcdir=$(SRC_PATH)/dtc/libfdt
+ DTC_CFLAGS=$(CFLAGS) $(QEMU_CFLAGS)
+ DTC_CPPFLAGS=-I$(BUILD_DIR)/dtc -I$(SRC_PATH)/dtc -I$(SRC_PATH)/dtc/libfdt
+@@ -532,7 +523,6 @@ distclean: clean
+ 	rm -rf $$d || exit 1 ; \
+         done
+ 	rm -Rf .sdk
+-	if test -f pixman/config.log; then $(MAKE) -C pixman distclean; fi
+ 	if test -f dtc/version_gen.h; then $(MAKE) $(DTC_MAKE_ARGS) clean; fi
+ 
+ KEYMAPS=da     en-gb  et  fr     fr-ch  is  lt  modifiers  no  pt-br  sv \
+diff --git a/ui/qemu-pixman.c b/ui/qemu-pixman.c
+index 6e8b83add6..6e591ab821 100644
+--- a/ui/qemu-pixman.c
++++ b/ui/qemu-pixman.c
+@@ -96,17 +96,13 @@ int qemu_pixman_get_type(int rshift, int gshift, int bshift)
+         if (bshift == 0) {
+             type = PIXMAN_TYPE_ARGB;
+         } else {
+-#if PIXMAN_VERSION >= PIXMAN_VERSION_ENCODE(0, 21, 8)
+             type = PIXMAN_TYPE_RGBA;
+-#endif
+         }
+     } else if (rshift < gshift && gshift < bshift) {
+         if (rshift == 0) {
+             type = PIXMAN_TYPE_ABGR;
+         } else {
+-#if PIXMAN_VERSION >= PIXMAN_VERSION_ENCODE(0, 16, 0)
+             type = PIXMAN_TYPE_BGRA;
+-#endif
+         }
+     }
+     return type;
+diff --git a/.gitmodules b/.gitmodules
+index 5b0c212622..84c54cdc49 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -22,9 +22,6 @@
+ [submodule "roms/sgabios"]
+ 	path = roms/sgabios
+ 	url = git://git.qemu-project.org/sgabios.git
+-[submodule "pixman"]
+-	path = pixman
+-	url = git://anongit.freedesktop.org/pixman
+ [submodule "dtc"]
+ 	path = dtc
+ 	url = git://git.qemu-project.org/dtc.git
+diff --git a/pixman b/pixman
+deleted file mode 160000
+index 87eea99e44..0000000000
+--- a/pixman
++++ /dev/null
+@@ -1 +0,0 @@
+-Subproject commit 87eea99e443b389c978cf37efc52788bf03a0ee0
+-- 
+2.9.3
