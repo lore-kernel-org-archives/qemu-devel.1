@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUu-0000W6-UB
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:41 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dnlWB-0001wq-1D
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:57:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUo-0007Rf-BI
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36008)
+	(envelope-from <kraxel@redhat.com>) id 1dnlW6-0007oc-Ar
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:57:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37009)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUo-0007R5-4S
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:26 -0400
-From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 14:56:03 +0200
-Message-Id: <20170901125611.29295-40-armbru@redhat.com>
-In-Reply-To: <20170901125611.29295-1-armbru@redhat.com>
-References: <20170901125611.29295-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 39/47] quorum: Use qapi_enum_parse() in
- quorum_open()
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dnlW6-0007oG-45
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:57:46 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 18067769E6
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:57:45 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri,  1 Sep 2017 14:57:37 +0200
+Message-Id: <20170901125742.4249-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 0/5] Vga 20170901 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +28,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Alberto Garcia <berto@igalia.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+The following changes since commit 223cd0e13f2e46078d7b573f0b8402bfbee339be:
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20170822132255.23945-12-marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-[Rebased, qemu_opt_get() factored out, commit message tweaked]
-Cc: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1503564371-26090-9-git-send-email-armbru@redhat.com>
----
- block/quorum.c | 28 +++++++++-------------------
- 1 file changed, 9 insertions(+), 19 deletions(-)
+  Merge remote-tracking branch 'remotes/elmarco/tags/tidy-pull-request' into staging (2017-08-31 15:52:43 +0100)
 
-diff --git a/block/quorum.c b/block/quorum.c
-index d04da4f430..cb6617703c 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -22,6 +22,7 @@
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qstring.h"
-+#include "qapi/util.h"
- #include "qapi-event.h"
- #include "crypto/hash.h"
-=20
-@@ -867,30 +868,13 @@ static QemuOptsList quorum_runtime_opts =3D {
-     },
- };
-=20
--static int parse_read_pattern(const char *opt)
--{
--    int i;
--
--    if (!opt) {
--        /* Set quorum as default */
--        return QUORUM_READ_PATTERN_QUORUM;
--    }
--
--    for (i =3D 0; i < QUORUM_READ_PATTERN__MAX; i++) {
--        if (!strcmp(opt, QuorumReadPattern_lookup[i])) {
--            return i;
--        }
--    }
--
--    return -EINVAL;
--}
--
- static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
-                        Error **errp)
- {
-     BDRVQuorumState *s =3D bs->opaque;
-     Error *local_err =3D NULL;
-     QemuOpts *opts =3D NULL;
-+    const char *pattern_str;
-     bool *opened;
-     int i;
-     int ret =3D 0;
-@@ -925,7 +909,13 @@ static int quorum_open(BlockDriverState *bs, QDict *=
-options, int flags,
-         goto exit;
-     }
-=20
--    ret =3D parse_read_pattern(qemu_opt_get(opts, QUORUM_OPT_READ_PATTER=
-N));
-+    pattern_str =3D qemu_opt_get(opts, QUORUM_OPT_READ_PATTERN);
-+    if (!pattern_str) {
-+        ret =3D QUORUM_READ_PATTERN_QUORUM;
-+    } else {
-+        ret =3D qapi_enum_parse(QuorumReadPattern_lookup, pattern_str,
-+                              -EINVAL, NULL);
-+    }
-     if (ret < 0) {
-         error_setg(&local_err, "Please set read-pattern as fifo or quoru=
-m");
-         goto exit;
---=20
-2.13.5
+are available in the git repository at:
+
+  git://git.kraxel.org/qemu tags/vga-20170901-pull-request
+
+for you to fetch changes up to 138bc2df843105edb22978284fc2e16307f16211:
+
+  vga/migration: Update memory map in post_load (2017-09-01 13:52:43 +0200)
+
+----------------------------------------------------------------
+qxl: chunked cursor support.
+stdvga: bugfixes.
+
+----------------------------------------------------------------
+
+Dr. David Alan Gilbert (1):
+  vga/migration: Update memory map in post_load
+
+Gerd Hoffmann (4):
+  vga: fix display update region calculation (split screen)
+  vga: stop passing pointers to vga_draw_line* functions
+  qxl: drop mono cursor support
+  qxl: add support for chunked cursors.
+
+ hw/display/vga-helpers.h | 202 ++++++++++++++++++++++++++---------------------
+ hw/display/vga_int.h     |   1 +
+ hw/display/qxl-render.c  |  45 +++++++----
+ hw/display/vga.c         |  16 +++-
+ 4 files changed, 152 insertions(+), 112 deletions(-)
+
+-- 
+2.9.3
