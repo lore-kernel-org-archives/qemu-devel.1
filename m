@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnny3-0003W2-FG
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:34:52 -0400
+	(envelope-from <tklauser@distanz.ch>) id 1dnnyy-0004Lz-UC
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:35:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnny0-0007tg-Ix
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:34:47 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170901110332.32650-1-otubo@redhat.com>
-	<20170901143016.GK7570@localhost.localdomain>
-Date: Fri, 01 Sep 2017 17:34:34 +0200
-In-Reply-To: <20170901143016.GK7570@localhost.localdomain> (Eduardo Habkost's
-	message of "Fri, 1 Sep 2017 11:30:16 -0300")
-Message-ID: <87lglyzb3p.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] dma/i82374: avoid double creation of
- i82374 device
+	(envelope-from <tklauser@distanz.ch>) id 1dnnyv-00008Q-Go
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:35:44 -0400
+Received: from mail.zhinst.com ([212.126.164.98]:40554)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <tklauser@distanz.ch>) id 1dnnyu-000051-Vl
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:35:41 -0400
+From: Tobias Klauser <tklauser@distanz.ch>
+Date: Fri,  1 Sep 2017 17:35:35 +0200
+Message-Id: <20170901153535.30680-1-tklauser@distanz.ch>
+Subject: [Qemu-devel] [PATCH v7] nios2: Add Altera JTAG UART emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +21,399 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Eduardo Otubo <otubo@redhat.com>, mst@redhat.com, qemu-trivial@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com, Aurelien Jarno <aurelien@aurel32.net>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marek Vasut <marex@denx.de>, Juro Bystricky <juro.bystricky@intel.com>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+From: Juro Bystricky <juro.bystricky@intel.com>
 
-> i82374 is compiled in only on ppc and sh4, so I'm CCing the
-> maintainers for those architectures.
->
-> On Fri, Sep 01, 2017 at 01:03:32PM +0200, Eduardo Otubo wrote:
->> When used with the following command line:
->> 
->>  ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device i82374
->> 
->> QEMU with machine type 40p already creates the device i82374. If
->> specified in the command line, it will try to create it again, hence
->> generating the error.
->
-> Which error?
->
->
->>                       One way to avoid this problem is to set
->> user_creatable=false.
->> 
->> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
->
-> The patch does more than just avoiding double creation: it
-> prevents usage of "-device i82374" completely.
->
-> Maybe nobody needs it to work with -device today (would the
-> device even work?) and it is OK to set user_creatable=false until
-> we fix the crash.  But we need to be sure of that.
->
->> ---
->>  hw/dma/i82374.c | 1 +
->>  1 file changed, 1 insertion(+)
->> 
->> diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
->> index 6c0f975df0..5275d822e0 100644
->> --- a/hw/dma/i82374.c
->> +++ b/hw/dma/i82374.c
->> @@ -139,6 +139,7 @@ static void i82374_class_init(ObjectClass *klass, void *data)
->>      dc->realize = i82374_realize;
->>      dc->vmsd = &vmstate_i82374;
->>      dc->props = i82374_properties;
->> +    dc->user_creatable = false;
->
-> A "Reason:" comment explaining why user_creatable=false is
-> mandatory.  See the comment above user_creatable declaration in
-> qdev-core.h for reference.
->
-> I suggest the following:
->
->     /*
->      * Reason: i82374_realize() crashes (assertion failure inside isa_bus_dma()
->      *         if the device is instantiated twice.
->      */
+Add the Altera JTAG UART model.
 
-We need to find out *why* it crashes.  Once we know, we can likely write
-a better comment.
+Hardware emulation based on:
+https://www.altera.com/en_US/pdfs/literature/ug/ug_embedded_ip.pdf
+(Please see "Register Map" on page 65)
+
+Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
+Acked-by: Marek Vasut <marex@denx.de>
+Tested-by: Tobias Klauser <tklauser@distanz.ch>
+[tk: updated to compile with latest qemu master]
+Signed-off-by: Tobias Klauser <tklauser@distanz.ch>
+---
+
+v7:
+ - resending with changes needed to compile with latest qemu master
+
+ default-configs/nios2-softmmu.mak |   1 +
+ hw/char/Makefile.objs             |   1 +
+ hw/char/altera_juart.c            | 286 ++++++++++++++++++++++++++++++++++++++
+ include/hw/char/altera_juart.h    |  46 ++++++
+ 4 files changed, 334 insertions(+)
+ create mode 100644 hw/char/altera_juart.c
+ create mode 100644 include/hw/char/altera_juart.h
+
+diff --git a/default-configs/nios2-softmmu.mak b/default-configs/nios2-softmmu.mak
+index 74dc70caaef0..61598465c11d 100644
+--- a/default-configs/nios2-softmmu.mak
++++ b/default-configs/nios2-softmmu.mak
+@@ -4,3 +4,4 @@ CONFIG_NIOS2=y
+ CONFIG_SERIAL=y
+ CONFIG_PTIMER=y
+ CONFIG_ALTERA_TIMER=y
++CONFIG_ALTERA_JUART=y
+diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+index 1bcd37e98d9c..adb0e3ebc36a 100644
+--- a/hw/char/Makefile.objs
++++ b/hw/char/Makefile.objs
+@@ -28,6 +28,7 @@ common-obj-$(CONFIG_LM32) += lm32_juart.o
+ common-obj-$(CONFIG_LM32) += lm32_uart.o
+ common-obj-$(CONFIG_MILKYMIST) += milkymist-uart.o
+ common-obj-$(CONFIG_SCLPCONSOLE) += sclpconsole.o sclpconsole-lm.o
++common-obj-$(CONFIG_ALTERA_JUART) += altera_juart.o
+ 
+ obj-$(CONFIG_VIRTIO) += virtio-serial-bus.o
+ obj-$(CONFIG_TERMINAL3270) += terminal3270.o
+diff --git a/hw/char/altera_juart.c b/hw/char/altera_juart.c
+new file mode 100644
+index 000000000000..66adbd261f4c
+--- /dev/null
++++ b/hw/char/altera_juart.c
+@@ -0,0 +1,286 @@
++/*
++ * QEMU model of the Altera JTAG UART.
++ *
++ * Copyright (c) 2016-2017 Intel Corporation.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version
++ * 2 of the License, or (at your option) any later version.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ *
++ * The Altera JTAG UART hardware registers are described in:
++ * https://www.altera.com/en_US/pdfs/literature/ug/ug_embedded_ip.pdf
++ * (In particular "Register Map" on page 65)
++ */
++
++#include "qemu/osdep.h"
++#include "chardev/char-serial.h"
++#include "hw/char/altera_juart.h"
++#include "sysemu/sysemu.h"
++#include "qemu/error-report.h"
++
++/* Data register */
++#define OFFSET_R_DATA   0
++#define DATA_RVALID     BIT(15)
++#define DATA_RAVAIL     0xFFFF0000
++
++/* Control register */
++#define OFFSET_R_CONTROL 4
++#define CONTROL_RE      BIT(0)
++#define CONTROL_WE      BIT(1)
++#define CONTROL_RI      BIT(8)
++#define CONTROL_WI      BIT(9)
++#define CONTROL_AC      BIT(10)
++#define CONTROL_WSPACE  0xFFFF0000
++
++#define CONTROL_WMASK (CONTROL_RE | CONTROL_WE | CONTROL_AC)
++
++#define TYPE_ALTERA_JUART "altera-juart"
++#define ALTERA_JUART(obj) \
++    OBJECT_CHECK(AlteraJUARTState, (obj), TYPE_ALTERA_JUART)
++
++/* Two registers 4 bytes wide each */
++#define ALTERA_JTAG_UART_REGS_MEM_SIZE  (2 * 4)
++
++/*
++ * The JTAG UART core generates an interrupt when either of the individual
++ * interrupt conditions is pending and enabled.
++ */
++static void altera_juart_update_irq(AlteraJUARTState *s)
++{
++    unsigned int irq;
++
++    irq = ((s->jcontrol & CONTROL_WE) && (s->jcontrol & CONTROL_WI)) ||
++          ((s->jcontrol & CONTROL_RE) && (s->jcontrol & CONTROL_RI));
++
++    qemu_set_irq(s->irq, irq);
++}
++
++static uint64_t altera_juart_read(void *opaque, hwaddr addr, unsigned int size)
++{
++    AlteraJUARTState *s = opaque;
++    uint32_t r;
++
++    switch (addr) {
++    case OFFSET_R_DATA:
++        r = s->rx_fifo[(s->rx_fifo_pos - s->rx_fifo_len) & (s->rx_fifo_size - 1)];
++        if (s->rx_fifo_len) {
++            s->rx_fifo_len--;
++            qemu_chr_fe_accept_input(&s->chr);
++            s->jdata = r | DATA_RVALID | (s->rx_fifo_len << 16);
++            s->jcontrol |= CONTROL_RI;
++        } else {
++            s->jdata = 0;
++            s->jcontrol &= ~CONTROL_RI;
++        }
++
++        altera_juart_update_irq(s);
++        return s->jdata;
++
++    case OFFSET_R_CONTROL:
++        return s->jcontrol;
++    }
++
++    return 0;
++}
++
++static void altera_juart_write(void *opaque, hwaddr addr,
++                               uint64_t value, unsigned int size)
++{
++    AlteraJUARTState *s = opaque;
++    unsigned char c;
++
++    switch (addr) {
++    case OFFSET_R_DATA:
++        c = value & 0xFF;
++        s->jcontrol |= CONTROL_WI;
++        s->jdata = c;
++        qemu_chr_fe_write(&s->chr, &c, 1);
++        altera_juart_update_irq(s);
++        break;
++
++    case OFFSET_R_CONTROL:
++        /* Only RE and WE are writable */
++        value &= CONTROL_WMASK;
++        s->jcontrol &= ~CONTROL_WMASK;
++        s->jcontrol |= value;
++
++        /* Writing 1 to AC clears it to 0 */
++        if (value & CONTROL_AC) {
++            s->jcontrol &= ~CONTROL_AC;
++        }
++        altera_juart_update_irq(s);
++        break;
++    }
++}
++
++static int altera_juart_can_receive(void *opaque)
++{
++    AlteraJUARTState *s = opaque;
++    return s->rx_fifo_size - s->rx_fifo_len;
++}
++
++static void altera_juart_receive(void *opaque, const uint8_t *buf, int size)
++{
++    int i;
++    AlteraJUARTState *s = opaque;
++
++    for (i = 0; i < size; i++) {
++        s->rx_fifo[s->rx_fifo_pos] = buf[i];
++        s->rx_fifo_pos++;
++        s->rx_fifo_pos &= (s->rx_fifo_size - 1);
++        s->rx_fifo_len++;
++    }
++    s->jcontrol |= CONTROL_RI;
++    altera_juart_update_irq(s);
++}
++
++static void altera_juart_event(void *opaque, int event)
++{
++}
++
++static void altera_juart_reset(DeviceState *d)
++{
++    AlteraJUARTState *s = ALTERA_JUART(d);
++
++    s->jdata = 0;
++
++    /* The number of spaces available in the write FIFO */
++    s->jcontrol = s->rx_fifo_size << 16;
++    s->rx_fifo_pos = 0;
++    s->rx_fifo_len = 0;
++}
++
++static const MemoryRegionOps juart_ops = {
++    .read = altera_juart_read,
++    .write = altera_juart_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4
++    }
++};
++
++static void altera_juart_init(Object *obj)
++{
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    AlteraJUARTState *s = ALTERA_JUART(obj);
++
++    memory_region_init_io(&s->mmio, OBJECT(s), &juart_ops, s,
++                    TYPE_ALTERA_JUART, ALTERA_JTAG_UART_REGS_MEM_SIZE);
++    sysbus_init_mmio(sbd, &s->mmio);
++    sysbus_init_irq(sbd, &s->irq);
++}
++
++void altera_juart_create(int channel, const hwaddr addr, qemu_irq irq, uint32_t fifo_sz)
++{
++    DeviceState *dev;
++    SysBusDevice *bus;
++    Chardev *chr;
++    const char chr_name[] = "juart";
++    char label[ARRAY_SIZE(chr_name) + 1];
++
++    dev = qdev_create(NULL, TYPE_ALTERA_JUART);
++
++    if (channel >= MAX_SERIAL_PORTS) {
++        error_report("Only %d serial ports are supported by QEMU",
++                     MAX_SERIAL_PORTS);
++        exit(1);
++    }
++
++    chr = serial_hds[channel];
++    if (!chr) {
++        snprintf(label, ARRAY_SIZE(label), "%s%d", chr_name, channel);
++        chr = qemu_chr_new(label, "null");
++        if (!chr) {
++            error_report("Failed to assign serial port to altera %s", label);
++            exit(1);
++        }
++    }
++    qdev_prop_set_chr(dev, "chardev", chr);
++
++    /*
++     * FIFO size can be set from 8 to 32,768 bytes.
++     * Only powers of two are allowed.
++     */
++    if (fifo_sz < 8 || fifo_sz > 32768 || (fifo_sz & ~(1 << ctz32(fifo_sz)))) {
++        error_report("juart%d: Invalid FIFO size. [%u]", channel, fifo_sz);
++        exit(1);
++    }
++
++    qdev_prop_set_uint32(dev, "fifo-size", fifo_sz);
++    bus = SYS_BUS_DEVICE(dev);
++    qdev_init_nofail(dev);
++
++    if (addr != (hwaddr)-1) {
++        sysbus_mmio_map(bus, 0, addr);
++    }
++
++    sysbus_connect_irq(bus, 0, irq);
++}
++
++static const VMStateDescription vmstate_altera_juart = {
++    .name = "altera-juart" ,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(jdata, AlteraJUARTState),
++        VMSTATE_UINT32(jcontrol, AlteraJUARTState),
++        VMSTATE_VBUFFER_UINT32(rx_fifo, AlteraJUARTState, 1, NULL, rx_fifo_size),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void altera_juart_realize(DeviceState *dev, Error **errp)
++{
++    AlteraJUARTState *s = ALTERA_JUART(dev);
++    qemu_chr_fe_set_handlers(&s->chr,
++                             altera_juart_can_receive,
++                             altera_juart_receive,
++                             altera_juart_event,
++                             NULL, s, NULL, true);
++    s->rx_fifo = g_malloc(s->rx_fifo_size);
++}
++
++static void altera_juart_unrealize(DeviceState *dev, Error **errp)
++{
++    AlteraJUARTState *s = ALTERA_JUART(dev);
++    g_free(s->rx_fifo);
++}
++
++static Property altera_juart_props[] = {
++    DEFINE_PROP_CHR("chardev", AlteraJUARTState, chr),
++    DEFINE_PROP_UINT32("fifo-size", AlteraJUARTState, rx_fifo_size,
++                                        ALTERA_JUART_DEFAULT_FIFO_SIZE),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void altera_juart_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++
++    dc->realize = altera_juart_realize;
++    dc->unrealize = altera_juart_unrealize;
++    dc->props = altera_juart_props;
++    dc->vmsd = &vmstate_altera_juart;
++    dc->reset = altera_juart_reset;
++    dc->desc = "Altera JTAG UART";
++}
++
++static const TypeInfo altera_juart_info = {
++    .name          = TYPE_ALTERA_JUART,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(AlteraJUARTState),
++    .instance_init = altera_juart_init,
++    .class_init    = altera_juart_class_init,
++};
++
++static void altera_juart_register(void)
++{
++    type_register_static(&altera_juart_info);
++}
++
++type_init(altera_juart_register)
+diff --git a/include/hw/char/altera_juart.h b/include/hw/char/altera_juart.h
+new file mode 100644
+index 000000000000..fcf7a602523d
+--- /dev/null
++++ b/include/hw/char/altera_juart.h
+@@ -0,0 +1,46 @@
++/*
++ * Altera JTAG UART emulation
++ *
++ * Copyright (c) 2016-2017 Intel Corporation.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version
++ * 2 of the License, or (at your option) any later version.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef ALTERA_JUART_H
++#define ALTERA_JUART_H
++
++#include "chardev/char-fe.h"
++#include "hw/sysbus.h"
++
++/*
++ * The read and write FIFO depths can be set from 8 to 32,768 bytes.
++ * Only powers of two are allowed. A depth of 64 is generally optimal for
++ * performance, and larger values are rarely necessary.
++ */
++
++#define ALTERA_JUART_DEFAULT_FIFO_SIZE 64
++
++typedef struct AlteraJUARTState {
++    SysBusDevice busdev;
++    MemoryRegion mmio;
++    CharBackend chr;
++    qemu_irq irq;
++
++    unsigned int rx_fifo_size;
++    unsigned int rx_fifo_pos;
++    unsigned int rx_fifo_len;
++    uint32_t jdata;
++    uint32_t jcontrol;
++    uint8_t *rx_fifo;
++} AlteraJUARTState;
++
++void altera_juart_create(int channel, const hwaddr addr, qemu_irq irq,
++                         uint32_t fifo_size);
++
++#endif /* ALTERA_JUART_H */
+-- 
+2.13.0
