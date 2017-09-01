@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnqIu-0007X9-NU
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:34 -0400
+	(envelope-from <eblake@redhat.com>) id 1dnqJ0-0007cj-26
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnqIo-0001yO-C6
+	(envelope-from <eblake@redhat.com>) id 1dnqIu-00025j-PV
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33440)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnqIu-00025I-Hj
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:28 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9A9DEC056819
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 18:04:27 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Fri,  1 Sep 2017 13:03:27 -0500
-Message-Id: <20170901180340.30009-17-eblake@redhat.com>
+Date: Fri,  1 Sep 2017 13:03:38 -0500
+Message-Id: <20170901180340.30009-28-eblake@redhat.com>
 In-Reply-To: <20170901180340.30009-1-eblake@redhat.com>
 References: <20170901180340.30009-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 16/29] libqos: Use explicit QTestState for
- virtio operations
+Subject: [Qemu-devel] [PATCH v6 27/29] libqtest: Make qtest_init() accept
+ format string
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,497 +31,261 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, "open list:virtio-blk" <qemu-block@nongnu.org>
+Cc: armbru@redhat.com, pbonzini@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-Drop one more client of global_qtest by teaching all virtio test
-functionality to pass in an explicit QTestState in constructors,
-where it is then reused for later access.  Adjust all callers.
-This gets us one step closer to eliminating implicit use of
-global_qtest.
+Several callers were formatting a string into a temporary
+variable before calling qtest_init(); factor that into the
+common code.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/libqos/virtio-mmio.h |  3 +-
- tests/libqos/virtio.h      |  5 ++-
- tests/libqos/virtio-mmio.c | 54 +++++++++++++++++---------------
- tests/libqos/virtio-pci.c  |  3 ++
- tests/libqos/virtio.c      | 77 ++++++++++++++++++++++++++--------------------
- tests/virtio-blk-test.c    |  3 +-
- 6 files changed, 84 insertions(+), 61 deletions(-)
+ tests/libqtest.h         |  7 ++++---
+ tests/libqtest.c         | 13 ++++++++++--
+ tests/bios-tables-test.c |  7 +------
+ tests/postcopy-test.c    |  4 ++--
+ tests/vhost-user-test.c  | 51 ++++++++++++++----------------------------------
+ 5 files changed, 33 insertions(+), 49 deletions(-)
 
-diff --git a/tests/libqos/virtio-mmio.h b/tests/libqos/virtio-mmio.h
-index e3e52b9ce1..bd01386054 100644
---- a/tests/libqos/virtio-mmio.h
-+++ b/tests/libqos/virtio-mmio.h
-@@ -41,6 +41,7 @@ typedef struct QVirtioMMIODevice {
+diff --git a/tests/libqtest.h b/tests/libqtest.h
+index 3ae570927a..d338de3e22 100644
+--- a/tests/libqtest.h
++++ b/tests/libqtest.h
+@@ -25,11 +25,12 @@ extern QTestState *global_qtest;
 
- extern const QVirtioBus qvirtio_mmio;
+ /**
+  * qtest_init:
+- * @extra_args: other arguments to pass to QEMU.
++ * @extra_args...: other arguments to pass to QEMU, formatted as if by
++ * sprintf().
+  *
+  * Returns: #QTestState instance.
+  */
+-QTestState *qtest_init(const char *extra_args);
++QTestState *qtest_init(const char *extra_args, ...) GCC_FMT_ATTR(1, 2);
 
--QVirtioMMIODevice *qvirtio_mmio_init_device(uint64_t addr, uint32_t page_size);
-+QVirtioMMIODevice *qvirtio_mmio_init_device(QTestState *qts, uint64_t addr,
-+                                            uint32_t page_size);
-
- #endif
-diff --git a/tests/libqos/virtio.h b/tests/libqos/virtio.h
-index 8fbcd1869c..d180d54fc4 100644
---- a/tests/libqos/virtio.h
-+++ b/tests/libqos/virtio.h
-@@ -19,6 +19,7 @@ typedef struct QVirtioBus QVirtioBus;
-
- typedef struct QVirtioDevice {
-     const QVirtioBus *bus;
-+    QTestState *qts;
-     /* Device type */
-     uint16_t device_type;
- } QVirtioDevice;
-@@ -35,12 +36,14 @@ typedef struct QVirtQueue {
-     uint16_t last_used_idx;
-     bool indirect;
-     bool event;
-+    QTestState *qts;
- } QVirtQueue;
-
- typedef struct QVRingIndirectDesc {
-     uint64_t desc; /* This points to an array fo struct vring_desc */
-     uint16_t index;
-     uint16_t elem;
-+    QTestState *qts;
- } QVRingIndirectDesc;
-
- struct QVirtioBus {
-@@ -93,7 +96,7 @@ struct QVirtioBus {
- static inline bool qvirtio_is_big_endian(QVirtioDevice *d)
+ /**
+  * qtest_init_without_qmp_handshake:
+@@ -518,7 +519,7 @@ void qtest_add_abrt_handler(GHookFunc fn, const void *data);
+  */
+ static inline QTestState *qtest_start(const char *args)
  {
-     /* FIXME: virtio 1.0 is always little-endian */
--    return qtest_big_endian(global_qtest);
-+    return qtest_big_endian(d->qts);
+-    global_qtest = qtest_init(args);
++    global_qtest = qtest_init("%s", args);
+     return global_qtest;
  }
 
- static inline uint32_t qvring_size(uint32_t num, uint32_t align)
-diff --git a/tests/libqos/virtio-mmio.c b/tests/libqos/virtio-mmio.c
-index 7aa8383338..d151209d8e 100644
---- a/tests/libqos/virtio-mmio.c
-+++ b/tests/libqos/virtio-mmio.c
-@@ -18,40 +18,40 @@
- static uint8_t qvirtio_mmio_config_readb(QVirtioDevice *d, uint64_t off)
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index b6dd26e54a..18facbf130 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -347,9 +347,18 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
+     return s;
+ }
+
+-QTestState *qtest_init(const char *extra_args)
++QTestState *qtest_init(const char *extra_args, ...)
  {
-     QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
--    return readb(dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
-+    return qtest_readb(d->qts, dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
- }
-
- static uint16_t qvirtio_mmio_config_readw(QVirtioDevice *d, uint64_t off)
- {
-     QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
--    return readw(dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
-+    return qtest_readw(d->qts, dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
- }
-
- static uint32_t qvirtio_mmio_config_readl(QVirtioDevice *d, uint64_t off)
- {
-     QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
--    return readl(dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
-+    return qtest_readl(d->qts, dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
- }
-
- static uint64_t qvirtio_mmio_config_readq(QVirtioDevice *d, uint64_t off)
- {
-     QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
--    return readq(dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
-+    return qtest_readq(d->qts, dev->addr + QVIRTIO_MMIO_DEVICE_SPECIFIC + off);
- }
-
- static uint32_t qvirtio_mmio_get_features(QVirtioDevice *d)
- {
-     QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
--    writel(dev->addr + QVIRTIO_MMIO_HOST_FEATURES_SEL, 0);
--    return readl(dev->addr + QVIRTIO_MMIO_HOST_FEATURES);
-+    qtest_writel(d->qts, dev->addr + QVIRTIO_MMIO_HOST_FEATURES_SEL, 0);
-+    return qtest_readl(d->qts, dev->addr + QVIRTIO_MMIO_HOST_FEATURES);
- }
-
- static void qvirtio_mmio_set_features(QVirtioDevice *d, uint32_t features)
- {
-     QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-     dev->features = features;
--    writel(dev->addr + QVIRTIO_MMIO_GUEST_FEATURES_SEL, 0);
--    writel(dev->addr + QVIRTIO_MMIO_GUEST_FEATURES, features);
-+    qtest_writel(d->qts, dev->addr + QVIRTIO_MMIO_GUEST_FEATURES_SEL, 0);
-+    qtest_writel(d->qts, dev->addr + QVIRTIO_MMIO_GUEST_FEATURES, features);
- }
-
- static uint32_t qvirtio_mmio_get_guest_features(QVirtioDevice *d)
-@@ -63,13 +63,14 @@ static uint32_t qvirtio_mmio_get_guest_features(QVirtioDevice *d)
- static uint8_t qvirtio_mmio_get_status(QVirtioDevice *d)
- {
-     QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
--    return (uint8_t)readl(dev->addr + QVIRTIO_MMIO_DEVICE_STATUS);
-+    return (uint8_t)qtest_readl(d->qts, dev->addr + QVIRTIO_MMIO_DEVICE_STATUS);
- }
-
- static void qvirtio_mmio_set_status(QVirtioDevice *d, uint8_t status)
- {
-     QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
--    writel(dev->addr + QVIRTIO_MMIO_DEVICE_STATUS, (uint32_t)status);
-+    qtest_writel(d->qts, dev->addr + QVIRTIO_MMIO_DEVICE_STATUS,
-+                 (uint32_t)status);
- }
-
- static bool qvirtio_mmio_get_queue_isr_status(QVirtioDevice *d, QVirtQueue *vq)
-@@ -77,9 +78,9 @@ static bool qvirtio_mmio_get_queue_isr_status(QVirtioDevice *d, QVirtQueue *vq)
-     QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-     uint32_t isr;
-
--    isr = readl(dev->addr + QVIRTIO_MMIO_INTERRUPT_STATUS) & 1;
-+    isr = qtest_readl(d->qts, dev->addr + QVIRTIO_MMIO_INTERRUPT_STATUS) & 1;
-     if (isr != 0) {
--        writel(dev->addr + QVIRTIO_MMIO_INTERRUPT_ACK, 1);
-+        qtest_writel(d->qts, dev->addr + QVIRTIO_MMIO_INTERRUPT_ACK, 1);
-         return true;
-     }
-
-@@ -91,9 +92,9 @@ static bool qvirtio_mmio_get_config_isr_status(QVirtioDevice *d)
-     QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
-     uint32_t isr;
-
--    isr = readl(dev->addr + QVIRTIO_MMIO_INTERRUPT_STATUS) & 2;
-+    isr = qtest_readl(d->qts, dev->addr + QVIRTIO_MMIO_INTERRUPT_STATUS) & 2;
-     if (isr != 0) {
--        writel(dev->addr + QVIRTIO_MMIO_INTERRUPT_ACK, 2);
-+        qtest_writel(d->qts, dev->addr + QVIRTIO_MMIO_INTERRUPT_ACK, 2);
-         return true;
-     }
-
-@@ -103,21 +104,23 @@ static bool qvirtio_mmio_get_config_isr_status(QVirtioDevice *d)
- static void qvirtio_mmio_queue_select(QVirtioDevice *d, uint16_t index)
- {
-     QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
--    writel(dev->addr + QVIRTIO_MMIO_QUEUE_SEL, (uint32_t)index);
-+    qtest_writel(d->qts, dev->addr + QVIRTIO_MMIO_QUEUE_SEL, (uint32_t)index);
-
--    g_assert_cmphex(readl(dev->addr + QVIRTIO_MMIO_QUEUE_PFN), ==, 0);
-+    g_assert_cmphex(qtest_readl(d->qts, dev->addr + QVIRTIO_MMIO_QUEUE_PFN),
-+                    ==, 0);
- }
-
- static uint16_t qvirtio_mmio_get_queue_size(QVirtioDevice *d)
- {
-     QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
--    return (uint16_t)readl(dev->addr + QVIRTIO_MMIO_QUEUE_NUM_MAX);
-+    return (uint16_t)qtest_readl(d->qts,
-+                                 dev->addr + QVIRTIO_MMIO_QUEUE_NUM_MAX);
- }
-
- static void qvirtio_mmio_set_queue_address(QVirtioDevice *d, uint32_t pfn)
- {
-     QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
--    writel(dev->addr + QVIRTIO_MMIO_QUEUE_PFN, pfn);
-+    qtest_writel(d->qts, dev->addr + QVIRTIO_MMIO_QUEUE_PFN, pfn);
- }
-
- static QVirtQueue *qvirtio_mmio_virtqueue_setup(QVirtioDevice *d,
-@@ -128,8 +131,9 @@ static QVirtQueue *qvirtio_mmio_virtqueue_setup(QVirtioDevice *d,
-     uint64_t addr;
-
-     vq = g_malloc0(sizeof(*vq));
-+    vq->qts = d->qts;
-     qvirtio_mmio_queue_select(d, index);
--    writel(dev->addr + QVIRTIO_MMIO_QUEUE_ALIGN, dev->page_size);
-+    qtest_writel(d->qts, dev->addr + QVIRTIO_MMIO_QUEUE_ALIGN, dev->page_size);
-
-     vq->index = index;
-     vq->size = qvirtio_mmio_get_queue_size(d);
-@@ -139,7 +143,7 @@ static QVirtQueue *qvirtio_mmio_virtqueue_setup(QVirtioDevice *d,
-     vq->indirect = (dev->features & (1u << VIRTIO_RING_F_INDIRECT_DESC)) != 0;
-     vq->event = (dev->features & (1u << VIRTIO_RING_F_EVENT_IDX)) != 0;
-
--    writel(dev->addr + QVIRTIO_MMIO_QUEUE_NUM, vq->size);
-+    qtest_writel(d->qts, dev->addr + QVIRTIO_MMIO_QUEUE_NUM, vq->size);
-
-     /* Check different than 0 */
-     g_assert_cmpint(vq->size, !=, 0);
-@@ -164,7 +168,7 @@ static void qvirtio_mmio_virtqueue_cleanup(QVirtQueue *vq,
- static void qvirtio_mmio_virtqueue_kick(QVirtioDevice *d, QVirtQueue *vq)
- {
-     QVirtioMMIODevice *dev = (QVirtioMMIODevice *)d;
--    writel(dev->addr + QVIRTIO_MMIO_QUEUE_NOTIFY, vq->index);
-+    qtest_writel(d->qts, dev->addr + QVIRTIO_MMIO_QUEUE_NOTIFY, vq->index);
- }
-
- const QVirtioBus qvirtio_mmio = {
-@@ -187,21 +191,23 @@ const QVirtioBus qvirtio_mmio = {
-     .virtqueue_kick = qvirtio_mmio_virtqueue_kick,
- };
-
--QVirtioMMIODevice *qvirtio_mmio_init_device(uint64_t addr, uint32_t page_size)
-+QVirtioMMIODevice *qvirtio_mmio_init_device(QTestState *qts, uint64_t addr,
-+                                            uint32_t page_size)
- {
-     QVirtioMMIODevice *dev;
-     uint32_t magic;
-     dev = g_malloc0(sizeof(*dev));
-
--    magic = readl(addr + QVIRTIO_MMIO_MAGIC_VALUE);
-+    magic = qtest_readl(qts, addr + QVIRTIO_MMIO_MAGIC_VALUE);
-     g_assert(magic == ('v' | 'i' << 8 | 'r' << 16 | 't' << 24));
-
-     dev->addr = addr;
-     dev->page_size = page_size;
-     dev->vdev.device_type = readl(addr + QVIRTIO_MMIO_DEVICE_ID);
-     dev->vdev.bus = &qvirtio_mmio;
-+    dev->vdev.qts = qts;
-
--    writel(addr + QVIRTIO_MMIO_GUEST_PAGE_SIZE, page_size);
-+    qtest_writel(qts, addr + QVIRTIO_MMIO_GUEST_PAGE_SIZE, page_size);
-
-     return dev;
- }
-diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
-index 7ac15c04e1..f15971220c 100644
---- a/tests/libqos/virtio-pci.c
-+++ b/tests/libqos/virtio-pci.c
-@@ -240,6 +240,7 @@ static QVirtQueue *qvirtio_pci_virtqueue_setup(QVirtioDevice *d,
-     vqpci->vq.align = VIRTIO_PCI_VRING_ALIGN;
-     vqpci->vq.indirect = (feat & (1u << VIRTIO_RING_F_INDIRECT_DESC)) != 0;
-     vqpci->vq.event = (feat & (1u << VIRTIO_RING_F_EVENT_IDX)) != 0;
-+    vqpci->vq.qts = d->qts;
-
-     vqpci->msix_entry = -1;
-     vqpci->msix_addr = 0;
-@@ -316,6 +317,7 @@ QVirtioPCIDevice *qvirtio_pci_device_find(QPCIBus *bus, uint16_t device_type)
-                         qvirtio_pci_assign_device, &dev);
-
-     dev->vdev.bus = &qvirtio_pci;
-+    dev->vdev.qts = bus->qts;
-
-     return dev;
- }
-@@ -329,6 +331,7 @@ QVirtioPCIDevice *qvirtio_pci_device_find_slot(QPCIBus *bus,
-                         qvirtio_pci_assign_device, &dev);
-
-     dev->vdev.bus = &qvirtio_pci;
-+    dev->vdev.qts = bus->qts;
-
-     return dev;
- }
-diff --git a/tests/libqos/virtio.c b/tests/libqos/virtio.c
-index 9880a6964e..064a82f0f3 100644
---- a/tests/libqos/virtio.c
-+++ b/tests/libqos/virtio.c
-@@ -87,7 +87,7 @@ void qvirtio_wait_queue_isr(QVirtioDevice *d,
-     gint64 start_time = g_get_monotonic_time();
-
-     for (;;) {
--        clock_step(100);
-+        qtest_clock_step(d->qts, 100);
-         if (d->bus->get_queue_isr_status(d, vq)) {
-             return;
-         }
-@@ -109,7 +109,7 @@ uint8_t qvirtio_wait_status_byte_no_isr(QVirtioDevice *d,
-     uint8_t val;
-
-     while ((val = readb(addr)) == 0xff) {
--        clock_step(100);
-+        qtest_clock_step(d->qts, 100);
-         g_assert(!d->bus->get_queue_isr_status(d, vq));
-         g_assert(g_get_monotonic_time() - start_time <= timeout_us);
-     }
-@@ -133,7 +133,7 @@ void qvirtio_wait_used_elem(QVirtioDevice *d,
-     for (;;) {
-         uint32_t got_desc_idx;
-
--        clock_step(100);
-+        qtest_clock_step(d->qts, 100);
-
-         if (d->bus->get_queue_isr_status(d, vq) &&
-             qvirtqueue_get_buf(vq, &got_desc_idx)) {
-@@ -150,7 +150,7 @@ void qvirtio_wait_config_isr(QVirtioDevice *d, gint64 timeout_us)
-     gint64 start_time = g_get_monotonic_time();
-
-     for (;;) {
--        clock_step(100);
-+        qtest_clock_step(d->qts, 100);
-         if (d->bus->get_config_isr_status(d)) {
-             return;
-         }
-@@ -169,22 +169,23 @@ void qvring_init(const QGuestAllocator *alloc, QVirtQueue *vq, uint64_t addr)
-
-     for (i = 0; i < vq->size - 1; i++) {
-         /* vq->desc[i].addr */
--        writeq(vq->desc + (16 * i), 0);
-+        qtest_writeq(vq->qts, vq->desc + (16 * i), 0);
-         /* vq->desc[i].next */
--        writew(vq->desc + (16 * i) + 14, i + 1);
-+        qtest_writew(vq->qts, vq->desc + (16 * i) + 14, i + 1);
-     }
-
-     /* vq->avail->flags */
--    writew(vq->avail, 0);
-+    qtest_writew(vq->qts, vq->avail, 0);
-     /* vq->avail->idx */
--    writew(vq->avail + 2, 0);
-+    qtest_writew(vq->qts, vq->avail + 2, 0);
-     /* vq->avail->used_event */
--    writew(vq->avail + 4 + (2 * vq->size), 0);
-+    qtest_writew(vq->qts, vq->avail + 4 + (2 * vq->size), 0);
-
-     /* vq->used->flags */
--    writew(vq->used, 0);
-+    qtest_writew(vq->qts, vq->used, 0);
-     /* vq->used->avail_event */
--    writew(vq->used + 2 + sizeof(struct vring_used_elem) * vq->size, 0);
-+    qtest_writew(vq->qts,
-+                 vq->used + 2 + sizeof(struct vring_used_elem) * vq->size, 0);
- }
-
- QVRingIndirectDesc *qvring_indirect_desc_setup(QVirtioDevice *d,
-@@ -196,14 +197,15 @@ QVRingIndirectDesc *qvring_indirect_desc_setup(QVirtioDevice *d,
-     indirect->index = 0;
-     indirect->elem = elem;
-     indirect->desc = guest_alloc(alloc, sizeof(struct vring_desc) * elem);
-+    indirect->qts = d->qts;
-
-     for (i = 0; i < elem - 1; ++i) {
-         /* indirect->desc[i].addr */
--        writeq(indirect->desc + (16 * i), 0);
-+        qtest_writeq(d->qts, indirect->desc + (16 * i), 0);
-         /* indirect->desc[i].flags */
--        writew(indirect->desc + (16 * i) + 12, VRING_DESC_F_NEXT);
-+        qtest_writew(d->qts, indirect->desc + (16 * i) + 12, VRING_DESC_F_NEXT);
-         /* indirect->desc[i].next */
--        writew(indirect->desc + (16 * i) + 14, i + 1);
-+        qtest_writew(d->qts, indirect->desc + (16 * i) + 14, i + 1);
-     }
-
-     return indirect;
-@@ -216,18 +218,21 @@ void qvring_indirect_desc_add(QVRingIndirectDesc *indirect, uint64_t data,
-
-     g_assert_cmpint(indirect->index, <, indirect->elem);
-
--    flags = readw(indirect->desc + (16 * indirect->index) + 12);
-+    flags = qtest_readw(indirect->qts,
-+                        indirect->desc + (16 * indirect->index) + 12);
-
-     if (write) {
-         flags |= VRING_DESC_F_WRITE;
-     }
-
-     /* indirect->desc[indirect->index].addr */
--    writeq(indirect->desc + (16 * indirect->index), data);
-+    qtest_writeq(indirect->qts, indirect->desc + (16 * indirect->index), data);
-     /* indirect->desc[indirect->index].len */
--    writel(indirect->desc + (16 * indirect->index) + 8, len);
-+    qtest_writel(indirect->qts,
-+                 indirect->desc + (16 * indirect->index) + 8, len);
-     /* indirect->desc[indirect->index].flags */
--    writew(indirect->desc + (16 * indirect->index) + 12, flags);
-+    qtest_writew(indirect->qts,
-+                 indirect->desc + (16 * indirect->index) + 12, flags);
-
-     indirect->index++;
- }
-@@ -247,11 +252,11 @@ uint32_t qvirtqueue_add(QVirtQueue *vq, uint64_t data, uint32_t len, bool write,
-     }
-
-     /* vq->desc[vq->free_head].addr */
--    writeq(vq->desc + (16 * vq->free_head), data);
-+    qtest_writeq(vq->qts, vq->desc + (16 * vq->free_head), data);
-     /* vq->desc[vq->free_head].len */
--    writel(vq->desc + (16 * vq->free_head) + 8, len);
-+    qtest_writel(vq->qts, vq->desc + (16 * vq->free_head) + 8, len);
-     /* vq->desc[vq->free_head].flags */
--    writew(vq->desc + (16 * vq->free_head) + 12, flags);
-+    qtest_writew(vq->qts, vq->desc + (16 * vq->free_head) + 12, flags);
-
-     return vq->free_head++; /* Return and increase, in this order */
- }
-@@ -265,12 +270,13 @@ uint32_t qvirtqueue_add_indirect(QVirtQueue *vq, QVRingIndirectDesc *indirect)
-     vq->num_free--;
-
-     /* vq->desc[vq->free_head].addr */
--    writeq(vq->desc + (16 * vq->free_head), indirect->desc);
-+    qtest_writeq(vq->qts, vq->desc + (16 * vq->free_head), indirect->desc);
-     /* vq->desc[vq->free_head].len */
--    writel(vq->desc + (16 * vq->free_head) + 8,
--           sizeof(struct vring_desc) * indirect->elem);
-+    qtest_writel(vq->qts, vq->desc + (16 * vq->free_head) + 8,
-+                 sizeof(struct vring_desc) * indirect->elem);
-     /* vq->desc[vq->free_head].flags */
--    writew(vq->desc + (16 * vq->free_head) + 12, VRING_DESC_F_INDIRECT);
-+    qtest_writew(vq->qts,
-+                 vq->desc + (16 * vq->free_head) + 12, VRING_DESC_F_INDIRECT);
-
-     return vq->free_head++; /* Return and increase, in this order */
- }
-@@ -278,21 +284,23 @@ uint32_t qvirtqueue_add_indirect(QVirtQueue *vq, QVRingIndirectDesc *indirect)
- void qvirtqueue_kick(QVirtioDevice *d, QVirtQueue *vq, uint32_t free_head)
- {
-     /* vq->avail->idx */
--    uint16_t idx = readw(vq->avail + 2);
-+    uint16_t idx = qtest_readw(d->qts, vq->avail + 2);
-     /* vq->used->flags */
-     uint16_t flags;
-     /* vq->used->avail_event */
-     uint16_t avail_event;
-
-+    assert(d->qts == vq->qts);
+-    QTestState *s = qtest_init_without_qmp_handshake(extra_args);
++    va_list ap;
++    QTestState *s;
++    char *cmd;
 +
-     /* vq->avail->ring[idx % vq->size] */
--    writew(vq->avail + 4 + (2 * (idx % vq->size)), free_head);
-+    qtest_writew(d->qts, vq->avail + 4 + (2 * (idx % vq->size)), free_head);
-     /* vq->avail->idx */
--    writew(vq->avail + 2, idx + 1);
-+    qtest_writew(d->qts, vq->avail + 2, idx + 1);
++    va_start(ap, extra_args);
++    cmd = g_strdup_vprintf(extra_args, ap);
++    va_end(ap);
++
++    s = qtest_init_without_qmp_handshake(cmd);
++    g_free(cmd);
 
-     /* Must read after idx is updated */
--    flags = readw(vq->avail);
--    avail_event = readw(vq->used + 4 +
--                                sizeof(struct vring_used_elem) * vq->size);
-+    flags = qtest_readw(d->qts, vq->avail);
-+    avail_event = qtest_readw(d->qts, vq->used + 4 +
-+                              sizeof(struct vring_used_elem) * vq->size);
+     /* Read the QMP greeting and then do the handshake */
+     qtest_qmp_discard_response(s, "");
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 976792f2c5..f8a107499f 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -623,18 +623,14 @@ static void test_smbios_structs(test_data *data)
 
-     /* < 1 because we add elements to avail queue one by one */
-     if ((flags & VRING_USED_F_NO_NOTIFY) == 0 &&
-@@ -313,7 +321,7 @@ bool qvirtqueue_get_buf(QVirtQueue *vq, uint32_t *desc_idx)
+ static void test_acpi_one(const char *params, test_data *data)
  {
-     uint16_t idx;
+-    char *args;
+-
+     /* Disable kernel irqchip to be able to override apic irq0. */
+-    args = g_strdup_printf("-machine %s,accel=%s,kernel-irqchip=off "
++    data->qts = qtest_init("-machine %s,accel=%s,kernel-irqchip=off "
+                            "-net none -display none %s "
+                            "-drive id=hd0,if=none,file=%s,format=raw "
+                            "-device ide-hd,drive=hd0 ",
+                            data->machine, "kvm:tcg",
+                            params ? params : "", disk);
 
--    idx = readw(vq->used + offsetof(struct vring_used, idx));
-+    idx = qtest_readw(vq->qts, vq->used + offsetof(struct vring_used, idx));
-     if (idx == vq->last_used_idx) {
-         return false;
-     }
-@@ -325,7 +333,8 @@ bool qvirtqueue_get_buf(QVirtQueue *vq, uint32_t *desc_idx)
-                     offsetof(struct vring_used, ring) +
-                     (vq->last_used_idx % vq->size) *
-                     sizeof(struct vring_used_elem);
--        *desc_idx = readl(elem_addr + offsetof(struct vring_used_elem, id));
-+        *desc_idx = qtest_readl(vq->qts, elem_addr +
-+                                offsetof(struct vring_used_elem, id));
-     }
+-    data->qts = qtest_init(args);
+-
+     boot_sector_test(data->qts);
 
-     vq->last_used_idx++;
-@@ -337,5 +346,5 @@ void qvirtqueue_set_used_event(QVirtQueue *vq, uint16_t idx)
-     g_assert(vq->event);
+     test_acpi_rsdp_address(data);
+@@ -657,7 +653,6 @@ static void test_acpi_one(const char *params, test_data *data)
+     test_smbios_structs(data);
 
-     /* vq->avail->used_event */
--    writew(vq->avail + 4 + (2 * vq->size), idx);
-+    qtest_writew(vq->qts, vq->avail + 4 + (2 * vq->size), idx);
+     qtest_quit(data->qts);
+-    g_free(args);
  }
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index 0576cb16ba..26d0a7e9af 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -687,7 +687,8 @@ static void mmio_basic(void)
 
-     arm_test_start();
+ static uint8_t base_required_struct_types[] = {
+diff --git a/tests/postcopy-test.c b/tests/postcopy-test.c
+index 0e5fe20a83..20cfb280f6 100644
+--- a/tests/postcopy-test.c
++++ b/tests/postcopy-test.c
+@@ -403,10 +403,10 @@ static void test_migrate(void)
 
--    dev = qvirtio_mmio_init_device(MMIO_DEV_BASE_ADDR, MMIO_PAGE_SIZE);
-+    dev = qvirtio_mmio_init_device(global_qtest, MMIO_DEV_BASE_ADDR,
-+                                   MMIO_PAGE_SIZE);
-     g_assert(dev != NULL);
-     g_assert_cmphex(dev->vdev.device_type, ==, VIRTIO_ID_BLOCK);
+     g_free(bootpath);
 
+-    from = qtest_init(cmd_src);
++    from = qtest_init("%s", cmd_src);
+     g_free(cmd_src);
+
+-    to = qtest_init(cmd_dst);
++    to = qtest_init("%s", cmd_dst);
+     g_free(cmd_dst);
+
+     assert(!global_qtest);
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index 1e0c50d12a..0dbed5a36a 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -482,12 +482,12 @@ static inline void test_server_connect(TestServer *server)
+ }
+
+ #define GET_QEMU_CMD(s)                                         \
+-    g_strdup_printf(QEMU_CMD, 512, 512, (root), (s)->chr_name,  \
+-                    (s)->socket_path, "", (s)->chr_name)
++    QEMU_CMD, 512, 512, (root), (s)->chr_name,                  \
++        (s)->socket_path, "", (s)->chr_name
+
+ #define GET_QEMU_CMDE(s, mem, chr_opts, extra, ...)                     \
+-    g_strdup_printf(QEMU_CMD extra, (mem), (mem), (root), (s)->chr_name, \
+-                    (s)->socket_path, (chr_opts), (s)->chr_name, ##__VA_ARGS__)
++    QEMU_CMD extra, (mem), (mem), (root), (s)->chr_name,                \
++        (s)->socket_path, (chr_opts), (s)->chr_name, ##__VA_ARGS__
+
+ static gboolean _test_server_free(TestServer *server)
+ {
+@@ -637,7 +637,6 @@ static void test_migrate(void)
+     TestServer *dest = test_server_new("dest");
+     char *uri = g_strdup_printf("%s%s", "unix:", dest->mig_path);
+     GSource *source;
+-    gchar *cmd;
+     QDict *rsp;
+     guint8 *log;
+     guint64 size;
+@@ -645,18 +644,14 @@ static void test_migrate(void)
+     test_server_listen(s);
+     test_server_listen(dest);
+
+-    cmd = GET_QEMU_CMDE(s, 2, "", "");
+-    s->qts = qtest_init(cmd);
+-    g_free(cmd);
++    s->qts = qtest_init(GET_QEMU_CMDE(s, 2, "", ""));
+
+     init_virtio_dev(s);
+     wait_for_fds(s);
+     size = get_log_size(s);
+     g_assert_cmpint(size, ==, (2 * 1024 * 1024) / (VHOST_LOG_PAGE * 8));
+
+-    cmd = GET_QEMU_CMDE(dest, 2, "", " -incoming %s", uri);
+-    dest->qts = qtest_init(cmd);
+-    g_free(cmd);
++    dest->qts = qtest_init(GET_QEMU_CMDE(dest, 2, "", " -incoming %s", uri));
+
+     source = g_source_new(&test_migrate_source_funcs,
+                           sizeof(TestMigrateSource));
+@@ -749,12 +744,9 @@ connect_thread(gpointer data)
+ static void test_reconnect_subprocess(void)
+ {
+     TestServer *s = test_server_new("reconnect");
+-    char *cmd;
+
+     g_thread_new("connect", connect_thread, s);
+-    cmd = GET_QEMU_CMDE(s, 2, ",server", "");
+-    s->qts = qtest_init(cmd);
+-    g_free(cmd);
++    s->qts = qtest_init(GET_QEMU_CMDE(s, 2, ",server", ""));
+
+     init_virtio_dev(s);
+     wait_for_fds(s);
+@@ -783,13 +775,10 @@ static void test_reconnect(void)
+ static void test_connect_fail_subprocess(void)
+ {
+     TestServer *s = test_server_new("connect-fail");
+-    char *cmd;
+
+     s->test_fail = true;
+     g_thread_new("connect", connect_thread, s);
+-    cmd = GET_QEMU_CMDE(s, 2, ",server", "");
+-    s->qts = qtest_init(cmd);
+-    g_free(cmd);
++    s->qts = qtest_init(GET_QEMU_CMDE(s, 2, ",server", ""));
+
+     init_virtio_dev(s);
+     wait_for_fds(s);
+@@ -810,13 +799,10 @@ static void test_connect_fail(void)
+ static void test_flags_mismatch_subprocess(void)
+ {
+     TestServer *s = test_server_new("flags-mismatch");
+-    char *cmd;
+
+     s->test_flags = TEST_FLAGS_DISCONNECT;
+     g_thread_new("connect", connect_thread, s);
+-    cmd = GET_QEMU_CMDE(s, 2, ",server", "");
+-    s->qts = qtest_init(cmd);
+-    g_free(cmd);
++    s->qts = qtest_init(GET_QEMU_CMDE(s, 2, ",server", ""));
+
+     init_virtio_dev(s);
+     wait_for_fds(s);
+@@ -875,19 +861,16 @@ static void test_multiqueue(void)
+     QPCIBus *bus;
+     QVirtQueuePCI *vq[queues * 2];
+     QGuestAllocator *alloc;
+-    char *cmd;
+     int i;
+
+     s->queues = queues;
+     test_server_listen(s);
+
+-    cmd = g_strdup_printf(QEMU_CMD_MEM QEMU_CMD_CHR QEMU_CMD_NETDEV ",queues=%d "
+-                          "-device virtio-net-pci,netdev=net0,mq=on,vectors=%d",
+-                          512, 512, root, s->chr_name,
+-                          s->socket_path, "", s->chr_name,
+-                          queues, queues * 2 + 2);
+-    s->qts = qtest_init(cmd);
+-    g_free(cmd);
++    s->qts = qtest_init(QEMU_CMD_MEM QEMU_CMD_CHR QEMU_CMD_NETDEV ",queues=%d "
++                        "-device virtio-net-pci,netdev=net0,mq=on,vectors=%d",
++                        512, 512, root, s->chr_name,
++                        s->socket_path, "", s->chr_name,
++                        queues, queues * 2 + 2);
+
+     bus = qpci_init_pc(s->qts, NULL);
+     dev = virtio_net_pci_init(bus, PCI_SLOT);
+@@ -917,7 +900,6 @@ int main(int argc, char **argv)
+ {
+     TestServer *server = NULL;
+     const char *hugefs;
+-    char *qemu_cmd = NULL;
+     int ret;
+     char template[] = "/tmp/vhost-test-XXXXXX";
+     GMainLoop *loop;
+@@ -949,10 +931,7 @@ int main(int argc, char **argv)
+     /* run the main loop thread so the chardev may operate */
+     thread = g_thread_new(NULL, thread_function, loop);
+
+-    qemu_cmd = GET_QEMU_CMD(server);
+-
+-    server->qts = qtest_init(qemu_cmd);
+-    g_free(qemu_cmd);
++    server->qts = qtest_init(GET_QEMU_CMD(server));
+     init_virtio_dev(server);
+
+     qtest_add_data_func("/vhost-user/read-guest-mem", server, read_guest_mem);
 -- 
 2.13.5
