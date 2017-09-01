@@ -1,16 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dnZcf-0000Gu-BK
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:15:46 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dnZcl-0000Nw-SH
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:15:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dnZce-0004ip-1J
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:15:45 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dnZci-0004rx-MI
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:15:51 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Thu, 31 Aug 2017 20:14:58 -0400
-Message-Id: <20170901001502.29915-6-jsnow@redhat.com>
+Date: Thu, 31 Aug 2017 20:15:00 -0400
+Message-Id: <20170901001502.29915-8-jsnow@redhat.com>
 In-Reply-To: <20170901001502.29915-1-jsnow@redhat.com>
 References: <20170901001502.29915-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 5/9] IDE: replace DEBUG_AIO with trace events
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 7/9] AHCI: Rework IRQ constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,127 +25,233 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: eblake@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, f4bug@amsat.org, John Snow <jsnow@redhat.com>
 
+Create a new enum so that we can name the IRQ bits, which will make debug=
+ging
+them a little nicer if we can print them out. Not handled in this patch, =
+but
+this will make it possible to get a nice debug printf detailing exactly w=
+hich
+status bits are set, as it can be multiple at any given time.
+
+As a consequence of this patch, it is no longer possible to set multiple =
+IRQ
+codes at once, but nothing was utilizing this ability anyway.
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- hw/ide/atapi.c            |  5 +----
- hw/ide/core.c             | 24 +++++++++++++++++-------
- hw/ide/trace-events       |  3 +++
- include/hw/ide/internal.h |  6 ++++--
- 4 files changed, 25 insertions(+), 13 deletions(-)
+ hw/ide/ahci.c          | 49 ++++++++++++++++++++++++++++++++++++++------=
+-----
+ hw/ide/ahci_internal.h | 44 +++++++++++++++++++++++++++++++++++---------
+ hw/ide/trace-events    |  2 +-
+ 3 files changed, 74 insertions(+), 21 deletions(-)
 
-diff --git a/hw/ide/atapi.c b/hw/ide/atapi.c
-index 9b84a1b..c0509c8 100644
---- a/hw/ide/atapi.c
-+++ b/hw/ide/atapi.c
-@@ -416,10 +416,7 @@ static void ide_atapi_cmd_read_dma_cb(void *opaque, int ret)
-         s->io_buffer_size = n * 2048;
-         data_offset = 0;
+diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+index c60a000..82cc196 100644
+--- a/hw/ide/ahci.c
++++ b/hw/ide/ahci.c
+@@ -56,6 +56,27 @@ static bool ahci_map_fis_address(AHCIDevice *ad);
+ static void ahci_unmap_clb_address(AHCIDevice *ad);
+ static void ahci_unmap_fis_address(AHCIDevice *ad);
+=20
++static const char *AHCIPortIRQ_lookup[AHCI_PORT_IRQ__COUNT] =3D {
++    [AHCI_PORT_IRQ_BIT_DHRS] =3D "DHRS",
++    [AHCI_PORT_IRQ_BIT_PSS]  =3D "PSS",
++    [AHCI_PORT_IRQ_BIT_DSS]  =3D "DSS",
++    [AHCI_PORT_IRQ_BIT_SDBS] =3D "SDBS",
++    [AHCI_PORT_IRQ_BIT_UFS]  =3D "UFS",
++    [AHCI_PORT_IRQ_BIT_DPS]  =3D "DPS",
++    [AHCI_PORT_IRQ_BIT_PCS]  =3D "PCS",
++    [AHCI_PORT_IRQ_BIT_DMPS] =3D "DMPS",
++    [8 ... 21]               =3D "RESERVED",
++    [AHCI_PORT_IRQ_BIT_PRCS] =3D "PRCS",
++    [AHCI_PORT_IRQ_BIT_IPMS] =3D "IPMS",
++    [AHCI_PORT_IRQ_BIT_OFS]  =3D "OFS",
++    [25]                     =3D "RESERVED",
++    [AHCI_PORT_IRQ_BIT_INFS] =3D "INFS",
++    [AHCI_PORT_IRQ_BIT_IFS]  =3D "IFS",
++    [AHCI_PORT_IRQ_BIT_HBDS] =3D "HBDS",
++    [AHCI_PORT_IRQ_BIT_HBFS] =3D "HBFS",
++    [AHCI_PORT_IRQ_BIT_TFES] =3D "TFES",
++    [AHCI_PORT_IRQ_BIT_CPDS] =3D "CPDS"
++};
+=20
+ static uint32_t  ahci_port_read(AHCIState *s, int port, int offset)
+ {
+@@ -170,12 +191,18 @@ static void ahci_check_irq(AHCIState *s)
+ }
+=20
+ static void ahci_trigger_irq(AHCIState *s, AHCIDevice *d,
+-                             int irq_type)
++                             enum AHCIPortIRQ irqbit)
+ {
+-    DPRINTF(d->port_no, "trigger irq %#x -> %x\n",
+-            irq_type, d->port_regs.irq_mask & irq_type);
++    g_assert(irqbit >=3D 0 && irqbit < 32);
++    uint32_t irq =3D 1U << irqbit;
++    uint32_t irqstat =3D d->port_regs.irq_stat | irq;
+=20
+-    d->port_regs.irq_stat |=3D irq_type;
++    trace_ahci_trigger_irq(s, d->port_no,
++                           AHCIPortIRQ_lookup[irqbit], irq,
++                           d->port_regs.irq_stat, irqstat,
++                           irqstat & d->port_regs.irq_mask);
++
++    d->port_regs.irq_stat =3D irqstat;
+     ahci_check_irq(s);
+ }
+=20
+@@ -718,7 +745,7 @@ static void ahci_write_fis_sdb(AHCIState *s, NCQTrans=
+ferState *ncq_tfs)
+=20
+     /* Trigger IRQ if interrupt bit is set (which currently, it always i=
+s) */
+     if (sdb_fis->flags & 0x40) {
+-        ahci_trigger_irq(s, ad, PORT_IRQ_SDB_FIS);
++        ahci_trigger_irq(s, ad, AHCI_PORT_IRQ_BIT_SDBS);
      }
--#ifdef DEBUG_AIO
--    printf("aio_read_cd: lba=%u n=%d\n", s->lba, n);
--#endif
--
-+    trace_ide_atapi_cmd_read_dma_cb_aio(s, s->lba, n);
-     s->bus->dma->iov.iov_base = (void *)(s->io_buffer + data_offset);
-     s->bus->dma->iov.iov_len = n * ATAPI_SECTOR_SIZE;
-     qemu_iovec_init_external(&s->bus->dma->qiov, &s->bus->dma->iov, 1);
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index 82a19b1..2cc2a08 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -58,6 +58,21 @@ static const int smart_attributes[][12] = {
-     { 190,  0x03, 0x00, 0x45, 0x45, 0x1f, 0x00, 0x1f, 0x1f, 0x00, 0x00, 0x32},
- };
- 
-+const char *IDE_DMA_CMD_lookup[IDE_DMA__COUNT] = {
-+    [IDE_DMA_READ] = "DMA READ",
-+    [IDE_DMA_WRITE] = "DMA WRITE",
-+    [IDE_DMA_TRIM] = "DMA TRIM",
-+    [IDE_DMA_ATAPI] = "DMA ATAPI"
+ }
+=20
+@@ -761,10 +788,10 @@ static void ahci_write_fis_pio(AHCIDevice *ad, uint=
+16_t len)
+         ad->port.ifs[0].status;
+=20
+     if (pio_fis[2] & ERR_STAT) {
+-        ahci_trigger_irq(ad->hba, ad, PORT_IRQ_TF_ERR);
++        ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_TFES);
+     }
+=20
+-    ahci_trigger_irq(ad->hba, ad, PORT_IRQ_PIOS_FIS);
++    ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_PSS);
+ }
+=20
+ static bool ahci_write_fis_d2h(AHCIDevice *ad)
+@@ -804,10 +831,10 @@ static bool ahci_write_fis_d2h(AHCIDevice *ad)
+         ad->port.ifs[0].status;
+=20
+     if (d2h_fis[2] & ERR_STAT) {
+-        ahci_trigger_irq(ad->hba, ad, PORT_IRQ_TF_ERR);
++        ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_TFES);
+     }
+=20
+-    ahci_trigger_irq(ad->hba, ad, PORT_IRQ_D2H_REG_FIS);
++    ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_DHRS);
+     return true;
+ }
+=20
+@@ -1082,7 +1109,7 @@ static void process_ncq_command(AHCIState *s, int p=
+ort, uint8_t *cmd_fis,
+                      "is smaller than the requested size (0x%zx)",
+                      ncq_tfs->sglist.size, size);
+         ncq_err(ncq_tfs);
+-        ahci_trigger_irq(ad->hba, ad, PORT_IRQ_OVERFLOW);
++        ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_OFS);
+         return;
+     } else if (ncq_tfs->sglist.size !=3D size) {
+         trace_process_ncq_command_large(s, port, tag,
+@@ -1225,7 +1252,7 @@ static int handle_cmd(AHCIState *s, int port, uint8=
+_t slot)
+         trace_handle_cmd_badfis(s, port);
+         return -1;
+     } else if (cmd_len !=3D 0x80) {
+-        ahci_trigger_irq(s, &s->dev[port], PORT_IRQ_HBUS_ERR);
++        ahci_trigger_irq(s, &s->dev[port], AHCI_PORT_IRQ_BIT_HBFS);
+         trace_handle_cmd_badmap(s, port, cmd_len);
+         goto out;
+     }
+diff --git a/hw/ide/ahci_internal.h b/hw/ide/ahci_internal.h
+index 1e21169..ce2e818 100644
+--- a/hw/ide/ahci_internal.h
++++ b/hw/ide/ahci_internal.h
+@@ -91,6 +91,31 @@
+ #define PORT_CMD_ISSUE            0x38 /* command issue */
+ #define PORT_RESERVED             0x3c /* reserved */
+=20
++/* Port interrupt bit descriptors */
++enum AHCIPortIRQ {
++    AHCI_PORT_IRQ_BIT_DHRS =3D 0,
++    AHCI_PORT_IRQ_BIT_PSS  =3D 1,
++    AHCI_PORT_IRQ_BIT_DSS  =3D 2,
++    AHCI_PORT_IRQ_BIT_SDBS =3D 3,
++    AHCI_PORT_IRQ_BIT_UFS  =3D 4,
++    AHCI_PORT_IRQ_BIT_DPS  =3D 5,
++    AHCI_PORT_IRQ_BIT_PCS  =3D 6,
++    AHCI_PORT_IRQ_BIT_DMPS =3D 7,
++    /* RESERVED */
++    AHCI_PORT_IRQ_BIT_PRCS =3D 22,
++    AHCI_PORT_IRQ_BIT_IPMS =3D 23,
++    AHCI_PORT_IRQ_BIT_OFS  =3D 24,
++    /* RESERVED */
++    AHCI_PORT_IRQ_BIT_INFS =3D 26,
++    AHCI_PORT_IRQ_BIT_IFS  =3D 27,
++    AHCI_PORT_IRQ_BIT_HBDS =3D 28,
++    AHCI_PORT_IRQ_BIT_HBFS =3D 29,
++    AHCI_PORT_IRQ_BIT_TFES =3D 30,
++    AHCI_PORT_IRQ_BIT_CPDS =3D 31,
++    AHCI_PORT_IRQ__COUNT   =3D 32
 +};
 +
-+static const char *IDE_DMA_CMD_str(enum ide_dma_cmd enval)
-+{
-+    if (enval >= 0 && enval < IDE_DMA__COUNT) {
-+        return IDE_DMA_CMD_lookup[enval];
-+    }
-+    return "DMA UNKNOWN CMD";
-+}
 +
- static void ide_dummy_transfer_stop(IDEState *s);
- 
- static void padstr(char *str, const char *src, int len)
-@@ -860,10 +875,7 @@ static void ide_dma_cb(void *opaque, int ret)
-         goto eot;
-     }
- 
--#ifdef DEBUG_AIO
--    printf("ide_dma_cb: sector_num=%" PRId64 " n=%d, cmd_cmd=%d\n",
--           sector_num, n, s->dma_cmd);
--#endif
-+    trace_ide_dma_cb(s, sector_num, n, IDE_DMA_CMD_str(s->dma_cmd));
- 
-     if ((s->dma_cmd == IDE_DMA_READ || s->dma_cmd == IDE_DMA_WRITE) &&
-         !ide_sect_range_ok(s, sector_num, n)) {
-@@ -2391,9 +2403,7 @@ void ide_bus_reset(IDEBus *bus)
- 
-     /* pending async DMA */
-     if (bus->dma->aiocb) {
--#ifdef DEBUG_AIO
--        printf("aio_cancel\n");
--#endif
-+        trace_ide_bus_reset_aio();
-         blk_aio_cancel(bus->dma->aiocb);
-         bus->dma->aiocb = NULL;
-     }
+ /* PORT_IRQ_{STAT,MASK} bits */
+ #define PORT_IRQ_COLD_PRES        (1U << 31) /* cold presence detect */
+ #define PORT_IRQ_TF_ERR           (1 << 30) /* task file error */
+@@ -98,18 +123,19 @@
+ #define PORT_IRQ_HBUS_DATA_ERR    (1 << 28) /* host bus data error */
+ #define PORT_IRQ_IF_ERR           (1 << 27) /* interface fatal error */
+ #define PORT_IRQ_IF_NONFATAL      (1 << 26) /* interface non-fatal error=
+ */
++                                            /* reserved */
+ #define PORT_IRQ_OVERFLOW         (1 << 24) /* xfer exhausted available =
+S/G */
+ #define PORT_IRQ_BAD_PMP          (1 << 23) /* incorrect port multiplier=
+ */
+-
+ #define PORT_IRQ_PHYRDY           (1 << 22) /* PhyRdy changed */
+-#define PORT_IRQ_DEV_ILCK         (1 << 7) /* device interlock */
+-#define PORT_IRQ_CONNECT          (1 << 6) /* port connect change status=
+ */
+-#define PORT_IRQ_SG_DONE          (1 << 5) /* descriptor processed */
+-#define PORT_IRQ_UNK_FIS          (1 << 4) /* unknown FIS rx'd */
+-#define PORT_IRQ_SDB_FIS          (1 << 3) /* Set Device Bits FIS rx'd *=
+/
+-#define PORT_IRQ_DMAS_FIS         (1 << 2) /* DMA Setup FIS rx'd */
+-#define PORT_IRQ_PIOS_FIS         (1 << 1) /* PIO Setup FIS rx'd */
+-#define PORT_IRQ_D2H_REG_FIS      (1 << 0) /* D2H Register FIS rx'd */
++                                            /* reserved */
++#define PORT_IRQ_DEV_ILCK         (1 << 7)  /* device interlock */
++#define PORT_IRQ_CONNECT          (1 << 6)  /* port connect change statu=
+s */
++#define PORT_IRQ_SG_DONE          (1 << 5)  /* descriptor processed */
++#define PORT_IRQ_UNK_FIS          (1 << 4)  /* unknown FIS rx'd */
++#define PORT_IRQ_SDB_FIS          (1 << 3)  /* Set Device Bits FIS rx'd =
+*/
++#define PORT_IRQ_DMAS_FIS         (1 << 2)  /* DMA Setup FIS rx'd */
++#define PORT_IRQ_PIOS_FIS         (1 << 1)  /* PIO Setup FIS rx'd */
++#define PORT_IRQ_D2H_REG_FIS      (1 << 0)  /* D2H Register FIS rx'd */
+=20
+ #define PORT_IRQ_FREEZE           (PORT_IRQ_HBUS_ERR | PORT_IRQ_IF_ERR |=
+   \
+                                    PORT_IRQ_CONNECT | PORT_IRQ_PHYRDY | =
+   \
 diff --git a/hw/ide/trace-events b/hw/ide/trace-events
-index 8c79a6c..cc8949c 100644
+index 0b61c5d..e15fd77 100644
 --- a/hw/ide/trace-events
 +++ b/hw/ide/trace-events
-@@ -18,6 +18,8 @@ ide_cancel_dma_sync_remaining(void) "draining all remaining requests"
- ide_sector_read(int64_t sector_num, int nsectors) "sector=%"PRId64" nsectors=%d"
- ide_sector_write(int64_t sector_num, int nsectors) "sector=%"PRId64" nsectors=%d"
- ide_reset(void *s) "IDEstate %p"
-+ide_bus_reset_aio(void) "aio_cancel"
-+ide_dma_cb(void *s, int64_t sector_num, int n, const char *dma) "IDEState %p; sector_num=%"PRId64" n=%d cmd=%s"
- 
- # BMDMA HBAs:
- 
-@@ -51,5 +53,6 @@ ide_atapi_cmd_reply_end_new(void *s, int status) "IDEState: %p; new transfer sta
- ide_atapi_cmd_check_status(void *s) "IDEState: %p"
- ide_atapi_cmd_read(void *s, const char *method, int lba, int nb_sectors) "IDEState: %p; read %s: LBA=%d nb_sectors=%d"
- ide_atapi_cmd(void *s, uint8_t cmd) "IDEState: %p; cmd: 0x%02x"
-+ide_atapi_cmd_read_dma_cb_aio(void *s, int lba, int n) "IDEState: %p; aio read: lba=%d n=%d"
- # Warning: Verbose
- ide_atapi_cmd_packet(void *s, uint16_t limit, const char *packet) "IDEState: %p; limit=0x%x packet: %s"
-diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
-index 74efe8a..db9fde0 100644
---- a/include/hw/ide/internal.h
-+++ b/include/hw/ide/internal.h
-@@ -14,7 +14,6 @@
- #include "block/scsi.h"
- 
- /* debug IDE devices */
--//#define DEBUG_AIO
- #define USE_DMA_CDROM
- 
- typedef struct IDEBus IDEBus;
-@@ -333,12 +332,15 @@ struct unreported_events {
- };
- 
- enum ide_dma_cmd {
--    IDE_DMA_READ,
-+    IDE_DMA_READ = 0,
-     IDE_DMA_WRITE,
-     IDE_DMA_TRIM,
-     IDE_DMA_ATAPI,
-+    IDE_DMA__COUNT
- };
- 
-+extern const char *IDE_DMA_CMD_lookup[IDE_DMA__COUNT];
-+
- #define ide_cmd_is_read(s) \
- 	((s)->dma_cmd == IDE_DMA_READ)
- 
--- 
+@@ -62,7 +62,7 @@ ahci_port_read(void *s, int port, int offset, uint32_t =
+ret) "ahci(%p)[%d]: port
+ ahci_irq_raise(void *s) "ahci(%p): raise irq"
+ ahci_irq_lower(void *s) "ahci(%p): lower irq"
+ ahci_check_irq(void *s, uint32_t old, uint32_t new) "ahci(%p): check irq=
+ 0x%08x --> 0x%08x"
+-
++ahci_trigger_irq(void *s, int port, const char *name, uint32_t val, uint=
+32_t old, uint32_t new, uint32_t effective) "ahci(%p)[%d]: trigger irq +%=
+s (0x%08x); irqstat: 0x%08x --> 0x%08x; effective: 0x%08x"
+ ahci_port_write(void *s, int port, int offset, uint32_t val) "ahci(%p)[%=
+d]: port write @ 0x%x: 0x%08x"
+ ahci_mem_read_32(void *s, uint64_t addr, uint32_t val) "ahci(%p): mem re=
+ad @ 0x%"PRIx64": 0x%08x"
+ ahci_mem_read(void *s, unsigned size, uint64_t addr, uint64_t val) "ahci=
+(%p): read%u @ 0x%"PRIx64": 0x%016"PRIx64
+--=20
 2.9.5
