@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnrdg-0000wi-Gt
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 15:30:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1dnrta-0000Eb-L1
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 15:46:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnrdb-0007Zg-VL
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 15:30:00 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35895)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnrdb-0007ZQ-Rn
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 15:29:55 -0400
-Received: by mail-qk0-x244.google.com with SMTP id l65so840687qkc.3
-	for <qemu-devel@nongnu.org>; Fri, 01 Sep 2017 12:29:55 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170828174707.20786-1-famz@redhat.com>
-	<20170828174707.20786-4-famz@redhat.com>
-	<c751fc1d-602a-25ed-edb9-84ccdaeb2ecb@amsat.org>
-	<20170830033445.GE4208@lemon.lan>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <02eb8166-d0a4-a0e9-ec82-bc45a3626fd1@amsat.org>
-Date: Fri, 1 Sep 2017 16:29:50 -0300
+	(envelope-from <eblake@redhat.com>) id 1dnrtW-0007TA-MS
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 15:46:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37500)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnrtW-0007SX-DW
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 15:46:22 -0400
+References: <1504190408-11143-1-git-send-email-thuth@redhat.com>
+	<612870af-f8a4-039c-3e97-7590388b9e77@redhat.com>
+	<87o9qudbsk.fsf@dusky.pond.sub.org>
+	<96af6291-8427-89c8-c644-a3d82c3240c8@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a9a20aa6-c016-75f6-48ed-b95765895209@redhat.com>
+Date: Fri, 1 Sep 2017 14:46:07 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170830033445.GE4208@lemon.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 03/10] tests: Add vm test lib
+In-Reply-To: <96af6291-8427-89c8-c644-a3d82c3240c8@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="OEQGvPSKW00SGN2Lce1O1aSHxsLitlrmh"
+Subject: Re: [Qemu-devel] [PATCH v2] tests: Enable the drive_del test also
+ on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,41 +31,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>, Michael S Tsirkin <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Jason J Herne <jjherne@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 
-On 08/30/2017 12:34 AM, Fam Zheng wrote:
-> On Tue, 08/29 14:34, Philippe Mathieu-Daudé wrote:
->>> +        self._args = [ \
->>> +            "-nodefaults", "-m", "2G",
->>> +            "-cpu", "host",
->>> +            "-netdev", "user,id=vnet,hostfwd=:0.0.0.0:0-:22",
->>> +            "-device", "virtio-net-pci,netdev=vnet",
->>> +            "-vnc", ":0,to=20",
->>> +            "-serial", "file:%s" % os.path.join(self._tmpdir, "serial.out")]
->>> +        if vcpus:
->>> +            self._args += ["-smp", str(vcpus)]
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OEQGvPSKW00SGN2Lce1O1aSHxsLitlrmh
+From: Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ David Hildenbrand <david@redhat.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>,
+ Farhan Ali <alifm@linux.vnet.ibm.com>, Stefan Hajnoczi
+ <stefanha@redhat.com>, Michael S Tsirkin <mst@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>,
+ qemu-devel@nongnu.org, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Jason J Herne <jjherne@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>,
+ Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Message-ID: <a9a20aa6-c016-75f6-48ed-b95765895209@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] tests: Enable the drive_del test also on
+ s390x
+References: <1504190408-11143-1-git-send-email-thuth@redhat.com>
+ <612870af-f8a4-039c-3e97-7590388b9e77@redhat.com>
+ <87o9qudbsk.fsf@dusky.pond.sub.org>
+ <96af6291-8427-89c8-c644-a3d82c3240c8@redhat.com>
+In-Reply-To: <96af6291-8427-89c8-c644-a3d82c3240c8@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 09/01/2017 05:39 AM, Thomas Huth wrote:
+>>>>      /* Start with a drive used by a device that unplugs instantaneo=
+usly */
+>>>> -    qtest_start("-drive if=3Dnone,id=3Ddrive0,file=3Dnull-co://,for=
+mat=3Draw"
+>>>> -                " -device virtio-scsi-pci"
+>>>> -                " -device scsi-hd,drive=3Ddrive0,id=3Ddev0");
+>>>> +    args =3D g_strdup_printf("-drive if=3Dnone,id=3Ddrive0,file=3Dn=
+ull-co://,format=3Draw"
+>>>> +                           " -device virtio-scsi-%s"
+>>>> +                           " -device scsi-hd,drive=3Ddrive0,id=3Dde=
+v0",
+>>>
+>>> Would look better with the spaces at the end of the previous line (so=
+
+>>> all "-device" are aligned), but just my taste.
 >>
->> What about enabling mttcg which isn't default?
+>> The -device *are* aligned, but I get what you mean.
 >>
->>              self._args += ["--accel", "tcg,thread=multi"]
-> 
-> Any specific reason to enable it? I think it is not available on older QEMU.
+>> The advantage of leading rather than trailing space is that the
+>> intention "this is still the same string" is locally obvious both at t=
+he
+>> first part's end (no comma) and at the second part's beginning (leadin=
+g
+>> space).
+>=20
+> I don't mind either way, but in this case, I think I'd prefer to keep
+> the original formatting with the space at the beginning, for the
+> following two reasons:
+>=20
+> - The first line is already hitting the 80 columns limit, and I want to=
 
-Neither is dynamic portfwd :)
+>   avoid complaints from checkpatch.pl
+> - The original author formatted it that way.
 
-I see 2 reasons:
-- faster test
-- cover mttcg
+As it is, I got annoyed by the fact that we had so much strdup() of args
+to pass to qtest_init/qtest_start(), so my latest series reformats the
+code yet another way:
+https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg00308.html
 
-> 
->>
->>> +        if os.access("/dev/kvm", os.R_OK | os.W_OK):
->>> +            self._args += ["-enable-kvm"]
->>> +        else:
->>> +            logging.info("KVM not available, not using -enable-kvm")
->>> +        self._data_args = []
->> [...]
-> 
-> Fam
-> 
+Prone to cause some fun conflict resolution if my cleanups take too long
+to get in the tree...
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--OEQGvPSKW00SGN2Lce1O1aSHxsLitlrmh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmpuP8ACgkQp6FrSiUn
+Q2p0EggArP3TiOcpNAzYn86kJjv55v6nwKsfiO09Vj+0z6U1oLGBxPey8moyygtN
+fhdIxHGxXz/h6QaQ8H2fRnHy9hMBu0Giz9AANkJVUjlzlOmVsi0JyNFPMlsv0aLk
+ApXTmejZVGmn+vbCFVxMFUR58jExH9dXpoEr9Usdu8/9K2VCa371OWGiexD4VjXE
+6mBX77XxX/uaWK7AicwAYiGf30Izs20ql4W3+XPWmEHmMkC93OMkcSjxv3f4UuO8
+CD+urC6XLFOgxrfJyq68icfPnkssPlJfKDiyTvS0UK3Csf2nPAKnl2PwZOzJn57c
+81UHx/A0wt4FvdgPnrTVSnLi2W4gJA==
+=ckRV
+-----END PGP SIGNATURE-----
+
+--OEQGvPSKW00SGN2Lce1O1aSHxsLitlrmh--
