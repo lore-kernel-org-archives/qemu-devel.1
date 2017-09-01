@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dnmEE-000285-Gq
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 09:43:23 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dnmEE-00028K-PB
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 09:43:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1dnmE9-0000tv-R0
+	(envelope-from <cohuck@redhat.com>) id 1dnmEC-0000xq-Tx
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 09:43:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58044)
+Received: from mx1.redhat.com ([209.132.183.28]:33358)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1dnmE9-0000rv-Ki
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 09:43:17 -0400
-References: <CGME20170824192750epcas5p484df9724ca7c0a259a4dd85425a69e1d@epcas5p4.samsung.com>
-	<20170824192730.8440-1-dgilbert@redhat.com>
-	<ad360122-de03-39a8-21a8-d8968e885875@samsung.com>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <dbf7014f-826b-5f2f-5933-acb679a16e35@redhat.com>
-Date: Fri, 1 Sep 2017 15:42:56 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dnmEC-0000wY-Nf
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 09:43:20 -0400
+Date: Fri, 1 Sep 2017 15:43:00 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170901154300.2f83c59a.cohuck@redhat.com>
+In-Reply-To: <1504190408-11143-1-git-send-email-thuth@redhat.com>
+References: <1504190408-11143-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <ad360122-de03-39a8-21a8-d8968e885875@samsung.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 00/32] postcopy+vhost-user/shared ram
+Subject: Re: [Qemu-devel] [PATCH v2] tests: Enable the drive_del test also
+ on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +27,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>, "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, marcandre.lureau@redhat.com
-Cc: quintela@redhat.com, peterx@redhat.com, lvivier@redhat.com, aarcange@redhat.com, felipe@nutanix.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Jason J Herne <jjherne@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>, Michael S Tsirkin <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Hello Alexey,
+On Thu, 31 Aug 2017 16:40:08 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-On 09/01/2017 03:34 PM, Alexey Perevalov wrote:
-> Hello David,
+> We can use the drive_del test on s390x, too, to check that adding and
+> deleting also works fine with the virtio-ccw bus. But we have to make
+> sure that we use the devices with the "-ccw" suffix instead of the
+> "-pci" suffix for the virtio-ccw transport on s390x. Introduce a helper
+> function called qvirtio_get_dev_type() that returns the correct string
+> for the current architecture.
 > 
-> You wrote in previous version:
-> 
->> We've had a postcopy migrate work now, with a few hacks we're still
->> cleaning up, both on vhost-user-bridge and dpdk; so I'll get this
->> updated and reposted.
-> 
-> I want to know more about DPDK work, do you know, is somebody assigned 
-> to that task?
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  I'm just sending a patch for this test now to get some feedback whether
+>  I'm on the right track now. If this approach with qvirtio_get_dev_type()
+>  gets accepted, I'll continue converting the other virtio tests, too.
 
-I did the DPDK (rough) prototype, you may find it here:
-https://gitlab.com/mcoquelin/dpdk-next-virtio/commits/postcopy_proto_v1
+Looks good.
 
-Cheers,
-Maxime
+> 
+>  tests/Makefile.include |  3 ++-
+>  tests/drive_del-test.c | 25 ++++++++++++++++---------
+>  tests/libqos/virtio.c  | 17 +++++++++++++++++
+>  tests/libqos/virtio.h  |  3 +++
+>  4 files changed, 38 insertions(+), 10 deletions(-)
+> 
+
+> diff --git a/tests/libqos/virtio.c b/tests/libqos/virtio.c
+> index 9880a69..0879a62 100644
+> --- a/tests/libqos/virtio.c
+> +++ b/tests/libqos/virtio.c
+> @@ -339,3 +339,20 @@ void qvirtqueue_set_used_event(QVirtQueue *vq, uint16_t idx)
+>      /* vq->avail->used_event */
+>      writew(vq->avail + 4 + (2 * vq->size), idx);
+>  }
+> +
+> +/*
+> + * qvirtio_get_dev_type:
+> + * Returns: the preferred virtio bus/device type for the current architecture.
+> + */
+> +const char *qvirtio_get_dev_type(void)
+> +{
+> +    const char *arch = qtest_get_arch();
+> +
+> +    if (g_str_equal(arch, "arm") || g_str_equal(arch, "aarch64")) {
+> +        return "device";  /* for virtio-mmio */
+
+Would not mind a comment from someone familiar with virtio-mmio, though.
+
+> +    } else if (g_str_equal(arch, "s390x")) {
+> +        return "ccw";
+> +    } else {
+> +        return "pci";
+> +    }
+> +}
+
+I'll take this, unless someone complains.
