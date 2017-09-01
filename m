@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dno1S-0006iM-K2
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:27 -0400
+	(envelope-from <armbru@redhat.com>) id 1dno1b-0006uS-Ex
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dno1M-0001jT-HW
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56234)
+	(envelope-from <armbru@redhat.com>) id 1dno1T-0001pp-Ca
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37108)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dno1M-0001i8-9n
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:12 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dno1T-0001pG-6c
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:19 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 404537F3E2
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:38:18 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 17:37:46 +0200
-Message-Id: <20170901153758.8628-36-armbru@redhat.com>
+Date: Fri,  1 Sep 2017 17:37:47 +0200
+Message-Id: <20170901153758.8628-37-armbru@redhat.com>
 In-Reply-To: <20170901153758.8628-1-armbru@redhat.com>
 References: <20170901153758.8628-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 35/47] tpm: Clean up model registration &
- lookup
+Subject: [Qemu-devel] [PULL v2 36/47] hmp: Use qapi_enum_parse() in
+ hmp_migrate_set_capability()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,116 +34,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Berger <stefanb@us.ibm.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-We have a strict separation between enum TpmModel and tpm_models[]:
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-* TpmModel may have any number of members.  It just happens to have one.
+The error message on invalid capability name changes from
 
-* tpm_register_model() uses the first empty slot in tpm_models[].
+    Invalid parameter "NAME"
 
-  If you register more than tpm_models[] has space,
-  tpn_register_model() fails.  Its caller silently ignores the
-  failure.
+to
 
-  Register the same TpmModel more than once has no effect other than
-  wasting tpm_models[] slots: tpm_model_is_registered() is happy with
-  the first one it finds.
+    invalid parameter value: NAME
 
-Since we only ever register one model, and tpm_models[] has space for
-just that one, this contraption even works.
+No worse than before.
 
-Turn tpm_models[] into a straight map from enum TpmType to bool.  Much
-simpler.
-
-Cc: Stefan Berger <stefanb@us.ibm.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20170822132255.23945-9-marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+[Rebased, commit message rewritten]
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1503564371-26090-5-git-send-email-armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-[Commit message typo fixed]
+Message-Id: <1503564371-26090-6-git-send-email-armbru@redhat.com>
 ---
- include/sysemu/tpm_backend.h |  2 +-
- tpm.c                        | 37 +++++--------------------------------
- 2 files changed, 6 insertions(+), 33 deletions(-)
+ hmp.c | 23 ++++++++++-------------
+ 1 file changed, 10 insertions(+), 13 deletions(-)
 
-diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
-index 1d21c6b19b..b0a9731aee 100644
---- a/include/sysemu/tpm_backend.h
-+++ b/include/sysemu/tpm_backend.h
-@@ -226,7 +226,7 @@ TPMVersion tpm_backend_get_tpm_version(TPMBackend *s)=
-;
- TPMBackend *qemu_find_tpm(const char *id);
-=20
- const TPMDriverOps *tpm_get_backend_driver(const char *type);
--int tpm_register_model(enum TpmModel model);
-+void tpm_register_model(enum TpmModel model);
- void tpm_register_driver(const TPMDriverOps *tdo);
-=20
- #endif
-diff --git a/tpm.c b/tpm.c
-index 6f39ec9192..7635fc779b 100644
---- a/tpm.c
-+++ b/tpm.c
-@@ -24,39 +24,12 @@
- static QLIST_HEAD(, TPMBackend) tpm_backends =3D
-     QLIST_HEAD_INITIALIZER(tpm_backends);
-=20
--
--#define TPM_MAX_MODELS      1
--
- static TPMDriverOps const *be_drivers[TPM_TYPE__MAX];
-+static bool tpm_models[TPM_MODEL__MAX];
-=20
--static enum TpmModel tpm_models[TPM_MAX_MODELS] =3D {
--    TPM_MODEL__MAX,
--};
--
--int tpm_register_model(enum TpmModel model)
-+void tpm_register_model(enum TpmModel model)
- {
+diff --git a/hmp.c b/hmp.c
+index 03c1a783b6..7e0bd3d63b 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1527,23 +1527,20 @@ void hmp_migrate_set_capability(Monitor *mon, con=
+st QDict *qdict)
+     bool state =3D qdict_get_bool(qdict, "state");
+     Error *err =3D NULL;
+     MigrationCapabilityStatusList *caps =3D g_malloc0(sizeof(*caps));
 -    int i;
--
--    for (i =3D 0; i < TPM_MAX_MODELS; i++) {
--        if (tpm_models[i] =3D=3D TPM_MODEL__MAX) {
--            tpm_models[i] =3D model;
--            return 0;
++    int val;
+=20
+-    for (i =3D 0; i < MIGRATION_CAPABILITY__MAX; i++) {
+-        if (strcmp(cap, MigrationCapability_lookup[i]) =3D=3D 0) {
+-            caps->value =3D g_malloc0(sizeof(*caps->value));
+-            caps->value->capability =3D i;
+-            caps->value->state =3D state;
+-            caps->next =3D NULL;
+-            qmp_migrate_set_capabilities(caps, &err);
+-            break;
 -        }
++    val =3D qapi_enum_parse(MigrationCapability_lookup, cap, -1, &err);
++    if (val < 0) {
++        goto end;
+     }
+=20
+-    if (i =3D=3D MIGRATION_CAPABILITY__MAX) {
+-        error_setg(&err, QERR_INVALID_PARAMETER, cap);
 -    }
--    error_report("Could not register TPM model");
--    return 1;
--}
--
--static bool tpm_model_is_registered(enum TpmModel model)
--{
--    int i;
--
--    for (i =3D 0; i < TPM_MAX_MODELS; i++) {
--        if (tpm_models[i] =3D=3D model) {
--            return true;
--        }
--    }
--    return false;
-+    tpm_models[model] =3D true;
- }
++    caps->value =3D g_malloc0(sizeof(*caps->value));
++    caps->value->capability =3D val;
++    caps->value->state =3D state;
++    caps->next =3D NULL;
++    qmp_migrate_set_capabilities(caps, &err);
 =20
- const TPMDriverOps *tpm_get_backend_driver(const char *type)
-@@ -270,7 +243,7 @@ TPMInfoList *qmp_query_tpm(Error **errp)
-     TPMInfoList *info, *head =3D NULL, *cur_item =3D NULL;
++end:
+     qapi_free_MigrationCapabilityStatusList(caps);
 =20
-     QLIST_FOREACH(drv, &tpm_backends, list) {
--        if (!tpm_model_is_registered(drv->fe_model)) {
-+        if (!tpm_models[drv->fe_model]) {
-             continue;
-         }
-         info =3D g_new0(TPMInfoList, 1);
-@@ -317,7 +290,7 @@ TpmModelList *qmp_query_tpm_models(Error **errp)
-     TpmModelList *head =3D NULL, *prev =3D NULL, *cur_item;
-=20
-     for (i =3D 0; i < TPM_MODEL__MAX; i++) {
--        if (!tpm_model_is_registered(i)) {
-+        if (!tpm_models[i]) {
-             continue;
-         }
-         cur_item =3D g_new0(TpmModelList, 1);
+     if (err) {
 --=20
 2.13.5
