@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUi-0000F1-1W
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:23 -0400
+	(envelope-from <armbru@redhat.com>) id 1dnlUi-0000Ez-1K
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUd-0007IH-9X
+	(envelope-from <armbru@redhat.com>) id 1dnlUd-0007Hy-53
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34520)
+Received: from mx1.redhat.com ([209.132.183.28]:43820)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUd-0007Hr-0Q
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUc-0007Hl-VW
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:15 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 01E147F3F9
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:14 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D0F9283F44
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:13 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-75.ams2.redhat.com
+	[10.36.116.75])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E2279343A
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:13 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 14:55:25 +0200
-Message-Id: <20170901125611.29295-2-armbru@redhat.com>
+Date: Fri,  1 Sep 2017 14:55:27 +0200
+Message-Id: <20170901125611.29295-4-armbru@redhat.com>
 In-Reply-To: <20170901125611.29295-1-armbru@redhat.com>
 References: <20170901125611.29295-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 01/47] qapi: Fix error handling code on
- alternate conflict
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 03/47] qobject: Explain how QNum works, and why
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,151 +37,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
-
-The conflict check added by commit c0644771 ("qapi: Reject
-alternates that can't work with keyval_parse()") doesn't work
-with the following declaration:
-
-  { 'alternate': 'Alt',
-    'data': { 'one': 'bool',
-              'two': 'str' } }
-
-It crashes with:
-
-  Traceback (most recent call last):
-    File "./scripts/qapi-types.py", line 295, in <module>
-      schema = QAPISchema(input_file)
-    File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 1468, in __init__
-      self.exprs = check_exprs(parser.exprs)
-    File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 958, in check_exprs
-      check_alternate(expr, info)
-    File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 830, in check_alternate
-      % (name, key, types_seen[qtype]))
-  KeyError: 'QTYPE_QSTRING'
-
-This happens because the previously-seen conflicting member
-('one') can't be found at types_seen[qtype], but at
-types_seen['QTYPE_BOOL'].
-
-Fix the bug by moving the error check to the same loop that adds
-new items to types_seen, raising an exception if types_seen[qt]
-is already set.
-
-Add two additional test cases that can detect the bug.
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20170717180926.14924-1-ehabkost@redhat.com>
+Suggested-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <1503384739-17207-1-git-send-email-armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+[Comment typos fixed]
 ---
- scripts/qapi.py                                       | 8 ++++----
- tests/Makefile.include                                | 2 ++
- tests/qapi-schema/alternate-conflict-bool-string.err  | 1 +
- tests/qapi-schema/alternate-conflict-bool-string.exit | 1 +
- tests/qapi-schema/alternate-conflict-bool-string.json | 4 ++++
- tests/qapi-schema/alternate-conflict-bool-string.out  | 0
- tests/qapi-schema/alternate-conflict-num-string.err   | 1 +
- tests/qapi-schema/alternate-conflict-num-string.exit  | 1 +
- tests/qapi-schema/alternate-conflict-num-string.json  | 4 ++++
- tests/qapi-schema/alternate-conflict-num-string.out   | 0
- 10 files changed, 18 insertions(+), 4 deletions(-)
- create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.err
- create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.exit
- create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.json
- create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.out
- create mode 100644 tests/qapi-schema/alternate-conflict-num-string.err
- create mode 100644 tests/qapi-schema/alternate-conflict-num-string.exit
- create mode 100644 tests/qapi-schema/alternate-conflict-num-string.json
- create mode 100644 tests/qapi-schema/alternate-conflict-num-string.out
+ include/qapi/qmp/qnum.h | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 8aa2775f12..3693b520da 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -825,11 +825,11 @@ def check_alternate(expr, info):
-             else:
-                 conflicting.add('QTYPE_QNUM')
-                 conflicting.add('QTYPE_QBOOL')
--        if conflicting & set(types_seen):
--            raise QAPISemError(info, "Alternate '%s' member '%s' can't "
--                               "be distinguished from member '%s'"
--                               % (name, key, types_seen[qtype]))
-         for qt in conflicting:
-+            if qt in types_seen:
-+                raise QAPISemError(info, "Alternate '%s' member '%s' can't "
-+                                   "be distinguished from member '%s'"
-+                                   % (name, key, types_seen[qt]))
-             types_seen[qt] = key
- 
- 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index f08b7418f0..00af45ca85 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -376,6 +376,8 @@ qapi-schema += alternate-conflict-dict.json
- qapi-schema += alternate-conflict-enum-bool.json
- qapi-schema += alternate-conflict-enum-int.json
- qapi-schema += alternate-conflict-string.json
-+qapi-schema += alternate-conflict-bool-string.json
-+qapi-schema += alternate-conflict-num-string.json
- qapi-schema += alternate-empty.json
- qapi-schema += alternate-nested.json
- qapi-schema += alternate-unknown.json
-diff --git a/tests/qapi-schema/alternate-conflict-bool-string.err b/tests/qapi-schema/alternate-conflict-bool-string.err
-new file mode 100644
-index 0000000000..e52fee7620
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-bool-string.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/alternate-conflict-bool-string.json:2: Alternate 'Alt' member 'two' can't be distinguished from member 'one'
-diff --git a/tests/qapi-schema/alternate-conflict-bool-string.exit b/tests/qapi-schema/alternate-conflict-bool-string.exit
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-bool-string.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/alternate-conflict-bool-string.json b/tests/qapi-schema/alternate-conflict-bool-string.json
-new file mode 100644
-index 0000000000..0544de10f3
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-bool-string.json
-@@ -0,0 +1,4 @@
-+# alternate branches of 'str' type conflict with all scalar types
-+{ 'alternate': 'Alt',
-+  'data': { 'one': 'bool',
-+            'two': 'str' } }
-diff --git a/tests/qapi-schema/alternate-conflict-bool-string.out b/tests/qapi-schema/alternate-conflict-bool-string.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/alternate-conflict-num-string.err b/tests/qapi-schema/alternate-conflict-num-string.err
-new file mode 100644
-index 0000000000..5ba3827dd1
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-num-string.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/alternate-conflict-num-string.json:2: Alternate 'Alt' member 'two' can't be distinguished from member 'one'
-diff --git a/tests/qapi-schema/alternate-conflict-num-string.exit b/tests/qapi-schema/alternate-conflict-num-string.exit
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-num-string.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/alternate-conflict-num-string.json b/tests/qapi-schema/alternate-conflict-num-string.json
-new file mode 100644
-index 0000000000..ae901449af
---- /dev/null
-+++ b/tests/qapi-schema/alternate-conflict-num-string.json
-@@ -0,0 +1,4 @@
-+# alternate branches of 'str' type conflict with all scalar types
-+{ 'alternate': 'Alt',
-+  'data': { 'one': 'number',
-+            'two': 'str' } }
-diff --git a/tests/qapi-schema/alternate-conflict-num-string.out b/tests/qapi-schema/alternate-conflict-num-string.out
-new file mode 100644
-index 0000000000..e69de29bb2
--- 
+diff --git a/include/qapi/qmp/qnum.h b/include/qapi/qmp/qnum.h
+index 09d745c490..d6b0791139 100644
+--- a/include/qapi/qmp/qnum.h
++++ b/include/qapi/qmp/qnum.h
+@@ -23,6 +23,27 @@ typedef enum {
+     QNUM_DOUBLE
+ } QNumKind;
+=20
++/*
++ * QNum encapsulates how our dialect of JSON fills in the blanks left
++ * by the JSON specification (RFC 7159) regarding numbers.
++ *
++ * Conceptually, we treat number as an abstract type with three
++ * concrete subtypes: floating-point, signed integer, unsigned
++ * integer.  QNum implements this as a discriminated union of double,
++ * int64_t, uint64_t.
++ *
++ * The JSON parser picks the subtype as follows.  If the number has a
++ * decimal point or an exponent, it is floating-point.  Else if it
++ * fits into int64_t, it's signed integer.  Else if it fits into
++ * uint64_t, it's unsigned integer.  Else it's floating-point.
++ *
++ * Any number can serve as double: qnum_get_double() converts under
++ * the hood.
++ *
++ * An integer can serve as signed / unsigned integer as long as it is
++ * in range: qnum_get_try_int() / qnum_get_try_uint() check range and
++ * convert under the hood.
++ */
+ typedef struct QNum {
+     QObject base;
+     QNumKind kind;
+--=20
 2.13.5
