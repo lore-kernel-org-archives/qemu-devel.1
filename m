@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnrxM-00020j-I2
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 15:50:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1dnsGj-0000SX-Jd
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 16:10:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnrxH-0002JF-Qd
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 15:50:19 -0400
-Received: from mail-qt0-x231.google.com ([2607:f8b0:400d:c0d::231]:34144)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnrxH-0002IS-Kw
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 15:50:15 -0400
-Received: by mail-qt0-x231.google.com with SMTP id u11so5445635qtu.1
-	for <qemu-devel@nongnu.org>; Fri, 01 Sep 2017 12:50:15 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170831064302.14427-1-famz@redhat.com>
-	<20170831064302.14427-6-famz@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <2f969c4b-7568-5692-2763-21d1259981e9@amsat.org>
-Date: Fri, 1 Sep 2017 16:50:10 -0300
+	(envelope-from <eblake@redhat.com>) id 1dnsGi-0008Se-HQ
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 16:10:21 -0400
+References: <20170901105434.3288-1-berrange@redhat.com>
+	<5fff868d-4d35-ec3f-cdd8-9b7363c4e6d3@redhat.com>
+	<20170901143348.GP31680@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <92c6a48b-892b-e7de-bbe9-44618f4a94e9@redhat.com>
+Date: Fri, 1 Sep 2017 15:10:06 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170831064302.14427-6-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 05/12] tests: Add ubuntu.i386 image
+In-Reply-To: <20170901143348.GP31680@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ESB1whq0bgAC2elgcNQk8lIanh970ncvO"
+Subject: Re: [Qemu-devel] [PATCH 0/2] Fix / skip recent iotests with LUKS
+ driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,126 +26,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
 
-Hi Fam,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ESB1whq0bgAC2elgcNQk8lIanh970ncvO
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
+Message-ID: <92c6a48b-892b-e7de-bbe9-44618f4a94e9@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] Fix / skip recent iotests with LUKS
+ driver
+References: <20170901105434.3288-1-berrange@redhat.com>
+ <5fff868d-4d35-ec3f-cdd8-9b7363c4e6d3@redhat.com>
+ <20170901143348.GP31680@redhat.com>
+In-Reply-To: <20170901143348.GP31680@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 08/31/2017 03:42 AM, Fam Zheng wrote:
-> This adds a 32bit guest.
-> 
-> The official LTS cloud image is downloaded and initialized with
-> cloud-init.
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->   tests/vm/ubuntu.i386 | 88 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 88 insertions(+)
->   create mode 100755 tests/vm/ubuntu.i386
-> 
-> diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
-> new file mode 100755
-> index 0000000000..1a55856d9c
-> --- /dev/null
-> +++ b/tests/vm/ubuntu.i386
-> @@ -0,0 +1,88 @@
-> +#!/usr/bin/env python
-> +#
-> +# Ubuntu i386 image
-> +#
-> +# Copyright (C) 2017 Red Hat Inc.
-> +#
-> +# Authors:
-> +#  Fam Zheng <famz@redhat.com>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2.  See
-> +# the COPYING file in the top-level directory.
-> +#
-> +
-> +import os
-> +import sys
-> +import subprocess
-> +import basevm
-> +import time
-> +
-> +class UbuntuX86VM(basevm.BaseVM):
-> +    name = "ubuntu.i386"
-> +    BUILD_SCRIPT = """
-> +        set -e;
-> +        cd $(mktemp -d);
-> +        sudo chmod a+r /dev/vdb;
-> +        tar -xf /dev/vdb;
-> +        ./configure {configure_opts};
-> +        make -j{jobs};
-> +        make check;
-> +    """
-> +
-> +    def _gen_cloud_init_iso(self):
-> +        cidir = self._tmpdir
-> +        mdata = open(os.path.join(cidir, "meta-data"), "w")
-> +        mdata.writelines(["instance-id: ubuntu-vm-0\n",
-> +                         "local-hostname: ubuntu-guest\n"])
-> +        mdata.close()
-> +        udata = open(os.path.join(cidir, "user-data"), "w")
-> +        udata.writelines(["#cloud-config\n",
-> +                          "chpasswd:\n",
-> +                          "  list: |\n",
-> +                          "    root:%s\n" % self.ROOT_PASS,
-> +                          "    %s:%s\n" % (self.GUEST_USER, self.GUEST_PASS),
-> +                          "  expire: False\n",
-> +                          "users:\n",
-> +                          "  - name: %s\n" % self.GUEST_USER,
-> +                          "    sudo: ALL=(ALL) NOPASSWD:ALL\n",
-> +                          "    ssh-authorized-keys:\n",
-> +                          "    - %s\n" % basevm.SSH_PUB_KEY,
-> +                          "  - name: root\n",
-> +                          "    ssh-authorized-keys:\n",
-> +                          "    - %s\n" % basevm.SSH_PUB_KEY])
-> +        udata.close()
-> +        subprocess.check_call(["genisoimage", "-output", "cloud-init.iso",
-> +                               "-volid", "cidata", "-joliet", "-rock",
-> +                               "user-data", "meta-data"],
-> +                               cwd=cidir,
-> +                               stdin=self._devnull, stdout=self._stdout,
-> +                               stderr=self._stdout)
-> +        return os.path.join(cidir, "cloud-init.iso")
-> +
-> +    def build_image(self, img):
-> +        cimg = self._download_with_cache("https://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-i386-disk1.img")
-> +        img_tmp = img + ".tmp"
-> +        subprocess.check_call(["cp", "-f", cimg, img_tmp])
-> +        subprocess.check_call(["qemu-img", "resize", img_tmp, "50G"])
-> +        self.boot(img_tmp, extra_args = ["-cdrom", self._gen_cloud_init_iso()])
+On 09/01/2017 09:33 AM, Daniel P. Berrange wrote:
+> On Fri, Sep 01, 2017 at 09:26:30AM -0500, Eric Blake wrote:
+>> On 09/01/2017 05:54 AM, Daniel P. Berrange wrote:
+>>> Two recently added iotests are currently breaking 'check -luks',
+>>> fix the easy one and disable the hard one.
+>>>
+>>> Daniel P. Berrange (2):
+>>>   iotests: rewrite 192 to use _launch_qemu to fix LUKS support
+>>>   iotests: blacklist 194 with the luks driver
+>>
+>> Since both tests involve an NBD server, I can take this series through=
 
-I'd rather test a 32bit cpu, not 64bit cpu in 32bit mode.
+>> my NBD queue.  Or, since both involve LUKS, you can push it in your ne=
+xt
+>> crypto pull request.  Any preferences?
+>=20
+> Best if either you or a block maintainer queue it i think
 
-I first tested with "-cpu pentium2" which worked, I then find it easier 
-this way:
+Okay, on my NBD queue:
+http://repo.or.cz/qemu/ericb.git/shortlog/refs/heads/nbd
 
-if /dev/kvm: "kvm32"
-else: "qemu32"
+I'll wait to see if other NBD patches land in the next few days, but
+will send a pull request within a week.
 
-What do you think?
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-> +        self.wait_ssh()
-> +        self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
-> +        self.ssh_root_check("apt-get update")
-> +        self.ssh_root_check("apt-get install -y cloud-initramfs-growroot")
-> +        # Don't check the status in case the guest hang up too quickly
-> +        self.ssh_root("sync && reboot")
-> +        time.sleep(5)
-> +        self.wait_ssh()
-> +        # The previous update sometimes doesn't survive a reboot, so do it again
-> +        self.ssh_root_check("apt-get update")
-> +        self.ssh_root_check("apt-get build-dep -y qemu")
-> +        self.ssh_root_check("apt-get install -y libfdt-dev")
-> +        self.ssh_root("poweroff")
-> +        self.wait()
-> +        if os.path.exists(img):
-> +            os.remove(img)
-> +        os.rename(img_tmp, img)
-> +        return 0
-> +
-> +if __name__ == "__main__":
-> +    sys.exit(basevm.main(UbuntuX86VM))
-> 
+
+--ESB1whq0bgAC2elgcNQk8lIanh970ncvO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmpvp8ACgkQp6FrSiUn
+Q2rbxQgArR4+axS4PNYgu/PhBNWN19TsjGJTPwJAtH1EaSJXiiLqfLRdptjHHdxM
+AfFtAU0HA1rTBDI3ZAEsqwngAkgABvVd9UIapCyU9E9q92NyDyAVWxjyf1Cb54Nu
+vujMiX112XyOsvUj+bqjo1yoPSYlufpw7xQMRRSvym9tbE4lIKpkiDE0pQ9wC3Sl
+h7W1FlMrbWT6afKkO1hsYZRmustdtHI2WugZt6gI9ewh6/R7B2c44qF9NIA7Xd9P
+BbsKv+8WEdg/QIPa8uvQgdSdWfiRRdkL3mhgOHYgDbFEX/u3j8UsRNtxQqpHmA+o
+uJsh1rtR6329Th6w6174Csm32XRW/g==
+=5ZDB
+-----END PGP SIGNATURE-----
+
+--ESB1whq0bgAC2elgcNQk8lIanh970ncvO--
