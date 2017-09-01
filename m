@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dno1T-0006jh-R3
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:27 -0400
+	(envelope-from <armbru@redhat.com>) id 1dno1U-0006kj-M0
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dno1N-0001l1-Cs
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43802)
+	(envelope-from <armbru@redhat.com>) id 1dno1N-0001kG-3F
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34550)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dno1N-0001jO-3M
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:13 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dno1M-0001j0-Oz
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:12 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2613E806CD
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:38:12 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C9D217EAA9
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:38:11 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 17:37:51 +0200
-Message-Id: <20170901153758.8628-41-armbru@redhat.com>
+Date: Fri,  1 Sep 2017 17:37:31 +0200
+Message-Id: <20170901153758.8628-21-armbru@redhat.com>
 In-Reply-To: <20170901153758.8628-1-armbru@redhat.com>
 References: <20170901153758.8628-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 40/47] crypto: Use qapi_enum_parse() in
- qcrypto_block_luks_name_lookup()
+Subject: [Qemu-devel] [PULL v2 20/47] qapi-schema: Collect run state stuff
+ in qapi/run-state.json
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,89 +34,854 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-Cc: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1503564371-26090-10-git-send-email-armbru@redhat.com>
+Message-Id: <1503602048-12268-6-git-send-email-armbru@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Acked-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- crypto/block-luks.c | 19 +++++++------------
- 1 file changed, 7 insertions(+), 12 deletions(-)
+ MAINTAINERS         |   1 +
+ Makefile            |   1 +
+ qapi-schema.json    | 165 +-----------------------
+ qapi/event.json     | 182 ---------------------------
+ qapi/run-state.json | 352 ++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ 5 files changed, 355 insertions(+), 346 deletions(-)
+ create mode 100644 qapi/run-state.json
 
-diff --git a/crypto/block-luks.c b/crypto/block-luks.c
-index afb8543108..c3cacdb1ed 100644
---- a/crypto/block-luks.c
-+++ b/crypto/block-luks.c
-@@ -20,6 +20,7 @@
+diff --git a/MAINTAINERS b/MAINTAINERS
+index fb90a19b3d..289ea8c575 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1338,6 +1338,7 @@ F: cpus.c
+ F: util/main-loop.c
+ F: util/qemu-timer.c
+ F: vl.c
++F: qapi/run-state.json
 =20
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "qapi/util.h"
- #include "qemu/bswap.h"
+ Human Monitor (HMP)
+ M: Dr. David Alan Gilbert <dgilbert@redhat.com>
+diff --git a/Makefile b/Makefile
+index ca4a03c376..d3ba41afb8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -413,6 +413,7 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SRC_P=
+ATH)/qapi/common.json \
+                $(SRC_PATH)/qapi/crypto.json \
+                $(SRC_PATH)/qapi/event.json $(SRC_PATH)/qapi/introspect.j=
+son \
+                $(SRC_PATH)/qapi/rocker.json \
++               $(SRC_PATH)/qapi/run-state.json \
+                $(SRC_PATH)/qapi/sockets.json \
+                $(SRC_PATH)/qapi/trace.json
 =20
- #include "crypto/block-luks.h"
-@@ -265,39 +266,33 @@ qcrypto_block_luks_cipher_alg_lookup(QCryptoCipherA=
-lgorithm alg,
-  * make that function emit a more friendly error message */
- static int qcrypto_block_luks_name_lookup(const char *name,
-                                           const char *const *map,
--                                          size_t maplen,
-                                           const char *type,
-                                           Error **errp)
- {
--    size_t i;
--    for (i =3D 0; i < maplen; i++) {
--        if (g_str_equal(map[i], name)) {
--            return i;
--        }
--    }
-+    int ret =3D qapi_enum_parse(map, name, -1, NULL);
+diff --git a/qapi-schema.json b/qapi-schema.json
+index d69b6da5ec..f42d61b664 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -80,6 +80,7 @@
 =20
--    error_setg(errp, "%s %s not supported", type, name);
--    return 0;
-+    if (ret < 0) {
-+        error_setg(errp, "%s %s not supported", type, name);
-+        return 0;
-+    }
-+    return ret;
- }
+ { 'include': 'qapi/common.json' }
+ { 'include': 'qapi/sockets.json' }
++{ 'include': 'qapi/run-state.json' }
+ { 'include': 'qapi/crypto.json' }
+ { 'include': 'qapi/block.json' }
+ { 'include': 'qapi/rocker.json' }
+@@ -243,94 +244,6 @@
+ { 'command': 'query-kvm', 'returns': 'KvmInfo' }
 =20
- #define qcrypto_block_luks_cipher_mode_lookup(name, errp)               =
-\
-     qcrypto_block_luks_name_lookup(name,                                =
-\
-                                    QCryptoCipherMode_lookup,            =
-\
--                                   QCRYPTO_CIPHER_MODE__MAX,            =
-\
-                                    "Cipher mode",                       =
-\
-                                    errp)
+ ##
+-# @RunState:
+-#
+-# An enumeration of VM run states.
+-#
+-# @debug: QEMU is running on a debugger
+-#
+-# @finish-migrate: guest is paused to finish the migration process
+-#
+-# @inmigrate: guest is paused waiting for an incoming migration.  Note
+-# that this state does not tell whether the machine will start at the
+-# end of the migration.  This depends on the command-line -S option and
+-# any invocation of 'stop' or 'cont' that has happened since QEMU was
+-# started.
+-#
+-# @internal-error: An internal error that prevents further guest executi=
+on
+-# has occurred
+-#
+-# @io-error: the last IOP has failed and the device is configured to pau=
+se
+-# on I/O errors
+-#
+-# @paused: guest has been paused via the 'stop' command
+-#
+-# @postmigrate: guest is paused following a successful 'migrate'
+-#
+-# @prelaunch: QEMU was started with -S and guest has not started
+-#
+-# @restore-vm: guest is paused to restore VM state
+-#
+-# @running: guest is actively running
+-#
+-# @save-vm: guest is paused to save the VM state
+-#
+-# @shutdown: guest is shut down (and -no-shutdown is in use)
+-#
+-# @suspended: guest is suspended (ACPI S3)
+-#
+-# @watchdog: the watchdog action is configured to pause and has been tri=
+ggered
+-#
+-# @guest-panicked: guest has been panicked as a result of guest OS panic
+-#
+-# @colo: guest is paused to save/restore VM state under colo checkpoint,
+-#        VM can not get into this state unless colo capability is enable=
+d
+-#        for migration. (since 2.8)
+-##
+-{ 'enum': 'RunState',
+-  'data': [ 'debug', 'inmigrate', 'internal-error', 'io-error', 'paused'=
+,
+-            'postmigrate', 'prelaunch', 'finish-migrate', 'restore-vm',
+-            'running', 'save-vm', 'shutdown', 'suspended', 'watchdog',
+-            'guest-panicked', 'colo' ] }
+-
+-##
+-# @StatusInfo:
+-#
+-# Information about VCPU run state
+-#
+-# @running: true if all VCPUs are runnable, false if not runnable
+-#
+-# @singlestep: true if VCPUs are in single-step mode
+-#
+-# @status: the virtual machine @RunState
+-#
+-# Since:  0.14.0
+-#
+-# Notes: @singlestep is enabled through the GDB stub
+-##
+-{ 'struct': 'StatusInfo',
+-  'data': {'running': 'bool', 'singlestep': 'bool', 'status': 'RunState'=
+} }
+-
+-##
+-# @query-status:
+-#
+-# Query the run status of all VCPUs
+-#
+-# Returns: @StatusInfo reflecting all VCPUs
+-#
+-# Since:  0.14.0
+-#
+-# Example:
+-#
+-# -> { "execute": "query-status" }
+-# <- { "return": { "running": true,
+-#                  "singlestep": false,
+-#                  "status": "running" } }
+-#
+-##
+-{ 'command': 'query-status', 'returns': 'StatusInfo' }
+-
+-##
+ # @UuidInfo:
+ #
+ # Guest UUID information (Universally Unique Identifier).
+@@ -6017,34 +5930,6 @@
+ { 'command': 'query-acpi-ospm-status', 'returns': ['ACPIOSTInfo'] }
 =20
- #define qcrypto_block_luks_hash_name_lookup(name, errp)                 =
-\
-     qcrypto_block_luks_name_lookup(name,                                =
-\
-                                    QCryptoHashAlgorithm_lookup,         =
-\
--                                   QCRYPTO_HASH_ALG__MAX,               =
-\
-                                    "Hash algorithm",                    =
-\
-                                    errp)
+ ##
+-# @WatchdogExpirationAction:
+-#
+-# An enumeration of the actions taken when the watchdog device's timer i=
+s
+-# expired
+-#
+-# @reset: system resets
+-#
+-# @shutdown: system shutdown, note that it is similar to @powerdown, whi=
+ch
+-#            tries to set to system status and notify guest
+-#
+-# @poweroff: system poweroff, the emulator program exits
+-#
+-# @pause: system pauses, similar to @stop
+-#
+-# @debug: system enters debug state
+-#
+-# @none: nothing is done
+-#
+-# @inject-nmi: a non-maskable interrupt is injected into the first VCPU =
+(all
+-#              VCPUS on x86) (since 2.4)
+-#
+-# Since: 2.1
+-##
+-{ 'enum': 'WatchdogExpirationAction',
+-  'data': [ 'reset', 'shutdown', 'poweroff', 'pause', 'debug', 'none',
+-            'inject-nmi' ] }
+-
+-##
+ # @IoOperationType:
+ #
+ # An enumeration of the I/O operation types
+@@ -6059,54 +5944,6 @@
+   'data': [ 'read', 'write' ] }
 =20
- #define qcrypto_block_luks_ivgen_name_lookup(name, errp)                =
-\
-     qcrypto_block_luks_name_lookup(name,                                =
-\
-                                    QCryptoIVGenAlgorithm_lookup,        =
-\
--                                   QCRYPTO_IVGEN_ALG__MAX,              =
-\
-                                    "IV generator",                      =
-\
-                                    errp)
+ ##
+-# @GuestPanicAction:
+-#
+-# An enumeration of the actions taken when guest OS panic is detected
+-#
+-# @pause: system pauses
+-#
+-# Since: 2.1 (poweroff since 2.8)
+-##
+-{ 'enum': 'GuestPanicAction',
+-  'data': [ 'pause', 'poweroff' ] }
+-
+-##
+-# @GuestPanicInformationType:
+-#
+-# An enumeration of the guest panic information types
+-#
+-# Since: 2.9
+-##
+-{ 'enum': 'GuestPanicInformationType',
+-  'data': [ 'hyper-v'] }
+-
+-##
+-# @GuestPanicInformation:
+-#
+-# Information about a guest panic
+-#
+-# Since: 2.9
+-##
+-{'union': 'GuestPanicInformation',
+- 'base': {'type': 'GuestPanicInformationType'},
+- 'discriminator': 'type',
+- 'data': { 'hyper-v': 'GuestPanicInformationHyperV' } }
+-
+-##
+-# @GuestPanicInformationHyperV:
+-#
+-# Hyper-V specific guest panic information (HV crash MSRs)
+-#
+-# Since: 2.9
+-##
+-{'struct': 'GuestPanicInformationHyperV',
+- 'data': { 'arg1': 'uint64',
+-           'arg2': 'uint64',
+-           'arg3': 'uint64',
+-           'arg4': 'uint64',
+-           'arg5': 'uint64' } }
+-
+-##
+ # @rtc-reset-reinjection:
+ #
+ # This command will reset the RTC interrupt reinjection backlog.
+diff --git a/qapi/event.json b/qapi/event.json
+index 6d22b025cc..9c6126d278 100644
+--- a/qapi/event.json
++++ b/qapi/event.json
+@@ -5,144 +5,6 @@
+ ##
 =20
+ ##
+-# @SHUTDOWN:
+-#
+-# Emitted when the virtual machine has shut down, indicating that qemu i=
+s
+-# about to exit.
+-#
+-# @guest: If true, the shutdown was triggered by a guest request (such a=
+s
+-# a guest-initiated ACPI shutdown request or other hardware-specific act=
+ion)
+-# rather than a host request (such as sending qemu a SIGINT). (since 2.1=
+0)
+-#
+-# Note: If the command-line option "-no-shutdown" has been specified, qe=
+mu will
+-# not exit, and a STOP event will eventually follow the SHUTDOWN event
+-#
+-# Since: 0.12.0
+-#
+-# Example:
+-#
+-# <- { "event": "SHUTDOWN", "data": { "guest": true },
+-#      "timestamp": { "seconds": 1267040730, "microseconds": 682951 } }
+-#
+-##
+-{ 'event': 'SHUTDOWN', 'data': { 'guest': 'bool' } }
+-
+-##
+-# @POWERDOWN:
+-#
+-# Emitted when the virtual machine is powered down through the power con=
+trol
+-# system, such as via ACPI.
+-#
+-# Since: 0.12.0
+-#
+-# Example:
+-#
+-# <- { "event": "POWERDOWN",
+-#      "timestamp": { "seconds": 1267040730, "microseconds": 682951 } }
+-#
+-##
+-{ 'event': 'POWERDOWN' }
+-
+-##
+-# @RESET:
+-#
+-# Emitted when the virtual machine is reset
+-#
+-# @guest: If true, the reset was triggered by a guest request (such as
+-# a guest-initiated ACPI reboot request or other hardware-specific actio=
+n)
+-# rather than a host request (such as the QMP command system_reset).
+-# (since 2.10)
+-#
+-# Since: 0.12.0
+-#
+-# Example:
+-#
+-# <- { "event": "RESET", "data": { "guest": false },
+-#      "timestamp": { "seconds": 1267041653, "microseconds": 9518 } }
+-#
+-##
+-{ 'event': 'RESET', 'data': { 'guest': 'bool' } }
+-
+-##
+-# @STOP:
+-#
+-# Emitted when the virtual machine is stopped
+-#
+-# Since: 0.12.0
+-#
+-# Example:
+-#
+-# <- { "event": "STOP",
+-#      "timestamp": { "seconds": 1267041730, "microseconds": 281295 } }
+-#
+-##
+-{ 'event': 'STOP' }
+-
+-##
+-# @RESUME:
+-#
+-# Emitted when the virtual machine resumes execution
+-#
+-# Since: 0.12.0
+-#
+-# Example:
+-#
+-# <- { "event": "RESUME",
+-#      "timestamp": { "seconds": 1271770767, "microseconds": 582542 } }
+-#
+-##
+-{ 'event': 'RESUME' }
+-
+-##
+-# @SUSPEND:
+-#
+-# Emitted when guest enters a hardware suspension state, for example, S3=
+ state,
+-# which is sometimes called standby state
+-#
+-# Since: 1.1
+-#
+-# Example:
+-#
+-# <- { "event": "SUSPEND",
+-#      "timestamp": { "seconds": 1344456160, "microseconds": 309119 } }
+-#
+-##
+-{ 'event': 'SUSPEND' }
+-
+-##
+-# @SUSPEND_DISK:
+-#
+-# Emitted when guest enters a hardware suspension state with data saved =
+on
+-# disk, for example, S4 state, which is sometimes called hibernate state
+-#
+-# Note: QEMU shuts down (similar to event @SHUTDOWN) when entering this =
+state
+-#
+-# Since: 1.2
+-#
+-# Example:
+-#
+-# <-   { "event": "SUSPEND_DISK",
+-#        "timestamp": { "seconds": 1344456160, "microseconds": 309119 } =
+}
+-#
+-##
+-{ 'event': 'SUSPEND_DISK' }
+-
+-##
+-# @WAKEUP:
+-#
+-# Emitted when the guest has woken up from suspend state and is running
+-#
+-# Since: 1.1
+-#
+-# Example:
+-#
+-# <- { "event": "WAKEUP",
+-#      "timestamp": { "seconds": 1344522075, "microseconds": 745528 } }
+-#
+-##
+-{ 'event': 'WAKEUP' }
+-
+-##
+ # @RTC_CHANGE:
+ #
+ # Emitted when the guest changes the RTC time.
+@@ -165,30 +27,6 @@
+   'data': { 'offset': 'int' } }
+=20
+ ##
+-# @WATCHDOG:
+-#
+-# Emitted when the watchdog device's timer is expired
+-#
+-# @action: action that has been taken
+-#
+-# Note: If action is "reset", "shutdown", or "pause" the WATCHDOG event =
+is
+-# followed respectively by the RESET, SHUTDOWN, or STOP events
+-#
+-# Note: This event is rate-limited.
+-#
+-# Since: 0.13.0
+-#
+-# Example:
+-#
+-# <- { "event": "WATCHDOG",
+-#      "data": { "action": "reset" },
+-#      "timestamp": { "seconds": 1267061043, "microseconds": 959568 } }
+-#
+-##
+-{ 'event': 'WATCHDOG',
+-  'data': { 'action': 'WatchdogExpirationAction' } }
+-
+-##
+ # @DEVICE_DELETED:
+ #
+ # Emitted whenever the device removal completion is acknowledged by the =
+guest.
+@@ -491,26 +329,6 @@
+   'data': { 'actual': 'int' } }
+=20
+ ##
+-# @GUEST_PANICKED:
+-#
+-# Emitted when guest OS panic is detected
+-#
+-# @action: action that has been taken, currently always "pause"
+-#
+-# @info: information about a panic (since 2.9)
+-#
+-# Since: 1.5
+-#
+-# Example:
+-#
+-# <- { "event": "GUEST_PANICKED",
+-#      "data": { "action": "pause" } }
+-#
+-##
+-{ 'event': 'GUEST_PANICKED',
+-  'data': { 'action': 'GuestPanicAction', '*info': 'GuestPanicInformatio=
+n' } }
+-
+-##
+ # @QUORUM_FAILURE:
+ #
+ # Emitted by the Quorum block driver if it fails to establish a quorum
+diff --git a/qapi/run-state.json b/qapi/run-state.json
+new file mode 100644
+index 0000000000..d36ff49834
+--- /dev/null
++++ b/qapi/run-state.json
+@@ -0,0 +1,352 @@
++# -*- Mode: Python -*-
++#
++
++##
++# =3D VM run state
++##
++
++##
++# @RunState:
++#
++# An enumeration of VM run states.
++#
++# @debug: QEMU is running on a debugger
++#
++# @finish-migrate: guest is paused to finish the migration process
++#
++# @inmigrate: guest is paused waiting for an incoming migration.  Note
++# that this state does not tell whether the machine will start at the
++# end of the migration.  This depends on the command-line -S option and
++# any invocation of 'stop' or 'cont' that has happened since QEMU was
++# started.
++#
++# @internal-error: An internal error that prevents further guest executi=
+on
++# has occurred
++#
++# @io-error: the last IOP has failed and the device is configured to pau=
+se
++# on I/O errors
++#
++# @paused: guest has been paused via the 'stop' command
++#
++# @postmigrate: guest is paused following a successful 'migrate'
++#
++# @prelaunch: QEMU was started with -S and guest has not started
++#
++# @restore-vm: guest is paused to restore VM state
++#
++# @running: guest is actively running
++#
++# @save-vm: guest is paused to save the VM state
++#
++# @shutdown: guest is shut down (and -no-shutdown is in use)
++#
++# @suspended: guest is suspended (ACPI S3)
++#
++# @watchdog: the watchdog action is configured to pause and has been tri=
+ggered
++#
++# @guest-panicked: guest has been panicked as a result of guest OS panic
++#
++# @colo: guest is paused to save/restore VM state under colo checkpoint,
++#        VM can not get into this state unless colo capability is enable=
+d
++#        for migration. (since 2.8)
++##
++{ 'enum': 'RunState',
++  'data': [ 'debug', 'inmigrate', 'internal-error', 'io-error', 'paused'=
+,
++            'postmigrate', 'prelaunch', 'finish-migrate', 'restore-vm',
++            'running', 'save-vm', 'shutdown', 'suspended', 'watchdog',
++            'guest-panicked', 'colo' ] }
++
++##
++# @StatusInfo:
++#
++# Information about VCPU run state
++#
++# @running: true if all VCPUs are runnable, false if not runnable
++#
++# @singlestep: true if VCPUs are in single-step mode
++#
++# @status: the virtual machine @RunState
++#
++# Since:  0.14.0
++#
++# Notes: @singlestep is enabled through the GDB stub
++##
++{ 'struct': 'StatusInfo',
++  'data': {'running': 'bool', 'singlestep': 'bool', 'status': 'RunState'=
+} }
++
++##
++# @query-status:
++#
++# Query the run status of all VCPUs
++#
++# Returns: @StatusInfo reflecting all VCPUs
++#
++# Since:  0.14.0
++#
++# Example:
++#
++# -> { "execute": "query-status" }
++# <- { "return": { "running": true,
++#                  "singlestep": false,
++#                  "status": "running" } }
++#
++##
++{ 'command': 'query-status', 'returns': 'StatusInfo' }
++
++##
++# @SHUTDOWN:
++#
++# Emitted when the virtual machine has shut down, indicating that qemu i=
+s
++# about to exit.
++#
++# @guest: If true, the shutdown was triggered by a guest request (such a=
+s
++# a guest-initiated ACPI shutdown request or other hardware-specific act=
+ion)
++# rather than a host request (such as sending qemu a SIGINT). (since 2.1=
+0)
++#
++# Note: If the command-line option "-no-shutdown" has been specified, qe=
+mu will
++# not exit, and a STOP event will eventually follow the SHUTDOWN event
++#
++# Since: 0.12.0
++#
++# Example:
++#
++# <- { "event": "SHUTDOWN", "data": { "guest": true },
++#      "timestamp": { "seconds": 1267040730, "microseconds": 682951 } }
++#
++##
++{ 'event': 'SHUTDOWN', 'data': { 'guest': 'bool' } }
++
++##
++# @POWERDOWN:
++#
++# Emitted when the virtual machine is powered down through the power con=
+trol
++# system, such as via ACPI.
++#
++# Since: 0.12.0
++#
++# Example:
++#
++# <- { "event": "POWERDOWN",
++#      "timestamp": { "seconds": 1267040730, "microseconds": 682951 } }
++#
++##
++{ 'event': 'POWERDOWN' }
++
++##
++# @RESET:
++#
++# Emitted when the virtual machine is reset
++#
++# @guest: If true, the reset was triggered by a guest request (such as
++# a guest-initiated ACPI reboot request or other hardware-specific actio=
+n)
++# rather than a host request (such as the QMP command system_reset).
++# (since 2.10)
++#
++# Since: 0.12.0
++#
++# Example:
++#
++# <- { "event": "RESET", "data": { "guest": false },
++#      "timestamp": { "seconds": 1267041653, "microseconds": 9518 } }
++#
++##
++{ 'event': 'RESET', 'data': { 'guest': 'bool' } }
++
++##
++# @STOP:
++#
++# Emitted when the virtual machine is stopped
++#
++# Since: 0.12.0
++#
++# Example:
++#
++# <- { "event": "STOP",
++#      "timestamp": { "seconds": 1267041730, "microseconds": 281295 } }
++#
++##
++{ 'event': 'STOP' }
++
++##
++# @RESUME:
++#
++# Emitted when the virtual machine resumes execution
++#
++# Since: 0.12.0
++#
++# Example:
++#
++# <- { "event": "RESUME",
++#      "timestamp": { "seconds": 1271770767, "microseconds": 582542 } }
++#
++##
++{ 'event': 'RESUME' }
++
++##
++# @SUSPEND:
++#
++# Emitted when guest enters a hardware suspension state, for example, S3=
+ state,
++# which is sometimes called standby state
++#
++# Since: 1.1
++#
++# Example:
++#
++# <- { "event": "SUSPEND",
++#      "timestamp": { "seconds": 1344456160, "microseconds": 309119 } }
++#
++##
++{ 'event': 'SUSPEND' }
++
++##
++# @SUSPEND_DISK:
++#
++# Emitted when guest enters a hardware suspension state with data saved =
+on
++# disk, for example, S4 state, which is sometimes called hibernate state
++#
++# Note: QEMU shuts down (similar to event @SHUTDOWN) when entering this =
+state
++#
++# Since: 1.2
++#
++# Example:
++#
++# <-   { "event": "SUSPEND_DISK",
++#        "timestamp": { "seconds": 1344456160, "microseconds": 309119 } =
+}
++#
++##
++{ 'event': 'SUSPEND_DISK' }
++
++##
++# @WAKEUP:
++#
++# Emitted when the guest has woken up from suspend state and is running
++#
++# Since: 1.1
++#
++# Example:
++#
++# <- { "event": "WAKEUP",
++#      "timestamp": { "seconds": 1344522075, "microseconds": 745528 } }
++#
++##
++{ 'event': 'WAKEUP' }
++
++##
++# @WATCHDOG:
++#
++# Emitted when the watchdog device's timer is expired
++#
++# @action: action that has been taken
++#
++# Note: If action is "reset", "shutdown", or "pause" the WATCHDOG event =
+is
++# followed respectively by the RESET, SHUTDOWN, or STOP events
++#
++# Note: This event is rate-limited.
++#
++# Since: 0.13.0
++#
++# Example:
++#
++# <- { "event": "WATCHDOG",
++#      "data": { "action": "reset" },
++#      "timestamp": { "seconds": 1267061043, "microseconds": 959568 } }
++#
++##
++{ 'event': 'WATCHDOG',
++  'data': { 'action': 'WatchdogExpirationAction' } }
++
++##
++# @WatchdogExpirationAction:
++#
++# An enumeration of the actions taken when the watchdog device's timer i=
+s
++# expired
++#
++# @reset: system resets
++#
++# @shutdown: system shutdown, note that it is similar to @powerdown, whi=
+ch
++#            tries to set to system status and notify guest
++#
++# @poweroff: system poweroff, the emulator program exits
++#
++# @pause: system pauses, similar to @stop
++#
++# @debug: system enters debug state
++#
++# @none: nothing is done
++#
++# @inject-nmi: a non-maskable interrupt is injected into the first VCPU =
+(all
++#              VCPUS on x86) (since 2.4)
++#
++# Since: 2.1
++##
++{ 'enum': 'WatchdogExpirationAction',
++  'data': [ 'reset', 'shutdown', 'poweroff', 'pause', 'debug', 'none',
++            'inject-nmi' ] }
++
++##
++# @GUEST_PANICKED:
++#
++# Emitted when guest OS panic is detected
++#
++# @action: action that has been taken, currently always "pause"
++#
++# @info: information about a panic (since 2.9)
++#
++# Since: 1.5
++#
++# Example:
++#
++# <- { "event": "GUEST_PANICKED",
++#      "data": { "action": "pause" } }
++#
++##
++{ 'event': 'GUEST_PANICKED',
++  'data': { 'action': 'GuestPanicAction', '*info': 'GuestPanicInformatio=
+n' } }
++
++##
++# @GuestPanicAction:
++#
++# An enumeration of the actions taken when guest OS panic is detected
++#
++# @pause: system pauses
++#
++# Since: 2.1 (poweroff since 2.8)
++##
++{ 'enum': 'GuestPanicAction',
++  'data': [ 'pause', 'poweroff' ] }
++
++##
++# @GuestPanicInformationType:
++#
++# An enumeration of the guest panic information types
++#
++# Since: 2.9
++##
++{ 'enum': 'GuestPanicInformationType',
++  'data': [ 'hyper-v'] }
++
++##
++# @GuestPanicInformation:
++#
++# Information about a guest panic
++#
++# Since: 2.9
++##
++{'union': 'GuestPanicInformation',
++ 'base': {'type': 'GuestPanicInformationType'},
++ 'discriminator': 'type',
++ 'data': { 'hyper-v': 'GuestPanicInformationHyperV' } }
++
++##
++# @GuestPanicInformationHyperV:
++#
++# Hyper-V specific guest panic information (HV crash MSRs)
++#
++# Since: 2.9
++##
++{'struct': 'GuestPanicInformationHyperV',
++ 'data': { 'arg1': 'uint64',
++           'arg2': 'uint64',
++           'arg3': 'uint64',
++           'arg4': 'uint64',
++           'arg5': 'uint64' } }
 --=20
 2.13.5
