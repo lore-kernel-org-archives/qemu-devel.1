@@ -1,18 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tklauser@distanz.ch>) id 1dnnyy-0004Lz-UC
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:35:52 -0400
+	(envelope-from <armbru@redhat.com>) id 1dno1E-0006Vg-8t
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tklauser@distanz.ch>) id 1dnnyv-00008Q-Go
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:35:44 -0400
-Received: from mail.zhinst.com ([212.126.164.98]:40554)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tklauser@distanz.ch>) id 1dnnyu-000051-Vl
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:35:41 -0400
-From: Tobias Klauser <tklauser@distanz.ch>
-Date: Fri,  1 Sep 2017 17:35:35 +0200
-Message-Id: <20170901153535.30680-1-tklauser@distanz.ch>
-Subject: [Qemu-devel] [PATCH v7] nios2: Add Altera JTAG UART emulation
+	(envelope-from <armbru@redhat.com>) id 1dno1D-0001br-1P
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55824)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dno1C-0001bT-Oh
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:02 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C4B8F20B0C
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:38:01 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Fri,  1 Sep 2017 17:37:12 +0200
+Message-Id: <20170901153758.8628-2-armbru@redhat.com>
+In-Reply-To: <20170901153758.8628-1-armbru@redhat.com>
+References: <20170901153758.8628-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL v2 01/47] qapi: Fix error handling code on
+ alternate conflict
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,398 +31,151 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marek Vasut <marex@denx.de>, Juro Bystricky <juro.bystricky@intel.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 
-From: Juro Bystricky <juro.bystricky@intel.com>
+From: Eduardo Habkost <ehabkost@redhat.com>
 
-Add the Altera JTAG UART model.
+The conflict check added by commit c0644771 ("qapi: Reject
+alternates that can't work with keyval_parse()") doesn't work
+with the following declaration:
 
-Hardware emulation based on:
-https://www.altera.com/en_US/pdfs/literature/ug/ug_embedded_ip.pdf
-(Please see "Register Map" on page 65)
+  { 'alternate': 'Alt',
+    'data': { 'one': 'bool',
+              'two': 'str' } }
 
-Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
-Acked-by: Marek Vasut <marex@denx.de>
-Tested-by: Tobias Klauser <tklauser@distanz.ch>
-[tk: updated to compile with latest qemu master]
-Signed-off-by: Tobias Klauser <tklauser@distanz.ch>
+It crashes with:
+
+  Traceback (most recent call last):
+    File "./scripts/qapi-types.py", line 295, in <module>
+      schema = QAPISchema(input_file)
+    File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 1468, in __init__
+      self.exprs = check_exprs(parser.exprs)
+    File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 958, in check_exprs
+      check_alternate(expr, info)
+    File "/home/ehabkost/rh/proj/virt/qemu/scripts/qapi.py", line 830, in check_alternate
+      % (name, key, types_seen[qtype]))
+  KeyError: 'QTYPE_QSTRING'
+
+This happens because the previously-seen conflicting member
+('one') can't be found at types_seen[qtype], but at
+types_seen['QTYPE_BOOL'].
+
+Fix the bug by moving the error check to the same loop that adds
+new items to types_seen, raising an exception if types_seen[qt]
+is already set.
+
+Add two additional test cases that can detect the bug.
+
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20170717180926.14924-1-ehabkost@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
+ scripts/qapi.py                                       | 8 ++++----
+ tests/Makefile.include                                | 2 ++
+ tests/qapi-schema/alternate-conflict-bool-string.err  | 1 +
+ tests/qapi-schema/alternate-conflict-bool-string.exit | 1 +
+ tests/qapi-schema/alternate-conflict-bool-string.json | 4 ++++
+ tests/qapi-schema/alternate-conflict-bool-string.out  | 0
+ tests/qapi-schema/alternate-conflict-num-string.err   | 1 +
+ tests/qapi-schema/alternate-conflict-num-string.exit  | 1 +
+ tests/qapi-schema/alternate-conflict-num-string.json  | 4 ++++
+ tests/qapi-schema/alternate-conflict-num-string.out   | 0
+ 10 files changed, 18 insertions(+), 4 deletions(-)
+ create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.err
+ create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.exit
+ create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.json
+ create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.out
+ create mode 100644 tests/qapi-schema/alternate-conflict-num-string.err
+ create mode 100644 tests/qapi-schema/alternate-conflict-num-string.exit
+ create mode 100644 tests/qapi-schema/alternate-conflict-num-string.json
+ create mode 100644 tests/qapi-schema/alternate-conflict-num-string.out
 
-v7:
- - resending with changes needed to compile with latest qemu master
-
- default-configs/nios2-softmmu.mak |   1 +
- hw/char/Makefile.objs             |   1 +
- hw/char/altera_juart.c            | 286 ++++++++++++++++++++++++++++++++++++++
- include/hw/char/altera_juart.h    |  46 ++++++
- 4 files changed, 334 insertions(+)
- create mode 100644 hw/char/altera_juart.c
- create mode 100644 include/hw/char/altera_juart.h
-
-diff --git a/default-configs/nios2-softmmu.mak b/default-configs/nios2-softmmu.mak
-index 74dc70caaef0..61598465c11d 100644
---- a/default-configs/nios2-softmmu.mak
-+++ b/default-configs/nios2-softmmu.mak
-@@ -4,3 +4,4 @@ CONFIG_NIOS2=y
- CONFIG_SERIAL=y
- CONFIG_PTIMER=y
- CONFIG_ALTERA_TIMER=y
-+CONFIG_ALTERA_JUART=y
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-index 1bcd37e98d9c..adb0e3ebc36a 100644
---- a/hw/char/Makefile.objs
-+++ b/hw/char/Makefile.objs
-@@ -28,6 +28,7 @@ common-obj-$(CONFIG_LM32) += lm32_juart.o
- common-obj-$(CONFIG_LM32) += lm32_uart.o
- common-obj-$(CONFIG_MILKYMIST) += milkymist-uart.o
- common-obj-$(CONFIG_SCLPCONSOLE) += sclpconsole.o sclpconsole-lm.o
-+common-obj-$(CONFIG_ALTERA_JUART) += altera_juart.o
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index 8aa2775f12..3693b520da 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -825,11 +825,11 @@ def check_alternate(expr, info):
+             else:
+                 conflicting.add('QTYPE_QNUM')
+                 conflicting.add('QTYPE_QBOOL')
+-        if conflicting & set(types_seen):
+-            raise QAPISemError(info, "Alternate '%s' member '%s' can't "
+-                               "be distinguished from member '%s'"
+-                               % (name, key, types_seen[qtype]))
+         for qt in conflicting:
++            if qt in types_seen:
++                raise QAPISemError(info, "Alternate '%s' member '%s' can't "
++                                   "be distinguished from member '%s'"
++                                   % (name, key, types_seen[qt]))
+             types_seen[qt] = key
  
- obj-$(CONFIG_VIRTIO) += virtio-serial-bus.o
- obj-$(CONFIG_TERMINAL3270) += terminal3270.o
-diff --git a/hw/char/altera_juart.c b/hw/char/altera_juart.c
+ 
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f08b7418f0..00af45ca85 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -376,6 +376,8 @@ qapi-schema += alternate-conflict-dict.json
+ qapi-schema += alternate-conflict-enum-bool.json
+ qapi-schema += alternate-conflict-enum-int.json
+ qapi-schema += alternate-conflict-string.json
++qapi-schema += alternate-conflict-bool-string.json
++qapi-schema += alternate-conflict-num-string.json
+ qapi-schema += alternate-empty.json
+ qapi-schema += alternate-nested.json
+ qapi-schema += alternate-unknown.json
+diff --git a/tests/qapi-schema/alternate-conflict-bool-string.err b/tests/qapi-schema/alternate-conflict-bool-string.err
 new file mode 100644
-index 000000000000..66adbd261f4c
+index 0000000000..e52fee7620
 --- /dev/null
-+++ b/hw/char/altera_juart.c
-@@ -0,0 +1,286 @@
-+/*
-+ * QEMU model of the Altera JTAG UART.
-+ *
-+ * Copyright (c) 2016-2017 Intel Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the License, or (at your option) any later version.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ * The Altera JTAG UART hardware registers are described in:
-+ * https://www.altera.com/en_US/pdfs/literature/ug/ug_embedded_ip.pdf
-+ * (In particular "Register Map" on page 65)
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "chardev/char-serial.h"
-+#include "hw/char/altera_juart.h"
-+#include "sysemu/sysemu.h"
-+#include "qemu/error-report.h"
-+
-+/* Data register */
-+#define OFFSET_R_DATA   0
-+#define DATA_RVALID     BIT(15)
-+#define DATA_RAVAIL     0xFFFF0000
-+
-+/* Control register */
-+#define OFFSET_R_CONTROL 4
-+#define CONTROL_RE      BIT(0)
-+#define CONTROL_WE      BIT(1)
-+#define CONTROL_RI      BIT(8)
-+#define CONTROL_WI      BIT(9)
-+#define CONTROL_AC      BIT(10)
-+#define CONTROL_WSPACE  0xFFFF0000
-+
-+#define CONTROL_WMASK (CONTROL_RE | CONTROL_WE | CONTROL_AC)
-+
-+#define TYPE_ALTERA_JUART "altera-juart"
-+#define ALTERA_JUART(obj) \
-+    OBJECT_CHECK(AlteraJUARTState, (obj), TYPE_ALTERA_JUART)
-+
-+/* Two registers 4 bytes wide each */
-+#define ALTERA_JTAG_UART_REGS_MEM_SIZE  (2 * 4)
-+
-+/*
-+ * The JTAG UART core generates an interrupt when either of the individual
-+ * interrupt conditions is pending and enabled.
-+ */
-+static void altera_juart_update_irq(AlteraJUARTState *s)
-+{
-+    unsigned int irq;
-+
-+    irq = ((s->jcontrol & CONTROL_WE) && (s->jcontrol & CONTROL_WI)) ||
-+          ((s->jcontrol & CONTROL_RE) && (s->jcontrol & CONTROL_RI));
-+
-+    qemu_set_irq(s->irq, irq);
-+}
-+
-+static uint64_t altera_juart_read(void *opaque, hwaddr addr, unsigned int size)
-+{
-+    AlteraJUARTState *s = opaque;
-+    uint32_t r;
-+
-+    switch (addr) {
-+    case OFFSET_R_DATA:
-+        r = s->rx_fifo[(s->rx_fifo_pos - s->rx_fifo_len) & (s->rx_fifo_size - 1)];
-+        if (s->rx_fifo_len) {
-+            s->rx_fifo_len--;
-+            qemu_chr_fe_accept_input(&s->chr);
-+            s->jdata = r | DATA_RVALID | (s->rx_fifo_len << 16);
-+            s->jcontrol |= CONTROL_RI;
-+        } else {
-+            s->jdata = 0;
-+            s->jcontrol &= ~CONTROL_RI;
-+        }
-+
-+        altera_juart_update_irq(s);
-+        return s->jdata;
-+
-+    case OFFSET_R_CONTROL:
-+        return s->jcontrol;
-+    }
-+
-+    return 0;
-+}
-+
-+static void altera_juart_write(void *opaque, hwaddr addr,
-+                               uint64_t value, unsigned int size)
-+{
-+    AlteraJUARTState *s = opaque;
-+    unsigned char c;
-+
-+    switch (addr) {
-+    case OFFSET_R_DATA:
-+        c = value & 0xFF;
-+        s->jcontrol |= CONTROL_WI;
-+        s->jdata = c;
-+        qemu_chr_fe_write(&s->chr, &c, 1);
-+        altera_juart_update_irq(s);
-+        break;
-+
-+    case OFFSET_R_CONTROL:
-+        /* Only RE and WE are writable */
-+        value &= CONTROL_WMASK;
-+        s->jcontrol &= ~CONTROL_WMASK;
-+        s->jcontrol |= value;
-+
-+        /* Writing 1 to AC clears it to 0 */
-+        if (value & CONTROL_AC) {
-+            s->jcontrol &= ~CONTROL_AC;
-+        }
-+        altera_juart_update_irq(s);
-+        break;
-+    }
-+}
-+
-+static int altera_juart_can_receive(void *opaque)
-+{
-+    AlteraJUARTState *s = opaque;
-+    return s->rx_fifo_size - s->rx_fifo_len;
-+}
-+
-+static void altera_juart_receive(void *opaque, const uint8_t *buf, int size)
-+{
-+    int i;
-+    AlteraJUARTState *s = opaque;
-+
-+    for (i = 0; i < size; i++) {
-+        s->rx_fifo[s->rx_fifo_pos] = buf[i];
-+        s->rx_fifo_pos++;
-+        s->rx_fifo_pos &= (s->rx_fifo_size - 1);
-+        s->rx_fifo_len++;
-+    }
-+    s->jcontrol |= CONTROL_RI;
-+    altera_juart_update_irq(s);
-+}
-+
-+static void altera_juart_event(void *opaque, int event)
-+{
-+}
-+
-+static void altera_juart_reset(DeviceState *d)
-+{
-+    AlteraJUARTState *s = ALTERA_JUART(d);
-+
-+    s->jdata = 0;
-+
-+    /* The number of spaces available in the write FIFO */
-+    s->jcontrol = s->rx_fifo_size << 16;
-+    s->rx_fifo_pos = 0;
-+    s->rx_fifo_len = 0;
-+}
-+
-+static const MemoryRegionOps juart_ops = {
-+    .read = altera_juart_read,
-+    .write = altera_juart_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4
-+    }
-+};
-+
-+static void altera_juart_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    AlteraJUARTState *s = ALTERA_JUART(obj);
-+
-+    memory_region_init_io(&s->mmio, OBJECT(s), &juart_ops, s,
-+                    TYPE_ALTERA_JUART, ALTERA_JTAG_UART_REGS_MEM_SIZE);
-+    sysbus_init_mmio(sbd, &s->mmio);
-+    sysbus_init_irq(sbd, &s->irq);
-+}
-+
-+void altera_juart_create(int channel, const hwaddr addr, qemu_irq irq, uint32_t fifo_sz)
-+{
-+    DeviceState *dev;
-+    SysBusDevice *bus;
-+    Chardev *chr;
-+    const char chr_name[] = "juart";
-+    char label[ARRAY_SIZE(chr_name) + 1];
-+
-+    dev = qdev_create(NULL, TYPE_ALTERA_JUART);
-+
-+    if (channel >= MAX_SERIAL_PORTS) {
-+        error_report("Only %d serial ports are supported by QEMU",
-+                     MAX_SERIAL_PORTS);
-+        exit(1);
-+    }
-+
-+    chr = serial_hds[channel];
-+    if (!chr) {
-+        snprintf(label, ARRAY_SIZE(label), "%s%d", chr_name, channel);
-+        chr = qemu_chr_new(label, "null");
-+        if (!chr) {
-+            error_report("Failed to assign serial port to altera %s", label);
-+            exit(1);
-+        }
-+    }
-+    qdev_prop_set_chr(dev, "chardev", chr);
-+
-+    /*
-+     * FIFO size can be set from 8 to 32,768 bytes.
-+     * Only powers of two are allowed.
-+     */
-+    if (fifo_sz < 8 || fifo_sz > 32768 || (fifo_sz & ~(1 << ctz32(fifo_sz)))) {
-+        error_report("juart%d: Invalid FIFO size. [%u]", channel, fifo_sz);
-+        exit(1);
-+    }
-+
-+    qdev_prop_set_uint32(dev, "fifo-size", fifo_sz);
-+    bus = SYS_BUS_DEVICE(dev);
-+    qdev_init_nofail(dev);
-+
-+    if (addr != (hwaddr)-1) {
-+        sysbus_mmio_map(bus, 0, addr);
-+    }
-+
-+    sysbus_connect_irq(bus, 0, irq);
-+}
-+
-+static const VMStateDescription vmstate_altera_juart = {
-+    .name = "altera-juart" ,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(jdata, AlteraJUARTState),
-+        VMSTATE_UINT32(jcontrol, AlteraJUARTState),
-+        VMSTATE_VBUFFER_UINT32(rx_fifo, AlteraJUARTState, 1, NULL, rx_fifo_size),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void altera_juart_realize(DeviceState *dev, Error **errp)
-+{
-+    AlteraJUARTState *s = ALTERA_JUART(dev);
-+    qemu_chr_fe_set_handlers(&s->chr,
-+                             altera_juart_can_receive,
-+                             altera_juart_receive,
-+                             altera_juart_event,
-+                             NULL, s, NULL, true);
-+    s->rx_fifo = g_malloc(s->rx_fifo_size);
-+}
-+
-+static void altera_juart_unrealize(DeviceState *dev, Error **errp)
-+{
-+    AlteraJUARTState *s = ALTERA_JUART(dev);
-+    g_free(s->rx_fifo);
-+}
-+
-+static Property altera_juart_props[] = {
-+    DEFINE_PROP_CHR("chardev", AlteraJUARTState, chr),
-+    DEFINE_PROP_UINT32("fifo-size", AlteraJUARTState, rx_fifo_size,
-+                                        ALTERA_JUART_DEFAULT_FIFO_SIZE),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void altera_juart_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->realize = altera_juart_realize;
-+    dc->unrealize = altera_juart_unrealize;
-+    dc->props = altera_juart_props;
-+    dc->vmsd = &vmstate_altera_juart;
-+    dc->reset = altera_juart_reset;
-+    dc->desc = "Altera JTAG UART";
-+}
-+
-+static const TypeInfo altera_juart_info = {
-+    .name          = TYPE_ALTERA_JUART,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(AlteraJUARTState),
-+    .instance_init = altera_juart_init,
-+    .class_init    = altera_juart_class_init,
-+};
-+
-+static void altera_juart_register(void)
-+{
-+    type_register_static(&altera_juart_info);
-+}
-+
-+type_init(altera_juart_register)
-diff --git a/include/hw/char/altera_juart.h b/include/hw/char/altera_juart.h
++++ b/tests/qapi-schema/alternate-conflict-bool-string.err
+@@ -0,0 +1 @@
++tests/qapi-schema/alternate-conflict-bool-string.json:2: Alternate 'Alt' member 'two' can't be distinguished from member 'one'
+diff --git a/tests/qapi-schema/alternate-conflict-bool-string.exit b/tests/qapi-schema/alternate-conflict-bool-string.exit
 new file mode 100644
-index 000000000000..fcf7a602523d
+index 0000000000..d00491fd7e
 --- /dev/null
-+++ b/include/hw/char/altera_juart.h
-@@ -0,0 +1,46 @@
-+/*
-+ * Altera JTAG UART emulation
-+ *
-+ * Copyright (c) 2016-2017 Intel Corporation.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the License, or (at your option) any later version.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef ALTERA_JUART_H
-+#define ALTERA_JUART_H
-+
-+#include "chardev/char-fe.h"
-+#include "hw/sysbus.h"
-+
-+/*
-+ * The read and write FIFO depths can be set from 8 to 32,768 bytes.
-+ * Only powers of two are allowed. A depth of 64 is generally optimal for
-+ * performance, and larger values are rarely necessary.
-+ */
-+
-+#define ALTERA_JUART_DEFAULT_FIFO_SIZE 64
-+
-+typedef struct AlteraJUARTState {
-+    SysBusDevice busdev;
-+    MemoryRegion mmio;
-+    CharBackend chr;
-+    qemu_irq irq;
-+
-+    unsigned int rx_fifo_size;
-+    unsigned int rx_fifo_pos;
-+    unsigned int rx_fifo_len;
-+    uint32_t jdata;
-+    uint32_t jcontrol;
-+    uint8_t *rx_fifo;
-+} AlteraJUARTState;
-+
-+void altera_juart_create(int channel, const hwaddr addr, qemu_irq irq,
-+                         uint32_t fifo_size);
-+
-+#endif /* ALTERA_JUART_H */
++++ b/tests/qapi-schema/alternate-conflict-bool-string.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/alternate-conflict-bool-string.json b/tests/qapi-schema/alternate-conflict-bool-string.json
+new file mode 100644
+index 0000000000..0544de10f3
+--- /dev/null
++++ b/tests/qapi-schema/alternate-conflict-bool-string.json
+@@ -0,0 +1,4 @@
++# alternate branches of 'str' type conflict with all scalar types
++{ 'alternate': 'Alt',
++  'data': { 'one': 'bool',
++            'two': 'str' } }
+diff --git a/tests/qapi-schema/alternate-conflict-bool-string.out b/tests/qapi-schema/alternate-conflict-bool-string.out
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/alternate-conflict-num-string.err b/tests/qapi-schema/alternate-conflict-num-string.err
+new file mode 100644
+index 0000000000..5ba3827dd1
+--- /dev/null
++++ b/tests/qapi-schema/alternate-conflict-num-string.err
+@@ -0,0 +1 @@
++tests/qapi-schema/alternate-conflict-num-string.json:2: Alternate 'Alt' member 'two' can't be distinguished from member 'one'
+diff --git a/tests/qapi-schema/alternate-conflict-num-string.exit b/tests/qapi-schema/alternate-conflict-num-string.exit
+new file mode 100644
+index 0000000000..d00491fd7e
+--- /dev/null
++++ b/tests/qapi-schema/alternate-conflict-num-string.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/alternate-conflict-num-string.json b/tests/qapi-schema/alternate-conflict-num-string.json
+new file mode 100644
+index 0000000000..ae901449af
+--- /dev/null
++++ b/tests/qapi-schema/alternate-conflict-num-string.json
+@@ -0,0 +1,4 @@
++# alternate branches of 'str' type conflict with all scalar types
++{ 'alternate': 'Alt',
++  'data': { 'one': 'number',
++            'two': 'str' } }
+diff --git a/tests/qapi-schema/alternate-conflict-num-string.out b/tests/qapi-schema/alternate-conflict-num-string.out
+new file mode 100644
+index 0000000000..e69de29bb2
 -- 
-2.13.0
+2.13.5
