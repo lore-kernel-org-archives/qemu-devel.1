@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dnnUH-0008CG-PH
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:04:09 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dnnUV-0008Sv-Oo
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:04:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dnnUC-00032m-Sh
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:04:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36724)
+	(envelope-from <ehabkost@redhat.com>) id 1dnnUQ-000386-T4
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:04:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37582)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dnnUC-00031S-K5
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:03:56 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dnnUQ-00037r-Kn
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:04:10 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri,  1 Sep 2017 12:03:05 -0300
-Message-Id: <20170901150317.10380-18-ehabkost@redhat.com>
+Date: Fri,  1 Sep 2017 12:03:07 -0300
+Message-Id: <20170901150317.10380-20-ehabkost@redhat.com>
 In-Reply-To: <20170901150317.10380-1-ehabkost@redhat.com>
 References: <20170901150317.10380-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 17/29] nios2: replace cpu_nios2_init() with
+Subject: [Qemu-devel] [PULL 19/29] xtensa: replace cpu_xtensa_init() with
  cpu_generic_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,87 +32,119 @@ Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-cpu_nios2_init() always falls back to TYPE_NIOS2_CPU object
-regardless of cpu_model. Put fallback logic into
-nios2_cpu_class_by_name() which would translate any cpu_model
-into TYPE_NIOS2_CPU class and replace cpu_nios2_init()
-with cpu_generic_init()
+call xtensa_irq_init() at realize time which makes
+cpu_xtensa_init() like generic cpu creation function.
+As result we can replace it with cpu_generic_init()
+which does the same job, reducing code duplication a bit.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <1503592308-93913-14-git-send-email-imammedo@redhat.com>
+Message-Id: <1503592308-93913-16-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/nios2/cpu.h        | 3 +--
- hw/nios2/10m50_devboard.c | 2 +-
- target/nios2/cpu.c        | 9 +++------
- 3 files changed, 5 insertions(+), 9 deletions(-)
+ target/xtensa/cpu.h    |  4 +---
+ hw/xtensa/sim.c        |  2 +-
+ hw/xtensa/xtfpga.c     |  2 +-
+ target/xtensa/cpu.c    |  3 +++
+ target/xtensa/helper.c | 22 ----------------------
+ 5 files changed, 6 insertions(+), 27 deletions(-)
 
-diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
-index 13931f3f0b..50d803a217 100644
---- a/target/nios2/cpu.h
-+++ b/target/nios2/cpu.h
-@@ -212,7 +212,6 @@ static inline Nios2CPU *nios2_env_get_cpu(CPUNios2Sta=
-te *env)
- #define ENV_OFFSET offsetof(Nios2CPU, env)
+diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+index ee29fb1a14..48033313c5 100644
+--- a/target/xtensa/cpu.h
++++ b/target/xtensa/cpu.h
+@@ -475,9 +475,7 @@ void xtensa_cpu_do_unaligned_access(CPUState *cpu, va=
+ddr addr,
+ #define XTENSA_DEFAULT_CPU_MODEL "dc232b"
+ #endif
 =20
- void nios2_tcg_init(void);
--Nios2CPU *cpu_nios2_init(const char *cpu_model);
- void nios2_cpu_do_interrupt(CPUState *cs);
- int cpu_nios2_signal_handler(int host_signum, void *pinfo, void *puc);
- void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUNios2State *env)=
+-XtensaCPU *cpu_xtensa_init(const char *cpu_model);
+-
+-#define cpu_init(cpu_model) CPU(cpu_xtensa_init(cpu_model))
++#define cpu_init(cpu_model) cpu_generic_init(TYPE_XTENSA_CPU, cpu_model)
+=20
+ void xtensa_translate_init(void);
+ void xtensa_breakpoint_handler(CPUState *cs);
+diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
+index 249cd1e8c9..1b4767f58b 100644
+--- a/hw/xtensa/sim.c
++++ b/hw/xtensa/sim.c
+@@ -84,7 +84,7 @@ static void xtensa_sim_init(MachineState *machine)
+     }
+=20
+     for (n =3D 0; n < smp_cpus; n++) {
+-        cpu =3D cpu_xtensa_init(cpu_model);
++        cpu =3D XTENSA_CPU(cpu_generic_init(TYPE_XTENSA_CPU, cpu_model))=
 ;
-@@ -229,7 +228,7 @@ void nios2_check_interrupts(CPUNios2State *env);
- #define TARGET_PHYS_ADDR_SPACE_BITS 32
- #define TARGET_VIRT_ADDR_SPACE_BITS 32
+         if (cpu =3D=3D NULL) {
+             error_report("unable to find CPU definition '%s'",
+                          cpu_model);
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index 635a4d4ec3..182ec1e31c 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -232,7 +232,7 @@ static void lx_init(const LxBoardDesc *board, Machine=
+State *machine)
+     }
 =20
--#define cpu_init(cpu_model) CPU(cpu_nios2_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_NIOS2_CPU, cpu_model)
+     for (n =3D 0; n < smp_cpus; n++) {
+-        cpu =3D cpu_xtensa_init(cpu_model);
++        cpu =3D XTENSA_CPU(cpu_generic_init(TYPE_XTENSA_CPU, cpu_model))=
+;
+         if (cpu =3D=3D NULL) {
+             error_report("unable to find CPU definition '%s'",
+                          cpu_model);
+diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
+index cd7f95823f..85897df0a8 100644
+--- a/target/xtensa/cpu.c
++++ b/target/xtensa/cpu.c
+@@ -100,9 +100,12 @@ static ObjectClass *xtensa_cpu_class_by_name(const c=
+har *cpu_model)
+ static void xtensa_cpu_realizefn(DeviceState *dev, Error **errp)
+ {
+     CPUState *cs =3D CPU(dev);
++    XtensaCPU *cpu =3D XTENSA_CPU(dev);
+     XtensaCPUClass *xcc =3D XTENSA_CPU_GET_CLASS(dev);
+     Error *local_err =3D NULL;
 =20
- #define cpu_gen_code cpu_nios2_gen_code
- #define cpu_signal_handler cpu_nios2_signal_handler
-diff --git a/hw/nios2/10m50_devboard.c b/hw/nios2/10m50_devboard.c
-index b6868b8233..e4007f6d7f 100644
---- a/hw/nios2/10m50_devboard.c
-+++ b/hw/nios2/10m50_devboard.c
-@@ -75,7 +75,7 @@ static void nios2_10m50_ghrd_init(MachineState *machine=
-)
-                                 phys_ram_alias);
-=20
-     /* Create CPU -- FIXME */
--    cpu =3D cpu_nios2_init("nios2");
-+    cpu =3D NIOS2_CPU(cpu_generic_init(TYPE_NIOS2_CPU, "nios2"));
-=20
-     /* Register: CPU interrupt controller (PIC) */
-     cpu_irq =3D nios2_cpu_pic_init(cpu);
-diff --git a/target/nios2/cpu.c b/target/nios2/cpu.c
-index d56bb7245a..5b02fb67ea 100644
---- a/target/nios2/cpu.c
-+++ b/target/nios2/cpu.c
-@@ -83,13 +83,9 @@ static void nios2_cpu_initfn(Object *obj)
++    xtensa_irq_init(&cpu->env);
++
+     cpu_exec_realizefn(cs, &local_err);
+     if (local_err !=3D NULL) {
+         error_propagate(errp, local_err);
+diff --git a/target/xtensa/helper.c b/target/xtensa/helper.c
+index bcd0b7738d..e8fba20918 100644
+--- a/target/xtensa/helper.c
++++ b/target/xtensa/helper.c
+@@ -113,28 +113,6 @@ void xtensa_breakpoint_handler(CPUState *cs)
      }
  }
 =20
--Nios2CPU *cpu_nios2_init(const char *cpu_model)
-+static ObjectClass *nios2_cpu_class_by_name(const char *cpu_model)
- {
--    Nios2CPU *cpu =3D NIOS2_CPU(object_new(TYPE_NIOS2_CPU));
+-XtensaCPU *cpu_xtensa_init(const char *cpu_model)
+-{
+-    ObjectClass *oc;
+-    XtensaCPU *cpu;
+-    CPUXtensaState *env;
+-
+-    oc =3D cpu_class_by_name(TYPE_XTENSA_CPU, cpu_model);
+-    if (oc =3D=3D NULL) {
+-        return NULL;
+-    }
+-
+-    cpu =3D XTENSA_CPU(object_new(object_class_get_name(oc)));
+-    env =3D &cpu->env;
+-
+-    xtensa_irq_init(env);
 -
 -    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
 -
 -    return cpu;
-+    return object_class_by_name(TYPE_NIOS2_CPU);
- }
-=20
- static void nios2_cpu_realizefn(DeviceState *dev, Error **errp)
-@@ -203,6 +199,7 @@ static void nios2_cpu_class_init(ObjectClass *oc, voi=
-d *data)
-     ncc->parent_reset =3D cc->reset;
-     cc->reset =3D nios2_cpu_reset;
-=20
-+    cc->class_by_name =3D nios2_cpu_class_by_name;
-     cc->has_work =3D nios2_cpu_has_work;
-     cc->do_interrupt =3D nios2_cpu_do_interrupt;
-     cc->cpu_exec_interrupt =3D nios2_cpu_exec_interrupt;
+-}
+-
+-
+ void xtensa_cpu_list(FILE *f, fprintf_function cpu_fprintf)
+ {
+     XtensaConfigList *core =3D xtensa_cores;
 --=20
 2.13.5
