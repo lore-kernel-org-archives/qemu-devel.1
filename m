@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnqIn-0007PZ-1G
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1dnqIn-0007Pe-2s
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnqIh-0001rD-Sj
+	(envelope-from <eblake@redhat.com>) id 1dnqIh-0001qu-Kn
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53452)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnqIh-0001qN-Kk
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:15 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B384E81E0C
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 18:04:14 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Fri,  1 Sep 2017 13:03:30 -0500
-Message-Id: <20170901180340.30009-20-eblake@redhat.com>
+Date: Fri,  1 Sep 2017 13:03:25 -0500
+Message-Id: <20170901180340.30009-15-eblake@redhat.com>
 In-Reply-To: <20170901180340.30009-1-eblake@redhat.com>
 References: <20170901180340.30009-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 19/29] postcopy-test: Drop dependence on
- global_qtest
+Subject: [Qemu-devel] [PATCH v6 14/29] libqos: Use explicit QTestState for
+ fw_cfg operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,261 +21,343 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com
+Cc: armbru@redhat.com, pbonzini@redhat.com, John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, "open list:IDE" <qemu-block@nongnu.org>, "open list:sPAPR" <qemu-ppc@nongnu.org>
 
-Managing parallel connections to two different monitors via
-the implicit global_qtest makes it hard to copy-and-paste code
-to tests that are not aware of the implicit state.  We are
-already half-using the explicit APIs, so fix the remaining
-spots to also be explicit about which connection is in use,
-and avoid global_qtest.
-
-We can assert that the conversion is correct by checking that
-global_qtest remains NULL throughout the test (a later patch
-that changes global_qtest to not be a public global variable
-will drop the assertions).
+Drop one more client of global_qtest by teaching all fw_cfg test
+functionality (invoked through alloc-pc) to pass in an explicit
+QTestState, adjusting all callers.  In particular, fw_cfg-test
+had to reorder things to create the test state prior to creating
+the fw_cfg.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/postcopy-test.c | 84 ++++++++++++++++++++++++---------------------------
- 1 file changed, 40 insertions(+), 44 deletions(-)
+ tests/libqos/fw_cfg.h       | 10 ++++++----
+ tests/libqos/libqos.h       |  2 +-
+ tests/libqos/malloc-pc.h    |  4 ++--
+ tests/libqos/malloc-spapr.h |  2 +-
+ tests/libqos/malloc.h       |  1 +
+ tests/boot-order-test.c     |  6 +++---
+ tests/e1000e-test.c         |  2 +-
+ tests/fw_cfg-test.c         | 14 ++++++--------
+ tests/ide-test.c            |  2 +-
+ tests/libqos/fw_cfg.c       | 14 ++++++++------
+ tests/libqos/libqos.c       |  2 +-
+ tests/libqos/malloc-pc.c    |  8 ++++----
+ tests/libqos/malloc-spapr.c |  4 ++--
+ tests/vhost-user-test.c     |  2 +-
+ 14 files changed, 38 insertions(+), 35 deletions(-)
 
-diff --git a/tests/postcopy-test.c b/tests/postcopy-test.c
-index 8142f2ab90..0e5fe20a83 100644
---- a/tests/postcopy-test.c
-+++ b/tests/postcopy-test.c
-@@ -223,7 +223,7 @@ static void wait_for_serial(const char *side)
- /*
-  * Events can get in the way of responses we are actually waiting for.
-  */
--static QDict *return_or_event(QDict *response)
-+static QDict *return_or_event(QTestState *qts, QDict *response)
+diff --git a/tests/libqos/fw_cfg.h b/tests/libqos/fw_cfg.h
+index e8371b2317..396dd4ee1e 100644
+--- a/tests/libqos/fw_cfg.h
++++ b/tests/libqos/fw_cfg.h
+@@ -15,10 +15,12 @@
+
+
+ typedef struct QFWCFG QFWCFG;
++typedef struct QTestState QTestState;
+
+ struct QFWCFG
  {
-     const char *event_string;
-     if (!qdict_haskey(response, "event")) {
-@@ -236,7 +236,7 @@ static QDict *return_or_event(QDict *response)
-         got_stop = true;
-     }
-     QDECREF(response);
--    return return_or_event(qtest_qmp_receive(global_qtest));
-+    return return_or_event(qts, qtest_qmp_receive(qts));
+     uint64_t base;
++    QTestState *qts;
+     void (*select)(QFWCFG *fw_cfg, uint16_t key);
+     void (*read)(QFWCFG *fw_cfg, void *data, size_t len);
+ };
+@@ -30,12 +32,12 @@ uint16_t qfw_cfg_get_u16(QFWCFG *fw_cfg, uint16_t key);
+ uint32_t qfw_cfg_get_u32(QFWCFG *fw_cfg, uint16_t key);
+ uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key);
+
+-QFWCFG *mm_fw_cfg_init(uint64_t base);
+-QFWCFG *io_fw_cfg_init(uint16_t base);
++QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base);
++QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t base);
+
+-static inline QFWCFG *pc_fw_cfg_init(void)
++static inline QFWCFG *pc_fw_cfg_init(QTestState *qts)
+ {
+-    return io_fw_cfg_init(0x510);
++    return io_fw_cfg_init(qts, 0x510);
  }
 
+ #endif
+diff --git a/tests/libqos/libqos.h b/tests/libqos/libqos.h
+index 78e5c044a0..07d4b93d1d 100644
+--- a/tests/libqos/libqos.h
++++ b/tests/libqos/libqos.h
+@@ -8,7 +8,7 @@
+ typedef struct QOSState QOSState;
 
-@@ -247,12 +247,13 @@ static QDict *return_or_event(QDict *response)
-  * going postcopy.
-  */
+ typedef struct QOSOps {
+-    QGuestAllocator *(*init_allocator)(QAllocOpts);
++    QGuestAllocator *(*init_allocator)(QTestState *qts, QAllocOpts);
+     void (*uninit_allocator)(QGuestAllocator *);
+     QPCIBus *(*qpci_init)(QTestState *qts, QGuestAllocator *alloc);
+     void (*qpci_free)(QPCIBus *bus);
+diff --git a/tests/libqos/malloc-pc.h b/tests/libqos/malloc-pc.h
+index 86ab9f0429..10f3da6cf2 100644
+--- a/tests/libqos/malloc-pc.h
++++ b/tests/libqos/malloc-pc.h
+@@ -15,8 +15,8 @@
 
--static uint64_t get_migration_pass(void)
-+static uint64_t get_migration_pass(QTestState *qts)
+ #include "libqos/malloc.h"
+
+-QGuestAllocator *pc_alloc_init(void);
+-QGuestAllocator *pc_alloc_init_flags(QAllocOpts flags);
++QGuestAllocator *pc_alloc_init(QTestState *qts);
++QGuestAllocator *pc_alloc_init_flags(QTestState *qts, QAllocOpts flags);
+ void pc_alloc_uninit(QGuestAllocator *allocator);
+
+ #endif
+diff --git a/tests/libqos/malloc-spapr.h b/tests/libqos/malloc-spapr.h
+index 64d0e770d1..52a9346a26 100644
+--- a/tests/libqos/malloc-spapr.h
++++ b/tests/libqos/malloc-spapr.h
+@@ -11,7 +11,7 @@
+ #include "libqos/malloc.h"
+
+ QGuestAllocator *spapr_alloc_init(void);
+-QGuestAllocator *spapr_alloc_init_flags(QAllocOpts flags);
++QGuestAllocator *spapr_alloc_init_flags(QTestState *qts, QAllocOpts flags);
+ void spapr_alloc_uninit(QGuestAllocator *allocator);
+
+ #endif
+diff --git a/tests/libqos/malloc.h b/tests/libqos/malloc.h
+index ae9dac8f61..828fddabdb 100644
+--- a/tests/libqos/malloc.h
++++ b/tests/libqos/malloc.h
+@@ -14,6 +14,7 @@
+ #define LIBQOS_MALLOC_H
+
+ #include "qemu/queue.h"
++#include "libqtest.h"
+
+ typedef enum {
+     ALLOC_NO_FLAGS    = 0x00,
+diff --git a/tests/boot-order-test.c b/tests/boot-order-test.c
+index 9d516830dd..5fc2ca8e9e 100644
+--- a/tests/boot-order-test.c
++++ b/tests/boot-order-test.c
+@@ -135,7 +135,7 @@ static void test_prep_boot_order(void)
+
+ static uint64_t read_boot_order_pmac(void)
  {
-     QDict *rsp, *rsp_return, *rsp_ram;
-     uint64_t result;
+-    QFWCFG *fw_cfg = mm_fw_cfg_init(0xf0000510);
++    QFWCFG *fw_cfg = mm_fw_cfg_init(global_qtest, 0xf0000510);
 
--    rsp = return_or_event(qmp("{ 'execute': 'query-migrate' }"));
-+    rsp = return_or_event(qts,
-+                          qtest_qmp(qts, "{ 'execute': 'query-migrate' }"));
-     rsp_return = qdict_get_qdict(rsp, "return");
-     if (!qdict_haskey(rsp_return, "ram")) {
-         /* Still in setup */
-@@ -265,7 +266,7 @@ static uint64_t get_migration_pass(void)
-     return result;
+     return qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_DEVICE);
  }
+@@ -160,7 +160,7 @@ static void test_pmac_newworld_boot_order(void)
 
--static void wait_for_migration_complete(void)
-+static void wait_for_migration_complete(QTestState *qts)
+ static uint64_t read_boot_order_sun4m(void)
  {
-     QDict *rsp, *rsp_return;
-     bool completed;
-@@ -273,7 +274,8 @@ static void wait_for_migration_complete(void)
-     do {
-         const char *status;
+-    QFWCFG *fw_cfg = mm_fw_cfg_init(0xd00000510ULL);
++    QFWCFG *fw_cfg = mm_fw_cfg_init(global_qtest, 0xd00000510ULL);
 
--        rsp = return_or_event(qmp("{ 'execute': 'query-migrate' }"));
-+        rsp = return_or_event(qts,
-+                              qtest_qmp(qts, "{ 'execute': 'query-migrate' }"));
-         rsp_return = qdict_get_qdict(rsp, "return");
-         status = qdict_get_str(rsp_return, "status");
-         completed = strcmp(status, "completed") == 0;
-@@ -283,14 +285,14 @@ static void wait_for_migration_complete(void)
-     } while (!completed);
+     return qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_DEVICE);
  }
+@@ -172,7 +172,7 @@ static void test_sun4m_boot_order(void)
 
--static void wait_for_migration_pass(void)
-+static void wait_for_migration_pass(QTestState *qts)
+ static uint64_t read_boot_order_sun4u(void)
  {
--    uint64_t initial_pass = get_migration_pass();
-+    uint64_t initial_pass = get_migration_pass(qts);
-     uint64_t pass;
+-    QFWCFG *fw_cfg = io_fw_cfg_init(0x510);
++    QFWCFG *fw_cfg = io_fw_cfg_init(global_qtest, 0x510);
 
-     /* Wait for the 1st sync */
-     do {
--        initial_pass = get_migration_pass();
-+        initial_pass = get_migration_pass(qts);
-         if (got_stop || initial_pass) {
-             break;
-         }
-@@ -299,11 +301,11 @@ static void wait_for_migration_pass(void)
-
-     do {
-         usleep(1000 * 100);
--        pass = get_migration_pass();
-+        pass = get_migration_pass(qts);
-     } while (pass == initial_pass && !got_stop);
+     return qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_DEVICE);
  }
+diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
+index d8085d944e..32aa738b72 100644
+--- a/tests/e1000e-test.c
++++ b/tests/e1000e-test.c
+@@ -392,7 +392,7 @@ static void data_test_init(e1000e_device *d)
+     qtest_start(cmdline);
+     g_free(cmdline);
 
--static void check_guests_ram(void)
-+static void check_guests_ram(QTestState *qts)
- {
-     /* Our ASM test will have been incrementing one byte from each page from
-      * 1MB to <100MB in order.
-@@ -318,13 +320,13 @@ static void check_guests_ram(void)
-     bool hit_edge = false;
-     bool bad = false;
+-    test_alloc = pc_alloc_init();
++    test_alloc = pc_alloc_init(global_qtest);
+     g_assert_nonnull(test_alloc);
 
--    qtest_memread(global_qtest, start_address, &first_byte, 1);
-+    qtest_memread(qts, start_address, &first_byte, 1);
-     last_byte = first_byte;
+     test_bus = qpci_init_pc(global_qtest, test_alloc);
+diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+index 688342bed5..47596c57a1 100644
+--- a/tests/fw_cfg-test.c
++++ b/tests/fw_cfg-test.c
+@@ -107,7 +107,11 @@ int main(int argc, char **argv)
 
-     for (address = start_address + 4096; address < end_address; address += 4096)
-     {
-         uint8_t b;
--        qtest_memread(global_qtest, address, &b, 1);
-+        qtest_memread(qts, address, &b, 1);
-         if (b != last_byte) {
-             if (((b + 1) % 256) == last_byte && !hit_edge) {
-                 /* This is OK, the guest stopped at the point of
-@@ -356,9 +358,9 @@ static void cleanup(const char *filename)
- static void test_migrate(void)
- {
-     char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
--    QTestState *global = global_qtest, *from, *to;
-+    QTestState *from, *to;
-     unsigned char dest_byte_a, dest_byte_b, dest_byte_c, dest_byte_d;
--    gchar *cmd, *cmd_src, *cmd_dst;
-+    gchar *cmd_src, *cmd_dst;
-     QDict *rsp;
+     g_test_init(&argc, &argv, NULL);
 
-     char *bootpath = g_strdup_printf("%s/bootsect", tmpfs);
-@@ -401,24 +403,24 @@ static void test_migrate(void)
-
-     g_free(bootpath);
-
--    from = qtest_start(cmd_src);
-+    from = qtest_init(cmd_src);
-     g_free(cmd_src);
-
-     to = qtest_init(cmd_dst);
-     g_free(cmd_dst);
-
--    global_qtest = from;
--    rsp = qmp("{ 'execute': 'migrate-set-capabilities',"
--                  "'arguments': { "
-+    assert(!global_qtest);
+-    fw_cfg = pc_fw_cfg_init();
++    cmdline = g_strdup_printf("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8 ");
++    s = qtest_start(cmdline);
++    g_free(cmdline);
 +
-+    rsp = qtest_qmp(from, "{ 'execute': 'migrate-set-capabilities',"
-+                    "'arguments': { "
-                       "'capabilities': [ {"
-                           "'capability': 'postcopy-ram',"
-                           "'state': true } ] } }");
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
++    fw_cfg = pc_fw_cfg_init(s);
 
--    global_qtest = to;
--    rsp = qmp("{ 'execute': 'migrate-set-capabilities',"
--                  "'arguments': { "
-+    rsp = qtest_qmp(to, "{ 'execute': 'migrate-set-capabilities',"
-+                    "'arguments': { "
-                       "'capabilities': [ {"
-                           "'capability': 'postcopy-ram',"
-                           "'state': true } ] } }");
-@@ -429,15 +431,14 @@ static void test_migrate(void)
-      * quickly, but that it doesn't complete precopy even on a slow
-      * machine, so also set the downtime.
-      */
--    global_qtest = from;
--    rsp = qmp("{ 'execute': 'migrate_set_speed',"
--              "'arguments': { 'value': 100000000 } }");
-+    rsp = qtest_qmp(from, "{ 'execute': 'migrate_set_speed',"
-+                    "'arguments': { 'value': 100000000 } }");
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
+     qtest_add_func("fw_cfg/signature", test_fw_cfg_signature);
+     qtest_add_func("fw_cfg/id", test_fw_cfg_id);
+@@ -125,15 +129,9 @@ int main(int argc, char **argv)
+     qtest_add_func("fw_cfg/numa", test_fw_cfg_numa);
+     qtest_add_func("fw_cfg/boot_menu", test_fw_cfg_boot_menu);
 
-     /* 1ms downtime - it should never finish precopy */
--    rsp = qmp("{ 'execute': 'migrate_set_downtime',"
--              "'arguments': { 'value': 0.001 } }");
-+    rsp = qtest_qmp(from, "{ 'execute': 'migrate_set_downtime',"
-+                    "'arguments': { 'value': 0.001 } }");
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
-
-@@ -445,35 +446,30 @@ static void test_migrate(void)
-     /* Wait for the first serial output from the source */
-     wait_for_serial("src_serial");
-
--    cmd = g_strdup_printf("{ 'execute': 'migrate',"
--                          "'arguments': { 'uri': '%s' } }",
--                          uri);
--    rsp = qmp(cmd);
--    g_free(cmd);
-+    rsp = qtest_qmp(from,
-+                    "{'execute': 'migrate', 'arguments': { 'uri': %s}}", uri);
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
-
--    wait_for_migration_pass();
-+    wait_for_migration_pass(from);
-
--    rsp = return_or_event(qmp("{ 'execute': 'migrate-start-postcopy' }"));
-+    rsp = return_or_event(from,
-+                          qtest_qmp(from,
-+                                    "{ 'execute': 'migrate-start-postcopy' }"));
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
-
-     if (!got_stop) {
--        qmp_eventwait("STOP");
-+        qtest_qmp_eventwait(from, "STOP");
-     }
-
--    global_qtest = to;
--    qmp_eventwait("RESUME");
-+    qtest_qmp_eventwait(to, "RESUME");
-
-     wait_for_serial("dest_serial");
--    global_qtest = from;
--    wait_for_migration_complete();
-+    wait_for_migration_complete(from);
-
-     qtest_quit(from);
-
--    global_qtest = to;
+-    cmdline = g_strdup_printf("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8 ");
+-    s = qtest_start(cmdline);
+-    g_free(cmdline);
 -
-     qtest_memread(to, start_address, &dest_byte_a, 1);
+     ret = g_test_run();
 
-     /* Destination still running, wait for a byte to change */
-@@ -482,19 +478,19 @@ static void test_migrate(void)
-         usleep(10 * 1000);
-     } while (dest_byte_a == dest_byte_b);
+-    if (s) {
+-        qtest_quit(s);
+-    }
++    qtest_quit(s);
 
--    qmp_discard_response("{ 'execute' : 'stop'}");
-+    qtest_qmp_discard_response(to, "{ 'execute' : 'stop'}");
-     /* With it stopped, check nothing changes */
-     qtest_memread(to, start_address, &dest_byte_c, 1);
-     sleep(1);
-     qtest_memread(to, start_address, &dest_byte_d, 1);
-     g_assert_cmpint(dest_byte_c, ==, dest_byte_d);
+     return ret;
+ }
+diff --git a/tests/ide-test.c b/tests/ide-test.c
+index b2237b6158..084f6a5f96 100644
+--- a/tests/ide-test.c
++++ b/tests/ide-test.c
+@@ -125,7 +125,7 @@ static void ide_test_start(const char *cmdline_fmt, ...)
+     va_end(ap);
 
--    check_guests_ram();
-+    check_guests_ram(to);
+     qtest_start(cmdline);
+-    guest_malloc = pc_alloc_init();
++    guest_malloc = pc_alloc_init(global_qtest);
 
-     qtest_quit(to);
-     g_free(uri);
+     g_free(cmdline);
+ }
+diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
+index 4d9dc3fd0b..d0889d1e22 100644
+--- a/tests/libqos/fw_cfg.c
++++ b/tests/libqos/fw_cfg.c
+@@ -56,7 +56,7 @@ uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key)
 
--    global_qtest = global;
-+    assert(!global_qtest);
+ static void mm_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
+ {
+-    writew(fw_cfg->base, key);
++    qtest_writew(fw_cfg->qts, fw_cfg->base, key);
+ }
 
-     cleanup("bootsect");
-     cleanup("migsocket");
+ static void mm_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
+@@ -65,15 +65,16 @@ static void mm_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
+     int i;
+
+     for (i = 0; i < len; i++) {
+-        ptr[i] = readb(fw_cfg->base + 2);
++        ptr[i] = qtest_readb(fw_cfg->qts, fw_cfg->base + 2);
+     }
+ }
+
+-QFWCFG *mm_fw_cfg_init(uint64_t base)
++QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base)
+ {
+     QFWCFG *fw_cfg = g_malloc0(sizeof(*fw_cfg));
+
+     fw_cfg->base = base;
++    fw_cfg->qts = qts;
+     fw_cfg->select = mm_fw_cfg_select;
+     fw_cfg->read = mm_fw_cfg_read;
+
+@@ -82,7 +83,7 @@ QFWCFG *mm_fw_cfg_init(uint64_t base)
+
+ static void io_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
+ {
+-    outw(fw_cfg->base, key);
++    qtest_outw(fw_cfg->qts, fw_cfg->base, key);
+ }
+
+ static void io_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
+@@ -91,15 +92,16 @@ static void io_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
+     int i;
+
+     for (i = 0; i < len; i++) {
+-        ptr[i] = inb(fw_cfg->base + 1);
++        ptr[i] = qtest_inb(fw_cfg->qts, fw_cfg->base + 1);
+     }
+ }
+
+-QFWCFG *io_fw_cfg_init(uint16_t base)
++QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t base)
+ {
+     QFWCFG *fw_cfg = g_malloc0(sizeof(*fw_cfg));
+
+     fw_cfg->base = base;
++    fw_cfg->qts = qts;
+     fw_cfg->select = io_fw_cfg_select;
+     fw_cfg->read = io_fw_cfg_read;
+
+diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
+index c95428e1cb..62d2f39b93 100644
+--- a/tests/libqos/libqos.c
++++ b/tests/libqos/libqos.c
+@@ -24,7 +24,7 @@ QOSState *qtest_vboot(QOSOps *ops, const char *cmdline_fmt, va_list ap)
+     qs->ops = ops;
+     if (ops) {
+         if (ops->init_allocator) {
+-            qs->alloc = ops->init_allocator(ALLOC_NO_FLAGS);
++            qs->alloc = ops->init_allocator(qs->qts, ALLOC_NO_FLAGS);
+         }
+         if (ops->qpci_init) {
+             qs->pcibus = ops->qpci_init(qs->qts, qs->alloc);
+diff --git a/tests/libqos/malloc-pc.c b/tests/libqos/malloc-pc.c
+index dd2b900c5f..634b9c288a 100644
+--- a/tests/libqos/malloc-pc.c
++++ b/tests/libqos/malloc-pc.c
+@@ -29,11 +29,11 @@ void pc_alloc_uninit(QGuestAllocator *allocator)
+     alloc_uninit(allocator);
+ }
+
+-QGuestAllocator *pc_alloc_init_flags(QAllocOpts flags)
++QGuestAllocator *pc_alloc_init_flags(QTestState *qts, QAllocOpts flags)
+ {
+     QGuestAllocator *s;
+     uint64_t ram_size;
+-    QFWCFG *fw_cfg = pc_fw_cfg_init();
++    QFWCFG *fw_cfg = pc_fw_cfg_init(qts);
+
+     ram_size = qfw_cfg_get_u64(fw_cfg, FW_CFG_RAM_SIZE);
+     s = alloc_init_flags(flags, 1 << 20, MIN(ram_size, 0xE0000000));
+@@ -45,7 +45,7 @@ QGuestAllocator *pc_alloc_init_flags(QAllocOpts flags)
+     return s;
+ }
+
+-inline QGuestAllocator *pc_alloc_init(void)
++inline QGuestAllocator *pc_alloc_init(QTestState *qts)
+ {
+-    return pc_alloc_init_flags(ALLOC_NO_FLAGS);
++    return pc_alloc_init_flags(qts, ALLOC_NO_FLAGS);
+ }
+diff --git a/tests/libqos/malloc-spapr.c b/tests/libqos/malloc-spapr.c
+index 006404af33..1c359cea6c 100644
+--- a/tests/libqos/malloc-spapr.c
++++ b/tests/libqos/malloc-spapr.c
+@@ -22,7 +22,7 @@ void spapr_alloc_uninit(QGuestAllocator *allocator)
+     alloc_uninit(allocator);
+ }
+
+-QGuestAllocator *spapr_alloc_init_flags(QAllocOpts flags)
++QGuestAllocator *spapr_alloc_init_flags(QTestState *qts, QAllocOpts flags)
+ {
+     QGuestAllocator *s;
+
+@@ -34,5 +34,5 @@ QGuestAllocator *spapr_alloc_init_flags(QAllocOpts flags)
+
+ QGuestAllocator *spapr_alloc_init(void)
+ {
+-    return spapr_alloc_init_flags(ALLOC_NO_FLAGS);
++    return spapr_alloc_init_flags(NULL, ALLOC_NO_FLAGS);
+ }
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index ea7d38ea44..562bfaefd2 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -894,7 +894,7 @@ static void test_multiqueue(void)
+     bus = qpci_init_pc(global_qtest, NULL);
+     dev = virtio_net_pci_init(bus, PCI_SLOT);
+
+-    alloc = pc_alloc_init();
++    alloc = pc_alloc_init(global_qtest);
+     for (i = 0; i < queues * 2; i++) {
+         vq[i] = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, alloc, i);
+     }
 -- 
 2.13.5
