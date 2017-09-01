@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dnoBo-0001yn-U0
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:49:03 -0400
+	(envelope-from <armbru@redhat.com>) id 1dnoCi-0002hO-DN
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:50:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dnoBk-0006PP-29
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:49:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49564)
+	(envelope-from <armbru@redhat.com>) id 1dnoCd-0006co-HW
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:49:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41626)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dnoBj-0006PH-Rw
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:48:55 -0400
-Date: Fri, 1 Sep 2017 12:48:50 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170901154850.GP7570@localhost.localdomain>
-References: <20170830225225.27925-1-f4bug@amsat.org>
-	<20170901151850.GD17184@localhost.localdomain>
-	<e5407d61-b21c-8ff5-1051-f75a6221e222@amsat.org>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnoCd-0006cX-Bi
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:49:51 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
+	<20170822132255.23945-15-marcandre.lureau@redhat.com>
+Date: Fri, 01 Sep 2017 17:49:46 +0200
+In-Reply-To: <20170822132255.23945-15-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 22 Aug 2017
+	15:22:15 +0200")
+Message-ID: <87d17axvtx.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <e5407d61-b21c-8ff5-1051-f75a6221e222@amsat.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] QOMify MIPS cpu
+Subject: Re: [Qemu-devel] [PATCH v2 14/54] qapi2texi: minor python code
+ simplification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Fri, Sep 01, 2017 at 12:44:42PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> On 09/01/2017 12:18 PM, Eduardo Habkost wrote:
-> > On Wed, Aug 30, 2017 at 07:52:18PM -0300, Philippe Mathieu-Daud=E9 wr=
-ote:
-> > > Hi,
-> > >=20
-> > > This series is based on Igor's "complete cpu QOMification" [1] but =
-only modify
-> > > the MIPS part. Igor posted an updated series [2], both series shoul=
-d apply
-> > > separately.
-> > >=20
-> > > Igor suggested on IRC this series could enter via the Machine core =
-tree, so
-> > > I added Eduardo and Marcel.
-> >=20
-> > I would do that only if the MIPS maintainers (CCed) aren't
-> > willing to merge the series themselves.
->=20
-> Aurelien told me he looked at the series but isn't comfortable with
-> reviewing QOM code. Anyway since all patches are reviewed/tested and th=
-is is
-> MIPS only series it also makes sens to me this enters via their tree.
->=20
-> Eduardo can you Ack this series from the QOM part to help Aurelien?
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Absolutely:
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi2texi.py | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
+>
+> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+> index a317526e51..8b542f9fff 100755
+> --- a/scripts/qapi2texi.py
+> +++ b/scripts/qapi2texi.py
+> @@ -136,10 +136,9 @@ def texi_enum_value(value):
+>  def texi_member(member, suffix=3D''):
+>      """Format a table of members item for an object type member"""
+>      typ =3D member.type.doc_type()
+> -    return '@item @code{%s%s%s}%s%s\n' % (
+> -        member.name,
+> -        ': ' if typ else '',
+> -        typ if typ else '',
+> +    membertype =3D ': %s' % typ if typ else ''
 
-Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+I'd use string concatenation (': ' + typ) instead of interpolation.
+Matter of taste.  Could make the change when I apply.
 
-I will try to review the QOM code more closely and send
-Reviewed-by lines too.
+> +    return '@item @code{%s%s}%s%s\n' % (
+> +        member.name, membertype,
+>          ' (optional)' if member.optional else '',
+>          suffix)
 
---=20
-Eduardo
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
