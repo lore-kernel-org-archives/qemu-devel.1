@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dnndl-0001CD-P4
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:13:54 -0400
+	(envelope-from <quintela@redhat.com>) id 1dnngd-0004A9-Hr
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:16:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dnndi-00073n-IF
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:13:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42200)
+	(envelope-from <quintela@redhat.com>) id 1dnngc-0000G4-Fw
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:16:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58110)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dnndi-00073L-CC
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:13:46 -0400
-Date: Fri, 1 Sep 2017 16:13:40 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170901151340.GQ31680@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170831122925.GJ17315@redhat.com>
-	<CAFEAcA_pZn5evv_Z00EKevr1PrV+vNrs4bzEv9FaYLU_cisqyw@mail.gmail.com>
-	<1504254677.10150.3.camel@redhat.com>
-	<1504275104.10150.19.camel@redhat.com>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dnngc-0000Fe-7u
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:16:46 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 586BF61484
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:16:45 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170901122021.GN31680@redhat.com> (Daniel P. Berrange's message
+	of "Fri, 1 Sep 2017 13:20:21 +0100")
+References: <20170901115500.12654-1-quintela@redhat.com>
+	<20170901115500.12654-2-quintela@redhat.com>
+	<20170901122021.GN31680@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Fri, 01 Sep 2017 17:16:42 +0200
+Message-ID: <87wp5i78kl.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1504275104.10150.19.camel@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] RFC: changing ROM bundling in tar dists for
- releases
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] tests: Use real size for iov tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,45 +35,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-On Fri, Sep 01, 2017 at 04:11:44PM +0200, Gerd Hoffmann wrote:
->   Hi,
->=20
-> > I think it makes sense to create a separate project for the firmware
-> > blobs.=C2=A0=C2=A0Move over the firmware binaries and source submodul=
-es to the
-> > new project.=C2=A0=C2=A0This way updating both firmware sources and b=
-inaries
-> > can
-> > be done with a single commit, like we handle this today, just in the
-> > new firmware repo instead of the main qemu repo.
->=20
-> i.e. something like this:
->=20
-> https://www.kraxel.org/cgit/qemu-firmware/
->=20
-> (only seabios is there for now)
+"Daniel P. Berrange" <berrange@redhat.com> wrote:
+> On Fri, Sep 01, 2017 at 01:54:59PM +0200, Juan Quintela wrote:
+>> We were using -1 instead of the real size because the functions check
+>> what is bigger, size in bytes or the size of the iov.  Recent gcc's
+>> barf at this.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> Reviewed-by: Peter Xu <peterx@redhat.com>
+>> Tested-by: Cleber Rosa <crosa@redhat.com>
+>> --
+>> 
+>> Remove comments about this feature.
+>> Fix missing -1.
+>> ---
+>>  include/qemu/iov.h |  6 ------
+>>  tests/test-iov.c   | 10 +++++-----
+>>  2 files changed, 5 insertions(+), 11 deletions(-)
+>> 
+>> diff --git a/include/qemu/iov.h b/include/qemu/iov.h
+>> index bd9fd55b0a..72d4c559b4 100644
+>> --- a/include/qemu/iov.h
+>> +++ b/include/qemu/iov.h
+>> @@ -31,11 +31,6 @@ size_t iov_size(const struct iovec *iov, const unsigned int iov_cnt);
+>>   * Number of bytes actually copied will be returned, which is
+>>   *  min(bytes, iov_size(iov)-offset)
+>>   * `Offset' must point to the inside of iovec.
+>> - * It is okay to use very large value for `bytes' since we're
+>> - * limited by the size of the iovec anyway, provided that the
+>> - * buffer pointed to by buf has enough space.  One possible
+>> - * such "large" value is -1 (sinice size_t is unsigned),
+>> - * so specifying `-1' as `bytes' means 'up to the end of iovec'.
+>>   */
+>>  size_t iov_from_buf_full(const struct iovec *iov, unsigned int iov_cnt,
+>>                           size_t offset, const void *buf, size_t bytes);
+>> @@ -76,7 +71,6 @@ iov_to_buf(const struct iovec *iov, const unsigned int iov_cnt,
+>>   * up to the end of it, will be filled with the specified value.
+>>   * Function return actual number of bytes processed, which is
+>>   * min(size, iov_size(iov) - offset).
+>> - * Again, it is okay to use large value for `bytes' to mean "up to the end".
+>>   */
+>>  size_t iov_memset(const struct iovec *iov, const unsigned int iov_cnt,
+>>                    size_t offset, int fillc, size_t bytes);
+>
+> I'm not sure its right to be removing these comments, unless you've
+> audited the code to ensure no caller outside the test suite is
+> relying on this documented behaviour.
 
-So presumably we'd want a 'make install' target there too, to place the
-various ROMS in the location QEMU expects ?
+I did.  The caller call with the real size of the buffer.
+iov_memset() still works with the -1 size.
 
-So non-distro users would need to download & install the ROMs,
-and then download, build & install QEMU ?
+iov_to/from_buf, the non full versions don't work, because the inline
+gets confused with -1 with newer gcc's.
+>
+> For the test-iov.c changes though you can have
+>
+> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 
-How would you view ROM install working for devs working against GIT ?
-
-eg when we update a ROM in the firmware directory, how do devs know to
-update their firmware. Would the qemu-firmware.git be a submodule of
-qemu.git, so that a 'make install' would deploy roms for devs ?
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Later, Juan.
