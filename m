@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <asegundo@redhat.com>) id 1dnhkc-0004YQ-QY
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 04:56:31 -0400
+	(envelope-from <armbru@redhat.com>) id 1dnhtD-00037j-Uf
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 05:05:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <asegundo@redhat.com>) id 1dnhkY-0007Rv-5G
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 04:56:30 -0400
-Received: from mail-io0-f173.google.com ([209.85.223.173]:37688)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <asegundo@redhat.com>) id 1dnhkX-0007R2-WF
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 04:56:26 -0400
-Received: by mail-io0-f173.google.com with SMTP id d78so12656232ioe.4
-	for <qemu-devel@nongnu.org>; Fri, 01 Sep 2017 01:56:25 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1dnht8-0002hF-Hw
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 05:05:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58526)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnht8-0002gY-9J
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 05:05:18 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 614B78BD21
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 09:05:16 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170824103350.16400-1-marcandre.lureau@redhat.com>
+	<20170824103350.16400-3-marcandre.lureau@redhat.com>
+	<20170901000634.GC17184@localhost.localdomain>
+Date: Fri, 01 Sep 2017 11:05:11 +0200
+In-Reply-To: <20170901000634.GC17184@localhost.localdomain> (Eduardo Habkost's
+	message of "Thu, 31 Aug 2017 21:06:34 -0300")
+Message-ID: <87shg6dc1k.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170831233650.GH7570@localhost.localdomain>
-References: <20170818170526.13496-1-apahim@redhat.com>
-	<20170831233650.GH7570@localhost.localdomain>
-From: Amador Pahim <apahim@redhat.com>
-Date: Fri, 1 Sep 2017 10:56:23 +0200
-Message-ID: <CALAZnb3HMn0eGrXdWMM_1q1Sy0GdLm+nRN+-Fy915m4m0P785Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v7 00/11] scripts/qemu.py fixes and cleanups
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 02/14] qlit: move qlit from check-qjson to
+ qobject/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +37,91 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
 
-On Fri, Sep 1, 2017 at 1:36 AM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> I was going to queue most of this series except patch 02/11 due
-> the "qemu received signal" message log level, but a few conflicts
-> prevent the rest of the series from applying cleanly.  Are you
-> planning to send v8?
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-Now I am. Sending asap.
-
+> On Thu, Aug 24, 2017 at 12:33:38PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+>> Fix code style issues while at it, to please check-patch.
+>>=20
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  include/qapi/qmp/qlit.h | 49 +++++++++++++++++++++++++
+>>  qobject/qlit.c          | 89 ++++++++++++++++++++++++++++++++++++++++++=
++++
+>>  tests/check-qjson.c     | 96 +-----------------------------------------=
+-------
+>>  qobject/Makefile.objs   |  2 +-
+>>  4 files changed, 140 insertions(+), 96 deletions(-)
+>>  create mode 100644 include/qapi/qmp/qlit.h
+>>  create mode 100644 qobject/qlit.c
+>>=20
+>> diff --git a/include/qapi/qmp/qlit.h b/include/qapi/qmp/qlit.h
+>> new file mode 100644
+>> index 0000000000..4e2e760ef1
+>> --- /dev/null
+>> +++ b/include/qapi/qmp/qlit.h
+>> @@ -0,0 +1,49 @@
+>> +/*
+>> + * Copyright IBM, Corp. 2009
+>> + * Copyright (c) 2013, 2015, 2017 Red Hat Inc.
+>> + *
+>> + * Authors:
+>> + *  Anthony Liguori   <aliguori@us.ibm.com>
+>> + *  Markus Armbruster <armbru@redhat.com>
+>> + *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU LGPL, version 2.1 o=
+r later.
+>> + * See the COPYING.LIB file in the top-level directory.
+>> + *
+>> + */
+>> +#ifndef QLIT_H_
+>> +#define QLIT_H_
+>> +
+>> +#include "qapi-types.h"
+>> +#include "qobject.h"
+>> +
+>> +typedef struct LiteralQDictEntry LiteralQDictEntry;
+>> +typedef struct LiteralQObject LiteralQObject;
+>> +
+>> +struct LiteralQObject {
+>> +    int type;
+>> +    union {
+>> +        int64_t qnum;
+>> +        const char *qstr;
+>> +        LiteralQDictEntry *qdict;
+>> +        LiteralQObject *qlist;
+>> +    } value;
+>> +};
+>> +
+>> +struct LiteralQDictEntry {
+>> +    const char *key;
+>> +    LiteralQObject value;
+>> +};
+>> +
+>> +#define QLIT_QNUM(val) \
+>> +    (LiteralQObject){.type =3D QTYPE_QNUM, .value.qnum =3D (val)}
+>> +#define QLIT_QSTR(val) \
+>> +    (LiteralQObject){.type =3D QTYPE_QSTRING, .value.qstr =3D (val)}
+>> +#define QLIT_QDICT(val) \
+>> +    (LiteralQObject){.type =3D QTYPE_QDICT, .value.qdict =3D (val)}
+>> +#define QLIT_QLIST(val) \
+>> +    (LiteralQObject){.type =3D QTYPE_QLIST, .value.qlist =3D (val)}
 >
-> On Fri, Aug 18, 2017 at 07:05:15PM +0200, Amador Pahim wrote:
->> Changes v1->v2:
->>  - Style fixes to make checkpatch.pl happy.
->>  - Rebased.
->> Changes v2->v3:
->>  - Fix typo in patch 3 ("qemu.py: make 'args' public") commit message.
->> Changes v3->v4:
->>  - Squash the 2 first commits since they are co-dependant.
->>  - Cleanup launch() and shutdown().
->>  - Reorder the commits, putting the rename of self._args first.
->>  - Rebased.
->> Changes v4->v5:
->>  - Break the cleanup commit into logical changes and include in the
->>    commit messages the rationale for making them.
->> Changes v5->v6:
->>  - Remove the commit to rename self._args.
->>  - Fix is_running() return before first call to maunch().
->>  - Use python logging system.
->>  - Include the full command line on negative exit code error message.
->>  - Use os.path.null instead of /dev/null.
->>  - Improve the control over the created/deleted files.
->> Changes v6->v7:
->>  - Split commits in self-contained/atomic changes.
->>  - Addressed the comments from previous version, basically improving the
->>    logging messages and the control over created files. See individual
->>    commit messages for details.
->>
->> Amador Pahim (11):
->>   qemu.py: fix is_running() return before first launch()
->>   qemu.py: avoid writing to stdout/stderr
->>   qemu.py: use os.path.null instead of /dev/null
->>   qemu.py: use poll() instead of 'returncode'
->>   qemu.py: cleanup redundant calls in launch()
->>   qemu.py: improve message on negative exit code
->>   qemu.py: include debug information on launch error
->>   qemu.py: make sure we only remove files we create
->>   qemu.py: launch vm only if it's not running
->>   qemu.py: don't launch again before shutdown()
->>   qemu.py: refactor launch()
->>
->>  scripts/qemu.py | 141 ++++++++++++++++++++++++++++++++++++++++++--------------
->>  1 file changed, 106 insertions(+), 35 deletions(-)
->>
->> --
->> 2.13.5
->>
->>
->
-> --
-> Eduardo
+> I'm still trying to understand why this exists.  Doesn't this
+> provide exactly the same functionality as QObject?
+
+The value-add is initializers.  Check out check-qjson.c for examples.
+
+Use cases:
+
+* Specify expected output as data (QLitObject initializer), then use
+  qlit_equal_qobject() to verify actual output matches.  Example:
+  check-qjson.c.  I think it compares nicely to the qdict_get morass we
+  use elsewhere.
+
+* Specify a QObject as data (QLitObject initializer), build it with
+  qobject_from_qlit().  Example: PATCH 14.  I think it beats specifying
+  the QObject in code (qdict_new(), qdict_put(), ...) at least when the
+  QObject is big.
