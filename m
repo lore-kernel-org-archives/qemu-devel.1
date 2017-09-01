@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnoVO-0004XE-PL
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:09:15 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dnoXX-00074w-Da
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:11:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnoVK-0000bL-3l
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:09:14 -0400
-Received: from mail-qk0-x236.google.com ([2607:f8b0:400d:c09::236]:33512)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnoVJ-0000b6-VP
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:09:10 -0400
-Received: by mail-qk0-x236.google.com with SMTP id l65so2952466qkc.0
-	for <qemu-devel@nongnu.org>; Fri, 01 Sep 2017 09:09:09 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170830225225.27925-1-f4bug@amsat.org>
-	<20170901151850.GD17184@localhost.localdomain>
-	<e5407d61-b21c-8ff5-1051-f75a6221e222@amsat.org>
-	<20170901154850.GP7570@localhost.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e8c0ae1e-e157-35a9-fe71-8eb5b44f8178@amsat.org>
-Date: Fri, 1 Sep 2017 13:09:05 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1dnoXT-0002Dg-Ck
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:11:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33693)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dnoXT-0002DF-42
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:11:23 -0400
+Date: Fri, 1 Sep 2017 13:11:18 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170901161118.GQ7570@localhost.localdomain>
+References: <20170901154542.5687-1-cascardo@canonical.com>
 MIME-Version: 1.0
-In-Reply-To: <20170901154850.GP7570@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] QOMify MIPS cpu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170901154542.5687-1-cascardo@canonical.com>
+Subject: Re: [Qemu-devel] [PATCH] x86/acpi: build SRAT when memory hotplug
+ is enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,36 +27,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
+To: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Dou Liyang <douly.fnst@cn.fujitsu.com>
 
-On 09/01/2017 12:48 PM, Eduardo Habkost wrote:
-> On Fri, Sep 01, 2017 at 12:44:42PM -0300, Philippe Mathieu-Daudé wrote:
->> On 09/01/2017 12:18 PM, Eduardo Habkost wrote:
->>> On Wed, Aug 30, 2017 at 07:52:18PM -0300, Philippe Mathieu-Daudé wrote:
->>>> Hi,
->>>>
->>>> This series is based on Igor's "complete cpu QOMification" [1] but only modify
->>>> the MIPS part. Igor posted an updated series [2], both series should apply
->>>> separately.
->>>>
->>>> Igor suggested on IRC this series could enter via the Machine core tree, so
->>>> I added Eduardo and Marcel.
->>>
->>> I would do that only if the MIPS maintainers (CCed) aren't
->>> willing to merge the series themselves.
->>
->> Aurelien told me he looked at the series but isn't comfortable with
->> reviewing QOM code. Anyway since all patches are reviewed/tested and this is
->> MIPS only series it also makes sens to me this enters via their tree.
->>
->> Eduardo can you Ack this series from the QOM part to help Aurelien?
-> 
-> Absolutely:
-> 
-> Acked-by: Eduardo Habkost <ehabkost@redhat.com>
-> 
-> I will try to review the QOM code more closely and send
-> Reviewed-by lines too.
+On Fri, Sep 01, 2017 at 12:45:42PM -0300, Thadeu Lima de Souza Cascardo wrote:
+> Linux uses SRAT to determine the maximum memory in a system, which is
+> used to determine whether to use the swiotlb for IOMMU or not for a
+> device that supports only 32 bits of addresses.
 
-Thank you!
+Do you have a pointer to the corresponding Linux code, for
+reference?  Which SRAT entries Linux uses to make this decision?
+
+> 
+> When there is no NUMA configuration, qemu will not build SRAT. And when
+> memory hotplug is done, some Linux device drivers start failing.
+> 
+> Tested by running with -m 512M,slots=8,maxmem=1G, adding the memory,
+> putting that online and using the system. Without the patch, swiotlb is
+> not used and ATA driver fails. With the patch, swiotlb is used, no
+> driver failure is observed.
+> 
+> Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+
+As far as I can see, this will only add APIC entries and a memory
+affinity entry for the first 640KB (which would be obviously
+wrong) if pcms->numa_nodes is 0.
+
+Once we apply the "Fix SRAT memory building in case of node 0
+without RAM" patch from Dou Liyang, no memory affinity entries
+will be generated if pcms->numa_nodes is 0.  Would this cause the
+problem to happen again?
+
+
+> ---
+>  hw/i386/acpi-build.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 98dd424678..fb94249779 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2645,6 +2645,9 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>      GArray *tables_blob = tables->table_data;
+>      AcpiSlicOem slic_oem = { .id = NULL, .table_id = NULL };
+>      Object *vmgenid_dev;
+> +    ram_addr_t hotplugabble_address_space_size =
+> +        object_property_get_int(OBJECT(pcms), PC_MACHINE_MEMHP_REGION_SIZE,
+> +                                NULL);
+>  
+>      acpi_get_pm_info(&pm);
+>      acpi_get_misc_info(&misc);
+> @@ -2708,7 +2711,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>              build_tpm2(tables_blob, tables->linker);
+>          }
+>      }
+> -    if (pcms->numa_nodes) {
+> +    if (pcms->numa_nodes || hotplugabble_address_space_size) {
+>          acpi_add_table(table_offsets, tables_blob);
+>          build_srat(tables_blob, tables->linker, machine);
+>          if (have_numa_distance) {
+> -- 
+> 2.11.0
+> 
+
+-- 
+Eduardo
