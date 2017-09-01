@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUm-0000IG-Pt
+	(envelope-from <armbru@redhat.com>) id 1dnlUn-0000JU-GS
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUj-0007MW-Iu
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40920)
+	(envelope-from <armbru@redhat.com>) id 1dnlUh-0007K1-Dd
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60930)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUj-0007LO-6T
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:21 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUh-0007JI-5W
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:19 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 185047EA9F
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:20 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-75.ams2.redhat.com
-	[10.36.116.75])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id AFFEA78203
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:19 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2E028356F2
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:18 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 14:55:52 +0200
-Message-Id: <20170901125611.29295-29-armbru@redhat.com>
+Date: Fri,  1 Sep 2017 14:55:33 +0200
+Message-Id: <20170901125611.29295-10-armbru@redhat.com>
 In-Reply-To: <20170901125611.29295-1-armbru@redhat.com>
 References: <20170901125611.29295-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 28/47] qapi-schema: Fold event.json back into
- qapi-schema.json
+Subject: [Qemu-devel] [PULL 09/47] qlit: make qlit_equal_qobject return a
+ bool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,373 +34,172 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+Make it more obvious about the expected return values.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20170825105913.4060-7-marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1503602048-12268-14-git-send-email-armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- Makefile         |   2 +-
- qapi-schema.json | 134 +++++++++++++++++++++++++++++++++++++++++++++++++=
-+++-
- qapi/event.json  | 138 -------------------------------------------------=
-------
- 3 files changed, 134 insertions(+), 140 deletions(-)
- delete mode 100644 qapi/event.json
+ include/qapi/qmp/qlit.h |  2 +-
+ qobject/qlit.c          | 18 +++++++++---------
+ tests/check-qjson.c     | 14 +++++++-------
+ 3 files changed, 17 insertions(+), 17 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 3dde210662..337a1f6f9b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -412,7 +412,7 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SRC_P=
-ATH)/qapi/common.json \
-                $(SRC_PATH)/qapi/block.json $(SRC_PATH)/qapi/block-core.j=
-son \
-                $(SRC_PATH)/qapi/char.json \
-                $(SRC_PATH)/qapi/crypto.json \
--               $(SRC_PATH)/qapi/event.json $(SRC_PATH)/qapi/introspect.j=
-son \
-+               $(SRC_PATH)/qapi/introspect.json \
-                $(SRC_PATH)/qapi/migration.json \
-                $(SRC_PATH)/qapi/net.json \
-                $(SRC_PATH)/qapi/rocker.json \
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 0ad4e0237d..4964d927bd 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -90,7 +90,6 @@
- { 'include': 'qapi/ui.json' }
- { 'include': 'qapi/migration.json' }
- { 'include': 'qapi/transaction.json' }
--{ 'include': 'qapi/event.json' }
- { 'include': 'qapi/trace.json' }
- { 'include': 'qapi/introspect.json' }
+diff --git a/include/qapi/qmp/qlit.h b/include/qapi/qmp/qlit.h
+index 5a180477c8..35aabbdc9f 100644
+--- a/include/qapi/qmp/qlit.h
++++ b/include/qapi/qmp/qlit.h
+@@ -44,6 +44,6 @@ struct QLitDictEntry {
+ #define QLIT_QLIST(val) \
+     { .type =3D QTYPE_QLIST, .value.qlist =3D (val) }
 =20
-@@ -552,6 +551,28 @@
- { 'command': 'query-balloon', 'returns': 'BalloonInfo' }
+-int qlit_equal_qobject(QLitObject *lhs, QObject *rhs);
++bool qlit_equal_qobject(QLitObject *lhs, QObject *rhs);
 =20
- ##
-+# @BALLOON_CHANGE:
-+#
-+# Emitted when the guest changes the actual BALLOON level. This value is
-+# equivalent to the @actual field return by the 'query-balloon' command
-+#
-+# @actual: actual level of the guest memory balloon in bytes
-+#
-+# Note: this event is rate-limited.
-+#
-+# Since: 1.2
-+#
-+# Example:
-+#
-+# <- { "event": "BALLOON_CHANGE",
-+#      "data": { "actual": 944766976 },
-+#      "timestamp": { "seconds": 1267020223, "microseconds": 435656 } }
-+#
-+##
-+{ 'event': 'BALLOON_CHANGE',
-+  'data': { 'actual': 'int' } }
-+
-+##
- # @PciMemoryRange:
- #
- # A PCI device memory region
-@@ -1434,6 +1455,30 @@
- { 'command': 'device_del', 'data': {'id': 'str'} }
+ #endif /* QLIT_H */
+diff --git a/qobject/qlit.c b/qobject/qlit.c
+index 0c4101898d..a2975bef3f 100644
+--- a/qobject/qlit.c
++++ b/qobject/qlit.c
+@@ -21,19 +21,19 @@
+ typedef struct QListCompareHelper {
+     int index;
+     QLitObject *objs;
+-    int result;
++    bool result;
+ } QListCompareHelper;
 =20
- ##
-+# @DEVICE_DELETED:
-+#
-+# Emitted whenever the device removal completion is acknowledged by the =
-guest.
-+# At this point, it's safe to reuse the specified device ID. Device remo=
-val can
-+# be initiated by the guest or by HMP/QMP commands.
-+#
-+# @device: device name
-+#
-+# @path: device path
-+#
-+# Since: 1.5
-+#
-+# Example:
-+#
-+# <- { "event": "DEVICE_DELETED",
-+#      "data": { "device": "virtio-net-pci-0",
-+#                "path": "/machine/peripheral/virtio-net-pci-0" },
-+#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
-+#
-+##
-+{ 'event': 'DEVICE_DELETED',
-+  'data': { '*device': 'str', 'path': 'str' } }
-+
-+##
- # @DumpGuestMemoryFormat:
- #
- # An enumeration of guest-memory-dump's format.
-@@ -1569,6 +1614,29 @@
- { 'command': 'query-dump', 'returns': 'DumpQueryResult' }
+ static void compare_helper(QObject *obj, void *opaque)
+ {
+     QListCompareHelper *helper =3D opaque;
 =20
- ##
-+# @DUMP_COMPLETED:
-+#
-+# Emitted when background dump has completed
-+#
-+# @result: DumpQueryResult type described in qapi-schema.json.
-+#
-+# @error: human-readable error string that provides
-+#         hint on why dump failed. Only presents on failure. The
-+#         user should not try to interpret the error string.
-+#
-+# Since: 2.6
-+#
-+# Example:
-+#
-+# { "event": "DUMP_COMPLETED",
-+#   "data": {"result": {"total": 1090650112, "status": "completed",
-+#                       "completed": 1090650112} } }
-+#
-+##
-+{ 'event': 'DUMP_COMPLETED' ,
-+  'data': { 'result': 'DumpQueryResult', '*error': 'str' } }
-+
-+##
- # @DumpGuestMemoryCapability:
- #
- # A list of the available formats for dump-guest-memory
-@@ -2652,6 +2720,29 @@
- { 'command': 'query-memory-devices', 'returns': ['MemoryDeviceInfo'] }
+-    if (helper->result =3D=3D 0) {
++    if (!helper->result) {
+         return;
+     }
 =20
- ##
-+# @MEM_UNPLUG_ERROR:
-+#
-+# Emitted when memory hot unplug error occurs.
-+#
-+# @device: device name
-+#
-+# @msg: Informative message
-+#
-+# Since: 2.4
-+#
-+# Example:
-+#
-+# <- { "event": "MEM_UNPLUG_ERROR"
-+#      "data": { "device": "dimm1",
-+#                "msg": "acpi: device unplug for unsupported device"
-+#      },
-+#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
-+#
-+##
-+{ 'event': 'MEM_UNPLUG_ERROR',
-+  'data': { 'device': 'str', 'msg': 'str' } }
-+
-+##
- # @ACPISlotType:
- #
- # @DIMM: memory slot
-@@ -2706,6 +2797,25 @@
- { 'command': 'query-acpi-ospm-status', 'returns': ['ACPIOSTInfo'] }
+     if (helper->objs[helper->index].type =3D=3D QTYPE_NONE) {
+-        helper->result =3D 0;
++        helper->result =3D false;
+         return;
+     }
 =20
- ##
-+# @ACPI_DEVICE_OST:
-+#
-+# Emitted when guest executes ACPI _OST method.
-+#
-+# @info: ACPIOSTInfo type as described in qapi-schema.json
-+#
-+# Since: 2.1
-+#
-+# Example:
-+#
-+# <- { "event": "ACPI_DEVICE_OST",
-+#      "data": { "device": "d1", "slot": "0",
-+#                "slot-type": "DIMM", "source": 1, "status": 0 } }
-+#
-+##
-+{ 'event': 'ACPI_DEVICE_OST',
-+     'data': { 'info': 'ACPIOSTInfo' } }
-+
-+##
- # @IoOperationType:
- #
- # An enumeration of the I/O operation types
-@@ -2738,6 +2848,28 @@
- { 'command': 'rtc-reset-reinjection' }
+@@ -41,12 +41,12 @@ static void compare_helper(QObject *obj, void *opaque=
+)
+         qlit_equal_qobject(&helper->objs[helper->index++], obj);
+ }
 =20
- ##
-+# @RTC_CHANGE:
-+#
-+# Emitted when the guest changes the RTC time.
-+#
-+# @offset: offset between base RTC clock (as specified by -rtc base), an=
-d
-+#          new RTC clock value
-+#
-+# Note: This event is rate-limited.
-+#
-+# Since: 0.13.0
-+#
-+# Example:
-+#
-+# <-   { "event": "RTC_CHANGE",
-+#        "data": { "offset": 78 },
-+#        "timestamp": { "seconds": 1267020223, "microseconds": 435656 } =
-}
-+#
-+##
-+{ 'event': 'RTC_CHANGE',
-+  'data': { 'offset': 'int' } }
-+
-+##
- # @ReplayMode:
- #
- # Mode of the replay subsystem.
-diff --git a/qapi/event.json b/qapi/event.json
-deleted file mode 100644
-index 48a5d8fb21..0000000000
---- a/qapi/event.json
-+++ /dev/null
-@@ -1,138 +0,0 @@
--# -*- Mode: Python -*-
--
--##
--# =3D Other events
--##
--
--##
--# @RTC_CHANGE:
--#
--# Emitted when the guest changes the RTC time.
--#
--# @offset: offset between base RTC clock (as specified by -rtc base), an=
-d
--#          new RTC clock value
--#
--# Note: This event is rate-limited.
--#
--# Since: 0.13.0
--#
--# Example:
--#
--# <-   { "event": "RTC_CHANGE",
--#        "data": { "offset": 78 },
--#        "timestamp": { "seconds": 1267020223, "microseconds": 435656 } =
-}
--#
--##
--{ 'event': 'RTC_CHANGE',
--  'data': { 'offset': 'int' } }
--
--##
--# @DEVICE_DELETED:
--#
--# Emitted whenever the device removal completion is acknowledged by the =
-guest.
--# At this point, it's safe to reuse the specified device ID. Device remo=
-val can
--# be initiated by the guest or by HMP/QMP commands.
--#
--# @device: device name
--#
--# @path: device path
--#
--# Since: 1.5
--#
--# Example:
--#
--# <- { "event": "DEVICE_DELETED",
--#      "data": { "device": "virtio-net-pci-0",
--#                "path": "/machine/peripheral/virtio-net-pci-0" },
--#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
--#
--##
--{ 'event': 'DEVICE_DELETED',
--  'data': { '*device': 'str', 'path': 'str' } }
--
--##
--# @ACPI_DEVICE_OST:
--#
--# Emitted when guest executes ACPI _OST method.
--#
--# @info: ACPIOSTInfo type as described in qapi-schema.json
--#
--# Since: 2.1
--#
--# Example:
--#
--# <- { "event": "ACPI_DEVICE_OST",
--#      "data": { "device": "d1", "slot": "0",
--#                "slot-type": "DIMM", "source": 1, "status": 0 } }
--#
--##
--{ 'event': 'ACPI_DEVICE_OST',
--     'data': { 'info': 'ACPIOSTInfo' } }
--
--##
--# @BALLOON_CHANGE:
--#
--# Emitted when the guest changes the actual BALLOON level. This value is
--# equivalent to the @actual field return by the 'query-balloon' command
--#
--# @actual: actual level of the guest memory balloon in bytes
--#
--# Note: this event is rate-limited.
--#
--# Since: 1.2
--#
--# Example:
--#
--# <- { "event": "BALLOON_CHANGE",
--#      "data": { "actual": 944766976 },
--#      "timestamp": { "seconds": 1267020223, "microseconds": 435656 } }
--#
--##
--{ 'event': 'BALLOON_CHANGE',
--  'data': { 'actual': 'int' } }
--
--##
--# @MEM_UNPLUG_ERROR:
--#
--# Emitted when memory hot unplug error occurs.
--#
--# @device: device name
--#
--# @msg: Informative message
--#
--# Since: 2.4
--#
--# Example:
--#
--# <- { "event": "MEM_UNPLUG_ERROR"
--#      "data": { "device": "dimm1",
--#                "msg": "acpi: device unplug for unsupported device"
--#      },
--#      "timestamp": { "seconds": 1265044230, "microseconds": 450486 } }
--#
--##
--{ 'event': 'MEM_UNPLUG_ERROR',
--  'data': { 'device': 'str', 'msg': 'str' } }
--
--##
--# @DUMP_COMPLETED:
--#
--# Emitted when background dump has completed
--#
--# @result: DumpQueryResult type described in qapi-schema.json.
--#
--# @error: human-readable error string that provides
--#         hint on why dump failed. Only presents on failure. The
--#         user should not try to interpret the error string.
--#
--# Since: 2.6
--#
--# Example:
--#
--# { "event": "DUMP_COMPLETED",
--#   "data": {"result": {"total": 1090650112, "status": "completed",
--#                       "completed": 1090650112} } }
--#
--##
--{ 'event': 'DUMP_COMPLETED' ,
--  'data': { 'result': 'DumpQueryResult', '*error': 'str' } }
+-int qlit_equal_qobject(QLitObject *lhs, QObject *rhs)
++bool qlit_equal_qobject(QLitObject *lhs, QObject *rhs)
+ {
+     int64_t val;
+=20
+     if (!rhs || lhs->type !=3D qobject_type(rhs)) {
+-        return 0;
++        return false;
+     }
+=20
+     switch (lhs->type) {
+@@ -64,18 +64,18 @@ int qlit_equal_qobject(QLitObject *lhs, QObject *rhs)
+                                      lhs->value.qdict[i].key);
+=20
+             if (!qlit_equal_qobject(&lhs->value.qdict[i].value, obj)) {
+-                return 0;
++                return false;
+             }
+         }
+=20
+-        return 1;
++        return true;
+     }
+     case QTYPE_QLIST: {
+         QListCompareHelper helper;
+=20
+         helper.index =3D 0;
+         helper.objs =3D lhs->value.qlist;
+-        helper.result =3D 1;
++        helper.result =3D true;
+=20
+         qlist_iter(qobject_to_qlist(rhs), compare_helper, &helper);
+=20
+@@ -85,5 +85,5 @@ int qlit_equal_qobject(QLitObject *lhs, QObject *rhs)
+         break;
+     }
+=20
+-    return 0;
++    return false;
+ }
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index e5ca273cbc..59227934ce 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -1094,13 +1094,13 @@ static void simple_dict(void)
+         QString *str;
+=20
+         obj =3D qobject_from_json(test_cases[i].encoded, &error_abort);
+-        g_assert(qlit_equal_qobject(&test_cases[i].decoded, obj) =3D=3D =
+1);
++        g_assert(qlit_equal_qobject(&test_cases[i].decoded, obj));
+=20
+         str =3D qobject_to_json(obj);
+         qobject_decref(obj);
+=20
+         obj =3D qobject_from_json(qstring_get_str(str), &error_abort);
+-        g_assert(qlit_equal_qobject(&test_cases[i].decoded, obj) =3D=3D =
+1);
++        g_assert(qlit_equal_qobject(&test_cases[i].decoded, obj));
+         qobject_decref(obj);
+         QDECREF(str);
+     }
+@@ -1203,13 +1203,13 @@ static void simple_list(void)
+         QString *str;
+=20
+         obj =3D qobject_from_json(test_cases[i].encoded, &error_abort);
+-        g_assert(qlit_equal_qobject(&test_cases[i].decoded, obj) =3D=3D =
+1);
++        g_assert(qlit_equal_qobject(&test_cases[i].decoded, obj));
+=20
+         str =3D qobject_to_json(obj);
+         qobject_decref(obj);
+=20
+         obj =3D qobject_from_json(qstring_get_str(str), &error_abort);
+-        g_assert(qlit_equal_qobject(&test_cases[i].decoded, obj) =3D=3D =
+1);
++        g_assert(qlit_equal_qobject(&test_cases[i].decoded, obj));
+         qobject_decref(obj);
+         QDECREF(str);
+     }
+@@ -1265,13 +1265,13 @@ static void simple_whitespace(void)
+         QString *str;
+=20
+         obj =3D qobject_from_json(test_cases[i].encoded, &error_abort);
+-        g_assert(qlit_equal_qobject(&test_cases[i].decoded, obj) =3D=3D =
+1);
++        g_assert(qlit_equal_qobject(&test_cases[i].decoded, obj));
+=20
+         str =3D qobject_to_json(obj);
+         qobject_decref(obj);
+=20
+         obj =3D qobject_from_json(qstring_get_str(str), &error_abort);
+-        g_assert(qlit_equal_qobject(&test_cases[i].decoded, obj) =3D=3D =
+1);
++        g_assert(qlit_equal_qobject(&test_cases[i].decoded, obj));
+=20
+         qobject_decref(obj);
+         QDECREF(str);
+@@ -1295,7 +1295,7 @@ static void simple_varargs(void)
+     g_assert(embedded_obj !=3D NULL);
+=20
+     obj =3D qobject_from_jsonf("[%d, 2, %p]", 1, embedded_obj);
+-    g_assert(qlit_equal_qobject(&decoded, obj) =3D=3D 1);
++    g_assert(qlit_equal_qobject(&decoded, obj));
+=20
+     qobject_decref(obj);
+ }
 --=20
 2.13.5
