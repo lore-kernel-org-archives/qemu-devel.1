@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnqIw-0007Yk-0S
+	(envelope-from <eblake@redhat.com>) id 1dnqIs-0007VV-H5
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnqIt-00024f-Be
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1dnqIp-0001zm-Ad
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43572)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnqIp-0001yX-1f
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:23 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Fri,  1 Sep 2017 13:03:28 -0500
-Message-Id: <20170901180340.30009-18-eblake@redhat.com>
+Date: Fri,  1 Sep 2017 13:03:34 -0500
+Message-Id: <20170901180340.30009-24-eblake@redhat.com>
 In-Reply-To: <20170901180340.30009-1-eblake@redhat.com>
 References: <20170901180340.30009-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 17/29] ahci-test: Drop dependence on
+Subject: [Qemu-devel] [PATCH v6 23/29] tests/acpi-utils: Drop dependence on
  global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,563 +25,462 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, John Snow <jsnow@redhat.com>, "open list:IDE" <qemu-block@nongnu.org>
+Cc: armbru@redhat.com, pbonzini@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Ben Warren <ben@skyportsystems.com>
 
-Managing parallel connections to two different monitors via
-the implicit global_qtest makes it hard to copy-and-paste code
-to tests that are not aware of the implicit state; the
-management of global_qtest is even harder to follow because
-it was masked behind set_context().
-
-Instead, explicitly pass QTestState* around (generally, by
-reusing the member already present in ahci->parent QOSState),
-and call explicit qtest_* functions on all places that
-interact with a monitor.
-
-We can assert that the conversion is correct by checking that
-global_qtest remains NULL throughout the test (a later patch
-that changes global_qtest to not be a public global variable
-will drop the assertions).
-
-Bonus: there were several spots that were constructing a JSON
-string, then passing that through qmp() as the format, rather
-than directly using qmp() to construct the JSON.  Fixing that
-gets us one step closer to enabling -Wformat checking on
-constructed JSON.
+As a general rule, we prefer avoiding implicit global state
+because it makes code harder to safely copy and paste without
+thinking about the global state.  Adjust the helper code to
+use explicit state instead, and update all callers.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/libqos/libqos.h    |  1 -
- tests/ahci-test.c        | 83 +++++++++++++++++++++++-------------------------
- tests/libqos/ahci.c      | 45 +++++++++++++-------------
- tests/libqos/libqos-pc.c |  2 +-
- tests/libqos/libqos.c    | 37 ++++++---------------
- 5 files changed, 73 insertions(+), 95 deletions(-)
+ tests/acpi-utils.h       |  65 +++++++++----------
+ tests/acpi-utils.c       |  19 +++---
+ tests/bios-tables-test.c | 161 ++++++++++++++++++++++++-----------------------
+ tests/vmgenid-test.c     |  18 +++---
+ 4 files changed, 133 insertions(+), 130 deletions(-)
 
-diff --git a/tests/libqos/libqos.h b/tests/libqos/libqos.h
-index 07d4b93d1d..9e020efb10 100644
---- a/tests/libqos/libqos.h
-+++ b/tests/libqos/libqos.h
-@@ -29,7 +29,6 @@ void qtest_shutdown(QOSState *qs);
- bool have_qemu_img(void);
- void mkimg(const char *file, const char *fmt, unsigned size_mb);
- void mkqcow2(const char *file, unsigned size_mb);
--void set_context(QOSState *s);
- void migrate(QOSState *from, QOSState *to, const char *uri);
- void prepare_blkdebug_script(const char *debug_fn, const char *event);
- void generate_pattern(void *buffer, size_t len, size_t cycle_len);
-diff --git a/tests/ahci-test.c b/tests/ahci-test.c
-index c94d1bd712..ba3f643d09 100644
---- a/tests/ahci-test.c
-+++ b/tests/ahci-test.c
-@@ -157,6 +157,7 @@ static AHCIQState *ahci_vboot(const char *cli, va_list ap)
+diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+index f8d87236c6..8ec83f71b1 100644
+--- a/tests/acpi-utils.h
++++ b/tests/acpi-utils.h
+@@ -28,20 +28,20 @@ typedef struct {
+     bool tmp_files_retain;   /* do not delete the temp asl/aml */
+ } AcpiSdtTable;
 
-     s = g_malloc0(sizeof(AHCIQState));
-     s->parent = qtest_pc_vboot(cli, ap);
-+    global_qtest = NULL;
-     alloc_set_flags(s->parent->alloc, ALLOC_LEAK_ASSERT);
+-#define ACPI_READ_FIELD(field, addr)           \
++#define ACPI_READ_FIELD(qts, field, addr)      \
+     do {                                       \
+         switch (sizeof(field)) {               \
+         case 1:                                \
+-            field = readb(addr);               \
++            field = qtest_readb(qts, addr);    \
+             break;                             \
+         case 2:                                \
+-            field = readw(addr);               \
++            field = qtest_readw(qts, addr);    \
+             break;                             \
+         case 4:                                \
+-            field = readl(addr);               \
++            field = qtest_readl(qts, addr);    \
+             break;                             \
+         case 8:                                \
+-            field = readq(addr);               \
++            field = qtest_readq(qts, addr);    \
+             break;                             \
+         default:                               \
+             g_assert(false);                   \
+@@ -49,28 +49,28 @@ typedef struct {
+         addr += sizeof(field);                  \
+     } while (0);
 
-     /* Verify that we have an AHCI device present. */
-@@ -196,7 +197,7 @@ static void ahci_shutdown(AHCIQState *ahci)
+-#define ACPI_READ_ARRAY_PTR(arr, length, addr)  \
+-    do {                                        \
+-        int idx;                                \
+-        for (idx = 0; idx < length; ++idx) {    \
+-            ACPI_READ_FIELD(arr[idx], addr);    \
+-        }                                       \
++#define ACPI_READ_ARRAY_PTR(qts, arr, length, addr)      \
++    do {                                                 \
++        int idx;                                         \
++        for (idx = 0; idx < length; ++idx) {             \
++            ACPI_READ_FIELD(qts, arr[idx], addr);        \
++        }                                                \
+     } while (0);
+
+-#define ACPI_READ_ARRAY(arr, addr)                               \
+-    ACPI_READ_ARRAY_PTR(arr, sizeof(arr) / sizeof(arr[0]), addr)
++#define ACPI_READ_ARRAY(qts, arr, addr)                                 \
++    ACPI_READ_ARRAY_PTR(qts, arr, sizeof(arr) / sizeof(arr[0]), addr)
+
+-#define ACPI_READ_TABLE_HEADER(table, addr)                      \
++#define ACPI_READ_TABLE_HEADER(qts, table, addr)                 \
+     do {                                                         \
+-        ACPI_READ_FIELD((table)->signature, addr);               \
+-        ACPI_READ_FIELD((table)->length, addr);                  \
+-        ACPI_READ_FIELD((table)->revision, addr);                \
+-        ACPI_READ_FIELD((table)->checksum, addr);                \
+-        ACPI_READ_ARRAY((table)->oem_id, addr);                  \
+-        ACPI_READ_ARRAY((table)->oem_table_id, addr);            \
+-        ACPI_READ_FIELD((table)->oem_revision, addr);            \
+-        ACPI_READ_ARRAY((table)->asl_compiler_id, addr);         \
+-        ACPI_READ_FIELD((table)->asl_compiler_revision, addr);   \
++        ACPI_READ_FIELD(qts, (table)->signature, addr);          \
++        ACPI_READ_FIELD(qts, (table)->length, addr);             \
++        ACPI_READ_FIELD(qts, (table)->revision, addr);           \
++        ACPI_READ_FIELD(qts, (table)->checksum, addr);           \
++        ACPI_READ_ARRAY(qts, (table)->oem_id, addr);             \
++        ACPI_READ_ARRAY(qts, (table)->oem_table_id, addr);       \
++        ACPI_READ_FIELD(qts, (table)->oem_revision, addr);       \
++        ACPI_READ_ARRAY(qts, (table)->asl_compiler_id, addr);    \
++        ACPI_READ_FIELD(qts, (table)->asl_compiler_revision, addr);     \
+     } while (0);
+
+ #define ACPI_ASSERT_CMP(actual, expected) do { \
+@@ -87,18 +87,19 @@ typedef struct {
+     g_assert_cmpstr(ACPI_ASSERT_CMP_str, ==, expected); \
+ } while (0)
+
+-#define ACPI_READ_GENERIC_ADDRESS(field, addr)       \
+-    do {                                             \
+-        ACPI_READ_FIELD((field).space_id, addr);     \
+-        ACPI_READ_FIELD((field).bit_width, addr);    \
+-        ACPI_READ_FIELD((field).bit_offset, addr);   \
+-        ACPI_READ_FIELD((field).access_width, addr); \
+-        ACPI_READ_FIELD((field).address, addr);      \
++#define ACPI_READ_GENERIC_ADDRESS(qts, field, addr)       \
++    do {                                                  \
++        ACPI_READ_FIELD(qts, (field).space_id, addr);     \
++        ACPI_READ_FIELD(qts, (field).bit_width, addr);    \
++        ACPI_READ_FIELD(qts, (field).bit_offset, addr);   \
++        ACPI_READ_FIELD(qts, (field).access_width, addr); \
++        ACPI_READ_FIELD(qts, (field).address, addr);      \
+     } while (0);
+
+
+ uint8_t acpi_calc_checksum(const uint8_t *data, int len);
+-uint32_t acpi_find_rsdp_address(void);
+-void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table);
++uint32_t acpi_find_rsdp_address(QTestState *qts);
++void acpi_parse_rsdp_table(QTestState *qts, uint32_t addr,
++                           AcpiRsdpDescriptor *rsdp_table);
+
+ #endif  /* TEST_ACPI_UTILS_H */
+diff --git a/tests/acpi-utils.c b/tests/acpi-utils.c
+index 41dc1ea9b4..6dc8ca1a8c 100644
+--- a/tests/acpi-utils.c
++++ b/tests/acpi-utils.c
+@@ -32,7 +32,7 @@ uint8_t acpi_calc_checksum(const uint8_t *data, int len)
+     return sum;
+ }
+
+-uint32_t acpi_find_rsdp_address(void)
++uint32_t acpi_find_rsdp_address(QTestState *qts)
  {
-     QOSState *qs = ahci->parent;
+     uint32_t off;
 
--    set_context(qs);
-+    assert(!global_qtest);
-     ahci_clean_mem(ahci);
-     free_ahci_device(ahci->dev);
-     g_free(ahci);
-@@ -869,15 +870,15 @@ static void ahci_test_io_rw_simple(AHCIQState *ahci, unsigned bufsize,
+@@ -42,7 +42,7 @@ uint32_t acpi_find_rsdp_address(void)
+         int i;
 
-     /* Write some indicative pattern to our buffer. */
-     generate_pattern(tx, bufsize, AHCI_SECTOR_SIZE);
--    bufwrite(ptr, tx, bufsize);
-+    qtest_bufwrite(ahci->parent->qts, ptr, tx, bufsize);
+         for (i = 0; i < sizeof sig - 1; ++i) {
+-            sig[i] = readb(off + i);
++            sig[i] = qtest_readb(qts, off + i);
+         }
 
-     /* Write this buffer to disk, then read it back to the DMA buffer. */
-     ahci_guest_io(ahci, port, write_cmd, ptr, bufsize, sector);
--    qmemset(ptr, 0x00, bufsize);
-+    qtest_memset(ahci->parent->qts, ptr, 0x00, bufsize);
-     ahci_guest_io(ahci, port, read_cmd, ptr, bufsize, sector);
-
-     /*** Read back the Data ***/
--    bufread(ptr, rx, bufsize);
-+    qtest_bufread(ahci->parent->qts, ptr, rx, bufsize);
-     g_assert_cmphex(memcmp(tx, rx, bufsize), ==, 0);
-
-     ahci_free(ahci, ptr);
-@@ -918,7 +919,7 @@ static void ahci_test_max(AHCIQState *ahci)
-     }
-
-     port = ahci_test_nondata(ahci, cmd);
--    memread(ahci->port[port].fb + 0x40, d2h, 0x20);
-+    qtest_memread(ahci->parent->qts, ahci->port[port].fb + 0x40, d2h, 0x20);
-     nsect = (uint64_t)d2h->lba_hi[2] << 40 |
-         (uint64_t)d2h->lba_hi[1] << 32 |
-         (uint64_t)d2h->lba_hi[0] << 24 |
-@@ -1036,7 +1037,7 @@ static void test_dma_fragmented(void)
-     /* Create a DMA buffer in guest memory, and write our pattern to it. */
-     ptr = guest_alloc(ahci->parent->alloc, bufsize);
-     g_assert(ptr);
--    bufwrite(ptr, tx, bufsize);
-+    qtest_bufwrite(ahci->parent->qts, ptr, tx, bufsize);
-
-     cmd = ahci_command_create(CMD_WRITE_DMA);
-     ahci_command_adjust(cmd, 0, ptr, bufsize, 32);
-@@ -1053,7 +1054,7 @@ static void test_dma_fragmented(void)
-     ahci_command_free(cmd);
-
-     /* Read back the guest's receive buffer into local memory */
--    bufread(ptr, rx, bufsize);
-+    qtest_bufread(ahci->parent->qts, ptr, rx, bufsize);
-     guest_free(ahci->parent->alloc, ptr);
-
-     g_assert_cmphex(memcmp(tx, rx, bufsize), ==, 0);
-@@ -1164,8 +1165,6 @@ static void ahci_migrate_simple(uint8_t cmd_read, uint8_t cmd_write)
-                     "-drive if=ide,format=%s,file=%s "
-                     "-incoming %s", imgfmt, tmp_path, uri);
-
--    set_context(src->parent);
--
-     /* initialize */
-     px = ahci_port_select(src);
-     ahci_port_clear(src, px);
-@@ -1233,7 +1232,7 @@ static void ahci_halted_io_test(uint8_t cmd_read, uint8_t cmd_write)
-     generate_pattern(tx, bufsize, AHCI_SECTOR_SIZE);
-     ptr = ahci_alloc(ahci, bufsize);
-     g_assert(ptr);
--    memwrite(ptr, tx, bufsize);
-+    qtest_memwrite(ahci->parent->qts, ptr, tx, bufsize);
-
-     /* Attempt to write (and fail) */
-     cmd = ahci_guest_io_halt(ahci, port, cmd_write,
-@@ -1299,8 +1298,6 @@ static void ahci_migrate_halted_io(uint8_t cmd_read, uint8_t cmd_write)
-                     "-incoming %s",
-                     tmp_path, imgfmt, uri);
-
--    set_context(src->parent);
--
-     /* Initialize and prepare */
-     port = ahci_port_select(src);
-     ahci_port_clear(src, port);
-@@ -1309,7 +1306,7 @@ static void ahci_migrate_halted_io(uint8_t cmd_read, uint8_t cmd_write)
-     /* create DMA source buffer and write pattern */
-     ptr = ahci_alloc(src, bufsize);
-     g_assert(ptr);
--    memwrite(ptr, tx, bufsize);
-+    qtest_memwrite(src->parent->qts, ptr, tx, bufsize);
-
-     /* Write, trigger the VM to stop, migrate, then resume. */
-     cmd = ahci_guest_io_halt(src, port, cmd_write,
-@@ -1350,7 +1347,6 @@ static void test_flush_migrate(void)
-     AHCIQState *src, *dst;
-     AHCICommand *cmd;
-     uint8_t px;
--    const char *s;
-     char *uri = g_strdup_printf("unix:%s", mig_socket);
-
-     prepare_blkdebug_script(debug_path, "flush_to_disk");
-@@ -1368,8 +1364,6 @@ static void test_flush_migrate(void)
-                     "-device ide-hd,drive=drive0 "
-                     "-incoming %s", tmp_path, imgfmt, uri);
-
--    set_context(src->parent);
--
-     px = ahci_port_select(src);
-     ahci_port_clear(src, px);
-
-@@ -1380,15 +1374,14 @@ static void test_flush_migrate(void)
-     cmd = ahci_command_create(CMD_FLUSH_CACHE);
-     ahci_command_commit(src, cmd, px);
-     ahci_command_issue_async(src, cmd);
--    qmp_eventwait("STOP");
-+    qtest_qmp_eventwait(src->parent->qts, "STOP");
-
-     /* Migrate over */
-     ahci_migrate(src, dst, uri);
-
-     /* Complete the command */
--    s = "{'execute':'cont' }";
--    qmp_async(s);
--    qmp_eventwait("RESUME");
-+    qtest_async_qmp(dst->parent->qts, "{'execute':'cont'}");
-+    qtest_qmp_eventwait(dst->parent->qts, "RESUME");
-     ahci_command_wait(dst, cmd);
-     ahci_command_verify(dst, cmd);
-
-@@ -1480,7 +1473,7 @@ static int ahci_cb_cmp_buff(AHCIQState *ahci, AHCICommand *cmd,
-     }
-
-     rx = g_malloc0(opts->size);
--    bufread(opts->buffer, rx, opts->size);
-+    qtest_bufread(ahci->parent->qts, opts->buffer, rx, opts->size);
-     g_assert_cmphex(memcmp(tx, rx, opts->size), ==, 0);
-     g_free(rx);
-
-@@ -1555,9 +1548,10 @@ static void test_atapi_bcl(void)
+         if (!memcmp(sig, "RSD PTR ", sizeof sig)) {
+@@ -52,14 +52,15 @@ uint32_t acpi_find_rsdp_address(void)
+     return off;
  }
 
-
--static void atapi_wait_tray(bool open)
-+static void atapi_wait_tray(AHCIQState *ahci, bool open)
+-void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table)
++void acpi_parse_rsdp_table(QTestState *qts, uint32_t addr,
++                           AcpiRsdpDescriptor *rsdp_table)
  {
--    QDict *rsp = qmp_eventwait_ref("DEVICE_TRAY_MOVED");
-+    QDict *rsp = qtest_qmp_eventwait_ref(ahci->parent->qts,
-+                                         "DEVICE_TRAY_MOVED");
-     QDict *data = qdict_get_qdict(rsp, "data");
-     if (open) {
-         g_assert(qdict_get_bool(data, "tray-open"));
-@@ -1584,43 +1578,46 @@ static void test_atapi_tray(void)
-     port = ahci_port_select(ahci);
+-    ACPI_READ_FIELD(rsdp_table->signature, addr);
++    ACPI_READ_FIELD(qts, rsdp_table->signature, addr);
+     ACPI_ASSERT_CMP64(rsdp_table->signature, "RSD PTR ");
 
-     ahci_atapi_eject(ahci, port);
--    atapi_wait_tray(true);
-+    atapi_wait_tray(ahci, true);
-
-     ahci_atapi_load(ahci, port);
--    atapi_wait_tray(false);
-+    atapi_wait_tray(ahci, false);
-
-     /* Remove media */
--    qmp_async("{'execute': 'blockdev-open-tray', "
--               "'arguments': {'device': 'drive0'}}");
--    atapi_wait_tray(true);
--    rsp = qmp_receive();
-+    qtest_async_qmp(ahci->parent->qts, "{'execute': 'blockdev-open-tray', "
-+                    "'arguments': {'device': 'drive0'}}");
-+    atapi_wait_tray(ahci, true);
-+    rsp = qtest_qmp_receive(ahci->parent->qts);
-     QDECREF(rsp);
-
--    qmp_discard_response("{'execute': 'x-blockdev-remove-medium', "
--                         "'arguments': {'device': 'drive0'}}");
-+    qtest_qmp_discard_response(ahci->parent->qts,
-+                               "{'execute': 'x-blockdev-remove-medium', "
-+                               "'arguments': {'device': 'drive0'}}");
-
-     /* Test the tray without a medium */
-     ahci_atapi_load(ahci, port);
--    atapi_wait_tray(false);
-+    atapi_wait_tray(ahci, false);
-
-     ahci_atapi_eject(ahci, port);
--    atapi_wait_tray(true);
-+    atapi_wait_tray(ahci, true);
-
-     /* Re-insert media */
--    qmp_discard_response("{'execute': 'blockdev-add', "
--                          "'arguments': {'node-name': 'node0', "
-+    qtest_qmp_discard_response(ahci->parent->qts,
-+                               "{'execute': 'blockdev-add', "
-+                               "'arguments': {'node-name': 'node0', "
-                                         "'driver': 'raw', "
-                                         "'file': { 'driver': 'file', "
-                                                   "'filename': %s }}}", iso);
--    qmp_discard_response("{'execute': 'x-blockdev-insert-medium',"
--                          "'arguments': { 'device': 'drive0', "
-+    qtest_qmp_discard_response(ahci->parent->qts,
-+                               "{'execute': 'x-blockdev-insert-medium',"
-+                               "'arguments': { 'device': 'drive0', "
-                                          "'node-name': 'node0' }}");
-
-     /* Again, the event shows up first */
--    qmp_async("{'execute': 'blockdev-close-tray', "
--               "'arguments': {'device': 'drive0'}}");
--    atapi_wait_tray(false);
--    rsp = qmp_receive();
-+    qtest_async_qmp(ahci->parent->qts, "{'execute': 'blockdev-close-tray', "
-+                    "'arguments': {'device': 'drive0'}}");
-+    atapi_wait_tray(ahci, false);
-+    rsp = qtest_qmp_receive(ahci->parent->qts);
-     QDECREF(rsp);
-
-     /* Now, to convince ATAPI we understand the media has changed... */
-@@ -1640,10 +1637,10 @@ static void test_atapi_tray(void)
-
-     /* Final tray test. */
-     ahci_atapi_eject(ahci, port);
--    atapi_wait_tray(true);
-+    atapi_wait_tray(ahci, true);
-
-     ahci_atapi_load(ahci, port);
--    atapi_wait_tray(false);
-+    atapi_wait_tray(ahci, false);
-
-     /* Cleanup */
-     g_free(tx);
-diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
-index 790ef991b3..ba79cd77a0 100644
---- a/tests/libqos/ahci.c
-+++ b/tests/libqos/ahci.c
-@@ -283,7 +283,8 @@ void ahci_hba_enable(AHCIQState *ahci)
-         /* Allocate Memory for the Command List Buffer & FIS Buffer */
-         /* PxCLB space ... 0x20 per command, as in 4.2.2 p 36 */
-         ahci->port[i].clb = ahci_alloc(ahci, num_cmd_slots * 0x20);
--        qmemset(ahci->port[i].clb, 0x00, num_cmd_slots * 0x20);
-+        qtest_memset(ahci->parent->qts, ahci->port[i].clb, 0x00,
-+                     num_cmd_slots * 0x20);
-         g_test_message("CLB: 0x%08" PRIx64, ahci->port[i].clb);
-         ahci_px_wreg(ahci, i, AHCI_PX_CLB, ahci->port[i].clb);
-         g_assert_cmphex(ahci->port[i].clb, ==,
-@@ -291,7 +292,7 @@ void ahci_hba_enable(AHCIQState *ahci)
-
-         /* PxFB space ... 0x100, as in 4.2.1 p 35 */
-         ahci->port[i].fb = ahci_alloc(ahci, 0x100);
--        qmemset(ahci->port[i].fb, 0x00, 0x100);
-+        qtest_memset(ahci->parent->qts, ahci->port[i].fb, 0x00, 0x100);
-         g_test_message("FB: 0x%08" PRIx64, ahci->port[i].fb);
-         ahci_px_wreg(ahci, i, AHCI_PX_FB, ahci->port[i].fb);
-         g_assert_cmphex(ahci->port[i].fb, ==,
-@@ -397,7 +398,7 @@ void ahci_port_clear(AHCIQState *ahci, uint8_t port)
-     g_assert_cmphex(ahci_px_rreg(ahci, port, AHCI_PX_IS), ==, 0);
-
-     /* Wipe the FIS-Receive Buffer */
--    qmemset(ahci->port[port].fb, 0x00, 0x100);
-+    qtest_memset(ahci->parent->qts, ahci->port[port].fb, 0x00, 0x100);
+-    ACPI_READ_FIELD(rsdp_table->checksum, addr);
+-    ACPI_READ_ARRAY(rsdp_table->oem_id, addr);
+-    ACPI_READ_FIELD(rsdp_table->revision, addr);
+-    ACPI_READ_FIELD(rsdp_table->rsdt_physical_address, addr);
+-    ACPI_READ_FIELD(rsdp_table->length, addr);
++    ACPI_READ_FIELD(qts, rsdp_table->checksum, addr);
++    ACPI_READ_ARRAY(qts, rsdp_table->oem_id, addr);
++    ACPI_READ_FIELD(qts, rsdp_table->revision, addr);
++    ACPI_READ_FIELD(qts, rsdp_table->rsdt_physical_address, addr);
++    ACPI_READ_FIELD(qts, rsdp_table->length, addr);
  }
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index bde62bf1cf..75b29df493 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -77,7 +77,7 @@ static void free_test_data(test_data *data)
 
- /**
-@@ -466,7 +467,7 @@ void ahci_port_check_d2h_sanity(AHCIQState *ahci, uint8_t port, uint8_t slot)
-     RegD2HFIS *d2h = g_malloc0(0x20);
-     uint32_t reg;
-
--    memread(ahci->port[port].fb + 0x40, d2h, 0x20);
-+    qtest_memread(ahci->parent->qts, ahci->port[port].fb + 0x40, d2h, 0x20);
-     g_assert_cmphex(d2h->fis_type, ==, 0x34);
-
-     reg = ahci_px_rreg(ahci, port, AHCI_PX_TFD);
-@@ -484,7 +485,7 @@ void ahci_port_check_pio_sanity(AHCIQState *ahci, uint8_t port,
-     /* We cannot check the Status or E_Status registers, because
-      * the status may have again changed between the PIO Setup FIS
-      * and the conclusion of the command with the D2H Register FIS. */
--    memread(ahci->port[port].fb + 0x20, pio, 0x20);
-+    qtest_memread(ahci->parent->qts, ahci->port[port].fb + 0x20, pio, 0x20);
-     g_assert_cmphex(pio->fis_type, ==, 0x5f);
-
-     /* BUG: PIO Setup FIS as utilized by QEMU tries to fit the entire
-@@ -516,7 +517,7 @@ void ahci_get_command_header(AHCIQState *ahci, uint8_t port,
+ static void test_acpi_rsdp_address(test_data *data)
  {
-     uint64_t ba = ahci->port[port].clb;
-     ba += slot * sizeof(AHCICommandHeader);
--    memread(ba, cmd, sizeof(AHCICommandHeader));
-+    qtest_memread(ahci->parent->qts, ba, cmd, sizeof(AHCICommandHeader));
-
-     cmd->flags = le16_to_cpu(cmd->flags);
-     cmd->prdtl = le16_to_cpu(cmd->prdtl);
-@@ -537,7 +538,7 @@ void ahci_set_command_header(AHCIQState *ahci, uint8_t port,
-     tmp.prdbc = cpu_to_le32(cmd->prdbc);
-     tmp.ctba = cpu_to_le64(cmd->ctba);
-
--    memwrite(ba, &tmp, sizeof(AHCICommandHeader));
-+    qtest_memwrite(ahci->parent->qts, ba, &tmp, sizeof(AHCICommandHeader));
+-    uint32_t off = acpi_find_rsdp_address();
++    uint32_t off = acpi_find_rsdp_address(global_qtest);
+     g_assert_cmphex(off, <, 0x100000);
+     data->rsdp_addr = off;
  }
+@@ -87,7 +87,7 @@ static void test_acpi_rsdp_table(test_data *data)
+     AcpiRsdpDescriptor *rsdp_table = &data->rsdp_table;
+     uint32_t addr = data->rsdp_addr;
 
- void ahci_destroy_command(AHCIQState *ahci, uint8_t port, uint8_t slot)
-@@ -575,7 +576,7 @@ void ahci_write_fis(AHCIQState *ahci, AHCICommand *cmd)
-         tmp.count = cpu_to_le16(tmp.count);
-     }
+-    acpi_parse_rsdp_table(addr, rsdp_table);
++    acpi_parse_rsdp_table(global_qtest, addr, rsdp_table);
 
--    memwrite(addr, &tmp, sizeof(tmp));
-+    qtest_memwrite(ahci->parent->qts, addr, &tmp, sizeof(tmp));
- }
+     /* rsdp checksum is not for the whole table, but for the first 20 bytes */
+     g_assert(!acpi_calc_checksum((uint8_t *)rsdp_table, 20));
+@@ -102,7 +102,7 @@ static void test_acpi_rsdt_table(test_data *data)
+     uint8_t checksum;
 
- unsigned ahci_pick_cmd(AHCIQState *ahci, uint8_t port)
-@@ -636,7 +637,7 @@ void ahci_exec(AHCIQState *ahci, uint8_t port,
-     if (opts->size && !opts->buffer) {
-         opts->buffer = ahci_alloc(ahci, opts->size);
-         g_assert(opts->buffer);
--        qmemset(opts->buffer, 0x00, opts->size);
-+        qtest_memset(ahci->parent->qts, opts->buffer, 0x00, opts->size);
-     }
+     /* read the header */
+-    ACPI_READ_TABLE_HEADER(rsdt_table, addr);
++    ACPI_READ_TABLE_HEADER(global_qtest, rsdt_table, addr);
+     ACPI_ASSERT_CMP(rsdt_table->signature, "RSDT");
 
-     /* Command creation */
-@@ -661,15 +662,15 @@ void ahci_exec(AHCIQState *ahci, uint8_t port,
-     ahci_command_commit(ahci, cmd, port);
-     ahci_command_issue_async(ahci, cmd);
-     if (opts->error) {
--        qmp_eventwait("STOP");
-+        qtest_qmp_eventwait(ahci->parent->qts, "STOP");
-     }
-     if (opts->mid_cb) {
-         rc = opts->mid_cb(ahci, cmd, opts);
-         g_assert_cmpint(rc, ==, 0);
-     }
-     if (opts->error) {
--        qmp_async("{'execute':'cont' }");
--        qmp_eventwait("RESUME");
-+        qtest_async_qmp(ahci->parent->qts, "{'execute':'cont' }");
-+        qtest_qmp_eventwait(ahci->parent->qts, "RESUME");
-     }
+     /* compute the table entries in rsdt */
+@@ -112,7 +112,7 @@ static void test_acpi_rsdt_table(test_data *data)
 
-     /* Wait for command to complete and verify sanity */
-@@ -697,7 +698,7 @@ AHCICommand *ahci_guest_io_halt(AHCIQState *ahci, uint8_t port,
-     ahci_command_adjust(cmd, sector, buffer, bufsize, 0);
-     ahci_command_commit(ahci, cmd, port);
-     ahci_command_issue_async(ahci, cmd);
--    qmp_eventwait("STOP");
-+    qtest_qmp_eventwait(ahci->parent->qts, "STOP");
+     /* get the addresses of the tables pointed by rsdt */
+     tables = g_new0(uint32_t, tables_nr);
+-    ACPI_READ_ARRAY_PTR(tables, tables_nr, addr);
++    ACPI_READ_ARRAY_PTR(global_qtest, tables, tables_nr, addr);
 
-     return cmd;
- }
-@@ -706,8 +707,8 @@ AHCICommand *ahci_guest_io_halt(AHCIQState *ahci, uint8_t port,
- void ahci_guest_io_resume(AHCIQState *ahci, AHCICommand *cmd)
+     checksum = acpi_calc_checksum((uint8_t *)rsdt_table, rsdt_table->length) +
+                acpi_calc_checksum((uint8_t *)tables,
+@@ -128,63 +128,64 @@ static void test_acpi_fadt_table(test_data *data)
  {
-     /* Complete the command */
--    qmp_async("{'execute':'cont' }");
--    qmp_eventwait("RESUME");
-+    qtest_async_qmp(ahci->parent->qts, "{'execute':'cont' }");
-+    qtest_qmp_eventwait(ahci->parent->qts, "RESUME");
-     ahci_command_wait(ahci, cmd);
-     ahci_command_verify(ahci, cmd);
-     ahci_command_free(cmd);
-@@ -754,16 +755,16 @@ void ahci_io(AHCIQState *ahci, uint8_t port, uint8_t ide_cmd,
-     g_assert(props);
-     ptr = ahci_alloc(ahci, bufsize);
-     g_assert(!bufsize || ptr);
--    qmemset(ptr, 0x00, bufsize);
-+    qtest_memset(ahci->parent->qts, ptr, 0x00, bufsize);
+     AcpiFadtDescriptorRev3 *fadt_table = &data->fadt_table;
+     uint32_t addr;
++    QTestState *qts = global_qtest;
 
-     if (bufsize && props->write) {
--        bufwrite(ptr, buffer, bufsize);
-+        qtest_bufwrite(ahci->parent->qts, ptr, buffer, bufsize);
-     }
+     /* FADT table comes first */
+     addr = data->rsdt_tables_addr[0];
+-    ACPI_READ_TABLE_HEADER(fadt_table, addr);
++    ACPI_READ_TABLE_HEADER(qts, fadt_table, addr);
 
-     ahci_guest_io(ahci, port, ide_cmd, ptr, bufsize, sector);
+-    ACPI_READ_FIELD(fadt_table->firmware_ctrl, addr);
+-    ACPI_READ_FIELD(fadt_table->dsdt, addr);
+-    ACPI_READ_FIELD(fadt_table->model, addr);
+-    ACPI_READ_FIELD(fadt_table->reserved1, addr);
+-    ACPI_READ_FIELD(fadt_table->sci_int, addr);
+-    ACPI_READ_FIELD(fadt_table->smi_cmd, addr);
+-    ACPI_READ_FIELD(fadt_table->acpi_enable, addr);
+-    ACPI_READ_FIELD(fadt_table->acpi_disable, addr);
+-    ACPI_READ_FIELD(fadt_table->S4bios_req, addr);
+-    ACPI_READ_FIELD(fadt_table->reserved2, addr);
+-    ACPI_READ_FIELD(fadt_table->pm1a_evt_blk, addr);
+-    ACPI_READ_FIELD(fadt_table->pm1b_evt_blk, addr);
+-    ACPI_READ_FIELD(fadt_table->pm1a_cnt_blk, addr);
+-    ACPI_READ_FIELD(fadt_table->pm1b_cnt_blk, addr);
+-    ACPI_READ_FIELD(fadt_table->pm2_cnt_blk, addr);
+-    ACPI_READ_FIELD(fadt_table->pm_tmr_blk, addr);
+-    ACPI_READ_FIELD(fadt_table->gpe0_blk, addr);
+-    ACPI_READ_FIELD(fadt_table->gpe1_blk, addr);
+-    ACPI_READ_FIELD(fadt_table->pm1_evt_len, addr);
+-    ACPI_READ_FIELD(fadt_table->pm1_cnt_len, addr);
+-    ACPI_READ_FIELD(fadt_table->pm2_cnt_len, addr);
+-    ACPI_READ_FIELD(fadt_table->pm_tmr_len, addr);
+-    ACPI_READ_FIELD(fadt_table->gpe0_blk_len, addr);
+-    ACPI_READ_FIELD(fadt_table->gpe1_blk_len, addr);
+-    ACPI_READ_FIELD(fadt_table->gpe1_base, addr);
+-    ACPI_READ_FIELD(fadt_table->reserved3, addr);
+-    ACPI_READ_FIELD(fadt_table->plvl2_lat, addr);
+-    ACPI_READ_FIELD(fadt_table->plvl3_lat, addr);
+-    ACPI_READ_FIELD(fadt_table->flush_size, addr);
+-    ACPI_READ_FIELD(fadt_table->flush_stride, addr);
+-    ACPI_READ_FIELD(fadt_table->duty_offset, addr);
+-    ACPI_READ_FIELD(fadt_table->duty_width, addr);
+-    ACPI_READ_FIELD(fadt_table->day_alrm, addr);
+-    ACPI_READ_FIELD(fadt_table->mon_alrm, addr);
+-    ACPI_READ_FIELD(fadt_table->century, addr);
+-    ACPI_READ_FIELD(fadt_table->boot_flags, addr);
+-    ACPI_READ_FIELD(fadt_table->reserved, addr);
+-    ACPI_READ_FIELD(fadt_table->flags, addr);
+-    ACPI_READ_GENERIC_ADDRESS(fadt_table->reset_register, addr);
+-    ACPI_READ_FIELD(fadt_table->reset_value, addr);
+-    ACPI_READ_FIELD(fadt_table->arm_boot_flags, addr);
+-    ACPI_READ_FIELD(fadt_table->minor_revision, addr);
+-    ACPI_READ_FIELD(fadt_table->x_facs, addr);
+-    ACPI_READ_FIELD(fadt_table->x_dsdt, addr);
+-    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm1a_event_block, addr);
+-    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm1b_event_block, addr);
+-    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm1a_control_block, addr);
+-    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm1b_control_block, addr);
+-    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm2_control_block, addr);
+-    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm_timer_block, addr);
+-    ACPI_READ_GENERIC_ADDRESS(fadt_table->xgpe0_block, addr);
+-    ACPI_READ_GENERIC_ADDRESS(fadt_table->xgpe1_block, addr);
++    ACPI_READ_FIELD(qts, fadt_table->firmware_ctrl, addr);
++    ACPI_READ_FIELD(qts, fadt_table->dsdt, addr);
++    ACPI_READ_FIELD(qts, fadt_table->model, addr);
++    ACPI_READ_FIELD(qts, fadt_table->reserved1, addr);
++    ACPI_READ_FIELD(qts, fadt_table->sci_int, addr);
++    ACPI_READ_FIELD(qts, fadt_table->smi_cmd, addr);
++    ACPI_READ_FIELD(qts, fadt_table->acpi_enable, addr);
++    ACPI_READ_FIELD(qts, fadt_table->acpi_disable, addr);
++    ACPI_READ_FIELD(qts, fadt_table->S4bios_req, addr);
++    ACPI_READ_FIELD(qts, fadt_table->reserved2, addr);
++    ACPI_READ_FIELD(qts, fadt_table->pm1a_evt_blk, addr);
++    ACPI_READ_FIELD(qts, fadt_table->pm1b_evt_blk, addr);
++    ACPI_READ_FIELD(qts, fadt_table->pm1a_cnt_blk, addr);
++    ACPI_READ_FIELD(qts, fadt_table->pm1b_cnt_blk, addr);
++    ACPI_READ_FIELD(qts, fadt_table->pm2_cnt_blk, addr);
++    ACPI_READ_FIELD(qts, fadt_table->pm_tmr_blk, addr);
++    ACPI_READ_FIELD(qts, fadt_table->gpe0_blk, addr);
++    ACPI_READ_FIELD(qts, fadt_table->gpe1_blk, addr);
++    ACPI_READ_FIELD(qts, fadt_table->pm1_evt_len, addr);
++    ACPI_READ_FIELD(qts, fadt_table->pm1_cnt_len, addr);
++    ACPI_READ_FIELD(qts, fadt_table->pm2_cnt_len, addr);
++    ACPI_READ_FIELD(qts, fadt_table->pm_tmr_len, addr);
++    ACPI_READ_FIELD(qts, fadt_table->gpe0_blk_len, addr);
++    ACPI_READ_FIELD(qts, fadt_table->gpe1_blk_len, addr);
++    ACPI_READ_FIELD(qts, fadt_table->gpe1_base, addr);
++    ACPI_READ_FIELD(qts, fadt_table->reserved3, addr);
++    ACPI_READ_FIELD(qts, fadt_table->plvl2_lat, addr);
++    ACPI_READ_FIELD(qts, fadt_table->plvl3_lat, addr);
++    ACPI_READ_FIELD(qts, fadt_table->flush_size, addr);
++    ACPI_READ_FIELD(qts, fadt_table->flush_stride, addr);
++    ACPI_READ_FIELD(qts, fadt_table->duty_offset, addr);
++    ACPI_READ_FIELD(qts, fadt_table->duty_width, addr);
++    ACPI_READ_FIELD(qts, fadt_table->day_alrm, addr);
++    ACPI_READ_FIELD(qts, fadt_table->mon_alrm, addr);
++    ACPI_READ_FIELD(qts, fadt_table->century, addr);
++    ACPI_READ_FIELD(qts, fadt_table->boot_flags, addr);
++    ACPI_READ_FIELD(qts, fadt_table->reserved, addr);
++    ACPI_READ_FIELD(qts, fadt_table->flags, addr);
++    ACPI_READ_GENERIC_ADDRESS(qts, fadt_table->reset_register, addr);
++    ACPI_READ_FIELD(qts, fadt_table->reset_value, addr);
++    ACPI_READ_FIELD(qts, fadt_table->arm_boot_flags, addr);
++    ACPI_READ_FIELD(qts, fadt_table->minor_revision, addr);
++    ACPI_READ_FIELD(qts, fadt_table->x_facs, addr);
++    ACPI_READ_FIELD(qts, fadt_table->x_dsdt, addr);
++    ACPI_READ_GENERIC_ADDRESS(qts, fadt_table->xpm1a_event_block, addr);
++    ACPI_READ_GENERIC_ADDRESS(qts, fadt_table->xpm1b_event_block, addr);
++    ACPI_READ_GENERIC_ADDRESS(qts, fadt_table->xpm1a_control_block, addr);
++    ACPI_READ_GENERIC_ADDRESS(qts, fadt_table->xpm1b_control_block, addr);
++    ACPI_READ_GENERIC_ADDRESS(qts, fadt_table->xpm2_control_block, addr);
++    ACPI_READ_GENERIC_ADDRESS(qts, fadt_table->xpm_timer_block, addr);
++    ACPI_READ_GENERIC_ADDRESS(qts, fadt_table->xgpe0_block, addr);
++    ACPI_READ_GENERIC_ADDRESS(qts, fadt_table->xgpe1_block, addr);
 
-     if (bufsize && props->read) {
--        bufread(ptr, buffer, bufsize);
-+        qtest_bufread(ahci->parent->qts, ptr, buffer, bufsize);
-     }
+     ACPI_ASSERT_CMP(fadt_table->signature, "FACP");
+     g_assert(!acpi_calc_checksum((uint8_t *)fadt_table, fadt_table->length));
+@@ -195,13 +196,13 @@ static void test_acpi_facs_table(test_data *data)
+     AcpiFacsDescriptorRev1 *facs_table = &data->facs_table;
+     uint32_t addr = data->fadt_table.firmware_ctrl;
 
-     ahci_free(ahci, ptr);
-@@ -901,7 +902,7 @@ static int copy_buffer(AHCIQState *ahci, AHCICommand *cmd,
-                         const AHCIOpts *opts)
+-    ACPI_READ_FIELD(facs_table->signature, addr);
+-    ACPI_READ_FIELD(facs_table->length, addr);
+-    ACPI_READ_FIELD(facs_table->hardware_signature, addr);
+-    ACPI_READ_FIELD(facs_table->firmware_waking_vector, addr);
+-    ACPI_READ_FIELD(facs_table->global_lock, addr);
+-    ACPI_READ_FIELD(facs_table->flags, addr);
+-    ACPI_READ_ARRAY(facs_table->resverved3, addr);
++    ACPI_READ_FIELD(global_qtest, facs_table->signature, addr);
++    ACPI_READ_FIELD(global_qtest, facs_table->length, addr);
++    ACPI_READ_FIELD(global_qtest, facs_table->hardware_signature, addr);
++    ACPI_READ_FIELD(global_qtest, facs_table->firmware_waking_vector, addr);
++    ACPI_READ_FIELD(global_qtest, facs_table->global_lock, addr);
++    ACPI_READ_FIELD(global_qtest, facs_table->flags, addr);
++    ACPI_READ_ARRAY(global_qtest, facs_table->resverved3, addr);
+
+     ACPI_ASSERT_CMP(facs_table->signature, "FACS");
+ }
+@@ -210,11 +211,11 @@ static void test_dst_table(AcpiSdtTable *sdt_table, uint32_t addr)
  {
-     unsigned char *rx = opts->opaque;
--    bufread(opts->buffer, rx, opts->size);
-+    qtest_bufread(ahci->parent->qts, opts->buffer, rx, opts->size);
-     return 0;
- }
+     uint8_t checksum;
 
-@@ -1141,7 +1142,7 @@ void ahci_command_commit(AHCIQState *ahci, AHCICommand *cmd, uint8_t port)
-     ahci_write_fis(ahci, cmd);
-     /* Then ATAPI CMD, if needed */
-     if (cmd->props->atapi) {
--        memwrite(table_ptr + 0x40, cmd->atapi_cmd, 16);
-+        qtest_memwrite(ahci->parent->qts, table_ptr + 0x40, cmd->atapi_cmd, 16);
+-    ACPI_READ_TABLE_HEADER(&sdt_table->header, addr);
++    ACPI_READ_TABLE_HEADER(global_qtest, &sdt_table->header, addr);
+
+     sdt_table->aml_len = sdt_table->header.length - sizeof(AcpiTableHeader);
+     sdt_table->aml = g_malloc0(sdt_table->aml_len);
+-    ACPI_READ_ARRAY_PTR(sdt_table->aml, sdt_table->aml_len, addr);
++    ACPI_READ_ARRAY_PTR(global_qtest, sdt_table->aml, sdt_table->aml_len, addr);
+
+     checksum = acpi_calc_checksum((uint8_t *)sdt_table,
+                                   sizeof(AcpiTableHeader)) +
+@@ -492,32 +493,32 @@ static bool smbios_ep_table_ok(test_data *data)
+     struct smbios_21_entry_point *ep_table = &data->smbios_ep_table;
+     uint32_t addr = data->smbios_ep_addr;
+
+-    ACPI_READ_ARRAY(ep_table->anchor_string, addr);
++    ACPI_READ_ARRAY(global_qtest, ep_table->anchor_string, addr);
+     if (memcmp(ep_table->anchor_string, "_SM_", 4)) {
+         return false;
      }
-
-     /* Construct and write the PRDs to the command table */
-@@ -1162,8 +1163,8 @@ void ahci_command_commit(AHCIQState *ahci, AHCICommand *cmd, uint8_t port)
-         prd.dbc |= cpu_to_le32(0x80000000); /* Request DPS Interrupt */
-
-         /* Commit the PRD entry to the Command Table */
--        memwrite(table_ptr + 0x80 + (i * sizeof(PRD)),
--                 &prd, sizeof(PRD));
-+        qtest_memwrite(ahci->parent->qts, table_ptr + 0x80 + (i * sizeof(PRD)),
-+                       &prd, sizeof(PRD));
+-    ACPI_READ_FIELD(ep_table->checksum, addr);
+-    ACPI_READ_FIELD(ep_table->length, addr);
+-    ACPI_READ_FIELD(ep_table->smbios_major_version, addr);
+-    ACPI_READ_FIELD(ep_table->smbios_minor_version, addr);
+-    ACPI_READ_FIELD(ep_table->max_structure_size, addr);
+-    ACPI_READ_FIELD(ep_table->entry_point_revision, addr);
+-    ACPI_READ_ARRAY(ep_table->formatted_area, addr);
+-    ACPI_READ_ARRAY(ep_table->intermediate_anchor_string, addr);
++    ACPI_READ_FIELD(global_qtest, ep_table->checksum, addr);
++    ACPI_READ_FIELD(global_qtest, ep_table->length, addr);
++    ACPI_READ_FIELD(global_qtest, ep_table->smbios_major_version, addr);
++    ACPI_READ_FIELD(global_qtest, ep_table->smbios_minor_version, addr);
++    ACPI_READ_FIELD(global_qtest, ep_table->max_structure_size, addr);
++    ACPI_READ_FIELD(global_qtest, ep_table->entry_point_revision, addr);
++    ACPI_READ_ARRAY(global_qtest, ep_table->formatted_area, addr);
++    ACPI_READ_ARRAY(global_qtest, ep_table->intermediate_anchor_string, addr);
+     if (memcmp(ep_table->intermediate_anchor_string, "_DMI_", 5)) {
+         return false;
      }
-
-     /* Bookmark the PRDTL and CTBA values */
-diff --git a/tests/libqos/libqos-pc.c b/tests/libqos/libqos-pc.c
-index b554758802..a9c1aceaa7 100644
---- a/tests/libqos/libqos-pc.c
-+++ b/tests/libqos/libqos-pc.c
-@@ -25,7 +25,7 @@ QOSState *qtest_pc_boot(const char *cmdline_fmt, ...)
-     qs = qtest_vboot(&qos_ops, cmdline_fmt, ap);
-     va_end(ap);
-
--    qtest_irq_intercept_in(global_qtest, "ioapic");
-+    qtest_irq_intercept_in(qs->qts, "ioapic");
-
-     return qs;
- }
-diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
-index 62d2f39b93..24e8156fe2 100644
---- a/tests/libqos/libqos.c
-+++ b/tests/libqos/libqos.c
-@@ -79,34 +79,19 @@ void qtest_shutdown(QOSState *qs)
+-    ACPI_READ_FIELD(ep_table->intermediate_checksum, addr);
+-    ACPI_READ_FIELD(ep_table->structure_table_length, addr);
++    ACPI_READ_FIELD(global_qtest, ep_table->intermediate_checksum, addr);
++    ACPI_READ_FIELD(global_qtest, ep_table->structure_table_length, addr);
+     if (ep_table->structure_table_length == 0) {
+         return false;
      }
- }
-
--void set_context(QOSState *s)
-+static QDict *qmp_execute(QTestState *qts, const char *command)
- {
--    global_qtest = s->qts;
--}
--
--static QDict *qmp_execute(const char *command)
--{
--    char *fmt;
--    QDict *rsp;
--
--    fmt = g_strdup_printf("{ 'execute': '%s' }", command);
--    rsp = qmp(fmt);
--    g_free(fmt);
--
--    return rsp;
-+    return qtest_qmp(qts, "{ 'execute': %s }", command);
- }
-
- void migrate(QOSState *from, QOSState *to, const char *uri)
- {
-     const char *st;
--    char *s;
-     QDict *rsp, *sub;
-     bool running;
-
--    set_context(from);
--
-     /* Is the machine currently running? */
--    rsp = qmp_execute("query-status");
-+    rsp = qmp_execute(from->qts, "query-status");
-     g_assert(qdict_haskey(rsp, "return"));
-     sub = qdict_get_qdict(rsp, "return");
-     g_assert(qdict_haskey(sub, "running"));
-@@ -114,30 +99,27 @@ void migrate(QOSState *from, QOSState *to, const char *uri)
-     QDECREF(rsp);
-
-     /* Issue the migrate command. */
--    s = g_strdup_printf("{ 'execute': 'migrate',"
--                        "'arguments': { 'uri': '%s' } }",
--                        uri);
--    rsp = qmp(s);
--    g_free(s);
-+    rsp = qtest_qmp(from->qts,
-+                    "{ 'execute': 'migrate', 'arguments': { 'uri': %s }}",
-+                    uri);
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
-
-     /* Wait for STOP event, but only if we were running: */
-     if (running) {
--        qmp_eventwait("STOP");
-+        qtest_qmp_eventwait(from->qts, "STOP");
+-    ACPI_READ_FIELD(ep_table->structure_table_address, addr);
+-    ACPI_READ_FIELD(ep_table->number_of_structures, addr);
++    ACPI_READ_FIELD(global_qtest, ep_table->structure_table_address, addr);
++    ACPI_READ_FIELD(global_qtest, ep_table->number_of_structures, addr);
+     if (ep_table->number_of_structures == 0) {
+         return false;
      }
+-    ACPI_READ_FIELD(ep_table->smbios_bcd_revision, addr);
++    ACPI_READ_FIELD(global_qtest, ep_table->smbios_bcd_revision, addr);
+     if (acpi_calc_checksum((uint8_t *)ep_table, sizeof *ep_table) ||
+         acpi_calc_checksum((uint8_t *)ep_table + 0x10,
+                            sizeof *ep_table - 0x10)) {
+diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+index 4bdc8a15e7..73473162d0 100644
+--- a/tests/vmgenid-test.c
++++ b/tests/vmgenid-test.c
+@@ -50,15 +50,15 @@ static uint32_t acpi_find_vgia(void)
+     boot_sector_test(global_qtest);
 
-     /* If we were running, we can wait for an event. */
-     if (running) {
-         migrate_allocator(from->alloc, to->alloc);
--        set_context(to);
--        qmp_eventwait("RESUME");
-+        qtest_qmp_eventwait(to->qts, "RESUME");
-         return;
-     }
+     /* Tables should be initialized now. */
+-    rsdp_offset = acpi_find_rsdp_address();
++    rsdp_offset = acpi_find_rsdp_address(global_qtest);
 
-     /* Otherwise, we need to wait: poll until migration is completed. */
-     while (1) {
--        rsp = qmp_execute("query-migrate");
-+        rsp = qmp_execute(from->qts, "query-migrate");
-         g_assert(qdict_haskey(rsp, "return"));
-         sub = qdict_get_qdict(rsp, "return");
-         g_assert(qdict_haskey(sub, "status"));
-@@ -160,7 +142,6 @@ void migrate(QOSState *from, QOSState *to, const char *uri)
-     }
+     g_assert_cmphex(rsdp_offset, <, RSDP_ADDR_INVALID);
 
-     migrate_allocator(from->alloc, to->alloc);
--    set_context(to);
- }
+-    acpi_parse_rsdp_table(rsdp_offset, &rsdp_table);
++    acpi_parse_rsdp_table(global_qtest, rsdp_offset, &rsdp_table);
 
- bool have_qemu_img(void)
+     rsdt = rsdp_table.rsdt_physical_address;
+     /* read the header */
+-    ACPI_READ_TABLE_HEADER(&rsdt_table, rsdt);
++    ACPI_READ_TABLE_HEADER(global_qtest, &rsdt_table, rsdt);
+     ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
+
+     /* compute the table entries in rsdt */
+@@ -68,21 +68,21 @@ static uint32_t acpi_find_vgia(void)
+
+     /* get the addresses of the tables pointed by rsdt */
+     tables = g_new0(uint32_t, tables_nr);
+-    ACPI_READ_ARRAY_PTR(tables, tables_nr, rsdt);
++    ACPI_READ_ARRAY_PTR(global_qtest, tables, tables_nr, rsdt);
+
+     for (i = 0; i < tables_nr; i++) {
+-        ACPI_READ_TABLE_HEADER(&ssdt_table, tables[i]);
++        ACPI_READ_TABLE_HEADER(global_qtest, &ssdt_table, tables[i]);
+         if (!strncmp((char *)ssdt_table.oem_table_id, "VMGENID", 7)) {
+             /* the first entry in the table should be VGIA
+              * That's all we need
+              */
+-            ACPI_READ_FIELD(vgid_table.name_op, tables[i]);
++            ACPI_READ_FIELD(global_qtest, vgid_table.name_op, tables[i]);
+             g_assert(vgid_table.name_op == 0x08);  /* name */
+-            ACPI_READ_ARRAY(vgid_table.vgia, tables[i]);
++            ACPI_READ_ARRAY(global_qtest, vgid_table.vgia, tables[i]);
+             g_assert(memcmp(vgid_table.vgia, "VGIA", 4) == 0);
+-            ACPI_READ_FIELD(vgid_table.val_op, tables[i]);
++            ACPI_READ_FIELD(global_qtest, vgid_table.val_op, tables[i]);
+             g_assert(vgid_table.val_op == 0x0C);  /* dword */
+-            ACPI_READ_FIELD(vgid_table.vgia_val, tables[i]);
++            ACPI_READ_FIELD(global_qtest, vgid_table.vgia_val, tables[i]);
+             /* The GUID is written at a fixed offset into the fw_cfg file
+              * in order to implement the "OVMF SDT Header probe suppressor"
+              * see docs/specs/vmgenid.txt for more details
 -- 
 2.13.5
