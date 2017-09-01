@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnqIW-0007AM-O8
+	(envelope-from <eblake@redhat.com>) id 1dnqIa-0007DP-5X
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnqIS-0001bG-7x
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36182)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnqIS-0001ah-2p
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:00 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 278C6356F2
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 18:03:59 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1dnqIY-0001hV-Aj
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:08 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Fri,  1 Sep 2017 13:03:22 -0500
-Message-Id: <20170901180340.30009-12-eblake@redhat.com>
+Date: Fri,  1 Sep 2017 13:03:24 -0500
+Message-Id: <20170901180340.30009-14-eblake@redhat.com>
 In-Reply-To: <20170901180340.30009-1-eblake@redhat.com>
 References: <20170901180340.30009-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 11/29] libqtest: Inline
- qtest_query_target_endianness()
+Subject: [Qemu-devel] [PATCH v6 13/29] libqos: Use explicit QTestState for
+ pci operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +21,213 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com
+Cc: armbru@redhat.com, pbonzini@redhat.com, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, "open list:sPAPR" <qemu-ppc@nongnu.org>
 
-There was only one caller; it's easier to inline things.
+Now that the QPCIBus tracks QTestState, use that state instead
+of an implicit reliance on global_qtest.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/libqtest.c | 22 ++++++----------------
- 1 file changed, 6 insertions(+), 16 deletions(-)
+ tests/libqos/pci-pc.c    | 47 ++++++++++++++++++++++++-----------------------
+ tests/libqos/pci-spapr.c | 20 ++++++++++----------
+ 2 files changed, 34 insertions(+), 33 deletions(-)
 
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 5d16351e24..b6dd26e54a 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -244,20 +244,6 @@ redo:
-     return words;
- }
+diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
+index 85b34c6d13..9545f881ee 100644
+--- a/tests/libqos/pci-pc.c
++++ b/tests/libqos/pci-pc.c
+@@ -29,90 +29,91 @@ typedef struct QPCIBusPC
 
--static int qtest_query_target_endianness(QTestState *s)
--{
--    gchar **args;
--    int big_endian;
--
--    qtest_sendf(s, "endianness\n");
--    args = qtest_rsp(s, 1);
--    g_assert(strcmp(args[1], "big") == 0 || strcmp(args[1], "little") == 0);
--    big_endian = strcmp(args[1], "big") == 0;
--    g_strfreev(args);
--
--    return big_endian;
--}
--
- static void cleanup_sigabrt_handler(void)
+ static uint8_t qpci_pc_pio_readb(QPCIBus *bus, uint32_t addr)
  {
-     sigaction(SIGABRT, &sigact_old, NULL);
-@@ -288,6 +274,7 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
-     gchar *qmp_socket_path;
-     gchar *command;
-     const char *qemu_binary;
-+    gchar **args;
-
-     qemu_binary = getenv("QTEST_QEMU_BINARY");
-     if (!qemu_binary) {
-@@ -351,8 +338,11 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
-     }
-
-     /* ask endianness of the target */
--
--    s->big_endian = qtest_query_target_endianness(s);
-+    qtest_sendf(s, "endianness\n");
-+    args = qtest_rsp(s, 1);
-+    g_assert(strcmp(args[1], "big") == 0 || strcmp(args[1], "little") == 0);
-+    s->big_endian = strcmp(args[1], "big") == 0;
-+    g_strfreev(args);
-
-     return s;
+-    return inb(addr);
++    return qtest_inb(bus->qts, addr);
  }
+
+ static void qpci_pc_pio_writeb(QPCIBus *bus, uint32_t addr, uint8_t val)
+ {
+-    outb(addr, val);
++    qtest_outb(bus->qts, addr, val);
+ }
+
+ static uint16_t qpci_pc_pio_readw(QPCIBus *bus, uint32_t addr)
+ {
+-    return inw(addr);
++    return qtest_inw(bus->qts, addr);
+ }
+
+ static void qpci_pc_pio_writew(QPCIBus *bus, uint32_t addr, uint16_t val)
+ {
+-    outw(addr, val);
++    qtest_outw(bus->qts, addr, val);
+ }
+
+ static uint32_t qpci_pc_pio_readl(QPCIBus *bus, uint32_t addr)
+ {
+-    return inl(addr);
++    return qtest_inl(bus->qts, addr);
+ }
+
+ static void qpci_pc_pio_writel(QPCIBus *bus, uint32_t addr, uint32_t val)
+ {
+-    outl(addr, val);
++    qtest_outl(bus->qts, addr, val);
+ }
+
+ static uint64_t qpci_pc_pio_readq(QPCIBus *bus, uint32_t addr)
+ {
+-    return (uint64_t)inl(addr) + ((uint64_t)inl(addr + 4) << 32);
++    return (uint64_t)qtest_inl(bus->qts, addr) +
++        ((uint64_t)qtest_inl(bus->qts, addr + 4) << 32);
+ }
+
+ static void qpci_pc_pio_writeq(QPCIBus *bus, uint32_t addr, uint64_t val)
+ {
+-    outl(addr, val & 0xffffffff);
+-    outl(addr + 4, val >> 32);
++    qtest_outl(bus->qts, addr, val & 0xffffffff);
++    qtest_outl(bus->qts, addr + 4, val >> 32);
+ }
+
+ static void qpci_pc_memread(QPCIBus *bus, uint32_t addr, void *buf, size_t len)
+ {
+-    memread(addr, buf, len);
++    qtest_memread(bus->qts, addr, buf, len);
+ }
+
+ static void qpci_pc_memwrite(QPCIBus *bus, uint32_t addr,
+                              const void *buf, size_t len)
+ {
+-    memwrite(addr, buf, len);
++    qtest_memwrite(bus->qts, addr, buf, len);
+ }
+
+ static uint8_t qpci_pc_config_readb(QPCIBus *bus, int devfn, uint8_t offset)
+ {
+-    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
+-    return inb(0xcfc);
++    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
++    return qtest_inb(bus->qts, 0xcfc);
+ }
+
+ static uint16_t qpci_pc_config_readw(QPCIBus *bus, int devfn, uint8_t offset)
+ {
+-    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
+-    return inw(0xcfc);
++    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
++    return qtest_inw(bus->qts, 0xcfc);
+ }
+
+ static uint32_t qpci_pc_config_readl(QPCIBus *bus, int devfn, uint8_t offset)
+ {
+-    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
+-    return inl(0xcfc);
++    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
++    return qtest_inl(bus->qts, 0xcfc);
+ }
+
+ static void qpci_pc_config_writeb(QPCIBus *bus, int devfn, uint8_t offset, uint8_t value)
+ {
+-    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
+-    outb(0xcfc, value);
++    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
++    qtest_outb(bus->qts, 0xcfc, value);
+ }
+
+ static void qpci_pc_config_writew(QPCIBus *bus, int devfn, uint8_t offset, uint16_t value)
+ {
+-    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
+-    outw(0xcfc, value);
++    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
++    qtest_outw(bus->qts, 0xcfc, value);
+ }
+
+ static void qpci_pc_config_writel(QPCIBus *bus, int devfn, uint8_t offset, uint32_t value)
+ {
+-    outl(0xcf8, (1U << 31) | (devfn << 8) | offset);
+-    outl(0xcfc, value);
++    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
++    qtest_outl(bus->qts, 0xcfc, value);
+ }
+
+ QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc)
+diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
+index cd9b8f52d2..d7b2aa75e6 100644
+--- a/tests/libqos/pci-spapr.c
++++ b/tests/libqos/pci-spapr.c
+@@ -45,63 +45,63 @@ typedef struct QPCIBusSPAPR {
+ static uint8_t qpci_spapr_pio_readb(QPCIBus *bus, uint32_t addr)
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+-    return readb(s->pio_cpu_base + addr);
++    return qtest_readb(bus->qts, s->pio_cpu_base + addr);
+ }
+
+ static void qpci_spapr_pio_writeb(QPCIBus *bus, uint32_t addr, uint8_t val)
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+-    writeb(s->pio_cpu_base + addr, val);
++    qtest_writeb(bus->qts, s->pio_cpu_base + addr, val);
+ }
+
+ static uint16_t qpci_spapr_pio_readw(QPCIBus *bus, uint32_t addr)
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+-    return bswap16(readw(s->pio_cpu_base + addr));
++    return bswap16(qtest_readw(bus->qts, s->pio_cpu_base + addr));
+ }
+
+ static void qpci_spapr_pio_writew(QPCIBus *bus, uint32_t addr, uint16_t val)
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+-    writew(s->pio_cpu_base + addr, bswap16(val));
++    qtest_writew(bus->qts, s->pio_cpu_base + addr, bswap16(val));
+ }
+
+ static uint32_t qpci_spapr_pio_readl(QPCIBus *bus, uint32_t addr)
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+-    return bswap32(readl(s->pio_cpu_base + addr));
++    return bswap32(qtest_readl(bus->qts, s->pio_cpu_base + addr));
+ }
+
+ static void qpci_spapr_pio_writel(QPCIBus *bus, uint32_t addr, uint32_t val)
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+-    writel(s->pio_cpu_base + addr, bswap32(val));
++    qtest_writel(bus->qts, s->pio_cpu_base + addr, bswap32(val));
+ }
+
+ static uint64_t qpci_spapr_pio_readq(QPCIBus *bus, uint32_t addr)
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+-    return bswap64(readq(s->pio_cpu_base + addr));
++    return bswap64(qtest_readq(bus->qts, s->pio_cpu_base + addr));
+ }
+
+ static void qpci_spapr_pio_writeq(QPCIBus *bus, uint32_t addr, uint64_t val)
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+-    writeq(s->pio_cpu_base + addr, bswap64(val));
++    qtest_writeq(bus->qts, s->pio_cpu_base + addr, bswap64(val));
+ }
+
+ static void qpci_spapr_memread(QPCIBus *bus, uint32_t addr,
+                                void *buf, size_t len)
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+-    memread(s->mmio32_cpu_base + addr, buf, len);
++    qtest_memread(bus->qts, s->mmio32_cpu_base + addr, buf, len);
+ }
+
+ static void qpci_spapr_memwrite(QPCIBus *bus, uint32_t addr,
+                                 const void *buf, size_t len)
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+-    memwrite(s->mmio32_cpu_base + addr, buf, len);
++    qtest_memwrite(bus->qts, s->mmio32_cpu_base + addr, buf, len);
+ }
+
+ static uint8_t qpci_spapr_config_readb(QPCIBus *bus, int devfn, uint8_t offset)
 -- 
 2.13.5
