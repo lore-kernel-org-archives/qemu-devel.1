@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dnuCE-0002v6-P4
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 18:13:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1dnuFt-0004lk-0k
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 18:17:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dnuCD-0007xi-7O
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 18:13:50 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:38154)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1dnuCC-0007wS-TO
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 18:13:49 -0400
-Received: by mail-wr0-x242.google.com with SMTP id j3so657263wrb.5
-	for <qemu-devel@nongnu.org>; Fri, 01 Sep 2017 15:13:48 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170901105023.11108-1-kraxel@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dnuFp-0002hQ-Sz
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 18:17:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35458)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnuFp-0002g8-JB
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 18:17:33 -0400
 References: <20170901105023.11108-1-kraxel@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 1 Sep 2017 15:13:17 -0700
-Message-ID: <CAKmqyKMUVEb13Ffv5YsovOTRAaQ8g=Q2C=U4FzWWZuygAdMwdA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	<CAKmqyKMUVEb13Ffv5YsovOTRAaQ8g=Q2C=U4FzWWZuygAdMwdA@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2c31126f-81fb-7cd2-9575-8071e3623ab9@redhat.com>
+Date: Fri, 1 Sep 2017 17:17:28 -0500
+MIME-Version: 1.0
+In-Reply-To: <CAKmqyKMUVEb13Ffv5YsovOTRAaQ8g=Q2C=U4FzWWZuygAdMwdA@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="u2eiopMmeq465rNV5DE1mhFMprfWv3v5S"
 Subject: Re: [Qemu-devel] [PATCH] pixman: drop submodule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,167 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
+To: Alistair Francis <alistair23@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
 Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-'On Fri, Sep 1, 2017 at 3:50 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> Drop pixman submodule and support for the "internal" pixman build.
-> pixman should be reasonable well established meanwhile that we don't
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--u2eiopMmeq465rNV5DE1mhFMprfWv3v5S
+From: Eric Blake <eblake@redhat.com>
+To: Alistair Francis <alistair23@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Message-ID: <2c31126f-81fb-7cd2-9575-8071e3623ab9@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] pixman: drop submodule
+References: <20170901105023.11108-1-kraxel@redhat.com>
+ <CAKmqyKMUVEb13Ffv5YsovOTRAaQ8g=Q2C=U4FzWWZuygAdMwdA@mail.gmail.com>
+In-Reply-To: <CAKmqyKMUVEb13Ffv5YsovOTRAaQ8g=Q2C=U4FzWWZuygAdMwdA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-s/reasonable/reasonably/g
-s/meanwhile/meaning/g
+On 09/01/2017 05:13 PM, Alistair Francis wrote:
+> 'On Fri, Sep 1, 2017 at 3:50 AM, Gerd Hoffmann <kraxel@redhat.com> wrot=
+e:
+>> Drop pixman submodule and support for the "internal" pixman build.
+>> pixman should be reasonable well established meanwhile that we don't
+>=20
+>=20
+> Is there any use case for '--with-system-pixman now?
+>=20
+> Overall I think this is fine, Pixman does seem to be pretty common. I
+> verified that RHEL7 has a new enough version, not sure about RHEL6
+> though.
 
-> need the fallback submodule any more.  While being at it also drop
+pixman-devel-0.32.8-1.el6.x86_64
 
-s/While being at/While at/g
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-> some #ifdefs for pixman versions olter than what we require in
-> configure anyway.
->
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  configure        | 20 ++------------------
->  Makefile         | 10 ----------
->  ui/qemu-pixman.c |  4 ----
->  .gitmodules      |  3 ---
->  pixman           |  1 -
->  5 files changed, 2 insertions(+), 36 deletions(-)
->  delete mode 160000 pixman
->
-> diff --git a/configure b/configure
-> index dd73cce62f..73760430b0 100755
-> --- a/configure
-> +++ b/configure
-> @@ -930,8 +930,6 @@ for opt do
->    ;;
->    --with-system-pixman) pixman="system"
 
-Is there any use case for '--with-system-pixman now?
+--u2eiopMmeq465rNV5DE1mhFMprfWv3v5S
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Overall I think this is fine, Pixman does seem to be pretty common. I
-verified that RHEL7 has a new enough version, not sure about RHEL6
-though.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Thanks,
-Alistair
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmp3HgACgkQp6FrSiUn
+Q2p2aAf/YZoUBcjBewbUIZqYDrWevGwv9hoo9IZA5dMsQLf3OtHG7qBK3paSTHrb
+22DLZni76shq8m+jrrSz8B1rqS9k9O0krMxaz+XZfDcRY5+peLLB5LA8lmZs6ESR
+AlGAiUN0lafp8KWAa9Yvsr5gtk7mNbwVERCw/XaOAWYFYWDpDtqb4MO7Y9tBmDqS
+OcyTY8AbgrDJGoD1gqetEYUDO61ZW6OStRHGEavobpD5AEJ8SY3pbBW3jBvrkMlL
++6Zlfpb5eQNx+jKyyKUmmgVkD6eABIillDtGcul/vZME88DBKN1VK3izxShZ4rXo
+/g0ij9kf6+iZ60obME7fhU+Xk0VZMQ==
+=u5cy
+-----END PGP SIGNATURE-----
 
->    ;;
-> -  --without-system-pixman) pixman="internal"
-> -  ;;
->    --without-pixman) pixman="none"
->    ;;
->    --disable-sdl) sdl="no"
-> @@ -3305,8 +3303,6 @@ if test "$pixman" = ""; then
->      pixman="none"
->    elif $pkg_config --atleast-version=0.21.8 pixman-1 > /dev/null 2>&1; then
->      pixman="system"
-> -  else
-> -    pixman="internal"
->    fi
->  fi
->  if test "$pixman" = "none"; then
-> @@ -3323,16 +3319,8 @@ elif test "$pixman" = "system"; then
->    pixman_cflags=$($pkg_config --cflags pixman-1)
->    pixman_libs=$($pkg_config --libs pixman-1)
->  else
-> -  if test ! -d ${source_path}/pixman/pixman; then
-> -    error_exit "pixman >= 0.21.8 not present. Your options:" \
-> -        "  (1) Preferred: Install the pixman devel package (any recent" \
-> -        "      distro should have packages as Xorg needs pixman too)." \
-> -        "  (2) Fetch the pixman submodule, using:" \
-> -        "      git submodule update --init pixman"
-> -  fi
-> -  mkdir -p pixman/pixman
-> -  pixman_cflags="-I\$(SRC_PATH)/pixman/pixman -I\$(BUILD_DIR)/pixman/pixman"
-> -  pixman_libs="-L\$(BUILD_DIR)/pixman/pixman/.libs -lpixman-1"
-> +  error_exit "pixman >= 0.21.8 not present." \
-> +      "Please install the pixman devel package."
->  fi
->
->  ##########################################
-> @@ -6527,10 +6515,6 @@ echo "QEMU_CFLAGS+=$cflags" >> $config_target_mak
->
->  done # for target in $targets
->
-> -if [ "$pixman" = "internal" ]; then
-> -  echo "config-host.h: subdir-pixman" >> $config_host_mak
-> -fi
-> -
->  if [ "$dtc_internal" = "yes" ]; then
->    echo "config-host.h: subdir-dtc" >> $config_host_mak
->  fi
-> diff --git a/Makefile b/Makefile
-> index 81447b1f08..280af66628 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -325,15 +325,6 @@ $(SOFTMMU_SUBDIR_RULES): config-all-devices.mak
->  subdir-%:
->         $(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" all,)
->
-> -subdir-pixman: pixman/Makefile
-> -       $(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C pixman V="$(V)" all,)
-> -
-> -pixman/Makefile: $(SRC_PATH)/pixman/configure
-> -       (cd pixman; CFLAGS="$(CFLAGS) -fPIC $(extra_cflags) $(extra_ldflags)" $(SRC_PATH)/pixman/configure $(AUTOCONF_HOST) --disable-gtk --disable-shared --enable-static)
-> -
-> -$(SRC_PATH)/pixman/configure:
-> -       (cd $(SRC_PATH)/pixman; autoreconf -v --install)
-> -
->  DTC_MAKE_ARGS=-I$(SRC_PATH)/dtc VPATH=$(SRC_PATH)/dtc -C dtc V="$(V)" LIBFDT_srcdir=$(SRC_PATH)/dtc/libfdt
->  DTC_CFLAGS=$(CFLAGS) $(QEMU_CFLAGS)
->  DTC_CPPFLAGS=-I$(BUILD_DIR)/dtc -I$(SRC_PATH)/dtc -I$(SRC_PATH)/dtc/libfdt
-> @@ -532,7 +523,6 @@ distclean: clean
->         rm -rf $$d || exit 1 ; \
->          done
->         rm -Rf .sdk
-> -       if test -f pixman/config.log; then $(MAKE) -C pixman distclean; fi
->         if test -f dtc/version_gen.h; then $(MAKE) $(DTC_MAKE_ARGS) clean; fi
->
->  KEYMAPS=da     en-gb  et  fr     fr-ch  is  lt  modifiers  no  pt-br  sv \
-> diff --git a/ui/qemu-pixman.c b/ui/qemu-pixman.c
-> index 6e8b83add6..6e591ab821 100644
-> --- a/ui/qemu-pixman.c
-> +++ b/ui/qemu-pixman.c
-> @@ -96,17 +96,13 @@ int qemu_pixman_get_type(int rshift, int gshift, int bshift)
->          if (bshift == 0) {
->              type = PIXMAN_TYPE_ARGB;
->          } else {
-> -#if PIXMAN_VERSION >= PIXMAN_VERSION_ENCODE(0, 21, 8)
->              type = PIXMAN_TYPE_RGBA;
-> -#endif
->          }
->      } else if (rshift < gshift && gshift < bshift) {
->          if (rshift == 0) {
->              type = PIXMAN_TYPE_ABGR;
->          } else {
-> -#if PIXMAN_VERSION >= PIXMAN_VERSION_ENCODE(0, 16, 0)
->              type = PIXMAN_TYPE_BGRA;
-> -#endif
->          }
->      }
->      return type;
-> diff --git a/.gitmodules b/.gitmodules
-> index 5b0c212622..84c54cdc49 100644
-> --- a/.gitmodules
-> +++ b/.gitmodules
-> @@ -22,9 +22,6 @@
->  [submodule "roms/sgabios"]
->         path = roms/sgabios
->         url = git://git.qemu-project.org/sgabios.git
-> -[submodule "pixman"]
-> -       path = pixman
-> -       url = git://anongit.freedesktop.org/pixman
->  [submodule "dtc"]
->         path = dtc
->         url = git://git.qemu-project.org/dtc.git
-> diff --git a/pixman b/pixman
-> deleted file mode 160000
-> index 87eea99e44..0000000000
-> --- a/pixman
-> +++ /dev/null
-> @@ -1 +0,0 @@
-> -Subproject commit 87eea99e443b389c978cf37efc52788bf03a0ee0
-> --
-> 2.9.3
->
->
+--u2eiopMmeq465rNV5DE1mhFMprfWv3v5S--
