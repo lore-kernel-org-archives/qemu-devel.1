@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dnpDi-0005pP-Gu
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:55:08 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dnpDt-00061k-OF
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:55:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dnpDf-00065T-Az
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:55:02 -0400
-Received: from mail-sn1nam01on0050.outbound.protection.outlook.com
-	([104.47.32.50]:9768
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	(envelope-from <alistai@xilinx.com>) id 1dnpDo-00069v-HB
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:55:13 -0400
+Received: from mail-co1nam03on0066.outbound.protection.outlook.com
+	([104.47.40.66]:35376
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dnpDf-00065C-26
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:54:59 -0400
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dnpDo-00067g-4g
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 12:55:08 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Fri, 1 Sep 2017 09:51:15 -0700
-Message-ID: <d64777dcf9079a8f997416b148b9cffbc14e0c49.1504228916.git.alistair.francis@xilinx.com>
+Date: Fri, 1 Sep 2017 09:51:21 -0700
+Message-ID: <cbc16f480d26b40e12cd03a992d89830f271182a.1504228916.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1504228916.git.alistair.francis@xilinx.com>
 References: <cover.1504228916.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 3/7] Convert single line fprintf(.../n) to
- warn_report()
+Subject: [Qemu-devel] [PATCH v3 5/7] General warn report fixups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,291 +28,197 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, pbonzini@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Jason Wang <jasowang@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, James Hogan <james.hogan@imgtec.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, pbonzini@redhat.com
 
-Convert all the single line uses of fprintf(stderr, "warning:"..."\n"...
-to use warn_report() instead. This helps standardise on a single
-method of printing warnings to the user.
-
-All of the warnings were changed using this command:
-  find ./* -type f -exec sed -i \
-    's|fprintf(.*".*warning[,:] \(.*\)\\n"\(.*\));|warn_report("\1"\2);|Ig' \
-    {} +
-
-Some of the lines were manually edited to reduce the line length to below
-80 charecters.
-
-The #include lines were manually updated to allow the code to compile.
+Tidy up some of the warn_report() messages after having converted them
+to use warn_report().
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: James Hogan <james.hogan@imgtec.com>
-Cc: Aurelien Jarno <aurelien@aurel32.net>
-Cc: Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
 
- block/vvfat.c              | 4 +++-
- hw/acpi/core.c             | 3 ++-
- hw/i386/pc.c               | 2 +-
- hw/misc/applesmc.c         | 2 +-
- hw/usb/hcd-ehci.c          | 5 +++--
- hw/virtio/virtio-balloon.c | 3 ++-
- net/hub.c                  | 3 ++-
- net/socket.c               | 7 +++++--
- qga/vss-win32.c            | 2 +-
- target/mips/kvm.c          | 4 ++--
- trace/simple.c             | 3 ++-
- ui/keymaps.c               | 2 +-
- ui/spice-display.c         | 2 +-
- 13 files changed, 26 insertions(+), 16 deletions(-)
+ block/vvfat.c               | 3 +--
+ hw/arm/vexpress.c           | 2 +-
+ hw/i386/xen/xen-mapcache.c  | 2 +-
+ hw/mips/mips_malta.c        | 4 ++--
+ hw/mips/mips_r4k.c          | 3 +--
+ hw/s390x/s390-virtio.c      | 7 ++++---
+ net/hub.c                   | 6 ++----
+ net/net.c                   | 5 +++--
+ target/i386/hax-mem.c       | 5 ++---
+ target/ppc/translate_init.c | 3 +--
+ ui/keymaps.c                | 3 +--
+ 11 files changed, 19 insertions(+), 24 deletions(-)
 
 diff --git a/block/vvfat.c b/block/vvfat.c
-index a9e207f7f0..d682f0a9dc 100644
+index 04801f3136..55f416868a 100644
 --- a/block/vvfat.c
 +++ b/block/vvfat.c
-@@ -32,6 +32,7 @@
- #include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qstring.h"
- #include "qemu/cutils.h"
-+#include "qemu/error-report.h"
+@@ -1227,8 +1227,7 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
  
- #ifndef S_IWGRP
- #define S_IWGRP 0
-@@ -3028,7 +3029,8 @@ DLOG(checkpoint());
-                         if (memcmp(direntries + k,
-                                     array_get(&(s->directory), dir_index + k),
-                                     sizeof(direntry_t))) {
--                            fprintf(stderr, "Warning: tried to write to write-protected file\n");
-+                            warn_report("tried to write to write-protected "
-+                                        "file");
-                             return -1;
-                         }
-                     }
-diff --git a/hw/acpi/core.c b/hw/acpi/core.c
-index 95fcac95a2..2a1b79c838 100644
---- a/hw/acpi/core.c
-+++ b/hw/acpi/core.c
-@@ -28,6 +28,7 @@
- #include "qapi/opts-visitor.h"
- #include "qapi-visit.h"
- #include "qapi-event.h"
-+#include "qemu/error-report.h"
- 
- struct acpi_table_header {
-     uint16_t _length;         /* our length, not actual part of the hdr */
-@@ -221,7 +222,7 @@ static void acpi_table_install(const char unsigned *blob, size_t bloblen,
-     }
- 
-     if (!has_header && changed_fields == 0) {
--        fprintf(stderr, "warning: ACPI table: no headers are specified\n");
-+        warn_report("ACPI table: no headers are specified");
-     }
- 
-     /* recalculate checksum */
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index c882f8c2ea..ef5f30e644 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1310,7 +1310,7 @@ void pc_acpi_init(const char *default_dsdt)
- 
-     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, default_dsdt);
-     if (filename == NULL) {
--        fprintf(stderr, "WARNING: failed to find %s\n", default_dsdt);
-+        warn_report("failed to find %s", default_dsdt);
+     switch (s->fat_type) {
+     case 32:
+-        warn_report("FAT32 has not been tested. "
+-                    "You are welcome to do so!");
++        warn_report("FAT32 has not been tested. You are welcome to do so!");
+         break;
+     case 16:
+     case 12:
+diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+index 2445eb4408..fa53cf96b4 100644
+--- a/hw/arm/vexpress.c
++++ b/hw/arm/vexpress.c
+@@ -492,7 +492,7 @@ static void vexpress_modify_dtb(const struct arm_boot_info *info, void *fdt)
+          * happen with older device tree blobs.
+          */
+         warn_report("couldn't find interrupt controller in "
+-                    "dtb; will not include virtio-mmio devices in the dtb.");
++                    "dtb; will not include virtio-mmio devices in the dtb");
      } else {
-         QemuOpts *opts = qemu_opts_create(qemu_find_opts("acpi"), NULL, 0,
-                                           &error_abort);
-diff --git a/hw/misc/applesmc.c b/hw/misc/applesmc.c
-index 7896812304..7be8b5f13c 100644
---- a/hw/misc/applesmc.c
-+++ b/hw/misc/applesmc.c
-@@ -331,7 +331,7 @@ static void applesmc_isa_realize(DeviceState *dev, Error **errp)
-                         s->iobase + APPLESMC_ERR_PORT);
+         int i;
+         const hwaddr *map = daughterboard->motherboard_map;
+diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
+index 91a4fd6984..baab93b614 100644
+--- a/hw/i386/xen/xen-mapcache.c
++++ b/hw/i386/xen/xen-mapcache.c
+@@ -127,7 +127,7 @@ void xen_map_cache_init(phys_offset_to_gaddr_t f, void *opaque)
  
-     if (!s->osk || (strlen(s->osk) != 64)) {
--        fprintf(stderr, "WARNING: Using AppleSMC with invalid key\n");
-+        warn_report("Using AppleSMC with invalid key");
-         s->osk = default_osk;
+         if (rlimit_as.rlim_max != RLIM_INFINITY) {
+             warn_report("QEMU's maximum size of virtual"
+-                        " memory is not infinity.");
++                        " memory is not infinity");
+         }
+         if (rlimit_as.rlim_max < MCACHE_MAX_SIZE + NON_MCACHE_MEMORY_SIZE) {
+             mapcache->max_mcache_size = rlimit_as.rlim_max -
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 233e2ee802..b8ba684c93 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -216,8 +216,8 @@ static void generate_eeprom_spd(uint8_t *eeprom, ram_addr_t ram_size)
      }
  
-diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
-index 604912cb3e..46fd30b075 100644
---- a/hw/usb/hcd-ehci.c
-+++ b/hw/usb/hcd-ehci.c
-@@ -32,6 +32,7 @@
- #include "hw/usb/ehci-regs.h"
- #include "hw/usb/hcd-ehci.h"
- #include "trace.h"
-+#include "qemu/error-report.h"
- 
- #define FRAME_TIMER_FREQ 1000
- #define FRAME_TIMER_NS   (NANOSECONDS_PER_SECOND / FRAME_TIMER_FREQ)
-@@ -348,7 +349,7 @@ static void ehci_trace_sitd(EHCIState *s, hwaddr addr,
- static void ehci_trace_guest_bug(EHCIState *s, const char *message)
- {
-     trace_usb_ehci_guest_bug(message);
--    fprintf(stderr, "ehci warning: %s\n", message);
-+    warn_report("%s", message);
- }
- 
- static inline bool ehci_enabled(EHCIState *s)
-@@ -1728,7 +1729,7 @@ static int ehci_state_fetchsitd(EHCIState *ehci, int async)
-         /* siTD is not active, nothing to do */;
-     } else {
-         /* TODO: split transfers are not implemented */
--        fprintf(stderr, "WARNING: Skipping active siTD\n");
-+        warn_report("Skipping active siTD");
+     if (ram_size) {
+-        warn_report("SPD cannot represent final %dMB"
+-                    " of SDRAM", (int)ram_size);
++        warn_report("SPD cannot represent final "RAM_ADDR_FMT"MB"
++                    " of SDRAM", ram_size);
      }
  
-     ehci_set_fetch_addr(ehci, async, sitd.next);
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index a705e0ec55..37cde38982 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -26,6 +26,7 @@
- #include "qapi/visitor.h"
- #include "qapi-event.h"
- #include "trace.h"
-+#include "qemu/error-report.h"
- 
- #include "hw/virtio/virtio-bus.h"
- #include "hw/virtio/virtio-access.h"
-@@ -292,7 +293,7 @@ static void virtio_balloon_receive_stats(VirtIODevice *vdev, VirtQueue *vq)
-     s->stats_vq_offset = offset;
- 
-     if (qemu_gettimeofday(&tv) < 0) {
--        fprintf(stderr, "warning: %s: failed to get time of day\n", __func__);
-+        warn_report("%s: failed to get time of day", __func__);
-         goto out;
+     /* fill in SPD memory information */
+diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+index 6ffb88fd70..b48a4d72ac 100644
+--- a/hw/mips/mips_r4k.c
++++ b/hw/mips/mips_r4k.c
+@@ -254,8 +254,7 @@ void mips_r4k_init(MachineState *machine)
+ 	}
+     } else if (!qtest_enabled()) {
+         /* not fatal */
+-        warn_report("could not load MIPS bios '%s'",
+-                    bios_name);
++        warn_report("could not load MIPS bios '%s'", bios_name);
      }
+     g_free(filename);
  
+diff --git a/hw/s390x/s390-virtio.c b/hw/s390x/s390-virtio.c
+index 964df517b4..946f23fc23 100644
+--- a/hw/s390x/s390-virtio.c
++++ b/hw/s390x/s390-virtio.c
+@@ -146,9 +146,10 @@ void gtod_save(QEMUFile *f, void *opaque)
+ 
+     r = s390_get_clock(&tod_high, &tod_low);
+     if (r) {
+-        warn_report("Unable to get guest clock for migration. "
+-                    "Error code %d. Guest clock will not be migrated "
+-                    "which could cause the guest to hang.", r);
++        warn_report("Unable to get guest clock for migration: %s",
++                    strerror(-r));
++        error_printf("Guest clock will not be migrated "
++                     "which could cause the guest to hang.");
+         qemu_put_byte(f, S390_TOD_CLOCK_VALUE_MISSING);
+         return;
+     }
 diff --git a/net/hub.c b/net/hub.c
-index 32d8cf5cd4..afe941ae7a 100644
+index 745a2168a1..14b4eec68f 100644
 --- a/net/hub.c
 +++ b/net/hub.c
-@@ -18,6 +18,7 @@
- #include "clients.h"
- #include "hub.h"
- #include "qemu/iov.h"
-+#include "qemu/error-report.h"
- 
- /*
-  * A hub broadcasts incoming packets to all its ports except the source port.
-@@ -330,7 +331,7 @@ void net_hub_check_clients(void)
+@@ -310,8 +310,7 @@ void net_hub_check_clients(void)
+         QLIST_FOREACH(port, &hub->ports, next) {
+             peer = port->nc.peer;
+             if (!peer) {
+-                warn_report("hub port %s has no peer",
+-                            port->nc.name);
++                warn_report("hub port %s has no peer", port->nc.name);
+                 continue;
              }
-         }
-         if (has_host_dev && !has_nic) {
--            fprintf(stderr, "Warning: vlan %d with no nics\n", hub->id);
-+            warn_report("vlan %d with no nics", hub->id);
+ 
+@@ -334,8 +333,7 @@ void net_hub_check_clients(void)
+             warn_report("vlan %d with no nics", hub->id);
          }
          if (has_nic && !has_host_dev) {
-             fprintf(stderr,
-diff --git a/net/socket.c b/net/socket.c
-index 18af2ab5f3..daea750644 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -448,8 +448,11 @@ static NetSocketState *net_socket_fd_init(NetClientState *peer,
-     case SOCK_STREAM:
-         return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
-     default:
--        /* who knows ... this could be a eg. a pty, do warn and continue as stream */
--        fprintf(stderr, "qemu: warning: socket type=%d for fd=%d is not SOCK_DGRAM or SOCK_STREAM\n", so_type, fd);
-+        /* who knows ... this could be a eg. a pty, do warn and continue as
-+         * stream
-+         */
-+        warn_report("socket type=%d for fd=%d is not SOCK_DGRAM or "
-+                    "SOCK_STREAM", so_type, fd);
-         return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+-            warn_report("vlan %d is not connected to host network",
+-                        hub->id);
++            warn_report("vlan %d is not connected to host network", hub->id);
+         }
      }
-     return NULL;
-diff --git a/qga/vss-win32.c b/qga/vss-win32.c
-index a80933c98b..b748b9ff57 100644
---- a/qga/vss-win32.c
-+++ b/qga/vss-win32.c
-@@ -61,7 +61,7 @@ static bool vss_check_os_version(void)
-             return false;
+ }
+diff --git a/net/net.c b/net/net.c
+index 45ab2a1a02..5e5e27f7e0 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1482,8 +1482,9 @@ void net_check_clients(void)
+     QTAILQ_FOREACH(nc, &net_clients, next) {
+         if (!nc->peer) {
+             warn_report("%s %s has no peer",
+-                        nc->info->type == NET_CLIENT_DRIVER_NIC ?
+-                        "nic" : "netdev", nc->name);
++                        nc->info->type == NET_CLIENT_DRIVER_NIC
++                        ? "nic" : "netdev",
++                        nc->name);
          }
-         if (wow64) {
--            fprintf(stderr, "Warning: Running under WOW64\n");
-+            warn_report("Running under WOW64");
+     }
+ 
+diff --git a/target/i386/hax-mem.c b/target/i386/hax-mem.c
+index 756f2dd268..ad1248fece 100644
+--- a/target/i386/hax-mem.c
++++ b/target/i386/hax-mem.c
+@@ -178,9 +178,8 @@ static void hax_process_section(MemoryRegionSection *section, uint8_t flags)
+     if (!memory_region_is_ram(mr)) {
+         if (memory_region_is_romd(mr)) {
+             /* HAXM kernel module does not support ROMD yet  */
+-            warn_report("Ignoring ROMD region 0x%016" PRIx64
+-                        "->0x%016" PRIx64 "", __func__, start_pa,
+-                        start_pa + size);
++            warn_report("Ignoring ROMD region 0x%016"PRIx64"->0x%016"PRIx64"",
++                        start_pa, start_pa + size);
          }
+         return;
+     }
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 989c104b76..be09aadfd9 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -9230,8 +9230,7 @@ static void init_ppc_proc(PowerPCCPU *cpu)
+     }
  #endif
-         return !wow64;
-diff --git a/target/mips/kvm.c b/target/mips/kvm.c
-index 3317905e71..a23aa438d2 100644
---- a/target/mips/kvm.c
-+++ b/target/mips/kvm.c
-@@ -95,11 +95,11 @@ void kvm_mips_reset_vcpu(MIPSCPU *cpu)
-     CPUMIPSState *env = &cpu->env;
- 
-     if (!kvm_mips_fpu_cap && env->CP0_Config1 & (1 << CP0C1_FP)) {
--        fprintf(stderr, "Warning: KVM does not support FPU, disabling\n");
-+        warn_report("KVM does not support FPU, disabling");
-         env->CP0_Config1 &= ~(1 << CP0C1_FP);
+     if (env->check_pow == NULL) {
+-        warn_report("no power management check handler "
+-                    "registered."
++        warn_report("no power management check handler registered."
+                     " Attempt QEMU to crash very soon !");
      }
-     if (!kvm_mips_msa_cap && env->CP0_Config3 & (1 << CP0C3_MSAP)) {
--        fprintf(stderr, "Warning: KVM does not support MSA, disabling\n");
-+        warn_report("KVM does not support MSA, disabling");
-         env->CP0_Config3 &= ~(1 << CP0C3_MSAP);
-     }
- 
-diff --git a/trace/simple.c b/trace/simple.c
-index a221a3f703..e82018d923 100644
---- a/trace/simple.c
-+++ b/trace/simple.c
-@@ -15,6 +15,7 @@
- #include "qemu/timer.h"
- #include "trace/control.h"
- #include "trace/simple.h"
-+#include "qemu/error-report.h"
- 
- /** Trace file header event ID, picked to avoid conflict with real event IDs */
- #define HEADER_EVENT_ID (~(uint64_t)0)
-@@ -405,7 +406,7 @@ bool st_init(void)
- 
-     thread = trace_thread_create(writeout_thread);
-     if (!thread) {
--        fprintf(stderr, "warning: unable to initialize simple trace backend\n");
-+        warn_report("unable to initialize simple trace backend");
-         return false;
-     }
- 
+ }
 diff --git a/ui/keymaps.c b/ui/keymaps.c
-index fa00b82027..7fa21f81b2 100644
+index a6cefdaff9..f9762d1497 100644
 --- a/ui/keymaps.c
 +++ b/ui/keymaps.c
-@@ -141,7 +141,7 @@ static kbd_layout_t *parse_keyboard_layout(const name2keysym_t *table,
-                 int keysym;
-                 keysym = get_keysym(table, keyname);
-                 if (keysym == 0) {
--                    /* fprintf(stderr, "Warning: unknown keysym %s\n", line);*/
-+                    /* warn_report("unknown keysym %s", line);*/
-                 } else {
-                     const char *rest = line + offset + 1;
-                     int keycode = strtol(rest, NULL, 0);
-diff --git a/ui/spice-display.c b/ui/spice-display.c
-index 042292cc90..0963c7825f 100644
---- a/ui/spice-display.c
-+++ b/ui/spice-display.c
-@@ -850,7 +850,7 @@ static void qemu_spice_gl_unblock_bh(void *opaque)
- 
- static void qemu_spice_gl_block_timer(void *opaque)
- {
--    fprintf(stderr, "WARNING: spice: no gl-draw-done within one second\n");
-+    warn_report("spice: no gl-draw-done within one second");
- }
- 
- static void spice_gl_refresh(DisplayChangeListener *dcl)
+@@ -198,8 +198,7 @@ int keysym2scancode(void *kbd_layout, int keysym)
+     if (keysym < MAX_NORMAL_KEYCODE) {
+         if (k->keysym2keycode[keysym] == 0) {
+             trace_keymap_unmapped(keysym);
+-            warn_report("no scancode found for keysym %d",
+-                        keysym);
++            warn_report("no scancode found for keysym %d", keysym);
+         }
+         return k->keysym2keycode[keysym];
+     } else {
 -- 
 2.11.0
