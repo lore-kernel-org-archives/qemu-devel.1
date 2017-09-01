@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dnjex-00006q-20
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:58:52 -0400
+	(envelope-from <otubo@redhat.com>) id 1dnjey-000089-MJ
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:58:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dnjer-0001CM-3A
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:58:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45752)
+	(envelope-from <otubo@redhat.com>) id 1dnjex-0001Gh-DL
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:58:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53852)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1dnjeq-0001Bz-RI
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:58:41 -0400
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1dnjex-0001E4-4Y
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:58:47 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C17747EA87
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 10:58:39 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 29F52356F4
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 10:58:46 +0000 (UTC)
 From: Eduardo Otubo <otubo@redhat.com>
-Date: Fri,  1 Sep 2017 12:58:13 +0200
-Message-Id: <20170901105818.31956-2-otubo@redhat.com>
+Date: Fri,  1 Sep 2017 12:58:15 +0200
+Message-Id: <20170901105818.31956-4-otubo@redhat.com>
 In-Reply-To: <20170901105818.31956-1-otubo@redhat.com>
 References: <20170901105818.31956-1-otubo@redhat.com>
-Subject: [Qemu-devel] [PATCHv4 1/6] seccomp: changing from whitelist to
- blacklist
+Subject: [Qemu-devel] [PATCHv4 3/6] seccomp: add elevateprivileges argument
+ to command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,331 +33,164 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, thuth@redhat.com
 
-This patch changes the default behavior of the seccomp filter from
-whitelist to blacklist. By default now all system calls are allowed and
-a small black list of definitely forbidden ones was created.
+This patch introduces the new argument
+[,elevateprivileges=allow|deny|children] to the `-sandbox on'. It allows
+or denies Qemu process to elevate its privileges by blacklisting all
+set*uid|gid system calls. The 'children' option will let forks and
+execves run unprivileged.
 
 Signed-off-by: Eduardo Otubo <otubo@redhat.com>
 ---
- include/sysemu/seccomp.h |   2 +
- qemu-seccomp.c           | 264 ++++++-----------------------------------------
- vl.c                     |   1 -
- 3 files changed, 35 insertions(+), 232 deletions(-)
+ include/sysemu/seccomp.h |  1 +
+ qemu-options.hx          | 12 +++++++++---
+ qemu-seccomp.c           | 29 ++++++++++++++++++-----------
+ vl.c                     | 27 +++++++++++++++++++++++++++
+ 4 files changed, 55 insertions(+), 14 deletions(-)
 
 diff --git a/include/sysemu/seccomp.h b/include/sysemu/seccomp.h
-index cfc06008cb..23b9c3c789 100644
+index 215138a372..4a9e63c7cd 100644
 --- a/include/sysemu/seccomp.h
 +++ b/include/sysemu/seccomp.h
-@@ -15,6 +15,8 @@
- #ifndef QEMU_SECCOMP_H
- #define QEMU_SECCOMP_H
+@@ -17,6 +17,7 @@
  
-+#define QEMU_SECCOMP_SET_DEFAULT     (1 << 0)
-+
+ #define QEMU_SECCOMP_SET_DEFAULT     (1 << 0)
+ #define QEMU_SECCOMP_SET_OBSOLETE    (1 << 1)
++#define QEMU_SECCOMP_SET_PRIVILEGED  (1 << 2)
+ 
  #include <seccomp.h>
  
- int seccomp_start(void);
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 72150c6b84..5c1b163fb5 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4017,20 +4017,26 @@ Old param mode (ARM only).
+ ETEXI
+ 
+ DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
+-    "-sandbox on[,obsolete=allow|deny]\n" \
++    "-sandbox on[,obsolete=allow|deny][,elevateprivileges=allow|deny|children]\n" \
+     "                Enable seccomp mode 2 system call filter (default 'off').\n" \
+     "                use 'obsolete' to allow obsolete system calls that are provided\n" \
+     "                    by the kernel, but typically no longer used by modern\n" \
+-    "                    C library implementations.\n",
++    "                    C library implementations.\n" \
++    "                use 'elevateprivileges' to allow or deny QEMU process to elevate\n" \
++    "                    its privileges by blacklisting all set*uid|gid system calls.\n" \
++    "                    The value 'children' will deny set*uid|gid system calls for\n" \
++    "                    main QEMU process but will allow forks and execves to run unprivileged\n",
+     QEMU_ARCH_ALL)
+ STEXI
+-@item -sandbox @var{arg}[,obsolete=@var{string}]
++@item -sandbox @var{arg}[,obsolete=@var{string}][,elevateprivileges=@var{string}]
+ @findex -sandbox
+ Enable Seccomp mode 2 system call filter. 'on' will enable syscall filtering and 'off' will
+ disable it.  The default is 'off'.
+ @table @option
+ @item obsolete=@var{string}
+ Enable Obsolete system calls
++@item elevateprivileges=@var{string}
++Disable set*uid|gid system calls
+ @end table
+ ETEXI
+ 
 diff --git a/qemu-seccomp.c b/qemu-seccomp.c
-index df75d9c471..585de42a97 100644
+index 3e3f15cc08..16c8c20132 100644
 --- a/qemu-seccomp.c
 +++ b/qemu-seccomp.c
-@@ -28,232 +28,34 @@
- 
- struct QemuSeccompSyscall {
-     int32_t num;
--    uint8_t priority;
-+    int type;
-+    uint8_t set;
+@@ -57,17 +57,16 @@ static const struct QemuSeccompSyscall blacklist[] = {
+     { SCMP_SYS(ulimit),                1, QEMU_SECCOMP_SET_DEFAULT },
+     { SCMP_SYS(vserver),               1, QEMU_SECCOMP_SET_DEFAULT },
+     /* obsolete */
+-    { SCMP_SYS(readdir),               2, QEMU_SECCOMP_SET_OBSOLETE },
+-    { SCMP_SYS(_sysctl),               2, QEMU_SECCOMP_SET_OBSOLETE },
+-    { SCMP_SYS(bdflush),               2, QEMU_SECCOMP_SET_OBSOLETE },
+-    { SCMP_SYS(create_module),         2, QEMU_SECCOMP_SET_OBSOLETE },
+-    { SCMP_SYS(get_kernel_syms),       2, QEMU_SECCOMP_SET_OBSOLETE },
+-    { SCMP_SYS(query_module),          2, QEMU_SECCOMP_SET_OBSOLETE },
+-    { SCMP_SYS(sgetmask),              2, QEMU_SECCOMP_SET_OBSOLETE },
+-    { SCMP_SYS(ssetmask),              2, QEMU_SECCOMP_SET_OBSOLETE },
+-    { SCMP_SYS(sysfs),                 2, QEMU_SECCOMP_SET_OBSOLETE },
+-    { SCMP_SYS(uselib),                2, QEMU_SECCOMP_SET_OBSOLETE },
+-    { SCMP_SYS(ustat),                 2, QEMU_SECCOMP_SET_OBSOLETE },
++    { SCMP_SYS(setuid),                4, QEMU_SECCOMP_SET_PRIVILEGED },
++    { SCMP_SYS(setgid),                4, QEMU_SECCOMP_SET_PRIVILEGED },
++    { SCMP_SYS(setpgid),               4, QEMU_SECCOMP_SET_PRIVILEGED },
++    { SCMP_SYS(setsid),                4, QEMU_SECCOMP_SET_PRIVILEGED },
++    { SCMP_SYS(setreuid),              4, QEMU_SECCOMP_SET_PRIVILEGED },
++    { SCMP_SYS(setregid),              4, QEMU_SECCOMP_SET_PRIVILEGED },
++    { SCMP_SYS(setresuid),             4, QEMU_SECCOMP_SET_PRIVILEGED },
++    { SCMP_SYS(setresgid),             4, QEMU_SECCOMP_SET_PRIVILEGED },
++    { SCMP_SYS(setfsuid),              4, QEMU_SECCOMP_SET_PRIVILEGED },
++    { SCMP_SYS(setfsgid),              4, QEMU_SECCOMP_SET_PRIVILEGED },
  };
  
--static const struct QemuSeccompSyscall seccomp_whitelist[] = {
--    { SCMP_SYS(timer_settime), 255 },
--    { SCMP_SYS(timer_gettime), 254 },
--    { SCMP_SYS(futex), 253 },
--    { SCMP_SYS(select), 252 },
--    { SCMP_SYS(recvfrom), 251 },
--    { SCMP_SYS(sendto), 250 },
--    { SCMP_SYS(socketcall), 250 },
--    { SCMP_SYS(read), 249 },
--    { SCMP_SYS(io_submit), 249 },
--    { SCMP_SYS(brk), 248 },
--    { SCMP_SYS(clone), 247 },
--    { SCMP_SYS(mmap), 247 },
--    { SCMP_SYS(mprotect), 246 },
--    { SCMP_SYS(execve), 245 },
--    { SCMP_SYS(open), 245 },
--    { SCMP_SYS(ioctl), 245 },
--    { SCMP_SYS(socket), 245 },
--    { SCMP_SYS(setsockopt), 245 },
--    { SCMP_SYS(recvmsg), 245 },
--    { SCMP_SYS(sendmsg), 245 },
--    { SCMP_SYS(accept), 245 },
--    { SCMP_SYS(connect), 245 },
--    { SCMP_SYS(socketpair), 245 },
--    { SCMP_SYS(bind), 245 },
--    { SCMP_SYS(listen), 245 },
--    { SCMP_SYS(semget), 245 },
--    { SCMP_SYS(ipc), 245 },
--    { SCMP_SYS(gettimeofday), 245 },
--    { SCMP_SYS(readlink), 245 },
--    { SCMP_SYS(access), 245 },
--    { SCMP_SYS(prctl), 245 },
--    { SCMP_SYS(signalfd), 245 },
--    { SCMP_SYS(getrlimit), 245 },
--    { SCMP_SYS(getrusage), 245 },
--    { SCMP_SYS(set_tid_address), 245 },
--    { SCMP_SYS(statfs), 245 },
--    { SCMP_SYS(unlink), 245 },
--    { SCMP_SYS(wait4), 245 },
--    { SCMP_SYS(fcntl64), 245 },
--    { SCMP_SYS(fstat64), 245 },
--    { SCMP_SYS(stat64), 245 },
--    { SCMP_SYS(getgid32), 245 },
--    { SCMP_SYS(getegid32), 245 },
--    { SCMP_SYS(getuid32), 245 },
--    { SCMP_SYS(geteuid32), 245 },
--    { SCMP_SYS(sigreturn), 245 },
--    { SCMP_SYS(_newselect), 245 },
--    { SCMP_SYS(_llseek), 245 },
--    { SCMP_SYS(mmap2), 245 },
--    { SCMP_SYS(sigprocmask), 245 },
--    { SCMP_SYS(sched_getparam), 245 },
--    { SCMP_SYS(sched_getscheduler), 245 },
--    { SCMP_SYS(fstat), 245 },
--    { SCMP_SYS(clock_getres), 245 },
--    { SCMP_SYS(sched_get_priority_min), 245 },
--    { SCMP_SYS(sched_get_priority_max), 245 },
--    { SCMP_SYS(stat), 245 },
--    { SCMP_SYS(uname), 245 },
--    { SCMP_SYS(eventfd2), 245 },
--    { SCMP_SYS(io_getevents), 245 },
--    { SCMP_SYS(dup), 245 },
--    { SCMP_SYS(dup2), 245 },
--    { SCMP_SYS(dup3), 245 },
--    { SCMP_SYS(gettid), 245 },
--    { SCMP_SYS(getgid), 245 },
--    { SCMP_SYS(getegid), 245 },
--    { SCMP_SYS(getuid), 245 },
--    { SCMP_SYS(geteuid), 245 },
--    { SCMP_SYS(timer_create), 245 },
--    { SCMP_SYS(times), 245 },
--    { SCMP_SYS(exit), 245 },
--    { SCMP_SYS(clock_gettime), 245 },
--    { SCMP_SYS(time), 245 },
--    { SCMP_SYS(restart_syscall), 245 },
--    { SCMP_SYS(pwrite64), 245 },
--    { SCMP_SYS(nanosleep), 245 },
--    { SCMP_SYS(chown), 245 },
--    { SCMP_SYS(openat), 245 },
--    { SCMP_SYS(getdents), 245 },
--    { SCMP_SYS(timer_delete), 245 },
--    { SCMP_SYS(exit_group), 245 },
--    { SCMP_SYS(rt_sigreturn), 245 },
--    { SCMP_SYS(sync), 245 },
--    { SCMP_SYS(pread64), 245 },
--    { SCMP_SYS(madvise), 245 },
--    { SCMP_SYS(set_robust_list), 245 },
--    { SCMP_SYS(lseek), 245 },
--    { SCMP_SYS(pselect6), 245 },
--    { SCMP_SYS(fork), 245 },
--    { SCMP_SYS(rt_sigprocmask), 245 },
--    { SCMP_SYS(write), 244 },
--    { SCMP_SYS(fcntl), 243 },
--    { SCMP_SYS(tgkill), 242 },
--    { SCMP_SYS(kill), 242 },
--    { SCMP_SYS(rt_sigaction), 242 },
--    { SCMP_SYS(pipe2), 242 },
--    { SCMP_SYS(munmap), 242 },
--    { SCMP_SYS(mremap), 242 },
--    { SCMP_SYS(fdatasync), 242 },
--    { SCMP_SYS(close), 242 },
--    { SCMP_SYS(rt_sigpending), 242 },
--    { SCMP_SYS(rt_sigtimedwait), 242 },
--    { SCMP_SYS(readv), 242 },
--    { SCMP_SYS(writev), 242 },
--    { SCMP_SYS(preadv), 242 },
--    { SCMP_SYS(pwritev), 242 },
--    { SCMP_SYS(setrlimit), 242 },
--    { SCMP_SYS(ftruncate), 242 },
--    { SCMP_SYS(lstat), 242 },
--    { SCMP_SYS(pipe), 242 },
--    { SCMP_SYS(umask), 242 },
--    { SCMP_SYS(chdir), 242 },
--    { SCMP_SYS(setitimer), 242 },
--    { SCMP_SYS(setsid), 242 },
--    { SCMP_SYS(poll), 242 },
--    { SCMP_SYS(epoll_create), 242 },
--    { SCMP_SYS(epoll_ctl), 242 },
--    { SCMP_SYS(epoll_wait), 242 },
--    { SCMP_SYS(waitpid), 242 },
--    { SCMP_SYS(getsockname), 242 },
--    { SCMP_SYS(getpeername), 242 },
--    { SCMP_SYS(accept4), 242 },
--    { SCMP_SYS(timerfd_settime), 242 },
--    { SCMP_SYS(newfstatat), 241 },
--    { SCMP_SYS(shutdown), 241 },
--    { SCMP_SYS(getsockopt), 241 },
--    { SCMP_SYS(semop), 241 },
--    { SCMP_SYS(semtimedop), 241 },
--    { SCMP_SYS(epoll_ctl_old), 241 },
--    { SCMP_SYS(epoll_wait_old), 241 },
--    { SCMP_SYS(epoll_pwait), 241 },
--    { SCMP_SYS(epoll_create1), 241 },
--    { SCMP_SYS(ppoll), 241 },
--    { SCMP_SYS(creat), 241 },
--    { SCMP_SYS(link), 241 },
--    { SCMP_SYS(getpid), 241 },
--    { SCMP_SYS(getppid), 241 },
--    { SCMP_SYS(getpgrp), 241 },
--    { SCMP_SYS(getpgid), 241 },
--    { SCMP_SYS(getsid), 241 },
--    { SCMP_SYS(getdents64), 241 },
--    { SCMP_SYS(getresuid), 241 },
--    { SCMP_SYS(getresgid), 241 },
--    { SCMP_SYS(getgroups), 241 },
--    { SCMP_SYS(getresuid32), 241 },
--    { SCMP_SYS(getresgid32), 241 },
--    { SCMP_SYS(getgroups32), 241 },
--    { SCMP_SYS(signal), 241 },
--    { SCMP_SYS(sigaction), 241 },
--    { SCMP_SYS(sigsuspend), 241 },
--    { SCMP_SYS(sigpending), 241 },
--    { SCMP_SYS(truncate64), 241 },
--    { SCMP_SYS(ftruncate64), 241 },
--    { SCMP_SYS(fchown32), 241 },
--    { SCMP_SYS(chown32), 241 },
--    { SCMP_SYS(lchown32), 241 },
--    { SCMP_SYS(statfs64), 241 },
--    { SCMP_SYS(fstatfs64), 241 },
--    { SCMP_SYS(fstatat64), 241 },
--    { SCMP_SYS(lstat64), 241 },
--    { SCMP_SYS(sendfile64), 241 },
--    { SCMP_SYS(ugetrlimit), 241 },
--    { SCMP_SYS(alarm), 241 },
--    { SCMP_SYS(rt_sigsuspend), 241 },
--    { SCMP_SYS(rt_sigqueueinfo), 241 },
--    { SCMP_SYS(rt_tgsigqueueinfo), 241 },
--    { SCMP_SYS(sigaltstack), 241 },
--    { SCMP_SYS(signalfd4), 241 },
--    { SCMP_SYS(truncate), 241 },
--    { SCMP_SYS(fchown), 241 },
--    { SCMP_SYS(lchown), 241 },
--    { SCMP_SYS(fchownat), 241 },
--    { SCMP_SYS(fstatfs), 241 },
--    { SCMP_SYS(getitimer), 241 },
--    { SCMP_SYS(syncfs), 241 },
--    { SCMP_SYS(fsync), 241 },
--    { SCMP_SYS(fchdir), 241 },
--    { SCMP_SYS(msync), 241 },
--    { SCMP_SYS(sched_setparam), 241 },
--    { SCMP_SYS(sched_setscheduler), 241 },
--    { SCMP_SYS(sched_yield), 241 },
--    { SCMP_SYS(sched_rr_get_interval), 241 },
--    { SCMP_SYS(sched_setaffinity), 241 },
--    { SCMP_SYS(sched_getaffinity), 241 },
--    { SCMP_SYS(readahead), 241 },
--    { SCMP_SYS(timer_getoverrun), 241 },
--    { SCMP_SYS(unlinkat), 241 },
--    { SCMP_SYS(readlinkat), 241 },
--    { SCMP_SYS(faccessat), 241 },
--    { SCMP_SYS(get_robust_list), 241 },
--    { SCMP_SYS(splice), 241 },
--    { SCMP_SYS(vmsplice), 241 },
--    { SCMP_SYS(getcpu), 241 },
--    { SCMP_SYS(sendmmsg), 241 },
--    { SCMP_SYS(recvmmsg), 241 },
--    { SCMP_SYS(prlimit64), 241 },
--    { SCMP_SYS(waitid), 241 },
--    { SCMP_SYS(io_cancel), 241 },
--    { SCMP_SYS(io_setup), 241 },
--    { SCMP_SYS(io_destroy), 241 },
--    { SCMP_SYS(arch_prctl), 240 },
--    { SCMP_SYS(mkdir), 240 },
--    { SCMP_SYS(fchmod), 240 },
--    { SCMP_SYS(shmget), 240 },
--    { SCMP_SYS(shmat), 240 },
--    { SCMP_SYS(shmdt), 240 },
--    { SCMP_SYS(timerfd_create), 240 },
--    { SCMP_SYS(shmctl), 240 },
--    { SCMP_SYS(mlockall), 240 },
--    { SCMP_SYS(mlock), 240 },
--    { SCMP_SYS(munlock), 240 },
--    { SCMP_SYS(semctl), 240 },
--    { SCMP_SYS(fallocate), 240 },
--    { SCMP_SYS(fadvise64), 240 },
--    { SCMP_SYS(inotify_init1), 240 },
--    { SCMP_SYS(inotify_add_watch), 240 },
--    { SCMP_SYS(mbind), 240 },
--    { SCMP_SYS(memfd_create), 240 },
--#ifdef HAVE_CACHEFLUSH
--    { SCMP_SYS(cacheflush), 240 },
--#endif
--    { SCMP_SYS(sysinfo), 240 },
-+static const struct QemuSeccompSyscall blacklist[] = {
-+    /* default set of syscalls to blacklist */
-+    { SCMP_SYS(reboot),                1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(swapon),                1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(swapoff),               1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(syslog),                1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(mount),                 1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(umount),                1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(kexec_load),            1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(afs_syscall),           1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(break),                 1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(ftime),                 1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(getpmsg),               1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(gtty),                  1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(lock),                  1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(mpx),                   1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(prof),                  1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(profil),                1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(putpmsg),               1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(security),              1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(stty),                  1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(tuxcall),               1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(ulimit),                1, QEMU_SECCOMP_SET_DEFAULT },
-+    { SCMP_SYS(vserver),               1, QEMU_SECCOMP_SET_DEFAULT },
- };
  
- int seccomp_start(void)
-@@ -262,19 +64,19 @@ int seccomp_start(void)
-     unsigned int i = 0;
-     scmp_filter_ctx ctx;
+@@ -93,6 +92,14 @@ int seccomp_start(uint32_t seccomp_opts)
+             }
  
--    ctx = seccomp_init(SCMP_ACT_KILL);
-+    ctx = seccomp_init(SCMP_ACT_ALLOW);
-     if (ctx == NULL) {
-         rc = -1;
-         goto seccomp_return;
-     }
- 
--    for (i = 0; i < ARRAY_SIZE(seccomp_whitelist); i++) {
--        rc = seccomp_rule_add(ctx, SCMP_ACT_ALLOW, seccomp_whitelist[i].num, 0);
--        if (rc < 0) {
--            goto seccomp_return;
-+    for (i = 0; i < ARRAY_SIZE(blacklist); i++) {
-+        switch (blacklist[i].set) {
-+        default:
-+            goto add_syscall;
-         }
--        rc = seccomp_syscall_priority(ctx, seccomp_whitelist[i].num,
--                                      seccomp_whitelist[i].priority);
-+add_syscall:
-+        rc = seccomp_rule_add(ctx, SCMP_ACT_KILL, blacklist[i].num, 0);
-         if (rc < 0) {
-             goto seccomp_return;
+             break;
++        case QEMU_SECCOMP_SET_PRIVILEGED:
++            if (seccomp_opts & QEMU_SECCOMP_SET_PRIVILEGED) {
++                goto add_syscall;
++            } else {
++                continue;
++            }
++
++            break;
+         default:
+             goto add_syscall;
          }
 diff --git a/vl.c b/vl.c
-index 8e247cc2a2..305531aba8 100644
+index ca267f9918..1d44b05772 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -1030,7 +1030,6 @@ static int bt_parse(const char *opt)
+@@ -29,6 +29,7 @@
  
- static int parse_sandbox(void *opaque, QemuOpts *opts, Error **errp)
- {
--    /* FIXME: change this to true for 1.3 */
-     if (qemu_opt_get_bool(opts, "enable", false)) {
  #ifdef CONFIG_SECCOMP
-         if (seccomp_start() < 0) {
+ #include "sysemu/seccomp.h"
++#include "sys/prctl.h"
+ #endif
+ 
+ #if defined(CONFIG_VDE)
+@@ -275,6 +276,10 @@ static QemuOptsList qemu_sandbox_opts = {
+             .name = "obsolete",
+             .type = QEMU_OPT_STRING,
+         },
++        {
++            .name = "elevateprivileges",
++            .type = QEMU_OPT_STRING,
++        },
+         { /* end of list */ }
+     },
+ };
+@@ -1052,6 +1057,28 @@ static int parse_sandbox(void *opaque, QemuOpts *opts, Error **errp)
+ 	    }
+         }
+ 
++        value = qemu_opt_get(opts, "elevateprivileges");
++        if (value) {
++            if (strcmp(value, "deny") == 0) {
++                seccomp_opts |= QEMU_SECCOMP_SET_PRIVILEGED;
++            } else if (strcmp(value, "children") == 0) {
++                seccomp_opts |= QEMU_SECCOMP_SET_PRIVILEGED;
++
++                /* calling prctl directly because we're
++                 * not sure if host has CAP_SYS_ADMIN set*/
++                if (prctl(PR_SET_NO_NEW_PRIVS, 1)) {
++                    error_report("failed to set no_new_privs "
++                                 "aborting");
++                    return -1;
++                }
++            } else if (strcmp(value, "allow") == 0) {
++                /* default value */
++            } else {
++                error_report("invalid argument for elevateprivileges");
++                return -1;
++            }
++        }
++
+         if (seccomp_start(seccomp_opts) < 0) {
+             error_report("failed to install seccomp syscall filter "
+                          "in the kernel");
 -- 
 2.13.5
