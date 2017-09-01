@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUo-0000KE-2O
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:36 -0400
+	(envelope-from <armbru@redhat.com>) id 1dnlUu-0000W6-UB
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUk-0007OF-9G
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52866)
+	(envelope-from <armbru@redhat.com>) id 1dnlUo-0007Rf-BI
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36008)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUk-0007MK-1t
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:22 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 67FE3C0467C4
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:20 +0000 (UTC)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUo-0007R5-4S
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:26 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 14:56:00 +0200
-Message-Id: <20170901125611.29295-37-armbru@redhat.com>
+Date: Fri,  1 Sep 2017 14:56:03 +0200
+Message-Id: <20170901125611.29295-40-armbru@redhat.com>
 In-Reply-To: <20170901125611.29295-1-armbru@redhat.com>
 References: <20170901125611.29295-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 36/47] hmp: Use qapi_enum_parse() in
- hmp_migrate_set_capability()
+Subject: [Qemu-devel] [PULL 39/47] quorum: Use qapi_enum_parse() in
+ quorum_open()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,69 +28,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Alberto Garcia <berto@igalia.com>
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The error message on invalid capability name changes from
-
-    Invalid parameter "NAME"
-
-to
-
-    invalid parameter value: NAME
-
-No worse than before.
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20170822132255.23945-9-marcandre.lureau@redhat.com>
+Message-Id: <20170822132255.23945-12-marcandre.lureau@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-[Rebased, commit message rewritten]
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+[Rebased, qemu_opt_get() factored out, commit message tweaked]
+Cc: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1503564371-26090-6-git-send-email-armbru@redhat.com>
+Message-Id: <1503564371-26090-9-git-send-email-armbru@redhat.com>
 ---
- hmp.c | 23 ++++++++++-------------
- 1 file changed, 10 insertions(+), 13 deletions(-)
+ block/quorum.c | 28 +++++++++-------------------
+ 1 file changed, 9 insertions(+), 19 deletions(-)
 
-diff --git a/hmp.c b/hmp.c
-index 03c1a783b6..7e0bd3d63b 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1527,23 +1527,20 @@ void hmp_migrate_set_capability(Monitor *mon, con=
-st QDict *qdict)
-     bool state =3D qdict_get_bool(qdict, "state");
-     Error *err =3D NULL;
-     MigrationCapabilityStatusList *caps =3D g_malloc0(sizeof(*caps));
--    int i;
-+    int val;
+diff --git a/block/quorum.c b/block/quorum.c
+index d04da4f430..cb6617703c 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -22,6 +22,7 @@
+ #include "qapi/qmp/qjson.h"
+ #include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qstring.h"
++#include "qapi/util.h"
+ #include "qapi-event.h"
+ #include "crypto/hash.h"
 =20
--    for (i =3D 0; i < MIGRATION_CAPABILITY__MAX; i++) {
--        if (strcmp(cap, MigrationCapability_lookup[i]) =3D=3D 0) {
--            caps->value =3D g_malloc0(sizeof(*caps->value));
--            caps->value->capability =3D i;
--            caps->value->state =3D state;
--            caps->next =3D NULL;
--            qmp_migrate_set_capabilities(caps, &err);
--            break;
+@@ -867,30 +868,13 @@ static QemuOptsList quorum_runtime_opts =3D {
+     },
+ };
+=20
+-static int parse_read_pattern(const char *opt)
+-{
+-    int i;
+-
+-    if (!opt) {
+-        /* Set quorum as default */
+-        return QUORUM_READ_PATTERN_QUORUM;
+-    }
+-
+-    for (i =3D 0; i < QUORUM_READ_PATTERN__MAX; i++) {
+-        if (!strcmp(opt, QuorumReadPattern_lookup[i])) {
+-            return i;
 -        }
-+    val =3D qapi_enum_parse(MigrationCapability_lookup, cap, -1, &err);
-+    if (val < 0) {
-+        goto end;
+-    }
+-
+-    return -EINVAL;
+-}
+-
+ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
+                        Error **errp)
+ {
+     BDRVQuorumState *s =3D bs->opaque;
+     Error *local_err =3D NULL;
+     QemuOpts *opts =3D NULL;
++    const char *pattern_str;
+     bool *opened;
+     int i;
+     int ret =3D 0;
+@@ -925,7 +909,13 @@ static int quorum_open(BlockDriverState *bs, QDict *=
+options, int flags,
+         goto exit;
      }
 =20
--    if (i =3D=3D MIGRATION_CAPABILITY__MAX) {
--        error_setg(&err, QERR_INVALID_PARAMETER, cap);
--    }
-+    caps->value =3D g_malloc0(sizeof(*caps->value));
-+    caps->value->capability =3D val;
-+    caps->value->state =3D state;
-+    caps->next =3D NULL;
-+    qmp_migrate_set_capabilities(caps, &err);
-=20
-+end:
-     qapi_free_MigrationCapabilityStatusList(caps);
-=20
-     if (err) {
+-    ret =3D parse_read_pattern(qemu_opt_get(opts, QUORUM_OPT_READ_PATTER=
+N));
++    pattern_str =3D qemu_opt_get(opts, QUORUM_OPT_READ_PATTERN);
++    if (!pattern_str) {
++        ret =3D QUORUM_READ_PATTERN_QUORUM;
++    } else {
++        ret =3D qapi_enum_parse(QuorumReadPattern_lookup, pattern_str,
++                              -EINVAL, NULL);
++    }
+     if (ret < 0) {
+         error_setg(&local_err, "Please set read-pattern as fifo or quoru=
+m");
+         goto exit;
 --=20
 2.13.5
