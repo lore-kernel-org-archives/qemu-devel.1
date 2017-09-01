@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dnjfB-0000Kk-1B
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:59:10 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dnjhG-0002Qc-RK
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:01:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dnjfA-0001Rg-5C
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:59:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45910)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1dnjf9-0001RK-V6
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 06:59:00 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D8B49C047B9B
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 10:58:58 +0000 (UTC)
-From: Eduardo Otubo <otubo@redhat.com>
-Date: Fri,  1 Sep 2017 12:58:18 +0200
-Message-Id: <20170901105818.31956-7-otubo@redhat.com>
-In-Reply-To: <20170901105818.31956-1-otubo@redhat.com>
-References: <20170901105818.31956-1-otubo@redhat.com>
-Subject: [Qemu-devel] [PATCHv4 6/6] seccomp: adding documentation to new
- seccomp model
+	(envelope-from <peter.maydell@linaro.org>) id 1dnjh7-0002R6-B8
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:01:10 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:38314)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dnjh7-0002Qw-4j
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:01:01 -0400
+Received: by mail-wm0-x233.google.com with SMTP id 187so1530638wmn.1
+	for <qemu-devel@nongnu.org>; Fri, 01 Sep 2017 04:01:00 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170901092407.GE31680@redhat.com>
+References: <20170831122925.GJ17315@redhat.com>
+	<CAFEAcA_pZn5evv_Z00EKevr1PrV+vNrs4bzEv9FaYLU_cisqyw@mail.gmail.com>
+	<1504254677.10150.3.camel@redhat.com>
+	<20170901092407.GE31680@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 1 Sep 2017 12:00:39 +0100
+Message-ID: <CAFEAcA_XBugpJj+t+ne92ZmBsKRHR+_Ztz00yCU24Lof4jEQPA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] RFC: changing ROM bundling in tar dists for
+ releases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, thuth@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Adding new documentation under docs/ to describe every one and each new
-option added by the refactoring patchset.
+On 1 September 2017 at 10:24, Daniel P. Berrange <berrange@redhat.com> wrote:
+> I've always wondered why we need to specialcase those modules at all.
+> Personally I'd just remove them entirely and let people install the
+> -dev packages on their distro just like they do for any other build
+> prerequisite of QEMU.
 
-Signed-off-by: Eduardo Otubo <otubo@redhat.com>
----
- docs/seccomp.txt | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
- create mode 100644 docs/seccomp.txt
+Two uses: (1) we've tended to want newer versions of dtc than
+distros actually had released (in fact right now we need a
+pretty new dtc that not many distros have) and (2) for
+hosts like OSX and Windows dependencies are not
+a simple matter of "just install the distro's dev package".
 
-diff --git a/docs/seccomp.txt b/docs/seccomp.txt
-new file mode 100644
-index 0000000000..a5eca85a9b
---- /dev/null
-+++ b/docs/seccomp.txt
-@@ -0,0 +1,31 @@
-+QEMU Seccomp system call filter
-+===============================
-+
-+Starting from QEMU version 2.11, the seccomp filter does not work as a
-+whitelist but as a blacklist instead. This method allows safer deploys since
-+only the strictly forbidden system calls will be black-listed and the
-+possibility of breaking any workload is close to zero.
-+
-+The default option (-sandbox on) has a slightly looser security though and the
-+reason is that it shouldn't break any backwards compatibility with previous
-+deploys and command lines already running. But if the intent is to have a
-+better security from this version on, one should make use of the following
-+additional options properly:
-+
-+* obsolete=allow|deny: It allows Qemu to run safely on old system that still
-+  relies on old system calls.
-+
-+* elevateprivileges=allow|deny|children: It allows or denies Qemu process
-+  to elevate its privileges by blacklisting all set*uid|gid system calls. The
-+  'children' option sets the PR_SET_NO_NEW_PRIVS to 1 which allows helpers
-+  (forks and execs) to run unprivileged.
-+
-+* spawn=allow|deny: It blacklists fork and execve system calls, avoiding QEMU to
-+  spawn new threads or processes.
-+
-+* resourcecontrol=allow|deny: It blacklists all process affinity and scheduler
-+  priority system calls to avoid that the process can increase its amount of
-+  allowed resource consumption.
-+
-+--
-+Eduardo Otubo <otubo@redhat.com>
--- 
-2.13.5
+thanks
+-- PMM
