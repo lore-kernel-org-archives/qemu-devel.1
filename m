@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dnuis-0003UD-Aj
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 18:47:36 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dnuou-0006Q0-1S
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 18:53:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dnuil-00048F-Vf
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 18:47:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49314)
+	(envelope-from <jsnow@redhat.com>) id 1dnuoq-0007zx-2w
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 18:53:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35156)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1dnuil-000478-L3
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 18:47:27 -0400
-References: <1504113297-22052-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-	<1504113297-22052-2-git-send-email-chugh.ishani@research.iiit.ac.in>
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1dnuop-0007z8-Po
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 18:53:44 -0400
+References: <1504120538-9309-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+	<1504120538-9309-4-git-send-email-chugh.ishani@research.iiit.ac.in>
+	<20170831020210.GF17741@lemon.lan>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <db264166-9b9f-31ac-321e-8436d7ae0354@redhat.com>
-Date: Fri, 1 Sep 2017 18:47:20 -0400
+Message-ID: <5b41f64d-3a13-4314-4f0e-29864c940c2b@redhat.com>
+Date: Fri, 1 Sep 2017 18:53:36 -0400
 MIME-Version: 1.0
-In-Reply-To: <1504113297-22052-2-git-send-email-chugh.ishani@research.iiit.ac.in>
+In-Reply-To: <20170831020210.GF17741@lemon.lan>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] backup: QEMU Backup Tool
+Subject: Re: [Qemu-devel] [PATCH 3/3] Backup Tool: Test for Incremental
+ Backup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,540 +30,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ishani Chugh <chugh.ishani@research.iiit.ac.in>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, stefanha@redhat.com
+To: Fam Zheng <famz@redhat.com>, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com
 
-I suggest as your commit message here, something like:
 
-"backup: Add QEMU backup tool"
 
-A good commit message should say what applying the patch will do:
-
-"What will happen if I apply this patch?"
-"It will 'Add QEMU backup tool'"
-
-On 08/30/2017 01:14 PM, Ishani Chugh wrote:
-> qemu-backup will be a command-line tool for performing full and
-> incremental disk backups on running VMs. It is intended as a
-> reference implementation for management stack and backup developers
-> to see QEMU's backup features in action. The tool writes details of
-> guest in a configuration file and the data is retrieved from the file
-> while creating a backup. The location of config file can be set as an
-> environment variable QEMU_BACKUP_CONFIG. The usage is as follows:
+On 08/30/2017 10:02 PM, Fam Zheng wrote:
+> On Thu, 08/31 00:45, Ishani Chugh wrote:
+>> This patch is the test for incremental backup implementation in Backup tool.
+>> The test employs two basic subtests:
+>> 1) Backing up an empty guest and comparing it with base image.
+>> 2) Writing a pattern to the guest, creating backup, writing
+>>    a pattern again, creating backup and comparing with base image.
+>>
+>> Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+>> ---
+>>  tests/qemu-iotests/193     | 86 ++++++++++++++++++++++++++++++++++++++++++++++
+>>  tests/qemu-iotests/193.out | 34 ++++++++++++++++++
+>>  tests/qemu-iotests/group   |  1 +
+>>  3 files changed, 121 insertions(+)
+>>  create mode 100755 tests/qemu-iotests/193
+>>  create mode 100644 tests/qemu-iotests/193.out
+>>
+>> diff --git a/tests/qemu-iotests/193 b/tests/qemu-iotests/193
+>> new file mode 100755
+>> index 0000000..500e5df
+>> --- /dev/null
+>> +++ b/tests/qemu-iotests/193
+>> @@ -0,0 +1,86 @@
+>> +#!/bin/bash
+>> +#
+>> +# Test Incremental backup functionality of qemu-backup tool
+>> +#
+>> +# Copyright (C) 2009 Red Hat, Inc.
 > 
-> Add a guest
-> python qemu-backup.py guest add --guest <guest_name> --qmp <socket_path>
-> 
-
-This should probably be organized by subcommand, so:
-
-guest add
-guest remove
-guest list
-
-drive add
-
-backup
-
-restore
-
-
-> Add a drive for backup in a specified guest
-> python qemu-backup.py drive add --guest <guest_name> --id <drive_id> [--target <target_file_path>]
-> 
-> Create backup of the added drives:
-> python qemu-backup.py backup --guest <guest_name>
-> 
-> List all guest configs in configuration file:
-> python qemu-backup.py guest list
-> 
-> Restore operation
-> python qemu-backup.py restore --guest <guest-name>
-> 
-> Remove a guest
-> python qemu-backup.py guest remove --guest <guest_name>
+> Year is off, probably the copyright holder too?
 > 
 
-Looks good, but the man page should perhaps be patch 01 instead of 03 so
-that the usage can be reviewed outside of the commit message.
+Yup, please take credit for your own work, Ishani :)
 
-> Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-> ---
->  contrib/backup/qemu-backup.py | 343 ++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 343 insertions(+)
->  create mode 100644 contrib/backup/qemu-backup.py
+>> +#
+>> +# This program is free software; you can redistribute it and/or modify
+>> +# it under the terms of the GNU General Public License as published by
+>> +# the Free Software Foundation; either version 2 of the License, or
+>> +# (at your option) any later version.
+>> +#
+>> +# This program is distributed in the hope that it will be useful,
+>> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> +# GNU General Public License for more details.
+>> +#
+>> +# You should have received a copy of the GNU General Public License
+>> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>> +#
+>> +
+>> +# creator
+>> +owner=chugh.ishani@research.iiit.ac.in
+>> +
+>> +seq=`basename $0`
+>> +echo "QA output created by $seq"
+>> +
+>> +here=`pwd`
+>> +status=1	# failure is the default!
 > 
-> diff --git a/contrib/backup/qemu-backup.py b/contrib/backup/qemu-backup.py
-> new file mode 100644
-> index 0000000..248ca9f
-> --- /dev/null
-> +++ b/contrib/backup/qemu-backup.py
-> @@ -0,0 +1,343 @@
-> +#!/usr/bin/python
-> +# -*- coding: utf-8 -*-
-> +#
-> +# Copyright (C) 2017 Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-> +#
-> +# This program is free software; you can redistribute it and/or modify
-> +# it under the terms of the GNU General Public License as published by
-> +# the Free Software Foundation; either version 2 of the License, or
-> +# (at your option) any later version.
-> +#
-> +# This program is distributed in the hope that it will be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> +#
-> +
-> +"""
-> +This file is an implementation of backup tool
-> +"""
-> +from __future__ import print_function
-> +from argparse import ArgumentParser
-> +import os
-> +import errno
-> +from socket import error as socket_error
-> +try:
-> +    import configparser
-> +except ImportError:
-> +    import ConfigParser as configparser
-> +import sys
-> +sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..',
-> +                             'scripts', 'qmp'))
-> +from qmp import QEMUMonitorProtocol
-> +
-> +
-> +class BackupTool(object):
-> +    """BackupTool Class"""
-> +    def __init__(self, config_file=os.path.expanduser('~') +
-> +                 '/.config/qemu/qemu-backup-config'):
-> +        if "QEMU_BACKUP_CONFIG" in os.environ:
-> +            self.config_file = os.environ["QEMU_BACKUP_CONFIG"]
-> +
-> +        else:
-> +            self.config_file = config_file
-> +            try:
-> +                if not os.path.isdir(os.path.dirname(self.config_file)):
-> +                    os.makedirs(os.path.dirname(self.config_file))
-> +            except:
-> +                print("Cannot create config directory", file=sys.stderr)
-> +                sys.exit(1)
-> +        self.config = configparser.ConfigParser()
-> +        self.config.read(self.config_file)
-> +        try:
-> +            if self.config.get('general', 'version') != '1.0':
-> +                    print("Version Conflict in config file", file=sys.stderr)
-> +                    sys.exit(1)
-> +        except:
-> +            self.config['general'] = {'version': '1.0'}
-> +            self.write_config()
-> +
-> +    def write_config(self):
-> +        """
-> +        Writes configuration to ini file.
-> +        """
-> +        config_file = open(self.config_file + ".tmp", 'w')
-> +        self.config.write(config_file)
-> +        config_file.flush()
-> +        os.fsync(config_file.fileno())
-> +        config_file.close()
-> +        os.rename(self.config_file + ".tmp", self.config_file)
-> +
-> +    def get_socket_address(self, socket_address):
-> +        """
-> +        Return Socket address in form of string or tuple
-> +        """
-> +        if socket_address.startswith('tcp'):
-> +            return (socket_address.split(':')[1],
-> +                    int(socket_address.split(':')[2]))
-> +        return socket_address.split(':', 2)[1]
-> +
-> +    def _full_backup(self, guest_name):
-> +        """
-> +        Performs full backup of guest
-> +        """
-> +        if guest_name not in self.config.sections():
-> +            print("Cannot find specified guest", file=sys.stderr)
-> +            sys.exit(1)
-> +
-> +        self.verify_guest_running(guest_name)
-> +        connection = QEMUMonitorProtocol(
-> +                                         self.get_socket_address(
-> +                                             self.config[guest_name]['qmp']))
-> +        connection.connect()
-> +        cmd = {"execute": "transaction", "arguments": {"actions": []}}
-> +        drive_list = []
-> +        for key in self.config[guest_name]:
-> +            if key.startswith("drive_"):
-> +                drive = key[len('drive_'):]
-> +                drive_list.append(drive)
-> +                target = self.config[guest_name][key]
-> +                sub_cmd = {"type": "drive-backup", "data": {"device": drive,
-> +                                                            "target": target,
-> +                                                            "sync": "full"}}
-> +                cmd['arguments']['actions'].append(sub_cmd)
-> +        qmp_return = connection.cmd_obj(cmd)
-> +        if 'error' in qmp_return:
-> +            print(qmp_return['error']['desc'], file=sys.stderr)
-> +            sys.exit(1)
-> +        print("Backup Started")
-> +        while drive_list:
-> +            event = connection.pull_event(wait=True)
-> +            if event['event'] == 'SHUTDOWN':
-> +                print("The guest was SHUT DOWN", file=sys.stderr)
-> +                sys.exit(1)
-> +
-> +            if event['event'] == 'BLOCK_JOB_COMPLETED':
-> +                if event['data']['device'] in drive_list and \
-> +                        event['data']['type'] == 'backup':
-> +                        print("*" + event['data']['device'])
-> +                        drive_list.remove(event['data']['device'])
-> +
-> +            if event['event'] == 'BLOCK_JOB_ERROR':
-> +                if event['data']['device'] in drive_list and \
-> +                        event['data']['type'] == 'backup':
-> +                        print(event['data']['device'] + " Backup Failed",
-> +                              file=sys.stderr)
-> +                        drive_list.remove(event['data']['device'])
-> +        print("Backup Complete")
-> +
-> +    def _drive_add(self, drive_id, guest_name, target=None):
-> +        """
-> +        Adds drive for backup
-> +        """
-> +        if target is None:
-> +            target = os.path.abspath(drive_id)
-
-Similar problem as with other commands:
-
-jhuston@probe (review) ~/s/q/c/backup> ./qemu-backup.py drive add
-Traceback (most recent call last):
-  File "./qemu-backup.py", line 343, in <module>
-    main()
-  File "./qemu-backup.py", line 340, in main
-    args.func(args)
-  File "./qemu-backup.py", line 272, in drive_add_wrapper
-    self._drive_add(args.id, args.guest, args.target)
-  File "./qemu-backup.py", line 137, in _drive_add
-    target = os.path.abspath(drive_id)
-  File "/usr/lib64/python2.7/posixpath.py", line 360, in abspath
-    if not isabs(path):
-  File "/usr/lib64/python2.7/posixpath.py", line 54, in isabs
-    return s.startswith('/')
-AttributeError: 'NoneType' object has no attribute 'startswith'
-
-This errors out if you don't tell it what drive you want to add.
-
-
-Meanwhile,
-
-jhuston@probe (review) ~/s/q/c/backup> ./qemu-backup.py drive add --id
-foobar
-Cannot find specified guest
-
-Should probably error out because you didn't set the guest name at all.
-
-> +
-> +        if os.path.isdir(os.path.dirname(target)) is False:
-> +            print("Cannot find target directory", file=sys.stderr)
-> +            sys.exit(1)
-> +
-> +        if guest_name not in self.config.sections():
-> +            print("Cannot find specified guest", file=sys.stderr)
-> +            sys.exit(1)
-> +
-> +        if "drive_" + drive_id in self.config[guest_name]:
-> +            print("Drive already marked for backup", file=sys.stderr)
-> +            sys.exit(1)
-> +
-> +        self.verify_guest_running(guest_name)
-> +
-> +        connection = QEMUMonitorProtocol(
-> +                                         self.get_socket_address(
-> +                                             self.config[guest_name]['qmp']))
-> +        connection.connect()
-> +        cmd = {'execute': 'query-block'}
-> +        returned_json = connection.cmd_obj(cmd)
-> +        device_present = False
-> +        for device in returned_json['return']:
-> +            if device['device'] == drive_id:
-> +                device_present = True
-> +                break
-> +
-> +        if not device_present:
-> +            print("No such drive in guest", file=sys.stderr)
-> +            sys.exit(1)
-
-cool!
-
-> +
-> +        drive_id = "drive_" + drive_id
-> +        for d_id in self.config[guest_name]:
-> +            if self.config[guest_name][d_id] == target:
-> +                print("Please choose different target", file=sys.stderr)
-> +                sys.exit(1)
-> +        self.config.set(guest_name, drive_id, target)
-> +        self.write_config()
-> +        print("Successfully Added Drive")
-> +
-> +    def verify_guest_running(self, guest_name):
-> +        """
-> +        Checks whether specified guest is running or not
-> +        """
-> +        socket_address = self.config.get(guest_name, 'qmp')> +        try:
-> +            connection = QEMUMonitorProtocol(self.get_socket_address(
-> +                                             socket_address))
-> +            connection.connect()
-> +        except socket_error:
-> +            if socket_error.errno != errno.ECONNREFUSED:
-
-what happens if errno *IS* ECONNREFUSED?
-
-> +                print("Connection to guest refused", file=sys.stderr)
-> +                sys.exit(1)
-> +
-> +    def _guest_add(self, guest_name, socket_address):
-> +        """
-> +        Adds a guest to the config file
-> +        """
-> +        if guest_name in self.config.sections():
-> +            print("ID already exists. Please choose a different guest name",
-> +                  file=sys.stderr)
-> +            sys.exit(1)
-> +        self.config[guest_name] = {'qmp': socket_address}
-> +        self.verify_guest_running(guest_name)
-> +        self.write_config()
-> +        print("Successfully Added Guest")
-
-this function crashes if you do not provide a guest_name, it should
-report an error instead.
-
-./qemu-backup.py guest add
-./qemu-backup.py guest add --guest foobar
-
-both crash, please correct.
-
-./qemu-backup.py guest add --guest foobar --qmp foobar
-
-also crashes, please error gracefully if you cannot parse the QMP
-argument as a valid socket.
-
-> +
-> +    def _guest_remove(self, guest_name):
-> +        """
-> +        Removes a guest from config file
-> +        """
-> +        if guest_name not in self.config.sections():
-> +            print("Guest Not present", file=sys.stderr)
-> +            sys.exit(1)
-> +        self.config.remove_section(guest_name)
-> +        print("Guest successfully deleted")
-> +
-
-If you don't supply a guest name, you get the "Guest Not present" error
-message, but really we should error out as if it was a parsing error.
-
-jhuston@probe (review) ~/s/q/c/backup> ./qemu-backup.py guest remove
---guest general
-Guest successfully deleted
-
-Whoops!
-
-> +    def _restore(self, guest_name):
-> +        """
-> +        Prints Steps to perform restore operation
-> +        """
-> +        if guest_name not in self.config.sections():
-> +            print("Cannot find specified guest", file=sys.stderr)
-> +            sys.exit(1)
-> +
-> +        self.verify_guest_running(guest_name)
-> +        connection = QEMUMonitorProtocol(
-> +                                         self.get_socket_address(
-> +                                             self.config[guest_name]['qmp']))
-> +        connection.connect()
-> +        print("To perform restore:")
-> +        print("Shut down guest")
-> +        for key in self.config[guest_name]:
-> +            if key.startswith("drive_"):
-> +                drive = key[len('drive_'):]
-> +                target = self.config[guest_name][key]
-> +                cmd = {'execute': 'query-block'}
-> +                returned_json = connection.cmd_obj(cmd)
-> +                device_present = False
-> +                for device in returned_json['return']:
-> +                    if device['device'] == drive:
-> +                        device_present = True
-> +                        location = device['inserted']['image']['filename']
-> +                        print("qemu-img convert " + target + " " + location)
-> +
-> +                if not device_present:
-> +                    print("No such drive in guest", file=sys.stderr)
-> +                    sys.exit(1)
-> +
-> +    def guest_remove_wrapper(self, args):
-> +        """
-> +        Wrapper for _guest_remove method.
-> +        """
-> +        guest_name = args.guest
-> +        self._guest_remove(guest_name)
-> +        self.write_config()
-> +
-> +    def list(self, args):
-> +        """
-> +        Prints guests present in Config file
-> +        """
-> +        for guest_name in self.config.sections():
-> +            print(guest_name)
-
-This will print out "general" too, which I think should be exempted from
-this list, as it is not actually a guest!
-
-I propose something like this:
-
-[general]
-guests=ishanivm1 ishanivm2 ishanivm3
-
-[guest:ishanivm]
-foo=bar
-
-[guest:ishanivm2]
-foo=bar2
-
-and so on.
-
-("What happens if someone tries to name a guest 'guest:foobar'? Well,
-then the section just gets named 'guest:guest:foobar' and we go about
-our happy way.")
-
-Whenever a guest is added or removed, you update the list and delete or
-add the corresponding section appropriately.
-
-> +
-> +    def guest_add_wrapper(self, args):
-> +        """
-> +        Wrapper for _quest_add method
-
-s/quest/guest/
-
-> +        """
-> +        self._guest_add(args.guest, args.qmp)
-> +> +    def drive_add_wrapper(self, args):
-> +        """
-> +        Wrapper for _drive_add method
-> +        """
-> +        self._drive_add(args.id, args.guest, args.target)
-> +
-> +    def fullbackup_wrapper(self, args):
-> +        """
-> +        Wrapper for _full_backup method
-> +        """
-> +        self._full_backup(args.guest)
-> +
-> +    def restore_wrapper(self, args):
-> +        """
-> +        Wrapper for restore
-> +        """
-> +        self._restore(args.guest)
-> +
-> +
-> +def main():
-> +    backup_tool = BackupTool()
-> +    parser = ArgumentParser()
-
-The following is a pretty big block without much visual structure to
-guide the eye. I'd recommend:
-
-(1) Splitting this out into a helper function so the overall flow of
-main() is easier to spot at a glance, and
-(2) Adding a few comments to just visually break up the monotony.
-
-> +    subparsers = parser.add_subparsers(title='Subcommands',
-> +                                       description='Valid Subcommands',
-> +                                       help='Subcommand help')       # guest
-> +    guest_parser = subparsers.add_parser('guest', help='Adds or \
-> +                                                   removes and lists guest(s)')
-
-Try "Manage guest(s)" as a shorthand, or just write "add, remove, or
-list guests."
-
-"Adds (or) removes (and) lists" is an awkward construct.
-
-> +    guest_subparsers = guest_parser.add_subparsers(title='Guest Subparser')
-       # guest list
-> +    guest_list_parser = guest_subparsers.add_parser('list',
-> +                                                    help='Lists all guests')
-> +    guest_list_parser.set_defaults(func=backup_tool.list)
-> +
-       # guest add
-> +    guest_add_parser = guest_subparsers.add_parser('add', help='Adds a guest')
-> +    guest_add_parser.add_argument('--guest', action='store', type=str,
-> +                                  help='Name of the guest')
-> +    guest_add_parser.add_argument('--qmp', action='store', type=str,
-> +                                  help='Path of socket')
-> +    guest_add_parser.set_defaults(func=backup_tool.guest_add_wrapper)
-> +
-       # guest remove
-> +    guest_remove_parser = guest_subparsers.add_parser('remove',
-> +                                                      help='removes a guest')
-> +    guest_remove_parser.add_argument('--guest', action='store', type=str,
-> +                                     help='Name of the guest')
-> +    guest_remove_parser.set_defaults(func=backup_tool.guest_remove_wrapper)
-> +
-       # drive
-> +    drive_parser = subparsers.add_parser('drive',
-> +                                         help='Adds drive(s) for backup')
-> +    drive_subparsers = drive_parser.add_subparsers(title='Add subparser',
-> +                                                   description='Drive \
-> +                                                                subparser')
-       # drive add
-> +    drive_add_parser = drive_subparsers.add_parser('add',
-> +                                                   help='Adds new \
-> +                                                         drive for backup')
-> +    drive_add_parser.add_argument('--guest', action='store',
-> +                                  type=str, help='Name of the guest')
-> +    drive_add_parser.add_argument('--id', action='store',
-> +                                  type=str, help='Drive ID')
-> +    drive_add_parser.add_argument('--target', nargs='?',
-> +                                  default=None, help='Destination path')
-> +    drive_add_parser.set_defaults(func=backup_tool.drive_add_wrapper)
-> +
-       # backup
-> +    backup_parser = subparsers.add_parser('backup', help='Creates backup')
-> +    backup_parser.add_argument('--guest', action='store',
-> +                               type=str, help='Name of the guest')
-> +    backup_parser.set_defaults(func=backup_tool.fullbackup_wrapper)
-> +
-       # restore
-> +    backup_parser = subparsers.add_parser('restore', help='Restores drives')
-> +    backup_parser.add_argument('--guest', action='store',
-> +                               type=str, help='Name of the guest')
-> +    backup_parser.set_defaults(func=backup_tool.restore_wrapper)
-> +
-
-maybe something like:
-       parser = buildMyParser()
-
-?
-
-> +    args = parser.parse_args()
-> +    args.func(args)
-> +
-> +if __name__ == '__main__':
-> +    main()
+> s/\t/ /
 > 
 
-Looking good overall; my advice is to try testing your tool by
-intentionally omitting items and giving it bad information. Make sure
-that any arguments marked as mandatory in the manpage/parser are
-actually mandatory and try to eliminate stack trace dumps from your
-python tool.
+Fam means to remove the tab here and use spaces instead.
 
-I stopped a little short of reviewing the entire tool this time, so
-there may be more cases that are similar to the other issues I've
-already pointed out.
-
-Thanks!
+>> +
+>> +
+>> +# get standard environment, filters and checks
+>> +. ./common.rc
+>> +. ./common.filter
+>> +. ./common.qemu
+>> +
+>> +_supported_fmt generic
+>> +_supported_proto generic
+>> +_supported_os Linux
+>> +
+>> +
+>> +CONFIG_FILE=$TEST_DIR/backup-config
+>> +SOCKET=unix:$TEST_DIR/backup_socket
+>> +size=128M
+>> +
+>> +_make_test_img $size
+>> +export QEMU_BACKUP_CONFIG=$CONFIG_FILE
+>> +qemu_comm_method="monitor"
+>> +echo
+>> +_launch_qemu -drive if=virtio,file=$TEST_IMG -qmp $SOCKET,server,nowait
+>> +$PYTHON ../../contrib/backup/qemu-backup.py guest add --guest adad --qmp $SOCKET
+>> +$PYTHON ../../contrib/backup/qemu-backup.py drive add --id virtio0 --guest adad --target $TEST_DIR/virtio0
+>> +echo
+>> +echo "== Creating backup =="
+>> +$PYTHON ../../contrib/backup/qemu-backup.py backup --inc --guest adad
+>> +_send_qemu_cmd $QEMU_HANDLE 'quit' ''
+>> +wait=1 _cleanup_qemu
+>> +echo
+>> +echo "== Comparing images =="
+>> +$QEMU_IMG compare $TEST_DIR/virtio0_inc_0 $TEST_IMG
+>> +
+>> +rm $TEST_DIR/virtio0_inc_0
+>> +
+>> +_launch_qemu -drive if=virtio,id=virtio0,file=$TEST_IMG -qmp $SOCKET,server,nowait
+>> +echo
+>> +echo "== Writing Pattern =="
+>> +_send_qemu_cmd $QEMU_HANDLE 'qemu-io virtio0 "write -P 0x22 0 1M"' "(qemu)" | _filter_qemu_io
+>> +echo
+>> +
+>> +echo "== Creating backup =="
+>> +$PYTHON ../../contrib/backup/qemu-backup.py backup --inc --guest adad
+>> +
+>> +echo "== Writing Pattern =="
+>> +_send_qemu_cmd $QEMU_HANDLE 'qemu-io virtio0 "write -P 0x22 0 1M"' "(qemu)" | _filter_qemu_io
+>> +echo
+>> +$PYTHON ../../contrib/backup/qemu-backup.py backup --inc --guest adad
+>> +_send_qemu_cmd $QEMU_HANDLE 'quit' ''
+>> +wait=1 _cleanup_qemu
+>> +echo
+>> +echo "== Comparing images =="
+>> +$QEMU_IMG compare $TEST_DIR/virtio0_inc_1 $TEST_IMG
+>> +rm $TEST_DIR/virtio0_inc_0
+>> +rm $TEST_DIR/virtio0_inc_1
+>> +rm $CONFIG_FILE
+>> +
+>> +echo "*** done"
+>> +status=0
+>> \ No newline at end of file
+>> diff --git a/tests/qemu-iotests/193.out b/tests/qemu-iotests/193.out
+>> new file mode 100644
+>> index 0000000..3a836c2
+>> --- /dev/null
+>> +++ b/tests/qemu-iotests/193.out
+>> @@ -0,0 +1,34 @@
+>> +QA output created by 193
+>> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+>> +
+>> +Successfully Added Guest
+>> +Successfully Added Drive
+>> +
+>> +== Creating backup ==
+>> +QEMU X.Y.Z monitor - type 'help' for more information
+>> +(qemu) Formatting 'TEST_DIR/virtio0_inc_0', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
+>> +quit
+>> +
+>> +== Comparing images ==
+>> +Images are identical.
+>> +
+>> +== Writing Pattern ==
+>> +QEMU X.Y.Z monitor - type 'help' for more information
+>> +(qemu) qemu-io virtio0 "write -P 0x22 0 1M"
+>> +
+>> +== Creating backup ==
+>> +Initial Backup does not exist
+>> +== Writing Pattern ==
+>> +wrote 1048576/1048576 bytes at offset 0
+>> +1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>> +(qemu) Formatting 'TEST_DIR/virtio0_inc_0', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
+>> +
+>> +Formatting '/home/ishani/Desktop/opw/qemu/tests/qemu-iotests/scratch/virtio0_inc_1', fmt=qcow2 size=134217728 backing_file=/home/ishani/Desktop/opw/qemu/tests/qemu-iotests/scratch/virtio0_inc_0 backing_fmt=qcow2 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
+>> +qemu-io virtio0 "write -P 0x22 0 1M"
+>> +wrote 1048576/1048576 bytes at offset 0
+>> +1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>> +(qemu) quit
+>> +
+>> +== Comparing images ==
+>> +Images are identical.
+>> +*** done
+>> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+>> index 33c945b..6b9e034 100644
+>> --- a/tests/qemu-iotests/group
+>> +++ b/tests/qemu-iotests/group
+>> @@ -189,3 +189,4 @@
+>>  191 rw auto
+>>  192 rw auto quick
+>>  194 rw auto migration quick
+>> +193 rw auto
+> 
+> Let's add this line after 192 before 194, and you can add 'quick' btw.
+> 
+> Fam
+> 
+>> -- 
+>> 2.7.4
+>>
+>>
