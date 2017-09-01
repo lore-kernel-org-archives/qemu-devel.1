@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dnrai-0007dX-2E
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 15:26:56 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dnrdM-0000mN-UH
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 15:29:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dnrae-00069M-Tj
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 15:26:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43234)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1dnrae-00068L-L8
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 15:26:52 -0400
-References: <87r2w6eq5n.fsf@gmail.com> <87h8x1yox3.fsf@dusky.pond.sub.org>
-	<20170830170941.GB24565@stefanha-x1.localdomain>
-	<87bmmwi6r6.fsf@dusky.pond.sub.org>
-	<CAFEAcA8r-EqOjZDvP=0mYG7QQ83MU-54RL9Bu8Eb_wPzQo1M7Q@mail.gmail.com>
-	<87r2vrlwr3.fsf@dusky.pond.sub.org> <20170831131412.GK17315@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a763a037-7279-793b-5b92-3b956a85a5b5@redhat.com>
-Date: Fri, 1 Sep 2017 21:26:46 +0200
+	(envelope-from <jsnow@redhat.com>) id 1dnrdI-0007PB-9C
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 15:29:40 -0400
+References: <20170901110706.429-1-otubo@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <af65a01a-d4a5-e043-b222-87bbaf797d2a@redhat.com>
+Date: Fri, 1 Sep 2017 15:29:27 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170831131412.GK17315@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="pHrIDOXX7lth1I5D36FKiRPh74GhjF0m8"
-Subject: Re: [Qemu-devel] [PATCH] scripts: Support building with Python 3
+In-Reply-To: <20170901110706.429-1-otubo@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] isa-fdc: assert replaced by proper error
+ exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,63 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, David Michael <fedora.dm0@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pHrIDOXX7lth1I5D36FKiRPh74GhjF0m8
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Peter Maydell <peter.maydell@linaro.org>,
- David Michael <fedora.dm0@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <a763a037-7279-793b-5b92-3b956a85a5b5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] scripts: Support building with Python 3
-References: <87r2w6eq5n.fsf@gmail.com> <87h8x1yox3.fsf@dusky.pond.sub.org>
- <20170830170941.GB24565@stefanha-x1.localdomain>
- <87bmmwi6r6.fsf@dusky.pond.sub.org>
- <CAFEAcA8r-EqOjZDvP=0mYG7QQ83MU-54RL9Bu8Eb_wPzQo1M7Q@mail.gmail.com>
- <87r2vrlwr3.fsf@dusky.pond.sub.org> <20170831131412.GK17315@redhat.com>
-In-Reply-To: <20170831131412.GK17315@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2017-08-31 15:14, Daniel P. Berrange wrote:
-
-[...]
-
-> NB, some distros have already changed /usr/bin/python to point to py3
-> so all the files with #!/usr/bin/python in QEMU are already broken on
-> those distros.
-
-For what it's worth, I (at least used to) build qemu regularly on Arch
-Linux and the only issue I encountered with this is that the iotests
-wouldn't work.  As a workaround, I made the check script detect that
-interpreter line and just run the script through the interpreter
-configured through --python, so it works now...
-
-So from what I could tell, everything worked when you specify
---python=3Dpython2.
-
-Max
+To: Eduardo Otubo <otubo@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, qemu-block@nongnu.org
 
 
---pHrIDOXX7lth1I5D36FKiRPh74GhjF0m8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+On 09/01/2017 07:07 AM, Eduardo Otubo wrote:
+> When not available, isa-fdc falls into assert instead of proper error
+> exit. This patch fixes this behavior.
+> 
+> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+> ---
+>  hw/block/fdc.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+> index 401129073b..0b6def4e1d 100644
+> --- a/hw/block/fdc.c
+> +++ b/hw/block/fdc.c
+> @@ -2699,11 +2699,15 @@ static void isabus_fdc_realize(DeviceState *dev, Error **errp)
+>      fdctrl->dma_chann = isa->dma;
+>      if (fdctrl->dma_chann != -1) {
+>          fdctrl->dma = isa_get_dma(isa_bus_from_device(isadev), isa->dma);
+> -        assert(fdctrl->dma);
+> +        if (!fdctrl->dma) {
+> +            error_setg(errp, "isa-fdc not supported");
+> +            goto error;
+> +        }
+>      }
+>  
+>      qdev_set_legacy_instance_id(dev, isa->iobase, 2);
+>      fdctrl_realize_common(dev, fdctrl, &err);
+> +error:
+>      if (err != NULL) {
+>          error_propagate(errp, err);
+>          return;
+> 
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlmptHcSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AuOgIAKHBO/UPeroCrGnLmVFaOwqvX7C/1njH
-swK2LCjkURhhfib9rQWATnffEehNN2apChAydvTP2uRyOGEiA2wmgpiNDvHqDUBN
-Zp0VpWWpaOz7yr3CMV552OBunIlCh1xh3Irsbek8BvLDNOdpaz/p1rzzy8uBe/Ga
-FkEV00Gpez2PSZmlUMJTnW2iexTvk37cSDvSA+0OsnlLeba8dbJufWNEq8eqR+HC
-5sy8DCNB9TbFoQMWvBIVPO68hQuk3MQyN2DEAMBZIeheFOHPA1EPwJ80R3jtwD7v
-uzwKuFjlmCjjA54KLGZ6aiQclCE9AWjqZi5HbkWA0Z13Xx+IYxpbMzk=
-=P4SA
------END PGP SIGNATURE-----
+I was going to ask if we needn't take care of undoing the portio or IRQ
+registration, but it turns out that there is not one single caller of
+portio_list_destroy in all of QEMU...
 
---pHrIDOXX7lth1I5D36FKiRPh74GhjF0m8--
+Paolo admitted as much in e3fb0ade83420a86464ee50c71f2daf5641cab10 when
+he updated the destroy function :)
+
+It looks like the way we assign IRQs to ISA devices is kind of simple
+and not trivial to undo correctly, so instead of barking up that tree,
+why don't we hoist the isa_get_dma call up and fail before we try to
+initialize portio or IRQs?
