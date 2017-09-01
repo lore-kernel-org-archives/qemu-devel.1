@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dno1F-0006XR-VZ
+	(envelope-from <armbru@redhat.com>) id 1dno1J-0006b7-Ls
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dno1B-0001bB-CX
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55790)
+	(envelope-from <armbru@redhat.com>) id 1dno1I-0001e7-5a
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33900)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dno1B-0001aa-3l
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:01 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dno1H-0001df-Rj
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:08 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 24F9C25C28
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:38:00 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-75.ams2.redhat.com
-	[10.36.116.75])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C0228A63DE
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:37:59 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C6D5E7EA9F
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:38:06 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 17:37:13 +0200
-Message-Id: <20170901153758.8628-3-armbru@redhat.com>
+Date: Fri,  1 Sep 2017 17:37:16 +0200
+Message-Id: <20170901153758.8628-6-armbru@redhat.com>
 In-Reply-To: <20170901153758.8628-1-armbru@redhat.com>
 References: <20170901153758.8628-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 02/47] tests/qmp-test: Add generic,
- basic test of query commands
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 05/47] qlit: move qlit from check-qjson to
+ qobject/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,302 +34,311 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-A command is a query if it has no side effect and yields a result.
-Such commands are typically named query-FOO, but there are exceptions.
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The basic idea is to find candidates with query-qmp-schema, filter out
-the ones that aren't queries with an explicit blacklist, and test the
-remaining ones against a QEMU with no special arguments.
+Fix code style issues while at it, to please checkpatch.
 
-The current blacklist is just add-fd.
-
-The test can't do queries with arguments, because it knows nothing
-about the arguments.  No coverage for query-cpu-model-baseline,
-query-cpu-model-comparison, query-cpu-model-expansion, query-rocker,
-query-rocker-ports, query-rocker-of-dpa-flows, and
-query-rocker-of-dpa-groups.
-
-Most tested commands are expected to succeed.  The test does not check
-the return value then.
-
-query-balloon and query-vm-generation-id are expected to fail because
-they need a virtio-balloon / vmgenid device to succeed, and this test
-is too dumb to set one up.  Could be addressed later.
-
-query-acpi-ospm-status and query-hotpluggable-cpus are expected to
-fail because they require features provided only by special machine
-types, and this test is too dumb to set that up.  Could also be
-addressed later.
-
-Several commands may either be functional or stubs that always fail,
-depending on build configuration.  Ideally, the stubs shouldn't be in
-query-qmp-schema, but that requires QAPI schema compile-time
-configuration, which we don't have, yet.  Until we do, we need to
-figure out whether a command is a stub.  When we have a suitable
-CONFIG_FOO preprocessor symbol is available, use that.  Else,
-simply blacklist the command for now.
-
-We get basic test coverage for the following commands, except as
-noted:
-
-    qom-list-types
-    query-acpi-ospm-status      (expected to fail)
-    query-balloon               (expected to fail)
-    query-block
-    query-block-jobs
-    query-blockstats
-    query-chardev
-    query-chardev-backends
-    query-command-line-options
-    query-commands
-    query-cpu-definitions       (blacklisted for now)
-    query-cpus
-    query-dump
-    query-dump-guest-memory-capability
-    query-events
-    query-fdsets
-    query-gic-capabilities      (blacklisted for now)
-    query-hotpluggable-cpus     (expected to fail)
-    query-iothreads
-    query-kvm
-    query-machines
-    query-memdev
-    query-memory-devices
-    query-mice
-    query-migrate
-    query-migrate-cache-size
-    query-migrate-capabilities
-    query-migrate-parameters
-    query-name
-    query-named-block-nodes
-    query-pci                   (blacklisted for now)
-    query-qmp-schema
-    query-rx-filter
-    query-spice
-    query-status
-    query-target
-    query-tpm
-    query-tpm-models
-    query-tpm-types
-    query-uuid
-    query-version
-    query-vm-generation-id      (expected to fail)
-    query-vnc
-    query-vnc-servers
-    query-xen-replication-status
-
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20170825105913.4060-3-marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1502461148-10154-1-git-send-email-armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-[Commit message typo fixed]
 ---
- tests/qmp-test.c | 182 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 181 insertions(+), 1 deletion(-)
+ include/qapi/qmp/qlit.h | 49 +++++++++++++++++++++++++
+ qobject/Makefile.objs   |  2 +-
+ qobject/qlit.c          | 89 +++++++++++++++++++++++++++++++++++++++++++=
+++
+ tests/check-qjson.c     | 96 +------------------------------------------=
+------
+ 4 files changed, 140 insertions(+), 96 deletions(-)
+ create mode 100644 include/qapi/qmp/qlit.h
+ create mode 100644 qobject/qlit.c
 
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 5d0260b2be..e5fb17c201 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -15,6 +15,7 @@
- #include "qapi-visit.h"
+diff --git a/include/qapi/qmp/qlit.h b/include/qapi/qmp/qlit.h
+new file mode 100644
+index 0000000000..280db5064a
+--- /dev/null
++++ b/include/qapi/qmp/qlit.h
+@@ -0,0 +1,49 @@
++/*
++ * Copyright IBM, Corp. 2009
++ * Copyright (c) 2013, 2015, 2017 Red Hat Inc.
++ *
++ * Authors:
++ *  Anthony Liguori   <aliguori@us.ibm.com>
++ *  Markus Armbruster <armbru@redhat.com>
++ *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
+ later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
++ */
++#ifndef QLIT_H
++#define QLIT_H
++
++#include "qapi-types.h"
++#include "qobject.h"
++
++typedef struct LiteralQDictEntry LiteralQDictEntry;
++typedef struct LiteralQObject LiteralQObject;
++
++struct LiteralQObject {
++    int type;
++    union {
++        int64_t qnum;
++        const char *qstr;
++        LiteralQDictEntry *qdict;
++        LiteralQObject *qlist;
++    } value;
++};
++
++struct LiteralQDictEntry {
++    const char *key;
++    LiteralQObject value;
++};
++
++#define QLIT_QNUM(val) \
++    (LiteralQObject){.type =3D QTYPE_QNUM, .value.qnum =3D (val)}
++#define QLIT_QSTR(val) \
++    (LiteralQObject){.type =3D QTYPE_QSTRING, .value.qstr =3D (val)}
++#define QLIT_QDICT(val) \
++    (LiteralQObject){.type =3D QTYPE_QDICT, .value.qdict =3D (val)}
++#define QLIT_QLIST(val) \
++    (LiteralQObject){.type =3D QTYPE_QLIST, .value.qlist =3D (val)}
++
++int compare_litqobj_to_qobj(LiteralQObject *lhs, QObject *rhs);
++
++#endif /* QLIT_H */
+diff --git a/qobject/Makefile.objs b/qobject/Makefile.objs
+index fc8885c9a4..002d25873a 100644
+--- a/qobject/Makefile.objs
++++ b/qobject/Makefile.objs
+@@ -1,2 +1,2 @@
+-util-obj-y =3D qnull.o qnum.o qstring.o qdict.o qlist.o qbool.o
++util-obj-y =3D qnull.o qnum.o qstring.o qdict.o qlist.o qbool.o qlit.o
+ util-obj-y +=3D qjson.o qobject.o json-lexer.o json-streamer.o json-pars=
+er.o
+diff --git a/qobject/qlit.c b/qobject/qlit.c
+new file mode 100644
+index 0000000000..5917c3584e
+--- /dev/null
++++ b/qobject/qlit.c
+@@ -0,0 +1,89 @@
++/*
++ * QLit literal qobject
++ *
++ * Copyright IBM, Corp. 2009
++ * Copyright (c) 2013, 2015, 2017 Red Hat Inc.
++ *
++ * Authors:
++ *  Anthony Liguori   <aliguori@us.ibm.com>
++ *  Markus Armbruster <armbru@redhat.com>
++ *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1 or=
+ later.
++ * See the COPYING.LIB file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++
++#include "qapi/qmp/qlit.h"
++#include "qapi/qmp/types.h"
++
++typedef struct QListCompareHelper {
++    int index;
++    LiteralQObject *objs;
++    int result;
++} QListCompareHelper;
++
++static void compare_helper(QObject *obj, void *opaque)
++{
++    QListCompareHelper *helper =3D opaque;
++
++    if (helper->result =3D=3D 0) {
++        return;
++    }
++
++    if (helper->objs[helper->index].type =3D=3D QTYPE_NONE) {
++        helper->result =3D 0;
++        return;
++    }
++
++    helper->result =3D
++        compare_litqobj_to_qobj(&helper->objs[helper->index++], obj);
++}
++
++int compare_litqobj_to_qobj(LiteralQObject *lhs, QObject *rhs)
++{
++    int64_t val;
++
++    if (!rhs || lhs->type !=3D qobject_type(rhs)) {
++        return 0;
++    }
++
++    switch (lhs->type) {
++    case QTYPE_QNUM:
++        g_assert(qnum_get_try_int(qobject_to_qnum(rhs), &val));
++        return lhs->value.qnum =3D=3D val;
++    case QTYPE_QSTRING:
++        return (strcmp(lhs->value.qstr,
++                       qstring_get_str(qobject_to_qstring(rhs))) =3D=3D =
+0);
++    case QTYPE_QDICT: {
++        int i;
++
++        for (i =3D 0; lhs->value.qdict[i].key; i++) {
++            QObject *obj =3D qdict_get(qobject_to_qdict(rhs),
++                                     lhs->value.qdict[i].key);
++
++            if (!compare_litqobj_to_qobj(&lhs->value.qdict[i].value, obj=
+)) {
++                return 0;
++            }
++        }
++
++        return 1;
++    }
++    case QTYPE_QLIST: {
++        QListCompareHelper helper;
++
++        helper.index =3D 0;
++        helper.objs =3D lhs->value.qlist;
++        helper.result =3D 1;
++
++        qlist_iter(qobject_to_qlist(rhs), compare_helper, &helper);
++
++        return helper.result;
++    }
++    default:
++        break;
++    }
++
++    return 0;
++}
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index a3a97b0d99..525f79e60b 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -16,6 +16,7 @@
  #include "qapi/error.h"
- #include "qapi/qobject-input-visitor.h"
-+#include "qapi/util.h"
- #include "qapi/visitor.h"
- 
- const char common_args[] = "-nodefaults -machine none";
-@@ -129,11 +130,190 @@ static void test_qmp_protocol(void)
-     qtest_end();
+ #include "qapi/qmp/types.h"
+ #include "qapi/qmp/qjson.h"
++#include "qapi/qmp/qlit.h"
+ #include "qemu-common.h"
+=20
+ static void escaped_string(void)
+@@ -1059,101 +1060,6 @@ static void keyword_literal(void)
+     QDECREF(null);
  }
- 
-+static int query_error_class(const char *cmd)
-+{
-+    static struct {
-+        const char *cmd;
-+        int err_class;
-+    } fails[] = {
-+        /* Success depends on build configuration: */
-+#ifndef CONFIG_SPICE
-+        "query-spice", ERROR_CLASS_COMMAND_NOT_FOUND,
-+#endif
-+#ifndef CONFIG_VNC
-+        "query-vnc", ERROR_CLASS_GENERIC_ERROR },
-+        "query-vnc-servers", ERROR_CLASS_GENERIC_ERROR },
-+#endif
-+#ifndef CONFIG_REPLICATION
-+        "query-xen-replication-spice", ERROR_CLASS_COMMAND_NOT_FOUND,
-+#endif
-+        /* Likewise, and require special QEMU command-line arguments: */
-+        { "query-acpi-ospm-status", ERROR_CLASS_GENERIC_ERROR },
-+        { "query-balloon", ERROR_CLASS_DEVICE_NOT_ACTIVE },
-+        { "query-hotpluggable-cpus", ERROR_CLASS_GENERIC_ERROR },
-+        { "query-vm-generation-id", ERROR_CLASS_GENERIC_ERROR },
-+        { NULL, -1 }
-+    };
-+    int i;
-+
-+    for (i = 0; fails[i].cmd; i++) {
-+        if (!strcmp(cmd, fails[i].cmd)) {
-+            return fails[i].err_class;
-+        }
-+    }
-+    return -1;
-+}
-+
-+static void test_query(const void *data)
-+{
-+    const char *cmd = data;
-+    int expected_error_class = query_error_class(cmd);
-+    QDict *resp, *error;
-+    const char *error_class;
-+
-+    qtest_start(common_args);
-+
-+    resp = qmp("{ 'execute': %s }", cmd);
-+    error = qdict_get_qdict(resp, "error");
-+    error_class = error ? qdict_get_str(error, "class") : NULL;
-+
-+    if (expected_error_class < 0) {
-+        g_assert(qdict_haskey(resp, "return"));
-+    } else {
-+        g_assert(error);
-+        g_assert_cmpint(qapi_enum_parse(QapiErrorClass_lookup, error_class,
-+                                        QAPI_ERROR_CLASS__MAX, -1,
-+                                        &error_abort),
-+                        ==, expected_error_class);
-+    }
-+    QDECREF(resp);
-+
-+    qtest_end();
-+}
-+
-+static bool query_is_blacklisted(const char *cmd)
-+{
-+    const char *blacklist[] = {
-+        /* Not actually queries: */
-+        "add-fd",
-+        /* Success depends on target arch: */
-+        "query-cpu-definitions",  /* arm, i386, ppc, s390x */
-+        "query-gic-capabilities", /* arm */
-+        /* Success depends on target-specific build configuration: */
-+        "query-pci",              /* CONFIG_PCI */
-+        NULL
-+    };
-+    int i;
-+
-+    for (i = 0; blacklist[i]; i++) {
-+        if (!strcmp(cmd, blacklist[i])) {
-+            return true;
-+        }
-+    }
-+    return false;
-+}
-+
-+typedef struct {
-+    SchemaInfoList *list;
-+    GHashTable *hash;
-+} QmpSchema;
-+
-+static void qmp_schema_init(QmpSchema *schema)
-+{
-+    QDict *resp;
-+    Visitor *qiv;
-+    SchemaInfoList *tail;
-+
-+    qtest_start(common_args);
-+    resp = qmp("{ 'execute': 'query-qmp-schema' }");
-+
-+    qiv = qobject_input_visitor_new(qdict_get(resp, "return"));
-+    visit_type_SchemaInfoList(qiv, NULL, &schema->list, &error_abort);
-+    visit_free(qiv);
-+
-+    QDECREF(resp);
-+    qtest_end();
-+
-+    schema->hash = g_hash_table_new(g_str_hash, g_str_equal);
-+
-+    /* Build @schema: hash table mapping entity name to SchemaInfo */
-+    for (tail = schema->list; tail; tail = tail->next) {
-+        g_hash_table_insert(schema->hash, tail->value->name, tail->value);
-+    }
-+}
-+
-+static SchemaInfo *qmp_schema_lookup(QmpSchema *schema, const char *name)
-+{
-+    return g_hash_table_lookup(schema->hash, name);
-+}
-+
-+static void qmp_schema_cleanup(QmpSchema *schema)
-+{
-+    qapi_free_SchemaInfoList(schema->list);
-+    g_hash_table_destroy(schema->hash);
-+}
-+
-+static bool object_type_has_mandatory_members(SchemaInfo *type)
-+{
-+    SchemaInfoObjectMemberList *tail;
-+
-+    g_assert(type->meta_type == SCHEMA_META_TYPE_OBJECT);
-+
-+    for (tail = type->u.object.members; tail; tail = tail->next) {
-+        if (!tail->value->has_q_default) {
-+            return true;
-+        }
-+    }
-+
-+    return false;
-+}
-+
-+static void add_query_tests(QmpSchema *schema)
-+{
-+    SchemaInfoList *tail;
-+    SchemaInfo *si, *arg_type, *ret_type;
-+    const char *test_name;
-+
-+    /* Test the query-like commands */
-+    for (tail = schema->list; tail; tail = tail->next) {
-+        si = tail->value;
-+        if (si->meta_type != SCHEMA_META_TYPE_COMMAND) {
-+            continue;
-+        }
-+
-+        if (query_is_blacklisted(si->name)) {
-+            continue;
-+        }
-+
-+        arg_type = qmp_schema_lookup(schema, si->u.command.arg_type);
-+        if (object_type_has_mandatory_members(arg_type)) {
-+            continue;
-+        }
-+
-+        ret_type = qmp_schema_lookup(schema, si->u.command.ret_type);
-+        if (ret_type->meta_type == SCHEMA_META_TYPE_OBJECT
-+            && !ret_type->u.object.members) {
-+            continue;
-+        }
-+
-+        test_name = g_strdup_printf("qmp/%s", si->name);
-+        qtest_add_data_func(test_name, si->name, test_query);
-+    }
-+}
-+
- int main(int argc, char *argv[])
+=20
+-typedef struct LiteralQDictEntry LiteralQDictEntry;
+-typedef struct LiteralQObject LiteralQObject;
+-
+-struct LiteralQObject
+-{
+-    int type;
+-    union {
+-        int64_t qnum;
+-        const char *qstr;
+-        LiteralQDictEntry *qdict;
+-        LiteralQObject *qlist;
+-    } value;
+-};
+-
+-struct LiteralQDictEntry
+-{
+-    const char *key;
+-    LiteralQObject value;
+-};
+-
+-#define QLIT_QNUM(val) (LiteralQObject){.type =3D QTYPE_QNUM, .value.qnu=
+m =3D (val)}
+-#define QLIT_QSTR(val) (LiteralQObject){.type =3D QTYPE_QSTRING, .value.=
+qstr =3D (val)}
+-#define QLIT_QDICT(val) (LiteralQObject){.type =3D QTYPE_QDICT, .value.q=
+dict =3D (val)}
+-#define QLIT_QLIST(val) (LiteralQObject){.type =3D QTYPE_QLIST, .value.q=
+list =3D (val)}
+-
+-typedef struct QListCompareHelper
+-{
+-    int index;
+-    LiteralQObject *objs;
+-    int result;
+-} QListCompareHelper;
+-
+-static int compare_litqobj_to_qobj(LiteralQObject *lhs, QObject *rhs);
+-
+-static void compare_helper(QObject *obj, void *opaque)
+-{
+-    QListCompareHelper *helper =3D opaque;
+-
+-    if (helper->result =3D=3D 0) {
+-        return;
+-    }
+-
+-    if (helper->objs[helper->index].type =3D=3D QTYPE_NONE) {
+-        helper->result =3D 0;
+-        return;
+-    }
+-
+-    helper->result =3D compare_litqobj_to_qobj(&helper->objs[helper->ind=
+ex++], obj);
+-}
+-
+-static int compare_litqobj_to_qobj(LiteralQObject *lhs, QObject *rhs)
+-{
+-    int64_t val;
+-
+-    if (!rhs || lhs->type !=3D qobject_type(rhs)) {
+-        return 0;
+-    }
+-
+-    switch (lhs->type) {
+-    case QTYPE_QNUM:
+-        g_assert(qnum_get_try_int(qobject_to_qnum(rhs), &val));
+-        return lhs->value.qnum =3D=3D val;
+-    case QTYPE_QSTRING:
+-        return (strcmp(lhs->value.qstr, qstring_get_str(qobject_to_qstri=
+ng(rhs))) =3D=3D 0);
+-    case QTYPE_QDICT: {
+-        int i;
+-
+-        for (i =3D 0; lhs->value.qdict[i].key; i++) {
+-            QObject *obj =3D qdict_get(qobject_to_qdict(rhs), lhs->value=
+.qdict[i].key);
+-
+-            if (!compare_litqobj_to_qobj(&lhs->value.qdict[i].value, obj=
+)) {
+-                return 0;
+-            }
+-        }
+-
+-        return 1;
+-    }
+-    case QTYPE_QLIST: {
+-        QListCompareHelper helper;
+-
+-        helper.index =3D 0;
+-        helper.objs =3D lhs->value.qlist;
+-        helper.result =3D 1;
+-       =20
+-        qlist_iter(qobject_to_qlist(rhs), compare_helper, &helper);
+-
+-        return helper.result;
+-    }
+-    default:
+-        break;
+-    }
+-
+-    return 0;
+-}
+-
+ static void simple_dict(void)
  {
-+    QmpSchema schema;
-+    int ret;
-+
-     g_test_init(&argc, &argv, NULL);
- 
-     qtest_add_func("qmp/protocol", test_qmp_protocol);
-+    qmp_schema_init(&schema);
-+    add_query_tests(&schema);
- 
--    return g_test_run();
-+    ret = g_test_run();
-+
-+    qmp_schema_cleanup(&schema);
-+    return ret;
- }
--- 
+     int i;
+--=20
 2.13.5
