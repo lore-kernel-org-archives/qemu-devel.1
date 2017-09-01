@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnqmm-00028r-KD
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:35:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1dnqw4-0005p3-M0
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:45:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnqmj-0007Rh-Gt
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:35:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48304)
+	(envelope-from <eblake@redhat.com>) id 1dnqw1-0003KP-K5
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:44:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43990)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnqmj-0007RB-86
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:35:17 -0400
-References: <20170901152200.5953-1-famz@redhat.com>
-	<20170901152200.5953-4-famz@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnqw1-0003K9-B1
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:44:53 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3BF1CC056784
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 18:44:52 +0000 (UTC)
+References: <150429070706.231.1744967003803393863@b5667b65043c>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <dc1cf740-09d8-edfd-c953-e559395363cd@redhat.com>
-Date: Fri, 1 Sep 2017 13:35:12 -0500
+Message-ID: <246d9e59-ff55-a86d-57ab-4a3bbf26b246@redhat.com>
+Date: Fri, 1 Sep 2017 13:44:48 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170901152200.5953-4-famz@redhat.com>
+In-Reply-To: <150429070706.231.1744967003803393863@b5667b65043c>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="EiNgTbJdAHftqc9XEQ1mVfh823UCKsFn3"
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] docker: Add test-block
+	boundary="cujCjnhW2ufr3hdgFe4fADWnFlIQA4FK2"
+Subject: Re: [Qemu-devel] [PATCH v6 00/29] Preliminary libqtest cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +33,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, kchamart@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, pbonzini@redhat.com, armbru@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EiNgTbJdAHftqc9XEQ1mVfh823UCKsFn3
+--cujCjnhW2ufr3hdgFe4fADWnFlIQA4FK2
 From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, kchamart@redhat.com,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <dc1cf740-09d8-edfd-c953-e559395363cd@redhat.com>
-Subject: Re: [PATCH v3 3/3] docker: Add test-block
-References: <20170901152200.5953-1-famz@redhat.com>
- <20170901152200.5953-4-famz@redhat.com>
-In-Reply-To: <20170901152200.5953-4-famz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, pbonzini@redhat.com, armbru@redhat.com
+Message-ID: <246d9e59-ff55-a86d-57ab-4a3bbf26b246@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 00/29] Preliminary libqtest cleanups
+References: <150429070706.231.1744967003803393863@b5667b65043c>
+In-Reply-To: <150429070706.231.1744967003803393863@b5667b65043c>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 09/01/2017 10:22 AM, Fam Zheng wrote:
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  tests/docker/test-block | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
->  create mode 100755 tests/docker/test-block
+On 09/01/2017 01:31 PM, no-reply@patchew.org wrote:
+> Hi,
 >=20
-> diff --git a/tests/docker/test-block b/tests/docker/test-block
-> new file mode 100755
-> index 0000000000..efc77b4b91
-> --- /dev/null
-> +++ b/tests/docker/test-block
-> @@ -0,0 +1,22 @@
-> +#!/bin/bash -e
+> This series failed automatic build test. Please find the testing comman=
+ds and
+> their output below. If you have docker installed, you can probably repr=
+oduce it
+> locally.
+>=20
+>   CC      tests/libqos/pci.o
+>   CC      tests/libqos/fw_cfg.o
+>   CC      tests/libqos/malloc.o
+> In file included from /tmp/qemu-test/src/tests/libqos/fw_cfg.c:18:
+> /tmp/qemu-test/src/tests/libqtest.h:22: error: redefinition of typedef =
+=E2=80=98QTestState=E2=80=99
+> /tmp/qemu-test/src/tests/libqos/fw_cfg.h:18: note: previous declaration=
+ of =E2=80=98QTestState=E2=80=99 was here
+> make: *** [tests/libqos/fw_cfg.o] Error 1
+> make: *** Waiting for unfinished jobs....
 
-'set -e' is awful; it exists for backwards-compatibility with shell
-scripts that pre-date functions, but is NOT intuitive and generally does
-NOT do what you want when shell functions are added to the mix.  You're
-better off doing manual error checking than relying on 'set -e' to check
-for errors on your behalf.
-
-> +#
-> +# Run block test cases
-> +#
-> +# Copyright (c) 2017 Red Hat Inc.
-> +#
-> +# Authors:
-> +#  Fam Zheng <famz@redhat.com>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2
-> +# or (at your option) any later version. See the COPYING file in
-> +# the top-level directory.
-> +
-> +. common.rc
-
-Are we sure that '.' is early enough on $PATH that this will pick up the
-right common.rc? Safer is '. ./common.rc'.
-
-> +
-> +cd "$BUILD_DIR"
-> +
-> +build_qemu --target-list=3Dx86_64-softmmu
-> +cd tests/qemu-iotests
-> +for t in raw qcow2 nbd luks; do
-> +    ./check -g quick -$t
-> +done
-
-That said, this script (and common.rc) is small enough to verify that
-you probably aren't going to trip over those non-intuitive 'set -e'
-behaviors, so the real reason to avoid it is if we want to be able to
-copy-and-paste into other scripts that aren't using 'set -e' (on the
-premise that avoiding implicit global state, like 'set -e', and being
-explicit instead, is a good thing).
+Legitimate complaint due to different gcc version; I'll send a fixup
+patch for the offending commit.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -106,7 +77,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---EiNgTbJdAHftqc9XEQ1mVfh823UCKsFn3
+--cujCjnhW2ufr3hdgFe4fADWnFlIQA4FK2
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -115,14 +86,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmpqGAACgkQp6FrSiUn
-Q2q6EggAhpPbR11T0hXHKVOWKHeejrjKuXq9YZbUd3f2rOVUjnjOO19R9IXkW5Jg
-FSS12RPEKNnshKFCATxvlCBVSZa+GMRfAQ7kfYc6sJaTwUraBYMhQtUR2KslyE0Y
-hhAdC94ts6qNc5/oOtOFUA7u2I6LekVZ9n7rm0KpX/jJKzFcnEHWDkvQHNHc6W5V
-dSCz2gmdNwWVCli1rkBJx6yzNp9DhFShQfttR8VnnUOiPkqpfKIB2OQXCo+LnM65
-TqQiJdcehV+EcVnCEmA5jmBtMNLgLa+n4g8kSkmC4XWLAk4eQO3X1B0m6QB0zEdZ
-qUyX0/lIEO26dbvlS4AHGpUu6ksxwQ==
-=m/ql
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmpqqAACgkQp6FrSiUn
+Q2psGQf/TvgzSO7THliQwfWz8ZzmwuDhL01QaWdcehHPkLglSUaK2LGvoYmnbuDc
+neWwTv5In0ZYb3CvyZzjygwbWkn5urdkiHDA6v8pLPFUgg0z5B7WqBmujccNoHdn
+igUVFf+vp4pyH9QX6Eu0Bujj5RsAWM5qrfcvQ5PuLe3E0clCG8AQjd1EOKDZFBWe
+LfQGpnU8xFv94NgYSnpynSQLTIdluRyVs/ixPvhe5XF8FewEfcX8judLp4gA6AHg
+GYrs6tt+hmqkO6CZnJhnVFoNnKws24EnaaS9JhzA5G2kKKEMBz1XaKg+rZVOYID0
+SNlWXlaWqPrWNcjakM0K2OePvKhZVA==
+=TSx/
 -----END PGP SIGNATURE-----
 
---EiNgTbJdAHftqc9XEQ1mVfh823UCKsFn3--
+--cujCjnhW2ufr3hdgFe4fADWnFlIQA4FK2--
