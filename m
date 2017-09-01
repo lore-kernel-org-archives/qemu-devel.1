@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnZoS-0000jQ-DE
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:27:57 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dnZyN-0004MC-1h
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:38:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnZoN-0001gQ-A1
-	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:27:56 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170901001502.29915-1-jsnow@redhat.com>
-	<20170901001502.29915-6-jsnow@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b16eaf48-2452-8f9f-547d-b9ac999be308@amsat.org>
-Date: Thu, 31 Aug 2017 21:27:46 -0300
+	(envelope-from <jsnow@redhat.com>) id 1dnZyL-0006IX-Pk
+	for qemu-devel@nongnu.org; Thu, 31 Aug 2017 20:38:11 -0400
+References: <150422562278.204.10709806603962737796@b5667b65043c>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <431cc1c3-adaf-0159-93f4-d5ed76aea4b3@redhat.com>
+Date: Thu, 31 Aug 2017 20:37:57 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170901001502.29915-6-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <150422562278.204.10709806603962737796@b5667b65043c>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 5/9] IDE: replace DEBUG_AIO with trace
- events
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/9] IDE: replace printfs with tracing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,133 +23,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: eblake@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com, f4bug@amsat.org
 
-On 08/31/2017 09:14 PM, John Snow wrote:
-> Signed-off-by: John Snow <jsnow@redhat.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> ---
->   hw/ide/atapi.c            |  5 +----
->   hw/ide/core.c             | 24 +++++++++++++++++-------
->   hw/ide/trace-events       |  3 +++
->   include/hw/ide/internal.h |  6 ++++--
->   4 files changed, 25 insertions(+), 13 deletions(-)
+On 08/31/2017 08:27 PM, no-reply@patchew.org wrote:
+> Hi,
 > 
-> diff --git a/hw/ide/atapi.c b/hw/ide/atapi.c
-> index 9b84a1b..c0509c8 100644
-> --- a/hw/ide/atapi.c
-> +++ b/hw/ide/atapi.c
-> @@ -416,10 +416,7 @@ static void ide_atapi_cmd_read_dma_cb(void *opaque, int ret)
->           s->io_buffer_size = n * 2048;
->           data_offset = 0;
->       }
-> -#ifdef DEBUG_AIO
-> -    printf("aio_read_cd: lba=%u n=%d\n", s->lba, n);
-> -#endif
-> -
-> +    trace_ide_atapi_cmd_read_dma_cb_aio(s, s->lba, n);
->       s->bus->dma->iov.iov_base = (void *)(s->io_buffer + data_offset);
->       s->bus->dma->iov.iov_len = n * ATAPI_SECTOR_SIZE;
->       qemu_iovec_init_external(&s->bus->dma->qiov, &s->bus->dma->iov, 1);
-> diff --git a/hw/ide/core.c b/hw/ide/core.c
-> index 82a19b1..2cc2a08 100644
-> --- a/hw/ide/core.c
-> +++ b/hw/ide/core.c
-> @@ -58,6 +58,21 @@ static const int smart_attributes[][12] = {
->       { 190,  0x03, 0x00, 0x45, 0x45, 0x1f, 0x00, 0x1f, 0x1f, 0x00, 0x00, 0x32},
->   };
->   
-> +const char *IDE_DMA_CMD_lookup[IDE_DMA__COUNT] = {
-> +    [IDE_DMA_READ] = "DMA READ",
-> +    [IDE_DMA_WRITE] = "DMA WRITE",
-> +    [IDE_DMA_TRIM] = "DMA TRIM",
-> +    [IDE_DMA_ATAPI] = "DMA ATAPI"
-> +};
-> +
-> +static const char *IDE_DMA_CMD_str(enum ide_dma_cmd enval)
-> +{
-> +    if (enval >= 0 && enval < IDE_DMA__COUNT) {
-> +        return IDE_DMA_CMD_lookup[enval];
-> +    }
-> +    return "DMA UNKNOWN CMD";
-> +}
-> +
->   static void ide_dummy_transfer_stop(IDEState *s);
->   
->   static void padstr(char *str, const char *src, int len)
-> @@ -860,10 +875,7 @@ static void ide_dma_cb(void *opaque, int ret)
->           goto eot;
->       }
->   
-> -#ifdef DEBUG_AIO
-> -    printf("ide_dma_cb: sector_num=%" PRId64 " n=%d, cmd_cmd=%d\n",
-> -           sector_num, n, s->dma_cmd);
-> -#endif
-> +    trace_ide_dma_cb(s, sector_num, n, IDE_DMA_CMD_str(s->dma_cmd));
->   
->       if ((s->dma_cmd == IDE_DMA_READ || s->dma_cmd == IDE_DMA_WRITE) &&
->           !ide_sect_range_ok(s, sector_num, n)) {
-> @@ -2391,9 +2403,7 @@ void ide_bus_reset(IDEBus *bus)
->   
->       /* pending async DMA */
->       if (bus->dma->aiocb) {
-> -#ifdef DEBUG_AIO
-> -        printf("aio_cancel\n");
-> -#endif
-> +        trace_ide_bus_reset_aio();
->           blk_aio_cancel(bus->dma->aiocb);
->           bus->dma->aiocb = NULL;
->       }
-> diff --git a/hw/ide/trace-events b/hw/ide/trace-events
-> index 8c79a6c..cc8949c 100644
-> --- a/hw/ide/trace-events
-> +++ b/hw/ide/trace-events
-> @@ -18,6 +18,8 @@ ide_cancel_dma_sync_remaining(void) "draining all remaining requests"
->   ide_sector_read(int64_t sector_num, int nsectors) "sector=%"PRId64" nsectors=%d"
->   ide_sector_write(int64_t sector_num, int nsectors) "sector=%"PRId64" nsectors=%d"
->   ide_reset(void *s) "IDEstate %p"
-> +ide_bus_reset_aio(void) "aio_cancel"
-> +ide_dma_cb(void *s, int64_t sector_num, int n, const char *dma) "IDEState %p; sector_num=%"PRId64" n=%d cmd=%s"
->   
->   # BMDMA HBAs:
->   
-> @@ -51,5 +53,6 @@ ide_atapi_cmd_reply_end_new(void *s, int status) "IDEState: %p; new transfer sta
->   ide_atapi_cmd_check_status(void *s) "IDEState: %p"
->   ide_atapi_cmd_read(void *s, const char *method, int lba, int nb_sectors) "IDEState: %p; read %s: LBA=%d nb_sectors=%d"
->   ide_atapi_cmd(void *s, uint8_t cmd) "IDEState: %p; cmd: 0x%02x"
-> +ide_atapi_cmd_read_dma_cb_aio(void *s, int lba, int n) "IDEState: %p; aio read: lba=%d n=%d"
->   # Warning: Verbose
->   ide_atapi_cmd_packet(void *s, uint16_t limit, const char *packet) "IDEState: %p; limit=0x%x packet: %s"
-> diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
-> index 74efe8a..db9fde0 100644
-> --- a/include/hw/ide/internal.h
-> +++ b/include/hw/ide/internal.h
-> @@ -14,7 +14,6 @@
->   #include "block/scsi.h"
->   
->   /* debug IDE devices */
-> -//#define DEBUG_AIO
->   #define USE_DMA_CDROM
->   
->   typedef struct IDEBus IDEBus;
-> @@ -333,12 +332,15 @@ struct unreported_events {
->   };
->   
->   enum ide_dma_cmd {
-> -    IDE_DMA_READ,
-> +    IDE_DMA_READ = 0,
->       IDE_DMA_WRITE,
->       IDE_DMA_TRIM,
->       IDE_DMA_ATAPI,
-> +    IDE_DMA__COUNT
->   };
->   
-> +extern const char *IDE_DMA_CMD_lookup[IDE_DMA__COUNT];
-> +
->   #define ide_cmd_is_read(s) \
->   	((s)->dma_cmd == IDE_DMA_READ)
->   
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Message-id: 20170901001502.29915-1-jsnow@redhat.com
+> Subject: [Qemu-devel] [PATCH v3 0/9] IDE: replace printfs with tracing
+> Type: series
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> 
+> BASE=base
+> n=1
+> total=$(git log --oneline $BASE.. | wc -l)
+> failed=0
+> 
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> 
+> commits="$(git log --format=%H --reverse $BASE..)"
+> for c in $commits; do
+>     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
+>     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
+>         failed=1
+>         echo
+>     fi
+>     n=$((n+1))
+> done
+> 
+> exit $failed
+> === TEST SCRIPT END ===
+> 
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> From https://github.com/patchew-project/qemu
+>  t [tag update]            patchew/1503938283-12404-1-git-send-email-sundeep.lkml@gmail.com -> patchew/1503938283-12404-1-git-send-email-sundeep.lkml@gmail.com
+>  t [tag update]            patchew/1504190408-11143-1-git-send-email-thuth@redhat.com -> patchew/1504190408-11143-1-git-send-email-thuth@redhat.com
+>  * [new tag]               patchew/20170901001502.29915-1-jsnow@redhat.com -> patchew/20170901001502.29915-1-jsnow@redhat.com
+> Switched to a new branch 'test'
+> b45bc7135d AHCI: remove DPRINTF macro
+> 52a114ea94 AHCI: pretty-print FIS to buffer instead of stderr
+> dc1fb9df07 AHCI: Rework IRQ constants
+> 01eb2629b7 AHCI: Replace DPRINTF with trace-events
+> b64224c313 IDE: replace DEBUG_AIO with trace events
+> 0a54222e15 ATAPI: Replace DEBUG_IDE_ATAPI with tracing events
+> 1c976d454b IDE: add tracing for data ports
+> b46b3c2141 IDE: Add register hints to tracing
+> 1da9fe67ec IDE: replace DEBUG_IDE with tracing system
+> 
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/9: IDE: replace DEBUG_IDE with tracing system...
+> ERROR: spaces required around that '|' (ctx:VxV)
+> #143: FILE: hw/ide/core.c:1197:
+> +    if (reg_num != 7 && (s->status & (BUSY_STAT|DRQ_STAT))) {
+
+Existing damage, but I suppose I'll fix it since I'm here.
+
+>                                                 ^
+> 
+> total: 1 errors, 0 warnings, 337 lines checked
+> 
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> Checking PATCH 2/9: IDE: Add register hints to tracing...
+> Checking PATCH 3/9: IDE: add tracing for data ports...
+> Checking PATCH 4/9: ATAPI: Replace DEBUG_IDE_ATAPI with tracing events...
+> Checking PATCH 5/9: IDE: replace DEBUG_AIO with trace events...
+> Checking PATCH 6/9: AHCI: Replace DPRINTF with trace-events...
+> ERROR: Hex numbers must be prefixed with '0x'
+> #544: FILE: hw/ide/trace-events:91:
+> +handle_reg_h2d_fis_pmp(void *s, int port, char b0, char b1, char b2) "ahci(%p)[%d]: Port Multiplier not supported, FIS: 0x%02x-%02x-%02x"
+> 
+
+False positive, it's part of a hex sequence so the context is obvious.
+
+> ERROR: Hex numbers must be prefixed with '0x'
+> #545: FILE: hw/ide/trace-events:92:
+> +handle_reg_h2d_fis_res(void *s, int port, char b0, char b1, char b2) "ahci(%p)[%d]: Reserved flags set in H2D Register FIS, FIS: 0x%02x-%02x-%02x"
+> 
+
+Same
+
+> ERROR: Hex numbers must be prefixed with '0x'
+> #551: FILE: hw/ide/trace-events:98:
+> +handle_cmd_unhandled_fis(void *s, int port, uint8_t b0, uint8_t b1, uint8_t b2) "ahci(%p)[%d]: unhandled FIS type. cmd_fis: 0x%02x-%02x-%02x"
+> 
+
+Same
+
+> total: 3 errors, 0 warnings, 496 lines checked
+> 
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> Checking PATCH 7/9: AHCI: Rework IRQ constants...
+> Checking PATCH 8/9: AHCI: pretty-print FIS to buffer instead of stderr...
+> WARNING: line over 80 characters
+> #52: FILE: hw/ide/ahci.c:1206:
+> +            char *pretty_fis = ahci_pretty_buffer_fis(ide_state->io_buffer, 0x10);
+> 
+
+Will adjust.
+
+> total: 0 errors, 1 warnings, 60 lines checked
+> 
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> Checking PATCH 9/9: AHCI: remove DPRINTF macro...
+> === OUTPUT END ===
+> 
+> Test command exited with code: 1
+> 
+> 
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@freelists.org
 > 
