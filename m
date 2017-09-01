@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUq-0000PK-GT
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:34 -0400
+	(envelope-from <armbru@redhat.com>) id 1dnlUs-0000T7-M1
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUj-0007N6-QQ
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52804)
+	(envelope-from <armbru@redhat.com>) id 1dnlUk-0007Of-QY
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35678)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUj-0007Lb-C2
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:21 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUk-0007My-FH
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:22 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4A20191FFD
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:21 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 14:55:51 +0200
-Message-Id: <20170901125611.29295-28-armbru@redhat.com>
+Date: Fri,  1 Sep 2017 14:56:01 +0200
+Message-Id: <20170901125611.29295-38-armbru@redhat.com>
 In-Reply-To: <20170901125611.29295-1-armbru@redhat.com>
 References: <20170901125611.29295-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 27/47] qapi-schema: Move block events from
- event.json to block.json
+Subject: [Qemu-devel] [PULL 37/47] hmp: Use qapi_enum_parse() in
+ hmp_migrate_set_parameter()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,186 +34,191 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alberto Garcia <berto@igalia.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Cc: Alberto Garcia <berto@igalia.com>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+The error message on invalid parameter name changes from
+
+    Invalid parameter "NAME"
+
+to
+
+    invalid parameter value: NAME
+
+Slight degratation, perhaps.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20170822132255.23945-10-marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+[Rebased, assertion added, commit message rewritten]
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1503602048-12268-13-git-send-email-armbru@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <1503564371-26090-7-git-send-email-armbru@redhat.com>
 ---
- qapi/block.json | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- qapi/event.json | 68 ---------------------------------------------------=
+ hmp.c | 138 +++++++++++++++++++++++++++++++++---------------------------=
 ------
- 2 files changed, 68 insertions(+), 68 deletions(-)
+ 1 file changed, 68 insertions(+), 70 deletions(-)
 
-diff --git a/qapi/block.json b/qapi/block.json
-index 414b61bde7..8ce335739f 100644
---- a/qapi/block.json
-+++ b/qapi/block.json
-@@ -277,3 +277,71 @@
- ##
- { 'enum': 'QuorumOpType',
-   'data': [ 'read', 'write', 'flush' ] }
-+
-+##
-+# @QUORUM_FAILURE:
-+#
-+# Emitted by the Quorum block driver if it fails to establish a quorum
-+#
-+# @reference: device name if defined else node name
-+#
-+# @sector-num: number of the first sector of the failed read operation
-+#
-+# @sectors-count: failed read operation sector count
-+#
-+# Note: This event is rate-limited.
-+#
-+# Since: 2.0
-+#
-+# Example:
-+#
-+# <- { "event": "QUORUM_FAILURE",
-+#      "data": { "reference": "usr1", "sector-num": 345435, "sectors-cou=
-nt": 5 },
-+#      "timestamp": { "seconds": 1344522075, "microseconds": 745528 } }
-+#
-+##
-+{ 'event': 'QUORUM_FAILURE',
-+  'data': { 'reference': 'str', 'sector-num': 'int', 'sectors-count': 'i=
-nt' } }
-+
-+##
-+# @QUORUM_REPORT_BAD:
-+#
-+# Emitted to report a corruption of a Quorum file
-+#
-+# @type: quorum operation type (Since 2.6)
-+#
-+# @error: error message. Only present on failure. This field
-+#         contains a human-readable error message. There are no semantic=
-s other
-+#         than that the block layer reported an error and clients should=
- not
-+#         try to interpret the error string.
-+#
-+# @node-name: the graph node name of the block driver state
-+#
-+# @sector-num: number of the first sector of the failed read operation
-+#
-+# @sectors-count: failed read operation sector count
-+#
-+# Note: This event is rate-limited.
-+#
-+# Since: 2.0
-+#
-+# Example:
-+#
-+# 1. Read operation
-+#
-+# { "event": "QUORUM_REPORT_BAD",
-+#      "data": { "node-name": "node0", "sector-num": 345435, "sectors-co=
-unt": 5,
-+#                "type": "read" },
-+#      "timestamp": { "seconds": 1344522075, "microseconds": 745528 } }
-+#
-+# 2. Flush operation
-+#
-+# { "event": "QUORUM_REPORT_BAD",
-+#      "data": { "node-name": "node0", "sector-num": 0, "sectors-count":=
- 2097120,
-+#                "type": "flush", "error": "Broken pipe" },
-+#      "timestamp": { "seconds": 1456406829, "microseconds": 291763 } }
-+#
-+##
-+{ 'event': 'QUORUM_REPORT_BAD',
-+  'data': { 'type': 'QuorumOpType', '*error': 'str', 'node-name': 'str',
-+            'sector-num': 'int', 'sectors-count': 'int' } }
-diff --git a/qapi/event.json b/qapi/event.json
-index a043de4cd8..48a5d8fb21 100644
---- a/qapi/event.json
-+++ b/qapi/event.json
-@@ -92,74 +92,6 @@
-   'data': { 'actual': 'int' } }
+diff --git a/hmp.c b/hmp.c
+index 7e0bd3d63b..2b6e919501 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1556,84 +1556,82 @@ void hmp_migrate_set_parameter(Monitor *mon, cons=
+t QDict *qdict)
+     MigrateSetParameters *p =3D g_new0(MigrateSetParameters, 1);
+     uint64_t valuebw =3D 0;
+     Error *err =3D NULL;
+-    int i, ret;
++    int val, ret;
 =20
- ##
--# @QUORUM_FAILURE:
--#
--# Emitted by the Quorum block driver if it fails to establish a quorum
--#
--# @reference: device name if defined else node name
--#
--# @sector-num: number of the first sector of the failed read operation
--#
--# @sectors-count: failed read operation sector count
--#
--# Note: This event is rate-limited.
--#
--# Since: 2.0
--#
--# Example:
--#
--# <- { "event": "QUORUM_FAILURE",
--#      "data": { "reference": "usr1", "sector-num": 345435, "sectors-cou=
-nt": 5 },
--#      "timestamp": { "seconds": 1344522075, "microseconds": 745528 } }
--#
--##
--{ 'event': 'QUORUM_FAILURE',
--  'data': { 'reference': 'str', 'sector-num': 'int', 'sectors-count': 'i=
-nt' } }
+-    for (i =3D 0; i < MIGRATION_PARAMETER__MAX; i++) {
+-        if (strcmp(param, MigrationParameter_lookup[i]) =3D=3D 0) {
+-            switch (i) {
+-            case MIGRATION_PARAMETER_COMPRESS_LEVEL:
+-                p->has_compress_level =3D true;
+-                visit_type_int(v, param, &p->compress_level, &err);
+-                break;
+-            case MIGRATION_PARAMETER_COMPRESS_THREADS:
+-                p->has_compress_threads =3D true;
+-                visit_type_int(v, param, &p->compress_threads, &err);
+-                break;
+-            case MIGRATION_PARAMETER_DECOMPRESS_THREADS:
+-                p->has_decompress_threads =3D true;
+-                visit_type_int(v, param, &p->decompress_threads, &err);
+-                break;
+-            case MIGRATION_PARAMETER_CPU_THROTTLE_INITIAL:
+-                p->has_cpu_throttle_initial =3D true;
+-                visit_type_int(v, param, &p->cpu_throttle_initial, &err)=
+;
+-                break;
+-            case MIGRATION_PARAMETER_CPU_THROTTLE_INCREMENT:
+-                p->has_cpu_throttle_increment =3D true;
+-                visit_type_int(v, param, &p->cpu_throttle_increment, &er=
+r);
+-                break;
+-            case MIGRATION_PARAMETER_TLS_CREDS:
+-                p->has_tls_creds =3D true;
+-                p->tls_creds =3D g_new0(StrOrNull, 1);
+-                p->tls_creds->type =3D QTYPE_QSTRING;
+-                visit_type_str(v, param, &p->tls_creds->u.s, &err);
+-                break;
+-            case MIGRATION_PARAMETER_TLS_HOSTNAME:
+-                p->has_tls_hostname =3D true;
+-                p->tls_hostname =3D g_new0(StrOrNull, 1);
+-                p->tls_hostname->type =3D QTYPE_QSTRING;
+-                visit_type_str(v, param, &p->tls_hostname->u.s, &err);
+-                break;
+-            case MIGRATION_PARAMETER_MAX_BANDWIDTH:
+-                p->has_max_bandwidth =3D true;
+-                /*
+-                 * Can't use visit_type_size() here, because it
+-                 * defaults to Bytes rather than Mebibytes.
+-                 */
+-                ret =3D qemu_strtosz_MiB(valuestr, NULL, &valuebw);
+-                if (ret < 0 || valuebw > INT64_MAX
+-                    || (size_t)valuebw !=3D valuebw) {
+-                    error_setg(&err, "Invalid size %s", valuestr);
+-                    break;
+-                }
+-                p->max_bandwidth =3D valuebw;
+-                break;
+-            case MIGRATION_PARAMETER_DOWNTIME_LIMIT:
+-                p->has_downtime_limit =3D true;
+-                visit_type_int(v, param, &p->downtime_limit, &err);
+-                break;
+-            case MIGRATION_PARAMETER_X_CHECKPOINT_DELAY:
+-                p->has_x_checkpoint_delay =3D true;
+-                visit_type_int(v, param, &p->x_checkpoint_delay, &err);
+-                break;
+-            case MIGRATION_PARAMETER_BLOCK_INCREMENTAL:
+-                p->has_block_incremental =3D true;
+-                visit_type_bool(v, param, &p->block_incremental, &err);
+-                break;
+-            }
++    val =3D qapi_enum_parse(MigrationParameter_lookup, param, -1, &err);
++    if (val < 0) {
++        goto cleanup;
++    }
+=20
+-            if (err) {
+-                goto cleanup;
+-            }
 -
--##
--# @QUORUM_REPORT_BAD:
--#
--# Emitted to report a corruption of a Quorum file
--#
--# @type: quorum operation type (Since 2.6)
--#
--# @error: error message. Only present on failure. This field
--#         contains a human-readable error message. There are no semantic=
-s other
--#         than that the block layer reported an error and clients should=
- not
--#         try to interpret the error string.
--#
--# @node-name: the graph node name of the block driver state
--#
--# @sector-num: number of the first sector of the failed read operation
--#
--# @sectors-count: failed read operation sector count
--#
--# Note: This event is rate-limited.
--#
--# Since: 2.0
--#
--# Example:
--#
--# 1. Read operation
--#
--# { "event": "QUORUM_REPORT_BAD",
--#      "data": { "node-name": "node0", "sector-num": 345435, "sectors-co=
-unt": 5,
--#                "type": "read" },
--#      "timestamp": { "seconds": 1344522075, "microseconds": 745528 } }
--#
--# 2. Flush operation
--#
--# { "event": "QUORUM_REPORT_BAD",
--#      "data": { "node-name": "node0", "sector-num": 0, "sectors-count":=
- 2097120,
--#                "type": "flush", "error": "Broken pipe" },
--#      "timestamp": { "seconds": 1456406829, "microseconds": 291763 } }
--#
--##
--{ 'event': 'QUORUM_REPORT_BAD',
--  'data': { 'type': 'QuorumOpType', '*error': 'str', 'node-name': 'str',
--            'sector-num': 'int', 'sectors-count': 'int' } }
--
--##
- # @MEM_UNPLUG_ERROR:
- #
- # Emitted when memory hot unplug error occurs.
+-            qmp_migrate_set_parameters(p, &err);
++    switch (val) {
++    case MIGRATION_PARAMETER_COMPRESS_LEVEL:
++        p->has_compress_level =3D true;
++        visit_type_int(v, param, &p->compress_level, &err);
++        break;
++    case MIGRATION_PARAMETER_COMPRESS_THREADS:
++        p->has_compress_threads =3D true;
++        visit_type_int(v, param, &p->compress_threads, &err);
++        break;
++    case MIGRATION_PARAMETER_DECOMPRESS_THREADS:
++        p->has_decompress_threads =3D true;
++        visit_type_int(v, param, &p->decompress_threads, &err);
++        break;
++    case MIGRATION_PARAMETER_CPU_THROTTLE_INITIAL:
++        p->has_cpu_throttle_initial =3D true;
++        visit_type_int(v, param, &p->cpu_throttle_initial, &err);
++        break;
++    case MIGRATION_PARAMETER_CPU_THROTTLE_INCREMENT:
++        p->has_cpu_throttle_increment =3D true;
++        visit_type_int(v, param, &p->cpu_throttle_increment, &err);
++        break;
++    case MIGRATION_PARAMETER_TLS_CREDS:
++        p->has_tls_creds =3D true;
++        p->tls_creds =3D g_new0(StrOrNull, 1);
++        p->tls_creds->type =3D QTYPE_QSTRING;
++        visit_type_str(v, param, &p->tls_creds->u.s, &err);
++        break;
++    case MIGRATION_PARAMETER_TLS_HOSTNAME:
++        p->has_tls_hostname =3D true;
++        p->tls_hostname =3D g_new0(StrOrNull, 1);
++        p->tls_hostname->type =3D QTYPE_QSTRING;
++        visit_type_str(v, param, &p->tls_hostname->u.s, &err);
++        break;
++    case MIGRATION_PARAMETER_MAX_BANDWIDTH:
++        p->has_max_bandwidth =3D true;
++        /*
++         * Can't use visit_type_size() here, because it
++         * defaults to Bytes rather than Mebibytes.
++         */
++        ret =3D qemu_strtosz_MiB(valuestr, NULL, &valuebw);
++        if (ret < 0 || valuebw > INT64_MAX
++            || (size_t)valuebw !=3D valuebw) {
++            error_setg(&err, "Invalid size %s", valuestr);
+             break;
+         }
++        p->max_bandwidth =3D valuebw;
++        break;
++    case MIGRATION_PARAMETER_DOWNTIME_LIMIT:
++        p->has_downtime_limit =3D true;
++        visit_type_int(v, param, &p->downtime_limit, &err);
++        break;
++    case MIGRATION_PARAMETER_X_CHECKPOINT_DELAY:
++        p->has_x_checkpoint_delay =3D true;
++        visit_type_int(v, param, &p->x_checkpoint_delay, &err);
++        break;
++    case MIGRATION_PARAMETER_BLOCK_INCREMENTAL:
++        p->has_block_incremental =3D true;
++        visit_type_bool(v, param, &p->block_incremental, &err);
++        break;
++    default:
++        assert(0);
+     }
+=20
+-    if (i =3D=3D MIGRATION_PARAMETER__MAX) {
+-        error_setg(&err, QERR_INVALID_PARAMETER, param);
++    if (err) {
++        goto cleanup;
+     }
+=20
++    qmp_migrate_set_parameters(p, &err);
++
+  cleanup:
+     qapi_free_MigrateSetParameters(p);
+     visit_free(v);
 --=20
 2.13.5
