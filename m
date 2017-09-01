@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUz-0000bU-Ge
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:44 -0400
+	(envelope-from <armbru@redhat.com>) id 1dnlUt-0000US-Mz
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUm-0007QG-7k
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38904)
+	(envelope-from <armbru@redhat.com>) id 1dnlUk-0007O3-7Z
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35558)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUl-0007PQ-Pi
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:24 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUj-0007LT-9G
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:22 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BF1F07F3E2
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:22 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2AF5591FE6
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:20 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 14:56:10 +0200
-Message-Id: <20170901125611.29295-47-armbru@redhat.com>
+Date: Fri,  1 Sep 2017 14:55:48 +0200
+Message-Id: <20170901125611.29295-25-armbru@redhat.com>
 In-Reply-To: <20170901125611.29295-1-armbru@redhat.com>
 References: <20170901125611.29295-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 46/47] qapi: Change data type of the FOO_lookup
- generated for enum FOO
+Subject: [Qemu-devel] [PULL 24/47] qapi-schema: Collect migration stuff in
+ qapi/migration.json
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,903 +34,2487 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-Currently, a FOO_lookup is an array of strings terminated by a NULL
-sentinel.
-
-A future patch will generate enums with "holes".  NULL-termination
-will cease to work then.
-
-To prepare for that, store the length in the FOO_lookup by wrapping it
-in a struct and adding a member for the length.
-
-The sentinel will be dropped next.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20170822132255.23945-13-marcandre.lureau@redhat.com>
-[Basically redone]
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1503564371-26090-16-git-send-email-armbru@redhat.com>
+Message-Id: <1503602048-12268-10-git-send-email-armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- backends/hostmem.c                 |  2 +-
- block.c                            |  2 +-
- block/blkdebug.c                   |  4 ++--
- block/file-posix.c                 |  8 +++++---
- block/gluster.c                    |  4 ++--
- block/parallels.c                  | 14 ++++++++------
- block/qcow2.c                      |  4 ++--
- block/quorum.c                     |  2 +-
- blockdev.c                         |  2 +-
- crypto/block-luks.c                |  8 ++++----
- crypto/secret.c                    |  2 +-
- crypto/tlscreds.c                  |  2 +-
- hmp.c                              |  6 +++---
- hw/core/qdev-properties.c          | 10 +++++-----
- include/hw/qdev-core.h             |  2 +-
- include/qapi/util.h                |  9 +++++++--
- include/qapi/visitor.h             |  2 +-
- include/qom/object.h               |  4 ++--
- migration/global_state.c           |  2 +-
- net/filter.c                       |  2 +-
- qapi/qapi-util.c                   | 12 ++++++------
- qapi/qapi-visit-core.c             | 24 +++++++++++++-----------
- qemu-img.c                         |  2 +-
- qemu-nbd.c                         |  2 +-
- qom/object.c                       | 16 ++++++++--------
- scripts/qapi-visit.py              |  2 +-
- scripts/qapi.py                    | 13 ++++++++-----
- tests/check-qom-proplist.c         | 15 +++++++++------
- tests/test-qapi-util.c             | 10 +++++-----
- tests/test-qobject-input-visitor.c |  2 +-
- tpm.c                              |  2 +-
- 31 files changed, 104 insertions(+), 87 deletions(-)
+ MAINTAINERS         |    1 +
+ Makefile            |    1 +
+ qapi-schema.json    | 1056 +--------------------------------------------=
+----
+ qapi/common.json    |   16 +
+ qapi/event.json     |   38 --
+ qapi/migration.json | 1085 +++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ 6 files changed, 1104 insertions(+), 1093 deletions(-)
+ create mode 100644 qapi/migration.json
 
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index 06e8898e40..217cff6766 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -395,7 +395,7 @@ host_memory_backend_class_init(ObjectClass *oc, void =
-*data)
-         host_memory_backend_set_host_nodes,
-         NULL, NULL, &error_abort);
-     object_class_property_add_enum(oc, "policy", "HostMemPolicy",
--        HostMemPolicy_lookup,
-+        &HostMemPolicy_lookup,
-         host_memory_backend_get_policy,
-         host_memory_backend_set_policy, &error_abort);
-     object_class_property_add_str(oc, "id", get_id, set_id, &error_abort=
-);
-diff --git a/block.c b/block.c
-index 845eff8177..b749bd6404 100644
---- a/block.c
-+++ b/block.c
-@@ -1332,7 +1332,7 @@ static int bdrv_open_common(BlockDriverState *bs, B=
-lockBackend *file,
-     detect_zeroes =3D qemu_opt_get(opts, "detect-zeroes");
-     if (detect_zeroes) {
-         BlockdevDetectZeroesOptions value =3D
--            qapi_enum_parse(BlockdevDetectZeroesOptions_lookup,
-+            qapi_enum_parse(&BlockdevDetectZeroesOptions_lookup,
-                             detect_zeroes,
-                             BLOCKDEV_DETECT_ZEROES_OPTIONS_OFF,
-                             &local_err);
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index b370fcedfb..8e385acf54 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -169,7 +169,7 @@ static int add_rule(void *opaque, QemuOpts *opts, Err=
-or **errp)
-         error_setg(errp, "Missing event name for rule");
-         return -1;
-     }
--    event =3D qapi_enum_parse(BlkdebugEvent_lookup, event_name, -1, errp=
-);
-+    event =3D qapi_enum_parse(&BlkdebugEvent_lookup, event_name, -1, err=
-p);
-     if (event < 0) {
-         return -1;
-     }
-@@ -732,7 +732,7 @@ static int blkdebug_debug_breakpoint(BlockDriverState=
- *bs, const char *event,
-     struct BlkdebugRule *rule;
-     int blkdebug_event;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 24c5105b12..baa9859b4a 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1498,6 +1498,7 @@ F: migration/
+ F: scripts/vmstate-static-checker.py
+ F: tests/vmstate-static-checker-data/
+ F: docs/migration.txt
++F: qapi/migration.json
 =20
--    blkdebug_event =3D qapi_enum_parse(BlkdebugEvent_lookup, event, -1, =
-NULL);
-+    blkdebug_event =3D qapi_enum_parse(&BlkdebugEvent_lookup, event, -1,=
- NULL);
-     if (blkdebug_event < 0) {
-         return -ENOENT;
-     }
-diff --git a/block/file-posix.c b/block/file-posix.c
-index bfef91db63..6acbd56238 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -437,7 +437,8 @@ static int raw_open_common(BlockDriverState *bs, QDic=
-t *options,
-     aio_default =3D (bdrv_flags & BDRV_O_NATIVE_AIO)
-                   ? BLOCKDEV_AIO_OPTIONS_NATIVE
-                   : BLOCKDEV_AIO_OPTIONS_THREADS;
--    aio =3D qapi_enum_parse(BlockdevAioOptions_lookup, qemu_opt_get(opts=
-, "aio"),
-+    aio =3D qapi_enum_parse(&BlockdevAioOptions_lookup,
-+                          qemu_opt_get(opts, "aio"),
-                           aio_default, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-@@ -446,7 +447,8 @@ static int raw_open_common(BlockDriverState *bs, QDic=
-t *options,
-     }
-     s->use_linux_aio =3D (aio =3D=3D BLOCKDEV_AIO_OPTIONS_NATIVE);
+ Seccomp
+ M: Eduardo Otubo <otubo@redhat.com>
+diff --git a/Makefile b/Makefile
+index c7b6fd1a1c..18cf670833 100644
+--- a/Makefile
++++ b/Makefile
+@@ -413,6 +413,7 @@ qapi-modules =3D $(SRC_PATH)/qapi-schema.json $(SRC_P=
+ATH)/qapi/common.json \
+                $(SRC_PATH)/qapi/char.json \
+                $(SRC_PATH)/qapi/crypto.json \
+                $(SRC_PATH)/qapi/event.json $(SRC_PATH)/qapi/introspect.j=
+son \
++               $(SRC_PATH)/qapi/migration.json \
+                $(SRC_PATH)/qapi/net.json \
+                $(SRC_PATH)/qapi/rocker.json \
+                $(SRC_PATH)/qapi/run-state.json \
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 6a23f5991c..21f54ea1a2 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -87,6 +87,7 @@
+ { 'include': 'qapi/net.json' }
+ { 'include': 'qapi/rocker.json' }
+ { 'include': 'qapi/ui.json' }
++{ 'include': 'qapi/migration.json' }
+ { 'include': 'qapi/event.json' }
+ { 'include': 'qapi/trace.json' }
+ { 'include': 'qapi/introspect.json' }
+@@ -117,22 +118,6 @@
+ { 'command': 'qmp_capabilities' }
 =20
--    locking =3D qapi_enum_parse(OnOffAuto_lookup, qemu_opt_get(opts, "lo=
-cking"),
-+    locking =3D qapi_enum_parse(&OnOffAuto_lookup,
-+                              qemu_opt_get(opts, "locking"),
-                               ON_OFF_AUTO_AUTO, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-@@ -1973,7 +1975,7 @@ static int raw_create(const char *filename, QemuOpt=
-s *opts, Error **errp)
-                           BDRV_SECTOR_SIZE);
-     nocow =3D qemu_opt_get_bool(opts, BLOCK_OPT_NOCOW, false);
-     buf =3D qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
--    prealloc =3D qapi_enum_parse(PreallocMode_lookup, buf,
-+    prealloc =3D qapi_enum_parse(&PreallocMode_lookup, buf,
-                                PREALLOC_MODE_OFF, &local_err);
-     g_free(buf);
-     if (local_err) {
-diff --git a/block/gluster.c b/block/gluster.c
-index 29f9427e47..0f4265a3a4 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -543,7 +543,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGlu=
-ster *gconf,
-         if (!strcmp(ptr, "tcp")) {
-             ptr =3D "inet";       /* accept legacy "tcp" */
-         }
--        type =3D qapi_enum_parse(SocketAddressType_lookup, ptr, -1, NULL=
-);
-+        type =3D qapi_enum_parse(&SocketAddressType_lookup, ptr, -1, NUL=
-L);
-         if (type !=3D SOCKET_ADDRESS_TYPE_INET
-             && type !=3D SOCKET_ADDRESS_TYPE_UNIX) {
-             error_setg(&local_err,
-@@ -1000,7 +1000,7 @@ static int qemu_gluster_create(const char *filename=
-,
-                           BDRV_SECTOR_SIZE);
-=20
-     tmp =3D qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
--    prealloc =3D qapi_enum_parse(PreallocMode_lookup, tmp, PREALLOC_MODE=
-_OFF,
-+    prealloc =3D qapi_enum_parse(&PreallocMode_lookup, tmp, PREALLOC_MOD=
-E_OFF,
-                                &local_err);
-     g_free(tmp);
-     if (local_err) {
-diff --git a/block/parallels.c b/block/parallels.c
-index d812210b4f..cce7336cac 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -68,13 +68,15 @@ typedef enum ParallelsPreallocMode {
-     PRL_PREALLOC_MODE__MAX =3D 2,
- } ParallelsPreallocMode;
-=20
--static const char *prealloc_mode_lookup[] =3D {
--    "falloc",
--    "truncate",
--    NULL,
-+static QEnumLookup prealloc_mode_lookup =3D {
-+    .array =3D (const char *const[]) {
-+        "falloc",
-+        "truncate",
-+        NULL,
-+    },
-+    .size =3D PRL_PREALLOC_MODE__MAX
- };
-=20
+ ##
+-# @StrOrNull:
+-#
+-# This is a string value or the explicit lack of a string (null
+-# pointer in C).  Intended for cases when 'optional absent' already
+-# has a different meaning.
+-#
+-# @s: the string value
+-# @n: no string value
+-#
+-# Since: 2.10
+-##
+-{ 'alternate': 'StrOrNull',
+-  'data': { 's': 'str',
+-            'n': 'null' } }
 -
- typedef struct BDRVParallelsState {
-     /** Locking is conservative, the lock protects
-      *   - image file extending (truncate, fallocate)
-@@ -695,7 +697,7 @@ static int parallels_open(BlockDriverState *bs, QDict=
- *options, int flags,
-         qemu_opt_get_size_del(opts, PARALLELS_OPT_PREALLOC_SIZE, 0);
-     s->prealloc_size =3D MAX(s->tracks, s->prealloc_size >> BDRV_SECTOR_=
-BITS);
-     buf =3D qemu_opt_get_del(opts, PARALLELS_OPT_PREALLOC_MODE);
--    s->prealloc_mode =3D qapi_enum_parse(prealloc_mode_lookup, buf,
-+    s->prealloc_mode =3D qapi_enum_parse(&prealloc_mode_lookup, buf,
-                                        PRL_PREALLOC_MODE_FALLOCATE,
-                                        &local_err);
-     g_free(buf);
-diff --git a/block/qcow2.c b/block/qcow2.c
-index cbe9681fb0..2ec399663e 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2915,7 +2915,7 @@ static int qcow2_create(const char *filename, QemuO=
-pts *opts, Error **errp)
-         goto finish;
-     }
-     buf =3D qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
--    prealloc =3D qapi_enum_parse(PreallocMode_lookup, buf,
-+    prealloc =3D qapi_enum_parse(&PreallocMode_lookup, buf,
-                                PREALLOC_MODE_OFF, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-@@ -3605,7 +3605,7 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *op=
-ts, BlockDriverState *in_bs,
-     }
+-##
+ # @LostTickPolicy:
+ #
+ # Policy for handling lost ticks in timer devices.
+@@ -316,778 +301,6 @@
+ { 'command': 'query-events', 'returns': ['EventInfo'] }
 =20
-     optstr =3D qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
--    prealloc =3D qapi_enum_parse(PreallocMode_lookup, optstr,
-+    prealloc =3D qapi_enum_parse(&PreallocMode_lookup, optstr,
-                                PREALLOC_MODE_OFF, &local_err);
-     g_free(optstr);
-     if (local_err) {
-diff --git a/block/quorum.c b/block/quorum.c
-index 8d1c9f6306..272f9a5b77 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -912,7 +912,7 @@ static int quorum_open(BlockDriverState *bs, QDict *o=
-ptions, int flags,
-     if (!pattern_str) {
-         ret =3D QUORUM_READ_PATTERN_QUORUM;
-     } else {
--        ret =3D qapi_enum_parse(QuorumReadPattern_lookup, pattern_str,
-+        ret =3D qapi_enum_parse(&QuorumReadPattern_lookup, pattern_str,
-                               -EINVAL, NULL);
-     }
-     if (ret < 0) {
-diff --git a/blockdev.c b/blockdev.c
-index bfb2a95299..796beaed94 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -437,7 +437,7 @@ static void extract_common_blockdev_options(QemuOpts =
-*opts, int *bdrv_flags,
-=20
-     if (detect_zeroes) {
-         *detect_zeroes =3D
--            qapi_enum_parse(BlockdevDetectZeroesOptions_lookup,
-+            qapi_enum_parse(&BlockdevDetectZeroesOptions_lookup,
-                             qemu_opt_get(opts, "detect-zeroes"),
-                             BLOCKDEV_DETECT_ZEROES_OPTIONS_OFF,
-                             &local_error);
-diff --git a/crypto/block-luks.c b/crypto/block-luks.c
-index 4e828951d4..36bc856084 100644
---- a/crypto/block-luks.c
-+++ b/crypto/block-luks.c
-@@ -264,7 +264,7 @@ qcrypto_block_luks_cipher_alg_lookup(QCryptoCipherAlg=
-orithm alg,
- /* XXX replace with qapi_enum_parse() in future, when we can
-  * make that function emit a more friendly error message */
- static int qcrypto_block_luks_name_lookup(const char *name,
--                                          const char *const *map,
-+                                          const QEnumLookup *map,
-                                           const char *type,
-                                           Error **errp)
- {
-@@ -279,19 +279,19 @@ static int qcrypto_block_luks_name_lookup(const cha=
-r *name,
-=20
- #define qcrypto_block_luks_cipher_mode_lookup(name, errp)               =
-\
-     qcrypto_block_luks_name_lookup(name,                                =
-\
--                                   QCryptoCipherMode_lookup,            =
-\
-+                                   &QCryptoCipherMode_lookup,           =
-\
-                                    "Cipher mode",                       =
-\
-                                    errp)
-=20
- #define qcrypto_block_luks_hash_name_lookup(name, errp)                 =
-\
-     qcrypto_block_luks_name_lookup(name,                                =
-\
--                                   QCryptoHashAlgorithm_lookup,         =
-\
-+                                   &QCryptoHashAlgorithm_lookup,        =
-\
-                                    "Hash algorithm",                    =
-\
-                                    errp)
-=20
- #define qcrypto_block_luks_ivgen_name_lookup(name, errp)                =
-\
-     qcrypto_block_luks_name_lookup(name,                                =
-\
--                                   QCryptoIVGenAlgorithm_lookup,        =
-\
-+                                   &QCryptoIVGenAlgorithm_lookup,       =
-\
-                                    "IV generator",                      =
-\
-                                    errp)
-=20
-diff --git a/crypto/secret.c b/crypto/secret.c
-index 285ab7a63c..388abd7df5 100644
---- a/crypto/secret.c
-+++ b/crypto/secret.c
-@@ -378,7 +378,7 @@ qcrypto_secret_class_init(ObjectClass *oc, void *data=
+ ##
+-# @MigrationStats:
+-#
+-# Detailed migration status.
+-#
+-# @transferred: amount of bytes already transferred to the target VM
+-#
+-# @remaining: amount of bytes remaining to be transferred to the target =
+VM
+-#
+-# @total: total amount of bytes involved in the migration process
+-#
+-# @duplicate: number of duplicate (zero) pages (since 1.2)
+-#
+-# @skipped: number of skipped zero pages (since 1.5)
+-#
+-# @normal: number of normal pages (since 1.2)
+-#
+-# @normal-bytes: number of normal bytes sent (since 1.2)
+-#
+-# @dirty-pages-rate: number of pages dirtied by second by the
+-#        guest (since 1.3)
+-#
+-# @mbps: throughput in megabits/sec. (since 1.6)
+-#
+-# @dirty-sync-count: number of times that dirty ram was synchronized (si=
+nce 2.1)
+-#
+-# @postcopy-requests: The number of page requests received from the dest=
+ination
+-#        (since 2.7)
+-#
+-# @page-size: The number of bytes per page for the various page-based
+-#        statistics (since 2.10)
+-#
+-# Since: 0.14.0
+-##
+-{ 'struct': 'MigrationStats',
+-  'data': {'transferred': 'int', 'remaining': 'int', 'total': 'int' ,
+-           'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
+-           'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
+-           'mbps' : 'number', 'dirty-sync-count' : 'int',
+-           'postcopy-requests' : 'int', 'page-size' : 'int' } }
+-
+-##
+-# @XBZRLECacheStats:
+-#
+-# Detailed XBZRLE migration cache statistics
+-#
+-# @cache-size: XBZRLE cache size
+-#
+-# @bytes: amount of bytes already transferred to the target VM
+-#
+-# @pages: amount of pages transferred to the target VM
+-#
+-# @cache-miss: number of cache miss
+-#
+-# @cache-miss-rate: rate of cache miss (since 2.1)
+-#
+-# @overflow: number of overflows
+-#
+-# Since: 1.2
+-##
+-{ 'struct': 'XBZRLECacheStats',
+-  'data': {'cache-size': 'int', 'bytes': 'int', 'pages': 'int',
+-           'cache-miss': 'int', 'cache-miss-rate': 'number',
+-           'overflow': 'int' } }
+-
+-##
+-# @MigrationStatus:
+-#
+-# An enumeration of migration status.
+-#
+-# @none: no migration has ever happened.
+-#
+-# @setup: migration process has been initiated.
+-#
+-# @cancelling: in the process of cancelling migration.
+-#
+-# @cancelled: cancelling migration is finished.
+-#
+-# @active: in the process of doing migration.
+-#
+-# @postcopy-active: like active, but now in postcopy mode. (since 2.5)
+-#
+-# @completed: migration is finished.
+-#
+-# @failed: some error occurred during migration process.
+-#
+-# @colo: VM is in the process of fault tolerance, VM can not get into th=
+is
+-#        state unless colo capability is enabled for migration. (since 2=
+.8)
+-#
+-# Since: 2.3
+-#
+-##
+-{ 'enum': 'MigrationStatus',
+-  'data': [ 'none', 'setup', 'cancelling', 'cancelled',
+-            'active', 'postcopy-active', 'completed', 'failed', 'colo' ]=
+ }
+-
+-##
+-# @MigrationInfo:
+-#
+-# Information about current migration process.
+-#
+-# @status: @MigrationStatus describing the current migration status.
+-#          If this field is not returned, no migration process
+-#          has been initiated
+-#
+-# @ram: @MigrationStats containing detailed migration
+-#       status, only returned if status is 'active' or
+-#       'completed'(since 1.2)
+-#
+-# @disk: @MigrationStats containing detailed disk migration
+-#        status, only returned if status is 'active' and it is a block
+-#        migration
+-#
+-# @xbzrle-cache: @XBZRLECacheStats containing detailed XBZRLE
+-#                migration statistics, only returned if XBZRLE feature i=
+s on and
+-#                status is 'active' or 'completed' (since 1.2)
+-#
+-# @total-time: total amount of milliseconds since migration started.
+-#        If migration has ended, it returns the total migration
+-#        time. (since 1.2)
+-#
+-# @downtime: only present when migration finishes correctly
+-#        total downtime in milliseconds for the guest.
+-#        (since 1.3)
+-#
+-# @expected-downtime: only present while migration is active
+-#        expected downtime in milliseconds for the guest in last walk
+-#        of the dirty bitmap. (since 1.3)
+-#
+-# @setup-time: amount of setup time in milliseconds _before_ the
+-#        iterations begin but _after_ the QMP command is issued. This is=
+ designed
+-#        to provide an accounting of any activities (such as RDMA pinnin=
+g) which
+-#        may be expensive, but do not actually occur during the iterativ=
+e
+-#        migration rounds themselves. (since 1.6)
+-#
+-# @cpu-throttle-percentage: percentage of time guest cpus are being
+-#        throttled during auto-converge. This is only present when auto-=
+converge
+-#        has started throttling guest cpus. (Since 2.7)
+-#
+-# @error-desc: the human readable error description string, when
+-#              @status is 'failed'. Clients should not attempt to parse =
+the
+-#              error strings. (Since 2.7)
+-#
+-# Since: 0.14.0
+-##
+-{ 'struct': 'MigrationInfo',
+-  'data': {'*status': 'MigrationStatus', '*ram': 'MigrationStats',
+-           '*disk': 'MigrationStats',
+-           '*xbzrle-cache': 'XBZRLECacheStats',
+-           '*total-time': 'int',
+-           '*expected-downtime': 'int',
+-           '*downtime': 'int',
+-           '*setup-time': 'int',
+-           '*cpu-throttle-percentage': 'int',
+-           '*error-desc': 'str'} }
+-
+-##
+-# @query-migrate:
+-#
+-# Returns information about current migration process. If migration
+-# is active there will be another json-object with RAM migration
+-# status and if block migration is active another one with block
+-# migration status.
+-#
+-# Returns: @MigrationInfo
+-#
+-# Since: 0.14.0
+-#
+-# Example:
+-#
+-# 1. Before the first migration
+-#
+-# -> { "execute": "query-migrate" }
+-# <- { "return": {} }
+-#
+-# 2. Migration is done and has succeeded
+-#
+-# -> { "execute": "query-migrate" }
+-# <- { "return": {
+-#         "status": "completed",
+-#         "ram":{
+-#           "transferred":123,
+-#           "remaining":123,
+-#           "total":246,
+-#           "total-time":12345,
+-#           "setup-time":12345,
+-#           "downtime":12345,
+-#           "duplicate":123,
+-#           "normal":123,
+-#           "normal-bytes":123456,
+-#           "dirty-sync-count":15
+-#         }
+-#      }
+-#    }
+-#
+-# 3. Migration is done and has failed
+-#
+-# -> { "execute": "query-migrate" }
+-# <- { "return": { "status": "failed" } }
+-#
+-# 4. Migration is being performed and is not a block migration:
+-#
+-# -> { "execute": "query-migrate" }
+-# <- {
+-#       "return":{
+-#          "status":"active",
+-#          "ram":{
+-#             "transferred":123,
+-#             "remaining":123,
+-#             "total":246,
+-#             "total-time":12345,
+-#             "setup-time":12345,
+-#             "expected-downtime":12345,
+-#             "duplicate":123,
+-#             "normal":123,
+-#             "normal-bytes":123456,
+-#             "dirty-sync-count":15
+-#          }
+-#       }
+-#    }
+-#
+-# 5. Migration is being performed and is a block migration:
+-#
+-# -> { "execute": "query-migrate" }
+-# <- {
+-#       "return":{
+-#          "status":"active",
+-#          "ram":{
+-#             "total":1057024,
+-#             "remaining":1053304,
+-#             "transferred":3720,
+-#             "total-time":12345,
+-#             "setup-time":12345,
+-#             "expected-downtime":12345,
+-#             "duplicate":123,
+-#             "normal":123,
+-#             "normal-bytes":123456,
+-#             "dirty-sync-count":15
+-#          },
+-#          "disk":{
+-#             "total":20971520,
+-#             "remaining":20880384,
+-#             "transferred":91136
+-#          }
+-#       }
+-#    }
+-#
+-# 6. Migration is being performed and XBZRLE is active:
+-#
+-# -> { "execute": "query-migrate" }
+-# <- {
+-#       "return":{
+-#          "status":"active",
+-#          "capabilities" : [ { "capability": "xbzrle", "state" : true }=
+ ],
+-#          "ram":{
+-#             "total":1057024,
+-#             "remaining":1053304,
+-#             "transferred":3720,
+-#             "total-time":12345,
+-#             "setup-time":12345,
+-#             "expected-downtime":12345,
+-#             "duplicate":10,
+-#             "normal":3333,
+-#             "normal-bytes":3412992,
+-#             "dirty-sync-count":15
+-#          },
+-#          "xbzrle-cache":{
+-#             "cache-size":67108864,
+-#             "bytes":20971520,
+-#             "pages":2444343,
+-#             "cache-miss":2244,
+-#             "cache-miss-rate":0.123,
+-#             "overflow":34434
+-#          }
+-#       }
+-#    }
+-#
+-##
+-{ 'command': 'query-migrate', 'returns': 'MigrationInfo' }
+-
+-##
+-# @MigrationCapability:
+-#
+-# Migration capabilities enumeration
+-#
+-# @xbzrle: Migration supports xbzrle (Xor Based Zero Run Length Encoding=
+).
+-#          This feature allows us to minimize migration traffic for cert=
+ain work
+-#          loads, by sending compressed difference of the pages
+-#
+-# @rdma-pin-all: Controls whether or not the entire VM memory footprint =
+is
+-#          mlock()'d on demand or all at once. Refer to docs/rdma.txt fo=
+r usage.
+-#          Disabled by default. (since 2.0)
+-#
+-# @zero-blocks: During storage migration encode blocks of zeroes efficie=
+ntly. This
+-#          essentially saves 1MB of zeroes per block on the wire. Enabli=
+ng requires
+-#          source and target VM to support this feature. To enable it is=
+ sufficient
+-#          to enable the capability on the source VM. The feature is dis=
+abled by
+-#          default. (since 1.6)
+-#
+-# @compress: Use multiple compression threads to accelerate live migrati=
+on.
+-#          This feature can help to reduce the migration traffic, by sen=
+ding
+-#          compressed pages. Please note that if compress and xbzrle are=
+ both
+-#          on, compress only takes effect in the ram bulk stage, after t=
+hat,
+-#          it will be disabled and only xbzrle takes effect, this can he=
+lp to
+-#          minimize migration traffic. The feature is disabled by defaul=
+t.
+-#          (since 2.4 )
+-#
+-# @events: generate events for each migration state change
+-#          (since 2.4 )
+-#
+-# @auto-converge: If enabled, QEMU will automatically throttle down the =
+guest
+-#          to speed up convergence of RAM migration. (since 1.6)
+-#
+-# @postcopy-ram: Start executing on the migration target before all of R=
+AM has
+-#          been migrated, pulling the remaining pages along as needed. N=
+OTE: If
+-#          the migration fails during postcopy the VM will fail.  (since=
+ 2.6)
+-#
+-# @x-colo: If enabled, migration will never end, and the state of the VM=
+ on the
+-#        primary side will be migrated continuously to the VM on seconda=
+ry
+-#        side, this process is called COarse-Grain LOck Stepping (COLO) =
+for
+-#        Non-stop Service. (since 2.8)
+-#
+-# @release-ram: if enabled, qemu will free the migrated ram pages on the=
+ source
+-#        during postcopy-ram migration. (since 2.9)
+-#
+-# @block: If enabled, QEMU will also migrate the contents of all block
+-#          devices.  Default is disabled.  A possible alternative uses
+-#          mirror jobs to a builtin NBD server on the destination, which
+-#          offers more flexibility.
+-#          (Since 2.10)
+-#
+-# @return-path: If enabled, migration will use the return path even
+-#               for precopy. (since 2.10)
+-#
+-# Since: 1.2
+-##
+-{ 'enum': 'MigrationCapability',
+-  'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
+-           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram'=
+,
+-           'block', 'return-path' ] }
+-
+-##
+-# @MigrationCapabilityStatus:
+-#
+-# Migration capability information
+-#
+-# @capability: capability enum
+-#
+-# @state: capability state bool
+-#
+-# Since: 1.2
+-##
+-{ 'struct': 'MigrationCapabilityStatus',
+-  'data': { 'capability' : 'MigrationCapability', 'state' : 'bool' } }
+-
+-##
+-# @migrate-set-capabilities:
+-#
+-# Enable/Disable the following migration capabilities (like xbzrle)
+-#
+-# @capabilities: json array of capability modifications to make
+-#
+-# Since: 1.2
+-#
+-# Example:
+-#
+-# -> { "execute": "migrate-set-capabilities" , "arguments":
+-#      { "capabilities": [ { "capability": "xbzrle", "state": true } ] }=
+ }
+-#
+-##
+-{ 'command': 'migrate-set-capabilities',
+-  'data': { 'capabilities': ['MigrationCapabilityStatus'] } }
+-
+-##
+-# @query-migrate-capabilities:
+-#
+-# Returns information about the current migration capabilities status
+-#
+-# Returns: @MigrationCapabilitiesStatus
+-#
+-# Since: 1.2
+-#
+-# Example:
+-#
+-# -> { "execute": "query-migrate-capabilities" }
+-# <- { "return": [
+-#       {"state": false, "capability": "xbzrle"},
+-#       {"state": false, "capability": "rdma-pin-all"},
+-#       {"state": false, "capability": "auto-converge"},
+-#       {"state": false, "capability": "zero-blocks"},
+-#       {"state": false, "capability": "compress"},
+-#       {"state": true, "capability": "events"},
+-#       {"state": false, "capability": "postcopy-ram"},
+-#       {"state": false, "capability": "x-colo"}
+-#    ]}
+-#
+-##
+-{ 'command': 'query-migrate-capabilities', 'returns':   ['MigrationCapab=
+ilityStatus']}
+-
+-##
+-# @MigrationParameter:
+-#
+-# Migration parameters enumeration
+-#
+-# @compress-level: Set the compression level to be used in live migratio=
+n,
+-#          the compression level is an integer between 0 and 9, where 0 =
+means
+-#          no compression, 1 means the best compression speed, and 9 mea=
+ns best
+-#          compression ratio which will consume more CPU.
+-#
+-# @compress-threads: Set compression thread count to be used in live mig=
+ration,
+-#          the compression thread count is an integer between 1 and 255.
+-#
+-# @decompress-threads: Set decompression thread count to be used in live
+-#          migration, the decompression thread count is an integer betwe=
+en 1
+-#          and 255. Usually, decompression is at least 4 times as fast a=
+s
+-#          compression, so set the decompress-threads to the number abou=
+t 1/4
+-#          of compress-threads is adequate.
+-#
+-# @cpu-throttle-initial: Initial percentage of time guest cpus are throt=
+tled
+-#                        when migration auto-converge is activated. The
+-#                        default value is 20. (Since 2.7)
+-#
+-# @cpu-throttle-increment: throttle percentage increase each time
+-#                          auto-converge detects that migration is not m=
+aking
+-#                          progress. The default value is 10. (Since 2.7=
 )
-                                    NULL);
-     object_class_property_add_enum(oc, "format",
-                                    "QCryptoSecretFormat",
--                                   QCryptoSecretFormat_lookup,
-+                                   &QCryptoSecretFormat_lookup,
-                                    qcrypto_secret_prop_get_format,
-                                    qcrypto_secret_prop_set_format,
-                                    NULL);
-diff --git a/crypto/tlscreds.c b/crypto/tlscreds.c
-index a8965531b6..3cd41035bb 100644
---- a/crypto/tlscreds.c
-+++ b/crypto/tlscreds.c
-@@ -233,7 +233,7 @@ qcrypto_tls_creds_class_init(ObjectClass *oc, void *d=
-ata)
-                                   NULL);
-     object_class_property_add_enum(oc, "endpoint",
-                                    "QCryptoTLSCredsEndpoint",
--                                   QCryptoTLSCredsEndpoint_lookup,
-+                                   &QCryptoTLSCredsEndpoint_lookup,
-                                    qcrypto_tls_creds_prop_get_endpoint,
-                                    qcrypto_tls_creds_prop_set_endpoint,
-                                    NULL);
-diff --git a/hmp.c b/hmp.c
-index 30819fe602..cd046c6d71 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1528,7 +1528,7 @@ void hmp_migrate_set_capability(Monitor *mon, const=
- QDict *qdict)
-     MigrationCapabilityStatusList *caps =3D g_malloc0(sizeof(*caps));
-     int val;
+-#
+-# @tls-creds: ID of the 'tls-creds' object that provides credentials for
+-#             establishing a TLS connection over the migration data chan=
+nel.
+-#             On the outgoing side of the migration, the credentials mus=
+t
+-#             be for a 'client' endpoint, while for the incoming side th=
+e
+-#             credentials must be for a 'server' endpoint. Setting this
+-#             will enable TLS for all migrations. The default is unset,
+-#             resulting in unsecured migration at the QEMU level. (Since=
+ 2.7)
+-#
+-# @tls-hostname: hostname of the target host for the migration. This is
+-#                required when using x509 based TLS credentials and the
+-#                migration URI does not already include a hostname. For
+-#                example if using fd: or exec: based migration, the
+-#                hostname must be provided so that the server's x509
+-#                certificate identity can be validated. (Since 2.7)
+-#
+-# @max-bandwidth: to set maximum speed for migration. maximum speed in
+-#                 bytes per second. (Since 2.8)
+-#
+-# @downtime-limit: set maximum tolerated downtime for migration. maximum
+-#                  downtime in milliseconds (Since 2.8)
+-#
+-# @x-checkpoint-delay: The delay time (in ms) between two COLO checkpoin=
+ts in
+-#          periodic mode. (Since 2.8)
+-#
+-# @block-incremental: Affects how much storage is migrated when the
+-# 	block migration capability is enabled.  When false, the entire
+-# 	storage backing chain is migrated into a flattened image at
+-# 	the destination; when true, only the active qcow2 layer is
+-# 	migrated and the destination must already have access to the
+-# 	same backing chain as was used on the source.  (since 2.10)
+-#
+-# Since: 2.4
+-##
+-{ 'enum': 'MigrationParameter',
+-  'data': ['compress-level', 'compress-threads', 'decompress-threads',
+-           'cpu-throttle-initial', 'cpu-throttle-increment',
+-           'tls-creds', 'tls-hostname', 'max-bandwidth',
+-           'downtime-limit', 'x-checkpoint-delay', 'block-incremental' ]=
+ }
+-
+-##
+-# @MigrateSetParameters:
+-#
+-# @compress-level: compression level
+-#
+-# @compress-threads: compression thread count
+-#
+-# @decompress-threads: decompression thread count
+-#
+-# @cpu-throttle-initial: Initial percentage of time guest cpus are
+-#                        throttled when migration auto-converge is activ=
+ated.
+-#                        The default value is 20. (Since 2.7)
+-#
+-# @cpu-throttle-increment: throttle percentage increase each time
+-#                          auto-converge detects that migration is not m=
+aking
+-#                          progress. The default value is 10. (Since 2.7=
+)
+-#
+-# @tls-creds: ID of the 'tls-creds' object that provides credentials
+-#             for establishing a TLS connection over the migration data
+-#             channel. On the outgoing side of the migration, the creden=
+tials
+-#             must be for a 'client' endpoint, while for the incoming si=
+de the
+-#             credentials must be for a 'server' endpoint. Setting this
+-#             to a non-empty string enables TLS for all migrations.
+-#             An empty string means that QEMU will use plain text mode f=
+or
+-#             migration, rather than TLS (Since 2.9)
+-#             Previously (since 2.7), this was reported by omitting
+-#             tls-creds instead.
+-#
+-# @tls-hostname: hostname of the target host for the migration. This
+-#                is required when using x509 based TLS credentials and t=
+he
+-#                migration URI does not already include a hostname. For
+-#                example if using fd: or exec: based migration, the
+-#                hostname must be provided so that the server's x509
+-#                certificate identity can be validated. (Since 2.7)
+-#                An empty string means that QEMU will use the hostname
+-#                associated with the migration URI, if any. (Since 2.9)
+-#                Previously (since 2.7), this was reported by omitting
+-#                tls-hostname instead.
+-#
+-# @max-bandwidth: to set maximum speed for migration. maximum speed in
+-#                 bytes per second. (Since 2.8)
+-#
+-# @downtime-limit: set maximum tolerated downtime for migration. maximum
+-#                  downtime in milliseconds (Since 2.8)
+-#
+-# @x-checkpoint-delay: the delay time between two COLO checkpoints. (Sin=
+ce 2.8)
+-#
+-# @block-incremental: Affects how much storage is migrated when the
+-# 	block migration capability is enabled.  When false, the entire
+-# 	storage backing chain is migrated into a flattened image at
+-# 	the destination; when true, only the active qcow2 layer is
+-# 	migrated and the destination must already have access to the
+-# 	same backing chain as was used on the source.  (since 2.10)
+-#
+-# Since: 2.4
+-##
+-# TODO either fuse back into MigrationParameters, or make
+-# MigrationParameters members mandatory
+-{ 'struct': 'MigrateSetParameters',
+-  'data': { '*compress-level': 'int',
+-            '*compress-threads': 'int',
+-            '*decompress-threads': 'int',
+-            '*cpu-throttle-initial': 'int',
+-            '*cpu-throttle-increment': 'int',
+-            '*tls-creds': 'StrOrNull',
+-            '*tls-hostname': 'StrOrNull',
+-            '*max-bandwidth': 'int',
+-            '*downtime-limit': 'int',
+-            '*x-checkpoint-delay': 'int',
+-            '*block-incremental': 'bool' } }
+-
+-##
+-# @migrate-set-parameters:
+-#
+-# Set various migration parameters.
+-#
+-# Since: 2.4
+-#
+-# Example:
+-#
+-# -> { "execute": "migrate-set-parameters" ,
+-#      "arguments": { "compress-level": 1 } }
+-#
+-##
+-{ 'command': 'migrate-set-parameters', 'boxed': true,
+-  'data': 'MigrateSetParameters' }
+-
+-##
+-# @MigrationParameters:
+-#
+-# The optional members aren't actually optional.
+-#
+-# @compress-level: compression level
+-#
+-# @compress-threads: compression thread count
+-#
+-# @decompress-threads: decompression thread count
+-#
+-# @cpu-throttle-initial: Initial percentage of time guest cpus are
+-#                        throttled when migration auto-converge is activ=
+ated.
+-#                        (Since 2.7)
+-#
+-# @cpu-throttle-increment: throttle percentage increase each time
+-#                          auto-converge detects that migration is not m=
+aking
+-#                          progress. (Since 2.7)
+-#
+-# @tls-creds: ID of the 'tls-creds' object that provides credentials
+-#             for establishing a TLS connection over the migration data
+-#             channel. On the outgoing side of the migration, the creden=
+tials
+-#             must be for a 'client' endpoint, while for the incoming si=
+de the
+-#             credentials must be for a 'server' endpoint.
+-#             An empty string means that QEMU will use plain text mode f=
+or
+-#             migration, rather than TLS (Since 2.7)
+-#             Note: 2.8 reports this by omitting tls-creds instead.
+-#
+-# @tls-hostname: hostname of the target host for the migration. This
+-#                is required when using x509 based TLS credentials and t=
+he
+-#                migration URI does not already include a hostname. For
+-#                example if using fd: or exec: based migration, the
+-#                hostname must be provided so that the server's x509
+-#                certificate identity can be validated. (Since 2.7)
+-#                An empty string means that QEMU will use the hostname
+-#                associated with the migration URI, if any. (Since 2.9)
+-#                Note: 2.8 reports this by omitting tls-hostname instead=
+.
+-#
+-# @max-bandwidth: to set maximum speed for migration. maximum speed in
+-#                 bytes per second. (Since 2.8)
+-#
+-# @downtime-limit: set maximum tolerated downtime for migration. maximum
+-#                  downtime in milliseconds (Since 2.8)
+-#
+-# @x-checkpoint-delay: the delay time between two COLO checkpoints. (Sin=
+ce 2.8)
+-#
+-# @block-incremental: Affects how much storage is migrated when the
+-# 	block migration capability is enabled.  When false, the entire
+-# 	storage backing chain is migrated into a flattened image at
+-# 	the destination; when true, only the active qcow2 layer is
+-# 	migrated and the destination must already have access to the
+-# 	same backing chain as was used on the source.  (since 2.10)
+-#
+-# Since: 2.4
+-##
+-{ 'struct': 'MigrationParameters',
+-  'data': { '*compress-level': 'int',
+-            '*compress-threads': 'int',
+-            '*decompress-threads': 'int',
+-            '*cpu-throttle-initial': 'int',
+-            '*cpu-throttle-increment': 'int',
+-            '*tls-creds': 'str',
+-            '*tls-hostname': 'str',
+-            '*max-bandwidth': 'int',
+-            '*downtime-limit': 'int',
+-            '*x-checkpoint-delay': 'int',
+-            '*block-incremental': 'bool' } }
+-
+-##
+-# @query-migrate-parameters:
+-#
+-# Returns information about the current migration parameters
+-#
+-# Returns: @MigrationParameters
+-#
+-# Since: 2.4
+-#
+-# Example:
+-#
+-# -> { "execute": "query-migrate-parameters" }
+-# <- { "return": {
+-#          "decompress-threads": 2,
+-#          "cpu-throttle-increment": 10,
+-#          "compress-threads": 8,
+-#          "compress-level": 1,
+-#          "cpu-throttle-initial": 20,
+-#          "max-bandwidth": 33554432,
+-#          "downtime-limit": 300
+-#       }
+-#    }
+-#
+-##
+-{ 'command': 'query-migrate-parameters',
+-  'returns': 'MigrationParameters' }
+-
+-##
+-# @client_migrate_info:
+-#
+-# Set migration information for remote display.  This makes the server
+-# ask the client to automatically reconnect using the new parameters
+-# once migration finished successfully.  Only implemented for SPICE.
+-#
+-# @protocol:     must be "spice"
+-# @hostname:     migration target hostname
+-# @port:         spice tcp port for plaintext channels
+-# @tls-port:     spice tcp port for tls-secured channels
+-# @cert-subject: server certificate subject
+-#
+-# Since: 0.14.0
+-#
+-# Example:
+-#
+-# -> { "execute": "client_migrate_info",
+-#      "arguments": { "protocol": "spice",
+-#                     "hostname": "virt42.lab.kraxel.org",
+-#                     "port": 1234 } }
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'client_migrate_info',
+-  'data': { 'protocol': 'str', 'hostname': 'str', '*port': 'int',
+-            '*tls-port': 'int', '*cert-subject': 'str' } }
+-
+-##
+-# @migrate-start-postcopy:
+-#
+-# Followup to a migration command to switch the migration to postcopy mo=
+de.
+-# The postcopy-ram capability must be set before the original migration
+-# command.
+-#
+-# Since: 2.5
+-#
+-# Example:
+-#
+-# -> { "execute": "migrate-start-postcopy" }
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'migrate-start-postcopy' }
+-
+-##
+-# @COLOMessage:
+-#
+-# The message transmission between Primary side and Secondary side.
+-#
+-# @checkpoint-ready: Secondary VM (SVM) is ready for checkpointing
+-#
+-# @checkpoint-request: Primary VM (PVM) tells SVM to prepare for checkpo=
+inting
+-#
+-# @checkpoint-reply: SVM gets PVM's checkpoint request
+-#
+-# @vmstate-send: VM's state will be sent by PVM.
+-#
+-# @vmstate-size: The total size of VMstate.
+-#
+-# @vmstate-received: VM's state has been received by SVM.
+-#
+-# @vmstate-loaded: VM's state has been loaded by SVM.
+-#
+-# Since: 2.8
+-##
+-{ 'enum': 'COLOMessage',
+-  'data': [ 'checkpoint-ready', 'checkpoint-request', 'checkpoint-reply'=
+,
+-            'vmstate-send', 'vmstate-size', 'vmstate-received',
+-            'vmstate-loaded' ] }
+-
+-##
+-# @COLOMode:
+-#
+-# The colo mode
+-#
+-# @unknown: unknown mode
+-#
+-# @primary: master side
+-#
+-# @secondary: slave side
+-#
+-# Since: 2.8
+-##
+-{ 'enum': 'COLOMode',
+-  'data': [ 'unknown', 'primary', 'secondary'] }
+-
+-##
+-# @FailoverStatus:
+-#
+-# An enumeration of COLO failover status
+-#
+-# @none: no failover has ever happened
+-#
+-# @require: got failover requirement but not handled
+-#
+-# @active: in the process of doing failover
+-#
+-# @completed: finish the process of failover
+-#
+-# @relaunch: restart the failover process, from 'none' -> 'completed' (S=
+ince 2.9)
+-#
+-# Since: 2.8
+-##
+-{ 'enum': 'FailoverStatus',
+-  'data': [ 'none', 'require', 'active', 'completed', 'relaunch' ] }
+-
+-##
+-# @x-colo-lost-heartbeat:
+-#
+-# Tell qemu that heartbeat is lost, request it to do takeover procedures=
+.
+-# If this command is sent to the PVM, the Primary side will exit COLO mo=
+de.
+-# If sent to the Secondary, the Secondary side will run failover work,
+-# then takes over server operation to become the service VM.
+-#
+-# Since: 2.8
+-#
+-# Example:
+-#
+-# -> { "execute": "x-colo-lost-heartbeat" }
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'x-colo-lost-heartbeat' }
+-
+-##
+ # @CpuInfoArch:
+ #
+ # An enumeration of cpu types that enable additional information during
+@@ -2072,107 +1285,6 @@
+   'returns': 'str' }
 =20
--    val =3D qapi_enum_parse(MigrationCapability_lookup, cap, -1, &err);
-+    val =3D qapi_enum_parse(&MigrationCapability_lookup, cap, -1, &err);
-     if (val < 0) {
-         goto end;
-     }
-@@ -1557,7 +1557,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const =
-QDict *qdict)
-     Error *err =3D NULL;
-     int val, ret;
+ ##
+-# @migrate_cancel:
+-#
+-# Cancel the current executing migration process.
+-#
+-# Returns: nothing on success
+-#
+-# Notes: This command succeeds even if there is no migration process run=
+ning.
+-#
+-# Since: 0.14.0
+-#
+-# Example:
+-#
+-# -> { "execute": "migrate_cancel" }
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'migrate_cancel' }
+-
+-##
+-# @migrate_set_downtime:
+-#
+-# Set maximum tolerated downtime for migration.
+-#
+-# @value: maximum downtime in seconds
+-#
+-# Returns: nothing on success
+-#
+-# Notes: This command is deprecated in favor of 'migrate-set-parameters'
+-#
+-# Since: 0.14.0
+-#
+-# Example:
+-#
+-# -> { "execute": "migrate_set_downtime", "arguments": { "value": 0.1 } =
+}
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'migrate_set_downtime', 'data': {'value': 'number'} }
+-
+-##
+-# @migrate_set_speed:
+-#
+-# Set maximum speed for migration.
+-#
+-# @value: maximum speed in bytes per second.
+-#
+-# Returns: nothing on success
+-#
+-# Notes: This command is deprecated in favor of 'migrate-set-parameters'
+-#
+-# Since: 0.14.0
+-#
+-# Example:
+-#
+-# -> { "execute": "migrate_set_speed", "arguments": { "value": 1024 } }
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'migrate_set_speed', 'data': {'value': 'int'} }
+-
+-##
+-# @migrate-set-cache-size:
+-#
+-# Set cache size to be used by XBZRLE migration
+-#
+-# @value: cache size in bytes
+-#
+-# The size will be rounded down to the nearest power of 2.
+-# The cache size can be modified before and during ongoing migration
+-#
+-# Returns: nothing on success
+-#
+-# Since: 1.2
+-#
+-# Example:
+-#
+-# -> { "execute": "migrate-set-cache-size",
+-#      "arguments": { "value": 536870912 } }
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'migrate-set-cache-size', 'data': {'value': 'int'} }
+-
+-##
+-# @query-migrate-cache-size:
+-#
+-# Query migration XBZRLE cache size
+-#
+-# Returns: XBZRLE cache size in bytes
+-#
+-# Since: 1.2
+-#
+-# Example:
+-#
+-# -> { "execute": "query-migrate-cache-size" }
+-# <- { "return": 67108864 }
+-#
+-##
+-{ 'command': 'query-migrate-cache-size', 'returns': 'int' }
+-
+-##
+ # @ObjectPropertyInfo:
+ #
+ # @name: the name of the property
+@@ -2378,99 +1490,6 @@
+   'returns': [ 'DevicePropertyInfo' ] }
 =20
--    val =3D qapi_enum_parse(MigrationParameter_lookup, param, -1, &err);
-+    val =3D qapi_enum_parse(&MigrationParameter_lookup, param, -1, &err)=
-;
-     if (val < 0) {
-         goto cleanup;
-     }
-@@ -1735,7 +1735,7 @@ void hmp_change(Monitor *mon, const QDict *qdict)
-     } else {
-         if (read_only) {
-             read_only_mode =3D
--                qapi_enum_parse(BlockdevChangeReadOnlyMode_lookup,
-+                qapi_enum_parse(&BlockdevChangeReadOnlyMode_lookup,
-                                 read_only,
-                                 BLOCKDEV_CHANGE_READ_ONLY_MODE_RETAIN, &=
-err);
-             if (err) {
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 7512bd4379..1dc80fcea2 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -587,7 +587,7 @@ const PropertyInfo qdev_prop_macaddr =3D {
- const PropertyInfo qdev_prop_on_off_auto =3D {
-     .name =3D "OnOffAuto",
-     .description =3D "on/off/auto",
--    .enum_table =3D OnOffAuto_lookup,
-+    .enum_table =3D &OnOffAuto_lookup,
-     .get =3D get_enum,
-     .set =3D set_enum,
-     .set_default_value =3D set_default_value_enum,
-@@ -599,7 +599,7 @@ QEMU_BUILD_BUG_ON(sizeof(LostTickPolicy) !=3D sizeof(=
-int));
+ ##
+-# @migrate:
+-#
+-# Migrates the current running guest to another Virtual Machine.
+-#
+-# @uri: the Uniform Resource Identifier of the destination VM
+-#
+-# @blk: do block migration (full disk copy)
+-#
+-# @inc: incremental disk copy migration
+-#
+-# @detach: this argument exists only for compatibility reasons and
+-#          is ignored by QEMU
+-#
+-# Returns: nothing on success
+-#
+-# Since: 0.14.0
+-#
+-# Notes:
+-#
+-# 1. The 'query-migrate' command should be used to check migration's pro=
+gress
+-#    and final result (this information is provided by the 'status' memb=
+er)
+-#
+-# 2. All boolean arguments default to false
+-#
+-# 3. The user Monitor's "detach" argument is invalid in QMP and should n=
+ot
+-#    be used
+-#
+-# Example:
+-#
+-# -> { "execute": "migrate", "arguments": { "uri": "tcp:0:4446" } }
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'migrate',
+-  'data': {'uri': 'str', '*blk': 'bool', '*inc': 'bool', '*detach': 'boo=
+l' } }
+-
+-##
+-# @migrate-incoming:
+-#
+-# Start an incoming migration, the qemu must have been started
+-# with -incoming defer
+-#
+-# @uri: The Uniform Resource Identifier identifying the source or
+-#       address to listen on
+-#
+-# Returns: nothing on success
+-#
+-# Since: 2.3
+-#
+-# Notes:
+-#
+-# 1. It's a bad idea to use a string for the uri, but it needs to stay
+-#    compatible with -incoming and the format of the uri is already expo=
+sed
+-#    above libvirt.
+-#
+-# 2. QEMU must be started with -incoming defer to allow migrate-incoming=
+ to
+-#    be used.
+-#
+-# 3. The uri format is the same as for -incoming
+-#
+-# Example:
+-#
+-# -> { "execute": "migrate-incoming",
+-#      "arguments": { "uri": "tcp::4446" } }
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'migrate-incoming', 'data': {'uri': 'str' } }
+-
+-##
+-# @xen-save-devices-state:
+-#
+-# Save the state of all devices to file. The RAM and the block devices
+-# of the VM are not saved by this command.
+-#
+-# @filename: the file to save the state of the devices to as binary
+-# data. See xen-save-devices-state.txt for a description of the binary
+-# format.
+-#
+-# Returns: Nothing on success
+-#
+-# Since: 1.1
+-#
+-# Example:
+-#
+-# -> { "execute": "xen-save-devices-state",
+-#      "arguments": { "filename": "/tmp/save" } }
+-# <- { "return": {} }
+-#
+-##
+-{ 'command': 'xen-save-devices-state', 'data': {'filename': 'str'} }
+-
+-##
+ # @xen-set-global-dirty-log:
+ #
+ # Enable or disable the global dirty log mode.
+@@ -4037,79 +3056,6 @@
+ { 'command': 'xen-load-devices-state', 'data': {'filename': 'str'} }
 =20
- const PropertyInfo qdev_prop_losttickpolicy =3D {
-     .name  =3D "LostTickPolicy",
--    .enum_table  =3D LostTickPolicy_lookup,
-+    .enum_table  =3D &LostTickPolicy_lookup,
-     .get   =3D get_enum,
-     .set   =3D set_enum,
-     .set_default_value =3D set_default_value_enum,
-@@ -613,7 +613,7 @@ const PropertyInfo qdev_prop_blockdev_on_error =3D {
-     .name =3D "BlockdevOnError",
-     .description =3D "Error handling policy, "
-                    "report/ignore/enospc/stop/auto",
--    .enum_table =3D BlockdevOnError_lookup,
-+    .enum_table =3D &BlockdevOnError_lookup,
-     .get =3D get_enum,
-     .set =3D set_enum,
-     .set_default_value =3D set_default_value_enum,
-@@ -627,7 +627,7 @@ const PropertyInfo qdev_prop_bios_chs_trans =3D {
-     .name =3D "BiosAtaTranslation",
-     .description =3D "Logical CHS translation algorithm, "
-                    "auto/none/lba/large/rechs",
--    .enum_table =3D BiosAtaTranslation_lookup,
-+    .enum_table =3D &BiosAtaTranslation_lookup,
-     .get =3D get_enum,
-     .set =3D set_enum,
-     .set_default_value =3D set_default_value_enum,
-@@ -639,7 +639,7 @@ const PropertyInfo qdev_prop_fdc_drive_type =3D {
-     .name =3D "FdcDriveType",
-     .description =3D "FDC drive type, "
-                    "144/288/120/none/auto",
--    .enum_table =3D FloppyDriveType_lookup,
-+    .enum_table =3D &FloppyDriveType_lookup,
-     .get =3D get_enum,
-     .set =3D set_enum,
-     .set_default_value =3D set_default_value_enum,
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index ae317286a4..089146197f 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -249,7 +249,7 @@ struct Property {
- struct PropertyInfo {
-     const char *name;
-     const char *description;
--    const char * const *enum_table;
-+    const QEnumLookup *enum_table;
-     int (*print)(DeviceState *dev, Property *prop, char *dest, size_t le=
-n);
-     void (*set_default_value)(Object *obj, const Property *prop);
-     void (*create)(Object *obj, Property *prop, Error **errp);
-diff --git a/include/qapi/util.h b/include/qapi/util.h
-index 5e50d0c1ce..a7c3c64148 100644
---- a/include/qapi/util.h
-+++ b/include/qapi/util.h
-@@ -11,8 +11,13 @@
- #ifndef QAPI_UTIL_H
- #define QAPI_UTIL_H
-=20
--const char *qapi_enum_lookup(const char *const lookup[], int val);
--int qapi_enum_parse(const char * const lookup[], const char *buf,
-+typedef struct QEnumLookup {
-+    const char *const *array;
-+    int size;
-+} QEnumLookup;
+ ##
+-# @xen-set-replication:
+-#
+-# Enable or disable replication.
+-#
+-# @enable: true to enable, false to disable.
+-#
+-# @primary: true for primary or false for secondary.
+-#
+-# @failover: true to do failover, false to stop. but cannot be
+-#            specified if 'enable' is true. default value is false.
+-#
+-# Returns: nothing.
+-#
+-# Example:
+-#
+-# -> { "execute": "xen-set-replication",
+-#      "arguments": {"enable": true, "primary": false} }
+-# <- { "return": {} }
+-#
+-# Since: 2.9
+-##
+-{ 'command': 'xen-set-replication',
+-  'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } =
+}
+-
+-##
+-# @ReplicationStatus:
+-#
+-# The result format for 'query-xen-replication-status'.
+-#
+-# @error: true if an error happened, false if replication is normal.
+-#
+-# @desc: the human readable error description string, when
+-#        @error is 'true'.
+-#
+-# Since: 2.9
+-##
+-{ 'struct': 'ReplicationStatus',
+-  'data': { 'error': 'bool', '*desc': 'str' } }
+-
+-##
+-# @query-xen-replication-status:
+-#
+-# Query replication status while the vm is running.
+-#
+-# Returns: A @ReplicationResult object showing the status.
+-#
+-# Example:
+-#
+-# -> { "execute": "query-xen-replication-status" }
+-# <- { "return": { "error": false } }
+-#
+-# Since: 2.9
+-##
+-{ 'command': 'query-xen-replication-status',
+-  'returns': 'ReplicationStatus' }
+-
+-##
+-# @xen-colo-do-checkpoint:
+-#
+-# Xen uses this command to notify replication to trigger a checkpoint.
+-#
+-# Returns: nothing.
+-#
+-# Example:
+-#
+-# -> { "execute": "xen-colo-do-checkpoint" }
+-# <- { "return": {} }
+-#
+-# Since: 2.9
+-##
+-{ 'command': 'xen-colo-do-checkpoint' }
+-
+-##
+ # @GICCapability:
+ #
+ # The struct describes capability for a specific GIC (Generic
+diff --git a/qapi/common.json b/qapi/common.json
+index 862e73f982..e2c58564d8 100644
+--- a/qapi/common.json
++++ b/qapi/common.json
+@@ -173,3 +173,19 @@
+ { 'struct': 'String',
+   'data': {
+     'str': 'str' } }
 +
-+const char *qapi_enum_lookup(const QEnumLookup *lookup, int val);
-+int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
-                     int def, Error **errp);
++##
++# @StrOrNull:
++#
++# This is a string value or the explicit lack of a string (null
++# pointer in C).  Intended for cases when 'optional absent' already
++# has a different meaning.
++#
++# @s: the string value
++# @n: no string value
++#
++# Since: 2.10
++##
++{ 'alternate': 'StrOrNull',
++  'data': { 's': 'str',
++            'n': 'null' } }
+diff --git a/qapi/event.json b/qapi/event.json
+index f49bd3d564..a043de4cd8 100644
+--- a/qapi/event.json
++++ b/qapi/event.json
+@@ -51,44 +51,6 @@
+   'data': { '*device': 'str', 'path': 'str' } }
 =20
- int parse_qapi_name(const char *name, bool complete);
-diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
-index 0f3b8cb459..62a51a54cb 100644
---- a/include/qapi/visitor.h
-+++ b/include/qapi/visitor.h
-@@ -469,7 +469,7 @@ bool visit_optional(Visitor *v, const char *name, boo=
-l *present);
-  * that visit_type_str() must have no unwelcome side effects.
-  */
- void visit_type_enum(Visitor *v, const char *name, int *obj,
--                     const char *const strings[], Error **errp);
-+                     const QEnumLookup *lookup, Error **errp);
-=20
- /*
-  * Check if visitor is an input visitor.
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 1b828994fa..f3e5cff37a 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -1415,14 +1415,14 @@ void object_class_property_add_bool(ObjectClass *=
-klass, const char *name,
-  */
- void object_property_add_enum(Object *obj, const char *name,
-                               const char *typename,
--                              const char * const *strings,
-+                              const QEnumLookup *lookup,
-                               int (*get)(Object *, Error **),
-                               void (*set)(Object *, int, Error **),
-                               Error **errp);
-=20
- void object_class_property_add_enum(ObjectClass *klass, const char *name=
+ ##
+-# @MIGRATION:
+-#
+-# Emitted when a migration event happens
+-#
+-# @status: @MigrationStatus describing the current migration status.
+-#
+-# Since: 2.4
+-#
+-# Example:
+-#
+-# <- {"timestamp": {"seconds": 1432121972, "microseconds": 744001},
+-#     "event": "MIGRATION",
+-#     "data": {"status": "completed"} }
+-#
+-##
+-{ 'event': 'MIGRATION',
+-  'data': {'status': 'MigrationStatus'}}
+-
+-##
+-# @MIGRATION_PASS:
+-#
+-# Emitted from the source side of a migration at the start of each pass
+-# (when it syncs the dirty bitmap)
+-#
+-# @pass: An incrementing count (starting at 1 on the first pass)
+-#
+-# Since: 2.6
+-#
+-# Example:
+-#
+-# { "timestamp": {"seconds": 1449669631, "microseconds": 239225},
+-#   "event": "MIGRATION_PASS", "data": {"pass": 2} }
+-#
+-##
+-{ 'event': 'MIGRATION_PASS',
+-  'data': { 'pass': 'int' } }
+-
+-##
+ # @ACPI_DEVICE_OST:
+ #
+ # Emitted when guest executes ACPI _OST method.
+diff --git a/qapi/migration.json b/qapi/migration.json
+new file mode 100644
+index 0000000000..ee2b3b8733
+--- /dev/null
++++ b/qapi/migration.json
+@@ -0,0 +1,1085 @@
++# -*- Mode: Python -*-
++#
++
++##
++# =3D Migration
++##
++
++{ 'include': 'common.json' }
++
++##
++# @MigrationStats:
++#
++# Detailed migration status.
++#
++# @transferred: amount of bytes already transferred to the target VM
++#
++# @remaining: amount of bytes remaining to be transferred to the target =
+VM
++#
++# @total: total amount of bytes involved in the migration process
++#
++# @duplicate: number of duplicate (zero) pages (since 1.2)
++#
++# @skipped: number of skipped zero pages (since 1.5)
++#
++# @normal: number of normal pages (since 1.2)
++#
++# @normal-bytes: number of normal bytes sent (since 1.2)
++#
++# @dirty-pages-rate: number of pages dirtied by second by the
++#        guest (since 1.3)
++#
++# @mbps: throughput in megabits/sec. (since 1.6)
++#
++# @dirty-sync-count: number of times that dirty ram was synchronized (si=
+nce 2.1)
++#
++# @postcopy-requests: The number of page requests received from the dest=
+ination
++#        (since 2.7)
++#
++# @page-size: The number of bytes per page for the various page-based
++#        statistics (since 2.10)
++#
++# Since: 0.14.0
++##
++{ 'struct': 'MigrationStats',
++  'data': {'transferred': 'int', 'remaining': 'int', 'total': 'int' ,
++           'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
++           'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
++           'mbps' : 'number', 'dirty-sync-count' : 'int',
++           'postcopy-requests' : 'int', 'page-size' : 'int' } }
++
++##
++# @XBZRLECacheStats:
++#
++# Detailed XBZRLE migration cache statistics
++#
++# @cache-size: XBZRLE cache size
++#
++# @bytes: amount of bytes already transferred to the target VM
++#
++# @pages: amount of pages transferred to the target VM
++#
++# @cache-miss: number of cache miss
++#
++# @cache-miss-rate: rate of cache miss (since 2.1)
++#
++# @overflow: number of overflows
++#
++# Since: 1.2
++##
++{ 'struct': 'XBZRLECacheStats',
++  'data': {'cache-size': 'int', 'bytes': 'int', 'pages': 'int',
++           'cache-miss': 'int', 'cache-miss-rate': 'number',
++           'overflow': 'int' } }
++
++##
++# @MigrationStatus:
++#
++# An enumeration of migration status.
++#
++# @none: no migration has ever happened.
++#
++# @setup: migration process has been initiated.
++#
++# @cancelling: in the process of cancelling migration.
++#
++# @cancelled: cancelling migration is finished.
++#
++# @active: in the process of doing migration.
++#
++# @postcopy-active: like active, but now in postcopy mode. (since 2.5)
++#
++# @completed: migration is finished.
++#
++# @failed: some error occurred during migration process.
++#
++# @colo: VM is in the process of fault tolerance, VM can not get into th=
+is
++#        state unless colo capability is enabled for migration. (since 2=
+.8)
++#
++# Since: 2.3
++#
++##
++{ 'enum': 'MigrationStatus',
++  'data': [ 'none', 'setup', 'cancelling', 'cancelled',
++            'active', 'postcopy-active', 'completed', 'failed', 'colo' ]=
+ }
++
++##
++# @MigrationInfo:
++#
++# Information about current migration process.
++#
++# @status: @MigrationStatus describing the current migration status.
++#          If this field is not returned, no migration process
++#          has been initiated
++#
++# @ram: @MigrationStats containing detailed migration
++#       status, only returned if status is 'active' or
++#       'completed'(since 1.2)
++#
++# @disk: @MigrationStats containing detailed disk migration
++#        status, only returned if status is 'active' and it is a block
++#        migration
++#
++# @xbzrle-cache: @XBZRLECacheStats containing detailed XBZRLE
++#                migration statistics, only returned if XBZRLE feature i=
+s on and
++#                status is 'active' or 'completed' (since 1.2)
++#
++# @total-time: total amount of milliseconds since migration started.
++#        If migration has ended, it returns the total migration
++#        time. (since 1.2)
++#
++# @downtime: only present when migration finishes correctly
++#        total downtime in milliseconds for the guest.
++#        (since 1.3)
++#
++# @expected-downtime: only present while migration is active
++#        expected downtime in milliseconds for the guest in last walk
++#        of the dirty bitmap. (since 1.3)
++#
++# @setup-time: amount of setup time in milliseconds _before_ the
++#        iterations begin but _after_ the QMP command is issued. This is=
+ designed
++#        to provide an accounting of any activities (such as RDMA pinnin=
+g) which
++#        may be expensive, but do not actually occur during the iterativ=
+e
++#        migration rounds themselves. (since 1.6)
++#
++# @cpu-throttle-percentage: percentage of time guest cpus are being
++#        throttled during auto-converge. This is only present when auto-=
+converge
++#        has started throttling guest cpus. (Since 2.7)
++#
++# @error-desc: the human readable error description string, when
++#              @status is 'failed'. Clients should not attempt to parse =
+the
++#              error strings. (Since 2.7)
++#
++# Since: 0.14.0
++##
++{ 'struct': 'MigrationInfo',
++  'data': {'*status': 'MigrationStatus', '*ram': 'MigrationStats',
++           '*disk': 'MigrationStats',
++           '*xbzrle-cache': 'XBZRLECacheStats',
++           '*total-time': 'int',
++           '*expected-downtime': 'int',
++           '*downtime': 'int',
++           '*setup-time': 'int',
++           '*cpu-throttle-percentage': 'int',
++           '*error-desc': 'str'} }
++
++##
++# @query-migrate:
++#
++# Returns information about current migration process. If migration
++# is active there will be another json-object with RAM migration
++# status and if block migration is active another one with block
++# migration status.
++#
++# Returns: @MigrationInfo
++#
++# Since: 0.14.0
++#
++# Example:
++#
++# 1. Before the first migration
++#
++# -> { "execute": "query-migrate" }
++# <- { "return": {} }
++#
++# 2. Migration is done and has succeeded
++#
++# -> { "execute": "query-migrate" }
++# <- { "return": {
++#         "status": "completed",
++#         "ram":{
++#           "transferred":123,
++#           "remaining":123,
++#           "total":246,
++#           "total-time":12345,
++#           "setup-time":12345,
++#           "downtime":12345,
++#           "duplicate":123,
++#           "normal":123,
++#           "normal-bytes":123456,
++#           "dirty-sync-count":15
++#         }
++#      }
++#    }
++#
++# 3. Migration is done and has failed
++#
++# -> { "execute": "query-migrate" }
++# <- { "return": { "status": "failed" } }
++#
++# 4. Migration is being performed and is not a block migration:
++#
++# -> { "execute": "query-migrate" }
++# <- {
++#       "return":{
++#          "status":"active",
++#          "ram":{
++#             "transferred":123,
++#             "remaining":123,
++#             "total":246,
++#             "total-time":12345,
++#             "setup-time":12345,
++#             "expected-downtime":12345,
++#             "duplicate":123,
++#             "normal":123,
++#             "normal-bytes":123456,
++#             "dirty-sync-count":15
++#          }
++#       }
++#    }
++#
++# 5. Migration is being performed and is a block migration:
++#
++# -> { "execute": "query-migrate" }
++# <- {
++#       "return":{
++#          "status":"active",
++#          "ram":{
++#             "total":1057024,
++#             "remaining":1053304,
++#             "transferred":3720,
++#             "total-time":12345,
++#             "setup-time":12345,
++#             "expected-downtime":12345,
++#             "duplicate":123,
++#             "normal":123,
++#             "normal-bytes":123456,
++#             "dirty-sync-count":15
++#          },
++#          "disk":{
++#             "total":20971520,
++#             "remaining":20880384,
++#             "transferred":91136
++#          }
++#       }
++#    }
++#
++# 6. Migration is being performed and XBZRLE is active:
++#
++# -> { "execute": "query-migrate" }
++# <- {
++#       "return":{
++#          "status":"active",
++#          "capabilities" : [ { "capability": "xbzrle", "state" : true }=
+ ],
++#          "ram":{
++#             "total":1057024,
++#             "remaining":1053304,
++#             "transferred":3720,
++#             "total-time":12345,
++#             "setup-time":12345,
++#             "expected-downtime":12345,
++#             "duplicate":10,
++#             "normal":3333,
++#             "normal-bytes":3412992,
++#             "dirty-sync-count":15
++#          },
++#          "xbzrle-cache":{
++#             "cache-size":67108864,
++#             "bytes":20971520,
++#             "pages":2444343,
++#             "cache-miss":2244,
++#             "cache-miss-rate":0.123,
++#             "overflow":34434
++#          }
++#       }
++#    }
++#
++##
++{ 'command': 'query-migrate', 'returns': 'MigrationInfo' }
++
++##
++# @MigrationCapability:
++#
++# Migration capabilities enumeration
++#
++# @xbzrle: Migration supports xbzrle (Xor Based Zero Run Length Encoding=
+).
++#          This feature allows us to minimize migration traffic for cert=
+ain work
++#          loads, by sending compressed difference of the pages
++#
++# @rdma-pin-all: Controls whether or not the entire VM memory footprint =
+is
++#          mlock()'d on demand or all at once. Refer to docs/rdma.txt fo=
+r usage.
++#          Disabled by default. (since 2.0)
++#
++# @zero-blocks: During storage migration encode blocks of zeroes efficie=
+ntly. This
++#          essentially saves 1MB of zeroes per block on the wire. Enabli=
+ng requires
++#          source and target VM to support this feature. To enable it is=
+ sufficient
++#          to enable the capability on the source VM. The feature is dis=
+abled by
++#          default. (since 1.6)
++#
++# @compress: Use multiple compression threads to accelerate live migrati=
+on.
++#          This feature can help to reduce the migration traffic, by sen=
+ding
++#          compressed pages. Please note that if compress and xbzrle are=
+ both
++#          on, compress only takes effect in the ram bulk stage, after t=
+hat,
++#          it will be disabled and only xbzrle takes effect, this can he=
+lp to
++#          minimize migration traffic. The feature is disabled by defaul=
+t.
++#          (since 2.4 )
++#
++# @events: generate events for each migration state change
++#          (since 2.4 )
++#
++# @auto-converge: If enabled, QEMU will automatically throttle down the =
+guest
++#          to speed up convergence of RAM migration. (since 1.6)
++#
++# @postcopy-ram: Start executing on the migration target before all of R=
+AM has
++#          been migrated, pulling the remaining pages along as needed. N=
+OTE: If
++#          the migration fails during postcopy the VM will fail.  (since=
+ 2.6)
++#
++# @x-colo: If enabled, migration will never end, and the state of the VM=
+ on the
++#        primary side will be migrated continuously to the VM on seconda=
+ry
++#        side, this process is called COarse-Grain LOck Stepping (COLO) =
+for
++#        Non-stop Service. (since 2.8)
++#
++# @release-ram: if enabled, qemu will free the migrated ram pages on the=
+ source
++#        during postcopy-ram migration. (since 2.9)
++#
++# @block: If enabled, QEMU will also migrate the contents of all block
++#          devices.  Default is disabled.  A possible alternative uses
++#          mirror jobs to a builtin NBD server on the destination, which
++#          offers more flexibility.
++#          (Since 2.10)
++#
++# @return-path: If enabled, migration will use the return path even
++#               for precopy. (since 2.10)
++#
++# Since: 1.2
++##
++{ 'enum': 'MigrationCapability',
++  'data': ['xbzrle', 'rdma-pin-all', 'auto-converge', 'zero-blocks',
++           'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram'=
 ,
-                                     const char *typename,
--                                    const char * const *strings,
-+                                    const QEnumLookup *lookup,
-                                     int (*get)(Object *, Error **),
-                                     void (*set)(Object *, int, Error **)=
++           'block', 'return-path' ] }
++
++##
++# @MigrationCapabilityStatus:
++#
++# Migration capability information
++#
++# @capability: capability enum
++#
++# @state: capability state bool
++#
++# Since: 1.2
++##
++{ 'struct': 'MigrationCapabilityStatus',
++  'data': { 'capability' : 'MigrationCapability', 'state' : 'bool' } }
++
++##
++# @migrate-set-capabilities:
++#
++# Enable/Disable the following migration capabilities (like xbzrle)
++#
++# @capabilities: json array of capability modifications to make
++#
++# Since: 1.2
++#
++# Example:
++#
++# -> { "execute": "migrate-set-capabilities" , "arguments":
++#      { "capabilities": [ { "capability": "xbzrle", "state": true } ] }=
+ }
++#
++##
++{ 'command': 'migrate-set-capabilities',
++  'data': { 'capabilities': ['MigrationCapabilityStatus'] } }
++
++##
++# @query-migrate-capabilities:
++#
++# Returns information about the current migration capabilities status
++#
++# Returns: @MigrationCapabilitiesStatus
++#
++# Since: 1.2
++#
++# Example:
++#
++# -> { "execute": "query-migrate-capabilities" }
++# <- { "return": [
++#       {"state": false, "capability": "xbzrle"},
++#       {"state": false, "capability": "rdma-pin-all"},
++#       {"state": false, "capability": "auto-converge"},
++#       {"state": false, "capability": "zero-blocks"},
++#       {"state": false, "capability": "compress"},
++#       {"state": true, "capability": "events"},
++#       {"state": false, "capability": "postcopy-ram"},
++#       {"state": false, "capability": "x-colo"}
++#    ]}
++#
++##
++{ 'command': 'query-migrate-capabilities', 'returns':   ['MigrationCapab=
+ilityStatus']}
++
++##
++# @MigrationParameter:
++#
++# Migration parameters enumeration
++#
++# @compress-level: Set the compression level to be used in live migratio=
+n,
++#          the compression level is an integer between 0 and 9, where 0 =
+means
++#          no compression, 1 means the best compression speed, and 9 mea=
+ns best
++#          compression ratio which will consume more CPU.
++#
++# @compress-threads: Set compression thread count to be used in live mig=
+ration,
++#          the compression thread count is an integer between 1 and 255.
++#
++# @decompress-threads: Set decompression thread count to be used in live
++#          migration, the decompression thread count is an integer betwe=
+en 1
++#          and 255. Usually, decompression is at least 4 times as fast a=
+s
++#          compression, so set the decompress-threads to the number abou=
+t 1/4
++#          of compress-threads is adequate.
++#
++# @cpu-throttle-initial: Initial percentage of time guest cpus are throt=
+tled
++#                        when migration auto-converge is activated. The
++#                        default value is 20. (Since 2.7)
++#
++# @cpu-throttle-increment: throttle percentage increase each time
++#                          auto-converge detects that migration is not m=
+aking
++#                          progress. The default value is 10. (Since 2.7=
+)
++#
++# @tls-creds: ID of the 'tls-creds' object that provides credentials for
++#             establishing a TLS connection over the migration data chan=
+nel.
++#             On the outgoing side of the migration, the credentials mus=
+t
++#             be for a 'client' endpoint, while for the incoming side th=
+e
++#             credentials must be for a 'server' endpoint. Setting this
++#             will enable TLS for all migrations. The default is unset,
++#             resulting in unsecured migration at the QEMU level. (Since=
+ 2.7)
++#
++# @tls-hostname: hostname of the target host for the migration. This is
++#                required when using x509 based TLS credentials and the
++#                migration URI does not already include a hostname. For
++#                example if using fd: or exec: based migration, the
++#                hostname must be provided so that the server's x509
++#                certificate identity can be validated. (Since 2.7)
++#
++# @max-bandwidth: to set maximum speed for migration. maximum speed in
++#                 bytes per second. (Since 2.8)
++#
++# @downtime-limit: set maximum tolerated downtime for migration. maximum
++#                  downtime in milliseconds (Since 2.8)
++#
++# @x-checkpoint-delay: The delay time (in ms) between two COLO checkpoin=
+ts in
++#          periodic mode. (Since 2.8)
++#
++# @block-incremental: Affects how much storage is migrated when the
++# 	block migration capability is enabled.  When false, the entire
++# 	storage backing chain is migrated into a flattened image at
++# 	the destination; when true, only the active qcow2 layer is
++# 	migrated and the destination must already have access to the
++# 	same backing chain as was used on the source.  (since 2.10)
++#
++# Since: 2.4
++##
++{ 'enum': 'MigrationParameter',
++  'data': ['compress-level', 'compress-threads', 'decompress-threads',
++           'cpu-throttle-initial', 'cpu-throttle-increment',
++           'tls-creds', 'tls-hostname', 'max-bandwidth',
++           'downtime-limit', 'x-checkpoint-delay', 'block-incremental' ]=
+ }
++
++##
++# @MigrateSetParameters:
++#
++# @compress-level: compression level
++#
++# @compress-threads: compression thread count
++#
++# @decompress-threads: decompression thread count
++#
++# @cpu-throttle-initial: Initial percentage of time guest cpus are
++#                        throttled when migration auto-converge is activ=
+ated.
++#                        The default value is 20. (Since 2.7)
++#
++# @cpu-throttle-increment: throttle percentage increase each time
++#                          auto-converge detects that migration is not m=
+aking
++#                          progress. The default value is 10. (Since 2.7=
+)
++#
++# @tls-creds: ID of the 'tls-creds' object that provides credentials
++#             for establishing a TLS connection over the migration data
++#             channel. On the outgoing side of the migration, the creden=
+tials
++#             must be for a 'client' endpoint, while for the incoming si=
+de the
++#             credentials must be for a 'server' endpoint. Setting this
++#             to a non-empty string enables TLS for all migrations.
++#             An empty string means that QEMU will use plain text mode f=
+or
++#             migration, rather than TLS (Since 2.9)
++#             Previously (since 2.7), this was reported by omitting
++#             tls-creds instead.
++#
++# @tls-hostname: hostname of the target host for the migration. This
++#                is required when using x509 based TLS credentials and t=
+he
++#                migration URI does not already include a hostname. For
++#                example if using fd: or exec: based migration, the
++#                hostname must be provided so that the server's x509
++#                certificate identity can be validated. (Since 2.7)
++#                An empty string means that QEMU will use the hostname
++#                associated with the migration URI, if any. (Since 2.9)
++#                Previously (since 2.7), this was reported by omitting
++#                tls-hostname instead.
++#
++# @max-bandwidth: to set maximum speed for migration. maximum speed in
++#                 bytes per second. (Since 2.8)
++#
++# @downtime-limit: set maximum tolerated downtime for migration. maximum
++#                  downtime in milliseconds (Since 2.8)
++#
++# @x-checkpoint-delay: the delay time between two COLO checkpoints. (Sin=
+ce 2.8)
++#
++# @block-incremental: Affects how much storage is migrated when the
++# 	block migration capability is enabled.  When false, the entire
++# 	storage backing chain is migrated into a flattened image at
++# 	the destination; when true, only the active qcow2 layer is
++# 	migrated and the destination must already have access to the
++# 	same backing chain as was used on the source.  (since 2.10)
++#
++# Since: 2.4
++##
++# TODO either fuse back into MigrationParameters, or make
++# MigrationParameters members mandatory
++{ 'struct': 'MigrateSetParameters',
++  'data': { '*compress-level': 'int',
++            '*compress-threads': 'int',
++            '*decompress-threads': 'int',
++            '*cpu-throttle-initial': 'int',
++            '*cpu-throttle-increment': 'int',
++            '*tls-creds': 'StrOrNull',
++            '*tls-hostname': 'StrOrNull',
++            '*max-bandwidth': 'int',
++            '*downtime-limit': 'int',
++            '*x-checkpoint-delay': 'int',
++            '*block-incremental': 'bool' } }
++
++##
++# @migrate-set-parameters:
++#
++# Set various migration parameters.
++#
++# Since: 2.4
++#
++# Example:
++#
++# -> { "execute": "migrate-set-parameters" ,
++#      "arguments": { "compress-level": 1 } }
++#
++##
++{ 'command': 'migrate-set-parameters', 'boxed': true,
++  'data': 'MigrateSetParameters' }
++
++##
++# @MigrationParameters:
++#
++# The optional members aren't actually optional.
++#
++# @compress-level: compression level
++#
++# @compress-threads: compression thread count
++#
++# @decompress-threads: decompression thread count
++#
++# @cpu-throttle-initial: Initial percentage of time guest cpus are
++#                        throttled when migration auto-converge is activ=
+ated.
++#                        (Since 2.7)
++#
++# @cpu-throttle-increment: throttle percentage increase each time
++#                          auto-converge detects that migration is not m=
+aking
++#                          progress. (Since 2.7)
++#
++# @tls-creds: ID of the 'tls-creds' object that provides credentials
++#             for establishing a TLS connection over the migration data
++#             channel. On the outgoing side of the migration, the creden=
+tials
++#             must be for a 'client' endpoint, while for the incoming si=
+de the
++#             credentials must be for a 'server' endpoint.
++#             An empty string means that QEMU will use plain text mode f=
+or
++#             migration, rather than TLS (Since 2.7)
++#             Note: 2.8 reports this by omitting tls-creds instead.
++#
++# @tls-hostname: hostname of the target host for the migration. This
++#                is required when using x509 based TLS credentials and t=
+he
++#                migration URI does not already include a hostname. For
++#                example if using fd: or exec: based migration, the
++#                hostname must be provided so that the server's x509
++#                certificate identity can be validated. (Since 2.7)
++#                An empty string means that QEMU will use the hostname
++#                associated with the migration URI, if any. (Since 2.9)
++#                Note: 2.8 reports this by omitting tls-hostname instead=
+.
++#
++# @max-bandwidth: to set maximum speed for migration. maximum speed in
++#                 bytes per second. (Since 2.8)
++#
++# @downtime-limit: set maximum tolerated downtime for migration. maximum
++#                  downtime in milliseconds (Since 2.8)
++#
++# @x-checkpoint-delay: the delay time between two COLO checkpoints. (Sin=
+ce 2.8)
++#
++# @block-incremental: Affects how much storage is migrated when the
++# 	block migration capability is enabled.  When false, the entire
++# 	storage backing chain is migrated into a flattened image at
++# 	the destination; when true, only the active qcow2 layer is
++# 	migrated and the destination must already have access to the
++# 	same backing chain as was used on the source.  (since 2.10)
++#
++# Since: 2.4
++##
++{ 'struct': 'MigrationParameters',
++  'data': { '*compress-level': 'int',
++            '*compress-threads': 'int',
++            '*decompress-threads': 'int',
++            '*cpu-throttle-initial': 'int',
++            '*cpu-throttle-increment': 'int',
++            '*tls-creds': 'str',
++            '*tls-hostname': 'str',
++            '*max-bandwidth': 'int',
++            '*downtime-limit': 'int',
++            '*x-checkpoint-delay': 'int',
++            '*block-incremental': 'bool' } }
++
++##
++# @query-migrate-parameters:
++#
++# Returns information about the current migration parameters
++#
++# Returns: @MigrationParameters
++#
++# Since: 2.4
++#
++# Example:
++#
++# -> { "execute": "query-migrate-parameters" }
++# <- { "return": {
++#          "decompress-threads": 2,
++#          "cpu-throttle-increment": 10,
++#          "compress-threads": 8,
++#          "compress-level": 1,
++#          "cpu-throttle-initial": 20,
++#          "max-bandwidth": 33554432,
++#          "downtime-limit": 300
++#       }
++#    }
++#
++##
++{ 'command': 'query-migrate-parameters',
++  'returns': 'MigrationParameters' }
++
++##
++# @client_migrate_info:
++#
++# Set migration information for remote display.  This makes the server
++# ask the client to automatically reconnect using the new parameters
++# once migration finished successfully.  Only implemented for SPICE.
++#
++# @protocol:     must be "spice"
++# @hostname:     migration target hostname
++# @port:         spice tcp port for plaintext channels
++# @tls-port:     spice tcp port for tls-secured channels
++# @cert-subject: server certificate subject
++#
++# Since: 0.14.0
++#
++# Example:
++#
++# -> { "execute": "client_migrate_info",
++#      "arguments": { "protocol": "spice",
++#                     "hostname": "virt42.lab.kraxel.org",
++#                     "port": 1234 } }
++# <- { "return": {} }
++#
++##
++{ 'command': 'client_migrate_info',
++  'data': { 'protocol': 'str', 'hostname': 'str', '*port': 'int',
++            '*tls-port': 'int', '*cert-subject': 'str' } }
++
++##
++# @migrate-start-postcopy:
++#
++# Followup to a migration command to switch the migration to postcopy mo=
+de.
++# The postcopy-ram capability must be set before the original migration
++# command.
++#
++# Since: 2.5
++#
++# Example:
++#
++# -> { "execute": "migrate-start-postcopy" }
++# <- { "return": {} }
++#
++##
++{ 'command': 'migrate-start-postcopy' }
++
++##
++# @MIGRATION:
++#
++# Emitted when a migration event happens
++#
++# @status: @MigrationStatus describing the current migration status.
++#
++# Since: 2.4
++#
++# Example:
++#
++# <- {"timestamp": {"seconds": 1432121972, "microseconds": 744001},
++#     "event": "MIGRATION",
++#     "data": {"status": "completed"} }
++#
++##
++{ 'event': 'MIGRATION',
++  'data': {'status': 'MigrationStatus'}}
++
++##
++# @MIGRATION_PASS:
++#
++# Emitted from the source side of a migration at the start of each pass
++# (when it syncs the dirty bitmap)
++#
++# @pass: An incrementing count (starting at 1 on the first pass)
++#
++# Since: 2.6
++#
++# Example:
++#
++# { "timestamp": {"seconds": 1449669631, "microseconds": 239225},
++#   "event": "MIGRATION_PASS", "data": {"pass": 2} }
++#
++##
++{ 'event': 'MIGRATION_PASS',
++  'data': { 'pass': 'int' } }
++
++##
++# @COLOMessage:
++#
++# The message transmission between Primary side and Secondary side.
++#
++# @checkpoint-ready: Secondary VM (SVM) is ready for checkpointing
++#
++# @checkpoint-request: Primary VM (PVM) tells SVM to prepare for checkpo=
+inting
++#
++# @checkpoint-reply: SVM gets PVM's checkpoint request
++#
++# @vmstate-send: VM's state will be sent by PVM.
++#
++# @vmstate-size: The total size of VMstate.
++#
++# @vmstate-received: VM's state has been received by SVM.
++#
++# @vmstate-loaded: VM's state has been loaded by SVM.
++#
++# Since: 2.8
++##
++{ 'enum': 'COLOMessage',
++  'data': [ 'checkpoint-ready', 'checkpoint-request', 'checkpoint-reply'=
 ,
-                                     Error **errp);
-diff --git a/migration/global_state.c b/migration/global_state.c
-index 8db2f19459..dfdaf63910 100644
---- a/migration/global_state.c
-+++ b/migration/global_state.c
-@@ -88,7 +88,7 @@ static int global_state_post_load(void *opaque, int ver=
-sion_id)
-     s->received =3D true;
-     trace_migrate_global_state_post_load(runstate);
-=20
--    r =3D qapi_enum_parse(RunState_lookup, runstate, -1, &local_err);
-+    r =3D qapi_enum_parse(&RunState_lookup, runstate, -1, &local_err);
-=20
-     if (r =3D=3D -1) {
-         if (local_err) {
-diff --git a/net/filter.c b/net/filter.c
-index 1dfd2caa23..2fd7d7d663 100644
---- a/net/filter.c
-+++ b/net/filter.c
-@@ -179,7 +179,7 @@ static void netfilter_init(Object *obj)
-                             netfilter_get_netdev_id, netfilter_set_netde=
-v_id,
-                             NULL);
-     object_property_add_enum(obj, "queue", "NetFilterDirection",
--                             NetFilterDirection_lookup,
-+                             &NetFilterDirection_lookup,
-                              netfilter_get_direction, netfilter_set_dire=
-ction,
-                              NULL);
-     object_property_add_str(obj, "status",
-diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
-index 7af2f04d36..e9b266bb70 100644
---- a/qapi/qapi-util.c
-+++ b/qapi/qapi-util.c
-@@ -14,14 +14,14 @@
- #include "qapi/error.h"
- #include "qemu-common.h"
-=20
--const char *qapi_enum_lookup(const char *const lookup[], int val)
-+const char *qapi_enum_lookup(const QEnumLookup *lookup, int val)
- {
--    assert(val >=3D 0);
-+    assert(val >=3D 0 && val < lookup->size);
-=20
--    return lookup[val];
-+    return lookup->array[val];
- }
-=20
--int qapi_enum_parse(const char * const lookup[], const char *buf,
-+int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
-                     int def, Error **errp)
- {
-     int i;
-@@ -30,8 +30,8 @@ int qapi_enum_parse(const char * const lookup[], const =
-char *buf,
-         return def;
-     }
-=20
--    for (i =3D 0; lookup[i]; i++) {
--        if (!strcmp(buf, lookup[i])) {
-+    for (i =3D 0; i < lookup->size; i++) {
-+        if (!strcmp(buf, lookup->array[i])) {
-             return i;
-         }
-     }
-diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
-index 30dc85b6f3..3dcb968867 100644
---- a/qapi/qapi-visit-core.c
-+++ b/qapi/qapi-visit-core.c
-@@ -333,24 +333,26 @@ void visit_type_null(Visitor *v, const char *name, =
-QNull **obj,
- }
-=20
- static void output_type_enum(Visitor *v, const char *name, int *obj,
--                             const char *const strings[], Error **errp)
-+                             const QEnumLookup *lookup, Error **errp)
- {
--    int i =3D 0;
-     int value =3D *obj;
-     char *enum_str;
-=20
--    while (strings[i++] !=3D NULL);
--    if (value < 0 || value >=3D i - 1) {
-+    /*
-+     * TODO why is this an error, not an assertion?  If assertion:
-+     * delete, and rely on qapi_enum_lookup()
-+     */
-+    if (value < 0 || value >=3D lookup->size) {
-         error_setg(errp, QERR_INVALID_PARAMETER, name ? name : "null");
-         return;
-     }
-=20
--    enum_str =3D (char *)qapi_enum_lookup(strings, value);
-+    enum_str =3D (char *)qapi_enum_lookup(lookup, value);
-     visit_type_str(v, name, &enum_str, errp);
- }
-=20
- static void input_type_enum(Visitor *v, const char *name, int *obj,
--                            const char *const strings[], Error **errp)
-+                            const QEnumLookup *lookup, Error **errp)
- {
-     Error *local_err =3D NULL;
-     int64_t value;
-@@ -362,7 +364,7 @@ static void input_type_enum(Visitor *v, const char *n=
-ame, int *obj,
-         return;
-     }
-=20
--    value =3D qapi_enum_parse(strings, enum_str, -1, NULL);
-+    value =3D qapi_enum_parse(lookup, enum_str, -1, NULL);
-     if (value < 0) {
-         error_setg(errp, QERR_INVALID_PARAMETER, enum_str);
-         g_free(enum_str);
-@@ -374,16 +376,16 @@ static void input_type_enum(Visitor *v, const char =
-*name, int *obj,
- }
-=20
- void visit_type_enum(Visitor *v, const char *name, int *obj,
--                     const char *const strings[], Error **errp)
-+                     const QEnumLookup *lookup, Error **errp)
- {
--    assert(obj && strings);
-+    assert(obj && lookup);
-     trace_visit_type_enum(v, name, obj);
-     switch (v->type) {
-     case VISITOR_INPUT:
--        input_type_enum(v, name, obj, strings, errp);
-+        input_type_enum(v, name, obj, lookup, errp);
-         break;
-     case VISITOR_OUTPUT:
--        output_type_enum(v, name, obj, strings, errp);
-+        output_type_enum(v, name, obj, lookup, errp);
-         break;
-     case VISITOR_CLONE:
-         /* nothing further to do, scalar value was already copied by
-diff --git a/qemu-img.c b/qemu-img.c
-index a72a2e3133..df984b11b9 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -3489,7 +3489,7 @@ static int img_resize(int argc, char **argv)
-             image_opts =3D true;
-             break;
-         case OPTION_PREALLOCATION:
--            prealloc =3D qapi_enum_parse(PreallocMode_lookup, optarg,
-+            prealloc =3D qapi_enum_parse(&PreallocMode_lookup, optarg,
-                                        PREALLOC_MODE__MAX, NULL);
-             if (prealloc =3D=3D PREALLOC_MODE__MAX) {
-                 error_report("Invalid preallocation mode '%s'", optarg);
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index a97f3f4540..d75ca51482 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -638,7 +638,7 @@ int main(int argc, char **argv)
-             break;
-         case QEMU_NBD_OPT_DETECT_ZEROES:
-             detect_zeroes =3D
--                qapi_enum_parse(BlockdevDetectZeroesOptions_lookup,
-+                qapi_enum_parse(&BlockdevDetectZeroesOptions_lookup,
-                                 optarg,
-                                 BLOCKDEV_DETECT_ZEROES_OPTIONS_OFF,
-                                 &local_err);
-diff --git a/qom/object.c b/qom/object.c
-index fe6e744b4d..3e18537e9b 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1246,7 +1246,7 @@ uint64_t object_property_get_uint(Object *obj, cons=
-t char *name,
- }
-=20
- typedef struct EnumProperty {
--    const char * const *strings;
-+    const QEnumLookup *lookup;
-     int (*get)(Object *, Error **);
-     void (*set)(Object *, int, Error **);
- } EnumProperty;
-@@ -1284,7 +1284,7 @@ int object_property_get_enum(Object *obj, const cha=
-r *name,
-     visit_complete(v, &str);
-     visit_free(v);
-     v =3D string_input_visitor_new(str);
--    visit_type_enum(v, name, &ret, enumprop->strings, errp);
-+    visit_type_enum(v, name, &ret, enumprop->lookup, errp);
-=20
-     g_free(str);
-     visit_free(v);
-@@ -1950,7 +1950,7 @@ static void property_get_enum(Object *obj, Visitor =
-*v, const char *name,
-         return;
-     }
-=20
--    visit_type_enum(v, name, &value, prop->strings, errp);
-+    visit_type_enum(v, name, &value, prop->lookup, errp);
- }
-=20
- static void property_set_enum(Object *obj, Visitor *v, const char *name,
-@@ -1960,7 +1960,7 @@ static void property_set_enum(Object *obj, Visitor =
-*v, const char *name,
-     int value;
-     Error *err =3D NULL;
-=20
--    visit_type_enum(v, name, &value, prop->strings, &err);
-+    visit_type_enum(v, name, &value, prop->lookup, &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-@@ -1977,7 +1977,7 @@ static void property_release_enum(Object *obj, cons=
-t char *name,
-=20
- void object_property_add_enum(Object *obj, const char *name,
-                               const char *typename,
--                              const char * const *strings,
-+                              const QEnumLookup *lookup,
-                               int (*get)(Object *, Error **),
-                               void (*set)(Object *, int, Error **),
-                               Error **errp)
-@@ -1985,7 +1985,7 @@ void object_property_add_enum(Object *obj, const ch=
-ar *name,
-     Error *local_err =3D NULL;
-     EnumProperty *prop =3D g_malloc(sizeof(*prop));
-=20
--    prop->strings =3D strings;
-+    prop->lookup =3D lookup;
-     prop->get =3D get;
-     prop->set =3D set;
-=20
-@@ -2002,7 +2002,7 @@ void object_property_add_enum(Object *obj, const ch=
-ar *name,
-=20
- void object_class_property_add_enum(ObjectClass *klass, const char *name=
-,
-                                     const char *typename,
--                                    const char * const *strings,
-+                                    const QEnumLookup *lookup,
-                                     int (*get)(Object *, Error **),
-                                     void (*set)(Object *, int, Error **)=
-,
-                                     Error **errp)
-@@ -2010,7 +2010,7 @@ void object_class_property_add_enum(ObjectClass *kl=
-ass, const char *name,
-     Error *local_err =3D NULL;
-     EnumProperty *prop =3D g_malloc(sizeof(*prop));
-=20
--    prop->strings =3D strings;
-+    prop->lookup =3D lookup;
-     prop->get =3D get;
-     prop->set =3D set;
-=20
-diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-index bd0b742236..7e1cfc13f0 100644
---- a/scripts/qapi-visit.py
-+++ b/scripts/qapi-visit.py
-@@ -153,7 +153,7 @@ def gen_visit_enum(name):
- void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s *obj=
-, Error **errp)
- {
-     int value =3D *obj;
--    visit_type_enum(v, name, &value, %(c_name)s_lookup, errp);
-+    visit_type_enum(v, name, &value, &%(c_name)s_lookup, errp);
-     *obj =3D value;
- }
- ''',
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 8736b9c786..39a67270fc 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -1849,19 +1849,22 @@ def guardend(name):
- def gen_enum_lookup(name, values, prefix=3DNone):
-     ret =3D mcgen('''
-=20
--const char *const %(c_name)s_lookup[] =3D {
-+const QEnumLookup %(c_name)s_lookup =3D {
-+    .array =3D (const char *const[]) {
- ''',
-                 c_name=3Dc_name(name))
-     for value in values:
-         index =3D c_enum_const(name, value, prefix)
-         ret +=3D mcgen('''
--    [%(index)s] =3D "%(value)s",
-+        [%(index)s] =3D "%(value)s",
- ''',
-                      index=3Dindex, value=3Dvalue)
-=20
-     max_index =3D c_enum_const(name, '_MAX', prefix)
-     ret +=3D mcgen('''
--    [%(max_index)s] =3D NULL,
-+        [%(max_index)s] =3D NULL,
-+    },
-+    .size =3D %(max_index)s
- };
- ''',
-                  max_index=3Dmax_index)
-@@ -1895,9 +1898,9 @@ typedef enum %(c_name)s {
-     ret +=3D mcgen('''
-=20
- #define %(c_name)s_str(val) \\
--    qapi_enum_lookup(%(c_name)s_lookup, (val))
-+    qapi_enum_lookup(&%(c_name)s_lookup, (val))
-=20
--extern const char *const %(c_name)s_lookup[];
-+extern const QEnumLookup %(c_name)s_lookup;
- ''',
-                  c_name=3Dc_name(name))
-     return ret
-diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
-index c51e6e734d..07e351f950 100644
---- a/tests/check-qom-proplist.c
-+++ b/tests/check-qom-proplist.c
-@@ -46,11 +46,14 @@ enum DummyAnimal {
-     DUMMY_LAST,
- };
-=20
--static const char *const dummy_animal_map[DUMMY_LAST + 1] =3D {
--    [DUMMY_FROG] =3D "frog",
--    [DUMMY_ALLIGATOR] =3D "alligator",
--    [DUMMY_PLATYPUS] =3D "platypus",
--    [DUMMY_LAST] =3D NULL,
-+const QEnumLookup dummy_animal_map =3D {
-+    .array =3D (const char *const[]) {
-+        [DUMMY_FROG] =3D "frog",
-+        [DUMMY_ALLIGATOR] =3D "alligator",
-+        [DUMMY_PLATYPUS] =3D "platypus",
-+        [DUMMY_LAST] =3D NULL,
-+    },
-+    .size =3D DUMMY_LAST
- };
-=20
- struct DummyObject {
-@@ -142,7 +145,7 @@ static void dummy_class_init(ObjectClass *cls, void *=
-data)
-                                   NULL);
-     object_class_property_add_enum(cls, "av",
-                                    "DummyAnimal",
--                                   dummy_animal_map,
-+                                   &dummy_animal_map,
-                                    dummy_get_av,
-                                    dummy_set_av,
-                                    NULL);
-diff --git a/tests/test-qapi-util.c b/tests/test-qapi-util.c
-index 0992bdb218..4b5e4f8bd3 100644
---- a/tests/test-qapi-util.c
-+++ b/tests/test-qapi-util.c
-@@ -19,19 +19,19 @@ static void test_qapi_enum_parse(void)
-     Error *err =3D NULL;
-     int ret;
-=20
--    ret =3D qapi_enum_parse(QType_lookup, NULL, QTYPE_NONE, &error_abort=
-);
-+    ret =3D qapi_enum_parse(&QType_lookup, NULL, QTYPE_NONE, &error_abor=
-t);
-     g_assert_cmpint(ret, =3D=3D, QTYPE_NONE);
-=20
--    ret =3D qapi_enum_parse(QType_lookup, "junk", -1, NULL);
-+    ret =3D qapi_enum_parse(&QType_lookup, "junk", -1, NULL);
-     g_assert_cmpint(ret, =3D=3D, -1);
-=20
--    ret =3D qapi_enum_parse(QType_lookup, "junk", -1, &err);
-+    ret =3D qapi_enum_parse(&QType_lookup, "junk", -1, &err);
-     error_free_or_abort(&err);
-=20
--    ret =3D qapi_enum_parse(QType_lookup, "none", -1, &error_abort);
-+    ret =3D qapi_enum_parse(&QType_lookup, "none", -1, &error_abort);
-     g_assert_cmpint(ret, =3D=3D, QTYPE_NONE);
-=20
--    ret =3D qapi_enum_parse(QType_lookup, QType_str(QTYPE__MAX - 1),
-+    ret =3D qapi_enum_parse(&QType_lookup, QType_str(QTYPE__MAX - 1),
-                           QTYPE__MAX - 1, &error_abort);
-     g_assert_cmpint(ret, =3D=3D, QTYPE__MAX - 1);
- }
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-inpu=
-t-visitor.c
-index f8720aa5eb..fe591814e4 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -1110,7 +1110,7 @@ static void test_visitor_in_fail_struct_missing(Tes=
-tInputVisitorData *data,
-     error_free_or_abort(&err);
-     visit_optional(v, "optional", &present);
-     g_assert(!present);
--    visit_type_enum(v, "enum", &en, EnumOne_lookup, &err);
-+    visit_type_enum(v, "enum", &en, &EnumOne_lookup, &err);
-     error_free_or_abort(&err);
-     visit_type_int(v, "i64", &i64, &err);
-     error_free_or_abort(&err);
-diff --git a/tpm.c b/tpm.c
-index 111f1ca63f..2d830d072a 100644
---- a/tpm.c
-+++ b/tpm.c
-@@ -33,7 +33,7 @@ void tpm_register_model(enum TpmModel model)
-=20
- const TPMDriverOps *tpm_get_backend_driver(const char *type)
- {
--    int i =3D qapi_enum_parse(TpmType_lookup, type, -1, NULL);
-+    int i =3D qapi_enum_parse(&TpmType_lookup, type, -1, NULL);
-=20
-     return i >=3D 0 ? be_drivers[i] : NULL;
- }
++            'vmstate-send', 'vmstate-size', 'vmstate-received',
++            'vmstate-loaded' ] }
++
++##
++# @COLOMode:
++#
++# The colo mode
++#
++# @unknown: unknown mode
++#
++# @primary: master side
++#
++# @secondary: slave side
++#
++# Since: 2.8
++##
++{ 'enum': 'COLOMode',
++  'data': [ 'unknown', 'primary', 'secondary'] }
++
++##
++# @FailoverStatus:
++#
++# An enumeration of COLO failover status
++#
++# @none: no failover has ever happened
++#
++# @require: got failover requirement but not handled
++#
++# @active: in the process of doing failover
++#
++# @completed: finish the process of failover
++#
++# @relaunch: restart the failover process, from 'none' -> 'completed' (S=
+ince 2.9)
++#
++# Since: 2.8
++##
++{ 'enum': 'FailoverStatus',
++  'data': [ 'none', 'require', 'active', 'completed', 'relaunch' ] }
++
++##
++# @x-colo-lost-heartbeat:
++#
++# Tell qemu that heartbeat is lost, request it to do takeover procedures=
+.
++# If this command is sent to the PVM, the Primary side will exit COLO mo=
+de.
++# If sent to the Secondary, the Secondary side will run failover work,
++# then takes over server operation to become the service VM.
++#
++# Since: 2.8
++#
++# Example:
++#
++# -> { "execute": "x-colo-lost-heartbeat" }
++# <- { "return": {} }
++#
++##
++{ 'command': 'x-colo-lost-heartbeat' }
++
++##
++# @migrate_cancel:
++#
++# Cancel the current executing migration process.
++#
++# Returns: nothing on success
++#
++# Notes: This command succeeds even if there is no migration process run=
+ning.
++#
++# Since: 0.14.0
++#
++# Example:
++#
++# -> { "execute": "migrate_cancel" }
++# <- { "return": {} }
++#
++##
++{ 'command': 'migrate_cancel' }
++
++##
++# @migrate_set_downtime:
++#
++# Set maximum tolerated downtime for migration.
++#
++# @value: maximum downtime in seconds
++#
++# Returns: nothing on success
++#
++# Notes: This command is deprecated in favor of 'migrate-set-parameters'
++#
++# Since: 0.14.0
++#
++# Example:
++#
++# -> { "execute": "migrate_set_downtime", "arguments": { "value": 0.1 } =
+}
++# <- { "return": {} }
++#
++##
++{ 'command': 'migrate_set_downtime', 'data': {'value': 'number'} }
++
++##
++# @migrate_set_speed:
++#
++# Set maximum speed for migration.
++#
++# @value: maximum speed in bytes per second.
++#
++# Returns: nothing on success
++#
++# Notes: This command is deprecated in favor of 'migrate-set-parameters'
++#
++# Since: 0.14.0
++#
++# Example:
++#
++# -> { "execute": "migrate_set_speed", "arguments": { "value": 1024 } }
++# <- { "return": {} }
++#
++##
++{ 'command': 'migrate_set_speed', 'data': {'value': 'int'} }
++
++##
++# @migrate-set-cache-size:
++#
++# Set cache size to be used by XBZRLE migration
++#
++# @value: cache size in bytes
++#
++# The size will be rounded down to the nearest power of 2.
++# The cache size can be modified before and during ongoing migration
++#
++# Returns: nothing on success
++#
++# Since: 1.2
++#
++# Example:
++#
++# -> { "execute": "migrate-set-cache-size",
++#      "arguments": { "value": 536870912 } }
++# <- { "return": {} }
++#
++##
++{ 'command': 'migrate-set-cache-size', 'data': {'value': 'int'} }
++
++##
++# @query-migrate-cache-size:
++#
++# Query migration XBZRLE cache size
++#
++# Returns: XBZRLE cache size in bytes
++#
++# Since: 1.2
++#
++# Example:
++#
++# -> { "execute": "query-migrate-cache-size" }
++# <- { "return": 67108864 }
++#
++##
++{ 'command': 'query-migrate-cache-size', 'returns': 'int' }
++
++##
++# @migrate:
++#
++# Migrates the current running guest to another Virtual Machine.
++#
++# @uri: the Uniform Resource Identifier of the destination VM
++#
++# @blk: do block migration (full disk copy)
++#
++# @inc: incremental disk copy migration
++#
++# @detach: this argument exists only for compatibility reasons and
++#          is ignored by QEMU
++#
++# Returns: nothing on success
++#
++# Since: 0.14.0
++#
++# Notes:
++#
++# 1. The 'query-migrate' command should be used to check migration's pro=
+gress
++#    and final result (this information is provided by the 'status' memb=
+er)
++#
++# 2. All boolean arguments default to false
++#
++# 3. The user Monitor's "detach" argument is invalid in QMP and should n=
+ot
++#    be used
++#
++# Example:
++#
++# -> { "execute": "migrate", "arguments": { "uri": "tcp:0:4446" } }
++# <- { "return": {} }
++#
++##
++{ 'command': 'migrate',
++  'data': {'uri': 'str', '*blk': 'bool', '*inc': 'bool', '*detach': 'boo=
+l' } }
++
++##
++# @migrate-incoming:
++#
++# Start an incoming migration, the qemu must have been started
++# with -incoming defer
++#
++# @uri: The Uniform Resource Identifier identifying the source or
++#       address to listen on
++#
++# Returns: nothing on success
++#
++# Since: 2.3
++#
++# Notes:
++#
++# 1. It's a bad idea to use a string for the uri, but it needs to stay
++#    compatible with -incoming and the format of the uri is already expo=
+sed
++#    above libvirt.
++#
++# 2. QEMU must be started with -incoming defer to allow migrate-incoming=
+ to
++#    be used.
++#
++# 3. The uri format is the same as for -incoming
++#
++# Example:
++#
++# -> { "execute": "migrate-incoming",
++#      "arguments": { "uri": "tcp::4446" } }
++# <- { "return": {} }
++#
++##
++{ 'command': 'migrate-incoming', 'data': {'uri': 'str' } }
++
++##
++# @xen-save-devices-state:
++#
++# Save the state of all devices to file. The RAM and the block devices
++# of the VM are not saved by this command.
++#
++# @filename: the file to save the state of the devices to as binary
++# data. See xen-save-devices-state.txt for a description of the binary
++# format.
++#
++# Returns: Nothing on success
++#
++# Since: 1.1
++#
++# Example:
++#
++# -> { "execute": "xen-save-devices-state",
++#      "arguments": { "filename": "/tmp/save" } }
++# <- { "return": {} }
++#
++##
++{ 'command': 'xen-save-devices-state', 'data': {'filename': 'str'} }
++
++##
++# @xen-set-replication:
++#
++# Enable or disable replication.
++#
++# @enable: true to enable, false to disable.
++#
++# @primary: true for primary or false for secondary.
++#
++# @failover: true to do failover, false to stop. but cannot be
++#            specified if 'enable' is true. default value is false.
++#
++# Returns: nothing.
++#
++# Example:
++#
++# -> { "execute": "xen-set-replication",
++#      "arguments": {"enable": true, "primary": false} }
++# <- { "return": {} }
++#
++# Since: 2.9
++##
++{ 'command': 'xen-set-replication',
++  'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } =
+}
++
++##
++# @ReplicationStatus:
++#
++# The result format for 'query-xen-replication-status'.
++#
++# @error: true if an error happened, false if replication is normal.
++#
++# @desc: the human readable error description string, when
++#        @error is 'true'.
++#
++# Since: 2.9
++##
++{ 'struct': 'ReplicationStatus',
++  'data': { 'error': 'bool', '*desc': 'str' } }
++
++##
++# @query-xen-replication-status:
++#
++# Query replication status while the vm is running.
++#
++# Returns: A @ReplicationResult object showing the status.
++#
++# Example:
++#
++# -> { "execute": "query-xen-replication-status" }
++# <- { "return": { "error": false } }
++#
++# Since: 2.9
++##
++{ 'command': 'query-xen-replication-status',
++  'returns': 'ReplicationStatus' }
++
++##
++# @xen-colo-do-checkpoint:
++#
++# Xen uses this command to notify replication to trigger a checkpoint.
++#
++# Returns: nothing.
++#
++# Example:
++#
++# -> { "execute": "xen-colo-do-checkpoint" }
++# <- { "return": {} }
++#
++# Since: 2.9
++##
++{ 'command': 'xen-colo-do-checkpoint' }
 --=20
 2.13.5
