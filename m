@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnhtD-00037j-Uf
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 05:05:28 -0400
+	(envelope-from <armbru@redhat.com>) id 1dnhyU-0007aj-2b
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 05:10:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnht8-0002hF-Hw
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 05:05:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58526)
+	(envelope-from <armbru@redhat.com>) id 1dnhyO-00053Z-PK
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 05:10:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36966)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnht8-0002gY-9J
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 05:05:18 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 614B78BD21
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 09:05:16 +0000 (UTC)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnhyO-00052K-Ib
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 05:10:44 -0400
 From: Markus Armbruster <armbru@redhat.com>
-References: <20170824103350.16400-1-marcandre.lureau@redhat.com>
-	<20170824103350.16400-3-marcandre.lureau@redhat.com>
-	<20170901000634.GC17184@localhost.localdomain>
-Date: Fri, 01 Sep 2017 11:05:11 +0200
-In-Reply-To: <20170901000634.GC17184@localhost.localdomain> (Eduardo Habkost's
-	message of "Thu, 31 Aug 2017 21:06:34 -0300")
-Message-ID: <87shg6dc1k.fsf@dusky.pond.sub.org>
+References: <1504190408-11143-1-git-send-email-thuth@redhat.com>
+	<612870af-f8a4-039c-3e97-7590388b9e77@redhat.com>
+Date: Fri, 01 Sep 2017 11:10:35 +0200
+In-Reply-To: <612870af-f8a4-039c-3e97-7590388b9e77@redhat.com> (David
+	Hildenbrand's message of "Thu, 31 Aug 2017 17:36:45 +0200")
+Message-ID: <87o9qudbsk.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 02/14] qlit: move qlit from check-qjson to
- qobject/
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] tests: Enable the drive_del test also
+ on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,92 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>, Michael S Tsirkin <mst@redhat.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Jason J Herne <jjherne@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+David Hildenbrand <david@redhat.com> writes:
 
-> On Thu, Aug 24, 2017 at 12:33:38PM +0200, Marc-Andr=C3=A9 Lureau wrote:
->> Fix code style issues while at it, to please check-patch.
->>=20
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> ---
->>  include/qapi/qmp/qlit.h | 49 +++++++++++++++++++++++++
->>  qobject/qlit.c          | 89 ++++++++++++++++++++++++++++++++++++++++++=
-+++
->>  tests/check-qjson.c     | 96 +-----------------------------------------=
--------
->>  qobject/Makefile.objs   |  2 +-
->>  4 files changed, 140 insertions(+), 96 deletions(-)
->>  create mode 100644 include/qapi/qmp/qlit.h
->>  create mode 100644 qobject/qlit.c
->>=20
->> diff --git a/include/qapi/qmp/qlit.h b/include/qapi/qmp/qlit.h
->> new file mode 100644
->> index 0000000000..4e2e760ef1
->> --- /dev/null
->> +++ b/include/qapi/qmp/qlit.h
->> @@ -0,0 +1,49 @@
->> +/*
->> + * Copyright IBM, Corp. 2009
->> + * Copyright (c) 2013, 2015, 2017 Red Hat Inc.
->> + *
->> + * Authors:
->> + *  Anthony Liguori   <aliguori@us.ibm.com>
->> + *  Markus Armbruster <armbru@redhat.com>
->> + *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> + *
->> + * This work is licensed under the terms of the GNU LGPL, version 2.1 o=
-r later.
->> + * See the COPYING.LIB file in the top-level directory.
->> + *
->> + */
->> +#ifndef QLIT_H_
->> +#define QLIT_H_
+>>  static void test_drive_del_device_del(void)
+>>  {
+>> +    char *args;
 >> +
->> +#include "qapi-types.h"
->> +#include "qobject.h"
->> +
->> +typedef struct LiteralQDictEntry LiteralQDictEntry;
->> +typedef struct LiteralQObject LiteralQObject;
->> +
->> +struct LiteralQObject {
->> +    int type;
->> +    union {
->> +        int64_t qnum;
->> +        const char *qstr;
->> +        LiteralQDictEntry *qdict;
->> +        LiteralQObject *qlist;
->> +    } value;
->> +};
->> +
->> +struct LiteralQDictEntry {
->> +    const char *key;
->> +    LiteralQObject value;
->> +};
->> +
->> +#define QLIT_QNUM(val) \
->> +    (LiteralQObject){.type =3D QTYPE_QNUM, .value.qnum =3D (val)}
->> +#define QLIT_QSTR(val) \
->> +    (LiteralQObject){.type =3D QTYPE_QSTRING, .value.qstr =3D (val)}
->> +#define QLIT_QDICT(val) \
->> +    (LiteralQObject){.type =3D QTYPE_QDICT, .value.qdict =3D (val)}
->> +#define QLIT_QLIST(val) \
->> +    (LiteralQObject){.type =3D QTYPE_QLIST, .value.qlist =3D (val)}
+>>      /* Start with a drive used by a device that unplugs instantaneously */
+>> -    qtest_start("-drive if=none,id=drive0,file=null-co://,format=raw"
+>> -                " -device virtio-scsi-pci"
+>> -                " -device scsi-hd,drive=drive0,id=dev0");
+>> +    args = g_strdup_printf("-drive if=none,id=drive0,file=null-co://,format=raw"
+>> +                           " -device virtio-scsi-%s"
+>> +                           " -device scsi-hd,drive=drive0,id=dev0",
 >
-> I'm still trying to understand why this exists.  Doesn't this
-> provide exactly the same functionality as QObject?
+> Would look better with the spaces at the end of the previous line (so
+> all "-device" are aligned), but just my taste.
 
-The value-add is initializers.  Check out check-qjson.c for examples.
+The -device *are* aligned, but I get what you mean.
 
-Use cases:
+The advantage of leading rather than trailing space is that the
+intention "this is still the same string" is locally obvious both at the
+first part's end (no comma) and at the second part's beginning (leading
+space).
 
-* Specify expected output as data (QLitObject initializer), then use
-  qlit_equal_qobject() to verify actual output matches.  Example:
-  check-qjson.c.  I think it compares nicely to the qdict_get morass we
-  use elsewhere.
-
-* Specify a QObject as data (QLitObject initializer), build it with
-  qobject_from_qlit().  Example: PATCH 14.  I think it beats specifying
-  the QObject in code (qdict_new(), qdict_put(), ...) at least when the
-  QObject is big.
+>> +                           qvirtio_get_dev_type());
+>> +    qtest_start(args);
+>>  
+>>      /*
+>>       * Delete the drive, and then the device
+[...]
