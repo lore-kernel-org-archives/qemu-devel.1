@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnqIn-0007QM-TS
+	(envelope-from <eblake@redhat.com>) id 1dnqIs-0007VU-GR
 	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dnqIi-0001s6-Mo
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33096)
+	(envelope-from <eblake@redhat.com>) id 1dnqIr-00022P-5a
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56298)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnqIi-0001rE-FU
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:16 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dnqIq-00021f-Ty
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 14:04:25 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 85F29C056828
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 18:04:15 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 014C65D5F4
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 18:04:24 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Fri,  1 Sep 2017 13:03:31 -0500
-Message-Id: <20170901180340.30009-21-eblake@redhat.com>
+Date: Fri,  1 Sep 2017 13:03:36 -0500
+Message-Id: <20170901180340.30009-26-eblake@redhat.com>
 In-Reply-To: <20170901180340.30009-1-eblake@redhat.com>
 References: <20170901180340.30009-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 20/29] vhost-user-test: Drop dependence on
+Subject: [Qemu-devel] [PATCH v6 25/29] wdt_ib700-test: Drop dependence on
  global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,250 +33,143 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, pbonzini@redhat.com
 
-Managing parallel connections to two different monitors via
-the implicit global_qtest makes it hard to copy-and-paste code
-to tests that are not aware of the implicit state.  Now that
-libqos is fully-explicit, it is easy to expand the rest of
-vhost-user-test to also use explicit state everywhere.
-
-We can assert that the conversion is correct by checking that
-global_qtest remains NULL throughout the test (a later patch
-that changes global_qtest to not be a public global variable
-will drop the assertions).
+As a general rule, we prefer avoiding implicit global state
+because it makes code harder to safely copy and paste without
+thinking about the global state.  Improve this test to be
+explicit about the state.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/vhost-user-test.c | 68 ++++++++++++++++++++++---------------------------
- 1 file changed, 30 insertions(+), 38 deletions(-)
+ tests/wdt_ib700-test.c | 63 +++++++++++++++++++++++++++-----------------------
+ 1 file changed, 34 insertions(+), 29 deletions(-)
 
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 562bfaefd2..1e0c50d12a 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -139,6 +139,7 @@ enum {
- };
+diff --git a/tests/wdt_ib700-test.c b/tests/wdt_ib700-test.c
+index 4fc8eeae86..4bb8374011 100644
+--- a/tests/wdt_ib700-test.c
++++ b/tests/wdt_ib700-test.c
+@@ -11,9 +11,9 @@
+ #include "libqtest.h"
+ #include "qemu/timer.h"
 
- typedef struct TestServer {
-+    QTestState *qts;
-     QPCIBus *bus;
-     gchar *socket_path;
-     gchar *mig_path;
-@@ -164,7 +165,7 @@ static void init_virtio_dev(TestServer *s)
-     QVirtioPCIDevice *dev;
-     uint32_t features;
-
--    s->bus = qpci_init_pc(global_qtest, NULL);
-+    s->bus = qpci_init_pc(s->qts, NULL);
-     g_assert_nonnull(s->bus);
-
-     dev = qvirtio_pci_device_find(s->bus, VIRTIO_ID_NET);
-@@ -236,8 +237,11 @@ static void read_guest_mem(const void *data)
-         guest_mem += (s->memory.regions[i].mmap_offset / sizeof(*guest_mem));
-
-         for (j = 0; j < 256; j++) {
--            uint32_t a = readl(s->memory.regions[i].guest_phys_addr + j*4);
--            uint32_t b = guest_mem[j];
-+            uint32_t a, b;
-+
-+            a = qtest_readl(s->qts,
-+                            s->memory.regions[i].guest_phys_addr + j * 4);
-+            b = guest_mem[j];
-
-             g_assert_cmpint(a, ==, b);
-         }
-@@ -515,6 +519,12 @@ static gboolean _test_server_free(TestServer *server)
-
- static void test_server_free(TestServer *server)
+-static void qmp_check_no_event(void)
++static void qmp_check_no_event(QTestState *s)
  {
-+    assert(!global_qtest);
-+    if (server->qts) {
-+        qtest_quit(server->qts);
-+        server->qts = NULL;
-+    }
+-    QDict *resp = qmp("{'execute':'query-status'}");
++    QDict *resp = qtest_qmp(s, "{'execute':'query-status'}");
+     g_assert(qdict_haskey(resp, "return"));
+     QDECREF(resp);
+ }
+@@ -22,30 +22,30 @@ static QDict *ib700_program_and_wait(QTestState *s)
+ {
+     QDict *event, *data;
+
+-    clock_step(NANOSECONDS_PER_SECOND * 40);
+-    qmp_check_no_event();
++    qtest_clock_step(s, NANOSECONDS_PER_SECOND * 40);
++    qmp_check_no_event(s);
+
+     /* 2 second limit */
+-    outb(0x443, 14);
++    qtest_outb(s, 0x443, 14);
+
+     /* Ping */
+-    clock_step(NANOSECONDS_PER_SECOND);
+-    qmp_check_no_event();
+-    outb(0x443, 14);
++    qtest_clock_step(s, NANOSECONDS_PER_SECOND);
++    qmp_check_no_event(s);
++    qtest_outb(s, 0x443, 14);
+
+     /* Disable */
+-    clock_step(NANOSECONDS_PER_SECOND);
+-    qmp_check_no_event();
+-    outb(0x441, 1);
+-    clock_step(3 * NANOSECONDS_PER_SECOND);
+-    qmp_check_no_event();
++    qtest_clock_step(s, NANOSECONDS_PER_SECOND);
++    qmp_check_no_event(s);
++    qtest_outb(s, 0x441, 1);
++    qtest_clock_step(s, 3 * NANOSECONDS_PER_SECOND);
++    qmp_check_no_event(s);
+
+     /* Enable and let it fire */
+-    outb(0x443, 13);
+-    clock_step(3 * NANOSECONDS_PER_SECOND);
+-    qmp_check_no_event();
+-    clock_step(2 * NANOSECONDS_PER_SECOND);
+-    event = qmp_eventwait_ref("WATCHDOG");
++    qtest_outb(s, 0x443, 13);
++    qtest_clock_step(s, 3 * NANOSECONDS_PER_SECOND);
++    qmp_check_no_event(s);
++    qtest_clock_step(s, 2 * NANOSECONDS_PER_SECOND);
++    event = qtest_qmp_eventwait_ref(s, "WATCHDOG");
+     data = qdict_get_qdict(event, "data");
+     QINCREF(data);
+     QDECREF(event);
+@@ -56,48 +56,53 @@ static QDict *ib700_program_and_wait(QTestState *s)
+ static void ib700_pause(void)
+ {
+     QDict *d;
+-    QTestState *s = qtest_start("-watchdog-action pause -device ib700");
++    QTestState *s = qtest_init("-watchdog-action pause -device ib700");
 +
-     g_idle_add((GSourceFunc)_test_server_free, server);
- }
-
-@@ -626,7 +636,6 @@ static void test_migrate(void)
-     TestServer *s = test_server_new("src");
-     TestServer *dest = test_server_new("dest");
-     char *uri = g_strdup_printf("%s%s", "unix:", dest->mig_path);
--    QTestState *global = global_qtest, *from, *to;
-     GSource *source;
-     gchar *cmd;
-     QDict *rsp;
-@@ -637,7 +646,7 @@ static void test_migrate(void)
-     test_server_listen(dest);
-
-     cmd = GET_QEMU_CMDE(s, 2, "", "");
--    from = qtest_start(cmd);
-+    s->qts = qtest_init(cmd);
-     g_free(cmd);
-
-     init_virtio_dev(s);
-@@ -646,7 +655,7 @@ static void test_migrate(void)
-     g_assert_cmpint(size, ==, (2 * 1024 * 1024) / (VHOST_LOG_PAGE * 8));
-
-     cmd = GET_QEMU_CMDE(dest, 2, "", " -incoming %s", uri);
--    to = qtest_init(cmd);
-+    dest->qts = qtest_init(cmd);
-     g_free(cmd);
-
-     source = g_source_new(&test_migrate_source_funcs,
-@@ -657,16 +666,13 @@ static void test_migrate(void)
-
-     /* slow down migration to have time to fiddle with log */
-     /* TODO: qtest could learn to break on some places */
--    rsp = qmp("{ 'execute': 'migrate_set_speed',"
--              "'arguments': { 'value': 10 } }");
-+    rsp = qtest_qmp(s->qts, "{ 'execute': 'migrate_set_speed',"
-+                    "'arguments': { 'value': 10 } }");
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
-
--    cmd = g_strdup_printf("{ 'execute': 'migrate',"
--                          "'arguments': { 'uri': '%s' } }",
--                          uri);
--    rsp = qmp(cmd);
--    g_free(cmd);
-+    rsp = qtest_qmp(s->qts,
-+                    "{'execute': 'migrate', 'arguments': { 'uri': %s}}", uri);
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
-
-@@ -681,28 +687,23 @@ static void test_migrate(void)
-     munmap(log, size);
-
-     /* speed things up */
--    rsp = qmp("{ 'execute': 'migrate_set_speed',"
--              "'arguments': { 'value': 0 } }");
-+    rsp = qtest_qmp(s->qts, "{ 'execute': 'migrate_set_speed',"
-+                    "'arguments': { 'value': 0 } }");
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
-
+     qtest_irq_intercept_in(s, "ioapic");
+     d = ib700_program_and_wait(s);
+     g_assert(!strcmp(qdict_get_str(d, "action"), "pause"));
+     QDECREF(d);
 -    qmp_eventwait("STOP");
-+    qtest_qmp_eventwait(s->qts, "STOP");
-
--    global_qtest = to;
--    qmp_eventwait("RESUME");
-+    qtest_qmp_eventwait(dest->qts, "RESUME");
-
-     read_guest_mem(dest);
-
-     g_source_destroy(source);
-     g_source_unref(source);
-
--    qtest_quit(to);
-     test_server_free(dest);
--    qtest_quit(from);
-     test_server_free(s);
-     g_free(uri);
--
--    global_qtest = global;
+-    qtest_end();
++    qtest_qmp_eventwait(s, "STOP");
++    qtest_quit(s);
  }
 
- static void wait_for_rings_started(TestServer *s, size_t count)
-@@ -752,7 +753,7 @@ static void test_reconnect_subprocess(void)
-
-     g_thread_new("connect", connect_thread, s);
-     cmd = GET_QEMU_CMDE(s, 2, ",server", "");
--    qtest_start(cmd);
-+    s->qts = qtest_init(cmd);
-     g_free(cmd);
-
-     init_virtio_dev(s);
-@@ -766,7 +767,6 @@ static void test_reconnect_subprocess(void)
-     wait_for_fds(s);
-     wait_for_rings_started(s, 2);
-
+ static void ib700_reset(void)
+ {
+     QDict *d;
+-    QTestState *s = qtest_start("-watchdog-action reset -device ib700");
++    QTestState *s = qtest_init("-watchdog-action reset -device ib700");
++
+     qtest_irq_intercept_in(s, "ioapic");
+     d = ib700_program_and_wait(s);
+     g_assert(!strcmp(qdict_get_str(d, "action"), "reset"));
+     QDECREF(d);
+-    qmp_eventwait("RESET");
 -    qtest_end();
-     test_server_free(s);
-     return;
- }
-@@ -788,14 +788,13 @@ static void test_connect_fail_subprocess(void)
-     s->test_fail = true;
-     g_thread_new("connect", connect_thread, s);
-     cmd = GET_QEMU_CMDE(s, 2, ",server", "");
--    qtest_start(cmd);
-+    s->qts = qtest_init(cmd);
-     g_free(cmd);
-
-     init_virtio_dev(s);
-     wait_for_fds(s);
-     wait_for_rings_started(s, 2);
-
--    qtest_end();
-     test_server_free(s);
++    qtest_qmp_eventwait(s, "RESET");
++    qtest_quit(s);
  }
 
-@@ -816,14 +815,13 @@ static void test_flags_mismatch_subprocess(void)
-     s->test_flags = TEST_FLAGS_DISCONNECT;
-     g_thread_new("connect", connect_thread, s);
-     cmd = GET_QEMU_CMDE(s, 2, ",server", "");
--    qtest_start(cmd);
-+    s->qts = qtest_init(cmd);
-     g_free(cmd);
-
-     init_virtio_dev(s);
-     wait_for_fds(s);
-     wait_for_rings_started(s, 2);
-
+ static void ib700_shutdown(void)
+ {
+     QDict *d;
+-    QTestState *s = qtest_start("-watchdog-action reset -no-reboot -device ib700");
++    QTestState *s;
++
++    s = qtest_init("-watchdog-action reset -no-reboot -device ib700");
+     qtest_irq_intercept_in(s, "ioapic");
+     d = ib700_program_and_wait(s);
+     g_assert(!strcmp(qdict_get_str(d, "action"), "reset"));
+     QDECREF(d);
+-    qmp_eventwait("SHUTDOWN");
 -    qtest_end();
-     test_server_free(s);
++    qtest_qmp_eventwait(s, "SHUTDOWN");
++    qtest_quit(s);
  }
 
-@@ -888,13 +886,13 @@ static void test_multiqueue(void)
-                           512, 512, root, s->chr_name,
-                           s->socket_path, "", s->chr_name,
-                           queues, queues * 2 + 2);
--    qtest_start(cmd);
-+    s->qts = qtest_init(cmd);
-     g_free(cmd);
-
--    bus = qpci_init_pc(global_qtest, NULL);
-+    bus = qpci_init_pc(s->qts, NULL);
-     dev = virtio_net_pci_init(bus, PCI_SLOT);
-
--    alloc = pc_alloc_init(global_qtest);
-+    alloc = pc_alloc_init(s->qts);
-     for (i = 0; i < queues * 2; i++) {
-         vq[i] = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, alloc, i);
-     }
-@@ -911,14 +909,12 @@ static void test_multiqueue(void)
-     g_free(dev->pdev);
-     g_free(dev);
-     qpci_free_pc(bus);
+ static void ib700_none(void)
+ {
+     QDict *d;
+-    QTestState *s = qtest_start("-watchdog-action none -device ib700");
++    QTestState *s = qtest_init("-watchdog-action none -device ib700");
++
+     qtest_irq_intercept_in(s, "ioapic");
+     d = ib700_program_and_wait(s);
+     g_assert(!strcmp(qdict_get_str(d, "action"), "none"));
+     QDECREF(d);
 -    qtest_end();
-
-     test_server_free(s);
++    qtest_quit(s);
  }
 
  int main(int argc, char **argv)
- {
--    QTestState *s = NULL;
-     TestServer *server = NULL;
-     const char *hugefs;
-     char *qemu_cmd = NULL;
-@@ -955,7 +951,7 @@ int main(int argc, char **argv)
-
-     qemu_cmd = GET_QEMU_CMD(server);
-
--    s = qtest_start(qemu_cmd);
-+    server->qts = qtest_init(qemu_cmd);
-     g_free(qemu_cmd);
-     init_virtio_dev(server);
-
-@@ -976,10 +972,6 @@ int main(int argc, char **argv)
-
-     ret = g_test_run();
-
--    if (s) {
--        qtest_quit(s);
--    }
--
-     /* cleanup */
-     test_server_free(server);
-
 -- 
 2.13.5
