@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1dnkBQ-0001ca-8n
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:32:25 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dnkBn-0001up-6h
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:32:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <apahim@redhat.com>) id 1dnkBP-00075l-Au
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:32:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37148)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <apahim@redhat.com>) id 1dnkBP-00075W-4T
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:32:19 -0400
-From: Amador Pahim <apahim@redhat.com>
-Date: Fri,  1 Sep 2017 13:28:29 +0200
-Message-Id: <20170901112829.2571-14-apahim@redhat.com>
-In-Reply-To: <20170901112829.2571-1-apahim@redhat.com>
-References: <20170901112829.2571-1-apahim@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 13/13] qemu.py: don't launch again before
- shutdown()
+	(envelope-from <no-reply@patchew.org>) id 1dnkBk-0007Aa-1D
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:32:43 -0400
+Resent-Message-Id: <E1dnkBk-0007Aa-1D@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21302)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dnkBj-0007AF-Q5
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:32:39 -0400
+In-Reply-To: <20170901105818.31956-1-otubo@redhat.com>
+Message-ID: <150426555188.216.3681080346934443112@b5667b65043c>
+Reply-To: <qemu-devel@nongnu.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 1 Sep 2017 04:32:32 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCHv4 0/6] seccomp: feature refactoring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,56 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: stefanha@gmail.com, famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com, Amador Pahim <apahim@redhat.com>
+To: otubo@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, thuth@redhat.com
 
-If a VM is launched, files are created and a cleanup is required before
-a new launch. This cleanup is executed by shutdown(), so shutdown() must
-be called even if the VM is manually terminated (i.e. using kill).
-
-This patch creates a control to make sure launch() will not be executed
-again if shutdown() is not called after the previous launch().
-
-Signed-off-by: Amador Pahim <apahim@redhat.com>
----
- scripts/qemu.py | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/scripts/qemu.py b/scripts/qemu.py
-index 363f649a7e..05fca4d268 100644
---- a/scripts/qemu.py
-+++ b/scripts/qemu.py
-@@ -52,6 +52,7 @@ class QEMUMachine(object):
-         self._debug = debug
-         self._qemu_full_args = None
-         self._created_files = []
-+        self._pending_shutdown = False
- 
-     # This can be used to add an unused monitor instance.
-     def add_monitor_telnet(self, ip, port):
-@@ -168,10 +169,14 @@ class QEMUMachine(object):
-         if self.is_running():
-             raise QEMUMachineError('VM already running')
- 
-+        if self._pending_shutdown:
-+            raise QEMUMachineError('Shutdown pending after previous launch')
-+
-         self._iolog = None
-         self._qemu_full_args = None
-         try:
-             self._launch()
-+            self._pending_shutdown = True
-         except:
-             self.shutdown()
- 
-@@ -217,6 +222,8 @@ class QEMUMachine(object):
-                 command = ''
-             LOG.warn(msg, exitcode, command)
- 
-+        self._pending_shutdown = False
-+
-     underscore_to_dash = string.maketrans('_', '-')
-     def qmp(self, cmd, conv_keys=True, **args):
-         '''Invoke a QMP command and return the result dict'''
--- 
-2.13.5
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzA5MDExMDU4MTguMzE5NTYtMS1vdHVib0ByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVs
+XSBbUEFUQ0h2NCAwLzZdIHNlY2NvbXA6IGZlYXR1cmUgcmVmYWN0b3JpbmcKVHlwZTogc2VyaWVz
+Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRv
+dGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJB
+U0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4v
+JHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBz
+aG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
+ayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChu
+KzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
+IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBu
+ZXcgYnJhbmNoICd0ZXN0JwpiOTNjOWU3NjQ4IHNlY2NvbXA6IGFkZGluZyBkb2N1bWVudGF0aW9u
+IHRvIG5ldyBzZWNjb21wIG1vZGVsCjE5ZjA3MTMwNjMgc2VjY29tcDogYWRkIHJlc291cmNlY29u
+dHJvbCBhcmd1bWVudCB0byBjb21tYW5kIGxpbmUKMGQyYTU1M2JjZSBzZWNjb21wOiBhZGQgc3Bh
+d24gYXJndW1lbnQgdG8gY29tbWFuZCBsaW5lCjc4OTlhMjNmYjYgc2VjY29tcDogYWRkIGVsZXZh
+dGVwcml2aWxlZ2VzIGFyZ3VtZW50IHRvIGNvbW1hbmQgbGluZQpkNDNiM2NiY2Y4IHNlY2NvbXA6
+IGFkZCBvYnNvbGV0ZSBhcmd1bWVudCB0byBjb21tYW5kIGxpbmUKMjc2NTc1MmY4ZSBzZWNjb21w
+OiBjaGFuZ2luZyBmcm9tIHdoaXRlbGlzdCB0byBibGFja2xpc3QKCj09PSBPVVRQVVQgQkVHSU4g
+PT09CkNoZWNraW5nIFBBVENIIDEvNjogc2VjY29tcDogY2hhbmdpbmcgZnJvbSB3aGl0ZWxpc3Qg
+dG8gYmxhY2tsaXN0Li4uCkNoZWNraW5nIFBBVENIIDIvNjogc2VjY29tcDogYWRkIG9ic29sZXRl
+IGFyZ3VtZW50IHRvIGNvbW1hbmQgbGluZS4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5l
+dmVyIHVzZSB0YWJzCiMxMjg6IEZJTEU6IHZsLmM6MTA0ODoKK15JXkkgKiB0byBwcm92aWRlIGEg
+bGl0dGxlIGJpdCBvZiBjb25zaXN0ZW5jeSBmb3IkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
+IG5ldmVyIHVzZSB0YWJzCiMxMjk6IEZJTEU6IHZsLmM6MTA0OToKK15JXkkgKiB0aGUgY29tbWFu
+ZCBsaW5lICovJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTMw
+OiBGSUxFOiB2bC5jOjEwNTA6CiteSSAgICB9IGVsc2UgeyQKCkVSUk9SOiBjb2RlIGluZGVudCBz
+aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzEzMTogRklMRTogdmwuYzoxMDUxOgorXkleSWVycm9yX3Jl
+cG9ydCgiaW52YWxpZCBhcmd1bWVudCBmb3Igb2Jzb2xldGUiKTskCgpFUlJPUjogY29kZSBpbmRl
+bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMzI6IEZJTEU6IHZsLmM6MTA1MjoKK15JICAgIH0k
+Cgp0b3RhbDogNSBlcnJvcnMsIDAgd2FybmluZ3MsIDEwNCBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
+dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzY6IHNlY2Nv
+bXA6IGFkZCBlbGV2YXRlcHJpdmlsZWdlcyBhcmd1bWVudCB0byBjb21tYW5kIGxpbmUuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggNC82OiBzZWNjb21wOiBhZGQgc3Bhd24gYXJndW1lbnQgdG8gY29tbWFuZCBs
+aW5lLi4uCkNoZWNraW5nIFBBVENIIDUvNjogc2VjY29tcDogYWRkIHJlc291cmNlY29udHJvbCBh
+cmd1bWVudCB0byBjb21tYW5kIGxpbmUuLi4KRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRo
+YXQgJywnIChjdHg6VnhWKQojNzg6IEZJTEU6IHFlbXUtc2VjY29tcC5jOjgzOgorICAgIHsgU0NN
+UF9TWVMoc2NoZWRfZ2V0X3ByaW9yaXR5X21heCksMTYsIFFFTVVfU0VDQ09NUF9TRVRfUkVTT1VS
+Q0VDVEwgfSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6
+IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojNzk6IEZJTEU6IHFlbXUt
+c2VjY29tcC5jOjg0OgorICAgIHsgU0NNUF9TWVMoc2NoZWRfZ2V0X3ByaW9yaXR5X21pbiksMTYs
+IFFFTVVfU0VDQ09NUF9TRVRfUkVTT1VSQ0VDVEwgfSwKICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXgoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
+cwojMTI0OiBGSUxFOiB2bC5jOjExMDk6CiteSV5JZXJyb3JfcmVwb3J0KCJpbnZhbGlkIGFyZ3Vt
+ZW50IGZvciByZXNvdXJjZWNvbnRyb2wiKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5l
+dmVyIHVzZSB0YWJzCiMxMjU6IEZJTEU6IHZsLmM6MTExMDoKK15JXklyZXR1cm4gLTE7JAoKRVJS
+T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTI2OiBGSUxFOiB2bC5jOjEx
+MTE6CiteSSAgICB9JAoKdG90YWw6IDUgZXJyb3JzLCAwIHdhcm5pbmdzLCA5NSBsaW5lcyBjaGVj
+a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
+SCA2LzY6IHNlY2NvbXA6IGFkZGluZyBkb2N1bWVudGF0aW9uIHRvIG5ldyBzZWNjb21wIG1vZGVs
+Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
+CgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
+dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBm
+cmVlbGlzdHMub3Jn
