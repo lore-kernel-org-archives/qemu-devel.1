@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUi-0000Ez-1K
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:22 -0400
+	(envelope-from <armbru@redhat.com>) id 1dnlUj-0000G8-Vx
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dnlUd-0007Hy-53
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43820)
+	(envelope-from <armbru@redhat.com>) id 1dnlUh-0007KT-T3
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52584)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUc-0007Hl-VW
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:15 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dnlUh-0007Ji-Ko
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 08:56:19 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D0F9283F44
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:13 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-75.ams2.redhat.com
-	[10.36.116.75])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E2279343A
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:13 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A8E84C04D2AC
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 12:56:18 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 14:55:27 +0200
-Message-Id: <20170901125611.29295-4-armbru@redhat.com>
+Date: Fri,  1 Sep 2017 14:55:37 +0200
+Message-Id: <20170901125611.29295-14-armbru@redhat.com>
 In-Reply-To: <20170901125611.29295-1-armbru@redhat.com>
 References: <20170901125611.29295-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 03/47] qobject: Explain how QNum works, and why
+Subject: [Qemu-devel] [PULL 13/47] tests/check-qlit: New,
+ covering qobject/qlit.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,47 +34,127 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Suggested-by: Max Reitz <mreitz@redhat.com>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20170825105913.4060-11-marcandre.lureau@redhat.com>
+[Copyright notice correction squashed in, commit message tweaked]
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1503384739-17207-1-git-send-email-armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-[Comment typos fixed]
 ---
- include/qapi/qmp/qnum.h | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ tests/Makefile.include |  5 +++-
+ tests/check-qlit.c     | 64 ++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ 2 files changed, 68 insertions(+), 1 deletion(-)
+ create mode 100644 tests/check-qlit.c
 
-diff --git a/include/qapi/qmp/qnum.h b/include/qapi/qmp/qnum.h
-index 09d745c490..d6b0791139 100644
---- a/include/qapi/qmp/qnum.h
-+++ b/include/qapi/qmp/qnum.h
-@@ -23,6 +23,27 @@ typedef enum {
-     QNUM_DOUBLE
- } QNumKind;
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 00af45ca85..fae5715e9c 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -43,6 +43,8 @@ check-unit-y +=3D tests/check-qnull$(EXESUF)
+ gcov-files-check-qnull-y =3D qobject/qnull.c
+ check-unit-y +=3D tests/check-qjson$(EXESUF)
+ gcov-files-check-qjson-y =3D qobject/qjson.c
++check-unit-y +=3D tests/check-qlit$(EXESUF)
++gcov-files-check-qlit-y =3D qobject/qlit.c
+ check-unit-y +=3D tests/test-qobject-output-visitor$(EXESUF)
+ gcov-files-test-qobject-output-visitor-y =3D qapi/qobject-output-visitor=
+.c
+ check-unit-y +=3D tests/test-clone-visitor$(EXESUF)
+@@ -541,7 +543,7 @@ GENERATED_FILES +=3D tests/test-qapi-types.h tests/te=
+st-qapi-visit.h \
 =20
+ test-obj-y =3D tests/check-qnum.o tests/check-qstring.o tests/check-qdic=
+t.o \
+ 	tests/check-qlist.o tests/check-qnull.o \
+-	tests/check-qjson.o \
++	tests/check-qjson.o tests/check-qlit.o \
+ 	tests/test-coroutine.o tests/test-string-output-visitor.o \
+ 	tests/test-string-input-visitor.o tests/test-qobject-output-visitor.o \
+ 	tests/test-clone-visitor.o \
+@@ -575,6 +577,7 @@ tests/check-qdict$(EXESUF): tests/check-qdict.o $(tes=
+t-util-obj-y)
+ tests/check-qlist$(EXESUF): tests/check-qlist.o $(test-util-obj-y)
+ tests/check-qnull$(EXESUF): tests/check-qnull.o $(test-util-obj-y)
+ tests/check-qjson$(EXESUF): tests/check-qjson.o $(test-util-obj-y)
++tests/check-qlit$(EXESUF): tests/check-qlit.o $(test-util-obj-y)
+ tests/check-qom-interface$(EXESUF): tests/check-qom-interface.o $(test-q=
+om-obj-y)
+ tests/check-qom-proplist$(EXESUF): tests/check-qom-proplist.o $(test-qom=
+-obj-y)
+=20
+diff --git a/tests/check-qlit.c b/tests/check-qlit.c
+new file mode 100644
+index 0000000000..d2422bbaf0
+--- /dev/null
++++ b/tests/check-qlit.c
+@@ -0,0 +1,64 @@
 +/*
-+ * QNum encapsulates how our dialect of JSON fills in the blanks left
-+ * by the JSON specification (RFC 7159) regarding numbers.
++ * QLit unit-tests.
 + *
-+ * Conceptually, we treat number as an abstract type with three
-+ * concrete subtypes: floating-point, signed integer, unsigned
-+ * integer.  QNum implements this as a discriminated union of double,
-+ * int64_t, uint64_t.
++ * Copyright (C) 2017 Red Hat Inc.
 + *
-+ * The JSON parser picks the subtype as follows.  If the number has a
-+ * decimal point or an exponent, it is floating-point.  Else if it
-+ * fits into int64_t, it's signed integer.  Else if it fits into
-+ * uint64_t, it's unsigned integer.  Else it's floating-point.
-+ *
-+ * Any number can serve as double: qnum_get_double() converts under
-+ * the hood.
-+ *
-+ * An integer can serve as signed / unsigned integer as long as it is
-+ * in range: qnum_get_try_int() / qnum_get_try_uint() check range and
-+ * convert under the hood.
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
 + */
- typedef struct QNum {
-     QObject base;
-     QNumKind kind;
++
++#include "qemu/osdep.h"
++
++#include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qlit.h"
++#include "qapi/qmp/qnum.h"
++#include "qapi/qmp/qstring.h"
++
++static QLitObject qlit =3D QLIT_QDICT(((QLitDictEntry[]) {
++    { "foo", QLIT_QNUM(42) },
++    { "bar", QLIT_QSTR("hello world") },
++    { "baz", QLIT_QNULL },
++    { "bee", QLIT_QLIST(((QLitObject[]) {
++        QLIT_QNUM(43),
++        QLIT_QNUM(44),
++        QLIT_QBOOL(true),
++        { },
++    }))},
++    { },
++}));
++
++static QObject *make_qobject(void)
++{
++    QDict *qdict =3D qdict_new();
++    QList *list =3D qlist_new();
++
++    qdict_put_int(qdict, "foo", 42);
++    qdict_put_str(qdict, "bar", "hello world");
++    qdict_put_null(qdict, "baz");
++
++    qlist_append_int(list, 43);
++    qlist_append_int(list, 44);
++    qlist_append_bool(list, true);
++    qdict_put(qdict, "bee", list);
++
++    return QOBJECT(qdict);
++}
++
++static void qlit_equal_qobject_test(void)
++{
++    QObject *qobj =3D make_qobject();
++
++    g_assert(qlit_equal_qobject(&qlit, qobj));
++
++    qobject_decref(qobj);
++}
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++
++    g_test_add_func("/qlit/equal_qobject", qlit_equal_qobject_test);
++
++    return g_test_run();
++}
 --=20
 2.13.5
