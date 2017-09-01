@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dnkUB-00036S-LY
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:51:48 -0400
+	(envelope-from <quintela@redhat.com>) id 1dnkXs-0005mH-Sn
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:55:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dnkUA-000604-II
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:51:43 -0400
-Date: Fri, 1 Sep 2017 13:51:21 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170901135121.57ca6a04@nial.brq.redhat.com>
-In-Reply-To: <dfaeb539-8006-85d6-35b2-0af31f5a0675@huawei.com>
-References: <1503066227-18251-1-git-send-email-gengdongjiu@huawei.com>
-	<1503066227-18251-3-git-send-email-gengdongjiu@huawei.com>
-	<20170829122053.36cf550c@nial.brq.redhat.com>
-	<dfaeb539-8006-85d6-35b2-0af31f5a0675@huawei.com>
+	(envelope-from <quintela@redhat.com>) id 1dnkXo-0007wN-8e
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:55:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57510)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dnkXo-0007wC-2p
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 07:55:28 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 18D101F570
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 11:55:27 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Fri,  1 Sep 2017 13:55:00 +0200
+Message-Id: <20170901115500.12654-3-quintela@redhat.com>
+In-Reply-To: <20170901115500.12654-1-quintela@redhat.com>
+References: <20170901115500.12654-1-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 2/6] ACPI: Add APEI GHES Table
- Generation support
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 2/2] tests: Make vmgenid test compile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,55 +32,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: mst@redhat.com, zhaoshenglong@huawei.com, lersek@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org, edk2-devel@lists.01.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, will.deacon@arm.com, james.morse@arm.com, ard.biesheuvel@linaro.org, mingo@kernel.org, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, devel@acpica.org, john.garry@huawei.com, jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com, huangdaode@hisilicon.com, wangzhou1@hisilicon.com, zhengqiang10@huawei.com, wuquanming@huawei.com, huangshaoyu@huawei.com, linuxarm@huawei.com
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-On Fri, 1 Sep 2017 17:58:55 +0800
-gengdongjiu <gengdongjiu@huawei.com> wrote:
+Just make sure that nr_tables is size_t not int.
+Once there, do the assert in the right place and be sure that we don't
+have a division by zero.
 
-> Hi Igor,
-> 
-> On 2017/8/29 18:20, Igor Mammedov wrote:
-> > On Fri, 18 Aug 2017 22:23:43 +0800
-> > Dongjiu Geng <gengdongjiu@huawei.com> wrote:
-[...]
-> >   
-> >> +void ghes_build_acpi(GArray *table_data, GArray *hardware_error,
-> >> +                                            BIOSLinker *linker)
-> >> +{
-> >> +    uint32_t ghes_start = table_data->len;
-> >> +    uint32_t address_size, error_status_address_offset;
-> >> +    uint32_t read_ack_register_offset, i;
-> >> +
-> >> +    address_size = sizeof(struct AcpiGenericAddress) -
-> >> +        offsetof(struct AcpiGenericAddress, address);  
-> > it's confusing name for var,
-> > AcpiGenericAddress::address is fixed unsigned 64 bit integer per spec
-> > also, I'm not sure why it's needed at all.  
->  it is because other people have concern about where does the "unsigned 64 bit integer"
->  come from, they are confused about the "unsigned 64 bit integer"
->  so they suggested use sizeof. anyway I will directly use unsigned 64 bit integer.
-Maybe properly named macro instead of sizeof(foo) would do the job
+Suggested-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Tested-by: Cleber Rosa <crosa@redhat.com>
 
+--
 
-[...]
-> >> +
-> >> +        /* Build error status address*/
-> >> +        build_address(table_data, linker, error_status_address_offset + i *
-> >> +            sizeof(AcpiGenericHardwareErrorSourceV2), i * address_size,
-> >> +            AML_SYSTEM_MEMORY, 0x40, 0, 4 /* QWord access */);  
-> > just do something like this instead of build_address():
-> > build_append_gas()
-> > bios_linker_loader_add_pointer()  
-> Thanks for the suggestion.
-> 
-> > 
-> > also register width 0x40 looks suspicious, where does it come from?
-> > While at it do you have a real hardware which has HEST table that you re trying to model after?
-> > I'd like to see HEST and other related tables from it.  
-> 
-> Igor, what is your suspicious point? The register width 0x40 come from our host BIOS record to the System Memory space.
+Drop the s/g_new0/g_malloc0/ change.
+Avoid division by zero with assert (danp)
+---
+ tests/vmgenid-test.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-maybe s/0x40/ERROR_STATUS_BLOCK_POINTER_SIZE/
-
-[...]
+diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+index 3d5c1c3615..918c82c82a 100644
+--- a/tests/vmgenid-test.c
++++ b/tests/vmgenid-test.c
+@@ -40,7 +40,7 @@ static uint32_t acpi_find_vgia(void)
+     AcpiRsdpDescriptor rsdp_table;
+     uint32_t rsdt;
+     AcpiRsdtDescriptorRev1 rsdt_table;
+-    int tables_nr;
++    size_t tables_nr;
+     uint32_t *tables;
+     AcpiTableHeader ssdt_table;
+     VgidTable vgid_table;
+@@ -62,9 +62,9 @@ static uint32_t acpi_find_vgia(void)
+     ACPI_ASSERT_CMP(rsdt_table.signature, "RSDT");
+=20
+     /* compute the table entries in rsdt */
++    g_assert_cmpint(rsdt_table.length, >, sizeof(AcpiRsdtDescriptorRev1)=
+);
+     tables_nr =3D (rsdt_table.length - sizeof(AcpiRsdtDescriptorRev1)) /
+                 sizeof(uint32_t);
+-    g_assert_cmpint(tables_nr, >, 0);
+=20
+     /* get the addresses of the tables pointed by rsdt */
+     tables =3D g_new0(uint32_t, tables_nr);
+--=20
+2.13.5
