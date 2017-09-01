@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dno1N-0006f2-D2
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:19 -0400
+	(envelope-from <armbru@redhat.com>) id 1dno1O-0006fv-DI
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dno1I-0001ea-OH
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53794)
+	(envelope-from <armbru@redhat.com>) id 1dno1J-0001fP-Ed
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60520)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dno1I-0001dw-IX
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:08 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dno1J-0001eP-8K
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 11:38:09 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8BE0934CD
-	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:38:07 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4589CC0467DB
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:38:08 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-75.ams2.redhat.com
+	[10.36.116.75])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 11D5981F92
+	for <qemu-devel@nongnu.org>; Fri,  1 Sep 2017 15:38:08 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  1 Sep 2017 17:37:22 +0200
-Message-Id: <20170901153758.8628-12-armbru@redhat.com>
+Date: Fri,  1 Sep 2017 17:37:27 +0200
+Message-Id: <20170901153758.8628-17-armbru@redhat.com>
 In-Reply-To: <20170901153758.8628-1-armbru@redhat.com>
 References: <20170901153758.8628-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 11/47] qlit: add QLIT_QNULL and QLIT_BOOL
+Subject: [Qemu-devel] [PULL v2 16/47] qapi-schema: Document how generated
+ documentation is ordered
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,68 +38,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Documentation generated with qapi2texi.py is in source order, with
+included sub-schemas inserted at the first include directive
+(subsequent include directives have no effect).  To get a sane and
+stable order, it's best to include each sub-schema just once, or
+include it first in qapi-schema.json.  Document that.
 
-As they are going to be used in the following patches.
+While there, drop a few redundant comments.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20170825105913.4060-9-marcandre.lureau@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <1503602048-12268-2-git-send-email-armbru@redhat.com>
 ---
- include/qapi/qmp/qlit.h | 5 +++++
- qobject/qlit.c          | 4 ++++
- 2 files changed, 9 insertions(+)
+ qapi-schema.json | 17 ++++++-----------
+ 1 file changed, 6 insertions(+), 11 deletions(-)
 
-diff --git a/include/qapi/qmp/qlit.h b/include/qapi/qmp/qlit.h
-index fc1a2d845d..b18406bce9 100644
---- a/include/qapi/qmp/qlit.h
-+++ b/include/qapi/qmp/qlit.h
-@@ -23,6 +23,7 @@ typedef struct QLitObject QLitObject;
- struct QLitObject {
-     int type;
-     union {
-+        bool qbool;
-         int64_t qnum;
-         const char *qstr;
-         QLitDictEntry *qdict;
-@@ -35,6 +36,10 @@ struct QLitDictEntry {
-     QLitObject value;
- };
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 802ea53d00..3db3d1972f 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -72,22 +72,17 @@
+         'q_obj_CpuInfo-base'    # CPU, visible through query-cpu
+     ] } }
 =20
-+#define QLIT_QNULL \
-+    { .type =3D QTYPE_QNULL }
-+#define QLIT_QBOOL(val) \
-+    { .type =3D QTYPE_QBOOL, .value.qbool =3D (val) }
- #define QLIT_QNUM(val) \
-     { .type =3D QTYPE_QNUM, .value.qnum =3D (val) }
- #define QLIT_QSTR(val) \
-diff --git a/qobject/qlit.c b/qobject/qlit.c
-index ae2787ef35..07ad6b05e8 100644
---- a/qobject/qlit.c
-+++ b/qobject/qlit.c
-@@ -50,6 +50,8 @@ bool qlit_equal_qobject(const QLitObject *lhs, const QO=
-bject *rhs)
-     }
+-# QAPI common definitions
++# Documentation generated with qapi2texi.py is in source order, with
++# included sub-schemas inserted at the first include directive
++# (subsequent include directives have no effect).  To get a sane and
++# stable order, it's best to include each sub-schema just once, or
++# include it first in qapi-schema.json.
++
+ { 'include': 'qapi/common.json' }
+-
+-# QAPI crypto definitions
+ { 'include': 'qapi/crypto.json' }
+-
+-# QAPI block definitions
+ { 'include': 'qapi/block.json' }
+-
+-# QAPI event definitions
+ { 'include': 'qapi/event.json' }
+-
+-# Tracing commands
+ { 'include': 'qapi/trace.json' }
+-
+-# QAPI introspection
+ { 'include': 'qapi/introspect.json' }
 =20
-     switch (lhs->type) {
-+    case QTYPE_QBOOL:
-+        return lhs->value.qbool =3D=3D qbool_get_bool(qobject_to_qbool(r=
-hs));
-     case QTYPE_QNUM:
-         g_assert(qnum_get_try_int(qobject_to_qnum(rhs), &val));
-         return lhs->value.qnum =3D=3D val;
-@@ -81,6 +83,8 @@ bool qlit_equal_qobject(const QLitObject *lhs, const QO=
-bject *rhs)
-=20
-         return helper.result;
-     }
-+    case QTYPE_QNULL:
-+        return true;
-     default:
-         break;
-     }
+ ##
 --=20
 2.13.5
