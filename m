@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1dnvHG-0002aI-3m
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 19:23:11 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dnvyQ-00033p-RM
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 20:07:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1dnvHC-0002yB-W7
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 19:23:06 -0400
-Sender: fluxion <flukshun@gmail.com>
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dnvyL-0005Yt-Tk
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 20:07:42 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35981)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dnvyL-0005Yd-PI
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 20:07:37 -0400
+Received: by mail-qk0-x244.google.com with SMTP id l65so1212314qkc.3
+	for <qemu-devel@nongnu.org>; Fri, 01 Sep 2017 17:07:37 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170901180340.30009-1-eblake@redhat.com>
+	<20170901180340.30009-27-eblake@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8e442540-5f6e-bb7a-2b85-0f805884a6bc@amsat.org>
+Date: Fri, 1 Sep 2017 21:07:32 -0300
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <150420240019.3063.7604695454722520315@loki>
-References: <1503965694-10794-1-git-send-email-mdroth@linux.vnet.ibm.com>
-	<150420240019.3063.7604695454722520315@loki>
-Message-ID: <150430817105.14429.17528343463628373147@loki>
-Date: Fri, 01 Sep 2017 18:22:51 -0500
-Subject: Re: [Qemu-devel] [PATCH 00/79] Patch Round-up for stable 2.9.1,
- freeze on 2017-09-04
+In-Reply-To: <20170901180340.30009-27-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v6 26/29] fw_cfg-test: Drop dependence on
+ global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +36,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, armbru@redhat.com
 
-Quoting Michael Roth (2017-08-31 13:00:00)
-> Quoting Michael Roth (2017-08-28 19:13:35)
-> > Hi everyone,
-> > =
+On 09/01/2017 03:03 PM, Eric Blake wrote:
+> As a general rule, we prefer avoiding implicit global state
+> because it makes code harder to safely copy and paste without
+> thinking about the global state.  It turns out that with the
+> recent changes to libqos, fw_cfg-test was not even using
+> global_qtest any more.  Avoid a pointless strdup while at it.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-> > The following new patches are queued for QEMU stable v2.9.1:
-> > =
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> >   https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__github.com_mdr=
-oth_qemu_commits_stable-2D2.9-2Dstaging&d=3DDwIFaQ&c=3Djf_iaSHvJObTbx-siA1Z=
-Og&r=3DsThPI1c0u5x-3sg5Nw8wNqjg_5Z5xLzfPGC18E94zn8&m=3Dhoyg_NnavbPJKZEF_zct=
--EdpBD-Nb3rhYLms_7k54A4&s=3Ddc2xpZH9f2d88cyYQblkq-w_a99BSN8i6ypQkAYf5Pw&e=
-=3D =
-
-> =
-
-> Thank you for the recommendations. Branch updated with the following
-> additional patches:
-> =
-
->  s390-ccw: Fix alignment for CCW1
->  vnc: Set default kbd delay to 10ms
->  qemu-nbd: Ignore SIGPIPE
->  usb-redir: fix stack overflow in usbredir_log_data
->  megasas: do not read SCSI req parameters more than once from frame
->  megasas: do not read command more than once from frame
->  megasas: do not read DCMD opcode more than once from frame
->  megasas: do not read iovec count more than once from frame
->  megasas: do not read sense length more than once from frame
->  9pfs: local: forbid client access to metadata (CVE-2017-7493)
->  scsi: avoid an off-by-one error in megasas_mmio_write
->  audio: release capture buffers
->  vmw_pvscsi: check message ring page count at initialisation
->  hw/ppc/spapr_iommu: Fix crash when removing the "spapr-tce-table" device
->  hw/ppc/spapr_rtc: Mark the RTC device with user_creatable =3D false
->  qdev: Replace cannot_instantiate_with_device_add_yet with !user_creatable
->  fix qemu-system-unicore32 crashing when calling without -kernel
->  hw/s390x/ipl: Fix crash with virtio-scsi-pci device
->  slirp: fix clearing ifq_so from pending packets
->  slirp: tftp, copy sockaddr_size
->  monitor: Check whether TCG is enabled before running the "info jit" code
->  target-s390x: Mask the SIGP order_code to 8bit.
-> =
-
-
-Branch updated with the following additional patches:
-
-  exec: Add lock parameter to qemu_ram_ptr_length
-  xen/mapcache: store dma information in revmapcache entries for debugging
-  exec: use qemu_ram_ptr_length to access guest ram
-  xhci: only update dequeue ptr on completed transfers
-  vl.c/exit: pause cpus before closing block devices
-  PPC: E500: update u-boot to match shipped binary
-
->=20
+> ---
+>   tests/fw_cfg-test.c | 5 +----
+>   1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+> index 47596c57a1..3a8dc7a2cd 100644
+> --- a/tests/fw_cfg-test.c
+> +++ b/tests/fw_cfg-test.c
+> @@ -102,14 +102,11 @@ static void test_fw_cfg_boot_menu(void)
+>   int main(int argc, char **argv)
+>   {
+>       QTestState *s;
+> -    char *cmdline;
+>       int ret;
+> 
+>       g_test_init(&argc, &argv, NULL);
+> 
+> -    cmdline = g_strdup_printf("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8 ");
+> -    s = qtest_start(cmdline);
+> -    g_free(cmdline);
+> +    s = qtest_init("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8");
+> 
+>       fw_cfg = pc_fw_cfg_init(s);
+> 
