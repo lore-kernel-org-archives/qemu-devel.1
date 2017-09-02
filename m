@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1do0d0-0000Xp-19
-	for qemu-devel@nongnu.org; Sat, 02 Sep 2017 01:05:58 -0400
+	(envelope-from <bounces@canonical.com>) id 1do3Wn-0003cf-DH
+	for qemu-devel@nongnu.org; Sat, 02 Sep 2017 04:11:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1do0cv-0007pI-2K
-	for qemu-devel@nongnu.org; Sat, 02 Sep 2017 01:05:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51664)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1do0cu-0007oV-Ru
-	for qemu-devel@nongnu.org; Sat, 02 Sep 2017 01:05:48 -0400
-Date: Sat, 2 Sep 2017 13:05:42 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170902050542.GC5845@lemon.lan>
-References: <20170828174707.20786-1-famz@redhat.com>
-	<20170828174707.20786-4-famz@redhat.com>
-	<c751fc1d-602a-25ed-edb9-84ccdaeb2ecb@amsat.org>
-	<20170830033445.GE4208@lemon.lan>
-	<02eb8166-d0a4-a0e9-ec82-bc45a3626fd1@amsat.org>
+	(envelope-from <bounces@canonical.com>) id 1do3Wi-0007Q0-98
+	for qemu-devel@nongnu.org; Sat, 02 Sep 2017 04:11:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38996)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1do3Wi-0007Pg-2W
+	for qemu-devel@nongnu.org; Sat, 02 Sep 2017 04:11:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1do3Wg-0003nd-2r
+	for <qemu-devel@nongnu.org>; Sat, 02 Sep 2017 08:11:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C64B62E80E4
+	for <qemu-devel@nongnu.org>; Sat,  2 Sep 2017 08:11:33 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <02eb8166-d0a4-a0e9-ec82-bc45a3626fd1@amsat.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 03/10] tests: Add vm test lib
+Date: Sat, 02 Sep 2017 08:04:05 -0000
+From: Launchpad Bug Tracker <1711602@bugs.launchpad.net>
+Reply-To: Bug 1711602 <1711602@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150305905460.11582.12289718300820278863.malonedeb@wampee.canonical.com>
+Message-Id: <150433944938.10535.14149286760036571226.malone@ackee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1711602] Re: --copy-storage-all failing with qemu
+ 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,66 +37,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Kamil Rytarowski <kamil@netbsd.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
 
-On Fri, 09/01 16:29, Philippe Mathieu-Daud=E9 wrote:
-> On 08/30/2017 12:34 AM, Fam Zheng wrote:
-> > On Tue, 08/29 14:34, Philippe Mathieu-Daud=E9 wrote:
-> > > > +        self._args =3D [ \
-> > > > +            "-nodefaults", "-m", "2G",
-> > > > +            "-cpu", "host",
-> > > > +            "-netdev", "user,id=3Dvnet,hostfwd=3D:0.0.0.0:0-:22"=
-,
-> > > > +            "-device", "virtio-net-pci,netdev=3Dvnet",
-> > > > +            "-vnc", ":0,to=3D20",
-> > > > +            "-serial", "file:%s" % os.path.join(self._tmpdir, "s=
-erial.out")]
-> > > > +        if vcpus:
-> > > > +            self._args +=3D ["-smp", str(vcpus)]
-> > >=20
-> > > What about enabling mttcg which isn't default?
-> > >=20
-> > >              self._args +=3D ["--accel", "tcg,thread=3Dmulti"]
-> >=20
-> > Any specific reason to enable it? I think it is not available on olde=
-r QEMU.
->=20
-> Neither is dynamic portfwd :)
+This bug was fixed in the package qemu - 1:2.10~rc4+dfsg-0ubuntu1
 
-I figured, but portfwd is strongly justified, whereas ...
+---------------
+qemu (1:2.10~rc4+dfsg-0ubuntu1) artful; urgency=3Dmedium
 
->=20
-> I see 2 reasons:
-> - faster test
+  * Merge with Upstream 2.10-rc4; This fixes a migration issue (LP: #171160=
+2);
+    Remaining changes:
+    - qemu-kvm to systemd unit
+      - d/qemu-kvm-init: script for QEMU KVM preparation modules, ksm,
+        hugepages and architecture specifics
+      - d/qemu-kvm.service: systemd unit to call qemu-kvm-init
+      - d/qemu-system-common.install: install systemd unit and helper script
+      - d/qemu-system-common.maintscript: clean old sysv and upstart scripts
+      - d/qemu-system-common.qemu-kvm.default: defaults for
+        /etc/default/qemu-kvm
+      - d/rules: install /etc/default/qemu-kvm
+    - Enable nesting by default
+      - set nested=3D1 module option on intel. (is default on amd)
+      - re-load kvm_intel.ko if it was loaded without nested=3D1
+      - d/p/ubuntu/expose-vmx_qemu64cpu.patch: expose nested kvm by default
+        in qemu64 cpu type.
+      - d/p/ubuntu/enable-svm-by-default.patch: Enable nested svm by default
+        in qemu64 on amd
+    - libvirt/qemu user/group support
+      - qemu-system-common.postinst: remove acl placed by udev, and add ude=
+vadm
+        trigger.
+      - qemu-system-common.preinst: add kvm group if needed
+    - Distribution specific machine type
+      - d/p/ubuntu/define-ubuntu-machine-types.patch: define distro machine
+        types to ease future live vm migration.
+      - d/qemu-system-x86.NEWS Info on fixed machine type defintions
+    - improved dependencies
+      - Make qemu-system-common depend on qemu-block-extra
+      - Make qemu-utils depend on qemu-block-extra
+      - let qemu-utils recommend sharutils
+    - s390x support
+      - Create qemu-system-s390x package
+      - Include s390-ccw.img firmware
+      - Enable numa support for s390x
+    - ppc64[le] support
+      - d/qemu-system-ppc.links provide usr/bin/qemu-system-ppc64le symlink
+      - Enable seccomp for ppc64el
+      - bump libseccomp-dev dependency, 2.3 is the minimum for ppc64
+    - arch aware kvm wrappers
+    - update VCS-git to match the Artful branch
+    - disable missing x32 architecture
+    - d/rules: or32 is now named or1k (since 4a09d0bb)
+    - d/qemu-system-common.docs: new paths since (ac06724a)
+    - d/qemu-system-common.install: qmp-commands.txt removed, but replaced
+      by qapi-schema.json which is already packaged (since 4d8bb958)
+    - d/p/02_kfreebsd.patch: utimensat is no more optional upstream (Update
+      to Debian patch to match qemu 2.10)
+    - s390x package now builds correctly on all architectures (LP 1710695)
+  * Added changes:
+    - d/qemu-system-common.docs: adapt new path of live-block-operations.rst
+      since 8508eee7
+    - d/qemu-system-common.docs: adapt q35 config paths since 9ca019c1
+    - make nios2/hppa not installed explicitly until further stablized
+    - d/qemu-guest-agent.install: add the new guest agent reference man page
+      qemu-ga-ref
+    - d/qemu-system-common.install: add the now generated qapi/qmp reference
+      along the qapi intro
+    - d/not-installed: ignore further generated (since 56e8bdd4) files in
+      dh_missing that are already provided in other formats qemu-doc,
+      qemu-qmp-ref,qemu-ga-ref
+    - d/p/ubuntu/define-ubuntu-machine-types.patch: update to match new
+      changes in 2.10-rc4
 
-Any data? And if it is noticably faster, I doubt anyone is going to actua=
-lly use
-it, because it probably take a whole day to run one build.
+ -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Fri, 25 Aug
+2017 07:49:30 +0200
 
-> - cover mttcg
+** Changed in: qemu (Ubuntu)
+       Status: In Progress =3D> Fix Released
 
-Testing mttcg is good, but we don't want to test mttcg and building at th=
-e same
-time. Again, it can take a whole day.
+-- =
 
-But anyway --accel and any other options should be possible to get passed=
- as
-command line options.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1711602
 
-Fam
+Title:
+  --copy-storage-all failing with qemu 2.10
 
->=20
-> >=20
-> > >=20
-> > > > +        if os.access("/dev/kvm", os.R_OK | os.W_OK):
-> > > > +            self._args +=3D ["-enable-kvm"]
-> > > > +        else:
-> > > > +            logging.info("KVM not available, not using -enable-k=
-vm")
-> > > > +        self._data_args =3D []
-> > > [...]
-> >=20
-> > Fam
-> >=20
->=20
+Status in QEMU:
+  Fix Committed
+Status in qemu package in Ubuntu:
+  Fix Released
+
+Bug description:
+  We fixed an issue around disk locking already in regard to qemu-nbd
+  [1], but there still seem to be issues.
+
+  $ virsh migrate --live --copy-storage-all kvmguest-artful-normal qemu+ssh=
+://10.22.69.196/system
+  error: internal error: qemu unexpectedly closed the monitor: 2017-08-18T1=
+2:10:29.800397Z qemu-system-x86_64: -chardev pty,id=3Dcharserial0: char dev=
+ice redirected to /dev/pts/0 (label charserial0)
+  2017-08-18T12:10:48.545776Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+
+  Source libvirt log for the guest:
+  2017-08-18 12:09:08.251+0000: initiating migration
+  2017-08-18T12:09:08.809023Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+  2017-08-18T12:09:08.809481Z qemu-system-x86_64: Unable to read from socke=
+t: Connection reset by peer
+
+  Target libvirt log for the guest:
+  2017-08-18T12:09:08.730911Z qemu-system-x86_64: load of migration failed:=
+ Input/output error
+  2017-08-18 12:09:09.010+0000: shutting down, reason=3Dcrashed
+
+  Given the timing it seems that the actual copy now works (it is busy ~10 =
+seconds on my environment which would be the copy).
+  Also we don't see the old errors we saw before, but afterwards on the act=
+ual take-over it fails.
+
+  Dmesg has no related denials as often apparmor is in the mix.
+
+  Need to check libvirt logs of source [2] and target [3] in Detail.
+
+  [1]: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02200.html
+  [2]: http://paste.ubuntu.com/25339356/
+  [3]: http://paste.ubuntu.com/25339358/
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1711602/+subscriptions
