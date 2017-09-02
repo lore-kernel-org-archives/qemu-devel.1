@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnw1a-00055r-P7
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 20:11:03 -0400
+	(envelope-from <cota@braap.org>) id 1dnxUb-0005H4-VQ
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 21:45:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnw1V-0007TW-Pn
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 20:10:58 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:37697)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dnw1V-0007TN-Kr
-	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 20:10:53 -0400
-Received: by mail-qk0-x244.google.com with SMTP id c6so474046qkh.4
-	for <qemu-devel@nongnu.org>; Fri, 01 Sep 2017 17:10:53 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170901180340.30009-1-eblake@redhat.com>
-	<20170901180340.30009-12-eblake@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e282830f-476d-2b18-5f8e-2d577d9409e4@amsat.org>
-Date: Fri, 1 Sep 2017 21:10:48 -0300
+	(envelope-from <cota@braap.org>) id 1dnxUY-0005I0-UF
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 21:45:02 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:53477)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dnxUY-0005Dt-LP
+	for qemu-devel@nongnu.org; Fri, 01 Sep 2017 21:44:58 -0400
+Date: Fri, 1 Sep 2017 21:44:56 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170902014456.GA29493@flamenco>
+References: <20170829063313.10237-1-bobby.prani@gmail.com>
+	<20170829063313.10237-4-bobby.prani@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170901180340.30009-12-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v6 11/29] libqtest: Inline
- qtest_query_target_endianness()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170829063313.10237-4-bobby.prani@gmail.com>
+Subject: Re: [Qemu-devel] [RFC v3 PATCH 4/5] mttcg: Implement implicit
+ ordering semantics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,65 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, armbru@redhat.com
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: alex.bennee@linaro.org, Richard Henderson <rth@twiddle.net>, "open list:All patches CC here" <qemu-devel@nongnu.org>, pbonzini@redhat.com
 
-On 09/01/2017 03:03 PM, Eric Blake wrote:
-> There was only one caller; it's easier to inline things.
+On Tue, Aug 29, 2017 at 02:33:12 -0400, Pranith Kumar wrote:
+> Currently, we cannot use mttcg for running strong memory model guests
+> on weak memory model hosts due to missing ordering semantics.
 > 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> We implicitly generate fence instructions for stronger guests if an
 
-Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+This confused me. By "We implicitly" are we still talking about
+the current state (as per the "currently" above?). If not, I'd
+rephrase as:
 
-> ---
->   tests/libqtest.c | 22 ++++++----------------
->   1 file changed, 6 insertions(+), 16 deletions(-)
+"We cannot use [...].
+
+To fix it, generate fences [...]"
+
+Also, I think you meant s/stronger/weaker/ in the last sentence.
+
+> ordering mismatch is detected. We generate fences only for the orders
+> for which fence instructions are necessary, for example a fence is not
+> necessary between a store and a subsequent load on x86 since its
+> absence in the guest binary tells that ordering need not be
+> ensured. Also note that if we find multiple subsequent fence
+> instructions in the generated IR, we combine them in the TCG
+> optimization pass.
+
+A before/after example of -d out_asm would be great to have here.
 > 
-> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> index 5d16351e24..b6dd26e54a 100644
-> --- a/tests/libqtest.c
-> +++ b/tests/libqtest.c
-> @@ -244,20 +244,6 @@ redo:
->       return words;
->   }
-> 
-> -static int qtest_query_target_endianness(QTestState *s)
-> -{
-> -    gchar **args;
-> -    int big_endian;
-> -
-> -    qtest_sendf(s, "endianness\n");
-> -    args = qtest_rsp(s, 1);
-> -    g_assert(strcmp(args[1], "big") == 0 || strcmp(args[1], "little") == 0);
-> -    big_endian = strcmp(args[1], "big") == 0;
-> -    g_strfreev(args);
-> -
-> -    return big_endian;
-> -}
-> -
->   static void cleanup_sigabrt_handler(void)
->   {
->       sigaction(SIGABRT, &sigact_old, NULL);
-> @@ -288,6 +274,7 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
->       gchar *qmp_socket_path;
->       gchar *command;
->       const char *qemu_binary;
-> +    gchar **args;
-> 
->       qemu_binary = getenv("QTEST_QEMU_BINARY");
->       if (!qemu_binary) {
-> @@ -351,8 +338,11 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
->       }
-> 
->       /* ask endianness of the target */
-> -
-> -    s->big_endian = qtest_query_target_endianness(s);
-> +    qtest_sendf(s, "endianness\n");
-> +    args = qtest_rsp(s, 1);
-> +    g_assert(strcmp(args[1], "big") == 0 || strcmp(args[1], "little") == 0);
-> +    s->big_endian = strcmp(args[1], "big") == 0;
-> +    g_strfreev(args);
-> 
->       return s;
->   }
-> 
+> This patch allows us to boot an x86 guest on ARM64 hosts using mttcg.
+
+A test with a simple program that *cannot* work without this patch
+would be even better.
+
+Thanks,
+
+		Emilio
