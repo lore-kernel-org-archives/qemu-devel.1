@@ -1,18 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43936)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1doY5d-0003oR-9n
-	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 12:49:46 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44676)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <izik@veertu.com>) id 1doY9s-0005i0-KS
+	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 12:54:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1doY5Y-0003VE-GH
-	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 12:49:41 -0400
-Received: from mout.gmx.net ([212.227.15.19]:53956)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1doY5Y-0003U1-4R
-	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 12:49:36 -0400
-From: Kamil Rytarowski <n54@gmx.com>
-Date: Sun,  3 Sep 2017 18:37:26 +0200
-Message-Id: <20170903163726.16541-1-n54@gmx.com>
-Subject: [Qemu-devel] [PATCH] e1000: Rename the SEC symbol to SEQEC
+	(envelope-from <izik@veertu.com>) id 1doY9m-0008Cg-Sj
+	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 12:54:04 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:37243)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <izik@veertu.com>) id 1doY9m-0008AZ-HQ
+	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 12:53:58 -0400
+Received: by mail-wm0-x232.google.com with SMTP id u26so25367971wma.0
+	for <qemu-devel@nongnu.org>; Sun, 03 Sep 2017 09:53:58 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CABgObfYAH3xtVO0mZCBiVnE5m=p_BqiopGJtovzL1LFBN0366Q@mail.gmail.com>
+References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
+	<20170830082702.3011-3-Sergio.G.DelReal@gmail.com>
+	<20170830140738.GS18526@redhat.com>
+	<20170831074215.GA13619@stefanha-x1.localdomain>
+	<CABgObfYRUtdH9-7+zWx5Zur=iE_Qr5953+EOgcxRfVGnEonbmg@mail.gmail.com>
+	<CAJTBuyhJgVZ-A+AHatjAwPjsSv2Q-HxuF7nc1NpbWNmGnCOhVQ@mail.gmail.com>
+	<CABgObfaDtgixAEF8OPLuDf=21GiCwY3EUOPHujXPeLqYTup=Yw@mail.gmail.com>
+	<CAJTBuyhKqbXWjphh-t60TVjZfVFEYGyWFgEs4TmR+CE1q04GhQ@mail.gmail.com>
+	<CAJTBuyhvCySRHvrKMOW7fvjuogTUUUXi4QRjiJrrzfu-gbb5jQ@mail.gmail.com>
+	<CABgObfYAH3xtVO0mZCBiVnE5m=p_BqiopGJtovzL1LFBN0366Q@mail.gmail.com>
+From: Izik Eidus <izik@veertu.com>
+Date: Sun, 3 Sep 2017 19:53:56 +0300
+Message-ID: <CAJTBuyg2Q43RhiVo1KuYL6uKZG3ztt5j09oeEoOk5h8r16hjeA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 02/13] hvf: add code base from Google's
+ QEMU repository
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,83 +37,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dmitry@daynix.com
-Cc: qemu-devel@nongnu.org, Kamil Rytarowski <n54@gmx.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: vpalatin@chromium.org, qemu-devel <qemu-devel@nongnu.org>, "Hajnoczi, Stefan" <stefanha@gmail.com>, =?UTF-8?Q?Sergio_Andr=C3=A9s_G=C3=B3mez_del_Real?= <sergio.g.delreal@gmail.com>
 
-SunOS defines SEC in <sys/time.h> as 1 (commonly used time symbols).
+On Sun, Sep 3, 2017 at 7:35 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-This fixes build on SmartOS (Joyent).
+>
+>
+> Il 03 set 2017 6:17 PM, "Izik Eidus" <izik@veertu.com> ha scritto:
+>
+> Hi,
+>
+> Paolo, my biggest challenge right now is:
+> hvf-all.c
+> it include currently the following copyright:
+>
+> // Copyright 2008 IBM Corporation
+>
+> //           2008 Red Hat, Inc.
+>
+> // Copyright 2011 Intel Corporation
+>
+> // Copyright 2016 Veertu, Inc.
+> // Copyright 2017 The Android Open Source Project
+>
+> and it is GPLv2, However we want to integrate this stuff to QEMU in the
+> required license (GPLv2+), I have a suggestion that maybe the safest way
+> for us to achieve GPLv2+  would be that we will send you the current
+> hypervisor framework implementation of Anka that is derived from
+> xhyve/bhyve + our own changes to make it run windows / linux / macOS,
+>
+>
+> What code is derived from v2-only sources? IIRC the task switch code is
+> derived from KVM, is there anything else?
+>
 
-Patch cherry-picked from pkgsrc by jperkin (Joyent).
 
-Signed-off-by: Kamil Rytarowski <n54@gmx.com>
----
- hw/net/e1000.c         | 4 ++--
- hw/net/e1000_regs.h    | 2 +-
- hw/net/e1000e_core.c   | 2 +-
- hw/net/e1000x_common.h | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
+Yes this is exactly the code that I found as well, however considering the
+fact that I didn't even know it was there requires me to go and validate
+that other stuff are safe for GPL2v+.
 
-diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-index f2e5072d27..eebe3a9c13 100644
---- a/hw/net/e1000.c
-+++ b/hw/net/e1000.c
-@@ -1127,7 +1127,7 @@ static uint32_t (*macreg_readops[])(E1000State *, int) = {
-     getreg(TADV),     getreg(ITR),      getreg(FCRUC),    getreg(IPAV),
-     getreg(WUC),      getreg(WUS),      getreg(SCC),      getreg(ECOL),
-     getreg(MCC),      getreg(LATECOL),  getreg(COLC),     getreg(DC),
--    getreg(TNCRS),    getreg(SEC),      getreg(CEXTERR),  getreg(RLEC),
-+    getreg(TNCRS),    getreg(SEQEC),    getreg(CEXTERR),  getreg(RLEC),
-     getreg(XONRXC),   getreg(XONTXC),   getreg(XOFFRXC),  getreg(XOFFTXC),
-     getreg(RFC),      getreg(RJC),      getreg(RNBC),     getreg(TSCTFC),
-     getreg(MGTPRC),   getreg(MGTPDC),   getreg(MGTPTC),   getreg(GORCL),
-@@ -1223,7 +1223,7 @@ static const uint8_t mac_reg_access[0x8000] = {
-     [FFLT]    = markflag(MAC),    [FFMT]    = markflag(MAC),
-     [SCC]     = markflag(MAC),    [FCRUC]   = markflag(MAC),
-     [LATECOL] = markflag(MAC),    [COLC]    = markflag(MAC),
--    [SEC]     = markflag(MAC),    [CEXTERR] = markflag(MAC),
-+    [SEQEC]   = markflag(MAC),    [CEXTERR] = markflag(MAC),
-     [XONTXC]  = markflag(MAC),    [XOFFRXC] = markflag(MAC),
-     [RJC]     = markflag(MAC),    [RNBC]    = markflag(MAC),
-     [MGTPDC]  = markflag(MAC),    [MGTPTC]  = markflag(MAC),
-diff --git a/hw/net/e1000_regs.h b/hw/net/e1000_regs.h
-index 23eed50b9c..ae99f58bab 100644
---- a/hw/net/e1000_regs.h
-+++ b/hw/net/e1000_regs.h
-@@ -260,7 +260,7 @@
- #define E1000_COLC     0x04028  /* Collision Count - R/clr */
- #define E1000_DC       0x04030  /* Defer Count - R/clr */
- #define E1000_TNCRS    0x04034  /* TX-No CRS - R/clr */
--#define E1000_SEC      0x04038  /* Sequence Error Count - R/clr */
-+#define E1000_SEQEC    0x04038  /* Sequence Error Count - R/clr */
- #define E1000_CEXTERR  0x0403C  /* Carrier Extension Error Count - R/clr */
- #define E1000_RLEC     0x04040  /* Receive Length Error Count - R/clr */
- #define E1000_XONRXC   0x04048  /* XON RX Count - R/clr */
-diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-index 81405640f0..43a8d89955 100644
---- a/hw/net/e1000e_core.c
-+++ b/hw/net/e1000e_core.c
-@@ -2855,7 +2855,7 @@ static uint32_t (*e1000e_macreg_readops[])(E1000ECore *, int) = {
-     e1000e_getreg(RDLEN0),
-     e1000e_getreg(RDH1),
-     e1000e_getreg(LATECOL),
--    e1000e_getreg(SEC),
-+    e1000e_getreg(SEQEC),
-     e1000e_getreg(XONTXC),
-     e1000e_getreg(WUS),
-     e1000e_getreg(GORCL),
-diff --git a/hw/net/e1000x_common.h b/hw/net/e1000x_common.h
-index 21bf28e0cc..3072ce9d50 100644
---- a/hw/net/e1000x_common.h
-+++ b/hw/net/e1000x_common.h
-@@ -40,7 +40,7 @@ enum {
-     defreg(VFTA),    defreg(VET),     defreg(RDTR),    defreg(RADV),
-     defreg(TADV),    defreg(ITR),     defreg(SCC),     defreg(ECOL),
-     defreg(MCC),     defreg(LATECOL), defreg(COLC),    defreg(DC),
--    defreg(TNCRS),   defreg(SEC),     defreg(CEXTERR), defreg(RLEC),
-+    defreg(TNCRS),   defreg(SEQEC),   defreg(CEXTERR), defreg(RLEC),
-     defreg(XONRXC),  defreg(XONTXC),  defreg(XOFFRXC), defreg(XOFFTXC),
-     defreg(FCRUC),   defreg(AIT),     defreg(TDFH),    defreg(TDFT),
-     defreg(TDFHS),   defreg(TDFTS),   defreg(TDFPC),   defreg(WUC),
--- 
-2.14.1
+
+>
+> If you can identify the functions that cannot be v2-or-later that's
+> already okay. There is a lot more refactoring to do in the HVF code to
+> remove duplication with other parts of the code, and if it's just a couple
+> isolated cases we can maybe try to prioritize them. For example it's part
+> of the plan to replace the task switch code with the version in
+> seg_helper.c. Worst case, QEMU has done clean room reverse engineering a
+> couple times in the past to fix licensing issues.
+>
+> If you think your plan works better and you can devote a week to it, we
+> can also try it. But having a clear answer on what code is from v2-only
+> sources may help judging on the better approach. I an worried that some of
+> the later patches could be tricky to redo/backport. What are the advantages
+> of the newer implementation? Does it reuse more KVM userspace bits?
+>
+
+
+The newer implementation is what we are using in Anka to virtluze macOS
+(but it is handling windows/linux/*), in my perspective it is more mature
+and handle many more corner case, it is currently not plugged into QEMU,
+and all the work that need to happen is: plug it like the KVM user space
+bits with the ideas of Sergio, and the recommendations of QEMU for this
+patch's.
+
+One big advantage is that we will be more than happy to back port fix's as
+they come from Anka to QEMU hvf.
+
+>
+> Paolo
+>
+> in
+> such case all copyright go back to BSD2 and we can license it as GPL2v+ or
+> whatever work for QEMU.
+> If you want to go in such case what we will do would be the following:
+> take kvm user space implemantion of qemu that is GPLv2+, integrate to it
+> the hypervisor framework from Anka (in kvm user space style) - this will
+> put us in hvf [1|2|3 / 13] in safe GPLv2+ and then we can back port the
+> rest of Sergio changes to this stuff.
+>
+> I know this is less than ideal as it requires some changes to the current
+> patch set, however it will make it 100% safe to be GPL2v+, what you guys
+> think?, we can get this stuff done before the end of this week...
+>
+> Thanks.
+>
+>
+> On Fri, Sep 1, 2017 at 12:39 AM, Izik Eidus <izik@veertu.com> wrote:
+>
+> >
+> >
+> > On Fri, Sep 1, 2017 at 12:21 AM, Paolo Bonzini <pbonzini@redhat.com>
+> > wrote:
+> >
+> >> Il 31 ago 2017 3:54 PM, "Izik Eidus" <izik@veertu.com> ha scritto:
+> >>
+> >> > Izik, Vincent (assuming you are the right person to contact at
+> Google),
+> >> > can you reply to Daniel and Stefan?
+> >> >
+> >>
+> >> Hi,
+> >>
+> >> What I suggest is that we will send our patch' again as gpl2+ and clean
+> >> the
+> >> entire stuff to make sure they are falling into the right copyright
+> >> category as required by QEMU.
+> >>
+> >>
+> >> That's not necessary. Just you and Vincent replying to this thread with
+> a
+> >> "Signed-off-by" line would be enough for Sergio to use the right
+> license in
+> >> his v3 submission. Sergio already made some non-trivial changes that are
+> >> needed for inclusion in QEMU from a supportability (e.g. dirty page
+> >> tracking for graphics) or maintainability perspective (e.g. -cpu
+> support),
+> >> so the simplest thing to do is to retrofit the right license to his
+> >> submission. You can do so if you can confirm that the code you used only
+> >> came from QEMU itself, Bochs or other GPLv2+/LGPL software (and the rest
+> >> was written by Veertu).
+> >>
+> >
+> > Hi,
+> >
+> > Sure fine with us, let me go over all the code and see that all copyright
+> > that are needed are there, and then you can relicense all our code to
+> > GPLv2+, I think I saw a a file that was missing Bochs copyright in it,
+> so I
+> > want to make sure that I fix this before and that all others are fine.
+> >
+> > Thanks.
+> >
+> >
+> >>
+> >> Google has already contributed the HAXN accelerator, so I am moderately
+> >> optimistic that they can help with HVF too.
+> >>
+> >> BTW, another thing that need to be integrated in order to make this
+> stuff
+> >> useful is the vmnet patch's, it is apple NAT for vms that allow guests
+> to
+> >> have networking...
+> >>
+> >>
+> >> People can always use slirp (or tap with some more effort), so these
+> >> patches are already a minimum viable feature and pretty close to being
+> >> mergeable. But of course any other contribution is welcome!
+> >>
+> >> Paolo
+> >>
+> >>
+> >> (altho that it come with a trick, without certificate it
+> >> will require root permission, while hypverisor framework itself can run
+> >> without root)
+> >>
+> >> What do you guys think?
+> >>
+> >>
+> >> >
+> >> > Sergio worked on completing the QEMU port to Hypervisor.framework. The
+> >> > hvf-all.c file that Daniel pointed out as v2-only is derived from
+> >> kvm-all.c
+> >> > and hax-all.c, and should be under v2-or-later license. The others
+> seem
+> >> to
+> >> > be either original or derived from Bochs, which is LGPL, so they could
+> >> be
+> >> > LGPL or GPLv2+.
+> >> >
+> >> > Thanks,
+> >> >
+> >> > Paolo
+> >> >
+> >> >
+> >> > There are benefits to having this code upstream.  If they ever want to
+> >> > rebase on qemu.git there will be less work for them.
+> >>
+> >>
+> OK,
+>
+>
+> > >
+> >> > Stefan
+> >> >
+> >> >
+> >> >
+> >>
+> >>
+> >>
+> >
+>
+>
+>
