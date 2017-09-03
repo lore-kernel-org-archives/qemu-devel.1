@@ -1,39 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41281)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1doXv3-0006jJ-Gn
-	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 12:38:51 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42511)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1doXzy-0000Nf-Ql
+	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 12:43:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1doXuy-0005Ng-8P
-	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 12:38:45 -0400
-Received: from mail-ua0-x22b.google.com ([2607:f8b0:400c:c08::22b]:37309)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
-	id 1doXuy-0005NI-25
-	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 12:38:40 -0400
-Received: by mail-ua0-x22b.google.com with SMTP id k23so6342777uaf.4
-	for <qemu-devel@nongnu.org>; Sun, 03 Sep 2017 09:38:39 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAMzKsXt5h9Y3JmvumG0paSV+JGAivunUNZ5=t7CdcOawGAkqxg@mail.gmail.com>
-References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
-	<20170830082702.3011-3-Sergio.G.DelReal@gmail.com>
-	<20170830140738.GS18526@redhat.com>
-	<20170831074215.GA13619@stefanha-x1.localdomain>
-	<CABgObfYRUtdH9-7+zWx5Zur=iE_Qr5953+EOgcxRfVGnEonbmg@mail.gmail.com>
-	<CAJTBuyhJgVZ-A+AHatjAwPjsSv2Q-HxuF7nc1NpbWNmGnCOhVQ@mail.gmail.com>
-	<CABgObfaDtgixAEF8OPLuDf=21GiCwY3EUOPHujXPeLqYTup=Yw@mail.gmail.com>
-	<CAMzKsXuvdroUvT=6rjeTtM+FKHz6pat9Fgby5ayF_dZp9qaQaw@mail.gmail.com>
-	<CAJTBuyhCg1YMShp4W72eHzYh0jcOC3e9NhY7iv=sJv6iMaPe6w@mail.gmail.com>
-	<CABgObfb_HCGjE7gfU8Jeu3WofiRQOQqt8rBVC7ws46V2gDX2Xw@mail.gmail.com>
-	<CAJTBuygq_EE=4Xrp8yX=1gZ-yeeR6HCoZFsxz4RqVoTNVQAJyQ@mail.gmail.com>
-	<CAMzKsXt5h9Y3JmvumG0paSV+JGAivunUNZ5=t7CdcOawGAkqxg@mail.gmail.com>
-From: =?UTF-8?Q?Sergio_Andr=C3=A9s_G=C3=B3mez_del_Real?=
-	<sergio.g.delreal@gmail.com>
-Date: Sun, 3 Sep 2017 11:38:38 -0500
-Message-ID: <CAMzKsXuwGwy9tzNwDax0WWcpNsMF1TCNN8aR50haHJ97N80GvQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 02/13] hvf: add code base from Google's
- QEMU repository
+	(envelope-from <n54@gmx.com>) id 1doXzt-0008Vt-O5
+	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 12:43:50 -0400
+Received: from mout.gmx.net ([212.227.17.22]:49533)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1doXzt-0008VC-DV
+	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 12:43:45 -0400
+From: Kamil Rytarowski <n54@gmx.com>
+Date: Sun,  3 Sep 2017 18:31:30 +0200
+Message-Id: <20170903163130.14288-1-n54@gmx.com>
+Subject: [Qemu-devel] [PATCH] target/m68k: Change fpu_rom from const static
+ array to switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,196 +22,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Izik Eidus <izik@veertu.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, vpalatin@chromium.org, qemu-devel <qemu-devel@nongnu.org>, "Hajnoczi,
-	Stefan" <stefanha@gmail.com>, Frank Yang <lfy@google.com>
+To: laurent@vivier.eu
+Cc: qemu-devel@nongnu.org, Kamil Rytarowski <n54@gmx.com>
 
-Just saw your last message. Will wait for Paolo's response.
+GCC 4.7.2 on SunOS reports that the values assigned to array members are not
+real constants:
 
-On Sun, Sep 3, 2017 at 11:33 AM, Sergio Andr=C3=A9s G=C3=B3mez del Real <
-sergio.g.delreal@gmail.com> wrote:
+target/m68k/fpu_helper.c:32:5: error: initializer element is not constant
+target/m68k/fpu_helper.c:32:5: error: (near initialization for 'fpu_rom[0]')
+rules.mak:66: recipe for target 'target/m68k/fpu_helper.o' failed
 
-> Izik, sorry for the late response. Tell me if you have any further issue.
-> What are the 2 functions that couldn't be relicensed?
->
-> Stefan, as soon as relicensing is available I'll send v3 of the patchset.
->
-> On Sun, Sep 3, 2017 at 8:00 AM, Izik Eidus <izik@veertu.com> wrote:
->
->>
->>
->> On Sun, Sep 3, 2017 at 9:23 AM, Paolo Bonzini <pbonzini@redhat.com>
->> wrote:
->>
->>> Il 01 set 2017 7:59 PM, "Izik Eidus" <izik@veertu.com> ha scritto:
->>>
->>> Hi,
->>>
->>> Sergio, I was trying to applying patch  1/13 and 2/13 and then I ran:
->>> ./configure and saw: 'HVF support       yes'
->>> after that 'make' was happy
->>> and:
->>>
->>> ./x86_64-softmmu/qemu-system-x86_64 --help | grep accel
->>>
->>> \                property accel=3Daccel1[:accel2[:...]] selects acceler=
-ator
->>>
->>>                 supported accelerators are kvm, xen, hax, hvf or tcg
->>> (default: tcg)
->>>
->>>                 kernel_irqchip=3Don|off|split controls accelerated irqc=
-hip
->>> support (default=3Doff)
->>>
->>>
->>> however:
->>>
->>> ./x86_64-softmmu/qemu-system-x86_64 -cdrom
->>> /Users/izik/Downloads/ubuntu-16.04.3-desktop-amd64.iso -machine
->>> q35,accel=3Dhvf
->>>
->>> qemu-system-x86_64: -machine accel=3Dhvf: No accelerator found
->>>
->>>
->>> What am I doing wrong?
->>>
->>>
->>> Try applying patch 3 too. Most of the early patches will end up squashe=
-d.
->>>
->>
->> Yea that did the magic, now I have compilation errors but from here I
->> will take it, and just fix the compilation step for each patch and resen=
-d.
->>
->>
->>>
->>> Paolo
->>>
->>>
->>> Thanks.
->>>
->>>
->>>
->>>
->>> On Fri, Sep 1, 2017 at 12:41 AM, Sergio Andr=C3=A9s G=C3=B3mez del Real=
- <
->>> sergio.g.delreal@gmail.com> wrote:
->>>
->>> > Hello,
->>> > Mr. Frank Yang was the guy at Google that introduced the HVF port to
->>> > Google's Android Emulator QEMU branch.
->>> > Frank, in this thread we are discussing the licensing issue with the
->>> HVF
->>> > files (their being GPL v2-only). Paolo from Red Hat was asking to
->>> Veertu
->>> > developer Izik Eidus if the code in Veertu derived only from QEMU,
->>> Bochs
->>> > and other GPLv2+ or LGPL software. Because the code at Google was
->>> itself
->>> > derived from Veertu, I'd imagine the same licensing terms would apply
->>> in
->>> > your case. Any light you can throw over this issue would be much
->>> > appreciated.
->>> >
->>> > Thank you.
->>> >
->>> > On Thu, Aug 31, 2017 at 4:21 PM, Paolo Bonzini <pbonzini@redhat.com>
->>> > wrote:
->>> >
->>> >> Il 31 ago 2017 3:54 PM, "Izik Eidus" <izik@veertu.com> ha scritto:
->>> >>
->>> >> > Izik, Vincent (assuming you are the right person to contact at
->>> Google),
->>> >> > can you reply to Daniel and Stefan?
->>> >> >
->>> >>
->>> >> Hi,
->>> >>
->>> >> What I suggest is that we will send our patch' again as gpl2+ and
->>> clean
->>> >> the
->>> >> entire stuff to make sure they are falling into the right copyright
->>> >> category as required by QEMU.
->>> >>
->>> >>
->>> >> That's not necessary. Just you and Vincent replying to this thread
->>> with a
->>> >> "Signed-off-by" line would be enough for Sergio to use the right
->>> license in
->>> >> his v3 submission. Sergio already made some non-trivial changes that
->>> are
->>> >> needed for inclusion in QEMU from a supportability (e.g. dirty page
->>> >> tracking for graphics) or maintainability perspective (e.g. -cpu
->>> support),
->>> >> so the simplest thing to do is to retrofit the right license to his
->>> >> submission. You can do so if you can confirm that the code you used
->>> only
->>> >> came from QEMU itself, Bochs or other GPLv2+/LGPL software (and the
->>> rest
->>> >> was written by Veertu).
->>> >>
->>> >> Google has already contributed the HAXN accelerator, so I am
->>> moderately
->>> >> optimistic that they can help with HVF too.
->>> >>
->>> >> BTW, another thing that need to be integrated in order to make this
->>> stuff
->>> >> useful is the vmnet patch's, it is apple NAT for vms that allow
->>> guests to
->>> >> have networking...
->>> >>
->>> >>
->>> >> People can always use slirp (or tap with some more effort), so these
->>> >> patches are already a minimum viable feature and pretty close to bei=
-ng
->>> >> mergeable. But of course any other contribution is welcome!
->>> >>
->>> >> Paolo
->>> >>
->>> >>
->>> >> (altho that it come with a trick, without certificate it
->>> >> will require root permission, while hypverisor framework itself can
->>> run
->>> >> without root)
->>> >>
->>> >> What do you guys think?
->>> >>
->>> >>
->>> >> >
->>> >> > Sergio worked on completing the QEMU port to Hypervisor.framework.
->>> The
->>> >> > hvf-all.c file that Daniel pointed out as v2-only is derived from
->>> >> kvm-all.c
->>> >> > and hax-all.c, and should be under v2-or-later license. The others
->>> seem
->>> >> to
->>> >> > be either original or derived from Bochs, which is LGPL, so they
->>> could
->>> >> be
->>> >> > LGPL or GPLv2+.
->>> >> >
->>> >> > Thanks,
->>> >> >
->>> >> > Paolo
->>> >> >
->>> >> >
->>> >> > There are benefits to having this code upstream.  If they ever wan=
-t
->>> to
->>> >> > rebase on qemu.git there will be less work for them.
->>> >> >
->>> >> > Stefan
->>> >> >
->>> >> >
->>> >> >
->>> >>
->>> >>
->>> >>
->>> >
->>>
->>>
->>>
->>
->
+Convert the array to switch() to workaround the issue.
+
+This fixes build on SmartOS (Joyent).
+
+Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+---
+ target/m68k/fpu_helper.c | 108 ++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 78 insertions(+), 30 deletions(-)
+
+diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
+index bdfc537c68..13ce40db06 100644
+--- a/target/m68k/fpu_helper.c
++++ b/target/m68k/fpu_helper.c
+@@ -24,35 +24,6 @@
+ #include "exec/exec-all.h"
+ #include "exec/cpu_ldst.h"
+ 
+-/* Undefined offsets may be different on various FPU.
+- * On 68040 they return 0.0 (floatx80_zero)
+- */
+-
+-static const floatx80 fpu_rom[128] = {
+-    [0x00] = floatx80_pi,                                   /* Pi */
+-    [0x0b] = make_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
+-    [0x0c] = make_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
+-    [0x0d] = make_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
+-    [0x0e] = make_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
+-    [0x0f] = floatx80_zero,                                 /* Zero     */
+-    [0x30] = floatx80_ln2,                                  /* ln(2)    */
+-    [0x31] = make_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
+-    [0x32] = floatx80_one,                                  /* 10^0     */
+-    [0x33] = make_floatx80(0x4002, 0xa000000000000000ULL),  /* 10^1     */
+-    [0x34] = make_floatx80(0x4005, 0xc800000000000000ULL),  /* 10^2     */
+-    [0x35] = make_floatx80(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
+-    [0x36] = make_floatx80(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
+-    [0x37] = make_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
+-    [0x38] = make_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
+-    [0x39] = make_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
+-    [0x3a] = make_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
+-    [0x3b] = make_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
+-    [0x3c] = make_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
+-    [0x3d] = make_floatx80(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
+-    [0x3e] = make_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
+-    [0x3f] = make_floatx80(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
+-};
+-
+ int32_t HELPER(reds32)(CPUM68KState *env, FPReg *val)
+ {
+     return floatx80_to_int32(val->d, &env->fp_status);
+@@ -387,7 +358,84 @@ void HELPER(ftst)(CPUM68KState *env, FPReg *val)
+ 
+ void HELPER(fconst)(CPUM68KState *env, FPReg *val, uint32_t offset)
+ {
+-    val->d = fpu_rom[offset];
++    floatx80 tmp;
++
++    /* Undefined offsets may be different on various FPU.
++     * On 68040 they return 0.0 (floatx80_zero)
++     */
++    switch (offset) {
++    case 0x00:
++        tmp = floatx80_pi;                                   /* Pi */
++        break;
++    case 0x0b:
++        tmp = make_floatx80(0x3ffd, 0x9a209a84fbcff798ULL);  /* Log10(2) */
++        break;
++    case 0x0c:
++        tmp = make_floatx80(0x4000, 0xadf85458a2bb4a9aULL);  /* e        */
++        break;
++    case 0x0d:
++        tmp = make_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL);  /* Log2(e)  */
++        break;
++    case 0x0e:
++        tmp = make_floatx80(0x3ffd, 0xde5bd8a937287195ULL);  /* Log10(e) */
++        break;
++    case 0x0f:
++        tmp = floatx80_zero;                                 /* Zero     */
++        break;
++    case 0x30:
++        tmp = floatx80_ln2;                                  /* ln(2)    */
++        break;
++    case 0x31:
++        tmp = make_floatx80(0x4000, 0x935d8dddaaa8ac17ULL);  /* ln(10)   */
++        break;
++    case 0x32:
++        tmp = floatx80_one;                                  /* 10^0     */
++        break;
++    case 0x33:
++        tmp = make_floatx80(0x4002, 0xa000000000000000ULL);  /* 10^1     */
++        break;
++    case 0x34:
++        tmp = make_floatx80(0x4005, 0xc800000000000000ULL);  /* 10^2     */
++        break;
++    case 0x35:
++        tmp = make_floatx80(0x400c, 0x9c40000000000000ULL);  /* 10^4     */
++        break;
++    case 0x36:
++        tmp = make_floatx80(0x4019, 0xbebc200000000000ULL);  /* 10^8     */
++        break;
++    case 0x37:
++        tmp = make_floatx80(0x4034, 0x8e1bc9bf04000000ULL);  /* 10^16    */
++        break;
++    case 0x38:
++        tmp = make_floatx80(0x4069, 0x9dc5ada82b70b59eULL);  /* 10^32    */
++        break;
++    case 0x39:
++        tmp = make_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL);  /* 10^64    */
++        break;
++    case 0x3a:
++        tmp = make_floatx80(0x41a8, 0x93ba47c980e98ce0ULL);  /* 10^128   */
++        break;
++    case 0x3b:
++        tmp = make_floatx80(0x4351, 0xaa7eebfb9df9de8eULL);  /* 10^256   */
++        break;
++    case 0x3c:
++        tmp = make_floatx80(0x46a3, 0xe319a0aea60e91c7ULL);  /* 10^512   */
++        break;
++    case 0x3d:
++        tmp = make_floatx80(0x4d48, 0xc976758681750c17ULL);  /* 10^1024  */
++        break;
++    case 0x3e:
++        tmp = make_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL);  /* 10^2048  */
++        break;
++    case 0x3f:
++        tmp = make_floatx80(0x7525, 0xc46052028a20979bULL);  /* 10^4096  */
++        break;
++    default:
++        tmp = floatx80_zero;
++        break;
++    }
++
++    val->d = tmp;
+ }
+ 
+ typedef int (*float_access)(CPUM68KState *env, uint32_t addr, FPReg *fp,
+-- 
+2.14.1
