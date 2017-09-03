@@ -1,25 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1doYKe-0002F6-7D
-	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 13:05:16 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1doYSe-0004pC-Vg
+	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 13:13:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1doYKZ-0005tn-NM
-	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 13:05:12 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:54146)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1doYKZ-0005rW-AZ
-	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 13:05:07 -0400
-References: <20170903163130.14288-1-n54@gmx.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <9f33a768-77d1-191b-8be3-35d625752cbf@vivier.eu>
-Date: Sun, 3 Sep 2017 19:05:03 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1doYSZ-0002lq-Bz
+	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 13:13:28 -0400
+Received: from mail-oi0-f51.google.com ([209.85.218.51]:34691)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1doYSZ-0002kY-4b
+	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 13:13:23 -0400
+Received: by mail-oi0-f51.google.com with SMTP id h70so38729oic.1
+	for <qemu-devel@nongnu.org>; Sun, 03 Sep 2017 10:13:23 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170903163130.14288-1-n54@gmx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] target/m68k: Change fpu_rom from const
- static array to switch
+In-Reply-To: <CABgObfaDuLvaxpb-GmefsNcoUsjJi3y_oAnfYuQU8LQcGtx9zQ@mail.gmail.com>
+References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
+	<20170830082702.3011-3-Sergio.G.DelReal@gmail.com>
+	<20170830140738.GS18526@redhat.com>
+	<20170831074215.GA13619@stefanha-x1.localdomain>
+	<CABgObfYRUtdH9-7+zWx5Zur=iE_Qr5953+EOgcxRfVGnEonbmg@mail.gmail.com>
+	<CAJTBuyhJgVZ-A+AHatjAwPjsSv2Q-HxuF7nc1NpbWNmGnCOhVQ@mail.gmail.com>
+	<CABgObfaDtgixAEF8OPLuDf=21GiCwY3EUOPHujXPeLqYTup=Yw@mail.gmail.com>
+	<CAJTBuyhKqbXWjphh-t60TVjZfVFEYGyWFgEs4TmR+CE1q04GhQ@mail.gmail.com>
+	<CAJTBuyhvCySRHvrKMOW7fvjuogTUUUXi4QRjiJrrzfu-gbb5jQ@mail.gmail.com>
+	<CABgObfYAH3xtVO0mZCBiVnE5m=p_BqiopGJtovzL1LFBN0366Q@mail.gmail.com>
+	<CAJTBuyg2Q43RhiVo1KuYL6uKZG3ztt5j09oeEoOk5h8r16hjeA@mail.gmail.com>
+	<CABgObfaDuLvaxpb-GmefsNcoUsjJi3y_oAnfYuQU8LQcGtx9zQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sun, 3 Sep 2017 19:13:21 +0200
+Message-ID: <CABgObfYx+uP2gmsT4SfagM-kZre-8RieyMQ21yOEcLOp38WaNg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 02/13] hvf: add code base from Google's
+ QEMU repository
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,23 +39,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <n54@gmx.com>
-Cc: qemu-devel@nongnu.org
+To: Izik Eidus <izik@veertu.com>
+Cc: vpalatin@chromium.org, qemu-devel <qemu-devel@nongnu.org>, "Hajnoczi, Stefan" <stefanha@gmail.com>, =?UTF-8?Q?Sergio_Andr=C3=A9s_G=C3=B3mez_del_Real?= <sergio.g.delreal@gmail.com>
 
-Le 03/09/2017 à 18:31, Kamil Rytarowski a écrit :
-> GCC 4.7.2 on SunOS reports that the values assigned to array members are not
-> real constants:
-> 
-> target/m68k/fpu_helper.c:32:5: error: initializer element is not constant
-> target/m68k/fpu_helper.c:32:5: error: (near initialization for 'fpu_rom[0]')
-> rules.mak:66: recipe for target 'target/m68k/fpu_helper.o' failed
-> 
-> Convert the array to switch() to workaround the issue.
+Il 03 set 2017 6:54 PM, "Izik Eidus" <izik@veertu.com> ha scritto:
 
-I don't like the idea. It's really an array and should be managed as an
-array.
+> What code is derived from v2-only sources? IIRC the task switch code is
+> derived from KVM, is there anything else?
 
-Could you try to use make_floatx80_init() instead of make_floatx80() ?
+Yes this is exactly the code that I found as well, however considering the
+fact that I didn't even know it was there requires me to go and validate
+that other stuff are safe for GPL2v+.
 
-Thanks,
-Laurent
+
+FWIW I didn't find anything else coming from KVM.
+
+The newer implementation is what we are using in Anka to virtluze macOS
+(but it is handling windows/linux/*), in my perspective it is more mature
+and handle many more corner case, it is currently not plugged into QEMU,
+and all the work that need to happen is: plug it like the KVM user space
+bits with the ideas of Sergio, and the recommendations of QEMU for this
+patch's.
+
+One big advantage is that we will be more than happy to back port fix's as
+they come from Anka to QEMU hvf.
+
+
+It's difficult for me to judge without seeing your code (couldn't find it
+from a quick look on GitHub). I expect any code that we merged from Anka
+would diverge as QEMU's HVF integration matures (e.g. adding support for
+live migration, unifying the page walkers, etc.). On the other hand if you
+open-source more hypervisor.framework client code or new instruction
+emulator code we can certainly merge it back into QEMU when it makes sense!
+
+I think it's safe to use v2+ for this code once Google agrees. The task
+switch code, which is going to go away soon anyway and is isolated from the
+rest, can be moved to a separate file for the time being.
+
+Paolo
+
+
+>
+> Paolo
+>
+> in
+> such case all copyright go back to BSD2 and we can license it as GPL2v+ or
+> whatever work for QEMU.
+> If you want to go in such case what we will do would be the following:
+> take kvm user space implemantion of qemu that is GPLv2+, integrate to it
+> the hypervisor framework from Anka (in kvm user space style) - this will
+> put us in hvf [1|2|3 / 13] in safe GPLv2+ and then we can back port the
+> rest of Sergio changes to this stuff.
+>
+> I know this is less than ideal as it requires some changes to the current
+> patch set, however it will make it 100% safe to be GPL2v+, what you guys
+> think?, we can get this stuff done before the end of this week...
+>
+> Thanks.
+>
+>
+> On Fri, Sep 1, 2017 at 12:39 AM, Izik Eidus <izik@veertu.com> wrote:
+>
+> >
+> >
+> > On Fri, Sep 1, 2017 at 12:21 AM, Paolo Bonzini <pbonzini@redhat.com>
+> > wrote:
+> >
+> >> Il 31 ago 2017 3:54 PM, "Izik Eidus" <izik@veertu.com> ha scritto:
+> >>
+> >> > Izik, Vincent (assuming you are the right person to contact at
+> Google),
+> >> > can you reply to Daniel and Stefan?
+> >> >
+> >>
+> >> Hi,
+> >>
+> >> What I suggest is that we will send our patch' again as gpl2+ and clean
+> >> the
+> >> entire stuff to make sure they are falling into the right copyright
+> >> category as required by QEMU.
+> >>
+> >>
+> >> That's not necessary. Just you and Vincent replying to this thread with
+> a
+> >> "Signed-off-by" line would be enough for Sergio to use the right
+> license in
+> >> his v3 submission. Sergio already made some non-trivial changes that
+are
+> >> needed for inclusion in QEMU from a supportability (e.g. dirty page
+> >> tracking for graphics) or maintainability perspective (e.g. -cpu
+> support),
+> >> so the simplest thing to do is to retrofit the right license to his
+> >> submission. You can do so if you can confirm that the code you used
+only
+> >> came from QEMU itself, Bochs or other GPLv2+/LGPL software (and the
+rest
+> >> was written by Veertu).
+> >>
+> >
+> > Hi,
+> >
+> > Sure fine with us, let me go over all the code and see that all
+copyright
+> > that are needed are there, and then you can relicense all our code to
+> > GPLv2+, I think I saw a a file that was missing Bochs copyright in it,
+> so I
+> > want to make sure that I fix this before and that all others are fine.
+> >
+> > Thanks.
+> >
+> >
+> >>
+> >> Google has already contributed the HAXN accelerator, so I am moderately
+> >> optimistic that they can help with HVF too.
+> >>
+> >> BTW, another thing that need to be integrated in order to make this
+> stuff
+> >> useful is the vmnet patch's, it is apple NAT for vms that allow guests
+> to
+> >> have networking...
+> >>
+> >>
+> >> People can always use slirp (or tap with some more effort), so these
+> >> patches are already a minimum viable feature and pretty close to being
+> >> mergeable. But of course any other contribution is welcome!
+> >>
+> >> Paolo
+> >>
+> >>
+> >> (altho that it come with a trick, without certificate it
+> >> will require root permission, while hypverisor framework itself can run
+> >> without root)
+> >>
+> >> What do you guys think?
+> >>
+> >>
+> >> >
+> >> > Sergio worked on completing the QEMU port to Hypervisor.framework.
+The
+> >> > hvf-all.c file that Daniel pointed out as v2-only is derived from
+> >> kvm-all.c
+> >> > and hax-all.c, and should be under v2-or-later license. The others
+> seem
+> >> to
+> >> > be either original or derived from Bochs, which is LGPL, so they
+could
+> >> be
+> >> > LGPL or GPLv2+.
+> >> >
+> >> > Thanks,
+> >> >
+> >> > Paolo
+> >> >
+> >> >
+> >> > There are benefits to having this code upstream.  If they ever want
+to
+> >> > rebase on qemu.git there will be less work for them.
+> >>
+> >>
+> OK,
+>
+>
+> > >
+> >> > Stefan
+> >> >
+> >> >
+> >> >
+> >>
+> >>
+> >>
+> >
+>
+>
+>
