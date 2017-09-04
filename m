@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dooQk-0007uA-B5
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 06:16:39 -0400
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dooQz-00080r-9I
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 06:16:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dooQf-0005F6-AY
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 06:16:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35350)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dooQf-0005ER-4g
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 06:16:29 -0400
-Date: Mon, 4 Sep 2017 11:16:24 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170904101624.GE7186@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAOE=1Z3xuudQenX+Oe11fPDZfrC_d02S50HQ9mJ=RfnJ0B5DUg@mail.gmail.com>
-	<20170904093623.GB7186@redhat.com>
-	<CAOE=1Z2HFVhD8b1TXaQFd8sGvqoddOeJoSds1ZxwzKSw8im7ng@mail.gmail.com>
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dooQr-0005OZ-5f
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 06:16:49 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:27667
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dooQq-0005N5-Ci
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 06:16:41 -0400
+References: <1504181068-17822-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	<1504181068-17822-2-git-send-email-douly.fnst@cn.fujitsu.com>
+	<20170904113907.2a6e0cc7@nial.brq.redhat.com>
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Message-ID: <ec0c5471-5960-42aa-2723-f3dcb63d9fdc@cn.fujitsu.com>
+Date: Mon, 4 Sep 2017 18:16:31 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAOE=1Z2HFVhD8b1TXaQFd8sGvqoddOeJoSds1ZxwzKSw8im7ng@mail.gmail.com>
-Subject: Re: [Qemu-devel] How to use monitor socket in python to connect VM?
+In-Reply-To: <20170904113907.2a6e0cc7@nial.brq.redhat.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 1/3] hw/acpi-build: Fix SRAT memory
+ building in case of node 0 without RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +29,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam <batmanustc@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, mst@redhat.com, rth@twiddle.net
 
-On Mon, Sep 04, 2017 at 06:11:44PM +0800, Sam wrote:
-> Actually I use qga socket first(send json format command like {'execute':
-> 'chardev-add', 'arguments': {'id': id, 'type': type}, 'params': params} by
-> qga socket, which is
-> /opt/cloud/workspace/servers/1925a92d-f003-4d77-871c-bce8f85229aa/qga.sock,
-> using the same script as first mail), but it response me "netdev_add is not
-> valid command"(it's reasonable, as guest OS could not operate 'netdev_add'
-> command), so I thought qga could not do this work, then I change to monitor.
 
-You're mixing up two different things.  'QGA' is the QEMU guest agent
-which is a service than runs in the guest OS. 'QMP' is the QEMU monitor
-socket which runs in the host OS. Both of these use the same JSON based
-protocol, but take completely different commands.
 
-You need to use 'QMP' for 'netdev_add', not 'QGA'.
+At 09/04/2017 05:39 PM, Igor Mammedov wrote:
+> On Thu, 31 Aug 2017 20:04:26 +0800
+> Dou Liyang <douly.fnst@cn.fujitsu.com> wrote:
+>
+>> From: Eduardo Habkost <ehabkost@redhat.com>
+>>
+>> Currently, Using the fisrt node without memory on the machine makes
+>> QEMU unhappy. With this example command line:
+>>   ... \
+>>   -m 1024M,slots=4,maxmem=32G \
+>>   -numa node,nodeid=0 \
+>>   -numa node,mem=1024M,nodeid=1 \
+>>   -numa node,nodeid=2 \
+>>   -numa node,nodeid=3 \
+>> Guest reports "No NUMA configuration found" and the NUMA topology is
+>> wrong.
+>>
+>> This is because when QEMU builds ACPI SRAT, it regards node 0 as the
+>> default node to deal with the memory hole(640K-1M). this means the
+>> node0 must have some memory(>1M), but, actually it can have no
+>> memory.
+>>
+>> Fix this problem by  cut out the 640K hole in the same way the PCI
+>> 4G hole does. Also do some cleanup.
+>>
+>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+>> ---
+>>  hw/i386/acpi-build.c | 30 +++++++++++++++++++++++-------
+>>  1 file changed, 23 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> index 98dd424..48525a1 100644
+>> --- a/hw/i386/acpi-build.c
+>> +++ b/hw/i386/acpi-build.c
+>> @@ -2318,6 +2318,9 @@ build_tpm2(GArray *table_data, BIOSLinker *linker)
+>>                   (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
+>>  }
+>>
+>> +#define HOLE_640K_START  (640 * 1024)
+>> +#define HOLE_640K_END   (1024 * 1024)
+>> +
+>>  static void
+>>  build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>>  {
+>> @@ -2373,17 +2376,30 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>>      next_base = 0;
+>>      numa_start = table_data->len;
+>>
+>> -    numamem = acpi_data_push(table_data, sizeof *numamem);
+>> -    build_srat_memory(numamem, 0, 640 * 1024, 0, MEM_AFFINITY_ENABLED);
+>> -    next_base = 1024 * 1024;
+>>      for (i = 1; i < pcms->numa_nodes + 1; ++i) {
+>>          mem_base = next_base;
+>>          mem_len = pcms->node_mem[i - 1];
+>> -        if (i == 1) {
+>> -            mem_len -= 1024 * 1024;
+>> -        }
+>>          next_base = mem_base + mem_len;
+>>
+>> +        /* Cut out the 640K hole */
+>> +        if (mem_base <= HOLE_640K_START &&
+>> +            next_base > HOLE_640K_START) {
+>> +            mem_len -= next_base - HOLE_640K_START;
+>> +            if (mem_len > 0) {
+>> +                numamem = acpi_data_push(table_data, sizeof *numamem);
+>> +                build_srat_memory(numamem, mem_base, mem_len, i - 1,
+>> +                                  MEM_AFFINITY_ENABLED);
+>> +            }
+>> +
+>> +            /* Check for the rare case: 640K < RAM < 1M */
+>> +            if (next_base <= HOLE_640K_END) {
+>> +                next_base = HOLE_640K_END;
+> Is this assignment really necessary?
+>
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+It is necessary, because we set mem_base to next_base before setting
+next_base;
+
+But, I can refine it:
+
+                                    MEM_AFFINITY_ENABLED);
+              }
+
++            mem_base = HOLE_640K_END;
+              /* Check for the rare case: 640K < RAM < 1M */
+              if (next_base <= HOLE_640K_END) {
+-                next_base = HOLE_640K_END;
+                  continue;
+              }
+-            mem_base = HOLE_640K_END;
+              mem_len = next_base - HOLE_640K_END;
+          }
+
+Is it?
+
+Thanks,
+	dou.
+
+> it seems that next_base will be set at the start of the loop.
+>
+
+
+>> +                continue;
+>> +            }
+>> +            mem_base = HOLE_640K_END;
+>> +            mem_len = next_base - HOLE_640K_END;
+>> +        }
+>> +
+>>          /* Cut out the ACPI_PCI hole */
+>>          if (mem_base <= pcms->below_4g_mem_size &&
+>>              next_base > pcms->below_4g_mem_size) {
+>> @@ -2395,7 +2411,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>>              }
+>>              mem_base = 1ULL << 32;
+>>              mem_len = next_base - pcms->below_4g_mem_size;
+>> -            next_base += (1ULL << 32) - pcms->below_4g_mem_size;
+>> +            next_base = mem_base + mem_len;
+>>          }
+>>          numamem = acpi_data_push(table_data, sizeof *numamem);
+>>          build_srat_memory(numamem, mem_base, mem_len, i - 1,
+>
+>
+>
+>
