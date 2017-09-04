@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dovXN-0003ZP-5r
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:51:57 -0400
+	(envelope-from <sw@weilnetz.de>) id 1dovb6-0005ZB-Rl
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:55:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dovXI-0002f8-BX
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:51:53 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:41269
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dovXI-0002a8-4Q
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:51:48 -0400
-Date: Mon, 4 Sep 2017 18:51:01 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <20170904175101.GA27187@kentang.lan>
+	(envelope-from <sw@weilnetz.de>) id 1dovb1-0004M9-T5
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:55:44 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:51044
+	helo=v2201612906741603.powersrv.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1dovb1-0004LB-M1
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:55:39 -0400
+References: <150442540217.17409.6458222878014636993.malonedeb@gac.canonical.com>
+	<150453789823.8244.9432426777778032459.malone@soybean.canonical.com>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <1ffeb7f3-ca5f-aec5-df63-07d37d5c559a@weilnetz.de>
+Date: Mon, 4 Sep 2017 19:55:33 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [PULL] qemu-sparc updates
+In-Reply-To: <150453789823.8244.9432426777778032459.malone@soybean.canonical.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Bug 1714750] Re: 2.10.0 cannot be installed on
+ case-insensitive file system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,43 +30,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Bug 1714750 <1714750@bugs.launchpad.net>, qemu-devel@nongnu.org
 
-Hi Peter,
+Am 04.09.2017 um 17:11 schrieb Peter Maydell:
+> Yes, it's awkward for users who are on OSX (or Windows, I assume).
 
-Here is the first patchset in preparation for updating the sun4u machine PCI topology. Please pull.
+Windows users who want to extract the tarball would have the same
+problem. I don't think that there are many users who do that.
 
+Nevertheless I have just sent an e-mail to the u-boot mailing list
+(subscription worked for me, but my e-mail is still waiting
+for the moderation) and also to the author who added the
+relevant commit to u-boot.
 
-ATB,
+u-boot v2017.09 is scheduled for 11 September 2017, so there is
+a chance to get that fixed until then.
 
-Mark.
- 
-
-The following changes since commit 2b483739791b33c46e6084b51edcf62107058ae1:
-
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170904-2' into staging (2017-09-04 17:21:24 +0100)
-
-are available in the git repository at:
-
-
-  https://github.com/mcayland/qemu.git tags/qemu-sparc-signed
-
-for you to fetch changes up to e5fd1eb05ec918e9877640d85ec45680cf106632:
-
-  apb: add busA qdev property to PBM PCI bridge (2017-09-04 18:41:01 +0100)
-
-----------------------------------------------------------------
-qemu-sparc update
-
-----------------------------------------------------------------
-Mark Cave-Ayland (6):
-      sun4u: pass PCIDevice into pci_ebus_init() instead of PCIBus
-      sun4u: switch to using qdev to instantiate fw_cfg interface
-      sun4u: expose fw_cfg and NVRAM on ebus PCI IO address space
-      apb: fix up PCI bus nomenclature
-      apb: fix endianness for APB and PCI config accesses
-      apb: add busA qdev property to PBM PCI bridge
-
- hw/pci-host/apb.c  |   62 +++++++++++++++++++++++++++++++++++++---------------
- hw/sparc64/sun4u.c |   27 ++++++++++++++---------
- 2 files changed, 61 insertions(+), 28 deletions(-)
+Regards
+Stefan
