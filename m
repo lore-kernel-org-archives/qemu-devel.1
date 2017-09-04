@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dmitry@daynix.com>) id 1dolpP-0001Aw-P8
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 03:29:52 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dols2-000374-HD
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 03:32:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dmitry@daynix.com>) id 1dolpM-0006em-L7
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 03:29:51 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36030)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1dolpM-0006cA-Dl
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 03:29:48 -0400
-Received: by mail-wm0-x243.google.com with SMTP id p17so5595027wmd.3
-	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 00:29:47 -0700 (PDT)
-From: Dmitry Fleytman <dmitry@daynix.com>
-Message-Id: <17D7366F-5413-4A0B-B984-33ED480A9A3C@daynix.com>
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Date: Mon, 4 Sep 2017 10:29:43 +0300
-In-Reply-To: <20170904072353.GA19748@lemon.lan>
-References: <20170903163726.16541-1-n54@gmx.com>
-	<20170904072353.GA19748@lemon.lan>
-Content-Type: text/plain;
-	charset=us-ascii
+	(envelope-from <imammedo@redhat.com>) id 1dols1-0001tZ-DW
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 03:32:34 -0400
+Date: Mon, 4 Sep 2017 09:32:24 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170904093224.62b43efb@nial.brq.redhat.com>
+In-Reply-To: <241130c59df31aebaf4f23b5f151b6b5c91f36fa.1504293917.git.alistair.francis@xilinx.com>
+References: <cover.1504293917.git.alistair.francis@xilinx.com>
+	<241130c59df31aebaf4f23b5f151b6b5c91f36fa.1504293917.git.alistair.francis@xilinx.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] e1000: Rename the SEC symbol to SEQEC
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] xlnx-zynqmp-pmu: Add the CPU and
+ memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +24,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Kamil Rytarowski <n54@gmx.com>, qemu-devel@nongnu.org, jasowang@redhat.com
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com, alistair23@gmail.com, qemu-arm@nongnu.org
 
-Reviewed-by: Dmitry Fleytman <dmitry@daynix.com>
+On Fri, 1 Sep 2017 14:00:37 -0700
+Alistair Francis <alistair.francis@xilinx.com> wrote:
 
-> On 4 Sep 2017, at 10:23 AM, Fam Zheng <famz@redhat.com> wrote:
+> Connect the MicroBlaze CPU and the ROM and RAM memory regions.
 > 
-> On Sun, 09/03 18:37, Kamil Rytarowski wrote:
->> SunOS defines SEC in <sys/time.h> as 1 (commonly used time symbols).
->> 
->> This fixes build on SmartOS (Joyent).
->> 
->> Patch cherry-picked from pkgsrc by jperkin (Joyent).
->> 
->> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> ---
 > 
-> Cc Jason Wang (net maintainer).
+>  hw/microblaze/xlnx-zynqmp-pmu.c | 65 +++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 63 insertions(+), 2 deletions(-)
 > 
-> Fam
+> diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
+> index fc3c8b236f..33584cfa4d 100644
+> --- a/hw/microblaze/xlnx-zynqmp-pmu.c
+> +++ b/hw/microblaze/xlnx-zynqmp-pmu.c
+> @@ -18,8 +18,11 @@
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+>  #include "qemu-common.h"
+> +#include "exec/address-spaces.h"
+>  #include "hw/boards.h"
+> +#include "hw/qdev-properties.h"
+>  #include "cpu.h"
+> +#include "boot.h"
+>  
+>  /* Define the PMU device */
+>  
+> @@ -27,21 +30,51 @@
+>  #define XLNX_ZYNQMP_PMU(obj) OBJECT_CHECK(XlnxZynqMPPMUState, (obj), \
+>                                            TYPE_XLNX_ZYNQMP_PMU)
+>  
+> +#define XLNX_ZYNQMP_PMU_ROM_SIZE    0x8000
+> +#define XLNX_ZYNQMP_PMU_ROM_ADDR    0xFFD00000
+> +#define XLNX_ZYNQMP_PMU_RAM_ADDR    0xFFDC0000
+> +
+>  typedef struct XlnxZynqMPPMUState {
+>      /*< private >*/
+>      DeviceState parent_obj;
+>  
+>      /*< public >*/
+> +    MicroBlazeCPU cpu;
+>  }  XlnxZynqMPPMUState;
+>  
+>  static void xlnx_zynqmp_pmu_init(Object *obj)
+>  {
+> +    XlnxZynqMPPMUState *s = XLNX_ZYNQMP_PMU(obj);
+>  
+> +    object_initialize(&s->cpu, sizeof(s->cpu),
+> +                      TYPE_MICROBLAZE_CPU);
+> +    object_property_add_child(obj, "pmu-cpu[*]", OBJECT(&s->cpu),
+                                              ^^^ why do you use this syntax here?
+
+> +                              &error_abort);
+>  }
+>  
+>  static void xlnx_zynqmp_pmu_realize(DeviceState *dev, Error **errp)
+>  {
+> -
+> +    XlnxZynqMPPMUState *s = XLNX_ZYNQMP_PMU(dev);
+> +
+> +    object_property_set_uint(OBJECT(&s->cpu), XLNX_ZYNQMP_PMU_ROM_ADDR,
+> +                             "base-vectors", &error_abort);
+> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-stack-protection",
+> +                             &error_abort);
+> +    object_property_set_uint(OBJECT(&s->cpu), 0, "use-fpu", &error_abort);
+> +    object_property_set_uint(OBJECT(&s->cpu), 0, "use-hw-mul", &error_abort);
+> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-barrel",
+> +                             &error_abort);
+> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-msr-instr",
+> +                             &error_abort);
+> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-pcmp-instr",
+> +                             &error_abort);
+> +    object_property_set_bool(OBJECT(&s->cpu), false, "use-mmu", &error_abort);
+> +    object_property_set_bool(OBJECT(&s->cpu), true, "endianness",
+> +                             &error_abort);
+> +    object_property_set_str(OBJECT(&s->cpu), "8.40.b", "version",
+> +                            &error_abort);
+> +    object_property_set_uint(OBJECT(&s->cpu), 0, "pvr", &error_abort);
+> +    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &error_fatal);
+I'd replace error_fatal here with errp
+
+>  }
+>  
+>  static void xlnx_zynqmp_pmu_class_init(ObjectClass *oc, void *data)
+> @@ -70,7 +103,35 @@ type_init(xlnx_zynqmp_pmu_register_types)
+>  
+>  static void xlnx_zcu102_pmu_init(MachineState *machine)
+>  {
+> -
+> +    XlnxZynqMPPMUState *pmu = g_new0(XlnxZynqMPPMUState, 1);
+> +    MemoryRegion *address_space_mem = get_system_memory();
+> +    MemoryRegion *pmu_rom = g_new(MemoryRegion, 1);
+> +    MemoryRegion *pmu_ram = g_new(MemoryRegion, 1);
+> +
+> +    /* Create the ROM */
+> +    memory_region_init_rom(pmu_rom, NULL, "xlnx-zcu102-pmu.rom",
+> +                           XLNX_ZYNQMP_PMU_ROM_SIZE, &error_fatal);
+> +    memory_region_add_subregion(address_space_mem, XLNX_ZYNQMP_PMU_ROM_ADDR,
+> +                                pmu_rom);
+> +
+> +    /* Create the RAM */
+> +    memory_region_init_ram(pmu_ram, NULL, "xlnx-zcu102-pmu.ram",
+> +                           machine->ram_size, &error_fatal);
+> +    memory_region_add_subregion(address_space_mem, XLNX_ZYNQMP_PMU_RAM_ADDR,
+> +                                pmu_ram);
+> +
+> +    /* Create the PMU device */
+> +    object_initialize(pmu, sizeof(XlnxZynqMPPMUState), TYPE_XLNX_ZYNQMP_PMU);
+> +    object_property_add_child(OBJECT(machine), "pmu", OBJECT(pmu),
+> +                              &error_abort);
+> +    object_property_set_bool(OBJECT(pmu), true, "realized", &error_fatal);
+> +
+> +    /* Load the kernel */
+> +    microblaze_load_kernel(&pmu->cpu, XLNX_ZYNQMP_PMU_RAM_ADDR,
+> +                           machine->ram_size,
+> +                           machine->kernel_filename,
+> +                           machine->dtb,
+> +                           NULL);
+>  }
+>  
+>  static void xlnx_zcu102_pmu_machine_init(MachineClass *mc)
