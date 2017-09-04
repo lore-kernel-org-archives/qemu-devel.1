@@ -1,27 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50175)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1dp0fr-0007Zx-AT
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 19:21:04 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52025)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1dp0qX-0003QB-M1
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 19:32:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1dp0fm-0000LQ-7y
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 19:20:59 -0400
-Received: from mout.gmx.net ([212.227.17.22]:58609)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1dp0fl-0000Jk-T6
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 19:20:54 -0400
-References: <20170903163455.15132-1-n54@gmx.com>
-	<20170904172500.26513-1-n54@gmx.com>
-	<CAFEAcA8ojJteWAuwxhQPVTVvFh5b-S4zWoyCssM0ZxWt5tt4GQ@mail.gmail.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <53cd29e6-0bd7-339a-96b8-a285e15ffee8@gmx.com>
-Date: Tue, 5 Sep 2017 01:22:53 +0200
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1dp0qS-0006dJ-Pa
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 19:32:01 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43313
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
+	id 1dp0qS-0006cf-IX
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 19:31:56 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v84NT9n9021674
+	for <qemu-devel@nongnu.org>; Mon, 4 Sep 2017 19:31:55 -0400
+Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cs8rt3v1j-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 19:31:55 -0400
+Received: from localhost
+	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
+	Tue, 5 Sep 2017 09:31:52 +1000
+Date: Tue, 5 Sep 2017 09:31:47 +1000
+From: Sam Bobroff <sam.bobroff@au1.ibm.com>
+References: <747daf1a700a5340eeeedd9d98188bf89f75bb85.1504161284.git.sam.bobroff@au1.ibm.com>
+	<20170904101945.A6B6EAC041@b01ledav006.gho.pok.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8ojJteWAuwxhQPVTVvFh5b-S4zWoyCssM0ZxWt5tt4GQ@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nEcvb0Bw7QWf7leihsc3dBITkxpajKmVh"
-Subject: Re: [Qemu-devel] [PATCH v2] usb-mtp: Add fallback definition of
- NAME_MAX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170904101945.A6B6EAC041@b01ledav006.gho.pok.ibm.com>
+Message-Id: <20170904233147.g4froekilptpud5h@tungsten.ozlabs.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/1] ppc: spapr: Move VCPU ID
+ calculation into sPAPR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,141 +43,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Jonathan Perkin <jperkin@joyent.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nEcvb0Bw7QWf7leihsc3dBITkxpajKmVh
-From: Kamil Rytarowski <n54@gmx.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers
- <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, Jonathan Perkin <jperkin@joyent.com>
-Message-ID: <53cd29e6-0bd7-339a-96b8-a285e15ffee8@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH v2] usb-mtp: Add fallback definition of
- NAME_MAX
-References: <20170903163455.15132-1-n54@gmx.com>
- <20170904172500.26513-1-n54@gmx.com>
- <CAFEAcA8ojJteWAuwxhQPVTVvFh5b-S4zWoyCssM0ZxWt5tt4GQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA8ojJteWAuwxhQPVTVvFh5b-S4zWoyCssM0ZxWt5tt4GQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Sep 04, 2017 at 12:18:57PM +0200, Greg Kurz wrote:
+> On Thu, 31 Aug 2017 16:38:46 +1000
+> Sam Bobroff <sam.bobroff@au1.ibm.com> wrote:
+> 
+> > Move the calculation of a CPU's VCPU ID out of the generic PPC code
+> > (ppc_cpu_realizefn()) and into sPAPR specific code
+> > (spapr_cpu_core_realize()) where it belongs.
+> > 
+> > Unfortunately, due to the way things are ordered, we still need to
+> > default the VCPU ID in ppc_cpu_realizfn() but at least doing that
+> > doesn't require any interaction with sPAPR.
+> > 
+> > Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+> > ---
+> > This is follow up work arising from my work to clean up the way CPU VCPU IDs are
+> > handled on PowerPC. It had looked like it would be difficult to move the actual
+> > VCPU ID calculation out of generic code but it turned out to be OK.
+> > 
+> > It's based on dgibson/ppc-for-2.11.
+> > 
+> > Cheers,
+> > Sam.
+> > 
+> >  hw/ppc/spapr_cpu_core.c     | 11 +++++++++++
+> >  target/ppc/translate_init.c | 18 +++---------------
+> >  2 files changed, 14 insertions(+), 15 deletions(-)
+> > 
+> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> > index 5e319d9bbb..84dcc6e264 100644
+> > --- a/hw/ppc/spapr_cpu_core.c
+> > +++ b/hw/ppc/spapr_cpu_core.c
+> > @@ -211,6 +211,7 @@ error:
+> >  
+> >  static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+> >  {
+> > +    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+> >      sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
+> >      sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
+> >      CPUCore *cc = CPU_CORE(OBJECT(dev));
+> > @@ -237,6 +238,16 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+> >          cs = CPU(obj);
+> >          cpu = POWERPC_CPU(cs);
+> >          cs->cpu_index = cc->core_id + i;
+> > +        cpu->vcpu_id = (cc->core_id * spapr->vsmt / smp_threads) + i;
+> 
+> According to what we currently have in the generic code, this should be:
+> 
+> ((cc->core_id + i) / smp_threads) * spapr->vsmt + ((cc->core_id + i) % smp_threads)
+> 
+> but since cc->core_id is a multiple of smp_threads and i < cc->nr_threads <= smp_threads,
+> then we can indeed simplify the computation as you did. :)
+> 
+> \o/
+> 
+> Reviewed-by: Greg Kurz <groug@kaod.org>
 
-On 04.09.2017 19:50, Peter Maydell wrote:
-> On 4 September 2017 at 18:25, Kamil Rytarowski <n54@gmx.com> wrote:
->> This fixes build on SmartOS (Joyent).
->>
->> Patch cherry-picked from pkgsrc by jperkin (Joyent).
->>
->> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->>  include/qemu/osdep.h | 5 +++++
->>  1 file changed, 5 insertions(+)
->>
->> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
->> index 6855b94bbf..5d3860f80e 100644
->> --- a/include/qemu/osdep.h
->> +++ b/include/qemu/osdep.h
->> @@ -306,6 +306,11 @@ void qemu_anon_ram_free(void *ptr, size_t size);
->>  #endif
->>  #endif
->>
->> +/* Required by SmartOS (SunOS) */
->> +#ifndef NAME_MAX
->> +#define NAME_MAX 255
->> +#endif
->=20
-> So in hw/usb/dev-mtp.c we're using NAME_MAX in
->     char buf[sizeof(struct inotify_event) + NAME_MAX + 1];
->=20
-> because the Linux implementation of inotify documents in inotify(7)
-> that this is guaranteed to be sufficient to read at least one event:
->   http://man7.org/linux/man-pages/man7/inotify.7.html
-> Looking at the SmartOS manpage
->   https://smartos.org/man/5/inotify
-> there doesn't seem to be any equivalent language.
->=20
-> What is the SmartOS requirement on the buffer size to be
-> guaranteed to read at least one complete event ?
-> Defining NAME_MAX to 255 seems like it shuts up the compiler
-> error but does it give us the correct behaviour?
->=20
-According to my understanding SmartOS has the same logic. It tries to
-read at least one element, and NAME_MAX guarantees that it will be
-available.
+Thanks for the review, and the nice simplification was David's idea :-)
 
-https://github.com/joyent/illumos-joyent/blob/master/usr/src/uts/common/i=
-o/inotify.c#L1193
-
-I've gathered some overall details about the patches.
-
-1. The inotify linux-compat interface is only SmartOS specific, it
-hasn't been upstreamed so far to other Illumos distributions.
-
-2. Upstream Illumos implemented NAME_MAX
-https://github.com/illumos/illumos-gate/commit/9c0752ac0dc05794d2f8a8b452=
-1d55e2b3f63247
-
-It's not available in SmartOS.
-
-3. Proprietary Solaris is out of scope of this work.
-
-Looking at their userland we can assume no qemu support:
-
-https://github.com/oracle/solaris-userland
-
-https://github.com/oracle/solaris-userland/commit/9c78c7b45a5d3dbd64afb45=
-5d278d2ca277e2b95#diff-94df904ebca88ee0ff038eaedb063ad6R61
-
-++        if platform.system() =3D=3D 'SunOS':
-++            # No QEMU support on Solaris now.
-++            qemu_img =3D False
-
-We can stop pretending to support it now.
-
-4. SmartOS forked qemu for its hypervisor part and uses qemu-kvm with
-the Linux kvm interface (yes, there is Linux kernel kvm port to SmartOS)
-- upstreaming the hypervisor's fork is out of scope.
-
-https://github.com/joyent/illumos-kvm-cmd
-
-5. SmartOS ships with virtual machine guests, they host pkgsrc and qemu
-from pkgsrc.
-
-6. Jonathan mentioned that preparing a SmartOS tutorial and image will
-be tricky, as SmartOS is a hypervisor. I will focus on upstreaming
-SmartOS-guest support for qemu, where there is pkgsrc. There is an
-option to prepare another Illumos distribution tutorial and testbot,
-hopefully it will be fully compatible with SmartOS patches.
-
-> thanks
-> -- PMM
->=20
-
-
-
---nEcvb0Bw7QWf7leihsc3dBITkxpajKmVh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZreBUAAoJEEuzCOmwLnZsCqcP/1phwKOxgSJtWmaXQcFiIDAc
-bgotHBIuUOJWSuE1lo9MDYNMq7Z+EKyGXMuG2KrXeXjF4mutfYjHjl7CxQ+hGmRr
-UFcDkfjYAkBoKyUQe5pp3xF4CCM2zfYPK6/x80EXhnE/UZxFYbIKYmf8m+FIapYt
-DtMiaWhren3NNoWCCehwdS4sFyAus5+/DCiOwTP//wB9JtiV/27upHzC78K+2zKi
-G9uSETctenwn4CHPxEAZIqNGYXidh0FbemKd8+iJT+VI81vNTcqI1YUbK1NxsNnp
-+hVFXcPI5uTE6Qz8T89vZMb3KUGscy28XoLLvORWtzLtRNoJtNFsNDm9mp4OWT2E
-iVkJKEqNKrOgKsLG4M/DmdXZNlbxy6Uql3CyYanmUsu1f4e7d7yAlb54hs8aIoX6
-ZNFXzwtPfVCzrYkbd40lnmeESvYb5m1Vkj5GxTPNClCRSoFIAcjFKD4ks3G7YmpY
-G0XL7nLomt1LeowBIvLj1uQ5XsM+0WsDudcyNPWP++6bH7/qrE9NQeWR9//m4/AI
-KeuapgO8a53rDp74fXmymXUBwTHubZjPiIQW6WGenHKRshEd+mbmgF1Tn7qKcYSf
-+DOULRonBy9UCOLzC5079Ev46/UtNkbW5OrK6evrb8z0XBQcKU+vrLZ+b2F4wKrv
-QJ7Hu88rED9btbVngbM1
-=Gu+m
------END PGP SIGNATURE-----
-
---nEcvb0Bw7QWf7leihsc3dBITkxpajKmVh--
+> > +        if (kvm_enabled() && !kvm_vcpu_id_is_valid(cpu->vcpu_id)) {
+> > +            error_setg(&local_err, "Can't create CPU with id %d in KVM",
+> > +                       cpu->vcpu_id);
+> > +            error_append_hint(&local_err, "Adjust the number of cpus to %d "
+> > +                              "or try to raise the number of threads per core\n",
+> > +                              cpu->vcpu_id * smp_threads / spapr->vsmt);
+> > +            goto err;
+> > +        }
+> > +
+> >  
+> >          /* Set NUMA node for the threads belonged to core  */
+> >          cpu->node_id = sc->node_id;
+> > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> > index 7f6a349e43..1f7286c893 100644
+> > --- a/target/ppc/translate_init.c
+> > +++ b/target/ppc/translate_init.c
+> > @@ -9903,28 +9903,15 @@ static void ppc_cpu_realizefn(DeviceState *dev, Error **errp)
+> >      PowerPCCPU *cpu = POWERPC_CPU(dev);
+> >      PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
+> >      Error *local_err = NULL;
+> > -#if !defined(CONFIG_USER_ONLY)
+> > -    int max_smt = kvmppc_smt_threads();
+> > -#endif
+> >  
+> >      cpu_exec_realizefn(cs, &local_err);
+> >      if (local_err != NULL) {
+> >          error_propagate(errp, local_err);
+> >          return;
+> >      }
+> > -
+> > -#if !defined(CONFIG_USER_ONLY)
+> > -    cpu->vcpu_id = (cs->cpu_index / smp_threads) * max_smt
+> > -        + (cs->cpu_index % smp_threads);
+> > -
+> > -    if (kvm_enabled() && !kvm_vcpu_id_is_valid(cpu->vcpu_id)) {
+> > -        error_setg(errp, "Can't create CPU with id %d in KVM", cpu->vcpu_id);
+> > -        error_append_hint(errp, "Adjust the number of cpus to %d "
+> > -                          "or try to raise the number of threads per core\n",
+> > -                          cpu->vcpu_id * smp_threads / max_smt);
+> > -        goto unrealize;
+> > +    if (cpu->vcpu_id == UNASSIGNED_CPU_INDEX) {
+> > +        cpu->vcpu_id = cs->cpu_index;
+> >      }
+> > -#endif
+> >  
+> >      if (tcg_enabled()) {
+> >          if (ppc_fixup_cpu(cpu) != 0) {
+> > @@ -10625,6 +10612,7 @@ static void ppc_cpu_initfn(Object *obj)
+> >      CPUPPCState *env = &cpu->env;
+> >  
+> >      cs->env_ptr = env;
+> > +    cpu->vcpu_id = UNASSIGNED_CPU_INDEX;
+> >  
+> >      env->msr_mask = pcc->msr_mask;
+> >      env->mmu_model = pcc->mmu_model;
+> 
