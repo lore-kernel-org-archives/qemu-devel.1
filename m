@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ramysameh26@gmail.com>) id 1dofEK-00069c-I2
-	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 20:27:13 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dofF8-0006X9-4b
+	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 20:28:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ramysameh26@gmail.com>) id 1dofEF-0004Tm-O2
-	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 20:27:08 -0400
-Received: from mail-oi0-x229.google.com ([2607:f8b0:4003:c06::229]:33219)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dofF3-0005Jj-Hz
+	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 20:27:58 -0400
+Received: from mail-qk0-x22c.google.com ([2607:f8b0:400d:c09::22c]:38330)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ramysameh26@gmail.com>)
-	id 1dofEF-0004SM-Fz
-	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 20:27:03 -0400
-Received: by mail-oi0-x229.google.com with SMTP id r203so34140300oih.0
-	for <qemu-devel@nongnu.org>; Sun, 03 Sep 2017 17:27:01 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dofF3-0005HK-EP
+	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 20:27:53 -0400
+Received: by mail-qk0-x22c.google.com with SMTP id n64so12611890qki.5
+	for <qemu-devel@nongnu.org>; Sun, 03 Sep 2017 17:27:52 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170903163130.14288-1-n54@gmx.com>
+	<9f33a768-77d1-191b-8be3-35d625752cbf@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1257d6ba-9ca1-0940-af9e-a9ea7dea0287@amsat.org>
+Date: Sun, 3 Sep 2017 21:27:49 -0300
 MIME-Version: 1.0
-From: Ramy Sameh <ramysameh26@gmail.com>
-Date: Mon, 4 Sep 2017 02:27:00 +0200
-Message-ID: <CAF6HrYxj5BoTQpQjz95Z1_N_p615jpEE12xh_afuuqE4fcTyLg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Questions regarding emulated UART in VersatilePB board
+In-Reply-To: <9f33a768-77d1-191b-8be3-35d625752cbf@vivier.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] target/m68k: Change fpu_rom from const
+ static array to switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,70 +36,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Ahmed Aly <ahmedaly50@gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>, Kamil Rytarowski <n54@gmx.com>
+Cc: qemu-devel@nongnu.org
 
-Hello all,
+On 09/03/2017 02:05 PM, Laurent Vivier wrote:
+> Le 03/09/2017 à 18:31, Kamil Rytarowski a écrit :
+>> GCC 4.7.2 on SunOS reports that the values assigned to array members are not
+>> real constants:
+>>
+>> target/m68k/fpu_helper.c:32:5: error: initializer element is not constant
+>> target/m68k/fpu_helper.c:32:5: error: (near initialization for 'fpu_rom[0]')
+>> rules.mak:66: recipe for target 'target/m68k/fpu_helper.o' failed
+>>
+>> Convert the array to switch() to workaround the issue.
+> 
+> I don't like the idea. It's really an array and should be managed as an
+> array.
 
-I have 2 problems regarding UART (pl011) in the emulated board VersatilePB.
-(I am using *QEMU version 2.8.1.*)
+I agree with Laurent.
 
-*My main goal is*:
-Disturbing the UART registers (such UARTCR, UARTLCR_H ... etc) in order to
-simulate hardware faults (which can make bit flips in the hardware
-registers through radiation for example).
+> 
+> Could you try to use make_floatx80_init() instead of make_floatx80() ?
 
+I guess the problem comes from the macro which cast as not const:
 
-*My 2 questions are:*
+#define make_floatx80(exp, mant) ((floatx80) { mant, exp })
 
-*First:*
-Are interrupts activated in the emulated pl011 ?
-I mean, if I enabled the interrupt bits for UARTTXINTR, will this trigger
-an interrupt when the FIFO reaches a certain level?
+make_floatx80_init() doesn't cast so it might work,
+else we could add a macro such const_floatx80():
 
-*Second:*
-Another problem is that I can't find some of the UART registers (which are
-in the data sheet PrimeCell UART (PL011)), in QEMU's emulated UART pl011.
-
-*These are the registers which I can't find their matches in the structure
-PL011State:*
-
-1.) Interrupt FIFO level select register, UARTIFLS
-2.) Raw interrupt status register, UARTRIS
-3.) Masked interrupt status register, UARTMIS
-4.) Interrupt clear register, UARTICR
-5.) Peripheral identification registers, UARTPeriphID0-3
-6.) PrimeCell identification registers, UARTPCellID0-3
-
-*This is the structure where I get pl011 emulated registers:*
-typedef struct PL011State
-{
-    SysBusDevice parent_obj;
-
-    MemoryRegion iomem;
-    uint32_t readbuff;
-    uint32_t flags;
-    uint32_t lcr;
-    uint32_t rsr;
-    uint32_t cr;
-    uint32_t dmacr;
-    uint32_t int_enabled;
-    uint32_t int_level;
-    uint32_t read_fifo[16];
-    uint32_t ilpr;
-    uint32_t ibrd;
-    uint32_t fbrd;
-    uint32_t ifl;
-    int read_pos;
-    int read_count;
-    int read_trigger;
-    CharBackend chr;
-    qemu_irq irq;
-    const unsigned char *id;
-} PL011State
-
--- 
-Best Regards,
-Ramy Sameh
-Embedded Software Engineer
-+2-010-172-777-14
+#define const_floatx80(exp, mant) ((const floatx80) { mant, exp })
