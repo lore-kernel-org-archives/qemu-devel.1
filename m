@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1donkI-0007CL-H0
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:32:43 -0400
+	(envelope-from <berrange@redhat.com>) id 1dono0-0000NZ-QA
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:36:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1donkD-0007k0-RN
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:32:42 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:38261)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1donkD-0007jh-Ji
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:32:37 -0400
-Received: by mail-wm0-x234.google.com with SMTP id 187so33750985wmn.1
-	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 02:32:37 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1donnw-0002Ap-Nt
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:36:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58396)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1donnw-00029b-Hu
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:36:28 -0400
+Date: Mon, 4 Sep 2017 10:36:23 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170904093623.GB7186@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <CAOE=1Z3xuudQenX+Oe11fPDZfrC_d02S50HQ9mJ=RfnJ0B5DUg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170903164952.26760-1-n54@gmx.com>
-References: <20170903164952.26760-1-n54@gmx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Sep 2017 10:32:15 +0100
-Message-ID: <CAFEAcA-wB8JezCNjyU92U83+75C5NccfBHe1G5q-D67H4CMTKA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] tests: Do not include lutil on SunOS
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAOE=1Z3xuudQenX+Oe11fPDZfrC_d02S50HQ9mJ=RfnJ0B5DUg@mail.gmail.com>
+Subject: Re: [Qemu-devel] How to use monitor socket in python to connect VM?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +27,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <n54@gmx.com>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Sam <batmanustc@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 3 September 2017 at 17:49, Kamil Rytarowski <n54@gmx.com> wrote:
-> This fixes build on SmartOS (Joyent).
->
-> Patch cherry-picked from pkgsrc by jperkin (Joyent).
->
-> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
-> ---
->  tests/Makefile.include | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index f08b7418f0..0e5e6cb9b8 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -810,8 +810,10 @@ tests/migration/initrd-stress.img: tests/migration/stress$(EXESUF)
->         rmdir $(INITRD_WORK_DIR)
->
->  ifeq ($(CONFIG_POSIX),y)
-> +ifneq ($(CONFIG_SOLARIS),y)
->  LIBS += -lutil
->  endif
-> +endif
+On Mon, Sep 04, 2017 at 02:17:39PM +0800, Sam wrote:
+> Hi all,
+> 
+> I'm using python socket to connect VM's monitor socket like this:
+> 
+> [root@yf-mos-test-net09 tests]# python
+> > Python 2.7.5 (default, Jun 24 2015, 00:41:19)
+> > [GCC 4.8.3 20140911 (Red Hat 4.8.3-9)] on linux2
+> > Type "help", "copyright", "credits" or "license" for more information.
+> > >>> from socket import *
+> > >>> sock = socket(AF_INET, SOCK_STREAM, 0)
+> > >>> sock.connect(('127.0.0.1', 55902))
 
-I don't object to this patch in principle, but I don't think
-this is the best way to fix the underlying problem.
+NB, running the QEMU monitor on an IP socket is not secure. There
+is no authentication, and a monitor connection allows you do fully
+exploit the user account QEMU is running under (because the user
+can attach arbitrary files as virtual disks and thus access their
+content).  You always want to use a UNIX domain socket connection.
 
-My assumption is that the issue is that Solaris doesn't
-have a -lutil (it's helpful to quote the linker or
-compiler error message for this kind of patch to clarify
-what the failure is that we're trying to fix).
+> > >>> sock.recv(1024)
+> > "QEMU 2.6.0 monitor - type 'help' for more information\r\n(qemu) "
+> > >>> sock.recv(1024)
 
-It looks like we use libutil here for openpty, which
-is used in the test-char test. But the condition we're
-using in tests/Makefile.include isn't the same as the
-one we used to decide whether to add -lutil to the
-emulator binary link line, which is in configure:
+[snip]
 
-if test "$darwin" != "yes" -a "$mingw32" != "yes" -a "$solaris" != yes -a \
-        "$aix" != "yes" -a "$haiku" != "yes" ; then
-    libs_softmmu="-lutil $libs_softmmu"
-fi
+> But as we see, there are problems:
+> 1. commands like '>>> sock.send('chardev-add
+> socket,id=char-vhost_test_intf1,path=/usr/local/var/run/openvswitch/vhost_test_intf1,server=on')
+> 106'  does not work, this I'm very sure and I use some method to verify it.
+> 2. commands like '>>> sock.recv(1024)' got a lot of unknown characters.
 
-So I think I'd prefer it if we have:
- * a configure test for "is openpty() in libutil"
- * use that to determine whether to add -lutil to
-   libs_softmmu and to the libs for tests, rather than
-   doing OS-specific tests
+You're trying to interact with the *human* monitor here, so all the
+garbage you see is the result of the readline library trying to
+do interactive command processing for you.
 
-Q: does Solaris still not have an openpty() implementation?
-Currently we have a local implementation in util/qemu-openpty.c,
-but if that workaround is only needed in old Solaris we don't
-support any more we could perhaps drop it.
+To automate QEMU you should always use the QMP monitor. eg
 
-thanks
--- PMM
+  $QEMU -qmp unix:/some/path/qemu.sock
+
+> 
+> So is there some one who use python(or shell) to connect monitor socket of
+> VM? Could you please share the code or tell me the way to operate?
+
+You might want to look at scripts/qemu.py in the QEMU git tree. It is the
+python code we use for communicating with QMP monitor in QEMU test suites.
+You can probably use it as a starting point.
+
+> For example, should I send command with '(qemu) ' before my command? Should
+> I recv result by the end of '\r\n' or something?
+
+No, you should use QMP and avoid this pain entirely :-)
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
