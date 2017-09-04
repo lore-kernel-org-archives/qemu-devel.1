@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dovRU-0001eU-94
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:45:53 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dovWK-00034c-O8
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:50:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dovRP-0007LS-Ct
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:45:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44195)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dovRP-0007Kd-6I
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:45:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dovRO-0004cX-4M
-	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 17:45:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1987D2E80C9
-	for <qemu-devel@nongnu.org>; Mon,  4 Sep 2017 17:45:42 +0000 (UTC)
+	(envelope-from <peter.maydell@linaro.org>) id 1dovWF-00022o-W4
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:50:48 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:37456)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dovWF-00021g-MY
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:50:43 -0400
+Received: by mail-wm0-x230.google.com with SMTP id u26so7153444wma.0
+	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 10:50:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 04 Sep 2017 17:39:16 -0000
+In-Reply-To: <20170904172500.26513-1-n54@gmx.com>
+References: <20170903163455.15132-1-n54@gmx.com>
+	<20170904172500.26513-1-n54@gmx.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1713066 <1713066@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150366905912.16996.8020711454083281212.malonedeb@gac.canonical.com>
-Message-Id: <150454675615.8441.3307561069191176249.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1713066] Re: Incorrect handling of aarch64 ldp in
- some cases
+Date: Mon, 4 Sep 2017 18:50:21 +0100
+Message-ID: <CAFEAcA8ojJteWAuwxhQPVTVvFh5b-S4zWoyCssM0ZxWt5tt4GQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] usb-mtp: Add fallback definition of
+ NAME_MAX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,58 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kamil Rytarowski <n54@gmx.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-This fix has now been committed to master as commit
-3e4d91b94ce400326fae0 and will be in QEMU 2.11 (and possibly in some
-stable releases before that).
+On 4 September 2017 at 18:25, Kamil Rytarowski <n54@gmx.com> wrote:
+> This fixes build on SmartOS (Joyent).
+>
+> Patch cherry-picked from pkgsrc by jperkin (Joyent).
+>
+> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  include/qemu/osdep.h | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index 6855b94bbf..5d3860f80e 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -306,6 +306,11 @@ void qemu_anon_ram_free(void *ptr, size_t size);
+>  #endif
+>  #endif
+>
+> +/* Required by SmartOS (SunOS) */
+> +#ifndef NAME_MAX
+> +#define NAME_MAX 255
+> +#endif
 
+So in hw/usb/dev-mtp.c we're using NAME_MAX in
+    char buf[sizeof(struct inotify_event) + NAME_MAX + 1];
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
+because the Linux implementation of inotify documents in inotify(7)
+that this is guaranteed to be sufficient to read at least one event:
+  http://man7.org/linux/man-pages/man7/inotify.7.html
+Looking at the SmartOS manpage
+  https://smartos.org/man/5/inotify
+there doesn't seem to be any equivalent language.
 
--- =
+What is the SmartOS requirement on the buffer size to be
+guaranteed to read at least one complete event ?
+Defining NAME_MAX to 255 seems like it shuts up the compiler
+error but does it give us the correct behaviour?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1713066
-
-Title:
-  Incorrect handling of aarch64 ldp in some cases
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  In some cases the ldp instruction (and presumably other multi-register
-  loads and stores) can behave incorrectly.
-
-  Given the following instruction:
-  ldp x0, x1, [x0]
-
-  This will load two 64 bit values from memory, however if each location
-  to load is on a different page and the second page is unmapped this
-  will raise an exception. When this happens x0 has already been updated
-  so after the exception handler has run the operating system will try
-  to rerun the instruction. QEMU will now try to perform an invalid load
-  and raise a new exception.
-
-  I believe this is incorrect as section D.1.14.5 of the ARMv8 reference
-  manual B.a states that, on taking an exception, registers used in the
-  generation of addresses are restored to their initial value, so x0
-  shouldn't be changed, where x1 can be un an unknown state.
-
-  I found the issue running FreeBSD with the cortex-strings
-  implementation of memcpy. This uses a similar instruction when copying
-  between 64 and 96 bytes.
-
-  I've observed this on:
-  QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.14), Copyright (=
-c) 2003-2008 Fabrice Bellard
-
-  And checked I still get the same behaviour on:
-  QEMU emulator version 2.9.94 (v2.10.0-rc4-dirty)
-  Git revision: 248b23735645f7cbb503d9be6f5bf825f2a603ab
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1713066/+subscriptions
+thanks
+-- PMM
