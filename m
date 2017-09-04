@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dosji-00060R-NX
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:53:31 -0400
+	(envelope-from <berrange@redhat.com>) id 1dosmc-0008WA-PN
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:56:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dosie-0000E2-8N
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:52:26 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44870)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dosie-0000CE-0i
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:51:20 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dosib-0007t3-SU
-	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 14:51:18 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id ED7EF2E80DF
-	for <qemu-devel@nongnu.org>; Mon,  4 Sep 2017 14:51:14 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1doslf-0003YS-QD
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:55:26 -0400
+Date: Mon, 4 Sep 2017 15:48:12 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170904144812.GD27285@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170904111616.21333-1-kchamart@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 04 Sep 2017 14:36:04 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1714750 <1714750@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150442540217.17409.6458222878014636993.malonedeb@gac.canonical.com>
-Message-Id: <150453576499.10925.15426626572583305613.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1714750] Re: 2.10.0 cannot be installed on
- case-insensitive file system
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170904111616.21333-1-kchamart@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Make test 192 use QMP;
+ convert it to Python
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,32 +24,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, dgilbert@redhat.com, stefanha@redhat.com
 
-Eh? That command line is not particularly slow, especially compared to
-the time it takes to download the tarball in the first place.
+On Mon, Sep 04, 2017 at 01:16:16PM +0200, Kashyap Chamarthy wrote:
+> The test 192 ("Test NBD export with '-incoming' (non-shared
+> storage migration use case from libvirt")) is currently using HMP.
+> Replace the HMP usage with QMP, as the upstream preference seems to be:
+> "Use QMP where possible, unless you're explicitly testing something
+> related to HMP".
+> 
+> While at it, convert the test from Bash to Python.
 
--- =
+FYI This looks like it'll clash with the patch I sent to fix this
+test case with LUKS
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1714750
+https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg00041.html
 
-Title:
-  2.10.0 cannot be installed on case-insensitive file system
 
-Status in QEMU:
-  New
-
-Bug description:
-  The https://download.qemu.org/qemu-2.10.0.tar.bz2 tarball cannot be
-  unpacked on a case-insensitive file system because it has a file
-  qemu-2.10.0/roms/u-boot/scripts/Kconfig and a directory
-  qemu-2.10.0/roms/u-boot/scripts/kconfig. This prevents installation on
-  most macOS systems since by default the file system is case
-  insensitive. The 2.10.0 upgrade is blocked in Homebrew due to this
-  issue. See https://github.com/Homebrew/homebrew-core/pull/17467. This
-  is a regression from 2.9.0, which didn't have this problem.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1714750/+subscriptions
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
