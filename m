@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37323)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dokdM-0005Vh-Rj
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 02:13:22 -0400
+	(envelope-from <batmanustc@gmail.com>) id 1dokhb-0000JN-6V
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 02:17:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dokdI-0002j9-Rp
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 02:13:20 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:18989
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dokdI-0002hR-23
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 02:13:16 -0400
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Mon, 4 Sep 2017 14:14:46 +0800
-Message-ID: <1504505688-32455-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-In-Reply-To: <1504505688-32455-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-References: <1504505688-32455-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	(envelope-from <batmanustc@gmail.com>) id 1dokhZ-0006Dc-JT
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 02:17:43 -0400
+Received: from mail-qt0-x229.google.com ([2607:f8b0:400d:c0d::229]:36421)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <batmanustc@gmail.com>)
+	id 1dokhZ-0006CD-Cl
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 02:17:41 -0400
+Received: by mail-qt0-x229.google.com with SMTP id v20so19237874qtg.3
+	for <qemu-devel@nongnu.org>; Sun, 03 Sep 2017 23:17:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V5 1/3] net/colo-compare.c: Optimize
- unpredictable tcp options comparison
+From: Sam <batmanustc@gmail.com>
+Date: Mon, 4 Sep 2017 14:17:39 +0800
+Message-ID: <CAOE=1Z3xuudQenX+Oe11fPDZfrC_d02S50HQ9mJ=RfnJ0B5DUg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] How to use monitor socket in python to connect VM?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,107 +27,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-When network is busy, some tcp options(like sack) will unpredictable
-occur in primary side or secondary side. it will make packet size
-not same, but the two packet's payload is identical. colo just
-care about packet payload, so we skip the option field.
+Hi all,
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
----
- net/colo-compare.c | 40 ++++++++++++++++++++++++++++------------
- 1 file changed, 28 insertions(+), 12 deletions(-)
+I'm using python socket to connect VM's monitor socket like this:
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index ca67c68..18a9ebf 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -186,7 +186,10 @@ static int packet_enqueue(CompareState *s, int mode)
-  * return:    0  means packet same
-  *            > 0 || < 0 means packet different
-  */
--static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, int offset)
-+static int colo_packet_compare_common(Packet *ppkt,
-+                                      Packet *spkt,
-+                                      int poffset,
-+                                      int soffset)
- {
-     if (trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
-         char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_dst[20];
-@@ -201,12 +204,14 @@ static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, int offset)
-                                    sec_ip_src, sec_ip_dst);
-     }
- 
--    offset = ppkt->vnet_hdr_len + offset;
-+    poffset = ppkt->vnet_hdr_len + poffset;
-+    soffset = ppkt->vnet_hdr_len + soffset;
- 
--    if (ppkt->size == spkt->size) {
--        return memcmp(ppkt->data + offset,
--                      spkt->data + offset,
--                      spkt->size - offset);
-+    if (ppkt->size == spkt->size ||
-+        ppkt->size - poffset == spkt->size - soffset) {
-+        return memcmp(ppkt->data + poffset,
-+                      spkt->data + soffset,
-+                      spkt->size - soffset);
-     } else {
-         trace_colo_compare_main("Net packet size are not the same");
-         return -1;
-@@ -263,13 +268,22 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
-      * so we just need skip this field.
-      */
-     if (ptcp->th_off > 5) {
--        ptrdiff_t tcp_offset;
-+        ptrdiff_t ptcp_offset, stcp_offset;
- 
--        tcp_offset = ppkt->transport_header - (uint8_t *)ppkt->data
--                     + (ptcp->th_off * 4) - ppkt->vnet_hdr_len;
--        res = colo_packet_compare_common(ppkt, spkt, tcp_offset);
-+        ptcp_offset = ppkt->transport_header - (uint8_t *)ppkt->data
-+                      + (ptcp->th_off * 4) - ppkt->vnet_hdr_len;
-+        stcp_offset = spkt->transport_header - (uint8_t *)spkt->data
-+                      + (stcp->th_off * 4) - spkt->vnet_hdr_len;
-+
-+        /*
-+         * When network is busy, some tcp options(like sack) will unpredictable
-+         * occur in primary side or secondary side. it will make packet size
-+         * not same, but the two packet's payload is identical. colo just
-+         * care about packet payload, so we skip the option field.
-+         */
-+        res = colo_packet_compare_common(ppkt, spkt, ptcp_offset, stcp_offset);
-     } else if (ptcp->th_sum == stcp->th_sum) {
--        res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
-+        res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN, ETH_HLEN);
-     } else {
-         res = -1;
-     }
-@@ -329,6 +343,7 @@ static int colo_packet_compare_udp(Packet *spkt, Packet *ppkt)
-      * the ip payload here.
-      */
-     ret = colo_packet_compare_common(ppkt, spkt,
-+                                     network_header_length + ETH_HLEN,
-                                      network_header_length + ETH_HLEN);
- 
-     if (ret) {
-@@ -366,6 +381,7 @@ static int colo_packet_compare_icmp(Packet *spkt, Packet *ppkt)
-      * the ip payload here.
-      */
-     if (colo_packet_compare_common(ppkt, spkt,
-+                                   network_header_length + ETH_HLEN,
-                                    network_header_length + ETH_HLEN)) {
-         trace_colo_compare_icmp_miscompare("primary pkt size",
-                                            ppkt->size);
-@@ -403,7 +419,7 @@ static int colo_packet_compare_other(Packet *spkt, Packet *ppkt)
-                                    sec_ip_src, sec_ip_dst);
-     }
- 
--    return colo_packet_compare_common(ppkt, spkt, 0);
-+    return colo_packet_compare_common(ppkt, spkt, 0, 0);
- }
- 
- static int colo_old_packet_check_one(Packet *pkt, int64_t *check_time)
--- 
-2.7.4
+[root@yf-mos-test-net09 tests]# python
+> Python 2.7.5 (default, Jun 24 2015, 00:41:19)
+> [GCC 4.8.3 20140911 (Red Hat 4.8.3-9)] on linux2
+> Type "help", "copyright", "credits" or "license" for more information.
+> >>> from socket import *
+> >>> sock =3D socket(AF_INET, SOCK_STREAM, 0)
+> >>> sock.connect(('127.0.0.1', 55902))
+> >>> sock.recv(1024)
+> "QEMU 2.6.0 monitor - type 'help' for more information\r\n(qemu) "
+> >>> sock.recv(1024)
+> ^CTraceback (most recent call last):
+>   File "<stdin>", line 1, in <module>
+> KeyboardInterrupt
+> >>> sock.send('chardev-add
+> socket,id=3Dchar-vhost_test_intf1,path=3D/usr/local/var/run/openvswitch/v=
+host_test_intf1,server=3Don')
+> 106
+> >>> sock.send('netdev_add
+> vhost-user,id=3Dvhost_test_intf1,chardev=3Dchar-vhost_test_intf1,vhostfor=
+ce=3Don')
+> 85
+> >>> sock.send('device_add
+> virtio-net-pci,netdev=3Dvhost_test_intf1,mac=3D00:22:79:29:d2:6c,id=3Dnet=
+dev-vhost_test_intf1')
+> 98
+> >>> sock.recv(1024)
+> 'c\x1b[K\x1b[Dch\x1b[K\x1b[D\x1b[Dcha\x1b[K\x1b[D\x1b[D\x1b[Dchar\x1b[K\x=
+1b[D\x1b[D\x1b[D\x1b[Dchard\x1b[K\x1b[D\x1b[D\x1b[D\x1b[D\x1b[Dcharde\x1b[K=
+\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[Dchardev\x1b[K\x1b[D\x1b[D\x1b[D\x1b[D\x=
+1b[D\x1b[D\x1b[Dchardev-\x1b[K\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1=
+b[Dchardev-a\x1b[K\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[Dcha=
+rdev-ad\x1b[K\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[Dch=
+ardev-add\x1b[K\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D=
+\x1b[Dchardev-add
+> \x1b[K\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\=
+x1b[Dchardev-add
+> s\x1b[K\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D=
+\x1b[D\x1b[Dchardev-add
+> so\x1b[K\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[=
+D\x1b[D\x1b[D\x1b[Dchardev-add
+> soc\x1b[K\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b=
+[D\x1b[D\x1b[D\x1b[D\x1b[Dchardev-add
+> sock\x1b[K\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1=
+b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[Dchardev-add
+> socke\x1b[K\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x=
+1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[Dchardev-add
+> socket\x1b[K\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\=
+x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[Dchardev-add
+> socket,\x1b[K\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D=
+\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[Dchardev-add
+> socket,i\x1b[K\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[=
+D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[Dchardev-add
+> socket,id\x1b[K\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b=
+[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[D\x1b[Dchardev=
+-add
+> socket,id=3D\x1b[K\x1b[D\x1b[D\x1b[D\x1b[D'
+> >>>
+
+
+But as we see, there are problems:
+1. commands like '>>> sock.send('chardev-add
+socket,id=3Dchar-vhost_test_intf1,path=3D/usr/local/var/run/openvswitch/vho=
+st_test_intf1,server=3Don')
+106'  does not work, this I'm very sure and I use some method to verify it.
+2. commands like '>>> sock.recv(1024)' got a lot of unknown characters.
+
+So is there some one who use python(or shell) to connect monitor socket of
+VM? Could you please share the code or tell me the way to operate?
+
+For example, should I send command with '(qemu) ' before my command? Should
+I recv result by the end of '\r\n' or something?
+
+Thank you~
