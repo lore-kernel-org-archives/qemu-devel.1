@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dosVe-0005oB-EU
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:38:02 -0400
+	(envelope-from <intermediadc@hotmail.com>) id 1dosWZ-0006Wv-JW
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:38:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dosVZ-00040f-8i
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:37:54 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:32749
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dosVY-0003xu-Fd
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:37:49 -0400
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Date: Mon, 4 Sep 2017 22:35:38 +0800
-Message-ID: <81411b5c110b874a19c63cea528d1c913bd2bce3.1504533674.git.maozy.fnst@cn.fujitsu.com>
-In-Reply-To: <cover.1504533674.git.maozy.fnst@cn.fujitsu.com>
-References: <cover.1504533674.git.maozy.fnst@cn.fujitsu.com>
+	(envelope-from <intermediadc@hotmail.com>) id 1dosWU-0004c4-DC
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:38:51 -0400
+From: luigi burdo <intermediadc@hotmail.com>
+Date: Mon, 4 Sep 2017 14:38:32 +0000
+Message-ID: <AM5P194MB0132337AF77CC74475687CF1C8910@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
+References: <AM5P194MB01329E868116B28535E050A3C8930@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
+In-Reply-To: <AM5P194MB01329E868116B28535E050A3C8930@AM5P194MB0132.EURP194.PROD.OUTLOOK.COM>
+Content-Language: it-IT
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v9 2/4] net/socket: Convert several helper
- functions to Error
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] e5500 pcce500 disabled network and no
+ video on device virtio-gpu or virtio gpu-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,254 +24,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jasowang@redhat.com, armbru@redhat.com, berrange@redhat.com
+To: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
 
-Currently, net_socket_mcast_create(), net_socket_fd_init_dgram() and
-net_socket_fd_init() use the function such as fprintf(), perror() to
-report an error message.
+i found probably another issue,
 
-Now, convert these functions to Error.
+i cant made the img boot if i run qemu 2.10 build on an X86_64 (endianess?)=
+.
 
-Cc: jasowang@redhat.com
-Cc: armbru@redhat.com
-Cc: berrange@redhat.com
-Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
----
- net/socket.c | 82 ++++++++++++++++++++++++++++++++++++------------------------
- 1 file changed, 50 insertions(+), 32 deletions(-)
+tested on qemu 2.10 on MacOsx 10.12 and on Ubuntu Mate 17.04 (amd64)
 
-diff --git a/net/socket.c b/net/socket.c
-index b4c5a04..00f9796 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -209,7 +209,9 @@ static void net_socket_send_dgram(void *opaque)
-     }
- }
- 
--static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr *localaddr)
-+static int net_socket_mcast_create(struct sockaddr_in *mcastaddr,
-+                                   struct in_addr *localaddr,
-+                                   Error **errp)
- {
-     struct ip_mreq imr;
-     int fd;
-@@ -221,16 +223,16 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
- #endif
- 
-     if (!IN_MULTICAST(ntohl(mcastaddr->sin_addr.s_addr))) {
--        fprintf(stderr, "qemu: error: specified mcastaddr \"%s\" (0x%08x) "
--                "does not contain a multicast address\n",
--                inet_ntoa(mcastaddr->sin_addr),
--                (int)ntohl(mcastaddr->sin_addr.s_addr));
-+        error_setg(errp, "specified mcastaddr %s (0x%08x) "
-+                   "does not contain a multicast address",
-+                   inet_ntoa(mcastaddr->sin_addr),
-+                   (int)ntohl(mcastaddr->sin_addr.s_addr));
-         return -1;
--
-     }
-+
-     fd = qemu_socket(PF_INET, SOCK_DGRAM, 0);
-     if (fd < 0) {
--        perror("socket(PF_INET, SOCK_DGRAM)");
-+        error_setg_errno(errp, errno, "can't create datagram socket");
-         return -1;
-     }
- 
-@@ -242,13 +244,15 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
-     val = 1;
-     ret = qemu_setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
-     if (ret < 0) {
--        perror("setsockopt(SOL_SOCKET, SO_REUSEADDR)");
-+        error_setg_errno(errp, errno,
-+                         "can't set socket option SO_REUSEADDR");
-         goto fail;
-     }
- 
-     ret = bind(fd, (struct sockaddr *)mcastaddr, sizeof(*mcastaddr));
-     if (ret < 0) {
--        perror("bind");
-+        error_setg_errno(errp, errno, "can't bind ip=%s to socket",
-+                         inet_ntoa(mcastaddr->sin_addr));
-         goto fail;
-     }
- 
-@@ -263,7 +267,9 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
-     ret = qemu_setsockopt(fd, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-                           &imr, sizeof(struct ip_mreq));
-     if (ret < 0) {
--        perror("setsockopt(IP_ADD_MEMBERSHIP)");
-+        error_setg_errno(errp, errno,
-+                         "can't add socket to multicast group %s",
-+                         inet_ntoa(imr.imr_multiaddr));
-         goto fail;
-     }
- 
-@@ -272,7 +278,8 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
-     ret = qemu_setsockopt(fd, IPPROTO_IP, IP_MULTICAST_LOOP,
-                           &loop, sizeof(loop));
-     if (ret < 0) {
--        perror("setsockopt(SOL_IP, IP_MULTICAST_LOOP)");
-+        error_setg_errno(errp, errno,
-+                         "can't force multicast message to loopback");
-         goto fail;
-     }
- 
-@@ -281,7 +288,8 @@ static int net_socket_mcast_create(struct sockaddr_in *mcastaddr, struct in_addr
-         ret = qemu_setsockopt(fd, IPPROTO_IP, IP_MULTICAST_IF,
-                               localaddr, sizeof(*localaddr));
-         if (ret < 0) {
--            perror("setsockopt(IP_MULTICAST_IF)");
-+            error_setg_errno(errp, errno,
-+                             "can't set the default network send interface");
-             goto fail;
-         }
-     }
-@@ -321,7 +329,8 @@ static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
-                                                 const char *model,
-                                                 const char *name,
-                                                 int fd, int is_connected,
--                                                const char *mcast)
-+                                                const char *mcast,
-+                                                Error **errp)
- {
-     struct sockaddr_in saddr;
-     int newfd;
-@@ -335,21 +344,17 @@ static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
- 
-     if (is_connected && mcast != NULL) {
-             if (parse_host_port(&saddr, mcast) < 0) {
--                fprintf(stderr,
--                        "qemu: error: init_dgram: fd=%d failed parse_host_port()\n",
--                        fd);
-+                error_setg(errp, "fd=%d failed parse_host_port()", fd);
-                 goto err;
-             }
-             /* must be bound */
-             if (saddr.sin_addr.s_addr == 0) {
--                fprintf(stderr, "qemu: error: init_dgram: fd=%d unbound, "
--                        "cannot setup multicast dst addr\n", fd);
-+                error_setg(errp, "can't setup multicast destination address");
-                 goto err;
-             }
-             /* clone dgram socket */
--            newfd = net_socket_mcast_create(&saddr, NULL);
-+            newfd = net_socket_mcast_create(&saddr, NULL, errp);
-             if (newfd < 0) {
--                /* error already reported by net_socket_mcast_create() */
-                 goto err;
-             }
-             /* clone newfd to fd, close newfd */
-@@ -431,20 +436,21 @@ static NetSocketState *net_socket_fd_init_stream(NetClientState *peer,
- 
- static NetSocketState *net_socket_fd_init(NetClientState *peer,
-                                           const char *model, const char *name,
--                                          int fd, int is_connected, const char *mc)
-+                                          int fd, int is_connected,
-+                                          const char *mc, Error **errp)
- {
-     int so_type = -1, optlen=sizeof(so_type);
- 
-     if(getsockopt(fd, SOL_SOCKET, SO_TYPE, (char *)&so_type,
-         (socklen_t *)&optlen)< 0) {
--        fprintf(stderr, "qemu: error: getsockopt(SO_TYPE) for fd=%d failed\n",
--                fd);
-+        error_setg(errp, "can't get socket option SO_TYPE");
-         closesocket(fd);
-         return NULL;
-     }
-     switch(so_type) {
-     case SOCK_DGRAM:
--        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected, mc);
-+        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected,
-+                                        mc, errp);
-     case SOCK_STREAM:
-         return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
-     default:
-@@ -535,6 +541,7 @@ static int net_socket_connect_init(NetClientState *peer,
-     NetSocketState *s;
-     int fd, connected, ret;
-     struct sockaddr_in saddr;
-+    Error *err = NULL;
- 
-     if (parse_host_port(&saddr, host_str) < 0)
-         return -1;
-@@ -566,9 +573,12 @@ static int net_socket_connect_init(NetClientState *peer,
-             break;
-         }
-     }
--    s = net_socket_fd_init(peer, model, name, fd, connected, NULL);
--    if (!s)
-+    s = net_socket_fd_init(peer, model, name, fd, connected, NULL, &err);
-+    if (!s) {
-+        error_report_err(err);
-         return -1;
-+    }
-+
-     snprintf(s->nc.info_str, sizeof(s->nc.info_str),
-              "socket: connect to %s:%d",
-              inet_ntoa(saddr.sin_addr), ntohs(saddr.sin_port));
-@@ -585,6 +595,7 @@ static int net_socket_mcast_init(NetClientState *peer,
-     int fd;
-     struct sockaddr_in saddr;
-     struct in_addr localaddr, *param_localaddr;
-+    Error *err = NULL;
- 
-     if (parse_host_port(&saddr, host_str) < 0)
-         return -1;
-@@ -597,13 +608,17 @@ static int net_socket_mcast_init(NetClientState *peer,
-         param_localaddr = NULL;
-     }
- 
--    fd = net_socket_mcast_create(&saddr, param_localaddr);
--    if (fd < 0)
-+    fd = net_socket_mcast_create(&saddr, param_localaddr, &err);
-+    if (fd < 0) {
-+        error_report_err(err);
-         return -1;
-+    }
- 
--    s = net_socket_fd_init(peer, model, name, fd, 0, NULL);
--    if (!s)
-+    s = net_socket_fd_init(peer, model, name, fd, 0, NULL, &err);
-+    if (!s) {
-+        error_report_err(err);
-         return -1;
-+    }
- 
-     s->dgram_dst = saddr;
- 
-@@ -623,6 +638,7 @@ static int net_socket_udp_init(NetClientState *peer,
-     NetSocketState *s;
-     int fd, ret;
-     struct sockaddr_in laddr, raddr;
-+    Error *err = NULL;
- 
-     if (parse_host_port(&laddr, lhost) < 0) {
-         return -1;
-@@ -651,8 +667,9 @@ static int net_socket_udp_init(NetClientState *peer,
-     }
-     qemu_set_nonblock(fd);
- 
--    s = net_socket_fd_init(peer, model, name, fd, 0, NULL);
-+    s = net_socket_fd_init(peer, model, name, fd, 0, NULL, &err);
-     if (!s) {
-+        error_report_err(err);
-         return -1;
-     }
- 
-@@ -695,7 +712,8 @@ int net_init_socket(const Netdev *netdev, const char *name,
-             return -1;
-         }
-         qemu_set_nonblock(fd);
--        if (!net_socket_fd_init(peer, "socket", name, fd, 1, sock->mcast)) {
-+        if (!net_socket_fd_init(peer, "socket", name, fd, 1, sock->mcast,
-+                                errp)) {
-             return -1;
-         }
-         return 0;
--- 
-2.9.4
+
+this issue is present if i choose -hda instead -device file=3D too
+
+
+[    8.564326] ata6: SATA link up 1.5 Gbps (SStatus 113 SControl 300)
+
+[    8.569373] ata6.00: failed to IDENTIFY (INIT_DEV_PARAMS failed, err_mas=
+k=3D0x80)
+
+[    8.575744] ata6: limiting SATA link speed to 1.5 Gbps
+
+[   14.195086] ata6: SATA link up 1.5 Gbps (SStatus 113 SControl 310)
+
+[   14.200326] ata6.00: failed to IDENTIFY (INIT_DEV_PARAMS failed, err_mas=
+k=3D0x80)
+
+[   19.828186] ata6: SATA link up 1.5 Gbps (SStatus 113 SControl 310)[   19=
+.867419] VFS: Cannot open root device "sda2" or unknown-block(0,0): error -=
+6
+
+[   19.872611] Please append a correct "root=3D" boot option; here are the =
+availa
+
+[   19.967119] Kernel panic - not syncing: VFS: Unable to mount root fs on =
+unknown-block(0,0)
+
+
+Luigi
+
+
+
+
+Oggetto: [Qemu-ppc] e5500 pcce500 disabled network and no video on device v=
+irtio-gpu or virtio gpu-pci
+
+
+Hi all,
+
+like the topic i cant made the machine goes online plus the video output do=
+n work.
+
+on this email i made the links with
+
+kernel 411 with virtio,bochs etc etc .
+
+a base of distro with kernel modules
+
+my usual lines configuration.
+
+
+Note i tested all on real e5500 machine and all is working there.
+
+Hope my job will help in fixing and developing
+
+
+ubuntu base : https://www.dropbox.com/s/yzp657yad3cp48n/Amigaone_Ubuntu_16.=
+04-Base-1.img.gz?dl=3D0
+
+
+Kernel 411:https://www.dropbox.com/s/ne49j5bo62680l0/u411.gz?dl=3D0
+
+
+qemu line config: https://www.dropbox.com/s/j5kekeut75ogs9r/qemu_config.gz?=
+dl=3D0
+
+
+Thanks
+
+Luigi
