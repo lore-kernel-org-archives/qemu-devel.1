@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43722)
 	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1doz1h-0000H5-IG
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 17:35:31 -0400
+	id 1doz2S-0000ip-Vn
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 17:36:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1doz1c-0005WY-MM
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 17:35:25 -0400
-Received: from mout.gmx.net ([212.227.17.22]:55103)
+	(envelope-from <n54@gmx.com>) id 1doz2O-0006A9-B9
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 17:36:13 -0400
+Received: from mout.gmx.net ([212.227.17.22]:61857)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1doz1c-0005WH-B4
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 17:35:20 -0400
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1doz2N-000697-VF
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 17:36:08 -0400
+References: <20170904164659.26915-1-n54@gmx.com>
+	<20170904173226.25252-1-n54@gmx.com>
+	<1a66a487-b906-3f9f-6f4c-15e04c409903@vivier.eu>
 From: Kamil Rytarowski <n54@gmx.com>
-Date: Mon,  4 Sep 2017 23:23:06 +0200
-Message-Id: <20170904212306.3020-1-n54@gmx.com>
-In-Reply-To: <20170904173226.25252-1-n54@gmx.com>
-References: <20170904173226.25252-1-n54@gmx.com>
+Message-ID: <d110585e-b1a8-fb2f-dfe1-99a9cef6bdcd@gmx.com>
+Date: Mon, 4 Sep 2017 23:38:23 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4] target/m68k: Switch fpu_rom from
+In-Reply-To: <1a66a487-b906-3f9f-6f4c-15e04c409903@vivier.eu>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ERdVwTb6Uv5rPGJ39ouAMlpUD9ElvbA12"
+Subject: Re: [Qemu-devel] [PATCH v3] target/m68k: Switch fpu_rom from
  make_floatx80() to make_floatx80_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,82 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: laurent@vivier.eu
-Cc: qemu-devel@nongnu.org, f4bug@amsat.org, peter.maydell@linaro.org, Kamil Rytarowski <n54@gmx.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, f4bug@amsat.org, peter.maydell@linaro.org
 
-GCC 4.7.2 on SunOS reports that the values assigned to array members are not
-real constants:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ERdVwTb6Uv5rPGJ39ouAMlpUD9ElvbA12
+From: Kamil Rytarowski <n54@gmx.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, f4bug@amsat.org, peter.maydell@linaro.org
+Message-ID: <d110585e-b1a8-fb2f-dfe1-99a9cef6bdcd@gmx.com>
+Subject: Re: [PATCH v3] target/m68k: Switch fpu_rom from make_floatx80() to
+ make_floatx80_init()
+References: <20170904164659.26915-1-n54@gmx.com>
+ <20170904173226.25252-1-n54@gmx.com>
+ <1a66a487-b906-3f9f-6f4c-15e04c409903@vivier.eu>
+In-Reply-To: <1a66a487-b906-3f9f-6f4c-15e04c409903@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-target/m68k/fpu_helper.c:32:5: error: initializer element is not constant
-target/m68k/fpu_helper.c:32:5: error: (near initialization for 'fpu_rom[0]')
-rules.mak:66: recipe for target 'target/m68k/fpu_helper.o' failed
+On 04.09.2017 21:02, Laurent Vivier wrote:
+>=20
+> I don't want to be picky, but you should use "ULL" instead of "LL" for
+> the new values.
+>=20
 
-Convert the array to make_floatx80_init() to fix it.
-Replace floatx80_pi-like constants with make_floatx80_init() as they are
-defined as make_floatx80().
+I was wondering why the integer is shorter.. should be fixed in v4.
 
-This fixes build on SmartOS (Joyent).
 
-Signed-off-by: Kamil Rytarowski <n54@gmx.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- target/m68k/fpu_helper.c | 44 ++++++++++++++++++++++----------------------
- 1 file changed, 22 insertions(+), 22 deletions(-)
 
-diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-index bdfc537c68..665e7609af 100644
---- a/target/m68k/fpu_helper.c
-+++ b/target/m68k/fpu_helper.c
-@@ -29,28 +29,28 @@
-  */
- 
- static const floatx80 fpu_rom[128] = {
--    [0x00] = floatx80_pi,                                   /* Pi */
--    [0x0b] = make_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
--    [0x0c] = make_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
--    [0x0d] = make_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
--    [0x0e] = make_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
--    [0x0f] = floatx80_zero,                                 /* Zero     */
--    [0x30] = floatx80_ln2,                                  /* ln(2)    */
--    [0x31] = make_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
--    [0x32] = floatx80_one,                                  /* 10^0     */
--    [0x33] = make_floatx80(0x4002, 0xa000000000000000ULL),  /* 10^1     */
--    [0x34] = make_floatx80(0x4005, 0xc800000000000000ULL),  /* 10^2     */
--    [0x35] = make_floatx80(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
--    [0x36] = make_floatx80(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
--    [0x37] = make_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
--    [0x38] = make_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
--    [0x39] = make_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
--    [0x3a] = make_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
--    [0x3b] = make_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
--    [0x3c] = make_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
--    [0x3d] = make_floatx80(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
--    [0x3e] = make_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
--    [0x3f] = make_floatx80(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
-+    [0x00] = make_floatx80_init(0x4000, 0xc90fdaa22168c235ULL),  /* Pi       */
-+    [0x0b] = make_floatx80_init(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
-+    [0x0c] = make_floatx80_init(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
-+    [0x0d] = make_floatx80_init(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
-+    [0x0e] = make_floatx80_init(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
-+    [0x0f] = make_floatx80_init(0x0000, 0x0000000000000000ULL),  /* Zero     */
-+    [0x30] = make_floatx80_init(0x3ffe, 0xb17217f7d1cf79acULL),  /* ln(2)    */
-+    [0x31] = make_floatx80_init(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
-+    [0x32] = make_floatx80_init(0x3fff, 0x8000000000000000ULL),  /* 10^0     */
-+    [0x33] = make_floatx80_init(0x4002, 0xa000000000000000ULL),  /* 10^1     */
-+    [0x34] = make_floatx80_init(0x4005, 0xc800000000000000ULL),  /* 10^2     */
-+    [0x35] = make_floatx80_init(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
-+    [0x36] = make_floatx80_init(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
-+    [0x37] = make_floatx80_init(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
-+    [0x38] = make_floatx80_init(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
-+    [0x39] = make_floatx80_init(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
-+    [0x3a] = make_floatx80_init(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
-+    [0x3b] = make_floatx80_init(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
-+    [0x3c] = make_floatx80_init(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
-+    [0x3d] = make_floatx80_init(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
-+    [0x3e] = make_floatx80_init(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
-+    [0x3f] = make_floatx80_init(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
- };
- 
- int32_t HELPER(reds32)(CPUM68KState *env, FPReg *val)
--- 
-2.14.1
+--ERdVwTb6Uv5rPGJ39ouAMlpUD9ElvbA12
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZrcfVAAoJEEuzCOmwLnZsGwMP/Ar/9yjrP0vjcWpDTltz3DTl
+1vyog3ngRYM1M1nRlAYyKS9Cw0FQo5iltV/RVkMjbIw2d6IihD+j3U9J3KP36BL7
+uyRLeoX2iYMwDn1kiL0rqODc9tsKtx8kU3ycpuFqnq5StMJzkwUXpJVsziZQkfkY
+nxxixY6jnq5K7BS2UioiUdLrc3/oWuVGVOwV3Ce8bhp1w9d5BDA+CBPWuTnH/2l0
+H5vg+FgU26FlNPuqz2nL+xwMYYRfxd2GJ70gMykKntJpg2jR7ED4kXF8B/2DSLPs
+wZXAQID9M9DffIUMRBkPuaGkjhCRDG3CGbkFkxuztUWe9zXudwPZAKKmJqA5d7tC
+kmqcYY8Iq93yDCkbB7+chwSODiNmbxvgKXh2q55YPU5S2wj+u41iEiJi1CZKSeFE
+rMROE7Y+snLyd7qAzKjMAxAOTsJFwwIEvcCPHRoAEpjFUknaE5KzGM2zCHnHvnuF
+pK3mfvKiMCv9MGjeOixoRWfkSt6Q+o1lp4c223QvqA+V/pNcWiTodFlRgKT25WPl
+3t6Lyycx8vBtWtEa6cIYPYd0THRPlRQ8rXP0OacUx3aMeD2uiwNbnzGyVLbv5TBv
+zx1Nm+8sa3ZvvdMj4O0cpFQBms1SbJINr/3O5sl3ufBvRK9KyrvMkFmF3xIo5TqE
+Ttzn08dFjU2MzU/h5sHN
+=mi8F
+-----END PGP SIGNATURE-----
+
+--ERdVwTb6Uv5rPGJ39ouAMlpUD9ElvbA12--
