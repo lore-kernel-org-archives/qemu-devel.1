@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1doqv2-0003FU-Ij
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:56:05 -0400
+	(envelope-from <berrange@redhat.com>) id 1doqzX-0007i1-Lb
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:01:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1doqux-0001Zj-1i
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:56:00 -0400
-Date: Mon, 4 Sep 2017 20:55:23 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170904125523.GC19748@lemon.lan>
-References: <20170904111616.21333-1-kchamart@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1doqye-0005B6-Fu
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:00:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42448)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1doqye-0005AO-7H
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:59:44 -0400
+Date: Mon, 4 Sep 2017 13:59:40 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170904125940.GA27285@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <CAOE=1Z3xuudQenX+Oe11fPDZfrC_d02S50HQ9mJ=RfnJ0B5DUg@mail.gmail.com>
+	<20170904093623.GB7186@redhat.com>
+	<CAOE=1Z2HFVhD8b1TXaQFd8sGvqoddOeJoSds1ZxwzKSw8im7ng@mail.gmail.com>
+	<20170904101624.GE7186@redhat.com>
+	<CAOE=1Z2E-OJKFGp1QWwTbBm0evbtLDubv7JVS5hC8dPqK_9M-Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170904111616.21333-1-kchamart@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Make test 192 use QMP;
- convert it to Python
+In-Reply-To: <CAOE=1Z2E-OJKFGp1QWwTbBm0evbtLDubv7JVS5hC8dPqK_9M-Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] How to use monitor socket in python to connect VM?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,147 +31,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, stefanha@redhat.com, eblake@redhat.com, kwolf@redhat.com, dgilbert@redhat.com
+To: Sam <batmanustc@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Kashyap,
+On Mon, Sep 04, 2017 at 08:31:29PM +0800, Sam wrote:
+> Thank you, but I have to ask last question. My qemu is 2.6.0, and there is
+> no -qmp option :
 
-On Mon, 09/04 13:16, Kashyap Chamarthy wrote:
-> The test 192 ("Test NBD export with '-incoming' (non-shared
-> storage migration use case from libvirt")) is currently using HMP.
-> Replace the HMP usage with QMP, as the upstream preference seems to be:
-> "Use QMP where possible, unless you're explicitly testing something
-> related to HMP".
+QEMU 2.6.0 supports it, but whatever person/application has run
+the QEMU process shown here has not used the -qmp arg. You'll
+need to get that changed somehow.
+
 > 
-> While at it, convert the test from Bash to Python.
+> [root@yf-mos-test-net09 ~]# ps aux | grep qemu
+> > root      5714  0.0  0.0 1669388 77736 ?       Sl   Sep01   0:09
+> > /usr/local/bin/qemu-system-x86_64_2.6.0 -enable-kvm -cpu
+> > qemu64,+vmx,+ssse3,+sse4.1,+sse4.2,+x2apic,+aes,+avx,+vme,+pat,+ss,+pclmulqdq,+xsave,level=13
+> > -machine pc,accel=kvm -chardev
+> > socket,id=hmqmondev,port=55919,host=127.0.0.1,nodelay,server,nowait -mon
+> > chardev=hmqmondev,id=hmqmon,mode=readline -rtc
+> > base=utc,clock=host,driftfix=none -usb -device usb-tablet -daemonize
+> > -nodefaults -nodefconfig -no-kvm-pit-reinjection -global
+> > kvm-pit.lost_tick_policy=discard -vga std -k en-us -smp 1 -name
+> > mvs5-huanghuai -m 1024 -boot order=cdn -vnc :19,password -drive
+> > file=/opt/cloud/workspace/disks/4a5148da-e34e-4c81-aada-12a247c0337e,if=none,id=drive_0,format=qcow2,cache=none,aio=native
+> > -device virtio-blk-pci,id=dev_drive_0,drive=drive_0,bus=pci.0,addr=0x5
+> > -drive
+> > file=/opt/cloud/workspace/disks/08eb3f72-07ba-44e9-8ee9-4ab662dbbd1f,if=none,id=drive_1,format=qcow2,cache=none,aio=native
+> > -device virtio-blk-pci,id=dev_drive_1,drive=drive_1,bus=pci.0,addr=0x6
+> > -device ide-cd,drive=ide0-cd0,bus=ide.1,unit=1 -drive
+> > id=ide0-cd0,media=cdrom,if=none -chardev
+> > socket,id=char-n-f879ac2f,path=/usr/local/var/run/openvswitch/n-f879ac2f,server
+> > -netdev type=vhost-user,id=n-f879ac2f,chardev=char-n-f879ac2f,vhostforce=on
+> > -device
+> > virtio-net-pci,netdev=n-f879ac2f,mac=00:22:f8:79:ac:2f,id=netdev-n-f879ac2f,addr=0xf
+> > -object
+> > memory-backend-file,id=mem,size=1024M,mem-path=/dev/hugepages,share=on
+> > -numa node,memdev=mem -mem-prealloc -pidfile
+> > /opt/cloud/workspace/servers/63ef2ec4-556f-47ea-93e0-23089bb59be5/pid
+> > -chardev
+> > socket,path=/opt/cloud/workspace/servers/63ef2ec4-556f-47ea-93e0-23089bb59be5/qga.sock,server,nowait,id=qga0
+> > -device virtio-serial -device
+> > virtserialport,chardev=qga0,name=org.qemu.guest_agent.0 -incoming tcp:0:8081
 > 
-> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
-> ---
->  tests/qemu-iotests/192     | 78 ++++++++++++++++++----------------------------
->  tests/qemu-iotests/192.out | 14 ++++-----
->  2 files changed, 38 insertions(+), 54 deletions(-)
 > 
-> diff --git a/tests/qemu-iotests/192 b/tests/qemu-iotests/192
-> index b50a2c0c8e2fccdddfae4ac58ca35937c5f784c6..692475f0a8c80c81396587d3289d4b32c0ee0d21 100755
-> --- a/tests/qemu-iotests/192
-> +++ b/tests/qemu-iotests/192
-> @@ -1,7 +1,4 @@
-> -#!/bin/bash
-> -#
-> -# Test NBD export with -incoming (non-shared storage migration use case from
-> -# libvirt)
-> +#!/usr/bin/env python
->  #
->  # Copyright (C) 2017 Red Hat, Inc.
->  #
-> @@ -18,46 +15,33 @@
->  # You should have received a copy of the GNU General Public License
->  # along with this program.  If not, see <http://www.gnu.org/licenses/>.
->  #
-> -
-> -# creator
-> -owner=famz@redhat.com
-> -
-> -seq=`basename $0`
-> -echo "QA output created by $seq"
-> -
-> -here=`pwd`
-> -status=1	# failure is the default!
-> -
-> -_cleanup()
-> -{
-> -	_cleanup_test_img
-> -}
-> -trap "_cleanup; exit \$status" 0 1 2 3 15
-> -
-> -# get standard environment, filters and checks
-> -. ./common.rc
-> -. ./common.filter
-> -
-> -_supported_fmt generic
-> -_supported_proto file
-> -_supported_os Linux
-> -
-> -if [ "$QEMU_DEFAULT_MACHINE" != "pc" ]; then
-> -    _notrun "Requires a PC machine"
-> -fi
-> -
-> -size=64M
-> -_make_test_img $size
-> -
-> -{
-> -echo "nbd_server_start unix:$TEST_DIR/nbd"
-> -echo "nbd_server_add -w drive0"
-> -echo "q"
-> -} | $QEMU -nodefaults -display none -monitor stdio \
-> -    -drive format=$IMGFMT,file=$TEST_IMG,if=ide,id=drive0 \
-> -    -incoming defer 2>&1 | _filter_testdir | _filter_qemu | _filter_hmp
-> -
-> -# success, all done
-> -echo "*** done"
-> -rm -f $seq.full
-> -status=0
-> +# Author: Kashyap Chamarthy <kchamart@redhat.com>
-> +#         [Converted to Python from the original Bash version by Fam
-> +#         Zheng (<famz@redhat.com)]
-> +#
-> +# Purpose: Test NBD export with '-incoming' (non-shared storage
-> +# migration use case from libvirt)
-> +
-> +import os
-> +import atexit
-> +import iotests
-> +
-> +iotests.verify_platform(['linux'])
-> +
-> +img_size = '1G'
-> +test_img_path = os.path.join(iotests.test_dir, 'dest.img')
-> +iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, test_img_path, img_size)
-> +
-> +iotests.log('Launching VM...')
-> +nbd_sock_path = os.path.join(iotests.test_dir, 'nbd.sock')
-> +dest_vm = (iotests.VM('dest').add_drive(test_img_path)
-> +                               .add_incoming('defer'))
-
-Superfluous parenthesis?
-
-> +dest_vm.launch()
-> +atexit.register(dest_vm.shutdown)
-
-As an improvement maybe you could rebase to Stefan's "iotests: clean up
-resources using context managers" series and switch to "with" for the temp file
-and VM.
-
-Otherwise looks good to me.
-
-Fam
-
-> +
-> +iotests.log('Launching NBD server on destination...')
-> +iotests.log(dest_vm.qmp('nbd-server-start', addr={'type': 'unix', 'data': {'path': nbd_sock_path}}))
-> +iotests.log('Exporting the block device to NBD server...')
-> +iotests.log(dest_vm.qmp('nbd-server-add', device='drive0', writable=True))
-> +iotests.log('Stopping the NBD server on destination...')
-> +iotests.log(dest_vm.qmp('nbd-server-stop'))
-> diff --git a/tests/qemu-iotests/192.out b/tests/qemu-iotests/192.out
-> index 1e0be4c4d7a891f81c2536b87c5a29a21d39138c..f62b94c5641f1a1e60f17090aeb20ed0bc037afd 100644
-> --- a/tests/qemu-iotests/192.out
-> +++ b/tests/qemu-iotests/192.out
-> @@ -1,7 +1,7 @@
-> -QA output created by 192
-> -Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-> -QEMU X.Y.Z monitor - type 'help' for more information
-> -(qemu) nbd_server_start unix:TEST_DIR/nbd
-> -(qemu) nbd_server_add -w drive0
-> -(qemu) q
-> -*** done
-> +Launching VM...
-> +Launching NBD server on destination...
-> +{u'return': {}}
-> +Exporting the block device to NBD server...
-> +{u'return': {}}
-> +Stopping the NBD server on destination...
-> +{u'return': {}}
-> -- 
-> 2.9.5
+>  After I use telnet like this `telnet localhost 55919`, then enter this cmd
+> line:
 > 
+> [root@yf-mos-test-net09 ~]# telnet localhost 55919
+> > Trying ::1...
+> > telnet: connect to address ::1: Connection refused
+> > Trying 127.0.0.1...
+> > Connected to localhost.
+> > Escape character is '^]'.
+> > QEMU 2.6.0 monitor - type 'help' for more information
+> > (qemu) help
+> > help
+> > acl_add aclname match allow|deny [index] -- add a match rule to the access
+> > control list
+> > ...
+> > xp /fmt addr -- physical memory dump starting at 'addr'
+> > (qemu)
+> > (qemu)
+> 
+> (qemu) {"execute":"query-status"}
+> > {"execute":"query-status"}
+> > unknown command: '{"execute":"query-status"}'
+
+This won't work - you're trying to send QMP commands to the HMP - they
+speak completely different protocols.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
