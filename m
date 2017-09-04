@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dotKs-0008KR-2a
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:30:55 -0400
+	(envelope-from <bounces@canonical.com>) id 1dotL1-0008P4-I6
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:31:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dotKn-0000gS-8x
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:30:50 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:36143)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dotKn-0000gL-24
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:30:45 -0400
-Received: by mail-qt0-x244.google.com with SMTP id 7so475352qtz.3
-	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 08:30:44 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1504533662-198084-1-git-send-email-imammedo@redhat.com>
-	<1504533662-198084-2-git-send-email-imammedo@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f9123c18-9e8a-0be2-f28e-b2fdc47832e5@amsat.org>
-Date: Mon, 4 Sep 2017 12:30:40 -0300
+	(envelope-from <bounces@canonical.com>) id 1dotKw-0000jv-Lm
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:30:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51913)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dotKw-0000jU-FR
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:30:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dotKu-0004lM-KS
+	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 15:30:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 734E52E80D3
+	for <qemu-devel@nongnu.org>; Mon,  4 Sep 2017 15:30:52 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1504533662-198084-2-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/6] qom: cpus: split cpu_generic_init() on
- feature parsing and cpu creation parts
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 04 Sep 2017 15:24:39 -0000
+From: ilovezfs <1714750@bugs.launchpad.net>
+Reply-To: Bug 1714750 <1714750@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150442540217.17409.6458222878014636993.malonedeb@gac.canonical.com>
+Message-Id: <150453867973.8514.5266666376298453367.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1714750] Re: 2.10.0 cannot be installed on
+ case-insensitive file system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,129 +37,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Andrew Jones <drjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On 09/04/2017 11:00 AM, Igor Mammedov wrote:
-> it would allow to reuse feature parsing part in various machines
-> that have CPU features instead of re-implementing the same feature
-> parsing each time.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>Thanks for putting the workaround into the homebrew packaging in the
+meantime.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+You're welcome. I have now shipped the 2.10.0 binaries.
 
-> ---
->   include/qom/cpu.h | 21 +++++++++++++++++++++
->   qom/cpu.c         | 46 ++++++++++++++++++++++++++++++----------------
->   2 files changed, 51 insertions(+), 16 deletions(-)
-> 
-> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-> index b7ac949..a92a7d2 100644
-> --- a/include/qom/cpu.h
-> +++ b/include/qom/cpu.h
-> @@ -633,6 +633,27 @@ void cpu_reset(CPUState *cpu);
->   ObjectClass *cpu_class_by_name(const char *typename, const char *cpu_model);
->   
->   /**
-> + * cpu_create:
-> + * @typename: The CPU type.
-> + *
-> + * Instantiates a CPU and realizes the CPU.
-> + *
-> + * Returns: A #CPUState or %NULL if an error occurred.
-> + */
-> +CPUState *cpu_create(const char *typename);
-> +
-> +/**
-> + * cpu_parse_features:
-> + * @typename: The CPU base type or CPU type.
-> + * @cpu_model: The model string including optional parameters.
-> + *
-> + * processes optional parameters and registers them as global properties
-> + *
-> + * Returns: type of CPU to create or %NULL if an error occurred.
-> + */
-> +const char *cpu_parse_features(const char *typename, const char *cpu_model);
-> +
-> +/**
->    * cpu_generic_init:
->    * @typename: The CPU base type.
->    * @cpu_model: The model string including optional parameters.
-> diff --git a/qom/cpu.c b/qom/cpu.c
-> index deb8880..d715890 100644
-> --- a/qom/cpu.c
-> +++ b/qom/cpu.c
-> @@ -53,13 +53,26 @@ bool cpu_exists(int64_t id)
->       return !!cpu_by_arch_id(id);
->   }
->   
-> -CPUState *cpu_generic_init(const char *typename, const char *cpu_model)
-> +CPUState *cpu_create(const char *typename)
-> +{
-> +    Error *err = NULL;
-> +    CPUState *cpu = CPU(object_new(typename));
-> +    object_property_set_bool(OBJECT(cpu), true, "realized", &err);
-> +    if (err != NULL) {
-> +        error_report_err(err);
-> +        object_unref(OBJECT(cpu));
-> +        return NULL;
-> +    }
-> +    return cpu;
-> +}
-> +
-> +const char *cpu_parse_features(const char *typename, const char *cpu_model)
->   {
-> -    CPUState *cpu = NULL;
->       ObjectClass *oc;
->       CPUClass *cc;
->       Error *err = NULL;
->       gchar **model_pieces;
-> +    const char *cpu_type;
->   
->       model_pieces = g_strsplit(cpu_model, ",", 2);
->   
-> @@ -69,27 +82,28 @@ CPUState *cpu_generic_init(const char *typename, const char *cpu_model)
->           return NULL;
->       }
->   
-> +    cpu_type = object_class_get_name(oc);
->       cc = CPU_CLASS(oc);
-> -    /* TODO: all callers of cpu_generic_init() need to be converted to
-> -     * call parse_features() only once, before calling cpu_generic_init().
-> -     */
-> -    cc->parse_features(object_class_get_name(oc), model_pieces[1], &err);
-> +    cc->parse_features(cpu_type, model_pieces[1], &err);
->       g_strfreev(model_pieces);
->       if (err != NULL) {
-> -        goto out;
-> -    }
-> -
-> -    cpu = CPU(object_new(object_class_get_name(oc)));
-> -    object_property_set_bool(OBJECT(cpu), true, "realized", &err);
-> -
-> -out:
-> -    if (err != NULL) {
->           error_report_err(err);
-> -        object_unref(OBJECT(cpu));
->           return NULL;
->       }
-> +    return cpu_type;
-> +}
->   
-> -    return cpu;
-> +CPUState *cpu_generic_init(const char *typename, const char *cpu_model)
-> +{
-> +    /* TODO: all callers of cpu_generic_init() need to be converted to
-> +     * call cpu_parse_features() only once, before calling cpu_generic_init().
-> +     */
-> +    const char *cpu_type = cpu_parse_features(typename, cpu_model);
-> +
-> +    if (cpu_type) {
-> +        return cpu_create(cpu_type);
-> +    }
-> +    return NULL;
->   }
->   
->   bool cpu_paging_enabled(const CPUState *cpu)
-> 
+>if this bug had been reported for one of the 2.10.x release candidates
+it would maybe have been a release blocker
+
+We should add a `devel` spec to the qemu formula for the next release
+candidates. I will try to remember.
+
+> As it is we have to wait for a 2.10.1 release
+
+Yeah that is unfortunate.
+
+>(and we need to actually fix the problem, preferably by getting u-boot
+upstream to do so).
+
+Agreed. If only their mailing list would confirm my subscription ... lol
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1714750
+
+Title:
+  2.10.0 cannot be installed on case-insensitive file system
+
+Status in QEMU:
+  New
+
+Bug description:
+  The https://download.qemu.org/qemu-2.10.0.tar.bz2 tarball cannot be
+  unpacked on a case-insensitive file system because it has a file
+  qemu-2.10.0/roms/u-boot/scripts/Kconfig and a directory
+  qemu-2.10.0/roms/u-boot/scripts/kconfig. This prevents installation on
+  most macOS systems since by default the file system is case
+  insensitive. The 2.10.0 upgrade is blocked in Homebrew due to this
+  issue. See https://github.com/Homebrew/homebrew-core/pull/17467. This
+  is a regression from 2.9.0, which didn't have this problem.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1714750/+subscriptions
