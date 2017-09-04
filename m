@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dozB1-0002ik-SM
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 17:45:08 -0400
+	(envelope-from <groug@kaod.org>) id 1dozCq-0003en-Tk
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 17:47:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dozAx-0001jx-6i
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 17:45:03 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:63060)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dozAw-0001jW-SW
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 17:44:59 -0400
-References: <20170904173226.25252-1-n54@gmx.com>
-	<20170904212306.3020-1-n54@gmx.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <7cf547d4-e850-c5ec-2afa-2d699e1c0aa9@vivier.eu>
-Date: Mon, 4 Sep 2017 23:44:53 +0200
+	(envelope-from <groug@kaod.org>) id 1dozCm-0002nA-C1
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 17:46:56 -0400
+Received: from 7.mo178.mail-out.ovh.net ([46.105.58.91]:49442)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dozCm-0002mG-5T
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 17:46:52 -0400
+Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 802504AC77
+	for <qemu-devel@nongnu.org>; Mon,  4 Sep 2017 23:46:50 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Mon, 04 Sep 2017 23:46:44 +0200
+Message-ID: <150456160452.17000.3290192176290246589.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170904212306.3020-1-n54@gmx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4] target/m68k: Switch fpu_rom from
- make_floatx80() to make_floatx80_init()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH 0/4] ppc: fix migration with KVM PR (nested)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <n54@gmx.com>
-Cc: qemu-devel@nongnu.org, f4bug@amsat.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-Le 04/09/2017 à 23:23, Kamil Rytarowski a écrit :
-> GCC 4.7.2 on SunOS reports that the values assigned to array members are not
-> real constants:
-> 
-> target/m68k/fpu_helper.c:32:5: error: initializer element is not constant
-> target/m68k/fpu_helper.c:32:5: error: (near initialization for 'fpu_rom[0]')
-> rules.mak:66: recipe for target 'target/m68k/fpu_helper.o' failed
-> 
-> Convert the array to make_floatx80_init() to fix it.
-> Replace floatx80_pi-like constants with make_floatx80_init() as they are
-> defined as make_floatx80().
-> 
-> This fixes build on SmartOS (Joyent).
-> 
-> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  target/m68k/fpu_helper.c | 44 ++++++++++++++++++++++----------------------
->  1 file changed, 22 insertions(+), 22 deletions(-)
-> 
+A guest running with KVM PR ends up irresponsive after migration most of the
+time. This happens because the HPT allocated by QEMU is likely to have a
+different address on the destination than it had on the source, but we push
+the source address to KVM.
 
-Applied to my branch m68k-for-2.11
+This series does a little cleanup and fixes the issue. I could successfully
+test it with a nested setup (KVM PR running in KVM HV).
 
-Thanks,
-Laurent
+However, this isn't enough to fix migration when using KVM PR on baremetal...
+CPUs seem to end up looping on H_CEDE in the guest. I can't figure out what's
+happening... Any suggestion would be appreciated.
+
+Cheers,
+
+--
+Greg
+
+---
+
+Greg Kurz (4):
+      spapr: only update SDR1 once per-cpu during CAS
+      spapr: introduce a helper to compute the address of the HPT
+      ppc: kvm: introduce a helper to update SDR1 for a single CPU
+      ppc: kvm: update HPT pointer in KVM PR after migration
+
+
+ hw/ppc/spapr.c          |   15 +++++++++++++++
+ hw/ppc/spapr_cpu_core.c |    8 +++-----
+ hw/ppc/spapr_hcall.c    |   20 +++++++++-----------
+ include/hw/ppc/spapr.h  |    1 +
+ target/ppc/cpu.h        |    1 +
+ target/ppc/kvm.c        |   12 ++++++++----
+ target/ppc/kvm_ppc.h    |    3 ++-
+ target/ppc/machine.c    |    7 +++++++
+ 8 files changed, 46 insertions(+), 21 deletions(-)
