@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dosCL-0004dc-6C
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:18:03 -0400
+	(envelope-from <bounces@canonical.com>) id 1dosFR-0006f3-Sh
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:21:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dosCG-00068g-25
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:17:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58138)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dosCF-00068G-S5
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:17:51 -0400
-Date: Mon, 4 Sep 2017 11:17:48 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170904141748.GU7570@localhost.localdomain>
-References: <cover.1504228916.git.alistair.francis@xilinx.com>
-	<5bf40ca8376c537ac05dd848a84e072a88a1d939.1504228916.git.alistair.francis@xilinx.com>
+	(envelope-from <bounces@canonical.com>) id 1dosFM-0007rp-VE
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:21:09 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39872)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dosFM-0007r2-PH
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:21:04 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dosFK-0006uD-9N
+	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 14:21:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 81BD52E8225
+	for <qemu-devel@nongnu.org>; Mon,  4 Sep 2017 14:20:55 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5bf40ca8376c537ac05dd848a84e072a88a1d939.1504228916.git.alistair.francis@xilinx.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/7] hw/i386: Improve some of the
- warning messages
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 04 Sep 2017 14:08:07 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1714750 <1714750@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150442540217.17409.6458222878014636993.malonedeb@gac.canonical.com>
+Message-Id: <150453408755.19576.4419521562831850375.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1714750] Re: 2.10.0 cannot be installed on
+ case-insensitive file system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +37,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, alistair23@gmail.com, armbru@redhat.com, pbonzini@redhat.com, Don Slutz <dslutz@verizon.com>
+To: qemu-devel@nongnu.org
 
-On Fri, Sep 01, 2017 at 09:51:05AM -0700, Alistair Francis wrote:
-[...]
-> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> index 169a214d50..435eb2c458 100644
-> --- a/hw/i386/pc_q35.c
-> +++ b/hw/i386/pc_q35.c
-> @@ -101,9 +101,11 @@ static void pc_q35_init(MachineState *machine)
->          lowmem = pcms->max_ram_below_4g;
->          if (machine->ram_size - lowmem > lowmem &&
->              lowmem & ((1ULL << 30) - 1)) {
-> -            warn_report("Large machine and max_ram_below_4g(%"PRIu64
-> -                        ") not a multiple of 1G; possible bad performance.",
-> -                        pcms->max_ram_below_4g);
-> +            warn_report("Large machine as the ram size (0x%" PRIx64 ") is more"
-> +                        " then twice the size of the internal limit"
-> +                        " (0x%" PRIx64 ") and max-ram-below-4g (%"PRIu64")"
-> +                        " note a multiple of 1G; possible bad performance.",
-> +                        machine->ram_size, lowmem, pcms->max_ram_below_4g);
+There is a simple workaround: use
+  tar xf qemu-2.10.0.tar.xz --exclude qemu-2.10.0/roms/u-boot/scripts/Kconf=
+ig
 
-Here lowmem and max_ram_below_4g have exactly the same value,
-don't they?  There's no internal limit involved in this logic,
-only max_ram_below_4g and ram_size.
+-- =
 
--- 
-Eduardo
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1714750
+
+Title:
+  2.10.0 cannot be installed on case-insensitive file system
+
+Status in QEMU:
+  New
+
+Bug description:
+  The https://download.qemu.org/qemu-2.10.0.tar.bz2 tarball cannot be
+  unpacked on a case-insensitive file system because it has a file
+  qemu-2.10.0/roms/u-boot/scripts/Kconfig and a directory
+  qemu-2.10.0/roms/u-boot/scripts/kconfig. This prevents installation on
+  most macOS systems since by default the file system is case
+  insensitive. The 2.10.0 upgrade is blocked in Homebrew due to this
+  issue. See https://github.com/Homebrew/homebrew-core/pull/17467. This
+  is a regression from 2.9.0, which didn't have this problem.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1714750/+subscriptions
