@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <JBeulich@suse.com>) id 1donxF-0003PJ-KF
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:46:10 -0400
+	(envelope-from <marcel@redhat.com>) id 1doo1r-0005Bd-FD
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:50:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <JBeulich@suse.com>) id 1donxA-00086J-Qz
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:46:05 -0400
-Received: from prv-mh.provo.novell.com ([137.65.248.74]:43475)
+	(envelope-from <marcel@redhat.com>) id 1doo1h-000325-JF
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:50:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38418)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <JBeulich@suse.com>) id 1donxA-00085P-Hb
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:46:00 -0400
-Message-Id: <59AD3CF302000078001770C4@prv-mh.provo.novell.com>
-Date: Mon, 04 Sep 2017 03:45:55 -0600
-From: "Jan Beulich" <JBeulich@suse.com>
-References: <59A9A6260200007800176A6A@prv-mh.provo.novell.com>
-	<59A9A6260200007800176A6A@prv-mh.provo.novell.com>
-	<20170901182022.2m46ussfgiwo32c5@MacBook-Pro-de-Roger.local>
-	<59AD3349020000780017704A@prv-mh.provo.novell.com>
-	<20170904092331.zj2nj4nawzobjero@MacBook-Pro-de-Roger.local>
-In-Reply-To: <20170904092331.zj2nj4nawzobjero@MacBook-Pro-de-Roger.local>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH] xen: use vMSI related
- #define-s from public interface
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1doo1h-00030L-CR
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:50:41 -0400
+References: <1500236854-28271-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<be3aee2e-bfa0-b18c-f14f-eff2224b7d03@ilande.co.uk>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <8901c7e1-76f8-ff0e-c4e3-70b35e609e77@redhat.com>
+Date: Mon, 4 Sep 2017 12:50:31 +0300
+MIME-Version: 1.0
+In-Reply-To: <be3aee2e-bfa0-b18c-f14f-eff2224b7d03@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv3 0/2] pci: allow PCI bus slots to be
+ marked as reserved
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, xen-devel <xen-devel@lists.xenproject.org>, qemu-devel@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, mst@redhat.com, armbru@redhat.com
 
->>> On 04.09.17 at 11:23, <roger.pau@citrix.com> wrote:
-> On Mon, Sep 04, 2017 at 03:04:41AM -0600, Jan Beulich wrote:
->> >>> On 01.09.17 at 20:20, <roger.pau@citrix.com> wrote:
->> > On Fri, Sep 01, 2017 at 10:25:42AM -0600, Jan Beulich wrote:
->> >> Xen and qemu having identical #define-s (with different names) is a
->> >> strong hint that these should have been part of the public interface
->> >> from the very start. Use them if they're available, falling back to
->> >> privately defined values only when using older headers.
->> >>=20
->> >> Signed-off-by: Jan Beulich <jbeulich@suse.com>
->> >=20
->> > Reviewed-by: Roger Pau Monn=C3=A9 <roger.pau@citrix.com>
->>=20
->> Thanks.
->>=20
->> >> --- a/hw/xen/xen_pt_msi.c
->> >> +++ b/hw/xen/xen_pt_msi.c
->> >> @@ -18,6 +18,11 @@
->> >> =20
->> >>  #define XEN_PT_AUTO_ASSIGN -1
->> >> =20
->> >> +#ifndef XEN_DOMCTL_VMSI_X86_DEST_ID_MASK
->> >> +#if XEN_DOMCTL_INTERFACE_VERSION >=3D 0x0000000e
->> >=20
->> > XEN_DOMCTL_INTERFACE_VERSION is already 0xe (without you added
->> > defines), I guess it doesn't matter much because we only care for
->> > stable releases.
->>=20
->> Well, that's if you build qemu against master Xen. What about
->> people building against older Xen versions/headers?
->=20
-> Sorry, I think I haven't explained myself clearly. What I mean is
-> that if this change gets committed before the Xen side one, QEMU would
-> not compile against current Xen. As said, this is only a transitory
-> issue, and it's never going to be a problem in stable branches. This
-> is because of the "#error" that you add.
+On 31/08/2017 9:54, Mark Cave-Ayland wrote:
+> On 16/07/17 21:27, Mark Cave-Ayland wrote:
+> 
+>> For some machines it is impossible to plug devices into a particular PCI bus
+>> slot, e.g. for a real Ultra 5 there are 2 PCI bridges attached to the root
+>> bus behind which all devices must be plugged. Ignoring this rule will cause
+>> problems with interrupt routing since the interrupt numbers are calculated
+>> based upon PCI bridge id and secondary PCI bus slot id.
+>>
+>> This patchset adds a new slot_reserved_mask property to PCIBus which is a
+>> bitmask used to indicate whether PCI bus slots are reserved, i.e. they cannot
+>> be used for hot or cold plugging on a particular PCI bus.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>
+>> v3:
+>> - Rebase onto master
+>> - Simplify pci_bus_devfn_available() as suggested by Marcel
+>> - Also simplify pci_bus_devfn_reserved() in a similar manner
+>>
+>> v2:
+>> - Rename dev_reserved_mask to slot_reserved_mask as suggested by Marcel
+>> - Squash patches 2 and 3 together
+>>
+>>
+>> Mark Cave-Ayland (2):
+>>    pci: move check for existing devfn into new pci_bus_devfn_available()
+>>      helper
+>>    pci: add reserved slot check to do_pci_register_device()
+>>
+>>   hw/pci/pci.c             |   26 ++++++++++++++++++++++----
+>>   include/hw/pci/pci_bus.h |    1 +
+>>   2 files changed, 23 insertions(+), 4 deletions(-)
+> 
+> Ping? Is there any chance to get this in soon, as I ended up having to
+> drop a couple of sun4u patch series for 2.10 that were dependent upon
+> this :(
+> 
+> I have R-B tags from Marcel, however my understanding is that this patch
+> still needs review from Michael?
+> 
 
-Oh, yes, that's the case. I can't see an easy way around it, but I'm
-pretty sure the qemu side of it will see some further delay anyway.
+Hi Mark,
+I think Michael did not start yet to pick patches for 2.11 .
 
-Jan
+Thanks,
+Marcel
+
+> Here is the link to the patch that depends upon this:
+> https://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg03041.html
+> 
+> 
+> Many thanks,
+> 
+> Mark.
+> 
