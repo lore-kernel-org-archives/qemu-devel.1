@@ -1,39 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dolAO-0002KR-GL
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 02:47:30 -0400
+	(envelope-from <bounces@canonical.com>) id 1dolDd-0003j1-D4
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 02:50:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dolAJ-0002fv-Df
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 02:47:28 -0400
-Received: from mail-oi0-f51.google.com ([209.85.218.51]:32808)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dolAJ-0002eT-5A
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 02:47:23 -0400
-Received: by mail-oi0-f51.google.com with SMTP id r203so38033703oih.0
-	for <qemu-devel@nongnu.org>; Sun, 03 Sep 2017 23:47:22 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1dolDY-0004c6-VL
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 02:50:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54193)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dolDY-0004bP-K1
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 02:50:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dolDW-0000Rc-Hv
+	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 06:50:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 868752E80C9
+	for <qemu-devel@nongnu.org>; Mon,  4 Sep 2017 06:50:42 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CABgObfZTRAF7NJea=-SyNy67ZXFZVgoQLRjgswvPSs14euq+zw@mail.gmail.com>
-References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
-	<20170830082702.3011-3-Sergio.G.DelReal@gmail.com>
-	<20170830140738.GS18526@redhat.com>
-	<20170831074215.GA13619@stefanha-x1.localdomain>
-	<CABgObfYRUtdH9-7+zWx5Zur=iE_Qr5953+EOgcxRfVGnEonbmg@mail.gmail.com>
-	<CAJTBuyhJgVZ-A+AHatjAwPjsSv2Q-HxuF7nc1NpbWNmGnCOhVQ@mail.gmail.com>
-	<CABgObfaDtgixAEF8OPLuDf=21GiCwY3EUOPHujXPeLqYTup=Yw@mail.gmail.com>
-	<CAJTBuyhKqbXWjphh-t60TVjZfVFEYGyWFgEs4TmR+CE1q04GhQ@mail.gmail.com>
-	<CAJTBuyhvCySRHvrKMOW7fvjuogTUUUXi4QRjiJrrzfu-gbb5jQ@mail.gmail.com>
-	<CABgObfYAH3xtVO0mZCBiVnE5m=p_BqiopGJtovzL1LFBN0366Q@mail.gmail.com>
-	<CAJTBuyg2Q43RhiVo1KuYL6uKZG3ztt5j09oeEoOk5h8r16hjeA@mail.gmail.com>
-	<CABgObfaDuLvaxpb-GmefsNcoUsjJi3y_oAnfYuQU8LQcGtx9zQ@mail.gmail.com>
-	<CABgObfYx+uP2gmsT4SfagM-kZre-8RieyMQ21yOEcLOp38WaNg@mail.gmail.com>
-	<CAJTBuyj7rQgOUBZRb1p4JdSbSFbTLDJM6suArdpD3myug79WEQ@mail.gmail.com>
-	<CABgObfZTRAF7NJea=-SyNy67ZXFZVgoQLRjgswvPSs14euq+zw@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 4 Sep 2017 08:47:20 +0200
-Message-ID: <CABgObfYv7GCbjhtCe0e=+MJH0dw_sfqhT6RxaeL9M6vRwKRFwg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 02/13] hvf: add code base from Google's
- QEMU repository
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 04 Sep 2017 06:41:40 -0000
+From: ilovezfs <1714750@bugs.launchpad.net>
+Reply-To: Bug 1714750 <1714750@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150442540217.17409.6458222878014636993.malonedeb@gac.canonical.com>
+Message-Id: <150450730038.10925.5732268391815995664.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1714750] Re: 2.10.0 cannot be installed on
+ case-insensitive file system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,199 +37,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Izik Eidus <izik@veertu.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, vpalatin@chromium.org, "Hajnoczi, Stefan" <stefanha@gmail.com>, =?UTF-8?Q?Sergio_Andr=C3=A9s_G=C3=B3mez_del_Real?= <sergio.g.delreal@gmail.com>
+To: qemu-devel@nongnu.org
 
-Il 03 set 2017 8:49 PM, "Izik Eidus" <izik@veertu.com> ha scritto:
+The offending commit is
+https://github.com/u-boot/u-boot/commit/61304dbec36dc445bbe7d2c19b4da069586=
+1e0a8
+so it should be possible to downgrade u-boot until it gets fixed
+upstream, no?
 
-For now i want to get hypervisor framework merged into QEMU in required
-license. I did offer to open source everything needed from anka to the make
-QEMU being able to run any os using hypervisor.framework.
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1714750
 
-Having such code as open source will certainly help anyone who is going to
-work more on QEMU HVF so it would be great.
+Title:
+  2.10.0 cannot be installed on case-insensitive file system
 
-Sergio, in the meanwhile can you post v3 with an extra patch after 2/13
-that:
+Status in QEMU:
+  New
 
-- moves the task switch code to a new file with v2-only header
+Bug description:
+  The https://download.qemu.org/qemu-2.10.0.tar.bz2 tarball cannot be
+  unpacked on a case-insensitive file system because it has a file
+  qemu-2.10.0/roms/u-boot/scripts/Kconfig and a directory
+  qemu-2.10.0/roms/u-boot/scripts/kconfig. This prevents installation on
+  most macOS systems since by default the file system is case
+  insensitive. The 2.10.0 upgrade is blocked in Homebrew due to this
+  issue. See https://github.com/Homebrew/homebrew-core/pull/17467. This
+  is a regression from 2.9.0, which didn't have this problem.
 
-- changes all v2-only or v2-v3 headers in HVF files to v2-or-later
-
-Then Izik and Frank can reply with their Signed-off-by to that extra patch.
-
-Thanks,
-
-Paolo
-
-
-
->
-> I think it's safe to use v2+ for this code once Google agrees. The task
-> switch code, which is going to go away soon anyway and is isolated from
-the
-> rest, can be moved to a separate file for the time being.
->
-
-
-OK, such case would be simpler to me to go if this what you prefer, in such
-case, i will send the 1|2|3 patches splited from task switch and
-everything  beside task switch as gpl2v+.
-
-Whatever you guys decide...
-
-Thanks.
-
-
->
-> Paolo
->
->
-> >
-> > Paolo
-> >
-> > in
-> > such case all copyright go back to BSD2 and we can license it as GPL2v+
-> or
-> > whatever work for QEMU.
-> > If you want to go in such case what we will do would be the following:
-> > take kvm user space implemantion of qemu that is GPLv2+, integrate to it
-> > the hypervisor framework from Anka (in kvm user space style) - this will
-> > put us in hvf [1|2|3 / 13] in safe GPLv2+ and then we can back port the
-> > rest of Sergio changes to this stuff.
-> >
-> > I know this is less than ideal as it requires some changes to the
-current
-> > patch set, however it will make it 100% safe to be GPL2v+, what you guys
-> > think?, we can get this stuff done before the end of this week...
-> >
-> > Thanks.
-> >
-> >
-> > On Fri, Sep 1, 2017 at 12:39 AM, Izik Eidus <izik@veertu.com
-> <javascript:_e(%7B%7D,'cvml','izik@veertu.com');>> wrote:
-> >
-> > >
-> > >
-> > > On Fri, Sep 1, 2017 at 12:21 AM, Paolo Bonzini <pbonzini@redhat.com
-> <javascript:_e(%7B%7D,'cvml','pbonzini@redhat.com');>>
-> > > wrote:
-> > >
-> > >> Il 31 ago 2017 3:54 PM, "Izik Eidus" <izik@veertu.com
-> <javascript:_e(%7B%7D,'cvml','izik@veertu.com');>> ha scritto:
-> > >>
-> > >> > Izik, Vincent (assuming you are the right person to contact at
-> > Google),
-> > >> > can you reply to Daniel and Stefan?
-> > >> >
-> > >>
-> > >> Hi,
-> > >>
-> > >> What I suggest is that we will send our patch' again as gpl2+ and
-> clean
-> > >> the
-> > >> entire stuff to make sure they are falling into the right copyright
-> > >> category as required by QEMU.
-> > >>
-> > >>
-> > >> That's not necessary. Just you and Vincent replying to this thread
-> with
-> > a
-> > >> "Signed-off-by" line would be enough for Sergio to use the right
-> > license in
-> > >> his v3 submission. Sergio already made some non-trivial changes that
-> are
-> > >> needed for inclusion in QEMU from a supportability (e.g. dirty page
-> > >> tracking for graphics) or maintainability perspective (e.g. -cpu
-> > support),
-> > >> so the simplest thing to do is to retrofit the right license to his
-> > >> submission. You can do so if you can confirm that the code you used
-> only
-> > >> came from QEMU itself, Bochs or other GPLv2+/LGPL software (and the
-> rest
-> > >> was written by Veertu).
-> > >>
-> > >
-> > > Hi,
-> > >
-> > > Sure fine with us, let me go over all the code and see that all
-> copyright
-> > > that are needed are there, and then you can relicense all our code to
-> > > GPLv2+, I think I saw a a file that was missing Bochs copyright in it,
-> > so I
-> > > want to make sure that I fix this before and that all others are fine.
-> > >
-> > > Thanks.
-> > >
-> > >
-> > >>
-> > >> Google has already contributed the HAXN accelerator, so I am
-> moderately
-> > >> optimistic that they can help with HVF too.
-> > >>
-> > >> BTW, another thing that need to be integrated in order to make this
-> > stuff
-> > >> useful is the vmnet patch's, it is apple NAT for vms that allow
-guests
-> > to
-> > >> have networking...
-> > >>
-> > >>
-> > >> People can always use slirp (or tap with some more effort), so these
-> > >> patches are already a minimum viable feature and pretty close to
-being
-> > >> mergeable. But of course any other contribution is welcome!
-> > >>
-> > >> Paolo
-> > >>
-> > >>
-> > >> (altho that it come with a trick, without certificate it
-> > >> will require root permission, while hypverisor framework itself can
-> run
-> > >> without root)
-> > >>
-> > >> What do you guys think?
-> > >>
-> > >>
-> > >> >
-> > >> > Sergio worked on completing the QEMU port to Hypervisor.framework.
-> The
-> > >> > hvf-all.c file that Daniel pointed out as v2-only is derived from
-> > >> kvm-all.c
-> > >> > and hax-all.c, and should be under v2-or-later license. The others
-> > seem
-> > >> to
-> > >> > be either original or derived from Bochs, which is LGPL, so they
-> could
-> > >> be
-> > >> > LGPL or GPLv2+.
-> > >> >
-> > >> > Thanks,
-> > >> >
-> > >> > Paolo
-> > >> >
-> > >> >
-> > >> > There are benefits to having this code upstream.  If they ever want
-> to
-> > >> > rebase on qemu.git there will be less work for them.
-> > >>
-> > >>
-> > OK,
-> >
-> >
-> > > >
-> > >> > Stefan
-> > >> >
-> > >> >
-> > >> >
-> > >>
-> > >>
-> > >>
-> > >
-> >
-> >
-> >
->
->
->
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1714750/+subscriptions
