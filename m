@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dotW5-0003Vk-30
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:42:29 -0400
+	(envelope-from <david@redhat.com>) id 1dotX6-0004Ey-NG
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:43:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dotW0-0008S1-9n
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:42:25 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1504511031-26834-1-git-send-email-s1seetee@linux.vnet.ibm.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5577a43c-0c60-a1c7-e5ab-7b940225ea85@amsat.org>
-Date: Mon, 4 Sep 2017 12:42:01 -0300
-MIME-Version: 1.0
-In-Reply-To: <1504511031-26834-1-git-send-email-s1seetee@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v5] vl: exit if maxcpus is negative
+	(envelope-from <david@redhat.com>) id 1dotX1-0000q7-S9
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:43:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50762)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dotX1-0000p6-Je
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:43:23 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Mon,  4 Sep 2017 17:42:57 +0200
+Message-Id: <20170904154316.4148-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 00/19] s390x cleanups and CPU hotplug via
+ device_add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +22,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 09/04/2017 04:43 AM, Seeteena Thoufeek wrote:
-> ---Steps to Reproduce---
-> 
-> When passed a negative number to 'maxcpus' parameter, Qemu aborts
-> with a core dump.
-> 
-> Run the following command with maxcpus argument as negative number
-> 
-> ppc64-softmmu/qemu-system-ppc64 --nographic -vga none -machine
-> pseries,accel=kvm,kvm-type=HV -m size=200g -device virtio-blk-pci,
-> drive=rootdisk -drive file=/home/images/pegas-1.0-ppc64le.qcow2,
-> if=none,cache=none,id=rootdisk,format=qcow2 -monitor telnet
-> :127.0.0.1:1234,server,nowait -net nic,model=virtio -net
-> user -redir tcp:2000::22 -device nec-usb-xhci -smp 8,cores=1,
-> threads=1,maxcpus=-12
-> 
-> (process:12149): GLib-ERROR **: gmem.c:130: failed to allocate
->   18446744073709550568 bytes
-> 
-> Trace/breakpoint trap
-> 
-> Reported-by: R.Nageswara Sastry <rnsastry@linux.vnet.ibm.com>
-> Signed-off-by: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
+The first patches are a bunch of cleanups. I decided to go the
+extra mile and implement CPU hotplug via "device_add", as well as
+"query-hotpluggable-cpus". So the last patches in this series differ
+to v1. I tried to stick as much as possible to x86.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On s390x, only complete cores can be plugged. Cores have to be plugged in
+the right order (core-id 0, 1, 2 ...). CPU hot unplug is not supported
+by the architecture.
 
-> ---
-> v1 -> v2:
->    - Fix the error check in vl.c to make it generic.
-> v2 -> v3:
->    - Fix coding style pointed out by patchew.
->    - Fix check for "<= 0" instead of just "< 0".
-> v3 -> v4:
->    - Fix subject line.
->    - Removed space before ":" from vl.c:1248
->    - Removed Reviewed-by: flag
-> v4-> v5:
->    - Code rework to declare max_cpus as unsigned int in sysemu.h
->    - Remove the error check in vl.c referred in v2.
->    - declare max_cpus as unsigned int in vl.c
-> ---
->   include/sysemu/sysemu.h | 2 +-
->   vl.c                    | 6 +++---
->   2 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index b213696..c083869 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -113,7 +113,7 @@ extern int win2k_install_hack;
->   extern int alt_grab;
->   extern int ctrl_grab;
->   extern int smp_cpus;
-> -extern int max_cpus;
-> +extern unsigned int max_cpus;
->   extern int cursor_hide;
->   extern int graphic_rotate;
->   extern int no_quit;
-> diff --git a/vl.c b/vl.c
-> index 8e247cc..1470c21 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -164,7 +164,7 @@ Chardev *sclp_hds[MAX_SCLP_CONSOLES];
->   int win2k_install_hack = 0;
->   int singlestep = 0;
->   int smp_cpus = 1;
-> -int max_cpus = 1;
-> +unsigned int max_cpus = 1;
->   int smp_cores = 1;
->   int smp_threads = 1;
->   int acpi_enabled = 1;
-> @@ -4233,8 +4233,8 @@ int main(int argc, char **argv, char **envp)
->   
->       machine_class->max_cpus = machine_class->max_cpus ?: 1; /* Default to UP */
->       if (max_cpus > machine_class->max_cpus) {
-> -        error_report("Number of SMP CPUs requested (%d) exceeds max CPUs "
-> -                     "supported by machine '%s' (%d)", max_cpus,
-> +        error_report("Invalid SMP CPUs %d. The max CPUs "
-> +                     "supported by machine '%s' is %d", max_cpus,
->                        machine_class->name, machine_class->max_cpus);
->           exit(1);
->       }
-> 
+In addition, we now also print the CPU model list in sorted order and allow
+only 1 CPU for TCG.
+
+v1 -> v2:
+- "exec,dump,i386,ppc,s390x: don't include exec/cpu-all.h explicitly"
+-- added a few instances I missed
+- "s390x: get rid of s390-virtio.c"
+-- move everything in the first shot and clean the "cpu_states" stuff up
+   in later patches, when we have ms->possible_cpus.
+- Added "target/s390x: move typedef of S390CPU to its definition"
+- Added "s390x: move s390_virtio_hypercall() to s390-virtio-hcall.h"
+- Added "s390x: move two function declarations to s390-virtio-ccw.h"
+- Added "s390x: move sclp_service_call() to interrupt.c"
+- "target/s390x: use program_interrupt() in per_check_exception()"
+-- Add a comment describing my concern
+- "s390x: allow only 1 CPU with TCG"
+-- Add a #define to easily be able to change it (e.g. for development)
+- Added "target/s390x: set cpu->id for linux user when realizing"
+- "target/s390x: use "core-id" for cpu number/address/id handling"
+-- I now use "core-id" as property name, because that will be used by
+   device_add
+- "target/s390x: rename next_cpu_id to next_core_id"
+-- Also change to the term "core_id"
+- Added "s390x: print CPU definitions in sorted order"
+- Added "s390x: allow cpu hotplug via device_add"
+- Added "s390x: CPU hot unplug via device_del cannot work"
+- Added "s390x: implement query-hotpluggable-cpu"
+- Added "s390x: get rid of cpu_s390x_create()"
+
+David Hildenbrand (19):
+  exec,dump,i386,ppc,s390x: don't include exec/cpu-all.h explicitly
+  cpu: drop old comments describing members
+  s390x: get rid of s390-virtio.c
+  s390x: rename s390-virtio.h to s390-virtio-hcall.h
+  target/s390x: move typedef of S390CPU to its definition
+  s390x: move s390_virtio_hypercall() to s390-virtio-hcall.h
+  s390x: move two function declarations to s390-virtio-ccw.h
+  s390x: move sclp_service_call() to interrupt.c
+  target/s390x: use trigger_pgm_exception() in
+    s390_cpu_handle_mmu_fault()
+  target/s390x: use program_interrupt() in per_check_exception()
+  s390x: allow only 1 CPU with TCG
+  target/s390x: set cpu->id for linux user when realizing
+  target/s390x: use "core-id" for cpu number/address/id handling
+  target/s390x: rename next_cpu_id to next_core_id
+  s390x: print CPU definitions in sorted order
+  s390x: allow cpu hotplug via device_add
+  s390x: CPU hot unplug via device_del cannot work
+  s390x: implement query-hotpluggable-cpus
+  s390x: get rid of cpu_s390x_create()
+
+ dump.c                             |   1 -
+ exec.c                             |   2 -
+ hw/s390x/Makefile.objs             |   1 -
+ hw/s390x/s390-virtio-ccw.c         | 259 +++++++++++++++++++++++++++++++++++--
+ hw/s390x/s390-virtio-hcall.c       |   2 +-
+ hw/s390x/s390-virtio-hcall.h       |  21 +++
+ hw/s390x/s390-virtio.c             |  37 ------
+ hw/s390x/s390-virtio.h             |  35 -----
+ hw/s390x/sclp.c                    |  51 +-------
+ include/hw/s390x/s390-virtio-ccw.h |   3 +
+ include/hw/s390x/sclp.h            |   1 +
+ include/qom/cpu.h                  |   6 +-
+ qapi-schema.json                   |  16 +++
+ target/i386/arch_dump.c            |   1 -
+ target/i386/arch_memory_mapping.c  |   1 -
+ target/i386/svm_helper.c           |   1 -
+ target/ppc/arch_dump.c             |   1 -
+ target/s390x/arch_dump.c           |   1 -
+ target/s390x/cpu-qom.h             |   4 +-
+ target/s390x/cpu.c                 |  86 ++++--------
+ target/s390x/cpu.h                 |  19 +--
+ target/s390x/cpu_models.c          |  65 ++++++----
+ target/s390x/diag.c                |   1 +
+ target/s390x/excp_helper.c         |   5 +-
+ target/s390x/helper.c              |  47 +------
+ target/s390x/internal.h            |   1 -
+ target/s390x/interrupt.c           |  52 ++++++++
+ target/s390x/kvm.c                 |   3 +-
+ target/s390x/misc_helper.c         |  22 ++--
+ target/s390x/translate.c           |   5 +-
+ 30 files changed, 443 insertions(+), 307 deletions(-)
+ create mode 100644 hw/s390x/s390-virtio-hcall.h
+ delete mode 100644 hw/s390x/s390-virtio.h
+
+-- 
+2.13.5
