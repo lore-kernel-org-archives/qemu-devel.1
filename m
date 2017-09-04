@@ -1,40 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52025)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1dp0qX-0003QB-M1
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 19:32:06 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54520)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1dp12F-0006yN-3e
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 19:44:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1dp0qS-0006dJ-Pa
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 19:32:01 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43313
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
-	id 1dp0qS-0006cf-IX
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 19:31:56 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v84NT9n9021674
-	for <qemu-devel@nongnu.org>; Mon, 4 Sep 2017 19:31:55 -0400
-Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cs8rt3v1j-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 19:31:55 -0400
-Received: from localhost
-	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
-	Tue, 5 Sep 2017 09:31:52 +1000
-Date: Tue, 5 Sep 2017 09:31:47 +1000
-From: Sam Bobroff <sam.bobroff@au1.ibm.com>
-References: <747daf1a700a5340eeeedd9d98188bf89f75bb85.1504161284.git.sam.bobroff@au1.ibm.com>
-	<20170904101945.A6B6EAC041@b01ledav006.gho.pok.ibm.com>
+	(envelope-from <n54@gmx.com>) id 1dp12A-00069b-Gp
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 19:44:07 -0400
+References: <20170903164952.26760-1-n54@gmx.com>
+	<CAFEAcA-wB8JezCNjyU92U83+75C5NccfBHe1G5q-D67H4CMTKA@mail.gmail.com>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <747d805a-98ed-3d36-c4e7-5e6b21b89924@gmx.com>
+Date: Tue, 5 Sep 2017 01:46:15 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170904101945.A6B6EAC041@b01ledav006.gho.pok.ibm.com>
-Message-Id: <20170904233147.g4froekilptpud5h@tungsten.ozlabs.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/1] ppc: spapr: Move VCPU ID
- calculation into sPAPR
+In-Reply-To: <CAFEAcA-wB8JezCNjyU92U83+75C5NccfBHe1G5q-D67H4CMTKA@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="t8SX5MW7MiO7GaUOwQ1f4nX2bmPd5xQ2P"
+Subject: Re: [Qemu-devel] [PATCH] tests: Do not include lutil on SunOS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,120 +24,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Jonathan Perkin <jperkin@joyent.com>
 
-On Mon, Sep 04, 2017 at 12:18:57PM +0200, Greg Kurz wrote:
-> On Thu, 31 Aug 2017 16:38:46 +1000
-> Sam Bobroff <sam.bobroff@au1.ibm.com> wrote:
-> 
-> > Move the calculation of a CPU's VCPU ID out of the generic PPC code
-> > (ppc_cpu_realizefn()) and into sPAPR specific code
-> > (spapr_cpu_core_realize()) where it belongs.
-> > 
-> > Unfortunately, due to the way things are ordered, we still need to
-> > default the VCPU ID in ppc_cpu_realizfn() but at least doing that
-> > doesn't require any interaction with sPAPR.
-> > 
-> > Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
-> > ---
-> > This is follow up work arising from my work to clean up the way CPU VCPU IDs are
-> > handled on PowerPC. It had looked like it would be difficult to move the actual
-> > VCPU ID calculation out of generic code but it turned out to be OK.
-> > 
-> > It's based on dgibson/ppc-for-2.11.
-> > 
-> > Cheers,
-> > Sam.
-> > 
-> >  hw/ppc/spapr_cpu_core.c     | 11 +++++++++++
-> >  target/ppc/translate_init.c | 18 +++---------------
-> >  2 files changed, 14 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > index 5e319d9bbb..84dcc6e264 100644
-> > --- a/hw/ppc/spapr_cpu_core.c
-> > +++ b/hw/ppc/spapr_cpu_core.c
-> > @@ -211,6 +211,7 @@ error:
-> >  
-> >  static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-> >  {
-> > +    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-> >      sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-> >      sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
-> >      CPUCore *cc = CPU_CORE(OBJECT(dev));
-> > @@ -237,6 +238,16 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-> >          cs = CPU(obj);
-> >          cpu = POWERPC_CPU(cs);
-> >          cs->cpu_index = cc->core_id + i;
-> > +        cpu->vcpu_id = (cc->core_id * spapr->vsmt / smp_threads) + i;
-> 
-> According to what we currently have in the generic code, this should be:
-> 
-> ((cc->core_id + i) / smp_threads) * spapr->vsmt + ((cc->core_id + i) % smp_threads)
-> 
-> but since cc->core_id is a multiple of smp_threads and i < cc->nr_threads <= smp_threads,
-> then we can indeed simplify the computation as you did. :)
-> 
-> \o/
-> 
-> Reviewed-by: Greg Kurz <groug@kaod.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--t8SX5MW7MiO7GaUOwQ1f4nX2bmPd5xQ2P
+From: Kamil Rytarowski <n54@gmx.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Jonathan Perkin <jperkin@joyent.com>
+Message-ID: <747d805a-98ed-3d36-c4e7-5e6b21b89924@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH] tests: Do not include lutil on SunOS
+References: <20170903164952.26760-1-n54@gmx.com>
+ <CAFEAcA-wB8JezCNjyU92U83+75C5NccfBHe1G5q-D67H4CMTKA@mail.gmail.com>
+In-Reply-To: <CAFEAcA-wB8JezCNjyU92U83+75C5NccfBHe1G5q-D67H4CMTKA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for the review, and the nice simplification was David's idea :-)
+On 04.09.2017 11:32, Peter Maydell wrote:
+> On 3 September 2017 at 17:49, Kamil Rytarowski <n54@gmx.com> wrote:
+>> This fixes build on SmartOS (Joyent).
+>>
+>> Patch cherry-picked from pkgsrc by jperkin (Joyent).
+>>
+>> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+>> ---
+>>  tests/Makefile.include | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index f08b7418f0..0e5e6cb9b8 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -810,8 +810,10 @@ tests/migration/initrd-stress.img: tests/migratio=
+n/stress$(EXESUF)
+>>         rmdir $(INITRD_WORK_DIR)
+>>
+>>  ifeq ($(CONFIG_POSIX),y)
+>> +ifneq ($(CONFIG_SOLARIS),y)
+>>  LIBS +=3D -lutil
+>>  endif
+>> +endif
+>=20
+> I don't object to this patch in principle, but I don't think
+> this is the best way to fix the underlying problem.
+>=20
+> My assumption is that the issue is that Solaris doesn't
+> have a -lutil (it's helpful to quote the linker or
+> compiler error message for this kind of patch to clarify
+> what the failure is that we're trying to fix).
+>=20
 
-> > +        if (kvm_enabled() && !kvm_vcpu_id_is_valid(cpu->vcpu_id)) {
-> > +            error_setg(&local_err, "Can't create CPU with id %d in KVM",
-> > +                       cpu->vcpu_id);
-> > +            error_append_hint(&local_err, "Adjust the number of cpus to %d "
-> > +                              "or try to raise the number of threads per core\n",
-> > +                              cpu->vcpu_id * smp_threads / spapr->vsmt);
-> > +            goto err;
-> > +        }
-> > +
-> >  
-> >          /* Set NUMA node for the threads belonged to core  */
-> >          cpu->node_id = sc->node_id;
-> > diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> > index 7f6a349e43..1f7286c893 100644
-> > --- a/target/ppc/translate_init.c
-> > +++ b/target/ppc/translate_init.c
-> > @@ -9903,28 +9903,15 @@ static void ppc_cpu_realizefn(DeviceState *dev, Error **errp)
-> >      PowerPCCPU *cpu = POWERPC_CPU(dev);
-> >      PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-> >      Error *local_err = NULL;
-> > -#if !defined(CONFIG_USER_ONLY)
-> > -    int max_smt = kvmppc_smt_threads();
-> > -#endif
-> >  
-> >      cpu_exec_realizefn(cs, &local_err);
-> >      if (local_err != NULL) {
-> >          error_propagate(errp, local_err);
-> >          return;
-> >      }
-> > -
-> > -#if !defined(CONFIG_USER_ONLY)
-> > -    cpu->vcpu_id = (cs->cpu_index / smp_threads) * max_smt
-> > -        + (cs->cpu_index % smp_threads);
-> > -
-> > -    if (kvm_enabled() && !kvm_vcpu_id_is_valid(cpu->vcpu_id)) {
-> > -        error_setg(errp, "Can't create CPU with id %d in KVM", cpu->vcpu_id);
-> > -        error_append_hint(errp, "Adjust the number of cpus to %d "
-> > -                          "or try to raise the number of threads per core\n",
-> > -                          cpu->vcpu_id * smp_threads / max_smt);
-> > -        goto unrealize;
-> > +    if (cpu->vcpu_id == UNASSIGNED_CPU_INDEX) {
-> > +        cpu->vcpu_id = cs->cpu_index;
-> >      }
-> > -#endif
-> >  
-> >      if (tcg_enabled()) {
-> >          if (ppc_fixup_cpu(cpu) != 0) {
-> > @@ -10625,6 +10612,7 @@ static void ppc_cpu_initfn(Object *obj)
-> >      CPUPPCState *env = &cpu->env;
-> >  
-> >      cs->env_ptr = env;
-> > +    cpu->vcpu_id = UNASSIGNED_CPU_INDEX;
-> >  
-> >      env->msr_mask = pcc->msr_mask;
-> >      env->mmu_model = pcc->mmu_model;
-> 
+There is no libutil on SmartOS.
+
+I cannot provide any information about the proprietary Solaris here and
+in next questions.
+
+> It looks like we use libutil here for openpty, which
+> is used in the test-char test. But the condition we're
+> using in tests/Makefile.include isn't the same as the
+> one we used to decide whether to add -lutil to the
+> emulator binary link line, which is in configure:
+>=20
+> if test "$darwin" !=3D "yes" -a "$mingw32" !=3D "yes" -a "$solaris" !=3D=
+ yes -a \
+>         "$aix" !=3D "yes" -a "$haiku" !=3D "yes" ; then
+>     libs_softmmu=3D"-lutil $libs_softmmu"
+> fi
+>=20
+> So I think I'd prefer it if we have:
+>  * a configure test for "is openpty() in libutil"
+>  * use that to determine whether to add -lutil to
+>    libs_softmmu and to the libs for tests, rather than
+>    doing OS-specific tests
+>=20
+
+This looks cleaner. I will go for it.
+
+> Q: does Solaris still not have an openpty() implementation?
+> Currently we have a local implementation in util/qemu-openpty.c,
+> but if that workaround is only needed in old Solaris we don't
+> support any more we could perhaps drop it.
+>=20
+
+SmartOS does not have openpty(). I don't see it either in the mainstream
+Illumos-gate repository.
+
+According to pkgsrc, openpty() is in libutil (-lutil) on all BSDs and
+Darwin.
+
+> thanks
+> -- PMM
+>=20
+
+
+
+--t8SX5MW7MiO7GaUOwQ1f4nX2bmPd5xQ2P
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZreXNAAoJEEuzCOmwLnZsTxYQAJtnp6SLHbuEMVqlBgNssBS9
+RDsxbeGkCVzGqmk7IdizJIOGN3X+7Y9j5r2MIFfi4hu3e4D9MU1rozcr62TjcVhj
+q2tyVTOnwyeJQYg9D/Rsi3dml3wq40q3f86XqzSpw7snMRW/uyxwwEHXBgozFCg+
+gaQ3OSJey8MtNU1j7r9qjPeeg+/iy2AjqdEHiuHL5vS69OsTGU9ymHZC+QjEgLht
+dSDhk3DssHosa1x9ySOGUl0GwdnY9hkq4SXo/rJrMSBTBvioHAocmV0bQiAwYcA0
+ArQkJwHY6IWkLheBEj96hueXw2ir48mwF4owqOGmduIpQ0EFGDokhEFdDDw9cJyo
+Uj+Cccqo0qgLIu7A3msFPajxqOfjLQ3c5yJU2ZZ+Tx3QfJrwS1wAoIMlxiu6KZc7
+8zxVb414r7VcUVQrQx6KBX9HHUFU2JHByEHJ5GShpQ+7j5n2njyYaSaVJtvWl444
+tbK9Ctlt90NZH9A1b/O/Q8ND3glOGf/ALxWQkOszYOP9VH3z/+Zze9pBGGytsiQF
+bfA3jUMt1FGgujlT7biuDqn0wUKDdvdNoK2+DxC89+colGm0tiEGvFYH/x7AMFUD
+WtG0FCQGfGlXsXcJMnDo75Z7Ssexn+StA/jplsKhcAfAu/ad0Y989cX1+/qnFPDG
+b/zw+iwkbF+1fHpagrDN
+=agIo
+-----END PGP SIGNATURE-----
+
+--t8SX5MW7MiO7GaUOwQ1f4nX2bmPd5xQ2P--
