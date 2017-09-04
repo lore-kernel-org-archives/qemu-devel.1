@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dotXx-0004xg-RT
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:44:26 -0400
+	(envelope-from <laurent@vivier.eu>) id 1doth8-0004Mq-EH
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:53:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dotXs-0001Sp-VQ
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:44:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54698)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dotXs-0001S5-Nj
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:44:16 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Mon,  4 Sep 2017 17:43:16 +0200
-Message-Id: <20170904154316.4148-20-david@redhat.com>
-In-Reply-To: <20170904154316.4148-1-david@redhat.com>
-References: <20170904154316.4148-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 19/19] s390x: get rid of cpu_s390x_create()
+	(envelope-from <laurent@vivier.eu>) id 1doth4-0007Jz-1o
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:53:50 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:59347)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1doth3-0007JL-Oi
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:53:45 -0400
+References: <20170903163130.14288-1-n54@gmx.com>
+	<9f33a768-77d1-191b-8be3-35d625752cbf@vivier.eu>
+	<1257d6ba-9ca1-0940-af9e-a9ea7dea0287@amsat.org>
+	<941d403b-7413-517f-23af-2c0c88a3ec57@gmx.com>
+	<c1c4d90a-380f-4bd1-8aa4-8a970241020d@vivier.eu>
+	<CAFEAcA-RUoY5X1KsS2eAkte6G3g2CC_YYMg1e1XxxWd420LBow@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <a91359d6-457c-7164-18f9-050193f2d419@vivier.eu>
+Date: Mon, 4 Sep 2017 17:53:40 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-RUoY5X1KsS2eAkte6G3g2CC_YYMg1e1XxxWd420LBow@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] target/m68k: Change fpu_rom from const
+ static array to switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,163 +33,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Kamil Rytarowski <n54@gmx.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Now that there is only one user of cpu_s390x_create() left, make cpu
-creation looks like on x86.
-- Perform the model/properties split and checks in s390_init_cpus()
-- Parse features only once without having to remember if already parsed
-- Pass only the typename to s390x_new_cpu()
-- Use the typename of an existing CPU for hotplug via cpu-add
+Le 04/09/2017 à 17:02, Peter Maydell a écrit :
+> On 4 September 2017 at 15:09, Laurent Vivier <laurent@vivier.eu> wrote:
+>> You can:
+>>
+>> either replace the "#define floatx80_pi make_floatx80(...)" by a "const
+>> floatx80 floatx80_pi = make_floatx80_init(...)"
+>>
+>> or replace all the macros in the m68k/fpu_helper.c array by
+>> make_floatx80_init(...)
+> 
+> Taking a step back, what's different about floatx80 and float12
+> that means they need separate _init and non-init versions of
+> the macros, when for float16/float32/float64 we instead have
+> #define make_float32(x) __extension__ ({ float32 f32_val = {x}; f32_val; })
+> #define const_float32(x) { x }
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/s390x/s390-virtio-ccw.c | 29 +++++++++++++++++++++++++++--
- target/s390x/cpu.h         |  2 +-
- target/s390x/helper.c      | 45 ++-------------------------------------------
- target/s390x/internal.h    |  1 -
- 4 files changed, 30 insertions(+), 47 deletions(-)
+floatx80/float128 are structureq while float16/float32/float64 are
+native data types.
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 458615252c..8bd063377c 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -69,6 +69,10 @@ S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
- static void s390_init_cpus(MachineState *machine)
- {
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-+    const char *typename;
-+    gchar **model_pieces;
-+    ObjectClass *oc;
-+    CPUClass *cc;
-     int i;
- 
-     if (machine->cpu_model == NULL) {
-@@ -84,8 +88,25 @@ static void s390_init_cpus(MachineState *machine)
-     /* initialize possible_cpus */
-     mc->possible_cpu_arch_ids(machine);
- 
-+    model_pieces = g_strsplit(machine->cpu_model, ",", 2);
-+    if (!model_pieces[0]) {
-+        error_report("Invalid/empty CPU model name");
-+        exit(1);
-+    }
-+
-+    oc = cpu_class_by_name(TYPE_S390_CPU, model_pieces[0]);
-+    if (!oc) {
-+        error_report("Unable to find CPU definition: %s", model_pieces[0]);
-+        exit(1);
-+    }
-+    typename = object_class_get_name(oc);
-+    cc = CPU_CLASS(oc);
-+    /* after parsing, properties will be applied to all *typename* instances */
-+    cc->parse_features(typename, model_pieces[1], &error_fatal);
-+    g_strfreev(model_pieces);
-+
-     for (i = 0; i < smp_cpus; i++) {
--        s390x_new_cpu(machine->cpu_model, i, &error_fatal);
-+        s390x_new_cpu(typename, i, &error_fatal);
-     }
- }
- 
-@@ -396,8 +417,12 @@ static HotplugHandler *s390_get_hotplug_handler(MachineState *machine,
- static void s390_hot_add_cpu(const int64_t id, Error **errp)
- {
-     MachineState *machine = MACHINE(qdev_get_machine());
-+    ObjectClass *oc;
-+
-+    g_assert(machine->possible_cpus->cpus[0].cpu);
-+    oc = OBJECT_CLASS(CPU_GET_CLASS(machine->possible_cpus->cpus[0].cpu));
- 
--    s390x_new_cpu(machine->cpu_model, id, errp);
-+    s390x_new_cpu(object_class_get_name(oc), id, errp);
- }
- 
- static void s390_nmi(NMIState *n, int cpu_index, Error **errp)
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 878b6cc83e..4c639240de 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -690,7 +690,7 @@ const char *s390_default_cpu_model_name(void);
- 
- /* helper.c */
- #define cpu_init(cpu_model) cpu_generic_init(TYPE_S390_CPU, cpu_model)
--S390CPU *s390x_new_cpu(const char *cpu_model, uint32_t core_id, Error **errp);
-+S390CPU *s390x_new_cpu(const char *typename, uint32_t core_id, Error **errp);
- /* you can call this signal handler from your SIGBUS and SIGSEGV
-    signal handlers to inform the virtual CPU of exceptions. non zero
-    is returned if the signal was handled by the virtual CPU.  */
-diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-index dfb24ef5b2..97adbcc86d 100644
---- a/target/s390x/helper.c
-+++ b/target/s390x/helper.c
-@@ -68,52 +68,11 @@ void s390x_cpu_timer(void *opaque)
- }
- #endif
- 
--S390CPU *cpu_s390x_create(const char *cpu_model, Error **errp)
-+S390CPU *s390x_new_cpu(const char *typename, uint32_t core_id, Error **errp)
- {
--    static bool features_parsed;
--    char *name, *features;
--    const char *typename;
--    ObjectClass *oc;
--    CPUClass *cc;
--
--    name = g_strdup(cpu_model);
--    features = strchr(name, ',');
--    if (features) {
--        features[0] = 0;
--        features++;
--    }
--
--    oc = cpu_class_by_name(TYPE_S390_CPU, name);
--    if (!oc) {
--        error_setg(errp, "Unknown CPU definition \'%s\'", name);
--        g_free(name);
--        return NULL;
--    }
--    typename = object_class_get_name(oc);
--
--    if (!features_parsed) {
--        features_parsed = true;
--        cc = CPU_CLASS(oc);
--        cc->parse_features(typename, features, errp);
--    }
--    g_free(name);
--
--    if (*errp) {
--        return NULL;
--    }
--    return S390_CPU(CPU(object_new(typename)));
--}
--
--S390CPU *s390x_new_cpu(const char *cpu_model, uint32_t core_id, Error **errp)
--{
--    S390CPU *cpu;
-+    S390CPU *cpu = S390_CPU(object_new(typename));
-     Error *err = NULL;
- 
--    cpu = cpu_s390x_create(cpu_model, &err);
--    if (err != NULL) {
--        goto out;
--    }
--
-     object_property_set_int(OBJECT(cpu), core_id, "core-id", &err);
-     if (err != NULL) {
-         goto out;
-diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-index b4d3583b24..bc8f83129a 100644
---- a/target/s390x/internal.h
-+++ b/target/s390x/internal.h
-@@ -337,7 +337,6 @@ uint64_t get_psw_mask(CPUS390XState *env);
- void s390_cpu_recompute_watchpoints(CPUState *cs);
- void s390x_tod_timer(void *opaque);
- void s390x_cpu_timer(void *opaque);
--S390CPU *cpu_s390x_create(const char *cpu_model, Error **errp);
- void do_restart_interrupt(CPUS390XState *env);
- #ifndef CONFIG_USER_ONLY
- LowCore *cpu_map_lowcore(CPUS390XState *env);
--- 
-2.13.5
+> ? Could we move to consistency for the macro naming we're using?
+
+Do you mean "s/make_floatx80_init/const_floatx80/"?
+
+Laurent
