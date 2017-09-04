@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dooQz-00080r-9I
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 06:16:54 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dooSo-0000qW-GL
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 06:18:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dooQr-0005OZ-5f
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 06:16:49 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:27667
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dooQq-0005N5-Ci
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 06:16:41 -0400
-References: <1504181068-17822-1-git-send-email-douly.fnst@cn.fujitsu.com>
-	<1504181068-17822-2-git-send-email-douly.fnst@cn.fujitsu.com>
-	<20170904113907.2a6e0cc7@nial.brq.redhat.com>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <ec0c5471-5960-42aa-2723-f3dcb63d9fdc@cn.fujitsu.com>
-Date: Mon, 4 Sep 2017 18:16:31 +0800
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dooSj-0006AY-O8
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 06:18:42 -0400
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Date: Mon,  4 Sep 2017 13:18:00 +0300
+Message-ID: <20170904101800.22945-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20170904113907.2a6e0cc7@nial.brq.redhat.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 1/3] hw/acpi-build: Fix SRAT memory
- building in case of node 0 without RAM
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] qcow2: move
+ qcow2_store_persistent_dirty_bitmaps() before cache flushing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,133 +21,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, mst@redhat.com, rth@twiddle.net
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, pbutsykin@virtuozzo.com, den@openvz.org
 
+After calling qcow2_inactivate(), all qcow2 caches must be flushed, but thi=
+s
+may not happen, because the last call qcow2_store_persistent_dirty_bitmaps(=
+)
+can lead to marking l2/refcont cache as dirty.
 
+Let's move qcow2_store_persistent_dirty_bitmaps() before the ca=D1=81he flu=
+shing
+to fix it.
 
-At 09/04/2017 05:39 PM, Igor Mammedov wrote:
-> On Thu, 31 Aug 2017 20:04:26 +0800
-> Dou Liyang <douly.fnst@cn.fujitsu.com> wrote:
->
->> From: Eduardo Habkost <ehabkost@redhat.com>
->>
->> Currently, Using the fisrt node without memory on the machine makes
->> QEMU unhappy. With this example command line:
->>   ... \
->>   -m 1024M,slots=4,maxmem=32G \
->>   -numa node,nodeid=0 \
->>   -numa node,mem=1024M,nodeid=1 \
->>   -numa node,nodeid=2 \
->>   -numa node,nodeid=3 \
->> Guest reports "No NUMA configuration found" and the NUMA topology is
->> wrong.
->>
->> This is because when QEMU builds ACPI SRAT, it regards node 0 as the
->> default node to deal with the memory hole(640K-1M). this means the
->> node0 must have some memory(>1M), but, actually it can have no
->> memory.
->>
->> Fix this problem by  cut out the 640K hole in the same way the PCI
->> 4G hole does. Also do some cleanup.
->>
->> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
->> ---
->>  hw/i386/acpi-build.c | 30 +++++++++++++++++++++++-------
->>  1 file changed, 23 insertions(+), 7 deletions(-)
->>
->> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->> index 98dd424..48525a1 100644
->> --- a/hw/i386/acpi-build.c
->> +++ b/hw/i386/acpi-build.c
->> @@ -2318,6 +2318,9 @@ build_tpm2(GArray *table_data, BIOSLinker *linker)
->>                   (void *)tpm2_ptr, "TPM2", sizeof(*tpm2_ptr), 4, NULL, NULL);
->>  }
->>
->> +#define HOLE_640K_START  (640 * 1024)
->> +#define HOLE_640K_END   (1024 * 1024)
->> +
->>  static void
->>  build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->>  {
->> @@ -2373,17 +2376,30 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->>      next_base = 0;
->>      numa_start = table_data->len;
->>
->> -    numamem = acpi_data_push(table_data, sizeof *numamem);
->> -    build_srat_memory(numamem, 0, 640 * 1024, 0, MEM_AFFINITY_ENABLED);
->> -    next_base = 1024 * 1024;
->>      for (i = 1; i < pcms->numa_nodes + 1; ++i) {
->>          mem_base = next_base;
->>          mem_len = pcms->node_mem[i - 1];
->> -        if (i == 1) {
->> -            mem_len -= 1024 * 1024;
->> -        }
->>          next_base = mem_base + mem_len;
->>
->> +        /* Cut out the 640K hole */
->> +        if (mem_base <= HOLE_640K_START &&
->> +            next_base > HOLE_640K_START) {
->> +            mem_len -= next_base - HOLE_640K_START;
->> +            if (mem_len > 0) {
->> +                numamem = acpi_data_push(table_data, sizeof *numamem);
->> +                build_srat_memory(numamem, mem_base, mem_len, i - 1,
->> +                                  MEM_AFFINITY_ENABLED);
->> +            }
->> +
->> +            /* Check for the rare case: 640K < RAM < 1M */
->> +            if (next_base <= HOLE_640K_END) {
->> +                next_base = HOLE_640K_END;
-> Is this assignment really necessary?
->
+Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+---
+ block/qcow2.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-It is necessary, because we set mem_base to next_base before setting
-next_base;
-
-But, I can refine it:
-
-                                    MEM_AFFINITY_ENABLED);
-              }
-
-+            mem_base = HOLE_640K_END;
-              /* Check for the rare case: 640K < RAM < 1M */
-              if (next_base <= HOLE_640K_END) {
--                next_base = HOLE_640K_END;
-                  continue;
-              }
--            mem_base = HOLE_640K_END;
-              mem_len = next_base - HOLE_640K_END;
-          }
-
-Is it?
-
-Thanks,
-	dou.
-
-> it seems that next_base will be set at the start of the loop.
->
-
-
->> +                continue;
->> +            }
->> +            mem_base = HOLE_640K_END;
->> +            mem_len = next_base - HOLE_640K_END;
->> +        }
->> +
->>          /* Cut out the ACPI_PCI hole */
->>          if (mem_base <= pcms->below_4g_mem_size &&
->>              next_base > pcms->below_4g_mem_size) {
->> @@ -2395,7 +2411,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->>              }
->>              mem_base = 1ULL << 32;
->>              mem_len = next_base - pcms->below_4g_mem_size;
->> -            next_base += (1ULL << 32) - pcms->below_4g_mem_size;
->> +            next_base = mem_base + mem_len;
->>          }
->>          numamem = acpi_data_push(table_data, sizeof *numamem);
->>          build_srat_memory(numamem, mem_base, mem_len, i - 1,
->
->
->
->
+diff --git a/block/qcow2.c b/block/qcow2.c
+index a3679c69e8..dcf49084c5 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2037,6 +2037,14 @@ static int qcow2_inactivate(BlockDriverState *bs)
+     int ret, result =3D 0;
+     Error *local_err =3D NULL;
+=20
++    qcow2_store_persistent_dirty_bitmaps(bs, &local_err);
++    if (local_err !=3D NULL) {
++        result =3D -EINVAL;
++        error_report_err(local_err);
++        error_report("Persistent bitmaps are lost for node '%s'",
++                     bdrv_get_device_or_node_name(bs));
++    }
++
+     ret =3D qcow2_cache_flush(bs, s->l2_table_cache);
+     if (ret) {
+         result =3D ret;
+@@ -2051,14 +2059,6 @@ static int qcow2_inactivate(BlockDriverState *bs)
+                      strerror(-ret));
+     }
+=20
+-    qcow2_store_persistent_dirty_bitmaps(bs, &local_err);
+-    if (local_err !=3D NULL) {
+-        result =3D -EINVAL;
+-        error_report_err(local_err);
+-        error_report("Persistent bitmaps are lost for node '%s'",
+-                     bdrv_get_device_or_node_name(bs));
+-    }
+-
+     if (result =3D=3D 0) {
+         qcow2_mark_clean(bs);
+     }
+--=20
+2.14.1
