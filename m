@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dor0P-00008X-EA
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:02:30 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dor5v-0004qJ-94
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:08:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1doqzQ-0005yk-KE
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:01:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57190)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1doqzQ-0005xs-EB
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:00:32 -0400
-Date: Mon, 4 Sep 2017 14:00:28 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170904130028.GB27285@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAOE=1Z3xuudQenX+Oe11fPDZfrC_d02S50HQ9mJ=RfnJ0B5DUg@mail.gmail.com>
-	<20170904093623.GB7186@redhat.com>
-	<CAOE=1Z2HFVhD8b1TXaQFd8sGvqoddOeJoSds1ZxwzKSw8im7ng@mail.gmail.com>
-	<20170904101624.GE7186@redhat.com>
-	<CAOE=1Z2E-OJKFGp1QWwTbBm0evbtLDubv7JVS5hC8dPqK_9M-Q@mail.gmail.com>
-	<CAOE=1Z1=gc_BJPiCTfVj_-DCixDxzFE62W8szxtY6G9oXgNTiw@mail.gmail.com>
+	(envelope-from <imammedo@redhat.com>) id 1dor4B-0003VZ-Tz
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:07:15 -0400
+Date: Mon, 4 Sep 2017 15:05:24 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170904150524.7fdcc0a0@nial.brq.redhat.com>
+In-Reply-To: <20170904111054.GB2735@umbus.fritz.box>
+References: <1504099475-241036-9-git-send-email-imammedo@redhat.com>
+	<1504103170-259479-1-git-send-email-imammedo@redhat.com>
+	<20170904111054.GB2735@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAOE=1Z1=gc_BJPiCTfVj_-DCixDxzFE62W8szxtY6G9oXgNTiw@mail.gmail.com>
-Subject: Re: [Qemu-devel] How to use monitor socket in python to connect VM?
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 9/8] fixup! ppc: remove non implemented
+ cpu models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +25,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam <batmanustc@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
 
-On Mon, Sep 04, 2017 at 08:32:38PM +0800, Sam wrote:
-> There are two docs:
+On Mon, 4 Sep 2017 21:10:54 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> On Wed, Aug 30, 2017 at 04:26:10PM +0200, Igor Mammedov wrote:
+> > only TODO escaped defines were meant to be removed,
+> > but not TODO_USER_ONLY which are compiled in case of
+> > *-user targets.
+> > 
+> > So retirn back "440" model removed by mistake
+> > 
+> > Spotted-by: Thomas Huth <thuth@redhat.com>
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
 > 
-> https://wiki.qemu.org/index.php/Documentation/QMP
-
-This one is right
-
-> https://en.wikibooks.org/wiki/QEMU/Monitor
-
-This refers to the older  Human Monitor Protocol (HMP)
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> I've applied patch 8 with this change folded in, so as not to break
+> bisect.
+Thanks!
