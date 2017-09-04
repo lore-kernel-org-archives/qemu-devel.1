@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dorVl-0005o1-VJ
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:34:41 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dorfM-0003Br-Pf
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:44:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dorUm-00052N-UD
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:33:57 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:26005)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dorUm-0004pr-Ob
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:32:56 -0400
-References: <20170830225225.27925-1-f4bug@amsat.org>
-	<20170901151850.GD17184@localhost.localdomain>
-	<e5407d61-b21c-8ff5-1051-f75a6221e222@amsat.org>
-	<20170901154850.GP7570@localhost.localdomain>
-	<e8c0ae1e-e157-35a9-fe71-8eb5b44f8178@amsat.org>
-From: Yongbok Kim <yongbok.kim@imgtec.com>
-Message-ID: <5d7f7453-1303-7879-5437-73a79f2f0033@imgtec.com>
-Date: Mon, 4 Sep 2017 14:32:41 +0100
+	(envelope-from <cohuck@redhat.com>) id 1dorel-0003sr-KU
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:43:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47544)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dorel-0003rw-9p
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:43:15 -0400
+Date: Mon, 4 Sep 2017 15:43:03 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170904154303.48c525fd.cohuck@redhat.com>
+In-Reply-To: <20170901154300.2f83c59a.cohuck@redhat.com>
+References: <1504190408-11143-1-git-send-email-thuth@redhat.com>
+	<20170901154300.2f83c59a.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e8c0ae1e-e157-35a9-fe71-8eb5b44f8178@amsat.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] QOMify MIPS cpu
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] tests: Enable the drive_del test also
+ on s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Jason J Herne <jjherne@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Cleber Rosa <crosa@redhat.com>, Michael S Tsirkin <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
+On Fri, 1 Sep 2017 15:43:00 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
+> On Thu, 31 Aug 2017 16:40:08 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+> 
+> > We can use the drive_del test on s390x, too, to check that adding and
+> > deleting also works fine with the virtio-ccw bus. But we have to make
+> > sure that we use the devices with the "-ccw" suffix instead of the
+> > "-pci" suffix for the virtio-ccw transport on s390x. Introduce a helper
+> > function called qvirtio_get_dev_type() that returns the correct string
+> > for the current architecture.
+> > 
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > ---
+> >  I'm just sending a patch for this test now to get some feedback whether
+> >  I'm on the right track now. If this approach with qvirtio_get_dev_type()
+> >  gets accepted, I'll continue converting the other virtio tests, too.  
+> 
+> Looks good.
+> 
+> > 
+> >  tests/Makefile.include |  3 ++-
+> >  tests/drive_del-test.c | 25 ++++++++++++++++---------
+> >  tests/libqos/virtio.c  | 17 +++++++++++++++++
+> >  tests/libqos/virtio.h  |  3 +++
+> >  4 files changed, 38 insertions(+), 10 deletions(-)
+> >   
+> 
+> > diff --git a/tests/libqos/virtio.c b/tests/libqos/virtio.c
+> > index 9880a69..0879a62 100644
+> > --- a/tests/libqos/virtio.c
+> > +++ b/tests/libqos/virtio.c
+> > @@ -339,3 +339,20 @@ void qvirtqueue_set_used_event(QVirtQueue *vq, uint16_t idx)
+> >      /* vq->avail->used_event */
+> >      writew(vq->avail + 4 + (2 * vq->size), idx);
+> >  }
+> > +
+> > +/*
+> > + * qvirtio_get_dev_type:
+> > + * Returns: the preferred virtio bus/device type for the current architecture.
+> > + */
+> > +const char *qvirtio_get_dev_type(void)
+> > +{
+> > +    const char *arch = qtest_get_arch();
+> > +
+> > +    if (g_str_equal(arch, "arm") || g_str_equal(arch, "aarch64")) {
+> > +        return "device";  /* for virtio-mmio */  
+> 
+> Would not mind a comment from someone familiar with virtio-mmio, though.
+> 
+> > +    } else if (g_str_equal(arch, "s390x")) {
+> > +        return "ccw";
+> > +    } else {
+> > +        return "pci";
+> > +    }
+> > +}  
+> 
+> I'll take this, unless someone complains.
 
-On 01/09/2017 17:09, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 09/01/2017 12:48 PM, Eduardo Habkost wrote:
->> On Fri, Sep 01, 2017 at 12:44:42PM -0300, Philippe Mathieu-Daud=C3=A9 =
-wrote:
->>> On 09/01/2017 12:18 PM, Eduardo Habkost wrote:
->>>> On Wed, Aug 30, 2017 at 07:52:18PM -0300, Philippe Mathieu-Daud=C3=A9=
- wrote:
->>>>> Hi,
->>>>>
->>>>> This series is based on Igor's "complete cpu QOMification" [1] but
->>>>> only modify
->>>>> the MIPS part. Igor posted an updated series [2], both series shoul=
-d
->>>>> apply
->>>>> separately.
->>>>>
->>>>> Igor suggested on IRC this series could enter via the Machine core
->>>>> tree, so
->>>>> I added Eduardo and Marcel.
->>>>
->>>> I would do that only if the MIPS maintainers (CCed) aren't
->>>> willing to merge the series themselves.
->>>
->>> Aurelien told me he looked at the series but isn't comfortable with
->>> reviewing QOM code. Anyway since all patches are reviewed/tested and
->>> this is
->>> MIPS only series it also makes sens to me this enters via their tree.
->>>
->>> Eduardo can you Ack this series from the QOM part to help Aurelien?
->>
->> Absolutely:
->>
->> Acked-by: Eduardo Habkost <ehabkost@redhat.com>
->>
->> I will try to review the QOM code more closely and send
->> Reviewed-by lines too.
->=20
-> Thank you!
->=20
-
-I can take the series too. Please carry on reviewing.
-
-Regards,
-Yongbok
+Nobody complained, so I applied this.
