@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49074)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dovf1-0006cX-VW
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:59:52 -0400
+	(envelope-from <bounces@canonical.com>) id 1dovgT-0007Oc-A8
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 14:01:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dovex-0005vb-2m
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:59:48 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:36454)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dovew-0005vT-UI
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:59:42 -0400
-Received: by mail-qk0-x244.google.com with SMTP id w20so672589qkb.3
-	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 10:59:42 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1504545540-8002-1-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b92ede74-a487-dcba-dc68-f9427b3f881e@amsat.org>
-Date: Mon, 4 Sep 2017 14:59:38 -0300
+	(envelope-from <bounces@canonical.com>) id 1dovgO-0006nG-KM
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 14:01:17 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45512)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dovgO-0006mr-EI
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 14:01:12 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dovgM-00065Q-SP
+	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 18:01:11 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9EE102E80D3
+	for <qemu-devel@nongnu.org>; Mon,  4 Sep 2017 18:01:10 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1504545540-8002-1-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] configure: Drop AIX host support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 04 Sep 2017 17:48:02 -0000
+From: dcb <1715007@bugs.launchpad.net>
+Reply-To: Bug 1715007 <1715007@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <150454728299.11465.16419614126542209437.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1715007] [NEW] hw/block/onenand.c:520: dead code ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,103 +35,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: qemu-devel@nongnu.org
 
-On 09/04/2017 02:19 PM, Peter Maydell wrote:
-> Nobody has mentioned AIX host support on the mailing list for years,
-> and we have no test systems for it so it is most likely broken.
-> We've advertised in configure for two releases now that we plan
-> to drop support for this host OS, and have had no complaints.
-> Drop the AIX host support code.
-> 
-> We can also drop the now-unused AIX version of sys_cache_info().
-> 
-> Note that the _CALL_AIX define used in the PPC tcg backend is
-> also used for Linux PPC64, and so that code should not be removed.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Public bug reported:
 
-:~(
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+qemu/hw/block/onenand.c:520] -> [qemu/hw/block/onenand.c:521]: (warning)
+Opposite inner 'if' condition leads to a dead code block.
 
-> ---
->   configure        | 13 +------------
->   util/cacheinfo.c | 11 +----------
->   2 files changed, 2 insertions(+), 22 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index fb7e34a..931b3ba 100755
-> --- a/configure
-> +++ b/configure
-> @@ -350,7 +350,6 @@ cocoa="no"
->   softmmu="yes"
->   linux_user="no"
->   bsd_user="no"
-> -aix="no"
->   blobs="yes"
->   pkgversion=""
->   pie=""
-> @@ -554,8 +553,6 @@ elif check_define __NetBSD__; then
->     targetos='NetBSD'
->   elif check_define __APPLE__; then
->     targetos='Darwin'
-> -elif check_define _AIX; then
-> -  targetos='AIX'
->   else
->     # This is a fatal error, but don't report it yet, because we
->     # might be going to just print the --help text, or it might
-> @@ -767,10 +764,6 @@ SunOS)
->     LIBS="$solarisnetlibs $LIBS"
->     libs_qga="$solarisnetlibs $libs_qga"
->   ;;
-> -AIX)
-> -  aix="yes"
-> -  make="${MAKE-gmake}"
-> -;;
->   Haiku)
->     haiku="yes"
->     QEMU_CFLAGS="-DB_USE_POSITIVE_POSIX_ERRORS $QEMU_CFLAGS"
-> @@ -4214,7 +4207,7 @@ elif compile_prog "" "$pthread_lib -lrt" ; then
->   fi
->   
->   if test "$darwin" != "yes" -a "$mingw32" != "yes" -a "$solaris" != yes -a \
-> -        "$aix" != "yes" -a "$haiku" != "yes" ; then
-> +        "$haiku" != "yes" ; then
->       libs_softmmu="-lutil $libs_softmmu"
->   fi
->   
-> @@ -5523,10 +5516,6 @@ if test "$darwin" = "yes" ; then
->     echo "CONFIG_DARWIN=y" >> $config_host_mak
->   fi
->   
-> -if test "$aix" = "yes" ; then
-> -  echo "CONFIG_AIX=y" >> $config_host_mak
-> -fi
-> -
->   if test "$solaris" = "yes" ; then
->     echo "CONFIG_SOLARIS=y" >> $config_host_mak
->   fi
-> diff --git a/util/cacheinfo.c b/util/cacheinfo.c
-> index 593940f..db5172d 100644
-> --- a/util/cacheinfo.c
-> +++ b/util/cacheinfo.c
-> @@ -15,16 +15,7 @@ int qemu_dcache_linesize = 0;
->    * Operating system specific detection mechanisms.
->    */
->   
-> -#if defined(_AIX)
-> -# include <sys/systemcfg.h>
-> -
-> -static void sys_cache_info(int *isize, int *dsize)
-> -{
-> -    *isize = _system_configuration.icache_line;
-> -    *dsize = _system_configuration.dcache_line;
-> -}
-> -
-> -#elif defined(_WIN32)
-> +#if defined(_WIN32)
->   
->   static void sys_cache_info(int *isize, int *dsize)
->   {
-> 
+Source code is
+
+        for (b =3D 0; b < s->blocks; b ++) {
+            if (b >=3D s->blocks) {
+                s->status |=3D ONEN_ERR_CMD;
+                break;
+            }
+
+I am not sure if the if condition can be merely deleted, or something more
+complex needs to be implemented.
+
+Recent qemu trunk.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1715007
+
+Title:
+  hw/block/onenand.c:520: dead code ?
+
+Status in QEMU:
+  New
+
+Bug description:
+  qemu/hw/block/onenand.c:520] -> [qemu/hw/block/onenand.c:521]:
+  (warning) Opposite inner 'if' condition leads to a dead code block.
+
+  Source code is
+
+          for (b =3D 0; b < s->blocks; b ++) {
+              if (b >=3D s->blocks) {
+                  s->status |=3D ONEN_ERR_CMD;
+                  break;
+              }
+
+  I am not sure if the if condition can be merely deleted, or something more
+  complex needs to be implemented.
+
+  Recent qemu trunk.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1715007/+subscriptions
