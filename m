@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33250)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zack.cornelius@kove.net>) id 1doufl-0002eQ-FY
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 12:56:34 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34186)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1douib-00048F-T2
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 12:59:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zack.cornelius@kove.net>) id 1doufg-0008Jr-LS
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 12:56:29 -0400
-Received: from mail.kove.net ([67.109.75.252]:5338)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zack.cornelius@kove.net>)
-	id 1doufg-0008JO-G3
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 12:56:24 -0400
-Date: Mon, 4 Sep 2017 11:56:14 -0500 (CDT)
-From: Zack Cornelius <zack.cornelius@kove.net>
-Reply-To: Zack Cornelius <zack.cornelius@kove.net>
-Message-ID: <985325221.20010.1504544174723.JavaMail.zimbra@kove.net>
-In-Reply-To: <20170824192315.5897-1-ehabkost@redhat.com>
-References: <20170824192315.5897-1-ehabkost@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] hostmem-file: Add "discard-data"
- option
+	(envelope-from <n54@gmx.com>) id 1douiX-0001uh-17
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 12:59:25 -0400
+Received: from mout.gmx.net ([212.227.17.20]:65023)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1douiW-0001tW-N9
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 12:59:20 -0400
+From: Kamil Rytarowski <n54@gmx.com>
+Date: Mon,  4 Sep 2017 18:46:59 +0200
+Message-Id: <20170904164659.26915-1-n54@gmx.com>
+In-Reply-To: <20170903163130.14288-1-n54@gmx.com>
+References: <20170903163130.14288-1-n54@gmx.com>
+Subject: [Qemu-devel] [PATCH v2] target/m68k: Switch fpu_rom from
+ make_floatx80() to make_floatx80_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +24,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: laurent@vivier.eu
+Cc: qemu-devel@nongnu.org, f4bug@amsat.org, peter.maydell@linaro.org, Kamil Rytarowski <n54@gmx.com>
 
-I've tested this patch set, and it has the expected results.
+GCC 4.7.2 on SunOS reports that the values assigned to array members are not
+real constants:
 
-On a clean exit, with discard-data=on, madvise(MADV_REMOVE) is called, clearing any dirty data from RAM without needing to flush, and removing data from the underlying memory file. These results match our expected operation.
+target/m68k/fpu_helper.c:32:5: error: initializer element is not constant
+target/m68k/fpu_helper.c:32:5: error: (near initialization for 'fpu_rom[0]')
+rules.mak:66: recipe for target 'target/m68k/fpu_helper.o' failed
 
+Convert the array to make_floatx80_init() to fix it.
+Replace floatx80_pi-like constants with make_floatx80_init() as they are
+defined as make_floatx80().
 
-Run with the options:
+This fixes build on SmartOS (Joyent).
 
-qemu-system-x86_64 -smp 2 -m 8192 -enable-kvm -name ubuntu -vnc 0.0.0.0:5901 -object memory-backend-file,id=mem,size=4096M,mem-path=$MEM_PATH,share=on,discard-data=on -numa node,memdev=mem -mem-prealloc -hda $HD_PATH
+Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+---
+ target/m68k/fpu_helper.c | 44 ++++++++++++++++++++++----------------------
+ 1 file changed, 22 insertions(+), 22 deletions(-)
 
-While running (First output is the size on disk):
-
-[root@sr3 qemu]# ls -ls /root/qemu_mem/qemu_memory.raw --block-size 1
-8589934592 -rw-r--r--. 1 root root 8589934592 Sep  4 11:34 /root/qemu_mem/qemu_memory.raw
-
-At exit, dirty data was dropped, instead of flushed to disk.
-
-After shutting down, actual size on disk is 0:
-
-[root@sr3 qemu]# ls -ls /root/qemu_mem/qemu_memory.raw 
-0 -rw-r--r--. 1 root root 8589934592 Sep  4 11:35 /root/qemu_mem/qemu_memory.raw
-
---
-Zack
-
------ Original Message -----
-> From: "Eduardo Habkost" <ehabkost@redhat.com>
-> To: qemu-devel@nongnu.org
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Zack Cornelius" <zack.cornelius@kove.net>, "Paolo Bonzini"
-> <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, "Igor Mammedov" <imammedo@redhat.com>
-> Sent: Thursday, August 24, 2017 2:23:12 PM
-> Subject: [PATCH v2 0/3] hostmem-file: Add "discard-data" option
-
-> This series adds a new "discard-data" option to
-> memory-backend-file.  The new option will be useful if somebody
-> is sharing RAM contents on a pre-existing file using share=on,
-> but don't need data to be flushed to disk when QEMU exits.
-> 
-> Internally, it will trigger a madvise(MADV_REMOVE) call when the
-> memory backend is removed or when QEMU exits.
-> 
-> To make we actually trigger the new code when QEMU exits, the
-> first patch in the series ensures we destroy all user-created
-> objects when exiting QEMU.
-> 
-> Changes v1 -> v2:
-> * Original subject line of v1 was:
->  '[PATCH 0/5] hostmem-file: Add "persistent" option'
-> * Replaced 'persistent=no' with 'discard-data=yes', to make it
->  clear that the flag will destroy data on the backing file.
-> * Use qemu_madvise() instead of madvise()
->  * New patch added to series: "osdep: define QEMU_MADV_REMOVE"
-> * Call qemu_madvise() directly from the backend unparent()
->  method, insteead of adding a new flag to the memory API and
->  reusing ram_block_discard_range()
->  * In addition to simplifying the code a lot, this fixes a bug,
->    because v1 relied on getting the memory region reference
->    count back to 0, which doesn't happen when QEMU is exiting
->    because there's no machine cleanup code to ensure that.
-> 
-> Eduardo Habkost (3):
->  vl: Clean up user-creatable objects when exiting
->  osdep: Define QEMU_MADV_REMOVE
->  hostmem-file: Add "discard-data" option
-> 
-> include/qemu/osdep.h            |  7 +++++++
-> include/qom/object_interfaces.h |  8 ++++++++
-> backends/hostmem-file.c         | 29 +++++++++++++++++++++++++++++
-> qom/object_interfaces.c         |  5 +++++
-> vl.c                            |  1 +
-> qemu-options.hx                 |  5 ++++-
-> 6 files changed, 54 insertions(+), 1 deletion(-)
-> 
-> --
-> 2.9.4
+diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
+index bdfc537c68..8afd319ede 100644
+--- a/target/m68k/fpu_helper.c
++++ b/target/m68k/fpu_helper.c
+@@ -29,28 +29,28 @@
+  */
+ 
+ static const floatx80 fpu_rom[128] = {
+-    [0x00] = floatx80_pi,                                   /* Pi */
+-    [0x0b] = make_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
+-    [0x0c] = make_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
+-    [0x0d] = make_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
+-    [0x0e] = make_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
+-    [0x0f] = floatx80_zero,                                 /* Zero     */
+-    [0x30] = floatx80_ln2,                                  /* ln(2)    */
+-    [0x31] = make_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
+-    [0x32] = floatx80_one,                                  /* 10^0     */
+-    [0x33] = make_floatx80(0x4002, 0xa000000000000000ULL),  /* 10^1     */
+-    [0x34] = make_floatx80(0x4005, 0xc800000000000000ULL),  /* 10^2     */
+-    [0x35] = make_floatx80(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
+-    [0x36] = make_floatx80(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
+-    [0x37] = make_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
+-    [0x38] = make_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
+-    [0x39] = make_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
+-    [0x3a] = make_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
+-    [0x3b] = make_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
+-    [0x3c] = make_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
+-    [0x3d] = make_floatx80(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
+-    [0x3e] = make_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
+-    [0x3f] = make_floatx80(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
++    [0x00] = make_floatx80_init(0x4000, 0x0c90fdaa22168c235LL),  /* Pi       */
++    [0x0b] = make_floatx80_init(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
++    [0x0c] = make_floatx80_init(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
++    [0x0d] = make_floatx80_init(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
++    [0x0e] = make_floatx80_init(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
++    [0x0f] = make_floatx80_init(0x0000, 0x00000000000000000LL),  /* Zero     */
++    [0x30] = make_floatx80_init(0x3ffe, 0x0b17217f7d1cf79acLL),  /* ln(2)    */
++    [0x31] = make_floatx80_init(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
++    [0x32] = make_floatx80_init(0x3fff, 0x08000000000000000LL),  /* 10^0     */
++    [0x33] = make_floatx80_init(0x4002, 0xa000000000000000ULL),  /* 10^1     */
++    [0x34] = make_floatx80_init(0x4005, 0xc800000000000000ULL),  /* 10^2     */
++    [0x35] = make_floatx80_init(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
++    [0x36] = make_floatx80_init(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
++    [0x37] = make_floatx80_init(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
++    [0x38] = make_floatx80_init(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
++    [0x39] = make_floatx80_init(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
++    [0x3a] = make_floatx80_init(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
++    [0x3b] = make_floatx80_init(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
++    [0x3c] = make_floatx80_init(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
++    [0x3d] = make_floatx80_init(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
++    [0x3e] = make_floatx80_init(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
++    [0x3f] = make_floatx80_init(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
+ };
+ 
+ int32_t HELPER(reds32)(CPUM68KState *env, FPReg *val)
+-- 
+2.14.1
