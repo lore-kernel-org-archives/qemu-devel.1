@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dolDd-0003j1-D4
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 02:50:50 -0400
+	(envelope-from <lvivier@redhat.com>) id 1dolGY-0004vb-3O
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 02:53:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dolDY-0004c6-VL
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 02:50:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54193)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dolDY-0004bP-K1
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 02:50:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dolDW-0000Rc-Hv
-	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 06:50:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 868752E80C9
-	for <qemu-devel@nongnu.org>; Mon,  4 Sep 2017 06:50:42 +0000 (UTC)
+	(envelope-from <lvivier@redhat.com>) id 1dolGS-0006uC-5g
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 02:53:50 -0400
+References: <1504030416-18618-1-git-send-email-thuth@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <eb148e1c-6cfa-b871-c201-de3f3565e4c8@redhat.com>
+Date: Mon, 4 Sep 2017 08:53:37 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 04 Sep 2017 06:41:40 -0000
-From: ilovezfs <1714750@bugs.launchpad.net>
-Reply-To: Bug 1714750 <1714750@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150442540217.17409.6458222878014636993.malonedeb@gac.canonical.com>
-Message-Id: <150450730038.10925.5732268391815995664.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1714750] Re: 2.10.0 cannot be installed on
- case-insensitive file system
+In-Reply-To: <1504030416-18618-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.11] tests: Fix broken
+ ivshmem-server-msi/-irq tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,35 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-The offending commit is
-https://github.com/u-boot/u-boot/commit/61304dbec36dc445bbe7d2c19b4da069586=
-1e0a8
-so it should be possible to downgrade u-boot until it gets fixed
-upstream, no?
+On 29/08/2017 20:13, Thomas Huth wrote:
+> Broken with commit b4ba67d9a7025 ("libqos: Change PCI accessors to take
+> opaque BAR handle") a while ago, but nobody noticed since the tests are
+> only run in SPEED=slow mode: The msix_pba_bar is not correctly initialized
 
--- =
+you mean "SPEED=quick"?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1714750
+> anymore if bir_pba has the same value as bir_table. With this fix,
+> "make check SPEED=slow" should work fine again.
+> 
+> Fixes: b4ba67d9a702507793c2724e56f98e9b0f7be02b
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tests/libqos/pci.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
+> index 2dcdead..28d576c 100644
+> --- a/tests/libqos/pci.c
+> +++ b/tests/libqos/pci.c
+> @@ -120,6 +120,8 @@ void qpci_msix_enable(QPCIDevice *dev)
+>      bir_pba = table & PCI_MSIX_FLAGS_BIRMASK;
+>      if (bir_pba != bir_table) {
+>          dev->msix_pba_bar = qpci_iomap(dev, bir_pba, NULL);
+> +    } else {
+> +        dev->msix_pba_bar = dev->msix_table_bar;
+>      }
+>      dev->msix_pba_off = table & ~PCI_MSIX_FLAGS_BIRMASK;
+>  
+> @@ -138,8 +140,11 @@ void qpci_msix_disable(QPCIDevice *dev)
+>      qpci_config_writew(dev, addr + PCI_MSIX_FLAGS,
+>                                                  val & ~PCI_MSIX_FLAGS_ENABLE);
+>  
+> +    if (dev->msix_pba_bar.addr != dev->msix_table_bar.addr) {
+> +        qpci_iounmap(dev, dev->msix_pba_bar);
+> +    }
+>      qpci_iounmap(dev, dev->msix_table_bar);
+> -    qpci_iounmap(dev, dev->msix_pba_bar);
+> +
+>      dev->msix_enabled = 0;
+>      dev->msix_table_off = 0;
+>      dev->msix_pba_off = 0;
+> 
 
-Title:
-  2.10.0 cannot be installed on case-insensitive file system
-
-Status in QEMU:
-  New
-
-Bug description:
-  The https://download.qemu.org/qemu-2.10.0.tar.bz2 tarball cannot be
-  unpacked on a case-insensitive file system because it has a file
-  qemu-2.10.0/roms/u-boot/scripts/Kconfig and a directory
-  qemu-2.10.0/roms/u-boot/scripts/kconfig. This prevents installation on
-  most macOS systems since by default the file system is case
-  insensitive. The 2.10.0 upgrade is blocked in Homebrew due to this
-  issue. See https://github.com/Homebrew/homebrew-core/pull/17467. This
-  is a regression from 2.9.0, which didn't have this problem.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1714750/+subscriptions
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
