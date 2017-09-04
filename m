@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51936)
+Received: from eggs.gnu.org ([208.118.235.92]:59163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dor85-0006mm-5J
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:13:32 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dorJh-0006XG-Qh
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:22:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dor71-0006l3-3h
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:09:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44910)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dor70-0006fK-Os
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:08:23 -0400
-Date: Mon, 4 Sep 2017 10:08:14 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170904130814.GR7570@localhost.localdomain>
-References: <20170901154542.5687-1-cascardo@canonical.com>
-	<20170901161118.GQ7570@localhost.localdomain>
-	<2ab3aaef-c6d7-ae3d-808b-f947dcb3ed1c@cn.fujitsu.com>
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dorIJ-0000rx-9t
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 09:21:27 -0400
+References: <20170828055631.GB3258@host-172-16-90-85.openstacklocal>
+	<7327a956-aef3-a8da-13ff-53073039802f@redhat.com>
+	<20170829025645.GA30307@host-172-16-90-85.openstacklocal>
+	<17126413-cb74-a633-0138-5bd4e5dab315@virtuozzo.com>
+	<20170831065515.GA22443@host-172-16-90-85.openstacklocal>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <d101b33b-e411-5a23-c92c-e6e411d79173@virtuozzo.com>
+Date: Mon, 4 Sep 2017 16:17:42 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2ab3aaef-c6d7-ae3d-808b-f947dcb3ed1c@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH] x86/acpi: build SRAT when memory hotplug
- is enabled
+In-Reply-To: <20170831065515.GA22443@host-172-16-90-85.openstacklocal>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] reduce write bandwidth of qcow2 driver while
+ allocating new cluster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,114 +28,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Cc: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Liu Qing <liuqing@huayun.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Mon, Sep 04, 2017 at 09:38:47AM +0800, Dou Liyang wrote:
-> Hi Eduardo, Thadeu,
-> 
-> At 09/02/2017 12:11 AM, Eduardo Habkost wrote:
-> > On Fri, Sep 01, 2017 at 12:45:42PM -0300, Thadeu Lima de Souza Cascardo wrote:
-> > > Linux uses SRAT to determine the maximum memory in a system, which is
-> > > used to determine whether to use the swiotlb for IOMMU or not for a
-> > > device that supports only 32 bits of addresses.
-> > 
-> > Do you have a pointer to the corresponding Linux code, for
-> > reference?  Which SRAT entries Linux uses to make this decision?
-> > 
-> > > 
-> > > When there is no NUMA configuration, qemu will not build SRAT. And when
-> > > memory hotplug is done, some Linux device drivers start failing.
-> > > 
-> > > Tested by running with -m 512M,slots=8,maxmem=1G, adding the memory,
-> > > putting that online and using the system. Without the patch, swiotlb is
-> > > not used and ATA driver fails. With the patch, swiotlb is used, no
-> > > driver failure is observed.
-> > > 
-> > > Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-> > 
-> > As far as I can see, this will only add APIC entries and a memory
-> > affinity entry for the first 640KB (which would be obviously
-> > wrong) if pcms->numa_nodes is 0.
-> > 
-> 
-> In my opinion, this may also add the hotpluggable memory, and see the
-> following commemts.
-> 
->     /*
->      * Entry is required for Windows to enable memory hotplug in OS
->      * and for Linux to enable SWIOTLB when booted with less than
->            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->      * 4G of RAM. Windows works better if the entry sets proximity
->      * to the highest NUMA node in the machine.
->      * Memory devices may override proximity set by this entry,
->      * providing _PXM method if necessary.
->      */
->     if (hotplugabble_address_space_size) {
->         numamem = acpi_data_push(table_data, sizeof *numamem);
->         build_srat_memory(numamem, pcms->hotplug_memory.base,
->                           hotplugabble_address_space_size, pcms->numa_nodes
-> - 1,
->                           MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
->     }
 
-You are correct, I didn't see that part of the code.  If that's
-the entry that's missing, the patch makes sense.  Thanks!
 
-However, the resulting tables still don't look correct: it will
-generate an entry assigned to NUMA node (uint32_t)-1 if no NUMA
-nodes are configured elsewhere, some APIC entries, but no entries
-for the rest of the memory.
+On 31/8/2017 9:55 AM, Liu Qing wrote:
+> On Wed, Aug 30, 2017 at 01:15:33PM +0300, Anton Nefedov wrote:
+>>
+>> On 29/08/2017 05:56, Liu Qing wrote:
+>>> On Mon, Aug 28, 2017 at 10:46:34AM -0500, Eric Blake wrote:
+>>>> [adding qemu-block]
+>>>>
+>>>> On 08/28/2017 12:56 AM, Liu Qing wrote:
+>>>>> Dear list,
+>>>>>     Recently I used fio to test qcow2 driver in the guest os, and found out
+>>>>> that when a new cluster is allocated the 4K IO will occupy 64K(default cluster
+>>>>> size) bandwith.
+>>>>>     From the code qcow2 driver will fill the unused part of new allocated
+>>>>> cluster with 0 in perform_cow. These 0s are set in qcow2_co_readv when the read
+>>>>> destination is not allocated and it has no backing file. Could I forbidden any
+>>>>> further write in copy_sectors if the copy source is not allocated and it has
+>>>>> no backing file? So only the requested data is written to the cluster. Function
+>>>>> copy_sectors is only used by perform_cow in the master branch.
+>>>>
+>>>> There have already been discussions on optimizing COW writes in a manner
+>>>> similar to what you are describing; for example,
+>>>>
+>>>> https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg00109.html
+>>> Thanks Eric, this is what I am looking for.
+>>> The only concern I have is in patch '[Qemu-devel] [PATCH v4 12/15] qcow2: skip
+>>> writing zero buffers to empty' it says:
+>>>
+>>> It can be detected that
+>>>   1. COW alignment of a write request is zeroes
+>>>   2. Respective areas on the underlying BDS already read as zeroes
+>>>      after being preallocated previously
+>>>   If both of these true, COW may be skipped
+>>>
+>>> Will writing zero be skipped if the disk is not preallocated? @Anton
+>>>
+>>
+>> Hi,
+>>
+>> In short, no, it will not (with my patches), but there might be some way
+>> if that's what you really need.
+>>
+>>
+>> First of all, this might be undesirable as you lose the cluster-size
+>> data locality: now the whole cluster is written at once and is expected
+>> to reside in the contiguous area on the physical drive.
+>>
+>> Secondly, I think there is no guarantee that the underlying bs->file
+>> image reads back as zeroes if the cluster is unallocated on qcow2 level.
+> Why we need this guarantee? If the cluster is unallocated, it means no
+> one used these clusters previously. So why should these unallocated
+> clusters be read back as zeroes?
 
-Igor's suggestion to enable NUMA implicitly sounds safer to me.
+Hi, sorry I missed your mail;
 
-> 
-> 
-> Thanks,
-> 	dou.
-> 
-> > Once we apply the "Fix SRAT memory building in case of node 0
-> > without RAM" patch from Dou Liyang, no memory affinity entries
-> > will be generated if pcms->numa_nodes is 0.  Would this cause the
-> > problem to happen again?
-> > 
-> 
-> 
-> 
-> > 
-> > > ---
-> > >  hw/i386/acpi-build.c | 5 ++++-
-> > >  1 file changed, 4 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > > index 98dd424678..fb94249779 100644
-> > > --- a/hw/i386/acpi-build.c
-> > > +++ b/hw/i386/acpi-build.c
-> > > @@ -2645,6 +2645,9 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-> > >      GArray *tables_blob = tables->table_data;
-> > >      AcpiSlicOem slic_oem = { .id = NULL, .table_id = NULL };
-> > >      Object *vmgenid_dev;
-> > > +    ram_addr_t hotplugabble_address_space_size =
-> > > +        object_property_get_int(OBJECT(pcms), PC_MACHINE_MEMHP_REGION_SIZE,
-> > > +                                NULL);
-> > > 
-> > >      acpi_get_pm_info(&pm);
-> > >      acpi_get_misc_info(&misc);
-> > > @@ -2708,7 +2711,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-> > >              build_tpm2(tables_blob, tables->linker);
-> > >          }
-> > >      }
-> > > -    if (pcms->numa_nodes) {
-> > > +    if (pcms->numa_nodes || hotplugabble_address_space_size) {
-> > >          acpi_add_table(table_offsets, tables_blob);
-> > >          build_srat(tables_blob, tables->linker, machine);
-> > >          if (have_numa_distance) {
-> > > --
-> > > 2.11.0
-> > > 
-> > 
-> 
-> 
+I'm actually not sure if this is fixed in some spec or smth, that we
+must read 0 from the never-written-to areas.
 
--- 
-Eduardo
+I can guess why it looks quite desirable - suppose we had a guest offset
+X which mapped to the image offset Y, then the cluster got discarded and
+the new guest offset Z mapped to the image offset Y - then the guest can
+read old data from the other offset. But of course the sensitive data at
+X should be explicitly overwritten by guest means, rather than just
+discarded.
+
+/Anton
+
+>>
+>> For example, the unallocated cluster could have been used earlier but
+>> then discarded. Discard passthrough is configurable so discard may not
+>> be passed down to the underlying image. And I guess that in general,
+>> even if it is passed, there is no strong requirement on reading back as
+>> zeroes - look at qcow2 discard handling - discard head and tail which do
+>> not cover full clusters are ignored.
+>>
+>> _perhaps_, one may expect that there will be zeroes if the cluster is
+>> allocated at the end of file
+>> (see 'clusters_are_trailing' detection here
+>> https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg00122.html)
+>>
+>> but I haven't thought about all corner cases here.
+>>
+>>
+>> /Anton
+>>
+>>> BTW: why the code in the patch is a little different than the latest
+>>> master branch? For example I don't have the is_zero function but only
+>>> get is_zero_sectors. Is there something wrong with my settings?
+>>>
+>>> My repo:
+>>> # git remote -v
+>>> origin  git://git.qemu-project.org/qemu.git (fetch)
+>>> origin  git://git.qemu-project.org/qemu.git (push)
+>>>
+>>> Thanks.
+>>>>
+>>>> --
+>>>> Eric Blake, Principal Software Engineer
+>>>> Red Hat, Inc.           +1-919-301-3266
+>>>> Virtualization:  qemu.org | libvirt.org
+>>>>
+>>>
+>>>
