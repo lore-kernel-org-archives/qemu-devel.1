@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dorwJ-0003g4-Sx
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:01:31 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dorwO-0003iQ-RT
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:01:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dorwF-00041H-6B
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:01:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39252)
+	(envelope-from <imammedo@redhat.com>) id 1dorwG-00043g-SV
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:01:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50824)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dorwE-00040D-TQ
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:01:19 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dorwG-00041t-BY
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:01:20 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon,  4 Sep 2017 16:01:00 +0200
-Message-Id: <1504533662-198084-5-git-send-email-imammedo@redhat.com>
+Date: Mon,  4 Sep 2017 16:01:01 +0200
+Message-Id: <1504533662-198084-6-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1504533662-198084-1-git-send-email-imammedo@redhat.com>
 References: <1504533662-198084-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/6] vl.c: convert cpu_model to cpu type and
- set of global properties before machine_init()
+Subject: [Qemu-devel] [PATCH 5/6] pc: use generic cpu_model parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,106 +24,163 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Andrew Jones <drjones@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Andrew Jones <drjones@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-All machines that support user specified cpu_model either call
-cpu_generic_init() or cpu_class_by_name()/CPUClass::parse_features
-to parse feature string and to get CPU type to create.
+define default CPU type in generic way in pc_machine_class_init()
+and let common machine code to handle cpu_model parsing
 
-Which leads to code duplication and hard-codding default CPU model
-within machine_foo_init() code. Which makes it impossible to
-get CPU type before machine_init() is run.
-
-So instead of setting default CPUs models and doing parsing in
-target specific machine_foo_init() in various ways, provide
-a generic data driven cpu_model parsing before machine_init()
-is called.
-
-in follow up per target patches, it will allow to:
-  * define default CPU type in consistent/generic manner
-    per machine type and drop custom code that fallbacks
-    to default if cpu_model is NULL
-  * drop custom features parsing in targets and do it
-    in centralized way.
-  * for cases of
-      cpu_generic_init(TYPE_BASE/DEFAULT_CPU, "some_cpu")
-    replace it with
-      cpu_create(machine->cpu_type) || cpu_create(TYPE_FOO)
-    depending if CPU type is user settable or not.
-    not doing useless parsing and clearly documenting where
-    CPU model is user settable or fixed one.
-
-Patch allows machine subclasses to define default CPU type
-per machine class at class_init() time and if that is set
-generic code will parse cpu_model into a MachineState::cpu_type
-which will be used to create CPUs for that machine instance
-and allows gradual per board conversion.
+Patch also introduces TARGET_DEFAULT_CPU_TYPE define for 2 purposes:
+  * make foo_machine_class_init() look uniform on every target
+  * use define in [bsd|linux]-user targets to pick default
+    cpu type
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-Target specific changes will split into separate per target/machine
-patches to make changes reviewable.
+ target/i386/cpu.h |  9 +++++++++
+ hw/i386/pc.c      | 41 +++++------------------------------------
+ hw/i386/pc_piix.c |  4 +---
+ target/i386/cpu.c |  3 ---
+ 4 files changed, 15 insertions(+), 42 deletions(-)
 
-CC: Marcel Apfelbaum <marcel@redhat.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Eduardo Habkost <ehabkost@redhat.com>
-
----
- include/hw/boards.h |  6 ++++++
- vl.c                | 10 ++++++++++
- 2 files changed, 16 insertions(+)
-
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 3363dd1..b8f255a 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -131,6 +131,10 @@ typedef struct {
-  *    size than the target architecture's minimum. (Attempting to create
-  *    such a CPU will fail.) Note that changing this is a migration
-  *    compatibility break for the machine.
-+ * @default_cpu_type:
-+ *    specifies default CPU_TYPE, which will be used for parsing target
-+ *    specific features and for creating CPUs if CPU name wasn't provided
-+ *    explicitly at CLI
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 525d35d..4035a11 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1508,6 +1508,15 @@ uint64_t cpu_get_tsc(CPUX86State *env);
+ 
+ #define cpu_init(cpu_model) cpu_generic_init(TYPE_X86_CPU, cpu_model)
+ 
++#define X86_CPU_TYPE_SUFFIX "-" TYPE_X86_CPU
++#define X86_CPU_TYPE_NAME(name) (name X86_CPU_TYPE_SUFFIX)
++
++#ifdef TARGET_X86_64
++#define TARGET_DEFAULT_CPU_TYPE X86_CPU_TYPE_NAME("qemu64")
++#else
++#define TARGET_DEFAULT_CPU_TYPE X86_CPU_TYPE_NAME("qemu32")
++#endif
++
+ #define cpu_signal_handler cpu_x86_signal_handler
+ #define cpu_list x86_cpu_list
+ 
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 2108104..2247ac0 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1107,7 +1107,6 @@ static void pc_new_cpu(const char *typename, int64_t apic_id, Error **errp)
+ 
+ void pc_hot_add_cpu(const int64_t id, Error **errp)
+ {
+-    ObjectClass *oc;
+     MachineState *ms = MACHINE(qdev_get_machine());
+     int64_t apic_id = x86_cpu_apic_id_from_index(id);
+     Error *local_err = NULL;
+@@ -1124,9 +1123,7 @@ void pc_hot_add_cpu(const int64_t id, Error **errp)
+         return;
+     }
+ 
+-    assert(ms->possible_cpus->cpus[0].cpu); /* BSP is always present */
+-    oc = OBJECT_CLASS(CPU_GET_CLASS(ms->possible_cpus->cpus[0].cpu));
+-    pc_new_cpu(object_class_get_name(oc), apic_id, &local_err);
++    pc_new_cpu(ms->cpu_type, apic_id, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -1136,39 +1133,10 @@ void pc_hot_add_cpu(const int64_t id, Error **errp)
+ void pc_cpus_init(PCMachineState *pcms)
+ {
+     int i;
+-    CPUClass *cc;
+-    ObjectClass *oc;
+-    const char *typename;
+-    gchar **model_pieces;
+     const CPUArchIdList *possible_cpus;
+-    MachineState *machine = MACHINE(pcms);
++    MachineState *ms = MACHINE(pcms);
+     MachineClass *mc = MACHINE_GET_CLASS(pcms);
+ 
+-    /* init CPUs */
+-    if (machine->cpu_model == NULL) {
+-#ifdef TARGET_X86_64
+-        machine->cpu_model = "qemu64";
+-#else
+-        machine->cpu_model = "qemu32";
+-#endif
+-    }
+-
+-    model_pieces = g_strsplit(machine->cpu_model, ",", 2);
+-    if (!model_pieces[0]) {
+-        error_report("Invalid/empty CPU model name");
+-        exit(1);
+-    }
+-
+-    oc = cpu_class_by_name(TYPE_X86_CPU, model_pieces[0]);
+-    if (oc == NULL) {
+-        error_report("Unable to find CPU definition: %s", model_pieces[0]);
+-        exit(1);
+-    }
+-    typename = object_class_get_name(oc);
+-    cc = CPU_CLASS(oc);
+-    cc->parse_features(typename, model_pieces[1], &error_fatal);
+-    g_strfreev(model_pieces);
+-
+     /* Calculates the limit to CPU APIC ID values
+      *
+      * Limit for the APIC ID value, so that all
+@@ -1177,9 +1145,9 @@ void pc_cpus_init(PCMachineState *pcms)
+      * This is used for FW_CFG_MAX_CPUS. See comments on bochs_bios_init().
+      */
+     pcms->apic_id_limit = x86_cpu_apic_id_from_index(max_cpus - 1) + 1;
+-    possible_cpus = mc->possible_cpu_arch_ids(machine);
++    possible_cpus = mc->possible_cpu_arch_ids(ms);
+     for (i = 0; i < smp_cpus; i++) {
+-        pc_new_cpu(typename, possible_cpus->cpus[i].arch_id, &error_fatal);
++        pc_new_cpu(ms->cpu_type, possible_cpus->cpus[i].arch_id, &error_fatal);
+     }
+ }
+ 
+@@ -2360,6 +2328,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     hc->unplug_request = pc_machine_device_unplug_request_cb;
+     hc->unplug = pc_machine_device_unplug_cb;
+     nc->nmi_monitor_handler = x86_nmi;
++    mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
+ 
+     object_class_property_add(oc, PC_MACHINE_MEMHP_REGION_SIZE, "int",
+         pc_machine_get_hotplug_memory_region_size, NULL,
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 46dfd2c..a3f4e2a 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -378,9 +378,6 @@ static void pc_compat_0_13(MachineState *machine)
+ 
+ static void pc_init_isa(MachineState *machine)
+ {
+-    if (!machine->cpu_model) {
+-        machine->cpu_model = "486";
+-    }
+     x86_cpu_change_kvm_default("kvm-pv-eoi", NULL);
+     enable_compat_apic_id_mode();
+     pc_init1(machine, TYPE_I440FX_PCI_HOST_BRIDGE, TYPE_I440FX_PCI_DEVICE);
+@@ -1104,6 +1101,7 @@ static void isapc_machine_options(MachineClass *m)
+     pcmc->gigabyte_align = false;
+     pcmc->smbios_legacy_mode = true;
+     pcmc->has_reserved_memory = false;
++    m->default_cpu_type = X86_CPU_TYPE_NAME("486");
+ }
+ 
+ DEFINE_PC_MACHINE(isapc, "isapc", pc_init_isa,
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index f81576d..a91b2b6 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -705,9 +705,6 @@ void host_vendor_fms(char *vendor, int *family, int *model, int *stepping)
+ 
+ /* CPU class name definitions: */
+ 
+-#define X86_CPU_TYPE_SUFFIX "-" TYPE_X86_CPU
+-#define X86_CPU_TYPE_NAME(name) (name X86_CPU_TYPE_SUFFIX)
+-
+ /* Return type name for a given CPU model name
+  * Caller is responsible for freeing the returned string.
   */
- struct MachineClass {
-     /*< private >*/
-@@ -167,6 +171,7 @@ struct MachineClass {
-     GArray *compat_props;
-     const char *hw_version;
-     ram_addr_t default_ram_size;
-+    const char *default_cpu_type;
-     bool option_rom_has_mr;
-     bool rom_file_has_mr;
-     int minimum_page_bits;
-@@ -220,6 +225,7 @@ struct MachineState {
-     char *kernel_cmdline;
-     char *initrd_filename;
-     const char *cpu_model;
-+    const char *cpu_type;
-     AccelState *accelerator;
-     CPUArchIdList *possible_cpus;
- };
-diff --git a/vl.c b/vl.c
-index 8e247cc..9ae6001 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4630,6 +4630,16 @@ int main(int argc, char **argv, char **envp)
-     current_machine->boot_order = boot_order;
-     current_machine->cpu_model = cpu_model;
- 
-+
-+    /* parse features once if machine provides default cpu_type */
-+    if (machine_class->default_cpu_type) {
-+        current_machine->cpu_type = machine_class->default_cpu_type;
-+        if (cpu_model) {
-+            current_machine->cpu_type =
-+                cpu_parse_cpu_model(machine_class->default_cpu_type, cpu_model);
-+        }
-+    }
-+
-     machine_run_board_init(current_machine);
- 
-     realtime_init();
 -- 
 2.7.4
