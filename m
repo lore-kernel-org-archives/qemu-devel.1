@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1doqRv-0004fF-1M
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:25:59 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1doqS5-0004lV-HT
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1doqRq-0004Q3-4i
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:25:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47209)
+	(envelope-from <pm215@archaic.org.uk>) id 1doqS1-0004Z5-1m
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:05 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37104)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1doqRp-0004PK-UI
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:25:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1doqRo-00062c-TO
-	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 12:25:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DBEAC2E80CC
-	for <qemu-devel@nongnu.org>; Mon,  4 Sep 2017 12:25:48 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 04 Sep 2017 12:18:11 -0000
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1doqS0-0004RY-SH
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:00 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1doqRz-0005R8-0O
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:25:59 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1714750 <1714750@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150442540217.17409.6458222878014636993.malonedeb@gac.canonical.com>
-Message-Id: <150452749113.10991.14087632652420178113.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1714750] Re: 2.10.0 cannot be installed on
- case-insensitive file system
+Date: Mon,  4 Sep 2017 13:25:36 +0100
+Message-Id: <1504527967-29248-6-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1504527967-29248-1-git-send-email-peter.maydell@linaro.org>
+References: <1504527967-29248-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PULL 05/36] hw/intc/armv7m_nvic.c: Remove out of date
+ comment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,31 +30,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-I don't think it would be wise to downgrade u-boot. You can always just
-skip unpacking the u-boot sources -- we don't actually build them, we
-just ship them for license compliance reasons.
+Remove an out of date comment which says there's only one
+item in the NVIC container region -- we put systick into its
+own device object a while back and so now there are two
+things in the container.
 
--- =
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 1501692241-23310-6-git-send-email-peter.maydell@linaro.org
+---
+ hw/intc/armv7m_nvic.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1714750
-
-Title:
-  2.10.0 cannot be installed on case-insensitive file system
-
-Status in QEMU:
-  New
-
-Bug description:
-  The https://download.qemu.org/qemu-2.10.0.tar.bz2 tarball cannot be
-  unpacked on a case-insensitive file system because it has a file
-  qemu-2.10.0/roms/u-boot/scripts/Kconfig and a directory
-  qemu-2.10.0/roms/u-boot/scripts/kconfig. This prevents installation on
-  most macOS systems since by default the file system is case
-  insensitive. The 2.10.0 upgrade is blocked in Homebrew due to this
-  issue. See https://github.com/Homebrew/homebrew-core/pull/17467. This
-  is a regression from 2.9.0, which didn't have this problem.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1714750/+subscriptions
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index 323e2d4..2e8166a 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -1036,10 +1036,6 @@ static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
+      *  0xd00..0xd3c - SCS registers
+      *  0xd40..0xeff - Reserved or Not implemented
+      *  0xf00 - STIR
+-     *
+-     * At the moment there is only one thing in the container region,
+-     * but we leave it in place to allow us to pull systick out into
+-     * its own device object later.
+      */
+     memory_region_init(&s->container, OBJECT(s), "nvic", 0x1000);
+     /* The system register region goes at the bottom of the priority
+-- 
+2.7.4
