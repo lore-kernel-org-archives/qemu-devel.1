@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1doqSY-00056w-4v
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:46 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1doqSb-00058m-4g
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1doqSI-0004qN-GL
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:34 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37124)
+	(envelope-from <pm215@archaic.org.uk>) id 1doqSL-0004sQ-Hu
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:37 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37128)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1doqSI-0004pl-5Q
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:18 -0400
+	id 1doqSL-0004ru-7c
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:21 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1doqSH-0005Xq-7C
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:26:17 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1doqSK-0005ZA-88
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:26:20 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  4 Sep 2017 13:25:51 +0100
-Message-Id: <1504527967-29248-21-git-send-email-peter.maydell@linaro.org>
+Date: Mon,  4 Sep 2017 13:25:54 +0100
+Message-Id: <1504527967-29248-24-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1504527967-29248-1-git-send-email-peter.maydell@linaro.org>
 References: <1504527967-29248-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 20/36] target/arm/kvm: pmu: split init and
- set-irq stages
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 23/36] watchdog: wdt_aspeed: Add support for the
+ reset width register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,169 +33,208 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Andrew Jones <drjones@redhat.com>
+From: Andrew Jeffery <andrew@aj.id.au>
 
-When adding a PMU with a userspace irqchip we skip the set-irq
-stage of device creation. Split the 'create' function into two
-functions 'init' and 'set-irq' so they may be called separately.
+The reset width register controls how the pulse on the SoC's WDTRST{1,2}
+pins behaves. A pulse is emitted if the external reset bit is set in
+WDT_CTRL. On the AST2500 WDT_RESET_WIDTH can consume magic bit patterns
+to configure push-pull/open-drain and active-high/active-low
+behaviours and thus needs some special handling in the write path.
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Christoffer Dall <cdall@linaro.org>
-Message-id: 1500471597-2517-3-git-send-email-drjones@redhat.com
+As some of the capabilities depend on the SoC version a silicon-rev
+property is introduced, which is used to guard version-specific
+behaviour.
+
+Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/kvm_arm.h | 10 ++++++++--
- hw/arm/virt.c        | 11 +++++++++--
- target/arm/kvm32.c   |  8 +++++++-
- target/arm/kvm64.c   | 52 +++++++++++++++++++++++++---------------------------
- 4 files changed, 49 insertions(+), 32 deletions(-)
+ include/hw/watchdog/wdt_aspeed.h |  2 +
+ hw/watchdog/wdt_aspeed.c         | 93 +++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 84 insertions(+), 11 deletions(-)
 
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 633d088..cab5ea9 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -195,7 +195,8 @@ int kvm_arm_sync_mpstate_to_qemu(ARMCPU *cpu);
+diff --git a/include/hw/watchdog/wdt_aspeed.h b/include/hw/watchdog/wdt_aspeed.h
+index 080c223..7de3e5c 100644
+--- a/include/hw/watchdog/wdt_aspeed.h
++++ b/include/hw/watchdog/wdt_aspeed.h
+@@ -27,6 +27,8 @@ typedef struct AspeedWDTState {
+     uint32_t regs[ASPEED_WDT_REGS_MAX];
  
- int kvm_arm_vgic_probe(void);
+     uint32_t pclk_freq;
++    uint32_t silicon_rev;
++    uint32_t ext_pulse_width_mask;
+ } AspeedWDTState;
  
--int kvm_arm_pmu_create(CPUState *cs, int irq);
-+int kvm_arm_pmu_set_irq(CPUState *cs, int irq);
-+int kvm_arm_pmu_init(CPUState *cs);
+ #endif  /* ASPEED_WDT_H */
+diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
+index 8bbe579..22bce36 100644
+--- a/hw/watchdog/wdt_aspeed.c
++++ b/hw/watchdog/wdt_aspeed.c
+@@ -8,16 +8,19 @@
+  */
  
- #else
+ #include "qemu/osdep.h"
++
++#include "qapi/error.h"
+ #include "qemu/log.h"
++#include "qemu/timer.h"
+ #include "sysemu/watchdog.h"
++#include "hw/misc/aspeed_scu.h"
+ #include "hw/sysbus.h"
+-#include "qemu/timer.h"
+ #include "hw/watchdog/wdt_aspeed.h"
  
-@@ -204,7 +205,12 @@ static inline int kvm_arm_vgic_probe(void)
-     return 0;
+-#define WDT_STATUS              (0x00 / 4)
+-#define WDT_RELOAD_VALUE        (0x04 / 4)
+-#define WDT_RESTART             (0x08 / 4)
+-#define WDT_CTRL                (0x0C / 4)
++#define WDT_STATUS                      (0x00 / 4)
++#define WDT_RELOAD_VALUE                (0x04 / 4)
++#define WDT_RESTART                     (0x08 / 4)
++#define WDT_CTRL                        (0x0C / 4)
+ #define   WDT_CTRL_RESET_MODE_SOC       (0x00 << 5)
+ #define   WDT_CTRL_RESET_MODE_FULL_CHIP (0x01 << 5)
+ #define   WDT_CTRL_1MHZ_CLK             BIT(4)
+@@ -25,18 +28,41 @@
+ #define   WDT_CTRL_WDT_INTR             BIT(2)
+ #define   WDT_CTRL_RESET_SYSTEM         BIT(1)
+ #define   WDT_CTRL_ENABLE               BIT(0)
++#define WDT_RESET_WIDTH                 (0x18 / 4)
++#define   WDT_RESET_WIDTH_ACTIVE_HIGH   BIT(31)
++#define     WDT_POLARITY_MASK           (0xFF << 24)
++#define     WDT_ACTIVE_HIGH_MAGIC       (0xA5 << 24)
++#define     WDT_ACTIVE_LOW_MAGIC        (0x5A << 24)
++#define   WDT_RESET_WIDTH_PUSH_PULL     BIT(30)
++#define     WDT_DRIVE_TYPE_MASK         (0xFF << 24)
++#define     WDT_PUSH_PULL_MAGIC         (0xA8 << 24)
++#define     WDT_OPEN_DRAIN_MAGIC        (0x8A << 24)
+ 
+-#define WDT_TIMEOUT_STATUS      (0x10 / 4)
+-#define WDT_TIMEOUT_CLEAR       (0x14 / 4)
+-#define WDT_RESET_WDITH         (0x18 / 4)
++#define WDT_TIMEOUT_STATUS              (0x10 / 4)
++#define WDT_TIMEOUT_CLEAR               (0x14 / 4)
+ 
+-#define WDT_RESTART_MAGIC       0x4755
++#define WDT_RESTART_MAGIC               0x4755
+ 
+ static bool aspeed_wdt_is_enabled(const AspeedWDTState *s)
+ {
+     return s->regs[WDT_CTRL] & WDT_CTRL_ENABLE;
  }
  
--static inline int kvm_arm_pmu_create(CPUState *cs, int irq)
-+static inline int kvm_arm_pmu_set_irq(CPUState *cs, int irq)
++static bool is_ast2500(const AspeedWDTState *s)
 +{
-+    return 0;
++    switch (s->silicon_rev) {
++    case AST2500_A0_SILICON_REV:
++    case AST2500_A1_SILICON_REV:
++        return true;
++    case AST2400_A0_SILICON_REV:
++    case AST2400_A1_SILICON_REV:
++    default:
++        break;
++    }
++
++    return false;
 +}
 +
-+static inline int kvm_arm_pmu_init(CPUState *cs)
+ static uint64_t aspeed_wdt_read(void *opaque, hwaddr offset, unsigned size)
  {
-     return 0;
- }
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index a06ec13..d6e2486 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -492,10 +492,17 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
- 
-     CPU_FOREACH(cpu) {
-         armcpu = ARM_CPU(cpu);
--        if (!arm_feature(&armcpu->env, ARM_FEATURE_PMU) ||
--            (kvm_enabled() && !kvm_arm_pmu_create(cpu, PPI(VIRTUAL_PMU_IRQ)))) {
-+        if (!arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
-             return;
+     AspeedWDTState *s = ASPEED_WDT(opaque);
+@@ -55,9 +81,10 @@ static uint64_t aspeed_wdt_read(void *opaque, hwaddr offset, unsigned size)
+         return 0;
+     case WDT_CTRL:
+         return s->regs[WDT_CTRL];
++    case WDT_RESET_WIDTH:
++        return s->regs[WDT_RESET_WIDTH];
+     case WDT_TIMEOUT_STATUS:
+     case WDT_TIMEOUT_CLEAR:
+-    case WDT_RESET_WDITH:
+         qemu_log_mask(LOG_UNIMP,
+                       "%s: uninmplemented read at offset 0x%" HWADDR_PRIx "\n",
+                       __func__, offset);
+@@ -119,9 +146,27 @@ static void aspeed_wdt_write(void *opaque, hwaddr offset, uint64_t data,
+             timer_del(s->timer);
          }
-+        if (kvm_enabled()) {
-+            if (!kvm_arm_pmu_set_irq(cpu, PPI(VIRTUAL_PMU_IRQ))) {
-+                return;
-+            }
-+            if (!kvm_arm_pmu_init(cpu)) {
-+                return;
+         break;
++    case WDT_RESET_WIDTH:
++    {
++        uint32_t property = data & WDT_POLARITY_MASK;
++
++        if (property && is_ast2500(s)) {
++            if (property == WDT_ACTIVE_HIGH_MAGIC) {
++                s->regs[WDT_RESET_WIDTH] |= WDT_RESET_WIDTH_ACTIVE_HIGH;
++            } else if (property == WDT_ACTIVE_LOW_MAGIC) {
++                s->regs[WDT_RESET_WIDTH] &= ~WDT_RESET_WIDTH_ACTIVE_HIGH;
++            } else if (property == WDT_PUSH_PULL_MAGIC) {
++                s->regs[WDT_RESET_WIDTH] |= WDT_RESET_WIDTH_PUSH_PULL;
++            } else if (property == WDT_OPEN_DRAIN_MAGIC) {
++                s->regs[WDT_RESET_WIDTH] &= ~WDT_RESET_WIDTH_PUSH_PULL;
 +            }
 +        }
-     }
++        s->regs[WDT_RESET_WIDTH] &= ~s->ext_pulse_width_mask;
++        s->regs[WDT_RESET_WIDTH] |= data & s->ext_pulse_width_mask;
++        break;
++    }
+     case WDT_TIMEOUT_STATUS:
+     case WDT_TIMEOUT_CLEAR:
+-    case WDT_RESET_WDITH:
+         qemu_log_mask(LOG_UNIMP,
+                       "%s: uninmplemented write at offset 0x%" HWADDR_PRIx "\n",
+                       __func__, offset);
+@@ -167,6 +212,7 @@ static void aspeed_wdt_reset(DeviceState *dev)
+     s->regs[WDT_RELOAD_VALUE] = 0x03EF1480;
+     s->regs[WDT_RESTART] = 0;
+     s->regs[WDT_CTRL] = 0;
++    s->regs[WDT_RESET_WIDTH] = 0xFF;
  
-     if (vms->gic_version == 2) {
-diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
-index 069da0c..e3aab89 100644
---- a/target/arm/kvm32.c
-+++ b/target/arm/kvm32.c
-@@ -522,7 +522,13 @@ bool kvm_arm_hw_debug_active(CPUState *cs)
-     return false;
+     timer_del(s->timer);
+ }
+@@ -187,6 +233,25 @@ static void aspeed_wdt_realize(DeviceState *dev, Error **errp)
+     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+     AspeedWDTState *s = ASPEED_WDT(dev);
+ 
++    if (!is_supported_silicon_rev(s->silicon_rev)) {
++        error_setg(errp, "Unknown silicon revision: 0x%" PRIx32,
++                s->silicon_rev);
++        return;
++    }
++
++    switch (s->silicon_rev) {
++    case AST2400_A0_SILICON_REV:
++    case AST2400_A1_SILICON_REV:
++        s->ext_pulse_width_mask = 0xff;
++        break;
++    case AST2500_A0_SILICON_REV:
++    case AST2500_A1_SILICON_REV:
++        s->ext_pulse_width_mask = 0xfffff;
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
+     s->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, aspeed_wdt_timer_expired, dev);
+ 
+     /* FIXME: This setting should be derived from the SCU hw strapping
+@@ -199,6 +264,11 @@ static void aspeed_wdt_realize(DeviceState *dev, Error **errp)
+     sysbus_init_mmio(sbd, &s->iomem);
  }
  
--int kvm_arm_pmu_create(CPUState *cs, int irq)
-+int kvm_arm_pmu_set_irq(CPUState *cs, int irq)
-+{
-+    qemu_log_mask(LOG_UNIMP, "%s: not implemented\n", __func__);
-+    return 0;
-+}
++static Property aspeed_wdt_properties[] = {
++    DEFINE_PROP_UINT32("silicon-rev", AspeedWDTState, silicon_rev, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
 +
-+int kvm_arm_pmu_init(CPUState *cs)
+ static void aspeed_wdt_class_init(ObjectClass *klass, void *data)
  {
-     qemu_log_mask(LOG_UNIMP, "%s: not implemented\n", __func__);
-     return 0;
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index a16abc8..e26638a 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -381,46 +381,44 @@ static CPUWatchpoint *find_hw_watchpoint(CPUState *cpu, target_ulong addr)
-     return NULL;
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -207,6 +277,7 @@ static void aspeed_wdt_class_init(ObjectClass *klass, void *data)
+     dc->reset = aspeed_wdt_reset;
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+     dc->vmsd = &vmstate_aspeed_wdt;
++    dc->props = aspeed_wdt_properties;
  }
  
--static bool kvm_arm_pmu_support_ctrl(CPUState *cs, struct kvm_device_attr *attr)
--{
--    return kvm_vcpu_ioctl(cs, KVM_HAS_DEVICE_ATTR, attr) == 0;
--}
--
--int kvm_arm_pmu_create(CPUState *cs, int irq)
-+static bool kvm_arm_pmu_set_attr(CPUState *cs, struct kvm_device_attr *attr)
- {
-     int err;
- 
--    struct kvm_device_attr attr = {
--        .group = KVM_ARM_VCPU_PMU_V3_CTRL,
--        .addr = (intptr_t)&irq,
--        .attr = KVM_ARM_VCPU_PMU_V3_IRQ,
--        .flags = 0,
--    };
--
--    if (!kvm_arm_pmu_support_ctrl(cs, &attr)) {
--        return 0;
-+    err = kvm_vcpu_ioctl(cs, KVM_HAS_DEVICE_ATTR, attr);
-+    if (err != 0) {
-+        return false;
-     }
- 
--    err = kvm_vcpu_ioctl(cs, KVM_SET_DEVICE_ATTR, &attr);
-+    err = kvm_vcpu_ioctl(cs, KVM_SET_DEVICE_ATTR, attr);
-     if (err < 0) {
-         fprintf(stderr, "KVM_SET_DEVICE_ATTR failed: %s\n",
-                 strerror(-err));
-         abort();
-     }
- 
--    attr.group = KVM_ARM_VCPU_PMU_V3_CTRL;
--    attr.attr = KVM_ARM_VCPU_PMU_V3_INIT;
--    attr.addr = 0;
--    attr.flags = 0;
-+    return true;
-+}
- 
--    err = kvm_vcpu_ioctl(cs, KVM_SET_DEVICE_ATTR, &attr);
--    if (err < 0) {
--        fprintf(stderr, "KVM_SET_DEVICE_ATTR failed: %s\n",
--                strerror(-err));
--        abort();
--    }
-+int kvm_arm_pmu_init(CPUState *cs)
-+{
-+    struct kvm_device_attr attr = {
-+        .group = KVM_ARM_VCPU_PMU_V3_CTRL,
-+        .attr = KVM_ARM_VCPU_PMU_V3_INIT,
-+    };
-+
-+    return kvm_arm_pmu_set_attr(cs, &attr);
-+}
-+
-+int kvm_arm_pmu_set_irq(CPUState *cs, int irq)
-+{
-+    struct kvm_device_attr attr = {
-+        .group = KVM_ARM_VCPU_PMU_V3_CTRL,
-+        .addr = (intptr_t)&irq,
-+        .attr = KVM_ARM_VCPU_PMU_V3_IRQ,
-+    };
- 
--    return 1;
-+    return kvm_arm_pmu_set_attr(cs, &attr);
- }
- 
- static inline void set_feature(uint64_t *features, int feature)
+ static const TypeInfo aspeed_wdt_info = {
 -- 
 2.7.4
