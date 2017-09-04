@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1doqST-00051d-3g
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:44 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1doqSX-00056l-VL
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1doqSF-0004nw-AS
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:29 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37120)
+	(envelope-from <pm215@archaic.org.uk>) id 1doqSJ-0004qq-DA
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:33 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37124)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1doqSF-0004nZ-3a
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:15 -0400
+	id 1doqSJ-0004pl-5m
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:19 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1doqSE-0005Wj-4U
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:26:14 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1doqSI-0005YG-1F
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:26:18 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  4 Sep 2017 13:25:48 +0100
-Message-Id: <1504527967-29248-18-git-send-email-peter.maydell@linaro.org>
+Date: Mon,  4 Sep 2017 13:25:52 +0100
+Message-Id: <1504527967-29248-22-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1504527967-29248-1-git-send-email-peter.maydell@linaro.org>
 References: <1504527967-29248-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 17/36] loader: Ignore zero-sized ELF segments
+Subject: [Qemu-devel] [PULL 21/36] hw/arm/virt: allow pmu instantiation with
+ userspace irqchip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,55 +30,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Some ELF files have program headers that specify segments that
-are of zero size. Ignore them, rather than trying to create
-zero-length ROM blobs for them, because the zero-length blob
-can falsely trigger the overlapping-ROM-blobs check.
+From: Andrew Jones <drjones@redhat.com>
 
+Move the in-kernel-irqchip test to only guard the set-irq
+stage, not the init stage of the PMU.  Also add the PMU to
+the KVM device irq line synchronization to enable its use.
+
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Christoffer Dall <cdall@linaro.org>
+Message-id: 1500471597-2517-4-git-send-email-drjones@redhat.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Tested-by: Hua Yanghao <huayanghao@gmail.com>
-Message-id: 1502116754-18867-3-git-send-email-peter.maydell@linaro.org
 ---
- include/hw/elf_ops.h | 24 +++++++++++++++++-------
- 1 file changed, 17 insertions(+), 7 deletions(-)
+ hw/arm/virt.c      | 3 ++-
+ target/arm/kvm.c   | 6 +++++-
+ target/arm/kvm64.c | 3 +--
+ 3 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
-index 2e526d3..d192e7e 100644
---- a/include/hw/elf_ops.h
-+++ b/include/hw/elf_ops.h
-@@ -451,14 +451,24 @@ static int glue(load_elf, SZ)(const char *name, int fd,
-                 *pentry = ehdr.e_entry - ph->p_vaddr + ph->p_paddr;
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index d6e2486..999f448 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -496,7 +496,8 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
+             return;
+         }
+         if (kvm_enabled()) {
+-            if (!kvm_arm_pmu_set_irq(cpu, PPI(VIRTUAL_PMU_IRQ))) {
++            if (kvm_irqchip_in_kernel() &&
++                !kvm_arm_pmu_set_irq(cpu, PPI(VIRTUAL_PMU_IRQ))) {
+                 return;
              }
+             if (!kvm_arm_pmu_init(cpu)) {
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 7c17f0d..211a7bf 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -567,7 +567,11 @@ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
+             switched_level &= ~KVM_ARM_DEV_EL1_PTIMER;
+         }
  
--            if (load_rom) {
--                snprintf(label, sizeof(label), "phdr #%d: %s", i, name);
--
--                /* rom_add_elf_program() seize the ownership of 'data' */
--                rom_add_elf_program(label, data, file_size, mem_size, addr, as);
--            } else {
--                cpu_physical_memory_write(addr, data, file_size);
-+            if (mem_size == 0) {
-+                /* Some ELF files really do have segments of zero size;
-+                 * just ignore them rather than trying to create empty
-+                 * ROM blobs, because the zero-length blob can falsely
-+                 * trigger the overlapping-ROM-blobs check.
-+                 */
-                 g_free(data);
-+            } else {
-+                if (load_rom) {
-+                    snprintf(label, sizeof(label), "phdr #%d: %s", i, name);
-+
-+                    /* rom_add_elf_program() seize the ownership of 'data' */
-+                    rom_add_elf_program(label, data, file_size, mem_size,
-+                                        addr, as);
-+                } else {
-+                    cpu_physical_memory_write(addr, data, file_size);
-+                    g_free(data);
-+                }
-             }
+-        /* XXX PMU IRQ is missing */
++        if (switched_level & KVM_ARM_DEV_PMU) {
++            qemu_set_irq(cpu->pmu_interrupt,
++                         !!(run->s.regs.device_irq_level & KVM_ARM_DEV_PMU));
++            switched_level &= ~KVM_ARM_DEV_PMU;
++        }
  
-             total_size += mem_size;
+         if (switched_level) {
+             qemu_log_mask(LOG_UNIMP, "%s: unhandled in-kernel device IRQ %x\n",
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index e26638a..ec7d853 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -506,8 +506,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     if (!arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_EL1_32BIT;
+     }
+-    if (!kvm_irqchip_in_kernel() ||
+-        !kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PMU_V3)) {
++    if (!kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PMU_V3)) {
+             cpu->has_pmu = false;
+     }
+     if (cpu->has_pmu) {
 -- 
 2.7.4
