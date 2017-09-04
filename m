@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dovzg-0004aD-If
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 14:21:13 -0400
+	(envelope-from <ppandit@redhat.com>) id 1dowFI-0008NB-Rv
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 14:37:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dovzb-0003M7-Tp
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 14:21:08 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:37850)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dovzb-0003Lm-MZ
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 14:21:03 -0400
-Received: by mail-wr0-x231.google.com with SMTP id n33so3522820wrn.4
-	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 11:21:03 -0700 (PDT)
+	(envelope-from <ppandit@redhat.com>) id 1dowFD-0005Zi-Rt
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 14:37:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47962)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1dowFD-0005Yz-LO
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 14:37:11 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CC6882EC6B2
+	for <qemu-devel@nongnu.org>; Mon,  4 Sep 2017 18:37:09 +0000 (UTC)
+Date: Tue, 5 Sep 2017 00:07:02 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <20170901131409.6712-1-kraxel@redhat.com>
+Message-ID: <nycvar.YSQ.7.76.1709050001150.31255@wniryva>
+References: <20170901131409.6712-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d91a4033-a76a-9adc-aaa0-ded8468a337b@redhat.com>
-References: <1504545540-8002-1-git-send-email-peter.maydell@linaro.org>
-	<d91a4033-a76a-9adc-aaa0-ded8468a337b@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Sep 2017 19:20:41 +0100
-Message-ID: <CAFEAcA8-pX+QoqSwNzL9vvRqwByoazOzB2970a2K5Zg8CXKL+A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] configure: Drop AIX host support
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH] wm8750: add record buffer underrun check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On 4 September 2017 at 19:09, Thomas Huth <thuth@redhat.com> wrote:
-> On 04.09.2017 19:19, Peter Maydell wrote:
->> Nobody has mentioned AIX host support on the mailing list for years,
->> and we have no test systems for it so it is most likely broken.
->> We've advertised in configure for two releases now that we plan
->> to drop support for this host OS, and have had no complaints.
->
-> We just added this some weeks ago to our qemu-doc.texi:
->
-> "Prior to the 2.10.0 release there was no official policy on how long
-> features would be deprecated prior to their removal, nor any documented
-> list of which features were deprecated. Thus any features deprecated
-> prior to 2.10.0 will be treated as if they were first deprecated in the
-> 2.10.0 release."
++-- On Fri, 1 Sep 2017, Gerd Hoffmann wrote --+
+| diff --git a/hw/audio/wm8750.c b/hw/audio/wm8750.c
+| index f8b5bebfc2..d2bf2e1da1 100644
+| --- a/hw/audio/wm8750.c
+| +++ b/hw/audio/wm8750.c
+| @@ -680,8 +680,12 @@ uint32_t wm8750_adc_dat(void *opaque)
+|      WM8750State *s = (WM8750State *) opaque;
+|      uint32_t *data;
+|  
+| -    if (s->idx_in >= sizeof(s->data_in))
+| +    if (s->idx_in >= sizeof(s->data_in)) {
+|          wm8750_in_load(s);
+| +        if (s->idx_in >= sizeof(s->data_in)) {
+| +            return 0x80008000; /* silence in AUD_FMT_S16 sample format */
+| +        }
+| +    }
+|  
+|      data = (uint32_t *) &s->data_in[s->idx_in];
+|      s->req_in -= 4;
 
-We pretty clearly say in the configure message
-    echo "The QEMU project intends to remove support for this host OS in"
-    echo "a future release if nobody volunteers to maintain it and to"
-    echo "provide a build host for our continuous integration setup."
-
-and my intention when I wrote that was absolutely to dump old
-OSes in a couple of releases... The amount of code removed here
-isn't great so I guess waiting a little longer doesn't hurt,
-but I feel like somebody's moved the goalposts in adding that
-language and not listing the deprecated host OSes and CPUs
-in the list of deprecated features in 2.10 :-(
-
-thanks
--- PMM
+Ack, looks good. Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
