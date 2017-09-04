@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1doqSj-0005Eq-ES
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:53 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1doqSg-0005DX-3f
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1doqSW-00050I-FN
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:45 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37138)
+	(envelope-from <pm215@archaic.org.uk>) id 1doqSQ-0004vs-UD
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:42 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37132)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1doqSW-0004yH-9t
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:32 -0400
+	id 1doqSQ-0004v8-N6
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:26 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1doqSV-0005dq-57
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:26:31 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1doqSP-0005aw-Mz
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:26:25 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  4 Sep 2017 13:26:05 +0100
-Message-Id: <1504527967-29248-35-git-send-email-peter.maydell@linaro.org>
+Date: Mon,  4 Sep 2017 13:25:58 +0100
+Message-Id: <1504527967-29248-28-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1504527967-29248-1-git-send-email-peter.maydell@linaro.org>
 References: <1504527967-29248-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 34/36] hw/arm/digic: Mark device with
- user_creatable = false
+Subject: [Qemu-devel] [PULL 27/36] cputlb: Support generating CPU exceptions
+ on memory transaction failures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +30,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Thomas Huth <thuth@redhat.com>
+Call the new cpu_transaction_failed() hook at the places where
+CPU generated code interacts with the memory system:
+ io_readx()
+ io_writex()
+ get_page_addr_code()
 
-QEMU currently shows some unexpected behavior when the user trys to
-do a "device_add digic" on an unrelated ARM machine like integratorcp
-in "-nographic" mode (the device_add command does not immediately
-return to the monitor prompt), and trying to "device_del" the device
-later results in a "qemu/qdev-monitor.c:872:qdev_unplug: assertion
-failed: (hotplug_ctrl)" error condition.
-Looking at the realize function of the device, it uses serial_hds
-directly and this means that the device can not be added a second
-time, so let's simply mark it with "user_creatable = false" now.
+Any access from C code (eg via cpu_physical_memory_rw(),
+address_space_rw(), ld/st_*_phys()) will *not* trigger CPU exceptions
+via cpu_transaction_failed().  Handling for transactions failures for
+this kind of call should be done by using a function which returns a
+MemTxResult and treating the failure case appropriately in the
+calling code.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+In an ideal world we would not generate CPU exceptions for
+instruction fetch failures in get_page_addr_code() but instead wait
+until the code translation process tried a load and it failed;
+however that change would require too great a restructuring and
+redesign to attempt at this point.
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/arm/digic.c | 2 ++
- 1 file changed, 2 insertions(+)
+ softmmu_template.h |  4 ++--
+ accel/tcg/cputlb.c | 32 ++++++++++++++++++++++++++++++--
+ 2 files changed, 32 insertions(+), 4 deletions(-)
 
-diff --git a/hw/arm/digic.c b/hw/arm/digic.c
-index 94f3263..6184020 100644
---- a/hw/arm/digic.c
-+++ b/hw/arm/digic.c
-@@ -101,6 +101,8 @@ static void digic_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
+diff --git a/softmmu_template.h b/softmmu_template.h
+index 4a2b665..d756329 100644
+--- a/softmmu_template.h
++++ b/softmmu_template.h
+@@ -101,7 +101,7 @@ static inline DATA_TYPE glue(io_read, SUFFIX)(CPUArchState *env,
+                                               uintptr_t retaddr)
+ {
+     CPUIOTLBEntry *iotlbentry = &env->iotlb[mmu_idx][index];
+-    return io_readx(env, iotlbentry, addr, retaddr, DATA_SIZE);
++    return io_readx(env, iotlbentry, mmu_idx, addr, retaddr, DATA_SIZE);
+ }
+ #endif
  
-     dc->realize = digic_realize;
-+    /* Reason: Uses serial_hds in the realize function --> not usable twice */
-+    dc->user_creatable = false;
+@@ -262,7 +262,7 @@ static inline void glue(io_write, SUFFIX)(CPUArchState *env,
+                                           uintptr_t retaddr)
+ {
+     CPUIOTLBEntry *iotlbentry = &env->iotlb[mmu_idx][index];
+-    return io_writex(env, iotlbentry, val, addr, retaddr, DATA_SIZE);
++    return io_writex(env, iotlbentry, mmu_idx, val, addr, retaddr, DATA_SIZE);
  }
  
- static const TypeInfo digic_type_info = {
+ void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index 85635ae..e72415a 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -747,6 +747,7 @@ static inline ram_addr_t qemu_ram_addr_from_host_nofail(void *ptr)
+ }
+ 
+ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
++                         int mmu_idx,
+                          target_ulong addr, uintptr_t retaddr, int size)
+ {
+     CPUState *cpu = ENV_GET_CPU(env);
+@@ -754,6 +755,7 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+     MemoryRegion *mr = iotlb_to_region(cpu, physaddr, iotlbentry->attrs);
+     uint64_t val;
+     bool locked = false;
++    MemTxResult r;
+ 
+     physaddr = (physaddr & TARGET_PAGE_MASK) + addr;
+     cpu->mem_io_pc = retaddr;
+@@ -767,7 +769,12 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+         qemu_mutex_lock_iothread();
+         locked = true;
+     }
+-    memory_region_dispatch_read(mr, physaddr, &val, size, iotlbentry->attrs);
++    r = memory_region_dispatch_read(mr, physaddr,
++                                    &val, size, iotlbentry->attrs);
++    if (r != MEMTX_OK) {
++        cpu_transaction_failed(cpu, physaddr, addr, size, MMU_DATA_LOAD,
++                               mmu_idx, iotlbentry->attrs, r, retaddr);
++    }
+     if (locked) {
+         qemu_mutex_unlock_iothread();
+     }
+@@ -776,6 +783,7 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+ }
+ 
+ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
++                      int mmu_idx,
+                       uint64_t val, target_ulong addr,
+                       uintptr_t retaddr, int size)
+ {
+@@ -783,6 +791,7 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+     hwaddr physaddr = iotlbentry->addr;
+     MemoryRegion *mr = iotlb_to_region(cpu, physaddr, iotlbentry->attrs);
+     bool locked = false;
++    MemTxResult r;
+ 
+     physaddr = (physaddr & TARGET_PAGE_MASK) + addr;
+     if (mr != &io_mem_rom && mr != &io_mem_notdirty && !cpu->can_do_io) {
+@@ -795,7 +804,12 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+         qemu_mutex_lock_iothread();
+         locked = true;
+     }
+-    memory_region_dispatch_write(mr, physaddr, val, size, iotlbentry->attrs);
++    r = memory_region_dispatch_write(mr, physaddr,
++                                     val, size, iotlbentry->attrs);
++    if (r != MEMTX_OK) {
++        cpu_transaction_failed(cpu, physaddr, addr, size, MMU_DATA_STORE,
++                               mmu_idx, iotlbentry->attrs, r, retaddr);
++    }
+     if (locked) {
+         qemu_mutex_unlock_iothread();
+     }
+@@ -845,6 +859,7 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
+     MemoryRegion *mr;
+     CPUState *cpu = ENV_GET_CPU(env);
+     CPUIOTLBEntry *iotlbentry;
++    hwaddr physaddr;
+ 
+     index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
+     mmu_idx = cpu_mmu_index(env, true);
+@@ -868,6 +883,19 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
+         }
+         qemu_mutex_unlock_iothread();
+ 
++        /* Give the new-style cpu_transaction_failed() hook first chance
++         * to handle this.
++         * This is not the ideal place to detect and generate CPU
++         * exceptions for instruction fetch failure (for instance
++         * we don't know the length of the access that the CPU would
++         * use, and it would be better to go ahead and try the access
++         * and use the MemTXResult it produced). However it is the
++         * simplest place we have currently available for the check.
++         */
++        physaddr = (iotlbentry->addr & TARGET_PAGE_MASK) + addr;
++        cpu_transaction_failed(cpu, physaddr, addr, 0, MMU_INST_FETCH, mmu_idx,
++                               iotlbentry->attrs, MEMTX_DECODE_ERROR, 0);
++
+         cpu_unassigned_access(cpu, addr, false, true, 0, 4);
+         /* The CPU's unassigned access hook might have longjumped out
+          * with an exception. If it didn't (or there was no hook) then
 -- 
 2.7.4
