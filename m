@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dov5m-0003NR-VS
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:23:27 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dovB6-0004ng-Eg
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:28:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dov5i-0002At-0o
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:23:22 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:58824)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dov5h-00029V-NV
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:23:17 -0400
-References: <20170903163130.14288-1-n54@gmx.com>
-	<20170904164659.26915-1-n54@gmx.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <0deb4442-a7a5-45e5-bc5c-5fad2a7c9385@vivier.eu>
-Date: Mon, 4 Sep 2017 19:23:10 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dovB1-0005T4-Th
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:28:52 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:34987)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dovB1-0005Sn-LJ
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:28:47 -0400
+Received: by mail-wr0-x236.google.com with SMTP id y15so3311295wrc.2
+	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 10:28:47 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170904164659.26915-1-n54@gmx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] target/m68k: Switch fpu_rom from
- make_floatx80() to make_floatx80_init()
+In-Reply-To: <1504542075-28447-1-git-send-email-peter.maydell@linaro.org>
+References: <1504542075-28447-1-git-send-email-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 4 Sep 2017 18:28:25 +0100
+Message-ID: <CAFEAcA8iDousTBOZ+T54DP_cnO0D8wPonLw2X9LpAaOTNqN8bQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/33] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <n54@gmx.com>
-Cc: qemu-devel@nongnu.org, f4bug@amsat.org, peter.maydell@linaro.org
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-Le 04/09/2017 à 18:46, Kamil Rytarowski a écrit :
-> GCC 4.7.2 on SunOS reports that the values assigned to array members are not
-> real constants:
-> 
-> target/m68k/fpu_helper.c:32:5: error: initializer element is not constant
-> target/m68k/fpu_helper.c:32:5: error: (near initialization for 'fpu_rom[0]')
-> rules.mak:66: recipe for target 'target/m68k/fpu_helper.o' failed
-> 
-> Convert the array to make_floatx80_init() to fix it.
-> Replace floatx80_pi-like constants with make_floatx80_init() as they are
-> defined as make_floatx80().
-> 
-> This fixes build on SmartOS (Joyent).
-> 
-> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
-> ---
->  target/m68k/fpu_helper.c | 44 ++++++++++++++++++++++----------------------
->  1 file changed, 22 insertions(+), 22 deletions(-)
-> 
-> diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-> index bdfc537c68..8afd319ede 100644
-> --- a/target/m68k/fpu_helper.c
-> +++ b/target/m68k/fpu_helper.c
-> @@ -29,28 +29,28 @@
->   */
->  
->  static const floatx80 fpu_rom[128] = {
-> -    [0x00] = floatx80_pi,                                   /* Pi */
-> -    [0x0b] = make_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
-> -    [0x0c] = make_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
-> -    [0x0d] = make_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
-> -    [0x0e] = make_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
-> -    [0x0f] = floatx80_zero,                                 /* Zero     */
-> -    [0x30] = floatx80_ln2,                                  /* ln(2)    */
-> -    [0x31] = make_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
-> -    [0x32] = floatx80_one,                                  /* 10^0     */
-> -    [0x33] = make_floatx80(0x4002, 0xa000000000000000ULL),  /* 10^1     */
-> -    [0x34] = make_floatx80(0x4005, 0xc800000000000000ULL),  /* 10^2     */
-> -    [0x35] = make_floatx80(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
-> -    [0x36] = make_floatx80(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
-> -    [0x37] = make_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
-> -    [0x38] = make_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
-> -    [0x39] = make_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
-> -    [0x3a] = make_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
-> -    [0x3b] = make_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
-> -    [0x3c] = make_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
-> -    [0x3d] = make_floatx80(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
-> -    [0x3e] = make_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
-> -    [0x3f] = make_floatx80(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
-> +    [0x00] = make_floatx80_init(0x4000, 0x0c90fdaa22168c235LL),  /* Pi       */
+On 4 September 2017 at 17:21, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Third time's the charm...
+>
+> -- PMM
+>
+> The following changes since commit 98bfaac788be0ca63d7d010c8d4ba100ff1d8278:
+>
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-09-01-v3' into staging (2017-09-04 13:28:09 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20170904-2
+>
+> for you to fetch changes up to 7229ec5825df6b933f150b54a8a2bedd2de1864c:
+>
+>   arm_gicv3_kvm: Fix compile warning (2017-09-04 17:13:53 +0100)
+>
+> ----------------------------------------------------------------
+> target-arm:
+>  * collection of M profile cleanups and minor bugfixes
+>  * loader: handle ELF files with overlapping zero-init data
+>  * virt: allow PMU instantiation with userspace irqchip
+>  * wdt_aspeed: Add support for the reset width register
+>  * cpu: Define new cpu_transaction_failed() hook
+>  * Mark some SoC devices as not user-creatable
+>  * arm: Fix aa64 ldp register writeback
+>  * arm_gicv3_kvm: Fix compile warning
+>
 
-should be       make_floatx80_init(0x4000, 0xc90fdaa22168c235ULL)
+Applied, thanks.
 
-> +    [0x0b] = make_floatx80_init(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
-> +    [0x0c] = make_floatx80_init(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
-> +    [0x0d] = make_floatx80_init(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
-> +    [0x0e] = make_floatx80_init(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
-> +    [0x0f] = make_floatx80_init(0x0000, 0x00000000000000000LL),  /* Zero     */
-
-                make_floatx80_init(0x0000, 0x0000000000000000ULL)
-
-> +    [0x30] = make_floatx80_init(0x3ffe, 0x0b17217f7d1cf79acLL),  /* ln(2)    */
-
-                make_floatx80_init(0x3ffe, 0xb17217f7d1cf79acULL)
-
-> +    [0x31] = make_floatx80_init(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
-> +    [0x32] = make_floatx80_init(0x3fff, 0x08000000000000000LL),  /* 10^0     */
-
-                make_floatx80_init(0x3fff, 0x8000000000000000ULL)
-
-> +    [0x33] = make_floatx80_init(0x4002, 0xa000000000000000ULL),  /* 10^1     */
-> +    [0x34] = make_floatx80_init(0x4005, 0xc800000000000000ULL),  /* 10^2     */
-> +    [0x35] = make_floatx80_init(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
-> +    [0x36] = make_floatx80_init(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
-> +    [0x37] = make_floatx80_init(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
-> +    [0x38] = make_floatx80_init(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
-> +    [0x39] = make_floatx80_init(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
-> +    [0x3a] = make_floatx80_init(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
-> +    [0x3b] = make_floatx80_init(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
-> +    [0x3c] = make_floatx80_init(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
-> +    [0x3d] = make_floatx80_init(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
-> +    [0x3e] = make_floatx80_init(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
-> +    [0x3f] = make_floatx80_init(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
->  };
->  
->  int32_t HELPER(reds32)(CPUM68KState *env, FPReg *val)
-> 
-
-Thanks,
-Laurent
+-- PMM
