@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dovhF-000811-1T
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 14:02:09 -0400
+	(envelope-from <thuth@redhat.com>) id 1dovoM-0001PH-78
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 14:09:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dovhA-0007Jg-8v
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 14:02:05 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:38376)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dovhA-0007JW-3o
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 14:02:00 -0400
-Received: by mail-qt0-x241.google.com with SMTP id 12so724946qtn.5
-	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 11:01:59 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170903163130.14288-1-n54@gmx.com>
-	<20170904164659.26915-1-n54@gmx.com>
-	<0deb4442-a7a5-45e5-bc5c-5fad2a7c9385@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f4882a27-c238-8442-e341-b20ecb2676c2@amsat.org>
-Date: Mon, 4 Sep 2017 15:01:56 -0300
+	(envelope-from <thuth@redhat.com>) id 1dovoH-00066v-Ho
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 14:09:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33932)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dovoH-00065w-Cu
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 14:09:21 -0400
+References: <1504545540-8002-1-git-send-email-peter.maydell@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d91a4033-a76a-9adc-aaa0-ded8468a337b@redhat.com>
+Date: Mon, 4 Sep 2017 20:09:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <0deb4442-a7a5-45e5-bc5c-5fad2a7c9385@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1504545540-8002-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] target/m68k: Switch fpu_rom from
- make_floatx80() to make_floatx80_init()
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] configure: Drop AIX host support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,101 +27,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, Kamil Rytarowski <n54@gmx.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Laurent Vivier <laurent@vivier.eu>
 
-On 09/04/2017 02:23 PM, Laurent Vivier wrote:
-> Le 04/09/2017 à 18:46, Kamil Rytarowski a écrit :
->> GCC 4.7.2 on SunOS reports that the values assigned to array members are not
->> real constants:
->>
->> target/m68k/fpu_helper.c:32:5: error: initializer element is not constant
->> target/m68k/fpu_helper.c:32:5: error: (near initialization for 'fpu_rom[0]')
->> rules.mak:66: recipe for target 'target/m68k/fpu_helper.o' failed
->>
->> Convert the array to make_floatx80_init() to fix it.
->> Replace floatx80_pi-like constants with make_floatx80_init() as they are
->> defined as make_floatx80().
->>
->> This fixes build on SmartOS (Joyent).
->>
->> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
->> ---
->>   target/m68k/fpu_helper.c | 44 ++++++++++++++++++++++----------------------
->>   1 file changed, 22 insertions(+), 22 deletions(-)
->>
->> diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
->> index bdfc537c68..8afd319ede 100644
->> --- a/target/m68k/fpu_helper.c
->> +++ b/target/m68k/fpu_helper.c
->> @@ -29,28 +29,28 @@
->>    */
->>   
->>   static const floatx80 fpu_rom[128] = {
->> -    [0x00] = floatx80_pi,                                   /* Pi */
->> -    [0x0b] = make_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
->> -    [0x0c] = make_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
->> -    [0x0d] = make_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
->> -    [0x0e] = make_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
->> -    [0x0f] = floatx80_zero,                                 /* Zero     */
->> -    [0x30] = floatx80_ln2,                                  /* ln(2)    */
->> -    [0x31] = make_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
->> -    [0x32] = floatx80_one,                                  /* 10^0     */
->> -    [0x33] = make_floatx80(0x4002, 0xa000000000000000ULL),  /* 10^1     */
->> -    [0x34] = make_floatx80(0x4005, 0xc800000000000000ULL),  /* 10^2     */
->> -    [0x35] = make_floatx80(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
->> -    [0x36] = make_floatx80(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
->> -    [0x37] = make_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
->> -    [0x38] = make_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
->> -    [0x39] = make_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
->> -    [0x3a] = make_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
->> -    [0x3b] = make_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
->> -    [0x3c] = make_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
->> -    [0x3d] = make_floatx80(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
->> -    [0x3e] = make_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
->> -    [0x3f] = make_floatx80(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
->> +    [0x00] = make_floatx80_init(0x4000, 0x0c90fdaa22168c235LL),  /* Pi       */
-> 
-> should be       make_floatx80_init(0x4000, 0xc90fdaa22168c235ULL)
+On 04.09.2017 19:19, Peter Maydell wrote:
+> Nobody has mentioned AIX host support on the mailing list for years,
+> and we have no test systems for it so it is most likely broken.
+> We've advertised in configure for two releases now that we plan
+> to drop support for this host OS, and have had no complaints.
 
-oops I missed the sign, thankfully you did a careful review!
+We just added this some weeks ago to our qemu-doc.texi:
 
-> 
->> +    [0x0b] = make_floatx80_init(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
->> +    [0x0c] = make_floatx80_init(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
->> +    [0x0d] = make_floatx80_init(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
->> +    [0x0e] = make_floatx80_init(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
->> +    [0x0f] = make_floatx80_init(0x0000, 0x00000000000000000LL),  /* Zero     */
-> 
->                  make_floatx80_init(0x0000, 0x0000000000000000ULL)
-> 
->> +    [0x30] = make_floatx80_init(0x3ffe, 0x0b17217f7d1cf79acLL),  /* ln(2)    */
-> 
->                  make_floatx80_init(0x3ffe, 0xb17217f7d1cf79acULL)
-> 
->> +    [0x31] = make_floatx80_init(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
->> +    [0x32] = make_floatx80_init(0x3fff, 0x08000000000000000LL),  /* 10^0     */
-> 
->                  make_floatx80_init(0x3fff, 0x8000000000000000ULL)
-> 
->> +    [0x33] = make_floatx80_init(0x4002, 0xa000000000000000ULL),  /* 10^1     */
->> +    [0x34] = make_floatx80_init(0x4005, 0xc800000000000000ULL),  /* 10^2     */
->> +    [0x35] = make_floatx80_init(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
->> +    [0x36] = make_floatx80_init(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
->> +    [0x37] = make_floatx80_init(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
->> +    [0x38] = make_floatx80_init(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
->> +    [0x39] = make_floatx80_init(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
->> +    [0x3a] = make_floatx80_init(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
->> +    [0x3b] = make_floatx80_init(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
->> +    [0x3c] = make_floatx80_init(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
->> +    [0x3d] = make_floatx80_init(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
->> +    [0x3e] = make_floatx80_init(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
->> +    [0x3f] = make_floatx80_init(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
->>   };
->>   
->>   int32_t HELPER(reds32)(CPUM68KState *env, FPReg *val)
->>
-> 
-> Thanks,
-> Laurent
-> 
+"Prior to the 2.10.0 release there was no official policy on how long
+features would be deprecated prior to their removal, nor any documented
+list of which features were deprecated. Thus any features deprecated
+prior to 2.10.0 will be treated as if they were first deprecated in the
+2.10.0 release."
+
+Should we maybe wait two more releases (for version 3.0 ;-)) 'till we
+remove it?
+
+Anyway, the patch looks fine to me, so:
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
