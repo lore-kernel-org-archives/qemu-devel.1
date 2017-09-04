@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dooTL-0001DV-I3
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 06:19:20 -0400
+	(envelope-from <thuth@redhat.com>) id 1dooUl-0002PU-Pv
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 06:20:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dooTD-0006RP-Rg
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 06:19:15 -0400
-Received: from 5.mo178.mail-out.ovh.net ([46.105.51.53]:52223)
+	(envelope-from <thuth@redhat.com>) id 1dooUg-00070v-HL
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 06:20:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41228)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dooTD-0006Qs-IK
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 06:19:07 -0400
-Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 1DE7E4C99B
-	for <qemu-devel@nongnu.org>; Mon,  4 Sep 2017 12:19:05 +0200 (CEST)
-Date: Mon, 4 Sep 2017 12:18:57 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170904121857.1def843f@bahia>
-In-Reply-To: <747daf1a700a5340eeeedd9d98188bf89f75bb85.1504161284.git.sam.bobroff@au1.ibm.com>
-References: <747daf1a700a5340eeeedd9d98188bf89f75bb85.1504161284.git.sam.bobroff@au1.ibm.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dooUg-00070U-8G
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 06:20:38 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5AA845F7B2
+	for <qemu-devel@nongnu.org>; Mon,  4 Sep 2017 10:20:37 +0000 (UTC)
+References: <20170904090310.22530-1-marcandre.lureau@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <1931f0be-40ce-49b8-02e4-0d98801091ae@redhat.com>
+Date: Mon, 4 Sep 2017 12:20:30 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/UaqakGZhRkDdpzo7hlnMTNN";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/1] ppc: spapr: Move VCPU ID
- calculation into sPAPR
+In-Reply-To: <20170904090310.22530-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] build-sys: generate tests/.gitignore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,144 +33,228 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam Bobroff <sam.bobroff@au1.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com
 
---Sig_/UaqakGZhRkDdpzo7hlnMTNN
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, 31 Aug 2017 16:38:46 +1000
-Sam Bobroff <sam.bobroff@au1.ibm.com> wrote:
-
-> Move the calculation of a CPU's VCPU ID out of the generic PPC code
-> (ppc_cpu_realizefn()) and into sPAPR specific code
-> (spapr_cpu_core_realize()) where it belongs.
+On 04.09.2017 11:03, Marc-Andr=C3=A9 Lureau wrote:
+> tests/.gitignore is often out of date. Let's generate it based on the
+> files and directories to clean.
 >=20
-> Unfortunately, due to the way things are ordered, we still need to
-> default the VCPU ID in ppc_cpu_realizfn() but at least doing that
-> doesn't require any interaction with sPAPR.
+> Note: I didn't succeed yet at generalizing this approach for the rest
+> of qemu .gitignore files, but I hope it may eventually happen.
 >=20
-> Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
-> This is follow up work arising from my work to clean up the way CPU VCPU =
-IDs are
-> handled on PowerPC. It had looked like it would be difficult to move the =
-actual
-> VCPU ID calculation out of generic code but it turned out to be OK.
+>  Makefile                   |  7 +++-
+>  tests/.gitignore           | 97 --------------------------------------=
+--------
+>  tests/Makefile.include     | 39 +++++++++++++++++--
+>  tests/migration/.gitignore |  2 -
+>  4 files changed, 41 insertions(+), 104 deletions(-)
+>  delete mode 100644 tests/.gitignore
+>  delete mode 100644 tests/migration/.gitignore
 >=20
-> It's based on dgibson/ppc-for-2.11.
->=20
-> Cheers,
-> Sam.
->=20
->  hw/ppc/spapr_cpu_core.c     | 11 +++++++++++
->  target/ppc/translate_init.c | 18 +++---------------
->  2 files changed, 14 insertions(+), 15 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 5e319d9bbb..84dcc6e264 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -211,6 +211,7 @@ error:
+> diff --git a/Makefile b/Makefile
+> index 81447b1f08..89d5edf531 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -6,7 +6,7 @@ BUILD_DIR=3D$(CURDIR)
+>  # Before including a proper config-host.mak, assume we are in the sour=
+ce tree
+>  SRC_PATH=3D.
 > =20
->  static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
->  {
-> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
->      sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
->      sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
->      CPUCore *cc =3D CPU_CORE(OBJECT(dev));
-> @@ -237,6 +238,16 @@ static void spapr_cpu_core_realize(DeviceState *dev,=
- Error **errp)
->          cs =3D CPU(obj);
->          cpu =3D POWERPC_CPU(cs);
->          cs->cpu_index =3D cc->core_id + i;
-> +        cpu->vcpu_id =3D (cc->core_id * spapr->vsmt / smp_threads) + i;
-
-According to what we currently have in the generic code, this should be:
-
-((cc->core_id + i) / smp_threads) * spapr->vsmt + ((cc->core_id + i) % smp_=
-threads)
-
-but since cc->core_id is a multiple of smp_threads and i < cc->nr_threads <=
-=3D smp_threads,
-then we can indeed simplify the computation as you did. :)
-
-\o/
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
-> +        if (kvm_enabled() && !kvm_vcpu_id_is_valid(cpu->vcpu_id)) {
-> +            error_setg(&local_err, "Can't create CPU with id %d in KVM",
-> +                       cpu->vcpu_id);
-> +            error_append_hint(&local_err, "Adjust the number of cpus to =
-%d "
-> +                              "or try to raise the number of threads per=
- core\n",
-> +                              cpu->vcpu_id * smp_threads / spapr->vsmt);
-> +            goto err;
-> +        }
+> -UNCHECKED_GOALS :=3D %clean TAGS cscope ctags docker docker-%
+> +UNCHECKED_GOALS :=3D %clean TAGS cscope ctags docker docker-% gitignor=
+e
+> =20
+>  # All following code might depend on configuration variables
+>  ifneq ($(wildcard config-host.mak),)
+> @@ -14,6 +14,11 @@ ifneq ($(wildcard config-host.mak),)
+>  all:
+>  include config-host.mak
+> =20
+> +.PHONY: gitignore
+> +ifneq ($(filter-out $(UNCHECKED_GOALS),$(MAKECMDGOALS)),$(if $(MAKECMD=
+GOALS),,fail))
+> +all $(MAKECMDGOALS): gitignore
+> +endif
 > +
+>  # Check that we're not trying to do an out-of-tree build from
+>  # a tree that's been used for an in-tree build.
+>  ifneq ($(realpath $(SRC_PATH)),$(realpath .))
+> diff --git a/tests/.gitignore b/tests/.gitignore
+> deleted file mode 100644
+> index fed0189a5a..0000000000
+> --- a/tests/.gitignore
+> +++ /dev/null
+> @@ -1,97 +0,0 @@
+> -atomic_add-bench
+> -benchmark-crypto-cipher
+> -benchmark-crypto-hash
+> -benchmark-crypto-hmac
+> -check-qdict
+> -check-qnum
+> -check-qjson
+> -check-qlist
+> -check-qnull
+> -check-qstring
+> -check-qom-interface
+> -check-qom-proplist
+> -qht-bench
+> -rcutorture
+> -test-aio
+> -test-aio-multithread
+> -test-arm-mptimer
+> -test-base64
+> -test-bitops
+> -test-bitcnt
+> -test-blockjob
+> -test-blockjob-txn
+> -test-bufferiszero
+> -test-char
+> -test-clone-visitor
+> -test-coroutine
+> -test-crypto-afsplit
+> -test-crypto-block
+> -test-crypto-cipher
+> -test-crypto-hash
+> -test-crypto-hmac
+> -test-crypto-ivgen
+> -test-crypto-pbkdf
+> -test-crypto-secret
+> -test-crypto-tlscredsx509
+> -test-crypto-tlscredsx509-work/
+> -test-crypto-tlscredsx509-certs/
+> -test-crypto-tlssession
+> -test-crypto-tlssession-work/
+> -test-crypto-tlssession-client/
+> -test-crypto-tlssession-server/
+> -test-crypto-xts
+> -test-cutils
+> -test-hbitmap
+> -test-hmp
+> -test-int128
+> -test-iov
+> -test-io-channel-buffer
+> -test-io-channel-command
+> -test-io-channel-command.fifo
+> -test-io-channel-file
+> -test-io-channel-file.txt
+> -test-io-channel-socket
+> -test-io-channel-tls
+> -test-io-task
+> -test-keyval
+> -test-logging
+> -test-mul64
+> -test-opts-visitor
+> -test-qapi-event.[ch]
+> -test-qapi-types.[ch]
+> -test-qapi-util
+> -test-qapi-visit.[ch]
+> -test-qdev-global-props
+> -test-qemu-opts
+> -test-qdist
+> -test-qga
+> -test-qht
+> -test-qht-par
+> -test-qmp-commands
+> -test-qmp-commands.h
+> -test-qmp-event
+> -test-qobject-input-strict
+> -test-qobject-input-visitor
+> -test-qmp-introspect.[ch]
+> -test-qmp-marshal.c
+> -test-qobject-output-visitor
+> -test-rcu-list
+> -test-replication
+> -test-shift128
+> -test-string-input-visitor
+> -test-string-output-visitor
+> -test-thread-pool
+> -test-throttle
+> -test-timed-average
+> -test-uuid
+> -test-visitor-serialization
+> -test-vmstate
+> -test-write-threshold
+> -test-x86-cpuid
+> -test-x86-cpuid-compat
+> -test-xbzrle
+> -test-netfilter
+> -test-filter-mirror
+> -test-filter-redirector
+> -*-test
+> -qapi-schema/*.test.*
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index f08b7418f0..e94671e879 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -901,8 +901,34 @@ $(patsubst %, check-%, $(check-qapi-schema-y)): ch=
+eck-%.json: $(SRC_PATH)/%.json
+>  check-tests/qapi-schema/doc-good.texi: tests/qapi-schema/doc-good.test=
+.texi
+>  	@diff -q $(SRC_PATH)/tests/qapi-schema/doc-good.texi $<
 > =20
->          /* Set NUMA node for the threads belonged to core  */
->          cpu->node_id =3D sc->node_id;
-> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-> index 7f6a349e43..1f7286c893 100644
-> --- a/target/ppc/translate_init.c
-> +++ b/target/ppc/translate_init.c
-> @@ -9903,28 +9903,15 @@ static void ppc_cpu_realizefn(DeviceState *dev, E=
-rror **errp)
->      PowerPCCPU *cpu =3D POWERPC_CPU(dev);
->      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
->      Error *local_err =3D NULL;
-> -#if !defined(CONFIG_USER_ONLY)
-> -    int max_smt =3D kvmppc_smt_threads();
-> -#endif
+> -# Consolidated targets
+> +tests-cleanfiles =3D *.o
+> +tests-cleanfiles +=3D .gitignore
+> +tests-cleanfiles +=3D qht-bench$(EXESUF)
+> +tests-cleanfiles +=3D qapi-schema/*.test.*
+> +tests-cleanfiles +=3D test-qapi-event.[ch]
+> +tests-cleanfiles +=3D test-qapi-types.[ch]
+> +tests-cleanfiles +=3D test-qapi-visit.[ch]
+> +tests-cleanfiles +=3D test-qmp-introspect.[ch]
+> +tests-cleanfiles +=3D test-qmp-commands.h
+> +tests-cleanfiles +=3D test-qmp-marshal.c
+> +tests-cleanfiles +=3D $(subst tests/,,$(check-unit-y))
+> +tests-cleanfiles +=3D $(subst tests/,,$(check-speed-y))
+> +tests-cleanfiles +=3D $(subst tests/,,$(check-block-y))
+> +tests-cleanfiles +=3D $(subst tests/,,$(check-qtest-y))
+> +tests-cleanfiles +=3D $(subst tests/,,$(QEMU_IOTESTS_HELPERS-y))
+> +tests-cleanfiles +=3D migration/initrd-stress.img
+> +tests-cleanfiles +=3D migration/stress$(EXESUF)
+> +tests-cleanfiles +=3D atomic_add-bench$(EXESUF)
+> +tests-cleanfiles +=3D test-io-channel-file.txt
+> +tests-cleanfiles +=3D test-io-channel-command.fifo
+> +
+> +tests-cleandirs +=3D test-crypto-tlscredsx509-certs/
+> +tests-cleandirs +=3D test-crypto-tlscredsx509-work/
+> +tests-cleandirs +=3D test-crypto-tlssession-client/
+> +tests-cleandirs +=3D test-crypto-tlssession-server/
+> +tests-cleandirs +=3D test-crypto-tlssession-work/
 > =20
->      cpu_exec_realizefn(cs, &local_err);
->      if (local_err !=3D NULL) {
->          error_propagate(errp, local_err);
->          return;
->      }
+> +# Consolidated targets
+>  .PHONY: check-qapi-schema check-qtest check-unit check check-clean
+>  check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check=
+-tests/qapi-schema/doc-good.texi
+>  check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+> @@ -912,15 +938,20 @@ check-block: $(patsubst %,check-%, $(check-block-=
+y))
+>  check: check-qapi-schema check-unit check-qtest
+>  check-clean:
+>  	$(MAKE) -C tests/tcg clean
+> -	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+> -	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$=
+(target)-y)) $(check-qtest-generic-y))
 > -
-> -#if !defined(CONFIG_USER_ONLY)
-> -    cpu->vcpu_id =3D (cs->cpu_index / smp_threads) * max_smt
-> -        + (cs->cpu_index % smp_threads);
-> -
-> -    if (kvm_enabled() && !kvm_vcpu_id_is_valid(cpu->vcpu_id)) {
-> -        error_setg(errp, "Can't create CPU with id %d in KVM", cpu->vcpu=
-_id);
-> -        error_append_hint(errp, "Adjust the number of cpus to %d "
-> -                          "or try to raise the number of threads per cor=
-e\n",
-> -                          cpu->vcpu_id * smp_threads / max_smt);
-> -        goto unrealize;
-> +    if (cpu->vcpu_id =3D=3D UNASSIGNED_CPU_INDEX) {
-> +        cpu->vcpu_id =3D cs->cpu_index;
->      }
-> -#endif
+> +	rm -f $(addprefix tests/, $(tests-cleanfiles))
+> +	rm -rf $(addprefix tests/, $(tests-cleandirs))
+
+I think you should mention this in the patch description, too, that
+you're touching the "clean" target here.
+
+>  clean: check-clean
 > =20
->      if (tcg_enabled()) {
->          if (ppc_fixup_cpu(cpu) !=3D 0) {
-> @@ -10625,6 +10612,7 @@ static void ppc_cpu_initfn(Object *obj)
->      CPUPPCState *env =3D &cpu->env;
+>  # Build the help program automatically
 > =20
->      cs->env_ptr =3D env;
-> +    cpu->vcpu_id =3D UNASSIGNED_CPU_INDEX;
+>  all: $(QEMU_IOTESTS_HELPERS-y)
 > =20
->      env->msr_mask =3D pcc->msr_mask;
->      env->mmu_model =3D pcc->mmu_model;
+> +$(SRC_PATH)/tests/.gitignore: $(MAKEFILE_LIST)
+> +	$(call quiet-command, echo "$(tests-cleanfiles)" "$(tests-cleandirs)"=
+ | \
+> +		xargs -n1 | sort | uniq | sed -e s:^:/: > $@,"GEN","$(@F)")
 
+Please do not use SRC_PATH here. I'm doing out of tree builds, and I
+don't want that these are touching my source folder!
 
---Sig_/UaqakGZhRkDdpzo7hlnMTNN
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWa0okgAKCRAC/DrrAQHb
-wt3DAJ4wFmkOuNE+TBPc4v5c5ovdwwv72gCffAocsjXE6h8hX1gZ5Wgv3tv+GW4=
-=3nbt
------END PGP SIGNATURE-----
-
---Sig_/UaqakGZhRkDdpzo7hlnMTNN--
+ Thomas
