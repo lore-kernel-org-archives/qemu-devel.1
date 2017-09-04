@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dotXA-0004FM-Cy
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:43:37 -0400
+	(envelope-from <david@redhat.com>) id 1dotXE-0004Jm-PM
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:43:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dotX5-0000sK-LO
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:43:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39506)
+	(envelope-from <david@redhat.com>) id 1dotXA-0000tx-4d
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:43:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53794)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dotX5-0000rw-F1
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:43:27 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dotX9-0000td-Uv
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:43:32 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Mon,  4 Sep 2017 17:42:59 +0200
-Message-Id: <20170904154316.4148-3-david@redhat.com>
+Date: Mon,  4 Sep 2017 17:43:01 +0200
+Message-Id: <20170904154316.4148-5-david@redhat.com>
 In-Reply-To: <20170904154316.4148-1-david@redhat.com>
 References: <20170904154316.4148-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 02/19] cpu: drop old comments describing
- members
+Subject: [Qemu-devel] [PATCH v2 04/19] s390x: rename s390-virtio.h to
+ s390-virtio-hcall.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +27,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
 
-These comments are obviously stale.
+The only interface left, so let's properly rename it.
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- include/qom/cpu.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ hw/s390x/s390-virtio-ccw.c                      | 2 +-
+ hw/s390x/s390-virtio-hcall.c                    | 2 +-
+ hw/s390x/{s390-virtio.h => s390-virtio-hcall.h} | 8 ++++----
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+ rename hw/s390x/{s390-virtio.h => s390-virtio-hcall.h} (77%)
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index b7ac9491c8..386ab0af40 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -378,10 +378,10 @@ struct CPUState {
-     DECLARE_BITMAP(trace_dstate, CPU_TRACE_DSTATE_MAX_EVENTS);
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 4c3a3e177b..f67b4b5d58 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -16,7 +16,7 @@
+ #include "cpu.h"
+ #include "hw/boards.h"
+ #include "exec/address-spaces.h"
+-#include "s390-virtio.h"
++#include "hw/s390x/s390-virtio-hcall.h"
+ #include "hw/s390x/sclp.h"
+ #include "hw/s390x/s390_flic.h"
+ #include "hw/s390x/ioinst.h"
+diff --git a/hw/s390x/s390-virtio-hcall.c b/hw/s390x/s390-virtio-hcall.c
+index 23d67d6170..ec7cf8beb3 100644
+--- a/hw/s390x/s390-virtio-hcall.c
++++ b/hw/s390x/s390-virtio-hcall.c
+@@ -11,7 +11,7 @@
  
-     /* TODO Move common fields from CPUArchState here. */
--    int cpu_index; /* used by alpha TCG */
--    uint32_t halted; /* used by alpha, cris, ppc TCG */
-+    int cpu_index;
-+    uint32_t halted;
-     uint32_t can_do_io;
--    int32_t exception_index; /* used by m68k TCG */
-+    int32_t exception_index;
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+-#include "hw/s390x/s390-virtio.h"
++#include "hw/s390x/s390-virtio-hcall.h"
  
-     /* shared by kvm, hax and hvf */
-     bool vcpu_dirty;
+ #define MAX_DIAG_SUBCODES 255
+ 
+diff --git a/hw/s390x/s390-virtio.h b/hw/s390x/s390-virtio-hcall.h
+similarity index 77%
+rename from hw/s390x/s390-virtio.h
+rename to hw/s390x/s390-virtio-hcall.h
+index d984cd4115..59fcba3a06 100644
+--- a/hw/s390x/s390-virtio.h
++++ b/hw/s390x/s390-virtio-hcall.h
+@@ -1,5 +1,5 @@
+ /*
+- * Virtio interfaces for s390
++ * Support for virtio hypercalls on s390x
+  *
+  * Copyright 2012 IBM Corp.
+  * Author(s): Cornelia Huck <cornelia.huck@de.ibm.com>
+@@ -9,12 +9,12 @@
+  * directory.
+  */
+ 
+-#ifndef HW_S390_VIRTIO_H
+-#define HW_S390_VIRTIO_H
++#ifndef HW_S390_VIRTIO_HCALL_H
++#define HW_S390_VIRTIO_HCALL_H
+ 
+ #include "standard-headers/asm-s390/kvm_virtio.h"
+ #include "standard-headers/asm-s390/virtio-ccw.h"
+ 
+ typedef int (*s390_virtio_fn)(const uint64_t *args);
+ void s390_register_virtio_hypercall(uint64_t code, s390_virtio_fn fn);
+-#endif
++#endif /* HW_S390_VIRTIO_HCALL_H */
 -- 
 2.13.5
