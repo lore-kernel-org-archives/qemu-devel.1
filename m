@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dosuU-0004WL-4q
+	(envelope-from <peter.maydell@linaro.org>) id 1dosuU-0004WJ-4n
 	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:04:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dossp-0002aW-9s
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:03:33 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47562)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dossp-0002ZP-4Z
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:01:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dossm-0002IV-Qb
-	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 15:01:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 880122E81BE
-	for <qemu-devel@nongnu.org>; Mon,  4 Sep 2017 15:01:45 +0000 (UTC)
+	(envelope-from <peter.maydell@linaro.org>) id 1dostR-00030S-1r
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:03:32 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:33036)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dostQ-0002zZ-QN
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:02:28 -0400
+Received: by mail-wr0-x236.google.com with SMTP id a43so2399251wrc.0
+	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 08:02:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 04 Sep 2017 14:53:24 -0000
-From: ilovezfs <1714750@bugs.launchpad.net>
-Reply-To: Bug 1714750 <1714750@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150442540217.17409.6458222878014636993.malonedeb@gac.canonical.com>
-Message-Id: <150453680466.10750.3497504310042559272.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1714750] Re: 2.10.0 cannot be installed on
- case-insensitive file system
+In-Reply-To: <c1c4d90a-380f-4bd1-8aa4-8a970241020d@vivier.eu>
+References: <20170903163130.14288-1-n54@gmx.com>
+	<9f33a768-77d1-191b-8be3-35d625752cbf@vivier.eu>
+	<1257d6ba-9ca1-0940-af9e-a9ea7dea0287@amsat.org>
+	<941d403b-7413-517f-23af-2c0c88a3ec57@gmx.com>
+	<c1c4d90a-380f-4bd1-8aa4-8a970241020d@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 4 Sep 2017 16:02:07 +0100
+Message-ID: <CAFEAcA-RUoY5X1KsS2eAkte6G3g2CC_YYMg1e1XxxWd420LBow@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] target/m68k: Change fpu_rom from const
+ static array to switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,68 +33,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Kamil Rytarowski <n54@gmx.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-I mean in that every user is going to have to figure this out
-individually until it's fixed.
+On 4 September 2017 at 15:09, Laurent Vivier <laurent@vivier.eu> wrote:
+> You can:
+>
+> either replace the "#define floatx80_pi make_floatx80(...)" by a "const
+> floatx80 floatx80_pi = make_floatx80_init(...)"
+>
+> or replace all the macros in the m68k/fpu_helper.c array by
+> make_floatx80_init(...)
 
-In any case it will not be a problem for our Homebrew users, as I will do t=
-his:
-```
-diff --git a/Formula/qemu.rb b/Formula/qemu.rb
-index 16a54af167..db0e68d103 100644
---- a/Formula/qemu.rb
-+++ b/Formula/qemu.rb
-@@ -1,10 +1,20 @@
-+# Fix extraction on case-insentive file systems.
-+# Reported 4 Sep 2017 https://bugs.launchpad.net/qemu/+bug/1714750
-+# This is actually an issue with u-boot and may take some time to sort out.
-+class QemuDownloadStrategy < CurlDownloadStrategy
-+  def stage
-+    exclude =3D "#{name}-#{version}/roms/u-boot/scripts/Kconfig"
-+    safe_system "tar", "xjf", cached_location, "--exclude", exclude
-+    chdir
-+  end
-+end
-+
- class Qemu < Formula
-   desc "x86 and PowerPC Emulator"
-   homepage "https://www.qemu.org/"
--  url "https://download.qemu.org/qemu-2.9.0.tar.bz2"
--  sha256 "00bfb217b1bb03c7a6c3261b819cfccbfb5a58e3e2ceff546327d271773c6c14"
--  revision 2
--
-+  url "https://download.qemu.org/qemu-2.10.0.tar.bz2",
-+      :using =3D> QemuDownloadStrategy
-+  sha256 "7e9f39e1306e6dcc595494e91c1464d4b03f55ddd2053183e0e1b69f7f776d48"
-   head "https://git.qemu.org/git/qemu.git"
- =
+Taking a step back, what's different about floatx80 and float12
+that means they need separate _init and non-init versions of
+the macros, when for float16/float32/float64 we instead have
+#define make_float32(x) __extension__ ({ float32 f32_val = {x}; f32_val; })
+#define const_float32(x) { x }
 
-   bottle do
-```
-https://github.com/Homebrew/homebrew-core/pull/17467
+? Could we move to consistency for the macro naming we're using?
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1714750
-
-Title:
-  2.10.0 cannot be installed on case-insensitive file system
-
-Status in QEMU:
-  New
-
-Bug description:
-  The https://download.qemu.org/qemu-2.10.0.tar.bz2 tarball cannot be
-  unpacked on a case-insensitive file system because it has a file
-  qemu-2.10.0/roms/u-boot/scripts/Kconfig and a directory
-  qemu-2.10.0/roms/u-boot/scripts/kconfig. This prevents installation on
-  most macOS systems since by default the file system is case
-  insensitive. The 2.10.0 upgrade is blocked in Homebrew due to this
-  issue. See https://github.com/Homebrew/homebrew-core/pull/17467. This
-  is a regression from 2.9.0, which didn't have this problem.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1714750/+subscriptions
+thanks
+-- PMM
