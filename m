@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dogZn-0000WW-Qj
-	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 21:55:03 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dohmf-000627-9V
+	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 23:11:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dogYj-0003f8-Jr
-	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 21:53:23 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:34291
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dogYi-0003aK-I2
-	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 21:52:17 -0400
-References: <1503305719-2512-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1503305719-2512-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<17975998-de91-6c9c-6e37-04cf46dd6254@cn.fujitsu.com>
-	<b96e1ef6-046d-f790-8ea3-14bb46b57f2d@gmail.com>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <f9722faf-4d55-fb74-3ad4-16e9fd68f43e@cn.fujitsu.com>
-Date: Mon, 4 Sep 2017 09:52:06 +0800
+	(envelope-from <jasowang@redhat.com>) id 1dohlf-0003ei-K0
+	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 23:10:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33890)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dohlf-0003cY-9f
+	for qemu-devel@nongnu.org; Sun, 03 Sep 2017 23:09:43 -0400
+References: <cover.1499329674.git.maozy.fnst@cn.fujitsu.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <307d18b6-54e6-e3e0-541e-9ad053955b84@redhat.com>
+Date: Mon, 4 Sep 2017 11:09:29 +0800
 MIME-Version: 1.0
-In-Reply-To: <b96e1ef6-046d-f790-8ea3-14bb46b57f2d@gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V4 1/3] net/colo-compare.c: Optimize
- unpredictable tcp options comparison
+In-Reply-To: <cover.1499329674.git.maozy.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v8 0/4] Improve error reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,184 +27,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>, qemu-devel@nongnu.org, zhangchen.fnst@cn.fujitsu.com
-Cc: jasowang@redhat.com, =?UTF-8?B?TGksIFpoaWppYW4v5p2OIOaZuuWdmg==?= <lizhijian@cn.fujitsu.com>
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, eblake@redhat.com
 
-Hi Chen,
 
-At 09/02/2017 12:02 AM, Zhang Chen wrote:
->
->
-> On 09/01/2017 05:35 PM, Dou Liyang wrote:
->> Hi chen,
->>
->> At 08/21/2017 04:55 PM, Zhang Chen wrote:
->>> When network is busy, some tcp options(like sack) will unpredictable
->>> occur in primary side or secondary side. it will make packet size
->>> not same, but the two packet's payload is identical. colo just
->>> care about packet payload, so we skip the option field.
->>>
->>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->>> ---
->>>  net/colo-compare.c | 39 +++++++++++++++++++++++++++------------
->>>  1 file changed, 27 insertions(+), 12 deletions(-)
->>>
->>> diff --git a/net/colo-compare.c b/net/colo-compare.c
->>> index ca67c68..f6bda41 100644
->>> --- a/net/colo-compare.c
->>> +++ b/net/colo-compare.c
->>> @@ -186,7 +186,10 @@ static int packet_enqueue(CompareState *s, int
->>> mode)
->>>   * return:    0  means packet same
->>>   *            > 0 || < 0 means packet different
->>>   */
->>> -static int colo_packet_compare_common(Packet *ppkt, Packet *spkt,
->>> int offset)
->>> +static int colo_packet_compare_common(Packet *ppkt,
->>> +                                      Packet *spkt,
->>> +                                      int poffset,
->>> +                                      int soffset)
->>>  {
->>>      if (trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
->>>          char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20],
->>> sec_ip_dst[20];
->>> @@ -201,12 +204,13 @@ static int colo_packet_compare_common(Packet
->>> *ppkt, Packet *spkt, int offset)
->>>                                     sec_ip_src, sec_ip_dst);
->>>      }
->>>
->>> -    offset = ppkt->vnet_hdr_len + offset;
->>> +    poffset = ppkt->vnet_hdr_len + poffset;
->>> +    soffset = ppkt->vnet_hdr_len + soffset;
->>>
->>> -    if (ppkt->size == spkt->size) {
->>> -        return memcmp(ppkt->data + offset,
->>> -                      spkt->data + offset,
->>> -                      spkt->size - offset);
->>> +    if (ppkt->size == spkt->size || poffset != soffset) {
->>> +        return memcmp(ppkt->data + poffset,
->>> +                      spkt->data + soffset,
->>> +                      spkt->size - soffset);
->>
->> Here maybe a mistake,
->>
->> I guess you should make sure
->>
->> (ppkt->size - poffset) == (spkt->size - soffset) is true in case of
->> (poffset != soffset) at the same time.
->>
->> Because, if sack make the header not equal, it is also possible that
->> the data is not equal at the same time.
->
-> Good catch! In rare situation will miss a different packet, I will fix
-> it in next version.
->
 
-Thank you very much!
-
->>
->>>      } else {
->>>          trace_colo_compare_main("Net packet size are not the same");
->>>          return -1;
->>> @@ -263,13 +267,22 @@ static int colo_packet_compare_tcp(Packet
->>> *spkt, Packet *ppkt)
->>>       * so we just need skip this field.
->>>       */
->>>      if (ptcp->th_off > 5) {
->>> -        ptrdiff_t tcp_offset;
->>> +        ptrdiff_t ptcp_offset, stcp_offset;
->>>
->>> -        tcp_offset = ppkt->transport_header - (uint8_t *)ppkt->data
->>> -                     + (ptcp->th_off * 4) - ppkt->vnet_hdr_len;
->>> -        res = colo_packet_compare_common(ppkt, spkt, tcp_offset);
->>> +        ptcp_offset = ppkt->transport_header - (uint8_t *)ppkt->data
->>> +                      + (ptcp->th_off * 4) - ppkt->vnet_hdr_len;
->>> +        stcp_offset = spkt->transport_header - (uint8_t *)spkt->data
->>> +                      + (stcp->th_off * 4) - spkt->vnet_hdr_len;
->>> +
->>> +        /*
->>> +         * When network is busy, some tcp options(like sack) will
->>> unpredictable
->>> +         * occur in primary side or secondary side. it will make
->>> packet size
->>> +         * not same, but the two packet's payload is identical. colo
->>> just
->>> +         * care about packet payload, so we skip the option field.
->>> +         */
->>> +        res = colo_packet_compare_common(ppkt, spkt, ptcp_offset,
->>> stcp_offset);
->>
->> we add a new parameter in xxx_common() just for xxx_tcp().
->> In my opinion, it seems not good.
->>
->> Can we split the tcp related code out from xxx_common, and make the
->> xxx_common function just do like what its name says.
+On 2017=E5=B9=B407=E6=9C=8806=E6=97=A5 16:47, Mao Zhongyi wrote:
+> v8:
+> * PATCH 02 & 04
+>    -resetting the error message for the user to read.   [Markus Armbrus=
+ter]
+>    -fix the indentation and commit message.  [Markus Armbruster]
+>   =20
+> v7:
+> * PATCH 01
+>    -fix the error message.    [Daniel P. Berrange]
+>    -adjust the indentation problem.    [Eric Blake]
+> * PATCH 03
+>    -print a generic message when gethostbyname() failed in parse_host_p=
+ort(),
+>     drop the misleading ": unkonwn host" part.    [Markus Armbruster]
 >
-> We introduce this parameter for all protocol, just tcp is the first user.
-> We should have the ability of compare all kinds of packet.
-> Maybe we must use different offset for other protocol except tcp in the
-> future.
+> v6:
+> * PATCH 02
+>    -rename the subject
+>    -drop the "qemu: error: " prefix.
+>    -correct inappropriate error information settings.
+> * PATCH 03,04
+>    -correct inappropriate error information settings.    [Markus Armbru=
+ster]
+>
+> v5:
+> * PATCH 01 make the commit message more exact about the actual function=
+.    [Markus Armbruster]
+> * PATCH 02, 03, 04 still retains the original function, but specific
+>             content and order of each patch has been adjusted substanti=
+ally,
+>             so that ensure each patch is a completed fix.    [Markus Ar=
+mbruster]
+>
+> v4:
+> * PATCH 01 is redoing previous patch 1, replace the fprintf() with erro=
+r_report()
+> 		     in the 'default' case of net_socket_fd_init() [Markus Armbruster=
+]
+>
+> v3:
+> * PATCH 01 is suggested by Markus and Daniel that removes the dubious '=
+default' case
+>             in the net_socket_fd_init(). Jason agreed.
+> * PATCH 02 is redoing previous patch 4.
+> * PATCH 04 is redoing previous patch 2, improves sort of error messages=
+.
+>
+> v2:
+> * PATCH 02 reworking of patch 2 following Markus's suggestion that conv=
+ert error_report()
+>             in the function called by net_socket_*_init() to Error. Als=
+o add many error
+>             handling information.
+> * PATCH 03 net_socket_mcast_create(), net_socket_fd_init_dgram() and ne=
+t_socket_fd_init()
+>             use the function such as fprintf, perror to report an error=
+ message. Convert it
+>             to Error.
+> * PATCH 04 parse_host_port() may fail without reporting an error. Now, =
+fix it to set an
+>             error when it fails.
+>
+> Cc: jasowang@redhat.com
+> Cc: armbru@redhat.com
+> Cc: berrange@redhat.com
+> Cc: kraxel@redhat.com
+> Cc: pbonzini@redhat.com
+> Cc: eblake@redhat.com
+>
+> Mao Zhongyi (4):
+>    net/socket: Don't treat odd socket type as SOCK_STREAM
+>    net/socket: Convert several helper functions to Error
+>    net/net: Convert parse_host_port() to Error
+>    net/socket: Improve -net socket error reporting
+>
+>   include/qemu/sockets.h |   3 +-
+>   net/net.c              |  22 +++++--
+>   net/socket.c           | 153 ++++++++++++++++++++++++++++------------=
+---------
+>   3 files changed, 106 insertions(+), 72 deletions(-)
 >
 
-Got it,
+Hi:
 
-Thanks,
-	dou.
+Want to apply this, but looks like it does not apply cleanly, could you=20
+please send a new version?
 
-> Thanks
-> Zhang Chen
->
->>
->>
->>>      } else if (ptcp->th_sum == stcp->th_sum) {
->>> -        res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
->>> +        res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN,
->>> ETH_HLEN);
->>>      } else {
->>>          res = -1;
->>>      }
->>> @@ -329,6 +342,7 @@ static int colo_packet_compare_udp(Packet *spkt,
->>> Packet *ppkt)
->>>       * the ip payload here.
->>>       */
->>>      ret = colo_packet_compare_common(ppkt, spkt,
->>> +                                     network_header_length + ETH_HLEN,
->>>                                       network_header_length + ETH_HLEN);
->>
->> ditto
->>
->>>
->>>      if (ret) {
->>> @@ -366,6 +380,7 @@ static int colo_packet_compare_icmp(Packet *spkt,
->>> Packet *ppkt)
->>>       * the ip payload here.
->>>       */
->>>      if (colo_packet_compare_common(ppkt, spkt,
->>> +                                   network_header_length + ETH_HLEN,
->>>                                     network_header_length + ETH_HLEN)) {
->>
->> ditto
->>
->>> trace_colo_compare_icmp_miscompare("primary pkt size",
->>>                                             ppkt->size);
->>> @@ -403,7 +418,7 @@ static int colo_packet_compare_other(Packet
->>> *spkt, Packet *ppkt)
->>>                                     sec_ip_src, sec_ip_dst);
->>>      }
->>>
->>> -    return colo_packet_compare_common(ppkt, spkt, 0);
->>> +    return colo_packet_compare_common(ppkt, spkt, 0, 0);
->>
->> ditto
->>
->> Thanks,
->>     dou.
->>
->>>  }
->>>
->>>  static int colo_old_packet_check_one(Packet *pkt, int64_t *check_time)
->>>
->>
->>
->>
->
+Thanks
