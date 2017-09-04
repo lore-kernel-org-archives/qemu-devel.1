@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.poctavek@erigones.com>) id 1doqsL-0000tX-OL
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:53:18 -0400
+	(envelope-from <famz@redhat.com>) id 1doqv2-0003FU-Ij
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:56:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.poctavek@erigones.com>) id 1doqsG-0007Xu-PS
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:53:13 -0400
-Received: from zimbra.entira.sk ([93.184.68.160]:55086)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jan.poctavek@erigones.com>)
-	id 1doqsG-0007RC-Dl
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:53:08 -0400
-References: <8c62454c-828b-0f16-76dd-227d9c52af1d@erigones.com>
-	<20170829100806.GO25960@stefanha-x1.localdomain>
-From: =?UTF-8?Q?J=c3=a1n_Poctavek?= <jan.poctavek@erigones.com>
-Message-ID: <2bfb1acd-cd69-a719-0c18-a5684367da04@erigones.com>
-Date: Mon, 4 Sep 2017 14:52:57 +0200
+	(envelope-from <famz@redhat.com>) id 1doqux-0001Zj-1i
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:56:00 -0400
+Date: Mon, 4 Sep 2017 20:55:23 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170904125523.GC19748@lemon.lan>
+References: <20170904111616.21333-1-kchamart@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170829100806.GO25960@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] wrong ioctl error handling on dirty pages sync?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170904111616.21333-1-kchamart@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-iotests: Make test 192 use QMP;
+ convert it to Python
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +23,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, stefanha@redhat.com, eblake@redhat.com, kwolf@redhat.com, dgilbert@redhat.com
 
+Hi Kashyap,
 
-On 29. 8. 2017 12:08, Stefan Hajnoczi wrote:
-> On Fri, Aug 25, 2017 at 01:42:55PM +0200, J=C3=A1n Poctavek wrote:
->> Hi guys,
->>
->> Maybe it is just my lack of understanding, this seems like a bug to me=
-:
->>
->> To get list of dirty pages, qemu calls kvm_vm_ioctl() with
->> KVM_GET_DIRTY_LOG:
->> https://github.com/qemu/qemu/blob/v2.10.0-rc4/accel/kvm/kvm-all.c#L494
->>
->> and considers the ioctl call failed when -1 is returned.
->>
->> But the kvm_vm_ioctl() itself returns -errno, not the -1 on error:
->> https://github.com/qemu/qemu/blob/v2.10.0-rc4/accel/kvm/kvm-all.c#L214=
-2
->>
->> Thanks in advance for sheding some light into this for me.
-> Looks like a bug to me.  Do you want to send a patch?
->
-> Guidelines on how to submit a patch are here:
-> http://wiki.qemu.org/Contribute/SubmitAPatch
->
-> Stefan
+On Mon, 09/04 13:16, Kashyap Chamarthy wrote:
+> The test 192 ("Test NBD export with '-incoming' (non-shared
+> storage migration use case from libvirt")) is currently using HMP.
+> Replace the HMP usage with QMP, as the upstream preference seems to be:
+> "Use QMP where possible, unless you're explicitly testing something
+> related to HMP".
+> 
+> While at it, convert the test from Bash to Python.
+> 
+> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+> ---
+>  tests/qemu-iotests/192     | 78 ++++++++++++++++++----------------------------
+>  tests/qemu-iotests/192.out | 14 ++++-----
+>  2 files changed, 38 insertions(+), 54 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/192 b/tests/qemu-iotests/192
+> index b50a2c0c8e2fccdddfae4ac58ca35937c5f784c6..692475f0a8c80c81396587d3289d4b32c0ee0d21 100755
+> --- a/tests/qemu-iotests/192
+> +++ b/tests/qemu-iotests/192
+> @@ -1,7 +1,4 @@
+> -#!/bin/bash
+> -#
+> -# Test NBD export with -incoming (non-shared storage migration use case from
+> -# libvirt)
+> +#!/usr/bin/env python
+>  #
+>  # Copyright (C) 2017 Red Hat, Inc.
+>  #
+> @@ -18,46 +15,33 @@
+>  # You should have received a copy of the GNU General Public License
+>  # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>  #
+> -
+> -# creator
+> -owner=famz@redhat.com
+> -
+> -seq=`basename $0`
+> -echo "QA output created by $seq"
+> -
+> -here=`pwd`
+> -status=1	# failure is the default!
+> -
+> -_cleanup()
+> -{
+> -	_cleanup_test_img
+> -}
+> -trap "_cleanup; exit \$status" 0 1 2 3 15
+> -
+> -# get standard environment, filters and checks
+> -. ./common.rc
+> -. ./common.filter
+> -
+> -_supported_fmt generic
+> -_supported_proto file
+> -_supported_os Linux
+> -
+> -if [ "$QEMU_DEFAULT_MACHINE" != "pc" ]; then
+> -    _notrun "Requires a PC machine"
+> -fi
+> -
+> -size=64M
+> -_make_test_img $size
+> -
+> -{
+> -echo "nbd_server_start unix:$TEST_DIR/nbd"
+> -echo "nbd_server_add -w drive0"
+> -echo "q"
+> -} | $QEMU -nodefaults -display none -monitor stdio \
+> -    -drive format=$IMGFMT,file=$TEST_IMG,if=ide,id=drive0 \
+> -    -incoming defer 2>&1 | _filter_testdir | _filter_qemu | _filter_hmp
+> -
+> -# success, all done
+> -echo "*** done"
+> -rm -f $seq.full
+> -status=0
+> +# Author: Kashyap Chamarthy <kchamart@redhat.com>
+> +#         [Converted to Python from the original Bash version by Fam
+> +#         Zheng (<famz@redhat.com)]
+> +#
+> +# Purpose: Test NBD export with '-incoming' (non-shared storage
+> +# migration use case from libvirt)
+> +
+> +import os
+> +import atexit
+> +import iotests
+> +
+> +iotests.verify_platform(['linux'])
+> +
+> +img_size = '1G'
+> +test_img_path = os.path.join(iotests.test_dir, 'dest.img')
+> +iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, test_img_path, img_size)
+> +
+> +iotests.log('Launching VM...')
+> +nbd_sock_path = os.path.join(iotests.test_dir, 'nbd.sock')
+> +dest_vm = (iotests.VM('dest').add_drive(test_img_path)
+> +                               .add_incoming('defer'))
 
-It seems that the patch has already been created a long time ago. But it=20
-is still not included:
+Superfluous parenthesis?
 
-https://lists.nongnu.org/archive/html/qemu-devel/2014-03/msg03996.html
+> +dest_vm.launch()
+> +atexit.register(dest_vm.shutdown)
 
-Can I help with this somehow?
+As an improvement maybe you could rebase to Stefan's "iotests: clean up
+resources using context managers" series and switch to "with" for the temp file
+and VM.
 
-Jan
+Otherwise looks good to me.
+
+Fam
+
+> +
+> +iotests.log('Launching NBD server on destination...')
+> +iotests.log(dest_vm.qmp('nbd-server-start', addr={'type': 'unix', 'data': {'path': nbd_sock_path}}))
+> +iotests.log('Exporting the block device to NBD server...')
+> +iotests.log(dest_vm.qmp('nbd-server-add', device='drive0', writable=True))
+> +iotests.log('Stopping the NBD server on destination...')
+> +iotests.log(dest_vm.qmp('nbd-server-stop'))
+> diff --git a/tests/qemu-iotests/192.out b/tests/qemu-iotests/192.out
+> index 1e0be4c4d7a891f81c2536b87c5a29a21d39138c..f62b94c5641f1a1e60f17090aeb20ed0bc037afd 100644
+> --- a/tests/qemu-iotests/192.out
+> +++ b/tests/qemu-iotests/192.out
+> @@ -1,7 +1,7 @@
+> -QA output created by 192
+> -Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+> -QEMU X.Y.Z monitor - type 'help' for more information
+> -(qemu) nbd_server_start unix:TEST_DIR/nbd
+> -(qemu) nbd_server_add -w drive0
+> -(qemu) q
+> -*** done
+> +Launching VM...
+> +Launching NBD server on destination...
+> +{u'return': {}}
+> +Exporting the block device to NBD server...
+> +{u'return': {}}
+> +Stopping the NBD server on destination...
+> +{u'return': {}}
+> -- 
+> 2.9.5
+> 
