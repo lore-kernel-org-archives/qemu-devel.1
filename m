@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1doo39-0005zO-G4
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:52:18 -0400
+	(envelope-from <marcel@redhat.com>) id 1doo3G-00063X-8b
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:52:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1doo32-00047c-7p
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:52:11 -0400
-Date: Mon, 4 Sep 2017 10:51:24 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170904095124.GB21280@stefanha-x1.localdomain>
-References: <cover.1504111803.git.jcody@redhat.com>
-	<aba8a2b58f34b56281e63e5e9404eb0aab016836.1504111803.git.jcody@redhat.com>
-	<1646044f-3c57-c415-f261-463c74ea45b8@redhat.com>
-	<2690a268-b5be-7974-e8ef-c5a2f09c72a5@redhat.com>
-	<c8f38ba5-5170-d3c8-99ca-24030f900e53@redhat.com>
-	<494b96d5-d2a2-957e-3169-7fb2461b59de@redhat.com>
-	<20170831153949.GA19001@stefanha-x1.localdomain>
-	<20170831154759.GN4770@localhost.localdomain>
+	(envelope-from <marcel@redhat.com>) id 1doo38-00049i-Ih
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:52:18 -0400
+References: <20170830215523.25278-1-f4bug@amsat.org>
+	<20170830215523.25278-10-f4bug@amsat.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <e99108db-bf6a-b0de-696d-102634cc1066@redhat.com>
+Date: Mon, 4 Sep 2017 12:51:58 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170831154759.GN4770@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v3 4/5] qemu-iotests: make python tests
- attempt to leave intermediate files
+In-Reply-To: <20170830215523.25278-10-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 09/17] MAINTAINERS: add missing PCI
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +25,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, armbru@redhat.com, qemu-block@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On Thu, Aug 31, 2017 at 11:47:59AM -0400, Jeff Cody wrote:
-> On Thu, Aug 31, 2017 at 04:39:49PM +0100, Stefan Hajnoczi wrote:
-> > On Wed, Aug 30, 2017 at 06:40:29PM -0400, John Snow wrote:
-> > > 
-> > > 
-> > > On 08/30/2017 06:35 PM, Eric Blake wrote:
-> > > > On 08/30/2017 05:28 PM, John Snow wrote:
-> > > > 
-> > > >> I'm a little iffy on this patch; I know that ./check can take care of
-> > > >> our temp files for us now, but because each python test is itself a
-> > > >> little mini-harness, I'm a little leery of moving the teardown to setup
-> > > >> and trying to pre-clean the confetti before the test begins.
-> > > >>
-> > > >> What's the benefit? We still have to clean up these files per-test, but
-> > > >> now it's slightly more error-prone and in a weird place.
-> > > >>
-> > > >> If we want to try to preserve the most-recent-failure-files, perhaps we
-> > > >> can define a setting in the python test-runner that allows us to
-> > > >> globally skip file cleanup.
-> > > > 
-> > > > On the other hand, since each test is a mini-harness, globally skipping
-> > > > cleanup will make a two-part test fail on the second because of garbage
-> > > > left behind by the first.
-> > > > 
-> > > 
-> > > subtext was to have per-subtest files.
-> > > 
-> > > > Patch 5 adds a comment with another possible solution: teach the python
-> > > > mini-harness to either clean all files in the directory, or to relocate
-> > > > the directory according to test name, so that each mini-test starts with
-> > > > a fresh location, and cleanup is then handled by the harness rather than
-> > > > spaghetti pre-cleanup.  But any solution is better than our current
-> > > > situation of nothing, so that's why I'm still okay with this patch as-is
-> > > > as offering more (even if not perfect) than before.
-> > > > 
-> > > 
-> > > I guess where I am unsure is really if this is better than what we
-> > > currently do, which is to (try) to clean up after each test as best as
-> > > we can. I don't see it as too different from trying to clean up before
-> > > each test.
-> > > 
-> > > It does give us the ability to leave behind a little detritus after a
-> > > failed run, but it's so imperfect that I wonder if it's worth shifting
-> > > this code around to change not much.
-> > 
-> > An alternative is to define iotests.QMPTestCase.setUp() so it clears out
-> > iotests.test_dir.  Unfortunately this still requires touching up all
-> > setUp() methods so that they call super(TheClass, self).setUp().
-> > 
-> > At least there would be no need to delete specific files by name (e.g.
-> > blind_remove(my_img)).
-> > 
-> 
-> One reason to only remove specific files used in the test, is that it
-> increases the chance that intermediate files will be left behind in case of
-> test failure of a different test case.
-> 
-> I think the real long-term solution is to run each unittest test case in its
-> own subdirectory, so that no intermediate file removal is necessary, and
-> each test case is self-contained.
+On 31/08/2017 0:55, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>   MAINTAINERS | 2 ++
+>   1 file changed, 2 insertions(+)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index dd5e2c2b6b..bbe1191883 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -928,6 +928,8 @@ F: include/hw/pci/*
+>   F: hw/misc/pci-testdev.c
+>   F: hw/pci/*
+>   F: hw/pci-bridge/*
+> +F: docs/pci*
+> +F: docs/specs/*pci*
+>  =20
+>   ACPI/SMBIOS
+>   M: Michael S. Tsirkin <mst@redhat.com>
+>=20
 
-That could be achieved in the same way:
+  Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
-Modify iotests.QMPTestCase.setUp() to create a new directory and chdir()
-into it.  This still requires touching up all existing setUp() methods
-to call their superclass.
-
-Stefan
+Thanks,
+Marcel
