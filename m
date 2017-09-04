@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <JBeulich@suse.com>) id 1donJM-0004pg-0g
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:05:01 -0400
+	(envelope-from <kchamart@redhat.com>) id 1donSi-00006S-HE
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:14:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <JBeulich@suse.com>) id 1donJH-0002cp-TN
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:04:52 -0400
-Received: from prv-mh.provo.novell.com ([137.65.248.74]:56795)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <JBeulich@suse.com>) id 1donJH-0002bw-L9
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:04:47 -0400
-Message-Id: <59AD3349020000780017704A@prv-mh.provo.novell.com>
-Date: Mon, 04 Sep 2017 03:04:41 -0600
-From: "Jan Beulich" <JBeulich@suse.com>
-References: <59A9A6260200007800176A6A@prv-mh.provo.novell.com>
-	<59A9A6260200007800176A6A@prv-mh.provo.novell.com>
-	<20170901182022.2m46ussfgiwo32c5@MacBook-Pro-de-Roger.local>
-In-Reply-To: <20170901182022.2m46ussfgiwo32c5@MacBook-Pro-de-Roger.local>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <kchamart@redhat.com>) id 1donSh-0001q2-M8
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 05:14:32 -0400
+Date: Mon, 4 Sep 2017 11:14:15 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20170904091415.wgsuqx67y3il7hnd@eukaryote>
+References: <20170901105434.3288-1-berrange@redhat.com>
+	<20170901105434.3288-3-berrange@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH] xen: use vMSI related
- #define-s from public interface
+In-Reply-To: <20170901105434.3288-3-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] iotests: blacklist 194
+ with the luks driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +24,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, xen-devel <xen-devel@lists.xenproject.org>, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
 
->>> On 01.09.17 at 20:20, <roger.pau@citrix.com> wrote:
-> On Fri, Sep 01, 2017 at 10:25:42AM -0600, Jan Beulich wrote:
->> Xen and qemu having identical #define-s (with different names) is a
->> strong hint that these should have been part of the public interface
->> from the very start. Use them if they're available, falling back to
->> privately defined values only when using older headers.
->>=20
->> Signed-off-by: Jan Beulich <jbeulich@suse.com>
->=20
-> Reviewed-by: Roger Pau Monn=C3=A9 <roger.pau@citrix.com>
+On Fri, Sep 01, 2017 at 11:54:34AM +0100, Daniel P. Berrange wrote:
+> The 194 test has alot of code that assumes a simple image file. Rewriting
+> this to work with luks is possible, but non-trivial, so blacklist the
+> luks format for now.
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  tests/qemu-iotests/194        | 1 +
+>  tests/qemu-iotests/iotests.py | 4 +++-
+>  2 files changed, 4 insertions(+), 1 deletion(-)
 
-Thanks.
+Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
 
->> --- a/hw/xen/xen_pt_msi.c
->> +++ b/hw/xen/xen_pt_msi.c
->> @@ -18,6 +18,11 @@
->> =20
->>  #define XEN_PT_AUTO_ASSIGN -1
->> =20
->> +#ifndef XEN_DOMCTL_VMSI_X86_DEST_ID_MASK
->> +#if XEN_DOMCTL_INTERFACE_VERSION >=3D 0x0000000e
->=20
-> XEN_DOMCTL_INTERFACE_VERSION is already 0xe (without you added
-> defines), I guess it doesn't matter much because we only care for
-> stable releases.
+> diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
+> index a3e3bad664..bfe1859ecf 100755
+> --- a/tests/qemu-iotests/194
+> +++ b/tests/qemu-iotests/194
+> @@ -23,6 +23,7 @@ import os
+>  import atexit
+>  import iotests
+>  
+> +iotests.verify_image_format(unsupported_fmts=['luks'])
+>  iotests.verify_platform(['linux'])
+>  
+>  img_size = '1G'
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> index 7233983f3c..3e7304b678 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -395,9 +395,11 @@ def notrun(reason):
+>      print '%s not run: %s' % (seq, reason)
+>      sys.exit(0)
+>  
+> -def verify_image_format(supported_fmts=[]):
+> +def verify_image_format(supported_fmts=[], unsupported_fmts=[]):
+>      if supported_fmts and (imgfmt not in supported_fmts):
+>          notrun('not suitable for this image format: %s' % imgfmt)
+> +    if unsupported_fmts and (imgfmt in unsupported_fmts):
+> +        notrun('not suitable for this image format: %s' % imgfmt)
+>  
+>  def verify_platform(supported_oses=['linux']):
+>      if True not in [sys.platform.startswith(x) for x in supported_oses]:
+> -- 
+> 2.13.5
+> 
+> 
 
-Well, that's if you build qemu against master Xen. What about
-people building against older Xen versions/headers?
-
-Jan
+-- 
+/kashyap
