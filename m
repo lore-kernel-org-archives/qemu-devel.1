@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dotXW-0004c6-UJ
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:43:59 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dotXX-0004eJ-OF
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:44:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dotXS-00015g-CP
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dotXT-00016d-32
 	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:43:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53086)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dotXS-00015P-6a
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:43:50 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Mon,  4 Sep 2017 17:43:08 +0200
-Message-Id: <20170904154316.4148-12-david@redhat.com>
-In-Reply-To: <20170904154316.4148-1-david@redhat.com>
-References: <20170904154316.4148-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 11/19] s390x: allow only 1 CPU with TCG
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34829)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dotXS-00016H-VU
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 11:43:51 -0400
+Received: by mail-qt0-x242.google.com with SMTP id p55so501454qtc.2
+	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 08:43:50 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <150450989314.1143.5582306195355968158.stgit@bahia.lan>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a962aafb-309d-84e8-550d-9f33c8569fb3@amsat.org>
+Date: Mon, 4 Sep 2017 12:43:46 -0300
+MIME-Version: 1.0
+In-Reply-To: <150450989314.1143.5582306195355968158.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: local: clarify fchmodat_nofollow()
+ implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +35,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 
-Specifying more than 1 CPU (e.g. -smp 5) leads to SIGP errors (the
-guest tries to bring these CPUs up but fails), because we don't support
-multiple CPUs on s390x under TCG.
+On 09/04/2017 04:24 AM, Greg Kurz wrote:
+> Since fchmodat(2) on Linux doesn't support AT_SYMLINK_NOFOLLOW, we have to
+> implement it using workarounds. There are two different ways, depending on
+> whether the system supports O_PATH or not.
+> 
+> In the case O_PATH is supported, we rely on the behavhior of openat(2)
+> when passing O_NOFOLLOW | O_PATH and the file is a symbolic link. Even
+> if openat_file() already adds O_NOFOLLOW to the flags, this patch makes
+> it explicit that we need both creation flags to obtain the expected
+> behavior.
+> 
+> This is only cleanup, no functional change.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Let's bail out if more than 1 is specified, so we don't raise people's
-hope. Make it a define, so we can easily bump it up later.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/s390x/s390-virtio-ccw.c | 7 +++++++
- target/s390x/cpu.h         | 2 ++
- 2 files changed, 9 insertions(+)
-
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index f67b4b5d58..f7ca20d77a 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -23,6 +23,7 @@
- #include "hw/s390x/css.h"
- #include "virtio-ccw.h"
- #include "qemu/config-file.h"
-+#include "qemu/error-report.h"
- #include "s390-pci-bus.h"
- #include "hw/s390x/storage-keys.h"
- #include "hw/s390x/storage-attributes.h"
-@@ -55,6 +56,12 @@ static void s390_init_cpus(MachineState *machine)
-     if (machine->cpu_model == NULL) {
-         machine->cpu_model = s390_default_cpu_model_name();
-     }
-+    if (tcg_enabled() && max_cpus > S390_TCG_MAX_CPUS) {
-+        error_report("Number of SMP CPUs requested (%d) exceeds max CPUs "
-+                     "supported by TCG (%d) on s390x", max_cpus,
-+                     S390_TCG_MAX_CPUS);
-+        exit(1);
-+    }
- 
-     cpu_states = g_new0(S390CPU *, max_cpus);
- 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 147aceba28..dca6aa9aae 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -209,6 +209,8 @@ static inline S390CPU *s390_env_get_cpu(CPUS390XState *env)
- 
- #define ENV_OFFSET offsetof(S390CPU, env)
- 
-+#define S390_TCG_MAX_CPUS 1
-+
- #ifndef CONFIG_USER_ONLY
- extern const struct VMStateDescription vmstate_s390_cpu;
- #endif
--- 
-2.13.5
+> ---
+>   hw/9pfs/9p-local.c |   12 ++++++++----
+>   1 file changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> index efb0b79a74bf..e51af87309c6 100644
+> --- a/hw/9pfs/9p-local.c
+> +++ b/hw/9pfs/9p-local.c
+> @@ -349,11 +349,11 @@ static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
+>           return -1;
+>       }
+>   
+> -    /* Access modes are ignored when O_PATH is supported. We try O_RDONLY and
+> -     * O_WRONLY for old-systems that don't support O_PATH.
+> -     */
+> -    fd = openat_file(dirfd, name, O_RDONLY | O_PATH_9P_UTIL, 0);
+> +    fd = openat_file(dirfd, name, O_RDONLY | O_PATH_9P_UTIL | O_NOFOLLOW, 0);
+>   #if O_PATH_9P_UTIL == 0
+> +    /* Fallback for systems that don't support O_PATH: we depend on the file
+> +     * being readable or writable.
+> +     */
+>       if (fd == -1) {
+>           /* In case the file is writable-only and isn't a directory. */
+>           if (errno == EACCES) {
+> @@ -368,6 +368,10 @@ static int fchmodat_nofollow(int dirfd, const char *name, mode_t mode)
+>       }
+>       ret = fchmod(fd, mode);
+>   #else
+> +    /* Access modes are ignored when O_PATH is supported. If name is a symbolic
+> +     * link, O_PATH | O_NOFOLLOW causes openat(2) to return a file descriptor
+> +     * referring to the symbolic link.
+> +     */
+>       if (fd == -1) {
+>           return -1;
+>       }
+> 
+> 
