@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1doqSh-0005Dc-Dx
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:53 -0400
+	(envelope-from <batmanustc@gmail.com>) id 1doqXQ-0000nj-Cd
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:31:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1doqST-0004xP-OB
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:43 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37134)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1doqST-0004wD-F0
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:26:29 -0400
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1doqSS-0005c3-2v
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 13:26:28 +0100
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  4 Sep 2017 13:26:01 +0100
-Message-Id: <1504527967-29248-31-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1504527967-29248-1-git-send-email-peter.maydell@linaro.org>
-References: <1504527967-29248-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 30/36] target/arm: Factor out fault delivery code
+	(envelope-from <batmanustc@gmail.com>) id 1doqXL-00081k-0J
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:31:36 -0400
+Received: from mail-qk0-x22d.google.com ([2607:f8b0:400d:c09::22d]:38511)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <batmanustc@gmail.com>)
+	id 1doqXK-00081M-Qn
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 08:31:30 -0400
+Received: by mail-qk0-x22d.google.com with SMTP id a128so1191727qkc.5
+	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 05:31:30 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170904101624.GE7186@redhat.com>
+References: <CAOE=1Z3xuudQenX+Oe11fPDZfrC_d02S50HQ9mJ=RfnJ0B5DUg@mail.gmail.com>
+	<20170904093623.GB7186@redhat.com>
+	<CAOE=1Z2HFVhD8b1TXaQFd8sGvqoddOeJoSds1ZxwzKSw8im7ng@mail.gmail.com>
+	<20170904101624.GE7186@redhat.com>
+From: Sam <batmanustc@gmail.com>
+Date: Mon, 4 Sep 2017 20:31:29 +0800
+Message-ID: <CAOE=1Z2E-OJKFGp1QWwTbBm0evbtLDubv7JVS5hC8dPqK_9M-Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] How to use monitor socket in python to connect VM?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,186 +31,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-We currently have some similar code in tlb_fill() and in
-arm_cpu_do_unaligned_access() for delivering a data abort or prefetch
-abort.  We're also going to want to do the same thing to handle
-external aborts.  Factor out the common code into a new function
-deliver_fault().
+Thank you, but I have to ask last question. My qemu is 2.6.0, and there is
+no -qmp option :
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Acked-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- target/arm/op_helper.c | 110 +++++++++++++++++++++++++------------------------
- 1 file changed, 57 insertions(+), 53 deletions(-)
+[root@yf-mos-test-net09 ~]# ps aux | grep qemu
+> root      5714  0.0  0.0 1669388 77736 ?       Sl   Sep01   0:09
+> /usr/local/bin/qemu-system-x86_64_2.6.0 -enable-kvm -cpu
+> qemu64,+vmx,+ssse3,+sse4.1,+sse4.2,+x2apic,+aes,+avx,+vme,+pat,+ss,+pclmulqdq,+xsave,level=13
+> -machine pc,accel=kvm -chardev
+> socket,id=hmqmondev,port=55919,host=127.0.0.1,nodelay,server,nowait -mon
+> chardev=hmqmondev,id=hmqmon,mode=readline -rtc
+> base=utc,clock=host,driftfix=none -usb -device usb-tablet -daemonize
+> -nodefaults -nodefconfig -no-kvm-pit-reinjection -global
+> kvm-pit.lost_tick_policy=discard -vga std -k en-us -smp 1 -name
+> mvs5-huanghuai -m 1024 -boot order=cdn -vnc :19,password -drive
+> file=/opt/cloud/workspace/disks/4a5148da-e34e-4c81-aada-12a247c0337e,if=none,id=drive_0,format=qcow2,cache=none,aio=native
+> -device virtio-blk-pci,id=dev_drive_0,drive=drive_0,bus=pci.0,addr=0x5
+> -drive
+> file=/opt/cloud/workspace/disks/08eb3f72-07ba-44e9-8ee9-4ab662dbbd1f,if=none,id=drive_1,format=qcow2,cache=none,aio=native
+> -device virtio-blk-pci,id=dev_drive_1,drive=drive_1,bus=pci.0,addr=0x6
+> -device ide-cd,drive=ide0-cd0,bus=ide.1,unit=1 -drive
+> id=ide0-cd0,media=cdrom,if=none -chardev
+> socket,id=char-n-f879ac2f,path=/usr/local/var/run/openvswitch/n-f879ac2f,server
+> -netdev type=vhost-user,id=n-f879ac2f,chardev=char-n-f879ac2f,vhostforce=on
+> -device
+> virtio-net-pci,netdev=n-f879ac2f,mac=00:22:f8:79:ac:2f,id=netdev-n-f879ac2f,addr=0xf
+> -object
+> memory-backend-file,id=mem,size=1024M,mem-path=/dev/hugepages,share=on
+> -numa node,memdev=mem -mem-prealloc -pidfile
+> /opt/cloud/workspace/servers/63ef2ec4-556f-47ea-93e0-23089bb59be5/pid
+> -chardev
+> socket,path=/opt/cloud/workspace/servers/63ef2ec4-556f-47ea-93e0-23089bb59be5/qga.sock,server,nowait,id=qga0
+> -device virtio-serial -device
+> virtserialport,chardev=qga0,name=org.qemu.guest_agent.0 -incoming tcp:0:8081
 
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index 5a94a5f..6114597 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -115,6 +115,51 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
-     return syn;
- }
- 
-+static void deliver_fault(ARMCPU *cpu, vaddr addr, MMUAccessType access_type,
-+                          uint32_t fsr, uint32_t fsc, ARMMMUFaultInfo *fi)
-+{
-+    CPUARMState *env = &cpu->env;
-+    int target_el;
-+    bool same_el;
-+    uint32_t syn, exc;
-+
-+    target_el = exception_target_el(env);
-+    if (fi->stage2) {
-+        target_el = 2;
-+        env->cp15.hpfar_el2 = extract64(fi->s2addr, 12, 47) << 4;
-+    }
-+    same_el = (arm_current_el(env) == target_el);
-+
-+    if (fsc == 0x3f) {
-+        /* Caller doesn't have a long-format fault status code. This
-+         * should only happen if this fault will never actually be reported
-+         * to an EL that uses a syndrome register. Check that here.
-+         * 0x3f is a (currently) reserved FSC code, in case the constructed
-+         * syndrome does leak into the guest somehow.
-+         */
-+        assert(target_el != 2 && !arm_el_is_aa64(env, target_el));
-+    }
-+
-+    if (access_type == MMU_INST_FETCH) {
-+        syn = syn_insn_abort(same_el, 0, fi->s1ptw, fsc);
-+        exc = EXCP_PREFETCH_ABORT;
-+    } else {
-+        syn = merge_syn_data_abort(env->exception.syndrome, target_el,
-+                                   same_el, fi->s1ptw,
-+                                   access_type == MMU_DATA_STORE,
-+                                   fsc);
-+        if (access_type == MMU_DATA_STORE
-+            && arm_feature(env, ARM_FEATURE_V6)) {
-+            fsr |= (1 << 11);
-+        }
-+        exc = EXCP_DATA_ABORT;
-+    }
-+
-+    env->exception.vaddress = addr;
-+    env->exception.fsr = fsr;
-+    raise_exception(env, exc, syn, target_el);
-+}
-+
- /* try to fill the TLB and return an exception if error. If retaddr is
-  * NULL, it means that the function was called in C code (i.e. not
-  * from generated code or from helper.c)
-@@ -129,23 +174,13 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
-     ret = arm_tlb_fill(cs, addr, access_type, mmu_idx, &fsr, &fi);
-     if (unlikely(ret)) {
-         ARMCPU *cpu = ARM_CPU(cs);
--        CPUARMState *env = &cpu->env;
--        uint32_t syn, exc, fsc;
--        unsigned int target_el;
--        bool same_el;
-+        uint32_t fsc;
- 
-         if (retaddr) {
-             /* now we have a real cpu fault */
-             cpu_restore_state(cs, retaddr);
-         }
- 
--        target_el = exception_target_el(env);
--        if (fi.stage2) {
--            target_el = 2;
--            env->cp15.hpfar_el2 = extract64(fi.s2addr, 12, 47) << 4;
--        }
--        same_el = arm_current_el(env) == target_el;
--
-         if (fsr & (1 << 9)) {
-             /* LPAE format fault status register : bottom 6 bits are
-              * status code in the same form as needed for syndrome
-@@ -153,34 +188,15 @@ void tlb_fill(CPUState *cs, target_ulong addr, MMUAccessType access_type,
-             fsc = extract32(fsr, 0, 6);
-         } else {
-             /* Short format FSR : this fault will never actually be reported
--             * to an EL that uses a syndrome register. Check that here,
--             * and use a (currently) reserved FSR code in case the constructed
--             * syndrome does leak into the guest somehow.
-+             * to an EL that uses a syndrome register. Use a (currently)
-+             * reserved FSR code in case the constructed syndrome does leak
-+             * into the guest somehow. deliver_fault will assert that
-+             * we don't target an EL using the syndrome.
-              */
--            assert(target_el != 2 && !arm_el_is_aa64(env, target_el));
-             fsc = 0x3f;
-         }
- 
--        /* For insn and data aborts we assume there is no instruction syndrome
--         * information; this is always true for exceptions reported to EL1.
--         */
--        if (access_type == MMU_INST_FETCH) {
--            syn = syn_insn_abort(same_el, 0, fi.s1ptw, fsc);
--            exc = EXCP_PREFETCH_ABORT;
--        } else {
--            syn = merge_syn_data_abort(env->exception.syndrome, target_el,
--                                       same_el, fi.s1ptw,
--                                       access_type == MMU_DATA_STORE, fsc);
--            if (access_type == MMU_DATA_STORE
--                && arm_feature(env, ARM_FEATURE_V6)) {
--                fsr |= (1 << 11);
--            }
--            exc = EXCP_DATA_ABORT;
--        }
--
--        env->exception.vaddress = addr;
--        env->exception.fsr = fsr;
--        raise_exception(env, exc, syn, target_el);
-+        deliver_fault(cpu, addr, access_type, fsr, fsc, &fi);
-     }
- }
- 
-@@ -191,9 +207,8 @@ void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
- {
-     ARMCPU *cpu = ARM_CPU(cs);
-     CPUARMState *env = &cpu->env;
--    int target_el;
--    bool same_el;
--    uint32_t syn;
-+    uint32_t fsr, fsc;
-+    ARMMMUFaultInfo fi = {};
-     ARMMMUIdx arm_mmu_idx = core_to_arm_mmu_idx(env, mmu_idx);
- 
-     if (retaddr) {
-@@ -201,28 +216,17 @@ void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
-         cpu_restore_state(cs, retaddr);
-     }
- 
--    target_el = exception_target_el(env);
--    same_el = (arm_current_el(env) == target_el);
--
--    env->exception.vaddress = vaddr;
--
-     /* the DFSR for an alignment fault depends on whether we're using
-      * the LPAE long descriptor format, or the short descriptor format
-      */
-     if (arm_s1_regime_using_lpae_format(env, arm_mmu_idx)) {
--        env->exception.fsr = (1 << 9) | 0x21;
-+        fsr = (1 << 9) | 0x21;
-     } else {
--        env->exception.fsr = 0x1;
--    }
--
--    if (access_type == MMU_DATA_STORE && arm_feature(env, ARM_FEATURE_V6)) {
--        env->exception.fsr |= (1 << 11);
-+        fsr = 0x1;
-     }
-+    fsc = 0x21;
- 
--    syn = merge_syn_data_abort(env->exception.syndrome, target_el,
--                               same_el, 0, access_type == MMU_DATA_STORE,
--                               0x21);
--    raise_exception(env, EXCP_DATA_ABORT, syn, target_el);
-+    deliver_fault(cpu, vaddr, access_type, fsr, fsc, &fi);
- }
- 
- #endif /* !defined(CONFIG_USER_ONLY) */
--- 
-2.7.4
+
+ After I use telnet like this `telnet localhost 55919`, then enter this cmd
+line:
+
+[root@yf-mos-test-net09 ~]# telnet localhost 55919
+> Trying ::1...
+> telnet: connect to address ::1: Connection refused
+> Trying 127.0.0.1...
+> Connected to localhost.
+> Escape character is '^]'.
+> QEMU 2.6.0 monitor - type 'help' for more information
+> (qemu) help
+> help
+> acl_add aclname match allow|deny [index] -- add a match rule to the access
+> control list
+> ...
+> xp /fmt addr -- physical memory dump starting at 'addr'
+> (qemu)
+> (qemu)
+
+(qemu) {"execute":"query-status"}
+> {"execute":"query-status"}
+> unknown command: '{"execute":"query-status"}'
+
+
+
+And I send QMP json format command,  it report error as above. So where is
+the monitor socket? Why I got error while using QMP command?
+
+
+2017-09-04 18:16 GMT+08:00 Daniel P. Berrange <berrange@redhat.com>:
+
+> On Mon, Sep 04, 2017 at 06:11:44PM +0800, Sam wrote:
+> > Actually I use qga socket first(send json format command like {'execute':
+> > 'chardev-add', 'arguments': {'id': id, 'type': type}, 'params': params}
+> by
+> > qga socket, which is
+> > /opt/cloud/workspace/servers/1925a92d-f003-4d77-871c-
+> bce8f85229aa/qga.sock,
+> > using the same script as first mail), but it response me "netdev_add is
+> not
+> > valid command"(it's reasonable, as guest OS could not operate
+> 'netdev_add'
+> > command), so I thought qga could not do this work, then I change to
+> monitor.
+>
+> You're mixing up two different things.  'QGA' is the QEMU guest agent
+> which is a service than runs in the guest OS. 'QMP' is the QEMU monitor
+> socket which runs in the host OS. Both of these use the same JSON based
+> protocol, but take completely different commands.
+>
+> You need to use 'QMP' for 'netdev_add', not 'QGA'.
+>
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/
+> dberrange :|
+> |: https://libvirt.org         -o-
+> https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/
+> dberrange :|
+>
