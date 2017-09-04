@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1doppi-0001A9-RM
+	(envelope-from <armbru@redhat.com>) id 1doppj-0001AA-3a
 	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 07:46:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1doppd-0000K9-PR
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 07:46:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50964)
+	(envelope-from <armbru@redhat.com>) id 1doppd-0000KF-Pu
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 07:46:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50966)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1doppd-0000IO-Gt
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1doppd-0000IQ-H0
 	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 07:46:21 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 97C7C806A1
+	by mx1.redhat.com (Postfix) with ESMTPS id 97D26806BF
 	for <qemu-devel@nongnu.org>; Mon,  4 Sep 2017 11:46:19 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-75.ams2.redhat.com
 	[10.36.116.75])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3EBE312522E
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3EA6A12522C
 	for <qemu-devel@nongnu.org>; Mon,  4 Sep 2017 11:46:19 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  4 Sep 2017 13:46:17 +0200
-Message-Id: <20170904114617.26311-2-armbru@redhat.com>
-In-Reply-To: <20170904114617.26311-1-armbru@redhat.com>
-References: <20170904114617.26311-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v3 02/47] tests/qmp-test: Add generic,
- basic test of query commands
+Date: Mon,  4 Sep 2017 13:46:16 +0200
+Message-Id: <20170904114617.26311-1-armbru@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v3 00/47] QAPI patches for 2017-09-01
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,301 +36,211 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-A command is a query if it has no side effect and yields a result.
-Such commands are typically named query-FOO, but there are exceptions.
+Note: omitting actual patches except for PATCH 02/47, because only
+that one changed since v2.
 
-The basic idea is to find candidates with query-qmp-schema, filter out
-the ones that aren't queries with an explicit blacklist, and test the
-remaining ones against a QEMU with no special arguments.
+The following changes since commit 223cd0e13f2e46078d7b573f0b8402bfbee339=
+be:
 
-The current blacklist is just add-fd.
+  Merge remote-tracking branch 'remotes/elmarco/tags/tidy-pull-request' i=
+nto staging (2017-08-31 15:52:43 +0100)
 
-The test can't do queries with arguments, because it knows nothing
-about the arguments.  No coverage for query-cpu-model-baseline,
-query-cpu-model-comparison, query-cpu-model-expansion, query-rocker,
-query-rocker-ports, query-rocker-of-dpa-flows, and
-query-rocker-of-dpa-groups.
+are available in the git repository at:
 
-Most tested commands are expected to succeed.  The test does not check
-the return value then.
+  git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2017-09-01-v3
 
-query-balloon and query-vm-generation-id are expected to fail because
-they need a virtio-balloon / vmgenid device to succeed, and this test
-is too dumb to set one up.  Could be addressed later.
+for you to fetch changes up to ebf677c8497ee81537f7ce57b165c978511ccde5:
 
-query-acpi-ospm-status and query-hotpluggable-cpus are expected to
-fail because they require features provided only by special machine
-types, and this test is too dumb to set that up.  Could also be
-addressed later.
+  qapi: drop the sentinel in enum array (2017-09-04 13:09:13 +0200)
 
-Several commands may either be functional or stubs that always fail,
-depending on build configuration.  Ideally, the stubs shouldn't be in
-query-qmp-schema, but that requires QAPI schema compile-time
-configuration, which we don't have, yet.  Until we do, we need to
-figure out whether a command is a stub.  When we have a suitable
-CONFIG_FOO preprocessor symbol is available, use that.  Else,
-simply blacklist the command for now.
+----------------------------------------------------------------
+QAPI patches for 2017-09-01
 
-We get basic test coverage for the following commands, except as
-noted:
+----------------------------------------------------------------
+Eduardo Habkost (1):
+      qapi: Fix error handling code on alternate conflict
 
-    qom-list-types
-    query-acpi-ospm-status      (expected to fail)
-    query-balloon               (expected to fail)
-    query-block
-    query-block-jobs
-    query-blockstats
-    query-chardev
-    query-chardev-backends
-    query-command-line-options
-    query-commands
-    query-cpu-definitions       (blacklisted for now)
-    query-cpus
-    query-dump
-    query-dump-guest-memory-capability
-    query-events
-    query-fdsets
-    query-gic-capabilities      (blacklisted for now)
-    query-hotpluggable-cpus     (expected to fail)
-    query-iothreads
-    query-kvm
-    query-machines
-    query-memdev
-    query-memory-devices
-    query-mice
-    query-migrate
-    query-migrate-cache-size
-    query-migrate-capabilities
-    query-migrate-parameters
-    query-name
-    query-named-block-nodes
-    query-pci                   (blacklisted for now)
-    query-qmp-schema
-    query-rx-filter
-    query-spice
-    query-status
-    query-target
-    query-tpm
-    query-tpm-models
-    query-tpm-types
-    query-uuid
-    query-version
-    query-vm-generation-id      (expected to fail)
-    query-vnc
-    query-vnc-servers
-    query-xen-replication-status
+Marc-Andr=C3=A9 Lureau (19):
+      qdict: Add qdict_put_null() helper, and put it to use
+      qlit: move qlit from check-qjson to qobject/
+      qlit: use QLit prefix consistently
+      qlit: Change compound literals to initializers
+      qlit: rename compare_litqobj_to_qobj() to qlit_equal_qobject()
+      qlit: make qlit_equal_qobject return a bool
+      qlit: make qlit_equal_qobject() take const arguments
+      qlit: add QLIT_QNULL and QLIT_BOOL
+      qlit: Replace open-coded qnum_get_int() by call
+      tests/check-qlit: New, covering qobject/qlit.c
+      qlit: Tighten QLit dict vs QDict comparison
+      qlit: Tighten QLit list vs QList comparison
+      tpm: Clean up driver registration & lookup
+      hmp: Use qapi_enum_parse() in hmp_migrate_set_capability()
+      hmp: Use qapi_enum_parse() in hmp_migrate_set_parameter()
+      block: Use qemu_enum_parse() in blkdebug_debug_breakpoint()
+      quorum: Use qapi_enum_parse() in quorum_open()
+      qapi: Change data type of the FOO_lookup generated for enum FOO
+      qapi: drop the sentinel in enum array
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1502461148-10154-1-git-send-email-armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-[Typos in code under #ifndef and in the commit message fixed]
----
- tests/qmp-test.c | 182 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 181 insertions(+), 1 deletion(-)
+Markus Armbruster (27):
+      tests/qmp-test: Add generic, basic test of query commands
+      qobject: Explain how QNum works, and why
+      qapi-schema: Document how generated documentation is ordered
+      qapi-schema: Introspection doc is in the wrong section, fix
+      qapi-schema: Rocker doc section contains unrelated stuff, fix
+      qapi-schema: Collect sockets stuff in qapi/sockets.json
+      qapi-schema: Collect run state stuff in qapi/run-state.json
+      qapi-schema: Collect char device stuff in qapi/char.json
+      qapi-schema: Collect net device stuff in qapi/net.json
+      qapi-schema: Collect UI stuff in qapi/ui.json
+      qapi-schema: Collect migration stuff in qapi/migration.json
+      qapi-schema: Collect transaction stuff in qapi/transaction.json
+      qapi-schema: Collect TPM stuff in qapi/tpm.json
+      qapi-schema: Move block events from event.json to block.json
+      qapi-schema: Fold event.json back into qapi-schema.json
+      qapi-schema: Make block-core.json self-contained
+      qapi-schema: Move queries from common.json to qapi-schema.json
+      qapi-schema: Improve section headings
+      qapi: Update qapi-code-gen.txt examples to match current code
+      qapi: Drop superfluous qapi_enum_parse() parameter max
+      tpm: Clean up model registration & lookup
+      crypto: Use qapi_enum_parse() in qcrypto_block_luks_name_lookup()
+      qapi: Use qapi_enum_parse() in input_type_enum()
+      qapi: Avoid unnecessary use of enum lookup table's sentinel
+      qapi: Generate FOO_str() macro for QAPI enum FOO
+      qapi: Mechanically convert FOO_lookup[...] to FOO_str(...)
+      qapi: Convert indirect uses of FOO_lookup[...] to qapi_enum_lookup(=
+)
 
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 5d0260b2be..5ce886312a 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -15,6 +15,7 @@
- #include "qapi-visit.h"
- #include "qapi/error.h"
- #include "qapi/qobject-input-visitor.h"
-+#include "qapi/util.h"
- #include "qapi/visitor.h"
- 
- const char common_args[] = "-nodefaults -machine none";
-@@ -129,11 +130,190 @@ static void test_qmp_protocol(void)
-     qtest_end();
- }
- 
-+static int query_error_class(const char *cmd)
-+{
-+    static struct {
-+        const char *cmd;
-+        int err_class;
-+    } fails[] = {
-+        /* Success depends on build configuration: */
-+#ifndef CONFIG_SPICE
-+        { "query-spice", ERROR_CLASS_COMMAND_NOT_FOUND },
-+#endif
-+#ifndef CONFIG_VNC
-+        { "query-vnc", ERROR_CLASS_GENERIC_ERROR },
-+        { "query-vnc-servers", ERROR_CLASS_GENERIC_ERROR },
-+#endif
-+#ifndef CONFIG_REPLICATION
-+        { "query-xen-replication-status", ERROR_CLASS_COMMAND_NOT_FOUND },
-+#endif
-+        /* Likewise, and require special QEMU command-line arguments: */
-+        { "query-acpi-ospm-status", ERROR_CLASS_GENERIC_ERROR },
-+        { "query-balloon", ERROR_CLASS_DEVICE_NOT_ACTIVE },
-+        { "query-hotpluggable-cpus", ERROR_CLASS_GENERIC_ERROR },
-+        { "query-vm-generation-id", ERROR_CLASS_GENERIC_ERROR },
-+        { NULL, -1 }
-+    };
-+    int i;
-+
-+    for (i = 0; fails[i].cmd; i++) {
-+        if (!strcmp(cmd, fails[i].cmd)) {
-+            return fails[i].err_class;
-+        }
-+    }
-+    return -1;
-+}
-+
-+static void test_query(const void *data)
-+{
-+    const char *cmd = data;
-+    int expected_error_class = query_error_class(cmd);
-+    QDict *resp, *error;
-+    const char *error_class;
-+
-+    qtest_start(common_args);
-+
-+    resp = qmp("{ 'execute': %s }", cmd);
-+    error = qdict_get_qdict(resp, "error");
-+    error_class = error ? qdict_get_str(error, "class") : NULL;
-+
-+    if (expected_error_class < 0) {
-+        g_assert(qdict_haskey(resp, "return"));
-+    } else {
-+        g_assert(error);
-+        g_assert_cmpint(qapi_enum_parse(QapiErrorClass_lookup, error_class,
-+                                        QAPI_ERROR_CLASS__MAX, -1,
-+                                        &error_abort),
-+                        ==, expected_error_class);
-+    }
-+    QDECREF(resp);
-+
-+    qtest_end();
-+}
-+
-+static bool query_is_blacklisted(const char *cmd)
-+{
-+    const char *blacklist[] = {
-+        /* Not actually queries: */
-+        "add-fd",
-+        /* Success depends on target arch: */
-+        "query-cpu-definitions",  /* arm, i386, ppc, s390x */
-+        "query-gic-capabilities", /* arm */
-+        /* Success depends on target-specific build configuration: */
-+        "query-pci",              /* CONFIG_PCI */
-+        NULL
-+    };
-+    int i;
-+
-+    for (i = 0; blacklist[i]; i++) {
-+        if (!strcmp(cmd, blacklist[i])) {
-+            return true;
-+        }
-+    }
-+    return false;
-+}
-+
-+typedef struct {
-+    SchemaInfoList *list;
-+    GHashTable *hash;
-+} QmpSchema;
-+
-+static void qmp_schema_init(QmpSchema *schema)
-+{
-+    QDict *resp;
-+    Visitor *qiv;
-+    SchemaInfoList *tail;
-+
-+    qtest_start(common_args);
-+    resp = qmp("{ 'execute': 'query-qmp-schema' }");
-+
-+    qiv = qobject_input_visitor_new(qdict_get(resp, "return"));
-+    visit_type_SchemaInfoList(qiv, NULL, &schema->list, &error_abort);
-+    visit_free(qiv);
-+
-+    QDECREF(resp);
-+    qtest_end();
-+
-+    schema->hash = g_hash_table_new(g_str_hash, g_str_equal);
-+
-+    /* Build @schema: hash table mapping entity name to SchemaInfo */
-+    for (tail = schema->list; tail; tail = tail->next) {
-+        g_hash_table_insert(schema->hash, tail->value->name, tail->value);
-+    }
-+}
-+
-+static SchemaInfo *qmp_schema_lookup(QmpSchema *schema, const char *name)
-+{
-+    return g_hash_table_lookup(schema->hash, name);
-+}
-+
-+static void qmp_schema_cleanup(QmpSchema *schema)
-+{
-+    qapi_free_SchemaInfoList(schema->list);
-+    g_hash_table_destroy(schema->hash);
-+}
-+
-+static bool object_type_has_mandatory_members(SchemaInfo *type)
-+{
-+    SchemaInfoObjectMemberList *tail;
-+
-+    g_assert(type->meta_type == SCHEMA_META_TYPE_OBJECT);
-+
-+    for (tail = type->u.object.members; tail; tail = tail->next) {
-+        if (!tail->value->has_q_default) {
-+            return true;
-+        }
-+    }
-+
-+    return false;
-+}
-+
-+static void add_query_tests(QmpSchema *schema)
-+{
-+    SchemaInfoList *tail;
-+    SchemaInfo *si, *arg_type, *ret_type;
-+    const char *test_name;
-+
-+    /* Test the query-like commands */
-+    for (tail = schema->list; tail; tail = tail->next) {
-+        si = tail->value;
-+        if (si->meta_type != SCHEMA_META_TYPE_COMMAND) {
-+            continue;
-+        }
-+
-+        if (query_is_blacklisted(si->name)) {
-+            continue;
-+        }
-+
-+        arg_type = qmp_schema_lookup(schema, si->u.command.arg_type);
-+        if (object_type_has_mandatory_members(arg_type)) {
-+            continue;
-+        }
-+
-+        ret_type = qmp_schema_lookup(schema, si->u.command.ret_type);
-+        if (ret_type->meta_type == SCHEMA_META_TYPE_OBJECT
-+            && !ret_type->u.object.members) {
-+            continue;
-+        }
-+
-+        test_name = g_strdup_printf("qmp/%s", si->name);
-+        qtest_add_data_func(test_name, si->name, test_query);
-+    }
-+}
-+
- int main(int argc, char *argv[])
- {
-+    QmpSchema schema;
-+    int ret;
-+
-     g_test_init(&argc, &argv, NULL);
- 
-     qtest_add_func("qmp/protocol", test_qmp_protocol);
-+    qmp_schema_init(&schema);
-+    add_query_tests(&schema);
- 
--    return g_test_run();
-+    ret = g_test_run();
-+
-+    qmp_schema_cleanup(&schema);
-+    return ret;
- }
--- 
+ MAINTAINERS                                        |   16 +
+ Makefile                                           |   15 +-
+ backends/hostmem.c                                 |    4 +-
+ block.c                                            |    4 +-
+ block/backup.c                                     |    2 +-
+ block/blkdebug.c                                   |   27 +-
+ block/file-posix.c                                 |   20 +-
+ block/file-win32.c                                 |    7 +-
+ block/gluster.c                                    |   11 +-
+ block/iscsi.c                                      |    2 +-
+ block/nfs.c                                        |    2 +-
+ block/parallels.c                                  |   17 +-
+ block/qcow2.c                                      |   15 +-
+ block/qed.c                                        |    2 +-
+ block/quorum.c                                     |   27 +-
+ block/rbd.c                                        |    2 +-
+ block/sheepdog.c                                   |    2 +-
+ blockdev.c                                         |    8 +-
+ blockjob.c                                         |    6 +-
+ chardev/char.c                                     |    4 +-
+ crypto/block-luks.c                                |   38 +-
+ crypto/block.c                                     |    4 +-
+ crypto/cipher-afalg.c                              |    2 +-
+ crypto/cipher-builtin.c                            |    8 +-
+ crypto/cipher-gcrypt.c                             |    4 +-
+ crypto/cipher-nettle.c                             |    8 +-
+ crypto/hmac-gcrypt.c                               |    2 +-
+ crypto/hmac-glib.c                                 |    2 +-
+ crypto/hmac-nettle.c                               |    2 +-
+ crypto/pbkdf-gcrypt.c                              |    2 +-
+ crypto/pbkdf-nettle.c                              |    2 +-
+ crypto/secret.c                                    |    2 +-
+ crypto/tlscreds.c                                  |    2 +-
+ docs/devel/qapi-code-gen.txt                       |   50 +-
+ hmp.c                                              |  220 +-
+ hw/block/fdc.c                                     |    6 +-
+ hw/char/escc.c                                     |    2 +-
+ hw/core/qdev-properties.c                          |   17 +-
+ hw/input/virtio-input-hid.c                        |    4 +-
+ include/hw/qdev-core.h                             |    2 +-
+ include/qapi/qmp/qdict.h                           |    4 +-
+ include/qapi/qmp/qlit.h                            |   54 +
+ include/qapi/qmp/qnum.h                            |   21 +
+ include/qapi/util.h                                |   10 +-
+ include/qapi/visitor.h                             |    2 +-
+ include/qom/object.h                               |    4 +-
+ include/sysemu/tpm_backend.h                       |    4 +-
+ migration/colo-failover.c                          |    4 +-
+ migration/colo.c                                   |   14 +-
+ migration/global_state.c                           |    6 +-
+ migration/migration.c                              |    1 -
+ monitor.c                                          |   20 +-
+ net/filter.c                                       |    2 +-
+ net/net.c                                          |    4 +-
+ qapi-schema.json                                   | 3866 ++------------=
+------
+ qapi/block-core.json                               |    5 +-
+ qapi/block.json                                    |   73 +-
+ qapi/char.json                                     |  538 +++
+ qapi/common.json                                   |  132 +-
+ qapi/crypto.json                                   |    2 +-
+ qapi/event.json                                    |  646 ----
+ qapi/introspect.json                               |    6 +-
+ qapi/migration.json                                | 1085 ++++++
+ qapi/net.json                                      |  706 ++++
+ qapi/qapi-util.c                                   |   16 +-
+ qapi/qapi-visit-core.c                             |   34 +-
+ qapi/qmp-dispatch.c                                |    2 +-
+ qapi/run-state.json                                |  352 ++
+ qapi/sockets.json                                  |  147 +
+ qapi/tpm.json                                      |  137 +
+ qapi/trace.json                                    |    2 +-
+ qapi/transaction.json                              |  158 +
+ qapi/ui.json                                       |  977 +++++
+ qemu-img.c                                         |    6 +-
+ qemu-nbd.c                                         |    4 +-
+ qobject/Makefile.objs                              |    2 +-
+ qobject/qlit.c                                     |   84 +
+ qom/object.c                                       |   16 +-
+ scripts/coccinelle/qobject.cocci                   |    3 +
+ scripts/qapi-event.py                              |    1 +
+ scripts/qapi-types.py                              |    4 +
+ scripts/qapi-visit.py                              |    2 +-
+ scripts/qapi.py                                    |   24 +-
+ target/i386/cpu.c                                  |    4 +-
+ tests/Makefile.include                             |    7 +-
+ tests/check-qjson.c                                |  150 +-
+ tests/check-qlit.c                                 |   74 +
+ tests/check-qom-proplist.c                         |   14 +-
+ .../qapi-schema/alternate-conflict-bool-string.err |    1 +
+ .../alternate-conflict-bool-string.exit            |    1 +
+ .../alternate-conflict-bool-string.json            |    4 +
+ .../qapi-schema/alternate-conflict-bool-string.out |    0
+ .../qapi-schema/alternate-conflict-num-string.err  |    1 +
+ .../qapi-schema/alternate-conflict-num-string.exit |    1 +
+ .../qapi-schema/alternate-conflict-num-string.json |    4 +
+ .../qapi-schema/alternate-conflict-num-string.out  |    0
+ tests/qmp-test.c                                   |  181 +-
+ tests/test-qapi-util.c                             |   18 +-
+ tests/test-qobject-input-visitor.c                 |    8 +-
+ tests/test-qobject-output-visitor.c                |    2 +-
+ tests/test-string-input-visitor.c                  |    4 +-
+ tests/test-string-output-visitor.c                 |    4 +-
+ tpm.c                                              |   81 +-
+ ui/input-legacy.c                                  |    6 +-
+ ui/input.c                                         |   12 +-
+ ui/vnc.c                                           |    6 +-
+ util/keyval.c                                      |    1 -
+ vl.c                                               |    6 +-
+ 108 files changed, 5360 insertions(+), 4982 deletions(-)
+ create mode 100644 include/qapi/qmp/qlit.h
+ create mode 100644 qapi/char.json
+ delete mode 100644 qapi/event.json
+ create mode 100644 qapi/migration.json
+ create mode 100644 qapi/net.json
+ create mode 100644 qapi/run-state.json
+ create mode 100644 qapi/sockets.json
+ create mode 100644 qapi/tpm.json
+ create mode 100644 qapi/transaction.json
+ create mode 100644 qapi/ui.json
+ create mode 100644 qobject/qlit.c
+ create mode 100644 tests/check-qlit.c
+ create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.err
+ create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.exit
+ create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.json
+ create mode 100644 tests/qapi-schema/alternate-conflict-bool-string.out
+ create mode 100644 tests/qapi-schema/alternate-conflict-num-string.err
+ create mode 100644 tests/qapi-schema/alternate-conflict-num-string.exit
+ create mode 100644 tests/qapi-schema/alternate-conflict-num-string.json
+ create mode 100644 tests/qapi-schema/alternate-conflict-num-string.out
+
+--=20
 2.13.5
