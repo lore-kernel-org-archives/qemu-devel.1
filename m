@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dols2-000374-HD
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 03:32:35 -0400
+	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1dom3E-000714-7H
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 03:44:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dols1-0001tZ-DW
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 03:32:34 -0400
-Date: Mon, 4 Sep 2017 09:32:24 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170904093224.62b43efb@nial.brq.redhat.com>
-In-Reply-To: <241130c59df31aebaf4f23b5f151b6b5c91f36fa.1504293917.git.alistair.francis@xilinx.com>
-References: <cover.1504293917.git.alistair.francis@xilinx.com>
-	<241130c59df31aebaf4f23b5f151b6b5c91f36fa.1504293917.git.alistair.francis@xilinx.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] xlnx-zynqmp-pmu: Add the CPU and
- memory
+	(envelope-from <s1seetee@linux.vnet.ibm.com>) id 1dom3B-0003Se-3g
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 03:44:08 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46019)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <s1seetee@linux.vnet.ibm.com>)
+	id 1dom3A-0003RS-Rh
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 03:44:05 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v847dtFK070128
+	for <qemu-devel@nongnu.org>; Mon, 4 Sep 2017 03:44:02 -0400
+Received: from e23smtp05.au.ibm.com (e23smtp05.au.ibm.com [202.81.31.147])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2crq2nga32-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 03:44:02 -0400
+Received: from localhost
+	by e23smtp05.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <s1seetee@linux.vnet.ibm.com>;
+	Mon, 4 Sep 2017 17:43:59 +1000
+From: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
+Date: Mon,  4 Sep 2017 13:13:51 +0530
+Message-Id: <1504511031-26834-1-git-send-email-s1seetee@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v5] vl: exit if maxcpus is negative
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,127 +35,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com, alistair23@gmail.com, qemu-arm@nongnu.org
+To: f4bug@amsat.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: s1seetee@linux.vnet.ibm.com
 
-On Fri, 1 Sep 2017 14:00:37 -0700
-Alistair Francis <alistair.francis@xilinx.com> wrote:
+---Steps to Reproduce---
 
-> Connect the MicroBlaze CPU and the ROM and RAM memory regions.
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
-> 
->  hw/microblaze/xlnx-zynqmp-pmu.c | 65 +++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 63 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
-> index fc3c8b236f..33584cfa4d 100644
-> --- a/hw/microblaze/xlnx-zynqmp-pmu.c
-> +++ b/hw/microblaze/xlnx-zynqmp-pmu.c
-> @@ -18,8 +18,11 @@
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
->  #include "qemu-common.h"
-> +#include "exec/address-spaces.h"
->  #include "hw/boards.h"
-> +#include "hw/qdev-properties.h"
->  #include "cpu.h"
-> +#include "boot.h"
->  
->  /* Define the PMU device */
->  
-> @@ -27,21 +30,51 @@
->  #define XLNX_ZYNQMP_PMU(obj) OBJECT_CHECK(XlnxZynqMPPMUState, (obj), \
->                                            TYPE_XLNX_ZYNQMP_PMU)
->  
-> +#define XLNX_ZYNQMP_PMU_ROM_SIZE    0x8000
-> +#define XLNX_ZYNQMP_PMU_ROM_ADDR    0xFFD00000
-> +#define XLNX_ZYNQMP_PMU_RAM_ADDR    0xFFDC0000
-> +
->  typedef struct XlnxZynqMPPMUState {
->      /*< private >*/
->      DeviceState parent_obj;
->  
->      /*< public >*/
-> +    MicroBlazeCPU cpu;
->  }  XlnxZynqMPPMUState;
->  
->  static void xlnx_zynqmp_pmu_init(Object *obj)
->  {
-> +    XlnxZynqMPPMUState *s = XLNX_ZYNQMP_PMU(obj);
->  
-> +    object_initialize(&s->cpu, sizeof(s->cpu),
-> +                      TYPE_MICROBLAZE_CPU);
-> +    object_property_add_child(obj, "pmu-cpu[*]", OBJECT(&s->cpu),
-                                              ^^^ why do you use this syntax here?
+When passed a negative number to 'maxcpus' parameter, Qemu aborts
+with a core dump.
 
-> +                              &error_abort);
->  }
->  
->  static void xlnx_zynqmp_pmu_realize(DeviceState *dev, Error **errp)
->  {
-> -
-> +    XlnxZynqMPPMUState *s = XLNX_ZYNQMP_PMU(dev);
-> +
-> +    object_property_set_uint(OBJECT(&s->cpu), XLNX_ZYNQMP_PMU_ROM_ADDR,
-> +                             "base-vectors", &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-stack-protection",
-> +                             &error_abort);
-> +    object_property_set_uint(OBJECT(&s->cpu), 0, "use-fpu", &error_abort);
-> +    object_property_set_uint(OBJECT(&s->cpu), 0, "use-hw-mul", &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-barrel",
-> +                             &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-msr-instr",
-> +                             &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-pcmp-instr",
-> +                             &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), false, "use-mmu", &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "endianness",
-> +                             &error_abort);
-> +    object_property_set_str(OBJECT(&s->cpu), "8.40.b", "version",
-> +                            &error_abort);
-> +    object_property_set_uint(OBJECT(&s->cpu), 0, "pvr", &error_abort);
-> +    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &error_fatal);
-I'd replace error_fatal here with errp
+Run the following command with maxcpus argument as negative number
 
->  }
->  
->  static void xlnx_zynqmp_pmu_class_init(ObjectClass *oc, void *data)
-> @@ -70,7 +103,35 @@ type_init(xlnx_zynqmp_pmu_register_types)
->  
->  static void xlnx_zcu102_pmu_init(MachineState *machine)
->  {
-> -
-> +    XlnxZynqMPPMUState *pmu = g_new0(XlnxZynqMPPMUState, 1);
-> +    MemoryRegion *address_space_mem = get_system_memory();
-> +    MemoryRegion *pmu_rom = g_new(MemoryRegion, 1);
-> +    MemoryRegion *pmu_ram = g_new(MemoryRegion, 1);
-> +
-> +    /* Create the ROM */
-> +    memory_region_init_rom(pmu_rom, NULL, "xlnx-zcu102-pmu.rom",
-> +                           XLNX_ZYNQMP_PMU_ROM_SIZE, &error_fatal);
-> +    memory_region_add_subregion(address_space_mem, XLNX_ZYNQMP_PMU_ROM_ADDR,
-> +                                pmu_rom);
-> +
-> +    /* Create the RAM */
-> +    memory_region_init_ram(pmu_ram, NULL, "xlnx-zcu102-pmu.ram",
-> +                           machine->ram_size, &error_fatal);
-> +    memory_region_add_subregion(address_space_mem, XLNX_ZYNQMP_PMU_RAM_ADDR,
-> +                                pmu_ram);
-> +
-> +    /* Create the PMU device */
-> +    object_initialize(pmu, sizeof(XlnxZynqMPPMUState), TYPE_XLNX_ZYNQMP_PMU);
-> +    object_property_add_child(OBJECT(machine), "pmu", OBJECT(pmu),
-> +                              &error_abort);
-> +    object_property_set_bool(OBJECT(pmu), true, "realized", &error_fatal);
-> +
-> +    /* Load the kernel */
-> +    microblaze_load_kernel(&pmu->cpu, XLNX_ZYNQMP_PMU_RAM_ADDR,
-> +                           machine->ram_size,
-> +                           machine->kernel_filename,
-> +                           machine->dtb,
-> +                           NULL);
->  }
->  
->  static void xlnx_zcu102_pmu_machine_init(MachineClass *mc)
+ppc64-softmmu/qemu-system-ppc64 --nographic -vga none -machine
+pseries,accel=kvm,kvm-type=HV -m size=200g -device virtio-blk-pci,
+drive=rootdisk -drive file=/home/images/pegas-1.0-ppc64le.qcow2,
+if=none,cache=none,id=rootdisk,format=qcow2 -monitor telnet
+:127.0.0.1:1234,server,nowait -net nic,model=virtio -net
+user -redir tcp:2000::22 -device nec-usb-xhci -smp 8,cores=1,
+threads=1,maxcpus=-12
+
+(process:12149): GLib-ERROR **: gmem.c:130: failed to allocate
+ 18446744073709550568 bytes
+
+Trace/breakpoint trap
+
+Reported-by: R.Nageswara Sastry <rnsastry@linux.vnet.ibm.com>
+Signed-off-by: Seeteena Thoufeek <s1seetee@linux.vnet.ibm.com>
+---
+v1 -> v2:
+  - Fix the error check in vl.c to make it generic.
+v2 -> v3:
+  - Fix coding style pointed out by patchew.
+  - Fix check for "<= 0" instead of just "< 0".
+v3 -> v4:
+  - Fix subject line.
+  - Removed space before ":" from vl.c:1248
+  - Removed Reviewed-by: flag
+v4-> v5:
+  - Code rework to declare max_cpus as unsigned int in sysemu.h
+  - Remove the error check in vl.c referred in v2.
+  - declare max_cpus as unsigned int in vl.c
+---
+ include/sysemu/sysemu.h | 2 +-
+ vl.c                    | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index b213696..c083869 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -113,7 +113,7 @@ extern int win2k_install_hack;
+ extern int alt_grab;
+ extern int ctrl_grab;
+ extern int smp_cpus;
+-extern int max_cpus;
++extern unsigned int max_cpus;
+ extern int cursor_hide;
+ extern int graphic_rotate;
+ extern int no_quit;
+diff --git a/vl.c b/vl.c
+index 8e247cc..1470c21 100644
+--- a/vl.c
++++ b/vl.c
+@@ -164,7 +164,7 @@ Chardev *sclp_hds[MAX_SCLP_CONSOLES];
+ int win2k_install_hack = 0;
+ int singlestep = 0;
+ int smp_cpus = 1;
+-int max_cpus = 1;
++unsigned int max_cpus = 1;
+ int smp_cores = 1;
+ int smp_threads = 1;
+ int acpi_enabled = 1;
+@@ -4233,8 +4233,8 @@ int main(int argc, char **argv, char **envp)
+ 
+     machine_class->max_cpus = machine_class->max_cpus ?: 1; /* Default to UP */
+     if (max_cpus > machine_class->max_cpus) {
+-        error_report("Number of SMP CPUs requested (%d) exceeds max CPUs "
+-                     "supported by machine '%s' (%d)", max_cpus,
++        error_report("Invalid SMP CPUs %d. The max CPUs "
++                     "supported by machine '%s' is %d", max_cpus,
+                      machine_class->name, machine_class->max_cpus);
+         exit(1);
+     }
+-- 
+1.8.3.1
