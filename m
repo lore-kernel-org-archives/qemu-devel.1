@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dou0Q-00031q-Fh
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 12:13:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dou4O-0005bI-1U
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 12:17:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dou0K-0002ko-TD
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 12:13:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60776)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dou0K-0002kd-Jk
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 12:13:40 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-18-marcandre.lureau@redhat.com>
-Date: Mon, 04 Sep 2017 18:13:35 +0200
-In-Reply-To: <20170822132255.23945-18-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 22 Aug 2017
-	15:22:18 +0200")
-Message-ID: <87h8wicuhc.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1dou4J-0004n7-D8
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 12:17:52 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:32910)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dou4J-0004mJ-6M
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 12:17:47 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id a43so2916799wrc.0
+	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 09:17:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <a91359d6-457c-7164-18f9-050193f2d419@vivier.eu>
+References: <20170903163130.14288-1-n54@gmx.com>
+	<9f33a768-77d1-191b-8be3-35d625752cbf@vivier.eu>
+	<1257d6ba-9ca1-0940-af9e-a9ea7dea0287@amsat.org>
+	<941d403b-7413-517f-23af-2c0c88a3ec57@gmx.com>
+	<c1c4d90a-380f-4bd1-8aa4-8a970241020d@vivier.eu>
+	<CAFEAcA-RUoY5X1KsS2eAkte6G3g2CC_YYMg1e1XxxWd420LBow@mail.gmail.com>
+	<a91359d6-457c-7164-18f9-050193f2d419@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 4 Sep 2017 17:17:25 +0100
+Message-ID: <CAFEAcA8VYnJgru6bV7_tNkPoJSKm3pwTH=8oJRdpTEW9PXycug@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 17/54] qapi: add 'if' condition on
- entity objects
+Subject: Re: [Qemu-devel] [PATCH] target/m68k: Change fpu_rom from const
+ static array to switch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,376 +36,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Kamil Rytarowski <n54@gmx.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> Take 'if' from expression, and use it to construct entity objects.
-> Shared implicit objects must share the same 'if' condition.
-
-Shared by what?
-
+On 4 September 2017 at 16:53, Laurent Vivier <laurent@vivier.eu> wrote:
+> Le 04/09/2017 =C3=A0 17:02, Peter Maydell a =C3=A9crit :
+>> On 4 September 2017 at 15:09, Laurent Vivier <laurent@vivier.eu> wrote:
+>>> You can:
+>>>
+>>> either replace the "#define floatx80_pi make_floatx80(...)" by a "const
+>>> floatx80 floatx80_pi =3D make_floatx80_init(...)"
+>>>
+>>> or replace all the macros in the m68k/fpu_helper.c array by
+>>> make_floatx80_init(...)
+>>
+>> Taking a step back, what's different about floatx80 and float12
+>> that means they need separate _init and non-init versions of
+>> the macros, when for float16/float32/float64 we instead have
+>> #define make_float32(x) __extension__ ({ float32 f32_val =3D {x}; f32_va=
+l; })
+>> #define const_float32(x) { x }
 >
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi.py | 81 +++++++++++++++++++++++++++++++++++++--------------=
-------
->  1 file changed, 53 insertions(+), 28 deletions(-)
+> floatx80/float128 are structureq while float16/float32/float64 are
+> native data types.
+
+If USE_SOFTFLOAT_STRUCT_TYPES is defined then float16/32/64 are
+also struct types and use the make_ and const_ macros as above.
+
+(We should check whether USE_SOFTFLOAT_STRUCT_TYPES still builds,
+it tends to bitrot. If it does then maybe we should use it by default
+since gcc 3 is now just a memory...)
+
+>> ? Could we move to consistency for the macro naming we're using?
 >
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index a94d93ada4..dc40d74abb 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -992,7 +992,7 @@ def check_exprs(exprs):
->  #
->=20=20
->  class QAPISchemaEntity(object):
-> -    def __init__(self, name, info, doc):
-> +    def __init__(self, name, info, doc, ifcond=3DNone):
->          assert isinstance(name, str)
->          self.name =3D name
->          # For explicitly defined entities, info points to the (explicit)
+> Do you mean "s/make_floatx80_init/const_floatx80/"?
 
-Not visible here: QAPISchemaType inherits this.
+Yes (and the same implementation would be nice too).
 
-> @@ -1002,6 +1002,7 @@ class QAPISchemaEntity(object):
->          # such place).
->          self.info =3D info
->          self.doc =3D doc
-> +        self.ifcond =3D ifcond
->=20=20
->      def c_name(self):
->          return c_name(self.name)
-> @@ -1118,8 +1119,8 @@ class QAPISchemaBuiltinType(QAPISchemaType):
->=20=20
->=20=20
->  class QAPISchemaEnumType(QAPISchemaType):
-> -    def __init__(self, name, info, doc, values, prefix):
-> -        QAPISchemaType.__init__(self, name, info, doc)
-> +    def __init__(self, name, info, doc, values, prefix, ifcond=3DNone):
-> +        QAPISchemaType.__init__(self, name, info, doc, ifcond)
->          for v in values:
->              assert isinstance(v, QAPISchemaMember)
->              v.set_owner(name)
-> @@ -1162,6 +1163,7 @@ class QAPISchemaArrayType(QAPISchemaType):
->      def check(self, schema):
->          self.element_type =3D schema.lookup_type(self._element_type_name)
->          assert self.element_type
-> +        self.ifcond =3D self.element_type.ifcond
-
-This is subtler than it looks on first glance.
-
-All the other entities set self.ifcond in their constructor to the true
-value passed in as argument.
-
-QAPISchemaArrayType doesn't take such an argument.  Instead, it inherits
-its .ifcond from its .element_type.  However, .element_type isn't known
-at construction time if it's a forward reference.  We therefore delay
-setting it until .check() time.  You do the same for .ifcond (no
-choice).
-
-Before .check(), .ifcond is None, because the constructor sets it that
-way: it calls QAPISchemaType.__init__() without passing a ifcond
-argument, which then sets self.ifcond to its default argument None.
-
-Pitfall: accessing ent.ifcond before ent.check() works *except* when ent
-is an array type.  Hmm.
-
->=20=20
->      def is_implicit(self):
->          return True
-> @@ -1183,11 +1185,12 @@ class QAPISchemaArrayType(QAPISchemaType):
->=20=20
->=20=20
->  class QAPISchemaObjectType(QAPISchemaType):
-> -    def __init__(self, name, info, doc, base, local_members, variants):
-> +    def __init__(self, name, info, doc, base, local_members, variants,
-> +                 ifcond=3DNone):
->          # struct has local_members, optional base, and no variants
->          # flat union has base, variants, and no local_members
->          # simple union has local_members, variants, and no base
-> -        QAPISchemaType.__init__(self, name, info, doc)
-> +        QAPISchemaType.__init__(self, name, info, doc, ifcond)
->          assert base is None or isinstance(base, str)
->          for m in local_members:
->              assert isinstance(m, QAPISchemaObjectTypeMember)
-> @@ -1375,8 +1378,8 @@ class QAPISchemaObjectTypeVariant(QAPISchemaObjectT=
-ypeMember):
->=20=20
->=20=20
->  class QAPISchemaAlternateType(QAPISchemaType):
-> -    def __init__(self, name, info, doc, variants):
-> -        QAPISchemaType.__init__(self, name, info, doc)
-> +    def __init__(self, name, info, doc, variants, ifcond):
-> +        QAPISchemaType.__init__(self, name, info, doc, ifcond)
->          assert isinstance(variants, QAPISchemaObjectTypeVariants)
->          assert variants.tag_member
->          variants.set_owner(name)
-> @@ -1413,8 +1416,8 @@ class QAPISchemaAlternateType(QAPISchemaType):
->=20=20
->  class QAPISchemaCommand(QAPISchemaEntity):
->      def __init__(self, name, info, doc, arg_type, ret_type,
-> -                 gen, success_response, boxed):
-> -        QAPISchemaEntity.__init__(self, name, info, doc)
-> +                 gen, success_response, boxed, ifcond):
-> +        QAPISchemaEntity.__init__(self, name, info, doc, ifcond)
->          assert not arg_type or isinstance(arg_type, str)
->          assert not ret_type or isinstance(ret_type, str)
->          self._arg_type_name =3D arg_type
-> @@ -1451,8 +1454,8 @@ class QAPISchemaCommand(QAPISchemaEntity):
->=20=20
->=20=20
->  class QAPISchemaEvent(QAPISchemaEntity):
-> -    def __init__(self, name, info, doc, arg_type, boxed):
-> -        QAPISchemaEntity.__init__(self, name, info, doc)
-> +    def __init__(self, name, info, doc, arg_type, boxed, ifcond):
-> +        QAPISchemaEntity.__init__(self, name, info, doc, ifcond)
->          assert not arg_type or isinstance(arg_type, str)
->          self._arg_type_name =3D arg_type
->          self.arg_type =3D None
-
-Hmm.  You're adding parameter ifcond to all entity constructors.  The
-entity constructors' signatures all look like this:
-
-    def __init__(<common parameters>, <specific parameters>)
-
-where <common parameters> is self, name, info, doc.
-
-Since ifcond is common, let's add it to <common parameters>.  Pick a
-position you like.
-
-> @@ -1547,11 +1550,11 @@ class QAPISchema(object):
->      def _make_enum_members(self, values):
->          return [QAPISchemaMember(v) for v in values]
->=20=20
-> -    def _make_implicit_enum_type(self, name, info, values):
-> +    def _make_implicit_enum_type(self, name, info, values, ifcond):
->          # See also QAPISchemaObjectTypeMember._pretty_owner()
->          name =3D name + 'Kind'   # Use namespace reserved by add_name()
->          self._def_entity(QAPISchemaEnumType(
-> -            name, info, None, self._make_enum_members(values), None))
-> +            name, info, None, self._make_enum_members(values), None, ifc=
-ond))
->          return name
-
-Called by _def_union_type() to create the implicit tag enum, with the
-same ifcond it passes to QAPISchemaObjectType().  Thus, the implicit
-type's ifcond matches the ifcond of its only user.  Good.
-
->=20=20
->      def _make_array_type(self, element_type, info):
-> @@ -1560,22 +1563,29 @@ class QAPISchema(object):
->              self._def_entity(QAPISchemaArrayType(name, info, element_typ=
-e))
->          return name
->=20=20
-> -    def _make_implicit_object_type(self, name, info, doc, role, members):
-> +    def _make_implicit_object_type(self, name, info, doc, role, members,
-> +                                   ifcond=3DNone):
->          if not members:
->              return None
->          # See also QAPISchemaObjectTypeMember._pretty_owner()
->          name =3D 'q_obj_%s-%s' % (name, role)
-> -        if not self.lookup_entity(name, QAPISchemaObjectType):
-> +        typ =3D self.lookup_entity(name, QAPISchemaObjectType)
-> +        if typ:
-> +            # FIXME: generating the disjunction of all conditions
-
-What are "all conditions"?  I hope I can shed some light on that below.
-
-> +            assert ifcond =3D=3D typ.ifcond
-> +        else:
->              self._def_entity(QAPISchemaObjectType(name, info, doc, None,
-> -                                                  members, None))
-> +                                                  members, None, ifcond))
->          return name
-
-Several callers:
-
-* _make_simple_variant() to create a wrapper type, with the wrapped
-  type's ifcond.  The wrapped type's ifcond is necessary for the wrapper
-  type to compile.  It's not sufficient for it to be needed.  The
-  "needed" condition is the disjunction of all users' ifcond.
-
-  In other words, your code generates condition that is correct, but not
-  tight.  Your FIXME is about tightening it.  I'd make it a TODO,
-  because nothing is actually broken now.
-
-  Need a comment explaining this.  Perhaps:
-
-        if typ:
-            # The implicit object type has multiple users.  This can
-            # happen only for simple unions' implicit wrapper types.
-            # Its ifcond should be the disjunction of its user's
-            # ifconds.  Not implemented.  Instead, we always pass the
-            # wrapped type's ifcond, which is trivially the same for all
-            # users.  It's also necessary for the wrapper to compile.
-            # But it's not tight: the disjunction need not imply it.  We
-            # may end up compiling useless wrapper types.
-            # TODO kill simple unions or implement the disjunction
-
-  I hate simple unions.
-
-* _def_union_type() to create an implicit base type, with same ifcond it
-  passes to QAPISchemaObjectType().  Thus, the implicit base type's
-  ifcond matches the ifcond of its only user.  Good.
-
-* _def_command() to create an implicit argument type, with the same
-  ifcond it passes to QAPISchemaCommand().  Thus, the implicit argument
-  type's ifcond matches the ifcond of its only user.  Good.
-
-* _def_event() likewise.
-
-I still can't make sense of the commit message's "Shared implicit
-objects must share the same 'if' condition."
-
->=20=20
->      def _def_enum_type(self, expr, info, doc):
->          name =3D expr['enum']
->          data =3D expr['data']
->          prefix =3D expr.get('prefix')
-> +        ifcond =3D expr.get('if')
->          self._def_entity(QAPISchemaEnumType(
-> -            name, info, doc, self._make_enum_members(data), prefix))
-> +            name, info, doc, self._make_enum_members(data), prefix,
-> +            ifcond))
->=20=20
->      def _make_member(self, name, typ, info):
->          optional =3D False
-> @@ -1595,9 +1605,10 @@ class QAPISchema(object):
->          name =3D expr['struct']
->          base =3D expr.get('base')
->          data =3D expr['data']
-> +        ifcond =3D expr.get('if')
->          self._def_entity(QAPISchemaObjectType(name, info, doc, base,
->                                                self._make_members(data, i=
-nfo),
-> -                                              None))
-> +                                              None, ifcond))
->=20=20
->      def _make_variant(self, case, typ):
->          return QAPISchemaObjectTypeVariant(case, typ)
-> @@ -1606,19 +1617,23 @@ class QAPISchema(object):
->          if isinstance(typ, list):
->              assert len(typ) =3D=3D 1
->              typ =3D self._make_array_type(typ[0], info)
-> +        type_entity =3D self.lookup_type(typ)
->          typ =3D self._make_implicit_object_type(
-> -            typ, info, None, 'wrapper', [self._make_member('data', typ, =
-info)])
-> +            typ, info, None, 'wrapper',
-> +            [self._make_member('data', typ, info)], type_entity.ifcond)
->          return QAPISchemaObjectTypeVariant(case, typ)
-
-This is where you create the wrapper type with the wrapped type's
-ifcond.
-
-I don't like the name type_entity.  I'd simply eliminate the variable.
-
->=20=20
->      def _def_union_type(self, expr, info, doc):
->          name =3D expr['union']
->          data =3D expr['data']
->          base =3D expr.get('base')
-> +        ifcond =3D expr.get('if')
->          tag_name =3D expr.get('discriminator')
->          tag_member =3D None
->          if isinstance(base, dict):
-> -            base =3D (self._make_implicit_object_type(
-> -                name, info, doc, 'base', self._make_members(base, info)))
-> +            base =3D self._make_implicit_object_type(
-> +                name, info, doc, 'base', self._make_members(base, info),
-> +                ifcond)
->          if tag_name:
->              variants =3D [self._make_variant(key, value)
->                          for (key, value) in data.iteritems()]
-
-This is where you create a union's implicit base type with the union's
-ifcond.
-
-> @@ -1627,18 +1642,21 @@ class QAPISchema(object):
->              variants =3D [self._make_simple_variant(key, value, info)
->                          for (key, value) in data.iteritems()]
->              typ =3D self._make_implicit_enum_type(name, info,
-> -                                                [v.name for v in variant=
-s])
-> +                                                [v.name for v in variant=
-s],
-> +                                                ifcond)
->              tag_member =3D QAPISchemaObjectTypeMember('type', typ, False)
->              members =3D [tag_member]
-
-This is where you create a union's implicit tag enum with the union's ifcon=
-d.
-
->          self._def_entity(
->              QAPISchemaObjectType(name, info, doc, base, members,
->                                   QAPISchemaObjectTypeVariants(tag_name,
->                                                                tag_member,
-> -                                                              variants)))
-> +                                                              variants),
-> +                                 ifcond))
->=20=20
->      def _def_alternate_type(self, expr, info, doc):
->          name =3D expr['alternate']
->          data =3D expr['data']
-> +        ifcond =3D expr.get('if')
->          variants =3D [self._make_variant(key, value)
->                      for (key, value) in data.iteritems()]
->          tag_member =3D QAPISchemaObjectTypeMember('type', 'QType', False)
-> @@ -1646,7 +1664,8 @@ class QAPISchema(object):
->              QAPISchemaAlternateType(name, info, doc,
->                                      QAPISchemaObjectTypeVariants(None,
->                                                                   tag_mem=
-ber,
-> -                                                                 variant=
-s)))
-> +                                                                 variant=
-s),
-> +                                    ifcond))
->=20=20
->      def _def_command(self, expr, info, doc):
->          name =3D expr['command']
-> @@ -1655,23 +1674,29 @@ class QAPISchema(object):
->          gen =3D expr.get('gen', True)
->          success_response =3D expr.get('success-response', True)
->          boxed =3D expr.get('boxed', False)
-> +        ifcond =3D expr.get('if')
->          if isinstance(data, OrderedDict):
->              data =3D self._make_implicit_object_type(
-> -                name, info, doc, 'arg', self._make_members(data, info))
-> +                name, info, doc, 'arg', self._make_members(data, info),
-> +                ifcond)
-
-This is where you create a command's implicit argument type with the
-command's ifcond.
-
->          if isinstance(rets, list):
->              assert len(rets) =3D=3D 1
->              rets =3D self._make_array_type(rets[0], info)
->          self._def_entity(QAPISchemaCommand(name, info, doc, data, rets,
-> -                                           gen, success_response, boxed))
-> +                                           gen, success_response, boxed,
-> +                                           ifcond))
->=20=20
->      def _def_event(self, expr, info, doc):
->          name =3D expr['event']
->          data =3D expr.get('data')
->          boxed =3D expr.get('boxed', False)
-> +        ifcond =3D expr.get('if')
->          if isinstance(data, OrderedDict):
->              data =3D self._make_implicit_object_type(
-> -                name, info, doc, 'arg', self._make_members(data, info))
-> -        self._def_entity(QAPISchemaEvent(name, info, doc, data, boxed))
-> +                name, info, doc, 'arg', self._make_members(data, info),
-> +                ifcond)
-
-This is where you create an event's implicit argument type with the
-event's ifcond.
-
-> +        self._def_entity(QAPISchemaEvent(name, info, doc, data, boxed,
-> +                                         ifcond))
->=20=20
->      def _def_exprs(self):
->          for expr_elem in self.exprs:
+thanks
+-- PMM
