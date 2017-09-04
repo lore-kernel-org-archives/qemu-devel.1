@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dorwO-0003iQ-RT
+	(envelope-from <imammedo@redhat.com>) id 1dorwI-0003fs-QJ
 	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:01:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dorwG-00043g-SV
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:01:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50824)
+	(envelope-from <imammedo@redhat.com>) id 1dorwB-0003xZ-PC
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:01:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40556)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dorwG-00041t-BY
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:01:20 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dorwB-0003vi-Cf
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 10:01:15 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon,  4 Sep 2017 16:01:01 +0200
-Message-Id: <1504533662-198084-6-git-send-email-imammedo@redhat.com>
+Date: Mon,  4 Sep 2017 16:00:58 +0200
+Message-Id: <1504533662-198084-3-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1504533662-198084-1-git-send-email-imammedo@redhat.com>
 References: <1504533662-198084-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/6] pc: use generic cpu_model parsing
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 2/6] cpu: make cpu_generic_init() abort QEMU on
+ error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,163 +28,757 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Andrew Jones <drjones@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Andrew Jones <drjones@redhat.com>, Richard Henderson <rth@twiddle.net>, Jan Kiszka <jan.kiszka@web.de>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, Michael Walle <michael@walle.cc>, Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Anthony Green <green@moxielogic.com>, Jia Liu <proljc@gmail.com>, Stafford Horne <shorne@gmail.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Magnus Damm <magnus.damm@gmail.com>, Fabien Chouteau <chouteau@adacore.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Max Filippov <jcmvbkbc@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-define default CPU type in generic way in pc_machine_class_init()
-and let common machine code to handle cpu_model parsing
+Almost every user of cpu_generic_init() checks for
+returned NULL and then reports failure in a custom way
+and aborts process.
+Some users assume that call can't fail and don't check
+for failure, though they should have checked for it.
 
-Patch also introduces TARGET_DEFAULT_CPU_TYPE define for 2 purposes:
-  * make foo_machine_class_init() look uniform on every target
-  * use define in [bsd|linux]-user targets to pick default
-    cpu type
+In either cases cpu_generic_init() failure is fatal,
+so instead of checking for failure and reporting
+it various ways, make cpu_generic_init() report
+errors in consistent way and terminate QEMU on failure.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- target/i386/cpu.h |  9 +++++++++
- hw/i386/pc.c      | 41 +++++------------------------------------
- hw/i386/pc_piix.c |  4 +---
- target/i386/cpu.c |  3 ---
- 4 files changed, 15 insertions(+), 42 deletions(-)
+Even though it's tree wide change, it's trivial so all
+affected call sites are included within one patch.
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 525d35d..4035a11 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1508,6 +1508,15 @@ uint64_t cpu_get_tsc(CPUX86State *env);
- 
- #define cpu_init(cpu_model) cpu_generic_init(TYPE_X86_CPU, cpu_model)
- 
-+#define X86_CPU_TYPE_SUFFIX "-" TYPE_X86_CPU
-+#define X86_CPU_TYPE_NAME(name) (name X86_CPU_TYPE_SUFFIX)
-+
-+#ifdef TARGET_X86_64
-+#define TARGET_DEFAULT_CPU_TYPE X86_CPU_TYPE_NAME("qemu64")
-+#else
-+#define TARGET_DEFAULT_CPU_TYPE X86_CPU_TYPE_NAME("qemu32")
-+#endif
-+
- #define cpu_signal_handler cpu_x86_signal_handler
- #define cpu_list x86_cpu_list
- 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 2108104..2247ac0 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1107,7 +1107,6 @@ static void pc_new_cpu(const char *typename, int64_t apic_id, Error **errp)
- 
- void pc_hot_add_cpu(const int64_t id, Error **errp)
- {
--    ObjectClass *oc;
-     MachineState *ms = MACHINE(qdev_get_machine());
-     int64_t apic_id = x86_cpu_apic_id_from_index(id);
-     Error *local_err = NULL;
-@@ -1124,9 +1123,7 @@ void pc_hot_add_cpu(const int64_t id, Error **errp)
-         return;
-     }
- 
--    assert(ms->possible_cpus->cpus[0].cpu); /* BSP is always present */
--    oc = OBJECT_CLASS(CPU_GET_CLASS(ms->possible_cpus->cpus[0].cpu));
--    pc_new_cpu(object_class_get_name(oc), apic_id, &local_err);
-+    pc_new_cpu(ms->cpu_type, apic_id, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-@@ -1136,39 +1133,10 @@ void pc_hot_add_cpu(const int64_t id, Error **errp)
- void pc_cpus_init(PCMachineState *pcms)
- {
-     int i;
--    CPUClass *cc;
--    ObjectClass *oc;
--    const char *typename;
--    gchar **model_pieces;
-     const CPUArchIdList *possible_cpus;
--    MachineState *machine = MACHINE(pcms);
-+    MachineState *ms = MACHINE(pcms);
-     MachineClass *mc = MACHINE_GET_CLASS(pcms);
- 
--    /* init CPUs */
--    if (machine->cpu_model == NULL) {
--#ifdef TARGET_X86_64
--        machine->cpu_model = "qemu64";
--#else
--        machine->cpu_model = "qemu32";
--#endif
--    }
--
--    model_pieces = g_strsplit(machine->cpu_model, ",", 2);
--    if (!model_pieces[0]) {
--        error_report("Invalid/empty CPU model name");
--        exit(1);
--    }
--
--    oc = cpu_class_by_name(TYPE_X86_CPU, model_pieces[0]);
--    if (oc == NULL) {
--        error_report("Unable to find CPU definition: %s", model_pieces[0]);
--        exit(1);
--    }
--    typename = object_class_get_name(oc);
--    cc = CPU_CLASS(oc);
--    cc->parse_features(typename, model_pieces[1], &error_fatal);
--    g_strfreev(model_pieces);
--
-     /* Calculates the limit to CPU APIC ID values
-      *
-      * Limit for the APIC ID value, so that all
-@@ -1177,9 +1145,9 @@ void pc_cpus_init(PCMachineState *pcms)
-      * This is used for FW_CFG_MAX_CPUS. See comments on bochs_bios_init().
-      */
-     pcms->apic_id_limit = x86_cpu_apic_id_from_index(max_cpus - 1) + 1;
--    possible_cpus = mc->possible_cpu_arch_ids(machine);
-+    possible_cpus = mc->possible_cpu_arch_ids(ms);
-     for (i = 0; i < smp_cpus; i++) {
--        pc_new_cpu(typename, possible_cpus->cpus[i].arch_id, &error_fatal);
-+        pc_new_cpu(ms->cpu_type, possible_cpus->cpus[i].arch_id, &error_fatal);
-     }
- }
- 
-@@ -2360,6 +2328,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     hc->unplug_request = pc_machine_device_unplug_request_cb;
-     hc->unplug = pc_machine_device_unplug_cb;
-     nc->nmi_monitor_handler = x86_nmi;
-+    mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
- 
-     object_class_property_add(oc, PC_MACHINE_MEMHP_REGION_SIZE, "int",
-         pc_machine_get_hotplug_memory_region_size, NULL,
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 46dfd2c..a3f4e2a 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -378,9 +378,6 @@ static void pc_compat_0_13(MachineState *machine)
- 
- static void pc_init_isa(MachineState *machine)
- {
--    if (!machine->cpu_model) {
--        machine->cpu_model = "486";
--    }
-     x86_cpu_change_kvm_default("kvm-pv-eoi", NULL);
-     enable_compat_apic_id_mode();
-     pc_init1(machine, TYPE_I440FX_PCI_HOST_BRIDGE, TYPE_I440FX_PCI_DEVICE);
-@@ -1104,6 +1101,7 @@ static void isapc_machine_options(MachineClass *m)
-     pcmc->gigabyte_align = false;
-     pcmc->smbios_legacy_mode = true;
-     pcmc->has_reserved_memory = false;
-+    m->default_cpu_type = X86_CPU_TYPE_NAME("486");
- }
- 
- DEFINE_PC_MACHINE(isapc, "isapc", pc_init_isa,
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index f81576d..a91b2b6 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -705,9 +705,6 @@ void host_vendor_fms(char *vendor, int *family, int *model, int *stepping)
- 
- /* CPU class name definitions: */
- 
--#define X86_CPU_TYPE_SUFFIX "-" TYPE_X86_CPU
--#define X86_CPU_TYPE_NAME(name) (name X86_CPU_TYPE_SUFFIX)
--
- /* Return type name for a given CPU model name
-  * Caller is responsible for freeing the returned string.
+CC: Richard Henderson <rth@twiddle.net>=20
+CC: Jan Kiszka <jan.kiszka@web.de>=20
+CC: Peter Maydell <peter.maydell@linaro.org>=20
+CC: Andrzej Zaborowski <balrogg@gmail.com>=20
+CC: Michael Walle <michael@walle.cc>=20
+CC: Thomas Huth <huth@tuxfamily.org>=20
+CC: Aurelien Jarno <aurelien@aurel32.net>=20
+CC: Yongbok Kim <yongbok.kim@imgtec.com>=20
+CC: "Herv=C3=A9 Poussineau" <hpoussin@reactos.org>=20
+CC: Anthony Green <green@moxielogic.com>=20
+CC: Jia Liu <proljc@gmail.com>=20
+CC: Stafford Horne <shorne@gmail.com>=20
+CC: Alexander Graf <agraf@suse.de>=20
+CC: David Gibson <david@gibson.dropbear.id.au>=20
+CC: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>=20
+CC: Magnus Damm <magnus.damm@gmail.com>=20
+CC: Fabien Chouteau <chouteau@adacore.com>=20
+CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>=20
+CC: Artyom Tarasenko <atar4qemu@gmail.com>=20
+CC: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>=20
+CC: Guan Xuetao <gxt@mprc.pku.edu.cn>=20
+CC: Max Filippov <jcmvbkbc@gmail.com>=20
+CC: Riku Voipio <riku.voipio@iki.fi>=20
+CC: Laurent Vivier <laurent@vivier.eu>=20
+
+---
+ include/qom/cpu.h              |  3 ++-
+ bsd-user/main.c                |  4 ----
+ hw/alpha/dp264.c               |  4 ----
+ hw/arm/musicpal.c              |  4 ----
+ hw/arm/omap1.c                 |  4 ----
+ hw/arm/omap2.c                 |  4 ----
+ hw/arm/pxa2xx.c                |  8 --------
+ hw/arm/strongarm.c             |  5 -----
+ hw/lm32/lm32_boards.c          |  8 --------
+ hw/lm32/milkymist.c            |  4 ----
+ hw/m68k/an5206.c               |  4 ----
+ hw/m68k/mcf5208.c              |  4 ----
+ hw/mips/cps.c                  |  4 ----
+ hw/mips/mips_fulong2e.c        |  4 ----
+ hw/mips/mips_jazz.c            |  4 ----
+ hw/mips/mips_malta.c           |  4 ----
+ hw/mips/mips_mipssim.c         |  4 ----
+ hw/mips/mips_r4k.c             |  4 ----
+ hw/moxie/moxiesim.c            |  4 ----
+ hw/openrisc/openrisc_sim.c     |  4 ----
+ hw/ppc/e500.c                  |  4 ----
+ hw/ppc/mac_newworld.c          |  4 ----
+ hw/ppc/mac_oldworld.c          |  4 ----
+ hw/ppc/ppc440_bamboo.c         |  4 ----
+ hw/ppc/ppc4xx_devs.c           |  5 -----
+ hw/ppc/prep.c                  |  9 ---------
+ hw/ppc/virtex_ml507.c          |  4 ----
+ hw/sh4/r2d.c                   |  4 ----
+ hw/sh4/shix.c                  |  4 ----
+ hw/sparc/leon3.c               |  4 ----
+ hw/sparc/sun4m.c               |  4 ----
+ hw/sparc64/sparc64.c           |  4 ----
+ hw/tricore/tricore_testboard.c |  4 ----
+ hw/unicore32/puv3.c            |  4 ----
+ hw/xtensa/sim.c                |  5 -----
+ hw/xtensa/xtfpga.c             |  5 -----
+ linux-user/main.c              |  4 ----
+ qom/cpu.c                      | 13 ++++++-------
+ 38 files changed, 8 insertions(+), 169 deletions(-)
+
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index a92a7d2..392ae75 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -649,7 +649,8 @@ CPUState *cpu_create(const char *typename);
+  *
+  * processes optional parameters and registers them as global properties
+  *
+- * Returns: type of CPU to create or %NULL if an error occurred.
++ * Returns: type of CPU to create or prints error and terminates process
++ *          if an error occurred.
   */
--- 
+ const char *cpu_parse_features(const char *typename, const char *cpu_mod=
+el);
+=20
+diff --git a/bsd-user/main.c b/bsd-user/main.c
+index 8a6706a..836daac 100644
+--- a/bsd-user/main.c
++++ b/bsd-user/main.c
+@@ -902,10 +902,6 @@ int main(int argc, char **argv)
+     /* NOTE: we need to init the CPU at this stage to get
+        qemu_host_page_size */
+     cpu =3D cpu_init(cpu_model);
+-    if (!cpu) {
+-        fprintf(stderr, "Unable to find CPU definition\n");
+-        exit(1);
+-    }
+     env =3D cpu->env_ptr;
+ #if defined(TARGET_SPARC) || defined(TARGET_PPC)
+     cpu_reset(cpu);
+diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+index 1c5a177..1b12130 100644
+--- a/hw/alpha/dp264.c
++++ b/hw/alpha/dp264.c
+@@ -68,10 +68,6 @@ static void clipper_init(MachineState *machine)
+     memset(cpus, 0, sizeof(cpus));
+     for (i =3D 0; i < smp_cpus; ++i) {
+         cpus[i] =3D ALPHA_CPU(cpu_generic_init(TYPE_ALPHA_CPU, cpu_model=
+));
+-        if (!cpus[i]) {
+-            error_report("Unable to find CPU definition");
+-            exit(1);
+-        }
+     }
+=20
+     cpus[0]->env.trap_arg0 =3D ram_size;
+diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
+index a8b3d46..64c8e09 100644
+--- a/hw/arm/musicpal.c
++++ b/hw/arm/musicpal.c
+@@ -1594,10 +1594,6 @@ static void musicpal_init(MachineState *machine)
+         cpu_model =3D "arm926";
+     }
+     cpu =3D ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, cpu_model));
+-    if (!cpu) {
+-        fprintf(stderr, "Unable to find CPU definition\n");
+-        exit(1);
+-    }
+=20
+     /* For now we use a fixed - the original - RAM size */
+     memory_region_allocate_system_memory(ram, NULL, "musicpal.ram",
+diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
+index 400ba30..04e65ce 100644
+--- a/hw/arm/omap1.c
++++ b/hw/arm/omap1.c
+@@ -3864,10 +3864,6 @@ struct omap_mpu_state_s *omap310_mpu_init(MemoryRe=
+gion *system_memory,
+     /* Core */
+     s->mpu_model =3D omap310;
+     s->cpu =3D ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, core));
+-    if (s->cpu =3D=3D NULL) {
+-        fprintf(stderr, "Unable to find CPU definition\n");
+-        exit(1);
+-    }
+     s->sdram_size =3D sdram_size;
+     s->sram_size =3D OMAP15XX_SRAM_SIZE;
+=20
+diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
+index ece25ae..5821477 100644
+--- a/hw/arm/omap2.c
++++ b/hw/arm/omap2.c
+@@ -2262,10 +2262,6 @@ struct omap_mpu_state_s *omap2420_mpu_init(MemoryR=
+egion *sysmem,
+     /* Core */
+     s->mpu_model =3D omap2420;
+     s->cpu =3D ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, core ?: "arm1136-r=
+2"));
+-    if (s->cpu =3D=3D NULL) {
+-        fprintf(stderr, "Unable to find CPU definition\n");
+-        exit(1);
+-    }
+     s->sdram_size =3D sdram_size;
+     s->sram_size =3D OMAP242X_SRAM_SIZE;
+=20
+diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
+index b0ac3cf..c16657d 100644
+--- a/hw/arm/pxa2xx.c
++++ b/hw/arm/pxa2xx.c
+@@ -2067,10 +2067,6 @@ PXA2xxState *pxa270_init(MemoryRegion *address_spa=
+ce,
+         revision =3D "pxa270";
+=20
+     s->cpu =3D ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, revision));
+-    if (s->cpu =3D=3D NULL) {
+-        fprintf(stderr, "Unable to find CPU definition\n");
+-        exit(1);
+-    }
+     s->reset =3D qemu_allocate_irq(pxa2xx_reset, s, 0);
+=20
+     /* SDRAM & Internal Memory Storage */
+@@ -2197,10 +2193,6 @@ PXA2xxState *pxa255_init(MemoryRegion *address_spa=
+ce, unsigned int sdram_size)
+     s =3D g_new0(PXA2xxState, 1);
+=20
+     s->cpu =3D ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, "pxa255"));
+-    if (s->cpu =3D=3D NULL) {
+-        fprintf(stderr, "Unable to find CPU definition\n");
+-        exit(1);
+-    }
+     s->reset =3D qemu_allocate_irq(pxa2xx_reset, s, 0);
+=20
+     /* SDRAM & Internal Memory Storage */
+diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
+index 884242b..c1145dd 100644
+--- a/hw/arm/strongarm.c
++++ b/hw/arm/strongarm.c
+@@ -1599,11 +1599,6 @@ StrongARMState *sa1110_init(MemoryRegion *sysmem,
+=20
+     s->cpu =3D ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, rev));
+=20
+-    if (!s->cpu) {
+-        error_report("Unable to find CPU definition");
+-        exit(1);
+-    }
+-
+     memory_region_allocate_system_memory(&s->sdram, NULL, "strongarm.sdr=
+am",
+                                          sdram_size);
+     memory_region_add_subregion(sysmem, SA_SDCS0, &s->sdram);
+diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
+index eccf0ac..b0bb3ef 100644
+--- a/hw/lm32/lm32_boards.c
++++ b/hw/lm32/lm32_boards.c
+@@ -105,10 +105,6 @@ static void lm32_evr_init(MachineState *machine)
+         cpu_model =3D "lm32-full";
+     }
+     cpu =3D LM32_CPU(cpu_generic_init(TYPE_LM32_CPU, cpu_model));
+-    if (cpu =3D=3D NULL) {
+-        fprintf(stderr, "qemu: unable to find CPU '%s'\n", cpu_model);
+-        exit(1);
+-    }
+=20
+     env =3D &cpu->env;
+     reset_info->cpu =3D cpu;
+@@ -206,10 +202,6 @@ static void lm32_uclinux_init(MachineState *machine)
+         cpu_model =3D "lm32-full";
+     }
+     cpu =3D LM32_CPU(cpu_generic_init(TYPE_LM32_CPU, cpu_model));
+-    if (cpu =3D=3D NULL) {
+-        fprintf(stderr, "qemu: unable to find CPU '%s'\n", cpu_model);
+-        exit(1);
+-    }
+=20
+     env =3D &cpu->env;
+     reset_info->cpu =3D cpu;
+diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
+index dffd879..4db4d2d 100644
+--- a/hw/lm32/milkymist.c
++++ b/hw/lm32/milkymist.c
+@@ -112,10 +112,6 @@ milkymist_init(MachineState *machine)
+         cpu_model =3D "lm32-full";
+     }
+     cpu =3D LM32_CPU(cpu_generic_init(TYPE_LM32_CPU, cpu_model));
+-    if (cpu =3D=3D NULL) {
+-        fprintf(stderr, "qemu: unable to find CPU '%s'\n", cpu_model);
+-        exit(1);
+-    }
+=20
+     env =3D &cpu->env;
+     reset_info->cpu =3D cpu;
+diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
+index 7b9b15d..9002c46 100644
+--- a/hw/m68k/an5206.c
++++ b/hw/m68k/an5206.c
+@@ -43,10 +43,6 @@ static void an5206_init(MachineState *machine)
+         cpu_model =3D "m5206";
+     }
+     cpu =3D M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
+-    if (!cpu) {
+-        error_report("Unable to find m68k CPU definition");
+-        exit(1);
+-    }
+     env =3D &cpu->env;
+=20
+     /* Initialize CPU registers.  */
+diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
+index 1a0f180..b9dde75 100644
+--- a/hw/m68k/mcf5208.c
++++ b/hw/m68k/mcf5208.c
+@@ -233,10 +233,6 @@ static void mcf5208evb_init(MachineState *machine)
+         cpu_model =3D "m5208";
+     }
+     cpu =3D M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
+-    if (!cpu) {
+-        fprintf(stderr, "Unable to find m68k CPU definition\n");
+-        exit(1);
+-    }
+     env =3D &cpu->env;
+=20
+     /* Initialize CPU registers.  */
+diff --git a/hw/mips/cps.c b/hw/mips/cps.c
+index 4ef337d..79d4c5e 100644
+--- a/hw/mips/cps.c
++++ b/hw/mips/cps.c
+@@ -72,10 +72,6 @@ static void mips_cps_realize(DeviceState *dev, Error *=
+*errp)
+=20
+     for (i =3D 0; i < s->num_vp; i++) {
+         cpu =3D cpu_mips_init(s->cpu_model);
+-        if (cpu =3D=3D NULL) {
+-            error_setg(errp, "%s: CPU initialization failed",  __func__)=
+;
+-            return;
+-        }
+=20
+         /* Init internal devices */
+         cpu_mips_irq_init_cpu(cpu);
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index 3532399..439a3d7 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -281,10 +281,6 @@ static void mips_fulong2e_init(MachineState *machine=
+)
+         cpu_model =3D "Loongson-2E";
+     }
+     cpu =3D cpu_mips_init(cpu_model);
+-    if (cpu =3D=3D NULL) {
+-        fprintf(stderr, "Unable to find CPU definition\n");
+-        exit(1);
+-    }
+     env =3D &cpu->env;
+=20
+     qemu_register_reset(main_cpu_reset, cpu);
+diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
+index df2262a..ae10670 100644
+--- a/hw/mips/mips_jazz.c
++++ b/hw/mips/mips_jazz.c
+@@ -152,10 +152,6 @@ static void mips_jazz_init(MachineState *machine,
+         cpu_model =3D "R4000";
+     }
+     cpu =3D cpu_mips_init(cpu_model);
+-    if (cpu =3D=3D NULL) {
+-        fprintf(stderr, "Unable to find CPU definition\n");
+-        exit(1);
+-    }
+     env =3D &cpu->env;
+     qemu_register_reset(main_cpu_reset, cpu);
+=20
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index af678f5..c82e0af 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -932,10 +932,6 @@ static void create_cpu_without_cps(const char *cpu_m=
+odel,
+=20
+     for (i =3D 0; i < smp_cpus; i++) {
+         cpu =3D cpu_mips_init(cpu_model);
+-        if (cpu =3D=3D NULL) {
+-            fprintf(stderr, "Unable to find CPU definition\n");
+-            exit(1);
+-        }
+=20
+         /* Init internal devices */
+         cpu_mips_irq_init_cpu(cpu);
+diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
+index 07fc4c2..49cd38d 100644
+--- a/hw/mips/mips_mipssim.c
++++ b/hw/mips/mips_mipssim.c
+@@ -164,10 +164,6 @@ mips_mipssim_init(MachineState *machine)
+ #endif
+     }
+     cpu =3D cpu_mips_init(cpu_model);
+-    if (cpu =3D=3D NULL) {
+-        fprintf(stderr, "Unable to find CPU definition\n");
+-        exit(1);
+-    }
+     env =3D &cpu->env;
+=20
+     reset_info =3D g_malloc0(sizeof(ResetData));
+diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+index 2f5ced7..60da607 100644
+--- a/hw/mips/mips_r4k.c
++++ b/hw/mips/mips_r4k.c
+@@ -194,10 +194,6 @@ void mips_r4k_init(MachineState *machine)
+ #endif
+     }
+     cpu =3D cpu_mips_init(cpu_model);
+-    if (cpu =3D=3D NULL) {
+-        fprintf(stderr, "Unable to find CPU definition\n");
+-        exit(1);
+-    }
+     env =3D &cpu->env;
+=20
+     reset_info =3D g_malloc0(sizeof(ResetData));
+diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
+index 4c27b45..5ea8dd3 100644
+--- a/hw/moxie/moxiesim.c
++++ b/hw/moxie/moxiesim.c
+@@ -119,10 +119,6 @@ static void moxiesim_init(MachineState *machine)
+         cpu_model =3D "MoxieLite-moxie-cpu";
+     }
+     cpu =3D MOXIE_CPU(cpu_generic_init(TYPE_MOXIE_CPU, cpu_model));
+-    if (!cpu) {
+-        fprintf(stderr, "Unable to find CPU definition\n");
+-        exit(1);
+-    }
+     env =3D &cpu->env;
+=20
+     qemu_register_reset(main_cpu_reset, cpu);
+diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
+index 243d802..86bf284 100644
+--- a/hw/openrisc/openrisc_sim.c
++++ b/hw/openrisc/openrisc_sim.c
+@@ -110,10 +110,6 @@ static void openrisc_sim_init(MachineState *machine)
+=20
+     for (n =3D 0; n < smp_cpus; n++) {
+         cpu =3D OPENRISC_CPU(cpu_generic_init(TYPE_OPENRISC_CPU, cpu_mod=
+el));
+-        if (cpu =3D=3D NULL) {
+-            fprintf(stderr, "Unable to find CPU definition!\n");
+-            exit(1);
+-        }
+         qemu_register_reset(main_cpu_reset, cpu);
+         main_cpu_reset(cpu);
+     }
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index f0596f3..fc4786c 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -821,10 +821,6 @@ void ppce500_init(MachineState *machine, PPCE500Para=
+ms *params)
+=20
+         cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
+                                            machine->cpu_model));
+-        if (cpu =3D=3D NULL) {
+-            fprintf(stderr, "Unable to initialize CPU!\n");
+-            exit(1);
+-        }
+         env =3D &cpu->env;
+         cs =3D CPU(cpu);
+=20
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index d466634..33b46cb 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -189,10 +189,6 @@ static void ppc_core99_init(MachineState *machine)
+     for (i =3D 0; i < smp_cpus; i++) {
+         cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
+                                            machine->cpu_model));
+-        if (cpu =3D=3D NULL) {
+-            fprintf(stderr, "Unable to find PowerPC CPU definition\n");
+-            exit(1);
+-        }
+         env =3D &cpu->env;
+=20
+         /* Set time-base frequency to 100 Mhz */
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index fcac399..193b904 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -118,10 +118,6 @@ static void ppc_heathrow_init(MachineState *machine)
+     for (i =3D 0; i < smp_cpus; i++) {
+         cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
+                                            machine->cpu_model));
+-        if (cpu =3D=3D NULL) {
+-            fprintf(stderr, "Unable to find PowerPC CPU definition\n");
+-            exit(1);
+-        }
+         env =3D &cpu->env;
+=20
+         /* Set time-base frequency to 16.6 Mhz */
+diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+index ca26398..f92d47f 100644
+--- a/hw/ppc/ppc440_bamboo.c
++++ b/hw/ppc/ppc440_bamboo.c
+@@ -187,10 +187,6 @@ static void bamboo_init(MachineState *machine)
+         machine->cpu_model =3D "440EP";
+     }
+     cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, machine->cpu_=
+model));
+-    if (cpu =3D=3D NULL) {
+-        fprintf(stderr, "Unable to initialize CPU!\n");
+-        exit(1);
+-    }
+     env =3D &cpu->env;
+=20
+     if (env->mmu_model !=3D POWERPC_MMU_BOOKE) {
+diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
+index 6b38ed7..88f3d4c 100644
+--- a/hw/ppc/ppc4xx_devs.c
++++ b/hw/ppc/ppc4xx_devs.c
+@@ -57,11 +57,6 @@ PowerPCCPU *ppc4xx_init(const char *cpu_model,
+=20
+     /* init CPUs */
+     cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, cpu_model));
+-    if (cpu =3D=3D NULL) {
+-        fprintf(stderr, "Unable to find PowerPC %s CPU definition\n",
+-                cpu_model);
+-        exit(1);
+-    }
+     env =3D &cpu->env;
+=20
+     cpu_clk->cb =3D NULL; /* We don't care about CPU clock frequency cha=
+nges */
+diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+index 00f3321..94138a4 100644
+--- a/hw/ppc/prep.c
++++ b/hw/ppc/prep.c
+@@ -522,10 +522,6 @@ static void ppc_prep_init(MachineState *machine)
+     for (i =3D 0; i < smp_cpus; i++) {
+         cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
+                                            machine->cpu_model));
+-        if (cpu =3D=3D NULL) {
+-            fprintf(stderr, "Unable to find PowerPC CPU definition\n");
+-            exit(1);
+-        }
+         env =3D &cpu->env;
+=20
+         if (env->flags & POWERPC_FLAG_RTC_CLK) {
+@@ -726,11 +722,6 @@ static void ibm_40p_init(MachineState *machine)
+         machine->cpu_model =3D "604";
+     }
+     cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, machine->cpu_=
+model));
+-    if (!cpu) {
+-        error_report("could not initialize CPU '%s'",
+-                     machine->cpu_model);
+-        exit(1);
+-    }
+     env =3D &cpu->env;
+     if (PPC_INPUT(env) !=3D PPC_FLAGS_INPUT_6xx) {
+         error_report("only 6xx bus is supported on this machine");
+diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+index d5fdc16..ed9b406 100644
+--- a/hw/ppc/virtex_ml507.c
++++ b/hw/ppc/virtex_ml507.c
+@@ -97,10 +97,6 @@ static PowerPCCPU *ppc440_init_xilinx(ram_addr_t *ram_=
+size,
+     qemu_irq *irqs;
+=20
+     cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, cpu_model));
+-    if (cpu =3D=3D NULL) {
+-        fprintf(stderr, "Unable to initialize CPU!\n");
+-        exit(1);
+-    }
+     env =3D &cpu->env;
+=20
+     ppc_booke_timers_init(cpu, sysclk, 0/* no flags */);
+diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
+index 22bc534..16b9ed2 100644
+--- a/hw/sh4/r2d.c
++++ b/hw/sh4/r2d.c
+@@ -247,10 +247,6 @@ static void r2d_init(MachineState *machine)
+     }
+=20
+     cpu =3D SUPERH_CPU(cpu_generic_init(TYPE_SUPERH_CPU, cpu_model));
+-    if (cpu =3D=3D NULL) {
+-        fprintf(stderr, "Unable to find CPU definition\n");
+-        exit(1);
+-    }
+     env =3D &cpu->env;
+=20
+     reset_info =3D g_malloc0(sizeof(ResetData));
+diff --git a/hw/sh4/shix.c b/hw/sh4/shix.c
+index 7f8a4b6..50ee36a 100644
+--- a/hw/sh4/shix.c
++++ b/hw/sh4/shix.c
+@@ -57,10 +57,6 @@ static void shix_init(MachineState *machine)
+         cpu_model =3D "any";
+=20
+     cpu =3D SUPERH_CPU(cpu_generic_init(TYPE_SUPERH_CPU, cpu_model));
+-    if (cpu =3D=3D NULL) {
+-        fprintf(stderr, "Unable to find CPU definition\n");
+-        exit(1);
+-    }
+=20
+     /* Allocate memory space */
+     memory_region_init_ram(rom, NULL, "shix.rom", 0x4000, &error_fatal);
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index 56512ec..ec2816b 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -127,10 +127,6 @@ static void leon3_generic_hw_init(MachineState *mach=
+ine)
+     }
+=20
+     cpu =3D SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+-    if (cpu =3D=3D NULL) {
+-        fprintf(stderr, "qemu: Unable to find Sparc CPU definition\n");
+-        exit(1);
+-    }
+     env =3D &cpu->env;
+=20
+     cpu_sparc_set_id(env, 0);
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index cf47dca..e1bdd48 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -798,10 +798,6 @@ static void cpu_devinit(const char *cpu_model, unsig=
+ned int id,
+     CPUSPARCState *env;
+=20
+     cpu =3D SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+-    if (cpu =3D=3D NULL) {
+-        fprintf(stderr, "qemu: Unable to find Sparc CPU definition\n");
+-        exit(1);
+-    }
+     env =3D &cpu->env;
+=20
+     cpu_sparc_set_id(env, id);
+diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
+index ecf38a4..097d529 100644
+--- a/hw/sparc64/sparc64.c
++++ b/hw/sparc64/sparc64.c
+@@ -354,10 +354,6 @@ SPARCCPU *sparc64_cpu_devinit(const char *cpu_model,
+         cpu_model =3D default_cpu_model;
+     }
+     cpu =3D SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
+-    if (cpu =3D=3D NULL) {
+-        fprintf(stderr, "Unable to find Sparc CPU definition\n");
+-        exit(1);
+-    }
+     env =3D &cpu->env;
+=20
+     env->tick =3D cpu_timer_create("tick", cpu, tick_irq,
+diff --git a/hw/tricore/tricore_testboard.c b/hw/tricore/tricore_testboar=
+d.c
+index 3fcd8bb..0486f8a 100644
+--- a/hw/tricore/tricore_testboard.c
++++ b/hw/tricore/tricore_testboard.c
+@@ -75,10 +75,6 @@ static void tricore_testboard_init(MachineState *machi=
+ne, int board_id)
+         machine->cpu_model =3D "tc1796";
+     }
+     cpu =3D TRICORE_CPU(cpu_generic_init(TYPE_TRICORE_CPU, machine->cpu_=
+model));
+-    if (!cpu) {
+-        error_report("Unable to find CPU definition");
+-        exit(1);
+-    }
+     env =3D &cpu->env;
+     memory_region_init_ram(ext_cram, NULL, "powerlink_ext_c.ram",
+                            2 * 1024 * 1024, &error_fatal);
+diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
+index eb9862f..504ea46 100644
+--- a/hw/unicore32/puv3.c
++++ b/hw/unicore32/puv3.c
+@@ -128,10 +128,6 @@ static void puv3_init(MachineState *machine)
+     }
+=20
+     cpu =3D UNICORE32_CPU(cpu_generic_init(TYPE_UNICORE32_CPU, cpu_model=
+));
+-    if (!cpu) {
+-        error_report("Unable to find CPU definition");
+-        exit(1);
+-    }
+     env =3D &cpu->env;
+=20
+     puv3_soc_init(env);
+diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
+index 1b4767f..b3580b1 100644
+--- a/hw/xtensa/sim.c
++++ b/hw/xtensa/sim.c
+@@ -85,11 +85,6 @@ static void xtensa_sim_init(MachineState *machine)
+=20
+     for (n =3D 0; n < smp_cpus; n++) {
+         cpu =3D XTENSA_CPU(cpu_generic_init(TYPE_XTENSA_CPU, cpu_model))=
+;
+-        if (cpu =3D=3D NULL) {
+-            error_report("unable to find CPU definition '%s'",
+-                         cpu_model);
+-            exit(EXIT_FAILURE);
+-        }
+         env =3D &cpu->env;
+=20
+         env->sregs[PRID] =3D n;
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index 182ec1e..a19cceb 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -233,11 +233,6 @@ static void lx_init(const LxBoardDesc *board, Machin=
+eState *machine)
+=20
+     for (n =3D 0; n < smp_cpus; n++) {
+         cpu =3D XTENSA_CPU(cpu_generic_init(TYPE_XTENSA_CPU, cpu_model))=
+;
+-        if (cpu =3D=3D NULL) {
+-            error_report("unable to find CPU definition '%s'",
+-                         cpu_model);
+-            exit(EXIT_FAILURE);
+-        }
+         env =3D &cpu->env;
+=20
+         env->sregs[PRID] =3D n;
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 03666ef..829f974 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -4323,10 +4323,6 @@ int main(int argc, char **argv, char **envp)
+     /* NOTE: we need to init the CPU at this stage to get
+        qemu_host_page_size */
+     cpu =3D cpu_init(cpu_model);
+-    if (!cpu) {
+-        fprintf(stderr, "Unable to find CPU definition\n");
+-        exit(EXIT_FAILURE);
+-    }
+     env =3D cpu->env_ptr;
+     cpu_reset(cpu);
+=20
+diff --git a/qom/cpu.c b/qom/cpu.c
+index d715890..307d638 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -61,7 +61,7 @@ CPUState *cpu_create(const char *typename)
+     if (err !=3D NULL) {
+         error_report_err(err);
+         object_unref(OBJECT(cpu));
+-        return NULL;
++        exit(EXIT_FAILURE);
+     }
+     return cpu;
+ }
+@@ -78,8 +78,9 @@ const char *cpu_parse_features(const char *typename, co=
+nst char *cpu_model)
+=20
+     oc =3D cpu_class_by_name(typename, model_pieces[0]);
+     if (oc =3D=3D NULL) {
++        error_report("unable to find CPU model '%s'", model_pieces[0]);
+         g_strfreev(model_pieces);
+-        return NULL;
++        exit(EXIT_FAILURE);
+     }
+=20
+     cpu_type =3D object_class_get_name(oc);
+@@ -88,7 +89,7 @@ const char *cpu_parse_features(const char *typename, co=
+nst char *cpu_model)
+     g_strfreev(model_pieces);
+     if (err !=3D NULL) {
+         error_report_err(err);
+-        return NULL;
++        exit(EXIT_FAILURE);
+     }
+     return cpu_type;
+ }
+@@ -100,10 +101,8 @@ CPUState *cpu_generic_init(const char *typename, con=
+st char *cpu_model)
+      */
+     const char *cpu_type =3D cpu_parse_features(typename, cpu_model);
+=20
+-    if (cpu_type) {
+-        return cpu_create(cpu_type);
+-    }
+-    return NULL;
++    assert(cpu_type);
++    return cpu_create(cpu_type);
+ }
+=20
+ bool cpu_paging_enabled(const CPUState *cpu)
+--=20
 2.7.4
