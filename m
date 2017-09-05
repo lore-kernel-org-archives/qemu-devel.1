@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dpCyF-00066r-EV
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:28:55 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dpCyM-000689-Ij
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:28:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dpCyA-0005UL-Ly
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:28:47 -0400
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:38426)
+	(envelope-from <alex.bennee@linaro.org>) id 1dpCyE-0005W1-Fx
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:28:54 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:37514)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dpCyA-0005TF-Fp
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:28:42 -0400
-Received: by mail-wr0-x236.google.com with SMTP id 108so8361449wra.5
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 05:28:42 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dpCyE-0005Vm-6u
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:28:46 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id n33so8385259wrn.4
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 05:28:46 -0700 (PDT)
+References: <20170829063313.10237-1-bobby.prani@gmail.com>
+	<20170829063313.10237-2-bobby.prani@gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170829063313.10237-2-bobby.prani@gmail.com>
+Date: Tue, 05 Sep 2017 13:28:43 +0100
+Message-ID: <87k21dmiro.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170828221901.12827-1-portia.stephens@xilinx.com>
-References: <20170828221901.12827-1-portia.stephens@xilinx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 Sep 2017 13:28:20 +0100
-Message-ID: <CAFEAcA-5tT6X=N7UOiYMecN-OnxOfDAfoGswa01QXCOt4JDWig@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Remove 5J architecture
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC v3 PATCH 2/5] cpus-common: Cache allocated
+ work items
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +31,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Portia Stephens <portia.stephens@xilinx.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, stephensportia@gmail.com, Alistair Francis <alistair.francis@xilinx.com>
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Sergey Fedorov <serge.fdrv@gmail.com>, qemu-devel@nongnu.org
 
-On 28 August 2017 at 23:19, Portia Stephens <portia.stephens@xilinx.com> wrote:
-> This fixes the issue that any BXJ instruction will result in an illegal_op.
-> This is because the 5J archiecture is always unsupported.
-> 5J architecture doesn't have a feature set and ENABLE_ARCH_5J is hardcoded
-> to 0, causing any ARCH(5J) to result in an illegal_op. The only use of
-> ARCH(5J) is in the BXJ instruction disassembly.
+
+Pranith Kumar <bobby.prani@gmail.com> writes:
+
+> Using heaptrack, I found that quite a few of our temporary allocations
+> are coming from allocating work items. Instead of doing this
+> continously, we can cache the allocated items and reuse them instead
+> of freeing them.
 >
-> This patch replaces that ARCH(5J) with ARCH(6) and removes the 5J architecture,
-> this isn't technically correct since the v5J ISA does support the BXJ
-> instruction. This change means that running a BXJ instruction on any v5 will
-> cause an illegal_op but it is better than the current state where any
-> architecture running a BXJ would cause an illegal_op. The correct solution
-> would be to create a feature set for v5J but that doesn't seem worth it as the
-> v5J is so old.
+> Stats from an ARM64 guest (boot+shutdown):
 >
-> Signed-off-by: Portia Stephens <portia.stephens@xilinx.com>
-> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+> heaptrack stats(before):
+>         allocations:            1471317
+>         leaked allocations:     73824
+>         temporary allocations:  651293
+>
+> heaptrack stats(after):
+>         allocations:            1143130
+>         leaked allocations:     73693
+>         temporary allocations:  487342
+>
+> The improvement in speedup is minor and within error margins, however I think the
+> patch is still worth. We can also explore atomics instead of taking a lock for
+> the work item pool.
+
+When we where doing the original MTTCG work I looked at using GArray for
+the work queue, see:
+
+  http://lists.gnu.org/archive/html/qemu-devel/2016-08/msg00367.html
+
+specifically:
+
+  Subject: [PATCH v5 13/13] cpu-exec: replace cpu->queued_work with GArray
+  Date: Tue,  2 Aug 2016 18:27:44 +0100
+  Message-Id: <1470158864-17651-14-git-send-email-alex.bennee@linaro.org>
+
+which I personally think might yield better results than messing around
+with custom allocators and GSlice and the like. You still get the
+dynamic sizing of a malloc based array but for operations like insertion
+and iterating through the work queue should be cache friendly.
+
+Once the array has (transparently) reached a reasonable size to service
+all allocations in the usual servicing period the same memory can be
+used over and over again ;-)
+
+My fondness for arrays is informed by comments by Bjarne Stroustrup:
+
+  https://www.youtube.com/watch?v=YQs6IC-vgmo
+
+Obviously this patch would need to be re-worked given how much the code
+has changes since it was merged.
+
+>
+> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
 > ---
->  target/arm/translate.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+>  cpus-common.c | 75 +++++++++++++++++++++++++++++++++++++++++++++++------------
+>  1 file changed, 60 insertions(+), 15 deletions(-)
 >
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index d1a5f56998..4a30c0d7e0 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -41,7 +41,6 @@
->  #define ENABLE_ARCH_5     arm_dc_feature(s, ARM_FEATURE_V5)
->  /* currently all emulated v5 cores are also v5TE, so don't bother */
->  #define ENABLE_ARCH_5TE   arm_dc_feature(s, ARM_FEATURE_V5)
-> -#define ENABLE_ARCH_5J    0
->  #define ENABLE_ARCH_6     arm_dc_feature(s, ARM_FEATURE_V6)
->  #define ENABLE_ARCH_6K    arm_dc_feature(s, ARM_FEATURE_V6K)
->  #define ENABLE_ARCH_6T2   arm_dc_feature(s, ARM_FEATURE_THUMB2)
-> @@ -8389,7 +8388,10 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
->              break;
->          case 0x2:
->              if (op1 == 1) {
-> -                ARCH(5J); /* bxj */
-> +                /* This should actually be ARCH(5J) but there is currently no
-> +                 * 5J architecture in QEMU.
-> +                 */
-> +                ARCH(6); /* bxj */
->                  /* Trivial implementation equivalent to bx.  */
->                  tmp = load_reg(s, rm);
->                  gen_bx(s, tmp);
+> diff --git a/cpus-common.c b/cpus-common.c
+> index 59f751ecf9..ccf5f50e4e 100644
+> --- a/cpus-common.c
+> +++ b/cpus-common.c
+> @@ -24,6 +24,7 @@
+>  #include "sysemu/cpus.h"
+>
+>  static QemuMutex qemu_cpu_list_lock;
+> +static QemuMutex qemu_wi_pool_lock;
+>  static QemuCond exclusive_cond;
+>  static QemuCond exclusive_resume;
+>  static QemuCond qemu_work_cond;
+> @@ -33,6 +34,49 @@ static QemuCond qemu_work_cond;
+>   */
+>  static int pending_cpus;
+>
+> +typedef struct qemu_work_item {
+> +    struct qemu_work_item *next;
+> +    run_on_cpu_func func;
+> +    run_on_cpu_data data;
+> +    bool free, exclusive, done;
+> +} qemu_work_item;
+> +
+> +typedef struct qemu_wi_pool {
+> +    qemu_work_item *head;
+> +    int num_items;
+> +} qemu_wi_pool;
+> +
+> +qemu_wi_pool *wi_free_pool;
+> +
+> +static void qemu_init_workitem_pool(void)
+> +{
+> +    wi_free_pool = g_malloc0(sizeof(qemu_wi_pool));
+> +}
+> +
+> +static void qemu_wi_pool_insert(qemu_work_item *item)
+> +{
+> +    qemu_mutex_lock(&qemu_wi_pool_lock);
+> +    qemu_work_item *curr = atomic_read(&wi_free_pool->head);
+> +    item->next = curr;
+> +    wi_free_pool->head = item;
+> +    qemu_mutex_unlock(&qemu_wi_pool_lock);
+> +}
+> +
+> +static qemu_work_item *qemu_wi_pool_remove(void)
+> +{
+> +    qemu_mutex_lock(&qemu_wi_pool_lock);
+> +    qemu_work_item *curr = atomic_read(&wi_free_pool->head);
+> +    if (curr == NULL) {
+> +        goto out;
+> +    }
+> +    wi_free_pool->head = curr->next;
+> +    curr->next = NULL;
+> +
+> + out:
+> +    qemu_mutex_unlock(&qemu_wi_pool_lock);
+> +    return curr;
+> +}
+> +
+>  void qemu_init_cpu_list(void)
+>  {
+>      /* This is needed because qemu_init_cpu_list is also called by the
+> @@ -43,6 +87,9 @@ void qemu_init_cpu_list(void)
+>      qemu_cond_init(&exclusive_cond);
+>      qemu_cond_init(&exclusive_resume);
+>      qemu_cond_init(&qemu_work_cond);
+> +
+> +    qemu_init_workitem_pool();
+> +    qemu_mutex_init(&qemu_wi_pool_lock);
+>  }
+>
+>  void cpu_list_lock(void)
+> @@ -106,14 +153,7 @@ void cpu_list_remove(CPUState *cpu)
+>      qemu_mutex_unlock(&qemu_cpu_list_lock);
+>  }
+>
+> -struct qemu_work_item {
+> -    struct qemu_work_item *next;
+> -    run_on_cpu_func func;
+> -    run_on_cpu_data data;
+> -    bool free, exclusive, done;
+> -};
+> -
+> -static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
+> +static void queue_work_on_cpu(CPUState *cpu, qemu_work_item *wi)
+>  {
+>      qemu_mutex_lock(&cpu->work_mutex);
+>      if (cpu->queued_work_first == NULL) {
+> @@ -132,7 +172,7 @@ static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
+>  void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data,
+>                     QemuMutex *mutex)
+>  {
+> -    struct qemu_work_item wi;
+> +    qemu_work_item wi;
+>
+>      if (qemu_cpu_is_self(cpu)) {
+>          func(cpu, data);
+> @@ -156,9 +196,11 @@ void do_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data,
+>
+>  void async_run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
+>  {
+> -    struct qemu_work_item *wi;
+> +    qemu_work_item *wi = qemu_wi_pool_remove();
+>
+> -    wi = g_malloc0(sizeof(struct qemu_work_item));
+> +    if (!wi) {
+> +        wi = g_malloc0(sizeof(qemu_work_item));
+> +    }
+>      wi->func = func;
+>      wi->data = data;
+>      wi->free = true;
+> @@ -299,9 +341,11 @@ void cpu_exec_end(CPUState *cpu)
+>  void async_safe_run_on_cpu(CPUState *cpu, run_on_cpu_func func,
+>                             run_on_cpu_data data)
+>  {
+> -    struct qemu_work_item *wi;
+> +    qemu_work_item *wi = qemu_wi_pool_remove();
+>
+> -    wi = g_malloc0(sizeof(struct qemu_work_item));
+> +    if (!wi) {
+> +        wi = g_malloc0(sizeof(qemu_work_item));
+> +    }
+>      wi->func = func;
+>      wi->data = data;
+>      wi->free = true;
+> @@ -312,7 +356,7 @@ void async_safe_run_on_cpu(CPUState *cpu, run_on_cpu_func func,
+>
+>  void process_queued_cpu_work(CPUState *cpu)
+>  {
+> -    struct qemu_work_item *wi;
+> +    qemu_work_item *wi;
+>
+>      if (cpu->queued_work_first == NULL) {
+>          return;
+> @@ -343,7 +387,8 @@ void process_queued_cpu_work(CPUState *cpu)
+>          }
+>          qemu_mutex_lock(&cpu->work_mutex);
+>          if (wi->free) {
+> -            g_free(wi);
+> +            memset(wi, 0, sizeof(qemu_work_item));
+> +            qemu_wi_pool_insert(wi);
+>          } else {
+>              atomic_mb_set(&wi->done, true);
+>          }
 
-Thanks for this patch. However we do have both v5-no-J
-(arm946, all the pxa2xx cores) and v5-with-J CPUs (arm926, arm1026),
-so I think it would be better to fix this bug by adding an
-extra ARM_FEATURE_JAZELLE, which would be set in
-arm_cpu_realizefn() if ARM_FEATURE_V6 is set, and set in
-the per-core realize functions for arm926 and arm1026.
-It should be a fairly small patch overall I think.
 
-thanks
--- PMM
+--
+Alex Bennée
