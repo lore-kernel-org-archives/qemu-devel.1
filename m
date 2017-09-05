@@ -1,41 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dp9cj-0007Ju-PH
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 04:54:26 -0400
+	(envelope-from <famz@redhat.com>) id 1dp9dZ-0007wL-Ug
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 04:55:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dp9ce-0007CI-V8
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 04:54:21 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56099
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dp9ce-0007C7-P3
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 04:54:16 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v858s7OR082602
-	for <qemu-devel@nongnu.org>; Tue, 5 Sep 2017 04:54:16 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2csq86p0en-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 04:54:15 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 5 Sep 2017 09:54:14 +0100
-References: <20170904154316.4148-1-david@redhat.com>
-	<20170904154316.4148-5-david@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 5 Sep 2017 10:54:09 +0200
+	(envelope-from <famz@redhat.com>) id 1dp9dR-0007dK-28
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 04:55:09 -0400
+Date: Tue, 5 Sep 2017 16:54:41 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170905085441.GU22515@lemon.lan>
+References: <20170830100605.22694-1-famz@redhat.com>
+	<20170905084431.GA4633@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20170904154316.4148-5-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <3ff50714-ccfa-7471-063d-ebef989590f1@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 04/19] s390x: rename s390-virtio.h to
- s390-virtio-hcall.h
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170905084431.GA4633@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH] block: Cleanup BMDS in bdrv_close_all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,78 +23,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org, peterx@redhat.com, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 09/04/2017 05:43 PM, David Hildenbrand wrote:
-> The only interface left, so let's properly rename it.
+On Tue, 09/05 10:44, Kevin Wolf wrote:
+> Am 30.08.2017 um 12:06 hat Fam Zheng geschrieben:
+> > This fixes the assertion due to op blockers added by BMDS:
+> > 
+> > block.c:3248: bdrv_delete: Assertion `bdrv_op_blocker_is_empty(bs)' failed.
+> > 
+> > Reproducer: simply start block migration and quit QEMU before it ends.
+> > 
+> > Cc: qemu-stable@nongnu.org
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > ---
+> >  block.c                 | 2 ++
+> >  migration/block.c       | 2 +-
+> >  migration/block.h       | 1 +
+> >  stubs/Makefile.objs     | 1 +
+> >  stubs/block-migration.c | 6 ++++++
+> >  5 files changed, 11 insertions(+), 1 deletion(-)
+> >  create mode 100644 stubs/block-migration.c
+> > 
+> > diff --git a/block.c b/block.c
+> > index 3308814bba..508a57274d 100644
+> > --- a/block.c
+> > +++ b/block.c
+> > @@ -43,6 +43,7 @@
+> >  #include "qemu/cutils.h"
+> >  #include "qemu/id.h"
+> >  #include "qapi/util.h"
+> > +#include "migration/block.h"
+> >  
+> >  #ifdef CONFIG_BSD
+> >  #include <sys/ioctl.h>
+> > @@ -3111,6 +3112,7 @@ static void bdrv_close(BlockDriverState *bs)
+> >  
+> >  void bdrv_close_all(void)
+> >  {
+> > +    block_migration_cleanup_bmds();
+> >      block_job_cancel_sync_all();
+> >      nbd_export_close_all();
 > 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+> This is before bdrv_drain_all(). Can't we still have a block migration
+> request in flight, whose callback will then dereference a stale pointer?
 
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+You're right, bdrv_drain_all should be called first.
 
-> ---
->  hw/s390x/s390-virtio-ccw.c                      | 2 +-
->  hw/s390x/s390-virtio-hcall.c                    | 2 +-
->  hw/s390x/{s390-virtio.h => s390-virtio-hcall.h} | 8 ++++----
->  3 files changed, 6 insertions(+), 6 deletions(-)
->  rename hw/s390x/{s390-virtio.h => s390-virtio-hcall.h} (77%)
-> 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 4c3a3e177b..f67b4b5d58 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -16,7 +16,7 @@
->  #include "cpu.h"
->  #include "hw/boards.h"
->  #include "exec/address-spaces.h"
-> -#include "s390-virtio.h"
-> +#include "hw/s390x/s390-virtio-hcall.h"
->  #include "hw/s390x/sclp.h"
->  #include "hw/s390x/s390_flic.h"
->  #include "hw/s390x/ioinst.h"
-> diff --git a/hw/s390x/s390-virtio-hcall.c b/hw/s390x/s390-virtio-hcall.c
-> index 23d67d6170..ec7cf8beb3 100644
-> --- a/hw/s390x/s390-virtio-hcall.c
-> +++ b/hw/s390x/s390-virtio-hcall.c
-> @@ -11,7 +11,7 @@
-> 
->  #include "qemu/osdep.h"
->  #include "cpu.h"
-> -#include "hw/s390x/s390-virtio.h"
-> +#include "hw/s390x/s390-virtio-hcall.h"
-> 
->  #define MAX_DIAG_SUBCODES 255
-> 
-> diff --git a/hw/s390x/s390-virtio.h b/hw/s390x/s390-virtio-hcall.h
-> similarity index 77%
-> rename from hw/s390x/s390-virtio.h
-> rename to hw/s390x/s390-virtio-hcall.h
-> index d984cd4115..59fcba3a06 100644
-> --- a/hw/s390x/s390-virtio.h
-> +++ b/hw/s390x/s390-virtio-hcall.h
-> @@ -1,5 +1,5 @@
->  /*
-> - * Virtio interfaces for s390
-> + * Support for virtio hypercalls on s390x
->   *
->   * Copyright 2012 IBM Corp.
->   * Author(s): Cornelia Huck <cornelia.huck@de.ibm.com>
-> @@ -9,12 +9,12 @@
->   * directory.
->   */
-> 
-> -#ifndef HW_S390_VIRTIO_H
-> -#define HW_S390_VIRTIO_H
-> +#ifndef HW_S390_VIRTIO_HCALL_H
-> +#define HW_S390_VIRTIO_HCALL_H
-> 
->  #include "standard-headers/asm-s390/kvm_virtio.h"
->  #include "standard-headers/asm-s390/virtio-ccw.h"
-> 
->  typedef int (*s390_virtio_fn)(const uint64_t *args);
->  void s390_register_virtio_hypercall(uint64_t code, s390_virtio_fn fn);
-> -#endif
-> +#endif /* HW_S390_VIRTIO_HCALL_H */
-> 
+Fam
