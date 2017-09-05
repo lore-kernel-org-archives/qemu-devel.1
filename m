@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpLFs-00011m-Uu
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 17:19:37 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dpLP1-0002si-Ob
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 17:29:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpLFo-0006MH-5G
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 17:19:32 -0400
-References: <1504541267-36954-1-git-send-email-pradeep.jagadeesh@huawei.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <809da3cc-4051-cb39-7f6a-2355013d3f9a@redhat.com>
-Date: Tue, 5 Sep 2017 16:19:11 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1dpLOx-0003dN-1L
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 17:28:59 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:34635)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dpLOw-0003cm-QJ
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 17:28:54 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id a47so9185988wra.1
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 14:28:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1504541267-36954-1-git-send-email-pradeep.jagadeesh@huawei.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="6ijkiRs6wOgkSLPOdM9ervufAr2qio2dp"
-Subject: Re: [Qemu-devel] [PATCH v10 0/6] fsdev: qmp interface for io
- throttling
+In-Reply-To: <cfc75c71-1558-3405-8e5c-188cdb329bfe@amsat.org>
+References: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
+	<1503414539-28762-2-git-send-email-peter.maydell@linaro.org>
+	<cfc75c71-1558-3405-8e5c-188cdb329bfe@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 5 Sep 2017 22:28:32 +0100
+Message-ID: <CAFEAcA_OcZ6SzGioQcscv2YQZ1t_xGB3fg7iJrJKui3gwwoKQA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 01/20] target/arm: Implement
+ ARMv8M's PMSAv8 registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +32,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, greg kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org, "kwolf@redhat.com" <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6ijkiRs6wOgkSLPOdM9ervufAr2qio2dp
-From: Eric Blake <eblake@redhat.com>
-To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, greg kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>,
- alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org,
- "kwolf@redhat.com" <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>
-Message-ID: <809da3cc-4051-cb39-7f6a-2355013d3f9a@redhat.com>
-Subject: Re: [PATCH v10 0/6] fsdev: qmp interface for io throttling
-References: <1504541267-36954-1-git-send-email-pradeep.jagadeesh@huawei.com>
-In-Reply-To: <1504541267-36954-1-git-send-email-pradeep.jagadeesh@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 5 September 2017 at 20:16, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+> Hi Peter,
+>
+>
+> On 08/22/2017 12:08 PM, Peter Maydell wrote:
+>>   diff --git a/target/arm/machine.c b/target/arm/machine.c
+>> index 3193b00..05e2909 100644
+>> --- a/target/arm/machine.c
+>> +++ b/target/arm/machine.c
+>> @@ -159,7 +159,8 @@ static bool pmsav7_needed(void *opaque)
+>>       CPUARMState *env =3D &cpu->env;
+>>         return arm_feature(env, ARM_FEATURE_PMSA) &&
+>> -           arm_feature(env, ARM_FEATURE_V7);
+>> +           arm_feature(env, ARM_FEATURE_V7) &&
+>> +           !arm_feature(env, ARM_FEATURE_V8);
+>>   }
+>>     static bool pmsav7_rgnr_vmstate_validate(void *opaque, int version_i=
+d)
+>> @@ -209,6 +210,31 @@ static const VMStateDescription vmstate_pmsav7_rnr =
+=3D
+>> {
+>>       }
+>>   };
+>>   +static bool pmsav8_needed(void *opaque)
+>> +{
+>> +    ARMCPU *cpu =3D opaque;
+>> +    CPUARMState *env =3D &cpu->env;
+>> +
+>> +    return arm_feature(env, ARM_FEATURE_PMSA) &&
+>> +        arm_feature(env, ARM_FEATURE_V8);
+>> +}
+>> +
+>> +static const VMStateDescription vmstate_pmsav8 =3D {
+>> +    .name =3D "cpu/pmsav8",
+>> +    .version_id =3D 1,
+>> +    .minimum_version_id =3D 1,
+>> +    .needed =3D pmsav8_needed,
+>> +    .fields =3D (VMStateField[]) {
+>> +        VMSTATE_VARRAY_UINT32(env.pmsav8.rbar, ARMCPU, pmsav7_dregion, =
+0,
+>> +                              vmstate_info_uint32, uint32_t),
+>> +        VMSTATE_VARRAY_UINT32(env.pmsav8.rlar, ARMCPU, pmsav7_dregion, =
+0,
+>> +                              vmstate_info_uint32, uint32_t),
+>> +        VMSTATE_UINT32(env.pmsav8.mair0, ARMCPU),
+>> +        VMSTATE_UINT32(env.pmsav8.mair1, ARMCPU),
+>> +        VMSTATE_END_OF_LIST()
+>> +    }
+>> +};
+>> +
+>>   static int get_cpsr(QEMUFile *f, void *opaque, size_t size,
+>>                       VMStateField *field)
+>>   {
+>>
+>
+> maybe you plan to add migration between version 22 and 23 in a later patc=
+h,
+> else
+>
+> ...
+> const VMStateDescription vmstate_arm_cpu =3D {
+>     ...
+>     .subsections =3D (const VMStateDescription*[]) {
+>         ...
+>         &vmstate_pmsav8,
+>
+> do not forget this ^
 
-On 09/04/2017 11:07 AM, Pradeep Jagadeesh wrote:
-> These patches provide the qmp interface, to query the io throttle=20
-> status of the all fsdev devices that are present in a vm.
-> also, it provides an interface to set the io throttle parameters of a
-> fsdev to a required value. some of the patches also remove the duplicat=
-e
-> code that was present in block and fsdev files.=20
->=20
-> Pradeep Jagadeesh (6):
->   throttle: factor out duplicate code
->   qmp: Create IOThrottle structure
->   throttle: move out function to reuse the code
->   hmp: create a throttle initialization function for code reusability
->   fsdev: QMP interface for throttling
->   fsdev: hmp interface for throttling
+Whoops, yes, I forgot that bit. I'm surprised the compiler
+didn't complain about the unused variables...
 
-I know you're already up to v10, but your code changes conflict with
-Manos throttling work, which has now landed on Kevin's branch:
-
-https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01051.html
-
-T: git git://repo.or.cz/qemu/kevin.git block
-
-How hard is it for you to post a rebased v11 on top of Manos' work?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+There's no need to worry about migration compat in any
+of these v8M-specific vmstate structs, because right now
+there are no QEMU CPUs with v8M enabled and so the
+vmstate struct can't be used. That means we can freely
+add fields to them in later patches without having to
+bump version numbers or otherwise keep compatibility.
+Once the patch which adds a cortex-m33 CPU lands in
+master the rules will change and we'll need to be more
+careful.
 
 
---6ijkiRs6wOgkSLPOdM9ervufAr2qio2dp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmvFM8ACgkQp6FrSiUn
-Q2qIWQf8CA8dQkGAA1SLnHSaLg6WZUWtESNPKKxASKAT/eT9+WIhfA19AiDoUH/J
-JOhlrpkAplCzm7NEESm4g7xN/dtL0ffJqCrDrc9RKiUf4SUfqKRig2Hkb3VznJu2
-iUM+lcNlZPj3LDaW9ipYGohIEc4qbnOohHCir3NthIrwt+57XMgQqfzUMbEdnpDr
-nGPMKvJ77NHcK4bcDylsKtYjtrONvlh8lPPrr4DnEzCFIUmLpOljZV4K1+YI/QzG
-e4bOEkKIvKbmkrt9WaGgg+vLVoarDs7kr+1WkCHktDM2Ovcuz7VDoXGnGfrqu0NQ
-cZghyHvB7xb/+kJCJFw5KjL/vpsoUQ==
-=uhd7
------END PGP SIGNATURE-----
-
---6ijkiRs6wOgkSLPOdM9ervufAr2qio2dp--
+thanks
+-- PMM
