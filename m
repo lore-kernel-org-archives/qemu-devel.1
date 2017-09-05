@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dp8np-00019H-LB
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 04:01:55 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dp8om-0001YX-2f
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 04:02:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dp8nk-00056G-NB
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 04:01:45 -0400
-Received: from 7.mo178.mail-out.ovh.net ([46.105.58.91]:53230)
+	(envelope-from <cohuck@redhat.com>) id 1dp8og-0005ro-VL
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 04:02:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49440)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dp8nk-00052V-H3
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 04:01:40 -0400
-Received: from player728.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id BCFD751F7C
-	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 10:01:31 +0200 (CEST)
-Date: Tue, 5 Sep 2017 10:01:27 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170905100127.4892e02f@bahia>
-In-Reply-To: <1504545540-8002-1-git-send-email-peter.maydell@linaro.org>
-References: <1504545540-8002-1-git-send-email-peter.maydell@linaro.org>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dp8og-0005rP-Ld
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 04:02:38 -0400
+Date: Tue, 5 Sep 2017 10:02:34 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170905100234.7a92128e.cohuck@redhat.com>
+In-Reply-To: <e805e756-495d-3125-eaf0-262635b9c545@linux.vnet.ibm.com>
+References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
+	<20170830163609.50260-3-pasic@linux.vnet.ibm.com>
+	<20170831111953.242ddc28.cohuck@redhat.com>
+	<e805e756-495d-3125-eaf0-262635b9c545@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/uX_=e1jTB.3GULWVEs.aDLT";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] configure: Drop AIX host support
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/9] s390x: fix invalid use of cc 1 for SSCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,125 +29,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
---Sig_/uX_=e1jTB.3GULWVEs.aDLT
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Thu, 31 Aug 2017 12:41:05 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-On Mon,  4 Sep 2017 18:19:00 +0100
-Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 08/31/2017 11:19 AM, Cornelia Huck wrote:
+> > On Wed, 30 Aug 2017 18:36:02 +0200
+> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> >   
+> >> According to the POP a start subchannel instruction (SSCH) returning with
+> >> cc 1 implies that the subchannel was status pending when SSCH executed.
+> >>
+> >> Due to a somewhat confusing error handling, where error codes are mapped
+> >> to cc value, sane looking error codes result in non AR compliant
+> >> behavior.
+> >>
+> >> Let's fix this! Instead of cc 1 we use cc 3 which means device not
+> >> operational, and is much closer to the truth in the given cases.
+> >>
+> >> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> >> Acked-by: Pierre Morel<pmorel@linux.vnet.ibm.com>
+> >> ---
+> >>
+> >> This patch turned out quite controversial. We did not reach a consensus
+> >> during the internal review.
+> >>
+> >> The most of the discussion revolved around the ORB flag which
+> >> architecturally must be supported, but are currently not supported by
+> >> vfio-ccw (not yet, or can't be). The idea showing the most promise for
+> >> consensus was to handle this via device status (along the lines better a
+> >> strange acting device than a non-conform machine) but since it's a
+> >> radical change we decided to first discuss upstream and then do whatever
+> >> needs to be done.
+> >> ---
+> >>  hw/s390x/css.c      | 15 ++++++---------
+> >>  hw/s390x/s390-ccw.c |  2 +-
+> >>  2 files changed, 7 insertions(+), 10 deletions(-)
+> >>
+> >> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> >> index a50fb0727e..0822538cde 100644
+> >> --- a/hw/s390x/css.c
+> >> +++ b/hw/s390x/css.c
+> >> @@ -1034,7 +1034,7 @@ static int sch_handle_start_func_passthrough(SubchDev *sch)
+> >>       */
+> >>      if (!(orb->ctrl0 & ORB_CTRL0_MASK_PFCH) ||
+> >>          !(orb->ctrl0 & ORB_CTRL0_MASK_C64)) {
+> >> -        return -EINVAL;
+> >> +        return -ENODEV;  
+> > 
+> > This feels wrong. If we don't support this yet, doing something like a
+> > channel-program check or an operand exception feels closer to the
+> > architecture than indicating a gone device.  
+> 
+> I disagree, a channel-program check or an operand exception, or cc 1
+> (current solution) makes the machine obviously non-conform.
 
-> Nobody has mentioned AIX host support on the mailing list for years,
-> and we have no test systems for it so it is most likely broken.
-> We've advertised in configure for two releases now that we plan
-> to drop support for this host OS, and have had no complaints.
-> Drop the AIX host support code.
->=20
-> We can also drop the now-unused AIX version of sys_cache_info().
->=20
-> Note that the _CALL_AIX define used in the PPC tcg backend is
-> also used for Linux PPC64, and so that code should not be removed.
->=20
+Well, it *is* not compliant...
 
-Yeah this is used by the old big-endian ABI.
+> 
+> My train of thought was that architecturally you can loose connection
+> to the device at any time (you can't prohibit admins pulling cables or
+> smashing equipment with a 10kg hammer).
 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
+But that's not what you're doing: Iff you want to signal 'device
+gone' (and I'm not convinced it's a good idea), you need to do more
+than signal cc 3.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+> 
+> Also from the guest OS perspective I think saying device not operational
+> could provoke a proper reaction form the guest OS: that is just give up
+> on the device. The things you propose would in my opinion put the blame
+> on the guest OS driver (making non-conform requests) so in that case
+> it would make sense to give up on the driver (but the same driver could
+> wonderfully work with let's say a fully emulated device).
 
->  configure        | 13 +------------
->  util/cacheinfo.c | 11 +----------
->  2 files changed, 2 insertions(+), 22 deletions(-)
->=20
-> diff --git a/configure b/configure
-> index fb7e34a..931b3ba 100755
-> --- a/configure
-> +++ b/configure
-> @@ -350,7 +350,6 @@ cocoa=3D"no"
->  softmmu=3D"yes"
->  linux_user=3D"no"
->  bsd_user=3D"no"
-> -aix=3D"no"
->  blobs=3D"yes"
->  pkgversion=3D""
->  pie=3D""
-> @@ -554,8 +553,6 @@ elif check_define __NetBSD__; then
->    targetos=3D'NetBSD'
->  elif check_define __APPLE__; then
->    targetos=3D'Darwin'
-> -elif check_define _AIX; then
-> -  targetos=3D'AIX'
->  else
->    # This is a fatal error, but don't report it yet, because we
->    # might be going to just print the --help text, or it might
-> @@ -767,10 +764,6 @@ SunOS)
->    LIBS=3D"$solarisnetlibs $LIBS"
->    libs_qga=3D"$solarisnetlibs $libs_qga"
->  ;;
-> -AIX)
-> -  aix=3D"yes"
-> -  make=3D"${MAKE-gmake}"
-> -;;
->  Haiku)
->    haiku=3D"yes"
->    QEMU_CFLAGS=3D"-DB_USE_POSITIVE_POSIX_ERRORS $QEMU_CFLAGS"
-> @@ -4214,7 +4207,7 @@ elif compile_prog "" "$pthread_lib -lrt" ; then
->  fi
-> =20
->  if test "$darwin" !=3D "yes" -a "$mingw32" !=3D "yes" -a "$solaris" !=3D=
- yes -a \
-> -        "$aix" !=3D "yes" -a "$haiku" !=3D "yes" ; then
-> +        "$haiku" !=3D "yes" ; then
->      libs_softmmu=3D"-lutil $libs_softmmu"
->  fi
-> =20
-> @@ -5523,10 +5516,6 @@ if test "$darwin" =3D "yes" ; then
->    echo "CONFIG_DARWIN=3Dy" >> $config_host_mak
->  fi
-> =20
-> -if test "$aix" =3D "yes" ; then
-> -  echo "CONFIG_AIX=3Dy" >> $config_host_mak
-> -fi
-> -
->  if test "$solaris" =3D "yes" ; then
->    echo "CONFIG_SOLARIS=3Dy" >> $config_host_mak
->  fi
-> diff --git a/util/cacheinfo.c b/util/cacheinfo.c
-> index 593940f..db5172d 100644
-> --- a/util/cacheinfo.c
-> +++ b/util/cacheinfo.c
-> @@ -15,16 +15,7 @@ int qemu_dcache_linesize =3D 0;
->   * Operating system specific detection mechanisms.
->   */
-> =20
-> -#if defined(_AIX)
-> -# include <sys/systemcfg.h>
-> -
-> -static void sys_cache_info(int *isize, int *dsize)
-> -{
-> -    *isize =3D _system_configuration.icache_line;
-> -    *dsize =3D _system_configuration.dcache_line;
-> -}
-> -
-> -#elif defined(_WIN32)
-> +#if defined(_WIN32)
-> =20
->  static void sys_cache_info(int *isize, int *dsize)
->  {
+I'd not call that 'putting blame on the driver'. What happens is that
+we signal the driver 'you send us something we cannot deal with' - the
+more common reason for that is that the driver built an invalid
+request, but I've certainly seen rejects for stuff that simply was not
+implemented in the past.
 
+The important thing is that I don't want to lie to the driver: The
+device is there, and will work with a different request. Also see my
+comment above.
 
---Sig_/uX_=e1jTB.3GULWVEs.aDLT
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+(The real fix is of course to implement what is required by the
+architecture :), but I don't think cc 3 is a good stop-gap measure.)
 
------BEGIN PGP SIGNATURE-----
+> 
+> As I have stated in the cover letter of this patch, I would find
+> setting device status even better, but I wanted to discuss first
+> before going from setting cc to something else.
+> 
+> Setting cc was not my idea in the first place (AFAIK the -EINVAL
+> here effectively triggers cc 1).
 
-iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWa5Z1wAKCRAC/DrrAQHb
-wg+WAKCa68tPwDP29b9a95uouGEXMzK3bgCfa1aiynCgpxJN8Go9FsyCXyuVp+0=
-=0vWA
------END PGP SIGNATURE-----
+Something else than cc 1 is better, yes (but the intention was probably
+a channel-program check or so).
 
---Sig_/uX_=e1jTB.3GULWVEs.aDLT--
+> 
+> >   
+> >>      }
+> >>  
+> >>      ret = s390_ccw_cmd_request(orb, s, sch->driver_data);
+> >> @@ -1046,16 +1046,13 @@ static int sch_handle_start_func_passthrough(SubchDev *sch)
+> >>          break;
+> >>      case -ENODEV:
+> >>          break;
+> >> +    case -EFAULT:
+> >> +         break;
+> >>      case -EACCES:
+> >>          /* Let's reflect an inaccessible host device by cc 3. */
+> >> -        ret = -ENODEV;
+> >> -        break;
+> >>      default:
+> >> -       /*
+> >> -        * All other return codes will trigger a program check,
+> >> -        * or set cc to 1.
+> >> -        */
+> >> -       break;
+> >> +        /* Let's make all other return codes map to cc 3.  */
+> >> +        ret = -ENODEV;  
+> > 
+> > Why? This feels wrong. For those cases where we want to signal an error
+> > but cc 1 is conceptually wrong, either an operand exception (for very
+> > few cases) or a channel-program check feels more in line with the
+> > architecture.  
+> 
+> You mean the original code feels wrong, or? I keep the program check for
+> -EFAULT (that's why it's added) and just change cc 1 to cc 3 for the
+> not explicitly handled error codes (reason stated in the commit message).
+
+I mean that both feel wrong :) Moving away from abuses of cc 1 makes
+sense, but I don't think cc 3 is the correct direction.
+
+> 
+> > 
+> > That's a general problem with doing stuff in the hypervisor: We have
+> > sets of internal problems that obviously don't show up in the
+> > architecture, and we can either handle them internally or use what the
+> > architecture offers for problem signaling. z/VM has probably faced the
+> > same problems :)  
+> 
+> I agree.
+> 
+> >   
+> >>      };
+> >>  
+> >>      return ret;
+> >> @@ -1115,7 +1112,7 @@ static int do_subchannel_work(SubchDev *sch)
+> >>      if (sch->do_subchannel_work) {
+> >>          return sch->do_subchannel_work(sch);
+> >>      } else {
+> >> -        return -EINVAL;
+> >> +        return -ENODEV;  
+> > 
+> > This rather seems like a job for an assert? If we don't have a function
+> > for the 'asynchronous' handling of the various functions assigned for a
+> > subchannel, that looks like an internal error.
+> >   
+> 
+> IMHO it depends. Aborting qemu is heavy handed, and as an user I would not
+> be happy about it. But certainly it is an assert situation.  We can look for
+> an even better solution, but I think this is an improvement. The logic behind
+> is that the device is broken and can't be talked to properly.
+
+We currently don't have a vast array of subchannel types (and are
+unlikely to get more types that need a different handler function). We
+know the current ones are fine, and an assert would catch programming
+errors early.
+
+> 
+> >>      }
+> >>  }
+> >>  
+> >> diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
+> >> index 8614dda6f8..2b0741741c 100644
+> >> --- a/hw/s390x/s390-ccw.c
+> >> +++ b/hw/s390x/s390-ccw.c
+> >> @@ -25,7 +25,7 @@ int s390_ccw_cmd_request(ORB *orb, SCSW *scsw, void *data)
+> >>      if (cdc->handle_request) {
+> >>          return cdc->handle_request(orb, scsw, data);
+> >>      } else {
+> >> -        return -ENOSYS;
+> >> +        return -ENODEV;  
+> > 
+> > If we get here, it means that we called a request handler (which is
+> > only done for the passthrough variety) without having assigned a
+> > request handler beforehand. This also looks like an internal error to
+> > me...
+> >   
+> 
+> Certainly. Again I was not the one who wrote or accepted the original
+> code. My previous comment about whether assert or not applies here as
+> well.
+
+My answer applies even more here :)
