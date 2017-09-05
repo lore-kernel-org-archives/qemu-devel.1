@@ -1,43 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dpArM-0006gl-9U
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:13:37 -0400
+	(envelope-from <thuth@redhat.com>) id 1dpAuE-0000mB-E9
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:16:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dpArE-0003dw-EJ
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:13:32 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46393
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
-	id 1dpArE-0003dZ-8q
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:13:24 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v85A8eZd007921
-	for <qemu-devel@nongnu.org>; Tue, 5 Sep 2017 06:13:23 -0400
-Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cspu33a4b-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 06:13:23 -0400
-Received: from localhost
-	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
-	Tue, 5 Sep 2017 20:13:20 +1000
-Received: from d23av05.au.ibm.com (d23av05.au.ibm.com [9.190.234.119])
-	by d23relay06.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v85ADHVq40960142
-	for <qemu-devel@nongnu.org>; Tue, 5 Sep 2017 20:13:17 +1000
-Received: from d23av05.au.ibm.com (localhost [127.0.0.1])
-	by d23av05.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v85ADGus012104
-	for <qemu-devel@nongnu.org>; Tue, 5 Sep 2017 20:13:17 +1000
-From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Date: Tue,  5 Sep 2017 12:13:00 +0200
-In-Reply-To: <1504606380-49341-1-git-send-email-zyimin@linux.vnet.ibm.com>
-References: <1504606380-49341-1-git-send-email-zyimin@linux.vnet.ibm.com>
-Message-Id: <1504606380-49341-4-git-send-email-zyimin@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 3/3] s390x/pci: add iommu replay callback
+	(envelope-from <thuth@redhat.com>) id 1dpAu9-0005wH-92
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:16:30 -0400
+References: <20170901180340.30009-1-eblake@redhat.com>
+	<20170901180340.30009-16-eblake@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7ba1c642-f17d-8f55-ae14-18b8bd55fa9d@redhat.com>
+Date: Tue, 5 Sep 2017 12:16:20 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170901180340.30009-16-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 15/29] libqos: Use explicit QTestState
+ for rtas operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,50 +25,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, cohuck@redhat.com, agraf@suse.de, richard.henderson@linaro.org, zyimin@linux.vnet.ibm.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, armbru@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-Let's introduce iommu replay callback for s390 pci iommu memory region.
-Currently we don't need any dma mapping replay. So let it return
-directly. This implementation will avoid meaningless loops calling
-translation callback.
+On 01.09.2017 20:03, Eric Blake wrote:
+> Drop one more client of global_qtest by teaching all rtas test
+> functionality to pass in an explicit QTestState, adjusting all
+> callers.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  tests/libqos/rtas.h      |  9 ++++++---
+>  tests/libqos/pci-spapr.c | 18 ++++++++++++------
+>  tests/libqos/rtas.c      | 21 ++++++++++++---------
+>  tests/rtas-test.c        |  2 +-
+>  4 files changed, 31 insertions(+), 19 deletions(-)
+> 
+> diff --git a/tests/libqos/rtas.h b/tests/libqos/rtas.h
+> index 498eb19230..e3d0f850a7 100644
+> --- a/tests/libqos/rtas.h
+> +++ b/tests/libqos/rtas.h
+> @@ -7,9 +7,12 @@
+>  #define LIBQOS_RTAS_H
+>  #include "libqos/malloc.h"
+> 
+> -int qrtas_get_time_of_day(QGuestAllocator *alloc, struct tm *tm, uint32_t *ns);
+> -uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
+> +int qrtas_get_time_of_day(QTestState *qts, QGuestAllocator *alloc,
+> +                          struct tm *tm, uint32_t *ns);
+> +uint32_t qrtas_ibm_read_pci_config(QTestState *qts, QGuestAllocator *alloc,
+> +                                   uint64_t buid,
+>                                     uint32_t addr, uint32_t size);
+> -int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
+> +int qrtas_ibm_write_pci_config(QTestState *qts, QGuestAllocator *alloc,
+> +                               uint64_t buid,
+>                                 uint32_t addr, uint32_t size, uint32_t val);
+>  #endif /* LIBQOS_RTAS_H */
+> diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
+> index d7b2aa75e6..b7199501b4 100644
+> --- a/tests/libqos/pci-spapr.c
+> +++ b/tests/libqos/pci-spapr.c
+> @@ -108,21 +108,24 @@ static uint8_t qpci_spapr_config_readb(QPCIBus *bus, int devfn, uint8_t offset)
+>  {
+>      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+>      uint32_t config_addr = (devfn << 8) | offset;
+> -    return qrtas_ibm_read_pci_config(s->alloc, s->buid, config_addr, 1);
+> +    return qrtas_ibm_read_pci_config(bus->qts, s->alloc, s->buid,
+> +                                     config_addr, 1);
+>  }
+> 
+>  static uint16_t qpci_spapr_config_readw(QPCIBus *bus, int devfn, uint8_t offset)
+>  {
+>      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+>      uint32_t config_addr = (devfn << 8) | offset;
+> -    return qrtas_ibm_read_pci_config(s->alloc, s->buid, config_addr, 2);
+> +    return qrtas_ibm_read_pci_config(bus->qts, s->alloc, s->buid,
+> +                                     config_addr, 2);
+>  }
+> 
+>  static uint32_t qpci_spapr_config_readl(QPCIBus *bus, int devfn, uint8_t offset)
+>  {
+>      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+>      uint32_t config_addr = (devfn << 8) | offset;
+> -    return qrtas_ibm_read_pci_config(s->alloc, s->buid, config_addr, 4);
+> +    return qrtas_ibm_read_pci_config(bus->qts, s->alloc, s->buid,
+> +                                     config_addr, 4);
+>  }
+> 
+>  static void qpci_spapr_config_writeb(QPCIBus *bus, int devfn, uint8_t offset,
+> @@ -130,7 +133,8 @@ static void qpci_spapr_config_writeb(QPCIBus *bus, int devfn, uint8_t offset,
+>  {
+>      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+>      uint32_t config_addr = (devfn << 8) | offset;
+> -    qrtas_ibm_write_pci_config(s->alloc, s->buid, config_addr, 1, value);
+> +    qrtas_ibm_write_pci_config(bus->qts, s->alloc, s->buid,
+> +                               config_addr, 1, value);
+>  }
+> 
+>  static void qpci_spapr_config_writew(QPCIBus *bus, int devfn, uint8_t offset,
+> @@ -138,7 +142,8 @@ static void qpci_spapr_config_writew(QPCIBus *bus, int devfn, uint8_t offset,
+>  {
+>      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+>      uint32_t config_addr = (devfn << 8) | offset;
+> -    qrtas_ibm_write_pci_config(s->alloc, s->buid, config_addr, 2, value);
+> +    qrtas_ibm_write_pci_config(bus->qts, s->alloc, s->buid,
+> +                               config_addr, 2, value);
+>  }
+> 
+>  static void qpci_spapr_config_writel(QPCIBus *bus, int devfn, uint8_t offset,
+> @@ -146,7 +151,8 @@ static void qpci_spapr_config_writel(QPCIBus *bus, int devfn, uint8_t offset,
+>  {
+>      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+>      uint32_t config_addr = (devfn << 8) | offset;
+> -    qrtas_ibm_write_pci_config(s->alloc, s->buid, config_addr, 4, value);
+> +    qrtas_ibm_write_pci_config(bus->qts, s->alloc, s->buid,
+> +                               config_addr, 4, value);
+>  }
+> 
+>  #define SPAPR_PCI_BASE               (1ULL << 45)
+> diff --git a/tests/libqos/rtas.c b/tests/libqos/rtas.c
+> index 0269803ce0..fb25f91723 100644
+> --- a/tests/libqos/rtas.c
+> +++ b/tests/libqos/rtas.c
+> @@ -26,7 +26,8 @@ static void qrtas_copy_ret(uint64_t target_ret, uint32_t nret, uint32_t *ret)
+>      }
+>  }
+> 
+> -static uint64_t qrtas_call(QGuestAllocator *alloc, const char *name,
+> +static uint64_t qrtas_call(QTestState *qts, QGuestAllocator *alloc,
+> +                           const char *name,
+>                             uint32_t nargs, uint32_t *args,
+>                             uint32_t nret, uint32_t *ret)
+>  {
+> @@ -37,8 +38,7 @@ static uint64_t qrtas_call(QGuestAllocator *alloc, const char *name,
+>      target_ret = guest_alloc(alloc, nret * sizeof(uint32_t));
+> 
+>      qrtas_copy_args(target_args, nargs, args);
+> -    res = qtest_rtas_call(global_qtest, name,
+> -                          nargs, target_args, nret, target_ret);
+> +    res = qtest_rtas_call(qts, name, nargs, target_args, nret, target_ret);
+>      qrtas_copy_ret(target_ret, nret, ret);
+> 
+>      guest_free(alloc, target_ret);
+> @@ -47,12 +47,13 @@ static uint64_t qrtas_call(QGuestAllocator *alloc, const char *name,
+>      return res;
+>  }
+> 
+> -int qrtas_get_time_of_day(QGuestAllocator *alloc, struct tm *tm, uint32_t *ns)
+> +int qrtas_get_time_of_day(QTestState *qts, QGuestAllocator *alloc,
+> +                          struct tm *tm, uint32_t *ns)
+>  {
+>      int res;
+>      uint32_t ret[8];
+> 
+> -    res = qrtas_call(alloc, "get-time-of-day", 0, NULL, 8, ret);
+> +    res = qrtas_call(qts, alloc, "get-time-of-day", 0, NULL, 8, ret);
+>      if (res != 0) {
+>          return res;
+>      }
+> @@ -70,7 +71,8 @@ int qrtas_get_time_of_day(QGuestAllocator *alloc, struct tm *tm, uint32_t *ns)
+>      return res;
+>  }
+> 
+> -uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
+> +uint32_t qrtas_ibm_read_pci_config(QTestState *qts, QGuestAllocator *alloc,
+> +                                   uint64_t buid,
+>                                     uint32_t addr, uint32_t size)
+>  {
+>      int res;
+> @@ -80,7 +82,7 @@ uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
+>      args[1] = buid >> 32;
+>      args[2] = buid & 0xffffffff;
+>      args[3] = size;
+> -    res = qrtas_call(alloc, "ibm,read-pci-config", 4, args, 2, ret);
+> +    res = qrtas_call(qts, alloc, "ibm,read-pci-config", 4, args, 2, ret);
+>      if (res != 0) {
+>          return -1;
+>      }
+> @@ -92,7 +94,8 @@ uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
+>      return ret[1];
+>  }
+> 
+> -int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
+> +int qrtas_ibm_write_pci_config(QTestState *qts, QGuestAllocator *alloc,
+> +                               uint64_t buid,
+>                                 uint32_t addr, uint32_t size, uint32_t val)
+>  {
+>      int res;
+> @@ -103,7 +106,7 @@ int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
+>      args[2] = buid & 0xffffffff;
+>      args[3] = size;
+>      args[4] = val;
+> -    res = qrtas_call(alloc, "ibm,write-pci-config", 5, args, 1, ret);
+> +    res = qrtas_call(qts, alloc, "ibm,write-pci-config", 5, args, 1, ret);
+>      if (res != 0) {
+>          return -1;
+>      }
+> diff --git a/tests/rtas-test.c b/tests/rtas-test.c
+> index 276c87ef84..34a692163f 100644
+> --- a/tests/rtas-test.c
+> +++ b/tests/rtas-test.c
+> @@ -16,7 +16,7 @@ static void test_rtas_get_time_of_day(void)
+>      qs = qtest_spapr_boot("-machine pseries");
+> 
+>      t1 = time(NULL);
+> -    ret = qrtas_get_time_of_day(qs->alloc, &tm, &ns);
+> +    ret = qrtas_get_time_of_day(qs->qts, qs->alloc, &tm, &ns);
+>      g_assert_cmpint(ret, ==, 0);
+>      t2 = mktimegm(&tm);
+>      g_assert(t2 - t1 < 5); /* 5 sec max to run the test */
+> 
 
-Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
----
- hw/s390x/s390-pci-bus.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index bd8a3e1e1c..3b9965fde0 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -397,6 +397,17 @@ static IOMMUTLBEntry s390_translate_iommu(IOMMUMemoryRegion *mr, hwaddr addr,
-     return ret;
- }
- 
-+static void s390_pci_iommu_replay(IOMMUMemoryRegion *iommu,
-+                                  IOMMUNotifier *notifier)
-+{
-+    /* It's impossible to plug a pci device on s390x that already has iommu
-+     * mappings which need to be replayed, that is due to the "one iommu per
-+     * zpci device" construct. But when we support migration of vfio-pci
-+     * devices in future, we need to revisit this.
-+     */
-+    return;
-+}
-+
- static S390PCIIOMMU *s390_pci_get_iommu(S390pciState *s, PCIBus *bus,
-                                         int devfn)
- {
-@@ -1045,6 +1056,7 @@ static void s390_iommu_memory_region_class_init(ObjectClass *klass, void *data)
-     IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
- 
-     imrc->translate = s390_translate_iommu;
-+    imrc->replay = s390_pci_iommu_replay;
- }
- 
- static const TypeInfo s390_iommu_memory_region_info = {
--- 
-2.11.0 (Apple Git-81)
+Reviewed-by: Thomas Huth <thuth@redhat.com>
