@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dpEmO-0000eE-9x
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:24:45 -0400
+	(envelope-from <armbru@redhat.com>) id 1dpEmj-0000vl-PU
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:25:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dpEmJ-0002Nv-8I
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:24:40 -0400
-Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:52913)
+	(envelope-from <armbru@redhat.com>) id 1dpEmb-0002Yh-Sm
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:25:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49172)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dpEmJ-0002Lj-1o
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:24:35 -0400
-Received: from player157.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 0A282AAEB2
-	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 16:24:32 +0200 (CEST)
-Date: Tue, 5 Sep 2017 16:24:25 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170905162425.3a202a87@bahia>
-In-Reply-To: <1d5efdef-21b8-9b7b-6939-339b97fd9bce@redhat.com>
-References: <150451194093.7046.18254446012958612468.stgit@bahia>
-	<1d5efdef-21b8-9b7b-6939-339b97fd9bce@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dpEmb-0002Xp-KO
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:24:53 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
+	<20170822132255.23945-23-marcandre.lureau@redhat.com>
+Date: Tue, 05 Sep 2017 16:24:48 +0200
+In-Reply-To: <20170822132255.23945-23-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 22 Aug 2017
+	15:22:23 +0200")
+Message-ID: <87lgltp6j3.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/9glOxOmFT1hlWQgHCaHOX1G";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] virtfs: error out gracefully when
- mandatory suboptions are missing
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 22/54] qapi-introspect: add preprocessor
+ conditions to generated QLit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,105 +30,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, mdroth@linux.vnet.ibm.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
---Sig_/9glOxOmFT1hlWQgHCaHOX1G
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-On Tue, 5 Sep 2017 15:35:34 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+> Add 'ifcond' condition to QLit objects.
+>
+> to_qlit() handles the (obj, ifcond) tuples.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi-introspect.py | 20 +++++++++++---------
+>  1 file changed, 11 insertions(+), 9 deletions(-)
+>
+> diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
+> index 9ef6f271d4..5e736a06df 100644
+> --- a/scripts/qapi-introspect.py
+> +++ b/scripts/qapi-introspect.py
+> @@ -125,12 +125,12 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+>              return '[' + self._use_type(typ.element_type) + ']'
+>          return self._name(typ.name)
+>=20=20
+> -    def _gen_qlit(self, name, mtype, obj):
+> +    def _gen_qlit(self, name, mtype, obj, ifcond):
+>          if mtype not in ('command', 'event', 'builtin', 'array'):
+>              name =3D self._name(name)
+>          obj['name'] =3D name
+>          obj['meta-type'] =3D mtype
+> -        self._qlits.append(obj)
+> +        self._qlits.append((obj, ifcond))
 
-> On 04.09.2017 09:59, Greg Kurz wrote:
-> > We internally convert -virtfs to -fsdev/-device. If the user doesn't
-> > provide the path or security_model suboptions, and the fsdev backend
-> > requires them, we hit an assertion when populating the internal -fsdev
-> > option:
-> >=20
-> > util/qemu-option.c:547: opt_set: Assertion `opt->str' failed.
-> > Aborted (core dumped)
-> >=20
-> > Let's test the suboption presence on the command line before trying
-> > to set it in the internal -fsdev option, and let the backend code
-> > error out gracefully (ie, like it already does when the user passes
-> > -fsdev on the command line).
-> >=20
-> > Reported-by: Thomas Huth <thuth@redhat.com>
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  vl.c |   16 ++++++++++------
-> >  1 file changed, 10 insertions(+), 6 deletions(-)
-> >=20
-> > diff --git a/vl.c b/vl.c
-> > index 8e247cc2a239..d63269332fed 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -3557,7 +3557,7 @@ int main(int argc, char **argv, char **envp)
-> >              case QEMU_OPTION_virtfs: {
-> >                  QemuOpts *fsdev;
-> >                  QemuOpts *device;
-> > -                const char *writeout, *sock_fd, *socket;
-> > +                const char *writeout, *sock_fd, *socket, *path, *secur=
-ity_model;
-> > =20
-> >                  olist =3D qemu_find_opts("virtfs");
-> >                  if (!olist) {
-> > @@ -3596,11 +3596,15 @@ int main(int argc, char **argv, char **envp)
-> >                  }
-> >                  qemu_opt_set(fsdev, "fsdriver",
-> >                               qemu_opt_get(opts, "fsdriver"), &error_ab=
-ort);
-> > -                qemu_opt_set(fsdev, "path", qemu_opt_get(opts, "path"),
-> > -                             &error_abort);
-> > -                qemu_opt_set(fsdev, "security_model",
-> > -                             qemu_opt_get(opts, "security_model"),
-> > -                             &error_abort);
-> > +                path =3D qemu_opt_get(opts, "path");
-> > +                if (path) {
-> > +                    qemu_opt_set(fsdev, "path", path, &error_abort);
-> > +                }
-> > +                security_model =3D qemu_opt_get(opts, "security_model"=
-);
-> > +                if (security_model) {
-> > +                    qemu_opt_set(fsdev, "security_model", security_mod=
-el,
-> > +                                 &error_abort);
-> > +                }
-> >                  socket =3D qemu_opt_get(opts, "socket");
-> >                  if (socket) {
-> >                      qemu_opt_set(fsdev, "socket", socket, &error_abort=
-); =20
->=20
-> By the way, I think this should be CC:-ed to stable, too.
->=20
+If I read this correctly, all elements of self._qlits become pairs, even
+the unconditional ones.  They all go through to_qlit()'s tuple case.
+Works, because gen_if(None) and gen_endif(None) do nothing.
 
-Well, it's been there forever and it isn't a critical fix... but the
-thread on qemu-discuss the other day showed that it was confusing
-people, and the fix is trivial. So I guess it doesn't hurt to have
-this in stable. :)
+Would
 
-Michael,
+           if ifcond:
+               obj =3D (obj, ifcond)
+           self.qlits.append(obj)
 
-I'll send a pull req later today. If it's not too late, maybe you can add
-this patch to 2.9.1 when it's merged in master?
+be clearer?  It could be a bit more efficient, but I doubt that matters.
 
-Cheers,
-
---
-Greg
-
->  Thomas
-
---Sig_/9glOxOmFT1hlWQgHCaHOX1G
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWa6zmQAKCRAC/DrrAQHb
-wj6IAJ0dn+60IMF0sJixH+rJ1JBJOvef7wCeOSNV7wj9EzEygJ10yQct9gJ/qsA=
-=TnFN
------END PGP SIGNATURE-----
-
---Sig_/9glOxOmFT1hlWQgHCaHOX1G--
+>=20=20
+>      def _gen_member(self, member):
+>          ret =3D {'name': member.name, 'type': self._use_type(member.type=
+)}
+> @@ -146,26 +146,27 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+>          return {'case': variant.name, 'type': self._use_type(variant.typ=
+e)}
+>=20=20
+>      def visit_builtin_type(self, name, info, json_type):
+> -        self._gen_qlit(name, 'builtin', {'json-type': json_type})
+> +        self._gen_qlit(name, 'builtin', {'json-type': json_type}, None)
+>=20=20
+>      def visit_enum_type(self, name, info, values, prefix, ifcond):
+> -        self._gen_qlit(name, 'enum', {'values': values})
+> +        self._gen_qlit(name, 'enum', {'values': values}, ifcond)
+>=20=20
+>      def visit_array_type(self, name, info, element_type, ifcond):
+>          element =3D self._use_type(element_type)
+> -        self._gen_qlit('[' + element + ']', 'array', {'element-type': el=
+ement})
+> +        self._gen_qlit('[' + element + ']', 'array', {'element-type': el=
+ement},
+> +                       ifcond)
+>=20=20
+>      def visit_object_type_flat(self, name, info, members, variants, ifco=
+nd):
+>          obj =3D {'members': [self._gen_member(m) for m in members]}
+>          if variants:
+>              obj.update(self._gen_variants(variants.tag_member.name,
+>                                            variants.variants))
+> -        self._gen_qlit(name, 'object', obj)
+> +        self._gen_qlit(name, 'object', obj, ifcond)
+>=20=20
+>      def visit_alternate_type(self, name, info, variants, ifcond):
+>          self._gen_qlit(name, 'alternate',
+>                         {'members': [{'type': self._use_type(m.type)}
+> -                                    for m in variants.variants]})
+> +                                    for m in variants.variants]}, ifcond)
+>=20=20
+>      def visit_command(self, name, info, arg_type, ret_type,
+>                        gen, success_response, boxed, ifcond):
+> @@ -173,11 +174,12 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+>          ret_type =3D ret_type or self._schema.the_empty_object_type
+>          self._gen_qlit(name, 'command',
+>                         {'arg-type': self._use_type(arg_type),
+> -                        'ret-type': self._use_type(ret_type)})
+> +                        'ret-type': self._use_type(ret_type)}, ifcond)
+>=20=20
+>      def visit_event(self, name, info, arg_type, boxed, ifcond):
+>          arg_type =3D arg_type or self._schema.the_empty_object_type
+> -        self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_ty=
+pe)})
+> +        self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_ty=
+pe)},
+> +                       ifcond)
+>=20=20
+>  # Debugging aid: unmask QAPI schema's type names
+>  # We normally mask them, because they're not QMP wire ABI
